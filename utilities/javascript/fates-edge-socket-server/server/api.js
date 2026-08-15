@@ -1071,6 +1071,43 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // NEW: flip a knowledge[] entry's live `revealed` gate. `by` is
+    // optional free-form provenance (e.g. 'AI_GM', a GM's display name)
+    // for the log/reference dump -- see server/adventure.js's KNOWLEDGE
+    // STATE doc comment for the full design. Broadcasting
+    // 'adventure-knowledge-revealed'/'-hidden' (rather than reusing a
+    // generic 'adventure-loaded'-style event) lets clients react to just
+    // this without re-rendering the whole adventure panel.
+    router.post('/api/rooms/:code/adventure/knowledge/reveal', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { id, by } = req.body;
+            if (!id) return res.status(400).json({ error: 'id is required' });
+            const state = adventure.revealKnowledge(r, id, { by });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-knowledge-revealed', { source: 'api', id, ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            const notFound = err.message.includes('No knowledge entry') || err.message.includes('No adventure');
+            res.status(notFound ? 404 : 400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/adventure/knowledge/hide', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { id, by } = req.body;
+            if (!id) return res.status(400).json({ error: 'id is required' });
+            const state = adventure.hideKnowledge(r, id, { by });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-knowledge-hidden', { source: 'api', id, ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            const notFound = err.message.includes('No knowledge entry') || err.message.includes('No adventure');
+            res.status(notFound ? 404 : 400).json({ error: err.message });
+        }
+    });
+
     router.post('/api/rooms/:code/adventure/scene', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);

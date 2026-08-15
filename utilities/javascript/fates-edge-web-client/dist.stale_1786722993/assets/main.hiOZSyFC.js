@@ -216,7 +216,7 @@ import{t as He}from"./rolldown-runtime.BQ-_32WO.js";import{d as oe,f as D,i as O
             </div>
             <div class="field">
                 <label>Campaign Code</label>
-                <input type="text" id="sync-campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" />
+                <input type="text" id="sync-campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" />
             </div>
             <div class="field">
                 <label>Password</label>

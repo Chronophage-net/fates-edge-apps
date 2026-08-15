@@ -67,7 +67,7 @@ DISCORD_GUILD_ID=YOUR_GUILD_ID  # Optional, for dev
 # Fate's Edge VTT Server
 VTT_SERVER_URL=ws://localhost:10000
 VTT_API_KEY=your-api-key
-VTT_ROOM_CODE=ABC123
+VTT_ROOM_CODE=AC12
 VTT_LOG_CHANNEL=123456789012345678  # Channel for GM notifications
 
 # Bot Settings
@@ -143,7 +143,7 @@ docker-compose --profile discord-bot up
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `/vtt connect [room]` | Connect to VTT server | `/vtt connect ABC123` |
+| `/vtt connect [room]` | Connect to VTT server | `/vtt connect AC12` |
 | `/vtt disconnect` | Disconnect from VTT server | `/vtt disconnect` |
 | `/vtt status` | Show connection status | `/vtt status` |
 | `/vtt info` | Show room info and clients | `/vtt info` |
@@ -234,7 +234,7 @@ docker-compose --profile discord-bot up
 | `/vttadmin players` | List players currently in the VTT room | `/vttadmin players` |
 | `/vttadmin kick <target> [reason]` | Kick a player from the VTT room | `/vttadmin kick "Levi" "AFK too long"` |
 | `/vttadmin ban <target> [reason]` | Ban a player from the VTT room | `/vttadmin ban "Levi"` |
-| `/vttadmin unban <client-id>` | Unban a client by id | `/vttadmin unban ws-abc123` |
+| `/vttadmin unban <client-id>` | Unban a client by id | `/vttadmin unban ws-AC12` |
 | `/vttadmin role <target> <role> [save]` | Change a player's role — Co-GM, Assistant GM, Player, or Spectator (server enforces GM-only; `save` persists a Co-GM/Assistant GM grant across reconnects, demotions always persist) | `/vttadmin role "AI_GM" assistant-gm save:True` |
 
 `target` in the commands above accepts either a player's display name or their raw client id (`ws-...`/socket.io id). `role` assigns `assistant-gm` to the AI GM Bot's own client the same way you'd promote a human to Co-GM — see the `fates-edge-ai-gm-bot` repo's README ("Assistant GM Mode" section) for what changes once it holds that role.

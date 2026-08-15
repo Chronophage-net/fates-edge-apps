@@ -632,6 +632,33 @@ function setupSocketIO(io, appConfig) {
             }
         });
 
+        // NEW: knowledge state (module.knowledge[] entries) -- see
+        // server/adventure.js's KNOWLEDGE STATE doc comment and the REST
+        // equivalents (POST .../adventure/knowledge/reveal|hide) in api.js.
+        socket.on('adventure-knowledge-reveal', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.revealKnowledge(r, data?.id, { by: data?.by });
+                room.broadcastToRoom(socket.room, 'adventure-knowledge-revealed', { id: data?.id, ...state });
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adventure-knowledge-hide', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = adventure.hideKnowledge(r, data?.id, { by: data?.by });
+                room.broadcastToRoom(socket.room, 'adventure-knowledge-hidden', { id: data?.id, ...state });
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
         socket.on('adventure-state', (callback) => {
             if (!socket.room) { callback?.({ error: 'Not in a room' }); return; }
             const r = room.rooms.get(socket.room);

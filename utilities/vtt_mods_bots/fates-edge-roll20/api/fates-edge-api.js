@@ -25,7 +25,7 @@
  * 2. Paste this script
  * 3. Set environment variables in Roll20 API:
  *    - FATES_EDGE_SERVER_URL: ws://your-server:10000
- *    - FATES_EDGE_ROOM_CODE: ABC123
+ *    - FATES_EDGE_ROOM_CODE: AC12
  *    - FATES_EDGE_PLAYER_NAME: Optional (defaults to Roll20 display name)
  *    - FATES_EDGE_API_KEY: Your API key (if required)
  *    - FATES_EDGE_AUTO_CONNECT: true/false

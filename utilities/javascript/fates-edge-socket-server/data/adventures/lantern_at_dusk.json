@@ -390,5 +390,51 @@
       "use_story_beats": "When a player fails a roll, say: 'That's a Miss. You gain a Story Beat, and I'm going to spend one to make things interesting...' Then introduce a complication. This teaches the SB economy.",
       "summarize_lessons": "At the end of each scene, briefly summarize: 'So in this scene, you learned how Position works, how to use Boons, and how Timers build tension. In the next scene, we'll look at social encounters and alternative resolutions.' This reinforces learning."
     }
-  }
+  },
+  "knowledge": [
+    {
+      "id": "that-the-lantern-cannot-be-destroyed",
+      "subject": "plot",
+      "gm": "That the lantern cannot be destroyed — this is a Partial Outcome reveal in the Resolution scene; do not telegraph it early",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-lena-is-working-for-someone",
+      "subject": "plot",
+      "gm": "That Lena is working for someone else — this is a potential recurring plot hook; let her mention 'someone in the city' vaguely, but do not name the patron",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-the-duskwights-were-once-human",
+      "subject": "plot",
+      "gm": "That the Duskwights were once human — this is the emotional weight of the Spirit Corridor; let it emerge through roleplay, not GM exposition",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-the-barrow-guardian-exists-it",
+      "subject": "plot",
+      "gm": "That the Barrow Guardian exists — it appears only if the party disturbs the lantern; do not foreshadow it heavily",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    }
+  ]
 }

@@ -609,13 +609,6 @@
     }
   ],
   "notes": "This adventure uses the Horror Campaigns expansion mechanics: Dread (individual), Reality Fracture (represented by Deep Drake Awakening), Collective Sanity, and Environmental Doom. The Whisper mechanic is key – every roll in corrupted areas risks advancing Dread and the primary timer. The party must balance investigation, survival, and psychological integrity. Success requires either binding the Drake, escaping before it fully awakens, or making a terrible sacrifice.",
-  "currentAct": 0,
-  "currentScene": 0,
-  "startedAt": null,
-  "completedAt": null,
-  "status": "planned",
-  "createdAt": "2026-07-29T00:00:00.000Z",
-  "updatedAt": "2026-07-29T00:00:00.000Z",
   "_gmhints": {
     "tone": "THIS ADVENTURE IS A TENSE, ISOLATION-BASED COSMIC HORROR SURVIVAL STORY. The tone should be claustrophobic, oppressive, and psychologically draining. The Deep Drake is not a monster to be fought—it is a pressure that thinks. It is the spawn of the world worm Nidhoggr, and it feeds on the Aeler (dwarves) whom it can entrance. Being in the tunnels of Thepyrgos is new to it—it is not prepared for this environment, and neither are the PCs. This mutual unpreparedness is the key tension: the Drake is learning the tunnels as the party tries to survive them. The whispers should be personal, patient, and always true—the Drake does not lie, because it does not need to. The truth is more devastating than any lie. Rennik is pragmatic, logical, and increasingly paranoid—he is the canary in the coal mine. Mira is stoic, professional, and determined—she will sacrifice herself if it buys the party time. The tunnels themselves are a character: ancient, labyrinthine, and indifferent to human suffering. The water is unnaturally cold and seems to pull at limbs. Time flows strangely. The walls breathe. Every scene should feel like the party is being watched, tested, and slowly consumed.",
     "pacing": {
@@ -646,5 +639,124 @@
       "collective_sanity": "Collective Sanity is the party-wide timer. When it advances, describe shared hallucinations: a door that appears to all of them, a voice that they all hear, a smell that fills the chamber. When it fills, shared hallucinations become real—all Perception rolls are Desperate for the scene. This is a moment of crisis. Let the players feel the pressure of their collective mental state fracturing.",
       "the_bargain": "The Deep Drake offers bargains that seem fair. It offers power, knowledge, escape. The price is always a memory, a name, a promise. Every bargain feeds the Drake—it grows stronger with every deal. The party should feel the weight of every bargain. The Bone Merchant is a warning: he was once a mortal scholar, now he serves the Drake because he has nothing left. The party is on the same path."
     }
-  }
+  },
+  "currentAct": 0,
+  "currentScene": 0,
+  "startedAt": null,
+  "completedAt": null,
+  "status": "planned",
+  "createdAt": "2026-07-29T00:00:00.000Z",
+  "updatedAt": "2026-07-29T00:00:00.000Z",
+  "knowledge": [
+    {
+      "id": "rennik-stoneheart-secret",
+      "subject": "npc-rennik-stoneheart",
+      "gm": "Rennik is pragmatic, logical, and increasingly paranoid. He speaks in mathematical equations under stress—this is his coping mechanism, not a quirk. He is haunted by a previous collapse he survived; he carries the guilt of those he could not save. He is the first to show signs of corruption—if the party does not help him, he will become a Stage 1 Drakespawn. His arc is about whether he can be saved or whether he is too far gone. Do not make him a villain; make him a cautionary tale.",
+      "player": "Rennik Stoneheart plays the part everyone assumes: Lead Engineer. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "captain-mira-deeproad-secret",
+      "subject": "npc-captain-mira-deeproad",
+      "gm": "Mira is stoic, professional, and determined. She lost her brother to a tunnel accident years ago—she carries his badge. She will sacrifice herself to buy the party time if it comes to that. Her arc is about whether she can protect her people or whether she will break under the weight of command. She is not cold—she is burdened. Her moments of vulnerability should be rare and powerful.",
+      "player": "Captain Mira Deeproad plays the part everyone assumes: Tunnel Guard Commander. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "bone-merchant-secret",
+      "subject": "npc-bone-merchant",
+      "gm": "The Bone Merchant was once a mortal scholar who sought to understand the Deep Drake. Now he serves it—his service is not slavery, but addiction. He collects memories and debts because they are all he has left. He is not evil—he is tragic. He will trade information for memories, but every trade feeds the Drake. He is a warning to the party about what they might become.",
+      "player": "The Bone Merchant plays the part everyone assumes: Ghostly Spirit. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "master-thane-echo-secret",
+      "subject": "npc-master-thane-echo",
+      "gm": "Master Thane's Echo is a ghostly artisan who knows the original binding ritual. He is reluctant to share it because his apprentices were corrupted by the Drake. He is not malicious—he is protective and haunted. He will help the party if they prove they are not seeking power, only survival. His knowledge is the key to binding the Drake—but using it requires sacrifice.",
+      "player": "Master Thane's Echo plays the part everyone assumes: Ghostly Artisan. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "that-the-deep-drake-is-nidhoggr-s",
+      "subject": "plot",
+      "gm": "That the Deep Drake is Nidhoggr's spawn — this is a deep lore reveal; hint at it through Aelerian carvings, but do not state it plainly until Act II at the earliest",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-the-drake-is-unprepared-for",
+      "subject": "plot",
+      "gm": "That the Drake is unprepared for the Thepyrgos tunnels — this is a subtle tactical advantage; let the party discover it through observation (e.g., the Drake's whispers are sometimes confused, its influence flickers in certain chambers)",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-binding-the-drake-requires-sacrifice",
+      "subject": "plot",
+      "gm": "That binding the Drake requires sacrifice — foreshadow it, but do not state it mechanically until the party is in the Drowned Palace",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-rennik-will-become-a-drakespawn",
+      "subject": "plot",
+      "gm": "That Rennik will become a Drakespawn if not saved — this is the emotional gut-punch of Act I; let it emerge through his behavior, not through GM exposition",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-mira-carries-her-brother-s-badge",
+      "subject": "plot",
+      "gm": "That Mira carries her brother's badge — this is a character detail that should emerge naturally, not be volunteered",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-the-crying-workshop-s-forge-can",
+      "subject": "plot",
+      "gm": "That the Crying Workshop's forge can create binding stones — this is the Act II discovery; do not mention it in Act I",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    }
+  ]
 }

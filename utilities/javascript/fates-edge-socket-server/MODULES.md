@@ -114,7 +114,7 @@ Once a module is installed (on disk or via the API above), broadcast it to every
 curl -X POST http://localhost:3000/api/modules/my-adventure/push \
   -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{ "roomCode": "ABC123" }'
+  -d '{ "roomCode": "AC12" }'
 ```
 
 Omit `roomCode` to broadcast to every active room on the server.

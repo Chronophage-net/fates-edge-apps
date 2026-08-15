@@ -3,6 +3,15 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **Adventure Engine: structured knowledge state** (`fates-edge-socket-server/server/adventure.js`). Adventure modules can now define a `knowledge[]` array of `{ id, subject, gm, player, revealed, revealCondition, tags }` entries — an explicit, queryable game-state answer to "what is the party allowed to know right now?" instead of leaving it to be inferred from `_gmhints` prose (still fully supported, unchanged). `revealed` is live state, reset to its authored value on every `loadAdventureModule()`/`loadAdventureContent()` alongside existing scene/timer resets, and flipped at runtime via new `revealKnowledge(room, id, { by })` / `hideKnowledge(room, id, { by })`.
+- Two new REST routes: `POST /api/rooms/:code/adventure/knowledge/reveal` and `.../knowledge/hide`, both `{ id, by? }`, broadcasting `adventure-knowledge-revealed`/`-hidden` to the room. Same `authenticate`-only gating as the rest of the Adventure Engine's routes — no new role/permission model introduced.
+- `getPublicState()` (the player-safe live-state fetch) now includes a filtered `knowledge` view — `{ id, subject, revealed, text }`, where `text` is the entry's `player` text pre-reveal and its full `gm` text once revealed. `gm` and `revealCondition` are never included here.
+- `getReferenceData()` (the existing GM/AI-eyes-only reference fetch, already home to full NPC/bestiary/notes secrets) now includes the full `knowledge[]` array unfiltered — this is what `fates-edge-ai-gm-bot`'s system prompt is built from.
+- Matching Socket.IO/plain-WS parity for the two new REST routes above: `adventure-knowledge-reveal` / `adventure-knowledge-hide` events on both transports (`ws-handlers.js`, `socketio-handlers.js`), broadcasting the same `adventure-knowledge-revealed` / `adventure-knowledge-hidden` events — same one-event-per-REST-route convention every other Adventure Engine route already follows.
+
 ## [4.14.0] - 2026-08-14
 
 Addresses three abuse-hardening/scaling gaps flagged from a review of the socket-server's `DESIGN.md`: no general API rate limiting, no way to use more than one CPU core on a single machine, and no cap on how many clients a single room can hold.

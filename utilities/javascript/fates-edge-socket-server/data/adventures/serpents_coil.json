@@ -653,13 +653,6 @@
     }
   ],
   "notes": "This is a sword & sorcery adventure with a wink. The heroes are not the sharpest swords in the armory—they solve problems with axes, miss clues until they trip over them, and tend to believe the first explanation offered. Play them with affection. A heavy brow and a trusting nature are their own kind of courage. The Serpent's Favor is a secret track the GM keeps for each character—they think they're becoming legendary heroes. They are, but also they're becoming something else.",
-  "currentAct": 0,
-  "currentScene": 0,
-  "startedAt": null,
-  "completedAt": null,
-  "status": "planned",
-  "createdAt": "2026-07-28T00:00:00.000Z",
-  "updatedAt": "2026-07-28T00:00:00.000Z",
   "_gmhints": {
     "tone": "THIS ADVENTURE IS PULPY, CHEESY, AND DOES NOT TAKE ITSELF SERIOUSLY. Lean into the sword & sorcery tropes: heroes who solve problems with axes, miss clues until they trip over them, and believe the first explanation offered. The narration should be dramatic, over-the-top, and slightly winking at the audience. Thaliss monologues—let him! Then let the heroes interrupt him. Isoka is beautiful and terrible and also a bit bemused by the whole cult thing. Yara thinks becoming a snake-person is 'cool'—this is meant to be funny and a little tragic. The heroes are not the sharpest swords in the armory; play that with affection. By Crom!",
     "pacing": {
@@ -691,5 +684,146 @@
       "corruption_visuals": "The Corruption Score is visible to players. Describe physical changes as they happen: patches of scale, vertical pupils, a forked tongue when they speak. Make it weird and slightly cool. Players should be torn between 'this is bad' and 'this is awesome.'",
       "the_choice": "The Final Choice is a moment of pulp drama. Let players debate it in character. If they can't decide, let the timer (Cult Ascendancy) make the choice for them—the ritual completes, and they must adapt."
     }
-  }
+  },
+  "currentAct": 0,
+  "currentScene": 0,
+  "startedAt": null,
+  "completedAt": null,
+  "status": "planned",
+  "createdAt": "2026-07-28T00:00:00.000Z",
+  "updatedAt": "2026-07-28T00:00:00.000Z",
+  "knowledge": [
+    {
+      "id": "orun-gray-ash-secret",
+      "subject": "npc-orun-gray-ash",
+      "gm": "He is sincere but slightly drunk. His description of events may be exaggerated. Let players roll Wits+Lore to catch inconsistencies. This is played for comedy, not tragedy.",
+      "player": "Orun of the Gray Ash plays the part everyone assumes: Ykrul Chieftain (Quest Giver). Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "yara-secret",
+      "subject": "npc-yara",
+      "gm": "She thinks becoming a snake-person is 'cool.' She hasn't thought it through. This is tragicomic—she's a kid making a terrible decision. The party's job is to convince her with small words. Don't make her evil; make her naïve and enthusiastic about a terrible idea.",
+      "player": "Yara plays the part everyone assumes: Orun's Daughter / Cult Volunteer. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "captain-dravik-secret",
+      "subject": "npc-captain-dravik",
+      "gm": "He broods, then charges. He was drummed out of the Black Banner for refusing to burn a village. The cult reminds him of his failure. He's useful in a fight and otherwise a mess.",
+      "player": "Captain James 'The Disgraced' Dravik plays the part everyone assumes: Former Black Banner, Current Drunk. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "korvash-secret",
+      "subject": "npc-korvash",
+      "gm": "Swings axe, says something about his ancestors, swings again. He can't actually remember his ancestors' names. He just says 'ancestors' and hopes nobody asks.",
+      "player": "Korvash the Iron-Blooded plays the part everyone assumes: Vilikari Warrior. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "szik-secret",
+      "subject": "npc-szik",
+      "gm": "Rolls his eyes, picks the lock, disappears when fighting starts. He's far too competent to be hanging out with these people. He's staying because they're the only ones who don't judge his gambling debts.",
+      "player": "Szik the Swift plays the part everyone assumes: Ykrul Rogue. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "isoka-secret",
+      "subject": "npc-isoka",
+      "gm": "She didn't start the cult. She's curious to see what happens. She finds her followers exhausting. The real question isn't whether the heroes will change—it's whether they'll notice, and whether they'll care. Play her as amused and slightly distant, not malevolent.",
+      "player": "Isoka, Angel of Serpents plays the part everyone assumes: Cosmic Entity / Patron. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "thaliss-secret",
+      "subject": "npc-thaliss",
+      "gm": "He is a terrible orator. He monologues at length. Let the heroes interrupt him—it's more fun that way. He genuinely believes he's the chosen one. He is not. His cultists are just too afraid to tell him.",
+      "player": "Thaliss plays the part everyone assumes: High Priest of the Serpent Cult. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "that-yara-is-a-willing-cultist",
+      "subject": "plot",
+      "gm": "That Yara is a willing cultist, not a victim — this is the Act II reveal; let the party discover it when they find her",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-the-serpent-s-favor-is-a",
+      "subject": "plot",
+      "gm": "That the Serpent's Favor is a corruption track — players should notice physical changes and strange luck before they understand the mechanic",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-isoka-is-ambivalent-about-the",
+      "subject": "plot",
+      "gm": "That Isoka is ambivalent about the cult — she appears as a terrifying cosmic entity first; her bemused ambivalence is a later discovery",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-the-final-choice-has-multiple",
+      "subject": "plot",
+      "gm": "That the Final Choice has multiple outcomes — the module describes five options; let the players discover them organically, not as a menu",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-korvash-doesn-t-remember-his-ancestors",
+      "subject": "plot",
+      "gm": "That Korvash doesn't remember his ancestors' names — this is a running gag; let it emerge when a player asks a follow-up question",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    }
+  ]
 }

@@ -11,7 +11,7 @@
       },
       "roomCode": {
         "name": "Room Code",
-        "hint": "The room code to join (e.g., ABC123)"
+        "hint": "The room code to join (e.g., AC12)"
       },
       "playerName": {
         "name": "Player Name",

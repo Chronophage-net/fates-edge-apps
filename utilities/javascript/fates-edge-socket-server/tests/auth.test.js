@@ -79,7 +79,7 @@ describe('auth.js requireAuth middleware', () => {
     });
 
     test('rejects a malformed (non-Bearer) header with 401', () => {
-        const req = { headers: { authorization: 'Basic abc123' } };
+        const req = { headers: { authorization: 'Basic AC12' } };
         const res = mockRes();
         auth.requireAuth(req, res, () => {});
         assert.equal(res.statusCode, 401);

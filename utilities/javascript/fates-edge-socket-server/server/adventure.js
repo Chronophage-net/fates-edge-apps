@@ -62,8 +62,50 @@
  *     locations: [ { id, name, description, tags } ],
  *     factions: [ { id, name, goals, relationship } ],
  *     campaignTimers: [ { name, segments, current, description } ],
+ *     knowledge: [ { id, subject, gm, player, revealed, revealCondition, tags } ],
  *     notes, currentAct, currentScene, startedAt, completedAt, status,
  *     createdAt, updatedAt }
+ *
+ * KNOWLEDGE STATE (v3, this pass): a module's `knowledge` array is the
+ * explicit, structured alternative to burying secrets in `_gmhints` prose
+ * (still supported, unchanged, for back-compat -- see _gmhints handling in
+ * the ai-gm-bot's adventure-context.js). Each entry is a single fact with
+ * two audiences and a gate:
+ *
+ *   {
+ *     id: "rennik-transformation",   // stable, unique within the module
+ *     subject: "npc-rennik",         // free-form grouping key (an npc/
+ *                                     // location/faction id, or anything
+ *                                     // else useful to filter by)
+ *     gm: "Rennik will transform into a wraith if the party fails him.",
+ *     player: "Rennik seems increasingly agitated and pale.",  // or null
+ *     revealed: false,               // authored starting state; also the
+ *                                     // LIVE, mutable gate (see below)
+ *     revealCondition: "...",        // free-text guidance for the GM/AI
+ *                                     // on when this should flip to true
+ *                                     // -- narrative guidance, not a
+ *                                     // mechanically-evaluated expression
+ *     tags: ["npc-secret", "act2"],  // optional, free-form
+ *   }
+ *
+ * `gm` is the full truth and is NEVER included in getPublicState() --
+ * only getReferenceData() (the GM/AI-eyes-only reference fetch) carries
+ * it, exactly like npcs[]/notes/bestiary secrets already do. `player` is
+ * whatever is safe to say BEFORE the reveal (a cover story, a partial
+ * truth, or null for "nothing to say yet") and IS included in
+ * getPublicState() so player-facing UIs can show it directly. Once
+ * `revealed` flips true (via revealKnowledge(), below), getPublicState()
+ * switches that entry's player-safe text over to the full `gm` text --
+ * the entry's home for "what am I allowed to tell the players?" moves in
+ * one place, not two.
+ *
+ * `revealed` is LIVE STATE: it resets to each entry's authored starting
+ * value on every loadAdventureModule()/loadAdventureContent() (same
+ * treatment as scene.completed / timer.current), then flips at runtime
+ * via revealKnowledge(id)/hideKnowledge(id) exactly like startEncounter()/
+ * tickTimer() flip other live fields -- a human GM command, an AI's
+ * [REVEAL "id"] tag, or any other caller can flip it, and the change is
+ * visible to every client in the room on the next getPublicState() poll.
  *
  * currentAct/currentScene in the SOURCE FILE are just the default
  * starting position (normally 0/0) -- once loaded into a room, this
@@ -134,6 +176,30 @@ function appendLog(adventure, entry) {
     if (adventure.log.length > MAX_LOG_ENTRIES) {
         adventure.log = adventure.log.slice(-MAX_LOG_ENTRIES);
     }
+}
+
+/**
+ * Reset every knowledge[] entry's LIVE `revealed` flag back to its
+ * authored starting value (default false when omitted), and clear any
+ * runtime-only revealedAt/revealedBy bookkeeping -- same treatment as the
+ * scene.completed / timer.current resets that already happen alongside
+ * this in loadAdventureModule()/loadAdventureContent(). Entries authored
+ * with `revealed: true` (a fact the party is meant to already know at
+ * session start) correctly stay revealed after this reset; only the
+ * runtime bookkeeping of when/by-whom it was (re-)revealed is cleared.
+ * No-op (and safe) for modules that don't define `knowledge` at all.
+ */
+function resetKnowledgeState(moduleCopy) {
+    for (const entry of moduleCopy.knowledge || []) {
+        entry.revealed = !!entry.revealed;
+        delete entry.revealedAt;
+        delete entry.revealedBy;
+    }
+}
+
+/** Find a knowledge[] entry by id. Returns null if no `knowledge` array, or no match. */
+function findKnowledgeEntry(adventure, id) {
+    return (adventure.module?.knowledge || []).find(k => k.id === id) || null;
 }
 
 function getCurrentAct(adventure) {
@@ -218,6 +284,7 @@ function loadAdventureModule(room, moduleId) {
     for (const t of moduleCopy.campaignTimers || []) {
         t.current = 0;
     }
+    resetKnowledgeState(moduleCopy);
 
     const adventure = ensureAdventureState(room);
     adventure.module = moduleCopy;
@@ -279,6 +346,7 @@ function loadAdventureContent(room, content, options = {}) {
     for (const t of moduleCopy.campaignTimers || []) {
         t.current = 0;
     }
+    resetKnowledgeState(moduleCopy);
 
     const adventure = ensureAdventureState(room);
     adventure.module = moduleCopy;
@@ -703,6 +771,52 @@ function logBeat(room, { text, author = 'GM' } = {}) {
 }
 
 /**
+ * Flip a knowledge[] entry's LIVE `revealed` flag to true. `by` is
+ * free-form provenance (e.g. 'AI_GM', a human GM's display name) recorded
+ * as revealedAt/revealedBy for the log/reference dump -- it does not gate
+ * anything. Idempotent: revealing an already-revealed entry just refreshes
+ * revealedAt/revealedBy and still logs the beat, since a caller (e.g. the
+ * AI re-confirming a reveal mid-scene) re-asserting it is harmless.
+ * Throws if no adventure/knowledge entry matches `id`, mirroring
+ * resolveEncounterRef()'s not-found handling elsewhere in this file.
+ */
+function revealKnowledge(room, id, { by = 'GM' } = {}) {
+    if (!id) throw new Error('id is required');
+    const adventure = ensureAdventureState(room);
+    if (!adventure.module) throw new Error('No adventure module is loaded in this room');
+    const entry = findKnowledgeEntry(adventure, id);
+    if (!entry) throw new Error(`No knowledge entry "${id}" in this adventure`);
+    entry.revealed = true;
+    entry.revealedAt = Date.now();
+    entry.revealedBy = by;
+    appendLog(adventure, { type: 'knowledge-revealed', message: `Revealed: ${id}`, author: by });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
+ * Flip a knowledge[] entry's LIVE `revealed` flag back to false -- for a
+ * GM (human or AI) walking back a premature reveal, or re-hiding
+ * something for a replay/retcon. Same not-found handling as
+ * revealKnowledge().
+ */
+function hideKnowledge(room, id, { by = 'GM' } = {}) {
+    if (!id) throw new Error('id is required');
+    const adventure = ensureAdventureState(room);
+    if (!adventure.module) throw new Error('No adventure module is loaded in this room');
+    const entry = findKnowledgeEntry(adventure, id);
+    if (!entry) throw new Error(`No knowledge entry "${id}" in this adventure`);
+    entry.revealed = false;
+    delete entry.revealedAt;
+    delete entry.revealedBy;
+    appendLog(adventure, { type: 'knowledge-hidden', message: `Hid: ${id}`, author: by });
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
  * The subset of adventure state that's safe/useful to send on every
  * update: current position, active encounter (creature-enriched if
  * applicable), campaign timers, a recent slice of the log, and a
@@ -764,6 +878,19 @@ function getPublicState(room) {
         })),
         saga: adventure.module.saga ? { sagaParts: adventure.module.sagaParts || [] } : null,
         updatedAt: adventure.updatedAt,
+        // NEW: player-safe knowledge view -- `gm` (the secret truth) is
+        // deliberately NEVER included here, only in getReferenceData()
+        // below. Before a reveal, `text` is whatever `player` says (may be
+        // null -- "nothing to tell yet"); once `revealed` flips true,
+        // `text` switches over to the full `gm` truth for that entry, so a
+        // player-facing UI showing this array is always safe to render
+        // as-is with no extra secrecy logic of its own.
+        knowledge: (adventure.module.knowledge || []).map(k => ({
+            id: k.id,
+            subject: k.subject,
+            revealed: !!k.revealed,
+            text: k.revealed ? (k.gm ?? null) : (k.player ?? null),
+        })),
         // NEW
         dynamicGrowth: adventure.dynamicGrowth,
         sessionsPlayed: adventure.sessionsPlayed,
@@ -789,6 +916,13 @@ function getReferenceData(room) {
         locations: adventure.module.locations || [],
         factions: adventure.module.factions || [],
         notes: adventure.module.notes || '',
+        // NEW: GM/AI-eyes-only knowledge view -- the ONLY place `gm` (the
+        // secret truth) and `revealCondition` (authoring guidance on when
+        // to reveal it) are ever exposed. This is what the AI GM's system
+        // prompt is built from (see ai-gm-bot's adventure-context.js) so it
+        // has an explicit answer to "what am I allowed to tell the
+        // players?" instead of inferring it from _gmhints prose.
+        knowledge: adventure.module.knowledge || [],
     };
 }
 
@@ -808,6 +942,8 @@ module.exports = {
     tickTimer,
     resetAdventure,
     logBeat,
+    revealKnowledge,
+    hideKnowledge,
     getPublicState,
     getReferenceData,
     getCurrentAct,

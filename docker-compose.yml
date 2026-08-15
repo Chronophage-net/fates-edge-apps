@@ -191,7 +191,7 @@ services:
       - DISCORD_GUILD_ID=${DISCORD_GUILD_ID:-}
       - VTT_SERVER_URL=ws://server:${SERVER_PORT:-10000}
       - VTT_API_KEY=${API_KEY:-}
-      - VTT_ROOM_CODE=${DISCORD_ROOM_CODE:-ABC123}
+      - VTT_ROOM_CODE=${DISCORD_ROOM_CODE:-AC12}
       - PREFIX=${DISCORD_PREFIX:-!}
       - LOG_LEVEL=${LOG_LEVEL:-info}
     restart: unless-stopped

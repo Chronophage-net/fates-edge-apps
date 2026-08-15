@@ -118,10 +118,10 @@ placeholder line instead of region-specific flavor text.
 when loading.
 
 ```bash
-fates-edge server --upload --code ABC123 --server http://localhost:10000
-fates-edge server --load --code ABC123 --campaign-code xy12ab --server http://localhost:10000
-fates-edge server --sync --code ABC123 --server http://localhost:10000
-fates-edge server --deck-draw --code ABC123 --count 2 --region Acasia --server http://localhost:10000
+fates-edge server --upload --code AC12 --server http://localhost:10000
+fates-edge server --load --code AC12 --campaign-code xy12ab --server http://localhost:10000
+fates-edge server --sync --code AC12 --server http://localhost:10000
+fates-edge server --deck-draw --code AC12 --count 2 --region Acasia --server http://localhost:10000
 ```
 
 > Loading will overwrite your local data; you'll be prompted to confirm.
@@ -133,12 +133,12 @@ fates-edge server --deck-draw --code ABC123 --count 2 --region Acasia --server h
 >
 > `--chat` and `--roll` have no REST equivalent on the server -- chat and
 > dice rolls are WebSocket-only. Use `fates-edge websocket --code
-> ABC123` (or the `shell`) for those instead.
+> AC12` (or the `shell`) for those instead.
 
 ### 🔌 WebSocket
 
 ```bash
-fates-edge websocket --code ABC123 --server http://localhost:10000
+fates-edge websocket --code AC12 --server http://localhost:10000
 ```
 
 Once connected:

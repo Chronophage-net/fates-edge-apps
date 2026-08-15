@@ -1061,13 +1061,6 @@
     }
   ],
   "notes": "The Blood and Silk saga is a complete campaign arc following exiles from Silkstrand as they defend Millhaven, mediate at the Valvano Ford, and heist the Iron Seal of Varus at the Bronze Gate. The Curse of Acasia is a persistent threat throughout. Key themes: redemption, community, second chances, the weight of exile, and the power of belonging.",
-  "currentAct": 0,
-  "currentScene": 0,
-  "startedAt": null,
-  "completedAt": null,
-  "status": "planned",
-  "createdAt": "2026-07-28T00:00:00.000Z",
-  "updatedAt": "2026-07-28T00:00:00.000Z",
   "_gmhints": {
     "pacing": {
       "prequel": "This is a flashback prologue. The Velvet Court is a looming threat, but its deeper structure (the Silken Blade, the Court's long-term plans) is not revealed yet. Old Kes dies—his sacrifice should feel personal and immediate, not mythologized. The players' choices here create their Legacy Tokens; emphasize consequence over exposition. The ninth bridge (and its curse) can be hinted at but not explained.",
@@ -1099,5 +1092,179 @@
       "Garrick Ursillo's Vhasian army brand — it's a visible scar if players look closely, but its meaning is a discovery, not a first-meeting detail",
       "Quick Lena's Silk Coin past — she may recognize the players' style, but she will not volunteer her history"
     ]
-  }
+  },
+  "currentAct": 0,
+  "currentScene": 0,
+  "startedAt": null,
+  "completedAt": null,
+  "status": "planned",
+  "createdAt": "2026-07-28T00:00:00.000Z",
+  "updatedAt": "2026-07-28T00:00:00.000Z",
+  "knowledge": [
+    {
+      "id": "elder-thorne-secret",
+      "subject": "npc-elder-thorne",
+      "gm": "His secret about the old Imperial bridge is a hook, not a reveal. He may share his ritual (leaving milk on the bridge) as a strange local custom, but the full story of the broken promise should only emerge if players investigate the bridge directly or earn his complete trust.",
+      "player": "Elder Thorne plays the part everyone assumes: Village Leader of Millhaven. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "mira-baker-secret",
+      "subject": "npc-mira-baker",
+      "gm": "Her grandmother's knowledge of the vanished tax collector is a clue that leads to the bridge's curse. This should surface in Act I if players ask about the village's history, but the connection to the Curse of Acasia is an Act II/III realization.",
+      "player": "Mira the Baker plays the part everyone assumes: Village Representative. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "tema-secret",
+      "subject": "npc-tema",
+      "gm": "Her desperation is visible from Act II onward, but her ruin-level investment should be revealed gradually. In Act II, she is a hopeful merchant. In Act III, her urgency reveals the full stakes—if the seal is not recovered, she loses everything.",
+      "player": "Tema plays the part everyone assumes: Vilikari Merchant. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "old-kes-secret",
+      "subject": "npc-old-kes",
+      "gm": "He is already deceased by the start of the campaign. His legacy is carried by the players. His secret (the principles of the Silk Coin) is the party's inheritance—it defines their moral compass, not a plot twist.",
+      "player": "Old Kes plays the part everyone assumes: Silk Coin Fence (Deceased). Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "mareth-secret",
+      "subject": "npc-mareth",
+      "gm": "Their past as a Runekeeper of the Traveler is a private burden. They may reveal it slowly over the campaign, especially if the party encounters way-routes or gets lost. It is not a secret to guard tightly, but it should be earned through trust and shared hardship.",
+      "player": "Mareth plays the part everyone assumes: Exiled Scholar of Thepyrgos. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "the-iron-seal-of-varus-and",
+      "subject": "plot",
+      "gm": "The Iron Seal of Varus and its curse mechanics (Act III only)",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "the-ninth-clause-the-ghost-s-true",
+      "subject": "plot",
+      "gm": "The Ninth Clause (the ghost's true name ending the curse) — this is a late Act III discovery",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "prefect-marcellus-s-cult-of-oathbreakers",
+      "subject": "plot",
+      "gm": "Prefect Marcellus's cult of oathbreakers",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "censor-cassia-s-terminal-illness",
+      "subject": "plot",
+      "gm": "Censor Cassia's terminal illness",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "captain-rusk-s-possession-of-varus-s-badge",
+      "subject": "plot",
+      "gm": "Captain Rusk's possession of Varus's badge of rank",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "khatun-sarnai-s-daughter-yel-is-a",
+      "subject": "plot",
+      "gm": "Khatun Sarnai's daughter Yelü is a legionary's child",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "the-full-mechanics-of-the-curse",
+      "subject": "plot",
+      "gm": "The full mechanics of the Curse of Acasia and The Hollow's Attention timers — hint at the curse as a folk belief, not a mechanical system",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "the-ninth-arch-of-any-bridge",
+      "subject": "plot",
+      "gm": "The ninth arch of any bridge is the site of a broken promise — this is a recurring motif; mention it as superstition early, but do not explain its deeper magical significance until Act II or III",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "garrick-ursillo-s-vhasian-army-brand-it-s",
+      "subject": "plot",
+      "gm": "Garrick Ursillo's Vhasian army brand — it's a visible scar if players look closely, but its meaning is a discovery, not a first-meeting detail",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "quick-lena-s-silk-coin-past-she",
+      "subject": "plot",
+      "gm": "Quick Lena's Silk Coin past — she may recognize the players' style, but she will not volunteer her history",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    }
+  ]
 }

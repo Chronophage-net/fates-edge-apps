@@ -22,7 +22,7 @@ export const registerSettings = function() {
     
     game.settings.register('fates-edge-bridge', 'roomCode', {
         name: 'Room Code',
-        hint: 'The room code to join (e.g., ABC123)',
+        hint: 'The room code to join (e.g., AC12)',
         scope: 'world',
         config: true,
         type: String,

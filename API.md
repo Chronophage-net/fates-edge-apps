@@ -56,8 +56,8 @@ Returns server stats and room overview. No auth required.
     "totalRooms": 2,
     "rooms": [
       {
-        "code": "ABC123",
-        "name": "Room ABC123",
+        "code": "AC12",
+        "name": "Room AC12",
         "clients": 3,
         "deckRemaining": 47,
         "historyCount": 12,
@@ -101,8 +101,8 @@ Get the current deck state.
 **Response:**
 ```json
 {
-  "code": "ABC123",
-  "name": "Room ABC123",
+  "code": "AC12",
+  "name": "Room AC12",
   "deck": [ ... cards ... ],
   "deckHistory": [ ... ],
   "remaining": 47,
@@ -150,7 +150,7 @@ List all clients in a room.
 **Response:**
 ```json
 {
-  "code": "ABC123",
+  "code": "AC12",
   "clients": [
     { "id": "ws-123...", "name": "Alice", "role": "gm", "email": "" },
     { "id": "socketio-id...", "name": "Bob", "role": "player", "email": "" }
@@ -198,14 +198,14 @@ Permanently install an adventure module: writes `manifest.json` + `adventure.jso
 Push a module to a room or all rooms. Notifies clients via `module-push`.
 **Request body:**
 ```json
-{ "roomCode": "ABC123" }  // optional; if omitted, push to all rooms
+{ "roomCode": "AC12" }  // optional; if omitted, push to all rooms
 ```
 
 **`POST /api/modules/:id/cleanup`**
 Request cleanup of a module from clients. Notifies clients via `module-cleanup`.
 **Request body:**
 ```json
-{ "roomCode": "ABC123" }  // optional
+{ "roomCode": "AC12" }  // optional
 ```
 
 ---
@@ -215,10 +215,16 @@ Request cleanup of a module from clients. Notifies clients via `module-cleanup`.
 State machine defined in `server/adventure.js`. These routes let a GM's own tooling — or a fully automated/AI GM — drive an entire adventure through plain authenticated REST calls, and mirror the Socket.IO/WS events of the same name one-for-one: whichever path drove a change, everyone in the room sees the update via the matching broadcast event.
 
 **`GET /api/rooms/:code/adventure`**
-Current adventure state (module, act, scene, active encounter, campaign timers, recent log, growth tracking).
+Current adventure state (module, act, scene, active encounter, campaign timers, recent log, growth tracking, player-safe `knowledge[]` view — see below).
 
 **`GET /api/rooms/:code/adventure/reference`**
-Bestiary/NPCs/locations/factions/notes for the loaded adventure.
+Bestiary/NPCs/locations/factions/notes/**full `knowledge[]`** for the loaded adventure — GM/AI-eyes-only, includes each entry's secret `gm` text and `revealCondition`.
+
+**`POST /api/rooms/:code/adventure/knowledge/reveal`** — `{ id, by? }`
+Flip a `knowledge[]` entry's `revealed` flag to `true`. `by` is optional free-form provenance (e.g. `"AI_GM"`, a GM's display name). Broadcasts `adventure-knowledge-revealed`. 404 if `id` doesn't match a knowledge entry in the loaded adventure.
+
+**`POST /api/rooms/:code/adventure/knowledge/hide`** — `{ id, by? }`
+Flip a `knowledge[]` entry's `revealed` flag back to `false` (undo a mistaken/premature reveal). Broadcasts `adventure-knowledge-hidden`. Same 404 behavior as reveal.
 
 **`POST /api/rooms/:code/adventure/load`** — `{ moduleId }`
 Load an adventure module by id (must have `"type": "adventure"` in its manifest plus an `adventure.json`). Broadcasts `adventure-loaded`.
@@ -349,7 +355,7 @@ Plain WebSocket messages are JSON objects with a `type` field, sent flat (`{ "ty
 ```json
 {
   "type": "handshake",
-  "campaignCode": "ABC123",
+  "campaignCode": "AC12",
   "clientName": "Alice",
   "role": "gm",
   "clientEmail": "alice@example.com"
@@ -374,7 +380,7 @@ Connect to the server and emit `join-room`:
 
 ```json
 {
-  "roomCode": "ABC123",
+  "roomCode": "AC12",
   "playerName": "Alice",
   "playerRole": "gm",
   "playerEmail": "alice@example.com"
@@ -427,6 +433,8 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 | `adventure-encounter-resolve` | Resolve the active encounter | `{ "outcome": "clean", "notes": "" }`   |
 | `adventure-timer`    | Tick a timer                         | `{ "scope": "scene", "ref": 0, "amount": 1 }` |
 | `adventure-log`      | Append a narrative beat              | `{ "text": "...", "author": "..." }`     |
+| `adventure-knowledge-reveal` | Flip a `knowledge[]` entry's `revealed` gate to `true` | `{ "id": "rennik-transformation", "by": "AI_GM" }` |
+| `adventure-knowledge-hide` | Flip a `knowledge[]` entry's `revealed` gate back to `false` | `{ "id": "rennik-transformation", "by": "GM" }` |
 | `adventure-state`    | Request current adventure state (ack callback) | `{}`                            |
 | `adventure-reference` | Request bestiary/npcs/locations/etc. (ack callback) | `{}`                    |
 
@@ -436,7 +444,7 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 
 | Event Type           | Description                                   | Payload Example                                       |
 |----------------------|-----------------------------------------------|---------------------------------------------------------|
-| `connected`          | Connection established (plain WS)             | `{ "clientId": "...", "room": "ABC123", "serverVersion": "..." }` |
+| `connected`          | Connection established (plain WS)             | `{ "clientId": "...", "room": "AC12", "serverVersion": "..." }` |
 | `handshake_ack`       | Handshake/join accepted                       | `{ "clientId": "...", "clientRole": "gm", "activeClients": [...] }` |
 | `room-joined`         | (Socket.io) Full room snapshot on join, including characters | `{ "room": "...", "clients": [...], "whiteboard": {...}, "characters": [...] }` |
 | `chat-message`       | Incoming chat message                         | `{ "text": "...", "sender": "Bob", ... }`             |
@@ -459,7 +467,7 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 | `whiteboard-update`  | Whiteboard was replaced/updated by someone    | `{ "whiteboard": { ... }, "source": "..." }`          |
 | `sync-state`          | Response to `sync-request` — whiteboard state | `{ "state": { ... } }`                                |
 | `scene-status-update` / `combat-status-update` | Broadcast-only status relay (see client→server table above) | `{ ... }` |
-| `adventure-loaded` / `adventure-reset` / `scene-changed` / `scene-appended` / `act-appended` / `npc-added` / `creature-added` / `session-ended` / `adventure-climax-triggered` / `encounter-started` / `encounter-resolved` / `timer-ticked` / `adventure-log` | Broadcast counterparts of the Adventure Engine REST/socket calls above | full updated adventure state object |
+| `adventure-loaded` / `adventure-reset` / `scene-changed` / `scene-appended` / `act-appended` / `npc-added` / `creature-added` / `session-ended` / `adventure-climax-triggered` / `encounter-started` / `encounter-resolved` / `timer-ticked` / `adventure-log` / `adventure-knowledge-revealed` / `adventure-knowledge-hidden` | Broadcast counterparts of the Adventure Engine REST/socket calls above | full updated adventure state object |
 | `kicked`             | You have been kicked from the room            | `{ "reason": "..." }`                                 |
 | `error`              | Server error message                          | `{ "message": "..." }`                                |
 | `room-closed`        | Room has been closed by the server            | `{}`                                                  |
@@ -515,7 +523,7 @@ Each room has one shared whiteboard object (`drawings`, `notes`, `images`, `grid
 
 ```javascript
 const socket = io('http://localhost:10000');
-socket.emit('join-room', { roomCode: 'ABC123', playerName: 'Alice', playerRole: 'gm' });
+socket.emit('join-room', { roomCode: 'AC12', playerName: 'Alice', playerRole: 'gm' });
 
 socket.on('room-joined', (data) => { console.log('Joined', data); });
 socket.on('chat-message', (msg) => { console.log('Chat:', msg); });
@@ -524,7 +532,7 @@ socket.on('chat-message', (msg) => { console.log('Chat:', msg); });
 ### Connect with Plain WebSocket
 
 ```javascript
-const ws = new WebSocket('ws://localhost:10000?room=ABC123');
+const ws = new WebSocket('ws://localhost:10000?room=AC12');
 ws.onopen = () => {
   ws.send(JSON.stringify({ type: 'handshake', clientName: 'Alice', role: 'gm' }));
 };
@@ -537,7 +545,7 @@ ws.onmessage = (evt) => {
 ### Kick a player via REST API
 
 ```bash
-curl -X POST http://localhost:10000/api/rooms/ABC123/clients/ws-abc123/kick \
+curl -X POST http://localhost:10000/api/rooms/AC12/clients/ws-AC12/kick \
   -H "x-api-key: your-key" \
   -H "Content-Type: application/json" \
   -d '{"reason": "Too many dogs"}'
@@ -546,7 +554,7 @@ curl -X POST http://localhost:10000/api/rooms/ABC123/clients/ws-abc123/kick \
 ### Place a grid combat token via REST API
 
 ```bash
-curl -X POST http://localhost:10000/api/rooms/ABC123/whiteboard/tokens \
+curl -X POST http://localhost:10000/api/rooms/AC12/whiteboard/tokens \
   -H "x-api-key: your-key" \
   -H "Content-Type: application/json" \
   -d '{"token": {"label": "Bandit", "faction": "enemy", "col": 4, "row": 2}}'

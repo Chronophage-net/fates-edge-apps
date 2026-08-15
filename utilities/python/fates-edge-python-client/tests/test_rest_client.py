@@ -27,19 +27,19 @@ def _mock_response(status_code=200, json_data=None, content=b'{}'):
 async def test_get_deck_success():
     client = FatesEdgeRestClient('http://localhost:10000')
     with patch('requests.get', return_value=_mock_response(200, {'remaining': 40})) as mock_get:
-        result = await client.get_deck('ABC123')
+        result = await client.get_deck('AC12')
         assert result == {'remaining': 40}
         mock_get.assert_called_once()
-        assert '/api/rooms/ABC123/deck' in mock_get.call_args[0][0]
+        assert '/api/rooms/AC12/deck' in mock_get.call_args[0][0]
 
 
 @pytest.mark.asyncio
 async def test_404_translates_to_room_not_found():
     client = FatesEdgeRestClient('http://localhost:10000')
-    error_resp = _mock_response(404, {'error': 'Room ABC123 not found'})
+    error_resp = _mock_response(404, {'error': 'Room AC12 not found'})
     with patch('requests.get', return_value=error_resp):
         with pytest.raises(RoomNotFoundError) as exc_info:
-            await client.get_deck('ABC123')
+            await client.get_deck('AC12')
         assert exc_info.value.status_code == 404
         assert 'not found' in str(exc_info.value)
 
@@ -50,7 +50,7 @@ async def test_other_http_error_translates_to_base_api_error():
     error_resp = _mock_response(401, {'error': 'API key required'})
     with patch('requests.get', return_value=error_resp):
         with pytest.raises(FatesEdgeApiError) as exc_info:
-            await client.get_deck('ABC123')
+            await client.get_deck('AC12')
         assert not isinstance(exc_info.value, RoomNotFoundError)
         assert exc_info.value.status_code == 401
 
@@ -60,7 +60,7 @@ async def test_chat_raises_not_supported_without_network_call():
     client = FatesEdgeRestClient('http://localhost:10000')
     with patch('requests.post') as mock_post:
         with pytest.raises(NotSupportedByServerError):
-            await client.send_chat('ABC123', 'hello')
+            await client.send_chat('AC12', 'hello')
         mock_post.assert_not_called()
 
 
@@ -68,7 +68,7 @@ async def test_chat_raises_not_supported_without_network_call():
 async def test_upload_posts_and_returns_code():
     client = FatesEdgeRestClient('http://localhost:10000')
     with patch('requests.post', return_value=_mock_response(200, {'code': 'xy12ab'})):
-        code = await client.upload('ABC123', {'characters': []})
+        code = await client.upload('AC12', {'characters': []})
         assert code == 'xy12ab'
 
 

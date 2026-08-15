@@ -150,7 +150,7 @@ The system will leverage WebSockets for bidirectional communication, implement c
 // Client → Server
 {
   type: 'handshake',
-  campaignCode: 'ABC123',
+  campaignCode: 'AC12',
   password: 'hashed_password',
   clientId: 'uuid',
   clientName: 'GM Nick',
@@ -934,7 +934,7 @@ export function createConnectionStatus() {
 │ 🌐 Live Campaign                                         │
 ├─────────────────────────────────────────────────────────────┤
 │  Server URL: [http://localhost:3000  ]                    │
-│  Campaign Code: [ABC123    ] [Connect] [Disconnect]       │
+│  Campaign Code: [AC12    ] [Connect] [Disconnect]       │
 │                                                           │
 │  ● Connected · 3 players online                           │
 │  ┌─────────────────────────────────────────────────────┐   │
@@ -1123,7 +1123,7 @@ function validateOperation(op) {
   timestamp: '2026-07-09T10:00:00Z',
   level: 'info' | 'warn' | 'error',
   source: 'connection_manager' | 'operation_processor' | 'conflict_resolver',
-  campaignCode: 'ABC123',
+  campaignCode: 'AC12',
   clientId: 'uuid',
   operationId: 'op-123',
   message: 'Operation processed successfully',
@@ -1521,7 +1521,7 @@ Based on the current architecture and your existing WebSocket server, here are f
 #### WebSocket Client Connection
 ```javascript
 // Simple connection setup
-const socket = new WebSocket('ws://localhost:3000/campaign/ABC123');
+const socket = new WebSocket('ws://localhost:3000/campaign/AC12');
 
 socket.onopen = () => {
   // Authenticate with API key
@@ -1533,7 +1533,7 @@ socket.onopen = () => {
   // Join campaign
   socket.send(JSON.stringify({
     type: 'join-room',
-    roomCode: 'ABC123',
+    roomCode: 'AC12',
     clientData: {
       name: localStorage.getItem('userName') || 'Player',
       role: 'player'

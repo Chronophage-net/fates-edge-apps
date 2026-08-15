@@ -1,274 +1,334 @@
-# Fate's Edge Web Client
+# Fate's Edge Toolkit
 
-**The browser‑based toolkit for running Fate's Edge – a narrative‑first TTRPG.**
+> **A complete digital ecosystem for playing, running, and building Fate's Edge.**
 
-[![License: MIT](https://img.shields.io/badge/Code%20License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/SRD%20License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Project: Fate's Edge](https://img.shields.io/badge/Project-Fate's%20Edge-8A2BE2)](https://github.com/Chronophage-net/fates-edge-apps)
+Fate's Edge is a narrative tabletop roleplaying game built around **Story Beats, Patrons, Rites, consequences, and player-driven fiction**.
 
-> *"Every choice carries weight. Every debt echoes forward. Every road remembers."*
+The Fate's Edge Toolkit brings the game to the browser and connects it to the tools people already use to play tabletop RPGs. Create characters, run adventures, manage encounters, play online with your group, connect to VTTs and Discord, or let the AI GM help run the game.
 
----
-
-## 📖 Overview
-
-The **Fate's Edge Web Client** is a complete, self‑contained browser application for running *Fate's Edge* – a narrative‑first tabletop roleplaying game. It provides all the tools you need to create characters, roll dice, manage encounters, track factions, plan campaigns, and explore a rich magical system – all in one single‑page application.
-
-This client is part of the larger [Fate's Edge Applications](https://github.com/Chronophage-net/fates-edge-apps) monorepo, which also includes the real‑time campaign server, Discord bots, and VTT integrations.
-
-> **The Rules:** This application implements the full *Fate's Edge* ruleset. The **Essentials** guide (included in the repository) contains the open‑license System Reference Document (SRD) – the core mechanics you need to play. The full game (extended lore, proprietary magic systems, adventures, etc.) is available separately.
+It also includes standalone games and tools built for the Fate's Edge universe, including **Kon'reh** and **Toll & Veil**.
 
 ---
 
-## ✨ Features
+## 🎲 What Can I Do?
 
-### 🎲 Core Systems
-- **Dice Roller** – Full resolution with Position (Dominant/Controlled/Desperate), Boons, and Story Beats.
-- **Character Wizard** – Guided creation with attributes, skills, talents, and magic paths.
-- **Character Editor** – Full management with XP tracking, skills, and inventory.
+### 🧙 Play Fate's Edge
 
-### 🎭 Game Management
-- **Adventure Manager** – Load, create, and track campaigns with acts, scenes, timers, and progress. Timer ticks sync live to every connected client, GM or AI-driven.
-- **Adventure Module Library (Settings)** – Browse modules bundled in the local adventure library with metadata (title, tier, author, description) and install any of them with one click, right from Settings.
-- **Crown Spread Integration** – Generate complete adventures from card readings.
-- **Whiteboard** – Collaborative drawing, notes, tactical planning with layers, grid combat, and Fog of War.
-- **Kanban Board** – Campaign progress tracking with custom columns and clocks.
-- **GM Tools** – Scene management, timers, encounter tracking, and session logging.
+* Create and manage characters
+* Build characters with the full Fate's Edge rules
+* Roll dice and resolve actions
+* Manage Patrons, Symbols, Rites, Talents, and other character elements
+* Track Story Beats and other campaign resources
+* Play through adventures and encounters
+* Use the built-in magic and monastic-path systems
 
-### 📚 Reference & Content
-- **Wiki** – Markdown‑powered reference for rules, patrons, regions, equipment, talents, and more.
-- **Document Library** – Browse and view HTML/PDF documents from `/data/docs/`.
-- **Patrons Module** – Cosmic and terrestrial patrons with rites, gifts, and corruption mechanics.
-- **Faction Manager** – Track faction standing, agendas, assets, and followers.
-- **Bestiary** – Creature reference with stats, descriptions, and SB moves.
-- **Search Everything** (`js/features/search/`) – Full-text search across the Wiki, documents, patrons, factions, and regions. Works with zero setup (a local Fuse.js index, auto-built from `/data/` on first use) — optionally point it at a self-hosted **Solr** or **Elasticsearch** index instead for a shared, pre-built search backend. See [Search Backend Configuration](#-search-backend-configuration-optional) below.
+### 🗺️ Run a Campaign
 
-### 🌐 Connected Play
-- **WebSocket Support** – Real‑time multiplayer with Socket.io or plain WebSocket modes.
-- **VTT (Virtual Tabletop)** – Live table with chat, presence, and WebRTC voice support.
-- **Campaign Sharing** – Upload and load campaign states via HTTP API.
+The toolkit gives Game Masters a complete set of campaign-management tools:
 
-### 🧙 Magic & Spellcraft – *One unified interface*
-- **TAGS Calculator** – Free Caster spell creation and testing.
-- **Rites** – Runekeeper and Invoker rite management.
-- **Cantor** – Songs and corruption mechanics.
-- **Witchcraft** – Hedge Gifts, Quick Workings, Full Rituals, and the Shadow/Shame/Identity Strain price tracks. Available to the Witch path, and to any character who's taken the "Craft of the Hedge" talent — not gated on magic path alone.
-- **Summoning** – Spirit binding and leash management.
-- **Spellbook** – Spell collection and casting.
-- **Monastic Traditions** – Breath states, techniques, and corruption track.
+* Campaign and party management
+* Adventure and scene management
+* Encounter tracking
+* Objective clocks for combat and non-combat challenges
+* NPC and faction management
+* Shared campaign state
+* Deck of Consequences management
+* GM, Co-GM, Assistant GM, Player, and Spectator roles
+* Real-time synchronization between players
 
-### 🔨 Crafting – *Its own sidebar page, open to every character*
-- **Crafting Bench** – Forage or buy ingredients, combine them, and work recipes into consumables (per the *Gear, Magic Items, and Crafting* rules: a downtime action, 1–2 XP, a DV 3 skill roll). Tracks a per‑character crafted‑item inventory with uses remaining.
-- **The Codex** – A browsable reference of sample magic items, consumables, and artifacts (Minor/Major/Prestige/Epic tiers), loaded from `/data/wiki.json`. Attune up to 3 magic items and track their upkeep — pay XP (Efficient) or spend a downtime scene (Intensive) each downtime, or let an item slide from Maintained → Neglected → Compromised.
-- Split out from Witchcraft, since ingredient/recipe crafting never had anything to do with hedge magic specifically — see `js/features/crafting/index.js`.
+The **Assistant GM** role is designed specifically to support AI-assisted game mastering without giving an AI unrestricted administrative authority.
 
-### 🎮 Bonus: Kon'reh Strategy Board Game
-- Original 8×8 strategy game with two‑player local or AI opponents (six distinct schools of play).
-- Coach Mode with live move suggestions.
+### 🌐 Play Together Online
 
-### 🗺️ Travel Planner
-- Plan overland routes with regional data.
+The Fate's Edge campaign server provides real-time multiplayer infrastructure for the toolkit.
+
+Players can:
+
+* Join shared campaign rooms
+* Synchronize characters and campaign state
+* See party presence
+* Share adventure progress
+* Participate in real-time encounters
+* Use integrated voice chat
+* Share campaign resources
+
+The server supports both Socket.IO and plain WebSocket transports.
+
+### 🤖 Use AI to Help Run the Game
+
+Fate's Edge can integrate with an AI GM service to assist with:
+
+* Campaign state
+* Adventure management
+* Encounters
+* Character information
+* Patron obligations
+* Narrative support
+* GM-assistant workflows
+
+The AI GM operates within the same campaign infrastructure as human players and GMs.
+
+---
+
+## 🎭 Use the Tools You Already Have
+
+Fate's Edge is designed to work alongside existing tabletop platforms rather than requiring everyone to abandon them.
+
+### Foundry VTT
+
+Connect Fate's Edge campaigns to Foundry VTT through the Fate's Edge bridge.
+
+### Roll20
+
+Use Fate's Edge commands and campaign functionality directly from Roll20.
+
+### Discord
+
+The Fate's Edge Discord bot provides campaign and administrative commands without requiring everyone to remain in the web client.
+
+### Avrae
+
+Fate's Edge can integrate with Avrae-based Discord workflows.
+
+---
+
+## ⚔️ More Than a VTT
+
+The toolkit also contains standalone games from the Fate's Edge universe.
+
+### Kon'reh
+
+A strategic board game set within the Fate's Edge world.
+
+Play:
+
+* Pass-and-play
+* Against the built-in AI
+* In real-time multiplayer
+
+Kon'reh's AI includes phase-aware strategic behavior and can provide coaching during play.
+
+### Toll & Veil
+
+A second original game built on the Fate's Edge infrastructure.
+
+Toll & Veil supports:
+
+* Pass-and-play
+* Solo play against AI
+* Real-time multiplayer
+* Optional stakes
+* Narrative consequences tied to the Fate's Edge setting
+
+These games aren't separate technology islands. They use the same ecosystem and multiplayer infrastructure as the rest of the toolkit.
 
 ---
 
 ## 🚀 Quick Start
 
-**→ See [INSTALL.md](INSTALL.md) for the full setup guide** — solo/local
-use, hosting it for your table (Docker), pointing it at your own Socket
-Server, updates, and troubleshooting.
+### Run the web client
 
-### For Players & GMs (solo, no install)
-1. **Clone or download** this repository.
-2. Open `index.html` in a modern browser (Chrome, Firefox, Edge, or Safari).
-3. Set a password (optional) – click the lock icon in the sidebar.
-4. Start creating characters, rolling dice, and building your campaign!
+The simplest way to explore Fate's Edge is through the web application.
 
-### Hosting it for your table
 ```bash
-cd fates-edge-apps/utilities/javascript/fates-edge-web-client
-docker compose up -d
-```
-Then open `http://localhost:8080`. See [INSTALL.md](INSTALL.md) for
-pointing it at your self-hosted [Socket Server](../fates-edge-socket-server/INSTALL.md)
-— that step's easy to miss.
-
-### For Developers
-```bash
-# Clone the monorepo
 git clone https://github.com/Chronophage-net/fates-edge-apps.git
-cd fates-edge-apps/utilities/javascript/fates-edge-web-client
-
-# Serve locally (any static server)
-python3 -m http.server 8000
-# or
-npx serve
-
-# Build for production (generates manifests and seed)
+cd fates-edge-apps
+npm install
 npm run build
 ```
 
----
+The repository contains the web client, server, integrations, game modules, and supporting packages.
 
-## 📁 Project Structure
+### Docker
 
+A Docker Compose configuration is provided for running the ecosystem as a collection of services.
+
+```bash
+docker compose up
 ```
-fates-edge-web-client/
-├── index.html              # Main entry point
-├── css/                    # Stylesheets
-├── data/                   # Game data (all JSON)
-│   ├── adventures/         # Campaign adventures
-│   ├── bestiary/           # Creature data
-│   ├── docs/               # Document library
-│   ├── factions/           # Faction data
-│   ├── patrons/            # Cosmic patron data
-│   ├── regions/            # Regional data
-│   ├── religions/          # Religion data
-│   └── terrestrial/        # Terrestrial patron data
-├── js/                     # JavaScript source
-│   ├── app.js              # Application entry point
-│   ├── router.js           # Navigation routing
-│   ├── module-loader.js    # Dynamic module loading
-│   ├── core/               # Core libraries (dice, state, sync, etc.)
-│   ├── features/           # Feature modules
-│   └── tools/              # Build and utility tools
-├── tests/                  # Unit and integration tests
-├── DESIGN.md               # Design documentation
-├── Dockerfile              # Production container
-└── README.md               # This file
-```
+
+Additional services, including the AI GM bot and TURN server, can be enabled through the appropriate Compose profiles.
+
+See the deployment documentation for production configurations.
 
 ---
 
-## 🔐 Password Protection
+## 🏗️ Architecture
 
-The toolkit can be password‑protected in two ways:
+At its core, Fate's Edge separates the **game rules and data** from the **interfaces used to play the game**.
 
-1. **User‑Set Password** – Click the lock icon in the sidebar to set a local password (stored only in your browser).
-2. **Build‑Time Lock** – Use `npm run build:locked -- --password=your-secure-password` to distribute a pre‑locked build.
+```text
+                         Fate's Edge Rules & Data
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │ Campaign Server  │
+                         │  Authoritative   │
+                         │   Game State     │
+                         └────────┬─────────┘
+                                  │
+               ┌──────────────────┼──────────────────┐
+               │                  │                  │
+               ▼                  ▼                  ▼
+          Web Client          AI GM Bot        VTT / Bots
+               │                                     │
+        ┌──────┼──────┐                    ┌─────────┼─────────┐
+        ▼      ▼      ▼                    ▼         ▼         ▼
+      Players   GM   Games              Foundry   Roll20   Discord
+```
 
-> **Emergency Reset:** If you forget your local password, set an emergency reset code in `data/lock-reset.json` (see the `generate-seed.js` tool for hashing).
+The server is authoritative for shared campaign state, while clients provide the interfaces through which players and GMs interact with that state.
+
+This makes it possible to add new interfaces without rebuilding the underlying campaign system.
+
+### Scaling
+
+The socket server can operate as:
+
+* A single self-contained instance
+* A multi-core Node.js cluster
+* Multiple instances using Redis
+* A horizontally scaled deployment behind a load balancer
+
+The common configuration remains deliberately simple: **no external services are required for basic single-server operation.**
 
 ---
 
-## 🌐 Real‑Time Campaign Server
+## 🔒 Security
 
-The client connects to a WebSocket/Socket.io server for multiplayer features. The server is part of the parent monorepo and can be run separately.
+The multiplayer infrastructure includes protections for hostile or malformed clients, including:
 
-Default endpoints:
-```
-ws://localhost:10000              # Local development
-wss://fates-edge-ws.onrender.com  # Production default
-```
+* REST API rate limiting
+* WebSocket message-rate limiting
+* Authentication rate limiting
+* Per-room client limits
+* Input length and validation controls
+* Server-verified socket identities
+* Network-supplied display-name sanitization
+* Authoritative multiplayer game state
+* Controlled stake transactions
+* Configurable deployment limits
 
-### API Endpoint for Character Sync
-```
-POST /api/rooms/:roomCode/characters/update
-{ "updates": { "Character Name": { "harm": 0, "fatigue": 0, "boons": 3, "patron": "...", ... } } }
-```
-
-Character sync is bidirectional and automatic: the client pushes on connect/reconnect *and* on
-every local character edit (debounced ~1.5s so a burst of field changes collapses into one push
-— see `core/state.js`'s `onCharacterChange()` and `vtt-connected.js`'s `pushCharactersToServer()`
-subscriber), and the server broadcasts `state-updated` back to the room (including to any
-connected AI GM bot) on every update. `patron` is included in the pushed payload so anything
-reading server-side character data — like the AI GM bot's per-Patron Obligation breakdown — can
-see which Patron a character's Obligation is owed to.
-
-Adventure timers follow the same round-trip: a client tick (`advanceTimer()`/
-`advanceSceneTimer()`) is sent to the server, which recomputes it authoritatively and broadcasts
-the canonical result (`timer-ticked`) back to every client in the room, so timer displays stay in
-sync regardless of who — player, GM, or an AI agent — drove the change.
+Security is treated as part of the game infrastructure rather than something added after multiplayer functionality is complete.
 
 ---
 
-## 🔍 Search Backend Configuration (optional)
+## 📦 Repository Structure
 
-`js/features/search/index.js` works out of the box with **no configuration at all** — it builds a local search index from `/data/` on first use (Fuse.js, cached in `sessionStorage`) and needs nothing external. This is the right choice for the common case (a single GM's browser, or a small self-hosted table).
+The repository contains the major components of the Fate's Edge digital ecosystem.
 
-If you're deploying this client at scale and want a shared, pre-built search index instead (faster, and searchable the same way for every visitor without each browser rebuilding its own), point it at a self-hosted **Solr** or **Elasticsearch** instance by setting one of these globals in a small inline `<script>` before this app's own scripts load (e.g. added to `index.html`, or via whatever templating your deployment uses):
+| Component          | Purpose                                                            |
+| ------------------ | ------------------------------------------------------------------ |
+| Web Client         | Browser-based player and GM interface                              |
+| Socket Server      | Real-time campaign and multiplayer infrastructure                  |
+| AI GM Bot          | AI-assisted game mastering                                         |
+| Discord Bot        | Discord campaign integration                                       |
+| Foundry Bridge     | Foundry VTT integration                                            |
+| Roll20 Integration | Roll20 campaign integration                                        |
+| Avrae Integration  | Discord/Avrae integration                                          |
+| Kon'reh            | Strategy game                                                      |
+| Toll & Veil        | Card game                                                          |
+| Adventure Modules  | Playable Fate's Edge adventures                                    |
+| Shared Data        | Rules, characters, factions, patrons, talents, and other game data |
 
-```html
-<script>
-  // Solr — url should be the collection's /select endpoint
-  window.__SOLR_URL = 'https://solr.example.com/solr/fatesedge/select';
-
-  // Elasticsearch — url is the index base, no trailing slash / no /_search
-  window.__ES_URL = 'https://es.example.com/fatesedge';
-  window.__ES_API_KEY = 'base64-id:secret';  // optional, sent as `Authorization: ApiKey ...`
-
-  // Only needed if you've configured BOTH and want to force one:
-  window.__SEARCH_BACKEND = 'elasticsearch'; // or 'solr'
-</script>
-```
-
-If both are configured with no explicit `__SEARCH_BACKEND`, Solr is tried first, falling back to Elasticsearch, then to the local Fuse.js index if neither responds. Whichever one actually connects is shown on the **System Status** page (sidebar → System → 🩺 Status).
-
-**Security note:** queries go straight from the browser to whichever URL you configure — there's no server-side proxy in this client. That means the endpoint needs either open CORS or the embedded API key above; don't point either at an endpoint you wouldn't want a site visitor querying directly from their own browser's devtools.
-
-Neither backend is required, installed, or run by anything in this repo — "configuring" one just means pointing this client at search infrastructure you already run yourself.
+For detailed architecture, implementation notes, and development history, see [`DESIGN.md`](DESIGN.md).
 
 ---
 
-## 📄 License
+## 📚 Documentation
 
-The project uses a **dual‑license** model to protect both the open‑source code and the proprietary game content.
-
-### Code (MIT)
-The source code of this web client is licensed under the **MIT License**.  
-You are free to use, modify, and distribute the code for any purpose, provided you include the original copyright notice.
-
-### Content (Mixed)
-
-- **SRD (System Reference Document)** – The core mechanics, as published in the *Essentials* guide, are licensed under **CC BY‑NC‑SA 4.0**. You may share and adapt them for non‑commercial purposes, with attribution.
-- **All Other Content** – This includes setting lore, original characters, faction descriptions, proprietary magic systems (e.g., Runekeeper, Invoker, Cantor), artwork, maps, adventures, and narrative text. These are **All Rights Reserved** and the intellectual property of Nicholas A. Gasper.
-
-For permissions regarding Copyright, contact: **support@fates-edge.com**
+| Document                                                                 | Description                                                |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| [`DESIGN.md`](DESIGN.md)                                                 | Architecture, implementation details, and technical design |
+| [`ROADMAP.md`](utilities/javascript/fates-edge-socket-server/ROADMAP.md) | Planned development                                        |
+| [`ROLES.md`](utilities/javascript/fates-edge-socket-server/ROLES.md)     | Multiplayer roles and permissions                          |
+| [`SCALING.md`](utilities/javascript/fates-edge-socket-server/SCALING.md) | Socket-server scaling                                      |
+| Adventure documentation                                                  | Running and building Fate's Edge adventures                |
+| Integration READMEs                                                      | Foundry, Roll20, Discord, and other integrations           |
 
 ---
 
-## 📚 The Essentials Guide
+## 🧪 Development
 
-The **Essentials** guide (included in this repository as `Fate's Edge - Essentials.txt` or `Fate's Edge - Essentials.pdf`) is the open‑license core of the game. It contains:
+The project uses automated tests across its major components.
 
-- The complete resolution loop (dice, Position, DV, Outcome Matrix)
-- Character creation rules
-- Boons, Story Beats, Fatigue, Harm, and Armor Conversion
-- A starter adventure (*The Lantern at Dusk*)
-- Simplified magic (Free Casting and Hedge Gifts)
-- GM tips and quick reference
+Run the appropriate package tests from the component you are working on.
 
-This guide is the perfect starting point for new players and GMs.
+The project is primarily JavaScript/Node.js, with additional tooling and integrations where appropriate.
+
+Before submitting changes:
+
+1. Run the relevant test suites.
+2. Verify the affected integration or client.
+3. Update documentation when behavior changes.
+4. Keep shared game data compatible with existing campaigns.
+
+---
+
+## 🛣️ Roadmap
+
+Fate's Edge is actively developed.
+
+Current development focuses on:
+
+* Expanding the campaign and adventure system
+* Improving multiplayer reliability
+* Expanding AI GM capabilities
+* Improving VTT integrations
+* Expanding the standalone game collection
+* Improving accessibility and usability
+* Continuing security and scaling work
+
+See [`ROADMAP.md`](utilities/javascript/fates-edge-socket-server/ROADMAP.md) for the current technical roadmap.
+
+---
+
+## 📜 Licensing
+
+The Fate's Edge ecosystem contains several categories of material with different licenses.
+
+### Code
+
+Code is released under the **MIT License** unless otherwise specified.
+
+See [`LICENSE.code`](LICENSE.code).
+
+### Fate's Edge SRD
+
+The Fate's Edge System Reference Document is released under **CC BY-NC-SA 4.0** unless otherwise specified.
+
+See [`LICENSE.srd`](LICENSE.srd).
+
+### Proprietary Content
+
+Setting material, artwork, adventures, characters, and other designated Fate's Edge content may be **All Rights Reserved**.
+
+See [`LICENSE.proprietary`](LICENSE.proprietary).
+
+When in doubt, check the license associated with the specific file or component.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please ensure:
+Contributions, bug reports, testing, and feedback are welcome.
 
-1. All code contributions are MIT‑licensed.
-2. Content additions that are not SRD are clearly marked as proprietary.
-3. Feature additions are well‑documented.
-
-### Development Setup
-```bash
-# Clone the monorepo
-git clone https://github.com/Chronophage-net/fates-edge-apps.git
-cd fates-edge-apps/utilities/javascript/fates-edge-web-client
-
-# Install dependencies (if any) and build
-npm install
-npm run build
-
-# Start a local server
-npm start
-```
+Before contributing, please read the relevant technical documentation in [`DESIGN.md`](DESIGN.md) and check the component-specific documentation for the area you want to change.
 
 ---
 
-## 🙏 Credits
+## 🌌 About Fate's Edge
 
-**Fate's Edge** was created by **Nicholas A. Gasper** (Chronophage).  
-The web client is built with vanilla JavaScript and runs entirely in your browser – no sign‑up, no accounts, no hidden costs.
+Fate's Edge is a tabletop roleplaying game about **people, powers, obligations, and consequences**.
 
-> *"The coin that never spends is the one you don't remember taking."*  
-> — Serafine of the Velvet Touch
+The digital toolkit exists to make those systems easier to play without replacing the things that make tabletop RPGs work: imagination, conversation, improvisation, and the people sitting around the table.
+
+Whether you're running a campaign, playing a character, experimenting with the setting, or building tools for the system, the goal is the same:
+
+**Make Fate's Edge easier to play—and give the world more ways to come alive.**
+
+---
+
+**Fate's Edge Toolkit v4.14.0**
+
+[Chronophage-net/fates-edge-apps](https://github.com/Chronophage-net/fates-edge-apps)

@@ -390,6 +390,32 @@ function setupWSS(wss, appConfig) {
                         break;
                     }
 
+                    // NEW: knowledge state (module.knowledge[] entries) --
+                    // see server/adventure.js's KNOWLEDGE STATE doc comment
+                    // and the REST equivalents (POST .../adventure/knowledge/
+                    // reveal|hide) in api.js. Same shape as every other
+                    // Adventure Engine case here: recompute authoritatively,
+                    // broadcast the canonical result.
+                    case 'adventure-knowledge-reveal': {
+                        try {
+                            const state = adventure.revealKnowledge(currentRoom, data.id, { by: data.by });
+                            room.broadcastToRoom(roomKey, 'adventure-knowledge-revealed', { id: data.id, ...state });
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adventure-knowledge-hide': {
+                        try {
+                            const state = adventure.hideKnowledge(currentRoom, data.id, { by: data.by });
+                            room.broadcastToRoom(roomKey, 'adventure-knowledge-hidden', { id: data.id, ...state });
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
                     case 'adventure-state-request': {
                         ws.send(JSON.stringify({ type: 'adventure-state', ...adventure.getPublicState(currentRoom) }));
                         break;

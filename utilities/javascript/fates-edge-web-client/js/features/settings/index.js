@@ -835,7 +835,7 @@ export function render(el) {
                     </div>
                     <div class="field">
                         <label>Campaign Code</label>
-                        <input type="text" id="sync-campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" />
+                        <input type="text" id="sync-campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" />
                     </div>
                     <div class="field">
                         <label>Password</label>
@@ -871,7 +871,7 @@ export function render(el) {
                 <p class="text-muted small">Upload your current toolkit state to a campaign server, then share the generated code with your group. They can load it with the same code. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
                 <div class="form-row">
                     <div class="field large"><label>Server URL</label><input type="text" id="campaign-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" /></div>
-                    <div class="field" style="flex:0 0 120px;"><label>Campaign Code</label><input type="text" id="campaign-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;" /></div>
+                    <div class="field" style="flex:0 0 120px;"><label>Campaign Code</label><input type="text" id="campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" /></div>
                 </div>
                 <div class="flex">
                     <button class="btn btn-gold" id="campaign-upload-btn">⬆ Upload Current State</button>

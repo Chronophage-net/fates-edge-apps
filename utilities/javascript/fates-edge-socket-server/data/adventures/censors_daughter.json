@@ -697,13 +697,6 @@
     "obligation_clear": "The party may clear 2 Obligation to The Sentinel if they successfully complete the exorcism."
   },
   "notes": "This adventure is adapted from Saikou Ira's case files. The exorcism mini-game is the mechanical centerpiece—players must conduct research, gather witnesses, and perform the Three Calls while managing the Possession Depth timer. The adventure supports multiple resolution paths: expose the Censor, perform a secret exorcism, or break the girl out. Each path has its own costs and consequences. The themes of debt, obligation, and witness are central—the party must decide what they are willing to pay to save a child. Designed for a single session of 4–6 hours, but can be extended into a mini-campaign by expanding the investigation phase.",
-  "currentAct": 0,
-  "currentScene": 0,
-  "startedAt": null,
-  "completedAt": null,
-  "status": "planned",
-  "createdAt": "2026-07-29T00:00:00.000Z",
-  "updatedAt": "2026-07-29T00:00:00.000Z",
   "_gmhints": {
     "pacing": {
       "act1": "This is the investigation phase. The party has three days (or fewer, if they burn daylight). Emphasize the ticking clock—the Inquisition's Schedule is the primary pressure. Fabius is a broken man, not a villain; his guilt is palpable. The Weeping Shade is a puzzle, not a combat—it requires empathy and truth-telling. The demon's nature (debt-as-entity) should be revealed gradually through ledgers and whispers, not exposited upfront. The Witness is a presence, not a character—its revelations feel earned, not handed out. Do not name Harperar until the party discovers the true name; refer to it as 'the debt,' 'the collector,' or 'the thing in the mirror.' The mirrors are already cracking—emphasize their fragility as a visual cue for the demon's growing power.",
@@ -726,5 +719,146 @@
       "That Saikou Ira is the Invoker of The Witness — if he appears, he is simply 'a scholar of the old ways' or 'a man who knows the value of a promise'; his true role is a discovery, not an introduction",
       "The Chain-Lanterns' true agenda (exposing the Inquisition) — they are 'allies who help save the girl' in Act I; their larger goal emerges in Act III"
     ]
-  }
+  },
+  "currentAct": 0,
+  "currentScene": 0,
+  "startedAt": null,
+  "completedAt": null,
+  "status": "planned",
+  "createdAt": "2026-07-29T00:00:00.000Z",
+  "updatedAt": "2026-07-29T00:00:00.000Z",
+  "knowledge": [
+    {
+      "id": "livia-valerius-secret",
+      "subject": "npc-livia-valerius",
+      "gm": "She has known the demon's name for three years but cannot speak it. This is her tragedy, not a plot convenience. If the party tries to pressure her for information, the demon speaks instead. Her moments of clarity are rare and precious—treat them as gifts, not guarantees. She is not the demon; she is its cage.",
+      "player": "Livia Valerius plays the part everyone assumes: Possessed Child, Daughter of the Censor. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "fabius-valerius-secret",
+      "subject": "npc-fabius-valerius",
+      "gm": "His secret (the loan, the hidden interest rate) is the heart of the mystery. He will not confess it easily—shame and denial have calcified over three years. He needs to be confronted with evidence, not persuasion. When he breaks, it should feel like a dam bursting, not a casual admission. He is not evil; he is a man who made one terrible mistake and has been paying for it ever since.",
+      "player": "Fabius Valerius plays the part everyone assumes: Censor, Father of Livia. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "saikou-ira-secret",
+      "subject": "npc-saikou-ira",
+      "gm": "His cameo is optional—he is the Invoker of The Witness, and his presence implies the party has earned the attention of something older than the Inquisition. His secret (he has forgotten his daughter's face) is a mirror to Fabius's story: both men have paid a price for their debts. If he appears, he should feel like a figure from a fable, not an ordinary NPC.",
+      "player": "Saikou Ira (Optional Cameo) plays the part everyone assumes: Invoker of The Witness. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "flame-warden-ervin-secret",
+      "subject": "npc-flame-warden-ervin",
+      "gm": "He is a zealot, but he is not a monster. His secret (he knows the Ninth Citation and has used it twice) suggests a man who has seen too much and sleeps poorly. He can be bargained with if the party has leverage—but he will never betray his faith directly. He is a wall, not a door.",
+      "player": "Flame-Warden Ervin plays the part everyone assumes: Inquisitor of the Everflame. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "chain-lantern-silva-secret",
+      "subject": "npc-chain-lantern-silva",
+      "gm": "She is an ally with an agenda. Her secret (she was conscripted at seven, she does not remember her name before the Temple) makes her sympathetic but also dangerous—she will sacrifice the party if it serves her goal of exposing the Inquisition. She is not trustworthy, but she is reliable in her own way.",
+      "player": "Chain-Lantern Silva plays the part everyone assumes: Agent of the Quiet Seal. Nothing about their manner invites a second look.",
+      "revealed": false,
+      "revealCondition": "When a player succeeds an Investigation, Lore, or Insight roll against them, when they're confronted directly with contradicting evidence, or when the story naturally reaches this secret's planned reveal beat.",
+      "tags": [
+        "npc-secret"
+      ]
+    },
+    {
+      "id": "harperar-s-true-name-the-interest-rate",
+      "subject": "plot",
+      "gm": "Harperar's true name (the interest rate) — this is the climax of the investigation, not a first-scene reveal",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-the-demon-is-literally-the",
+      "subject": "plot",
+      "gm": "That the demon is literally the debt, given will — hint at it through Fabius's guilt and the ledgers, but do not state it plainly until the party connects the dots",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "the-ninth-citation-the-inquisition-s-forbidden",
+      "subject": "plot",
+      "gm": "The Ninth Citation (the Inquisition's forbidden passage) — this is a late Act II or Act III revelation, used as leverage or as a reveal of the Inquisition's corruption",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "the-weeping-shade-s-secret-the-maid",
+      "subject": "plot",
+      "gm": "The Weeping Shade's secret (the maid witnessed a murder) — this is a puzzle to solve, not a handout; the party must earn it through investigation or empathy",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "the-cost-of-the-exorcism-the",
+      "subject": "plot",
+      "gm": "The cost of the exorcism (the exorcist loses a memory) — foreshadow it, but do not state it mechanically until the ritual is complete; the party should feel the weight of the price after they have already committed",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "that-saikou-ira-is-the-invoker",
+      "subject": "plot",
+      "gm": "That Saikou Ira is the Invoker of The Witness — if he appears, he is simply 'a scholar of the old ways' or 'a man who knows the value of a promise'; his true role is a discovery, not an introduction",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    },
+    {
+      "id": "the-chain-lanterns-true-agenda-exposing",
+      "subject": "plot",
+      "gm": "The Chain-Lanterns' true agenda (exposing the Inquisition) — they are 'allies who help save the girl' in Act I; their larger goal emerges in Act III",
+      "player": null,
+      "revealed": false,
+      "revealCondition": "GM/AI discretion, guided by this adventure's pacing notes above -- reveal once the party has actually earned it through play, not on request.",
+      "tags": [
+        "plot-secret"
+      ]
+    }
+  ]
 }

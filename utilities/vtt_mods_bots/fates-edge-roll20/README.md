@@ -53,7 +53,7 @@ In the Roll20 API console, set these global variables (they can be added at the 
 ```javascript
 // Required
 var FATES_EDGE_SERVER_URL = 'ws://your-server:10000';
-var FATES_EDGE_ROOM_CODE = 'ABC123';
+var FATES_EDGE_ROOM_CODE = 'AC12';
 
 // Optional – API key if your server requires it
 var FATES_EDGE_API_KEY = 'your-api-key-here';

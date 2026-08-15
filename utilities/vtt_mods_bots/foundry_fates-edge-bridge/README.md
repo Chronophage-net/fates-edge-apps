@@ -62,7 +62,7 @@ After installation, enable the module in your world and configure it via **Setti
 | Setting | Description |
 |---------|-------------|
 | **Server URL** | The WebSocket URL of your Fate's Edge server (e.g., `ws://localhost:10000` or `wss://your-server.com`). |
-| **Room Code** | The room code to join (e.g., `ABC123`). |
+| **Room Code** | The room code to join (e.g., `AC12`). |
 | **API Key** | (Optional) API key for authentication if your server requires it. |
 | **Player Name** | Your display name in the VTT (defaults to your Foundry username). |
 | **Default Region** | Default region for deck draws. |

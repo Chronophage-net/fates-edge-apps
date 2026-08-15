@@ -26,7 +26,7 @@ const path = require('path');
 const CONFIG = {
     version: '2.4.0',
     defaultServerUrl: 'ws://localhost:3000',
-    defaultRoom: 'ABC123',
+    defaultRoom: 'AC12',
     defaultName: 'Terminal Player',
     defaultPassword: 'password123',
     reconnectDelay: 3000,
