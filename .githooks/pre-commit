@@ -10,6 +10,7 @@ set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 WEB_CLIENT_DIR="utilities/javascript/fates-edge-web-client"
+SOCKET_SERVER_DIR="utilities/javascript/fates-edge-socket-server"
 
 # Only run the build if this commit actually touches the web client.
 if ! git diff --cached --name-only --diff-filter=ACMR | grep -q "^${WEB_CLIENT_DIR}/"; then
@@ -20,10 +21,7 @@ echo "pre-commit: staged changes touch ${WEB_CLIENT_DIR} — running npm run bui
 
 cd "${REPO_ROOT}/${WEB_CLIENT_DIR}"
 
-if [ ! -d node_modules ]; then
-  echo "pre-commit: node_modules missing in ${WEB_CLIENT_DIR}, run 'npm install' there first." >&2
-  exit 1
-fi
+npm install
 
 if ! npm run build; then
   echo "" >&2
@@ -33,3 +31,9 @@ if ! npm run build; then
 fi
 
 echo "pre-commit: web-client build succeeded."
+
+cd "${REPO_ROOT}/${SOCKET_SERVER_DIR}"
+
+npm install
+
+echo "pre-commit: socket-server install succeeded."
