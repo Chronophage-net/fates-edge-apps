@@ -33,7 +33,7 @@ env:
   DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
   REGISTRY: docker.io
   IMAGE_BASE: chronophage/fates-edge
-  # NEW: also push to GitHub Container Registry so images show up as
+  # Also push to GitHub Container Registry so images show up as
   # Packages on the repo itself, with zero extra secrets (GITHUB_TOKEN
   # already has packages: write above). GHCR requires an all-lowercase
   # image path, so the owner is lowercased at runtime below rather than
@@ -53,6 +53,13 @@ jobs:
           - name: web-client
             context: ./utilities/javascript/fates-edge-web-client
             dockerfile: ./utilities/javascript/fates-edge-web-client/Dockerfile
+          # NEW: previously had a working Dockerfile but was never
+          # actually built/pushed anywhere -- only packaged as a plain
+          # tarball in build-and-release.yml. Added to this matrix so it
+          # gets a real, pullable image like its two siblings.
+          - name: discord-bot
+            context: ./utilities/vtt_mods_bots/fates-edge-discord-bot
+            dockerfile: ./utilities/vtt_mods_bots/fates-edge-discord-bot/Dockerfile
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,7 +76,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # NEW: log in to GHCR too, using the built-in token (no secrets to manage).
+      # Log in to GHCR too, using the built-in token (no secrets to manage).
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -86,16 +93,26 @@ jobs:
           fi
           SHA="${{ github.sha }}"
           APP="${{ matrix.app.name }}"
-          TAGS="${IMAGE_BASE}:${VERSION},${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-${SHA}"
+
+          # FIX: this used to also push a bare "${IMAGE_BASE}:${VERSION}"
+          # tag (no app suffix) from every matrix job. Since all three
+          # apps share one Docker Hub repo (chronophage/fates-edge), that
+          # bare tag collided across socket-server/web-client/discord-bot
+          # -- whichever matrix job finished last silently overwrote it,
+          # so "chronophage/fates-edge:v4.15.0" ended up pointing at only
+          # one of the three images with no error or warning. Every tag
+          # pushed now is prefixed with the app name, so each app's tags
+          # are unique within the shared repo.
+          TAGS="${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-${SHA}"
           if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            TAGS="${TAGS},${IMAGE_BASE}:${APP}-${VERSION},${IMAGE_BASE}:${APP}-latest"
+            TAGS="${TAGS},${IMAGE_BASE}:${APP}-latest"
           fi
 
-          # NEW: mirror the same tag set to ghcr.io. GHCR image paths must
-          # be all-lowercase, so the repository owner is lowercased here.
+          # Mirror the same tag set to ghcr.io. GHCR image paths must be
+          # all-lowercase, so the repository owner is lowercased here.
           GHCR_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           GHCR_BASE="${GHCR_REGISTRY}/${GHCR_OWNER}/fates-edge"
-          GHCR_TAGS="${GHCR_BASE}:${VERSION},${GHCR_BASE}:${APP}-${VERSION},${GHCR_BASE}:${APP}-${SHA}"
+          GHCR_TAGS="${GHCR_BASE}:${APP}-${VERSION},${GHCR_BASE}:${APP}-${SHA}"
           if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             GHCR_TAGS="${GHCR_TAGS},${GHCR_BASE}:${APP}-latest"
           fi
