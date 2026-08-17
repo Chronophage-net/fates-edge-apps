@@ -56,6 +56,7 @@ Desktop.ini
 .env
 .env.local
 .env.*.local
+.env.demo
 
 # TURN (coturn) TLS certs -- never commit real certs/keys
 utilities/javascript/fates-edge-socket-server/coturn/*.pem
@@ -101,3 +102,7 @@ utilities/python/fates_edge_tool/fate_edge_gm.json
 
 output.txt
 *.tmp
+
+# Local scratch/session noise -- never intended for commit
+.claude/
+_to_delete/

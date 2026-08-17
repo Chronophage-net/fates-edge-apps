@@ -35,7 +35,7 @@ const CONFIG = {
             ? 'https://fates-edge-ws.onrender.com'
             : 'http://localhost:10000';
     },
-    DEFAULT_ROOM: 'VTRM',
+    DEFAULT_ROOM: 'AC12', // matches fates-edge-ai-gm-bot's own ROOM default (ai-gm-bot.js) so a fresh client and a freshly-started bot land in the same room with zero config
     MAX_RECONNECT: 5,
     RECONNECT_INTERVAL: 3000,
     CONNECTION_TIMEOUT: 10000

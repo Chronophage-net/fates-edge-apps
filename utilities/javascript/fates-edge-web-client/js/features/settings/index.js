@@ -240,9 +240,17 @@ FATE'S EDGE — LICENSE SUMMARY
 // DEFAULT CONFIGURATION
 // ============================================================
 
-const DEFAULT_WS_URL = 'wss://fates-edge-socket-server.onrender.com';
-const DEFAULT_WS_ROOM = 'vtt-room';
-const DEFAULT_SERVER_URL = 'https://fates-edge-socket-server.onrender.com';
+// Overridable at BUILD time via Vite env vars (VITE_WS_URL / VITE_WS_ROOM /
+// VITE_SERVER_URL) -- e.g. docker-compose.full.yml's demo build bakes in
+// ws://localhost:<port> + room DEMO here so a locally-built demo image talks
+// to its own local server out of the box, instead of everyone's first run
+// silently connecting to the hosted production server. Falls back to the
+// hosted production server/room for the normal (non-demo) build, unchanged
+// from before. Still fully user-overridable afterward in Settings -- these
+// are just the pre-Settings defaults.
+const DEFAULT_WS_URL = import.meta.env.VITE_WS_URL || 'wss://fates-edge-socket-server.onrender.com';
+const DEFAULT_WS_ROOM = import.meta.env.VITE_WS_ROOM || 'AC12'; // matches fates-edge-ai-gm-bot's own ROOM default (ai-gm-bot.js) -- 'vtt-room' was a made-up placeholder no bot ever actually defaulted to joining
+const DEFAULT_SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://fates-edge-socket-server.onrender.com';
 
 // ============================================================
 // RENDER

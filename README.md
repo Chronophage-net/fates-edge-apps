@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.14.0 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.15.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,14 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.14.0-blue)](https://github.com/Chronophage-net/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.15.0-blue)](https://github.com/Chronophage-net/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
-- [What's New in v4.14.0](#-whats-new-in-v4140)
+- [What's New in v4.15.0](#-whats-new-in-v4150)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
@@ -39,6 +39,14 @@
 The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io server, a **campaign sharing server** with GM election and shared Deck of Consequences draws, **integrations** for Foundry VTT, Discord, Roll20, and Avrae, and a growing set of **standalone in-browser mini-tools** (including an original strategy board game, Kon'reh).
 
 ---
+
+## 🆕 What's New in v4.15.0
+
+- **🎥 A real recording of the demo actually running** — README's Quick Start now embeds `docs/media/demo.mp4`: the AI GM bot joining room `DEMO` and narrating a live reply, generated entirely by the local Ollama instance `npm run demo` starts (no API keys, nothing cloud-hosted).
+- **🐛 Fixed: the demo client was silently talking to the production server, not the local stack.** `fates-edge-web-client`'s WebSocket URL/room/server defaults were hardcoded to the hosted production server, so opening `localhost:8080` after `npm run demo` connected the browser to production instead of the containers `npm run demo` just started — the AI GM bot (correctly joined to the *local* server's room `DEMO`) was never in the same room as the browser. Now overridable at build time via `VITE_WS_URL`/`VITE_WS_ROOM`/`VITE_SERVER_URL`, and `docker-compose.full.yml`'s demo build sets them to point the client at itself. The normal production build is unaffected.
+- **🔧 Demo stack polish**, closing out a round of review feedback: `tools/demo.sh` now generates a random per-run `API_KEY` instead of a static placeholder, warns when the lightweight default model (`llama3.2:1b`) is in use and suggests `llama3.2:3b`/`mistral`, and notes that the AI GM's first reply may take 10-30s longer while Ollama loads the model.
+- **🐛 Five more first-run bugs fixed**, all surfaced by actually running `npm run demo` end to end for the first time: a missing `pull_policy` on the three locally-built services (Compose tried to *pull* them instead of building), `fates-edge-socket-server/.dockerignore` excluding `package-lock.json` (broke `npm ci`), a missing `--break-system-packages` on that service's `pip3 install` (PEP 668), an unquoted `AIGM_BOT_NAME=AI GM` in `.env.demo(.example)` breaking `tools/demo.sh`'s env sourcing, and `OLLAMA_PORT` colliding with a native (non-Docker) Ollama install on the same machine.
+- **🧠 Adventure Engine: structured knowledge state** (`fates-edge-socket-server/server/adventure.js`) — adventure modules can now define a `knowledge[]` array of explicit `{ id, subject, gm, player, revealed, revealCondition, tags }` secret entries instead of burying them in `_gmhints` prose. Two new REST routes (`POST /api/rooms/:code/adventure/knowledge/reveal|hide`) plus matching Socket.IO/plain-WS events flip an entry's live reveal state at runtime; `getPublicState()`/`getReferenceData()` split so GM-only truth never reaches player-facing views. See `fates-edge-ai-gm-bot`'s matching `[REVEAL "id"]`/`[HIDE "id"]` AI tags.
 
 ## 🆕 What's New in v4.14.0
 
@@ -171,6 +179,42 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 ---
 
 ## 🚀 Quick Start
+
+### See it working right now (no API keys, ~2 min after the first build)
+
+```bash
+npm run demo
+```
+
+[![Watch the demo](docs/media/demo-thumbnail.png)](docs/media/demo.mp4)
+
+*Click to play `docs/media/demo.mp4` -- the AI GM bot joining room `DEMO`
+and narrating a live reply, generated entirely by the local Ollama
+instance `npm run demo` just started (no API keys, nothing cloud-hosted).*
+
+Brings up the web client, the real-time server, Redis, a local Ollama
+instance, and the AI GM bot -- wired together with sensible defaults, no
+OpenAI/DeepSeek key needed (the AI GM talks to the local Ollama instance
+instead). Clones `fates-edge-ai-gm-bot` as a sibling directory
+automatically if it isn't already there. Then:
+
+1. Open http://localhost:8080, create/join room `DEMO`
+2. Wait ~10s -- the AI GM bot auto-joins and takes the GM seat
+3. Open a second tab, join the same room, and turn on voice chat in both
+   (works over plain STUN on localhost, no TURN relay needed)
+
+The very first run also builds three Docker images and pulls a small
+local model (~1.3GB) — expect a few minutes, not literally two, the
+first time. Every run after that reuses the Docker cache and the
+already-pulled model. See `docker-compose.full.yml`'s header comment
+for the full breakdown, `.env.demo.example` for every knob (bigger/
+smaller local model, ports, etc.), and `npm run demo -- --down` to tear
+it down (your pulled model and data stay cached).
+
+This is a separate, self-contained file (`docker-compose.full.yml`)
+from the "bring your own API key(s)" `docker-compose.yml` covered next
+-- use that one instead once you're ready to plug in a real AI
+provider and/or TURN relay for a real game.
 
 ### Prerequisites
 
@@ -517,7 +561,14 @@ privately rather than filing a public issue.
 
 ## 📋 Version History
 
-### v4.14.0 (Current)
+### v4.15.0 (Current)
+- **Added** `docs/media/demo.mp4`/`demo-thumbnail.png` — a real recording of `npm run demo`, embedded in the README Quick Start
+- **Added** Adventure Engine structured `knowledge[]` state, reveal/hide REST + socket events, `getPublicState()`/`getReferenceData()` split
+- **Fixed** Demo client was hardcoded to the hosted production WebSocket server instead of the local demo stack — now overridable via `VITE_WS_URL`/`VITE_WS_ROOM`/`VITE_SERVER_URL` build args, wired up for the demo build
+- **Fixed** Five first-run bugs in the demo stack: missing `pull_policy` on locally-built services, `.dockerignore` excluding `package-lock.json`, missing `--break-system-packages` on `pip3 install`, unquoted `AIGM_BOT_NAME` breaking env sourcing, `OLLAMA_PORT` colliding with native Ollama installs
+- **Changed** `tools/demo.sh` generates a random per-run `API_KEY`, warns about the lightweight default model, and notes first-reply load time
+
+### v4.14.0
 - **Added** General per-IP API rate limiting across the whole REST API (`API_RATE_LIMIT_WINDOW_MS`/`API_RATE_LIMIT_MAX`), previously only on login/register
 - **Added** Per-connection WebSocket message rate limiting on both transports (`WS_MESSAGE_RATE_WINDOW_MS`/`WS_MESSAGE_RATE_MAX`)
 - **Added** Per-room client cap (`MAX_CLIENTS_PER_ROOM`, default unlimited)

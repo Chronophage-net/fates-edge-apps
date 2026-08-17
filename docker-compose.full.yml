@@ -1,0 +1,284 @@
+# =================================================================
+# Fate's Edge — FULL DEMO STACK
+#
+# Everything needed to see the AI GM and voice chat working, from a
+# cold clone, with NO API keys required except optionally pulling a
+# different Ollama model. Brings up: web client, real-time server,
+# Redis (socket.io scaling backend), a local Ollama instance (with
+# its model pre-pulled by a one-shot init container), and the AI GM
+# bot wired to talk to that local Ollama instance.
+#
+# This is a separate file from the main `docker-compose.yml` on
+# purpose -- that one is the "bring your own API key(s), pick your
+# profile" file for real use; this one is the "just make it go"
+# demo/eval file with everything hardcoded to sensible local defaults.
+#
+# Quick start:
+#   npm run demo
+#
+# ...or by hand:
+#   cp .env.demo.example .env.demo    # optional -- every value has a default
+#   docker compose -f docker-compose.full.yml --env-file .env.demo up --build
+#
+# Then:
+#   1. Open http://localhost:8080
+#   2. Create or join room "DEMO" (or whatever DEMO_ROOM is set to)
+#   3. Wait ~10s -- the AI GM bot auto-joins and takes the GM seat
+#   4. Open a second browser tab/window, join the same room, and turn
+#      on voice chat in both to hear it work (plain STUN is enough on
+#      localhost -- no TURN relay needed for a same-machine demo)
+#
+# Timing: the FIRST run builds three Docker images (client/server/bot)
+# and pulls a small local model (default: llama3.2:1b, ~1.3GB) into a
+# named volume -- expect this to take a few minutes depending on your
+# machine and connection, not literally two. Every run after that
+# reuses the Docker layer cache and the already-pulled model, so it's
+# much closer to the two-minute mark `npm run demo` aims for.
+#
+# Requires fates-edge-ai-gm-bot cloned as a sibling directory (same
+# layout as the main docker-compose.yml expects):
+#   Chronophage-net_GitHub/
+#   ├── fates-edge-apps/          <- this repo (this file is here)
+#   └── fates-edge-ai-gm-bot/     <- sibling clone
+# `npm run demo` clones it for you automatically if it's missing.
+#
+# Requires Docker Compose V2 (the `docker compose` subcommand, not the
+# older standalone `docker-compose` v1 binary) -- this file uses the
+# `service_completed_successfully` depends_on condition (for the
+# Ollama model-pull init container) that v1 doesn't support.
+# =================================================================
+
+services:
+  # ─── Redis (socket.io horizontal-scaling backend) ────────────
+  # Entirely optional at the application level -- the server only
+  # activates its Redis pub/sub adapter if REDIS_URL is set (see
+  # server/scaling.js) -- but included here so the demo shows the
+  # complete stack end to end, including the scaling path.
+  redis:
+    image: redis:7-alpine
+    container_name: fates-edge-demo-redis
+    restart: unless-stopped
+    volumes:
+      - demo-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - fates-edge-demo-network
+
+  # ─── Local Ollama instance ────────────────────────────────────
+  # No API key required -- this is what makes the whole stack
+  # zero-API-key by default. CPU-only out of the box so it works on
+  # any machine; see the commented `deploy.resources` block below if
+  # you have an NVIDIA GPU + nvidia-container-toolkit and want it faster.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: fates-edge-demo-ollama
+    restart: unless-stopped
+    ports:
+      # Exposed on the host so you can `ollama pull` other models, or
+      # point an external tool at it, while the stack is running.
+      # Comment out if you don't want it reachable outside Docker.
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - demo-ollama-data:/root/.ollama
+    healthcheck:
+      # Reuses the image's own CLI rather than assuming curl/wget is
+      # present in the base image -- `ollama list` only succeeds once
+      # the local server is actually accepting requests.
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 15s
+    # Uncomment to use an NVIDIA GPU (requires nvidia-container-toolkit
+    # installed on the host -- see https://ollama.com/blog/ollama-is-now-available-as-an-official-docker-image):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    networks:
+      - fates-edge-demo-network
+
+  # ─── One-shot: pull the demo model into the Ollama volume ────
+  # Runs once, pulls DEMO_OLLAMA_MODEL, then exits 0. The AI GM bot
+  # below waits on this (service_completed_successfully) so it never
+  # races Ollama for a model that isn't there yet. Idempotent -- if
+  # the model's already in the `demo-ollama-data` volume from a
+  # previous run, `ollama pull` verifies it's up to date and returns
+  # almost instantly instead of re-downloading.
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: fates-edge-demo-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=ollama:11434
+      # Substituted by Compose at config-parse time (not inside the
+      # container's shell) -- so unlike a `$${...}` shell-side fallback,
+      # this one actually sees whatever DEMO_OLLAMA_MODEL is set to in
+      # your shell env / .env.demo / --env-file.
+      - PULL_MODEL=${DEMO_OLLAMA_MODEL:-llama3.2:1b}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "Pulling $$PULL_MODEL into the local Ollama instance (first run only takes a while)..."
+        ollama pull "$$PULL_MODEL"
+        echo "Model ready."
+    restart: "no"
+    networks:
+      - fates-edge-demo-network
+
+  # ─── Web Client ───────────────────────────────────────────────
+  client:
+    build:
+      context: ./utilities/javascript/fates-edge-web-client
+      dockerfile: Dockerfile
+      # Bake the demo's own local server into the compiled SPA's defaults
+      # (see js/features/settings/index.js), so opening the client just
+      # works without a manual trip to Settings -- otherwise it silently
+      # defaults to the hosted production server instead of this stack.
+      args:
+        VITE_WS_URL: ws://localhost:${SERVER_PORT:-10000}
+        VITE_WS_ROOM: ${DEMO_ROOM:-DEMO}
+        VITE_SERVER_URL: http://localhost:${SERVER_PORT:-10000}
+    image: fates-edge-client:latest
+    pull_policy: never  # locally built -- never try to pull this from a registry
+    container_name: fates-edge-demo-client
+    ports:
+      - "${CLIENT_PORT:-8080}:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - fates-edge-demo-network
+
+  # ─── Real-Time / Campaign Sharing Server ─────────────────────
+  server:
+    build:
+      context: ./utilities/javascript/fates-edge-socket-server
+      dockerfile: Dockerfile
+    image: fates-edge-server:latest
+    pull_policy: never  # locally built -- never try to pull this from a registry
+    container_name: fates-edge-demo-server
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "${SERVER_PORT:-10000}:${SERVER_PORT:-10000}"
+    environment:
+      - NODE_ENV=production
+      - PORT=${SERVER_PORT:-10000}
+      # Fixed (not auto-generated) for the demo so the AI GM bot below
+      # can be pre-configured with a value that's guaranteed to match --
+      # the production docker-compose.yml leaves this blank on purpose
+      # (auto-generated + logged), but that requires a human to go read
+      # the logs and copy it into the bot's config, which defeats "see
+      # it working in two minutes." Change it before exposing this
+      # stack beyond your own machine.
+      - API_KEY=${API_KEY:-demo-local-key-change-me}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Redis-backed socket.io adapter -- see server/scaling.js. Not
+      # required for a single-instance demo to work, but wired up so
+      # the demo actually exercises it end to end.
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./utilities/javascript/fates-edge-socket-server/data:/app/data
+      - demo-server-logs:/app/logs
+      - demo-server-modules:/app/modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:${SERVER_PORT:-10000}/healthz', r => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    networks:
+      - fates-edge-demo-network
+
+  # ─── AI GM Bot (talks to the local Ollama instance -- zero API keys) ───
+  # Lives in the separate fates-edge-ai-gm-bot repo, cloned as a sibling
+  # directory -- see this file's header comment. `npm run demo` clones
+  # it automatically if it's missing.
+  ai-gm-bot:
+    build:
+      context: ../fates-edge-ai-gm-bot
+      dockerfile: Dockerfile
+    image: fates-edge-ai-gm-bot:latest
+    pull_policy: never  # locally built -- never try to pull this from a registry
+    container_name: fates-edge-demo-ai-gm-bot
+    ports:
+      # The bot's own live status dashboard (Story Beats, loaded
+      # adventure, recent AI "memory", connection state) -- open
+      # http://localhost:4141 alongside the client to watch the GM
+      # bot's internal state while you play. See modules/status-server.js
+      # in the ai-gm-bot repo. Set AIGM_STATUS_PORT to change the host
+      # port, or STATUS_SERVER=false in the environment block below to
+      # disable it entirely.
+      - "${AIGM_STATUS_PORT:-4141}:4141"
+    depends_on:
+      server:
+        condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
+    environment:
+      - NODE_ENV=production
+      - WS_URL=ws://server:${SERVER_PORT:-10000}
+      - API_KEY=${API_KEY:-demo-local-key-change-me}
+      - ROOM=${DEMO_ROOM:-DEMO}
+      - BOT_NAME=${AIGM_BOT_NAME:-AI GM}
+      # This is the whole point of the demo: no OpenAI/DeepSeek key,
+      # just a local model talking to the local Ollama container above.
+      - AI_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=${DEMO_OLLAMA_MODEL:-llama3.2:1b}
+      # This is sent straight through to Ollama as its own `num_ctx`
+      # request parameter (see ollama-driver.js), not just used for this
+      # bot's local history-trimming budget -- so it actually controls
+      # how much conversation Ollama will consider, not merely how much
+      # this bot tries to send it. If you change DEMO_OLLAMA_MODEL, bump
+      # this to match: run `ollama show <model>` (once pulled) to see
+      # that model's real max context, and pick a value your machine's
+      # RAM/VRAM can comfortably hold -- bigger isn't free, it costs more
+      # memory per request. The 8192 default here is conservative and
+      # well under every model this file suggests (llama3.2:1b/3b and
+      # mistral all officially support far more), not a hard ceiling.
+      - OLLAMA_CONTEXT_WINDOW=${DEMO_OLLAMA_CONTEXT_WINDOW:-8192}
+      # REQUIRED for any headless/unattended Ollama deployment -- skips
+      # the interactive "pull this model?" terminal prompt (which would
+      # otherwise hang forever with no stdin attached) and fails fast
+      # with a clear error instead. See ollama-driver.js's _recoverModel().
+      - HEADLESS=true
+      # The status dashboard binds to 127.0.0.1 ONLY by default (a
+      # deliberate security hardening -- see modules/status-server.js /
+      # this repo's CHANGELOG). That's the container's own loopback, not
+      # reachable through the `ports:` mapping above unless it's told to
+      # bind all interfaces. Fine here since only this container's own
+      # network is exposed on 4141, not the host's.
+      - STATUS_HOST=0.0.0.0
+    restart: unless-stopped
+    networks:
+      - fates-edge-demo-network
+
+networks:
+  fates-edge-demo-network:
+    driver: bridge
+
+volumes:
+  demo-redis-data:
+  demo-ollama-data:
+  demo-server-logs:
+  demo-server-modules:

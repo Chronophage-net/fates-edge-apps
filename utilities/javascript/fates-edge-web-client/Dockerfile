@@ -17,6 +17,18 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Optional build-time overrides for the WebSocket/server defaults baked
+# into the compiled SPA (see js/features/settings/index.js) -- unset by
+# default, which preserves the normal production build pointed at the
+# hosted server. docker-compose.full.yml's demo build sets these to point
+# a locally-built image at its own local server instead.
+ARG VITE_WS_URL=""
+ARG VITE_WS_ROOM=""
+ARG VITE_SERVER_URL=""
+ENV VITE_WS_URL=${VITE_WS_URL}
+ENV VITE_WS_ROOM=${VITE_WS_ROOM}
+ENV VITE_SERVER_URL=${VITE_SERVER_URL}
+
 COPY package*.json ./
 RUN npm ci
 

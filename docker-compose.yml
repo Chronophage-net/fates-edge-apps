@@ -161,7 +161,7 @@ services:
       - NODE_ENV=production
       - WS_URL=ws://server:${SERVER_PORT:-10000}
       - API_KEY=${API_KEY:-}
-      - ROOM=${AIGM_ROOM:-AIGM}
+      - ROOM=${AIGM_ROOM:-AC12}
       - BOT_NAME=${AIGM_BOT_NAME:-AIGM}
       - AI_PROVIDER=${AI_PROVIDER:-openai}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
