@@ -270,6 +270,20 @@ export class KonrehEngine {
       } else if (blue.crossExclusion > 0) {
         blue.crossExclusion--;
       }
+
+      // Cross Stay: counts consecutive OWN TURNS that end with Blue inside
+      // the Cross — not consecutive turns on which Blue itself was the
+      // piece moved. This must tick here, once per completed turn,
+      // regardless of which piece moved: a player can otherwise camp Blue
+      // in the Cross indefinitely just by moving something else instead,
+      // since makeMove() (and therefore the old increment site) never
+      // fires for Blue on those turns. Resets to 0 the moment Blue ends a
+      // turn outside the Cross, so each fresh visit gets its own budget.
+      if (this.isCross(blue.x, blue.y)) {
+        blue.crossStays++;
+      } else {
+        blue.crossStays = 0;
+      }
     }
 
     // Reforge countdown: the captured side gets exactly 5 of its own turns
@@ -489,16 +503,12 @@ export class KonrehEngine {
         piece.mobilizationDelay = false; // this Blue has now made its first departure from Home
       }
 
-      // Cross Stay: consecutive turns ended inside the Cross. Resets to 0
-      // the moment Blue ends a turn outside it, so each fresh visit (after
-      // satisfying the exclusion cooldown) gets its own full 3-turn budget.
+      // Cross exclusion: triggers the instant Blue's move carries it OUT of
+      // the Cross. (crossStays — turns Blue spends *sitting* in the Cross —
+      // is tracked once per completed turn in applyEndOfTurnUpkeep instead,
+      // since Blue can remain in the Cross on turns where a different piece
+      // is moved, and the clock must still tick on those turns too.)
       const nowInCross = this.isCross(piece.x, piece.y);
-      if (nowInCross) {
-        piece.crossStays++;
-      } else if (wasInCross) {
-        piece.crossStays = 0;
-      }
-
       piece.crossExclusionJustSet = false;
       if (wasInCross && !nowInCross) {
         piece.crossExclusion = 2;
