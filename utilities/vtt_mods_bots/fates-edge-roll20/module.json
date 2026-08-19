@@ -2,7 +2,7 @@
   "name": "fates-edge-roll20",
   "title": "Fate's Edge Bridge for Roll20",
   "description": "Connects Roll20 to the Fate's Edge VTT server with chat, dice, deck, and GM management.",
-  "version": "2.1.0",
+  "version": "4.16.0",
   "author": "Fate's Edge Team",
   "scripts": [
     "api/fates-edge-api.js"

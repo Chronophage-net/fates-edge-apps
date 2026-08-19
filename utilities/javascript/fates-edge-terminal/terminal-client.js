@@ -15,6 +15,16 @@
  * curses-style UI (blessed): scrolling log pane + live status sidebar +
  * dedicated input box, instead of the classic readline prompt. Same
  * commands, same wire protocol — just a different skin.
+ *
+ * Known gaps (server v4.16.0): the socket server added two new REST-only
+ * routes -- POST /api/rooms/:code/adventure/climax-forced (sibling of the
+ * existing climax-triggered marker) and GET/POST /api/rooms/:code/deck/seed
+ * (read/reseed this room's deck RNG for reproducible draws) -- with no
+ * accompanying WS event, so there's nothing for this WS-only client to hook
+ * `/adventure`, `/draw`, `/crown`, or `/shuffle` into yet. Server-side deck
+ * draws otherwise now use a per-room seedable PRNG instead of a shared
+ * unseeded Math.random(), which is why reseeding is possible at all --
+ * transparent to existing /draw, /crown, /shuffle here either way.
  */
 
 const WebSocket = require('ws');

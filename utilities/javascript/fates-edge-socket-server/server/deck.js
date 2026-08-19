@@ -89,10 +89,14 @@ const ACE_EFFECTS = {
     // ... (other region-specific effects can be added, but fallback to generic if missing)
 };
 
-// ─── Helper: deterministic shuffle (not used for server, but kept for parity) ──
-function shuffleArray(array) {
+// ─── Helper: shuffle, optionally with a caller-supplied deterministic RNG ──
+// `rng` is any zero-arg function returning a float in [0, 1) -- defaults to
+// the global Math.random() so every existing call site that doesn't pass one
+// keeps behaving exactly as before. Pass rng.getRoomRng(room) (see rng.js)
+// for a reproducible, per-room-isolated sequence instead.
+function shuffleArray(array, rng = Math.random) {
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(rng() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
@@ -430,7 +434,12 @@ function interpretCrownCard(card, position, regionData) {
 }
 
 // ─── Build a deck (for server-side draws) ──────────────────────────
-function buildDeck() {
+// `rng` -- see shuffleArray()'s doc comment above; same default/override
+// contract. Pass a per-room rng (rng.js's getRoomRng(room)) from api.js's
+// route handlers so each room's deck shuffle is independently seeded and
+// reproducible instead of everyone drawing off the same global Math.random()
+// stream.
+function buildDeck(rng = Math.random) {
     const deck = [];
     for (const suit of SUITS) {
         for (const rank of RANKS) {
@@ -447,9 +456,9 @@ function buildDeck() {
     }
     deck.push({ suit: 'joker', rank: 'Red', symbol: '🃏', color: '#d4af37', isJoker: true, suitName: 'Joker', rankName: 'Red' });
     deck.push({ suit: 'joker', rank: 'Black', symbol: '🃏', color: '#d4af37', isJoker: true, suitName: 'Joker', rankName: 'Black' });
-    // Shuffle using Fisher-Yates with crypto randomness
+    // Fisher-Yates, using whichever rng was supplied (see param doc above).
     for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(rng() * (i + 1));
         [deck[i], deck[j]] = [deck[j], deck[i]];
     }
     return deck;
@@ -564,10 +573,10 @@ function drawCrownSpread(deck, regionName) {
 }
 
 /**
- * Reset / rebuild the deck.
+ * Reset / rebuild the deck. `rng` -- see buildDeck()'s doc comment.
  */
-function resetDeck() {
-    return buildDeck();
+function resetDeck(rng = Math.random) {
+    return buildDeck(rng);
 }
 
 // ─── Exports ─────────────────────────────────────────────────────────
@@ -577,6 +586,7 @@ module.exports = {
     drawCrownSpread,
     buildDeck,
     resetDeck,
+    shuffleArray,
     // For internal use / testing
     transformRegionData,
     getCardMeaningFromRegion,

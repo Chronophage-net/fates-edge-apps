@@ -99,6 +99,35 @@
  * the entry's home for "what am I allowed to tell the players?" moves in
  * one place, not two.
  *
+ * LEGACY TRACKER (this pass): a module may declare an optional top-level
+ * `persistence` block describing what carries over into the campaign's
+ * cross-adventure legacy state once this adventure finishes:
+ *
+ *   "persistence": {
+ *     "schema": "fenwood-legacy-v1",     // unique id later adventures reuse
+ *                                          // to pick up this same thread
+ *     "carryover": [
+ *       { "key": "fenwood_ledger", "type": "timer", "default": 0, "max": 12 },
+ *       { "key": "heirlooms", "type": "inventory", "items": [...] },
+ *       { "key": "oaths", "type": "list", "fields": ["name","to_whom","status"] },
+ *       { "key": "npc_status", "type": "dictionary", "default": "unknown" }
+ *     ],
+ *     "reset_on_complete": false          // if true, clear this schema's
+ *                                          // legacy entry instead of writing
+ *                                          // fresh values when this
+ *                                          // adventure finishes
+ *   }
+ *
+ * Purely declarative here -- this file never interprets `persistence`, it
+ * only stores it as part of the module (so it survives the deep-clone in
+ * loadAdventureModule()/loadAdventureContent() like any other field) and
+ * surfaces it via getReferenceData() (GM/AI-eyes-only, like `notes`).
+ * modules/legacy-tracker.js on the bot side does the actual extraction
+ * (reading `key`-named values out of the bot's own campaign facts/this
+ * adventure's timers), and adventure-context.js injects whatever the
+ * CURRENT adventure's own `persistence.schema` already has on file into
+ * the LLM system prompt as a structured JSON block.
+ *
  * `revealed` is LIVE STATE: it resets to each entry's authored starting
  * value on every loadAdventureModule()/loadAdventureContent() (same
  * treatment as scene.completed / timer.current), then flips at runtime
@@ -146,6 +175,11 @@ const ADVENTURES_DIR = path.resolve(process.cwd(), 'data', 'adventures');
 const MAX_LOG_ENTRIES = 200;
 const VALID_OUTCOMES = ['clean', 'partial', 'miss'];
 const DEFAULT_CLIMAX_AFTER_SESSIONS = 4;
+// NEW: default cap on scene-transitions a dynamic-growth adventure's
+// climax act gets before the bot-side director is allowed to force a
+// dramatic turn toward resolution -- see the CLIMAX PACING doc block
+// near markClimaxTriggered()/advanceScene() below.
+const DEFAULT_CLIMAX_PAD_SCENES = 2;
 
 /** Ensure room.data.adventure exists, and return it. */
 function ensureAdventureState(room) {
@@ -166,6 +200,18 @@ function ensureAdventureState(room) {
             sessionsPlayed: 0,
             climaxAfterSessions: DEFAULT_CLIMAX_AFTER_SESSIONS,
             climaxTriggered: false,
+            // NEW: climax PACING tracking (see "CLIMAX PACING" doc block
+            // near markClimaxTriggered()/advanceScene() below). climaxPadScenes
+            // is how many scene-transitions the climax act is expected to
+            // resolve within before the bot-side director is allowed to force
+            // a dramatic turn; climaxScenesSinceTrigger counts actual
+            // transitions since climaxTriggered flipped true; climaxForced
+            // records whether that forcing has already happened once (it
+            // should only ever fire once per climax, same as climaxTriggered
+            // itself only ever fires once per adventure).
+            climaxPadScenes: DEFAULT_CLIMAX_PAD_SCENES,
+            climaxScenesSinceTrigger: 0,
+            climaxForced: false,
         };
     }
     return room.data.adventure;
@@ -301,6 +347,9 @@ function loadAdventureModule(room, moduleId) {
     adventure.sessionsPlayed = 0;
     adventure.climaxAfterSessions = DEFAULT_CLIMAX_AFTER_SESSIONS;
     adventure.climaxTriggered = false;
+    adventure.climaxPadScenes = DEFAULT_CLIMAX_PAD_SCENES;
+    adventure.climaxScenesSinceTrigger = 0;
+    adventure.climaxForced = false;
     appendLog(adventure, { type: 'loaded', message: `Loaded adventure "${moduleCopy.title}"` });
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
@@ -362,6 +411,10 @@ function loadAdventureContent(room, content, options = {}) {
     adventure.sessionsPlayed = 0;
     adventure.climaxAfterSessions = options.climaxAfterSessions || DEFAULT_CLIMAX_AFTER_SESSIONS;
     adventure.climaxTriggered = false;
+    // NEW: climax pacing, also opt-in via options (see DEFAULT_CLIMAX_PAD_SCENES doc)
+    adventure.climaxPadScenes = options.climaxPadScenes || DEFAULT_CLIMAX_PAD_SCENES;
+    adventure.climaxScenesSinceTrigger = 0;
+    adventure.climaxForced = false;
     appendLog(adventure, { type: 'loaded', message: `Loaded custom adventure "${moduleCopy.title}"` });
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
@@ -391,6 +444,17 @@ function advanceScene(room, target = {}) {
 
     const leavingScene = getCurrentScene(adventure);
     if (leavingScene) leavingScene.completed = true;
+
+    // NEW: CLIMAX PACING -- count every scene transition that happens
+    // once climaxTriggered is true (regardless of whether it's an
+    // ordinary sequential advance or an explicit-target jump), so the
+    // bot-side director can compare against climaxPadScenes and decide
+    // whether the party is dragging the climax out longer than intended.
+    // Deliberately counts transitions rather than wall-clock time or chat
+    // volume -- see DEFAULT_CLIMAX_PAD_SCENES's doc comment.
+    if (adventure.climaxTriggered) {
+        adventure.climaxScenesSinceTrigger = (adventure.climaxScenesSinceTrigger || 0) + 1;
+    }
 
     const hasExplicitTarget = typeof target.actIndex === 'number' || typeof target.sceneIndex === 'number';
 
@@ -571,6 +635,27 @@ function markSessionEnd(room) {
 function markClimaxTriggered(room) {
     const adventure = ensureAdventureState(room);
     adventure.climaxTriggered = true;
+    // NEW: a fresh climax starts its own pacing clock from zero.
+    adventure.climaxScenesSinceTrigger = 0;
+    adventure.climaxForced = false;
+    adventure.updatedAt = Date.now();
+    room.lastActivity = Date.now();
+    return getPublicState(room);
+}
+
+/**
+ * NEW: CLIMAX PACING -- mark that the bot-side director has already
+ * forced one dramatic turn during this climax (see DEFAULT_CLIMAX_PAD_SCENES
+ * and advanceScene()'s climaxScenesSinceTrigger counting above). Kept as
+ * its own tiny mutation function/route, matching this file's existing
+ * pattern (markSessionEnd/markClimaxTriggered), rather than folding the
+ * flag into some other call -- so it's independently loggable/broadcastable
+ * and only ever needs to fire once per climax.
+ */
+function markClimaxForced(room) {
+    const adventure = ensureAdventureState(room);
+    adventure.climaxForced = true;
+    appendLog(adventure, { type: 'climax-forced', message: 'The GM forced a dramatic turn to keep the climax moving.' });
     adventure.updatedAt = Date.now();
     room.lastActivity = Date.now();
     return getPublicState(room);
@@ -738,6 +823,8 @@ function resetAdventure(room) {
     adventure.activeEncounterRef = null;
     adventure.sessionsPlayed = 0;
     adventure.climaxTriggered = false;
+    adventure.climaxScenesSinceTrigger = 0;
+    adventure.climaxForced = false;
     for (const act of adventure.module.acts || []) {
         for (const scene of act.scenes || []) {
             scene.completed = false;
@@ -842,6 +929,9 @@ function getPublicState(room) {
             sessionsPlayed: adventure.sessionsPlayed,
             climaxAfterSessions: adventure.climaxAfterSessions,
             climaxTriggered: adventure.climaxTriggered,
+            climaxPadScenes: adventure.climaxPadScenes,
+            climaxScenesSinceTrigger: adventure.climaxScenesSinceTrigger,
+            climaxForced: adventure.climaxForced,
         };
     }
 
@@ -896,6 +986,10 @@ function getPublicState(room) {
         sessionsPlayed: adventure.sessionsPlayed,
         climaxAfterSessions: adventure.climaxAfterSessions,
         climaxTriggered: adventure.climaxTriggered,
+        // NEW: climax pacing (see DEFAULT_CLIMAX_PAD_SCENES doc comment)
+        climaxPadScenes: adventure.climaxPadScenes,
+        climaxScenesSinceTrigger: adventure.climaxScenesSinceTrigger,
+        climaxForced: adventure.climaxForced,
     };
 }
 
@@ -916,6 +1010,18 @@ function getReferenceData(room) {
         locations: adventure.module.locations || [],
         factions: adventure.module.factions || [],
         notes: adventure.module.notes || '',
+        // NEW: LEGACY TRACKER -- a module's optional `persistence` block
+        // (see modules/legacy-tracker.js on the bot side for the full
+        // design) declares which of THIS adventure's own tracked values
+        // (timers/facts/etc.) should be extracted into the campaign's
+        // cross-adventure legacy state when it finishes, and under which
+        // `schema` key later adventures should look for that state.
+        // Passed through here verbatim (undefined/no-op for the many
+        // modules that don't define it) rather than interpreted
+        // server-side -- interpreting it is the bot's job, this file just
+        // surfaces the module's own declaration the same way it already
+        // surfaces `notes`/`knowledge`.
+        persistence: adventure.module.persistence || null,
         // NEW: GM/AI-eyes-only knowledge view -- the ONLY place `gm` (the
         // secret truth) and `revealCondition` (authoring guidance on when
         // to reveal it) are ever exposed. This is what the AI GM's system
@@ -937,6 +1043,7 @@ module.exports = {
     addCreature,
     markSessionEnd,
     markClimaxTriggered,
+    markClimaxForced,
     startEncounter,
     resolveEncounter,
     tickTimer,

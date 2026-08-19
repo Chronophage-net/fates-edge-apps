@@ -41,8 +41,8 @@ Routes are grouped by feature area below; **`server/api.js` is the authoritative
 
 - **Rooms** — create/list/inspect rooms, client lists, kick/ban/unban.
 - **Characters** — per-room character CRUD, plus an account-owned character *library* (`/api/account/characters`) independent of any room, and a claim/release bridge tying a library character to a room's live roster (see [ROLES.md](ROLES.md)).
-- **Deck** — draw/shuffle/history for the shared Deck of Consequences, and the Crown Spread reading.
-- **Adventure** — load/reset an adventure, advance scenes/timers, log entries, start/resolve encounters, append acts/scenes, add NPCs/creatures.
+- **Deck** — draw/shuffle/history for the shared Deck of Consequences, the Crown Spread reading, and `GET`/`POST /api/rooms/:code/deck/seed` to read/reseed the room's deck PRNG (see "Deck PRNG" below).
+- **Adventure** — load/reset an adventure, advance scenes/timers, log entries, start/resolve encounters, append acts/scenes, add NPCs/creatures, and pace/force a climax (`climax-triggered` / `climax-forced`, see "Climax pacing" below).
 - **Whiteboard** — tokens, grid-combat state.
 - **Campaigns** — manual short-code share/upload/download, plus a separate always-latest auto-save (see `server/storage.js`'s header comment for why those two don't share one retention table).
 - **Auth** — `POST /api/auth/register`, `POST /api/auth/login` (both behind a hand-rolled in-memory rate limiter, see §5), `GET /api/auth/me`.
@@ -51,6 +51,42 @@ Routes are grouped by feature area below; **`server/api.js` is the authoritative
 - **Health** — `GET /healthz` / `GET /api/healthz`.
 
 Not real (were listed in an earlier draft of this document, don't exist in `api.js`): `/api/rooms/template/:template`, `/api/rooms/:code/chat`, `/api/rooms/:code/roll`, `/api/rooms/:code/vtt/*`, `/api/sessions`, `/api/keys`, `/api/stats`, `/api/analytics`, `/api/convert/pdf`.
+
+### Deck PRNG
+
+The deck used to shuffle with bare `Math.random()`. It now shuffles with a per-room xorshift128 PRNG (`server/rng.js`, new): each room's state carries a seed, and `deck.js`'s internal `buildDeck()`/`shuffleArray()` both take an optional `rng` function parameter — defaulting to `Math.random` when omitted, so any existing call site that doesn't pass one behaves exactly as before. `GET /api/rooms/:code/deck/seed` returns the room's current seed; `POST /api/rooms/:code/deck/seed` (`{ seed }`) reseeds the room's PRNG and reshuffles the deck, broadcasting `deck-shuffled` with `{ reason: "reseeded", ... }`. The practical upshot is a room's entire shuffle sequence is now reproducible from its seed — useful for reproducing a specific draw sequence (bug reports, streamed sessions wanting a fair, pre-committed shuffle) without needing to store the full deck order separately.
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as api.js
+    participant R as rng.js
+    participant D as deck.js
+    C->>A: POST /api/rooms/:code/deck/seed { seed }
+    A->>R: setRoomSeed(room, seed)
+    R-->>A: seed hashed into room.data.deckRngState
+    A->>R: getRoomRng(room)
+    R-->>A: seeded rng() function (xorshift128)
+    A->>D: buildDeck(rng)
+    D-->>A: freshly shuffled deck (deterministic given seed)
+    A-->>C: { success, code, seed, remaining }
+    A->>C: broadcast deck-shuffled { reason: "reseeded", ... }
+```
+
+### Climax pacing
+
+`server/adventure.js`'s growth tracking now paces a triggered climax act instead of leaving it open-ended. Three fields on adventure state: `climaxPadScenes` (settable via `load-custom`'s optional `climaxPadScenes` field, defaults to `2`), `climaxScenesSinceTrigger` (increments once per completed scene while `climaxTriggered` is true), and `climaxForced` (flips `true` once a forced climax twist has fired, resets on the next adventure load). When `climaxScenesSinceTrigger` reaches `climaxPadScenes`, `POST /api/rooms/:code/adventure/climax-forced` (no body) becomes eligible — it's the server-side hook the AI GM bot's `modules/adventure-director.js` (`generateForcedClimaxTwist()`) calls to push a stalled climax toward resolution, mirroring `climax-triggered`'s existing shape and broadcasting `adventure-climax-forced`. Note this route only *records* that a forced twist happened (`markClimaxForced()`) — the twist's content is generated bot-side and appended via the ordinary `scene/append` route first; the server never generates narrative content itself.
+
+```mermaid
+flowchart LR
+    A["climaxTriggered = true\n(POST climax-triggered)"] --> B["scene completes"]
+    B --> C["climaxScenesSinceTrigger++"]
+    C --> D{"climaxScenesSinceTrigger\n>= climaxPadScenes?"}
+    D -- no, more pad left --> B
+    D -- yes, not climaxForced yet --> E["bot appends a forced-twist scene\n(POST scene/append), then\nPOST climax-forced"]
+    E --> F["climaxForced = true\n(won't fire again this climax)"]
+    D -- climax's own final\nscene completes instead --> G["status: completed"]
+```
 
 ## 4. WebSocket Protocol
 
@@ -68,6 +104,7 @@ Server-originated broadcasts follow the pattern `broadcastToRoom(roomCode, event
   deck: Array,                 // built via deck.js's buildDeck()
   deckHistory: Array,
   deckOffset: Number,
+  // + a per-room deck PRNG seed (server/rng.js) — see "Deck PRNG" in §3
   characters: Object,          // normalizeCharKey(name) -> character record
   characterClaims: Object,     // userId -> claimed character key (v4.8, see ROLES.md)
   banned: Set,                 // banned userIds/names

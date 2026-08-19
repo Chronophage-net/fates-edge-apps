@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Roll20-API-blue" alt="Roll20 API"/>
-  <img src="https://img.shields.io/badge/version-2.1.0-orange" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-4.16.0-orange" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
 </p>
 
@@ -130,6 +130,8 @@ Roll20 page changes are also synced automatically when `FATES_EDGE_SYNC_SCENES` 
 | `!fates-edge shuffle` | Shuffle the deck. |
 | `!fates-edge region [name]` | Set or get the default region. |
 
+> **Server API note (v4.16.0):** each room's deck now shuffles with its own seedable RNG instead of a shared unseeded one, so draws are reproducible per room via two new REST routes, `GET`/`POST /api/rooms/:code/deck/seed`. The existing `deck-shuffled` broadcast handled above already fires generically regardless of `reason`, so a server-side reseed (`reason: 'reseeded'`) needs no code change here, but no `!fates-edge` subcommand calls the seed routes yet.
+
 ### Module Management
 
 | Command | Description |
@@ -149,6 +151,8 @@ Roll20 page changes are also synced automatically when `FATES_EDGE_SYNC_SCENES` 
 | `!fates-edge adventure status` | Show current adventure state. |
 | `!fates-edge adventure reference` | Show bestiary/NPCs/locations/factions for the loaded adventure. |
 | `!fates-edge adventure reset` | Reset the loaded adventure back to planned. |
+
+> **Server API note (v4.16.0):** the socket server added `POST /api/rooms/:code/adventure/climax-forced` (a sibling of the existing `climax-triggered` route, broadcasting `adventure-climax-forced` when the AI GM director forces a stalled climax forward), and the adventure state/reference payloads (`adventure status` / `adventure reference` above) now also carry `climaxPadScenes`, `climaxScenesSinceTrigger`, `climaxForced` (state) and an optional `persistence` block (reference — the "Legacy Tracker" schema declaration). No `!fates-edge adventure` subcommand calls the new route or surfaces these fields yet.
 
 ### GM Election & Promotion
 

@@ -122,7 +122,15 @@ fates-edge server --upload --code AC12 --server http://localhost:10000
 fates-edge server --load --code AC12 --campaign-code xy12ab --server http://localhost:10000
 fates-edge server --sync --code AC12 --server http://localhost:10000
 fates-edge server --deck-draw --code AC12 --count 2 --region Acasia --server http://localhost:10000
+fates-edge server --deck-seed-get --code AC12 --server http://localhost:10000
+fates-edge server --deck-seed-set --code AC12 --seed my-seed-123 --server http://localhost:10000
 ```
+
+As of server v4.16.0, every room shuffles its deck with its own
+independent, seedable PRNG instead of a shared unseeded `Math.random()` --
+`--deck-seed-get` reads a room's current (auto-generated if never set)
+seed, and `--deck-seed-set` explicitly reseeds it and immediately
+rebuilds+reshuffles, so the room's next draw is reproducible.
 
 > Loading will overwrite your local data; you'll be prompted to confirm.
 >

@@ -471,6 +471,23 @@ function renderMarkdownBold(html) {
 
 function renderCardText(text) {
     if (!text) return '';
+    // NEW: prefer DOMPurify when it's loaded (window.DOMPurify) -- our own
+    // escapeKeepingAllowedTags() below is safe for the STATIC,
+    // developer-authored region JSON this renders today, but isn't a
+    // substitute for a real sanitizer once GMs can upload their own custom
+    // region data (see the region-upload roadmap note). To enable, load
+    // DOMPurify before this script (e.g. a <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js">
+    // tag, or `npm install dompurify` and import it) -- nothing else here
+    // needs to change once window.DOMPurify exists. Only the escaping step
+    // is replaced; markdown-bold/bracket-chip rendering still runs
+    // afterward exactly like the legacy path.
+    if (typeof window !== 'undefined' && window.DOMPurify) {
+        const sanitized = window.DOMPurify.sanitize(String(text), {
+            ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS,
+            ALLOWED_ATTR: [],
+        });
+        return renderBracketChips(renderMarkdownBold(sanitized));
+    }
     return renderBracketChips(renderMarkdownBold(escapeKeepingAllowedTags(text)));
 }
 

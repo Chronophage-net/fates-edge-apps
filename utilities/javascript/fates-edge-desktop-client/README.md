@@ -6,7 +6,9 @@ A lightweight desktop client for the Fate's Edge Virtual Tabletop.
 
 - 📦 Standalone desktop application
 - 🔌 Connects to Fate's Edge server
-- 🎲 Full web client support
+- 🎲 Full web client support, including GM Tools → Session Recap (recording +
+  event transcript now bundle into a single `.zip` download, with an opt-in
+  best-effort live-transcription checkbox)
 - ⚡ Minimal resource usage
 - 🔄 Auto-updater built-in
 - 🎨 Native OS integration

@@ -13,7 +13,9 @@
  * - Session Log / Recap (automatic event logging)
  * - Tag Injector (scene tags affecting Position/DV)
  * - Ace Effects Integration (special effects on Ace draws)
- * - 🎥 Session Recap & Save (voice recording, VTT events, export)
+ * - 🎥 Session Recording (screen+mic capture -> .zip bundle with a synced
+ *   event SRT, optional best-effort live transcription) and a separate
+ *   Session Log Export (JSON dump of the text log/VTT events)
  * - 🔄 Automation: auto-tick timers on Partial/Miss, auto-increment SB Bank
  *
  * ── NEW: Adventure Manager cross-links ───────────────────────────────
@@ -54,12 +56,13 @@ import {
 import { isConnectedToServer } from '../../core/websocket.js';
 
 // Import media module
-import { 
-    initMediaModule, 
-    startRecording as mediaStartRecording, 
+import {
+    initMediaModule,
+    startRecording as mediaStartRecording,
     stopRecording as mediaStopRecording,
     isCurrentlyRecording,
-    getRecordingStatus
+    getRecordingStatus,
+    isLiveTranscriptionSupported
 } from '../../core/media.js';
 
 // ============================================================
@@ -1217,17 +1220,26 @@ function renderSessionView() {
     return `
         <div class="flex flex-col gap-2">
             <div class="panel">
-                <h3 class="panel-title">🎙️ Session Recap & Save</h3>
-                <p class="text-muted text-sm">Capture your session with voice recording, VTT event logging, and export a bundle.</p>
-                
+                <h3 class="panel-title">🎙️ Session Recording</h3>
+                <p class="text-muted text-sm">Records screen + mic as a .webm, and logs in-app events (deck draws, timers, scene changes, etc.) to a synced SRT subtitle track. Stopping the recording downloads BOTH as one .zip bundle -- drop the SRT into Premiere/Resolve/etc. as a subtitle track.</p>
+
                 <div class="flex gap-1 flex-wrap mt-2">
                     <button class="btn btn-primary" id="session-record-btn" ${recordingStatus.isRecording ? 'style="display:none;"' : ''}>🎤 Record</button>
                     <button class="btn btn-danger" id="session-stop-btn" ${!recordingStatus.isRecording ? 'style="display:none;"' : ''}>⏹️ Stop</button>
-                    <button class="btn btn-secondary" id="session-export-btn">📦 Export Bundle</button>
-                    <button class="btn btn-secondary" id="session-clear-btn">🧹 Clear Session</button>
+                    <button class="btn btn-secondary" id="session-clear-btn">🧹 Clear Session Log</button>
                 </div>
+                <label class="text-sm text-muted mt-1" style="display:flex;align-items:center;gap:0.4rem;${recordingStatus.isRecording ? 'opacity:0.5;pointer-events:none;' : ''}" title="${isLiveTranscriptionSupported() ? 'Adds best-effort speech-to-text lines to the SRT using your browser\'s built-in speech recognition. Not a substitute for a real transcription tool -- see the README.' : 'Not supported in this browser -- try Chrome or Edge.'}">
+                    <input type="checkbox" id="session-live-transcription" ${isLiveTranscriptionSupported() ? '' : 'disabled'} />
+                    🗣️ Live transcription (experimental, best-effort -- see README)
+                </label>
                 <div id="session-recording-status" class="text-sm text-muted mt-1">
                     ${recordingStatus.isRecording ? `🔴 Recording... (${Math.floor(recordingStatus.duration)}s)` : 'Not recording'}
+                </div>
+
+                <h4 class="mt-2" style="font-size:0.9rem;">📦 Session Log Export</h4>
+                <p class="text-muted text-sm">Separately, export the text session log + VTT event history (not the video/SRT above) as JSON -- useful for your own records or tooling, independent of whether you recorded anything.</p>
+                <div class="flex gap-1 flex-wrap mt-1">
+                    <button class="btn btn-secondary" id="session-export-btn">📦 Export Session Log (JSON)</button>
                 </div>
             </div>
             
@@ -1292,7 +1304,7 @@ function exportSessionBundle() {
     a.download = `session_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Session bundle exported.', 'success');
+    showToast('Session log exported (JSON).', 'success');
     logToSession('📦 Session bundle exported.', 'success');
 }
 
@@ -1917,7 +1929,8 @@ function attachSessionEvents() {
     document.getElementById('session-record-btn')?.addEventListener('click', async () => {
         const state = getState();
         const userName = state.characters?.[0]?.name || 'Player';
-        await mediaStartRecording(userName);
+        const liveTranscription = document.getElementById('session-live-transcription')?.checked || false;
+        await mediaStartRecording(userName, { liveTranscription });
         updateRecordingUI();
     });
     document.getElementById('session-stop-btn')?.addEventListener('click', () => {
@@ -1940,10 +1953,18 @@ function updateRecordingUI() {
     const recordBtn = document.getElementById('session-record-btn');
     const stopBtn = document.getElementById('session-stop-btn');
     const statusEl = document.getElementById('session-recording-status');
-    
+    const transcriptionLabel = document.getElementById('session-live-transcription')?.closest('label');
+
     if (recordBtn) recordBtn.style.display = status.isRecording ? 'none' : 'inline-block';
     if (stopBtn) stopBtn.style.display = status.isRecording ? 'inline-block' : 'none';
     if (statusEl) statusEl.textContent = status.isRecording ? `🔴 Recording... (${status.duration}s)` : 'Not recording';
+    // The transcription checkbox is read once at recording start -- lock it
+    // while a recording is in progress so it can't be flipped mid-recording
+    // and silently do nothing.
+    if (transcriptionLabel) {
+        transcriptionLabel.style.opacity = status.isRecording ? '0.5' : '';
+        transcriptionLabel.style.pointerEvents = status.isRecording ? 'none' : '';
+    }
 }
 
 // ============================================================

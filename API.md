@@ -140,6 +140,35 @@ Retrieve draw history.
 **`DELETE /api/rooms/:code/deck/history`**
 Clear deck history. Notifies room via `deck-history-cleared`.
 
+**`GET /api/rooms/:code/deck/seed`**
+Get the room's current deck PRNG seed.
+**Response:**
+```json
+{
+  "code": "AC12",
+  "seed": 1234567890
+}
+```
+
+**`POST /api/rooms/:code/deck/seed`**
+Reseed the room's per-room PRNG and reshuffle the deck.
+**Request body:**
+```json
+{
+  "seed": 1234567890
+}
+```
+`seed` is required and may be any JSON-serializable seed value. Notifies room via `deck-shuffled` with `{ reason: "reseeded", ... }`.
+**Response:**
+```json
+{
+  "success": true,
+  "code": "AC12",
+  "seed": 1234567890,
+  "remaining": 54
+}
+```
+
 ---
 
 ### Player / Client Management (Ban/Kick)
@@ -215,10 +244,10 @@ Request cleanup of a module from clients. Notifies clients via `module-cleanup`.
 State machine defined in `server/adventure.js`. These routes let a GM's own tooling — or a fully automated/AI GM — drive an entire adventure through plain authenticated REST calls, and mirror the Socket.IO/WS events of the same name one-for-one: whichever path drove a change, everyone in the room sees the update via the matching broadcast event.
 
 **`GET /api/rooms/:code/adventure`**
-Current adventure state (module, act, scene, active encounter, campaign timers, recent log, growth tracking, player-safe `knowledge[]` view — see below).
+Current adventure state (module, act, scene, active encounter, campaign timers, recent log, growth tracking, player-safe `knowledge[]` view — see below). Growth/climax-pacing fields on the state object include `climaxPadScenes` (number, defaults to `2`; overridable per-adventure via `load-custom`'s optional `climaxPadScenes` field below, but always reset to the default on a file-based module load, since dynamic growth is server-forced off for those), `climaxScenesSinceTrigger` (number, increments once per `scene-changed`-completed scene while `climaxTriggered` is true), and `climaxForced` (boolean, true once a forced climax twist has fired for the current climax — resets when a new adventure loads).
 
 **`GET /api/rooms/:code/adventure/reference`**
-Bestiary/NPCs/locations/factions/notes/**full `knowledge[]`** for the loaded adventure — GM/AI-eyes-only, includes each entry's secret `gm` text and `revealCondition`.
+Bestiary/NPCs/locations/factions/notes/**full `knowledge[]`** for the loaded adventure — GM/AI-eyes-only, includes each entry's secret `gm` text and `revealCondition`. Also includes `persistence` — either `null`, or an object `{ schema, carryover: [...], reset_on_complete }` surfaced verbatim from the loaded adventure module's declared "Legacy Tracker" schema (a bot-side feature; the server just passes the module's own `persistence` block through read-only).
 
 **`POST /api/rooms/:code/adventure/knowledge/reveal`** — `{ id, by? }`
 Flip a `knowledge[]` entry's `revealed` flag to `true`. `by` is optional free-form provenance (e.g. `"AI_GM"`, a GM's display name). Broadcasts `adventure-knowledge-revealed`. 404 if `id` doesn't match a knowledge entry in the loaded adventure.
@@ -229,8 +258,8 @@ Flip a `knowledge[]` entry's `revealed` flag back to `false` (undo a mistaken/pr
 **`POST /api/rooms/:code/adventure/load`** — `{ moduleId }`
 Load an adventure module by id (must have `"type": "adventure"` in its manifest plus an `adventure.json`). Broadcasts `adventure-loaded`.
 
-**`POST /api/rooms/:code/adventure/load-custom`** — `{ content, id?, dynamicGrowth?, climaxAfterSessions? }`
-Load an in-memory adventure with no file on disk — for AI-GM-generated adventures (e.g. built from a Crown Spread). Broadcasts `adventure-loaded`.
+**`POST /api/rooms/:code/adventure/load-custom`** — `{ content, id?, dynamicGrowth?, climaxAfterSessions?, climaxPadScenes? }`
+Load an in-memory adventure with no file on disk — for AI-GM-generated adventures (e.g. built from a Crown Spread). `climaxPadScenes` (number, defaults to `2`) sets how many scenes a triggered climax is allowed to run before `climaxScenesSinceTrigger` reaches it and a climax-forced twist becomes eligible. Broadcasts `adventure-loaded`.
 
 **`POST /api/rooms/:code/adventure/reset`**
 Reset the loaded adventure back to planned (position, completed flags, timers, session/climax tracking). Broadcasts `adventure-reset`.
@@ -255,6 +284,9 @@ Mark a real-world play session as ended (increments `sessionsPlayed`, which the 
 
 **`POST /api/rooms/:code/adventure/climax-triggered`**
 Mark that the climax act has already been generated, so growth logic doesn't generate a second one. Broadcasts `adventure-climax-triggered`.
+
+**`POST /api/rooms/:code/adventure/climax-forced`**
+Mark that a forced climax twist has already been generated and appended (flips `climaxForced` to `true`, so this only ever applies once per climax) — used internally by the AI GM bot (`modules/adventure-director.js`'s `generateForcedClimaxTwist()`) after it appends a forced-twist scene via `scene/append`, once `climaxScenesSinceTrigger` reaches `climaxPadScenes` without the climax resolving. This route only records the flag; it does not generate anything itself. No request body. Broadcasts `adventure-climax-forced`.
 
 **`POST /api/rooms/:code/adventure/encounter/start`** — `{ ref }` (index or name/creatureId in the current scene) **or** `{ encounter }` (a full ad-hoc object for an improvised fight)
 Broadcasts `encounter-started`.
@@ -467,7 +499,7 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 | `whiteboard-update`  | Whiteboard was replaced/updated by someone    | `{ "whiteboard": { ... }, "source": "..." }`          |
 | `sync-state`          | Response to `sync-request` — whiteboard state | `{ "state": { ... } }`                                |
 | `scene-status-update` / `combat-status-update` | Broadcast-only status relay (see client→server table above) | `{ ... }` |
-| `adventure-loaded` / `adventure-reset` / `scene-changed` / `scene-appended` / `act-appended` / `npc-added` / `creature-added` / `session-ended` / `adventure-climax-triggered` / `encounter-started` / `encounter-resolved` / `timer-ticked` / `adventure-log` / `adventure-knowledge-revealed` / `adventure-knowledge-hidden` | Broadcast counterparts of the Adventure Engine REST/socket calls above | full updated adventure state object |
+| `adventure-loaded` / `adventure-reset` / `scene-changed` / `scene-appended` / `act-appended` / `npc-added` / `creature-added` / `session-ended` / `adventure-climax-triggered` / `adventure-climax-forced` / `encounter-started` / `encounter-resolved` / `timer-ticked` / `adventure-log` / `adventure-knowledge-revealed` / `adventure-knowledge-hidden` | Broadcast counterparts of the Adventure Engine REST/socket calls above | full updated adventure state object |
 | `kicked`             | You have been kicked from the room            | `{ "reason": "..." }`                                 |
 | `error`              | Server error message                          | `{ "message": "..." }`                                |
 | `room-closed`        | Room has been closed by the server            | `{}`                                                  |

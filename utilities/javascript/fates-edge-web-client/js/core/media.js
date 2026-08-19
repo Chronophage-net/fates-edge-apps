@@ -1,8 +1,38 @@
 /**
  * Media Module - Centralized audio/video recording management
  * Handles MediaRecorder lifecycle, file downloads, WebSocket broadcast,
- * and exports an SRT manifest for video editors.
- * Shows a global overlay when any connected client is recording.
+ * and exports an SRT manifest of in-app events (deck draws, timers,
+ * scene changes, etc. -- see logRecordingEvent()'s call sites) for video
+ * editors. Shows a global overlay when any connected client is recording.
+ *
+ * PACKAGING (this pass): the recording (.webm, video+audio) and its event
+ * SRT used to download as two separate files a moment apart -- easy to
+ * lose track of which SRT belongs to which recording once you've got a
+ * folder of both. handleRecordingStop() now bundles them into a single
+ * .zip (recording + events.srt + a small session-info.txt) via the
+ * JSZip global already loaded by index.html (used the same way
+ * core/pack-manager.js already uses it) -- one download, unambiguously
+ * paired. Falls back to the old two-separate-files behavior if JSZip
+ * somehow isn't available (e.g. the CDN script was blocked), so this
+ * never blocks a recording from being saved at all.
+ *
+ * TRANSCRIPTION (this pass): this module does NOT do speech-to-text --
+ * that's a real, hard problem (accuracy, language support, diarization)
+ * and out of scope to build/host here. What it DOES do is optionally
+ * feed the browser's own built-in SpeechRecognition API (Chrome/Edge;
+ * see isLiveTranscriptionSupported()) into the exact same event log the
+ * click/deck/timer events already use -- each recognized phrase becomes
+ * a `speech` event, timestamped and included in the SRT like everything
+ * else. It's best-effort (whatever your OS/browser's own recognizer
+ * gives you, no editing/correction pass) and OFF by default -- opt in
+ * per-recording via startRecording(userName, { liveTranscription: true })
+ * or the checkbox in GM Tools' Session Recap panel. For a real
+ * transcript, see the "Transcription" section of this repo's README --
+ * the honest answer for real accuracy is running the exported audio
+ * through an existing open-source/hosted speech-to-text tool
+ * (e.g. whisper.cpp, faster-whisper, or a cloud STT API) after the fact,
+ * which is a much better fit for that job than anything we'd hand-roll
+ * here.
  */
 
 import { getSyncManager } from './sync/index.js';
@@ -17,11 +47,13 @@ let recordedChunks = [];
 let isRecording = false;
 let recordingStartTime = null;
 let recordingEvents = []; // For manifest/transcript generation
-let recordingUserId = null; 
+let recordingUserId = null;
 let overlayElement = null;
 let overlayTimer = null;
-let activeRecordings = {}; 
+let activeRecordings = {};
 let currentUserId = null;
+let speechRecognizer = null; // NEW: live-transcription (see module doc comment above)
+let liveTranscriptionRequested = false;
 
 // ============================================================
 // OVERLAY MANAGEMENT
@@ -207,12 +239,89 @@ export function logRecordingEvent(eventType = 'event', text = '') {
     });
 }
 
+// ============================================================
+// LIVE TRANSCRIPTION (optional, best-effort) -- see this file's header
+// doc comment's "TRANSCRIPTION" section for the full rationale.
+// ============================================================
+
 /**
- * Generate and download an SRT subtitle file synced with the recording.
- * This is the "manifest" for video editors. They can drop this into Premiere/Resolve.
+ * Whether the browser's own SpeechRecognition API is available at all --
+ * check this before offering the live-transcription checkbox in the UI.
+ * Chrome/Edge (webkitSpeechRecognition) support it; Firefox/Safari
+ * generally don't as of this writing.
  */
-function generateAndDownloadManifest() {
-    if (recordingEvents.length === 0) return;
+export function isLiveTranscriptionSupported() {
+    return typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+
+/**
+ * Start feeding the browser's built-in speech recognizer into the SAME
+ * event log deck draws/timers/etc. already use -- each finalized phrase
+ * becomes a `speech` event via logRecordingEvent(), so it shows up in the
+ * SRT export as a `[SPEECH]` line, timestamped like everything else. No
+ * server round-trip, no new dependency -- purely whatever the OS/browser's
+ * own recognizer produces. `continuous` + auto-restart-on-end keeps it
+ * running for the length of the recording (the browser API stops itself
+ * periodically on its own); a transient recognition error just logs a
+ * warning and lets the next `onend`-triggered restart try again rather
+ * than killing the whole recording.
+ */
+function startLiveTranscription() {
+    if (!isLiveTranscriptionSupported()) {
+        showToast('Live transcription isn\'t supported in this browser (try Chrome/Edge). Recording continues without it.', 'warning');
+        return;
+    }
+    const SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
+    try {
+        speechRecognizer = new SpeechRecognitionImpl();
+        speechRecognizer.continuous = true;
+        speechRecognizer.interimResults = false;
+        speechRecognizer.lang = (navigator.language || 'en-US');
+
+        speechRecognizer.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                if (result.isFinal) {
+                    const transcript = (result[0]?.transcript || '').trim();
+                    if (transcript) logRecordingEvent('speech', transcript);
+                }
+            }
+        };
+        speechRecognizer.onerror = (event) => {
+            console.warn('[Media] Live transcription error (continuing recording):', event.error);
+        };
+        speechRecognizer.onend = () => {
+            // The browser API stops itself periodically (silence, internal
+            // limits) even in `continuous` mode -- auto-restart as long as
+            // we're still recording and transcription is still requested.
+            if (isRecording && liveTranscriptionRequested) {
+                try { speechRecognizer.start(); } catch (e) { /* already starting/stopping -- ignore */ }
+            }
+        };
+        speechRecognizer.start();
+    } catch (e) {
+        console.warn('[Media] Failed to start live transcription:', e);
+        showToast('Could not start live transcription. Recording continues without it.', 'warning');
+    }
+}
+
+function stopLiveTranscription() {
+    liveTranscriptionRequested = false;
+    if (speechRecognizer) {
+        try { speechRecognizer.onend = null; speechRecognizer.stop(); } catch (e) { /* ignore */ }
+        speechRecognizer = null;
+    }
+}
+
+/**
+ * Build the SRT subtitle text synced with the recording -- the "manifest"
+ * for video editors (drop it into Premiere/Resolve/etc. as a subtitle
+ * track). Split out from the old generateAndDownloadManifest() so both
+ * the zip-bundle path and the standalone-file fallback can share it.
+ * Returns '' if there's nothing to log yet.
+ */
+function generateSrtContent() {
+    if (recordingEvents.length === 0) return '';
 
     // Convert milliseconds to SRT time format: HH:MM:SS,mmm
     const msToSrtTime = (ms) => {
@@ -237,14 +346,75 @@ function generateAndDownloadManifest() {
         srtContent += `[${event.type.toUpperCase()}] ${event.text}\n\n`;
     });
 
-    const blob = new Blob([srtContent], { type: 'text/plain' });
+    return srtContent;
+}
+
+function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    a.download = `recording_manifest_${timestamp}.srt`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+/**
+ * Package the just-finished recording (.webm) and its event SRT into ONE
+ * .zip download instead of two separate files -- see the "PACKAGING"
+ * section of this file's header doc comment for why. Uses the JSZip
+ * global already loaded by index.html (same one core/pack-manager.js
+ * uses for pack import/export) rather than adding a new dependency.
+ * Falls back to downloading the two files separately (old behavior) if
+ * JSZip isn't available for any reason, so a blocked CDN script can
+ * never cost the user their recording.
+ */
+async function downloadRecordingBundle(videoBlob, srtContent, timestamp) {
+    const videoName = `recording_${timestamp}.webm`;
+    const srtName = `recording_events_${timestamp}.srt`;
+
+    if (typeof JSZip === 'undefined') {
+        console.warn('[Media] JSZip not available -- falling back to separate video/SRT downloads.');
+        downloadBlob(videoBlob, videoName);
+        if (srtContent) downloadBlob(new Blob([srtContent], { type: 'text/plain' }), srtName);
+        return;
+    }
+
+    try {
+        const zip = new JSZip();
+        zip.file(videoName, videoBlob);
+        if (srtContent) zip.file(srtName, srtContent);
+        zip.file('session-info.txt', buildSessionInfoText(timestamp));
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        downloadBlob(zipBlob, `session_recording_${timestamp}.zip`);
+    } catch (e) {
+        console.warn('[Media] Failed to build zip bundle, falling back to separate downloads:', e);
+        downloadBlob(videoBlob, videoName);
+        if (srtContent) downloadBlob(new Blob([srtContent], { type: 'text/plain' }), srtName);
+    }
+}
+
+/** Small human-readable readme dropped inside the zip bundle so a video editor opening the folder later knows what they're looking at and how the SRT lines up. */
+function buildSessionInfoText(timestamp) {
+    const durationSec = recordingStartTime ? Math.round((Date.now() - recordingStartTime) / 1000) : 0;
+    const lines = [
+        `Fate's Edge session recording`,
+        `Captured: ${new Date().toISOString()}`,
+        `Duration: ~${durationSec}s`,
+        `Events logged: ${recordingEvents.length}`,
+        '',
+        `recording_${timestamp}.webm  -- screen + mic capture (video/audio)`,
+        `recording_events_${timestamp}.srt -- event subtitle track (deck draws, timers, scene changes, etc.` +
+            (liveTranscriptionRequested ? ', plus best-effort live speech-to-text' : '') +
+            `) -- import as a subtitle/caption track in Premiere, DaVinci Resolve, etc.`,
+        '',
+        'This SRT is generated from in-app EVENTS, not full audio transcription. For a real speech',
+        'transcript of the audio track, run it through an existing speech-to-text tool after the fact',
+        '(e.g. whisper.cpp / faster-whisper locally, or a cloud STT API) -- see this repo\'s README',
+        '"Transcription" section for pointers. If live transcription was enabled for this recording,',
+        'best-effort speech events are already interleaved into the SRT above as `[SPEECH]` lines.',
+    ];
+    return lines.join('\n');
 }
 
 // ============================================================
@@ -270,12 +440,12 @@ export function initMediaModule(userId = 'local') {
 /**
  * Start recording Screen + Microphone
  */
-export async function startRecording(userName = 'Player') {
+export async function startRecording(userName = 'Player', { liveTranscription = false } = {}) {
     if (isRecording) {
         showToast('Already recording.', 'warning');
         return;
     }
-    
+
     try {
         // 1. Get Screen Capture (with system audio if permitted by OS)
         const screenStream = await navigator.mediaDevices.getDisplayMedia({ 
@@ -329,9 +499,16 @@ export async function startRecording(userName = 'Player') {
         
         // Log the start event for the manifest
         logRecordingEvent('recording_start', `Recording started by ${userName}`);
-        
+
+        // NEW: optional best-effort live transcription -- see this file's
+        // header doc comment ("TRANSCRIPTION") for what this is and isn't.
+        liveTranscriptionRequested = !!liveTranscription;
+        if (liveTranscriptionRequested) {
+            startLiveTranscription();
+        }
+
         showToast('🎥 Screen & Audio recording started.', 'success');
-        
+
     } catch (err) {
         console.error('[Media] Recording error:', err);
         showToast('Screen capture canceled or failed.', 'error');
@@ -351,10 +528,12 @@ export function stopRecording() {
     
     isRecording = false;
     recordingUserId = null;
-    
+
+    stopLiveTranscription(); // NEW: no-op if it was never started
+
     // Log the stop event
     logRecordingEvent('recording_stop', 'Recording stopped');
-    
+
     // Stop all tracks across both conceptual streams
     mediaRecorder.stream.getTracks().forEach(track => track.stop());
     
@@ -368,29 +547,25 @@ export function stopRecording() {
     showToast('⏹️ Recording stopped. Processing files...', 'info');
 }
 
-function handleRecordingStop() {
+async function handleRecordingStop() {
     if (recordedChunks.length === 0) {
         showToast('No video captured.', 'warning');
         return;
     }
-    
-    // 1. Save Video/Audio File
+
     const blob = new Blob(recordedChunks, { type: 'video/webm' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    a.download = `recording_${timestamp}.webm`;
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    // 2. Generate Manifest/SRT File for editors
-    generateAndDownloadManifest();
-    
+    const srtContent = generateSrtContent();
+
+    // NEW: one .zip download (recording.webm + events.srt + session-info.txt)
+    // instead of two separate files landing a moment apart -- see this
+    // file's "PACKAGING" header doc comment.
+    await downloadRecordingBundle(blob, srtContent, timestamp);
+
     recordedChunks = [];
     recordingEvents = [];
-    
-    showToast('💾 Video and Manifest saved.', 'success');
+
+    showToast('💾 Session recording bundle saved (.zip: video + SRT).', 'success');
 }
 
 export function isCurrentlyRecording() {
@@ -426,6 +601,7 @@ export function destroyMediaModule() {
         } catch (e) { /* ignore */ }
         isRecording = false;
         recordingUserId = null;
+        stopLiveTranscription();
         broadcastRecordingStatus('stop', currentUserId);
     }
     if (overlayElement) {
@@ -447,6 +623,7 @@ export default {
     isCurrentlyRecording,
     getRecordingStatus,
     logRecordingEvent, // Expose this so scene-tools/chat can log markers!
+    isLiveTranscriptionSupported,
     destroy: destroyMediaModule,
     _handleBroadcast: handleMediaBroadcast,
     _broadcastStatus: broadcastRecordingStatus

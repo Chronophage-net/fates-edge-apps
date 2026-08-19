@@ -22,6 +22,7 @@ const path = require('path');
 const crypto = require('crypto');
 const room = require('./room.js');
 const deck = require('./deck.js');
+const deckRng = require('./rng.js'); // NEW: per-room-seedable shuffle RNG (see rng.js)
 const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS, createRateLimiter, MAX_NAME_LENGTH } = require('./security.js');
 const adventure = require('./adventure.js');
 const { deriveManifestFromContent } = require('./module-manifest-utils.js');
@@ -418,14 +419,22 @@ function createApiRouter(appConfig) {
         }
     });
 
-    // ─── Deck endpoints (unchanged) ────────────────────────────────
+    // ─── Deck endpoints ─────────────────────────────────────────────
+    // NEW: buildDeck() now takes each room's OWN rng (deckRng.getRoomRng(r)),
+    // isolated from every other room, instead of the shared global
+    // Math.random() -- see rng.js's doc comment for why. Behavior for
+    // rooms that never touch the new seed endpoints below is unchanged
+    // (still unpredictable draws); the only difference is that draws for
+    // any two rooms can no longer influence each other's sequence, and a
+    // room's sequence becomes reproducible once you know its seed.
     router.get('/api/rooms/:code/deck', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
             if (!r.deck) {
-                r.deck = deck.buildDeck();
+                const rng = deckRng.getRoomRng(r);
+                r.deck = deck.buildDeck(rng);
                 r.deckHistory = [];
-                r.deckOffset = Math.floor(Math.random() * 1000);
+                r.deckOffset = Math.floor(rng() * 1000);
             }
             res.json({
                 code: req.params.code.toUpperCase(),
@@ -443,8 +452,9 @@ function createApiRouter(appConfig) {
     router.post('/api/rooms/:code/deck/shuffle', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            r.deck = deck.buildDeck();
-            r.deckOffset = Math.floor(Math.random() * 1000);
+            const rng = deckRng.getRoomRng(r);
+            r.deck = deck.buildDeck(rng);
+            r.deckOffset = Math.floor(rng() * 1000);
             r.lastActivity = Date.now();
             const roomCode = req.params.code.toUpperCase();
             room.broadcastToRoom(roomCode, 'deck-shuffled', {
@@ -458,17 +468,61 @@ function createApiRouter(appConfig) {
         }
     });
 
+    // NEW: read this room's current deck seed -- auto-generates and
+    // persists one on first call if the room hasn't drawn/shuffled yet,
+    // so this is always safe to call for a "what seed are we on?" display.
+    router.get('/api/rooms/:code/deck/seed', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            res.json({ code: req.params.code.toUpperCase(), seed: deckRng.getRoomSeed(r) });
+        } catch (err) {
+            res.status(404).json({ error: err.message });
+        }
+    });
+
+    // NEW: explicitly (re)seed this room's deck RNG and immediately
+    // rebuild+reshuffle the deck under the new seed, so the room's very
+    // next draw is reproducible from a known starting point -- useful for
+    // tournament play (every table plays the identical sequence) and for
+    // reproducing a specific draw sequence when chasing down a bug.
+    // `seed` (required) can be any string/number; the same seed on the
+    // same room always regenerates the identical card order.
+    router.post('/api/rooms/:code/deck/seed', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { seed } = req.body;
+            if (seed === undefined || seed === null || seed === '') {
+                return res.status(400).json({ error: 'seed is required' });
+            }
+            deckRng.setRoomSeed(r, seed);
+            r.deck = deck.buildDeck(deckRng.getRoomRng(r));
+            r.deckHistory = [];
+            r.lastActivity = Date.now();
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'deck-shuffled', {
+                source: 'api',
+                reason: 'reseeded',
+                remaining: r.deck.length,
+                timestamp: Date.now()
+            });
+            res.json({ success: true, code: roomCode, seed: r.data.deckSeed, remaining: r.deck.length });
+        } catch (err) {
+            res.status(404).json({ error: err.message });
+        }
+    });
+
     router.post('/api/rooms/:code/deck/draw', authenticate, async (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
             const { region = 'Acasia' } = req.body;
             const count = clampCount(req.body.count);
-            if (!r.deck || r.deck.length === 0) r.deck = deck.buildDeck();
-            if (r.deck.length < count) r.deck = deck.buildDeck();
+            const rng = deckRng.getRoomRng(r);
+            if (!r.deck || r.deck.length === 0) r.deck = deck.buildDeck(rng);
+            if (r.deck.length < count) r.deck = deck.buildDeck(rng);
 
             const drawn = [];
             for (let i = 0; i < count; i++) {
-                if (r.deck.length === 0) r.deck = deck.buildDeck();
+                if (r.deck.length === 0) r.deck = deck.buildDeck(rng);
                 drawn.push(r.deck.pop());
             }
 
@@ -509,11 +563,12 @@ function createApiRouter(appConfig) {
         try {
             const r = room.getRoom(req.params.code);
             const { region = 'Acasia' } = req.body;
-            if (!r.deck || r.deck.length < 5) r.deck = deck.buildDeck();
+            const rng = deckRng.getRoomRng(r);
+            if (!r.deck || r.deck.length < 5) r.deck = deck.buildDeck(rng);
 
             const cards = [];
             for (let i = 0; i < 5; i++) {
-                if (r.deck.length === 0) r.deck = deck.buildDeck();
+                if (r.deck.length === 0) r.deck = deck.buildDeck(rng);
                 cards.push(r.deck.pop());
             }
             const mainCards = cards.slice(0, 4);
@@ -951,9 +1006,9 @@ function createApiRouter(appConfig) {
     router.post('/api/rooms/:code/adventure/load-custom', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
-            const { content, id, dynamicGrowth, climaxAfterSessions } = req.body;
+            const { content, id, dynamicGrowth, climaxAfterSessions, climaxPadScenes } = req.body;
             if (!content || typeof content !== 'object') return res.status(400).json({ error: 'content object is required' });
-            const state = adventure.loadAdventureContent(r, content, { id, dynamicGrowth, climaxAfterSessions });
+            const state = adventure.loadAdventureContent(r, content, { id, dynamicGrowth, climaxAfterSessions, climaxPadScenes });
             const roomCode = req.params.code.toUpperCase();
             room.broadcastToRoom(roomCode, 'adventure-loaded', { source: 'api', ...state });
             res.json({ success: true, code: roomCode, ...state });
@@ -1053,6 +1108,22 @@ function createApiRouter(appConfig) {
             const state = adventure.markClimaxTriggered(r);
             const roomCode = req.params.code.toUpperCase();
             room.broadcastToRoom(roomCode, 'adventure-climax-triggered', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // NEW: CLIMAX PACING -- mark that the bot-side director has forced a
+    // dramatic turn to keep a stalled climax moving (see
+    // DEFAULT_CLIMAX_PAD_SCENES in server/adventure.js). Mirrors the
+    // climax-triggered route just above.
+    router.post('/api/rooms/:code/adventure/climax-forced', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const state = adventure.markClimaxForced(r);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adventure-climax-forced', { source: 'api', ...state });
             res.json({ success: true, code: roomCode, ...state });
         } catch (err) {
             res.status(400).json({ error: err.message });
@@ -1670,6 +1741,8 @@ function createApiRouter(appConfig) {
                     shuffle: 'POST /api/rooms/:code/deck/shuffle - Shuffle the deck',
                     draw: 'POST /api/rooms/:code/deck/draw - Draw cards from deck',
                     crown: 'POST /api/rooms/:code/deck/crown - Draw a Crown Spread (5 cards)',
+                    getSeed: 'GET /api/rooms/:code/deck/seed - Read this room\'s current deck RNG seed',
+                    setSeed: 'POST /api/rooms/:code/deck/seed - ({ seed }) Reseed this room\'s deck RNG and reshuffle for a reproducible draw sequence',
                     history: 'GET /api/rooms/:code/deck/history - Get deck draw history',
                     clearHistory: 'DELETE /api/rooms/:code/deck/history - Clear deck history'
                 },
@@ -1692,6 +1765,7 @@ function createApiRouter(appConfig) {
                     creatureAdd: 'POST /api/rooms/:code/adventure/creature - Register an ad-hoc creature into the bestiary ({ creature: { name, ... } })',
                     sessionEnd: 'POST /api/rooms/:code/adventure/session/end - Mark a real-world play session as ended (increments sessionsPlayed)',
                     climaxTriggered: 'POST /api/rooms/:code/adventure/climax-triggered - Mark that the climax act has already been generated for this adventure',
+                    climaxForced: 'POST /api/rooms/:code/adventure/climax-forced - Mark that the director forced a dramatic turn to keep a stalled climax moving',
                     encounterStart: "POST /api/rooms/:code/adventure/encounter/start - Start an encounter ({ ref } by index or name/creatureId in the current scene, OR { encounter } as a full ad-hoc object for an improvised fight/objective; optional encounter.type sets its objective-type id, e.g. 'combat'|'lockpick'|'heist'|'social', default 'combat')",
                     encounterResolve: 'POST /api/rooms/:code/adventure/encounter/resolve - Resolve the active encounter ({ outcome: "clean"|"partial"|"miss", notes? })',
                     timer: 'POST /api/rooms/:code/adventure/timer - Tick a timer ({ scope: "scene"|"campaign", ref (index or name), amount? } amount defaults to +1, can be negative)',

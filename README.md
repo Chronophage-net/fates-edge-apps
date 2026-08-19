@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.15.2 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.16.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,13 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.15.2-blue)](https://github.com/Chronophage-net/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.16.0-blue)](https://github.com/Chronophage-net/fates-edge-apps)
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
+- [What's New in v4.16.0](#-whats-new-in-v4160)
 - [What's New in v4.15.0](#-whats-new-in-v4150)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
@@ -26,6 +27,7 @@
 - [Integrations](#-integrations)
 - [Real‑Time Campaign Server](#-real-time-campaign-server)
 - [Roadmap](#-roadmap)
+  - [Transcription](#transcription)
 - [License](#-license)
 - [Contributing](#-contributing)
 - [Credits](#-credits)
@@ -40,8 +42,16 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 
 ---
 
+## 🆕 What's New in v4.16.0
+
+- **🎬 Adventure Engine: climax pacing/forcing** (`fates-edge-socket-server/server/adventure.js`) — a triggered climax act can now stall out (players circling without resolving it), so the adventure state gained `climaxPadScenes` (settable via `POST /api/rooms/:code/adventure/load-custom`'s new optional field, defaults to `2`), `climaxScenesSinceTrigger` (increments once per completed scene while `climaxTriggered` is true), and `climaxForced` (flips once a forced twist has fired, resets on the next adventure load). A new sibling route, `POST /api/rooms/:code/adventure/climax-forced`, broadcasts `adventure-climax-forced` and is used by `fates-edge-ai-gm-bot`'s `modules/adventure-director.js` (`generateForcedClimaxTwist()`) to push a stalled climax toward resolution once the pad is used up. See [API.md](API.md) for the full route/field reference.
+- **📜 Legacy Tracker persistence surfaced through the API** — `GET /api/rooms/:code/adventure/reference` now includes a `persistence` field (`null`, or `{ schema, carryover: [...], reset_on_complete }`) read straight through from a loaded adventure module's own declared schema. This is a bot-side carryover/legacy-state feature (`fates-edge-ai-gm-bot`); the server itself only passes the module's `persistence` block through read-only.
+- **🎲 Per-room seedable deck RNG** (`fates-edge-socket-server/server/rng.js`, new) — the Deck of Consequences now shuffles with a per-room xorshift128 PRNG stored in room state instead of bare `Math.random()`, making a room's shuffle sequence fully reproducible from its seed. Two new routes: `GET /api/rooms/:code/deck/seed` (current seed) and `POST /api/rooms/:code/deck/seed` (`{ seed }`, reseeds + reshuffles, broadcasts `deck-shuffled` with `{ reason: "reseeded" }`). `deck.js`'s internal `buildDeck()`/`shuffleArray()` both take an optional `rng` param defaulting to `Math.random`, so nothing that doesn't care about seeding changes behavior.
+- **🔒 Card-text rendering sanitized with DOMPurify** (web client) — user-uploaded/custom card text now runs through DOMPurify when it's loaded, hardening the custom-content path against stored XSS.
+
 ## 🆕 What's New in v4.15.0
 
+- **🎙️ Session Recording bundled into one `.zip`, plus optional live transcription** — `js/core/media.js`'s recording (screen+mic `.webm`) and its event-driven SRT used to download as two separate files a moment apart; they now download together as a single `.zip` (recording + SRT + a short `session-info.txt`) via the `JSZip` already loaded for pack import/export, with a two-file fallback if that's ever unavailable. Also added an opt-in, best-effort **live transcription** checkbox (GM Tools → Session Recap) that feeds the browser's own `SpeechRecognition` API into the same event log as `[SPEECH]` lines. Neither is full audio transcription on its own — see the new [Transcription](#transcription) section under Roadmap for pairing this with a real speech-to-text tool. Also fixed: docs/table entries that described `media.js` as voice-chat support were wrong (that's `VoiceChat.js`/`vtt/voice.js`) — corrected throughout.
 - **🎥 A real recording of the demo actually running** — README's Quick Start now embeds `docs/media/demo.mp4`: the AI GM bot joining room `DEMO` and narrating a live reply, generated entirely by the local Ollama instance `npm run demo` starts (no API keys, nothing cloud-hosted).
 - **🐛 Fixed: the demo client was silently talking to the production server, not the local stack.** `fates-edge-web-client`'s WebSocket URL/room/server defaults were hardcoded to the hosted production server, so opening `localhost:8080` after `npm run demo` connected the browser to production instead of the containers `npm run demo` just started — the AI GM bot (correctly joined to the *local* server's room `DEMO`) was never in the same room as the browser. Now overridable at build time via `VITE_WS_URL`/`VITE_WS_ROOM`/`VITE_SERVER_URL`, and `docker-compose.full.yml`'s demo build sets them to point the client at itself. The normal production build is unaffected.
 - **🔧 Demo stack polish**, closing out a round of review feedback: `tools/demo.sh` now generates a random per-run `API_KEY` instead of a static placeholder, warns when the lightweight default model (`llama3.2:1b`) is in use and suggests `llama3.2:3b`/`mistral`, and notes that the AI GM's first reply may take 10-30s longer while Ollama loads the model.
@@ -126,7 +136,7 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 - **🖥️ Terminal Client Account Commands** – `/mychar list|save|delete` now exposes the account-character endpoints the terminal client's auth system already supported but never surfaced.
 - **🔢 Real Semantic Versioning** – Replaced the inconsistent `4.3a`-style version scheme with strict `MAJOR.MINOR.PATCH` across every repo, plus `tools/bump-version.mjs` to automate future bumps (version sync across every `package.json`, CHANGELOG generation, git tag) — see `VERSIONING.md`.
 
-> **Note on Session Logging & Voice Recording:** an earlier release cycle documented automatic session logging, voice recording, and SRT subtitle generation as shipped features. They were never actually implemented in this codebase and have been moved to [Roadmap](#-roadmap) rather than listed as available.
+> **Note on Session Logging & Voice Recording (historical):** at the time of this v4.4.1 entry, session logging/recording/SRT generation had been documented ahead of implementation and were pulled back to [Roadmap](#-roadmap) rather than listed as available. That gap is closed — see **Session Recording** under [Features](#-features) and the [Transcription](#transcription) section below for the current, actually-implemented state (screen+mic capture, an event-driven SRT, and both bundled into one `.zip` download).
 
 ---
 
@@ -165,6 +175,7 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 - **📦 Module Management** — Push and clean up modules on connected clients
 - **🌍 Region Support** — Multiple regions with unique card meanings, synced across clients
 - **🎤 Voice Chat** — WebRTC voice signaling for in‑game communication
+- **🎙️ Session Recording** — Screen + mic capture (GM Tools → Session Recap), downloaded as a single `.zip` bundle: the `.webm` recording plus a synced `.srt` subtitle track auto-generated from in-app events (deck draws, Crown Spreads, timers, scene changes — see `js/core/media.js`). Optional best-effort live transcription (browser `SpeechRecognition`, Chrome/Edge) adds `[SPEECH]` lines to the same SRT. Not full audio transcription by itself — see [Transcription](#transcription) below for pairing it with a real speech-to-text tool.
 - **👑 GM Election & Promotion** — Request GM status, approve/reject requests, view roles, and transfer GM powers seamlessly
 - **🕸️ Kon'reh** — A standalone strategy board game with six AI opponent "Schools" and a live move-coaching mode
 
@@ -387,7 +398,7 @@ const ROUTE_IMPORTS = {
 | `sync/` | Real-time sync via WebSocket (`conflict.js`, `offline-queue.js`, `operations.js`, `presence.js`) |
 | `dice.js` | Dice rolling engine |
 | `websocket.js` / `discovery.js` | WebSocket connection management and server discovery |
-| `media.js` | Voice recording/playback support used by the VTT's voice chat |
+| `media.js` | Session recording (screen+mic capture) and its event-driven SRT/zip-bundle export — **not** the live voice chat itself (that's `VoiceChat.js`/`vtt/voice.js`) |
 | `crypto.js` | Client-side hashing (used by the password gate) |
 | `password.js` | Password protection |
 | `gravatar.js` | Gravatar integration for presence avatars |
@@ -483,7 +494,7 @@ cd utilities/python/fates-edge-python-client && pip install -e . && fates-edge-c
 
 ## 🗺️ Roadmap
 
-**Shipped since the last update:** Voice chat (WebRTC, `js/features/vtt/voice.js` + `js/components/VoiceChat.js`) and session recording/logging (screen + mic capture with an auto-generated SRT subtitle manifest for video editors, `js/core/media.js`, surfaced in GM Tools) are both implemented and wired end-to-end, including short-lived TURN credentials (see `docker-compose.yml`'s `turn` profile) so voice chat traverses symmetric NAT / restrictive firewalls, not just STUN-friendly networks. A single root `docker-compose.yml` now also brings up the whole ecosystem (client + server + optional bots) in one command — see [Quick Start](#-quick-start). Licensing is also now spelled out in plain language per-category (code/SRD/proprietary) in [COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md), and the `LICENSE.code`/`LICENSE.srd`/`LICENSE.proprietary` files the badges above link to actually exist now. A **System Status** page (sidebar → System → 🩺 Status, `js/features/system-status/`) now shows real-time server connection, voice chat + TURN availability, active recording, sync/offline-queue state, who's in the room, and browser feature support, all auto-refreshing. The installable-adventure **module system** (`/api/modules`, push/cleanup) has been fixed end-to-end (it was pointed at a directory that never existed) and is documented in [MODULES.md](utilities/javascript/fates-edge-socket-server/MODULES.md); the custom-content **data schema** is documented in [DATA_SCHEMA.md](utilities/javascript/fates-edge-web-client/DATA_SCHEMA.md).
+**Shipped since the last update:** Voice chat (WebRTC, `js/features/vtt/voice.js` + `js/components/VoiceChat.js`) and session recording/logging (screen + mic capture with an auto-generated SRT event manifest for video editors, `js/core/media.js`, surfaced in GM Tools) are both implemented and wired end-to-end, including short-lived TURN credentials (see `docker-compose.yml`'s `turn` profile) so voice chat traverses symmetric NAT / restrictive firewalls, not just STUN-friendly networks. The recording and its SRT now download together as a single `.zip` bundle instead of two separate files, and an opt-in best-effort live-transcription mode (browser `SpeechRecognition`) can fold `[SPEECH]` lines into that same SRT — see [Transcription](#transcription). A single root `docker-compose.yml` now also brings up the whole ecosystem (client + server + optional bots) in one command — see [Quick Start](#-quick-start). Licensing is also now spelled out in plain language per-category (code/SRD/proprietary) in [COMMUNITY_USE_POLICY.md](COMMUNITY_USE_POLICY.md), and the `LICENSE.code`/`LICENSE.srd`/`LICENSE.proprietary` files the badges above link to actually exist now. A **System Status** page (sidebar → System → 🩺 Status, `js/features/system-status/`) now shows real-time server connection, voice chat + TURN availability, active recording, sync/offline-queue state, who's in the room, and browser feature support, all auto-refreshing. The installable-adventure **module system** (`/api/modules`, push/cleanup) has been fixed end-to-end (it was pointed at a directory that never existed) and is documented in [MODULES.md](utilities/javascript/fates-edge-socket-server/MODULES.md); the custom-content **data schema** is documented in [DATA_SCHEMA.md](utilities/javascript/fates-edge-web-client/DATA_SCHEMA.md).
 
 **Also since then (through v4.8.3):** a second original card game, **Toll & Veil**, shipped with the same three play modes as Kon'reh (pass-and-play, solo vs. AI, host-authoritative real-time table) plus an opt-in stakes system and its own in-app guide. Co-GM roles were added and propagated across the Discord bot, AI GM bot, Foundry bridge, and Roll20 integration, which closes out the "VTT/bot audit" item that used to sit in this section. A security sweep of the new multiplayer path fixed stored XSS in lobby/challenge banners, closed a sender-identity spoofing hole in the socket server's generic event relay, and stopped forged stake-transfer messages from bypassing agreed caps.
 
@@ -493,9 +504,19 @@ cd utilities/python/fates-edge-python-client && pip install -e . && fates-edge-c
 
 Features that have been discussed or partially scaffolded but are **not yet implemented** in this build:
 
-- **Session Playback / Export** — replaying or exporting a recorded/logged session as HTML/Markdown/plain text (beyond the SRT manifest voice/logging already produces).
+- **Session Playback / Export** — replaying or exporting a recorded/logged session as HTML/Markdown/plain text (beyond the SRT event manifest recording already produces).
+- **Full audio transcription** — see [Transcription](#transcription) immediately below for the honest current state and how to get a real transcript today without waiting on this.
 
 If you were looking for the voice-chat/logging line from an earlier README revision: it was documented ahead of implementation at the time and pulled back to this roadmap section — it has since actually shipped, per the note above.
+
+### Transcription
+
+The SRT that Session Recording produces is **event-driven, not audio transcription** — it's built from in-app actions (deck draws, Crown Spreads, timer ticks, scene changes, chat highlights, etc. — see `logRecordingEvent()` call sites in `js/features/decks/index.js` and elsewhere) plus, if you opt in, best-effort speech recognition. It is not a substitute for a real spoken-word transcript, and we're deliberately not building a hosted speech-to-text pipeline for this project — that's a substantial, well-solved problem elsewhere, and duplicating it here would be scope creep for what is fundamentally a VTT.
+
+Two ways to get an actual transcript today, in increasing order of effort:
+
+1. **Opt-in live transcription (built in, zero setup).** GM Tools → Session Recap → check "🗣️ Live transcription" before hitting Record. Uses the browser's own `SpeechRecognition` API (Chrome/Edge; the checkbox disables itself where unsupported) to fold recognized speech into the same SRT as `[SPEECH]` lines, timestamped alongside the game events. Best-effort, single-language-at-a-time, no correction pass — good enough for search/skimming, not for publishing verbatim.
+2. **Run the exported audio through a real speech-to-text tool after the fact.** The `.webm` inside the session recording `.zip` has a full audio track. Feed it to an existing open-source or hosted transcriber — [whisper.cpp](https://github.com/ggerganov/whisper.cpp) or [faster-whisper](https://github.com/SYSTRAN/faster-whisper) run locally (free, private, works offline), or a cloud STT API if you'd rather not run anything locally — and you'll get a proper, corrected transcript/SRT. Most of these tools accept `.webm`/extracted `.wav` directly and can emit their own `.srt`, which you can then align alongside (or merge with) the event SRT from this app in your editor of choice. This repo intentionally doesn't wrap or bundle one of these tools — pick whichever fits your accuracy/cost/privacy tradeoff, since that choice is genuinely yours to make, not ours.
 
 ---
 
@@ -561,7 +582,13 @@ privately rather than filing a public issue.
 
 ## 📋 Version History
 
-### v4.15.0 (Current)
+### v4.16.0 (Current)
+- **Added** Adventure Engine climax pacing/forcing — `climaxPadScenes`/`climaxScenesSinceTrigger`/`climaxForced` state fields, new `POST /api/rooms/:code/adventure/climax-forced` route + `adventure-climax-forced` broadcast, `climaxPadScenes` on `load-custom`
+- **Added** `persistence` field on `GET /api/rooms/:code/adventure/reference`, surfacing a loaded module's Legacy Tracker schema read-only
+- **Added** Per-room seedable deck RNG (`server/rng.js`, xorshift128) with `GET`/`POST /api/rooms/:code/deck/seed`; `deck.js`'s `buildDeck()`/`shuffleArray()` take an optional `rng` param (defaults to `Math.random`)
+- **Changed** Web client's card-text renderer now sanitizes with DOMPurify when loaded
+
+### v4.15.0
 - **Added** `docs/media/demo.mp4`/`demo-thumbnail.png` — a real recording of `npm run demo`, embedded in the README Quick Start
 - **Added** Adventure Engine structured `knowledge[]` state, reveal/hide REST + socket events, `getPublicState()`/`getReferenceData()` split
 - **Fixed** Demo client was hardcoded to the hosted production WebSocket server instead of the local demo stack — now overridable via `VITE_WS_URL`/`VITE_WS_ROOM`/`VITE_SERVER_URL` build args, wired up for the demo build

@@ -181,6 +181,21 @@ class FatesEdgeRestClient:
     async def clear_deck_history(self, code: str) -> Dict:
         return await self._request('DELETE', f'/api/rooms/{code}/deck/history')
 
+    async def get_deck_seed(self, code: str) -> Dict:
+        """Get this room's current deck-shuffle RNG seed. Every room now
+        shuffles with its own independent, seedable PRNG (server/rng.js)
+        instead of a shared unseeded Math.random(), so this seed is
+        auto-generated/persisted on the room's first draw/shuffle if it was
+        never explicitly set. Returns {code, seed}."""
+        return await self._request('GET', f'/api/rooms/{code}/deck/seed')
+
+    async def set_deck_seed(self, code: str, seed) -> Dict:
+        """Explicitly (re)seed this room's deck RNG (string or number) and
+        immediately rebuild+reshuffle, so the room's next draw is
+        reproducible. Returns {success, code, seed, remaining}; broadcasts
+        'deck-shuffled' with reason 'reseeded' to the room."""
+        return await self._request('POST', f'/api/rooms/{code}/deck/seed', {"seed": seed})
+
     # ------------------------------------------------------------
     # Modules
     # ------------------------------------------------------------

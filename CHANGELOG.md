@@ -3,6 +3,23 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.16.0] - 2026-08-19
+
+Adventure Director v2 (climax pacing, deck RNG seeding, persistence hooks) + Session Recording bundling/live transcription
+
+### Added
+- **Climax pacing** (`server/adventure.js`, `server/api.js`) — three new live-state fields (`climaxPadScenes`, `climaxScenesSinceTrigger`, `climaxForced`) track how long a dynamic-growth adventure's final act has been running once `climaxTriggered`, and a new `POST /api/rooms/:code/adventure/climax-forced` route (sibling of the existing `climax-triggered` route) lets the AI GM bot mark that it forced a dramatic turn to keep a stalled climax moving. `POST /api/rooms/:code/adventure/load-custom` now also accepts an optional `climaxPadScenes` in its body.
+- **Legacy Tracker persistence declaration** — `GET /api/rooms/:code/adventure/reference` now includes a `persistence` field (`{ schema, carryover, reset_on_complete }` or `null`) surfacing an adventure module's own optional declaration of what cross-adventure state should carry over, unfiltered, the same way `notes`/`knowledge` already are. Purely declarative on the server side — see `fates-edge-ai-gm-bot`'s new `modules/legacy-tracker.js` for the actual extraction/injection logic.
+- **Per-room seedable deck RNG** (`server/rng.js`, new) — every room's deck shuffle now uses its own independent xorshift128 PRNG (`room.data.deckSeed`/`deckRngState`) instead of the shared, unseeded global `Math.random()`. Two new routes: `GET /api/rooms/:code/deck/seed` (read the room's current seed) and `POST /api/rooms/:code/deck/seed` (`{ seed }`, reseed + immediately reshuffle) — enables reproducible draws for tournament play or bug repro. `deck.buildDeck()`/`shuffleArray()` now take an optional `rng` function (default `Math.random`, fully backward compatible).
+- **Session Recording bundling + live transcription** (`js/core/media.js`, web client) — the screen+mic recording and its event-driven SRT now download together as one `.zip` (via the already-loaded `JSZip`) instead of two separate files, with a two-file fallback if `JSZip` is unavailable. New opt-in, best-effort **live transcription** (browser `SpeechRecognition` API) folds recognized speech into the same SRT as `[SPEECH]` lines. Surfaced in GM Tools → Session Recap.
+- `renderCardText()` (`js/features/decks/index.js`) now prefers `window.DOMPurify` for sanitizing card text when it's loaded, falling back to the existing hand-rolled `escapeKeepingAllowedTags()` otherwise — ready for GM-uploaded custom region content without changing behavior for today's static, developer-authored region JSON.
+
+### Docs
+- Corrected several integrations' docs describing `media.js` as voice-chat support (it's the session-recording/SRT system; live voice chat is `VoiceChat.js`/`vtt/voice.js`). Updated README/CHANGELOG across `fates-edge-discord-bot`, `foundry_fates-edge-bridge`, `fates-edge-roll20`, `avrae_module.txt`, `fates-edge-terminal`, `fates-edge-desktop-client`, and `fates-edge-python-client` (which also gained real `get_deck_seed()`/`set_deck_seed()` client methods + CLI flags + tests) to reflect the API changes above. `foundry_fates-edge-bridge/module.json` and `fates-edge-roll20/module.json`/`version.json` bumped to `4.16.0` by hand (outside `tools/bump-version.mjs`'s package.json-only scope) to stay on the same release train.
+
+### Other
+- Updated Kon'reh, fixed Blue camping in the cross.
+
 ## [4.15.2] - 2026-08-19
 
 ### Other

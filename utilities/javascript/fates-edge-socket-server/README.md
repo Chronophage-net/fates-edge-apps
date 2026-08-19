@@ -1,4 +1,4 @@
-# Fate's Edge Socket Server v4.15.2 — Real-Time VTT & Campaign Sharing
+# Fate's Edge Socket Server v4.16.0 — Real-Time VTT & Campaign Sharing
 
 **Fate's Edge** is a narrative‑first TTRPG system. This is the real‑time backend for the web toolkit: a WebSocket/Socket.io server that syncs campaign state live across your group, plus a short‑code **campaign sharing** endpoint for loading/saving full toolkit state without a persistent connection.
 
@@ -16,7 +16,8 @@ Earlier documentation for this server described it as a minimal REST endpoint fo
 - **Roles & character registration (v4.8)** — beyond the single GM seat above, `server/room.js` now supports GM-granted Co-GM promotions (session-only or saved), a read-only Spectator role, and a claim/release bridge that binds a player's saved character (their account library) to a room's live roster. See [ROLES.md](ROLES.md) for the full model, including diagrams.
 - **Optional scaling, two axes** — off by default (single process, no external dependency). Use more of one machine's CPU cores with `CLUSTER_WORKERS` (Node `cluster` + sticky sessions, no Redis needed), or run more than one machine behind a load balancer with `REDIS_URL` (a pub/sub relay). The two combine. See [SCALING.md](SCALING.md).
 - **Rate limiting & per-room client caps** — a general per-IP limit across the whole REST API, a per-connection message-rate limit on both WebSocket transports, and an optional per-room client cap (`MAX_CLIENTS_PER_ROOM`). All configurable, all off/generous by default. See [DESIGN.md](DESIGN.md) §5.
-- **Shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data (`data/regions/`) as the web client.
+- **Shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data (`data/regions/`) as the web client. Shuffles run on a per-room seedable PRNG (`server/rng.js`, xorshift128) rather than bare `Math.random()`, so a room's shuffle sequence is reproducible from its seed — see `GET`/`POST /api/rooms/:code/deck/seed` below.
+- **Adventure Engine climax pacing** — `server/adventure.js` tracks how many scenes a triggered climax act has run (`climaxScenesSinceTrigger`) against a configurable pad (`climaxPadScenes`, default 2), and exposes `POST /api/rooms/:code/adventure/climax-forced` for driving a stalled climax toward resolution once the pad is exhausted (`climaxForced` flips true). Also passes through a loaded module's `persistence` (Legacy Tracker) schema read-only via the reference endpoint, for bot-side campaign carryover.
 - **Campaign persistence** — `server/storage.js` stores campaigns, rooms, accounts, and characters in a database: SQLite by default (`campaigns.db`, see [INSTALL.md](INSTALL.md#backing-up-your-campaigns-your-world-save) for backup notes), or Postgres/MySQL via `DATABASE_TYPE`/`DATABASE_URL`.
 - **Security & config** — `server/security.js` and `server/config.js` handle basic request validation and environment-driven configuration.
 - **A bundled test/reference dataset** — `data/patrons/the_traveler.json` and `data/regions/acasia.json` ship with the server so you can smoke-test deck draws and patron lookups without the full web client's data folder.
@@ -167,11 +168,12 @@ Every route below is served from `server/api.js`. `authenticate` means the reque
 | POST   | `/api/rooms/:code/clients/:clientId/kick` \| `/ban` \| `/unban` | ✅ | Moderation. |
 | POST   | `/api/rooms/:code/password`             | ✅  | Set/change/clear a room password. |
 | GET/POST | `/api/rooms/:code/deck*`, `/api/rooms/:code/deck/crown`, `.../history` | ✅ | Deck of Consequences draws/history (same logic the WS `deck-draw`/`crown-spread` events use). |
+| GET/POST | `/api/rooms/:code/deck/seed`           | ✅  | Read/set the room's per-room deck PRNG seed (`server/rng.js`); `POST` reseeds and reshuffles, broadcasting `deck-shuffled` with `reason: "reseeded"`. |
 | GET    | `/api/modules`, `/api/rooms/:code/modules` | ✅ | List installed modules (`modules/<id>/manifest.json`) plus standalone `data/adventures/*.json`. |
 | POST   | `/api/modules`                          | ✅  | Install a module: writes `modules/<id>/{manifest.json,adventure.json}`. See [MODULES.md](MODULES.md). |
 | POST   | `/api/modules/:id/push`                 | ✅  | Broadcast an installed module to a room (or every room). |
 | POST   | `/api/modules/:id/cleanup`              | ✅  | Broadcast a cleanup request for a module id. |
-| GET/POST | `/api/rooms/:code/adventure*`         | ✅  | Adventure Engine: load/reset/scene/encounter/timer/log, backed by `server/adventure.js`. |
+| GET/POST | `/api/rooms/:code/adventure*`         | ✅  | Adventure Engine: load/reset/scene/encounter/timer/log/climax-triggered/climax-forced, backed by `server/adventure.js`. Includes climax-pacing state (`climaxPadScenes`/`climaxScenesSinceTrigger`/`climaxForced`) and a module's `persistence` (Legacy Tracker) block on the reference endpoint. |
 | GET/POST | `/api/rooms/:code/whiteboard*`, `/api/rooms/:code/characters*`, `/api/rooms/:code/campaigns*` | ✅ | Whiteboard state, character sync, campaign save/load (see "Using Campaign Sharing" above for the short-code flow). |
 | GET    | `/api/data/docs`                        | –   | This same endpoint list, machine-readable. |
 

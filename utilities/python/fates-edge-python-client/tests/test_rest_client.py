@@ -73,6 +73,29 @@ async def test_upload_posts_and_returns_code():
 
 
 @pytest.mark.asyncio
+async def test_get_deck_seed_success():
+    client = FatesEdgeRestClient('http://localhost:10000')
+    with patch('requests.get', return_value=_mock_response(200, {'code': 'AC12', 'seed': 'abc123'})) as mock_get:
+        result = await client.get_deck_seed('AC12')
+        assert result == {'code': 'AC12', 'seed': 'abc123'}
+        mock_get.assert_called_once()
+        assert '/api/rooms/AC12/deck/seed' in mock_get.call_args[0][0]
+
+
+@pytest.mark.asyncio
+async def test_set_deck_seed_posts_seed_and_returns_result():
+    client = FatesEdgeRestClient('http://localhost:10000')
+    expected = {'success': True, 'code': 'AC12', 'seed': 42, 'remaining': 54}
+    with patch('requests.post', return_value=_mock_response(200, expected)) as mock_post:
+        result = await client.set_deck_seed('AC12', 42)
+        assert result == expected
+        mock_post.assert_called_once()
+        args, kwargs = mock_post.call_args
+        assert '/api/rooms/AC12/deck/seed' in args[0]
+        assert kwargs['json'] == {"seed": 42}
+
+
+@pytest.mark.asyncio
 async def test_api_key_sent_as_header():
     client = FatesEdgeRestClient('http://localhost:10000', api_key='secret123')
     assert client.headers == {"X-API-Key": "secret123"}

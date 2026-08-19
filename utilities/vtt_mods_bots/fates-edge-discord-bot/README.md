@@ -204,6 +204,8 @@ docker-compose --profile discord-bot up
 | `/vttadventure log <text> [author]` | Append a narrative beat to the adventure log | `/vttadventure log "The bridge collapses behind them."` |
 | `/vttadventure status` | Show current adventure state | `/vttadventure status` |
 
+> **Server API note (v4.16.0):** the socket server added `POST /api/rooms/:code/adventure/climax-forced` (a sibling of the existing `climax-triggered` route, marking that the AI GM director forced a dramatic turn to keep a stalled climax moving — broadcasts `adventure-climax-forced`), and the `GET /api/rooms/:code/adventure` state now also reports `climaxPadScenes`, `climaxScenesSinceTrigger`, and `climaxForced`. The `load-custom` route also accepts an optional `climaxPadScenes` field, and the GM/AI-eyes-only `GET /api/rooms/:code/adventure/reference` payload now carries an optional `persistence` block (the "Legacy Tracker" schema declaration). None of these are surfaced by a slash command yet — `/vttadventure status` and `/vttadventure reference` are unaffected until their embeds are updated to display the new fields.
+
 ### Deck Operations
 
 | Command | Description | Example |
@@ -214,6 +216,8 @@ docker-compose --profile discord-bot up
 | `/vttdeck history` | Show deck history | `/vttdeck history` |
 
 > **Note:** `/deck` (in `commands/dice.js`) is a near-duplicate of `/vttdeck` with the same draw/crown/shuffle/status/history subcommands under a shorter name — either works.
+
+> **Server API note (v4.16.0):** each room's deck now shuffles with its own seedable RNG instead of a shared unseeded one, so draws are reproducible per room. Two new REST routes support this — `GET /api/rooms/:code/deck/seed` (returns `{ code, seed }`) and `POST /api/rooms/:code/deck/seed` with body `{ seed }` (reseeds and reshuffles, broadcasting `deck-shuffled` with `reason: 'reseeded'`). No slash command calls these yet.
 
 ### Module Management
 

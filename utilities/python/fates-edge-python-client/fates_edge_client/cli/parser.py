@@ -94,6 +94,8 @@ def build_parser() -> argparse.ArgumentParser:
     server_parser.add_argument('--deck-shuffle', action='store_true', help='Shuffle deck')
     server_parser.add_argument('--deck-draw', action='store_true', help='Draw cards from deck')
     server_parser.add_argument('--deck-crown', action='store_true', help='Crown Spread')
+    server_parser.add_argument('--deck-seed-get', action='store_true', help='Get this room\'s deck RNG seed')
+    server_parser.add_argument('--deck-seed-set', metavar='SEED', help='Reseed this room\'s deck RNG (string or number) and reshuffle')
     server_parser.add_argument('--code', help='Room code (required by every --server subcommand)')
     server_parser.add_argument('--campaign-code', help='Campaign share code (returned by --upload; required by --load)')
     server_parser.add_argument('--message', help='Chat message')

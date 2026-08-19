@@ -184,6 +184,26 @@ async def run(args, store: DataStore) -> None:
         except FatesEdgeApiError as e:
             print(f"❌ Crown spread failed: {e}")
 
+    elif args.deck_seed_get:
+        if not args.code:
+            print("❌ Please provide --code CODE")
+            return
+        try:
+            result = await with_spinner(client.get_deck_seed(args.code), "Getting deck seed")
+            print(f"✅ Deck seed for room {result.get('code', args.code)}: {result.get('seed')}")
+        except FatesEdgeApiError as e:
+            print(f"❌ Deck seed get failed: {e}")
+
+    elif args.deck_seed_set is not None:
+        if not args.code:
+            print("❌ Please provide --code CODE")
+            return
+        try:
+            result = await with_spinner(client.set_deck_seed(args.code, args.deck_seed_set), "Reseeding deck")
+            print(f"✅ Deck reseeded to {result.get('seed')}. {result.get('remaining', 0)} cards remaining.")
+        except FatesEdgeApiError as e:
+            print(f"❌ Deck reseed failed: {e}")
+
     else:
         print("Server subcommands:")
         print("  upload --server URL                - upload local data")
@@ -196,3 +216,5 @@ async def run(args, store: DataStore) -> None:
         print("  deck-shuffle --server URL --code CODE - shuffle deck")
         print("  deck-draw --server URL --code CODE --count N --region R - draw cards")
         print("  deck-crown --server URL --code CODE --region R - crown spread")
+        print("  deck-seed-get --server URL --code CODE - get deck RNG seed")
+        print("  deck-seed-set --server URL --code CODE --seed VALUE - reseed deck RNG")

@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Foundry-VTT-orange" alt="Foundry VTT"/>
-  <img src="https://img.shields.io/badge/version-4.15.2-blue" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-4.16.0-blue" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/status-stable-brightgreen" alt="Status"/>
 </p>
@@ -146,6 +146,10 @@ listModules();
 // Get deck status (returns remaining cards and history count)
 getDeckStatus();
 ```
+
+> **Server API note (v4.16.0):** the socket server added `POST /api/rooms/:code/adventure/climax-forced` (a sibling of the existing `climax-triggered` route, broadcasting `adventure-climax-forced` when the AI GM director forces a stalled climax forward), and the adventure state (`GET /api/rooms/:code/adventure`, and the `adventure-state`/`adventure-loaded` broadcasts this bridge already handles) now also reports `climaxPadScenes`, `climaxScenesSinceTrigger`, and `climaxForced`. The GM-only `adventure/reference` payload (`_handleAdventureReference`) now also carries an optional `persistence` block (the "Legacy Tracker" schema declaration). This bridge doesn't expose any adventure-specific macros today, so no code change is needed — the new fields simply ride along in `this.adventureState`/`Hooks.call('fates-edge-adventure-state', ...)` for anything downstream that wants them.
+
+> **Server API note (v4.16.0):** each room's deck now shuffles with its own seedable RNG instead of a shared unseeded one, so draws are reproducible per room via two new REST routes, `GET`/`POST /api/rooms/:code/deck/seed`. The existing `deck-shuffled` broadcast this bridge already listens for (`_handleDeckShuffled`) now also fires with `reason: 'reseeded'` when a room is explicitly reseeded — no code change needed here since that handler already renders any `deck-shuffled` event generically. Neither seed route has a macro yet.
 
 #### Character & Scene Sync
 - **Characters**: automatic — whenever combat/character sheet data changes, if **Sync Characters** is enabled, characters are synced to the VTT as journal entries.

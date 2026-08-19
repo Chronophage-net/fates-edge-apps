@@ -1,4 +1,9 @@
 <!drac2>
+# Server API as of fates-edge-apps v4.16.0 adds climax-forced
+# (POST /rooms/:code/adventure/climax-forced) and deck-seed
+# (GET/POST /rooms/:code/deck/seed) endpoints, plus new fields on the
+# existing adventure state/reference/load-custom endpoints. Not yet used
+# by this script -- see the "adventure" and deck subcommands below.
 import requests
 import json
 import os
