@@ -212,6 +212,72 @@ function renderCurrentAdventurePanel() {
     `;
 }
 
+// 👇 NEW: GM-only "Secrets & Factions" panel for whichever adventure is
+// currently active. Surfaces adventure.knowledge[] (the GM truth behind
+// each secret, plus its reveal condition) and adventure.factions[] right
+// where a GM running a live session is already looking — the Scene tab —
+// instead of requiring a tab-switch into Adventure Manager's detail view.
+// This is GM Tools' own view, so no extra role gate is needed here beyond
+// what already gates the tab itself.
+function renderAdventureIntelPanel(adventure) {
+    if (!adventure) return '';
+    const knowledge = Array.isArray(adventure.knowledge) ? adventure.knowledge : [];
+    const factions = Array.isArray(adventure.factions) ? adventure.factions : [];
+    if (knowledge.length === 0 && factions.length === 0) return '';
+
+    const knowledgeHtml = knowledge.length ? `
+        <div class="panel" style="border-left:2px solid var(--red);">
+            <h4 style="margin:0;font-size:0.85rem;">🔒 Secrets (GM Only)</h4>
+            <div style="max-height:220px;overflow-y:auto;margin-top:0.2rem;">
+                ${knowledge.map(k => `
+                    <div style="font-size:0.7rem;padding:0.25rem 0;border-bottom:1px solid var(--border);">
+                        <div class="flex-between">
+                            <span style="color:var(--gold);font-weight:600;">${escHtml(k.subject || 'Unknown')}</span>
+                            <span class="${k.revealed ? 'badge badge-green' : 'badge'}" style="cursor:pointer;font-size:0.6rem;" onclick="window.gmToggleKnowledgeRevealed('${escHtml(k.id || '')}')" title="Click to mark ${k.revealed ? 'hidden' : 'revealed'}">${k.revealed ? '👁️ Revealed' : '🙈 Hidden'}</span>
+                        </div>
+                        <div style="color:var(--text2);font-size:0.68rem;margin-top:0.1rem;">${escHtml(k.gm || '')}</div>
+                        ${k.revealCondition ? `<div style="color:var(--text3);font-size:0.62rem;margin-top:0.1rem;">⤷ Reveals when: ${escHtml(k.revealCondition)}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    const factionsHtml = factions.length ? `
+        <div class="panel" style="border-left:2px solid var(--purple);">
+            <h4 style="margin:0;font-size:0.85rem;">🏛️ Factions</h4>
+            <div style="max-height:160px;overflow-y:auto;margin-top:0.2rem;">
+                ${factions.map(f => `
+                    <div style="font-size:0.7rem;padding:0.2rem 0;border-bottom:1px solid var(--border);">
+                        <span style="font-weight:600;">${escHtml(f.name || 'Unnamed')}</span>
+                        ${f.goals ? `<div style="color:var(--text2);font-size:0.65rem;">🎯 ${escHtml(f.goals)}</div>` : ''}
+                        ${f.relationship ? `<div style="color:var(--text3);font-size:0.6rem;">🤝 ${escHtml(f.relationship)}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    return `${knowledgeHtml}${factionsHtml}`;
+}
+
+window.gmToggleKnowledgeRevealed = async function(knowledgeId) {
+    const adventure = getRunningAdventure();
+    if (!adventure || !Array.isArray(adventure.knowledge)) return;
+    const entry = adventure.knowledge.find(k => k.id === knowledgeId);
+    if (!entry) return;
+    entry.revealed = !entry.revealed;
+    try {
+        const advModule = await import('../adventure-manager/index.js');
+        advModule.loadAdventuresFromState();
+        advModule.saveAdventuresToState();
+    } catch (e) {
+        console.error('[GM Tools] Could not persist knowledge reveal:', e);
+    }
+    logToSession(`${entry.revealed ? '👁️' : '🙈'} Secret "${entry.subject || knowledgeId}" marked ${entry.revealed ? 'revealed' : 'hidden'} (${adventure.title})`, 'info');
+    refreshView();
+};
+
 // ============================================================
 // TAG INJECTOR
 // ============================================================
@@ -782,6 +848,7 @@ function renderSceneView() {
     return `
         <div class="flex flex-col gap-2">
             ${renderCurrentAdventurePanel()}
+            ${renderAdventureIntelPanel(getRunningAdventure())}
 
             <div class="panel">
                 <h3 class="panel-title">⚙️ GM Settings</h3>

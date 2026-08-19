@@ -25,7 +25,7 @@
  * 2. Paste this script
  * 3. Set environment variables in Roll20 API:
  *    - FATES_EDGE_SERVER_URL: ws://your-server:10000
- *    - FATES_EDGE_ROOM_CODE: AC12
+ *    - FATES_EDGE_ROOM_CODE: ABC123
  *    - FATES_EDGE_PLAYER_NAME: Optional (defaults to Roll20 display name)
  *    - FATES_EDGE_API_KEY: Your API key (if required)
  *    - FATES_EDGE_AUTO_CONNECT: true/false
@@ -445,6 +445,14 @@ function handleMessage(data) {
         case 'adventure-reset':
             handleAdventureReset(data);
             break;
+
+        case 'adventure-knowledge-revealed':
+            handleAdventureKnowledgeRevealed(data);
+            break;
+
+        case 'adventure-knowledge-hidden':
+            handleAdventureKnowledgeHidden(data);
+            break;
         // ─── end new ────────────────────────────────────────
 
         case 'room-closed':
@@ -793,6 +801,25 @@ function handleAdventureReference(data) {
     if (data.notes) {
         msg += '📝 Notes: ' + data.notes + '\n';
     }
+    // NEW: full GM/AI-eyes-only knowledge view -- `data` here is the same
+    // GM-only reference fetch npcs/bestiary/notes above already come from,
+    // so `gm`/`revealCondition` are safe to print raw.
+    if (data.knowledge && data.knowledge.length > 0) {
+        msg += '🗝️ Knowledge (' + data.knowledge.length + '):\n';
+        data.knowledge.forEach(function(k) {
+            var lock = k.revealed ? '🔓 REVEALED' : '🔒 secret';
+            msg += '  ' + lock + ' — ' + k.id + (k.subject ? ' (' + k.subject + ')' : '') + '\n';
+            if (k.revealed) {
+                msg += '    ' + (k.gm || '') + '\n';
+            } else {
+                msg += '    truth (DO NOT reveal): ' + (k.gm || '') + '\n';
+                msg += '    players currently know: ' + (k.player != null ? k.player : '(nothing yet)') + '\n';
+                if (k.revealCondition) {
+                    msg += '    reveal when: ' + k.revealCondition + '\n';
+                }
+            }
+        });
+    }
     sendToChat(msg);
     createHandout('Reference: ' + data.moduleId, msg);
 }
@@ -801,6 +828,30 @@ function handleAdventureReset(data) {
     adventureState = mergeAdventureState(adventureState, data);
     log('🔄 Adventure reset');
     sendToChat('🔄 Adventure has been reset to its initial state.');
+}
+
+// NEW: knowledge state reveal/hide -- see sendAdventureKnowledgeReveal/
+// Hide() below and server/adventure.js's revealKnowledge()/hideKnowledge().
+// `data` here is getPublicState()'s player-safe view (`text`/`revealed`,
+// no `gm`), same shape every other Adventure Engine broadcast above
+// carries -- not the GM-only reference fetch handleAdventureReference()
+// uses.
+function handleAdventureKnowledgeRevealed(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    log('🔓 Knowledge revealed: ' + data.id);
+    var entry = null;
+    if (data.knowledge) {
+        for (var i = 0; i < data.knowledge.length; i++) {
+            if (data.knowledge[i].id === data.id) { entry = data.knowledge[i]; break; }
+        }
+    }
+    sendToChat('🔓 Knowledge revealed: ' + data.id + (entry && entry.text ? '\n' + entry.text : ''));
+}
+
+function handleAdventureKnowledgeHidden(data) {
+    adventureState = mergeAdventureState(adventureState, data);
+    log('🔒 Knowledge hidden: ' + data.id);
+    sendToChat('🔒 Knowledge hidden again: ' + data.id);
 }
 
 function generateProgressBar(current, max) {
@@ -1415,6 +1466,26 @@ function sendAdventureReset() {
     sendToChat('🔄 Resetting adventure...');
 }
 
+function sendAdventureKnowledgeReveal(id) {
+    if (!id) {
+        log('Knowledge entry id required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adventure-knowledge-reveal', id: id, by: getPlayerName() });
+    log('🔓 Revealing knowledge: ' + id);
+    sendToChat('🔓 Requesting reveal of "' + id + '"...');
+}
+
+function sendAdventureKnowledgeHide(id) {
+    if (!id) {
+        log('Knowledge entry id required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adventure-knowledge-hide', id: id, by: getPlayerName() });
+    log('🔒 Hiding knowledge: ' + id);
+    sendToChat('🔒 Requesting hide of "' + id + '"...');
+}
+
 // ============================================================
 // GM Public Methods
 // ============================================================
@@ -1983,8 +2054,20 @@ function registerCommands() {
                             sendAdventureReference();
                         } else if (advSub === 'reset') {
                             sendAdventureReset();
+                        } else if (advSub === 'reveal') {
+                            if (!advParams[0]) {
+                                sendToChat('Usage: !fates-edge adventure reveal <id>');
+                                break;
+                            }
+                            sendAdventureKnowledgeReveal(advParams[0]);
+                        } else if (advSub === 'hide') {
+                            if (!advParams[0]) {
+                                sendToChat('Usage: !fates-edge adventure hide <id>');
+                                break;
+                            }
+                            sendAdventureKnowledgeHide(advParams[0]);
                         } else {
-                            sendToChat('Adventure Commands:\n!fates-edge adventure load <moduleId>\n!fates-edge adventure scene [actIndex] [sceneIndex]\n!fates-edge adventure encounter start <ref>\n!fates-edge adventure encounter resolve <clean|partial|miss> [notes]\n!fates-edge adventure timer <name> [amount] [scene|campaign]\n!fates-edge adventure log <text>\n!fates-edge adventure status\n!fates-edge adventure reference\n!fates-edge adventure reset');
+                            sendToChat('Adventure Commands:\n!fates-edge adventure load <moduleId>\n!fates-edge adventure scene [actIndex] [sceneIndex]\n!fates-edge adventure encounter start <ref>\n!fates-edge adventure encounter resolve <clean|partial|miss> [notes]\n!fates-edge adventure timer <name> [amount] [scene|campaign]\n!fates-edge adventure log <text>\n!fates-edge adventure status\n!fates-edge adventure reference\n!fates-edge adventure reset\n!fates-edge adventure reveal <id>\n!fates-edge adventure hide <id>');
                         }
                         break;
 

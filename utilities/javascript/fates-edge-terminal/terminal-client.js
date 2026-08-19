@@ -26,7 +26,7 @@ const path = require('path');
 const CONFIG = {
     version: '2.4.0',
     defaultServerUrl: 'ws://localhost:3000',
-    defaultRoom: 'AC12',
+    defaultRoom: 'ABC123',
     defaultName: 'Terminal Player',
     defaultPassword: 'password123',
     reconnectDelay: 3000,
@@ -491,6 +491,10 @@ function printAdventureState(state) {
             console.log(`    - ${t.name}: ${progress}`);
         });
     }
+    if (state.knowledge && state.knowledge.length) {
+        const revealedCount = state.knowledge.filter(k => k.revealed).length;
+        console.log(`  🗝️  Knowledge: ${revealedCount}/${state.knowledge.length} revealed (see /adventure knowledge)`);
+    }
     if (state.log && state.log.length) {
         const last = state.log[state.log.length - 1];
         console.log(`  📜 Last log: ${last.message || last.type}`);
@@ -538,6 +542,42 @@ function printAdventureReference(ref) {
     if (ref.notes) {
         console.log(`  📝 Notes: ${ref.notes.slice(0, 200)}${ref.notes.length > 200 ? '…' : ''}`);
     }
+    // NEW: full GM/AI-eyes-only knowledge view -- `ref` comes from
+    // GET/'adventure-reference-request', the same GM-only fetch npcs/
+    // bestiary/notes above already come from, so it's safe to print the
+    // raw `gm` secret text here (unlike printAdventureKnowledge() below,
+    // which only ever sees the player-safe subset).
+    if (ref.knowledge && ref.knowledge.length) {
+        console.log(`  🗝️  Knowledge (${ref.knowledge.length}, GM view):`);
+        ref.knowledge.forEach(k => {
+            const lock = k.revealed ? '🔓' : '🔒';
+            console.log(`    ${lock} ${k.id}${k.subject ? ` (${k.subject})` : ''} — ${k.revealed ? 'REVEALED' : 'secret'}`);
+            console.log(`        gm: ${(k.gm || '').slice(0, 140)}${(k.gm || '').length > 140 ? '…' : ''}`);
+            if (!k.revealed) console.log(`        players know: ${k.player ?? '(nothing yet)'}`);
+        });
+    }
+    promptAgain(true);
+}
+
+// NEW: player-safe knowledge view -- from adventureState.knowledge, which
+// comes off getPublicState()'s filtered `{ id, subject, revealed, text }`
+// shape (see server/adventure.js). `text` is already the correct thing
+// to show regardless of revealed state, so this never needs to branch on
+// it the way printAdventureReference()'s GM view does above.
+function printAdventureKnowledge(knowledge) {
+    if (!knowledge || !knowledge.length) {
+        printSystemMessage('This adventure defines no knowledge/secret entries (or none is loaded).', colors.dim);
+        return;
+    }
+    process.stdout.write('\r\x1b[K');
+    console.log(`${colors.magenta}🗝️  Knowledge State (${knowledge.length}):${colors.reset}`);
+    knowledge.forEach(k => {
+        const lock = k.revealed ? '🔓' : '🔒';
+        const status = k.revealed ? colors.green + 'REVEALED' + colors.reset : colors.dim + 'secret' + colors.reset;
+        console.log(`  ${lock} ${k.id}${k.subject ? ` (${k.subject})` : ''} — ${status}`);
+        console.log(`      ${k.text ?? '(nothing to tell yet)'}`);
+    });
+    console.log(`${colors.dim}Use /adventure reveal <id> or /adventure hide <id> to change one (GM only).${colors.reset}`);
     promptAgain(true);
 }
 
@@ -590,6 +630,9 @@ ${colors.yellow}Adventure Engine:${colors.reset}
   /adventure timer <name> [amount]      Tick a timer (default +1)
   /adventure log <text>       Add a narrative beat to the log
   /adventure reference         Show reference data (bestiary, NPCs, locations, factions)
+  /adventure knowledge         Show this adventure's knowledge/secret state (player-safe view)
+  /adventure reveal <id>       Mark a knowledge entry revealed, safe to share (GM only)
+  /adventure hide <id>         Mark a knowledge entry secret again (GM only)
 
 ${colors.yellow}GM Management:${colors.reset}
   /gm request                 Request GM
@@ -646,6 +689,9 @@ ${colors.magenta}📖 Adventure Commands${colors.reset}
   /adventure timer <name> [amount]  Tick a timer by name (amount defaults to +1)
   /adventure log <text>        Append a narrative beat to the adventure log
   /adventure reference          Show reference data (bestiary, NPCs, locations, factions)
+  /adventure knowledge          Show this adventure's knowledge/secret state (player-safe view)
+  /adventure reveal <id>        Mark a knowledge entry revealed, safe to share (GM only)
+  /adventure hide <id>          Mark a knowledge entry secret again (GM only)
 ${colors.dim}All adventure commands require a connection and GM role (or admin).${colors.reset}
 `);
     promptAgain(true);
@@ -1348,6 +1394,23 @@ function handleInputLine(input) {
                         sendMessage('adventure-reference-request', {});
                         printSystemMessage('📚 Requesting reference data...', colors.magenta);
                         break;
+                    case 'knowledge':
+                        printAdventureKnowledge(adventureState.knowledge);
+                        break;
+                    case 'reveal': {
+                        const id = subArgs[0];
+                        if (!id) { printSystemMessage('Usage: /adventure reveal <id>', colors.red); break; }
+                        sendMessage('adventure-knowledge-reveal', { id, by: clientName });
+                        printSystemMessage(`🔓 Requesting reveal of "${id}"...`, colors.magenta);
+                        break;
+                    }
+                    case 'hide': {
+                        const id = subArgs[0];
+                        if (!id) { printSystemMessage('Usage: /adventure hide <id>', colors.red); break; }
+                        sendMessage('adventure-knowledge-hide', { id, by: clientName });
+                        printSystemMessage(`🔒 Requesting hide of "${id}"...`, colors.magenta);
+                        break;
+                    }
                     default:
                         printSystemMessage(`Unknown adventure command. Use /adventure help.`);
                 }
@@ -1639,6 +1702,21 @@ function handleMessage(msg) {
         adventureState = { ...adventureState, ...msg };
         printSystemMessage(`🔄 Adventure reset.`, colors.magenta);
         printAdventureState(adventureState);
+        return;
+    }
+    // NEW: knowledge-state reveal/hide broadcasts (see server/adventure.js's
+    // revealKnowledge()/hideKnowledge() and the matching WS cases in
+    // ws-handlers.js). Payload spreads getPublicState() same as every other
+    // Adventure Engine broadcast, so this also refreshes
+    // adventureState.knowledge with the player-safe view.
+    if (msg.type === 'adventure-knowledge-revealed') {
+        adventureState = { ...adventureState, ...msg };
+        printSystemMessage(`🔓 Knowledge revealed: ${msg.id}`, colors.magenta);
+        return;
+    }
+    if (msg.type === 'adventure-knowledge-hidden') {
+        adventureState = { ...adventureState, ...msg };
+        printSystemMessage(`🔒 Knowledge hidden again: ${msg.id}`, colors.magenta);
         return;
     }
 

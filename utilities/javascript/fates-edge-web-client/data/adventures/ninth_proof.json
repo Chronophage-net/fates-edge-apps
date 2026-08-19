@@ -655,7 +655,7 @@
   "completedAt": null,
   "status": "planned",
   "createdAt": "2026-08-03T00:00:00.000Z",
-  "updatedAt": "2026-08-03T00:00:00.000Z",
+  "updatedAt": "2026-08-18T00:00:00.000Z",
   "knowledge": [
     {
       "id": "markus-fenwood-secret",
@@ -778,5 +778,12 @@
         "plot-secret"
       ]
     }
-  ]
+  ],
+  "sessions": "3-4",
+  "themes": [
+    "Price of Knowledge",
+    "The Hollow's Attention",
+    "Nature of Proof"
+  ],
+  "tierRange": "II-III"
 }

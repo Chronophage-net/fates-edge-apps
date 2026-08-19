@@ -361,6 +361,12 @@ export const FatesEdgeBridge = {
             case 'adventure-reset':
                 this._handleAdventureReset(data);
                 break;
+            case 'adventure-knowledge-revealed':
+                this._handleAdventureKnowledgeRevealed(data);
+                break;
+            case 'adventure-knowledge-hidden':
+                this._handleAdventureKnowledgeHidden(data);
+                break;
             case 'room-closed':
                 ui.notifications.warn('⚠️ Fate\'s Edge: Room closed by server');
                 this.disconnect();
@@ -1050,7 +1056,26 @@ export const FatesEdgeBridge = {
     sendAdventureReset() {
         return this._send('adventure-reset', {});
     },
-    
+
+    // NEW: knowledge state (module.knowledge[] entries) -- see
+    // server/adventure.js's KNOWLEDGE STATE doc comment and the matching
+    // REST/WS routes in api.js/ws-handlers.js/socketio-handlers.js.
+    sendAdventureKnowledgeReveal(id) {
+        if (!id) {
+            ui.notifications.warn('⚠️ Knowledge entry id required');
+            return false;
+        }
+        return this._send('adventure-knowledge-reveal', { id, by: game.user.name });
+    },
+
+    sendAdventureKnowledgeHide(id) {
+        if (!id) {
+            ui.notifications.warn('⚠️ Knowledge entry id required');
+            return false;
+        }
+        return this._send('adventure-knowledge-hide', { id, by: game.user.name });
+    },
+
     // ============================================================
     // Adventure Engine Handlers (NEW)
     // ============================================================
@@ -1210,12 +1235,31 @@ export const FatesEdgeBridge = {
         if (data.notes) {
             content += `<h3>📝 Notes</h3><p>${data.notes}</p>`;
         }
+        // NEW: full GM/AI-eyes-only knowledge view -- `data` here is the
+        // same GM-only reference fetch npcs/bestiary/notes above already
+        // come from, so `gm`/`revealCondition` are safe to print raw.
+        if (data.knowledge && data.knowledge.length) {
+            content += `<h3>🗝️ Knowledge (${data.knowledge.length})</h3><ul>`;
+            data.knowledge.forEach(k => {
+                const lock = k.revealed ? '🔓 REVEALED' : '🔒 secret';
+                content += `<li><b>${lock} — ${k.id}${k.subject ? ` (${k.subject})` : ''}</b><br>`;
+                if (k.revealed) {
+                    content += `${k.gm || ''}</li>`;
+                } else {
+                    content += `<i>truth (DO NOT reveal):</i> ${k.gm || ''}<br>`;
+                    content += `<i>players currently know:</i> ${k.player ?? '(nothing yet)'}`;
+                    if (k.revealCondition) content += `<br><i>reveal when:</i> ${k.revealCondition}`;
+                    content += `</li>`;
+                }
+            });
+            content += `</ul>`;
+        }
         content += `<hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>`;
         this._createJournalEntry(`[Fate's Edge] Reference: ${data.moduleId}`, content);
         ui.notifications.info(`📚 Fate's Edge: Reference data for "${data.moduleId}" received`);
         Hooks.call('fates-edge-adventure-reference', data);
     },
-    
+
     _handleAdventureReset(data) {
         this.adventureState = { ...this.adventureState, ...data };
         console.log('🔄 Adventure reset');
@@ -1227,6 +1271,33 @@ export const FatesEdgeBridge = {
         this._createJournalEntry(`[Fate's Edge] Adventure Reset`, content);
         ui.notifications.info('🔄 Fate\'s Edge: Adventure reset to start');
         Hooks.call('fates-edge-adventure-reset', data);
+    },
+
+    // NEW: knowledge state reveal/hide -- see sendAdventureKnowledgeReveal/
+    // Hide() above and server/adventure.js's revealKnowledge()/
+    // hideKnowledge(). `data` here is getPublicState()'s player-safe view
+    // (`text`/`revealed`, no `gm`) -- same shape every other Adventure
+    // Engine broadcast above carries, not the GM-only reference fetch.
+    _handleAdventureKnowledgeRevealed(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        const entry = (data.knowledge || []).find(k => k.id === data.id);
+        console.log(`🔓 Knowledge revealed: ${data.id}`);
+        const content = `
+            <h2>🔓 Knowledge Revealed</h2>
+            <p><b>${data.id}</b></p>
+            ${entry ? `<p>${entry.text ?? ''}</p>` : ''}
+            <hr><p><small>Synced from Fate's Edge VTT v2.1.0</small></p>
+        `;
+        this._createJournalEntry(`[Fate's Edge] Knowledge Revealed: ${data.id}`, content);
+        ui.notifications.info(`🔓 Fate's Edge: "${data.id}" revealed`);
+        Hooks.call('fates-edge-adventure-knowledge-revealed', data);
+    },
+
+    _handleAdventureKnowledgeHidden(data) {
+        this.adventureState = { ...this.adventureState, ...data };
+        console.log(`🔒 Knowledge hidden: ${data.id}`);
+        ui.notifications.info(`🔒 Fate's Edge: "${data.id}" hidden again`);
+        Hooks.call('fates-edge-adventure-knowledge-hidden', data);
     },
     
     // ============================================================

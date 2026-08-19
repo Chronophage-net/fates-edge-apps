@@ -1099,7 +1099,7 @@
   "completedAt": null,
   "status": "planned",
   "createdAt": "2026-07-28T00:00:00.000Z",
-  "updatedAt": "2026-07-28T00:00:00.000Z",
+  "updatedAt": "2026-08-18T00:00:00.000Z",
   "knowledge": [
     {
       "id": "elder-thorne-secret",
@@ -1266,5 +1266,14 @@
         "plot-secret"
       ]
     }
-  ]
+  ],
+  "sessions": "12-16",
+  "themes": [
+    "Redemption",
+    "Community",
+    "Second Chances",
+    "Weight of Exile",
+    "Power of Belonging"
+  ],
+  "tierRange": "I"
 }
