@@ -24,6 +24,7 @@ import { performRoll } from '../../core/dice.js';
 import { collectEquipmentModifiers } from '../../core/talent-effects.js';
 import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '../characters/roller.js';
 import { showToast } from '../../components/Toast.js';
+import { announce } from '../../core/a11y-announce.js';
 import { escHtml } from '../../core/utils.js';
 import {
     isConnectedToServer,
@@ -1542,6 +1543,11 @@ function callVoiceClient(clientId) {
     }
     initiateVoiceCall(clientId);
     showToast(`Calling ${client.name}...`, 'info');
+    // NEW: the toast above is visual-only -- a screen-reader user tabbing
+    // through the party roster and pressing the call button got no
+    // confirmation the call actually started. announce() mirrors it to the
+    // sr-only live region the way chat/roll events already do.
+    announce(`Calling ${client.name}...`);
 }
 
 // ============================================================
@@ -1674,6 +1680,9 @@ function attachEvents() {
     const changeHandler = (e) => {
         if (e.target.id === 'vtt-auto-scroll') {
             VTT_CONFIG.chatAutoScroll = e.target.checked;
+        }
+        if (e.target.id === 'vtt-speak-messages') {
+            VTT_CONFIG.speakMessages = e.target.checked;
         }
     };
     eventListeners = [
@@ -1857,6 +1866,11 @@ export function render(el) {
             <div class="flex mt-1" style="flex-wrap:wrap;gap:0.9rem;font-size:0.9rem;align-items:center;">
             <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
             <label class="inline-check"><input type="checkbox" id="vtt-auto-scroll" checked /> Auto-scroll</label>
+            <!-- NEW: "Type to Speak" -- reads new chat messages aloud via
+                 the browser's speechSynthesis so a player who typed instead
+                 of speaking (deaf, mute, or just not on voice) is heard by
+                 anyone listening, not only anyone reading. -->
+            <label class="inline-check" title="Reads new chat messages aloud, so a player who types instead of speaking is still heard"><input type="checkbox" id="vtt-speak-messages" /> 🔊 Read aloud</label>
             </div>
             <div class="vtt-hint">Try <code>/roll 3 2 3</code>, <code>/deck 1</code>, <code>/crown</code>, or <code>/help</code> for the full command list.</div>
         </div>

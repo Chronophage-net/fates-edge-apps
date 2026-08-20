@@ -19,8 +19,14 @@ The web client already had a meaningful amount of accessibility infrastructure i
 | Whiteboard/VTT slider labels + numeric readouts | ✅ Done | |
 | Image `alt` text (whiteboard/roster) | ✅ Done | |
 | GM keyboard-shortcuts modal | ✅ Done | |
-| Static accessibility lint tests | ✅ Done | 9 checks in `tests/unit/a11y-lint.test.js` |
+| Static accessibility lint tests | ✅ Done | 14 checks in `tests/unit/a11y-lint.test.js` |
 | DOMPurify strips `aria-*`/`role` | ✅ Already sufficient | `ALLOWED_ATTR: []` predates this work and is stricter than the suggested fix |
+| "Type to Speak" chat TTS (deaf/mute → listening players) | ✅ Done | Opt-in `#vtt-speak-messages` checkbox; new chat messages read aloud via `speechSynthesis` |
+| Voice call initiation feedback | ✅ Done | `announce()` alongside the existing toast |
+| Recording status for screen readers | ✅ Done | `announce()` on start/stop + every 30s while recording — the visual overlay is `pointer-events:none` with no ARIA |
+| Session recording button labels | ✅ Already sufficient | Buttons already had visible text (`🎤 Record`/`⏹️ Stop`); explicit `aria-label` added anyway for a clearer name |
+| Soundboard volume control labels | ➖ N/A | Audited — the current soundboard UI has no `<input type="range">` volume slider to label (volume is set programmatically only); nothing to fix |
+| Configurable mic sensitivity | ⏳ Deferred | Speaking threshold is hardcoded (`avg > 0.05` in `voice.js`); would need a Settings UI, lower priority than the above |
 | Real axe-core/Playwright coverage in CI | ⏳ Deferred | Plan documented below; genuinely new devDependency + CI job |
 | `inert`-based focus trapping (inline editors) | ⏳ Deferred | `inert` is the right modern approach when this is built — see below |
 | Local mic self-activity indicator | ⏳ Deferred | Backend (`getVoiceActivity()`) already exists, unused in UI |
@@ -199,7 +205,7 @@ All source-only regex checks, same conservative philosophy as the original three
 4. **`document.title` regression guard** — asserts `router.js` still contains a `document.title =` assignment.
 5. **Live-region regression guard** — asserts `index.html` still hardcodes both `#a11y-announcer` (`aria-live="polite"`) and `#a11y-announcer-urgent` (`aria-live="assertive"`).
 
-`npm test` is 152/152 (the one pre-existing Toll & Veil flake noted below aside).
+`npm test` was 152/152 at the end of this pass (the one pre-existing Toll & Veil flake noted below aside; see the fifth pass below for the current count).
 
 ### `inert` — noted for whenever inline-editor focus-trapping gets built
 
@@ -211,6 +217,47 @@ Both live in separate repos from this one and weren't touched this pass. For whe
 
 ---
 
+## Fifth pass: voice/media audit — "Type to Speak" TTS, call/recording announcements
+
+A follow-up audit of the voice chat and session-recording features, covering six suggested improvements. Each was verified against the actual source before anything was changed — two of the six turned out not to match the current codebase and were skipped rather than "fixed" against a description of code that doesn't exist.
+
+### "Type to Speak" — chat messages read aloud (the main item)
+
+The gap: a deaf or mute player types into the same shared chat everyone else uses, which works fine for anyone reading the screen, but anyone in the voice call who isn't also watching chat never hears what they said — the same asymmetry as before, just in the other direction from live transcription (which turns *spoken* audio into text for deaf players; this turns *typed* text into audio for anyone not reading).
+
+Added an opt-in, per-client `#vtt-speak-messages` checkbox ("🔊 Read aloud") next to the existing "Auto-scroll" checkbox in both VTT chat panels (`vtt-connected.js` and `vtt-local.js`, since both render through the same `renderChat()` in `vtt-core.js`). When on, every new chat message (not System/Roll/Deck noise) is spoken via the browser's built-in `SpeechSynthesisUtterance` as `"{sender} says: {text}"`. Two things it deliberately does NOT do:
+
+- **Speak the backlog.** Turning the checkbox on doesn't read out the last 200 messages — a `spokenMessageIds` set (same pattern as the existing `processedRollIds` roll-dedup set) tracks every message id seen across renders, but only actually queues speech for ids that are new *and* arrive after the very first render pass. Toggling the checkbox on later doesn't retroactively speak anything already in the set.
+- **Add a new dependency.** `speechSynthesis`/`SpeechSynthesisUtterance` are both built into every evergreen browser; no library, no network call, no per-message cost.
+
+It's a local-only, per-listener setting (not synced to other clients) — exactly like the "Auto-scroll" checkbox it sits next to — so anyone who doesn't want messages spoken simply doesn't turn it on.
+
+### Voice call initiation now reaches screen readers
+
+`vtt-connected.js`'s call-a-teammate button called `showToast(...)` only — confirmed by reading the actual call site, not just the audit's description. Added an `announce()` call alongside the existing toast, same pattern used everywhere else discrete events need a screen-reader-only channel.
+
+### Recording status is no longer visual-only
+
+Confirmed: `core/media.js`'s recording badge (`#media-recording-overlay`) is `position:fixed`, `pointer-events:none`, and carries no ARIA attributes at all — a screen-reader user had no way to discover a recording was happening, or ever stopped. `showOverlay()`/`hideOverlay()` now call `announce()` once each on start/stop (guarded against re-announcing if the overlay was already showing/already hidden, so multiple clients recording at once doesn't spam), and `startOverlayTimer()` — which was already ticking a visible `MM:SS` readout every second — now also calls `announce()` every 30 seconds with the elapsed time. 30s, not 1s: matching the visible timer's cadence would turn the live region into an unusable stopwatch ("one, two, three, four…"); 30s gives an occasional, unobtrusive confirmation that the recording is still going.
+
+### Session recording button labels — audited, already sufficient
+
+The audit described `<button id="vtt-record-btn">🔴</button>` as unlabeled. The actual button (`#session-record-btn` in `gm-tools/index.js`, in the Session Recording panel) already has visible text content — `🎤 Record` / `⏹️ Stop` — which is a perfectly valid accessible name on its own; it was not literally unlabeled. Added an explicit `aria-label` to each anyway ("Start screen and audio recording" / "Stop recording") since it's a one-line, zero-risk improvement to the announced name's clarity, but this was a smaller fix than the audit implied.
+
+### Soundboard volume controls — audited, not applicable
+
+The audit described an unlabeled `<input type="range">` volume slider in the soundboard. Checked `core/soundboard.js` and the soundboard panel in `gm-tools/index.js`: `setAmbienceVolume()`/`setSfxVolume()` exist as programmatic APIs, but there is currently no volume slider (or any range input) in the rendered soundboard UI to label — the panel only has a track picker and Play/Stop buttons. Nothing to fix here; noted in the status table as N/A rather than silently dropped.
+
+### Mic sensitivity — confirmed hardcoded, deferred
+
+`voice.js` does hardcode `const isSpeaking = avg > 0.05;` as the audit described. Making this user-configurable is a real, reasonable idea, but it's a Settings-UI feature (a new slider, persisted preference, and wiring into `voice.js`'s activity-detection loop) rather than a small fix, and it's the lowest-priority item in the audit's own recommended order — deferred rather than implemented in the same pass as everything else above, to keep this pass reviewable.
+
+### Test coverage
+
+`tests/unit/a11y-lint.test.js` gained two more `describe` blocks (5 new `it`s): regression guards that `media.js` still imports and calls `announce()`, that `vtt-connected.js`'s voice-call handler still calls `announce()` near `initiateVoiceCall()`, that the session recording buttons keep their `aria-label`s, and that both VTT chat panels still expose `#vtt-speak-messages` and construct a `SpeechSynthesisUtterance`. Every new regex was checked against a synthetic true/false pair before being trusted (see the file's own header comment on this practice). `npm test` is 157/157 clean, including the previously-flaky Toll & Veil test passing on this run (see the flakiness note below — still not something this pass touched or fixed).
+
+---
+
 ## Note on test suite flakiness (pre-existing, unrelated to this work)
 
-`npm test` currently shows 151/152 or 152/152 depending on the run: `TollVeilEngine: follow-suit and trump-breaking › must follow suit when able` fails intermittently (confirmed by re-running it several times in isolation, across multiple accessibility passes now — it passes most runs, fails occasionally with a `got null` assertion on a randomly-varying expected suit symbol). This is a pre-existing flake in the Toll & Veil card-engine test, unrelated to any file this accessibility work has touched, and out of scope here — flagged for whoever next works in `tests/unit/toll-and-veil.test.js` to track down (likely an unseeded random draw somewhere in the AI-play test path).
+`npm test` currently shows 156/157 or 157/157 depending on the run: `TollVeilEngine: follow-suit and trump-breaking › must follow suit when able` fails intermittently (confirmed by re-running it several times in isolation, across multiple accessibility passes now — it passes most runs, fails occasionally with a `got null` assertion on a randomly-varying expected suit symbol). This is a pre-existing flake in the Toll & Veil card-engine test, unrelated to any file this accessibility work has touched, and out of scope here — flagged for whoever next works in `tests/unit/toll-and-veil.test.js` to track down (likely an unseeded random draw somewhere in the AI-play test path).

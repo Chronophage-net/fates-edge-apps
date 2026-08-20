@@ -30,6 +30,10 @@ export const VTT_CONFIG = {
     maxChatMessages: 200,
     chatAutoScroll: true,
     presenceUpdateInterval: 5000,
+    // NEW: "Read messages aloud" -- see speakNewChatMessages() below. Off by
+    // default (speech is opinionated and some players will find it
+    // annoying), opt-in per session via the #vtt-speak-messages checkbox.
+    speakMessages: false,
 };
 
 export const SENDER_TYPES = {
@@ -221,6 +225,57 @@ function getOutcomeCodeFromLabel(label) {
 const processedRollIds = new Set();
 
 // ============================================================
+// "Type to Speak" -- text-to-speech for chat messages
+// ============================================================
+// A deaf or mute player who can't (or doesn't want to) use voice chat
+// still types into the same shared chat everyone else uses. That's fine
+// for players who are reading the screen, but anyone in the voice call
+// who ISN'T also watching chat -- driving-adjacent attention during combat,
+// a low-vision player, or just someone looking at the map -- never hears
+// what that player said. This opts each client into having new chat
+// messages read aloud locally via the browser's built-in speechSynthesis,
+// so a typed message reaches a listening player the same way a spoken one
+// does. It's per-client and off by default (see VTT_CONFIG.speakMessages
+// and the #vtt-speak-messages checkbox in vtt-connected.js/vtt-local.js).
+const spokenMessageIds = new Set();
+let hasRenderedChatOnce = false;
+
+function speakChatMessage(sender, text) {
+    if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
+    // Strip markdown bold/bracket-annotation punctuation that renderChatMessageText
+    // turns into styled HTML -- here we're reading the raw text, so "**bold**"
+    // would otherwise be read aloud as literal asterisks.
+    const spoken = String(text).replace(/\*\*/g, '').trim();
+    if (!spoken) return;
+    try {
+        const utterance = new SpeechSynthesisUtterance(`${sender} says: ${spoken}`);
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        console.warn('[VTT] speechSynthesis failed:', e);
+    }
+}
+
+// Called once per chat re-render with the messages currently being shown.
+// Speaks only messages that are new since the last render, and never speaks
+// the existing backlog the first time chat renders (e.g. on page load, or
+// the moment the checkbox is first turned on) -- only turn-taking messages
+// that arrive from then on.
+function speakNewChatMessages(displayMessages) {
+    const isFirstRender = !hasRenderedChatOnce;
+    for (const msg of displayMessages) {
+        if (!msg || !msg.id) continue;
+        if (spokenMessageIds.has(msg.id)) continue;
+        spokenMessageIds.add(msg.id);
+        if (isFirstRender) continue;
+        if (!VTT_CONFIG.speakMessages) continue;
+        const sender = msg.sender || 'Unknown';
+        if (sender === SENDER_TYPES.SYSTEM || sender === SENDER_TYPES.ROLL || sender === SENDER_TYPES.DECK) continue;
+        speakChatMessage(sender, msg.text || '');
+    }
+    hasRenderedChatOnce = true;
+}
+
+// ============================================================
 // Chat renderer (reactive) – with selected character display
 // ============================================================
 let chatUnsubscribe = null;
@@ -324,6 +379,8 @@ export function renderChat() {
         const displayMessages = allMessages.length > VTT_CONFIG.maxChatMessages
             ? allMessages.slice(-VTT_CONFIG.maxChatMessages)
             : allMessages;
+
+        speakNewChatMessages(displayMessages);
 
         let html = '';
         for (const msg of displayMessages) {

@@ -37,6 +37,13 @@
 
 import { getSyncManager } from './sync/index.js';
 import { showToast } from '../components/Toast.js';
+// NEW: the recording-status overlay below is a visual-only pulsing badge
+// (position:fixed, pointer-events:none, no ARIA) -- a screen-reader user
+// has no way to discover that a recording is in progress, or that it has
+// stopped, unless something else tells them. announce() posts the same
+// information to the sr-only live region so that gap doesn't require a
+// second visual UI just to be accessible.
+import { announce } from './a11y-announce.js';
 
 // ============================================================
 // STATE
@@ -112,21 +119,37 @@ function createOverlay() {
 function showOverlay(userId, userName = 'Someone') {
     createOverlay();
     if (!overlayElement) return;
-    
+
+    // NEW: was already showing (e.g. a second client started recording
+    // while the first was still going) -- don't re-announce, the first
+    // announcement already told screen-reader users a recording is live.
+    const wasAlreadyShowing = overlayElement.style.display === 'flex';
+
     const textEl = document.getElementById('media-recording-text');
+    const isSelf = userId === currentUserId;
     if (textEl) {
-        if (userId === currentUserId) {
+        if (isSelf) {
             textEl.textContent = '🔴 You are recording';
         } else {
             textEl.textContent = `🔴 ${userName} is recording`;
         }
     }
-    
+
     overlayElement.style.display = 'flex';
     startOverlayTimer();
+
+    if (!wasAlreadyShowing) {
+        announce(isSelf ? 'Recording started.' : `${userName} started recording.`);
+    }
 }
 
 function hideOverlay() {
+    // NEW: only announce a stop if the overlay was actually visible --
+    // hideOverlay() is called defensively from several places (e.g. on
+    // cleanup) even when nothing was recording, and announcing "Recording
+    // stopped" then would be confusing noise.
+    const wasShowing = !!overlayElement && overlayElement.style.display === 'flex';
+
     if (overlayElement) {
         overlayElement.style.display = 'none';
     }
@@ -136,7 +159,18 @@ function hideOverlay() {
     }
     const timerEl = document.getElementById('media-recording-timer');
     if (timerEl) timerEl.textContent = '00:00';
+
+    if (wasShowing) {
+        announce('Recording stopped.');
+    }
 }
+
+// NEW: how often (in seconds) the sr-only live region gets an elapsed-time
+// update while recording. Every second (matching the visible timer) would
+// bury a screen-reader user in "one, two, three..." -- 30s gives blind
+// users an occasional, unobtrusive confirmation that the recording is
+// still going without turning the announcer into a stopwatch.
+const RECORDING_ANNOUNCE_INTERVAL_SEC = 30;
 
 function startOverlayTimer() {
     if (overlayTimer) clearInterval(overlayTimer);
@@ -147,6 +181,9 @@ function startOverlayTimer() {
         const secs = String(elapsed % 60).padStart(2, '0');
         const timerEl = document.getElementById('media-recording-timer');
         if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+        if (elapsed > 0 && elapsed % RECORDING_ANNOUNCE_INTERVAL_SEC === 0) {
+            announce(`Still recording — ${mins}:${secs} elapsed.`);
+        }
     }, 1000);
 }
 

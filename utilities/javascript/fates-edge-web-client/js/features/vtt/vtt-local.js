@@ -512,6 +512,9 @@ function attachEvents() {
     if (e.target.id === 'vtt-auto-scroll') {
       VTT_CONFIG.chatAutoScroll = e.target.checked;
     }
+    if (e.target.id === 'vtt-speak-messages') {
+      VTT_CONFIG.speakMessages = e.target.checked;
+    }
   };
   eventListeners = [
     { event: 'click', handler: clickHandler },
@@ -629,6 +632,9 @@ export function render(el) {
         <div class="flex mt-1" style="flex-wrap:wrap;gap:0.9rem;font-size:0.9rem;align-items:center;">
           <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
           <label class="inline-check"><input type="checkbox" id="vtt-auto-scroll" checked /> Auto-scroll</label>
+          <!-- NEW: "Type to Speak" -- see vtt-connected.js for the same
+               checkbox and the reasoning behind it. -->
+          <label class="inline-check" title="Reads new chat messages aloud, so a player who types instead of speaking is still heard"><input type="checkbox" id="vtt-speak-messages" /> 🔊 Read aloud</label>
         </div>
         <div class="vtt-hint">Try <code>/roll 3 2 3</code> or <code>/help</code> for the full command list.</div>
       </div>

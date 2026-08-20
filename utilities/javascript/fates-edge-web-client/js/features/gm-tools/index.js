@@ -1224,8 +1224,8 @@ function renderSessionView() {
                 <p class="text-muted text-sm">Records screen + mic as a .webm, and logs in-app events (deck draws, timers, scene changes, etc.) to a synced SRT subtitle track. Stopping the recording downloads BOTH as one .zip bundle -- drop the SRT into Premiere/Resolve/etc. as a subtitle track.</p>
 
                 <div class="flex gap-1 flex-wrap mt-2">
-                    <button class="btn btn-primary" id="session-record-btn" ${recordingStatus.isRecording ? 'style="display:none;"' : ''}>🎤 Record</button>
-                    <button class="btn btn-danger" id="session-stop-btn" ${!recordingStatus.isRecording ? 'style="display:none;"' : ''}>⏹️ Stop</button>
+                    <button class="btn btn-primary" id="session-record-btn" aria-label="Start screen and audio recording" ${recordingStatus.isRecording ? 'style="display:none;"' : ''}>🎤 Record</button>
+                    <button class="btn btn-danger" id="session-stop-btn" aria-label="Stop recording" ${!recordingStatus.isRecording ? 'style="display:none;"' : ''}>⏹️ Stop</button>
                     <button class="btn btn-secondary" id="session-clear-btn">🧹 Clear Session Log</button>
                 </div>
                 <label class="text-sm text-muted mt-1" style="display:flex;align-items:center;gap:0.4rem;${recordingStatus.isRecording ? 'opacity:0.5;pointer-events:none;' : ''}" title="${isLiveTranscriptionSupported() ? 'Adds best-effort speech-to-text lines to the SRT using your browser\'s built-in speech recognition. Not a substitute for a real transcription tool -- see the README.' : 'Not supported in this browser -- try Chrome or Edge.'}">

@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const WEB_CLIENT_ROOT = join(__dirname, '..', '..');
+const WEB_CLIENT_JS = join(WEB_CLIENT_ROOT, 'js');
 const JS_FEATURES_DIR = join(WEB_CLIENT_ROOT, 'js', 'features');
 const INDEX_HTML = join(WEB_CLIENT_ROOT, 'index.html');
 
@@ -231,5 +232,69 @@ describe('Accessibility lint: live-announcer regions are present at parse time',
             /id="a11y-announcer-urgent"[^>]*aria-live="assertive"|aria-live="assertive"[^>]*id="a11y-announcer-urgent"/.test(source),
             'index.html no longer hardcodes #a11y-announcer-urgent (aria-live="assertive")'
         );
+    });
+});
+
+describe('Accessibility lint: voice/media events reach the sr-only announcer', () => {
+    it('media.js recording overlay announces start/stop and periodic elapsed time (visual-only overlay otherwise)', () => {
+        const source = readFileSync(join(WEB_CLIENT_JS, 'core', 'media.js'), 'utf8');
+        assert(
+            /import\s*\{\s*announce\s*\}\s*from\s*['"]\.\/a11y-announce\.js['"]/.test(source),
+            'media.js no longer imports announce() from core/a11y-announce.js'
+        );
+        assert(
+            /announce\(/.test(source),
+            'media.js no longer calls announce() -- the recording-status overlay is position:fixed/pointer-events:none with no ARIA, so screen-reader users depend entirely on this call to know a recording started, stopped, or is still going'
+        );
+    });
+
+    it('vtt-connected.js announces voice call initiation, not just a toast', () => {
+        const source = readFileSync(join(WEB_CLIENT_JS, 'features', 'vtt', 'vtt-connected.js'), 'utf8');
+        assert(
+            /initiateVoiceCall\([^)]*\);[\s\S]{0,400}announce\(/.test(source),
+            'vtt-connected.js no longer calls announce() near initiateVoiceCall() -- a screen-reader user pressing the call button would only get the visible toast'
+        );
+    });
+
+    it('the session recording buttons keep their aria-label (GM Tools)', () => {
+        const source = readFileSync(join(WEB_CLIENT_JS, 'features', 'gm-tools', 'index.js'), 'utf8');
+        assert(
+            /id="session-record-btn"[^>]*aria-label="/.test(source),
+            '#session-record-btn lost its aria-label'
+        );
+        assert(
+            /id="session-stop-btn"[^>]*aria-label="/.test(source),
+            '#session-stop-btn lost its aria-label'
+        );
+    });
+});
+
+describe('Accessibility lint: "Type to Speak" chat TTS stays wired', () => {
+    it('vtt-core.js still speaks new chat messages when VTT_CONFIG.speakMessages is on', () => {
+        // Regression guard for the deaf/mute-player TTS bridge: a typed chat
+        // message should reach players who are listening (voice call) but
+        // not reading chat, the same way a spoken message would. This
+        // doesn't attempt to simulate speechSynthesis under the DOM-shim
+        // test harness (see tests/support/dom-shim.js) -- it just guards
+        // against the wiring being silently deleted.
+        const source = readFileSync(join(WEB_CLIENT_JS, 'features', 'vtt', 'vtt-core.js'), 'utf8');
+        assert(
+            /speakMessages/.test(source),
+            'vtt-core.js no longer references VTT_CONFIG.speakMessages'
+        );
+        assert(
+            /SpeechSynthesisUtterance/.test(source),
+            'vtt-core.js no longer constructs a SpeechSynthesisUtterance -- the "Read aloud" chat feature may have been removed'
+        );
+    });
+
+    it('both VTT chat panels (connected + local) expose the "Read aloud" checkbox', () => {
+        for (const file of ['vtt-connected.js', 'vtt-local.js']) {
+            const source = readFileSync(join(WEB_CLIENT_JS, 'features', 'vtt', file), 'utf8');
+            assert(
+                /id="vtt-speak-messages"/.test(source),
+                `${file} is missing the #vtt-speak-messages checkbox`
+            );
+        }
     });
 });
