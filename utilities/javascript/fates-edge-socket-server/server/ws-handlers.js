@@ -149,6 +149,9 @@ function setupWSS(wss, appConfig) {
             historyCount: currentRoom.deckHistory?.length || 0,
             whiteboard: currentRoom.whiteboard || {},
             characters: charArray,
+            // Rolling chat window -- see room.js's recordChatMessage() and
+            // the matching field on socketio-handlers.js's 'room-joined'.
+            chatHistory: currentRoom.chatHistory || [],
             timestamp: Date.now()
         };
         if (currentRoom.data?.region) {
@@ -289,13 +292,24 @@ function setupWSS(wss, appConfig) {
                         }
                         break;
 
+                    // ─── Chat messages (recorded into the room's rolling ──
+                    // history) -- pulled out of the direct-broadcast group
+                    // below because this one needs a side effect
+                    // (room.recordChatMessage) before the broadcast. See
+                    // that function's doc comment in room.js and the
+                    // matching 'chatHistory' field added to 'room-state'
+                    // above (sent right after connect).
+                    case 'chat-message':
+                        room.recordChatMessage(currentRoom, (data && data.message) || data, wssConfig.maxChatHistory);
+                        room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
+                        break;
+
                     // ─── Direct broadcast events ──────────────────────────
                     case 'media_recording':
                     case 'voice-offer':
                     case 'voice-answer':
                     case 'voice-ice-candidate':
                     case 'voice-status':
-                    case 'chat-message':
                     case 'roll-dice':
                     case 'roll-result':
                     case 'operation':

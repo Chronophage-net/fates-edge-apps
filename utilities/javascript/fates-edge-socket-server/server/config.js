@@ -14,6 +14,17 @@ function loadConfig() {
         logLevel: process.env.LOG_LEVEL || 'INFO',
         corsOrigin: process.env.CORS_ORIGIN || '*',
         maxDeckHistory: parseInt(process.env.MAX_DECK_HISTORY, 10) || 100,
+        // ─── Rolling chat history (per room, in-memory) ─────────────
+        // Newly-joined clients get the last N chat messages in their
+        // room-joined/room-state payload (see room.js's recordChatMessage()
+        // and its call sites in socketio-handlers.js/ws-handlers.js), so a
+        // client that connects mid-conversation isn't staring at a blank
+        // pane. Purely in-memory, same lifetime as the room itself --
+        // cleared when the room empties out and is recreated (see room.js's
+        // createRoom()), same as deckHistory. Set to 0 to disable entirely
+        // (no history stored, no history sent on join -- behaves exactly
+        // like before this feature existed).
+        maxChatHistory: parseInt(process.env.MAX_CHAT_HISTORY, 10) || 50,
         healthEndpoint: process.env.HEALTH_ENDPOINT || '/api/health',
         statsInterval: parseInt(process.env.STATS_INTERVAL, 10) || 30000,
         apiKey: process.env.API_KEY || null,
@@ -43,19 +54,6 @@ function loadConfig() {
         wsMessageRateMax: process.env.WS_MESSAGE_RATE_MAX !== undefined
             ? parseInt(process.env.WS_MESSAGE_RATE_MAX, 10)
             : 120,
-
-        // ─── WebSocket message payload size ─────────────────────────
-        // NEW: added for the optional AI GM Bot voice narration feature
-        // (see fates-edge-ai-gm-bot's modules/tts-client.js) -- a
-        // 'tts-audio' event's base64-encoded audio can run a few hundred
-        // KB to a couple MB for a longer narration, comfortably past
-        // Socket.IO's 1MB `maxHttpBufferSize` default (the plain-ws
-        // transport has no default cap at all, which is its own DoS
-        // surface). Applied to both transports in index.js. Raise this if
-        // TTS_MAX_CHARS is set high enough that narration audio still gets
-        // rejected; lower it if you'd rather fail closed than let one
-        // connection send multi-MB frames.
-        wsMaxPayloadBytes: parseInt(process.env.WS_MAX_PAYLOAD_BYTES, 10) || 8 * 1024 * 1024,
 
         // ─── Per-room client cap ─────────────────────────────────────
         // 0 (default) = unlimited, unchanged behavior. A very large public

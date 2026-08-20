@@ -8,6 +8,7 @@ API_KEY=your-secret-key-here        # Required for API authentication
 
 # ─── Deck & History ────────────────────────────────────────────
 MAX_DECK_HISTORY=100                # Number of deck draws to keep in history
+MAX_CHAT_HISTORY=50                 # Rolling chat window sent to newly-joined clients (0 disables)
 
 # ─── Room Settings ─────────────────────────────────────────────
 ROOM_PASSWORD=                      # Optional: password for room creation (leave blank for no password)

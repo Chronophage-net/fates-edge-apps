@@ -1010,6 +1010,17 @@ function setupWebSocketSync() {
     vttStore.updateTimers(getState().timers || []);
 
     // ─── ROOM STATE ────────────────────────────────────
+    // Sent once, right after connecting, as either 'room-state' (plain WS)
+    // or 'room-joined' (Socket.io) -- see server/ws-handlers.js's
+    // roomStatePayload / server/socketio-handlers.js's 'room-joined' emit.
+    // Both carry the same fields we care about here, so one handler covers
+    // both transports.
+    //
+    // `chatHistoryLoaded` guards against replaying the same history twice
+    // if this ever fires more than once for a single mount (it shouldn't,
+    // but the live chatHandler below has no de-dupe of its own, so a
+    // double-apply would show duplicate messages rather than just no-op).
+    let chatHistoryLoaded = false;
     const roomStateHandler = (data) => {
         if (isDestroyed) return;
         if (data && data.characters && Array.isArray(data.characters)) {
@@ -1024,9 +1035,22 @@ function setupWebSocketSync() {
             const regionDisplay = q('#vtt-region-display');
             if (regionDisplay) regionDisplay.textContent = defaultRegion;
         }
+        // ─── Rolling chat history (see server/room.js's recordChatMessage) ──
+        // Server sends oldest-first; vttStore.addChatMessage() appends, so
+        // replaying in that order reconstructs the same chronological log
+        // a client that had been connected the whole time would have.
+        if (!chatHistoryLoaded && data && Array.isArray(data.chatHistory) && data.chatHistory.length) {
+            chatHistoryLoaded = true;
+            for (const msg of data.chatHistory) {
+                if (!msg) continue;
+                vttStore.addChatMessage({ ...msg, local: false, sent: true, fromHistory: true });
+            }
+        }
     };
     onWSEvent('room-state', roomStateHandler);
     wsListeners.set('room-state', roomStateHandler);
+    onWSEvent('room-joined', roomStateHandler);
+    wsListeners.set('room-joined', roomStateHandler);
 
     // ─── SYNC STATE ──────────────────────────────────
     const syncStateHandler = (data) => {

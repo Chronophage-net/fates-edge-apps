@@ -606,6 +606,9 @@ function createRoom(roomCode) {
         clients: new Map(),
         deck: buildDeck(),
         deckHistory: [],
+        // Rolling chat-message window -- see config.js's maxChatHistory
+        // and recordChatMessage() below.
+        chatHistory: [],
         deckOffset: Math.floor(Math.random() * 1000),
         lastActivity: Date.now(),
         created: Date.now(),
@@ -657,6 +660,26 @@ function createDefaultWhiteboard() {
     };
 }
 
+// ---------- Chat history (rolling window) ----------
+// Called by socketio-handlers.js/ws-handlers.js's 'chat-message' handlers
+// right before they broadcast, so the room's stored history always
+// matches what clients actually saw go out live. `maxHistory` is
+// config.maxChatHistory (0 disables storage entirely -- no-ops here,
+// and the join payloads at the two call sites send an empty array).
+// Accepts either the raw message object or the `{message: {...}}`
+// wrapper both transports send (see websocket.js's sendChatMessage()) --
+// callers can pass `data.message || data` without checking which shape
+// they got.
+function recordChatMessage(roomObj, message, maxHistory) {
+    if (!roomObj || !maxHistory || maxHistory <= 0) return;
+    if (!message || typeof message !== 'object') return;
+    if (!roomObj.chatHistory) roomObj.chatHistory = [];
+    roomObj.chatHistory.push(message);
+    if (roomObj.chatHistory.length > maxHistory) {
+        roomObj.chatHistory = roomObj.chatHistory.slice(-maxHistory);
+    }
+}
+
 // ---------- Exports ----------
 module.exports = {
     rooms,
@@ -691,4 +714,5 @@ module.exports = {
     createRoom,
     setRoomPassword,
     createDefaultWhiteboard,
+    recordChatMessage,
 };

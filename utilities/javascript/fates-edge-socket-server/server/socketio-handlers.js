@@ -306,7 +306,14 @@ function setupSocketIO(io, appConfig) {
                 deckHistory: currentRoom.deckHistory.slice(-20),
                 totalClients: currentRoom.clients.size,
                 whiteboard: currentRoom.whiteboard || {},
-                characters: charArray  // <-- send full characters
+                characters: charArray,  // <-- send full characters
+                // Rolling chat window (see room.js's recordChatMessage()) --
+                // already capped to ioConfig.maxChatHistory at write time,
+                // so no further slicing needed here. Empty array (not
+                // missing) when MAX_CHAT_HISTORY=0 disables the feature,
+                // so older clients that don't check for the field's
+                // presence still behave correctly either way.
+                chatHistory: currentRoom.chatHistory || []
             });
 
             // Broadcast with sender exclusion
@@ -828,10 +835,26 @@ function setupSocketIO(io, appConfig) {
             socket.emit('whiteboard-update', data);
         });
 
+        // ─── Chat messages (recorded into the room's rolling history) ──
+        // Pulled out of the generic relayEvents loop below because this
+        // one needs a side effect (room.recordChatMessage) before the
+        // broadcast, not just a pass-through -- see that function's doc
+        // comment in room.js and the matching 'chatHistory' field added
+        // to 'room-joined' further down.
+        socket.on('chat-message', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (r) room.recordChatMessage(r, (data && data.message) || data, ioConfig.maxChatHistory);
+            room.broadcastToRoom(socket.room, 'chat-message', {
+                ...data,
+                clientName: socket.clientData?.name || 'Player',
+            }, socket.id);
+        });
+
         // ─── Relay events ───────────────────────────────────────────
         const relayEvents = [
             'media_recording', 'voice-offer', 'voice-answer', 'voice-ice-candidate',
-            'voice-status', 'chat-message', 'roll-dice', 'roll-result',
+            'voice-status', 'roll-dice', 'roll-result',
             'event', 'operation', 'operation_ack', 'presence',
             // NEW: parity with the plain-WS handler's direct-broadcast list
             // (ws-handlers.js) -- these were relay-only there but silently

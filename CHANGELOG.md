@@ -3,6 +3,19 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.20.0] - 2026-08-20
+
+Rolling chat history: newly-joined clients see recent room chat, not a blank pane
+
+### Added
+- **`MAX_CHAT_HISTORY`** (`server/config.js`, default `50`, `0` disables) — the socket server now keeps a rolling, in-memory window of recent chat messages per room (`room.js`'s new `recordChatMessage()`, called from both transports' `chat-message` handlers right before they broadcast — the stored history always matches what clients actually saw live). Sent to newly-joined clients as `chatHistory` (oldest first) in Socket.io's `room-joined` and plain-WS's `room-state` payloads, alongside the existing `deckHistory`/`whiteboard`/`characters` snapshot those already carry.
+- **Web client replay** (`js/features/vtt/vtt-connected.js`) — on connect, replays `chatHistory` into the chat pane via the same `vttStore.addChatMessage()` the live handler already uses, so history and live messages render identically. Also fixes a pre-existing gap where nothing in the client was listening for `room-joined` at all (only `room-state`, the plain-WS variant) — both now share one handler.
+- **`tests/chat-history.test.js`** — unit coverage for `recordChatMessage()`'s windowing/trim/disable behavior. Full existing suite (120 tests) still green.
+
+### Notes
+- Purely in-memory, same lifetime as the room itself (cleared when a room empties out and gets recreated — see `room.js`'s `createRoom()`), same as `deckHistory`. Nothing is persisted to disk or a database.
+- **Whisper privacy is unchanged, not newly introduced:** whispered messages were already broadcast to every client in the room over the wire (only hidden client-side by `recipient` matching) — this feature extends that same existing exposure across time (a client joining mid-conversation now also receives whispers it would have received live had it been connected), it doesn't create a new one. Properly scoping whisper history to only its intended recipient(s) would need the server to track clientId↔recipient-name mapping and is a separate, larger change — flagging here rather than silently deciding either way.
+
 ## [4.19.0] - 2026-08-20
 
 Voice-cloning sidecar for the demo stack: `npm run demo -- --voice`/`--voice-rvc`

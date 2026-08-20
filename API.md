@@ -419,7 +419,7 @@ Connect to the server and emit `join-room`:
 }
 ```
 
-The server responds with `handshake_ack` followed by `room-joined` (Socket.io's `room-joined` includes `characters` — the plain-WS handshake flow does not include a directly equivalent single event; use `sync-request` after joining to pull whiteboard + character state).
+The server responds with `handshake_ack` followed by `room-joined` (Socket.io's `room-joined` includes `characters` — the plain-WS handshake flow does not include a directly equivalent single event; use `sync-request` after joining to pull whiteboard + character state). Both `room-joined` and plain-WS's `room-state` (sent right after connect) also include `chatHistory`: the room's rolling window of recent chat messages (`message-shaped` objects, oldest first — see "Chat History" below), letting a client that joins mid-conversation show something other than a blank pane.
 
 ---
 
@@ -480,7 +480,7 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 |----------------------|-----------------------------------------------|---------------------------------------------------------|
 | `connected`          | Connection established (plain WS)             | `{ "clientId": "...", "room": "AC12", "serverVersion": "..." }` |
 | `handshake_ack`       | Handshake/join accepted                       | `{ "clientId": "...", "clientRole": "gm", "activeClients": [...] }` |
-| `room-joined`         | (Socket.io) Full room snapshot on join, including characters | `{ "room": "...", "clients": [...], "whiteboard": {...}, "characters": [...] }` |
+| `room-joined`         | (Socket.io) Full room snapshot on join, including characters and `chatHistory` (rolling window of recent messages, oldest first — see `MAX_CHAT_HISTORY`, default 50, 0 disables) | `{ "room": "...", "clients": [...], "whiteboard": {...}, "characters": [...], "chatHistory": [...] }` |
 | `chat-message`       | Incoming chat message                         | `{ "text": "...", "sender": "Bob", ... }`             |
 | `tts-audio`           | Optional AI GM voice narration audio, broadcast to everyone in the room (including the bot's own connection) | `{ "audio": "<base64>", "text": "...", "voice": "default", "format": "wav" }` |
 | `soundboard-ambience` | Optional Reactive Soundscape cue, broadcast to everyone in the room (including the bot's own connection) — clients with a matching `trackId` in their local soundboard crossfade to it | `{ "mood": "tense", "trackId": "sound_abc123", "transitionDuration": 2000 }` |
