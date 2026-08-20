@@ -4,6 +4,33 @@ This document tracks the accessibility (a11y) state of the Fate's Edge web clien
 
 The web client already had a meaningful amount of accessibility infrastructure in place before this pass — a visible `aria-live` toast system, a `role="tab"`/`role="tabpanel"` sidebar, and a strict DOMPurify sanitization config. This pass focused on closing real, verified gaps rather than re-implementing things that already existed.
 
+## Status at a glance
+
+| Area | Status | Notes |
+|---|---|---|
+| Focus management on route change | ✅ Done | `router.js` moves focus + announces the new tab |
+| `document.title` on route change | ✅ Done | `Fate's Edge — {Tab}`, updates on every navigation including initial load |
+| `aria-live` announcer regions | ✅ Done | Hardcoded in `index.html`, not left to lazy JS injection |
+| Sidebar `aria-selected`/`aria-controls` | ✅ Done | |
+| Chat `role="log"`, dice-roll self-announcement | ✅ Done | |
+| Color contrast (dark/light `--text3`) | ✅ Done | Light theme's `--gold` intentionally left as a documented, unfixed finding — see below |
+| High-contrast theme | ✅ Done | Third built-in theme, AAA-level contrast throughout |
+| Voice chat speaking indicators | ✅ Done | Icon + sr-only text, not just color; local self-indicator still open |
+| Whiteboard/VTT slider labels + numeric readouts | ✅ Done | |
+| Image `alt` text (whiteboard/roster) | ✅ Done | |
+| GM keyboard-shortcuts modal | ✅ Done | |
+| Static accessibility lint tests | ✅ Done | 9 checks in `tests/unit/a11y-lint.test.js` |
+| DOMPurify strips `aria-*`/`role` | ✅ Already sufficient | `ALLOWED_ATTR: []` predates this work and is stricter than the suggested fix |
+| Real axe-core/Playwright coverage in CI | ⏳ Deferred | Plan documented below; genuinely new devDependency + CI job |
+| `inert`-based focus trapping (inline editors) | ⏳ Deferred | `inert` is the right modern approach when this is built — see below |
+| Local mic self-activity indicator | ⏳ Deferred | Backend (`getVoiceActivity()`) already exists, unused in UI |
+| Discord bot embed alt text | ⏳ Deferred | Different repo; not touched this pass |
+| Foundry bridge `CONFIG.ariaLabels` | ⏳ Deferred | Different repo; not touched this pass |
+| Demo video captions/transcript | ⏳ Deferred | Out of scope for now |
+| Lighthouse CI GitHub Action | ⏳ Deferred | Bundle with the axe-core/Playwright work above |
+
+The rest of this document is organized by pass, oldest first, with the reasoning and verification behind each entry — this table is just the map.
+
 ---
 
 ## What changed in this pass
@@ -140,14 +167,50 @@ The original review suggested Jest + `axe-core`. Checked against the actual proj
 2. Every `<img>` under `js/features/` and in `index.html` has an `alt` attribute (empty `alt=""` counts — that's the correct, deliberate marker for a decorative image whose meaning is carried by adjacent visible text; only a fully missing `alt` is flagged).
 3. Every sidebar `role="tab"` button in `index.html` has `aria-controls`, and `router.js` still contains the `setAttribute('aria-selected', ...)` call that keeps `aria-selected` in sync at runtime (a regression guard for the exact bug the first accessibility pass fixed).
 
-Writing this test immediately found three more real, previously-unnoticed gaps it was designed to catch: two `<img>` tags in the whiteboard's own renderer (a pinned image, and — since its accompanying text label already names it — a character token) and one in the roster panel, all missing `alt` entirely. Fixed alongside the test (`alt="Image pinned to the whiteboard"` for the standalone image; `alt=""` for the two with an adjacent visible name label, to avoid double-announcing the same information). All four lint checks pass against the current codebase; `npm test` is 141-142/142 depending on run (see note below).
+Writing this test immediately found three more real, previously-unnoticed gaps it was designed to catch: two `<img>` tags in the whiteboard's own renderer (a pinned image, and — since its accompanying text label already names it — a character token) and one in the roster panel, all missing `alt` entirely. Fixed alongside the test (`alt="Image pinned to the whiteboard"` for the standalone image; `alt=""` for the two with an adjacent visible name label, to avoid double-announcing the same information). All four lint checks (now nine — see the Fourth pass section below) pass against the current codebase; `npm test`'s total has grown across each pass (see the flakiness note below for the current count).
 
 This is not full axe-core coverage — it can't check contrast, focus order, or anything that needs actual layout/computed styles — but it directly guards the exact classes of regression this project has already shipped once.
 
 **Still open — real coverage, real cost:** swap in a headless browser for CI only. Add Playwright (not currently a dependency anywhere in this repo — confirmed by checking every `package.json`) as a *separate*, opt-in test target — e.g. `npm run test:a11y` — that boots the built `dist/` in headless Chromium and runs `@axe-core/playwright` against each routed tab. This gives real axe-core coverage without touching `tests/runner.js` or its shim at all, and can be wired into a Lighthouse CI GitHub Action (the review's other suggestion) as the same job, since both need a real browser anyway. This is a genuinely new devDependency and CI job, not a small add — size it as its own follow-up piece of work.
 
+When this gets built: point it at the built `dist/` output, not the Vite dev server — `dist/` is what actually ships, and dev-server-only quirks (unminified markup, HMR scaffolding) aren't what a real user's screen reader will ever see. Start with a single route (Home is the obvious first target) and expand route-by-route rather than trying to cover all ~23 tabs in the first version — each route needs its own known-good baseline reviewed by a human before it's trustworthy as a CI gate, and doing that for one route at a time is far more tractable than trying to sign off on all of them in one PR.
+
+---
+
+## Fourth pass: document title, hardcoded live regions, five more lint checks
+
+Three smaller, cheap fixes plus meaningfully expanding the static lint suite.
+
+### `document.title` now updates on every route change
+
+`router.js`'s `navigate()` sets `document.title = \`Fate's Edge — ${activeLabel}\`` using the exact same resolved tab label the sidebar's `aria-selected` sync and the `announce()` call already use — no separate lookup, so it can't drift out of sync with what's actually showing. Unlike the focus-move/announce logic (deliberately skipped on the very first page load, so it doesn't fight the browser's own default focus), the title update runs on *every* navigation including the first — a static `<title>Fate's Edge Toolkit v4.16.1</title>` regardless of which tab a deep link opened to was itself a small pre-existing gap. A well-behaved SPA updating `<title>` on route change is what lets a screen reader's own built-in "announce title on navigation" behavior actually say something useful.
+
+### `aria-live` announcer regions are now hardcoded in `index.html`
+
+`core/a11y-announce.js`'s `ensureRegions()` always checked `getElementById` before creating anything, so this only required adding the two `<div>`s to the static HTML — zero JS changes. The regions now exist in the DOM from first paint rather than being created on the first `announce()` call, which removes a subtle real risk: some screen readers only reliably pick up a live region added to the DOM *after* page load if it happens to still be there by the time they finish their own initial accessibility-tree pass. `ensureRegions()`'s create-on-demand logic stays in place as a defensive fallback (and is still what lets `tests/unit/theme-manager.test.js`-style DOM-free tests import the module without crashing), but production now never actually exercises it.
+
+### Five more static lint checks in `tests/unit/a11y-lint.test.js`
+
+All source-only regex checks, same conservative philosophy as the original three (false negatives are acceptable, false positives are not): all nine checks currently pass clean against the live codebase, meaning these are regression guards rather than fixes for something currently broken.
+
+1. **`role="button"` on a `<div>`/`<span>`** — flags it outright rather than trying to also verify the hand-rolled `tabindex`/keydown wiring a real interactive `role="button"` div needs to not be a keyboard trap. Cheaper to just never do it than to correctly verify it's done right every time.
+2. **Empty, unlabeled `<button>`/`<a>`** — flags a `<button>`/`<a>` whose inner content is empty (after stripping comments) *and* contains no `${...}` interpolation *and* has no `aria-label`/`aria-labelledby` on the opening tag. Deliberately narrow: it will not catch every possible missing-accessible-name case (an interpolated value that's always empty at runtime is invisible to a static check), but it will never flag a genuinely text-bearing or labeled element.
+3. **No positive `tabindex`** — `tabindex="0"`/`"-1"` are both fine and already used deliberately elsewhere (e.g. `router.js`'s focus-on-navigate); a positive value reorders the whole page's tab sequence around one element's guess at priority, almost always fighting the DOM's own — usually correct — source order.
+4. **`document.title` regression guard** — asserts `router.js` still contains a `document.title =` assignment.
+5. **Live-region regression guard** — asserts `index.html` still hardcodes both `#a11y-announcer` (`aria-live="polite"`) and `#a11y-announcer-urgent` (`aria-live="assertive"`).
+
+`npm test` is 152/152 (the one pre-existing Toll & Veil flake noted below aside).
+
+### `inert` — noted for whenever inline-editor focus-trapping gets built
+
+Still deferred (see the status table above), but worth recording now rather than re-researching later: `inert` has been a real, broadly-supported HTML attribute for a while now (not a proposal or a polyfill-only feature), and is the right tool for this — it's a single attribute that removes an entire subtree from both the tab order and screen-reader traversal at once, which is more robust than the older pattern of manually toggling `aria-hidden` on every sibling and separately managing a focus trap by hand (easy to get subtly wrong, e.g. forgetting one sibling, or a trap that doesn't release cleanly on close).
+
+### Discord bot / Foundry bridge — still out of scope, noted for whoever picks them up
+
+Both live in separate repos from this one and weren't touched this pass. For whenever they are: the Discord bot's embeds should carry alt text on any image field where Discord's embed schema supports it (and a plain-text fallback line in the message body for clients that don't render embeds at all — some mobile/accessibility-mode Discord clients don't). The Foundry bridge's interactive elements (buttons, selects in its GM panel) should inherit accessible names from Foundry's own `CONFIG.ariaLabels` where the host instance defines them, rather than hardcoding English-only labels that ignore whatever the GM's Foundry instance is already configured with.
+
 ---
 
 ## Note on test suite flakiness (pre-existing, unrelated to this work)
 
-`npm test` currently shows 141/142 or 142/142 depending on the run: `TollVeilEngine: follow-suit and trump-breaking › must follow suit when able` fails intermittently (confirmed by re-running it several times in isolation — it passes most runs, fails occasionally with `expected ♢, got null`). This is a pre-existing flake in the Toll & Veil card-engine test, unrelated to any file this accessibility pass touched, and out of scope here — flagged for whoever next works in `tests/unit/toll-and-veil.test.js` to track down (likely an unseeded random draw somewhere in the AI-play test path).
+`npm test` currently shows 151/152 or 152/152 depending on the run: `TollVeilEngine: follow-suit and trump-breaking › must follow suit when able` fails intermittently (confirmed by re-running it several times in isolation, across multiple accessibility passes now — it passes most runs, fails occasionally with a `got null` assertion on a randomly-varying expected suit symbol). This is a pre-existing flake in the Toll & Veil card-engine test, unrelated to any file this accessibility work has touched, and out of scope here — flagged for whoever next works in `tests/unit/toll-and-veil.test.js` to track down (likely an unseeded random draw somewhere in the AI-play test path).

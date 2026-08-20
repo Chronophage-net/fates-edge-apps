@@ -179,6 +179,14 @@ export async function navigate(tab, options = {}) {
         }
     });
 
+    // NEW: keep <title> in sync with the active tab, on every navigation
+    // including the very first page load (unlike the focus/announce
+    // handling below, which is deliberately skipped on initial load to
+    // avoid fighting the browser's own default focus). Screen readers
+    // announce the document title on route change in a well-behaved SPA;
+    // leaving it static meant that announcement never happened here.
+    document.title = `Fate's Edge — ${activeLabel}`;
+
     // Hide all tab contents, show the active one
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     const contentEl = getOrCreateContentElement(resolved);

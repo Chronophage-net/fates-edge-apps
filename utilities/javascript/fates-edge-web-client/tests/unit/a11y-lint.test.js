@@ -113,3 +113,123 @@ describe('Accessibility lint: sidebar tabs stay wired to their panels', () => {
         );
     });
 });
+
+describe('Accessibility lint: role="button" is not used on non-<button> elements', () => {
+    it('no <div>/<span> in js/features or index.html carries role="button"', () => {
+        // A real <button> gets keyboard activation (Enter/Space), focus
+        // styling, and its accessible role for free. role="button" on a
+        // <div>/<span> gets none of that automatically -- it needs a hand-
+        // rolled tabindex + keydown handler to not be a keyboard trap, and
+        // that's exactly the kind of thing that's easy to add once and
+        // forget to maintain. Cheaper to just never do it in the first
+        // place; this is a static-analysis guard against reintroducing it.
+        const files = [...walkJsFiles(JS_FEATURES_DIR), INDEX_HTML];
+        const roleButtonRe = /<(div|span)\b[^>]*?role="button"[^>]*?>/gs;
+        const offenders = [];
+        for (const file of files) {
+            const source = readFileSync(file, 'utf8');
+            for (const tag of findTags(source, roleButtonRe)) {
+                offenders.push(shortLabel(file, tag));
+            }
+        }
+        assert(
+            offenders.length === 0,
+            `role="button" found on a non-<button> element (use a real <button> instead):\n  ${offenders.join('\n  ')}`
+        );
+    });
+});
+
+describe('Accessibility lint: interactive elements have an accessible name', () => {
+    it('no <button>/<a> in js/features or index.html is both empty and unlabeled', () => {
+        // Flags only the unambiguous case: a <button>/<a> whose inner
+        // content, after stripping comments, is empty or whitespace-only
+        // AND contains no ${...} interpolation (which could render real
+        // text at runtime this static check can't see) AND has no
+        // aria-label/aria-labelledby on the opening tag. This is
+        // deliberately conservative -- it will not catch every missing
+        // accessible name (e.g. an interpolated value that's itself
+        // always empty), but it will never flag a genuinely-labeled or
+        // genuinely-text-bearing element.
+        const files = [...walkJsFiles(JS_FEATURES_DIR), INDEX_HTML];
+        const tagRe = /<(button|a)\b([^>]*)>([\s\S]*?)<\/\1>/g;
+        const offenders = [];
+        for (const file of files) {
+            const source = readFileSync(file, 'utf8');
+            let m;
+            tagRe.lastIndex = 0;
+            while ((m = tagRe.exec(source)) !== null) {
+                const [full, , attrs, inner] = m;
+                const hasLabel = /aria-label(ledby)?="/.test(attrs);
+                const stripped = inner.replace(/<!--[\s\S]*?-->/g, '').trim();
+                const hasInterpolation = stripped.includes('${');
+                if (!hasLabel && !hasInterpolation && stripped === '') {
+                    offenders.push(shortLabel(file, full.slice(0, 140)));
+                }
+            }
+        }
+        assert(
+            offenders.length === 0,
+            `Empty, unlabeled interactive element(s) (add text content or aria-label):\n  ${offenders.join('\n  ')}`
+        );
+    });
+});
+
+describe('Accessibility lint: no positive tabindex', () => {
+    it('no element in js/features or index.html has tabindex > 0', () => {
+        // tabindex="0" (join the natural tab order) and tabindex="-1"
+        // (focusable via script only, not Tab) are both fine and used
+        // deliberately elsewhere in this codebase (e.g. router.js's
+        // focus-on-navigate). A positive tabindex reorders the whole
+        // page's tab sequence around one element's guess at what should
+        // come "first" -- almost always an antipattern that fights the
+        // DOM's natural (and usually correct) source-order tab sequence.
+        const files = [...walkJsFiles(JS_FEATURES_DIR), INDEX_HTML];
+        const positiveTabindexRe = /tabindex="([1-9][0-9]*)"/g;
+        const offenders = [];
+        for (const file of files) {
+            const source = readFileSync(file, 'utf8');
+            let m;
+            positiveTabindexRe.lastIndex = 0;
+            while ((m = positiveTabindexRe.exec(source)) !== null) {
+                offenders.push(`${relative(WEB_CLIENT_ROOT, file)}: tabindex="${m[1]}"`);
+            }
+        }
+        assert(
+            offenders.length === 0,
+            `Positive tabindex found (use "0" or "-1" instead):\n  ${offenders.join('\n  ')}`
+        );
+    });
+});
+
+describe('Accessibility lint: route changes keep the document title in sync', () => {
+    it('router.js still updates document.title on navigate()', () => {
+        // Regression guard for the specific fix -- see ACCESSIBILITY.md.
+        // A static <title> means a screen reader announces nothing useful
+        // when a keyboard/AT user navigates between tabs in this SPA.
+        const routerSource = readFileSync(join(WEB_CLIENT_ROOT, 'js', 'router.js'), 'utf8');
+        assert(
+            /document\.title\s*=/.test(routerSource),
+            'router.js no longer sets document.title on navigation'
+        );
+    });
+});
+
+describe('Accessibility lint: live-announcer regions are present at parse time', () => {
+    it('index.html hardcodes both #a11y-announcer and #a11y-announcer-urgent', () => {
+        // Regression guard: these used to only exist via
+        // a11y-announce.js's create-on-first-call fallback, which risks a
+        // late-injected aria-live region going unnoticed by some screen
+        // readers. Hardcoding them in the static HTML removes that race
+        // entirely -- see ACCESSIBILITY.md and index.html's own comment
+        // at these two elements.
+        const source = readFileSync(INDEX_HTML, 'utf8');
+        assert(
+            /id="a11y-announcer"[^>]*aria-live="polite"|aria-live="polite"[^>]*id="a11y-announcer"/.test(source),
+            'index.html no longer hardcodes #a11y-announcer (aria-live="polite")'
+        );
+        assert(
+            /id="a11y-announcer-urgent"[^>]*aria-live="assertive"|aria-live="assertive"[^>]*id="a11y-announcer-urgent"/.test(source),
+            'index.html no longer hardcodes #a11y-announcer-urgent (aria-live="assertive")'
+        );
+    });
+});

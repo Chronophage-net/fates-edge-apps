@@ -441,6 +441,19 @@
     <!-- ===== TOAST CONTAINER ===== -->
     <div id="toast-container" role="status" aria-live="polite"></div>
 
+    <!-- ===== SCREEN-READER-ONLY LIVE ANNOUNCER REGIONS =====
+         Hardcoded here (rather than left to core/a11y-announce.js's
+         create-if-missing fallback) so they exist in the DOM from the very
+         first paint, before any announce() call ever fires. Some screen
+         readers only reliably pick up a late-injected aria-live region if
+         it happens to still be present by the time they finish their own
+         initial pass over the page — having it present at parse time
+         removes that race entirely. a11y-announce.js's ensureRegions()
+         still finds these via getElementById and otherwise no-ops; its own
+         create-on-demand logic stays as a defensive fallback only. -->
+    <div id="a11y-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <div id="a11y-announcer-urgent" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
     <!-- ===== X‑CARD FLOATING BUTTON & OVERLAY ===== -->
     <!-- Floating button (bottom‑right) -->
     <button id="xcard-toggle" class="xcard-floating-btn" title="X-Card (Ctrl+Shift+X)" aria-label="Toggle X-Card overlay">
