@@ -1,6 +1,6 @@
 [![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
 
-# Fate's Edge Toolkit v4.16.1 – Complete VTT Ecosystem
+# Fate's Edge Toolkit v4.18.0 – Complete VTT Ecosystem
 
 > A modular, self-contained toolkit for running Fate's Edge TTRPG campaigns, with real‑time collaboration, VTT integrations, Game Master management, and a full in-browser magic/monastic-path system.
 
@@ -10,7 +10,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
-[![Version](https://img.shields.io/badge/version-4.16.1-blue)](https://github.com/Chronophage-net/fates-edge-apps)
+[![Version](https://img.shields.io/badge/version-4.18.0-blue)](https://github.com/Chronophage-net/fates-edge-apps)
 
 ---
 
@@ -248,8 +248,10 @@ local model (~1.3GB) — expect a few minutes, not literally two, the
 first time. Every run after that reuses the Docker cache and the
 already-pulled model. See `docker-compose.full.yml`'s header comment
 for the full breakdown, `.env.demo.example` for every knob (bigger/
-smaller local model, ports, etc.), and `npm run demo -- --down` to tear
-it down (your pulled model and data stay cached).
+smaller local model, ports, etc. — or just set `DEMO_LEVEL=light` /
+`quality` there for an all-in-one speed/quality preset instead of
+tuning each one by hand), and `npm run demo -- --down` to tear it down
+(your pulled model and data stay cached).
 
 This is a separate, self-contained file (`docker-compose.full.yml`)
 from the "bring your own API key(s)" `docker-compose.yml` covered next

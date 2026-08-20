@@ -257,6 +257,16 @@ services:
       # well under every model this file suggests (llama3.2:1b/3b and
       # mistral all officially support far more), not a hard ceiling.
       - OLLAMA_CONTEXT_WINDOW=${DEMO_OLLAMA_CONTEXT_WINDOW:-8192}
+      # How long the bot waits for one Ollama /api/generate call before
+      # aborting and posting "(AI error)" (see ollama-driver.js). The
+      # bot's own built-in default is 60000ms, which is frequently too
+      # short for Ollama running inside this Docker container -- Docker
+      # Desktop can't pass a host GPU through to a container (no Metal
+      # on macOS, no CUDA without extra setup on Linux/WSL), so
+      # generation runs on CPU only. 180000 (3 min) gives CPU-only
+      # inference realistic headroom; see DEMO_OLLAMA_TIMEOUT_MS in
+      # .env.demo.example for the full explanation and tuning notes.
+      - OLLAMA_TIMEOUT_MS=${DEMO_OLLAMA_TIMEOUT_MS:-180000}
       # REQUIRED for any headless/unattended Ollama deployment -- skips
       # the interactive "pull this model?" terminal prompt (which would
       # otherwise hang forever with no stdin attached) and fails fast

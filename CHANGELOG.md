@@ -3,6 +3,19 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.18.0] - 2026-08-20
+
+Local demo stack: configurable Ollama timeout + `DEMO_LEVEL` speed/quality preset
+
+### Added
+- **`DEMO_LEVEL` preset** (`tools/demo.sh`, `.env.demo.example`) — set `DEMO_LEVEL=light` or `DEMO_LEVEL=quality` in `.env.demo` as an all-or-nothing bundle over `DEMO_OLLAMA_MODEL`/`_CONTEXT_WINDOW`/`_TIMEOUT_MS`, for anyone who'd rather say "my machine is slow" than tune three separate knobs by hand. Resolved only by `npm run demo` (a bare `docker compose up` doesn't see it); doesn't probe actual hardware — Docker Desktop's CPU/RAM allocation isn't visible outside the container anyway. Leave unset/`default` to keep hand-tuning the three vars as before.
+
+### Fixed
+- **`npm run demo` "(AI error)" / Ollama timeouts** (`docker-compose.full.yml`, wired to `fates-edge-ai-gm-bot`'s `ollama-driver.js` `OLLAMA_TIMEOUT_MS` via new `DEMO_OLLAMA_TIMEOUT_MS`) — the AI GM bot's built-in 60s Ollama request timeout was routinely too short for Ollama running CPU-only inside Docker (Docker Desktop can't pass a host GPU through to a container — no Metal on macOS, no CUDA without extra setup on Linux/WSL), causing spurious "(AI error)" fallbacks on otherwise-working demo stacks. Default raised to 180000ms (3min); configurable, and bundled into the new `DEMO_LEVEL` presets above.
+
+### Docs
+- README Quick Start now points to `DEMO_LEVEL` as the fast path for tuning the local-model demo to your machine.
+
 ## [4.16.1] - 2026-08-20
 
 ### Other

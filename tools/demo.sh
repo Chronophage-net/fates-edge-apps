@@ -18,6 +18,10 @@
 #   --down     : stop and remove the demo stack (containers + network;
 #                named volumes -- the pulled model, Redis data, server
 #                logs -- are left alone so the next `npm run demo` is fast)
+#
+# Slow machine, or model replies timing out? Set DEMO_LEVEL=light in
+# .env.demo (or DEMO_LEVEL=quality for a beefier machine) -- see that
+# file's "Local model (Ollama)" section for the full explanation.
 # -------------------------------------------------------------------
 
 set -euo pipefail
@@ -129,17 +133,51 @@ set -a
 source "$ENV_FILE"
 set +a
 
+# ─── DEMO_LEVEL: an all-or-nothing preset over the three Ollama knobs ──
+# (DEMO_OLLAMA_MODEL / _CONTEXT_WINDOW / _TIMEOUT_MS). Doesn't probe your
+# actual hardware -- Docker Desktop's CPU/RAM allocation isn't visible to
+# a script running outside the container anyway -- just three sensible
+# bundles for people who'd rather say "my laptop is a potato" or "I've
+# got a beefy machine" than tune three separate .env.demo values. Unset
+# or "default" leaves whatever's already in .env.demo alone. Exporting
+# here (rather than just setting) is what lets these win over --env-file
+# when Compose resolves ${...} in docker-compose.full.yml.
+case "${DEMO_LEVEL:-default}" in
+    light)
+        export DEMO_OLLAMA_MODEL="llama3.2:1b"
+        export DEMO_OLLAMA_CONTEXT_WINDOW="4096"
+        export DEMO_OLLAMA_TIMEOUT_MS="240000"
+        echo "DEMO_LEVEL=light -- smallest/fastest model (llama3.2:1b), smaller context,"
+        echo "a generous 4min timeout for slow/CPU-only machines."
+        echo
+        ;;
+    quality)
+        export DEMO_OLLAMA_MODEL="mistral"
+        export DEMO_OLLAMA_CONTEXT_WINDOW="8192"
+        export DEMO_OLLAMA_TIMEOUT_MS="300000"
+        echo "DEMO_LEVEL=quality -- best writing (mistral, ~4.1GB first pull), 5min timeout"
+        echo "to give the larger model room on CPU-only Ollama."
+        echo
+        ;;
+    default|"") ;;
+    *)
+        echo "⚠️  Unknown DEMO_LEVEL='$DEMO_LEVEL' (expected light, default, or quality) --" >&2
+        echo "   ignoring it and using DEMO_OLLAMA_MODEL/_CONTEXT_WINDOW/_TIMEOUT_MS from .env.demo as-is." >&2
+        ;;
+esac
+
 echo
 echo "Starting the demo stack: client + server + Redis + local Ollama + AI GM bot"
 echo "(First run: builds 3 images and pulls a small local model -- a few minutes."
 echo " Later runs reuse the Docker cache and the already-pulled model -- much faster.)"
 echo
 if [[ "${DEMO_OLLAMA_MODEL:-llama3.2:1b}" == "llama3.2:1b" ]]; then
-    echo "ℹ️  Using the default model, llama3.2:1b -- fast to pull, but its writing can get"
-    echo "   nonsensical on complex TTRPG scenarios (don't worry, the AI GM isn't broken --"
-    echo "   it's just a very small model). For a noticeably better GM, set"
-    echo "   DEMO_OLLAMA_MODEL=llama3.2:3b or DEMO_OLLAMA_MODEL=mistral in .env.demo"
-    echo "   (both larger and smarter, just slower to pull the first time)."
+    echo "ℹ️  Using llama3.2:1b -- fast to pull, but its writing can get nonsensical on"
+    echo "   complex TTRPG scenarios (don't worry, the AI GM isn't broken -- it's just a"
+    echo "   very small model). For a noticeably better GM, set DEMO_LEVEL=quality in"
+    echo "   .env.demo for an all-in-one preset, or hand-pick with"
+    echo "   DEMO_OLLAMA_MODEL=llama3.2:3b / mistral (both larger and smarter, just"
+    echo "   slower to pull the first time)."
     echo
 fi
 echo "Once it's up:"
