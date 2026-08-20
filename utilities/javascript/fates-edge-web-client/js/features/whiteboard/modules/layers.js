@@ -35,7 +35,8 @@ export function renderLayersPanel() {
                 <span class="wb-layer-name text-sm" data-layer-id="${l.id}" style="flex:1;cursor:pointer;${l.isGM ? 'font-style:italic;color:#c47a7a;' : ''}"
                       title="${l.isGM ? 'GM-only layer' : ''}">${escHtml(l.name)}${l.isGM ? ' 🛡️' : ''}</span>
                 <input type="range" class="wb-layer-opacity" data-layer-id="${l.id}" min="0" max="1" step="0.05" value="${l.opacity}"
-                       style="width:56px;" title="Layer opacity" />
+                       style="width:56px;" title="Layer opacity" aria-label="Opacity for layer ${escHtml(l.name)}" />
+                <span class="wb-layer-opacity-value text-xs" data-layer-id="${l.id}" style="min-width:28px;">${Math.round(l.opacity * 100)}%</span>
                 <button class="wb-layer-up" data-layer-id="${l.id}" title="Move up" style="background:none;border:none;cursor:pointer;" ${i === 0 ? 'disabled' : ''}>⬆️</button>
                 <button class="wb-layer-down" data-layer-id="${l.id}" title="Move down" style="background:none;border:none;cursor:pointer;" ${i === ordered.length - 1 ? 'disabled' : ''}>⬇️</button>
                 ${DEFAULT_LAYER_DEFS.some(d => d.id === l.id) ? '' : `<button class="wb-layer-del" data-layer-id="${l.id}" title="Delete layer" style="background:none;border:none;cursor:pointer;color:var(--red,#c45a5a);">✕</button>`}
@@ -77,6 +78,8 @@ export function renderLayersPanel() {
         const layer = getLayer(inp.dataset.layerId);
         if (!layer) return;
         layer.opacity = parseFloat(inp.value);
+        const valueLabel = panel.querySelector(`.wb-layer-opacity-value[data-layer-id="${inp.dataset.layerId}"]`);
+        if (valueLabel) valueLabel.textContent = `${Math.round(layer.opacity * 100)}%`;
         saveWhiteboardData();
         restoreDrawings();
         renderOverlay();

@@ -192,13 +192,13 @@ function renderLightsPanel() {
                     <span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${light.color || 'rgba(255,220,150,0.25)'};border:1px solid var(--gold);"></span>
                     <label class="text-muted text-xs" title="Radius in cells">R:</label>
                     <input type="range" min="1" max="20" step="0.5" value="${light.radius / cellSize}" 
-                           data-light-idx="${idx}" data-prop="radius" style="width:60px;" />
+                           data-light-idx="${idx}" data-prop="radius" style="width:60px;" aria-label="Radius in cells for light ${idx + 1}" />
                     <span class="text-xs">${(light.radius / cellSize).toFixed(1)}</span>
                     <label class="text-muted text-xs">Int:</label>
                     <input type="range" min="0.1" max="1" step="0.05" value="${light.intensity ?? 1}" 
-                           data-light-idx="${idx}" data-prop="intensity" style="width:50px;" />
+                           data-light-idx="${idx}" data-prop="intensity" style="width:50px;" aria-label="Intensity for light ${idx + 1}" />
                     <span class="text-xs">${(light.intensity ?? 1).toFixed(2)}</span>
-                    <input type="color" value="${rgbToHex(light.color)}" data-light-idx="${idx}" data-prop="color" style="width:24px;height:24px;padding:0;border:none;background:none;cursor:pointer;" />
+                    <input type="color" value="${rgbToHex(light.color)}" data-light-idx="${idx}" data-prop="color" style="width:24px;height:24px;padding:0;border:none;background:none;cursor:pointer;" aria-label="Color for light ${idx + 1}" />
                     <button class="btn btn-xs btn-danger" data-light-idx="${idx}" data-action="delete-light">✕</button>
                 </div>
             `).join('')}
@@ -385,9 +385,11 @@ export function render(el) {
                         </div>
 
                         <div class="flex gap-1 flex-center">
-                            <input type="color" id="whiteboard-color" value="${currentColor}" style="width:32px;height:32px;padding:0;border:none;background:none;cursor:pointer;" />
-                            <input type="range" id="whiteboard-size" min="1" max="20" value="${currentSize}" title="Stroke size" style="width:70px;" />
-                            <input type="range" id="whiteboard-opacity" min="0.1" max="1" step="0.05" value="${currentOpacity}" title="Stroke opacity" style="width:60px;" />
+                            <input type="color" id="whiteboard-color" value="${currentColor}" style="width:32px;height:32px;padding:0;border:none;background:none;cursor:pointer;" aria-label="Stroke color" />
+                            <input type="range" id="whiteboard-size" min="1" max="20" value="${currentSize}" title="Stroke size" aria-label="Stroke size" style="width:70px;" />
+                            <span id="whiteboard-size-value" class="text-xs" style="min-width:20px;">${currentSize}</span>
+                            <input type="range" id="whiteboard-opacity" min="0.1" max="1" step="0.05" value="${currentOpacity}" title="Stroke opacity" aria-label="Stroke opacity" style="width:60px;" />
+                            <span id="whiteboard-opacity-value" class="text-xs" style="min-width:28px;">${Math.round(currentOpacity * 100)}%</span>
                         </div>
 
                         <div class="flex gap-1 flex-center">
@@ -592,10 +594,14 @@ export function attachEvents() {
     document.getElementById('whiteboard-size')?.addEventListener('input', (e) => {
         currentSize = parseInt(e.target.value);
         setCurrentSize(currentSize);
+        const sizeLabel = document.getElementById('whiteboard-size-value');
+        if (sizeLabel) sizeLabel.textContent = String(currentSize);
     });
     document.getElementById('whiteboard-opacity')?.addEventListener('input', (e) => {
         currentOpacity = parseFloat(e.target.value);
         setCurrentOpacity(currentOpacity);
+        const opacityLabel = document.getElementById('whiteboard-opacity-value');
+        if (opacityLabel) opacityLabel.textContent = `${Math.round(currentOpacity * 100)}%`;
     });
     document.getElementById('whiteboard-grid')?.addEventListener('change', (e) => {
         state.settings.gridSnap = e.target.checked;
