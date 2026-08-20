@@ -197,7 +197,7 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 npm run demo
 ```
 
-[![Watch the demo](docs/media/demo-thumbnail.png)](docs/media/demo.mp4)
+[![Screenshot of the AI GM bot narrating a live reply in the Fate's Edge web client, linking to a video demo](docs/media/demo-thumbnail.png)](docs/media/demo.mp4)
 
 *Click to play `docs/media/demo.mp4` -- the AI GM bot joining room `DEMO`
 and narrating a live reply, generated entirely by the local Ollama
@@ -548,6 +548,8 @@ Licensed under **CC BY-NC-SA 4.0**. See [LICENSE.srd](LICENSE.srd).
 
 Found a security issue? See [SECURITY.md](SECURITY.md) for how to report it
 privately rather than filing a public issue.
+
+Working on accessibility? See the web client's [`ACCESSIBILITY.md`](utilities/javascript/fates-edge-web-client/ACCESSIBILITY.md) for the current state, the last audit's findings, and what's still open.
 
 1. **Fork the repository** and create your branch from `main`
 2. **Follow the code style** — use existing patterns

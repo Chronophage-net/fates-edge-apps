@@ -14,6 +14,13 @@ import { addRoll, getState, saveState } from '../../core/state.js';
 import { performRoll, rollDie } from '../../core/dice.js';
 // Import WebSocket for sync
 import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '../../core/websocket.js';
+// NEW: a11y -- remote rolls already get a showToast() (aria-live via
+// #toast-container) in the rollHandler below, but the LOCAL roller's own
+// result previously only ever landed in the visible #roll-result DOM node,
+// with no screen-reader announcement of what just happened. See
+// core/a11y-announce.js's file header for why this is a separate,
+// screen-reader-only channel from Toast.js.
+import { announce } from '../../core/a11y-announce.js';
 
 let container = null;
 let wsListeners = new Map();
@@ -637,6 +644,11 @@ function handleRoll() {
         
         addRoll(rollData);
         displayResult(result);
+        // NEW: a11y -- announce the local roll's outcome to screen readers
+        // (see the import above). Kept concise on purpose: successes,
+        // story beats, and the outcome label are the numbers a player
+        // actually needs, not every individual die face.
+        announce(`Rolled ${result.resultText || result.outcome || 'a dice pool'}: ${result.successes || 0} success${result.successes === 1 ? '' : 'es'}, ${result.storyBeats || 0} story beat${result.storyBeats === 1 ? '' : 's'}.`);
         renderHistory();
         updateStats();
         

@@ -88,6 +88,13 @@
 </head>
 <body>
 
+    <!-- NEW: Skip-to-content link -- first focusable element on the page,
+         visually hidden until it receives keyboard focus (Tab from the very
+         top). Lets keyboard/screen-reader users bypass the ~20-item sidebar
+         nav and jump straight to the active tab panel. See css/app.css's
+         .sr-only/.sr-only-focusable rules. -->
+    <a href="#main-content" class="sr-only sr-only-focusable">Skip to content</a>
+
     <!-- ===== PASSWORD OVERLAY ===== -->
     <div class="password-overlay" id="passwordOverlay" role="dialog" aria-modal="true" aria-label="Password gate">
         <div class="gate-box">
@@ -162,83 +169,92 @@
                 </div>
             </div>
             
-            <nav class="sidebar-nav" id="sidebarNav" aria-label="Module Navigation">
+            <!-- NEW: role="tablist" + aria-controls per button -- these were
+                 already role="tab"/aria-selected individually, but the
+                 container never declared itself a tablist and no button
+                 said which panel it controls. aria-controls targets are
+                 valid once the router creates each tab-<id> panel (most
+                 exist in the static markup below already; a couple like
+                 tab-crafting are created on first visit by router.js's
+                 getOrCreateContentElement() — harmless for aria-controls
+                 to reference an id that doesn't exist yet). -->
+            <nav class="sidebar-nav" id="sidebarNav" role="tablist" aria-orientation="vertical" aria-label="Module Navigation">
                 <div class="nav-group">
                     <span class="nav-group-title">Core</span>
-                    <button class="nav-item active" data-tab="home" title="Home" role="tab" aria-selected="true">
+                    <button class="nav-item active" data-tab="home" title="Home" role="tab" aria-selected="true" aria-controls="tab-home">
                         <span class="nav-icon">📜</span> <span class="nav-label">Home</span>
                     </button>
-                    <button class="nav-item" data-tab="dashboard" title="Dashboard" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="dashboard" title="Dashboard" role="tab" aria-selected="false" aria-controls="tab-dashboard">
                         <span class="nav-icon">📊</span> <span class="nav-label">Dashboard</span>
                     </button>
-                    <button class="nav-item" data-tab="characters" title="Characters" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="characters" title="Characters" role="tab" aria-selected="false" aria-controls="tab-characters">
                         <span class="nav-icon">👤</span> <span class="nav-label">Characters</span>
                     </button>
-                    <button class="nav-item" data-tab="dice" title="Dice Roller" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="dice" title="Dice Roller" role="tab" aria-selected="false" aria-controls="tab-dice">
                         <span class="nav-icon">🎲</span> <span class="nav-label">Dice</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
                     <span class="nav-group-title">World</span>
-                    <button class="nav-item" data-tab="encounters" title="Encounters" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="encounters" title="Encounters" role="tab" aria-selected="false" aria-controls="tab-encounters">
                         <span class="nav-icon">⚔️</span> <span class="nav-label">Encounters</span>
                     </button>
-                    <button class="nav-item" data-tab="factions" title="Factions & Assets" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="factions" title="Factions & Assets" role="tab" aria-selected="false" aria-controls="tab-factions">
                         <span class="nav-icon">🏛️</span> <span class="nav-label">Factions</span>
                     </button>
-                    <button class="nav-item" data-tab="wiki" title="Wiki" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="wiki" title="Wiki" role="tab" aria-selected="false" aria-controls="tab-wiki">
                         <span class="nav-icon">📖</span> <span class="nav-label">Wiki</span>
                     </button>
-                    <button class="nav-item" data-tab="patrons" title="Patrons" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="patrons" title="Patrons" role="tab" aria-selected="false" aria-controls="tab-patrons">
                         <span class="nav-icon">👁️</span> <span class="nav-label">Patrons</span>
                     </button>
                     <!-- Spellcraft -->
-                    <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" role="tab" aria-selected="false" aria-controls="tab-spellcraft">
                         <span class="nav-icon">🧙</span> <span class="nav-label">Spellcraft</span>
                     </button>
-                    <button class="nav-item" data-tab="crafting" title="Crafting" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="crafting" title="Crafting" role="tab" aria-selected="false" aria-controls="tab-crafting">
                         <span class="nav-icon">🔨</span> <span class="nav-label">Crafting</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
                     <span class="nav-group-title">Table</span>
-                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab" aria-selected="false" aria-controls="tab-vtt">
                         <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
                     </button>
-                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools" aria-selected="false">
+                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools" aria-selected="false" aria-controls="tab-gm-tools">
                         <span class="nav-icon">🎯</span> <span class="nav-label">GM Tools</span>
                     </button>
-                    <button class="nav-item" data-tab="timers" title="Timers" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="timers" title="Timers" role="tab" aria-selected="false" aria-controls="tab-timers">
                         <span class="nav-icon">⏱️</span> <span class="nav-label">Timers</span>
                     </button>
-                    <button class="nav-item" data-tab="decks" title="Decks" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="decks" title="Decks" role="tab" aria-selected="false" aria-controls="tab-decks">
                         <span class="nav-icon">🃏</span> <span class="nav-label">Decks</span>
                     </button>
-                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab" aria-selected="false" aria-controls="tab-whiteboard">
                         <span class="nav-icon">✏️</span> <span class="nav-label">Whiteboard</span>
                     </button>
-                    <button class="nav-item" data-tab="adventure-manager" title="Adventure Manager" role="tab" id="nav-adventure-manager" aria-selected="false">
+                    <button class="nav-item" data-tab="adventure-manager" title="Adventure Manager" role="tab" id="nav-adventure-manager" aria-selected="false" aria-controls="tab-adventure-manager">
                         <span class="nav-icon">🤺</span> <span class="nav-label">Adventure Manager</span>
                     </button>
-                    <button class="nav-item" data-tab="kon-reh" title="Kon'reh Strategy Game" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="kon-reh" title="Kon'reh Strategy Game" role="tab" aria-selected="false" aria-controls="tab-kon-reh">
                         <span class="nav-icon">⚪</span> <span class="nav-label">Kon'reh</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
                     <span class="nav-group-title">System</span>
-                    <button class="nav-item" data-tab="search" title="Search" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="search" title="Search" role="tab" aria-selected="false" aria-controls="tab-search">
                         <span class="nav-icon">🔍</span> <span class="nav-label">Search</span>
                     </button>
-                    <button class="nav-item" data-tab="docs" title="Documentation" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="docs" title="Documentation" role="tab" aria-selected="false" aria-controls="tab-docs">
                         <span class="nav-icon">📄</span> <span class="nav-label">Docs</span>
                     </button>
-                    <button class="nav-item" data-tab="settings" title="Settings" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="settings" title="Settings" role="tab" aria-selected="false" aria-controls="tab-settings">
                         <span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span>
                     </button>
-                    <button class="nav-item" data-tab="system-status" title="System Status" role="tab" aria-selected="false">
+                    <button class="nav-item" data-tab="system-status" title="System Status" role="tab" aria-selected="false" aria-controls="tab-system-status">
                         <span class="nav-icon">🩺</span> <span class="nav-label">Status</span>
                     </button>
                 </div>
@@ -260,7 +276,7 @@
         </aside>
 
         <!-- ===== MAIN CONTENT ===== -->
-        <main class="main-content">
+        <main class="main-content" id="main-content" role="main">
             <!-- Core tabs -->
             <div id="tab-home" class="tab-content active" role="tabpanel"></div>
             <div id="tab-dashboard" class="tab-content" role="tabpanel"></div>

@@ -12,7 +12,14 @@
 
     --text: #e2e4f0;
     --text2: #8b8fa3;
-    --text3: #5a5e72;
+    /* NEW: was #5a5e72 (2.95:1 against --bg #0f1117 — fails WCAG AA's 4.5:1
+       for normal text, and even the 3:1 large-text minimum). Lightened to
+       hit 4.52:1 while staying the same muted blue-gray family as before —
+       still visibly the "faintest" tier relative to --text/--text2, just
+       no longer unreadable-by-spec. Contrast values verified with a small
+       WCAG-relative-luminance script against the exact hex pairs in this
+       file; see ACCESSIBILITY.md for the full audit and every value checked. */
+    --text3: #767b93;
     --text-inverse: #0f1117;
 
     --gold: #f0a500;
@@ -84,8 +91,20 @@ html.light {
     --bg-glass-light: rgba(238, 234, 239, 0.6);
     --text: #1e1a24;
     --text2: #5a5560;
-    --text3: #8a8590;
+    /* NEW: was #8a8590 (3.35:1 against --bg #f8f6fa — fails WCAG AA's 4.5:1
+       for normal text). Darkened to 4.62:1; see the matching --text3 note
+       in :root above and ACCESSIBILITY.md for the full contrast audit. */
+    --text3: #736e79;
     --text-inverse: #f8f6fa;
+    /* NOTE (not changed here — see ACCESSIBILITY.md): --gold (#b8860b) is
+       only 3.03:1 against this theme's --bg, below AA's 4.5:1 for text use.
+       Left as-is because --gold also drives the .btn-gold background
+       gradient (--gold → --gold-light) with --text-inverse text on top,
+       where --gold-light's OWN contrast is already worse (2.21:1) — fixing
+       just --gold in isolation wouldn't fix that gradient, and widening the
+       fix to the gradient risks a visible design change beyond what this
+       pass verified. See ACCESSIBILITY.md for the calculated replacement
+       value and what still needs visual QA before landing it. */
     --gold: #b8860b;
     --gold-light: #d4a017;
     --gold-dark: #9a7208;
@@ -219,6 +238,43 @@ h1, h2, h3, h4, h5, h6 {
 .hidden { display: none !important; }
 .block { display: block; }
 .inline-block { display: inline-block; }
+
+/* NEW: standard "visually hidden but still announced by screen readers"
+   utility -- deliberately NOT display:none/visibility:hidden, both of
+   which also hide content from assistive tech, not just sighted users.
+   Used by core/a11y-announce.js's two live-region divs, and the
+   "Skip to content" link in index.html (which un-hides itself on focus
+   via the sibling rule below, so keyboard users can see and use it). */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+.sr-only-focusable:focus {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    height: auto;
+    padding: 0.6rem 1rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    z-index: 10000;
+    background: var(--gold);
+    color: var(--text-inverse);
+    border-radius: var(--radius-sm, 4px);
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
 
 .rounded { border-radius: var(--radius); }
 .rounded-sm { border-radius: var(--radius-sm); }

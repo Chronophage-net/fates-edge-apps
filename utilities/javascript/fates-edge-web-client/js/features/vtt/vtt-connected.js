@@ -1833,8 +1833,12 @@ export function render(el) {
                 <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
             </div>
             </div>
-            <!-- Viewport-relative sizing — see vtt-local.js for the same change. -->
-            <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);"></div>
+            <!-- Viewport-relative sizing — see vtt-local.js for the same change.
+                 NEW: role="log"/aria-live="polite"/aria-relevant="additions" makes
+                 screen readers announce each new chat message as it's appended,
+                 with no JS changes needed to chatHandler below -- the standard
+                 ARIA pattern for a persistently-visible, append-only log. -->
+            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);"></div>
             <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
             <div class="chat-input-row" style="display:flex;gap:0.4rem;">
             <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />

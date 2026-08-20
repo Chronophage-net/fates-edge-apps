@@ -611,8 +611,10 @@ export function render(el) {
         </div>
         <!-- Viewport-relative sizing so short/mobile viewports don't force a
              fixed 300-600px box that overflows the page; scales with vh,
-             capped so huge desktop monitors don't get an absurdly tall pane. -->
-        <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);"></div>
+             capped so huge desktop monitors don't get an absurdly tall pane.
+             NEW: role="log"/aria-live="polite"/aria-relevant="additions" —
+             see the matching change in vtt-connected.js's header comment. -->
+        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);"></div>
         <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
         <div class="chat-input-row" style="display:flex;gap:0.4rem;">
           <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />

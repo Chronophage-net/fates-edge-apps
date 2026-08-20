@@ -9,11 +9,24 @@
  * or GM-toggled off, so this check runs unconditionally for every route —
  * no allowlist needed here. See core/feature-toggles.js.
  * ────────────────────────────────────────────────────────────────────────
+ * NEW: a11y focus management. Previously a click on a sidebar item swapped
+ * the visible tab panel but left keyboard focus sitting on the button the
+ * user just clicked -- fine visually, but a screen-reader or keyboard-only
+ * user got no indication the page actually changed, and had to manually
+ * navigate into the new content to find it. navigate() now moves focus to
+ * the freshly-rendered panel (tabindex="-1" added on demand, so this
+ * doesn't add a new stop to normal Tab-key order) and announces the tab's
+ * label via core/a11y-announce.js's screen-reader-only live region. Also
+ * fixed: aria-selected on the sidebar buttons was only ever set once in
+ * the static HTML (permanently true on "Home") and never updated here --
+ * every navigation now syncs it alongside the existing .active class toggle.
+ * ────────────────────────────────────────────────────────────────────────
  */
 
 import { showToast } from './components/Toast.js';
 import { moduleLoader } from './module-loader.js';
 import { isFeatureVisible, getFeatureLockMessage } from './core/feature-toggles.js';
+import { announce } from './core/a11y-announce.js';
 
 // ============================================================
 // CONSTANTS & CONFIGURATION
@@ -152,10 +165,18 @@ export async function navigate(tab, options = {}) {
     currentTab = resolved;
 
     // Update sidebar active state
+    let activeLabel = resolved;
     document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
         const btnTab = btn.dataset.tab;
         const isActive = btnTab === resolved || ROUTE_REDIRECTS[btnTab] === resolved;
         btn.classList.toggle('active', isActive);
+        // NEW: keep aria-selected in sync -- see file header note. Was
+        // previously only ever true on "Home" from the static HTML.
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        if (isActive) {
+            const labelEl = btn.querySelector('.nav-label');
+            activeLabel = (labelEl?.textContent || btn.title || resolved).trim();
+        }
     });
 
     // Hide all tab contents, show the active one
@@ -169,6 +190,17 @@ export async function navigate(tab, options = {}) {
         activeCallbacks.forEach(cb => cb(resolved, moduleLoader.getModule(resolved)));
         if (isRedirect) {
             showToast(`↪️ Redirected to ${resolved}`, 'info');
+        }
+
+        // NEW: a11y focus management -- see file header note. Skipped on
+        // initial page load (no prior navigation yet) so the browser's own
+        // default focus-on-load behavior isn't fought with.
+        if (!options._isInitialLoad) {
+            if (!contentEl.hasAttribute('tabindex')) {
+                contentEl.setAttribute('tabindex', '-1');
+            }
+            contentEl.focus({ preventScroll: false });
+            announce(`Navigated to ${activeLabel}`);
         }
     } catch (err) {
         // The loader already shows an error UI, but we also want to log and notify
@@ -280,7 +312,7 @@ export function initRouter() {
         window.history.replaceState(null, '', `#${resolvedInit}`);
     }
     // Defer to let DOM settle
-    setTimeout(() => navigate(initialTab), 50);
+    setTimeout(() => navigate(initialTab, { _isInitialLoad: true }), 50);
 }
 
 // ============================================================
