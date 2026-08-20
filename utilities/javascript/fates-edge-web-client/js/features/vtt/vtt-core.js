@@ -1174,10 +1174,17 @@ export function renderVoiceClients() {
             } else if (state === 'connected') {
                 callButton = `<span style="font-size:0.7rem;color:var(--green);">● Live</span>`;
             }
+            // Speaking is conveyed three ways, not just the color dot: a
+            // visible 🔊 icon (so it's not color-only for colorblind users)
+            // and an sr-only text suffix on the name (so it's discoverable
+            // by screen readers browsing this roster) -- deliberately NOT
+            // pushed through the aria-live announcer, since mic activity
+            // toggles many times a second and would be pure noise there.
+            const speakingNow = isSpeaking === 'var(--gold)';
             html += `
                 <span class="voice-client-badge" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.8rem;border-radius:20px;background:var(--bg4);font-size:0.85rem;border:1px solid var(--border);">
-                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isSpeaking};transition:background 0.3s;" title="${isSpeaking === 'var(--gold)' ? 'Speaking' : 'Silent'}"></span>
-                    <span style="font-weight:500;">${escHtml(client.name)}</span>
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isSpeaking};transition:background 0.3s;" aria-hidden="true"></span>
+                    <span style="font-weight:500;">${escHtml(client.name)}${speakingNow ? ' <span aria-hidden="true" title="Speaking">🔊</span>' : ''}<span class="sr-only">${speakingNow ? ', speaking' : ''}</span></span>
                     <span style="font-size:0.7rem;color:${statusColor};">${statusLabel}</span>
                     ${callButton}
                 </span>

@@ -87,7 +87,7 @@ export function registerTheme(theme) {
  * that no longer exists.
  */
 export function unregisterTheme(id) {
-    if (!themes.has(id) || id === 'dark' || id === 'light') return; // never unregister the built-ins
+    if (!themes.has(id) || id === 'dark' || id === 'light' || id === 'high-contrast') return; // never unregister the built-ins
     themes.delete(id);
     if (resolvePreference(currentPreference) === id) {
         setTheme('dark');
@@ -183,6 +183,67 @@ export function setTheme(idOrAuto, { persist = true } = {}) {
 // INITIALIZATION
 // ============================================================
 
+// WCAG contrast ratios for every pair below were computed with the same
+// relative-luminance/contrast-ratio formulas as ACCESSIBILITY.md's audit
+// (0.2126R + 0.7152G + 0.0722B weighted luminance; (L_lighter+0.05)/
+// (L_darker+0.05) ratio), checked against these exact hex values before
+// being committed here — not eyeballed. Every text/background and
+// accent/background pair clears the AAA threshold (7:1) except --border
+// (11.54:1, AAA), --border-strong (21:1, AAA — pure white on pure black),
+// and --border-light (5.32:1 — below AAA but still clear of AA's 3:1
+// large-text/UI minimum, appropriate for a deliberately subtler tertiary
+// border). --red was picked specifically to clear 7:1 (a slightly brighter
+// red than the base themes' would otherwise suggest) so every semantic
+// color in this theme reaches the same bar, not just most of them.
+export const HIGH_CONTRAST_VARIABLES = {
+    '--bg': '#000000',
+    '--bg2': '#0d0d0d',
+    '--bg3': '#1a1a1a',
+    '--bg4': '#262626',
+    '--bg-glass': 'rgba(0, 0, 0, 0.92)',
+    '--bg-glass-light': 'rgba(13, 13, 13, 0.85)',
+
+    '--text': '#ffffff',
+    '--text2': '#d0d0d0',
+    '--text3': '#a8a8a8',
+    '--text-inverse': '#000000',
+
+    '--gold': '#ffcc00',
+    '--gold-light': '#ffe066',
+    '--gold-dark': '#cc9900',
+    '--gold-glow': 'rgba(255, 204, 0, 0.25)',
+    '--gold-glow-strong': 'rgba(255, 204, 0, 0.4)',
+
+    '--red': '#ff6666',
+    '--red-light': '#ff9999',
+    '--red-glow': 'rgba(255, 102, 102, 0.25)',
+
+    '--green': '#4dff4d',
+    '--green-light': '#a3ffa3',
+    '--green-glow': 'rgba(77, 255, 77, 0.25)',
+
+    '--blue': '#5cb3ff',
+    '--blue-light': '#a3d4ff',
+    '--blue-glow': 'rgba(92, 179, 255, 0.25)',
+
+    '--purple': '#d199ff',
+    '--purple-light': '#e6ccff',
+    '--purple-glow': 'rgba(209, 153, 255, 0.25)',
+
+    '--orange': '#ffa64d',
+    '--orange-light': '#ffcc99',
+
+    // Solid, not translucent — a low-alpha rgba border is itself a
+    // low-vision accessibility problem (the whole point of this theme is
+    // to stop relying on subtle differences).
+    '--border': '#c0c0c0',
+    '--border-light': '#808080',
+    '--border-strong': '#ffffff',
+
+    '--shadow': 'rgba(0, 0, 0, 0.7)',
+    '--shadow-strong': 'rgba(0, 0, 0, 0.85)',
+};
+
 let systemThemeListenerAttached = false;
 
 /**
@@ -198,6 +259,24 @@ export function initTheme() {
     }
     if (!themes.has('light')) {
         registerTheme({ id: 'light', label: 'Light', icon: '☀️', isDark: false });
+    }
+    if (!themes.has('high-contrast')) {
+        // A third built-in, registered the same way a pack would register
+        // one — see HIGH_CONTRAST_VARIABLES's own comment for the contrast
+        // math behind every value. Pure black/white with AAA-level
+        // (7:1+, mostly well past it) contrast throughout, rather than
+        // trying to nudge the existing dark/light palettes any further —
+        // ACCESSIBILITY.md's contrast audit found the light theme's --gold
+        // couldn't be fixed in isolation without an unreviewed visual
+        // change to .btn-gold's gradient; a dedicated opt-in theme sidesteps
+        // that entirely instead of chasing it pair by pair.
+        registerTheme({
+            id: 'high-contrast',
+            label: 'High Contrast',
+            icon: '◐',
+            isDark: true,
+            variables: HIGH_CONTRAST_VARIABLES,
+        });
     }
 
     const stored = getStorage(STORAGE_KEY, null);

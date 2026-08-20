@@ -2083,7 +2083,7 @@ function renderThemeButtons() {
  *  Cross-referencing installed packs here lets the status line say *which*
  *  pack a non-built-in theme came from, rather than just "not built-in". */
 function getThemeSource(themeId) {
-    if (themeId === 'dark' || themeId === 'light') {
+    if (themeId === 'dark' || themeId === 'light' || themeId === 'high-contrast') {
         return { label: 'Built-in', pack: null };
     }
     const pack = getInstalledPacks().find(p => p.theme && p.theme.id === themeId);

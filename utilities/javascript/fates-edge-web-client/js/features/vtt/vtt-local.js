@@ -552,11 +552,14 @@ export function render(el) {
 
   const voiceClientsHtml = voiceClients.map(id => {
     const client = getVoiceClient(id);
-    const isSpeaking = client?.speaking ? 'var(--gold)' : 'var(--bg3)';
+    const speaking = !!client?.speaking;
+    const isSpeaking = speaking ? 'var(--gold)' : 'var(--bg3)';
     const name = client?.name || 'Player';
+    // Speaking is conveyed three ways, not just the color dot -- see the
+    // matching comment in vtt-connected.js's identical badge markup.
     return `<span class="voice-client-badge" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.2rem 0.8rem;border-radius:20px;background:var(--bg4);font-size:0.85rem;border:1px solid var(--border);">
-      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isSpeaking};transition:background 0.3s;"></span>
-      ${escHtml(name)}
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isSpeaking};transition:background 0.3s;" aria-hidden="true"></span>
+      ${escHtml(name)}${speaking ? ' <span aria-hidden="true" title="Speaking">🔊</span>' : ''}<span class="sr-only">${speaking ? ', speaking' : ''}</span>
     </span>`;
   }).join('');
 

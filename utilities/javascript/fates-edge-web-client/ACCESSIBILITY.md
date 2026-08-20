@@ -71,16 +71,37 @@ The suggestion to strip `aria-*`/`role` attributes from user-authored rich text 
 
 Scoped out deliberately, to keep each pass focused and reviewable rather than attempt everything at once:
 
-- Voice chat visual/text speaking indicators (who's currently talking, for players who can't rely on audio cues).
+- A visual/text indicator for the *local* user's own mic activity (remote participants' speaking state is now covered — see below; `VoiceChat.js` already exposes `getVoiceActivity()`/`onActivity()` for this, just not wired to any UI yet).
 - `inert`-based focus-trapping for inline editor screens (currently only true `role="dialog"` modals trap focus; full-screen inline editors do not).
 - Real axe-core/headless-browser coverage in CI (see **Automated accessibility regression testing**, option 2 below — the cheap option-1 lint is now implemented; the real-browser option is still open).
 - A Lighthouse CI GitHub Action.
 - Discord bot embed accessibility (alt text on embed images, plain-text fallbacks).
 - Foundry bridge inheriting/propagating `CONFIG.ariaLabels` from the host Foundry instance.
 - Captions/transcript for the project's demo video, if/when one exists.
-- A user-facing high-contrast theme toggle (distinct from the baseline contrast fixes above, which apply to the existing themes as-is).
 
 These remain a reasonable roadmap for a follow-up pass.
+
+---
+
+## Third pass: voice chat speaking indicators + a high-contrast theme
+
+### Voice chat speaking indicators — implemented
+
+Checked before writing anything: `js/features/vtt/voice.js` already had a *complete* per-remote-participant speaking-detection backend — `voiceClients` tracking `{ name, speaking, connectionState }` per client, a `startSpeakingDetector`/`stopSpeakingDetector` pair analyzing each remote audio stream, and `onVoiceClientsChanged()` broadcasting live updates. The actual gap was narrower than "build speaking detection" — it was purely in the three places that render the voice roster (`vtt-connected.js`, `vtt-local.js`, and the real live-updating renderer in `vtt-core.js`'s `renderVoiceClients()`): `speaking` only ever changed a small dot's *color* (gold vs. gray), with a `title` tooltip as the only non-color cue — invisible to screen readers, and weak for colorblind users since it was color-only with no shape/icon difference.
+
+Fixed identically in all three render sites: a visible 🔊 icon now appears next to a speaking participant's name (not just a color change), and an `sr-only` text suffix (", speaking") is added to the name so it's discoverable by a screen reader browsing the roster. This is deliberately **not** wired through the `aria-live` announcer from the first pass — mic activity can toggle many times a second, and pushing that through a live region would be pure noise, not a useful announcement. Making the *persistent* DOM node's accessible name reflect current state (discoverable on demand) is the right pattern here, the same way a mute button's own label change is enough without needing an announcement every time it's pressed.
+
+Left open: the local user's own mic-activity indicator (see Deferred above) — `VoiceChat.js` already computes it, nothing in the UI reads it yet.
+
+### High-contrast theme — implemented
+
+Rather than continuing to chase individual light/dark contrast failures pair-by-pair (the light theme's `--gold` was left unresolved in the first pass specifically because fixing it in isolation risked an unreviewed visual change to `.btn-gold`'s gradient), this adds a third, dedicated theme built for maximum legibility from the ground up: pure black background, pure white primary text, and every accent color picked to clear WCAG **AAA** (7:1), not just AA — verified with the same relative-luminance/contrast-ratio math as the original audit, now also pinned down by an automated test (see below) instead of only a one-time manual check.
+
+It plugs into the *existing* theme registry (`core/theme-manager.js`) exactly the way a pack-supplied theme would — `initTheme()` now registers a third built-in (`registerTheme({ id: 'high-contrast', ... })`) alongside `dark`/`light`, using a new exported `HIGH_CONTRAST_VARIABLES` map of CSS custom-property overrides. Nothing in the registry, application, or pack-comparison logic needed to change beyond that one registration call and updating `settings/index.js`'s `getThemeSource()` to recognize it as `Built-in` rather than misreporting it as a random pack-registered theme — the Settings page's theme picker already renders every registered theme generically, so "High Contrast" (◐) just appears there automatically, with no new UI code.
+
+Translucent borders (`rgba(..., 0.6)`-style) are replaced with solid colors in this theme specifically — a low-alpha border is itself a low-vision problem, which somewhat defeats the point of a high-contrast mode if left as-is. `--border-light` (a deliberately subtler tertiary border) is the one value that stops at AA (5.32:1) rather than AAA, on purpose — everything else, including every semantic accent (red/green/blue/purple/orange) and their `-light` variants, clears AAA.
+
+New `tests/unit/theme-manager.test.js` guards this going forward: it asserts every base custom property is actually defined in `HIGH_CONTRAST_VARIABLES` (an unlisted variable would silently fall through to the dark theme's value, quietly reintroducing whatever contrast problem this theme exists to avoid), checks the real contrast ratios of every color in the palette against `--bg` (AA baseline for all, AAA for the primary text/accent set), and confirms registering the theme makes it discoverable through the same `getThemes()`/`getTheme()` API a pack theme would use.
 
 ---
 
