@@ -8,7 +8,7 @@
 #            explanation of what this starts and why.
 #
 # Usage: npm run demo
-#     or: ./tools/demo.sh [--build] [--down]
+#     or: ./tools/demo.sh [--build] [--down] [--voice] [--voice-rvc]
 #
 #   (no args)  : bring the stack up (builds images if needed), attached
 #   --build    : force a rebuild of the client/server/bot images even
@@ -18,6 +18,17 @@
 #   --down     : stop and remove the demo stack (containers + network;
 #                named volumes -- the pulled model, Redis data, server
 #                logs -- are left alone so the next `npm run demo` is fast)
+#   --voice    : also bring up docker-compose.voice.yml's `tts` +
+#                `voice-adapter` services, giving the AI GM a cloned
+#                voice (Chatterbox, zero-shot from a reference clip --
+#                see voice-tts-reference/README.md). Heavier than the
+#                base demo (multi-GB model download on first run) --
+#                see docker-compose.voice.yml's header comment.
+#   --voice-rvc: everything --voice does, plus the `rvc` service for a
+#                second voice-conversion layer -- needs a trained model
+#                you supply yourself (see voice-rvc-models/README.md)
+#                and VOICE_RVC_ENABLED=true in .env.demo to actually
+#                turn it on for the bot, not just start the container.
 #
 # Slow machine, or model replies timing out? Set DEMO_LEVEL=light in
 # .env.demo (or DEMO_LEVEL=quality for a beefier machine) -- see that
@@ -31,6 +42,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 AI_GM_BOT_DIR="$(cd "$REPO_ROOT/.." 2>/dev/null && pwd)/fates-edge-ai-gm-bot"
 AI_GM_BOT_REPO_URL="https://github.com/Chronophage-net/fates-edge-ai-gm-bot.git"
 COMPOSE_FILE="$REPO_ROOT/docker-compose.full.yml"
+VOICE_COMPOSE_FILE="$REPO_ROOT/docker-compose.voice.yml"
 ENV_FILE="$REPO_ROOT/.env.demo"
 ENV_EXAMPLE="$REPO_ROOT/.env.demo.example"
 
@@ -38,13 +50,27 @@ cd "$REPO_ROOT"
 
 BUILD_FLAG=""
 DOWN=false
+VOICE=false
+VOICE_RVC=false
 for arg in "$@"; do
     case "$arg" in
         --build) BUILD_FLAG="--build" ;;
         --down) DOWN=true ;;
+        --voice) VOICE=true ;;
+        --voice-rvc) VOICE=true; VOICE_RVC=true ;;
         *) echo "Unknown option: $arg" >&2; exit 1 ;;
     esac
 done
+
+# ─── Build the -f file list and profile flags for docker compose ──
+COMPOSE_FILE_ARGS=(-f "$COMPOSE_FILE")
+PROFILE_ARGS=()
+if [[ "$VOICE" == true ]]; then
+    COMPOSE_FILE_ARGS+=(-f "$VOICE_COMPOSE_FILE")
+fi
+if [[ "$VOICE_RVC" == true ]]; then
+    PROFILE_ARGS+=(--profile voice-rvc)
+fi
 
 # ─── Pick a Compose command (V2 required -- see docker-compose.full.yml) ──
 if docker compose version >/dev/null 2>&1; then
@@ -68,10 +94,17 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 # ─── Handle --down and exit early ─────────────────────────────────
+# Always includes the voice compose file (harmless if those services
+# were never started) so `--down` alone tears down everything from a
+# previous `--voice`/`--voice-rvc` run too, without needing to remember
+# which flags you brought it up with.
 if [[ "$DOWN" == true ]]; then
-    echo "Stopping the demo stack (volumes are kept -- pulled model, Redis data, server logs)..."
-    "${COMPOSE[@]}" -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down 2>/dev/null \
-        || "${COMPOSE[@]}" -f "$COMPOSE_FILE" down
+    echo "Stopping the demo stack (volumes are kept -- pulled model, Redis data, server logs,"
+    echo "Chatterbox's model cache)..."
+    DOWN_FILE_ARGS=(-f "$COMPOSE_FILE")
+    [[ -f "$VOICE_COMPOSE_FILE" ]] && DOWN_FILE_ARGS+=(-f "$VOICE_COMPOSE_FILE")
+    "${COMPOSE[@]}" "${DOWN_FILE_ARGS[@]}" --profile voice-rvc --env-file "$ENV_FILE" down 2>/dev/null \
+        || "${COMPOSE[@]}" "${DOWN_FILE_ARGS[@]}" --profile voice-rvc down
     echo "✓ Stopped. Run 'npm run demo' again any time -- the model and data are still cached."
     exit 0
 fi
@@ -189,8 +222,34 @@ echo "     into memory for the first time -- every reply after that is much fast
 echo "  4. Open a second tab, join the same room, and turn on voice chat in both"
 echo "  5. (optional) http://localhost:${AIGM_STATUS_PORT:-4141} -- the bot's own live status dashboard"
 echo
+
+if [[ "$VOICE" == true ]]; then
+    echo "🎙️  --voice: bringing up Chatterbox + voice-adapter too."
+    echo "   First run downloads Chatterbox's model weights (multi-GB) -- this is on top of"
+    echo "   the Ollama pull above and can take a while depending on your connection."
+    if [[ ! -s "$REPO_ROOT/voice-tts-reference/${CHATTERBOX_REFERENCE_FILE:-reference.wav}" ]]; then
+        echo "   ⚠️  No reference clip found at voice-tts-reference/${CHATTERBOX_REFERENCE_FILE:-reference.wav} --"
+        echo "      the GM will still talk, just in Chatterbox's stock voice, not a cloned one."
+        echo "      Drop a 10-30s .wav there (see that folder's README) and restart to clone it."
+    else
+        echo "   ✓ Found reference clip: voice-tts-reference/${CHATTERBOX_REFERENCE_FILE:-reference.wav}"
+    fi
+    echo
+fi
+if [[ "$VOICE_RVC" == true ]]; then
+    echo "🗣️  --voice-rvc: also bringing up the rvc service."
+    if [[ "${VOICE_RVC_ENABLED:-false}" != "true" ]]; then
+        echo "   ⚠️  VOICE_RVC_ENABLED is not 'true' in .env.demo -- the rvc container will start,"
+        echo "      but the bot won't route audio through it until you set that and restart."
+    fi
+    if [[ -z "$(ls -A "$REPO_ROOT/voice-rvc-models" 2>/dev/null | grep -v -e README.md -e .gitkeep)" ]]; then
+        echo "   ⚠️  voice-rvc-models/ looks empty -- see that folder's README for what to put there."
+    fi
+    echo
+fi
+
 echo "Press Ctrl+C to stop. Nothing is deleted -- 'npm run demo' again picks up"
 echo "right where you left off. Use 'npm run demo -- --down' to tear it down."
 echo
 
-exec "${COMPOSE[@]}" -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up $BUILD_FLAG
+exec "${COMPOSE[@]}" "${COMPOSE_FILE_ARGS[@]}" "${PROFILE_ARGS[@]}" --env-file "$ENV_FILE" up $BUILD_FLAG

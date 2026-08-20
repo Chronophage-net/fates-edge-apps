@@ -258,6 +258,28 @@ from the "bring your own API key(s)" `docker-compose.yml` covered next
 -- use that one instead once you're ready to plug in a real AI
 provider and/or TURN relay for a real game.
 
+#### Optional: hear the GM in a cloned voice
+
+```bash
+npm run demo -- --voice          # + Chatterbox TTS, zero-shot clone from a reference clip
+npm run demo -- --voice-rvc      # + a second RVC voice-conversion layer on top
+```
+
+Brings up `docker-compose.voice.yml` alongside the base demo: a Chatterbox
+TTS container (zero-shot voice cloning — no training needed, just a
+10-30s reference clip dropped into `voice-tts-reference/`), a tiny
+`voice-adapter` sidecar that translates between the AI GM bot's
+`TTS_URL`/`RVC_URL` contract and whatever Chatterbox/RVC actually speak
+(see `tools/voice-adapter/adapter.py`), and — with `--voice-rvc` — an
+RVC service for re-voicing through a trained model you supply yourself
+(`voice-rvc-models/`). Heavier than the base demo (Chatterbox's model
+weights are multi-GB on first run), which is why it's a separate opt-in
+flag rather than part of `npm run demo` by default. See
+`docker-compose.voice.yml`'s header comment for the full picture, and
+`fates-edge-ai-gm-bot/docs/local-voice-cloning/VOICE-CLONING-LOCAL-SETUP.md`
+for a from-scratch walkthrough (useful if you want to run this outside
+Docker, or understand what the sidecar is actually doing).
+
 ### Prerequisites
 
 - **Node.js** 24.x or later (for server components)

@@ -106,3 +106,14 @@ output.txt
 # Local scratch/session noise -- never intended for commit
 .claude/
 _to_delete/
+
+# docker-compose.voice.yml -- your own reference clip / trained RVC
+# model, not sample content worth diffing in source control. The
+# folders themselves (and their READMEs) stay tracked via the
+# .gitkeep + ! exceptions below.
+voice-tts-reference/*
+!voice-tts-reference/.gitkeep
+!voice-tts-reference/README.md
+voice-rvc-models/*
+!voice-rvc-models/.gitkeep
+!voice-rvc-models/README.md

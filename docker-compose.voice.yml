@@ -1,0 +1,144 @@
+# =================================================================
+# Fate's Edge -- VOICE CLONING OVERLAY for the demo stack
+#
+# Adds a cloned GM voice (Chatterbox TTS, zero-shot from a reference
+# clip) and, optionally, an RVC voice-conversion layer on top of it,
+# wired straight into the AI GM bot's existing TTS_URL/RVC_URL config
+# -- see fates-edge-ai-gm-bot's README ("Voice Narration"/"Voice
+# Cloning") and DESIGN.md 6.1/6.2 for what those actually do.
+#
+# This is a SEPARATE, OPT-IN file on top of docker-compose.full.yml --
+# not part of the default `npm run demo` -- because the `tts` service's
+# first run downloads real model weights (multiple GB) and is
+# meaningfully heavier than the small Ollama model the base demo
+# pulls. See tools/demo.sh's --voice/--voice-rvc flags for the easy
+# way to bring this up; by hand it's:
+#
+#   docker compose -f docker-compose.full.yml -f docker-compose.voice.yml \
+#     --env-file .env.demo up --build
+#
+# Add --profile voice-rvc (and set VOICE_RVC_ENABLED=true in .env.demo)
+# to also bring up the `rvc` service -- off by default since it needs a
+# trained voice model you supply yourself (see voice-rvc-models/README.md).
+#
+# Before it does anything useful: drop a 10-30s reference clip into
+# voice-tts-reference/ (see that folder's README) so Chatterbox has a
+# voice to clone. Works with no reference clip too -- Chatterbox just
+# falls back to its own predefined voice instead of erroring.
+#
+# Requires the same sibling-repo layout as docker-compose.full.yml:
+#   Chronophage-net_GitHub/
+#   ├── fates-edge-apps/          <- this repo (this file is here)
+#   └── fates-edge-ai-gm-bot/     <- sibling clone
+# =================================================================
+
+services:
+  # ─── Chatterbox TTS (zero-shot voice cloning from a reference clip) ───
+  # Built straight from the upstream project's own Dockerfile via a git
+  # build context, rather than vendoring a copy here, so it stays in
+  # sync with upstream without us maintaining a fork. CPU-only image --
+  # see that project's docker-compose-cu*/​-rocm*.yml files if you have a
+  # GPU and want to hand-adapt this service to use one.
+  tts:
+    build:
+      context: https://github.com/devnen/Chatterbox-TTS-Server.git
+      dockerfile: Dockerfile.cpu
+    image: fates-edge-demo-chatterbox:latest
+    pull_policy: never
+    container_name: fates-edge-demo-tts
+    restart: unless-stopped
+    ports:
+      - "${CHATTERBOX_PORT:-8004}:8004"
+    volumes:
+      # Drop a reference clip here -- see voice-tts-reference/README.md.
+      - ./voice-tts-reference:/app/reference_audio
+      # Persists the Hugging Face model cache across rebuilds, so you
+      # only pay the multi-GB download once.
+      - demo-tts-hf-cache:/app/hf_cache
+    healthcheck:
+      # Generous start_period -- first boot loads model weights into
+      # memory on top of the download, which can take a couple of
+      # minutes on CPU.
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    networks:
+      - fates-edge-demo-network
+
+  # ─── RVC voice conversion (optional second layer, needs your model) ──
+  rvc:
+    build:
+      context: ./tools/voice-rvc
+    image: fates-edge-demo-rvc:latest
+    pull_policy: never
+    container_name: fates-edge-demo-rvc
+    profiles: ["voice-rvc"]
+    restart: unless-stopped
+    ports:
+      - "${RVC_PORT:-5050}:5050"
+    volumes:
+      - ./voice-rvc-models:/app/rvc_models
+    networks:
+      - fates-edge-demo-network
+
+  # ─── voice-adapter: translates the bot's fixed TTS_URL/RVC_URL ───────
+  # contract into whatever Chatterbox/rvc-python actually speak. See
+  # tools/voice-adapter/adapter.py's header comment for the full why.
+  voice-adapter:
+    build:
+      context: ./tools/voice-adapter
+    image: fates-edge-demo-voice-adapter:latest
+    pull_policy: never
+    container_name: fates-edge-demo-voice-adapter
+    restart: unless-stopped
+    depends_on:
+      tts:
+        condition: service_healthy
+    environment:
+      - CHATTERBOX_URL=http://tts:8004
+      - CHATTERBOX_REFERENCE_FILE=${CHATTERBOX_REFERENCE_FILE:-reference.wav}
+      - RVC_PYTHON_URL=http://rvc:5050
+      - ADAPTER_PORT=8095
+    ports:
+      - "${VOICE_ADAPTER_PORT:-8095}:8095"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8095/healthz', timeout=5)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - fates-edge-demo-network
+
+  # ─── Point the AI GM bot at the sidecar ───────────────────────────────
+  # Merges into the `ai-gm-bot` service already defined in
+  # docker-compose.full.yml -- Compose merges `environment`/`depends_on`
+  # by key across -f files, it doesn't replace them wholesale, so
+  # WS_URL/OLLAMA_*/etc. from that file are untouched.
+  ai-gm-bot:
+    depends_on:
+      voice-adapter:
+        condition: service_healthy
+    environment:
+      - TTS_ENABLED=true
+      - TTS_URL=http://voice-adapter:8095/synthesize
+      - TTS_VOICE=default
+      - TTS_FORMAT=wav
+      # Off unless you've also brought up the `rvc` service (--profile
+      # voice-rvc) with a real trained model mounted -- see
+      # voice-rvc-models/README.md. RVC_ENABLED alone does nothing
+      # without TTS already working, per the bot's own design.
+      - RVC_ENABLED=${VOICE_RVC_ENABLED:-false}
+      - RVC_URL=http://voice-adapter:8095/convert
+      - RVC_VOICE=${RVC_VOICE:-default}
+
+# No top-level `networks:` block here on purpose -- docker-compose.full.yml
+# already declares `fates-edge-demo-network`, and Compose merges services
+# from both files onto it automatically as long as each service lists it
+# under its own `networks:` (as every service above does). Redeclaring it
+# here with `external: true` would conflict with that file's `driver: bridge`.
+
+volumes:
+  demo-tts-hf-cache:

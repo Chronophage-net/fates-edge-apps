@@ -3,6 +3,24 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.19.0] - 2026-08-20
+
+Voice-cloning sidecar for the demo stack: `npm run demo -- --voice`/`--voice-rvc`
+
+### Added
+- **`docker-compose.voice.yml`** — a separate, opt-in overlay on top of `docker-compose.full.yml` that brings up a cloned GM voice for the demo stack: a `tts` service (Chatterbox, built directly from its upstream repo via a git build context, so it stays in sync with upstream without a fork here), an optional `rvc` service (`tools/voice-rvc/`, a thin Dockerfile around [daswer123/rvc-python](https://github.com/daswer123/rvc-python), gated behind a `voice-rvc` Compose profile since it needs a trained model you supply), and a `voice-adapter` sidecar (`tools/voice-adapter/`) that translates between `fates-edge-ai-gm-bot`'s fixed `TTS_URL`/`RVC_URL` JSON contract and whatever Chatterbox/rvc-python actually speak — neither upstream project needs patching. Merges new `TTS_*`/`RVC_*` env vars straight into the existing `ai-gm-bot` service (`environment`/`depends_on` merge by key across `-f` files, verified via `docker compose config` — nothing from `docker-compose.full.yml` is clobbered).
+- **`tools/demo.sh --voice` / `--voice-rvc`** (also `npm run demo:voice` / `demo:voice-rvc`) — brings the voice overlay up alongside the base stack, with status messages checking whether you've dropped a reference clip in `voice-tts-reference/` (for Chatterbox's zero-shot cloning) or a trained model in `voice-rvc-models/` (for RVC) yet. `npm run demo -- --down` tears down both the base and voice stacks regardless of which flags started them.
+- **`voice-tts-reference/`, `voice-rvc-models/`** — untracked-by-default folders (see new `.gitignore` entries) for your own reference clip and RVC model, each with a README explaining what goes there.
+- New `.env.demo.example` vars: `CHATTERBOX_PORT`, `VOICE_ADAPTER_PORT`, `CHATTERBOX_REFERENCE_FILE`, `VOICE_RVC_ENABLED`, `RVC_PORT`, `RVC_VOICE` — all ignored unless the stack is brought up with `--voice`/`--voice-rvc`.
+
+### Docs
+- README Quick Start gets a new "Optional: hear the GM in a cloned voice" subsection under Docker.
+- `fates-edge-ai-gm-bot/docs/local-voice-cloning/VOICE-CLONING-LOCAL-SETUP.md` (that repo's manual, outside-Docker walkthrough) now leads with this overlay as the fastest path, keeping the from-scratch instructions below it for anyone not using the demo stack.
+
+### Notes
+- Heavier than the base demo on purpose, which is why it's opt-in rather than part of `npm run demo` by default: Chatterbox's model weights are a multi-GB download on first run, on top of the Ollama pull the base demo already does.
+- `rvc-python`'s API server holds one active model at a time; `voice-adapter` doesn't forward `RVC_VOICE` per-request — make sure whatever model `rvc-python` has loaded actually matches what you've set `RVC_VOICE`/`voice-rvc-models/` to.
+
 ## [4.18.0] - 2026-08-20
 
 Local demo stack: configurable Ollama timeout + `DEMO_LEVEL` speed/quality preset
