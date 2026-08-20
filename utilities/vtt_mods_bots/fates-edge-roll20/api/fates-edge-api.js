@@ -315,6 +315,31 @@ function handleMessage(data) {
             handleChatMessage(data);
             break;
 
+        // NEW: optional AI GM voice narration (see the AI GM Bot's
+        // TTS_ENABLED/TTS_URL). The Roll20 API sandbox has no audio
+        // playback capability at all -- no Web Audio API, no way to
+        // host/attach the synthesized bytes as a Jukebox track (that
+        // API only plays pre-uploaded tracks by ID, and the sandbox has
+        // no fetch/filesystem access to upload one at runtime) -- so
+        // there's nothing this integration can actually DO with the
+        // audio. Explicitly handled (rather than falling through to the
+        // "Unhandled message type" default below) so that's a
+        // documented limitation, not a silent gap. The narration TEXT
+        // still reaches Roll20 chat as usual via the separate
+        // 'chat-message' event above.
+        case 'tts-audio':
+            handleTtsAudio(data);
+            break;
+
+        // NEW: optional Reactive Soundscape -- same sandbox limitation as
+        // tts-audio above (no fetch/filesystem access to resolve a
+        // trackId into a playable Roll20 audio asset), so this is also
+        // logged-only. Roll20's own Jukebox has no API-driven "play by
+        // arbitrary external id" mechanism to bridge into here.
+        case 'soundboard-ambience':
+            handleSoundboardAmbience(data);
+            break;
+
         case 'roll-result':
             handleRollResult(data);
             break;
@@ -577,6 +602,17 @@ function handleChatMessage(data) {
     if (CONFIG.syncChat) {
         sendToChat('[Fate\'s Edge] ' + escapeChatText(data.sender) + ': ' + escapeChatText(data.text));
     }
+}
+
+function handleTtsAudio(data) {
+    // See the switch-case comment above -- logged for diagnostics only;
+    // the Roll20 API sandbox cannot play the audio itself.
+    log('🔊 AI GM narration audio received (not playable in the Roll20 API sandbox): "' + (data.text || '').slice(0, 60) + '"');
+}
+
+function handleSoundboardAmbience(data) {
+    // See the switch-case comment above -- logged for diagnostics only.
+    log('🎵 Ambience cue received: mood="' + (data.mood || '?') + '" trackId="' + (data.trackId || '?') + '" (not playable in the Roll20 API sandbox)');
 }
 
 function handleRollResult(data) {

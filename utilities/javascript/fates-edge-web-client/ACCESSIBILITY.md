@@ -30,8 +30,9 @@ The web client already had a meaningful amount of accessibility infrastructure i
 | Real axe-core/Playwright coverage in CI | ⏳ Deferred | Plan documented below; genuinely new devDependency + CI job |
 | `inert`-based focus trapping (inline editors) | ⏳ Deferred | `inert` is the right modern approach when this is built — see below |
 | Local mic self-activity indicator | ⏳ Deferred | Backend (`getVoiceActivity()`) already exists, unused in UI |
-| Discord bot embed alt text | ⏳ Deferred | Different repo; not touched this pass |
-| Foundry bridge `CONFIG.ariaLabels` | ⏳ Deferred | Different repo; not touched this pass |
+| Discord bot embed alt text | ✅ Verified — N/A | Audited every `EmbedBuilder` call in the bot's `commands/*.js`: zero uses `setImage()`/`setThumbnail()`/any image field today. Nothing to add alt text to; re-check this if/when an embed image is actually added. |
+| Foundry bridge `CONFIG.ariaLabels` | ✅ Done | GM panel's icon-only/ambiguous controls (`main.js`) now carry explicit `aria-label`s, sourced from a `CONFIG.ariaLabels` override when the host Foundry instance defines one, falling back to our own English text otherwise — see below |
+| AI GM voice narration accessibility | ✅ Done | New feature this pass, not a pre-existing TODO — off-by-default opt-in toggle everywhere it was added (web client, Foundry, Discord), consistent with "Type to Speak" TTS's own opt-in pattern — see below |
 | Demo video captions/transcript | ⏳ Deferred | Out of scope for now |
 | Lighthouse CI GitHub Action | ⏳ Deferred | Bundle with the axe-core/Playwright work above |
 
@@ -108,9 +109,10 @@ Scoped out deliberately, to keep each pass focused and reviewable rather than at
 - `inert`-based focus-trapping for inline editor screens (currently only true `role="dialog"` modals trap focus; full-screen inline editors do not).
 - Real axe-core/headless-browser coverage in CI (see **Automated accessibility regression testing**, option 2 below — the cheap option-1 lint is now implemented; the real-browser option is still open).
 - A Lighthouse CI GitHub Action.
-- Discord bot embed accessibility (alt text on embed images, plain-text fallbacks).
-- Foundry bridge inheriting/propagating `CONFIG.ariaLabels` from the host Foundry instance.
 - Captions/transcript for the project's demo video, if/when one exists.
+
+Two items previously listed here — Discord bot embed alt text and the Foundry bridge's
+`CONFIG.ariaLabels` — were finished in a later pass; see "Sixth pass" below.
 
 These remain a reasonable roadmap for a follow-up pass.
 
@@ -211,9 +213,9 @@ All source-only regex checks, same conservative philosophy as the original three
 
 Still deferred (see the status table above), but worth recording now rather than re-researching later: `inert` has been a real, broadly-supported HTML attribute for a while now (not a proposal or a polyfill-only feature), and is the right tool for this — it's a single attribute that removes an entire subtree from both the tab order and screen-reader traversal at once, which is more robust than the older pattern of manually toggling `aria-hidden` on every sibling and separately managing a focus trap by hand (easy to get subtly wrong, e.g. forgetting one sibling, or a trap that doesn't release cleanly on close).
 
-### Discord bot / Foundry bridge — still out of scope, noted for whoever picks them up
+### Discord bot / Foundry bridge — finished in the sixth pass
 
-Both live in separate repos from this one and weren't touched this pass. For whenever they are: the Discord bot's embeds should carry alt text on any image field where Discord's embed schema supports it (and a plain-text fallback line in the message body for clients that don't render embeds at all — some mobile/accessibility-mode Discord clients don't). The Foundry bridge's interactive elements (buttons, selects in its GM panel) should inherit accessible names from Foundry's own `CONFIG.ariaLabels` where the host instance defines them, rather than hardcoding English-only labels that ignore whatever the GM's Foundry instance is already configured with.
+Both live in separate repos from this one and weren't touched in this (the third) pass. Finished later — see "Sixth pass" below for what was actually done, and why the Discord item turned out to already be N/A rather than needing a fix.
 
 ---
 
@@ -255,6 +257,31 @@ The audit described an unlabeled `<input type="range">` volume slider in the sou
 ### Test coverage
 
 `tests/unit/a11y-lint.test.js` gained two more `describe` blocks (5 new `it`s): regression guards that `media.js` still imports and calls `announce()`, that `vtt-connected.js`'s voice-call handler still calls `announce()` near `initiateVoiceCall()`, that the session recording buttons keep their `aria-label`s, and that both VTT chat panels still expose `#vtt-speak-messages` and construct a `SpeechSynthesisUtterance`. Every new regex was checked against a synthetic true/false pair before being trusted (see the file's own header comment on this practice). `npm test` is 157/157 clean, including the previously-flaky Toll & Veil test passing on this run (see the flakiness note below — still not something this pass touched or fixed).
+
+---
+
+## Sixth pass: Discord bot / Foundry bridge — the two cross-repo deferred items, plus new AI GM voice narration
+
+Closes out the two items that were deferred as "different repo, not touched" back in the third pass (see above), done alongside propagating the new `tts-audio` WebSocket event (AI GM voice narration — see `fates-edge-ai-gm-bot`'s `modules/tts-client.js`) to every VTT/mod/bot client. Each client's a11y treatment below follows the same "off by default, opt-in, fails soft" pattern already established for the web client's own narration toggle and its "Type to Speak" TTS feature.
+
+### Discord bot embed alt text — audited, not applicable
+
+Checked every `EmbedBuilder` call across `commands/*.js` (`vttdeck.js`, `character.js`, `vtt.js`, `adventure.js`, `timer.js`, `dice.js`, `admin.js`, `chat.js`) for `setImage()`/`setThumbnail()`/any other image field: there are none. The bot's embeds are text/field-only today. There is currently nothing to add alt text to — same outcome as this repo's own "Soundboard volume controls" finding above (a real concern, checked against actual code, and found not to apply yet). Re-audit this if an embed image is ever added.
+
+### Foundry bridge `CONFIG.ariaLabels` — done
+
+`main.js`'s GM panel had several controls with no accessible name beyond short/ambiguous visible text or none at all: the status-bar "👑 GM" icon button, the pending-request "Approve"/"Reject" buttons (no indication of *whose* request), the per-client role `<select>` (no label at all), and the "Set" apply button (ambiguous on its own). Added a small `ariaLabel(key, fallback)` helper that checks a `CONFIG.ariaLabels` override first — a lightweight, opt-in convention some Foundry modules/systems use so a GM's own localization/naming choices propagate across every module's UI instead of each one hardcoding its own — and falls back to our own English text when the host instance doesn't define one. `CONFIG.ariaLabels` is not part of Foundry's core API, so `ariaLabel()` is written defensively (guarded property access, `typeof` check on the result); if it's undefined, which is the common case today, this is a pure passthrough to the English fallback and nothing here depends on it existing. Applied `aria-label`s to all of the controls above, including per-player context on the approve/reject/role-select/apply controls (e.g. `"Approve Aria's Game Master request"`, `"Change role for Kestrel"`) rather than a single generic label that wouldn't distinguish rows.
+
+### New: AI GM voice narration, propagated to every client
+
+The AI GM Bot's optional `tts-audio` WebSocket event (synthesized speech for its own chat replies) needed a decision in every client that receives it, not just the web client this document otherwise covers:
+
+- **Web client** — already covered elsewhere in this repo; see the main `README.md`/session history for `js/features/vtt/tts-narration.js`. Off by default, per-browser toggle, no `aria-live` spam (playback isn't announced turn-by-turn, matching this document's existing reasoning for mic-activity state above — a toggle's own label change is enough, an announcement on every clip would be noise).
+- **Foundry bridge** — plays via `AudioHelper.play()`, gated behind a new **client-scoped** `narrationEnabled` setting (off by default) plus a `narrationVolume` slider, both in `settings.js`. Client-scoped (not world-scoped like the bridge's other toggles) so this is each Foundry user's own preference, not something the GM sets for the whole table — same reasoning as the web client's per-browser toggle. Defaulting this to `false` deliberately breaks from this bridge's own convention of defaulting "Sync X" toggles to `true`: those are silent data plumbing, this is an audible, potentially startling change, and a table shouldn't suddenly hear the GM speak the first time someone enables `TTS_ENABLED` server-side without every player having separately opted in.
+- **Discord bot** — plays into a voice channel via `@discordjs/voice`, gated behind `DISCORD_TTS_ENABLED` (off by default) and an explicit `DISCORD_TTS_VOICE_CHANNEL_ID`. Fails soft at every layer: missing the optional `@discordjs/voice`/Opus-encoder/FFmpeg dependencies, no permission to join, or no configuration all degrade to "narration text still arrives normally, audio silently doesn't play" rather than an error surfaced to users.
+- **Roll20 mod, Python client, terminal client** — none can play arbitrary audio (the Roll20 API sandbox has no audio playback capability at all; the Python and terminal clients are text-only with no audio pipeline of their own). Each now explicitly acknowledges the `tts-audio` event with a one-line log/print rather than silently falling through to an "unhandled event type" path, but none attempt playback — narration integration was explicitly scoped out for these three.
+
+No new automated a11y tests were added for this pass — the new controls are plain `<button>`/`<select>`/checkbox elements following patterns this document's static lint (`tests/unit/a11y-lint.test.js`) already covers structurally, and they live in three different repos/languages (Foundry's own harness, Discord.js, this project's `npm test`), so extending that lint's reach across repo boundaries is its own follow-up rather than folded in here.
 
 ---
 

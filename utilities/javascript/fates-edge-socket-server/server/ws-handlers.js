@@ -305,6 +305,12 @@ function setupWSS(wss, appConfig) {
                     case 'sync-state':
                     case 'combat-status-update':
                     case 'scene-status-update':
+                    // NEW: AI GM Bot voice narration (optional) -- see the
+                    // matching note in socketio-handlers.js's relayEvents.
+                    case 'tts-audio':
+                    // NEW: Reactive Soundscape (optional) -- see the
+                    // matching note in socketio-handlers.js's relayEvents.
+                    case 'soundboard-ambience':
                         room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
                         break;
 

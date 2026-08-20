@@ -31,6 +31,15 @@ function loadConfig() {
             // a known secret. See index.js's startWebhookServer(), which
             // refuses to start rather than falling back too.
             secret: process.env.WEBHOOK_SECRET || null
+        },
+        // NEW: optional AI GM voice narration playback (see
+        // utils/tts-voice.js and the AI GM Bot's TTS_ENABLED/TTS_URL).
+        // Off unless BOTH are set -- a bare DISCORD_TTS_ENABLED with no
+        // channel configured (or vice versa) is treated as "not
+        // configured", not a half-broken feature.
+        voice: {
+            enabled: process.env.DISCORD_TTS_ENABLED === 'true',
+            channelId: process.env.DISCORD_TTS_VOICE_CHANNEL_ID || ''
         }
     };
 
@@ -51,6 +60,16 @@ function loadConfig() {
 
     if (!config.vtt.roomCode) {
         logger.warn('⚠️ VTT_ROOM_CODE not set - will need to specify room in commands');
+    }
+
+    if (config.voice.enabled && !config.voice.channelId) {
+        logger.warn('⚠️ DISCORD_TTS_ENABLED is true but DISCORD_TTS_VOICE_CHANNEL_ID is not set - AI GM voice narration will not play');
+    }
+    if (config.voice.channelId && !config.voice.enabled) {
+        logger.warn('⚠️ DISCORD_TTS_VOICE_CHANNEL_ID is set but DISCORD_TTS_ENABLED is not "true" - AI GM voice narration stays off');
+    }
+    if (config.voice.enabled && !config.discord.guildId) {
+        logger.warn('⚠️ DISCORD_TTS_ENABLED is true but DISCORD_GUILD_ID is not set - AI GM voice narration needs a guild to join a voice channel in');
     }
 
     if (errors.length > 0) {

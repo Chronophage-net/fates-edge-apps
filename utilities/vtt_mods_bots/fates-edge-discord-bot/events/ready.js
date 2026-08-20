@@ -3,6 +3,8 @@
  * Sets up VTT event listeners for GM election/promotion notifications
  */
 
+const ttsVoice = require('../utils/tts-voice');
+
 module.exports = {
     name: 'ready',
     once: true,
@@ -115,6 +117,43 @@ module.exports = {
         // Optional: log presence updates for debugging
         vtt.on('presence', (data) => {
             // Could log client count changes if needed
+        });
+
+        // NEW: optional AI GM voice narration (see utils/tts-voice.js
+        // and DISCORD_TTS_ENABLED/DISCORD_TTS_VOICE_CHANNEL_ID). A
+        // silent no-op when not configured -- see that module's own
+        // header comment.
+        vtt.on('tts-audio', (data) => {
+            ttsVoice.playNarration(client, data).catch(e => {
+                console.warn('⚠️ AI GM voice narration playback error:', e.message);
+            });
+        });
+
+        // NEW: optional Reactive Soundscape (see the AI GM Bot's
+        // adventure-context.js mood -> trackId profile). Posts a "now
+        // playing" embed to the VTT log channel when ambience changes --
+        // no voice playback here, the actual audio plays client-side in
+        // each connected web browser (see that repo's
+        // js/core/soundboard.js). A silent no-op if VTT_LOG_CHANNEL isn't
+        // configured, same as every other getLogChannel()-gated listener
+        // above.
+        vtt.on('soundboard-ambience', (data) => {
+            const channel = getLogChannel();
+            if (!channel) return;
+            const { mood, trackId, transitionDuration } = data || {};
+            if (!mood && !trackId) return;
+            channel.send({
+                embeds: [{
+                    color: 0x9b59b6,
+                    title: '🎵 Now Playing',
+                    description: mood
+                        ? `Ambience shifting to **${mood}**.`
+                        : 'Ambience shifting.',
+                    fields: trackId ? [{ name: 'Track', value: trackId, inline: true }] : [],
+                    footer: transitionDuration ? { text: `Crossfading over ${transitionDuration}ms` } : undefined,
+                    timestamp: new Date().toISOString()
+                }]
+            });
         });
 
         console.log('✅ VTT GM event listeners registered');

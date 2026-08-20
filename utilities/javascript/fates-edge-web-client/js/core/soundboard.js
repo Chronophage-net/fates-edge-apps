@@ -11,12 +11,30 @@
  * `url` can point at anything the browser can play (a hosted mp3/ogg, or a
  * user-supplied link). Saved to state.soundboard.tracks so it persists and
  * syncs like everything else in this app.
+ *
+ * NEW (Reactive Soundscape): playAmbience() now accepts an optional
+ * `{ transitionDuration }` and crossfades into the new track instead of
+ * hard-cutting, when a duration is given. This is what lets the
+ * `soundboard-ambience` WS event (fired by the AI GM bot's mood ->
+ * trackId profile — see ai-gm-bot's adventure-context.js and
+ * process-tags.js's [MOOD "..."] tag) smoothly swap ambience mid-scene
+ * instead of jarringly snapping the music. Manual UI clicks (gm-tools'
+ * board) still default to an instant switch (transitionDuration
+ * omitted/0) — nothing about that existing behavior changes.
+ *
+ * Crossfade is done with plain <audio>.volume ramping via
+ * requestAnimationFrame across two overlapping Audio() elements, not a
+ * WebAudio GainNode graph — consistent with the "no WebAudio graph"
+ * design note above; a manual volume ramp gets the same audible result
+ * for a single ambience loop without pulling in an AudioContext.
  */
 
 import { getState, saveState } from './state.js';
 import { generateId } from './utils.js';
 
-let ambienceEl = null;
+let ambienceEl = null;       // the currently-targeted ambience element (fading in, or already steady)
+let fadingOutEl = null;      // the previous ambience element, fading out (null once torn down)
+let fadeHandle = null;       // requestAnimationFrame handle for an in-progress crossfade
 let currentAmbienceId = null;
 let ambienceVolume = 0.5;
 let sfxVolume = 0.8;
@@ -53,30 +71,93 @@ export function removeSoundTrack(id) {
     return true;
 }
 
+function cancelFade() {
+    if (fadeHandle !== null) {
+        cancelAnimationFrame(fadeHandle);
+        fadeHandle = null;
+    }
+    // A cancelled fade still needs its outgoing element torn down --
+    // otherwise it's left paused-but-not-cleaned-up, silently holding a
+    // decoded audio buffer for a track no client control ever stops.
+    if (fadingOutEl) {
+        fadingOutEl.pause();
+        fadingOutEl.src = '';
+        fadingOutEl = null;
+    }
+}
+
 /**
  * Start looping an ambience track. Stops/replaces whatever ambience track (if
  * any) was already playing — only one ambience loop plays at a time, same as
  * every VTT's ambience layer.
+ *
+ * `transitionDuration` (ms) is optional. When omitted or 0 (or nothing is
+ * currently playing to fade from), this is an instant hard-cut switch —
+ * identical to this function's original behavior. When given a positive
+ * value, the new track fades in from silence while the old one fades out
+ * over that duration, then the old element is torn down.
  */
-export function playAmbience(id) {
+export function playAmbience(id, { transitionDuration = 0 } = {}) {
     const track = getSoundTracks().find(t => t.id === id);
     if (!track) return false;
 
-    if (ambienceEl) {
-        ambienceEl.pause();
-        ambienceEl.src = '';
+    const targetVolume = ambienceVolume * (track.volume ?? 1);
+    const newEl = new Audio(track.url);
+    newEl.loop = true;
+
+    const outgoing = ambienceEl;
+
+    if (!transitionDuration || transitionDuration <= 0 || !outgoing) {
+        // Instant switch -- same behavior as before crossfade existed.
+        cancelFade();
+        if (outgoing) {
+            outgoing.pause();
+            outgoing.src = '';
+        }
+        newEl.volume = targetVolume;
+        currentAmbienceId = id;
+        ambienceEl = newEl;
+        newEl.play().catch(err => {
+            console.warn('[Soundboard] Ambience playback blocked or failed:', err?.message);
+        });
+        return true;
     }
-    ambienceEl = new Audio(track.url);
-    ambienceEl.loop = true;
-    ambienceEl.volume = ambienceVolume * (track.volume ?? 1);
+
+    // Crossfade: any fade already in flight gets cut short (its outgoing
+    // element torn down) so we never end up ramping three overlapping
+    // tracks at once.
+    cancelFade();
+    fadingOutEl = outgoing;
+    const outgoingStartVolume = outgoing.volume;
+
+    newEl.volume = 0;
     currentAmbienceId = id;
-    ambienceEl.play().catch(err => {
+    ambienceEl = newEl;
+    newEl.play().catch(err => {
         console.warn('[Soundboard] Ambience playback blocked or failed:', err?.message);
     });
+
+    const startedAt = performance.now();
+    const step = (now) => {
+        const elapsed = now - startedAt;
+        const t = Math.min(1, elapsed / transitionDuration);
+        newEl.volume = targetVolume * t;
+        outgoing.volume = outgoingStartVolume * (1 - t);
+        if (t < 1) {
+            fadeHandle = requestAnimationFrame(step);
+        } else {
+            outgoing.pause();
+            outgoing.src = '';
+            if (fadingOutEl === outgoing) fadingOutEl = null;
+            fadeHandle = null;
+        }
+    };
+    fadeHandle = requestAnimationFrame(step);
     return true;
 }
 
 export function stopAmbience() {
+    cancelFade();
     if (ambienceEl) {
         ambienceEl.pause();
         ambienceEl.src = '';
@@ -91,7 +172,20 @@ export function getCurrentAmbienceId() {
 
 export function setAmbienceVolume(vol) {
     ambienceVolume = Math.min(1, Math.max(0, vol));
-    if (ambienceEl) ambienceEl.volume = ambienceVolume;
+    // Only rescales the steady (non-fading) element -- nudging volume
+    // mid-crossfade would fight the ramp's own math and produce an
+    // audible glitch, and the ramp already converges on the correct
+    // ambienceVolume-scaled target by its final frame regardless.
+    //
+    // FIX: this used to set ambienceEl.volume = ambienceVolume directly,
+    // ignoring the current track's own per-track `volume` multiplier --
+    // so calling this while a track with e.g. volume: 0.5 was playing
+    // would audibly jump it louder than playAmbience() had originally
+    // set it to. Re-derive from the actual current track instead.
+    if (ambienceEl && fadeHandle === null) {
+        const track = getSoundTracks().find(t => t.id === currentAmbienceId);
+        ambienceEl.volume = ambienceVolume * (track?.volume ?? 1);
+    }
 }
 
 export function setSfxVolume(vol) {

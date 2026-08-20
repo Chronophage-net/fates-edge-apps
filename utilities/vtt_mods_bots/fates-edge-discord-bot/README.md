@@ -245,6 +245,49 @@ docker-compose --profile discord-bot up
 
 ---
 
+## 🎙️ AI GM Voice Narration (optional)
+
+Off by default. If the AI GM Bot has its own voice narration configured (`TTS_ENABLED`/`TTS_URL`
+in `fates-edge-ai-gm-bot`'s `.env` — see that repo's README), this bot can additionally speak
+those same replies into a Discord voice channel.
+
+**Setup:**
+
+1. Install the extra playback dependencies (not installed by default — see `package.json`'s
+   `_note_voice`):
+   ```bash
+   npm install @discordjs/opus ffmpeg-static
+   ```
+   (or have a system `ffmpeg` on `PATH` instead of `ffmpeg-static`, and/or `opusscript` instead of
+   `@discordjs/opus` if you'd rather avoid a native build.)
+2. Set in `.env`:
+   ```
+   DISCORD_GUILD_ID=your-server-id
+   DISCORD_TTS_ENABLED=true
+   DISCORD_TTS_VOICE_CHANNEL_ID=the-voice-channel-id
+   ```
+3. Make sure the bot has `Connect` and `Speak` permissions on that voice channel.
+
+The bot joins the configured channel on the first narration clip it receives and stays connected
+(no auto-leave yet — disconnect it from Discord's own UI, or restart the bot, if you want it to
+leave). Entirely optional and fails soft: with `DISCORD_TTS_ENABLED` unset, or the extra
+dependencies not installed, or the bot lacking channel permissions, playback silently no-ops and
+logs a warning — the narration **text** still reaches Discord exactly as before via whatever
+already relays `chat-message` (e.g. the webhook's `vtt-chat` event below).
+
+---
+
+## 🎵 Reactive Soundscape (optional)
+
+Off by default — needs no setup on this bot's side. If the AI GM Bot has a mood → trackId
+soundscape profile configured (see `fates-edge-ai-gm-bot`'s README "Reactive Soundscape" section),
+this bot posts a "🎵 Now Playing" embed to `VTT_LOG_CHANNEL` whenever the ambience changes — text
+only, no voice playback here. The actual ambience audio plays client-side in each player's own web
+browser (see `fates-edge-web-client`'s `core/soundboard.js`), not through this bot's voice
+connection — that's what AI GM Voice Narration above is for.
+
+---
+
 ## 🌐 Webhook Integration
 
 The bot includes an Express webhook server for external services to send messages to Discord.

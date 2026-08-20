@@ -187,6 +187,35 @@ The toolkit includes **real‑time VTT features** via a WebSocket/Socket.io serv
 - **Terminal Client** — MUD‑style CLI for testing and administration
 - **Python CLI** — Full‑featured command‑line client, rebuilt as a structured package (v5.0.0)
 
+### AI GM Voice, TTS & Reactive Soundscape (optional)
+Three independent, off-by-default features layered on the AI GM Bot (a separate sibling repo,
+[`fates-edge-ai-gm-bot`](https://github.com/Chronophage-net/fates-edge-ai-gm-bot)) and relayed
+through this repo's socket server, same as chat/dice/deck:
+- **🎙️ Voice Narration (TTS)** — the AI GM's replies are synthesized to speech and broadcast
+  alongside the text (`tts-audio` WS event). Played back in the web client (Web Audio API, opt-in
+  toggle), the Foundry bridge (`AudioHelper`, opt-in setting), and the Discord bot
+  (`@discordjs/voice`, opt-in channel) — acknowledged but not played in Roll20/terminal/Python
+  clients, which have no audio capability.
+- **🗣️ Voice Cloning (RVC)** — a second optional layer on top of TTS that re-voices the narration
+  through [RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI) so the GM
+  consistently sounds like one specific trained voice, with an LRU cache for repeated stock lines.
+- **🎵 Reactive Soundscape** — the AI GM can shift the room's background ambience to match the
+  scene's mood, automatically on scene changes or explicitly mid-scene, via a new `soundboard-ambience`
+  WS event; the web client's `core/soundboard.js` crossfades to the matching track. Discord posts a
+  text-only "Now Playing" embed.
+
+See the AI GM Bot's own README ("Voice Narration," "Voice Cloning," "Reactive Soundscape") for
+setup, and its `DESIGN.md` for the full pipeline walkthrough. This repo's [API.md](API.md)
+documents the `tts-audio`/`soundboard-ambience` WS events these features add.
+
+### ♿ Accessibility
+The web client's accessibility work is an ongoing, actively-tracked pass — focus management,
+`aria-live` announcements, a high-contrast theme, labeled controls, two independent opt-in
+text-to-speech features ("Type to Speak" for incoming chat, AI GM Voice Narration above for the
+AI's replies), and cross-repo coverage (Foundry bridge `aria-label`s, Discord embed alt-text
+audit). See the web client's own README and [`ACCESSIBILITY.md`](utilities/javascript/fates-edge-web-client/ACCESSIBILITY.md)
+for the full pass-by-pass record.
+
 ---
 
 ## 🚀 Quick Start

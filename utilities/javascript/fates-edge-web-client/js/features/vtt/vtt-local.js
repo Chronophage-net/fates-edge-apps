@@ -22,7 +22,7 @@ import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory, sav
 import { performRoll } from '../../core/dice.js';
 import { showToast } from '../../components/Toast.js';
 import { escHtml } from '../../core/utils.js';
-import { isConnectedToServer } from '../../core/websocket.js';
+import { isConnectedToServer, isLocalOnlyMode, setLocalOnlyMode } from '../../core/websocket.js';
 import { collectEquipmentModifiers } from '../../core/talent-effects.js';
 import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '../characters/roller.js';
 import {
@@ -500,6 +500,18 @@ function attachEvents() {
       }
       case 'vtt-voice-toggle': toggleVoice(); break;
       case 'vtt-mute-toggle': toggleMuteVoice(); break;
+      case 'vtt-local-only-toggle': {
+        const goingOffline = !isLocalOnlyMode();
+        setLocalOnlyMode(goingOffline);
+        showToast(
+          goingOffline
+            ? 'Working fully offline. No more connection attempts.'
+            : 'Local-only mode off. Fate\'s Edge may connect to a server again.',
+          'info'
+        );
+        render(container);
+        break;
+      }
     }
   };
   const keydownHandler = (e) => {
@@ -587,6 +599,22 @@ export function render(el) {
           <span class="vtt-dot" style="background:var(--vtt-gold);"></span>
           📡 Local mode (no server)
         </span>
+      </div>
+      <!-- NEW: real local-only mode. Local mode (this view) just means "not
+           currently connected" -- the WS layer still auto-connects and
+           retries in the background by default. This affordance is the
+           discoverable, one-click way to actually turn that off (wraps
+           core/websocket.js's isLocalOnlyMode()/setLocalOnlyMode(); the
+           Settings > WebSocket panel has the same toggle for anyone who'd
+           rather set it there). -->
+      <div class="vtt-stat-row" id="vtt-local-only-row" style="justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;margin-bottom:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);">
+        ${isLocalOnlyMode() ? `
+          <span class="text-muted" style="font-size:0.85rem;">✅ Fully offline &mdash; no connection attempts, no reconnect loop.</span>
+          <button class="btn btn-sm btn-ghost" id="vtt-local-only-toggle" title="Allow connecting to a server again">🌐 Allow connecting</button>
+        ` : `
+          <span class="text-muted" style="font-size:0.85rem;">Still trying to reconnect in the background? Turn that off:</span>
+          <button class="btn btn-sm btn-ghost" id="vtt-local-only-toggle" title="Stop all connection attempts and stay fully offline">🔌 Work fully offline</button>
+        `}
       </div>
       <div class="vtt-stat-row" style="justify-content:space-between;">
         <div class="vtt-btn-row" style="align-items:center;">

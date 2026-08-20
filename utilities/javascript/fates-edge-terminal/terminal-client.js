@@ -1745,6 +1745,24 @@ function handleMessage(msg) {
             printChatMessage(msg.sender, msg.text);
             break;
 
+        // NEW: optional AI GM voice narration (see the AI GM Bot's
+        // TTS_ENABLED/TTS_URL). This terminal client has no audio
+        // playback of its own -- deliberately not implemented here (see
+        // the web client's js/features/vtt/tts-narration.js and the
+        // Foundry bridge/Discord bot for the clients that do play it).
+        // The narration TEXT already arrived via the 'chat-message'
+        // above; this just avoids the event silently falling through to
+        // "unhandled".
+        case 'tts-audio':
+            printSystemMessage('🔊 AI GM narration audio available (not played in this terminal client).', colors.dim);
+            break;
+
+        // NEW: optional Reactive Soundscape -- acknowledge-only, same as
+        // tts-audio above; this terminal client has no audio playback.
+        case 'soundboard-ambience':
+            printSystemMessage(`🎵 Ambience shifting to "${msg.mood || '?'}" (not played in this terminal client).`, colors.dim);
+            break;
+
         case 'roll-result':
             printRollResult(msg.sender, msg.formula || 'dice', msg.result || 0, (msg.rolls || []).join(', '));
             break;

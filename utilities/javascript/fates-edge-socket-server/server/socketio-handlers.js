@@ -840,7 +840,29 @@ function setupSocketIO(io, appConfig) {
             // broadcast-only notifications (e.g. a VTT mod announcing its
             // current scene/combat status) should reach every connected
             // client regardless of which transport they used to connect.
-            'scene-status-update', 'combat-status-update'
+            'scene-status-update', 'combat-status-update',
+            // NEW: AI GM Bot voice narration (optional -- see
+            // fates-edge-ai-gm-bot's modules/tts-client.js). The bot
+            // synthesizes speech for its own chat replies and sends the
+            // resulting audio as this event; relayed exactly like
+            // 'chat-message' so every connected web client can decode and
+            // play it (see fates-edge-web-client's
+            // js/features/vtt/tts-narration.js). Base64-encoded audio in
+            // `data.audio` can be a few hundred KB -- see index.js's
+            // maxHttpBufferSize, raised above Socket.IO's 1MB default to
+            // accommodate it.
+            'tts-audio',
+            // NEW: Reactive Soundscape (optional -- see fates-edge-ai-gm-bot's
+            // adventure-context.js mood -> trackId profile and
+            // process-tags.js's [MOOD "..."] tag). Fired by the bot when a
+            // scene advances or the AI explicitly sets a mood; relayed
+            // exactly like 'tts-audio' above so every connected web client
+            // picks it up and crossfades ambience (see
+            // fates-edge-web-client's js/core/soundboard.js and
+            // js/features/vtt/vtt-connected.js). Payload is tiny (mood/
+            // trackId/transitionDuration strings+numbers, no audio data),
+            // so this needs no special payload-size handling.
+            'soundboard-ambience'
         ];
         relayEvents.forEach(eventName => {
             socket.on(eventName, (data) => {

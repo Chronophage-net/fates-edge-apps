@@ -135,7 +135,19 @@ const eventHandlers = {
     // index.js's applyRemoteTimerTick().
     'timer-ticked': [],
     'handshake_ack': [],
-    
+
+    // NEW: AI GM Bot voice narration (optional) -- base64-encoded audio
+    // for the bot's own chat replies, sent by the server alongside
+    // 'chat-message'. See js/features/vtt/tts-narration.js, the module
+    // that actually registers a listener and plays it.
+    'tts-audio': [],
+
+    // NEW: Reactive Soundscape (optional) -- mood/trackId/transitionDuration
+    // cue fired by the AI GM Bot on scene changes (or an explicit
+    // [MOOD "..."] tag). See js/features/vtt/vtt-connected.js for the
+    // listener that actually crossfades via core/soundboard.js.
+    'soundboard-ambience': [],
+
 };
 
 // ============================================================
@@ -162,6 +174,47 @@ function getWSConfig() {
         enabled: settings.wsEnabled !== false && localStorage.getItem('fates-edge-ws-enabled') !== 'false',
         mode: settings.wsMode || localStorage.getItem('fates-edge-ws-mode') || 'websocket'
     };
+}
+
+/**
+ * NEW: Real local-only mode.
+ *
+ * `getWSConfig().enabled` already gates both the DOMContentLoaded
+ * auto-connect below and every manual connect path, via the
+ * `fates-edge-ws-enabled` localStorage flag (and `state.settings.wsEnabled`).
+ * These two helpers just give that flag clear, discoverable, inverted-sense
+ * names -- "local-only mode" reads better at a VTT-local call site than
+ * "WS not enabled" -- and `setLocalOnlyMode(true)` additionally tears down
+ * any in-flight connection/reconnect loop immediately, rather than only
+ * taking effect on the next page load. See vtt-local.js's "Work fully
+ * offline" affordance and the Settings WS-enabled checkbox for the two
+ * places a user can flip this.
+ */
+export function isLocalOnlyMode() {
+    return !getWSConfig().enabled;
+}
+
+export function setLocalOnlyMode(enabled) {
+    try {
+        localStorage.setItem('fates-edge-ws-enabled', enabled ? 'false' : 'true');
+    } catch (e) {
+        console.warn('Could not persist local-only mode to localStorage:', e.message);
+    }
+
+    const state = getState();
+    state.settings = state.settings || {};
+    state.settings.wsEnabled = !enabled;
+    updateState(state);
+
+    if (enabled) {
+        // Fully offline: stop any in-flight connection attempt and clear
+        // the reconnect-backoff loop right away -- don't wait for a page
+        // reload for this to take effect.
+        disconnectWebSocket();
+        wsStatus = 'disabled';
+    }
+
+    return isLocalOnlyMode();
 }
 
 /**
@@ -456,7 +509,15 @@ function handleWebSocketMessage(data) {
         case 'chat-message':
             triggerEvent('chat-message', data);
             break;
-            
+
+        case 'tts-audio':
+            triggerEvent('tts-audio', data);
+            break;
+
+        case 'soundboard-ambience':
+            triggerEvent('soundboard-ambience', data);
+            break;
+
         case 'roll-result':
             triggerEvent('roll-result', data);
             break;
@@ -962,7 +1023,15 @@ function setupSocketIOListeners() {
     socket.on('chat-message', (data) => {
         triggerEvent('chat-message', data);
     });
-    
+
+    socket.on('tts-audio', (data) => {
+        triggerEvent('tts-audio', data);
+    });
+
+    socket.on('soundboard-ambience', (data) => {
+        triggerEvent('soundboard-ambience', data);
+    });
+
     socket.on('roll-result', (data) => {
         triggerEvent('roll-result', data);
     });
@@ -1754,6 +1823,8 @@ export default {
     
     // Shared
     initWebSocket,
+    isLocalOnlyMode,
+    setLocalOnlyMode,
     onEvent,
     onWSEvent,
     offEvent,

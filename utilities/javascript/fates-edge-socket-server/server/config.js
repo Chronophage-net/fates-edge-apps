@@ -44,6 +44,19 @@ function loadConfig() {
             ? parseInt(process.env.WS_MESSAGE_RATE_MAX, 10)
             : 120,
 
+        // ─── WebSocket message payload size ─────────────────────────
+        // NEW: added for the optional AI GM Bot voice narration feature
+        // (see fates-edge-ai-gm-bot's modules/tts-client.js) -- a
+        // 'tts-audio' event's base64-encoded audio can run a few hundred
+        // KB to a couple MB for a longer narration, comfortably past
+        // Socket.IO's 1MB `maxHttpBufferSize` default (the plain-ws
+        // transport has no default cap at all, which is its own DoS
+        // surface). Applied to both transports in index.js. Raise this if
+        // TTS_MAX_CHARS is set high enough that narration audio still gets
+        // rejected; lower it if you'd rather fail closed than let one
+        // connection send multi-MB frames.
+        wsMaxPayloadBytes: parseInt(process.env.WS_MAX_PAYLOAD_BYTES, 10) || 8 * 1024 * 1024,
+
         // ─── Per-room client cap ─────────────────────────────────────
         // 0 (default) = unlimited, unchanged behavior. A very large public
         // room is a niche case, but an unbounded one is also an easy denial-

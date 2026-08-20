@@ -259,6 +259,25 @@ export const FatesEdgeBridge = {
             case 'chat-message':
                 this._handleChatMessage(data);
                 break;
+            // NEW: optional AI GM voice narration -- see the AI GM Bot's
+            // modules/tts-client.js and this module's `narrationEnabled`
+            // client setting (settings.js).
+            case 'tts-audio':
+                this._handleTtsAudio(data);
+                break;
+            // NEW: optional Reactive Soundscape -- see the AI GM Bot's
+            // adventure-context.js mood -> trackId profile. Unlike
+            // tts-audio above, there's no real playback here: `trackId`
+            // refers to a track id from the WEB CLIENT's own soundboard
+            // (core/soundboard.js), which has no equivalent inside
+            // Foundry's own Playlist system to map onto automatically.
+            // This just surfaces the cue (console log + a Hooks.call so
+            // a GM's own macro/module could react, e.g. by triggering a
+            // matching Foundry playlist manually) rather than silently
+            // dropping it.
+            case 'soundboard-ambience':
+                this._handleSoundboardAmbience(data);
+                break;
             case 'roll-result':
                 this._handleRollResult(data);
                 break;
@@ -513,7 +532,45 @@ export const FatesEdgeBridge = {
         ChatMessage.create(chatData);
         Hooks.call('fates-edge-chat-message', data);
     },
-    
+
+    // NEW: optional AI GM voice narration playback. Local to THIS
+    // client only -- deliberately does not go through Foundry's own
+    // socket layer (AudioHelper.play(data, true) would broadcast it a
+    // second time to every other connected client, who each already
+    // received this same 'tts-audio' WS message directly from the
+    // Fate's Edge server and are independently deciding whether to play
+    // it). Off unless the user has opted in via the `narrationEnabled`
+    // client setting -- see settings.js's note on why this defaults to
+    // false. Fails soft: a decode/playback error here never breaks chat
+    // sync, since `_handleChatMessage` already delivered the text.
+    _handleTtsAudio(data) {
+        if (!game.settings.get('fates-edge-bridge', 'narrationEnabled')) return;
+        const { audio, text, format } = data || {};
+        if (!audio) return;
+        try {
+            const mime = { wav: 'audio/wav', mp3: 'audio/mpeg', ogg: 'audio/ogg' }[format] || 'audio/wav';
+            const volume = game.settings.get('fates-edge-bridge', 'narrationVolume');
+            AudioHelper.play({ src: `data:${mime};base64,${audio}`, volume, autoplay: true, loop: false }, false);
+            if (text) console.log(`🔊 [Fate's Edge] AI GM narration: "${String(text).slice(0, 80)}${text.length > 80 ? '…' : ''}"`);
+        } catch (e) {
+            console.warn("⚠️ Fate's Edge: failed to play AI GM narration audio:", e);
+        }
+        Hooks.call('fates-edge-tts-audio', data);
+    },
+
+    // NEW: optional Reactive Soundscape -- see the case comment above.
+    // No `trackId` -> Foundry Playlist mapping exists here, so this is
+    // acknowledge-only: logs the cue and fires a hook so a GM's own
+    // module/macro can react (e.g. by starting a matching Foundry
+    // playlist sound), same "surface it, don't fabricate playback"
+    // posture as fates-edge-roll20's handling of this event.
+    _handleSoundboardAmbience(data) {
+        const { mood, trackId, transitionDuration } = data || {};
+        if (!mood && !trackId) return;
+        console.log(`🎵 [Fate's Edge] Ambience cue: mood="${mood || '?'}" trackId="${trackId || '?'}"${transitionDuration ? ` (${transitionDuration}ms)` : ''}`);
+        Hooks.call('fates-edge-soundboard-ambience', data);
+    },
+
     _handleRollResult(data) {
         console.log('🎲 Roll:', data);
         let resultText = data.result;

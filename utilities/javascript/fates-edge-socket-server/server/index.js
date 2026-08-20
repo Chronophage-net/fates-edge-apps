@@ -71,7 +71,11 @@ const server = http.createServer(app);
 // ---------- Socket.io ----------
 const io = socketIo(server, {
     cors: { origin: config.corsOrigin, methods: ["GET", "POST"], credentials: true },
-    transports: ['websocket', 'polling']
+    transports: ['websocket', 'polling'],
+    // NEW: raised above Socket.IO's 1MB default -- see config.js's
+    // wsMaxPayloadBytes note (added for the optional AI GM Bot voice
+    // narration feature's base64-encoded 'tts-audio' events).
+    maxHttpBufferSize: config.wsMaxPayloadBytes
 });
 room.setIo(io);                // enable room.broadcastToRoom for Socket.io
 ioHandlers.setupSocketIO(io, config);
@@ -99,7 +103,9 @@ const effectiveScalingApi = scalingApi.enabled
 room.setScaling(effectiveScalingApi);
 
 // ---------- Plain WebSocket ----------
-const wss = new WebSocket.Server({ server, path: '/' });
+// NEW: maxPayload -- see config.js's wsMaxPayloadBytes note. The plain-ws
+// transport has no default cap at all otherwise.
+const wss = new WebSocket.Server({ server, path: '/', maxPayload: config.wsMaxPayloadBytes });
 wsHandlers.setupWSS(wss, config);
 
 // Prevent the WebSocket server from crashing on underlying HTTP errors

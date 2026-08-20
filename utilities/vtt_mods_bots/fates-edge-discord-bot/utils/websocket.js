@@ -278,6 +278,22 @@ class VTTClient extends EventEmitter {
                 this.emit('chat-message', message);
                 break;
 
+            // NEW: optional AI GM voice narration -- see
+            // utils/tts-voice.js and events/ready.js's 'tts-audio'
+            // listener.
+            case 'tts-audio':
+                this.emit('tts-audio', message);
+                break;
+
+            // NEW: optional Reactive Soundscape -- see events/ready.js's
+            // 'soundboard-ambience' listener, which posts a "now playing"
+            // embed. No voice/audio playback here (unlike tts-audio) --
+            // ambience audio plays in players' own web clients, this is
+            // just a text notification for the Discord channel.
+            case 'soundboard-ambience':
+                this.emit('soundboard-ambience', message);
+                break;
+
             case 'roll-result':
                 this.emit('roll-result', message);
                 break;

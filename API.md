@@ -453,6 +453,8 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 | `voice-answer`      | WebRTC signaling                     | ...                                      |
 | `voice-ice-candidate` | WebRTC signaling                   | ...                                      |
 | `voice-status`      | Voice enabled/disabled               | `{ "enabled": true }`                    |
+| `tts-audio`         | Optional AI GM voice narration — base64-encoded synthesized speech, broadcast to the room exactly like `chat-message` (see the AI GM Bot's `TTS_ENABLED`/`TTS_URL`; see `WS_MAX_PAYLOAD_BYTES` below for the size cap this needs) | `{ "audio": "<base64>", "text": "...", "voice": "default", "format": "wav" }` |
+| `soundboard-ambience` | Optional Reactive Soundscape — fired by the AI GM Bot when a scene advances or it explicitly sets a mood (see the bot's `adventure-context.js` mood→trackId profile and its `[MOOD "..."]` tag); relayed to the room exactly like `tts-audio`. `trackId` must match an id already present in the room's `state.soundboard.tracks` (see the web client's `core/soundboard.js`) — a mood mapped to a track no client has created is a silent no-op on the receiving end. | `{ "mood": "tense", "trackId": "sound_abc123", "transitionDuration": 2000 }` |
 | `scene-status-update` | Non-destructive broadcast-only notification — relayed to the room as-is, no room state is touched. Good for things like "here's my current scene name" that shouldn't clobber the whiteboard. | `{ "scene": { "name": "..." } }` |
 | `combat-status-update` | Same as `scene-status-update` but semantically for combat/encounter status (e.g. a bot's local timer list) | `{ ... }` |
 | `event`              | Generic custom event                 | `{ ... }`                                |
@@ -480,6 +482,8 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 | `handshake_ack`       | Handshake/join accepted                       | `{ "clientId": "...", "clientRole": "gm", "activeClients": [...] }` |
 | `room-joined`         | (Socket.io) Full room snapshot on join, including characters | `{ "room": "...", "clients": [...], "whiteboard": {...}, "characters": [...] }` |
 | `chat-message`       | Incoming chat message                         | `{ "text": "...", "sender": "Bob", ... }`             |
+| `tts-audio`           | Optional AI GM voice narration audio, broadcast to everyone in the room (including the bot's own connection) | `{ "audio": "<base64>", "text": "...", "voice": "default", "format": "wav" }` |
+| `soundboard-ambience` | Optional Reactive Soundscape cue, broadcast to everyone in the room (including the bot's own connection) — clients with a matching `trackId` in their local soundboard crossfade to it | `{ "mood": "tense", "trackId": "sound_abc123", "transitionDuration": 2000 }` |
 | `roll-result`        | Incoming dice roll                            | `{ "outcome": "success", "dice": [1,4,6], ... }`     |
 | `deck-drawn`         | Cards were drawn                              | `{ "cards": [...], "synthesis": "..." }`              |
 | `deck-shuffled`      | Deck was shuffled                             | `{ "remaining": 54 }`                                 |

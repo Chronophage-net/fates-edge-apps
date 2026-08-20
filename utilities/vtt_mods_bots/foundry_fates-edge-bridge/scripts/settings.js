@@ -190,6 +190,42 @@ export const registerSettings = function() {
     });
     
     // ============================================================
+    // AI GM Voice Narration (optional -- see the AI GM Bot's
+    // TTS_ENABLED/TTS_URL and modules/tts-client.js). Off by default:
+    // this is a genuinely interruptive, audible change (unlike the sync
+    // toggles above, which are silent data plumbing), and a table
+    // shouldn't suddenly start hearing the GM's replies spoken aloud
+    // the first time someone enables TTS server-side without every
+    // player having separately opted in here. Client-scoped so each
+    // Foundry user's preference is their own, not something the world's
+    // GM sets for everyone -- same reasoning as the web client's
+    // per-browser narration toggle (js/features/vtt/tts-narration.js).
+    // ============================================================
+
+    game.settings.register('fates-edge-bridge', 'narrationEnabled', {
+        name: 'AI GM Voice Narration',
+        hint: "Play the AI GM's chat replies aloud, when the bot has voice narration configured (TTS_ENABLED on the bot). Off by default -- opt in per-user.",
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false
+    });
+
+    game.settings.register('fates-edge-bridge', 'narrationVolume', {
+        name: 'AI GM Narration Volume',
+        hint: 'Playback volume for AI GM voice narration (0 = silent, 1 = full).',
+        scope: 'client',
+        config: true,
+        type: Number,
+        default: 0.8,
+        range: {
+            min: 0,
+            max: 1,
+            step: 0.1
+        }
+    });
+
+    // ============================================================
     // GM Features
     // ============================================================
     

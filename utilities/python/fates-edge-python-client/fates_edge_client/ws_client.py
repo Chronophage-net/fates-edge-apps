@@ -41,6 +41,19 @@ _DEFAULT_PRINTERS = (
     "chat-message", "roll-result", "deck-drawn", "deck-shuffled",
     "crown-spread", "state-updated", "module-push", "module-cleanup",
     "scene-status-update", "combat-status-update",
+    # NEW: optional AI GM voice narration (see the AI GM Bot's
+    # TTS_ENABLED/TTS_URL). This client has no audio playback of its
+    # own -- narration integration is intentionally out of scope here
+    # (see the web client, Foundry bridge, and Discord bot for the
+    # clients that do play it) -- so this just prints a one-line
+    # acknowledgment instead of dropping the event silently. The
+    # narration TEXT already arrived via the separate "chat-message"
+    # event above.
+    "tts-audio",
+    # NEW: optional Reactive Soundscape (see the AI GM Bot's
+    # adventure-context.js mood -> trackId profile). Acknowledge-only,
+    # same reasoning as tts-audio above -- no audio playback here.
+    "soundboard-ambience",
 )
 
 
@@ -285,3 +298,10 @@ class FatesEdgeWsClient:
             print(f"\n[SCENE] Scene status updated: {scene.get('name', scene.get('id', 'Unknown'))}")
         elif event_type == "combat-status-update":
             print(f"\n[COMBAT] Combat status updated by {data.get('updatedBy', 'Unknown')}")
+        elif event_type == "tts-audio":
+            text = (data.get("text") or "")[:60]
+            print(f"\n[TTS] AI GM narration audio received (not played by this client): \"{text}\"")
+        elif event_type == "soundboard-ambience":
+            mood = data.get("mood", "?")
+            track_id = data.get("trackId", "?")
+            print(f"\n[SOUNDSCAPE] Ambience shifting to \"{mood}\" (track {track_id}, not played by this client)")

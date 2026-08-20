@@ -75,7 +75,14 @@ import {
     initiateVoiceCall,
     onVoiceClientsChanged
 } from './voice.js';
+import {
+    initTtsNarration,
+    cleanupTtsNarration,
+    isNarrationEnabled,
+    setNarrationEnabled
+} from './tts-narration.js';
 import { renderCombatActions, resetCombatScene } from './combat-actions.js';
+import { playAmbience as playAmbienceTrack, getSoundTracks } from '../../core/soundboard.js';
 
 // ============================================================
 // STATE
@@ -988,6 +995,12 @@ function setupWebSocketSync() {
 
     cleanupWebSocketListeners();
 
+    // AI GM voice narration (optional -- see tts-narration.js's header
+    // note). Just registers a listener; whether anything actually plays
+    // depends on the per-browser toggle in isNarrationEnabled(), and on
+    // whether the bot itself has TTS configured at all.
+    initTtsNarration();
+
     try {
         sendEvent({ type: 'state-updated', state: getState() });
     } catch (e) { /* ignore */ }
@@ -1125,6 +1138,34 @@ function setupWebSocketSync() {
     };
     onWSEvent('crown-spread', crownSpreadHandler);
     wsListeners.set('crown-spread', crownSpreadHandler);
+
+    // ─── REACTIVE SOUNDSCAPE ────────────────────────
+    // Optional -- fired by the AI GM Bot on scene changes or an explicit
+    // [MOOD "..."] tag (see that repo's adventure-context.js/
+    // process-tags.js). `trackId` is only meaningful if a track with that
+    // exact id already exists in THIS room's soundboard (see
+    // core/soundboard.js's addSoundTrack()) -- a mood the bot's own
+    // profile maps to a track this room never created is a silent no-op
+    // here, same fail-soft posture as every other optional integration in
+    // this app. Defaults transitionDuration to 2000ms (the "bonus" smooth
+    // fade from the feature request) when the event doesn't specify one.
+    const soundboardAmbienceHandler = (data) => {
+        if (isDestroyed) return;
+        const trackId = data?.trackId;
+        if (!trackId) return;
+        const exists = getSoundTracks().some(t => t.id === trackId);
+        if (!exists) {
+            console.log(`[VTT] Soundscape cue for mood "${data?.mood || '?'}" references unknown track "${trackId}" -- no matching track in this room's soundboard, ignoring.`);
+            return;
+        }
+        const transitionDuration = Number.isFinite(data?.transitionDuration) ? data.transitionDuration : 2000;
+        playAmbienceTrack(trackId, { transitionDuration });
+        if (data?.mood) {
+            showToast(`🎵 Ambience shifting to "${data.mood}"`, 'info');
+        }
+    };
+    onWSEvent('soundboard-ambience', soundboardAmbienceHandler);
+    wsListeners.set('soundboard-ambience', soundboardAmbienceHandler);
 
     const deckHistoryHandler = (data) => {
         if (isDestroyed) return;
@@ -1514,6 +1555,17 @@ async function toggleVoice() {
     }
 }
 
+function toggleTtsNarration() {
+    const enabled = !isNarrationEnabled();
+    setNarrationEnabled(enabled);
+    const btn = q('#vtt-tts-toggle');
+    if (btn) {
+        btn.textContent = enabled ? '🔊 AI Narration On' : '🔈 AI Narration Off';
+        btn.className = `btn btn-sm ${enabled ? 'btn-primary' : ''}`;
+    }
+    showToast(enabled ? 'AI GM narration enabled.' : 'AI GM narration disabled.', 'info');
+}
+
 function toggleMuteVoice() {
     const muted = toggleMute();
     const btn = q('#vtt-mute-toggle');
@@ -1629,6 +1681,7 @@ function attachEvents() {
             }
             case 'vtt-voice-toggle': toggleVoice(); break;
             case 'vtt-mute-toggle': toggleMuteVoice(); break;
+            case 'vtt-tts-toggle': toggleTtsNarration(); break;
             case 'vtt-deck-draw-1': handleDeckDraw(1); break;
             case 'vtt-deck-draw-2': handleDeckDraw(2); break;
             case 'vtt-deck-draw-3': handleDeckDraw(3); break;
@@ -1796,6 +1849,7 @@ export function render(el) {
             <button class="btn btn-sm ${voiceInitialized ? 'btn-primary' : ''}" id="vtt-voice-toggle">${voiceInitialized ? '🎤 Voice On' : '🎤 Voice Off'}</button>
             ${voiceInitialized ? `<button class="btn btn-sm ${voiceStatus?.muted ? 'btn-danger' : 'btn-green'}" id="vtt-mute-toggle">${voiceStatus?.muted ? '🔇 Muted' : '🎙️ Live'}</button>` : ''}
             <span class="vtt-stat-pill" id="voice-clients-count">${voiceClients.length} voice users</span>
+            <button class="btn btn-sm ${isNarrationEnabled() ? 'btn-primary' : ''}" id="vtt-tts-toggle" title="Play the AI GM's replies aloud, when the bot has voice narration configured">${isNarrationEnabled() ? '🔊 AI Narration On' : '🔈 AI Narration Off'}</button>
             </div>
         </div>
         <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.5rem;">
@@ -2114,6 +2168,7 @@ export function destroy() {
     });
     docEventListeners = [];
     cleanupWebSocketListeners();
+    cleanupTtsNarration();
     if (voiceUnsubscribe) {
         voiceUnsubscribe();
         voiceUnsubscribe = null;

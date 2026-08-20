@@ -19,6 +19,24 @@ function escapeHtml(value) {
         .replace(/"/g, '&quot;');
 }
 
+// Accessibility (see the web client's ACCESSIBILITY.md, "Foundry bridge
+// CONFIG.ariaLabels" item): several controls in the status bar and GM
+// panel below are icon-only or use short, ambiguous text ("👑", "Set", a
+// bare role <select>) that isn't a useful accessible name on its own.
+// Rather than hardcoding only English labels, this checks for a
+// `CONFIG.ariaLabels` override first -- a lightweight, opt-in convention
+// some Foundry modules/systems use so a GM's own localization/naming
+// choices propagate across every module's UI instead of each one
+// hardcoding its own -- and falls back to our own English text when the
+// host instance doesn't define one. `CONFIG.ariaLabels` is not part of
+// Foundry's core API, so this is written defensively: if it's undefined
+// (the common case today), `ariaLabel()` is just a passthrough to
+// `fallback` and nothing here depends on it existing.
+function ariaLabel(key, fallback) {
+    const override = (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.ariaLabels) ? CONFIG.ariaLabels[key] : null;
+    return (typeof override === 'string' && override.trim()) ? override : fallback;
+}
+
 // ============================================================
 // Module Registration
 // ============================================================
@@ -86,7 +104,7 @@ function addStatusBarUI() {
         <span id="fates-edge-deck" style="color: #d4af37;">🃏 54</span>
         <span id="fates-edge-voice" style="color: #747f8d;">🎤 Off</span>
         <span id="fates-edge-region" style="color: #8ac49a;">📍 ${game.settings.get('fates-edge-bridge', 'defaultRegion') || 'Acasia'}</span>
-        <button id="fates-edge-gm-btn" style="
+        <button id="fates-edge-gm-btn" aria-label="${escapeHtml(ariaLabel('fatesEdgeGmPanel', 'Open Game Master management panel'))}" style="
             background: rgba(212, 175, 55, 0.2);
             border: 1px solid #d4af37;
             border-radius: 4px;
@@ -195,7 +213,7 @@ function buildGmPanelContent(state) {
             </div>
             <div id="gm-actions" style="margin-bottom: 10px;">
                 ${isGM ? `
-                    <button id="gm-resign-btn" style="
+                    <button id="gm-resign-btn" aria-label="${escapeHtml(ariaLabel('fatesEdgeResignGm', 'Resign as Game Master'))}" style="
                         background: #d9534f;
                         border: none;
                         color: white;
@@ -204,7 +222,7 @@ function buildGmPanelContent(state) {
                         cursor: pointer;
                     ">Resign GM</button>
                 ` : `
-                    <button id="gm-request-btn" style="
+                    <button id="gm-request-btn" aria-label="${escapeHtml(ariaLabel('fatesEdgeRequestGm', 'Request the Game Master role'))}" style="
                         background: #d4af37;
                         border: none;
                         color: #222;
@@ -227,7 +245,7 @@ function buildGmPanelContent(state) {
                             <span>${escapeHtml(r.requesterName)}</span>
                             ${isGM ? `
                                 <div>
-                                    <button class="gm-approve" data-target="${r.requesterId}" style="
+                                    <button class="gm-approve" data-target="${r.requesterId}" aria-label="${escapeHtml(ariaLabel('fatesEdgeApproveGmRequest', `Approve ${r.requesterName}'s Game Master request`))}" style="
                                         background: #43b581;
                                         border: none;
                                         color: white;
@@ -236,7 +254,7 @@ function buildGmPanelContent(state) {
                                         cursor: pointer;
                                         margin-right: 4px;
                                     ">Approve</button>
-                                    <button class="gm-reject" data-target="${r.requesterId}" style="
+                                    <button class="gm-reject" data-target="${r.requesterId}" aria-label="${escapeHtml(ariaLabel('fatesEdgeRejectGmRequest', `Reject ${r.requesterName}'s Game Master request`))}" style="
                                         background: #d9534f;
                                         border: none;
                                         color: white;
@@ -270,16 +288,16 @@ function buildGmPanelContent(state) {
                         const canAssign = isGM && role !== 'gm';
                         const roleControl = canAssign ? `
                             <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                <select class="gm-role-select" data-target="${c.id}" data-current="${escapeHtml(role)}" style="font-size: 0.85em; padding: 1px 3px;">
+                                <select class="gm-role-select" data-target="${c.id}" data-current="${escapeHtml(role)}" aria-label="${escapeHtml(ariaLabel('fatesEdgeRoleSelect', `Change role for ${name}`))}" style="font-size: 0.85em; padding: 1px 3px;">
                                     <option value="co-gm" ${role === 'co-gm' ? 'selected' : ''}>Co-GM</option>
                                     <option value="assistant-gm" ${role === 'assistant-gm' ? 'selected' : ''}>Assistant GM</option>
                                     <option value="player" ${role === 'player' ? 'selected' : ''}>Player</option>
                                     <option value="spectator" ${role === 'spectator' ? 'selected' : ''}>Spectator</option>
                                 </select>
                                 <label style="font-size: 0.75em; color: #888; cursor: pointer;" title="Persist this grant across reconnects (demotions always persist)">
-                                    <input type="checkbox" class="gm-role-persist" data-target="${c.id}" style="vertical-align: middle;"> save
+                                    <input type="checkbox" class="gm-role-persist" data-target="${c.id}" aria-label="${escapeHtml(ariaLabel('fatesEdgeRolePersist', `Persist ${name}'s role grant across reconnects`))}" style="vertical-align: middle;"> save
                                 </label>
-                                <button class="gm-role-apply" data-target="${c.id}" style="
+                                <button class="gm-role-apply" data-target="${c.id}" aria-label="${escapeHtml(ariaLabel('fatesEdgeRoleApply', `Apply role change for ${name}`))}" style="
                                     background: #4a90d9; border: none; color: white;
                                     padding: 1px 8px; border-radius: 3px; cursor: pointer; font-size: 0.85em;
                                 ">Set</button>

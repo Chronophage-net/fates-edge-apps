@@ -707,10 +707,18 @@ export function render(el) {
                 <div class="form-row">
                     <div class="field" style="flex:0 0 auto;">
                         <label class="inline-check">
-                            <input type="checkbox" id="settings-ws-enabled" 
+                            <input type="checkbox" id="settings-ws-enabled"
                                    ${settings.wsEnabled !== false ? 'checked' : ''} />
                             Enable WebSocket
                         </label>
+                        <!-- NEW: real local-only mode. Unchecking this is the
+                             same "no connection attempts, no reconnect loop"
+                             toggle as the "Work fully offline" button on the
+                             VTT local view (core/websocket.js's
+                             isLocalOnlyMode()/setLocalOnlyMode()) -- spelled
+                             out here since "Enable WebSocket" alone doesn't
+                             make that clear from Settings. -->
+                        <div class="field-hint">Unchecking this fully disables auto-connect and background reconnect attempts &mdash; use it to work offline with no connection noise.</div>
                     </div>
                     <div class="field" style="flex:0 0 auto;">
                         <label class="inline-check">

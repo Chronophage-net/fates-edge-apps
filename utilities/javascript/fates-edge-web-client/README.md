@@ -213,6 +213,38 @@ Security is treated as part of the game infrastructure rather than something add
 
 ---
 
+## ♿ Accessibility
+
+Accessibility is an ongoing, actively-tracked pass, not a one-time checklist — see
+[`ACCESSIBILITY.md`](ACCESSIBILITY.md) for the full, pass-by-pass record (what's implemented,
+what was audited and found already sufficient, and what's deliberately deferred, with the
+reasoning for each). Highlights:
+
+* Focus management + `document.title` updates on every route change, with `aria-live` regions
+  hardcoded in `index.html`
+* A `role="log"` chat pane, self-announcing dice rolls, and a `role="tab"`/`role="tabpanel"`
+  sidebar with `aria-selected`/`aria-controls`
+* A built-in **high-contrast theme** (AAA-level contrast throughout) alongside the dark/light themes
+* Two independent opt-in **text-to-speech features**, serving accessibility from opposite
+  directions: **"Type to Speak"** reads incoming chat messages aloud (for players who'd rather
+  listen than read a fast-scrolling log), and **AI GM Voice Narration** (see the AI GM Bot's
+  README/DESIGN.md) reads the AI's own replies aloud alongside the text — both off by default,
+  both purely additive to the text that's already there
+* Voice-chat speaking indicators (icon + screen-reader text, not color alone), labeled sliders
+  with numeric readouts, image `alt` text, a GM keyboard-shortcuts modal, and DOMPurify configured
+  to strip `aria-*`/`role` from any untrusted content
+* 14 static accessibility lint checks (`tests/unit/a11y-lint.test.js`), run as part of the normal
+  test suite — see "Development" below
+* Cross-repo coverage: the Foundry bridge's GM panel controls carry explicit `aria-label`s
+  (honoring a `CONFIG.ariaLabels` override when the host Foundry instance defines one), and the
+  Discord bot's embeds were audited for missing alt text (none currently use image fields)
+
+Real axe-core/Playwright coverage in CI, `inert`-based focus trapping for inline editors, and a
+configurable mic-sensitivity threshold are tracked as deferred in `ACCESSIBILITY.md`, not silently
+dropped.
+
+---
+
 ## 📦 Repository Structure
 
 The repository contains the major components of the Fate's Edge digital ecosystem.
