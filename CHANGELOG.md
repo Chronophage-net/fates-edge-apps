@@ -3,6 +3,15 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.16.1] - 2026-08-20
+
+### Other
+- voice chat speaking indicators, high-contrast theme
+- GM shortcuts modal, image alt fixes, static a11y lint tests
+- label and add numeric readouts to whiteboard/VTT sliders
+- Accessibility sweep: focus management, live regions, contrast fixes
+- Updated Kon'reh, fixed Blue camping in the cross.
+
 ## [4.16.0] - 2026-08-19
 
 Adventure Director v2 (climax pacing, deck RNG seeding, persistence hooks) + Session Recording bundling/live transcription
