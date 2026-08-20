@@ -116,6 +116,7 @@ async function init() {
         setupConflictModalListener();
         setupXCardShortcut();
         setupXCard();  // button/resume clicks + remote raise/resume listeners
+        setupShortcutsModal();
 
         // 6. Password gate
         const hasPassword = !!state.passwordHash;
@@ -303,6 +304,38 @@ function setupXCardShortcut() {
             e.preventDefault();
             toggleXCard();
         }
+    });
+}
+
+/**
+ * GM/player keyboard-shortcuts reference modal — opened via the sidebar's
+ * ⌨️ footer button or the "?" key. Close/outside-click/Escape are handled
+ * generically by setupModals() since this is a normal .modal-overlay.
+ *
+ * "?" is only armed when focus isn't in a text-entry control, so it never
+ * steals a literal "?" character from chat, search, or any other input.
+ */
+function setupShortcutsModal() {
+    const modal = document.getElementById('shortcutsModal');
+    const openBtn = document.getElementById('shortcutsBtn');
+    if (!modal) return;
+
+    const open = () => {
+        modal.classList.add('open');
+        modal.querySelector('.modal-close')?.focus();
+    };
+
+    openBtn?.addEventListener('click', open);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== '?') return;
+        const target = e.target;
+        const isTyping = target && (
+            target.matches('input, textarea, select, [contenteditable="true"]')
+        );
+        if (isTyping || e.ctrlKey || e.metaKey || e.altKey) return;
+        e.preventDefault();
+        open();
     });
 }
 

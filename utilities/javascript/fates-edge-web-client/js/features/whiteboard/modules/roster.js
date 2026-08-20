@@ -31,7 +31,7 @@ export function populateRoster() {
         <div style="max-height:200px;overflow-y:auto;">
             ${items.map(item => `
                 <div class="roster-item" draggable="true" style="display:flex;align-items:center;gap:8px;padding:4px;border-bottom:1px solid var(--border);cursor:grab;">
-                    <img src="${escHtml(item.image)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+                    <img src="${escHtml(item.image)}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
                     <span class="text-sm">${escHtml(item.name)}</span>
                 </div>
             `).join('')}

@@ -252,7 +252,7 @@ export function renderOverlay() {
         return `
         <div style="position:absolute;left:${img.x}px;top:${img.y}px;cursor:${canDrag && !locked ? 'grab' : 'pointer'};z-index:5;pointer-events:auto;opacity:${opacity};"
              ${canDrag && !locked ? `onmousedown="window.__wbStartDragImage('${img.id}', event)"` : ''}>
-            <img src="${img.data}" style="max-width:250px;max-height:250px;border-radius:4px;display:block;border:1px solid var(--border);" draggable="false" />
+            <img src="${img.data}" alt="Image pinned to the whiteboard" style="max-width:250px;max-height:250px;border-radius:4px;display:block;border:1px solid var(--border);" draggable="false" />
             <button class="btn btn-xs btn-danger absolute" style="top:-8px;right:-8px;" onclick="window.deleteWhiteboardImage('${img.id}')">✕</button>
         </div>
     `;
@@ -267,7 +267,7 @@ export function renderOverlay() {
         return `
         <div style="position:absolute;left:${token.x}px;top:${token.y}px;cursor:${canDrag && !locked ? 'grab' : 'default'};z-index:15;pointer-events:auto;opacity:${opacity};display:flex;flex-direction:column;align-items:center;"
              ${canDrag && !locked ? `onmousedown="window.__wbStartDragToken('${token.id}', event)"` : ''}>
-            <img src="${escHtml(token.imageData)}" style="width:48px;height:48px;border-radius:4px;border:2px solid var(--gold);object-fit:cover;" draggable="false" />
+            <img src="${escHtml(token.imageData)}" alt="" style="width:48px;height:48px;border-radius:4px;border:2px solid var(--gold);object-fit:cover;" draggable="false" />
             <span style="font-size:0.7rem;color:var(--text);background:rgba(0,0,0,0.6);padding:0 4px;border-radius:2px;margin-top:2px;max-width:80px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${escHtml(token.name)}</span>
             <button class="btn btn-xs btn-danger" style="position:absolute;top:-8px;right:-8px;padding:0 4px;font-size:0.6rem;border-radius:50%;" onclick="window.deleteCharacterToken('${token.id}')">✕</button>
         </div>

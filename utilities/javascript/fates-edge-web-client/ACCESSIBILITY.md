@@ -67,14 +67,13 @@ The suggestion to strip `aria-*`/`role` attributes from user-authored rich text 
 
 ---
 
-## Deferred (not implemented this pass)
+## Deferred (not implemented)
 
-Scoped out deliberately, to keep this pass focused and reviewable rather than attempt everything in one sweep:
+Scoped out deliberately, to keep each pass focused and reviewable rather than attempt everything at once:
 
 - Voice chat visual/text speaking indicators (who's currently talking, for players who can't rely on audio cues).
-- A GM keyboard-shortcuts reference/help modal — see **Setting the stage** below for a real inventory of what already exists to build it from.
 - `inert`-based focus-trapping for inline editor screens (currently only true `role="dialog"` modals trap focus; full-screen inline editors do not).
-- Automated accessibility regression testing — see **Setting the stage** below for a plan that fits this project's actual test runner (it doesn't use Jest).
+- Real axe-core/headless-browser coverage in CI (see **Automated accessibility regression testing**, option 2 below — the cheap option-1 lint is now implemented; the real-browser option is still open).
 - A Lighthouse CI GitHub Action.
 - Discord bot embed accessibility (alt text on embed images, plain-text fallbacks).
 - Foundry bridge inheriting/propagating `CONFIG.ariaLabels` from the host Foundry instance.
@@ -85,13 +84,17 @@ These remain a reasonable roadmap for a follow-up pass.
 
 ---
 
-## Setting the stage for the next pass
+## Follow-up pass: GM shortcuts modal + automated lint coverage
 
-Two of the deferred items above are big enough that "implement it" isn't a one-sitting task, but each has real groundwork worth capturing now rather than starting from zero later.
+Two items that were originally left as "groundwork for later" got built out in a second pass.
 
-### GM keyboard-shortcuts modal — existing shortcut inventory
+### GM keyboard-shortcuts modal — implemented
 
-There are **22 separate `addEventListener('keydown', ...)` call sites** across the codebase, each independently defining its own key handling with no central registry. Before a shortcuts-help modal can exist, its content has to come from *somewhere real* — the table below is that inventory, gathered by grepping every keydown handler in `js/` rather than guessed:
+A `#shortcutsModal` (standard `.modal-overlay`/`.modal` markup, so it gets close-button/outside-click/Escape handling for free from the existing `setupModals()`) is now reachable two ways: the sidebar footer's new ⌨️ button, or pressing `?` anywhere that isn't a text-entry control (checked via `target.matches('input, textarea, select, [contenteditable="true"]')`, and skipped if any modifier key is held, so it never steals a literal `?` from chat/search/any input). Wired up in `js/app.js`'s `setupShortcutsModal()`.
+
+Its content is the GM-relevant subset of the shortcut inventory below: X-Card toggle, the combat timer's Space/R, and whiteboard undo/redo — the ones worth a mid-session reminder. `Escape` and `?` itself are listed too, since a shortcuts list that doesn't mention how to close itself is an odd first impression.
+
+Existing shortcut inventory (kept here for reference — this is what the modal's content was built from). There are **22 separate `addEventListener('keydown', ...)` call sites** across the codebase, each independently defining its own key handling with no central registry:
 
 | Shortcut | Where | What it does |
 |---|---|---|
@@ -104,17 +107,26 @@ There are **22 separate `addEventListener('keydown', ...)` call sites** across t
 | `Ctrl/Cmd+Z` | Whiteboard (`whiteboard/modules/ui.js`) | Undo |
 | `Ctrl/Cmd+Y` or `Ctrl/Cmd+Shift+Z` | Whiteboard (`whiteboard/modules/ui.js`) | Redo |
 
-The other 12+ keydown sites (character editor/wizard/roller, talent editor, patrons, search, settings, spellcraft calculator, travel planner, whiteboard onboarding, wiki editor, talent-effects, local-lock/password, feature-flags, utils) were checked and are internal input-handling (autocomplete navigation, form submission, modal dismissal on their own scoped inputs) rather than discoverable "shortcuts" a GM would want listed — they're omitted from the table above as noise, not overlooked.
+The other 12+ keydown sites (character editor/wizard/roller, talent editor, patrons, search, settings, spellcraft calculator, travel planner, whiteboard onboarding, wiki editor, talent-effects, local-lock/password, feature-flags, utils) were checked and are internal input-handling (autocomplete navigation, form submission, modal dismissal on their own scoped inputs) rather than discoverable "shortcuts" a GM would want listed — deliberately left out of the modal's content as noise, not overlooked.
 
-**Next step for whoever builds the modal:** the GM-relevant subset worth surfacing is the X-Card toggle, the combat timer's Space/R shortcuts, and the whiteboard undo/redo — those are the ones a GM would plausibly want a reminder of mid-session. A simple `role="dialog"` modal (matching the existing modal pattern already used elsewhere in the app) listing exactly those, wired to a new keybinding (e.g. `?` or `Ctrl+/`, both currently unused — confirmed via the same grep), is a scoped, low-risk follow-up.
-
-### Automated accessibility regression testing — a plan that fits this project's actual setup
+### Automated accessibility regression testing — cheap option implemented, real option still open
 
 The original review suggested Jest + `axe-core`. Checked against the actual project: **there is no Jest here** — `npm test` runs `tests/runner.js`, a small hand-rolled test framework (`assert`/`assertEqual`/`assertTrue`/etc.) that runs directly under plain `node`, with `tests/support/dom-shim.js` providing a deliberately minimal DOM/localStorage/window stub (explicitly *not* jsdom, to stay lightweight — see that file's own header comment). `axe-core` itself needs a real DOM to walk (computed styles, layout, live `getComputedStyle`) — it fundamentally can't run against the current shim, and swapping in jsdom (or a real headless browser) just to support it would be a meaningfully bigger infrastructure change than "add a test."
 
-Two realistic paths, in increasing order of investment:
+**Implemented: `tests/unit/a11y-lint.test.js`** — a static-analysis pass over the actual source, using the project's own `describe`/`it`/`assert` conventions, zero new dependencies. It checks three things, each a direct regression guard for a bug this project has actually had:
 
-1. **Cheap, no new dependency: a static-analysis lint pass over feature templates.** Most of what this pass fixed (`aria-selected` never set, unlabeled sliders, missing `role="log"`) is pattern-matchable in the *source* — e.g. a small Node script (using the project's existing `tests/runner.js` conventions) that scans `js/features/**/*.js` for `<input type="range"` without a nearby `aria-label`/`aria-labelledby`, `<img` without `alt`, or `role="tab"` buttons without a matching `aria-controls`. This wouldn't catch everything axe-core would, but it would catch regressions of the exact bugs this pass just fixed, runs in milliseconds, and needs zero new dependencies — a natural fit to add as a new `tests/unit/a11y-lint.test.js` alongside the existing suite.
-2. **Real coverage, real cost: swap the shim for a headless browser in CI only.** Add Playwright (not currently a dependency anywhere in this repo — confirmed by checking every `package.json`) as a *separate*, opt-in test target — e.g. `npm run test:a11y` — that boots the built `dist/` in headless Chromium and runs `@axe-core/playwright` against each routed tab. This gives real axe-core coverage without touching `tests/runner.js` or its shim at all, and can be wired into a Lighthouse CI GitHub Action (the review's other suggestion) as the same job, since both need a real browser anyway. This is a genuinely new devDependency and CI job, not a small add — size it as its own follow-up piece of work.
+1. Every `<input type="range">` under `js/features/` has `aria-label` or `aria-labelledby`.
+2. Every `<img>` under `js/features/` and in `index.html` has an `alt` attribute (empty `alt=""` counts — that's the correct, deliberate marker for a decorative image whose meaning is carried by adjacent visible text; only a fully missing `alt` is flagged).
+3. Every sidebar `role="tab"` button in `index.html` has `aria-controls`, and `router.js` still contains the `setAttribute('aria-selected', ...)` call that keeps `aria-selected` in sync at runtime (a regression guard for the exact bug the first accessibility pass fixed).
 
-Recommendation: start with (1) now — it's genuinely cheap and directly encodes what this pass already learned — and treat (2) as the real "Jest + axe-core"-equivalent follow-up, sized correctly for what it actually requires.
+Writing this test immediately found three more real, previously-unnoticed gaps it was designed to catch: two `<img>` tags in the whiteboard's own renderer (a pinned image, and — since its accompanying text label already names it — a character token) and one in the roster panel, all missing `alt` entirely. Fixed alongside the test (`alt="Image pinned to the whiteboard"` for the standalone image; `alt=""` for the two with an adjacent visible name label, to avoid double-announcing the same information). All four lint checks pass against the current codebase; `npm test` is 141-142/142 depending on run (see note below).
+
+This is not full axe-core coverage — it can't check contrast, focus order, or anything that needs actual layout/computed styles — but it directly guards the exact classes of regression this project has already shipped once.
+
+**Still open — real coverage, real cost:** swap in a headless browser for CI only. Add Playwright (not currently a dependency anywhere in this repo — confirmed by checking every `package.json`) as a *separate*, opt-in test target — e.g. `npm run test:a11y` — that boots the built `dist/` in headless Chromium and runs `@axe-core/playwright` against each routed tab. This gives real axe-core coverage without touching `tests/runner.js` or its shim at all, and can be wired into a Lighthouse CI GitHub Action (the review's other suggestion) as the same job, since both need a real browser anyway. This is a genuinely new devDependency and CI job, not a small add — size it as its own follow-up piece of work.
+
+---
+
+## Note on test suite flakiness (pre-existing, unrelated to this work)
+
+`npm test` currently shows 141/142 or 142/142 depending on the run: `TollVeilEngine: follow-suit and trump-breaking › must follow suit when able` fails intermittently (confirmed by re-running it several times in isolation — it passes most runs, fails occasionally with `expected ♢, got null`). This is a pre-existing flake in the Toll & Veil card-engine test, unrelated to any file this accessibility pass touched, and out of scope here — flagged for whoever next works in `tests/unit/toll-and-veil.test.js` to track down (likely an unseeded random draw somewhere in the AI-play test path).

@@ -444,7 +444,7 @@ export function render(el) {
                             <button class="btn btn-sm btn-ghost" id="whiteboard-fog-clear" title="Clear all fog data">Clear Fog</button>
                         </div>
                         <div class="flex gap-1 flex-center">
-                            <label class="text-muted text-sm flex gap-1 flex-center" title="Darkness level">Dark <input type="range" id="whiteboard-fog-darkness" min="0" max="1" step="0.01" value="${state.gridCombat.fogOfWar?.darkness ?? 0.85}" style="width:80px;" /><span id="whiteboard-darkness-value" class="text-xs" style="min-width:30px;">${Math.round((state.gridCombat.fogOfWar?.darkness ?? 0.85) * 100)}%</span></label>
+                            <label class="text-muted text-sm flex gap-1 flex-center" title="Darkness level">Dark <input type="range" id="whiteboard-fog-darkness" min="0" max="1" step="0.01" value="${state.gridCombat.fogOfWar?.darkness ?? 0.85}" style="width:80px;" aria-label="Fog darkness level" /><span id="whiteboard-darkness-value" class="text-xs" style="min-width:30px;">${Math.round((state.gridCombat.fogOfWar?.darkness ?? 0.85) * 100)}%</span></label>
                             <button class="btn btn-sm btn-secondary" id="whiteboard-manage-lights">💡 Manage Lights</button>
                         </div>
                     </div>

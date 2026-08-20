@@ -270,6 +270,7 @@
                     <button class="footer-btn" id="importBtn" title="Import JSON" aria-label="Import Data">⬆</button>
                     <input type="file" id="importFile" accept=".json" class="hidden" />
                     <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle Theme">🌙</button>
+                    <button class="footer-btn" id="shortcutsBtn" title="Keyboard shortcuts (?)" aria-label="Keyboard Shortcuts">⌨️</button>
                     <button class="footer-btn" id="lockAppBtn" title="Lock screen" aria-label="Lock Screen">🔒</button>
                 </div>
             </div>
@@ -356,6 +357,44 @@
                 <button class="btn" id="wizard-back">← Back</button>
                 <button class="btn btn-gold" id="wizard-next">Next →</button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="shortcutsModal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title">
+        <div class="modal" style="max-width:480px;">
+            <button class="modal-close" id="shortcutsModalClose" aria-label="Close">&times;</button>
+            <h2 id="shortcuts-modal-title">⌨️ Keyboard Shortcuts</h2>
+            <dl class="shortcuts-list">
+                <div class="shortcuts-row">
+                    <dt><kbd>?</kbd></dt>
+                    <dd>Open this shortcuts list</dd>
+                </div>
+                <div class="shortcuts-row">
+                    <dt><kbd>Esc</kbd></dt>
+                    <dd>Close the open dialog or panel</dd>
+                </div>
+                <div class="shortcuts-row">
+                    <dt><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd></dt>
+                    <dd>Raise or resume the X-Card (safety pause), from anywhere</dd>
+                </div>
+                <div class="shortcuts-row">
+                    <dt><kbd>Space</kbd></dt>
+                    <dd>Advance to the next combatant, while the combat timer is open</dd>
+                </div>
+                <div class="shortcuts-row">
+                    <dt><kbd>R</kbd></dt>
+                    <dd>Reset the combat timer, while the combat timer is open</dd>
+                </div>
+                <div class="shortcuts-row">
+                    <dt><kbd>Ctrl</kbd> + <kbd>Z</kbd></dt>
+                    <dd>Undo the last whiteboard action, while the Whiteboard tab is open</dd>
+                </div>
+                <div class="shortcuts-row">
+                    <dt><kbd>Ctrl</kbd> + <kbd>Y</kbd></dt>
+                    <dd>Redo, while the Whiteboard tab is open</dd>
+                </div>
+            </dl>
+            <p class="text-muted text-xs" style="margin-top:0.5rem;">Shortcuts marked "while ... is open" only apply when that panel is focused or visible, so they don't clash with typing elsewhere.</p>
         </div>
     </div>
 
