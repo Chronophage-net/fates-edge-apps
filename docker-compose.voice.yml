@@ -34,17 +34,21 @@
 
 services:
   # ─── Chatterbox TTS (zero-shot voice cloning from a reference clip) ───
-  # Built straight from the upstream project's own Dockerfile via a git
-  # build context, rather than vendoring a copy here, so it stays in
-  # sync with upstream without us maintaining a fork. CPU-only image --
-  # see that project's docker-compose-cu*/​-rocm*.yml files if you have a
-  # GPU and want to hand-adapt this service to use one.
+  # Pulls upstream's own published GHCR image rather than building from
+  # source (an earlier version of this file built from a git context via
+  # Dockerfile.cpu -- switched because upstream already publishes
+  # multi-arch images, and pulling one is both faster (skips compiling
+  # torch/its dependency stack from source) and no heavier on network
+  # than building would have been anyway). `main-cpu` is their rolling
+  # CPU-build tag; override CHATTERBOX_IMAGE in .env.demo to use one of
+  # their GPU variants instead if your hardware supports it --
+  # main-nvidia / main-cu128 / main-rocm / main-strixhalo (see
+  # https://github.com/devnen/Chatterbox-TTS-Server/pkgs/container/chatterbox-tts-server
+  # for the current tag list; there's no plain "latest", it's per-variant).
+  # Pin to a `sha-<hash>-cpu` tag instead of `main-cpu` if you want a
+  # fixed, reproducible version rather than upstream's rolling build.
   tts:
-    build:
-      context: https://github.com/devnen/Chatterbox-TTS-Server.git
-      dockerfile: Dockerfile.cpu
-    image: fates-edge-demo-chatterbox:latest
-    pull_policy: never
+    image: ${CHATTERBOX_IMAGE:-ghcr.io/devnen/chatterbox-tts-server:main-cpu}
     container_name: fates-edge-demo-tts
     restart: unless-stopped
     ports:

@@ -16,6 +16,11 @@ Rolling chat history: newly-joined clients see recent room chat, not a blank pan
 - Purely in-memory, same lifetime as the room itself (cleared when a room empties out and gets recreated — see `room.js`'s `createRoom()`), same as `deckHistory`. Nothing is persisted to disk or a database.
 - **Whisper privacy is unchanged, not newly introduced:** whispered messages were already broadcast to every client in the room over the wire (only hidden client-side by `recipient` matching) — this feature extends that same existing exposure across time (a client joining mid-conversation now also receives whispers it would have received live had it been connected), it doesn't create a new one. Properly scoping whisper history to only its intended recipient(s) would need the server to track clientId↔recipient-name mapping and is a separate, larger change — flagging here rather than silently deciding either way.
 
+## [4.20.1] - 2026-08-21
+
+### Fixed
+- **`docker-compose.voice.yml`'s `tts` service now pulls upstream's published GHCR image (`ghcr.io/devnen/chatterbox-tts-server:main-cpu`) instead of building from a git context on every fresh `npm run demo -- --voice`.** [4.19.0] originally built it from source (`Dockerfile.cpu` via a git build context) reasoning that it would "stay in sync with upstream without maintaining a fork" — true, but upstream already publishes multi-arch images for exactly that reason, and pulling one is strictly better: no local build step, no compiling torch's dependency stack from source, same "no fork to maintain" property. `CHATTERBOX_IMAGE` in `.env.demo` overrides the tag if you want a GPU variant (`main-nvidia`/`main-cu128`/`main-rocm`/`main-strixhalo`) or a pinned `sha-<hash>-cpu` build instead of upstream's rolling `main-cpu`.
+
 ## [4.19.0] - 2026-08-20
 
 Voice-cloning sidecar for the demo stack: `npm run demo -- --voice`/`--voice-rvc`
