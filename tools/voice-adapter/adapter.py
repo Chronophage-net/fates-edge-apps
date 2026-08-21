@@ -26,9 +26,16 @@ Env vars (all optional, defaults match docker-compose.voice.yml):
                                convertVoice() already treats as "no RVC this
                                time" (see DESIGN.md 6.2's fail-soft note)
     ADAPTER_PORT               8095
+
+Note on the reference-file check below: this container gets its own
+read-only mount of voice-tts-reference/ (same host folder Chatterbox
+itself mounts) purely so it can check the file exists and log a clear
+warning -- it never reads the audio itself, `reference_audio_filename`
+is passed to Chatterbox by name and Chatterbox reads its own copy.
 """
 import base64
 import os
+from pathlib import Path
 
 import requests
 from flask import Flask, Response, jsonify, request
@@ -39,11 +46,23 @@ CHATTERBOX_URL = os.environ.get("CHATTERBOX_URL", "http://tts:8004")
 CHATTERBOX_REFERENCE_FILE = os.environ.get("CHATTERBOX_REFERENCE_FILE", "reference.wav")
 RVC_PYTHON_URL = os.environ.get("RVC_PYTHON_URL", "http://rvc:5050")
 ADAPTER_PORT = int(os.environ.get("ADAPTER_PORT", "8095"))
+REFERENCE_AUDIO_DIR = Path("/app/reference_audio")
+
+
+def reference_file_present():
+    """Cheap enough to call per-request (not just at startup) -- lets a
+    clip dropped in mid-session show up as 'present' without restarting
+    the container, and keeps /healthz honest at any point in time."""
+    return (REFERENCE_AUDIO_DIR / CHATTERBOX_REFERENCE_FILE).is_file()
 
 
 @app.route("/healthz", methods=["GET"])
 def healthz():
-    return jsonify({"ok": True}), 200
+    return jsonify({
+        "ok": True,
+        "referenceFile": CHATTERBOX_REFERENCE_FILE,
+        "referenceFilePresent": reference_file_present(),
+    }), 200
 
 
 @app.route("/synthesize", methods=["POST"])
@@ -54,6 +73,15 @@ def synthesize():
 
     if not text:
         return jsonify({"error": "missing 'text'"}), 400
+
+    if not reference_file_present():
+        # Not an error -- Chatterbox falls back to its own predefined
+        # voice when the named reference file doesn't exist, so this
+        # still produces audio, just not a cloned one. Logged (not
+        # jsonify'd into the error path) so it doesn't look like a
+        # failure to the bot, only to whoever's watching `docker logs`.
+        print(f"[voice-adapter] WARNING: reference file '{CHATTERBOX_REFERENCE_FILE}' not found "
+              f"under {REFERENCE_AUDIO_DIR} -- Chatterbox will use its stock voice instead of cloning.")
 
     payload = {
         "text": text,
@@ -103,4 +131,10 @@ if __name__ == "__main__":
     print(f"voice-adapter listening on :{ADAPTER_PORT}")
     print(f"  /synthesize -> {CHATTERBOX_URL}/tts (reference file: {CHATTERBOX_REFERENCE_FILE})")
     print(f"  /convert    -> {RVC_PYTHON_URL}/convert")
+    if reference_file_present():
+        print(f"  ✓ reference file found: {REFERENCE_AUDIO_DIR / CHATTERBOX_REFERENCE_FILE}")
+    else:
+        print(f"  ⚠ reference file NOT found: {REFERENCE_AUDIO_DIR / CHATTERBOX_REFERENCE_FILE} "
+              f"-- drop a clip there (see voice-tts-reference/README.md) to get a cloned voice; "
+              f"Chatterbox's stock voice is used until then.")
     app.run(host="0.0.0.0", port=ADAPTER_PORT)

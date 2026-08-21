@@ -225,8 +225,10 @@ echo
 
 if [[ "$VOICE" == true ]]; then
     echo "🎙️  --voice: bringing up Chatterbox + voice-adapter too."
-    echo "   First run downloads Chatterbox's model weights (multi-GB) -- this is on top of"
-    echo "   the Ollama pull above and can take a while depending on your connection."
+    echo "   First run pulls the Chatterbox image, then downloads its model weights on"
+    echo "   first startup (together, roughly a few GB) -- this is on top of the Ollama"
+    echo "   pull above and can take 10-15 minutes on a slower connection. Watch progress"
+    echo "   with: docker logs -f fates-edge-demo-tts"
     if [[ ! -s "$REPO_ROOT/voice-tts-reference/${CHATTERBOX_REFERENCE_FILE:-reference.wav}" ]]; then
         echo "   ⚠️  No reference clip found at voice-tts-reference/${CHATTERBOX_REFERENCE_FILE:-reference.wav} --"
         echo "      the GM will still talk, just in Chatterbox's stock voice, not a cloned one."

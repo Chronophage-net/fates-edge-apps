@@ -3,6 +3,23 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.20.2] - 2026-08-21
+
+Voice-adapter/demo hardening from a code-review pass on `docker-compose.voice.yml`
+
+### Added
+- **Reference-clip existence check** (`tools/voice-adapter/adapter.py`) — `voice-adapter` now gets its own read-only mount of `voice-tts-reference/` (the same host folder Chatterbox itself mounts) purely to check the configured `CHATTERBOX_REFERENCE_FILE` actually exists, logging a clear warning at startup and on every `/synthesize` call when it's missing, and reporting `referenceFilePresent`/`referenceFile` from `/healthz`. Not an error condition — Chatterbox falls back to its stock voice either way — but it used to be a silent "why does it sound like the stock voice?" discovery instead of a `docker logs` line. `tools/demo.sh --voice` already checked for the file before startup (since [4.19.0]); this covers the same gap for anyone running `docker compose` directly.
+- **Soft memory guard on `tts`** (`mem_limit: ${CHATTERBOX_MEMORY_LIMIT:-6g}`) — Chatterbox on CPU can use several GB during inference, and shares a machine with Ollama/the socket server/etc. in the demo stack; an unbounded container is the one most likely to starve everything else if something goes wrong. Deliberately the legacy top-level `mem_limit` key, not `deploy.resources.limits` — the latter is a Swarm-mode construct that plain `docker compose up` silently ignores outside a stack deploy, which would have made the limit a no-op.
+- Clearer first-run size/time messaging in `tools/demo.sh --voice` (rough GB/minutes estimate, points at `docker logs -f fates-edge-demo-tts` for progress).
+
+### Notes
+- Prompted by a code-review pass on the voice-cloning overlay. Most of its other suggestions were already covered by existing design (RVC model-discovery warnings already live in `demo.sh`; `depends_on: condition: service_healthy` already gates startup ordering, making adapter-side retry logic redundant) or were declined with reasoning: an HTTP healthcheck that actually runs synthesis every 15-30s would burn real CPU/RAM on a model server for marginal benefit over a plain reachability check; a TTS-model pre-pull init container was left out because the reviewer's suggested Hugging Face repo ID (Coqui XTTS-v2) doesn't match Chatterbox's actual model, and shipping an unverified repo ID risked pulling the wrong model entirely.
+
+## [4.20.1] - 2026-08-21
+
+### Fixed
+- **`docker-compose.voice.yml`'s `tts` service now pulls upstream's published GHCR image (`ghcr.io/devnen/chatterbox-tts-server:main-cpu`) instead of building from a git context on every fresh `npm run demo -- --voice`.** [4.19.0] originally built it from source (`Dockerfile.cpu` via a git build context) reasoning that it would "stay in sync with upstream without maintaining a fork" — true, but upstream already publishes multi-arch images for exactly that reason, and pulling one is strictly better: no local build step, no compiling torch's dependency stack from source, same "no fork to maintain" property. `CHATTERBOX_IMAGE` in `.env.demo` overrides the tag if you want a GPU variant (`main-nvidia`/`main-cu128`/`main-rocm`/`main-strixhalo`) or a pinned `sha-<hash>-cpu` build instead of upstream's rolling `main-cpu`.
+
 ## [4.20.0] - 2026-08-20
 
 Rolling chat history: newly-joined clients see recent room chat, not a blank pane
@@ -15,11 +32,6 @@ Rolling chat history: newly-joined clients see recent room chat, not a blank pan
 ### Notes
 - Purely in-memory, same lifetime as the room itself (cleared when a room empties out and gets recreated — see `room.js`'s `createRoom()`), same as `deckHistory`. Nothing is persisted to disk or a database.
 - **Whisper privacy is unchanged, not newly introduced:** whispered messages were already broadcast to every client in the room over the wire (only hidden client-side by `recipient` matching) — this feature extends that same existing exposure across time (a client joining mid-conversation now also receives whispers it would have received live had it been connected), it doesn't create a new one. Properly scoping whisper history to only its intended recipient(s) would need the server to track clientId↔recipient-name mapping and is a separate, larger change — flagging here rather than silently deciding either way.
-
-## [4.20.1] - 2026-08-21
-
-### Fixed
-- **`docker-compose.voice.yml`'s `tts` service now pulls upstream's published GHCR image (`ghcr.io/devnen/chatterbox-tts-server:main-cpu`) instead of building from a git context on every fresh `npm run demo -- --voice`.** [4.19.0] originally built it from source (`Dockerfile.cpu` via a git build context) reasoning that it would "stay in sync with upstream without maintaining a fork" — true, but upstream already publishes multi-arch images for exactly that reason, and pulling one is strictly better: no local build step, no compiling torch's dependency stack from source, same "no fork to maintain" property. `CHATTERBOX_IMAGE` in `.env.demo` overrides the tag if you want a GPU variant (`main-nvidia`/`main-cu128`/`main-rocm`/`main-strixhalo`) or a pinned `sha-<hash>-cpu` build instead of upstream's rolling `main-cpu`.
 
 ## [4.19.0] - 2026-08-20
 

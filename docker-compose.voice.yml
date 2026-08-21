@@ -68,6 +68,15 @@ services:
       timeout: 10s
       retries: 10
       start_period: 120s
+    # Soft guard, not a measured budget -- Chatterbox on CPU can use
+    # several GB during inference and this stack shares a machine with
+    # Ollama/the socket server/etc., so an unbounded TTS container is the
+    # one most likely to starve everything else if something goes wrong
+    # (a stuck request, a memory leak in a dependency). Override
+    # CHATTERBOX_MEMORY_LIMIT in .env.demo if this trips on a real
+    # workload -- raise it, or set it far above your RAM to effectively
+    # disable it.
+    mem_limit: ${CHATTERBOX_MEMORY_LIMIT:-6g}
     networks:
       - fates-edge-demo-network
 
@@ -105,6 +114,13 @@ services:
       - CHATTERBOX_REFERENCE_FILE=${CHATTERBOX_REFERENCE_FILE:-reference.wav}
       - RVC_PYTHON_URL=http://rvc:5050
       - ADAPTER_PORT=8095
+    volumes:
+      # Read-only -- the adapter never writes here, it just checks the
+      # reference clip actually exists (once at startup, logged; see
+      # adapter.py) so a missing/misnamed file shows up as a clear log
+      # line instead of a silent "why does it sound like the stock
+      # voice?" the first time you actually talk to the GM.
+      - ./voice-tts-reference:/app/reference_audio:ro
     ports:
       - "${VOICE_ADAPTER_PORT:-8095}:8095"
     healthcheck:
