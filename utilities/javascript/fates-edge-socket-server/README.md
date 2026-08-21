@@ -1,46 +1,40 @@
-# Fate's Edge Socket Server v4.16.1 — Real-Time VTT & Campaign Sharing
+# Fate's Edge Socket Server
 
-**Fate's Edge** is a narrative‑first TTRPG system. This is the real‑time backend for the web toolkit: a WebSocket/Socket.io server that syncs campaign state live across your group, plus a short‑code **campaign sharing** endpoint for loading/saving full toolkit state without a persistent connection.
+The real-time backend for the Fate's Edge web toolkit: a WebSocket/Socket.IO server that syncs campaign state live across a group, plus a short-code **campaign sharing** endpoint for loading and saving a full toolkit snapshot without staying connected.
 
-> This server lives at `utilities/javascript/fates-edge-socket-server/` inside the main [fates-edge-apps](../../../README.md) monorepo. It is no longer distributed as a standalone repo.
-
----
-
-## ✨ What this actually does
-
-Earlier documentation for this server described it as a minimal REST endpoint for uploading/downloading a JSON blob. That's still one thing it does, but the real server (`server/`) is considerably more:
-
-- **Real‑time sync** — chat, dice rolls, character updates, timers, and scene changes broadcast to every connected client, over both a Socket.io transport and a raw `ws` transport (`server/socketio-handlers.js`, `server/ws-handlers.js`).
-- **Account authentication** — `server/auth.js` provides real user accounts: `POST /api/auth/register` and `POST /api/auth/login` hash passwords with bcrypt and issue JWT session tokens, layered alongside the existing per-request API-key authentication used for service-to-service calls.
-- **GM election & rooms** — `server/room.js` handles requesting, approving, and transferring GM status per room/campaign code.
-- **Roles & character registration (v4.8)** — beyond the single GM seat above, `server/room.js` now supports GM-granted Co-GM promotions (session-only or saved), a read-only Spectator role, and a claim/release bridge that binds a player's saved character (their account library) to a room's live roster. See [ROLES.md](ROLES.md) for the full model, including diagrams.
-- **Optional scaling, two axes** — off by default (single process, no external dependency). Use more of one machine's CPU cores with `CLUSTER_WORKERS` (Node `cluster` + sticky sessions, no Redis needed), or run more than one machine behind a load balancer with `REDIS_URL` (a pub/sub relay). The two combine. See [SCALING.md](SCALING.md).
-- **Rate limiting & per-room client caps** — a general per-IP limit across the whole REST API, a per-connection message-rate limit on both WebSocket transports, and an optional per-room client cap (`MAX_CLIENTS_PER_ROOM`). All configurable, all off/generous by default. See [DESIGN.md](DESIGN.md) §5.
-- **Shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data (`data/regions/`) as the web client. Shuffles run on a per-room seedable PRNG (`server/rng.js`, xorshift128) rather than bare `Math.random()`, so a room's shuffle sequence is reproducible from its seed — see `GET`/`POST /api/rooms/:code/deck/seed` below.
-- **Adventure Engine climax pacing** — `server/adventure.js` tracks how many scenes a triggered climax act has run (`climaxScenesSinceTrigger`) against a configurable pad (`climaxPadScenes`, default 2), and exposes `POST /api/rooms/:code/adventure/climax-forced` for driving a stalled climax toward resolution once the pad is exhausted (`climaxForced` flips true). Also passes through a loaded module's `persistence` (Legacy Tracker) schema read-only via the reference endpoint, for bot-side campaign carryover.
-- **Campaign persistence** — `server/storage.js` stores campaigns, rooms, accounts, and characters in a database: SQLite by default (`campaigns.db`, see [INSTALL.md](INSTALL.md#backing-up-your-campaigns-your-world-save) for backup notes), or Postgres/MySQL via `DATABASE_TYPE`/`DATABASE_URL`.
-- **Security & config** — `server/security.js` and `server/config.js` handle basic request validation and environment-driven configuration.
-- **A bundled test/reference dataset** — `data/patrons/the_traveler.json` and `data/regions/acasia.json` ship with the server so you can smoke-test deck draws and patron lookups without the full web client's data folder.
-- **A Python CLI** (`fates-edge-cli.py`) for exercising the server from the command line without a browser.
+> This server lives at `utilities/javascript/fates-edge-socket-server/`, inside the [fates-edge-apps](../../../README.md) monorepo — a sibling directory to the web client, not a separate repository.
 
 ---
 
-## 🚀 Getting Started
+## What it does
 
-**→ See [INSTALL.md](INSTALL.md) for the full setup guide** — Docker or
-manual Node.js, opening your server to players, backups, updates, and
-troubleshooting, written for anyone who's run a dedicated game server
-before. The short version:
+- **Real-time sync** — chat, dice rolls, character updates, timers, and scene changes broadcast to every connected client, over both a Socket.IO transport and a raw `ws` transport (`server/socketio-handlers.js`, `server/ws-handlers.js`) so the client can use whichever is more reliable in a given deployment.
+- **Account authentication** — `server/auth.js` provides real user accounts: `POST /api/auth/register` and `POST /api/auth/login` hash passwords with bcrypt and issue JWT session tokens, alongside the existing per-request API-key authentication used for service-to-service calls.
+- **GM election & rooms** — `server/room.js` handles requesting, approving, and transferring GM status per room/campaign code, plus GM-granted Co-GM and Assistant-GM promotions, a read-only Spectator role, and a claim/release bridge that binds a player's saved character to a room's live roster. See [`ROLES.md`](ROLES.md) for the full model, with diagrams.
+- **The Adventure Engine** — `server/adventure.js` loads and runs structured adventures (acts, scenes, encounters, timers, knowledge/reveal state, climax pacing), with matching REST and Socket.IO/WS events for every mutation.
+- **The shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data as the web client. Shuffles run on a per-room seedable PRNG (`server/rng.js`), so a room's shuffle sequence is reproducible from its seed via `GET`/`POST /api/rooms/:code/deck/seed`.
+- **Module management** — installable adventure modules can be listed, pushed to connected clients, and cleaned up; see [`MODULES.md`](MODULES.md).
+- **Scaling, two independent axes** — off by default (single process, no external dependency). `CLUSTER_WORKERS` uses more of one machine's CPU cores via Node's `cluster` module; `REDIS_URL` runs multiple instances behind a load balancer via a pub/sub relay. The two combine. See [`SCALING.md`](SCALING.md).
+- **Rate limiting & per-room client caps** — a general per-IP limit across the REST API, a per-connection message-rate limit on both WebSocket transports, and an optional per-room client cap. All configurable, all generous/off by default. See [`DESIGN.md`](DESIGN.md) §5.
+- **Campaign persistence** — `server/storage.js` stores campaigns, rooms, accounts, and characters in SQLite by default (`campaigns.db`; see [`INSTALL.md`](INSTALL.md#backing-up-your-campaigns-your-world-save) for backups), or Postgres/MySQL via `DATABASE_TYPE`/`DATABASE_URL`.
+- **TURN credential minting** — `server/turn.js` mints short-lived coturn credentials for the web client's voice chat, so it can traverse symmetric NAT and restrictive firewalls rather than relying on STUN alone.
+- **A bundled reference dataset** (`data/patrons/the_traveler.json`, `data/regions/acasia.json`) and a Python CLI (`fates-edge-cli.py`), so you can smoke-test deck draws and patron lookups without the full web client's data folder.
+
+---
+
+## Getting started
+
+**→ See [`INSTALL.md`](INSTALL.md) for the full setup guide** — Docker or manual Node.js, opening your server to players, backups, updates, and troubleshooting. The short version:
 
 ```bash
 cd utilities/javascript/fates-edge-socket-server
-cp .env.example .env   # your server config file — set a real API_KEY
+cp .env.example .env   # set a real API_KEY
 docker compose up -d
 ```
 
 The server listens on port **10000** by default (`PORT` in `.env`).
 
-### Manual Setup (no Docker)
+### Manual setup (no Docker)
 
 ```bash
 cd utilities/javascript/fates-edge-socket-server
@@ -60,45 +54,32 @@ docker run -d -p 10000:10000 --name campaign-server \
   fates-edge-socket-server
 ```
 
-The `-v .../data` mount + `DATABASE_URL` pointing inside it is what makes
-your campaign data (a SQLite database, not individual files — see
-"Server Layout" below) survive a container restart; see
-[INSTALL.md](INSTALL.md#backing-up-your-campaigns-your-world-save) for
-details. **`docker compose up -d` (below) already sets this up for you**
-— prefer it over the raw `docker run` above unless you have a reason not to.
+The `-v .../data` mount plus `DATABASE_URL` pointing inside it is what makes your campaign data (a SQLite database, not individual files — see "Server layout" below) survive a container restart; see [`INSTALL.md`](INSTALL.md#backing-up-your-campaigns-your-world-save). `docker compose up -d` below already sets this up for you — prefer it unless you have a reason not to.
 
 ### Docker Compose (recommended — server + optional TURN for voice chat)
 
 ```bash
-cp .env.example .env   # fill in API_KEY, and TURN_SECRET/TURN_URLS if you want voice chat to work behind strict NATs/firewalls
+cp .env.example .env   # fill in API_KEY, and TURN_SECRET/TURN_URLS if you want voice chat behind strict NATs
 docker compose up -d
 ```
 
-This starts the server (with campaign persistence already configured
-correctly) plus a [coturn](https://github.com/coturn/coturn) TURN relay
-for the web client's voice chat feature (`js/features/vtt/voice.js`).
-Voice chat works without any TURN configuration too — it just falls back
-to STUN-only, which can't traverse symmetric NAT/restrictive firewalls.
-See `env-example.md`, [INSTALL.md](INSTALL.md#voice-chat-optional), and
-the comments in `docker-compose.yml` for the full TURN setup (including
-optional TLS for firewalls that block everything but HTTPS-looking
-traffic).
+Starts the server (with campaign persistence already configured) plus a [coturn](https://github.com/coturn/coturn) TURN relay for the web client's voice chat. Voice chat works without any TURN configuration too — it just falls back to STUN-only, which can't traverse symmetric NAT/restrictive firewalls. See `env-example.md`, [`INSTALL.md`](INSTALL.md#voice-chat-optional), and the comments in `docker-compose.yml` for the full TURN setup, including optional TLS.
 
 ---
 
-## 🔌 Using Campaign Sharing (short‑code upload/download)
+## Using campaign sharing (short-code upload/download)
 
 1. In the web client, go to **Settings → Campaign Sharing**.
-2. Enter your server's URL (e.g., `http://localhost:3000`).
-3. Click **Upload Current State** — the server returns a short code (e.g., `A9K3LQ`), matching the file names you'll see land under `server/campaigns/` (e.g. `HMRU2I.json`, `K112VK.json`).
+2. Enter your server's URL (e.g. `http://localhost:10000`).
+3. Click **Upload Current State** — the server returns a short code (e.g. `A9K3LQ`), matching a file under `server/campaigns/` (e.g. `A9K3LQ.json`).
 4. Share the code with your players. They enter the same server URL and code, then **Load State**.
-5. Use **Delete Campaign** to remove a stored campaign from the server.
+5. **Delete Campaign** removes a stored campaign from the server.
 
-For live, always‑connected play (chat/dice/GM election/deck draws shared in real time rather than a manual upload/download), connect to the same server URL from the **VTT** tab instead — that's the Socket.io/`ws` path, not the upload endpoint.
+For live, always-connected play — chat, dice, GM election, and deck draws shared in real time rather than a manual upload/download — connect to the same server URL from the **VTT** tab instead. That's the Socket.IO/`ws` path, distinct from the upload endpoint above.
 
 ---
 
-## 📦 Server Layout
+## Server layout
 
 ```
 fates-edge-socket-server/
@@ -111,9 +92,9 @@ fates-edge-socket-server/
 │   ├── patrons/the_traveler.json
 │   └── regions/acasia.json
 ├── DESIGN.md
-├── ROLES.md                    # role/permission model, promoted out of DESIGN.md (with diagrams)
-├── SCALING.md                  # optional multi-core (cluster) and multi-instance (Redis) deployment
-├── ROADMAP.md                  # genuinely planned, not-yet-built work (server-specific)
+├── ROLES.md                    # role/permission model, with diagrams
+├── SCALING.md                  # multi-core (cluster) and multi-instance (Redis) deployment
+├── ROADMAP.md                  # planned, not-yet-built work (server-specific)
 ├── docker-compose.yml          # server + coturn (see "Docker Compose" above)
 ├── Dockerfile
 ├── fates-edge-cli.py           # Python CLI test client
@@ -131,81 +112,81 @@ fates-edge-socket-server/
 │   ├── cluster.js                # optional Node `cluster`-based multi-core scaling — see SCALING.md
 │   ├── config.js                 # env/config.json loader
 │   ├── deck.js                   # Deck of Consequences logic
-│   ├── index.js                  # the actual server implementation (Express + Socket.io + ws + scaling wiring)
+│   ├── index.js                  # the server implementation (Express + Socket.IO + ws + scaling wiring)
 │   ├── logger.js
 │   ├── module-manifest-utils.js  # shared manifest-deriving logic (API install path + generate-manifest.js)
 │   ├── room.js                   # GM election / room state / broadcastToRoom
 │   ├── scaling.js                # optional Redis-backed horizontal scaling — see SCALING.md
-│   ├── security.js               # input validation + rate limiters (HTTP per-IP and per-connection WS message)
-│   ├── server.js                 # one-line re-export of index.js (kept only so server-start.js's require path still works)
-│   ├── socketio-handlers.js      # Socket.io transport
+│   ├── security.js               # input validation + rate limiters
+│   ├── server.js                 # re-exports index.js (server-start.js's require target)
+│   ├── socketio-handlers.js      # Socket.IO transport
 │   ├── storage.js
-│   ├── turn.js                   # short-lived TURN credential minting (see TURN docs above)
+│   ├── turn.js                   # short-lived TURN credential minting
 │   └── ws-handlers.js            # plain-WebSocket transport (the web client's default)
-├── server-start.js             # entry point (requires server/server.js)
+├── server-start.js             # entry point
 └── utils/
     ├── config.js
     ├── logger.js
     └── websocket.js
 ```
 
-See [MODULES.md](MODULES.md) for how to author, install, and push an adventure module.
+See [`MODULES.md`](MODULES.md) for how to author, install, and push an adventure module.
 
 ---
 
-## 📦 REST API
+## REST API
 
-Every route below is served from `server/api.js`. `authenticate` means the request needs an `X-API-Key` header (or `?apiKey=`) matching the server's `API_KEY`; unmarked routes are open (same trust boundary as being able to connect to the room/server at all).
+Every route below is served from `server/api.js`. `authenticate` means the request needs an `X-API-Key` header (or `?apiKey=`) matching the server's `API_KEY`; unmarked routes are open (the same trust boundary as being able to reach the room/server at all).
 
-| Method | Endpoint                              | Auth | Description |
-|--------|-----------------------------------------|:---:|-------------|
-| GET    | `/healthz`, `/api/healthz` | – | Plain `OK` liveness check, always available regardless of config. |
-| GET    | `<HEALTH_ENDPOINT>` (default `/api/health`) | – | Fuller health check + room stats as JSON. |
-| GET    | `/api/turn-credentials?clientId=X`      | –   | Mint short-lived TURN credentials (404 if `TURN_SECRET` isn't configured). See the root docker-compose's `turn` profile. |
-| GET    | `/api/rooms`                            | ✅  | List all rooms with stats. |
-| POST   | `/api/auth/register`, `/api/auth/login` | –*  | Account auth (bcrypt + JWT). *Requires the optional DB storage module to be present. |
-| GET    | `/api/rooms/:code/clients`              | ✅  | List clients in a room. |
-| POST   | `/api/rooms/:code/clients/:clientId/kick` \| `/ban` \| `/unban` | ✅ | Moderation. |
-| POST   | `/api/rooms/:code/password`             | ✅  | Set/change/clear a room password. |
+| Method | Endpoint | Auth | Description |
+|---|---|:---:|---|
+| GET | `/healthz`, `/api/healthz` | – | Plain `OK` liveness check, always available regardless of config. |
+| GET | `<HEALTH_ENDPOINT>` (default `/api/health`) | – | Fuller health check + room stats as JSON. |
+| GET | `/api/turn-credentials?clientId=X` | – | Mint short-lived TURN credentials (404 if `TURN_SECRET` isn't configured). |
+| GET | `/api/rooms` | ✅ | List all rooms with stats. |
+| POST | `/api/auth/register`, `/api/auth/login` | –* | Account auth (bcrypt + JWT). *Requires the optional DB storage module to be present. |
+| GET | `/api/rooms/:code/clients` | ✅ | List clients in a room. |
+| POST | `/api/rooms/:code/clients/:clientId/kick` \| `/ban` \| `/unban` | ✅ | Moderation. |
+| POST | `/api/rooms/:code/password` | ✅ | Set/change/clear a room password. |
 | GET/POST | `/api/rooms/:code/deck*`, `/api/rooms/:code/deck/crown`, `.../history` | ✅ | Deck of Consequences draws/history (same logic the WS `deck-draw`/`crown-spread` events use). |
-| GET/POST | `/api/rooms/:code/deck/seed`           | ✅  | Read/set the room's per-room deck PRNG seed (`server/rng.js`); `POST` reseeds and reshuffles, broadcasting `deck-shuffled` with `reason: "reseeded"`. |
-| GET    | `/api/modules`, `/api/rooms/:code/modules` | ✅ | List installed modules (`modules/<id>/manifest.json`) plus standalone `data/adventures/*.json`. |
-| POST   | `/api/modules`                          | ✅  | Install a module: writes `modules/<id>/{manifest.json,adventure.json}`. See [MODULES.md](MODULES.md). |
-| POST   | `/api/modules/:id/push`                 | ✅  | Broadcast an installed module to a room (or every room). |
-| POST   | `/api/modules/:id/cleanup`              | ✅  | Broadcast a cleanup request for a module id. |
-| GET/POST | `/api/rooms/:code/adventure*`         | ✅  | Adventure Engine: load/reset/scene/encounter/timer/log/climax-triggered/climax-forced, backed by `server/adventure.js`. Includes climax-pacing state (`climaxPadScenes`/`climaxScenesSinceTrigger`/`climaxForced`) and a module's `persistence` (Legacy Tracker) block on the reference endpoint. |
-| GET/POST | `/api/rooms/:code/whiteboard*`, `/api/rooms/:code/characters*`, `/api/rooms/:code/campaigns*` | ✅ | Whiteboard state, character sync, campaign save/load (see "Using Campaign Sharing" above for the short-code flow). |
-| GET    | `/api/data/docs`                        | –   | This same endpoint list, machine-readable. |
+| GET/POST | `/api/rooms/:code/deck/seed` | ✅ | Read/set the room's per-room deck PRNG seed; `POST` reseeds and reshuffles, broadcasting `deck-shuffled` with `reason: "reseeded"`. |
+| GET | `/api/modules`, `/api/rooms/:code/modules` | ✅ | List installed modules plus standalone `data/adventures/*.json`. |
+| POST | `/api/modules` | ✅ | Install a module — see [`MODULES.md`](MODULES.md). |
+| POST | `/api/modules/:id/push` | ✅ | Broadcast an installed module to a room (or every room). |
+| POST | `/api/modules/:id/cleanup` | ✅ | Broadcast a cleanup request for a module id. |
+| GET/POST | `/api/rooms/:code/adventure*` | ✅ | Adventure Engine: load/reset/scene/encounter/timer/log/climax state, backed by `server/adventure.js`. |
+| GET/POST | `/api/rooms/:code/whiteboard*`, `/api/rooms/:code/characters*`, `/api/rooms/:code/campaigns*` | ✅ | Whiteboard state, character sync, campaign save/load (see "Using campaign sharing" above). |
+| GET | `/api/data/docs` | – | This same endpoint list, machine-readable. |
 
-Real‑time events (chat, dice, GM election, deck draws, scene/timer sync, voice signaling, module push/cleanup) are handled separately over Socket.io/`ws` — see `server/socketio-handlers.js` and `server/ws-handlers.js` for the full event list, and [MODULES.md](MODULES.md) for the module-specific events.
+Real-time events (chat, dice, GM election, deck draws, scene/timer sync, voice signaling, module push/cleanup) are handled separately over Socket.IO/`ws` — see `server/socketio-handlers.js` and `server/ws-handlers.js` for the full event list, and [`MODULES.md`](MODULES.md) for module-specific events. For the authoritative, current list of routes and events, grep those files directly rather than trusting a hand-copied table — see [`DESIGN.md`](DESIGN.md) for why that matters.
 
 ---
 
-## 🛠️ Configuration
+## Configuration
 
-Environment variables (see `env-example.md` for the full list, `.env.example` for the docker-compose-specific subset):
+Environment variables (see `env-example.md` for the full list, `.env.example` for the Docker Compose subset):
 
-| Env Var   | Default | Description |
-|-----------|---------|-------------|
-| `PORT`    | `10000` | Port to listen on. |
-| `API_KEY` | *(auto-generated + logged if unset)* | Admin API key for `authenticate`-gated routes above. |
+| Env var | Default | Description |
+|---|---|---|
+| `PORT` | `10000` | Port to listen on. |
+| `API_KEY` | auto-generated + logged if unset | Admin API key for `authenticate`-gated routes above. |
 | `DATABASE_TYPE` / `DATABASE_URL` | `sqlite` / `./campaigns.db` | Where campaigns, rooms, accounts, and characters are persisted. |
-| `HEALTH_ENDPOINT` | `/api/health` | The fuller JSON health/stats route — `/healthz` and `/api/healthz` (plain `OK`) are always available regardless of this. |
-| `TURN_SECRET`, `TURN_REALM`, `TURN_URLS`, `TURN_CREDENTIAL_TTL` | unset | TURN credential minting — see `/api/turn-credentials` above and this server's own `docker-compose.yml` `coturn` service. |
-| `API_RATE_LIMIT_WINDOW_MS` / `API_RATE_LIMIT_MAX` | `60000` / `300` | General per-IP REST API rate limit (`_MAX=0` disables). |
+| `HEALTH_ENDPOINT` | `/api/health` | The fuller JSON health/stats route — `/healthz` and `/api/healthz` are always available regardless. |
+| `TURN_SECRET`, `TURN_REALM`, `TURN_URLS`, `TURN_CREDENTIAL_TTL` | unset | TURN credential minting — see `/api/turn-credentials` above and this server's `docker-compose.yml` `coturn` service. |
+| `API_RATE_LIMIT_WINDOW_MS` / `API_RATE_LIMIT_MAX` | `60000` / `300` | General per-IP REST rate limit (`_MAX=0` disables). |
 | `WS_MESSAGE_RATE_WINDOW_MS` / `WS_MESSAGE_RATE_MAX` | `10000` / `120` | Per-connection WebSocket message rate limit, both transports (`_MAX=0` disables). |
 | `MAX_CLIENTS_PER_ROOM` | `0` (unlimited) | Reject new joins once a room already holds this many clients. |
-| `CLUSTER_WORKERS` | `0` (single process) | Fork this many worker processes (or `auto` = one per CPU core) — see [SCALING.md](SCALING.md). |
-| `REDIS_URL` | unset | Optional multi-instance scaling — see [SCALING.md](SCALING.md). |
+| `CLUSTER_WORKERS` | `0` (single process) | Fork this many worker processes (or `auto` = one per CPU core) — see [`SCALING.md`](SCALING.md). |
+| `REDIS_URL` | unset | Optional multi-instance scaling — see [`SCALING.md`](SCALING.md). |
 
-`campaigns.db` (or your configured `DATABASE_URL`) and `modules/` are created automatically at runtime as needed. For Docker, `docker-compose.yml` already mounts `./data` (with `DATABASE_URL` pointed inside it), plus named volumes for `/app/logs` and `/app/modules`, so all of this persists across container restarts out of the box — see [INSTALL.md](INSTALL.md#backing-up-your-campaigns-your-world-save).
+`campaigns.db` (or your configured `DATABASE_URL`) and `modules/` are created automatically at runtime. For Docker, `docker-compose.yml` already mounts `./data` (with `DATABASE_URL` pointed inside it) plus named volumes for `/app/logs` and `/app/modules`, so all of this persists across container restarts out of the box.
 
 ---
 
-## 🔒 License & Attribution
+## License & attribution
 
-- **Fate's Edge** is © Nicholas A. Gasper.
-- Source code in this server is MIT-licensed as part of the [fates-edge-apps](../../../README.md) monorepo.
+- *Fate's Edge* is © Nicholas A. Gasper.
+- Source code in this server is MIT-licensed, as part of the [fates-edge-apps](../../../README.md) monorepo.
 - Bundled reference data (patron/region JSON) is proprietary Fate's Edge content, distributed for free for personal, non-commercial use. See the root README's License section for details.
 
 ---

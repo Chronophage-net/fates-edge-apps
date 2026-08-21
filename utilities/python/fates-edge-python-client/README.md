@@ -1,16 +1,10 @@
-# Fate's Edge – Python Client
+# Fate's Edge — Python Client
 
-A command-line client for the **Fate's Edge** TTRPG toolkit: character
-management, timers, dice rolling, the Deck of Consequences (region-aware
-card meanings, Crown Spread), and syncing with a Fate's Edge socket
-server over REST and WebSocket.
-
-As of v5.0.0 this is a proper installable package (`fates_edge_client/`),
-not a single script you copy around.
+A command-line client for the **Fate's Edge** TTRPG toolkit: character management, timers, dice rolling, the Deck of Consequences (region-aware card meanings, Crown Spread), and syncing with a Fate's Edge [socket server](../../javascript/fates-edge-socket-server/) over REST and WebSocket. Installs as a proper package (`fates_edge_client/`) rather than a script you copy around.
 
 ---
 
-## 📦 Installation
+## Installation
 
 From this directory:
 
@@ -20,41 +14,35 @@ source venv/bin/activate      # On Windows: venv\Scripts\activate
 pip install .
 ```
 
-For development (editable install, so code changes take effect
-immediately):
+For development (editable install, so code changes take effect immediately):
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-This installs a `fates-edge` command on your `PATH`, backed by the
-`fates_edge_client` package. `pyproject.toml` is the single source of
-packaging truth.
+This installs a `fates-edge` command on your `PATH`, backed by the `fates_edge_client` package. `pyproject.toml` is the single source of packaging truth.
 
-If you'd rather not install the package at all, `pip install -r
-requirements.txt` followed by `python -m fates_edge_client --help` from
-this directory works too.
+If you'd rather not install the package at all, `pip install -r requirements.txt` followed by `python -m fates_edge_client --help` from this directory works too.
 
 ---
 
-## 🔧 Usage
+## Usage
 
-Once installed, run `fates-edge --help` (or `python -m fates_edge_client
---help` without installing). The client is split into subcommands:
+Once installed, run `fates-edge --help` (or `python -m fates_edge_client --help` without installing). The client is split into subcommands:
 
-| Command      | Description |
-|--------------|-------------|
+| Command | Description |
+|---|---|
 | `characters` | List, add, delete, export, or import characters |
-| `timers`     | List, add, tick, reset, or delete timers |
-| `roll`       | Perform a Fate's Edge dice roll |
-| `deck`       | Build/shuffle/draw from the Deck of Consequences, or pull a Crown Spread -- fully offline, using the same region flavor-text data the server ships |
-| `modules`    | Module listing/push/cleanup (currently a local-only stub; see note below) |
-| `server`     | Upload / load / sync campaigns with a socket server over REST |
-| `websocket`  | Connect to a room over WebSocket for live chat, dice, and deck events |
-| `config`     | Set/show the stored API key and other local settings |
-| `shell`      | Start an interactive REPL -- accepts exactly the same subcommands and flags as the command line |
+| `timers` | List, add, tick, reset, or delete timers |
+| `roll` | Perform a Fate's Edge dice roll |
+| `deck` | Build/shuffle/draw from the Deck of Consequences, or pull a Crown Spread — fully offline, using the same region flavor-text data the server ships |
+| `modules` | Module listing/push/cleanup (currently a local-only stub — see note below) |
+| `server` | Upload / load / sync campaigns with a socket server over REST |
+| `websocket` | Connect to a room over WebSocket for live chat, dice, and deck events |
+| `config` | Set/show the stored API key and other local settings |
+| `shell` | Start an interactive REPL — accepts exactly the same subcommands and flags as the command line |
 
-### 📌 Characters
+### Characters
 
 ```bash
 fates-edge characters --list
@@ -65,7 +53,7 @@ fates-edge characters --export 1 --export-path aria.yaml
 fates-edge characters --import-char aria.yaml
 ```
 
-### ⏱️ Timers
+### Timers
 
 ```bash
 fates-edge timers --list
@@ -75,17 +63,14 @@ fates-edge timers --reset 1
 fates-edge timers --delete 1
 ```
 
-### 🎲 Roll dice
+### Roll dice
 
 ```bash
-# Basic roll (default position: controlled)
-fates-edge roll --attr 3 --skill 2 --dv 3
-
-# With position and boons
+fates-edge roll --attr 3 --skill 2 --dv 3                       # default position: controlled
 fates-edge roll --attr 4 --skill 2 --dv 4 --pos dominant --boons 2
 ```
 
-### 🃏 Deck of Consequences
+### Deck of Consequences
 
 ```bash
 fates-edge deck --build
@@ -95,27 +80,17 @@ fates-edge deck --history
 fates-edge deck --shuffle
 ```
 
-Region flavor text is loaded from the same region JSON the socket server
-ships, so `--draw`/`--crown` actually reflect the `--region` you pass --
-earlier versions of this client silently fell back to a generic
-placeholder line regardless of region. As of v5.1.0 that data is no longer
-bundled into the installed package (it's Fate's Edge Copyright content,
-licensed separately from this MIT client's own code -- see
-[LICENSE.proprietary](../../../LICENSE.proprietary)), so fetch it once,
-opt-in, before relying on region-specific meanings:
+Region flavor text is loaded from the same region JSON the socket server ships, so `--draw`/`--crown` reflect the `--region` you pass. That data is Fate's Edge Copyright content, licensed separately from this MIT client's own code (see [`LICENSE.proprietary`](../../../LICENSE.proprietary)), and isn't bundled into the installed package — fetch it once, opt-in, before relying on region-specific meanings:
 
 ```bash
 fates-edge data --fetch
 ```
 
-Without it, `--draw`/`--crown` still work, just with the generic
-placeholder line instead of region-specific flavor text.
+Without it, `--draw`/`--crown` still work, just with a generic placeholder line instead of region-specific flavor text.
 
-### 🌐 Server (REST)
+### Server (REST)
 
-`--code` is always your **room code**. Uploading returns a separate
-**campaign share code**, which you pass back in as `--campaign-code`
-when loading.
+`--code` is always your **room code**. Uploading returns a separate **campaign share code**, which you pass back in as `--campaign-code` when loading.
 
 ```bash
 fates-edge server --upload --code AC12 --server http://localhost:10000
@@ -126,24 +101,15 @@ fates-edge server --deck-seed-get --code AC12 --server http://localhost:10000
 fates-edge server --deck-seed-set --code AC12 --seed my-seed-123 --server http://localhost:10000
 ```
 
-As of server v4.16.0, every room shuffles its deck with its own
-independent, seedable PRNG instead of a shared unseeded `Math.random()` --
-`--deck-seed-get` reads a room's current (auto-generated if never set)
-seed, and `--deck-seed-set` explicitly reseeds it and immediately
-rebuilds+reshuffles, so the room's next draw is reproducible.
+Every room shuffles its deck with its own independent, seedable PRNG rather than a shared unseeded `Math.random()` — `--deck-seed-get` reads a room's current (auto-generated if never set) seed, and `--deck-seed-set` explicitly reseeds it and immediately rebuilds and reshuffles, so the room's next draw is reproducible.
 
 > Loading will overwrite your local data; you'll be prompted to confirm.
 >
-> There is currently no server-side way to delete a manually uploaded
-> campaign snapshot -- the server auto-prunes old ones (oldest first)
-> once more than 2 exist for a room, so `--delete` reports that it isn't
-> supported.
+> There is currently no server-side way to delete a manually uploaded campaign snapshot — the server auto-prunes old ones (oldest first) once more than 2 exist for a room, so `--delete` reports that it isn't supported.
 >
-> `--chat` and `--roll` have no REST equivalent on the server -- chat and
-> dice rolls are WebSocket-only. Use `fates-edge websocket --code
-> AC12` (or the `shell`) for those instead.
+> `--chat` and `--roll` have no REST equivalent on the server — chat and dice rolls are WebSocket-only. Use `fates-edge websocket --code AC12` (or the `shell`) for those instead.
 
-### 🔌 WebSocket
+### WebSocket
 
 ```bash
 fates-edge websocket --code AC12 --server http://localhost:10000
@@ -160,14 +126,13 @@ Once connected:
 > /quit
 ```
 
-### 🖥️ Interactive Shell
+### Interactive shell
 
 ```bash
 fates-edge shell
 ```
 
-The shell accepts exactly the commands above, without the leading
-`fates-edge`:
+The shell accepts exactly the commands above, without the leading `fates-edge`:
 
 ```
 fates-edge> characters --list
@@ -178,43 +143,31 @@ fates-edge> exit
 
 ---
 
-## 💾 Data Storage
+## Data storage
 
-All data is stored in `~/.fates_edge/data.json` on Unix-like systems.
-Saves are atomic (written to a temp file, then swapped into place), so a
-crash mid-write can't corrupt your data. If a data file ever fails to
-parse, it's preserved as a `.corrupt` sibling instead of being silently
-discarded.
+All data is stored in `~/.fates_edge/data.json` on Unix-like systems. Saves are atomic (written to a temp file, then swapped into place), so a crash mid-write can't corrupt your data. If a data file ever fails to parse, it's preserved as a `.corrupt` sibling instead of being silently discarded.
 
 ---
 
-## 🧩 Server Compatibility
+## Server compatibility
 
-The client talks to the same Fate's Edge socket server as the web
-toolkit and other VTT integrations. See `API.md` in the repo root for
-the authoritative route/event list. To run your own server, see
-`utilities/javascript/fates-edge-socket-server/README.md`.
+The client talks to the same Fate's Edge socket server as the web toolkit and other VTT integrations. See [`API.md`](../../../API.md) in the repository root for the authoritative route/event list. To run your own server, see [the socket server's own README](../../javascript/fates-edge-socket-server/README.md).
 
 ---
 
-## 📚 Requirements
+## Requirements
 
 - Python 3.9+
-- `requests`, `python-socketio[asyncio-client]`, `pyyaml` (installed
-  automatically by `pip install .`)
+- `requests`, `python-socketio[asyncio-client]`, `pyyaml` (installed automatically by `pip install .`)
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-This client is part of the **Fate's Edge** project. Please open an issue
-or pull request for improvements.
+This client is part of the **Fate's Edge** project. Please open an issue or pull request for improvements.
 
 ---
 
-## 📜 License
+## License
 
-This package's own source code is MIT (see the `license` field in
-`pyproject.toml`). The optional Fate's Edge region lore it can fetch via
-`fates-edge data --fetch` is not: SRD material is CC BY-NC-SA, everything
-else is All Rights Reserved. See the root `LICENSE.md` for details.
+This package's own source code is MIT (see the `license` field in `pyproject.toml`). The optional Fate's Edge region lore it can fetch via `fates-edge data --fetch` is not: SRD material is CC BY-NC-SA, everything else is All Rights Reserved. See the root [`LICENSE.md`](../../../LICENSE.md) for details.

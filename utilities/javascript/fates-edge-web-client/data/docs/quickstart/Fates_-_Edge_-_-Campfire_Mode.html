@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏕️ Fate's Edge: Campfire Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #fcf3e6;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            padding: 2rem 1rem;
+            color: #2c241a;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fffaf0;
+            border-radius: 32px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem;
+            border: 1px solid #eddccb;
+        }
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            color: #593c1e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 4px solid #e6c9a8;
+            padding-bottom: 0.5rem;
+        }
+        .subhead {
+            font-size: 1.2rem;
+            color: #7a5d3e;
+            margin-top: -0.2rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+            background: #f2e4d4;
+            display: inline-block;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+        }
+        .gold-rule {
+            background: #2c241a;
+            color: #f7e8d9;
+            padding: 1.2rem 1.8rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            border-left: 8px solid #e6a44a;
+        }
+        .gold-rule strong {
+            color: #f5c542;
+        }
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 2.2rem;
+            margin-bottom: 0.8rem;
+            color: #4d351b;
+            border-left: 6px solid #dba46a;
+            padding-left: 1rem;
+        }
+        h3 {
+            font-size: 1.3rem;
+            margin-top: 1.6rem;
+            margin-bottom: 0.4rem;
+            color: #5e4024;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem 1.5rem;
+            background: #f8efe6;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin: 0.8rem 0;
+        }
+        .stat-grid .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 0.2rem;
+        }
+        .stat-item .label {
+            font-weight: 700;
+            min-width: 4.5rem;
+            color: #4d351b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f8efe6;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        th {
+            background: #dba46a;
+            color: #1f160f;
+            font-weight: 600;
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid #e6d4c2;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .outcome-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1.5fr;
+            gap: 0.1rem;
+            background: #dba46a;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .outcome-grid .cell {
+            background: #f8efe6;
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid #e6d4c2;
+        }
+        .outcome-grid .cell.header {
+            background: #e6c9a8;
+            font-weight: 700;
+            color: #2c1f13;
+        }
+        .outcome-grid .cell:last-child {
+            border-bottom: none;
+        }
+        .badge {
+            display: inline-block;
+            background: #e6c9a8;
+            border-radius: 40px;
+            padding: 0.05rem 0.9rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2c1f13;
+        }
+        .pack {
+            background: #f5eee7;
+            border-radius: 20px;
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+            border-left: 6px solid #b88752;
+        }
+        .pack h4 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #3f2c19;
+            margin-bottom: 0.3rem;
+        }
+        .pack ul {
+            padding-left: 1.2rem;
+        }
+        .pack ul li {
+            margin-bottom: 0.3rem;
+        }
+        .tip-box {
+            background: #e6d9c9;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        .cheat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem 1.2rem;
+            background: #f8efe6;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin: 0.8rem 0;
+        }
+        .cheat-grid .cheat-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #dccbbc;
+            padding: 0.2rem 0;
+        }
+        .cheat-item .action {
+            font-weight: 500;
+        }
+        .cheat-item .roll {
+            color: #5e4024;
+            font-weight: 600;
+        }
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #e6c9a8, transparent);
+            margin: 2rem 0;
+        }
+        .footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 1rem;
+            color: #7a5d3e;
+            border-top: 2px solid #e6c9a8;
+            padding-top: 1.5rem;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem 1rem; }
+            h1 { font-size: 2rem; flex-wrap: wrap; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .outcome-grid { grid-template-columns: 1fr; }
+            .outcome-grid .cell { border-bottom: 1px solid #e6d4c2; }
+            .cheat-grid { grid-template-columns: 1fr; }
+            .gold-rule { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🏕️ Fate's Edge: Campfire Edition</h1>
+    <div class="subhead">✨ One Table, Any Playstyle – A Guide for Mixed‑Ability Groups</div>
+
+    <div class="gold-rule">
+        <p style="font-size:1.3rem; font-weight:600; margin-bottom:0.3rem;">🎯 The Golden Rule</p>
+        <p style="font-size:1.1rem;">
+            <strong>Everyone at this table uses the EXACT SAME dice roll.</strong><br />
+            Pick your <strong>Attribute</strong> + <strong>Skill</strong>. Roll that many d10s.<br />
+            Count <strong>6–9</strong> as 1 success, <strong>10</strong> as 2 successes.<br />
+            Compare to the <strong>Target Number (DV)</strong> set by the GM.
+        </p>
+        <p style="margin-top:0.4rem; opacity:0.9;">That's it. The dice always speak the same language.</p>
+    </div>
+
+    <!-- ============ BASE CHARACTER ============ -->
+    <h2>📝 The Base Character <span style="font-size:1rem; font-weight:400; color:#7a5d3e;">(for everyone)</span></h2>
+    <p style="margin-bottom:0.5rem;">Fits on an index card. Distribute <strong>1, 2, 2, 3</strong> among the four attributes.</p>
+
+    <h3>⚡ 1. Pick Your Stats</h3>
+    <div class="stat-grid">
+        <div class="stat-item"><span class="label">Body 💪</span> Being strong, tough, and athletic.</div>
+        <div class="stat-item"><span class="label">Wits 🧠</span> Being quick, sneaky, and perceptive.</div>
+        <div class="stat-item"><span class="label">Spirit ✨</span> Being brave, focused, and magical.</div>
+        <div class="stat-item"><span class="label">Presence 👑</span> Being charming, scary, and commanding.</div>
+    </div>
+
+    <h3>🎯 2. Pick Your Skills <span style="font-size:0.9rem; font-weight:400;">(6 points, max 2 per skill)</span></h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.3rem 1.2rem; background:#f8efe6; padding:0.8rem 1.5rem; border-radius:16px; margin:0.8rem 0;">
+        <div><strong>Fight ⚔️</strong> – sword, axe, spear, or punches</div>
+        <div><strong>Move 🏃</strong> – climb, sneak, hide, jump</div>
+        <div><strong>Talk 🗣️</strong> – persuade, lie, intimidate</div>
+        <div><strong>Know 📚</strong> – history, medicine, spot clues</div>
+        <div><strong>Magic ✨</strong> – weave spells, read runes</div>
+        <div><strong>Craft 🔧</strong> – pick locks, build traps, fix gear</div>
+    </div>
+
+    <h3>❤️ Health Track (Stamina + Wounds)</h3>
+    <ul style="background:#f8efe6; padding:0.8rem 1.5rem; border-radius:16px; list-style:none; margin:0.4rem 0 1rem 0;">
+        <li><strong>Fatigue 😮‍💨</strong> – you get tired. Track = your <strong>Body</strong>. Mark it when you do hard stuff.</li>
+        <li><strong>Harm 🩸</strong> – you get hurt. 1 = Sore, 2 = Badly Hurt, 3 = Down (can't fight).</li>
+    </ul>
+
+    <!-- ============ RESOLUTION LOOP ============ -->
+    <h2>🎲 The Resolution Loop</h2>
+    <ol style="background:#f8efe6; padding:0.8rem 1.5rem 0.8rem 2.5rem; border-radius:16px; margin:0.8rem 0;">
+        <li><strong>Step 1:</strong> The GM sets the scene. “What do you do?”</li>
+        <li><strong>Step 2:</strong> Pick your <strong>Attribute + Skill</strong>.</li>
+        <li><strong>Step 3:</strong> The GM says the Difficulty (<strong>DV</strong>).
+            <ul style="margin-top:0.2rem; list-style:none; padding-left:0.2rem;">
+                <li>• <strong>DV 2</strong> – Easy (kick open a rickety door)</li>
+                <li>• <strong>DV 3</strong> – Normal (fight a guard)</li>
+                <li>• <strong>DV 4</strong> – Hard (climb a cliff in rain)</li>
+                <li>• <strong>DV 5+</strong> – Crazy (convince a king to surrender)</li>
+            </ul>
+        </li>
+        <li><strong>Step 4:</strong> Roll the dice!</li>
+        <li><strong>Step 5:</strong> Look at the result (see table below).</li>
+    </ol>
+
+    <div class="outcome-grid">
+        <div class="cell header">Roll Result</div>
+        <div class="cell header">What Happens</div>
+        <div class="cell header">You Get...</div>
+
+        <div class="cell"><strong>Hit</strong> (Successes ≥ DV)</div>
+        <div class="cell">You do it! No problem.</div>
+        <div class="cell">Nothing extra.</div>
+
+        <div class="cell"><strong>Hit with 1s</strong> (Successes ≥ DV, but you rolled a 1)</div>
+        <div class="cell">You do it! …but <em>something</em> goes wrong.</div>
+        <div class="cell">GM gets 1 <span class="badge">Story Beat</span> (trouble token)</div>
+
+        <div class="cell"><strong>Partial</strong> (Successes &lt; DV, but &gt; 0)</div>
+        <div class="cell">You <em>sort of</em> do it, but it costs you.</div>
+        <div class="cell">You get 1 <span class="badge">Boon</span> (luck coin)</div>
+
+        <div class="cell"><strong>Miss</strong> (Successes = 0)</div>
+        <div class="cell">You don't do it. Things get worse.</div>
+        <div class="cell">You get 2 <span class="badge">Boons</span> AND the GM gets a Story Beat.</div>
+    </div>
+
+    <!-- ============ TWO TREASURIES ============ -->
+    <h2>🪙 The Two Treasuries</h2>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0;">
+        <div style="background:#f2e4d4; border-radius:16px; padding:1rem 1.2rem;">
+            <h4 style="display:flex; align-items:center; gap:0.4rem; margin:0 0 0.4rem 0;">🪙 Player's Boons <span style="font-size:0.8rem; font-weight:400;">(luck coins)</span></h4>
+            <ul style="list-style:none; padding-left:0.2rem;">
+                <li>✓ Get them on <strong>Partial</strong> or <strong>Miss</strong>.</li>
+                <li>✓ Hold up to <strong>5</strong>.</li>
+                <li>✓ <strong>Spend 1</strong> to: re-roll a die, get +1 on your next roll, or activate a special item/pet.</li>
+                <li style="margin-top:0.3rem; font-size:0.9rem; color:#5e4024;">(Veterans: convert 2 Boons → 1 XP at end of session!)</li>
+            </ul>
+        </div>
+        <div style="background:#2c241a; color:#f7e8d9; border-radius:16px; padding:1rem 1.2rem;">
+            <h4 style="display:flex; align-items:center; gap:0.4rem; margin:0 0 0.4rem 0; color:#f5c542;">⚡ GM's Story Beats <span style="font-size:0.8rem; font-weight:400; color:#c4b09c;">(trouble tokens)</span></h4>
+            <ul style="list-style:none; padding-left:0.2rem; color:#f0e3d6;">
+                <li>✓ Get them when players roll a <strong>1</strong>.</li>
+                <li>✓ <strong>Spend 1</strong> – “A guard turns around.” (tiny)</li>
+                <li>✓ <strong>Spend 2</strong> – “Reinforcements arrive.” (big)</li>
+                <li>✓ <strong>Spend 3</strong> – “The floor collapses!” (huge)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ============ EXPANSION PACKS ============ -->
+    <h2>🧩 Expansion Packs <span style="font-size:1rem; font-weight:400; color:#7a5d3e;">(add complexity later)</span></h2>
+    <p>Players who want to keep it simple just use the Base Character above. Players who want more crunch can pick one of these packs.</p>
+
+    <div class="pack">
+        <h4>📦 Pack 1: The Talented <span style="font-size:0.9rem; font-weight:400;">(simple feats)</span></h4>
+        <ul>
+            <li><strong>Pick 3 cool things</strong> your character is great at. (e.g. “Duelist: +1 die when fighting one enemy”, “Thief: pick any normal lock without rolling”)</li>
+            <li><strong>Mechanic:</strong> When you use a Stunt, you just say “I use my X” and roll with advantage (e.g. +1 die, or ignore a negative modifier).</li>
+        </ul>
+    </div>
+
+    <div class="pack">
+        <h4>📦 Pack 2: The Free Caster <span style="font-size:0.9rem; font-weight:400;">(easy magic)</span></h4>
+        <ul>
+            <li>You know <strong>2 simple spells</strong> (e.g. <em>Fire Bolt</em>, <em>Healing Touch</em>).</li>
+            <li>Roll <strong>Wits + Magic</strong>. DV is usually <strong>3</strong> for a cool trick, <strong>4</strong> for a big blast.</li>
+            <li><strong>Backlash:</strong> If you roll a <strong>1</strong>, the GM does something annoying (your robe catches fire, you get pushed back). Improvise it!</li>
+        </ul>
+    </div>
+
+    <div class="pack">
+        <h4>📦 Pack 3: The Runekeeper <span style="font-size:0.9rem; font-weight:400;">(obligation)</span></h4>
+        <ul>
+            <li>You made a deal with a patron. You have <strong>3 special moves</strong> (Rites).</li>
+            <li>To use a Rite: roll <strong>Spirit + Magic</strong> (DV 3).</li>
+            <li><strong>Obligation:</strong> Mark a box (track = Spirit + Presence). If it fills, take 1 Fatigue. Clear it by doing a small favor for your patron.</li>
+        </ul>
+    </div>
+
+    <div class="pack">
+        <h4>📦 Pack 4: The Summoner <span style="font-size:0.9rem; font-weight:400;">(monster buddy)</span></h4>
+        <ul>
+            <li>You have a cool monster buddy (spirit). <strong>Summon it:</strong> spend 1 Boon (or take 1 Fatigue).</li>
+            <li>The buddy has <strong>3 Health</strong> (Leash). It can do one simple thing per round (attack, scout, carry).</li>
+            <li>If it gets hit, it loses 1 Health. If it loses all Health, it vanishes and you take 1 Fatigue.</li>
+            <li><em>Veteran upgrade:</em> track a full “Leash” track – but for kids, it’s just “pet with 3 HP.”</li>
+        </ul>
+    </div>
+
+    <!-- ============ GM TIPS ============ -->
+    <h2>🧑‍🏫 GM Tips for Mixed‑Experience Tables</h2>
+    <div class="tip-box">
+        <p><strong>1. The Spotlight Shift</strong><br />
+        Rotate the spotlight. Let the simple Fighter roll a huge “Fight” check. Then, let the complex Summoner roll “Spirit + Magic”. They both roll the same dice, but the narrative looks different.</p>
+
+        <p><strong>2. Color the Consequences</strong><br />
+        When the simple player rolls a 1, the problem is physical (“Your sword gets stuck”). When the complex player rolls a 1, the problem is mystical (“Your patron glares at you”).</p>
+
+        <p><strong>3. The “Fiction First” Rule</strong><br />
+        If a player doesn’t understand their Rite, revert to the core rule. <em>“What do you want to happen?”</em> → “I want to make the enemy fall asleep.” → “Cool. Roll Spirit + Magic. DV 3. If you hit, they sleep. If you roll a 1, they get angry.”</p>
+
+        <p><strong>4. Don’t Track Resources for Everyone</strong><br />
+        The kid tracks Boons + Fatigue. The veteran tracks Boons, Fatigue, Leash, <em>and</em> Obligation. That’s their job, not yours.</p>
+
+        <p><strong>5. End of Session</strong><br />
+        Give everyone the <strong>same XP</strong> (e.g. 6 XP). The kid buys a new Stunt; the veteran buys a new Rite. They progress together.</p>
+    </div>
+
+    <!-- ============ QUICK REFERENCE ============ -->
+    <h2>📋 Quick Reference <span style="font-size:1rem; font-weight:400; color:#7a5d3e;">(for kids &amp; everyone)</span></h2>
+    <div class="cheat-grid">
+        <div class="cheat-item"><span class="action">⚔️ Hit someone with a sword</span><span class="roll">Body + Fight</span></div>
+        <div class="cheat-item"><span class="action">👻 Sneak past a guard</span><span class="roll">Wits + Move</span></div>
+        <div class="cheat-item"><span class="action">🧗 Climb a wall</span><span class="roll">Body + Move</span></div>
+        <div class="cheat-item"><span class="action">🗣️ Talk your way out of a fight</span><span class="roll">Presence + Talk</span></div>
+        <div class="cheat-item"><span class="action">✨ Cast a cool spell</span><span class="roll">Wits + Magic (or Spirit)</span></div>
+        <div class="cheat-item"><span class="action">🔧 Fix a broken wheel</span><span class="roll">Wits + Craft</span></div>
+        <div class="cheat-item"><span class="action">🔍 Notice a trap</span><span class="roll">Wits + Know</span></div>
+        <div class="cheat-item"><span class="action">💪 Lift a heavy gate</span><span class="roll">Body + (no skill, or Move)</span></div>
+    </div>
+
+    <div style="background:#f8efe6; border-radius:16px; padding:0.6rem 1.2rem; margin:0.4rem 0 1.2rem 0; display:flex; flex-wrap:wrap; gap:0.8rem 1.5rem;">
+        <span>🟩 <strong>6–9</strong> = 1 Success</span>
+        <span>🟨 <strong>10</strong> = 2 Successes</span>
+        <span>🟥 <strong>1</strong> = GM gets a Trouble Token!</span>
+    </div>
+
+    <!-- ============ FINAL THOUGHT ============ -->
+    <hr />
+    <div style="font-size:1.1rem; text-align:center; padding:0.5rem 0;">
+        <p style="font-style:italic; color:#3f2c19;">“The road remembers every traveler, no matter how they walk it.”</p>
+        <p style="margin-top:0.8rem; font-weight:500;">Start simple. If the kid wants to learn Summoner later, let them “upgrade” mid‑campaign.<br />
+        If the veteran wants to play a basic Fighter to take a break, let them do that too.</p>
+    </div>
+
+    <div class="footer">
+        ⚔️ Fate’s Edge · Campfire Edition · Free to share at your table<br />
+        <span style="font-size:0.85rem; color:#9a7f65;">Core SRD by Nicholas A. Gasper · Adapted for mixed‑experience groups</span>
+    </div>
+
+</div>
+</body>
+</html>

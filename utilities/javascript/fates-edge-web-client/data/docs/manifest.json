@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-20T15:41:15.625Z",
+  "generated": "2026-08-20T18:26:43.725Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -89,6 +89,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "🗡️ Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "campfire_mode",
+      "title": "Campfire Mode",
+      "file": "Fates_-_Edge_-_-Campfire_Mode.html",
+      "path": "/data/docs/quickstart/",
+      "category": "quickstart",
+      "categoryLabel": "⚡ Quickstart",
       "core": false,
       "active": true
     },
@@ -913,7 +923,7 @@
       "active": true
     }
   ],
-  "total_count": 91,
-  "active_count": 91,
+  "total_count": 92,
+  "active_count": 92,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

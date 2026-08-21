@@ -1,277 +1,188 @@
-# Fate's Edge Bridge – Foundry VTT Module
+# Fate's Edge Bridge — Foundry VTT Module
 
 <p align="center">
   <img src="https://img.shields.io/badge/Foundry-VTT-orange" alt="Foundry VTT"/>
-  <img src="https://img.shields.io/badge/version-4.16.1-blue" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/status-stable-brightgreen" alt="Status"/>
 </p>
 
-**Fate's Edge Bridge** connects your Foundry VTT instance to the Fate's Edge WebSocket server, enabling real‑time synchronization of chat, dice rolls, characters, scene notifications, the Deck of Consequences, Crown Spread readings, module listing, and **Game Master election/promotion** between Foundry and other connected VTT clients.
+Connects a Foundry VTT world to the Fate's Edge [socket server](../../javascript/fates-edge-socket-server/), so chat, dice rolls, characters, scene notifications, the Deck of Consequences, Crown Spread readings, module listing, and GM election/promotion all sync in real time between Foundry and every other connected VTT client.
 
 ---
 
-## ✨ Features
+## Features
 
-- **🔌 Real‑time Connection** – Persistent WebSocket connection to the Fate's Edge server.
-- **💬 Chat Sync** – Bidirectional chat message exchange between Foundry and VTT.
-- **🎲 Dice Roll Sync** – Send dice rolls from Foundry to VTT clients.
-- **👥 Character Sync** – Synchronize character data (Harm, Fatigue, Boons, Tier) as journal entries.
-- **🎬 Scene Notifications** – Broadcast the active Foundry scene's name to the VTT whenever it changes (one-way, Foundry → VTT).
-- **🃏 Deck Operations** – Draw cards, shuffle, and perform Crown Spread readings, all displayed as Foundry chat messages and journal entries.
-- **📦 Module Listing** – List modules available on the server.
-- **👑 GM Election & Promotion** – Request GM status, approve/reject requests, view client lists and roles directly from the Foundry UI.
-- **🔄 Auto‑Reconnect** – Automatically reconnects if the connection drops.
-- **🔐 Secure** – API key authentication and configurable permissions.
+- **Real-time connection** — a persistent WebSocket connection to the Fate's Edge server, with auto-reconnect.
+- **Chat sync** — bidirectional, between Foundry and the VTT.
+- **Dice roll sync** — Foundry rolls relay to VTT clients.
+- **Character sync** — Harm, Fatigue, Boons, and Tier sync as journal entries.
+- **Scene notifications** — the active scene's name broadcasts to the VTT whenever it changes (one-way, Foundry → VTT).
+- **Deck operations** — draw, shuffle, and Crown Spread, shown as both Foundry chat messages and journal entries.
+- **Module listing** — see modules available on the server.
+- **GM election & promotion** — request, approve/reject, and view client roles from the Foundry UI.
+- **Secure** — API key authentication and configurable per-feature permissions.
 
 ---
 
-## 📋 Requirements
+## Requirements
 
 - Foundry VTT v11 or higher (tested with v13)
-- Fate's Edge WebSocket Server running and accessible
-- (Recommended) A stable internet connection for WebSocket communication
+- A Fate's Edge socket server, running and reachable
+- A stable connection for WebSocket communication
 
 ---
 
-## 🚀 Installation
+## Installation
 
-This module lives inside the `fates-edge-apps` monorepo rather than as its
-own standalone repo, so it's installed by copying the folder in rather than
-a Foundry manifest URL:
+This module lives inside the `fates-edge-apps` monorepo rather than as its own standalone repo, so it installs by copying the folder in rather than via a Foundry manifest URL:
 
 1. Clone or download `fates-edge-apps`:
    ```bash
    git clone https://github.com/Chronophage-net/fates-edge-apps.git
    ```
-2. Copy `fates-edge-apps/utilities/vtt_mods_bots/foundry_fates-edge-bridge/`
-   into your Foundry `Data/modules/` directory, renaming it to
-   `fates-edge-bridge`. The folder structure should end up as
-   `Data/modules/fates-edge-bridge/`.
-3. Restart Foundry (or reload) and enable **Fate's Edge Bridge** under
-   **Add‑on Modules** in your world.
+2. Copy `fates-edge-apps/utilities/vtt_mods_bots/foundry_fates-edge-bridge/` into your Foundry `Data/modules/` directory, renaming it to `fates-edge-bridge`, so the result is `Data/modules/fates-edge-bridge/`.
+3. Restart (or reload) Foundry and enable **Fate's Edge Bridge** under **Add-on Modules** in your world.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-After installation, enable the module in your world and configure it via **Settings** → **Configure Settings** → **Module Settings** → **Fate's Edge Bridge**.
+After enabling the module, configure it via **Settings → Configure Settings → Module Settings → Fate's Edge Bridge**.
 
-### Connection Settings
+### Connection
 
 | Setting | Description |
-|---------|-------------|
-| **Server URL** | The WebSocket URL of your Fate's Edge server (e.g., `ws://localhost:10000` or `wss://your-server.com`). |
-| **Room Code** | The room code to join (e.g., `AC12`). |
-| **API Key** | (Optional) API key for authentication if your server requires it. |
+|---|---|
+| **Server URL** | The WebSocket URL of your Fate's Edge server (`ws://localhost:10000` or `wss://your-server.com`). |
+| **Room Code** | The room code to join (e.g. `AC12`). |
+| **API Key** | Optional, if your server requires one. |
 | **Player Name** | Your display name in the VTT (defaults to your Foundry username). |
 | **Default Region** | Default region for deck draws. |
-| **Auto Connect** | Automatically connect when Foundry loads. |
+| **Auto Connect** | Connect automatically when Foundry loads. |
 
-### Synchronization Settings
-
-| Setting | Description |
-|---------|-------------|
-| **Sync Chat** | Mirror ordinary (non-whisper) Foundry chat messages to the VTT. |
-| **Sync Dice Rolls** | Send Foundry dice rolls to the VTT. |
-| **Sync Characters** | Synchronize characters with the VTT as journal entries. |
-| **Sync Timers** | Reserved for a future scene/campaign timer integration — this toggle is currently registered but not yet wired to any behavior. |
-| **Sync Scenes** | Broadcast the active scene's name to the VTT whenever it changes (one-way notification only, doesn't affect the room whiteboard). |
-| **Sync Deck** | Synchronize Deck of Consequences draws with the VTT. |
-
-### GM Features
+### Synchronization
 
 | Setting | Description |
-|---------|-------------|
-| **Enable GM Management Features** | Toggle the GM election/promotion UI and functionality. |
+|---|---|
+| **Sync Chat** | Mirror ordinary (non-whisper) Foundry chat to the VTT. |
+| **Sync Dice Rolls** | Send Foundry rolls to the VTT. |
+| **Sync Characters** | Sync characters to the VTT as journal entries. |
+| **Sync Timers** | Reserved for a future scene/campaign timer integration — registered but not yet wired to any behavior. |
+| **Sync Scenes** | Broadcast the active scene's name on change (notification only — doesn't touch the room whiteboard). |
+| **Sync Deck** | Sync Deck of Consequences draws with the VTT. |
+
+### GM features
+
+| Setting | Description |
+|---|---|
+| **Enable GM Management Features** | Toggle the GM election/promotion UI. |
 
 ---
 
-## 🎮 Usage
+## Usage
 
 ### Connecting
 
-- Enable **Auto Connect** and reload Foundry, or run the `connectFatesEdge()` macro (see [Macros Reference](#-macros-reference)) — or just click the status indicator itself, which toggles connect/disconnect.
-- A status bar element will appear in the top‑left corner showing connection status, deck count, voice status, current region, and a **GM** button.
+Enable **Auto Connect** and reload Foundry, run the `connectFatesEdge()` macro, or click the status bar's status indicator, which toggles connect/disconnect. A status bar element appears top-left showing connection status, deck count, voice status, current region, and a **GM** button.
 
-### Status Bar Controls
+| Status bar element | Function |
+|---|---|
+| Status indicator | `🟢 Connected` / `🔴 Disconnected`; click to toggle |
+| Deck counter | Remaining cards; click to refresh |
+| Voice indicator | Voice status (visual only) |
+| Region display | Current default region |
+| GM button (👑) | Opens the GM Management panel |
 
-| Element | Function |
-|---------|----------|
-| **Status indicator** | Displays `🟢 Connected` / `🔴 Disconnected`. Click to toggle connection. |
-| **Deck counter** | Shows remaining cards in the deck. Click to refresh. |
-| **Voice indicator** | Shows voice status (currently visual only). |
-| **Region display** | Shows the current default region. |
-| **GM button** (👑) | Opens the GM Management panel (see below). |
+### GM Management panel
 
-### GM Management Panel
+Shows the current GM, your own role badge, a **Request GM** button (players) or **Resign GM** button (the GM — resigning requires approving a pending request, or using `/vtt gm approve` in Discord), a **Pending Requests** list with Approve/Reject (visible to the current GM only), and a **Clients List**. As GM, every non-GM row also gets a role dropdown (Co-GM / Assistant GM / Player / Spectator), a "save" checkbox to persist the grant across reconnects, and a **Set** button — "Assistant GM" is typically assigned to the AI GM Bot's own client; see the [`fates-edge-ai-gm-bot`](https://github.com/Chronophage-net/fates-edge-ai-gm-bot) repo's README ("Assistant GM Mode"). The server has final say on every role change, checked against your own connection, same as everywhere else in this panel.
 
-Click the **GM** button in the status bar to open the panel. This panel displays:
+### Sending actions from Foundry
 
-- **Current GM** name and your role badge (`You are GM` or `Player`).
-- **Request GM** button (if you are a player) or **Resign GM** button (if you are the GM – note: resigning requires approving a pending request or using the `/vtt gm approve` command in Discord).
-- **Pending Requests** list (visible only to the current GM) with **Approve** / **Reject** buttons.
-- **Clients List** showing all connected clients and their roles (e.g., `GM`, `Player`). If you're the GM, every non-GM row also has a role dropdown (Co-GM / Assistant GM / Player / Spectator), a "save" checkbox to persist the grant across reconnects, and a **Set** button. "Assistant GM" is typically assigned to the AI GM Bot's own client — see the `fates-edge-ai-gm-bot` repo's README ("Assistant GM Mode") for what changes once it holds that role. The server has final say (GM-only, checked against your own connection), same as everything else in this panel.
+**Chat** and **dice rolls** — just use Foundry normally; they mirror to the VTT if the corresponding sync setting is on.
 
-### Sending Actions from Foundry
-
-#### Chat Messages
-Send a chat message normally in Foundry; it will be mirrored to the VTT (if `Sync Chat` is enabled).
-
-#### Dice Rolls
-Roll dice using Foundry's dice system; the result will be sent to the VTT (if `Sync Rolls` is enabled).
-
-#### Deck Operations (Macros)
-Use these macros to interact with the Deck of Consequences:
+**Deck operations** (macros):
 
 ```javascript
-// Draw 1 card from the default region
-drawCard(1);
-
-// Draw 3 cards from a specific region
-drawCard(3, 'Vhasia');
-
-// Perform a Crown Spread
-crownSpread();
-
-// Shuffle the deck
-shuffleDeck();
-
-// Set the default region
-setRegion('Acasia');
-
-// List loaded modules
-listModules();
-
-// Get deck status (returns remaining cards and history count)
-getDeckStatus();
+drawCard(1);                  // Draw 1 card from the default region
+drawCard(3, 'Vhasia');        // Draw 3 cards from a specific region
+crownSpread();                // Crown Spread reading
+shuffleDeck();                // Shuffle the deck
+setRegion('Acasia');          // Set the default region
+listModules();                // List loaded modules
+getDeckStatus();              // { remaining, history }
 ```
 
-> **Server API note (v4.16.0):** the socket server added `POST /api/rooms/:code/adventure/climax-forced` (a sibling of the existing `climax-triggered` route, broadcasting `adventure-climax-forced` when the AI GM director forces a stalled climax forward), and the adventure state (`GET /api/rooms/:code/adventure`, and the `adventure-state`/`adventure-loaded` broadcasts this bridge already handles) now also reports `climaxPadScenes`, `climaxScenesSinceTrigger`, and `climaxForced`. The GM-only `adventure/reference` payload (`_handleAdventureReference`) now also carries an optional `persistence` block (the "Legacy Tracker" schema declaration). This bridge doesn't expose any adventure-specific macros today, so no code change is needed — the new fields simply ride along in `this.adventureState`/`Hooks.call('fates-edge-adventure-state', ...)` for anything downstream that wants them.
+**Characters & scenes** — both sync automatically when their setting is enabled (character sheet/combat changes; active-scene changes). There's no separate manual button for either.
 
-> **Server API note (v4.16.0):** each room's deck now shuffles with its own seedable RNG instead of a shared unseeded one, so draws are reproducible per room via two new REST routes, `GET`/`POST /api/rooms/:code/deck/seed`. The existing `deck-shuffled` broadcast this bridge already listens for (`_handleDeckShuffled`) now also fires with `reason: 'reseeded'` when a room is explicitly reseeded — no code change needed here since that handler already renders any `deck-shuffled` event generically. Neither seed route has a macro yet.
-
-#### Character & Scene Sync
-- **Characters**: automatic — whenever combat/character sheet data changes, if **Sync Characters** is enabled, characters are synced to the VTT as journal entries.
-- **Scene**: automatic — whenever you change the active scene, if **Sync Scenes** is enabled, the new scene's name is broadcast to the VTT. There's no separate manual button for either of these; toggle the corresponding setting to turn the behavior on or off.
+The server also tracks adventure climax pacing and a per-module "Legacy Tracker" persistence schema; this bridge doesn't expose adventure-specific macros yet, but both ride along in `this.adventureState`/`Hooks.call('fates-edge-adventure-state', ...)` for anything downstream that wants them. Deck reseeding (`GET`/`POST /api/rooms/:code/deck/seed`) is likewise available server-side without a macro yet — the existing `deck-shuffled` handler already renders a reseed event generically.
 
 ---
 
-## 🔧 Macros Reference
+## Macros reference
 
 | Function | Description |
-|----------|-------------|
-| `connectFatesEdge()` | Connect to the configured Fate's Edge server. |
-| `disconnectFatesEdge()` | Disconnect from the server. |
-| `drawCard(count, region)` | Draw `count` cards (1–5) from the specified region (or default). |
-| `crownSpread(region)` | Perform a Crown Spread reading from the given region (or default). |
-| `shuffleDeck()` | Shuffle the deck. |
-| `setRegion(region)` | Change the default region. |
-| `listModules()` | Request the list of loaded modules from the VTT server. |
-| `getDeckStatus()` | Returns an object with `remaining` and `history` length. |
-| `requestGM()` | Send a GM request to the server. |
-| `approveGM(targetId)` | Approve a GM request (GM only). |
-| `getGMStatus()` | Returns an object with `currentGM`, `isGM`, `pendingRequests`, and `clients` count. |
+|---|---|
+| `connectFatesEdge()` | Connect to the configured server |
+| `disconnectFatesEdge()` | Disconnect |
+| `drawCard(count, region)` | Draw 1–5 cards from a region (or default) |
+| `crownSpread(region)` | Crown Spread reading |
+| `shuffleDeck()` | Shuffle the deck |
+| `setRegion(region)` | Change the default region |
+| `listModules()` | List loaded modules |
+| `getDeckStatus()` | `{ remaining, history }` |
+| `requestGM()` | Send a GM request |
+| `approveGM(targetId)` | Approve a GM request (GM only) |
+| `getGMStatus()` | `{ currentGM, isGM, pendingRequests, clients }` |
 
-All of the above are also available as `FatesEdgeBridge.<methodName>(...)` directly (e.g. `FatesEdgeBridge.connect()`), which the short `window.*` names above just wrap.
-
----
-
-## 🐛 Troubleshooting
-
-### Connection Failed
-- Verify the **Server URL** and **Room Code** are correct.
-- Ensure the Fate's Edge server is running and reachable.
-- Check firewall/network settings (try `ws://` vs `wss://`).
-
-### Messages Not Syncing
-- Ensure the corresponding sync setting is enabled.
-- Verify the WebSocket connection is active (check status bar).
-- Check the browser console for errors.
-
-### GM Panel Not Showing
-- Ensure **Enable GM Management Features** is enabled in settings.
-- Reconnect to the server; the panel requires a connection to populate client data.
-
-### Deck Draws Not Appearing
-- Ensure **Sync Deck** is enabled.
-- Check that the deck has remaining cards (status bar shows the count).
-
-### Common Errors
-
-| Error | Solution |
-|-------|----------|
-| `WebSocket connection failed` | Server not running or incorrect URL. |
-| `Room not found` | Invalid room code – create a new room or check the code. |
-| `Authentication failed` | Check API key configuration. |
-| `Connection timed out` | Network issue or server overloaded. |
+All of the above are also available as `FatesEdgeBridge.<methodName>(...)` directly — the short `window.*` names just wrap them.
 
 ---
 
-## 🔄 Updating
+## Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| Connection fails | Server URL, room code, `ws://` vs `wss://`, firewall |
+| Messages not syncing | The relevant sync setting is on; connection is active (status bar); browser console for errors |
+| GM panel empty | **Enable GM Management Features** is on; reconnect to populate client data |
+| Deck draws not appearing | **Sync Deck** is on; the deck has cards remaining |
+
+| Error | Meaning |
+|---|---|
+| `WebSocket connection failed` | Server not running, or wrong URL |
+| `Room not found` | Invalid room code |
+| `Authentication failed` | Check API key |
+| `Connection timed out` | Network issue, or server overloaded |
+
+---
+
+## Updating
 
 ```bash
 cd fates-edge-apps && git pull
 ```
 
-Then re-copy `utilities/vtt_mods_bots/foundry_fates-edge-bridge/` over
-`Data/modules/fates-edge-bridge/`, overwriting existing files.
+Then re-copy `utilities/vtt_mods_bots/foundry_fates-edge-bridge/` over `Data/modules/fates-edge-bridge/`, overwriting existing files.
 
 ---
 
-## 🤝 Contributing
+## Documentation
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/amazing-feature`).
-3. Commit your changes (`git commit -m 'Add amazing feature'`).
-4. Push to the branch (`git push origin feature/amazing-feature`).
-5. Open a Pull Request.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License – see the monorepo root's
-[LICENSE.code](../../../LICENSE.code) for details.
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────┐     WebSocket      ┌─────────────────────┐
-│  Foundry VTT    │◄──────────────────►│  Fate's Edge        │
-│  (Module)       │                     │  WebSocket Server   │
-└─────────────────┘                     └─────────────────────┘
-         │                                         │
-         │                                         │
-         ▼                                         ▼
-┌─────────────────┐                     ┌─────────────────────┐
-│  Foundry Users  │                     │  VTT Clients        │
-│  & Game Data    │                     │  (Browser, Mobile)  │
-└─────────────────┘                     └─────────────────────┘
-```
-
----
-
-## 📚 Documentation
-
-- [Fate's Edge Server](../../javascript/fates-edge-socket-server/README.md)
+- [Fate's Edge socket server](../../javascript/fates-edge-socket-server/README.md)
 - [Foundry VTT Wiki](https://foundryvtt.wiki)
 
----
+## License
 
-## 💬 Support
+MIT — see the monorepo root's [`LICENSE.code`](../../../LICENSE.code).
 
-- **Issues**: [GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues)
-- **Email**: support@fates-edge.com
+## Contributing
 
----
+Fork, branch, commit, push, open a pull request.
 
-## ✨ Credits
+## Support
 
-- **Foundry VTT** – The incredible virtual tabletop platform.
-- **Fate's Edge Team** – The amazing team behind Fate's Edge.
+[GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues) · support@fates-edge.com
 
 ---
 

@@ -2,61 +2,52 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Discord-Bot-blue" alt="Discord Bot"/>
-  <img src="https://img.shields.io/badge/version-4.10.0-orange" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/node-18+-brightgreen" alt="Node.js"/>
 </p>
 
-**Fate's Edge Discord Bot** bridges your Discord server with the Fate's Edge VTT WebSocket server, enabling real‑time interaction between Discord users and your VTT sessions. It includes **Game Master election and promotion** features alongside deck, character, chat, and Adventure Engine commands.
+Bridges your Discord server with the Fate's Edge [socket server](../../javascript/fates-edge-socket-server/), so a table can play through Discord slash commands instead of (or alongside) the web client. Covers GM election and promotion, chat relay, dice, characters, timers, the Deck of Consequences, module management, and the Adventure Engine.
 
 ---
 
-## ✨ Features
+## Features
 
-- 🔌 **VTT Connection Management** – Connect, disconnect, and monitor VTT server status.
-- 💬 **Chat Relay** – Send messages between Discord and VTT clients.
-- 🎲 **Dice Rolling** – Roll dice in Discord and optionally broadcast to VTT.
-- 👥 **Character Management** – Create, update, and list VTT characters.
-- ⏱️ **Timer Management** – Create, tick, and track VTT timers.
-- 🃏 **Deck Operations** – Draw cards, shuffle, perform Crown Spread readings.
-- 📦 **Module Management** – List, push, and clean up VTT modules (`/vtt modules`, `/vttadmin modules`).
-- 🎭 **Adventure Engine** – Load modules, advance scenes, run encounters, tick timers, and log narrative beats (`/vttadventure`).
-- 👑 **GM Election & Promotion** – Request GM status, approve/reject requests, view GM status and client lists (via `/vtt gm` subcommands).
-- 🌐 **Webhook Support** – External services can trigger Discord messages.
-- 🔐 **Admin Commands** – Broadcast messages, force sync, view stats.
-- 📊 **Rich Embeds** – Beautiful Discord embed messages for all commands.
+- **VTT connection management** — connect, disconnect, and monitor server status.
+- **Chat relay** — messages flow between Discord and other connected VTT clients.
+- **Dice rolling** — roll in Discord, optionally broadcast to the VTT.
+- **Character management** — create, update, and list VTT characters.
+- **Timer management** — create, tick, and track VTT timers (see the note under Timer Management below — these are separate from the server's own Adventure Engine timers).
+- **Deck operations** — draw, shuffle, and Crown Spread readings.
+- **Module management** — list, push, and clean up VTT adventure modules.
+- **Adventure Engine** — load modules, advance scenes, run encounters, tick timers, and log narrative beats.
+- **GM election & promotion** — request GM status, approve/reject requests, view roles and client lists.
+- **Webhook support** — external services can trigger Discord messages.
+- **Admin commands** — broadcast messages, force sync, view stats, moderate clients.
+- **Rich embeds** for every command's output.
 
 ---
 
-## 📋 Requirements
+## Requirements
 
 - Node.js 18 or higher
-- Discord Bot Token ([Discord Developer Portal](https://discord.com/developers/applications))
-- Fate's Edge VTT WebSocket Server running and accessible
-- Discord Server with bot permissions
+- A Discord Bot Token ([Discord Developer Portal](https://discord.com/developers/applications))
+- A Fate's Edge socket server, running and reachable
+- A Discord server where you can install bots
 
 ---
 
-## 🚀 Quick Start
+## Quick start
 
-### 1. Clone & Install
-
-This bot lives inside the `fates-edge-apps` monorepo, alongside the web
-client and socket server:
+This bot lives inside the `fates-edge-apps` monorepo, alongside the web client and socket server:
 
 ```bash
 git clone https://github.com/Chronophage-net/fates-edge-apps.git
 cd fates-edge-apps/utilities/vtt_mods_bots/fates-edge-discord-bot
 npm install
-```
-
-### 2. Configure Environment
-
-```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your settings:
+Edit `.env`:
 
 ```env
 # Discord Bot Configuration
@@ -81,27 +72,12 @@ WEBHOOK_PORT=3001
 WEBHOOK_SECRET=your-webhook-secret
 ```
 
-### 3. Register Slash Commands
-
 ```bash
-npm run register
-```
-
-### 4. Start the Bot
-
-```bash
-npm start
-```
-
-For development with auto-restart:
-
-```bash
-npm run dev
+npm run register   # register slash commands
+npm start           # or `npm run dev` for auto-restart during development
 ```
 
 ### Docker
-
-A `Dockerfile` is included, and the bot is also wired into the monorepo root's `docker-compose.yml` under the `bots`/`discord-bot` profiles:
 
 ```bash
 # from the fates-edge-apps repo root
@@ -109,93 +85,72 @@ cp .env.example .env   # fill in DISCORD_TOKEN
 docker-compose --profile discord-bot up
 ```
 
----
-
-## 🔧 Discord Bot Setup
-
-### Creating a Bot Token
-
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Click **New Application** and name it "Fate's Edge Bot"
-3. Go to the **Bot** tab
-4. Click **Add Bot**
-5. Under **Token**, click **Copy** (save this for `.env`)
-6. Enable **Message Content Intent** and **Server Members Intent**
-
-### Inviting the Bot
-
-1. Go to the **OAuth2** → **URL Generator** tab
-2. Under **Scopes**, select `bot` and `applications.commands`
-3. Under **Bot Permissions**, select:
-   - Send Messages
-   - Embed Links
-   - Attach Files
-   - Read Message History
-   - Use Slash Commands
-4. Copy the generated URL and open it in your browser
-5. Select your server and authorize
+A standalone `Dockerfile` is also included if you'd rather build just this bot in isolation.
 
 ---
 
-## 📊 Command Reference
+## Discord bot setup
 
-### VTT Management
+**Creating a bot token:** [Discord Developer Portal](https://discord.com/developers/applications) → New Application → Bot tab → Add Bot → copy the token for `.env`. Enable **Message Content Intent** and **Server Members Intent**.
+
+**Inviting the bot:** OAuth2 → URL Generator → scopes `bot` and `applications.commands` → permissions Send Messages, Embed Links, Attach Files, Read Message History, Use Slash Commands → open the generated URL and authorize it for your server.
+
+---
+
+## Command reference
+
+### VTT management
 
 | Command | Description | Example |
-|---------|-------------|---------|
-| `/vtt connect [room]` | Connect to VTT server | `/vtt connect AC12` |
-| `/vtt disconnect` | Disconnect from VTT server | `/vtt disconnect` |
+|---|---|---|
+| `/vtt connect [room]` | Connect to the VTT server | `/vtt connect AC12` |
+| `/vtt disconnect` | Disconnect | `/vtt disconnect` |
 | `/vtt status` | Show connection status | `/vtt status` |
 | `/vtt info` | Show room info and clients | `/vtt info` |
 | `/vtt region <region>` | Set default region for deck draws | `/vtt region Acasia` |
 | `/vtt modules` | List loaded modules | `/vtt modules` |
 
-### GM Management (subgroup `/vtt gm`)
+### GM management (`/vtt gm`)
 
 | Command | Description | Example |
-|---------|-------------|---------|
+|---|---|---|
 | `/vtt gm request` | Request to become Game Master | `/vtt gm request` |
 | `/vtt gm approve <player>` | Approve a pending GM request (GM only) | `/vtt gm approve "PlayerName"` |
 | `/vtt gm status` | Show current GM and pending requests | `/vtt gm status` |
 | `/vtt gm list` | List all connected clients with their roles | `/vtt gm list` |
 
-### Dice Rolling
+### Dice & chat
 
 | Command | Description | Example |
-|---------|-------------|---------|
+|---|---|---|
 | `/roll <dice> [reason] [vtt:true]` | Roll dice and optionally send to VTT | `/roll 3d6+2 "Attack" vtt:true` |
+| `/vttchat <message> [sender]` | Send a message to VTT chat | `/vttchat "Hello VTT!" "GM"` |
 
-### Chat Relay
-
-| Command | Description | Example |
-|---------|-------------|---------|
-| `/vttchat <message> [sender]` | Send message to VTT chat | `/vttchat "Hello VTT!" "GM"` |
-
-### Character Management
+### Character management
 
 | Command | Description | Example |
-|---------|-------------|---------|
+|---|---|---|
 | `/vttchar list` | List all VTT characters | `/vttchar list` |
 | `/vttchar add <name> [harm] [fatigue] [boons] [tier]` | Add character | `/vttchar add "Aria" harm:2 fatigue:1 boons:3 tier:3` |
 | `/vttchar update <name> [harm] [fatigue] [boons] [tier]` | Update character | `/vttchar update "Aria" harm:3` |
 | `/vttchar remove <name>` | Remove character | `/vttchar remove "Aria"` |
 
-### Timer Management
+### Timer management
 
 | Command | Description | Example |
-|---------|-------------|---------|
+|---|---|---|
 | `/vtttimer create <name> <segments>` | Create a new timer | `/vtttimer create "Ritual" 6` |
 | `/vtttimer tick <name> [amount]` | Tick a timer forward | `/vtttimer tick "Ritual" 2` |
 | `/vtttimer list` | List all active timers | `/vtttimer list` |
 | `/vtttimer remove <name>` | Remove a timer | `/vtttimer remove "Ritual"` |
 | `/vtttimer reset <name>` | Reset a timer to 0 | `/vtttimer reset "Ritual"` |
 
-> **Note:** these are local, freeform timers tracked only by the bot — they're not the same thing as the server's Adventure Engine timers (`/vttadventure timer`, tied to timers defined inside a loaded adventure module). The bot broadcasts its timer list to the room as a non-destructive status notification whenever it changes, so other connected clients can display it, but nothing on the server persists or authoritatively tracks these.
+These are local, freeform timers tracked only by the bot — distinct from the server's Adventure Engine timers (`/vttadventure timer`, tied to timers defined inside a loaded adventure module). The bot broadcasts its timer list to the room as a non-destructive status notification whenever it changes, so other clients can display it, but nothing on the server persists or authoritatively tracks these.
 
 ### Adventure Engine
 
 | Command | Description | Example |
-|---------|-------------|---------|
+|---|---|---|
 | `/vttadventure load <moduleid>` | Load an adventure module | `/vttadventure load "the-hazel-root"` |
 | `/vttadventure scene [actindex] [sceneindex]` | Advance the adventure (omit both to advance sequentially) | `/vttadventure scene actindex:1 sceneindex:0` |
 | `/vttadventure encounter start <ref>` | Start an encounter by index or name | `/vttadventure encounter start "Bandit Ambush"` |
@@ -204,62 +159,54 @@ docker-compose --profile discord-bot up
 | `/vttadventure log <text> [author]` | Append a narrative beat to the adventure log | `/vttadventure log "The bridge collapses behind them."` |
 | `/vttadventure status` | Show current adventure state | `/vttadventure status` |
 
-> **Server API note (v4.16.0):** the socket server added `POST /api/rooms/:code/adventure/climax-forced` (a sibling of the existing `climax-triggered` route, marking that the AI GM director forced a dramatic turn to keep a stalled climax moving — broadcasts `adventure-climax-forced`), and the `GET /api/rooms/:code/adventure` state now also reports `climaxPadScenes`, `climaxScenesSinceTrigger`, and `climaxForced`. The `load-custom` route also accepts an optional `climaxPadScenes` field, and the GM/AI-eyes-only `GET /api/rooms/:code/adventure/reference` payload now carries an optional `persistence` block (the "Legacy Tracker" schema declaration). None of these are surfaced by a slash command yet — `/vttadventure status` and `/vttadventure reference` are unaffected until their embeds are updated to display the new fields.
+The server also tracks climax pacing (how long a triggered climax act has run before a GM or the AI GM director forces it toward resolution) and a per-adventure-module "Legacy Tracker" persistence schema; neither has a dedicated slash command yet, so use `/vttadventure status`/`reference` for the raw state or drive them from the web client.
 
-### Deck Operations
+### Deck operations
 
 | Command | Description | Example |
-|---------|-------------|---------|
+|---|---|---|
 | `/vttdeck draw <count> [region]` | Draw cards from deck | `/vttdeck draw 3 Acasia` |
 | `/vttdeck crown [region]` | Perform Crown Spread | `/vttdeck crown Acasia` |
 | `/vttdeck shuffle` | Shuffle the deck | `/vttdeck shuffle` |
 | `/vttdeck history` | Show deck history | `/vttdeck history` |
 
-> **Note:** `/deck` (in `commands/dice.js`) is a near-duplicate of `/vttdeck` with the same draw/crown/shuffle/status/history subcommands under a shorter name — either works.
+`/deck` (in `commands/dice.js`) is a near-duplicate of `/vttdeck` with the same subcommands under a shorter name — either works. Each room's deck shuffles with its own seedable RNG, so draws are reproducible per room via the server's `GET`/`POST /api/rooms/:code/deck/seed` routes; no slash command calls those yet.
 
-> **Server API note (v4.16.0):** each room's deck now shuffles with its own seedable RNG instead of a shared unseeded one, so draws are reproducible per room. Two new REST routes support this — `GET /api/rooms/:code/deck/seed` (returns `{ code, seed }`) and `POST /api/rooms/:code/deck/seed` with body `{ seed }` (reseeds and reshuffles, broadcasting `deck-shuffled` with `reason: 'reseeded'`). No slash command calls these yet.
-
-### Module Management
+### Module management
 
 | Command | Description | Example |
-|---------|-------------|---------|
+|---|---|---|
 | `/vtt modules` | List loaded modules | `/vtt modules` |
 | `/vttadmin modules list` | List loaded modules (admin) | `/vttadmin modules list` |
 | `/vttadmin modules push <module-id>` | Push a module to clients | `/vttadmin modules push "my-module"` |
 | `/vttadmin modules cleanup <module-id>` | Clean up a module | `/vttadmin modules cleanup "my-module"` |
 
-### Admin Commands
+### Admin commands
 
 | Command | Description | Example |
-|---------|-------------|---------|
-| `/vttadmin broadcast <message>` | Broadcast message to all VTT clients | `/vttadmin broadcast "Break time!"` |
+|---|---|---|
+| `/vttadmin broadcast <message>` | Broadcast a message to all VTT clients | `/vttadmin broadcast "Break time!"` |
 | `/vttadmin sync` | Force sync all state | `/vttadmin sync` |
 | `/vttadmin stats` | Show bot statistics | `/vttadmin stats` |
 | `/vttadmin players` | List players currently in the VTT room | `/vttadmin players` |
 | `/vttadmin kick <target> [reason]` | Kick a player from the VTT room | `/vttadmin kick "Levi" "AFK too long"` |
-| `/vttadmin ban <target> [reason]` | Ban a player from the VTT room | `/vttadmin ban "Levi"` |
+| `/vttadmin ban <target> [reason]` | Ban a player | `/vttadmin ban "Levi"` |
 | `/vttadmin unban <client-id>` | Unban a client by id | `/vttadmin unban ws-AC12` |
 | `/vttadmin role <target> <role> [save]` | Change a player's role — Co-GM, Assistant GM, Player, or Spectator (server enforces GM-only; `save` persists a Co-GM/Assistant GM grant across reconnects, demotions always persist) | `/vttadmin role "AI_GM" assistant-gm save:True` |
 
-`target` in the commands above accepts either a player's display name or their raw client id (`ws-...`/socket.io id). `role` assigns `assistant-gm` to the AI GM Bot's own client the same way you'd promote a human to Co-GM — see the `fates-edge-ai-gm-bot` repo's README ("Assistant GM Mode" section) for what changes once it holds that role.
+`target` accepts either a player's display name or their raw client id (`ws-...`/socket.io id). `assistant-gm` is the role typically assigned to the AI GM Bot's own client — see the [`fates-edge-ai-gm-bot`](https://github.com/Chronophage-net/fates-edge-ai-gm-bot) repo's README ("Assistant GM Mode") for what changes once it holds that role.
 
 ---
 
-## 🎙️ AI GM Voice Narration (optional)
+## AI GM Voice Narration (optional)
 
-Off by default. If the AI GM Bot has its own voice narration configured (`TTS_ENABLED`/`TTS_URL`
-in `fates-edge-ai-gm-bot`'s `.env` — see that repo's README), this bot can additionally speak
-those same replies into a Discord voice channel.
+Off by default. If the AI GM Bot has its own voice narration configured (see its own README), this bot can additionally speak those replies into a Discord voice channel:
 
-**Setup:**
-
-1. Install the extra playback dependencies (not installed by default — see `package.json`'s
-   `_note_voice`):
+1. Install the extra playback dependencies (not installed by default):
    ```bash
    npm install @discordjs/opus ffmpeg-static
    ```
-   (or have a system `ffmpeg` on `PATH` instead of `ffmpeg-static`, and/or `opusscript` instead of
-   `@discordjs/opus` if you'd rather avoid a native build.)
+   (or a system `ffmpeg` on `PATH` instead of `ffmpeg-static`, and/or `opusscript` instead of `@discordjs/opus` if you'd rather avoid a native build.)
 2. Set in `.env`:
    ```
    DISCORD_GUILD_ID=your-server-id
@@ -268,31 +215,17 @@ those same replies into a Discord voice channel.
    ```
 3. Make sure the bot has `Connect` and `Speak` permissions on that voice channel.
 
-The bot joins the configured channel on the first narration clip it receives and stays connected
-(no auto-leave yet — disconnect it from Discord's own UI, or restart the bot, if you want it to
-leave). Entirely optional and fails soft: with `DISCORD_TTS_ENABLED` unset, or the extra
-dependencies not installed, or the bot lacking channel permissions, playback silently no-ops and
-logs a warning — the narration **text** still reaches Discord exactly as before via whatever
-already relays `chat-message` (e.g. the webhook's `vtt-chat` event below).
+The bot joins the configured channel on the first narration clip it receives and stays connected — disconnect it from Discord's own UI, or restart the bot, to have it leave. This fails soft at every layer: missing dependencies, no permission, or `DISCORD_TTS_ENABLED` unset all degrade to "narration text still arrives normally, audio silently doesn't play."
+
+## Reactive Soundscape (optional)
+
+Off by default, no setup needed on this bot's side. If the AI GM Bot has a mood → track soundscape profile configured, this bot posts a "🎵 Now Playing" embed to `VTT_LOG_CHANNEL` whenever the ambience changes — text only, no voice playback here. The actual ambience audio plays client-side in each player's own web browser (`fates-edge-web-client`'s `core/soundboard.js`), not through this bot's voice connection — that's what Voice Narration above is for.
 
 ---
 
-## 🎵 Reactive Soundscape (optional)
+## Webhook integration
 
-Off by default — needs no setup on this bot's side. If the AI GM Bot has a mood → trackId
-soundscape profile configured (see `fates-edge-ai-gm-bot`'s README "Reactive Soundscape" section),
-this bot posts a "🎵 Now Playing" embed to `VTT_LOG_CHANNEL` whenever the ambience changes — text
-only, no voice playback here. The actual ambience audio plays client-side in each player's own web
-browser (see `fates-edge-web-client`'s `core/soundboard.js`), not through this bot's voice
-connection — that's what AI GM Voice Narration above is for.
-
----
-
-## 🌐 Webhook Integration
-
-The bot includes an Express webhook server for external services to send messages to Discord.
-
-### Webhook Endpoint
+The bot runs an Express webhook server so external services can send messages to Discord:
 
 ```
 POST /webhook
@@ -303,177 +236,69 @@ Body: {
 }
 ```
 
-### Example Webhook Usage
-
 ```bash
 curl -X POST http://localhost:3001/webhook \
   -H "x-webhook-secret: your-webhook-secret" \
   -H "Content-Type: application/json" \
   -d '{
     "event": "vtt-roll",
-    "data": {
-      "channelId": "1234567890",
-      "sender": "Aria",
-      "roll": "3d6+2",
-      "result": "15"
-    }
+    "data": { "channelId": "1234567890", "sender": "Aria", "roll": "3d6+2", "result": "15" }
   }'
 ```
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐     WebSocket      ┌─────────────────────┐
 │  Discord Bot    │◄──────────────────►│  Fate's Edge        │
-│  (Commands)     │                     │  WebSocket Server   │
+│  (Commands)     │                     │  Socket Server       │
 └─────────────────┘                     └─────────────────────┘
-         │                                         │
          │                                         │
          ▼                                         ▼
 ┌─────────────────┐                     ┌─────────────────────┐
 │  Discord Users  │                     │  VTT Clients        │
-│  (Slash cmds)   │                     │  (Foundry/Roll20)   │
+│  (Slash cmds)   │                     │  (Foundry/Roll20/…)  │
 └─────────────────┘                     └─────────────────────┘
          │
          ▼
 ┌─────────────────┐
-│  Webhook         │
-│  Server (optional) │
+│  Webhook Server  │
+│  (optional)      │
 └─────────────────┘
 ```
 
 ---
 
-## 🐛 Troubleshooting
-
-### Bot Not Connecting
-
-| Issue | Solution |
-|-------|----------|
-| Invalid token | Check `DISCORD_TOKEN` in `.env` |
-| Missing intents | Enable Message Content Intent in Discord Developer Portal |
-| Gateway connection | Check network connectivity and Discord status |
-
-### VTT Connection Failed
-
-| Issue | Solution |
-|-------|----------|
-| Server offline | Start the VTT WebSocket server |
-| Wrong URL | Check `VTT_SERVER_URL` in `.env` |
-| Invalid room | Check `VTT_ROOM_CODE` in `.env` |
-| API key error | Check `VTT_API_KEY` in `.env` |
-
-### GM Approval Not Working
-
-- The user must first send a GM request (`/vtt gm request`).
-- Only the current GM can approve.
-- Use `/vtt gm list` to see all clients and their roles.
-
-### Notifications Not Sending (GM events)
-
-- Set `VTT_LOG_CHANNEL` to a valid Discord channel ID.
-- Ensure the bot has permission to send messages in that channel.
-- Verify the bot is connected to the VTT server.
-
-### Slash Commands Not Appearing
-
-| Issue | Solution |
-|-------|----------|
-| Commands not registered | Run `npm run register` |
-| Bot missing permissions | Re-invite bot with `applications.commands` scope |
-| Cache | Wait 1 hour or re-invite bot |
-
-### Permission Errors
-
-The bot needs these permissions:
-- Send Messages
-- Embed Links
-- Attach Files
-- Read Message History
-- Use Slash Commands
-
----
-
-## 📝 Logs
-
-Logs are stored in `logs/` directory:
-- `combined.log` - All logs
-- `error.log` - Error logs only
-
----
-
-## 🔄 Updating
-
-```bash
-git pull
-npm install
-npm run register
-pm2 restart fates-edge-bot  # If using PM2
-```
-
----
-
-## 📄 License
-
-MIT License – see the monorepo root's [LICENSE.code](../../../LICENSE.code) for details.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/amazing`).
-3. Commit changes (`git commit -m 'Add amazing feature'`).
-4. Push to branch (`git push origin feature/amazing`).
-5. Open a Pull Request.
-
----
-
-## 💬 Support
-
-- **Issues**: [GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues)
-- **Email**: support@fates-edge.com
-
----
-
-## 🛠️ Development
-
-### Project Structure
+## Project structure
 
 ```
 fates-edge-discord-bot/
 ├── index.js                # Main entry
-├── package.json            # Dependencies
-├── .env.example            # Environment template
-├── commands/               # Slash commands
-│   ├── vtt.js              # VTT connection, info, GM, grid/whiteboard, characters
-│   ├── admin.js            # /vttadmin: broadcast, sync, stats, deck, modules, region, kick/ban, grid, token, whiteboard
-│   ├── adventure.js        # /vttadventure: load, scene, encounter, timer, log, status
-│   ├── dice.js             # /deck (near-duplicate of vttdeck.js)
-│   ├── chat.js             # Chat relay
-│   ├── character.js        # Character management
-│   ├── timer.js            # Local (bot-only) timer tracking
-│   └── vttdeck.js          # Deck operations
-├── utils/                  # Utilities
-│   ├── websocket.js        # WebSocket client (with GM support)
-│   ├── logger.js           # Logging
-│   └── config.js           # Configuration
-└── events/                 # Discord events
-    ├── ready.js            # Ready handler (GM notifications)
-    ├── messageCreate.js    # Message handler
-    └── interactionCreate.js # Interaction handler
+├── package.json
+├── .env.example
+├── commands/                # Slash commands
+│   ├── vtt.js               # VTT connection, info, GM, grid/whiteboard, characters
+│   ├── admin.js              # /vttadmin: broadcast, sync, stats, deck, modules, region, kick/ban, grid, token, whiteboard
+│   ├── adventure.js          # /vttadventure: load, scene, encounter, timer, log, status
+│   ├── dice.js                # /deck (near-duplicate of vttdeck.js)
+│   ├── chat.js                 # Chat relay
+│   ├── character.js            # Character management
+│   ├── timer.js                # Local (bot-only) timer tracking
+│   └── vttdeck.js               # Deck operations
+├── utils/
+│   ├── websocket.js             # WebSocket client (with GM support)
+│   ├── logger.js
+│   └── config.js
+└── events/
+    ├── ready.js                 # Ready handler (GM notifications)
+    ├── messageCreate.js
+    └── interactionCreate.js
 ```
 
-### Adding New Commands
+Adding a new command: create `commands/yourcommand.js`, export `data` (built with `SlashCommandBuilder`) and `execute(interaction, client)` — it auto-loads on restart.
 
-1. Create `commands/yourcommand.js`.
-2. Use `SlashCommandBuilder` for command definition.
-3. Export `data` and `execute(interaction, client)`.
-4. Command auto-loads on restart.
-
-Example:
 ```javascript
 const { SlashCommandBuilder } = require('discord.js');
 
@@ -486,6 +311,41 @@ module.exports = {
     }
 };
 ```
+
+---
+
+## Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| Bot won't connect to Discord | `DISCORD_TOKEN`, Message Content Intent enabled, Discord status |
+| Bot can't reach the VTT server | Server running? `VTT_SERVER_URL`/`VTT_ROOM_CODE`/`VTT_API_KEY` correct? |
+| GM approval not working | Requester must `/vtt gm request` first; only the current GM can approve; check `/vtt gm list` |
+| GM notifications not sending | `VTT_LOG_CHANNEL` set to a valid channel id the bot can post in |
+| Slash commands missing | `npm run register`; re-invite with `applications.commands` scope; Discord's command cache can take up to an hour |
+
+Logs land in `logs/` — `combined.log` for everything, `error.log` for errors only.
+
+## Updating
+
+```bash
+git pull
+npm install
+npm run register
+pm2 restart fates-edge-bot  # if using PM2
+```
+
+## License
+
+MIT — see the monorepo root's [`LICENSE.code`](../../../LICENSE.code).
+
+## Contributing
+
+Fork, branch, commit, push, open a pull request.
+
+## Support
+
+[GitHub Issues](https://github.com/Chronophage-net/fates-edge-apps/issues) · support@fates-edge.com
 
 ---
 

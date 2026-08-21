@@ -1,27 +1,22 @@
 # Fate's Edge Desktop Client
 
-A lightweight desktop client for the Fate's Edge Virtual Tabletop.
+An Electron wrapper around the [web client](../fates-edge-web-client/) — the same application, packaged as a native desktop app instead of a browser tab.
 
 ## Features
 
-- 📦 Standalone desktop application
-- 🔌 Connects to Fate's Edge server
-- 🎲 Full web client support, including GM Tools → Session Recap (recording +
-  event transcript now bundle into a single `.zip` download, with an opt-in
-  best-effort live-transcription checkbox)
-- ⚡ Minimal resource usage
-- 🔄 Auto-updater built-in
-- 🎨 Native OS integration
-- ⌨️ Keyboard shortcuts
+- The full web client, unmodified — characters, dice, the VTT, Spellcraft, Kon'reh, Toll & Veil, Session Recap (recording + event transcript bundle into one `.zip`, with an opt-in live-transcription checkbox), all of it.
+- Native OS integration, an auto-updater, and app-level keyboard shortcuts (below) on top of whatever the web client itself already provides.
+- Minimal resource usage — this is a thin shell, not a second copy of the application logic.
 
 ## Installation
 
 ### Download
-Download the latest release from the GitHub Releases page.
 
-### From Source
+Grab the latest release from the GitHub Releases page.
+
+### From source
+
 ```bash
-# Clone the repository
 git clone https://github.com/Chronophage-net/fates-edge-apps.git
 cd fates-edge-apps/utilities/javascript/fates-edge-desktop-client
 
@@ -36,149 +31,89 @@ npm run build
 ```
 
 ### Development
-```bash
-# Run in development mode (copies the web client build into renderer/
-# automatically via the predev script -- rebuild the web client first
-# with `npm run build` in ../fates-edge-web-client if you've changed it)
-npm run dev
 
-# Run in production mode
-npm start
+```bash
+npm run dev      # rebuilds/copies the web client's dist/ into renderer/ automatically, then launches
+npm start         # production mode
 ```
 
-Both `npm start` and `npm run dev` copy `../fates-edge-web-client/dist`
-into this package's `renderer/` folder before launching (see
-`scripts/copy-renderer.js`). If that dist folder doesn't exist yet, build
-the web client first: `cd ../fates-edge-web-client && npm run build`.
+Both commands copy `../fates-edge-web-client/dist` into this package's `renderer/` folder before launching (`scripts/copy-renderer.js`). If that `dist/` folder doesn't exist yet, build the web client first: `cd ../fates-edge-web-client && npm run build`.
 
 ## Usage
 
-1. Launch the application
-2. Enter your Fate's Edge server URL
-3. Start gaming!
+1. Launch the application.
+2. Enter your Fate's Edge server URL (or skip this to use the client entirely offline, same as the browser version).
+3. Play.
 
-## Keyboard Shortcuts
+## Keyboard shortcuts
 
-- `Cmd/Ctrl + ,` - Open settings
-- `Cmd/Ctrl + R` - Reload page
-- `Cmd/Ctrl + Q` - Quit
-- `Cmd/Ctrl + Shift + I` - Developer Tools
-- `Cmd/Ctrl + 0` - Reset zoom
-- `Cmd/Ctrl + =` - Zoom in
-- `Cmd/Ctrl + -` - Zoom out
-- `F11` - Toggle full screen
+| Shortcut | Action |
+|---|---|
+| `Cmd/Ctrl + ,` | Open settings |
+| `Cmd/Ctrl + R` | Reload page |
+| `Cmd/Ctrl + Q` | Quit |
+| `Cmd/Ctrl + Shift + I` | Developer tools |
+| `Cmd/Ctrl + 0` / `+` / `-` | Reset / zoom in / zoom out |
+| `F11` | Toggle full screen |
 
-## Configuration
+These are in addition to the web client's own in-app shortcuts — see its [`ACCESSIBILITY.md`](../fates-edge-web-client/ACCESSIBILITY.md) for those.
 
-Settings are stored via `electron-store` (as `settings.json`, alongside a
-separate `localdata.json` for saved VTT state) under Electron's standard
-per-OS userData directory for this app (productName `FatesEdge`):
+## Configuration & data
+
+Settings are stored via `electron-store` (`settings.json`, plus a separate `localdata.json` for saved VTT state) under Electron's standard per-OS userData directory for this app (productName `FatesEdge`):
+
 - **Windows:** `%APPDATA%/FatesEdge/settings.json`
 - **macOS:** `~/Library/Application Support/FatesEdge/settings.json`
 - **Linux:** `~/.config/FatesEdge/settings.json`
 
-Backups (`create-backup`) and named sessions (`save-session`) are written
-as JSON files under `backups/` and `sessions/` in that same directory.
+Backups (`create-backup`) and named sessions (`save-session`) are written as JSON files under `backups/` and `sessions/` in that same directory.
 
 ## Building
 
-### Build for Current Platform
 ```bash
-npm run build
-```
+npm run build              # current platform
+npm run build:mac          # macOS
+npm run build:win          # Windows
+npm run build:linux        # Linux
+npm run build:all          # all platforms
 
-### Build for Specific Platform
-```bash
-npm run build:mac    # macOS
-npm run build:win    # Windows
-npm run build:linux  # Linux
-```
-
-### Build for All Platforms
-```bash
-npm run build:all
-```
-
-### Using the Build Script
-```bash
-# Interactive menu
+# or the interactive build script
 node scripts/build.js
-
-# Build for specific platform
 node scripts/build.js --platform=mac
-
-# Build for all platforms
 node scripts/build.js --all
-
-# Clean build directory
 node scripts/build.js --clean
-
-# Show help
-node scripts/build.js --help
 ```
 
-## Requirements
+### Platform requirements
 
-- Node.js 18+
-- npm or yarn
-- For building: electron-builder dependencies
+- **macOS** — Xcode Command Line Tools; an Apple Developer certificate for codesigning.
+- **Windows** — Windows 10/11; Visual Studio Build Tools (for native modules).
+- **Linux** — `libc6 libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 libxcb1 libx11-xcb1 libxcb-dri3-0 libdrm2 libgbm1`.
 
-### Platform-Specific Requirements
-
-#### macOS
-- Xcode Command Line Tools
-- For codesigning: Apple Developer certificate
-
-#### Windows
-- Windows 10/11
-- Visual Studio Build Tools (for native modules)
-
-#### Linux
-- libc6, libgtk-3-0, libnotify4, libnss3, libxss1, libxtst6, libxcb1, libx11-xcb1, libxcb-dri3-0, libdrm2, libgbm1
-
-## Icon Generation
-
-To generate app icons:
+### Icon generation
 
 ```bash
-# Install ImageMagick (if not already installed)
-brew install imagemagick  # macOS
-apt-get install imagemagick  # Linux
-choco install imagemagick  # Windows
-
-# Generate icons from a source image
+brew install imagemagick   # or apt-get / choco
 cd build
 ./generate-icons.sh source.png
 ```
 
 ## Troubleshooting
 
-### "Electron failed to install correctly"
-```bash
-rm -rf node_modules
-npm install
-```
+| Problem | Fix |
+|---|---|
+| "Electron failed to install correctly" | `rm -rf node_modules && npm install` |
+| Cannot connect to server | Confirm the server is running, check the URL in Settings (`Cmd/Ctrl + ,`), check your firewall |
+| Build fails on macOS | `xcode-select --install`; for dev builds, `export CSC_IDENTITY_AUTO_DISCOVERY=false` |
 
-### "Cannot connect to server"
-- Make sure the Fate's Edge server is running
-- Check the server URL in settings (Cmd/Ctrl + ,)
-- Check network/firewall settings
+## Requirements
 
-### Build fails on macOS
-```bash
-# Install missing dependencies
-xcode-select --install
-# Allow signing errors during development
-export CSC_IDENTITY_AUTO_DISCOVERY=false
-```
+Node.js 18+, npm or yarn, and (for building installers) `electron-builder`'s per-platform dependencies above.
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+Fork the repository, branch, make your changes, and open a pull request.
 
 ## License
 
-MIT License
+MIT — see the monorepo root's [`LICENSE.code`](../../../LICENSE.code).
