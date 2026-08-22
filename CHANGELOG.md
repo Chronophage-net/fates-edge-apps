@@ -3,6 +3,12 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.20.3] - 2026-08-22
+
+Documentation sweep across the ecosystem; AI GM Bot lite Docker stack for underpowered machines; link Campfire Mode from the welcome wizard
+
+_No commits since the last tag — manual version bump._
+
 ## [4.20.2] - 2026-08-21
 
 Voice-adapter/demo hardening from a code-review pass on `docker-compose.voice.yml`

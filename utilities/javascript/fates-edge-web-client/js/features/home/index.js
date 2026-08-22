@@ -25,6 +25,7 @@ let overlayShown = false; // prevent duplicate overlays
 let quickStartInFlight = false; // guard against double-fire (delegated handler + direct listener both match [data-action="quick-start"])
 
 const ESSENTIALS_DOC_URL = '/data/docs/resources/Fates_-_Edge_-_-Essentials.html';
+const CAMPFIRE_DOC_URL = '/data/docs/quickstart/Fates_-_Edge_-_-Campfire_Mode.html';
 
 // ─── Render Functions ──────────────────────────────────────────────────
 
@@ -862,6 +863,7 @@ function showWelcomeOverlay() {
         <ul>
           <li><a href="/data/docs/resources/Fates_-_Edge_-_-Essentials.html" target="_blank">⚡ Essentials</a> – quick start rules</li>
           <li><a href="/data/docs/resources/Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html" target="_blank">📜 Playing &amp; Running Fate's Edge</a> – full guide</li>
+          <li><a href="${CAMPFIRE_DOC_URL}" target="_blank">🏕️ Campfire Mode</a> – the whole game on a handful of pages, free to print and share at the table</li>
         </ul>
       </div>
 
@@ -944,6 +946,7 @@ function renderQuickStartConfirmation(overlayEl, { character, adventure }) {
       <p style="margin:0;font-weight:500;">📖 New to Fate's Edge?</p>
       <ul>
         <li><a href="${ESSENTIALS_DOC_URL}" target="_blank" rel="noopener">⚡ Essentials</a> – the quickstart rules primer, keep it open in a tab while you play</li>
+        <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener">🏕️ Campfire Mode</a> – an even shorter cheat-sheet version, good for a first-time table</li>
       </ul>
     </div>
     <div class="welcome-actions">
