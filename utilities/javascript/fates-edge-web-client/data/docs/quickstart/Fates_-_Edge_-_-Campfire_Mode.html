@@ -5,73 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🏕️ Fate's Edge: Campfire Edition</title>
     <style>
+        :root {
+            /* Warm parchment palette (default / light / print) */
+            --bg: #fcf3e6;
+            --panel-bg: #fffaf0;
+            --panel-border: #eddccb;
+            --ink: #2c241a;
+            --ink-soft: #7a5d3e;
+            --head: #593c1e;
+            --sub-bg: #f2e4d4;
+            --rule: #e6c9a8;
+            --rule-strong: #dba46a;
+            --h2: #4d351b;
+            --h3: #5e4024;
+            --card-bg: #f8efe6;
+            --th-bg: #dba46a;
+            --th-ink: #1f160f;
+            --td-border: #e6d4c2;
+            --dark-bg: #2c241a;
+            --dark-ink: #f7e8d9;
+            --dark-ink-soft: #c4b09c;
+            --dark-accent: #f5c542;
+            --pack-bg: #f5eee7;
+            --pack-border: #b88752;
+            --tip-bg: #e6d9c9;
+            --dash: #dccbbc;
+            --badge-bg: #e6c9a8;
+            --footer-ink: #7a5d3e;
+            --footer-sub: #9a7f65;
+            --shadow: rgba(0,0,0,0.10);
+        }
+        /* Darker, still-warm parchment — matches the palette used by the
+           other Fate's Edge reference documents (Essentials, SRD, GM
+           Guide) so this doesn't jar against them, and so it doesn't
+           flash a bright white/cream page for anyone reading in a dark
+           room or with system dark mode on. */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a140d;
+                --panel-bg: #241c13;
+                --panel-border: #3a2c1a;
+                --ink: #f0e3d3;
+                --ink-soft: #cbb08a;
+                --head: #f0c987;
+                --sub-bg: #2e2417;
+                --rule: #5c4a30;
+                --rule-strong: #b8863f;
+                --h2: #e8c98a;
+                --h3: #dba46a;
+                --card-bg: #2a2115;
+                --th-bg: #6b4a26;
+                --th-ink: #f5e6cf;
+                --td-border: #4a3a24;
+                --dark-bg: #0f0b07;
+                --dark-ink: #f7e8d9;
+                --dark-ink-soft: #c4b09c;
+                --dark-accent: #f5c542;
+                --pack-bg: #241c13;
+                --pack-border: #8a6339;
+                --tip-bg: #2e2417;
+                --dash: #4a3a24;
+                --badge-bg: #4a3a24;
+                --footer-ink: #cbb08a;
+                --footer-sub: #9a7f65;
+                --shadow: rgba(0,0,0,0.45);
+            }
+        }
+        /* Higher-contrast pass for prefers-contrast / forced-colors —
+           thicker rules and stronger borders so the sheet stays readable
+           when someone needs more separation between sections. */
+        @media (prefers-contrast: more) {
+            :root {
+                --panel-border: #8a6339;
+                --td-border: #8a6339;
+                --dash: #8a6339;
+            }
+            h1, h2 { border-width: 5px; }
+            table, .stat-grid, .cheat-grid, .outcome-grid { border: 2px solid var(--rule-strong); }
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            background: #fcf3e6;
+            background: var(--bg);
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             padding: 2rem 1rem;
-            color: #2c241a;
+            color: var(--ink);
             line-height: 1.6;
         }
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: #fffaf0;
+            background: var(--panel-bg);
             border-radius: 32px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+            box-shadow: 0 12px 40px var(--shadow);
             padding: 2.5rem 2rem;
-            border: 1px solid #eddccb;
+            border: 1px solid var(--panel-border);
         }
         h1 {
             font-size: 2.6rem;
             font-weight: 700;
             margin-bottom: 0.2rem;
-            color: #593c1e;
+            color: var(--head);
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            border-bottom: 4px solid #e6c9a8;
+            border-bottom: 4px solid var(--rule);
             padding-bottom: 0.5rem;
         }
         .subhead {
             font-size: 1.2rem;
-            color: #7a5d3e;
+            color: var(--ink-soft);
             margin-top: -0.2rem;
             margin-bottom: 2rem;
             font-style: italic;
-            background: #f2e4d4;
+            background: var(--sub-bg);
             display: inline-block;
             padding: 0.2rem 1.2rem;
             border-radius: 40px;
         }
         .gold-rule {
-            background: #2c241a;
-            color: #f7e8d9;
+            background: var(--dark-bg);
+            color: var(--dark-ink);
             padding: 1.2rem 1.8rem;
             border-radius: 20px;
             margin-bottom: 2rem;
-            border-left: 8px solid #e6a44a;
+            border-left: 8px solid var(--rule-strong);
         }
         .gold-rule strong {
-            color: #f5c542;
+            color: var(--dark-accent);
         }
         h2 {
             font-size: 1.8rem;
             margin-top: 2.2rem;
             margin-bottom: 0.8rem;
-            color: #4d351b;
-            border-left: 6px solid #dba46a;
+            color: var(--h2);
+            border-left: 6px solid var(--rule-strong);
             padding-left: 1rem;
         }
         h3 {
             font-size: 1.3rem;
             margin-top: 1.6rem;
             margin-bottom: 0.4rem;
-            color: #5e4024;
+            color: var(--h3);
             display: flex;
             align-items: center;
             gap: 0.4rem;
@@ -80,7 +158,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.8rem 1.5rem;
-            background: #f8efe6;
+            background: var(--card-bg);
             padding: 1rem 1.5rem;
             border-radius: 16px;
             margin: 0.8rem 0;
@@ -93,26 +171,26 @@
         .stat-item .label {
             font-weight: 700;
             min-width: 4.5rem;
-            color: #4d351b;
+            color: var(--h2);
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #f8efe6;
+            background: var(--card-bg);
             border-radius: 16px;
             overflow: hidden;
             margin: 1rem 0;
         }
         th {
-            background: #dba46a;
-            color: #1f160f;
+            background: var(--th-bg);
+            color: var(--th-ink);
             font-weight: 600;
             padding: 0.6rem 0.8rem;
             text-align: left;
         }
         td {
             padding: 0.6rem 0.8rem;
-            border-bottom: 1px solid #e6d4c2;
+            border-bottom: 1px solid var(--td-border);
         }
         tr:last-child td {
             border-bottom: none;
@@ -121,46 +199,46 @@
             display: grid;
             grid-template-columns: 1fr 2fr 1.5fr;
             gap: 0.1rem;
-            background: #dba46a;
+            background: var(--th-bg);
             border-radius: 16px;
             overflow: hidden;
             margin: 1rem 0;
         }
         .outcome-grid .cell {
-            background: #f8efe6;
+            background: var(--card-bg);
             padding: 0.6rem 0.8rem;
-            border-bottom: 1px solid #e6d4c2;
+            border-bottom: 1px solid var(--td-border);
         }
         .outcome-grid .cell.header {
-            background: #e6c9a8;
+            background: var(--rule);
             font-weight: 700;
-            color: #2c1f13;
+            color: var(--ink);
         }
         .outcome-grid .cell:last-child {
             border-bottom: none;
         }
         .badge {
             display: inline-block;
-            background: #e6c9a8;
+            background: var(--badge-bg);
             border-radius: 40px;
             padding: 0.05rem 0.9rem;
             font-weight: 600;
             font-size: 0.85rem;
-            color: #2c1f13;
+            color: var(--ink);
         }
         .pack {
-            background: #f5eee7;
+            background: var(--pack-bg);
             border-radius: 20px;
             padding: 1.2rem 1.5rem;
             margin: 1.2rem 0;
-            border-left: 6px solid #b88752;
+            border-left: 6px solid var(--pack-border);
         }
         .pack h4 {
             font-size: 1.2rem;
             display: flex;
             align-items: center;
             gap: 0.4rem;
-            color: #3f2c19;
+            color: var(--h3);
             margin-bottom: 0.3rem;
         }
         .pack ul {
@@ -170,7 +248,7 @@
             margin-bottom: 0.3rem;
         }
         .tip-box {
-            background: #e6d9c9;
+            background: var(--tip-bg);
             border-radius: 16px;
             padding: 1rem 1.5rem;
             margin: 1rem 0;
@@ -179,7 +257,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.4rem 1.2rem;
-            background: #f8efe6;
+            background: var(--card-bg);
             padding: 1rem 1.5rem;
             border-radius: 16px;
             margin: 0.8rem 0;
@@ -187,28 +265,28 @@
         .cheat-grid .cheat-item {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px dashed #dccbbc;
+            border-bottom: 1px dashed var(--dash);
             padding: 0.2rem 0;
         }
         .cheat-item .action {
             font-weight: 500;
         }
         .cheat-item .roll {
-            color: #5e4024;
+            color: var(--h3);
             font-weight: 600;
         }
         hr {
             border: none;
             height: 2px;
-            background: linear-gradient(to right, #e6c9a8, transparent);
+            background: linear-gradient(to right, var(--rule), transparent);
             margin: 2rem 0;
         }
         .footer {
             margin-top: 2.5rem;
             text-align: center;
             font-size: 1rem;
-            color: #7a5d3e;
-            border-top: 2px solid #e6c9a8;
+            color: var(--footer-ink);
+            border-top: 2px solid var(--rule);
             padding-top: 1.5rem;
         }
         @media (max-width: 600px) {
@@ -216,9 +294,46 @@
             h1 { font-size: 2rem; flex-wrap: wrap; }
             .stat-grid { grid-template-columns: 1fr; }
             .outcome-grid { grid-template-columns: 1fr; }
-            .outcome-grid .cell { border-bottom: 1px solid #e6d4c2; }
+            .outcome-grid .cell { border-bottom: 1px solid var(--td-border); }
             .cheat-grid { grid-template-columns: 1fr; }
             .gold-rule { padding: 1rem; }
+        }
+        /* This sheet is meant to be printed and handed around the table —
+           force the light parchment palette on paper regardless of the
+           reader's on-screen mode, and drop the shadow/rounded-card chrome
+           that only makes sense on a screen. */
+        @media print {
+            :root {
+                --bg: #ffffff;
+                --panel-bg: #ffffff;
+                --panel-border: #d8c6ac;
+                --ink: #2c241a;
+                --ink-soft: #5e4024;
+                --head: #593c1e;
+                --sub-bg: #f2e4d4;
+                --rule: #e6c9a8;
+                --rule-strong: #b8863f;
+                --h2: #4d351b;
+                --h3: #5e4024;
+                --card-bg: #f8efe6;
+                --th-bg: #dba46a;
+                --th-ink: #1f160f;
+                --td-border: #d8c6ac;
+                --dark-bg: #f2e4d4;
+                --dark-ink: #2c241a;
+                --dark-ink-soft: #5e4024;
+                --dark-accent: #7a5d3e;
+                --pack-bg: #f5eee7;
+                --pack-border: #b88752;
+                --tip-bg: #f2e4d4;
+                --dash: #b8863f;
+                --badge-bg: #e6c9a8;
+                --footer-ink: #5e4024;
+                --footer-sub: #7a5d3e;
+                --shadow: transparent;
+            }
+            body { padding: 0; }
+            .container { box-shadow: none; border-radius: 0; border: none; padding: 0.5rem; }
         }
     </style>
 </head>
@@ -240,7 +355,7 @@
     </div>
 
     <!-- ============ BASE CHARACTER ============ -->
-    <h2>📝 The Base Character <span style="font-size:1rem; font-weight:400; color:#7a5d3e;">(for everyone)</span></h2>
+    <h2>📝 The Base Character <span style="font-size:1rem; font-weight:400; color:var(--ink-soft);">(for everyone)</span></h2>
     <p style="margin-bottom:0.5rem;">Fits on an index card. Distribute <strong>1, 2, 2, 3</strong> among the four attributes.</p>
 
     <h3>⚡ 1. Pick Your Stats</h3>
@@ -252,7 +367,7 @@
     </div>
 
     <h3>🎯 2. Pick Your Skills <span style="font-size:0.9rem; font-weight:400;">(6 points, max 2 per skill)</span></h3>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.3rem 1.2rem; background:#f8efe6; padding:0.8rem 1.5rem; border-radius:16px; margin:0.8rem 0;">
+    <div class="stat-grid">
         <div><strong>Fight ⚔️</strong> – sword, axe, spear, or punches</div>
         <div><strong>Move 🏃</strong> – climb, sneak, hide, jump</div>
         <div><strong>Talk 🗣️</strong> – persuade, lie, intimidate</div>
@@ -262,14 +377,14 @@
     </div>
 
     <h3>❤️ Health Track (Stamina + Wounds)</h3>
-    <ul style="background:#f8efe6; padding:0.8rem 1.5rem; border-radius:16px; list-style:none; margin:0.4rem 0 1rem 0;">
+    <ul style="background:var(--card-bg); padding:0.8rem 1.5rem; border-radius:16px; list-style:none; margin:0.4rem 0 1rem 0;">
         <li><strong>Fatigue 😮‍💨</strong> – you get tired. Track = your <strong>Body</strong>. Mark it when you do hard stuff.</li>
         <li><strong>Harm 🩸</strong> – you get hurt. 1 = Sore, 2 = Badly Hurt, 3 = Down (can't fight).</li>
     </ul>
 
     <!-- ============ RESOLUTION LOOP ============ -->
     <h2>🎲 The Resolution Loop</h2>
-    <ol style="background:#f8efe6; padding:0.8rem 1.5rem 0.8rem 2.5rem; border-radius:16px; margin:0.8rem 0;">
+    <ol style="background:var(--card-bg); padding:0.8rem 1.5rem 0.8rem 2.5rem; border-radius:16px; margin:0.8rem 0;">
         <li><strong>Step 1:</strong> The GM sets the scene. “What do you do?”</li>
         <li><strong>Step 2:</strong> Pick your <strong>Attribute + Skill</strong>.</li>
         <li><strong>Step 3:</strong> The GM says the Difficulty (<strong>DV</strong>).
@@ -309,18 +424,18 @@
     <!-- ============ TWO TREASURIES ============ -->
     <h2>🪙 The Two Treasuries</h2>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0;">
-        <div style="background:#f2e4d4; border-radius:16px; padding:1rem 1.2rem;">
-            <h4 style="display:flex; align-items:center; gap:0.4rem; margin:0 0 0.4rem 0;">🪙 Player's Boons <span style="font-size:0.8rem; font-weight:400;">(luck coins)</span></h4>
-            <ul style="list-style:none; padding-left:0.2rem;">
+        <div style="background:var(--sub-bg); border-radius:16px; padding:1rem 1.2rem;">
+            <h4 style="display:flex; align-items:center; gap:0.4rem; margin:0 0 0.4rem 0; color:var(--h2);">🪙 Player's Boons <span style="font-size:0.8rem; font-weight:400; color:var(--ink-soft);">(luck coins)</span></h4>
+            <ul style="list-style:none; padding-left:0.2rem; color:var(--ink);">
                 <li>✓ Get them on <strong>Partial</strong> or <strong>Miss</strong>.</li>
                 <li>✓ Hold up to <strong>5</strong>.</li>
                 <li>✓ <strong>Spend 1</strong> to: re-roll a die, get +1 on your next roll, or activate a special item/pet.</li>
-                <li style="margin-top:0.3rem; font-size:0.9rem; color:#5e4024;">(Veterans: convert 2 Boons → 1 XP at end of session!)</li>
+                <li style="margin-top:0.3rem; font-size:0.9rem; color:var(--ink-soft);">(Veterans: convert 2 Boons → 1 XP at end of session!)</li>
             </ul>
         </div>
-        <div style="background:#2c241a; color:#f7e8d9; border-radius:16px; padding:1rem 1.2rem;">
-            <h4 style="display:flex; align-items:center; gap:0.4rem; margin:0 0 0.4rem 0; color:#f5c542;">⚡ GM's Story Beats <span style="font-size:0.8rem; font-weight:400; color:#c4b09c;">(trouble tokens)</span></h4>
-            <ul style="list-style:none; padding-left:0.2rem; color:#f0e3d6;">
+        <div style="background:var(--dark-bg); color:var(--dark-ink); border-radius:16px; padding:1rem 1.2rem;">
+            <h4 style="display:flex; align-items:center; gap:0.4rem; margin:0 0 0.4rem 0; color:var(--dark-accent);">⚡ GM's Story Beats <span style="font-size:0.8rem; font-weight:400; color:var(--dark-ink-soft);">(trouble tokens)</span></h4>
+            <ul style="list-style:none; padding-left:0.2rem; color:var(--dark-ink);">
                 <li>✓ Get them when players roll a <strong>1</strong>.</li>
                 <li>✓ <strong>Spend 1</strong> – “A guard turns around.” (tiny)</li>
                 <li>✓ <strong>Spend 2</strong> – “Reinforcements arrive.” (big)</li>
@@ -330,7 +445,7 @@
     </div>
 
     <!-- ============ EXPANSION PACKS ============ -->
-    <h2>🧩 Expansion Packs <span style="font-size:1rem; font-weight:400; color:#7a5d3e;">(add complexity later)</span></h2>
+    <h2>🧩 Expansion Packs <span style="font-size:1rem; font-weight:400; color:var(--ink-soft);">(add complexity later)</span></h2>
     <p>Players who want to keep it simple just use the Base Character above. Players who want more crunch can pick one of these packs.</p>
 
     <div class="pack">
@@ -389,7 +504,7 @@
     </div>
 
     <!-- ============ QUICK REFERENCE ============ -->
-    <h2>📋 Quick Reference <span style="font-size:1rem; font-weight:400; color:#7a5d3e;">(for kids &amp; everyone)</span></h2>
+    <h2>📋 Quick Reference <span style="font-size:1rem; font-weight:400; color:var(--ink-soft);">(for kids &amp; everyone)</span></h2>
     <div class="cheat-grid">
         <div class="cheat-item"><span class="action">⚔️ Hit someone with a sword</span><span class="roll">Body + Fight</span></div>
         <div class="cheat-item"><span class="action">👻 Sneak past a guard</span><span class="roll">Wits + Move</span></div>
@@ -401,7 +516,7 @@
         <div class="cheat-item"><span class="action">💪 Lift a heavy gate</span><span class="roll">Body + (no skill, or Move)</span></div>
     </div>
 
-    <div style="background:#f8efe6; border-radius:16px; padding:0.6rem 1.2rem; margin:0.4rem 0 1.2rem 0; display:flex; flex-wrap:wrap; gap:0.8rem 1.5rem;">
+    <div style="background:var(--card-bg); border-radius:16px; padding:0.6rem 1.2rem; margin:0.4rem 0 1.2rem 0; display:flex; flex-wrap:wrap; gap:0.8rem 1.5rem;">
         <span>🟩 <strong>6–9</strong> = 1 Success</span>
         <span>🟨 <strong>10</strong> = 2 Successes</span>
         <span>🟥 <strong>1</strong> = GM gets a Trouble Token!</span>
@@ -410,14 +525,14 @@
     <!-- ============ FINAL THOUGHT ============ -->
     <hr />
     <div style="font-size:1.1rem; text-align:center; padding:0.5rem 0;">
-        <p style="font-style:italic; color:#3f2c19;">“The road remembers every traveler, no matter how they walk it.”</p>
+        <p style="font-style:italic; color:var(--h2);">“The road remembers every traveler, no matter how they walk it.”</p>
         <p style="margin-top:0.8rem; font-weight:500;">Start simple. If the kid wants to learn Summoner later, let them “upgrade” mid‑campaign.<br />
         If the veteran wants to play a basic Fighter to take a break, let them do that too.</p>
     </div>
 
     <div class="footer">
         ⚔️ Fate’s Edge · Campfire Edition · Free to share at your table<br />
-        <span style="font-size:0.85rem; color:#9a7f65;">Core SRD by Nicholas A. Gasper · Adapted for mixed‑experience groups</span>
+        <span style="font-size:0.85rem; color:var(--footer-sub);">Core SRD by Nicholas A. Gasper · Adapted for mixed‑experience groups</span>
     </div>
 
 </div>
