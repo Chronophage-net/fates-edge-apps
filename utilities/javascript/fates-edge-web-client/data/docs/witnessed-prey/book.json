@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "generated": "2026-08-23T14:33:54.144240+00:00",
+  "id": "witnessed-prey",
+  "title": "The Witnessed Prey, a Hunter's Guide",
+  "subtitle": "A bestiary of debts, flesh, and thresholds",
+  "index": "index.html",
+  "chapters": [
+    {
+      "file": "Witnessed-_-Prey-_-01-_-Mortal-_-Adversaries.html",
+      "label": "Chapter 1",
+      "title": "Mortal Adversaries"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-02-_-The-_-Unquiet-_-Dead.html",
+      "label": "Chapter 2",
+      "title": "The Unquiet Dead"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-03-_-Beings-_-of-_-the-_-Road.html",
+      "label": "Chapter 3",
+      "title": "Beings of the Road"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-04-_-The-_-Cursed-_-&-_-Corrupted.html",
+      "label": "Chapter 4",
+      "title": "The Cursed & Corrupted"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-05-_-Beasts-_-of-_-the-_-Wilds.html",
+      "label": "Chapter 5",
+      "title": "Beasts of the Wilds"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-06-_-Fae-_-&-_-Threshold-_-Spirits.html",
+      "label": "Chapter 6",
+      "title": "Fae & Threshold Spirits"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-07-_-Goblinoids.html",
+      "label": "Chapter 7",
+      "title": "Goblinoids"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-08-_-Giants-_-Ogres-_-and-_-Oni.html",
+      "label": "Chapter 8",
+      "title": "Giants Ogres and Oni"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-09-_-Dragons.html",
+      "label": "Chapter 9",
+      "title": "Dragons"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-10-_-Demons-_-and-_-the-_-Hungry-_-Shadows.html",
+      "label": "Chapter 10",
+      "title": "Demons and the Hungry Shadows"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-11-_-Epic-_-&-_-Unique-_-Bosses.html",
+      "label": "Chapter 11",
+      "title": "Epic & Unique Bosses"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-12-_-Adversary-_-Templates-_-&-_-Quick-_-Generators.html",
+      "label": "Chapter 12",
+      "title": "Adversary Templates & Quick Generators"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-13-_-Constructs-_-and-_-Golems-_-The-_-Unwitnessed-_-Servants.html",
+      "label": "Chapter 13",
+      "title": "Constructs and Golems The Unwitnessed Servants"
+    },
+    {
+      "file": "Witnessed-_-Prey-_-14-_-Appendix-_-Tools-_-&-_-Tables.html",
+      "label": "Chapter 14",
+      "title": "Appendix Tools & Tables"
+    }
+  ]
+}

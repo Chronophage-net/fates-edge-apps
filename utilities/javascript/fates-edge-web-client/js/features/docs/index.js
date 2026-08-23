@@ -125,6 +125,16 @@ let currentDocPath = null;
 let isDarkMode = false;
 let container = null;
 
+// Multi-page "book" document state. currentBookDoc is the manifest entry
+// (with its `pages` array); currentChapterIndex is -1 for the table of
+// contents view, or an index into currentBookDoc.pages otherwise.
+let currentBookDoc = null;
+let currentChapterIndex = -1;
+
+// Which category sections the user has manually collapsed, so re-renders
+// (filtering, theme changes) don't spring every section back open.
+const collapsedSections = new Set();
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -359,9 +369,11 @@ export function render(el) {
             <span id="docsFilterStats" style="font-size:0.8rem;color:var(--text2);padding:0.2rem 0 0 0.2rem;"></span>
         </div>
 
-        <!-- Document Grid -->
-        <div id="doc-list" class="doc-grid" style="display:flex;flex-direction:row;gap:1rem;overflow-x:auto;overflow-y:visible;padding:0.5rem 0.2rem 1rem 0.2rem;flex-wrap:nowrap;align-items:stretch;scrollbar-width:thin;scrollbar-color:var(--bg4) var(--bg2);-webkit-overflow-scrolling:touch;">
-            <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">📄 Loading documents…</div>
+        <!-- Document Sections (grouped by category so the list stays scannable
+             as more documents are added -- one flat row of everything gets
+             unwieldy fast; a row per category doesn't. -->
+        <div id="doc-list" class="doc-sections">
+            <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;">📄 Loading documents…</div>
         </div>
 
         <!-- Document Viewer -->
@@ -372,6 +384,14 @@ export function render(el) {
                     <button class="btn btn-sm btn-primary" id="doc-copy-url">🔗 Copy Link</button>
                     <button class="btn btn-sm" id="doc-close-viewer">✕ Close</button>
                 </div>
+            </div>
+            <!-- Chapter nav -- only populated/shown for multi-page ("book") documents,
+                 so a whole guide reads as one document with internal navigation
+                 rather than as dozens of separate library entries. -->
+            <div id="doc-chapter-nav" style="display:none;align-items:center;gap:0.5rem;flex-wrap:wrap;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.7rem;margin-bottom:0.8rem;">
+                <button class="btn btn-sm" id="doc-chapter-prev" title="Previous chapter">⬅</button>
+                <select id="doc-chapter-select" style="flex:1 1 220px;padding:0.35rem 0.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:0.85rem;"></select>
+                <button class="btn btn-sm" id="doc-chapter-next" title="Next chapter">➡</button>
             </div>
             <div id="doc-viewer" class="doc-viewer" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;min-height:500px;height:70vh;max-height:800px;overflow-y:auto;position:relative;">
                 <div class="loading" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text2);font-style:italic;padding:2rem;">Select a document to view.</div>
@@ -738,7 +758,9 @@ function setupThemeObserver() {
     const observer = new MutationObserver(() => {
         const isLight = document.documentElement.classList.contains('light');
         isDarkMode = !isLight;
-        if (currentDocPath) {
+        if (currentBookDoc) {
+            loadBookChapter(currentBookDoc, currentChapterIndex, true);
+        } else if (currentDocPath) {
             loadDocument(currentDocPath, true);
         }
     });
@@ -762,6 +784,29 @@ function attachDocEvents() {
     const refreshBtn = document.getElementById('doc-refresh-btn');
     const uploadBtn = document.getElementById('doc-upload-btn');
     const rebuildBtn = document.getElementById('doc-rebuild-btn');
+    const chapterSelect = document.getElementById('doc-chapter-select');
+    const chapterPrev = document.getElementById('doc-chapter-prev');
+    const chapterNext = document.getElementById('doc-chapter-next');
+
+    if (chapterSelect) {
+        chapterSelect.addEventListener('change', function() {
+            if (currentBookDoc) loadBookChapter(currentBookDoc, parseInt(this.value, 10));
+        });
+    }
+    if (chapterPrev) {
+        chapterPrev.addEventListener('click', function() {
+            if (currentBookDoc && currentChapterIndex > 0) {
+                loadBookChapter(currentBookDoc, currentChapterIndex - 1);
+            }
+        });
+    }
+    if (chapterNext) {
+        chapterNext.addEventListener('click', function() {
+            if (currentBookDoc && currentChapterIndex < currentBookDoc.pages.length - 1) {
+                loadBookChapter(currentBookDoc, currentChapterIndex + 1);
+            }
+        });
+    }
 
     if (typeFilter) typeFilter.addEventListener('change', applyDocsFilter);
     if (searchInput) searchInput.addEventListener('input', applyDocsFilter);
@@ -994,7 +1039,79 @@ function saveUploadedDoc(doc) {
 // APPLY FILTERS
 // ============================================================
 
-export function applyDocsFilter() {
+function renderDocCard(doc) {
+    const isPDF = doc.isPDF || doc.file?.toLowerCase().endsWith('.pdf');
+    const icon = doc.book ? '📖' : (isPDF ? '📄' : '📜');
+    const typeInfo = DOC_TYPES[doc.type] || DOC_TYPES.other;
+    const typeIcon = typeInfo.icon || '📄';
+    const typeLabel = typeInfo.label || 'Other';
+    const tierBadge = doc.tier ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--gold)33;color:var(--gold);border:1px solid var(--gold);">Tier ${doc.tier}</span>` : '';
+    const sessionsBadge = doc.sessions ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--blue)33;color:var(--blue);border:1px solid var(--blue);">${doc.sessions} sessions</span>` : '';
+    const pagesBadge = doc.book && Array.isArray(doc.pages) ? `<span style="font-size:0.6rem;color:var(--text2);">${doc.pages.length} chapters</span>` : '';
+
+    return `
+        <div class="doc-card" data-fullpath="${escHtml(doc.fullPath || '#')}"
+             style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;cursor:pointer;transition:all 0.15s;min-width:160px;max-width:200px;flex:0 0 auto;display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+                <div style="font-size:1.5rem;margin-bottom:0.2rem;">${icon}</div>
+                <h4 style="color:var(--gold);margin-bottom:0.3rem;font-size:0.95rem;font-weight:600;word-break:break-word;">${escHtml(doc.title)}</h4>
+            </div>
+            <div>
+                <div class="doc-meta" style="font-size:0.75rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;margin-top:0.3rem;">
+                    <span class="doc-category-badge ${doc.type || 'other'}"
+                          style="display:inline-block;padding:0.05rem 0.5rem;border-radius:12px;font-size:0.6rem;font-weight:600;background:var(--bg4);color:var(--text2);letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">
+                        ${typeIcon} ${escHtml(typeLabel)}
+                    </span>
+                    ${doc.core ? '<span style="font-size:0.6rem;color:var(--gold);font-weight:600;">⭐ Core</span>' : ''}
+                    ${doc.uploaded ? '<span style="font-size:0.6rem;color:var(--green);font-weight:600;">📤</span>' : ''}
+                    ${tierBadge}
+                    ${sessionsBadge}
+                    ${pagesBadge}
+                </div>
+                ${doc.description ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(doc.description)}</div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function attachDocCardEvents(container) {
+    container.querySelectorAll('.doc-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const fullPath = this.dataset.fullpath;
+            if (!fullPath || fullPath === '#') {
+                showToast('Invalid document path.', 'error');
+                return;
+            }
+            const doc = allDocs.find(d => (d.fullPath || '#') === fullPath);
+            if (doc && doc.book) {
+                openBookDocument(doc);
+            } else {
+                loadDocument(fullPath);
+            }
+        });
+
+        card.addEventListener('mouseenter', function() {
+            this.style.borderColor = 'var(--gold)';
+            this.style.transform = 'translateY(-2px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.borderColor = 'var(--border)';
+            this.style.transform = 'translateY(0)';
+        });
+    });
+}
+
+// ============================================================
+// GROUPED (BY CATEGORY) RENDERING
+// ============================================================
+// One flat row works for a handful of documents but turns into an
+// unscannable wall as more guides/adventures/expansions are added. Instead
+// each category gets its own labeled, collapsible, horizontally-scrolling
+// row -- so the list stays intuitive regardless of how many documents
+// exist in total, and a reader can jump straight to "GM Guide" or
+// "Adventures" instead of hunting through everything at once.
+
+function applyDocsFilter() {
     const typeFilter = document.getElementById('docsTypeFilter');
     const searchInput = document.getElementById('docsSearchInput');
     const container = document.getElementById('doc-list');
@@ -1020,7 +1137,7 @@ export function applyDocsFilter() {
 
     if (filtered.length === 0) {
         container.innerHTML = `
-            <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;min-width:100%;">
+            <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;">
                 <div style="font-size:1.4rem;">🔍</div>
                 <p>No documents match your filters.</p>
                 <p class="text-muted" style="font-size:0.85rem;">Try adjusting the type or search term.</p>
@@ -1029,58 +1146,66 @@ export function applyDocsFilter() {
         return;
     }
 
-    container.innerHTML = filtered.map(doc => {
-        const isPDF = doc.isPDF || doc.file?.toLowerCase().endsWith('.pdf');
-        const icon = isPDF ? '📄' : '📜';
-        const typeInfo = DOC_TYPES[doc.type] || DOC_TYPES.other;
-        const typeIcon = typeInfo.icon || '📄';
-        const typeLabel = typeInfo.label || 'Other';
-        const tierBadge = doc.tier ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--gold)33;color:var(--gold);border:1px solid var(--gold);">Tier ${doc.tier}</span>` : '';
-        const sessionsBadge = doc.sessions ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--blue)33;color:var(--blue);border:1px solid var(--blue);">${doc.sessions} sessions</span>` : '';
+    // Group by type/category, preserving TYPE_ORDER (with any unknown
+    // types appended alphabetically after the known ones).
+    const groups = new Map();
+    for (const doc of filtered) {
+        const key = doc.type || 'other';
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(doc);
+    }
+
+    const orderedKeys = Array.from(groups.keys()).sort((a, b) => {
+        const ia = TYPE_ORDER.indexOf(a);
+        const ib = TYPE_ORDER.indexOf(b);
+        if (ia === -1 && ib === -1) return a.localeCompare(b);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+    });
+
+    // Single-type filter or a search narrow enough to leave one group:
+    // no point showing a section header for the one section present.
+    const showHeaders = orderedKeys.length > 1;
+
+    container.innerHTML = orderedKeys.map(key => {
+        const docs = groups.get(key);
+        const typeInfo = DOC_TYPES[key] || DOC_TYPES.other;
+        const isCollapsed = collapsedSections.has(key);
+        const header = showHeaders ? `
+            <summary class="doc-section-header" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;list-style:none;padding:0.3rem 0.2rem;font-weight:600;color:var(--text);user-select:none;">
+                <span style="font-size:1.05rem;">${typeInfo.icon}</span>
+                <span>${escHtml(typeInfo.label.replace(/^\S+\s/, ''))}</span>
+                <span style="font-size:0.75rem;color:var(--text3);font-weight:400;">${docs.length}</span>
+            </summary>
+        ` : '';
+        const rowHtml = `
+            <div class="doc-grid" style="display:flex;flex-direction:row;gap:1rem;overflow-x:auto;overflow-y:visible;padding:0.5rem 0.2rem 1rem 0.2rem;flex-wrap:nowrap;align-items:stretch;scrollbar-width:thin;scrollbar-color:var(--bg4) var(--bg2);-webkit-overflow-scrolling:touch;">
+                ${docs.map(renderDocCard).join('')}
+            </div>
+        `;
+
+        if (!showHeaders) return rowHtml;
 
         return `
-            <div class="doc-card" data-fullpath="${escHtml(doc.fullPath || '#')}" 
-                 style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;cursor:pointer;transition:all 0.15s;min-width:160px;max-width:200px;flex:0 0 auto;display:flex;flex-direction:column;justify-content:space-between;">
-                <div>
-                    <div style="font-size:1.5rem;margin-bottom:0.2rem;">${icon}</div>
-                    <h4 style="color:var(--gold);margin-bottom:0.3rem;font-size:0.95rem;font-weight:600;word-break:break-word;">${escHtml(doc.title)}</h4>
-                </div>
-                <div>
-                    <div class="doc-meta" style="font-size:0.75rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;margin-top:0.3rem;">
-                        <span class="doc-category-badge ${doc.type || 'other'}" 
-                              style="display:inline-block;padding:0.05rem 0.5rem;border-radius:12px;font-size:0.6rem;font-weight:600;background:var(--bg4);color:var(--text2);letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">
-                            ${typeIcon} ${escHtml(typeLabel)}
-                        </span>
-                        ${doc.core ? '<span style="font-size:0.6rem;color:var(--gold);font-weight:600;">⭐ Core</span>' : ''}
-                        ${doc.uploaded ? '<span style="font-size:0.6rem;color:var(--green);font-weight:600;">📤</span>' : ''}
-                        ${tierBadge}
-                        ${sessionsBadge}
-                    </div>
-                    ${doc.description ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(doc.description)}</div>` : ''}
-                </div>
-            </div>
+            <details class="doc-section" data-section-key="${escHtml(key)}" ${isCollapsed ? '' : 'open'} style="margin-bottom:0.3rem;border-bottom:1px solid var(--border);">
+                ${header}
+                ${rowHtml}
+            </details>
         `;
     }).join('');
 
-    container.querySelectorAll('.doc-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const fullPath = this.dataset.fullpath;
-            if (fullPath && fullPath !== '#') {
-                loadDocument(fullPath);
-            } else {
-                showToast('Invalid document path.', 'error');
-            }
+    if (showHeaders) {
+        container.querySelectorAll('.doc-section').forEach(section => {
+            section.addEventListener('toggle', function() {
+                const key = this.dataset.sectionKey;
+                if (this.open) collapsedSections.delete(key);
+                else collapsedSections.add(key);
+            });
         });
+    }
 
-        card.addEventListener('mouseenter', function() {
-            this.style.borderColor = 'var(--gold)';
-            this.style.transform = 'translateY(-2px)';
-        });
-        card.addEventListener('mouseleave', function() {
-            this.style.borderColor = 'var(--border)';
-            this.style.transform = 'translateY(0)';
-        });
-    });
+    attachDocCardEvents(container);
 }
 
 // ============================================================
@@ -1135,11 +1260,113 @@ function updateTotalCount() {
 }
 
 // ============================================================
+// BOOK DOCUMENTS (multi-page: GM Guide, Player's Guide, ...)
+// ============================================================
+// A book's manifest entry carries a `pages` array (from book.json, written
+// by tools/generate_book_index.py in the docs repo). Opening one shows a
+// single document view with a chapter nav bar instead of dozens of
+// separate library rows -- clicking "GM Guide" reads as opening one book,
+// not choosing among 25 unrelated documents.
+
+function openBookDocument(doc) {
+    currentBookDoc = doc;
+    loadBookChapter(doc, 0);
+}
+
+function updateChapterNav(doc, chapterIndex) {
+    const nav = document.getElementById('doc-chapter-nav');
+    const select = document.getElementById('doc-chapter-select');
+    const prevBtn = document.getElementById('doc-chapter-prev');
+    const nextBtn = document.getElementById('doc-chapter-next');
+    if (!nav || !select || !prevBtn || !nextBtn) return;
+
+    nav.style.display = 'flex';
+    select.innerHTML = doc.pages.map((p, i) =>
+        `<option value="${i}">${escHtml(p.label ? `${p.label}: ${p.title}` : p.title)}</option>`
+    ).join('');
+    select.value = String(chapterIndex);
+
+    prevBtn.disabled = chapterIndex <= 0;
+    nextBtn.disabled = chapterIndex >= doc.pages.length - 1;
+    prevBtn.style.opacity = prevBtn.disabled ? '0.4' : '1';
+    nextBtn.style.opacity = nextBtn.disabled ? '0.4' : '1';
+}
+
+function hideChapterNav() {
+    const nav = document.getElementById('doc-chapter-nav');
+    if (nav) nav.style.display = 'none';
+}
+
+function loadBookChapter(doc, chapterIndex, preserveTheme = false) {
+    if (!doc || !Array.isArray(doc.pages) || !doc.pages[chapterIndex]) return;
+
+    currentBookDoc = doc;
+    currentChapterIndex = chapterIndex;
+    const chapter = doc.pages[chapterIndex];
+
+    const viewerContainer = document.getElementById('doc-viewer-container');
+    const viewer = document.getElementById('doc-viewer');
+    const titleEl = document.getElementById('doc-viewer-title');
+    if (!viewerContainer || !viewer || !titleEl) return;
+
+    const basePath = doc.path.endsWith('/') ? doc.path : doc.path + '/';
+    const chapterPath = basePath + chapter.file;
+    currentDocPath = chapterPath;
+
+    viewerContainer.style.display = 'block';
+    updateChapterNav(doc, chapterIndex);
+    titleEl.textContent = preserveTheme ? titleEl.textContent : 'Loading…';
+    if (!preserveTheme) {
+        viewer.innerHTML = '<div class="loading" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text2);font-style:italic;padding:2rem;">Loading chapter…</div>';
+    }
+
+    fetch(chapterPath)
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.text();
+        })
+        .then(html => {
+            if (isSpaContent(html)) {
+                viewer.innerHTML = `
+                    <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;">
+                        <div style="font-size:2rem;">🚫</div>
+                        <p>Could not load chapter.</p>
+                        <p class="text-muted" style="font-size:0.75rem;">Path: ${escHtml(chapterPath)}</p>
+                    </div>
+                `;
+                titleEl.textContent = 'Error';
+                return;
+            }
+            const sanitized = sanitizeHtml(html);
+            viewer.innerHTML = injectThemeAndStyles(sanitized, chapterPath);
+            titleEl.textContent = `${doc.title} — ${chapter.label ? `${chapter.label}: ` : ''}${chapter.title}`;
+            if (!preserveTheme) {
+                showToast(`📖 Loaded: ${chapter.title}`, 'success');
+            }
+        })
+        .catch(err => {
+            console.error('Chapter load error:', err);
+            viewer.innerHTML = `
+                <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;">
+                    <div style="font-size:2rem;">❌</div>
+                    <p>Could not load chapter.</p>
+                    <p class="text-muted" style="font-size:0.85rem;">${escHtml(err.message)}</p>
+                </div>
+            `;
+            titleEl.textContent = 'Error';
+            showToast(`Failed to load chapter: ${err.message}`, 'error');
+        });
+}
+
+// ============================================================
 // LOAD DOCUMENT
 // ============================================================
 
 export function loadDocument(docPath, preserveTheme = false) {
     currentDocPath = docPath;
+    currentBookDoc = null;
+    currentChapterIndex = -1;
+    hideChapterNav();
     const viewerContainer = document.getElementById('doc-viewer-container');
     const viewer = document.getElementById('doc-viewer');
     const titleEl = document.getElementById('doc-viewer-title');
@@ -1365,6 +1592,9 @@ export function closeDocViewer() {
     if (container) container.style.display = 'none';
     if (viewer) viewer.innerHTML = '<div class="loading" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text2);font-style:italic;padding:2rem;">Select a document to view.</div>';
     currentDocPath = null;
+    currentBookDoc = null;
+    currentChapterIndex = -1;
+    hideChapterNav();
 }
 
 // ============================================================

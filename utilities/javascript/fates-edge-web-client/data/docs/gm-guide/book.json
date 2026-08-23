@@ -1,0 +1,135 @@
+{
+  "version": "1.0",
+  "generated": "2026-08-23T13:10:57.595827+00:00",
+  "id": "gm_guide",
+  "title": "GM Guide",
+  "subtitle": "A Comprehensive Guide for the Fate's Edge Game Master",
+  "index": "index.html",
+  "chapters": [
+    {
+      "file": "GM-_-Guide-_-01-_-Introduction.html",
+      "label": "Chapter 1",
+      "title": "Introduction"
+    },
+    {
+      "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
+      "label": "Chapter 2",
+      "title": "Core Procedures"
+    },
+    {
+      "file": "GM-_-Guide-_-03-_-Managing-_-Resources.html",
+      "label": "Chapter 3",
+      "title": "Managing Resources"
+    },
+    {
+      "file": "GM-_-Guide-_-04-_-Running-_-a-_-Currency-_-Free-_-Game.html",
+      "label": "Chapter 4",
+      "title": "Running a Currency Free Game"
+    },
+    {
+      "file": "GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html",
+      "label": "Chapter 5",
+      "title": "Magic and Backlash"
+    },
+    {
+      "file": "GM-_-Guide-_-06-_-Running-_-Scenarios.html",
+      "label": "Chapter 6",
+      "title": "Running Scenarios"
+    },
+    {
+      "file": "GM-_-Guide-_-07-_-Assets-_-and-_-Followers.html",
+      "label": "Chapter 7",
+      "title": "Assets and Followers"
+    },
+    {
+      "file": "GM-_-Guide-_-08-_-Travel-_-Framework.html",
+      "label": "Chapter 8",
+      "title": "Travel Framework"
+    },
+    {
+      "file": "GM-_-Guide-_-09-_-Downtime.html",
+      "label": "Chapter 9",
+      "title": "Downtime"
+    },
+    {
+      "file": "GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html",
+      "label": "Chapter 10",
+      "title": "Campaigns Timers Consequences"
+    },
+    {
+      "file": "GM-_-Guide-_-11-_-Epic-_-Tier-_-Adventures.html",
+      "label": "Chapter 11",
+      "title": "Epic Tier Adventures"
+    },
+    {
+      "file": "GM-_-Guide-_-12-_-Advanced-_-GM-_-Techniques.html",
+      "label": "Chapter 12",
+      "title": "Advanced GM Techniques"
+    },
+    {
+      "file": "GM-_-Guide-_-13-_-Player-_-Archetypes-_-at-_-the-_-Table.html",
+      "label": "Chapter 13",
+      "title": "Player Archetypes at the Table"
+    },
+    {
+      "file": "GM-_-Guide-_-14-_-Lore-_-Compendium.html",
+      "label": "Chapter 14",
+      "title": "Lore Compendium"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-A-_-Core-_-Reference-_-Tables.html",
+      "label": "Appendix A",
+      "title": "Core Reference Tables"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-B-_-Optional-_-Rules-_-and-_-Tactical-_-Tools.html",
+      "label": "Appendix B",
+      "title": "Optional Rules and Tactical Tools"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-C-_-Deck-_-and-_-Magic-_-Reference.html",
+      "label": "Appendix C",
+      "title": "Deck and Magic Reference"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-D-_-Campaign-_-Management.html",
+      "label": "Appendix D",
+      "title": "Campaign Management"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-E-_-Safety-_-and-_-Inclusivity.html",
+      "label": "Appendix E",
+      "title": "Safety and Inclusivity"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-F-_-Rival-_-Party-_-Generator.html",
+      "label": "Appendix F",
+      "title": "Rival Party Generator"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-G-_-One-_-Page-_-GM-_-Screen-_-Summary.html",
+      "label": "Appendix G",
+      "title": "One Page GM Screen Summary"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-H-_-Sample-_-Deck-_-Reading.html",
+      "label": "Appendix H",
+      "title": "Sample Deck Reading"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-I-_-Session-_-Zero-_-Checklist.html",
+      "label": "Appendix I",
+      "title": "Session Zero Checklist"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-J-_-Using-_-Expansions-_-and-_-Adversary-_-Templates.html",
+      "label": "Appendix J",
+      "title": "Using Expansions and Adversary Templates"
+    },
+    {
+      "file": "GM-_-Guide-_-App-_-K-_-Patron-_-Quick-_-Reference.html",
+      "label": "Appendix K",
+      "title": "Patron Quick Reference"
+    }
+  ]
+}

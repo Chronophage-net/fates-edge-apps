@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "generated": "2026-08-23T14:33:54.177873+00:00",
+  "id": "saikou-compendium",
+  "title": "Saikou Ira's Compendium of the Veil",
+  "subtitle": "An investigation into the unquiet dead, the cursed, and the hungry",
+  "index": "index.html",
+  "chapters": [
+    {
+      "file": "Saikou-_-Compendium-_-01-_-Preface.html",
+      "label": "Chapter 1",
+      "title": "Preface"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-02-_-The-_-Unquiet-_-Dead.html",
+      "label": "Chapter 2",
+      "title": "The Unquiet Dead"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-03-_-The-_-Hungry.html",
+      "label": "Chapter 3",
+      "title": "The Hungry"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-04-_-The-_-Cursed.html",
+      "label": "Chapter 4",
+      "title": "The Cursed"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-05-_-Other-_-Entities-_-of-_-the-_-World.html",
+      "label": "Chapter 5",
+      "title": "Other Entities of the World"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-06-_-The-_-Bound.html",
+      "label": "Chapter 6",
+      "title": "The Bound"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-07-_-Field-_-Equipment.html",
+      "label": "Chapter 7",
+      "title": "Field Equipment"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-08-_-Appendices.html",
+      "label": "Chapter 8",
+      "title": "Appendices"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-09-_-Creature-_-Stat-_-Blocks.html",
+      "label": "Chapter 9",
+      "title": "Creature Stat Blocks"
+    },
+    {
+      "file": "Saikou-_-Compendium-_-10-_-Adventure-_-Seeds.html",
+      "label": "Chapter 10",
+      "title": "Adventure Seeds"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "kon-reh",
-  "version": "4.20.3",
+  "version": "4.20.4",
   "description": "Fate's Edge Toolkit",
   "scripts": {
     "test": "vitest run --passWithNoTests",
@@ -20,6 +20,6 @@
     "eslint": "^8.0.0"
   },
   "license": "MIT",
-  "_license": "Code: MIT. Game content (data files, lore, SRD-marked material): see LICENSE.md for the CC BY-NC-SA 4.0 / All Rights Reserved split. © 2024 - 2026 Nicholas A. Gasper.",
+  "_license": "Code: MIT. Game content (data files, lore, SRD-marked material): see LICENSE.md for the CC BY-NC-SA 4.0 / All Rights Reserved split. \u00a9 2024 - 2026 Nicholas A. Gasper.",
   "author": "Nicholas A. Gasper"
 }

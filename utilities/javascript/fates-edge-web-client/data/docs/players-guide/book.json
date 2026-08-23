@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "generated": "2026-08-23T13:10:57.632360+00:00",
+  "id": "players_guide",
+  "title": "Player's Guide",
+  "subtitle": "Your Path to Adventure in the Amaranthine Sea and Beyond",
+  "index": "index.html",
+  "chapters": [
+    {
+      "file": "Players-_-Guide-_-01-_-Quickstart.html",
+      "label": "Chapter 1",
+      "title": "Quickstart"
+    },
+    {
+      "file": "Players-_-Guide-_-02-_-Character-_-Creation.html",
+      "label": "Chapter 2",
+      "title": "Character Creation"
+    },
+    {
+      "file": "Players-_-Guide-_-03-_-Core-_-Mechanics.html",
+      "label": "Chapter 3",
+      "title": "Core Mechanics"
+    },
+    {
+      "file": "Players-_-Guide-_-04-_-Magic.html",
+      "label": "Chapter 4",
+      "title": "Magic"
+    },
+    {
+      "file": "Players-_-Guide-_-05-_-Healing.html",
+      "label": "Chapter 5",
+      "title": "Healing"
+    },
+    {
+      "file": "Players-_-Guide-_-06-_-Talents.html",
+      "label": "Chapter 6",
+      "title": "Talents"
+    },
+    {
+      "file": "Players-_-Guide-_-07-_-Advancement.html",
+      "label": "Chapter 7",
+      "title": "Advancement"
+    },
+    {
+      "file": "Players-_-Guide-_-08-_-XP-_-Paths.html",
+      "label": "Chapter 8",
+      "title": "XP Paths"
+    },
+    {
+      "file": "Players-_-Guide-_-09-_-Your-_-First-_-Magical-_-Character.html",
+      "label": "Chapter 9",
+      "title": "Your First Magical Character"
+    },
+    {
+      "file": "Players-_-Guide-_-10-_-Assets-_-and-_-Followers.html",
+      "label": "Chapter 10",
+      "title": "Assets and Followers"
+    },
+    {
+      "file": "Players-_-Guide-_-11-_-Downtime.html",
+      "label": "Chapter 11",
+      "title": "Downtime"
+    },
+    {
+      "file": "Players-_-Guide-_-12-_-World-_-Regions-_-and-_-Cultures.html",
+      "label": "Chapter 12",
+      "title": "World Regions and Cultures"
+    },
+    {
+      "file": "Players-_-Guide-_-13-_-World-_-Powers-_-and-_-Patrons.html",
+      "label": "Chapter 13",
+      "title": "World Powers and Patrons"
+    },
+    {
+      "file": "Players-_-Guide-_-14-_-World-_-Interaction.html",
+      "label": "Chapter 14",
+      "title": "World Interaction"
+    },
+    {
+      "file": "Players-_-Guide-_-15-_-Currency-_-Free-_-Economy.html",
+      "label": "Chapter 15",
+      "title": "Currency Free Economy"
+    },
+    {
+      "file": "Players-_-Guide-_-16-_-Character-_-Backgrounds.html",
+      "label": "Chapter 16",
+      "title": "Character Backgrounds"
+    },
+    {
+      "file": "Players-_-Guide-_-17-_-The-_-Legacy-_-Engine.html",
+      "label": "Chapter 17",
+      "title": "The Legacy Engine"
+    },
+    {
+      "file": "Players-_-Guide-_-18-_-Enhanced-_-Player-_-Play.html",
+      "label": "Chapter 18",
+      "title": "Enhanced Player Play"
+    },
+    {
+      "file": "Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html",
+      "label": "Chapter 19",
+      "title": "Appendix Quick Reference"
+    }
+  ]
+}

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge — The Witnessed Prey, a Hunter's Guide — Chapter 6: Fae & Threshold Spirits</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+    p { margin: 0.5rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    dl { margin: 0.4rem 0; }
+    dt { font-weight: 600; color: var(--gold); margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1rem; color: var(--text2); }
+    .subtitle { color: var(--text3); font-size: 0.95rem; margin-top: -0.2rem; margin-bottom: 1rem; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.7rem 0;
+    }
+    .panel > h4:first-child, .panel > .panel-title { margin-top: 0; }
+    .panel-title { color: var(--gold); font-weight: 700; margin-bottom: 0.3rem; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.6rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    footer { text-align: center; color: var(--text3); font-size: 0.8rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<h1>Fae & Threshold Spirits</h1>
+<p class="subtitle">The Witnessed Prey, a Hunter's Guide — Chapter 6</p>
+<p><em>&ldquo;The fae do not lie. They simply keep a different reckoning. What you call a trick, they call a fair price.&rdquo;</em> &mdash;Aqyl, son of Aqyl</p>
+
+<p>The fae are not monsters. They are neighbors. They live in the hedge, the hollow, the space between the ninth step and the tenth. They borrow milk. They leave small gifts. They remember every promise you forget.</p>
+
+<h2 id="trow-shadow-bargainers">Trow&mdash;Shadow Bargainers</h2>
+
+<p><em>Enigmatic fey who keep to thresholds and almost-there spaces. Most hint at an unnamed patron&mdash;the Gray Benefactor, the Under-Guest&mdash;but never speak that allegiance twice beneath the same roof.</em></p>
+
+<ul>
+<li><strong>Tier III, Cap 4.</strong> Incorporeal (when they choose), Intelligent, Bound by Courtesy.</li>
+<li><strong>Harm:</strong> 4. <strong>Fatigue:</strong> Spirit.</li>
+<li><strong>Traits:</strong> <em>Shadow-Step</em>&mdash;move between witnessed thresholds in Near as a move action. <em>Night-Guest Writ</em>&mdash;once per leg, declare dusk-right between two duskmarks; hostile checks to bar passage suffer DV +1 unless they bring a counter-witness.</li>
+<li><strong>Clock:</strong> Gray Courtesy [4]&mdash;ticks each time players skip lamp, bread, or salt. On fill, hospitality voids; all bargains turn literal.</li>
+<li><strong>Resolution:</strong> Bread-and-salt under a lifted lamp binds the Trow to guest-right for one night and one truthful answer. Payment must be in honest memory.</li>
+<li><strong>Harm Levels:</strong> 8 (advanced).</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Shadow-Step</strong></td><td>2</td><td>Move between witnessed thresholds in Near.</td><td>As move action.</td></tr>
+<tr><td><strong>Night-Guest Writ</strong></td><td>1</td><td>Declare dusk-right; hostile checks DV +1 without counter-witness.</td><td>Once per leg.</td></tr>
+<tr><td><strong>Almost-Presence</strong></td><td>1</td><td>Any social roll to spot the Trow is at &ndash;1 die.</td><td>Ongoing.</td></tr>
+<tr><td><strong>Demand Payment</strong></td><td>2</td><td>Target must offer a memory or accept a Reckoning Timer [4].</td><td>When bargaining.</td></tr>
+<tr><td><strong>Omission</strong></td><td>2</td><td>Omit a name from a record, a door from a hallway.</td><td>When cheated.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="neighbors-the-hollow-s-kin">Neighbors&mdash;The Hollow&rsquo;s Kin</h2>
+
+<p><em>The Neighbors are a category of attention&mdash;the forest&rsquo;s awareness of intruders, manifesting as silence, footsteps that aren&rsquo;t there, a voice that speaks your language but does not belong to any throat.</em></p>
+
+<ul>
+<li><strong>Tier II, Cap 2.</strong> Incorporeal, Attentive, Patient.</li>
+<li><strong>Harm:</strong> Cannot be harmed. <strong>Fatigue:</strong> None.</li>
+<li><strong>Traits:</strong> <em>Silence</em>&mdash;in the presence of a Neighbor, all sound is muffled. <em>The Watching</em>&mdash;a character who fails a Resolve test (DV 4) in a Neighbor&rsquo;s presence gains the Condition Marked&mdash;the Neighbor knows their location for the rest of the scene.</li>
+<li><strong>Clock:</strong> Neighbor&rsquo;s Patience [6]&mdash;ticks each time a taboo is broken (ninth cup, ninth step, unoffered red thread). When full, the Neighbor manifests as an Oath-Keeper.</li>
+<li><strong>Resolution:</strong> Speak a truth about yourself that you have never told anyone.</li>
+<li><strong>Harm Levels:</strong> None. A Neighbor cannot be harmed &mdash; it is a puzzle of attention and taboo, not a fight.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Silence</strong></td><td>2</td><td>All sound muffled; communication beyond Close impossible.</td><td>At start of encounter.</td></tr>
+<tr><td><strong>The Watching</strong></td><td>1</td><td>Target tests Resolve (DV 4); on failure, Neighbor knows their location.</td><td>When approached.</td></tr>
+<tr><td><strong>Manifest Oath-Keeper</strong></td><td>4</td><td>Neighbor becomes an Oath-Keeper and demands payment.</td><td>Neighbor&rsquo;s Patience fills.</td></tr>
+<tr><td><strong>Offer Truth</strong></td><td>0</td><td>Target speaks a never-told truth; Neighbor fades.</td><td>Resolution.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="green-court-fae">Green Court Fae</h2>
+
+<p>The courts of the Hazel Queen and the Alder King are not places; they are obligations.</p>
+
+<h3>Hazel Queen&rsquo;s Emissary</h3>
+
+<p><em>A fae courtier wearing leaves and law. Their skin is the color of hazel bark; their eyes are acorns.</em></p>
+
+<ul>
+<li><strong>Tier III, Cap 4.</strong> Corporeal, Courteous, Bound by Law.</li>
+<li><strong>Harm:</strong> 4. <strong>Fatigue:</strong> Spirit.</li>
+<li><strong>Traits:</strong> <em>Leaf and Law</em>&mdash;the Emissary cannot lie, but they may omit. <em>Courteous Snare</em>&mdash;any gift accepted from the Emissary creates a Reckoning Timer [4].</li>
+<li><strong>Resolution:</strong> Present a hazel token&mdash;a nut cracked in the presence of a witness.</li>
+<li><strong>Harm Levels:</strong> 8 (advanced).</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Leaf and Law</strong></td><td>1</td><td>Emissary may omit information; Insight test (DV 4) reveals omission.</td><td>Ongoing.</td></tr>
+<tr><td><strong>Courteous Snare</strong></td><td>2</td><td>Gift accepted creates Reckoning Timer [4]; when full, service is demanded.</td><td>When offering gifts.</td></tr>
+<tr><td><strong>Demand Service</strong></td><td>2</td><td>Target must perform a service of equivalent value.</td><td>Reckoning Timer fills.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Lady of Thorns</h3>
+
+<p><em>Sovereign of a hawthorn court. Smiles like a snare, forgives in exact measures. She has never lied. She has never needed to.</em></p>
+
+<ul>
+<li><strong>Tier V, Cap 6.</strong> Corporeal, Courteous, Absolute.</li>
+<li><strong>Harm:</strong> 8 (what she deals, if it ever comes to that). <strong>Fatigue:</strong> Spirit.</li>
+<li><strong>Traits:</strong> <em>Thorn Sentence</em>&mdash;once per scene, the Lady may declare a character &ldquo;bound by courtesy.&rdquo; The character cannot take hostile actions for one exchange unless they speak a truth that wounds them.</li>
+<li><strong>Resolution:</strong> Cannot be fought. Cannot be bargained with on unequal terms. Offer a gift of equal value to what you seek.</li>
+<li><strong>Harm Levels:</strong> None. The Lady of Thorns is an Avatar-tier power &mdash; she is a puzzle of courtesy and equal exchange, not a fight to be won by attrition.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Thorn Sentence</strong></td><td>3</td><td>Target cannot take hostile actions for 1 exchange unless they speak a wounding truth.</td><td>Once per scene.</td></tr>
+<tr><td><strong>Demand Equal Gift</strong></td><td>2</td><td>Target must offer a gift of equal value to what they seek.</td><td>When bargaining.</td></tr>
+<tr><td><strong>Prune</strong></td><td>3</td><td>Target&rsquo;s name is forgotten in her court.</td><td>When defied.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="the-hollow-s-oath-keeper">The Hollow&rsquo;s Oath-Keeper</h2>
+
+<p><em>The Oath-Keeper is not a spirit of a person. It is the Hollow&rsquo;s attention given shape. It appears when a character ignores three omens.</em></p>
+
+<ul>
+<li><strong>Tier IV, Cap 5.</strong> Incorporeal, Inexorable, Patient.</li>
+<li><strong>Harm:</strong> Cannot be harmed. <strong>Fatigue:</strong> None.</li>
+<li><strong>Traits:</strong> <em>Demand</em>&mdash;the Oath-Keeper asks a single question: &ldquo;What do you owe?&rdquo; The character must answer truthfully. <em>Mounting Toll</em>&mdash;each time the Oath-Keeper appears, what is owed grows.</li>
+<li><strong>Clock:</strong> Hollow&rsquo;s Patience [8]&mdash;ticks each time a debt is ignored. When full, the Oath-Keeper claims the name of the one who owes.</li>
+<li><strong>Resolution:</strong> Pay the original debt&mdash;in coin, in kind, or in a story worth as much as what was first taken.</li>
+<li><strong>Harm Levels:</strong> None. The Oath-Keeper cannot be harmed &mdash; it is a puzzle of debt and truth-telling, not a fight.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Demand</strong></td><td>2</td><td>Target must answer: &ldquo;What do you owe?&rdquo; or lose a memory.</td><td>At appearance.</td></tr>
+<tr><td><strong>Mounting Toll</strong></td><td>2</td><td>What is owed grows; advance a Reckoning Timer or impose a curse.</td><td>Each appearance.</td></tr>
+<tr><td><strong>Claim Name</strong></td><td>4</td><td>Target becomes a stranger to everyone who knew them.</td><td>Hollow&rsquo;s Patience fills.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="quick-reference-fae-threshold-spirits">Quick Reference&mdash;Fae &amp; Threshold Spirits</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Creature</strong></th>
+<th><strong>Tier</strong></th>
+<th><strong>Vulnerability</strong></th>
+<th><strong>Resolution</strong></th>
+<th><strong>Harm Levels</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Trow</td><td>III</td><td>Broken pipe</td><td>Offer bread-and-salt, honest memory.</td><td>8 (advanced)</td></tr>
+<tr><td>Neighbor</td><td>II</td><td>Truth offered</td><td>Speak a never-told truth.</td><td>Unkillable (puzzle)</td></tr>
+<tr><td>Hazel Emissary</td><td>III</td><td>Hazel token</td><td>Crack a hazelnut with witness.</td><td>8 (advanced)</td></tr>
+<tr><td>Alder Bound</td><td>III</td><td>Burned grove</td><td>Return what was borrowed.</td><td>3 (standard)</td></tr>
+<tr><td>Green Knight</td><td>IV</td><td>Crack antler helm</td><td>Win three proofs or combat.</td><td>8 (advanced)</td></tr>
+<tr><td>Lady of Thorns</td><td>V</td><td>Equal gift</td><td>Cannot be fought.</td><td>Unkillable (puzzle)</td></tr>
+<tr><td>Oath-Keeper</td><td>IV</td><td>Pay original debt</td><td>Payment with witness.</td><td>Unkillable (puzzle)</td></tr>
+<tr><td>Unwitnessed Door</td><td>IV</td><td>None (choice)</td><td>Choose mirror, speak name.</td><td>Unkillable (puzzle)</td></tr>
+<tr><td>Counting Bell</td><td>III</td><td>Silence clapper</td><td>Stealth or Mechanics test.</td><td>3 (standard)</td></tr>
+</tbody>
+</table>
+</div>
+
+<blockquote>I keep this table on a separate leaf. The leaf is pinned with a copper nail. The nail is warm. I do not know why.<span class="attribution">Lerris Fenwood</span></blockquote>
+
+<blockquote>The fae do not lie. They do not need to. The truth, told at the wrong time, is a sharper weapon.<span class="attribution">The Gray Wanderer</span></blockquote>
+<blockquote>I have bargained with a desperate Trow, I tricked him into trading his name for my most precious memory. It was done between three mirrors that I set up near a mummer&rsquo;s encampment at moonlight. I do not remember what or why I wished to forget. And I dare not speak that name.<span class="attribution">Saikou Ira</span></blockquote>
+<blockquote>The Oath-Keeper took a story from me once. It was the story of a woman who forgot to name her child. The Oath-Keeper listened. Then it said, &rdquo;The child is you.&ldquo; I have named myself every morning since.<span class="attribution">Dusana</span></blockquote>
+
+<footer>Fate's Edge Copyright &mdash; (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
+</body>
+</html>

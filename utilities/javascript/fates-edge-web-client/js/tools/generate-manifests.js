@@ -29,8 +29,8 @@ const EXCLUDED_FILE_PATTERN = /manifest.*\.json(\.tmp)?$/i;
 const CATEGORY_MAP = {
   'core': { id: 'core', label: '📘 Core', path: '/data/docs/core/' },
   'quickstart': { id: 'quickstart', label: '⚡ Quickstart', path: '/data/docs/quickstart/' },
-  'players-guide': { id: 'players-guide', label: '🎲 Player\'s Guide', path: '/data/docs/players-guide/' },
-  'gm-guide': { id: 'gm-guide', label: '🎬 GM Guide', path: '/data/docs/gm-guide/' },
+  'players-guide': { id: 'players-guide', label: '🎲 Player\'s Guide', path: '/data/docs/players-guide/', book: true },
+  'gm-guide': { id: 'gm-guide', label: '🎬 GM Guide', path: '/data/docs/gm-guide/', book: true },
   'resources': { id: 'resources', label: '📚 Resources', path: '/data/docs/resources/' },
   'adventures': { id: 'adventures', label: '🗡️ Adventures', path: '/data/docs/adventures/' },
   'expansions': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/expansions/' },
@@ -40,6 +40,8 @@ const CATEGORY_MAP = {
   'konreh': { id: 'konreh', label: '♟️ Kon\'reh', path: '/data/docs/konreh/' },
   'tollveil': { id: 'tollveil', label: '🃏 Toll & Veil', path: '/data/docs/tollveil/' },
   'uploaded': { id: 'uploaded', label: '📤 Uploaded', path: '/data/docs/uploaded/' },
+  'witnessed-prey': { id: 'witnessed-prey', label: '🩸 Witnessed Prey', path: '/data/docs/witnessed-prey/', book: true },
+  'saikou-compendium': { id: 'saikou-compendium', label: '🕯️ Saikou Compendium', path: '/data/docs/saikou-compendium/', book: true },
 };
 
 const SUBDIRS = Object.keys(CATEGORY_MAP);
@@ -75,6 +77,52 @@ function ensureDirectory(dirPath) {
   return fullPath;
 }
 
+// ─── Multi-page "book" documents ──────────────────────────────────
+// A book directory (gm-guide/, players-guide/, ...) holds one chapter per
+// .html file plus a book.json written by tools/generate_book_index.py in
+// the docs repo (and propagated here by sync_data_to_consumers.py). Such
+// a directory becomes ONE manifest entry -- pointing at its index.html --
+// carrying a `pages` array so the UI can present it as a single document
+// with internal chapter navigation, instead of one manifest row per
+// chapter (which is what made the doc list unwieldy as guides were added).
+function readBookManifestEntry(subPath, category) {
+  const bookJsonPath = path.join(subPath, 'book.json');
+  if (!fs.existsSync(bookJsonPath)) {
+    console.warn(`⚠️  ${category.id} is marked as a book but has no book.json (run tools/generate_book_index.py in fates-edge-docs and re-sync) -- falling back to one entry per file`);
+    return null;
+  }
+
+  let book;
+  try {
+    book = JSON.parse(fs.readFileSync(bookJsonPath, 'utf8'));
+  } catch (err) {
+    console.error(`❌ Failed to parse ${bookJsonPath}:`, err.message);
+    return null;
+  }
+
+  const pages = (book.chapters || []).map(c => ({
+    file: c.file,
+    label: c.label,
+    title: c.title,
+  }));
+
+  if (pages.length === 0) return null;
+
+  return {
+    id: book.id || category.id,
+    title: book.title || category.label,
+    subtitle: book.subtitle || '',
+    file: book.index || 'index.html',
+    path: category.path,
+    category: category.id,
+    categoryLabel: category.label,
+    core: false,
+    active: true,
+    book: true,
+    pages: pages,
+  };
+}
+
 // ─── Generate Docs Manifest ──────────────────────────────────────
 function generateDocsManifest(docsPath) {
   const fullPath = ensureDirectory(docsPath);
@@ -91,11 +139,23 @@ function generateDocsManifest(docsPath) {
     if (!fs.existsSync(subPath)) continue;
 
     const category = CATEGORY_MAP[subdir];
+
+    if (category.book) {
+      const bookEntry = readBookManifestEntry(subPath, category);
+      if (bookEntry) {
+        documents.push(bookEntry);
+        continue;
+      }
+      // else: no book.json found yet -- fall through and list chapters
+      // individually so the docs still show up somehow.
+    }
+
     const files = fs.readdirSync(subPath);
 
     for (const file of files) {
       if (!file.endsWith('.html')) continue;
       if (EXCLUDED_FILES.has(file)) continue;
+      if (file.toLowerCase() === 'index.html') continue;
 
       const title = getDocTitle(file);
       const id = generateId(title);

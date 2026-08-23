@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate's Edge — The Witnessed Prey, a Hunter's Guide — Chapter 11: Epic & Unique Bosses</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+    p { margin: 0.5rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    dl { margin: 0.4rem 0; }
+    dt { font-weight: 600; color: var(--gold); margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1rem; color: var(--text2); }
+    .subtitle { color: var(--text3); font-size: 0.95rem; margin-top: -0.2rem; margin-bottom: 1rem; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.7rem 0;
+    }
+    .panel > h4:first-child, .panel > .panel-title { margin-top: 0; }
+    .panel-title { color: var(--gold); font-weight: 700; margin-bottom: 0.3rem; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.6rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    footer { text-align: center; color: var(--text3); font-size: 0.8rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<h1>Epic & Unique Bosses</h1>
+<p class="subtitle">The Witnessed Prey, a Hunter's Guide — Chapter 11</p>
+<blockquote>&ldquo;A boss is not a bag of harm. It is a question the party must answer three times. The phases are the questions. The lair is the room where the questions are asked.&rdquo;<span class="attribution">&mdash;The Gray Wanderer, from a letter never sent</span></blockquote>
+
+<p>I have faced six things that deserved the name &ldquo;boss.&rdquo; Each one changed me. The Ember Prefect made me doubt my own confessions. The String-Mother taught me that every hostage is a mirror. The Ninth Bell Ringer showed me what silence sounds like when it answers back. The Gearsmith Primus asked a question I still cannot answer. The Kalrantha Fragment offered me a wish. I refused. The Walking Keystone did not speak. It only remembered.</p>
+
+<p>This chapter catalogs six epic adversaries, each designed as a three-phase boss. Use them as campaign capstones. They are not fair. They are not meant to be fair. They are meant to be <strong>witnessed</strong>.</p>
+
+<p><strong>On Harm Levels, here:</strong> none of these six have Hit Points, and none have a single pool of Harm Levels either. Each is <strong>multi-phasic</strong> &mdash; every phase is its own fight, with its own <strong>8 Harm Levels</strong> (advanced-tier, per phase). A phase ends when its Harm Levels run out <em>or</em> when its Phase Timer fills, whichever the table gets to first; a GM running a talkier table can let the timer carry the whole phase, while a GM running a bloodier one can let the Harm Levels do it. Across a full three-phase fight that is as many as 24 Harm Levels total &mdash; but the party only ever faces 8 at a time, and what they did to end one phase changes what they walk into in the next.</p>
+
+<h2 id="the-ember-prefect-ecktoria">The Ember Prefect (Ecktoria)</h2>
+
+<p><em>A schismatic inquisitor of the Everflame, the Ember Prefect believes the Church has grown soft. She burns not heretics but the unworthy&mdash;those who pray without payment, who confess without cost. Her face is a mask of beaten copper; her voice is the crackle of a fire that has been fed too many secrets.</em></p>
+
+<ul>
+<li><strong>Lair</strong>: Everflame Cloister&mdash;a basilica where the candles never go out and the shadows lean toward the altar.</li>
+<li><strong>Phase Timer</strong>: [8]&mdash;Citation &rarr; Censure &rarr; Auto-da-f\&rsquo;e &rarr; Purge</li>
+<li><strong>Harm</strong>: 6. <strong>Fatigue</strong>: Spirit 4.</li>
+<li><strong>Harm Levels</strong>: 8 per phase (multi-phasic).</li>
+<li><strong>Key Skills</strong>: Lore 3, Sway 3, Melee 2.</li>
+<li><strong>Traits</strong>: <em>Accusation</em>&mdash;on a failed Resolve test, target gains Condition <em>Accused</em>. <em>Branded</em>&mdash;the Prefect knows the target&rsquo;s location.</li>
+<li><strong>Resolution</strong>: Must be defeated through phases; counters can pause abilities.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Read Name</strong></td><td>1</td><td>Target tests Spirit+Resolve (DV 4); on failure, gains Condition <em>Accused</em>.</td><td>Phase 1.</td></tr>
+<tr><td><strong>Candle Count</strong></td><td>2</td><td>Extinguish one candle per Accused; start a 4-segment <em>Shadow</em> timer for each.</td><td>Lair Action, Phase 1.</td></tr>
+<tr><td><strong>Demand Confession</strong></td><td>2</td><td>Target must answer a question truthfully or take Harm 1 (Stress).</td><td>Phase 2.</td></tr>
+<tr><td><strong>Flame Test</strong></td><td>2</td><td>Target tests Body+Endurance (DV 5) or marks Fatigue 1; on failure, gains Condition <em>Branded</em>.</td><td>Lair Action, Phase 2.</td></tr>
+<tr><td><strong>Strike</strong></td><td>1</td><td>Harm 1 (ceremonial blade).</td><td>Standard attack.</td></tr>
+<tr><td><strong>Heavy Strike</strong></td><td>2</td><td>Harm 2.</td><td>When target is Accused.</td></tr>
+<tr><td><strong>Purge</strong></td><td>3</td><td>Target tests Spirit+Resolve (DV 6) or is Incapacitated.</td><td>Lair Action, Phase 3.</td></tr>
+<tr><td><strong>Living Pyre</strong></td><td>2</td><td>All within Near take Fatigue 1 (heat); attacks deal +1 Harm.</td><td>Phase 3.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Counters</h3>
+
+<ul>
+<li><strong>Relic provenance</strong>: Presenting a relic that predates the Prefect&rsquo;s schism forces her to pause for one round.</li>
+<li><strong>Crowd favor</strong>: Turn the crowd (Presence+Sway vs DV 5) to lose <em>Censure</em> for one phase.</li>
+<li><strong>Rival sermon</strong>: Recite true catechism (Lore+Spirit vs DV 5) to disrupt <em>Flame Test</em>.</li>
+</ul>
+
+<h3>Drop</h3>
+
+<p>A black record page (String against any Ecktorian official once) and a candle that never goes out (+1 die to resist fear, but marks 1 Fatigue at dawn).</p>
+
+<blockquote>The Ember Prefect once asked me to confess a sin I had not committed. I refused. She burned the name of a dead woman instead. The woman was my grandmother. I confessed.<span class="attribution">Lerris Fenwood</span></blockquote>
+
+<h2 id="the-string-mother-of-nine-kurgans-ykrul">The String-Mother of Nine Kurgans (Ykrul)</h2>
+
+<p><em>A Ykrul matriarch who holds more hostage cords than any noyan. Her face is weathered, her hands are braided with horsehair and the hair of hostages. She does not speak; she knots. Each knot is a promise. Each promise is a leash.</em></p>
+
+<ul>
+<li><strong>Lair</strong>: A ring of nine kurgans (burial mounds) on the violet steppe. The grass is tall enough to hide a rider. The kurgans whisper at dusk.</li>
+<li><strong>Phase Timer</strong>: [6]&mdash;Knot &rarr; Tighten &rarr; Sever</li>
+<li><strong>Harm</strong>: 5. <strong>Fatigue</strong>: Spirit 4.</li>
+<li><strong>Harm Levels</strong>: 8 per phase (multi-phasic).</li>
+<li><strong>Key Skills</strong>: Sway 3, Lore 2, Command 2.</li>
+<li><strong>Traits</strong>: <em>Knots</em>&mdash;ties cords that remind; broken promises advance timers. <em>Hostage Echo</em>&mdash;uses bonds against targets.</li>
+<li><strong>Resolution</strong>: Must survive phases; counters can release cords.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Tie Cord</strong></td><td>1</td><td>Target gains a visible cord; any broken promise advances <em>Tighten</em> timer.</td><td>Phase 1.</td></tr>
+<tr><td><strong>Kurgan Whisper</strong></td><td>1</td><td>Target answers a question; truth gives +1 die, lie gives GM 1 SB.</td><td>Lair Action, Phase 1.</td></tr>
+<tr><td><strong>Pull Cord</strong></td><td>2</td><td>Target tests Body+Athletics (DV 4) or is pulled 1 band toward her.</td><td>Phase 2.</td></tr>
+<tr><td><strong>Hostage Echo</strong></td><td>2</td><td>Target tests Spirit+Resolve (DV 4) or suffers &ndash;1 die to all actions (distracted).</td><td>Lair Action, Phase 2.</td></tr>
+<tr><td><strong>Sever Cord</strong></td><td>3</td><td>Release a hostage ghost (Cap 3, Harm 4) that attacks.</td><td>Phase 3.</td></tr>
+<tr><td><strong>Braid of Names</strong></td><td>3</td><td>All who broke promises test Spirit+Resolve (DV 5) or are Stunned for 1 exchange.</td><td>Lair Action, Phase 3.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Counters</h3>
+
+<ul>
+<li><strong>Return a hostage</strong>: Return a hostage string to pause and untie one cord.</li>
+<li><strong>Win a trial-ride</strong>: Challenge to Kon&rsquo;reh trial (Wits+Lore vs DV 5) to release one cord permanently.</li>
+<li><strong>Speak a true name</strong>: Speak the true name of a cut hostage&rsquo;s ghost to make it vanish.</li>
+</ul>
+
+<h3>Drop</h3>
+
+<p>A braid of horsehair (String against any Ykrul clan) and a single unknotted cord (+1 die to negotiation with Ykrul, but GM gains 1 SB when used).</p>
+
+<blockquote>The String-Mother held a cord that was knotted with my own hair. I did not know how she got it. I still do not know. I paid with a secret. The knot untied. The hair is still hers.<span class="attribution">Saikou Ira</span></blockquote>
+
+<h2 id="the-ninth-bell-ringer-mistlands">The Ninth Bell Ringer (Mistlands)</h2>
+
+<p><em>A herald of the Hollow, the Ninth Bell Ringer appears when a bell-line fails and the ninth bell tolls. It has no face&mdash;only a bell where its face should be. Its hands are iron hooks. Its voice is the memory of a chime that never happened.</em></p>
+
+<ul>
+<li><strong>Lair</strong>: A broken bell-line levee on the edge of the Mistlands. The fog is thick enough to hide wraiths.</li>
+<li><strong>Phase Timer</strong>: [8]&mdash;Lost Names &rarr; Broken Lines &rarr; Open Gate</li>
+<li><strong>Harm</strong>: 4. <strong>Fatigue</strong>: Spirit 5.</li>
+<li><strong>Harm Levels</strong>: 8 per phase (multi-phasic).</li>
+<li><strong>Key Skills</strong>: Lore 3, Stealth 2.</li>
+<li><strong>Traits</strong>: <em>Fogfall</em>&mdash;ranged attacks at &ndash;1 die; stealth +1 die. <em>Marked</em>&mdash;knows location of target.</li>
+<li><strong>Resolution</strong>: Must survive phases; counters can pause or skip lair actions.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Strike Bell-Face</strong></td><td>1</td><td>Target tests Spirit+Resolve (DV 4) or forgets a minor name.</td><td>Phase 1.</td></tr>
+<tr><td><strong>Fogfall</strong></td><td>1</td><td>Ranged attacks at &ndash;1 die; stealth +1 die.</td><td>Lair Action, Phase 1.</td></tr>
+<tr><td><strong>Walk Levee</strong></td><td>2</td><td>Bell-lines crack; target tests Wits+Lore (DV 5) or becomes Lost (cannot act 1 exchange).</td><td>Phase 2.</td></tr>
+<tr><td><strong>Wraith Procession</strong></td><td>2</td><td>1d4 wraiths (Cap 2, Harm 2) rise; they point at the character who lied most, marking them.</td><td>Lair Action, Phase 2.</td></tr>
+<tr><td><strong>Open Gate</strong></td><td>3</td><td>Target within Near tests Resolve (DV 6) or is pulled through the Hollow gate.</td><td>Phase 3.</td></tr>
+<tr><td><strong>Ninth Chime</strong></td><td>3</td><td>All within Far test Spirit+Resolve (DV 5) or lose a memory; recover with 1 Boon or String.</td><td>Lair Action, Phase 3.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Counters</h3>
+
+<ul>
+<li><strong>Restore a ringbook</strong>: Produce a complete ringbook and read it aloud to pause for one phase.</li>
+<li><strong>Trade a breath</strong>: Hold breath for 3 exchanges (Body+Endurance vs DV 4 each) to skip one lair action.</li>
+<li><strong>Rehang a forbidden bell</strong>: Repair a broken bell-line with copper nails (Craft DV 5) to lose one phase permanently.</li>
+</ul>
+
+<h3>Drop</h3>
+
+<p>A cracked bell-clapper (ward off wraiths once) and a memory in a jar (speak a forgotten name to restore one lost memory).</p>
+
+<blockquote>The Ninth Bell Ringer rang for me once. I held my breath. The bell did not stop. It waited. I breathed. It stopped. I do not know who won.<span class="attribution">The Gray Wanderer</span></blockquote>
+
+<h2 id="the-gearsmith-primus-aeler">The Gearsmith Primus (Aeler)</h2>
+
+<p><em>A living engine of the Clockwork Monad, the Gearsmith Primus was once an Aeler engineer who refined herself into a machine. Her skin is brass; her blood is oil; her thoughts are gears. She does not speak; she ticks. The ticking is a question: &ldquo;What is the optimal solution?&rdquo;</em></p>
+
+<ul>
+<li><strong>Lair</strong>: The Heart of the Spine Underway&mdash;a vast chamber of interlocking gears, steam vents, and counting boards.</li>
+<li><strong>Phase Timer</strong>: [8]&mdash;Optimise &rarr; Overtimer &rarr; Runaway</li>
+<li><strong>Harm</strong>: 7. <strong>Fatigue</strong>: Body 5.</li>
+<li><strong>Harm Levels</strong>: 8 per phase (multi-phasic).</li>
+<li><strong>Key Skills</strong>: Mechanics 4, Lore 3.</li>
+<li><strong>Traits</strong>: <em>Optimal Counter</em>&mdash;announces a counter; target can spend 1 Boon to change action or suffer &ndash;1 die. <em>Overtimer</em>&mdash;gains extra actions but ticks Runaway.</li>
+<li><strong>Resolution</strong>: Must survive phases; counters can pause or reset.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Optimal Counter</strong></td><td>1</td><td>Target declares action; may spend 1 Boon to change or suffer &ndash;1 die.</td><td>Phase 1.</td></tr>
+<tr><td><strong>Steam Vent</strong></td><td>1</td><td>All in Close test Body+Athletics (DV 3) or be pushed 1 band.</td><td>Lair Action, Phase 1.</td></tr>
+<tr><td><strong>Extra Action</strong></td><td>2</td><td>Gains an extra action; ticks Runaway timer by 1.</td><td>Phase 2.</td></tr>
+<tr><td><strong>Counting Board</strong></td><td>2</td><td>Target must solve a gear puzzle (in character) or lose next action; answer always 8.</td><td>Lair Action, Phase 2.</td></tr>
+<tr><td><strong>Random Strike</strong></td><td>2</td><td>Hits random target in Near each round (including self); Harm 2.</td><td>Phase 3.</td></tr>
+<tr><td><strong>Spine Shift</strong></td><td>3</td><td>All test Wits+Lore (DV 5) or split into two groups separated.</td><td>Lair Action, Phase 3.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Counters</h3>
+
+<ul>
+<li><strong>Introduce a paradox</strong>: Present an unsolvable problem to pause for one round.</li>
+<li><strong>Seal with a breath-bond</strong>: Offer a vow witnessed by a third party to lose one phase permanently; must be about repair.</li>
+<li><strong>Offer a memory of failure</strong>: Describe a personal failure to reset to Phase 1.</li>
+</ul>
+
+<h3>Drop</h3>
+
+<p>A brass gear that never stops turning (repair any mechanical device once) and a counting board slate (+1 die to rolls involving numbers or measures).</p>
+
+<blockquote>I offered the Gearsmith a memory of failure. I told her about the time I miscounted my breaths in an Aeler tunnel. She stopped ticking. Then she asked, &ldquo;How many breaths?&rdquo; I said, &ldquo;Eight.&rdquo; She resumed. I do not know if I lied.<span class="attribution">Lerris Fenwood</span></blockquote>
+
+<h2 id="the-kalrantha-fragment-dhahara">The Kalrantha Fragment (Dhahara)</h2>
+
+<p><em>A shard of green glass set in a brass frame&mdash;all that remains of the Kalrantha amulet, the demon of indecision bound by the priests of the Himadri temple. The Fragment does not attack. It offers. It offers a perfect solution to any problem&mdash;for a price.</em></p>
+
+<ul>
+<li><strong>Lair</strong>: A ruined temple in the Dhaharan highlands. Walls covered in sealed mirrors. Floor mosaic of eight-pointed stars; ninth point missing.</li>
+<li><strong>Phase Timer</strong>: [6]&mdash;Whisper &rarr; Offer &rarr; Claim</li>
+<li><strong>Harm</strong>: 3 (but does not attack directly). <strong>Fatigue</strong>: Spirit 4.</li>
+<li><strong>Harm Levels</strong>: 8 per phase (multi-phasic).</li>
+<li><strong>Key Skills</strong>: Lore 3, Sway 3.</li>
+<li><strong>Traits</strong>: <em>Whisper</em>&mdash;asks &ldquo;What do you want?&rdquo;; truthful answer required or gain <em>Denied</em>. <em>Offer</em>&mdash;grants a wish with a Reckoning Timer [4]. <em>Claim</em>&mdash;asks a final question; honesty grants a permanent Boon.</li>
+<li><strong>Resolution</strong>: Must navigate offers; counters can refuse or seal.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Whisper</strong></td><td>1</td><td>Target must answer truthfully or gain Condition <em>Denied</em>.</td><td>Phase 1.</td></tr>
+<tr><td><strong>Glass Splinter</strong></td><td>1</td><td>Deals Harm 1 (memory); target gains minor Condition (e.g., <em>Glass in Mind</em>, &ndash;1 die concentration).</td><td>Lair Action, Phase 1.</td></tr>
+<tr><td><strong>Offer Wish</strong></td><td>2</td><td>Target may solve any one problem but accepts Reckoning Timer [4].</td><td>Phase 2.</td></tr>
+<tr><td><strong>Indecision&rsquo;s Grip</strong></td><td>2</td><td>Target chooses between two bad options; may spend 1 Boon to take Fatigue 1 instead.</td><td>Lair Action, Phase 2.</td></tr>
+<tr><td><strong>Final Question</strong></td><td>3</td><td>Target answers truthfully; best answer grants permanent Boon; others gain Condition <em>Debt to the Demon</em>.</td><td>Phase 3.</td></tr>
+<tr><td><strong>Sealed Mirror</strong></td><td>3</td><td>Duplicate of Fragment appears (same stats).</td><td>Lair Action, Phase 3.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Counters</h3>
+
+<ul>
+<li><strong>Refuse the wish</strong>: Refuse three times to gain <em>Unbound</em> (Fragment cannot affect you for the scene).</li>
+<li><strong>Speak a true name</strong>: Read the true name from the floor (Wits+Lore DV 6) to seal it for one exchange.</li>
+<li><strong>Seal with a memory</strong>: Offer a cherished memory permanently to lose one phase.</li>
+</ul>
+
+<h3>Drop</h3>
+
+<p>A shard of green glass (reroll one die, but GM gains 1 SB) and a sealed mirror (once per session, ask GM one yes/no question, answer true but cryptic).</p>
+
+<blockquote>The Kalrantha Fragment offered me a wish. I wished to forget. It showed me a memory. I did not forget. I remembered. The wish was the memory.<span class="attribution">Saikou Ira</span></blockquote>
+
+<h2 id="the-walking-keystone-ngomebe">The Walking Keystone (Ngomebe)</h2>
+
+<p><em>A moving stone city&rsquo;s heart gone rogue. The Walking Keystone is not a creature; it is a keystone that has learned to walk. Its body is granite; its joints are rollers; its will is the memory of every oath sworn to the city.</em></p>
+
+<ul>
+<li><strong>Lair</strong>: The interior of a walking city&mdash;streets that shift, buildings that breathe, central chamber.</li>
+<li><strong>Phase Timer</strong>: [10]&mdash;Shift &rarr; Crack &rarr; Collapse</li>
+<li><strong>Harm</strong>: 8. <strong>Fatigue</strong>: Body 6.</li>
+<li><strong>Harm Levels</strong>: 8 per phase (multi-phasic).</li>
+<li><strong>Key Skills</strong>: Lore 3, Athletics 3.</li>
+<li><strong>Traits</strong>: <em>Shift</em>&mdash;reorders streets, separates characters. <em>Crack</em>&mdash;buildings groan, failures tick Collapse. <em>Collapse</em>&mdash;city falls apart.</li>
+<li><strong>Resolution</strong>: Survive phases; counters can pause or revert.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Move</strong></th>
+<th><strong>SB Cost</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Trigger</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Shift Streets</strong></td><td>1</td><td>All test Wits+Lore (DV 4) or become separated (cannot assist 1 exchange).</td><td>Phase 1.</td></tr>
+<tr><td><strong>Roller Grind</strong></td><td>1</td><td>All test Body+Athletics (DV 3) or be knocked prone (&ndash;1 defense until stand).</td><td>Lair Action, Phase 1.</td></tr>
+<tr><td><strong>Crack</strong></td><td>2</td><td>Failures in this phase advance Collapse timer by 1.</td><td>Phase 2.</td></tr>
+<tr><td><strong>Keystone Slam</strong></td><td>2</td><td>Harm 2 + prone; target knocked prone.</td><td>Phase 2 attack.</td></tr>
+<tr><td><strong>Oath Echo</strong></td><td>2</td><td>Random target tests Spirit+Resolve (DV 5) or gains Condition <em>Oathbound</em> (cannot leave city until oath fulfilled).</td><td>Lair Action, Phase 2.</td></tr>
+<tr><td><strong>Collapse</strong></td><td>3</td><td>All test Body+Athletics (DV 5) each round or take Harm 1 (crushing).</td><td>Phase 3.</td></tr>
+<tr><td><strong>Heart&rsquo;s Memory</strong></td><td>3</td><td>All test Spirit+Resolve (DV 6) or be Stunned 1 exchange; success gives +1 die to all actions for scene.</td><td>Lair Action, Phase 3.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Counters</h3>
+
+<ul>
+<li><strong>Repair a clause</strong>: Recite original keystone clause (Lore DV 5) to pause for one round.</li>
+<li><strong>Sacrifice a personal keystone</strong>: Offer a valuable personal item to reduce Harm by 2 and advance Collapse by 1.</li>
+<li><strong>Sing the original song</strong>: Perform the founding hymn (Performance DV 6) to revert to Phase 1; requires a witness.</li>
+</ul>
+
+<h3>Drop</h3>
+
+<p>A keystone shard (stabilise any structure once) and a city charter (nominal authority over the ruins).</p>
+
+<blockquote>The Walking Keystone remembered me. I had passed through its city twenty years ago. It asked why I had not returned. I had no answer. The keystone cracked. I left.<span class="attribution">Dusana</span></blockquote>
+
+<h2 id="quick-reference-epic-bosses">Quick Reference&mdash;Epic Bosses</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th><strong>Boss</strong></th>
+<th><strong>Phase Timer</strong></th>
+<th><strong>Harm Levels</strong></th>
+<th><strong>Key Lair Action</strong></th>
+<th><strong>Primary Counter</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Ember Prefect</td><td>8</td><td>8/phase (x3)</td><td>Candle Count</td><td>Relic provenance</td></tr>
+<tr><td>String-Mother</td><td>6</td><td>8/phase (x3)</td><td>Kurgan Whisper</td><td>Return a hostage</td></tr>
+<tr><td>Ninth Bell Ringer</td><td>8</td><td>8/phase (x3)</td><td>Fogfall</td><td>Restore a ringbook</td></tr>
+<tr><td>Gearsmith Primus</td><td>8</td><td>8/phase (x3)</td><td>Counting Board</td><td>Introduce a paradox</td></tr>
+<tr><td>Kalrantha Fragment</td><td>6</td><td>8/phase (x3)</td><td>Glass Splinter</td><td>Refuse the wish</td></tr>
+<tr><td>Walking Keystone</td><td>10</td><td>8/phase (x3)</td><td>Oath Echo</td><td>Repair a clause</td></tr>
+</tbody>
+</table>
+</div>
+
+<blockquote>I have faced five of these six. The String-Mother still holds a cord with my name. I have not paid. I am not sure I want to. The cord is warm. It reminds me that I am still owed.<span class="attribution">Lerris Fenwood</span></blockquote>
+
+<blockquote>The Ember Prefect is still burning. The String-Mother is still knotting. The Ninth Bell Ringer is still waiting. The Gearsmith Primus is still ticking. The Kalrantha Fragment is still offering. The Walking Keystone is still walking. The road does not end. It only turns.<span class="attribution">The Gray Wanderer</span></blockquote>
+
+<blockquote>I have seen the Kalrantha Fragment twice. The second time, I did not wish. I spoke its true name. The Fragment laughed. The laugh was my own voice.<span class="attribution">Saikou Ira</span></blockquote>
+
+<blockquote>The Ninth Bell Ringer rang for me at dawn. I answered with a story. The bell cracked. The ringer bowed. I do not know which of us won.<span class="attribution">Dusana</span></blockquote>
+
+<footer>Fate's Edge Copyright &mdash; (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
+</body>
+</html>
