@@ -63,11 +63,11 @@ const DOC_TYPES = {
         icon: '🎨',
         description: 'Game design documents and development notes'
     },
-    konreh: {
-        label: '♟️ Kon\'reh',
+    'other-games': {
+        label: '🎮 Other Games',
         folder: 'konreh',
-        icon: '♟️',
-        description: 'Kon\'reh strategy game content'
+        icon: '🎮',
+        description: 'Standalone mini-games set in the Fate\'s Edge world (Kon\'reh, Toll & Veil, ...)'
     },
     quickstart: {
         label: '⚡ Quickstart',
@@ -112,9 +112,13 @@ const FOLDER_TO_TYPE = {};
 for (const [id, type] of Object.entries(DOC_TYPES)) {
     FOLDER_TO_TYPE[type.folder] = id;
 }
+// Toll & Veil shares the 'other-games' type with Kon'reh but lives in its
+// own folder, so it needs a second folder->type mapping the auto-built
+// loop above (one folder per DOC_TYPES entry) can't express.
+FOLDER_TO_TYPE['tollveil'] = 'other-games';
 
 // ─── Type order for sorting ──────────────────────────────────
-const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'travel', 'design', 'konreh', 'uploaded', 'other'];
+const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'travel', 'design', 'other-games', 'uploaded', 'other'];
 
 // ============================================================
 // STATE
@@ -339,6 +343,24 @@ export function render(el) {
     isDarkMode = document.documentElement.classList.contains('light') ? false : true;
 
     container.innerHTML = `
+        <style>
+            /* Tile grid for each category's documents -- 8 columns on wide
+               screens, stepping down as the viewport narrows, instead of a
+               horizontally-scrolling single row. Keeps each category
+               section to a couple of rows of tiles rather than one long
+               strip, so the whole tree takes far less vertical space. */
+            .doc-grid {
+                display: grid;
+                grid-template-columns: repeat(8, 1fr);
+                gap: 0.75rem;
+                padding: 0.5rem 0.2rem 1rem 0.2rem;
+            }
+            @media (max-width: 1400px) { .doc-grid { grid-template-columns: repeat(6, 1fr); } }
+            @media (max-width: 1000px) { .doc-grid { grid-template-columns: repeat(4, 1fr); } }
+            @media (max-width: 700px)  { .doc-grid { grid-template-columns: repeat(3, 1fr); } }
+            @media (max-width: 480px)  { .doc-grid { grid-template-columns: repeat(2, 1fr); } }
+            .doc-card { width: 100%; }
+        </style>
         <h1 class="page-title">📄 Document Library</h1>
         <p class="page-sub">Browse, upload, and manage your Fate's Edge documents.</p>
 
@@ -638,7 +660,7 @@ export async function scanFilesystem() {
     }
 
     // ─── Step 3: Try directory listing for subdirectories ──────────
-    const subdirs = ['core', 'resources', 'adventures', 'expansions', 'travel', 'design', 'konreh'];
+    const subdirs = ['core', 'resources', 'adventures', 'expansions', 'travel', 'design', 'konreh', 'tollveil'];
 
     for (const subdir of subdirs) {
         try {
@@ -1051,7 +1073,7 @@ function renderDocCard(doc) {
 
     return `
         <div class="doc-card" data-fullpath="${escHtml(doc.fullPath || '#')}"
-             style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;cursor:pointer;transition:all 0.15s;min-width:160px;max-width:200px;flex:0 0 auto;display:flex;flex-direction:column;justify-content:space-between;">
+             style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;justify-content:space-between;min-height:100%;">
             <div>
                 <div style="font-size:1.5rem;margin-bottom:0.2rem;">${icon}</div>
                 <h4 style="color:var(--gold);margin-bottom:0.3rem;font-size:0.95rem;font-weight:600;word-break:break-word;">${escHtml(doc.title)}</h4>
@@ -1180,7 +1202,7 @@ function applyDocsFilter() {
             </summary>
         ` : '';
         const rowHtml = `
-            <div class="doc-grid" style="display:flex;flex-direction:row;gap:1rem;overflow-x:auto;overflow-y:visible;padding:0.5rem 0.2rem 1rem 0.2rem;flex-wrap:nowrap;align-items:stretch;scrollbar-width:thin;scrollbar-color:var(--bg4) var(--bg2);-webkit-overflow-scrolling:touch;">
+            <div class="doc-grid">
                 ${docs.map(renderDocCard).join('')}
             </div>
         `;

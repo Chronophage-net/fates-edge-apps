@@ -37,11 +37,19 @@ const CATEGORY_MAP = {
   'anthology': { id: 'anthology', label: '📖 Anthology', path: '/data/docs/anthology/' },
   'travel': { id: 'travel', label: '🗺️ Travel', path: '/data/docs/travel/' },
   'design': { id: 'design', label: '🎨 Design', path: '/data/docs/design/' },
-  'konreh': { id: 'konreh', label: '♟️ Kon\'reh', path: '/data/docs/konreh/' },
-  'tollveil': { id: 'tollveil', label: '🃏 Toll & Veil', path: '/data/docs/tollveil/' },
+  // Kon'reh and Toll & Veil are each a single standalone mini-game
+  // reference rather than a full expansion or line of their own -- they
+  // share the 'other-games' category id/label so they land in one
+  // "Other Games" section instead of each getting its own single-item
+  // category tile.
+  'konreh': { id: 'other-games', label: '🎲 Other Games', path: '/data/docs/konreh/' },
+  'tollveil': { id: 'other-games', label: '🎲 Other Games', path: '/data/docs/tollveil/' },
   'uploaded': { id: 'uploaded', label: '📤 Uploaded', path: '/data/docs/uploaded/' },
-  'witnessed-prey': { id: 'witnessed-prey', label: '🩸 Witnessed Prey', path: '/data/docs/witnessed-prey/', book: true },
-  'saikou-compendium': { id: 'saikou-compendium', label: '🕯️ Saikou Compendium', path: '/data/docs/saikou-compendium/', book: true },
+  // Witnessed Prey and Saikou Compendium are Fate's Edge expansions, so
+  // they share the 'expansions' category id/label with the rest of the
+  // Expansions folder even though each lives in its own book directory.
+  'witnessed-prey': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/witnessed-prey/', book: true },
+  'saikou-compendium': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/saikou-compendium/', book: true },
 };
 
 const SUBDIRS = Object.keys(CATEGORY_MAP);

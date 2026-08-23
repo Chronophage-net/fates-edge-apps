@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-23T22:12:11.336Z",
+  "generated": "2026-08-23T22:27:08.777Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -356,8 +356,8 @@
       "title": "Kon'Reh   The   Definitive   Guide",
       "file": "Kon'reh-_-The-_-Definitive-_-Guide.html",
       "path": "/data/docs/konreh/",
-      "category": "konreh",
-      "categoryLabel": "♟️ Kon'reh",
+      "category": "other-games",
+      "categoryLabel": "🎲 Other Games",
       "core": false,
       "active": true
     },
@@ -546,8 +546,8 @@
       "subtitle": "An investigation into the unquiet dead, the cursed, and the hungry",
       "file": "index.html",
       "path": "/data/docs/saikou-compendium/",
-      "category": "saikou-compendium",
-      "categoryLabel": "🕯️ Saikou Compendium",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
       "core": false,
       "active": true,
       "book": true,
@@ -800,8 +800,8 @@
       "subtitle": "A bestiary of debts, flesh, and thresholds",
       "file": "index.html",
       "path": "/data/docs/witnessed-prey/",
-      "category": "witnessed-prey",
-      "categoryLabel": "🩸 Witnessed Prey",
+      "category": "expansions",
+      "categoryLabel": "📦 Expansions",
       "core": false,
       "active": true,
       "book": true,
@@ -883,8 +883,8 @@
       "title": "Toll   Veil   The   Definitive   Guide",
       "file": "Toll-_-Veil-_-The-_-Definitive-_-Guide.html",
       "path": "/data/docs/tollveil/",
-      "category": "tollveil",
-      "categoryLabel": "🃏 Toll & Veil",
+      "category": "other-games",
+      "categoryLabel": "🎲 Other Games",
       "core": false,
       "active": true
     },
