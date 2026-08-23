@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-23T22:27:08.777Z",
+  "generated": "2026-08-23T22:36:36.877Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -157,8 +157,8 @@
       "title": "Fenwood Everblood Chronicles",
       "file": "Fates_-_Edge_-_-Fenwood-Everblood-Chronicles.html",
       "path": "/data/docs/",
-      "category": "other",
-      "categoryLabel": "📄 Other",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
       "core": false,
       "active": true
     },
@@ -635,16 +635,6 @@
       "active": true
     },
     {
-      "id": "terrestrial_patrons_myrmis_canray",
-      "title": "Terrestrial Patrons Myrmis Canray",
-      "file": "Fates_-_Edge_-_-Terrestrial-Patrons-Myrmis-Canray.html",
-      "path": "/data/docs/",
-      "category": "other",
-      "categoryLabel": "📄 Other",
-      "core": false,
-      "active": true
-    },
-    {
       "id": "the_complete_guide_to_subclasses",
       "title": "The   Complete   Guide   To   Subclasses",
       "file": "Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Subclasses.html",
@@ -929,7 +919,7 @@
       "active": true
     }
   ],
-  "total_count": 57,
-  "active_count": 57,
+  "total_count": 56,
+  "active_count": 56,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

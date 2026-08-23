@@ -212,7 +212,7 @@ function generateDocsManifest(docsPath) {
       category = 'resources';
       label = '📚 Resources';
       path = '/data/docs/';
-    } else if (lower.includes('saga') || lower.includes('dreams') || lower.includes('serpent') || lower.includes('adventure')) {
+    } else if (lower.includes('saga') || lower.includes('dreams') || lower.includes('serpent') || lower.includes('adventure') || lower.includes('chronicle')) {
       category = 'adventures';
       label = '🗡️ Adventures';
       path = '/data/docs/';

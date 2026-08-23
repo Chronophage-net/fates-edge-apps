@@ -154,7 +154,7 @@ function getDocTitle(file) {
 }
 
 function getDocTypeFromFile(file) {
-  const adventurePatterns = ['Saga', 'Dreams', 'Serpent', 'Blood', 'Carnival', 'Adventure', 'Coil', 'Lantern'];
+  const adventurePatterns = ['Saga', 'Dreams', 'Serpent', 'Blood', 'Carnival', 'Adventure', 'Coil', 'Lantern', 'Chronicle'];
   if (adventurePatterns.some(p => file.includes(p))) return 'adventures';
   if (file.includes('Screen') || file.includes('GM')) return 'resources';
   if (file.includes('Reference') || file.includes('SRD') || file.includes('Essentials') || file.includes('Essential')) return 'core';
@@ -344,21 +344,23 @@ export function render(el) {
 
     container.innerHTML = `
         <style>
-            /* Tile grid for each category's documents -- 8 columns on wide
-               screens, stepping down as the viewport narrows, instead of a
-               horizontally-scrolling single row. Keeps each category
-               section to a couple of rows of tiles rather than one long
-               strip, so the whole tree takes far less vertical space. */
+            /* Tile grid for each category's documents -- a fixed 4 tiles
+               per row, capped to roughly two rows tall (~8 tiles visible)
+               with the category's own vertical scrollbar for anything
+               beyond that, instead of letting a big category (like
+               Expansions) grow the whole page taller and taller. */
             .doc-grid {
                 display: grid;
-                grid-template-columns: repeat(8, 1fr);
+                grid-template-columns: repeat(4, 1fr);
+                grid-auto-rows: minmax(160px, auto);
                 gap: 0.75rem;
                 padding: 0.5rem 0.2rem 1rem 0.2rem;
+                max-height: calc(160px * 2 + 0.75rem + 1.5rem);
+                overflow-y: auto;
+                overflow-x: hidden;
             }
-            @media (max-width: 1400px) { .doc-grid { grid-template-columns: repeat(6, 1fr); } }
-            @media (max-width: 1000px) { .doc-grid { grid-template-columns: repeat(4, 1fr); } }
-            @media (max-width: 700px)  { .doc-grid { grid-template-columns: repeat(3, 1fr); } }
-            @media (max-width: 480px)  { .doc-grid { grid-template-columns: repeat(2, 1fr); } }
+            @media (max-width: 700px) { .doc-grid { grid-template-columns: repeat(2, 1fr); } }
+            @media (max-width: 420px) { .doc-grid { grid-template-columns: 1fr; } }
             .doc-card { width: 100%; }
         </style>
         <h1 class="page-title">📄 Document Library</h1>
@@ -376,9 +378,9 @@ export function render(el) {
         <!-- Filter Bar -->
         <div class="docs-filter-bar" style="display:flex;flex-wrap:wrap;gap:0.8rem 1rem;align-items:flex-end;padding:0.6rem 0.8rem;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1rem;">
             <div class="filter-group" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;flex:1 1 200px;">
-                <label style="margin:0;font-size:0.8rem;font-weight:600;color:var(--text2);white-space:nowrap;">Type</label>
+                <label style="margin:0;font-size:0.8rem;font-weight:600;color:var(--text2);white-space:nowrap;">Category</label>
                 <select id="docsTypeFilter" style="padding:0.35rem 0.6rem;font-size:0.9rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);flex:0 1 160px;">
-                    <option value="">All</option>
+                    <option value="">All Categories</option>
                 </select>
             </div>
             <div class="filter-group" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;flex:1 1 200px;">
