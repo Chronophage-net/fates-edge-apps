@@ -564,6 +564,39 @@ async function loadAdventureManifest() {
 
 // ─── MODAL-BASED ADVENTURE LIBRARY BROWSER ──────────────────────
 
+// The manifest only lists filename slugs (e.g. "within_the_demons_eye_saga"),
+// not titles -- so the library picker used to show those raw slugs instead
+// of the adventure's actual name. This fetches each adventure file just far
+// enough to read its .title before the picker renders, falling back to a
+// slug formatted as a title (underscores/dashes -> spaces, Title Case) for
+// any file that fails to fetch or has no title field, so a broken file
+// still shows something readable rather than breaking the whole list.
+function formatSlugAsTitle(slug) {
+    return slug
+        .replace(/[_-]+/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase())
+        .trim();
+}
+
+async function fetchAdventureTitle(slug) {
+    const candidates = [
+        `${ADVENTURES_DATA_PATH}${slug}.json`,
+        `.${ADVENTURES_DATA_PATH}${slug}.json`,
+    ];
+    for (const url of candidates) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) continue;
+            const data = await response.json();
+            if (data && typeof data.title === 'string' && data.title.trim()) {
+                return data.title.trim();
+            }
+            break;
+        } catch (_) { /* try next candidate, or fall through to slug */ }
+    }
+    return formatSlugAsTitle(slug);
+}
+
 async function browseAdventureLibrary() {
     if (!isGM()) {
         showToast('Only the GM can browse the adventure library.', 'error');
@@ -585,6 +618,13 @@ async function browseAdventureLibrary() {
         showToast(`${ADVENTURES_DATA_PATH}manifest.json was found, but the adventure list is empty.`, 'warning');
         return;
     }
+
+    showToast('📚 Loading adventure titles…', 'info');
+    const entries = await Promise.all(ids.map(async id => ({
+        slug: id,
+        title: await fetchAdventureTitle(id)
+    })));
+    if (isDestroyed) return;
 
     // Inline editor screen — not a pop-up. Takes over the page in place of
     // whatever's currently shown.
@@ -608,14 +648,14 @@ async function browseAdventureLibrary() {
     content.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
             <h3 style="margin:0;color:var(--gold);">📚 Adventure Library</h3>
-            <span style="font-size:0.8rem;color:var(--text3);">${ids.length} available</span>
+            <span style="font-size:0.8rem;color:var(--text3);">${entries.length} available</span>
         </div>
         <p style="margin:0 0 0.8rem 0;font-size:0.85rem;color:var(--text2);">
             Click an adventure to load it into your library.
         </p>
         <div style="flex:1;overflow-y:auto;padding-right:0.3rem;">
-            ${ids.map(id => `
-                <div class="adv-library-item" data-slug="${escHtml(id)}" style="
+            ${entries.map(({ slug, title }) => `
+                <div class="adv-library-item" data-slug="${escHtml(slug)}" data-title="${escHtml(title)}" style="
                     padding:0.4rem 0.6rem;
                     margin:0.15rem 0;
                     background:var(--bg3);
@@ -628,7 +668,7 @@ async function browseAdventureLibrary() {
                     justify-content:space-between;
                     align-items:center;
                 ">
-                    <span>${escHtml(id)}</span>
+                    <span>${escHtml(title)}</span>
                     <span style="font-size:0.6rem;color:var(--text3);">📄 JSON</span>
                 </div>
             `).join('')}
@@ -674,9 +714,10 @@ async function browseAdventureLibrary() {
     items.forEach(item => {
         item.addEventListener('click', async function() {
             const slug = this.dataset.slug;
+            const title = this.dataset.title || slug;
             this.style.opacity = '0.5';
             this.style.cursor = 'wait';
-            this.innerHTML = `<span>${escHtml(slug)}</span><span style="font-size:0.6rem;color:var(--gold);">⏳ Loading…</span>`;
+            this.innerHTML = `<span>${escHtml(title)}</span><span style="font-size:0.6rem;color:var(--gold);">⏳ Loading…</span>`;
 
             const data = await loadAdventureFromFile(slug);
             if (isDestroyed) {
