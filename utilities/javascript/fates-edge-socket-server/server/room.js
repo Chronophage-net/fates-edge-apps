@@ -591,6 +591,82 @@ function broadcastToRoom(roomCode, event, data, senderId = null) {
     }
 }
 
+/**
+ * Deliver a chat-message whisper to exactly its intended recipient, plus
+ * an echo back to the sender, instead of the whole room.
+ *
+ * BUG FIX: `chat-message` payloads carrying `whisper: true` (e.g. the AI
+ * GM bot's join greeting -- see fates-edge-ai-gm-bot's ai-gm-bot.js
+ * sendWhisper()) were never actually delivered privately. Every call
+ * site used the ordinary broadcastToRoom() above, which -- correctly for
+ * every OTHER event type -- sends to the whole room; `whisper`/
+ * `recipient` were pure client-side decoration (a 🔒 icon), enforced
+ * nowhere. This function is the actual enforcement point: callers check
+ * `data.message.whisper && data.message.recipient` and, only if this
+ * returns true (a live, resolvable recipient), skip the normal
+ * broadcastToRoom() call.
+ *
+ * Scope, deliberately narrow: this only resolves a `recipient` that is a
+ * real, currently-connected client's id in this room -- which is what
+ * the AI GM bot's whisper always sends (a live clientId, taken straight
+ * off the `player-joined` event it's replying to). It does NOT attempt
+ * to resolve the *human*-typed whisper feature's recipient values (a
+ * selected character's id, or the literal string 'gm' -- see the web
+ * client's populateChatRecipients()), which live in a different,
+ * unrelated identifier space and were never wired to any per-client
+ * targeting on the server either. Making those private too is a real,
+ * separate gap -- worth its own fix -- but guessing at that mapping here
+ * risks silently misdelivering (or dropping) a human's whisper. When
+ * `recipient` doesn't resolve to a connected clientId, this returns
+ * `false` and the caller falls back to the original, unchanged
+ * broadcastToRoom() behavior -- exactly what happened before this
+ * function existed, so the human-whisper case is not regressed, just
+ * not newly fixed either.
+ *
+ * Multi-instance caveat: `room.clients` only holds clients connected to
+ * THIS instance (see deliverToLocalWsClients() above) -- if the
+ * recipient is connected to a different instance behind a Redis-scaled
+ * deployment (SCALING.md), this returns `false` (recipient not found
+ * locally) and the caller falls back to broadcastToRoom(), i.e. the
+ * whisper goes to the whole room rather than being silently dropped.
+ * Properly resolving a recipient across instances would need a
+ * Redis-relayed "is this clientId connected anywhere, and where" lookup
+ * that doesn't exist today -- out of scope for this fix.
+ *
+ * @returns {boolean} true if delivered privately (caller should NOT also
+ *   call broadcastToRoom), false if the recipient couldn't be resolved
+ *   locally (caller should fall back to broadcastToRoom as before).
+ */
+function deliverWhisper(roomCode, event, data, senderId, recipientClientId) {
+    if (!recipientClientId) return false;
+    const roomKey = roomCode.toUpperCase();
+    const room = rooms.get(roomKey);
+    if (!room) return false;
+    const target = room.clients.get(recipientClientId);
+    if (!target) return false;
+
+    const payload = { ...data };
+    if (senderId) payload.clientId = senderId;
+
+    const deliverTo = (client) => {
+        if (client.type === 'socket.io' && client.socket) {
+            client.socket.emit(event, payload);
+        } else if (client.type === 'ws' && client.ws && client.ws.readyState === WebSocket.OPEN) {
+            client.ws.send(JSON.stringify({ type: event, ...payload }));
+        }
+    };
+
+    deliverTo(target);
+    // Echo back to the sender too (if they're a different, still-connected
+    // client) -- a whisper you can't see yourself send is confusing UX for
+    // a human; harmless for the bot.
+    if (senderId && senderId !== recipientClientId) {
+        const sender = room.clients.get(senderId);
+        if (sender) deliverTo(sender);
+    }
+    return true;
+}
+
 // ---------- Room Creation ----------
 function createRoom(roomCode) {
     if (!validateRoomCode(roomCode)) {
@@ -711,6 +787,7 @@ module.exports = {
     canEditCharacter,
     setIo,
     broadcastToRoom,
+    deliverWhisper,
     createRoom,
     setRoomPassword,
     createDefaultWhiteboard,

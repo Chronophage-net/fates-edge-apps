@@ -4,6 +4,17 @@
  */
 
 const ttsVoice = require('../utils/tts-voice');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+
+// Suggestion id -> the Discord message posted for it, so
+// assistantSuggestionResolved can edit that same message in place
+// (buttons disabled, outcome shown) instead of posting a second message.
+// Module-level and process-lifetime only, same posture as
+// assistant-suggestions.js's own in-memory queue on the bot side -- a
+// suggestion still pending across a Discord bot restart just won't have
+// its original message editable, which is an acceptable loss (the queue
+// itself lives in the AI GM Bot process, not here).
+const assistantSuggestionMessages = new Map();
 
 module.exports = {
     name: 'ready',
@@ -154,6 +165,55 @@ module.exports = {
                     timestamp: new Date().toISOString()
                 }]
             });
+        });
+
+        // NEW: Assistant GM suggestion queue (optional -- see the AI GM
+        // Bot's modules/assistant-suggestions.js and ROADMAP.md item 2 in
+        // that repo, and utils/websocket.js's matching case comment).
+        // Posted to the VTT log channel as an embed with live Approve/
+        // Reject buttons; see events/interactionCreate.js for the button
+        // handler that turns a click back into the existing `!gm
+        // approve/reject <id>` chat command. A silent no-op if
+        // VTT_LOG_CHANNEL isn't configured, same as every other
+        // getLogChannel()-gated listener above.
+        vtt.on('assistantSuggestionCreated', async (data) => {
+            const channel = getLogChannel();
+            if (!channel) return;
+            const { id, kind, label, preview } = data || {};
+            if (!id) return;
+            const embed = new EmbedBuilder()
+                .setColor(0xf1c40f)
+                .setTitle('📋 Assistant GM Proposal')
+                .setDescription(preview || label || kind || '(no description)')
+                .addFields({ name: 'Kind', value: kind || 'suggestion', inline: true })
+                .setFooter({ text: `id: ${id}` })
+                .setTimestamp();
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId(`assistant_suggestion:approve:${id}`).setLabel('✅ Approve').setStyle(ButtonStyle.Success),
+                new ButtonBuilder().setCustomId(`assistant_suggestion:reject:${id}`).setLabel('🗑️ Reject').setStyle(ButtonStyle.Danger)
+            );
+            try {
+                const sent = await channel.send({ embeds: [embed], components: [row] });
+                assistantSuggestionMessages.set(id, sent);
+            } catch (e) {
+                console.warn('⚠️ Failed to post Assistant GM suggestion embed:', e.message);
+            }
+        });
+
+        vtt.on('assistantSuggestionResolved', async (data) => {
+            const { id, outcome } = data || {};
+            if (!id) return;
+            const sent = assistantSuggestionMessages.get(id);
+            assistantSuggestionMessages.delete(id);
+            if (!sent) return; // this Discord bot process didn't post it (or restarted) -- nothing to edit
+            const outcomeLabel = { approved: '✅ Approved', rejected: '🗑️ Rejected', 'auto-rejected': '🗑️ Auto-rejected (another option was approved)' }[outcome] || outcome;
+            try {
+                const original = sent.embeds[0];
+                const embed = EmbedBuilder.from(original).setColor(outcome === 'approved' ? 0x43b581 : 0x99aab5).addFields({ name: 'Outcome', value: outcomeLabel });
+                await sent.edit({ embeds: [embed], components: [] });
+            } catch (e) {
+                console.warn('⚠️ Failed to update Assistant GM suggestion embed:', e.message);
+            }
         });
 
         console.log('✅ VTT GM event listeners registered');

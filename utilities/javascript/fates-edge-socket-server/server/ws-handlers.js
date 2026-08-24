@@ -299,10 +299,22 @@ function setupWSS(wss, appConfig) {
                     // that function's doc comment in room.js and the
                     // matching 'chatHistory' field added to 'room-state'
                     // above (sent right after connect).
-                    case 'chat-message':
-                        room.recordChatMessage(currentRoom, (data && data.message) || data, wssConfig.maxChatHistory);
-                        room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
+                    case 'chat-message': {
+                        const chatMsg = (data && data.message) || data;
+                        room.recordChatMessage(currentRoom, chatMsg, wssConfig.maxChatHistory);
+                        // Whisper with a resolvable live recipient (e.g. the AI GM
+                        // bot's join greeting) -- deliver privately instead of to
+                        // the whole room. See room.js's deliverWhisper() for what
+                        // "resolvable" means and why this doesn't (yet) cover the
+                        // human-typed whisper feature's character-id/'gm' recipients.
+                        const whisperedPrivately = chatMsg && chatMsg.whisper && chatMsg.recipient
+                            ? room.deliverWhisper(roomKey, messageType, data, ws.clientId, chatMsg.recipient)
+                            : false;
+                        if (!whisperedPrivately) {
+                            room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
+                        }
                         break;
+                    }
 
                     // ─── Direct broadcast events ──────────────────────────
                     case 'media_recording':
@@ -325,6 +337,22 @@ function setupWSS(wss, appConfig) {
                     // NEW: Reactive Soundscape (optional) -- see the
                     // matching note in socketio-handlers.js's relayEvents.
                     case 'soundboard-ambience':
+                    // NEW: Assistant GM suggestion queue (optional -- see
+                    // fates-edge-ai-gm-bot's modules/assistant-suggestions.js
+                    // and ROADMAP.md item 2). Fired by the bot whenever it
+                    // enqueues/approves/rejects a pending suggestion (SB
+                    // spend + Crown Spread LLM synthesis, plus every
+                    // pre-existing suggestion kind -- fact/npc-create/
+                    // scene-complete/knowledge-reveal/-hide, all
+                    // backfilled with the same event shape). Plain
+                    // pass-through relay exactly like tts-audio/
+                    // soundboard-ambience above -- the bot is the only
+                    // thing that ever sends these, clients only render
+                    // them; approving/rejecting still goes back over chat
+                    // as `!gm approve <id>` / `!gm reject <id>`, no new
+                    // client->server request type needed.
+                    case 'assistant-suggestion-created':
+                    case 'assistant-suggestion-resolved':
                         room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
                         break;
 

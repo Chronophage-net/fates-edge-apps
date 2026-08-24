@@ -844,11 +844,23 @@ function setupSocketIO(io, appConfig) {
         socket.on('chat-message', (data) => {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
-            if (r) room.recordChatMessage(r, (data && data.message) || data, ioConfig.maxChatHistory);
-            room.broadcastToRoom(socket.room, 'chat-message', {
+            const chatMsg = (data && data.message) || data;
+            if (r) room.recordChatMessage(r, chatMsg, ioConfig.maxChatHistory);
+            const payload = {
                 ...data,
                 clientName: socket.clientData?.name || 'Player',
-            }, socket.id);
+            };
+            // Whisper with a resolvable live recipient (e.g. the AI GM bot's
+            // join greeting) -- deliver privately instead of to the whole
+            // room. See room.js's deliverWhisper() for what "resolvable"
+            // means and why this doesn't (yet) cover the human-typed
+            // whisper feature's character-id/'gm' recipients.
+            const whisperedPrivately = chatMsg && chatMsg.whisper && chatMsg.recipient
+                ? room.deliverWhisper(socket.room, 'chat-message', payload, socket.id, chatMsg.recipient)
+                : false;
+            if (!whisperedPrivately) {
+                room.broadcastToRoom(socket.room, 'chat-message', payload, socket.id);
+            }
         });
 
         // ─── Relay events ───────────────────────────────────────────
@@ -885,7 +897,17 @@ function setupSocketIO(io, appConfig) {
             // js/features/vtt/vtt-connected.js). Payload is tiny (mood/
             // trackId/transitionDuration strings+numbers, no audio data),
             // so this needs no special payload-size handling.
-            'soundboard-ambience'
+            'soundboard-ambience',
+            // NEW: Assistant GM suggestion queue (optional -- see
+            // fates-edge-ai-gm-bot's modules/assistant-suggestions.js and
+            // ROADMAP.md item 2). Fired by the bot whenever it enqueues/
+            // approves/rejects a pending suggestion (SB spend + Crown
+            // Spread LLM synthesis, plus every pre-existing suggestion
+            // kind, all sharing the same event shape). Plain pass-through
+            // relay exactly like 'tts-audio'/'soundboard-ambience' above --
+            // see ws-handlers.js's matching case for the full rationale.
+            'assistant-suggestion-created',
+            'assistant-suggestion-resolved'
         ];
         relayEvents.forEach(eventName => {
             socket.on(eventName, (data) => {

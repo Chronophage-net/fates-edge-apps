@@ -94,6 +94,11 @@ let wsListeners = new Map();
 let eventListeners = [];
 let docEventListeners = [];
 let isDestroyed = false;
+// id -> {kind, preview} for pending Assistant GM suggestions, so the
+// assistant-suggestion-resolved handler can rebuild a full suggestionData
+// patch (the resolved event itself only carries {id, outcome, result} --
+// see ROADMAP.md item 2). Cleared per-id once resolved.
+const pendingSuggestionMeta = new Map();
 let reconnectTimer = null;
 let voiceUnsubscribe = null;
 let presenceInterval = null;
@@ -1163,6 +1168,60 @@ function setupWebSocketSync() {
     onWSEvent('crown-spread', crownSpreadHandler);
     wsListeners.set('crown-spread', crownSpreadHandler);
 
+    // ─── ASSISTANT GM SUGGESTIONS ────────────────────
+    // Optional -- fired by fates-edge-ai-gm-bot's modules/
+    // assistant-suggestions.js whenever the bot (in Assistant GM mode)
+    // proposes something needing human approval: a new fact, NPC, scene
+    // advance, knowledge reveal/hide, or (new) an LLM-synthesized SB spend
+    // complication / Crown Spread interpretation (see ROADMAP.md item 2
+    // in that repo). Rendered as its own chat card (renderSuggestionDetails()
+    // in vtt-core.js) with live Approve/Reject buttons; clicking one
+    // dispatches 'assistant-suggestion-action' (handled below), which
+    // just sends the existing `!gm approve <id>` / `!gm reject <id>` chat
+    // command over whatever connection this client already has -- no new
+    // client->server request type, 100% reuse of the approval path that
+    // already works today via chat.
+    //
+    // Rendered directly via vttStore.addChatMessage() rather than
+    // sendMessage() -- this is a notification ABOUT something the server
+    // already decided, not an outbound chat message this client is
+    // originating, so it must not also be sent back over the wire (that
+    // would echo it into every other client's chat as if a human typed it).
+    const suggestionCreatedHandler = (data) => {
+        if (isDestroyed) return;
+        const { id, kind, label, preview } = data || {};
+        if (!id) return;
+        pendingSuggestionMeta.set(id, { kind, preview: preview || label });
+        vttStore.addChatMessage({
+            id,
+            text: label || kind || 'Assistant GM proposal',
+            sender: 'GM Assistant',
+            recipient: 'all',
+            whisper: false,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            local: false,
+            sent: true,
+            suggestionData: { id, kind, preview: preview || label, status: 'pending' },
+        });
+        showToast(`📋 Assistant GM proposal: ${label || kind}`, 'info');
+    };
+    onWSEvent('assistant-suggestion-created', suggestionCreatedHandler);
+    wsListeners.set('assistant-suggestion-created', suggestionCreatedHandler);
+
+    const suggestionResolvedHandler = (data) => {
+        if (isDestroyed) return;
+        const { id, outcome } = data || {};
+        if (!id) return;
+        const meta = pendingSuggestionMeta.get(id) || {};
+        vttStore.updateChatMessage(id, {
+            suggestionData: { id, kind: meta.kind, preview: meta.preview, status: outcome },
+        });
+        pendingSuggestionMeta.delete(id);
+    };
+    onWSEvent('assistant-suggestion-resolved', suggestionResolvedHandler);
+    wsListeners.set('assistant-suggestion-resolved', suggestionResolvedHandler);
+
     // ─── REACTIVE SOUNDSCAPE ────────────────────────
     // Optional -- fired by the AI GM Bot on scene changes or an explicit
     // [MOOD "..."] tag (see that repo's adventure-context.js/
@@ -1789,6 +1848,20 @@ function attachEvents() {
     };
     document.addEventListener('follower-chat', followerChatHandler);
     docEventListeners.push({ event: 'follower-chat', handler: followerChatHandler });
+
+    // --- Assistant GM suggestion Approve/Reject buttons ---
+    // Dispatched by vtt-core.js's renderChat() click delegation (see
+    // renderSuggestionDetails() there) -- translates a button click into
+    // the same `!gm approve <id>` / `!gm reject <id>` chat command a human
+    // GM would type, sent over whatever connection this client already
+    // has. No new client->server request type.
+    const suggestionActionHandler = (e) => {
+        const { id, action } = e.detail || {};
+        if (!id || !action || (action !== 'approve' && action !== 'reject')) return;
+        sendMessage(`!gm ${action} ${id}`, getSenderName(), 'all');
+    };
+    document.addEventListener('assistant-suggestion-action', suggestionActionHandler);
+    docEventListeners.push({ event: 'assistant-suggestion-action', handler: suggestionActionHandler });
 }
 
 // ============================================================

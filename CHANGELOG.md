@@ -3,6 +3,17 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.21.0] - 2026-08-24
+
+Cross-repo assistant-suggestion events (SB-spend/Crown Spread LLM synthesis approvals from the AI GM Bot), relayed by the socket server and rendered with live Approve/Reject in the web client, Discord bot, Foundry bridge, and Roll20 API script; whisper-privacy bug fix for join greetings
+
+### Other
+- Adventure Manager: Browse Library shows adventure titles, not filenames
+- docs UI: single category dropdown + one tile pane, not per-category sections
+- Updated documents and document feature
+- docs UI: category dropdown label, fixed 4-col tile grid w/ scroll; fix Chronicles category; retire Myrmis-Canray doc
+- docs UI: tile grid layout, consolidate Expansions + Other Games categories
+
 ## [4.20.3] - 2026-08-22
 
 Documentation sweep across the ecosystem; AI GM Bot lite Docker stack for underpowered machines; link Campfire Mode from the welcome wizard

@@ -324,6 +324,23 @@ class VTTClient extends EventEmitter {
                 this.emit('crownSpread', message);
                 break;
 
+            // NEW: Assistant GM suggestion queue (optional -- see the AI
+            // GM Bot's modules/assistant-suggestions.js and ROADMAP.md
+            // item 2 in that repo). Fired whenever the bot, in Assistant
+            // GM mode, proposes something needing human approval -- a new
+            // fact/NPC/scene advance/knowledge change, or (new) an
+            // LLM-synthesized SB spend complication / Crown Spread
+            // interpretation. See events/ready.js's listeners for the
+            // embed-with-buttons rendering and events/interactionCreate.js
+            // for the button -> `!gm approve/reject <id>` translation.
+            case 'assistant-suggestion-created':
+                this.emit('assistantSuggestionCreated', message);
+                break;
+
+            case 'assistant-suggestion-resolved':
+                this.emit('assistantSuggestionResolved', message);
+                break;
+
             // ─── Modules ────────────────────────────────────────────
             case 'module-list':
                 this.modules = message.modules || [];

@@ -286,6 +286,30 @@ export function renderChat() {
     const chatContainer = currentContainer.querySelector('#chatMessages');
     if (!chatContainer) return;
 
+    // NEW: Assistant GM suggestion Approve/Reject buttons (see
+    // renderSuggestionDetails() below and vtt-connected.js's
+    // assistant-suggestion-created/-resolved handlers, ROADMAP.md item 2
+    // in fates-edge-ai-gm-bot). One delegated click listener, wired once
+    // per container instance (chatContainer persists across the many
+    // vttStore.subscribe re-renders below, only renderChat() itself is
+    // ever re-invoked on remount) -- dispatches a DOM CustomEvent rather
+    // than importing sendMessage() directly, matching this module's
+    // existing 'timer-tick-request'/'sb-generated' pattern for talking
+    // back to vtt-connected.js without a circular import.
+    if (!chatContainer.dataset.suggestionClickWired) {
+        chatContainer.dataset.suggestionClickWired = '1';
+        chatContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-suggestion-action]');
+            if (!btn) return;
+            const id = btn.getAttribute('data-suggestion-id');
+            const action = btn.getAttribute('data-suggestion-action');
+            if (!id || !action) return;
+            const card = btn.closest('.suggestion-card');
+            if (card) card.querySelectorAll('button').forEach(b => { b.disabled = true; });
+            document.dispatchEvent(new CustomEvent('assistant-suggestion-action', { detail: { id, action } }));
+        });
+    }
+
     const selectedDisplay = currentContainer.querySelector('#selected-character-display');
     if (selectedDisplay) {
         if (selectedCharUnsubscribe) selectedCharUnsubscribe();
@@ -444,6 +468,7 @@ export function renderChat() {
                     </div>
                     ${msg.rollData ? renderRollDetails(msg.rollData) : ''}
                     ${msg.deckData ? renderDeckDetails(msg.deckData) : ''}
+                    ${msg.suggestionData ? renderSuggestionDetails(msg.suggestionData) : ''}
                 </div>
             `;
         }
@@ -503,6 +528,42 @@ function renderDeckDetails(deckData) {
         <div style="margin-top:0.3rem;padding:0.3rem 0.5rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
             <span>🃏 ${cardNames}</span>
             ${deckData.remaining !== undefined ? `<span style="margin-left:0.5rem;">Remaining: ${deckData.remaining}</span>` : ''}
+        </div>
+    `;
+}
+
+// NEW: Assistant GM suggestion card (fates-edge-ai-gm-bot's
+// assistant-suggestion-created/-resolved events -- see ROADMAP.md item 2
+// and this file's renderChat() for the click-delegation wiring). `status`
+// is 'pending' | 'approved' | 'rejected' | 'auto-rejected' -- only
+// 'pending' shows live buttons; the other three are terminal, rendered as
+// a plain outcome line so the card stays in the chat log as a record of
+// what happened instead of disappearing.
+function renderSuggestionDetails(suggestionData) {
+    if (!suggestionData) return '';
+    const { id, kind, preview, status = 'pending' } = suggestionData;
+    const kindLabel = escHtml(kind || 'suggestion');
+    const previewHtml = preview ? `<div style="margin-top:0.2rem;white-space:pre-wrap;">${escHtml(preview)}</div>` : '';
+
+    if (status !== 'pending') {
+        const outcomeLabel = { approved: '✅ Approved', rejected: '🗑️ Rejected', 'auto-rejected': '🗑️ Auto-rejected (another option was approved)' }[status] || status;
+        return `
+            <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
+                <span class="outcome-tag" style="font-weight:600;">${outcomeLabel}</span>
+                <span style="margin-left:0.4rem;color:var(--text4);">[${kindLabel}]</span>
+                ${previewHtml}
+            </div>
+        `;
+    }
+
+    return `
+        <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;border:1px solid var(--gold);font-size:0.85rem;">
+            <div><span style="color:var(--text4);">[${kindLabel}]</span> pending GM approval</div>
+            ${previewHtml}
+            <div style="margin-top:0.4rem;display:flex;gap:0.4rem;">
+                <button class="btn btn-xs" data-suggestion-id="${escHtml(id)}" data-suggestion-action="approve" style="color:var(--green);border-color:var(--green);">✅ Approve</button>
+                <button class="btn btn-xs" data-suggestion-id="${escHtml(id)}" data-suggestion-action="reject" style="color:var(--red);border-color:var(--red);">🗑️ Reject</button>
+            </div>
         </div>
     `;
 }

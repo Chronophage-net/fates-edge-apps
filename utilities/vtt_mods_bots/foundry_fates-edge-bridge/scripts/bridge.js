@@ -57,6 +57,13 @@ export const FatesEdgeBridge = {
         updatedAt: null
     },
     
+    // Assistant GM suggestion queue (see ROADMAP.md item 2 in the AI GM
+    // Bot repo). suggestionId -> Foundry ChatMessage id, so
+    // _handleAssistantSuggestionResolved can update the same card in
+    // place instead of posting a second message. Process/session
+    // lifetime only, same posture as the Discord bot's equivalent map.
+    assistantSuggestionMessages: new Map(),
+
     // GM State
     clients: new Map(),          // clientId -> { id, name, role, ... }
     gmId: null,                  // clientId of current GM
@@ -96,7 +103,26 @@ export const FatesEdgeBridge = {
         Hooks.on('canvasReady', () => {
             this.hookSceneChange();
         });
-        
+
+        // NEW: Assistant GM suggestion Approve/Reject buttons (see
+        // _handleAssistantSuggestionCreated below). Foundry's chat-render
+        // hook changed shape between v11 ('renderChatMessage', jQuery)
+        // and v12+ ('renderChatMessageHTML', a plain HTMLElement) --
+        // rather than branching on both across the v11-13 range this
+        // module supports (module.json), a single delegated
+        // document-level click listener works identically on every
+        // version, since the chat log is plain DOM either way.
+        document.addEventListener('click', (event) => {
+            const btn = event.target.closest('[data-fe-suggestion-action]');
+            if (!btn) return;
+            const id = btn.dataset.feSuggestionId;
+            const action = btn.dataset.feSuggestionAction;
+            if (!id || (action !== 'approve' && action !== 'reject')) return;
+            const card = btn.closest('.fe-suggestion-card');
+            if (card) card.querySelectorAll('button').forEach(b => { b.disabled = true; });
+            this.sendChatMessage(`!gm ${action} ${id}`);
+        });
+
         console.log('⚔️ Fate\'s Edge Bridge v2.1.0 initialized');
     },
     
@@ -302,6 +328,21 @@ export const FatesEdgeBridge = {
                 break;
             case 'crown-spread':
                 this._handleCrownSpread(data);
+                break;
+            // NEW: Assistant GM suggestion queue (optional -- see the AI
+            // GM Bot's modules/assistant-suggestions.js and ROADMAP.md
+            // item 2 in that repo). Fired whenever the bot, in Assistant
+            // GM mode, proposes something needing human approval -- a new
+            // fact/NPC/scene advance/knowledge change, or (new) an
+            // LLM-synthesized SB spend complication / Crown Spread
+            // interpretation. See this.initialize()'s delegated click
+            // listener for the button -> `!gm approve/reject <id>`
+            // translation.
+            case 'assistant-suggestion-created':
+                this._handleAssistantSuggestionCreated(data);
+                break;
+            case 'assistant-suggestion-resolved':
+                this._handleAssistantSuggestionResolved(data);
                 break;
             // Module Events
             case 'module-list':
@@ -706,7 +747,61 @@ export const FatesEdgeBridge = {
         this._updateDeckUI();
         Hooks.call('fates-edge-crown-spread', data);
     },
-    
+
+    // Assistant GM suggestion queue (see ROADMAP.md item 2 in the AI GM
+    // Bot repo). Renders a chat card with live Approve/Reject buttons;
+    // this.initialize()'s delegated click listener sends the click back
+    // as the same `!gm approve <id>` / `!gm reject <id>` chat command a
+    // human GM would type -- no new client->server request type, same
+    // reuse-the-approval-path posture as the web client/Discord bot's
+    // equivalent buttons.
+    async _handleAssistantSuggestionCreated(data) {
+        const { id, kind, label, preview } = data || {};
+        if (!id) return;
+        const content = `
+            <div class="fe-suggestion-card" style="border: 2px solid #f1c40f; border-radius: 8px; padding: 10px; margin: 5px 0; background: rgba(241, 196, 15, 0.1);">
+                <h4 style="margin: 0 0 4px 0;">📋 Assistant GM Proposal <span style="font-weight: normal; font-size: 0.85em; color: #888;">[${escapeHtml(kind || 'suggestion')}]</span></h4>
+                <p style="margin: 0 0 8px 0; white-space: pre-wrap;">${escapeHtml(preview || label || kind || '(no description)')}</p>
+                <button type="button" class="fe-suggestion-btn" data-fe-suggestion-id="${escapeHtml(id)}" data-fe-suggestion-action="approve" style="color: #2ecc71;">✅ Approve</button>
+                <button type="button" class="fe-suggestion-btn" data-fe-suggestion-id="${escapeHtml(id)}" data-fe-suggestion-action="reject" style="color: #e74c3c;">🗑️ Reject</button>
+            </div>
+        `;
+        try {
+            const message = await ChatMessage.create({ user: game.user, content, whisper: [] });
+            if (message?.id) this.assistantSuggestionMessages.set(id, message.id);
+        } catch (e) {
+            console.warn("⚠️ Fate's Edge: failed to post Assistant GM suggestion card:", e);
+        }
+        Hooks.call('fates-edge-assistant-suggestion-created', data);
+    },
+
+    async _handleAssistantSuggestionResolved(data) {
+        const { id, outcome } = data || {};
+        if (!id) return;
+        const messageId = this.assistantSuggestionMessages.get(id);
+        this.assistantSuggestionMessages.delete(id);
+        if (!messageId) return; // this Foundry client didn't post it (or reloaded) -- nothing to edit
+        const message = game.messages.get(messageId);
+        if (!message) return;
+        const outcomeLabel = { approved: '✅ Approved', rejected: '🗑️ Rejected', 'auto-rejected': '🗑️ Auto-rejected (another option was approved)' }[outcome] || outcome;
+        try {
+            const el = document.createElement('div');
+            el.innerHTML = message.content;
+            const card = el.querySelector('.fe-suggestion-card');
+            if (card) {
+                card.querySelectorAll('button').forEach(b => b.remove());
+                const p = document.createElement('p');
+                p.style.cssText = 'margin: 4px 0 0 0; font-weight: bold;';
+                p.textContent = outcomeLabel;
+                card.appendChild(p);
+                await message.update({ content: el.innerHTML });
+            }
+        } catch (e) {
+            console.warn("⚠️ Fate's Edge: failed to update Assistant GM suggestion card:", e);
+        }
+        Hooks.call('fates-edge-assistant-suggestion-resolved', data);
+    },
+
     // ============================================================
     // Module Handlers
     // ============================================================

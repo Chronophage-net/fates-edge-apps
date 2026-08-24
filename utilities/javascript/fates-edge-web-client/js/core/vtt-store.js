@@ -67,6 +67,23 @@ class VTTStore {
     this.setState({ chatMessages: messages });
   }
 
+  /** Patches an already-added chat message in place by id (e.g. an
+   * Assistant GM suggestion card moving from 'pending' to 'approved' when
+   * assistant-suggestion-resolved arrives -- see vtt-connected.js). A
+   * no-op if the id isn't found (message scrolled out of maxChatMessages,
+   * or belongs to a different session), since the underlying suggestion
+   * itself is still correctly resolved server-side either way -- this
+   * only affects how a past chat card displays it. */
+  updateChatMessage(id, patch) {
+    if (!id) return;
+    let found = false;
+    const messages = this.state.chatMessages.map(m => {
+      if (m && m.id === id) { found = true; return { ...m, ...patch }; }
+      return m;
+    });
+    if (found) this.setState({ chatMessages: messages });
+  }
+
   clearChat() {
     this.setState({ chatMessages: [] });
   }

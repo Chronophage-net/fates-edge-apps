@@ -373,6 +373,25 @@ function handleMessage(data) {
             handleCrownSpread(data);
             break;
 
+        // NEW: Assistant GM suggestion queue (optional -- see the AI GM
+        // Bot's modules/assistant-suggestions.js and ROADMAP.md item 2 in
+        // that repo). Fired whenever the bot, in Assistant GM mode,
+        // proposes something needing human approval -- a new fact/NPC/
+        // scene advance/knowledge change, or (new) an LLM-synthesized SB
+        // spend complication / Crown Spread interpretation. Rendered as
+        // a Roll20 chat-button card (see handleAssistantSuggestionCreated
+        // below) -- clicking it sends `!fates-edge suggestion approve/
+        // reject <id>` as this player, which the '!fates-edge suggestion'
+        // command below turns into the existing `!gm approve/reject <id>`
+        // chat command. No new client->server request type.
+        case 'assistant-suggestion-created':
+            handleAssistantSuggestionCreated(data);
+            break;
+
+        case 'assistant-suggestion-resolved':
+            handleAssistantSuggestionResolved(data);
+            break;
+
         // Module Events
         case 'module-list':
             handleModuleList(data);
@@ -986,6 +1005,34 @@ function handleCrownSpread(data) {
         sendToChat(msg);
         createHandout('Crown Spread - ' + region, msg);
     }
+}
+
+// suggestionId -> true, purely to give a friendly "already resolved"
+// message if a player double-clicks a button after someone else already
+// acted on it (Roll20 doesn't let a script disable/remove a button once
+// sent, unlike the web client/Discord/Foundry integrations, which can
+// edit their own message in place). Session lifetime only.
+var resolvedAssistantSuggestions = {};
+
+function handleAssistantSuggestionCreated(data) {
+    var id = data.id;
+    var kind = data.kind || 'suggestion';
+    var text = data.preview || data.label || kind;
+    if (!id) return;
+    log('📋 Assistant GM proposal (' + kind + '): ' + text);
+    var msg = '📋 **Assistant GM Proposal** [' + kind + ']\n' + text + '\n\n' +
+        '[✅ Approve](!fates-edge suggestion approve ' + id + ') ' +
+        '[🗑️ Reject](!fates-edge suggestion reject ' + id + ')';
+    sendToChat(msg);
+}
+
+function handleAssistantSuggestionResolved(data) {
+    var id = data.id;
+    var outcome = data.outcome;
+    if (!id) return;
+    resolvedAssistantSuggestions[id] = outcome;
+    var outcomeLabel = { approved: '✅ Approved', rejected: '🗑️ Rejected', 'auto-rejected': '🗑️ Auto-rejected (another option was approved)' }[outcome] || outcome;
+    sendToChat('📋 Suggestion ' + id + ': ' + outcomeLabel);
 }
 
 // ============================================================
@@ -1858,6 +1905,29 @@ function registerCommands() {
                     case 'crown':
                         sendCrownSpread(param || currentRegion);
                         sendToChat('👑 Crown Spread from ' + (param || currentRegion) + '...');
+                        break;
+
+                    // NEW: Assistant GM suggestion Approve/Reject chat
+                    // buttons (see handleAssistantSuggestionCreated
+                    // above). Roll20 API buttons work by sending this
+                    // exact command as a chat message when clicked --
+                    // this just relays it to the AI GM Bot as the same
+                    // `!gm approve/reject <id>` chat command a human GM
+                    // would type, over the existing chat-message
+                    // connection. No new client->server request type.
+                    case 'suggestion':
+                        var subAction = args[2];
+                        var suggId = args[3];
+                        if ((subAction !== 'approve' && subAction !== 'reject') || !suggId) {
+                            sendToChat('Usage: !fates-edge suggestion approve|reject <id>');
+                            break;
+                        }
+                        if (resolvedAssistantSuggestions[suggId]) {
+                            sendToChat('📋 Suggestion ' + suggId + ' was already resolved (' + resolvedAssistantSuggestions[suggId] + ').');
+                            break;
+                        }
+                        sendChatMessage('!gm ' + subAction + ' ' + suggId);
+                        sendToChat((subAction === 'approve' ? '✅ Approving' : '🗑️ Rejecting') + ' ' + suggId + '...');
                         break;
 
                     case 'shuffle':
