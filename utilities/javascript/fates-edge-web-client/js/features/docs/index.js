@@ -135,10 +135,6 @@ let container = null;
 let currentBookDoc = null;
 let currentChapterIndex = -1;
 
-// Which category sections the user has manually collapsed, so re-renders
-// (filtering, theme changes) don't spring every section back open.
-const collapsedSections = new Set();
-
 // ============================================================
 // HELPERS
 // ============================================================
@@ -344,14 +340,15 @@ export function render(el) {
 
     container.innerHTML = `
         <style>
-            /* Tile grid for each category's documents -- a fixed 4 tiles
-               per row, capped to roughly two rows tall (~8 tiles visible)
-               with the category's own vertical scrollbar for anything
-               beyond that, instead of letting a big category (like
-               Expansions) grow the whole page taller and taller. */
+            /* One category showing at a time, as a tile pane -- 6 columns
+               on wide screens, capped to roughly two rows tall (~12 tiles
+               visible) with its own vertical scrollbar for anything past
+               that. Selecting a different category in the dropdown swaps
+               the whole pane's contents rather than everything living in
+               one long, ever-growing accordion. */
             .doc-grid {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(6, 1fr);
                 grid-auto-rows: minmax(160px, auto);
                 gap: 0.75rem;
                 padding: 0.5rem 0.2rem 1rem 0.2rem;
@@ -359,8 +356,9 @@ export function render(el) {
                 overflow-y: auto;
                 overflow-x: hidden;
             }
-            @media (max-width: 700px) { .doc-grid { grid-template-columns: repeat(2, 1fr); } }
-            @media (max-width: 420px) { .doc-grid { grid-template-columns: 1fr; } }
+            @media (max-width: 1100px) { .doc-grid { grid-template-columns: repeat(4, 1fr); } }
+            @media (max-width: 700px)  { .doc-grid { grid-template-columns: repeat(2, 1fr); } }
+            @media (max-width: 420px)  { .doc-grid { grid-template-columns: 1fr; } }
             .doc-card { width: 100%; }
         </style>
         <h1 class="page-title">📄 Document Library</h1>
@@ -375,13 +373,11 @@ export function render(el) {
             <span id="docsTotalCount" style="font-size:0.75rem;color:var(--text3);"></span>
         </div>
 
-        <!-- Filter Bar -->
+        <!-- Category + Search Bar -->
         <div class="docs-filter-bar" style="display:flex;flex-wrap:wrap;gap:0.8rem 1rem;align-items:flex-end;padding:0.6rem 0.8rem;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1rem;">
             <div class="filter-group" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;flex:1 1 200px;">
                 <label style="margin:0;font-size:0.8rem;font-weight:600;color:var(--text2);white-space:nowrap;">Category</label>
-                <select id="docsTypeFilter" style="padding:0.35rem 0.6rem;font-size:0.9rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);flex:0 1 160px;">
-                    <option value="">All Categories</option>
-                </select>
+                <select id="docsTypeFilter" style="padding:0.35rem 0.6rem;font-size:0.9rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);flex:0 1 220px;"></select>
             </div>
             <div class="filter-group" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;flex:1 1 200px;">
                 <label style="margin:0;font-size:0.8rem;font-weight:600;color:var(--text2);white-space:nowrap;">Search</label>
@@ -393,9 +389,8 @@ export function render(el) {
             <span id="docsFilterStats" style="font-size:0.8rem;color:var(--text2);padding:0.2rem 0 0 0.2rem;"></span>
         </div>
 
-        <!-- Document Sections (grouped by category so the list stays scannable
-             as more documents are added -- one flat row of everything gets
-             unwieldy fast; a row per category doesn't. -->
+        <!-- Document Selection Pane -- shows only the tiles for the
+             category currently chosen in the dropdown above. -->
         <div id="doc-list" class="doc-sections">
             <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;">📄 Loading documents…</div>
         </div>
@@ -837,7 +832,9 @@ function attachDocEvents() {
 
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
-            if (typeFilter) typeFilter.value = '';
+            // "Clear" only resets the search term now -- the category
+            // dropdown always has one category selected (there's no "All"
+            // option to clear back to), so leave it as the user set it.
             if (searchInput) searchInput.value = '';
             applyDocsFilter();
             if (searchInput) searchInput.focus();
@@ -1126,14 +1123,14 @@ function attachDocCardEvents(container) {
 }
 
 // ============================================================
-// GROUPED (BY CATEGORY) RENDERING
+// SINGLE-CATEGORY TILE PANE
 // ============================================================
-// One flat row works for a handful of documents but turns into an
-// unscannable wall as more guides/adventures/expansions are added. Instead
-// each category gets its own labeled, collapsible, horizontally-scrolling
-// row -- so the list stays intuitive regardless of how many documents
-// exist in total, and a reader can jump straight to "GM Guide" or
-// "Adventures" instead of hunting through everything at once.
+// One flat row (or one section per category, stacked) both turn into an
+// unscannable/ever-taller wall as more guides/adventures/expansions are
+// added. Instead there's one dropdown -- pick a category and the pane
+// below swaps to just that category's tiles (6 wide, ~2 rows visible,
+// scrolling internally past that) -- so the page height never depends on
+// how many documents or categories exist.
 
 function applyDocsFilter() {
     const typeFilter = document.getElementById('docsTypeFilter');
@@ -1144,11 +1141,18 @@ function applyDocsFilter() {
     const type = typeFilter ? typeFilter.value : '';
     const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    let filtered = allDocs;
-
-    if (type) {
-        filtered = filtered.filter(d => d.type === type);
+    if (!type) {
+        container.innerHTML = `
+            <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;">
+                <div style="font-size:1.4rem;">📂</div>
+                <p>Choose a category above to browse its documents.</p>
+            </div>
+        `;
+        updateDocStats(0);
+        return;
     }
+
+    let filtered = allDocs.filter(d => d.type === type);
     if (search) {
         filtered = filtered.filter(d =>
             d.title.toLowerCase().includes(search) ||
@@ -1164,76 +1168,23 @@ function applyDocsFilter() {
             <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;">
                 <div style="font-size:1.4rem;">🔍</div>
                 <p>No documents match your filters.</p>
-                <p class="text-muted" style="font-size:0.85rem;">Try adjusting the type or search term.</p>
+                <p class="text-muted" style="font-size:0.85rem;">Try adjusting the category or search term.</p>
             </div>
         `;
         return;
     }
 
-    // Group by type/category, preserving TYPE_ORDER (with any unknown
-    // types appended alphabetically after the known ones).
-    const groups = new Map();
-    for (const doc of filtered) {
-        const key = doc.type || 'other';
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key).push(doc);
-    }
-
-    const orderedKeys = Array.from(groups.keys()).sort((a, b) => {
-        const ia = TYPE_ORDER.indexOf(a);
-        const ib = TYPE_ORDER.indexOf(b);
-        if (ia === -1 && ib === -1) return a.localeCompare(b);
-        if (ia === -1) return 1;
-        if (ib === -1) return -1;
-        return ia - ib;
-    });
-
-    // Single-type filter or a search narrow enough to leave one group:
-    // no point showing a section header for the one section present.
-    const showHeaders = orderedKeys.length > 1;
-
-    container.innerHTML = orderedKeys.map(key => {
-        const docs = groups.get(key);
-        const typeInfo = DOC_TYPES[key] || DOC_TYPES.other;
-        const isCollapsed = collapsedSections.has(key);
-        const header = showHeaders ? `
-            <summary class="doc-section-header" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;list-style:none;padding:0.3rem 0.2rem;font-weight:600;color:var(--text);user-select:none;">
-                <span style="font-size:1.05rem;">${typeInfo.icon}</span>
-                <span>${escHtml(typeInfo.label.replace(/^\S+\s/, ''))}</span>
-                <span style="font-size:0.75rem;color:var(--text3);font-weight:400;">${docs.length}</span>
-            </summary>
-        ` : '';
-        const rowHtml = `
-            <div class="doc-grid">
-                ${docs.map(renderDocCard).join('')}
-            </div>
-        `;
-
-        if (!showHeaders) return rowHtml;
-
-        return `
-            <details class="doc-section" data-section-key="${escHtml(key)}" ${isCollapsed ? '' : 'open'} style="margin-bottom:0.3rem;border-bottom:1px solid var(--border);">
-                ${header}
-                ${rowHtml}
-            </details>
-        `;
-    }).join('');
-
-    if (showHeaders) {
-        container.querySelectorAll('.doc-section').forEach(section => {
-            section.addEventListener('toggle', function() {
-                const key = this.dataset.sectionKey;
-                if (this.open) collapsedSections.delete(key);
-                else collapsedSections.add(key);
-            });
-        });
-    }
+    container.innerHTML = `
+        <div class="doc-grid">
+            ${filtered.map(renderDocCard).join('')}
+        </div>
+    `;
 
     attachDocCardEvents(container);
 }
 
 // ============================================================
-// TYPE FILTER POPULATE
+// CATEGORY DROPDOWN POPULATE
 // ============================================================
 
 function populateTypeFilter(docs) {
@@ -1244,7 +1195,7 @@ function populateTypeFilter(docs) {
     docs.forEach(d => { if (d.type) types.add(d.type); });
 
     const currentValue = sel.value;
-    sel.innerHTML = '<option value="">All Types</option>';
+    sel.innerHTML = '';
 
     const sortedTypes = Array.from(types).sort((a, b) => {
         const ia = TYPE_ORDER.indexOf(a);
@@ -1263,8 +1214,14 @@ function populateTypeFilter(docs) {
         sel.appendChild(opt);
     });
 
+    // A category is always selected -- there's no "All" option, since the
+    // whole point of the dropdown is to pick the one category whose tiles
+    // populate the pane below. Keep whatever was already chosen if it's
+    // still valid, otherwise default to the first category.
     if (currentValue && sortedTypes.includes(currentValue)) {
         sel.value = currentValue;
+    } else if (sortedTypes.length > 0) {
+        sel.value = sortedTypes[0];
     }
 }
 
