@@ -4193,246 +4193,6 @@
       ]
     },
     {
-      "id": 349,
-      "title": "The Narethi (Deep Desert Felids)",
-      "category": "people",
-      "body": "Cat-people who dwell in the Sunken Courts beneath the Deep Desert. They are ruled by the Father of Resonance, who interprets the dream of the Unburied—a crystalline Sorcerer-King who drew the power of the Unsunken Well into itself. They follow two dreams: the Unbroken Way (calm) and the Riven Path (rage). They trade with the Fhara at boundary stones, leaving offerings of salt and dried dates.",
-      "tags": [
-        "people",
-        "narethi",
-        "desert",
-        "felids"
-      ]
-    },
-    {
-      "id": 350,
-      "title": "The Sunken Courts (Narethi)",
-      "category": "locations",
-      "body": "A network of subterranean chambers beneath the Deep Desert, carved from ancient salt and basalt. The entrance is a sinkhole that smells of ozone. Visitors are blindfolded and led through nine switchbacks. The Courts are lit by phosphorescent crystals that pulse faintly, as if breathing. At the heart of the Courts lies the Unburied—a crystalline Sorcerer-King who dreams of two things: the Unbroken Way and the Riven Path.",
-      "tags": [
-        "location",
-        "narethi",
-        "courts",
-        "desert"
-      ]
-    },
-    {
-      "id": 351,
-      "title": "The Unburied (Narethi)",
-      "category": "people",
-      "body": "The crystalline Sorcerer-King of the Narethi, fused into a throne of petrified wood. Its body is salt-crusted glass; its mind is shattered into fragments, each dreaming a different dream. It drew the power of the Unsunken Well into itself—and the thing that slept beneath the well with it. Its dreams leak through crystals that Narethi cut and polish. It is a lock, not a prisoner. Beneath it, something else sleeps.",
-      "tags": [
-        "people",
-        "narethi",
-        "unburied",
-        "dream"
-      ]
-    },
-    {
-      "id": 352,
-      "title": "The Unbroken Way (Narethi Dream)",
-      "category": "lore",
-      "body": "One of the two dreams of the Unburied. It is the dream of calm—the regret that it had not found another way. A world where control, discipline, and restraint could have saved its people without destroying them. Followers learn stillness, precision, and the open hand that redirects force rather than meeting it. The Father of Resonance interprets this dream.",
-      "tags": [
-        "narethi",
-        "lore",
-        "dream",
-        "calm"
-      ]
-    },
-    {
-      "id": 353,
-      "title": "The Riven Path (Narethi Dream)",
-      "category": "lore",
-      "body": "One of the two dreams of the Unburied. It is the dream of rage—the fury that desired to break the thing that forced its hand. A world where power is seized, chains are shattered, and oppression is answered with annihilation. Followers learn passion, liberation, and the closed fist that breaks what it cannot bend. It is the same name as the patron of the same name—a syncretic connection.",
-      "tags": [
-        "narethi",
-        "lore",
-        "dream",
-        "rage"
-      ]
-    },
-    {
-      "id": 354,
-      "title": "The Unsunken Well (Narethi)",
-      "category": "locations",
-      "body": "A font of psionic energy with no known bottom, located beneath the Sunken Courts. The Unburied reached into it and pulled, drawing the well's power into itself—and the thing that slept beneath the well with it. The well went dry, and the Great Silence killed most of the Narethi. The survivors woke with no memory of who they had been.",
-      "tags": [
-        "narethi",
-        "location",
-        "well",
-        "psionics"
-      ]
-    },
-    {
-      "id": 355,
-      "title": "Thin Places",
-      "category": "locations",
-      "body": "Locations where the boundary between the waking world and the Ways Between is unusually permeable. Crossing is not a matter of ritual or intent—it is a matter of being in the wrong place at the wrong angle. A wrong step, a miscounted breath, a name spoken at the wrong hour. Thin places are the cracks where the Hollow's attention seeps through.",
-      "tags": [
-        "locations",
-        "thresholds",
-        "ways between",
-        "hollow"
-      ]
-    },
-    {
-      "id": 356,
-      "title": "The Long Mile of Temptation",
-      "category": "locations",
-      "body": "A path in the Ways Between where the road stretches differently for each traveler. It is Vice's testing ground, where the Hollow's Oath-Keeper waits at the halfway mark. Those who walk it must face the choices they have not made and the debts they have not paid. It is a place of judgment, not a place of travel.",
-      "tags": [
-        "ways between",
-        "location",
-        "temptation",
-        "vice"
-      ]
-    },
-    {
-      "id": 357,
-      "title": "The Thirteenth Stone",
-      "category": "locations",
-      "body": "A warm stone in the deepest layer of the Ways Between. It is Ikasha's Seal—the path reveals its true destination here. The stone whispers a promise you made to yourself and broke. Beneath it, Ikasha dreams of freedom. Her nightmares seep upward, infecting the layers above.",
-      "tags": [
-        "ways between",
-        "location",
-        "ikasha",
-        "seal"
-      ]
-    },
-    {
-      "id": 358,
-      "title": "Varnek Karn (Death's Negotiator)",
-      "category": "patrons",
-      "body": "A patron of bargains with the departed, the broker who speaks across the veil. He dwells in the gray between life and death, mediating disputes between living and dead. His servants practice post-mortem diplomacy: they negotiate with spirits as equals. The dead are patient and rarely generous—but they are honest. To serve him is to understand that death cancels all ledgers.",
-      "tags": [
-        "patron",
-        "death",
-        "bargains",
-        "negotiation"
-      ]
-    },
-    {
-      "id": 359,
-      "title": "The Unquiet Host",
-      "category": "spirits",
-      "body": "A temporary spectral warband summoned by a follower of Varnek Karn. It is a Cap 3 Follower that can Assist (+3 dice to a combat or intimidation roll) or take Independent Action (Scout & Signal, Distract & Draw). It is vulnerable to salt, bells, and consecrated ground. When it departs, the dead demand their due: Obligation or a Memorial Rite.",
-      "tags": [
-        "spirit",
-        "combat",
-        "varnek karn",
-        "host"
-      ]
-    },
-    {
-      "id": 360,
-      "title": "Beast-kin (Valewood)",
-      "category": "people",
-      "body": "The descendants of the Genesis Vats—elf and beast combined, spirit and stone fused. They are not a single species but a loose alliance of animal-aspected beings. They have Scent Memory (+1 die to track by smell), Parliament Oath (ask a local animal one question), and Claw or Fang (unarmed strikes deal Harm 1). They are the empire's unfinished business.",
-      "tags": [
-        "valewood",
-        "people",
-        "beast-kin",
-        "genesis"
-      ]
-    },
-    {
-      "id": 361,
-      "title": "The Genesis Vats (Valewood)",
-      "category": "locations",
-      "body": "Deep beneath the Amber Ziggurat, the Lethai-thora's failed laboratories. Here, elf and beast were combined to create the perfect guardian. The vats still hum, and the beast-kin who survived do not speak of what they saw. The Genesis Keeper (a ghost) still tries to finish the equation for a thousand years. It is almost complete.",
-      "tags": [
-        "valewood",
-        "location",
-        "genesis",
-        "horror"
-      ]
-    },
-    {
-      "id": 362,
-      "title": "The Amber Ziggurat (Valewood)",
-      "category": "locations",
-      "body": "A ruin caught mid-construction for a thousand years. The workers are statues of amber; their eyes follow you. Beneath it, the Genesis Vats still hum. It is the heart of the Valewood's forgotten empire, where the Lethai-thora built their weapons and sealed their guilt. The Shardwrights guard its secrets.",
-      "tags": [
-        "valewood",
-        "location",
-        "ziggurat",
-        "amber"
-      ]
-    },
-    {
-      "id": 363,
-      "title": "The Hazel Queen (Valewood)",
-      "category": "people",
-      "body": "Sovereign of the Hazel Court, a Lethai-al ruler in leaf and law. She has never spoken a lie—she has never needed to. Her court sings of a door that should stay closed. She is the forest's voice, a title that passes from dryad to dryad. The current Queen is not a dryad—she is a ghost, the last survivor of the empire that fell beneath the leaves.",
-      "tags": [
-        "valewood",
-        "npc",
-        "fae",
-        "queen"
-      ]
-    },
-    {
-      "id": 364,
-      "title": "The Alder King (Valewood)",
-      "category": "people",
-      "body": "Sovereign of the Twilit Court, a ruler in shadow and promise. His crown is a noose of thorns; he wears it proudly. He knows what came through the door. He will not say. He is the forest's warden, a title passed from fallen empire to fallen empire. The current King is a Lethai-ar who was born in the year the last empire fell. He has not aged since.",
-      "tags": [
-        "valewood",
-        "npc",
-        "fae",
-        "king"
-      ]
-    },
-    {
-      "id": 365,
-      "title": "Star-Roads (Valewood)",
-      "category": "locations",
-      "body": "Ancient paths between worlds, cracked and phasing. They hum with geometries that twist the unwary into yesterday. A Star-Road Shard is a pale flagstone that hums when trod in sequence—the sequence is always incomplete. The missing step is the one you hesitate to take. The Shardwrights repair them, but the empire's ghosts still patrol them.",
-      "tags": [
-        "valewood",
-        "location",
-        "roads",
-        "magic"
-      ]
-    },
-    {
-      "id": 366,
-      "title": "The Lethai-al (Valewood)",
-      "category": "people",
-      "body": "The true wood elves, those who remain when the tower falls. They do not walk the high roads; they mend them from below, speaking to roots instead of stars. Their elders are oaks, their children are saplings, and their grievances outlast stone. They keep no scrolls and sign no contracts, yet nothing is given without expectation. A meal shared is a shield-pledge. A path shown is a future claimed.",
-      "tags": [
-        "valewood",
-        "people",
-        "wood elves",
-        "reciprocity"
-      ]
-    },
-    {
-      "id": 367,
-      "title": "The Lethai-thora (Valewood)",
-      "category": "people",
-      "body": "The high elf archivists and sorcerers who served the old fey courts. They fled east when the courts fell, crossing the mountains with armfuls of scrolls. In Sihai, they taught the tribes to write contracts instead of drawing blood. Now they dwell in hidden pavilions, preserving 'forgotten ledgers' that record what the Mandate prefers to forget. Each secret they preserve erases a piece of themselves.",
-      "tags": [
-        "valewood",
-        "people",
-        "high elves",
-        "archivists"
-      ]
-    },
-    {
-      "id": 368,
-      "title": "The Fledging of the Empire (Lethai-thora Origin)",
-      "category": "lore",
-      "body": "When the Valewood's fey courts crumbled, a caravan of Lethai-thora refugees crossed the eastern passes. They found warring clans along the Sihon River and taught them to write disputes on clay. A generation later, the first emperor rose—a man who had learned his letters from a Lethai-thora tutor. He built his capital around the archive, and the Lethai-thora became the empire's memory.",
-      "tags": [
-        "lore",
-        "lethai-thora",
-        "empire",
-        "origin"
-      ]
-    },
-    {
       "id": 369,
       "title": "Asset Crafter",
       "category": "talents",
@@ -5193,7 +4953,6 @@
       "activation": "active",
       "prerequisites": "",
       "body": "Active, once per scene. When you attempt to lift a small object (purse, key, letter, seal) from a person or desk, treat your first Stealth or Subterfuge roll as Position +1. No one notices until it is already in your sleeve.",
-      "quote": "No one notices until it is already in your sleeve.",
       "source_book": "The Velvet Touch",
       "source_section": "2.1 — 2 XP Talents: Foundations"
     },
@@ -5619,7 +5378,6 @@
       "dv": 2,
       "xpCost": 1,
       "tier": "minor",
-      "effect": "Remove 1 Fatigue when applied during a short rest.",
       "icon": "🩹"
     },
     {
@@ -5641,7 +5399,6 @@
       "dv": 3,
       "xpCost": 2,
       "tier": "minor",
-      "effect": "Remove one Poisoned Condition.",
       "icon": "🧪"
     },
     {
@@ -5663,7 +5420,6 @@
       "dv": 3,
       "xpCost": 1,
       "tier": "minor",
-      "effect": "Target tests Spirit+Resolve (DV 3) or falls asleep for 1 hour.",
       "icon": "💤"
     },
     {
@@ -5685,7 +5441,6 @@
       "dv": 3,
       "xpCost": 2,
       "tier": "minor",
-      "effect": "Line wards against spirits and undead (Spirit+Resolve DV 4 to cross).",
       "icon": "🧂"
     },
     {
@@ -5707,7 +5462,6 @@
       "dv": 4,
       "xpCost": 3,
       "tier": "standard",
-      "effect": "Target tests Spirit+Resolve (DV 4) or speaks only truth for one exchange.",
       "icon": "🔮"
     },
     {
@@ -5729,7 +5483,6 @@
       "dv": 2,
       "xpCost": 1,
       "tier": "minor",
-      "effect": "+1 die on next Wits or Spirit roll within 1 hour.",
       "icon": "🌙"
     },
     {
@@ -5751,7 +5504,6 @@
       "dv": 4,
       "xpCost": 3,
       "tier": "standard",
-      "effect": "Creates a small fire (Harm 2, Area) in Close range. One use.",
       "icon": "🔥"
     },
     {
@@ -5772,7 +5524,6 @@
       "dv": 3,
       "xpCost": 2,
       "tier": "standard",
-      "effect": "Anoints a weapon or threshold; counts as [WARD] or [BLESSED] for one scene.",
       "icon": "🕯️"
     },
     {

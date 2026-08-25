@@ -918,8 +918,25 @@ export function destroy() {
     container = null;
 }
 
+export function onActivate() {
+    // Dashboard's "Track" button and encounter-card click stash the target
+    // id here before navigating over — see js/features/dashboard/index.js.
+    const pendingTrackerId = sessionStorage.getItem('fe-pending-combat-tracker');
+    if (pendingTrackerId) {
+        sessionStorage.removeItem('fe-pending-combat-tracker');
+        openCombatTracker(pendingTrackerId);
+    }
+
+    const pendingEditorId = sessionStorage.getItem('fe-pending-encounter-editor');
+    if (pendingEditorId) {
+        sessionStorage.removeItem('fe-pending-encounter-editor');
+        openEncounterEditor(pendingEditorId);
+    }
+}
+
 export default {
     render,
     destroy,
-    attachEvents
+    attachEvents,
+    onActivate
 };

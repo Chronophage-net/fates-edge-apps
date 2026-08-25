@@ -212,14 +212,14 @@ export function renderWiki() {
                 actions = `<span class="badge badge-cloned" style="color:var(--green);">✅ Cloned</span>`;
             } else {
                 actions = `
-                    <button class="btn btn-xs btn-primary wiki-clone-btn" data-id="${escHtml(String(e.id))}">📋 Clone</button>
-                    <button class="btn btn-xs btn-ghost wiki-hide-btn" data-id="${escHtml(String(e.id))}" title="Hide this entry">✕</button>
+                    <button class="btn btn-xs btn-primary wiki-clone-btn" data-action="clone" data-id="${escHtml(String(e.id))}">📋 Clone</button>
+                    <button class="btn btn-xs btn-ghost wiki-hide-btn" data-action="hide" data-id="${escHtml(String(e.id))}" title="Hide this entry">✕</button>
                 `;
             }
         } else {
             actions = `
-                <button class="btn btn-xs btn-primary wiki-edit-btn" data-id="${escHtml(String(e.id))}">✏️ Edit</button>
-                <button class="btn btn-xs btn-danger wiki-delete-btn" data-id="${escHtml(String(e.id))}">🗑️</button>
+                <button class="btn btn-xs btn-primary wiki-edit-btn" data-action="edit" data-id="${escHtml(String(e.id))}">✏️ Edit</button>
+                <button class="btn btn-xs btn-danger wiki-delete-btn" data-action="delete" data-id="${escHtml(String(e.id))}">🗑️</button>
             `;
         }
 
@@ -249,7 +249,7 @@ export function renderWiki() {
                 </div>
                 <div class="wiki-entry-actions">
                     ${actions}
-                    ${e.body && e.body.length > 300 ? `<button class="btn btn-xs btn-ghost wiki-expand-btn" data-id="${escHtml(String(e.id))}">▼ Expand</button>` : ''}
+                    ${e.body && e.body.length > 300 ? `<button class="btn btn-xs btn-ghost wiki-expand-btn" data-action="expand" data-id="${escHtml(String(e.id))}">▼ Expand</button>` : ''}
                 </div>
             </div>
         `;

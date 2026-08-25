@@ -1420,6 +1420,16 @@ export function init(el) {
     return render(el);
 }
 
+export function onActivate() {
+    // Dashboard's "open character" links stash the target id here before
+    // navigating over — see js/features/dashboard/index.js.
+    const pendingCharId = sessionStorage.getItem('fe-pending-character-editor');
+    if (pendingCharId) {
+        sessionStorage.removeItem('fe-pending-character-editor');
+        openCharacterEditor(pendingCharId);
+    }
+}
+
 export function destroy() {
     container = null;
 }
@@ -1435,6 +1445,7 @@ export { renderPartyOverview };
 export default {
     render,
     init,
+    onActivate,
     destroy,
     renderCharList,
     renderTalentList,

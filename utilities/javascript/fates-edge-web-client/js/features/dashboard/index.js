@@ -882,6 +882,60 @@ window.dashboardRefresh = function() {
     showToast('🔄 Dashboard refreshed', 'info');
 };
 
+// Simple cross-tab navigation — matches the window.location.hash pattern
+// used everywhere else in the app (router.js listens for 'hashchange').
+window.openCharacterBuilder = function() {
+    window.location.hash = 'characters';
+};
+
+window.addTimerFromDash = function() {
+    window.location.hash = 'timers';
+};
+
+window.addEncounterFromDash = function() {
+    window.location.hash = 'encounters';
+};
+
+window.openFactions = function() {
+    window.location.hash = 'factions';
+};
+
+window.openPatrons = function() {
+    window.location.hash = 'patrons';
+};
+
+// These two need to open a *specific* item on the target page, which the
+// target module can only do once it has actually rendered. Stash the id
+// where the target module's onActivate() knows to look for it, then hop
+// over via the normal hash route.
+window.openPatronDetail = function(patronId) {
+    sessionStorage.setItem('fe-pending-patron-detail', patronId);
+    window.location.hash = 'patrons';
+};
+
+window.openCombatTrackerForEncounter = function(encounterId) {
+    sessionStorage.setItem('fe-pending-combat-tracker', encounterId);
+    window.location.hash = 'encounters';
+};
+
+window.openCharacter = function(charId) {
+    sessionStorage.setItem('fe-pending-character-editor', charId);
+    window.location.hash = 'characters';
+};
+
+window.openEncounter = function(encounterId) {
+    sessionStorage.setItem('fe-pending-encounter-editor', encounterId);
+    window.location.hash = 'encounters';
+};
+
+window.openFactionDetail = function(factionId) {
+    sessionStorage.setItem('fe-pending-faction-detail', factionId);
+    window.location.hash = 'factions';
+};
+
+// window.tickTimer already exists (defined in features/gm-tools/index.js) —
+// completeTimer lives there too, right next to it.
+
 // ============================================================
 // EVENT LISTENERS
 // ============================================================

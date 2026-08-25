@@ -1,0 +1,38 @@
+name: Bug Report
+description: Something in the web client, terminal client, or utilities isn't behaving as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug! Check the [dev portal](https://dev.fates-edge.com) if you're unsure whether this belongs here or in `fates-edge-ai-gm-bot`.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which client surface?
+      options:
+        - Web client
+        - Terminal client
+        - Voice tools / utilities
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Browser/OS/Node version as relevant.
+    validations:
+      required: false

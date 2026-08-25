@@ -982,7 +982,7 @@ function renderKanbanView() {
             <div class="panel">
                 <div class="flex-between">
                     <h3 class="panel-title">📋 Campaign Kanban</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.addKanbanItem()">+ Add Item</button>
+                    <button class="btn btn-sm btn-primary" onclick="window.gmAddKanbanItem()">+ Add Item</button>
                 </div>
                 <div class="grid-2 mt-1">
                     ${Object.entries(columns).map(([key, col]) => `
@@ -995,9 +995,9 @@ function renderKanbanView() {
                                         <div class="text-sm font-bold">${escHtml(item.title)}</div>
                                         ${item.description ? `<div class="text-xs text-muted mt-1">${escHtml(item.description)}</div>` : ''}
                                         <div class="flex gap-1 mt-1 flex-center">
-                                            <button class="btn btn-xs btn-ghost" onclick="window.moveKanbanItem('${key}', ${idx}, -1)">←</button>
-                                            <button class="btn btn-xs btn-ghost" onclick="window.moveKanbanItem('${key}', ${idx}, 1)">→</button>
-                                            <button class="btn btn-xs btn-danger ml-auto" onclick="window.removeKanbanItem('${key}', ${idx})">✕</button>
+                                            <button class="btn btn-xs btn-ghost" onclick="window.gmMoveKanbanItem('${key}', ${idx}, -1)">←</button>
+                                            <button class="btn btn-xs btn-ghost" onclick="window.gmMoveKanbanItem('${key}', ${idx}, 1)">→</button>
+                                            <button class="btn btn-xs btn-danger ml-auto" onclick="window.gmRemoveKanbanItem('${key}', ${idx})">✕</button>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -1564,7 +1564,19 @@ window.tickTimer = function(id) {
     }
 };
 
-window.addKanbanItem = function() {
+window.completeTimer = function(id) {
+    const state = getState();
+    const timer = state.timers.find(t => t.id === id);
+    if (timer) {
+        timer.current = timer.segments;
+        saveState();
+        logToSession(`⏱️ Timer completed: ${timer.name}`, 'warning');
+        showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
+        refreshView();
+    }
+};
+
+window.gmAddKanbanItem = function() {
     const title = prompt('Enter item title:');
     if (!title) return;
     const description = prompt('Enter description (optional):') || '';
@@ -1576,7 +1588,7 @@ window.addKanbanItem = function() {
     showToast(`📋 Added "${title}" to ${column}`, 'success');
 };
 
-window.moveKanbanItem = function(column, index, direction) {
+window.gmMoveKanbanItem = function(column, index, direction) {
     const cols = ['todo', 'doing', 'done', 'blocked'];
     const newIdx = cols.indexOf(column) + direction;
     if (newIdx < 0 || newIdx >= cols.length) return showToast('Cannot move further', 'warning');
@@ -1589,7 +1601,7 @@ window.moveKanbanItem = function(column, index, direction) {
     showToast(`📋 Moved to ${targetCol}`, 'success');
 };
 
-window.removeKanbanItem = function(column, index) {
+window.gmRemoveKanbanItem = function(column, index) {
     if (!confirm('Remove this item?')) return;
     kanbanData.columns[column].items.splice(index, 1);
     saveCampaignData();

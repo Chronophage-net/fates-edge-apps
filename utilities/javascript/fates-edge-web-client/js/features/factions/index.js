@@ -343,8 +343,32 @@ let state = {
 // LOAD DATA
 // ============================================================
 
+// One-time migration: Trusts used to also be creatable from a second,
+// incomplete implementation on the Patrons tab (prompt()-based CRUD,
+// saved separately under saved.patrons.trusts). That tab is gone — this
+// folds any trusts a party built there into the real list here, keyed by
+// id so it's safe to run on every load, then clears the old key so it
+// only ever does real work once.
+function migrateLegacyPatronTrusts(saved) {
+    const legacy = saved.patrons?.trusts;
+    if (!legacy || legacy.length === 0) return;
+
+    if (!saved.factions) saved.factions = {};
+    const existingIds = new Set((saved.factions.trusts || []).map(t => t.id));
+    const toMerge = legacy.filter(t => t?.id && !existingIds.has(t.id));
+
+    if (toMerge.length > 0) {
+        saved.factions.trusts = [...(saved.factions.trusts || []), ...toMerge];
+        console.log(`📦 Migrated ${toMerge.length} trust(s) from the old Patrons tab into Factions.`);
+    }
+
+    delete saved.patrons.trusts;
+    saveState();
+}
+
 export function loadFactionData() {
     const saved = getState();
+    migrateLegacyPatronTrusts(saved);
     if (saved.factions) {
         state.factions = saved.factions.factions || [];
         state.assets = saved.factions.assets || [];
@@ -1695,12 +1719,26 @@ export function attachEvents() {
 // LIFECYCLE METHODS
 // ============================================================
 
-export function onActivate() {
+export async function onActivate() {
     console.log('[Factions] Activated');
     if (!state.dataLoaded) {
         loadFactionData();
     }
     refreshView();
+
+    // Dashboard's "View faction" links stash the target id here before
+    // navigating over — see js/features/dashboard/index.js. loadFactionData()
+    // above kicks the remote fetch off but doesn't return a promise for it,
+    // so poll briefly for it to land rather than racing the modal open.
+    const pendingFactionId = sessionStorage.getItem('fe-pending-faction-detail');
+    if (pendingFactionId) {
+        sessionStorage.removeItem('fe-pending-faction-detail');
+        for (let i = 0; i < 20 && !state.dataLoaded; i++) {
+            await new Promise(r => setTimeout(r, 150));
+        }
+        refreshView();
+        window.viewFaction(pendingFactionId);
+    }
 }
 
 export function onDeactivate() {

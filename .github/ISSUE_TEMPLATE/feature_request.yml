@@ -1,0 +1,20 @@
+name: Feature Request
+description: Propose a UI improvement, new client surface, or utility enhancement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See [Ways to Contribute](https://dev.fates-edge.com/contribute) for guided starting points — mobile app, Slack bot, custom VTT, and web client polish are all explicitly welcome.
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What do you want to add or change?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why does it matter?
+    validations:
+      required: true
