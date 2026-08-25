@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-24T17:28:13.866Z",
+  "generated": "2026-08-25T14:51:42.157Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -146,9 +146,9 @@
       "id": "factions_of_the_fractured_sun",
       "title": "Factions Of The Fractured Sun",
       "file": "Fates_-_Edge_-_-Factions-of-the-Fractured-Sun.html",
-      "path": "/data/docs/",
-      "category": "other",
-      "categoryLabel": "📄 Other",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "🗡️ Adventures",
       "core": false,
       "active": true
     },
@@ -156,7 +156,7 @@
       "id": "fenwood_everblood_chronicles",
       "title": "Fenwood Everblood Chronicles",
       "file": "Fates_-_Edge_-_-Fenwood-Everblood-Chronicles.html",
-      "path": "/data/docs/",
+      "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "🗡️ Adventures",
       "core": false,
@@ -912,7 +912,7 @@
       "id": "within_the_demons_eye_saga",
       "title": "Within The Demons Eye Saga",
       "file": "Fates_-_Edge_-_-Within-the-Demons-Eye-Saga.html",
-      "path": "/data/docs/",
+      "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "🗡️ Adventures",
       "core": false,
