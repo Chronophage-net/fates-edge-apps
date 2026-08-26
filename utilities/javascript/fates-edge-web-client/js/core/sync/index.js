@@ -6,8 +6,8 @@
  * and presence tracking.
  */
 
-import { getState, saveState, mergeState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
+import { getState, saveState, mergeState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
 import { OfflineQueue } from './offline-queue.js';
 import { PresenceManager } from './presence.js';
 import { validateOperation } from './operations.js';

@@ -4,9 +4,9 @@
  * FIXED: Proper event listener cleanup.
  */
 
-import { getState, addWikiEntry, updateWikiEntry, deleteWikiEntry, saveState } from '../../core/state.js';
-import { escHtml, debounce } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
+import { getState, addWikiEntry, updateWikiEntry, deleteWikiEntry, saveState } from '@core/state.js';
+import { escHtml, debounce } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
 
 // ─── Configuration ──────────────────────────────────────────────────────
 

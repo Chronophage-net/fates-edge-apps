@@ -5,12 +5,12 @@
  * Updated for unified WebSocket module.
  */
 
-import { initMediaModule } from '../../core/media.js';
-import { getState, getStableClientId } from '../../core/state.js';
-import { VoiceChat } from '../../components/VoiceChat.js';
-import { sendVoiceOffer, sendVoiceAnswer, sendVoiceICECandidate, sendVoiceStatus, getSocketId, isConnectedToServer, onWSEvent, offWSEvent } from '../../core/websocket.js';
-import { fetchTurnIceServers } from '../../core/turn.js';
-import { showToast } from '../../components/Toast.js';
+import { initMediaModule } from '@core/media.js';
+import { getState, getStableClientId } from '@core/state.js';
+import { VoiceChat } from '@components/VoiceChat.js';
+import { sendVoiceOffer, sendVoiceAnswer, sendVoiceICECandidate, sendVoiceStatus, getSocketId, isConnectedToServer, onWSEvent, offWSEvent } from '@core/websocket.js';
+import { fetchTurnIceServers } from '@core/turn.js';
+import { showToast } from '@components/Toast.js';
 
 // ============================================================
 // STATE

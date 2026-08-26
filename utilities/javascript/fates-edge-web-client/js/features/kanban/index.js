@@ -10,9 +10,9 @@
  * - Campaign progress visualization
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
+import { getState, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
 
 // ============================================================
 // CONSTANTS

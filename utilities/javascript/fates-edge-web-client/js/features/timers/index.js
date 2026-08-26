@@ -6,13 +6,13 @@
  * v2 – Role‑based gating: non‑GM cannot create, edit, or delete timers.
  */
 
-import { getState, addTimer, deleteTimer, updateTimer, saveState } from '../../core/state.js';
-import { createTimerWidget } from '../../components/TimerWidget.js';
-import { escHtml, safeParseInt, generateId } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
+import { getState, addTimer, deleteTimer, updateTimer, saveState } from '@core/state.js';
+import { createTimerWidget } from '@components/TimerWidget.js';
+import { escHtml, safeParseInt, generateId } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
 // ─── Role check ──────────────────────────────────────────────
-import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
-import { isConnectedToServer } from '../../core/websocket.js';
+import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
+import { isConnectedToServer } from '@core/websocket.js';
 
 let container = null;
 let editingTimerId = null;

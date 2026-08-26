@@ -44,12 +44,12 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { getCharacterData, saveCharacter } from '../index.js';
-import { escHtml, safeParseInt } from '../../../core/utils.js';
-import { getState, saveState } from '../../../core/state.js';
-import { showToast } from '../../../components/Toast.js';
-import { performRoll } from '../../../core/dice.js';
-import patrons from '../../patrons/index.js';
+import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
+import { escHtml, safeParseInt } from '@core/utils.js';
+import { getState, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { performRoll } from '@core/dice.js';
+import patrons from '@features/patrons/index.js';
 const { loadPatronData, getPatronObligation, savePatronData } = patrons;
 
 // ============================================================

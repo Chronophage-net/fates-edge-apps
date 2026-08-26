@@ -25,7 +25,7 @@
  * a curious visitor hitting directly with browser devtools open.
  */
 
-import { escHtml, buildDocumentUrl, getBaseUrl } from '../../core/utils.js';
+import { escHtml, buildDocumentUrl, getBaseUrl } from '@core/utils.js';
 
 let container = null;
 let fuse = null;

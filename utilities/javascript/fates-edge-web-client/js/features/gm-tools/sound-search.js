@@ -18,10 +18,10 @@
  * REST route.
  */
 
-import { getApiBaseUrl } from '../../core/websocket.js';
-import { escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { addSoundTrack, setTrackAttribution, playAmbience, playSfx } from '../../core/soundboard.js';
+import { getApiBaseUrl } from '@core/websocket.js';
+import { escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { addSoundTrack, setTrackAttribution, playAmbience, playSfx } from '@core/soundboard.js';
 
 const API_KEY_STORAGE = 'fates-edge-api-key';
 const CROSSFADE_PRESETS = [

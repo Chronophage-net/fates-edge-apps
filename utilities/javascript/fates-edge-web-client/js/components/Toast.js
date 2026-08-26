@@ -1,4 +1,4 @@
-import { escHtml } from '../core/utils.js';
+import { escHtml } from '@core/utils.js';
 
 let container = null;
 

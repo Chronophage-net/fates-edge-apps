@@ -40,9 +40,11 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': resolve(__dirname, './'),
+            '@js': resolve(__dirname, './js'),
             '@core': resolve(__dirname, './js/core'),
             '@components': resolve(__dirname, './js/components'),
             '@features': resolve(__dirname, './js/features'),
+            '@tools': resolve(__dirname, './js/tools'),
             '@data': resolve(__dirname, './data'),
         },
     },

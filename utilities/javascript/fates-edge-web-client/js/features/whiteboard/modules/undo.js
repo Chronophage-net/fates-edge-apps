@@ -2,7 +2,7 @@
 import { state, getActiveSheet } from './state.js';
 import { saveWhiteboardData } from './persistence.js';
 import { restoreDrawings, renderOverlay, updateStats } from './renderer.js';
-import { showToast } from '../../../components/Toast.js';
+import { showToast } from '@components/Toast.js';
 
 const MAX_UNDO_HISTORY = 50;
 const undoHistory = new Map(); // key: sheetId, value: { undo: [], redo: [] }

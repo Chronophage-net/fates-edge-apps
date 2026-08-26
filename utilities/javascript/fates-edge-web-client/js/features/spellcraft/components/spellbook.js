@@ -97,13 +97,13 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { getCharacterData, saveCharacter } from '../index.js';
-import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
-import { showToast } from '../../../components/Toast.js';
-import { performRoll } from '../../../core/dice.js';
-import { getState } from '../../../core/state.js';
-import patronsModule from '../../patrons/index.js';
-import { sendEvent, sendRoll, isConnectedToServer } from '../../../core/websocket.js';
+import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
+import { escHtml, generateId, safeParseInt } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { performRoll } from '@core/dice.js';
+import { getState } from '@core/state.js';
+import patronsModule from '@features/patrons/index.js';
+import { sendEvent, sendRoll, isConnectedToServer } from '@core/websocket.js';
 
 // ============================================================
 // CONSTANTS

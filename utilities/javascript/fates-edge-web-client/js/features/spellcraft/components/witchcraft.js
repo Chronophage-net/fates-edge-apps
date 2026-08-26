@@ -79,12 +79,12 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { getCharacterData, saveCharacter } from '../index.js';
-import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
-import { showToast } from '../../../components/Toast.js';
-import { getState, saveState } from '../../../core/state.js';
-import { performRoll } from '../../../core/dice.js';
-import patrons from '../../patrons/index.js';
+import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
+import { escHtml, generateId, safeParseInt } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { getState, saveState } from '@core/state.js';
+import { performRoll } from '@core/dice.js';
+import patrons from '@features/patrons/index.js';
 
 const { loadPatronData: ensurePatronDataLoaded } = patrons;
 
@@ -151,7 +151,7 @@ async function refreshWitchcraftPanel() {
     if (mount) {
         await renderWitchcraft(mount);
     } else {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }

@@ -41,7 +41,7 @@
 // client's character record. See applyStakeEvent() below.
 
 import { TollVeilEngine, aiChooseBid, aiChoosePlay } from './toll-and-veil-engine.js';
-import { getCharacter, updateCharacter, getCharacters } from '../../core/state.js';
+import { getCharacter, updateCharacter, getCharacters } from '@core/state.js';
 
 export const TOLL_VEIL_CONNECTED_PROTOCOL_VERSION = 1;
 

@@ -37,10 +37,10 @@
  *    your table before using it as written.
  */
 
-import { vttStore } from '../../core/vtt-store.js';
+import { vttStore } from '@core/vtt-store.js';
 import { q, qa } from './vtt-core.js';
-import { escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
+import { escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
 
 // ============================================================
 // CONFIG — tweak here if your table's conventions differ
@@ -191,7 +191,7 @@ let combatModuleCache = null;
 async function getCombatModule() {
     if (combatModuleCache) return combatModuleCache;
     try {
-        combatModuleCache = await import('../encounters/combat.js');
+        combatModuleCache = await import('@features/encounters/combat.js');
         return combatModuleCache;
     } catch (e) {
         return null;

@@ -21,10 +21,10 @@
 // real game protocol traffic, handed straight to whichever
 // host/guest controller is currently live (see toll-and-veil-connected.js).
 
-import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '../../core/websocket.js';
+import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '@core/websocket.js';
 import { createTollVeilHost, createTollVeilGuest } from './toll-and-veil-connected.js';
 import { openTollVeilModal, closeTollVeilModal } from './toll-and-veil.js';
-import { escHtml } from '../../core/utils.js';
+import { escHtml } from '@core/utils.js';
 
 const NS = 'tollveil';
 
@@ -44,7 +44,7 @@ function transport() {
 }
 
 function postToVTTChat(text) {
-    import('../vtt/index.js')
+    import('@features/vtt/index.js')
         .then(module => {
             if (module.addChatMessage && typeof module.addChatMessage === 'function') {
                 module.addChatMessage({ text, sender: 'Toll & Veil', system: true });

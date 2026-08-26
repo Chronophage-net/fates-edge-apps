@@ -16,7 +16,7 @@
  */
 
 import { getState, importData, saveState, updateState } from './state.js';
-import { showToast } from '../components/Toast.js';
+import { showToast } from '@components/Toast.js';
 
 // ============================================================
 // CONFIGURATION

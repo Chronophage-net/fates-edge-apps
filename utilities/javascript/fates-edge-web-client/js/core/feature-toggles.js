@@ -202,7 +202,7 @@ export function setFeatureVisible(featureId, visible) {
  * everything should reappear/disappear appropriately").
  *
  * Usage:
- *   import { isFeatureVisible, watchFeatureVisibility } from '../core/feature-toggles.js';
+ *   import { isFeatureVisible, watchFeatureVisibility } from '@core/feature-toggles.js';
  *   watchFeatureVisibility(() => renderSidebarNav());
  *   // ...and inside renderSidebarNav's tab list:
  *   tabs.filter(tab => !isToggleable(tab.id) || isFeatureVisible(tab.id))

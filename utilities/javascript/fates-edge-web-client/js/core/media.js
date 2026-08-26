@@ -36,7 +36,7 @@
  */
 
 import { getSyncManager } from './sync/index.js';
-import { showToast } from '../components/Toast.js';
+import { showToast } from '@components/Toast.js';
 // NEW: the recording-status overlay below is a visual-only pulsing badge
 // (position:fixed, pointer-events:none, no ARIA) -- a screen-reader user
 // has no way to discover that a recording is in progress, or that it has

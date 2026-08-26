@@ -1,6 +1,6 @@
 // modules/sheets.js
-import { showToast } from '../../../components/Toast.js';
-import { escHtml } from '../../../core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
 import { state, syncActiveSheetRefs, getActiveSheet, getLayer } from './state.js';
 import { saveWhiteboardData } from './persistence.js';
 import { renderLayersPanel } from './layers.js';

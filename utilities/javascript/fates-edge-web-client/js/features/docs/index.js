@@ -12,8 +12,8 @@
  * - Clean path resolution
  */
 
-import { escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
+import { escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
 
 // ============================================================
 // CONSTANTS

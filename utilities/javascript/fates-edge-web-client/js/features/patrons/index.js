@@ -35,11 +35,11 @@
  *   - rivalries: [{ patron, description }]
  *   - _license: string */
  
-import { getState, saveState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
+import { getState, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
 // ─── Import shared discovery ────────────────────────────
-import { discoverPatrons } from '../../core/discovery.js';
+import { discoverPatrons } from '@core/discovery.js';
 import { recommendPatrons } from './recommender.js';
  
 // ============================================================

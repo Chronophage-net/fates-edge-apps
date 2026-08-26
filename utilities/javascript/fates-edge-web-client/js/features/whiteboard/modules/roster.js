@@ -1,7 +1,7 @@
 // modules/roster.js
-import { getState } from '../../../core/state.js';
-import { showToast } from '../../../components/Toast.js';
-import { escHtml } from '../../../core/utils.js';
+import { getState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
 import { state, getActiveSheet, getLayer} from './state.js';
 import { pushUndoSnapshot } from './undo.js';
 import { saveWhiteboardData } from './persistence.js';

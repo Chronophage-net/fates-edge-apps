@@ -31,13 +31,13 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '../../core/state.js';
-import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { loadPatronData } from '../patrons/index.js';
+import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '@core/state.js';
+import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { loadPatronData } from '@features/patrons/index.js';
 import { openTalentEditor } from './talent-editor.js';
-import { ensureTalentEffects } from '../../core/talent-effects.js';
-import { loadTalentCatalog, collectTalentTags } from '../../core/talent-loader.js';
+import { ensureTalentEffects } from '@core/talent-effects.js';
+import { loadTalentCatalog, collectTalentTags } from '@core/talent-loader.js';
 import { TALENT_CATEGORIES } from './talent-editor.js';
 
 console.log('[Editor] Module loaded');

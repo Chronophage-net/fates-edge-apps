@@ -42,10 +42,10 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { getState, saveState, getCharacter, updateCharacter } from '../../../core/state.js';
-import { showToast } from '../../../components/Toast.js';
-import { escHtml, safeParseInt } from '../../../core/utils.js';
-import patrons from '../../patrons/index.js';
+import { getState, saveState, getCharacter, updateCharacter } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml, safeParseInt } from '@core/utils.js';
+import patrons from '@features/patrons/index.js';
 
 const { 
     loadPatronData, 
@@ -920,7 +920,7 @@ window.usePatronGift = async function(patronId, characterId) {
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
@@ -1020,7 +1020,7 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
@@ -1039,7 +1039,7 @@ window.startNewScene = function(characterId = 'default-character') {
 
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
@@ -1102,7 +1102,7 @@ window.learnRite = function(patronId, riteIndex, characterId = 'default-characte
 
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
@@ -1167,7 +1167,7 @@ window.invokeRite = function(patronId, riteIndex, characterId = 'default-charact
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
@@ -1282,7 +1282,7 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
     // Refresh the rites view
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
@@ -1300,7 +1300,7 @@ window.addRiteObligation = function(patronId, amount = 1, characterId = 'default
     
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }
@@ -1313,7 +1313,7 @@ window.clearRiteObligation = function(patronId, characterId = 'default-character
     
     const container = document.getElementById('spellcraft-content');
     if (container) {
-        import('../index.js').then(module => {
+        import('@features/spellcraft/index.js').then(module => {
             if (module.renderActiveTabContent) module.renderActiveTabContent();
         });
     }

@@ -14,8 +14,8 @@
  * – The Gray Wanderer
  */
 
-import { getCharacterData } from '../index.js';
-import { escHtml } from '../../../core/utils.js';
+import { getCharacterData } from '@features/spellcraft/index.js';
+import { escHtml } from '@core/utils.js';
 
 // ============================================================
 // HELPER

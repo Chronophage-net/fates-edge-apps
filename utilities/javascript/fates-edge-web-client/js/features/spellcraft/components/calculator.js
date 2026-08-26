@@ -18,11 +18,11 @@
  * - Gamble: simulate the roll and see the outcome
  */
 
-import { getCharacterData, saveCharacter } from '../index.js';
-import { showToast } from '../../../components/Toast.js';
-import { escHtml, generateId } from '../../../core/utils.js';
-import { getState } from '../../../core/state.js';
-import { performRoll } from '../../../core/dice.js';
+import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml, generateId } from '@core/utils.js';
+import { getState } from '@core/state.js';
+import { performRoll } from '@core/dice.js';
 
 // ============================================================
 // STATE

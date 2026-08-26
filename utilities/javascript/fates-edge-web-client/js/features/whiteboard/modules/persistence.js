@@ -1,7 +1,7 @@
 // modules/persistence.js
-import { getState, saveState as saveGlobalState } from '../../../core/state.js';
-import { showToast } from '../../../components/Toast.js';
-import { isConnectedToServer, onWSEvent, offWSEvent, sendMessage } from '../../../core/websocket.js';
+import { getState, saveState as saveGlobalState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { isConnectedToServer, onWSEvent, offWSEvent, sendMessage } from '@core/websocket.js';
 import { state, syncActiveSheetRefs, getActiveSheet, setContainer } from './state.js';
 import { normalizeSheet, createDefaultSheet } from './sheets.js';
 import { refresh, renderVttCombatToolbar } from './ui.js';

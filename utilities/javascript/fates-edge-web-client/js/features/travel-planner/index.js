@@ -33,15 +33,15 @@
  * given card means in a given region.
  */
 
-import { logRecordingEvent } from '../../core/media.js';
-import { showToast } from '../../components/Toast.js';
-import { addTimer } from '../../core/state.js';
-import decksModule from '../decks/index.js';
+import { logRecordingEvent } from '@core/media.js';
+import { showToast } from '@components/Toast.js';
+import { addTimer } from '@core/state.js';
+import decksModule from '@features/decks/index.js';
 import {
     getSelectedRegion,
     getRegionNames,
     setSelectedRegion
-} from '../decks/index.js';
+} from '@features/decks/index.js';
 
 const { fetchRegionData } = decksModule;
 
@@ -1537,7 +1537,7 @@ function handleAddTimer() {
     const timerName = `Travel: ${currentJourney.startRegion} → ${currentJourney.destRegion}`;
     const segments = currentJourney.totalSegments || 6;
     
-    import('../timers/index.js').then(module => {
+    import('@features/timers/index.js').then(module => {
         if (module.openTimerEditor) {
             module.openTimerEditor({
                 name: timerName,

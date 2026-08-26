@@ -5,12 +5,12 @@
  * ✅ Preserves bestiary TL, class, category, stats, and sb_spends on adversaries
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { generateId, escHtml, safeParseInt } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
+import { getState, saveState } from '@core/state.js';
+import { generateId, escHtml, safeParseInt } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
 import { openTracker } from './combat.js';
 import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
-import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '../../core/objective-types.js';
+import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '@core/objective-types.js';
 
 let modal = null;
 let editingId = null;

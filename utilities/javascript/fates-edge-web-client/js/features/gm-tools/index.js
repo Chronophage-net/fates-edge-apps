@@ -34,16 +34,16 @@
  * *this* file — a static import the other way would be circular.
  */
 
-import { getState, addArchive, clearRollHistory, clearChatHistory, saveState, getStableClientId } from '../../core/state.js';
-import { resetTalentCharges } from '../../core/talent-effects.js';
+import { getState, addArchive, clearRollHistory, clearChatHistory, saveState, getStableClientId } from '@core/state.js';
+import { resetTalentCharges } from '@core/talent-effects.js';
 import {
     getSoundTracks, addSoundTrack, removeSoundTrack,
     playAmbience, stopAmbience, getCurrentAmbienceId, playSfx
-} from '../../core/soundboard.js';
-import { getGmState, updateGmState } from '../../core/state.js';
-import { clamp, escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { isFeatureVisible, getFeatureAccess } from '../../core/feature-toggles.js';
+} from '@core/soundboard.js';
+import { getGmState, updateGmState } from '@core/state.js';
+import { clamp, escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { isFeatureVisible, getFeatureAccess } from '@core/feature-toggles.js';
 import { 
     getSelectedRegion, 
     getRegionNames, 
@@ -52,8 +52,8 @@ import {
     setSelectedRegion,
     onRegionChange,
     getRegionData
-} from '../decks/index.js';
-import { isConnectedToServer } from '../../core/websocket.js';
+} from '@features/decks/index.js';
+import { isConnectedToServer } from '@core/websocket.js';
 
 // Import media module
 import {
@@ -63,7 +63,7 @@ import {
     isCurrentlyRecording,
     getRecordingStatus,
     isLiveTranscriptionSupported
-} from '../../core/media.js';
+} from '@core/media.js';
 
 // ============================================================
 // STATE
@@ -271,7 +271,7 @@ window.gmToggleKnowledgeRevealed = async function(knowledgeId) {
     if (!entry) return;
     entry.revealed = !entry.revealed;
     try {
-        const advModule = await import('../adventure-manager/index.js');
+        const advModule = await import('@features/adventure-manager/index.js');
         advModule.loadAdventuresFromState();
         advModule.saveAdventuresToState();
     } catch (e) {
@@ -1347,7 +1347,7 @@ function clearSessionData() {
 async function loadKanbanModule(containerEl) {
     try {
         if (moduleCache.kanban) return moduleCache.kanban.render(containerEl);
-        const module = await import('../kanban/index.js');
+        const module = await import('@features/kanban/index.js');
         moduleCache.kanban = module;
         module.render(containerEl);
     } catch (e) {
@@ -1358,7 +1358,7 @@ async function loadKanbanModule(containerEl) {
 async function loadWhiteboardModule(containerEl) {
     try {
         if (moduleCache.whiteboard) return moduleCache.whiteboard.render(containerEl);
-        const module = await import('../whiteboard/index.js');
+        const module = await import('@features/whiteboard/index.js');
         moduleCache.whiteboard = module;
         module.render(containerEl);
     } catch (e) {
@@ -1369,7 +1369,7 @@ async function loadWhiteboardModule(containerEl) {
 async function loadTravelPlannerModule(containerEl) {
     try {
         if (moduleCache.travel && moduleCache.travel.render) return moduleCache.travel.render(containerEl);
-        const module = await import('../travel-planner/index.js');
+        const module = await import('@features/travel-planner/index.js');
         moduleCache.travel = module;
         if (module.render) module.render(containerEl);
         else if (module.default?.render) module.default.render(containerEl);
@@ -1462,7 +1462,7 @@ window.gmCompleteScene = async function() {
     const adventure = getRunningAdventure();
     if (!adventure) return;
     try {
-        const advModule = await import('../adventure-manager/index.js');
+        const advModule = await import('@features/adventure-manager/index.js');
         // Ensure the adventure manager's cache is synced
         advModule.loadAdventuresFromState();
         const result = advModule.completeScene(adventure.id, adventure.currentAct, adventure.currentScene);
@@ -1480,7 +1480,7 @@ window.gmStartSceneEncounter = async function() {
     const adventure = getRunningAdventure();
     if (!adventure) return;
     try {
-        const advModule = await import('../adventure-manager/index.js');
+        const advModule = await import('@features/adventure-manager/index.js');
         advModule.loadAdventuresFromState();
         await advModule.startSceneEncounter(adventure.id, adventure.currentAct, adventure.currentScene);
     } catch (e) {
@@ -1499,7 +1499,7 @@ window.gmSaveQuickGenToAdventure = async function() {
         return;
     }
     try {
-        const advModule = await import('../adventure-manager/index.js');
+        const advModule = await import('@features/adventure-manager/index.js');
         advModule.loadAdventuresFromState();
         const { type, data } = lastQuickGenResult;
         if (type === 'npc') {
@@ -1528,7 +1528,7 @@ window.gmSaveQuickGenToAdventure = async function() {
 window.gmBuildAdventureFromCrownSpread = async function() {
     if (!lastCrownSpreadReading) return;
     try {
-        const advModule = await import('../adventure-manager/index.js');
+        const advModule = await import('@features/adventure-manager/index.js');
         const adventure = advModule.createAdventureFromCrownSpreadReading(lastCrownSpreadReading);
         if (adventure) {
             showToast(`👑 Built "${adventure.title}" — opening Adventure Manager…`, 'success');
@@ -1541,7 +1541,7 @@ window.gmBuildAdventureFromCrownSpread = async function() {
 };
 
 window.openCombatTracker = function() {
-    import('../encounters/combat.js').then(module => {
+    import('@features/encounters/combat.js').then(module => {
         if (module.default?.openTracker) module.default.openTracker(null);
         else if (module.openTracker) module.openTracker(null);
         else showToast('Combat tracker not available', 'error');
@@ -1549,21 +1549,21 @@ window.openCombatTracker = function() {
 };
 
 window.addTimerFromScene = function() {
-    import('../timers/index.js').then(module => {
+    import('@features/timers/index.js').then(module => {
         if (module.openTimerEditor) module.openTimerEditor(null);
         else showToast('Timer module not available', 'error');
     }).catch(() => showToast('Timer module not available', 'error'));
 };
 
 window.addEncounterFromScene = function() {
-    import('../encounters/index.js').then(module => {
+    import('@features/encounters/index.js').then(module => {
         if (module.openEncounterEditor) module.openEncounterEditor(null);
         else showToast('Encounter module not available', 'error');
     }).catch(() => showToast('Encounter module not available', 'error'));
 };
 
 window.openEncounterTracker = function(id) {
-    import('../encounters/combat.js').then(module => {
+    import('@features/encounters/combat.js').then(module => {
         if (module.default?.openTracker) module.default.openTracker(id);
         else if (module.openTracker) module.openTracker(id);
         else showToast('Combat tracker not available', 'error');
@@ -1808,7 +1808,7 @@ window.quickCrownSpreadFromScene = async function() {
 };
 
 window.shuffleDeck = function() {
-    import('../decks/index.js').then(module => {
+    import('@features/decks/index.js').then(module => {
         if (module.resetDeck || module.default?.resetDeck) {
             (module.resetDeck || module.default.resetDeck)();
             showToast('🔀 Deck shuffled', 'success');

@@ -7,20 +7,20 @@
  */
 
 // Import from core modules
-import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-import { escHtml, safeParseInt } from '../../core/utils.js';
-import { addRoll, getState, saveState } from '../../core/state.js';
+import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
+import { escHtml, safeParseInt } from '@core/utils.js';
+import { addRoll, getState, saveState } from '@core/state.js';
 // Import the core dice engine
-import { performRoll, rollDie } from '../../core/dice.js';
+import { performRoll, rollDie } from '@core/dice.js';
 // Import WebSocket for sync
-import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '../../core/websocket.js';
+import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '@core/websocket.js';
 // NEW: a11y -- remote rolls already get a showToast() (aria-live via
 // #toast-container) in the rollHandler below, but the LOCAL roller's own
 // result previously only ever landed in the visible #roll-result DOM node,
 // with no screen-reader announcement of what just happened. See
 // core/a11y-announce.js's file header for why this is a separate,
 // screen-reader-only channel from Toast.js.
-import { announce } from '../../core/a11y-announce.js';
+import { announce } from '@core/a11y-announce.js';
 
 let container = null;
 let wsListeners = new Map();
@@ -39,7 +39,7 @@ async function getCryptoModule() {
     cryptoLoadAttempted = true;
     try {
         // Try to load the crypto module
-        const module = await import('../../core/crypto.js');
+        const module = await import('@core/crypto.js');
         cryptoModule = module;
         console.log('[Dice] Crypto module loaded successfully');
         return cryptoModule;

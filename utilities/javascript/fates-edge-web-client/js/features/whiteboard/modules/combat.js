@@ -2,13 +2,13 @@
 import { state, ctx, canvas, getLayer, isLayerVisibleNow, layersInDrawOrder, isLayerLocked, tableModeActive } from './state.js';
 import { drawFogOfWar, paintFogCell } from './fog.js';
 import { GRID_COLORS } from './constants.js';
-import { showToast } from '../../../components/Toast.js';
-import { logRecordingEvent } from '../../../core/media.js';
+import { showToast } from '@components/Toast.js';
+import { logRecordingEvent } from '@core/media.js';
 import { saveWhiteboardData } from './persistence.js';
 import { restoreDrawings, renderOverlay, updateStats, snapToGrid } from './renderer.js';
 import { pushUndoSnapshot } from './undo.js';
-import { isConnectedToServer, sendMessage } from '../../../core/websocket.js';
-import { getLiveCombatants, isTrackerOpen, setTrackerRangeByName } from '../../encounters/combat.js';
+import { isConnectedToServer, sendMessage } from '@core/websocket.js';
+import { getLiveCombatants, isTrackerOpen, setTrackerRangeByName } from '@features/encounters/combat.js';
 
 // ── VTT Role Gating (shared) ──
 // `vttRole` is an in-session override, set only if the server explicitly

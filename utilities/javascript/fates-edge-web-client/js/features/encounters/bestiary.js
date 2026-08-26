@@ -12,11 +12,11 @@
  * - Combat Tracker integration uses tl for default difficulty/HP
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-import { discoverBestiary } from '../../core/discovery.js';
+import { getState, saveState } from '@core/state.js';
+import { escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
+import { discoverBestiary } from '@core/discovery.js';
 import { openTracker } from './combat.js'; // 👈 Integration import
 
 let container = null;

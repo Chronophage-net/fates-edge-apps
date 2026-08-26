@@ -3,7 +3,7 @@
 import { state, canvas, ctx, getLayer, isLayerVisibleNow, layersInDrawOrder, playerViewActive, currentTool } from './state.js';
 import { setCanvas, setCtx } from './state.js';
 import { GRID_COLORS } from './constants.js';
-import { escHtml } from '../../../core/utils.js';
+import { escHtml } from '@core/utils.js';
 
 // ── Exported UI update helpers ──
 export function updateStats() {

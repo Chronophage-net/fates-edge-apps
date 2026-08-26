@@ -30,9 +30,9 @@
 // the first opponent socketId they actually hear from, so a third
 // client that also has the Whiteboard open doesn't get mixed in.
 
-import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '../../core/websocket.js';
+import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '@core/websocket.js';
 import { openKonrehModalConnected } from './kon-reh-connected.js';
-import { escHtml } from '../../core/utils.js';
+import { escHtml } from '@core/utils.js';
 
 const NS = 'konreh';
 

@@ -11,9 +11,9 @@
  */
 
 import { getState, saveState } from './state.js';
-import { showToast } from '../components/Toast.js';
-import { registerRoute } from '../router.js';
-import { moduleLoader } from '../module-loader.js';
+import { showToast } from '@components/Toast.js';
+import { registerRoute } from '@js/router.js';
+import { moduleLoader } from '@js/module-loader.js';
 import { registerTheme, unregisterTheme } from './theme-manager.js';
 
 // ============================================================

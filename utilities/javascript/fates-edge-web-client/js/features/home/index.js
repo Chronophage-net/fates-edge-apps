@@ -4,9 +4,9 @@
  * Includes first‑start welcome overlay with Quick Start.
  */
 
-import { showToast } from '../../components/Toast.js';
-import { getState, saveState } from '../../core/state.js';
-import { escHtml } from '../../core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { getState, saveState } from '@core/state.js';
+import { escHtml } from '@core/utils.js';
 
 // ─── Constants ──────────────────────────────────────────────────────────
 
@@ -1004,7 +1004,7 @@ async function quickStart() {
         const state = getState();
 
         // 1. Import adventure manager early so we can sync its cache
-        const advModule = await import('../adventure-manager/index.js');
+        const advModule = await import('@features/adventure-manager/index.js');
 
         // 2. Ensure the adventure is loaded into state
         let adventure = state.adventures?.find(a => a.id === 'lantern_at_dusk');
@@ -1114,7 +1114,7 @@ function navigateToCharacters() {
     return;
   }
   // Fallback: use router
-  import('../../router.js')
+  import('@js/router.js')
     .then(module => module.navigate('characters'))
     .catch(() => showToast('Character editor not available', 'error'));
 }

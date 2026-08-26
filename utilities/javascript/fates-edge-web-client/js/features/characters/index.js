@@ -56,15 +56,15 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
+import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
 import { getCharacter, 
 	addCharacter, 
 	updateCharacter,
 	deleteCharacter, 
 	getState, 
-	saveState } from '../../core/state.js';
-import { createCharacterCard } from '../../components/CharacterCard.js';
-import { showToast } from '../../components/Toast.js';
+	saveState } from '@core/state.js';
+import { createCharacterCard } from '@components/CharacterCard.js';
+import { showToast } from '@components/Toast.js';
 
 // ============================================================
 // GAME DATA CONSTANTS (from Player's Guide)

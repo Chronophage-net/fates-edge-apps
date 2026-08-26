@@ -35,10 +35,10 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { generateId, escHtml, safeParseInt, clamp } from '../../core/utils.js';
-import { getState, addCharacter } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { loadPatronData } from '../patrons/index.js';
+import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { getState, addCharacter } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { loadPatronData } from '@features/patrons/index.js';
 
 // ─── Game Data Constants (from Player's Guide) ─────────────────────
 

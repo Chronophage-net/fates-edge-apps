@@ -1,4 +1,4 @@
-import { escHtml } from '../core/utils.js';
+import { escHtml } from '@core/utils.js';
 
 /**
  * Render a character's avatar as an <img> if char.avatar is set, or a

@@ -37,7 +37,7 @@ async function loadModules() {
     }
 
     try {
-        toastModule = await import('../components/Toast.js');
+        toastModule = await import('@components/Toast.js');
     } catch (e) {
         console.warn('Toast module not available, using mock:', e);
         toastModule = { 

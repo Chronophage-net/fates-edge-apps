@@ -5,9 +5,9 @@
  * Followers, Assets, Scene Tools, VTT, and Campaign Status
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
+import { getState, saveState } from '@core/state.js';
+import { escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
 
 let container = null;
 let refreshInterval = null;

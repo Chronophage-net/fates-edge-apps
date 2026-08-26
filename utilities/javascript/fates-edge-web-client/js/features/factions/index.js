@@ -14,9 +14,9 @@
  * tab content area (swap-in "screens"), consistent with the rest of the app.
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
+import { getState, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
 
 // ============================================================
 // CONSTANTS

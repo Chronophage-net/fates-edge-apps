@@ -66,11 +66,11 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { vttStore } from '../../core/vtt-store.js';
-import { getState, getCharacter, updateCharacter } from '../../core/state.js';
-import { escHtml, generateId, safeParseInt } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { performRoll } from '../../core/dice.js';
+import { vttStore } from '@core/vtt-store.js';
+import { getState, getCharacter, updateCharacter } from '@core/state.js';
+import { escHtml, generateId, safeParseInt } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { performRoll } from '@core/dice.js';
 
 import {
     ensureWikiLoaded, parseIngredientsFromWiki, parseRecipesFromWiki, parseCodexFromWiki

@@ -10,7 +10,7 @@
  * this module; see that app.css section for the class reference.
  */
 
-import { escHtml } from '../../core/utils.js';
+import { escHtml } from '@core/utils.js';
 import { TIER_META, CATEGORY_META } from './data.js';
 import {
     getIngredients, getCraftedItems, getAttunedItems, getCraftingLog,

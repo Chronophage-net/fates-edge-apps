@@ -20,11 +20,11 @@ import {
     getSocketId,
     getWSStatus,
     getConnectedClients
-} from '../../core/websocket.js';
-import { fetchTurnIceServers } from '../../core/turn.js';
-import { getRecordingStatus } from '../../core/media.js';
-import { getSyncManager } from '../../core/sync/index.js';
-import { getSearchStatus } from '../search/index.js';
+} from '@core/websocket.js';
+import { fetchTurnIceServers } from '@core/turn.js';
+import { getRecordingStatus } from '@core/media.js';
+import { getSyncManager } from '@core/sync/index.js';
+import { getSearchStatus } from '@features/search/index.js';
 
 const REFRESH_INTERVAL_MS = 5000;
 let refreshTimer = null;
@@ -76,7 +76,7 @@ async function collectVoiceStatus() {
     // page works even if voice was never initialized this session.
     let voice = null;
     try {
-        voice = await import('../vtt/voice.js');
+        voice = await import('@features/vtt/voice.js');
     } catch (e) {
         return { available: false, error: e.message };
     }

@@ -13,11 +13,11 @@
  * - Supports both global catalog and character-specific editing
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml, safeParseInt, clamp } from '../../core/utils.js';
-import { parseEffectText } from '../../core/talent-effects.js';
-import { loadTalentCatalog } from '../../core/talent-loader.js';
+import { getState, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { parseEffectText } from '@core/talent-effects.js';
+import { loadTalentCatalog } from '@core/talent-loader.js';
 
 // ============================================================
 // GAME CONSTANTS (from Player's Guide)

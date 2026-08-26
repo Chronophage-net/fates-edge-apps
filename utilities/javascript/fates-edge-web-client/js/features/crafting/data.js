@@ -7,7 +7,7 @@
  * module can be imported independently for data-only concerns.
  */
 
-import { getState, saveState } from '../../core/state.js';
+import { getState, saveState } from '@core/state.js';
 
 // ============================================================
 // WIKI DATA LOADING (ingredients, recipes, and the Codex)

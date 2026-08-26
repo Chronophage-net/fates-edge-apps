@@ -19,7 +19,7 @@
  * tree.
  */
 
-import { onWSEvent, offWSEvent } from '../../core/websocket.js';
+import { onWSEvent, offWSEvent } from '@core/websocket.js';
 
 const ENABLED_KEY = 'fates-edge-tts-narration-enabled';
 const VOLUME_KEY = 'fates-edge-tts-narration-volume';

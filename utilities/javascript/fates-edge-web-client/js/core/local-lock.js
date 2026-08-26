@@ -24,7 +24,7 @@
  * any changes needed here.
  */
 
-import { showToast } from '../components/Toast.js';
+import { showToast } from '@components/Toast.js';
 
 const LOCK_HASH_KEY = 'fates-edge-local-lock-hash';
 const LOCKED_FLAG_KEY = 'fates-edge-locked';

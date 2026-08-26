@@ -2,8 +2,8 @@
 import { state, getLayer, isLayerVisibleNow, layersInDrawOrder } from './state.js';
 import { saveWhiteboardData } from './persistence.js';
 import { restoreDrawings, renderOverlay, updateStats } from './renderer.js';
-import { showToast } from '../../../components/Toast.js';
-import { escHtml } from '../../../core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
 import { DEFAULT_LAYER_DEFS } from './constants.js';
 
 export let activeLayerId = 'drawing';

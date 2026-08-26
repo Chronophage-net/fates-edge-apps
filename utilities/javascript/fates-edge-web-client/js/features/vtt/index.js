@@ -4,7 +4,7 @@
  * Exposes window.sendToVTT for other modules to post messages/cards.
  */
 
-import { isConnectedToServer, onEvent, offEvent } from '../../core/websocket.js';
+import { isConnectedToServer, onEvent, offEvent } from '@core/websocket.js';
 import * as LocalVTT from './vtt-local.js';
 import * as ConnectedVTT from './vtt-connected.js';
 

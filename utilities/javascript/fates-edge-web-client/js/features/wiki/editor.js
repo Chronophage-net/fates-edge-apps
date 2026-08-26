@@ -4,9 +4,9 @@
  * Includes HTML sanitization to prevent XSS from markdown content.
  */
 
-import { getState, addWikiEntry, updateWikiEntry, saveState } from '../../core/state.js';
-import { escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
+import { getState, addWikiEntry, updateWikiEntry, saveState } from '@core/state.js';
+import { escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
 
 let modalOverlay = null;
 let currentEntryId = null;

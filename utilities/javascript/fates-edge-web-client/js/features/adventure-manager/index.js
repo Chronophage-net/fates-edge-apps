@@ -62,16 +62,16 @@
  *      timers/encounters/scenes.
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml, safeParseInt } from '../../core/utils.js';
-import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-import { isConnectedToServer, sendEvent, onWSEvent } from '../../core/websocket.js';
-import { loadBestiaryData, getCreatureDescription } from '../encounters/bestiary.js';
-import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '../../core/objective-types.js';
+import { getState, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml, safeParseInt } from '@core/utils.js';
+import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
+import { isConnectedToServer, sendEvent, onWSEvent } from '@core/websocket.js';
+import { loadBestiaryData, getCreatureDescription } from '@features/encounters/bestiary.js';
+import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '@core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
-import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
-import { openInlineScreen, closeInlineScreen, inlineScreenShell } from '../../components/InlineScreen.js';
+import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
+import { openInlineScreen, closeInlineScreen, inlineScreenShell } from '@components/InlineScreen.js';
 
 // ============================================================
 // CONSTANTS
@@ -1285,7 +1285,7 @@ async function startSceneEncounter(adventureId, actIndex, sceneIndex) {
     }
 
     try {
-        const combat = await import('../encounters/combat.js');
+        const combat = await import('@features/encounters/combat.js');
         combat.openTracker(encounter.id);
     } catch (e) {
         console.warn('[Adventures] Failed to open Combat Tracker:', e);
@@ -1580,7 +1580,7 @@ async function importCrownSpreadAsAdventure() {
     }
     let decks;
     try {
-        decks = await import('../decks/index.js');
+        decks = await import('@features/decks/index.js');
     } catch (e) {
         showToast('Decks module not available.', 'error');
         return null;
