@@ -91,11 +91,9 @@ class FeatureImporter {
   async loadAdvancedModules() {
     const advancedModules = [
       'search',
-      'sync',
       'presence',
       'vtt',
       'dashboard',
-      'builder',
     ];
     
     for (const module of advancedModules) {
@@ -120,7 +118,10 @@ class FeatureImporter {
       }
       
       // Dynamic import using resolved name
-      const module = await import(`../features/${resolvedName}/index.js`);
+      // FIX: this file lives at js/feature-importer.js, so '../features/'
+      // pointed outside js/ entirely (a nonexistent top-level features/ dir)
+      // -- every call here has always failed silently into the catch below.
+      const module = await import(`./features/${resolvedName}/index.js`);
       this.moduleCache.set(`feature:${resolvedName}`, module);
       
       const aliasMsg = (resolvedName !== moduleName) ? ` (via alias ${moduleName})` : '';
