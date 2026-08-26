@@ -7,7 +7,7 @@
 > files if you only need one category.
 
 > Wondering what happens to this project if the author becomes
-> unreachable? See [`SUCCESSION.md` in fates-edge-docs](https://github.com/Chronophage-net/fates-edge-docs/blob/main/SUCCESSION.md)
+> unreachable? See [Succession & Continuity](https://dev.fates-edge.com/succession) on the dev portal
 > — none of the licenses below depend on active maintenance to remain valid.
 
 This repository contains two distinct categories of intellectual property:
