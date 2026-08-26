@@ -24,7 +24,7 @@ export default defineConfig({
         emptyOutDir: true,
         rollupOptions: {
             input: {
-                main: resolve(__dirname, 'index.html'),
+                main: resolve(import.meta.dirname, 'index.html'),
             },
             output: {
                 entryFileNames: 'assets/[name].[hash].js',
@@ -39,13 +39,13 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@': resolve(__dirname, './'),
-            '@js': resolve(__dirname, './js'),
-            '@core': resolve(__dirname, './js/core'),
-            '@components': resolve(__dirname, './js/components'),
-            '@features': resolve(__dirname, './js/features'),
-            '@tools': resolve(__dirname, './js/tools'),
-            '@data': resolve(__dirname, './data'),
+            '@': resolve(import.meta.dirname, './'),
+            '@js': resolve(import.meta.dirname, './js'),
+            '@core': resolve(import.meta.dirname, './js/core'),
+            '@components': resolve(import.meta.dirname, './js/components'),
+            '@features': resolve(import.meta.dirname, './js/features'),
+            '@tools': resolve(import.meta.dirname, './js/tools'),
+            '@data': resolve(import.meta.dirname, './data'),
         },
     },
     optimizeDeps: {
@@ -61,7 +61,7 @@ export default defineConfig({
             const urlPath = req.url.split('?')[0];
             // Remove leading slash from urlPath BEFORE resolving
             const cleanPath = urlPath.replace(/^\/+/, '');
-            const filePath = resolve(__dirname, 'data', 'docs', cleanPath);
+            const filePath = resolve(import.meta.dirname, 'data', 'docs', cleanPath);
             
             if (fs.existsSync(filePath)) {
                 const ext = filePath.split('.').pop().toLowerCase();
@@ -96,7 +96,7 @@ export default defineConfig({
         server.middlewares.use('/data/adventures', (req, res, next) => {
             const urlPath = req.url.split('?')[0];
             const cleanPath = urlPath.replace(/^\/+/, '');
-            const filePath = resolve(__dirname, 'data', 'adventures', cleanPath);
+            const filePath = resolve(import.meta.dirname, 'data', 'adventures', cleanPath);
             
             if (fs.existsSync(filePath)) {
                 const ext = filePath.split('.').pop().toLowerCase();
@@ -129,8 +129,8 @@ export default defineConfig({
 
         server.httpServer?.once('listening', () => {
             console.log('\n📂 Dev server started. Checking data paths...');
-            const dataPath = resolve(__dirname, 'data');
-            const docsPath = resolve(__dirname, 'data', 'docs');
+            const dataPath = resolve(import.meta.dirname, 'data');
+            const docsPath = resolve(import.meta.dirname, 'data', 'docs');
             
             if (fs.existsSync(dataPath)) {
                 console.log(`  ✅ ${dataPath}`);
