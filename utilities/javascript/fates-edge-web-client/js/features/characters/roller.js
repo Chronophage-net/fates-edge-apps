@@ -17,12 +17,12 @@
  * - Regions match the guide's world chapter
  */
 
-import { getCharacter, updateCharacter, addRoll, saveState, getState, getMacros, addMacro, deleteMacro } from '../../core/state.js';
-import { performRoll } from '../../core/dice.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml, safeParseInt, clamp } from '../../core/utils.js';
-import { collectTalentModifiers, collectEquipmentModifiers, consumeTalentCharge } from '../../core/talent-effects.js';
-import { playDiceAnimation } from '../../components/Dice3D.js';
+import { getCharacter, updateCharacter, addRoll, saveState, getState, getMacros, addMacro, deleteMacro } from '@core/state.js';
+import { performRoll } from '@core/dice.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { collectTalentModifiers, collectEquipmentModifiers, consumeTalentCharge } from '@core/talent-effects.js';
+import { playDiceAnimation } from '@components/Dice3D.js';
 
 // ============================================================
 // GAME CONSTANTS (from Player's Guide)
@@ -196,7 +196,7 @@ let keyboardShortcutHandler = null;
 
 async function loadRegions() {
     try {
-        const decksModule = await import('../decks/index.js');
+        const decksModule = await import('@features/decks/index.js');
         if (decksModule.getRegionNames && decksModule.getSelectedRegion) {
             const names = decksModule.getRegionNames();
             if (names && names.length > 0) {
@@ -1059,10 +1059,13 @@ export async function renderRollerUI(el) {
                     </div>
                 </div>
                 
-                <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
+                <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;align-items:center;">
                     <button class="btn btn-gold" id="roller-roll-btn">🎲 Roll Dice</button>
                     <button class="btn btn-secondary" id="roller-generate-npc-btn">👤 Generate NPC Name</button>
                     <button class="btn btn-secondary" id="roller-generate-names-btn">📋 Generate Names</button>
+                    <select id="roller-region-select" title="Region used for name generation" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem 0.5rem;font-size:0.85rem;">
+                        ${regionNames.map(r => `<option value="${escHtml(r)}" ${r === selectedRegion ? 'selected' : ''}>${escHtml(r)}</option>`).join('')}
+                    </select>
                     <button class="btn btn-secondary" id="roller-save-macro-btn" title="Save the current Attribute/Skill/DV/Position/Boons/Assist/Fatigue/Harm as a one-click macro">⭐ Save as Macro</button>
                 </div>
 
@@ -1113,7 +1116,7 @@ function attachRollerEvents() {
     if (regionSelect) {
         regionSelect.addEventListener('change', () => {
             selectedRegion = regionSelect.value;
-            import('../decks/index.js').then(module => {
+            import('@features/decks/index.js').then(module => {
                 if (module.setSelectedRegion) module.setSelectedRegion(selectedRegion);
             }).catch(() => {});
         });
@@ -1583,7 +1586,7 @@ function buildRollMessage(name, result, attr, skill, dv, position, attrName = ''
 }
 
 function sendToVTT(message, result) {
-    import('../vtt/index.js')
+    import('@features/vtt/index.js')
         .then(module => {
             if (module.addChatMessage && typeof module.addChatMessage === 'function') {
                 module.addChatMessage({

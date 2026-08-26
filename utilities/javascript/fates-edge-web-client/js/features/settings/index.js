@@ -26,11 +26,11 @@ import {
     setPasswordHash,
     saveState,
     addCharacter
-} from '../../core/state.js';
-import { checkPasswordGate, hashPassword } from '../../core/password.js';
-import { escHtml, formatDate } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { getUserAvatar } from '../../core/gravatar.js';
+} from '@core/state.js';
+import { checkPasswordGate, hashPassword } from '@core/password.js';
+import { escHtml, formatDate } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { getUserAvatar } from '@core/gravatar.js';
 import {
     connectWebSocket,
     disconnectWebSocket,
@@ -40,7 +40,7 @@ import {
     sendWSMessage,
     onWSEvent,
     isConnectedToServer
-} from '../../core/websocket.js';
+} from '@core/websocket.js';
 import {
     installPack,
     uninstallPack,
@@ -48,19 +48,19 @@ import {
     getPack,
     getDocuments,
     initPackManager
-} from '../../core/pack-manager.js';
+} from '@core/pack-manager.js';
 import {
     getThemes,
     getTheme,
     setTheme as applyTheme,
     getCurrentPreference,
     getResolvedThemeId
-} from '../../core/theme-manager.js';
-import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
+} from '@core/theme-manager.js';
+import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
 import {
     loadAdventureManifest,
     loadAdventureFromFile
-} from '../adventure-manager/index.js';
+} from '@features/adventure-manager/index.js';
 
 let container = null;
 let themeChangeListenerAttached = false;
@@ -966,6 +966,26 @@ export function render(el) {
                 <div id="session-archives"></div>
                 <button class="btn btn-sm btn-primary mt-1" id="settings-new-session">📦 New Session (archive current)</button>
             </div>
+
+            <!-- ============================================================
+                 DATA MANAGEMENT
+                 Backup/restore/wipe everything in local storage. The
+                 handlers (exportAllData/importAllData/clearAllDataHandler)
+                 already existed and were wired in attachEvents(), but this
+                 panel was never actually rendered -- restored here.
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>💾 Data Management</h3>
+                </div>
+                <p class="text-muted small">Back up everything (characters, campaign state, settings) to a file, restore from a backup, or wipe all local data.</p>
+                <div class="flex" style="gap:0.5rem;flex-wrap:wrap;">
+                    <button class="btn btn-sm btn-primary" id="settings-export-btn">⬇️ Export All Data</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-import-btn">⬆️ Import Data</button>
+                    <input type="file" id="settings-import-file" accept="application/json" style="display:none;" />
+                    <button class="btn btn-sm btn-danger" id="settings-clear-btn">🗑️ Clear All Data</button>
+                </div>
+            </div>
             
             <!-- ============================================================
                  THEME & APPEARANCE
@@ -1042,8 +1062,10 @@ export function render(el) {
                         sysadmin/DevOps consultant with 20+ years in FreeBSD / Linux.
                     </p>
                     <p style="margin:0 0 0.8rem; color:var(--text); font-size:0.95rem;">
-                        I designed <em>Fate's Edge</em> and built this Virtual Tabletop as my first large 
-                        software project — an open‑source companion that puts the narrative first.
+                        <em>Fate's Edge</em> is the game I always wanted to run and could never quite find —
+                        so I built the system, then built this Virtual Tabletop to run it in, entirely as a
+                        first software project. Every layer of it exists because a rule, a tool, or a table
+                        actually needed it.
                     </p>
                     <blockquote style="margin:0.8rem 0; padding:0.8rem 1rem; background:rgba(201,168,76,0.05); border-left:3px solid var(--gold); border-radius:4px; font-style:italic; color:var(--text2); font-size:0.9rem;">
                         <p style="margin:0;">
@@ -1052,8 +1074,12 @@ export function render(el) {
                             but that pattern has served me for decades.”
                         </p>
                     </blockquote>
-                    <p style="margin:0.5rem 0 0; color:var(--text3); font-size:0.85rem;">
+                    <p style="margin:0.5rem 0 0.8rem; color:var(--text3); font-size:0.85rem;">
                         ☕ Fueled by coffee · 🧠 Neurodivergent & proud · 🌱 Community grows from within and without
+                    </p>
+                    <p style="margin:0; font-size:0.9rem;">
+                        📝 I write about the build (and the occasional detour) on the
+                        <a href="https://blog.fates-edge.com" target="_blank" rel="noopener" style="color:var(--gold);">dev blog</a>.
                     </p>
                 </div>
             </div>
@@ -1195,7 +1221,7 @@ function initSyncUI() {
         }
     }
     
-    import('../../core/sync/index.js')
+    import('@core/sync/index.js')
         .then(module => {
             const { syncManager } = module;
             window.__syncManager = syncManager;
@@ -1293,7 +1319,7 @@ async function submitAccountAuth(mode) {
         // Keep any already-connected sync session's token current too --
         // it only re-reads localStorage at connect() time otherwise.
         try {
-            const { syncManager } = await import('../../core/sync/index.js');
+            const { syncManager } = await import('@core/sync/index.js');
             syncManager.authToken = data.token;
         } catch (e) { /* sync module not loaded yet -- fine, connect() will pick it up */ }
 
@@ -1316,7 +1342,7 @@ async function logoutAccount() {
     localStorage.removeItem('fates-edge-auth-token');
     localStorage.removeItem('fates-edge-auth-username');
     try {
-        const { syncManager } = await import('../../core/sync/index.js');
+        const { syncManager } = await import('@core/sync/index.js');
         syncManager.authToken = '';
     } catch (e) { /* fine */ }
     showToast('Logged out', 'info');
@@ -1347,7 +1373,7 @@ async function connectToSyncServer() {
     }
 
     try {
-        const { syncManager } = await import('../../core/sync/index.js');
+        const { syncManager } = await import('@core/sync/index.js');
 
         syncManager.lastPassword = password;
         localStorage.setItem('fates-edge-client-role', userRole);
@@ -1378,7 +1404,7 @@ async function connectToSyncServer() {
 
 async function disconnectFromSyncServer() {
     try {
-        const { syncManager } = await import('../../core/sync/index.js');
+        const { syncManager } = await import('@core/sync/index.js');
         syncManager.disconnect();
         showToast('Disconnected from campaign', 'info');
     } catch (e) {
@@ -1416,7 +1442,7 @@ function saveUserProfile() {
         emailDisplay.textContent = userEmail || 'No email set';
     }
     
-    import('../../core/sync/index.js').then(module => {
+    import('@core/sync/index.js').then(module => {
         const { syncManager } = module;
         if (syncManager.isConnected && syncManager.setName) {
             syncManager.setName(userName || 'Player');
@@ -1641,7 +1667,7 @@ export function attachEvents() {
     document.getElementById('sync-connect-btn')?.addEventListener('click', connectToSyncServer);
     document.getElementById('sync-disconnect-btn')?.addEventListener('click', disconnectFromSyncServer);
     document.getElementById('sync-refresh-btn')?.addEventListener('click', () => {
-        import('../../core/sync/index.js').then(module => {
+        import('@core/sync/index.js').then(module => {
             if (module.syncManager && module.syncManager.requestFullSync) {
                 module.syncManager.requestFullSync();
                 showToast('Refreshing sync...', 'info');
@@ -1711,7 +1737,7 @@ export function attachEvents() {
         setTimeout(() => {
             const homeTab = document.querySelector('#tab-home');
             if (homeTab) {
-                import('../home/index.js').then(module => {
+                import('@features/home/index.js').then(module => {
                     if (module.render) module.render(homeTab);
                 }).catch(() => {
                     window.location.reload();
@@ -1730,7 +1756,7 @@ export function attachEvents() {
         setTimeout(() => {
             const spellcraftTab = document.querySelector('#tab-spellcraft');
             if (spellcraftTab) {
-                import('../spellcraft/index.js').then(module => {
+                import('@features/spellcraft/index.js').then(module => {
                     if (module.render) module.render(spellcraftTab);
                 }).catch(() => {
                     window.location.reload();

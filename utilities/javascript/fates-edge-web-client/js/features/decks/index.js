@@ -35,15 +35,15 @@
  *   - A: Ace → 10 segments
  */
 
-import { shuffleArray } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { getState, addTimer } from '../../core/state.js';
-import { logRecordingEvent } from '../../core/media.js';
+import { shuffleArray } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { getState, addTimer } from '@core/state.js';
+import { logRecordingEvent } from '@core/media.js';
 import { parseRegionDescription } from './region-parser.js';
 // ─── Use shared discovery ────────────────────────────────────
-import { initializeRegions, discoverRegions } from '../../core/discovery.js';
+import { initializeRegions, discoverRegions } from '@core/discovery.js';
 // ─── Role-based access ──────────────────────────────────────
-import { getFeatureAccess } from '../../core/feature-toggles.js';
+import { getFeatureAccess } from '@core/feature-toggles.js';
 
 // ============================================================
 // CONSTANTS
@@ -683,7 +683,7 @@ function drawOneOfEachSuit() {
 
 async function getSyncManager() {
     try {
-        const module = await import('../../core/sync/index.js');
+        const module = await import('@core/sync/index.js');
         return module.syncManager;
     } catch { return null; }
 }
@@ -894,6 +894,7 @@ async function handleRegionChange() {
 
     selectedRegion = regionName;
     const data = await fetchRegionData(regionName);
+    regionData = data;
 
     if (descEl) {
         if (data && data.description) {
@@ -1355,7 +1356,7 @@ function renderCards(cards, isCrown) {
 }
 
 function createTimerFromCard(cardName, segments) {
-    import('../timers/index.js').then(module => {
+    import('@features/timers/index.js').then(module => {
         if (module.openTimerEditor) {
             module.openTimerEditor({ name: `Crown Spread: ${cardName}`, segments, current: 0 });
             showToast(`⏱️ Creating timer from ${cardName} (${segments} segments)`, 'success');

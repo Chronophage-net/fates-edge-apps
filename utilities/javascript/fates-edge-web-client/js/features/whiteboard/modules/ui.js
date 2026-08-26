@@ -17,23 +17,23 @@ import {
 } from './combat.js';
 import { populateRoster, toggleRosterPanel, handleRosterDrop } from './roster.js';
 import { maybeShowOnboarding, showOnboardingModal } from './onboarding.js';
-import { showToast } from '../../../components/Toast.js';
-import { escHtml } from '../../../core/utils.js';
-import { isConnectedToServer, sendMessage } from '../../../core/websocket.js';
-import { onVoiceClientsChanged } from '../../vtt/voice.js';
-import { openKonrehModal } from '../../kon-reh/index.js';
-import { initKonrehVttBridge, challengeToKonreh } from '../../kon-reh/vtt-bridge.js';
-import { openTollVeilModal } from '../../kon-reh/toll-and-veil.js';
-import { initTollVeilVttBridge, openTollVeilTable } from '../../kon-reh/toll-veil-vtt-bridge.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
+import { isConnectedToServer, sendMessage } from '@core/websocket.js';
+import { onVoiceClientsChanged } from '@features/vtt/voice.js';
+import { openKonrehModal } from '@features/kon-reh/index.js';
+import { initKonrehVttBridge, challengeToKonreh } from '@features/kon-reh/vtt-bridge.js';
+import { openTollVeilModal } from '@features/kon-reh/toll-and-veil.js';
+import { initTollVeilVttBridge, openTollVeilTable } from '@features/kon-reh/toll-veil-vtt-bridge.js';
 
 // Wire the Kon'reh <-> VTT bridge's incoming-event listener once, at
 // module load, so a challenge can arrive even before the Whiteboard
 // panel itself has been opened this session.
 initKonrehVttBridge();
 initTollVeilVttBridge();
-import { logRecordingEvent } from '../../../core/media.js';
+import { logRecordingEvent } from '@core/media.js';
 import { activeLayerId } from './layers.js';
-import { getCharacters as getCoreCharacters } from '../../../core/state.js';
+import { getCharacters as getCoreCharacters } from '@core/state.js';
 
 // ============================================================
 // WHITEBOARD → VTT CHAT BRIDGE
@@ -56,7 +56,7 @@ function getWhiteboardSenderName() {
 }
 
 function postToVTTChat(text) {
-    import('../../vtt/index.js')
+    import('@features/vtt/index.js')
         .then(module => {
             if (module.addChatMessage && typeof module.addChatMessage === 'function') {
                 module.addChatMessage({ text, sender: 'Whiteboard', system: true });
@@ -336,7 +336,7 @@ export function render(el) {
 
     const isConnected = isConnectedToServer();
     el.innerHTML = `
-        <div class="whiteboard-modern-layout flex flex-col gap-2">
+        <div id="whiteboard-modern-layout" class="whiteboard-modern-layout flex flex-col gap-2">
             <header class="flex-between" id="whiteboard-header">
                 <div>
                     <h1 class="page-title">Campaign Whiteboard</h1>
@@ -540,7 +540,7 @@ export function render(el) {
 export function attachEvents() {
     // ── Connect button ──
     document.getElementById('whiteboard-connect-btn')?.addEventListener('click', () => {
-        import('../../../core/websocket.js').then(ws => ws.default.initWebSocket()).catch(() => {});
+        import('@core/websocket.js').then(ws => ws.default.initWebSocket()).catch(() => {});
     });
 
     // ── Tool buttons ──

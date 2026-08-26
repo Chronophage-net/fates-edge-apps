@@ -8,10 +8,10 @@
  * v2 – Role‑based gating: non‑GM cannot create, edit, delete, or open combat tracker.
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { escHtml } from '../../core/utils.js';
-import { showToast } from '../../components/Toast.js';
-import { logToSession, addVTTEvent } from '../gm-tools/index.js';
+import { getState, saveState } from '@core/state.js';
+import { escHtml } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
 import { 
     loadBestiaryData, 
     loadWikiData, 
@@ -19,10 +19,10 @@ import {
     getCreatureDescription
 } from './bestiary.js';
 import { openTracker } from './combat.js';
-import { getObjectiveType, DEFAULT_OBJECTIVE_TYPE } from '../../core/objective-types.js';
+import { getObjectiveType, DEFAULT_OBJECTIVE_TYPE } from '@core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
-import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
-import { isConnectedToServer } from '../../core/websocket.js'
+import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
+import { isConnectedToServer } from '@core/websocket.js'
 let container = null;
 let bestiaryData = [];
 let filteredBestiary = [];
@@ -511,7 +511,7 @@ function renderQuickReference() {
 // RENDER ENCOUNTERS (with role‑based gating)
 // ============================================================
 
-function renderEncounters() {
+export function renderEncounters() {
     const el = document.getElementById('encounter-list');
     if (!el) return;
     const state = getState();
@@ -811,7 +811,7 @@ function deleteEncounterHandler(id) {
     showToast('Encounter deleted.', 'success');
 }
 
-function openEncounterEditor(id) {
+export function openEncounterEditor(id) {
     if (!isGM()) {
         showToast('Only the GM can edit encounters.', 'error');
         return;

@@ -18,10 +18,10 @@
  * - NEW: Magic Paths Tour – a full-screen slide-show introduction to each tradition
  */
 
-import { vttStore } from '../../core/vtt-store.js';
-import { getState, getCharacter, updateCharacter, addCharacter, saveState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml, generateId, safeParseInt } from '../../core/utils.js';
+import { vttStore } from '@core/vtt-store.js';
+import { getState, getCharacter, updateCharacter, addCharacter, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml, generateId, safeParseInt } from '@core/utils.js';
 
 // ─── Import sub‑components ──────────────────────────────────
 import { renderRites } from './components/rites.js';
@@ -1144,7 +1144,7 @@ function getAvailableTabs(char) {
     return tabs;
 }
 
-async function renderActiveTabContent() {
+export async function renderActiveTabContent() {
     const contentEl = document.getElementById('spellcraft-content');
     if (!contentEl) return;
     const char = getCharacterData();

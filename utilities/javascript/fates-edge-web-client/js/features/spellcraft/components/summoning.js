@@ -26,10 +26,10 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-import { getCharacterData, saveCharacter } from '../index.js';
-import { escHtml, generateId, safeParseInt } from '../../../core/utils.js';
-import { showToast } from '../../../components/Toast.js';
-import { getState } from '../../../core/state.js';
+import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
+import { escHtml, generateId, safeParseInt } from '@core/utils.js';
+import { showToast } from '@components/Toast.js';
+import { getState } from '@core/state.js';
 
 // ============================================================
 // CONSTANTS
@@ -402,7 +402,7 @@ export async function renderSummoning(el) {
     ).join('');
 
     let html = `
-        <div class="summoning-container" style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div id="summoning-container" class="summoning-container" style="display:flex;flex-direction:column;gap:0.5rem;">
 
             <!-- ─── Header ─────────────────────────────────────── -->
             <div class="summoning-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;background:linear-gradient(135deg, var(--bg2) 0%, var(--bg1) 100%);border-radius:var(--radius) var(--radius) 0 0;padding:0.3rem 0.8rem;">
