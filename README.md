@@ -164,7 +164,7 @@ Session Recording's `.srt` is **event-driven, not audio transcription** — buil
 
 The socket server runs as a single, dependency-free instance by default, and can scale two independent ways: `CLUSTER_WORKERS` uses more of one machine's CPU cores via Node's `cluster` module, and `REDIS_URL` runs multiple instances behind a load balancer. The two combine. See [`SCALING.md`](utilities/javascript/fates-edge-socket-server/SCALING.md).
 
-Multiplayer surfaces get the same security treatment as everything else: per-IP and per-connection rate limiting, per-room client caps, server-verified socket identities (a client can't spoof another player's `socketId`), sanitized network-supplied display names and rich text, and authoritative validation of anything with a stake attached (XP wagers, String debt). Found a security issue? See [`SECURITY.md`](SECURITY.md) for how to report it privately.
+Multiplayer surfaces get the same security treatment as everything else: per-IP and per-connection rate limiting, per-room client caps, server-verified socket identities (a client can't spoof another player's `socketId`), a server-stamped, unspoofable `verifiedGM` flag on every chat message (a client claiming `sender: "GM"` no longer gets the GM-only rich-HTML rendering unless the server's own role tracking for that connection agrees), role changes that only ever happen through the guarded request/approve-GM flow (a client can no longer just declare `role: "gm"` in a presence update), sanitized network-supplied display names and rich text, and authoritative validation of anything with a stake attached (XP wagers, String debt). Found a security issue? See [`SECURITY.md`](SECURITY.md) for how to report it privately.
 
 ## Documentation map
 

@@ -80,6 +80,7 @@ Notes:
 - `persist: true` writes through to `room_memberships.role`, so the grant survives reconnects.
 - **Demotions always persist**, regardless of how the promotion was made — a saved Co-GM can be fully revoked, not just silenced for one session.
 - A client's self-declared role on join is only trusted for `gm`/`player`/`spectator` — **neither `co-gm` nor `assistant-gm` is ever accepted from the client itself.** Each is only restored automatically when the account's persisted `room_memberships.role` already says the same value (i.e. a previously *saved* grant), so nobody can claim Co-GM or Assistant GM by simply asking for it at join time — including a client just claiming to be the AI GM Bot.
+- **Role can only ever change through the flow diagrammed above (or its REST equivalent).** The plain-WebSocket transport's `presence` handler (`server/ws-handlers.js`) used to also accept a `role` field on any presence update and write it straight to `client.role` with no check at all — a connected client could send `{ type: 'presence', role: 'gm' }` and grant itself the GM seat, completely bypassing `canManageGmSeat()`/the one-GM-per-room rule. Fixed in [4.24.1]: presence updates can change a client's display `name`/`activeView` but never its `role` on either transport.
 
 **v4.12: a REST equivalent exists too.** `POST /api/rooms/:code/clients/:clientId/role { role, persist? }` (API-key admin, see `server/api.js`) calls `room.setClientRole()` — the same mutate/persist/broadcast core as the diagram above (`_applyRoleChange()` in `room.js`), just entered from a route instead of a live GM connection. It exists because the socket path requires the *caller* to already be connected to the room holding the GM seat, which every REST-only integration (the Discord bot's admin commands are otherwise entirely `apiRequest()`-based) can't do. There is deliberately **no `canManageGmSeat()` check** on this path — the API key itself is the authorization, exactly like the neighboring kick/ban routes never check a sender's role either. `byId` in the resulting `role_update` broadcast is the literal string `'api'` rather than a client id, so recipients can tell a change came from outside the room.
 
@@ -113,6 +114,7 @@ flowchart LR
 | Role assignment in web client | `fates-edge-web-client/js/features/vtt/vtt-core.js`, `js/core/websocket.js` | `renderLocalPresence()` (picker UI, GM-only), `changeRole()` (sends `role_change_request`) |
 | GM seat request/approve | `server/room.js` | `handleGmRequest`, `handleGmApproval` |
 | Permission checks | `server/security.js` | `isGmLike`, `canManageGmSeat`, `isSpectator` |
+| **Not** a role-change path (display metadata only) | `server/ws-handlers.js` | `presence` case / `sendEvent`-relayed `type: 'presence'` branch |
 | Character edit authorization | `server/room.js` | `canEditCharacter` |
 | Character claim/release (API) | `server/api.js` | `claim-character` routes |
 | Character claim/release (sockets) | `server/socketio-handlers.js`, `server/ws-handlers.js` | `claim-character` / `release-character` handlers |

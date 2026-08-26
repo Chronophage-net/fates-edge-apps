@@ -449,7 +449,7 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 
 | Event Type          | Description                          | Payload Example                          |
 |---------------------|--------------------------------------|------------------------------------------|
-| `chat-message`      | Send a chat message                  | `{ "text": "Hello", "sender": "Alice" }` |
+| `chat-message`      | Send a chat message. `sender` is just a display label — see the Server → Client row below for how GM trust is actually decided. | `{ "text": "Hello", "sender": "Alice" }` |
 | `roll-dice`         | Broadcast a dice roll                | `{ "expr": "3d6+2", "total": 15, ... }`  |
 | `deck-draw`         | Draw cards from deck                 | `{ "count": 1, "region": "Acasia" }`     |
 | `deck-shuffle`      | Shuffle the deck                     | `{}`                                     |
@@ -503,7 +503,7 @@ The server responds with `handshake_ack` followed by `room-joined` (Socket.io's 
 | `connected`          | Connection established (plain WS)             | `{ "clientId": "...", "room": "AC12", "serverVersion": "..." }` |
 | `handshake_ack`       | Handshake/join accepted                       | `{ "clientId": "...", "clientRole": "gm", "activeClients": [...] }` |
 | `room-joined`         | (Socket.io) Full room snapshot on join, including characters and `chatHistory` (rolling window of recent messages, oldest first — see `MAX_CHAT_HISTORY`, default 50, 0 disables) | `{ "room": "...", "clients": [...], "whiteboard": {...}, "characters": [...], "chatHistory": [...] }` |
-| `chat-message`       | Incoming chat message                         | `{ "text": "...", "sender": "Bob", ... }`             |
+| `chat-message`       | Incoming chat message. `verifiedGM` is stamped by the server from its own role tracking for the sending connection, overwriting anything the client sent — it's the only trustworthy signal that a message actually came from the room's GM (or a co-GM); `sender` is a free-text display label a client can set to anything, including `"GM"`. | `{ "text": "...", "sender": "Bob", "verifiedGM": false, ... }` |
 | `tts-audio`           | Optional AI GM voice narration audio, broadcast to everyone in the room (including the bot's own connection) | `{ "audio": "<base64>", "text": "...", "voice": "default", "format": "wav" }` |
 | `soundboard-ambience` | Optional Reactive Soundscape cue, broadcast to everyone in the room (including the bot's own connection) — clients with a matching `trackId` in their local soundboard crossfade to it; if `url` is sent instead (SOUNDSCAPE_AUTO_SEARCH), each client auto-adds its own track from the URL first | `{ "mood": "tense", "trackId": "sound_abc123", "transitionDuration": 2000 }` |
 | `roll-result`        | Incoming dice roll                            | `{ "outcome": "success", "dice": [1,4,6], ... }`     |

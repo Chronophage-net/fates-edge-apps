@@ -2,6 +2,25 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## [4.24.1] - 2026-08-26
+
+GM Tools button audit — dead-handler fixes, chat sender verification, dead-code cleanup, import aliases
+
+### Fixed
+- GM Tools' region picker showed "No region data available" because `decks/index.js`'s `handleRegionChange()` fetched region data but never assigned it to the module-level `regionData` it read from; the "Create Encounter" button called into `encounters/index.js` via a dynamic import whose target function wasn't exported. Both fixed.
+- Audited every rendered button/handler across the client (dynamic-import `.then(module => module.X)` calls, `onclick`/`window.*` globals, `getElementById`/`querySelector` lookups) and fixed the rest of what turned up: `encounters/index.js` also needed `renderEncounters()` exported (used by `vtt/editor.js` and `encounters/editor.js`'s post-save refresh); `spellcraft/index.js` needed `renderActiveTabContent()` exported (used by `witchcraft.js`); the dice roller's region `<select>` was wired up in JS but the element itself was never rendered into the template; Settings' "Data Management" panel (export/import/clear) had working handlers but no panel markup to attach them to; `summoning.js` and `whiteboard/modules/ui.js` each had a `getElementById()` cleanup/lookup call targeting an id that was never actually set on the corresponding element.
+- `js/feature-importer.js`'s `loadAdvancedModules()` preloader had a broken relative path (`../features/${name}/index.js` from a file that lives directly under `js/`, resolving outside `js/` entirely) that had been silently failing every preload call since it was written; fixed to `./features/${name}/index.js`.
+
+### Security
+- VTT chat rendering trusted a message's client-supplied `sender` string alone to decide whether to apply GM-only formatting (`sender === 'GM'`) — meaning any player could get GM-styled chat output just by naming themselves "GM". The client now also requires the server-stamped `verifiedGM` flag (derived from the connection's server-held role, never from anything the message claims) before granting GM formatting; local/solo mode (no other players to spoof for) always passes. See the socket server's changelog/`ROLES.md` for the matching server-side stamp and the related presence-role-escalation fix.
+- Fixed a handful of unescaped-interpolation XSS spots found during the audit: avatar URLs in `vtt-core.js` and character names in `encounters/combat.js`'s defeat-log message are now run through `escHtml()` before being placed in `src`/`innerHTML`.
+
+### Removed
+- Deleted dead code found during the audit: `vtt/editor.js` and `vtt/combat.js` (an unused duplicate encounter editor and its now-orphaned compat shim), `features/sync/index.js` (unreferenced, removed from `router.js`'s dynamic-import map and from `js/feature-importer.js`'s preload list), and `features/builder/index.js` (unreferenced and already broken — its own relative import pointed outside the `js/` tree).
+
+### Changed
+- Reworked internal `import`/`export` specifiers across ~76 files under `js/` to use the existing `@core`/`@components`/`@features`/`@data` path aliases (plus two new ones, `@js` and `@tools`, added to `vite.config.js`) instead of relative `../../..`-style paths, now that the module tree is deep enough for that to consistently improve readability. Same-directory (`./x.js`) imports are left as-is. No behavioral change — verified with a full `vite build` and `node --check` across every file.
+
 ## [4.12.0] - 2026-08-14
 
 ### Role labels — new "Assistant GM" role
