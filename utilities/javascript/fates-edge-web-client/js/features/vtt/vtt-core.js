@@ -503,7 +503,18 @@ function renderRollDetails(rollData) {
     }).join(' ');
     
     const outcomeColor = getOutcomeColor(rollData.outcome || '');
-    const outcomeLabel = getOutcomeLabel(rollData.outcome || '');
+    // FIX: getOutcomeLabel(successes, dv, storyBeats) takes three NUMBERS
+    // and recomputes the label from scratch -- it does not accept an
+    // already-computed label string. Calling it as
+    // getOutcomeLabel(rollData.outcome || '') passed the outcome STRING
+    // (e.g. "Clean Success") as `successes` with `dv`/`storyBeats`
+    // undefined, so every comparison inside it (`"Clean Success" >=
+    // undefined`, `"Clean Success" > 0`) evaluated to false via NaN and
+    // it fell through to the final `else` branch every single time --
+    // rendering "Miss" on the card no matter what the roll actually was.
+    // rollData.outcome is already the resolved label from the server
+    // (see modules/dice.js's determineOutcome()); just use it directly.
+    const outcomeLabel = rollData.outcome || getOutcomeLabel(rollData.successes || 0, rollData.dv || 0, rollData.storyBeats || 0);
     const outcomeClass = getOutcomeClass(rollData.outcome || '');
     
     return `

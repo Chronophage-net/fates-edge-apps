@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/status-stable-brightgreen" alt="Status"/>
 </p>
 
-Connects a Foundry VTT world to the Fate's Edge [socket server](../../javascript/fates-edge-socket-server/), so chat, dice rolls, characters, scene notifications, the Deck of Consequences, Crown Spread readings, module listing, and GM election/promotion all sync in real time between Foundry and every other connected VTT client.
+Connects a Foundry VTT world to the Fate's Edge [socket server](../../javascript/fates-edge-socket-server/), so chat, dice rolls, characters, scene notifications, ad-hoc timers, the Deck of Consequences, Crown Spread readings, module listing, and GM election/promotion all sync in real time between Foundry and every other connected VTT client.
 
 ---
 
@@ -17,6 +17,7 @@ Connects a Foundry VTT world to the Fate's Edge [socket server](../../javascript
 - **Dice roll sync** — Foundry rolls relay to VTT clients.
 - **Character sync** — Harm, Fatigue, Boons, and Tier sync as journal entries.
 - **Scene notifications** — the active scene's name broadcasts to the VTT whenever it changes (one-way, Foundry → VTT).
+- **Ad-hoc timers** — create, tick, list, and remove freeform GM/AI-improvised timers that live on the server, independent of any loaded adventure — shared with every other connected client.
 - **Deck operations** — draw, shuffle, and Crown Spread, shown as both Foundry chat messages and journal entries.
 - **Module listing** — see modules available on the server.
 - **GM election & promotion** — request, approve/reject, and view client roles from the Foundry UI.
@@ -67,7 +68,7 @@ After enabling the module, configure it via **Settings → Configure Settings �
 | **Sync Chat** | Mirror ordinary (non-whisper) Foundry chat to the VTT. |
 | **Sync Dice Rolls** | Send Foundry rolls to the VTT. |
 | **Sync Characters** | Sync characters to the VTT as journal entries. |
-| **Sync Timers** | Reserved for a future scene/campaign timer integration — registered but not yet wired to any behavior. |
+| **Sync Timers** | Reserved for a future scene/campaign timer integration — registered but not yet wired to any behavior. Unrelated to ad-hoc timers below, which always sync regardless of this setting. |
 | **Sync Scenes** | Broadcast the active scene's name on change (notification only — doesn't touch the room whiteboard). |
 | **Sync Deck** | Sync Deck of Consequences draws with the VTT. |
 
@@ -115,7 +116,16 @@ getDeckStatus();              // { remaining, history }
 
 **Characters & scenes** — both sync automatically when their setting is enabled (character sheet/combat changes; active-scene changes). There's no separate manual button for either.
 
-The server also tracks adventure climax pacing and a per-module "Legacy Tracker" persistence schema; this bridge doesn't expose adventure-specific macros yet, but both ride along in `this.adventureState`/`Hooks.call('fates-edge-adventure-state', ...)` for anything downstream that wants them. Deck reseeding (`GET`/`POST /api/rooms/:code/deck/seed`) is likewise available server-side without a macro yet — the existing `deck-shuffled` handler already renders a reseed event generically.
+**Ad-hoc timers** (macros) — independent of any loaded adventure module, distinct from the Adventure Engine's own scene/campaign timers (ticked via `FatesEdgeBridge.sendAdventureTimer(name, amount, scope)`, no macro wrapper):
+
+```javascript
+createAdhocTimer('Ritual', 6);          // Create a 6-segment ad-hoc timer
+tickAdhocTimer('Ritual', 2);            // Tick it forward (negative amounts tick back)
+listAdhocTimers();                      // Request the current list from the server
+removeAdhocTimer('Ritual');             // Remove it
+```
+
+The server also tracks adventure climax pacing and a per-module "Legacy Tracker" persistence schema; this bridge doesn't expose adventure-specific macros yet, but both ride along in `this.adventureState`/`Hooks.call('fates-edge-adventure-state', ...)` for anything downstream that wants them. Deck reseeding (`GET`/`POST /api/rooms/:code/deck/seed`) is likewise available server-side without a macro yet — the existing `deck-shuffled` handler already renders a reseed event generically. Same story for the socket server's `GET /api/soundboard/search` (Freesound proxy behind the web client's GM soundboard "Search Sounds" modal) — available server-side, no macro here yet; unlike Roll20, Foundry's Node/Electron context *can* make the fetch, so a macro wrapping it is a reasonable future addition, just not one this bridge does today.
 
 ---
 
@@ -131,6 +141,10 @@ The server also tracks adventure climax pacing and a per-module "Legacy Tracker"
 | `setRegion(region)` | Change the default region |
 | `listModules()` | List loaded modules |
 | `getDeckStatus()` | `{ remaining, history }` |
+| `createAdhocTimer(name, segments, description)` | Create a new ad-hoc timer |
+| `tickAdhocTimer(name, amount)` | Tick an ad-hoc timer forward (default 1; negative ticks back) |
+| `removeAdhocTimer(name)` | Remove an ad-hoc timer |
+| `listAdhocTimers()` | Request the ad-hoc timer list from the server |
 | `requestGM()` | Send a GM request |
 | `approveGM(targetId)` | Approve a GM request (GM only) |
 | `getGMStatus()` | `{ currentGM, isGM, pendingRequests, clients }` |

@@ -24,10 +24,10 @@ It's a monorepo — one Git repository holding several related projects side by 
 | Component | What it is | Where |
 |---|---|---|
 | **Web client** | The main application — character sheets, dice, the VTT, encounters, the magic system, Kon'reh, Toll & Veil, and everything else players and GMs touch day to day. Runs entirely in the browser. | [`utilities/javascript/fates-edge-web-client/`](utilities/javascript/fates-edge-web-client/) |
-| **Socket server** | The real-time backend — WebSocket sync, GM election, the Deck of Consequences, the Adventure Engine, account auth, campaign persistence. A sibling directory in this same repo, not a separate project. | [`utilities/javascript/fates-edge-socket-server/`](utilities/javascript/fates-edge-socket-server/) |
+| **Socket server** | The real-time backend — WebSocket sync, GM election, the Deck of Consequences, the Adventure Engine, GM-improvised ad-hoc timers (deliberately separate from the Adventure Engine's own pre-authored scene/campaign timers), account auth, campaign persistence. A sibling directory in this same repo, not a separate project. | [`utilities/javascript/fates-edge-socket-server/`](utilities/javascript/fates-edge-socket-server/) |
 | **Terminal client** | A MUD-style CLI against the same server, mainly for testing and administration. | `utilities/javascript/fates-edge-terminal/` |
 | **Desktop client** | An Electron wrapper around the web client, for a native app instead of a browser tab. | [`utilities/javascript/fates-edge-desktop-client/`](utilities/javascript/fates-edge-desktop-client/) |
-| **Python CLI client** | A scriptable command-line/REPL client covering the full REST and WebSocket surface. | [`utilities/python/fates-edge-python-client/`](utilities/python/fates-edge-python-client/) |
+| **Python CLI client** | ⚠️ Mothballed -- a scriptable command-line/REPL client covering the full REST and WebSocket surface, no longer under active development. See its README for the maintained alternative. | [`utilities/python/fates-edge-python-client/`](utilities/python/fates-edge-python-client/) |
 | **Python desktop tool** | A standalone Tkinter character sheet + GM screen, offline-first with optional server sync. | [`utilities/python/fates_edge_tool/`](utilities/python/fates_edge_tool/) |
 | **Foundry VTT bridge** | A Foundry module that mirrors chat, rolls, characters, scenes, and GM roles between Foundry and the campaign server. | [`utilities/vtt_mods_bots/foundry_fates-edge-bridge/`](utilities/vtt_mods_bots/foundry_fates-edge-bridge/) |
 | **Discord bot** | Slash commands for the same campaign surface, plus GM election and admin tools, from inside Discord. | [`utilities/vtt_mods_bots/fates-edge-discord-bot/`](utilities/vtt_mods_bots/fates-edge-discord-bot/) |
@@ -125,7 +125,8 @@ Each has its own README with full setup steps:
 - [Roll20 API script](utilities/vtt_mods_bots/fates-edge-roll20/README.md) — paste into a Roll20 API script.
 - Avrae — paste `utilities/vtt_mods_bots/avrae_module.txt` into Discord to create the `!fe` alias.
 - [Terminal client](utilities/javascript/fates-edge-terminal/) — `node terminal-client.js`.
-- [Python CLI](utilities/python/fates-edge-python-client/README.md) — `pip install . && fates-edge-cli --help`.
+- [`fates-edge-cli.py`](utilities/javascript/fates-edge-socket-server/README.md) — bundled with the socket server; room/client/module management, backups, and ad-hoc timers from the command line: `python3 utilities/javascript/fates-edge-socket-server/fates-edge-cli.py --help`. The maintained scriptable CLI going forward.
+- [Python CLI](utilities/python/fates-edge-python-client/README.md) — ⚠️ mothballed; still works for what it already covers, but see its README for why `fates-edge-cli.py` above is now the recommended alternative. `pip install . && fates-edge-cli --help`.
 
 ## What it does
 
@@ -135,7 +136,7 @@ Each has its own README with full setup steps:
 
 **Running a campaign:** faction and patron management, a campaign Kanban board, a shared Whiteboard, GM Tools separated from the shared player view, and a Travel Planner for overland routes.
 
-**Playing together:** real-time sync of chat, dice, characters, timers, and scenes over WebSocket; the shared Deck of Consequences and Crown Spread; GM/Co-GM/Assistant-GM/Player/Spectator roles with election and promotion; WebRTC voice chat with TURN support for restrictive networks; and session recording (screen + mic, bundled with an auto-generated, event-driven `.srt`) — see [Transcription](#transcription) below for pairing that with a real speech-to-text tool.
+**Playing together:** real-time sync of chat, dice, characters, timers (both pre-authored Adventure Engine scene/campaign timers and GM-improvised ad-hoc timers), and scenes over WebSocket; the shared Deck of Consequences and Crown Spread; GM/Co-GM/Assistant-GM/Player/Spectator roles with election and promotion; WebRTC voice chat with TURN support for restrictive networks; and session recording (screen + mic, bundled with an auto-generated, event-driven `.srt`) — see [Transcription](#transcription) below for pairing that with a real speech-to-text tool.
 
 **Two original games**, built on the same real-time infrastructure and playable pass-and-play, solo against AI, or as a live multiplayer table: **Kon'reh**, a strategy board game with six AI opponent "Schools" and a coaching mode, and **Toll & Veil**, a card game with optional Points/XP/String stakes.
 

@@ -275,6 +275,22 @@ module.exports = {
                         .setDescription("The account's user ID")
                         .setRequired(true)
                 )
+        )
+        // ── NEW: Sound search (Freesound, via server/api.js's GET
+        // /api/soundboard/search proxy). Global, not room-scoped -- lookup
+        // only, same role as the AI GM bot's `!gm soundsearch` and the
+        // terminal client's `/soundsearch`. Nothing to "add" server-side:
+        // soundboard tracks live client-side in the web client's
+        // localStorage (core/soundboard.js), so this just posts preview
+        // links for the GM to grab from Discord.
+        .addSubcommand(sub =>
+            sub.setName('soundsearch')
+                .setDescription('Search Freesound for sounds (preview only)')
+                .addStringOption(opt =>
+                    opt.setName('query')
+                        .setDescription('Search terms (e.g. "thunder", "tavern murmur")')
+                        .setRequired(true)
+                )
         ),
 
     async execute(interaction, client) {
@@ -302,6 +318,7 @@ module.exports = {
                 case 'room-password':   return handleRoomPassword(interaction, client);
                 case 'ban-account':     return handleBanAccount(interaction, client);
                 case 'unban-account':   return handleUnbanAccount(interaction, client);
+                case 'soundsearch':     return handleSoundSearch(interaction, client);
             }
         } catch (err) {
             await interaction.editReply(`❌ Error: ${err.message}`);
@@ -897,4 +914,54 @@ function getUptime() {
     const minutes = Math.floor((uptime % 3600) / 60);
     const seconds = Math.floor(uptime % 60);
     return `${hours}h ${minutes}m ${seconds}s`;
+}
+// ─── Sound search (Freesound, via server/api.js's GET /api/soundboard/
+// search proxy) ───────────────────────────────────────────────────────
+// Global route, not room-scoped -- uses apiRequestAdmin() the same as
+// handleRoomPassword/handleBanAccount above. Lookup only: there's no
+// server-side soundboard to add a result *to* (tracks live client-side
+// in the web client's localStorage, see core/soundboard.js), so this
+// just posts an embed of preview links for the GM to grab in the web
+// client's Soundboard panel.
+async function handleSoundSearch(interaction, client) {
+    if (!client.vtt.connected) {
+        return interaction.editReply('❌ Not connected to VTT server.');
+    }
+    const query = interaction.options.getString('query');
+    if (!query || query.trim().length < 2) {
+        return interaction.editReply('❌ Search query must be at least 2 characters.');
+    }
+    try {
+        const data = await apiRequestAdmin(client, `/soundboard/search?q=${encodeURIComponent(query.trim())}&page=1&page_size=8`);
+        const results = data.results || [];
+        if (results.length === 0) {
+            return interaction.editReply(`🔎 No sounds found for "${query}".`);
+        }
+        const embed = new EmbedBuilder()
+            .setColor(0xd4af37)
+            .setTitle(`🔎 Sound search: "${query}"`)
+            .setDescription(`Showing ${results.length} of ${data.count || results.length} results. Add one from the web client's Soundboard panel → 🔎 Search Sounds.`)
+            .addFields(results.slice(0, 8).map(s => ({
+                name: `${s.name} — ${classifySoundLicense(s.license)}`,
+                value: `by ${s.username} · ${typeof s.duration === 'number' ? s.duration.toFixed(1) : '?'}s\n${s.preview_url || '(no preview available)'}`
+            })))
+            .setTimestamp();
+        await interaction.editReply({ embeds: [embed] });
+    } catch (err) {
+        await interaction.editReply(`❌ Sound search failed: ${err.message} (needs FREESOUND_API_KEY set on the socket server)`);
+    }
+}
+
+// Mirrors the web client's classifyLicense() (js/features/gm-tools/
+// sound-search.js) -- matched by CC license URL path segment; an
+// unrecognized license reads as restricted rather than "safe".
+function classifySoundLicense(licenseUrl) {
+    const url = String(licenseUrl || '').toLowerCase();
+    if (url.includes('/publicdomain/zero') || url.includes('/publicdomain/')) return 'CC0 (Public Domain)';
+    if (url.includes('/by-nc-sa/')) return 'CC BY-NC-SA (non-commercial, attribution)';
+    if (url.includes('/by-nc/')) return 'CC BY-NC (non-commercial, attribution)';
+    if (url.includes('/by-sa/')) return 'CC BY-SA (attribution)';
+    if (url.includes('/by/')) return 'CC BY (attribution)';
+    if (url.includes('sampling+')) return 'Sampling+ (attribution)';
+    return 'Unknown license (treat as restricted)';
 }

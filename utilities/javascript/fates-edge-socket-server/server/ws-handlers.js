@@ -12,6 +12,7 @@ const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter } = require('./security.js');
 const adventure = require('./adventure.js');
+const timers = require('./timers.js'); // NEW: ad-hoc timers -- deliberately separate from adventure.js, see server/timers.js header
 const auth = require('./auth.js');
 const turn = require('./turn.js');
 
@@ -428,6 +429,42 @@ function setupWSS(wss, appConfig) {
                         break;
                     }
 
+                    // NEW: ad-hoc timers (server/timers.js) -- GM/AI-
+                    // improvised timers independent of any loaded
+                    // adventure, deliberately kept separate from the
+                    // 'adventure-timer' case above (see server/timers.js's
+                    // header doc). Event names are prefixed 'adhoc-timer-'
+                    // so they can't collide with 'timer-ticked' above.
+                    case 'adhoc-timer-create': {
+                        try {
+                            const state = timers.createTimer(currentRoom, { name: data.name, segments: data.segments, description: data.description });
+                            room.broadcastToRoom(roomKey, 'adhoc-timer-created', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adhoc-timer-tick': {
+                        try {
+                            const state = timers.tickTimer(currentRoom, { ref: data.ref, name: data.name, amount: data.amount });
+                            room.broadcastToRoom(roomKey, 'adhoc-timer-ticked', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
+                    case 'adhoc-timer-remove': {
+                        try {
+                            const state = timers.removeTimer(currentRoom, data.ref !== undefined ? data.ref : data.name);
+                            room.broadcastToRoom(roomKey, 'adhoc-timer-removed', state);
+                        } catch (err) {
+                            ws.send(JSON.stringify({ type: 'error', message: err.message }));
+                        }
+                        break;
+                    }
+
                     case 'adventure-log': {
                         try {
                             const state = adventure.logBeat(currentRoom, { text: data.text, author: data.author });
@@ -466,6 +503,15 @@ function setupWSS(wss, appConfig) {
 
                     case 'adventure-state-request': {
                         ws.send(JSON.stringify({ type: 'adventure-state', ...adventure.getPublicState(currentRoom) }));
+                        break;
+                    }
+
+                    // NEW: ad-hoc timers (server/timers.js) -- request/
+                    // response, mirroring 'adventure-state-request' above
+                    // exactly, so a client can seed its local timer list
+                    // on join/mount without needing the REST routes.
+                    case 'adhoc-timer-request': {
+                        ws.send(JSON.stringify({ type: 'adhoc-timer-state', ...timers.getPublicState(currentRoom) }));
                         break;
                     }
 

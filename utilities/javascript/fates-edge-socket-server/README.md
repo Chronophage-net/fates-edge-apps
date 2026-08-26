@@ -11,14 +11,15 @@ The real-time backend for the Fate's Edge web toolkit: a WebSocket/Socket.IO ser
 - **Real-time sync** — chat, dice rolls, character updates, timers, and scene changes broadcast to every connected client, over both a Socket.IO transport and a raw `ws` transport (`server/socketio-handlers.js`, `server/ws-handlers.js`) so the client can use whichever is more reliable in a given deployment.
 - **Account authentication** — `server/auth.js` provides real user accounts: `POST /api/auth/register` and `POST /api/auth/login` hash passwords with bcrypt and issue JWT session tokens, alongside the existing per-request API-key authentication used for service-to-service calls.
 - **GM election & rooms** — `server/room.js` handles requesting, approving, and transferring GM status per room/campaign code, plus GM-granted Co-GM and Assistant-GM promotions, a read-only Spectator role, and a claim/release bridge that binds a player's saved character to a room's live roster. See [`ROLES.md`](ROLES.md) for the full model, with diagrams.
-- **The Adventure Engine** — `server/adventure.js` loads and runs structured adventures (acts, scenes, encounters, timers, knowledge/reveal state, climax pacing), with matching REST and Socket.IO/WS events for every mutation.
+- **The Adventure Engine** — `server/adventure.js` loads and runs structured adventures (acts, scenes, encounters, pre-authored scene/campaign timers, knowledge/reveal state, climax pacing), with matching REST and Socket.IO/WS events for every mutation.
+- **Ad-hoc timers** — `server/timers.js` tracks improvised, GM/AI-created timers ("Guard Patrol", "Village Unrest") in their own `room.data.timers` bucket, deliberately independent of the Adventure Engine above — they exist and persist whether or not an adventure module is loaded. This is also the mechanism the **AI GM Bot** (`fates-edge-ai-gm-bot`, a separate app) uses to create/tick/read timers: the bot has no local timer state of its own, only this server does, so every client (web client, terminal, Roll20, Discord bot, Foundry bridge, the AI GM Bot) sees the same timers. See `server/timers.js`'s header comment and the REST API table below.
 - **The shared Deck of Consequences** — `server/deck.js` draws cards from a region's deck and broadcasts the result to everyone in the room, using the same region data as the web client. Shuffles run on a per-room seedable PRNG (`server/rng.js`), so a room's shuffle sequence is reproducible from its seed via `GET`/`POST /api/rooms/:code/deck/seed`.
 - **Module management** — installable adventure modules can be listed, pushed to connected clients, and cleaned up; see [`MODULES.md`](MODULES.md).
 - **Scaling, two independent axes** — off by default (single process, no external dependency). `CLUSTER_WORKERS` uses more of one machine's CPU cores via Node's `cluster` module; `REDIS_URL` runs multiple instances behind a load balancer via a pub/sub relay. The two combine. See [`SCALING.md`](SCALING.md).
 - **Rate limiting & per-room client caps** — a general per-IP limit across the REST API, a per-connection message-rate limit on both WebSocket transports, and an optional per-room client cap. All configurable, all generous/off by default. See [`DESIGN.md`](DESIGN.md) §5.
 - **Campaign persistence** — `server/storage.js` stores campaigns, rooms, accounts, and characters in SQLite by default (`campaigns.db`; see [`INSTALL.md`](INSTALL.md#backing-up-your-campaigns-your-world-save) for backups), or Postgres/MySQL via `DATABASE_TYPE`/`DATABASE_URL`.
 - **TURN credential minting** — `server/turn.js` mints short-lived coturn credentials for the web client's voice chat, so it can traverse symmetric NAT and restrictive firewalls rather than relying on STUN alone.
-- **A bundled reference dataset** (`data/patrons/the_traveler.json`, `data/regions/acasia.json`) and a Python CLI (`fates-edge-cli.py`), so you can smoke-test deck draws and patron lookups without the full web client's data folder.
+- **A bundled reference dataset** (`data/patrons/the_traveler.json`, `data/regions/acasia.json`) and a Python CLI (`fates-edge-cli.py`, v1.6.0) — room/client/module management, backups, and ad-hoc timers from the command line, plus enough to smoke-test deck draws and patron lookups without the full web client's data folder.
 
 ---
 
@@ -121,6 +122,7 @@ fates-edge-socket-server/
 │   ├── server.js                 # re-exports index.js (server-start.js's require target)
 │   ├── socketio-handlers.js      # Socket.IO transport
 │   ├── storage.js
+│   ├── timers.js                 # Ad-hoc (GM/AI-improvised) timers -- deliberately separate from adventure.js
 │   ├── turn.js                   # short-lived TURN credential minting
 │   └── ws-handlers.js            # plain-WebSocket transport (the web client's default)
 ├── server-start.js             # entry point
@@ -155,6 +157,7 @@ Every route below is served from `server/api.js`. `authenticate` means the reque
 | POST | `/api/modules/:id/push` | ✅ | Broadcast an installed module to a room (or every room). |
 | POST | `/api/modules/:id/cleanup` | ✅ | Broadcast a cleanup request for a module id. |
 | GET/POST | `/api/rooms/:code/adventure*` | ✅ | Adventure Engine: load/reset/scene/encounter/timer/log/climax state, backed by `server/adventure.js`. |
+| GET/POST/DELETE | `/api/rooms/:code/timers*` | ✅ | Ad-hoc timers (create/list/tick/resolve/remove), backed by `server/timers.js` — deliberately separate from the Adventure Engine's own scene/campaign timers above. |
 | GET/POST | `/api/rooms/:code/whiteboard*`, `/api/rooms/:code/characters*`, `/api/rooms/:code/campaigns*` | ✅ | Whiteboard state, character sync, campaign save/load (see "Using campaign sharing" above). |
 | GET | `/api/data/docs` | – | This same endpoint list, machine-readable. |
 

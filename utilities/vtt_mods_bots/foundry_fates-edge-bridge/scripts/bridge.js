@@ -1,7 +1,7 @@
 /**
- * Fate's Edge Bridge v2.1.0 - Core WebSocket Connection
+ * Fate's Edge Bridge v2.2.0 - Core WebSocket Connection
  * Supports: Chat, Rolls, Deck, Crown Spread, Modules, Regions,
- *           GM Election/Promotion, Characters (full sync),
+ *           GM Election/Promotion, Characters (full sync), Ad-Hoc Timers,
  *           Whiteboard, Grid Combat, and Adventure Engine.
  */
 
@@ -56,6 +56,13 @@ export const FatesEdgeBridge = {
         log: [],
         updatedAt: null
     },
+
+    // Ad-hoc Timer state (server/timers.js) -- deliberately separate from
+    // adventureState.campaignTimers above: these are GM-improvised
+    // timers that exist independent of any loaded adventure module, and
+    // survive adventure reset/load. See fates-edge-socket-server's
+    // server/timers.js header doc for the full rationale.
+    adhocTimers: [],
     
     // Assistant GM suggestion queue (see ROADMAP.md item 2 in the AI GM
     // Bot repo). suggestionId -> Foundry ChatMessage id, so
@@ -408,6 +415,14 @@ export const FatesEdgeBridge = {
                 break;
             case 'timer-ticked':
                 this._handleTimerTicked(data);
+                break;
+            // Ad-hoc Timer events (server/timers.js) -- separate system
+            // from the adventure-module timers above.
+            case 'adhoc-timer-created':
+            case 'adhoc-timer-ticked':
+            case 'adhoc-timer-removed':
+            case 'adhoc-timer-state':
+                this._handleAdhocTimerState(data);
                 break;
             case 'adventure-log':
                 this._handleAdventureLog(data);
@@ -955,6 +970,40 @@ export const FatesEdgeBridge = {
         });
         Hooks.call('fates-edge-timers-updated', timers);
     },
+
+    // Handles all four adhoc-timer-* broadcasts/replies from the server
+    // (server/timers.js's getPublicState() shape: { timers, log,
+    // updatedAt, tickedTimer?, resolvedTimer? }). Journals each active
+    // timer's current progress, same presentation as _updateTimers()
+    // above, and separately calls out a tick/resolve when present.
+    _handleAdhocTimerState(data) {
+        this.adhocTimers = data.timers || [];
+        console.log(`⏱️ ${this.adhocTimers.length} ad-hoc timers synced`);
+
+        const ticked = data.tickedTimer;
+        if (ticked) {
+            const progress = Math.round(((ticked.current || 0) / (ticked.segments || 1)) * 100);
+            const color = ticked.full ? '#cc3333' : '#d4af37';
+            const content = `
+                <h2>⏱️ Ad-Hoc Timer Ticked: ${escapeHtml(ticked.name || 'Timer')}</h2>
+                <p><b>Progress:</b> ${ticked.current || 0}/${ticked.segments || 0}</p>
+                <div style="width:100%;height:10px;background:#333;border-radius:5px;overflow:hidden;border:1px solid #555;">
+                    <div style="width:${Math.min(progress, 100)}%;height:100%;background:${color};border-radius:5px;transition:width 0.3s;"></div>
+                </div>
+                <p><b>Status:</b> ${ticked.full ? '⚠️ COMPLETE' : '⏳ Active'}</p>
+                <hr><p><small>Synced from Fate's Edge VTT v2.2.0</small></p>
+            `;
+            this._createJournalEntry(`[Fate's Edge] Ad-Hoc Timer: ${ticked.name || 'Timer'}`, content);
+            if (ticked.full) ui.notifications.warn(`⚠️ Fate's Edge: Ad-hoc timer "${ticked.name}" is complete!`);
+        }
+
+        const resolved = data.resolvedTimer;
+        if (resolved) {
+            ui.notifications.info(`⏱️ Fate's Edge: Ad-hoc timer "${resolved.name}" resolved`);
+        }
+
+        Hooks.call('fates-edge-adhoc-timers-updated', this.adhocTimers);
+    },
     
     // ============================================================
     // GM Handlers
@@ -1187,6 +1236,41 @@ export const FatesEdgeBridge = {
             return false;
         }
         return this._send('adventure-timer', { ref: name, amount, scope });
+    },
+
+    // Ad-hoc Timer sends (server/timers.js) -- independent of any loaded
+    // adventure, see the adhocTimers state comment above.
+    sendAdhocTimerCreate(name, segments, description = '') {
+        if (!name) {
+            ui.notifications.warn('⚠️ Timer name required');
+            return false;
+        }
+        segments = Number(segments);
+        if (!Number.isFinite(segments) || segments <= 0) {
+            ui.notifications.warn('⚠️ Timer segments must be a positive number');
+            return false;
+        }
+        return this._send('adhoc-timer-create', { name, segments, description });
+    },
+
+    sendAdhocTimerTick(name, amount = 1) {
+        if (!name) {
+            ui.notifications.warn('⚠️ Timer name required');
+            return false;
+        }
+        return this._send('adhoc-timer-tick', { ref: name, amount });
+    },
+
+    sendAdhocTimerRemove(name) {
+        if (!name) {
+            ui.notifications.warn('⚠️ Timer name required');
+            return false;
+        }
+        return this._send('adhoc-timer-remove', { ref: name });
+    },
+
+    requestAdhocTimers() {
+        return this._send('adhoc-timer-request', {});
     },
     
     sendAdventureLog(text, author = null) {

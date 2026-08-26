@@ -25,6 +25,7 @@ const deck = require('./deck.js');
 const deckRng = require('./rng.js'); // NEW: per-room-seedable shuffle RNG (see rng.js)
 const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS, createRateLimiter, MAX_NAME_LENGTH } = require('./security.js');
 const adventure = require('./adventure.js');
+const timers = require('./timers.js'); // NEW: ad-hoc timers -- deliberately separate from adventure.js, see server/timers.js header
 const { deriveManifestFromContent } = require('./module-manifest-utils.js');
 const auth = require('./auth.js');
 const turn = require('./turn.js');
@@ -817,7 +818,16 @@ function createApiRouter(appConfig) {
                             author: content.author || '',
                             type: 'adventure',
                             icon: content.icon || '📖',
-                            route: null
+                            route: null,
+                            // FIX: this loop never set tier/tierRange at all (unlike
+                            // the server/modules/ branch above, which reads
+                            // manifest.tier || manifest.tierRange), even though every
+                            // standalone adventure JSON here already carries both
+                            // fields. Callers (e.g. the AI GM bot's adventure-director
+                            // `${m.tierRange || m.tier || '?'}`) always fell back to
+                            // '?' for anything sourced from this directory.
+                            tier: content.tier || content.tierRange || '?',
+                            tierRange: content.tierRange || content.tier || '?'
                         });
                     } catch (e) { /* skip invalid JSON */ }
                 }
@@ -951,6 +961,120 @@ function createApiRouter(appConfig) {
             }
         } catch (err) {
             res.status(500).json({ error: err.message });
+        }
+    });
+
+    // ─── Soundboard sound search (Freesound proxy) ──────────────────
+    // Backs the GM soundboard panel's "Search Sounds" modal (see
+    // js/features/gm-tools/sound-search.js in the web client). This
+    // proxies https://freesound.org's text-search API so the Freesound
+    // API key stays server-side -- it is never sent to the browser.
+    // Behind `authenticate` (the same admin x-api-key every other GM-only
+    // route here uses) since it costs real Freesound quota per call; the
+    // web client already prompts the GM for this key for the equivalent
+    // VTT character-push feature (see vtt-connected.js), so this doesn't
+    // introduce a new credential the GM has to manage.
+    const soundSearchLimiter = createRateLimiter({
+        windowMs: 60 * 1000,
+        max: 20,
+        message: 'Too many sound searches. Please wait a moment and try again.'
+    });
+
+    router.get('/api/soundboard/search', soundSearchLimiter, authenticate, async (req, res) => {
+        if (!config.freesoundApiKey) {
+            return res.status(503).json({ error: 'Sound search is not configured on this server (missing FREESOUND_API_KEY).' });
+        }
+
+        const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+        if (!q || q.length < 2) {
+            return res.status(400).json({ error: 'Search query must be at least 2 characters' });
+        }
+        // Freesound query strings top out well under this, but there's no
+        // reason to forward an absurdly long value to their API either.
+        if (q.length > 200) {
+            return res.status(400).json({ error: 'Search query is too long' });
+        }
+
+        const page = clampCount(req.query.page, { min: 1, max: 1000, fallback: 1 });
+        const pageSize = clampCount(req.query.page_size, { min: 1, max: 50, fallback: 20 });
+
+        try {
+            const freesoundUrl = `https://freesound.org/apiv2/text-search/?query=${encodeURIComponent(q)}&page=${page}&page_size=${pageSize}&fields=id,name,previews,license,username,duration,description`;
+            const response = await fetch(freesoundUrl, {
+                headers: { 'Authorization': `Token ${config.freesoundApiKey}` }
+            });
+
+            if (response.status === 429) {
+                return res.status(429).json({ error: 'Freesound rate limit exceeded. Please wait a moment and try again.' });
+            }
+            if (!response.ok) {
+                throw new Error(`Freesound API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const results = (data.results || []).map(sound => ({
+                id: sound.id,
+                name: sound.name,
+                username: sound.username,
+                duration: sound.duration,
+                license: sound.license,
+                preview_url: sound.previews?.['preview-hq-mp3'] || sound.previews?.['preview-lq-mp3'] || null,
+                description: (sound.description || '').slice(0, 200)
+            }));
+
+            res.json({
+                count: data.count || 0,
+                page,
+                pageSize,
+                hasNext: Boolean(data.next),
+                hasPrevious: Boolean(data.previous),
+                results
+            });
+        } catch (err) {
+            console.error('[Soundboard Search] Error:', err.message);
+            res.status(502).json({ error: 'Failed to search sounds' });
+        }
+    });
+
+    // ─── Soundboard sound "download" (resolve a direct playable URL) ──
+    // NOTE: Freesound's true original-file download endpoint
+    // (/apiv2/sounds/:id/download/) requires three-legged OAuth2, which
+    // this server -- authenticating to Freesound with a plain API-key
+    // Token, same as the search route above -- cannot obtain. This route
+    // does NOT attempt that; it just re-resolves the sound's preview URL
+    // server-side (useful if a client only has the numeric Freesound ID,
+    // e.g. from a track's stored attribution, and wants a fresh preview
+    // link without re-running a search). The soundboard's actual "Add"
+    // flow uses the preview URL returned by /search directly and never
+    // needs this route at all.
+    router.get('/api/soundboard/download/:id', authenticate, async (req, res) => {
+        if (!config.freesoundApiKey) {
+            return res.status(503).json({ error: 'Sound search is not configured on this server (missing FREESOUND_API_KEY).' });
+        }
+        const id = req.params.id;
+        if (!/^\d+$/.test(String(id))) {
+            return res.status(400).json({ error: 'Invalid sound id' });
+        }
+        try {
+            const metaResponse = await fetch(
+                `https://freesound.org/apiv2/sounds/${id}/?fields=id,name,previews,license,username`,
+                { headers: { 'Authorization': `Token ${config.freesoundApiKey}` } }
+            );
+            if (metaResponse.status === 429) {
+                return res.status(429).json({ error: 'Freesound rate limit exceeded. Please wait a moment and try again.' });
+            }
+            if (!metaResponse.ok) {
+                throw new Error(`Failed to fetch sound metadata: ${metaResponse.status}`);
+            }
+            const meta = await metaResponse.json();
+            const previewUrl = meta.previews?.['preview-hq-mp3'] || meta.previews?.['preview-lq-mp3'] || null;
+            if (!previewUrl) {
+                return res.status(404).json({ error: 'No playable preview available for this sound.' });
+            }
+            res.json({ id: meta.id, name: meta.name, username: meta.username, license: meta.license, url: previewUrl });
+        } catch (err) {
+            console.error('[Soundboard Download] Error:', err.message);
+            res.status(502).json({ error: 'Failed to resolve sound' });
         }
     });
 
@@ -1254,6 +1378,76 @@ function createApiRouter(appConfig) {
             const state = adventure.logBeat(r, { text, author });
             const roomCode = req.params.code.toUpperCase();
             room.broadcastToRoom(roomCode, 'adventure-log', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    // ─── AD-HOC TIMERS (server/timers.js) ─────────────────────────────
+    // Deliberately its own top-level resource, NOT nested under
+    // /adventure/* -- these are GM/AI-improvised timers independent of
+    // any loaded adventure module (see server/timers.js's header doc for
+    // why this is kept separate from adventure.js's scene/encounter
+    // management). Use /api/rooms/:code/adventure/timer instead for
+    // ticking a pre-authored adventure-module timer.
+    router.get('/api/rooms/:code/timers', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            res.json({ success: true, code: req.params.code.toUpperCase(), ...timers.getPublicState(r) });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/timers', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { name, segments, description } = req.body;
+            const state = timers.createTimer(r, { name, segments, description });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adhoc-timer-created', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/timers/tick', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { ref, name, amount } = req.body;
+            if (ref === undefined && !name) return res.status(400).json({ error: 'ref (or name) is required' });
+            const state = timers.tickTimer(r, { ref, name, amount });
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adhoc-timer-ticked', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.post('/api/rooms/:code/timers/resolve', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const { ref, name } = req.body;
+            const timerRef = ref !== undefined ? ref : name;
+            if (timerRef === undefined || timerRef === null || timerRef === '') return res.status(400).json({ error: 'ref (or name) is required' });
+            const state = timers.resolveTimer(r, timerRef);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adhoc-timer-resolved', { source: 'api', ...state });
+            res.json({ success: true, code: roomCode, ...state });
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    });
+
+    router.delete('/api/rooms/:code/timers/:ref', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const state = timers.removeTimer(r, req.params.ref);
+            const roomCode = req.params.code.toUpperCase();
+            room.broadcastToRoom(roomCode, 'adhoc-timer-removed', { source: 'api', ...state });
             res.json({ success: true, code: roomCode, ...state });
         } catch (err) {
             res.status(400).json({ error: err.message });
@@ -1771,6 +1965,13 @@ function createApiRouter(appConfig) {
                     timer: 'POST /api/rooms/:code/adventure/timer - Tick a timer ({ scope: "scene"|"campaign", ref (index or name), amount? } amount defaults to +1, can be negative)',
                     log: 'POST /api/rooms/:code/adventure/log - Append a free-form narrative beat to the adventure log ({ text, author? })'
                 },
+                timers: {
+                    get: 'GET /api/rooms/:code/timers - List active ad-hoc timers (independent of any loaded adventure -- see server/timers.js)',
+                    create: 'POST /api/rooms/:code/timers - Create (or re-arm) an ad-hoc timer ({ name, segments, description? }); enforces a 3-active cap, auto-merging overflow',
+                    tick: 'POST /api/rooms/:code/timers/tick - Tick an ad-hoc timer ({ ref (index or name), amount? } amount defaults to +1, can be negative)',
+                    resolve: 'POST /api/rooms/:code/timers/resolve - Resolve (remove) a filled ad-hoc timer and get its data back for narration ({ ref (index or name) })',
+                    remove: 'DELETE /api/rooms/:code/timers/:ref - Remove an ad-hoc timer outright by name or index'
+                },
                 whiteboard: {
                     get: 'GET /api/rooms/:code/whiteboard - Get current whiteboard state (drawings, notes, images, gridCombat, ... returned directly, not wrapped)',
                     gridCombat: 'POST /api/rooms/:code/whiteboard/grid-combat - Enable/configure grid combat ({ enabled?, gridType?, cellSize? })',
@@ -1796,6 +1997,10 @@ function createApiRouter(appConfig) {
                 campaigns: {
                     upload: 'POST /api/rooms/:code/campaigns - Store campaign state (returns a random code)',
                     download: 'GET /api/rooms/:code/campaigns/:campaignCode - Retrieve stored campaign using the returned code'
+                },
+                soundboard: {
+                    search: 'GET /api/soundboard/search?q=&page=&page_size= - Proxy a Freesound text search (requires FREESOUND_API_KEY on this server; 503 if unset)',
+                    resolve: 'GET /api/soundboard/download/:id - Re-resolve a Freesound sound ID to its playable preview URL'
                 }
             }
         });

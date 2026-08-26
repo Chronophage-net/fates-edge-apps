@@ -237,6 +237,28 @@ Request cleanup of a module from clients. Notifies clients via `module-cleanup`.
 { "roomCode": "AC12" }  // optional
 ```
 
+### Soundboard Search
+
+Proxies [Freesound](https://freesound.org)'s text-search API for the web client's GM soundboard "Search Sounds" modal (`js/features/gm-tools/sound-search.js`), so the `FREESOUND_API_KEY` env var stays server-side. Both routes require the admin `x-api-key` (same as every other route in this section) and respond `503` if `FREESOUND_API_KEY` isn't set on this deployment. Rate-limited separately from the general API cap (20 requests/min per IP) since each call spends real Freesound quota.
+
+**`GET /api/soundboard/search?q=thunder&page=1&page_size=20`**
+Search Freesound. `q` must be 2+ characters; `page_size` is capped at 50.
+```json
+{
+  "count": 812,
+  "page": 1,
+  "pageSize": 20,
+  "hasNext": true,
+  "hasPrevious": false,
+  "results": [
+    { "id": 12345, "name": "Thunder Clap.wav", "username": "someuser", "duration": 4.2, "license": "https://creativecommons.org/licenses/by/4.0/", "preview_url": "https://freesound.org/...", "description": "..." }
+  ]
+}
+```
+
+**`GET /api/soundboard/download/:id`**
+Re-resolves a Freesound sound ID to its playable preview URL. Note: this is *not* a true original-file download — Freesound's real download endpoint requires three-legged OAuth2, which this server (authenticating with a plain API-key Token) can't obtain. The soundboard's own "Add" flow never calls this; it uses the `preview_url` already returned by `/search`.
+
 ---
 
 ### Adventure Engine

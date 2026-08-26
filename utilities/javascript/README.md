@@ -7,7 +7,7 @@ This directory holds the JavaScript half of the Fate's Edge ecosystem: the brows
 - **[`fates-edge-desktop-client/`](fates-edge-desktop-client/)** — an Electron wrapper that bundles the web client as a native desktop app.
 - **`fates-edge-terminal/`** — a MUD-style CLI client, mainly for testing and administration against a running server.
 
-VTT integrations (Discord bot, Roll20 API script, Foundry VTT module, Avrae module) live one level up under [`../vtt_mods_bots/`](../vtt_mods_bots/). The Python CLI and Tkinter desktop tool live under [`../python/`](../python/). See the [repository root README](../../README.md) for the full ecosystem overview, quick start, and licensing — this file only covers what's specific to the JS subprojects.
+VTT integrations (Discord bot, Roll20 API script, Foundry VTT module, Avrae module) live one level up under [`../vtt_mods_bots/`](../vtt_mods_bots/). The (⚠️ mothballed) standalone Python CLI client and the Tkinter desktop tool live under [`../python/`](../python/) — `fates-edge-socket-server/fates-edge-cli.py` above is the maintained scriptable CLI going forward. See the [repository root README](../../README.md) for the full ecosystem overview, quick start, and licensing — this file only covers what's specific to the JS subprojects.
 
 ---
 
@@ -19,7 +19,7 @@ Runs entirely in the browser, with all data in `localStorage` by default. Covers
 
 ### The campaign server (`fates-edge-socket-server/`)
 
-A Node/Express backend with two parallel WebSocket transports (Socket.IO and plain `ws`), account authentication (bcrypt + JWT alongside API-key auth), GM election with Co-GM/Assistant-GM/Spectator roles, the Adventure Engine, the shared Deck of Consequences, and optional horizontal scaling. Persists campaigns to SQLite by default (Postgres/MySQL also supported).
+A Node/Express backend with two parallel WebSocket transports (Socket.IO and plain `ws`), account authentication (bcrypt + JWT alongside API-key auth), GM election with Co-GM/Assistant-GM/Spectator roles, the Adventure Engine, GM-improvised ad-hoc timers (`server/timers.js` — deliberately separate from the Adventure Engine's own pre-authored scene/campaign timers), the shared Deck of Consequences, and optional horizontal scaling. Persists campaigns to SQLite by default (Postgres/MySQL also supported). Bundles its own Python CLI, `fates-edge-cli.py`, for scripting the REST surface.
 
 ---
 
@@ -75,7 +75,7 @@ node terminal-client.js --room YOUR_ROOM
 
 ### VTT integrations & Python clients
 
-See [`../vtt_mods_bots/`](../vtt_mods_bots/) (Discord bot, Roll20 API script, Foundry VTT module, Avrae module) and [`../python/`](../python/) (Python CLI client, Tkinter desktop tool). Each has its own README with setup instructions.
+See [`../vtt_mods_bots/`](../vtt_mods_bots/) (Discord bot, Roll20 API script, Foundry VTT module, Avrae module) and [`../python/`](../python/) (⚠️ mothballed Python CLI client, Tkinter desktop tool). Each has its own README with setup instructions. For scripting the server's REST API, prefer `fates-edge-socket-server/fates-edge-cli.py` (see above) over the mothballed standalone Python CLI client.
 
 ---
 
@@ -103,8 +103,10 @@ utilities/javascript/
 │   │   ├── api.js              # REST API routes
 │   │   ├── room.js             # room management / GM election
 │   │   ├── deck.js             # Deck of Consequences engine
+│   │   ├── timers.js           # ad-hoc timers, separate from adventure.js's own timers
 │   │   ├── ws-handlers.js
 │   │   └── socketio-handlers.js
+│   ├── fates-edge-cli.py       # bundled Python CLI (rooms, modules, backups, ad-hoc timers)
 │   └── DESIGN.md
 ├── fates-edge-terminal/
 │   └── terminal-client.js

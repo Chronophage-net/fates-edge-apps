@@ -269,6 +269,13 @@ let adventureState = {
     updatedAt: null
 };
 
+// NEW: ad-hoc timers (server/timers.js on the socket server) --
+// deliberately tracked SEPARATELY from adventureState.campaignTimers
+// above: these are GM/AI-improvised timers that exist independent of any
+// loaded adventure (see that file's header doc), so they're never gated
+// on adventureState.moduleId the way printAdventureState() is.
+let adhocTimers = [];
+
 // Session stats + roll history
 let sessionStats = {
     sessionStart: Date.now(),
@@ -515,6 +522,22 @@ function printAdventureState(state) {
     promptAgain(true);
 }
 
+// NEW: ad-hoc timers (server/timers.js) -- see the adhocTimers doc
+// comment above for why these print independent of printAdventureState().
+function printAdhocTimers(list) {
+    process.stdout.write('\r\x1b[K');
+    if (!list || !list.length) {
+        printSystemMessage('No active ad-hoc timers.', colors.dim);
+        return;
+    }
+    console.log(`${colors.cyan}⏱️ Ad-Hoc Timers:${colors.reset}`);
+    list.forEach(t => {
+        const tag = t.full ? ` ${colors.yellow}(FULL)${colors.reset}` : '';
+        console.log(`  - ${t.name}: ${t.current}/${t.segments}${tag}${t.description ? ` — ${t.description}` : ''}`);
+    });
+    promptAgain(true);
+}
+
 function printAdventureReference(ref) {
     if (!ref || !ref.moduleId) {
         printSystemMessage('No adventure loaded or no reference data available.', colors.dim);
@@ -644,6 +667,12 @@ ${colors.yellow}Adventure Engine:${colors.reset}
   /adventure reveal <id>       Mark a knowledge entry revealed, safe to share (GM only)
   /adventure hide <id>         Mark a knowledge entry secret again (GM only)
 
+${colors.yellow}Ad-Hoc Timers (independent of any loaded adventure):${colors.reset}
+  /timer add <name> <segments> [description]  Create a timer
+  /timer tick <name> [amount]                  Tick a timer (default +1)
+  /timer remove <name>                         Remove a timer
+  /timer list                                  Show active ad-hoc timers
+
 ${colors.yellow}GM Management:${colors.reset}
   /gm request                 Request GM
   /gm approve <id|name>       Approve GM request (GM only)
@@ -655,6 +684,7 @@ ${colors.yellow}Modules:${colors.reset}
   /modules list               List modules
   /modules push <moduleId>    Push module
   /modules cleanup <moduleId> Cleanup module
+  /soundsearch <query>        Search Freesound for sounds (admin, preview only)
 
 ${colors.yellow}Region:${colors.reset}
   /region [name]              Set or show default region
@@ -973,6 +1003,48 @@ async function handleAdminCommand(args) {
     } catch (err) {
         printSystemMessage(`Admin error: ${err.message}`, colors.red);
     }
+}
+
+// ─── Sound search (Freesound, via server/api.js's GET /api/soundboard/search
+// proxy) ──────────────────────────────────────────────────────────────
+// Not room-scoped -- same global admin x-api-key as /admin above, but its
+// own top-level command since it doesn't need an active room. Lookup only:
+// there's no server-side "soundboard" to add a result *to* (soundboard
+// tracks live client-side in the web client's localStorage -- see
+// core/soundboard.js), so this just prints preview links for the GM to
+// grab, same role as the AI GM bot's `!gm soundsearch`.
+async function handleSoundSearchCommand(args) {
+    if (!ADMIN_MODE) { printSystemMessage('Sound search requires an admin API key (start with --api-key, or set API_KEY).', colors.red); return; }
+    const query = args.join(' ').trim();
+    if (!query || query.length < 2) { printSystemMessage('Usage: /soundsearch <query> (at least 2 characters)', colors.red); return; }
+    try {
+        const data = await makeApiRequest(`/soundboard/search?q=${encodeURIComponent(query)}&page=1&page_size=10`);
+        const results = data.results || [];
+        if (results.length === 0) { printSystemMessage(`No sounds found for "${query}".`); return; }
+        printSystemMessage(`🔎 ${results.length} of ${data.count || results.length} results for "${query}":`);
+        results.forEach(s => {
+            const duration = typeof s.duration === 'number' ? s.duration.toFixed(1) : '?';
+            console.log(`  ${colors.bold}${s.name}${colors.reset} by ${s.username} (${duration}s) — ${classifySoundLicense(s.license)}`);
+            console.log(`    ${colors.dim}${s.preview_url || '(no preview available)'}${colors.reset}`);
+        });
+    } catch (err) {
+        printSystemMessage(`Sound search failed: ${err.message}`, colors.red);
+    }
+    promptAgain(true);
+}
+
+// Mirrors the web client's classifyLicense() (js/features/gm-tools/
+// sound-search.js) at a glance -- matched by CC license URL path segment;
+// an unrecognized license reads as restricted rather than "safe".
+function classifySoundLicense(licenseUrl) {
+    const url = String(licenseUrl || '').toLowerCase();
+    if (url.includes('/publicdomain/zero') || url.includes('/publicdomain/')) return 'CC0 (Public Domain)';
+    if (url.includes('/by-nc-sa/')) return 'CC BY-NC-SA (non-commercial, attribution)';
+    if (url.includes('/by-nc/')) return 'CC BY-NC (non-commercial, attribution)';
+    if (url.includes('/by-sa/')) return 'CC BY-SA (attribution)';
+    if (url.includes('/by/')) return 'CC BY (attribution)';
+    if (url.includes('sampling+')) return 'Sampling+ (attribution)';
+    return 'Unknown license (treat as restricted)';
 }
 
 // ─── WebSocket connection ───────────────────────────────────────
@@ -1427,6 +1499,49 @@ function handleInputLine(input) {
                 break;
             }
 
+            // ─── Ad-hoc Timers (server/timers.js) ────────────────
+            // Deliberately a SEPARATE top-level command from
+            // /adventure timer above -- these are GM/AI-improvised
+            // timers independent of any loaded adventure module. See
+            // the adhocTimers doc comment near its declaration.
+            case 'timer': {
+                const timerSub = args[0]?.toLowerCase() || '';
+                const timerArgs = args.slice(1);
+                switch (timerSub) {
+                    case 'add': {
+                        const name = timerArgs[0];
+                        const segments = parseInt(timerArgs[1]);
+                        const description = timerArgs.slice(2).join(' ') || '';
+                        if (!name || isNaN(segments)) { printSystemMessage('Usage: /timer add <name> <segments> [description]', colors.red); break; }
+                        sendMessage('adhoc-timer-create', { name, segments, description });
+                        printSystemMessage(`⏱️ Creating timer "${name}" (${segments} segments)...`, colors.cyan);
+                        break;
+                    }
+                    case 'tick': {
+                        const name = timerArgs[0];
+                        const amount = timerArgs[1] !== undefined ? parseInt(timerArgs[1]) : 1;
+                        if (!name) { printSystemMessage('Usage: /timer tick <name> [amount]', colors.red); break; }
+                        sendMessage('adhoc-timer-tick', { name, amount });
+                        printSystemMessage(`⏱️ Ticking timer "${name}" by ${amount}...`, colors.cyan);
+                        break;
+                    }
+                    case 'remove': {
+                        const name = timerArgs[0];
+                        if (!name) { printSystemMessage('Usage: /timer remove <name>', colors.red); break; }
+                        sendMessage('adhoc-timer-remove', { name });
+                        printSystemMessage(`⏱️ Removing timer "${name}"...`, colors.cyan);
+                        break;
+                    }
+                    case 'list':
+                    case '':
+                        printAdhocTimers(adhocTimers);
+                        break;
+                    default:
+                        printSystemMessage('Timer subcommands: add <name> <segments> [description], tick <name> [amount], remove <name>, list');
+                }
+                break;
+            }
+
             // ─── GM ─────────────────────────────────────────────
             case 'gm': {
                 const sub = args[0]?.toLowerCase() || '';
@@ -1481,6 +1596,10 @@ function handleInputLine(input) {
                 }
                 break;
             }
+
+            case 'soundsearch':
+                handleSoundSearchCommand(args);
+                break;
 
             case 'admin':
                 handleAdminCommand(args);
@@ -1686,6 +1805,22 @@ function handleMessage(msg) {
             printSystemMessage(`⏱️ Timer "${t.name}" advanced: ${t.current}/${t.segments}${t.full ? ' (FULL)' : ''}`, colors.cyan);
         } else {
             printSystemMessage(`⏱️ Timer ticked.`, colors.cyan);
+        }
+        return;
+    }
+
+    // NEW: ad-hoc timers (server/timers.js) -- separate event names
+    // ('adhoc-timer-*') so they never collide with the adventure-module
+    // 'timer-ticked' handler above. See the adhocTimers doc comment.
+    if (msg.type === 'adhoc-timer-created' || msg.type === 'adhoc-timer-ticked' || msg.type === 'adhoc-timer-removed') {
+        adhocTimers = msg.timers || [];
+        if (msg.type === 'adhoc-timer-created') {
+            printSystemMessage(`⏱️ Ad-hoc timer created.`, colors.cyan);
+        } else if (msg.type === 'adhoc-timer-ticked' && msg.tickedTimer) {
+            const t = msg.tickedTimer;
+            printSystemMessage(`⏱️ Ad-hoc timer "${t.name}" advanced: ${t.current}/${t.segments}${t.full ? ' (FULL)' : ''}`, colors.cyan);
+        } else if (msg.type === 'adhoc-timer-removed') {
+            printSystemMessage(`⏱️ Ad-hoc timer removed.`, colors.cyan);
         }
         return;
     }

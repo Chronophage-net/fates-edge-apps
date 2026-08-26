@@ -439,6 +439,20 @@ class VTTClient extends EventEmitter {
                 // Heartbeat response
                 break;
 
+            // NEW: ad-hoc timers (server/timers.js) -- GM/AI-improvised
+            // timers that live server-side, independent of any loaded
+            // adventure module. Deliberately a separate event name
+            // ('adhocTimerState') from anything adventure-related, and
+            // fired for all four server broadcasts (created/ticked/
+            // removed/the request/response reply) since they all carry
+            // the same { timers, ... } shape -- see commands/timer.js.
+            case 'adhoc-timer-created':
+            case 'adhoc-timer-ticked':
+            case 'adhoc-timer-removed':
+            case 'adhoc-timer-state':
+                this.emit('adhocTimerState', message);
+                break;
+
             default:
                 // Forward unknown events
                 this.emit('unknown', message);
@@ -655,18 +669,37 @@ class VTTClient extends EventEmitter {
     }
 
     // ─── Timers ──────────────────────────────────────────────────
-    // NOTE: this bot's /vtttimer commands are local, freeform, named
-    // timers, not the same thing as the server's Adventure Engine
-    // timers (adventure.js's scene/campaign `campaignTimers`, which
-    // only exist by name inside a *loaded adventure module* and are
-    // driven by 'adventure-timer'/POST /adventure/timer). Wiring these
-    // into that system would require inventing a matching adventure
-    // timer entry server-side for every ad-hoc name a Discord user
-    // types, which isn't something this bot can safely do unattended.
-    // Instead, this just broadcasts the bot's own timer list as a
-    // plain, non-destructive status notification (server relays
-    // 'combat-status-update' verbatim, no room state is touched) so
-    // any connected client that cares can display it.
+    // UPDATED: /vtttimer's freeform, GM-named timers now hit the
+    // server's own ad-hoc timer system (server/timers.js) instead of
+    // being tracked only in this bot's local memory -- that system
+    // exists exactly for this: a GM/AI-improvised timer independent of
+    // any loaded adventure module (as opposed to adventure.js's scene/
+    // campaign `campaignTimers`, which only exist by name inside a
+    // *loaded adventure module* and are driven by 'adventure-timer'/
+    // POST /adventure/timer -- a deliberately separate system, see
+    // that file's header doc). This makes /vtttimer's timers real,
+    // shared, persistent room state instead of a Discord-bot-only echo
+    // that vanished on restart and was invisible to every other client.
+    createAdhocTimer(name, segments, description) {
+        this.send('adhoc-timer-create', { name, segments, description });
+    }
+
+    tickAdhocTimer(name, amount = 1) {
+        this.send('adhoc-timer-tick', { name, amount });
+    }
+
+    removeAdhocTimer(name) {
+        this.send('adhoc-timer-remove', { name });
+    }
+
+    requestAdhocTimers() {
+        this.send('adhoc-timer-request', {});
+    }
+
+    // Still used for a plain, non-destructive combat-status broadcast
+    // (server relays 'combat-status-update' verbatim, no room state
+    // touched) -- kept for whatever else on the wire listens for it,
+    // separate from the real timer state above.
     syncTimers(timers) {
         this.send('combat-status-update', { timers, source: 'discord-bot', timestamp: Date.now() });
     }

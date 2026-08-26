@@ -1,8 +1,8 @@
 {
   "id": "fates-edge-bridge",
   "title": "Fate's Edge Bridge",
-  "description": "Connects Foundry VTT to the Fate's Edge WebSocket server for real-time sync of chat, dice rolls, characters, timers, scenes, Deck of Consequences, Crown Spread, modules, and Game Master election/promotion.",
-  "version": "4.16.0",
+  "description": "Connects Foundry VTT to the Fate's Edge WebSocket server for real-time sync of chat, dice rolls, characters, timers, ad-hoc timers, scenes, Deck of Consequences, Crown Spread, modules, and Game Master election/promotion.",
+  "version": "4.17.0",
   "authors": [
     {
       "name": "Fate's Edge Team",
@@ -81,12 +81,13 @@
       ]
     },
     "fates-edge": {
-      "version": "2.1.0",
+      "version": "2.2.0",
       "features": [
         "chat-sync",
         "dice-sync",
         "character-sync",
         "timer-sync",
+        "adhoc-timer-sync",
         "scene-sync",
         "deck-sync",
         "crown-spread",

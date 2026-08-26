@@ -435,6 +435,28 @@ window.listModules = function() {
     FatesEdgeBridge.sendModuleList();
 };
 
+// Ad-hoc timer macro helpers (server/timers.js) -- independent of any
+// loaded adventure module. Named "AdhocTimer" (not just "Timer") to stay
+// distinct from the adventure engine's own scene/campaign timers, which
+// are ticked via FatesEdgeBridge.sendAdventureTimer(name, amount, scope)
+// directly (no macro wrapper existed for those either).
+window.createAdhocTimer = function(name, segments, description = '') {
+    FatesEdgeBridge.sendAdhocTimerCreate(name, segments, description);
+};
+
+window.tickAdhocTimer = function(name, amount = 1) {
+    FatesEdgeBridge.sendAdhocTimerTick(name, amount);
+};
+
+window.removeAdhocTimer = function(name) {
+    FatesEdgeBridge.sendAdhocTimerRemove(name);
+};
+
+window.listAdhocTimers = function() {
+    FatesEdgeBridge.requestAdhocTimers();
+    return FatesEdgeBridge.adhocTimers;
+};
+
 window.getDeckStatus = function() {
     return {
         remaining: FatesEdgeBridge.deckState.remaining,

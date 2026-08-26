@@ -113,6 +113,14 @@ var adventureState = {
     updatedAt: null
 };
 
+// NEW: Ad-hoc timers (server/timers.js) -- deliberately SEPARATE from
+// adventureState.campaignTimers above. Those belong to a loaded
+// adventure module's authored content; these are GM/AI-improvised
+// timers that exist independent of any adventure being loaded, so they
+// get their own state array and their own request/response + broadcast
+// events ('adhoc-timer-*') instead of being folded into adventureState.
+var adhocTimers = [];
+
 // GM State
 var clients = {};           // clientId -> { id, name, role, ... }
 var gmId = null;            // clientId of current GM
@@ -219,6 +227,7 @@ function disconnect() {
         log: [],
         updatedAt: null
     };
+    adhocTimers = [];
     log('Disconnected');
     updateStatus('disconnected');
 }
@@ -472,6 +481,17 @@ function handleMessage(data) {
 
         case 'timer-ticked':
             handleTimerTicked(data);
+            break;
+
+        // NEW: ad-hoc timers (server/timers.js) -- separate event names
+        // ('adhoc-timer-*') so they never collide with 'timer-ticked'
+        // above, which is specifically the adventure module's own
+        // campaign/scene timers.
+        case 'adhoc-timer-created':
+        case 'adhoc-timer-ticked':
+        case 'adhoc-timer-removed':
+        case 'adhoc-timer-state':
+            handleAdhocTimerState(data);
             break;
 
         case 'adventure-log':
@@ -773,6 +793,31 @@ function handleTimerTicked(data) {
         sendToChat('⚠️ Timer "' + name + '" is complete!');
     }
     createHandout('Timer: ' + name, msg);
+}
+
+// NEW: ad-hoc timers (server/timers.js) -- see the case-statement
+// comment above for why this is separate from handleTimerTicked().
+function handleAdhocTimerState(data) {
+    adhocTimers = data.timers || [];
+    if (data.tickedTimer) {
+        var t = data.tickedTimer;
+        var bar = generateProgressBar(t.current || 0, t.segments || 1);
+        var msg = '⏱️ **Ad-Hoc Timer:** ' + (t.name || 'Timer') + '\n';
+        msg += '[' + bar + '] ' + (t.current || 0) + '/' + (t.segments || 1) + '\n';
+        msg += 'Status: ' + (t.full ? '⚠️ COMPLETE' : '⏳ Active');
+        sendToChat(msg);
+        return;
+    }
+    if (!adhocTimers.length) {
+        sendToChat('⏱️ No active ad-hoc timers.');
+        return;
+    }
+    var listMsg = '⏱️ **Ad-Hoc Timers**\n';
+    adhocTimers.forEach(function(t) {
+        var bar = generateProgressBar(t.current || 0, t.segments || 1);
+        listMsg += t.name + ' [' + bar + '] ' + t.current + '/' + t.segments + (t.full ? ' ⚠️' : '') + '\n';
+    });
+    sendToChat(listMsg);
 }
 
 function handleAdventureLog(data) {
@@ -1543,6 +1588,45 @@ function sendAdventureReference() {
     sendToChat('📚 Requesting adventure reference...');
 }
 
+// NEW: ad-hoc timers (server/timers.js) -- see the case-statement
+// comment near handleAdhocTimerState() for why these are separate
+// send functions from sendAdventureTimer() above.
+function sendAdhocTimerAdd(name, segments, description) {
+    if (!name || !segments) {
+        log('Timer name and segments required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adhoc-timer-create', name: name, segments: segments, description: description || '' });
+    log('⏱️ Creating ad-hoc timer: ' + name + ' (' + segments + ' segments)');
+    sendToChat('⏱️ Creating timer "' + name + '" (' + segments + ' segments)...');
+}
+
+function sendAdhocTimerTick(name, amount) {
+    amount = amount || 1;
+    if (!name) {
+        log('Timer name required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adhoc-timer-tick', name: name, amount: amount });
+    log('⏱️ Ticking ad-hoc timer: ' + name + ' by ' + amount);
+    sendToChat('⏱️ Ticking timer "' + name + '" by ' + amount);
+}
+
+function sendAdhocTimerRemove(name) {
+    if (!name) {
+        log('Timer name required', 'error');
+        return;
+    }
+    sendMessage({ type: 'adhoc-timer-remove', name: name });
+    log('⏱️ Removing ad-hoc timer: ' + name);
+    sendToChat('⏱️ Removing timer "' + name + '"...');
+}
+
+function sendAdhocTimerList() {
+    sendMessage({ type: 'adhoc-timer-request' });
+    log('⏱️ Requesting ad-hoc timer list');
+}
+
 function sendAdventureReset() {
     sendMessage({ type: 'adventure-reset' });
     log('🔄 Resetting adventure');
@@ -2174,6 +2258,47 @@ function registerCommands() {
                             sendAdventureKnowledgeHide(advParams[0]);
                         } else {
                             sendToChat('Adventure Commands:\n!fates-edge adventure load <moduleId>\n!fates-edge adventure scene [actIndex] [sceneIndex]\n!fates-edge adventure encounter start <ref>\n!fates-edge adventure encounter resolve <clean|partial|miss> [notes]\n!fates-edge adventure timer <name> [amount] [scene|campaign]\n!fates-edge adventure log <text>\n!fates-edge adventure status\n!fates-edge adventure reference\n!fates-edge adventure reset\n!fates-edge adventure reveal <id>\n!fates-edge adventure hide <id>');
+                        }
+                        break;
+
+                    // ─── NEW: Ad-Hoc Timer Commands (server/timers.js) ───
+                    // Deliberately a SEPARATE top-level command from
+                    // "adventure timer" above -- see the case-statement
+                    // comment near handleAdhocTimerState() for the full
+                    // rationale (GM/AI-improvised timers independent of
+                    // any loaded adventure module).
+                    case 'timer':
+                        var timerSub = args[2] || '';
+                        var timerParams = args.slice(3);
+
+                        if (timerSub === 'add') {
+                            var newTimerName = timerParams[0] || '';
+                            var newTimerSegments = timerParams[1] !== undefined ? parseInt(timerParams[1]) : undefined;
+                            var newTimerDesc = timerParams.slice(2).join(' ');
+                            if (!newTimerName || !newTimerSegments) {
+                                sendToChat('Usage: !fates-edge timer add <name> <segments> [description]');
+                                break;
+                            }
+                            sendAdhocTimerAdd(newTimerName, newTimerSegments, newTimerDesc);
+                        } else if (timerSub === 'tick') {
+                            var tickTimerName = timerParams[0] || '';
+                            var tickAmount = timerParams[1] !== undefined ? parseInt(timerParams[1]) : 1;
+                            if (!tickTimerName) {
+                                sendToChat('Usage: !fates-edge timer tick <name> [amount]');
+                                break;
+                            }
+                            sendAdhocTimerTick(tickTimerName, tickAmount);
+                        } else if (timerSub === 'remove') {
+                            var removeTimerName = timerParams[0] || '';
+                            if (!removeTimerName) {
+                                sendToChat('Usage: !fates-edge timer remove <name>');
+                                break;
+                            }
+                            sendAdhocTimerRemove(removeTimerName);
+                        } else if (timerSub === 'list' || timerSub === 'status' || timerSub === '') {
+                            sendAdhocTimerList();
+                        } else {
+                            sendToChat('Timer Commands:\n!fates-edge timer add <name> <segments> [description]\n!fates-edge timer tick <name> [amount]\n!fates-edge timer remove <name>\n!fates-edge timer list');
                         }
                         break;
 

@@ -71,6 +71,26 @@ export function removeSoundTrack(id) {
     return true;
 }
 
+/**
+ * Attach (or clear, passing null) attribution metadata to a track --
+ * used by the "Search Sounds" feature (see
+ * js/features/gm-tools/sound-search.js) when a CC-licensed sound that
+ * requires attribution is added, so credit can be displayed later without
+ * the caller reaching into soundboard state directly.
+ */
+export function setTrackAttribution(id, attribution) {
+    const sb = ensureSoundboardState();
+    const track = sb.tracks.find(t => t.id === id);
+    if (!track) return false;
+    if (attribution) {
+        track.attribution = attribution;
+    } else {
+        delete track.attribution;
+    }
+    saveState();
+    return true;
+}
+
 function cancelFade() {
     if (fadeHandle !== null) {
         cancelAnimationFrame(fadeHandle);
@@ -216,6 +236,7 @@ export default {
     getSoundTracks,
     addSoundTrack,
     removeSoundTrack,
+    setTrackAttribution,
     playAmbience,
     stopAmbience,
     getCurrentAmbienceId,

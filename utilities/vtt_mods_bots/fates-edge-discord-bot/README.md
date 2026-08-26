@@ -16,7 +16,7 @@ Bridges your Discord server with the Fate's Edge [socket server](../../javascrip
 - **Chat relay** — messages flow between Discord and other connected VTT clients.
 - **Dice rolling** — roll in Discord, optionally broadcast to the VTT.
 - **Character management** — create, update, and list VTT characters.
-- **Timer management** — create, tick, and track VTT timers (see the note under Timer Management below — these are separate from the server's own Adventure Engine timers).
+- **Ad-hoc timer management** — create, tick, list, and remove real, server-synced timers, visible to every connected client (see the note under Timer Management below — these are separate from the server's own Adventure Engine timers).
 - **Deck operations** — draw, shuffle, and Crown Spread readings.
 - **Module management** — list, push, and clean up VTT adventure modules.
 - **Adventure Engine** — load modules, advance scenes, run encounters, tick timers, and log narrative beats.
@@ -139,13 +139,12 @@ A standalone `Dockerfile` is also included if you'd rather build just this bot i
 
 | Command | Description | Example |
 |---|---|---|
-| `/vtttimer create <name> <segments>` | Create a new timer | `/vtttimer create "Ritual" 6` |
-| `/vtttimer tick <name> [amount]` | Tick a timer forward | `/vtttimer tick "Ritual" 2` |
-| `/vtttimer list` | List all active timers | `/vtttimer list` |
+| `/vtttimer create <name> <segments> [description]` | Create a new ad-hoc timer | `/vtttimer create "Ritual" 6` |
+| `/vtttimer tick <name> [amount]` | Tick a timer forward (negative amounts tick it back) | `/vtttimer tick "Ritual" 2` |
+| `/vtttimer list` | List all active ad-hoc timers | `/vtttimer list` |
 | `/vtttimer remove <name>` | Remove a timer | `/vtttimer remove "Ritual"` |
-| `/vtttimer reset <name>` | Reset a timer to 0 | `/vtttimer reset "Ritual"` |
 
-These are local, freeform timers tracked only by the bot — distinct from the server's Adventure Engine timers (`/vttadventure timer`, tied to timers defined inside a loaded adventure module). The bot broadcasts its timer list to the room as a non-destructive status notification whenever it changes, so other clients can display it, but nothing on the server persists or authoritatively tracks these.
+These are GM/AI-improvised ad-hoc timers (`server/timers.js`), independent of any loaded adventure — distinct from the server's Adventure Engine timers (`/vttadventure timer`, tied to timers defined inside a loaded adventure module). Unlike the old bot-only tracker, they're real, shared, persistent room state: the bot calls the server and awaits its confirmation before replying, and every other connected client (web client, Foundry, Roll20, the AI GM) sees the same timers. There's no `reset` subcommand anymore — tick by a negative amount, or remove and recreate, to get the same effect.
 
 ### Adventure Engine
 
@@ -193,6 +192,7 @@ The server also tracks climax pacing (how long a triggered climax act has run be
 | `/vttadmin ban <target> [reason]` | Ban a player | `/vttadmin ban "Levi"` |
 | `/vttadmin unban <client-id>` | Unban a client by id | `/vttadmin unban ws-AC12` |
 | `/vttadmin role <target> <role> [save]` | Change a player's role — Co-GM, Assistant GM, Player, or Spectator (server enforces GM-only; `save` persists a Co-GM/Assistant GM grant across reconnects, demotions always persist) | `/vttadmin role "AI_GM" assistant-gm save:True` |
+| `/vttadmin soundsearch <query>` | Search Freesound for sounds (preview only — add the result from the web client's Soundboard panel; server needs `FREESOUND_API_KEY` set) | `/vttadmin soundsearch query:"tavern murmur"` |
 
 `target` accepts either a player's display name or their raw client id (`ws-...`/socket.io id). `assistant-gm` is the role typically assigned to the AI GM Bot's own client — see the [`fates-edge-ai-gm-bot`](https://github.com/Chronophage-net/fates-edge-ai-gm-bot) repo's README ("Assistant GM Mode") for what changes once it holds that role.
 
@@ -280,12 +280,12 @@ fates-edge-discord-bot/
 ├── .env.example
 ├── commands/                # Slash commands
 │   ├── vtt.js               # VTT connection, info, GM, grid/whiteboard, characters
-│   ├── admin.js              # /vttadmin: broadcast, sync, stats, deck, modules, region, kick/ban, grid, token, whiteboard
+│   ├── admin.js              # /vttadmin: broadcast, sync, stats, deck, modules, region, kick/ban, grid, token, whiteboard, soundsearch
 │   ├── adventure.js          # /vttadventure: load, scene, encounter, timer, log, status
 │   ├── dice.js                # /deck (near-duplicate of vttdeck.js)
 │   ├── chat.js                 # Chat relay
 │   ├── character.js            # Character management
-│   ├── timer.js                # Local (bot-only) timer tracking
+│   ├── timer.js                # Ad-hoc timer commands (server/timers.js-backed)
 │   └── vttdeck.js               # Deck operations
 ├── utils/
 │   ├── websocket.js             # WebSocket client (with GM support)

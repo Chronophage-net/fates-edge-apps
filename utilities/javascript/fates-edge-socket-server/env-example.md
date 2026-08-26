@@ -6,6 +6,13 @@ WS_PORT=10000                      # WebSocket runs on same port by default
 # ─── API Security ──────────────────────────────────────────────
 API_KEY=your-secret-key-here        # Required for API authentication
 
+# ─── Soundboard sound search (optional) ──────────────────────────
+# Enables the GM soundboard's "Search Sounds" modal (proxies Freesound's
+# text-search API so the key never reaches the browser). Free key at
+# https://freesound.org/apiv2/apply/. Leave blank to disable the feature
+# (search/download routes respond 503).
+FREESOUND_API_KEY=
+
 # ─── Deck & History ────────────────────────────────────────────
 MAX_DECK_HISTORY=100                # Number of deck draws to keep in history
 MAX_CHAT_HISTORY=50                 # Rolling chat window sent to newly-joined clients (0 disables)

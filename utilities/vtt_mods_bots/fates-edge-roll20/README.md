@@ -15,6 +15,7 @@ Connects a Roll20 game to the Fate's Edge [socket server](../../javascript/fates
 - Bidirectional chat and dice roll sync.
 - Character sync (Harm, Fatigue, Boons, Tier) as Roll20 attributes and journal entries.
 - Adventure Engine access — load modules, advance scenes, run encounters, tick real campaign/scene timers, log narrative beats.
+- Ad-hoc timers — create, tick, list, and remove freeform GM/AI-improvised timers that live on the server, independent of any loaded adventure.
 - Scene notifications — the current Roll20 page name broadcasts to the VTT on change (one-way).
 - Deck of Consequences draws, shuffles, and Crown Spread readings from Roll20 chat.
 - Region support for card meanings.
@@ -109,13 +110,24 @@ Page changes also sync automatically when `FATES_EDGE_SYNC_SCENES` is on.
 | `!fates-edge shuffle` | Shuffle the deck |
 | `!fates-edge region [name]` | Set or get the default region |
 
-Each room's deck shuffles with its own seedable RNG, so draws are reproducible per room via the server's `GET`/`POST /api/rooms/:code/deck/seed` routes; no `!fates-edge` subcommand calls those yet, though a server-side reseed still shows up here via the existing `deck-shuffled` handler.
+Each room's deck shuffles with its own seedable RNG, so draws are reproducible per room via the server's `GET`/`POST /api/rooms/:code/deck/seed` routes; no `!fates-edge` subcommand calls those yet, though a server-side reseed still shows up here via the existing `deck-shuffled` handler. The socket server's `GET /api/soundboard/search` (Freesound proxy, backing the web client's GM soundboard "Search Sounds" modal) is likewise not exposed here — Roll20's API sandbox doesn't permit outbound HTTP requests at all, so this script is WebSocket-only by necessity, not by omission.
 
 ### Module management
 
 | Command | Description |
 |---|---|
 | `!fates-edge modules list` | List loaded modules |
+
+### Ad-hoc timers
+
+| Command | Description |
+|---|---|
+| `!fates-edge timer add <name> <segments> [description]` | Create a new ad-hoc timer |
+| `!fates-edge timer tick <name> [amount]` | Tick a timer forward (default 1) |
+| `!fates-edge timer remove <name>` | Remove a timer |
+| `!fates-edge timer list` | List all active ad-hoc timers (also `timer status` or bare `timer`) |
+
+Deliberately separate from Adventure Engine timers below — these are GM/AI-improvised and don't require (or care about) a loaded adventure module.
 
 ### Adventure Engine
 
@@ -166,6 +178,7 @@ See [`macros/examples.md`](macros/examples.md) for a full reference. A few basic
 !fates-edge sync characters
 !fates-edge roll 2d20kh1
 !fates-edge draw 3
+!fates-edge timer add "Ritual" 6
 !fates-edge adventure timer "Ritual" 1
 !fates-edge gm request
 ```

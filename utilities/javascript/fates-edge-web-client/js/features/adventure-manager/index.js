@@ -140,6 +140,94 @@ function broadcastTimerTick(timerName, scope, ref, amount) {
 }
 
 // ============================================================
+// AD-HOC TIMERS (server/timers.js) -- NEW
+// ============================================================
+//
+// Deliberately SEPARATE from the campaign/scene timers above: those
+// belong to a specific loaded adventure's authored content (this
+// client's own local copy, reconciled via 'adventure-timer'/
+// 'timer-ticked'). Ad-hoc timers are pure runtime state that exists on
+// the server independent of any adventure being loaded here at all --
+// this client has nothing local to seed them from, so the list is
+// fetched with a request/response round trip on mount ('adhoc-timer-
+// request' -> 'adhoc-timer-state') and kept live via the create/tick/
+// remove broadcasts. See server/timers.js's header doc for the full
+// rationale on why this is its own system.
+
+let adhocTimers = [];
+
+function requestAdhocTimers() {
+    if (!isConnectedToServer()) return;
+    try { sendEvent({ type: 'adhoc-timer-request' }); } catch (e) { /* ignore */ }
+}
+
+function applyAdhocTimerState(payload) {
+    adhocTimers = (payload && payload.timers) || [];
+    if (container && !isDestroyed) renderView();
+}
+
+onWSEvent('adhoc-timer-state', applyAdhocTimerState);
+onWSEvent('adhoc-timer-created', applyAdhocTimerState);
+onWSEvent('adhoc-timer-ticked', applyAdhocTimerState);
+onWSEvent('adhoc-timer-removed', applyAdhocTimerState);
+
+function renderAdhocTimersPanel() {
+    const canEdit = isGM();
+    const rows = adhocTimers.length
+        ? adhocTimers.map(t => `
+            <div class="flex gap-1 flex-center" style="margin:0.15rem 0;">
+                <span class="flex-1 text-sm">${escHtml(t.name)}</span>
+                ${t.description ? `<span style="font-size:0.65rem;color:var(--text2);">${escHtml(t.description)}</span>` : ''}
+                <div style="flex:1;background:var(--bg3);border-radius:var(--radius);height:6px;overflow:hidden;max-width:120px;">
+                    <div style="width:${(t.current / t.segments) * 100}%;height:100%;background:${t.full ? 'var(--red)' : 'var(--gold)'};"></div>
+                </div>
+                <span class="text-xs text-muted">${t.current}/${t.segments}${t.full ? ' 🔔' : ''}</span>
+                ${canEdit ? `
+                    <button class="btn btn-xs btn-primary" onclick="window.adhocTimerTick('${escHtml(t.name)}')">+1</button>
+                    <button class="btn btn-xs btn-danger" onclick="window.adhocTimerRemove('${escHtml(t.name)}')">✕</button>
+                ` : ''}
+            </div>
+        `).join('')
+        : '<span class="text-muted text-sm">No active ad-hoc timers.</span>';
+
+    return `
+        <div class="panel" style="margin-bottom:0.5rem;">
+            <div class="flex gap-1 flex-center" style="margin-bottom:0.3rem;">
+                <strong style="font-size:0.85rem;">⏱️ Ad-Hoc Timers</strong>
+                <span style="font-size:0.65rem;color:var(--text3);">GM/AI-improvised, independent of any loaded adventure</span>
+                ${canEdit ? `<button class="btn btn-xs btn-secondary" style="margin-left:auto;" onclick="window.adhocTimerAdd()">+ New Timer</button>` : ''}
+            </div>
+            ${rows}
+        </div>
+    `;
+}
+
+window.adhocTimerAdd = function() {
+    if (!isGM()) { showToast('Only the GM can create timers.', 'error'); return; }
+    const name = prompt('Timer name:');
+    if (!name) return;
+    const segmentsRaw = prompt('Segments (e.g. 4, 6, 8):', '4');
+    const segments = safeParseInt(segmentsRaw, 4);
+    if (!segments || segments <= 0) { showToast('Segments must be a positive number.', 'error'); return; }
+    const description = prompt('Description (optional):', '') || '';
+    if (!isConnectedToServer()) { showToast('Not connected to server.', 'error'); return; }
+    sendEvent({ type: 'adhoc-timer-create', name, segments, description });
+};
+
+window.adhocTimerTick = function(name, amount = 1) {
+    if (!isGM()) { showToast('Only the GM can tick timers.', 'error'); return; }
+    if (!isConnectedToServer()) { showToast('Not connected to server.', 'error'); return; }
+    sendEvent({ type: 'adhoc-timer-tick', name, amount });
+};
+
+window.adhocTimerRemove = function(name) {
+    if (!isGM()) { showToast('Only the GM can remove timers.', 'error'); return; }
+    if (!confirm(`Remove timer "${name}"?`)) return;
+    if (!isConnectedToServer()) { showToast('Not connected to server.', 'error'); return; }
+    sendEvent({ type: 'adhoc-timer-remove', name });
+};
+
+// ============================================================
 // TIMER SYNC LOOP — apply the server's canonical result
 // ============================================================
 //
@@ -1602,6 +1690,7 @@ function render(el) {
     container = el;
     isDestroyed = false;
     loadAdventuresFromState();
+    requestAdhocTimers();
     renderView();
 }
 
@@ -1694,6 +1783,8 @@ function renderAdventureList() {
                 `}
                 <button class="btn btn-sm btn-secondary" id="adv-refresh-btn">🔄 Refresh</button>
             </div>
+
+            ${renderAdhocTimersPanel()}
 
             ${hasAdventures ? `
                 <div class="flex gap-1 flex-center flex-wrap">
@@ -2723,6 +2814,7 @@ window.adventureRemoveBestiaryCreature = function(adventureId, creatureId) {
 function onActivate() {
     isDestroyed = false;
     loadAdventuresFromState();
+    requestAdhocTimers();
     if (container) render(container);
 }
 
@@ -2732,6 +2824,7 @@ function onDeactivate() {
 
 function refresh() {
     loadAdventuresFromState();
+    requestAdhocTimers();
     renderView();
 }
 

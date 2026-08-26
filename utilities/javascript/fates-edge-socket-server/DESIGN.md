@@ -27,7 +27,7 @@ There's no caching layer, no PDF conversion, no outbound email, no job scheduler
 
 ## HTTP API
 
-Routes group into a handful of feature areas: rooms (create/list/inspect, client lists, kick/ban/unban), characters (per-room CRUD plus an account-owned character *library* independent of any room, and a claim/release bridge tying a library character to a room's live roster — see [`ROLES.md`](ROLES.md)), the deck (draw/shuffle/history, Crown Spread, and the seed endpoints below), the Adventure Engine (load/reset an adventure, advance scenes/timers, log entries, run encounters, pace or force a climax), the whiteboard, campaigns (manual short-code share plus a separate always-latest auto-save — see `server/storage.js`'s header comment for why those two don't share one retention table), auth, modules, TURN credentials, and health checks.
+Routes group into a handful of feature areas: rooms (list/inspect, client lists, kick/ban/unban — there's no single-room GET/DELETE/create REST route, a room is created implicitly the moment any client connects, see `room.js`'s `createRoom()`), characters (per-room CRUD plus an account-owned character *library* independent of any room, and a claim/release bridge tying a library character to a room's live roster — see [`ROLES.md`](ROLES.md)), the deck (draw/shuffle/history, Crown Spread, and the seed endpoints below), the Adventure Engine (load/reset an adventure, advance scenes/pre-authored timers, log entries, run encounters, pace or force a climax), ad-hoc timers (`server/timers.js` — create/tick/resolve/remove GM/AI-improvised timers, deliberately separate from the Adventure Engine's own timers, see below), the whiteboard (including grid combat and tokens, under `/whiteboard/`), campaigns (manual short-code share plus a separate always-latest auto-save — see `server/storage.js`'s header comment for why those two don't share one retention table), auth, modules, TURN credentials, and health checks.
 
 ### The deck's PRNG
 
@@ -65,9 +65,15 @@ flowchart LR
     D -- climax's own final\nscene completes instead --> G["status: completed"]
 ```
 
+### Ad-hoc timers and the AI GM Bot
+
+`server/timers.js` tracks ad-hoc, GM/AI-improvised timers ("Guard Patrol", "Village Unrest") in their own `room.data.timers` bucket, deliberately kept separate from the Adventure Engine's pre-authored scene/campaign timers above — `resetAdventure()`/`loadAdventureModule()`/`loadAdventureContent()` never touch it, and it never touches `room.data.adventure`. It enforces a 3-active-timer cap (a GM's attention budget): a create that pushes past the cap keeps the top timers and coalesces the overflow into one "Merged: ..." timer carrying their averaged progress forward, rather than dropping them. A `applyDeckDrawToTimers()` hook (an Ace ticks one random ad-hoc timer, a Crown Spread ticks all of them) is exported but not yet wired into any deck-draw route. Exposed via `GET`/`POST /api/rooms/:code/timers`, `POST .../timers/tick`, `POST .../timers/resolve`, `DELETE .../timers/:ref`, and mirrored `adhoc-timer-create/tick/remove` + `adhoc-timer-request`→`adhoc-timer-state` events on both WebSocket transports.
+
+This closed a "server as source of truth" gap: the **AI GM Bot** (`fates-edge-ai-gm-bot`, a sibling app, not part of this repo) used to keep its own local timer-tracking module, invisible to every other client. That bot-local module is gone — the bot now creates/ticks/reads ad-hoc timers purely through this server's REST API, exactly like every other client (web client, terminal CLI, Roll20, Discord bot, Foundry bridge). The 3-active-timer cap and deck-draw hook above were ported from that former bot-local module so the logic wasn't lost in the move, not invented fresh here.
+
 ## WebSocket protocol
 
-Both transports speak the same logical protocol; `server/socketio-handlers.js`'s `socket.on(...)` calls and `server/ws-handlers.js`'s `switch` cases are the authoritative event list. Client-originated events cover joining/leaving a room, GM request/approve and role changes, character select/claim/release, deck draws/shuffle/history, chat and dice rolls, voice signaling (offer/answer/ICE/status), adventure state changes, module push/list/cleanup, whiteboard updates, kick/ban, and a generic `event` passthrough — used by client-side features like Kon'reh and Toll & Veil to ride the same relay without needing bespoke server code per feature.
+Both transports speak the same logical protocol; `server/socketio-handlers.js`'s `socket.on(...)` calls and `server/ws-handlers.js`'s `switch` cases are the authoritative event list. Client-originated events cover joining/leaving a room, GM request/approve and role changes, character select/claim/release, deck draws/shuffle/history, chat and dice rolls, voice signaling (offer/answer/ICE/status), adventure state changes, ad-hoc timer create/tick/remove/request (`adhoc-timer-*`, see "Ad-hoc timers and the AI GM Bot" above), module push/list/cleanup, whiteboard updates, kick/ban, and a generic `event` passthrough — used by client-side features like Kon'reh and Toll & Veil to ride the same relay without needing bespoke server code per feature.
 
 ### Room state
 
@@ -85,7 +91,7 @@ Both transports speak the same logical protocol; `server/socketio-handlers.js`'s
   banned: Set,                 // banned userIds/names
   whiteboard: { drawings, notes, images, settings, gridCombat },
   password: String|null,       // bcrypt hash, or null
-  data: Object,                // free-form custom state
+  data: Object,                // free-form custom state, incl. data.timers (ad-hoc timers, server/timers.js) and data.adventure
   created: Number,
   lastActivity: Number,
 }

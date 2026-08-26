@@ -29,6 +29,14 @@ function loadConfig() {
         statsInterval: parseInt(process.env.STATS_INTERVAL, 10) || 30000,
         apiKey: process.env.API_KEY || null,
 
+        // ─── Sound search (soundboard "Search Sounds" feature) ───────
+        // Server-side only -- never sent to the browser. Register a free
+        // key at https://freesound.org/apiv2/apply/. When unset, the
+        // /api/soundboard/search and /api/soundboard/download routes
+        // respond 503 rather than throwing, so a deployment that hasn't
+        // set this up just has that one feature disabled.
+        freesoundApiKey: process.env.FREESOUND_API_KEY || null,
+
         // ─── General API rate limiting ──────────────────────────────
         // Separate from (and stacked on top of) the tighter, route-specific
         // limiters already applied to /api/auth/login and /api/auth/register

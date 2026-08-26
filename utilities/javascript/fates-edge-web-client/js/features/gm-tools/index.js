@@ -761,12 +761,15 @@ function renderSoundboardPanel(isViewOnly) {
         `<option value="${t.id}" ${t.id === currentAmbienceId ? 'selected' : ''}>${escHtml(t.name)}</option>`
     ).join('');
 
-    const sfxButtons = sfxTracks.map(t => `
+    const sfxButtons = sfxTracks.map(t => {
+        const attrTitle = t.attribution ? ` \u2014 attribution: ${escHtml(t.attribution.author)} (${escHtml(t.attribution.license)})` : '';
+        return `
         <span style="display:inline-flex;align-items:center;gap:0.2rem;background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0.2rem 0.3rem 0.2rem 0.6rem;font-size:0.78rem;">
-            <button type="button" class="btn-sound-sfx" data-id="${t.id}" style="background:none;border:none;color:var(--text);cursor:pointer;font-size:0.78rem;padding:0;" ${isViewOnly ? 'disabled' : ''}>🔊 ${escHtml(t.name)}</button>
+            <button type="button" class="btn-sound-sfx" data-id="${t.id}" style="background:none;border:none;color:var(--text);cursor:pointer;font-size:0.78rem;padding:0;" ${isViewOnly ? 'disabled' : ''} title="${escHtml(t.name)}${attrTitle}">🔊 ${escHtml(t.name)}${t.attribution ? ' ⚠' : ''}</button>
             <button type="button" class="btn-sound-remove" data-id="${t.id}" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.72rem;padding:0 0.2rem;" ${isViewOnly ? 'disabled' : ''} title="Remove">✕</button>
         </span>
-    `).join('');
+    `;
+    }).join('');
 
     return `
         <div class="panel">
@@ -782,6 +785,12 @@ function renderSoundboardPanel(isViewOnly) {
                         <button class="btn btn-xs btn-secondary" id="sb-ambience-play" ${isViewOnly ? 'disabled' : ''}>▶ Play</button>
                         <button class="btn btn-xs btn-secondary" id="sb-ambience-stop" ${isViewOnly || !currentAmbienceId ? 'disabled' : ''}>⏹ Stop</button>
                     </div>
+                    ${(() => {
+                        const playing = ambienceTracks.find(t => t.id === currentAmbienceId);
+                        if (!playing?.attribution) return '';
+                        const a = playing.attribution;
+                        return `<div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">⚠ Attribution: <a href="${a.url}" target="_blank" rel="noopener noreferrer" style="color:var(--text2);">${escHtml(a.author)}</a> &middot; ${escHtml(a.license)}</div>`;
+                    })()}
                 </div>
                 <div>
                     <label style="font-size:0.75rem;color:var(--text2);">SFX (one-shot)</label>
@@ -789,12 +798,22 @@ function renderSoundboardPanel(isViewOnly) {
                         ${sfxButtons || '<span style="font-size:0.75rem;color:var(--text3);">No SFX yet.</span>'}
                     </div>
                 </div>
-                <div>
+                <div class="flex" style="gap:0.4rem;">
                     <button class="btn btn-xs btn-secondary" id="sb-add-sound-btn" ${isViewOnly ? 'disabled' : ''}>+ Add Sound</button>
+                    <button class="btn btn-xs btn-gold" id="sb-search-sound-btn" ${isViewOnly ? 'disabled' : ''}>🔎 Search Sounds</button>
                 </div>
             </div>
         </div>
     `;
+}
+
+function handleOpenSoundSearch() {
+    import('./sound-search.js').then(module => {
+        module.openSoundSearchModal({ onChange: refreshView });
+    }).catch(err => {
+        console.error('Failed to load sound search:', err);
+        showToast('Sound search not available.', 'error');
+    });
 }
 
 function handleAddSound() {
@@ -810,6 +829,7 @@ function handleAddSound() {
 
 function attachSoundboardEvents() {
     document.getElementById('sb-add-sound-btn')?.addEventListener('click', handleAddSound);
+    document.getElementById('sb-search-sound-btn')?.addEventListener('click', handleOpenSoundSearch);
 
     document.getElementById('sb-ambience-play')?.addEventListener('click', () => {
         const id = document.getElementById('sb-ambience-select')?.value;

@@ -1,5 +1,18 @@
 # Fate's Edge — Python Client
 
+> **⚠️ Mothballed.** This client is no longer under active development. The
+> `fates-edge-cli.py` bundled directly with the
+> [socket server](../../javascript/fates-edge-socket-server/) is now the
+> maintained scriptable/CLI entry point for the server's REST API (rooms,
+> deck, clients, modules, ad-hoc timers, and more) and is where new
+> server-API surface gets propagated first. This package still works
+> against the current server for what it already implements, but it won't
+> track future API changes (e.g. it predates the ad-hoc timer system in
+> `server/timers.js`) and isn't the recommended starting point for new
+> scripting. Kept in the repo for existing users; not recommended for new
+> setups.
+
+
 A command-line client for the **Fate's Edge** TTRPG toolkit: character management, timers, dice rolling, the Deck of Consequences (region-aware card meanings, Crown Spread), and syncing with a Fate's Edge [socket server](../../javascript/fates-edge-socket-server/) over REST and WebSocket. Installs as a proper package (`fates_edge_client/`) rather than a script you copy around.
 
 ---

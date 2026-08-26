@@ -32,7 +32,7 @@ To play with others, connect to a running [socket server](../fates-edge-socket-s
 - **Timers** — visual timers for scene and campaign pressure.
 - **Docs & Wiki** — a searchable document viewer for the SRD, Essentials guide, and GM Screen, plus a Markdown wiki with an in-app editor.
 - **Search** — full-text search across the Wiki, documents, patrons, factions, and regions. Zero-config with a built-in local Fuse.js index; optionally backed by a self-hosted Solr or Elasticsearch instance for larger deployments (`window.__SOLR_URL` / `window.__ES_URL`/`__ES_API_KEY`, `window.__SEARCH_BACKEND` to force one when both are configured — see System Status for which one is actually active).
-- **Travel Planner** — overland route and travel-time planning across regions.
+- **Crafting** — the Codex (Talent-tier-priced magic items/artifacts, attunement and upkeep/decay tracking) and the crafting bench for ingredients and recipes, split out into its own tab so it isn't gated behind any one magic path.
 
 ### Spellcraft — the magic system
 
@@ -51,9 +51,9 @@ One unified UI covering every path in the game:
 ### Running a campaign
 
 - **Factions & Patrons** — standings, agendas, relationships, and rites/witchcraft/traditions tied to cosmic and terrestrial patrons.
-- **Kanban** — a campaign task board for threats and opportunities.
+- **Adventure Manager** — load pre-authored adventure modules and track scene/act progress, NPCs, locations, and a per-adventure bestiary. Also hosts the **ad-hoc timer panel** — quick GM/AI-improvised countdown timers (e.g. "Guard Patrol," "Village Unrest") that are independent of any loaded adventure and live on the server (`server/timers.js`) rather than in this client's local state, separate from an adventure module's own authored scene/campaign timers.
 - **Whiteboard** — collaborative notes and grid-combat tools.
-- **GM Tools** — GM-only utilities kept separate from the shared player view, including Session Recap (below).
+- **GM Tools** — GM-only utilities kept separate from the shared player view: Session Recap (below), the **Kanban** task board for threats and opportunities, and the **Travel Planner** for overland route/travel-time planning across regions.
 
 ### Real-time play (needs the socket server)
 
@@ -84,9 +84,9 @@ const ROUTE_IMPORTS = {
     home:        () => import('./features/home/index.js'),
     dashboard:   () => import('./features/dashboard/index.js'),
     characters:  () => import('./features/characters/index.js'),
-    builder:     () => import('./features/builder/index.js'),
     dice:        () => import('./features/dice/index.js'),
     decks:       () => import('./features/decks/index.js'),
+    crafting:    () => import('./features/crafting/index.js'),
     encounters:  () => import('./features/encounters/index.js'),
     timers:      () => import('./features/timers/index.js'),
     factions:    () => import('./features/factions/index.js'),
@@ -94,6 +94,7 @@ const ROUTE_IMPORTS = {
     docs:        () => import('./features/docs/index.js'),
     search:      () => import('./features/search/index.js'),
     settings:    () => import('./features/settings/index.js'),
+    'system-status': () => import('./features/system-status/index.js'),
     sync:        () => import('./features/sync/index.js'),
     whiteboard:  () => import('./features/whiteboard/index.js'),
     kanban:      () => import('./features/kanban/index.js'),
@@ -102,9 +103,11 @@ const ROUTE_IMPORTS = {
     'gm-tools':  () => import('./features/gm-tools/index.js'),
     spellcraft:  () => import('./features/spellcraft/index.js'),
     'kon-reh':   () => import('./features/kon-reh/index.js'),
-    'travel-planner': () => import('./features/travel-planner/index.js'),
+    'adventure-manager': () => import('./features/adventure-manager/index.js'),
 };
 ```
+
+`builder` now redirects to `characters` (folded into the character builder wizard there) and `travel-planner` is loaded on demand from inside GM Tools rather than as a standalone route — see `ROUTE_REDIRECTS` in `js/router.js` for the full backward-compatibility list.
 
 Each tab in `js/features/` is self-contained; `js/core/` holds the shared machinery every feature draws on:
 
@@ -143,9 +146,9 @@ data/
 │   └── bloody-fist.json, ecktorian-censorate.json, gray-ash.json, house-contarini.json, iron-league.json, velvet-court.json
 ├── patrons/
 │   ├── manifest.json
-│   └── 17 patron files (inaea_angel_of_spiders.json, the_traveler.json, khemesh_the_abyssal_maw.json, thrysos_king_of_revels.json, …)
+│   └── 51 patron files (inaea_angel_of_spiders.json, the_traveler.json, khemesh_the_abyssal_maw.json, thrysos_king_of_revels.json, …)
 └── regions/
-    └── 18 region files (acasia.json, aelaerem.json, silkstrand.json, ykrul.json, zakov.json, …)
+    └── 23 region files (acasia.json, aelaerem.json, silkstrand.json, ykrul.json, zakov.json, …)
 ```
 
 Adding your own faction, patron, or region is a matter of dropping a JSON file in the right folder and listing it in that folder's `manifest.json` — see [`DATA_SCHEMA.md`](DATA_SCHEMA.md) for the exact on-disk shape of each data type.

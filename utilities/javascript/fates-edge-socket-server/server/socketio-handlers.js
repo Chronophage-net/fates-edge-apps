@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter } = require('./security.js');
 const adventure = require('./adventure.js');
+const timers = require('./timers.js'); // NEW: ad-hoc timers -- deliberately separate from adventure.js, see server/timers.js header
 const auth = require('./auth.js');
 const turn = require('./turn.js');
 
@@ -625,6 +626,56 @@ function setupSocketIO(io, appConfig) {
             } catch (error) {
                 socket.emit('error', { message: error.message });
             }
+        });
+
+        // NEW: ad-hoc timers (server/timers.js) -- see the matching case
+        // in ws-handlers.js for the full rationale on why these are kept
+        // separate from 'adventure-timer' above.
+        socket.on('adhoc-timer-create', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = timers.createTimer(r, { name: data?.name, segments: data?.segments, description: data?.description });
+                room.broadcastToRoom(socket.room, 'adhoc-timer-created', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adhoc-timer-tick', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = timers.tickTimer(r, { ref: data?.ref, name: data?.name, amount: data?.amount });
+                room.broadcastToRoom(socket.room, 'adhoc-timer-ticked', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        socket.on('adhoc-timer-remove', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            try {
+                const state = timers.removeTimer(r, data?.ref !== undefined ? data.ref : data?.name);
+                room.broadcastToRoom(socket.room, 'adhoc-timer-removed', state);
+            } catch (error) {
+                socket.emit('error', { message: error.message });
+            }
+        });
+
+        // NEW: request/response for a client to seed its local ad-hoc
+        // timer list on join/mount (no REST precedent exists in the web
+        // client for this -- see the matching plain-WS case for the
+        // full rationale).
+        socket.on('adhoc-timer-request', () => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return socket.emit('error', { message: 'Room not found' });
+            socket.emit('adhoc-timer-state', timers.getPublicState(r));
         });
 
         socket.on('adventure-log', (data) => {
