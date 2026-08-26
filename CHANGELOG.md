@@ -3,6 +3,17 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.22.0] - 2026-08-26
+
+Soundboard sound search (Freesound proxy) + ad-hoc timer module
+
+### Added
+- soundboard sound search (Freesound) + ad-hoc timer module, propagated to VTT/mods/bots/clients
+
+### Other
+- Updated the manifest and package-lock.json
+- Updated to fix dashboard buttons and general namespace collisions
+
 ## [4.21.0] - 2026-08-24
 
 Cross-repo assistant-suggestion events (SB-spend/Crown Spread LLM synthesis approvals from the AI GM Bot), relayed by the socket server and rendered with live Approve/Reject in the web client, Discord bot, Foundry bridge, and Roll20 API script; whisper-privacy bug fix for join greetings
