@@ -303,5 +303,15 @@ class FatesEdgeWsClient:
             print(f"\n[TTS] AI GM narration audio received (not played by this client): \"{text}\"")
         elif event_type == "soundboard-ambience":
             mood = data.get("mood", "?")
-            track_id = data.get("trackId", "?")
-            print(f"\n[SOUNDSCAPE] Ambience shifting to \"{mood}\" (track {track_id}, not played by this client)")
+            track_id = data.get("trackId")
+            url = data.get("url")
+            if track_id:
+                ref = f"track {track_id}"
+            elif url:
+                # AI GM Bot's SOUNDSCAPE_AUTO_SEARCH: no GM-curated trackId
+                # for this mood, so it searched Freesound itself instead.
+                name = data.get("name", "?")
+                ref = f'auto-searched "{name}" ({url})'
+            else:
+                ref = "track ?"
+            print(f"\n[SOUNDSCAPE] Ambience shifting to \"{mood}\" ({ref}, not played by this client)")

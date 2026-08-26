@@ -621,9 +621,19 @@ export const FatesEdgeBridge = {
     // playlist sound), same "surface it, don't fabricate playback"
     // posture as fates-edge-roll20's handling of this event.
     _handleSoundboardAmbience(data) {
-        const { mood, trackId, transitionDuration } = data || {};
-        if (!mood && !trackId) return;
-        console.log(`🎵 [Fate's Edge] Ambience cue: mood="${mood || '?'}" trackId="${trackId || '?'}"${transitionDuration ? ` (${transitionDuration}ms)` : ''}`);
+        // `url` (+ optional `name`/`attribution`) is the newer shape: the
+        // AI GM Bot's SOUNDSCAPE_AUTO_SEARCH found no GM-curated trackId
+        // for this mood and searched Freesound itself instead -- still no
+        // real playback here (no fetch in this bridge to pull the audio,
+        // and no equivalent inside Foundry's own Playlist system to map
+        // an arbitrary external URL onto automatically), but the Hooks.call
+        // payload below carries it through unchanged for any GM macro/
+        // module listening that wants to react (e.g. load it into a
+        // Playlist sound manually).
+        const { mood, trackId, url, name, transitionDuration } = data || {};
+        if (!mood && !trackId && !url) return;
+        const ref = trackId ? `trackId="${trackId}"` : url ? `url="${url}"${name ? ` name="${name}"` : ''}` : 'trackId="?"';
+        console.log(`🎵 [Fate's Edge] Ambience cue: mood="${mood || '?'}" ${ref}${transitionDuration ? ` (${transitionDuration}ms)` : ''}`);
         Hooks.call('fates-edge-soundboard-ambience', data);
     },
 

@@ -141,18 +141,29 @@ module.exports = {
         });
 
         // NEW: optional Reactive Soundscape (see the AI GM Bot's
-        // adventure-context.js mood -> trackId profile). Posts a "now
-        // playing" embed to the VTT log channel when ambience changes --
-        // no voice playback here, the actual audio plays client-side in
-        // each connected web browser (see that repo's
-        // js/core/soundboard.js). A silent no-op if VTT_LOG_CHANNEL isn't
-        // configured, same as every other getLogChannel()-gated listener
-        // above.
+        // adventure-context.js mood -> trackId profile, and its newer
+        // SOUNDSCAPE_AUTO_SEARCH fallback). Posts a "now playing" embed
+        // to the VTT log channel when ambience changes -- no voice
+        // playback here, the actual audio plays client-side in each
+        // connected web browser (see that repo's js/core/soundboard.js).
+        // A silent no-op if VTT_LOG_CHANNEL isn't configured, same as
+        // every other getLogChannel()-gated listener above.
         vtt.on('soundboard-ambience', (data) => {
             const channel = getLogChannel();
             if (!channel) return;
-            const { mood, trackId, transitionDuration } = data || {};
-            if (!mood && !trackId) return;
+            const { mood, trackId, url, name, attribution, transitionDuration } = data || {};
+            if (!mood && !trackId && !url) return;
+            const fields = [];
+            if (trackId) {
+                fields.push({ name: 'Track', value: trackId, inline: true });
+            } else if (url) {
+                // SOUNDSCAPE_AUTO_SEARCH result -- no pre-existing trackId,
+                // just the Freesound preview URL the bot picked.
+                fields.push({ name: 'Sound', value: name ? `${name} (auto-searched)` : 'Auto-searched', inline: true });
+                if (attribution) {
+                    fields.push({ name: 'Attribution', value: `${attribution.author} — ${attribution.license}`, inline: true });
+                }
+            }
             channel.send({
                 embeds: [{
                     color: 0x9b59b6,
@@ -160,7 +171,8 @@ module.exports = {
                     description: mood
                         ? `Ambience shifting to **${mood}**.`
                         : 'Ambience shifting.',
-                    fields: trackId ? [{ name: 'Track', value: trackId, inline: true }] : [],
+                    url: url || undefined,
+                    fields,
                     footer: transitionDuration ? { text: `Crossfading over ${transitionDuration}ms` } : undefined,
                     timestamp: new Date().toISOString()
                 }]

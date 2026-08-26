@@ -336,7 +336,13 @@ function setupWSS(wss, appConfig) {
                     // matching note in socketio-handlers.js's relayEvents.
                     case 'tts-audio':
                     // NEW: Reactive Soundscape (optional) -- see the
-                    // matching note in socketio-handlers.js's relayEvents.
+                    // matching note in socketio-handlers.js's relayEvents
+                    // for the full payload shape (trackId for a GM-curated
+                    // profile entry, or url/name/attribution when the
+                    // AI GM Bot's SOUNDSCAPE_AUTO_SEARCH picked a Freesound
+                    // result instead). Same plain pass-through relay here
+                    // either way -- this transport never inspects the
+                    // payload, just rebroadcasts it.
                     case 'soundboard-ambience':
                     // NEW: Assistant GM suggestion queue (optional -- see
                     // fates-edge-ai-gm-bot's modules/assistant-suggestions.js

@@ -651,7 +651,17 @@ function handleTtsAudio(data) {
 
 function handleSoundboardAmbience(data) {
     // See the switch-case comment above -- logged for diagnostics only.
-    log('🎵 Ambience cue received: mood="' + (data.mood || '?') + '" trackId="' + (data.trackId || '?') + '" (not playable in the Roll20 API sandbox)');
+    // `url` (+ optional `name`) is the newer shape: the AI GM Bot's
+    // SOUNDSCAPE_AUTO_SEARCH found no GM-curated trackId for this mood
+    // and searched Freesound itself instead. Still not playable here
+    // either way -- same sandbox limitation, no fetch/filesystem access
+    // to pull audio into Roll20's Jukebox regardless of which shape.
+    var ref = data.trackId
+        ? 'trackId="' + data.trackId + '"'
+        : data.url
+            ? 'url="' + data.url + '"' + (data.name ? ' name="' + data.name + '"' : '')
+            : 'trackId="?"';
+    log('🎵 Ambience cue received: mood="' + (data.mood || '?') + '" ' + ref + ' (not playable in the Roll20 API sandbox)');
 }
 
 function handleRollResult(data) {
