@@ -79,7 +79,7 @@ permission does **not** extend to:
 
 Free/non-commercial fan content (adventures, actual play, fan art, house
 rules set in the Amaranthine, etc.) is welcome without asking first — see
-[fate-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fate-edge-docs/blob/main/third-party-policy.md)
+[fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fates-edge-docs/blob/main/third-party-policy.md)
 for the full creator-facing policy and FAQ.
 
 For any commercial use, contact **support@fates-edge.com**.
@@ -106,7 +106,7 @@ you:
 - Distribute your contributions under this same license (CC BY‑NC‑SA 4.0)
 
 For the fuller creator-facing FAQ on publishing/streaming/selling SRD-based
-work, see [fate-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fate-edge-docs/blob/main/third-party-policy.md).
+work, see [fates-edge-docs' third-party-policy.md](https://github.com/Chronophage-net/fates-edge-docs/blob/main/third-party-policy.md).
 
 ---
 

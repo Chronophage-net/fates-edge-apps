@@ -3,6 +3,21 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.24.1] - 2026-08-26
+
+### Fixed
+- repair dangling GM Tools handlers found in button audit
+- verify chat GM formatting server-side, close presence role escalation
+
+### Changed
+- convert relative imports to path aliases across js/
+
+### Docs
+- document verifiedGM chat trust and the presence role-escalation fix
+
+### Chore
+- remove dead code (unused vtt/sync/builder modules)
+
 ## [4.24.0] - 2026-08-26
 
 Propagate SOUNDSCAPE_AUTO_SEARCH's url-shaped ambience cue across remaining VTT/mods/clients

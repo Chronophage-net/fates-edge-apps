@@ -8,6 +8,6 @@ UI work should follow the shared design tokens documented at [dev.fates-edge.com
 
 ## Ground rules
 
-- Open an issue before a large PR, or raise it in [Discussions](https://github.com/Chronophage-net/fate-edge-dev/discussions) first.
+- Open an issue before a large PR, or raise it in [Discussions](https://github.com/Chronophage-net/fates-edge-dev/discussions) first.
 - Small, focused PRs over big ones where possible.
-- Be kind — see the Code of Conduct on the [dev portal repo](https://github.com/Chronophage-net/fate-edge-dev/blob/main/CODE_OF_CONDUCT.md).
+- Be kind — see the Code of Conduct on the [dev portal repo](https://github.com/Chronophage-net/fates-edge-dev/blob/main/CODE_OF_CONDUCT.md).
