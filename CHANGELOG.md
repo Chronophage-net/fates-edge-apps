@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.24.0] - 2026-08-26
+
+Propagate SOUNDSCAPE_AUTO_SEARCH's url-shaped ambience cue across remaining VTT/mods/clients
+
+### Added
+- propagate SOUNDSCAPE_AUTO_SEARCH's url-shaped ambience cue to remaining VTT/mods/clients
+
 ## [4.23.0] - 2026-08-26
 
 Reactive Soundscape auto-search fallback for the AI GM Bot
