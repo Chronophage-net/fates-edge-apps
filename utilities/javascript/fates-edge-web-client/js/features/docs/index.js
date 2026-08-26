@@ -14,6 +14,28 @@
 
 import { escHtml } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
+import { printWithChromeHidden } from '@core/print.js';
+
+// Docs that get a "Print" button (browser native print-to-PDF covers the
+// "download as PDF" case for these -- see js/features/characters/
+// character-pdf.js's header comment for why that's not true of the
+// character sheet, which gets its own dedicated PDF export instead).
+//
+// Deliberately an allowlist of specific doc ids, not a doc "type"/folder
+// check: the SRD and Essentials guide are CC BY-NC-SA 4.0, and Campfire
+// Mode is explicitly written to be "free to print and share at the table"
+// (see js/features/home/index.js). Every other doc -- adventures, patron
+// lore, the bestiary, setting fiction, etc. -- is proprietary, distributed
+// for personal use only (see the repo root README's license section), and
+// intentionally gets no print/export affordance from inside the app. An
+// allowlist by id keeps that boundary explicit even if a future doc lands
+// in the same folder (e.g. "quickstart") without actually being covered by
+// the same license.
+// 'systems_reference_document' is the SRD's actual id as generated into
+// data/docs/manifest.json by generate-manifests.js; 'srd' is also listed
+// as a fallback since scanFilesystem()'s knownCoreFiles below would assign
+// that id instead if the manifest ever didn't already have this file.
+const PRINTABLE_DOC_IDS = new Set(['systems_reference_document', 'srd', 'essentials', 'campfire_mode']);
 
 // ============================================================
 // CONSTANTS
@@ -400,6 +422,9 @@ export function render(el) {
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.8rem;">
                 <h3 id="doc-viewer-title" style="color:var(--gold);margin:0;font-size:1.2rem;"></h3>
                 <div style="display:flex;gap:0.4rem;">
+                    <!-- Hidden by default; shown only for docs in
+                         PRINTABLE_DOC_IDS -- see loadDocument(). -->
+                    <button class="btn btn-sm" id="doc-print-btn" style="display:none;" title="Print this document">🖨️ Print</button>
                     <button class="btn btn-sm btn-primary" id="doc-copy-url">🔗 Copy Link</button>
                     <button class="btn btn-sm" id="doc-close-viewer">✕ Close</button>
                 </div>
@@ -843,6 +868,9 @@ function attachDocEvents() {
 
     if (copyBtn) copyBtn.addEventListener('click', copyDocUrl);
     if (closeBtn) closeBtn.addEventListener('click', closeDocViewer);
+
+    const printBtn = document.getElementById('doc-print-btn');
+    if (printBtn) printBtn.addEventListener('click', () => printWithChromeHidden());
 
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
@@ -1364,6 +1392,15 @@ export function loadDocument(docPath, preserveTheme = false) {
         if (!doc) {
             doc = allDocs.find(d => d.fullPath && d.fullPath.endsWith(docPath));
         }
+    }
+
+    // Show the Print button only for the docs it's actually meant for --
+    // see PRINTABLE_DOC_IDS's comment above. Set once here (rather than in
+    // each render branch below) so it stays correct regardless of which
+    // branch ends up rendering this doc.
+    const printBtn = document.getElementById('doc-print-btn');
+    if (printBtn) {
+        printBtn.style.display = (doc && PRINTABLE_DOC_IDS.has(doc.id)) ? '' : 'none';
     }
 
     if (doc && doc.isPDF) {

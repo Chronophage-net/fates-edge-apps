@@ -2783,3 +2783,75 @@ body.xcard-active .app-shell {
 .craft-result-missing { color: var(--orange); font-size: 0.75rem; }
 .craft-result-created { color: var(--green); font-size: 0.75rem; }
 .craft-result-close { align-self: flex-start; }
+
+/* ============================================================
+   PRINT — toggled by js/core/print.js's printWithChromeHidden(), which
+   flips `body.print-active` and calls window.print(). Not a general
+   print stylesheet for the whole app: the two features that use it
+   (js/features/characters/editor.js's character sheet, and
+   js/features/docs/index.js's SRD/Essentials/Campfire Mode viewer) each
+   already isolate their own content in the DOM before this ever needs to
+   hide anything else, so the rules below only need to cover the chrome
+   that's still visible around them (sidebar, toasts, in-panel buttons).
+   Has zero effect on a plain Ctrl+P with no print-active class set --
+   that still falls through to the browser's own default full-page print.
+   ============================================================ */
+@media print {
+    body.print-active #sidebar,
+    body.print-active #toast-container {
+        display: none !important;
+    }
+
+    /* Character sheet (js/features/characters/editor.js). openEditor()
+       already hides #app-content's other children (sidebar, main-content)
+       while the editor is open, so #charModal is effectively alone on the
+       page already -- this just strips its own remaining chrome and the
+       80vh scroll clamp so the whole sheet prints instead of one scrolled
+       page of it. */
+    body.print-active #charModal #charModalClose,
+    body.print-active #charModal button {
+        display: none !important;
+    }
+    body.print-active #charModal,
+    body.print-active #char-editor-content {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    body.print-active #charModal,
+    body.print-active #charModal * {
+        color: #000 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+    body.print-active #charModal input,
+    body.print-active #charModal select,
+    body.print-active #charModal textarea {
+        border: 1px solid #999 !important;
+        color: #000 !important;
+    }
+
+    /* Docs viewer (js/features/docs/index.js) -- gated to
+       PRINTABLE_DOC_IDS there (SRD / Essentials / Campfire Mode). Hide
+       everything else in the Docs tab (search/filter bar, doc list) and
+       the viewer's own toolbar/chapter-nav, then lift the fixed-height
+       scroll box so the full document prints. */
+    body.print-active #tab-docs > *:not(#doc-viewer-container) {
+        display: none !important;
+    }
+    body.print-active #doc-viewer-container > div:first-child,
+    body.print-active #doc-chapter-nav {
+        display: none !important;
+    }
+    body.print-active #doc-viewer-container,
+    body.print-active #doc-viewer {
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        border: none !important;
+    }
+    body.print-active #doc-viewer,
+    body.print-active #doc-viewer * {
+        color: #000 !important;
+        background: #fff !important;
+    }
+}

@@ -39,6 +39,8 @@ import { openTalentEditor } from './talent-editor.js';
 import { ensureTalentEffects } from '@core/talent-effects.js';
 import { loadTalentCatalog, collectTalentTags } from '@core/talent-loader.js';
 import { TALENT_CATEGORIES } from './talent-editor.js';
+import { printWithChromeHidden } from '@core/print.js';
+import { exportCharacterPDF } from './character-pdf.js';
 
 console.log('[Editor] Module loaded');
 
@@ -46,21 +48,21 @@ console.log('[Editor] Module loaded');
 // GAME DATA CONSTANTS (from Player's Guide)
 // ============================================================
 
-const ALL_SKILLS = [
+export const ALL_SKILLS = [
     'Melee', 'Ranged', 'Unarmed', 'Athletics',
     'Stealth', 'Endurance', 'Craft', 'Sway',
     'Deception', 'Subterfuge', 'Performance', 'Insight',
     'Lore', 'Investigation', 'Medicine', 'Arcana'
 ];
 
-const SKILL_ATTRIBUTES = {
+export const SKILL_ATTRIBUTES = {
     melee: 'body', ranged: 'wits', unarmed: 'body', athletics: 'body',
     stealth: 'wits', endurance: 'body', craft: 'wits', sway: 'presence',
     deception: 'presence', subterfuge: 'wits', performance: 'presence', insight: 'spirit',
     lore: 'wits', investigation: 'wits', medicine: 'wits', arcana: 'spirit'
 };
 
-const HERITAGES = [
+export const HERITAGES = [
     { id: 'human', label: 'Human — The Adaptable', note: 'No attribute adjustments. Endless Reach talent (free)' },
     { id: 'aelaerem', label: 'Aelaerem (Halfling) — Hearth & Hollow', note: 'Wits+1, Presence+1, Body-1. Small Folk traits' },
     { id: 'aelinnel', label: 'Aelinnel (Gnome) — Stone, Bough, Bright Things', note: 'Wits+1, Spirit+1, Body-1. Small Folk traits' },
@@ -365,7 +367,7 @@ function calculateTotalXpSpent(c) {
     return spent;
 }
 
-function getTierFromXp(xp) {
+export function getTierFromXp(xp) {
     for (const t of TIER_THRESHOLDS) {
         if (xp >= t.min && xp <= t.max) {
             return { tier: t.tier, name: t.name };
@@ -1532,9 +1534,15 @@ function buildEditorHTML(c) {
             </div>
 
             <!-- Buttons -->
-            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);flex-wrap:wrap;">
                 <button class="btn btn-gold" id="ce-save-btn">💾 Save</button>
                 <button class="btn btn-secondary" id="ce-cancel-btn">Cancel</button>
+                <!-- Print / PDF: character data is the player's own, so unlike
+                     the docs library (see js/features/docs/index.js's
+                     PRINTABLE_DOC_IDS) there's no licensing reason to gate
+                     these behind anything. -->
+                <button class="btn btn-secondary" id="ce-print-btn" title="Print this character sheet" style="margin-left:auto;">🖨️ Print</button>
+                <button class="btn btn-secondary" id="ce-pdf-btn" title="Download this character sheet as a PDF">⬇️ PDF</button>
             </div>
         </div>
     `;
@@ -1858,6 +1866,23 @@ function attachEditorEvents() {
         }
         editorState.saveListener = saveEditor;
         saveBtn.addEventListener('click', editorState.saveListener);
+    }
+
+    const printBtn = document.getElementById('ce-print-btn');
+    if (printBtn) {
+        printBtn.addEventListener('click', () => printWithChromeHidden());
+    }
+
+    const pdfBtn = document.getElementById('ce-pdf-btn');
+    if (pdfBtn) {
+        pdfBtn.addEventListener('click', () => {
+            const c = getCharacter(editorState.currentId);
+            if (!c) {
+                showToast('Character not found.', 'error');
+                return;
+            }
+            exportCharacterPDF(c);
+        });
     }
 
     const closeBtns = ['ce-cancel-btn', 'charModalClose'];
