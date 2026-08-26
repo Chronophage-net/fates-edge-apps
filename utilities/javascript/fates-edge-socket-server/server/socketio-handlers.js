@@ -945,9 +945,17 @@ function setupSocketIO(io, appConfig) {
             // exactly like 'tts-audio' above so every connected web client
             // picks it up and crossfades ambience (see
             // fates-edge-web-client's js/core/soundboard.js and
-            // js/features/vtt/vtt-connected.js). Payload is tiny (mood/
-            // trackId/transitionDuration strings+numbers, no audio data),
-            // so this needs no special payload-size handling.
+            // js/features/vtt/vtt-connected.js). Payload is either
+            // { mood, trackId, transitionDuration } (a GM-curated
+            // profile entry -- trackId must already exist in the
+            // receiving room's own soundboard) or, when the bot's
+            // SOUNDSCAPE_AUTO_SEARCH is on and no profile entry matched,
+            // { mood, url, name, attribution?, transitionDuration } from
+            // a live GET /api/soundboard/search lookup (see that route
+            // below) -- the receiving client auto-adds a track from the
+            // URL instead of looking one up by id. Either way this is a
+            // tiny JSON payload (no audio data), so it needs no special
+            // payload-size handling.
             'soundboard-ambience',
             // NEW: Assistant GM suggestion queue (optional -- see
             // fates-edge-ai-gm-bot's modules/assistant-suggestions.js and

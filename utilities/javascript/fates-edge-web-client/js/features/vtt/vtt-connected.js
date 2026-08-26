@@ -82,7 +82,7 @@ import {
     setNarrationEnabled
 } from './tts-narration.js';
 import { renderCombatActions, resetCombatScene } from './combat-actions.js';
-import { playAmbience as playAmbienceTrack, getSoundTracks } from '../../core/soundboard.js';
+import { playAmbience as playAmbienceTrack, getSoundTracks, addSoundTrack, setTrackAttribution } from '../../core/soundboard.js';
 
 // ============================================================
 // STATE
@@ -1225,26 +1225,52 @@ function setupWebSocketSync() {
     // ─── REACTIVE SOUNDSCAPE ────────────────────────
     // Optional -- fired by the AI GM Bot on scene changes or an explicit
     // [MOOD "..."] tag (see that repo's adventure-context.js/
-    // process-tags.js). `trackId` is only meaningful if a track with that
-    // exact id already exists in THIS room's soundboard (see
-    // core/soundboard.js's addSoundTrack()) -- a mood the bot's own
-    // profile maps to a track this room never created is a silent no-op
-    // here, same fail-soft posture as every other optional integration in
-    // this app. Defaults transitionDuration to 2000ms (the "bonus" smooth
-    // fade from the feature request) when the event doesn't specify one.
+    // process-tags.js). Two shapes, both fail-soft (silent no-op if
+    // unusable) like every other optional integration in this app:
+    //
+    //   1. `trackId` -- only meaningful if a track with that exact id
+    //      already exists in THIS room's soundboard (a GM manually mapped
+    //      this mood to one of their own tracks -- see
+    //      core/soundboard.js's addSoundTrack()). A mood the bot's
+    //      profile maps to a track this room never created is ignored.
+    //
+    //   2. `url` (NEW) -- the bot's SOUNDSCAPE_AUTO_SEARCH mode: no GM
+    //      mapping existed for this mood, so the bot searched Freesound
+    //      itself (via the socket server's /api/soundboard/search proxy)
+    //      and picked a result. There's no pre-existing local track to
+    //      reference, so this room auto-adds one on the fly (same
+    //      addSoundTrack() the "Search Sounds" modal uses) and plays
+    //      that -- every room that receives the cue ends up with its own
+    //      independent track pointing at the same URL, exactly as if
+    //      each GM had added it by hand. Attribution is attached the same
+    //      way the search modal does it, when the bot says it's required.
+    //
+    // Defaults transitionDuration to 2000ms (the "bonus" smooth fade from
+    // the feature request) when the event doesn't specify one.
     const soundboardAmbienceHandler = (data) => {
         if (isDestroyed) return;
-        const trackId = data?.trackId;
-        if (!trackId) return;
-        const exists = getSoundTracks().some(t => t.id === trackId);
-        if (!exists) {
-            console.log(`[VTT] Soundscape cue for mood "${data?.mood || '?'}" references unknown track "${trackId}" -- no matching track in this room's soundboard, ignoring.`);
+        const transitionDuration = Number.isFinite(data?.transitionDuration) ? data.transitionDuration : 2000;
+
+        if (data?.trackId) {
+            const exists = getSoundTracks().some(t => t.id === data.trackId);
+            if (!exists) {
+                console.log(`[VTT] Soundscape cue for mood "${data?.mood || '?'}" references unknown track "${data.trackId}" -- no matching track in this room's soundboard, ignoring.`);
+                return;
+            }
+            playAmbienceTrack(data.trackId, { transitionDuration });
+            if (data?.mood) showToast(`🎵 Ambience shifting to "${data.mood}"`, 'info');
             return;
         }
-        const transitionDuration = Number.isFinite(data?.transitionDuration) ? data.transitionDuration : 2000;
-        playAmbienceTrack(trackId, { transitionDuration });
-        if (data?.mood) {
-            showToast(`🎵 Ambience shifting to "${data.mood}"`, 'info');
+
+        if (data?.url) {
+            const name = (data.name || `Auto: ${data.mood || 'ambience'}`).trim();
+            const track = addSoundTrack({ name, url: data.url, type: 'ambience', volume: 1 });
+            if (!track) return;
+            if (data.attribution) {
+                setTrackAttribution(track.id, data.attribution);
+            }
+            playAmbienceTrack(track.id, { transitionDuration });
+            showToast(`🎵 AI GM auto-selected "${name}"${data?.mood ? ` for "${data.mood}"` : ''}`, 'info');
         }
     };
     onWSEvent('soundboard-ambience', soundboardAmbienceHandler);
