@@ -3,6 +3,11 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.22.1] - 2026-08-26
+
+### Docs
+- document soundboard sound search in DESIGN.md/README.md
+
 ## [4.22.0] - 2026-08-26
 
 Soundboard sound search (Freesound proxy) + ad-hoc timer module
