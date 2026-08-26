@@ -122,6 +122,10 @@ Every room shuffles its deck with its own independent, seedable PRNG rather than
 >
 > `--chat` and `--roll` have no REST equivalent on the server — chat and dice rolls are WebSocket-only. Use `fates-edge websocket --code AC12` (or the `shell`) for those instead.
 
+### Soundboard sound search (library only)
+
+`FatesEdgeRestClient` has `search_sounds(query, page=1, page_size=20)` and `resolve_sound(freesound_id)`, matching the socket server's `GET /api/soundboard/search` / `GET /api/soundboard/download/:id` (a Freesound proxy — see the socket server's README). Not yet wired into the `fates-edge` CLI or interactive shell, same as `list_modules()`/`push_module()`/`cleanup_module()` above (`cli/commands/modules.py` is a deliberate stub — see its docstring) — a follow-up, not a bug.
+
 ### WebSocket
 
 ```bash

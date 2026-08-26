@@ -53,7 +53,7 @@ One unified UI covering every path in the game:
 - **Factions & Patrons** — standings, agendas, relationships, and rites/witchcraft/traditions tied to cosmic and terrestrial patrons.
 - **Adventure Manager** — load pre-authored adventure modules and track scene/act progress, NPCs, locations, and a per-adventure bestiary. Also hosts the **ad-hoc timer panel** — quick GM/AI-improvised countdown timers (e.g. "Guard Patrol," "Village Unrest") that are independent of any loaded adventure and live on the server (`server/timers.js`) rather than in this client's local state, separate from an adventure module's own authored scene/campaign timers.
 - **Whiteboard** — collaborative notes and grid-combat tools.
-- **GM Tools** — GM-only utilities kept separate from the shared player view: Session Recap (below), the **Kanban** task board for threats and opportunities, and the **Travel Planner** for overland route/travel-time planning across regions.
+- **GM Tools** — GM-only utilities kept separate from the shared player view: Session Recap (below), the **Kanban** task board for threats and opportunities, the **Travel Planner** for overland route/travel-time planning across regions, and a **Soundboard** (ambience loops + one-shot SFX, with a crossfade transition) whose "Search Sounds" modal looks up CC-licensed tracks on [Freesound](https://freesound.org) via the socket server's proxy (needs `FREESOUND_API_KEY` set there — see that server's README) and tracks attribution for anything that requires it.
 
 ### Real-time play (needs the socket server)
 
