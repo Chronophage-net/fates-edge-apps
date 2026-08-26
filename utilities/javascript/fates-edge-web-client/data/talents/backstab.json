@@ -5,7 +5,6 @@
   "tier": "prestige",
   "activation": "reactive",
   "category": "rogue-thief",
-  "tags": ["reactive", "melee", "unarmed", "stealth", "once-per-scene", "prestige"],
   "useLimit": "once-scene",
   "prerequisites": "Stealth 3+, Requires: Tier III",
   "effect": "+1d Melee or Unarmed once per scene when attacking from Stealth",

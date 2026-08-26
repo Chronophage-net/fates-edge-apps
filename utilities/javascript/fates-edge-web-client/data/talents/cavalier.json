@@ -5,7 +5,6 @@
   "tier": "major",
   "activation": "passive",
   "category": "movement",
-  "tags": ["passive", "melee", "mounted", "major", "requires-asset"],
   "useLimit": "passive",
   "prerequisites": "Requires: mounted War Mount asset",
   "effect": "+2d Melee when moving Near→Far on a mount",

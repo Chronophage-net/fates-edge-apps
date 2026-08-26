@@ -5,7 +5,6 @@
   "tier": "epic",
   "activation": "reactive",
   "category": "monk-unarmed",
-  "tags": ["reactive", "unarmed", "monk", "reroll", "once-per-session", "epic"],
   "useLimit": "once-session",
   "prerequisites": "Unarmed 4+, Requires: Monastic Training",
   "effect": "Reroll a failing die once per session",

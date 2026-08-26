@@ -5,7 +5,6 @@
   "tier": "minor",
   "activation": "active",
   "category": "general",
-  "tags": ["active", "fatigue", "once-per-scene", "minor", "starter"],
   "useLimit": "once-scene",
   "prerequisites": "",
   "effect": "Ignore 1d of Fatigue penalty once per scene",

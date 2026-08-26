@@ -611,7 +611,7 @@
   "completedAt": null,
   "status": "planned",
   "createdAt": "2026-08-07T00:00:00.000Z",
-  "updatedAt": "2026-08-07T00:00:00.000Z",
+  "updatedAt": "2026-08-18T00:00:00.000Z",
   "knowledge": [
     {
       "id": "maelstraeus-agent-secret",
@@ -712,5 +712,6 @@
         "plot-secret"
       ]
     }
-  ]
+  ],
+  "tierRange": "III"
 }

@@ -5,7 +5,6 @@
   "tier": "major",
   "activation": "passive",
   "category": "combat",
-  "tags": ["passive", "melee", "combat", "major"],
   "useLimit": "passive",
   "prerequisites": "Melee 2+",
   "effect": "+2d Melee",

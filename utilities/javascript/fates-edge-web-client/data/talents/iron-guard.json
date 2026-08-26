@@ -5,7 +5,6 @@
   "tier": "major",
   "activation": "passive",
   "category": "defense",
-  "tags": ["passive", "armor", "defense", "major"],
   "useLimit": "passive",
   "prerequisites": "Body 3+",
   "effect": "ignore armor penalty",
