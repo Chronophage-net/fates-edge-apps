@@ -6,6 +6,10 @@
 > [LICENSE.srd](LICENSE.srd), and [LICENSE.proprietary](LICENSE.proprietary)
 > files if you only need one category.
 
+> Wondering what happens to this project if the author becomes
+> unreachable? See [`SUCCESSION.md` in fates-edge-docs](https://github.com/Chronophage-net/fates-edge-docs/blob/main/SUCCESSION.md)
+> — none of the licenses below depend on active maintenance to remain valid.
+
 This repository contains two distinct categories of intellectual property:
 1. **Software Source Code** – the application code that makes the Virtual Tabletop run.
 2. **Game Content** – all rules, lore, characters, and data files.
