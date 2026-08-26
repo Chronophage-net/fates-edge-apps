@@ -17,14 +17,14 @@
  *      matching the connected mode; chat height increased.
  */
 
-import { vttStore } from '../../core/vtt-store.js';
-import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory, saveState } from '../../core/state.js';
-import { performRoll } from '../../core/dice.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
-import { isConnectedToServer, isLocalOnlyMode, setLocalOnlyMode } from '../../core/websocket.js';
-import { collectEquipmentModifiers } from '../../core/talent-effects.js';
-import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '../characters/roller.js';
+import { vttStore } from '@core/vtt-store.js';
+import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory, saveState } from '@core/state.js';
+import { performRoll } from '@core/dice.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
+import { isConnectedToServer, isLocalOnlyMode, setLocalOnlyMode } from '@core/websocket.js';
+import { collectEquipmentModifiers } from '@core/talent-effects.js';
+import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '@features/characters/roller.js';
 import {
   setContainer,
   q,
@@ -69,8 +69,8 @@ async function renderMiniTracker() {
   const el = q('#vtt-mini-tracker-body');
   if (!el) return;
   try {
-    const combatModule = await import('../encounters/combat.js');
-    const { resolveObjectiveType, isCombatType } = await import('../../core/objective-types.js');
+    const combatModule = await import('@features/encounters/combat.js');
+    const { resolveObjectiveType, isCombatType } = await import('@core/objective-types.js');
     const trackerState = combatModule.getTrackerState();
     if (!trackerState.combatants || trackerState.combatants.length === 0) {
       el.innerHTML = '<div class="text-muted text-sm">No active encounter. Open Encounters to start one.</div>';
@@ -144,6 +144,11 @@ function createLocalMessage(text, sender, recipient = 'all', metadata = {}) {
     local: true,
     id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
     sent: false,
+    // Solo/local mode has no other connected players to spoof a GM label
+    // for -- see vtt-core.js's renderChatMessageText -- so it's always
+    // "verified" here, the same way isGM()-style checks elsewhere treat
+    // offline/solo play as full-trust.
+    verifiedGM: true,
     ...metadata
   };
 }
@@ -289,7 +294,7 @@ function handleSlash(text) {
     case 'timer': {
       const name = parts.slice(1, parts.length - 1).join(' ') || 'Scene Timer';
       const segments = parseInt(parts[parts.length - 1], 10) || 4;
-      import('../../core/state.js').then(module => {
+      import('@core/state.js').then(module => {
         const state = module.getState();
         const newTimer = { id: 'timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4), name, segments, current: 0 };
         state.timers = state.timers || [];
@@ -480,7 +485,7 @@ function attachEvents() {
         // version (it never reset once/scene talent charges or called
         // saveState() directly). Dynamic import avoids a circular top-level
         // import between vtt-local.js and gm-tools/index.js.
-        import('../gm-tools/index.js').then(module => {
+        import('@features/gm-tools/index.js').then(module => {
           if (typeof module.sceneEndTrimBoons === 'function') {
             module.sceneEndTrimBoons();
           }

@@ -303,6 +303,15 @@ function setupWSS(wss, appConfig) {
                     case 'chat-message': {
                         const chatMsg = (data && data.message) || data;
                         room.recordChatMessage(currentRoom, chatMsg, wssConfig.maxChatHistory);
+                        // SECURITY FIX: see the matching comment in
+                        // socketio-handlers.js's 'chat-message' handler --
+                        // stamp the server's own authoritative role for this
+                        // connection so the client can verify a 'GM' sender
+                        // claim instead of trusting the message's own
+                        // (client-supplied) sender/role fields.
+                        if (chatMsg && typeof chatMsg === 'object') {
+                            chatMsg.verifiedGM = isGmLike(ws.clientData?.role);
+                        }
                         // Whisper with a resolvable live recipient (e.g. the AI GM
                         // bot's join greeting) -- deliver privately instead of to
                         // the whole room. See room.js's deliverWhisper() for what
@@ -645,9 +654,16 @@ function setupWSS(wss, appConfig) {
                         if (data.name) {
                             ws.clientData.name = clampString(data.name, MAX_NAME_LENGTH) || ws.clientData.name;
                         }
-                        if (data.role) {
-                            ws.clientData.role = data.role;
-                        }
+                        // SECURITY FIX: `data.role` here used to be trusted
+                        // verbatim, letting any connected client grant itself
+                        // 'gm' (or any other role) by sending a presence
+                        // update with `role: 'gm'` -- completely bypassing
+                        // the guarded request_gm/approve_gm/role_change_request
+                        // flow above (which checks who's allowed to promote
+                        // whom, and that only one client holds the GM seat).
+                        // Role is server-authoritative and changes only
+                        // through that flow; presence updates must not be
+                        // able to touch it.
                         if (data.activeView) {
                             ws.clientData.activeView = data.activeView;
                         }
@@ -718,9 +734,11 @@ function setupWSS(wss, appConfig) {
                             if (data.name) {
                                 ws.clientData.name = data.name;
                             }
-                            if (data.role) {
-                                ws.clientData.role = data.role;
-                            }
+                            // SECURITY FIX: see the matching comment on the
+                            // 'presence' case above -- role must never be
+                            // settable from a client-supplied presence
+                            // payload, only through the guarded GM/role
+                            // request flow.
                             if (data.activeView) {
                                 ws.clientData.activeView = data.activeView;
                             }

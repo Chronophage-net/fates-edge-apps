@@ -18,14 +18,15 @@
  * v11 – Exposed global window.sendToVTT() for other modules to post messages/cards.
  */
 
-import { vttStore, MAX_CONTROLLED_CHARACTERS } from '../../core/vtt-store.js';
-import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId, onCharacterChange } from '../../core/state.js';
-import { performRoll } from '../../core/dice.js';
-import { collectEquipmentModifiers } from '../../core/talent-effects.js';
-import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '../characters/roller.js';
-import { showToast } from '../../components/Toast.js';
-import { announce } from '../../core/a11y-announce.js';
-import { escHtml } from '../../core/utils.js';
+import { vttStore, MAX_CONTROLLED_CHARACTERS } from '@core/vtt-store.js';
+import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId, onCharacterChange } from '@core/state.js';
+import { performRoll } from '@core/dice.js';
+import { collectEquipmentModifiers } from '@core/talent-effects.js';
+import { RANGE_BAND_OPTIONS, RANGE_BAND_LABEL_MAP } from '@features/characters/roller.js';
+import { showToast } from '@components/Toast.js';
+import { announce } from '@core/a11y-announce.js';
+import { escHtml } from '@core/utils.js';
+import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
 import {
     isConnectedToServer,
     sendChatMessage,
@@ -48,7 +49,7 @@ import {
     offWSEvent,
     getConnectionMode,
     sendWSMessage
-} from '../../core/websocket.js';
+} from '@core/websocket.js';
 import {
     setContainer,
     q,
@@ -82,7 +83,7 @@ import {
     setNarrationEnabled
 } from './tts-narration.js';
 import { renderCombatActions, resetCombatScene } from './combat-actions.js';
-import { playAmbience as playAmbienceTrack, getSoundTracks, addSoundTrack, setTrackAttribution } from '../../core/soundboard.js';
+import { playAmbience as playAmbienceTrack, getSoundTracks, addSoundTrack, setTrackAttribution } from '@core/soundboard.js';
 
 // ============================================================
 // STATE
@@ -190,8 +191,8 @@ async function renderMiniTracker() {
     const el = q('#vtt-mini-tracker-body');
     if (!el) return;
     try {
-        const combatModule = await import('../encounters/combat.js');
-        const { resolveObjectiveType, isCombatType } = await import('../../core/objective-types.js');
+        const combatModule = await import('@features/encounters/combat.js');
+        const { resolveObjectiveType, isCombatType } = await import('@core/objective-types.js');
         const trackerState = combatModule.getTrackerState();
         if (!trackerState.combatants || trackerState.combatants.length === 0) {
             el.innerHTML = '<div class="text-muted text-sm">No active encounter. Open Encounters to start one.</div>';
@@ -273,6 +274,14 @@ function createMessage(text, sender, recipient = 'all', metadata = {}) {
         local: !isConnected,
         id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
         sent: false,
+        // Optimistic local value for OUR OWN immediate render, based on our
+        // own last-known server-confirmed role -- see vtt-core.js's
+        // renderChatMessageText. The server stamps its own authoritative
+        // copy of this field when it relays the message to everyone else
+        // (see server/socketio-handlers.js / ws-handlers.js's 'chat-message'
+        // handlers), overwriting whatever we send, so a modified client
+        // claiming this locally can't fool other players -- only itself.
+        verifiedGM: !isConnected || isGmLikeRole(getMyStoredRole()),
         ...metadata
     };
 }
@@ -580,7 +589,7 @@ async function handleModulePush(moduleId) {
             if (adventureJson) {
                 try {
                     const content = JSON.parse(adventureJson);
-                    const adventureManager = await import('../adventure-manager/index.js');
+                    const adventureManager = await import('@features/adventure-manager/index.js');
                     adventureManager.installAdventureContent(content, { sourceLabel: '📦 Module installed' });
                 } catch (err) {
                     console.warn('[VTT Connected] Pushed module could not be auto-installed locally:', err);
@@ -727,7 +736,7 @@ function rollConnected(postToChat = true) {
             } catch (e) { /* ignore */ }
         }
 
-        import('../encounters/combat.js').then(module => {
+        import('@features/encounters/combat.js').then(module => {
             module.logExternalAction?.(sender, msg, 'roll');
         }).catch(() => {});
     }
@@ -767,7 +776,7 @@ function handleSlash(text) {
                     critical: result.critical
                 }
             });
-            import('../encounters/combat.js').then(module => {
+            import('@features/encounters/combat.js').then(module => {
                 module.logExternalAction?.(sender, msg, 'roll');
             }).catch(() => {});
             break;
@@ -1328,7 +1337,7 @@ function setupWebSocketSync() {
 
         try {
             const content = JSON.parse(adventureJson);
-            const adventureManager = await import('../adventure-manager/index.js');
+            const adventureManager = await import('@features/adventure-manager/index.js');
             adventureManager.installAdventureContent(content, {
                 sourceLabel: `📦 Module pushed`
             });
@@ -1344,7 +1353,7 @@ function setupWebSocketSync() {
         if (isDestroyed) return;
         const moduleId = data.moduleId || 'Unknown';
         try {
-            const adventureManager = await import('../adventure-manager/index.js');
+            const adventureManager = await import('@features/adventure-manager/index.js');
             const removed = adventureManager.removeInstalledAdventure(moduleId);
             showToast(removed ? `🧹 Module removed: ${moduleId}` : `🧹 Module cleanup: ${moduleId} (was not installed here)`, 'info');
         } catch (err) {
@@ -1625,7 +1634,7 @@ async function toggleVoice() {
         // BUGFIX: was `state.sessionId || 'vtt-' + Date.now().toString(36)`
         // — see getStableClientId() in core/state.js.
         const userId = getStableClientId();
-        const { initMediaModule } = await import('../../core/media.js');
+        const { initMediaModule } = await import('@core/media.js');
         initMediaModule(userId);
     } catch (e) { /* ignore */ }
     if (isDestroyed) return;
@@ -1761,7 +1770,7 @@ function attachEvents() {
             }
             case 'vtt-roll-post-btn': rollConnected(true); break;
             case 'vtt-roll-only-btn': rollConnected(false); break;
-            case 'vtt-add-timer': import('../../core/state.js').then(m => {
+            case 'vtt-add-timer': import('@core/state.js').then(m => {
                 const state = m.getState();
                 const name = prompt('Timer name:', 'Scene Timer');
                 if (name) {

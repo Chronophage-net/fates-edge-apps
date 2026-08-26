@@ -896,6 +896,22 @@ function setupSocketIO(io, appConfig) {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
             const chatMsg = (data && data.message) || data;
+            // SECURITY FIX: the web client treats a chat message's `sender`
+            // field of 'GM' as trusted and renders it with a more
+            // permissive HTML allowlist (see vtt-core.js's
+            // renderChatMessageText/isTrusted) -- but `sender` is whatever
+            // string the SENDING client put in its own message body, so any
+            // player could just claim `sender: 'GM'` to get that richer
+            // treatment. Stamp the server's own authoritative role for this
+            // socket (set only via the guarded join/request-gm/approve-gm
+            // flow, never from message content) directly onto the message
+            // object -- not the outer envelope -- since that's what the
+            // client actually reads (`data.message || data`), and do it
+            // BEFORE recording history so replayed backlog messages carry
+            // the real verdict too, not an absent/spoofed one.
+            if (chatMsg && typeof chatMsg === 'object') {
+                chatMsg.verifiedGM = isGmLike(socket.clientData?.role);
+            }
             if (r) room.recordChatMessage(r, chatMsg, ioConfig.maxChatHistory);
             const payload = {
                 ...data,

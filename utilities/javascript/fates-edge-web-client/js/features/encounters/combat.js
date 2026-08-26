@@ -10,14 +10,14 @@
  * ✅ Weapon range rules: melee vs ranged vs Reach-tagged weapons
  */
 
-import { getState, saveState } from '../../core/state.js';
-import { showToast } from '../../components/Toast.js';
-import { escHtml } from '../../core/utils.js';
+import { getState, saveState } from '@core/state.js';
+import { showToast } from '@components/Toast.js';
+import { escHtml } from '@core/utils.js';
 import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
-import { isConnectedToServer, sendEvent } from '../../core/websocket.js';
-import { logToSession, addVTTEvent } from '../gm-tools/index.js';
-import { getMyStoredRole, isGmLikeRole } from '../../core/feature-toggles.js';
-import { getObjectiveType, resolveObjectiveType, isCombatType, DEFAULT_OBJECTIVE_TYPE } from '../../core/objective-types.js';
+import { isConnectedToServer, sendEvent } from '@core/websocket.js';
+import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
+import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
+import { getObjectiveType, resolveObjectiveType, isCombatType, DEFAULT_OBJECTIVE_TYPE } from '@core/objective-types.js';
 
 // NOTE: combatant.type ('player'|'adversary') is the *role* field, pre-existing
 // and unrelated to the objective type below — kept separate to avoid a naming
@@ -590,7 +590,7 @@ function renderTracker() {
         const maxIsSuccess = c.maxMeansSuccess === true;
         const resolvedLabel = !isCombat
             ? (maxIsSuccess ? `✅ ${objType.label} succeeded` : `❌ ${objType.label} failed`)
-            : `${c.name} is defeated!`;
+            : `${escHtml(c.name)} is defeated!`;
 
         // ─── Armor & fatigue display ──────────────────────────────
         let armorLabel = '';
@@ -1087,6 +1087,16 @@ function addLog(type, message) {
     const time = new Date().toLocaleTimeString();
     combatLog.push({ type, message, time });
     if (combatLog.length > 50) combatLog.shift();
+}
+
+// Called from the VTT chat bridge (see vtt-connected.js) so that rolls made
+// in chat while a combat is live show up in the tracker's log too, instead
+// of vanishing once the chat scrolls past. No-ops when no encounter/tracker
+// is active so it's safe to call unconditionally.
+export function logExternalAction(sender, message, type = 'info') {
+    if (!currentEncounterId) return;
+    addLog(type, `${sender}: ${message}`);
+    if (modal && modal.parentNode) renderTracker();
 }
 
 function promptWeaponClass(defaultClass) {

@@ -17,11 +17,11 @@
  * - IMPROVED: Character sheet layout now looks like a TTRPG sheet with styled blocks.
  */
 
-import { vttStore, MAX_CONTROLLED_CHARACTERS } from '../../core/vtt-store.js';
-import { escHtml, getStorage, setStorage, setHtml, createElement, sanitizeHtml } from '../../core/utils.js';
-import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode, changeRole } from '../../core/websocket.js';
-import { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
-import { showToast } from '../../components/Toast.js';
+import { vttStore, MAX_CONTROLLED_CHARACTERS } from '@core/vtt-store.js';
+import { escHtml, getStorage, setStorage, setHtml, createElement, sanitizeHtml } from '@core/utils.js';
+import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode, changeRole } from '@core/websocket.js';
+import { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '@core/dice.js';
+import { showToast } from '@components/Toast.js';
 
 // ============================================================
 // Configuration
@@ -183,12 +183,24 @@ function renderCrownSpreadChatHtml(text) {
  * - Trusted senders (GM, System) get full HTML sanitised – no "Show full reading" toggle.
  * - Untrusted senders get the rich text treatment (Crown Spread blocks, bracket chips, bold).
  * - Long messages are always fully shown.
+ *
+ * SECURITY: a message's `sender` field is just text the SENDING client put
+ * in its own message body -- nothing stops a modified client from claiming
+ * `sender: 'GM'` to get the more permissive HTML allowlist below. For a
+ * message that came over the network, `verifiedGM` is stamped by the
+ * socket server from its own authoritative role tracking for that
+ * connection (see server/socketio-handlers.js and server/ws-handlers.js's
+ * 'chat-message' handlers), overwriting anything the client sent -- so it
+ * can't be spoofed the way the `sender` label can. `System` messages stay
+ * trusted by label: they're pre-built, developer-templated cards (spell
+ * casts, ace effects, X-Card notices) any client can legitimately post for
+ * its own actions, not a claim of GM authority.
  */
-function renderChatMessageText(rawText, sender = '') {
+function renderChatMessageText(rawText, sender = '', verifiedGM = false) {
     const text = String(rawText || '');
     if (!text) return '';
 
-    const isTrusted = (sender === 'GM' || sender === 'System');
+    const isTrusted = (sender === 'System') || (sender === 'GM' && verifiedGM === true);
 
     // --- Trusted senders: render full sanitised HTML ---
     if (isTrusted) {
@@ -317,7 +329,7 @@ export function renderChat() {
             const char = id ? vttStore.getSelectedCharacter() : null;
             if (char) {
                 const avatarHtml = char.avatar
-                    ? `<img src="${char.avatar}" alt="${escHtml(char.name)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);" />`
+                    ? `<img src="${escHtml(char.avatar)}" alt="${escHtml(char.name)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);" />`
                     : `<span style="font-size:1.8rem;">🧑</span>`;
                 selectedDisplay.innerHTML = `
                     <div style="display:flex;align-items:center;gap:0.5rem;background:var(--bg3);padding:0.2rem 0.8rem;border-radius:20px;border:2px solid var(--gold);">
@@ -462,7 +474,7 @@ export function renderChat() {
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         <span style="color:var(--text2);font-size:0.8rem;">${escHtml(time)}</span>
                         <strong style="color:${senderColor};font-size:1rem;">${escHtml(sender)}${recipient}:</strong>
-                        <div style="word-break:break-word;font-size:1rem;flex:1 1 auto;min-width:0;">${whisper}${renderChatMessageText(text, sender)}</div>
+                        <div style="word-break:break-word;font-size:1rem;flex:1 1 auto;min-width:0;">${whisper}${renderChatMessageText(text, sender, msg.verifiedGM === true)}</div>
                         ${modeBadge}
                         <span class="msg-status" style="font-size:0.7rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>
@@ -619,7 +631,7 @@ export function renderVTTChars() {
             const isSelected = char.id === selectedId;
 
             const avatarHtml = char.avatar
-                ? `<img src="${char.avatar}" alt="${escHtml(name)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid ${isSelected ? 'var(--gold)' : 'var(--border)'};flex-shrink:0;" />`
+                ? `<img src="${escHtml(char.avatar)}" alt="${escHtml(name)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid ${isSelected ? 'var(--gold)' : 'var(--border)'};flex-shrink:0;" />`
                 : `<span style="font-size:1.6rem;flex-shrink:0;">🧑</span>`;
 
             html += `
@@ -1130,7 +1142,7 @@ export function renderLocalPresence() {
             membersHtml += `
                 <div class="presence-item" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.6rem;padding:0.25rem 0;border-bottom:1px solid var(--border);${isSelf ? 'background:var(--bg4);border-radius:6px;padding:0.25rem 0.6rem;' : ''}">
                     <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isOnline ? 'var(--green)' : 'var(--text3)'};flex-shrink:0;" title="${isOnline ? 'Online' : 'Offline'}"></span>
-                    ${showAvatars ? `<img src="${avatarUrl}" alt="${escHtml(playerName)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(playerName.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
+                    ${showAvatars ? `<img src="${escHtml(avatarUrl)}" alt="${escHtml(playerName)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%232c3e50%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2214%22%3E${encodeURIComponent(playerName.charAt(0))}%3C/text%3E%3C/svg%3E'" />` : ''}
                     <span style="font-weight:${isSelf ? '600' : '400'};font-size:0.9rem;white-space:nowrap;">${escHtml(playerName)}${isSelf ? ' (you)' : ''}</span>
                     ${roleBadge}
                     ${roleControlHtml}
@@ -1399,4 +1411,4 @@ export function playNotificationSound() {
 // RE-EXPORT for convenience
 // ============================================================
 
-export { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '../../core/dice.js';
+export { getOutcomeColor, getOutcomeLabel, getOutcomeClass } from '@core/dice.js';
