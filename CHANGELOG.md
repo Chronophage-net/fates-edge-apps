@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.23.0] - 2026-08-26
+
+Reactive Soundscape auto-search fallback for the AI GM Bot
+
+### Added
+- auto-search fallback for the AI GM Bot's Reactive Soundscape
+
 ## [4.22.1] - 2026-08-26
 
 ### Docs
