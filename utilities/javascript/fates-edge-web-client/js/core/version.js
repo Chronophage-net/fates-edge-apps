@@ -18,7 +18,7 @@
  * alongside every package.json — see its VERSION_JS_FILES list.
  */
 
-export const APP_VERSION = '4.24.1';
+export const APP_VERSION = '4.25.0';
 
 // Pushes APP_VERSION into the DOM elements that show it statically in
 // index.html (title, meta description, .brand-version badge), so those

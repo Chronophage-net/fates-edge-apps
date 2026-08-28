@@ -3,6 +3,21 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.25.0] - 2026-08-28
+
+### Added
+- print button + PDF export for character sheets, print for SRD/Essentials/Campfire docs
+
+### Fixed
+- restore The Knave's Regret title, dedupe, fill gaps
+- use import.meta.dirname instead of __dirname in vite.config.js
+
+### Other
+- Fix SUCCESSION.md link: point at public dev-portal page, not private repo
+- Point to fates-edge-docs SUCCESSION.md from LICENSE.md
+- Sync data + docs from fates-edge-docs: new adventures, book-format guides, region/patron updates
+- Updated package-lock.json files.
+
 ## [4.24.1] - 2026-08-26
 
 ### Fixed
