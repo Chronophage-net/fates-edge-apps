@@ -11,3 +11,4 @@ UI work should follow the shared design tokens documented at [dev.fates-edge.com
 - Open an issue before a large PR, or raise it in [Discussions](https://github.com/Chronophage-net/fates-edge-dev/discussions) first.
 - Small, focused PRs over big ones where possible.
 - Be kind — see the Code of Conduct on the [dev portal repo](https://github.com/Chronophage-net/fates-edge-dev/blob/main/CODE_OF_CONDUCT.md).
+- **No AI-generated art.** UI icons and other visual assets contributed here must be human-made — traditional or digital, your call, but not output from an image-generation model. See the [No AI Art Policy](https://dev.fates-edge.com/no-ai-art) for the full reasoning and what this covers.
