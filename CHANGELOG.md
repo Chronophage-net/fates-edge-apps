@@ -8,16 +8,6 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 ### Docs
 - call out the No AI Art Policy
 
-## [4.25.2] - 2026-08-28
-
-### Docs
-- call out the No AI Art Policy
-
-## [4.25.1] - 2026-08-28
-
-### Docs
-- call out the No AI Art Policy
-
 ## [4.25.0] - 2026-08-28
 
 ### Added
