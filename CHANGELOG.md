@@ -3,6 +3,16 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.25.4] - 2026-08-28
+
+Settings: add small GitHub/Dev Portal links to About
+
+### Added
+- add GitHub/Dev Portal links to Settings About section
+
+### Chore
+- dedupe phantom CHANGELOG entries from retried release script
+
 ## [4.25.3] - 2026-08-28
 
 ### Docs
