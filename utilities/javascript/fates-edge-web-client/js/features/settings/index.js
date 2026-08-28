@@ -1077,9 +1077,14 @@ export function render(el) {
                     <p style="margin:0.5rem 0 0.8rem; color:var(--text3); font-size:0.85rem;">
                         ☕ Fueled by coffee · 🧠 Neurodivergent & proud · 🌱 Community grows from within and without
                     </p>
-                    <p style="margin:0; font-size:0.9rem;">
+                    <p style="margin:0 0 0.6rem; font-size:0.9rem;">
                         📝 I write about the build (and the occasional detour) on the
                         <a href="https://blog.fates-edge.com" target="_blank" rel="noopener" style="color:var(--gold);">dev blog</a>.
+                    </p>
+                    <p style="margin:0; font-size:0.8rem; color:var(--text3);">
+                        <a href="https://github.com/Chronophage-net" target="_blank" rel="noopener" style="color:var(--text3);">GitHub</a>
+                        &nbsp;·&nbsp;
+                        <a href="https://dev.fates-edge.com" target="_blank" rel="noopener" style="color:var(--text3);">Dev Portal</a>
                     </p>
                 </div>
             </div>
