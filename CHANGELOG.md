@@ -3,6 +3,19 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.26.1] - 2026-08-31
+
+Clear all npm audit findings; fix the test runner and a flaky test
+
+### Fixed
+- clear all npm audit findings in web-client and socket-server
+
+### Docs
+- note the unclean-manifest loop and the npm audit backlog
+
+### Chore
+- build artefacts from the release hook (lockfile versions, manifest timestamp)
+
 ## [4.26.0] - 2026-08-31
 
 Dark-fantasy theming pass, setting data sync, dependency pinning
