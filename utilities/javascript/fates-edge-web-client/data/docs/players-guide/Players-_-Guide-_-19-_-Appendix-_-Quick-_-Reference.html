@@ -132,19 +132,22 @@
 
 <h3>Resolution Index Card</h3>
 <div class="card">
-<p><strong>Declare Action &rarr; Build Dice Pool (Attribute + Skill) &rarr; Roll &rarr; Count Successes</strong></p>
-<p>0 Successes = <strong>Miss</strong> (GM gains SB, consequences)<br>
-1&ndash;3 Successes = <strong>Partial</strong> (success + complication)<br>
-4+ Successes = <strong>Full Success</strong> (clear win, no complication)</p>
-<p><strong>Position</strong> (Risk) + <strong>Effect</strong> (Impact) may shift outcomes.</p>
-<p><strong>SB (Story Beats)</strong> fuel abilities, magic, momentum, and narrative pushes.</p>
+<p><strong>Declare &rarr; GM sets DV and Position &rarr; roll Attribute + Skill in d10s &rarr; count.</strong></p>
+<p>Each <strong>6&ndash;9</strong> is 1 success. Each <strong>10</strong> is 2. Each <strong>1</strong> hands the GM 1 SB.</p>
+<p>Compare successes (S) to the <strong>DV</strong>:</p>
+<p>S &ge; DV, no 1s &rarr; <strong>Clean Success</strong><br>
+S &ge; DV, one or more 1s &rarr; <strong>Success with SB</strong> &mdash; you get it, the world pushes back<br>
+0 &lt; S &lt; DV &rarr; <strong>Partial</strong> &mdash; progress, not arrival; +1 Boon<br>
+S = 0 &rarr; <strong>Miss</strong> &mdash; it fails and worsens; +2 Boons</p>
+<p><strong>DV</strong> 2 routine &bull; 3 default &bull; 4 hard &bull; 5+ extreme. <strong>Position</strong> Dominant (re-roll one failure) / Controlled / Desperate (re-roll one success).</p>
+<p><strong>SB</strong> is the GM's pool: complications, escalation, timers.</p>
 </div>
 
 <h3>Fatigue and Harm Tracker</h3>
 <div class="card">
 <p><strong>Fatigue:</strong> <span class="fill">________</span> (Max = Body)<br>
 <strong>Mental Strain:</strong> <span class="fill">________</span><br>
-<strong>Harm:</strong> [&nbsp;] Harm 1 (&minus;1 die) &nbsp; [&nbsp;] Harm 2 (&minus;2 dice) &nbsp; [&nbsp;] Harm 3 (Incapacitated)</p>
+<strong>Harm:</strong> [&nbsp;] Harm 1 (&minus;1 die, related actions) &nbsp; [&nbsp;] Harm 2 (&minus;1 die, most actions) &nbsp; [&nbsp;] Harm 3 (incapacitated or dying)</p>
 <p>When tracks fill:</p>
 <ul>
 <li>Fatigue overflow &rarr; increase Harm by 1, clear Fatigue.</li>
@@ -156,7 +159,7 @@
 <h3>SB and Momentum Tracking</h3>
 <div class="card">
 <p><strong>Current SB (GM pool):</strong> <span class="fill">______</span><br>
-<strong>Momentum (party pool):</strong> <span class="fill">______</span> (max 2)<br>
+<strong>Momentum (party pool, optional &mdash; Ch.18):</strong> <span class="fill">______</span> (max 2 banked per session)<br>
 <strong>Used this session:</strong> <span class="fill">______</span></p>
 </div>
 
@@ -164,10 +167,10 @@
 <div class="table-wrap">
 <table>
 <tr><th>XP Cost</th><th>Talent Type / Impact</th></tr>
-<tr><td>2 XP</td><td>Minor Talent / Perk upgrade / situational bonus</td></tr>
-<tr><td>4 XP</td><td>Major Talent / specialization / strong permanent effect</td></tr>
-<tr><td>6 XP</td><td>Access talent (Spellcraft, Familiar, Codex, Patron's Symbol)</td></tr>
-<tr><td>8 XP</td><td>Prestige Talent / campaign-defining ability</td></tr>
+<tr><td>2&ndash;3 XP</td><td>Minor Talent &mdash; a situational bonus, a signature trick</td></tr>
+<tr><td>4&ndash;6 XP</td><td>Major Talent &mdash; a specialization, a strong standing effect</td></tr>
+<tr><td>7&ndash;10 XP</td><td>Prestige Talent &mdash; campaign-defining, usually gated behind a requirement</td></tr>
+<tr><td colspan="2"><em>Magic access talents are priced individually:</em> Familiar 2 &bull; Pact-Whisperer 2 &bull; Lesser Pactwright 2 &bull; Codex 4 &bull; Patron's Symbol 4 &bull; Spellcraft 6 &bull; Cantor's Path 8</td></tr>
 </table>
 </div>
 
@@ -446,7 +449,7 @@ Notes: <span class="fill">____________________</span></p>
 <div class="spell">
 <p class="spell-name">Sleep's Gentle Touch <span class="text-muted" style="color:var(--text3);font-weight:400;">(Water + Mind)</span></p>
 <p class="spell-tags">[DREAM][COMMAND]</p>
-<p><strong>Effect:</strong> One target falls asleep (scene duration; Resist: Spirit + Resolve DV 2).<br>
+<p><strong>Effect:</strong> One target falls asleep (scene duration; Resist: Spirit + Insight DV 2).<br>
 <strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Dangerous DV:</em> <strong>4</strong> (combat use).<br>
 <strong>Notes:</strong> Harm wakes target.</p>
 </div>
@@ -506,7 +509,7 @@ Notes: <span class="fill">____________________</span></p>
 <div class="spell">
 <p class="spell-name">Mind's Dominion <span class="text-muted" style="color:var(--text3);font-weight:400;">(Fate + Mind)</span></p>
 <p class="spell-tags">[COMMAND][AREA][CURSE]</p>
-<p><strong>Effect:</strong> All enemies in 25-foot radius test Spirit + Resolve (DV 4) or obey a single command.<br>
+<p><strong>Effect:</strong> All enemies in 25-foot radius test Spirit + Insight (DV 4) or obey a single command.<br>
 <strong>DV:</strong> 1 + 1 + 1 + 2 = <strong>5</strong>. <em>Dangerous DV:</em> <strong>7</strong>.<br>
 <strong>Notes:</strong> Significant ethical risk; backlash likely.</p>
 </div>
