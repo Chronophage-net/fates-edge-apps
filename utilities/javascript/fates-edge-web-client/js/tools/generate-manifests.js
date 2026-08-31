@@ -55,6 +55,19 @@ const CATEGORY_MAP = {
 const SUBDIRS = Object.keys(CATEGORY_MAP);
 
 // ─── Helpers ──────────────────────────────────────────────────────
+/**
+ * Reads an existing manifest.json, returning null if absent or unparseable.
+ * Used only to carry a previous `generated` timestamp forward when the
+ * manifest is otherwise byte-identical — see the call site.
+ */
+function readExistingManifest(manifestPath) {
+  try {
+    return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
 function getFileSlug(filename) {
   return filename.replace(/\.json$/, '').replace(/\.html$/, '');
 }
@@ -301,6 +314,21 @@ for (const entry of DATA_DIRS) {
   if (manifestData !== null && manifestData !== undefined) {
     const manifestPath = path.join(fullPath, 'manifest.json');
     try {
+      // Preserve the previous `generated` timestamp when nothing else changed.
+      // These manifests are committed, and a pre-commit hook regenerates them,
+      // so a fresh timestamp on every run left the working tree permanently
+      // dirty with a one-line diff that could never be committed away.
+      const existing = readExistingManifest(manifestPath);
+      if (existing && manifestData.generated) {
+        const sameBar = (a, b) => {
+          const { generated: _a, ...restA } = a || {};
+          const { generated: _b, ...restB } = b || {};
+          return JSON.stringify(restA) === JSON.stringify(restB);
+        };
+        if (sameBar(existing, manifestData)) {
+          manifestData.generated = existing.generated;
+        }
+      }
       fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2));
       console.log(`✅ Generated manifest for ${dir} (${count} entries)`);
     } catch (err) {

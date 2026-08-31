@@ -55,7 +55,7 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
 
 ## Security / hardening — found during the dark-fantasy theming pass
 
-- [ ] **Add SRI hashes to all CDN `<script>` tags in `index.html`.** Seven third-party
+- [x] **SRI hashes added to all seven CDN `<script>` tags in `index.html`.** Seven third-party
       scripts load with no `integrity` attribute, so a compromised or altered CDN artifact
       executes with full page privileges (it can read the unlock state in `localStorage`
       and everything in the character store). Hashes could not be computed in the
@@ -75,10 +75,11 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
       wiki paths are the ones that carry other people's text.
 - [x] `target="_blank"` links in the home module were missing `rel="noopener noreferrer"`.
       Fixed.
-- [ ] **`data/lock-reset.json` is tracked in git.** `resetCodeHash` is currently empty, so
-      nothing is leaked today — but the file is committed and not ignored, so the first
-      person to fill it in locally will commit their reset hash by accident. Add it to
-      `.gitignore` and ship a `lock-reset.example.json` instead.
+- [x] **`data/lock-reset.json` is no longer tracked.** Added to
+      `utilities/javascript/.gitignore`, with `data/lock-reset.example.json`
+      tracked in its place and INSTALL.md updated with the copy step. Runtime
+      behaviour is unchanged: `local-lock.js` already returns false on a
+      missing file, exactly as it did on the empty hash it shipped with.
 - [x] **Test runner fixed.** `node tests/runner.js` died on `Cannot find package
       '@core/state.js'`: the `@core` alias exists only in `vite.config.js`, and
       Node's ESM loader cannot see it (package.json `imports` can't express it
@@ -96,14 +97,13 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
 
 ## Repo hygiene
 
-- [ ] **`data/docs/manifest.json` can never be committed clean.** It stores a
+- [x] **`data/docs/manifest.json` can now be committed clean.** It stores a
       `generated` ISO timestamp, it is tracked, and the pre-commit hook
       regenerates it on every commit that touches the web client — so each
       commit leaves the tree dirty with a one-line timestamp diff, forever.
-      Either drop `generated` from the emitted manifest, or have
-      `generate-manifests.js` preserve the existing timestamp when the rest of
-      the document set is unchanged. Same applies to the other generated
-      manifests.
+      `generate-manifests.js` now carries the previous `generated` timestamp
+      forward when the rest of the manifest is byte-identical, so back-to-back
+      runs produce identical files. Applies to every generated manifest.
 - [x] **`npm audit` is clean in both projects (0 vulnerabilities).**
       web-client: all four criticals and most highs came from one dev-only
       dependency, `serve@^6.5.8` (2018). Bumped to `^14.2.6` and moved to

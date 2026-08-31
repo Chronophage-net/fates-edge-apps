@@ -7,3 +7,9 @@ build/
 
 # Node
 node_modules/
+
+# Local screen-lock emergency reset code (web client).
+# The tracked file always shipped with an EMPTY resetCodeHash, so nothing has
+# leaked — but tracking it means the first operator to configure a real code
+# commits their own reset hash by accident. The template is tracked instead.
+fates-edge-web-client/data/lock-reset.json

@@ -144,8 +144,15 @@ Two independent options, either or both:
   Stored only in that player's browser; doesn't affect anyone else.
 - **You lock the whole build** — `npm run build:locked -- --password=your-secure-password`
   distributes a pre-locked build everyone needs the password for. If you
-  go this route, also set an emergency reset code in
-  `data/lock-reset.json` (see `generate-seed.js`) in case you forget it.
+  go this route, also set an emergency reset code in case you forget it.
+  That file is gitignored so your hash is never committed, so a fresh clone
+  has none and the lock screen's "Forgot password?" path does nothing until
+  you create one:
+
+  ```bash
+  cp data/lock-reset.example.json data/lock-reset.json
+  # then follow the _instructions field in that file to set resetCodeHash
+  ```
 
 ---
 

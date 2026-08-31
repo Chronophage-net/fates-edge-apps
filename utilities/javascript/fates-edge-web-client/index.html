@@ -6,12 +6,13 @@
     <meta name="description" content="The Fate's Edge Toolkit — dice, decks, patrons, and the long memory of the table. A companion for players and GMs of Fate's Edge." />
     <meta name="theme-color" content="#0b0d12" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%94%EF%B8%8F%3C/text%3E%3C/svg%3E" />
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"
+            integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <title>Fate's Edge Toolkit v4.26.1</title>
 
     <!-- Preconnect for CDN performance -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" />
@@ -78,16 +79,60 @@
     <script src="seed.js" defer></script>
 
     <!-- Third-party libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer
+            integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js" defer
+            integrity="sha384-vuyrTV5nkscLp1knFvt+FIHfKKzmROBq5reruhMRslauj54mW+l2B8b6szMN6lCL"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" defer
+            integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js" defer
+            integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js" defer
+            integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- JSZip: used as a bare `JSZip` global by core/pack-manager.js's
          installPack() (JSZip.loadAsync(...)) to read .pack.zip files
          selected via Settings -> Pack Management. Was referenced there
          but never actually loaded anywhere -- "JSZip is not defined". -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer
+            integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Subresource-integrity failure guard.
+         Every third-party tag above carries an `integrity` hash. If one ever
+         mismatches — a CDN incident, or a hash not updated alongside a version
+         bump — the browser refuses the script SILENTLY: no error dialog, and
+         the feature that needed it simply stops working. DOMPurify is the
+         dangerous case, because js/core/utils.js falls back to a weaker
+         regex sanitiser when window.DOMPurify is absent, so a blocked script
+         would quietly downgrade XSS protection instead of breaking loudly.
+         This turns any such failure into an obvious console error. -->
+    <script>
+        window.addEventListener('load', function () {
+            var expected = [
+                ['DOMPurify', 'DOMPurify', 'HTML sanitising falls back to a weaker filter'],
+                ['jspdf', 'jspdf', 'PDF export'],
+                ['marked', 'marked', 'Markdown rendering'],
+                ['Fuse', 'Fuse', 'search'],
+                ['io', 'socket.io-client', 'multiplayer / VTT sync'],
+                ['JSZip', 'JSZip', 'module import & export']
+            ];
+            var missing = expected.filter(function (e) { return typeof window[e[0]] === 'undefined'; });
+            if (missing.length) {
+                console.error(
+                    '[fates-edge] %d third-party script(s) did not load. If the version in ' +
+                    'index.html was changed without regenerating its integrity hash, the browser ' +
+                    'blocked it. Affected: ' +
+                    missing.map(function (m) { return m[1] + ' (' + m[2] + ')'; }).join(', '),
+                    missing.length
+                );
+            }
+        });
+    </script>
 </head>
 <body>
 
