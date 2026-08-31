@@ -179,3 +179,36 @@ export function applyDowntimeTick(attunedItems) {
     }
     return attunedItems;
 }
+
+// ============================================================
+// FLAWS (SRD 6.9.4)
+//
+// A Partial at the bench does not produce a worse item — it produces an
+// item with a named property. A Flaw is not a minus; it is usually the
+// most interesting thing about the piece, and the SRD tells the GM to pay
+// Boons to a player who leans into one at the worst possible moment.
+// ============================================================
+
+export const FLAWS = [
+    { id: 'thirsty',     name: 'Thirsty',     effect: 'It wants something first — blood, oil, a spoken name, a coin left out overnight. Feed it, or roll one Position worse.' },
+    { id: 'loud',        name: 'Loud',        effect: 'It announces you. Using it hands the GM 1 SB.' },
+    { id: 'remembering', name: 'Remembering', effect: "It does what its materials' previous owner wanted, occasionally, and the GM picks when." },
+    { id: 'brittle',     name: 'Brittle',     effect: 'On a Miss while using it, it breaks. Not damaged — broken.' },
+    { id: 'marked',      name: 'Marked',      effect: 'Anyone who knows the craft can recognise the hand that made it, and that hand is yours.' }
+];
+
+export function flawById(id) {
+    return FLAWS.find(f => f.id === id) || null;
+}
+
+// Obligation marked when a Wonder is finished, by its Talent-equivalent
+// tier (SRD 6.9.5). You cannot make magic; you can only borrow it and put
+// it somewhere it will stay. A caster with no Patron marks it anyway.
+export function wonderObligationFor(xpCost) {
+    const xp = Number(xpCost) || 0;
+    if (xp <= 0) return 0;   // a Provision or a Work costs no Obligation
+    if (xp <= 2) return 1;   // Minor
+    if (xp <= 4) return 2;   // Major
+    if (xp <= 6) return 3;   // Prestige
+    return 4;                // Epic
+}

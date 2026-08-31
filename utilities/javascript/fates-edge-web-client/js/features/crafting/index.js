@@ -81,6 +81,7 @@ import {
     addToCraftingLog, availableXp,
     ATTUNEMENT_LIMIT, upkeepCostFor, intensiveUpkeepCostFor, canAttune,
     DECAY_ORDER, advanceDecay, itemRequiresUpkeep, applyDowntimeTick,
+    FLAWS, flawById, wonderObligationFor,
     FORAGE_LIMIT_PER_DOWNTIME, getForageCount, canForage, recordForageAttempt, resetForageCount
 } from './state.js';
 
@@ -95,6 +96,7 @@ import {
 export {
     ATTUNEMENT_LIMIT, upkeepCostFor, intensiveUpkeepCostFor, canAttune,
     DECAY_ORDER, advanceDecay, itemRequiresUpkeep, applyDowntimeTick,
+    FLAWS, flawById, wonderObligationFor,
     FORAGE_LIMIT_PER_DOWNTIME, getForageCount, canForage, recordForageAttempt, resetForageCount
 };
 
@@ -329,15 +331,42 @@ function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
     const attrValue = char[attr] || 1;
     const pool = attrValue + skillLevel;
     const dv = recipe.dv;
-    const result = performRoll(pool, dv);
+
+    // MATERIALS SET POSITION, NOT DICE (SRD 6.9.2). Having what the recipe
+    // asks for is Dominant; missing some of it is Desperate; the rest is
+    // Controlled. There is deliberately no reagent arithmetic — the SRD is
+    // explicit that once the table starts subtracting petals from a list,
+    // the game has stopped being about the thing being made.
+    const position = missing.length === 0
+        ? (required.length > 0 ? 'dominant' : 'controlled')
+        : 'desperate';
+
+    // performRoll's signature is (attr, skill, dv, position, boons). This
+    // used to be called as performRoll(pool, dv) — which passed the pool as
+    // the attribute, the DV as the skill, and left the DV undefined, so
+    // every craft rolled pool+dv dice.
+    const result = performRoll(attrValue, skillLevel, dv, position);
 
     let success = false, outcome = '', outcomeClass = 'failure', boons = 0, sbCount = 0;
-    if (result.successes >= dv) { success = true; outcome = '✅ Success'; outcomeClass = 'success'; }
-    else if (result.successes > 0) { outcome = '⚠️ Partial'; outcomeClass = 'partial'; boons = 1; }
-    else { outcome = '❌ Failure'; sbCount = result.storyBeats || 1; boons = 2; }
+    if (result.successes >= dv) {
+        success = true;
+        sbCount = result.storyBeats || 0;
+        outcome = sbCount > 0 ? '✅ Success, with a Story Beat' : '✅ Clean Success';
+        outcomeClass = 'success';
+    } else if (result.successes > 0) {
+        outcome = '⚠️ Partial — the piece takes a Flaw';
+        outcomeClass = 'partial';
+        boons = 1;
+        sbCount = result.storyBeats || 0;
+    } else {
+        outcome = '❌ Miss';
+        sbCount = result.storyBeats || 1;
+        boons = 2;
+    }
 
     const updates = {};
     let appliedXpCost = 0;
+    let obligationMarked = 0;
     if (success || outcome === '⚠️ Partial') {
         char.xpSpent = (char.xpSpent || 0) + totalXpCost;
         appliedXpCost = totalXpCost;
@@ -348,32 +377,28 @@ function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
         updates.boons = char.boons;
     }
 
-    // Ingredients are consumed regardless of outcome (components are
-    // spent/wasted either way — matches the pre-existing behavior here).
+    // Materials are NOT consumed by a subtraction. Under SRD 6.9.2 they set
+    // Position and nothing else, so the list a character keeps here is a
+    // record of what they have to hand, not a stock ledger to decrement.
+    // A Miss is where materials are lost, and that is the GM's call in the
+    // fiction, not an automatic splice.
     const consumed = [];
-    for (const req of required) {
-        for (let i = 0; i < quantity; i++) {
-            const idx = ingredients.findIndex(ing => ing.toLowerCase() === req.toLowerCase());
-            if (idx !== -1) {
-                consumed.push(ingredients[idx]);
-                ingredients.splice(idx, 1);
-            }
-        }
-    }
-    char.crafting.ingredients = ingredients;
     updates.crafting = char.crafting;
 
     const crafted = getCraftedItems(char);
     const itemsCreated = [];
     if (success || outcome === '⚠️ Partial') {
         for (let i = 0; i < quantity; i++) {
+            const flaw = success ? null : FLAWS[Math.floor(Math.random() * FLAWS.length)];
             const newItem = {
                 id: generateId('crafted_'),
                 name: recipe.name,
                 effect: recipe.effect,
                 quality: success ? 'standard' : 'flawed',
+                flaw: flaw ? { id: flaw.id, name: flaw.name, effect: flaw.effect } : null,
                 uses: recipe.tier === 'standard' ? 2 : 1,
                 recipe: recipe.id,
+                cost: recipe.xpCost || 0,
                 icon: recipe.icon || '🔧',
                 createdAt: Date.now()
             };
@@ -381,8 +406,21 @@ function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
             itemsCreated.push(newItem);
         }
         updates.crafting = char.crafting;
+        // A Wonder marks Obligation the moment it is finished (SRD 6.9.5) —
+        // you cannot make magic, only borrow it. A caster with no Patron
+        // marks it anyway; it goes to whatever answered.
+        obligationMarked = wonderObligationFor(recipe.xpCost) * quantity;
+        if (obligationMarked > 0) {
+            char.obligation = (char.obligation || 0) + obligationMarked;
+            updates.obligation = char.obligation;
+        }
         if (itemsCreated.length > 0) {
-            addToCraftingLog(char, { name: recipe.name, quality: itemsCreated[0].quality, icon: recipe.icon });
+            addToCraftingLog(char, {
+                name: recipe.name,
+                quality: itemsCreated[0].quality,
+                flaw: itemsCreated[0].flaw ? itemsCreated[0].flaw.name : null,
+                icon: recipe.icon
+            });
         }
     } else {
         addToCraftingLog(char, { name: `Failed: ${recipe.name}`, quality: 'failure', icon: '💥' });
@@ -392,8 +430,8 @@ function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
     uiState.craftExpandedRecipe = null;
 
     showToastWithHTML(renderCraftResultToast({
-        recipe, quantity, pool, dv, result, outcome, outcomeClass,
-        totalXpCost: appliedXpCost, boons, sbCount, consumed, missing, itemsCreated
+        recipe, quantity, pool, dv, position, result, outcome, outcomeClass,
+        totalXpCost: appliedXpCost, boons, sbCount, consumed, missing, itemsCreated, obligationMarked
     }));
     refreshPanel();
 }

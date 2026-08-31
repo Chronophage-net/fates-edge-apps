@@ -177,3 +177,37 @@ describe('crafting: forage attempts per downtime', () => {
         assertTrue(canForage(char));
     });
 });
+
+// ===== SRD 6.9 crafting rules =====
+
+import { FLAWS, flawById, wonderObligationFor } from '../../js/features/crafting/state.js';
+
+describe('crafting: Wonders borrow their magic (SRD 6.9.5)', () => {
+    it('marks Obligation by Talent-equivalent tier', () => {
+        assertEqual(wonderObligationFor(2), 1, 'Minor (2 XP) marks 1 Obligation');
+        assertEqual(wonderObligationFor(4), 2, 'Major (4 XP) marks 2');
+        assertEqual(wonderObligationFor(6), 3, 'Prestige (6 XP) marks 3');
+        assertEqual(wonderObligationFor(8), 4, 'Epic (8 XP) marks 4');
+    });
+
+    it('a Provision or a Work borrows nothing', () => {
+        assertEqual(wonderObligationFor(0), 0, 'no XP cost means no Obligation');
+        assertEqual(wonderObligationFor(undefined), 0, 'a missing cost is not a Wonder');
+    });
+});
+
+describe('crafting: Flaws (SRD 6.9.4)', () => {
+    it('offers the five named Flaws, each with an effect', () => {
+        assertEqual(FLAWS.length, 5, 'the SRD names five Flaws');
+        for (const f of FLAWS) {
+            assertTrue(!!f.id && !!f.name && !!f.effect, `Flaw ${f.id} is missing a field`);
+        }
+        for (const id of ['thirsty', 'loud', 'remembering', 'brittle', 'marked']) {
+            assertTrue(!!flawById(id), `Flaw "${id}" should exist`);
+        }
+    });
+
+    it('flawById returns null for an unknown Flaw rather than throwing', () => {
+        assertEqual(flawById('immaculate'), null, 'unknown Flaws are null, not exceptions');
+    });
+});

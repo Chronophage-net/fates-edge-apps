@@ -422,20 +422,21 @@ export function renderNoCharacterView(characters) {
 // TOAST-WITH-HTML CONTENT (crafting/refinement roll result)
 // ============================================================
 
-export function renderCraftResultToast({ recipe, quantity, pool, dv, result, outcome, outcomeClass, totalXpCost, boons, sbCount, consumed, missing, itemsCreated }) {
+export function renderCraftResultToast({ recipe, quantity, pool, dv, position, result, outcome, outcomeClass, totalXpCost, boons, sbCount, consumed, missing, itemsCreated, obligationMarked }) {
     return `
         <div class="craft-result-toast">
             <div class="craft-result-title">🔧 Crafting: ${escHtml(recipe.name)} (×${quantity})</div>
             <div class="craft-result-desc">${escHtml(recipe.description)}</div>
-            <div class="craft-result-meta">Pool: ${pool}d · DV: ${dv}</div>
+            <div class="craft-result-meta">Pool: ${pool}d · DV: ${dv} · Position: ${escHtml((position || 'controlled').replace(/^./, c => c.toUpperCase()))}</div>
             <div class="craft-result-roll">Roll: ${result.dice.join(', ')}</div>
             <div class="craft-result-successes">Rolled: <strong>${result.successes}</strong> successes</div>
             <div class="craft-result-outcome ${outcomeClass}">${outcome}</div>
             ${totalXpCost > 0 ? `<div class="craft-result-cost">Cost: ${totalXpCost} XP</div>` : ''}
             ${boons > 0 ? `<div class="craft-result-boons">⭐ +${boons} Boon${boons > 1 ? 's' : ''}</div>` : ''}
             ${sbCount > 0 ? `<div class="craft-result-sb">📖 GM gains ${sbCount} SB</div>` : ''}
-            ${consumed.length > 0 ? `<div class="craft-result-consumed">Consumed: ${consumed.join(', ')}</div>` : ''}
-            ${missing.length > 0 ? `<div class="craft-result-missing">Missing ingredients (crafted anyway): ${missing.join(', ')}</div>` : ''}
+            ${obligationMarked > 0 ? `<div class="craft-result-cost">⛓ +${obligationMarked} Obligation — you did not make the magic, you borrowed it</div>` : ''}
+            ${missing.length > 0 ? `<div class="craft-result-missing">Working without: ${missing.map(escHtml).join(', ')} — that is why this was Desperate</div>` : ''}
+            ${(itemsCreated[0] && itemsCreated[0].flaw) ? `<div class="craft-result-missing"><strong>Flaw — ${escHtml(itemsCreated[0].flaw.name)}:</strong> ${escHtml(itemsCreated[0].flaw.effect)}</div>` : ''}
             ${itemsCreated.length > 0 ? `<div class="craft-result-created">Created ${itemsCreated.length} item${itemsCreated.length > 1 ? 's' : ''}</div>` : ''}
             <button class="btn btn-secondary btn-xs craft-result-close" type="button">Close</button>
         </div>
