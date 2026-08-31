@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.26.2] - 2026-08-31
+
+SRI on third-party scripts, untrack the lock reset code, stop manifest timestamp churn
+
+### Fixed
+- pin third-party scripts with SRI, untrack the reset code, stop manifest churn
+
 ## [4.26.1] - 2026-08-31
 
 Clear all npm audit findings; fix the test runner and a flaky test
