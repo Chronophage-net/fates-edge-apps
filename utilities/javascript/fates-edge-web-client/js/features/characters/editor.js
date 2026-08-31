@@ -64,14 +64,14 @@ export const SKILL_ATTRIBUTES = {
 
 export const HERITAGES = [
     { id: 'human', label: 'Human — The Adaptable', note: 'No attribute adjustments. Endless Reach talent (free)' },
-    { id: 'aelaerem', label: 'Aelaerem (Halfling) — Hearth & Hollow', note: 'Wits+1, Presence+1, Body-1. Small Folk traits' },
-    { id: 'aelinnel', label: 'Aelinnel (Gnome) — Stone, Bough, Bright Things', note: 'Wits+1, Spirit+1, Body-1. Small Folk traits' },
-    { id: 'aeler', label: 'Aeler (Dwarf) — Crowns & Under-Vaults', note: 'Body+1, Spirit+1, Presence-1. Stone-sense' },
-    { id: 'lethai-al', label: 'Lethai-al (Wood Elf) — Root, River, Roof-Tree', note: 'Body+1, Wits+1, Presence-1' },
-    { id: 'lethai-thora', label: 'Lethai-thora (High Elf) — Mind\'s Eye & Civic Measure', note: 'Wits+1, Spirit+1, Body-1' },
-    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', note: 'Wits+1, Presence+1, Spirit-1' },
-    { id: 'ykrul', label: 'Ykrul (Orc) — Wolf Standards, Winter Camps', note: 'Body+1, Spirit+1, Presence-1' },
-    { id: 'narethi', label: 'Narethi — The Unburied of the Deep Desert', note: 'Wits+1, Spirit+1, Body-1. Resonance Leash' },
+    { id: 'aelaerem', label: 'Aelaerem (Halfling) — Hearth & Hollow', note: 'Affinity: Presence or Stealth; Limit: Body. Small Folk traits' },
+    { id: 'aelinnel', label: 'Aelinnel (Gnome) — Stone, Bough, Bright Things', note: 'Affinity: Wits or Craft; Limit: Body. Small Folk traits' },
+    { id: 'aeler', label: 'Aeler (Dwarf) — Crowns & Under-Vaults', note: 'Affinity: Body or Craft; Limit: Presence. Stone-sense' },
+    { id: 'lethai-al', label: 'Lethai-al (Wood Elf) — Root, River, Roof-Tree', note: 'Affinity: Wits or Stealth; Limit: Presence' },
+    { id: 'lethai-thora', label: 'Lethai-thora (High Elf) — Mind\'s Eye & Civic Measure', note: 'Affinity: Wits or Lore; Limit: Body' },
+    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', note: 'Affinity: Presence or Subterfuge; Limit: Spirit' },
+    { id: 'ykrul', label: 'Ykrul (Orc) — Wolf Standards, Winter Camps', note: 'Affinity: Body or Endurance; Limit: Presence' },
+    { id: 'narethi', label: 'Narethi — The Unburied of the Deep Desert', note: 'Affinity: Spirit or Arcana; Limit: Body. Resonance Leash' },
     { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', note: 'Choose one +1 and one -1 from parent cultures' }
 ];
 

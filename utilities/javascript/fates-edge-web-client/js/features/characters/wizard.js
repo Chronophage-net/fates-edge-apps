@@ -58,16 +58,16 @@ const SKILL_ATTRIBUTES = {
 };
 
 const HERITAGES = [
-    { id: 'human', label: 'Human — The Adaptable', adj: 'None', note: 'Endless Reach: +1 die on untrained skill rolls. Free Endless Reach talent.' },
-    { id: 'aelaerem', label: 'Aelaerem (Halfling) — Hearth & Hollow', adj: 'Wits+1, Presence+1, Body−1', note: 'Small Folk: Lucky break (improve Position 1/scene). Cannot use Heavy Armor.' },
-    { id: 'aelinnel', label: 'Aelinnel (Gnome) — Stone, Bough, Bright Things', adj: 'Wits+1, Spirit+1, Body−1', note: 'Small Folk: Short Step (teleport) or Knack (handy item). Cannot use Heavy Armor.' },
-    { id: 'aeler', label: 'Aeler (Dwarf) — Crowns & Under-Vaults', adj: 'Body+1, Spirit+1, Presence−1', note: 'Stone-sense, breath-counting, oath-cords. Heavy armor proficiency.' },
-    { id: 'lethai-al', label: 'Lethai-al (Wood Elf) — Root, River, Roof-Tree', adj: 'Body+1, Wits+1, Presence−1', note: 'Root-law, tree-speak, green ward in forests.' },
-    { id: 'lethai-thora', label: 'Lethai-thora (High Elf) — Mind\'s Eye & Civic Measure', adj: 'Wits+1, Spirit+1, Body−1', note: 'Lorekeeper, weave anchor, academic immunity.' },
-    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', adj: 'Wits+1, Presence+1, Spirit−1', note: 'Mask-right, vow-touch, serpent\'s shed.' },
-    { id: 'ykrul', label: 'Ykrul (Orc) — Wolf Standards, Winter Camps', adj: 'Body+1, Spirit+1, Presence−1', note: 'Blood memory, hostage strings, kon\'reh intuition. Mounted archery discount.' },
-    { id: 'narethi', label: 'Narethi — The Unburied of the Deep Desert', adj: 'Wits+1, Spirit+1, Body−1', note: 'Natural telepathy, sunken eyes (darkvision), resonance sense. Resonance Leash [4].' },
-    { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', adj: 'Choose one +1 and one −1', note: 'Pick two skill bonuses from parent cultures. Access both talent lists.' }
+    { id: 'human', label: 'Human — The Adaptable', adj: 'Affinity: +1 Position on any Skill you have no ranks in', note: 'Endless Reach: +1 Position on untrained skill rolls. Free Endless Reach talent.' },
+    { id: 'aelaerem', label: 'Aelaerem (Halfling) — Hearth & Hollow', adj: 'Affinity: Presence or Stealth • Limit: Body', note: 'Small Folk: Lucky break (improve Position 1/scene). Cannot use Heavy Armor.' },
+    { id: 'aelinnel', label: 'Aelinnel (Gnome) — Stone, Bough, Bright Things', adj: 'Affinity: Wits or Craft • Limit: Body', note: 'Small Folk: Short Step (teleport) or Knack (handy item). Cannot use Heavy Armor.' },
+    { id: 'aeler', label: 'Aeler (Dwarf) — Crowns & Under-Vaults', adj: 'Affinity: Body or Craft • Limit: Presence', note: 'Stone-sense, breath-counting, oath-cords. Heavy armor proficiency.' },
+    { id: 'lethai-al', label: 'Lethai-al (Wood Elf) — Root, River, Roof-Tree', adj: 'Affinity: Wits or Stealth • Limit: Presence', note: 'Root-law, tree-speak, green ward in forests.' },
+    { id: 'lethai-thora', label: 'Lethai-thora (High Elf) — Mind\'s Eye & Civic Measure', adj: 'Affinity: Wits or Craft • Limit: Body', note: 'Lorekeeper, weave anchor, academic immunity.' },
+    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', adj: 'Affinity: Presence or Subterfuge • Limit: Spirit', note: 'Mask-right, vow-touch, serpent\'s shed.' },
+    { id: 'ykrul', label: 'Ykrul (Orc) — Wolf Standards, Winter Camps', adj: 'Affinity: Body or Craft • Limit: Presence', note: 'Blood memory, hostage strings, kon\'reh intuition. Mounted archery discount.' },
+    { id: 'narethi', label: 'Narethi — The Unburied of the Deep Desert', adj: 'Affinity: Wits or Craft • Limit: Body', note: 'Natural telepathy, sunken eyes (darkvision), resonance sense. Resonance Leash [4].' },
+    { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', adj: "Affinity: one parent's • Limit: the other's", note: 'Take one parent Affinity and the other parent Limit. Access both talent lists.' }
 ];
 
 // ─── No hardcoded PATRONS! We load them dynamically from the patrons feature ───
