@@ -23,8 +23,8 @@ export function render(el) {
         <div class="dashboard-modern-layout">
             <!-- Header -->
             <header class="dashboard-header">
-                <h1 class="page-title">📊 Campaign Dashboard</h1>
-                <p class="page-sub">Quick overview of your campaign state and tools.</p>
+                <h1 class="page-title">The Table</h1>
+                <p class="page-sub">Where the campaign stands tonight.</p>
                 <div class="dashboard-status-bar">
                     <span class="status-badge" id="dash-status">● Live</span>
                     <span class="status-badge" id="dash-sync-status">● Local</span>
@@ -40,7 +40,7 @@ export function render(el) {
             <!-- Quick Actions (Player‑Facing) -->
             <div class="panel" id="dash-actions-panel">
                 <div class="panel-header">
-                    <h3 class="panel-title">⚡ Quick Actions</h3>
+                    <h3 class="panel-title">To hand</h3>
                     <div class="panel-actions">
                         <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
                     </div>
@@ -54,17 +54,17 @@ export function render(el) {
                         <span class="qa-desc">Set all Boons to 2</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.resetAllTimers()">
-                        <span class="qa-icon">⏱️</span>
+                        <span class="qa-icon" aria-hidden="true">&#9719;</span>
                         <span class="qa-label">Reset Timers</span>
                         <span class="qa-desc">Zero all timers</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.newSession()">
-                        <span class="qa-icon">📦</span>
+                        <span class="qa-icon" aria-hidden="true">&#9707;</span>
                         <span class="qa-label">New Session</span>
                         <span class="qa-desc">Archive and reset</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.openCombatTracker()">
-                        <span class="qa-icon">⚔️</span>
+                        <span class="qa-icon" aria-hidden="true">&#8224;</span>
                         <span class="qa-label">Combat Tracker</span>
                         <span class="qa-desc">Open combat tracker</span>
                     </button>
@@ -93,7 +93,7 @@ export function render(el) {
                     <!-- Characters -->
                     <div class="panel" id="dash-characters-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">👤 Characters</h3>
+                            <h3 class="panel-title">Characters</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
                                 <button class="btn btn-sm btn-primary" onclick="window.openCharacterBuilder()">+ New</button>
@@ -105,25 +105,25 @@ export function render(el) {
                     <!-- Active Timers -->
                     <div class="panel" id="dash-timers-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">⏱️ Active Timers</h3>
+                            <h3 class="panel-title">Running</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
                                 <button class="btn btn-sm btn-primary" onclick="window.addTimerFromDash()">+ Add</button>
                             </div>
                         </div>
-                        <div id="dash-timers"><span class="text-muted">No active timers.</span></div>
+                        <div id="dash-timers"><span class="text-muted">Nothing running. Quiet season.</span></div>
                     </div>
 
                     <!-- Active Encounters -->
                     <div class="panel" id="dash-encounters-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">⚔️ Active Encounters</h3>
+                            <h3 class="panel-title">In play</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
                                 <button class="btn btn-sm btn-primary" onclick="window.addEncounterFromDash()">+ Add</button>
                             </div>
                         </div>
-                        <div id="dash-encounters"><span class="text-muted">No active encounters.</span></div>
+                        <div id="dash-encounters"><span class="text-muted">Nothing in play.</span></div>
                     </div>
                 </div>
 
@@ -138,7 +138,7 @@ export function render(el) {
                                 <button class="btn btn-sm btn-primary" onclick="window.openFactions()">View All</button>
                             </div>
                         </div>
-                        <div id="dash-factions"><span class="text-muted">No factions tracked.</span></div>
+                        <div id="dash-factions"><span class="text-muted">No factions being watched yet.</span></div>
                     </div>
 
                     <!-- Patrons -->
@@ -150,13 +150,13 @@ export function render(el) {
                                 <button class="btn btn-sm btn-primary" onclick="window.openPatrons()">View All</button>
                             </div>
                         </div>
-                        <div id="dash-patrons"><span class="text-muted">No patrons loaded.</span></div>
+                        <div id="dash-patrons"><span class="text-muted">Nobody is listening yet.</span></div>
                     </div>
 
                     <!-- Followers & Assets -->
                     <div class="panel" id="dash-followers-assets-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">👤 Followers & 📦 Assets</h3>
+                            <h3 class="panel-title">Followers and assets</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
                                 <button class="btn btn-sm btn-primary" onclick="window.openFactions()">Manage</button>
@@ -570,18 +570,18 @@ function renderStats() {
     
     return `
         <div class="stat-card">
-            <span class="stat-icon">👤</span>
+            <span class="stat-icon" aria-hidden="true">&#10022;</span>
             <span class="stat-value">${characters.length}</span>
             <span class="stat-label">Characters</span>
         </div>
         <div class="stat-card">
-            <span class="stat-icon">⏱️</span>
+            <span class="stat-icon" aria-hidden="true">&#9719;</span>
             <span class="stat-value">${activeTimers.length}</span>
             <span class="stat-label">Active Timers</span>
             <span class="stat-sub">${completedTimers.length} completed</span>
         </div>
         <div class="stat-card">
-            <span class="stat-icon">⚔️</span>
+            <span class="stat-icon" aria-hidden="true">&#8224;</span>
             <span class="stat-value">${encounters.length}</span>
             <span class="stat-label">Encounters</span>
         </div>
@@ -596,17 +596,17 @@ function renderStats() {
             <span class="stat-label">Patrons</span>
         </div>
         <div class="stat-card">
-            <span class="stat-icon">👤</span>
+            <span class="stat-icon" aria-hidden="true">&#10022;</span>
             <span class="stat-value">${followers.length}</span>
             <span class="stat-label">Followers</span>
         </div>
         <div class="stat-card">
-            <span class="stat-icon">📦</span>
+            <span class="stat-icon" aria-hidden="true">&#9707;</span>
             <span class="stat-value">${assets.length}</span>
             <span class="stat-label">Assets</span>
         </div>
         <div class="stat-card">
-            <span class="stat-icon">📊</span>
+            <span class="stat-icon" aria-hidden="true">&#8801;</span>
             <span class="stat-value">${state.rollHistory?.length || 0}</span>
             <span class="stat-label">Rolls</span>
             <span class="stat-sub">${state.chatHistory?.length || 0} chat</span>
@@ -654,7 +654,7 @@ function updateCharacters() {
                 </div>
                 <div class="char-stats">
                     <span class="char-stat boon ${boonClass}" title="Boons">🪙 ${boons}</span>
-                    <span class="char-stat fatigue ${fatigueClass}" title="Fatigue">⚡ ${fatigue}</span>
+                    <span class="char-stat fatigue ${fatigueClass}" title="Fatigue">&#9650; ${fatigue}</span>
                     <span class="char-stat harm" title="Harm">❤️ ${harm}</span>
                     ${c.vtt ? '<span class="char-stat vtt" title="VTT Connected">🟢</span>' : ''}
                 </div>
@@ -725,7 +725,7 @@ function updateEncounters() {
                     ${e.location ? `<span class="encounter-location">📍 ${escHtml(e.location)}</span>` : ''}
                 </div>
                 <div class="encounter-actions">
-                    <button class="btn btn-xs btn-primary" onclick="event.stopPropagation();window.openCombatTrackerForEncounter('${e.id}')">⚔️ Track</button>
+                    <button class="btn btn-xs btn-primary" onclick="event.stopPropagation();window.openCombatTrackerForEncounter('${e.id}')">&#8224; Track</button>
                 </div>
             </div>
         `;
@@ -757,7 +757,7 @@ function updateFactions() {
                 </div>
                 <div class="faction-agenda">${escHtml(f.agenda || 'No agenda')}</div>
                 <div class="faction-timer-mini">
-                    ⏱️ ${f.agendaTimer?.current || 0}/${f.agendaTimer?.segments || 6}
+                    &#9719; ${f.agendaTimer?.current || 0}/${f.agendaTimer?.segments || 6}
                     <div class="timer-bar-track mini">
                         <div class="timer-bar-fill" style="width:${((f.agendaTimer?.current || 0) / (f.agendaTimer?.segments || 6)) * 100}%;"></div>
                     </div>
@@ -791,7 +791,7 @@ function updatePatrons() {
                 </div>
                 <div class="patron-detail">
                     <span class="patron-rites">🔮 ${ritesCount} rites</span>
-                    ${rivalsCount > 0 ? `<span class="patron-rivals">⚔️ ${rivalsCount} rivals</span>` : ''}
+                    ${rivalsCount > 0 ? `<span class="patron-rivals">&#8224; ${rivalsCount} rivals</span>` : ''}
                 </div>
             </div>
         `;

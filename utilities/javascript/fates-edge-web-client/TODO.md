@@ -52,3 +52,33 @@ The `tests/` suite now covers far more than this list anticipated — conflict r
 ---
 
 Looking for what's actually left to build? The root [README's Roadmap](../../../README.md#-roadmap) is kept current; as of v4.8.3 that's session playback/export and horizontal server scaling.
+
+## Security / hardening — found during the dark-fantasy theming pass
+
+- [ ] **Add SRI hashes to all CDN `<script>` tags in `index.html`.** Seven third-party
+      scripts load with no `integrity` attribute, so a compromised or altered CDN artifact
+      executes with full page privileges (it can read the unlock state in `localStorage`
+      and everything in the character store). Hashes could not be computed in the
+      environment this pass ran in — egress to jsdelivr/cdnjs was blocked. To generate:
+      `curl -sfL <url> | openssl dgst -sha384 -binary | openssl base64 -A`
+      then add `integrity="sha384-…" crossorigin="anonymous"` to each tag.
+      **Verify each hash actually loads before committing** — a wrong hash blocks the
+      script silently and takes the feature with it.
+- [x] **`marked` was loaded completely unpinned** (`/npm/marked/marked.min.js`, which
+      resolves to whatever is newest). Pinned to `marked@12.0.2`. The other six were
+      already version-pinned.
+- [ ] **Audit `innerHTML` against `sanitizeHTML()`.** `js/core/utils.js` has a DOMPurify
+      wrapper, but there are ~200 `innerHTML` assignments across the feature modules
+      (settings 29, docs 22, decks 18, kon-reh 17, vtt 14, dashboard 14) and it is not
+      established that user-supplied content — character names, wiki entries, adventure
+      titles, VTT chat — routes through it. Worth a pass module by module; the VTT and
+      wiki paths are the ones that carry other people's text.
+- [x] `target="_blank"` links in the home module were missing `rel="noopener noreferrer"`.
+      Fixed.
+- [ ] **`data/lock-reset.json` is tracked in git.** `resetCodeHash` is currently empty, so
+      nothing is leaked today — but the file is committed and not ignored, so the first
+      person to fill it in locally will commit their reset hash by accident. Add it to
+      `.gitignore` and ship a `lock-reset.example.json` instead.
+- [ ] **Test runner is broken independently of this work**: `node tests/runner.js` fails
+      with `Cannot find package '@core/state.js'` — an unresolved import alias, not a
+      test failure. Nothing can be validated until this is fixed.

@@ -2855,3 +2855,142 @@ body.xcard-active .app-shell {
         background: #fff !important;
     }
 }
+
+/* ==========================================================================
+   THE AMARANTHINE SKIN  —  dark-fantasy theming pass
+   --------------------------------------------------------------------------
+   Overrides only. No selectors or token NAMES change, so every existing rule
+   and every JS reference keeps working; only the values move.
+
+   Palette is drawn from the setting rather than from a UI kit. The previous
+   accents were stock Flat-UI hues (#3498db / #2ecc71 / #e74c3c / #9b59b6),
+   which read as a SaaS dashboard. These are lamplight on vellum, tarnished
+   bell-bronze, oxblood, verdigris, and bruise-violet.
+
+   Contrast: text tiers re-verified against the new --bg (#0b0d12) with the
+   WCAG relative-luminance formula — --text 15.17:1, --text2 7.19:1,
+   --text3 5.28:1. All pass AA for normal text, and --text3 IMPROVES on the
+   previous 4.52:1. See ACCESSIBILITY.md.
+
+   No raster art is used anywhere in this pass — texture is gradients only,
+   so nothing here adds a network request or a licensing question.
+   ========================================================================== */
+
+:root {
+    /* ground — deep water at night, not slate-gray */
+    --bg:  #0b0d12;
+    --bg2: #12141c;
+    --bg3: #181b25;
+    --bg4: #212533;
+    --bg-glass:       rgba(18, 20, 28, 0.88);
+    --bg-glass-light: rgba(24, 27, 37, 0.62);
+
+    /* ink on vellum, warm rather than blue */
+    --text:  #e8e3d6;
+    --text2: #a49d8b;
+    --text3: #8b8573;
+    --text-inverse: #0b0d12;
+
+    /* tarnished bell-bronze — the old gold was a warning-label yellow */
+    --gold:       #c9a227;
+    --gold-light: #e3bd48;
+    --gold-dark:  #8f6f18;
+    --gold-glow:        rgba(201, 162, 39, 0.14);
+    --gold-glow-strong: rgba(201, 162, 39, 0.24);
+
+    --red:       #9c3232;   /* oxblood */
+    --red-light: #c05149;
+    --red-glow:  rgba(156, 50, 50, 0.16);
+
+    --green:       #4a7c68; /* verdigris */
+    --green-light: #6fa38b;
+    --green-glow:  rgba(74, 124, 104, 0.16);
+
+    --blue:       #41708f;  /* cold harbour steel */
+    --blue-light: #6193b4;
+    --blue-glow:  rgba(65, 112, 143, 0.16);
+
+    --purple:       #6b4a7d; /* bruise */
+    --purple-light: #8f6aa3;
+    --purple-glow:  rgba(107, 74, 125, 0.16);
+
+    --orange:       #b8641f; /* ember */
+    --orange-light: #d38440;
+
+    --border:        rgba(72, 64, 48, 0.55);
+    --border-light:  rgba(232, 227, 214, 0.07);
+    --border-strong: rgba(90, 80, 60, 0.85);
+
+    --shadow-glow:        0 8px 32px rgba(201, 162, 39, 0.07);
+    --shadow-glow-strong: 0 8px 40px rgba(201, 162, 39, 0.11);
+
+    --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+}
+
+/* --- typography: serif for anything that speaks, sans for anything that works --- */
+h1, h2, h3,
+.brand, .brand-title,
+.modal-title, .panel-title, .card-title,
+.section-title, .wizard-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+h1, .brand-title { font-size: 1.9rem; line-height: 1.15; }
+h2 { font-size: 1.45rem; }
+
+/* small-caps eyebrow for nav group headings — reads as a rubric, not a label */
+.nav-section-title, .nav-group-label {
+    font-family: var(--font-display);
+    font-variant: small-caps;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+}
+
+/* --- texture: vellum grain + vignette, gradients only, pointer-events off --- */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        radial-gradient(120% 90% at 50% -10%, rgba(201, 162, 39, 0.045), transparent 60%),
+        radial-gradient(100% 100% at 50% 120%, rgba(0, 0, 0, 0.55), transparent 55%),
+        repeating-linear-gradient(0deg,   rgba(232,227,214,0.012) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg,  rgba(232,227,214,0.010) 0 1px, transparent 1px 4px);
+}
+@media (prefers-reduced-motion: reduce) { body::before { background-image: none; } }
+
+/* a hairline rule with a lozenge, for section breaks */
+.rule-ornament {
+    display: flex; align-items: center; gap: 0.75rem;
+    color: var(--gold-dark); margin: 1.25rem 0;
+}
+.rule-ornament::before, .rule-ornament::after {
+    content: ""; flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-strong), transparent);
+}
+.rule-ornament::after { transform: scaleX(-1); }
+
+/* the gate should feel like a threshold, not a login form */
+.gate-panel, .lock-panel {
+    background:
+        linear-gradient(180deg, rgba(201,162,39,0.05), transparent 40%),
+        var(--bg2);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-elevated), inset 0 1px 0 rgba(232,227,214,0.05);
+}
+.gate-panel h1, .lock-panel h1 { font-family: var(--font-display); }
+
+/* keep the X-Card loud and plain — safety UI is never decorated */
+.xcard-overlay, .xcard-overlay * { font-family: inherit !important; }
+
+/* card icon slots are empty now that the emoji are gone — collapse them
+   rather than leaving a gap where a glyph used to be. */
+.toolkit-icon:empty, .why-icon:empty, .mechanics-icon:empty { display: none; }
+.about-icon { color: var(--gold-dark); font-size: 1.6rem; }
+
+/* icon slots carry typographic glyphs now, not emoji — colour them with the
+   theme so they read as ornament rather than as a second content stream. */
+.qa-icon, .stat-icon { color: var(--gold-dark); font-style: normal; }

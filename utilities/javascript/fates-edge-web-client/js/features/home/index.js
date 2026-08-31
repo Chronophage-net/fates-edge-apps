@@ -35,28 +35,28 @@ function buildHTML() {
     <!-- SLIDE 1: HERO -->
     <section class="home-slide home-hero" id="slide-hero" role="region" aria-label="Hero">
       <div class="slide-content">
-        <div class="hero-badge">⚔️ Narrative-First TTRPG + Digital Toolkit</div>
+        <div class="hero-badge">A roleplaying game of the Amaranthine · and the tools to run it</div>
         <h1 class="hero-title"><span class="gold">Fate's</span> Edge</h1>
         <p class="hero-subtitle">
-          Roll dice. Build characters. Shape stories.
-          <span class="hero-attribution">— all in one open‑source companion</span>
+          Dice, cards, and consequence at the edge of the Amaranthine.
+          <span class="hero-attribution">Everything you need to play. Nothing you have to buy.</span>
         </p>
         <div class="hero-quote">
-          <p>“Every choice carries weight. Every debt echoes forward. Every road remembers.”</p>
+          <p>“Eight is the world. Nobody sensible counts past it.”</p>
         </div>
         <div class="hero-actions">
-          <a href="#slide-rules" class="btn btn-gold" data-action="rules-link">📖 View the Rules</a>
-          <a href="#" class="btn btn-primary" data-action="create-char">🎭 Create a Character</a>
-          <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link">🛠️ Explore the Toolkit</a>
-          <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">🚀 Quick Start – The Lantern at Dusk</button>
+          <a href="#slide-rules" class="btn btn-gold" data-action="rules-link">Read the rules</a>
+          <a href="#" class="btn btn-primary" data-action="create-char">Make someone</a>
+          <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link">Open the toolkit</a>
+          <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">Begin — The Lantern at Dusk</button>
         </div>
         <div class="hero-footer">
-          <p>“The road remembers. Every broken wheel leaves a mark, every lit lamp bears witness. The only question is: what are you willing to owe?”</p>
-          <cite>— Dusana of the Raven Road, <em>The Hearth Ledger</em></cite>
+          <p>“The road remembers. Every broken wheel leaves a mark and every lit lamp had someone behind it. The only question is which of those you mean to be.”</p>
+          <cite>— Dusana of the Raven Road, Tulkani story-keeper, <em>The Hearth Cord</em></cite>
         </div>
       </div>
       <div class="scroll-indicator" aria-hidden="true">
-        <span>Scroll to explore</span>
+        <span>Further in</span>
         <div class="scroll-arrow">↓</div>
       </div>
     </section>
@@ -70,17 +70,17 @@ function buildHTML() {
           <p>Every important action follows a simple, dramatic loop.</p>
         </div>
         <div class="golden-rule">
-          <p>🎲 <strong>The Golden Rule:</strong> When in doubt, make the choice that serves the story. Set DV=3, Position=Controlled, and let the dice fall.</p>
+          <p><strong>When in doubt:</strong> take the reading that gives the table something to play. DV 3, Position Controlled, and let them fall.</p>
         </div>
         <div class="mechanics-grid">
           ${buildMechanicsCard('Dice Pool', 'Attribute + Skill', 'Roll d10s. 6+ = success. 10 = 2 successes.')}
           ${buildMechanicsCard('Difficulty (DV)', '2 – 5+', '2 = routine · 3 = default · 4 = hard · 5+ = extreme')}
           ${buildMechanicsCard('Position', 'Dominant · Controlled · Desperate', 'Re-roll 1 failure · normal · re-roll 1 success')}
-          ${buildMechanicsCard('Boons', '⚡ 1–5', 'Earn on Partial (1) or Miss (2). Spend to re-roll, improve Position, activate Assets.')}
+          ${buildMechanicsCard('Boons', '1–5', 'Earn on Partial (1) or Miss (2). Spend to re-roll, improve Position, activate Assets.')}
         </div>
         ${buildOutcomeMatrix()}
         <div class="rules-nav">
-          <a href="#slide-characters" class="btn btn-primary" data-action="create-char">🎭 Build a Character →</a>
+          <a href="#slide-characters" class="btn btn-primary" data-action="create-char">Build a character →</a>
         </div>
       </div>
     </section>
@@ -103,7 +103,7 @@ function buildHTML() {
           ${buildCreationCard('🔗', 'Bonds & Complications', 'Up to 2 Bonds (+2 XP each) and 2 Complications (+2 XP each) for max 36 XP.', '"I saved your life" or "The magistrate still hunts me"')}
         </div>
         <div class="creation-actions">
-          <button class="btn btn-primary btn-large" data-action="create-char">🚀 Start Building Your Character</button>
+          <button class="btn btn-primary btn-large" data-action="create-char">Start building</button>
         </div>
       </div>
     </section>
@@ -113,18 +113,18 @@ function buildHTML() {
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">03</span>
-          <h2>🛠️ Digital Toolkit</h2>
+          <h2>The toolkit</h2>
           <p>Everything you need to run or play <em>Fate’s Edge</em> — right in your browser.</p>
         </div>
         <div class="toolkit-grid">
-          ${buildToolkitCard('🎲', 'Dice Roller', 'Roll d10s with position and difficulty modifiers. Auto‑calculates successes and Story Beats.')}
-          ${buildToolkitCard('👤', 'Character Sheets', 'Track attributes, skills, talents, bonds, and complications. Export to PDF for your table.')}
-          ${buildToolkitCard('⚔️', 'Encounter Tracker', 'Build scenes with NPCs, track initiative, and apply status effects on the fly.')}
-          ${buildToolkitCard('🏛️', 'Faction Manager', 'Define factions, track reputations, and see how the world reacts to your party’s choices.')}
+          ${buildToolkitCard('', 'Dice Roller', 'Roll d10s with position and difficulty modifiers. Auto‑calculates successes and Story Beats.')}
+          ${buildToolkitCard('', 'Character Sheets', 'Track attributes, skills, talents, bonds, and complications. Export to PDF for your table.')}
+          ${buildToolkitCard('', 'Encounter Tracker', 'Build scenes with NPCs, track initiative, and apply status effects on the fly.')}
+          ${buildToolkitCard('', 'Faction Manager', 'Define factions, track reputations, and see how the world reacts to your party’s choices.')}
         </div>
         <div class="toolkit-cta">
           <p>All data stays in your browser — no sign‑up required. <strong>Open source</strong> and ready to use.</p>
-          <a href="#" class="btn btn-primary" data-action="create-char">🎭 Jump to the Character Editor</a>
+          <a href="#" class="btn btn-primary" data-action="create-char">Jump to the character editor</a>
         </div>
       </div>
     </section>
@@ -134,16 +134,16 @@ function buildHTML() {
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">04</span>
-          <h2>Why This Game?</h2>
-          <p>Three core pillars that make <em>Fate’s Edge</em> stand out.</p>
+          <h2>What it plays like</h2>
+          <p>Three things you will notice in the first hour.</p>
         </div>
         <div class="why-grid">
-          ${buildWhyCard('📜', 'Narrative First', 'Every roll pushes the story forward. Successes and failures alike create new drama—never a dead end.')}
-          ${buildWhyCard('⚔️', 'Meaningful Risk', 'Position and Story Beats make each choice weighty. You’re not just rolling dice—you’re making a pact with fate.')}
-          ${buildWhyCard('⚡', 'Scalable Complexity', 'Start with just Attributes and Skills. Add Talents and Complications as you grow. The same core handles a tavern brawl or a kingdom‑saving heist.')}
+          ${buildWhyCard('', 'No dead rolls', 'A miss is not a stop. It moves the scene somewhere you did not choose, which is usually more interesting than where you were going.')}
+          ${buildWhyCard('', 'Risk you can see', 'Position and Story Beats put the cost on the table before you commit, so nobody is ever surprised by the price — only by who ends up paying it.')}
+          ${buildWhyCard('', 'Starts small', 'Attributes and Skills are enough for a first session. Talents and Complications layer on when the table wants them. The same core runs a bar fight and a succession crisis.')}
         </div>
         <div class="why-footer">
-          <p>“The road remembers. Every broken wheel leaves a mark, every lit lamp bears witness.”</p>
+          <p>“The road remembers. Every broken wheel leaves a mark, and every lit lamp had someone behind it.”</p>
           <cite>— Dusana of the Raven Road</cite>
         </div>
       </div>
@@ -155,11 +155,11 @@ function buildHTML() {
         <div class="section-header">
           <span class="section-number">05</span>
           <h2>About the Creator</h2>
-          <p>Built by a lifelong gamer, for everyone.</p>
+          <p>Who made this, and why it is free.</p>
         </div>
         <div class="about-grid">
           <div class="about-card">
-            <div class="about-icon">🐉</div>
+            <div class="about-icon" aria-hidden="true">&#10022;</div>
             <h3>Nicholas A. Gasper <span class="handle">(Chronophage)</span></h3>
             <p class="about-role">Sysadmin · DevOps · FreeBSD / Linux — 20+ years</p>
             <p class="about-bio">
@@ -170,11 +170,11 @@ function buildHTML() {
               <p>“Keep It Stupid — minimal but not fragile. Build from user needs, set a feature limit, layer by layer.”</p>
             </blockquote>
             <p class="about-contact">
-              📧 <a href="mailto:support@fates-edge.com">support@fates-edge.com</a> · 
-              ☕ <a href="https://venmo.com/chronophage" target="_blank" rel="noopener noreferrer">Venmo: chronophage</a> · 
-              🐦 <a href="https://twitter.com/chronophage" target="_blank" rel="noopener noreferrer">@chronophage</a> (everywhere)
+              <a href="mailto:support@fates-edge.com">support@fates-edge.com</a> &middot;
+              <a href="https://venmo.com/chronophage" target="_blank" rel="noopener noreferrer">Venmo: chronophage</a> &middot;
+              <a href="https://twitter.com/chronophage" target="_blank" rel="noopener noreferrer">@chronophage</a> (everywhere)
             </p>
-            <p class="about-tagline">☕ Fueled by coffee · 🧠 Neurodivergent & proud · 🌱 Community grows from within</p>
+            <p class="about-tagline">Neurodivergent, and it shows in the good parts too.</p>
           </div>
         </div>
       </div>
@@ -852,24 +852,24 @@ function showWelcomeOverlay() {
   overlay.id = 'welcome-overlay';
   overlay.innerHTML = `
     <div class="welcome-card">
-      <span style="font-size:3rem;">⚔️</span>
+      <span style="font-size:2.6rem;color:var(--gold-dark);" aria-hidden="true">&#10022;</span>
       <h1>Welcome to Fate's Edge</h1>
       <p style="color:var(--text2);font-size:1.05rem;margin:0;">
         Your complete toolkit for running and playing Fate's Edge.
       </p>
 
       <div class="welcome-docs">
-        <p style="margin:0;font-weight:500;">📖 Start here – essential documents:</p>
+        <p style="margin:0;font-weight:500;">Start here — the two documents that matter:</p>
         <ul>
-          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Essentials.html" target="_blank">⚡ Essentials</a> – quick start rules</li>
-          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html" target="_blank">📜 Playing &amp; Running Fate's Edge</a> – full guide</li>
-          <li><a href="${CAMPFIRE_DOC_URL}" target="_blank">🏕️ Campfire Mode</a> – the whole game on a handful of pages, free to print and share at the table</li>
+          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Essentials.html" target="_blank" rel="noopener noreferrer">Essentials</a> — the quick start</li>
+          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html" target="_blank" rel="noopener noreferrer">Playing &amp; Running Fate's Edge</a> — the whole thing</li>
+          <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener noreferrer">Campfire Mode</a> — the whole game on a handful of pages, free to print and share at the table</li>
         </ul>
       </div>
 
       <div class="welcome-actions">
         <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">
-          ⚡ Jump to the Action
+          Jump to the action
         </button>
         <p class="welcome-subtext">Drops you straight into <strong>The Lantern at Dusk</strong> (a short one‑shot) with a ready‑made character. No setup required.</p>
         <button class="btn btn-secondary" data-action="dismiss-welcome">
@@ -943,9 +943,9 @@ function renderQuickStartConfirmation(overlayEl, { character, adventure }) {
       ${charLine}
     </p>
     <div class="welcome-docs">
-      <p style="margin:0;font-weight:500;">📖 New to Fate's Edge?</p>
+      <p style="margin:0;font-weight:500;">First time here?</p>
       <ul>
-        <li><a href="${ESSENTIALS_DOC_URL}" target="_blank" rel="noopener">⚡ Essentials</a> – the quickstart rules primer, keep it open in a tab while you play</li>
+        <li><a href="${ESSENTIALS_DOC_URL}" target="_blank" rel="noopener">Essentials</a> — the quickstart primer; keep it open in a tab while you play</li>
         <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener">🏕️ Campfire Mode</a> – an even shorter cheat-sheet version, good for a first-time table</li>
       </ul>
     </div>
@@ -1102,7 +1102,7 @@ async function quickStartAndGo() {
     markWelcomeSeen();
     window.location.hash = 'adventure-manager';
     const who = result.character ? ` as ${result.character.name}` : '';
-    showToast(`🚀 Launched "${result.adventure.title}"${who}!`, 'success');
+    showToast(`Underway — "${result.adventure.title}"${who}`, 'success');
 }
 // ─── Event Handling ──────────────────────────────────────────────────
 

@@ -27,29 +27,29 @@ const EXCLUDED_FILE_PATTERN = /manifest.*\.json(\.tmp)?$/i;
 
 // ─── Category mapping: subdir → category info ────────────────────
 const CATEGORY_MAP = {
-  'core': { id: 'core', label: '📘 Core', path: '/data/docs/core/' },
-  'quickstart': { id: 'quickstart', label: '⚡ Quickstart', path: '/data/docs/quickstart/' },
-  'players-guide': { id: 'players-guide', label: '🎲 Player\'s Guide', path: '/data/docs/players-guide/', book: true },
-  'gm-guide': { id: 'gm-guide', label: '🎬 GM Guide', path: '/data/docs/gm-guide/', book: true },
-  'resources': { id: 'resources', label: '📚 Resources', path: '/data/docs/resources/' },
-  'adventures': { id: 'adventures', label: '🗡️ Adventures', path: '/data/docs/adventures/' },
-  'expansions': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/expansions/' },
-  'anthology': { id: 'anthology', label: '📖 Anthology', path: '/data/docs/anthology/' },
-  'travel': { id: 'travel', label: '🗺️ Travel', path: '/data/docs/travel/' },
-  'design': { id: 'design', label: '🎨 Design', path: '/data/docs/design/' },
+  'core': { id: 'core', label: 'Core', path: '/data/docs/core/' },
+  'quickstart': { id: 'quickstart', label: 'Quickstart', path: '/data/docs/quickstart/' },
+  'players-guide': { id: 'players-guide', label: 'Player\'s Guide', path: '/data/docs/players-guide/', book: true },
+  'gm-guide': { id: 'gm-guide', label: 'GM Guide', path: '/data/docs/gm-guide/', book: true },
+  'resources': { id: 'resources', label: 'Resources', path: '/data/docs/resources/' },
+  'adventures': { id: 'adventures', label: 'Adventures', path: '/data/docs/adventures/' },
+  'expansions': { id: 'expansions', label: 'Expansions', path: '/data/docs/expansions/' },
+  'anthology': { id: 'anthology', label: 'Anthology', path: '/data/docs/anthology/' },
+  'travel': { id: 'travel', label: 'Travel', path: '/data/docs/travel/' },
+  'design': { id: 'design', label: 'Design', path: '/data/docs/design/' },
   // Kon'reh and Toll & Veil are each a single standalone mini-game
   // reference rather than a full expansion or line of their own -- they
   // share the 'other-games' category id/label so they land in one
   // "Other Games" section instead of each getting its own single-item
   // category tile.
-  'konreh': { id: 'other-games', label: '🎲 Other Games', path: '/data/docs/konreh/' },
-  'tollveil': { id: 'other-games', label: '🎲 Other Games', path: '/data/docs/tollveil/' },
-  'uploaded': { id: 'uploaded', label: '📤 Uploaded', path: '/data/docs/uploaded/' },
+  'konreh': { id: 'other-games', label: 'Other Games', path: '/data/docs/konreh/' },
+  'tollveil': { id: 'other-games', label: 'Other Games', path: '/data/docs/tollveil/' },
+  'uploaded': { id: 'uploaded', label: 'Uploaded', path: '/data/docs/uploaded/' },
   // Witnessed Prey and Saikou Compendium are Fate's Edge expansions, so
   // they share the 'expansions' category id/label with the rest of the
   // Expansions folder even though each lives in its own book directory.
-  'witnessed-prey': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/witnessed-prey/', book: true },
-  'saikou-compendium': { id: 'expansions', label: '📦 Expansions', path: '/data/docs/saikou-compendium/', book: true },
+  'witnessed-prey': { id: 'expansions', label: 'Expansions', path: '/data/docs/witnessed-prey/', book: true },
+  'saikou-compendium': { id: 'expansions', label: 'Expansions', path: '/data/docs/saikou-compendium/', book: true },
 };
 
 const SUBDIRS = Object.keys(CATEGORY_MAP);
@@ -65,6 +65,9 @@ function getDocTitle(file) {
     .replace(/Fates_-_Edge_-_-/g, '')
     .replace(/_/g, ' ')
     .replace(/-/g, ' ')
+    // the source filenames use "-_-" as a word separator, which the two
+    // replaces above turn into runs of spaces ("The   Hearth   Cord").
+    .replace(/\s{2,}/g, ' ')
     .replace(/\b\w/g, l => l.toUpperCase())
     .trim();
 }
@@ -205,16 +208,16 @@ function generateDocsManifest(docsPath) {
     const lower = file.toLowerCase();
     if (lower.includes('srd') || lower.includes('reference')) {
       category = 'core';
-      label = '📘 Core';
+      label = 'Core';
       path = '/data/docs/';
       core = true;
     } else if (lower.includes('screen') || lower.includes('gm') || lower.includes('essential')) {
       category = 'resources';
-      label = '📚 Resources';
+      label = 'Resources';
       path = '/data/docs/';
     } else if (lower.includes('saga') || lower.includes('dreams') || lower.includes('serpent') || lower.includes('adventure') || lower.includes('chronicle')) {
       category = 'adventures';
-      label = '🗡️ Adventures';
+      label = 'Adventures';
       path = '/data/docs/';
     }
 
