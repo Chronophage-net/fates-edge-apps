@@ -120,9 +120,15 @@ describe('TollVeilEngine: follow-suit and trump-breaking', () => {
         bidAllZero(e);
         const leader = e.currentSeat;
         const hand = e.hands[leader];
-        // Force a known lead suit by playing whatever's first.
-        const leadCard = hand[0];
-        e.playCard(leader, cardId(leadCard));
+        // Lead a NON-trump card. The old version played hand[0] blindly, which
+        // failed roughly one run in three: when that card happened to be trump
+        // the engine correctly refused the lead (trump not yet broken), the
+        // play was rejected, and leadSuit stayed null. That was a flaky test,
+        // not an engine bug.
+        const leadCard = hand.find(c => c.suit !== e.trump);
+        if (!leadCard) return; // all-trump hand: covered by its own test below
+        const led = e.playCard(leader, cardId(leadCard));
+        assertTrue(led.ok, `leading a non-trump card should be legal (got ${led.reason})`);
         assertEqual(e.leadSuit, leadCard.suit);
 
         const nextSeat = e.currentSeat;

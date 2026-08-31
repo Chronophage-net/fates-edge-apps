@@ -79,9 +79,20 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
       nothing is leaked today — but the file is committed and not ignored, so the first
       person to fill it in locally will commit their reset hash by accident. Add it to
       `.gitignore` and ship a `lock-reset.example.json` instead.
-- [ ] **Test runner is broken independently of this work**: `node tests/runner.js` fails
-      with `Cannot find package '@core/state.js'` — an unresolved import alias, not a
-      test failure. Nothing can be validated until this is fixed.
+- [x] **Test runner fixed.** `node tests/runner.js` died on `Cannot find package
+      '@core/state.js'`: the `@core` alias exists only in `vite.config.js`, and
+      Node's ESM loader cannot see it (package.json `imports` can't express it
+      either — those keys must start with `#`). Added an ESM resolve hook in
+      `tests/support/alias-hooks.mjs` mirroring the vite alias map, registered
+      via `--import`. The suite was never broken, only unrunnable: **157/157
+      pass**. Keep the two alias maps in sync — adding one to vite.config.js
+      and not to the hook breaks only the tests.
+- [x] **Fixed a flaky Toll & Veil test** that failed ~1 run in 3.
+      "must follow suit when able" led `hand[0]` blindly; when that card was
+      trump the engine correctly refused the lead (trump not broken), the play
+      was rejected and `leadSuit` stayed null. It now leads a non-trump card
+      and asserts the lead succeeded. Engine behaviour was correct throughout.
+      10/10 clean runs after the fix.
 
 ## Repo hygiene
 
@@ -93,7 +104,30 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
       `generate-manifests.js` preserve the existing timestamp when the rest of
       the document set is unchanged. Same applies to the other generated
       manifests.
-- [ ] **`npm audit` is not clean.** web-client reports 12 vulnerabilities
-      (1 low, 7 high, 4 critical); socket-server reports 9 (2 low, 6 high,
-      1 critical). Not triaged in this pass — worth doing before anything is
-      sold or publicly hosted.
+- [x] **`npm audit` is clean in both projects (0 vulnerabilities).**
+      web-client: all four criticals and most highs came from one dev-only
+      dependency, `serve@^6.5.8` (2018). Bumped to `^14.2.6` and moved to
+      devDependencies where it belongs — it is CLI-only (`npx serve -s dist`),
+      never imported, and the production image serves via nginx, so nothing
+      ships differently. The remaining `nanoid` advisory cleared with a plain
+      `npm audit fix`.
+      socket-server: every advisory lived in `node-gyp`'s toolchain under
+      `sqlite3` (tar, cacache, make-fetch-happen, http-proxy-agent). Resolved
+      with `overrides` on `node-gyp@^11` and `tar@^7` rather than by taking
+      `sqlite3@6` — see the note below.
+- [ ] **Revisit `sqlite3@6` on a real build host.** The obvious fix was
+      `sqlite3@5.1.7 -> 6.0.1`, and it was reverted deliberately: v6's prebuilt
+      aarch64 binary requires GLIBC_2.38 and fails to load on older glibc with
+      "SQLite module not installed", which took the whole auth API down with
+      500s. The JS API is unchanged, so v6 is probably fine on the real target
+      (`node:24-alpine`, musl, builds from source) — but that could not be
+      verified from here, and an untestable major bump of a native module is
+      not worth it when `overrides` clears the advisories anyway. Try it on a
+      real build host, and check `require('sqlite3').verbose()` loads before
+      trusting the test suite.
+- [ ] **`npm run test:auth` has 3 pre-existing failures**, unrelated to any of
+      the above and present before these changes: "admin sets room password"
+      gets 404 Room TESTROOM not found, and the two anonymous-join password
+      checks pass when they should be rejected. Worth a look — on the face of
+      it a room has to exist before a password can be set on it, and the
+      password gate may not be enforced for anonymous joins.

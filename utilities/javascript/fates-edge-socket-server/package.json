@@ -21,12 +21,12 @@
     "ws": "^8.17.0"
   },
   "optionalDependencies": {
-    "mysql2": "^3.11.0",
-    "pg": "^8.13.0",
-    "ioredis": "^5.4.1",
+    "@socket.io/cluster-adapter": "^0.3.0",
     "@socket.io/redis-adapter": "^8.3.0",
     "@socket.io/sticky": "^2.0.1",
-    "@socket.io/cluster-adapter": "^0.3.0"
+    "ioredis": "^5.4.1",
+    "mysql2": "^3.11.0",
+    "pg": "^8.13.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
@@ -36,5 +36,9 @@
   },
   "license": "MIT",
   "_license": "Code: MIT. Game content: CC BY-NC-SA 4.0 (SRD) / All Rights Reserved (proprietary). © 2024 - 2026 Nicholas A. Gasper.",
-  "author": "Nicholas A. Gasper"
+  "author": "Nicholas A. Gasper",
+  "overrides": {
+    "node-gyp": "^11.2.0",
+    "tar": "^7.4.3"
+  }
 }
