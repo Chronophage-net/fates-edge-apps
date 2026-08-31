@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [4.26.0] - 2026-08-31
+
+Dark-fantasy theming pass, setting data sync, dependency pinning
+
+### Added
+- dark-fantasy theming pass, setting data sync, and hardening
+
 ## [4.25.4] - 2026-08-28
 
 Settings: add small GitHub/Dev Portal links to About
