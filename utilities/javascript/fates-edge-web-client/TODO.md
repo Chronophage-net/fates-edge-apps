@@ -82,3 +82,18 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
 - [ ] **Test runner is broken independently of this work**: `node tests/runner.js` fails
       with `Cannot find package '@core/state.js'` — an unresolved import alias, not a
       test failure. Nothing can be validated until this is fixed.
+
+## Repo hygiene
+
+- [ ] **`data/docs/manifest.json` can never be committed clean.** It stores a
+      `generated` ISO timestamp, it is tracked, and the pre-commit hook
+      regenerates it on every commit that touches the web client — so each
+      commit leaves the tree dirty with a one-line timestamp diff, forever.
+      Either drop `generated` from the emitted manifest, or have
+      `generate-manifests.js` preserve the existing timestamp when the rest of
+      the document set is unchanged. Same applies to the other generated
+      manifests.
+- [ ] **`npm audit` is not clean.** web-client reports 12 vulnerabilities
+      (1 low, 7 high, 4 critical); socket-server reports 9 (2 low, 6 high,
+      1 critical). Not triaged in this pass — worth doing before anything is
+      sold or publicly hosted.
