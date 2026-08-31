@@ -185,10 +185,9 @@
 <caption>Harm Levels and Effects</caption>
 <thead><tr><th>Level</th><th>SB Generation</th><th>Penalty</th><th>Recovery</th></tr></thead>
 <tbody>
-<tr><td>Minor</td><td>1 SB (next 2 rolls)</td><td>&minus;1 die (related actions)</td><td>Rest or basic care</td></tr>
-<tr><td>Moderate</td><td>1 SB (next roll)</td><td>&minus;1 die (most actions)</td><td>Medical treatment</td></tr>
-<tr><td>Severe</td><td>2 SB (next roll)</td><td>&minus;2 dice (most actions)</td><td>Extended care</td></tr>
-<tr><td>Critical</td><td>3 SB (next roll)</td><td>Incapacitated</td><td>Major intervention</td></tr>
+<tr><td>Harm 1</td><td>1 SB (next 2 rolls)</td><td>&minus;1 die on related actions</td><td>Rest or basic care</td></tr>
+<tr><td>Harm 2</td><td>1 SB (next roll)</td><td>&minus;1 die on most actions until treated</td><td>Medical treatment</td></tr>
+<tr><td>Harm 3</td><td>2 SB (next roll)</td><td>Incapacitated or dying</td><td>Major intervention</td></tr>
 </tbody>
 </table>
 </div>
@@ -217,9 +216,9 @@
 <h3>Supply Timer States</h3>
 <dl>
 <dt>Full (0 segments)</dt><dd>Well-provisioned, no penalty.</dd>
-<dt>Low (2 segments)</dt><dd>Minor friction — resource checks at &minus;1 die.</dd>
-<dt>Dangerously Low (3 segments)</dt><dd>Each PC gains Fatigue 1.</dd>
-<dt>Empty (4 segments)</dt><dd>Severe penalties — starvation or thirst risk.</dd>
+<dt>Low (1 segment)</dt><dd>Minor friction — resource checks at &minus;1 die.</dd>
+<dt>Dangerous (2 segments)</dt><dd>Each PC gains Fatigue 1.</dd>
+<dt>Empty (3 segments)</dt><dd>Severe penalties — starvation or thirst risk.</dd>
 </dl>
 </div>
 
@@ -254,7 +253,7 @@
 <ul>
 <li><strong>Efficient (higher XP, less time):</strong> Upkeep XP = max(1, Acquisition XP &divide; 3).</li>
 <li><strong>Intensive (1 XP, dedicated action):</strong> One full downtime action.</li>
-<li><strong>Failure to pay:</strong> Follower becomes Wary (or Seized if already Wary); Asset becomes Neglected (or Compromised if already Neglected).</li>
+<li><strong>Failure to pay:</strong> Follower's Loyalty worsens one step: Faithful &rarr; Strained &rarr; Broken; Asset becomes Neglected (or Compromised if already Neglected).</li>
 </ul>
 </div>
 
