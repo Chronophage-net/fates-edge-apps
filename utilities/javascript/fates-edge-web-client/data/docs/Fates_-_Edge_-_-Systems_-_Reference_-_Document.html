@@ -1296,9 +1296,9 @@ hide.”</p></li>
 <table>
 <thead><tr><th>Talent</th><th>Effect</th></tr></thead>
 <tbody>
-<tr><td>Lesser Pactwright <span class="badge badge-gold">2 XP</span></td><td>Call spirits of Cap 1.</td></tr>
-<tr><td>Greater Pactwright <span class="badge badge-gold">4 XP</span></td><td>Call spirits of Cap 3.</td></tr>
-<tr><td>Dual Pactwright <span class="badge badge-gold">6 XP</span></td><td>May maintain one spirit of each Cap simultaneously.</td></tr>
+<tr><td>Lesser Pactwright <span class="badge badge-gold">2 XP</span></td><td>Call spirits of TL 1.</td></tr>
+<tr><td>Greater Pactwright <span class="badge badge-gold">4 XP</span></td><td>Call spirits of TL 3.</td></tr>
+<tr><td>Dual Pactwright <span class="badge badge-gold">6 XP</span></td><td>May maintain one spirit of each TL simultaneously.</td></tr>
 <tr><td>Spirit Synergy <span class="badge badge-gold">4 XP</span></td><td>When maintaining two spirits simultaneously, reduce each spirit&rsquo;s Leash ticking by 1 (min 1).</td></tr>
 <tr><td>Bonded Summoner <span class="badge badge-gold">3 XP</span></td><td>Favored spirits (Spirit Bond Timer completed) gain an additional &ndash;1 tick per command (stacks with other reductions).</td></tr>
 <tr><td>Spirit Link <span class="badge badge-gold">10 XP</span></td><td>Commands are free actions; spirits act on your turn; reduce Leash ticking for natural behaviors by 1.</td></tr>
@@ -2066,7 +2066,7 @@ hide.”</p></li>
 <tr><td><span class="badge badge-gold">Invoker</span></td><td>Patron's Symbol</td><td>Ritual</td><td>Obligation + Symbol Compromise</td></tr>
 <tr><td><span class="badge badge-purple">Cantor</span></td><td>Cantor's Path (8 XP)</td><td>Performance + Lore</td><td>Corruption (Spirit-based track)</td></tr>
 <tr><td><span class="badge badge-green">Witchcraft</span></td><td>Craft of the Hedge (4 XP)</td><td>None (Gifts) / Wits+Lore (Workings)</td><td>None (Gifts); Promise Timers</td></tr>
-<tr><td><span class="badge badge-red">Summoning</span></td><td>Pact-Whisperer (2 XP)</td><td>Spirit + Lore</td><td>Leash (Cap + Spirit)</td></tr>
+<tr><td><span class="badge badge-red">Summoning</span></td><td>Pact-Whisperer (2 XP)</td><td>Spirit + Lore</td><td>Leash (Spirit + TL)</td></tr>
 </tbody>
 </table>
 </div>
@@ -3035,7 +3035,7 @@ hide.”</p></li>
 <p><span class="badge badge-blue">Control</span></p>
 <p>Challenge Outsiders crossing a warded edge or zone.</p>
 <ul>
-<li><strong>DV</strong> = target Cap. (Cap is the Outsider's tier: 1 for Lesser, 3 for Greater.)</li>
+<li><strong>DV</strong> = the target's TL (1 for a Lesser Outsider, 3 for a Greater).</li>
 <li><strong>Hit:</strong> Crosses; add +DV segments to its Leash.</li>
 <li><strong>Partial:</strong> Crosses; add +1 segment.</li>
 <li><strong>Miss:</strong> Cannot cross this beat.</li>
@@ -3049,7 +3049,7 @@ hide.”</p></li>
 <p><span class="badge badge-blue">Control</span></p>
 <p>Drive a visible Outsider toward departure.</p>
 <ul>
-<li><strong>DV</strong> = target Cap.</li>
+<li><strong>DV</strong> = the target's TL.</li>
 <li><strong>Hit:</strong> Add +DV to its Leash.</li>
 <li><strong>Partial:</strong> Add +1.</li>
 <li><strong>Miss:</strong> No effect.</li>
@@ -3288,7 +3288,7 @@ hide.”</p></li>
 <ul>
 <li><strong>Rite of Sealed Threshold</strong> <span class="text-sm text-muted">(Low)</span>: Mark a doorway; unauthorized crossing requires Resolve test (DV 3).</li>
 <li><strong>Rite of Circle of Denial</strong> <span class="text-sm text-muted">(Standard)</span>: Protective circle; spirits/outsiders must resist (Resolve vs DV 4) to enter.</li>
-<li><strong>Rite of Banishment Knot</strong> <span class="text-sm text-muted">(High)</span>: Cast out a supernatural entity; test vs its Cap.</li>
+<li><strong>Rite of Banishment Knot</strong> <span class="text-sm text-muted">(High)</span>: Cast out a supernatural entity; test against its TL.</li>
 </ul>
 </div>
 </section>
@@ -3370,8 +3370,8 @@ hide.”</p></li>
 <p>The essential summoning talents are:</p>
 <ul>
 <li><strong>Pact-Whisperer (2 XP):</strong> Base access to summoning.</li>
-<li><strong>Lesser Pactwright (2 XP):</strong> Call spirits of Cap 1.</li>
-<li><strong>Greater Pactwright (4 XP):</strong> Call spirits of Cap 3.</li>
+<li><strong>Lesser Pactwright (2 XP):</strong> Call spirits of TL 1.</li>
+<li><strong>Greater Pactwright (4 XP):</strong> Call spirits of TL 3.</li>
 <li><strong>Spirit Link (10 XP):</strong> Spirits act on your turn; all commands are free actions; reduce Leash ticking for natural behaviors by 1.</li>
 </ul>
 </section>
@@ -3393,7 +3393,7 @@ hide.”</p></li>
 
 <section class="level3" id="leash-capacity">
 <h3>3. Leash Capacity</h3>
-<p>The spirit has a Leash &mdash; a track of segments equal to Cap + Spirit. Cap is the spirit&rsquo;s tier: 1 for Lesser, 3 for Greater. The Leash represents the strain of keeping the spirit in the mortal world.</p>
+<p>The spirit has a Leash &mdash; a track of segments equal to your Spirit + the spirit's TL. TL is 1 for a Lesser spirit, 3 for a Greater. The Leash represents the strain of keeping the spirit in the mortal world.</p>
 </section>
 
 <section class="level3" id="ticking-the-leash">
@@ -3403,7 +3403,7 @@ hide.”</p></li>
 <li>The spirit takes Harm (1 segment per level of Harm).</li>
 <li>You command the spirit to act against its nature (1 segment).</li>
 <li>You split focus &mdash; take another significant action while the spirit is acting (1 segment).</li>
-<li>The spirit crosses a <code>[WARD]</code> without dispelling it (DV = Cap; tick segments equal to the ward&rsquo;s DV).</li>
+<li>The spirit crosses a <code>[WARD]</code> without dispelling it (DV = its TL; tick segments equal to the ward's DV).</li>
 <li>(Optional narrative trigger) A rival contests control, or the spirit moves too far from you.</li>
 </ul>
 </section>
@@ -3443,9 +3443,10 @@ hide.”</p></li>
 
 <div class="grid-2">
 <section class="level3" id="lesser-spirits">
-<h3>Lesser (Cap 1)</h3>
+<h3>Lesser (TL 1)</h3>
 <div class="panel panel-green">
-<p><span class="badge badge-green">Cap 1</span></p>
+<p><span class="badge badge-green">TL 1</span></p>
+<p><strong>Harm Levels:</strong> 3 (standard)</p>
 <ul>
 <li><strong>Shade:</strong> Stealthy scout; can pass through cracks; Harm 1, Leash = 1+Spirit.</li>
 <li><strong>Emberling:</strong> Small fire elemental; deals 1 Harm (fire) on touch; can ignite objects.</li>
@@ -3455,9 +3456,10 @@ hide.”</p></li>
 </section>
 
 <section class="level3" id="greater-spirits">
-<h3>Greater (Cap 3)</h3>
+<h3>Greater (TL 3)</h3>
 <div class="panel panel-red">
-<p><span class="badge badge-red">Cap 3</span></p>
+<p><span class="badge badge-red">TL 3</span></p>
+<p><strong>Harm Levels:</strong> 3 (standard)</p>
 <ul>
 <li><strong>Flame Elemental:</strong> Area fire attack (Harm 2 to all in Close); immune to mundane fire; Leash = 3+Spirit.</li>
 <li><strong>Shadow Hound:</strong> Track any scent; can move silently; attacks with Harm 2 (shadow bite).</li>
@@ -3473,7 +3475,7 @@ hide.”</p></li>
 <p>Choose one specialization when a spirit becomes Favored:</p>
 <ul>
 <li><strong>Combat Specialist:</strong> +1 Harm on attacks; ignores first Harm 1 per scene.</li>
-<li><strong>Scout Form:</strong> Stealthy; Cap 1 can carry 2 kg, Cap 3 can carry 10 kg; +2 dice to Stealth.</li>
+<li><strong>Scout Form:</strong> Stealthy; a TL 1 spirit can carry 2 kg, a TL 3 spirit 10 kg; +2 dice to Stealth.</li>
 <li><strong>Utility Spirit:</strong> Can perform simple tasks (opening unlocked doors, carrying light objects, fetching items).</li>
 <li><strong>Shield Guardian:</strong> Once per round, interpose and convert an ally&rsquo;s Harm 1 into Fatigue on the spirit.</li>
 </ul>
@@ -3734,7 +3736,7 @@ hide.”</p></li>
 
 <section class="level3" id="upkeep-and-delegation">
 <h3>14.5.3 Upkeep and Delegation</h3>
-<p>Each downtime, the Trust must pay upkeep for its Assets and Followers using the standard rules (1 XP or a scene per asset/follower). Alternatively, the Trust may delegate upkeep to a Cap 5 Follower:</p>
+<p>Each downtime, the Trust must pay upkeep for its Assets and Followers using the standard rules &mdash; Efficient upkeep of max(1, cost &divide; 3) in XP, or 1 XP and a scene, per asset or follower). Alternatively, the Trust may delegate upkeep to a Cap 5 Follower:</p>
 <ul>
 <li>The Cap 5 follower can manage up to 4 Assets (or any combination of Assets and Followers totaling 4 slots).</li>
 <li>The follower's own upkeep covers the delegated Assets — no separate XP cost.</li>
@@ -4212,7 +4214,7 @@ hide.”</p></li>
 <tr><td>Combat</td><td>3 (Controlled)</td><td>Melee, Ranged, Athletics, Command</td><td>Mob Overwhelm [6], Hazard [4–8]</td></tr>
 <tr><td>Social</td><td>3 (Controlled)</td><td>Sway, Subterfuge, Insight, Command</td><td>Persuasion [4–8], Opposition [4]</td></tr>
 <tr><td>Environmental</td><td>3–4 (varies)</td><td>Athletics, Survival, Craft, Stealth</td><td>Collapse [6], Flood [6], Chase [4]</td></tr>
-<tr><td>Magical</td><td>4–6 (specific)</td><td>Arcana, Lore, Spirit+Resolve</td><td>Leash [Cap+Spirit], Ritual [6–12]</td></tr>
+<tr><td>Magical</td><td>4–6 (specific)</td><td>Arcana, Lore, Spirit+Resolve</td><td>Leash [Spirit+TL], Ritual [6–12]</td></tr>
 </tbody>
 </table>
 </div>
@@ -4806,30 +4808,79 @@ hide.”</p></li>
 <section class="level1" id="npc-templates">
 <h1>NPC Templates</h1>
 
-<p>This section provides ready-to-use templates for non-player characters, from common guards to supernatural spirits. Each template includes a suggested Cap (capability tier), Harm output, typical dice pools, and special abilities. GMs may adjust values up or down by one step to suit the fiction.</p>
+<p>This section provides ready-to-use templates for non-player characters, from common guards to supernatural spirits. Each template includes a Threat Level (capability tier), Harm output, typical dice pools, and special abilities. GMs may adjust values up or down by one step to suit the fiction.</p>
 
 <section class="level2" id="npc-template-format">
-<h2>Template Format</h2>
-<ul>
-<li><strong>Name:</strong> Type of NPC.</li>
-<li><strong>Cap:</strong> 1–5 (training and threat level).</li>
-<li><strong>Harm:</strong> Typical damage output on a successful hit.</li>
-<li><strong>Dice Pools:</strong> Suggested Attribute + Skill combinations.</li>
-<li><strong>Armor:</strong> Light / Medium / Heavy / None.</li>
-<li><strong>Special:</strong> Unique abilities or tags.</li>
-<li><strong>Leash (for spirits):</strong> Cap + Spirit segments.</li>
-</ul>
-</section>
+<h2 id="srd-adversary-rating">Rating an Adversary: Threat Level</h2>
 
-<section class="level2" id="humanoid-npcs">
+<p>Every adversary in Fate's Edge is rated on <strong>one</strong> axis: <strong>Threat Level (TL)</strong>, an integer from 1 to 10. TL is the whole rating. It sets how hard the thing hits, roughly how big its pools are, and how much punishment it absorbs before the scene turns.</p>
+
+<p>Three words that look like ratings are <em>not</em> ratings, and never appear on an adversary:</p>
+<ul>
+<li><strong>Tier</strong> means a <em>player character's</em> progression band by XP (Tier I Novice through Tier V Mythic). A creature does not have a Tier.</li>
+<li><strong>Cap</strong> means a <em>Follower's</em> Capability, 1&ndash;5, bought at Cap&sup2; XP. A creature does not have a Cap. A Follower who fights is rated by Cap because you paid for them; an adversary is rated by TL because you did not.</li>
+<li><strong>Class</strong>, where it appears in older material, is a taxonomy &mdash; Class I spirits, Class IV spirits &mdash; not a difficulty. It is a name for a kind of thing, not a number.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>TL</th><th>What it is</th><th>Key Attributes</th><th>Harm it deals</th><th>Harm Levels it absorbs</th></tr></thead>
+<tbody>
+<tr><td><strong>1</strong></td><td>Rabble &mdash; frightened, untrained, dangerous in numbers only</td><td>1&ndash;2</td><td>1</td><td>3 (standard)</td></tr>
+<tr><td><strong>2</strong></td><td>Minion &mdash; a guard, a thug, a hungry animal</td><td>2</td><td>1&ndash;2</td><td>3 (standard)</td></tr>
+<tr><td><strong>3</strong></td><td>Standard &mdash; the competent professional; most of what fills a scene</td><td>2&ndash;3</td><td>2</td><td>3 (standard)</td></tr>
+<tr><td><strong>4</strong></td><td>Elite &mdash; a knight, a trained killer, a greater beast</td><td>3</td><td>2&ndash;3</td><td>3 (standard)</td></tr>
+<tr><td><strong>5</strong></td><td>Lieutenant &mdash; named, and worth naming</td><td>3&ndash;4</td><td>3</td><td>8 (advanced)</td></tr>
+<tr><td><strong>6</strong></td><td>Mini-boss &mdash; anchors an encounter by itself</td><td>4</td><td>3&ndash;4</td><td>8 (advanced)</td></tr>
+<tr><td><strong>7</strong></td><td>Boss &mdash; anchors a session</td><td>4&ndash;5</td><td>4&ndash;5</td><td>8 per phase, 2 phases</td></tr>
+<tr><td><strong>8</strong></td><td>Greater boss &mdash; anchors an arc</td><td>5</td><td>5&ndash;6</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>9</strong></td><td>Legendary &mdash; anchors a campaign</td><td>5&ndash;6</td><td>6&ndash;7</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>10</strong></td><td>Avatar or Power &mdash; the thing the campaign is <em>about</em></td><td>6+</td><td>8+</td><td>None &mdash; a puzzle, not a fight</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="srd-harm-levels-adv">Harm Levels, not Hit Points</h3>
+<p><strong>An adversary has no Hit Points.</strong> It has <strong>Harm Levels</strong>: the number of times it can be made to bleed, break, or bend before the fight is over. There are exactly four legal values, and every adversary has one of them:</p>
+<ul>
+<li><strong>3 (standard)</strong> &mdash; TL 1&ndash;4. Three good hits and it is done.</li>
+<li><strong>8 (advanced)</strong> &mdash; TL 5&ndash;6. Named things, meant to last.</li>
+<li><strong>8 per phase</strong> &mdash; TL 7&ndash;9. When a phase's Harm Levels are exhausted the phase ends and the next begins, with its own pool and its own moves.</li>
+<li><strong>None (puzzle)</strong> &mdash; the one override, and it is available at <em>any</em> TL. Use it when the fiction says the thing cannot be killed by hitting it: an Avatar, a demon that must be exorcised, an Echo that must be witnessed, a door that was never opened. It is resolved by a bargain, a true name, a witness, a debt paid &mdash; something other than attrition. A TL 2 spirit can be a puzzle; a TL 9 dragon can be a fight. If your adversary has no Harm Levels, it <em>must</em> have a stated Resolution.</li>
+
+</ul>
+<p>Apart from that one override, Harm Levels follow from TL. If you find yourself wanting a TL 3 creature with eight Harm Levels, you do not want a tougher TL 3 &mdash; you want a TL 5, and its attributes and Harm should come up to meet it.</p>
+<p>Note the two senses of the word and keep them apart on the page: <strong>Harm</strong> on a stat line is what the creature <em>deals</em>. <strong>Harm Levels</strong> is what it <em>absorbs</em>.</p>
+
+<h3 id="srd-npc-template">Template Format</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Line</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><strong>Name</strong></td><td>What it is, and what part of the world it stands for.</td></tr>
+<tr><td><strong>TL</strong></td><td>1&ndash;10, per the table above.</td></tr>
+<tr><td><strong>Attributes</strong></td><td>Body / Wits / Spirit / Presence, and one or two key Skills. Only list what will actually be rolled.</td></tr>
+<tr><td><strong>Harm</strong></td><td>Damage on a successful hit.</td></tr>
+<tr><td><strong>Fatigue</strong></td><td>Which Attribute sets its Fatigue track.</td></tr>
+<tr><td><strong>Harm Levels</strong></td><td>3, 8, 8 per phase, or None. Mandatory.</td></tr>
+<tr><td><strong>Armor</strong></td><td>None / Light / Medium / Heavy, converting Harm to Fatigue as usual.</td></tr>
+<tr><td><strong>SB Moves</strong></td><td>Two to five things the GM can buy with Story Beats, priced 1&ndash;3.</td></tr>
+<tr><td><strong>Timer</strong></td><td>Optional. A named clock of 4, 6, 8 or 10 segments, and what happens when it fills.</td></tr>
+<tr><td><strong>Resolution</strong></td><td>How this ends, if not by Harm. <em>Required</em> when Harm Levels is None.</td></tr>
+<tr><td><strong>Leash</strong></td><td>Spirits only, when bound by a Summoner: Leash = the binder's Spirit + the spirit's TL, in segments.</td></tr>
+</tbody>
+</table>
+</div>
+
 <h2>Humanoid NPCs</h2>
 
 <div class="grid-2">
 
 <section class="level3" id="bandit">
-<h3>Bandit <span class="badge">Tier I</span></h3>
+<h3>Bandit</h3>
 <div class="panel panel-red">
-<p><span class="badge">Cap 1</span></p>
+<p><span class="badge">TL 2</span></p>
+<p><strong>Harm Levels:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Melee 2d (Body 2 + Melee 0), Ranged 2d (Wits 2 + Ranged 0)</p>
 <p><strong>Harm:</strong> 1 (club…)</p>
 <p><strong>Armor:</strong> None (leather scraps, no conversion)</p>
@@ -4838,9 +4889,10 @@ hide.”</p></li>
 </section>
 
 <section class="level3" id="guard">
-<h3>Guard <span class="badge">Tier I–II</span></h3>
+<h3>Guard</h3>
 <div class="panel panel-red">
-<p><span class="badge">Cap 2</span></p>
+<p><span class="badge">TL 3</span></p>
+<p><strong>Harm Levels:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Melee 4d (Body 3 + Melee 1), Athletics 4d (Body 3 + Athletics 1)</p>
 <p><strong>Harm:</strong> 2 (spear or short sword)</p>
 <p><strong>Armor:</strong> Light (leather) — Harm 1 → Fatigue 1.</p>
@@ -4849,9 +4901,10 @@ hide.”</p></li>
 </section>
 
 <section class="level3" id="knight">
-<h3>Knight <span class="badge">Tier II–III</span></h3>
+<h3>Knight</h3>
 <div class="panel panel-red">
-<p><span class="badge">Cap 3</span></p>
+<p><span class="badge">TL 5</span></p>
+<p><strong>Harm Levels:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> Melee 6d (Body 3 + Melee 3), Command 5d (Presence 3 + Command 2)</p>
 <p><strong>Armor:</strong> Heavy (plate) — Harm 3 → Fatigue 2.</p>
 <p><strong>Special:</strong> Challenge — once per scene, force an enemy to engage in melee (Resist with Spirit, DV 4). Mounted — …</p>
@@ -4859,9 +4912,10 @@ hide.”</p></li>
 </section>
 
 <section class="level3" id="cultist">
-<h3>Cultist <span class="badge">Tier I–II</span></h3>
+<h3>Cultist</h3>
 <div class="panel panel-purple">
-<p><span class="badge">Cap 1–2</span></p>
+<p><span class="badge">TL 2&ndash;3</span></p>
+<p><strong>Harm Levels:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Arcana 4d (Wits 3 + Arcana 1), Deception 4d (Presence 3 + Deception 1)</p>
 <p><strong>Armor:</strong> None (robes).</p>
 <p><strong>Special:</strong> Ritual Chant — when three or more cultists act together, they may perform a Low Rite as a group acti…</p>
@@ -4869,9 +4923,10 @@ hide.”</p></li>
 </section>
 
 <section class="level3" id="bandit-leader">
-<h3>Bandit Leader <span class="badge">Tier II</span></h3>
+<h3>Bandit Leader</h3>
 <div class="panel panel-red">
-<p><span class="badge">Cap 3</span></p>
+<p><span class="badge">TL 5</span></p>
+<p><strong>Harm Levels:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> Melee 6d (Body 3 + Melee 3), Command 5d (Presence 3 + Command 2)</p>
 <p><strong>Armor:</strong> Medium (chain) — Harm 2 → Fatigue 1.</p>
 <p><strong>Special:</strong> Rally — once per scene, restore 1 Morale to a nearby bandit. Dirty Fighting — may spend 1 Boon to im…</p>
@@ -4889,10 +4944,11 @@ hide.”</p></li>
 <section class="level3" id="lesser-spirit">
 <h3>Lesser Spirit <span class="text-muted text-sm">(e.g., Shade, Emberling)</span></h3>
 <div class="panel panel-purple">
-<p><span class="badge">Cap 1</span></p>
+<p><span class="badge">TL 2</span></p>
+<p><strong>Harm Levels:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Stealth 5d (Wits 3 + Stealth 2), Arcana 4d (Spirit 3 + Arcana 1)</p>
 <p><strong>Armor:</strong> None (incorporeal — half physical Harm, rounded down)</p>
-<p><strong>Leash:</strong> Cap + Spirit (1 + caster's Spirit).</p>
+<p><strong>Leash:</strong> your Spirit + 1 (the spirit's TL).</p>
 <p><strong>Special:</strong> Incorporeal Movement — passes through small gaps and obstacles. Sunlight Sensitivity — while in direc…</p>
 </div>
 </section>
@@ -4900,18 +4956,20 @@ hide.”</p></li>
 <section class="level3" id="greater-spirit">
 <h3>Greater Spirit <span class="text-muted text-sm">(e.g., Flame Elemental, Stone Guardian)</span></h3>
 <div class="panel panel-purple">
-<p><span class="badge">Cap 3</span></p>
+<p><span class="badge">TL 5</span></p>
+<p><strong>Harm Levels:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> 7d in primary domain (e.g., Body + Melee for Guardian, Spirit + Arcana for Elemental)</p>
 <p><strong>Armor:</strong> Stone Guardian — Heavy (Harm 3 → Fatigue 2); Flame Elemental — Light (Harm 1 → Fatigue 1) + im…</p>
-<p><strong>Leash:</strong> Cap + Spirit (3 + caster's Spirit).</p>
+<p><strong>Leash:</strong> your Spirit + 3 (the spirit's TL).</p>
 <p><strong>Special:</strong> Elemental Aura — creatures in Close range suffer 1 Fatigue per round. Immutable — cannot be poisone…</p>
 </div>
 </section>
 
 <section class="level3" id="wraith">
-<h3>Wraith <span class="badge">Tier II–III</span></h3>
+<h3>Wraith</h3>
 <div class="panel panel-purple">
-<p><span class="badge">Cap 2–3</span></p>
+<p><span class="badge">TL 3&ndash;5</span></p>
+<p><strong>Harm Levels:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> Stealth 6d (Wits 3 + Stealth 3), Spirit + Resolve 6d (Spirit 3 + Resolve 3)</p>
 <p><strong>Armor:</strong> None (incorporeal — half physical Harm).</p>
 <p><strong>Special:</strong> Life Drain — on a successful touch attack, the target marks 1 Fatigue and the wraith clears 1 Fatigue.</p>
@@ -4927,9 +4985,10 @@ hide.”</p></li>
 <div class="grid-2">
 
 <section class="level3" id="wolf">
-<h3>Wolf <span class="badge">Tier I–II</span></h3>
+<h3>Wolf</h3>
 <div class="panel panel-green">
-<p><span class="badge">Cap 1–2 (pack)</span></p>
+<p><span class="badge">TL 2&ndash;3</span></p>
+<p><strong>Harm Levels:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Melee 5d (Body 3 + Brawl 2), Athletics 5d (Body 3 + Athletics 2)</p>
 <p><strong>Armor:</strong> None (hide).</p>
 <p><strong>Special:</strong> Pack Tactics — when two or more wolves attack the same target, each gains +1 die. Blood Scent — +2…</p>
@@ -4937,9 +4996,10 @@ hide.”</p></li>
 </section>
 
 <section class="level3" id="dire-bear">
-<h3>Dire Bear <span class="badge">Tier III</span></h3>
+<h3>Dire Bear</h3>
 <div class="panel panel-green">
-<p><span class="badge">Cap 4</span></p>
+<p><span class="badge">TL 6</span></p>
+<p><strong>Harm Levels:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> Melee 8d (Body 4 + Brawl 4), Endurance 8d (Body 4 + Endurance 4)</p>
 <p><strong>Armor:</strong> Medium (thick hide) — Harm 2 → Fatigue 1.</p>
 <p><strong>Special:</strong> Terrifying Roar — all creatures in Near range must test Resolve (DV 4) or become Shaken. Maul — on…</p>
@@ -4954,12 +5014,12 @@ hide.”</p></li>
 <p>Use these guidelines to create your own NPCs quickly.</p>
 
 <section class="level3" id="step-1-choose-cap">
-<h3>Step 1: Choose Cap</h3>
-<p>Cap determines overall threat level and dice pool size.</p>
+<h3>Step 1: Choose Threat Level</h3>
+<p>TL sets how much the thing can take, how hard it hits, and how big its pools are.</p>
 <ul>
-<li>Cap 1–2: Minions, guards, minor spirits. Dice pools 3–5.</li>
-<li>Cap 3–4: Elites, knights, greater spirits. Dice pools 6–8.</li>
-<li>Cap 5: Bosses, legendary creatures. Dice pools 9–10.</li>
+<li>TL 1&ndash;3: rabble, guards, minor spirits. Dice pools 3&ndash;5; three Harm Levels.</li>
+<li>TL 4&ndash;6: elites, knights, greater spirits. Dice pools 6&ndash;8; three Harm Levels to TL 4, eight from TL 5.</li>
+<li>TL 7&ndash;10: bosses and powers. Dice pools 9&ndash;10; phased Harm Levels, or none at all.</li>
 </ul>
 </section>
 
@@ -4988,8 +5048,8 @@ hide.”</p></li>
 </section>
 
 <section class="level3" id="step-5-set-leash">
-<h3>Step 5: Set Leash (for spirits)</h3>
-<p>Leash = Cap + Spirit (use Spirit 2–4 for typical spirits).</p>
+<h3>Step 5: Set Leash (spirits only)</h3>
+<p>Leash = your Spirit + the spirit's TL, in segments.</p>
 </section>
 
 </section>
@@ -4999,7 +5059,7 @@ hide.”</p></li>
 <div class="table-wrap">
 <table>
 <thead>
-<tr><th>NPC</th><th>Cap</th><th>Harm</th><th>Armor</th><th>Special</th></tr>
+<tr><th>NPC</th><th>TL</th><th>Harm</th><th>Armor</th><th>Special</th></tr>
 </thead>
 <tbody>
 <tr><td>Bandit</td><td>1</td><td>1</td><td>None</td><td>Cowardly</td></tr>
@@ -5263,7 +5323,7 @@ hide.”</p></li>
 </thead>
 <tbody>
 <tr><td><span class="badge">AREA</span></td><td>Affects all in a zone; collateral risk.</td></tr>
-<tr><td><span class="badge">BANISH</span></td><td>Drive an Outsider toward departure; DV = target Cap.</td></tr>
+<tr><td><span class="badge">BANISH</span></td><td>Drive an Outsider toward departure; DV = the target's TL.</td></tr>
 <tr><td><span class="badge">BARRIER</span></td><td>Creates cover/obstruction with Integrity Timer.</td></tr>
 <tr><td><span class="badge">BIND</span></td><td>Immobilizes target until broken.</td></tr>
 <tr><td><span class="badge">CLEANSE</span></td><td>Remove or suppress a Condition.</td></tr>
@@ -5281,7 +5341,7 @@ hide.”</p></li>
 <tr><td><span class="badge">SEAL</span>/<span class="badge">UNSEAL</span></td><td>Magically lock or unlock a container / door.</td></tr>
 <tr><td><span class="badge">TRANSPORT</span></td><td>Move a target across an obstacle.</td></tr>
 <tr><td><span class="badge">VEIL</span></td><td>Obscure a person, object, or zone (–1 die to Notice).</td></tr>
-<tr><td><span class="badge">WARD</span></td><td>Blocks specific entities (DV = target Cap to cross).</td></tr>
+<tr><td><span class="badge">WARD</span></td><td>Blocks specific entities (DV = the target's TL to cross).</td></tr>
 </tbody>
 </table>
 </div>
@@ -5400,7 +5460,7 @@ hide.”</p></li>
 <h2>Circle of Denial</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: Standard</span></p>
-<p>Protective circle vs Outsiders. To cross, Outsider tests DV = Cap&hellip;</p>
+<p>Protective circle vs Outsiders. To cross, the Outsider tests DV = its TL&hellip;</p>
 </div>
 </section>
 
@@ -5408,7 +5468,7 @@ hide.”</p></li>
 <h2>Banishment Knot</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: High</span></p>
-<p>Cast out a supernatural entity. Test Spirit + Ritual vs target&rsquo;s Cap. On hit, entit&hellip;</p>
+<p>Cast out a supernatural entity. Test Spirit + Arcana against the target's TL. On hit, entit&hellip;</p>
 </div>
 </section>
 

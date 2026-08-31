@@ -4,10 +4,11 @@
  * Integrated with Combat Tracker: one-click to open tracker with creature added
  *
  * Now supports:
- * - tl 1–10, class I–X, nature, services, price, lore, signs, connections
+ * - tl 1–10 (the single adversary rating; see the SRD, 'Rating an Adversary'),
+ *   harm_levels, nature, services, price, lore, signs, connections
  * - Story Beat (SB) moves sub-panel with GM SB bank
  * - Creature-specific sb_spends rendered in detail modal
- * - Filtering by TL, class, nature, region
+ * - Filtering by TL, nature, region
  * - Detail modal shows all relevant fields
  * - Combat Tracker integration uses tl for default difficulty/HP
  */
@@ -18,6 +19,16 @@ import { showToast } from '@components/Toast.js';
 import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
 import { discoverBestiary } from '@core/discovery.js';
 import { openTracker } from './combat.js'; // 👈 Integration import
+
+// Harm Levels follow from Threat Level, per the SRD's adversary rating.
+// "None (puzzle)" is the one override and is carried on the creature itself.
+export function harmLevelsForTl(tl) {
+    const n = parseInt(tl, 10) || 1;
+    if (n <= 4) return '3 (standard)';
+    if (n <= 6) return '8 (advanced)';
+    if (n <= 9) return '8 per phase';
+    return 'None (puzzle)';
+}
 
 let container = null;
 let bestiaryData = [];
@@ -103,9 +114,9 @@ const CACHE_KEY = 'fates-edge-bestiary-cache';
 
 // Hardcoded fallback entries (if everything else fails)
 const FALLBACK_ENTRIES = [
-    { id: 'goblin-scavenger', name: 'Goblin Scavenger', category: 'humanoid', tl: 1, class: 'I', description: 'A small, green-skinned creature with sharp teeth and a greedy glint.' },
-    { id: 'skeleton-knight', name: 'Skeleton Knight', category: 'undead', tl: 2, class: 'II', description: 'An animated suit of armor with hollow eye sockets glowing with pale blue light.' },
-    { id: 'thorn-dryad', name: 'Thorn Dryad', category: 'fey', tl: 3, class: 'III', description: 'A fey creature with bark-like skin and thorny vines for hair.' }
+    { id: 'goblin-scavenger', name: 'Goblin Scavenger', category: 'humanoid', tl: 1, harmLevels: '3 (standard)', description: 'A small, green-skinned creature with sharp teeth and a greedy glint.' },
+    { id: 'skeleton-knight', name: 'Skeleton Knight', category: 'undead', tl: 2, harmLevels: '3 (standard)', description: 'An animated suit of armor with hollow eye sockets glowing with pale blue light.' },
+    { id: 'thorn-dryad', name: 'Thorn Dryad', category: 'fey', tl: 3, harmLevels: '3 (standard)', description: 'A fey creature with bark-like skin and thorny vines for hair.' }
 ];
 
 // ============================================================
@@ -146,7 +157,7 @@ function flattenWrappedEntry(raw) {
             page: inner.page || '',
             // new fields
             tl: inner.tl,
-            class: inner.class,
+            harm_levels: inner.harm_levels,
             nature: inner.nature,
             services: inner.services || [],
             price: inner.price,
@@ -366,10 +377,6 @@ export async function render(el) {
                     <option value="all">All TL</option>
                     ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">TL ${n}</option>`).join('')}
                 </select>
-                <select id="bestiary-filter-class" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
-                    <option value="all">All Classes</option>
-                    ${['I','II','III','IV','V','VI','VII','VIII','IX','X'].map(c => `<option value="${c}">Class ${c}</option>`).join('')}
-                </select>
                 <select id="bestiary-filter-nature" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;max-width:120px;">
                     <option value="all">All Natures</option>
                     <!-- options will be populated from data -->
@@ -488,7 +495,6 @@ function renderBestiaryList() {
     // Get filter values
     const searchTerm = (document.getElementById('bestiary-search')?.value || '').toLowerCase().trim();
     const tlFilter = document.getElementById('bestiary-filter-tl')?.value || 'all';
-    const classFilter = document.getElementById('bestiary-filter-class')?.value || 'all';
     const natureFilter = document.getElementById('bestiary-filter-nature')?.value || 'all';
     const regionFilter = document.getElementById('bestiary-filter-region')?.value || 'all';
 
@@ -503,11 +509,6 @@ function renderBestiaryList() {
         if (tlFilter !== 'all') {
             const entryTl = entry.tl !== undefined ? parseInt(entry.tl, 10) : null;
             if (entryTl !== parseInt(tlFilter, 10)) return false;
-        }
-
-        // Class
-        if (classFilter !== 'all') {
-            if ((entry.class || '').toUpperCase() !== classFilter) return false;
         }
 
         // Nature
@@ -541,7 +542,7 @@ function renderBestiaryList() {
             ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;">${escHtml(entry.category)}</span>`
             : '';
         const tlDisplay = entry.tl ? `TL ${entry.tl}` : '';
-        const classDisplay = entry.class ? `Class ${entry.class}` : '';
+        const harmDisplay = entry.harm_levels ? `${entry.harm_levels} Harm Levels` : '';
         const description = getCreatureDescription(entry);
 
         return `
@@ -563,7 +564,7 @@ function renderBestiaryList() {
                         ${escHtml(name)}
                         ${categoryBadge}
                         ${tlDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${tlDisplay}</span>` : ''}
-                        ${classDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${classDisplay}</span>` : ''}
+                        ${classDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${harmDisplay}</span>` : ''}
                         ${entry.nature ? `<span style="font-size:0.65rem;color:var(--text3);">${escHtml(entry.nature)}</span>` : ''}
                     </div>
                     <div style="font-size:0.8rem;color:var(--text2);">
@@ -744,7 +745,7 @@ function showCreatureDetail(entry) {
             <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 ${escHtml(name)}
                 ${entry.tl ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tl}</span>` : ''}
-                ${entry.class ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">Class ${entry.class}</span>` : ''}
+                ${entry.harm_levels ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">Harm Levels: ${escHtml(entry.harm_levels)}</span>` : ''}
             </h2>
             ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="margin-bottom:0.5rem;">${escHtml(entry.category)}</span>` : ''}
             ${description ? `<div style="margin:0.5rem 0;line-height:1.5;">${escHtml(description)}</div>` : ''}
@@ -836,22 +837,21 @@ export function addCreatureAsAdversary(entry) {
     }
     const exists = targetEncounter.adversaries.some(a => a.name.toLowerCase() === entry.name.toLowerCase());
     if (!exists) {
-        // Create adversary with default stats if none provided
+        // Adversaries in Fate's Edge have no hit points. What they have is
+        // Harm Levels — 3, 8, 8-per-phase, or None (a puzzle, not a fight) —
+        // derived from TL unless the creature states None. See the SRD,
+        // "Harm Levels, not Hit Points". This used to synthesise
+        // `hp = tl * 10 + 10`, a stat the rules do not have.
         const stats = entry.stats ? { ...entry.stats } : {};
-        // If no stats, infer from TL: HP = TL * 10 + 10, other stats default
-        if (!stats.hp && entry.tl) {
-            stats.hp = entry.tl * 10 + 10;
-        }
-        if (!stats.hp) stats.hp = 20;
         targetEncounter.adversaries.push({
             name: entry.name,
             body: description || '',
-            tier: entry.tl || 2,
+            tl: entry.tl || 2,
+            harmLevels: entry.harm_levels || harmLevelsForTl(entry.tl || 2),
             stats: stats,
-            // Store other fields for reference
             _original: {
                 tl: entry.tl,
-                class: entry.class,
+                harm_levels: entry.harm_levels,
                 nature: entry.nature
             }
         });
@@ -884,8 +884,9 @@ function addCreatureToEncounter(entry) {
         adversaries: [{
             name: entry.name,
             body: description || '',
-            tier: entry.tl || 2,
-            stats: entry.stats || { hp: (entry.tl || 2) * 10 + 10 }
+            tl: entry.tl || 2,
+            harmLevels: entry.harm_levels || harmLevelsForTl(entry.tl || 2),
+            stats: entry.stats || {}
         }],
         created: Date.now()
     };
@@ -923,14 +924,13 @@ function attachEvents() {
     }
 
     // Filter dropdowns
-    ['bestiary-filter-tl', 'bestiary-filter-class', 'bestiary-filter-nature', 'bestiary-filter-region'].forEach(id => {
+    ['bestiary-filter-tl', 'bestiary-filter-nature', 'bestiary-filter-region'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('change', () => renderBestiaryList());
     });
 
     document.getElementById('bestiary-clear-filters')?.addEventListener('click', () => {
         document.getElementById('bestiary-filter-tl').value = 'all';
-        document.getElementById('bestiary-filter-class').value = 'all';
         document.getElementById('bestiary-filter-nature').value = 'all';
         document.getElementById('bestiary-filter-region').value = 'all';
         renderBestiaryList();
