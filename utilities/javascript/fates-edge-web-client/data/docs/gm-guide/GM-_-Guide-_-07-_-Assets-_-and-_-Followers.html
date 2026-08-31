@@ -179,7 +179,7 @@
 <p><strong>Cap (Capacity)</strong> is a single number that answers one question: <em>how capable is this Follower on their own?</em> Cap governs two things:</p>
 <ol>
 <li><strong>Independent actions</strong>: When a Follower acts on their own (an off-screen task, a delegated mission, an autonomous duty), they roll up to <strong>Cap</strong>d10 against a DV you set. A Cap 3 Follower rolling 3d10 is performing at the level of a Tier III NPC in their area of expertise.</li>
-<li><strong>Assist actions</strong>: When a Follower helps a PC's roll, the Follower contributes <strong>+1d10 per Cap tier</strong>, capped at +3 total assist dice per action. A Cap 1 Follower adds one die; a Cap 5 Follower adds up to three.</li>
+<li><strong>Assist actions</strong>: When a Follower helps a PC's roll, the Follower contributes dice equal to <strong>min(Cap, their relevant Skill)</strong>, capped at +3 total assist dice per action. Cap is what they could do; the Skill is whether they know anything about <em>this</em>. A Cap 5 quartermaster adds one die to a lockpicking roll, and it is the right one die.</li>
 </ol>
 <p><strong>Cap is a ceiling, not a skill list.</strong> A Cap 3 Follower is not "proficient at three things" — they are "as competent as a Tier III specialist within their defined role." Their specialty is determined by fiction (the street urchin knows locks; the mercenary captain knows cavalry), not by the number.</p>
 <p><strong>Cap is not Obligation Pool.</strong> A Follower's Cap and a Patron's Obligation Pool are different systems and may share the word "capacity" in colloquial use; this chapter uses <strong>Cap</strong> exclusively for Followers and <strong>Obligation Pool</strong> for Patrons.</p>
@@ -225,7 +225,7 @@
 <p>Followers do not act autonomously in scenes. Their benefits come only through three channels:</p>
 <ol>
 <li><strong>Bonds (1 Boon)</strong>: Draw on trust and loyalty for insight or support — a whispered warning, a remembered favor, a moment of hesitation in an enemy.</li>
-<li><strong>Assists (1 Boon)</strong>: The Follower contributes +1d10 per Cap tier to a PC's roll, capped at +3 total assist dice per action. The Boon represents the <em>PC's attention</em> to coordinating the Follower; a Cap 1 street urchin and a Cap 5 spymaster cost the same Boon because the cost prices the player's effort, not the Follower's capability.</li>
+<li><strong>Assists (1 Boon)</strong>: The Follower contributes dice equal to min(Cap, their relevant Skill), capped at +3 total assist dice per action. The Boon represents the <em>PC's attention</em> to coordinating the Follower; a Cap 1 street urchin and a Cap 5 spymaster cost the same Boon because the cost prices the player's effort, not the Follower's capability.</li>
 <li><strong>Offscreen Action (1 Boon or 1 downtime scene)</strong>: The Follower handles tasks that would otherwise demand PC time ("Your Informant spends the week gathering rumors — report next session").</li>
 </ol>
 <p><em>Never</em> say "My Follower scouts ahead." The player must spend a Boon for an Assist or declare a Bond-driven action; otherwise the Follower waits off-screen.</p>
@@ -281,10 +281,10 @@
 <span class="panel-title">Follower Upkeep by Cap</span>
 <div class="table-wrap"><table>
 <tr><th>Cap</th><th>Upkeep Cost</th><th>If Neglected</th></tr>
-<tr><td>1</td><td>1 downtime scene per <em>chapter</em> (no XP option)</td><td>Loyalty degrades per Cap 1 triggers; Failure to perform task the PC demanded drops Loyalty one step.</td></tr>
-<tr><td>2–5</td><td>XP = Cap × 2 per session <em>OR</em> 1 downtime scene</td><td>Loyalty/Fitness degrade per Cap-appropriate triggers; Asset neglect cascades.</td></tr>
+<tr><td>1</td><td>1 XP per downtime, <em>or</em> a downtime scene</td><td>Loyalty degrades per Cap 1 triggers; Failure to perform task the PC demanded drops Loyalty one step.</td></tr>
+<tr><td>2–5</td><td>Efficient: max(1, acquisition XP ÷ 3, rounded up) — 2 XP at Cap 2, 3 at Cap 3, 6 at Cap 4, 9 at Cap 5. Intensive: 1 XP and a downtime scene.</td><td>Loyalty/Fitness degrade per Cap-appropriate triggers; Asset neglect cascades.</td></tr>
 </table></div>
-<p class="text-sm text-muted"><em>Why the asymmetry</em>: A Tier I character cannot afford 2 XP/session/Cap 1 Follower without going bankrupt by session 5. Cap 1 Followers cost <em>attention</em>, tracked by the Loyalty table; Cap 2–5 Followers cost <em>XP or time</em>, scaling with their capability.</p>
+<p class="text-sm text-muted"><em>Why it scales this way</em>: upkeep is one-third of what you paid, so a Follower never costs more to keep than they cost to find. A Cap 1 costs a single point — which is to say a Cap 1 really costs <em>attention</em>, tracked by the Loyalty table above. A Cap 5 costs XP or time</em>, scaling with their capability.</p>
 </div>
 
 <div class="panel panel-blue">
@@ -480,9 +480,9 @@
 <li><strong>Cap (Capacity)</strong>: Maximum die a Follower may roll independently; maximum assist contribution to a PC's roll (capped at +3 dice per action). <em>Remember</em>: Cap is a ceiling, not a skill list. It is not the Patron's Obligation Pool.</li>
 <li><strong>Asset Free Use</strong>: Once per session, off-screen leverage <em>only if fiction supports it</em>. Frame at scene start or as flashback with GM assent (cost: 1 Boon or 1 downtime scene).</li>
 <li><strong>Asset Scene Surge</strong>: Spend 1 Boon for a one-beat, on-screen intervention. <strong>Limit to one meaningful use per scene</strong>.</li>
-<li><strong>Follower Benefits</strong>: Bonds (1 Boon for insight/support), Assists (1 Boon for +1 die per Cap tier, max +3), or Offscreen Action (1 Boon or 1 downtime scene). Cap 1 baseline loyalty actions are <em>free</em>.</li>
-<li><strong>Asset Upkeep</strong>: Pay XP = base cost <em>OR</em> devote a downtime scene. Neglect degrades condition (Maintained → Neglected → Compromised).</li>
-<li><strong>Follower Upkeep</strong>: Cap 1 = 1 downtime scene/chapter (no XP option). Cap 2–5 = XP = Cap × 2 per session <em>OR</em> 1 downtime scene.</li>
+<li><strong>Follower Benefits</strong>: Bonds (1 Boon for insight/support), Assists (1 Boon for min(Cap, relevant Skill) dice, max +3), or Offscreen Action (1 Boon or 1 downtime scene). Cap 1 baseline loyalty actions are <em>free</em>.</li>
+<li><strong>Asset Upkeep</strong>: Efficient — max(1, base cost ÷ 3, rounded up): 2 for a Minor, 3 for a Standard, 4 for a Major. Intensive — 1 XP and a downtime scene. Neglect degrades condition (Maintained → Neglected → Compromised).</li>
+<li><strong>Follower Upkeep</strong>: the same rule — max(1, acquisition XP ÷ 3, rounded up), or 1 XP and a downtime scene.</li>
 <li><strong>Asset Capacity (Optional)</strong>: Assets ≤ Spirit are easy; beyond that, upkeep taxes mount (+50% per extra Asset) or requires extra downtime scene.</li>
 <li><strong>Follower Management (Optional, Cap 3+)</strong>: A Follower tends up to Cap Assets once per session (cost: 1 Boon or 1 downtime scene). Cap 1–2 Followers cannot manage Assets.</li>
 <li><strong>Neglect is Your Engine</strong>: Always use Asset/Follower neglect to create complications — advance timers, spend SB, or degrade benefits. <strong>Never</strong> let neglect be "nothing happens."</li>
@@ -648,7 +648,7 @@
 <dl>
 <dt>Cost</dt><dd>Minor <strong>4 XP</strong>, Standard <strong>8 XP</strong>, Major <strong>12 XP</strong>. <em>GM Guidance:</em> Treat cost as a narrative threshold. In Tier I, 4 XP is a major investment; in Tier IV, it's pocket change. Adjust slightly for story weight (see above).</dd>
 <dt>Establishment</dt><dd>1 day / 1 week / 1 month respectively to become operational. <em>GM Guidance:</em> Use this for downtime storytelling. "The safehouse takes a week to prepare — what do you do while waiting?"</dd>
-<dt>Upkeep</dt><dd>Each downtime, either pay XP equal to the Asset's base cost <em>or</em> devote a full scene tending it. Neglect degrades condition (Maintained → Neglected → Compromised). <em>GM Guidance:</em> Track condition visibly. When an asset becomes Neglected, it's your cue to introduce complications. Compromised means it's broken — fixing it requires a quest or major downtime.</dd>
+<dt>Upkeep</dt><dd>Each downtime, either pay Efficient upkeep — max(1, base cost ÷ 3, rounded up) — or pay 1 XP and devote a full scene tending it. Neglect degrades condition (Maintained → Neglected → Compromised). <em>GM Guidance:</em> Track condition visibly. When an asset becomes Neglected, it's your cue to introduce complications. Compromised means it's broken — fixing it requires a quest or major downtime.</dd>
 <dt>Free Use</dt><dd>Once per session, trigger the listed <em>off-screen</em> benefit (framed at scene start or as flashback with GM assent). <em>GM Guidance:</em> This is <strong>not</strong> automatic. Ask: "Does the fiction support using this benefit <em>now</em>?" If yes, grant it; if no, require a scene of preparation or a Boon spend (Scene Surge).</dd>
 <dt>Scene Surge</dt><dd>Spend <strong>1 Boon</strong> to turn an Asset into a dramatic <em>on-screen</em> intervention as described (one beat, fiction permitting). <em>GM Guidance:</em> This is the asset's "big moment." Limit to <strong>one meaningful use per scene</strong> — more than that feels like a deus ex machina.</dd>
 <dt>Extra Use</dt><dd>Spend <strong>2 XP</strong> to trigger the off-screen benefit an additional time this session. <em>GM Guidance:</em> Rarely allow this — it risks making assets feel like vending machines. Reserve for narrative crescendos (e.g., "You've poured everything into this safehouse — use it twice this session to flee the duke's guards.").</dd>
