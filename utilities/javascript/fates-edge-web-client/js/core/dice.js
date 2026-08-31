@@ -549,43 +549,45 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
     
     // Handle position effects
     if (position === 'dominant') {
-        // Re-roll failures (dice < 6)
-        const failures = dice.filter(r => r < 6);
-        if (failures.length > 0) {
-            const rerollResults = rollDice(failures.length);
-            reRolledDice = failures.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
-            reRolls = rerollResults.length;
+        // Dominant re-rolls ONE failure, not every failure. (SRD, Position &
+        // Effect: "Dominant: Re-roll one failure (die <= 5)".) This used to
+        // re-roll the whole failing half of the pool, which made Dominant
+        // wildly stronger than the rules describe.
+        // Which failure: the lowest. Any choice is equivalent in expectation,
+        // so we pick deterministically to keep replays reproducible.
+        let pick = -1;
+        for (let i = 0; i < dice.length; i++) {
+            if (dice[i] <= 5 && (pick === -1 || dice[i] < dice[pick])) pick = i;
+        }
+        if (pick !== -1) {
+            const rerollResults = rollDice(1);
+            reRolledDice = [{ old: dice[pick], new: rerollResults[0] }];
+            reRolls = 1;
             rerollSuccesses = countSuccesses(rerollResults);
             rerollStoryBeats = rerollResults.filter(r => r === 1).length;
-            // Update dice array with re-roll results
-            let idx = 0;
-            dice = dice.map(r => {
-                if (r < 6 && idx < rerollResults.length) {
-                    return rerollResults[idx++];
-                }
-                return r;
-            });
+            dice = dice.map((r, i) => (i === pick ? rerollResults[0] : r));
             // Recalculate successes and story beats
             successes = countSuccesses(dice);
             storyBeats = dice.filter(r => r === 1).length;
         }
     } else if (position === 'desperate') {
-        // Re-roll successes (dice >= 6)
-        const successDice = dice.filter(r => r >= 6);
-        if (successDice.length > 0) {
-            const rerollResults = rollDice(successDice.length);
-            reRolledDice = successDice.map((old, i) => ({ old, new: rerollResults[i] || 1 }));
-            reRolls = rerollResults.length;
+        // Desperate re-rolls ONE success, and never a 10. (SRD: "Desperate:
+        // Re-roll one success (die >= 6). 10s are never re-rolled.") This used
+        // to re-roll every success in the pool, 10s included, which made a
+        // Desperate roll nearly unwinnable rather than merely costly.
+        // Which success: the lowest eligible, which is the least destructive
+        // reading and is deterministic.
+        let pick = -1;
+        for (let i = 0; i < dice.length; i++) {
+            if (dice[i] >= 6 && dice[i] < 10 && (pick === -1 || dice[i] < dice[pick])) pick = i;
+        }
+        if (pick !== -1) {
+            const rerollResults = rollDice(1);
+            reRolledDice = [{ old: dice[pick], new: rerollResults[0] }];
+            reRolls = 1;
             rerollSuccesses = countSuccesses(rerollResults);
             rerollStoryBeats = rerollResults.filter(r => r === 1).length;
-            // Replace success dice with re-roll results
-            let idx = 0;
-            dice = dice.map(r => {
-                if (r >= 6 && idx < rerollResults.length) {
-                    return rerollResults[idx++];
-                }
-                return r;
-            });
+            dice = dice.map((r, i) => (i === pick ? rerollResults[0] : r));
             // Recalculate successes and story beats
             successes = countSuccesses(dice);
             storyBeats = dice.filter(r => r === 1).length;
