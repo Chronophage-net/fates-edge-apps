@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peoples and Cultures, Volume III</title>
+<style>
+    :root {
+        --bg1: #0a0c09;
+        --bg2: #12160e;
+        --bg3: #1a2013;
+        --bg4: #242c1b;
+        --text: #e6e8df;
+        --text2: #b2b8a4;
+        --text3: #7d8471;
+        --gold: #93a355;
+        --gold-hover: #a9bb66;
+        --border: #333a28;
+        --red: #8e3a2a;
+        --green: #3d7a52;
+        --blue: #3c6e8f;
+        --purple: #6a4f7a;
+        --orange: #a8752a;
+        --brass: #9c7a3c;
+        --mist: #4f6b73;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #141c0e 0%, #0a0c09 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.6rem 0 0.35rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.45rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.2rem; }
+    h4 { font-size: 0.98rem; color: var(--text); margin-top: 0.8rem; }
+    p { margin: 0.35rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.35rem 0 0.35rem 1.3rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-brass { border-left: 4px solid var(--brass); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .panel > strong.title { display:block; color: var(--gold); margin-bottom:0.3rem; font-size:0.95rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        margin: 0.1rem 0.15rem 0.1rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #10130a; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-brass { background: var(--brass); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.87rem; }
+    .text-xs { font-size: 0.75rem; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0.9rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.7rem 1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.5rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.87rem; break-inside: avoid; }
+    .toc a:hover { color: var(--gold); }
+    @media (max-width: 700px) { .toc { columns: 1; } }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 0.85rem; }
+    caption { text-align:left; caption-side: top; font-size:0.8rem; color: var(--text3); margin-bottom:0.2rem; font-style: italic; }
+    th, td { border: 1px solid var(--border); padding: 0.45rem 0.65rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg3); color: var(--gold); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .talent-name { color: var(--gold); font-weight: 700; }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+    footer { font-size: 0.78rem; color: var(--text3); text-align: center; padding: 1.4rem 0 0.5rem; }
+
+        blockquote.epigraph { border-left: 3px solid var(--gold, #c9a227); padding: 0.3rem 0 0.3rem 1rem; margin: 0.6rem 0 0.9rem; font-style: italic; color: var(--text2); }
+        blockquote.epigraph cite { display:block; font-style:normal; font-size:0.78rem; color: var(--text3); margin-top:0.25rem; }
+    </style>
+</head>
+<body>
+
+<h1>Peoples and Cultures, Volume III</h1>
+<p class="text-sm text-muted" style="margin-bottom:1rem;"><span class="badge badge-gold">Expansion</span>
+    <span class="badge badge-blue">Playable Ancestries &amp; Cultures</span>
+    <span class="badge badge-green">Viterra · Thepyrgos · Narethi · Zakov</span>
+    <span class="badge badge-purple">Volume III</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
+
+<div class="frame">
+<p>Volume II covered the peoples no magistrate can reach. This one covers the opposite problem: the courts, cities and coasts where there is <em>too much</em> law, in overlapping and mutually contemptuous layers, and where the useful question is never "is this legal" but "whose court, and what will they accept as a witness".</p>
+<p>Viterra opens the volume because it is the clearest case: a queen's word, a codex of precedents, a hedge-law that predates both, and justicars who ride out to decide which one applies today. Thepyrgos follows as the other kind of city entirely &mdash; universities, a synod, a commissariat and an unfinished stair, all arguing. The Narethi of the deep desert are here because their ancestral vote is a legal system too, and a stricter one than either. Zakov closes the regional half with a court that is underwater and still holding sessions.</p>
+<p>Section V adds four peoples along the same principle as Volume II's: fire-tended temple keepers, Kahfagian deep-divers, Aeler struck from the rolls, and those the Clockwork Monad has rebuilt. None of them are imports. Each is what happens when an ordinary trade, judgment or medical practice is followed far enough.</p>
+</div>
+
+<div class="toc" id="toc">
+    <h3>Contents</h3>
+
+    <div class="toc-section">I. Viterra &mdash; The Queen's Word</div>
+    <a href="#the-queen-s-word">The Queen's Word</a>
+    <a href="#the-codex-of-precedents">The Codex of Precedents</a>
+    <a href="#the-hedge-law">The Hedge-Law</a>
+    <a href="#the-right-of-acknowledgment">The Right of Acknowledgment</a>
+    <a href="#the-queen-s-justicars">The Queen's Justicars</a>
+    <a href="#the-hedge-courts">The Hedge-Courts</a>
+    <a href="#the-turncloak-nobility">The Turncloak Nobility</a>
+    <a href="#the-parlement-of-viterra">The Parlement of Viterra</a>
+    <a href="#foundation-talents-2-ndash-4-xp">Foundation Talents (2&ndash;4 XP)</a>
+    <a href="#advanced-talents-6-ndash-8-xp">Advanced Talents (6&ndash;8 XP)</a>
+    <a href="#sample-timers">Sample Timers</a>
+    <a href="#sample-front-the-succession-crisis">Sample Front: The Succession Crisis</a>
+
+    <div class="toc-section">II. Thepyrgos &mdash; The City of Stairs</div>
+    <a href="#overview">Overview</a>
+    <a href="#geography">Geography</a>
+    <a href="#the-city">The City</a>
+    <a href="#the-universities">The Universities</a>
+    <a href="#the-unfinished-stair">The Unfinished Stair</a>
+    <a href="#the-synod">The Synod</a>
+    <a href="#the-commissariat">The Commissariat</a>
+    <a href="#the-hyro-villages">The Hyro Villages</a>
+    <a href="#the-theological-war">The Theological War</a>
+    <a href="#the-astroegro-vaults">The Astroegro Vaults</a>
+    <a href="#local-patrons">Local Patrons</a>
+    <a href="#core-timers">Core Timers</a>
+
+    <div class="toc-section">III. The Narethi &mdash; The Unburied of the Deep Desert</div>
+    <a href="#the-unburied-myth-and-memory">The Unburied &mdash; Myth and Memory</a>
+    <a href="#lands-after-landfall">Lands After Landfall</a>
+    <a href="#the-two-patrons-stillness-and-the-tide">The Two Patrons &mdash; Stillness and the Tide</a>
+    <a href="#law-custom-and-the-ancestral-vote">Law, Custom, and the Ancestral Vote</a>
+    <a href="#people-and-institutions">People &amp; Institutions</a>
+    <a href="#aesthetics-and-speech">Aesthetics &amp; Speech</a>
+    <a href="#rivals-and-kindreds">Rivals &amp; Kindreds</a>
+    <a href="#festivals-and-omens">Festivals &amp; Omens</a>
+    <a href="#the-resonance-leash-core-mechanic">The Resonance Leash (Core Mechanic)</a>
+    <a href="#kin-gifts-pick-2">Kin Gifts (Pick 2)</a>
+    <a href="#strings-and-secrets">Strings &amp; Secrets</a>
+    <a href="#running-narethi-pcs">Running Narethi PCs</a>
+    <a href="#narethi-in-the-wider-world">Narethi in the Wider World</a>
+
+    <div class="toc-section">IV. Zakov and the Drowned Court</div>
+    <a href="#new-faction-the-drowned-prince-terrestrial-patron">New Faction: The Drowned Prince (Terrestrial Patron)</a>
+    <a href="#new-mechanic-salt-coins">New Mechanic: Salt Coins</a>
+    <a href="#new-creature-salt-walker">New Creature: Salt Walker</a>
+    <a href="#new-talent-salt-scarred-major-8-xp">New Talent: Salt-Scarred (Prestige, 8 XP)</a>
+    <a href="#new-mechanic-the-tide-timer-nautical-pressure">New Mechanic: The Tide Timer (Nautical Pressure)</a>
+
+    <div class="toc-section">V. Four Peoples Newly Set Down</div>
+    <a href="#new-peoples-of-the-courts-the-coast-and-the-deep-desert">New Peoples of the Courts, the Coast and the Deep Desert</a>
+
+</div>
+
+<h2 id="i-viterra-the-queen-s-word">I. Viterra &mdash; The Queen's Word</h2>
+<h3 id="the-queen-s-word">The Queen's Word</h3>
+<p>The monarch may issue decrees, but a decree that contradicts the <em>Codex of Precedents</em> is null unless confirmed by the Parlement. Queen Veralyn has issued only seven decrees in five years; her predecessor issued forty in a single session.</p>
+<p>A royal decree carries the weight of the crown's authority. To defy it is treason. But the Queen herself may be petitioned to set aside a decree that causes manifest harm&mdash;a check on absolute power that has not been used in living memory.</p>
+<h3 id="the-codex-of-precedents">The Codex of Precedents</h3>
+<p>A massive book, kept in the White Hall under lock and witness, recording every judgment of the Queen's Justicars for four centuries. When a new case arises, the first question is always: <em>&ldquo;What does the Codex say?&rdquo;</em> If no precedent exists, the Justicar creates one&mdash;and the next Justicar must follow it.</p>
+<p>The Codex is not infallible. Pages have been lost to fire, water, and deliberate excision. Some precedents contradict one another; older clerks whisper that the Codex sometimes <em>changes</em> overnight, a new clause appearing in a margin as if written by a ghost.</p>
+<p>[Strings (Viterran Law)]</p>
+<ul>
+<li><strong>Precedent Citation</strong> &ndash; Reroll a failed Insight roll related to law or custom.</li>
+<li><strong>Codex Page</strong> &ndash; A copied folio; once per session, reduce DV by 1 on a legal argument.</li>
+</ul>
+<h3 id="the-hedge-law">The Hedge-Law</h3>
+<p>The unwritten customs of villages and rural manors. A hedge-court has no gavel, only a stool and a witness. Its judgments are binding only on those who consent&mdash;but refusal to consent is itself a mark against one's reputation. Hedge-law covers boundary stones, water rights, grazing rotations, and the proper distance between beehives.</p>
+<p>Hedge-courts are held under ancient oaks or at crossroads. The judge is often the oldest person present, or the one with the most even temper. Verdicts are pragmatic: a stolen pig is replaced; a broken fence is mended by the one who broke it; a blood-feud is settled by a marriage.</p>
+<p>[Strings (Hedge-Law)]</p>
+<ul>
+<li><strong>Boundary Stone</strong> &ndash; Declare a disputed line once; the hedge-court will honor your claim for a season.</li>
+<li><strong>Hedge Writ</strong> &ndash; Safe passage through rural lands; no tolls, no questions.</li>
+</ul>
+<h3 id="the-right-of-acknowledgment">The Right of Acknowledgment</h3>
+<p>The newest pillar, added by Queen Veralyn's own hand after the trial of Baron Aldric the Turncloak. It permits any child who was not ransomed, not visited, or not named in a will to demand that a parent speak one truth aloud under witness.</p>
+<p>The truth need not be kind. It need only be honest.</p>
+<p>Once spoken, the debt is considered paid in full. The parent cannot be compelled again. The child may walk away&mdash;or stay. The law does not care.</p>
+<p>Mechanically, invoking the Right of Acknowledgment is a social action (Presence + Sway or Command) against the parent's Resolve. On a hit, the parent speaks a true answer to one question. On a critical, the answer must be complete and without evasion. The parent may refuse, but refusal is an admission of guilt in the court of public reputation&mdash;they become <em>anima non grata</em>, and no lawful burial ground will accept their body.</p>
+<h3 id="the-queen-s-justicars">The Queen's Justicars</h3>
+<p>A small order of traveling magistrates, each bearing a silver gavel and a sealed writ. A Justicar may hear any case, anywhere, and her judgment is final unless overturned by the Queen herself. There are only twelve Justicars in all of Viterra. They are feared, respected, and occasionally murdered.</p>
+<p>[Strings]</p>
+<ul>
+<li><strong>Gavel token</strong> (force a parley under witness)</li>
+<li><strong>Justicar's seal</strong> (DV -1 for legal negotiations)</li>
+<li><strong>Precedent citation</strong> (reroll a failed Insight roll related to law)</li>
+</ul>
+<h3 id="the-hedge-courts">The Hedge-Courts</h3>
+<p>Local assemblies of elders, millers, and retired soldiers who settle disputes without reference to the Codex. Their judgments are pragmatic, swift, and often brutal. A hedge-court can outlaw a person from a village&mdash;a sentence of slow starvation.</p>
+<p>[Strings]</p>
+<ul>
+<li><strong>Boundary stone</strong> (declare a disputed line once)</li>
+<li><strong>Hedge writ</strong> (safe passage through rural lands)</li>
+<li><strong>Goose feather</strong> (one use to call a moot)</li>
+</ul>
+<h3 id="the-turncloak-nobility">The Turncloak Nobility</h3>
+<p>Nobles who changed sides during the succession wars. Some did so out of opportunity; others out of fear. Queen Veralyn has pardoned most but forgotten none. Their estates are intact, but their honor is stained. Many seek redemption through service&mdash;or revenge through conspiracy.</p>
+<p>[Strings]</p>
+<ul>
+<li><strong>Pardon letter</strong> (reduces Exposure by 2 in Viterra)</li>
+<li><strong>Oath of fealty</strong> (once/arc, call on a turncloak for aid, but mark a Debt to them)</li>
+<li><strong>Blood-silver receipt</strong> (proof of payment for a past betrayal)</li>
+</ul>
+<h3 id="the-parlement-of-viterra">The Parlement of Viterra</h3>
+<p>An assembly of nobles, bishops, and guildmasters that meets twice a year to advise the Queen and approve taxes. The Parlement has no power to make law, but it can refuse to fund the Queen's projects. Veralyn has learned to charm, bribe, and threaten them by turns.</p>
+<p>[Strings]</p>
+<ul>
+<li><strong>Proxy vote</strong> (once/session, sway a Parlement decision)</li>
+<li><strong>Tax receipt</strong> (reduces Supply cost by 1 in Viterran markets)</li>
+<li><strong>Censure motion</strong> (public shaming of an enemy)</li>
+</ul>
+<p>For characters who walk the road of law, oath, and judgment. These talents are available to any class, but they resonate most strongly with Runekeepers of Mykkiel or The Witness.</p>
+<h3 id="foundation-talents-2-ndash-4-xp">Foundation Talents (2&ndash;4 XP)</h3>
+<p>Once per session, you may declare that a past judgment covers the current situation. Roll Wits + Lore (DV 3). On a hit, gain +1 die on your next legal or social roll. On a miss, the precedent is contested&mdash;GM gains 1 SB.</p>
+<p>You carry a small gavel (or a symbolic equivalent). When you strike it against a hard surface and state a judgment, hostile NPCs within Near range must test Resolve (DV 4) or hesitate for one exchange. Usable once per scene.</p>
+<h3 id="advanced-talents-6-ndash-8-xp">Advanced Talents (6&ndash;8 XP)</h3>
+<p><em>Requirement: You have witnessed an injustice involving kin or oath.</em> Once per arc, you may demand that an NPC speak one true answer to a question of your choice. The NPC may refuse, but refusal forfeits all legal protections (they become <em>anima non grata</em> in Viterran territory). The truth need not be complete, but it must not be a lie.</p>
+<p>You have been granted the Queen's own seal. You cannot be arrested or detained by any lesser authority in Viterra. However, abuse of this immunity (committing a crime in plain sight) will cause the seal to crack&mdash;lose this talent until you undergo a ritual of purification (a downtime project).</p>
+<h3 id="sample-timers">Sample Timers</h3>
+<div class="table-wrap"><table><tr><th><strong>Clock</strong></th><th><strong>Purpose</strong></th><th><strong>Advance / Retreat</strong></th></tr><tr><td><strong>The Queen's Patience [6]</strong></td><td>How long the crown tolerates noble infighting</td><td>Advance when parties flout Justicar rulings; retreat when a major case is settled cleanly</td></tr><tr><td><strong>Hedge-Law Fracture [4]</strong></td><td>Local customs breaking down under pressure</td><td>Advance when a hedge-court's verdict is ignored; retreat when a respected elder restores peace</td></tr><tr><td><strong>Turncloak Conspiracy [8]</strong></td><td>A plot among pardoned nobles to reclaim lost lands</td><td>Advance when the party ignores rumors or protects a turncloak; retreat when a conspirator is exposed</td></tr><tr><td><strong>Codex Decay [6]</strong></td><td>The <em>Codex</em> losing authority as precedents contradict</td><td>Advance when contradictory rulings are issued; retreat when a Justicar reconciles two precedents</td></tr></table></div>
+<h3 id="sample-front-the-succession-crisis">Sample Front: The Succession Crisis</h3>
+<p><strong>Impulse:</strong> The Queen has no heir. Her marriage negotiations have stalled. The turncloak nobility smell blood.</p>
+<p><strong>Grim Portents:</strong></p>
+<ul>
+<li>A hedge-court declares a local lord has the &ldquo;ancient right&rdquo; to name the next Queen.</li>
+<li>The Parlement refuses to fund the Justicars, leaving a key case unheard.</li>
+<li>A turncloak knight invokes the Right of Acknowledgment against the Queen herself, demanding she name her father's true heir.</li>
+</ul>
+<p><strong>Timers:</strong></p>
+<ul>
+<li><em>Throne Vacancy [8]</em> &ndash; When full, a claimant marches on the White Hall.</li>
+<li><em>Justicar Defection [4]</em> &ndash; When full, one of the twelve Justicars declares for a rival.</li>
+<li><em>People's Petition [6]</em> &ndash; When full, a hedge-court of commoners issues a binding judgment on the succession, overriding noble law.</li>
+</ul>
+<p>This expansion was written in a Viterran hedge-court, on paper that had been used to wrap cheese. The ink is gall and the ash of a burned writ. The binding is leather from a debtor's cow.</p>
+<p>The Queen's Justicar Cass Venn died in her sleep seven years after the trial of Baron Aldric. Her gavel is kept in the White Hall, next to the <em>Codex of Precedents</em>. Children who visit the Hall are told to touch it for luck. They do.</p>
+<p>Ser Roran served the Queen for thirty years. He never married. He never took a squire. He wore the silver gauntlet until the day he died, and it was buried with him. The hedge-knight who ransomed him has no grave&mdash;his body was never found. But Roran paid his widow every year on the anniversary of the ransom, in full, with interest.</p>
+<p>The road to Viterra is straight, the hedges are trimmed, and the law is patient.</p>
+<p><em>The ink is dry. The gavel is still.</em></p>
+<h2 id="ii-thepyrgos-the-city-of-stairs">II. Thepyrgos &mdash; The City of Stairs</h2>
+<h3 id="overview">Overview</h3>
+<p>Thepyrgos is both city and province, a vertical labyrinth of stair-rights, rope-guilds, and synod edicts that shift with the tide. The capital rises in tiers of towers, terraces, and endless stairs above the Dolmis shore&mdash;but the stairs are not stone. They are fossilized vertebrae, the spine of a leviathan that Khemesh dragged under when the last Astroegro emperor broke a covenant older than the sea.</p>
+<p>Once a Utaran province, now a nation unto itself, Thepyrgos is famed for its universities, libraries, and debating synods, where precedent and philosophy weigh as much as pikes or coin. Yet beneath the scholar's gown and the notary's seal, an older war is fought&mdash;between the Witness, who would have every truth recorded and remembered, and the Ninth, who whispers that some truths should never have been written at all.</p>
+<p>The Synod Hall at dusk. Gold-glass mosaics glitter as a Matriarch reads a scroll aloud. <em>The Beacon Crown sees traitors in the smoke. A child's talent was surrendered to the Commissary last night. Find the informer&mdash;or the next stair seized will be yours. And if you hear a stair creak where none exists, do not turn around. The Ninth is counting.</em></p>
+<h3 id="geography">Geography</h3>
+<p>Thepyrgos occupies a peninsula jutting into the Dolmis Sea, bounded by the Black River to the north and the Belmont Marshes to the west. Viterra lies across the Black River, the two realms separated more by law than by water. The countryside is rugged: limestone hills, olive groves, whitewashed villages, and valleys choked with reed-filled marshes. The weather is warmer and wetter than the northern reaches&mdash;summers are humid, winters cool and drizzly, and fog rolls in from the sea without warning.</p>
+<p>The Astroegro Straits, the narrow sea passage between the Dolmis and the Amaranthine, are controlled by Thepyrgos, making the city a crucial link in the riverine trade between the fractured sun-kingdom and the imperial remnant. A few small colonies exist on the western coast of Hyaar&mdash;exiled scholars and retired Chain-Lanterns who trade olive oil and wine for eastern silks and spices. They are said to be even more paranoid than the mother city.</p>
+<h5 id="the-hyro-peoples">The Hyro Peoples</h5>
+<p>The Hyro are the surviving descendants of the Astroegro, a human civilization of formidable magic that fell before the Utaran legions ever marched east. Their ruins litter the hills and swamps south of the city, and their legacy haunts every threshold.</p>
+<p>A Hyro child born in the hills might dream in geometries that do not exist. A farmer might hear the stones whispering in a language no living throat can shape. The Chain-Lanterns and other Witch-Hunter Commissariats ruthlessly patrol these villages, using posted warrants, candle-smoke tests, and stair-seizures to identify and conscript children with arcane talent. The Hyro have learned to offer substitutes&mdash;a memory, a false name, a lock of hair&mdash;at crossroads, hoping the Hollow accepts the tribute.</p>
+<h5 id="the-fall-of-the-astroegro">The Fall of the Astroegro</h5>
+<p>The folk of Thepyrgos hold that Khemesh, the Abyssal Maw, destroyed the Astroegro with a single cataclysmic wave, dragging the emperor's palace into the abyss as punishment for the breaking of an ancient covenant. The scholars of the universities dismiss this as superstition. They point to evidence of slow decline, internal collapse, and the empire's own hubris. But the folk are not far from the truth.</p>
+<h3 id="the-city">The City</h3>
+<p>Thepyrgos is not one city but three, stacked on top of each other like a geological column, each layer pressed upon the one below like sediment in an ocean that never existed. The streets do not run straight. They climb, they curl, they terminate in dead ends that were once doorways to buildings that have since migrated elsewhere. A traveler who walks the same route on consecutive days will find the journey shorter or longer depending on the city's mood. The Thepyrgosi do not speak of this. They simply allow extra time.</p>
+<h5 id="the-lower-city">The Lower City</h5>
+<p>The Lower City clings to the harbour like barnacles to a wreck. Its buildings are ancient, their foundations sunk into mud that remembers the weight of Astroegro wharves. The architecture is a palimpsest: Utaran brick atop Astroegro stone atop something older that the Utarans themselves could not identify. Doorways are arched and narrow, designed for bodies smaller than modern measure. Windows are shuttered or bricked entirely. The streets are canals of shadow between leaning walls that have forgotten how to stand straight.</p>
+<p>The air smells of brine, cheap wine, and the copper tang of old blood. The fog rolls in from the Dolmis without warning, and when it does, the Lower City becomes a labyrinth of wet stone and muffled footsteps. The fog has a voice, the old folk say. It whispers names. The names are always those of people who died alone.</p>
+<p>The rope-guild halls are long, low buildings near the water, their facades carved with scenes of sailors drowning and being rescued and drowning again&mdash;the same figures in an endless cycle. Inside, the guilds keep their ledgers, their knots, and their secrets. The ropes they make are not merely rope; they are witnesses. A rope from the Lower City remembers who pulled it, who was tied by it, who was lowered into a grave with it coiled at their feet.</p>
+<p>The Commissariat's interrogation cells are cut into the bedrock beneath the harbour master's office. They are reached by a stair that descends nine flights. The ninth flight is below the water table. The walls weep. The prisoners do not know whether the wetness is condensation or the sea trying to claim them early. The Chain-Lanterns do not correct the ambiguity.</p>
+<h5 id="the-middle-city">The Middle City</h5>
+<p>The Middle City rises on fossil-stone terraces&mdash;the vertebrae of the leviathan that Khemesh dragged under when the last Astroegro emperor broke the covenant. The stone is gray-green, veined with white, and warm to the touch even in winter. In some places, the vertebrae are intact, forming natural arches that the Utarans incorporated into their colonnades. In others, the stone has been carved and recarved so many times that the original bone is visible only as a darker grain beneath the marble.</p>
+<p>This is the city of scholars, notaries, and those who live by the weight of the written word. The universities cluster here, their buildings linked by bridges that span the gaps between vertebrae. The bridges are narrow, unrailed, and deliberately unsettling. A student who cannot cross a bridge without looking down, the faculty say, has not yet learned to look up.</p>
+<p>The synod halls are domed structures of Astroegro construction, their interiors lined with gold-glass mosaics that depict not saints or emperors but geometric proofs&mdash;solved and unsolved. The solved proofs are illuminated in gold leaf; the unsolved are left as dark patches, waiting for a scholar to complete them. The acoustics are enchanted, or perhaps merely a property of the bone-stone. A whisper spoken at one end of the Synod Hall is audible at the other. A lie spoken anywhere in the hall echoes twice&mdash;once in the liar's voice, once in truth's. The truth's echo is always softer.</p>
+<p>The great archives are windowless, their walls lined with lead to keep out the sea-damp and the Hollow's attention. The shelves are organized not by subject or author but by the date the document was sealed. The oldest documents are at the bottom, in vaults that have not been opened in centuries. The Archivists do not know what those documents contain. They know only that the seals are still intact, and that the lead is warm to the touch.</p>
+<h5 id="the-upper-city">The Upper City</h5>
+<p>The Upper City crowns the acropolis, a walled fortress of ancient Astroegro construction. The walls are not stone; they are a single piece of fused material that the Utaran engineers could not replicate and the Thepyrgosi masons cannot repair. When a section cracks, the city does not patch it. It builds a new wall behind the old one, and the old wall is left to lean and whisper. The cracks have a geometry. No one has mapped it.</p>
+<p>The Archon's citadel sits at the highest point, a black mass of angles that do not quite meet. The citadel has no windows on its western face. The reason is not recorded. The Archon's chambers are in the eastern wing, where the morning light falls on a mosaic of the Astroegro emperor Ionius the Ninth, his face worn smooth by centuries of dust and deliberate erasure. The Archon does not sit facing the mosaic. No Archon has sat facing it since the fall.</p>
+<p>The Beacon Crown's signal towers ring the acropolis wall, their braziers fed with juniper and saltpeter. The smoke from the beacons does not rise; it hangs, forming a permanent gray pall that the Thepyrgosi call the Crown's Shadow. The shadow is thin in summer, thick in winter, and on certain nights&mdash;when the wind shifts and the bells are silent&mdash;it descends into the Middle City, carrying the taste of ash and the sound of voices that have been dead for generations.</p>
+<p>The stairs to the Upper City are guarded by the Palikars, the citizen-militia who answer only to the Synod. The Palikars wear black wool and carry staves of fossil-bone. They do not speak to those they escort. They do not need to. The stairs speak for them.</p>
+<h5 id="the-stairs">The Stairs</h5>
+<p>Between the three cities, the stairs. A thousand stairs, some public, some private, some belonging to guilds or families or no one at all. The Thepyrgosi do not count the stairs. They know that the number changes, and they have learned that a changed number is a warning, not an arithmetic problem.</p>
+<p>Each stair has a right&mdash;a charter, a tradition, a memory&mdash;and to climb without right is to invite the attention of the stair itself. Public stairs may be used by anyone, but they are slow, crowded, and patrolled by the Palikars. Private stairs are faster, but they require a token, a password, or a bribe. Family stairs are the fastest of all, but they are also the most dangerous, for a family stair remembers every member who has climbed it, and it knows when a stranger is pretending.</p>
+<p>Some stairs belong to no one. These are the unclaimed stairs, the ones that appear in the gaps between buildings, leading from nowhere to nowhere. The Thepyrgosi avoid them. A stair with no owner, they say, is a stair that the Hollow has already claimed. To climb an unclaimed stair is to arrive at a destination you did not choose.</p>
+<p>The stairs have long memories. They remember the Astroegro architects who carved them, working in total darkness because light would have revealed the geometry of the fossil-stone and driven them mad. They remember the Utaran legions who marched up them, counting their steps in Utaran, and the legions who marched down, counting their dead. They remember the fall&mdash;the night the leviathan stirred and Khemesh's wave swept the Lower City, drowning a district and leaving behind a new stair that had not been there before.</p>
+<p>And sometimes, at night, when the fog is thick and the bells are silent, the stairs remember a step that was never there before. A step that leads down when it should lead up. A step that is warm when it should be cold. A step that, if you place your foot upon it, will take you somewhere that is not Thepyrgos. The Thepyrgosi do not speak of these stairs. They do not avoid them either. They simply pretend not to see them, and the stairs, for their part, pretend not to exist.</p>
+<h5 id="the-architecture-of-dread">The Architecture of Dread</h5>
+<p>The buildings of Thepyrgos are not designed for human comfort. They are designed for permanence, and permanence, in Thepyrgos, is a kind of threat. Walls are thick enough to muffle screams. Ceilings are high enough to make a whisper echo. Doors are low, forcing even the tallest visitor to bow&mdash;a gesture of submission that the building does not acknowledge but nevertheless expects.</p>
+<p>The stone is always cold except where it is warm. The warm patches are not near hearths or braziers. They are in corners, in thresholds, in the spaces behind locked doors that have not been opened in living memory. The warmth is not geothermal. The warmth is the memory of something that once lived in the stone and has not yet left.</p>
+<p>The windows are narrow, set deep into the walls, and glazed with glass that distorts the view. A person looking out sees the street as a wavering line, the sky as a smear of gray. The distortion is not accidental. The Thepyrgosi do not want a clear view of the outside. A clear view would remind them that the city ends, and what lies beyond the walls&mdash;the marshes, the sea, the open road&mdash;is less certain than the stone.</p>
+<p>The doors are banded with iron, the iron stamped with seals that no longer correspond to any living authority. The seals are still enforced. A door sealed by a dead notary will not open for a living clerk, and the notary's ghost does not accept bribes. The Thepyrgosi have learned to negotiate with ghosts. It is slower than bribery, but the terms are clearer.</p>
+<h5 id="the-city-s-mood">The City's Mood</h5>
+<p>Thepyrgos has a mood, and the mood varies by district. The Lower City is sullen, brooding, its alleys narrow and its silences heavy. The Middle City is anxious, its scholars always looking over their shoulders, its bells always warning of something that has not yet arrived. The Upper City is serene, but it is the serenity of a tomb&mdash;a place where nothing changes because nothing is alive enough to change.</p>
+<p>At night, the mood shifts. The Lower City becomes watchful, its fog carrying whispers that are not quite words. The Middle City becomes restless, its bells ringing at odd hours for reasons no one can explain. The Upper City becomes silent. Not the silence of sleep, but the silence of a held breath. The Archon's citadel glows faintly, its black walls reflecting starlight that falls from a sky that is never entirely clear.</p>
+<p>The Thepyrgosi do not speak of the city's mood. To name it would be to admit that the city has a will, and that will is not entirely benevolent. Instead, they speak of the weather, of the tides, of the bells. They speak of everything except what the city wants from them. And the city, patient as stone, waits for them to ask.</p>
+<h5 id="the-lethai-thora">The Lethai-thora</h5>
+<p>High elf refugees from the fall of the Valewood's Empire of Leaves, the Lethai-thora fled across the Black River and were granted sanctuary in Thepyrgos. Generations later, their descendants still walk the city's tiers, their silver hair and ink-stained fingers a quiet reminder of a pact older than the synod.</p>
+<p>The Lethai-thora are the keepers of the deepest archives and the most secret keys. They are not universally trusted&mdash;their loyalty is to knowledge, not to Thepyrgos&mdash;but they are indispensable. They maintain the forbidden shelves, the sealed vaults, and the catalogs that no one else can read. The institutions of Thepyrgos are human-led, but the Lethai-thora hold a power that transcends mere office: they remember what others have forgotten.</p>
+<h3 id="the-universities">The Universities</h3>
+<p>Thepyrgos is home to six universities, each with its own specialisation, its own library, and its own patron. The faculties are human and Lethai-thora, though instructors of other cultures may be found among the more exotic disciplines.</p>
+<h5 id="the-university-of-sacred-architecture-artifice-school">The University of Sacred Architecture (Artifice School)</h5>
+<p>Geomancy, engineering, bridge-law. The True Masons maintain a chapterhouse here, training engineers who can read the stress-lines of stone and the breaking points of contracts. <em>Measure twice. Cut once. The mountain remembers the third cut.</em></p>
+<p>The University of Sacred Architecture occupies a cluster of buildings near the base of the Upper City, where the fossil-stone stairs are oldest and the weight of the citadel presses down. Its lecture halls are vaulted, windowless, and echo with the tap of measuring rods against slate. Students learn to calculate load tolerances in their heads, to sight a foundation's level from a hundred paces, and to hear the difference between a keystone that will hold and one that will whisper for a century before it fails.</p>
+<p>The faculty are drawn from the True Masons' guild, and the curriculum is as much oath as instruction. A graduate of Sacred Architecture does not merely know how to build; they know how to seal a bridge against fair-weather promises, how to carve a lintel that remembers the name of every contractor who worked on it, and how to read the stress-lines of a treaty by the way the clauses bear weight. The Weave respects architecture. So does the Hollow. A properly proportioned arch can outlast any curse&mdash;but a poorly sealed threshold invites attention.</p>
+<p>The school maintains the <strong>Registry of Keystone Charters</strong>, a brass-bound ledger recording every bridge, wall, and gate sealed by a True Mason's mark. To build without a charter is to invite collapse. To build with a false charter is to invite the Masons' attention. The Registry is kept in a vault behind a door that has no lock&mdash;only a riddle. The riddle changes each season. The answer is always a measurement.</p>
+<h5 id="the-lyceum-of-bells-and-beacons-thepyrgosi-school">The Lyceum of Bells and Beacons (Thepyrgosi School)</h5>
+<p>Acoustics, signal-law, weather-reading. This school trains the bell-ringers and beacon-keepers who maintain the city's warning systems. Its graduates can read a storm's approach by the taste of the wind and send a message across the province in the time it takes to ring a bell eight times.</p>
+<p>The Lyceum is housed in the Beacon Crown itself, a ring of watchtowers on the acropolis where the wind never stops and the bells speak in overlapping dialects. Students learn the grammar of chimes: three short for muster, two long for all clear, a single sustained note for <em>the Archon is coming, look busy</em>. They learn to read smoke signals by the way the wind bends them, to interpret mirror-flashes from the harbour, and to distinguish a fog-bell's warning from a fog-bell's lie.</p>
+<p>The faculty are retired beacon-keepers, deaf in one ear and patient in both. They teach that sound is a kind of law: it travels, it binds, it cannot be recalled. A bell rung in error can start a war. A bell not rung can lose a fleet. The Lyceum's motto is carved into the largest bell in the Crown: <em>The note that is not struck is the only note you can take back.</em></p>
+<p>Graduates of the Lyceum carry a <strong>Watcher's Bell</strong>, a small bronze chime tuned to the frequency of the Crown's signal network. Once per session, they may ring the bell to send a single word to any other Watcher's Bell within the province. The word arrives in the time it takes the bell to stop ringing. The Weave does not eavesdrop on this communication&mdash;but the Hollow listens to bells.</p>
+<h5 id="the-scriptorium-of-sealed-truths-lethai-thora-school">The Scriptorium of Sealed Truths (Lethai-thora School)</h5>
+<p>Archival science, cryptography, witness-law. The deepest archive in Thepyrgos, where forbidden texts are stored in lead-lined boxes and watched by blind sentinels. The Lethai-thora who work here are divided between those who believe all truths should be preserved and those who believe some truths should never have been written.</p>
+<p>The Scriptorium is not marked on any public map. It occupies a warren of rooms behind the Library of Keys, accessible only through a door that requires three keys held by three different Archivists. The building is older than the University district; some say it predates the Utaran occupation, that its walls are Astroegro work, that the lead lining was not added by the Synod but uncovered by it.</p>
+<p>Students at the Scriptorium learn the art of the <strong>sealed statement</strong>: a document that cannot be opened without breaking its own seal, and that will burn its contents if opened by the wrong hand. They learn to read ciphers that change with the tide, to write in inks that vanish when spoken aloud, and to witness oaths without recording them&mdash;to hold a truth in memory only, because paper can be stolen and a mind, properly guarded, cannot.</p>
+<p>The Scriptorium's divided loyalties are an open secret. The Archivists who serve the Witness believe that every sealed truth should eventually be unsealed, that the world deserves to know what it has forgotten. Those who serve the Ninth believe that some truths were sealed for a reason&mdash;that the Astroegro knew what they were doing when they locked their vaults and threw away the keys. The two factions do not speak to each other. They communicate through sealed memoranda. The memoranda are never opened.</p>
+<p>Graduates of the Scriptorium receive a <strong>Sealer's Ring</strong>, a silver band that stamps a wax seal only the wearer can break. Once per session, the wearer may seal a document or a spoken oath with the ring. Any attempt to break the seal&mdash;or to violate the oath&mdash;triggers a minor backlash (1 Fatigue, the Weave's disapproval) on the violator. The ring does not protect against the Hollow. The Hollow has its own seals.</p>
+<h5 id="the-college-of-waters-and-weights-commercial-school">The College of Waters and Weights (Commercial School)</h5>
+<p>Alchemy, maritime law, trade logistics. This school trains the factors, notaries, and customs inspectors who keep Thepyrgos' trade routes flowing. Its graduates can calculate interest in their heads and spot a forged seal from across a room.</p>
+<p>The College is located near the Salt Gate, where the harbour's tide licks the foundation stones and the air smells of brine and burnt ledgers. Its lecture halls are former warehouses; its practice yards are the docks themselves. Students learn to weigh a cargo by eye, to assess a ship's seaworthiness by the way it sits in the water, and to read a contract's hidden clauses by the spacing of the signatures.</p>
+<p>The faculty are retired merchants, former customs inspectors, and a few notaries who have seen enough forgeries to teach the difference between a genuine seal and a clever fake. They teach that the Weave is not the only system of exchange; coin and contract are older than magic, and the Hollow collects debts in all currencies. The College's motto is painted on the wall of every classroom: <em>The scales do not lie. The people who read them do.</em></p>
+<p>Graduates of the College may take the <strong>Merchant's Seal</strong>, a stamp that certifies their authority to inspect cargo, verify weights, and resolve disputes at the Salt Gate. Once per session, a character with the Merchant's Seal may demand to inspect a cargo or a contract without being refused&mdash;the Seal carries the weight of the Synod's commercial authority. However, each use ticks the <strong>Customs' Attention</strong> timer. When the timer fills, the College demands an accounting: a share of the cargo, a favor, or a truthful answer about where the goods came from.</p>
+<h5 id="the-hyro-college-of-unfinished-histories-unofficial-undergro">The Hyro College of Unfinished Histories (Unofficial, Underground)</h5>
+<p>Astroegro lore, folk magic, resistance theory. This college has no buildings, no faculty, and no official recognition. It is a network of Hyro scholars, runaway children, and sympathetic archivists who meet in basements and root cellars to preserve what the Synod would destroy. They teach the old songs, the forgotten proofs, and the names of the Astroegro vaults.</p>
+<p>The Hyro College has no fixed location. Meetings are announced by a chalk mark on a stair&mdash;a spiral, a triangle, an eye. The mark fades after a day. Those who recognize it gather at dusk in a cellar, a cistern, or the back room of a printer's shop. They bring food, stories, and questions. They leave with answers, warnings, and sometimes a child who needs to disappear.</p>
+<p>The curriculum is oral. There are no textbooks because textbooks can be seized. The College teaches the old songs&mdash;lullabies in Astroegro that still resonate with the Weave, work chants that keep a well from running dry, mourning verses that lay a ghost to rest without a priest. They teach folk magic: how to tie a knot that holds a promise, how to read a stone's temperature with the back of the hand, how to tell whether a stranger is Hollow-touched by the way their shadow falls.</p>
+<p>They also teach resistance. The College is the main conduit for smuggling gifted children out of Thepyrgos to Hyaar or the Vilikari marches. Its members know the hidden stairs, the corruptible guards, the Chain-Lantern patrol schedules. They do not teach violence. They teach escape.</p>
+<p>The College has no leader, but it has a symbol: the <strong>Unfinished Knot</strong>, a length of rope tied in eight loops with the ninth left loose. Those who carry an Unfinished Knot may recognize other members on sight. They may also, once per session, declare a hidden passage or a safe house in any district of Thepyrgos. The GM decides whether the passage is still safe. The Hollow does not know the College's secrets&mdash;but it is learning.</p>
+<h5 id="the-schola-of-the-unnamed-ninth-proscribed-underground">The Schola of the Unnamed Ninth (Proscribed, Underground)</h5>
+<p>Forbidden geometries, unproven theorems, the cult of forgetting. This school does not exist. Its members meet in the Unfinished Stair, in the spaces between bells, in the gaps of the city's memory. They believe that the Astroegro were right to unmake themselves&mdash;and that the only way to save the world from the Hollow is to help them finish the job.</p>
+<p>The Schola is not a school in any sense the Synod would recognize. It has no faculty, no curriculum, no entrance examination. It has only a text&mdash;the <strong>Ninth Proof</strong>, a fragment of Astroegro geometry that describes how to unmake a single fact without unmaking the facts around it. The Proof is incomplete. The Schola believes that completing it would allow a skilled caster to erase the Hollow from existence by erasing the memory of every debt it has ever collected.</p>
+<p>The Schola's members are recruited in dreams, in the margins of forbidden texts, in the silence after a catastrophic backlash. A Threadweaver who fails a dangerous spell badly enough may wake with a single sentence written on their arm in a hand they do not recognize: <em>The Ninth has seen you. The Stair is open.</em></p>
+<p>The Schola teaches that the Weave is a lie&mdash;that reality is a contract written by powers who cannot be trusted, and that forgetting is not a loss but a liberation. To forget a debt is not to default; it is to refuse to play the game. To forget a name is not to diminish the named; it is to free them from the ledger.</p>
+<p>The Synod has outlawed the Schola nine times. The Chain-Lanterns have executed suspected members. The Schola continues because it is not an organisation; it is an idea. And ideas, the Schola teaches, cannot be sealed. They can only be forgotten. And forgetting is their purpose.</p>
+<p>There is no mechanical benefit to joining the Schola. There is only a question: <em>What would you forget, if you could?</em> The answer is the only tuition. The Weave will remember what you forget. The Hollow will not.</p>
+<h5 id="the-university-of-mysteries-the-university">The University of Mysteries (The University)</h5>
+<p>Magic, anti-magic, threadweaving, metaphysics. This is the oldest and most coveted of Thepyrgos' schools, the one to which every provincial mage aspires and from which every provincial mage is eventually expelled. It trains sanctioned magi and invokers in the deeper mysteries of the world&mdash;not merely how to cast, but what casting does to the caster and to the fabric of reality itself.</p>
+<p>The University of Mysteries occupies no single building. Its classrooms are scattered across the Middle City: a lecture hall in a converted cistern, a practice yard behind a tannery, a scriptorium whose windows are painted black. The faculty believe that magic should not be comfortable. Comfort leads to carelessness, and carelessness leads to the attention of things that should not be woken.</p>
+<p>The curriculum is rigorous and deliberately disorienting. First-year students learn the Three Prohibitions: no blood magic, no summoning without a leash, no working that seeks to unmake a truth the Synod has sealed. Second-year students learn the Three Exceptions: when the Prohibitions may be broken, and who must witness the breaking. Third-year students learn that the Exceptions are lies, that the Prohibitions are suggestions, and that the only real law is the one the caster is willing to enforce with their own life.</p>
+<p>The higher you climb, the older and hungrier the world seems. The fourth-year curriculum is not taught; it is discovered. Those who reach the upper tiers find themselves in rooms that were not there the day before, consulting texts that were not written by human hands, and answering questions posed by faculty who may not be entirely alive. Some never come down. The University does not mourn them. It merely adds their names to the register of the disappeared&mdash;a ledger kept in a locked room that no one admits exists.</p>
+<p>The University is human-led, as are all Thepyrgos institutions, but the Lethai-thora are prominent among its senior faculty. They teach the older courses&mdash;the ones that require memory beyond a human lifespan&mdash;and they are the ones who decide which students are ready to climb higher. The current Chancellor, a Lethai-thora named Aerendil Thoraen, has held the position for nine decades. He has not aged visibly in that time. He does not speak of his predecessor, and the archives contain no record of an appointment.</p>
+<p><strong>Lysandra of the Amber Gate.</strong> No discussion of the University of Mysteries would be complete without naming its most famous&mdash;and most controversial&mdash;living alumna. Lysandra is a Master of Spellcraft, a Threadweaver of considerable power, and the author of a text the Synod has tried and failed to suppress three times. Her <em>Threadweaver's Spellbook</em> is required reading in the University's secret curriculum and forbidden reading in every official syllabus. It teaches the raw grammar of the Weave: intention, tag, and consequence. No patron. No writ. No seal.</p>
+<p>Lysandra is not a Runekeeper. She is a free caster&mdash;unlicensed, unbound, and unforgettable. She has taught at the University for forty years, despite the Synod's periodic efforts to dismiss her. The Chain-Lanterns have investigated her nine times. Each investigation closed when the lead inquisitor received a letter containing a single sentence: <em>&ldquo;The Weave remembers. So do I.&rdquo;</em></p>
+<p>Her classroom is the Amber Gate, a lecture hall in the lower tiers that smells of old smoke and burnt ambition. She does not assign textbooks. She assigns failure. &ldquo;Theory is a map,&rdquo; she tells her students. &ldquo;Practice is the road. You will singe your sleeve. Sew the burnt fabric into a book. One day that book will be the size of a pillow, and you will look at it and know exactly how much you owe.&rdquo;</p>
+<p>She is known for her three questions&mdash;the questions every Threadweaver must answer before every casting:</p>
+<ol>
+<li>What do you intend? (Be precise.)</li>
+<li>Which tags serve your intent? (Name them aloud.)</li>
+<li>What is the risk? (Look at your Position, your Fatigue, your witnesses.)</li>
+</ol>
+<p>The University does not officially endorse her methods. The University also does not dismiss her, because the Weave listens when she speaks, and the Weave has a long memory. Her students&mdash;the ones who survive&mdash;are among the most capable Threadweavers in the province. They are also among the most singed.</p>
+<p>The University maintains the <strong>Registry of Sanctioned Invokers</strong>, a brass-bound ledger that records every licensed magic-user in Thepyrgos. To practice magic without a license is to invite the Chain-Lanterns. To practice with a license is to accept that the University has a claim on your soul&mdash;a claim that can be called in at any time. Lysandra's name was struck from the Registry in 852 AR. She still teaches. The Registry still lists her. The contradiction has not been resolved.</p>
+<p>Notable faculty include <strong>Chrysanthos the Unraveler</strong>, a human theorist who believes that all magic is a form of threadweaving and that the Hollow is merely a loose thread waiting to be cut; <strong>Damek of the Iron Scales</strong>, a former Chain-Lantern who teaches anti-magic and the art of binding rogue casters; and <strong>Sophia the Silent</strong>, a Lethai-thora archivist who has not spoken in twenty years but who writes answers on water that freeze into legible ice. Students whisper that Sophia is not a teacher but a warning&mdash;she climbed too high and saw something that stole her voice.</p>
+<p>The University's motto is carved above the door of every lecture hall: <em>Prove what you can. Seal what you cannot. Forget what should never have been known.</em> The third clause is the most important. The University does not teach forgetting. It teaches that forgetting is sometimes the only responsible choice.</p>
+<p><strong>Mechanical Hook.</strong> A character who trains at the University of Mysteries may gain access to the <strong>Sanctioned Invoker's Seal</strong>, a brass token that grants lawful permission to practice magic in Thepyrgos. The seal also allows the Chain-Lanterns to track the bearer's location. Removing it is illegal. Keeping it is a leash.</p>
+<p>Once per session, a character with a Sanctioned Invoker's Seal may gain +1 die on any sanctioned magic roll&mdash;the University's authority shields them from scrutiny. However, each use ticks the <strong>Registry's Attention</strong> timer. When the timer fills, the University calls in a favor: a task, a testimony, or a truth the character would rather keep hidden.</p>
+<p>Characters who study under Lysandra&mdash;or who possess a copy of her <em>Spellbook</em>&mdash;may learn to free cast without the Seal. They gain access to the <strong>Threadweaver's Grammar</strong>, using the tag-based casting system described in her text. They also lose the protection of the Registry. The Chain-Lanterns will take an interest. The Weave does not care.</p>
+<h5 id="the-hyro-college-of-unfinished-histories-unofficial">The Hyro College of Unfinished Histories (Unofficial)</h5>
+<p>Astroegro lore, folk magic, resistance theory. This college has no buildings, no faculty, and no official recognition. It is a network of Hyro scholars, runaway children, and sympathetic archivists who meet in basements and root cellars to preserve what the Synod would destroy. They teach the old songs, the forgotten proofs, and the names of the Astroegro vaults.</p>
+<h5 id="the-schola-of-the-unnamed-ninth-proscribed">The Schola of the Unnamed Ninth (Proscribed)</h5>
+<p>Forbidden geometries, unproven theorems, the cult of forgetting. This school does not exist. Its members meet in the Unfinished Stair, in the spaces between bells, in the gaps of the city's memory. They believe that the Astroegro were right to unmake themselves&mdash;and that the only way to save the world from the Hollow is to help them finish the job.</p>
+<h3 id="the-unfinished-stair">The Unfinished Stair</h3>
+<p>The Unfinished Stair is the Ninth's domain in Thepyrgos&mdash;a hidden flight that appears only to those who have asked a question the Synod cannot answer. The stairs have no end. Each step is a different year. At the top, the Ninth and the Witness are playing knucklebones with forgotten names.</p>
+<p>Entering the Unfinished Stair is dangerous not because of monsters, but because of meaning. Each step forces you to confront a truth you have hidden or a memory you have suppressed. Those who climb too high forget why they climbed. Those who climb too low remember everything&mdash;and are crushed by the weight.</p>
+<p>To find the Unfinished Stair, a character must ask a question that the Synod's archives cannot answer&mdash;a question about the Astroegro, about the Hollow, about the nature of truth itself. Then they must walk the city's stairs at midnight, counting their steps. On the ninth flight, the Unfinished Stair will appear&mdash;or it will not. The Stair chooses who climbs.</p>
+<h3 id="the-synod">The Synod</h3>
+<p>The Synod is Thepyrgos' governing body, a council of matriarchs, rectors, and guild-masters who rule by consensus and precedent. Its chambers are in the Synod Hall, a domed building of Astroegro construction where the acoustics are enchanted to carry a whisper to every seat.</p>
+<p>The Synod does not have a single leader. The Matriarch presides over sessions but votes only to break ties. Real power lies in the committees: Sacred Measures, Foreign Relations, Unorthodox Texts, and the Commissariat.</p>
+<p>The Archon, the city's elected executive, is officially neutral. Unofficially, every Archon in living memory has leaned one way or the other&mdash;and each has died under mysterious circumstances before their term ended. The current Archon, Konstantinos, wears a key around his neck. No one knows what it opens. The key is a stair.</p>
+<h3 id="the-commissariat">The Commissariat</h3>
+<h5 id="the-chain-lanterns">The Chain-Lanterns</h5>
+<p>The Chain-Lanterns are the most feared of Thepyrgos' witch-hunting orders. They wear brass lanterns on chains, the lanterns tuned to the frequency of latent magic. A Chain-Lantern patrol can identify a gifted child from a hundred paces by the flicker of candle-smoke.</p>
+<p>Their methods are brutal and efficient. The Candle-Smoke Test forces a child to breathe onto a lit candle; if the smoke curls unnaturally, the child is marked. Stair-seizures revoke a family's stair-right, forcing them to use public stairs where the Chain-Lanterns can watch them. Children deemed too dangerous are quieted&mdash;their talent surrendered to the Commissary, and they become hollow-eyed servants of the state.</p>
+<p>The Chain-Lanterns are not evil. They believe they are saving Thepyrgos from the fate of the Astroegro. They are wrong&mdash;but they are not entirely wrong.</p>
+<h5 id="other-orders">Other Orders</h5>
+<p>The Proctors of the Exam Stair test children for talent in the universities, preferring to recruit rather than suppress. The Vigil of the Unnamed, a secret order within the Commissariat, believes the Chain-Lanterns have gone too far and smuggles gifted children out of the province. The Candle-Keepers maintain the Beacon Crown, watching for signs of heretical magic&mdash;and reporting what they see.</p>
+<h3 id="the-hyro-villages">The Hyro Villages</h3>
+<p>Outside the city, in the limestone hills and reed-choked valleys, the Hyro live much as they have for three thousand years. They farm olives and grapes, keep goats, and fish the coastal lagoons. They speak a dialect of Utaran flavoured with Astroegro words, and they remember&mdash;in songs, in stories, in the names they give their children&mdash;what the city has chosen to forget.</p>
+<p>A Hyro village is built around a well-shrine, a stone circle where offerings are left for the ancestors. The well-shrine is also a hiding place: its deep shaft contains a cache of forbidden texts, a secret passage to the next valley, or a child with the talent who must not be found.</p>
+<p>When a Hyro family fears the Chain-Lanterns are coming, they leave an offering at the nearest crossroads: a written name, a lock of hair, a childhood memory. The offering is taken by the Hollow&mdash;or by the Ninth, or by something older&mdash;and the family is passed over. The child survives, but something is lost: a memory, a name, a future that will never come to pass.</p>
+<h3 id="the-theological-war">The Theological War</h3>
+<p>The conflict between the Ninth and the Witness is not a war of swords. It is a war of records&mdash;a dispute over whether the world should be remembered or forgotten.</p>
+<p>The Witness holds that truth is sacred. Every lie must be exposed, every secret recorded, every broken oath witnessed. The Witness does not forgive; the Witness remembers. Its followers are archivists, investigators, and truth-tellers who believe that the only way to defeat the Hollow is to shine a light into every dark corner. But the Witness has a dark side: its hunger for truth can become cruelty. A Witness fanatic will destroy a family to expose a lie, topple a kingdom to correct the record, and burn a library to ensure that no one reads the wrong book.</p>
+<p>The Ninth holds that forgetting is mercy. Some truths are too heavy to carry, some secrets should never have been spoken, and some records are better left unwritten. Its followers are confessors, memory-thieves, and those who have learned that the kindest act is sometimes to forget. But the Ninth has a dark side too: its hunger for forgetting can become annihilation. A Ninth fanatic will burn a library to save a child, erase a name to protect a fugitive, and unmake a person to spare them from a truth they cannot bear.</p>
+<h5 id="factions">Factions</h5>
+<p>The Archivists of the Witness, orthodox and unbending, believe in preservation at all costs. Their leader is the Matriarch of the Ledger, who has never lost a case and never forgiven an error.</p>
+<p>The Coterie of the Ninth, radical and secretive, believe that the only way to defeat the Hollow is to forget it exists. Their leader is the Whisper of the Unfinished Stair, a being that may or may not exist, that may or may not be the Ninth itself wearing a mortal face.</p>
+<p>The Gray School, a small but influential faction of scholars, argue that the Witness and the Ninth are two halves of a single truth&mdash;that remembering and forgetting are both necessary, and that the wise scholar learns when to do which. Their leader is the Silent Rector, who speaks only in writing and has never been seen in public.</p>
+<h3 id="the-astroegro-vaults">The Astroegro Vaults</h3>
+<p>Beneath the city, nine vaults. The Synod knows of three and has sealed them with Witness-branded wax. The Ninth's Coterie has found a fourth. The other five are still buried, waiting for the right key&mdash;a true name, a specific death, a memory that has never been spoken.</p>
+<p>Each vault contains a weapon of impossible power, a guardian bound to defend it with its last calculation, and a cost&mdash;for to open the vault, you must sacrifice something the empire valued. The Ninth seeks to open all nine vaults simultaneously, triggering an unlearning that would erase the concept of record from the world. The Witness seeks to keep the vaults sealed, but remembered perfectly&mdash;to write down what happened, even if it must witness the end of everything.</p>
+<h3 id="local-patrons">Local Patrons</h3>
+<p>The Unwritten Citation is the Witness's aspect in Thepyrgos&mdash;a precedent that exists only in the margin, a law that was never written but is still enforced. Its servants are notaries, archivists, and truth-tellers who believe that every lie leaves a stain.</p>
+<p>The Silent Stair is the Ninth's aspect&mdash;the step that is never counted, the threshold that opens only once. Its servants are confessors, memory-thieves, and those who have learned that the kindest act is sometimes to forget.</p>
+<p>The Bell-Founder is Mykkiel, the law that rings true even when it hurts. The Abyssal Pressure is Khemesh, the weight beneath the city that the deep remembers. The Lantern Bearer is the Traveler, the light that guides lost ships and the lost. The Astroegro Remnant is the Sacred Geometry&mdash;the proof that was never finished, the equation that still ticks.</p>
+<h3 id="core-timers">Core Timers</h3>
+<h5 id="unfinished-stair-timer-6">Unfinished Stair Timer [6]</h5>
+<p>Tracks the party's entanglement with the hidden architecture of Thepyrgos. Ticks when the party uses a hidden stair, asks a question the Synod cannot answer, or speaks a true name of an Astroegro ruin.</p>
+<p>At 6 segments, the party discovers a new hidden stair&mdash;one that leads to an Astroegro Vault&mdash;but they are also marked. The Witness's attention falls on them. Their reflections in mirrors begin to lag by a heartbeat. The Chain-Lanterns receive a vision of their faces.</p>
+<p>Reduce the timer by feeding a memory to the Ninth's Coterie (lose a fact, a skill point, or a Bond) or by recording a truth in the Synod's archives (gain the Witness's Annotation).</p>
+<h5 id="synod-s-patience-4">Synod's Patience [4]</h5>
+<p>Tracks the Synod's tolerance for the party's meddling. Ticks when the party violates a stair-right, publishes a forbidden text, or interferes with a Chain-Lantern investigation.</p>
+<p>At 4 segments, the Synod issues a Writ of Censure. The party loses access to one privilege (library access, safe passage, an ally's aid) until they make amends.</p>
+<h5 id="heresy-index-4">Heresy Index [4]</h5>
+<p>Tracks the Commissariat's suspicion of the party. Ticks when the party harbours a gifted child, visits a Hyro village after a raid, or uses unsanctioned magic.</p>
+<p>At 4 segments, the Chain-Lanterns conduct a Candle-Smoke Test on the party. If they fail, they are marked&mdash;gain a Condition (Marked by the Commissariat) that gives -1 die to all social rolls with authorities until cleared.</p>
+<h2 id="iii-the-narethi-the-unburied-of-the-deep-desert">III. The Narethi &mdash; The Unburied of the Deep Desert</h2>
+<h3 id="the-unburied-myth-and-memory">The Unburied &mdash; Myth and Memory</h3>
+<p>The Narethi do not bury their dead. They leave them in the salt flats or the deep caverns, where the sun and the wind and the slow, patient pressure of the earth reduce bone to memory and memory to resonance. The <strong>Unburied</strong>&mdash;the first of their kind, a mummified First One sealed beneath the Sunken Courts&mdash;dreams still. Its dreams leak upward.</p>
+<p>Every Narethi is touched by this dream. It manifests as <strong>Resonance</strong>: a sixth sense, a psychic hum, the ability to hear what was never spoken. But the dream is hungry. It remembers. And it expects payment.</p>
+<h3 id="lands-after-landfall">Lands After Landfall</h3>
+<h6 id="the-sunken-courts-deep-desert">The Sunken Courts (Deep Desert)</h6>
+<p>A subterranean city of salt, basalt, and fossilized coral. The Unburied sleeps at its heart. The Courts are ruled by <strong>Watchers</strong>&mdash;priest-archivists who tattoo the names of the dead onto their own skin. Outsiders are not welcome; those who enter rarely leave unchanged. <em>Strings:</em> resonance-shard, sealed door token, watcher's silence.</p>
+<h6 id="the-salt-flats-coastal">The Salt Flats (Coastal)</h6>
+<p>Brilliant white, blinding, and treacherous. The Narethi harvest salt here, but the flats also serve as a cemetery: the dead are laid on stone tables and left to sublimate under the sun. At dusk, the flats whisper. <em>Strings:</em> salt-cake, tide-echo token, mummified hand.</p>
+<h6 id="the-oasis-of-echoes-liminal">The Oasis of Echoes (Liminal)</h6>
+<p>A freshwater spring at the edge of the deep desert. The water here carries memories&mdash;dip a cup, and you may hear a conversation from three centuries ago. The Narethi use it to consult ancestors. Non-Narethi who drink from it without offering a name are <strong>Hollow-Marked</strong> (the Hollow knows their face). <em>Strings:</em> memory-water vial, echo-shell, ancestor's whisper.</p>
+<h6 id="the-bone-archive-underground">The Bone Archive (Underground)</h6>
+<p>A library built from the remains of a thousand generations. Each bone is a scroll; each skull is a chapter. The <strong>Bone-Scribes</strong> maintain the Archive, adding a tooth or a knuckle for each truth recorded. The Archive is the only place where the <strong>True Name</strong> of the Unburied is written&mdash;but it is written in a language that no living Narethi remembers. <em>Strings:</em> scribe's needle, bone-token, sealed truth.</p>
+<h3 id="the-two-patrons-stillness-and-the-tide">The Two Patrons &mdash; Stillness and the Tide</h3>
+<p>The Narethi do not choose one patron. They walk the <strong>Unbroken Way</strong> (discipline, balance, control) and the <strong>Riven Path</strong> (passion, fury, liberation) simultaneously. The tension between them is their theology.</p>
+<h6 id="the-unbroken-way-stillness">The Unbroken Way (Stillness)</h6>
+<p>Taught by the <strong>Watchers</strong>. Teaches that the mind is a fortress, that emotion is a tide to be measured, and that the Unburied's dream must be <em>filtered</em>, not embraced. <em>Signature Technique: Resonance Cage</em>&mdash;once per scene, convert 2 Mental Strain into a <strong>Stillness Token</strong> (reduce DV of next psionic roll by 1).</p>
+<h6 id="the-riven-path-tide">The Riven Path (Tide)</h6>
+<p>Taught by the <strong>Unbound</strong>&mdash;exiles and heretics who believe the Unburied's dream is not a curse but an inheritance. They seek to <em>bloom</em>, to let the resonance reshape them. <em>Signature Technique: Unbound Surge</em>&mdash;once per scene, mark 1 Fatigue to gain +2 dice on a psionic roll; the GM gains 1 SB (the Unburied wakes a little further).</p>
+<h6 id="the-fracture">The Fracture</h6>
+<p>Most Narethi live between these poles. A character who favors Stillness gains +1 die to resist mental intrusion but suffers &ndash;1 die to Empathic Manipulation. A character who favors the Tide gains +1 die to Psychic Assault but marks Resonance Leash twice as fast.</p>
+<h3 id="law-custom-and-the-ancestral-vote">Law, Custom, and the Ancestral Vote</h3>
+<h6 id="the-cairn-council">The Cairn Council</h6>
+<p>The dead vote. At each full moon, the Watchers assemble the <strong>Cairn Council</strong>: a circle of skulls that have been treated with preserving salt. The living speak the question; the dead answer by how the salt grains shift. A shift toward the speaker means yes; away means no. A spiral means the ancestors are divided, and a living mediator must be chosen.</p>
+<h6 id="memory-debt">Memory Debt</h6>
+<p>Every Narethi carries a <strong>Memory Debt</strong> [4]. It ticks when they forget an obligation, fail to honor an ancestor, or allow a secret to be erased. When full, the Unburied sends a <strong>Dream-Eater</strong> (see bestiary) to collect&mdash;not a life, but a <em>significant memory</em> (a name, a face, a skill point). The memory is lost permanently unless a substitute is offered (a stronger memory, a physical token, or a year of service to the Watchers).</p>
+<h6 id="the-hollow-tithe">The Hollow Tithe</h6>
+<p>Once per season, the Narethi pour a cup of salt water into the desert at midnight. They speak no names. The Hollow drinks. If the tithe is forgotten, the Hollow sends an <strong>Oath-Keeper</strong> to the nearest settlement. The Oath-Keeper does not harm&mdash;it only <em>reminds</em>. The reminder is always a death.</p>
+<h3 id="people-and-institutions">People &amp; Institutions</h3>
+<h6 id="watchers">Watchers</h6>
+<p>Priest-archivists who maintain the Bone Archive and tend the Unburied's sleep. They are the only ones permitted to enter the deepest chamber of the Sunken Courts. A Watcher's face is hidden behind a mask of salt-cured leather; their true name is tattooed on the inside of their own ribs.</p>
+<h6 id="unbound-exiles">Unbound (Exiles)</h6>
+<p>Narethi who broke the Memory Debt or chose the Tide over Stillness. They wander the desert, selling their psionic services to caravans and city-states. Some become assassins (the Riven Path makes them deadly); others become spies (the Unbroken Way makes them invisible). The Unbound are feared, pitied, and occasionally hired&mdash;but never welcomed home.</p>
+<h6 id="bone-scribes">Bone-Scribes</h6>
+<p>Archivists of the Cairn Council. They do not speak aloud; they write on bone with needles dipped in their own blood. A Bone-Scribe can recall any Memory Debt recorded in the Archive&mdash;for a price (a tooth, a lock of hair, a promise to forget something else).</p>
+<h6 id="dream-eaters-spirits">Dream-Eaters (Spirits)</h6>
+<p>Manifestations of the Unburied's hunger. They appear as jackals with too many eyes, or as reflections that move independently. They do not kill; they <em>collect</em>. When a Dream-Eater takes a memory, the victim forgets not the fact but the <em>feeling</em>. They remember that they loved someone, but not the warmth of that love. They remember that they were betrayed, but not the sting. This is the Hollow's true cruelty: not death, but emptiness.</p>
+<h3 id="aesthetics-and-speech">Aesthetics &amp; Speech</h3>
+<h6 id="colors">Colors</h6>
+<p>Salt-white, basalt-black, dried-blood red, the violet of the steppe's edge.</p>
+<h6 id="shapes">Shapes</h6>
+<p>Spirals, mazes, the eight-pointed star of the Unbroken Way (the ninth point is the Unburied's eye).</p>
+<h6 id="clothing">Clothing</h6>
+<p>Light robes woven from desert flax, bone needles, salt-encrusted veils. Watchers wear masks; Unbound wear none.</p>
+<h6 id="proverbs">Proverbs</h6>
+<ul>
+<li>&ldquo;The sun remembers. The sand forgets. We remember both.&rdquo;</li>
+<li>&ldquo;A memory unpaid is a door left open.&rdquo;</li>
+<li>&ldquo;Stillness is not silence&mdash;it is the breath before the strike.&rdquo;</li>
+<li>&ldquo;The Riven Path does not forgive; it burns clean.&rdquo;</li>
+<li>&ldquo;When the ancestors vote, listen. They have all the time in the world.&rdquo;</li>
+</ul>
+<h3 id="rivals-and-kindreds">Rivals &amp; Kindreds</h3>
+<h6 id="the-aeler-dwarves">The Aeler (Dwarves)</h6>
+<p>Respect the Narethi's breath-counting, distrust their psionics. Aeler holds employ Unbound as &ldquo;resonance auditors&rdquo; but never let them near the keystone. <em>Relationship:</em> tense trade; shared hatred of the Hollow.</p>
+<h6 id="the-ykrul">The Ykrul</h6>
+<p>The steppe clans call the Narethi &ldquo;Salt-Eaters&rdquo; and avoid the deep desert. A Ykrul who accepts a Narethi's guest-cup is considered <em>resonance-marked</em>&mdash;the Hollow may visit their dreams. <em>Relationship:</em> wary respect; occasional alliances against common foes.</p>
+<h6 id="the-sidhi-brass-coast">The Sidhi (Brass Coast)</h6>
+<p>Kindred spirits. Both peoples carry the weight of a forgotten empire. Narethi and Sidhi trade in memories, salt, and lighthouse charts. Some Sidhi lighthouses are built on Narethi salt-pans; the arrangement is old and rarely spoken of. <em>Relationship:</em> old compact, weathering.</p>
+<h3 id="festivals-and-omens">Festivals &amp; Omens</h3>
+<h6 id="the-unburied-s-wake-annual">The Unburied's Wake (annual)</h6>
+<p>A night of silence. No fires. No speech. The Narethi sit in the dark and <em>remember</em>&mdash;each person reciting the names of their ancestors in their head. At dawn, they pour salt water on the ground. If the water steams, the Unburied has accepted the tribute. If it remains cold, a Dream-Eater is already hunting.</p>
+<h6 id="the-sand-recital-seasonal">The Sand Recital (seasonal)</h6>
+<p>Bone-Scribes gather to recite the Memory Debts of the previous season. They do not speak; they tap the rhythm on hollow bones. The audience listens with their hands pressed to the ground, feeling the vibration. A missed beat means a Debt is overdue. The Hollow will send a reminder within a week.</p>
+<h6 id="omens-that-matter">Omens that matter</h6>
+<ul>
+<li>A well that tastes of iron&mdash;the Unburied is dreaming of thirst.</li>
+<li>A reflection that moves after you stop&mdash;a Dream-Eater is considering you.</li>
+<li>A bone whistle found in the desert&mdash;someone has paid the Hollow with a name.</li>
+<li>Salt crystals that form in the shape of a spiral&mdash;the ancestors are voting.</li>
+</ul>
+<h3 id="the-resonance-leash-core-mechanic">The Resonance Leash (Core Mechanic)</h3>
+<p>Every Narethi character tracks a <strong>Resonance Leash</strong> [6]. It advances when:</p>
+<ul>
+<li>You use a significant psionic ability (Telepathy to read deep memories, Clairvoyance to scry, Psychic Assault, etc.) &ndash; mark +1.</li>
+<li>You fail a Resolve test while in a thin place or near a Dream-Eater &ndash; mark +1.</li>
+<li>The GM spends 2+ Story Beats to represent the Unburied's dream shifting &ndash; mark +1.</li>
+</ul>
+<p>When the Leash fills, you experience a <strong>waking vision</strong> of the First Scouring&mdash;a fragment of apocalyptic memory (a city of black glass, a sky on fire, a scream without end). You mark <strong>1 Fatigue</strong> (the strain of the memory), and the Leash resets to 0.</p>
+<h6 id="vision-consequences-d6">Vision Consequences (d6)</h6>
+<ol>
+<li>You glimpse a future death (your own or an ally&ldquo;s). Gain a <strong>Fate Token</strong> (once per session, reroll a failed roll against that death).</li>
+<li>You hear a true name&mdash;of a creature, a place, or a patron. The GM must whisper it to you. You may use it once as a String.</li>
+<li>Your shadow separates from you for one scene. It acts as a <strong>Cap 1 follower</strong> (can scout, distract, or steal small objects). It returns when you sleep.</li>
+<li>You forget a minor memory (the face of a passerby, a childhood pet's name). The GM gains 1 SB to spend on a memory-related complication.</li>
+<li>You speak a prophecy aloud (GM gives you one sentence about the future). It is always true, but cryptic. Mark 1 Obligation to the Unburied.</li>
+<li>A Dream-Eater appears at the edge of the scene. It does not attack&mdash;it watches. If you offer it a memory (erase a minor fact), it leaves. If you ignore it, it follows you for the session.</li>
+</ol>
+<h3 id="kin-gifts-pick-2">Kin Gifts (Pick 2)</h3>
+<h6 id="sand-reader-minor-2-xp">Sand-Reader (Minor, 2 XP)</h6>
+<p>You can read the memory of a place by tasting a pinch of its sand or soil. Once per session, ask the GM one yes/no question about an event that occurred within the last week within Close range.</p>
+<h6 id="unbound-step-minor-2-xp">Unbound Step (Minor, 2 XP)</h6>
+<p>You ignore the first level of difficult terrain caused by sand, salt, or loose stone. Once per scene, you may treat a fall as if you had taken no damage (landing in a slide).</p>
+<h6 id="venom-kissed-minor-2-xp">Venom-Kissed (Minor, 2 XP)</h6>
+<p>You are immune to mundane poisons and gain +1 die to resist magical poisons. Your own saliva is mildly toxic; you may deliver a Poisoned Condition (DV 3) via a bite or kiss.</p>
+<h6 id="stillness-within-minor-2-xp">Stillness Within (Minor, 2 XP)</h6>
+<p>Once per scene, as a reaction, you may reduce incoming Mental Strain from a psionic ability by 1 (minimum 0). You cannot use this if your Resonance Leash is already at 5+.</p>
+<h6 id="memory-eater-major-6-xp">Memory Eater (Major, 6 XP)</h6>
+<p>When you touch a willing or helpless creature, you may drain one specific minor memory from them (the name of a contact, a password, a childhood fear). You gain 1 Boon; the target forgets that memory permanently. Using this on an unwilling target requires a successful Psychic Assault roll.</p>
+<h6 id="cairn-speaker-major-6-xp">Cairn Speaker (Major, 6 XP)</h6>
+<p>You may commune with the dead through a physical anchor (a skull, a bone, a lock of hair). Once per session, ask the GM one question about the dead person's life, death, or unfinished business. The GM must answer truthfully, though cryptically. Mark 1 Fatigue after use.</p>
+<h6 id="resonance-cage-prestige-10-xp">Resonance Cage (Prestige, 10 XP)</h6>
+<p>You may suppress your own psionic signature completely. For one scene, you cannot be detected by any psionic means (Clairvoyance, Telepathy, Empathic Manipulation). You also cannot <em>use</em> psionics during that scene. Once per session.</p>
+<h6 id="unbound-surge-prestige-10-xp">Unbound Surge (Prestige, 10 XP)</h6>
+<p>When your Resonance Leash fills, you may choose to <em>not</em> reset it. Instead, you gain +2 dice to all psionic rolls for the next scene. At the end of the scene, the Leash fills again&mdash;this time, you experience a <em>major</em> vision (roll twice on the Vision Consequences table and take both). You cannot use this talent again until you have cleared a Memory Debt or performed a Hollow Tithe.</p>
+<h3 id="strings-and-secrets">Strings &amp; Secrets</h3>
+<h6 id="strings-sample">Strings (Sample)</h6>
+<ul>
+<li><strong>Salt-Kin Token</strong> &ndash; Proof of shared ancestry; once per session, gain +1 Position in a Narethi settlement.</li>
+<li><strong>Ancestor's Whisper</strong> &ndash; A bone-whistle that, when blown, calls a minor ancestor spirit to answer one question (the spirit is cryptic and demands a memory in return).</li>
+<li><strong>Watcher's Seal</strong> &ndash; A leaden seal stamped with a spiral; shows you are under the Watchers&ldquo; protection (or scrutiny).</li>
+<li><strong>Dream-Eater's Tooth</strong> &ndash; A small, warm tooth. Once, you may offer it to a Dream-Eater in place of a memory. The Dream-Eater will leave&mdash;but the tooth returns to your pocket the next dawn.</li>
+</ul>
+<h6 id="secrets-sample">Secrets (Sample)</h6>
+<ul>
+<li>The Unburied is not a First One&mdash;it is a <em>vessel</em>. The First One died during the Great Silence. The Unburied is a substitute, stitched together from the memories of a thousand dead Narethi.</li>
+<li>The Hollow's true name is written in the Bone Archive&mdash;but reading it would wake the Unburied permanently.</li>
+<li>The Sunken Courts are not a ruin. They are a <em>ship</em>. The Narethi did not flee across the Great Wake; they fell. The Courts are the wreck.</li>
+</ul>
+<h3 id="running-narethi-pcs">Running Narethi PCs</h3>
+<h6 id="resonance-as-resource">Resonance as Resource</h6>
+<p>Treat the Leash as a pressure gauge, not a punishment. When it fills, offer the player a choice: take the vision (Fatigue and a complication) or <em>bloom</em> (gain a temporary boon but mark a permanent Obligation). Blooming is how Narethi become Unbound.</p>
+<h6 id="memory-as-currency">Memory as Currency</h6>
+<p>Use Memory Debt to drive stories. A Debt that fills should not be a random penalty&mdash;it should be a <em>hook</em>. The Hollow takes something the player actually cares about (a name, a relationship, a key piece of information). Then the player has to decide: let it go, or go after it.</p>
+<h6 id="the-two-patrons-in-play">The Two Patrons in Play</h6>
+<p>Let the player choose which patron's voice is louder in a given scene. A Watcher might offer a <strong>Stillness Token</strong> (reduce Mental Strain). An Unbound exile might offer a <strong>Tide Token</strong> (bonus dice at the cost of a Leash tick). The tension between discipline and passion is the Narethi's core drama.</p>
+<h3 id="narethi-in-the-wider-world">Narethi in the Wider World</h3>
+<h6 id="in-ecktoria">In Ecktoria</h6>
+<p>Narethi are &ldquo;dream-readers,&rdquo; employed by the Censorate to verify testimony (does the witness believe they are telling the truth?). They are distrusted but necessary. A Narethi who claims to speak for the dead is ignored; one who offers to audit a memory is paid.</p>
+<h6 id="in-thepyrgos">In Thepyrgos</h6>
+<p>The Synod licenses Narethi psions as &ldquo;resonance consultants.&rdquo; The Chain-Lanterns watch them closely. A Narethi who oversteps (e.g., reading a clerk's mind without permission) is subject to the same candle-smoke test as any other unlicensed mage. Many Narethi in Thepyrgos work as archivists or witnesses, not as magi.</p>
+<h6 id="in-the-black-banners">In the Black Banners</h6>
+<p>Narethi psions are prized for their ability to interrogate prisoners without leaving marks. They are also feared&mdash;a Narethi who learns a captain's secrets is a Narethi who may sell them to the other side. The Banner's solution: pay them well, keep them fed, and never let them meet the quartermaster alone.</p>
+<h6 id="in-the-valewood">In the Valewood</h6>
+<p>The Lethai-al are wary of Narethi. Both peoples carry the memory of the Great Silence, but the Lethai blame the Narethi for it (or vice versa; the record is unclear). A Narethi who enters the Valewood is offered guest-right&mdash;coldly, precisely, and for exactly three nights. No more.</p>
+<h2 id="iv-zakov-and-the-drowned-court">IV. Zakov and the Drowned Court</h2>
+<h3 id="new-faction-the-drowned-prince-terrestrial-patron">New Faction: The Drowned Prince (Terrestrial Patron)</h3>
+<p>The Drowned Prince is not a god. He is a <em>creditor</em>. He was once a Zakov pirate king who made a bargain with Khemesh (the Abyssal Maw) to never die. Khemesh gave him immortality&mdash;but not in the way he expected. His body sank; his spirit rose. Now he rules the reefs, the wrecks, and the coins that have tasted death.</p>
+<h6 id="gaining-his-favor">Gaining His Favor</h6>
+<p>Find a salt coin (see below) and return it to his reef. He will offer a bargain: power in exchange for an annual payment.</p>
+<h6 id="obligation-track">Obligation Track</h6>
+<p>The Drowned Prince uses a standard Obligation track (Spirit + Presence). However, Obligation to him cannot be cleared by Acts of Service&mdash;only by paying the annual toll (1 silver coin per segment owed). If you cannot pay, the sea takes something from you: a memory, a skill point, or a year of your life.</p>
+<h6 id="new-rites-for-runekeepers-and-witches">New Rites (for Runekeepers and Witches)</h6>
+<ul>
+<li><strong>Salt Coin's Toll (Low, 4 XP)</strong> Touch a coin that has been used to buy a life (ransom, slave's purchase, bribe for execution). For one scene you may reroll one failed roll involving deception, escape, or bargains. Mark +1 Obligation to the Drowned Prince.</li>
+<li><strong>Drowned Prince's Favor (Standard, 8 XP)</strong> Once per journey you may call on the prince to calm a storm, part a reef, or guide your ship through treacherous waters. Mark +2 Obligation. The GM gains 1 Story Beat (the sea remembers your debt).</li>
+<li><strong>The Interest Comes Due (High, 12 XP)</strong> Once per campaign you may invoke this rite when you are about to die at sea. The Drowned Prince saves you&mdash;but you owe him your life. Mark +4 Obligation. You must pay 1 silver coin per segment within a year, or the prince will claim a loved one instead.</li>
+</ul>
+<h3 id="new-mechanic-salt-coins">New Mechanic: Salt Coins</h3>
+<p>Salt coins are silver pieces that have been used to pay for a life. They are physically indistinguishable from ordinary coins, but they are always warm. A salt coin can be:</p>
+<ul>
+<li><strong>Spent as a Boon</strong> (one use) to reroll any failed roll involving the sea, drowning, or escape.</li>
+<li><strong>Traded to the Drowned Prince</strong> to clear 1 segment of Obligation.</li>
+<li><strong>Used as material for the Rite of Salt Coin's Toll.</strong></li>
+</ul>
+<p><strong>Finding Salt Coins:</strong> On any Miss involving a death, a ransom, or a broken oath, the GM may place a salt coin in the scene. A player who searches (Wits + Investigation vs DV 3) may find it.</p>
+<p><strong>Curse of the Salt Coin:</strong> A character who carries more than 3 salt coins at once begins to dream of drowning. Each night test Spirit + Resolve (DV 4) or mark 1 Fatigue. Three failed tests in a row and the Drowned Prince sends a <em>Salt Walker</em> (see below) to collect.</p>
+<h3 id="new-creature-salt-walker">New Creature: Salt Walker</h3>
+<p>A drowned sailor raised by the Drowned Prince. It moves slowly, relentlessly, and smells of brine and old regret. It cannot be reasoned with&mdash;only bargained with.</p>
+<div class="creature-stats">
+    <span class="badge badge-gray">TL 5</span>
+    <span class="badge badge-gray">Key Attribute 4</span>
+    <span class="badge badge-gray">Harm 4 (brine and weight)</span>
+    <span class="badge badge-gray">Fatigue 4</span>
+    <span class="badge badge-gray">Armor None</span>
+    <span class="badge badge-gray">Harm Levels: None (puzzle)</span>
+    <div class="text-xs text-muted mt-1">Body 3 &middot; Wits 1 &middot; Spirit 2 &middot; Presence 1</div>
+</div>
+<div class="panel panel-blue">
+    <p class="text-sm"><strong>Why it has no Harm Levels.</strong> The source drafted the Salt Walker with hit-point-style regeneration, which this game does not have &mdash; and it did not need it, because it already stated the real answer: a Salt Walker is not destroyed, it is <em>paid</em>. It is a puzzle creature. Attacks land and change nothing; fire slows it and buys a scene, no more.</p>
+</div>
+<p><strong>Traits:</strong></p>
+<ul>
+<li><strong>Brine Aura:</strong> Any living creature within Near range suffers &ndash;1 die to Endurance rolls (salt burns the lungs).</li>
+<li><strong>Inexorable:</strong> Salt Walkers cannot be stopped by mundane means. They walk through walls, across water and over broken ground. Fire is the one thing that inconveniences them: burning one buys the party a single exchange to be somewhere else. Nothing else you do to it persists.</li>
+<li><strong>Bargain:</strong> Instead of fighting, a character may offer a salt coin to the Walker. The Walker takes the coin and leaves. If no coin is offered, the Walker attacks.</li>
+</ul>
+<p><strong>Resolution:</strong> Salt Walkers are not destroyed; they are <em>paid</em>. Offer a salt coin, or the debt the Walker was raised to collect, and it takes it and goes. A party with neither has to outrun it, and it does not stop.</p>
+<h3 id="new-talent-salt-scarred-major-8-xp">New Talent: Salt-Scarred (Prestige, 8 XP)</h3>
+<p>You have survived an encounter with the Drowned Prince, and the sea has marked you.</p>
+<ul>
+<li>You can hold your breath for twice as long as normal (test Spirit + Athletics vs DV 3 to extend to 1 minute per success).</li>
+<li>Once per session, when you fail a roll involving the sea (swimming, sailing, navigation), you may reroll one die. The GM gains 1 Story Beat (the sea remembers).</li>
+<li>You always know which way is north when you can see the horizon. This is instinct, not magic.</li>
+<li><strong>Drawback:</strong> You cannot sleep within a mile of a salt coin without marking 1 Fatigue. The prince whispers to you in dreams.</li>
+</ul>
+<h3 id="new-mechanic-the-tide-timer-nautical-pressure">New Mechanic: The Tide Timer (Nautical Pressure)</h3>
+<p>For any scene at sea in Zakov waters (or near the Drowned Prince's reef), the GM may start a <strong>Tide Timer [6]</strong>. It represents the rising of the prince's attention.</p>
+<ul>
+<li>Tick the timer when:</li>
+<ul>
+<li>A character fails a roll involving salt water.</li>
+<li>A salt coin is used or found.</li>
+<li>The party lingers in one place for more than an hour.</li>
+</ul>
+<li>When the timer reaches 3, the water becomes choppy. All sailing rolls are at &ndash;1 die.</li>
+<li>When the timer reaches 6, the Drowned Prince sends a Salt Walker (or his attention manifests as a rogue wave, a crack in the hull, or a sudden fog). The GM chooses.</li>
+</ul>
+<p><strong>Clearing the Tide Timer :</strong> Paying a salt coin to the Drowned Prince (via the Rite or a bargain) clears 2 segments. Leaving Zakov waters resets the timer.</p>
+<h2 id="v-four-peoples-newly-set-down">V. Four Peoples Newly Set Down</h2>
+<h3 id="new-peoples-of-the-courts-the-coast-and-the-deep-desert">New Peoples of the Courts, the Coast and the Deep Desert</h3>
+
+<p>Four archetypes the southern and coastal Amaranthine has always had room for, written to the same shape as every other entry: an Affinity, a Limit, three Gifts, Strings, and one thing the culture will not do.</p>
+
+<div class="panel panel-orange">
+    <strong class="title">The Pereshi &mdash; The Fire-Tended</strong>
+    <p class="text-sm">The keepers of the fire-temples along the salt roads, and the closest the Amaranthine comes to a people made of an element. A Pereshi is not born burning; they are <em>tended</em>, from infancy, at a hearth that has not gone out in eleven centuries, and by adulthood they run hot enough that snow will not settle on them and ink dries wrong under their hand. They are the south's metallurgists, glassmakers and cremators, and they are the only people every faith along the salt road will let handle its dead.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Craft at a forge, kiln or furnace, or on any roll to resist heat. <strong>Limit:</strong> &minus;1 Position on Body in genuine cold, and they feel it long before anyone else does.<br>
+    <strong>Gifts:</strong> <em>Tended Hand</em> (handle heated material without tools or Harm); <em>Reading the Colour</em> (know a fire's temperature, and what has been burnt in it, by looking); <em>Right of Ash</em> (any fire-temple owes you shelter and a night's fuel).<br>
+    <strong>Strings:</strong> a temple's hearth-right; ashes held in trust; a commission unfinished.<br>
+    <strong>Will not:</strong> let a tended fire go out. A Pereshi will spend a String, a favour or a limb first, and everyone along the road knows it &mdash; which makes it the easiest lever in the south to pull.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong class="title">The Tideborn &mdash; Kahfagian Deep-Divers</strong>
+    <p class="text-sm">Kahfagian families who have dived the wreck-shelves for so many generations that the sea has met them halfway: broad ribcages, a third eyelid, and a breath that lasts long enough to frighten passengers. They crew the salvage hulls and the harbour-works, they can testify to what is actually on a seabed, and their word closes insurance disputes from Kahfagia to Silkstrand. They are not fish-people and take the suggestion badly.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Endurance in or under water, or on any roll to work by touch in the dark. <strong>Limit:</strong> &minus;1 Position on Athletics on dry land over a long day &mdash; the build that dives does not run.<br>
+    <strong>Gifts:</strong> <em>Long Breath</em> (a dive lasts as long as the scene needs); <em>Wreck-Read</em> (DV &minus;1 to determine how a ship was lost); <em>Salvage Standing</em> (your account of a seabed is accepted by harbour courts).<br>
+    <strong>Strings:</strong> a salvage claim; a drowned name owed a marker; a hull you will not dive again.<br>
+    <strong>Will not:</strong> dive a wreck with people still aboard for profit alone. Recovery, yes. Stripping, never, and a Tideborn who does is put off the shelves for good.</p>
+</div>
+
+<div class="panel panel-gray">
+    <strong class="title">The Unledgered &mdash; Aeler Struck From the Rolls</strong>
+    <p class="text-sm">Aeler whose houses were dissolved by judgment, whose names were struck from the ledgers, and who did not stop being Aeler when it happened. Everything the Aeler are &mdash; the infrastructure, the law, the tremendous patience &mdash; the Unledgered still have, minus the entitlement that made it bearable. They keep the vaults nobody chartered and the bridges nobody voted for, and they are contemptuous of surface flattery in a way that reads, wrongly, as menace.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Craft or Investigation where a record has been falsified, lost or destroyed. <strong>Limit:</strong> &minus;1 Position on Presence in any chartered Aeler hall, where your standing is formally nil.<br>
+    <strong>Gifts:</strong> <em>Struck But Not Stupid</em> (you know the law that dissolved you better than the clerk enforcing it); <em>Unchartered Work</em> (build or repair without permission, and it holds); <em>Long Grudge</em> (name the house that struck yours; DV &minus;1 on anything against its interests).<br>
+    <strong>Strings:</strong> a judgment you dispute; a vault only you can open; an Aeler who still writes to you.<br>
+    <strong>Will not:</strong> forge a ledger entry. They were destroyed by a record and they will not become the thing that did it.</p>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">The Brasswrought &mdash; Made by the Clockwork Monad</strong>
+    <p class="text-sm">Not constructs and not automata: people the Iterative Forge has rebuilt, piece by piece, over a lifetime of repairs, until the question of how much is original stops having an answer. The Monad's Runekeepers do this as a mercy for the maimed and as a discipline for themselves, and the result is a small, self-aware population who are legally alive everywhere and are asked to prove it constantly. A Brasswrought remembers every iteration and can tell you which one they liked being.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Endurance against anything that damages the body as a mechanism &mdash; poison, exposure, exhaustion. <strong>Limit:</strong> &minus;1 Position on Medicine and Arcana performed <em>on you</em> by anyone not of the Forge; you are simply not what the textbook describes.<br>
+    <strong>Gifts:</strong> <em>Documented</em> (you carry your own complete repair record and can prove what you are); <em>Field Iteration</em> (repair yourself during a downtime scene with parts, not Medicine); <em>Tolerance</em> (one specific past injury no longer applies).<br>
+    <strong>Strings:</strong> a Runekeeper who maintains you; a part not yet replaced; an iteration you regret.<br>
+    <strong>Will not:</strong> accept a repair they did not consent to, however well meant. It is the entire ethical line the Monad's people hold, and they hold it hard.</p>
+</div>
+
+<div class="panel panel-gold">
+    <p class="text-sm"><strong>A note on the elemental and the constructed.</strong> Fate's Edge has no elemental planes and no golems, and these two entries are deliberately not that. The Pereshi are a <em>trade</em> that changed the people who practise it, and the Brasswrought are a <em>medical practice</em> with a philosophy attached. Both are reachable by an ordinary person making an ordinary decision, which is what keeps them in this setting rather than an imported one.</p>
+</div>
+
+
+
+<hr>
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    Peoples and Cultures, Volume III<br>
+    &copy; Nicholas A. Gasper &mdash; For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>
