@@ -224,6 +224,10 @@
 <hr>
 
 <!-- ===== PREMISE ===== -->
+<div class="panel panel-blue" style="margin:0.6rem 0 1rem;">
+    <strong>Reading an encounter badge.</strong> Each badge names a <strong>DV</strong> and a <strong>Position</strong>. It does not name a dice pool, and that is deliberate: the pool is <em>Attribute + Skill</em>, chosen from how the player says they are going about it. Two characters can attempt the same encounter with different pools and both be right. Where an approach is obviously the intended one, the badge says so; where it does not, ask what they are doing and build the pool from the answer.
+</div>
+
 <h2 id="premise">🌫️ Premise &amp; Tone</h2>
 
 <div class="panel panel-teal">
@@ -301,7 +305,7 @@
     <div class="scene-desc">A dock where boats have started arriving before they leave. Passengers disembark with memories of crossings that haven't happened yet — the party's first unambiguous proof this isn't superstition.</div>
     <div class="flex text-xs mt-1">
         <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
-        <span class="badge badge-red">Encounter: Temporal Echo (Cap 1, DV 3, Desperate)</span>
+        <span class="badge badge-red">Encounter: Temporal Echo (TL 2, DV 3, Desperate)</span>
     </div>
     <div class="outcome-table mt-1">
         <tr><td class="outcome-label">Clean:</td><td>The party identifies the echo — themselves, performing actions they haven't taken yet — and it unravels, leaving behind a useful fragment: it was searching for something at the Weeping Gate.</td></tr>
@@ -340,7 +344,7 @@
     <div class="scene-desc">Eddis's ferry runs one more time, this trip with a passenger who insists — reasonably, calmly, with the Walker's borrowed patience — that the safest course is straight into the thickest mist bank on the water.</div>
     <div class="flex text-xs mt-1">
         <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
-        <span class="badge badge-red">Encounter: Possessed Bell-Warden (Cap 2, DV 4, Controlled)</span>
+        <span class="badge badge-red">Encounter: Possessed Bell-Warden (TL 3, DV 4, Controlled)</span>
     </div>
     <div class="outcome-table mt-1">
         <tr><td class="outcome-label">Clean:</td><td>The party recognizes the possession before the boat commits and restrains or talks down the passenger. No harm done.</td></tr>
@@ -376,7 +380,7 @@
     <div class="flex text-xs mt-1">
         <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
         <span class="badge badge-gray">Timer: Sanctification Progress [6]</span>
-        <span class="badge badge-red">Encounter: Possessed Bell-Wardens (1d3+1, Cap 2, DV 4, Desperate)</span>
+        <span class="badge badge-red">Encounter: Possessed Bell-Wardens (1d3+1, TL 3, DV 4, Desperate)</span>
     </div>
     <div class="outcome-table mt-1">
         <tr><td class="outcome-label">Clean:</td><td>The party subdues or disperses the Wardens without lasting harm — the possession breaks when the Walker's attention moves elsewhere. No one need die here.</td></tr>
@@ -391,7 +395,7 @@
     <div class="flex text-xs mt-1">
         <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
         <span class="badge badge-gray">Timer: Sanctification Progress [6]</span>
-        <span class="badge badge-teal">Encounter: Extended Ritual — Craft + Arcana (DV 6, Desperate)</span>
+        <span class="badge badge-teal">Encounter: Extended Ritual — Craft + Arcana (DV 5, Desperate)</span>
     </div>
     <div class="outcome-table mt-1">
         <tr><td class="outcome-label">Clean:</td><td>The ritual takes hold cleanly. Mark Sanctification Progress +3 and Mist Corruption -1 — the nearby bells ring one true, clear note.</td></tr>
@@ -406,7 +410,7 @@
     <div class="flex text-xs mt-1">
         <span class="badge badge-gray">Timer: Mist Corruption [8]</span>
         <span class="badge badge-gray">Timer: Sanctification Progress [6]</span>
-        <span class="badge badge-red">Encounter: The Mist Walker (Cap 4, DV 6, Desperate)</span>
+        <span class="badge badge-red">Encounter: The Mist Walker (TL 6, DV 5, Desperate)</span>
     </div>
     <div class="outcome-table mt-1">
         <tr><td class="outcome-label">Clean:</td><td>The party achieves their chosen resolution on favorable terms. Mist Corruption stops advancing and begins to recede.</td></tr>
@@ -454,13 +458,13 @@
         <div class="npc-name">Bell-Warden Maren Thorne</div>
         <div class="npc-role">Dedicated keeper of the bell-lines</div>
         <div class="npc-motivation">🎯 Protect the wards she's spent her life tending, and prove to herself she isn't losing her mind.</div>
-        <div class="text-xs text-muted">Lore 3, Notice 2, Command 2. Increasingly rattled by the corruption — may make poor decisions under stress.</div>
+        <div class="text-xs text-muted">Lore 3, Insight 2, Sway 2. Increasingly rattled by the corruption — may make poor decisions under stress.</div>
     </div>
     <div class="npc-card">
         <div class="npc-name">Ferryman Eddis Crow</div>
         <div class="npc-role">River guide with supernatural awareness</div>
         <div class="npc-motivation">🎯 Keep his passengers alive and keep working the water he's worked for thirty years, even as it stops making sense.</div>
-        <div class="text-xs text-muted">Lore 3, Notice 3, Skirmish 1. Seeing things that aren't there yet — becoming unreliable.</div>
+        <div class="text-xs text-muted">Lore 3, Insight 3, Melee 1. Seeing things that aren't there yet — becoming unreliable.</div>
     </div>
 </div>
 
@@ -518,9 +522,10 @@
 <h2 id="bestiary">🐉 Bestiary</h2>
 <div class="creature-stats">
     <div class="creature-name">The Mist Walker</div>
-    <span class="badge badge-gold">Tier IV</span>
+    <span class="badge badge-gold">TL 6</span>
     <span class="badge badge-teal">Outsider</span>
     <span class="badge badge-red">Harm Levels: 3 (standard)</span>
+    <span class="badge badge-red">Harm 4</span>
     <div class="text-xs text-muted">A shape that is almost a person, seen best from the corner of the eye and worst face-on. It speaks with borrowed voices — the ferryman who drowned in '02, the child who never came home from the levee. It wants a door, not a kill.</div>
     <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 – Borrowed Voice (target Distracted, -1 die, until they act on or refuse what was said); 2 – Phase Step (passes through an unsealed barrier, repositions within Near); 3 – Tempting Toll (offers forbidden knowledge for a small yes — if accepted, mark 1 Mist Corruption); 4 – The Gate Remembers (forces open a seam; a possessed proxy acts immediately, out of sequence).</div>
     <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Sanctified iron and salt disrupt its coherence; it cannot hold physical form inside a properly warded circle or cross a line of salt laid with genuine intent.</div>
@@ -528,9 +533,10 @@
 
 <div class="creature-stats">
     <div class="creature-name">Possessed Bell-Warden</div>
-    <span class="badge badge-gold">Tier II</span>
+    <span class="badge badge-gold">TL 3</span>
     <span class="badge badge-teal">Possessed</span>
     <span class="badge badge-red">Harm Levels: 3 (standard)</span>
+    <span class="badge badge-red">Harm 2</span>
     <div class="text-xs text-muted">A tower-keeper or levee guard whose eyes have gone the color of standing water. They act normally and are wrong in every particular a stranger wouldn't notice. Under stress, the mask slips.</div>
     <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 – False Warning (gives confident, wrong directions — next navigation DV +1); 2 – Mask Slips (the borrowed voice bleeds through for one line — unsettling, but a free clue).</div>
     <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Cleansing (Lore + Arcana vs DV 5, requires sanctified iron and salt) restores the Warden and ends the possession without harming them.</div>
@@ -538,12 +544,13 @@
 
 <div class="creature-stats">
     <div class="creature-name">Temporal Echo</div>
-    <span class="badge badge-gold">Tier I</span>
+    <span class="badge badge-gold">TL 2</span>
     <span class="badge badge-teal">Phenomenon</span>
     <span class="badge badge-red">Harm Levels: 3 (standard)</span>
+    <span class="badge badge-red">Harm 2</span>
     <div class="text-xs text-muted">Not a creature so much as a wound in sequence — a repeated moment that thinks it's the present. Echoes look and sound exactly like the people or objects they duplicate, right up until they contradict themselves.</div>
     <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 – False Memory (a PC gains a vivid false memory and must act as though it's true until Insight vs DV 3 notices the seam).</div>
-    <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Cannot be harmed and cannot harm directly — only mislead. Identifying one (Wits + Notice vs DV 3) causes it to unravel harmlessly.</div>
+    <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Cannot be harmed and cannot harm directly — only mislead. Identifying one (Wits + Insight vs DV 3) causes it to unravel harmlessly.</div>
 </div>
 
 <hr>

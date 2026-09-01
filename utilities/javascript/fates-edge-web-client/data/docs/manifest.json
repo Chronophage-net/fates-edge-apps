@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-31T18:12:34.806Z",
+  "generated": "2026-09-01T13:30:33.202Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -103,9 +103,9 @@
       "active": true
     },
     {
-      "id": "canival_of_broken_dreams",
-      "title": "Canival Of Broken Dreams",
-      "file": "Fates_-_Edge_-_-Canival-_-of-_-Broken-_-Dreams.html",
+      "id": "carnival_of_broken_dreams",
+      "title": "Carnival Of Broken Dreams",
+      "file": "Fates_-_Edge_-_-Carnival-_-of-_-Broken-_-Dreams.html",
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",

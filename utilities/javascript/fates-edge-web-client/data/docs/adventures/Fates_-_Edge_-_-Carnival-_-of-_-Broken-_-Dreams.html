@@ -125,6 +125,7 @@
             font-size: 0.8rem;
             margin: 0.3rem 0;
         }
+        .creature-stats { background: var(--bg4, var(--bg3, #1a1d24)); border-radius: var(--radius, 6px); padding: 0.45rem 0.6rem; margin: 0.35rem 0; font-size: 0.8rem; border-left: 3px solid var(--gold, #c9a227); }
     </style>
 </head>
 <body>
@@ -158,6 +159,10 @@
 <hr>
 
 <!-- ===== ACT I ===== -->
+<div class="panel panel-blue" style="margin:0.6rem 0 1rem;">
+    <strong>Reading an encounter badge.</strong> Each badge names a <strong>DV</strong> and a <strong>Position</strong>. It does not name a dice pool, and that is deliberate: the pool is <em>Attribute + Skill</em>, chosen from how the player says they are going about it. Two characters can attempt the same encounter with different pools and both be right. Where an approach is obviously the intended one, the badge says so; where it does not, ask what they are doing and build the pool from the answer.
+</div>
+
 <h2 id="act-1">🔥 Act I — Firelight</h2>
 <p><span class="badge badge-gold">Tier I</span> <span class="badge badge-blue">1–2 Sessions</span></p>
 <p style="color:var(--text2);">The carnival parade arrives; a "free wish" hooks an important NPC. The party sees a miracle, then discovers the missing price. Gain your first Diamond through a fair-game contest or etiquette duel.</p>
@@ -411,5 +416,21 @@
     © Nicholas A. Gasper — For use with the Fate's Edge RPG
 </div>
 
+
+<hr>
+
+<h2 id="bestiary">⚔️ Bestiary</h2>
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Livaea-Touched Attendant</strong> — TL 3, Armor 0, Harm 2, Harm Levels: 3 (standard). Humanoid (carnival).
+    <div class="text-xs text-muted mt-1">Staff who have worked the Carnival long enough to start agreeing with it. They are unfailingly courteous, and the courtesy is the problem: every offer they make is real, and every one of them costs.</div>
+    <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 &mdash; <em>An Attentive Offer</em>: a PC is offered exactly the small thing they want; accepting ticks Carnival Appetite +1. 2 &mdash; <em>You Signed For This</em>: the attendant produces a ticket stub, a receipt, a signature &mdash; the party is in the wrong and everyone nearby agrees. 3 &mdash; <em>The Crowd Closes</em>: the party is separated by bodies, cheerfully, and cannot regroup for an exchange.</div>
+    <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> They cannot break the Carnival's own rules. Cite a Diamond the party holds and the attendant must stand aside, visibly irritated for the first time.</div>
+</div>
+<div class="creature-stats">
+    <strong style="color:var(--gold);">The Carnival Itself</strong> — TL 7, <strong>Harm Levels: None (puzzle)</strong>. Place.
+    <div class="text-xs text-muted mt-1">When Carnival Appetite [8] fills, this is what the grand act is. It is not a creature and cannot be attacked; it is a venue that has decided it is hungry, and every attendant, tent-flap and ticket is a part of it.</div>
+    <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 2 &mdash; <em>The Show Must Go On</em>: a PC is drawn onto a stage and must perform or forfeit something. 3 &mdash; <em>Rewrite the Bill</em>: a location the party has already cleared is different when they return to it. 4 &mdash; <em>Take the House</em>: the exits are gone until the appetite is answered.</div>
+    <div class="text-xs text-muted mt-1"><strong>Resolution:</strong> It is closed, not killed. Present the Diamonds the party has earned as a complete bill of account &mdash; the Carnival honours its own paperwork above everything, including its hunger &mdash; or give it a performance so good it is satisfied, which requires someone to give up something they actually wanted.</div>
+</div>
 </body>
 </html>

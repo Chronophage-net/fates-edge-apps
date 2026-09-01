@@ -71,6 +71,7 @@
         table.tension-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.4rem 0; }
         table.tension-table th, table.tension-table td { border: 1px solid var(--border); padding: 0.3rem 0.5rem; text-align: center; }
         table.tension-table th { background: var(--bg3); color: var(--gold); }
+        .creature-stats { background: var(--bg4, var(--bg3, #1a1d24)); border-radius: var(--radius, 6px); padding: 0.45rem 0.6rem; margin: 0.35rem 0; font-size: 0.8rem; border-left: 3px solid var(--gold, #c9a227); }
     </style>
 </head>
 <body>
@@ -110,6 +111,10 @@
 
 <hr>
 
+<div class="panel panel-blue" style="margin:0.6rem 0 1rem;">
+    <strong>Reading an encounter badge.</strong> Each badge names a <strong>DV</strong> and a <strong>Position</strong>. It does not name a dice pool, and that is deliberate: the pool is <em>Attribute + Skill</em>, chosen from how the player says they are going about it. Two characters can attempt the same encounter with different pools and both be right. Where an approach is obviously the intended one, the badge says so; where it does not, ask what they are doing and build the pool from the answer.
+</div>
+
 <h2 id="act-1">🧊 Act I — The Frozen Court</h2>
 <p style="color:var(--text2);">The party enters a chamber where time has curdled around the Aelinnel elders. Every alliance and rivalry is frozen at its most vulnerable moment.</p>
 
@@ -117,7 +122,7 @@
     <strong>Court Tension Timer [10]</strong> — begins at 3 (Tense)
     <table class="tension-table">
         <tr><th>Calm (0-2)</th><th>Tense (3-5)</th><th>Strained (6-8)</th><th>Fracturing (9-10)</th></tr>
-        <tr><td>-1 DV social</td><td>Normal DV</td><td>+1 DV</td><td>+2 DV, violence possible</td></tr>
+        <tr><td>&minus;1 DV social</td><td>Normal DV</td><td>+1 DV (never above 5)</td><td>Position one step worse; violence possible</td></tr>
     </table>
     <div class="text-xs text-muted">Worsens on a miss when negotiating, when the party disrupts the court, or an alliance goes unmaintained. Improves on a clean success strengthening an alliance, uncovering truth, or performing a stabilizing rite.</div>
 </div>
@@ -284,5 +289,22 @@
     © Nicholas A. Gasper — For use with the Fate's Edge RPG
 </div>
 
+
+<hr>
+
+<h2 id="bestiary">⚔️ When the Court Fractures</h2>
+<p>This adventure has no monsters, and that is not an oversight &mdash; it is a room full of people who will not speak. But <em>Court Tension</em> reaching Fracturing promises violence, so here is what that violence is. It is never a set-piece battle; it is one bad moment between people who have known each other for two hundred years.</p>
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Aelinnel Elder (any of them)</strong> — TL 4, Armor 0, Harm 3, Harm Levels: 3 (standard). Small Folk.
+    <div class="text-xs text-muted mt-1">Old, formal, and entirely out of practice at this. An elder who draws is humiliated before the first exchange and knows it. They fight badly, briefly, and never twice.</div>
+    <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 &mdash; <em>Said Aloud</em>: something unforgivable is finally spoken; tick Unspoken Price +2. 2 &mdash; <em>Take a Side</em>: another elder commits, and the room divides. 3 &mdash; <em>The First Blood</em>: someone is hurt who was not part of this, and the court cannot pretend afterwards.</div>
+    <div class="text-xs text-muted mt-1"><strong>Weakness:</strong> Witness. An elder will stop the instant a PC makes it clear they are watching and will remember. Nobody here wants to be the one who started it.</div>
+</div>
+<div class="creature-stats">
+    <strong style="color:var(--gold);">The Silence Itself</strong> — TL 6, <strong>Harm Levels: None (puzzle)</strong>. Condition.
+    <div class="text-xs text-muted mt-1">What actually opposes the party. It has no body, holds no weapon, and wins every scene in which nobody says the true thing.</div>
+    <div class="text-xs text-muted mt-1"><strong>SB Spends:</strong> 1 &mdash; <em>The Moment Passes</em>: a PC who hesitated loses the opening. 2 &mdash; <em>Everyone Agrees Not To</em>: a truth spoken aloud is politely ignored, and the speaker takes &minus;1 die socially for the scene. 3 &mdash; <em>Calcify</em>: tick Unspoken Price +2; what has gone unsaid this long starts to look permanent.</div>
+    <div class="text-xs text-muted mt-1"><strong>Resolution:</strong> Somebody says it, in front of everyone, and is not talked out of it. That is the whole adventure. Fracturing is what happens when the party runs out of time to do it gently.</div>
+</div>
 </body>
 </html>
