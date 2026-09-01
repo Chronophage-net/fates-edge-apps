@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-01T23:13:21.653Z",
+  "generated": "2026-09-01T23:27:43.231Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -422,6 +422,16 @@
       "active": true
     },
     {
+      "id": "peoples_and_cultures_volume_ii",
+      "title": "Peoples And Cultures Volume II",
+      "file": "Fates_-_Edge_-_-Peoples-_-and-_-Cultures-_-Volume-_-II.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "players_guide",
       "title": "Player's Guide",
       "subtitle": "Your Path to Adventure in the Amaranthine Sea and Beyond",
@@ -715,6 +725,16 @@
       "active": true
     },
     {
+      "id": "the_frost_and_the_hollow",
+      "title": "The Frost And The Hollow",
+      "file": "Fates_-_Edge_-_-The-_-Frost-_-and-_-the-_-Hollow.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_grumbling_vault",
       "title": "The Grumbling Vault",
       "file": "Fates_-_Edge_-_-The-_-Grumbling-_-Vault.html",
@@ -771,6 +791,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_salt_and_the_silk",
+      "title": "The Salt And The Silk",
+      "file": "Fates_-_Edge_-_-The-_-Salt-_-and-_-the-_-Silk.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
       "core": false,
       "active": true
     },
@@ -949,7 +979,7 @@
       "active": true
     }
   ],
-  "total_count": 59,
-  "active_count": 59,
+  "total_count": 62,
+  "active_count": 62,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

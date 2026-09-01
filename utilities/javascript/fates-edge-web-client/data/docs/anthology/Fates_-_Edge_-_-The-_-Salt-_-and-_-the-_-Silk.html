@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Salt and the Silk</title>
+<style>
+:root {
+    --bg1: #130e0a;
+    --bg2: #1d150f;
+    --bg3: #261c14;
+    --bg4: #33251a;
+    --text: #ead9c2;
+    --text2: #c3ab88;
+    --text3: #8d795f;
+    --amber: #c9902f;
+    --amber-hover: #dba43f;
+    --border: #3d2d1e;
+    --red: #7c2a2f;
+    --green: #5f7a3f;
+    --blue: #3f6d74;
+    --purple: #6a3f5c;
+    --orange: #a8622a;
+    --parchment: #d9bd7c;
+    --radius: 8px;
+    --font: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg1);
+    background-image: radial-gradient(circle at 50% 0%, #201812 0%, #130e0a 60%);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 1.5rem;
+    max-width: 980px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+h1, h2, h3, h4 { color: var(--amber); margin: 0.6rem 0 0.4rem; font-weight: 600; letter-spacing: 0.01em; }
+h1 { font-size: 2rem; border-bottom: 2px solid var(--amber); padding-bottom: 0.4rem; }
+h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 2.5rem; }
+h3 { font-size: 1.2rem; margin-top: 1.6rem; color: var(--parchment); }
+a { color: var(--amber); text-decoration: none; }
+p { margin: 0.6rem 0; color: var(--text); }
+.byline { color: var(--text3); font-style: italic; font-size: 0.88rem; margin: -0.1rem 0 0.6rem; }
+.closing { color: var(--text2); font-style: italic; border-left: 3px solid var(--amber); padding-left: 0.8rem; margin: 0.8rem 0; font-size: 0.92rem; }
+.panel {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    margin: 0.7rem 0;
+}
+.panel-amber { border-left: 4px solid var(--amber); }
+.panel-red { border-left: 4px solid var(--red); }
+.panel-blue { border-left: 4px solid var(--blue); }
+.panel-green { border-left: 4px solid var(--green); }
+.panel-purple { border-left: 4px solid var(--purple); }
+.panel-orange { border-left: 4px solid var(--orange); }
+.badge {
+    display: inline-block;
+    padding: 0.05rem 0.55rem;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    margin: 0.1rem 0.2rem 0.1rem 0;
+}
+.badge-amber { background: var(--amber); color: #1c1305; }
+.badge-red { background: var(--red); color: #fff; }
+.badge-green { background: var(--green); color: #fff; }
+.badge-blue { background: var(--blue); color: #fff; }
+.badge-purple { background: var(--purple); color: #fff; }
+.badge-orange { background: var(--orange); color: #fff; }
+.badge-gray { background: var(--bg4); color: var(--text3); }
+.text-muted { color: var(--text3); }
+.text-sm { font-size: 0.88rem; }
+hr { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
+.toc { background: var(--bg3); border-radius: var(--radius); padding: 0.8rem 1.1rem; border: 1px solid var(--border); }
+.toc h3 { margin-top: 0; color: var(--amber); font-size: 1.05rem; }
+.toc-section { margin: 0.7rem 0 0.3rem; color: var(--parchment); font-weight: 600; font-size: 0.95rem; }
+.toc a { color: var(--text2); display: block; padding: 0.08rem 0; font-size: 0.85rem; }
+.toc a:hover { color: var(--amber); }
+blockquote {
+    border-left: 3px solid var(--amber);
+    padding-left: 1rem;
+    margin: 0.6rem 0;
+    color: var(--text2);
+    font-style: italic;
+}
+.frame {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin: 0.8rem 0;
+}
+.sep {
+    text-align: center;
+    color: var(--text3);
+    letter-spacing: 0.4em;
+    margin: 1.6rem 0;
+    font-size: 0.9rem;
+}
+footer {
+    font-size: 0.75rem;
+    color: var(--text3);
+    text-align: center;
+    padding: 1.4rem 0 0.5rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2.5rem;
+}
+
+        blockquote.epigraph { border-left: 3px solid var(--gold, #c9a227); padding: 0.3rem 0 0.3rem 1rem; margin: 0.6rem 0 0.9rem; font-style: italic; color: var(--text2); }
+        blockquote.epigraph cite { display:block; font-style:normal; font-size:0.78rem; color: var(--text3); margin-top:0.25rem; }
+    </style>
+</head>
+<body>
+
+<h1>The Salt and the Silk</h1>
+<p class="text-sm text-muted" style="margin-bottom:1rem;"><span class="badge badge-amber">Anthology</span>
+    <span class="badge badge-blue">18 Tales</span>
+    <span class="badge badge-purple">Southern &amp; Eastern Folklore</span>
+    <span class="badge badge-green">Road Customs</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
+
+<div class="frame">
+<p>Follow the salt south and the silk east and you leave the countries that argue about who owns the road. Down here the road owns itself. It is kept by weigh-masters and toll-keepers and harbour clerks, and the stories it produces are accordingly about measurement: what a thing weighs, what it is worth, who wrote the number down, and what happens to a person who is not on the list.</p>
+<p>These are the tales the earlier collections did not have room for. <em>Tales of the Threshold</em> printed the famous ones — the djinn's three questions, the bridge of one hundred hands, the freedman's seal. What follows is the working repertoire underneath them: a lighthouse keeper's bargain, a carpet that will not forget the room it was woven in, a water-clock that keeps a time nobody asked it to keep, and a viceroy who dreams the wrong dream in the wrong month.</p>
+<p>Three storytellers' voices run through this book and they do not agree. The salt-road teller is a merchant and counts everything. The eastern teller is a guest and counts nothing, because a guest who counts has insulted the house. The monsoon-court teller is a courtier and counts silently, which is worse than either. Read a tale in the voice of whichever one your table needs.</p>
+</div>
+
+<div class="toc" id="toc">
+    <h3>Contents</h3>
+
+    <div class="toc-section">I. The Salt Roads</div>
+    <a href="#the-lighthouse-of-the-one-eyed-captain">The Lighthouse of the One-Eyed Captain</a>
+    <a href="#the-carpet-that-remembers">The Carpet That Remembers</a>
+    <a href="#the-sidhi-freedman-s-seal">The Sidhi Freedman's Seal</a>
+    <a href="#the-pereshi-fire-temple">The Pereshi Fire-Temple</a>
+    <a href="#the-weigh-master-s-grain-oshiira">The Weigh-Master's Grain (Oshiira)</a>
+    <a href="#the-slave-who-named-the-veil-ashaan">The Slave Who Named the Veil (Ashaan)</a>
+    <a href="#the-walking-city-s-keystone-ngomebe">The Walking City's Keystone (Ngomebe)</a>
+    <a href="#the-aelinnel-and-the-aelaerem-the-ninth-door">The Aelinnel and the Aelaerem &mdash; The Ninth Door</a>
+
+    <div class="toc-section">II. The Eastern Waters</div>
+    <a href="#the-mirror-in-the-rice-paddy">The Mirror in the Rice Paddy</a>
+    <a href="#the-well-that-did-not-sing">The Well That Did Not Sing</a>
+    <a href="#the-fhara-water-clock">The Fhara Water-Clock</a>
+    <a href="#the-kuva-s-road">The Kuva's Road</a>
+    <a href="#the-bamboo-taboo">The Bamboo Taboo</a>
+
+    <div class="toc-section">III. The Monsoon Courts</div>
+    <a href="#the-viceroy-s-elephant">The Viceroy's Elephant</a>
+    <a href="#the-monsoon-s-daughter-taharka-ngomebe-ayokha">The Monsoon's Daughter (Taharka, Ngomebe, Ayokha)</a>
+    <a href="#the-aelinnel-bell-and-the-aelaerem-cup">The Aelinnel Bell and the Aelaerem Cup</a>
+    <a href="#the-lethai-ar-s-silk-bridge">The Lethai-ar's Silk Bridge</a>
+    <a href="#the-viceroy-s-dream-ikasha">The Viceroy's Dream (Ikasha)</a>
+
+    <div class="toc-section">IV. Customs of the Southern and Eastern Roads</div>
+    <a href="#appendix-customs-of-the-southern-roads">Appendix: Customs of the Southern Roads</a>
+    <a href="#appendix-taboos-and-customs-of-the-eastern-roads">Appendix: Taboos and Customs of the Eastern Roads</a>
+    <a href="#appendix-customs-of-the-dhaharan-roads">Appendix: Customs of the Dhaharan Roads</a>
+
+    <div class="toc-section">V. What the Storytellers Left Unfinished</div>
+    <a href="#postscript-a-map-of-unwritten-tales">Postscript: A Map of Unwritten Tales</a>
+    <a href="#postscript-a-letter-found-in-the-binding">Postscript: A Letter Found in the Binding</a>
+
+</div>
+
+<h2 id="i-the-salt-roads">I. The Salt Roads</h2>
+<h3 id="the-lighthouse-of-the-one-eyed-captain">The Lighthouse of the One-Eyed Captain</h3>
+<h4 id="told-by">Told by</h4>
+<p>Captain Rana of the <em>Eel-Skiff</em>, the same woman who had carried me across the Dolmis. She told this tale at anchor, with her brass hook resting on the rail.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Sidhi say that every lighthouse was built over a drowned sailor's grave. Not the famous sailors &mdash; the forgotten ones. The ones who washed ashore with no name and no country.</p>
+<p>A lighthouse keeper &mdash; call her Amara &mdash; tended a beacon on the Sidhi coast. She was old, blind in one eye, and she spoke to the light as if it were her daughter.</p>
+<p>&ldquo;Why do you talk to the lamp?&rdquo; a visitor asked.</p>
+<p>&ldquo;Because the lamp talks back,&rdquo; Amara said. &ldquo;It tells me which ships are honest and which are carrying stolen salt.&rdquo;</p>
+<p>The visitor laughed. Amara said, &ldquo;Wait until midnight.&rdquo;</p>
+<p>At midnight, a ship appeared on the horizon. Its sails were furled, but it moved against the wind. Amara turned the lamp a quarter degree south.</p>
+<p>&ldquo;That ship is a slaver,&rdquo; she said. &ldquo;The light will lead it onto the reef.&rdquo;</p>
+<p>The ship struck. The crew drowned. The slaves swam to shore.</p>
+<p>The visitor was horrified. &ldquo;You killed them!&rdquo;</p>
+<p>&ldquo;I killed the slavers,&rdquo; Amara said. &ldquo;The lamp chose. I only turned it.&rdquo;</p>
+<p>She was arrested by the Admiralty. The magistrate asked, &ldquo;How do you know the lamp speaks?&rdquo;</p>
+<p>Amara touched her blind eye. &ldquo;Because I lost this eye to a lamp that would not speak for me. It saw a truth I did not want to see. So I cut the truth out. But the lamp &mdash; the lamp forgave me.&rdquo;</p>
+<p>The magistrate freed her. The lamp still burns on that headland. And every Sidhi sailor knows: if the light shifts a quarter degree south, you reef your sails and pray you are not carrying stolen salt.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A lamp that speaks is a witness. A witness that judges is a court. Do not ask for justice unless you are prepared to be judged.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Speaking Beacon (Sidhi variant)</strong> &mdash; A lighthouse whose lamp is alive. It can see the cargo of any ship on the horizon and will shift its beam to guide the worthy and wreck the guilty.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who tends the lamp for a night may ask one question about a ship visible from the shore. The lamp answers truthfully (GM discretion, but the answer must be useful).</li>
+<li>If the character asks the lamp to wreck a ship, they must succeed on a <em>Spirit + Lore</em> test (DV 4) to interpret the lamp's judgment. On a miss, the lamp wrecks a different ship &mdash; possibly one the character intended to save.</li>
+<li><strong>Clock: The Drowned's Reckoning [6]</strong> &ndash; ticks each time the lamp is used to judge. When full, a ghost ship appears, crewed by those the lamp has wrecked. The ghost ship demands an accounting.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Sidhi lighthouse keeper has gone blind in both eyes. The lamp has gone silent. Ships are wrecking on a clear night. The party must discover what the lamp last saw &mdash; and why it has stopped speaking.</p>
+<h3 id="the-carpet-that-remembers">The Carpet That Remembers</h3>
+<h4 id="told-by">Told by</h4>
+<p>Soraya the Weaver, a Pereshi woman whose family had woven carpets for seven generations. She spoke while her loom clicked, never looking up.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Pereshi say that a carpet is not a thing. It is a covenant between the weaver and the land. The wool is a promise. The dye is a memory. The pattern is a map of unsettled weights.</p>
+<p>A prince &mdash; call him Darius &mdash; commissioned a carpet from the greatest weaver in the mountains. He wanted a carpet that would remember his victories. The weaver agreed.</p>
+<p>For a year, she wove. She used wool from a lamb born under a blood moon. She used dye from a flower that blooms only once a century. She wove the prince's battles, his hunting trips, his coronation.</p>
+<p>When she finished, the prince was furious. &ldquo;Where is my face? I am not in the carpet.&rdquo;</p>
+<p>The weaver said, &ldquo;You are in every thread. But the carpet does not show faces. It shows the weight of what was taken without return.&rdquo;</p>
+<p>The prince looked closer. The battles were still there, but they were not his victories. They were the victories of the men who had died for him. Their faces were woven into the border &mdash; small, barely visible, but present.</p>
+<p>&ldquo;You have woven my shame,&rdquo; the prince said.</p>
+<p>&ldquo;I have woven the truth,&rdquo; the weaver said. &ldquo;A carpet that lies is a carpet that unravels.&rdquo;</p>
+<p>The prince kept the carpet. He did not hang it. He stored it in a chest. But every night, he dreamed of the faces in the border. And every morning, he gave a coin to a widow.</p>
+<p>When he died, they unrolled the carpet one last time. The faces were gone. In their place was a single word, woven in gold thread: <em>Returned</em>.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A carpet is a covenant. Walk on it, and you agree to its terms. Read the border before you step.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Carpet of Weights</strong> &mdash; A Pereshi carpet that records the unacknowledged weight a person carries. It cannot lie. If the weight is released, the images fade. If the weight grows, the carpet expands.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who sleeps on the carpet for a night sees a vision of one unsettled promise (material, emotional, or magical). The GM reveals a narrative hook.</li>
+<li>The character may choose to release that promise. If they do, they gain +1 die to all social rolls involving the community for a week. If they refuse, the carpet's pattern shifts to show the character's face in the border, and they suffer &ndash;1 die to all social rolls until the promise is settled.</li>
+<li><strong>Clock: The Unraveling [8]</strong> &ndash; ticks each time a promise is ignored. When full, the carpet tears itself apart, and the character's name is erased from their family's records.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Pereshi merchant's carpet has grown to fill an entire room. He does not know whose unsettled weights are woven into it. The party must discover the faces in the border &mdash; and find a way to release them before the carpet swallows the house.</p>
+<h3 id="the-sidhi-freedman-s-seal">The Sidhi Freedman's Seal</h3>
+<h4 id="told-by">Told by</h4>
+<p>An old Sidhi dock-worker in Port Shed, who showed me a scar on his wrist where a slave collar had been burned off.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Sidhi were slaves once. Not all of them, not forever &mdash; but long enough that every family has a story of the collar.</p>
+<p>A young Sidhi man &mdash; call him Elias &mdash; bought his freedom from an Ashaani master. He paid in silver and promises. The master gave him a seal &mdash; a brass disk stamped with the words <em>Freed by law</em>.</p>
+<p>&ldquo;This seal is your proof,&rdquo; the master said. &ldquo;Lose it, and you are a slave again.&rdquo;</p>
+<p>Elias wore the seal on a cord around his neck. He became a merchant. He prospered. He bought a ship. He hired other freedmen.</p>
+<p>One night, a storm sank his ship. Elias swam to shore. The seal was gone.</p>
+<p>He searched the beach for three days. Nothing.</p>
+<p>He went to the Ashaani master. &ldquo;I need a new seal.&rdquo;</p>
+<p>The master laughed. &ldquo;You are not a freedman without the seal. You are a slave who ran away. The law says I can take you back.&rdquo;</p>
+<p>Elias did not run. He knelt. &ldquo;Then take me. But let me say goodbye to my wife.&rdquo;</p>
+<p>The master agreed. Elias went home. He told his wife, &ldquo;Gather the crew. Tell them I am a slave again.&rdquo;</p>
+<p>His wife said, &ldquo;You are not a slave. You are a Sidhi. The law does not define you. The sea does.&rdquo;</p>
+<p>She cut a piece of rope from the anchor line. She tied it around his neck. &ldquo;This is your new seal. It is not brass. It is memory. Every knot is a freedman's name. When you have enough knots, the law will follow.&rdquo;</p>
+<p>Elias returned to the Ashaani master. &ldquo;I have no seal. But I have a rope with nine knots. Each knot is a witness. The law cannot enslave a man with nine witnesses.&rdquo;</p>
+<p>The master looked at the rope. He looked at Elias. He said, &ldquo;The law can do anything. But I am tired of this argument. Go. Keep your rope.&rdquo;</p>
+<p>Elias became a legend. The Sidhi still tie ropes with nine knots &mdash; one for each of the original witnesses &mdash; and they wear them under their shirts. The law does not ask to see them. The law is afraid of what the knots remember.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A seal is a promise. A memory is a witness. The law fears the witness more than the promise.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Nine-Knot Rope</strong> &mdash; A length of rope with nine knots, each representing a witness to a promise. It is not a legal document, but it carries the weight of memory. Those who wear it cannot be easily enslaved &mdash; the law hesitates to challenge the knots.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who wears the Nine-Knot Rope gains +1 die to resist any attempt to enslave, imprison, or legally bind them against their will. The knots remind the law of witnesses.</li>
+<li>Once per session, the character may untie one knot to &ldquo;spend&rdquo; a witness. The character gains +2 dice on a single social roll involving justice or freedom. The knot is gone; the witness is used.</li>
+<li><strong>Clock: The Witness's Silence [4]</strong> &ndash; ticks each time a knot is used. When full, the character's name is removed from the legal records of the town where the knot was tied. No one remembers them there. They are free &mdash; and forgotten.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Sidhi freedman's rope has been stolen. Without it, he can be re-enslaved. The party must find the thief &mdash; who is working for the Ashaani master who originally sold the seal. The rope has seven knots left. That is seven witnesses. That is seven days.</p>
+<h3 id="the-pereshi-fire-temple">The Pereshi Fire-Temple</h3>
+<h4 id="told-by">Told by</h4>
+<p>A Pereshi priest of the Eternal Flame, who tended a fire that had not gone out in three hundred years. He spoke in a whisper, as if the fire were listening.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Pereshi do not worship the fire. They tend it. There is a difference, they say. Worship is for gods. Tending is for guests.</p>
+<p>A traveler &mdash; call him Rostam &mdash; came to a fire-temple in the mountains. He was cold, hungry, and lost. The priest let him in.</p>
+<p>&ldquo;Sit by the fire,&rdquo; the priest said. &ldquo;But do not stare into it. The fire does not like to be watched.&rdquo;</p>
+<p>Rostam sat with his back to the flame. He warmed his hands. He ate bread and salt.</p>
+<p>&ldquo;What is the fire's name?&rdquo; he asked.</p>
+<p>&ldquo;It has no name,&rdquo; the priest said. &ldquo;The fire forgets names. It remembers only warmth.&rdquo;</p>
+<p>Rostam was curious. He turned and stared into the flame.</p>
+<p>The fire was not orange. It was blue. And in the blue, he saw faces. His mother. His father. His brother, who had died in a war.</p>
+<p>&ldquo;You are looking at the dead,&rdquo; the priest said. &ldquo;They are not angry. They are waiting. The fire is their messenger.&rdquo;</p>
+<p>Rostam could not look away. He watched for an hour. When he finally turned, the priest was gone. The fire was orange again. He was alone.</p>
+<p>He left the temple. He walked home. He never told anyone what he had seen. But he stopped being afraid of dying. He said, &ldquo;The fire is warm. The dead are waiting. There is nothing to fear.&rdquo;</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;Fire remembers. It does not judge. If you are not afraid of what it remembers, it will warm you. If you are, it will show you everything.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Blue Fire</strong> &mdash; A sacred flame that shows visions of the dead. It cannot be used for divination &mdash; the dead do not answer questions. They only appear. The fire is a messenger, not an oracle.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who stares into the Blue Fire for an hour sees a vision of one deceased person connected to their backstory. The GM describes the vision. The vision does not answer questions &mdash; it simply shows.</li>
+<li>After seeing the vision, the character gains +1 die to resist fear for the next week (they have seen the dead and survived).</li>
+<li>If a character looks away before an hour has passed, the fire goes cold. The temple must perform a ritual to relight it. The character who looked away marks 1 Corruption.</li>
+<li><strong>Clock: The Fire's Patience [6]</strong> &ndash; ticks each time the Blue Fire is disturbed. When full, the fire goes out permanently, and the temple becomes a cold ruin.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Pereshi fire-temple has gone dark. The priest is dead. The party must relight the Blue Fire &mdash; but the ritual requires a memory that has never been spoken. Someone in the party must confess a secret to the ashes.</p>
+<h3 id="the-weigh-master-s-grain-oshiira">The Weigh-Master's Grain (Oshiira)</h3>
+<h4 id="told-by">Told by</h4>
+<p>A weigh-master in the Oshiiran city of Mbaro, who balanced grain for a living and balanced justice in her spare time.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Oshiira say that every grain of wheat has a weight. The weight is not the same for everyone. A rich man's grain is lighter than a poor man's. The scales know. The scales are honest.</p>
+<p>A merchant &mdash; call him Kwame &mdash; brought a shipment of grain to the weigh-house. The weigh-master put it on the scale. It balanced perfectly.</p>
+<p>&ldquo;The grain is light,&rdquo; the merchant said. &ldquo;I brought more than I promised.&rdquo;</p>
+<p>The weigh-master said, &ldquo;The grain is not light. Your heart is heavy. You are trying to cheat.&rdquo;</p>
+<p>The merchant was angry. &ldquo;My heart has nothing to do with it.&rdquo;</p>
+<p>The weigh-master took a single grain from the pile and placed it on the scale. The scale tipped.</p>
+<p>&ldquo;One grain of guilt,&rdquo; she said. &ldquo;The scale weighs truth, not wheat. Bring honest grain, and it will balance. Bring lies, and it will tip.&rdquo;</p>
+<p>The merchant left. He came back a week later with a new shipment. The scale balanced. He settled his promise. And he never tried to cheat again &mdash; not because he was afraid of the law, but because he was afraid of the one grain that had tipped the scale.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A scale is a witness. It does not care about your excuses. It cares about the weight of what you carry.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Honest Scale</strong> &mdash; An Oshiiran weigh-house scale that measures the moral weight of goods, not their physical mass. It cannot be fooled. It will tip if the seller has cheated, even by a single grain.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who uses the Honest Scale to weigh a transaction learns whether the other party is cheating. The GM answers truthfully (yes or no). The scale does not reveal how &mdash; only that something is wrong.</li>
+<li>If the character is the one cheating, the scale's tip causes them to gain the Condition <em>Guilty</em> (&ndash;1 die to all social rolls until they confess).</li>
+<li><strong>Clock: The Unbalanced Reckoning [6]</strong> &ndash; ticks each time a character cheats without confessing. When full, the scale's spirit manifests and demands a public accounting. Refusal causes the character's name to be posted on the weigh-house wall as an oath-breaker.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A weigh-master has been murdered. The scale was found tipped, with a single grain of wheat on the guilty side. The party must discover who the grain points to &mdash; and why they killed to hide their crime.</p>
+<h3 id="the-slave-who-named-the-veil-ashaan">The Slave Who Named the Veil (Ashaan)</h3>
+<h4 id="told-by">Told by</h4>
+<p>A Breath-less agent in the catacombs of Galanina, who spoke through a silk curtain and never showed her face.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>In Ashaan, the Veiled Sisters bind spirits to their will. They also bind people &mdash; but those are not called slaves. They are called &ldquo;indentured.&rdquo; The Sisters are very careful with words.</p>
+<p>A Sidhi man &mdash; call him Malik &mdash; was born into indenture. He worked the spice docks of Port Shed, loading cargo that would never be his. He learned to read and write by watching the merchants' clerks. He learned that a name is a kind of lock.</p>
+<p>One day, a Veiled Sister came to the docks. She was looking for a scribe. Malik volunteered. He wrote letters for her. He copied contracts. He learned the names of her rivals.</p>
+<p>The Sister was pleased. &ldquo;You are useful,&rdquo; she said. &ldquo;I will free you.&rdquo;</p>
+<p>She gave him a seal &mdash; a black disk with a single word: <em>Mine</em>.</p>
+<p>&ldquo;This means you belong to no one but me,&rdquo; she said. &ldquo;Wear it always.&rdquo;</p>
+<p>Malik wore it. But the seal was warm. It whispered to him at night. It said, &ldquo;You are still a slave. The word on the seal is not <em>Mine</em>. It is <em>Burden</em>.&rdquo;</p>
+<p>Malik confronted the Sister. &ldquo;You lied.&rdquo;</p>
+<p>She laughed. &ldquo;A seal shows what the wearer believes. You believed you were mine. So you were. Now you know the truth. Are you free?&rdquo;</p>
+<p>Malik thought. He touched the seal. It was cold now.</p>
+<p>&ldquo;I am free because I say I am,&rdquo; he said. &ldquo;Not because of your seal.&rdquo;</p>
+<p>He cut the cord and threw the seal into the sea. The Sister's face &mdash; behind her veil &mdash; flickered. He had seen it. Just for a moment.</p>
+<p>&ldquo;I will tell everyone what I saw,&rdquo; Malik said.</p>
+<p>&ldquo;No one will believe you,&rdquo; the Sister said.</p>
+<p>&ldquo;I do not need them to believe. I only need them to wonder.&rdquo;</p>
+<p>Malik became a Breath-less agent. He never wore a seal again. But he carried a piece of black glass in his pocket &mdash; a shard from the seal he had thrown away. When he met a slave, he showed it to them. &ldquo;This is what freedom looks like,&rdquo; he said. &ldquo;Broken.&rdquo;</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A name is a lock. A veil is a key. Break the lock, and you are free. Lift the veil, and the Sister is afraid.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Broken Seal</strong> &mdash; A shard of a Veiled Sister's seal. It no longer binds, but it can reveal the truth about any magical enslavement. When touched to a slave's collar, the collar glows red if it is bound by magic.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>The Broken Seal can be used once per day to detect magical bondage on a person or object. The shard grows warm when held near a spell of binding.</li>
+<li>If the shard is used to break a binding spell (by cutting the collar or speaking the slave's true name), the character who performs the ritual marks 1 Corruption (the Sister's attention turns toward them).</li>
+<li><strong>Clock: The Sister's Gaze [8]</strong> &ndash; ticks each time the shard is used to free a slave. When full, a Veiled Sister appears in the character's dreams, offering a bargain: return the shard, and she will forget their name.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Breath-less agent has been captured. The party has the Broken Seal. To free her, they must enter the Sister's sanctum &mdash; but the seal will betray their presence. Do they risk everything for one freed slave, or do they wait for a better chance?</p>
+<h3 id="the-walking-city-s-keystone-ngomebe">The Walking City's Keystone (Ngomebe)</h3>
+<h4 id="told-by">Told by</h4>
+<p>An elder of the Mason-Kin, a woman whose hands were stained with granite dust and whose voice was the sound of stone grinding on stone.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Ngomebe cities walk. They move across the plateau on rollers of petrified wood, pulled by oxen and the will of the ancestors. A city that stops walking is a city that dies.</p>
+<p>One city &mdash; call it Khazembo &mdash; stopped. The rollers locked. The oxen lowed. The stone-song fell silent.</p>
+<p>The Mason-Kin gathered. They examined the keystone &mdash; the heart of the city's movement. It was cracked.</p>
+<p>&ldquo;Who cracked the keystone?&rdquo; the elders asked.</p>
+<p>No one confessed. The city grew desperate. Without movement, the fields could not be rotated. The spirits grew restless.</p>
+<p>A young mason &mdash; call her Nia &mdash; knelt before the keystone. &ldquo;I cracked it,&rdquo; she said. &ldquo;I hit it with my hammer. I was angry at my brother.&rdquo;</p>
+<p>The elders were silent. Then the eldest spoke. &ldquo;Why did you lie?&rdquo;</p>
+<p>Nia looked up. &ldquo;I did not lie.&rdquo;</p>
+<p>&ldquo;You did,&rdquo; the elder said. &ldquo;The keystone does not crack from a hammer. It cracks from a broken vow. You are not the breaker. You are the one who knows the breaker's name.&rdquo;</p>
+<p>Nia wept. She named her brother. The brother confessed. He had sold the city's ancestral stone to a Pereshi merchant.</p>
+<p>They retrieved the stone. The keystone healed. The city walked again.</p>
+<p>Nia became the keystone's keeper. She never lied to the stone again. And every mason knows: a crack in the city is a crack in someone's word.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A walking city is a promise on wheels. A crack is a broken vow. Find the vow, and the city will heal itself.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Cracked Keystone</strong> &mdash; The heart of a Ngomebe walking city. It is a living stone that records every broken promise made within the city's bounds. It cracks when a vow is broken. It can only be healed when the oath-breaker confesses.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who touches the keystone may ask, &ldquo;What promise was broken here?&rdquo; The keystone shows a vision of the broken vow (GM discretion). The character marks 1 Fatigue.</li>
+<li>If the character is the oath-breaker, the keystone causes them to speak the truth aloud (no roll). They cannot lie while touching the stone.</li>
+<li><strong>Clock: The City's Death [8]</strong> &ndash; ticks each time a vow is broken without confession. When full, the keystone shatters, and the city becomes a ruin. The only way to reverse it is to find the original oath-breaker's descendant and perform a ritual of apology.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A walking city has stopped. The keystone is cracked, but no one knows who broke it. The party must find the living descendant of the oath-breaker &mdash; who may not even know their ancestor's crime &mdash; and convince them to confess.</p>
+<h3 id="the-aelinnel-and-the-aelaerem-the-ninth-door">The Aelinnel and the Aelaerem &mdash; The Ninth Door</h3>
+<h4 id="told-by">Told by</h4>
+<p>Two voices: a gnome bell-tender named Pim and a halfling hedge-witch named Celandine. They argued throughout the telling, corrected each other, and eventually agreed to disagree.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Aelinnel build doors that count. The Aelaerem pour cups that cannot be counted. They have lived as neighbors for centuries, borrowing each other's thresholds and arguing about the number nine.</p>
+<p>A gnome &mdash; call him Tink &mdash; built a door for a halfling village. It was a fine door, made of living wood, with a bell that rang once for each opening. He counted the rings: one, two, three, four, five, six, seven, eight.</p>
+<p>&ldquo;Where is the ninth?&rdquo; the halflings asked.</p>
+<p>&ldquo;There is no ninth,&rdquo; Tink said. &ldquo;Nine is for the Hollow.&rdquo;</p>
+<p>The halflings were satisfied. But a child &mdash; call her Holly &mdash; was curious. She rang the bell eight times, then whispered, &ldquo;Nine.&rdquo;</p>
+<p>The door opened onto a corridor that was not there. The corridor smelled of ash and rain. Holly walked inside.</p>
+<p>She did not return for three days. When she did, she was carrying a stone. The stone was warm. It had a single word carved into it: <em>Borrowed</em>.</p>
+<p>The halflings blamed Tink. &ldquo;Your door let the Hollow in.&rdquo;</p>
+<p>Tink said, &ldquo;Your child called the ninth. The door only answered.&rdquo;</p>
+<p>The halflings wanted to destroy the door. Tink refused. &ldquo;The door is not the problem. The problem is that we do not agree on what the ninth means. To us, nine is a number. To you, nine is a door. We need a bridge.&rdquo;</p>
+<p>They built a second door, next to the first. This door had no bell. It had a cup.</p>
+<p>&ldquo;When you need to cross,&rdquo; Tink said, &ldquo;pour water into the cup. If it fills to the brim, the ninth is safe. If it overflows, the ninth is hungry.&rdquo;</p>
+<p>The halflings agreed. They kept both doors. The gnomes used the bell door. The halflings used the cup door. And every harvest, they met at the threshold and argued about whether the cup had overflowed.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A bridge between cultures is not a door. It is a cup. You must agree on what full means.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Two Doors</strong> &mdash; One door (gnome) rings a bell eight times and refuses the ninth. The second door (halfling) uses a cup to test the ninth. Crossing the wrong door without the proper rite invites the Hollow.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who uses the bell door must ring eight times. If they ring a ninth, they are lost in the Hollow for 1d3 hours and mark 1 Fatigue.</li>
+<li>A character who uses the cup door must pour water. If the cup overflows, a spirit of the Hollow appears. The spirit will answer one question, but then demand a memory in return.</li>
+<li><strong>Clock: The Threshold Dispute [6]</strong> &ndash; ticks each time the two cultures disagree on how to use the doors. When full, both doors slam shut. The only way to reopen them is to hold a moot where both sides tell a story that satisfies the other.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A gnome and a halfling village have stopped speaking. The doors are locked. The harvest is rotting. The party must arbitrate the dispute &mdash; and find a new ritual that both cultures accept.</p>
+<h2 id="ii-the-eastern-waters">II. The Eastern Waters</h2>
+<h3 id="the-mirror-in-the-rice-paddy">The Mirror in the Rice Paddy</h3>
+<h4 id="told-by">Told by</h4>
+<p>Old Mei, a rice farmer in Ayokha who had never left her valley but knew the names of every spirit in the water.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>In the monsoon season, the rice paddies become mirrors.</p>
+<p>You see the sky above you, the clouds, the birds. But sometimes &mdash; sometimes you see other things. A door that is not there. A face that does not belong to anyone you know. A version of yourself standing on the opposite bank, wearing different clothes.</p>
+<p>A young farmer &mdash; call him Heng &mdash; saw his own reflection in the paddy at twilight. But the face was older, wearier, and it was smiling.</p>
+<p>&ldquo;You are going to give away the land,&rdquo; the reflection said.</p>
+<p>&ldquo;I am not,&rdquo; Heng said.</p>
+<p>&ldquo;You will. To pay the doctor. Your mother is sick.&rdquo;</p>
+<p>Heng ran home. His mother was fine. She was cooking rice. He did not give away the land.</p>
+<p>The next twilight, the reflection was younger. It was a child's face, his own, from before his father had died.</p>
+<p>&ldquo;You are going to give away the land,&rdquo; the child said.</p>
+<p>&ldquo;I am not,&rdquo; Heng said.</p>
+<p>&ldquo;You will. To pay the tax collector. The mandala demands its tithe.&rdquo;</p>
+<p>Heng checked his records. The tax collector was not due for three months. He did not give.</p>
+<p>The third twilight, the reflection was a stranger. It wore a silver mask with no eyeholes.</p>
+<p>&ldquo;You will give away the land,&rdquo; it said.</p>
+<p>Heng was angry. &ldquo;No.&rdquo;</p>
+<p>The reflection reached out of the water and touched his foot. Its hand was cold. &ldquo;Then your daughter will give it. Or her daughter. The land does not belong to you. It belongs to the spirit who was here before the first seed was planted. You are only borrowing it. And the borrowing has a limit.&rdquo;</p>
+<p>Heng knelt. &ldquo;What does the spirit want?&rdquo;</p>
+<p>&ldquo;A story. A story that has never been told. Speak it into the water at the next full moon, and the bond will be renewed.&rdquo;</p>
+<p>He did. He told the story of how his grandmother had found the land &mdash; not by conquest, not by purchase, but by saving a child from drowning. The child was the spirit's own. The spirit had never known.</p>
+<p>The water rippled. The reflection bowed. The land was his.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;Every field has a keeper. The keeper does not care about your deeds or your silver. It cares whether you know its name.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Paddy Mirror</strong> &mdash; A spirit that lives in still water, visible only at twilight. It shows the future to those who do not ask, and the past to those who do not listen. Its touch is cold; its voice is the sound of water dripping.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>To speak with the spirit, a character must kneel at the water's edge at twilight and offer a story no one has heard. On success (<em>Spirit + Lore</em>, DV 4), the spirit answers one question about the land.</li>
+<li>On failure, the spirit shows a vision of the character's worst fear. The GM gains 1 SB, and the character marks 1 Fatigue.</li>
+<li><strong>Clock: Borrowed Ground [6]</strong> &ndash; ticks each time the land is used without acknowledgment. When full, the spirit demands a name, a memory, or a story. Refusal causes crops to fail for a season.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A village's rice harvest is failing. The farmers blame drought. The spirit says the land was transferred without its permission. The party must find the missing agreement &mdash; or negotiate a new covenant.</p>
+<h3 id="the-well-that-did-not-sing">The Well That Did Not Sing</h3>
+<h4 id="told-by">Told by</h4>
+<p>The daughter of a well-keeper in Ayokha, who learned the spirit's name from her mother and her mother's mother.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>Every well has a singer. You cannot hear it unless you have drunk from the well and never wasted the water. The song is not music. It is the sound of the water remembering the sky.</p>
+<p>One well &mdash; in a village called Tham Luang &mdash; stopped singing.</p>
+<p>The villagers panicked. Without the song, the water grew bitter. The crops wilted. The children dreamed of drowning.</p>
+<p>The well-keeper went down the rope. She found the spirit sitting at the bottom, its mouth sewn shut with silver thread.</p>
+<p>&ldquo;Who did this?&rdquo; she asked.</p>
+<p>The spirit could not answer. It pointed up.</p>
+<p>She climbed out. She gathered the village elders. &ldquo;Someone in this village has sewn the well's mouth. Confess, or the well will die.&rdquo;</p>
+<p>No one confessed.</p>
+<p>The well-keeper said, &ldquo;Then I will cut the thread myself.&rdquo; She descended again, carrying a knife blessed by the god-king.</p>
+<p>The spirit stopped her. It wrote in the mud: <em>The thread is your own silence. You have not spoken the truth in twenty years.</em></p>
+<p>The well-keeper wept. She had been hiding a secret &mdash; a death she had caused, a blame she had let fall on another. She climbed out. She confessed.</p>
+<p>The thread dissolved. The well sang again.</p>
+<p>The village did not forgive her. But they did not throw her out either. They built a new well, and she became its keeper. She sang to it every morning. The song told the truth. No one asked her what it said.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;The well sings your secrets. If you do not want to hear them, do not drink.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Silent Well</strong> &mdash; A well whose spirit has been bound by an unspoken lie. It will not sing until the liar confesses. While silent, the water is bitter and causes nightmares.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>Drinking from the well forces a <em>Wits + Resolve</em> test (DV 4) or the drinker must reveal a secret within the next day.</li>
+<li>To restore the well, a character must speak a truth they have never told. The truth must be meaningful (GM discretion). The well then sings for one year.</li>
+<li><strong>Clock: The Bitter Water [6]</strong> &ndash; ticks each time a character drinks from the well without confessing. When full, the drinker gains the Condition <em>Silenced</em> (cannot speak in complete sentences until they confess or have the truth extracted by magic).</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A village's wells have all gone silent. The keeper is dead, and no one knows the last secret she took to her grave. The party must find the truth &mdash; or dig a new well.</p>
+<h3 id="the-fhara-water-clock">The Fhara Water-Clock</h3>
+<h4 id="told-by">Told by</h4>
+<p>Suleiman the Oasis-Master, a Fhara caravaneer who carried a water-timer made of brass and glass. He never arrived late to any rendezvous.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Fhara do not measure time by the sun. The sun lies. It moves differently in the desert than it does in the mountains, and it forgets to set when the wells are dry. Instead, they measure time by water.</p>
+<p>A water-timer is a vessel with a small hole in the bottom. It fills at dawn, empties by noon, and is refilled three times before the evening prayer. There is a story that the first water-timer was not a timer at all, but a marriage agreement.</p>
+<p>A Fhara woman &mdash; call her Fatima &mdash; was promised to a man she did not love. Her father was a well-digger; her suitor was a spice merchant. The merchant offered seven camels and a chest of saffron. Fatima offered a counter-bargain.</p>
+<p>&ldquo;Let the water-timer decide,&rdquo; she said. &ldquo;If it empties before I return from the deep well, I will marry you. If it still holds water when I climb out, you will leave this oasis and never return.&rdquo;</p>
+<p>The merchant laughed. The deep well was thirty fathoms. She would be gone for hours. He agreed.</p>
+<p>Fatima climbed down. She did not climb up. She sat at the bottom of the well, waiting. The water-timer dripped. One hour. Two. Three.</p>
+<p>At the fourth hour, the water was still dripping. The merchant began to worry. At the fifth hour, he lowered a rope. Fatima tied it to a bucket of sand. He pulled up sand. She stayed below.</p>
+<p>At the sixth hour, the water-timer was empty. The merchant called down, &ldquo;The timer is dry! You have lost!&rdquo;</p>
+<p>Fatima laughed. &ldquo;You filled the timer at dawn. Today is the summer solstice. The water evaporates faster than it drips. The timer has been telling lies since noon.&rdquo;</p>
+<p>The merchant looked at the timer. The brass was hot. The water was gone. He had been tricked by his own agreement.</p>
+<p>He left. Fatima married a well-digger's son. They built a new water-timer that compensated for heat and cold. It is still used in that oasis, and every year on the solstice, they add a stone to a cairn &mdash; one for each hour the timer is allowed to lie.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;Time is water. Water is a promise. Read the current before you let it drip.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Water-Timer of the Solstice</strong> &mdash; A Fhara timepiece that measures water, not hours. It can be calibrated to tell different truths. On the solstice, it lies. Those who know its secrets can use the lie to break any timed agreement.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>Once per year (GM's discretion), a character who understands the timer's mechanism may declare that a time-sensitive agreement is invalid due to &ldquo;evaporation error.&rdquo; The agreement is voided; the other party suffers &ndash;2 dice to all actions for a day (confusion).</li>
+<li>Using the timer for this purpose requires a <em>Wits + Craft</em> test (DV 5). On a miss, the timer cracks and becomes useless until repaired (a downtime project).</li>
+<li><strong>Clock: The Dripping Reckoning [4]</strong> &ndash; ticks each time the timer is used outside of the solstice. When full, the water spirit inside the timer awakens and demands a sacrifice (a memory, an oath, or a finger).</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A merchant is trying to force a caravan master to honor a bond that comes due at noon. The caravan master has a water-timer &mdash; but it was damaged in a storm. The party must repair it before the deadline, or find another way to prove the agreement fraudulent.</p>
+<h3 id="the-kuva-s-road">The Kuva's Road</h3>
+<h4 id="told-by">Told by</h4>
+<p>An old Kuva woman at a caravanserai on the Way of Silk, who had walked from the Crimson Basin to the Inland Sea and back again. She smelled of cardamom and dust.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Kuva do not build roads. They walk them. And when they walk, they leave behind a trail not of stones but of promises.</p>
+<p>A young Kuva &mdash; call him Dastan &mdash; was tasked with delivering a message from the Satrapy of Dhahara to the court of the God-King in Ayokha. The message was sealed with brass and wax. He was not to open it.</p>
+<p>He walked for forty days. On the forty-first, he met a Pereshi merchant who offered him a fortune to see the seal. Dastan refused.</p>
+<p>&ldquo;Then walk with me,&rdquo; the merchant said. &ldquo;I will carry your pack.&rdquo;</p>
+<p>Dastan agreed. They walked together for ten days. On the tenth, the merchant asked again. Dastan refused.</p>
+<p>&ldquo;Then let me carry your water,&rdquo; the merchant said.</p>
+<p>Dastan agreed. They walked another ten days. On the tenth, the merchant asked again. Dastan refused.</p>
+<p>&ldquo;Then let me carry your burden,&rdquo; the merchant said. &ldquo;I will take whatever weight you carry.&rdquo;</p>
+<p>Dastan stopped. &ldquo;I carry nothing.&rdquo;</p>
+<p>&ldquo;Everyone carries something,&rdquo; the merchant said. &ldquo;The road. The water. The ground you borrow. You have been borrowing the world's patience for sixty days. Let me help.&rdquo;</p>
+<p>Dastan looked at the road ahead. He thought of his mother, who had died while he walked. He thought of the message he carried, which he would never read. He thought of the fortune he had refused.</p>
+<p>&ldquo;No,&rdquo; he said. &ldquo;The weight is mine.&rdquo;</p>
+<p>He walked on. The merchant did not follow.</p>
+<p>When Dastan reached the God-King's court, he was forty days late. The message was a treaty &mdash; an offer of peace between Dhahara and Ayokha. The offer had expired.</p>
+<p>The God-King was angry. &ldquo;You have brought us nothing but a dead promise.&rdquo;</p>
+<p>Dastan knelt. &ldquo;I have brought you forty days of walking. Forty days of refusing. Forty days of not taking what was not mine to take.&rdquo;</p>
+<p>The God-King looked at him. &ldquo;What is your name?&rdquo;</p>
+<p>&ldquo;Dastan, son of no one.&rdquo;</p>
+<p>&ldquo;Then you will be the son of this court. Rise. The treaty is expired. But a promise kept is worth more than a treaty signed. We will make a new one.&rdquo;</p>
+<p>Dastan became the God-King's messenger. He never carried a sealed letter again. He carried only his own word &mdash; and it was enough.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A borrowed road is not a stolen one. Walk it clean, and the road will remember. Walk it greedy, and the road will eat you.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Unopened Seal</strong> &mdash; A message sealed with brass and wax. If carried without being opened for the length of a journey (at least 40 days), the carrier gains the ability to speak one truth that cannot be denied. The message itself becomes inert, but the carrier's word gains supernatural weight.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who carries a sealed message for 40 days without opening it may, upon delivery, declare one statement that listeners must accept as true (no roll). This can be used to end a dispute, force a confession, or reveal a lie.</li>
+<li>The statement cannot be longer than a single sentence. After use, the character loses the ability to lie convincingly for a week (<em>&ndash;2 dice to Deception</em>).</li>
+<li><strong>Clock: The Road's Reckoning [6]</strong> &ndash; ticks each time the character accepts a gift or favor while carrying the message. When full, the message opens itself, and the character forgets the message's contents. The GM gains 3 SB.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A courier has disappeared with a sealed treaty. The treaty is the only thing preventing a war. The party must find the courier &mdash; but the courier has been walking for forty days, refusing to open the seal, and is now somewhere in the desert, guarded by a Pereshi merchant who wants the treaty for himself.</p>
+<h3 id="the-bamboo-taboo">The Bamboo Taboo</h3>
+<h4 id="told-by">Told by</h4>
+<p>An Aelaerem hedge-witch who lived in a hollow tree and spoke only in odd numbers.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>In a village at the edge of the Bamboo Forest, there was a rule: never sneeze seven times in a row.</p>
+<p>If you sneezed once, you covered your mouth. Twice, you excused yourself. Thrice, you left the room. Four times, you drank ginger tea. Five times, you lay down. Six times, you called for the healer.</p>
+<p>Seven times, you prayed.</p>
+<p>A child &mdash; call her Yuki &mdash; did not know the rule. She sneezed seven times, and a shadow stood in the corner of her room.</p>
+<p>&ldquo;You have summoned me,&rdquo; the shadow said. &ldquo;I am the Keeper of the Seventh Exhalation. I take what escapes.&rdquo;</p>
+<p>Yuki did not understand. &ldquo;What escapes?&rdquo;</p>
+<p>&ldquo;Your name. Your shadow. Your last breath. You have none left.&rdquo;</p>
+<p>The child ran to her grandmother. The grandmother knelt and said to the shadow, &ldquo;Take mine instead.&rdquo;</p>
+<p>The shadow considered. &ldquo;Why?&rdquo;</p>
+<p>&ldquo;Because I do not need it. I am old. I have sneezed seven times many years ago. I have been borrowing time ever since.&rdquo;</p>
+<p>The shadow took the grandmother's name. The grandmother forgot who she was. But the child lived.</p>
+<p>The village carved a new rule into the shrine gate: <em>Count to six. Stop. The seventh sneeze is a door.</em></p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;The body knows when to stop. The spirit knows when to ignore the body. Listen to both, or you will sneeze away something you cannot borrow back.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Keeper of the Seventh Exhalation</strong> &mdash; A spirit that appears when a mortal sneezes seven times in a row. It claims the &ldquo;seventh exhalation&rdquo; &mdash; which can be a name, a shadow, a memory, or a breath. It can be bargained with, but it always takes something.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who rolls a critical failure on an Endurance test may sneeze uncontrollably. The GM may declare that the character sneezes seven times, summoning the Keeper.</li>
+<li>The Keeper demands a payment: a name (the character forgets a significant NPC), a shadow (the character loses their shadow for 1d4 days; &ndash;1 Position on Stealth), or a memory (lose 1 XP).</li>
+<li>The character may offer a substitute: another character may volunteer a payment, or the party may offer a story (<em>Spirit + Performance</em>, DV 5). On success, the Keeper takes the story and leaves.</li>
+<li><strong>Clock: Borrowed Exhalations [4]</strong> &ndash; ticks each time the Keeper is summoned but not paid. When full, the Keeper claims the entire party's names for one night; they cannot introduce themselves, and no one remembers them until dawn.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A village has a plague of sneezing. The Keeper is collecting from the sick. The party must find a way to stop the sneezes &mdash; or convince the Keeper to take a different toll.</p>
+<h2 id="iii-the-monsoon-courts">III. The Monsoon Courts</h2>
+<h3 id="the-viceroy-s-elephant">The Viceroy's Elephant</h3>
+<h4 id="told-by">Told by</h4>
+<p>An old Aeler tunnel-wright who had served three viceroys and lost two fingers to a keystone. He spoke in a whisper, even though we were alone.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Aeler came to Dhahara on the backs of elephants. Not war elephants &mdash; those came later. The first elephants were surveyors, carrying stone-cutters and record-books up the passes. The Aeler measured the mountains. Then they measured the people.</p>
+<p>A Dhaharan prince &mdash; call him Vikram &mdash; watched the viceroy's elephant trample his father's rice paddy. He did not speak. He walked to the viceroy's court and knelt.</p>
+<p>&ldquo;My father's paddy is ruined. The elephant carries a weight against us.&rdquo;</p>
+<p>The viceroy laughed. &ldquo;The elephant carries nothing. It is an animal. You carry a weight for grazing on its path.&rdquo;</p>
+<p>Vikram stood. &ldquo;Then I will bear that weight. But the elephant must first bear its own. A burden is a burden.&rdquo;</p>
+<p>The viceroy was curious. He agreed. The elephant would be weighed against a single grain of wheat. If the wheat was heavier, the elephant would trample another field. If the elephant was heavier, Vikram would be given a year's grain.</p>
+<p>They brought the scales. They placed the elephant on one side. They placed a single grain of wheat on the other.</p>
+<p>The elephant was heavier.</p>
+<p>Vikram smiled. &ldquo;The weight is lifted.&rdquo;</p>
+<p>The viceroy was furious. &ldquo;You tricked me.&rdquo;</p>
+<p>&ldquo;I did not,&rdquo; Vikram said. &ldquo;The scale is honest. The elephant weighs more than a grain. You did not ask what the elephant weighed against. You asked to weigh the elephant against a grain.&rdquo;</p>
+<p>The viceroy paid. Vikram became a folk hero. He never challenged the viceroy again. But every time an Aeler elephant trampled a field, the farmers would whisper, &ldquo;Weigh it against a grain.&rdquo;</p>
+<p>The elephant never won again.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;An agreement is a scale. If you choose the wrong weight, you will always lose. Choose carefully. The Aeler do.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Viceroy's Scales</strong> &mdash; A set of weigh-house scales that can be used to settle any dispute, provided both parties agree on the terms. But the terms are always chosen by the one who holds the grain.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>The scales can resolve a dispute between two parties. Each party names a weight (an object, a promise, a memory). The scales determine which is heavier. The result is binding.</li>
+<li>A character may cheat by choosing a weight that is symbolic rather than literal (e.g., &ldquo;a grain of truth&rdquo;). The GM decides if the cheat works.</li>
+<li><strong>Clock: The Viceroy's Patience [6]</strong> &ndash; ticks each time the scales are used to defy an Aeler official. When full, the viceroy sends a tax collector to audit the user's entire community.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Dhaharan village has been using the viceroy's scales to cheat on taxes. The viceroy has noticed. He has sent an auditor &mdash; and a squad of elephant cavalry. The party must find a way to settle the dispute before the elephants trample the village.</p>
+<h3 id="the-monsoon-s-daughter-taharka-ngomebe-ayokha">The Monsoon's Daughter (Taharka, Ngomebe, Ayokha)</h3>
+<h4 id="told-by">Told by</h4>
+<p>A Taharkan spice merchant who had sailed from the Monsoon Coast to the Inland Sea and back again. She smelled of cardamom and salt.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The monsoon is not a wind. It is a woman. She has three daughters: one who brings rain to Taharka, one who brings grain to Ngomebe, and one who brings ships to Ayokha.</p>
+<p>The eldest daughter &mdash; call her Rani &mdash; fell in love with a Dhaharan sailor. She followed his ship across the sea. The rain stopped in Taharka. The crops failed. The king sent a messenger.</p>
+<p>&ldquo;Return, daughter. Your people need you.&rdquo;</p>
+<p>Rani refused. &ldquo;The sailor needs me more.&rdquo;</p>
+<p>The messenger returned to the king. The king consulted the spirits. They said, &ldquo;A trade. One monsoon for one story. If the story is good, the daughter returns.&rdquo;</p>
+<p>The king did not know any stories. He sent a Tulkani storyteller instead.</p>
+<p>The storyteller sat on the shore and told a tale of a woman who loved a sailor and drowned. The sea was her grave. The monsoon was her tears.</p>
+<p>Rani heard the tale. She wept. The sailor did not drown &mdash; but the story made her feel his drowning. She returned to Taharka. The rains started again.</p>
+<p>The king asked the storyteller, &ldquo;What did you tell her?&rdquo;</p>
+<p>&ldquo;The truth,&rdquo; the storyteller said. &ldquo;A truth she had not yet lived. Sometimes that is enough.&rdquo;</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;The monsoon is a story. Tell it right, and it will rain. Tell it wrong, and the ships will wait.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Monsoon's Daughter</strong> &mdash; A spirit of the rains. She can be persuaded to bring or withhold rain by the telling of a story. The story must be true &mdash; not necessarily factual, but emotionally true.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who knows a story that moves the Monsoon's Daughter may roll <em>Spirit + Performance</em> (DV 5). On success, the rains come within 1d4 days. On failure, the rains delay for another week.</li>
+<li>The story can be about any subject, but it must be new to the Daughter. She has heard most tales; the storyteller must improvise.</li>
+<li><strong>Clock: The Monsoon's Patience [8]</strong> &ndash; ticks each time a story fails to move her. When full, the Daughter returns to her mother and does not speak to mortals for a generation.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> The monsoon has failed. The spice fleet is stranded. The king has offered a fortune to anyone who can bring the rains. The party knows a story &mdash; but will it be enough?</p>
+<h3 id="the-aelinnel-bell-and-the-aelaerem-cup">The Aelinnel Bell and the Aelaerem Cup</h3>
+<h4 id="told-by">Told by</h4>
+<p>Two voices: an Aelinnel bell-tender named Greta and an Aelaerem hedge-witch named Thistle. They told the tale together, interrupting each other, finishing each other's sentences.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>Aelinnel and Aelaerem have lived in Dhahara since before the hills had names. The Aelinnel count steps. The Aelaerem pour cups. They agree on very little.</p>
+<p>A famine came. The Aelinnel bell-tender rang her bell eight times. The Hollow did not answer. The hedge-witch poured eight cups. The Hollow did not drink.</p>
+<p>&ldquo;The Hollow is full,&rdquo; the witch said.</p>
+<p>&ldquo;The Hollow is deaf,&rdquo; the bell-tender said.</p>
+<p>They argued. A child &mdash; neither gnome nor halfling, but something in between &mdash; spoke up.</p>
+<p>&ldquo;Why do you need the Hollow? Why not speak to each other?&rdquo;</p>
+<p>The bell-tender and the hedge-witch looked at each other. They had never tried.</p>
+<p>The bell-tender rang the bell for the witch. The witch poured a cup for the bell-tender. They shared the cup. The bell echoed.</p>
+<p>The Hollow did not stir. But the famine ended. The rains came. The Aelinnel and the Aelaerem did not become friends &mdash; but they became neighbors. And sometimes, that is enough.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;The Hollow is not the only listener. Sometimes the person next to you is enough.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Shared Threshold</strong> &mdash; A place where Aelinnel and Aelaerem customs meet. A bell and a cup sit side by side. Those who use both receive a blessing; those who use neither are ignored.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who rings the bell and pours the cup gains +2 dice on their next roll (the blessing of two peoples).</li>
+<li>A character who uses only one custom gains no benefit &mdash; the threshold does not recognize partial effort.</li>
+<li><strong>Clock: The Hollow's Curiosity [6]</strong> &ndash; ticks each time the bell and cup are used together. When full, the Hollow sends a messenger. The messenger offers a bargain &mdash; one wish, one price.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> An Aelinnel village and an Aelaerem village share a well. The well has run dry. The only way to restore it is for the two peoples to perform a joint ritual &mdash; but they cannot agree on whether to ring the bell first or pour the cup first.</p>
+<h3 id="the-lethai-ar-s-silk-bridge">The Lethai-ar's Silk Bridge</h3>
+<h4 id="told-by">Told by</h4>
+<p>A Lethai-ar silk-weaver who lived in the Crimson Valley. She spoke through a curtain of red thread, her voice soft as running water.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>The Lethai-ar do not build bridges of stone. Stone cracks. They build bridges of silk. Silk bends. Silk remembers.</p>
+<p>A Dhaharan prince &mdash; call him Arjun &mdash; needed to cross a gorge. The Aeler viceroy had sealed the mountain pass. The only other route was a Lethai-ar silk bridge, strung between two cliffs.</p>
+<p>The Lethai-ar agreed to let him cross &mdash; for a price. &ldquo;Give us your name.&rdquo;</p>
+<p>Arjun laughed. &ldquo;My name is worthless.&rdquo;</p>
+<p>&ldquo;Your name is a thread,&rdquo; the weaver said. &ldquo;We will weave it into the bridge. When you cross, the bridge will know you.&rdquo;</p>
+<p>Arjun gave his name. He crossed. The bridge held. He returned to his kingdom.</p>
+<p>Years later, the Aeler viceroy attacked. Arjun's army was outnumbered. He returned to the Lethai-ar.</p>
+<p>&ldquo;Let me cross again.&rdquo;</p>
+<p>The weaver shook her head. &ldquo;Your name is already in the bridge. You do not need to pay again. But the bridge has been waiting for you. It will not hold for anyone else.&rdquo;</p>
+<p>Arjun led his army across. The bridge swayed. The silk sang. The Aeler pursuers tried to follow. The bridge dropped them into the gorge.</p>
+<p>Arjun won his kingdom. He never gave his name to anyone again. But he visited the Lethai-ar every year, and he always brought silk.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;A name woven into silk is a promise. The silk remembers. The bridge holds &mdash; or it does not.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Silk Bridge</strong> &mdash; A Lethai-ar bridge that records the names of those who cross. A named person may cross freely; a stranger must pay a toll. The bridge judges the weight of the name, not the coin.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character whose name is woven into the bridge may cross at any time without toll.</li>
+<li>A character who gives a false name triggers the bridge's trap: the silk wraps around them, immobilizing them until they speak their true name.</li>
+<li><strong>Clock: The Bridge's Memory [8]</strong> &ndash; ticks each time a false name is given. When full, the bridge begins to fray. It can still be crossed, but each crossing costs 1 Fatigue (the silk pulls at the traveler's memory).</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Lethai-ar silk bridge has begun to sag. The weaver is dead. The names in the bridge are fading. The party must find a way to re-weave the bridge &mdash; or cross before it collapses.</p>
+<h3 id="the-viceroy-s-dream-ikasha">The Viceroy's Dream (Ikasha)</h3>
+<h4 id="told-by">Told by</h4>
+<p>A Tulkani storyteller &mdash; myself &mdash; at a fire in the Himadri foothills. The audience was a group of Aeler miners who had not heard Ikasha's name before.</p>
+<h4 id="the-tale">The Tale</h4>
+<p>Ikasha sleeps. She has slept for a thousand years. But she dreams. And in her dreams, she whispers.</p>
+<p>A miner &mdash; call him Durin &mdash; worked in the deep galleries. He was tired. He was cold. He was afraid of the dark.</p>
+<p>One night, he fell asleep at his post. He dreamed of a woman with black hair and blacker eyes. She sat in a stone chair, her hands folded in her lap.</p>
+<p>&ldquo;You are afraid,&rdquo; she said.</p>
+<p>&ldquo;Yes,&rdquo; Durin said.</p>
+<p>&ldquo;Of the dark?&rdquo;</p>
+<p>&ldquo;Of the dark. Of the stone. Of the mountain falling.&rdquo;</p>
+<p>She nodded. &ldquo;I am the dark. I am the stone. I am the mountain. You are not afraid of me. You are afraid of what I might do.&rdquo;</p>
+<p>Durin was silent.</p>
+<p>&ldquo;I will not do anything,&rdquo; she said. &ldquo;I sleep. I dream. I whisper. That is all.&rdquo;</p>
+<p>&ldquo;What do you whisper?&rdquo;</p>
+<p>&ldquo;The truth. That the mountain is not your master. That the viceroy is not your king. That you are awake &mdash; and I am not.&rdquo;</p>
+<p>Durin woke. He told the other miners. They began to whisper her name. The viceroy heard. He sent a priest to investigate.</p>
+<p>The priest found the miners whispering in the dark. He asked, &ldquo;What are you whispering?&rdquo;</p>
+<p>&ldquo;The name of the dreamer,&rdquo; they said.</p>
+<p>The priest left. He did not report them. He whispered Ikasha's name that night in his own bed.</p>
+<p>The viceroy never found out. But the mines grew quieter. The miners worked slower. They were not afraid anymore. They were waiting.</p>
+<h4 id="the-witch-s-closing">The Witch's Closing</h4>
+<p>&ldquo;Ikasha does not command. She whispers. A whisper is not a rebellion. It is the seed of one.&rdquo;</p>
+<h4 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h4>
+<p><strong>The Whisper of Ikasha</strong> &mdash; A current that spreads through dreams. Those who hear Ikasha's whisper gain +1 die to resist fear, but they become more visible to the viceroy's spies.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who whispers Ikasha's name before sleeping gains +1 die to resist fear for the next day.</li>
+<li>Each time a character uses this benefit, they mark 1 Exposure (the viceroy's network may notice).</li>
+<li><strong>Clock: The Viceroy's Attention [6]</strong> &ndash; ticks each time a character uses Ikasha's whisper in a public place. When full, the viceroy sends an auditor to interrogate the character's community.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> The viceroy has heard rumors of the whisper. He has sent a censor to the mining camps. The party must protect those who carry the whisper &mdash; or use the whisper to turn the censor against his master.</p>
+<h2 id="iv-customs-of-the-southern-and-eastern-roads">IV. Customs of the Southern and Eastern Roads</h2>
+<h3 id="appendix-customs-of-the-southern-roads">Appendix: Customs of the Southern Roads</h3>
+<p>chapterAppendix: Customs of the Southern Roads</p>
+<p>[h] p4cm p4cm X <strong>Custom</strong> &amp; <strong>Culture</strong> &amp; <strong>Consequence of Breaking</strong> Do not stare into the Blue Fire. &amp; Pereshi (fire-temples) &amp; You see the dead. You may not look away. Turn the lamp a quarter degree to judge a ship. &amp; Sidhi (lighthouses) &amp; The lamp may wreck a different ship. Answer the djinn's three questions truthfully. &amp; Hyaar (high passes) &amp; The djinn may keep your answer &mdash; or you. Tie nine knots in a rope to witness a promise. &amp; Sidhi (freedmen) &amp; The law hesitates. The witnesses remember. Tell a story to the river before crossing. &amp; Aeler (bridges) &amp; The bridge may collapse. The river may take a life. A carpet's border shows unsettled weights. &amp; Pereshi (weavers) &amp; The weights grow. The carpet unravels. The weigh-master's scale measures truth. &amp; Oshiira (grain trade) &amp; A single grain of guilt tips the balance. A Veiled Sister's seal shows what you believe. &amp; Ashaan (indenture) &amp; Break it, and she will see your face. A walking city's keystone cracks with every broken vow. &amp; Ngomebe (Mason-Kin) &amp; The city stops. The stone must hear a confession. A door that rings eight times should never answer a ninth. &amp; Aelinnel (gnomes) &amp; The Hollow opens. You may not return. A cup that overflows invites the Hollow. &amp; Aelaerem (halflings) &amp; A spirit will ask for a memory. The Walking Promise accepts only stories. &amp; All &amp; A story buys time. No story buys nothing.</p>
+<p>These are not laws. They are courtesies extended to the spirits who share the world. Violate them, and the spirits will not punish you &mdash; they will simply stop being polite.</p>
+<p>And impolite spirits are the most dangerous kind.</p>
+<h3 id="appendix-taboos-and-customs-of-the-eastern-roads">Appendix: Taboos and Customs of the Eastern Roads</h3>
+<p>chapterAppendix: Taboos and Customs of the Eastern Roads</p>
+<p>The following customs appear in these tales. They are not exhaustive. They are not universal. They are simply true enough to be useful.</p>
+<p>[h] p4cm p4cm X <strong>Custom</strong> &amp; <strong>Culture</strong> &amp; <strong>Consequence of Breaking</strong> Never pour the ninth cup. &amp; Ayokha, Aelaerem &amp; The Hollow Bride may attend your feast. Never sneeze seven times in a row. &amp; Nihori (bamboo villages) &amp; The Keeper claims your next exhalation. Count to eight before opening a door that has been closed for a season. &amp; Aelaerem (all) &amp; The Hollow watches from the threshold. Leave a gift for a fox's wedding. &amp; Nihori (forest shrines) &amp; The foxes remember. They always remember. Do not drink from a silent well. &amp; Ayokha (river valleys) &amp; You must confess a secret or go thirsty. Ring the bell before crossing a bridge. &amp; Inland Sea (all) &amp; The bridge demands a hand. The seventh sneeze is a door. &amp; Nihori, Aelaerem &amp; <em>Do not open it.</em> Water-timer agreements expire at solstice. &amp; Fhara (oasis courts) &amp; The agreement is void; the liar pays double. A sealed message carried forty days cannot be opened. &amp; Kuva (Way of Silk) &amp; The word becomes truth; the carrier cannot lie. A borrowed road is not a stolen one. &amp; All &amp; The road remembers; it may not let you pass again.</p>
+<p>These are not laws. They are courtesies extended to the spirits who share the world. Violate them, and the spirits will not punish you &mdash; they will simply stop being polite.</p>
+<p>And impolite spirits are the most dangerous kind.</p>
+<h3 id="appendix-customs-of-the-dhaharan-roads">Appendix: Customs of the Dhaharan Roads</h3>
+<p>chapterAppendix: Customs of the Dhaharan Roads</p>
+<p>[h] p4cm p4cm X <strong>Custom</strong> &amp; <strong>Culture</strong> &amp; <strong>Consequence of Breaking</strong> Weigh an elephant against a grain of wheat. &amp; Dhaharan (folk) &amp; The elephant may refuse to move. Offer a name instead of silver. &amp; Mykkielan (western) &amp; The name becomes property of the court. Tell a true story to bring the rains. &amp; Monsoon peoples &amp; The story may not be sufficient. Ring the bell and pour the cup together. &amp; Aelinnel &amp;amp; Aelaerem &amp; The Hollow notices. Weave a name into silk to cross a bridge. &amp; Lethai-ar (Crimson Valley) &amp; The bridge may forget you. Whisper Ikasha's name before sleep. &amp; Tulkani &amp;amp; miners &amp; The viceroy's spies may hear. Give a gift to a sentinel. &amp; Lethai-al (forest) &amp; The sentinel may speak. Not speaking is the greater gift.</p>
+<h2 id="v-what-the-storytellers-left-unfinished">V. What the Storytellers Left Unfinished</h2>
+<h3 id="postscript-a-map-of-unwritten-tales">Postscript: A Map of Unwritten Tales</h3>
+<p>chapterPostscript: A Map of Unwritten Tales</p>
+<p>This is the third cycle. There will be a fourth.</p>
+<p>I have heard whispers of a place called the Crimson Basin, where the river runs red with iron and the spirits are older than the first empire. I have heard of a desert called the Wound, where the Veiled Sisters bind slaves to their service with magic that has no name. I have heard of walking cities that move across the plateau, and of a temple where the Kalrantha amulet was first sealed.</p>
+<p>I do not know if I will write those tales. The road is long, and the ink is expensive.</p>
+<p>But I carry a promise to the Pereshi, and to the Sidhi, and to the Hyaar, and to all the peoples of the southern lands. I have returned some of what I borrowed. Not all.</p>
+<p>A cycle is never closed. It is only passed to the next teller.</p>
+<h3 id="postscript-a-letter-found-in-the-binding">Postscript: A Letter Found in the Binding</h3>
+<p>chapterPostscript: A Letter Found in the Binding</p>
+<p>To whoever reads this book after me:</p>
+<p>I have told seven stories, and three more besides. But the baronet was right about one thing: a promise was left unreturned.</p>
+<p>Not to him. To the road.</p>
+<p>When I was young, I borrowed a tale from a Pereshi storyteller in the port of Zakov. He told it to me in exchange for a cup of tea. I promised to tell it to someone else &mdash; to pass it along, as the Pereshi do. I never did. I forgot.</p>
+<p>This winter, I remembered. The baronet's fire, the silence of the manor, the way his greyhounds listened with their ears forward &mdash; it reminded me of that night in Zakov, with the salt wind and the storyteller's voice.</p>
+<p>I have not told his tale here. It is not mine to write. But I have written a different tale &mdash; the one about the Kuva and the sealed message &mdash; and I have left a space for his.</p>
+<p>The Pereshi storyteller's name was Kaveh. He had a scar on his left hand and a laugh that sounded like breaking glass. If you meet him, tell him the promise is acknowledged. He will know what it means.</p>
+<p>And if you do not meet him &mdash; tell the tale yourself. Borrow it. Keep it warm. Pass it on.</p>
+<p>That is the only way to return a promise to the Pereshi.</p>
+
+<hr>
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    The Salt and the Silk<br>
+    &copy; Nicholas A. Gasper &mdash; For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>

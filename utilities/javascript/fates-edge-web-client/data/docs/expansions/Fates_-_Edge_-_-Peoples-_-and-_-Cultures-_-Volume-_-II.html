@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peoples and Cultures, Volume II</title>
+<style>
+    :root {
+        --bg1: #0a0c09;
+        --bg2: #12160e;
+        --bg3: #1a2013;
+        --bg4: #242c1b;
+        --text: #e6e8df;
+        --text2: #b2b8a4;
+        --text3: #7d8471;
+        --gold: #93a355;
+        --gold-hover: #a9bb66;
+        --border: #333a28;
+        --red: #8e3a2a;
+        --green: #3d7a52;
+        --blue: #3c6e8f;
+        --purple: #6a4f7a;
+        --orange: #a8752a;
+        --brass: #9c7a3c;
+        --mist: #4f6b73;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        background-image: radial-gradient(circle at 50% 0%, #141c0e 0%, #0a0c09 60%);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.6rem 0 0.35rem; }
+    h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.45rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+    h3 { font-size: 1.15rem; margin-top: 1.2rem; }
+    h4 { font-size: 0.98rem; color: var(--text); margin-top: 0.8rem; }
+    p { margin: 0.35rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.35rem 0 0.35rem 1.3rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-brass { border-left: 4px solid var(--brass); }
+    .panel-mist { border-left: 4px solid var(--mist); }
+    .panel > strong.title { display:block; color: var(--gold); margin-bottom:0.3rem; font-size:0.95rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        margin: 0.1rem 0.15rem 0.1rem 0;
+    }
+    .badge-gold { background: var(--gold); color: #10130a; }
+    .badge-red { background: var(--red); color: #fff; }
+    .badge-green { background: var(--green); color: #fff; }
+    .badge-blue { background: var(--blue); color: #fff; }
+    .badge-purple { background: var(--purple); color: #fff; }
+    .badge-orange { background: var(--orange); color: #fff; }
+    .badge-brass { background: var(--brass); color: #fff; }
+    .badge-mist { background: var(--mist); color: #fff; }
+    .badge-gray { background: var(--bg4); color: var(--text3); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.87rem; }
+    .text-xs { font-size: 0.75rem; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0.9rem 0; }
+    .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.7rem 1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.5rem; }
+    .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.87rem; break-inside: avoid; }
+    .toc a:hover { color: var(--gold); }
+    @media (max-width: 700px) { .toc { columns: 1; } }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 0.85rem; }
+    caption { text-align:left; caption-side: top; font-size:0.8rem; color: var(--text3); margin-bottom:0.2rem; font-style: italic; }
+    th, td { border: 1px solid var(--border); padding: 0.45rem 0.65rem; text-align: left; vertical-align: top; }
+    th { background: var(--bg3); color: var(--gold); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .talent-name { color: var(--gold); font-weight: 700; }
+    blockquote {
+        border-left: 3px solid var(--gold);
+        padding-left: 1rem;
+        margin: 0.6rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+    footer { font-size: 0.78rem; color: var(--text3); text-align: center; padding: 1.4rem 0 0.5rem; }
+
+        blockquote.epigraph { border-left: 3px solid var(--gold, #c9a227); padding: 0.3rem 0 0.3rem 1rem; margin: 0.6rem 0 0.9rem; font-style: italic; color: var(--text2); }
+        blockquote.epigraph cite { display:block; font-style:normal; font-size:0.78rem; color: var(--text3); margin-top:0.25rem; }
+    </style>
+</head>
+<body>
+
+<h1>Peoples and Cultures, Volume II</h1>
+<p class="text-sm text-muted" style="margin-bottom:1rem;"><span class="badge badge-gold">Expansion</span>
+    <span class="badge badge-blue">Playable Ancestries &amp; Cultures</span>
+    <span class="badge badge-green">Ykrul · Vilikari · Mistlands · Deep Roads</span>
+    <span class="badge badge-purple">Volume II</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
+
+<div class="frame">
+<p>Volume I covered the peoples who live where the roads are paved and the law is written down. This volume covers the rest of the north and east: the horse-peoples of the Violet Steppe and the road-people who trade with them, the provinces the mist took, and the polities under the stone that no surface charter recognises.</p>
+<p>What these peoples have in common is that none of them can be reached by a magistrate. They are governed &mdash; thoroughly, in some cases ferociously &mdash; but by compact, repute, hostage-string and salvage claim rather than by writ. A party that walks into any of them expecting to find someone in charge has already failed the first roll.</p>
+<p>Section V adds four peoples that the setting has always implied and never written down: steppe half-bloods, deep-road ratkin, the sky-sworn of the signal towers, and those born inside the Mistlands after the breath came. They are built exactly like every other entry here, and each is placed on a specific road with a specific grievance, because a people without either is a costume.</p>
+</div>
+
+<div class="toc" id="toc">
+    <h3>Contents</h3>
+
+    <div class="toc-section">I. The Ykrul &mdash; People of the Violet Steppe</div>
+    <a href="#ykrul-the-people-of-the-violet-steppe">Ykrul &mdash; The People of the Violet Steppe</a>
+    <a href="#the-ykrul-ways">The Ykrul Ways</a>
+    <a href="#repute-standing-debts">Repute, Standing, Debts</a>
+    <a href="#how-ykrul-win-beyond-the-blade">How Ykrul Win (beyond the blade)</a>
+    <a href="#the-vilikari-compact">The Vilikari Compact</a>
+    <a href="#regional-notes-quiet-variety">Regional Notes (quiet variety)</a>
+    <a href="#the-ykrul-thirty-six-sayings">The Ykrul Thirty-Six Sayings</a>
+    <a href="#the-ostrikari-ikari-host-of-the-open-steppe">The Ostrikari (Ikari) &mdash; Host of the Open Steppe</a>
+
+    <div class="toc-section">II. The Vilikari &mdash; The Road People</div>
+    <a href="#aveh-the-rider-behind-the-storm">Aveh &mdash; The Rider Behind the Storm</a>
+    <a href="#origins-and-shape">Origins &amp; Shape</a>
+    <a href="#law-hustle-and-how-they-win">Law, Hustle, and How They Win</a>
+    <a href="#etiquette">Etiquette</a>
+    <a href="#strings-receipts-you-can-spend">Strings (Receipts you can spend)</a>
+    <a href="#institutions-and-everyday-faces">Institutions &amp; Everyday Faces</a>
+    <a href="#relationships-on-the-edge">Relationships on the Edge</a>
+    <a href="#running-vilikari-pcs-hats-not-classes">Running Vilikari PCs (Hats, not classes)</a>
+
+    <div class="toc-section">III. The Mistlands</div>
+    <a href="#what-the-mistlands-are-now">What the Mistlands Are Now</a>
+    <a href="#peoples-of-the-mistlands">Peoples of the Mistlands</a>
+    <a href="#the-direwood-the-wound-in-the-world">The Direwood (The Wound in the World)</a>
+    <a href="#new-mechanics">New Mechanics</a>
+    <a href="#history-of-the-mistlands-gm-facing">History of the Mistlands (GM-Facing)</a>
+
+    <div class="toc-section">IV. The Deep Roads</div>
+    <a href="#i-peoples-and-polities-below">I. Peoples &amp; Polities Below</a>
+    <a href="#ii-geography-and-economies-of-depth">II. Geography &amp; Economies of Depth</a>
+    <a href="#iii-procedures-under-stone">III. Procedures Under Stone</a>
+    <a href="#iv-etiquette-and-law-position-wins">IV. Etiquette &amp; Law (Position wins)</a>
+    <a href="#vii-strings-and-diamonds-carry-these">VII. Strings &amp; Diamonds (carry these)</a>
+
+    <div class="toc-section">V. Four Peoples Newly Set Down</div>
+    <a href="#new-peoples-of-the-north-the-steppe-and-the-deep">New Peoples of the North, the Steppe and the Deep</a>
+
+</div>
+
+<h2 id="i-the-ykrul-people-of-the-violet-steppe">I. The Ykrul &mdash; People of the Violet Steppe</h2>
+<h3 id="ykrul-the-people-of-the-violet-steppe">Ykrul &mdash; The People of the Violet Steppe</h3>
+<h5 id="kon-reh-as-sacred-geometry-memory-of-the-wake-and-a-world-se">Kon'reh as sacred geometry, memory of the Wake, and a world seen in lines, weights, and exits</h5>
+<blockquote>
+<p>&ldquo;Through the Wake, Across the Meadow, Into the Stone.&rdquo;</p>
+</blockquote>
+<h5 id="i-the-great-migration-wake-law">I. The Great Migration (Wake-Law)</h5>
+<p>Ykrul memory begins with flight: homesteads abandoned under a wrong sky, flotillas stitched from last ropes, and an ocean learned by star and sound. They call that crossing the <strong>Great Wake</strong>. Every clan keeps a coil of salt-stiff rope&mdash;the <strong>Salt Line</strong>&mdash;uncoiled before serious speech to place all present &ldquo;under Wake-law&rdquo;: plain words, straight debts, no riddles.</p>
+<ul>
+<li><strong>First Meadow.</strong> Landfall was a long, violet grassland. Its color&mdash;ironweed, crocus, mallow&mdash;named their world: the <em>Violet Steppe</em>.</li>
+<li><strong>Wake Names.</strong> Many wear a second name granted by the sea (<em>Wave-Left</em>, <em>Stern-Watcher</em>), which can be invoked for one unlooked-for courtesy &ldquo;as kin on the crossing.&rdquo;</li>
+<li><strong>Rites that stuck.</strong> A handful of salt in a new road's rut; a black river stone atop an elder's cairn; a song that lists exits before listing enemies.</li>
+</ul>
+<p><em>How they think:</em> the Wake taught them that survival comes from reading <strong>flow</strong> (what moves), <strong>weight</strong> (what holds), and <strong>exit</strong> (what opens). Kon'reh will codify this&mdash;but the Wake is the first proof.</p>
+<h5 id="ii-lands-after-landfall">II. Lands After Landfall</h5>
+<h6 id="the-violet-steppe-meadow">The Violet Steppe (Meadow)</h6>
+<p>Wind, hooves, and shallow lakes. Herd-bands form <em>ring-camps</em> (tents inward, cookfires outward); visitors call at the outer fire and announce themselves. Major decisions take place &ldquo;by <strong>Bowl and Board</strong>&rdquo;: the <em>Bowl</em> to test plain fairness, the <em>Board</em> to model routes and concessions.</p>
+<ul>
+<li><strong>Strings of the Meadow:</strong> rain-marker rod; herd-tally braid; windbreak right; salt share.</li>
+<li><strong>Persistent worries:</strong> black gnats; rivers that change their beds overnight; border rides that test how far a ring will bend.</li>
+</ul>
+<h6 id="the-eastern-steppes">The Eastern Steppes</h6>
+<p>Vaster, colder, older. <em>Sky cairns</em> mark wind and weather; riders replace a fallen stone and leave an ember as courtesy to strangers and spirits. Ward-storms roll in sheets; Kon'reh analogies (flow/weight/exit) double as actual storm-reading.</p>
+<h6 id="mountain-holds">Mountain Holds</h6>
+<p>Knife ridges and pass-stones. Mountain Ykrul are infamous even among Aeler captains: hard meat, harder hospitality. They swear <strong>Stone-Oaths</strong> at marked passes and genuinely believe a broken promise wakes the ridge (and avalanches have a long memory). Climbing gear is braided rope and iron wrapped in cloth; iron bares teeth only in war.</p>
+<h6 id="salt-coasts">Salt Coasts</h6>
+<p>Sea Ykrul cut sleet-thin wake-cutters and braid hullcraft with Linnic tricks. Harbor politics oscillate between <strong>Blue Moots</strong> (truce and tariff) and dawn raids. They swear by the <strong>Three Knots</strong> (helm, mast, rudder) and settle maritime disputes at a beach-board chalked into wet sand.</p>
+<h5 id="iii-kon-reh-sacred-geometry-lived">III. Kon'reh: Sacred Geometry Lived</h5>
+<p>Kon'reh is both a table game and a theology of place: the <em>Meadow</em> (pressure and path), the <em>River</em> (flow and change), the <em>Stone</em> (weight and witness). The <em>Concordance</em>&mdash;commentary cycles on Kon'reh and cosmology&mdash;treats roads, rivers, and ridges as the language of intention. Ykrul do not separate &ldquo;strategy&rdquo; from &ldquo;ethic&rdquo;&mdash;to place well is to behave well: no route you can't defend, no exit you build only to close behind weaker feet.</p>
+<ul>
+<li><strong>Bowl &amp;amp; Board.</strong> Public quarrels are fixed first by fairness (Bowl), then by geometry (Board). A concession on the Board becomes a season-long right at a ford, gate, or pasture.</li>
+<li><strong>Schools (as temperaments).</strong></li>
+<ul>
+<li><em>Meadow School:</em> control the middle by promising exits you can afford.</li>
+<li><em>Mountain School:</em> weld lanes until only one honest path remains.</li>
+<li><em>Wake School:</em> trade tempo like wind; arrive before you seem to move.</li>
+<li><em>Aeler-influenced ledgers:</em> price the route&mdash;make bad paths expensive rather than forbidden.</li>
+</ul>
+<li><strong>Devotion without temples.</strong> Shrines are boards carved in stone, lanes picked in cairns, and field-camps marked by ring and windbreak. The sacred is what holds under weight and gives under wisdom.</li>
+</ul>
+<p>It's not their only game. Ykrul play <em>river dice</em> (eddy-based gambling), <em>knot puzzles</em> (one-breath releases), <em>horse-circles</em> (precision riding), and <em>salt-bones</em> (story-sticks cast in patterns). But Kon'reh is how elders teach children to think about promises, borders, and the dignity of ground.</p>
+<h5 id="iv-law-diplomacy-war-mdash-seen-in-lines">IV. Law, Diplomacy, War&mdash;Seen in Lines</h5>
+<ul>
+<li><strong>Guest Right.</strong> A guest cup at the outer fire; theft &ldquo;under smoke&rdquo; brands your tent marks gray for a season.</li>
+<li><strong>Two Ledgers.</strong> Said and meant are recorded together; offering both averts face-losing traps.</li>
+<li><strong>Blood-Price.</strong> Paid in animals, salt, or length of rope; a band that refuses enters <em>Red Weather</em> (others treat them as if a storm hangs over their camp).</li>
+<li><strong>Silence Furlong (with the Lethai-al).</strong> A speechless border strip: no grazing, no felling, no names. Cross in silence, then speak once. Over time this produced mutual isolation and a brittle respect; when the strip is honored, councils run warm&mdash;when not, gray-fletched messengers appear at dusk.</li>
+<li><strong>Pass &amp;amp; Harbor Doctrine.</strong> In mountains, hold what you must and never promise what stone will not bear. At sea, get there first or sing the storm together; a shared song is worth more than a sharp keel.</li>
+</ul>
+<h5 id="v-people-amp-amp-institutions">V. People &amp;amp; Institutions</h5>
+<ul>
+<li><strong>Meadow Judges.</strong> A traveling trio who carry a bowl, a board, and a braid; their decision stands one season and one road.</li>
+<li><strong>Kon'reh Masters.</strong> Teachers who arbitrate by geometry; respected even by rivals. They rarely smile, often bleed for other people's mistakes, and will play anyone who brings a decent board and a decent reason.</li>
+<li><strong>Stone-Sons &amp;amp; Rope-Daughters.</strong> Mountain societies that test initiates on night crossings. Their braids anchor Aeler engines and their oaths make Aeler officers polite.</li>
+<li><strong>Wake-Wrought.</strong> Sea families that list their hulls like saints; name the rivets of a stolen boat and you can claim it back under Wake-law.</li>
+</ul>
+<h5 id="vi-aesthetics-amp-amp-speech">VI. Aesthetics &amp;amp; Speech</h5>
+<ul>
+<li><strong>Colors:</strong> violet (meadow), gray (stone), blue-white (wake).</li>
+<li><strong>Shapes:</strong> rings, crosses, and stepped lines; carpets and tattoos look like maps.</li>
+<li><strong>Proverbs:</strong></li>
+<ul>
+<li>Leave two exits; take one.</li>
+<li>If the river bends, your story should too.</li>
+<li>A promise that cannot bear weight is a trap, not a vow.</li>
+<li>Never place what you will not defend.</li>
+</ul>
+<li><strong>Names:</strong> given + road + deed: <em>Sera of the Third Road, Who Turned the Herd</em>. Hand-signs say policy faster than words: palms down = camp law; fingers split = board; knuckles together = witness shut.</li>
+</ul>
+<h5 id="vii-rivals-amp-amp-kindreds">VII. Rivals &amp;amp; Kindreds</h5>
+<ul>
+<li><strong>Lethai-al (wood elves).</strong> Ancient skirmishes shaped strict courtesy. The forest never forgets; the grass never lies. Councils hover between poetry and border drills.</li>
+<li><strong>Aeler (dwarves).</strong> Mutual admiration where work meets weather. The Rope and the Ring&mdash;each holds where the other cannot.</li>
+<li><strong>Linns (mist &amp;amp; iron).</strong> Kinship of hull and hunger; borrowed sailcloth and storm-songs; first to the river mouth takes the season unless a Blue Moot is sworn.</li>
+</ul>
+<h5 id="viii-festivals-amp-amp-omens">VIII. Festivals &amp;amp; Omens</h5>
+<ul>
+<li><strong>Banner Day.</strong> Spring match between bands: not about victory so much as who sets summer routes.</li>
+<li><strong>Blue Weather Choir.</strong> Storm season rite where ships and camps sing exit-lists in antiphon with thunder.</li>
+<li><strong>Gray Hand Month.</strong> When a band has failed blood-price; no mummers dance their fires.</li>
+<li><strong>Omens that matter:</strong> violets closing at midday; cairn shadows pointing backward; a wind that tastes of copper; horses all looking east at once.</li>
+</ul>
+<h5 id="ix-adventure-seeds">IX. Adventure Seeds</h5>
+<ol>
+<li><strong>The Bowl at the Ford.</strong> Meadow Judges convene; a toll war brews between Sea Ykrul and Linns. Your party may broker a concession that becomes a season-long ford right.</li>
+<li><strong>Stone-Oath Winter.</strong> A pass promise broke itself; avalanches argue like lawyers. Reset the oath before a rival Aeler captain &ldquo;fixes&rdquo; the ridge with iron.</li>
+<li><strong>Silence Furlong, Broken.</strong> Someone spoke and cut grazing under the roof-trees; restore trust with a geometry both sides can live in.</li>
+<li><strong>The Stolen Board.</strong> A Kon'reh Master's stones&mdash;heirlooms from First Meadow&mdash;are missing on the eve of a marriage pact. Recover them or design a substitute set both clans will accept.</li>
+<li><strong>Blue Weather Choir.</strong> Ward-storms roll from the Eastern Steppes; sing with Sea Ykrul and Linn captains&mdash;or watch the harbor tear itself in half.</li>
+</ol>
+<h5 id="x-portraying-the-ykrul">X. Portraying the Ykrul</h5>
+<ul>
+<li>Let geography talk first: route, exit, weight, witness.</li>
+<li>Treat Kon'reh as grammar, not hobby&mdash;how they make an argument about roads, borders, and mercy.</li>
+<li>Use Bowl then Board to structure any dispute: fairness $$ geometry $$ season-long concessions.</li>
+<li>Keep the Wake close: salt and rope as ritual memory; plain words when stakes are high.</li>
+<li>With rivals, play courtesy like a blade&mdash;sharp, exact, and meant to leave everyone standing if they choose.</li>
+</ul>
+<p><em>For the Ykrul, Kon'reh is not simply a pastime. It is the proof that the world has form&mdash;and that people owe each other exits.</em></p>
+<h3 id="the-ykrul-ways">The Ykrul Ways</h3>
+<p><strong>Where:</strong> violet grass, ring-camps, shallow lakes. <strong>Known for:</strong> fast musters, moving markets, distance diplomacy. <strong>Kin Gifts (pick 2):</strong> Herd-Mastery; Weather-Reading; Caravan Craft; Route-Planning (Kon'reh framing). <strong>Strings:</strong> rain-marker rod; herd-tally braid; windbreak right. <strong>Timers:</strong> 6; 6.</p>
+<p><strong>Where:</strong> pass-stones, winter bowls, knife ridges. <strong>Known for:</strong> holding lines, winter stores, signal sense. <strong>Kin Gifts:</strong> Stone-Sense; Counterweight Engineering; Rope-Craft; Avalanche Reading. <strong>Strings:</strong> pass-stone mark; winter fodder charter. <strong>Timers:</strong> 6; 4.</p>
+<p><strong>Where:</strong> rocky inlets, island runs, river mouths. <strong>Known for:</strong> pilots, moots, storm windows. <strong>Kin Gifts:</strong> Storm-Seamanship; Harbor Dues; Shoal Mapping; Blue Moot Etiquette. <strong>Strings:</strong> harbor priority; wake-rivet list. <strong>Timers:</strong> 4; 6.</p>
+<p><strong>Where:</strong> sky cairns, ward-storm belts, long legs. <strong>Known for:</strong> exit-finding, omen-reading, cross-cultural guides. <strong>Kin Gifts:</strong> Cairn-Talking; Ward-Storm Guidance; Long-Leg Logistics; Silence Furlong Etiquette. <strong>Strings:</strong> cairn ember; guide-right. <strong>Timers:</strong> 4; 4.</p>
+<h3 id="repute-standing-debts">Repute, Standing, Debts</h3>
+<p><strong>Repute [6]</strong> &mdash; kept bargains, delivered goods, exits honored. 0&ndash;2: distrusted (Position &ndash;1 in negotiation) • 3&ndash;4: reliable • 5&ndash;6: sought-after (Position +1, tempting target).</p>
+<p><strong>Standing [6]</strong> &mdash; weight in councils and moots. 0&ndash;2: marginal • 3&ndash;4: contributor • 5&ndash;6: chair/warden (responsibility timers light).</p>
+<p><strong>Debts [4]</strong> &mdash; dues, oaths, promises. At full: dues come due (court, kin, or market).</p>
+<h3 id="how-ykrul-win-beyond-the-blade">How Ykrul Win (beyond the blade)</h3>
+<h5 id="banked-fear-reputation-economy">Banked Fear (Reputation Economy)</h5>
+<p>On entering a venue where your fierce name precedes you, mark <strong>Banked Fear (1)</strong>. <em>Spend 1:</em> force <strong>Parley First</strong> (one roll of talk before a fight can start) <em>or</em> shift one enemy action to <strong>Controlled</strong> (they flinch at your name). If you bluff and then fail to deliver, erase all Banked Fear until you win publicly.</p>
+<h5 id="logistics-edge-strings-dv">Logistics Edge (Strings \ DV)</h5>
+<p>Convert any <strong>cache String</strong> (fodder lot, water right, hidden wharf) into <strong>DV &ndash;1</strong> on a relevant leg or score. If used to starve an innocent district, flip it: DV &ndash;1 becomes a public <strong>Debts +1</strong>.</p>
+<h5 id="kon-reh-arbitration-geometry-of-mercy">Kon'reh Arbitration (Geometry of Mercy)</h5>
+<p>Model roads, exits, and lanes in talk. On success, create a <strong>Seasonal Concession String</strong> at a ford/harbor/pass that either side may call once/season without offense.</p>
+<h3 id="the-vilikari-compact">The Vilikari Compact</h3>
+<h5 id="a-ledger-written-in-other-hands">A ledger written in other hands</h5>
+<p>The Ykrul and Vilikari have fought, married, traded, and cheated together across three coasts. The Syndicate likes coin that moves; the Ykrul like routes that hold. Between them grew the <strong>Compact</strong>: when Ykrul choose <em>where</em> and <em>when</em>, Vilikari decide <em>how hard</em>.</p>
+<h6 id="the-four-sacks-of-ecktoria">The Four Sacks of Ecktoria</h6>
+<p>Older Ykrul speak of <strong>four autumns</strong> when Ecktoria's pride buckled. The banners were Ykrul. The bulk of the street-fighting were Vilikari crews&mdash;bought dear, pointed like a storm, paid on the steps. Quartermasters with Kon'reh boards widened alleys into lanes, closed gates with carts, and fed the fists who did the breaking. The lesson stuck: <em>win the routes; hire the hands</em>. It left Ecktoria wary, the Vilikari rich, and the Ykrul rumor larger than their numbers.</p>
+<h6 id="table-levers-compact">Table Levers (Compact)</h6>
+<ul>
+<li><strong>Hire the Hands, Own the Routes:</strong> pay a Vilikari cohort with coin or cut; gain a <strong>Fists</strong> asset (Cap 3) and <strong>Route Priority (1)</strong> at one gate/ward for the score.</li>
+<li><strong>Two Ledgers, One Purse:</strong> keep a clean ledger (said/meant) while paying dirty; on a strong hit, convert one <strong>Crew Heat</strong> into <strong>Debts +1 (Vilikari)</strong> instead of City Heat.</li>
+<li><strong>Autumn Memory:</strong> in Ecktoria-only scenes, your name grants <strong>Banked Fear (1)</strong> even if unknown individually.</li>
+</ul>
+<h3 id="regional-notes-quiet-variety">Regional Notes (quiet variety)</h3>
+<h5 id="mid-ahkaz">Mid Ahkaz</h5>
+<p>A city that learned to breathe in seasons: fairs that walk, courts that listen before they price, and neighborhoods where Ykrul calendars hang beside local saint-days.</p>
+<h5 id="ecktoria">Ecktoria</h5>
+<p>Stone streets remember hoofbeats. Some doors open, some spit. Hirelings keep their eyes on the purse and the alley mouth. The Syndicate keeps longer books than it admits.</p>
+<h5 id="vhasian-amp-amp-viterran-cities">Vhasian &amp;amp; Viterran Cities</h5>
+<p>River towns price the tide; hill markets price the view. A banner can get you an audience; a good ledger gets you paid.</p>
+<h3 id="the-ykrul-thirty-six-sayings">The Ykrul Thirty-Six Sayings</h3>
+<p>They measure war not in strategies, but in breaths left to their foe.</p>
+<ol>
+<li><strong>Let the River Freeze Before You Cross</strong> Do not rush from your Home Apex. A Blue that leaves too early is a calf separated from the herd. Let the opponent make the first shape; your bridge will be built upon their impatience.</li>
+<li><strong>Borrow a Corridor to Trap a King</strong> When the enemy carves a path toward your sanctum, let it deepen while you count his exits. Then seal the mouth behind him. Their ambition becomes their tomb.</li>
+<li><strong>Kill With a Borrowed Blade</strong> Your Reds are cheap. Their purpose is to be spent. Lure the enemy's Orange into capturing a Red, placing it where your Blue can hop over it and land clean on the empty square beyond to strike a greater prize.</li>
+<li><strong>Watch the Fire Burn Across the River</strong> When the enemy's Blue is Rooted after a Seed, do not panic. They have spent their breath to gain a piece. Use their immobility to post your lids and print your lanes. Let them burn their own tempo.</li>
+<li><strong>Loot a Burning House</strong> Strike only when the enemy is committed elsewhere. A Blue in the Cross is a house with one door. A Blue after its second special is a house on fire. Plunder it.</li>
+<li><strong>Hide Your Dagger Behind a Smile</strong> Telegraph a threat on one flank. When they shift their lattice to meet it, strike on the silent file they were forced to weaken.</li>
+<li><strong>Cross the Sea by Fooling the Sky</strong> Make a small, obvious move to hide a greater one. A Red slide of two squares can scream so loudly it deafens them to your Orange sliding three elsewhere.</li>
+<li><strong>Cull a Kid to Save the Herd</strong> A Green is a piece of tempo, not a piece of value. Let it be captured if it baits their Blue into a square from which it cannot escape your true trap.</li>
+<li><strong>Take the Opportunity While He Counts Another Man's Breaths</strong> When your foe runs the Reforge, do not chase. Weld the penult squares to drown his lanes, or open an SSI-safe Seed of your own while his eyes are on the banner timer.</li>
+<li><strong>Point at the Ford to Close the Sluice</strong> Verbally threaten a Sanctum seed. Let them waste moves reinforcing it. Then seed from the opposite Sanctum they left under-strengthened.</li>
+<li><strong>Draw the Log from Under the Cauldron</strong> Do not attack the strong Blue head-on. Attack the weak Red that supports its escape route. Remove the log, and the cauldron tips itself.</li>
+<li><strong>The Cicada Sheds its Shell</strong> Leave a Red in a seemingly vulnerable position. When they capture it, they reveal the lane your Green uses to sprint for their Home Apex in the endgame.</li>
+<li><strong>Shut the Doors to Catch the Thief</strong> Do not chase the Reforge runner. Instead, seal every avenue to your own Home Apex. Let them run themselves to exhaustion against walls of your making.</li>
+<li><strong>Feign Madness but Keep Your Balance</strong> Let your board appear disordered, with gaps and holes. This is not madness. This is a throat, and you are the one who controls when it closes.</li>
+<li><strong>Lure the Tiger Down the Mountain</strong> Draw their Blue from its fortified Home Apex into the center. The steppe is vaster than their stone keep. On open ground, the hunter has the advantage.</li>
+<li><strong>To Catch Something, First Set it Free</strong> If you cannot immediately punish a Blue entering your territory, let it pass. Your pieces behind it are a net it does not see. Capture it on its retreat, when its specials are spent and its paths are closed.</li>
+<li><strong>Cast a Stone to Draw the Stallion</strong> Sacrifice an Orange only when the net is already knotted. A Blue capture is jade if the five breaths of Reforge are already dead on your map.</li>
+<li><strong>Defeat the Enemy by Capturing Their Chief</strong> The game is not won by capturing pieces. It is won by capturing the Blue and then proving the five breaths of Reforge are a death sentence. All other victories are illusions.</li>
+<li><strong>Let the Rain Fill the Ditch Before You Cross</strong> Force the enemy to expend effort and resources prematurely; let their strength wane in the waiting.</li>
+<li><strong>The Reed Bends, the Oak Breaks</strong> Yield to overwhelming force, but do not break; preserve your core to fight another day.</li>
+<li><strong>Weave the Snare with His Own Threads</strong> Use the enemy's strength, pride, or methods against them; let them build their own trap.</li>
+<li><strong>A Distant Banner Casts No Shadow</strong> A threat far away is no threat at all; control the center, and distant kings will kneel or starve.</li>
+<li><strong>The Well is Poisoned at its Source</strong> Strike the enemy's will to fight before striking their body; break their spirit, and their strength follows.</li>
+<li><strong>Do Not Share the Cup of Lies</strong> Trust, once broken, cannot be mended; if you must deceive, do so cleanly and ensure it is never discovered.</li>
+<li><strong>The Guest Who Outstays His Welcome Steals the Host's Peace</strong> Allow no force, however small, to remain within your lines uncontrolled; hospitality has its limits.</li>
+<li><strong>A Single Grain Does Not Break the Starving Man's Fast</strong> Small kindnesses mean nothing to the desperate; offer aid only when it can shift the balance of power.</li>
+<li><strong>Measure the Wind, Not the Banner</strong> Judge the strength of your enemy not by their display, but by the force that moves them.</li>
+<li><strong>A Silent Horse Leaves No Track</strong> Move your true strength unseen and unheard; let whispers precede your strike.</li>
+<li><strong>The Forge Glows Hottest Before the Break</strong> The enemy is most vulnerable not in weakness, but in the moment before their transformation or greatest effort.</li>
+<li><strong>The Vulture Waits Not for the Cry</strong> True opportunity comes not with fanfare, but in the silence before the fall.</li>
+<li><strong>Speak Softly, and Carry the Unseen Blade</strong> Let diplomacy smooth the way, but ensure your threat is always present, even if unspoken.</li>
+<li><strong>The Map is Not the Meadow</strong> Do not become so enamored with your plan that you forget the ground beneath your feet changes with every step.</li>
+<li><strong>A Broken Bridge is Easier to Defend</strong> Destroy what the enemy relies upon; make their strength a liability.</li>
+<li><strong>Count the Breath Between the Beats</strong> Victory belongs to he who controls the rhythm; master the pause, and you master the moment.</li>
+<li><strong>The Herd Moves as One, but Feeds as Many</strong> Unity of purpose does not require equal reward; know who is the shepherd and who is the sheep.</li>
+<li><strong>The Game Ends When the Last Player Forgets the Rules</strong> True mastery is making the enemy forget they are playing until it is far too late.</li>
+</ol>
+<h5 id="0-the-unwritten-strategy-count-exits-not-victims">0. The Unwritten Strategy: Count Exits, Not Victims</h5>
+<p>The greatest strategy is not listed, for it is the breath before all breaths. Before you move, count the number of ways your foe can flee. If the number is greater than zero, you have not yet won. You have only begun to fight.</p>
+<h3 id="the-ostrikari-ikari-host-of-the-open-steppe">The Ostrikari (Ikari) &mdash; Host of the Open Steppe</h3>
+<p><strong>Confederated riders, oath-law, and the winter mathematics of survival.</strong> The Ostrikari are a people of movement and assembly. In peace, they are wagon-circles, remount strings, and wintering compacts. In war, they become the <em>Host</em>: a temporary confederation sworn by oath-rings and overseen by the Thing of Spears. Their strength is not faceless number but the public law that binds them, the herds that feed them, and the memory of winters survived.</p>
+<h5 id="pillars-of-identity">Pillars of Identity</h5>
+<ul>
+<li><strong>Host-Law (Customary &amp;amp; Portable).</strong> Justice travels with the people: wergild (blood-silver), oath-rings, outlawry (&ldquo;wolf-head&rdquo;), and the <em>Thing of Spears</em> (moot) that can overrule any chief.</li>
+<li><strong>People of Movement.</strong> Wealth is mouths fed and roads kept open: wagons, remount strings, escort rights, and safe winter pasture.</li>
+<li><strong>Fostered Bonds.</strong> Children fostered between clans to cool feuds; marriage-compacts braid bloodlines and trade routes.</li>
+<li><strong>Reputation Economy.</strong> Oathkeepers rise; oathbreakers are unmade. Guest-right kept and promises paid are a leader's true treasury.</li>
+</ul>
+<h5 id="why-they-did-not-assimilate">Why They Did Not Assimilate</h5>
+<ul>
+<li><strong>Land as Trust, Not Title.</strong> Pasture and wintering grounds held as host commons; fixing them to deeds would shatter reciprocity webs.</li>
+<li><strong>Law-on-the-Move.</strong> Courts are wagons and circles, not halls of stone; the people would not trade the Thing of Spears for distant writs.</li>
+<li><strong>Devotion Fit.</strong> Oath, storm, and graves are their holy measures; foreign mandates felt like conquest-of-sky, not covenant.</li>
+<li><strong>Winter Memory.</strong> A remembered pasture tax that starved a season&mdash;every clan sings the warning&mdash;hardens their independence.</li>
+</ul>
+<h5 id="law-amp-amp-custom">Law &amp;amp; Custom</h5>
+<ul>
+<li><strong>Three-Night Guest-Right.</strong> No harm to a guest who keeps house-laws; after three nights, they must pledge or depart. Violation stains the lineage.</li>
+<li><strong>Blood-Silver (Wergild).</strong> Every wound has a price; pay it, or feud stands. High-born owe more&mdash;status increases liability.</li>
+<li><strong>Thing of Spears.</strong> War and law are public; a ring of stood spears may unseat a chief who breaks oath or endangers the winter stores.</li>
+<li><strong>Outlawry (Wolf-Head).</strong> Outside protection of law; anyone may strike. Declared at dawn by the moot-voice as last resort.</li>
+</ul>
+<h5 id="economy-beyond-raiding">Economy Beyond Raiding</h5>
+<ul>
+<li><strong>Moot-Fairs.</strong> Neutral markets guaranteed by host-law: horses, felt, leather, smoked meats, iron blooms, winter ferry rights.</li>
+<li><strong>Wintering Compacts.</strong> Fodder and pasture leased from river-lands; paid in escort service and herd-keepers.</li>
+<li><strong>Craft Lineages.</strong> Pattern-weld smiths, beadmakers, bone-inlay bowyers; artisans travel under <em>peace-hands</em> seals.</li>
+<li><strong>Gift Webs.</strong> Debt and counter-gift braid clans tighter than treaties; ledgers are sung, not inked.</li>
+</ul>
+<h5 id="war-doctrine-of-the-host">War Doctrine of the Host</h5>
+<h6 id="assembly">Assembly.</h6>
+<p>Clan warbands + oath-companions + wagon guards. A crisis raises a <em>war-king</em> for a season; the Thing must reconfirm after the campaign.</p>
+<h6 id="operational-art">Operational Art.</h6>
+<ol>
+<li><strong>Screen &amp;amp; Starve.</strong> Light horse screens, deny forage, scorch the raiding belt the foe needs.</li>
+<li><strong>Wagon-Lager.</strong> Defensive ring that turns mobility into a fortified camp.</li>
+<li><strong>Shock Window.</strong> Concentrate for two days: break a gate, force a crossing, or vanish.</li>
+</ol>
+<h6 id="taking-amp-amp-restraint">Taking &amp;amp; Restraint.</h6>
+<p>Preference for intimidation, blockade, ransom tables, and bribery; saps and rams appear only with hired or allied engineers. Oathbound limits protect bread-lands and shrines that paid guest-right; violations trigger Thing inquiries.</p>
+<h5 id="faith-amp-amp-story">Faith &amp;amp; Story</h5>
+<ul>
+<li><strong>Wind &amp;amp; Mound.</strong> Seers keep humming wind-lathes to measure omen-breezes; mound-keepers judge where the host may dwell.</li>
+<li><strong>Twin Virtues.</strong> <em>Fury</em> (storm-oath fulfilled without flinching) and <em>Measure</em> (winter mathematics: can we afford this glory?).</li>
+</ul>
+<h5 id="factions-within-the-confederation">Factions Within the Confederation</h5>
+<ul>
+<li><strong>Open-Hand Clans.</strong> Treaty-first, market-forward, eager for federate compacts (escort-for-land).</li>
+<li><strong>Iron-Hand Clans.</strong> Prestige wars, bride-price politics; insist the host must take before it can trade.</li>
+<li><strong>Mound-Keepers.</strong> Priestly/judicial lineages; conservative and anti-external-rule, often peacemakers.</li>
+<li><strong>Young-Riders.</strong> Glory-seeking small bands; can start feuds elders must then cool.</li>
+</ul>
+<h5 id="look-amp-amp-sound">Look &amp;amp; Sound</h5>
+<ul>
+<li><strong>Aesthetic.</strong> Felted cloaks, tablet-woven bands, horsehair and bone fittings, oath-rings on scabbards, shields stitched with storm-signs and ancestor marks, wagons painted with family knots.</li>
+<li><strong>Music.</strong> Frame drums and throat-hummed hymns; winter feast songs where stanzas are debts&mdash;who owes, who paid.</li>
+</ul>
+<h5 id="mechanical-hooks-fate-s-edge">Mechanical Hooks (Fate's Edge)</h5>
+<h6 id="tags">Tags.</h6>
+<p><code>Mounted</code>, <code>Wagon-Lager</code>, <code>Forage Denial</code>, <code>Reputation Oath</code>, <code>Guest-Right</code>.</p>
+<h6 id="timers">Timers.</h6>
+<ul>
+<li><strong>Assemble Host [8]</strong> &mdash; muster complete when filled.</li>
+<li><strong>Winter Stores [6]</strong> &mdash; if emptied, Morale drops and Measure overrules Fury.</li>
+<li><strong>Feud Ignites [4]</strong> &mdash; missteps push toward blood-debt.</li>
+<li><strong>External Response [6]</strong> &mdash; neighbors or distant powers intervene.</li>
+</ul>
+<h6 id="dv-amp-amp-position-cues">DV &amp;amp; Position Cues.</h6>
+<ul>
+<li>Presenting a foster-token: <strong>DV &ndash;1</strong> to Parley with elders.</li>
+<li>Violating guest-right: immediate <strong>Position $$ Desperate</strong> in all social scenes with witnesses; adds +1 tick to <strong>Feud Ignites</strong>.</li>
+<li>Public negotiations at the Thing: truth-telling is <strong>Dominant</strong>; deceit begins <strong>Controlled</strong> and flips to <strong>Desperate</strong> if exposed.</li>
+</ul>
+<h5 id="scene-frames">Scene Frames</h5>
+<ul>
+<li><strong>The Wergild Moot.</strong> A death threatens feud; arbitrate price, propose fosterage to end it.</li>
+<li><strong>Winter Ledger.</strong> The war-king wants a raid; the granary-mother shows the math&mdash;choose Fury or Measure.</li>
+<li><strong>Foster Exchange.</strong> Hostages of honor pass between clans; protect the ceremony from spoilers.</li>
+<li><strong>Oath of Crossing.</strong> Negotiate ferry rights; breaking the oath stains a patron and shuts every gate for a season.</li>
+</ul>
+<h5 id="adventure-seeds">Adventure Seeds</h5>
+<ol>
+<li><strong>The Wagon-Judge's Bell.</strong> A judge lies slain; find the killer before the Thing outlaws the wrong clan.</li>
+<li><strong>Host on the Border.</strong> Draft a federate compact; elders demand clauses on guest-right and winter pasture.</li>
+<li><strong>The Burned Belt.</strong> Bread-lands torched and blame laid falsely; clear the name before the host radicalizes.</li>
+<li><strong>Storm-King for a Season.</strong> Two chiefs tie the oath-ring to a neutral PC as war-king to stop a feud&mdash;survive the winter inquiry.</li>
+</ol>
+<h5 id="contrast-at-the-table">Contrast at the Table</h5>
+<ul>
+<li><strong>Vilikari:</strong> river-law, road charters, and markets that make bad roads pay by morning.</li>
+<li><strong>Ostrikari:</strong> host-law, foster bonds, and seasonal assembly into the Host.</li>
+<li><strong>Ykrul:</strong> route-pricing, breath-count logistics, and proofs over boasts.</li>
+</ul>
+<p>[Keeper Guidance] Show mass and momentum through wagons, forage, and remounts&mdash;not faceless waves. Keep procedural justice visible: <em>Thing</em>, wergild, outlawry, fosterage. Let internal arguments breathe: Open-Hand vs Iron-Hand; Fury vs Measure. Make oathkeeping costly and admired&mdash;villainy is breaking oaths, not being &ldquo;barbaric.&rdquo;</p>
+<p>ectionComplications that Feel Like Them</p>
+<ul>
+<li>A Gate Cantor switches sides mid-reading&mdash;because the other side offered repair years for a road you actually use.</li>
+<li>A Countkeeper discovers the party's favorite clause is forged but correct in spirit. Do you argue fairness or run?</li>
+<li>The Black Banner arrives to &ldquo;help,&rdquo; which means your quiet deal now has a drumline.</li>
+<li>Night Road Heat spikes because a rival used your braid pattern on a crime; clear it by solving their mess in public.</li>
+</ul>
+<h2 id="ii-the-vilikari-the-road-people">II. The Vilikari &mdash; The Road People</h2>
+<h3 id="aveh-the-rider-behind-the-storm">Aveh &mdash; The Rider Behind the Storm</h3>
+<h5 id="non-binary-patron-of-freedom-edges-and-the-unclaimed-road">Non-binary patron of freedom, edges, and the unclaimed road</h5>
+<blockquote>
+<p>&ldquo;No road owns me. No name cages you. Ride.&rdquo;</p>
+</blockquote>
+<h5 id="i-names-faces-signs">I. Names, Faces, Signs</h5>
+<p>Aveh rides where borders fray: along stormfronts, river booms, city rooftops, ridgebacks, and the hush between a question and an answer. Neither man nor woman (and not &ldquo;both&rdquo; so much as <em>other</em>), Aveh is called when people refuse a cage or cannot fit the one built for them.</p>
+<ul>
+<li><strong>Epithets:</strong> The Unreined; Way-Mercy; Break-Reins; The Door in the Wind; The Rider Without Shadow.</li>
+<li><strong>Signs:</strong> an inverted bridle; a broken bit-ring; a wind-bell singing with no air; a spiral cloud with an empty eye; footprints that begin mid-path.</li>
+<li><strong>Shrines:</strong> roof-altars with a single unlit lamp; bridle rings on cairns; chalk spirals at ferry posts; wind-bells hung under eaves.</li>
+</ul>
+<h5 id="ii-the-road-s-mercy-doctrine">II. The Road's Mercy (Doctrine)</h5>
+<p>Aveh's teaching is simple and sharp, like rain on hot stone.</p>
+<ul>
+<li><strong>No coercion.</strong> Do not bind a will without its consent; do not be bound without yours.</li>
+<li><strong>Leave exits.</strong> Every plan keeps a way out for the least of you.</li>
+<li><strong>Break bad bindings.</strong> Vows made under harm or lie are weather to be ridden through, not walls to revere.</li>
+<li><strong>Keep witness gentle.</strong> Names are gifts; use the ones people choose.</li>
+</ul>
+<p>Among Ykrul, this reads as the conscience inside sacred geometry: a route is only honest if those who must walk it can refuse.</p>
+<h5 id="iii-shrines-rites-and-everyday-practice">III. Shrines, Rites, and Everyday Practice</h5>
+<p><strong>Freehouses</strong> (door-bells, unlatched latches) are Aveh's favored shrines in towns and on roads. Custom says: <em>no questions first, names after consent, doors unlatched unless danger presses.</em></p>
+<ul>
+<li><strong>The Open Name.</strong> Speak the name you choose; listeners answer, &ldquo;Ridden and riding,&rdquo; acknowledging your authorship of self.</li>
+<li><strong>The Unknotted Door.</strong> Loosen one knot a day: a stuck latch, a tangled cord, a bureaucratic snare for a stranger.</li>
+<li><strong>Storm Cup.</strong> Keep a spare cup by the door; when the unlooked-for arrives, pour first, ask later.</li>
+<li><strong>Rite of Unnaming.</strong> Ash on the brow, rainwater over the tongue: &ldquo;Unname the harm, keep the memory.&rdquo; Used to shed imposed labels while preserving history.</li>
+<li><strong>Break-Reins Feast.</strong> At first storm of the season, bits are hung on a thorn or eave; those who cast off false ties pass beneath wind-bells and are applauded without questions.</li>
+</ul>
+<h5 id="iv-adherents-amp-amp-households">IV. Adherents &amp;amp; Households</h5>
+<p><strong>Nameless Riders</strong> are wandering mystics of Aveh: weathered cloaks, a bell, and writs that petition courts or clans to release people from unjust bonds. Some practice <em>total unnaming</em> for a season; wiser ones keep one thread (a color, a song) to anchor self.</p>
+<p><strong>Households of the Open Door</strong> are ordinary faithful: shelter-keepers, caravan hands who smuggle people rather than goods, clerks who &ldquo;lose&rdquo; bad papers, pilots who wave through the right boat on the wrong day. Chosen families flourish here.</p>
+<h5 id="v-law-courtesy-and-crossroads">V. Law, Courtesy, and Crossroads</h5>
+<p>Aveh does not despise law; Aveh despises <em>coerced</em> law. In Ykrul country, <em>Bowl before Board</em> becomes <em>Open Name before Bowl</em>: the courtesy of naming precedes fairness, which precedes geometry. Harbor captains hang wind-bells during <em>Blue Moots</em> to signal that refugees and misfits pass first. In courts fond of traps, Aveh's folk keep two ledgers (said/meant) and make both explicit.</p>
+<h5 id="vi-omens-amp-amp-visitations">VI. Omens &amp;amp; Visitations</h5>
+<p>A door that will not latch on a still night; a sudden scent of rain indoors; a bridle ring in a gutter; a lantern that refuses to light until a question is asked kindly. Aveh appears as a rider without reins, a voice like wind through reeds&mdash;precise, amused, never cruel.</p>
+<h5 id="vii-tokens-amp-amp-strings-in-play">VII. Tokens &amp;amp; Strings (in play)</h5>
+<ul>
+<li><strong>Wind-Bell (sanctuary).</strong> Signals a place where the unlatched custom holds; once/scene, improve Position when seeking safe audience or exit.</li>
+<li><strong>Bridle Ring (oath-breaker).</strong> Voids one coercive clause in a negotiation; converts it into a public concession timer.</li>
+<li><strong>Name-Shard.</strong> Establishes chosen-name etiquette in a scene; disrespect carries social harm.</li>
+<li><strong>Storm-Scrip.</strong> A small bag of cut cords; cash to soften a blockade or bypass petty gatekeeping without blood or bribe.</li>
+</ul>
+<p><em>Optional table norm:</em> When a PC protects someone's autonomy at a cost, grant <strong>Storm's Favor (1)</strong>; spend to shift Position/DV in escapes, parleys, and boundary crossings that harm no bystander.</p>
+<h5 id="viii-cross-cultural-notes">VIII. Cross-Cultural Notes</h5>
+<ul>
+<li><strong>Ykrul.</strong> Aveh is the exit written into the board: never place what you will not defend, never close the last way out.</li>
+<li><strong>Aelinnel.</strong> Two ledgers (said/meant) become sacrament; copper over iron in fraught negotiations.</li>
+<li><strong>Aelaerem.</strong> Guest-right tilts toward the stray: bread &amp;amp; salt first, genealogy later.</li>
+<li><strong>Linns.</strong> Mast-bells ring in storm season; ropes are cut before hulls become prisons.</li>
+</ul>
+<h5 id="ix-adventure-seeds">IX. Adventure Seeds</h5>
+<ol>
+<li><strong>The Door That Wouldn't Latch.</strong> A latch refuses to hold; behind it, papers forged under duress. Fix the bind, not the door.</li>
+<li><strong>Break-Reins at First Storm.</strong> A contract hides a coercive clause; ride the festival's chaos to unmake it without blood.</li>
+<li><strong>Unbinding Letters.</strong> Three border posts; three different lawful traps; one caravan carrying freedom writs.</li>
+<li><strong>The Nameless Rider.</strong> A mystic erased so much that their allies forgot the revolution they began. Find the anchor and give the name back.</li>
+<li><strong>Blue Moot Without Toll.</strong> Harbor captains demand papers from refugees; persuade them to declare a toll-free moot for one night&mdash;and hold the line when profiteers push back.</li>
+</ol>
+<h5 id="x-portraying-aveh">X. Portraying Aveh</h5>
+<p>Lead with courtesy that opens space. Make names holy and doors unlatched unless danger presses. Let storms change the scene <em>toward mercy</em>. When in doubt, ask: <em>Where is the exit, and who needs it most?</em></p>
+<p>The Vilikari are natives of Ecktoria's river valleys and the Violet Steppe fringe, living where forts end and pasture begins. To imperial clerks they're &ldquo;barbarians&rdquo; (an exonym with teeth); to caravaners and captains they're the people who can make a bad road pay by morning. Their reputation&mdash;hustlers, fixers, smugglers&mdash;isn't a destiny so much as a practiced craft: reading law and landscape at the same time.</p>
+<p>They sit at three tables at once:</p>
+<ul>
+<li>with Ykrul judges over Bowl and Board,</li>
+<li>with Ecktorian customs under lamps and ledgers,</li>
+<li>with Black Banner mercenaries in counting-tents that smell of oil and pay-chest wax.</li>
+</ul>
+<p>When the Ykrul &ldquo;sacked Ecktoria&rdquo; four times, it was often Vilikari cohorts who opened gates, fed horses, and brokered pay&mdash;route victories more than field ones.</p>
+<h3 id="origins-and-shape">Origins &amp; Shape</h3>
+<h5 id="after-the-wake-before-the-walls">After the Wake, Before the Walls</h5>
+<p>When the first Meadow bands pushed west, some families settled where ferry rights and pasture dues interlocked. Those families&mdash;later called Vilikari&mdash;built ring-forts on hill spurs, river quarters under bridges, and road-camps that could fold in an hour. They learned imperial paper because it moved grain; they learned Kon'reh because it moved people.</p>
+<h5 id="three-houses-one-people">Three Houses, One People</h5>
+<ul>
+<li><strong>Reed-House (rivers)</strong> barge teams, lock-keepers, night ferries; speak in tariffs and tide tables.</li>
+<li><strong>Stone-House (hills)</strong> ring-forts, dry-stone craft, winter markets; speak in oaths and neighbors.</li>
+<li><strong>Road-House (camps)</strong> caravans, remount strings, border paths; speak in exits and times.</li>
+</ul>
+<p>Expect intermarriage and seasonal migration between the three; expect cousins in every garrison town from Mid Ahkaz to the Ecktorian road hubs.</p>
+<h3 id="law-hustle-and-how-they-win">Law, Hustle, and How They Win</h3>
+<h5 id="reed-law-bend-don-t-break">Reed-Law (bend, don't break)</h5>
+<p>A ledger you can bend is worth more than a bridge you can't cross. Vilikari law centers on procedural mercy: show the rule, then the exception, then the witness who makes it stick.</p>
+<h5 id="night-roads">Night Roads</h5>
+<p>The Vilikari art of moving goods or people through legitimate gaps&mdash;after bell, before dawn, with a paper that's almost right. It's not crime by default; it's a relief valve for systems that jam.</p>
+<h5 id="kon-reh-as-streetcraft">Kon'reh as streetcraft</h5>
+<p>Ykrul sacred geometry&mdash;flow/weight/exit&mdash;is applied to kiosks, toll lanes, and patrol routes. The Vilikari don't outfight a checkpoint; they re-price the route until the gate opens for someone.</p>
+<h5 id="black-banner-accounts">Black Banner Accounts</h5>
+<p>Their long partnership with the Black Banner (a mercenary franchise) taught them payroll discipline and camp hygiene. In many campaigns the Banner provides muscle, the Vilikari provide supply, scouts, and brokers, and the empire provides the contracts&mdash;until the price changes.</p>
+<h3 id="etiquette">Etiquette</h3>
+<p>Use these as Position/DV levers at the table; no new math.</p>
+<p>Present any writ under a lit lamp and read it aloud&mdash;including the margins. <strong>Effect:</strong> Position +1 on bureaucratic scenes; on a miss, start Imperial Audit [4].</p>
+<p>Lay out public and private prices together (&ldquo;said/meant&rdquo;). <strong>Effect:</strong> DV −1 to close a deal; if you hide the second ledger, tick Night Road Heat [4].</p>
+<p>Pour for the guard before yourself. <strong>Effect:</strong> First social SB against you can be converted to Heat +1 instead of a complication.</p>
+<p>In any parley with mercenaries, keep a spear or flag upright by the entrance. <strong>Effect:</strong> Once/scene you may turn a melee into a negotiation without changing venues.</p>
+<h3 id="strings-receipts-you-can-spend">Strings (Receipts you can spend)</h3>
+<ul>
+<li><strong>Reed Chit</strong> A stamped lock-pass; once per session DV −1 on crossings or inspections.</li>
+<li><strong>Toll Braid</strong> A woven cord showing last season's dues; Position +1 at toll houses.</li>
+<li><strong>Black Banner Voucher</strong> IOU from a captain; cash to call 1 squad for 1 scene&mdash;or cancel one squad chasing you.</li>
+<li><strong>Guild Widow's Trust</strong> A fence or factor will hold goods no questions asked; mark City Heat +1 on use.</li>
+<li><strong>Ford Right (Season)</strong> A concession earned at Bowl &amp;amp; Board; treat a specific ford/bridge as friendly terrain.</li>
+</ul>
+<h3 id="institutions-and-everyday-faces">Institutions &amp; Everyday Faces</h3>
+<ul>
+<li><strong>Countkeepers</strong> Vilikari auditors who can read both imperial tallies and meadow braids; hired by anyone who doesn't want to be cheated&mdash;including you.</li>
+<li><strong>Ferry Mothers</strong> Night ferry syndics who control skiffs, bribes, and rumor flow; break their trust and you walk.</li>
+<li><strong>Gate Cantors</strong> Professional &ldquo;readers-aloud&rdquo; who know which clause saves you; they carry their own lamps.</li>
+<li><strong>Camp Brokers</strong> Middlefolk who place you with mercenary companies or get you out of them.</li>
+</ul>
+<h5 id="reputation-as-tool">Reputation as Tool</h5>
+<p>&ldquo;Hustler, smuggler, barbarian.&rdquo; The Vilikari let empire call them names because fear makes prices better. Anyone who's needed a quiet crossing learns quick who they really are.</p>
+<h3 id="relationships-on-the-edge">Relationships on the Edge</h3>
+<h5 id="ykrul">Ykrul</h5>
+<p>Cousins by road. Vilikari serve as interpreters of Kon'reh to imperial courts and of paper to meadow judges.</p>
+<p><strong>At the table:</strong> Bowl $$ Board + Two Weights creates season-long rights everyone honors.</p>
+<h5 id="ecktoria">Ecktoria</h5>
+<p>Love&ndash;hate. Vilikari run the empire's markets after dark and its fords at dawn. Clerks call for audits; generals ask for guides.</p>
+<p><strong>At the table:</strong> Spend a Reed Chit to turn a checkpoint into a transaction.</p>
+<h5 id="black-banner">Black Banner</h5>
+<p>Familiar. The Banner trusts Vilikari quartermasters because feed and pay arrive on time. If Banner Debt fills, trust evaporates fast.</p>
+<h5 id="aeler-amp-amp-lethai">Aeler &amp;amp; Lethai</h5>
+<p>Aeler hire Countkeepers; Lethai trade seed-tithes for night ferry know-how. Vilikari often mediate keystone vs. hedge disputes for a fee.</p>
+<h3 id="running-vilikari-pcs-hats-not-classes">Running Vilikari PCs (Hats, not classes)</h3>
+<ul>
+<li><strong>Key-Bearer</strong> Keeps the lamp, knows the clause. Once/scene, convert a hard &ldquo;No&rdquo; into a Project [4] (&ldquo;Bring X papers, do Y repair&rdquo;).</li>
+<li><strong>Road-Cutter</strong> Finds legal gray lanes. Once/leg, reroute around a Front at the cost of Night Road Heat +1.</li>
+<li><strong>Bargainer</strong> Turns reputation into leverage. On a strong hit in social scenes, take +1 Effect if you accept Notoriety.</li>
+<li><strong>Quartermaster</strong> Makes scarcity obey. Once/score, downgrade a Supply consequence to a timer you can work.</li>
+</ul>
+<h2 id="iii-the-mistlands">III. The Mistlands</h2>
+<h3 id="what-the-mistlands-are-now">What the Mistlands Are Now</h3>
+<ul>
+<li><strong>Genre:</strong> Folk horror / gothic / supernatural dread</li>
+<li><strong>Key themes:</strong> Isolation, collective obligation, the cost of safety, forgotten history, the power of remembrance</li>
+<li><strong>Dominant powers:</strong> Aeler Protectorate (temporal), local bell-wardens (spiritual), the Direwood (existential), the Forgotten Name (metaphysical)</li>
+</ul>
+<h5 id="the-three-truths-of-the-mistlands">The Three Truths of the Mistlands</h5>
+<ol>
+<li><strong>The fog is not weather. It is a wound.</strong> It rises from the Alder Throne, where the warden fell, and it remembers what was forgotten &ndash; specifically, the name of the heroine who bound him.</li>
+<li><strong>Bells are law.</strong> Every village has a bell-warden. Every crossing has a bell-chime. Strike the wrong note and the fog takes notice &ndash; but ring true in remembrance, and the fog hesitates.</li>
+<li><strong>The Aeler own your breath.</strong> Their wards keep the dead down, but the price is perpetual &ndash; in labor, in loyalty, in the slow erosion of self. Yet their true purpose is not oppression, but preservation: they maintain the wards that hold back the fog <em>until the heroine's name is remembered</em>.</li>
+</ol>
+<h3 id="peoples-of-the-mistlands">Peoples of the Mistlands</h3>
+<h5 id="mistlanders-mixed-ostrikari-and-linn">Mistlanders (Mixed Ostrikari and Linn)</h5>
+<p>The majority population. They speak a creole of Ostrikari breath-counting and Linn salt-oaths. Their houses are built with westward-facing doors (windward; the fog comes from the east) and every room has a <strong>silence bell</strong> &ndash; a small bronze bell that rings if a spirit enters.</p>
+<p><strong>Cultural touchstones:</strong></p>
+<ul>
+<li><strong>Thinblood hospitality:</strong> A guest who shares salt and bread gains one night of safety. Extend to a second night, and the house is obligated to defend them as kin.</li>
+<li><strong>The Ninth Bell Clause:</strong> No bell may be rung nine times in a row. If it rings nine, the ringer must immediately name a dead person aloud. The fog will hear but may be confused &ndash; unless the name spoken is the heroine&ldquo;s, in which case the fog recoils.</li>
+</ul>
+<h5 id="aeler-wardens-the-protectorate">Aeler Wardens (The Protectorate)</h5>
+<p>Dwarven engineers, clerics, and spirit-shields who maintain the bell-lines. They live in fortified <strong>vent-keeps</strong> along the eastern ridge. They do not mix with locals. They wear hoods lined with silver mesh to prevent possession.</p>
+<p><strong>Typical Aeler Warden:</strong></p>
+<ul>
+<li>Speaks Utaran with a clipped accent.</li>
+<li>Carries a null-bell and a ledger of ward-integrity scores.</li>
+<li>Genuinely believes the Compact is fair; has never seen a village fail to pay the Tithe of Breath &ndash; but knows that should the heroine's name be remembered, the tithe may one day be lifted.</li>
+</ul>
+<h5 id="the-unshrouded">The Unshrouded</h5>
+<p>Mistlanders who have rejected the Compact. They live in hidden valleys, trading with smugglers and paying no tithe. They are hunted by both the Aeler and the fog. Some have learned to <strong>bind small spirits</strong> into iron cages &ndash; a dangerous and heretical art, for binding spirits without remembrance only feeds the fog's hunger for forgotten names.</p>
+<h5 id="the-linn-heroine-s-descendants-if-any">The Linn Heroine's Descendants (If Any)</h5>
+<p>Spiral, fractured families who claim descent from the forgotten heroine. They carry a <strong>white braid</strong> in their hair &ndash; the color of lost memory. They are respected and pitied. Many become bell-wardens, hoping to earn enough grace to learn her name &ndash; for they know that only by speaking it can the mist be turned back.</p>
+<h3 id="the-direwood-the-wound-in-the-world">The Direwood (The Wound in the World)</h3>
+<p>The Direwood is not a forest. It is the <strong>warden's curse made forest</strong>. Trees grow from bone. Rivers run gray. Animals have too many eyes. The Direwood covers the eastern half of the Mistlands, and it is expanding. The bell-lines hold it at bay &ndash; for now, but only because they are maintained in remembrance of what was lost.</p>
+<p><strong>What lurks within:</strong></p>
+<ul>
+<li><strong>Wraiths</strong> &ndash; spirits of the warden's undead host, still marching.</li>
+<li><strong>The Unsilenced</strong> &ndash; corpses that rise when a bell-line fails, chanting a hymn in a language no one speaks &ndash; the language of the forgotten name.</li>
+<li><strong>The Alder King's Vestige</strong> &ndash; a fragment of the corrupted warden, trapped in a hollow oak. It cannot act directly, but it whispers to the desperate: <em>&ldquo;Forget her name, and I shall rise again.&rdquo;</em></li>
+</ul>
+<h3 id="new-mechanics">New Mechanics</h3>
+<h5 id="bell-ringer-minor-talent-2-xp">Bell-Ringer (Minor Talent, 2 XP)</h5>
+<p>You have trained with the village bells. Once per scene, when you hear a bell (including your own), you may:</p>
+<ul>
+<li><strong>Identify the purpose</strong> of the bell-ring (alarm, warning, celebration, ward-test) without rolling.</li>
+<li><strong>Ring a bell</strong> to create a <strong>Warded [4]</strong> timer in one zone: spirits suffer Position &ndash;1 and must test Resolve (DV 3) to enter.</li>
+</ul>
+<p>: If you ring a bell without first checking the ward-pattern (i.e., without invoking remembrance), you may tick the <strong>Fog Attention timer</strong> (see below).</p>
+<h5 id="ward-salt-minor-asset-4-xp">Ward-Salt (Minor Asset, 4 XP)</h5>
+<p>A pouch of consecrated salt from the Aeler pan-works. Use a handful:</p>
+<ul>
+<li><strong>As a reaction</strong> to a spirit's attack, reduce Harm from that attack by 1 (to a minimum of 0).</li>
+<li><strong>As an action</strong>, create a <strong>Salt Line</strong>. A spirit must test Body + Resolve (DV 4) to cross; on a failure, it cannot cross for the scene.</li>
+</ul>
+<p>: A pouch has 3 uses. Refill requires a journey to an Aeler vent-keep and paying the tithe (a memory, a lock of hair, or 1 XP).</p>
+<h5 id="fog-attention-timer">Fog Attention Timer</h5>
+<p>Every time the party fails a roll involving the fog, a spirit, or the Direwood <em>while forgetting what must be remembered</em>, the GM may tick the <strong>Fog Attention [6]</strong> timer. When it fills:</p>
+<ul>
+<li>The party is <strong>Noticed</strong>. All spirit encounters gain +1 Cap, and the fog may manifest a <strong>Devourer</strong> &ndash; a composite spirit made of three wraiths (Cap 4, Fear aura).</li>
+</ul>
+<p>Reducing the timer requires a ritual at a bell-line <em>while speaking a fragment of the heroine's name</em> (spend 1 Boon per segment, or a service to the Aeler framed as an act of remembrance).</p>
+<h5 id="the-tithe-of-breath-narrative-obligation">The Tithe of Breath (Narrative Obligation)</h5>
+<p>Each Mistlander character (or character who has lived in the Protectorate for more than a year) owes a <strong>Tithe Timer [4]</strong> to the Aeler. Advance it when:</p>
+<ul>
+<li>They use Aeler infrastructure (bell-lines, ward-salt, vent-keep hospitality).</li>
+<li>They refuse a direct request from a Spirit-Shield Corrector <em>without offering an act of remembrance in lieu</em>.</li>
+</ul>
+<p>When the timer fills, they must choose:</p>
+<ul>
+<li><strong>Serve:</strong> Go to the deep vaults for one month (off-screen). Clear the timer and gain +2 XP, but return with a <strong>Shadow</strong> (a minor Condition: &ndash;1 die to resist fear, as you&ldquo;ve seen something that still watches you &ndash; a shadow of the forgotten).</li>
+<li><strong>Refuse:</strong> The Aeler suspend your access to wards. The character takes an additional <strong>Fog Attention +2</strong> and becomes a target for Correctors &ndash; unless they perform a public act of remembrance (e.g., speaking a fragment of the heroine's name at a bell-tower), which may restore partial access.</li>
+</ul>
+<h3 id="history-of-the-mistlands-gm-facing">History of the Mistlands (GM-Facing)</h3>
+<h5 id="the-alder-throne-and-the-fortress-heart">The Alder Throne and the Fortress Heart</h5>
+<p>A low hill crowned with petrified oak and bleached bone &ndash; but this is only the surface. Beneath, the warden's corpse feeds a forest grown from bone and root: the <strong>Fortress Heart</strong>. Here, halls pulse faintly as if remembering breath, and at the very center stands the <strong>stone spear</strong>, planted by the Linn heroine. No one has been able to pull it free. It is said that only one who speaks her true name can draw the spear, and that doing so will end the mists &ndash; or release something worse.</p>
+<p>At the foot of the throne stands the spear, planted by the Linn heroine. No one has been able to pull it free. It is said that only one who speaks her true name can draw the spear, and that doing so will end the mists &ndash; or release something worse.</p>
+<h5 id="the-aeler-compact-keystone-of-suffering">The Aeler Compact (Keystone of Suffering)</h5>
+<p>Signed in blood and bell-bronze, this contract established the <strong>Mistlands Protectorate</strong>. Key clauses:</p>
+<ul>
+<li><strong>The Tithe of Breath:</strong> Each village must send one young adult per decade to serve in the Aeler deep vaults. Some return; most do not.</li>
+<li><strong>The Ward-Salt Levy:</strong> Peat and salt must be given to the Aeler at fixed prices, regardless of harvest.</li>
+<li><strong>The Right of Audit:</strong> Aeler &ldquo;Spirit-Shield Correctors&rdquo; may enter any threshold at any time to inspect ward integrity. They answer only to the Vault-Queen.</li>
+</ul>
+<p>Violating a clause does not bring punishment &ndash; it brings <strong>ward withdrawal</strong>. The Aeler simply stop maintaining the bell-lines in that village. The fog does the rest &ndash; but only if the heroine's name remains forgotten. Should her name be spoken in true remembrance, the wards strengthen even without Aeler aid.</p>
+<h2 id="iv-the-deep-roads">IV. The Deep Roads</h2>
+<h3 id="i-peoples-and-polities-below">I. Peoples &amp; Polities Below</h3>
+<h5 id="lethai-ar-mdash-courts-of-web-amp-amp-scale">Lethai-ar &mdash; Courts of Web &amp;amp; Scale</h5>
+<p>Wood-kin sworn to Inae (the Weaver) or Isoka (the Serpent Queen), ruling shadow-vales, web-bridges, and mirror chambers.</p>
+<ul>
+<li><strong>Doctrine</strong> Order through context. Oaths are woven, not hammered; a clause can be as binding as a chain.</li>
+<li><strong>Marks</strong> Animist skin-script that enhances sense/body&mdash;older ones can slip &ldquo;out of season&rdquo; and behave as Curses until recontexted.</li>
+<li><strong>War</strong> Asymmetric. Light discipline, kill-lanes, denial of approach; they prefer deterrence to slaughter. Most peoples leave them alone.</li>
+<li><strong>Etiquette</strong> Candle-right (never blow out another's light); Web-Law token gains DV −1 in courtly scenes; Shed-Skin rite (Isoka) forgives one past identity in exchange for a future favor.</li>
+<li><strong>Strings</strong> Web-Token (enter parley anywhere their silk is anchored), Shed-Skin Writ (voids 1 coercive clause once), Hedge-Pass (move unseen on a marked ledge, once/leg).</li>
+</ul>
+<h5 id="aeler-mdash-holds-of-stone-amp-amp-ledger">Aeler &mdash; Holds of Stone &amp;amp; Ledger</h5>
+<p>Mountain folk whose under-roads and keystone works keep nations standing. Underground to them is survival horror with accounting.</p>
+<ul>
+<li><strong>Orders</strong></li>
+<ul>
+<li>Iron Avengers: feud-keepers; make blood ledgers balance.</li>
+<li>Spirit Shield Warriors: ancestor rites + corridor defense.</li>
+<li>True Masons: wandering repair crews (Acasia, Vhasia, Viterra).</li>
+<li>Edgewalkers: coin-hungry rogues in the seams of law.</li>
+</ul>
+<li><strong>Politics</strong> Collectivist, mercantile, pre-colonial soft power: your display equals what you&ldquo;ve delivered to the common works. Many oppose human exploitation and live in foothills and cities.</li>
+<li><strong>Etiquette</strong> Keystone Courtesy (touch stone, name the builder if known); Public Weights (declare said/meant).</li>
+<li><strong>Strings</strong> Keystone Seal (close a passage behind you once), Display Writ (Position +1 when invoking public works), Stone-Oath Witness (turn a duel into arbitration).</li>
+</ul>
+<h5 id="mazereth-mdash-pressure-guilds-amp-amp-root-warrens">Mazereth &mdash; Pressure Guilds &amp;amp; Root-Warrens</h5>
+<p>Deep tunnelers (a subculture of the Aelinnel &ldquo;People of Sums&rdquo;) who live by math and marrow: pressure shafts, root-veins, earthen acoustics.</p>
+<ul>
+<li><strong>Traits</strong> Medium-small; +1 die underground; Pressure Adaptation. Gifts: Deep Earthen Sense, Tunnel Craft, Pressure Resistance, Pattern Reading.</li>
+<li><strong>Costs</strong> Surface sickness; Lantern Sway (SB: bright light causes missteps).</li>
+<li><strong>Customs</strong> Counting-breaths, toll-chalk tallies, bell-wire message lines.</li>
+<li><strong>Strings</strong> Pressure Map (DV −1 to navigate collapses), Bell-Wire Tap (hear &ldquo;ahead&rdquo;), Tally-Chalk (prove dues paid at a junction).</li>
+</ul>
+<h3 id="ii-geography-and-economies-of-depth">II. Geography &amp; Economies of Depth</h3>
+<h5 id="road-types">Road Types</h5>
+<ul>
+<li><strong>Keystone Roads (Aeler)</strong> mortared galleries, air chimneys, counted lantern niches (repairable).</li>
+<li><strong>Pressure Ways (Mazereth)</strong> breath-matched shafts, root-arches, drip ledges (readable).</li>
+<li><strong>Web-Law Lanes (Lethai-ar)</strong> silk bridges, mirror turns, hush zones (negotiable).</li>
+<li><strong>Drift-Rivers</strong> cold black water, rope ferries, bell-buoys (timed).</li>
+<li><strong>Raw Veins</strong> ore cracks, crystal falls, gas pockets (hungry).</li>
+</ul>
+<h5 id="trade-amp-amp-tithe">Trade &amp;amp; Tithe</h5>
+<ul>
+<li><strong>Light Economy</strong> Lantern oil, glow-silk, sun-scrip (surface days &ldquo;bottled&rdquo; in lenses).</li>
+<li><strong>Air Rights</strong> Chimney shares, bellows rents, breath auctions during sieges.</li>
+<li><strong>Repair Years</strong> Payment in labor to fix aqueducts, pillars, weirs; converts harm to civic credit.</li>
+</ul>
+<h3 id="iii-procedures-under-stone">III. Procedures Under Stone</h3>
+<h5 id="tracks-keep-visible">Tracks (keep visible)</h5>
+<ul>
+<li><strong>Air [6]</strong> suffocation, foul pockets, smoke.</li>
+<li><strong>Light [6]</strong> lamps, glow-silk, mirror routes.</li>
+<li><strong>Noise [4]</strong> stealth &amp;amp; echo discipline.</li>
+<li><strong>Attention [6]</strong> choose: Drake Notice, Patrol Net, or Vein Unrest.</li>
+</ul>
+<p>When Air or Light $$ 4, all risky maneuvers start one Position worse unless you cash a String (lamp, bell, mirror) or switch Intent to Survey.</p>
+<h5 id="intent-dial-per-leg">Intent Dial (per leg)</h5>
+<ul>
+<li><strong>Stealth</strong> Low Noise, slower; better vs patrol nets.</li>
+<li><strong>Speed</strong> Tick Noise to push distance; invites mishaps.</li>
+<li><strong>Survey</strong> Read the stone/web/flow; stabilizes Air/Light by 1 on a hit.</li>
+<li><strong>Communion</strong> Parley with place-spirits/ancestors/keepers; risky boons.</li>
+</ul>
+<h5 id="dv-ladder-pick-base-by-route">DV Ladder (pick base by route)</h5>
+<ul>
+<li><strong>Keystone Road</strong> DV 2 (clear) / 3 (ruined) / 4 (siege).</li>
+<li><strong>Pressure Way</strong> DV 3 (stable) / 4 (rising) / 5 (gassing).</li>
+<li><strong>Web-Lane</strong> DV 2 (escorted) / 3 (marked) / 4 (disputed).</li>
+<li><strong>Drift-River</strong> DV 3 (charted) / 4 (swollen) / 5 (blackwater).</li>
+<li><strong>Raw Vein</strong> DV 4 (open) / 5 (shifting).</li>
+</ul>
+<h5 id="sb-menu-under-realms-keeper">SB Menu: Under-Realms (Keeper)</h5>
+<ul>
+<li>Micro-collapse; lantern sputter; pocket gas; echo-lure answers in your voice; leech bloom; silk strand snaps; oath-magnet pulls a lie; drake whisper (mark Fatigue or start Wake-Sickness [4]); patrol net tightens; lose the bell-wire.</li>
+</ul>
+<h3 id="iv-etiquette-and-law-position-wins">IV. Etiquette &amp; Law (Position wins)</h3>
+<ul>
+<li><strong>Step on Stone</strong> Don&ldquo;t scuff sacred thresholds; grants Position +1 on first entry scene.</li>
+<li><strong>Speak Under Beam</strong> Any negotiation under a single visible light gains Witness&mdash;convert one future social SB to a Price (repair, rite).</li>
+<li><strong>Ring Once</strong> One bell to announce, two to plead, three for Bell Dawn (truce to bury, water, repair&mdash;break it and gain a portable Black Mark).</li>
+<li><strong>Two Ledgers (Said/Meant)</strong> Required in Aeler holds and Lethai-ar courts; present both to gain DV −1 in disputes.</li>
+<li><strong>Mask Right (Lethai)</strong> Respect a declared mask/persona; failure worsens Position in any social scene this leg.</li>
+</ul>
+<h3 id="vii-strings-and-diamonds-carry-these">VII. Strings &amp; Diamonds (carry these)</h3>
+<p>sectionStrings &amp;amp; Diamonds</p>
+<ul>
+<li><strong>Bell-Wire Spool</strong> Lay quick witness across rooms; convert one False Order/Echo Lure into Confusion Only.</li>
+<li><strong>Keystone Courtesy</strong> Once/leg, raise or drop a portcullis &ldquo;by the book&rdquo; without a roll&mdash;if you can name the builder.</li>
+<li><strong>Web-Token</strong> Enter Lethai-ar parley from a position of safety once.</li>
+<li><strong>Pressure Map</strong> DV −1 in collapse/quake scenes; reveal one exit that costs Air +1.</li>
+<li><strong>Reed-Charm (under-river)</strong> Treat a blackwater reach as neutral terrain once.</li>
+</ul>
+<p>See the Strings and Diamonds section (see page ) for details on use.</p>
+<h2 id="v-four-peoples-newly-set-down">V. Four Peoples Newly Set Down</h2>
+<h3 id="new-peoples-of-the-north-the-steppe-and-the-deep">New Peoples of the North, the Steppe and the Deep</h3>
+
+<p>Four archetypes that the Amaranthine has always implied and never written down. Each is built the same way as any other people in these volumes &mdash; an Affinity, a Limit, three Gifts, Strings, and one thing the culture will not do &mdash; and each is placed in a region rather than floating free, because a people without a road and a grievance is a costume.</p>
+
+<div class="panel panel-green">
+    <strong class="title">The Ostkin &mdash; Steppe Half-Bloods</strong>
+    <p class="text-sm">The children of the Ykrul Compact seasons: Ykrul on one side, Vilikari or settled-country on the other, raised in neither camp entirely. The steppe's answer to the half-orc, and treated about as well. An Ostkin has a Ykrul's reach and shoulders and a road-speaker's ear, and every host they ride with will eventually make a joke about which half is talking. They hold the Compact together in practice, because they are the only people both sides will accept as a witness.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Endurance, or on any roll made as a go-between. <strong>Limit:</strong> &minus;1 Position on Presence in any assembly that is formally one people's.<br>
+    <strong>Gifts:</strong> <em>Two Tongues</em> (never mistaken in either language, including the insults); <em>Compact Witness</em> (your account of an agreement is accepted by both sides once per session); <em>Long Seat</em> (ride or march a day further than anyone expects).<br>
+    <strong>Strings:</strong> a hostage-string from each side; a horse owed; a name in two registers.<br>
+    <strong>Will not:</strong> swear to one side exclusively. An Ostkin who does stops being Ostkin, and both sides note it.</p>
+</div>
+
+<div class="panel panel-purple">
+    <strong class="title">The Ghyll &mdash; Deep-Road Ratkin</strong>
+    <p class="text-sm">Small, quick, numerous, and the only people who know the deep roads the Aeler abandoned. The Ghyll did not build the underways and they say so cheerfully; they inherited them, the way a family inherits a house too large to heat. They run the salvage trade, the message runs, and the parts of the depth economy that require somebody to fit through a gap. Aeler law does not recognise them as a polity, which the Ghyll find funny and useful in roughly equal measure.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Athletics in confined ground, or on any roll to find a way through. <strong>Limit:</strong> &minus;1 Position on Presence when dealing with a chartered authority.<br>
+    <strong>Gifts:</strong> <em>Gap-Wise</em> (there is always a smaller route, and you know it); <em>Salvage Eye</em> (DV &minus;1 to identify what a broken thing was); <em>Warren Word</em> (get a message across a city underground faster than anyone can ride it).<br>
+    <strong>Strings:</strong> a warren debt; a salvage claim; a runner who owes you.<br>
+    <strong>Will not:</strong> hold ground. A Ghyll who fights a stand-up fight has already made a mistake and knows it.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong class="title">The Kuvani &mdash; The Sky-Sworn</strong>
+    <p class="text-sm">Sworn to Kuva, the Sky That Takes Many Names, and changed by it as surely as the Lethai-ar are changed by their Triad: hollow-boned, sharp-eyed, feathered at the forearm and the nape. They keep the high passes, the signal-towers and the raven-lofts of the northern roads, and they are the reason a message can cross the Mistlands in a day. The Kuvani do not consider themselves a people so much as a profession that breeds true, which is the sort of thing only a people would say.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Insight for anything seen from height or distance, or on any roll to read weather. <strong>Limit:</strong> &minus;1 Position on Body when required to stay in one place.<br>
+    <strong>Gifts:</strong> <em>Long Sight</em> (see and describe accurately at a range others cannot); <em>Fall Light</em> (a fall of any height costs Fatigue rather than Harm, once per scene); <em>Many Names</em> (you are owed hospitality at any signal-tower or loft).<br>
+    <strong>Strings:</strong> a tower's welcome; a name Kuva answers to; a message not yet delivered.<br>
+    <strong>Will not:</strong> carry a message they have read. A Kuvani who opens a post is finished in the trade.</p>
+</div>
+
+<div class="panel panel-red">
+    <strong class="title">The Ashen &mdash; Mist-Born</strong>
+    <p class="text-sm">Not a lineage but an outcome: people born inside the Mistlands after the breath came, who never had a name in the old registers because there were no registers left. The Ashen are grey-eyed, slow to be remembered, and constitutionally hard to place &mdash; strangers guess their age and origin wrongly and keep doing it. They are the Amaranthine's tiefling: marked by something that happened before they were born and asked to account for it constantly.</p>
+    <p class="text-sm"><strong>Affinity:</strong> +1 Position on Stealth or Deception where nobody has a fixed idea of who you are. <strong>Limit:</strong> &minus;1 Position on any roll that depends on being formally recognised &mdash; a claim, an inheritance, a chartered right.<br>
+    <strong>Gifts:</strong> <em>Unregistered</em> (no ledger has you; searches for you fail once per session); <em>Mist-Lung</em> (the Mistlands' breath costs you Fatigue at half rate); <em>Borrowed Name</em> (take a name that was never used and have it hold for a scene).<br>
+    <strong>Strings:</strong> a name remembered for you; a debt no ledger records; someone who knew your mother.<br>
+    <strong>Will not:</strong> give their true name to a scribe. Some cannot: it was never written down.</p>
+</div>
+
+<div class="panel panel-gold">
+    <p class="text-sm"><strong>Using these at your table.</strong> None of the four are secret or rare enough to be a plot in themselves. An Ostkin caravan guard, a Ghyll salvage broker, a Kuvani post-rider and an Ashen who cannot prove she owns her own house are all ordinary sights in the right province, and each carries a built-in conflict that a GM can pick up without inventing anything. If you want them rarer, make the region rarer &mdash; not the person.</p>
+</div>
+
+
+<hr>
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    Peoples and Cultures, Volume II<br>
+    &copy; Nicholas A. Gasper &mdash; For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>
