@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-01T13:45:51.129Z",
+  "generated": "2026-09-01T22:42:03.003Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -695,6 +695,16 @@
       "active": true
     },
     {
+      "id": "the_forge_of_souls",
+      "title": "The Forge Of Souls",
+      "file": "Fates_-_Edge_-_-The-_-Forge-_-of-_-Souls.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_grumbling_vault",
       "title": "The Grumbling Vault",
       "file": "Fates_-_Edge_-_-The-_-Grumbling-_-Vault.html",
@@ -929,7 +939,7 @@
       "active": true
     }
   ],
-  "total_count": 57,
-  "active_count": 57,
+  "total_count": 58,
+  "active_count": 58,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

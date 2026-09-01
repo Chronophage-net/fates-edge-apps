@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Forge of Souls — A Fate's Edge Adventure</title>
+    <style>
+        :root {
+            --bg1: #100c08; --bg2: #1c1610; --bg3: #2a2116; --bg4: #382c1c;
+            --text: #f0e6d4; --text2: #c9b89a; --text3: #93826a;
+            --gold: #c17a3d; --gold-hover: #d18a4d;
+            --border: #4a3826; --red: #a3462f; --green: #4f7f5a; --blue: #4a6f8a;
+            --purple: #7a5a45; --orange: #c17a3d;
+            --radius: 8px; --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg1); color: var(--text); font-family: var(--font); padding: 1.5rem; max-width: 1100px; margin: 0 auto; line-height: 1.6; }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; }
+        h3 { font-size: 1.1rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        .panel { background: var(--bg2); border-radius: var(--radius); padding: 0.6rem 0.8rem; border: 1px solid var(--border); margin: 0.5rem 0; }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 12px; font-size: 0.65rem; font-weight: 600; }
+        .badge-gold { background: var(--gold); color: #1a1000; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .scene-card { background: var(--bg3); border-radius: var(--radius); padding: 0.4rem 0.6rem; margin: 0.3rem 0; border-left: 3px solid var(--gold); }
+        .scene-card .scene-title { font-weight: 600; font-size: 0.9rem; }
+        .scene-card .scene-desc { font-size: 0.8rem; color: var(--text2); }
+        .timer-bar { background: var(--bg4); border-radius: 4px; height: 6px; overflow: hidden; flex: 1; min-width: 60px; }
+        .timer-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .npc-card, .loc-card { background: var(--bg3); border-radius: var(--radius); padding: 0.3rem 0.5rem; margin: 0.15rem 0; border-left: 2px solid var(--gold); }
+        .npc-card .npc-name { font-weight: 600; font-size: 0.85rem; }
+        .npc-card .npc-role { font-size: 0.7rem; color: var(--text3); }
+        .npc-card .npc-motivation { font-size: 0.75rem; color: var(--text2); }
+        .npc-card .npc-secret { font-size: 0.72rem; color: var(--text3); font-style: italic; margin-top: 0.15rem; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.5rem 0.8rem; border: 1px solid var(--border); }
+        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+        .toc a:hover { color: var(--gold); }
+        .encounter-box { background: var(--bg4); border-radius: var(--radius); padding: 0.3rem 0.5rem; margin: 0.2rem 0; border-left: 3px solid var(--orange); font-size: 0.8rem; }
+        .encounter-box .enc-name { font-weight: 600; color: var(--orange); }
+        .encounter-box .enc-outcomes { margin-top: 0.2rem; font-size: 0.75rem; color: var(--text2); }
+        .encounter-box .enc-outcomes div { margin: 0.1rem 0; }
+        .timers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.3rem; }
+        blockquote { border-left: 3px solid var(--gold); padding-left: 1rem; margin: 0.5rem 0; color: var(--text2); font-style: italic; }
+        .creature-stats { background: var(--bg4); border-radius: var(--radius); padding: 0.3rem 0.5rem; margin: 0.2rem 0; font-size: 0.8rem; }
+        .gm-box { background: #150f08; border: 1px solid var(--gold); border-radius: var(--radius); padding: 0.5rem 0.8rem; margin: 0.4rem 0; font-size: 0.82rem; color: var(--text2); }
+        .gm-box strong { color: var(--gold); }
+        .warn-box { background: #241408; border: 1px solid var(--red); border-radius: var(--radius); padding: 0.5rem 0.8rem; margin: 0.4rem 0; font-size: 0.82rem; color: var(--text2); }
+        .warn-box strong { color: var(--red); }
+        .unit-card { background: var(--bg3); border-radius: var(--radius); padding: 0.4rem 0.6rem; margin: 0.25rem 0; border-left: 3px solid var(--red); font-size: 0.82rem; }
+        .unit-card .unit-name { font-weight: 600; color: var(--gold); font-size: 0.9rem; }
+        .unit-card .unit-line { font-size: 0.75rem; color: var(--text2); margin-top: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; margin: 0.4rem 0; font-size: 0.8rem; }
+        th, td { border: 1px solid var(--border); padding: 0.25rem 0.45rem; text-align: left; vertical-align: top; }
+        th { background: var(--bg3); color: var(--gold); font-weight: 600; }
+        td.c, th.c { text-align: center; white-space: nowrap; }
+    </style>
+</head>
+<body>
+
+<h1>🔥 The Forge of Souls</h1>
+<p style="color:var(--text2);margin-bottom:1rem;">
+    <span class="badge badge-gold">Tier III-IV</span>
+    <span class="badge badge-blue">4-6 Sessions</span>
+    <span class="badge badge-red">Tactical Warfare</span>
+    <span class="badge badge-purple">Attrition &amp; Sacrifice</span>
+    <span class="badge badge-purple">Underground Campaign</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    Six weeks ago the deep works beneath Khaz-Vurim began to glow again. The Hollow Anvil — the furnace the
+    hold sealed and stopped naming four centuries ago, in the season the dwarves still call the Quiet
+    Burning — is lit, and it is not making tools. It is making soldiers. Every corpse that goes into the
+    ash-draft comes back out walking, welded into ranks, and the ranks are moving up the Spine Underway
+    toward the Halls at the pace of a slow tide. House Khaz-Vurim cannot field an army; it can barely field
+    a watch. What it can do is hand the party a scratch force, a map of a collapsing tunnel system, and the
+    keys to a war it has already privately decided it will lose.
+</p>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    <strong>The Forge of Souls is a war fought in corridors.</strong> It is the module for tables that want
+    fronts, supply, ground given and taken, and command decisions with names attached — run entirely through
+    the ordinary Fate's Edge roll and timer, with the mass-combat and miniatures tools from
+    <em>GM Guide Appendix B</em> doing the tactical work. There is no separate wargame here. There is a
+    dice pool, a Position, a set of timers, and a furnace at the bottom of the map that gets stronger every
+    time somebody dies — including your side.
+</p>
+
+<blockquote>
+    "You will not save the Underway. You will decide how much of it burns, and who is standing in it when
+    it does. That is the whole of your commission. Do not embarrass us." — Vault-Queen Thora Stonebeard
+</blockquote>
+
+<div class="warn-box">
+    <strong>Tone guardrail — grimdark, not grim-stupid.</strong> Khaz-Vurim's people are competent,
+    disciplined and doomed, and they know it. The horror is not gore; it is the arithmetic. Every dwarf who
+    falls in the Underway stands up again in the enemy's line within the hour, so the hold's own dead are the
+    forge's recruitment. Play the sergeants as professionals, the losses as bookkeeping that hurts, and the
+    forge as something that does not hate anyone and has never once stopped working. Nobody in this module
+    is evil. That is the point.
+</div>
+
+<div class="warn-box">
+    <strong>Content note.</strong> This module deals in attrition, mass death, the desecration of the
+    recently dead, and command decisions that spend lives. Raise it in Session Zero. <em>Appendix E</em> of
+    the GM Guide has the tools; the X-card and Lines &amp; Veils both apply cleanly here, and the module
+    survives cutting the corpse-reanimation imagery entirely — make the Muster stone-and-slag automata
+    instead and every mechanic below still works.
+</div>
+
+<div class="toc">
+    <strong style="color:var(--gold);">📑 Table of Contents</strong>
+    <a href="#warfare">⚔️ Running the War</a>
+    <a href="#act-1">Act I — The Muster</a>
+    <a href="#act-2">Act II — The War in the Underway</a>
+    <a href="#act-3">Act III — The Hollow Anvil</a>
+    <a href="#act-4">Act IV — The Last Ash</a>
+    <a href="#npcs">👤 Key NPCs</a>
+    <a href="#locations">📍 Locations</a>
+    <a href="#factions">🏛️ Factions &amp; Forces</a>
+    <a href="#bestiary">💀 Bestiary</a>
+    <a href="#timers">⏱️ Campaign Timers</a>
+    <a href="#rewards">🎖️ Rewards</a>
+    <a href="#gmnotes">🗒️ GM Notes</a>
+</div>
+
+<hr>
+
+<div class="panel panel-blue" style="margin:0.6rem 0 1rem;">
+    <strong>Reading an encounter badge.</strong> Each badge names a <strong>DV</strong> and a
+    <strong>Position</strong>. It does not name a dice pool, and that is deliberate: the pool is
+    <em>Attribute + Skill</em>, chosen from how the player says they are going about it. Two characters can
+    attempt the same encounter with different pools and both be right. Where an approach is obviously the
+    intended one, the badge says so; where it does not, ask what they are doing and build the pool from the
+    answer.
+</div>
+
+<h2 id="warfare">⚔️ Running the War</h2>
+<p style="color:var(--text2);">Everything below is core Fate's Edge plus <em>GM Guide Appendix B</em>. Read
+    this section once before Act I and you will not need to look anything else up.</p>
+
+<div class="panel panel-gold">
+    <strong>Forces are Followers.</strong> Each body of troops in this module is a Follower with a
+    <strong>Capability</strong>, a <strong>Supply</strong> timer and a <strong>Morale</strong> timer, exactly
+    as <em>Appendix B: Detailed Warfare</em> describes. A force assists a character's roll at
+    <strong>min(Cap, the relevant Skill)</strong>, and no character takes more than +3 dice from all sources
+    on any roll. That single line is the whole of the "how many soldiers do I have" question — resolve it and
+    move on to what the players are actually doing.
+</div>
+
+<div class="panel panel-gold">
+    <strong>Command rolls move objectives.</strong> A player directing a force rather than swinging a sword
+    rolls <em>Presence + Sway</em> (order, exhortation, threat) or <em>Wits + Insight</em> (reading the
+    ground, timing, spotting the lane) against the objective's DV, and the result fills the objective timer:
+    Clean Success or Success with a Story Beat fills 2 segments, Partial fills 1, a Miss fills none and
+    hands the table 2 Boons. Story Beats from command rolls are spent on the fog of war — a runner killed
+    before the order lands, a stair collapsing behind the flank, a sergeant who heard something other than
+    what was said.
+</div>
+
+<div class="panel panel-red">
+    <strong>The Ash Tithe.</strong> This is the module's one bespoke rule and the engine of the whole
+    campaign. <strong>Whenever a friendly force's Morale timer fills, or a named ally dies, or the party
+    leaves a fight without recovering their dead, fill 1 segment of Muster Strength.</strong> The forge takes
+    what falls. Losses do not merely subtract from your side; they add to theirs.
+    <div class="text-xs mt-1" style="margin-top:0.4rem;">
+        <strong>Denying the tithe — the Rite of Ash.</strong> A scene spent burning your own dead properly
+        denies the tithe for that engagement. <em>Spirit + Lore</em> or <em>Body + Endurance</em>, DV 3,
+        Controlled. Clean Success or Success with a Story Beat: no tithe, and the force's Morale timer
+        <em>empties 1 segment</em>. Partial: no tithe, but the pyre costs 1 segment of that force's Supply.
+        Miss: the tithe is taken anyway and every participant gains 1 Fatigue. Players will work out fast
+        that they can trade supplies and daylight for the enemy's growth curve. Let them. That trade is the
+        game.
+    </div>
+</div>
+
+<div class="panel panel-purple">
+    <strong>Miniatures are optional and supported.</strong> If your table wants hexes, <em>Appendix B:
+    Miniatures Mode</em> is written for exactly this module. Base DV starts at 3 and rises 1 per
+    complicating keyword to a maximum of 5; Disengage is DV 4; a tougher enemy does not raise the DV, it
+    worsens your Position. Every location in Act II names its hex keywords. If your table does not want
+    hexes, ignore them — the keywords read perfectly well as prose ("the gallery is <em>Difficult</em>"
+    simply means the footing is bad and the Position is worse).
+</div>
+
+<div class="gm-box">
+    <strong>What the party can actually do on any given turn of the war.</strong> Offer these five as a
+    standing menu and let the fiction pick the roll. <strong>Fight</strong> — hold or take ground, advancing
+    The Line Holds. <strong>Command</strong> — a command roll on an objective timer.
+    <strong>Salvage</strong> — <em>Wits + Craft</em>, DV 3, to fill a force's Supply. <strong>Burn</strong> —
+    the Rite of Ash, denying the tithe. <strong>Scout</strong> — <em>Wits + Insight</em> or
+    <em>Wits + Stealth</em>, DV 3, which reveals the next front's keywords and grants Dominant Position on
+    the first roll made there. There is never enough time to do all five. That scarcity is the tactical
+    layer; the dice are just how you find out.
+</div>
+
+<hr>
+
+<h2 id="act-1">🔔 Act I — The Muster</h2>
+<p style="color:var(--text2);">Khaz-Vurim admits, out loud and in front of witnesses, that it cannot hold its
+    own floor. The party is given a commission, a scratch force, and a door that is already warm to the
+    touch.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🏛️ The Vault-Queen's Commission</div>
+    <div class="scene-desc">Thora Stonebeard gives the party command in a hall deliberately emptied of
+        courtiers, because what she is about to say cannot be said in front of the other holds. The Ninth
+        Gate has fallen. The watch that held it has not come back and has been seen since — upright,
+        armoured, and marching the wrong way.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Forge Heat [10], starts at 3</span>
+        <span class="badge badge-orange">Take the Commission (DV 3, Controlled)</span>
+        <span class="badge badge-blue">Read What She Is Not Saying (DV 4, Controlled)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Negotiating the Commission (DV 4, Controlled)</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Full command authority in writing, plus Warden-Sergeant Halda
+                Grimmel seconded to the party as a Follower. Nobody in the Underway will question an order.</div>
+            <div><strong>Success with a Story Beat:</strong> The same, but the writ names a witness from a
+                rival house who will report everything the party does.</div>
+            <div><strong>Partial (+1 Boon):</strong> Command is granted in practice but not on paper. Every
+                order given to a unit not already loyal is one Position step worse.</div>
+            <div><strong>Miss (+2 Boons):</strong> Thora keeps the authority and lends the party only her
+                confidence. They will be fighting a war they have to argue their way through.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🪓 The Scratch Force</div>
+    <div class="scene-desc">What is left: two under-strength watch companies, a guild sapper crew with more
+        blasting powder than sense, and forty-odd hold militia who were stonemasons a week ago. They are
+        formed up in the Muster Yard and they are looking at the party to find out whether this is a defence
+        or a funeral.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Supply, Underway Command [6], starts at 4</span>
+        <span class="badge badge-orange">Speak to the Muster (DV 4, Controlled)</span>
+        <span class="badge badge-blue">Inspect and Reorganise (DV 3, Controlled)</span>
+        <span class="badge badge-green">Requisition from the Guild (DV 4, Controlled)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Speak to the Muster (DV 4, Controlled)</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Underway Command's Morale timer starts empty and the party may
+                choose one unit to raise to Cap 4.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, but one specific dwarf believes a
+                promise the party did not quite make. Note the name. It will matter in Act IV.</div>
+            <div><strong>Partial (+1 Boon):</strong> Morale starts at 1. They will follow, but they have
+                counted the odds themselves.</div>
+            <div><strong>Miss (+2 Boons):</strong> Morale starts at 2 and the sapper crew's foreman openly
+                asks whether anyone has actually been given a plan.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🚪 The Ninth Gate</div>
+    <div class="scene-desc">Four hours down the Spine Underway, the Ninth Gate stands open and the air past
+        it is thirty degrees warmer. The gate-warden is still at her post. She has been welded into it —
+        stone-and-iron grown up through her armour, her hands fused to the winch she was turning when the
+        draft found her. She is awake. She is apologising.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: The Line Holds [8]</span>
+        <span class="badge badge-red">Fight the Warden-Sergeant (DV 4, Desperate)</span>
+        <span class="badge badge-orange">Talk Her Down (DV 4, Controlled)</span>
+        <span class="badge badge-blue">Sever the Gate Mechanism (DV 3, Controlled)</span>
+        <span class="badge badge-purple">Hex keywords: Difficult, ZoC, Elevation</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Warden-Sergeant Bruni Ashgrave (TL 6)</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> She is released — killed, or unwelded and carried out dying, the
+                party's choice. Fill 2 segments of The Line Holds. Her body is recovered, so no Ash Tithe.</div>
+            <div><strong>Success with a Story Beat:</strong> The same, and she tells the party what she saw
+                come up the shaft before she names it and stops. Spend the Story Beat on the gate falling
+                shut behind them.</div>
+            <div><strong>Partial (+1 Boon):</strong> The party gets past her. She is still in the gate, still
+                apologising, and she is now behind them.</div>
+            <div><strong>Miss (+2 Boons):</strong> The gate holds against the party instead of for them. Fill
+                1 segment of Forge Heat and take the long way — the Cinder Stair, which is worse.</div>
+        </div>
+    </div>
+    <div class="gm-box" style="margin-top:0.4rem;">
+        <strong>The lesson of the Ninth Gate.</strong> This encounter exists to teach the table one thing
+        before the war starts: <em>the enemy is people you knew, and killing them is how the enemy grows.</em>
+        If the party leaves Bruni's body where it lies, take the Ash Tithe in front of them and say what it
+        means. They will never leave a body again, and that decision — carrying your dead uphill while the
+        clock runs — is the module.
+    </div>
+</div>
+
+<hr>
+<h2 id="act-2">⛰️ Act II — The War in the Underway</h2>
+<p style="color:var(--text2);">Three fronts, one force, and not enough of it. The party cannot hold all
+    three. This act is the campaign, and it ends when <strong>The Line Holds [8]</strong> fills — or when
+    <strong>Forge Heat [10]</strong> does, and the module goes to its failure state instead.</p>
+
+<div class="panel panel-gold">
+    <strong>How Act II runs.</strong> Present all three fronts at once and let the party divide their force.
+    Each front the party commits to in person plays as a scene with the encounters below; each front they
+    delegate resolves on a single command roll at the listed DV, one Position step worse, with no player
+    present to spend Boons. <strong>An undefended front advances Forge Heat by 1 each time the party turns
+    their attention elsewhere.</strong> There is no correct allocation. There is only the allocation the
+    party can live with, and the one they have to explain afterwards.
+</div>
+
+<h3>🌉 Front One — The Foundry Span</h3>
+<div class="scene-card">
+    <div class="scene-desc">A single stone walkway crosses the old casting floor, four hundred feet of it,
+        with the crucible pits still live underneath. Whoever holds the Span controls the only route the
+        Muster can bring its heavy ranks up. It is also the only route the party can bring anything back
+        down. Holding it is correct. Holding it is also how you lose people.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: The Span Holds [6]</span>
+        <span class="badge badge-red">Hold the Span (DV 4, Desperate)</span>
+        <span class="badge badge-orange">Drop the Span (DV 4, Controlled)</span>
+        <span class="badge badge-blue">Rig the Pits to Vent (DV 3, Controlled)</span>
+        <span class="badge badge-purple">Hex keywords: Difficult, ZoC, Elevation, no flanking lane</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Hold the Span against the Cindersworn (DV 4, Desperate)</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The rank breaks on the narrows. Fill 2 of The Line Holds. The dead
+                are on your side of the gap and can be recovered — no tithe.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, but the Story Beat buys a
+                <em>Reinforcement</em>: a second rank is already climbing, and the party learns the Muster
+                does not need to rest.</div>
+            <div><strong>Partial (+1 Boon):</strong> The Span holds, but the line is pushed back over the
+                gap. Fill 1 of The Line Holds and 1 of Underway Command's Morale. Bodies are left on the
+                far side — <strong>Ash Tithe</strong> unless the party goes back for them.</div>
+            <div><strong>Miss (+2 Boons):</strong> The Span is lost. Fill 2 of Forge Heat, take the Ash
+                Tithe, and the Muster now has a road.</div>
+        </div>
+    </div>
+    <div class="encounter-box">
+        <div class="enc-name">Drop the Span (DV 4, Controlled) — the sappers' answer</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Four hundred feet of walkway goes into the crucible. The Muster's
+                heavy ranks are cut off for the rest of the module — no Slagborn Breaker ever reaches the
+                upper Underway. Fill 3 of The Line Holds.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, but the sapper crew is still on it
+                when it goes. The party chooses whether to be honest about why.</div>
+            <div><strong>Partial (+1 Boon):</strong> The Span drops half-fallen — impassable to ranks,
+                crossable one at a time by anything patient. Fill 2 of The Line Holds.</div>
+            <div><strong>Miss (+2 Boons):</strong> The charges go early. The Span stands, the sappers do not,
+                and the party has spent its blasting powder. Fill 1 of Forge Heat and take the Ash Tithe.</div>
+        </div>
+    </div>
+    <div class="gm-box" style="margin-top:0.4rem;">
+        <strong>The Span is the module's best trap.</strong> Dropping it is tactically correct and strategically
+        catastrophic: it also cuts the party's own line of retreat and every route by which Khaz-Vurim could
+        ever reinforce them. Do not warn them. Let Halda Grimmel warn them, once, flatly, and then do what
+        she is told.
+    </div>
+</div>
+
+<h3>🕯️ Front Two — The Cinder Stair</h3>
+<div class="scene-card">
+    <div class="scene-desc">Nine hundred steps in a shaft the width of three dwarves abreast, spiralling down
+        past a dozen sealed side-galleries. The Muster does not use it — the Muster does not need to hurry.
+        The Stair is where the party's scouts go, where the wounded come up, and where the ash-draft comes
+        <em>through</em>, which is why the sealed galleries are no longer sealed.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: Ash-Draft [4]</span>
+        <span class="badge badge-orange">Clear a Gallery (DV 3, Controlled)</span>
+        <span class="badge badge-red">Fight in the Shaft (DV 4, Desperate)</span>
+        <span class="badge badge-blue">Reseal the Draft (DV 4, Controlled)</span>
+        <span class="badge badge-purple">Hex keywords: Difficult, Elevation, ZoC on every landing</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Reseal the Draft (DV 4, Controlled)</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> Ash-Draft empties and stops advancing for the rest of Act II. The
+                upper Underway stops producing new Ash-Thralls.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, but the seal takes the Stair with it —
+                the wounded now come up the Span or not at all.</div>
+            <div><strong>Partial (+1 Boon):</strong> The draft is slowed. Ash-Draft advances on every second
+                trigger instead of every one.</div>
+            <div><strong>Miss (+2 Boons):</strong> The gallery the party opened to reach the vent was not
+                empty. Fill Ash-Draft to full and roll an encounter from it immediately.</div>
+        </div>
+    </div>
+    <div class="panel panel-red mt-1">
+        <strong>Ash-Draft [4] — when it fills:</strong> the hold's own recent dead, carried up the Stair for
+        burial over the last six weeks and interred in the upper galleries, get up. Six Ash-Thralls in the
+        party's rear, wearing Khaz-Vurim colours, with names that people in the party's own force can read
+        off the armour. Empty the timer and let it start again. If the party has been running the Rite of Ash
+        properly, they can say so, and it costs them nothing but the memory of the argument they had about
+        whether it was worth the powder.
+    </div>
+</div>
+
+<h3>⚒️ Front Three — The Rememberers' Gallery</h3>
+<div class="scene-card">
+    <div class="scene-desc">The old master-craft workshops, where the Molten Rememberers work: not soldiers,
+        not thralls, but the forge's smiths — bound artisans who were once the hold's best, still making
+        things, still <em>good</em> at it. They are producing the Muster's armour. They will stop if asked
+        correctly. They cannot stop on their own, and they know it, and they have been trying to be asked for
+        four hundred years.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">Timer: The Work Continues [6], starts at 4</span>
+        <span class="badge badge-orange">Parley with a Rememberer (DV 4, Controlled)</span>
+        <span class="badge badge-blue">Learn the Binding (DV 4, Controlled)</span>
+        <span class="badge badge-red">Break the Gallery (DV 5, Desperate)</span>
+        <span class="badge badge-green">Commission a Work (DV 4, Controlled)</span>
+        <span class="badge badge-purple">Hex keywords: Difficult, Altar [WARD] at each anvil</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-name">Parley with a Rememberer (DV 4, Controlled)</div>
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The Work Continues empties. The Muster stops receiving new armour —
+                every Cindersworn encountered from here has Armor 1 instead of 2. The Rememberers ask, once,
+                to be freed, and remember who said no.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, and one Rememberer follows the party
+                down. It is not permitted to leave the gallery. It comes anyway, and the forge feels it go.</div>
+            <div><strong>Partial (+1 Boon):</strong> The Work slows — the timer advances only when the party
+                is elsewhere.</div>
+            <div><strong>Miss (+2 Boons):</strong> The Rememberers hear the request as a commission and
+                fulfil it with the material available, which is the party's dead. Fill 2 of Forge Heat.</div>
+        </div>
+    </div>
+    <div class="encounter-box">
+        <div class="enc-name">Commission a Work (DV 4, Controlled) — using the Crafting rules</div>
+        <div class="enc-outcomes">
+            <div>The Rememberers will make one thing for the party, properly, to the standard of the hold at
+                its height. Resolve it as a <strong>Work</strong> under <em>SRD §6.9 Crafting</em>: a [4]
+                Timer, <em>Attribute + Craft</em>, DV set by ambition, and the Rememberers' materials and
+                skill set the <strong>Position to Dominant</strong>. A <strong>Wonder</strong> is possible
+                here and only here — a [6] Timer, Arcana, and the XP and Obligation costs at the Talent tier
+                as written. The Obligation is owed to the gallery, and the gallery is owned by the forge.</div>
+        </div>
+    </div>
+</div>
+
+<hr>
+<h2 id="act-3">🔥 Act III — The Hollow Anvil</h2>
+<p style="color:var(--text2);">The Line Holds is full. The Muster is broken in the field, which changes
+    nothing, because the Muster was never the problem. The party goes down to the furnace and finds out why
+    it lit.</p>
+
+<div class="scene-card">
+    <div class="scene-title">🕳️ The Descent to the Deep Works</div>
+    <div class="scene-desc">Below the last worked stone the tunnels stop being dwarven and start being
+        something the dwarves cut into. The heat is structural now — the rock itself is at working
+        temperature, and the party's remaining force cannot follow them past this point without cooking in
+        their own armour. Whoever goes down goes down alone.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-orange">Endure the Descent (DV 4, Desperate)</span>
+        <span class="badge badge-blue">Read the Deep Works (DV 4, Controlled)</span>
+        <span class="badge badge-gray">Fatigue: 1 per character, unmitigated</span>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">📜 The Quiet Burning, Read Correctly</div>
+    <div class="scene-desc">The forge-records are still legible because nothing down here has ever been damp.
+        Four hundred years ago Khaz-Vurim did not seal the Hollow Anvil to stop it. They sealed it to keep it
+        <em>fed slowly</em> — a maintained banked fire, drawing one life a decade, quietly, from those the
+        hold could spare. The seal was a rationing device. It has held perfectly for four centuries and it
+        failed six weeks ago because the hold stopped paying, because the hold could no longer afford to.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-orange">Piece Together the Records (DV 4, Controlled)</span>
+        <span class="badge badge-blue">Confirm the Tithe Ledger (DV 5, Controlled)</span>
+        <span class="badge badge-red">Confront Halda With It (DV 4, Desperate)</span>
+    </div>
+    <div class="gm-box" style="margin-top:0.4rem;">
+        <strong>Who knew.</strong> Thora knew. Halda Grimmel knew — her post as Warden of the Ninth Gate was
+        the tithe's delivery duty, and she has walked people down that stair herself. Nobody lied to the
+        party; nobody was asked. The revelation should land as a professional obligation quietly discharged
+        for four hundred years by people who considered it the least bad option and were, arguably, correct.
+        Do not let any NPC apologise for it. Let one of them explain the arithmetic and mean it.
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🔨 The Hollow Anvil</div>
+    <div class="scene-desc">A furnace the size of a cathedral nave, built around an anvil with nothing on it,
+        and a draft that goes down further than the light does. It is not a monster and it will not fight.
+        It is a machine, running correctly, at the load it was given. It has no opinion about any of this.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-gray">TL 10 — Harm Levels: None (puzzle)</span>
+        <span class="badge badge-orange">Understand the Draw (DV 5, Controlled)</span>
+        <span class="badge badge-blue">Find the Cistern Sluice (DV 4, Controlled)</span>
+        <span class="badge badge-red">Touch the Anvil (DV 5, Desperate)</span>
+    </div>
+    <div class="warn-box" style="margin-top:0.4rem;">
+        <strong>The Anvil cannot be beaten in a fight, and the module does not pretend otherwise.</strong>
+        It has no Harm Levels. Attacks land, matter, and change nothing — the metal takes the damage and the
+        draft takes the attacker's Fatigue. Anyone who insists on fighting it gains 1 Fatigue per exchange
+        and learns, unambiguously, that this is not the shape of the problem. Give them that information
+        cleanly and early rather than punishing them for the assumption.
+    </div>
+</div>
+
+<hr>
+
+<h2 id="act-4">🕯️ Act IV — The Last Ash</h2>
+<p style="color:var(--text2);">Three endings, one failure state. None of them is clean, and the module is
+    explicit with the players that none of them is clean. Put all three on the table before the last roll —
+    this is a decision, not a puzzle with a hidden right answer.</p>
+
+<div class="scene-card">
+    <div class="scene-title">💧 Ending One — Quench</div>
+    <div class="scene-desc">Open the deep cistern into the fire-chamber. The Hollow Anvil dies. So does
+        forty miles of the Spine Underway, in steam and collapse, and Khaz-Vurim is cut off from the deep
+        holds for at least a generation.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-red">Open the Sluice (DV 5, Desperate)</span>
+        <span class="badge badge-blue">Time the Withdrawal (DV 4, Controlled)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The forge is out and the party is out. The Underway is gone.
+                Khaz-Vurim survives as a hold that will spend the next fifty years explaining why it is
+                poorer.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, but the Story Beat is who did not make
+                the stair. Name someone from the Muster Yard scene.</div>
+            <div><strong>Partial (+1 Boon):</strong> The forge is out. The party is on the wrong side of the
+                collapse and walks out the long way, through the deep, over weeks — a campaign's worth of
+                Travel Framework if you want it.</div>
+            <div><strong>Miss (+2 Boons):</strong> The cistern goes into a fire-chamber that is still at full
+                draw. The steam front takes the upper Underway too. The party lives; the Muster Yard
+                does not.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">🕯️ Ending Two — Bank the Fire</div>
+    <div class="scene-desc">Restore the seal. Restore the ration. The Anvil goes back to one life a decade
+        and Khaz-Vurim keeps its road, its trade, and its bargain — and the party is now the party that
+        chose to reinstate it, in writing, with their names on the ledger.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-orange">Restore the Seal (DV 5, Controlled)</span>
+        <span class="badge badge-red">Sign the Ledger (DV 4, Desperate)</span>
+        <span class="badge badge-gray">Obligation: +2 to each participating character, permanent</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> The seal holds. The Underway reopens within the year. Every
+                character who signed carries <strong>2 Obligation</strong> that does not clear, and the
+                Rememberers' Gallery is theirs to commission from — at the gallery's price.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, and the first name on the new roll is
+                chosen in front of them.</div>
+            <div><strong>Partial (+1 Boon):</strong> The seal holds imperfectly. Forge Heat does not reset;
+                it starts the next campaign at 4 and advances once per season.</div>
+            <div><strong>Miss (+2 Boons):</strong> The seal is set wrong. It will hold for eleven years. The
+                party will not be told which eleven.</div>
+        </div>
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">💀 Ending Three — Feed It the Muster</div>
+    <div class="scene-desc">The forge does not care what it is given, only how much. Drive the entire Ash
+        Muster back down the draft — every thrall, every legionary, every Breaker, every dwarf of Khaz-Vurim
+        it has ever taken — and the Anvil will be sated for a century on what it made itself.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-red">Drive the Muster Down (DV 5, Desperate)</span>
+        <span class="badge badge-orange">Command the Rearguard (DV 5, Desperate)</span>
+        <span class="badge badge-blue">Rite of Ash, at scale (DV 4, Controlled)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div><strong>Clean:</strong> A hundred years bought in an afternoon. The forge is banked without
+                a living tithe and the hold owes the party everything it will never say out loud.</div>
+            <div><strong>Success with a Story Beat:</strong> As Clean, but the Muster included people the
+                party's own force is related to, and the drive was witnessed.</div>
+            <div><strong>Partial (+1 Boon):</strong> Most of it goes down. The remainder scatters into the
+                deep galleries and becomes somebody's problem in thirty years.</div>
+            <div><strong>Miss (+2 Boons):</strong> The drive stalls at the lip. The party is between the
+                Muster and the draft, and the only mass left to give the forge is standing in the chamber.</div>
+        </div>
+    </div>
+    <div class="gm-box" style="margin-top:0.4rem;">
+        <strong>This is the ending the module is built for, and it must not be free.</strong> It requires the
+        Span intact (so it cannot be taken by a party that dropped it in Act II), Underway Command with
+        Morale below full, and at least one Rememberer willing to open the draft. A party that plays Act II
+        purely defensively cannot reach it. That is the reward for tactical patience, and it is the only
+        reward this module hands out for free.
+    </div>
+</div>
+
+<div class="scene-card">
+    <div class="scene-title">☠️ Failure State — The Muster Reaches the Halls</div>
+    <div class="scene-desc">If <strong>Forge Heat [10]</strong> fills before Act III, the war ends where wars
+        end. The Ash Muster comes up the Spine Underway into Khaz-Vurim Halls and the module becomes a
+        defence of the Vault Gate: a single extended scene, DV 5 throughout, Desperate throughout, with
+        every timer the party built in Act II spending itself to buy rounds.</div>
+    <div class="flex text-xs mt-1">
+        <span class="badge badge-red">Hold the Vault Gate (DV 5, Desperate)</span>
+        <span class="badge badge-orange">Evacuate the Halls (DV 4, Controlled)</span>
+    </div>
+    <div class="encounter-box mt-1">
+        <div class="enc-outcomes">
+            <div>This is a losing fight and should be played as one. The question is not whether Khaz-Vurim
+                falls but how many go out through the high passes before it does, and whether the party is
+                among them or on the gate. Both answers are playable. Neither is cowardice. Say so at the
+                table.</div>
+        </div>
+    </div>
+</div>
+
+<hr>
+<h2 id="npcs">👤 Key NPCs</h2>
+<div class="grid-2">
+    <div class="npc-card">
+        <div class="npc-name">Vault-Queen Thora Stonebeard</div>
+        <div class="npc-role">Ruler of House Khaz-Vurim</div>
+        <div class="npc-motivation">🎯 Keep the hold standing, and keep the other holds from learning what
+            standing has cost it.</div>
+        <div class="npc-secret">She has personally approved every tithe for nineteen years and can recite
+            the names. She stopped paying because the hold's decline left nobody she could justify sending.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Warden-Sergeant Halda Grimmel</div>
+        <div class="npc-role">Seconded to the party's command; Follower, Cap 4</div>
+        <div class="npc-motivation">🎯 Get as many of her people back up the stair as the orders allow.</div>
+        <div class="npc-secret">She walked the last three tithes down herself. She will tell the party the
+            truth the moment they ask her a question that requires it, and not one moment before.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Foreman Kesta Deepdelver</div>
+        <div class="npc-role">Edgewalkers Guild sapper crew, Cap 3</div>
+        <div class="npc-motivation">🎯 Bring her crew out, get paid in standing, and drop something enormous
+            on the way.</div>
+        <div class="npc-secret">Her charges are guild property, not Khaz-Vurim's. Every demolition the party
+            orders is a favour she is keeping count of.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Bruni Ashgrave</div>
+        <div class="npc-role">Warden of the Ninth Gate; welded into her own post</div>
+        <div class="npc-motivation">🎯 To be relieved. By anyone. On any terms.</div>
+        <div class="npc-secret">She held the gate for eleven days after the draft took her, refusing to let
+            the Muster through, and she is still holding it. She is apologising for the eleven days she
+            spent deciding.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">The Ninth Rememberer</div>
+        <div class="npc-role">Bound master-smith of the Rememberers' Gallery</div>
+        <div class="npc-motivation">🎯 To finish something that is not armour.</div>
+        <div class="npc-secret">It remembers being the hold's finest artisan and remembers agreeing to the
+            binding. It maintains that the agreement was reasonable and would like to argue the point with
+            someone qualified.</div>
+    </div>
+    <div class="npc-card">
+        <div class="npc-name">Clan-Speaker Thrain Ironhold</div>
+        <div class="npc-role">The house's voice among the other holds</div>
+        <div class="npc-motivation">🎯 Ensure that whatever happens below can be survived as a story above.</div>
+        <div class="npc-secret">Did not know about the tithe. Is the only significant NPC who did not, and
+            the party's account is how he finds out.</div>
+    </div>
+</div>
+
+<hr>
+
+<h2 id="locations">📍 Locations</h2>
+<div class="grid-2">
+    <div class="loc-card"><strong>Khaz-Vurim Halls</strong> — The hold above. Perfect stonework, thinning
+        population, a Muster Yard that has not been used in three generations and is now full.</div>
+    <div class="loc-card"><strong>The Ninth Gate</strong> — The last sealed door on the descending Underway.
+        Warm to the touch on the wrong side.</div>
+    <div class="loc-card"><strong>The Foundry Span</strong> — Four hundred feet of walkway over live crucible
+        pits. The only road for heavy ranks, in either direction.</div>
+    <div class="loc-card"><strong>The Cinder Stair</strong> — Nine hundred steps, three abreast, past a dozen
+        burial galleries that were sealed for good reason.</div>
+    <div class="loc-card"><strong>The Rememberers' Gallery</strong> — Master workshops still in production.
+        Warded anvils, excellent light, and the finest craft in the deep world.</div>
+    <div class="loc-card"><strong>The Deep Works</strong> — Below the last dwarven cut. The rock is at working
+        temperature and the geometry stops being anyone's.</div>
+    <div class="loc-card"><strong>The Hollow Anvil</strong> — A furnace the size of a cathedral nave, an anvil
+        with nothing on it, and a draft that goes down past the light.</div>
+    <div class="loc-card"><strong>The Deep Cistern</strong> — Four centuries of meltwater held above the
+        fire-chamber by a sluice gate somebody built deliberately, and then wrote nothing down about.</div>
+</div>
+
+<hr>
+
+<h2 id="factions">🏛️ Factions &amp; Forces</h2>
+<p class="text-sm text-muted">Forces are Followers with Supply and Morale timers, per <em>GM Guide
+    Appendix B: Detailed Warfare</em>. A force assists at <strong>min(Cap, relevant Skill)</strong>, and no
+    roll takes more than +3 dice from all sources.</p>
+
+<div class="unit-card">
+    <div class="unit-name">Underway Command — the party's scratch force</div>
+    <div class="unit-line"><span class="badge badge-gray">Cap 3</span>
+        <span class="badge badge-gray">Supply [6], starts at 4</span>
+        <span class="badge badge-gray">Morale [6]</span></div>
+    <div class="unit-line">Two under-strength watch companies, forty hold militia, one guild sapper crew.
+        Disciplined, undertrained, and entirely aware of the odds. When Morale fills, the force routs and the
+        <strong>Ash Tithe</strong> is taken.</div>
+</div>
+<div class="unit-card">
+    <div class="unit-name">Grimmel's Watch — regulars</div>
+    <div class="unit-line"><span class="badge badge-gray">Cap 4</span>
+        <span class="badge badge-gray">Supply [6]</span>
+        <span class="badge badge-gray">Morale [8]</span></div>
+    <div class="unit-line">The professionals. Slow to break, expensive to replace, and there will be no
+        replacements.</div>
+</div>
+<div class="unit-card">
+    <div class="unit-name">Kesta's Crew — guild sappers</div>
+    <div class="unit-line"><span class="badge badge-gray">Cap 3</span>
+        <span class="badge badge-gray">Supply [4]</span>
+        <span class="badge badge-gray">Morale [4]</span></div>
+    <div class="unit-line">Blasting powder, bracing timber, and the only unit in the module that can change
+        the map. Fragile. Supply is literal here: when it empties, no more demolitions.</div>
+</div>
+<div class="unit-card" style="border-left-color:var(--purple);">
+    <div class="unit-name">The Ash Muster — the forge's army</div>
+    <div class="unit-line"><span class="badge badge-gray">TL 7</span>
+        <span class="badge badge-gray">Muster Strength [6]</span>
+        <span class="badge badge-gray">No Morale timer</span></div>
+    <div class="unit-line">It does not rout, resupply, rest, or negotiate, and it grows every time anyone on
+        any side dies within reach of the draft. It has no Morale timer because it has no morale. Each time
+        <strong>Muster Strength</strong> fills, empty it and add one rank: first Cindersworn, then Slagborn
+        Breakers, then a second Breaker line.</div>
+</div>
+<div class="panel panel-gold mt-1"><strong>House Khaz-Vurim</strong> — Controlled, sliding to Desperate.
+    Negotiation DV 4/5. Will not commit further troops and will not say why.</div>
+<div class="panel panel-purple"><strong>The Rememberers' Gallery</strong> — Dominant in its own workshops,
+    bound everywhere else. Parley DV 4. The only faction in the module that can be freed rather than
+    defeated.</div>
+<div class="panel panel-blue"><strong>Edgewalkers Guild</strong> — Controlled, mercenary but honest.
+    Cooperation DV 3/4. Keeps a ledger of favours in standing, never in coin.</div>
+
+<hr>
+<h2 id="bestiary">💀 Bestiary</h2>
+<p class="text-sm text-muted">Rated per <em>SRD — Rating an Adversary: Threat Level</em>. Threat Level is
+    the only difficulty axis; Harm Levels are stated, never hit points.</p>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Ash-Thrall</strong>
+    <span class="badge badge-gray">TL 2</span> <span class="badge badge-gray">Key Attribute 2</span>
+    <span class="badge badge-gray">Harm 2</span> <span class="badge badge-gray">Fatigue 2</span>
+    <span class="badge badge-gray">Armor None</span>
+    <span class="badge badge-gray">Harm Levels: 3 (standard)</span>
+    <div class="text-xs text-muted mt-1">The recent dead, walked up out of the draft and given a direction.
+        Slow, tireless, and wearing colours the party's own force can read. They do not fight well. They
+        fight constantly.</div>
+    <div class="text-xs mt-1"><strong>SB Moves:</strong>
+        <em>[AMBUSH] Out of the Slack Ash</em> (1) — a gallery the party cleared was not clear; one more
+        stands up behind the line. ·
+        <em>[REINFORCEMENT] It Was Not Alone</em> (2) — fill 1 segment of Muster Strength. ·
+        <em>[SOCIAL] It Has a Name</em> (2) — someone present recognises it; that character takes one
+        Position step worse on their next roll in this scene.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Cindersworn Legionary</strong>
+    <span class="badge badge-gray">TL 4</span> <span class="badge badge-gray">Key Attribute 3</span>
+    <span class="badge badge-gray">Harm 3</span> <span class="badge badge-gray">Fatigue 3</span>
+    <span class="badge badge-gray">Armor 2</span>
+    <span class="badge badge-gray">Harm Levels: 3 (standard)</span>
+    <div class="text-xs text-muted mt-1">The Muster's line infantry: dead soldiers rebuilt by the
+        Rememberers into proper ranks, in armour better than anything the living side is wearing. They hold
+        formation, they dress the line, and they wait. Armor drops to 1 if the Rememberers' Gallery has been
+        stopped.</div>
+    <div class="text-xs mt-1"><strong>SB Moves:</strong>
+        <em>[TACTICS] Dress the Line</em> (1) — the rank closes; no flanking bonus this exchange. ·
+        <em>[TACTICS] Advance by Ranks</em> (2) — the front gives ground and the second rank arrives fresh;
+        Position worsens one step for everyone facing it. ·
+        <em>[TRAP] Fighting Withdrawal</em> (2) — it retreats onto ground of its choosing and the pursuit is
+        Desperate. ·
+        <em>[TIMER] The Muster Does Not Rest</em> (3) — advance any one front timer by 1.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Molten Rememberer</strong>
+    <span class="badge badge-gray">TL 5</span> <span class="badge badge-gray">Key Attribute 4</span>
+    <span class="badge badge-gray">Harm 3</span> <span class="badge badge-gray">Fatigue 4</span>
+    <span class="badge badge-gray">Armor 1</span>
+    <span class="badge badge-gray">Harm Levels: 8 (advanced)</span>
+    <div class="text-xs text-muted mt-1">A bound master-smith, still working, still excellent. It fights only
+        if the gallery is attacked and it fights the way a craftsman fights — economically, and with tools it
+        made. It would rather talk. It has had four hundred years to prepare what it wants to say.</div>
+    <div class="text-xs mt-1"><strong>SB Moves:</strong>
+        <em>[ENVIRONMENT] Bank the Anvil</em> (1) — the working heat rises; 1 Fatigue to everyone in the
+        gallery. ·
+        <em>[SOCIAL] A Reasonable Agreement</em> (2) — it explains why the binding was correct, at length,
+        and persuasively. ·
+        <em>[CURSE] Fitted to the Wearer</em> (2) — a piece of the party's equipment was made here; it
+        becomes Neglected. ·
+        <em>[REINFORCEMENT] The Work Continues</em> (3) — a finished rank walks out of the far door. ·
+        <em>Signature — [BARGAIN] The Commission</em> (4) — it offers to make one thing the party wants
+        more than it wants to win the fight, and the offer is sincere.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Warden-Sergeant Bruni Ashgrave</strong>
+    <span class="badge badge-gray">TL 6</span> <span class="badge badge-gray">Key Attribute 4</span>
+    <span class="badge badge-gray">Harm 4</span> <span class="badge badge-gray">Fatigue 4</span>
+    <span class="badge badge-gray">Armor 3</span>
+    <span class="badge badge-gray">Harm Levels: 8 (advanced)</span>
+    <div class="text-xs text-muted mt-1">The Ninth Gate's warden, grown into her own post — stone and iron up
+        through the armour, hands fused to the winch. She still holds the gate. She is not sure any more
+        which way she is holding it, and she says so, continuously, in a voice everyone present can
+        understand.</div>
+    <div class="text-xs mt-1"><strong>SB Moves:</strong>
+        <em>[ENVIRONMENT] The Gate Answers</em> (1) — the mechanism moves; one character is cut off from the
+        others. ·
+        <em>[SOCIAL] I Am Sorry</em> (2) — she apologises by name to someone in the party's force; that force
+        fills 1 segment of Morale. ·
+        <em>[TRAP] Eleven Days</em> (2) — she recounts the eleven days; anyone who listens takes 1 Fatigue
+        and learns one true thing about the tithe. ·
+        <em>Signature — [POSSESSION] Relieve Me</em> (4) — she offers the post to whoever is closest, and
+        the gate is willing. Accepting ends the fight instantly and is not survivable as a player
+        character.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">Slagborn Breaker</strong>
+    <span class="badge badge-gray">TL 6</span> <span class="badge badge-gray">Key Attribute 4</span>
+    <span class="badge badge-gray">Harm 4</span> <span class="badge badge-gray">Fatigue 4</span>
+    <span class="badge badge-gray">Armor 3</span>
+    <span class="badge badge-gray">Harm Levels: 8 (advanced)</span>
+    <div class="text-xs text-muted mt-1">Six or seven dwarves' worth of mass, poured into one frame and sent
+        up the road to open doors. Not a construct — a compaction. It is the reason the Foundry Span matters,
+        and the reason dropping the Span ends the war above ground.</div>
+    <div class="text-xs mt-1"><strong>SB Moves:</strong>
+        <em>[ENVIRONMENT] Through the Wall</em> (1) — it makes a new lane; every ZoC in the scene is void
+        this exchange. ·
+        <em>[TACTICS] Open the Door</em> (2) — a held position stops being held; advance one front timer. ·
+        <em>[REINFORCEMENT] The Road Is Open</em> (2) — fill 1 segment of Muster Strength. ·
+        <em>Signature — [ENVIRONMENT] Bring It Down</em> (5) — the chamber, span or stair the fight is in
+        fails structurally. Everyone present is in the collapse, both sides, no exceptions.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">The Ash Muster</strong> <span class="text-xs text-muted">(as a
+        formation — see Factions &amp; Forces for the campaign layer)</span>
+    <span class="badge badge-gray">TL 7</span> <span class="badge badge-gray">Key Attribute 5</span>
+    <span class="badge badge-gray">Harm 5</span> <span class="badge badge-gray">Fatigue 5</span>
+    <span class="badge badge-gray">Armor 2</span>
+    <span class="badge badge-gray">Harm Levels: 8 per phase</span>
+    <div class="text-xs text-muted mt-1">Statted as a single adversary only when the party fights the army
+        rather than commanding against it — the Vault Gate defence, or the drive down the draft. Each phase
+        is one rank: thralls, then Cindersworn, then Breakers.</div>
+    <div class="text-xs mt-1"><strong>SB Moves:</strong>
+        <em>[TIMER] Tireless</em> (1) — advance Forge Heat by 1. ·
+        <em>[TACTICS] Envelop</em> (2) — Position worsens one step for the whole party. ·
+        <em>[REINFORCEMENT] The Tithe</em> (2) — anyone who fell this exchange joins the next phase. ·
+        <em>[AMBUSH] Up Through the Floor</em> (3) — a phase begins behind the line. ·
+        <em>Signature — [TACTICS] The Whole Weight</em> (5) — all remaining phases attack at once; the
+        defence either breaks here or holds for good.</div>
+</div>
+
+<div class="creature-stats">
+    <strong style="color:var(--gold);">The Hollow Anvil</strong>
+    <span class="badge badge-gray">TL 10</span> <span class="badge badge-gray">Key Attribute 6</span>
+    <span class="badge badge-gray">Harm 8</span> <span class="badge badge-gray">Fatigue 6</span>
+    <span class="badge badge-gray">Armor None</span>
+    <span class="badge badge-gray">Harm Levels: None (puzzle)</span>
+    <div class="text-xs text-muted mt-1">A furnace. It is not awake, not malevolent, and not addressable. It
+        draws what it is given at the rate it was built to draw, and it has been given the whole Underway.
+        It has no Harm Levels because there is nothing in it to kill.</div>
+    <div class="text-xs mt-1"><strong>Resolution:</strong> The Anvil is a load problem, not a combat. It is
+        resolved by changing what it draws on: <em>quench</em> it with the Deep Cistern (Ending One),
+        <em>ration</em> it by restoring the seal and reinstating the tithe (Ending Two), or <em>sate</em> it
+        by feeding it the Ash Muster entire (Ending Three). Nothing else in the module ends it, and no roll
+        against it does anything except cost the roller Fatigue.</div>
+    <div class="text-xs mt-1"><strong>SB Moves:</strong>
+        <em>[ENVIRONMENT] Draw</em> (1) — 1 Fatigue to everyone in the chamber. ·
+        <em>[OMEN] The Draft Turns</em> (2) — the party learns, correctly and unhelpfully, exactly how long
+        the hold has. ·
+        <em>[MEMORY] What It Has Taken</em> (3) — the ash shows a character someone it took, accurately. ·
+        <em>Signature — [TIMER] Full Draw</em> (5) — Forge Heat fills immediately and the module goes to its
+        failure state.</div>
+</div>
+
+<hr>
+
+<h2 id="timers">⏱️ Campaign Timers</h2>
+<div class="timers-grid">
+    <div class="panel panel-red">
+        <div class="flex-between text-sm"><strong>🔥 Forge Heat</strong><span>3/10</span></div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:30%;background:var(--red);"></div></div>
+        <div class="text-xs text-muted">The doom clock. Advances on undefended fronts, lost engagements, and
+            Ash Tithes taken at scale. When full, the Muster reaches Khaz-Vurim Halls.</div>
+    </div>
+    <div class="panel panel-green">
+        <div class="flex-between text-sm"><strong>🛡️ The Line Holds</strong><span>0/8</span></div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--green);"></div></div>
+        <div class="text-xs text-muted">The party's war effort. Filled by holding ground and by command
+            rolls. When full, the Muster is broken in the field and Act III opens.</div>
+    </div>
+    <div class="panel panel-purple">
+        <div class="flex-between text-sm"><strong>💀 Muster Strength</strong><span>0/6</span></div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--purple);"></div></div>
+        <div class="text-xs text-muted">The Ash Tithe. Fills on every death the forge is allowed to keep.
+            When full, empty it and add a rank.</div>
+    </div>
+    <div class="panel panel-orange">
+        <div class="flex-between text-sm"><strong>🌉 The Span Holds</strong><span>0/6</span></div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--orange);"></div></div>
+        <div class="text-xs text-muted">Front One. When full, the Foundry Span is lost and heavy ranks have
+            a road to the upper Underway.</div>
+    </div>
+    <div class="panel panel-blue">
+        <div class="flex-between text-sm"><strong>🕯️ Ash-Draft</strong><span>0/4</span></div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:0%;background:var(--blue);"></div></div>
+        <div class="text-xs text-muted">Front Two. When full, the burial galleries on the Cinder Stair empty
+            themselves into the party's rear.</div>
+    </div>
+    <div class="panel panel-gold">
+        <div class="flex-between text-sm"><strong>⚒️ The Work Continues</strong><span>4/6</span></div>
+        <div class="timer-bar"><div class="timer-bar-fill" style="width:66%;background:var(--gold);"></div></div>
+        <div class="text-xs text-muted">Front Three. When full, the Rememberers complete a full issue of
+            plate and every Cindersworn gains Armor 3.</div>
+    </div>
+</div>
+<div class="panel panel-gold mt-1">
+    <strong>Force timers.</strong> Each force additionally tracks its own <strong>Supply</strong> and
+    <strong>Morale</strong> per <em>Appendix B</em>. Supply empties through use and refills on a successful
+    Salvage; Morale fills through loss and empties through a successful Rite of Ash or a Clean command roll
+    made in person. A force whose Morale fills routs, and routing takes the Ash Tithe.
+</div>
+
+<hr>
+<h2 id="rewards">🎖️ Rewards</h2>
+<p class="text-sm text-muted">Rewards are earned by ending, not by survival. All XP costs and Obligation
+    costs follow <em>SRD §6.9 Crafting</em> and the Talent tiers; nothing here bypasses them.</p>
+
+<table>
+    <tr><th>Reward</th><th class="c">Type</th><th>Terms</th></tr>
+    <tr>
+        <td><strong>Ashgrave's Winch-Key</strong></td>
+        <td class="c">Asset</td>
+        <td>Bruni's key, recovered if she is released rather than destroyed. Opens any Khaz-Vurim gate
+            mechanism without a roll. Upkeep: 1 (Efficient). Available in any ending where she is relieved.</td>
+    </tr>
+    <tr>
+        <td><strong>A Rememberer's Work</strong></td>
+        <td class="c">Equipment</td>
+        <td>Whatever the party commissioned in Act II, made properly, with no Flaw. Attunement 3; upkeep
+            max(1, cost ÷ 3). Requires the Gallery parleyed rather than broken.</td>
+    </tr>
+    <tr>
+        <td><strong>Cinder-Iron Plate</strong></td>
+        <td class="c">Equipment</td>
+        <td>Salvaged Cindersworn armour, reworked. Armor 2, and it does not corrode. Carries the
+            <em>Remembering</em> Flaw — it knows who wore it, and says so at inconvenient moments.</td>
+    </tr>
+    <tr>
+        <td><strong>The Underway Writ</strong></td>
+        <td class="c">Asset</td>
+        <td>Standing with House Khaz-Vurim, formally recorded. Grants Dominant Position on any dealing with
+            a dwarven hold that has heard the story. Available only on Endings One and Three.</td>
+    </tr>
+    <tr>
+        <td><strong>The Ledger Signature</strong></td>
+        <td class="c">Obligation</td>
+        <td>Ending Two only. <strong>+2 Obligation, permanent</strong>, to every character who signed. In
+            exchange, the Rememberers' Gallery is a standing Wonder-workshop — and the Gallery is owned by
+            the forge.</td>
+    </tr>
+    <tr>
+        <td><strong>Advancement</strong></td>
+        <td class="c">XP</td>
+        <td>Standard campaign award. Add 2 XP to each character who made a command decision they had to
+            defend to another character afterwards, whichever way it went.</td>
+    </tr>
+</table>
+
+<hr>
+
+<h2 id="gmnotes">🗒️ GM Notes</h2>
+<div class="warn-box"><strong>The arithmetic is the horror.</strong> Never describe the Muster as evil,
+    hungry, or hateful. Describe it as <em>on schedule</em>. The forge is a correctly functioning piece of
+    dwarven engineering being asked to do more than it was rationed for, and every atrocity in the module is
+    downstream of an accounting problem somebody solved reasonably four hundred years ago.</div>
+<div class="warn-box"><strong>No PC dies by GM fiat.</strong> The original draft of this adventure asked the
+    GM to choose a player character to sacrifice. That is not how this game works and it is not in here. Every
+    ending that costs a life costs it through a roll the player made or a choice the player stated, in
+    public, at the table.</div>
+<div class="gm-box"><strong>Act I:</strong> Spend real time in the Muster Yard. Name four dwarves. Let the
+    players talk to them. Every one of those names is a lever the module will pull later, and none of them
+    work if the party met the force as a number.</div>
+<div class="gm-box"><strong>Act II:</strong> Run the three fronts as a standing pressure, not a sequence.
+    Ask "where are you" at the top of every session and mean it. The correct feeling is that the party is
+    always one place short, and that this is nobody's fault.</div>
+<div class="gm-box"><strong>Act III:</strong> Let the reveal be quiet. Halda does not confess; she answers a
+    question. Thora does not justify; she assumes the party already worked it out. Nobody in Khaz-Vurim
+    thinks the tithe was a secret. They think it was a duty, discharged discreetly, and they are right that
+    it kept the hold alive.</div>
+<div class="gm-box"><strong>Act IV:</strong> Put all three endings on the table explicitly, with their costs,
+    before anyone rolls. This is not a puzzle to solve; it is a decision to own. Then let them argue about it
+    for as long as they want, because that argument is the climax and the dice are only the epilogue.</div>
+<div class="gm-box"><strong>Scaling.</strong> Written for Tier III–IV. For Tier II, drop every TL by 2, cut
+    the Slagborn Breaker entirely, and shorten Forge Heat to [8]. For Tier V, add a second Breaker line at
+    Muster Strength full, raise the Hollow Anvil's Draw to 2 Fatigue, and start Forge Heat at 5.</div>
+<div class="gm-box"><strong>Companion module.</strong> <em>The Dwarven Debt</em> shares this hold, this
+    Vault-Queen, and the Spine Underway. Running it first gives the party a reason to care that Khaz-Vurim
+    survives — and Ending One, which severs the Underway for a generation, lands very differently on a table
+    that has already walked it.</div>
+
+<hr>
+
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    The Forge of Souls — A Fate's Edge Adventure<br>
+    © Nicholas A. Gasper — For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>
