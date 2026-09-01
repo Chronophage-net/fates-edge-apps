@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-01T13:30:33.202Z",
+  "generated": "2026-09-01T13:45:51.129Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -56,6 +56,16 @@
       "id": "ashes_of_the_infernal_accord",
       "title": "Ashes Of The Infernal Accord",
       "file": "Fates_-_Edge_-_-Ashes-_-of-_-the-_-Infernal-_-Accord.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "between_knot_and_gate",
+      "title": "Between Knot And Gate",
+      "file": "Fates_-_Edge_-_-Between-_-Knot-_-and-_-Gate.html",
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
@@ -919,7 +929,7 @@
       "active": true
     }
   ],
-  "total_count": 56,
-  "active_count": 56,
+  "total_count": 57,
+  "active_count": 57,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
