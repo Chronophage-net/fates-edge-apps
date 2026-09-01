@@ -211,3 +211,88 @@ describe('crafting: Flaws (SRD 6.9.4)', () => {
         assertEqual(flawById('immaculate'), null, 'unknown Flaws are null, not exceptions');
     });
 });
+
+// ============================================================
+// REGRESSION: duplicate event listeners on the crafting container
+// ============================================================
+//
+// Reported symptom: expand the first recipe (fine, it opens and scrolls),
+// then close it — and the page stops responding.
+//
+// Cause: render() replaces container.innerHTML but NOT the container element,
+// while attachEvents() bound four delegated listeners to that same container
+// on every render. Handlers therefore accumulated — 1 set, then 2, then 4 —
+// and because every handler calls refreshPanel(), which re-binds, the count
+// doubled on each click until the page locked up. The even-numbered firings
+// also cancelled the expand/collapse toggle out, so the card looked dead
+// before the tab froze.
+//
+// These are source guards rather than DOM tests: the accumulation only shows
+// up across real renders against a live container, which the test DOM shim's
+// no-op addEventListener cannot model. They pin the three properties that
+// actually prevent the bug.
+
+describe('crafting source guard (regression): container listeners bind once', () => {
+
+    async function craftingSource() {
+        const { readFileSync } = await import('node:fs');
+        const path = await import('node:path');
+        const { fileURLToPath } = await import('node:url');
+        const p = path.join(path.dirname(fileURLToPath(import.meta.url)), '../../js/features/crafting/index.js');
+        return readFileSync(p, 'utf8');
+    }
+
+    it('guards every container.addEventListener behind a bind-once flag', async () => {
+        const src = await craftingSource();
+
+        const guardIdx = src.indexOf('container[BOUND_FLAG] = true;');
+        assert(guardIdx > -1, 'attachEvents() must set a bind-once flag on the container element');
+        assert(
+            src.indexOf('if (container[BOUND_FLAG]) return;') > -1,
+            'attachEvents() must return early when the container is already bound'
+        );
+
+        // Every delegated listener must sit AFTER the guard, so a re-render
+        // cannot add a second copy of it.
+        const positions = [];
+        let i = src.indexOf('container.addEventListener');
+        while (i !== -1) { positions.push(i); i = src.indexOf('container.addEventListener', i + 1); }
+        assert(positions.length > 0, 'expected delegated listeners on the container');
+        for (const pos of positions) {
+            assert(pos > guardIdx, 'a container.addEventListener call sits before the bind-once guard — it will be re-bound on every render');
+        }
+    });
+
+    it('does not capture a character in the long-lived handlers', async () => {
+        const src = await craftingSource();
+        // The handlers now outlive any single render, so a `char` captured at
+        // bind time would go stale and get written back over newer data.
+        assert(
+            /function attachEvents\(\s*\)/.test(src),
+            'attachEvents() must take no arguments — it must not close over a render-time character'
+        );
+        assert(
+            /attachEvents\(\s*\);/.test(src),
+            'render() must call attachEvents() with no arguments'
+        );
+        assert(
+            src.indexOf('function currentChar()') > -1,
+            'handlers must read the selected character at click time via currentChar()'
+        );
+    });
+
+    it('does not re-parse wiki data on every click', async () => {
+        const src = await craftingSource();
+        const start = src.indexOf('function attachEvents');
+        const end = src.indexOf('// TOAST WITH HTML');
+        assert(start > -1 && end > start, 'could not locate attachEvents() body');
+        const handlers = src.slice(start, end);
+
+        for (const fn of ['parseIngredientsFromWiki', 'parseRecipesFromWiki', 'parseCodexFromWiki']) {
+            assert(
+                handlers.indexOf(fn + '(') === -1,
+                `${fn}() must not run inside a click handler — render() already built that map`
+            );
+        }
+    });
+});

@@ -119,8 +119,14 @@ const uiState = {
     batchQuantity: 1
 };
 
-// Refinement recipes (map of id -> recipe), rebuilt each render()
+// Parsed wiki data, rebuilt each render() and read by the delegated event
+// handlers. These used to be re-parsed from scratch inside the click handler
+// on EVERY click, which is both wasteful and unnecessary: render() has
+// already done exactly this work, and a click cannot change wiki.json.
 let refinementMap = {};
+let ingredientMap = {};
+let recipeMap = {};
+let codexMap = {};
 
 function resetUiStateIfCharChanged(char) {
     if (lastCharId !== char.id) {
@@ -183,9 +189,9 @@ export async function render(el) {
 
     const state = getState();
     const wikiEntries = state.wikiEntries || [];
-    const ingredientMap = parseIngredientsFromWiki(wikiEntries);
-    const recipeMap = parseRecipesFromWiki(wikiEntries);
-    const codex = parseCodexFromWiki(wikiEntries);
+    ingredientMap = parseIngredientsFromWiki(wikiEntries);
+    recipeMap = parseRecipesFromWiki(wikiEntries);
+    codexMap = parseCodexFromWiki(wikiEntries);
 
     refinementMap = {};
     for (const [id, recipe] of Object.entries(recipeMap)) {
@@ -194,11 +200,11 @@ export async function render(el) {
 
     const tabContent = uiState.activeTab === 'crafting'
         ? renderCraftingTab(char, ingredientMap, recipeMap, refinementMap, uiState)
-        : renderCodexTab(char, codex, uiState);
+        : renderCodexTab(char, codexMap, uiState);
 
     container.innerHTML = renderRoot(char, tabContent, uiState);
 
-    attachEvents(char);
+    attachEvents();
 }
 
 function attachNoCharacterEvents() {
@@ -596,9 +602,32 @@ if (typeof document !== 'undefined') {
 // EVENTS
 // ============================================================
 
-function attachEvents(char) {
+// The delegated listeners below are bound to `container`, which render()
+// does NOT replace — it only overwrites container.innerHTML. Binding them on
+// every render therefore ACCUMULATED handlers: one set after the first
+// render, two after the first refresh, four after the next, and so on. Each
+// duplicate re-ran the whole handler, and handlers call refreshPanel(), which
+// re-bound again — so a couple of clicks (expand a recipe, collapse it) was
+// enough to multiply the listener count into the hundreds and lock the page
+// up. Worse, the toggle handler firing an even number of times cancelled
+// itself out, so the card appeared not to respond at all.
+//
+// Fix: bind exactly once per container element, tracked by a flag on the
+// element itself (so a genuinely new container in a later mount rebinds).
+// Because the handlers now outlive any single render, none of them may close
+// over a `char` captured at bind time — each reads the currently selected
+// character itself via currentChar().
+const BOUND_FLAG = '__fateseCraftingEventsBound';
+
+function currentChar() {
+    return getCharacterData({ silent: true });
+}
+
+function attachEvents() {
     if (!container) return;
 
+    // Re-bound every render: this button lives inside the replaced innerHTML,
+    // so its old listener goes away with the old element.
     const refreshBtn = document.getElementById('craft-refresh-btn');
     if (refreshBtn) refreshBtn.addEventListener('click', async () => {
         showToast('🔄 Reloading crafting data…', 'info');
@@ -606,6 +635,9 @@ function attachEvents(char) {
         await refreshPanel();
         showToast('✅ Crafting refreshed.', 'success');
     });
+
+    if (container[BOUND_FLAG]) return;
+    container[BOUND_FLAG] = true;
 
     // Tab switching
     container.addEventListener('click', (e) => {
@@ -649,33 +681,35 @@ function attachEvents(char) {
 
     // Click actions (delegated)
     container.addEventListener('click', async (e) => {
-        const state = getState();
-        const wikiEntries = state.wikiEntries || [];
-        const ingredientMap = parseIngredientsFromWiki(wikiEntries);
-        const recipeMap = parseRecipesFromWiki(wikiEntries);
-        const codex = parseCodexFromWiki(wikiEntries);
-
-        const forageBtn = e.target.closest('#craft-forage-btn');
-        if (forageBtn) return forageIngredient(char, ingredientMap);
-
-        const buyBtn = e.target.closest('#craft-buy-btn');
-        if (buyBtn) return purchaseIngredient(char, ingredientMap);
-
-        const combineBtn = e.target.closest('#craft-combine-btn');
-        if (combineBtn) return combineIngredients(char, recipeMap);
-
-        const clearCombineBtn = e.target.closest('#craft-clear-combine-btn');
-        if (clearCombineBtn) { uiState.craftCombineSelection = []; return refreshPanel(); }
-
-        const removeIngBtn = e.target.closest('[data-remove-ingredient-idx]');
-        if (removeIngBtn) return removeIngredientAt(char, parseInt(removeIngBtn.dataset.removeIngredientIdx, 10));
-
+        // Purely-visual toggles first: they need no character and no data, so
+        // they stay cheap and keep working even with no character selected.
         const toggleRecipeBtn = e.target.closest('[data-toggle-recipe]');
         if (toggleRecipeBtn) {
             const id = toggleRecipeBtn.dataset.toggleRecipe;
             uiState.craftExpandedRecipe = uiState.craftExpandedRecipe === id ? null : id;
             return refreshPanel();
         }
+
+        const clearCombineBtn = e.target.closest('#craft-clear-combine-btn');
+        if (clearCombineBtn) { uiState.craftCombineSelection = []; return refreshPanel(); }
+
+        const codexCategoryBtn = e.target.closest('[data-codex-category]');
+        if (codexCategoryBtn) { uiState.codexCategoryFilter = codexCategoryBtn.dataset.codexCategory; return refreshPanel(); }
+
+        const char = currentChar();
+        if (!char) return;
+
+        const forageBtn = e.target.closest('#craft-forage-btn');
+        if (forageBtn) return forageIngredient(char, ingredientMap);
+
+        const buyBtn = e.target.closest('#craft-buy-btn');
+        if (buyBtn) return buyIngredient(char, ingredientMap);
+
+        const combineBtn = e.target.closest('#craft-combine-btn');
+        if (combineBtn) return combineIngredients(char, recipeMap);
+
+        const removeIngBtn = e.target.closest('[data-remove-ingredient-idx]');
+        if (removeIngBtn) return removeIngredientAt(char, parseInt(removeIngBtn.dataset.removeIngredientIdx, 10));
 
         const craftRecipeBtn = e.target.closest('[data-craft-recipe]');
         if (craftRecipeBtn) return craftFromRecipe(char, recipeMap, craftRecipeBtn.dataset.craftRecipe, uiState.batchQuantity || 1);
@@ -689,11 +723,8 @@ function attachEvents(char) {
         const removeCraftedBtn = e.target.closest('[data-remove-crafted]');
         if (removeCraftedBtn) return removeCraftedItem(char, removeCraftedBtn.dataset.removeCrafted);
 
-        const codexCategoryBtn = e.target.closest('[data-codex-category]');
-        if (codexCategoryBtn) { uiState.codexCategoryFilter = codexCategoryBtn.dataset.codexCategory; return refreshPanel(); }
-
         const attuneBtn = e.target.closest('[data-toggle-attune]');
-        if (attuneBtn) return toggleAttune(char, codex, safeParseInt(attuneBtn.dataset.toggleAttune, 0));
+        if (attuneBtn) return toggleAttune(char, codexMap, safeParseInt(attuneBtn.dataset.toggleAttune, 0));
 
         const payUpkeepBtn = e.target.closest('[data-pay-upkeep]');
         if (payUpkeepBtn) return payUpkeep(char, payUpkeepBtn.dataset.payUpkeep, 'efficient');
