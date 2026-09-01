@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-01T23:31:41.927Z",
+  "generated": "2026-09-01T23:57:52.594Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -795,6 +795,16 @@
       "active": true
     },
     {
+      "id": "the_peoples_die",
+      "title": "The Peoples Die",
+      "file": "Fates_-_Edge_-_-The-_-Peoples-_-Die.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_recursive_garden",
       "title": "The Recursive Garden",
       "file": "Fates_-_Edge_-_-The-_-Recursive-_-Garden.html",
@@ -989,7 +999,7 @@
       "active": true
     }
   ],
-  "total_count": 63,
-  "active_count": 63,
+  "total_count": 64,
+  "active_count": 64,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

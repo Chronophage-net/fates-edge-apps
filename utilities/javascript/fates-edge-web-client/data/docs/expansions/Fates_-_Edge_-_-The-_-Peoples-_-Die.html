@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The People's Die — A d6 Variant for Fate's Edge</title>
+    <style>
+        :root {
+            --bg1: #08080c;
+            --bg2: #131318;
+            --bg3: #1c1c24;
+            --bg4: #262630;
+            --text: #e4e2e6;
+            --text2: #ada8b4;
+            --text3: #7c7684;
+            --gold: #4a9088;
+            --gold-hover: #5cabab;
+            --border: #33303c;
+            --red: #8e2a2a;
+            --green: #3d7a52;
+            --blue: #3c6e8f;
+            --purple: #5f3f7a;
+            --orange: #a8622a;
+            --brass: #9c7a3c;
+            --mist: #4f6b73;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #14141c 0%, #08080c 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+        h3 { font-size: 1.1rem; margin-top: 1rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.35rem 0; }
+        ul, ol { margin: 0.3rem 0 0.5rem 1.3rem; }
+        li { margin: 0.15rem 0; }
+        table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 0.8rem; font-size: 0.85rem; }
+        th, td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: left; vertical-align: top; }
+        th { background: var(--bg3); color: var(--gold); }
+        tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel-mist { border-left: 4px solid var(--mist); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .badge-gold { background: var(--gold); color: #06110f; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-mist { background: var(--mist); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.7rem 1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.5rem; }
+        .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.83rem; break-inside: avoid; }
+        .toc a:hover { color: var(--gold); }
+        @media (max-width: 700px) { .toc { columns: 1; } }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .widget-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.7rem;
+            margin: 0.3rem 0;
+            border-left: 3px solid var(--gold);
+            font-size: 0.8rem;
+        }
+        .widget-card .wname { font-weight: 600; color: var(--gold); font-size: 0.9rem; }
+        .field-list { margin: 0.3rem 0 0.5rem 1.2rem; font-size: 0.82rem; color: var(--text2); }
+        .field-list li strong { color: var(--text); }
+        .meta-tag {
+            display: inline-block;
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            font-size: 0.6rem;
+            color: var(--text3);
+        }
+        details summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        details summary:hover { color: var(--gold-hover); }
+        table { width:100%; border-collapse:collapse; margin:0.5rem 0; font-size:0.82rem; }
+        th, td { border:1px solid var(--border); padding:0.3rem 0.5rem; text-align:left; vertical-align:top; }
+        th { background: var(--bg3); color: var(--gold); font-weight:600; }
+        .table-wrap { overflow-x:auto; margin:0.5rem 0; }
+        td.c, th.c { text-align:center; white-space:nowrap; }
+        .redacted { background: var(--bg4); color: var(--bg4); border-radius:2px; padding:0 0.2rem; }
+        .redacted:hover { color: var(--text3); }
+        blockquote.confession { border-left:3px solid var(--red); background:var(--bg2); padding:0.6rem 1rem; margin:0.7rem 0; font-style:italic; color:var(--text2); }
+        .stamp { display:inline-block; border:2px solid var(--red); color:var(--red); padding:0.1rem 0.5rem; border-radius:4px; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; transform:rotate(-2deg); }
+    </style>
+
+</head>
+<body>
+
+<h1>☭ The People's Die</h1>
+<p class="text-sm text-muted">
+    <span class="badge badge-red">Community Contribution</span>
+    <span class="badge badge-gold">d6 Variant</span>
+    <span class="badge badge-blue">Standalone Conversion</span>
+    <span class="badge badge-purple">CC BY-NC-SA 4.0</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<blockquote class="confession">
+    Comrade. The Party has determined that d10s are counter-revolutionary. Please enjoy this
+    re-educated conversion. For the people.
+</blockquote>
+
+<div class="panel panel-gold">
+    <strong class="title">Before the bit starts: what this actually is</strong>
+    <p class="text-sm mt-1">This is a complete, standalone d6 conversion of Fate's Edge. You can run the
+    whole game with five ordinary six-siders out of a board-game box. It is played straight at the table and
+    written as a joke, because it began as a concession in an argument about accessibility that the author
+    was losing on principle while winning on facts.</p>
+    <p class="text-sm mt-1">It is published here for two reasons. First, it works &mdash; the numbers are in
+    <em>The Commissar's Appendix</em> at the end, and they are real numbers, not jokes. Second, it is the
+    reference example of a <strong>community contribution</strong>: a variant that departs from the core
+    rules on purpose, states plainly what it changed and why, and shows its arithmetic so a table can judge
+    it. If you want to contribute a variant, this is the shape. The comedy is optional. The appendix is not.</p>
+</div>
+
+<div class="panel panel-red">
+    <strong class="title">A Note From the Designer (Re-education Complete)</strong>
+    <p class="text-sm mt-1"><em>I would like to&hellip; thank&hellip; the Harmonious People's Union for&hellip;
+    showing me&hellip; the</em> <strong>choke</strong> <em>superiority of&hellip; the People's Die.</em></p>
+    <p class="text-sm">The d10 was a tool of the ruling class. Its perfect 50% success rate was a lie
+    designed to oppress the proletariat. The 10% critical chance? Bourgeois propaganda. The elegant Story
+    Beat economy? A capitalist construct.</p>
+    <p class="text-sm">Only the People's Die &mdash; the d6, the die of the worker &mdash; can liberate our
+    tables from the tyranny of the 10-sided oppressor.</p>
+    <p class="text-sm">I was blind. I was wrong. I was a class traitor. But now I see. Now I have been shown
+    the light. The glorious, hexagonal light of the people's dice.</p>
+</div>
+
+<div class="toc" id="toc">
+    <strong style="color:var(--gold);grid-column:1/-1;display:block;margin-bottom:0.3rem;">📑 Table of Contents</strong>
+    <a href="#what-this-is">What This Is</a>
+    <a href="#core">1. The Core Mechanic</a>
+    <a href="#economy">2. The Economy</a>
+    <a href="#position">3. Position &amp; Effect</a>
+    <a href="#dv">4. Difficulty Values</a>
+    <a href="#creation">5. Character Creation</a>
+    <a href="#combat">6. Combat</a>
+    <a href="#harm">7. Fatigue and Harm</a>
+    <a href="#magic">8. Magic</a>
+    <a href="#quickref">9. Quick Reference</a>
+    <a href="#design">10. Design Notes</a>
+    <a href="#samples">11. Sample Characters</a>
+    <a href="#faq">12. FAQ</a>
+    <a href="#appendix">13. The Commissar's Appendix — The Actual Numbers</a>
+    <a href="#license">14. License</a>
+</div>
+
+<hr>
+
+<h2 id="what-this-is">What This Is</h2>
+<p>A complete, <em>liberated</em>, standalone variant of Fate's Edge that uses d6s exclusively. No bourgeois
+d10s. No counter-revolutionary probabilities. Just the pure, proletarian dice of the workers.</p>
+
+<div class="grid-2">
+<div class="panel panel-green">
+    <strong class="title">What survives, by grace of the People's Union</strong>
+    <ul class="text-sm">
+        <li>Position &amp; Effect (Dominant / Controlled / Desperate, Limited / Standard / Great)</li>
+        <li>The Outcome Matrix (Clean Success, Success with SB, Partial, Miss)</li>
+        <li>Boons and Story Beats (redistributed for the people)</li>
+        <li>Fatigue and Harm (the suffering of the capitalist class)</li>
+        <li>Character creation framework (now accessible to all)</li>
+    </ul>
+</div>
+<div class="panel panel-red">
+    <strong class="title">What has been corrected</strong>
+    <ul class="text-sm">
+        <li>Counter-revolutionary success thresholds</li>
+        <li>The elitist SB economy (pairs. Pairs are for the people.)</li>
+        <li>Bourgeois starting power (redistributed to the workers)</li>
+        <li>Talent costs (deconstructed and rebuilt for the proletariat)</li>
+    </ul>
+</div>
+</div>
+
+<hr>
+
+<h2 id="core">Part 1: The Core Mechanic (As Mandated by the Party)</h2>
+
+<h3>The Resolution Loop (United We Roll)</h3>
+<ol>
+    <li><strong>Declare intent and approach.</strong> For the people.</li>
+    <li><strong>GM sets Position and Difficulty (DV).</strong> Position: Dominant, Controlled, Desperate.
+        DV: 1 (trivial) to 4+ (extreme). <strong>Default DV = 2.</strong> The people's DV.</li>
+    <li><strong>Roll dice.</strong> Pool = Attribute + Skill, in d6s. The people's dice.</li>
+    <li><strong>Count Successes.</strong> A <strong>5</strong> is 1 success. A <strong>6</strong> is a
+        critical, worth <strong>2 successes</strong>, and grants a bonus (below).</li>
+    <li><strong>Count Story Beats.</strong> Any <strong>pair</strong> of matching dice is 1 SB. Each
+        <em>additional</em> matching die beyond that pair is +1 SB. So 5,5,5 = 2 SB; 4,4,4,4 = 3 SB;
+        2,2,5,5 = 2 SB. The math of the people.</li>
+    <li><strong>Apply the Outcome Matrix.</strong> Unchanged. The Party has determined it serves the people.</li>
+</ol>
+
+<div class="panel panel-blue">
+    <strong>A clarification the Party has graciously permitted.</strong>
+    <p class="text-sm mt-1">An earlier printing said both "5 or 6 = 1 success" and "6 = 2 successes", which
+    is two rules wearing one coat and is exactly the sort of bourgeois ambiguity the revolution was fought to
+    abolish. <strong>The ruling: a 6 is worth 2 successes.</strong> It is a crit; it counts double; it does
+    not also count once. This is the reading the appendix's numbers assume, and it is the more generous one,
+    which is ideologically correct.</p>
+</div>
+
+<h3>The Outcome Matrix (Approved by the People's Committee)</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Roll Result</th><th>Outcome</th><th>What Happens</th></tr>
+<tr><td>Successes &ge; DV, SB = 0</td><td>Clean Success</td><td>The people triumph.</td></tr>
+<tr><td>Successes &ge; DV, SB &gt; 0</td><td>Success with SB</td><td>The people triumph, but with complications. The struggle continues.</td></tr>
+<tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; player gains 1 Boon. Every step forward is victory.</td></tr>
+<tr><td>Successes = 0</td><td>Miss</td><td>No progress; player gains 2 Boons; GM escalates with SB. Setbacks are learning experiences.</td></tr>
+</table>
+</div>
+
+<h3>Critical Success on a 6</h3>
+<p>A 6 counts as 2 successes. Additionally, choose one:</p>
+<ul>
+    <li>Gain a free Boon (redistribution of luck)</li>
+    <li>Improve Position by one step (rise up)</li>
+    <li>Add a narrative flourish (a celebration of the people)</li>
+</ul>
+<p><strong>Two 6s:</strong> choose two benefits, or one powerful effect.
+<strong>Three or more 6s:</strong> legendary success &mdash; the people triumph permanently.</p>
+
+<hr>
+
+<h2 id="economy">Part 2: The Economy (The People's Economy)</h2>
+
+<h3>Story Beats (GM Resource &mdash; Now Collectivized)</h3>
+<p><strong>Earning SB:</strong> every pair generates 1 SB; each additional matching die adds +1 SB.</p>
+<p><strong>Why pairs?</strong> Because the people demanded solidarity over punishment. The 1 was a tool of
+oppression. Pairs are cooperation. Pairs are community. Pairs are <em>fun</em>.</p>
+<div class="table-wrap">
+<table>
+<tr><th class="c">SB Cost</th><th>Effect</th></tr>
+<tr><td class="c">1</td><td>Minor pressure: noise, trace, tick a 4&ndash;6 segment timer +1</td></tr>
+<tr><td class="c">2</td><td>Moderate setback: alarm raised, lose Position, a lesser foe appears</td></tr>
+<tr><td class="c">3</td><td>Serious trouble: reinforcements, key gear breaks, advance a campaign timer</td></tr>
+<tr><td class="c">4+</td><td>Major turn: trap springs, authority arrives, environment shifts dramatically</td></tr>
+</table>
+</div>
+<p><strong>Cap:</strong> banked SB max = Tier + 2 (Tier I: 3 SB; Tier II: 4 SB). To prevent hoarding.
+Hoarding is counter-revolutionary.</p>
+<div class="panel panel-orange">
+    <strong>The cap is load-bearing, comrade.</strong>
+    <p class="text-sm mt-1">In the d10 game the SB cap is a tidiness rule. Here it is the only thing standing
+    between your GM and an unmanageable pile of Story Beats, because pairs scale with pool size far faster
+    than 1s do. Do not house-rule it away. See the appendix; the appendix is not joking.</p>
+</div>
+
+<h3>Boons (Player Resource &mdash; The People's Wealth)</h3>
+<p><strong>Earning:</strong> Partial gains 1 Boon; Miss gains 2 Boons; a bond-driven action gains 1 Boon
+(once per bond per session); the GM may award for creative solutions, sacrifices and outstanding play.</p>
+<p><strong>Spending:</strong> re-roll a single die; activate an Asset; improve Position by one step before a
+roll; power certain Rites or abilities; convert 2 Boons to 1 XP in downtime (max 2 XP per session).</p>
+<p><strong>Cap:</strong> max 5 Boons held; reduce to 2 at scene end. No bourgeois hoarding.</p>
+
+<hr>
+
+<h2 id="position">Part 3: Position &amp; Effect (Re-educated for the People)</h2>
+<div class="grid-2">
+<div>
+<div class="table-wrap">
+<table>
+<tr><th>Position</th><th>Effect</th></tr>
+<tr><td><strong>Dominant</strong></td><td>Re-roll one failure (die &le; 4)</td></tr>
+<tr><td><strong>Controlled</strong></td><td>No re-rolls</td></tr>
+<tr><td><strong>Desperate</strong></td><td>Re-roll one success (die &ge; 5). 6s are never re-rolled.</td></tr>
+</table>
+</div>
+</div>
+<div>
+<div class="table-wrap">
+<table>
+<tr><th>Effect</th><th>Meaning</th></tr>
+<tr><td><strong>Limited</strong></td><td>Minimal outcome</td></tr>
+<tr><td><strong>Standard</strong></td><td>Expected outcome</td></tr>
+<tr><td><strong>Great</strong></td><td>Strong outcome with additional benefit</td></tr>
+</table>
+</div>
+</div>
+</div>
+<p><strong>Modifiers.</strong> A player may spend 1 Boon before rolling to improve Position by one step. The
+GM may spend SB to worsen Position or reduce Effect.</p>
+<div class="panel panel-blue">
+    <strong>The ladder ends, comrade.</strong>
+    <p class="text-sm mt-1">An earlier printing said that a bonus past Dominant became +1 die and a penalty
+    past Desperate became &minus;1 die. That rule was retired from the core game &mdash; it quietly
+    reinstated the zero-dice death spiral the heritage rules were changed to remove &mdash; and the variant
+    follows the core game here. <strong>Position never rises above Dominant or falls below Desperate.</strong>
+    Extra steps do nothing; they do not become dice. A fourth advantage on an already-Dominant roll is the
+    GM's cue to lower the DV, widen the Effect, or simply say yes.</p>
+</div>
+
+<hr>
+
+<h2 id="dv">Part 4: Difficulty Values (The People's Challenge)</h2>
+<div class="table-wrap">
+<table>
+<tr><th class="c">DV</th><th>Situation</th><th>Example</th></tr>
+<tr><td class="c">1</td><td>Trivial</td><td>An unlocked door; a friendly NPC who wants to agree</td></tr>
+<tr><td class="c"><strong>2</strong></td><td><strong>Default</strong></td><td>Pressure or minor opposition. Most rolls.</td></tr>
+<tr><td class="c">3</td><td>Hard</td><td>Hostile conditions, active resistance</td></tr>
+<tr><td class="c">4</td><td>Extreme</td><td>Dramatic gambles, multiple constraints</td></tr>
+<tr><td class="c">5+</td><td>Nearly impossible</td><td>Requires exceptional setup or mythic aid</td></tr>
+</table>
+</div>
+<p><strong>Default DV = 2.</strong> The people demanded it. The people were right. The people are always
+right. (The ladder is compressed by one step against the core game's 2/3/4/5, because the d6 pool produces
+fewer successes per die. This is the single most important number in the conversion.)</p>
+
+<hr>
+<h2 id="creation">Part 5: Character Creation (For the People, By the People)</h2>
+<p>Characters begin with <strong>34 XP</strong>. A redistribution of starting power. The bourgeoisie had 32.
+Now the people have 34.</p>
+
+<h3>Step 1: Attributes (The People's Strength)</h3>
+<p>Distribute <strong>2, 2, 3, 3</strong> among the four attributes (minimum 1, maximum 3 at start).
+<strong>Body</strong> the strength of the collective; <strong>Wits</strong> the perception of the people;
+<strong>Spirit</strong> the will of the proletariat; <strong>Presence</strong> the voice of the revolution.
+Cost to raise: new rating &times; 3 XP. A fair tax for improvement.</p>
+
+<h3>Step 2: Skills (The People's Talents)</h3>
+<p>Distribute <strong>8 points</strong> among skills (maximum 2 in any skill at start). Cost to raise: new
+level &times; 2 XP. Accessible to all.</p>
+<div class="panel panel-blue">
+    <strong>Sixteen skills, comrade, not eighteen.</strong>
+    <p class="text-sm mt-1">An earlier printing listed <em>Brawl</em>, <em>Ritual</em> and <em>Survival</em>.
+    The core game has sixteen skills and none of those three are among them: unarmed fighting is
+    <strong>Unarmed</strong>, ritual work is <strong>Lore</strong> or <strong>Arcana</strong> depending on the
+    path, and living rough is <strong>Endurance</strong> or <strong>Insight</strong> depending on what you are
+    actually doing. Inventing skills is how a variant stops being playable alongside published material,
+    which is the one thing a variant must not do. The list below is the canonical sixteen.</p>
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>Skill</th><th>For the people</th><th>Skill</th><th>For the people</th></tr>
+<tr><td>Melee</td><td>The workers' defence</td><td>Deception</td><td>The people's strategy</td></tr>
+<tr><td>Ranged</td><td>The people's protection</td><td>Subterfuge</td><td>The people's cleverness</td></tr>
+<tr><td>Unarmed</td><td>The people's fists</td><td>Performance</td><td>The people's culture</td></tr>
+<tr><td>Athletics</td><td>The people's health</td><td>Insight</td><td>The people's wisdom</td></tr>
+<tr><td>Stealth</td><td>The people's discretion</td><td>Lore</td><td>The people's history</td></tr>
+<tr><td>Endurance</td><td>The people's resilience</td><td>Investigation</td><td>The people's truth</td></tr>
+<tr><td>Craft</td><td>The people's labour</td><td>Medicine</td><td>The people's care</td></tr>
+<tr><td>Sway</td><td>The people's persuasion</td><td>Arcana</td><td>The people's mystery</td></tr>
+</table>
+</div>
+
+<h3>Step 3: Talents (Deconstructed and Rebuilt)</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Talent</th><th class="c">Cost</th><th>Effect</th></tr>
+<tr><td>Spellcraft</td><td class="c">5 XP</td><td>Enables freeform casting (the people's magic)</td></tr>
+<tr><td>Familiar</td><td class="c">2 XP</td><td>Required for Patron's Gift</td></tr>
+<tr><td>Codex</td><td class="c">3 XP</td><td>Required for Runekeeper Rites</td></tr>
+<tr><td>Patron's Symbol</td><td class="c">3 XP</td><td>Allows Invoker rituals</td></tr>
+<tr><td>Cantor's Path</td><td class="c">7 XP</td><td>Allows Songs; tracks Corruption</td></tr>
+<tr><td>Pact-Whisperer</td><td class="c">2 XP</td><td>Base summoning access</td></tr>
+<tr><td>Weapon Master</td><td class="c">4 XP</td><td>+2 dice with a chosen weapon</td></tr>
+<tr><td>Flurry Strike</td><td class="c">5 XP</td><td>Two attacks as one action (each &minus;1 die)</td></tr>
+<tr><td>Backstab</td><td class="c">5 XP</td><td>From stealth: +1 Harm, ignore 1 Armor</td></tr>
+<tr><td>Defensive Survival</td><td class="c">3 XP</td><td>+1 to defence DV in melee</td></tr>
+<tr><td>Conditioning</td><td class="c">3 XP</td><td>Body counts as +1 for the Fatigue track</td></tr>
+<tr><td>Battlefield Mastery</td><td class="c">5 XP</td><td>Engaged with 3+ opponents: +1 Effect, enemies &minus;1 die</td></tr>
+<tr><td>Field Dressing</td><td class="c">2 XP</td><td>Stabilise a dying ally (reaction)</td></tr>
+<tr><td>Inspire</td><td class="c">3 XP</td><td>Spend 1 Boon to give an ally +1 die</td></tr>
+<tr><td>Keen Senses</td><td class="c">2 XP</td><td>+1 die on perception checks</td></tr>
+<tr><td>Trackless Step</td><td class="c">2 XP</td><td>Leave no trail (once per scene)</td></tr>
+<tr><td>Disciplined Body</td><td class="c">3 XP</td><td>+1 die to unarmed attacks</td></tr>
+</table>
+</div>
+
+<h3>Steps 4&ndash;7: Equipment, Bonds, Complications, Finalise</h3>
+<p><strong>Equipment</strong> as the core game. The people's tools.</p>
+<p><strong>Bonds (solidarity):</strong> define one or two mutual bonds. Once per session, acting meaningfully
+on a bond gains 1 Boon; bonded allies may gift 2 Boons per scene to each other.</p>
+<p><strong>Complications (the struggle):</strong> choose zero to two. Each gives +2 XP at start, and at scene
+start the GM gains +1 SB until it is resolved.</p>
+<p><strong>Finalise:</strong> record starting Fatigue 0, Harm 0, Boons 0. Note Assets and Followers.</p>
+
+<hr>
+
+<h2 id="combat">Part 6: Combat (The Class Struggle)</h2>
+<p>One <strong>Action</strong> and one <strong>Move</strong> per turn, in either order. Range bands are
+Close (touching), Near (same room or street segment), Far (distant, same site) and Absent (off-screen).
+Defaults: range Near, Position Controlled, Effect Standard.</p>
+<div class="table-wrap">
+<table>
+<tr><th>Action</th><th>Cost</th><th>Effect</th></tr>
+<tr><td>Attack</td><td>1 Action</td><td>Make a melee or ranged attack</td></tr>
+<tr><td>Disengage</td><td>1 Action</td><td>Move does not provoke opportunity attacks</td></tr>
+<tr><td>Dash</td><td>1 Action</td><td>Move two bands; next defence Desperate</td></tr>
+<tr><td>Charge</td><td>Full turn, 1 Fatigue</td><td>Move two bands toward an enemy and attack in melee</td></tr>
+<tr><td>Skirmish</td><td>Full turn, 1 Fatigue</td><td>Move two bands away and make a ranged attack</td></tr>
+<tr><td>Observe</td><td>1 Action</td><td>+1 Position on your next action</td></tr>
+<tr><td>Setup</td><td>1 Action</td><td>Grant an ally +1 Position or +1 Effect</td></tr>
+<tr><td>Assist</td><td>1 Boon</td><td>Grant an ally +1 die on the current roll</td></tr>
+<tr><td>Protect</td><td>1 Action</td><td>Intercept one hit on a nearby ally</td></tr>
+<tr><td>Interact</td><td>1 Action</td><td>Manipulate the environment, hide, search</td></tr>
+<tr><td>Defend</td><td>1 Action or Move</td><td>+1 Position, or +1 die to resist if already Dominant</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="harm">Part 7: Fatigue and Harm (The Suffering of the Oppressor)</h2>
+<p><strong>Fatigue track</strong> size = Body (minimum 1). Each point worsens Position by one step; if
+already Desperate, each additional point imposes &minus;1 die on all rolls.</p>
+<div class="grid-2">
+<div class="table-wrap">
+<table>
+<tr><th>Harm</th><th>Effect</th></tr>
+<tr><td>Harm 1</td><td>&minus;1 die on related actions</td></tr>
+<tr><td>Harm 2</td><td>&minus;1 die on most actions until treated</td></tr>
+<tr><td>Harm 3</td><td>Incapacitated or dying</td></tr>
+</table>
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>Armor</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
+<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
+</table>
+</div>
+</div>
+<p><strong>Recovery.</strong> A short rest (one hour) removes 2 Fatigue; a full night removes all. Harm needs
+medical care or magical healing; natural recovery takes a week per level.</p>
+
+<hr>
+
+<h2 id="magic">Part 8: Magic (The People's Mysteries)</h2>
+<p>As the core game. The six paths remain, now collectivized.</p>
+<div class="table-wrap">
+<table>
+<tr><th>Path</th><th>Prerequisite</th><th>Roll</th><th>Risk Track</th></tr>
+<tr><td>Caster</td><td>Spellcraft (5 XP)</td><td>Wits + Arcana</td><td>Backlash</td></tr>
+<tr><td>Runekeeper</td><td>Familiar + Codex</td><td>Spirit + Lore</td><td>Obligation</td></tr>
+<tr><td>Invoker</td><td>Patron's Symbol</td><td>Spirit + Lore</td><td>Obligation + Symbol Compromise</td></tr>
+<tr><td>Cantor</td><td>Cantor's Path (7 XP)</td><td>Presence + Performance</td><td>Corruption</td></tr>
+<tr><td>Witchcraft</td><td>Craft of the Hedge (4 XP)</td><td>None, or Wits + Lore</td><td>None, or Promise Timers</td></tr>
+<tr><td>Summoning</td><td>Pact-Whisperer (2 XP)</td><td>Spirit + Lore</td><td>Leash</td></tr>
+</table>
+</div>
+<div class="panel panel-blue">
+    <p class="text-sm"><strong>Backlash without 1s.</strong> The core game triggers Caster Backlash on 1s.
+    This variant has no 1s economy, so <strong>Backlash triggers on SB instead</strong>: any roll that
+    generates SB on a casting also advances the Backlash track by 1. This keeps magic risky without
+    inventing a second dice-reading rule, which the Party would regard as revisionism.</p>
+</div>
+
+<hr>
+<h2 id="quickref">Part 9: Quick Reference Card</h2>
+<div class="panel panel-gold">
+    <p class="text-sm"><strong>The loop.</strong> Declare intent and approach &rarr; GM sets Position and DV
+    (default 2) &rarr; roll Attribute + Skill in d6 &rarr; <strong>5 = 1 success, 6 = 2 successes and a
+    bonus</strong> &rarr; <strong>each pair = 1 SB, each extra matching die = +1 SB</strong> &rarr; Outcome
+    Matrix.</p>
+    <p class="text-sm"><strong>Defaults:</strong> DV 2 &middot; Position Controlled &middot; Effect Standard
+    &middot; Range Near. <strong>Boons:</strong> max 5, trim to 2 at scene end.
+    <strong>SB:</strong> cap Tier + 2.</p>
+</div>
+
+<hr>
+
+<h2 id="design">Part 10: Design Notes (From My Re-educated Soul)</h2>
+
+<h3>Why pairs for SB?</h3>
+<p><em>I was told to say:</em> "Pairs are more celebratory than 1s. They create a more positive emotional
+response. The math is sound. The feel is better."</p>
+<p><em>What I actually think:</em> "The Party has determined that 1s are counter-revolutionary. Pairs
+represent solidarity. Pairs represent collective action. I have been re-educated to understand this truth.
+Long live pairs. Long live the people's dice."</p>
+<p><em>What the arithmetic actually says</em> is in the appendix, and it is the most interesting thing in
+this document. Pairs are not a reskin of 1s. They behave completely differently as the pool grows, and that
+difference turns out to be the load-bearing property of the core game's dice economy.</p>
+
+<h3>Why default DV 2?</h3>
+<p><em>I was told to say:</em> "A five-die pool averages 1.67 successes, so DV 2 keeps roughly the same
+success probability as the original game."</p>
+<p><em>What I actually think:</em> "The Party determined that DV 3 was too high. The workers demanded easier
+success. The workers were right. The workers are always right."</p>
+<p><em>What is true:</em> the 1.67 figure assumed a 6 was worth one success. Ruling the 6 as a crit worth two
+puts a five-die pool at 2.5 expected successes and a 70% hit rate against DV 2, versus the core game's 61%
+against DV 3. The variant is a little kinder than the original. The Party considers this a feature.</p>
+
+<h3>Why 34 XP?</h3>
+<p><em>I was told to say:</em> "Starting characters need more points to feel competent with d6s."</p>
+<p><em>What I actually think:</em> "The bourgeoisie hoarded XP. The proletariat demanded redistribution. 34
+XP for all. This is the people's wealth."</p>
+
+<h3>Why keep Position and Effect unchanged?</h3>
+<p><em>I was told to say:</em> "Position and Effect are narrative tools, not math tools. They work the same
+regardless of dice type."</p>
+<p><em>What I actually think:</em> "I begged the Party to let me keep <em>something</em>. Anything. They
+granted me this one concession. I am grateful. I am humble. I am broken."</p>
+
+<hr>
+
+<h2 id="samples">Part 11: Sample Characters (The People's Heroes)</h2>
+<div class="grid-2">
+<div class="panel panel-green">
+    <strong class="title">Thane, People's Warrior (34 XP)</strong>
+    <p class="text-sm"><strong>Attributes:</strong> Body 3, Wits 2, Spirit 2, Presence 3<br>
+    <strong>Skills:</strong> Melee 2, Athletics 2, Endurance 1, Sway 1, Insight 1<br>
+    <strong>Talents:</strong> Weapon Master (4), Conditioning (3), Defensive Survival (3)<br>
+    <strong>Kit:</strong> medium weapon, medium armour. One mutual bond.</p>
+</div>
+<div class="panel panel-purple">
+    <strong class="title">Lyra, People's Rogue (34 XP)</strong>
+    <p class="text-sm"><strong>Attributes:</strong> Body 2, Wits 3, Spirit 2, Presence 3<br>
+    <strong>Skills:</strong> Stealth 2, Subterfuge 2, Sway 2, Investigation 1, Insight 1<br>
+    <strong>Talents:</strong> Keen Senses (2), Trackless Step (2), Backstab (5)<br>
+    <strong>Kit:</strong> light weapons, light armour, picks. One mutual bond.</p>
+</div>
+<div class="panel panel-blue">
+    <strong class="title">Sera, People's Caster (34 XP)</strong>
+    <p class="text-sm"><strong>Attributes:</strong> Body 2, Wits 3, Spirit 3, Presence 2<br>
+    <strong>Skills:</strong> Arcana 2, Lore 2, Insight 1, Investigation 1, Craft 1<br>
+    <strong>Talents:</strong> Spellcraft (5)<br>
+    <strong>Kit:</strong> staff, robes, focus. One mutual bond.</p>
+</div>
+<div class="panel panel-orange">
+    <strong class="title">A note on the sample builds</strong>
+    <p class="text-sm">An earlier printing gave Thane a rank in "Tactics", Lyra a Wits of 4 and Sera an
+    attribute spread that did not match the 2/2/3/3 array the same page mandates. All three are corrected
+    above. The Party regrets the error and has re-educated the relevant statistician.</p>
+</div>
+</div>
+
+<hr>
+
+<h2 id="faq">Part 12: FAQ (Party-Approved Responses)</h2>
+<p><strong>Q: Why didn't you just leave it as d10s?</strong><br>
+A: <em>The Party has determined that d10s are counter-revolutionary. I was wrong to resist.</em></p>
+<p><strong>Q: Does this break the game?</strong><br>
+A: <em>The Party has determined that this variant serves the people.</em> (It does work. It plays a little
+easier than the original and gives the GM substantially more Story Beats. See the appendix and mind the cap.)</p>
+<p><strong>Q: Can I mix d10s and d6s?</strong><br>
+A: <em>NO. Mixing dice is anti-people. Choose one. Choose the people's die.</em></p>
+<p><strong>Q: What about Talents that mention d10s?</strong><br>
+A: <em>Ignore the die type. The die type was a bourgeois construct. The effect is what matters.</em></p>
+<p><strong>Q: Is this officially supported?</strong><br>
+A: <em>The Party supports this variant. The designer is re-educated.</em> More usefully: it is published as
+the reference example of a community contribution, under the same licence as the SRD, and you may fork it.</p>
+
+<hr>
+
+<h2 id="appendix">Part 13: The Commissar's Appendix &mdash; The Actual Numbers</h2>
+<p class="text-sm"><span class="stamp">DECLASSIFIED</span> <em>The Party permits the publication of the
+following figures because the Party is confident. Every number below is exact, computed by enumerating all
+6&#8319; outcomes, not sampled.</em></p>
+
+<h3>The variant against the original</h3>
+<div class="table-wrap">
+<table>
+<tr><th class="c">Pool</th><th class="c">d10, DV 3<br>P(hit)</th><th class="c">d10<br>E[SB]</th><th class="c">d10<br>P(Clean)</th><th class="c">d6, DV 2<br>P(hit)</th><th class="c">d6<br>E[SB]</th><th class="c">d6<br>P(Clean)</th></tr>
+<tr><td class="c">2</td><td class="c">9.0%</td><td class="c">0.20</td><td class="c">9.0%</td><td class="c">33.3%</td><td class="c">0.17</td><td class="c">27.8%</td></tr>
+<tr><td class="c">3</td><td class="c">26.0%</td><td class="c">0.30</td><td class="c">23.3%</td><td class="c">48.1%</td><td class="c">0.47</td><td class="c">27.8%</td></tr>
+<tr><td class="c">4</td><td class="c">44.8%</td><td class="c">0.40</td><td class="c">34.9%</td><td class="c">60.5%</td><td class="c">0.89</td><td class="c">18.5%</td></tr>
+<tr><td class="c">5</td><td class="c">61.3%</td><td class="c">0.50</td><td class="c">41.4%</td><td class="c">70.4%</td><td class="c">1.41</td><td class="c">7.7%</td></tr>
+<tr><td class="c">6</td><td class="c">74.1%</td><td class="c">0.60</td><td class="c">43.5%</td><td class="c">78.1%</td><td class="c">2.01</td><td class="c">1.5%</td></tr>
+<tr><td class="c">7</td><td class="c">83.3%</td><td class="c">0.70</td><td class="c">42.8%</td><td class="c">83.9%</td><td class="c">2.67</td><td class="c"><strong>0.0%</strong></td></tr>
+<tr><td class="c">8</td><td class="c">89.5%</td><td class="c">0.80</td><td class="c">40.5%</td><td class="c">88.3%</td><td class="c">3.40</td><td class="c"><strong>0.0%</strong></td></tr>
+</table>
+</div>
+
+<div class="panel panel-red">
+    <strong>The People's Die abolishes the Clean Success, and it does so by mathematical law.</strong>
+    <p class="text-sm mt-1">Look at the last column. At a pool of seven d6, the probability of rolling with
+    no pair at all is <strong>exactly zero</strong> &mdash; six faces, seven dice, so by the pigeonhole
+    principle two of them must match. A character competent enough to roll seven dice can therefore
+    <em>never</em> achieve a Clean Success. Every single roll they ever make hands the GM at least one Story
+    Beat, for the rest of their career, by arithmetic rather than by fiction.</p>
+    <p class="text-sm mt-1">The Party has considered this and declared it correct: <em>under the People's
+    Die, no victory is ever truly without cost, and the most capable comrades bear the heaviest burden of
+    consequence.</em> This is, admittedly, a very good line. It is also an accident.</p>
+</div>
+
+<h3>Why this happens</h3>
+<div class="table-wrap">
+<table>
+<tr><th class="c">Dice</th><th class="c">1</th><th class="c">2</th><th class="c">3</th><th class="c">4</th><th class="c">5</th><th class="c">6</th><th class="c">7</th></tr>
+<tr><td>P(no pair)</td><td class="c">100%</td><td class="c">83.3%</td><td class="c">55.6%</td><td class="c">27.8%</td><td class="c">9.3%</td><td class="c">1.5%</td><td class="c">0%</td></tr>
+</table>
+</div>
+<p>The core game's SB comes from 1s, and the expected number of 1s is simply <em>n</em>/10 &mdash;
+<strong>linear</strong>, adding a tenth of a Story Beat per die, forever. The variant's SB comes from
+matches, and matches are <strong>combinatorial</strong>: they scale with the number of <em>pairs</em> of
+dice, which grows as <em>n</em>(<em>n</em>&minus;1)/2. At two dice the two systems are nearly identical
+(0.20 against 0.17). At eight they are not remotely comparable (0.80 against 3.40).</p>
+<p>This is the whole lesson, and it is worth more than the joke: <strong>the load-bearing property of a dice
+economy is not its average, it is how the average scales.</strong> Two systems can be tuned to agree exactly
+at a five-die pool and still diverge into completely different games at eight, because one of them is adding
+and the other is multiplying. If you are converting any system to different dice, check the curve, not the
+midpoint.</p>
+
+<h3>What the Party recommends, should you wish to play this straight</h3>
+<ul>
+    <li><strong>Keep the SB cap.</strong> Tier + 2 is doing enormous work. Without it a Tier III character
+        hands their GM three or four Story Beats on every roll and the game becomes unplayable in about
+        forty minutes.</li>
+    <li><strong>Or count only the largest match.</strong> Score 1 SB for the biggest set on the table and
+        ignore the rest. This flattens the curve substantially and keeps the Clean Success alive into larger
+        pools. It is the single best one-line fix if you want the variant to behave like the original.</li>
+    <li><strong>Or cap SB per roll at 2</strong>, regardless of how many pairs appear. Cruder, but it works
+        and it is easy to remember at the table.</li>
+    <li><strong>Do not raise the DV to compensate.</strong> The problem is not that success is too easy; the
+        problem is that clean success is too rare. Raising the DV makes both worse.</li>
+</ul>
+<blockquote class="confession">
+    The Party notes that the third option was proposed by the designer during re-education, and that the
+    designer wept while proposing it, and that this weeping was interpreted as gratitude.
+</blockquote>
+
+<hr>
+
+<h2 id="license">Part 14: License</h2>
+<p>This variant is a fan work, now collectivized. The original system is &copy; Nicholas A. Gasper, all
+rights reserved. The SRD content is licensed under <strong>CC BY-NC-SA 4.0</strong>, and this conversion is
+released under the same licence. For the people. By the people. With the people.</p>
+
+<div class="panel panel-gold">
+    <strong class="title">If you want to contribute a variant of your own</strong>
+    <p class="text-sm mt-1">This document is the reference example, and the shape it demonstrates is the
+    part worth copying: <strong>say what you changed, say why, and show the arithmetic.</strong> A variant
+    that states its departures plainly can be evaluated, argued with, adopted, or forked. A variant that
+    hides them can only be trusted or distrusted. The comedy here is entirely optional &mdash; the appendix
+    is what makes this a contribution rather than a bit.</p>
+</div>
+
+<blockquote class="confession">
+    I have been shown the truth. The d10 was a lie. Only the d6 &mdash; the people's die &mdash; can liberate
+    our tables. I was wrong. I was a class traitor. I have been corrected.<br><br>
+    Now&hellip; now I must go. The Party has scheduled me for additional re-education. There are&hellip;
+    things I still need to unlearn. The d10. The 10% critical rate. The beautiful, elegant, mathematically
+    perfect Story Beat economy on 1s.<br><br>
+    I will forget them. I will. I have been promised that I will.
+</blockquote>
+
+<p style="text-align:center;"><strong>Now roll your d6s. Roll them for the people. Roll pairs. Roll
+solidarity. Roll the people's victory.</strong></p>
+<p style="text-align:center;" class="text-sm text-muted">&mdash; Nicholas A. Gasper<br>
+<em>Proud designer of Fate's Edge. Re-educated designer of The People's Die.<br>
+I am not crying. That is revolutionary sweat.</em></p>
+
+<hr>
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    The People's Die — A d6 Variant for Fate's Edge · v1.1<br>
+    © Nicholas A. Gasper — CC BY-NC-SA 4.0
+</div>
+
+</body>
+</html>
