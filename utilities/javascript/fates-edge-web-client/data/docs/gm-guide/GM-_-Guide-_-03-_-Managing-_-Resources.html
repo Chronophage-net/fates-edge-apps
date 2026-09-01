@@ -634,50 +634,42 @@
 </ul>
 <p>Each task becomes a story hook.</p>
 
-<h3>Asset Slots and Patron Tier</h3>
-<p>A terrestrial patron's power determines how many Assets they can support and at what cost. Each patron has a <strong>Tier</strong> (Minor, Major, or Paramount) that sets their Asset capacity.</p>
-<div class="table-wrap">
-<table>
-    <caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Terrestrial Patron Tiers and Capacity</caption>
-    <thead><tr><th>Patron Tier</th><th>Reach</th><th>Asset Slots</th><th>Max Asset Size</th></tr></thead>
-    <tbody>
-        <tr><td>Minor</td><td>Local (one city or canton)</td><td>2 slots</td><td>Standard Asset (8 XP)</td></tr>
-        <tr><td>Major</td><td>Regional (multiple provinces)</td><td>4 slots</td><td>Major Asset (12 XP)</td></tr>
-        <tr><td>Paramount</td><td>International (across the Amaranthine)</td><td>6 slots</td><td>Major Asset (12 XP)</td></tr>
-    </tbody>
-</table>
+<h3 id="patron-rank">Rank: What a Patron Can Reach</h3>
+<p>A terrestrial patron's <strong>Rank</strong> says how far their arm goes: how many Assets they can carry for you, how large those Assets may be, and how much debt they will let you run up before they come collecting.</p>
+<div class="panel">
+    <div class="panel-title">Terrestrial Patron Rank</div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Rank</th><th>Reach</th><th>Debt Ceiling</th><th>Asset Slots</th><th>Largest Asset</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Street</strong> <span class="text-sm text-muted">(a guild steward, a local crime boss, a hedge-court judge)</span></td><td>A neighbourhood, a hall, one canton</td><td>3&ndash;4 segments</td><td>2</td><td>Minor (4 XP)</td></tr>
+            <tr><td><strong>City</strong> <span class="text-sm text-muted">(a noble house factor, a syndicate capo, a temple prefect)</span></td><td>One city and what feeds it</td><td>5&ndash;6 segments</td><td>4</td><td>Standard (8 XP)</td></tr>
+            <tr><td><strong>Regional</strong> <span class="text-sm text-muted">(a duchy spymaster, a merchant prince, a coven leader)</span></td><td>Several provinces</td><td>7&ndash;8 segments</td><td>6</td><td>Major (12 XP)</td></tr>
+            <tr><td><strong>Imperial</strong> <span class="text-sm text-muted">(an archduke, a syndicate master, a high priest)</span></td><td>Across the Amaranthine</td><td>8+ segments</td><td>8</td><td>Major, or something unique</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="text-sm"><em>Debt Ceiling</em> is how much this patron will let accumulate before they collect &mdash; a measure of their reach, not of you. Your own <strong>Obligation Capacity is Spirit + Presence</strong>, always, exactly as for a supernatural Patron; exceeding it costs 1 Fatigue per segment over.</p>
 </div>
 
-<h4>Asset Slot Costs</h4>
-<p>When a terrestrial patron grants an Asset in exchange for Obligation (rather than XP), the cost in Obligation segments is:</p>
-<div class="table-wrap">
-<table>
-    <caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Asset Costs by Patron Tier</caption>
-    <thead><tr><th>Asset Type</th><th>Minor Patron</th><th>Major/Paramount Patron</th></tr></thead>
-    <tbody>
-        <tr><td>Minor Asset (4 XP value)</td><td>2 Obligation</td><td>2 Obligation</td></tr>
-        <tr><td>Standard Asset (8 XP value)</td><td>4 Obligation</td><td>3 Obligation</td></tr>
-        <tr><td>Major Asset (12 XP value)</td><td>—</td><td>4 Obligation</td></tr>
-        <tr><td>Follower (Cap 2)</td><td>2 Obligation</td><td>2 Obligation</td></tr>
-        <tr><td>Follower (Cap 3)</td><td>4 Obligation</td><td>3 Obligation</td></tr>
-    </tbody>
-</table>
-</div>
-<p>A Minor Patron cannot grant Major Assets — their reach is too short. A Paramount Patron is rare; examples include the Matron of Silkstrand, the Federate King of the Vilikari, or the High King Beneath the Peaks.</p>
+<h3>What an Asset Costs in Obligation</h3>
+<p>When a patron grants an Asset or a Follower for Obligation rather than XP, the cost is <strong>the thing's tier</strong>: Minor 1, Standard 2, Major 3, unique 4. Followers ride the same ladder &mdash; a Cap 2 counts as Minor, a Cap 3 as Standard.</p>
+<p><strong>One modifier, and it is the interesting one.</strong> If what you are asking for sits at the very top of what that patron's Rank can provide, <strong>add 1</strong>. It costs <em>them</em>, so it costs you. A Street patron scraping together a safehouse is spending real credit; a Regional one hands over the same safehouse without breaking eye contact.</p>
+<p>No patron can grant an Asset larger than their Rank allows, at any price. That is not a cost question &mdash; their arm does not reach.</p>
 
 <h3>Example Terrestrial Patrons</h3>
 <div class="panel">
     <div class="panel-title">Sample Terrestrial Patrons</div>
     <div class="table-wrap">
     <table>
-        <thead><tr><th>Patron</th><th>Tier / Assets / Debt Trigger</th></tr></thead>
+        <thead><tr><th>Patron</th><th>Rank / Assets / Debt Trigger</th></tr></thead>
         <tbody>
-            <tr><td>Prefect Marcellus (Ecktorian commander)</td><td>Major (4 slots). Safe passage, food, guards. Debt: dangerous mission behind enemy lines.</td></tr>
-            <tr><td>Censor Cassia (judicial authority)</td><td>Minor (2 slots). Legal immunity, archive access. Debt: expose a political rival.</td></tr>
-            <tr><td>Khatun Sarnai (Ykrul chieftain)</td><td>Major (4 slots). Remounts, safe camp, guides. Debt: blood-price or raid on a rival clan.</td></tr>
-            <tr><td>Mistress Ilvar (Silkstrand crime lord)</td><td>Minor (2 slots). Black Bazaar access, cutpurses. Debt: public assassination.</td></tr>
-            <tr><td>House Contarini (Vilikari Archivolt)</td><td>Major (4 slots). Forged charters, legal immunity. Debt: retrieve a lost seal from a rival.</td></tr>
-            <tr><td>The Ragman (Silkstrand underworld)</td><td>Paramount (6 slots). Smuggling routes, night-boats, stolen goods. Debt: a favor that cannot be named.</td></tr>
+            <tr><td>Prefect Marcellus (Ecktorian commander)</td><td>City (4 slots). Safe passage, food, guards. Debt: dangerous mission behind enemy lines.</td></tr>
+            <tr><td>Censor Cassia (judicial authority)</td><td>Street (2 slots). Legal immunity, archive access. Debt: expose a political rival.</td></tr>
+            <tr><td>Khatun Sarnai (Ykrul chieftain)</td><td>City (4 slots). Remounts, safe camp, guides. Debt: blood-price or raid on a rival clan.</td></tr>
+            <tr><td>Mistress Ilvar (Silkstrand crime lord)</td><td>Street (2 slots). Black Bazaar access, cutpurses. Debt: public assassination.</td></tr>
+            <tr><td>House Contarini (Vilikari Archivolt)</td><td>City (4 slots). Forged charters, legal immunity. Debt: retrieve a lost seal from a rival.</td></tr>
+            <tr><td>The Ragman (Silkstrand underworld)</td><td>Regional (6 slots). Smuggling routes, night-boats, stolen goods. Debt: a favor that cannot be named.</td></tr>
         </tbody>
     </table>
     </div>
@@ -692,27 +684,8 @@
     <li>Patrons compete. If the party owes Obligation to two rival patrons, those patrons will eventually demand conflicting loyalties.</li>
 </ul>
 
-<h3>Rank: How Far a Terrestrial Patron Reaches</h3>
-<p>Not all power flows from ancient patrons. Some sits in counting-houses, guild halls, and the back rooms of taverns. These are <strong>Terrestrial Patrons</strong>—noble houses, crime syndicates, merchant leagues, or cults that offer tangible aid in exchange for Obligation.</p>
-
 <div class="panel">
-    <div class="panel-title">Terrestrial Patron Tiers</div>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>Rank</th><th>Debt Ceiling</th><th>Asset Slots</th><th>Max Asset Tier</th><th>Debt Trigger (when Obligation fills)</th></tr></thead>
-        <tbody>
-            <tr><td>Street <span class="text-sm text-muted">(local crime boss, guild steward, hedge-court judge)</span></td><td>3&ndash;4 segments</td><td>2</td><td>Minor (safehouse, contact network)</td><td>Demands a <em>minor service</em>: deliver a message, pay a bribe, rough up a rival.</td></tr>
-            <tr><td>City <span class="text-sm text-muted">(noble house factor, syndicate capo, temple prefect)</span></td><td>5&ndash;6 segments</td><td>4</td><td>Standard (spy ring, guild charter, fortified warehouse)</td><td>Demands a <em>significant task</em>: escort a caravan, break a siege, forge a document.</td></tr>
-            <tr><td>Regional <span class="text-sm text-muted">(duchy spymaster, merchant prince, coven leader)</span></td><td>7&ndash;8 segments</td><td>6</td><td>Major (fortress lease, city license, regional network)</td><td>Demands a <em>major service</em>: broker a treaty, assassinate a rival, steal a relic.</td></tr>
-            <tr><td>Imperial <span class="text-sm text-muted">(archduke, syndicate master, high priest)</span></td><td>8+</td><td>8+</td><td>Major or unique (legendary asset)</td><td>Demands a <em>campaign-defining favor</em>: start a war, erase a bloodline, wake or seal a patron.</td></tr>
-        </tbody>
-    </table>
-    </div>
-    <p class="text-sm"><em>Debt Ceiling</em> is how many segments this patron will let accumulate before they collect &mdash; it is a measure of their reach, not of you. Your own <em>Obligation Capacity</em> is Spirit + Presence, always, exactly as it is for a supernatural Patron; exceeding it costs 1 Fatigue per segment over. Refusing a triggered demand turns the patron into an enemy.</p>
-</div>
-
-<div class="panel">
-    <div class="panel-title">Example Terrestrial Patrons by Rank</div>
+    <div class="panel-title">More Examples, by Rank</div>
     <div class="table-wrap">
     <table>
         <thead><tr><th>Rank</th><th>Example Patron</th><th>Debt Ceiling</th><th>Typical Assets</th></tr></thead>
