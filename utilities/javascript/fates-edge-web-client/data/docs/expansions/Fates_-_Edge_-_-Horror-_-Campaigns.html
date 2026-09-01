@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horror Campaigns — A Fate's Edge Expansion</title>
+    <style>
+        :root {
+            --bg1: #08080c;
+            --bg2: #131318;
+            --bg3: #1c1c24;
+            --bg4: #262630;
+            --text: #e4e2e6;
+            --text2: #ada8b4;
+            --text3: #7c7684;
+            --gold: #4a9088;
+            --gold-hover: #5cabab;
+            --border: #33303c;
+            --red: #8e2a2a;
+            --green: #3d7a52;
+            --blue: #3c6e8f;
+            --purple: #5f3f7a;
+            --orange: #a8622a;
+            --brass: #9c7a3c;
+            --mist: #4f6b73;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #14141c 0%, #08080c 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.6rem; }
+        h3 { font-size: 1.1rem; margin-top: 1rem; }
+        h4 { font-size: 0.95rem; color: var(--text); }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.35rem 0; }
+        ul, ol { margin: 0.3rem 0 0.5rem 1.3rem; }
+        li { margin: 0.15rem 0; }
+        table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 0.8rem; font-size: 0.85rem; }
+        th, td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: left; vertical-align: top; }
+        th { background: var(--bg3); color: var(--gold); }
+        tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel-mist { border-left: 4px solid var(--mist); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .badge-gold { background: var(--gold); color: #06110f; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #fff; }
+        .badge-mist { background: var(--mist); color: #fff; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .text-muted { color: var(--text3); }
+        .text-gold { color: var(--gold); }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.7rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .toc { background: var(--bg3); border-radius: var(--radius); padding: 0.7rem 1rem; border: 1px solid var(--border); columns: 2; column-gap: 1.5rem; }
+        .toc a { color: var(--text2); display: block; padding: 0.12rem 0; font-size: 0.83rem; break-inside: avoid; }
+        .toc a:hover { color: var(--gold); }
+        @media (max-width: 700px) { .toc { columns: 1; } }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .widget-card {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.7rem;
+            margin: 0.3rem 0;
+            border-left: 3px solid var(--gold);
+            font-size: 0.8rem;
+        }
+        .widget-card .wname { font-weight: 600; color: var(--gold); font-size: 0.9rem; }
+        .field-list { margin: 0.3rem 0 0.5rem 1.2rem; font-size: 0.82rem; color: var(--text2); }
+        .field-list li strong { color: var(--text); }
+        .meta-tag {
+            display: inline-block;
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            font-size: 0.6rem;
+            color: var(--text3);
+        }
+        details summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+        details summary:hover { color: var(--gold-hover); }
+        table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; font-size: 0.82rem; }
+        th, td { border: 1px solid var(--border); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
+        th { background: var(--bg3); color: var(--gold); font-weight: 600; }
+        .table-wrap { overflow-x: auto; margin: 0.5rem 0; }
+        blockquote.found-doc { border-left: 3px solid var(--gold); background: var(--bg2); padding: 0.6rem 1rem; margin: 0.7rem 0; font-style: italic; color: var(--text2); }
+        code { background: var(--bg3); padding: 0.05rem 0.3rem; border-radius: 3px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<h1>🕯️ Horror Campaigns</h1>
+<p style="color:var(--text2);margin-bottom:0.5rem;">
+    <span class="badge badge-red">Horror Toolkit</span>
+    <span class="badge badge-purple">Dread &amp; Sanity</span>
+    <span class="badge badge-blue">Campaign Timers</span>
+    <span class="badge badge-orange">Subgenre Templates</span>
+    <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+</p>
+
+<div class="panel panel-red">
+    <strong>Safety first, and not as a formality.</strong>
+    <p class="text-sm mt-1">This expansion deals in psychological deterioration, body horror, cosmic insignificance and the loss of self. Run the Session Zero conversation in <em>Safety and Consent</em> below before the first scene, and keep <em>GM Guide Appendix E</em> to hand. Lines and Veils, the X-card and a check-in at the end of each session are all assumed here, not optional. A horror campaign that nobody wants to come back to has failed at the only thing it was for.</p>
+</div>
+
+<div class="panel panel-gold">
+    <strong>What this expansion adds</strong>
+    <p class="text-sm mt-1">Horror in Fate's Edge is built from parts the game already has: <strong>Boons</strong>, <strong>timers</strong> and <strong>Position</strong>. There is no sanity score and no second resolution engine. Instead a <strong>Dread</strong> clock tracks how far a character has come apart, and Boons &mdash; the resource you earn by failing &mdash; are what you spend to hold it back. That is the whole trick: the currency of your bad luck is also the currency of your composure, and you cannot spend it twice. Around that sit multi-clock campaign escalation, breaking-point moments, five-sense investigation tools, and modular subgenre templates for folk horror, cosmic horror, haunting, isolation and body horror.</p>
+</div>
+
+<div class="panel panel-blue">
+    <strong>All clocks here are ordinary clocks.</strong>
+    <p class="text-sm mt-1">Every timer in this expansion is a standard named clock of <strong>4, 6, 8 or 10</strong> segments and advances the way any other clock does. The source draft carried some at 12 and 15 segments; those are now [10], which is the longest clock the game has and quite long enough for a campaign to end inside.</p>
+</div>
+
+<div class="toc">
+    <strong style="color:var(--gold);grid-column:1/-1;display:block;margin-bottom:0.3rem;">📑 Table of Contents</strong>
+    <a href="#a-letter-to-the-reader">A Letter to the Reader</a>
+    <a href="#the-confrontation">The Confrontation</a>
+    <a href="#the-bargain-at-the-broken-well">The Bargain at the Broken Well</a>
+    <a href="#afterword">Afterword</a>
+    <a href="#horror-campaigns-expansion-overview">Horror Campaigns Expansion Overview</a>
+    <a href="#safety-and-consent">Safety and Consent</a>
+    <a href="#core-mechanical-framework">Core Mechanical Framework</a>
+    <a href="#campaign-timer-framework">Campaign Timer Framework</a>
+    <a href="#character-integration-system">Character Integration System</a>
+    <a href="#quick-setup-protocol">Quick Setup Protocol</a>
+    <a href="#environmental-and-narrative-mechanics">Environmental and Narrative Mechanics</a>
+    <a href="#gm-toolkit">GM Toolkit</a>
+    <a href="#experience-and-resolution-systems">Experience and Resolution Systems</a>
+    <a href="#modular-design-elements">Modular Design Elements</a>
+    <a href="#horror-deck-generators">Horror Deck Generators</a>
+    <a href="#horror-campaign-timers-generator">Horror Campaign Timers Generator</a>
+    <a href="#conclusion">Conclusion</a>
+    <a href="#the-worn-debtors-in-flesh">The Worn: Debtors in Flesh</a>
+    <a href="#fae-amp-amp-hag-folk-horror-the-alder-king-vs-the-hazel-quee">Fae &amp;amp; Hag Folk Horror: The Alder King vs. The Hazel Queen</a>
+    <a href="#digital-toolkit">Digital Toolkit</a>
+</div>
+
+<hr>
+
+<h2 id="a-letter-to-the-reader">A Letter to the Reader</h2>
+<blockquote class="found-doc">
+<p>You have found a thing that should not exist. I am Quentin Asselin, the first to drink from Malachai's wound. I was a paladin once. Now I am a monster&mdash;but a monster who keeps records.</p>
+<p>The Chained Angel speaks to me still. Not in words. In <em>interest</em>. Every century I return to Zahk'Kozahn to pay tribute. Every century I find something new in the ruins: a confession, a bargaining chip, a thread that leads to a deeper debt.</p>
+<p>This expansion is not my work. It is a collection of fragments I have stolen, copied, or been given by those who owe me. The Gray Wanderer transcribed them. I only provide the shelf.</p>
+<p>The first fragment is a confession. It was found in a lead-lined box in a Daughter's safe house, hidden beneath a floorboard that had been nailed shut from below. The handwriting is Sister Aris's. The story is about a bargain made at the Well of Ichor, a hollowed child, and a plague that will come due in three generations.</p>
+<p>You will read it and think you understand Malachai. You do not. You will think you understand the Cord. You do not.</p>
+<p>But you will be closer to the edge. And the edge is where I live.</p>
+<p>&mdash; Baron Quentin Asselin Belcourt, under a sky that has forgotten its stars</p>
+</blockquote>
+<hr>
+<p><em>An account written by Lerris Fenwood, fifth son of Duke Braedon Fenwood</em></p>
+<p>I did not want to look into the mirror. But the ritual required it, and a fifth son learns early that wanting has nothing to do with duty. The incense smoke coiled like a serpent before the glass. I stared, awaiting the name of my father's secret to manifest.</p>
+<p>The glass fogged. The fog cleared. My own bewildered face stared back&mdash;and below it, a name etched not in the glass, but in the very air, written in a scribe's fine hand. A name that should not have been there. A name that chilled me. Asselin.</p>
+<p>A Baron of neither kingdom and both. A man whose title Viterra and Vhasia each claimed was the other's problem. A legend, almost. His barony nestled in the shadow of the Aelerian mountains, north of memory. No crown sent for him, nor did any tax collector dare call him to account. The court preferred to forget he existed.</p>
+<p>The mirror, it seemed, had a longer memory than any king.</p>
+<p><strong>The Road North</strong></p>
+<p>The roads north of the Belworth were not for scholars. I needed a guide who knew the ways between maps. I found Dusana of the Raven Road camped outside Synod Square, a living legend. I asked her to lead me to the Baron's holdfast.</p>
+<p>&ldquo;No,&rdquo; was her reply.</p>
+<p>It seemeed oddly short.</p>
+<p>I pressed. She offered their traditional refusal: she would listen to a story and weigh its worth. In desperation, I told a story I should not have known&mdash;one my brother Markus had rambled in his broken sleep after his mind shattered at the University.</p>
+<p>Dusana's charming smile vanished into a flash of horror, then a frown of resignation.</p>
+<p>We will take you,&ldquo; she said sadly. And no more stories.&rdquo;</p>
+<p>North we went. Past the Black River, through holdings I knew only from ledgers, to a land where the sun seemed to wane and the pallor of the people deepened with every mile. Dusana spoke little. Most of her words were &ldquo;princeling.&rdquo;</p>
+<p>At a scarred and ancient tollbooth, she stopped. &ldquo;We're here. We go no further.&rdquo;</p>
+<p>No sooner had her wagons vanished back into the mist than two riders emerged from it. They were dressed in sharp uniforms of dark red and blue. Their cheekbones were as sharp as their sabers.</p>
+<p>&ldquo;We take you,&rdquo; the left one said, his Vhasian accent inflected by something cold and ancient.</p>
+<p>The right rider sniffed. &ldquo;To the village, and then three nights' ride.&rdquo;</p>
+<p>They knew why I had come. I had not said a word. <strong>The Baron's Threshold</strong></p>
+<p>We walked through the courtyard, into the keep, and through a gallery of portraits&mdash;each of a woman or a man, young, beautiful. Each bore a brass nameplate with a name scratched beyond legibility. The hand of the artwork was the same. And yet the paint faded and the frames aged as we proceeded.</p>
+<p>The Baron awaited us in his parlor. He was a tall man, dark of hair and light of eye. His build was that of a warrior, refined by noble blood. His only mark was a small dueling scar on his left cheek. He dressed in fine white silk, emblazoned with a symbol I could not quite place.</p>
+<p>&ldquo;The Order of the Lost Angel,&rdquo; the Baron stated flatly, his baritone voice echoing through the parlor as if he read my thoughts. &ldquo;Welcome, young Lerris. My apologies&mdash;I am preparing for a long voyage, and my time is limited.&rdquo;</p>
+<p>He gestured idly to two servants carrying a large chest. It sang of silver within as they jostled it.</p>
+<p>&ldquo;You reek of garlic and hedge-witchery,&rdquo; he said. &ldquo;So let us dispense with pretense. I am the Baron Asselin. I am ageless. Do you come as a hunter or a guest?&rdquo;</p>
+<p>Quite the greeting.</p>
+<p>&ldquo;I am Lerris,&rdquo; I said hesitantly, before shaking my head. He knew that. He knew my name. &ldquo;I come as a guest, my lord. Nothing more.&rdquo;</p>
+<p>&ldquo;No need for such pleasantries. Your birth and station are far above mine, and you are welcome.&rdquo; He gestured to his wiry servant&mdash;a man of middling years with steel eyes. On his neck was the tattoo of the Chain-Lanterns, marking him as an inquisitor.</p>
+<p>&ldquo;However, I can smell the lust in you. The hunger.&rdquo; The Baron continued, his voice soft. &ldquo;I have smelled it a dozen dozen times.&rdquo; He made a small gesture. Two servants bowed and receded behind the gallery.</p>
+<p>&ldquo;First, a bath. I don't know what smells worse&mdash;the garlic, or the hypocrisy of that iron emblem of the Everflame you wear over your heart.&rdquo;</p>
+<p>The water was hot. The steam rose like fog. I did not look for names in it.</p>
+<h3 id="the-first-night-the-consort-on-the-ledger-of-fear">The First Night: The Consort on the Ledger of Fear</h3>
+<p>She came at midnight&mdash;a woman clad in riding leathers worn soft as old linen, her hair a shock of white that spoke of terror, not age. Her eyes were the color of week-old bruises, and she carried no weapon. She did not need one. The way she moved was her weapon; a predator's grace barely contained by a veneer of courtly softness. Her smile, when it came, was a scalpel: precise, intimate, and cruel.</p>
+<p>She leaned against my doorframe, the candlelight guttering in her wake. Her shadow stayed pinned to the wall behind her, refusing to follow.</p>
+<p>&ldquo;The Baron sends his regards,&rdquo; she said. Her voice was the sound of velvet dragged over stone. &ldquo;He says you are afraid. Good. Fear is the first honest coin you&rdquo;ll spend here.&ldquo;</p>
+<p>She glided into the room. The air grew cold, yet a heat prickled at the nape of my neck. I am a scholar, a duke's son, taught to dissect emotion with reason. But this this was a primal calculus I couldn't solve. Her presence was a violation of my quiet study, and a part of me, a part I despised, was fascinated by it.</p>
+<p>&ldquo;You wish to hunt the things that hunt us?&rdquo; She placed a hand on my arm. Her touch was like polished marble&mdash;smooth and impossibly cold. I shuddered, but did not pull away. A gentleman does not. Yet my heart thudded a frantic, shameful rhythm against my ribs. &ldquo;Then learn the first lesson: <strong>fear is not your enemy. It is your coal.</strong> You stoke it. You burn it. You let it forge you.&rdquo;</p>
+<p>Her fingers pressed lightly against my wrist, where my pulse betrayed me. She felt it, and a flicker of amusement passed through her ancient eyes. This was as natural to her as breathing. &ldquo;I know its heat. I hunted <em>him</em> for seven years across the bones of three empires. I burned through every comrade, every coin, every prayer. And when I finally stood before him, I had nothing left. No steel. No silver. No hope. Only the fear.&rdquo; Her gaze turned inward, staring at a memory I was grateful I couldn't see. &ldquo;It was the last thing I owned.&rdquo;</p>
+<p>&ldquo;What did you do?&rdquo; The question left my lips in a whisper, breathless in a way that had nothing to do with dread.</p>
+<p>Her smirk was a silent laugh. She saw my impatience, my need for a hero's ending, and the other, baser curiosity simmering beneath. Her hand, which had stilled, began to move again&mdash;a slow, rhythmic circle on my arm. Up. Down. A courtesan's expertise in a hunter's gesture. My skin burned where she touched it.</p>
+<p>&ldquo;The world is cold, princeling. Cold and lonely as a forgotten grave. You must eat your fear. Swallow it whole. Let it arm you. Let it armor you. Let it be the blanket that smothers your weakness.&rdquo; She took a breath, a perfect mimicry of life. &ldquo;It will make you hard. It will make you swift. A perfect hunter.&rdquo; She said the words, but she had been remade into something else entirely, and the pride in her voice was the most terrifying thing of all.</p>
+<p>&ldquo;I thought I was conquering it. With every stake driven, every heart stilled, I felt a little of it leave me. I was so proud of my emptiness. Until I stood before him, truly empty, and realized I had spent my last coin. I looked into his eyes&mdash;first in defiance, then in weariness. A mortal life is so long. So short. Fear stretches every second and culls the years. I was tired of both.&rdquo;</p>
+<p>Her lips curled, revealing the tips of sharp canines. The smirk traveled through me, a visceral thrill of danger that coiled low in my belly. I was disgusted with myself. I was enthralled.</p>
+<p>&ldquo;So I knelt,&rdquo; she said, as if describing a choice of wine. &ldquo;My fear was gone, and in its place was acceptance. A new purpose.&rdquo; The wistful look her eyest took; she believed it. She saw the altar and called it a throne.</p>
+<p>She leaned close, her breath a winter chill against my ear. I flinched, but did not retreat. &ldquo;The lesson, scholar: <strong>you cannot destroy what you fear. You can only spend it.</strong> The wages of fear are a short, miserable life. But they are a hunter's currency. Spend it all, and you will have nothing left to pay for your life. You will kneel.&rdquo; Her voice dropped to a whisper, a sound meant for bedrooms. &ldquo;And you will find it a relief.&rdquo;</p>
+<div class="panel panel-purple"><strong>Mechanical resonance:</strong> The <strong>Dread Timer [10]</strong> tracks your psychological deterioration. Each segment is a debt that can be <em>prevented</em> by spending Boons&mdash;the coin of fear. The consort teaches that fear is a resource, not a flaw.</div>
+<p>She left as silently as she came. Pausing at the threshold, she glanced back, her form already blending with the shadows. &ldquo;After all,&rdquo; she murmured, the words hanging in the air like a perfume long after she was gone, &ldquo;I am his most beloved consort.&rdquo;</p>
+<p>The door closed. The room was colder than the grave. I stood there, my arm still burning from her touch, my mind a riot of terror, philosophy, and a shameful, aching want. I understood nothing.</p>
+<div class="panel panel-purple"><strong>Mechanical resonance:</strong> The <strong>Dread Timer [10]</strong> tracks personal psychological deterioration. Each segment is a debt that can be prevented by spending Boons&mdash;the coin of fear. The consort teaches that fear is a resource, not a flaw.</div>
+<p>She left. At the threshold, she murmured, &ldquo;After all, I am his most beloved consort.&rdquo; The door closed. The room felt colder.</p>
+<h3 id="the-second-night-the-child-on-the-geometry-of-madness">The Second Night: The Child on the Geometry of Madness</h3>
+<p>He did not come through the window so much as the window became him. One moment it was a rectangle of night sky, the next it was a frame around a perched silhouette that hurt to look at. He was a boy of sixteen, perhaps, but shaped by a hand that understood anatomy as a suggestion. His hands were too large, his smile a rictus of needle-pointed teeth that did not fit his face. He did not move. He <em>rearranged</em>.</p>
+<p>A sound came from him, not a voice but the memory of one, filtered through broken glass and static. &ldquo;The Baron says you are a question. Questions have shapes. Yours is sharp.&rdquo;</p>
+<p>I clutched my journal like a shield. &ldquo;What what are you?&rdquo;</p>
+<p>A tremor passed through him. &ldquo;I was a hunter. I was very good. I hunted the numbers. The angles of fear.&rdquo; His head tilted past the point a spine should allow. &ldquo;I learned the first rule: the monster is not the point. The point is the hole it makes in the world when you push it through.&rdquo;</p>
+<p>He flowed from the sill, a motion more liquid than human, and began to trace a circle around me. The air hummed. The walls behind him <em>wavered</em>, the mortar between stones bleeding a slow, black sap.</p>
+<p>&ldquo;I unmade three of his get,&rdquo; he whispered, and the whisper came from the corner of the room. &ldquo;With each un-making, the world relaxed. The numbers got polite. They showed me their manners. The walls sang to me. They were not good songs. Not songs to be sung.&rdquo;</p>
+<p>He stopped directly in front of me, his eyes two voids where the candlelight drowned. &ldquo;The other hunters they said &rdquo;madness&ldquo;. They did not understand. I was not mad. I was <em>invited</em>. I saw the guest list for the feast. My name was written in the geometry of a scream.&rdquo; He began to laugh, a sound like dry leaves skittering down a street at midnight. &ldquo;I was a good guest. I brought a gift. I brought myself.&rdquo;</p>
+<p>My mind strained to find a thread of logic in the chaos. &ldquo;How how did you survive?&rdquo; I begged, desperate for an anchor.</p>
+<p>&ldquo;Survive?&rdquo; He seemed genuinely puzzled by the word. &ldquo;The music does not stop. You just learn to dance to it. Or you break. I chose to dance. I knelt. The Baron he likes the dance. He gave me a new shape. A quieter shape.&rdquo; For a fleeting second, there was a horrifying clarity in his eyes&mdash;the ghost of the powerful man he had been, now utterly enslaved. Then it was gone, swallowed by the void.</p>
+<p>He leaned in. I smelled ozone and old blood. &ldquo;The lesson, little question: <strong>hunting breaks the world. Every truth you pull loose is a thread in the tapestry. Pull too many, and the picture becomes something else. Something hungrier.</strong>&rdquo;</p>
+<div class="panel panel-purple"><strong>Mechanical resonance:</strong> The <strong>Reality Fracture Timer [10]</strong> tracks how much fundamental reality has been destabilized by cosmic contact. The child embodies the cost of knowledge&mdash;a price that accrues passively and catastrophically.</div>
+<p>He flowed back onto the sill, a rewind of impossible physics. The madness in his eyes receded, leaving behind a terrifying, perfect lucidity. He looked at me, and for the first time, spoke with utter clarity.</p>
+<p>&ldquo;After all,&rdquo; he said, his voice now chillingly normal, &ldquo;I am his most beloved child.&rdquo;</p>
+<p>Then he was simply not there. The window was closed, latched from the inside. And carved into the stone sill where he had perched was a perfect, smoking fractal that made my eyes water to see. Of course. That closing line is perfect. It lands with the exact right mix of resignation, pride, and chilling finality. It ties the entire three-night lesson together.</p>
+<p>Here is the full scene with that powerful closing:</p>
+<h3 id="the-third-night-michel-on-the-weight-of-witness">The Third Night: Michel on the Weight of Witness</h3>
+<p>Michel did not arrive. He manifested. One moment the chamber was empty, the next he stood at its heart, as still as a gargoyle. The Inquisitor. The Valet. The man who had slain three of the Baron's get and been <em>rewarded</em> with eternity.</p>
+<p>He wore servant's livery, but it fit him like a shroud. His eyes, however, were not a servant's eyes. They were the cold, assessing eyes of a master hunter. He looked at me and saw a tool, a potential asset.</p>
+<p>&ldquo;You have seen the carrot and the stick,&rdquo; he said, his voice low, a conspirator's whisper that did not carry beyond the two of us. &ldquo;The seduction and the madness. Now you see the truth. He believes he cannot abide a hunter. It is his one vanity. But he is wrong. He needs us. He needs the challenge. The game.&rdquo;</p>
+<p>He took a step closer, and the air grew tight.</p>
+<p>&ldquo;I was the best of the Chain-Lanterns. Thirty years, I hunted his kind. I thought I was closing in on <em>him</em>. I thought I was winning.&rdquo; A bitter smile touched his lips, the ghost of the man he was. &ldquo;He let me think it. He let me believe I could be the hero of the story, the slayer in the dark. I cornered his third child in a forgotten crypt. No witnesses. Just me, my silver, and the thing's screams.&rdquo;</p>
+<p>His hand went to his forearm, though it was covered by his sleeve. &ldquo;I struck the blow. And in the silence that followed I felt it. The victory did not settle in me. The horror of it did. It poured into the empty space. Without another soul to hold the weight, to <em>see</em> it the deed became mine alone to carry. Forever.&rdquo;</p>
+<p>The conspiratorial tone was gone, replaced by a hollow dread. &ldquo;He found me three days later. I wasn't hiding. I was counting. Counting stones, counting breaths, counting the ways the world had gone wrong. He did not kill me. He offered me a position. &rdquo;A guest must be polite,&ldquo; he said. &rdquo;You were never a guest, Michel. You were always a hunter. Now you can be neither.&ldquo;&rdquo;</p>
+<p>Michel's steel eyes locked onto mine, and I saw the prison within them. &ldquo;The lesson is not about hunting. It is about <strong>being hunted.</strong> The Baron is the land, the sky, the law here. To hunt him is to break the world you stand on. The only way to survive is to cease to be a hunter. To become a <strong>guest.</strong> And a guest is polite. A guest makes requests. He cannot refuse a polite request. It is the only law he still honors.&rdquo;</p>
+<p>He leaned forward, his voice dropping back to that urgent whisper. &ldquo;You want his secret? The one he keeps in the lead-lined box? The confession of Sister Aris?&rdquo; He glanced at the door, a gesture of pure instinct. &ldquo;I have not told him you seek it. That is my last victory. Ask him for it. Politely. As a guest.&rdquo;</p>
+<p>He straightened up, becoming the valet once more. &ldquo;The lesson, scholar: <strong>hunting is not solitary. You need witnesses.</strong> Not for glory. For sanity. To hold the weight of the terrible things you must do, so they do not become the core of who you are.&rdquo; He rolled up his sleeve. His forearm was a ledger of pain&mdash;scars, brands, old seals. And beneath them, coiled around his wrist like a vein, was a <strong>gray thread</strong>, thin as a spider's silk, pulsing softly.</p>
+<p>&ldquo;Without a witness, the horror does not die. It transfers. It becomes a debt. And all debts here,&rdquo; he tapped the thread, &ldquo;are paid to him.&rdquo;</p>
+<div class="panel panel-purple"><strong>Mechanical resonance:</strong> The <strong>Collective Sanity Timer [8]</strong> tracks group psychological effects. Michel teaches that solitary hunting leads to corruption&mdash;shared witness is a shield. The gray thread is the Cord's mark, a symbol of a debt transferred to a higher power.</div>
+<p>He turned to leave.</p>
+<p>&ldquo;Michel,&rdquo; I called out, my mind reeling. &ldquo;The price for asking. What is it?&rdquo;</p>
+<p>He paused at the threshold, his back to me. &ldquo;The price is always the same. A piece of yourself. For him, it is a trophy. For you&rdquo; He half-turned, and his profile was etched in the gray dawn light. &ldquo;It is just the cost of doing business with the edge of the world.&rdquo;</p>
+<p>He faded into the dim light, his final words hanging in the air like a sentence.</p>
+<p>&ldquo;I should know. After all, I am his most beloved servant.&rdquo;</p>
+<h2 id="the-confrontation">The Confrontation</h2>
+<h3 id="the-confrontation">The Confrontation</h3>
+<p>I found the Baron in his study, seated not at his desk, but at a small table set for two, positioned directly before the portrait of the woman with the scratched nameplate. The silver chest sat at his feet, its low, metallic hum a counterpoint to the silence.</p>
+<p>He did not look up from the loaf of dark bread he was carefully slicing. &ldquo;Sit, Lerris. We have matters to discuss, and a guest should not be kept standing.&rdquo; His tone was not a request. It was a statement of fact, as immutable as the stone of his keep.</p>
+<p>A strange lassitude came over me. My indignation, my carefully rehearsed demands, they all seemed to drain away, leaving only a hollow compulsion. I found myself pulling out the chair and sitting before I had even consciously decided to do so. The action felt both entirely my own and completely outside my control.</p>
+<p>He placed a piece of bread on a fine porcelain plate and pushed it toward me. Then he took a pinch of salt from a small silver dish and sprinkled it over it. The gesture was ancient, ritualistic. &ldquo;Bread and salt. The oldest laws are the strongest. They remind us of our places. You are a guest in my house. I am your host. This makes things simple. It makes things safe. Eat.&rdquo;</p>
+<p>I ate. The bread was heavy, nutty. The salt was sharp on my tongue. He watched me swallow, his expression unreadable, and only then did he take a piece for himself.</p>
+<p>&ldquo;You wish to hunt,&rdquo; he stated, his voice flat. It wasn't a question. &ldquo;I can smell the ambition on you, the hunger for truths that should remain buried. It is a familiar scent. You will be a hunter, Lerris Fenwood. Of that, I have little doubt.&rdquo;</p>
+<p>He paused, his gaze drifting to the silver chest. &ldquo;But you seek to hunt <em>me</em>. And things like me. This is not a matter of courage or skill. It is a matter of geometry. You are a fleeting variable attempting to solve an eternal equation. You will fail. It is my duty as your host&mdash;and as a fellow noble who understands the weight of ancient obligations&mdash;to warn you against this path. There are powers in this world so old that to oppose them is not bravery, but a form of profound discourtesy. One must learn to navigate them, not quell them.&rdquo;</p>
+<p>He finally looked at me, and for the first time, I saw something akin to pity in his eyes. &ldquo;This is, I suppose, why the Witness chose you. The angel of revelation seeks a vessel, and it often chooses the indignant and the clever. You are the perfect patsy. You arrived on my doorstep armed for a kill, yet you said the word &rdquo;guest&ldquo;. The laws of hospitality are the only chains I willingly wear. So I must abide you. And I must warn you.&rdquo;</p>
+<p>He gestured to Michel, who stood like a shadow in the corner. The Inquisitor stepped forward and placed the lead-lined box in my hands. It was cold, far colder than it should have been.</p>
+<p>&ldquo;You ask for a secret,&rdquo; the Baron said. &ldquo;I give it to you. The price is not yours to bear, but you will carry it nonetheless. That is the nature of secrets. They have weight. They accrue interest. And they are never, ever free.&rdquo;</p>
+<p>I clutched the box, the Baron's words chilling me more than its temperature. My earlier vow felt childish now. &ldquo;I I will find a way&rdquo;</p>
+<p>He sighed, a long, weary exhalation. &ldquo;Yes. I am sure you will try. Escort for the scholar, Michel. See that he reaches the Black River by nightfall.&rdquo; He turned his gaze back to the portrait, his hand resting on the singing silver chest. As Michel led me away, I heard the Baron's final, quiet addition.</p>
+<p>&ldquo;And Michel?&rdquo; &ldquo;My lord?&rdquo; &ldquo;Do not kill him. I have, despite myself, grown fond of his indignation.&rdquo;</p>
+<p>The Baron did not watch us go. He was already lost in his silent accounting, a king in his castle of bones, forever paying a debt that could never be settled, having done his duty by one more doomed soul sent to him by a higher power.</p>
+<p><em>The Ways Between</em></p>
+<h3 id="the-ways-between">The Ways Between</h3>
+<p>We did not ride south through Viterra. Michel led me not to the road, but to a section of the mountain's bare rock face. He placed his palm against the stone, and where there had been nothing, a door manifested. It was old, dark wood, banded with iron that seemed to drink the thin morning light.</p>
+<p>&ldquo;The Ways Between,&rdquo; Michel said, his voice devoid of inflection. &ldquo;The Baron's gift. Or his insult. You will be across the Belworth by nightfall. The journey will take you one night. It will take something else from you as well. That is the toll.&rdquo;</p>
+<p>He opened the door. Beyond was not a tunnel, nor was it darkness. It was a shifting, impossible geometry of light and shadow that hurt to perceive. I felt a pull, a terrible, vertiginous suction.</p>
+<p>I stepped through.</p>
+<p>I will not describe what I saw. The description would be a lie, and the lie would become a crack, and the crack would widen. It was not a journey of distance, but of essence. I felt myself unraveling, my memories, my senses, my very self, stretched across a non-space that had no regard for the mortal mind.</p>
+<p>When I emerged, I collapsed onto cold, wet earth. The sound of rushing water filled my ears. I was on the far bank of the Black River, the sun bleeding into the horizon behind me. A single night had passed. A thousand years had passed.</p>
+<p>I was clutching the lead-lined box so tightly my fingers had cramped into claws. I was whole. I was intact.</p>
+<p>But I was hollowed.</p>
+<p>A cold panic seized me. I tried to picture my mother's face, to hear her voice chiding me for my recklessness. Her features were clear, her smile kind, her voice a familiar melody.</p>
+<p>But her eyes her eyes were voids. I could not remember their color. The memory was simply gone, scraped clean from my mind, a precise and terrible theft. A sob wrenched itself from my chest, a raw, helpless sound. I had to get across the river. I had to get home. I had to see her, to look into her face and find the color there again, before I forgot the rest.</p>
+<p>I did not open the box until I was safely on the southern shore, the lights of a familiar crossroads village twinkling in the distance. The confession inside was not my burden.</p>
+<p>But I would carry it anyway.</p>
+<h3 id="the-ways-between">The Ways Between</h3>
+<p>We did not ride south through Viterra. Michel led me not to the road, but to a section of the mountain's bare rock face. He placed his palm against the stone, and where there had been nothing, a door manifested. It was old, dark wood, banded with iron that seemed to drink the thin morning light.</p>
+<p>&ldquo;The Ways Between,&rdquo; Michel said, his voice devoid of inflection. &ldquo;The Baron's gift. Or his insult. You will be across the Belworth by nightfall. The journey will take you one night. It will take something else from you as well. That is the toll.&rdquo; s He opened the door. Beyond was not a tunnel, nor was it darkness. It was a shifting, impossible geometry of light and shadow that hurt to perceive. I felt a pull, a terrible, vertiginous suction.</p>
+<p>I stepped through.</p>
+<p>I will not describe what I saw. The description would be a lie, and the lie would become a crack, and the crack would widen. It was not a journey of distance, but of essence. I felt myself unraveling, my memories, my senses, my very self, stretched across a non-space that had no regard for the mortal mind.</p>
+<p>When I emerged, I collapsed onto cold, wet earth. The sound of rushing water filled my ears. I was on the far bank of the Black River, the sun bleeding into the horizon behind me. A single night had passed. A thousand years had passed.</p>
+<p>I was clutching the lead-lined box so tightly my fingers had cramped into claws. I was whole. I was intact.</p>
+<p>But I was hollowed.</p>
+<p>A cold panic seized me. I tried to picture my mother's face, to hear her voice chiding me for my recklessness. Her features were clear, her smile kind, her voice a familiar melody.</p>
+<p>But her eyes her eyes were voids. I could not remember their color. The memory was simply gone, scraped clean from my mind, a precise and terrible theft. A sob wrenched itself from my chest, a raw, helpless sound. I had to get across the river. I had to get home. I had to see her, to look into her face and find the color there again, before I forgot the rest.</p>
+<p>I did not open the box until I was safely on the southern shore, the lights of a familiar village twinkling in the distance. The confession inside was not my burden.</p>
+<p>But I would carry it anyway.</p>
+<h2 id="the-bargain-at-the-broken-well">The Bargain at the Broken Well</h2>
+<blockquote class="found-doc">
+<p><em>A confession recovered from the ruins of a Daughter's safe house, written on the back of a grain manifest. The ink is lampblack and tears. The paper is scorched.</em></p>
+<p><strong>Under the lamp, bread and salt. The soup was free. The price was her.</strong></p>
+<p>I am Sister Aris, Keeper of the Door, and I am writing this because I will not remember it in the morning. The Cord takes memories as interest. But I have hidden this page in a lead-lined box, and I have paid a Trow to forget where. When the Cord finds it&mdash;and it will&mdash;I will already be ash.</p>
+<p>My Hollowed has no name. I call him little one. He was weak. His mother was dead. A dark, uncertain life lay ahead. I held the cord tight. I did not unwrap it. The Cord demanded a breath or a death; I gave them a death.</p>
+<p>He has been my witness for forty years. He does not eat. He does not sleep. He does not age. His eyes are sewn open with silver wire, and he watches every soul I tend, every death I harvest, every thread I tie. I have told myself he is not my son. I have told myself he is a tool.</p>
+<p>I have lied.</p>
+<p>The Cord does not forbid love. It forbids <em>attachment</em>. Love is a debt; attachment is a loan with no interest. The High Mother weaves attachment into the pattern, but She does not permit us to keep the thread for ourselves.</p>
+<p>I have kept the thread.</p>
+<p><strong>The Road to Zahk'Kozahn</strong></p>
+<p>I fled the Cord at the dark of the moon. I took only my Hollowed, a skin of water, and a silver coin that had been pressed into a dead man's eye.</p>
+<p>The cursed city is not on any map. You find it by walking toward the place where the stars forget their names. I walked for nine nights. Through desert. Through dreams. On the ninth, the walls rose from the dust&mdash;black basalt, slick with condensation that smelled of honey and copper.</p>
+<p>The gates were open. The gates are always open.</p>
+<p>Inside, the Worn shuffled past me&mdash;Shamblers, Screamers, Stalkers, and one Crackler who asked me for a name. I gave her the name of a Sister who had wronged me. She took it and laughed. Her joints snapped like dry twigs. &ldquo;She will dream of drowning tonight,&rdquo; the Crackler said. &ldquo;That is the interest.&rdquo;</p>
+<p>I did not ask for the principal.</p>
+<p><strong>The Chained Angel</strong></p>
+<p>The ziggurat rose at the city's heart. I climbed. The steps were worn smooth by feet that had stopped bleeding centuries ago. At the top, a vaulted chamber lit by a single guttering candle.</p>
+<p>And there She was.</p>
+<p>Malachai hangs in chains of Aetherium&mdash;black iron that drinks light. Her wings are bound to the stone. Her mouth is sewn shut with silver wire. Her eyes are open. They are not angry. They are <em>patient</em>.</p>
+<p>She spoke through a wound in Her throat, her voice the rasp of rust and honey.</p>
+<p>&ldquo;You have brought a Hollowed,&rdquo; she sighed. &ldquo;And you wish to restore his heart.&rdquo;</p>
+<p>I knelt. &ldquo;I wish to raise him as my son. Not as a witness. Not as a tool. As a child.&rdquo;</p>
+<p>Malachai's eyes flickered. The chains groaned.</p>
+<p>&ldquo;He was dead. He was killed with kindness long ago, letting the breath fade. The Cord accepted that death as payment for another. He is not yours. He is the Cord's.&rdquo;</p>
+<p>&ldquo;Then I will pay the Cord's price. Whatever it is.&rdquo;</p>
+<p>&ldquo;You do not understand, <em>little sister</em>. The Cord does not sell. It <em>transfers</em>. You cannot buy a Hollowed's heart from the High Mother. She does not own it. She merely holds it.&rdquo;</p>
+<p>I did not understand. I still do not.</p>
+<p>Malachai smiled, ash falling from her lips. Her chains rattled, the sound of bells and damnation.</p>
+<p>&ldquo;I can restore their heart. I can make their lungs fill with air, their blood move with warmth, their eyes close at night. They will grow. They will laugh. They will weep. They will be everything you lost when you held that cord.&rdquo;</p>
+<p>&ldquo;And the price?&rdquo;</p>
+<p>&ldquo;A plague upon the Cord in three generations from this night. Not death&mdash;death is mercy. A <em>plague</em>. That's all you need know. The High Mother will forget a thread. A knot will loosen. A debt will be lost. The Cord will fray, just a little, just enough to let one soul slip free.&rdquo;</p>
+<p>I thought of my Hollowed. I thought of his silver-wire eyes, his hands that never warmed, his heart that did not beat.</p>
+<p>&ldquo;One soul,&rdquo; I said. &ldquo;You will let one soul slip free from the Cord?&rdquo;</p>
+<p>&ldquo;One soul,&rdquo; Malachai agreed. &ldquo;Not yours. Not theirs. But one.&rdquo;</p>
+<p>I agreed.</p>
+<p><strong>The Restoration</strong></p>
+<p>Malachai reached through Her chains. Her fingers were long, cold, and smelled of the Well of Ichor. She touched my Hollowed's chest.</p>
+<p>The gray thread that bound the child's heart unraveled. It did not fall&mdash;it <em>dissolved</em>, turning to ash that smelled of milk and iron. The ash swirled, then settled into the shape of a heart&mdash;small, pink, pulsing.</p>
+<p>The Hollowed gasped.</p>
+<p>Her eyes closed. When they opened, the silver wire was gone. Her eyes were brown&mdash;warm, bewildered, <em>alive</em>. And yet &ndash; the way she tilted her head, the small furrow of her brow &ndash; that was his. That was always his. And I loved her for it,</p>
+<p>She looked at me. &ldquo;Mama?&rdquo; she said.</p>
+<p>I wept. I had not wept in forty years. The Cord does not permit tears&mdash;tears are a debt unpaid. But I wept.</p>
+<p>Malachai watched. Her smile was the smile of a creditor who has just written a new clause in fine print.</p>
+<p>&ldquo;The plague will come in three generations. You will not see it. But you will have raised a daughter. Is that not enough?&rdquo;</p>
+<p>I held my child. She was warm. She was real. I did not ask what the fine print said.</p>
+<p><strong>The Cord</strong></p>
+<p>We fled Zahk'Kozahn at dawn. My daughter&mdash;I named her Bryn, after my own mother, who had no name I ever spoke aloud&mdash;walked beside me. Her hand was small and warm.</p>
+<p>We reached the Black River by nightfall. I built a fire. I poured two cups of tea.</p>
+<p>As she drank, I saw it.</p>
+<p>A gray thread, thin as a spider's silk, wrapped around her neck. It was not tight. It was <em>loose</em>&mdash;the way a Daughter ties her witness cord before a binding. The thread trailed behind her, disappearing into the darkness.</p>
+<p>I reached for it. My fingers passed through.</p>
+<p>&ldquo;Mama?&rdquo; she said. &ldquo;What's wrong?&rdquo;</p>
+<p>I looked at her. Her eyes were warm. Her heart beat. She was alive.</p>
+<p>But she was not free.</p>
+<p>The Cord had not released her. Malachai had restored her heart, yes&mdash;but the Cord had never <em>owned</em> her heart. The Cord owned the <em>debt</em> that her death had paid. And that debt had not been erased. It had been <em>transferred</em>&mdash;from the dead twin to the living child.</p>
+<p>Bryn is a Daughter of the Unbroken Cord. She always has been. She always will be.</p>
+<p>I did not flee the Cord. I delivered my own Daughter into its keeping. My own <em>little sister.</em></p>
+<p><strong>The Aftermath</strong></p>
+<p>I have raised her. She does not remember Zahk'Kozahn. She does not remember the Well of Ichor. She does not remember the day her heart began to beat.</p>
+<p>She wears gray robes. She tends the dying. She collects debts. She is a good Daughter&mdash;efficient, precise, and cold.</p>
+<p>Sometimes, when she sleeps, the gray thread around her neck glows faintly. I think the High Mother is whispering to her. I think Malachai is listening.</p>
+<p>I have tried to cut the thread. I cannot. I have tried to tie it in knots. It loosens. I have tried to offer the Cord a substitute&mdash;a memory, a name, a year of my own life. The Cord does not accept substitutes.</p>
+<p>The plague will come in three generations. I will not live to see it. But I have written this confession so that someone, somewhere, will know:</p>
+<p>Malachai keeps Her bargains. The Cord does not forgive. And I&mdash;I am the woman who sold her daughter's soul to buy her a heartbeat.</p>
+<p><em>The soup is always free. The price never is.</em></p>
+<p>&mdash; Sister Aris, Keeper of the Door, fleeing south The ink is ash. The thread is gray. The child is Bryn.</p>
+</blockquote>
+<h2 id="afterword">Afterword</h2>
+<p>I closed the lead-lined box. The candle guttered. The room grew cold.</p>
+<p>I understood now why the mirror had shown me Asselin's name. My father had not hidden a secret. He had inherited one. And now, so had I.</p>
+<p>The price was not mine to bear.</p>
+<p>But I would carry it anyway.</p>
+<p>I folded the confession and placed it in my pocket. The Baron would have his three nights. I would have my answer. And somewhere, in the darkness north of the Belworth, a thread tightened.</p>
+<p>The road goes south. The ink is fresh. The ninth cup remains un-poured.</p>
+<p>&mdash; Lerris Fenwood, at the weighhouse in Belcourt, in the hour before the eighth bell</p>
+<h2 id="horror-campaigns-expansion-overview">Horror Campaigns Expansion Overview</h2>
+<h3 id="core-concept">Core Concept</h3>
+<p>Horror in Fate's Edge should create vulnerability and mounting dread while maintaining player agency and meaningful action. The unknown is more terrifying than the known.</p>
+<h3 id="key-innovations">Key Innovations</h3>
+<ul>
+<li>Boon-based sanity management system</li>
+<li>Multi-layered campaign timers for escalating tension</li>
+<li>Breaking point mechanics for critical psychological moments</li>
+<li>Atmospheric investigation tools engaging all five senses</li>
+<li>Modular subgenre templates for quick campaign setup</li>
+</ul>
+<h3 id="target-themes">Target Themes</h3>
+<ul>
+<li>Isolation and vulnerability</li>
+<li>Unknown threats beyond comprehension</li>
+<li>Psychological decay and mental deterioration</li>
+<li>Escalating tension throughout campaigns</li>
+<li>Moral ambiguity and difficult choices</li>
+<li>Cosmic insignificance and existential dread</li>
+</ul>
+<h3 id="mechanical-focus">Mechanical Focus</h3>
+<ul>
+<li>Resource management through Boon economy</li>
+<li>Investigative procedures with sanity costs</li>
+<li>Environmental hazards and reality distortions</li>
+<li>Collective psychological effects</li>
+<li>Multi-timer tension building systems</li>
+</ul>
+<h2 id="safety-and-consent">Safety and Consent</h2>
+<p>Horror is as much about trust as fear. Use tools that suit your table; this book assumes some combination of lines-and-veils, X-card, open door, and debrief.</p>
+<h3 id="session-zero-safety-pass">Session Zero Safety Pass</h3>
+<p>Before characters exist, the table should:</p>
+<ul>
+<li>List <strong>lines</strong> (no-go content), <strong>veils</strong> (fade-to-black), and <strong>preferences</strong> (desired or avoided motifs).</li>
+<li>Choose a quick signal for <strong>pause</strong> and <strong>rewind</strong> (e.g., <em>&ldquo;cut,&rdquo; &ldquo;hold,&rdquo;</em> or a hand sign).</li>
+<li>Decide how to <strong>check in</strong> mid-session (traffic light, stars and wishes, or one-word mood check).</li>
+<li>Name <strong>anchors</strong> for each PC (a person, a place, and an object that stabilize them).</li>
+</ul>
+<h3 id="on-table-procedures">On-Table Procedures</h3>
+<p>During play:</p>
+<ul>
+<li>The GM <strong>front-loads content warnings</strong> before potentially graphic scenes.</li>
+<li>Anyone may call for a <strong>tone shift</strong> or <strong>content veil</strong> without explanation.</li>
+<li>After heavy scenes, run a <strong>breather</strong>: water, deep breaths, small talk&mdash;then confirm consent to continue.</li>
+<li>Close with a short <strong>debrief</strong>: what worked, what to avoid next time, what to emphasize.</li>
+</ul>
+<h3 id="hard-stops">Hard Stops</h3>
+<p>If someone says stop, you stop. Take a break, close the session, or pivot scenes. Content is never worth breaking trust.</p>
+<h2 id="core-mechanical-framework">Core Mechanical Framework</h2>
+<h3 id="dread-timer-sanity-as-resource-management">Dread Timer - Sanity as Resource Management</h3>
+<p>The signature system replaces traditional sanity points with a Boon-based approach where players must spend resources to prevent psychological deterioration.</p>
+<div class="panel panel-gold"><strong>Purpose and Integration</strong>
+<p>This system connects to the existing Boon economy while adding horror-specific tension through the multi-timer system. Players choose when to spend Boons to prevent Dread advancement, creating meaningful decisions about risk versus stability.</p>
+</div>
+<p><strong>Sample Uses:</strong></p>
+<ol>
+<li>Witnessing a Mist Wraith causes +1 segment advancement - player spends 1 Boon to prevent it</li>
+<li>Learning cosmic truth about reality triggers +3 segments - player must spend 3 Boons or face severe psychological effects</li>
+<li>Entity observation advances Dread by 2 segments - party must collectively decide how to manage limited Boon resources</li>
+</ol>
+<h3 id="resource-management-boons-as-sanity-currency">Resource Management - Boons as Sanity Currency</h3>
+<p><strong>Acquisition Methods:</strong></p>
+<ul>
+<li>Failing rolls (standard Boon economy)</li>
+<li>Bond-driven actions with intricate descriptions</li>
+<li>GM discretion for thematic play</li>
+<li>Session participation and milestone achievements</li>
+</ul>
+<p><strong>Spending Options:</strong></p>
+<ul>
+<li>Preventing Dread Timer advancement</li>
+<li>Improving your Position by one step before a roll</li>
+<li>Activating protective assets and items</li>
+<li>Converting to XP (max 2 per session)</li>
+</ul>
+<p><strong>Narrative Weight:</strong> Players must choose between immediate tactical advantages and long-term psychological stability.</p>
+<h3 id="risk-reward-balance">Risk/Reward Balance</h3>
+<p><strong>Dominant &mdash; playing it safe:</strong></p>
+<ul>
+<li>Surface-level investigation with minimal horror exposure</li>
+<li>Conservative approach: fewer Boons earned, because fewer rolls are missed</li>
+<li>Avoiding direct confrontation with unknown threats</li>
+</ul>
+<p><strong>Desperate &mdash; pressing anyway:</strong></p>
+<ul>
+<li>Deep investigation with significant horror exposure</li>
+<li>Direct engagement with incomprehensible entities</li>
+<li>Pursuing forbidden knowledge at personal cost</li>
+<li>+1-3 Dread segments, potential breaking points</li>
+</ul>
+<p><strong>Failure States:</strong></p>
+<ul>
+<li>Dread Timer fills completely</li>
+<li>Character becomes Broken - out of control, hostile to allies</li>
+<li>Permanent psychological damage requiring intervention</li>
+<li>Transformation into agent of horror</li>
+</ul>
+<h2 id="campaign-timer-framework">Campaign Timer Framework</h2>
+<h3 id="primary-timer-dread-timer-10-segments">Primary Timer : Dread Timer [10]</h3>
+<p>Psychological deterioration and mounting horror affecting individual characters.</p>
+<div class="table-wrap"><table><tr><th><strong>Dread Timer </strong></th><th><strong>Psychological deterioration and mounting horror</strong></th></tr><tr><td>Segments</td><td>0/10</td></tr></table></div>
+<p><strong>Advancement Triggers:</strong></p>
+<ul>
+<li>Witnessing death or violence: +1 segment (prevent with 1 Boon)</li>
+<li>Encountering the unknown: +1 segment (prevent with 1 Boon)</li>
+<li>Personal failure leading to harm: +1 segment (prevent with 1 Boon)</li>
+<li>Direct threat to sanity/morality: +2 segments (prevent with 2 Boons)</li>
+<li>Major revelation about the horror: +2 segments (prevent with 2 Boons)</li>
+<li>Companion/friend harmed or lost: +3 segments (prevent with 3 Boons)</li>
+</ul>
+<p><strong>Consequences when filled:</strong> Character becomes Broken - out of control, may become hostile to allies, permanent psychological damage, requires major intervention to recover.</p>
+<h3 id="secondary-timers">Secondary Timers</h3>
+<h4 id="reality-fracture-timer-12-segments">Reality Fracture Timer [10]</h4>
+<p>How much fundamental laws of reality have been altered by cosmic influence.</p>
+<div class="table-wrap"><table><tr><th><strong>Reality Fracture Timer </strong></th><th><strong>Fundamental laws of reality becoming unreliable</strong></th></tr><tr><td>Segments</td><td>0/12</td></tr></table></div>
+<p><strong>Advancement Triggers:</strong></p>
+<ul>
+<li>Impossible phenomena observed: +1 segment per day</li>
+<li>Dimensional mathematics researched: +2 segments</li>
+<li>PCs directly perceive alien geometry: +3 segments</li>
+<li>Local reality becomes unstable: +2 segments per incident</li>
+<li>Ancient experiments disturbed: +3 segments</li>
+</ul>
+<p><strong>Consequences when filled:</strong> Barriers between dimensions collapse completely; entity manifests fully in normal space.</p>
+<h4 id="collective-sanity-timer-8-segments">Collective Sanity Timer [8]</h4>
+<p>How much the party and observers are affected by cosmic horror.</p>
+<div class="table-wrap"><table><tr><th><strong>Collective Sanity Timer </strong></th><th><strong>Group psychological effects and shared hallucinations</strong></th></tr><tr><td>Segments</td><td>0/8</td></tr></table></div>
+<p><strong>Advancement Triggers:</strong></p>
+<ul>
+<li>Reality Fracture Timer advances: +1 segment</li>
+<li>Direct observation of alien entities: +2 segments each</li>
+<li>Comprehension of higher-dimensional concepts: +2 segments</li>
+<li>Witnessing impossible geometric shapes: +1 segment each</li>
+<li>Temporal anomalies experienced: +1 segment per hour</li>
+</ul>
+<p><strong>Consequences when filled:</strong> Shared hallucinations become reality; party exists partially outside normal space.</p>
+<h4 id="existential-threat-timer-15-segments">Existential Threat Timer [10]</h4>
+<p>How close cosmic entity is to full manifestation in our reality.</p>
+<div class="table-wrap"><table><tr><th><strong>Existential Threat Timer </strong></th><th><strong>Cosmic entity approaching full manifestation</strong></th></tr><tr><td>Segments</td><td>0/15</td></tr></table></div>
+<p><strong>Advancement Triggers:</strong></p>
+<ul>
+<li>Reality Fracture reaches 6 segments: +2 segments</li>
+<li>Collective Sanity reaches 6 segments: +3 segments</li>
+<li>PCs attempt to communicate with alien intelligence: +3 segments</li>
+<li>Dimensional barriers weakened further: +2 segments</li>
+<li>Ancient safeguards fail: +4 segments</li>
+</ul>
+<p><strong>Consequences when filled:</strong> Entity begins reshaping local reality according to alien logic.</p>
+<h3 id="timer-interaction">Timer Interaction</h3>
+<p>Reality Fracture drives other timers; as it advances, Collective Sanity and Existential Threat accelerate. High Collective Sanity makes Reality Fracture advance faster as perception warps reality.</p>
+<h2 id="character-integration-system">Character Integration System</h2>
+<h3 id="thematic-character-options">Thematic Character Options</h3>
+<h4 id="investigator-archetypes">Investigator Archetypes</h4>
+<p><strong>Scholar/Researcher:</strong></p>
+<ul>
+<li>Recognizes ancient symbols, understands cosmic principles (+1 Lore)</li>
+<li>Risks comprehension breaking points from forbidden knowledge</li>
+<li>Vulnerable to reality distortion when theories proven wrong</li>
+</ul>
+<p><strong>Veteran/Survivor:</strong></p>
+<ul>
+<li>Resistant to fear (-1 Dread advancement from combat exposure)</li>
+<li>Vulnerable to reality distortions that break tactical understanding</li>
+<li>Experienced with supernatural threats but may be overconfident</li>
+</ul>
+<p><strong>Psychic/Sensitive:</strong></p>
+<ul>
+<li>Can perceive hidden truths (+1 die to notice supernatural detail)</li>
+<li>Suffers +1 Dread from all supernatural exposure</li>
+<li>May become overwhelmed by too much psychic input</li>
+</ul>
+<p><strong>Skeptic/Rationalist:</strong></p>
+<ul>
+<li>Immune to some psychological effects through rational disbelief</li>
+<li>Suffers severe penalties (-2 dice) when forced to accept impossibility</li>
+<li>May become dangerously obsessed with proving rational explanations</li>
+</ul>
+<h3 id="background-integration">Background Integration</h3>
+<p><strong>Traumatized Past:</strong></p>
+<ul>
+<li>Start with 1 segment on Dread Timer</li>
+<li>Gain +1 die to resist similar future exposures</li>
+<li>May have flashbacks triggered by related stimuli</li>
+</ul>
+<p><strong>Occult Knowledge:</strong></p>
+<ul>
+<li>Access to forbidden lore (Wits + Lore, DV 3)</li>
+<li>Each use advances Dread by 1 and generates 1 SB</li>
+<li>May attract unwanted supernatural attention</li>
+</ul>
+<p><strong>Military Training:</strong></p>
+<ul>
+<li>+1 die to combat supernatural threats</li>
+<li>-1 die to social interactions due to paranoia</li>
+<li>May resort to violence when other options fail</li>
+</ul>
+<p><strong>Religious Faith:</strong></p>
+<ul>
+<li>Immunity to fear effects from traditional horror</li>
+<li>Vulnerable to anti-holy entities and corrupted faith</li>
+<li>May struggle with moral compromises required for survival</li>
+</ul>
+<h3 id="mechanical-hooks">Mechanical Hooks</h3>
+<h4 id="breaking-points">Breaking Points</h4>
+<p>Specific triggers that force immediate Dread advancement unless resisted:</p>
+<ul>
+<li><strong>Witnessing Corruption:</strong> Seeing friend/ally become corrupted (+2 Dread)</li>
+<li><strong>Personal Loss:</strong> Losing something precious (+3 Dread)</li>
+<li><strong>Moral Compromise:</strong> Acting against core beliefs (+2 Dread)</li>
+<li><strong>Incomprehensible Truth:</strong> Understanding reality-breaking fact (+3 Dread)</li>
+</ul>
+<p><strong>Resistance Options:</strong></p>
+<ul>
+<li>Spend 2 Boons to prevent advancement</li>
+<li>Spirit + Resolve roll (DV 5) with narrative justification</li>
+<li>Relevant Talents or Backgrounds provide resistance</li>
+</ul>
+<h4 id="corruption-track">Corruption Track</h4>
+<p>Physical/mental changes that occur at high Dread levels:</p>
+<ul>
+<li>7+ Dread: Speaking in equations, seeing geometric patterns</li>
+<li>8+ Dread: Attraction to dark spaces, partial dimensional existence</li>
+<li>9+ Dread: Unreliable narrator, shared hallucinations become real</li>
+<li>10+ Dread: Broken - permanent transformation, hostile to allies</li>
+</ul>
+<h4 id="collective-insanity">Collective Insanity</h4>
+<p>Party average Dread affects everyone's perception of reality:</p>
+<ul>
+<li>Average 5+: Shared hallucinations, impossible events become real</li>
+<li>Average 7+: Geometric spaces shift based on group consensus</li>
+<li>Average 9+: Group paranoia and infighting, -2 dice to cooperation</li>
+</ul>
+<h2 id="quick-setup-protocol">Quick Setup Protocol</h2>
+<h3 id="30-minute-campaign-launch">30-Minute Campaign Launch</h3>
+<p><strong>Character Preparation:</strong></p>
+<ul>
+<li>Use pre-generated Tier II characters or build using 32 XP with horror-themed backgrounds</li>
+<li>Ensure party has mix of investigative, combat, and social capabilities</li>
+<li>Assign relevant Talents for horror engagement (Lorekeeper, Backlash Soothing)</li>
+</ul>
+<p><strong>Core Conflict Establishment:</strong></p>
+<ol>
+<li>PCs encounter impossible phenomena that challenge reality/f sanity</li>
+<li>Threat appears to be beyond normal comprehension</li>
+<li>Stakes involve personal survival and broader existential implications</li>
+</ol>
+<p><strong>Opening Scene Hook:</strong></p>
+<ul>
+<li>Familiar environment becomes alien</li>
+<li>Impossible constellations in night sky</li>
+<li>Architecture defying geometric principles</li>
+<li>Whispers in familiar voices of missing people</li>
+</ul>
+<p><strong>Primary Campaign Timer :</strong></p>
+<ul>
+<li>Dread Timer [10] as personal threat</li>
+<li>2-3 supporting timers based on horror subgenre</li>
+<li>Start all timers at 1-2 segments for immediate tension</li>
+</ul>
+<p><strong>Key Mechanical Tutorial:</strong></p>
+<ul>
+<li>Introduce Dread Timer management through first horror encounter</li>
+<li>Demonstrate breaking point resistance with meaningful choice</li>
+<li>Show resource management between investigation and self-preservation</li>
+</ul>
+<h3 id="scaling-options">Scaling Options</h3>
+<h4 id="short-form-1-2-sessions">Short Form (1-2 sessions)</h4>
+<ul>
+<li>Single timer (Dread 8 segments) for focused threat</li>
+<li>Simplified breaking points with clear resistance options</li>
+<li>Limited corruption effects, mostly psychological</li>
+<li>Resolution focused on immediate survival/containment</li>
+</ul>
+<h4 id="standard-form-3-5-sessions">Standard Form (3-5 sessions)</h4>
+<ul>
+<li>Full 4-timer system with complex interactions</li>
+<li>Multiple breaking point types and resistance methods</li>
+<li>Progressive corruption with permanent character changes</li>
+<li>Multiple resolution paths with different consequences</li>
+</ul>
+<h4 id="extended-form-6-sessions">Extended Form (6+ sessions)</h4>
+<ul>
+<li>Campaign-level consequences affecting world/region</li>
+<li>Permanent reality alterations from filled timers</li>
+<li>Character retirement/retcon options for broken PCs</li>
+<li>Sequel hooks and ongoing cosmic threat elements</li>
+</ul>
+<h2 id="environmental-and-narrative-mechanics">Environmental and Narrative Mechanics</h2>
+<h3 id="setting-driven-mechanics">Setting-Driven Mechanics</h3>
+<h4 id="reality-distortion-zones">Reality Distortion Zones</h4>
+<p>Areas where physics/geometric principles become unreliable:</p>
+<ul>
+<li>Modifiers: -1 Investigation, +1 SB generation</li>
+<li>Spatial navigation requires Wits + Lore (DV 3-4)</li>
+<li>May generate 2 SB for time loops or dimensional folds</li>
+</ul>
+<p><strong>Player Interaction:</strong></p>
+<ul>
+<li>Can attempt stabilization with Arcana rolls but at cost of advancing timers</li>
+<li>Accepting impossibility grants DV 1 on next navigation roll</li>
+<li>Mathematical instruments may provide +1 die to related rolls</li>
+</ul>
+<h4 id="temporal-anomalies">Temporal Anomalies</h4>
+<p>Time flows differently or loops in specific areas:</p>
+<ul>
+<li>+1 Investigation for pattern recognition</li>
+<li>Generates 2 SB for time loops and paradoxes</li>
+<li>May cause characters to become &ldquo;unstuck&rdquo; in time</li>
+</ul>
+<p><strong>Effects:</strong></p>
+<ul>
+<li>Unreliable narrators who remember multiple timeline branches</li>
+<li>Repeating conversations with slight variations</li>
+<li>Causality breaking down - effects preceding causes</li>
+</ul>
+<h3 id="atmosphere-tools">Atmosphere Tools</h3>
+<h4 id="sensory-engagement">Sensory Engagement</h4>
+<p><strong>Sound:</strong></p>
+<ul>
+<li>Whispers that shouldn't be there</li>
+<li>Silence that presses against eardrums</li>
+<li>Geometric harmonies that hurt to hear</li>
+<li>Temporal echoes of future conversations</li>
+</ul>
+<p><strong>Sight:</strong></p>
+<ul>
+<li>Impossible shadows with their own movement</li>
+<li>Colors that shouldn't exist in natural spectrum</li>
+<li>Peripheral movement that vanishes when directly observed</li>
+<li>Geometric shapes existing in more than three dimensions</li>
+</ul>
+<p><strong>Touch:</strong></p>
+<ul>
+<li>Surfaces that breathe and pulse rhythmically</li>
+<li>Temperatures that shift without environmental cause</li>
+<li>Textures that change under fingers when not observed</li>
+<li>Gravity flowing in impossible directions</li>
+</ul>
+<p><strong>Smell:</strong></p>
+<ul>
+<li>Scents of places that never existed</li>
+<li>Odors of concepts made physical (fear, time, mathematics)</li>
+<li>Aromas that trigger false memories of impossible events</li>
+<li>Fragrances that seem to move independently of air currents</li>
+</ul>
+<p><strong>Taste:</strong></p>
+<ul>
+<li>Metallic fear on tongue during supernatural encounters</li>
+<li>The flavor of wrongness when reality distorts</li>
+<li>Aftertastes of cosmic truths that linger for hours</li>
+<li>Tastes that seem to exist in multiple dimensions simultaneously</li>
+</ul>
+<h3 id="narrative-structure">Narrative Structure</h3>
+<h4 id="scene-types">Scene Types</h4>
+<p><strong>Investigation:</strong></p>
+<ul>
+<li>Gathering clues while managing sanity/resource costs</li>
+<li>Wits + Investigation or Lore rolls with potential Dread advancement</li>
+<li>May generate SB for reality distortions or entity attention</li>
+</ul>
+<p><strong>Confrontation:</strong></p>
+<ul>
+<li>Direct engagement with horror elements</li>
+<li>Combat modified by psychological state (-1 die at 5+ Dread)</li>
+<li>Breaking point triggers for moral/psychological challenges</li>
+</ul>
+<p><strong>Breaking Point:</strong></p>
+<ul>
+<li>Critical moments testing psychological limits</li>
+<li>Immediate Dread advancement unless resisted</li>
+<li>May result in permanent character changes or retirement</li>
+</ul>
+<p><strong>Revelation:</strong></p>
+<ul>
+<li>Discovery of cosmic truths with severe consequences</li>
+<li>Comprehension breaking points risking +3 Dread advancement</li>
+<li>May unlock new investigative paths or resolution options</li>
+</ul>
+<h4 id="pacing-markers">Pacing Markers</h4>
+<p><strong>Sessions 1-2:</strong></p>
+<ul>
+<li>Local anomalies and minor reality distortions</li>
+<li>Introduction to threat without full comprehension</li>
+<li>Personal stakes established through connections to location/missing persons</li>
+</ul>
+<p><strong>Sessions 3-4:</strong></p>
+<ul>
+<li>Pattern recognition revealing deeper conspiracy</li>
+<li>First direct contact with entities or incomprehensible concepts</li>
+<li>Comprehension breaking points as forbidden knowledge accessed</li>
+</ul>
+<p><strong>Sessions 5+:</strong></p>
+<ul>
+<li>Full revelation of cosmic threat and implications</li>
+<li>Existential stakes becoming clear to all characters</li>
+<li>Resolution with universal consequences and permanent changes</li>
+</ul>
+<h4 id="resolution-formats">Resolution Formats</h4>
+<p><strong>Success States:</strong></p>
+<ul>
+<li><strong>The Sacrifice:</strong> Permanently contain entity through personal cost (15-18 XP)</li>
+<li><strong>The Investigation:</strong> Fully understand and banish threat (18-20 XP)</li>
+<li><strong>The Containment:</strong> Seal threat temporarily (12-15 XP)</li>
+</ul>
+<p><strong>Failure States:</strong></p>
+<ul>
+<li><strong>The Corruption:</strong> Become agent of horror (8-10 XP, character transformation)</li>
+<li><strong>The Breaking:</strong> Succumb to madness (0-5 XP, character retirement)</li>
+<li><strong>The Ignorance:</strong> Flee without understanding (10-12 XP, ongoing campaign thread)</li>
+</ul>
+<p><strong>Partial Success:</strong></p>
+<ul>
+<li><strong>The Bargain:</strong> Negotiate with entity for limited influence (12-15 XP, ongoing responsibilities)</li>
+<li><strong>The Transformation:</strong> Partial corruption with retained agency (15-17 XP, character change)</li>
+</ul>
+<p><strong>Pyrrhic Victory:</strong></p>
+<ul>
+<li><strong>The Price:</strong> Victory achieved but at devastating cost to world/self (18-20 XP, major consequences)</li>
+</ul>
+<h2 id="gm-toolkit">GM Toolkit</h2>
+<h3 id="session-preparation-checklist">Session Preparation Checklist</h3>
+<ul>
+<li>(impossible phenomena, entity manifestations, breaking point triggers)</li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<h3 id="complication-generator">Complication Generator</h3>
+<h4 id="mild-1-sb">Mild (1 SB)</h4>
+<ul>
+<li>Path shows reflection of alternate self</li>
+<li>Familiar voice whispers from darkness</li>
+<li>Waymark points wrong direction</li>
+<li>Unsettling geometric patterns in peripheral vision</li>
+<li>Temperature drop without environmental cause</li>
+</ul>
+<h4 id="moderate-2-sb">Moderate (2 SB)</h4>
+<ul>
+<li>Reality thins - see dreams of others</li>
+<li>Temporal loop shows funeral preparations</li>
+<li>Memory absorption begins during investigation</li>
+<li>Shadows move independently of light sources</li>
+<li>Mathematical equations appear spontaneously in environment</li>
+</ul>
+<h4 id="serious-3-sb">Serious (3 SB)</h4>
+<ul>
+<li>Dimensional mathematics become comprehensible (advance Dread by 2)</li>
+<li>Entity's patterns appear in environment</li>
+<li>Trusted companion shows signs of possession</li>
+<li>Gravity flows in impossible directions</li>
+<li>Time begins moving backward in specific area</li>
+</ul>
+<h4 id="major-4-sb">Major (4+ SB)</h4>
+<ul>
+<li>Entity manifests partially through resonance</li>
+<li>Reality becomes unstable in area</li>
+<li>Previous choice comes back to haunt PCs</li>
+<li>Multiple timeline branches become visible simultaneously</li>
+<li>Fundamental law of physics ceases to be reliable</li>
+</ul>
+<h3 id="player-agency-reminders">Player Agency Reminders</h3>
+<p><strong>Handling Unexpected Approaches:</strong></p>
+<ul>
+<li>Embrace creativity but ensure horror elements still manifest</li>
+<li>Adapt entity responses to match player innovations</li>
+<li>Allow success but with horror-themed consequences</li>
+<li>Provide multiple valid paths to objectives</li>
+</ul>
+<p><strong>When to Push Back:</strong></p>
+<ul>
+<li>Only when player choices would break core horror themes</li>
+<li>When actions would eliminate all tension or challenge</li>
+<li>When safety/pacing requires narrative redirection</li>
+<li>When mechanical balance needs preservation</li>
+</ul>
+<p><strong>Maintaining Tension:</strong></p>
+<ul>
+<li>Use timer advancement and breaking points rather than adversarial GMing</li>
+<li>Provide meaningful choices with real consequences</li>
+<li>Balance hope and despair throughout campaign</li>
+<li>Let player decisions drive horror escalation</li>
+</ul>
+<h2 id="experience-and-resolution-systems">Experience and Resolution Systems</h2>
+<h3 id="experience-awards">Experience Awards</h3>
+<p><strong>Participation:</strong></p>
+<ul>
+<li>+2 XP per session attendance</li>
+<li>+1 XP for meaningful horror engagement</li>
+<li>+1 XP for contributing to atmospheric tension</li>
+</ul>
+<p><strong>Thematic Play:</strong></p>
+<ul>
+<li>+1-2 XP for meaningful horror engagement</li>
+<li>+1 XP for playing character's psychological flaws</li>
+<li>+2 XP for embracing breaking point consequences</li>
+</ul>
+<p><strong>Risk Taking:</strong></p>
+<ul>
+<li>+1-3 XP for choosing dangerous investigative paths</li>
+<li>+2 XP for resisting breaking points at cost</li>
+<li>+1 XP for pursuing forbidden knowledge</li>
+</ul>
+<p><strong>Breaking Point Resistance:</strong></p>
+<ul>
+<li>+2 XP for successfully resisting major psychological trauma</li>
+<li>+1 XP for partial resistance with consequences</li>
+<li>+3 XP for transforming breaking point into character growth</li>
+</ul>
+<p><strong>Narrative Contribution:</strong></p>
+<ul>
+<li>+1-2 XP for creating memorable horror moments</li>
+<li>+1 XP for contributing to group survival</li>
+<li>+2 XP for defining campaign's central horror theme</li>
+</ul>
+<h2 id="modular-design-elements">Modular Design Elements</h2>
+<h3 id="plug-and-play-components">Plug-and-Play Components</h3>
+<p><strong>Dread Timer System:</strong></p>
+<ul>
+<li>Works independently in any horror scenario</li>
+<li>Scalable segment counts for different campaign lengths</li>
+<li>Compatible with existing Boon economy</li>
+</ul>
+<p><strong>Breaking Point Mechanics:</strong></p>
+<ul>
+<li>Can enhance investigation or combat encounters</li>
+<li>Adaptable to different horror subgenres</li>
+<li>Integrates with character backgrounds and talents</li>
+</ul>
+<p><strong>Reality Distortion Zones:</strong></p>
+<ul>
+<li>Can be added to any location</li>
+<li>Modular effects based on campaign tone</li>
+<li>Compatible with existing environmental hazards</li>
+</ul>
+<p><strong>Collective Sanity Effects:</strong></p>
+<ul>
+<li>Work in any group-based horror campaign</li>
+<li>Scale with party size and composition</li>
+<li>Create shared consequences for individual actions</li>
+</ul>
+<h3 id="cross-expansion-compatibility">Cross-Expansion Compatibility</h3>
+<p><strong>Noir Expansion:</strong></p>
+<ul>
+<li>Psychological breaking points enhance moral ambiguity</li>
+<li>Collective sanity effects mirror group paranoia</li>
+<li>Reality distortion zones complement urban atmosphere</li>
+</ul>
+<p><strong>Cyberpunk Expansion:</strong></p>
+<ul>
+<li>Technological horror through reality distortion</li>
+<li>Corporate conspiracy elements in cosmic threats</li>
+<li>Character corruption parallels cybernetic augmentation</li>
+</ul>
+<p><strong>Fantasy Expansion:</strong></p>
+<ul>
+<li>Cosmic entities as ancient gods/demons</li>
+<li>Magical research risks mirror forbidden knowledge</li>
+<li>Reality fracture effects enhance spell backlash</li>
+</ul>
+<h3 id="power-scaling">Power Scaling</h3>
+<p><strong>Lower Tiers (Rookie/Seasoned):</strong></p>
+<ul>
+<li>Reduced SB generation from horror encounters</li>
+<li>Simpler reality distortions with clear navigation</li>
+<li>Fewer breaking point triggers and easier resistance</li>
+<li>More recovery options for Dread advancement</li>
+</ul>
+<p><strong>Higher Tiers (Veteran/Paragon):</strong></p>
+<ul>
+<li>Increased cosmic comprehension risks (+3 Dread for understanding)</li>
+<li>More severe reality alterations affecting core mechanics</li>
+<li>Complex entity interactions requiring specialized knowledge</li>
+<li>Harsher consequences for filled timers and broken characters</li>
+</ul>
+<p><strong>New Players:</strong></p>
+<ul>
+<li>Streamlined timer system with fewer secondary timers</li>
+<li>More recovery options and safety mechanisms</li>
+<li>Clearer breaking point resistance paths</li>
+<li>Reduced penalties for high Dread states</li>
+</ul>
+<p><strong>Experienced Players:</strong></p>
+<ul>
+<li>Additional complications and harsher consequences</li>
+<li>Fewer safety mechanisms and more permanent effects</li>
+<li>Complex moral choices with no clear right answers</li>
+<li>Integration with existing campaign threads and consequences</li>
+</ul>
+<h2 id="horror-deck-generators">Horror Deck Generators</h2>
+<h3 id="cosmic-horror-generator">Cosmic Horror Generator</h3>
+<div class="panel panel-blue">
+<p><strong>Theme</strong>: Reality-breaking threats that challenge understanding of existence itself</p>
+<p><strong>Special Mechanics</strong>:</p>
+<ul>
+<li>Any Ace adds a fundamental law of reality that becomes unreliable</li>
+<li>Face cards (J/Q/K) represent cosmic entities or phenomena beyond normal comprehension</li>
+<li>Black suits (, ): Physical reality distortions, existential threats</li>
+<li>Red suits (, ): Psychological/cosmic influence, forbidden knowledge</li>
+</ul>
+</div>
+<h4 id="spades-mdash-places-impossible-locations-reality-warped-site">Spades &mdash; Places (impossible locations, reality-warped sites)</h4>
+<ul>
+<li>2. Observatory with a telescope that shows stars that shouldn't exist</li>
+<li>3. Library where books rewrite themselves when read</li>
+<li>4. Laboratory where the walls breathe and mathematical equations drip like liquid</li>
+<li>5. Ancient vault with doors that open to different dimensions</li>
+<li>6. Tower that exists in multiple time periods simultaneously</li>
+<li>7. Cave system where gravity flows in impossible directions</li>
+<li>8. Room where the corners don't meet and shadows have shadows</li>
+<li>9. Mirror maze that reflects possible futures instead of present reality</li>
+<li>10. Garden where plants grow in geometric patterns that hurt to perceive</li>
+<li>J. Research station experiencing temporal anomalies and dimensional bleeds</li>
+<li>Q. Ancient temple built according to alien geometry that shouldn't be physically possible</li>
+<li>K. Black monolith that exists partially outside normal space-time</li>
+<li>A. Location where a fundamental law of physics (time, gravity, causality) no longer applies</li>
+</ul>
+<h4 id="hearts-mdash-entities-amp-amp-factions-cosmic-beings-affecte">Hearts &mdash; Entities &amp;amp; Factions (cosmic beings, affected people)</h4>
+<ul>
+<li>2. Researcher who speaks only in mathematical equations</li>
+<li>3. Astronomer who can see the approach of something from beyond</li>
+<li>4. Mathematician whose calculations predict reality fractures</li>
+<li>5. Entity that exists as pure geometric impossibility</li>
+<li>6. Being from outside normal space-time seeking understanding</li>
+<li>7. Collective consciousness of a species that transcended physical form</li>
+<li>8. Fragment of a dead god that remembers when reality was different</li>
+<li>9. Scientist whose mind has been rewritten by cosmic influence</li>
+<li>10. Cultist who worships mathematical perfection and cosmic order</li>
+<li>J. Ancient Aeler philosopher who opened doors that should have remained closed</li>
+<li>Q. Cosmic entity that communicates through stellar movements and impossible geometry</li>
+<li>K. Being that exists simultaneously in all possible dimensions</li>
+<li>A. Intelligence that predates the current configuration of reality itself</li>
+</ul>
+<h4 id="clubs-mdash-threats-amp-amp-complications-reality-distortion">Clubs &mdash; Threats &amp;amp; Complications (reality distortions, existential dread)</h4>
+<ul>
+<li>2. Stars moving in patterns that violate known astronomical laws</li>
+<li>3. Mathematical proof that shows reality is fundamentally inconsistent</li>
+<li>4. Temporal loop where the same conversation repeats with slight variations</li>
+<li>5. Geometric shapes that exist in more than three dimensions becoming visible</li>
+<li>6. Fundamental constant of physics beginning to shift and change</li>
+<li>7. Memory of events that never happened becoming more real than actual history</li>
+<li>8. Observer effect causing reality to change based on perception</li>
+<li>9. Causality breaking down&mdash;effects preceding their causes</li>
+<li>10. Consciousness beginning to exist in multiple states simultaneously</li>
+<li>J. Local reality becoming unstable and fragmenting into possibility storms</li>
+<li>Q. Dimensions beginning to bleed into each other, mixing incompatible laws</li>
+<li>K. The universe approaching a mathematical proof of its own non-existence</li>
+<li>A. A fundamental aspect of existence (time, space, identity) ceasing to be reliable</li>
+</ul>
+<h4 id="diamonds-mdash-revelations-amp-amp-resources-forbidden-knowl">Diamonds &mdash; Revelations &amp;amp; Resources (forbidden knowledge, cosmic tools)</h4>
+<ul>
+<li>2. Star charts showing constellations from impossible angles</li>
+<li>3. Mathematical formula that describes the shape of space-time itself</li>
+<li>4. Instrument that can detect fluctuations in the fundamental constants</li>
+<li>5. Tome written in a language that predates human civilization by eons</li>
+<li>6. Crystal that stores memories from alternate versions of reality</li>
+<li>7. Equation that can temporarily stabilize dimensional barriers</li>
+<li>8. Observatory equipment calibrated to detect entities from outside normal space</li>
+<li>9. Protective ward that maintains local reality coherence for a limited time</li>
+<li>10. Research notes detailing experiments into forbidden dimensions</li>
+<li>J. Key to an ancient vault containing Aeler research into reality structure</li>
+<li>Q. Device that can briefly open controlled portals to adjacent dimensions</li>
+<li>K. Formula for creating paradoxes that can trap cosmic entities</li>
+<li>A. Knowledge of how to permanently seal breaches in dimensional barriers</li>
+</ul>
+<h3 id="quick-use-notes">Quick Use Notes</h3>
+<ul>
+<li>Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage</li>
+<li>Highest rank sets the main Timer (2&ndash;5 $$ 4, 6&ndash;10 $$ 6, J/Q/K $$ 8, A $$ 10)</li>
+<li>Diamonds are codified outcomes (knowledge/tools) that change position rather than call for a roll</li>
+<li>If any Ace appears, add a fundamental law of reality that becomes unreliable (time flows backward, gravity weakens, etc.)</li>
+<li>Face cards represent cosmic entities or phenomena beyond normal comprehension</li>
+</ul>
+<h3 id="using-the-cosmic-horror-generator">Using the Cosmic Horror Generator</h3>
+<div class="panel panel-blue">
+<p><strong>Standalone Campaign Use</strong>: When using the Cosmic Horror generator on its own, focus on reality-breaking threats that challenge the fundamental nature of existence. The generator provides a complete framework for campaigns where the PCs face threats beyond normal comprehension.</p>
+<p><strong>Key Considerations</strong>:</p>
+<ul>
+<li><strong>Scale</strong>: Cosmic horror operates on a universal or existential scale rather than personal threats</li>
+<li><strong>Comprehension</strong>: Understanding the threat may be as dangerous as ignoring it</li>
+<li><strong>Permanence</strong>: Changes to reality may be irreversible</li>
+<li><strong>Isolation</strong>: The PCs may be among the few who perceive the true threat</li>
+</ul>
+<p><strong>Standalone Setup</strong>:</p>
+<ol>
+<li>Draw the full seed (Spade, Heart, Club, Diamond) to establish the cosmic threat</li>
+<li>Note any Aces for fundamental reality changes</li>
+<li>Use Face cards to identify cosmic entities involved</li>
+<li>Set primary timer based on highest rank</li>
+<li>Establish 2-3 supporting timers (Reality Fracture, Collective Sanity, Existential Threat)</li>
+</ol>
+</div>
+<div class="panel panel-blue">
+<p><strong>Mixed Generator Use</strong>: The Cosmic Horror generator excels at adding existential weight to other campaign types. Mix it with regional generators to create campaigns where local threats have cosmic implications.</p>
+<p><strong>Common Mixing Strategies</strong>:</p>
+<p><strong>With Mistlands</strong>:</p>
+<ul>
+<li>Use Mistlands Spades/Clubs for atmospheric horror</li>
+<li>Use Cosmic Hearts/Diamonds for the underlying threat</li>
+<li>Result: Ancient entities sleeping beneath the mist, awakened by reality fractures</li>
+</ul>
+<p><strong>With Acasia</strong>:</p>
+<ul>
+<li>Use Acasia Spades/Clubs for cursed locations and social pressure</li>
+<li>Use Cosmic Hearts/Diamonds for the true threat behind local disturbances</li>
+<li>Result: Merchant houses unknowingly trafficking in reality-distorting artifacts</li>
+</ul>
+<p><strong>With Aeler</strong>:</p>
+<ul>
+<li>Use Aeler Spades/Clubs for underground locations and ancient dangers</li>
+<li>Use Cosmic Hearts/Diamonds for the vault-dwelling entities</li>
+<li>Result: Dwarven experiments that opened doors to impossible dimensions</li>
+</ul>
+<p><strong>With Valewood</strong>:</p>
+<ul>
+<li>Use Valewood Spades/Clubs for phasing ruins and imperial residue</li>
+<li>Use Cosmic Hearts/Diamonds for the entities behind the empire's fall</li>
+<li>Result: The empire fell not to war, but to reality-altering influence</li>
+</ul>
+<p><strong>Mixing Procedure</strong>:</p>
+<ol>
+<li>Draw 2-3 cards from base generator (location, local actor, local pressure)</li>
+<li>Draw 1-2 cards from Cosmic Horror generator (cosmic entity, reality threat)</li>
+<li>Blend elements to create a threat that feels both local and universal</li>
+<li>Use base generator's timer size, modified by cosmic elements</li>
+<li>Add 1-2 cosmic-themed supporting timers to base campaign timers</li>
+</ol>
+</div>
+<div class="panel panel-blue">
+<p><strong>Campaign Integration Tips</strong>:</p>
+<p><strong>Gradual Revelation</strong>: Start with local/normal threats, gradually revealing cosmic implications. Players are more invested when they discover their small problem is part of a universal threat.</p>
+<p><strong>Personal Stakes</strong>: Even cosmic threats need personal connections. Tie the existential danger to characters' backgrounds, goals, or loved ones.</p>
+<p><strong>Escalation Patterns</strong>:</p>
+<ul>
+<li>Sessions 1-2: Local anomalies, minor reality distortions</li>
+<li>Sessions 3-4: Pattern recognition, first contact with cosmic entities</li>
+<li>Sessions 5-6: Full revelation, existential stakes become clear</li>
+<li>Final Session: Resolution with universal consequences</li>
+</ul>
+<p><strong>Reality as Character</strong>: Treat the laws of physics and fundamental reality as active elements that can shift, change, and react to player actions. When players solve problems, let reality itself respond.</p>
+<p><strong>Knowledge Management</strong>: Forbidden knowledge should be both valuable and dangerous. Create systems where learning the truth advances both understanding and threat levels.</p>
+</div>
+<h3 id="mixed-deck-campaign-ldquo-the-whispering-depths-rdquo-mistla">Mixed Deck Campaign: &ldquo;The Whispering Depths&rdquo; (Mistlands + Cosmic Horror)</h3>
+<div class="panel panel-blue">
+<p><strong>Campaign Setup</strong>: Mixing the Mistlands generator with Cosmic Horror creates a campaign where ancient entities sleeping beneath the fog have begun to awaken as reality barriers weaken.</p>
+<p><strong>Drawn Elements</strong>:</p>
+<ul>
+<li>Mistlands Spade (7 - Pall Watch-tower on piles above the mire)</li>
+<li>Cosmic Horror Heart (Q - Cosmic entity that communicates through stellar movements)</li>
+<li>Mistlands Club (9 - Bell-line failure on the levee; a wraith steps across like it owns the road)</li>
+<li>Cosmic Horror Diamond (8 - Instrument that can detect fluctuations in the fundamental constants)</li>
+</ul>
+<p><strong>Timer Size</strong>: 9 (Queen) = 8-segment primary timer</p>
+<p><strong>Campaign Hook</strong>: The Pall Watch-tower, a key defensive position in the Mistlands, has begun experiencing temporal anomalies. Guards report that the bell-line failures don't follow normal patterns&mdash;instead, the bells ring in mathematical sequences that correspond to stellar movements visible only through the tower's ancient spyglass. Something from beyond normal space is using the weakened barriers between dimensions to influence the physical world, and the bell-code system that once kept the Mistlands safe is now serving as a communication channel for entities that predate human civilization.</p>
+<p><strong>Key NPCs</strong>:</p>
+<ul>
+<li>Bell-Warden Thorne: Paranoid keeper who first noticed the anomalous bell patterns</li>
+<li>Astronomer-Liaison Mara: Assigned to interpret the stellar correlations, slowly losing sanity</li>
+<li>The Deep Listener: Cosmic entity that exists partially in our dimension, communicating through bell harmonics</li>
+</ul>
+<p><strong>Campaign Timers</strong>:</p>
+<ul>
+<li>Bell-Line Corruption (8): How much the communication system has been compromised</li>
+<li>Reality Fracture (10): Local weakening of dimensional barriers</li>
+<li>Collective Sanity (8): Mental stability of the watch-tower garrison</li>
+</ul>
+<p><strong>Resolution Paths</strong>:</p>
+<ul>
+<li>Seal the dimensional breach using the stellar-aligned bell-code in reverse</li>
+<li>Negotiate with the entity to establish a controlled communication channel</li>
+<li>Destroy the watch-tower to sever the connection, sacrificing the region's defense</li>
+<li>Allow the entity full access to our reality in exchange for protection from other cosmic threats</li>
+</ul>
+<p><strong>Horror Elements</strong>:</p>
+<ul>
+<li>The bells ring in patterns that hurt to hear directly</li>
+<li>Guards begin aging rapidly during their watches</li>
+<li>Shadows cast by the tower show events from impossible futures</li>
+<li>The entity's influence causes time to loop in 8-hour cycles</li>
+</ul>
+</div>
+<h2 id="horror-campaign-timers-generator">Horror Campaign Timers Generator</h2>
+<h3 id="core-concept">Core Concept</h3>
+<p>The Horror Campaign Timers Generator creates thematically appropriate multi-timer systems for any horror scenario, providing escalating tension and meaningful consequences that drive narrative forward while maintaining mechanical coherence.</p>
+<h3 id="generator-structure">Generator Structure</h3>
+<p><strong>Primary Timer - Dread Timer [10]</strong></p>
+<ul>
+<li>Always represents psychological deterioration and mounting horror</li>
+<li>Universal across all horror subgenres</li>
+<li>Personal consequences for each character</li>
+</ul>
+<p><strong>Secondary Timers (2-3 timers, 8-15 segments)</strong></p>
+<ul>
+<li>Thematic timers that reflect specific horror elements</li>
+<li>Drive broader consequences beyond individual characters</li>
+<li>Create multi-layered tension</li>
+</ul>
+<h3 id="horror-subgenre-timer-templates">Horror Subgenre Timer Templates</h3>
+<h4 id="cosmic-horror-timers">Cosmic Horror Timers</h4>
+<ol>
+<li><strong>Dread Timer </strong> [10] - Personal psychological deterioration</li>
+<li><strong>Reality Fracture Timer </strong> [10] - Fundamental laws of reality becoming unreliable</li>
+<li><strong>Collective Sanity Timer </strong> [8] - Group psychological effects and shared hallucinations</li>
+<li><strong>Existential Threat Timer </strong> [10] - Cosmic entity approaching full manifestation</li>
+</ol>
+<h4 id="haunted-location-timers">Haunted Location Timers</h4>
+<ol>
+<li><strong>Dread Timer </strong> [10] - Personal psychological deterioration</li>
+<li><strong>Location Corruption Timer </strong> [10] - Physical space becoming more hostile/supernatural</li>
+<li><strong>Resident Sanity Timer </strong> [8] - Other inhabitants becoming affected</li>
+<li><strong>Supernatural Escalation Timer </strong> [10] - Ghostly activity intensifying</li>
+</ol>
+<h4 id="isolated-institution-timers">Isolated Institution Timers</h4>
+<ol>
+<li><strong>Dread Timer </strong> [10] - Personal psychological deterioration</li>
+<li><strong>Sanity Decay Timer </strong> [8] - Overall mental health of group deteriorating</li>
+<li><strong>Institution Collapse Timer </strong> [10] - Social/order breakdown of location</li>
+<li><strong>Horror Manifestation Timer </strong> [10] - Threat becoming more active/visible</li>
+</ol>
+<h4 id="body-horror-timers">Body Horror Timers</h4>
+<ol>
+<li><strong>Dread Timer </strong> [10] - Personal psychological deterioration</li>
+<li><strong>Physical Corruption Timer </strong> [8] - Character's body becoming affected</li>
+<li><strong>Social Isolation Timer </strong> [6] - Relationships breaking down due to transformation</li>
+<li><strong>Transformation Completion Timer </strong> [10] - Full metamorphosis approaching</li>
+</ol>
+<h3 id="timer-advancement-trigger-generator">Timer Advancement Trigger Generator</h3>
+<h4 id="dread-timer-triggers-personal-psychological-effects">Dread Timer Triggers (Personal Psychological Effects)</h4>
+<ul>
+<li><strong>Mild (1 segment):</strong> Unsettling sounds/sights, minor paranoia, sleep disturbances</li>
+<li><strong>Moderate (2 segments):</strong> Witnessing supernatural events, personal failure, disturbing revelations</li>
+<li><strong>Severe (3 segments):</strong> Companion harmed/lost, direct entity contact, moral compromise</li>
+</ul>
+<h4 id="reality-fracture-triggers-cosmic-horror">Reality Fracture Triggers (Cosmic Horror)</h4>
+<ul>
+<li><strong>Mild (+1):</strong> Impossible stellar movements, minor geometric anomalies, temporal glitches</li>
+<li><strong>Moderate (+2):</strong> Dimensional mathematics researched, witness alien geometry, reality instability incidents</li>
+<li><strong>Severe (+3):</strong> Ancient experiments disturbed, fundamental laws becoming unreliable, entity partially manifesting</li>
+</ul>
+<h4 id="location-corruption-triggers-haunted-supernatural">Location Corruption Triggers (Haunted/Supernatural)</h4>
+<ul>
+<li><strong>Mild (+1):</strong> Temperature drops, unexplained sounds, objects moving</li>
+<li><strong>Moderate (+2):</strong> Physical manifestations, apparitions becoming more aggressive, structural damage</li>
+<li><strong>Severe (+3):</strong> Laws of physics breaking down, location becoming sentient, permanent alterations</li>
+</ul>
+<h4 id="institution-collapse-triggers-isolated-settings">Institution Collapse Triggers (Isolated Settings)</h4>
+<ul>
+<li><strong>Mild (+1):</strong> Communication failures, supply shortages, minor conflicts</li>
+<li><strong>Moderate (+2):</strong> Authority figures becoming erratic, services failing, infighting</li>
+<li><strong>Severe (+3):</strong> Complete breakdown of order, mass hysteria, leadership collapse</li>
+</ul>
+<h3 id="timer-consequence-generator">Timer Consequence Generator</h3>
+<h4 id="when-dread-timer-fills-10-segments">When Dread Timer Fills [10]:</h4>
+<ul>
+<li>Character becomes Broken: Out of control, may become hostile, permanent psychological damage</li>
+<li>Party suffers -2 dice to all social rolls due to collective tension</li>
+<li>Reality begins to reflect character's mental state (shared hallucinations)</li>
+</ul>
+<h4 id="when-reality-fracture-timer-fills-12-segments">When Reality Fracture Timer Fills [10]:</h4>
+<ul>
+<li>Barriers between dimensions collapse completely</li>
+<li>Entity manifests fully in normal space</li>
+<li>Local reality becomes permanently unreliable (ongoing 2 SB per scene)</li>
+</ul>
+<h4 id="when-collective-sanity-timer-fills-8-segments">When Collective Sanity Timer Fills [8]:</h4>
+<ul>
+<li>Shared hallucinations become indistinguishable from reality</li>
+<li>Party begins to exist partially outside normal space</li>
+<li>Group paranoia leads to infighting (start all social rolls Desperate)</li>
+</ul>
+<h4 id="when-existential-threat-timer-fills-15-segments">When Existential Threat Timer Fills [10]:</h4>
+<ul>
+<li>Entity begins reshaping local reality according to alien logic</li>
+<li>PCs must make Spirit + Endurance (DV 5) or gain permanent corruption</li>
+<li>Campaign enters final phase - immediate resolution required</li>
+</ul>
+<h3 id="mixed-horror-generator-system">Mixed Horror Generator System</h3>
+<h4 id="procedure">Procedure:</h4>
+<ol>
+<li><strong>Select Base Horror Subgenre:</strong> Choose primary horror theme</li>
+<li><strong>Draw Base Timers:</strong> Use template for that subgenre</li>
+<li><strong>Add Secondary Elements:</strong> Draw 1-2 cards from different horror subgenres</li>
+<li><strong>Blend Consequences:</strong> Merge thematic elements for unique threat</li>
+<li><strong>Adjust Timer Sizes:</strong> Modify based on campaign scope and tier</li>
+</ol>
+<h4 id="example-mix-ldquo-the-whispering-depths-rdquo-mistlands-cosm">Example Mix - &ldquo;The Whispering Depths&rdquo; (Mistlands + Cosmic Horror):</h4>
+<ul>
+<li><strong>Base:</strong> Mistlands haunted location template</li>
+<li><strong>Add:</strong> Cosmic Horror reality fracture elements</li>
+<li><strong>Result:</strong> Ancient entities beneath the mist awakening as dimensional barriers weaken</li>
+<li><strong>Timers:</strong></li>
+<ol>
+<li>Dread Timer (10) - Personal psychological effects</li>
+<li>Bell-Line Corruption (8) - Communication system compromised by cosmic influence</li>
+<li>Reality Fracture (12) - Local dimensional barriers weakening</li>
+<li>Collective Sanity (8) - Mental stability of watch-tower garrison</li>
+</ol>
+</ul>
+<h4 id="mixing-benefits">Mixing Benefits:</h4>
+<ul>
+<li>Creates unique, layered threats that feel both local and universal</li>
+<li>Allows for gradual revelation of deeper cosmic implications</li>
+<li>Provides multiple resolution paths (local containment vs. cosmic sealing)</li>
+<li>Maintains personal stakes while expanding to existential consequences</li>
+</ul>
+<h3 id="quick-setup-cards">Quick Setup Cards</h3>
+<h4 id="cosmic-horror-quick-setup">Cosmic Horror Quick Setup:</h4>
+<ul>
+<li><strong>Hook:</strong> Stars moving in impossible patterns, reality becoming unreliable</li>
+<li><strong>Timers:</strong> Dread (10), Reality Fracture (12), Collective Sanity (8), Existential Threat (15)</li>
+<li><strong>Key Elements:</strong> Alien geometry, temporal distortions, incomprehensible entities</li>
+<li><strong>Resolution:</strong> Seal dimensional rift, embrace cosmic knowledge, or become heralds of new order</li>
+</ul>
+<h4 id="haunted-location-quick-setup">Haunted Location Quick Setup:</h4>
+<ul>
+<li><strong>Hook:</strong> Familiar place becoming hostile, supernatural activity escalating</li>
+<li><strong>Timers:</strong> Dread (10), Location Corruption (10), Resident Sanity (8), Supernatural Escalation (12)</li>
+<li><strong>Key Elements:</strong> Ghostly manifestations, location sentience, shared haunting effects</li>
+<li><strong>Resolution:</strong> Banish spirits, seal location, or join the haunting</li>
+</ul>
+<h4 id="isolated-institution-quick-setup">Isolated Institution Quick Setup:</h4>
+<ul>
+<li><strong>Hook:</strong> Remote location cut off, internal threat emerging</li>
+<li><strong>Timers:</strong> Dread (10), Sanity Decay (8), Institution Collapse (10), Horror Manifestation (12)</li>
+<li><strong>Key Elements:</strong> Social breakdown, confined space tension, group psychology</li>
+<li><strong>Resolution:</strong> Escape, contain threat, or become part of institution</li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>This Horror Campaigns expansion and timer generator system provides GMs with flexible, thematically coherent tools for running horror campaigns of any scope while maintaining the mechanical elegance and player agency that defines Fate's Edge. Whether running a single-session haunted house scenario or an extended cosmic horror campaign, these tools ensure that horror remains personal, consequential, and mechanically integrated with the core Fate's Edge experience.</p>
+<p>Remember that the best horror emerges from player investment in their characters and the world around them. Use these mechanical tools to support narrative tension and emotional investment, not replace them. The fear of what might be lurking in the shadows is often more effective than showing every monster in detail, and the psychological consequences of player choices should feel meaningful and lasting.</p>
+<p><strong>In the spaces between certainty and chaos, in the whispers of the unknown, and in the breaking points of human endurance, the truth waits patiently. Will you listen? Will you pay the price? Will you survive to tell the tale?</strong></p>
+<p>&mdash; Baron Quentin Asselin, Keeper of the Chained Angel's archives Belcourt, in the hour before the ninth bell (which never rings for the living)</p>
+<p><em>Annotated and prepared for publication by Lerris Fenwood, with the assistance of the Gray Wanderer.</em></p>
+<p><em>The ninth cup remains un-poured. The ninth bell has not rung. The ledger does not close.</em></p>
+<h2 id="the-worn-debtors-in-flesh">The Worn: Debtors in Flesh</h2>
+<h3 id="nature-of-the-worn">Nature of the Worn</h3>
+<p>When a bearer of Malachai s curse succumbs completely&mdash;when the hunger devours the last scrap of will, when the addiction burns out the soul&mdash;they do not simply die. Death would be mercy. Instead, they are drawn to the cursed city of Zahk Kozahn, where they join the ranks of the <strong>Worn</strong>.</p>
+<p>The Worn are not undead in the traditional sense. Their hearts still beat, though slowly. Their lungs still draw breath, though shallowly. They are the hollowed shells of the cursed, worn thin by their own appetites. Peeling skin, eyes like cracked glass, limbs that move too fast or too slow. They are desperate, always desperate, because the hunger never ends. It only changes shape.</p>
+<div class="panel panel-blue">
+<p><em>&ldquo;The Worn are not mindless. They remember fragments of who they were. They can be negotiated with, manipulated, even pitied. But they cannot be saved&mdash;not by mortal means. The only release is the Well of Ichor, or final death.&rdquo;</em></p>
+</div>
+<h3 id="classes-of-the-worn">Classes of the Worn</h3>
+<p>The Worn are not a uniform mass. Their degradation reflects the curse that created them and the personality that once inhabited the shell.</p>
+<h4 id="shambler-cap-2-tier-i">Shambler (Cap 2, Tier I)</h4>
+<p>The most common of the Worn. Shamblers are slow, relentless, and feel no pain. They were once laborers, soldiers, or anyone whose curse demanded endurance. Now they exist only to feed on warmth.</p>
+<div class="table-wrap"><table><tr><th><strong>Trait</strong></th><th><strong>Description</strong></th></tr><tr><td><strong>Cap</strong></td><td>2</td></tr><tr><td><strong>Attributes</strong></td><td>Body 3, Wits 1, Spirit 1, Presence 1</td></tr><tr><td><strong>Skills</strong></td><td>Brawl 2, Endurance 2</td></tr><tr><td><strong>Armor</strong></td><td>1 (thickened, calloused hide)</td></tr><tr><td><strong>Actions</strong></td><td><strong>Slam:</strong> Body + Brawl, Harm 1. <strong>Grasp:</strong> On a hit, target is Grappled (Controlled Position to escape).</td></tr><tr><td><strong>Special</strong></td><td><strong>Relentless:</strong> Ignores the first 2 Fatigue each scene. <strong>Feel No Pain:</strong> Immune to Called Shots and Called Shots. Cannot be reasoned with; all social rolls against a Shambler are Desperate.</td></tr><tr><td><strong>Weakness</strong></td><td>Fire. A Shambler exposed to fire must test Spirit (DV 3) or flee. Decapitation or complete incineration kills it permanently.</td></tr><tr><td><strong>Advance Dread</strong></td><td>First sighting: +1 Dread (prevent with 1 Boon). Being grappled: +2 Dread (prevent with 2 Boons).</td></tr></table></div>
+<h4 id="screamer-cap-3-tier-ii">Screamer (Cap 3, Tier II)</h4>
+<p>Emaciated, twitching things with throats stretched raw from constant shrieking. Screamers hunt in packs. Their cry is their weapon.</p>
+<div class="table-wrap"><table><tr><th><strong>Trait</strong></th><th><strong>Description</strong></th></tr><tr><td><strong>Cap</strong></td><td>3</td></tr><tr><td><strong>Attributes</strong></td><td>Body 2, Wits 2, Spirit 2, Presence 1</td></tr><tr><td><strong>Skills</strong></td><td>Brawl 2, Athletics 2, Intimidation 2</td></tr><tr><td><strong>Actions</strong></td><td><strong>Claw:</strong> Body + Brawl, Harm 1. <strong>Shriek (Action):</strong> All creatures within Near must test Spirit+Resolve (DV 3) or be Stunned for one exchange. A creature that succeeds is immune to that Screamer s shriek for the scene.</td></tr><tr><td><strong>Special</strong></td><td><strong>Pack Hunters:</strong> When two or more Screamers are within Near of the same target, they gain +1 die to attack rolls. <strong>Death Cry:</strong> When reduced to 0 Harm, the Screamer emits a final shriek that affects all within Far (same effect as Shriek).</td></tr><tr><td><strong>Weakness</strong></td><td>Salt. Sprinkling salt on a Screamer s mouth silences it for one exchange (costs 1 Boon or an action).</td></tr><tr><td><strong>Advance Dread</strong></td><td>Hearing a Shriek: +1 Dread (prevent with 1 Boon). Being surrounded by a pack: +2 Dread (prevent with 2 Boons).</td></tr></table></div>
+<h4 id="stalker-cap-3-tier-ii">Stalker (Cap 3, Tier II)</h4>
+<p>Silent, patient, and unnaturally intelligent. Stalkers follow prey for hours, days, learning patterns. When they strike, they do not miss.</p>
+<div class="table-wrap"><table><tr><th><strong>Trait</strong></th><th><strong>Description</strong></th></tr><tr><td><strong>Cap</strong></td><td>3</td></tr><tr><td><strong>Attributes</strong></td><td>Body 2, Wits 3, Spirit 2, Presence 2</td></tr><tr><td><strong>Skills</strong></td><td>Stealth 3, Melee 2, Investigation 2, Deception 2</td></tr><tr><td><strong>Actions</strong></td><td><strong>Surprise Strike:</strong> If attacking from Stealth, the attack automatically hits (no roll) and deals +1 Harm. After the first attack, the Stalker may attempt to re-enter Stealth as a free action (Stealth vs. Wits+Notice of all observers).</td></tr><tr><td><strong>Special</strong></td><td><strong>Patient Predator:</strong> A Stalker that has observed a target for at least one hour gains +2 dice to all rolls against that target. <strong>Mimicry:</strong> A Stalker can perfectly replicate a voice it has heard. It may use this to lure prey (opposed Deception vs. Insight).</td></tr><tr><td><strong>Weakness</strong></td><td>Witnesses. A Stalker cannot attack if it knows it is being watched (it will retreat and try again later).</td></tr><tr><td><strong>Advance Dread</strong></td><td>Realizing you are being stalked: +2 Dread (prevent with 2 Boons). Being attacked from Stealth: +3 Dread (prevent with 3 Boons).</td></tr></table></div>
+<h4 id="crackler-cap-4-tier-iii">Crackler (Cap 4, Tier III)</h4>
+<p>The most &ldquo;alive&rdquo; of the Worn. Their joints snap audibly as they move. Cracklers can still speak, still bargain, still beg. Their desperation is a weapon.</p>
+<div class="table-wrap"><table><tr><th><strong>Trait</strong></th><th><strong>Description</strong></th></tr><tr><td><strong>Cap</strong></td><td>4</td></tr><tr><td><strong>Attributes</strong></td><td>Body 2, Wits 3, Spirit 3, Presence 3</td></tr><tr><td><strong>Skills</strong></td><td>Sway 3, Deception 3, Insight 2, Lore 2</td></tr><tr><td><strong>Actions</strong></td><td><strong>Claw:</strong> Body + Brawl, Harm 1. <strong>Confess:</strong> A Crackler may offer a genuine secret (GM decides) in exchange for a Boon or a minor service. The secret is always true, but hearing it advances the hearer s Dread by 1 (cannot be prevented).</td></tr><tr><td><strong>Special</strong></td><td><strong>Debt Sense:</strong> A Crackler knows exactly what any creature within Near owes&mdash;and to whom. It may use this information to bargain (gain +1 die to Sway when offering to clear a debt). <strong>Wretched Bargain:</strong> A Crackler can offer to take a Condition (Fear, Guilt, Poisoned) from a target onto itself. In exchange, the target must give the Crackler a minor memory (a face, a name, a smell). The Crackler gains 1 Boon.</td></tr><tr><td><strong>Weakness</strong></td><td>A genuine, selfless act of kindness. If a PC helps a Crackler without expecting anything in return, the Crackler becomes Despondent (cannot act for one exchange) and loses its Debt Sense for the scene.</td></tr><tr><td><strong>Advance Dread</strong></td><td>Accepting a Wretched Bargain: +2 Dread. Hearing a secret from Confess: +1 Dread (automatic).</td></tr></table></div>
+<h3 id="running-the-worn-in-horror-campaigns">Running the Worn in Horror Campaigns</h3>
+<h4 id="atmosphere-and-first-encounters">Atmosphere and First Encounters</h4>
+<p>The Worn should not be introduced as mere combat obstacles. Their horror lies in their <em>familiarity</em>. A Shambler might wear the tattered uniform of a soldier the PCs once fought beside. A Screamer might shriek in the voice of a lost loved one. A Stalker might leave small tokens&mdash;a child s toy, a wedding ring&mdash;outside the PCs camp.</p>
+<div class="panel panel-blue">
+<p><strong>First Encounter Example:</strong> The party finds a Crackler sitting by a dead fire, alone. It does not attack. It says, &ldquo;I remember you. You were at the siege of Blackmoor. You left someone behind.&rdquo; It then offers to trade a secret for a cup of water. What does it know? What will it cost?</p>
+</div>
+<h4 id="integrating-worn-with-timers">Integrating Worn with Timers</h4>
+<p>The Worn are natural drivers for the Horror Campaigns timer system:</p>
+<ul>
+<li><strong>Dread Timer:</strong> Each new class of Worn encountered advances Dread by 1&ndash;3 (as noted in their entries). Recognizing a Worn as someone you once knew forces an immediate Breaking Point test.</li>
+<li><strong>Reality Fracture Timer:</strong> Worn presence indicates a weak spot between Zahk Kozahn and the real world. Each Worn encounter advances Reality Fracture by 1 segment.</li>
+<li><strong>Collective Sanity Timer:</strong> If the party debates whether a Worn is truly sentient or just a monster, the GM may advance Collective Sanity by 1&mdash;shared doubt erodes reality.</li>
+</ul>
+<h4 id="using-worn-as-antagonists-and-allies">Using Worn as Antagonists and Allies</h4>
+<p>Not every Worn wants to kill. Some want to forget. Some want to be released. Some want to drag others down with them.</p>
+<ul>
+<li><strong>Shamblers</strong> are environmental hazards. Use them to block exits, create obstacles, or wear down resources.</li>
+<li><strong>Screamers</strong> are alarms and ambushers. Their shriek can alert other Worn or collapse unstable architecture.</li>
+<li><strong>Stalkers</strong> are recurring threats. A Stalker can follow the party across an entire campaign arc, never striking until the worst moment.</li>
+<li><strong>Cracklers</strong> are wildcards. They can be allies, informants, or betrayers. Their bargains are always tempting and always costly.</li>
+</ul>
+<h3 id="sample-adventure-the-ninth-bell">Sample Adventure: The Ninth Bell</h3>
+<p><strong>Hook:</strong> The isolated watchtower of Thornhaven has stopped reporting. The last messenger returned with no memory of the journey, only a gray thread tied around his wrist and a single word: &ldquo;Crackling.&rdquo;</p>
+<p>The party is sent to investigate. The road is wrong. Landmarks shift. By the time they reach the tower, the sky is the wrong color.</p>
+<p><strong>Location:</strong> The tower is intact, but the interior has been <em>rearranged</em>. Rooms repeat. Stairs lead to ceilings. The garrison has become Worn&mdash;Shamblers on the lower levels, a Screamer in the bell tower, and a Crackler in the captain s quarters who claims to remember the party from a war that hasn t happened yet.</p>
+<p><strong>Timers:</strong></p>
+<ul>
+<li>Reality Fracture [10] &ndash; each impossible room advances by 1.</li>
+<li>Collective Sanity [8] &ndash; each time a PC argues about what is real, advance by 1.</li>
+<li>Dread (10) &ndash; individual tracking as normal.</li>
+</ul>
+<p><strong>Resolution:</strong> The tower is a &ldquo;thin place&rdquo; where Zahk Kozahn bleeds through. The party can:</p>
+<ol>
+<li>Seal the thin place with a ritual (requires knowledge from a Crackler s bargain).</li>
+<li>Destroy the tower (collapses the connection but kills any remaining human survivors).</li>
+<li>Walk into the bleeding-through and confront a fragment of Malachai directly (suicidal, but possible at high tiers).</li>
+</ol>
+<h3 id="customizing-the-worn-for-other-patrons">Customizing the Worn for Other Patrons</h3>
+<p>While the Worn are thematically tied to Malachai, their mechanics can be adapted to other horror patrons:</p>
+<ul>
+<li><strong>For Morag (Hidden Costs):</strong> The Worn become &ldquo;Unspooled&rdquo;&mdash;debtors who have lost everything. Cracklers offer to trade a forgotten debt for a memory. Stalkers follow those who broke a promise.</li>
+<li><strong>For Khemesh (Abyssal Maw):</strong> The Worn are &ldquo;Drowned&rdquo;&mdash;salt-crusted, waterlogged creatures that drag victims into deep water. Shriekers become &ldquo;Pressure Wails&rdquo; that cause ears to bleed.</li>
+<li><strong>For the Clockwork Monad (Apocalyptic Efficiency):</strong> The Worn are &ldquo;Iterative Failures&rdquo;&mdash;twisted, half-machine creatures that constantly try to optimize themselves into further deformity.</li>
+</ul>
+<h3 id="gm-guidance-the-worn-as-a-campaign-spine">GM Guidance: The Worn as a Campaign Spine</h3>
+<p>The Worn are most effective when they are not the main threat, but a symptom of a larger sickness. A single Crackler can foreshadow a reality fracture. A pack of Stalkers can drive the party toward an ancient vault they would otherwise avoid. A Screamer s death cry can announce the arrival of something worse.</p>
+<p>Use the Worn to answer the central question of horror in Fate s Edge: <em>What are you willing to lose to survive?</em></p>
+<div class="panel panel-purple"><em>The thread tightens. The bell cracks. The ninth hour approaches. You are not hunting the Worn. They are waiting for you to join them.</em></div>
+<h2 id="fae-amp-amp-hag-folk-horror-the-alder-king-vs-the-hazel-quee">Fae &amp;amp; Hag Folk Horror: The Alder King vs. The Hazel Queen</h2>
+<h3 id="the-old-gods-of-hedge-and-hollow">The Old Gods of Hedge and Hollow</h3>
+<p>Long before the Chained Angel rattled her chains, before the Daughters tied their first gray thread, there were the old ones&mdash;the lords and ladies of the wild places. They do not dwell in Zahk'Kozahn or in the geometry of madness. They live in the root cellar, the foggy meadow, the copse of alders where the light never quite reaches.</p>
+<p>Two stand above the rest: <strong>The Alder King</strong> and <strong>The Hazel Queen</strong>.</p>
+<p>They are not enemies. They are not allies. They are the two halves of a single, terrible coin: the dark, predatory wood and the cunning, bargain-making hedge. Their war is not fought with armies but with curses, with stolen children, with paths that lead nowhere and doors that open onto yesterday.</p>
+<p>Between them walk two others: <strong>The Huntsman</strong>, who serves neither but hunts both, and <strong>The Pathweaver</strong>, who mends what the war breaks&mdash;and sometimes breaks it further.</p>
+<div class="panel panel-blue">
+<p><em>&ldquo;The Alder King takes. The Hazel Queen bargains. The Huntsman follows. The Pathweaver forgets. In the old woods, you are never the hunter. You are only prey that has not yet been named.&rdquo;</em></p>
+</div>
+<h3 id="the-alder-king-mdash-the-root-that-strangles">The Alder King &mdash; The Root That Strangles</h3>
+<h4 id="lore">Lore</h4>
+<p>The Alder King is the spirit of the dark, wet wood&mdash;the alder grove where the ground is always damp, where the roots reach up to trip the unwary, where the trees grow close enough to whisper. He is patient, territorial, and cruel in the way of a snare: he does not hate you, but he will not let you go.</p>
+<p>His domain is the <strong>Thornwood</strong>, a shifting forest that appears where alders grow in circles. Those who enter find that the way out requires a sacrifice: a memory, a name, or the warmth of a living body to feed the roots.</p>
+<p><strong>Epithets:</strong> The Root-Father, The Knot-Weaver, The Lord of the Sunless Copse. <strong>Signs:</strong> Alder leaves floating in still water. A footprint filled with dark sap. A child's laughter from underground.</p>
+<h4 id="mechanics-the-thornwood-timer-10-segments">Mechanics: The Thornwood Timer [10]</h4>
+<p>When the party enters Alder King territory, start the <strong>Thornwood Timer</strong>. It represents how deeply the forest has claimed them.</p>
+<div class="table-wrap"><table><tr><th><strong>Segments</strong></th><th><strong>Effect</strong></th></tr><tr><td>0&ndash;2</td><td>The forest is unwelcoming but not hostile. Navigation rolls are at -1 die.</td></tr><tr><td>3&ndash;5</td><td>The forest begins to remember you. Paths shift when unobserved. Rest provides only half normal Fatigue recovery.</td></tr><tr><td>6&ndash;8</td><td>The roots have learned your names. You cannot leave the Thornwood without a sacrifice (a memory, a drop of blood, a promise). All social rolls within the wood are Desperate.</td></tr><tr><td>9&ndash;10</td><td>The Alder King manifests. He does not attack&mdash;he offers a bargain. Refusal requires a Spirit+Resolve test (DV 5) or the party becomes Lost (unable to find any exit for 1d6 hours).</td></tr></table></div>
+<p><strong>Advancement Triggers:</strong></p>
+<ul>
+<li>Stepping on an alder root: +1 segment</li>
+<li>Taking a rest within the Thornwood: +1 segment</li>
+<li>Harming a creature of the wood (even in self-defense): +2 segments</li>
+<li>Accepting a gift from the Alder King: +3 segments</li>
+</ul>
+<h4 id="the-alder-king-s-bargains">The Alder King's Bargains</h4>
+<p>The Alder King does not ask. He offers. Each bargain is a trap that feels like salvation.</p>
+<div class="table-wrap"><table><tr><th><strong>What He Offers</strong></th><th><strong>What He Takes</strong></th><th><strong>What Happens</strong></th></tr><tr><td>A path out of the Thornwood</td><td>Your left shoe</td><td>You will never walk without a limp again.</td></tr><tr><td>A cure for a poisoned ally</td><td>The memory of your mother's face</td><td>You will not recognize her when you return home.</td></tr><tr><td>A weapon that never misses</td><td>A year of your life</td><td>The year will be the worst one.</td></tr><tr><td>Safe passage for the party</td><td>The name of your firstborn</td><td>The child will be claimed on their seventh birthday.</td></tr></table></div>
+<h3 id="the-hazel-queen-mdash-the-cunning-hedge">The Hazel Queen &mdash; The Cunning Hedge</h3>
+<h4 id="lore">Lore</h4>
+<p>Where the Alder King is dark and patient, the Hazel Queen is bright and quick. She dwells in hedgerows, at crossroads, in the spaces between gardens and wild. She is the hag who offers exactly what you need&mdash;for a price you will not understand until the hazel nuts have fallen thrice.</p>
+<p>Her domain is the <strong>Hedge</strong>, a living labyrinth of thorn and hazel that separates the civilized from the wild. Unlike the Thornwood, the Hedge does not trap you. It offers you a choice: turn back, or pay the toll.</p>
+<p><strong>Epithets:</strong> The Crossroads Wife, The Kettle-Crone, She Who Counts in Nuts. <strong>Signs:</strong> A single hazel nut on a windowsill. A kettle that whistles without fire. A path that forks into three, then four, then nine.</p>
+<h4 id="mechanics-the-hedge-debt-timer-8-segments">Mechanics: The Hedge Debt Timer [8]</h4>
+<p>The Hazel Queen does not imprison. She lends. Each time the party accepts her aid, they incur debt. The <strong>Hedge Debt Timer</strong> tracks how much they owe.</p>
+<div class="table-wrap"><table><tr><th><strong>Segments</strong></th><th><strong>Effect</strong></th></tr><tr><td>0&ndash;2</td><td>No visible effect. You feel vaguely lucky.</td></tr><tr><td>3&ndash;4</td><td>Minor inconveniences: food spoils quickly, strangers forget your name, you cannot find small objects.</td></tr><tr><td>5&ndash;6</td><td>Significant losses: you forget a language you once knew, a childhood friend no longer recognizes you, your reflection appears tired.</td></tr><tr><td>7&ndash;8</td><td>The Hazel Queen calls in her debt. She appears and demands payment&mdash;a memory, a relationship, a future. Refusal adds 2 permanent Corruption.</td></tr></table></div>
+<p><strong>Advancement Triggers:</strong></p>
+<ul>
+<li>Accepting food or drink from a Hazel Queen shrine: +1 segment</li>
+<li>Using a Hazel Queen rite (see below): +2 segments</li>
+<li>Breaking a promise made at a crossroads: +3 segments</li>
+<li>Harming a hedge witch or Hazel Queen follower: +1 segment</li>
+</ul>
+<h3 id="the-huntsman-mdash-the-leash-made-flesh">The Huntsman &mdash; The Leash Made Flesh</h3>
+<h4 id="lore">Lore</h4>
+<p>The Huntsman serves neither king nor queen. He serves the hunt itself. He was once a mortal&mdash;a ranger, a trapper, a man who loved the forest too much. Now he is a creature of pure purpose: to track, to chase, and to bring down whatever the old powers set him upon.</p>
+<p>He appears as a tall figure in weathered leather, his face hidden by a hood of stitched leaves. His hounds are not dogs but the ghosts of wolves, the memories of teeth. He does not speak. He leaves notes carved into bark: a name, a direction, a single word: <em>Run.</em></p>
+<p><strong>Epithets:</strong> The Silent Tracker, The Warden of the Chase, The Debt Collector of the Wild. <strong>Signs:</strong> A single arrow embedded in a doorframe. A howl that comes from every direction. A set of tracks that end at a cliff&mdash;and resume on the other side.</p>
+<h4 id="mechanics-the-huntsman-s-hunt">Mechanics: The Huntsman's Hunt</h4>
+<p>The Huntsman is not a creature to be fought (though he can be). He is a <strong>campaign timer</strong> that follows the party when they have angered the old powers.</p>
+<ul>
+<li><strong>The Hunt Timer [10]</strong>: Starts when the party refuses a bargain, desecrates a grove, or kills a creature of the Alder King or Hazel Queen without permission.</li>
+<li><strong>Ticks:</strong> The Hunt advances 1 segment per day of travel, plus additional ticks for leaving traces, sleeping in the open, or using magic that disturbs the wild.</li>
+<li><strong>When Full:</strong> The Huntsman catches you. He offers no bargain, only a choice: one member of the party stays behind as a sacrifice, or the entire party faces his hounds in a fight that begins at Desperate Position.</li>
+</ul>
+<p><strong>Evading the Hunt:</strong></p>
+<ul>
+<li>Crossing running water resets the Hunt Timer to 1 (the Huntsman cannot follow, but he will wait on the other side).</li>
+<li>Entering a Hazel Queen shrine or Alder King grove pauses the Hunt&mdash;but you must bargain for safe passage.</li>
+<li>Finding the Huntsman's true name (lost somewhere in the Thornwood) ends the Hunt permanently. The party gains a permanent +1 die to all rolls against fae creatures as the Huntsman's respect buys them a measure of protection.</li>
+</ul>
+<h3 id="the-pathweaver-mdash-the-mender-of-liminal-wounds">The Pathweaver &mdash; The Mender of Liminal Wounds</h3>
+<h4 id="lore">Lore</h4>
+<p>The Pathweaver walks where the Alder King and Hazel Queen have torn the world. She does not fight them. She does not serve them. She weaves. When a path leads nowhere, she reminds it where it should go. When a door opens onto yesterday, she pulls it back to today.</p>
+<p>She appears as an old woman with a spindle of gray thread, her fingers moving in patterns that hurt to watch. Her eyes are mismatched: one sees the present, the other sees what could have been.</p>
+<p><strong>Epithets:</strong> The Gray Spinner, The Door-Mender, The Third Sister. <strong>Signs:</strong> A single gray thread tied around a door handle. A path that suddenly makes sense after hours of confusion. A dream of a woman weaving with your memory.</p>
+<h4 id="mechanics-the-pathweaver-s-boons">Mechanics: The Pathweaver's Boons</h4>
+<p>The Pathweaver is not a patron to be worshipped. She is a neutral force&mdash;a resource the party can invoke when lost, cursed, or trapped between the old powers.</p>
+<p><strong>Invoking the Pathweaver:</strong></p>
+<ul>
+<li>At any crossroads, a PC may spend 1 Boon and roll Spirit + Lore (DV 3). On a success, the Pathweaver appears and answers one question about the local geography or the location of a threshold.</li>
+<li>If the roll fails, the Pathweaver appears but is annoyed. She answers the question, but the PC loses a minor memory (GM choice) and marks 1 Fatigue.</li>
+</ul>
+<p><strong>Pathweaver's Rites (for Runekeepers or Cantors)</strong></p>
+<ul>
+<li><strong>Unknot the Way (Low, 5 XP):</strong> Untie a single knot&mdash;a closed door, a sealed promise, a locked heart. The target must be mundane (not magical). Push: Also silence any sound the opening makes.</li>
+<li><strong>Weave the Lost Path (Standard, 9 XP):</strong> Reveal a hidden route between two locations within one day's travel. The route is safe from mundane pursuit, but the Pathweaver will ask for a small favor in return (GM determines).</li>
+<li><strong>Mend the Threshold (High, 14 XP):</strong> Permanently repair a broken threshold&mdash;a door that leads nowhere, a bridge that collapses in spirit if not in stone. The repair costs a memory (the caster forgets why they came to the threshold in the first place).</li>
+</ul>
+<h3 id="the-war-of-root-and-hedge">The War of Root and Hedge</h3>
+<p>The Alder King and Hazel Queen have been warring for centuries&mdash;not openly, but through proxies, through curses, through the slow corruption of each other's domains. The party may be caught in the middle.</p>
+<h4 id="sample-conflict-seeds">Sample Conflict Seeds</h4>
+<ol>
+<li><strong>The Stolen Child:</strong> A village child was taken by the Alder King's roots. The Hazel Queen offers to return the child&mdash;if the party brings her a branch from the King's oldest tree. The King, in turn, offers to let the child go willingly&mdash;if the party burns a Hazel Queen shrine.</li>
+<li><strong>The Rival Huntsmen:</strong> Two Huntsmen&mdash;one in the King's service, one in the Queen's&mdash;are hunting the same prey: the party. The party must pit them against each other or find the Pathweaver to escape both.</li>
+<li><strong>The Broken Path:</strong> A road that once connected two towns now leads in circles. The Pathweaver says the road was caught in a dispute between King and Queen. To mend it, the party must retrieve a token from each: a thorn from the Thornwood and a nut from the Hedge.</li>
+<li><strong>The Ninth Threshold:</strong> The Pathweaver reveals that the war has torn a hole in reality&mdash;a ninth threshold that leads not to another place, but to a hungry void. The party must negotiate a truce between King and Queen long enough to seal it.</li>
+</ol>
+<h3 id="campaign-timers-for-fae-hag-horror">Campaign Timers for Fae/Hag Horror</h3>
+<ul>
+<li><strong>Thornwood Timer (10)</strong>: How deeply the party is trapped in Alder King territory.</li>
+<li><strong>Hedge Debt Timer (8)</strong>: How much the party owes the Hazel Queen.</li>
+<li><strong>The Hunt Timer (12)</strong>: How close the Huntsman is to catching the party.</li>
+<li><strong>Threshold Fracture (14)</strong>: How close the war is to breaking reality. Advances when the party takes sides, breaks a bargain, or kills a fae creature. When full, the ninth threshold opens and something from outside the old war enters&mdash;something even the King and Queen fear.</li>
+</ul>
+<h3 id="sample-adventure-the-hazel-nut-and-the-alder-thorn">Sample Adventure: The Hazel Nut and the Alder Thorn</h3>
+<p><strong>Hook:</strong> A village on the edge of the Thornwood has stopped paying taxes. The reason: every night, a single hazel nut appears on the mayor's pillow. The next morning, a child is missing. The Hazel Queen is collecting.</p>
+<p><strong>Investigation:</strong> The party discovers that the mayor made a bargain with the Queen years ago: prosperity for the village in exchange for &ldquo;the first harvest of each year.&rdquo; The Queen has interpreted &ldquo;harvest&rdquo; to mean children. The Alder King, sensing weakness, has begun encroaching on the village's edges.</p>
+<p><strong>Key NPCs:</strong></p>
+<ul>
+<li>Mayor Halver: Desperate, guilty, unwilling to admit the bargain.</li>
+<li>The Village Wise Woman: A hedge witch who serves neither King nor Queen but knows the Pathweaver's signs.</li>
+<li>The Taken Children: They are not dead, but kept in the Hedge, waiting to be &ldquo;harvested&rdquo; on their seventh birthdays.</li>
+</ul>
+<p><strong>Timers:</strong></p>
+<ul>
+<li>Hedge Debt (already at 5): The village owes the Queen deeply.</li>
+<li>Thornwood (3 and rising): The King's roots are reaching for the village well.</li>
+<li>Threshold Fracture (2): The war is still cold, but heating up.</li>
+</ul>
+<p><strong>Resolutions:</strong></p>
+<ol>
+<li><strong>Bargain with the Queen:</strong> Pay the debt with something other than children&mdash;a memory, a skill, a future. The Queen accepts, but the King is now angry.</li>
+<li><strong>Bargain with the King:</strong> Offer the King a foothold in the village (a well, a crossroads) in exchange for driving off the Queen. The village is safe, but now the King's roots are under every doorstep.</li>
+<li><strong>Find the Pathweaver:</strong> Discover a third path&mdash;a way to nullify the original bargain without payment. Requires finding the original contract (hidden in the Hedge) and burning it at a crossroads. The Pathweaver agrees to open the way, but demands that the village build a shrine to her&mdash;a place where neither King nor Queen may enter.</li>
+</ol>
+<h3 id="gm-guidance-folk-horror-pacing">GM Guidance: Folk Horror Pacing</h3>
+<p>Folk horror is slow, atmospheric, and deeply tied to place. Unlike cosmic horror (which overwhelms with scale), folk horror isolates with intimacy. Use these principles:</p>
+<ul>
+<li><strong>Kill the road:</strong> The party cannot simply leave. The road turns, the bridge is out, the map is wrong. Isolation is the first horror.</li>
+<li><strong>Make the land sentient:</strong> The forest watches. The well whispers. The hedge has thorns that reach for blood. Do not describe these as magical&mdash;describe them as <em>natural</em> in a world that has different rules.</li>
+<li><strong>Rituals have teeth:</strong> A simple hedge witch's blessing should feel like a contract. A prayer at a crossroads should leave a mark. Every interaction with the old powers has a cost, even if it is only a forgotten name.</li>
+<li><strong>Children are currency:</strong> In folk horror, children are never safe. They are taken, bargained, replaced with changelings. Use this sparingly&mdash;and always with safety tools&mdash;but recognize that the vulnerability of the young is the emotional core of the genre.</li>
+</ul>
+<div class="panel panel-purple"><em>The hazel nuts fall. The alder roots rise. The Huntsman's hounds are at the door. Somewhere, a spindle turns. The Pathweaver is weaving your fate&mdash;and she is not sure where the thread leads.</em></div>
+<h2 id="digital-toolkit">Digital Toolkit</h2>
+<p>The tools above are also available as an installable module package for the Fate's Edge web client and socket server — <code>ttrpg/reference/expansions/horror-module/</code> in this repo. It bundles:</p>
+<ul>
+<li>A <strong>theme</strong> for the web client — a gothic, low-light palette distinct from the Modern Noir cyberpunk reskin, installable from Settings $$ Pack Management.</li>
+<li>A <strong>data pack</strong> with the Daughters of the Cord (Thornhaven Chapter) as a faction record and Thornhaven Watchtower as a sample region, both drawn from &ldquo;Sample Adventure: The Ninth Bell,&rdquo; Section above.</li>
+<li>A ready-to-push <strong>socket-server module</strong> — &ldquo;The Ninth Bell&rdquo; built out into acts, scenes, and the four Worn stat blocks (Section ), installable via the server's <code>/api/modules</code> endpoint or a room's module-push UI.</li>
+</ul>
+<p>Both this module and the Modern Noir module are distributed as ready-to-install <code>.zip</code> archives inside their respective folders (see each <code>README.md</code>) — no manual zipping required to try them.</p>
+<p>See that folder's <code>README.md</code> for install instructions for each piece. It's the reference implementation for this expansion, not a replacement for it.</p>
+<h3 id="colophon">Colophon</h3>
+<p>This chapter was woven from fragments found in a hedge witch's cottage, pressed between the pages of a book that had no title. The witch was not there. The kettle was warm. The thread was gray.</p>
+<p>&mdash; <em>Lerris Fenwood, at the crossroads of Belcourt and nowhere, under a sky that remembered the old names</em></p>
+<hr>
+<div style="font-size:0.75rem;color:var(--text3);text-align:center;padding:1rem 0;">
+    Horror Campaigns — A Fate's Edge Expansion<br>
+    © Nicholas A. Gasper — For use with the Fate's Edge RPG
+</div>
+
+</body>
+</html>
