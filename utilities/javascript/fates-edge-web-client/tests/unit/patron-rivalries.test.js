@@ -57,6 +57,22 @@ describe('patrons: Cross-Resonance lookup', () => {
         }
     });
 
+    it('follows also_known_as when the table uses another name', () => {
+        // The Ninth is listed in the rivalry table under its Kon'reh name,
+        // "Ninth Rim" -- the rim beyond the eighth figure, off the edge of a
+        // board that only has eight. No amount of fuzzy matching against
+        // "The Ninth - Beyond Comprehension" would find that, so the patron
+        // file carries also_known_as and the lookup reads it.
+        const ninth = patrons.find(p => p.id === 'the-ninth');
+        assert(ninth, 'The Ninth should be in the patron data');
+        assert(Array.isArray(ninth.also_known_as) && ninth.also_known_as.includes('Ninth Rim'),
+            'The Ninth must declare its Kon\'reh name');
+        const rivals = rivalriesFor(ninth, table).map(r => r.rival);
+        assert(rivals.length === 3, `expected 3 rivals for The Ninth, got ${rivals.length}`);
+        assert(rivals.some(n => /Sacred Geometry/.test(n)),
+            'the rim beyond the eighth figure should oppose the architect of perfect forms');
+    });
+
     it('does not invent rivals for patrons the table never names', () => {
         // Eight patrons genuinely have no rows -- mostly Inaea's daughters,
         // whom the guide calls unclassifiable. Silence is the right answer;

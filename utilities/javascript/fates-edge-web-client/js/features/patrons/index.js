@@ -283,7 +283,13 @@ function isNinthTrigger(query) {
     const triggers = [
         'ninth', 'the ninth', 'forbidden', 'hidden', 'secret',
         'unspoken', 'void', 'infinite', 'overflow', 'knowledge',
-        'truth beyond', 'easter egg', 'beyond comprehension'
+        'truth beyond', 'easter egg', 'beyond comprehension',
+        // The Kon'reh name. A player who met this at a board rather than
+        // in a rumour arrives holding "Ninth Rim" and should find the same
+        // door — the Ykrul hold that Kon'reh models the world, so a term
+        // for what lies off the edge of the board is a term for what lies
+        // off the edge of everything.
+        'ninth rim', 'the ninth rim', 'rim beyond', 'taboo'
     ];
     return triggers.some(t => q.includes(t));
 }
@@ -383,6 +389,11 @@ export function rivalriesFor(patron, data) {
         ...nameKeys(patron.title),
         ...nameKeys(patron.name),
         ...nameKeys(String(patron.id || '').replace(/[-_]/g, ' ')),
+        // Some patrons are known by more than one name and the rivalry
+        // table may use either. The Ninth is listed there as "Ninth Rim",
+        // its Kon'reh name, which no amount of fuzzy matching against
+        // "The Ninth — Beyond Comprehension" would ever have found.
+        ...(patron.also_known_as || []).flatMap(a => [...nameKeys(a)]),
     ]);
     mine.delete('');
     const matches = (name) => {
@@ -1359,6 +1370,23 @@ function buildPatronSections(patron) {
         `;
     }
  
+    // ─── Names ─────────────────────────────────────────────────
+    // Some patrons are known by more than one name, and the difference is
+    // not trivia: The Sacred Geometry is the Ykrul name for Kon'reh, and
+    // The Ninth Rim is what lies past the eighth figure on that board.
+    // Same subject, seen from inside the architecture and from over its
+    // edge -- which is also why they are rivals.
+    if ((patron.also_known_as && patron.also_known_as.length) || patron.names_note) {
+        const aka = (patron.also_known_as || []).filter(a => a && a !== patron.title);
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--purple);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--purple);">🜂 Names</h3>
+                ${aka.length ? `<p style="margin:0.2rem 0;"><strong>Also known as:</strong> ${escHtml(aka.join(', '))}</p>` : ''}
+                ${patron.names_note ? formatText(patron.names_note) : ''}
+            </div>
+        `;
+    }
+
     // ─── Cross-Resonance ──────────────────────────────────────
     // Rendered from the shared table (loadRivalries) rather than from the
     // patron file's own `rivalries` key, which only five of fifty-one
