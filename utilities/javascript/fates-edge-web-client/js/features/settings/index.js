@@ -576,13 +576,9 @@ export function render(el) {
                 <p class="text-muted small">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
 
                 <div class="bundled-packs-hint mt-1">
-                    <strong style="color:var(--gold);">📚 Bundled theme packs</strong>
-                    <p class="text-sm" style="margin:0.3rem 0;">Two ready-to-install theme packs ship in the <strong>docs repo</strong> (fates-edge-docs), not this one — each bundles a full reskin (colors, borders, glow/vignette treatment) plus a matching faction, region, and quick-reference doc:</p>
-                    <ul class="text-sm" style="margin:0.2rem 0 0.3rem 1.2rem;">
-                        <li><strong>🌆 Modern Noir</strong> — <code>ttrpg/reference/expansions/modern-noir-module/web-client/modern-noir-module.pack.zip</code></li>
-                        <li><strong>🕯️ Horror</strong> — <code>ttrpg/reference/expansions/horror-module/web-client/horror-module.pack.zip</code></li>
-                    </ul>
-                    <p class="text-xs text-muted" style="margin:0;">Grab the .zip from that repo and install it below. Once installed, the theme shows up in Theme &amp; Appearance further down this page.</p>
+                    <strong style="color:var(--gold);">📚 What a pack contains</strong>
+                    <p class="text-sm" style="margin:0.3rem 0;">A pack is a single <code>.zip</code> that can carry a full reskin — colors, borders, glow and vignette treatment — alongside the content it belongs to: factions, regions, adversaries, and quick-reference documents. Several expansions ship one, so installing the pack themes the whole toolkit to match the book you are running.</p>
+                    <p class="text-xs text-muted" style="margin:0;">Drop a <code>.zip</code> below to install it. A pack that carries a theme adds it to Theme &amp; Appearance further down this page; everything else it brings shows up in the library it belongs to.</p>
                 </div>
 
                 <div class="form-row">
