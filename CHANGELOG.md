@@ -3,6 +3,11 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.1] - 2026-09-02
+
+### Other
+- Updated workflow to delete old github-pages artifacts.
+
 ## [5.0.0] - 2026-09-02
 
 Twelve skills, Threat Level, Position corrections, GM authority enforced on the wire
