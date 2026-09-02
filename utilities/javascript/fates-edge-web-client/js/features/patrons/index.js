@@ -1376,13 +1376,47 @@ function buildPatronSections(patron) {
     // The Ninth Rim is what lies past the eighth figure on that board.
     // Same subject, seen from inside the architecture and from over its
     // edge -- which is also why they are rivals.
-    if ((patron.also_known_as && patron.also_known_as.length) || patron.names_note) {
+    const guises = patron.guises || [];
+    if ((patron.also_known_as && patron.also_known_as.length) || patron.names_note || guises.length) {
         const aka = (patron.also_known_as || []).filter(a => a && a !== patron.title);
         html += `
             <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--purple);">
                 <h3 style="margin:0 0 0.3rem 0;color:var(--purple);">🜂 Names</h3>
-                ${aka.length ? `<p style="margin:0.2rem 0;"><strong>Also known as:</strong> ${escHtml(aka.join(', '))}</p>` : ''}
+                ${guises.length ? `
+                    <ul style="margin:0.2rem 0 0.3rem 1.1rem;font-size:0.88rem;color:var(--text2);">
+                        ${guises.map(g => `<li><strong>${escHtml(g.name || '')}</strong> — ${escHtml(g.among || '')}${g.note ? `. ${escHtml(g.note)}` : ''}</li>`).join('')}
+                    </ul>` : (aka.length ? `<p style="margin:0.2rem 0;"><strong>Also known as:</strong> ${escHtml(aka.join(', '))}</p>` : '')}
                 ${patron.names_note ? formatText(patron.names_note) : ''}
+            </div>
+        `;
+    }
+
+    // ─── Provenance ────────────────────────────────────────────
+    // Where a Patron came from, when that is not where it is worshipped.
+    if (patron.provenance && (patron.provenance.summary || patron.provenance.origin)) {
+        const pv = patron.provenance;
+        const paras = ['origin', 'summary', 'the_migration', 'why_it_took', 'note']
+            .map(k => pv[k]).filter(Boolean);
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🧭 Provenance</h3>
+                ${paras.map(t => formatText(t)).join('')}
+            </div>
+        `;
+    }
+
+    // ─── Philosophy ────────────────────────────────────────────
+    // Not every Patron has one. Where a Patron does, it is the thing a
+    // player actually needs in order to play them -- what the Patron
+    // believes, and therefore what it will and will not accept.
+    if (patron.philosophy && patron.philosophy.summary) {
+        const ph = patron.philosophy;
+        const paras = ['summary', 'the_point', 'the_third_thing', 'at_the_table']
+            .map(k => ph[k]).filter(Boolean);
+        html += `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--red);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--red);">⚖️ ${escHtml(ph.name || 'Philosophy')}</h3>
+                ${paras.map(t => formatText(t)).join('')}
             </div>
         `;
     }
