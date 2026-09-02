@@ -1,6 +1,6 @@
 {
   "name": "edge-terminal",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "Terminal client for the Fate's Edge MUD (WebSocket + ANSI banners)",
   "main": "terminal-client.js",
   "scripts": {

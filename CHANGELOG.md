@@ -3,6 +3,16 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.4] - 2026-09-02
+
+Prodigy + Campfire sync, settings pack panel, docs manifest
+
+### Added
+- stop pointing users at a repo they cannot open
+
+### Chore
+- sync the Campfire Mode vocabulary pass from fates-edge-docs
+
 ## [5.0.3] - 2026-09-02
 
 Reach band, Near label, DV ladder in the roller, printable paper docs
