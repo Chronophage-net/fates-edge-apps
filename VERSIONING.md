@@ -52,6 +52,29 @@ What it does:
    files are still updated and it prints the exact commands to finish by
    hand instead of leaving things half-done.
 
+## `auto` is a suggestion, not an authority
+
+Two standing overrides. `auto` reads commit prefixes and knows nothing about
+what the version *means*, so it gets both of these wrong every time:
+
+**A rules change is not an app major.** The apps version tracks the toolkit —
+its data shapes, its APIs, its saved-state format. A `feat!:`/`BREAKING CHANGE:`
+commit that breaks a *rule* (the DV ladder ends at 5; Reach is a band now)
+breaks nothing a user of this repo has integrated against, so it does not
+justify a major here even though `auto` will insist. Those land as
+`minor`/`patch` on the current line. Reserve major for something that actually
+breaks a consumer: the saved-character schema, a manifest format, a socket
+protocol.
+
+**In `fates-edge-docs`, 1.0.0 is a decision.** That repo is pre-1.0, and under
+semver a breaking change before 1.0 bumps the minor. `auto` will happily
+propose `1.0.0` off a `feat(srd)!:` commit; `1.0.0` means the game is released
+and is the author's call to make deliberately, never a side effect of a commit
+prefix. Pass `minor` explicitly there until that call is made.
+
+In both cases: run `--dry-run` first, and if the level it picks would say
+something you don't mean, pass the level by hand.
+
 See `tools/bump-version.mjs`'s own header comment for the full mechanics.
 The identical script is copied (not shared via a package dependency,
 since these are three unrelated git repos) into
