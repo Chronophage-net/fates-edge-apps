@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.7] - 2026-09-02
+
+Guises, Provenance and Philosophy; Myrmis
+
+### Added
+- Guises, Provenance and Philosophy sections
+
 ## [5.0.6] - 2026-09-02
 
 also_known_as lookup and the Names section
