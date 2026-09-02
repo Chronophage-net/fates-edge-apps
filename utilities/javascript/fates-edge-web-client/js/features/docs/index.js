@@ -35,7 +35,17 @@ import { printWithChromeHidden } from '@core/print.js';
 // data/docs/manifest.json by generate-manifests.js; 'srd' is also listed
 // as a fallback since scanFilesystem()'s knownCoreFiles below would assign
 // that id instead if the manifest ever didn't already have this file.
-const PRINTABLE_DOC_IDS = new Set(['systems_reference_document', 'srd', 'essentials', 'campfire_mode']);
+// 'the_paper_table' and 'the_peoples_die' are both CC BY-NC-SA 4.0 (the
+// licence is stated in each document), and both exist specifically to be
+// printed: The Paper Table replaces a set of dice with cut-out spinners and
+// lookup tables for players who cannot use dice at all, and The People's Die
+// converts the system to the d6s in a Yahtzee box. A document whose whole
+// purpose is to be carried to a table on paper, and which is licensed to be
+// copied and handed out, should not be missing the print button.
+const PRINTABLE_DOC_IDS = new Set([
+    'systems_reference_document', 'srd', 'essentials', 'campfire_mode',
+    'the_paper_table', 'the_peoples_die',
+]);
 
 // ============================================================
 // CONSTANTS

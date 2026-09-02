@@ -65,11 +65,13 @@ const POSITIONS = [
 // tracker's range grid. '' = "not applicable" — no weapon range bonus applied.
 const RANGE_BAND_OPTIONS = [
     { key: '', label: '— No range (n/a) —' },
-    { key: 'close', label: 'Close — knife/grapple distance' },
-    { key: 'near', label: 'Medium — one-handed weapon reach' },
-    { key: 'reach', label: 'Reach — two-handed weapon reach' },
-    { key: 'far', label: 'Far — missile-weapon distance' },
-    { key: 'absent', label: 'Absent — functionally gone' }
+    // SRD §8.3. 'near' is labelled Near, not Medium — Medium is a weapon
+    // weight class, and the two vocabularies share no words on purpose.
+    { key: 'close', label: 'Close — hands, knives' },
+    { key: 'near', label: 'Near — a step and a swing' },
+    { key: 'reach', label: 'Reach — a haft away; ranged treats it as Near' },
+    { key: 'far', label: 'Far — beyond every melee weapon' },
+    { key: 'absent', label: 'Absent — off-screen' }
 ];
 export const RANGE_BAND_LABEL_MAP = Object.fromEntries(RANGE_BAND_OPTIONS.filter(r => r.key).map(r => [r.key, r.label.split('—')[0].trim()]));
 export { RANGE_BAND_OPTIONS };
@@ -78,8 +80,11 @@ const DV_LADDER = [
     { value: 2, label: 'Routine', desc: 'Almost guaranteed' },
     { value: 3, label: 'Default', desc: 'A real challenge' },
     { value: 4, label: 'Hard', desc: 'Serious resistance' },
-    { value: 5, label: 'Extreme', desc: 'A dramatic gamble' },
-    { value: 6, label: 'Mythic', desc: 'Nearly impossible' }
+    { value: 5, label: 'Extreme', desc: 'A dramatic gamble' }
+    // The ladder ends at 5. There is no DV 6: a task harder than Extreme is
+    // a clock, a worse Position, or a flat no — not a bigger number. Raising
+    // the DV past 5 only walks the roll toward automatic failure, which the
+    // Outcome Matrix already has a row for and needs no difficulty to reach.
 ];
 
 const EFFECT_LEVELS = [

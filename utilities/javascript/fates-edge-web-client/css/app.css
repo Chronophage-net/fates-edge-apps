@@ -2789,7 +2789,7 @@ body.xcard-active .app-shell {
    flips `body.print-active` and calls window.print(). Not a general
    print stylesheet for the whole app: the two features that use it
    (js/features/characters/editor.js's character sheet, and
-   js/features/docs/index.js's SRD/Essentials/Campfire Mode viewer) each
+   js/features/docs/index.js's docs viewer, gated to PRINTABLE_DOC_IDS) each
    already isolate their own content in the DOM before this ever needs to
    hide anything else, so the rules below only need to cover the chrome
    that's still visible around them (sidebar, toasts, in-panel buttons).
@@ -2831,7 +2831,7 @@ body.xcard-active .app-shell {
     }
 
     /* Docs viewer (js/features/docs/index.js) -- gated to
-       PRINTABLE_DOC_IDS there (SRD / Essentials / Campfire Mode). Hide
+       PRINTABLE_DOC_IDS there. Hide
        everything else in the Docs tab (search/filter bar, doc list) and
        the viewer's own toolbar/chapter-nav, then lift the fixed-height
        scroll box so the full document prints. */
@@ -2853,6 +2853,37 @@ body.xcard-active .app-shell {
     body.print-active #doc-viewer * {
         color: #000 !important;
         background: #fff !important;
+    }
+
+    /* Keep the things you print a document FOR intact across page breaks.
+       The Paper Table's whole purpose is cut-out spinners and lookup
+       tables, and The People's Die is conversion tables end to end — a
+       spinner split down the middle by a page break is not a spinner, and
+       a table whose header lands alone at the foot of a page is worse than
+       useless at an actual table. Cheap, and harmless to the prose docs. */
+    body.print-active #doc-viewer table,
+    body.print-active #doc-viewer .panel,
+    body.print-active #doc-viewer .cut,
+    body.print-active #doc-viewer blockquote,
+    body.print-active #doc-viewer figure,
+    body.print-active #doc-viewer svg {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    body.print-active #doc-viewer h1,
+    body.print-active #doc-viewer h2,
+    body.print-active #doc-viewer h3,
+    body.print-active #doc-viewer h4 {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+    /* Borders carry the meaning once colour is gone. */
+    body.print-active #doc-viewer th,
+    body.print-active #doc-viewer td {
+        border: 1px solid #999 !important;
+    }
+    body.print-active #doc-viewer th {
+        background: #eee !important;
     }
 }
 

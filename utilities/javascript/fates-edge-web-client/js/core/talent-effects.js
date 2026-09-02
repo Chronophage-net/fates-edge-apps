@@ -260,18 +260,24 @@ export function collectTalentModifiers(character, rollContext = {}) {
  * Ranged's Close/Near/Far collapse the book's Light/Medium/Heavy Ranged
  * sub-table (§3.12.3, each with its own Tempo) into one representative curve
  * (roughly the Medium/"Standard" tempo row) since the tracker only exposes
- * one flat "Ranged" option: Close -2d (proxy for the book's flat "Ranged
- * attack in Close range → Desperate" rule — this pipeline works in dice, not
+ * one flat "Ranged" option: Close -2d (proxy for the book's Position rule —
+ * SRD §6.2 puts a ranged attack at Close at Controlled for a Light weapon and
+ * Desperate for anything heavier, because a bow is not harder to AIM at arm's
+ * length, it is harder to survive using; this pipeline works in dice, not
  * Position), Near +2d, Far +1d.
  *
- * Reach and Absent don't exist in the book at all — they're this GM's own
- * extended-band house rule on top of the RAW 3-band Close/Near/Far (see
- * encounters/combat.js's 5-band RANGE_BANDS). Only Heavy melee (halberd,
- * greatsword — weapons with real reach) can threaten the Reach band; every
- * other class is blocked there and at Far/Absent. Values are tunable
- * defaults, not hard rules-text — blocked bands get a stiff -3d rather than
- * a hard stop, since this is a manual player-driven roll (no auto opponent
- * lookup) and the GM/table should still be free to call for the roll anyway.
+ * Reach is SRD §8.3, not a house rule: the four-band track was backported to
+ * the book. Only Heavy melee (halberd, greatsword) threatens it natively, at
+ * +0d — Reach is where such a weapon CAN reach, not where it hits hardest.
+ * A Light or Medium weapon threatens it with the Hafted tag, also at +0d;
+ * there is no per-weapon tag field in this pipeline yet, so that case is the
+ * GM's call. Ranged treats Reach as Near, which is why those two numbers are
+ * equal below rather than coincidentally similar.
+ *
+ * Absent is a state rather than a distance — the scene declining to contain
+ * someone. Blocked bands get a stiff -3d rather than a hard stop, since this
+ * is a manual player-driven roll (no auto opponent lookup) and the table
+ * should still be free to call for the roll anyway.
  *
  * Band keys match encounters/combat.js's RANGE_BANDS exactly (Medium's
  * internal key stays 'near' for backward compatibility):
@@ -284,7 +290,10 @@ const RANGE_BONUS_TABLE = {
     ranged: { close: -2, near:  2, reach:  2, far:  1, absent: -3 },
 };
 
-const RANGE_BAND_LABELS = { close: 'Close', near: 'Medium', reach: 'Reach', far: 'Far', absent: 'Absent' };
+// Labels match SRD §8.3. 'near' is labelled Near, not Medium: Medium is a
+// weapon WEIGHT CLASS, and one word cannot be both without making every
+// sentence that contains it ambiguous. The key stays 'near' regardless.
+const RANGE_BAND_LABELS = { close: 'Close', near: 'Near', reach: 'Reach', far: 'Far', absent: 'Absent' };
 
 // Bands each weapon class can't really threaten — used only for the note
 // text, the -3d above already carries the mechanical weight.

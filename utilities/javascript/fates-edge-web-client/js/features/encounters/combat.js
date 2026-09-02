@@ -134,19 +134,27 @@ function tlToMaxHarm(tl) {
 // Range bands are narrative distance between two combatants, GM-set (see
 // canSetRange() above). Each band is defined by what can reach across it:
 //   Close  — knife/grapple distance, well within arm's reach.
-//   Medium — striking distance of a one-handed weapon.
-//   Reach  — striking distance of a two-handed (Reach-tagged) weapon.
-//   Far    — beyond melee range entirely; missile-weapon distance.
-//   Absent — beyond missile range; functionally gone, requires a scene change.
-// (Internal key for Medium stays 'near' for backward compatibility with saved
-// encounters/rangeMap entries and setTrackerRangeByName() callers — only the
-// label/description changed.)
+//   Near   — a step and a swing; one-handed weapons at their best.
+//   Reach  — a haft away: spear, polearm, greatsword. Ranged treats it as Near.
+//   Far    — beyond every melee weapon; missile distance.
+//   Absent — off-screen. A state, not a distance; needs a scene change.
+//
+// These are SRD §8.3, not a house rule — the four-band track and the Reach
+// band were backported to the book. The band label here was "Medium", which
+// collided with the Medium weapon WEIGHT CLASS: "a Medium weapon at Medium
+// range" is a sentence nobody should have to parse. The SRD's own word for
+// that band is Near, so use it. Three vocabularies, no shared words:
+//   distance  Close · Near · Reach · Far
+//   weight    Light · Medium · Heavy
+//   tags      Hafted · Infighting · Accurate · Brutal · …
+// (The internal key stays 'near' — it always was — so saved encounters,
+// rangeMap entries and setTrackerRangeByName() callers are unaffected.)
 const RANGE_BANDS = [
     { key: 'close',  label: 'Close',  short: 'C', color: 'var(--red)',    desc: "Knife/grapple distance — well within arm's reach." },
-    { key: 'near',   label: 'Medium', short: 'M', color: 'var(--gold)',   desc: 'Striking distance of a one-handed weapon.' },
-    { key: 'reach',  label: 'Reach',  short: 'R', color: 'var(--orange)', desc: 'Striking distance of a two-handed weapon — the gap a Reach-tagged weapon (spear, polearm) can still close.' },
-    { key: 'far',    label: 'Far',    short: 'F', color: 'var(--blue)',   desc: 'Beyond melee range — missile-weapon distance.' },
-    { key: 'absent', label: 'Absent', short: 'A', color: 'var(--text3)',  desc: 'Beyond missile range — functionally gone; requires a scene change.' }
+    { key: 'near',   label: 'Near',   short: 'N', color: 'var(--gold)',   desc: 'A step and a swing — one-handed weapons at their best.' },
+    { key: 'reach',  label: 'Reach',  short: 'R', color: 'var(--orange)', desc: 'A haft away — where a spear, polearm or greatsword still touches you and a sword does not. Ranged weapons treat this as Near.' },
+    { key: 'far',    label: 'Far',    short: 'F', color: 'var(--blue)',   desc: 'Beyond every melee weapon — missile distance.' },
+    { key: 'absent', label: 'Absent', short: 'A', color: 'var(--text3)',  desc: 'Off-screen — a state, not a distance; requires a scene change.' }
 ];
 const DEFAULT_RANGE = 'near';
 
@@ -192,12 +200,19 @@ function applyArmorConversion(harm, armorType) {
 // which talent-effects.js's callers sit behind.
 //   - Light:  Close +2d, Near +1d. Blocked beyond Near (fast/short weapon).
 //   - Medium: Close +1d, Near +2d. Blocked beyond Near.
-//   - Heavy:  Close -1d, Near +3d, Reach +0d (real reach — halberd,
-//     greatsword). Blocked at Far/Absent.
-//   - Ranged: Close -2d (the book's "Ranged in Close = Desperate", as a dice
-//     proxy), Near +2d, Reach +2d, Far +1d. Blocked only at Absent.
-// Reach/Absent don't exist in the book — they're this GM's own extended-band
-// house rule on top of the RAW 3-band Close/Near/Far.
+//   - Heavy:  Close -1d, Near +3d, Reach +0d (a halberd or greatsword can
+//     reach that far; Near is still where it hits hardest). Blocked at
+//     Far/Absent.
+//   - Ranged: Close -2d, Near +2d, Reach +2d (the book says ranged weapons
+//     treat Reach as Near, which is exactly these two numbers being equal),
+//     Far +1d. Blocked only at Absent.
+// Close for Ranged is the one place this table knowingly diverges from the
+// book: SRD §6.2 sets Position there (Controlled for Light, Desperate for
+// heavier) rather than dice, because a bow is not harder to AIM at arm's
+// length, it is harder to survive using. This pipeline works in dice, so
+// -2d stands in for it.
+// A Light or Medium weapon with the Hafted tag also threatens Reach at +0d;
+// the tracker has no per-weapon tag field yet, so a GM sets that by hand.
 //
 // Combatants with no weaponClass set (older saved encounters, imported
 // Factions/abstract entries, etc.) are left unflagged rather than guessed at.

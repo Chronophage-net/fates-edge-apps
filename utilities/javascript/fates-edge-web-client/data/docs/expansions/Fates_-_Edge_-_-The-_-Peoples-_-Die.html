@@ -133,6 +133,43 @@
         .redacted:hover { color: var(--text3); }
         blockquote.confession { border-left:3px solid var(--red); background:var(--bg2); padding:0.6rem 1rem; margin:0.7rem 0; font-style:italic; color:var(--text2); }
         .stamp { display:inline-block; border:2px solid var(--red); color:var(--red); padding:0.1rem 0.5rem; border-radius:4px; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; transform:rotate(-2deg); }
+
+        /* ── Print ──────────────────────────────────────────────────
+           This document exists so a table with no d10s can still play,
+           which means the paper copy is the point, not a fallback. It
+           prints on ordinary white paper in ordinary black ink: no dark
+           ground to drain a cartridge, no colour needed to read a table,
+           and every conversion table kept whole rather than split across
+           a page break. Matches The Paper Table's print rules. */
+        @media print {
+            body {
+                background: #fff;
+                background-image: none;
+                color: #000;
+                max-width: none;
+                padding: .4in;
+                font-size: 10.5pt;
+            }
+            h1, h2, h3, h4, h5 { color: #000; }
+            h1 { border-bottom: 2px solid #000; }
+            h2 { border-bottom: 1px solid #666; break-after: avoid; }
+            h3, h4 { break-after: avoid; }
+            a { color: #000; text-decoration: none; }
+            .panel, .callout, blockquote {
+                background: #fff;
+                border: 1px solid #666;
+                break-inside: avoid;
+            }
+            table { break-inside: avoid; }
+            th { background: #eee; color: #000; }
+            th, td { border: 1px solid #999; }
+            .badge {
+                background: #fff;
+                color: #000;
+                border: 1px solid #999;
+            }
+            .noprint, nav, .toc-toggle { display: none !important; }
+        }
     </style>
 
 </head>

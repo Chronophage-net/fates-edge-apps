@@ -1392,15 +1392,16 @@ number instead of describing the swing.</p>
 <section class="level2" id="weapons-by-weight-class">
 <h2>6.1 Weapons by Weight Class</h2>
 <p>A weapon's weight determines its Harm, its dice modifier at different ranges, and its tempo. Harm is applied directly when an attack hits; the dice modifier affects the attack roll, not damage.</p>
+<p><strong>Weight is not distance.</strong> Light, Medium and Heavy describe the weapon in your hands. Close, Near, Reach and Far describe the gap between you and the person you are trying to hit. The two sets of words never share a member, so "a Medium weapon at Near range" is unambiguous and always will be.</p>
 <div class="table-wrap">
 <table>
 <thead>
-<tr><th>Weight</th><th>Harm</th><th>Close</th><th>Near</th><th>Far</th><th>Tempo</th></tr>
+<tr><th>Weight</th><th>Harm</th><th>Close</th><th>Near</th><th>Reach</th><th>Tempo</th></tr>
 </thead>
 <tbody>
 <tr><td><span class="badge badge-green">Light</span></td><td>1</td><td>+2d</td><td>+1d</td><td>—</td><td>Fast</td></tr>
 <tr><td><span class="badge badge-gold">Medium</span></td><td>2</td><td>+1d</td><td>+2d</td><td>—</td><td>Standard</td></tr>
-<tr><td><span class="badge badge-red">Heavy</span></td><td>3</td><td>–1d</td><td>+3d</td><td>+1d</td><td>Slow</td></tr>
+<tr><td><span class="badge badge-red">Heavy</span></td><td>3</td><td>–1d</td><td>+3d</td><td>+0d</td><td>Slow</td></tr>
 </tbody>
 </table>
 </div>
@@ -1410,16 +1411,33 @@ number instead of describing the swing.</p>
 <ul>
 <li>Fast tempo: You may move and attack in the same turn (Move + Action).</li>
 <li>Standard tempo: You may move or attack in a turn, not both.</li>
-<li>Slow tempo: Attacking requires a Set action (or a full turn action) before the attack; you cannot move and attack in the same turn unless a talent says otherwise.</li>
+<li>Slow tempo: Attacking requires a Set action before the attack. Set on one turn and swing on the next, ordered <em>Move then Set</em>, then <em>Swing then Move</em> &mdash; the two Actions land back to back (see 7.1) and you keep both Moves. You cannot Set and swing in the same turn unless a talent says otherwise.</li>
 <li>Heavy weapons at Close: Suffer –1d due to limited maneuvering room.</li>
-<li>A weapon cannot attack beyond its maximum listed range unless a talent or special ammunition extends it.</li>
+<li><strong>Reach is where a hafted weapon can still touch you.</strong> A Heavy melee weapon threatens the Reach band natively &mdash; halberd, greatsword, war-scythe. It does so at no bonus: Reach is where such a weapon <em>can</em> reach, not where it does its best work. That is still Near, where its momentum arrives.</li>
+<li>A Light or Medium weapon threatens Reach only if it carries the <code>Hafted</code> tag (spear, quarterstaff, light polearm), and then also at +0d.</li>
+<li>A weapon cannot attack beyond its maximum listed range unless a talent or special ammunition extends it. A dash (&mdash;) means the weapon does not threaten that band at all.</li>
 </ul>
 </section>
 </section>
 
 <section class="level2" id="ranged-weapons-and-ammunition">
 <h2>6.2 Ranged Weapons and Ammunition</h2>
-<p>Ranged weapons follow the same weight and tempo rules. Ammunition is tracked abstractly as part of Supply (see Section 6.6 below). A character may run low on ammunition when the GM spends SB on resource strain or during extended travel.</p>
+<p>Ranged weapons use the same weight classes and the same tempo rules, but <strong>not the same range curve</strong> &mdash; a Heavy melee weapon is at its best at Near, while a Heavy ranged weapon is at its best at Far. They need their own table.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Weight</th><th>Tempo</th><th>Close</th><th>Near</th><th>Far</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-green">Light</span></td><td>Fast</td><td>Controlled</td><td>+1d</td><td>&mdash;</td></tr>
+<tr><td><span class="badge badge-gold">Medium</span></td><td>Standard</td><td>Desperate</td><td>+2d</td><td>+1d</td></tr>
+<tr><td><span class="badge badge-red">Heavy</span></td><td>Slow</td><td>Desperate</td><td>+1d</td><td>+3d</td></tr>
+</tbody>
+</table>
+</div>
+<p>Shooting into Close range moves <strong>Position</strong>, not dice: a Light ranged weapon manages it at Controlled, anything heavier at Desperate. A bow is not harder to aim at arm's length &mdash; it is harder to survive using.</p>
+<p><strong>Ranged weapons treat Reach as Near.</strong> An archer does not care whether the spear coming at them is at sword distance or haft distance; both are far too close. Reach is a melee band, and giving it a column here would be three numbers pretending to be a distinction.</p>
+<p>Ammunition is tracked abstractly as part of Supply (see Section 6.6 below). A character may run low on ammunition when the GM spends SB on resource strain or during extended travel.</p>
 </section>
 
 <section class="level2" id="equipment-armor">
@@ -1674,12 +1692,18 @@ number instead of describing the swing.</p>
 <section class="level2" id="turn-structure">
 <h2>7.1 Turn Structure</h2>
 <p>Each character takes 1 Action and 1 Move on their turn. Actions and Moves may be taken in any order. A character may use a Boon to re-roll their action at the expense of their Move if they still have it available.</p>
+
+<div class="panel panel-gold">
+<p><strong>Ordering is the whole answer to two-part actions.</strong> Because the order is free, a character who takes <em>Move then Action</em> on one turn and <em>Action then Move</em> on the next has taken two Actions back to back, with nothing of their own in between, and still moved twice.</p>
+<p>That is how anything needing two Actions resolves &mdash; setting a Heavy weapon and swinging it, loading a Slow weapon and firing it, any talent that says "then, on your next turn". None of them need a rule of their own. They need the ordering freedom this section already grants, and a player who knows to use it.</p>
+<p>What it costs is not time but <strong>commitment</strong>. Everyone else in the round still acts between your two Actions. You have announced where you will be and what you are about to do, and the table gets a turn to make you regret it &mdash; which is the tension a slow weapon exists to create, and a good thing for the GM to spend a Story Beat on.</p>
+</div>
 </section>
 
 <section class="level2" id="move">
 <h2>7.2 Move</h2>
 <ul>
-<li>Shift one range band: Close ↔ Near ↔ Far.</li>
+<li>Shift one range band: Close ↔ Near ↔ Reach ↔ Far.</li>
 <li>Reposition within the same range band (e.g., from behind one tree to another). This does not change your range band but may affect cover or line of sight.</li>
 <li>Stand: Use your Move to stand from prone.</li>
 </ul>
@@ -1700,12 +1724,13 @@ number instead of describing the swing.</p>
 
 <section class="level3" id="dash">
 <h3>7.3.3 Dash</h3>
-<p>Action. Move two range bands (e.g., Close → Far). Your next defense roll is Desperate.</p>
+<p>Action. Move two range bands (e.g., Close → Reach). Your next defense roll is Desperate.</p>
 </section>
 
 <section class="level3" id="charge-action-economy">
 <h3>7.3.4 Charge (Full Turn Action)</h3>
 <p>Move up to two range bands toward an enemy and make one melee attack. Costs 1 Fatigue. Your next defense is Desperate. Consumes both your Action and Move. Requires open ground (no difficult terrain). If your target is behind full cover, you cannot complete the Charge — you may move up to the cover and end your turn there; the attack is lost.</p>
+<p>Two bands is the limit, so a Charge from Far arrives at Near, not in the target's face. Crossing the last band to Close is another turn. This is correct: sprinting the length of a field into knife range, under whatever is being aimed at you, is not one beat of a fight.</p>
 </section>
 
 <section class="level3" id="skirmish-action-economy">
@@ -1765,7 +1790,7 @@ number instead of describing the swing.</p>
 
 <section class="level2" id="sidestep-strike">
 <h2>7.5 Sidestep Strike</h2>
-<p>As part of a melee attack action, you may move one range band (Close ↔ Near or Near ↔ Far) without using your Move action for the turn. If you do so, your Position for that attack worsens by one step (e.g., Controlled becomes Desperate, Dominant becomes Controlled). You cannot also use your regular Move action in the same turn.</p>
+<p>As part of a melee attack action, you may move one range band (Close ↔ Near, Near ↔ Reach, or Reach ↔ Far) without using your Move action for the turn. If you do so, your Position for that attack worsens by one step (e.g., Controlled becomes Desperate, Dominant becomes Controlled). You cannot also use your regular Move action in the same turn.</p>
 </section>
 
 <section class="level2" id="shove-action-economy">
@@ -1846,7 +1871,7 @@ number instead of describing the swing.</p>
 
 <section class="level3" id="move-combat">
 <h3>8.2.1 Move</h3>
-<p>Move up to one range band (Close → Near → Far, or vice versa). You may also use your Move to reposition within the same range band (e.g., from behind one tree to another at the same distance). This does not change your range band but may affect cover or line of sight.</p>
+<p>Move up to one range band (Close → Near → Reach → Far, or vice versa). You may also use your Move to reposition within the same range band (e.g., from behind one tree to another at the same distance). This does not change your range band but may affect cover or line of sight.</p>
 <ul>
 <li>Stand: Use your Move to stand from prone.</li>
 <li>Dash (Action): Gain an extra Move. You may move two bands total in your turn. Your next defense roll is Desperate.</li>
@@ -1867,19 +1892,22 @@ number instead of describing the swing.</p>
 <tr><th>Band</th><th>Default</th><th>Notes</th></tr>
 </thead>
 <tbody>
-<tr><td><span class="badge badge-blue">Close</span></td><td>Touching</td><td>Melee reach; grapples, knives, short weapons.</td></tr>
-<tr><td><span class="badge badge-green">Near</span></td><td>Same room/street segment</td><td>Thrown weapons, short bows, most magic.</td></tr>
-<tr><td><span class="badge badge-orange">Far</span></td><td>Distant (same site)</td><td>Long bows, line spells; needs time or route to close.</td></tr>
-<tr><td><span class="badge badge-purple">Absent</span></td><td>Off-screen</td><td>Outside scene frame; needs travel or cut to interact.</td></tr>
+<tr><td><span class="badge badge-blue">Close</span></td><td>Touching</td><td>Grapples, knives, short weapons. Inside the arc of anything longer.</td></tr>
+<tr><td><span class="badge badge-green">Near</span></td><td>A step and a swing</td><td>One-handed weapons at their best. Thrown weapons, short bows, most magic.</td></tr>
+<tr><td><span class="badge badge-orange">Reach</span></td><td>A haft away</td><td>Where a spear, polearm or greatsword still touches you and a sword does not.</td></tr>
+<tr><td><span class="badge badge-red">Far</span></td><td>Distant (same site)</td><td>Beyond every melee weapon. Long bows, line spells; needs time or a route to close.</td></tr>
+<tr><td><span class="badge badge-purple">Absent</span></td><td>Off-screen</td><td>Outside the scene frame; needs travel or a cut to interact. A state, not a distance.</td></tr>
 </tbody>
 </table>
 </div>
-<p class="text-sm text-muted">The SRD's native range track is Close / Near / Far, with an "Absent" (off-screen) state noted alongside it in this table. Transcribed as written; this is not the same as any extended house-ruled range track used elsewhere.</p>
+<p><strong>Four bands, and each is named for what crosses it.</strong> Close is decided by hands, Near by a sword, Reach by a haft, Far by a bow. Absent is not a fifth distance &mdash; it is the scene declining to contain someone.</p>
+<p>Reach exists because a polearm is not a long sword. A spear held at the haft governs a stretch of ground a blade cannot answer, and the person standing in it is in a fight the swordsman has not joined yet. A band is the honest way to say that: it is a place on the table that both players can point at, rather than an exception carried on one weapon's card.</p>
+<p class="text-sm text-muted"><strong>On names.</strong> Three vocabularies describe a weapon in play and they share no word between them. <strong>Distance</strong> is Close, Near, Reach, Far. <strong>Weight</strong> is Light, Medium, Heavy. <strong>Tags</strong> are <code>Hafted</code>, <code>Infighting</code>, <code>Accurate</code>, <code>Brutal</code>, and the rest. Any sentence combining them reads exactly one way, which is the whole reason the lists are kept apart.</p>
 </section>
 
 <section class="level2" id="melee-flag">
 <h2>8.4 Melee Flag</h2>
-<p>Two parties are "in Melee" when they are within Near and directly engaged.</p>
+<p>Two parties are "in Melee" when they are directly engaged and within a band each can threaten &mdash; Near for most weapons, Reach for a Heavy or <code>Hafted</code> one. A spearman at Reach against a swordsman is in Melee; the swordsman is not, until one of them closes.</p>
 <ul>
 <li>Enter Melee: 1 Move from Near (Controlled if under fire).</li>
 <li>Leave Melee: 1 Move to break off. If threatened, you must take the Disengage action. Without Disengage, leaving Close range provokes a free opportunity attack.</li>
@@ -1901,7 +1929,7 @@ number instead of describing the swing.</p>
 
 <section class="level3" id="charge-combat">
 <h3>8.6.1 Charge</h3>
-<p>Move up to two range bands toward an enemy (e.g., Far → Near → Close) and make one melee attack.</p>
+<p>Move up to two range bands toward an enemy (e.g., Far → Reach → Near) and make one melee attack. The track is four bands long, so a charge from Far arrives at Near &mdash; sword distance &mdash; and not in the target's face. Closing the last band takes another turn, or a talent.</p>
 <ul>
 <li>Costs 1 Fatigue.</li>
 <li>Your next defense is Desperate.</li>
@@ -5377,9 +5405,10 @@ number instead of describing the swing.</p>
 <tr><th>Band</th><th>Default Notes</th></tr>
 </thead>
 <tbody>
-<tr><td>Close</td><td>Touching; grapples, knives. Polearms from Near at Limited Effect.</td></tr>
-<tr><td>Near</td><td>Assumed same room/street segment; quick step away.</td></tr>
-<tr><td>Far</td><td>Distant same site; needs time/route/long implement.</td></tr>
+<tr><td>Close</td><td>Touching; grapples, knives. Inside the arc of anything longer.</td></tr>
+<tr><td>Near</td><td>A step and a swing; one-handed weapons at their best.</td></tr>
+<tr><td>Reach</td><td>A haft away; spear, polearm, greatsword. Ranged weapons treat this as Near.</td></tr>
+<tr><td>Far</td><td>Distant same site; beyond every melee weapon. Needs time or a route.</td></tr>
 <tr><td>Absent</td><td>Off-screen; needs cut or travel to interact.</td></tr>
 </tbody>
 </table>
@@ -5481,7 +5510,7 @@ number instead of describing the swing.</p>
 <div class="panel panel-blue">
 <ul>
 <li>Each turn: 1 Action + 1 Move.</li>
-<li>Move: shift one range band (Close ↔ Near ↔ Far).</li>
+<li>Move: shift one range band (Close ↔ Near ↔ Reach ↔ Far).</li>
 <li>Dash (Action): move two bands; next defense Desperate.</li>
 <li>Disengage (Action): then Move does not provoke opportunity attacks; cannot Attack this turn.</li>
 <li>Charge/Skirmish (Full Turn): move two bands and attack; costs 1 Fatigue; next defense Desperate; requires open ground.</li>

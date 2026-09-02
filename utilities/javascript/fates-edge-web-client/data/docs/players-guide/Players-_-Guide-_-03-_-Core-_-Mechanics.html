@@ -618,7 +618,7 @@ one roll, one consequence.</p>
 <h3>Turn Economy (Quick Rules)</h3>
 <p>Each character takes <strong>1 Action and 1 Move</strong> on their turn. Actions and Moves may be taken in any order; repeating the same Action is not allowed unless noted.</p>
 
-<p><strong>Move:</strong> Traverse up to <strong>one range band</strong> (Close &rarr; Near &rarr; Far, or the reverse).</p>
+<p><strong>Move:</strong> Traverse up to <strong>one range band</strong> (Close &rarr; Near &rarr; Reach &rarr; Far, or the reverse).</p>
 <ul>
   <li><strong>Stand:</strong> Use your Move to stand from prone.</li>
 </ul>
@@ -647,7 +647,7 @@ one roll, one consequence.</p>
 </div>
 
 <h4>Sidestep Strike (Closing or Stepping Back)</h4>
-<p>As part of a melee attack action, you may move <strong>one range band</strong> (Close &harr; Near, or Near &harr; Far) without using your Move action for the turn. If you do so, your Position for that attack worsens by one step (e.g., Controlled becomes Desperate, Dominant becomes Controlled). You cannot also use your regular Move action in the same turn.</p>
+<p>As part of a melee attack action, you may move <strong>one range band</strong> (Close &harr; Near, Near &harr; Reach, or Reach &harr; Far) without using your Move action for the turn. If you do so, your Position for that attack worsens by one step (e.g., Controlled becomes Desperate, Dominant becomes Controlled). You cannot also use your regular Move action in the same turn.</p>
 <p>This represents a daring lunge to close distance or a quick step back to create space, sacrificing safety for tactical positioning.</p>
 <ul>
   <li><strong>Example (Rogue):</strong> Lyra is at Near range with a knife (light weapon). She declares a Sidestep Strike, moving into Close range as she attacks. Her Position drops from Controlled to Desperate, but she now benefits from the knife's Close bonus (+2d). She rolls with the Desperate re-roll (successes are re-rolled once) but gets +2 dice from her weapon.</li>
@@ -681,7 +681,7 @@ one roll, one consequence.</p>
     <span class="panel-title">Combat in Brief</span>
     <ul>
         <li><strong>Turn:</strong> 1 Action + 1 Move.</li>
-        <li><strong>Move:</strong> Close &harr; Near &harr; Far.</li>
+        <li><strong>Move:</strong> Close &harr; Near &harr; Reach &harr; Far.</li>
         <li><strong>Attack:</strong> Roll Attribute + Skill vs. DV (enemy's defense). Ranged attack while in Close range &rarr; Desperate.</li>
         <li><strong>Shove:</strong> Opposed Body + Athletics vs. Body + Athletics. Push target one band.</li>
         <li><strong>Grapple:</strong> Opposed Body + Melee vs. Body + Athletics. Both Engaged; target suffers -1 die.</li>
@@ -711,14 +711,17 @@ one roll, one consequence.</p>
 <h3>Melee Modifiers</h3>
 <div class="table-wrap">
 <table>
-<thead><tr><th>Weight</th><th>Close</th><th>Near</th><th>Notes</th></tr></thead>
+<thead><tr><th>Weight</th><th>Close</th><th>Near</th><th>Reach</th><th>Notes</th></tr></thead>
 <tbody>
-<tr><td>Light</td><td>+2d</td><td>+1d</td><td>Quick in tight quarters</td></tr>
-<tr><td>Medium</td><td>+1d</td><td>+2d</td><td>Set once/scene or -1d first attack</td></tr>
-<tr><td>Heavy</td><td>-1d</td><td>+3d</td><td>Set once/scene or -2d first attack</td></tr>
+<tr><td>Light</td><td>+2d</td><td>+1d</td><td>&mdash;</td><td>Quick in tight quarters</td></tr>
+<tr><td>Medium</td><td>+1d</td><td>+2d</td><td>&mdash;</td><td>Set once/scene or -1d first attack</td></tr>
+<tr><td>Heavy</td><td>-1d</td><td>+3d</td><td>+0d</td><td>Set once/scene or -2d first attack</td></tr>
 </tbody>
 </table>
 </div>
+
+<p><strong>Reach</strong> is the band a haft crosses and a sword does not &mdash; spear, polearm, greatsword. Heavy weapons threaten it natively, at no bonus: it is where they can reach, not where they hit hardest. A Light or Medium weapon threatens it only with the <code>Hafted</code> tag, also at +0d. A dash means the weapon does not threaten that band at all.</p>
+<p class="text-sm text-muted">Weight and distance never share a word: no weapon is Close or Reach, and no band is Light, Medium or Heavy. "A Medium weapon at Near range" reads exactly one way.</p>
 
 <h3>Ranged &amp; Tempo</h3>
 <p>Ranged weapons have a <strong>Tempo</strong> that determines how they interact with movement, aiming, and reloading.</p>
@@ -729,10 +732,11 @@ one roll, one consequence.</p>
   <dt>Standard</dt>
   <dd>You may either <strong>Move</strong> or <strong>Shoot</strong> on your turn, not both. As a special action, you may <strong>Aim</strong> (gain +1d or +1 Effect on your next shot), but Aim replaces your attack that turn. <em>Examples:</em> longbow, heavy crossbow (if pre-loaded), musket.</dd>
   <dt>Slow</dt>
-  <dd>The weapon requires a <strong>full round to load</strong> (or set/brace). <em>Round 1:</em> Use your action to load (no attack). You may still move, but moving while loading is at Desperate Position unless you have a talent. <em>Round 2:</em> Shoot (and may move afterwards). Then you must reload again for another shot. <em>Examples:</em> ballista, hand-cannon, heavy arquebus.</dd>
+  <dd>The weapon requires a <strong>full round to load</strong> (or set/brace). <em>Round 1:</em> Use your action to load (no attack). You may still move, but moving while loading is at Desperate Position unless you have a talent. <em>Round 2:</em> Shoot (and may move afterwards). Then you must reload again for another shot. <em>Examples:</em> ballista, hand-cannon, heavy arquebus.
+  <p class="text-sm text-muted mt-1">Your Action and your Move can be taken in either order, so load <em>after</em> moving on round 1 and shoot <em>before</em> moving on round 2: the load and the shot land back to back and you still move both rounds. The cost of a Slow weapon is not lost time, it is that everyone else acts between the two &mdash; you have told the table where you will be and what you are about to do.</p></dd>
 </dl>
 
-<p><strong>Ranged Modifiers by Weight</strong></p>
+<p><strong>Ranged Modifiers by Weight.</strong> Note that Close is a <em>Position</em>, not a dice modifier &mdash; a bow is not harder to aim at arm's length, it is harder to survive using. <strong>Ranged weapons treat Reach as Near</strong>; an archer does not care whether the spear is at sword distance or haft distance.</p>
 <div class="table-wrap">
 <table>
 <thead><tr><th>Weight</th><th>Tempo</th><th>Close</th><th>Near</th><th>Far</th></tr></thead>
@@ -757,7 +761,11 @@ one roll, one consequence.</p>
 </div>
 
 <h3>Weapon Tags (Optional, +4 XP each, max 2)</h3>
-<p>Reach, Close, Accurate, Brutal, Hook, Concealable, Quickdraw, Two-Handed, Off-Hand.</p>
+<p><code>Hafted</code>, <code>Infighting</code>, Accurate, Brutal, Hook, Concealable, Quickdraw, Two-Handed, Off-Hand.</p>
+<ul>
+  <li><strong>Hafted</strong> &mdash; a spear, quarterstaff or light polearm. A Light or Medium weapon with this tag threatens the <strong>Reach</strong> band at +0d, which its weight class otherwise cannot.</li>
+  <li><strong>Infighting</strong> &mdash; built for the press: a buckler-spike, a main-gauche, a cut-down blade. +1d at <strong>Close</strong>.</li>
+</ul>
 
 <h3>Shields (Optional)</h3>
 <div class="table-wrap">

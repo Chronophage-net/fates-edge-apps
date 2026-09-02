@@ -891,7 +891,7 @@
 <h2>Combat in Brief</h2>
 <ul>
     <li><strong>Turn:</strong> 1 Action + 1 Move</li>
-    <li><strong>Move:</strong> Shift one range band (Close ↔ Near ↔ Far)</li>
+    <li><strong>Move:</strong> Shift one range band (Close ↔ Near ↔ Reach ↔ Far)</li>
     <li><strong>Opportunity Attack:</strong> Leaving Close range without Disengage provokes one free melee attack.</li>
     <li><strong>Sidestep Strike:</strong> Move one band as part of melee attack; worsen Position by one step.</li>
 </ul>
@@ -899,11 +899,11 @@
 <h2>Weapon Modifiers</h2>
 <h3>Melee Weapons</h3>
 <div class="table-wrap"><table>
-    <thead><tr><th>Weight</th><th>Close</th><th>Near</th></tr></thead>
+    <thead><tr><th>Weight</th><th>Close</th><th>Near</th><th>Reach</th></tr></thead>
     <tbody>
-        <tr><td>Light</td><td>+2d</td><td>+1d</td></tr>
-        <tr><td>Medium</td><td>+1d</td><td>+2d</td></tr>
-        <tr><td>Heavy</td><td><span class="math">−1</span>d</td><td>+3d</td></tr>
+        <tr><td>Light</td><td>+2d</td><td>+1d</td><td>—</td></tr>
+        <tr><td>Medium</td><td>+1d</td><td>+2d</td><td>—</td></tr>
+        <tr><td>Heavy</td><td><span class="math">−1</span>d</td><td>+3d</td><td>+0d</td></tr>
     </tbody>
 </table></div>
 
@@ -916,12 +916,15 @@
         <tr><td>Heavy</td><td>Desperate</td><td>+1d</td><td>+3d</td></tr>
     </tbody>
 </table></div>
+<p class="text-sm text-muted">Close is a <em>Position</em> for ranged, not a dice modifier. Ranged weapons treat <strong>Reach</strong> as Near. A Light or Medium melee weapon reaches the Reach band only with the <code>Hafted</code> tag, at +0d.</p>
 
 <h2>Range Bands</h2>
 <ul>
-    <li><strong>Close:</strong> Touching distance</li>
-    <li><strong>Near:</strong> Same room/area—a rush away</li>
-    <li><strong>Far:</strong> Same site but distant—requires route or time</li>
+    <li><strong>Close:</strong> Touching distance — hands, knives</li>
+    <li><strong>Near:</strong> A step and a swing — one-handed weapons at their best</li>
+    <li><strong>Reach:</strong> A haft away — spear, polearm, greatsword. Ranged weapons treat this as Near</li>
+    <li><strong>Far:</strong> Same site but distant — beyond every melee weapon; requires route or time</li>
+    <li><strong>Absent:</strong> Off-screen — a state, not a distance</li>
 </ul>
 
 <h2>Skill Synergies — Creative Pairs</h2>
