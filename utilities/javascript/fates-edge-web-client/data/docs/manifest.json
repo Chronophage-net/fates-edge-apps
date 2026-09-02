@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-02T23:35:35.088Z",
+  "generated": "2026-09-02T23:56:13.697Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -675,6 +675,16 @@
       "active": true
     },
     {
+      "id": "the_censor_s_daughter",
+      "title": "The Censor'S Daughter",
+      "file": "Fates_-_Edge_-_-The-_-Censor's-_-Daughter.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_complete_guide_to_subclasses",
       "title": "The Complete Guide To Subclasses",
       "file": "Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Subclasses.html",
@@ -1029,7 +1039,7 @@
       "active": true
     }
   ],
-  "total_count": 67,
-  "active_count": 67,
+  "total_count": 68,
+  "active_count": 68,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
