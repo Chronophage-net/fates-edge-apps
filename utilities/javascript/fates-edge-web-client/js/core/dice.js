@@ -404,7 +404,10 @@ function performDicePoolRoll(pool, dv, options = {}) {
             });
             // Recalculate successes and story beats
             successes = countSuccesses(dice);
-            storyBeats = dice.filter(r => r === 1).length;
+            // Story Beats are counted additively: a re-rolled 1 keeps the beat
+            // it already earned (SRD 18.1), and a new 1 adds another.
+            storyBeats = initialDice.filter(r => r === 1).length +
+                         rerollResults.filter(r => r === 1).length;
         }
     } else if (position === 'desperate') {
         // Re-roll successes (dice >= 6)
@@ -423,7 +426,10 @@ function performDicePoolRoll(pool, dv, options = {}) {
             });
             // Recalculate successes and story beats
             successes = countSuccesses(dice);
-            storyBeats = dice.filter(r => r === 1).length;
+            // Story Beats are counted additively: a re-rolled 1 keeps the beat
+            // it already earned (SRD 18.1), and a new 1 adds another.
+            storyBeats = initialDice.filter(r => r === 1).length +
+                         rerollResults.filter(r => r === 1).length;
         }
     }
     
@@ -451,9 +457,12 @@ function performDicePoolRoll(pool, dv, options = {}) {
             if (hasExploded) {
                 currentDice = newDice;
                 dice = [...dice, ...newDice];
-                // Update successes and story beats
                 successes = countSuccesses(dice);
-                storyBeats = dice.filter(r => r === 1).length;
+                // Add only the beats from the newly exploded dice. Recomputing
+                // from the whole pool here would undo the additive count the
+                // Position re-roll above established, erasing a re-rolled 1's
+                // beat all over again.
+                storyBeats += newDice.filter(r => r === 1).length;
             }
         }
     }

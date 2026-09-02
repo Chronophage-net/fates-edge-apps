@@ -116,3 +116,45 @@ describe('dice: a re-rolled 1 keeps its Story Beat', () => {
         }
     });
 });
+
+// ============================================================
+// REGRESSION: roller.js counts Story Beats additively too
+// ============================================================
+//
+// core/dice.js performRoll() was fixed to keep a re-rolled 1's Story Beat, but
+// the character roller has its OWN re-roll implementation and was still
+// recomputing beats from the final pool. Its Position re-rolls happened not to
+// hit 1s (Dominant deliberately skipped them), but a TALENT-granted re-roll
+// selects any die under 6 — so a talent that re-rolls a failure would silently
+// delete the beat that failure had earned.
+
+import { storyBeatsFor } from '../../js/features/characters/roller.js';
+
+describe('roller: a re-rolled 1 keeps its Story Beat', () => {
+
+    it('counts a beat for every 1 ever shown, not every 1 still showing', () => {
+        // rolled a 1, re-rolled it into a 7: the beat was earned and stands
+        assertEqual(storyBeatsFor([1, 5, 8], [{ index: 0, old: 1, new: 7 }]), 1);
+    });
+
+    it('adds a second beat when the re-roll is also a 1', () => {
+        // SRD 18.1: "if the re-rolled die also shows 1, it generates additional SB"
+        assertEqual(storyBeatsFor([1, 5, 8], [{ index: 0, old: 1, new: 1 }]), 2);
+    });
+
+    it('adds a beat when a non-1 is re-rolled into a 1', () => {
+        assertEqual(storyBeatsFor([4, 5, 8], [{ index: 0, old: 4, new: 1 }]), 1);
+    });
+
+    it('is unchanged when nothing was re-rolled', () => {
+        assertEqual(storyBeatsFor([1, 1, 6, 10], []), 2);
+        assertEqual(storyBeatsFor([4, 5, 6], []), 0);
+    });
+
+    it('handles several re-rolls without losing earlier beats', () => {
+        assertEqual(
+            storyBeatsFor([1, 1, 3], [{ index: 0, old: 1, new: 9 }, { index: 2, old: 3, new: 1 }]),
+            3
+        );
+    });
+});

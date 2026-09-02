@@ -412,6 +412,25 @@ function order_index(position) {
 }
 
 /**
+ * Story Beats for a roll, counted additively.
+ *
+ * SRD 18.1: "Each die result of 1 generates 1 SB. Re-rolling a 1 does not
+ * erase its SB; if the re-rolled die also shows 1, it generates additional SB."
+ *
+ * So a beat is owed for every 1 that was ever SHOWN, not for every 1 still
+ * showing at the end. Counting the final pool — which is what countResults()
+ * does — silently deletes the beat a re-rolled 1 had already earned.
+ *
+ * @param {number[]} rawDice        the pool as first rolled
+ * @param {Array}    reRolledDice   [{ index, old, new }] in the order applied
+ */
+export function storyBeatsFor(rawDice, reRolledDice) {
+    let beats = rawDice.filter(d => d === 1).length;
+    for (const rr of reRolledDice) beats += (rr.new === 1 ? 1 : 0);
+    return beats;
+}
+
+/**
  * Count successes, story beats, and handle 10s
  */
 function countResults(dice) {
@@ -446,8 +465,15 @@ function applyPositionRerolls(dice, position) {
     let workingDice = [...dice];
     
     if (position === 'dominant') {
-        // Re-roll one failure (2-5, not 1)
-        const failIdx = workingDice.findIndex(d => d >= 2 && d <= 5);
+        // Re-roll one failure (die <= 5). A 1 IS a failure and IS eligible —
+        // it used to be excluded here to stop its Story Beat being erased,
+        // which is no longer a risk: storyBeatsFor() below counts beats
+        // additively, so a re-rolled 1 keeps the beat it already earned
+        // (SRD 18.1). Pick the lowest, matching core/dice.js performRoll().
+        let failIdx = -1;
+        for (let i = 0; i < workingDice.length; i++) {
+            if (workingDice[i] <= 5 && (failIdx === -1 || workingDice[i] < workingDice[failIdx])) failIdx = i;
+        }
         if (failIdx >= 0) {
             const oldVal = workingDice[failIdx];
             const newVal = Math.floor(Math.random() * 10) + 1;
@@ -455,8 +481,13 @@ function applyPositionRerolls(dice, position) {
             reRolledDice.push({ index: failIdx, old: oldVal, new: newVal });
         }
     } else if (position === 'desperate') {
-        // Re-roll one success (6-9, not 10 — 10s are never re-rolled)
-        const successIdx = workingDice.findIndex(d => d >= 6 && d <= 9);
+        // Re-roll one success (6-9, not 10 — 10s are never re-rolled).
+        // Lowest eligible, matching core/dice.js performRoll().
+        let successIdx = -1;
+        for (let i = 0; i < workingDice.length; i++) {
+            if (workingDice[i] >= 6 && workingDice[i] <= 9 &&
+                (successIdx === -1 || workingDice[i] < workingDice[successIdx])) successIdx = i;
+        }
         if (successIdx >= 0) {
             const oldVal = workingDice[successIdx];
             const newVal = Math.floor(Math.random() * 10) + 1;
@@ -523,8 +554,10 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
     // Apply position re-rolls
     let { dice, reRolledDice } = applyPositionRerolls(rawDice, poolInfo.positionAfterFatigue);
 
-    // Count results
+    // Count results. Successes come from the final dice; Story Beats do NOT —
+    // see storyBeatsFor().
     let counts = countResults(dice);
+    counts.storyBeats = storyBeatsFor(rawDice, reRolledDice);
 
     // Determine outcome
     let outcome = determineOutcome(counts.successes, dv, counts.storyBeats);
@@ -543,6 +576,7 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
             reRolledDice.push({ index: failIdx, old: oldVal, new: newVal, talent: true });
         }
         counts = countResults(dice);
+        counts.storyBeats = storyBeatsFor(rawDice, reRolledDice);
         outcome = determineOutcome(counts.successes, dv, counts.storyBeats);
     }
 
