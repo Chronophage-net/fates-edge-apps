@@ -47,7 +47,7 @@ export const SENDER_TYPES = {
 // Updated common rolls to match character skill names (lowercase, full names)
 export const COMMON_ROLLS = {
     Stealth: { attr: 'body', skill: 'stealth' },
-    Investigate: { attr: 'wits', skill: 'investigation' },
+    Investigate: { attr: 'wits', skill: 'insight' },
     Perception: { attr: 'wits', skill: 'insight' },          // using insight for perception
     Athletics: { attr: 'body', skill: 'athletics' },
     Acrobatics: { attr: 'body', skill: 'athletics' },
@@ -55,7 +55,7 @@ export const COMMON_ROLLS = {
     Deception: { attr: 'presence', skill: 'deception' },
     Insight: { attr: 'spirit', skill: 'insight' },
     Survival: { attr: 'body', skill: 'endurance' },          // using endurance for survival
-    Medicine: { attr: 'wits', skill: 'medicine' },
+    Medicine: { attr: 'wits', skill: 'craft' },            // Craft is lay knowledge; a body is a thing you mend
     Arcana: { attr: 'spirit', skill: 'arcana' },
     Intimidation: { attr: 'presence', skill: 'sway' },       // using sway for intimidation
 };

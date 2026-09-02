@@ -142,7 +142,7 @@ export function renderCraftingTab(char, ingredientMap, recipeMap, refinementMap,
                     <input type="text" id="recipe-search" class="crafting-input" placeholder="Search..." value="${escHtml(uiState.recipeSearchQuery)}" />
                     <select id="recipe-skill-filter" class="crafting-select">
                         <option value="all" ${uiState.recipeSkillFilter === 'all' ? 'selected' : ''}>All Skills</option>
-                        ${['craft', 'medicine', 'lore', 'arcana'].map(s => `<option value="${s}" ${uiState.recipeSkillFilter === s ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}
+                        ${['craft', 'lore', 'arcana'].map(s => `<option value="${s}" ${uiState.recipeSkillFilter === s ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}
                     </select>
                     <select id="recipe-tier-filter" class="crafting-select">
                         <option value="all" ${uiState.recipeTierFilter === 'all' ? 'selected' : ''}>All Tiers</option>

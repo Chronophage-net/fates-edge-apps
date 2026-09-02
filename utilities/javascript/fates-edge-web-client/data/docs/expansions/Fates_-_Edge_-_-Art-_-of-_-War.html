@@ -567,7 +567,7 @@
 <div class="table-wrap">
 <table>
 <tr><th>Action</th><th>Roll</th><th>Effect</th></tr>
-<tr><td>Rally (Commander)</td><td>Presence + Command vs. DV (Cohesion deficit)</td><td>Restore up to 2 Cohesion on success; partial restores 1</td></tr>
+<tr><td>Rally (Commander)</td><td>Presence + Sway vs. DV (Cohesion deficit)</td><td>Restore up to 2 Cohesion on success; partial restores 1</td></tr>
 <tr><td>Flank</td><td>Tactics vs. enemy Command (opposed)</td><td>Success: +1 Position on next attack. Critical: +2 Position (Dominant)</td></tr>
 <tr><td>Feint</td><td>Deception vs. enemy Perception (opposed)</td><td>Success: next friendly action gains +1 Position. Partial: both sides −1 Position</td></tr>
 <tr><td>Set Against Charge</td><td>Tactics + Command (DV 3)</td><td>Success: +2 Effect vs. charging enemies this round. Failure: Desperate vs. charges</td></tr>
@@ -588,7 +588,7 @@
 <tr><th>Terrain</th><th>Movement</th><th>Cover</th><th>Visibility</th><th>Bonuses</th><th>Penalties</th></tr>
 <tr><td>Open Field</td><td>Normal</td><td>None (or limited)</td><td>Good</td><td>Cavalry charge, artillery, mass formations</td><td>Vulnerable to ranged attacks, no cover</td></tr>
 <tr><td>Hill</td><td>Up 1.5×, down normal</td><td>Partial (on ridge)</td><td>Good from top, limited from bottom</td><td>+1 Position for defenders on high ground</td><td>Slower movement uphill</td></tr>
-<tr><td>Forest</td><td>0.5×</td><td>Good (trees)</td><td>Poor (~2–3 cells)</td><td>Ambush, skirmishers, concealment</td><td>No cavalry charges; reduced missile range; −1 Command</td></tr>
+<tr><td>Forest</td><td>0.5×</td><td>Good (trees)</td><td>Poor (~2–3 cells)</td><td>Ambush, skirmishers, concealment</td><td>No cavalry charges; reduced missile range; −1 Sway</td></tr>
 <tr><td>Marsh</td><td>0.25× or impossible</td><td>None</td><td>Poor (fog)</td><td>Defensive position; slows enemy</td><td>Vulnerable to fire; −1 Melee; heavy units become Desperate</td></tr>
 <tr><td>Urban/Ruin</td><td>0.5× (streets), variable (buildings)</td><td>Good (buildings)</td><td>Limited (blind corners)</td><td>Defensive advantage; ambush; small-unit tactics</td><td>Large units suffer −1 Position; no cavalry; command and control difficult</td></tr>
 <tr><td>Water</td><td>0.5× wading, boats needed for deep water</td><td>None</td><td>Poor (mists, reflections)</td><td>Defensive barrier; slows enemy</td><td>Vulnerable while crossing; heavy units are Desperate</td></tr>
@@ -681,7 +681,7 @@
 <table>
 <caption>Turn Sequence</caption>
 <tr><th>Phase</th><th>What Happens</th></tr>
-<tr><td>Command</td><td>Commanders issue orders and make Command rolls; objectives update</td></tr>
+<tr><td>Command</td><td>Commanders issue orders and make Sway rolls; objectives update</td></tr>
 <tr><td>Movement</td><td>Units move per orders, using movement rates and terrain rules</td></tr>
 <tr><td>Ranged</td><td>Missile units and artillery fire; area attacks resolve</td></tr>
 <tr><td>Melee</td><td>Engaged units fight; special actions (charge, breach, etc.) resolve</td></tr>
@@ -710,7 +710,7 @@
 <div class="panel panel-red">
     <strong>Routing</strong>
     <p class="text-sm mt-1">When a unit's Cohesion reaches 0, or it fails a Morale check, it routs: it moves at double speed away from the enemy, drops all formation bonuses, is treated as Desperate for all purposes, and other units suffer −1 Morale in sympathy.</p>
-    <p class="text-sm mt-1"><strong>Rallying:</strong> a commander's Rally action (Presence + Command vs. DV equal to the unit's Cohesion deficit) stops the rout and reforms the unit at Cohesion 1 on success, or Cohesion 2 on a critical success.</p>
+    <p class="text-sm mt-1"><strong>Rallying:</strong> a commander's Rally action (Presence + Sway vs. DV equal to the unit's Cohesion deficit) stops the rout and reforms the unit at Cohesion 1 on success, or Cohesion 2 on a critical success.</p>
 </div>
 
 <p class="text-sm">Mass combat should feel costly. Each unit that routs or is destroyed suffers permanent casualties, tracked as Lost Cohesion that may take weeks to recover; mercenaries who take heavy losses may demand higher pay or leave outright. In the aftermath, units need time to recover, supplies must be replenished, morale must be rebuilt, and the dead must be buried.</p>
@@ -748,7 +748,7 @@
 <tr><td>Miss</td><td>All units act at −1 Position; commander may spend 1 Boon to negate</td></tr>
 </table>
 </div>
-<p class="text-sm"><strong>Orders:</strong> Simple ("Advance," "Hold," "Fall Back") need no roll. Complex ("Flank," "Charge," "Feint") roll Presence + Tactics. Special ("Rally," "Breach," "Screen," "Set") require a specific roll.</p>
+<p class="text-sm"><strong>Orders:</strong> Simple ("Advance," "Hold," "Fall Back") need no roll. Complex ("Flank," "Charge," "Feint") roll Presence + Insight. Special ("Rally," "Breach," "Screen," "Set") require a specific roll.</p>
 
 <div class="table-wrap">
 <table>
@@ -785,14 +785,14 @@
 <div class="table-wrap">
 <table>
 <tr><th>Action</th><th>Roll</th><th>Effect</th></tr>
-<tr><td>Command Roll</td><td>Presence + Tactics</td><td>Critical: all units +1 Position this round. Success: units act normally. Partial: one unit +1 Position, one −1 Position. Miss: all units −1 Position</td></tr>
-<tr><td>Rally</td><td>Presence + Command</td><td>Restore Cohesion to a routing or shaken unit</td></tr>
+<tr><td>Command Roll</td><td>Presence + Insight</td><td>Critical: all units +1 Position this round. Success: units act normally. Partial: one unit +1 Position, one −1 Position. Miss: all units −1 Position</td></tr>
+<tr><td>Rally</td><td>Presence + Sway</td><td>Restore Cohesion to a routing or shaken unit</td></tr>
 <tr><td>Inspiring Speech</td><td>Presence + Performance</td><td>All units within hearing gain +1 Morale for one round (+2 on a critical)</td></tr>
-<tr><td>Tactical Assessment</td><td>Wits + Tactics</td><td>Ask the GM one question about enemy dispositions</td></tr>
+<tr><td>Tactical Assessment</td><td>Wits + Insight</td><td>Ask the GM one question about enemy dispositions</td></tr>
 <tr><td>Decisive Intervention</td><td>Physical combat</td><td>Commander enters combat personally: +1 Morale to troops, but −2 Morale to the army if the commander is incapacitated</td></tr>
 </table>
 </div>
-<p class="text-sm">A commander may spend 1 Boon to reroll a Command roll, grant +1 Position to one unit this round, or grant +2 Morale to one unit for one round.</p>
+<p class="text-sm">A commander may spend 1 Boon to reroll a Sway roll, grant +1 Position to one unit this round, or grant +2 Morale to one unit for one round.</p>
 
 <h3>9.3 Heroes on the Battlefield</h3>
 <p class="text-sm">PCs in mass combat are heroes: they can lead units as their commander, fight as champions against enemy champions or dangerous units, perform special actions (sabotage, scouting, magical support), or otherwise change the course of the battle.</p>
@@ -803,7 +803,7 @@
 <tr><th>Action</th><th>Roll</th><th>Effect</th></tr>
 <tr><td>Duel</td><td>Standard combat</td><td>Engage an enemy commander or champion; the outcome affects morale on both sides</td></tr>
 <tr><td>Sabotage</td><td>Stealth, Craft, etc.</td><td>Enemy loses a Resource, suffers a Morale penalty, or loses a key unit</td></tr>
-<tr><td>Scout</td><td>Wits + Lore (or appropriate)</td><td>+1 Position on the next Command roll</td></tr>
+<tr><td>Scout</td><td>Wits + Lore (or appropriate)</td><td>+1 Position on the next Sway roll</td></tr>
 <tr><td>Magic</td><td>Appropriate skill</td><td>Area attacks, buffs, debuffs, communication</td></tr>
 </table>
 </div>
@@ -850,9 +850,9 @@
 <tr><th>Action</th><th>Roll</th><th>Success</th><th>Partial</th><th>Miss</th></tr>
 <tr><td>Bombard</td><td>Artillery + Resources</td><td>Damage walls; defender casualties; advance Siege Timer</td><td>Damage walls; limited casualties</td><td>Limited damage; Resources lost; no advance</td></tr>
 <tr><td>Assault</td><td>Melee + Cap</td><td>Foothold gained; Siege Timer +2</td><td>Foothold gained; lose a unit</td><td>Repulsed; lose a unit</td></tr>
-<tr><td>Mine</td><td>Craft + Tactics</td><td>Breach created; advance Siege Timer</td><td>Tunnel collapses; lose a Resource</td><td>Tunnel discovered; counter-mined</td></tr>
+<tr><td>Mine</td><td>Craft + Insight</td><td>Breach created; advance Siege Timer</td><td>Tunnel collapses; lose a Resource</td><td>Tunnel discovered; counter-mined</td></tr>
 <tr><td>Negotiate</td><td>Presence + Sway</td><td>Defenders consider terms; lower Defender Timer</td><td>Terms considered but not accepted</td><td>Terms rejected; defender morale rises</td></tr>
-<tr><td>Relieve</td><td>Melee + Tactics</td><td>Relief force arrives; siege broken</td><td>Relief delayed; both sides lose a unit</td><td>Relief force defeated; siege continues</td></tr>
+<tr><td>Relieve</td><td>Melee + Insight</td><td>Relief force arrives; siege broken</td><td>Relief delayed; both sides lose a unit</td><td>Relief force defeated; siege continues</td></tr>
 </table>
 </div>
 
@@ -862,8 +862,8 @@
 <tr><th>Action</th><th>Roll</th><th>Success</th><th>Partial</th><th>Miss</th></tr>
 <tr><td>Repair</td><td>Craft + Resources</td><td>Walls repaired; Siege Timer retreats</td><td>Partial repair; limited effect</td><td>No repair; Resources lost</td></tr>
 <tr><td>Sortie</td><td>Melee + Cap</td><td>Casualties inflicted; siege slowed</td><td>Casualties inflicted; lose a unit</td><td>Repulsed; lose a unit</td></tr>
-<tr><td>Counter-Mine</td><td>Wits + Tactics</td><td>Enemy mine destroyed</td><td>Mine detected but not destroyed</td><td>Mine collapses your own walls</td></tr>
-<tr><td>Rally</td><td>Presence + Command</td><td>Morale restored; Defender Timer retreats</td><td>Partial restoration</td><td>Morale falls further</td></tr>
+<tr><td>Counter-Mine</td><td>Wits + Insight</td><td>Enemy mine destroyed</td><td>Mine detected but not destroyed</td><td>Mine collapses your own walls</td></tr>
+<tr><td>Rally</td><td>Presence + Sway</td><td>Morale restored; Defender Timer retreats</td><td>Partial restoration</td><td>Morale falls further</td></tr>
 </table>
 </div>
 
@@ -987,7 +987,7 @@
     </div>
 </div>
 
-<p class="text-sm mt-1"><strong>Returning Home:</strong> after a campaign, each soldier makes a Spirit + Resolve roll. Success: unchanged. Partial: gains a permanent Condition. Miss: gains a serious Condition or must leave the campaign. PCs may likewise gain a Condition ("War-Weary," "Haunted," "Hardened") and a Boon ("Combat Veteran," "Network of Contacts," "Heroic Reputation").</p>
+<p class="text-sm mt-1"><strong>Returning Home:</strong> after a campaign, each soldier makes a Spirit + Endurance roll. Success: unchanged. Partial: gains a permanent Condition. Miss: gains a serious Condition or must leave the campaign. PCs may likewise gain a Condition ("War-Weary," "Haunted," "Hardened") and a Boon ("Combat Veteran," "Network of Contacts," "Heroic Reputation").</p>
 
 <div class="table-wrap">
 <table>
@@ -995,7 +995,7 @@
 <tr><th>Scar</th><th>Mechanical Effect</th></tr>
 <tr><td>War-Weary</td><td>−1 on Spirit rolls to resist fear; +1 on Endurance rolls (used to hardship)</td></tr>
 <tr><td>Haunted</td><td>−1 on Wits rolls after a failed rest (nightmares); +1 on Insight rolls (hypervigilance)</td></tr>
-<tr><td>Hardened</td><td>−1 on social rolls requiring empathy; +1 on Command rolls</td></tr>
+<tr><td>Hardened</td><td>−1 on social rolls requiring empathy; +1 on Sway rolls</td></tr>
 <tr><td>Bonded Survivors</td><td>+1 when fighting alongside a specific unit or character; −1 when they are threatened</td></tr>
 </table>
 </div>
@@ -1277,8 +1277,8 @@
 <p class="text-sm"><strong>Campaign Arcs:</strong></p>
 <ol class="text-sm">
     <li><strong>The First Wave</strong> — light horse-archers and conscripts probe the defense. Key decision: commit elite units (risk irreplaceable troops for +2 Position on defense) or use mercenaries as a sacrificial screen (preserve veterans, but risk a morale penalty if the screen breaks).</li>
-    <li><strong>The Siege of the Gate</strong> — siege towers, rams, and sappers batter the main gate. Key decision: hold the gate (+1 Position on defense, slows the siege timer, but a prolonged siege drains supplies) or sortie to burn the siege engines (Wits + Tactics; success destroys an engine and advances Pass Integrity by 2, failure invites a devastating counter-charge).</li>
-    <li><strong>The Winter March</strong> — unable to break the pass directly, the Khanate finds a narrow goat-track that could let them flank the defense. Key decision: abandon the pass for a delaying action in the rear (Tactics roll to set an ambush; success gives Dominant Position and may halt the flank) or trust the track's treachery and hold the pass (no roll, but risk being caught between two attacks if the legend proves false).</li>
+    <li><strong>The Siege of the Gate</strong> — siege towers, rams, and sappers batter the main gate. Key decision: hold the gate (+1 Position on defense, slows the siege timer, but a prolonged siege drains supplies) or sortie to burn the siege engines (Wits + Insight; success destroys an engine and advances Pass Integrity by 2, failure invites a devastating counter-charge).</li>
+    <li><strong>The Winter March</strong> — unable to break the pass directly, the Khanate finds a narrow goat-track that could let them flank the defense. Key decision: abandon the pass for a delaying action in the rear (Insight roll to set an ambush; success gives Dominant Position and may halt the flank) or trust the track's treachery and hold the pass (no roll, but risk being caught between two attacks if the legend proves false).</li>
 </ol>
 <p class="text-sm"><strong>Potential Endings:</strong> <em>Victory</em> (the pass holds, the Khanate's coalition breaks, the king's name becomes a byword for defiance); <em>Broken Alliance</em> (the pass holds but the lowland allies feel betrayed by tactics that favored the stone-warriors, and the kingdom's friendships shatter even as it survives); or <em>The Mountain Falls</em> (the flank succeeds, the kingdom is overrun — but the victors demand tribute and open trade rather than raze the land, crowning their warlord as a new kind of king).</p>
 
@@ -1307,7 +1307,7 @@
 <ol class="text-sm">
     <li><strong>The Crossing of the Steppe</strong> — the migration begins. Key decision: move fast and light (leaving a rearguard vulnerable, +1 Speed) or safe and steady (protecting families at the cost of speed, +1 Cohesion).</li>
     <li><strong>The Siege of the Border Fortresses</strong> — the Compact must take the frontier strongholds. Key decision: starve them out (Logistics roll; success secures the forts without costly assault) or send envoys with generous terms (Presence + Sway; success wins the lords' allegiance and +2 Position for the next phase).</li>
-    <li><strong>The Battle of the Ford</strong> — the kingdom's main army arrives to fight. Key decision: feign a retreat to draw the heavy infantry into a trap (Deception roll; success gives Dominant Position, failure turns the feint into a real rout) or commit the elite riders to a decisive charge on the enemy center (Tactics roll; success shatters the kingdom's army, failure costs the Compact's elite dearly).</li>
+    <li><strong>The Battle of the Ford</strong> — the kingdom's main army arrives to fight. Key decision: feign a retreat to draw the heavy infantry into a trap (Deception roll; success gives Dominant Position, failure turns the feint into a real rout) or commit the elite riders to a decisive charge on the enemy center (Insight roll; success shatters the kingdom's army, failure costs the Compact's elite dearly).</li>
 </ol>
 <p class="text-sm"><strong>Potential Endings:</strong> <em>The New Kingdom</em> (a hybrid steppe-settler state, the khatun its first queen); <em>The Compromise</em> (a semi-autonomous frontier territory under nominal tribute); or <em>The Fracture</em> (a jealous clan-lord's rebellion scatters the Compact before the conquest is complete).</p>
 

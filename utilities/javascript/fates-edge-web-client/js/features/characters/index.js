@@ -71,10 +71,9 @@ import { showToast } from '@components/Toast.js';
 // ============================================================
 
 const ALL_SKILLS = [
-    'Melee', 'Ranged', 'Unarmed', 'Athletics',
-    'Stealth', 'Endurance', 'Craft', 'Sway',
-    'Deception', 'Subterfuge', 'Performance', 'Insight',
-    'Lore', 'Investigation', 'Medicine', 'Arcana'
+    'Melee', 'Ranged', 'Athletics', 'Stealth',
+    'Endurance', 'Craft', 'Sway', 'Deception',
+    'Performance', 'Insight', 'Lore', 'Arcana'
 ];
 
 const TALENT_TIERS = [

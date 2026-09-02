@@ -683,7 +683,7 @@ export function rollForCharacter(id, options = {}) {
     }
     
     // Physical skills take armor penalties; keep in sync with editor.js's ARMOR_TYPES notes.
-    const PHYSICAL_SKILLS = new Set(['melee', 'ranged', 'unarmed', 'athletics']);
+    const PHYSICAL_SKILLS = new Set(['melee', 'ranged', 'athletics']);
 
     // Fatigue-as-Boon (Player's Guide): "If no Boons remaining, pay 1 Fatigue
     // in place of 1 Boon." If the requested boon spend exceeds what the
@@ -1203,7 +1203,7 @@ function handleRollerRoll() {
     // same convenience to the equipment modifiers.
     const state = getState();
     const activeChar = state.characters?.find(c => c.active !== false) || null;
-    const PHYSICAL_SKILLS = new Set(['melee', 'ranged', 'unarmed', 'athletics']);
+    const PHYSICAL_SKILLS = new Set(['melee', 'ranged', 'athletics']);
 
     const note = `Quick roll: ${attrName}+${skillName} (${selectedRegion || 'Acasia'})`;
 

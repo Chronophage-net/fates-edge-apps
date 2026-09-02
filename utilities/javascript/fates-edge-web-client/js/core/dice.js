@@ -206,26 +206,9 @@ if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
  * All available skills in the game
  */
 const ALL_SKILLS = [
-    'Fight',
-    'Shoot',
-    'Pilot',
-    'Fix',
-    'Hack',
-    'Mingle',
-    'Study',
-    'Survive',
-    'Tinker',
-    'Attune',
-    'Command',
-    'Consort',
-    'Finesse',
-    'Hunt',
-    'Prowl',
-    'Sway',
-    'Wreck',
-    'Doctor',
-    'Scout',
-    'Smith'
+    'Melee', 'Ranged', 'Athletics', 'Stealth',
+    'Endurance', 'Craft', 'Sway', 'Deception',
+    'Performance', 'Insight', 'Lore', 'Arcana'
 ];
 
 /**
@@ -233,14 +216,9 @@ const ALL_SKILLS = [
  * A subset of ALL_SKILLS that characters start with
  */
 const defaultSkills = [
-    'Fight',
-    'Shoot',
-    'Pilot',
-    'Fix',
-    'Hack',
-    'Mingle',
-    'Study',
-    'Survive'
+    'Melee', 'Ranged', 'Athletics', 'Stealth',
+    'Endurance', 'Craft', 'Sway', 'Deception',
+    'Performance', 'Insight', 'Lore', 'Arcana'
 ];
 
 // ============================================================

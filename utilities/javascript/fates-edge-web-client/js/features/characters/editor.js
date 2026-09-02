@@ -49,17 +49,15 @@ console.log('[Editor] Module loaded');
 // ============================================================
 
 export const ALL_SKILLS = [
-    'Melee', 'Ranged', 'Unarmed', 'Athletics',
-    'Stealth', 'Endurance', 'Craft', 'Sway',
-    'Deception', 'Subterfuge', 'Performance', 'Insight',
-    'Lore', 'Investigation', 'Medicine', 'Arcana'
+    'Melee', 'Ranged', 'Athletics', 'Stealth',
+    'Endurance', 'Craft', 'Sway', 'Deception',
+    'Performance', 'Insight', 'Lore', 'Arcana'
 ];
 
 export const SKILL_ATTRIBUTES = {
-    melee: 'body', ranged: 'wits', unarmed: 'body', athletics: 'body',
-    stealth: 'wits', endurance: 'body', craft: 'wits', sway: 'presence',
-    deception: 'presence', subterfuge: 'wits', performance: 'presence', insight: 'spirit',
-    lore: 'wits', investigation: 'wits', medicine: 'wits', arcana: 'spirit'
+    melee: 'body', ranged: 'wits', athletics: 'body', stealth: 'wits',
+    endurance: 'body', craft: 'wits', sway: 'presence', deception: 'presence',
+    performance: 'presence', insight: 'spirit', lore: 'wits', arcana: 'spirit'
 };
 
 export const HERITAGES = [

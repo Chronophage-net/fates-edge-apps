@@ -27,20 +27,34 @@ export const DEFAULT_ATTRIBUTES = { body: 1, wits: 1, spirit: 1, presence: 1 };
 export const DEFAULT_SKILLS = {
   melee: 0,
   ranged: 0,
-  unarmed: 0,
   athletics: 0,
   stealth: 0,
   endurance: 0,
   craft: 0,
   sway: 0,
   deception: 0,
-  subterfuge: 0,
   performance: 0,
   insight: 0,
   lore: 0,
-  investigation: 0,
-  medicine: 0,
   arcana: 0,
+};
+
+// Skills retired when the list was consolidated from sixteen to twelve, mapped
+// to the skill that absorbed them. A character saved under the old list keeps
+// their investment: the surviving skill takes the HIGHER of the two ratings, so
+// somebody with Melee 2 and Unarmed 3 ends up with Melee 3 rather than Melee 2.
+// Retired keys are then deleted so they can't linger and be re-displayed.
+export const RETIRED_SKILLS = {
+  unarmed: 'melee',
+  brawl: 'melee',
+  subterfuge: 'deception',
+  investigation: 'insight',
+  tactics: 'insight',
+  medicine: 'craft',
+  ritual: 'lore',
+  survival: 'endurance',
+  command: 'sway',
+  resolve: 'endurance',
 };
 
 // Magic paths
@@ -290,6 +304,15 @@ export function ensureCharacterDefaults(char) {
     if (!char.skills || typeof char.skills !== 'object') {
         char.skills = { ...DEFAULT_SKILLS };
     } else {
+        // Fold any retired skill into the one that absorbed it, keeping the
+        // higher rating, then drop the retired key.
+        for (const [oldKey, newKey] of Object.entries(RETIRED_SKILLS)) {
+            if (char.skills[oldKey] === undefined) continue;
+            const oldVal = Number(char.skills[oldKey]) || 0;
+            const newVal = Number(char.skills[newKey]) || 0;
+            char.skills[newKey] = Math.max(oldVal, newVal);
+            delete char.skills[oldKey];
+        }
         for (const [key, val] of Object.entries(DEFAULT_SKILLS)) {
             if (char.skills[key] === undefined) {
                 char.skills[key] = val;

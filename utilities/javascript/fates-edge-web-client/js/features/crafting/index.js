@@ -333,7 +333,7 @@ function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
     // One roll for the whole batch (rolling per-item would be more
     // granular but adds a lot of UI noise for little mechanical payoff).
     const skillLevel = char.skills?.[recipe.skill] || 0;
-    const attr = recipe.skill === 'medicine' || recipe.skill === 'craft' ? 'wits' : 'spirit';
+    const attr = recipe.skill === 'craft' ? 'wits' : 'spirit';
     const attrValue = char[attr] || 1;
     const pool = attrValue + skillLevel;
     const dv = recipe.dv;

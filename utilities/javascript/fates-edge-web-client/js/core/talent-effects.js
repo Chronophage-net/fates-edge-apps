@@ -47,9 +47,8 @@ const SCOPED_USE = new Set(['once-scene', 'once-session', 'once-arc', 'once-camp
 // ============================================================
 
 const SKILL_KEYS = [
-    'melee', 'ranged', 'unarmed', 'athletics', 'stealth', 'endurance', 'craft',
-    'sway', 'deception', 'subterfuge', 'performance', 'insight', 'lore',
-    'investigation', 'medicine', 'arcana'
+    'melee', 'ranged', 'athletics', 'stealth', 'endurance', 'craft',
+    'sway', 'deception', 'performance', 'insight', 'lore', 'arcana'
 ];
 const ATTR_KEYS = ['body', 'wits', 'spirit', 'presence'];
 
@@ -319,7 +318,7 @@ const SHIELD_DEFEND_NOTE = {
  * Mirrors the structured-effect shape above so armor/weapon bonuses can flow
  * through the same modifier pipeline as talents instead of being display-only.
  * `physicalSkill` should be true when the skill being rolled is Melee/Ranged/
- * Unarmed/Athletics (the "physical skills" armor penalties apply to).
+ * Melee/Athletics (the "physical skills" armor penalties apply to).
  *
  * @param {object} opts
  * @param {string} [opts.armorType]

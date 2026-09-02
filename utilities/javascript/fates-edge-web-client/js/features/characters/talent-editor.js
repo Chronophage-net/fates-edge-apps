@@ -87,7 +87,7 @@ export const TALENT_CATEGORIES = [
     { id: 'defense', label: 'Defense', desc: 'Guarding, shielding, and damage mitigation' },
     { id: 'movement', label: 'Movement', desc: 'Charge, skirmish, mounted combat, and mobility' },
     { id: 'social', label: 'Social', desc: 'Persuasion, deception, networking, and influence' },
-    { id: 'investigation', label: 'Investigation', desc: 'Research, deduction, and information gathering' },
+    { id: 'insight', label: 'Insight', desc: 'Reading people and ground; deduction from evidence' },
     { id: 'other', label: 'Other', desc: 'Doesn\'t fit standard categories' }
 ];
 

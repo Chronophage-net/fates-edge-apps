@@ -24,7 +24,7 @@
  * "Roll & Post" keeps working exactly as before.
  *
  * ── Assumptions worth knowing about (easy to retune below) ──────────────
- * 1. Attribute pairing per skill (SKILL_ATTR_MAP): Melee/Unarmed/Brawl/
+ * 1. Attribute pairing per skill (SKILL_ATTR_MAP): Melee/
  *    Athletics pair with Body; Ranged pairs with Wits (aim/precision);
  *    Tactics pairs with Wits; Command pairs with Presence. If your table
  *    plays it differently, just edit SKILL_ATTR_MAP.
@@ -48,19 +48,18 @@ import { showToast } from '@components/Toast.js';
 
 const SKILL_ATTR_MAP = {
     melee: 'body',
-    unarmed: 'body',
-    brawl: 'body',
     athletics: 'body',
     ranged: 'wits',
-    tactics: 'wits',
-    command: 'presence',
+    insight: 'wits',
+    sway: 'presence',
 };
 
+// Melee covers close combat armed or unarmed, so both buttons roll the same
+// skill. The unarmed button is kept because players reach for it by name.
 const ATTACK_SKILLS = [
     { key: 'melee', label: 'Melee', icon: '⚔️' },
     { key: 'ranged', label: 'Ranged', icon: '🏹' },
-    { key: 'unarmed', label: 'Unarmed', icon: '🥊' },
-    { key: 'brawl', label: 'Brawl', icon: '🥊' },
+    { key: 'melee', label: 'Unarmed', icon: '🥊' },
 ];
 
 // Mirrors characters/editor.js WEAPON_CLASSES close/near dice notes.
