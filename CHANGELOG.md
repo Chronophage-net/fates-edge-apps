@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.6] - 2026-09-02
+
+also_known_as lookup and the Names section
+
+### Added
+- read also_known_as, and show a Names section
+
 ## [5.0.5] - 2026-09-02
 
 Cross-Resonance in the patron browser; travel clock fix

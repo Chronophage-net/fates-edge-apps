@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-socket-server",
-  "version": "5.0.5",
+  "version": "5.0.6",
   "description": "Fate's Edge WebSocket + HTTP server with campaign storage, deck, and character management",
   "main": "server-start.js",
   "type": "commonjs",
