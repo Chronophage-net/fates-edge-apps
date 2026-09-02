@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.2] - 2026-09-02
+
+DV ladder correction synced from fates-edge-docs
+
+### Chore
+- sync the DV ladder correction from fates-edge-docs
+
 ## [5.0.1] - 2026-09-02
 
 ### Other
