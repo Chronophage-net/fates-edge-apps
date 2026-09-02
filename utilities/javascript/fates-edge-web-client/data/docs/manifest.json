@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-01T23:57:52.594Z",
+  "generated": "2026-09-02T12:57:30.459Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -795,6 +795,16 @@
       "active": true
     },
     {
+      "id": "the_paper_table",
+      "title": "The Paper Table",
+      "file": "Fates_-_Edge_-_-The-_-Paper-_-Table.html",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_peoples_die",
       "title": "The Peoples Die",
       "file": "Fates_-_Edge_-_-The-_-Peoples-_-Die.html",
@@ -999,7 +1009,7 @@
       "active": true
     }
   ],
-  "total_count": 64,
-  "active_count": 64,
+  "total_count": 65,
+  "active_count": 65,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
