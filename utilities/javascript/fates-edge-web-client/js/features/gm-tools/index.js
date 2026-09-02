@@ -51,7 +51,8 @@ import {
     quickCrownSpread,
     setSelectedRegion,
     onRegionChange,
-    getRegionData
+    getRegionData,
+    ensureRegionsReady
 } from '@features/decks/index.js';
 import { isConnectedToServer } from '@core/websocket.js';
 
@@ -637,6 +638,13 @@ function render(el) {
                 <h1 class="page-title">⚙️ GM Tools</h1>
                 <p class="page-sub">Manage scenes, campaign tracking, whiteboard, Kanban board, and journey planning.</p>
                 ${isViewOnly ? `<div class="text-muted text-sm" style="color:var(--gold);">👁️ View-only mode: ${reason === 'gm-only' ? 'Only the GM can access these tools.' : 'You have hidden this feature from your sidebar.'}</div>` : ''}
+                <div class="flex gap-1 flex-center flex-wrap mt-1">
+                    <span class="text-sm text-muted">📍 Region:</span>
+                    <select id="gm-region-select" aria-label="Region for deck draws and quick generation" style="max-width:220px;" ${isViewOnly ? 'disabled' : ''}>
+                        <option value="">Loading regions…</option>
+                    </select>
+                    <span class="text-muted text-xs">Shared with the Deck of Consequences.</span>
+                </div>
             </header>
 
             <div class="flex gap-1 flex-center flex-wrap" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -656,6 +664,12 @@ function render(el) {
     `;
 
     attachEvents();
+    // Region discovery is async and must not block the first paint: the
+    // header select renders as "Loading regions…" and is filled in when
+    // this resolves. Doing it here (rather than only on the Consequences
+    // tab) is the point — Quick Generate on the Scene tab needs a region
+    // too, and used to get whatever null fell back to.
+    initRegionControls();
 }
 
 function renderView(view) {
@@ -906,7 +920,7 @@ function renderSceneView() {
                     <button class="btn btn-sm btn-gold" id="gen-npc-btn" ${isViewOnly ? 'disabled' : ''}>👤 NPC</button>
                     <button class="btn btn-sm btn-gold" id="gen-location-btn" ${isViewOnly ? 'disabled' : ''}>📍 Location</button>
                     <button class="btn btn-sm btn-gold" id="gen-rumor-btn" ${isViewOnly ? 'disabled' : ''}>📜 Rumor</button>
-                    <span class="text-muted text-sm mx-auto">Uses current region's deck</span>
+                    <span class="text-muted text-sm mx-auto">Uses the region selected above</span>
                 </div>
                 <div id="quick-gen-result" class="mt-1 panel" style="background:var(--bg3); border-left: 3px solid var(--border);">
                     <span class="text-muted text-sm">Generate an NPC, Location, or Rumor.</span>
@@ -1383,23 +1397,88 @@ async function loadTravelPlannerModule(containerEl) {
 // CONSEQUENCES VIEW EVENTS
 // ============================================================
 
-function attachConsequencesEvents() {
-    const regionSelect = document.getElementById('scene-consequences-region-select');
-    if (regionSelect) {
-        regionSelect.addEventListener('change', async (e) => {
-            try {
-                await setSelectedRegion(e.target.value);
-                showToast(`Region set to ${e.target.value}`, 'info');
-            } catch (err) {
-                showToast('Could not change region', 'error');
-            }
-        });
+// ============================================================
+// REGION
+// ============================================================
+//
+// GM Tools does not own a region — it consumes the one the Deck of
+// Consequences owns, via decks/index.js. It has its own <select> (in the
+// header, so it is visible from every tab, not just Consequences) but
+// that select is a VIEW of shared state, not a second copy of it.
+//
+// Three things were wrong before:
+//
+//  1. Region discovery only ran inside decks' render(). A GM who opened
+//     GM Tools without first visiting Decks got getRegionNames() === []
+//     and getSelectedRegion() === null, so every quick-draw fell back to
+//     the string 'Acasia' and then failed on "No region data loaded."
+//     ensureRegionsReady() now performs that discovery from either side.
+//
+//  2. setSelectedRegion() only loaded the new region's DATA if decks'
+//     own <select> happened to be in the document. Changing the region
+//     from GM Tools therefore moved the name and left regionData on the
+//     previous region — cards drawn from GM Tools were read against the
+//     wrong region's meanings, silently.
+//
+//  3. The only selector lived on the Consequences tab, while Quick
+//     Generate (Scene tab) drew on the region too and merely asserted
+//     "Uses current region's deck" with no way to see or set it.
+
+/** Fill every region <select> GM Tools has rendered and select `current`. */
+function paintRegionSelects(names, current) {
+    const options = names.length
+        ? names.map(n => `<option value="${escHtml(n)}"${n === current ? ' selected' : ''}>${escHtml(n)}</option>`).join('')
+        : '<option value="">No regions found</option>';
+    for (const id of ['gm-region-select', 'scene-consequences-region-select']) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.innerHTML = options;
+        if (current) el.value = current;
     }
-    
-    onRegionChange((regionName) => {
-        const select = document.getElementById('scene-consequences-region-select');
-        if (select) select.value = regionName;
-    });
+}
+
+async function chooseRegion(name) {
+    if (!name) return;
+    try {
+        const ok = await setSelectedRegion(name);
+        if (!ok) return showToast(`Region "${name}" is not available.`, 'error');
+        showToast(`Region set to ${name}`, 'info');
+    } catch (err) {
+        showToast('Could not change region', 'error');
+    }
+}
+
+/** Subscriber kept as a module-level reference so registerRegionChange's
+ *  de-duplication can recognise it across repeated tab renders. */
+function syncRegionSelects(regionName) {
+    for (const id of ['gm-region-select', 'scene-consequences-region-select']) {
+        const el = document.getElementById(id);
+        if (el && regionName) el.value = regionName;
+    }
+}
+
+async function initRegionControls() {
+    onRegionChange(syncRegionSelects);
+    let names = [];
+    try {
+        names = await ensureRegionsReady();
+    } catch (err) {
+        console.warn('[GMTools] Region discovery failed', err);
+    }
+    paintRegionSelects(names, getSelectedRegion());
+
+    for (const id of ['gm-region-select', 'scene-consequences-region-select']) {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.regionBound === '1') continue;
+        el.dataset.regionBound = '1';
+        el.addEventListener('change', e => chooseRegion(e.target.value));
+    }
+}
+
+function attachConsequencesEvents() {
+    // The selector on this tab is repainted and rebound by the shared
+    // region wiring, so it stays in step with the header's.
+    initRegionControls();
 }
 
 // ============================================================
@@ -1884,8 +1963,21 @@ function refreshView() {
     }
 }
 
+// attachEvents() runs on the initial render AND after every tab switch
+// (the tab handler re-renders the view container and calls it again).
+// Anything it binds to an element that OUTLIVES that re-render therefore
+// has to be bound once, or the handler count grows with every click —
+// the leak that froze the crafting panel. Two kinds here: the .gm-tab
+// buttons, which live outside #gm-view-container and survive, and the
+// two document-level listeners at the bottom, which survive everything.
+let documentLevelEventsBound = false;
+
 function attachEvents() {
     document.querySelectorAll('.gm-tab').forEach(tab => {
+        // Per-element, not a module flag: a full render() rebuilds these
+        // buttons, and fresh buttons do need binding.
+        if (tab.dataset.gmTabBound === '1') return;
+        tab.dataset.gmTabBound = '1';
         tab.addEventListener('click', async () => {
             document.querySelectorAll('.gm-tab').forEach(t => t.classList.replace('btn-gold', 'btn-secondary'));
             tab.classList.replace('btn-secondary', 'btn-gold');
@@ -1928,16 +2020,19 @@ function attachEvents() {
         });
     }
     
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && document.activeElement === document.getElementById('scene-tag-input')) {
-            window.addSceneTag();
-        }
-    });
-    
-    document.addEventListener('click', (e) => {
-        const target = e.target.closest('.gm-tag-remove');
-        if (target) window.removeSceneTag(target.dataset.tag);
-    });
+    if (!documentLevelEventsBound) {
+        documentLevelEventsBound = true;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement === document.getElementById('scene-tag-input')) {
+                window.addSceneTag();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('.gm-tag-remove');
+            if (target) window.removeSceneTag(target.dataset.tag);
+        });
+    }
 
     // Safety Tools
     document.getElementById('safety-save-btn')?.addEventListener('click', () => {

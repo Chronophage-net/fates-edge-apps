@@ -10,7 +10,7 @@ const path = require('path');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
-const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter } = require('./security.js');
+const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter, checkEventPermission, permissionDeniedMessage } = require('./security.js');
 const adventure = require('./adventure.js');
 const timers = require('./timers.js'); // NEW: ad-hoc timers -- deliberately separate from adventure.js, see server/timers.js header
 const auth = require('./auth.js');
@@ -182,6 +182,35 @@ function setupWSS(wss, appConfig) {
                 const messageType = data.type || 'unknown';
                 const currentRoom = room.rooms.get(roomKey);
                 if (!currentRoom) return;
+
+                // ─── Permission gate ──────────────────────────────────
+                // Checked here, before the switch, so it covers every case
+                // below the way the rate gate above does. The event/role
+                // table is security.js's checkEventPermission -- the SAME
+                // table socketio-handlers.js's socket.use() gate consults,
+                // so a rule added for one transport cannot silently miss
+                // the other. (Every deck and adventure case below was open
+                // to any client, spectators included, until this existed;
+                // the client only ever hid the buttons.)
+                const senderRole = currentRoom.clients.get(clientId)?.role;
+                const denied = checkEventPermission(messageType, senderRole);
+                if (denied) {
+                    logger.warn('Blocked message from insufficient role', {
+                        room: currentRoom.code,
+                        clientId,
+                        event: messageType,
+                        role: senderRole || 'unknown'
+                    });
+                    ws.send(JSON.stringify({
+                        type: 'permission-denied',
+                        event: messageType,
+                        requires: denied.requires,
+                        message: permissionDeniedMessage(denied),
+                        code: 'PERMISSION_DENIED',
+                        timestamp: Date.now()
+                    }));
+                    return;
+                }
 
                 switch (messageType) {
                     case 'ping':

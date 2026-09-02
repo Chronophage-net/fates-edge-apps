@@ -148,6 +148,14 @@ const eventHandlers = {
     // listener that actually crossfades via core/soundboard.js.
     'soundboard-ambience': [],
 
+    // The server refused an event because this client's role isn't
+    // allowed to send it (see the socket server's security.js
+    // checkEventPermission). Carries { event, requires, message }. Worth
+    // surfacing rather than swallowing: the most likely reason a GM sees
+    // one is that they were demoted, or reconnected before the server
+    // restored their seat, and a button that used to work has gone quiet.
+    'permission-denied': [],
+
 };
 
 // ============================================================
@@ -570,6 +578,10 @@ function handleWebSocketMessage(data) {
 
         case 'character_released':
             triggerEvent('character_released', data);
+            break;
+
+        case 'permission-denied':
+            triggerEvent('permission-denied', data);
             break;
 
         case 'server_announcement':
@@ -1091,6 +1103,10 @@ function setupSocketIOListeners() {
 
     socket.on('character_released', (data) => {
         triggerEvent('character_released', data);
+    });
+
+    socket.on('permission-denied', (data) => {
+        triggerEvent('permission-denied', data);
     });
 
     socket.on('server_announcement', (data) => {

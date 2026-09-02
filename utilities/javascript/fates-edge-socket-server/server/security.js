@@ -258,6 +258,104 @@ function isSpectator(role) {
     return role === 'spectator';
 }
 
+// ─── Event permissions ──────────────────────────────────────────────
+// Every socket event that exercises GM authority is named here, ONCE,
+// and both transports gate on this table -- socketio-handlers.js from a
+// socket.use() middleware, ws-handlers.js from a check before its
+// switch. The alternative (a role check at the top of each handler) is
+// how ~40 handlers ended up with none at all: the client hid the Decks
+// and GM Tools tabs from non-GMs and everyone assumed that was the
+// boundary. It was not. `fates-edge-my-role` is a localStorage string;
+// hiding a tab hides a button, not an event. Anything a player could
+// name, they could send.
+//
+// Two tiers, because there are three GM-side roles and only two of them
+// hold seat-level authority:
+//
+//   STORY_AUTHORITY -- gm, co-gm, assistant-gm. Narrating the fiction:
+//   drawing on the Deck of Consequences (an SB spend -- a player doing
+//   this authors a complication against their own table), running the
+//   soundboard, pushing TTS audio, posting assistant suggestions.
+//   'assistant-gm' is included because the AI GM Bot holds exactly that
+//   role and seeds its campaign with a Crown Spread; excluding it would
+//   have broken the bot, not secured anything.
+//
+//   GM_GATED -- gm, co-gm only. Authority over the room's shared record:
+//   loading/resetting an adventure, advancing scenes and encounters,
+//   creating and ticking timers, revealing or hiding knowledge, choosing
+//   the region, wiping deck history. The AI bot is a narrator, not a
+//   keeper of the record, so it does not get these.
+//
+// Seat management (transfer/revoke GM, promote/demote a Co-GM, reset the
+// room) stays on canManageGmSeat() at its own call sites and is NOT
+// listed here.
+//
+// An event absent from both sets is deliberately open to any member:
+// rolls, chat, character claims, voice signalling, whiteboard strokes,
+// and every *-request / *-list read.
+
+const STORY_AUTHORITY_EVENTS = new Set([
+    'deck-draw',
+    'deck-shuffle',
+    'crown-spread',
+    'soundboard-ambience',
+    'tts-audio',
+    'combat-status-update',
+    'scene-status-update',
+    'assistant-suggestion-created',
+    'assistant-suggestion-resolved',
+]);
+
+const GM_GATED_EVENTS = new Set([
+    'deck-history-clear',
+    'set-region',
+    'adventure-load',
+    'adventure-reset',
+    'adventure-scene',
+    'adventure-encounter-start',
+    'adventure-encounter-resolve',
+    'adventure-timer',
+    'adventure-log',
+    'adventure-knowledge-reveal',
+    'adventure-knowledge-hide',
+    'adhoc-timer-create',
+    'adhoc-timer-tick',
+    'adhoc-timer-remove',
+    'module-push',
+    'module-push-request',
+    'module-cleanup',
+    'module-cleanup-request',
+]);
+
+const STORY_AUTHORITY_ROLES = new Set(['gm', 'co-gm', 'assistant-gm']);
+
+/**
+ * Permission check for one inbound event.
+ *
+ * @returns {null|{event:string, requires:string}} null when the role may
+ *   send this event; otherwise a reason object the transport turns into
+ *   its own flavour of error. Returning a value rather than throwing
+ *   keeps this pure and testable without a socket.
+ */
+function checkEventPermission(event, role) {
+    if (GM_GATED_EVENTS.has(event)) {
+        return isGmLike(role) ? null : { event, requires: 'gm' };
+    }
+    if (STORY_AUTHORITY_EVENTS.has(event)) {
+        return STORY_AUTHORITY_ROLES.has(role) ? null : { event, requires: 'story-authority' };
+    }
+    return null;
+}
+
+/** Human-readable refusal, shared by both transports so the wording
+ *  can't drift between them. */
+function permissionDeniedMessage(reason) {
+    if (!reason) return '';
+    return reason.requires === 'gm'
+        ? `Only the GM or a Co-GM can do that (${reason.event}).`
+        : `Only the GM, a Co-GM, or the Assistant GM can do that (${reason.event}).`;
+}
+
 module.exports = {
     UNSAFE_KEYS,
     safeAssign,
@@ -278,5 +376,9 @@ module.exports = {
     isGmLike,
     canManageGmSeat,
     isSpectator,
+    STORY_AUTHORITY_EVENTS,
+    GM_GATED_EVENTS,
+    checkEventPermission,
+    permissionDeniedMessage,
     sanitizeCharacterSelection,
 };

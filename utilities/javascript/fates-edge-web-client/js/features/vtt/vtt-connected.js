@@ -1531,6 +1531,17 @@ function setupWebSocketSync() {
     onWSEvent('server_announcement', announcementHandler);
     wsListeners.set('server_announcement', announcementHandler);
 
+    // The server refused an event this client sent because its role
+    // isn't allowed to send it. Shown rather than swallowed: without it
+    // a demoted (or not-yet-restored) GM just sees a button that quietly
+    // does nothing, which reads as a broken app rather than a permission.
+    const permissionDeniedHandler = (data) => {
+        if (isDestroyed) return;
+        showToast(data?.message || 'You do not have permission to do that.', 'error');
+    };
+    onWSEvent('permission-denied', permissionDeniedHandler);
+    wsListeners.set('permission-denied', permissionDeniedHandler);
+
     // ─── CONNECTION EVENTS ──────────────────────────
     const connectHandler = () => {
         if (isDestroyed) return;

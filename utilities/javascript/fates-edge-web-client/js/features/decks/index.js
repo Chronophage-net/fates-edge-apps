@@ -881,6 +881,61 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 // REGION CHANGE HANDLER
 // ============================================================
 
+/**
+ * Region state is owned by this module but CONSUMED by GM Tools, which
+ * imports getSelectedRegion/getRegionData/getRegionNames/onRegionChange
+ * from here. It used to be initialized only inside render() — i.e. only
+ * once someone actually opened the Decks tab. A GM who went straight to
+ * GM Tools got an empty region list, a null selectedRegion, and
+ * "No region data loaded." on every quick-draw.
+ *
+ * ensureRegionsReady() is that initialization, lifted out of render()
+ * and made callable from anywhere. It memoizes the promise rather than a
+ * boolean so two callers racing (GM Tools rendering while Decks is
+ * loading) share one discovery pass instead of running two.
+ */
+let regionInitPromise = null;
+
+export function ensureRegionsReady() {
+    if (!regionInitPromise) {
+        regionInitPromise = (async () => {
+            regionNames = await initializeRegions(REGION_DIR);
+            if (!selectedRegion && regionNames.length > 0) {
+                await applyRegion(regionNames[0], { silent: true });
+            }
+            return [...regionNames];
+        })().catch(err => {
+            // A failed discovery must not poison the cache forever — the
+            // next caller should get to try again.
+            regionInitPromise = null;
+            throw err;
+        });
+    }
+    return regionInitPromise;
+}
+
+/**
+ * Select a region and load its data. DOM-free on purpose: the previous
+ * implementation lived inside the <select>'s change handler, so
+ * setSelectedRegion() called from GM Tools set the region NAME and then
+ * returned early because #deck-region-select wasn't in the document.
+ * selectedRegion moved; regionData did not. GM Tools then drew cards and
+ * read their meanings out of the PREVIOUS region's table — silently, and
+ * only when Decks happened not to be rendered.
+ */
+async function applyRegion(regionName, { silent = false } = {}) {
+    if (!regionName) return null;
+    selectedRegion = regionName;
+    const data = await fetchRegionData(regionName);
+    regionData = data;
+    if (!silent) {
+        regionChangeCallbacks.forEach(cb => {
+            try { cb(regionName, data); } catch (e) { /* a bad subscriber must not break the region */ }
+        });
+    }
+    return data;
+}
+
 async function handleRegionChange() {
     const select = document.getElementById('deck-region-select');
     if (!select) return;
@@ -892,9 +947,7 @@ async function handleRegionChange() {
         return;
     }
 
-    selectedRegion = regionName;
-    const data = await fetchRegionData(regionName);
-    regionData = data;
+    const data = await applyRegion(regionName);
 
     if (descEl) {
         if (data && data.description) {
@@ -907,10 +960,8 @@ async function handleRegionChange() {
             descEl.innerHTML = '<span style="color:var(--text2);">No description available.</span>';
         }
     }
-
-    regionChangeCallbacks.forEach(cb => {
-        try { cb(regionName, data); } catch (e) { /* ignore */ }
-    });
+    // The subscriber fan-out happens inside applyRegion() so that a
+    // region chosen from GM Tools notifies exactly as one chosen here does.
 }
 
 // ============================================================
@@ -931,7 +982,7 @@ export async function render(el) {
     `;
 
     // ─── Use shared initialization ────────────────────────────
-    regionNames = await initializeRegions(REGION_DIR);
+    regionNames = await ensureRegionsReady();
 
     let regionOptions = regionNames.map(n => `<option value="${n}">${n}</option>`).join('');
     if (regionNames.length === 0) {
@@ -1046,12 +1097,15 @@ export async function render(el) {
     const select = document.getElementById('deck-region-select');
     if (select) {
         select.addEventListener('change', handleRegionChange);
-        if (regionNames.length > 0) {
-            select.value = regionNames[0];
-            await handleRegionChange();
-            selectedRegion = regionNames[0];
-        } else if (selectedRegion) {
-            select.value = selectedRegion;
+        // Reflect the region already in effect. This used to force
+        // regionNames[0] on every render, so navigating away from Decks
+        // and back — or opening Decks after choosing a region in GM Tools
+        // — silently threw the GM's choice away and reset to Acasia.
+        const current = selectedRegion && regionNames.includes(selectedRegion)
+            ? selectedRegion
+            : regionNames[0];
+        if (current) {
+            select.value = current;
             await handleRegionChange();
         }
     }
@@ -1165,6 +1219,7 @@ function updateSpreadDescription() {
 let lastDrawResults = null;
 
 export async function drawConsequence() {
+    await ensureRegionsReady();
     // Extra safety – this should not be called if UI is disabled, but keep it.
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
@@ -1678,16 +1733,21 @@ window.closeCrownSpread = function() {
 export function getSelectedRegion() { return selectedRegion; }
 export function getRegionNames() { return [...regionNames]; }
 export async function setSelectedRegion(regionName) {
+    // Callable before Decks has ever rendered — GM Tools does exactly
+    // that. Discovery is idempotent and memoized.
+    await ensureRegionsReady();
     if (!regionNames.includes(regionName)) {
         console.warn(`[Decks] Region "${regionName}" not found`);
         return false;
     }
-    selectedRegion = regionName;
     const select = document.getElementById('deck-region-select');
-    if (select) {
-        select.value = regionName;
-        await handleRegionChange();
-    }
+    if (select) select.value = regionName;
+    // Load the data and notify subscribers whether or not the Decks tab
+    // is in the document. Doing this only when the <select> existed was
+    // the bug: the name changed and the card meanings didn't.
+    await applyRegion(regionName);
+    // Keep the description panel in step when Decks *is* rendered.
+    if (select) await handleRegionChange();
     return true;
 }
 export function getRegionData() { return regionData; }
@@ -1702,6 +1762,13 @@ export function getCardMeaning(suit, rank) {
 }
 export function registerRegionChange(callback) {
     if (typeof callback === 'function') {
+        // De-duplicated on purpose. GM Tools subscribes from
+        // attachConsequencesEvents(), which runs on every render of that
+        // tab — three call sites, one of them on a setTimeout. Without
+        // this the subscriber list grew without bound for as long as a GM
+        // kept switching tabs, and every region change then ran the same
+        // callback dozens of times. Same failure the crafting panel had.
+        if (regionChangeCallbacks.includes(callback)) return;
         regionChangeCallbacks.push(callback);
         if (selectedRegion) {
             callback(selectedRegion, regionData);
@@ -1730,6 +1797,9 @@ export async function quickDraw(count = 1, regionName = null) {
         return null;
     }
 
+    // GM Tools calls this without ever having rendered Decks, so region
+    // discovery has to be able to happen right here.
+    await ensureRegionsReady();
     if (regionName) await setSelectedRegion(regionName);
     if (!selectedRegion) {
         showToast('Please select a region first.', 'error');
@@ -1787,6 +1857,9 @@ export async function quickCrownSpread(regionName = null) {
         return null;
     }
 
+    // GM Tools calls this without ever having rendered Decks, so region
+    // discovery has to be able to happen right here.
+    await ensureRegionsReady();
     if (regionName) await setSelectedRegion(regionName);
     if (!selectedRegion) {
         showToast('Please select a region first.', 'error');

@@ -8,7 +8,7 @@ const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const fs = require('fs');
 const path = require('path');
-const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter } = require('./security.js');
+const { buildSafeDict, isSafeModuleId, clampCount, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter, checkEventPermission, permissionDeniedMessage } = require('./security.js');
 const adventure = require('./adventure.js');
 const timers = require('./timers.js'); // NEW: ad-hoc timers -- deliberately separate from adventure.js, see server/timers.js header
 const auth = require('./auth.js');
@@ -64,6 +64,29 @@ function setupSocketIO(io, appConfig) {
         // the HTTP API's 429-without-connection-drop behavior, so a
         // legitimate client that briefly bursts past the cap just has
         // that one message dropped, not its whole session.
+        // Registered UNCONDITIONALLY, and before any socket.use() below.
+        // Socket.IO turns a middleware's next(err) into an 'error' event on
+        // this socket, and Socket extends Node's EventEmitter -- an 'error'
+        // with no listener throws and takes the process down. This used to
+        // live inside the `if (checkMessageRate)` block, which was safe only
+        // because the rate gate was the only middleware. It no longer is.
+        socket.on('error', (err) => {
+            if (err && err.message === 'rate_limited') {
+                socket.emit('server_announcement', {
+                    message: 'You are sending messages too quickly. Please slow down.',
+                    level: 'warning',
+                    timestamp: Date.now()
+                });
+                return;
+            }
+            if (err && err.message === 'permission_denied') {
+                // The gate below already emitted a 'permission-denied' with
+                // the event name and the role it wanted; nothing to add.
+                return;
+            }
+            logger.warn('Socket error', { socketId: socket.id, error: err?.message });
+        });
+
         if (checkMessageRate) {
             const rateState = {};
             socket.use((packet, next) => {
@@ -72,16 +95,43 @@ function setupSocketIO(io, appConfig) {
                 }
                 next();
             });
-            socket.on('error', (err) => {
-                if (err && err.message === 'rate_limited') {
-                    socket.emit('server_announcement', {
-                        message: 'You are sending messages too quickly. Please slow down.',
-                        level: 'warning',
-                        timestamp: Date.now()
-                    });
-                }
-            });
         }
+
+        // ─── Permission gate ────────────────────────────────────────────
+        // Second inbound middleware, same mechanism as the rate gate
+        // above and for the same reason: one place instead of ~40. The
+        // event/role table lives in security.js (checkEventPermission)
+        // so this transport and the plain-WS one cannot drift apart.
+        //
+        // Before this existed, EVERY deck and adventure event was open to
+        // any connected client, spectators included. The Decks and GM
+        // Tools tabs are hidden from non-GMs, but that is a localStorage
+        // role string deciding whether to render a button -- it never
+        // reached the wire. A player could draw the Deck of Consequences,
+        // shuffle it out from under the GM, wipe its history, reveal
+        // knowledge the GM was holding back, or reset the adventure.
+        //
+        // Refusals are announced, not silent: a client whose role is
+        // stale after a demotion should be told why its button stopped
+        // working rather than watching it do nothing.
+        socket.use((packet, next) => {
+            const [event] = packet;
+            const denied = checkEventPermission(event, socket.clientData?.role);
+            if (!denied) return next();
+            logger.warn('Blocked event from insufficient role', {
+                socketId: socket.id,
+                room: socket.room || null,
+                event,
+                role: socket.clientData?.role || 'unknown'
+            });
+            socket.emit('permission-denied', {
+                event,
+                requires: denied.requires,
+                message: permissionDeniedMessage(denied),
+                timestamp: Date.now()
+            });
+            return next(new Error('permission_denied'));
+        });
 
         // ─── Join Room ──────────────────────────────────────────────
         // NEW: `authToken` is optional -- a client with no account (or an
