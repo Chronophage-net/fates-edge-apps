@@ -156,6 +156,14 @@ const eventHandlers = {
     // restored their seat, and a button that used to work has gone quiet.
     'permission-denied': [],
 
+    // An Effect callout. Effect in Fate's Edge is a narrative quantity —
+    // Scale mismatch moves Effect, never DV or dice — so it is announced
+    // and never stored. This event IS the whole feature: a transient
+    // "+++ Effect" banner, a line in the VTT feed, and nothing written to
+    // any character or campaign record. Payload: { direction: 1 | -1,
+    // steps?, reason?, source?, actor? }. See DATA_SCHEMA.md.
+    'effect-called': [],
+
 };
 
 // ============================================================
@@ -582,6 +590,10 @@ function handleWebSocketMessage(data) {
 
         case 'permission-denied':
             triggerEvent('permission-denied', data);
+            break;
+
+        case 'effect-called':
+            triggerEvent('effect-called', data);
             break;
 
         case 'server_announcement':
@@ -1107,6 +1119,10 @@ function setupSocketIOListeners() {
 
     socket.on('permission-denied', (data) => {
         triggerEvent('permission-denied', data);
+    });
+
+    socket.on('effect-called', (data) => {
+        triggerEvent('effect-called', data);
     });
 
     socket.on('server_announcement', (data) => {

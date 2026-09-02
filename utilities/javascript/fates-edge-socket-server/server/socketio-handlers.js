@@ -993,6 +993,13 @@ function setupSocketIO(io, appConfig) {
             // current scene/combat status) should reach every connected
             // client regardless of which transport they used to connect.
             'scene-status-update', 'combat-status-update',
+            // Effect callouts (see security.js's STORY_AUTHORITY_EVENTS and
+            // the schema note in the web client's DATA_SCHEMA.md). Effect is
+            // a NARRATIVE quantity in Fate's Edge -- Scale mismatch moves
+            // Effect, never DV or dice -- so it is announced and never
+            // stored. This relay carries the announcement and nothing else;
+            // no server-side state is touched, by design.
+            'effect-called',
             // NEW: AI GM Bot voice narration (optional -- see
             // fates-edge-ai-gm-bot's modules/tts-client.js). The bot
             // synthesizes speech for its own chat replies and sends the

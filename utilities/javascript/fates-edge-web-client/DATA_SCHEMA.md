@@ -141,6 +141,55 @@ Regions use a large "generator" schema (~26 top-level keys in `acasia.json`) int
 
 ---
 
-## 4. `_license` field
+## 4. Things that are announced, not stored
+
+Not everything the rules name is a field. **Effect** is the standing
+example, and the reason this section exists.
+
+Effect is a narrative quantity: how *much* a success accomplishes, as
+opposed to whether it succeeds. A Scale mismatch moves Effect — it never
+moves DV or the dice pool. There is no Effect track, no Effect rating,
+and no Effect field on a character, an adversary or a unit, and adding
+one would be a mistake rather than an improvement: the moment Effect
+becomes a number somebody owns, the table starts arguing about the
+number instead of describing the swing.
+
+So Effect is carried as an **event**, not as state:
+
+```json
+{
+  "type": "effect-called",
+  "direction": 1,
+  "steps": 2,
+  "reason": "outnumbered three to one",
+  "source": "GM"
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `direction` | `1` for a step up, `-1` for a step down |
+| `steps` | `1`–`3`. Capped at three: a fourth step isn't a shift, it's a different scene |
+| `reason` | Optional. The fiction that caused it — what the table actually needs |
+| `source` | Optional display name for the caller |
+
+Every client that receives one shows a transient `+++ Effect!` banner and
+drops a line in the chat feed. Nothing is written to any character or
+campaign record, on the client or the server. The AI GM Bot emits these
+from an `[EFFECT + "reason"]` tag in its narration (see that repo's
+`modules/commands/process-tags.js`).
+
+Calling Effect is GM authority — the GM, a Co-GM, or the Assistant GM.
+An Effect shift is a ruling about the fiction, and a player announcing
+their own Effect is declaring their own outcome.
+
+If you are adding a mechanic and find yourself reaching for a new
+persisted field, it is worth asking whether it belongs here instead. The
+test: *does anything later read this value back, or does the table just
+need to hear it?*
+
+---
+
+## 5. `_license` field
 
 Faction and other content files may carry a `_license` field indicating whether the content is original SRD-licensed material, proprietary Fate's Edge content, or your own homebrew. If you're adding homebrew content for personal use this doesn't matter, but if you intend to share files with others, see [COMMUNITY_USE_POLICY.md](../../../COMMUNITY_USE_POLICY.md) at the repo root for what you're allowed to redistribute.

@@ -302,6 +302,11 @@ const STORY_AUTHORITY_EVENTS = new Set([
     'tts-audio',
     'combat-status-update',
     'scene-status-update',
+    // Effect is a narrative quantity, not a stat: it is announced, not
+    // recorded. Calling it is still the GM's call (or the Assistant GM's),
+    // because an Effect shift is a ruling about the fiction -- a player
+    // announcing their own Effect is declaring their own outcome.
+    'effect-called',
     'assistant-suggestion-created',
     'assistant-suggestion-resolved',
 ]);

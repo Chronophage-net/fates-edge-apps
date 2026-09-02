@@ -1542,6 +1542,43 @@ function setupWebSocketSync() {
     onWSEvent('permission-denied', permissionDeniedHandler);
     wsListeners.set('permission-denied', permissionDeniedHandler);
 
+    // ─── Effect callouts ────────────────────────────────────────
+    // Effect in Fate's Edge is a NARRATIVE quantity. A Scale mismatch
+    // moves Effect; it never moves DV or the dice pool. So there is
+    // deliberately nothing to store: no track, no counter, no field on a
+    // character. Announcing it IS the mechanic — the table needs to know
+    // the swing landed harder or softer than the roll alone implies, and
+    // then the fiction carries it.
+    //
+    // This handler therefore does exactly two things, both transient: a
+    // banner, and a line in the chat feed so the moment survives in the
+    // scrollback the way any other call at the table would. It writes to
+    // no state and sends nothing back over the wire.
+    const effectCalledHandler = (data) => {
+        if (isDestroyed) return;
+        const steps = Math.min(3, Math.max(1, parseInt(data?.steps, 10) || 1));
+        const up = (parseInt(data?.direction, 10) || 1) >= 0;
+        const marks = (up ? '+' : '-').repeat(steps);
+        const reason = (data?.reason || '').toString().trim();
+        const headline = `${marks} Effect${up ? '!' : ''}`;
+
+        showToast(reason ? `${headline} — ${reason}` : headline, up ? 'success' : 'warning');
+
+        vttStore.addChatMessage({
+            id: `effect-${Date.now().toString(36)}`,
+            text: reason ? `${headline} — ${reason}` : headline,
+            sender: data?.source || 'GM',
+            recipient: 'all',
+            whisper: false,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            local: false,
+            sent: true,
+        });
+    };
+    onWSEvent('effect-called', effectCalledHandler);
+    wsListeners.set('effect-called', effectCalledHandler);
+
     // ─── CONNECTION EVENTS ──────────────────────────
     const connectHandler = () => {
         if (isDestroyed) return;

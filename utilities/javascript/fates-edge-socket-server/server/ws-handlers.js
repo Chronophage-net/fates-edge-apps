@@ -370,6 +370,9 @@ function setupWSS(wss, appConfig) {
                     case 'sync-state':
                     case 'combat-status-update':
                     case 'scene-status-update':
+                    // Effect callout -- a pure announcement, never state.
+                    // See security.js's STORY_AUTHORITY_EVENTS.
+                    case 'effect-called':
                     // NEW: AI GM Bot voice narration (optional) -- see the
                     // matching note in socketio-handlers.js's relayEvents.
                     case 'tts-audio':
