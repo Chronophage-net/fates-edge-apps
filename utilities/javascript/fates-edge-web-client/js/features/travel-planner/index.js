@@ -130,6 +130,14 @@ function getFaceCardNote(suit, rank) {
 // may offer `variants` (the sourcebook's "Pick 1" branch points); the
 // first variant is the default. Legs use the real dataset region names so
 // they can be fed straight into fetchRegionData().
+// clockHint is the leg's BASE clock. Legal clock sizes are 4, 6, 8 and 10 --
+// nothing else -- and 18 legs here carried a 7, which is not a clock. The
+// source books write these legs as "Clock: 6-8 depending on unrest", and 7 is
+// what you get by averaging a range that was never meant to be averaged: the
+// book is saying 6 normally, 8 when the leg is contested. So the hint is the
+// base, and escalation is the GM's call at the table (which is also where the
+// information about whether this crossing is contested actually lives).
+// tests/unit/travel-clocks.test.js keeps every value legal.
 const WORKED_ITINERARIES = [
     {
         key: 'coastal_haul',
@@ -137,7 +145,7 @@ const WORKED_ITINERARIES = [
         description: 'Kahfagia → Ecktoria → Silkstrand (Acasia) → Marcott (Vhasia) → Fairport (Viterra).',
         legs: [
             { label: 'Kassamira → Ecktoria', spade: 'Ecktoria', heart: 'Ecktoria', club: WILDS_REGION_NAME, diamond: 'Kahfagia', clockHint: 6, flavor: 'Aqueduct arcades; Coin-house factor; gale; convoy letter.' },
-            { label: 'Ecktoria → Silkstrand', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: "Three-Queens Bridge; Dyers' Guildmistress; loom strike; Exchange pass." },
+            { label: 'Ecktoria → Silkstrand', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 6, flavor: "Three-Queens Bridge; Dyers' Guildmistress; loom strike; Exchange pass." },
             { label: 'Silkstrand → Marcott', spade: 'Vhasia', heart: 'Vhasia', club: 'Vhasia', diamond: 'Vhasia', flavor: 'Pont-du-Tithe; Parlement clerk; coin rumor; letters patent.' },
             { label: 'Marcott → Fairport', spade: 'Viterra', heart: 'Viterra', club: 'Linn', diamond: 'Viterra', clockHint: 6, flavor: 'Fairport tideworks; shipwright; boom lifts; customs seal.' }
         ]
@@ -165,7 +173,7 @@ const WORKED_ITINERARIES = [
         description: 'Fairport (Viterra) → Marcott (Vhasia) → Silkstrand (Acasia) → Ecktoria → Kassamira (Kahfagia).',
         legs: [
             { label: 'Fairport → Marcott', spade: 'Vhasia', heart: 'Vhasia', club: 'Vhasia', diamond: 'Vhasia', flavor: 'Pont-du-Tithe; Parlement clerk; coin rumor; letters patent.' },
-            { label: 'Marcott → Silkstrand', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: "Three-Queens Bridge; Dyers' Guildmistress; loom strike; Exchange pass." },
+            { label: 'Marcott → Silkstrand', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 6, flavor: "Three-Queens Bridge; Dyers' Guildmistress; loom strike; Exchange pass." },
             { label: 'Silkstrand → Ecktoria', spade: 'Ecktoria', heart: 'Ecktoria', club: WILDS_REGION_NAME, diamond: 'Ecktoria', clockHint: 6, flavor: 'Aqueduct arcades; Coin-house factor; gale; berth priority.' },
             { label: 'Ecktoria → Kassamira', spade: 'Kahfagia', heart: 'Kahfagia', club: WILDS_REGION_NAME, diamond: 'Kahfagia', clockHint: 6, flavor: 'Kassamira Port auctions; Mirror-Keeper; gale; convoy letter and lantern-law warrant.' }
         ]
@@ -200,7 +208,7 @@ const WORKED_ITINERARIES = [
         name: 'Acasia → Silkstrand (Overland Caravan Road)',
         description: 'Many caravans skip the Ecktoria sea-lane entirely and cut south through the Broken Marches to the canals -- slower than a coastal hop, but it avoids harbor tariffs.',
         legs: [
-            { label: 'Broken Marches → Silkstrand (by caravan)', spade: 'Silkstrand', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: "A condotta escort haggles over the toll before the canals even come into view; the Curse's weight is felt in the dyewater long before the bridges are." }
+            { label: 'Broken Marches → Silkstrand (by caravan)', spade: 'Silkstrand', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 6, flavor: "A condotta escort haggles over the toll before the canals even come into view; the Curse's weight is felt in the dyewater long before the bridges are." }
         ]
     },
     {
@@ -208,7 +216,7 @@ const WORKED_ITINERARIES = [
         name: 'Silkstrand → Acasia (Overland Caravan Road, reversed)',
         description: 'The same caravan road, walked out of the City of Bridges and back into the Broken Marches.',
         legs: [
-            { label: 'Silkstrand → Broken Marches (by caravan)', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 7, flavor: 'The bridges fall behind as the canal road turns to rutted track; a condotta banner marks the marches ahead.' }
+            { label: 'Silkstrand → Broken Marches (by caravan)', spade: 'Acasia', heart: 'Acasia', club: 'Acasia', diamond: 'Acasia', clockHint: 6, flavor: 'The bridges fall behind as the canal road turns to rutted track; a condotta banner marks the marches ahead.' }
         ]
     },
     // Mistlands <-> Violet Steppe (Ykrul): two documented borders, two
@@ -226,7 +234,7 @@ const WORKED_ITINERARIES = [
         description: 'The direct border crossing north of Aeler -- fog gives way to open grass without ever touching the mountain holds.',
         legs: [
             { label: "Payden's Port → the Fogline Border", spade: 'Mistlands', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', clockHint: 6, flavor: 'Bell-line outposts thin out heading north; a Protectorate patrol logs your papers before the fog gives out.' },
-            { label: 'Fogline → Violet Steppe (Ykrul)', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 7, flavor: 'The bells stop; the grass starts. Winter-camp smoke on the horizon -- the Ykrul do not linger where the bells rang false, but they watch the treeline all the same.' }
+            { label: 'Fogline → Violet Steppe (Ykrul)', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 6, flavor: 'The bells stop; the grass starts. Winter-camp smoke on the horizon -- the Ykrul do not linger where the bells rang false, but they watch the treeline all the same.' }
         ]
     },
     {
@@ -234,7 +242,7 @@ const WORKED_ITINERARIES = [
         name: 'Violet Steppe → Mistlands (North of the Aelerian Mountains, reversed)',
         description: 'Ykrul territory → the Fogline Border → Payden\'s Port.',
         legs: [
-            { label: 'Ykrul Territory → the Fogline Border', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 7, flavor: 'Grass gives way to fog on the horizon long before the bells are audible. No khagan\'s writ runs past this line.' },
+            { label: 'Ykrul Territory → the Fogline Border', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 6, flavor: 'Grass gives way to fog on the horizon long before the bells are audible. No khagan\'s writ runs past this line.' },
             { label: "Fogline → Payden's Port (Mistlands)", spade: 'Mistlands', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', clockHint: 6, flavor: 'The first bell-line outpost logs your papers with visible relief. A Protectorate patrol escorts you the rest of the way in.' }
         ]
     },
@@ -244,7 +252,7 @@ const WORKED_ITINERARIES = [
         description: 'Through the mountain holds instead of around them -- slower, but the Aeler under-passages are safer than open steppe in raiding season.',
         legs: [
             { label: 'Mistlands → Aeler High Holds', spade: 'Aeler', heart: 'Aeler', club: 'Aeler', diamond: 'Aeler', clockHint: 8, flavor: 'Bell-line caravans trade places with grain barges at the border; the High-Mist Pass toll is paid in iron, not coin. Mountain Passes rule: an Ace here may convert the route to an under-route.' },
-            { label: 'Aeler High Holds → Violet Steppe (Ykrul)', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Aeler', clockHint: 7, flavor: "The passes empty onto contested valleys; the Khagan's scouts watch from the ridgelines. Your Aeler papers may or may not mean anything out here -- the mountain's authority doesn't extend past its own shadow." }
+            { label: 'Aeler High Holds → Violet Steppe (Ykrul)', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Aeler', clockHint: 6, flavor: "The passes empty onto contested valleys; the Khagan's scouts watch from the ridgelines. Your Aeler papers may or may not mean anything out here -- the mountain's authority doesn't extend past its own shadow." }
         ]
     },
     {
@@ -252,7 +260,7 @@ const WORKED_ITINERARIES = [
         name: 'Violet Steppe → Mistlands (South, via the Aeler High Passes, reversed)',
         description: 'Ykrul territory → Aeler High Holds → Mistlands.',
         legs: [
-            { label: 'Ykrul Territory → Aeler High Holds', spade: 'Aeler', heart: 'Aeler', club: WILDS_REGION_NAME, diamond: 'Aeler', clockHint: 7, flavor: "Contested valleys narrow toward the passes; the Khagan's scouts fall away as the mountain's shadow takes over." },
+            { label: 'Ykrul Territory → Aeler High Holds', spade: 'Aeler', heart: 'Aeler', club: WILDS_REGION_NAME, diamond: 'Aeler', clockHint: 6, flavor: "Contested valleys narrow toward the passes; the Khagan's scouts fall away as the mountain's shadow takes over." },
             { label: 'Aeler High Holds → Mistlands', spade: 'Mistlands', heart: 'Mistlands', club: 'Aeler', diamond: 'Aeler', clockHint: 8, flavor: 'Grain barges trade places with bell-line caravans at the border; the High-Mist Pass toll is paid in iron, not coin.' }
         ]
     },
@@ -265,7 +273,7 @@ const WORKED_ITINERARIES = [
         name: 'Viterra → Thepyrgos (South Coastal Road)',
         description: 'Continuing the Coastal Haul past Fairport, south along the Black River border into Synod territory.',
         legs: [
-            { label: 'Fairport → the Black River Crossing', spade: 'Thepyrgos', heart: 'Thepyrgos', club: WILDS_REGION_NAME, diamond: 'Thepyrgos', clockHint: 7, flavor: 'Chain-Lanterns watch both banks; a Viterran warrant is kindling here, and vice versa. The boom rises when the moon is high and the tide is low.' }
+            { label: 'Fairport → the Black River Crossing', spade: 'Thepyrgos', heart: 'Thepyrgos', club: WILDS_REGION_NAME, diamond: 'Thepyrgos', clockHint: 6, flavor: 'Chain-Lanterns watch both banks; a Viterran warrant is kindling here, and vice versa. The boom rises when the moon is high and the tide is low.' }
         ]
     },
     {
@@ -273,7 +281,7 @@ const WORKED_ITINERARIES = [
         name: 'Thepyrgos → Viterra (South Coastal Road, reversed)',
         description: 'The Black River Crossing → Fairport.',
         legs: [
-            { label: 'Thepyrgos → the Black River Crossing', spade: 'Viterra', heart: 'Viterra', club: WILDS_REGION_NAME, diamond: 'Viterra', clockHint: 7, flavor: "The chain-towers fall behind; hedge-law replaces Synod edict at the ford. The Queen's justiciars ride this border every spring." }
+            { label: 'Thepyrgos → the Black River Crossing', spade: 'Viterra', heart: 'Viterra', club: WILDS_REGION_NAME, diamond: 'Viterra', clockHint: 6, flavor: "The chain-towers fall behind; hedge-law replaces Synod edict at the ford. The Queen's justiciars ride this border every spring." }
         ]
     },
     // North instead: Ubral, then a Dolmis Sea crossing. Ubral's own entry
@@ -289,7 +297,7 @@ const WORKED_ITINERARIES = [
         name: 'Viterra → Ubral → Dolmis Sea Crossing',
         description: 'North past Fairport into the highland clans, then a sea crossing to whichever eastern shore the winds allow.',
         legs: [
-            { label: 'Fairport → Ubral Highlands', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', clockHint: 7, flavor: "The Queen's writ ends at the highland line; tax collectors go armed here, and the cairns vote against the crown every season." },
+            { label: 'Fairport → Ubral Highlands', spade: 'Ubral', heart: 'Ubral', club: WILDS_REGION_NAME, diamond: 'Ubral', clockHint: 6, flavor: "The Queen's writ ends at the highland line; tax collectors go armed here, and the cairns vote against the crown every season." },
             {
                 label: 'Dolmis Sea Crossing (pick a landfall)', spade: 'Zakov', heart: 'Zakov', club: WILDS_REGION_NAME, diamond: 'Zakov', clockHint: 8,
                 variants: [
@@ -325,7 +333,7 @@ const WORKED_ITINERARIES = [
         legs: [
             { label: "Payden's Port → Thin Shore (Shadow Corridor)", spade: 'Valewood', heart: 'Mistlands', club: 'Mistlands', diamond: 'Mistlands', clockHint: 6, flavor: 'Green lane / Unfound stile; Protectorate clerk; bell-line failure; Lantern Writ. Rule of 9s applies.' },
             { label: 'Thin Shore Transit (toward Zakov)', spade: 'Valewood', heart: 'Valewood', club: 'Valewood', diamond: 'Valewood', clockHint: 6, flavor: 'Sea-mist arcade; Path-warden; Sweet wind; Way-cord (spending it negates one Sweet wind lie).' },
-            { label: 'Approach to Zakov (Roadstead & Booms)', spade: 'Zakov', heart: 'Zakov', club: 'Zakov', diamond: 'Zakov', clockHint: 7, flavor: 'Boomhouse or Red Wharf; Pilot-Matron or Night Magistrate; Boom Drop or Customs Sweep; Harbor-Green Chit or Pilot Token. Apply the Gatekeepers overlay on arrival; a 9 triggers Missing Ninth.' },
+            { label: 'Approach to Zakov (Roadstead & Booms)', spade: 'Zakov', heart: 'Zakov', club: 'Zakov', diamond: 'Zakov', clockHint: 6, flavor: 'Boomhouse or Red Wharf; Pilot-Matron or Night Magistrate; Boom Drop or Customs Sweep; Harbor-Green Chit or Pilot Token. Apply the Gatekeepers overlay on arrival; a 9 triggers Missing Ninth.' },
             {
                 label: 'Corsair Job Inside Zakov (pick one)', spade: 'Zakov', heart: 'Zakov', club: 'Zakov', diamond: 'Zakov',
                 variants: [
@@ -334,7 +342,7 @@ const WORKED_ITINERARIES = [
                     { name: "C) Smuggler's Ladder Run", flavor: "Lantern Ladder; Lampman; Informant Flip; Smuggler's Ladder Map -- your tip was sold twice." }
                 ]
             },
-            { label: 'Zakov → Theona (Isles & Moot)', spade: 'Theona', heart: 'Theona', club: 'Linn', diamond: 'Theona', clockHint: 7, flavor: "Uncounted Bridge; Matron of Wells or Moot Envoy; fogfall raids; Moot Token. Taboo: don't count the steps aloud." },
+            { label: 'Zakov → Theona (Isles & Moot)', spade: 'Theona', heart: 'Theona', club: 'Linn', diamond: 'Theona', clockHint: 6, flavor: "Uncounted Bridge; Matron of Wells or Moot Envoy; fogfall raids; Moot Token. Taboo: don't count the steps aloud." },
             {
                 label: 'Theona Contract (pick one)', spade: 'Theona', heart: 'Theona', club: 'Theona', diamond: 'Theona',
                 variants: [
@@ -349,8 +357,8 @@ const WORKED_ITINERARIES = [
         name: 'Steppe Passage: Black Banner Territory',
         description: 'A dangerous journey through contested lands where three powers vie for control.',
         legs: [
-            { label: 'Foedus Stone → Black Banner Camp', spade: 'Vilikari', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 7, flavor: 'Wolf Road milepost or Foedus Stone; Clan Elder or War Captain; Rasputitsa or Remount Sickness; Safe-conduct or Remount Chit. Foedus recall may invalidate your papers.' },
-            { label: 'Black Banner Camp → Ykrul Territory', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 7, flavor: "Winter camp ring or Khagan's way-station; Khatun of the Ring or Noyan envoy; Hostage protocol or Feud spark; Paiza tablet or Foedus seal. Choose which law applies." }
+            { label: 'Foedus Stone → Black Banner Camp', spade: 'Vilikari', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 6, flavor: 'Wolf Road milepost or Foedus Stone; Clan Elder or War Captain; Rasputitsa or Remount Sickness; Safe-conduct or Remount Chit. Foedus recall may invalidate your papers.' },
+            { label: 'Black Banner Camp → Ykrul Territory', spade: 'Ykrul', heart: 'Ykrul', club: WILDS_REGION_NAME, diamond: 'Ykrul', clockHint: 6, flavor: "Winter camp ring or Khagan's way-station; Khatun of the Ring or Noyan envoy; Hostage protocol or Feud spark; Paiza tablet or Foedus seal. Choose which law applies." }
         ]
     },
     // Reverse of the above -- same contested corridor, run from Ykrul
@@ -362,8 +370,8 @@ const WORKED_ITINERARIES = [
         name: 'Steppe Passage: Black Banner Territory (Ykrul → Vilikari, reversed)',
         description: 'The same contested corridor, run from Ykrul territory back toward the Foedus Stone.',
         legs: [
-            { label: 'Ykrul Territory → Black Banner Camp', spade: 'Black Banners', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 7, flavor: "Winter camp ring or Khagan's way-station falls behind; Khatun of the Ring or Noyan envoy; Hostage protocol or Feud spark; Paiza tablet or Foedus seal. Choose which law applies." },
-            { label: 'Black Banner Camp → Foedus Stone', spade: 'Vilikari', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 7, flavor: 'Wolf Road milepost or Foedus Stone comes into view; Clan Elder or War Captain; Rasputitsa or Remount Sickness; Safe-conduct or Remount Chit. Foedus recall may invalidate your papers.' }
+            { label: 'Ykrul Territory → Black Banner Camp', spade: 'Black Banners', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 6, flavor: "Winter camp ring or Khagan's way-station falls behind; Khatun of the Ring or Noyan envoy; Hostage protocol or Feud spark; Paiza tablet or Foedus seal. Choose which law applies." },
+            { label: 'Black Banner Camp → Foedus Stone', spade: 'Vilikari', heart: 'Black Banners', club: WILDS_REGION_NAME, diamond: 'Black Banners', clockHint: 6, flavor: 'Wolf Road milepost or Foedus Stone comes into view; Clan Elder or War Captain; Rasputitsa or Remount Sickness; Safe-conduct or Remount Chit. Foedus recall may invalidate your papers.' }
         ]
     },
     // Reverse of the Corsair Jobs arc -- isle taboos back into pirate
@@ -384,7 +392,7 @@ const WORKED_ITINERARIES = [
                     { name: 'B) Deliver the Ledger Shard', spade: 'Theona', heart: 'Theona', club: 'Zakov', diamond: 'Theona', flavor: 'Well-yard; Matron of Wells; a Zakov Debt Call follows you; Sanctuary Night buys time.' }
                 ]
             },
-            { label: 'Theona → Zakov (Isles & Moot, reversed)', spade: 'Zakov', heart: 'Zakov', club: 'Linn', diamond: 'Zakov', clockHint: 7, flavor: "Uncounted Bridge falls behind; Boomhouse gossip waits dockside; fogfall raids; Moot Token still honored. Taboo: don't count the steps aloud." },
+            { label: 'Theona → Zakov (Isles & Moot, reversed)', spade: 'Zakov', heart: 'Zakov', club: 'Linn', diamond: 'Zakov', clockHint: 6, flavor: "Uncounted Bridge falls behind; Boomhouse gossip waits dockside; fogfall raids; Moot Token still honored. Taboo: don't count the steps aloud." },
             {
                 label: 'Corsair Job Inside Zakov (pick one)', spade: 'Zakov', heart: 'Zakov', club: 'Zakov', diamond: 'Zakov',
                 variants: [
@@ -1382,7 +1390,7 @@ function renderItineraryPreview() {
             <div style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem 0.7rem;margin-bottom:0.4rem;">
                 <strong style="font-size:0.85rem;">Leg ${idx + 1}: ${leg.label}</strong>
                 <div style="font-size:0.75rem;color:var(--text3);margin-top:0.15rem;">
-                    ♠${leg.spade} ♥${leg.heart} ♣${leg.club} ♦${leg.diamond}${leg.clockHint ? ` — suggested clock ${leg.clockHint}` : ''}
+                    ♠${leg.spade} ♥${leg.heart} ♣${leg.club} ♦${leg.diamond}${leg.clockHint ? ` — base clock ${leg.clockHint} (8 if contested)` : ''}
                 </div>
                 ${leg.flavor ? `<div style="font-size:0.75rem;font-style:italic;color:var(--text2);margin-top:0.15rem;">${leg.flavor}</div>` : ''}
                 ${leg.variants ? `

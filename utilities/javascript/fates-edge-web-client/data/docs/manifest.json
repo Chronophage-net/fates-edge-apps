@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-02T12:57:30.459Z",
+  "generated": "2026-09-02T22:54:20.902Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -785,6 +785,16 @@
       "active": true
     },
     {
+      "id": "the_invokers_guide",
+      "title": "The Invokers Guide",
+      "file": "Fates_-_Edge_-_-The-_-Invokers-_-Guide.html",
+      "path": "/data/docs/",
+      "category": "other",
+      "categoryLabel": "📄 Other",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_ninth_proof",
       "title": "The Ninth Proof",
       "file": "Fates_-_Edge_-_-The-_-Ninth-_-Proof.html",
@@ -1009,7 +1019,7 @@
       "active": true
     }
   ],
-  "total_count": 65,
-  "active_count": 65,
+  "total_count": 66,
+  "active_count": 66,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

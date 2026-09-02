@@ -304,8 +304,11 @@ const BLOCKED_BANDS = {
     ranged: new Set(['absent']),
 };
 
-// SHIELDS (Player's Guide §3.12.5, see data/wiki.json ids 71-72/79 for the
-// authored reference text) — previously pure character-sheet flavor with
+// SHIELDS (Player's Guide §3.12.5; the authored reference text is in
+// data/wiki.json under Buckler / Heater Shield / Pavise — cited by TITLE,
+// never by id: wiki.json is a build artifact whose ids are assigned by append
+// order in js/tools/scrape-regions-to-wiki.js and move on every rebuild)
+// — previously pure character-sheet flavor with
 // zero runtime effect (editor.js's SHIELD_TYPES/shieldType field was never
 // read by the roller). Buckler and Heater both carry "off-hand occupied;
 // -1d to ranged attacks" per the wiki reference; Pavise trades mobility
