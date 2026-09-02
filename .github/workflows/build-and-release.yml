@@ -501,9 +501,59 @@ jobs:
             echo "⚠️ index.html not found in deploy directory"
           fi
 
+      # ─── Clean up duplicate artifacts before upload ────────────
+      - name: Clean up duplicate Pages artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: artifacts } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+            
+            const pagesArtifacts = artifacts.artifacts.filter(
+              artifact => artifact.name === 'github-pages'
+            );
+            
+            if (pagesArtifacts.length === 0) {
+              console.log('No "github-pages" artifacts found to clean up');
+              return;
+            }
+            
+            console.log(`Found ${pagesArtifacts.length} "github-pages" artifact(s)`);
+            
+            // If multiple exist, keep the oldest one and delete the rest
+            if (pagesArtifacts.length > 1) {
+              console.log('Multiple artifacts found, keeping the oldest and deleting duplicates...');
+              const sorted = pagesArtifacts.sort((a, b) => 
+                new Date(a.created_at) - new Date(b.created_at)
+              );
+              // Keep the oldest (first), delete the rest
+              for (let i = 1; i < sorted.length; i++) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: sorted[i].id,
+                });
+                console.log(`Deleted duplicate artifact: ${sorted[i].name} (${sorted[i].id}) created at ${sorted[i].created_at}`);
+              }
+              console.log(`Kept artifact: ${sorted[0].name} (${sorted[0].id}) created at ${sorted[0].created_at}`);
+            } else {
+              // Only one artifact exists, delete it so we can upload a fresh one
+              console.log(`Deleting existing artifact: ${pagesArtifacts[0].name} (${pagesArtifacts[0].id})`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: pagesArtifacts[0].id,
+              });
+              console.log('Artifact deleted successfully');
+            }
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages
           path: web-client-deploy/
 
       - name: Deploy to Pages
@@ -529,4 +579,4 @@ jobs:
     with:
       version: ${{ needs.build-components.outputs.release_tag }}
       push: true
-    secrets: inherit 
+    secrets: inherit
