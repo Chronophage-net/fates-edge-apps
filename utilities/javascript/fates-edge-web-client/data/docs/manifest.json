@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-02T22:54:20.902Z",
+  "generated": "2026-09-02T23:35:35.088Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -795,6 +795,16 @@
       "active": true
     },
     {
+      "id": "the_nameless",
+      "title": "The Nameless",
+      "file": "Fates_-_Edge_-_-The-_-Nameless.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_ninth_proof",
       "title": "The Ninth Proof",
       "file": "Fates_-_Edge_-_-The-_-Ninth-_-Proof.html",
@@ -1019,7 +1029,7 @@
       "active": true
     }
   ],
-  "total_count": 66,
-  "active_count": 66,
+  "total_count": 67,
+  "active_count": 67,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
