@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Paper Table — Playing Fate's Edge Without Dice</title>
+<style>
+  :root { --bg1:#0d0d1a; --bg2:#15152a; --bg3:#1e1e38; --bg4:#282848;
+          --text:#e8e6f0; --text2:#b8b4c8; --text3:#8a86a0;
+          --gold:#c9a227; --red:#a3462f; --green:#4f7f5a; --blue:#4a6f8a;
+          --purple:#6b5b95; --border:#3a3a5c; --radius:8px; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg1);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+       padding:1.5rem;max-width:1000px;margin:0 auto;line-height:1.6}
+  h1,h2,h3,h4{color:var(--gold);margin:1.2rem 0 .4rem}
+  h1{font-size:1.9rem;border-bottom:2px solid var(--gold);padding-bottom:.3rem}
+  h2{font-size:1.35rem;border-bottom:1px solid var(--border);padding-bottom:.2rem;margin-top:2rem}
+  h3{font-size:1.05rem}
+  a{color:var(--gold)}
+  .panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem 1rem;margin:.7rem 0}
+  .panel-gold{border-left:4px solid var(--gold)} .panel-blue{border-left:4px solid var(--blue)}
+  .panel-red{border-left:4px solid var(--red)} .panel-green{border-left:4px solid var(--green)}
+  .badge{display:inline-block;padding:.05rem .5rem;border-radius:12px;font-size:.68rem;font-weight:600}
+  .badge-gold{background:var(--gold);color:#1a1000}.badge-blue{background:var(--blue);color:#fff}
+  .badge-green{background:var(--green);color:#fff}.badge-gray{background:var(--bg4);color:var(--text3)}
+  .badge-purple{background:var(--purple);color:#fff}
+  .text-sm{font-size:.87rem}.text-xs{font-size:.75rem}.text-muted{color:var(--text3)}
+  table{width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.82rem}
+  th,td{border:1px solid var(--border);padding:.28rem .5rem;text-align:left;vertical-align:top}
+  th{background:var(--bg3);color:var(--gold)}
+  td.c,th.c{text-align:center;white-space:nowrap}
+  .table-wrap{overflow-x:auto}
+  .cut{background:#fff;border-radius:6px;padding:1rem;margin:.8rem 0;display:inline-block}
+  .cut .wheel{display:block}
+  .cutrow{display:flex;gap:1.2rem;flex-wrap:wrap;align-items:flex-start}
+  .clockstrip,.boxrow{background:#fff;border-radius:4px;padding:.3rem;margin:.2rem 0}
+  .trk{margin:.5rem 0}
+  .trk .lbl{font-size:.78rem;color:var(--text2);margin-bottom:.1rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .cols3{column-count:3;column-gap:1.2rem;font-size:.78rem}
+  @media(max-width:800px){.cols3{column-count:2}}
+  @media(max-width:520px){.cols3{column-count:1}}
+  .cols3 table{break-inside:avoid}
+  @media print{
+    body{background:#fff;color:#000;max-width:none;padding:.4in}
+    h1,h2,h3,h4{color:#000}
+    .panel{background:#fff;border:1px solid #666}
+    th{background:#eee;color:#000}
+    th,td{border:1px solid #999}
+    .cut{border:1px dashed #444;padding:.5rem}
+    .noprint{display:none}
+    a{color:#000;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<h1>🎡 The Paper Table</h1>
+<p class="text-sm text-muted"><span class="badge badge-gold">Resource</span> <span class="badge badge-blue">Printable</span> <span class="badge badge-green">No dice required</span> <span class="badge badge-purple">Accessibility</span> <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
+<blockquote style="border-left:3px solid var(--gold);padding-left:1rem;margin:.8rem 0;font-style:italic;color:var(--text2)">Where dice are dangerous.</blockquote>
+<div class="panel panel-gold">
+<strong>What this is.</strong>
+<p class="text-sm mt-1">Everything in this document prints on ordinary paper and replaces a set of dice.
+There is a spinner you can cut out, three methods that need no spinner at all, a lookup table that
+resolves a whole dice pool in two spins, and paper trackers for clocks, Boons, Story Beats, Harm and
+Fatigue. Print it in black and white; nothing here depends on colour.</p>
+<p class="text-sm">Fate's Edge is played with ten-sided dice, and dice are not always available. Some
+tables have lost them, or travel light, or are playing on a bus. Some are playing where dice often
+aren't allowed. And some people simply read pips faster than they read small engraved numerals. The
+game does not actually require the objects &mdash; it requires a fair way to get a number from 1 to 10,
+and there are many.</p>
+</div>
+<h2 id="wheel">1. The Wheel</h2>
+<p>Cut it out, or just lay the page flat and spin on it. Each sector is one tenth of the circle, so every number is equally likely &mdash; this <em>is</em> a d10, drawn instead of moulded.</p>
+<div class="cutrow">
+<div class="cut"><svg viewBox="0 0 340 340" width="340" height="340" role="img" aria-label="ten-sector spinner" class="wheel">
+<circle cx="170.0" cy="170.0" r="156.0" fill="#fff" stroke="#000" stroke-width="3"/>
+<path d="M170.0,170.0 L170.0,14.0 A156.0,156.0 0 0,1 261.7,43.8 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="203.7" y="66.1" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">1</text>
+<path d="M170.0,170.0 L261.7,43.8 A156.0,156.0 0 0,1 318.4,121.8 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="258.3" y="105.8" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">2</text>
+<path d="M170.0,170.0 L318.4,121.8 A156.0,156.0 0 0,1 318.4,218.2 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="279.2" y="170.0" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">3</text>
+<path d="M170.0,170.0 L318.4,218.2 A156.0,156.0 0 0,1 261.7,296.2 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="258.3" y="234.2" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">4</text>
+<path d="M170.0,170.0 L261.7,296.2 A156.0,156.0 0 0,1 170.0,326.0 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="203.7" y="273.9" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">5</text>
+<path d="M170.0,170.0 L170.0,326.0 A156.0,156.0 0 0,1 78.3,296.2 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="136.3" y="273.9" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">6</text>
+<path d="M170.0,170.0 L78.3,296.2 A156.0,156.0 0 0,1 21.6,218.2 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="81.7" y="234.2" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">7</text>
+<path d="M170.0,170.0 L21.6,218.2 A156.0,156.0 0 0,1 21.6,121.8 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="60.8" y="170.0" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">8</text>
+<path d="M170.0,170.0 L21.6,121.8 A156.0,156.0 0 0,1 78.3,43.8 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="81.7" y="105.8" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">9</text>
+<path d="M170.0,170.0 L78.3,43.8 A156.0,156.0 0 0,1 170.0,14.0 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="136.3" y="66.1" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">10</text>
+<circle cx="170.0" cy="170.0" r="5.5" fill="#000"/>
+<circle cx="170.0" cy="170.0" r="12" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="3 3"/>
+</svg></div>
+<div style="flex:1;min-width:240px">
+<h3>Three ways to spin it</h3>
+<p class="text-sm"><strong>With a paperclip.</strong> Open one end, hold it at the centre with a pen or
+pencil tip through the loop, and flick. Read the sector the long end stops in.</p>
+<p class="text-sm"><strong>With a pencil alone.</strong> Stand the pencil on its point at the centre dot,
+pinch the top, and spin it like a top. Read the sector it falls toward.</p>
+<p class="text-sm"><strong>By dropping.</strong> Hold a pencil about a foot above the page, eyes on the
+centre, and drop it. Read where the point lands; drop again if it misses the circle. Slower, and the
+fairest of the three if your spinner is warped.</p>
+<div class="panel panel-blue" style="margin-top:.6rem">
+<p class="text-xs"><strong>Is it actually fair?</strong> A spinner is fair if the sectors are equal and
+the spin is long enough to lose its starting position &mdash; two or three full turns is plenty. Sectors
+here are exactly 36&deg;. The usual way a paper spinner goes wrong is a bent clip or a soft centre hole
+that drags; if one number starts coming up more than its share, re-cut the centre or switch to dropping.</p>
+</div>
+</div>
+</div>
+<h2 id="nothing">2. If you have no spinner at all</h2>
+<p>All three of these produce a fair number from 1 to 10 using things you already have. None need a printed page.</p>
+<div class="grid2">
+<div class="panel panel-green">
+<strong>The book.</strong>
+<p class="text-sm mt-1">Let a thick book fall open and read the <em>last digit</em> of the left-hand page
+number. 0 counts as 10. Any book over about two hundred pages works, and page numbers are uniform in
+their last digit regardless of where the spine likes to open &mdash; which is why this method is more
+robust than it looks.</p>
+<p class="text-xs text-muted">Two digits, for the table in section 4: read the last digit of the left page,
+then the last digit of the right page.</p>
+</div>
+<div class="panel panel-green">
+<strong>The dropped pencil.</strong>
+<p class="text-sm mt-1">Number ten short lines across a page, or use the printed wheel. Drop a pencil from
+a hand's height and read the nearest number. Re-drop if it lands off the page.</p>
+</div>
+<div class="panel panel-green">
+<strong>The clock.</strong>
+<p class="text-sm mt-1">If you can see a second hand, glance away, then look: the seconds' last digit is
+your number, 0 counting as 10. Fair, instant, and needs nothing at all &mdash; but only once every few
+seconds, so it suits one-off rolls rather than a full pool.</p>
+</div>
+<div class="panel panel-red">
+<strong>What doesn't work.</strong>
+<p class="text-sm mt-1">Picking a number "at random" in your head, or stabbing a numbered grid with your
+eyes shut. People are reliably biased at both &mdash; middling numbers come up far too often and edges
+almost never. If it feels random, it probably isn't; use one of the three above.</p>
+</div>
+</div>
+<h2 id="pool">3. Rolling a pool</h2>
+<p>A Fate's Edge roll is <em>Attribute + Skill</em> dice, so most rolls are four to seven spins.
+Spin that many times and tally as you go &mdash; a stroke for each success, a dot for each 1:</p>
+<div class="table-wrap"><table>
+<tr><th class="c">Spin</th><th>Counts as</th></tr>
+<tr><td class="c">1</td><td>No success, and <strong>1 Story Beat to the GM</strong></td></tr>
+<tr><td class="c">2&ndash;5</td><td>Nothing</td></tr>
+<tr><td class="c">6&ndash;9</td><td><strong>1 success</strong></td></tr>
+<tr><td class="c">10</td><td><strong>2 successes</strong></td></tr>
+</table></div>
+<p class="text-sm"><strong>Position works normally.</strong> Dominant: re-spin one failure (a 1&ndash;5),
+your choice. Desperate: re-spin one success (a 6&ndash;9); a 10 is never re-spun. A re-spun 1
+<strong>keeps</strong> its Story Beat &mdash; mark the dot before you re-spin, and mark another if the new
+spin is also a 1.</p>
+<h2 id="fast">4. The fast table &mdash; two spins for any pool</h2>
+<p>Spinning eight times gets old. This resolves an entire pool in <strong>two spins</strong>: the first
+is the tens digit, the second the units, giving a number from 01 to 00 (that is, 100). Read your pool's
+column and take the successes and Story Beats straight off it.</p>
+<div class="panel panel-blue">
+<p class="text-sm"><strong>What this is, exactly.</strong> Each column is the true probability distribution
+of that pool, computed by enumerating every possible roll, then divided into a hundred slots. It is not an
+approximation of the <em>game</em> &mdash; it is the same maths the dice do, sampled in one step instead of
+eight. Slot allocation rounds each outcome to the nearest percent, so any single line is at most about one
+percentage point off, which is far below what anyone notices at a table.</p>
+<p class="text-sm"><strong>Slot 00 is not a rounding bin.</strong> The very best and very worst results are
+rarer than one percent and would round away to nothing, so instead of quietly deleting them the table
+sends you to <strong>00: spin the long way</strong> &mdash; one spin per die, per section 3. It comes up
+about one roll in a hundred and it is the only way the spectacular results stay reachable.</p>
+</div>
+<p class="text-sm"><strong>These columns are for Controlled Position.</strong> For Dominant or Desperate,
+spin the pool the long way and apply the re-spin; Position turns on a single die, and a table that has
+already added them up cannot tell you which one to change.</p>
+<div class="cols3">
+<div><strong class="text-sm">Pool of 2</strong>
+<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01&ndash;16</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">17&ndash;24</td><td class="c">0</td><td class="c">1</td></tr>
+<tr><td class="c">25</td><td class="c">0</td><td class="c">2</td></tr>
+<tr><td class="c">26&ndash;56</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">57&ndash;64</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">65&ndash;88</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">89&ndash;90</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">91&ndash;98</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">99</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
+</table></div>
+<div><strong class="text-sm">Pool of 3</strong>
+<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01&ndash;06</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">07&ndash;11</td><td class="c">0</td><td class="c">1</td></tr>
+<tr><td class="c">12</td><td class="c">0</td><td class="c">2</td></tr>
+<tr><td class="c">13&ndash;31</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">32&ndash;41</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">42</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">43&ndash;66</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">67&ndash;73</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">74&ndash;89</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">90&ndash;92</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">93&ndash;98</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">99</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
+</table></div>
+<div><strong class="text-sm">Pool of 4</strong>
+<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01&ndash;03</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">04&ndash;06</td><td class="c">0</td><td class="c">1</td></tr>
+<tr><td class="c">07</td><td class="c">0</td><td class="c">2</td></tr>
+<tr><td class="c">08&ndash;17</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">18&ndash;25</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">26&ndash;27</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">28&ndash;45</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">46&ndash;55</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">56</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">57&ndash;74</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">75&ndash;80</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">81</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">82&ndash;92</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">93&ndash;94</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">95&ndash;98</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">99</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
+</table></div>
+<div><strong class="text-sm">Pool of 5</strong>
+<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">02</td><td class="c">0</td><td class="c">1</td></tr>
+<tr><td class="c">03</td><td class="c">0</td><td class="c">2</td></tr>
+<tr><td class="c">04&ndash;08</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">09&ndash;13</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">14&ndash;15</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">16&ndash;27</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">28&ndash;36</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">37&ndash;38</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">39&ndash;53</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">54&ndash;62</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">63&ndash;64</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">65&ndash;77</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">78&ndash;83</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">84</td><td class="c">4</td><td class="c">2</td></tr>
+<tr><td class="c">85&ndash;92</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">93&ndash;94</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">95&ndash;97</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">98</td><td class="c">6</td><td class="c">1</td></tr>
+<tr><td class="c">99</td><td class="c">7</td><td class="c">0</td></tr>
+<tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
+</table></div>
+<div><strong class="text-sm">Pool of 6</strong>
+<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01</td><td class="c">0</td><td class="c">1</td></tr>
+<tr><td class="c">02&ndash;03</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">04&ndash;06</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">07&ndash;08</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">09&ndash;15</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">16&ndash;22</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">23&ndash;25</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">26&ndash;36</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">37&ndash;45</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">46&ndash;48</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">49&ndash;61</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">62&ndash;69</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">70&ndash;71</td><td class="c">4</td><td class="c">2</td></tr>
+<tr><td class="c">72&ndash;81</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">82&ndash;86</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">87</td><td class="c">5</td><td class="c">2</td></tr>
+<tr><td class="c">88&ndash;93</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">94&ndash;95</td><td class="c">6</td><td class="c">1</td></tr>
+<tr><td class="c">96&ndash;97</td><td class="c">7</td><td class="c">0</td></tr>
+<tr><td class="c">98</td><td class="c">7</td><td class="c">1</td></tr>
+<tr><td class="c">99</td><td class="c">8</td><td class="c">0</td></tr>
+<tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
+</table></div>
+<div><strong class="text-sm">Pool of 7</strong>
+<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">02&ndash;03</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">04</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">05&ndash;08</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">09&ndash;13</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">14&ndash;15</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">16</td><td class="c">2</td><td class="c">3</td></tr>
+<tr><td class="c">17&ndash;23</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">24&ndash;31</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">32&ndash;34</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">35</td><td class="c">3</td><td class="c">3</td></tr>
+<tr><td class="c">36&ndash;45</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">46&ndash;54</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">55&ndash;57</td><td class="c">4</td><td class="c">2</td></tr>
+<tr><td class="c">58&ndash;67</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">68&ndash;74</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">75&ndash;76</td><td class="c">5</td><td class="c">2</td></tr>
+<tr><td class="c">77&ndash;84</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">85&ndash;88</td><td class="c">6</td><td class="c">1</td></tr>
+<tr><td class="c">89</td><td class="c">6</td><td class="c">2</td></tr>
+<tr><td class="c">90&ndash;93</td><td class="c">7</td><td class="c">0</td></tr>
+<tr><td class="c">94&ndash;95</td><td class="c">7</td><td class="c">1</td></tr>
+<tr><td class="c">96&ndash;97</td><td class="c">8</td><td class="c">0</td></tr>
+<tr><td class="c">98</td><td class="c">8</td><td class="c">1</td></tr>
+<tr><td class="c">99</td><td class="c">9</td><td class="c">0</td></tr>
+<tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
+</table></div>
+<div><strong class="text-sm">Pool of 8</strong>
+<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">02</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">03</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">04&ndash;05</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">06&ndash;08</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">09&ndash;10</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">11</td><td class="c">2</td><td class="c">3</td></tr>
+<tr><td class="c">12&ndash;16</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">17&ndash;22</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">23&ndash;25</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">26</td><td class="c">3</td><td class="c">3</td></tr>
+<tr><td class="c">27&ndash;33</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">34&ndash;41</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">42&ndash;45</td><td class="c">4</td><td class="c">2</td></tr>
+<tr><td class="c">46</td><td class="c">4</td><td class="c">3</td></tr>
+<tr><td class="c">47&ndash;55</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">56&ndash;63</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">64&ndash;66</td><td class="c">5</td><td class="c">2</td></tr>
+<tr><td class="c">67&ndash;74</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">75&ndash;80</td><td class="c">6</td><td class="c">1</td></tr>
+<tr><td class="c">81&ndash;82</td><td class="c">6</td><td class="c">2</td></tr>
+<tr><td class="c">83&ndash;88</td><td class="c">7</td><td class="c">0</td></tr>
+<tr><td class="c">89&ndash;91</td><td class="c">7</td><td class="c">1</td></tr>
+<tr><td class="c">92</td><td class="c">7</td><td class="c">2</td></tr>
+<tr><td class="c">93&ndash;95</td><td class="c">8</td><td class="c">0</td></tr>
+<tr><td class="c">96&ndash;97</td><td class="c">8</td><td class="c">1</td></tr>
+<tr><td class="c">98</td><td class="c">9</td><td class="c">0</td></tr>
+<tr><td class="c">99</td><td class="c">9</td><td class="c">1</td></tr>
+<tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
+</table></div>
+</div>
+<h2 id="trackers">5. Paper trackers</h2>
+<p>Cut these out, or copy them by hand &mdash; they are only boxes. Fill a box with a stroke; erase or cross out to clear. Clocks come in four legal sizes and no others.</p>
+<div class="grid2">
+<div class="trk"><div class="lbl"><strong>Clock [4]</strong> &mdash; The shortest legal clock.</div><svg viewBox="0 0 119 32" width="119" height="32" role="img" aria-label="four-segment clock" class="clockstrip">
+<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+</svg></div>
+<div class="trk"><div class="lbl"><strong>Clock [6]</strong> &mdash; The workhorse.</div><svg viewBox="0 0 177 32" width="177" height="32" role="img" aria-label="six-segment clock" class="clockstrip">
+<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="119" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="148" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+</svg></div>
+<div class="trk"><div class="lbl"><strong>Clock [8]</strong> &mdash; Long pressure.</div><svg viewBox="0 0 235 32" width="235" height="32" role="img" aria-label="eight-segment clock" class="clockstrip">
+<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="119" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="148" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="177" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="206" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+</svg></div>
+<div class="trk"><div class="lbl"><strong>Clock [10]</strong> &mdash; A campaign can end inside one.</div><svg viewBox="0 0 293 32" width="293" height="32" role="img" aria-label="ten-segment clock" class="clockstrip">
+<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="119" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="148" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="177" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="206" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="235" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<rect x="264" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+</svg></div>
+</div>
+<div class="grid2">
+<div class="trk"><div class="lbl"><strong>Boons</strong> &mdash; max 5; trim to 2 at scene end.</div><svg viewBox="0 0 100.0 22.0" width="100.0" height="22.0" role="img" aria-label="five boxes" class="boxrow">
+<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="61.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="80.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+</svg></div>
+<div class="trk"><div class="lbl"><strong>Story Beats</strong> &mdash; the GM's pool.</div><svg viewBox="0 0 119.5 22.0" width="119.5" height="22.0" role="img" aria-label="six boxes" class="boxrow">
+<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="61.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="80.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="100.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+</svg></div>
+<div class="trk"><div class="lbl"><strong>Harm</strong> &mdash; 1, 2, 3. Three levels only.</div><svg viewBox="0 0 61.0 22.0" width="61.0" height="22.0" role="img" aria-label="three boxes" class="boxrow">
+<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+</svg></div>
+<div class="trk"><div class="lbl"><strong>Fatigue</strong> &mdash; track size equals Body.</div><svg viewBox="0 0 119.5 22.0" width="119.5" height="22.0" role="img" aria-label="six boxes" class="boxrow">
+<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="61.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="80.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<rect x="100.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+</svg></div>
+</div>
+<h2 id="d6">6. If you have six-siders but not ten</h2>
+<p>A board-game box usually has d6s in it. <a href="../expansions/Fates_-_Edge_-_-The-_-Peoples-_-Die.html"><em>The People's Die</em></a> is a complete d6 conversion of the game &mdash; and if you have no d6s either, here is the wheel for it. Six sectors, same three spinning methods.</p>
+<div class="cut"><svg viewBox="0 0 250 250" width="250" height="250" role="img" aria-label="six-sector spinner" class="wheel">
+<circle cx="125.0" cy="125.0" r="111.0" fill="#fff" stroke="#000" stroke-width="3"/>
+<path d="M125.0,125.0 L125.0,14.0 A111.0,111.0 0 0,1 221.1,69.5 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="163.8" y="57.7" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">1</text>
+<path d="M125.0,125.0 L221.1,69.5 A111.0,111.0 0 0,1 221.1,180.5 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="202.7" y="125.0" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">2</text>
+<path d="M125.0,125.0 L221.1,180.5 A111.0,111.0 0 0,1 125.0,236.0 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="163.8" y="192.3" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">3</text>
+<path d="M125.0,125.0 L125.0,236.0 A111.0,111.0 0 0,1 28.9,180.5 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="86.2" y="192.3" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">4</text>
+<path d="M125.0,125.0 L28.9,180.5 A111.0,111.0 0 0,1 28.9,69.5 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
+<text x="47.3" y="125.0" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">5</text>
+<path d="M125.0,125.0 L28.9,69.5 A111.0,111.0 0 0,1 125.0,14.0 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
+<text x="86.1" y="57.7" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">6</text>
+<circle cx="125.0" cy="125.0" r="5.5" fill="#000"/>
+<circle cx="125.0" cy="125.0" r="12" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="3 3"/>
+</svg></div>
+<h2 id="print">7. Printing notes</h2>
+<ul class="text-sm">
+<li>Print at 100% &mdash; "fit to page" will shrink the wheel and skew the sectors slightly.</li>
+<li>Black and white is fine. Nothing in this document carries meaning in colour alone.</li>
+<li>Card or a glued-on cereal box back makes a wheel that lasts; plain paper works for a session.</li>
+<li>The wheel is about 3.5 inches across. Two fit side by side on a sheet if you want a spare.</li>
+<li>Everything here is under the same licence as the SRD, CC BY-NC-SA 4.0. Copy it, hand it out,
+put it in a zine, mail it to somebody.</li>
+</ul>
+<div class="panel panel-gold">
+<strong>A note for whoever is running this.</strong>
+<p class="text-sm mt-1">None of the above changes a single rule. The dice pool, the Outcome Matrix,
+Position, Boons and Story Beats are all exactly as written in the core book &mdash; a spinner is just a
+d10 that lies flat, and the table in section 4 is the same distribution the dice produce. A character
+built at a paper table is playable at any other table, and the reverse. That is the whole point: the
+rules were never the part that needed the equipment.</p>
+</div>
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+<div style="font-size:.75rem;color:var(--text3);text-align:center;padding:1rem 0">The Paper Table &mdash; a Fate's Edge resource<br>&copy; Nicholas A. Gasper &mdash; CC BY-NC-SA 4.0</div>
+</body>
+</html>
