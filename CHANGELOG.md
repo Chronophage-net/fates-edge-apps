@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.9] - 2026-09-02
+
+Data canon sweep, Censor's Daughter document, Nameless conversion
+
+### Chore
+- sync data canon fixes, The Censor's Daughter and The Nameless
+
 ## [5.0.8] - 2026-09-02
 
 The Hollowed saga, Chain/Cord fixes, sync corrections
