@@ -327,6 +327,87 @@ const state = {
 // caller explicitly passes force=true.
 let hasLoadedOnceThisSession = false;
 
+// ─── Cross-Resonance ────────────────────────────────────────────────
+// 81 rivalry pairings, extracted from the Invoker's Guide's LaTeX longtable
+// into data/patron-rivalries.json (fates-edge-docs
+// tools/extract_patron_rivalries.py). Only five of fifty-one patron files
+// ever carried a `rivalries` key of their own, so before this the other
+// seventy-odd relationships existed nowhere a tool could see them.
+//
+// Relationships are symmetric: the source lists each pair once, under
+// whichever patron came first alphabetically. Looking a patron up has to
+// check BOTH columns or half its rivals go missing -- which is exactly the
+// bug a table like this invites.
+let _rivalryData = null;
+let _rivalryPromise = null;
+
+export function loadRivalries() {
+    if (_rivalryData) return Promise.resolve(_rivalryData);
+    if (!_rivalryPromise) {
+        _rivalryPromise = fetch('./data/patron-rivalries.json')
+            .then(r => (r.ok ? r.json() : null))
+            .then(d => { _rivalryData = d || { pairs: [], rulings: [] }; return _rivalryData; })
+            .catch(() => { _rivalryData = { pairs: [], rulings: [] }; return _rivalryData; });
+    }
+    return _rivalryPromise;
+}
+
+/**
+ * Match a patron file to a row in the rivalry table.
+ *
+ * The table names patrons the way a sentence does -- "Aveh",
+ * "Oath of Flame & Light" -- while patron files carry long titles like
+ * "Aveh, the Rider Behind the Storm". So compare on NAME KEYS: the
+ * squashed full title, and the leading segment before the first comma or
+ * dash, which is where a patron's actual name lives.
+ *
+ * A containment test alone is not enough and was the first thing tried:
+ * requiring the shorter side to be five characters or more (to stop
+ * "the" matching everything) silently dropped every short-named patron --
+ * Aveh, Mab, Oya, Kuva, Gaila, Inaea, Isoka. Fifteen of fifty-one showed
+ * no rivals at all, which looks exactly like "this patron has none".
+ */
+function nameKeys(value) {
+    const squash = s => String(s || '')
+        .toLowerCase()
+        .replace(/\band\b/g, '&')
+        .replace(/[^a-z0-9&]/g, '');
+    const raw = String(value || '');
+    const lead = raw.split(/[,\u2014\u2013]|\s+-\s+/)[0];
+    return new Set([squash(raw), squash(lead)].filter(Boolean));
+}
+
+export function rivalriesFor(patron, data) {
+    if (!patron || !data || !data.pairs) return [];
+    const mine = new Set([
+        ...nameKeys(patron.title),
+        ...nameKeys(patron.name),
+        ...nameKeys(String(patron.id || '').replace(/[-_]/g, ' ')),
+    ]);
+    mine.delete('');
+    const matches = (name) => {
+        for (const k of nameKeys(name)) {
+            if (mine.has(k)) return true;
+            // Fall back to containment only for names long enough that a
+            // partial hit means something.
+            for (const m of mine) {
+                if (k.length > 6 && m.includes(k)) return true;
+                if (m.length > 6 && k.includes(m)) return true;
+            }
+        }
+        return false;
+    };
+    const out = [];
+    for (const p of data.pairs) {
+        if (matches(p.patron)) {
+            out.push({ rival: p.rival, domains: p.rival_domains, loci: p.edge_loci, friction: p.friction });
+        } else if (matches(p.rival)) {
+            out.push({ rival: p.patron, domains: p.patron_domains, loci: p.edge_loci, friction: p.friction });
+        }
+    }
+    return out;
+}
+
 export async function loadPatronData(force = false) {
     if (!hasLoadedOnceThisSession) {
         force = true;
@@ -959,7 +1040,48 @@ window.openPatronDetailModal = function(patronId) {
     modal.onclick = (e) => {
         if (e.target === modal) window.closePatronModal();
     };
+
+    // Fill Cross-Resonance once the table has loaded. Deliberately after
+    // the modal paints: the rivalry file is one fetch and the detail panel
+    // should never wait on it.
+    fillCrossResonance(patron);
 };
+
+/**
+ * Render this patron's Cross-Resonance into the placeholder left by
+ * buildPatronSections(). Silent when a patron has no rivals -- plenty
+ * don't, and an empty "no rivalries" box is worse than nothing.
+ */
+function fillCrossResonance(patron) {
+    loadRivalries().then(data => {
+        const slot = document.getElementById('patron-cross-resonance');
+        if (!slot || slot.dataset.patron !== patron.id) return;   // modal moved on
+        const rivals = rivalriesFor(patron, data);
+        if (rivals.length === 0) return;
+
+        const rows = rivals.map(r => `
+            <div style="margin:0.3rem 0;padding:0.4rem 0.6rem;background:var(--bg3);border-radius:var(--radius);border-left:2px solid var(--orange);">
+                <div><strong>${escHtml(r.rival)}</strong>${r.domains && r.domains.length
+                    ? ` <span style="color:var(--text3);font-size:0.8rem;">(${escHtml(r.domains.join(', '))})</span>` : ''}</div>
+                <div style="font-size:0.82rem;color:var(--text2);margin-top:0.15rem;"><em>Edge loci:</em> ${escHtml(r.loci)}</div>
+                <div style="font-size:0.82rem;color:var(--text2);"><em>SB prompts:</em> ${escHtml(r.friction)}</div>
+            </div>`).join('');
+
+        const rulings = (data.rulings || []).map(r =>
+            `<li><strong>${escHtml(r.name)}.</strong> ${escHtml(r.text)}</li>`).join('');
+
+        slot.innerHTML = `
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--orange);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--orange);">⚔️ Cross-Resonance <span style="font-weight:400;color:var(--text3);font-size:0.8rem;">${rivals.length} rival${rivals.length === 1 ? '' : 's'}</span></h3>
+                <p style="margin:0 0 0.4rem 0;font-size:0.85rem;color:var(--text2);">Carrying Symbols from rival Patrons generates friction. <em>Edge loci</em> are where one side starts a step better in Position; the prompts are for spending Story Beats, not penalties to apply.</p>
+                ${rows}
+                <details style="margin-top:0.5rem;">
+                    <summary style="cursor:pointer;color:var(--text2);font-size:0.85rem;">Quick rulings</summary>
+                    <ul style="margin:0.3rem 0 0 1.1rem;font-size:0.82rem;color:var(--text2);">${rulings}</ul>
+                </details>
+            </div>`;
+    });
+}
  
 // ============================================================
 // BUILD PATRON SECTIONS
@@ -1237,7 +1359,14 @@ function buildPatronSections(patron) {
         `;
     }
  
-    // ─── Rivalries ─────────────────────────────────────────────
+    // ─── Cross-Resonance ──────────────────────────────────────
+    // Rendered from the shared table (loadRivalries) rather than from the
+    // patron file's own `rivalries` key, which only five of fifty-one
+    // files have. The container is filled asynchronously so the detail
+    // panel paints immediately; an empty table just leaves it out.
+    html += `<div id="patron-cross-resonance" data-patron="${escHtml(patron.id)}"></div>`;
+
+    // ─── Rivalries (patron-authored, where present) ───────────
     if (patron.rivalries && patron.rivalries.length > 0) {
         html += `
             <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--orange);">
