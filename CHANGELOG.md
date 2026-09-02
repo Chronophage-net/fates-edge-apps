@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.3] - 2026-09-02
+
+Reach band, Near label, DV ladder in the roller, printable paper docs
+
+### Added
+- Reach is a band in the book now, not a house rule here
+
 ## [5.0.2] - 2026-09-02
 
 DV ladder correction synced from fates-edge-docs
