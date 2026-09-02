@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.8] - 2026-09-02
+
+The Hollowed saga, Chain/Cord fixes, sync corrections
+
+### Chore
+- sync The Hollowed saga, Chain/Cord corrections and the rivalry table
+
 ## [5.0.7] - 2026-09-02
 
 Guises, Provenance and Philosophy; Myrmis
