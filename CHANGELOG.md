@@ -3,6 +3,79 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.0] - 2026-09-02
+
+Twelve skills, Threat Level, Position corrections, GM authority enforced on the wire
+
+### Added
+- announce Effect, and do not store it
+- implement SRD 6.9
+- adversaries have Harm Levels, not hit points
+- heritage Affinity/Limit in the character tools and public docs
+
+### Fixed
+- share one region, and gate GM authority on the wire
+- a re-rolled 1 keeps its Story Beat in all three roll paths
+- Position re-rolls one die, not half the pool
+
+### Chore
+- sync Between Knot and Gate + manifests from fates-edge-docs
+- sync adventure corrections from fates-edge-docs
+- regenerate manifests
+- sync Fenwood/Demon's Eye continuity fix from fates-edge-docs
+- regenerate manifests
+- sync
+- regenerate manifests
+- sync GM Guide ch.3 patron merge from fates-edge-docs
+- regenerate manifests
+- sync cross-reference fixes from fates-edge-docs
+- regenerate manifests
+- sync GM Guide ch.2 and the Position-ladder fix from fates-edge-docs
+- regenerate manifests
+- sync GM Guide + Witnessed Prey card/generator alignment
+- regenerate manifests
+- sync GM Guide consistency pass from fates-edge-docs
+- regenerate manifests
+- sync SRD-conformant bestiary from fates-edge-docs
+- sync crafting rules and manifests from fates-edge-docs
+- regenerate manifests
+- sync TL standardisation from fates-edge-docs
+- regenerate manifests
+- regenerate manifests
+- sync upkeep/assist unification from fates-edge-docs
+- regenerate manifests
+- sync GM Guide ch.7 dedup from fates-edge-docs
+- regenerate manifests after guide corrections
+- sync corrected XP walkthroughs (PG ch.4, 8, 9) from fates-edge-docs
+- sync GM Guide ch.13 build-block corrections from fates-edge-docs
+- sync canonical-skill sweep across the guides from fates-edge-docs
+- sync Player's Guide ch.3, ch.6, ch.12 from fates-edge-docs
+- sync revised Player's Guide ch.2 from fates-edge-docs
+
+### Other
+- web client: consolidate to the twelve skills, with a migration for saved characters
+- sync trackers section, DV/clock fixes, revision-commentary strip
+- regenerate manifests after The Paper Table sync
+- sync The Paper Table; docs manifest 65 entries
+- a re-rolled 1 keeps its Story Beat; deprecate the stale sibling roller
+- manifest churn from the docs sync
+- sync The People's Die framing revision from fates-edge-docs
+- sync The People's Die; docs manifest 64 entries
+- manifest churn from the docs sync
+- sync the elemental planes correction from fates-edge-docs
+- sync the elemental-planes SRD section and the P&C Volume III correction
+- sync Peoples and Cultures Volume III; docs manifest 63 entries
+- sync the Cycles anthologies and Peoples and Cultures volumes; manifest 62 entries
+- sync Horror Campaigns from fates-edge-docs; docs manifest 59 entries
+- sync expansions canon pass + SRD unit rating from fates-edge-docs
+- take the corrected sagas from docs; drop the duplicate root copies
+- fix the page locking up after expanding then collapsing a recipe
+- settle manifest churn from the docs sync
+- sync App B reconciliation + Forge of Souls update from fates-edge-docs
+- sync bestiary (Forge of Souls adversaries) from fates-edge-docs
+- web-client: sync The Forge of Souls, regenerate docs manifest (58 entries)
+- Updated manifests
+
 ## [4.26.2] - 2026-08-31
 
 SRI on third-party scripts, untrack the lock reset code, stop manifest timestamp churn
