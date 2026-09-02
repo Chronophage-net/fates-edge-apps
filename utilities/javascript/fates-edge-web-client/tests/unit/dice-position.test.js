@@ -1,4 +1,4 @@
-import { describe, it, assertEqual, assertTrue } from '../runner.js';
+import { describe, it, assert, assertEqual, assertTrue } from '../runner.js';
 import { performRoll } from '../../js/core/dice.js';
 
 // The Position ladder re-rolls exactly ONE die. The SRD is explicit:
@@ -69,5 +69,50 @@ describe('performRoll: Position re-rolls exactly one die', () => {
         // And the gap should be about one die's worth either way, not half the pool.
         assertTrue(dom - con < 1.2, `Dominant is ${(dom - con).toFixed(2)} successes better than Controlled; one re-rolled die is worth well under 1`);
         assertTrue(con - des < 1.2, `Desperate is ${(con - des).toFixed(2)} successes worse than Controlled; one re-rolled die is worth well under 1`);
+    });
+});
+
+// ============================================================
+// REGRESSION: a re-rolled 1 keeps its Story Beat (SRD 18.1)
+// ============================================================
+//
+// "Each die result of 1 generates 1 SB. Re-rolling a 1 does not erase its SB;
+// if the re-rolled die also shows 1, it generates additional SB."
+//
+// performRoll() recomputed storyBeats from the final dice after a Position
+// re-roll, which deleted the beat the original 1 had already earned. Dominant
+// picks the LOWEST failing die, so whenever the pool contained a 1 that was
+// exactly the die re-rolled — meaning Dominant silently ate a Story Beat on
+// most rolls that generated one.
+
+describe('dice: a re-rolled 1 keeps its Story Beat', () => {
+
+    it('Dominant re-rolls the lowest failure without erasing its beat', () => {
+        // Average SB per roll must not drop when Position improves. Story Beats
+        // come from the dice, and Dominant re-rolls exactly one die — it can add
+        // a beat (new 1) but must never subtract the one already earned.
+        let dom = 0, ctl = 0;
+        const N = 4000;
+        for (let i = 0; i < N; i++) {
+            dom += performRoll(3, 2, 3, 'dominant').storyBeats;
+            ctl += performRoll(3, 2, 3, 'controlled').storyBeats;
+        }
+        const dAvg = dom / N, cAvg = ctl / N;
+        // Controlled: 5 dice x 1/10 = 0.50 beats. Dominant re-rolls one die and
+        // keeps any beat it had, so it can only be >= that, plus 1/10 of a beat
+        // from the re-roll itself when a failure existed to re-roll.
+        assert(dAvg >= cAvg - 0.06,
+            `Dominant averaged ${dAvg.toFixed(3)} Story Beats vs Controlled ${cAvg.toFixed(3)} — ` +
+            `improving Position must not destroy Story Beats`);
+        assert(cAvg > 0.40 && cAvg < 0.60, `Controlled SB average ${cAvg.toFixed(3)} should sit near 0.50`);
+    });
+
+    it('never reports fewer beats than the surviving 1s in the final pool', () => {
+        for (let i = 0; i < 2000; i++) {
+            const r = performRoll(3, 2, 3, i % 2 ? 'dominant' : 'desperate');
+            const onesShowing = r.dice.filter(d => d === 1).length;
+            assert(r.storyBeats >= onesShowing,
+                `reported ${r.storyBeats} beats but ${onesShowing} ones are showing`);
+        }
     });
 });

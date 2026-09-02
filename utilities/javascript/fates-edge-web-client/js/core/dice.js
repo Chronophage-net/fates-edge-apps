@@ -382,6 +382,15 @@ function rollPool(pool, sides = 10) {
  * @param {number} options.boons - Number of boons to add
  * @returns {Object} Roll result with successes, dice, storyBeats, etc.
  */
+// DEPRECATED. This is an older, unused sibling of performRoll() below, and it
+// encodes two rules that are no longer correct:
+//   1. Dominant/Desperate re-roll EVERY failure/success here. The rules re-roll
+//      exactly one, and 10s are never re-rolled at all.
+//   2. It recomputes Story Beats after the re-roll, erasing the beat a re-rolled
+//      1 had already earned (SRD 18.1 says that beat persists).
+// Nothing in this repo or in fates-edge-ai-gm-bot calls it; it is kept only so
+// an external consumer doesn't break on an unannounced removal. Use performRoll()
+// for anything new, and delete this once the next major version lands.
 function performDicePoolRoll(pool, dv, options = {}) {
     const {
         position = 'controlled',
@@ -565,10 +574,17 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
             reRolls = 1;
             rerollSuccesses = countSuccesses(rerollResults);
             rerollStoryBeats = rerollResults.filter(r => r === 1).length;
+            const rerolledWasOne = dice[pick] === 1;
             dice = dice.map((r, i) => (i === pick ? rerollResults[0] : r));
-            // Recalculate successes and story beats
+            // Recalculate successes from the final dice.
             successes = countSuccesses(dice);
+            // Story Beats are NOT recomputed from the final dice. SRD 18.1:
+            // "Re-rolling a 1 does not erase its SB; if the re-rolled die also
+            // shows 1, it generates additional SB." Recomputing wiped the beat
+            // the original 1 had already earned — and since Dominant picks the
+            // LOWEST failure, that was every 1 in the pool.
             storyBeats = dice.filter(r => r === 1).length;
+            if (rerolledWasOne) storyBeats += 1;
         }
     } else if (position === 'desperate') {
         // Desperate re-rolls ONE success, and never a 10. (SRD: "Desperate:
@@ -587,10 +603,17 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
             reRolls = 1;
             rerollSuccesses = countSuccesses(rerollResults);
             rerollStoryBeats = rerollResults.filter(r => r === 1).length;
+            const rerolledWasOne = dice[pick] === 1;
             dice = dice.map((r, i) => (i === pick ? rerollResults[0] : r));
-            // Recalculate successes and story beats
+            // Recalculate successes from the final dice.
             successes = countSuccesses(dice);
+            // Story Beats are NOT recomputed from the final dice. SRD 18.1:
+            // "Re-rolling a 1 does not erase its SB; if the re-rolled die also
+            // shows 1, it generates additional SB." Recomputing wiped the beat
+            // the original 1 had already earned — and since Dominant picks the
+            // LOWEST failure, that was every 1 in the pool.
             storyBeats = dice.filter(r => r === 1).length;
+            if (rerolledWasOne) storyBeats += 1;
         }
     }
     
