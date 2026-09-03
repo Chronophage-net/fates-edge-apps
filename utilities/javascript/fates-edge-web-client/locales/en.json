@@ -1,0 +1,214 @@
+{
+  "$meta": {
+    "code": "en",
+    "name": "English",
+    "nativeName": "English",
+    "dir": "ltr",
+    "note": "Source catalogue. Every other locale is a translation of THIS file; run `npm run i18n:report` after editing to see which locales fell behind."
+  },
+  "app": {
+    "name": "Fate's Edge",
+    "title": "Fate's Edge Toolkit",
+    "skipToContent": "Skip to content"
+  },
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "← Back",
+    "next": "Next →",
+    "language": "Language"
+  },
+  "nav": {
+    "main": "Main Navigation",
+    "modules": "Module Navigation",
+    "groups": {
+      "core": "Core",
+      "world": "World",
+      "table": "Table",
+      "system": "System"
+    },
+    "home": {
+      "label": "Home",
+      "title": "Home"
+    },
+    "dashboard": {
+      "label": "Dashboard",
+      "title": "Dashboard"
+    },
+    "characters": {
+      "label": "Characters",
+      "title": "Characters"
+    },
+    "dice": {
+      "label": "Dice",
+      "title": "Dice Roller"
+    },
+    "encounters": {
+      "label": "Encounters",
+      "title": "Encounters"
+    },
+    "factions": {
+      "label": "Factions",
+      "title": "Factions & Assets"
+    },
+    "wiki": {
+      "label": "Wiki",
+      "title": "Wiki"
+    },
+    "patrons": {
+      "label": "Patrons",
+      "title": "Patrons"
+    },
+    "spellcraft": {
+      "label": "Spellcraft",
+      "title": "Spellcraft & Magic"
+    },
+    "crafting": {
+      "label": "Crafting",
+      "title": "Crafting"
+    },
+    "vtt": {
+      "label": "VTT",
+      "title": "Virtual Tabletop"
+    },
+    "gmTools": {
+      "label": "GM Tools",
+      "title": "GM Tools"
+    },
+    "timers": {
+      "label": "Timers",
+      "title": "Timers"
+    },
+    "decks": {
+      "label": "Decks",
+      "title": "Decks"
+    },
+    "whiteboard": {
+      "label": "Whiteboard",
+      "title": "Whiteboard"
+    },
+    "adventureManager": {
+      "label": "Adventure Manager",
+      "title": "Adventure Manager"
+    },
+    "konReh": {
+      "label": "Kon'reh",
+      "title": "Kon'reh Strategy Game"
+    },
+    "search": {
+      "label": "Search",
+      "title": "Search"
+    },
+    "docs": {
+      "label": "Docs",
+      "title": "Documentation"
+    },
+    "settings": {
+      "label": "Settings",
+      "title": "Settings"
+    },
+    "systemStatus": {
+      "label": "Status",
+      "title": "System Status"
+    }
+  },
+  "footer": {
+    "saved": "Saved",
+    "export": {
+      "title": "Export JSON",
+      "aria": "Export Data"
+    },
+    "import": {
+      "title": "Import JSON",
+      "aria": "Import Data"
+    },
+    "theme": {
+      "title": "Toggle theme",
+      "aria": "Toggle Theme"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts (?)",
+      "aria": "Keyboard Shortcuts"
+    },
+    "lock": {
+      "title": "Lock screen",
+      "aria": "Lock Screen"
+    }
+  },
+  "gate": {
+    "aria": "Password gate",
+    "title": "Fate's Edge",
+    "subtitle": "The door is shut. Say the word and it opens.",
+    "placeholder": "Enter password…",
+    "submit": "Enter",
+    "foot": "✦ playtesters only, for now ✦"
+  },
+  "lock": {
+    "aria": "Screen locked",
+    "title": "Screen locked",
+    "subtitle": "Nothing has been lost. The table is exactly where you left it.",
+    "placeholder": "Enter password…",
+    "submit": "Unlock",
+    "forgot": "Forgot password? Emergency reset",
+    "resetHint": "Enter the emergency reset code. Whoever set this instance up has it.",
+    "resetPlaceholder": "Reset code…",
+    "resetSubmit": "Reset and enter"
+  },
+  "modal": {
+    "character": "Character Editor",
+    "timer": "Timer Editor",
+    "wiki": "Wiki Entry",
+    "talent": "Talent Editor",
+    "wizard": "Character Wizard",
+    "encounter": "Encounter Editor",
+    "npc": "NPC Editor",
+    "combat": "Combat Tracker",
+    "faction": "Faction Editor",
+    "license": "📜 License Notice"
+  },
+  "shortcuts": {
+    "title": "⌨️ Keyboard Shortcuts",
+    "help": "Open this shortcuts list",
+    "escape": "Close the open dialog or panel",
+    "xcard": "Raise or resume the X-Card (safety pause), from anywhere",
+    "nextCombatant": "Advance to the next combatant, while the combat timer is open",
+    "resetTimer": "Reset the combat timer, while the combat timer is open",
+    "undo": "Undo the last whiteboard action, while the Whiteboard tab is open",
+    "redo": "Redo, while the Whiteboard tab is open",
+    "note": "Shortcuts marked \"while ... is open\" only apply when that panel is focused or visible, so they don't clash with typing elsewhere."
+  },
+  "xcard": {
+    "toggleTitle": "X-Card (Ctrl+Shift+X)",
+    "toggleAria": "Toggle X-Card overlay",
+    "overlayAria": "X-Card Pause",
+    "paused": "PAUSED",
+    "message": "X‑Card has been called. Pause the scene and check in with your group.",
+    "explainer": "The X‑Card is a safety tool: any player can call it at any time to stop a scene that is making them uncomfortable. No questions asked.",
+    "resume": "Resume Game",
+    "shortcutHint": "Press <kbd>Ctrl+Shift+X</kbd> to close"
+  },
+  "settings": {
+    "language": {
+      "heading": "🌐 Language",
+      "badge": "{{count}} available",
+      "intro": "Choose the language the toolkit's interface is shown in. Game content — adventures, wiki entries, patrons and other data — stays in the language it was written in. Anything not yet translated falls back to English, so nothing goes missing.",
+      "auto": "🔄 Match my browser",
+      "status": "Interface:",
+      "autoNote": "(matching your browser)",
+      "autoNoteUnsupported": "(matching your browser — it asked for a language we do not ship yet, so English it is)",
+      "coverage": "{{percent}}% translated",
+      "coverageTitle": "Untranslated text falls back to English",
+      "changed": "Interface language set to {{language}}.",
+      "contribute": "Adding a language takes one JSON file — see TRANSLATION.md in the web client.",
+      "showDevLocale": "Show the translation-test locale",
+      "hideDevLocale": "Hide the translation-test locale"
+    }
+  },
+  "plurals": {
+    "characterCount": {
+      "one": "{{count}} character",
+      "other": "{{count}} characters"
+    }
+  }
+}

@@ -56,6 +56,17 @@ import {
     getCurrentPreference,
     getResolvedThemeId
 } from '@core/theme-manager.js';
+import {
+    getLocales,
+    getLocale,
+    getLocalePreference,
+    getLocaleDescriptor,
+    getCoverage,
+    setLocale,
+    detectBrowserLocale,
+    t as translate
+} from '@core/i18n.js';
+import { getStorage, setStorage } from '@core/utils.js';
 import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
 import {
     loadAdventureManifest,
@@ -64,6 +75,7 @@ import {
 
 let container = null;
 let themeChangeListenerAttached = false;
+let localeChangeListenerAttached = false;
 
 // ============================================================
 // ADVENTURE MODULE LIBRARY (Settings/Admin one-click install)
@@ -994,6 +1006,40 @@ export function render(el) {
                  change needed here. "Auto" is still handled as a meta-option
                  (not a registered theme) exactly as before.
                  ============================================================ -->
+            <!-- ============================================================
+                 LANGUAGE
+                 ============================================================
+                 Deliberately placed next to Theme & Appearance: both are
+                 "how the interface presents itself" preferences, both are
+                 stored locally rather than synced (a shared campaign should
+                 not force everyone at the table into one language), and both
+                 use the same button-row pattern.
+
+                 Only the INTERFACE is translated. Adventures, wiki entries,
+                 patrons and the rest of /data are authored content, not UI
+                 strings, and stay in whatever language they were written in
+                 — saying so here avoids a support question later.
+                 ============================================================ -->
+            <div class="panel settings-panel">
+                <div class="panel-header">
+                    <h3>${escHtml(translate('settings.language.heading', null, '🌐 Language'))}</h3>
+                    <span class="badge" id="locale-count-badge">${escHtml(localeCountLabel())}</span>
+                </div>
+                <p class="text-muted small">${escHtml(translate('settings.language.intro', null, "Choose the language the toolkit's interface is shown in. Game content — adventures, wiki entries, patrons and other data — stays in the language it was written in. Anything not yet translated falls back to English, so nothing goes missing."))}</p>
+                <div class="flex" style="gap:0.5rem;flex-wrap:wrap;" id="locale-picker">
+                    ${renderLocaleButtons()}
+                </div>
+                <div id="locale-status-line" class="mt-1">
+                    ${renderLocaleStatusLine()}
+                </div>
+                <p class="text-xs text-muted" style="margin:0.5rem 0 0;">
+                    ${escHtml(translate('settings.language.contribute', null, 'Adding a language takes one JSON file — see TRANSLATION.md in the web client.'))}
+                    <a href="#" id="locale-dev-toggle" style="color:inherit;text-decoration:underline;cursor:pointer;">${escHtml(devLocalesVisible()
+                        ? translate('settings.language.hideDevLocale', null, 'Hide the translation-test locale')
+                        : translate('settings.language.showDevLocale', null, 'Show the translation-test locale'))}</a>.
+                </p>
+            </div>
+
             <div class="panel settings-panel">
                 <div class="panel-header">
                     <h3>🎨 Theme & Appearance</h3>
@@ -1693,6 +1739,27 @@ export function attachEvents() {
     // Session
     document.getElementById('settings-new-session')?.addEventListener('click', newSessionHandler);
     
+    // Language
+    document.querySelectorAll('.locale-btn').forEach(btn => {
+        btn.addEventListener('click', () => pickLocale(btn.dataset.locale));
+    });
+    document.getElementById('locale-dev-toggle')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        setStorage(DEV_LOCALES_KEY, !devLocalesVisible());
+        // render() re-wires its own handlers at the end (see its
+        // attachEvents() call), so calling it alone is the whole refresh —
+        // adding a second attachEvents() here would double-bind every
+        // listener in the panel.
+        render(container);
+    });
+    // Same reasoning as the theme listener below: the language can change
+    // from outside this panel (a pack registering a catalogue), and this
+    // listener outlives the panel's own re-renders.
+    if (!localeChangeListenerAttached) {
+        localeChangeListenerAttached = true;
+        document.addEventListener('locale-changed', refreshLocaleStatus);
+    }
+
     // Theme
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.addEventListener('click', () => setTheme(btn.dataset.theme));
@@ -2100,6 +2167,100 @@ function newSessionHandler() {
 // both go through core/theme-manager.js, and this module's job is just
 // rendering + rebinding the button row, including any pack-supplied themes.
 // ============================================================
+
+// ============================================================
+// LANGUAGE
+// ============================================================
+//
+// Mirrors the theme row below it on purpose — same button classes, same
+// "Auto" meta-option, same live status line — so the two preferences look
+// and behave like siblings rather than two different ideas of what a
+// picker is.
+
+const DEV_LOCALES_KEY = 'fates-edge-i18n-dev';
+
+/** The pseudolocale is a developer tool, not a language; hidden by default. */
+function devLocalesVisible() {
+    return !!getStorage(DEV_LOCALES_KEY, false);
+}
+
+function visibleLocales() {
+    const showDev = devLocalesVisible();
+    return getLocales().filter(l => showDev || !getLocaleDescriptor(l.code)?.dev);
+}
+
+function renderLocaleButtons() {
+    const preference = getLocalePreference();
+    const buttons = visibleLocales().map(locale => {
+        const active = preference === locale.code ? ' active' : '';
+        // Native name first (that is what a speaker of it scans for), with
+        // the English name after it only when the two differ.
+        const label = locale.nativeName && locale.nativeName !== locale.name
+            ? `${escHtml(locale.nativeName)} <span class="text-muted small">(${escHtml(locale.name)})</span>`
+            : escHtml(locale.name);
+        return `<button class="btn btn-sm locale-btn${active}" data-locale="${escHtml(locale.code)}" lang="${escHtml(locale.code)}">${label}</button>`;
+    });
+    buttons.push(
+        `<button class="btn btn-sm locale-btn${preference === 'auto' || !preference ? ' active' : ''}" data-locale="auto">${escHtml(translate('settings.language.auto', null, '🔄 Match my browser'))}</button>`
+    );
+    return buttons.join('');
+}
+
+function renderLocaleStatusLine() {
+    const preference = getLocalePreference();
+    const active = getLocaleDescriptor(getLocale());
+    const label = active ? escHtml(active.nativeName || active.name) : escHtml(getLocale());
+    const isAuto = preference === 'auto' || !preference;
+
+    const coverage = Math.round(getCoverage(getLocale()) * 100);
+    const coverageNote = coverage >= 100
+        ? ''
+        : ` <span class="source-tag" title="${escHtml(translate('settings.language.coverageTitle', null, 'Untranslated text falls back to English'))}">${escHtml(translate('settings.language.coverage', { percent: coverage }, `${coverage}% translated`))}</span>`;
+
+    const detected = detectBrowserLocale();
+    const autoNote = isAuto
+        ? ` <span class="text-muted small">${escHtml(detected
+            ? translate('settings.language.autoNote', null, '(matching your browser)')
+            : translate('settings.language.autoNoteUnsupported', null, '(matching your browser — it asked for a language we do not ship yet, so English it is)'))}</span>`
+        : '';
+
+    return `
+        <span class="theme-status-badge">
+            <span class="dot"></span>
+            ${escHtml(translate('settings.language.status', null, 'Interface:'))} <strong>${label}</strong>${autoNote}
+            ${coverageNote}
+        </span>
+    `;
+}
+
+function localeCountLabel() {
+    const count = visibleLocales().length;
+    return translate('settings.language.badge', { count }, `${count} available`);
+}
+
+function refreshLocaleStatus() {
+    const badge = document.getElementById('locale-count-badge');
+    if (badge) badge.textContent = localeCountLabel();
+    const statusLine = document.getElementById('locale-status-line');
+    if (statusLine) statusLine.innerHTML = renderLocaleStatusLine();
+    document.querySelectorAll('.locale-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.locale === (getLocalePreference() || 'auto'));
+    });
+}
+
+async function pickLocale(codeOrAuto) {
+    if (!codeOrAuto) return;
+    await setLocale(codeOrAuto);
+    const active = getLocaleDescriptor(getLocale());
+    // translate() is used rather than a literal so this confirmation is
+    // itself shown in the language just selected.
+    showToast(
+        translate('settings.language.changed', { language: active?.nativeName || getLocale() },
+            `Interface language set to ${active?.nativeName || getLocale()}.`),
+        'success'
+    );
+    refreshLocaleStatus();
+}
 
 function renderThemeButtons() {
     const current = getCurrentPreference();

@@ -141,18 +141,18 @@
          top). Lets keyboard/screen-reader users bypass the ~20-item sidebar
          nav and jump straight to the active tab panel. See css/app.css's
          .sr-only/.sr-only-focusable rules. -->
-    <a href="#main-content" class="sr-only sr-only-focusable">Skip to content</a>
+    <a href="#main-content" class="sr-only sr-only-focusable" data-i18n="app.skipToContent">Skip to content</a>
 
     <!-- ===== PASSWORD OVERLAY ===== -->
-    <div class="password-overlay" id="passwordOverlay" role="dialog" aria-modal="true" aria-label="Password gate">
+    <div class="password-overlay" id="passwordOverlay" role="dialog" aria-modal="true" aria-label="Password gate" data-i18n-attr="aria-label:gate.aria">
         <div class="gate-box">
             <div class="gate-icon">⚔️</div>
-            <div class="gate-title">Fate's Edge</div>
-            <div class="gate-sub">The door is shut. Say the word and it opens.</div>
+            <div class="gate-title" data-i18n="gate.title">Fate's Edge</div>
+            <div class="gate-sub" data-i18n="gate.subtitle">The door is shut. Say the word and it opens.</div>
             <div class="gate-error" id="gateError"></div>
-            <input type="password" class="gate-input" id="gateInput" placeholder="Enter password…" autocomplete="current-password" />
-            <button class="gate-btn" id="gateBtn">Enter</button>
-            <div class="gate-foot">&#10022; playtesters only, for now &#10022;</div>
+            <input type="password" class="gate-input" id="gateInput" placeholder="Enter password…" data-i18n-attr="placeholder:gate.placeholder" autocomplete="current-password" />
+            <button class="gate-btn" id="gateBtn" data-i18n="gate.submit">Enter</button>
+            <div class="gate-foot" data-i18n="gate.foot">&#10022; playtesters only, for now &#10022;</div>
         </div>
     </div>
 
@@ -164,21 +164,21 @@
          until the local lock password (or an emergency reset code from
          data/lock-reset.json) is entered. Reuses the same .gate-* classes
          as the password overlay above for visual consistency. -->
-    <div class="password-overlay" id="localLockOverlay" role="dialog" aria-modal="true" aria-label="Screen locked">
+    <div class="password-overlay" id="localLockOverlay" role="dialog" aria-modal="true" aria-label="Screen locked" data-i18n-attr="aria-label:lock.aria">
         <div class="gate-box">
             <div class="gate-icon">🔒</div>
-            <div class="gate-title">Screen locked</div>
-            <div class="gate-sub">Nothing has been lost. The table is exactly where you left it.</div>
+            <div class="gate-title" data-i18n="lock.title">Screen locked</div>
+            <div class="gate-sub" data-i18n="lock.subtitle">Nothing has been lost. The table is exactly where you left it.</div>
             <div class="gate-error" id="localLockError"></div>
-            <input type="password" class="gate-input" id="localLockInput" placeholder="Enter password…" autocomplete="off" />
-            <button class="gate-btn" id="localLockBtn">Unlock</button>
+            <input type="password" class="gate-input" id="localLockInput" placeholder="Enter password…" data-i18n-attr="placeholder:lock.placeholder" autocomplete="off" />
+            <button class="gate-btn" id="localLockBtn" data-i18n="lock.submit">Unlock</button>
             <div class="gate-foot">
-                <a href="#" id="localLockForgotLink" style="color:inherit;text-decoration:underline;cursor:pointer;">Forgot password? Emergency reset</a>
+                <a href="#" id="localLockForgotLink" style="color:inherit;text-decoration:underline;cursor:pointer;" data-i18n="lock.forgot">Forgot password? Emergency reset</a>
             </div>
             <div id="localLockResetSection" style="display:none;margin-top:0.6rem;">
-                <div class="gate-sub" style="font-size:0.8rem;">Enter the emergency reset code. Whoever set this instance up has it.</div>
-                <input type="text" class="gate-input" id="localLockResetInput" placeholder="Reset code…" autocomplete="off" />
-                <button class="gate-btn" id="localLockResetBtn">Reset and enter</button>
+                <div class="gate-sub" style="font-size:0.8rem;" data-i18n="lock.resetHint">Enter the emergency reset code. Whoever set this instance up has it.</div>
+                <input type="text" class="gate-input" id="localLockResetInput" placeholder="Reset code…" data-i18n-attr="placeholder:lock.resetPlaceholder" autocomplete="off" />
+                <button class="gate-btn" id="localLockResetBtn" data-i18n="lock.resetSubmit">Reset and enter</button>
             </div>
         </div>
     </div>
@@ -208,11 +208,11 @@
          this exact same missing-id fallback too — see its constructor.) -->
     <div class="app-shell" id="app-content">
         <!-- ===== SIDEBAR ===== -->
-        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main Navigation">
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main Navigation" data-i18n-attr="aria-label:nav.main">
             <div class="sidebar-brand">
                 <span class="brand-icon">⚔️</span>
                 <div class="brand-text">
-                    <span class="brand-name">Fate's Edge</span>
+                    <span class="brand-name" data-i18n="app.name">Fate's Edge</span>
                     <span class="brand-version">v5.0.9</span>
                 </div>
             </div>
@@ -226,84 +226,84 @@
                  tab-crafting are created on first visit by router.js's
                  getOrCreateContentElement() — harmless for aria-controls
                  to reference an id that doesn't exist yet). -->
-            <nav class="sidebar-nav" id="sidebarNav" role="tablist" aria-orientation="vertical" aria-label="Module Navigation">
+            <nav class="sidebar-nav" id="sidebarNav" role="tablist" aria-orientation="vertical" aria-label="Module Navigation" data-i18n-attr="aria-label:nav.modules">
                 <div class="nav-group">
-                    <span class="nav-group-title">Core</span>
-                    <button class="nav-item active" data-tab="home" title="Home" role="tab" aria-selected="true" aria-controls="tab-home">
-                        <span class="nav-icon">📜</span> <span class="nav-label">Home</span>
+                    <span class="nav-group-title" data-i18n="nav.groups.core">Core</span>
+                    <button class="nav-item active" data-tab="home" title="Home" data-i18n-attr="title:nav.home.title" role="tab" aria-selected="true" aria-controls="tab-home">
+                        <span class="nav-icon">📜</span> <span class="nav-label" data-i18n="nav.home.label">Home</span>
                     </button>
-                    <button class="nav-item" data-tab="dashboard" title="Dashboard" role="tab" aria-selected="false" aria-controls="tab-dashboard">
-                        <span class="nav-icon">📊</span> <span class="nav-label">Dashboard</span>
+                    <button class="nav-item" data-tab="dashboard" title="Dashboard" data-i18n-attr="title:nav.dashboard.title" role="tab" aria-selected="false" aria-controls="tab-dashboard">
+                        <span class="nav-icon">📊</span> <span class="nav-label" data-i18n="nav.dashboard.label">Dashboard</span>
                     </button>
-                    <button class="nav-item" data-tab="characters" title="Characters" role="tab" aria-selected="false" aria-controls="tab-characters">
-                        <span class="nav-icon">👤</span> <span class="nav-label">Characters</span>
+                    <button class="nav-item" data-tab="characters" title="Characters" data-i18n-attr="title:nav.characters.title" role="tab" aria-selected="false" aria-controls="tab-characters">
+                        <span class="nav-icon">👤</span> <span class="nav-label" data-i18n="nav.characters.label">Characters</span>
                     </button>
-                    <button class="nav-item" data-tab="dice" title="Dice Roller" role="tab" aria-selected="false" aria-controls="tab-dice">
-                        <span class="nav-icon">🎲</span> <span class="nav-label">Dice</span>
+                    <button class="nav-item" data-tab="dice" title="Dice Roller" data-i18n-attr="title:nav.dice.title" role="tab" aria-selected="false" aria-controls="tab-dice">
+                        <span class="nav-icon">🎲</span> <span class="nav-label" data-i18n="nav.dice.label">Dice</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
-                    <span class="nav-group-title">World</span>
-                    <button class="nav-item" data-tab="encounters" title="Encounters" role="tab" aria-selected="false" aria-controls="tab-encounters">
-                        <span class="nav-icon">⚔️</span> <span class="nav-label">Encounters</span>
+                    <span class="nav-group-title" data-i18n="nav.groups.world">World</span>
+                    <button class="nav-item" data-tab="encounters" title="Encounters" data-i18n-attr="title:nav.encounters.title" role="tab" aria-selected="false" aria-controls="tab-encounters">
+                        <span class="nav-icon">⚔️</span> <span class="nav-label" data-i18n="nav.encounters.label">Encounters</span>
                     </button>
-                    <button class="nav-item" data-tab="factions" title="Factions & Assets" role="tab" aria-selected="false" aria-controls="tab-factions">
-                        <span class="nav-icon">🏛️</span> <span class="nav-label">Factions</span>
+                    <button class="nav-item" data-tab="factions" title="Factions & Assets" data-i18n-attr="title:nav.factions.title" role="tab" aria-selected="false" aria-controls="tab-factions">
+                        <span class="nav-icon">🏛️</span> <span class="nav-label" data-i18n="nav.factions.label">Factions</span>
                     </button>
-                    <button class="nav-item" data-tab="wiki" title="Wiki" role="tab" aria-selected="false" aria-controls="tab-wiki">
-                        <span class="nav-icon">📖</span> <span class="nav-label">Wiki</span>
+                    <button class="nav-item" data-tab="wiki" title="Wiki" data-i18n-attr="title:nav.wiki.title" role="tab" aria-selected="false" aria-controls="tab-wiki">
+                        <span class="nav-icon">📖</span> <span class="nav-label" data-i18n="nav.wiki.label">Wiki</span>
                     </button>
-                    <button class="nav-item" data-tab="patrons" title="Patrons" role="tab" aria-selected="false" aria-controls="tab-patrons">
-                        <span class="nav-icon">👁️</span> <span class="nav-label">Patrons</span>
+                    <button class="nav-item" data-tab="patrons" title="Patrons" data-i18n-attr="title:nav.patrons.title" role="tab" aria-selected="false" aria-controls="tab-patrons">
+                        <span class="nav-icon">👁️</span> <span class="nav-label" data-i18n="nav.patrons.label">Patrons</span>
                     </button>
                     <!-- Spellcraft -->
-                    <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" role="tab" aria-selected="false" aria-controls="tab-spellcraft">
-                        <span class="nav-icon">🧙</span> <span class="nav-label">Spellcraft</span>
+                    <button class="nav-item" data-tab="spellcraft" title="Spellcraft & Magic" data-i18n-attr="title:nav.spellcraft.title" role="tab" aria-selected="false" aria-controls="tab-spellcraft">
+                        <span class="nav-icon">🧙</span> <span class="nav-label" data-i18n="nav.spellcraft.label">Spellcraft</span>
                     </button>
-                    <button class="nav-item" data-tab="crafting" title="Crafting" role="tab" aria-selected="false" aria-controls="tab-crafting">
-                        <span class="nav-icon">🔨</span> <span class="nav-label">Crafting</span>
-                    </button>
-                </div>
-
-                <div class="nav-group">
-                    <span class="nav-group-title">Table</span>
-                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" role="tab" aria-selected="false" aria-controls="tab-vtt">
-                        <span class="nav-icon">💬</span> <span class="nav-label">VTT</span>
-                    </button>
-                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" role="tab" id="nav-gm-tools" aria-selected="false" aria-controls="tab-gm-tools">
-                        <span class="nav-icon">🎯</span> <span class="nav-label">GM Tools</span>
-                    </button>
-                    <button class="nav-item" data-tab="timers" title="Timers" role="tab" aria-selected="false" aria-controls="tab-timers">
-                        <span class="nav-icon">⏱️</span> <span class="nav-label">Timers</span>
-                    </button>
-                    <button class="nav-item" data-tab="decks" title="Decks" role="tab" aria-selected="false" aria-controls="tab-decks">
-                        <span class="nav-icon">🃏</span> <span class="nav-label">Decks</span>
-                    </button>
-                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" role="tab" aria-selected="false" aria-controls="tab-whiteboard">
-                        <span class="nav-icon">✏️</span> <span class="nav-label">Whiteboard</span>
-                    </button>
-                    <button class="nav-item" data-tab="adventure-manager" title="Adventure Manager" role="tab" id="nav-adventure-manager" aria-selected="false" aria-controls="tab-adventure-manager">
-                        <span class="nav-icon">🤺</span> <span class="nav-label">Adventure Manager</span>
-                    </button>
-                    <button class="nav-item" data-tab="kon-reh" title="Kon'reh Strategy Game" role="tab" aria-selected="false" aria-controls="tab-kon-reh">
-                        <span class="nav-icon">⚪</span> <span class="nav-label">Kon'reh</span>
+                    <button class="nav-item" data-tab="crafting" title="Crafting" data-i18n-attr="title:nav.crafting.title" role="tab" aria-selected="false" aria-controls="tab-crafting">
+                        <span class="nav-icon">🔨</span> <span class="nav-label" data-i18n="nav.crafting.label">Crafting</span>
                     </button>
                 </div>
 
                 <div class="nav-group">
-                    <span class="nav-group-title">System</span>
-                    <button class="nav-item" data-tab="search" title="Search" role="tab" aria-selected="false" aria-controls="tab-search">
-                        <span class="nav-icon">🔍</span> <span class="nav-label">Search</span>
+                    <span class="nav-group-title" data-i18n="nav.groups.table">Table</span>
+                    <button class="nav-item" data-tab="vtt" title="Virtual Tabletop" data-i18n-attr="title:nav.vtt.title" role="tab" aria-selected="false" aria-controls="tab-vtt">
+                        <span class="nav-icon">💬</span> <span class="nav-label" data-i18n="nav.vtt.label">VTT</span>
                     </button>
-                    <button class="nav-item" data-tab="docs" title="Documentation" role="tab" aria-selected="false" aria-controls="tab-docs">
-                        <span class="nav-icon">📄</span> <span class="nav-label">Docs</span>
+                    <button class="nav-item" data-tab="gm-tools" title="GM Tools" data-i18n-attr="title:nav.gmTools.title" role="tab" id="nav-gm-tools" aria-selected="false" aria-controls="tab-gm-tools">
+                        <span class="nav-icon">🎯</span> <span class="nav-label" data-i18n="nav.gmTools.label">GM Tools</span>
                     </button>
-                    <button class="nav-item" data-tab="settings" title="Settings" role="tab" aria-selected="false" aria-controls="tab-settings">
-                        <span class="nav-icon">⚙️</span> <span class="nav-label">Settings</span>
+                    <button class="nav-item" data-tab="timers" title="Timers" data-i18n-attr="title:nav.timers.title" role="tab" aria-selected="false" aria-controls="tab-timers">
+                        <span class="nav-icon">⏱️</span> <span class="nav-label" data-i18n="nav.timers.label">Timers</span>
                     </button>
-                    <button class="nav-item" data-tab="system-status" title="System Status" role="tab" aria-selected="false" aria-controls="tab-system-status">
-                        <span class="nav-icon">🩺</span> <span class="nav-label">Status</span>
+                    <button class="nav-item" data-tab="decks" title="Decks" data-i18n-attr="title:nav.decks.title" role="tab" aria-selected="false" aria-controls="tab-decks">
+                        <span class="nav-icon">🃏</span> <span class="nav-label" data-i18n="nav.decks.label">Decks</span>
+                    </button>
+                    <button class="nav-item" data-tab="whiteboard" title="Whiteboard" data-i18n-attr="title:nav.whiteboard.title" role="tab" aria-selected="false" aria-controls="tab-whiteboard">
+                        <span class="nav-icon">✏️</span> <span class="nav-label" data-i18n="nav.whiteboard.label">Whiteboard</span>
+                    </button>
+                    <button class="nav-item" data-tab="adventure-manager" title="Adventure Manager" data-i18n-attr="title:nav.adventureManager.title" role="tab" id="nav-adventure-manager" aria-selected="false" aria-controls="tab-adventure-manager">
+                        <span class="nav-icon">🤺</span> <span class="nav-label" data-i18n="nav.adventureManager.label">Adventure Manager</span>
+                    </button>
+                    <button class="nav-item" data-tab="kon-reh" title="Kon'reh Strategy Game" data-i18n-attr="title:nav.konReh.title" role="tab" aria-selected="false" aria-controls="tab-kon-reh">
+                        <span class="nav-icon">⚪</span> <span class="nav-label" data-i18n="nav.konReh.label">Kon'reh</span>
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-title" data-i18n="nav.groups.system">System</span>
+                    <button class="nav-item" data-tab="search" title="Search" data-i18n-attr="title:nav.search.title" role="tab" aria-selected="false" aria-controls="tab-search">
+                        <span class="nav-icon">🔍</span> <span class="nav-label" data-i18n="nav.search.label">Search</span>
+                    </button>
+                    <button class="nav-item" data-tab="docs" title="Documentation" data-i18n-attr="title:nav.docs.title" role="tab" aria-selected="false" aria-controls="tab-docs">
+                        <span class="nav-icon">📄</span> <span class="nav-label" data-i18n="nav.docs.label">Docs</span>
+                    </button>
+                    <button class="nav-item" data-tab="settings" title="Settings" data-i18n-attr="title:nav.settings.title" role="tab" aria-selected="false" aria-controls="tab-settings">
+                        <span class="nav-icon">⚙️</span> <span class="nav-label" data-i18n="nav.settings.label">Settings</span>
+                    </button>
+                    <button class="nav-item" data-tab="system-status" title="System Status" data-i18n-attr="title:nav.systemStatus.title" role="tab" aria-selected="false" aria-controls="tab-system-status">
+                        <span class="nav-icon">🩺</span> <span class="nav-label" data-i18n="nav.systemStatus.label">Status</span>
                     </button>
                 </div>
             </nav>
@@ -311,15 +311,15 @@
             <div class="sidebar-footer">
                 <div class="footer-status">
                     <span class="status-dot" id="save-status"></span>
-                    <span class="status-label">Saved</span>
+                    <span class="status-label" data-i18n="footer.saved">Saved</span>
                 </div>
                 <div class="footer-actions">
-                    <button class="footer-btn" id="exportBtn" title="Export JSON" aria-label="Export Data">⬇</button>
-                    <button class="footer-btn" id="importBtn" title="Import JSON" aria-label="Import Data">⬆</button>
+                    <button class="footer-btn" id="exportBtn" title="Export JSON" aria-label="Export Data" data-i18n-attr="title:footer.export.title;aria-label:footer.export.aria">⬇</button>
+                    <button class="footer-btn" id="importBtn" title="Import JSON" aria-label="Import Data" data-i18n-attr="title:footer.import.title;aria-label:footer.import.aria">⬆</button>
                     <input type="file" id="importFile" accept=".json" class="hidden" />
-                    <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle Theme">🌙</button>
-                    <button class="footer-btn" id="shortcutsBtn" title="Keyboard shortcuts (?)" aria-label="Keyboard Shortcuts">⌨️</button>
-                    <button class="footer-btn" id="lockAppBtn" title="Lock screen" aria-label="Lock Screen">🔒</button>
+                    <button class="footer-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle Theme" data-i18n-attr="title:footer.theme.title;aria-label:footer.theme.aria">🌙</button>
+                    <button class="footer-btn" id="shortcutsBtn" title="Keyboard shortcuts (?)" aria-label="Keyboard Shortcuts" data-i18n-attr="title:footer.shortcuts.title;aria-label:footer.shortcuts.aria">⌨️</button>
+                    <button class="footer-btn" id="lockAppBtn" title="Lock screen" aria-label="Lock Screen" data-i18n-attr="title:footer.lock.title;aria-label:footer.lock.aria">🔒</button>
                 </div>
             </div>
         </aside>
@@ -366,122 +366,122 @@
     <!-- ===== MODALS ===== -->
     <div class="modal-overlay" id="charModal" role="dialog" aria-modal="true">
         <div class="modal">
-            <button class="modal-close" id="charModalClose" aria-label="Close">&times;</button>
-            <h2 id="char-modal-title">Character Editor</h2>
+            <button class="modal-close" id="charModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="char-modal-title" data-i18n="modal.character">Character Editor</h2>
             <div id="char-editor-content"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="timerModal" role="dialog" aria-modal="true">
         <div class="modal">
-            <button class="modal-close" id="timerModalClose" aria-label="Close">&times;</button>
-            <h2 id="timer-modal-title">Timer Editor</h2>
+            <button class="modal-close" id="timerModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="timer-modal-title" data-i18n="modal.timer">Timer Editor</h2>
             <div id="timer-editor-content"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="wikiModal" role="dialog" aria-modal="true">
         <div class="modal">
-            <button class="modal-close" id="wikiModalClose" aria-label="Close">&times;</button>
-            <h2 id="wiki-modal-title">Wiki Entry</h2>
+            <button class="modal-close" id="wikiModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="wiki-modal-title" data-i18n="modal.wiki">Wiki Entry</h2>
             <div id="wiki-editor-content"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="talentModal" role="dialog" aria-modal="true">
         <div class="modal">
-            <button class="modal-close" id="talentModalClose" aria-label="Close">&times;</button>
-            <h2 id="talent-modal-title">Talent Editor</h2>
+            <button class="modal-close" id="talentModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="talent-modal-title" data-i18n="modal.talent">Talent Editor</h2>
             <div id="talent-editor-content"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="wizardModal" role="dialog" aria-modal="true">
         <div class="modal" style="max-width:800px;">
-            <button class="modal-close" id="wizardModalClose" aria-label="Close">&times;</button>
-            <h2 id="wizard-title">Character Wizard</h2>
+            <button class="modal-close" id="wizardModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="wizard-title" data-i18n="modal.wizard">Character Wizard</h2>
             <div id="wizard-steps"></div>
             <div class="flex mt-1" id="wizard-nav">
-                <button class="btn" id="wizard-back">← Back</button>
-                <button class="btn btn-gold" id="wizard-next">Next →</button>
+                <button class="btn" id="wizard-back" data-i18n="common.back">← Back</button>
+                <button class="btn btn-gold" id="wizard-next" data-i18n="common.next">Next →</button>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="shortcutsModal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title">
         <div class="modal" style="max-width:480px;">
-            <button class="modal-close" id="shortcutsModalClose" aria-label="Close">&times;</button>
-            <h2 id="shortcuts-modal-title">⌨️ Keyboard Shortcuts</h2>
+            <button class="modal-close" id="shortcutsModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="shortcuts-modal-title" data-i18n="shortcuts.title">⌨️ Keyboard Shortcuts</h2>
             <dl class="shortcuts-list">
                 <div class="shortcuts-row">
                     <dt><kbd>?</kbd></dt>
-                    <dd>Open this shortcuts list</dd>
+                    <dd data-i18n="shortcuts.help">Open this shortcuts list</dd>
                 </div>
                 <div class="shortcuts-row">
                     <dt><kbd>Esc</kbd></dt>
-                    <dd>Close the open dialog or panel</dd>
+                    <dd data-i18n="shortcuts.escape">Close the open dialog or panel</dd>
                 </div>
                 <div class="shortcuts-row">
                     <dt><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd></dt>
-                    <dd>Raise or resume the X-Card (safety pause), from anywhere</dd>
+                    <dd data-i18n="shortcuts.xcard">Raise or resume the X-Card (safety pause), from anywhere</dd>
                 </div>
                 <div class="shortcuts-row">
                     <dt><kbd>Space</kbd></dt>
-                    <dd>Advance to the next combatant, while the combat timer is open</dd>
+                    <dd data-i18n="shortcuts.nextCombatant">Advance to the next combatant, while the combat timer is open</dd>
                 </div>
                 <div class="shortcuts-row">
                     <dt><kbd>R</kbd></dt>
-                    <dd>Reset the combat timer, while the combat timer is open</dd>
+                    <dd data-i18n="shortcuts.resetTimer">Reset the combat timer, while the combat timer is open</dd>
                 </div>
                 <div class="shortcuts-row">
                     <dt><kbd>Ctrl</kbd> + <kbd>Z</kbd></dt>
-                    <dd>Undo the last whiteboard action, while the Whiteboard tab is open</dd>
+                    <dd data-i18n="shortcuts.undo">Undo the last whiteboard action, while the Whiteboard tab is open</dd>
                 </div>
                 <div class="shortcuts-row">
                     <dt><kbd>Ctrl</kbd> + <kbd>Y</kbd></dt>
-                    <dd>Redo, while the Whiteboard tab is open</dd>
+                    <dd data-i18n="shortcuts.redo">Redo, while the Whiteboard tab is open</dd>
                 </div>
             </dl>
-            <p class="text-muted text-xs" style="margin-top:0.5rem;">Shortcuts marked "while ... is open" only apply when that panel is focused or visible, so they don't clash with typing elsewhere.</p>
+            <p class="text-muted text-xs" style="margin-top:0.5rem;" data-i18n="shortcuts.note">Shortcuts marked "while ... is open" only apply when that panel is focused or visible, so they don't clash with typing elsewhere.</p>
         </div>
     </div>
 
     <div class="modal-overlay" id="encounterModal" role="dialog" aria-modal="true">
         <div class="modal" style="max-width:900px;">
-            <button class="modal-close" id="encounterModalClose" aria-label="Close">&times;</button>
-            <h2 id="encounter-modal-title">Encounter Editor</h2>
+            <button class="modal-close" id="encounterModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="encounter-modal-title" data-i18n="modal.encounter">Encounter Editor</h2>
             <div id="encounter-editor-content"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="npcModal" role="dialog" aria-modal="true">
         <div class="modal" style="max-width:700px;">
-            <button class="modal-close" id="npcModalClose" aria-label="Close">&times;</button>
-            <h2 id="npc-modal-title">NPC Editor</h2>
+            <button class="modal-close" id="npcModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="npc-modal-title" data-i18n="modal.npc">NPC Editor</h2>
             <div id="npc-editor-content"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="combatModal" role="dialog" aria-modal="true">
         <div class="modal" style="max-width:800px;">
-            <button class="modal-close" id="combatModalClose" aria-label="Close">&times;</button>
-            <h2 id="combat-modal-title">Combat Tracker</h2>
+            <button class="modal-close" id="combatModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="combat-modal-title" data-i18n="modal.combat">Combat Tracker</h2>
             <div id="combat-editor-content"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="factionModal" role="dialog" aria-modal="true">
         <div class="modal" style="max-width:700px;">
-            <button class="modal-close" id="factionModalClose" aria-label="Close">&times;</button>
-            <h2 id="faction-modal-title">Faction Editor</h2>
+            <button class="modal-close" id="factionModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 id="faction-modal-title" data-i18n="modal.faction">Faction Editor</h2>
             <div id="faction-editor-content"></div>
         </div>
     </div>
     
     <div class="modal-overlay" id="licenseModal" role="dialog" aria-modal="true">
         <div class="modal">
-            <button class="modal-close" id="licenseModalClose" aria-label="Close">&times;</button>
-            <h2>📜 License Notice</h2>
+            <button class="modal-close" id="licenseModalClose" aria-label="Close" data-i18n-attr="aria-label:common.close">&times;</button>
+            <h2 data-i18n="modal.license">📜 License Notice</h2>
             <div class="license-box" id="licenseContent"></div>
         </div>
     </div>
@@ -504,19 +504,19 @@
 
     <!-- ===== X‑CARD FLOATING BUTTON & OVERLAY ===== -->
     <!-- Floating button (bottom‑right) -->
-    <button id="xcard-toggle" class="xcard-floating-btn" title="X-Card (Ctrl+Shift+X)" aria-label="Toggle X-Card overlay">
+    <button id="xcard-toggle" class="xcard-floating-btn" title="X-Card (Ctrl+Shift+X)" aria-label="Toggle X-Card overlay" data-i18n-attr="title:xcard.toggleTitle;aria-label:xcard.toggleAria">
         🛑
     </button>
 
     <!-- X-Card overlay (full‑screen pause) -->
-    <div id="xcard-overlay" class="xcard-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="X-Card Pause">
+    <div id="xcard-overlay" class="xcard-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="X-Card Pause" data-i18n-attr="aria-label:xcard.overlayAria">
         <div class="xcard-content">
             <div class="xcard-icon">🛑</div>
-            <h1 class="xcard-title">PAUSED</h1>
-            <p class="xcard-message" style="font-size:0.9rem;">X‑Card has been called. Pause the scene and check in with your group.</p>
-            <p style="font-size:0.8rem;color:var(--text3);margin-top:0.2rem;">The X‑Card is a safety tool: any player can call it at any time to stop a scene that is making them uncomfortable. No questions asked.</p>
-            <button class="xcard-resume-btn" id="xcard-resume">Resume Game</button>
-            <div class="xcard-shortcut-hint">Press <kbd>Ctrl+Shift+X</kbd> to close</div>
+            <h1 class="xcard-title" data-i18n="xcard.paused">PAUSED</h1>
+            <p class="xcard-message" style="font-size:0.9rem;" data-i18n="xcard.message">X‑Card has been called. Pause the scene and check in with your group.</p>
+            <p style="font-size:0.8rem;color:var(--text3);margin-top:0.2rem;" data-i18n="xcard.explainer">The X‑Card is a safety tool: any player can call it at any time to stop a scene that is making them uncomfortable. No questions asked.</p>
+            <button class="xcard-resume-btn" id="xcard-resume" data-i18n="xcard.resume">Resume Game</button>
+            <div class="xcard-shortcut-hint" data-i18n-html="xcard.shortcutHint">Press <kbd>Ctrl+Shift+X</kbd> to close</div>
         </div>
     </div>
 

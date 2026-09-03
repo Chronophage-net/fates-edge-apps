@@ -26,6 +26,7 @@ import { lockApp, initLocalLock } from './core/local-lock.js';
 import { escHtml } from './core/utils.js';
 import { sendEvent, onWSEvent, isConnectedToServer } from './core/websocket.js';
 import { initTheme, setTheme, getCurrentPreference, getResolvedThemeId } from './core/theme-manager.js';
+import { initI18n, applyTranslations, t } from './core/i18n.js';
 import { initPackManager } from './core/pack-manager.js';
 
 // ============================================================
@@ -59,6 +60,15 @@ async function init() {
     applyDisplayedVersion();
 
     try {
+        // 0. Interface language.
+        //
+        // Runs before anything renders so the shell is translated on its
+        // first paint rather than flashing English and being swapped a
+        // moment later. initI18n() never rejects — a missing or broken
+        // catalogue leaves the app in English — so awaiting it here cannot
+        // stop boot. See core/i18n.js.
+        await initI18n();
+
         // 1. Load state
         loadState();
         const state = getState();
@@ -107,6 +117,7 @@ async function init() {
         initPackManager();
         setupImportExport();
         setupTheme();
+        setupI18nRefresh();
         setupModals();
         setupSyncUI();
         setupSettingsTabHook();
@@ -642,6 +653,32 @@ function setupTheme() {
 
     toggle.addEventListener('click', () => {
         setTheme(getResolvedThemeId() === 'light' ? 'dark' : 'light');
+    });
+}
+
+/**
+ * Re-translates the static shell whenever the interface language changes,
+ * and re-renders whatever tab is open so the feature modules' own strings
+ * come back in the new language too.
+ *
+ * Feature modules build their markup imperatively, so unlike index.html's
+ * shell they cannot be re-translated in place — the only way to update them
+ * is to render them again. refreshCurrentTab() is the router's existing
+ * "draw this tab from scratch" entry point, so a language switch reuses
+ * exactly the code path a normal navigation already takes.
+ */
+function setupI18nRefresh() {
+    document.addEventListener('locale-changed', async () => {
+        applyTranslations(document);
+        try {
+            const { refreshCurrentTab } = await import('./router.js');
+            await refreshCurrentTab();
+        } catch (e) {
+            // A refresh failure must not leave the app half-translated and
+            // broken — the shell is already updated above, and the open tab
+            // will pick the new language up on its next navigation.
+            console.warn('[i18n] Could not re-render the open tab after a language change.', e);
+        }
     });
 }
 

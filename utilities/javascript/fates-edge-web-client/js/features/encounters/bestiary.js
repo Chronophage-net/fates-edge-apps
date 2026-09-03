@@ -5,7 +5,8 @@
  *
  * Now supports:
  * - tl 1–10 (the single adversary rating; see the SRD, 'Rating an Adversary'),
- *   harm_levels, nature, services, price, lore, signs, connections
+ *   resilience (formerly harm_levels), nature, services, price, lore, signs,
+ *   connections
  * - Story Beat (SB) moves sub-panel with GM SB bank
  * - Creature-specific sb_spends rendered in detail modal
  * - Filtering by TL, nature, region
@@ -20,14 +21,36 @@ import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
 import { discoverBestiary } from '@core/discovery.js';
 import { openTracker } from './combat.js'; // 👈 Integration import
 
-// Harm Levels follow from Threat Level, per the SRD's adversary rating.
+// Resilience follows from Threat Level, per the SRD's adversary rating.
 // "None (puzzle)" is the one override and is carried on the creature itself.
-export function harmLevelsForTl(tl) {
+//
+// RENAME: this stat was called "Harm Levels" until the terminology pass that
+// split the three senses of "Harm" apart — the damage a creature deals, the
+// 1–3 severity of a single wound, and the number of wounds it can absorb. Only
+// the third became Resilience; a player's Harm 0–3 track is untouched and is
+// still called Harm.
+export function resilienceForTl(tl) {
     const n = parseInt(tl, 10) || 1;
     if (n <= 4) return '3 (standard)';
     if (n <= 6) return '8 (advanced)';
     if (n <= 9) return '8 per phase';
     return 'None (puzzle)';
+}
+
+/** @deprecated Use resilienceForTl. Kept so packs and forks still resolve. */
+export const harmLevelsForTl = resilienceForTl;
+
+/**
+ * Resilience off a creature record, whichever spelling it carries.
+ *
+ * Campaigns saved before the rename, installed packs, and hand-authored
+ * bestiary JSON all still use `harm_levels`, and those files are the user's —
+ * they are not migrated on load. Every read goes through here so both spellings
+ * keep working indefinitely.
+ */
+export function resilienceOf(entry) {
+    if (!entry) return undefined;
+    return entry.resilience != null ? entry.resilience : entry.harm_levels;
 }
 
 let container = null;
@@ -114,9 +137,9 @@ const CACHE_KEY = 'fates-edge-bestiary-cache';
 
 // Hardcoded fallback entries (if everything else fails)
 const FALLBACK_ENTRIES = [
-    { id: 'goblin-scavenger', name: 'Goblin Scavenger', category: 'humanoid', tl: 1, harmLevels: '3 (standard)', description: 'A small, green-skinned creature with sharp teeth and a greedy glint.' },
-    { id: 'skeleton-knight', name: 'Skeleton Knight', category: 'undead', tl: 2, harmLevels: '3 (standard)', description: 'An animated suit of armor with hollow eye sockets glowing with pale blue light.' },
-    { id: 'thorn-dryad', name: 'Thorn Dryad', category: 'fey', tl: 3, harmLevels: '3 (standard)', description: 'A fey creature with bark-like skin and thorny vines for hair.' }
+    { id: 'goblin-scavenger', name: 'Goblin Scavenger', category: 'humanoid', tl: 1, resilience: '3 (standard)', harmLevels: '3 (standard)', description: 'A small, green-skinned creature with sharp teeth and a greedy glint.' },
+    { id: 'skeleton-knight', name: 'Skeleton Knight', category: 'undead', tl: 2, resilience: '3 (standard)', harmLevels: '3 (standard)', description: 'An animated suit of armor with hollow eye sockets glowing with pale blue light.' },
+    { id: 'thorn-dryad', name: 'Thorn Dryad', category: 'fey', tl: 3, resilience: '3 (standard)', harmLevels: '3 (standard)', description: 'A fey creature with bark-like skin and thorny vines for hair.' }
 ];
 
 // ============================================================
@@ -157,7 +180,7 @@ function flattenWrappedEntry(raw) {
             page: inner.page || '',
             // new fields
             tl: inner.tl,
-            harm_levels: inner.harm_levels,
+            resilience: resilienceOf(inner),
             nature: inner.nature,
             services: inner.services || [],
             price: inner.price,
@@ -542,7 +565,8 @@ function renderBestiaryList() {
             ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;">${escHtml(entry.category)}</span>`
             : '';
         const tlDisplay = entry.tl ? `TL ${entry.tl}` : '';
-        const harmDisplay = entry.harm_levels ? `${entry.harm_levels} Harm Levels` : '';
+        const resilience = resilienceOf(entry);
+        const harmDisplay = resilience ? `Resilience ${resilience}` : '';
         const description = getCreatureDescription(entry);
 
         return `
@@ -745,7 +769,7 @@ function showCreatureDetail(entry) {
             <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 ${escHtml(name)}
                 ${entry.tl ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tl}</span>` : ''}
-                ${entry.harm_levels ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">Harm Levels: ${escHtml(entry.harm_levels)}</span>` : ''}
+                ${resilienceOf(entry) ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">Resilience: ${escHtml(resilienceOf(entry))}</span>` : ''}
             </h2>
             ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="margin-bottom:0.5rem;">${escHtml(entry.category)}</span>` : ''}
             ${description ? `<div style="margin:0.5rem 0;line-height:1.5;">${escHtml(description)}</div>` : ''}
@@ -847,11 +871,15 @@ export function addCreatureAsAdversary(entry) {
             name: entry.name,
             body: description || '',
             tl: entry.tl || 2,
-            harmLevels: entry.harm_levels || harmLevelsForTl(entry.tl || 2),
+            // `harmLevels` is written alongside `resilience` because saved
+            // encounters from before the rename read that key; dropping it
+            // would blank the stat on every existing adversary.
+            resilience: resilienceOf(entry) || resilienceForTl(entry.tl || 2),
+            harmLevels: resilienceOf(entry) || resilienceForTl(entry.tl || 2),
             stats: stats,
             _original: {
                 tl: entry.tl,
-                harm_levels: entry.harm_levels,
+                resilience: resilienceOf(entry),
                 nature: entry.nature
             }
         });
@@ -885,7 +913,8 @@ function addCreatureToEncounter(entry) {
             name: entry.name,
             body: description || '',
             tl: entry.tl || 2,
-            harmLevels: entry.harm_levels || harmLevelsForTl(entry.tl || 2),
+            resilience: resilienceOf(entry) || resilienceForTl(entry.tl || 2),
+            harmLevels: resilienceOf(entry) || resilienceForTl(entry.tl || 2),
             stats: entry.stats || {}
         }],
         created: Date.now()

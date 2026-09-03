@@ -178,13 +178,33 @@ Focus management and `aria-live` announcements on navigation, a high-contrast th
 
 ---
 
+## Languages
+
+The interface is translatable. Pick a language under **Settings → Language**;
+it is stored per browser, so a shared campaign never forces one language on
+the whole table. Game content — adventures, wiki entries, patrons, the SRD —
+stays in the language it was written in.
+
+English is the source catalogue (`locales/en.json`) and the fallback for
+everything: any string without a translation is shown in English rather than
+left blank, so a partial translation is always safe to ship. A generated
+pseudolocale ("Pseudo (translation test)") is available for spotting
+untranslated text and layouts that break when words get longer.
+
+Adding a language takes one JSON file. See [`TRANSLATION.md`](TRANSLATION.md)
+for the translator's guide and the developer notes on `t()`, `data-i18n` and
+`npm run i18n:report`.
+
+---
+
 ## Development
 
 ```bash
 npm test          # runs tests/runner.js — a small hand-rolled test framework, no Jest
+npm run i18n:report   # interface translation + string-extraction coverage
 ```
 
-Before submitting a change: run the test suite, update this README or `DESIGN.md`/`ACCESSIBILITY.md`/`DATA_SCHEMA.md` if you changed behavior those documents describe, and keep any change to a data file's shape backward-compatible with existing saved campaigns where possible.
+Before submitting a change: run the test suite, update this README or `DESIGN.md`/`ACCESSIBILITY.md`/`DATA_SCHEMA.md`/`TRANSLATION.md` if you changed behavior those documents describe, and keep any change to a data file's shape backward-compatible with existing saved campaigns where possible.
 
 ---
 

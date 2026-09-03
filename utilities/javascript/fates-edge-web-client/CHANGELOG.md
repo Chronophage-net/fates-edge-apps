@@ -2,6 +2,37 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## [Unreleased]
+
+### Changed
+- **Adversary `harm_levels` is now `resilience`**, matching the rules terminology pass in the docs repo (the word "Harm" was doing three jobs; only the adversary's damage-absorbing pool was renamed). All 257 `data/bestiary.json` entries are converted, and the Bestiary and Encounters panels now read "Resilience".
+  - **Nothing existing breaks.** Saved campaigns, installed packs and hand-authored bestiary JSON are the user's files and are never rewritten on load: every read goes through a new `resilienceOf()` accessor that accepts either spelling, adversaries are written with both keys, and `harmLevelsForTl` remains as an alias of the renamed `resilienceForTl`. Nine unit tests pin this down.
+  - **A character's Harm track is unaffected** — still Harm 0--3, still called Harm, in `characters/index.js` and in the wiki data.
+
+### Fixed
+- The three built-in fallback creatures (Goblin Scavenger, Skeleton Knight, Thorn Dryad) carried their stat on a `harmLevels` key that no reader ever looked at, so their Resilience never rendered when the bestiary fell back to the built-in list.
+
+
+Internationalisation groundwork — the interface can now be translated
+
+### Added
+- `js/core/i18n.js`: a dependency-free i18n runtime — `t()`/`tn()` with `{{placeholder}}` interpolation and `Intl.PluralRules`-based plurals, `Intl`-backed number/date/list/relative-time helpers, a locale registry that packs can extend via `registerLocale()` (mirroring `theme-manager.js`'s `registerTheme()`), and `applyTranslations()` for `data-i18n` / `data-i18n-html` / `data-i18n-attr` markup.
+- `locales/en.json`, the source catalogue for the app shell (navigation, footer, modals, keyboard-shortcut list, X-Card, password/lock gates, the new Language panel), plus `locales/index.js` listing the shipped languages.
+- `locales/en-x-pseudo.js`: a pseudolocale generated from `en.json` at import time (`[Ŝèttîngš ··]`) for finding strings that never went through `t()` and layouts that break when words run ~30% longer. Hidden from the normal picker behind a "Show the translation-test locale" toggle.
+- **Settings → Language**: a picker with a "Match my browser" option, a live status line reporting how much of the active language is actually translated, and a note that game content is not translated.
+- `npm run i18n:report` (translation + extraction coverage, `--strict` for CI) and `npm run i18n:new -- <code> "<Name>" "<Native name>"` (scaffolds a locale file).
+- [`TRANSLATION.md`](TRANSLATION.md) — a translator's guide and the developer conventions for adding translatable strings.
+- 26 unit tests covering fallback behaviour, interpolation, plurals, locale switching, DOM application, and a guard that fails if `index.html`'s `data-i18n` keys drift away from `en.json`.
+
+### Changed
+- `index.html`'s shell is annotated with `data-i18n` attributes. The English text stays inline and remains the fallback; no visible text changed.
+- `js/app.js` awaits `initI18n()` before rendering, and re-translates the shell plus `refreshCurrentTab()` when the language changes.
+
+### Notes
+- Nothing here can blank out the UI: a missing key, an unknown locale, or a catalogue that fails to load all fall back to the English that was already there, and `initI18n()` never rejects.
+- Feature modules still render English inline; extraction is meant to proceed feature by feature, and `npm run i18n:report` names the largest remaining pockets.
+- Right-to-left languages get `dir="rtl"` on the document, but `css/app.css` still uses physical `left`/`right` properties in places — an RTL translation needs a CSS pass alongside it.
+
 ## [4.24.1] - 2026-08-26
 
 GM Tools button audit — dead-handler fixes, chat sender verification, dead-code cleanup, import aliases
