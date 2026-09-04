@@ -1,6 +1,6 @@
 {
   "name": "kon-reh",
-  "version": "5.0.9",
+  "version": "5.0.10",
   "description": "Fate's Edge Toolkit",
   "scripts": {
     "test": "vitest run --passWithNoTests",

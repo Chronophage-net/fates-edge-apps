@@ -3,6 +3,14 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.10] - 2026-09-04
+
+### Other
+- Copy quality pass
+- Updated HTML and JSON files.
+- Add workflow to delete GitHub Actions caches
+- Localization preperation
+
 ## [5.0.9] - 2026-09-02
 
 Data canon sweep, Censor's Daughter document, Nameless conversion
