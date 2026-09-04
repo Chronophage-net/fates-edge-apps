@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-02T23:56:13.697Z",
+  "generated": "2026-09-04T14:22:38.739Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -440,6 +440,17 @@
       "categoryLabel": "Expansions",
       "core": false,
       "active": true
+    },
+    {
+      "id": "player_sheets",
+      "title": "Player Sheets",
+      "file": "Fates_-_Edge_-_-Player-_-Sheets.pdf",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
+      "core": false,
+      "active": true,
+      "isPDF": true
     },
     {
       "id": "players_guide",
@@ -1039,7 +1050,7 @@
       "active": true
     }
   ],
-  "total_count": 68,
-  "active_count": 68,
+  "total_count": 69,
+  "active_count": 69,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

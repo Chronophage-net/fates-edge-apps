@@ -790,7 +790,7 @@ function renderOnboarding(el, char) {
                 <p style="color:var(--text2);font-size:1.05rem;font-weight:500;">You have not yet begun the Way.</p>
                 <p style="font-size:0.85rem;max-width:500px;margin:0.2rem auto;">
                     The monastic path is open to anyone — no patron required. 
-                    Learn a <strong>Foundation talent</strong> to begin your journey.
+                    Learn a <strong>Foundation talent</strong> to begin training.
                 </p>
                 <p style="font-size:0.75rem;color:var(--text3);">
                     Available XP: <strong style="color:var(--gold);">${available}</strong> 
@@ -809,8 +809,8 @@ function renderOnboarding(el, char) {
             </div>
 
             <div style="font-size:0.7rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
-                <strong>💡 Tip:</strong> Foundation talents are cheap (2 XP) and unlock the entire monastic system.
-                Choose the one that fits your character's style.
+                A Foundation talent costs 2 XP and opens Breath States, Meditation, and Techniques.
+                Choose the discipline your character would actually practice.
             </div>
         </div>
     `;

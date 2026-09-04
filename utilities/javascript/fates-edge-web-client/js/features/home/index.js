@@ -35,11 +35,11 @@ function buildHTML() {
     <!-- SLIDE 1: HERO -->
     <section class="home-slide home-hero" id="slide-hero" role="region" aria-label="Hero">
       <div class="slide-content">
-        <div class="hero-badge">A roleplaying game of the Amaranthine · and the tools to run it</div>
+        <div class="hero-badge">A roleplaying game of the Amaranthine</div>
         <h1 class="hero-title"><span class="gold">Fate's</span> Edge</h1>
         <p class="hero-subtitle">
-          Dice, cards, and consequence at the edge of the Amaranthine.
-          <span class="hero-attribution">Everything you need to play. Nothing you have to buy.</span>
+          Dice and cards settle the danger. What you owe one another is harder.
+          <span class="hero-attribution">Free rules and a browser toolkit for players and GMs.</span>
         </p>
         <div class="hero-quote">
           <p>“Eight is the world. Nobody sensible counts past it.”</p>
@@ -49,10 +49,6 @@ function buildHTML() {
           <a href="#" class="btn btn-primary" data-action="create-char">Make someone</a>
           <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link">Open the toolkit</a>
           <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">Begin — The Lantern at Dusk</button>
-        </div>
-        <div class="hero-footer">
-          <p>“The road remembers. Every broken wheel leaves a mark and every lit lamp had someone behind it. The only question is which of those you mean to be.”</p>
-          <cite>— Dusana of the Raven Road, Tulkani story-keeper, <em>The Hearth Cord</em></cite>
         </div>
       </div>
       <div class="scroll-indicator" aria-hidden="true">
@@ -67,10 +63,10 @@ function buildHTML() {
         <div class="section-header">
           <span class="section-number">01</span>
           <h2>Core Mechanics</h2>
-          <p>Every important action follows a simple, dramatic loop.</p>
+          <p>One roll answers two questions: did you do it, and what did it set loose?</p>
         </div>
         <div class="golden-rule">
-          <p><strong>When in doubt:</strong> take the reading that gives the table something to play. DV 3, Position Controlled, and let them fall.</p>
+          <p><strong>When in doubt:</strong> choose the reading that leaves the players with a decision. DV 3, Position Controlled, and let the dice fall.</p>
         </div>
         <div class="mechanics-grid">
           ${buildMechanicsCard('Dice Pool', 'Attribute + Skill', 'Roll d10s. 6+ = success. 10 = 2 successes.')}
@@ -91,16 +87,16 @@ function buildHTML() {
         <div class="section-header">
           <span class="section-number">02</span>
           <h2>Character Creation</h2>
-          <p>Build a character in about 10–15 minutes. Start with 32 XP.</p>
+          <p>Start with a person, then spend 32 XP deciding what they can do.</p>
         </div>
         <div class="quick-start">
-          <p>🧙 <strong>Quick Start:</strong> Concept → Attributes (Body/Wits/Spirit/Presence) → Skills → Talents → Bonds & Complications</p>
+          <p><strong>In order:</strong> Concept → Attributes → Skills → Talents → Bonds &amp; Complications</p>
         </div>
         <div class="creation-grid">
-          ${buildCreationCard('🧬', 'Attributes', 'Body · Wits · Spirit · Presence<br />Rated 1–5. Cost: new rating × 3 XP per step.', 'Example: Body 3 costs 15 XP total')}
-          ${buildCreationCard('📚', 'Skills', 'Sixteen core skills. Rated 0–5. Cost: new level × 2 XP per step.', 'Melee, Stealth, Lore, Arcana, and more')}
-          ${buildCreationCard('✨', 'Talents', 'Special abilities. Minor (2–3 XP), Major (4–6 XP), Prestige (7–10 XP).', 'Keen Senses, Weapon Mastery, Silver Tongue')}
-          ${buildCreationCard('🔗', 'Bonds & Complications', 'Up to 2 Bonds (+2 XP each) and 2 Complications (+2 XP each) for max 36 XP.', '"I saved your life" or "The magistrate still hunts me"')}
+          ${buildCreationCard('', 'Attributes', 'Body · Wits · Spirit · Presence<br />Rated 1–5. Cost: new rating × 3 XP per step.', 'Body 3 costs 15 XP total')}
+          ${buildCreationCard('', 'Skills', 'Sixteen core skills, rated 0–5. Cost: new level × 2 XP per step.', 'Melee, Stealth, Lore, Arcana, and twelve more')}
+          ${buildCreationCard('', 'Talents', 'Training, gifts, and practiced advantages. Minor (2–3 XP), Major (4–6 XP), Prestige (7–10 XP).', 'Keen Senses · Weapon Mastery · Silver Tongue')}
+          ${buildCreationCard('', 'Bonds & Complications', 'Take up to two of each. Every one gives 2 more XP, to a maximum of 36.', '“I left my brother at the gate.” · “The magistrate knows my old name.”')}
         </div>
         <div class="creation-actions">
           <button class="btn btn-primary btn-large" data-action="create-char">Start building</button>
@@ -114,17 +110,17 @@ function buildHTML() {
         <div class="section-header">
           <span class="section-number">03</span>
           <h2>The toolkit</h2>
-          <p>Everything you need to run or play <em>Fate’s Edge</em> — right in your browser.</p>
+          <p>The things most likely to slow a session down, kept in one place.</p>
         </div>
         <div class="toolkit-grid">
-          ${buildToolkitCard('', 'Dice Roller', 'Roll d10s with position and difficulty modifiers. Auto‑calculates successes and Story Beats.')}
-          ${buildToolkitCard('', 'Character Sheets', 'Track attributes, skills, talents, bonds, and complications. Export to PDF for your table.')}
-          ${buildToolkitCard('', 'Encounter Tracker', 'Build scenes with NPCs, track initiative, and apply status effects on the fly.')}
-          ${buildToolkitCard('', 'Faction Manager', 'Define factions, track reputations, and see how the world reacts to your party’s choices.')}
+          ${buildToolkitCard('', 'Dice Roller', 'Set Position and DV, roll the pool, and count successes and Story Beats.')}
+          ${buildToolkitCard('', 'Character Sheets', 'Keep attributes, skills, talents, Bonds, and Complications together. Export a PDF when paper is easier.')}
+          ${buildToolkitCard('', 'Encounter Tracker', 'Build the opposition, track initiative, and keep conditions visible.')}
+          ${buildToolkitCard('', 'Faction Manager', 'Record allies, enemies, Followers, Assets, and the obligations tying them together.')}
         </div>
         <div class="toolkit-cta">
-          <p>All data stays in your browser — no sign‑up required. <strong>Open source</strong> and ready to use.</p>
-          <a href="#" class="btn btn-primary" data-action="create-char">Jump to the character editor</a>
+          <p>Your table stays in your browser. There is no account to make, and the source is open.</p>
+          <a href="#" class="btn btn-primary" data-action="create-char">Open the character editor</a>
         </div>
       </div>
     </section>
@@ -138,9 +134,9 @@ function buildHTML() {
           <p>Three things you will notice in the first hour.</p>
         </div>
         <div class="why-grid">
-          ${buildWhyCard('', 'No dead rolls', 'A miss is not a stop. It moves the scene somewhere you did not choose, which is usually more interesting than where you were going.')}
-          ${buildWhyCard('', 'Risk you can see', 'Position and Story Beats put the cost on the table before you commit, so nobody is ever surprised by the price — only by who ends up paying it.')}
-          ${buildWhyCard('', 'Starts small', 'Attributes and Skills are enough for a first session. Talents and Complications layer on when the table wants them. The same core runs a bar fight and a succession crisis.')}
+          ${buildWhyCard('', 'No dead rolls', 'A miss does not stop the scene. It gives the GM a turn of the screw and gives you Boons for what comes next.')}
+          ${buildWhyCard('', 'Known risks', 'Position tells you how exposed you are. Story Beats tell the GM how much trouble is waiting. You choose with both in view.')}
+          ${buildWhyCard('', 'People before builds', 'Attributes and Skills are enough for a first session. Add Talents and Complications when you know who this person is. The same rules can carry a bar fight or a succession crisis.')}
         </div>
         <div class="why-footer">
           <p>“The road remembers. Every broken wheel leaves a mark, and every lit lamp had someone behind it.”</p>
@@ -164,7 +160,7 @@ function buildHTML() {
             <p class="about-role">Sysadmin · DevOps · FreeBSD / Linux — 20+ years</p>
             <p class="about-bio">
               Rolling dice since age twelve — three decades of tabletop stories. I live in the Twin Cities, Minnesota.
-              This is my first large software project: an open‑source companion designed to put the narrative first.
+              This is my first large software project. I built it for fewer pauses to look things up and more time for the decisions that matter.
             </p>
             <blockquote class="about-philosophy">
               <p>“Keep It Stupid — minimal but not fragile. Build from user needs, set a feature limit, layer by layer.”</p>
@@ -197,7 +193,7 @@ function buildMechanicsCard(label, value, desc) {
 function buildCreationCard(icon, title, desc, example) {
   return `
     <div class="creation-card">
-      <span class="creation-icon">${icon}</span>
+      ${icon ? `<span class="creation-icon">${icon}</span>` : ''}
       <h3>${title}</h3>
       <p>${desc}</p>
       <span class="creation-example">${example}</span>
@@ -266,7 +262,7 @@ function buildOutcomeMatrix() {
         </table>
       </div>
       <div class="matrix-tip">
-        💡 <strong>Pro Tip:</strong> A Partial is not failure — it's meaningful progress. A Miss is never "nothing happens" — the GM must introduce a complication.
+        <strong>Keep the scene moving:</strong> a Partial changes the situation. A Miss changes it against you. Neither leaves things where they were.
         <span class="tip-sub">SB = Story Beats — each die showing a <strong>1</strong> gives the GM a Story Beat to spend on complications.</span>
       </div>
     </div>
@@ -855,28 +851,28 @@ function showWelcomeOverlay() {
       <span style="font-size:2.6rem;color:var(--gold-dark);" aria-hidden="true">&#10022;</span>
       <h1>Welcome to Fate's Edge</h1>
       <p style="color:var(--text2);font-size:1.05rem;margin:0;">
-        Your complete toolkit for running and playing Fate's Edge.
+        Read first, or sit down and play.
       </p>
 
       <div class="welcome-docs">
-        <p style="margin:0;font-weight:500;">Start here — the two documents that matter:</p>
+        <p style="margin:0;font-weight:500;">The short ways in:</p>
         <ul>
-          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Essentials.html" target="_blank" rel="noopener noreferrer">Essentials</a> — the quick start</li>
-          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html" target="_blank" rel="noopener noreferrer">Playing &amp; Running Fate's Edge</a> — the whole thing</li>
-          <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener noreferrer">Campfire Mode</a> — the whole game on a handful of pages, free to print and share at the table</li>
+          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Essentials.html" target="_blank" rel="noopener noreferrer">Essentials</a> — enough rules to begin</li>
+          <li><a href="/data/docs/resources/Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html" target="_blank" rel="noopener noreferrer">Playing &amp; Running Fate's Edge</a> — the complete rules</li>
+          <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener noreferrer">Campfire Mode</a> — a short version to print and pass around</li>
         </ul>
       </div>
 
       <div class="welcome-actions">
         <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">
-          Jump to the action
+          Start The Lantern at Dusk
         </button>
-        <p class="welcome-subtext">Drops you straight into <strong>The Lantern at Dusk</strong> (a short one‑shot) with a ready‑made character. No setup required.</p>
+        <p class="welcome-subtext">Loads a short one-shot and a ready-made character.</p>
         <button class="btn btn-secondary" data-action="dismiss-welcome">
-          Skip – I'll explore on my own
+          Take me to the toolkit
         </button>
       </div>
-      <p class="welcome-footer">You can re‑open this welcome tour anytime in Settings.</p>
+      <p class="welcome-footer">You can return to this screen from Settings.</p>
     </div>
   `;
 
@@ -934,24 +930,24 @@ function renderQuickStartConfirmation(overlayEl, { character, adventure }) {
   const card = overlayEl.querySelector('.welcome-card');
   if (!card) return;
   const charLine = character
-    ? `Playing as <strong>${escHtml(character.name)}</strong> — ${escHtml(character.tagline || 'ready to go')} — in <strong>${escHtml(adventure.title)}</strong>.`
-    : `<strong>${escHtml(adventure.title)}</strong> is loaded and ready — head to Characters to pick or build one.`;
+    ? `<strong>${escHtml(character.name)}</strong> is ready for <strong>${escHtml(adventure.title)}</strong>. ${escHtml(character.tagline || '')}`
+    : `<strong>${escHtml(adventure.title)}</strong> is loaded. Choose or make a character when you are ready.`;
   card.innerHTML = `
     <span style="font-size:3rem;">🏮</span>
-    <h1>You're in!</h1>
+    <h1>The table is set.</h1>
     <p style="color:var(--text2);font-size:1.05rem;margin:0;">
       ${charLine}
     </p>
     <div class="welcome-docs">
-      <p style="margin:0;font-weight:500;">First time here?</p>
+      <p style="margin:0;font-weight:500;">Keep one of these nearby:</p>
       <ul>
-        <li><a href="${ESSENTIALS_DOC_URL}" target="_blank" rel="noopener">Essentials</a> — the quickstart primer; keep it open in a tab while you play</li>
-        <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener">🏕️ Campfire Mode</a> – an even shorter cheat-sheet version, good for a first-time table</li>
+        <li><a href="${ESSENTIALS_DOC_URL}" target="_blank" rel="noopener">Essentials</a> — the short rules reference</li>
+        <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener">Campfire Mode</a> — the rules on a handful of pages</li>
       </ul>
     </div>
     <div class="welcome-actions">
       <button class="btn btn-gold btn-large" data-action="enter-game" style="font-weight:700;border-width:2px;">
-        ▶ Enter the Game
+        Enter the Game
       </button>
     </div>
   `;

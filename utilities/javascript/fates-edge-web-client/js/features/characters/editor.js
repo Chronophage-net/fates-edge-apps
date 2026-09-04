@@ -39,8 +39,7 @@ import { openTalentEditor } from './talent-editor.js';
 import { ensureTalentEffects } from '@core/talent-effects.js';
 import { loadTalentCatalog, collectTalentTags } from '@core/talent-loader.js';
 import { TALENT_CATEGORIES } from './talent-editor.js';
-import { printWithChromeHidden } from '@core/print.js';
-import { exportCharacterPDF } from './character-pdf.js';
+import { exportCharacterPDF, printCharacterPDF } from './character-pdf.js';
 
 console.log('[Editor] Module loaded');
 
@@ -1868,7 +1867,14 @@ function attachEditorEvents() {
 
     const printBtn = document.getElementById('ce-print-btn');
     if (printBtn) {
-        printBtn.addEventListener('click', () => printWithChromeHidden());
+        printBtn.addEventListener('click', () => {
+            const c = getCharacter(editorState.currentId);
+            if (!c) {
+                showToast('Character not found.', 'error');
+                return;
+            }
+            printCharacterPDF(c);
+        });
     }
 
     const pdfBtn = document.getElementById('ce-pdf-btn');

@@ -37,7 +37,7 @@ let activeBackend = null; // 'solr' | 'elasticsearch' | 'fuse' | null (not yet l
 // Default fallback when everything else fails
 const FALLBACK_ENTRIES = [
     { title: "Fate's Edge Toolkit", content: "Welcome to the Fate's Edge Toolkit. Search for rules, documents, and more.", url: "index.html", type: "document", category: "Home" },
-    { title: "Getting Started", content: "The Fate's Edge Toolkit is a comprehensive toolset for running Fate's Edge campaigns.", url: "index.html", type: "document", category: "Guide" },
+    { title: "Getting Started", content: "Rules, characters, dice, encounters, factions, and table tools for Fate's Edge.", url: "index.html", type: "document", category: "Guide" },
     { title: "Search Documentation", content: "Search is powered by Fuse.js. Type at least 2 characters to start searching.", url: "#", type: "document", category: "Info" }
 ];
 

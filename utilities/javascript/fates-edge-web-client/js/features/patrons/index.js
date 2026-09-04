@@ -71,8 +71,8 @@ const DEFAULT_COSMIC_PATRONS = [
         icon: '🚶',
         domain: 'Ways & Journeys',
         subtitle: 'Guide of the Lost',
-        description: 'The Traveler is the eternal guide of the road, guardian of those who walk the paths between what is and what might be.',
-        lore: 'The Traveler has no fixed form, but appears as a wanderer at every crossroads.',
+        description: 'At a crossroads, leave water, bread, and a true account of where you came from. The Traveler may show you the next road. It may also remind you why you left.',
+        lore: 'Pilgrims disagree about the face beneath the hood. They agree that a road offered in kindness must never be used for conquest.',
         rites: [],
         source: 'default'
     },
@@ -82,8 +82,8 @@ const DEFAULT_COSMIC_PATRONS = [
         icon: '🔥',
         domain: 'Dawn & Vows',
         subtitle: 'The Unquenchable Fire',
-        description: 'The Oath of Flame & Light demands that those who swear within its radiance speak truly and pay the cost of keeping their word.',
-        lore: 'Born from the first dawn fire, this patron is invoked by paladins and healers.',
+        description: 'Those who swear by this fire ask it to witness them. It warms the faithful who keep their word and burns those who discover, too late, what their promise required.',
+        lore: 'Paladins, healers, and frightened witnesses carry its light. None of them agree whether the flame judges the oath or only remembers it.',
         rites: [],
         source: 'default'
     }
@@ -202,7 +202,7 @@ function getPatronSummary(patron) {
  
 function getPatronIcon(patron) {
     if (patron?.icon) return patron.icon;
-    return '🌟';
+    return '';
 }
  
 function getPatronColor(patron) {
@@ -618,15 +618,15 @@ export function clearPatronObligation(characterId, patronId, amount = 1) {
  
 export function render(el) {
     container = el;
-    loadPatronData();
+    const loadPromise = loadPatronData();
  
     const usingFallback = state.usingFallback;
  
     container.innerHTML = `
         <div class="patrons-modern-layout">
             <header class="patrons-header" style="margin-bottom:0.5rem;">
-                <h1 class="patrons-title">👁️ Patrons & Resources</h1>
-                <p class="patrons-subtitle">Cosmic patrons, terrestrial powers, religions, and the assets they grant.</p>
+                <h1 class="patrons-title">👁️ Patrons</h1>
+                <p class="patrons-subtitle">The powers, houses, and faiths that may put a claim on a character.</p>
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading data...</p>' : `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial, ${state.religions.length} religions</p>`}
                 ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ Using fallback defaults for some data.</div>` : ''}
             </header>
@@ -647,6 +647,16 @@ export function render(el) {
     `;
  
     attachEvents();
+
+    // The first render deliberately shows a loading state while the patron
+    // files are discovered. Re-render when that work finishes; otherwise a
+    // first-time visitor is left looking at "Loading..." until they leave the
+    // tab and come back.
+    if (!state.dataLoaded) {
+        loadPromise.then(() => {
+            if (container === el && el.isConnected) render(el);
+        });
+    }
 }
  
 function renderView(view) {
@@ -685,9 +695,9 @@ function renderCosmicPatrons() {
     const rec = state.recommender;
     const recommenderBox = `
         <div class="patron-recommender" style="display:flex;gap:0.3rem;align-items:center;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border:1px solid var(--border);flex-wrap:wrap;">
-            <span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">🔮 Find your patron:</span>
+            <span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">Find a patron:</span>
             <input type="text" id="patron-recommender-input" value="${escHtml(rec.query)}"
-                placeholder="e.g. 'a nature-loving druid' or 'stealthy rogue who steals secrets'"
+                placeholder="e.g. 'a courier who never refuses shelter'"
                 onkeydown="if(event.key==='Enter') window.runPatronRecommender()"
                 style="flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.4rem;font-size:0.75rem;" />
             <button class="btn btn-xs btn-primary" onclick="window.runPatronRecommender()">Search</button>
@@ -705,7 +715,7 @@ function renderCosmicPatrons() {
         ninthRevealed = true;
         // Optional: show a cryptic toast
         setTimeout(() => {
-            showToast('🔮 You sense a presence beyond the eighth threshold...', 'info');
+            showToast('The count is wrong.', 'info');
         }, 300);
     }
 
@@ -729,8 +739,7 @@ function renderCosmicPatrons() {
         if (visibleResults.length === 0 && rec.results.length > 0) {
             // This handles the case where the only match was The Ninth
             resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.3rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--purple);">
-                🔮 <em>"The Ninth is not found. It finds you."</em> — Try a different search, or seek what is hidden.
-                ${!ninthRevealed ? `<br><span style="font-size:0.65rem;color:var(--text3);">(Hint: seek <strong>forbidden knowledge</strong>)</span>` : ''}
+                No patron answers. The index insists that nothing is missing.
             </div>`;
             gridPatrons = displayPatrons;
         } else if (visibleResults.length === 0) {
@@ -745,19 +754,19 @@ function renderCosmicPatrons() {
             const hiddenNinthMatch = rec.results.some(r => isTheNinth(r.patron) && !ninthRevealed);
             if (hiddenNinthMatch) {
                 resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.2rem 0.3rem;font-style:italic;">
-                    🔮 ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}". 
-                    <span style="color:var(--text3);">Something stirs beyond the eighth threshold...</span>
+                    ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}".
+                    <span style="color:var(--text3);">The index has left a space between entries.</span>
                 </div>`;
             } else {
                 resultsNote = `<div style="font-size:0.7rem;color:var(--gold);padding:0.2rem 0.3rem;">
-                    🔮 ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}", best first.
+                    ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}", best first.
                 </div>`;
             }
         }
     } else if (ninthRevealed) {
         // Show a subtle indicator that The Ninth is present
         resultsNote = `<div style="font-size:0.7rem;color:var(--purple);padding:0.2rem 0.3rem;font-style:italic;">
-            🌌 <em>The Ninth has revealed itself to you.</em>
+            One entry has no proper place in the list.
         </div>`;
     }
 
@@ -780,12 +789,12 @@ function renderCosmicPatrons() {
                     return `
                         <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${color};transition:all 0.2s;${matched ? 'border:1px solid var(--gold);' : ''}${isNinth ? 'border:1px solid var(--purple);position:relative;' : ''}">
                             ${isNinth ? `<div style="position:absolute;top:-6px;right:-4px;font-size:0.7rem;color:var(--purple);">🔮</div>` : ''}
-                            <div style="font-size:1.5rem;">${safeString(icon)}</div>
+                            ${icon ? `<div style="font-size:1.5rem;">${safeString(icon)}</div>` : ''}
                             <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
                             <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
-                            ${matched ? `<div style="font-size:0.55rem;color:var(--gold);margin-top:0.1rem;">🔮 ${matched.map(escHtml).join(', ')}</div>` : ''}
-                            ${isNinth ? `<div style="font-size:0.55rem;color:var(--purple);margin-top:0.05rem;">🌌 Beyond the Eighth</div>` : ''}
-                            <div style="font-size:0.55rem;color:var(--text2);margin-top:0.1rem;">Oblig: ${obl}</div>
+                            ${matched ? `<div style="font-size:0.55rem;color:var(--gold);margin-top:0.1rem;">${matched.map(escHtml).join(', ')}</div>` : ''}
+                            ${isNinth ? `<div style="font-size:0.55rem;color:var(--purple);margin-top:0.05rem;">Unindexed</div>` : ''}
+                            <div style="font-size:0.55rem;color:var(--text2);margin-top:0.1rem;">Obligation ${obl}</div>
                         </div>
                     `;
                 }).join('')}
@@ -1913,7 +1922,7 @@ window.runPatronRecommender = function() {
     if (!input) return;
     const query = input.value.trim();
     if (!query) {
-        showToast('Describe a character concept first — e.g. "a nature-loving druid".', 'info');
+        showToast('Describe the character first — for example, “a courier who never refuses shelter.”', 'info');
         return;
     }
 
@@ -1925,7 +1934,7 @@ window.runPatronRecommender = function() {
     if (results.length === 0) {
         showToast(`No patrons matched "${query}". Showing the full list — try different words.`, 'info');
     } else {
-        showToast(`🔮 Found ${results.length} match${results.length === 1 ? '' : 'es'}.`, 'success');
+        showToast(`Found ${results.length} match${results.length === 1 ? '' : 'es'}.`, 'success');
     }
 
     refreshView();

@@ -670,15 +670,17 @@ following figures because the Party is confident. Every number below is exact, c
 </table>
 </div>
 <p>The core game's SB comes from 1s, and the expected number of 1s is simply <em>n</em>/10 &mdash;
-<strong>linear</strong>, adding a tenth of a Story Beat per die, forever. The variant's SB comes from
-matches, and matches are <strong>combinatorial</strong>: they scale with the number of <em>pairs</em> of
-dice, which grows as <em>n</em>(<em>n</em>&minus;1)/2. At two dice the two systems are nearly identical
-(0.20 against 0.17). At eight they are not remotely comparable (0.80 against 3.40).</p>
+<strong>linear</strong>, adding a tenth of a Story Beat per die, forever. The variant counts repeated
+faces: the first die showing a number is free, and each additional die showing that number adds 1 SB.
+Its expected value is <em>n</em> &minus; 6 + 6(5/6)<sup><em>n</em></sup> &mdash; the birthday-collision curve.
+Early dice usually find an unused face; later dice increasingly collide with one already on the table.
+Once the pool exceeds six, at least one collision is certain. At two dice the two systems are nearly
+identical (0.20 against 0.17). At eight they are not remotely comparable (0.80 against 3.40).</p>
 <p>This is the whole lesson, and it is worth more than the joke: <strong>the load-bearing property of a dice
-economy is not its average, it is how the average scales.</strong> Two systems can be tuned to agree exactly
-at a five-die pool and still diverge into completely different games at eight, because one of them is adding
-and the other is multiplying. If you are converting any system to different dice, check the curve, not the
-midpoint.</p>
+economy is not its average, it is how the average scales.</strong> Two systems can look close at one pool
+and still diverge into completely different games at eight, because one gives every die the same independent
+chance while the other changes each new die's odds according to what is already on the table. If you are
+converting any system to different dice, check the curve, not the midpoint.</p>
 
 <h3>What the Party recommends, should you wish to play this straight</h3>
 <ul>

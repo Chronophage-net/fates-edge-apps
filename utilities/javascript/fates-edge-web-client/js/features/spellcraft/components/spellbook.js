@@ -944,19 +944,19 @@ export async function renderSpellbook(el) {
         setTimeout(() => {
             showToastWithHTML(`
                 <div style="display:flex;flex-direction:column;gap:0.3rem;">
-                    <div style="font-weight:600;font-size:1.1rem;color:var(--gold);">📖 Welcome to Your Grimoire</div>
+                    <div style="font-weight:600;font-size:1.1rem;color:var(--gold);">Your grimoire is empty</div>
                     <p style="font-size:0.85rem;color:var(--text2);">
                         Record your spells here. Each spell has a <strong>name</strong>, <strong>tags</strong>, 
                         and a <strong>DV</strong> (difficulty).
                     </p>
                     <p style="font-size:0.85rem;color:var(--text2);">
-                        ⭐ <strong>Signature</strong> spells get +1 die when cast.
+                        <strong>Signature</strong> spells get +1 die when cast.
                     </p>
                     <p style="font-size:0.85rem;color:var(--text2);">
-                        📋 Use <strong>Templates</strong> for inspiration, or build your own with the <strong>Add</strong> button.
+                        Start from a <strong>Template</strong>, or use <strong>Add</strong> to record your own.
                     </p>
                     <p style="font-size:0.75rem;color:var(--text3);font-style:italic;">
-                        "The Weave respects repetition. Record your spells."
+                        If you cannot repeat it, you have discovered an incident, not a spell. — Lysandra
                     </p>
                     <button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove(); localStorage.setItem('fates-edge-spellbook-tutorial-shown', 'true');">Got it!</button>
                 </div>
@@ -1660,9 +1660,9 @@ window.spellbookUse = async function(id, attributeChoice) {
             ${boonGain > 0 ? `<div style="font-size:0.75rem;color:var(--gold);">+${boonGain} Boon${boonGain > 1 ? 's' : ''} gained</div>` : ''}
             ${isConnectedToServer() ? `<div style="font-size:0.6rem;color:var(--text3);">📡 Broadcast to VTT</div>` : ''}
             <div style="font-size:0.65rem;color:var(--text3);font-style:italic;margin-top:0.1rem;">
-                ${outcome === 'clean' ? '"The Weave remembers your precision." – Lysandra' :
-                  outcome === 'miss' ? '"The Weave\'s receipt is your teacher." – Lysandra' :
-                  '"Balance the risk and the reward." – Lysandra'}
+                ${outcome === 'clean' ? 'Specific. Repeatable. Try not to look so surprised. — Lysandra' :
+                  outcome === 'miss' ? 'Write down exactly what you did. Especially the foolish part. — Lysandra' :
+                  'Possible is not the same as wise. — Lysandra'}
             </div>
             <div style="font-size:0.6rem;color:var(--text3);">
                 Cast ${spell.usage} time${spell.usage > 1 ? 's' : ''} · ${spell._successes || 0} successes

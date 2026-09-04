@@ -69,12 +69,12 @@ function readExistingManifest(manifestPath) {
 }
 
 function getFileSlug(filename) {
-  return filename.replace(/\.json$/, '').replace(/\.html$/, '');
+  return filename.replace(/\.(json|html|pdf)$/i, '');
 }
 
 function getDocTitle(file) {
   return file
-    .replace(/\.html$/, '')
+    .replace(/\.(html|pdf)$/i, '')
     .replace(/Fates_-_Edge_-_-/g, '')
     .replace(/_/g, ' ')
     .replace(/-/g, ' ')
@@ -177,7 +177,7 @@ function generateDocsManifest(docsPath) {
     const files = fs.readdirSync(subPath);
 
     for (const file of files) {
-      if (!file.endsWith('.html')) continue;
+      if (!/\.(html|pdf)$/i.test(file)) continue;
       if (EXCLUDED_FILES.has(file)) continue;
       if (file.toLowerCase() === 'index.html') continue;
 
@@ -193,7 +193,8 @@ function generateDocsManifest(docsPath) {
         category: category.id,
         categoryLabel: category.label,
         core: isCore,
-        active: true
+        active: true,
+        ...(file.toLowerCase().endsWith('.pdf') ? { isPDF: true } : {})
       });
     }
   }
@@ -201,7 +202,7 @@ function generateDocsManifest(docsPath) {
   // ─── Scan root directory ──────────────────────────────────────────
   // Only process files that aren't in a subdirectory
   for (const file of rootFiles) {
-    if (!file.endsWith('.html')) continue;
+    if (!/\.(html|pdf)$/i.test(file)) continue;
     if (EXCLUDED_FILES.has(file)) continue;
 
     // Check if this file is already in a subdirectory (shouldn't happen)
@@ -242,7 +243,8 @@ function generateDocsManifest(docsPath) {
       category: category,
       categoryLabel: label,
       core: core,
-      active: true
+      active: true,
+      ...(file.toLowerCase().endsWith('.pdf') ? { isPDF: true } : {})
     });
   }
 

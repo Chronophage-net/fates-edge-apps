@@ -316,7 +316,7 @@ function calculatorShowHint(tag) {
         hintEl.innerHTML = `💡 <strong>${escHtml(upper)}</strong>: ${escHtml(hint)}`;
         hintEl.style.color = 'var(--text2)';
     } else {
-        hintEl.innerHTML = `💡 ${escHtml(upper)} — no specific hints, but experiment!`;
+        hintEl.innerHTML = `${escHtml(upper)} — no note for this tag. Try it with a second tag.`;
         hintEl.style.color = 'var(--text3)';
     }
 }
@@ -327,7 +327,7 @@ function calculatorClearHint() {
     if (activeTags.length > 0) {
         const lastTag = activeTags[activeTags.length - 1];
         const def = tagDefinitions ? tagDefinitions.get(lastTag) : null;
-        hintEl.innerHTML = `💡 <strong>${escHtml(lastTag)}</strong>: ${def?.description || 'Experiment with combinations!'}`;
+        hintEl.innerHTML = `<strong>${escHtml(lastTag)}</strong>: ${def?.description || 'No note for this tag yet.'}`;
         hintEl.style.color = 'var(--text3)';
     } else {
         hintEl.innerHTML = '💡 Select a tag to see how it works with others.';
@@ -471,7 +471,7 @@ function calculatorTestCast() {
                 <strong>⚡ Backlash:</strong> ${backlashSeverity} — ${backlashDesc}
             </div>
             <div style="font-size:0.65rem;color:var(--text3);font-style:italic;margin-top:0.1rem;">
-                ${result.successes >= dv ? '"The Weave remembers your precision." – Lysandra' : '"The Weave\'s receipt is your teacher." – Lysandra'}
+                ${result.successes >= dv ? 'Specific. Repeatable. Try not to look so surprised. — Lysandra' : 'Write down exactly what you did. Especially the foolish part. — Lysandra'}
             </div>
             <div style="font-size:0.6rem;color:var(--text3);margin-top:0.1rem;">
                 Tracked: ${historyEntry.successes} successes · ${historyEntry.failures} failures
@@ -533,7 +533,7 @@ function calculatorGamble() {
                 <strong>Most likely outcome:</strong> ${mostLikely}
             </div>
             <div style="font-size:0.65rem;color:var(--text3);font-style:italic;">
-                ${dv <= 3 ? '"The Weave welcomes the bold."' : dv <= 5 ? '"Balance the risk and the reward."' : '"The Weave hungers for the reckless."'}
+                ${dv <= 3 ? 'Lysandra’s note: You may survive this one.' : dv <= 5 ? 'Lysandra’s note: Possible is not the same as wise.' : 'Lysandra’s note: Write a will first.'}
             </div>
             <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
         </div>

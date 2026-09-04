@@ -635,7 +635,7 @@ function updateCharacters() {
     
     const chars = state.characters || [];
     if (chars.length === 0) {
-        el.innerHTML = '<span class="text-muted">No characters yet. Create one in the Character Builder!</span>';
+        el.innerHTML = '<span class="text-muted">No characters yet. Open Characters to make one.</span>';
         return;
     }
     
@@ -705,7 +705,7 @@ function updateEncounters() {
     
     const encounters = state.encounters || [];
     if (encounters.length === 0) {
-        el.innerHTML = '<span class="text-muted">No active encounters. Create one in the Encounters module!</span>';
+        el.innerHTML = '<span class="text-muted">No active encounters. Open Encounters to prepare one.</span>';
         return;
     }
     
@@ -739,7 +739,7 @@ function updateFactions() {
     
     const factions = state.factions?.factions || [];
     if (factions.length === 0) {
-        el.innerHTML = '<span class="text-muted">No factions tracked. Add some in the Factions module!</span>';
+        el.innerHTML = '<span class="text-muted">No factions tracked. Add them under Factions &amp; Assets.</span>';
         return;
     }
     

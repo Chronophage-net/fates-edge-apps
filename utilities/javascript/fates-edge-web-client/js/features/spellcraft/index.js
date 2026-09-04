@@ -51,7 +51,7 @@ const PATH_META = {
         label: 'Free Caster',
         icon: '🔮',
         color: '#8e44ad',
-        description: 'Weave the raw Weave using TAGS. No patron required – only will and grammar.',
+        description: 'Combine TAGS into spells without a Patron. Every mistake is yours.',
         longDescription: 'Free Casters reach directly into the Weave, shaping reality through will, word, and gesture. No Patron, no Codex, no Symbol – just you and the raw stuff of creation. The power is intoxicating, but the Backlash is entirely your own.',
         recommendations: [
             'I want to improvise and invent my own spells',
@@ -68,7 +68,7 @@ const PATH_META = {
         label: 'Runekeeper',
         icon: '📜',
         color: '#d4af37',
-        description: 'Bound to a single Patron. Your Codex and Thiasos are the instruments of your covenant.',
+        description: 'Serve one Patron through Rites kept in a Codex. A Thiasos travels beside you and witnesses that service.',
         longDescription: 'Runekeepers are the agents of the great powers – Paladins of Mykkiel, Druids of Grimmir, Artificers of the Clockwork Monad. You serve one Patron, and in return you wield structured, reliable power. Your Codex is your covenant; your Thiasos is your witness.',
         recommendations: [
             'I want clear, structured power with defined costs',
@@ -85,7 +85,7 @@ const PATH_META = {
         label: 'Invoker',
         icon: '🎴',
         color: '#e67e22',
-        description: 'Carry Symbols from multiple Patrons. Power is borrowed, interest is steep.',
+        description: 'Carry Symbols from several Patrons. Each grants a Rite and carries its own Obligation.',
         longDescription: 'Invokers are gamblers who carry Symbols – physical anchors to Patrons they have never fully sworn to. They diversify their portfolio of power, juggling obligations like a merchant hedging against ruin. The power is versatile, but the interest is always compounding.',
         recommendations: [
             'I want flexibility and versatility',
@@ -102,7 +102,7 @@ const PATH_META = {
         label: 'Cantor',
         icon: '🎵',
         color: '#6b4c9a',
-        description: 'Your voice is the instrument. Sing the old songs, and the Weave answers – at a cost.',
+        description: 'Old songs invite a Patron to echo through the singer. The voice changes first.',
         longDescription: 'Cantors are the wild singers, the mad pipers, the hymn-leaders who become the altar. They do not swear to Patrons – they echo them. Their power is intimacy, unmediated and deeply dangerous. The voice that sings too often to the storm begins to carry thunder in its timbre.',
         recommendations: [
             'I love social/performance scenes',
@@ -119,7 +119,7 @@ const PATH_META = {
         label: 'Witch',
         icon: '🧹',
         color: '#27ae60',
-        description: 'Threshold magic, hedge gifts, and the quiet work of names. The hedge keeps the wolves at bay.',
+        description: 'Work with names, thresholds, and household rites. The magic is quiet; its failures are not.',
         longDescription: 'Witches practice the systemic magic that maintains the world – the quiet, overlooked power that is at once invisible and essential. They work with knots, thresholds, and the accumulated weight of stories. Their magic is intimate, corrupting in the old sense: not rotten, but changed.',
         recommendations: [
             'I like subtlety and preparation over flashy magic',
@@ -136,7 +136,7 @@ const PATH_META = {
         label: 'Psion',
         icon: '🧠',
         color: '#2980b9',
-        description: 'The mind is the only focus. Mental Strain is the price of bending reality with will alone.',
+        description: 'Turn discipline inward and work without a visible focus. Mental Strain records what the effort does to you.',
         longDescription: 'Psions look only to the self – the disciplined, trained, dangerous self. They carry no outward signs of their power. No glowing staff, no familiar, no song to warn you. They are accountable only to themselves, and in a world built on bonds and covenants, this makes them suspect. The mind is a fortress with no gates – safe until it isn\'t.',
         recommendations: [
             'I prefer internal struggle over external debts',
@@ -153,7 +153,7 @@ const PATH_META = {
         label: 'Summoner',
         icon: '👁️',
         color: '#c0392b',
-        description: 'Bind spirits with the Leash. Negotiate, command, and hope the price is worth the service.',
+        description: 'Call a spirit into the world, agree on terms, and keep the Leash from tightening.',
         longDescription: 'Summoners are the diplomats of the damned and the blessed alike – the ones who open doors and hope to close them before something follows through. The dead, the fey, the demons, the angels – they are all spirits, and they all speak the language of contract. The Leash is a courtesy extended by the spirit while it finds your measure.',
         recommendations: [
             'I like tactical "pet" management and action economy',
@@ -169,7 +169,7 @@ const PATH_META = {
         label: 'Monk',
         icon: '🧘',
         color: '#f39c12',
-        description: 'The body is a temple. The breath is a weapon. Stillness is the greatest disguise.',
+        description: 'Train breath and body into a discipline that can answer steel or sorcery.',
         longDescription: 'Monks of the Unbroken Way walk the path of discipline and balance. They do not bargain with Patrons – they master themselves. Their power is not in what they can do, but in what they can choose not to do. The body is a temple; the breath is a weapon; stillness is the greatest disguise.',
         recommendations: [
             'I want discipline and balance over raw power',
@@ -302,13 +302,15 @@ function ensureStyles() {
             border-top: 1px solid var(--border);
             padding-top: 0.2rem;
         }
-        .path-finder-card .path-archetypes {
+        .path-finder-card .path-archetypes,
+        .path-info-card .path-archetypes {
             display: flex;
             flex-wrap: wrap;
             gap: 0.2rem;
             margin-top: 0.1rem;
         }
-        .path-finder-card .path-archetypes span {
+        .path-finder-card .path-archetypes span,
+        .path-info-card .path-archetypes span {
             font-size: 0.55rem;
             padding: 0.05rem 0.3rem;
             border-radius: 6px;
@@ -754,9 +756,10 @@ function renderNoCharacterView() {
 
     return `
         <div class="spellcraft-empty" style="padding:1.5rem 1.5rem 2rem;text-align:center;color:var(--text3);background:var(--bg2);border-radius:var(--radius);border:1px dashed var(--border);">
-            <div style="font-size:3rem;">🧙</div>
             <h2 style="margin:0.5rem 0;color:var(--text);">Select a Character</h2>
-            <p style="margin:0 0 0.8rem;">Pick a character below, or go to the VTT and click a character card.</p>
+            <p style="margin:0 0 0.8rem;">${characters.length > 0
+                ? 'Choose one below, or select a character card in the VTT.'
+                : 'Magic here belongs to a character. Make one first.'}</p>
 
             <div style="display:flex;gap:0.4rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
                 ${characters.length > 0 ? `
@@ -769,14 +772,14 @@ function renderNoCharacterView() {
                             return `<option value="${escHtml(c.id)}">${escHtml(c.name || 'Unnamed')}${pathLabel ? ` — ${escHtml(pathLabel)}` : ''}</option>`;
                         }).join('')}
                     </select>
-                ` : `
-                    <p style="font-size:0.85rem;color:var(--text3);margin:0;">No characters yet — create one on the Characters tab first.</p>
-                `}
-                <button class="btn btn-gold" id="go-to-vtt-btn">🎯 Go to VTT</button>
+                ` : ''}
+                ${characters.length > 0
+                    ? '<button class="btn btn-gold" id="go-to-vtt-btn">Go to VTT</button>'
+                    : '<button class="btn btn-gold" id="go-to-characters-btn">Create a character</button>'}
             </div>
 
             <div style="text-align:left;max-width:960px;margin:0 auto;">
-                <div style="font-weight:600;color:var(--gold);margin-bottom:0.5rem;text-align:center;">📚 Magic Paths at a Glance</div>
+                <div style="font-weight:600;color:var(--gold);margin-bottom:0.5rem;text-align:center;">Magic paths at a glance</div>
                 <div class="path-info-grid">
                     ${Object.entries(PATH_META)
                         .filter(([id]) => id !== 'none')
@@ -796,7 +799,7 @@ function renderNoCharacterView() {
                         `).join('')}
                 </div>
                 <div style="margin-top:0.6rem;font-size:0.75rem;color:var(--text3);text-align:center;">
-                    The Spellbook is available to every character regardless of path. Witchcraft (Hedge Gifts, Quick Workings, Full Rituals) also works without the Witch path if you've taken "Craft of the Hedge." Ingredient/recipe crafting and the item Codex live in their own <strong>Crafting</strong> page in the sidebar.
+                    Every character may use the Spellbook. <strong>Craft of the Hedge</strong> opens Witchcraft without the Witch path. Ingredients, recipes, and the item Codex are under <strong>Crafting</strong>.
                 </div>
             </div>
         </div>
@@ -1324,6 +1327,9 @@ function attachEvents() {
         switch (target.id) {
             case 'go-to-vtt-btn':
                 window.location.hash = 'vtt';
+                break;
+            case 'go-to-characters-btn':
+                window.location.hash = 'characters';
                 break;
             case 'spellcraft-refresh':
                 renderAll();
