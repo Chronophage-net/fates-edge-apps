@@ -13,6 +13,7 @@
  * - Tours & Onboarding (Product Tour + Welcome Tour + Magic Paths Tour)
  */
 
+import { openPaperImport } from './paper-import.js';
 import { t as i18nText } from '@core/i18n.js';
 import { 
     getState as getAppState,
@@ -992,6 +993,7 @@ export function render(el) {
                 <div class="flex" style="gap:0.5rem;flex-wrap:wrap;">
                     <button class="btn btn-sm btn-primary" id="settings-export-btn" data-i18n="feature.settings.exportAllData">⬇️ Export All Data</button>
                     <button class="btn btn-sm btn-secondary" id="settings-import-btn" data-i18n="feature.settings.importData">⬆️ Import Data</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-paper-import" data-i18n="paperImport.title">Import from Paper</button>
                     <input type="file" id="settings-import-file" accept="application/json" style="display:none;" />
                     <button class="btn btn-sm btn-danger" id="settings-clear-btn" data-i18n="feature.settings.clearAllData">🗑️ Clear All Data</button>
                 </div>
@@ -1690,6 +1692,7 @@ export function attachEvents() {
     
     // Data management
     document.getElementById('settings-export-btn')?.addEventListener('click', exportAllData);
+    document.getElementById('settings-paper-import')?.addEventListener('click', openPaperImport);
     document.getElementById('settings-import-btn')?.addEventListener('click', () => {
         document.getElementById('settings-import-file')?.click();
     });

@@ -2691,5 +2691,31 @@
     "settings.themeRegistered": "Registered",
     "settings.themeAutoNote": "(Auto — matches your system's {{theme}} preference)",
     "settings.themeActive": "Active:"
+  },
+  "paperImport": {
+    "title": "Import from Paper",
+    "intro": "Paste a transcribed sheet or OCR text, preview every value, then import. Characters can be updated by exact ID; without an ID, each block creates a new entry. New characters receive the usual defaults for omitted fields. Timers and journals are new entries. Check your campaign connection before importing; changes use campaign sync.",
+    "input": "Paper import text",
+    "example": "Use example",
+    "preview": "Preview",
+    "apply": "Import reviewed entries",
+    "close": "Close",
+    "create": "Create new entry",
+    "update": "Update existing character",
+    "saved": "Saved locally; delivery uses campaign sync. Do not paste the same blocks again to retry delivery.",
+    "pending": "Saved locally, but delivery was not confirmed. Check sync status before continuing; do not import these blocks again.",
+    "idError": "Check IDs: character IDs must already exist and appear only once. Omit IDs from new timer and journal blocks.",
+    "issue": {
+      "size": "Text must contain at most 50,000 characters.",
+      "section": "Line {{line}}: Unknown section: {{value}}",
+      "header": "Line {{line}}: Start with === Character ===, === Timer ===, or === Journal ===. {{value}}",
+      "field": "Line {{line}}: Unknown or malformed field: {{value}}",
+      "duplicate": "Line {{line}}: Repeated field: {{value}}",
+      "corrected": "Line {{line}}: Review OCR correction: {{value}}",
+      "number": "Line {{line}}: Invalid number: {{value}}",
+      "skill": "Line {{line}}: Unknown or malformed skill: {{value}}",
+      "required": "Line {{line}}: Required field: {{value}}",
+      "empty": "No import blocks found."
+    }
   }
 }

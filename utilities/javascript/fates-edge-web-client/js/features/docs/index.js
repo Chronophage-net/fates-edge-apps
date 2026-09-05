@@ -45,7 +45,7 @@ import { printWithChromeHidden } from '@core/print.js';
 // copied and handed out, should not be missing the print button.
 const PRINTABLE_DOC_IDS = new Set([
     'systems_reference_document', 'srd', 'essentials', 'campfire_mode',
-    'the_paper_table', 'the_peoples_die',
+    'the_paper_table', 'the_peoples_die', 'paper_import_reference',
 ]);
 
 // ============================================================

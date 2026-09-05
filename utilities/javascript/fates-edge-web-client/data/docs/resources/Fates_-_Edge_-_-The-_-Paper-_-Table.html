@@ -495,6 +495,36 @@ d10 that lies flat, and the table in section 4 is the same distribution the dice
 built at a paper table is playable at any other table, and the reverse. That is the whole point: the
 rules were never the part that needed the equipment.</p>
 </div>
+<h2 id="paper-import">9. Sending a paper session to the web client</h2>
+<p>A player can write these blocks by hand, type them in an email, or ask a trusted person to transcribe them. The recipient opens <strong>Settings → Data Management → Import from Paper</strong>, pastes the text, previews every value, and imports. No account or device is needed by the person writing the paper sheet.</p>
+<p>Use the field labels exactly as shown, in English even when the client is in Spanish; names and notes can be in any language. Copy the completed values, not blank worksheet lines. <a href="Paper-Import-Reference.html">Print the one-page Paper Import Reference</a> for all supported fields.</p>
+<h3>Character sheet — import block</h3>
+<p>Copy this block at the bottom of a character sheet. For a new character, omit ID. To update an existing character, copy its exact <code>id</code> from an exported backup; keep Name and only the fields you want to change. Omitted fields stay unchanged on an update. New characters receive the client's usual defaults for omitted fields. Skills listed here update those skills only.</p>
+<pre style="white-space:pre-wrap;font-family:monospace">=== Character ===
+Name: Rowan
+Body: 2
+Wits: 3
+Spirit: 1
+Presence: 2
+XP: 32
+Skills: Melee=2, Lore=1
+Fatigue: 0
+Harm: 0
+Boons: 1
+Notes: Arrived at the old bridge.</pre>
+<h3>GM session tracker — import block</h3>
+<p>Each Timer block adds a new clock; each Journal block adds a new wiki entry. Use a distinct session title so it is easy to find later. Story Beat totals and other campaign details can be recorded in the journal text; they do not change the live counters automatically.</p>
+<pre style="white-space:pre-wrap;font-family:monospace">=== Timer ===
+Name: Patrol returns
+Segments: 6
+Current: 2
+
+=== Journal ===
+Title: Session at the bridge
+Content: We promised to return before dawn.
+Tags: session, bridge</pre>
+<p>Check the recipient's campaign connection before importing: these changes use the existing campaign sync and offline queue. Review OCR output carefully. In numeric fields only, O becomes 0 and I, l or | becomes 1; every such repair appears in the preview. Unknown labels, invalid values and repeated fields block the import. Other ambiguous text must be corrected by the transcriber. Import each block once; pending delivery is not a reason to import it again. This flow accepts text, not image uploads.</p>
+
 <hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
 <div style="font-size:.75rem;color:var(--text3);text-align:center;padding:1rem 0">The Paper Table &mdash; a Fate's Edge resource<br>&copy; Nicholas A. Gasper &mdash; CC BY-NC-SA 4.0</div>
 </body>

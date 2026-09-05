@@ -2691,5 +2691,31 @@
     "settings.themeRegistered": "Registrado",
     "settings.themeAutoNote": "(Automático: sigue la preferencia de tu sistema: {{theme}})",
     "settings.themeActive": "Activo:"
+  },
+  "paperImport": {
+    "title": "Importar desde papel",
+    "intro": "Pega una hoja transcrita o texto de OCR, revisa cada valor e importa. Puedes actualizar personajes mediante su ID exacto; sin ID, cada bloque crea una entrada nueva. Los campos omitidos de un personaje nuevo reciben los valores predeterminados habituales. Los temporizadores y diarios son entradas nuevas. Comprueba la conexión a tu campaña antes de importar; los cambios usan la sincronización de campaña.",
+    "input": "Texto para importar desde papel",
+    "example": "Usar ejemplo",
+    "preview": "Vista previa",
+    "apply": "Importar entradas revisadas",
+    "close": "Cerrar",
+    "create": "Crear entrada nueva",
+    "update": "Actualizar personaje existente",
+    "saved": "Guardado localmente; el envío usa la sincronización de campaña. No vuelvas a pegar los mismos bloques para reintentar el envío.",
+    "pending": "Guardado localmente, pero no se confirmó el envío. Comprueba la sincronización antes de continuar; no vuelvas a importar estos bloques.",
+    "idError": "Comprueba los ID: los ID de personajes deben existir y aparecer una sola vez. Omite los ID en los bloques nuevos de temporizadores y diarios.",
+    "issue": {
+      "size": "El texto debe contener como máximo 50,000 caracteres.",
+      "section": "Línea {{line}}: Sección desconocida: {{value}}",
+      "header": "Línea {{line}}: Empieza con === Character ===, === Timer === o === Journal ===. {{value}}",
+      "field": "Línea {{line}}: Campo desconocido o mal formado: {{value}}",
+      "duplicate": "Línea {{line}}: Campo repetido: {{value}}",
+      "corrected": "Línea {{line}}: Revisa la corrección de OCR: {{value}}",
+      "number": "Línea {{line}}: Número no válido: {{value}}",
+      "skill": "Línea {{line}}: Habilidad desconocida o mal formada: {{value}}",
+      "required": "Línea {{line}}: Campo obligatorio: {{value}}",
+      "empty": "No se encontraron bloques para importar."
+    }
   }
 }

@@ -770,6 +770,13 @@ buildWebSocketUrl(serverUrl, campaignCode) {
         version: { ...this.versionVector }
       };
 
+      if (!this.socket || this.socket.readyState !== 1) {
+        this.offlineQueue.enqueue({ type: 'operation', operation: fullOperation });
+        this.applyOperation(fullOperation);
+        resolve({ queued: true, operationId: opId });
+        return;
+      }
+
       this.pendingOperations.set(opId, { resolve, reject, timestamp: Date.now() });
 
       // Send to server
@@ -787,7 +794,7 @@ buildWebSocketUrl(serverUrl, campaignCode) {
           if (this.pendingOperations.has(opId)) {
             const pending = this.pendingOperations.get(opId);
             if (pending) {
-              this.offlineQueue.enqueue(fullOperation);
+              this.offlineQueue.enqueue({ type: 'operation', operation: fullOperation });
               pending.reject(new Error('Operation timeout'));
             }
             this.pendingOperations.delete(opId);

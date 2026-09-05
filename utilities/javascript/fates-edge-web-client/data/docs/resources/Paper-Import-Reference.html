@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Paper Import Reference</title>
+<style>body{font:15px/1.35 system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;color:#202020;background:white}h1{font-size:1.5rem}h2{font-size:1.1rem;margin-bottom:.3rem}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:.25rem;text-align:left}pre{font:12px/1.3 monospace;white-space:pre-wrap}.columns{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media print{body{font-size:10pt;margin:0;padding:0}h1{margin-top:0}@page{size:auto;margin:12mm}section,table,pre{break-inside:avoid}}</style></head><body>
+<h1>Fate's Edge — Paper Import Reference</h1>
+<p><strong>Settings → Data Management → Import from Paper.</strong> Paste transcribed text, preview every value, then import once. Labels stay in English; names and text may use any language. This imports text, not photographs.</p>
+<table><tr><th>Section header</th><th>Fields</th></tr>
+<tr><td><code>=== Character ===</code></td><td><strong>Name</strong> required. Optional: ID, Body, Wits, Spirit, Presence, XP, Skills, Fatigue, Harm, Boons, Notes.</td></tr>
+<tr><td><code>=== Timer ===</code></td><td><strong>Name, Segments</strong> required. Optional: Current (default 0). Creates a new timer; omit ID.</td></tr>
+<tr><td><code>=== Journal ===</code></td><td><strong>Title, Content</strong> required. Optional: Tags. Creates a new wiki entry; omit ID.</td></tr></table>
+<div class="columns"><section><h2>Character example</h2><pre>=== Character ===
+Name: Rowan
+Body: 2
+Wits: 3
+Spirit: 1
+Presence: 2
+XP: 32
+Skills: Melee=2, Lore=1
+Fatigue: 0
+Harm: 0
+Boons: 1
+Notes: Arrived at the bridge.</pre></section><section><h2>Session example</h2><pre>=== Timer ===
+Name: Patrol returns
+Segments: 6
+Current: 2
+
+=== Journal ===
+Title: Session at the bridge
+Content: Return before dawn.
+Tags: session, bridge</pre></section></div>
+<h2>Supported values</h2>
+<p>Attributes: 1–5. Skills: 0–5. Harm: 0–3. Fatigue and Boons: 0–100 (import limits, not rules caps). XP: 0–100000. Clock Segments: 4, 6, 8 or 10. Current: 0 through Segments. Values are totals, not amounts to add; the importer does not spend XP or validate a character build.</p>
+<p><strong>Skills:</strong> Melee, Ranged, Athletics, Stealth, Endurance, Craft, Sway, Deception, Performance, Insight, Lore, Arcana. Separate skill ratings with commas: <code>Melee=2, Lore=1</code>. Tags also use commas. Skills, Tags, Notes and Content may continue on following lines; use no colon on continuation lines. Lines starting with # are comments.</p>
+<h2>Updates and transcription</h2>
+<p>Without ID, a character block creates a new character with usual defaults. To update one, copy its exact <code>id</code> from an exported backup into <code>ID:</code>; keep Name and include only changed fields. Other fields and unlisted skills stay unchanged. Names alone never select an existing character. Duplicate or unknown IDs stop the import.</p>
+<p>Numeric O → 0 and I/l/| → 1 repairs are shown for review. Invalid numbers, unknown labels and repeated fields must be fixed. Check all OCR text against the paper. Connect to the intended campaign before importing; delivery uses sync and its offline queue. Do not re-import to retry a pending delivery.</p>
+<p><small>© Nicholas A. Gasper — CC BY-NC-SA 4.0. Copy, print and share with your table.</small></p>
+</body></html>

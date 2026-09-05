@@ -93,6 +93,7 @@ describe('SyncManager Integration', () => {
     it('should broadcast operations', async () => {
         const sync = new SyncManager();
         const mockWs = createMockWebSocket();
+        mockWs.readyState = 1; // Broadcast through an open transport.
         sync.socket = mockWs;
         sync.isConnecting = false;
         sync.isConnected = true;
@@ -127,6 +128,39 @@ describe('SyncManager Integration', () => {
         assertDeepEqual(ops[0].operation.value, charData);
     });
     
+    it('queues an offline operation envelope once and applies it locally', async () => {
+        const sync = new SyncManager();
+        sync.socket = null;
+        const queued = [];
+        let applied = 0;
+        sync.offlineQueue.enqueue = op => queued.push(op);
+        sync.applyOperation = () => { applied++; return true; };
+        const result = await sync.broadcast({ type: 'add_character', value: { id: 'paper-test' } });
+        assertEqual(result.queued, true);
+        assertEqual(queued.length, 1);
+        assertEqual(queued[0].type, 'operation');
+        assertEqual(queued[0].operation.type, 'add_character');
+        assertEqual(applied, 1);
+        assertEqual(sync.pendingOperations.size, 0);
+    });
+
+    it('retains the operation envelope when acknowledgement times out', async () => {
+        const sync = new SyncManager();
+        sync.socket = { readyState: 1 };
+        sync.operationTimeout = 1;
+        sync.send = () => {};
+        sync.applyOperation = () => true;
+        const queued = [];
+        sync.offlineQueue.enqueue = op => queued.push(op);
+        let timedOut = false;
+        try { await sync.broadcast({ type: 'add_timer', value: { id: 'clock-test' } }); }
+        catch { timedOut = true; }
+        assertEqual(timedOut, true);
+        assertEqual(queued.length, 1);
+        assertEqual(queued[0].type, 'operation');
+        assertEqual(queued[0].operation.value.id, 'clock-test');
+    });
+
     it('should apply remote operations', async () => {
         loadState();
         const sync = new SyncManager();

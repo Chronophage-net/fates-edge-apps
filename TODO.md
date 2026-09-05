@@ -1,3 +1,17 @@
+## Paper import — implemented 2026-09-05
+
+- [x] Settings → Data Management → Import from Paper: paste, preview, and import.
+- [x] Character creation and exact-ID updates; new timers and journal/wiki entries.
+- [x] Explicit validation, visible numeric OCR repairs, and preservation of omitted character fields.
+- [x] Existing sync operations and offline queue; corrected offline delivery envelope handling.
+- [x] Character and GM import blocks in The Paper Table; printable Paper Import Reference in Resources.
+- [ ] Optional follow-up: image upload/OCR (current flow accepts transcribed or externally recognized text).
+- [ ] Optional follow-up: Discord/Foundry `!import` adapters using the same format.
+
+The exchange labels stay in English for interoperability; the import dialog is localized in American English, British English, and Spanish. The reference lists exactly which fields are supported. Campaign counters beyond character tracks and new timers can be recorded in a journal but are not automatically applied.
+
+### Original notes
+
 "Paper" (manual) import:
 
 Implementation Sketch

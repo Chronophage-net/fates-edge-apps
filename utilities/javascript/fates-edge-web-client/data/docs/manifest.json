@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-05T22:01:29.805Z",
+  "generated": "2026-09-05T22:16:14.096Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -518,6 +518,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "paper_import_reference",
+      "title": "Paper Import Reference",
+      "file": "Paper-Import-Reference.html",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
       "core": false,
       "active": true
     },
@@ -1160,7 +1170,7 @@
       "active": true
     }
   ],
-  "total_count": 80,
-  "active_count": 80,
+  "total_count": 81,
+  "active_count": 81,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

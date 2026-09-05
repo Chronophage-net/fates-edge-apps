@@ -222,3 +222,10 @@ Before submitting a change: run the test suite, update this README or `DESIGN.md
 
 **Enjoy your games!**
 — Nick Gasper
+
+
+### Import from Paper
+
+In **Settings → Data Management → Import from Paper**, paste a transcribed sheet, preview the entries and any OCR repairs, then import. The shared plain-text format supports character creation, exact-ID character updates, new timers, and journal entries. It uses existing campaign sync and queues offline changes. Image recognition and chat commands are future extensions.
+
+See the printable [Paper Import Reference](data/docs/resources/Paper-Import-Reference.html) for all fields and examples. The pure parser lives in `js/core/paper-import.js` for future client adapters.
