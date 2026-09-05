@@ -7,6 +7,7 @@
  */
 
 // Import from core modules
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
 import { escHtml, safeParseInt } from '@core/utils.js';
 import { addRoll, getState, saveState } from '@core/state.js';
@@ -263,7 +264,7 @@ function showToast(message, type = 'info') {
     toast.style.cssText = `
         position: fixed;
         bottom: 20px;
-        left: 50%;
+        left: 50%; /* rtl-physical: viewport centering */
         transform: translateX(-50%);
         background: var(--bg2);
         color: ${colors[type] || colors.info};
@@ -301,19 +302,19 @@ export function render(el) {
     const isConnected = isConnectedToServer();
     
     container.innerHTML = `
-        <h1 class="page-title">🎲 Dice Roller</h1>
-        <p class="page-sub">Roll dice with the Fate's Edge resolution system.</p>
+        <h1 class="page-title" data-i18n="feature.dice.diceRoller">🎲 Dice Roller</h1>
+        <p class="page-sub" data-i18n="feature.dice.rollDiceWithTheFateSEdge">Roll dice with the Fate's Edge resolution system.</p>
         
         <!-- Connection & Seed Status -->
-        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isConnected ? 'var(--green)' : 'var(--text3)'};">
+        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-inline-start:3px solid ${isConnected ? 'var(--green)' : 'var(--text3)'};">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                 <span style="font-size:0.8rem;color:var(--text2);">
                     ${isConnected ? '🟢 Connected to server' : '📡 Local mode'}
                     ${isDeterministic ? ` 🎲 Deterministic (seed: ${seed.substring(0, 8)}...)` : ' 🔀 Cryptographic RNG'}
                 </span>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-ghost" id="seed-regenerate" title="Regenerate seed">🔄 New Seed</button>
-                    <button class="btn btn-xs btn-ghost" id="seed-clear" title="Clear seed (use crypto)">🧹 Clear Seed</button>
+                    <button class="btn btn-xs btn-ghost" id="seed-regenerate" title="Regenerate seed" data-i18n-attr="title:feature.dice.regenerateSeed" data-i18n="feature.dice.newSeed">🔄 New Seed</button>
+                    <button class="btn btn-xs btn-ghost" id="seed-clear" title="Clear seed (use crypto)" data-i18n-attr="title:feature.dice.clearSeedUseCrypto" data-i18n="feature.dice.clearSeed">🧹 Clear Seed</button>
                 </div>
             </div>
         </div>
@@ -321,7 +322,7 @@ export function render(el) {
         <div class="panel">
             <div class="form-row">
                 <div class="field small">
-                    <label>Attribute</label>
+                    <label data-i18n="feature.dice.attribute">Attribute</label>
                     <select id="roll-attr">
                         <option value="1">1</option>
                         <option value="2" selected>2</option>
@@ -331,7 +332,7 @@ export function render(el) {
                     </select>
                 </div>
                 <div class="field small">
-                    <label>Skill</label>
+                    <label data-i18n="feature.dice.skill">Skill</label>
                     <select id="roll-skill">
                         <option value="0">0</option>
                         <option value="1" selected>1</option>
@@ -342,7 +343,7 @@ export function render(el) {
                     </select>
                 </div>
                 <div class="field small">
-                    <label>DV</label>
+                    <label data-i18n="feature.dice.dv">DV</label>
                     <select id="roll-dv">
                         <option value="2">2</option>
                         <option value="3" selected>3</option>
@@ -352,15 +353,15 @@ export function render(el) {
                     </select>
                 </div>
                 <div class="field small">
-                    <label>Position</label>
+                    <label data-i18n="feature.dice.position">Position</label>
                     <select id="roll-position">
-                        <option value="controlled" selected>Controlled</option>
-                        <option value="dominant">Dominant</option>
-                        <option value="desperate">Desperate</option>
+                        <option value="controlled" selected data-i18n="feature.dice.controlled">Controlled</option>
+                        <option value="dominant" data-i18n="feature.dice.dominant">Dominant</option>
+                        <option value="desperate" data-i18n="feature.dice.desperate">Desperate</option>
                     </select>
                 </div>
                 <div class="field small">
-                    <label>Boons</label>
+                    <label data-i18n="feature.dice.boons">Boons</label>
                     <select id="roll-boons">
                         <option value="0" selected>0</option>
                         <option value="1">1</option>
@@ -374,18 +375,18 @@ export function render(el) {
             
             <!-- Quick Roll Presets -->
             <div class="preset-rolls" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem;">
-                <button class="btn btn-sm btn-ghost" data-roll-preset="combat">⚔️ Combat (3+2, DV3)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="stealth">👤 Stealth (2+3, DV4)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="social">💬 Social (2+2, DV3)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="magic">🔮 Magic (1+4, DV5)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="desperate">🔥 Desperate (2+2, DV4, Desperate)</button>
-                <button class="btn btn-sm btn-ghost" data-roll-preset="deterministic">🎲 Deterministic Demo</button>
+                <button class="btn btn-sm btn-ghost" data-roll-preset="combat" data-i18n="feature.dice.combat32DV3">⚔️ Combat (3+2, DV3)</button>
+                <button class="btn btn-sm btn-ghost" data-roll-preset="stealth" data-i18n="feature.dice.stealth23DV4">👤 Stealth (2+3, DV4)</button>
+                <button class="btn btn-sm btn-ghost" data-roll-preset="social" data-i18n="feature.dice.social22DV3">💬 Social (2+2, DV3)</button>
+                <button class="btn btn-sm btn-ghost" data-roll-preset="magic" data-i18n="feature.dice.magic14DV5">🔮 Magic (1+4, DV5)</button>
+                <button class="btn btn-sm btn-ghost" data-roll-preset="desperate" data-i18n="feature.dice.desperate22DV4Desperate">🔥 Desperate (2+2, DV4, Desperate)</button>
+                <button class="btn btn-sm btn-ghost" data-roll-preset="deterministic" data-i18n="feature.dice.deterministicDemo">🎲 Deterministic Demo</button>
             </div>
             
             <div class="flex">
-                <button class="btn btn-gold" id="roll-btn">🎲 Roll</button>
-                <button class="btn btn-sm" id="roll-clear-history">🗑️ Clear History</button>
-                <button class="btn btn-sm" id="roll-export-history">📤 Export</button>
+                <button class="btn btn-gold" id="roll-btn" data-i18n="feature.dice.roll">🎲 Roll</button>
+                <button class="btn btn-sm" id="roll-clear-history" data-i18n="feature.dice.clearHistory">🗑️ Clear History</button>
+                <button class="btn btn-sm" id="roll-export-history" data-i18n="feature.dice.export">📤 Export</button>
             </div>
         </div>
         
@@ -393,11 +394,11 @@ export function render(el) {
         
         <div class="panel">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                <h3 style="margin:0;">📜 Roll History</h3>
+                <h3 style="margin:0;" data-i18n="feature.dice.rollHistory">📜 Roll History</h3>
                 <div id="roll-stats" style="font-size:0.8rem;color:var(--text2);"></div>
             </div>
             <div id="roll-history" style="max-height:300px;overflow-y:auto;margin-top:0.5rem;">
-                <span class="text-muted">No rolls yet.</span>
+                <span class="text-muted" data-i18n="feature.dice.noRollsYet">No rolls yet.</span>
             </div>
         </div>
     `;
@@ -440,7 +441,10 @@ function setupWebSocketSync() {
         renderHistory();
         updateStats();
         
-        showToast(`🎲 ${data.sender || 'Remote'} rolled: ${data.outcome || 'Dice'}`, 'info');
+        showToast(i18nText("feature.dice.valueRolledValue", {
+            value0: data.sender || i18nText('common.remote', null, 'Remote'),
+            value1: data.outcome || i18nText('feature.dice.dice', null, 'Dice')
+        }, "🎲 {{value0}} rolled: {{value1}}"), 'info');
     };
     
     try {
@@ -508,17 +512,17 @@ function attachEvents() {
         seedRegenerate.addEventListener('click', async function() {
             const newSeed = await generateSeed();
             render(container);
-            showToast('🎲 New seed generated: ' + newSeed.substring(0, 8) + '...', 'success');
+            showToast(i18nText("feature.dice.newSeedGeneratedValue", { value0: newSeed.substring(0, 8) }, "🎲 New seed generated: {{value0}}..."), 'success');
         });
     }
     
     const seedClear = document.getElementById('seed-clear');
     if (seedClear) {
         seedClear.addEventListener('click', function() {
-            if (confirm('Clear the deterministic seed? This will use cryptographic RNG instead.')) {
+            if (confirm(i18nText("feature.dice.clearTheDeterministicSeedThisWillUse", null, "Clear the deterministic seed? This will use cryptographic RNG instead."))) {
                 setSeed(null);
                 render(container);
-                showToast('🧹 Seed cleared. Using cryptographic RNG.', 'info');
+                showToast(i18nText("feature.dice.seedClearedUsingCryptographicRNG", null, "🧹 Seed cleared. Using cryptographic RNG."), 'info');
             }
         });
     }
@@ -648,7 +652,15 @@ function handleRoll() {
         // (see the import above). Kept concise on purpose: successes,
         // story beats, and the outcome label are the numbers a player
         // actually needs, not every individual die face.
-        announce(`Rolled ${result.resultText || result.outcome || 'a dice pool'}: ${result.successes || 0} success${result.successes === 1 ? '' : 'es'}, ${result.storyBeats || 0} story beat${result.storyBeats === 1 ? '' : 's'}.`);
+        const successes = result.successes || 0;
+        const storyBeats = result.storyBeats || 0;
+        const successPhrase = i18nPlural('feature.dice.successCount', successes, null, '{{count}} successes');
+        const storyBeatPhrase = i18nPlural('feature.dice.storyBeatCount', storyBeats, null, '{{count}} story beats');
+        announce(i18nText('feature.dice.rollAnnouncement', {
+            result: result.resultText || result.outcome || i18nText('feature.dice.aDicePool', null, 'a dice pool'),
+            successes: successPhrase,
+            storyBeats: storyBeatPhrase
+        }, 'Rolled {{result}}: {{successes}}, {{storyBeats}}.'));
         renderHistory();
         updateStats();
         
@@ -805,10 +817,10 @@ function renderHistory() {
                             <span style="color:${outcomeColor};font-weight:500;">${escHtml(String(roll.resultText || roll.outcome || 'Unknown'))}</span>
                             ${roll.storyBeats > 0 ? ` <span style="color:var(--gold);font-weight:500;">✨${roll.storyBeats}</span>` : ''}
                         </div>
-                        <div style="font-size:0.7rem;color:var(--text3);text-align:right;flex-shrink:0;">
+                        <div style="font-size:0.7rem;color:var(--text3);text-align: end;flex-shrink:0;">
                             <span style="background:var(--bg3);padding:0.05rem 0.4rem;border-radius:8px;">[${escHtml(diceDisplay)}]</span>
                             ${rerollDisplay}
-                            <span class="text-muted" style="margin-left:0.3rem;">${time}</span>
+                            <span class="text-muted" style="margin-inline-start:0.3rem;">${time}</span>
                         </div>
                     </div>
                 `;
@@ -873,7 +885,7 @@ function updateStats() {
 // ============================================================
 
 function clearHistory() {
-    if (confirm('Clear all roll history?')) {
+    if (confirm(i18nText("feature.dice.clearAllRollHistory", null, "Clear all roll history?"))) {
         try {
             const state = getState();
             state.diceHistory = [];
@@ -884,7 +896,7 @@ function clearHistory() {
             if (resultEl) resultEl.style.display = 'none';
         } catch (error) {
             console.error('Error clearing history:', error);
-            alert('Failed to clear history. Please try again.');
+            alert(i18nText("feature.dice.failedToClearHistoryPleaseTryAgain", null, "Failed to clear history. Please try again."));
         }
     }
 }
@@ -895,7 +907,7 @@ function exportHistory() {
         const history = state.diceHistory || [];
         
         if (history.length === 0) {
-            alert('No roll history to export.');
+            alert(i18nText("feature.dice.noRollHistoryToExport", null, "No roll history to export."));
             return;
         }
         
@@ -911,7 +923,7 @@ function exportHistory() {
         URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Error exporting history:', error);
-        alert('Failed to export history. Please try again.');
+        alert(i18nText("feature.dice.failedToExportHistoryPleaseTryAgain", null, "Failed to export history. Please try again."));
     }
 }
 

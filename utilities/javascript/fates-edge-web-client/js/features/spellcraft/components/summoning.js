@@ -26,6 +26,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
 import { escHtml, generateId, safeParseInt } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -132,7 +133,7 @@ function buildSummoningCardHtml(title, spiritName, icon, effect, costDetails, ex
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--border);
-            border-left:4px solid var(--gold);
+            border-inline-start:4px solid var(--gold);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             max-width: 450px;
             margin:0.1rem 0;
@@ -410,20 +411,20 @@ export async function renderSummoning(el) {
                     <span style="font-size:1.4rem;">👁️</span>
                     <div>
                         <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">The Opened Door</span>
-                        <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${spirits.length} bound</span>
+                        <span style="font-size:0.7rem;color:var(--text3);margin-inline-start:0.3rem;">${spirits.length} bound</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
                     <select id="summoner-bind-cost-select" style="font-size:0.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
                         ${costOptionsHtml}
                     </select>
-                    <button class="btn btn-sm btn-gold" onclick="window.summonerBindRitualFromSelect()">🔮 Bind Spirit</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.summonerRefresh()">🔄 Refresh</button>
+                    <button class="btn btn-sm btn-gold" onclick="window.summonerBindRitualFromSelect()" data-i18n="feature.spellcraft.components.summoning.bindSpirit">🔮 Bind Spirit</button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.summonerRefresh()" data-i18n="feature.spellcraft.components.summoning.refresh">🔄 Refresh</button>
                 </div>
             </div>
 
             <!-- ─── Leash Track ────────────────────────────────── -->
-            <div class="summoning-leash" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid ${mood.color};">
+            <div class="summoning-leash" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid ${mood.color};">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;font-size:0.8rem;">
                     <div style="display:flex;align-items:center;gap:0.3rem;">
                         <span style="font-size:1.2rem;">${mood.emoji}</span>
@@ -436,7 +437,7 @@ export async function renderSummoning(el) {
                         <select id="summoner-negotiate-offer-select" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;">
                             ${costOptionsHtml}
                         </select>
-                        <button class="btn btn-xs btn-gold" onclick="window.summonerNegotiateFromSelect()" style="font-size:0.6rem;">🤝 Negotiate</button>
+                        <button class="btn btn-xs btn-gold" onclick="window.summonerNegotiateFromSelect()" style="font-size:0.6rem;" data-i18n="feature.spellcraft.components.summoning.negotiate">🤝 Negotiate</button>
                         <button class="btn btn-xs btn-ghost" onclick="window.summonerClearLeash()" style="color:var(--red);">✕</button>
                     </div>
                 </div>
@@ -492,7 +493,7 @@ export async function renderSummoning(el) {
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">🔗 Bound Spirits (${spirits.length})</span>
                     <div style="display:flex;gap:0.2rem;">
-                        <button class="btn btn-xs btn-secondary" onclick="window.summonerReleaseAll()" style="color:var(--red);">Release All</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.summonerReleaseAll()" style="color:var(--red);" data-i18n="feature.spellcraft.components.summoning.releaseAll">Release All</button>
                     </div>
                 </div>
                 ${spirits.length === 0 ? `
@@ -558,7 +559,7 @@ window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
     const fullBestiary = await loadBestiary();
     const spiritData = fullBestiary.find(s => (s.id || s.name) === bestiaryId);
     if (!spiritData) {
-        showToast('Spirit not found in bestiary.', 'error');
+        showToast(i18nText("feature.spellcraft.components.summoning.spiritNotFoundInBestiary", null, "Spirit not found in bestiary."), 'error');
         return;
     }
 
@@ -568,17 +569,17 @@ window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
     const tl = getSpiritTL(spiritData);
 
     if (tl >= 4) {
-        showToast(`"${name}" is TL ${tl} and cannot be bound.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.summoning.valueIsTLValueAndCannotBe", { value0: name, value1: tl }, "\"{{value0}}\" is TL {{value1}} and cannot be bound."), 'error');
         return;
     }
 
     if ((char.boundSpirits || []).some(s => s.bestiaryId === bestiaryId || s.name === name)) {
-        showToast(`"${name}" is already bound.`, 'warning');
+        showToast(i18nText("feature.spellcraft.components.summoning.valueIsAlreadyBound", { value0: name }, "\"{{value0}}\" is already bound."), 'warning');
         return;
     }
 
     if (!['boon', 'fatigue', 'memory'].includes(cost)) {
-        showToast('Invalid cost. Choose boon, fatigue, or memory.', 'error');
+        showToast(i18nText("feature.spellcraft.components.summoning.invalidCostChooseBoonFatigueOrMemory", null, "Invalid cost. Choose boon, fatigue, or memory."), 'error');
         return;
     }
 
@@ -586,13 +587,13 @@ window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
     let costDesc = '';
     if (cost === 'boon') {
         const boons = char.boons || 0;
-        if (boons < 1) { showToast('Not enough Boons!', 'error'); return; }
+        if (boons < 1) { showToast(i18nText("feature.spellcraft.components.summoning.notEnoughBoons", null, "Not enough Boons!"), 'error'); return; }
         char.boons = boons - 1;
         costDesc = '1 Boon';
     } else if (cost === 'fatigue') {
         const fatigue = char.fatigue || 0;
         const maxFatigue = char.attributes?.body || 1;
-        if (fatigue >= maxFatigue) { showToast('Fatigue track full!', 'error'); return; }
+        if (fatigue >= maxFatigue) { showToast(i18nText("feature.spellcraft.components.summoning.fatigueTrackFull", null, "Fatigue track full!"), 'error'); return; }
         char.fatigue = fatigue + 1;
         costDesc = '1 Fatigue';
     } else {
@@ -619,7 +620,7 @@ window.summonerBindFromBestiaryWithCost = async function(bestiaryId, cost) {
     char.boundSpirits.push(newSpirit);
     saveCharacter({ boundSpirits: char.boundSpirits, boons: char.boons, fatigue: char.fatigue });
 
-    showToast(`🔮 Bound "${name}"! The leash is set. (Paid with ${cost})`, 'success');
+    showToast(i18nText("feature.spellcraft.components.summoning.boundValueTheLeashIsSetPaid", { value0: name, value1: cost }, "🔮 Bound \"{{value0}}\"! The leash is set. (Paid with {{value1}})"), 'success');
 
     // ─── Send VTT card ──────────────────────────────────────────
     const icon = newSpirit.icon || '🌀';
@@ -641,32 +642,32 @@ window.summonerBindRitualFromSelect = function() {
     const costSelect = document.getElementById('summoner-bind-cost-select');
     const cost = costSelect ? costSelect.value : 'boon';
 
-    const name = prompt('🔮 Spirit name:');
+    const name = prompt(i18nText("feature.spellcraft.components.summoning.spiritName", null, "🔮 Spirit name:"));
     if (!name) return;
 
-    const nature = prompt('Nature (Ancestral/Indigenous/Elemental/Vengeful/Fae/Shadow/Anchor):') || 'Unknown';
-    const servicesInput = prompt('Services (comma-separated):') || '';
+    const nature = prompt(i18nText("feature.spellcraft.components.summoning.natureAncestralIndigenousElementalVengefulFaeShadow", null, "Nature (Ancestral/Indigenous/Elemental/Vengeful/Fae/Shadow/Anchor):")) || 'Unknown';
+    const servicesInput = prompt(i18nText("feature.spellcraft.components.summoning.servicesCommaSeparated", null, "Services (comma-separated):")) || '';
     const services = servicesInput.split(',').map(s => s.trim()).filter(Boolean);
-    const price = prompt('Price (what you pay):') || 'None';
-    const classInput = prompt('Class (I-V, or leave blank for II):') || 'II';
+    const price = prompt(i18nText("feature.spellcraft.components.summoning.priceWhatYouPay", null, "Price (what you pay):")) || 'None';
+    const classInput = prompt(i18nText("feature.spellcraft.components.summoning.classIVOrLeaveBlankFor", null, "Class (I-V, or leave blank for II):")) || 'II';
     const cls = classInput.toUpperCase();
     const meta = CLASS_META[cls] || CLASS_META['II'];
 
     if (!['boon', 'fatigue', 'memory'].includes(cost)) {
-        showToast('Invalid cost. Choose boon, fatigue, or memory.', 'error');
+        showToast(i18nText("feature.spellcraft.components.summoning.invalidCostChooseBoonFatigueOrMemory", null, "Invalid cost. Choose boon, fatigue, or memory."), 'error');
         return;
     }
 
     let costDesc = '';
     if (cost === 'boon') {
         const boons = char.boons || 0;
-        if (boons < 1) { showToast('Not enough Boons!', 'error'); return; }
+        if (boons < 1) { showToast(i18nText("feature.spellcraft.components.summoning.notEnoughBoons", null, "Not enough Boons!"), 'error'); return; }
         char.boons = boons - 1;
         costDesc = '1 Boon';
     } else if (cost === 'fatigue') {
         const fatigue = char.fatigue || 0;
         const maxFatigue = char.attributes?.body || 1;
-        if (fatigue >= maxFatigue) { showToast('Fatigue track full!', 'error'); return; }
+        if (fatigue >= maxFatigue) { showToast(i18nText("feature.spellcraft.components.summoning.fatigueTrackFull", null, "Fatigue track full!"), 'error'); return; }
         char.fatigue = fatigue + 1;
         costDesc = '1 Fatigue';
     } else {
@@ -692,7 +693,7 @@ window.summonerBindRitualFromSelect = function() {
     char.boundSpirits.push(newSpirit);
     saveCharacter({ boundSpirits: char.boundSpirits, boons: char.boons, fatigue: char.fatigue });
 
-    showToast(`🔮 Bound "${name}" (${meta.label})`, 'success');
+    showToast(i18nText("feature.spellcraft.components.summoning.boundValueValue", { value0: name, value1: meta.label }, "🔮 Bound \"{{value0}}\" ({{value1}})"), 'success');
 
     // ─── Send VTT card ──────────────────────────────────────────
     const icon = '🌀';
@@ -719,7 +720,7 @@ window.summonerTickLeash = function(amount = 1) {
     const mood = getMood(newLeash, max);
 
     if (newLeash >= max) {
-        showToast('💥 LEASH BROKEN! The spirit acts on its nature!', 'warning');
+        showToast(i18nText("feature.spellcraft.components.summoning.leashBROKENTheSpiritActsOnIts", null, "💥 LEASH BROKEN! The spirit acts on its nature!"), 'warning');
         // Send VTT card for break
         const cardHtml = buildSummoningCardHtml(
             '💥 Leash Broken',
@@ -731,7 +732,7 @@ window.summonerTickLeash = function(amount = 1) {
         );
         sendVTTMessage(cardHtml);
     } else if (newLeash >= max * 0.8) {
-        showToast('⚠️ Leash is straining! The spirit grows restless.', 'warning');
+        showToast(i18nText("feature.spellcraft.components.summoning.leashIsStrainingTheSpiritGrowsRestless", null, "⚠️ Leash is straining! The spirit grows restless."), 'warning');
         // Send VTT card for straining
         const cardHtml = buildSummoningCardHtml(
             '⚠️ Leash Straining',
@@ -767,7 +768,7 @@ window.summonerNegotiateFromSelect = function() {
     const offer = select.value;
 
     if (!['boon', 'fatigue', 'memory'].includes(offer)) {
-        showToast('Invalid offer. Choose boon, fatigue, or memory.', 'error');
+        showToast(i18nText("feature.spellcraft.components.summoning.invalidOfferChooseBoonFatigueOrMemory", null, "Invalid offer. Choose boon, fatigue, or memory."), 'error');
         return;
     }
 
@@ -775,21 +776,21 @@ window.summonerNegotiateFromSelect = function() {
     let offerDesc = '';
     if (offer === 'boon') {
         const boons = char.boons || 0;
-        if (boons < 1) { showToast('Not enough Boons!', 'error'); return; }
+        if (boons < 1) { showToast(i18nText("feature.spellcraft.components.summoning.notEnoughBoons", null, "Not enough Boons!"), 'error'); return; }
         char.boons = boons - 1;
         accepted = true;
         offerDesc = '1 Boon';
     } else if (offer === 'fatigue') {
         const fatigue = char.fatigue || 0;
         const maxFatigue = char.attributes?.body || 1;
-        if (fatigue >= maxFatigue) { showToast('Fatigue track full!', 'error'); return; }
+        if (fatigue >= maxFatigue) { showToast(i18nText("feature.spellcraft.components.summoning.fatigueTrackFull", null, "Fatigue track full!"), 'error'); return; }
         char.fatigue = fatigue + 1;
         accepted = true;
         offerDesc = '1 Fatigue';
     } else {
         accepted = true;
         offerDesc = 'A Memory';
-        showToast('🧠 The spirit accepts your memory. It will carry it into the dark.', 'info');
+        showToast(i18nText("feature.spellcraft.components.summoning.theSpiritAcceptsYourMemoryItWill", null, "🧠 The spirit accepts your memory. It will carry it into the dark."), 'info');
     }
 
     if (!accepted) return;
@@ -797,7 +798,7 @@ window.summonerNegotiateFromSelect = function() {
     const current = char.leash || 0;
     char.leash = Math.max(0, Math.floor(current / 2));
     saveCharacter({ leash: char.leash, boons: char.boons, fatigue: char.fatigue });
-    showToast(`🤝 Leash reduced to ${char.leash}/${char.leashMax || 4}.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.summoning.leashReducedToValueValue", { value0: char.leash, value1: char.leashMax || 4 }, "🤝 Leash reduced to {{value0}}/{{value1}}."), 'success');
 
     // ─── Send VTT card ──────────────────────────────────────────
     const cardHtml = buildSummoningCardHtml(
@@ -816,11 +817,11 @@ window.summonerNegotiateFromSelect = function() {
 window.summonerClearLeash = function() {
     const char = getCharacterData();
     if (!char) return;
-    if (!confirm('Clear all leash tension? This may anger the spirit.')) return;
+    if (!confirm(i18nText("feature.spellcraft.components.summoning.clearAllLeashTensionThisMayAnger", null, "Clear all leash tension? This may anger the spirit."))) return;
     const oldLeash = char.leash || 0;
     char.leash = 0;
     saveCharacter({ leash: char.leash });
-    showToast('Leash cleared.', 'info');
+    showToast(i18nText("feature.spellcraft.components.summoning.leashCleared", null, "Leash cleared."), 'info');
 
     // ─── Send VTT card ──────────────────────────────────────────
     const cardHtml = buildSummoningCardHtml(
@@ -840,13 +841,13 @@ window.summonerTickSpiritLeash = function(spiritId, amount = 1) {
     const char = getCharacterData();
     if (!char) return;
     const spirit = char.boundSpirits.find(s => s.id === spiritId);
-    if (!spirit) return showToast('Spirit not found.', 'error');
+    if (!spirit) return showToast(i18nText("feature.spellcraft.components.summoning.spiritNotFound", null, "Spirit not found."), 'error');
     const old = spirit.currentLeash || 0;
     spirit.currentLeash = Math.max(0, old + amount);
     const max = spirit.leashMax || 4;
     const mood = getMood(spirit.currentLeash, max);
     if (spirit.currentLeash >= max) {
-        showToast(`💥 "${spirit.name}" breaks the leash! It acts on its nature!`, 'warning');
+        showToast(i18nText("feature.spellcraft.components.summoning.valueBreaksTheLeashItActsOn", { value0: spirit.name }, "💥 \"{{value0}}\" breaks the leash! It acts on its nature!"), 'warning');
         // Send card for break
         const cardHtml = buildSummoningCardHtml(
             '💥 Spirit Breaks Free',
@@ -868,28 +869,30 @@ window.summonerCommandSpirit = function(spiritId) {
     const char = getCharacterData();
     if (!char) return;
     const spirit = char.boundSpirits.find(s => s.id === spiritId);
-    if (!spirit) return showToast('Spirit not found.', 'error');
+    if (!spirit) return showToast(i18nText("feature.spellcraft.components.summoning.spiritNotFound", null, "Spirit not found."), 'error');
 
     const services = (spirit.services || []).join('\n• ');
     const command = prompt(
-        `⚡ Command "${spirit.name}" (${spirit.nature || 'Unknown'})\n\n` +
-        `Services:\n• ${services || 'None listed'}\n\n` +
-        `Enter your command:`,
+        i18nText("feature.spellcraft.components.summoning.commandValueValueServicesValueEnterYour", {
+            value0: spirit.name,
+            value1: spirit.nature || i18nText('common.unknown', null, 'Unknown'),
+            value2: services || i18nText('common.noneListed', null, 'None listed')
+        }, "⚡ Command \"{{value0}}\" ({{value1}})\n\nServices:\n• {{value2}}\n\nEnter your command:"),
         'Scout ahead'
     );
     if (!command) return;
 
-    const againstNature = confirm(`Is this command AGAINST "${spirit.nature}" nature? (Click Yes if it goes against their nature)`);
+    const againstNature = confirm(i18nText("feature.spellcraft.components.summoning.isThisCommandAGAINSTValueNatureClick", { value0: spirit.nature }, "Is this command AGAINST \"{{value0}}\" nature? (Click Yes if it goes against their nature)"));
     let leashChange = 0;
     if (againstNature) {
         spirit.currentLeash = (spirit.currentLeash || 0) + 1;
         leashChange = 1;
-        showToast(`⚡ Command issued against nature. Leash +1.`, 'warning');
+        showToast(i18nText("feature.spellcraft.components.summoning.commandIssuedAgainstNatureLeash1", null, "⚡ Command issued against nature. Leash +1."), 'warning');
         if (spirit.currentLeash >= (spirit.leashMax || 4)) {
-            showToast(`💥 "${spirit.name}" breaks the leash!`, 'warning');
+            showToast(i18nText("feature.spellcraft.components.summoning.valueBreaksTheLeash", { value0: spirit.name }, "💥 \"{{value0}}\" breaks the leash!"), 'warning');
         }
     } else {
-        showToast(`✅ "${spirit.name}" follows your command.`, 'success');
+        showToast(i18nText("feature.spellcraft.components.summoning.valueFollowsYourCommand", { value0: spirit.name }, "✅ \"{{value0}}\" follows your command."), 'success');
     }
 
     if (!spirit.commands) spirit.commands = [];
@@ -928,7 +931,7 @@ window.summonerReleaseSpirit = function(spiritId) {
         `⚠️ WARNING: This spirit is ${mood.label.toLowerCase()}! Releasing it may have consequences.` :
         `The spirit is ${mood.label.toLowerCase()}. It will depart peacefully.`;
 
-    if (!confirm(`Release "${spirit.name}"?\n\n${warning}`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.summoning.releaseValueValue", { value0: spirit.name, value1: warning }, "Release \"{{value0}}\"?\n\n{{value1}}"))) return;
 
     const name = spirit.name;
     const icon = spirit.icon || '🌀';
@@ -938,9 +941,9 @@ window.summonerReleaseSpirit = function(spiritId) {
     saveCharacter({ boundSpirits: char.boundSpirits });
 
     if (wasAngry) {
-        showToast(`💥 "${name}" is released in anger! The spirit will remember this.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.summoning.valueIsReleasedInAngerTheSpirit", { value0: name }, "💥 \"{{value0}}\" is released in anger! The spirit will remember this."), 'error');
     } else {
-        showToast(`🌀 "${name}" is released peacefully.`, 'info');
+        showToast(i18nText("feature.spellcraft.components.summoning.valueIsReleasedPeacefully", { value0: name }, "🌀 \"{{value0}}\" is released peacefully."), 'info');
     }
 
     // ─── Send VTT card ──────────────────────────────────────────
@@ -964,15 +967,15 @@ window.summonerReleaseAll = function() {
     const char = getCharacterData();
     if (!char) return;
     if (!char.boundSpirits || char.boundSpirits.length === 0) {
-        showToast('No spirits to release.', 'info');
+        showToast(i18nText("feature.spellcraft.components.summoning.noSpiritsToRelease", null, "No spirits to release."), 'info');
         return;
     }
-    if (!confirm('Release ALL bound spirits? This will break all pacts.')) return;
+    if (!confirm(i18nText("feature.spellcraft.components.summoning.releaseALLBoundSpiritsThisWillBreak", null, "Release ALL bound spirits? This will break all pacts."))) return;
     const count = char.boundSpirits.length;
     const names = char.boundSpirits.map(s => s.name).join(', ');
     char.boundSpirits = [];
     saveCharacter({ boundSpirits: char.boundSpirits });
-    showToast('All spirits released.', 'info');
+    showToast(i18nText("feature.spellcraft.components.summoning.allSpiritsReleased", null, "All spirits released."), 'info');
 
     // ─── Send VTT card ──────────────────────────────────────────
     const cardHtml = buildSummoningCardHtml(
@@ -1004,7 +1007,7 @@ window.summonerViewBoundSpirit = function(spiritId) {
 window.summonerRefresh = function() {
     const el = document.getElementById('summoning-container');
     if (el) renderSummoning(el);
-    showToast('🔄 Summoning refreshed.', 'info');
+    showToast(i18nText("feature.spellcraft.components.summoning.summoningRefreshed", null, "🔄 Summoning refreshed."), 'info');
 };
 
 // ─── Backward Compatibility (legacy redirects) ──────────────────
@@ -1018,7 +1021,7 @@ window.summonerBindRitual = function() {
     if (select) {
         window.summonerBindRitualFromSelect();
     } else {
-        showToast('Please refresh the panel to use the dropdown.', 'info');
+        showToast(i18nText("feature.spellcraft.components.summoning.pleaseRefreshThePanelToUseThe", null, "Please refresh the panel to use the dropdown."), 'info');
     }
 };
 
@@ -1027,7 +1030,7 @@ window.summonerNegotiateLeash = function() {
     if (select) {
         window.summonerNegotiateFromSelect();
     } else {
-        showToast('Please refresh the panel to use the dropdown.', 'info');
+        showToast(i18nText("feature.spellcraft.components.summoning.pleaseRefreshThePanelToUseThe", null, "Please refresh the panel to use the dropdown."), 'info');
     }
 };
 
@@ -1044,7 +1047,7 @@ function showToastWithHTML(html, type = 'info') {
     const modal = document.createElement('div');
     modal.className = 'custom-toast-modal';
     modal.style.cssText = `
-        position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
+        position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 9999;
         animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
@@ -1054,7 +1057,7 @@ function showToastWithHTML(html, type = 'info') {
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;
     `;
-    inner.innerHTML = html + `<br><button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove()">Close</button>`;
+    inner.innerHTML = html + `<br><button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove()" data-i18n="feature.spellcraft.components.summoning.close">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
 

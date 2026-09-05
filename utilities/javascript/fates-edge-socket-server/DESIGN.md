@@ -111,6 +111,9 @@ Room state lives entirely in memory (`server/room.js`) for whichever rooms this 
 - **API key** — an `X-API-Key` header or `?apiKey` query param, required on most `/api/*` routes (the `authenticate` middleware in `api.js`). Auto-generated and logged once at startup if `API_KEY` isn't set.
 - **JWT accounts** — `server/auth.js` issues a JWT on register/login; `auth.requireAuth` gates account-specific routes (`/api/account/characters`, claim-character, `/api/auth/me`).
 - **Room roles** — `gm` / `co-gm` / `assistant-gm` / `player` / `spectator`, covered in full in [`ROLES.md`](ROLES.md).
+- **Spectator boundary** — both transports call the same permission gate before dispatch. Spectators
+  have an explicit allow-list of public reads; chat, rolls, voice signaling, presence changes,
+  generic relays, shared-state writes, GM reference data, and unknown future events fail closed.
 - **Rate limiting** — a small hand-rolled in-memory fixed-window limiter (`server/security.js`'s `createRateLimiter`), applied three ways: tight per-route limits on `/api/auth/login` and `/api/auth/register` to slow credential stuffing; a broad, generous general limiter across every other `/api/*` route (registered right after the health-check routes, so uptime probes are never throttled); and a per-connection message-rate gate on both WebSocket transports (`createConnectionMessageLimiter`) to stop a single already-connected client from flooding the server. All three are independently configurable and disable-able by setting their `_MAX` to `0`.
 
 ## Data persistence

@@ -17,6 +17,7 @@
  * - Regions match the guide's world chapter
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getCharacter, updateCharacter, addRoll, saveState, getState, getMacros, addMacro, deleteMacro } from '@core/state.js';
 import { performRoll } from '@core/dice.js';
 import { showToast } from '@components/Toast.js';
@@ -630,7 +631,7 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
 export function rollForCharacter(id, options = {}) {
     const c = getCharacter(id);
     if (!c) {
-        showToast('Character not found.', 'error');
+        showToast(i18nText("feature.characters.roller.characterNotFound", null, "Character not found."), 'error');
         return null;
     }
     
@@ -659,7 +660,7 @@ export function rollForCharacter(id, options = {}) {
 
     // Check for incapacitation
     if (useHarm && (c.harm || 0) >= 3) {
-        if (!silent) showToast(`${c.name} is incapacitated (Harm 3) and cannot act.`, 'error');
+        if (!silent) showToast(i18nText("feature.characters.roller.valueIsIncapacitatedHarm3AndCannot", { value0: c.name }, "{{value0}} is incapacitated (Harm 3) and cannot act."), 'error');
         return null;
     }
 
@@ -756,7 +757,7 @@ export function rollForCharacter(id, options = {}) {
     try {
         const result = executeRoll(attr, skill, dv, position, boons, charData);
         if (!result) {
-            if (!silent) showToast('Roll failed: dice pool must be at least 1 die.', 'error');
+            if (!silent) showToast(i18nText("feature.characters.roller.rollFailedDicePoolMustBeAt", null, "Roll failed: dice pool must be at least 1 die."), 'error');
             return null;
         }
         if (boonShortfall > 0) {
@@ -815,7 +816,7 @@ export function rollForCharacter(id, options = {}) {
         return result;
     } catch (error) {
         console.error('[CharacterRoller] Error rolling for character:', error);
-        if (!silent) showToast('Error performing roll.', 'error');
+        if (!silent) showToast(i18nText("feature.characters.roller.errorPerformingRoll", null, "Error performing roll."), 'error');
         return null;
     }
 }
@@ -826,7 +827,7 @@ export function rollForCharacter(id, options = {}) {
 
 export function rollForNPC(npc, options = {}) {
     if (!npc || !npc.name) {
-        showToast('Invalid NPC data.', 'error');
+        showToast(i18nText("feature.characters.roller.invalidNPCData", null, "Invalid NPC data."), 'error');
         return null;
     }
     
@@ -915,17 +916,17 @@ export function customRoll(config = {}) {
     } = config;
     
     if (attr < 1 || attr > 5) {
-        if (!silent) showToast('Attribute must be between 1 and 5.', 'error');
+        if (!silent) showToast(i18nText("feature.characters.roller.attributeMustBeBetween1And5", null, "Attribute must be between 1 and 5."), 'error');
         return null;
     }
     
     if (skill < 0 || skill > 5) {
-        if (!silent) showToast('Skill must be between 0 and 5.', 'error');
+        if (!silent) showToast(i18nText("feature.characters.roller.skillMustBeBetween0And5", null, "Skill must be between 0 and 5."), 'error');
         return null;
     }
     
     if (boons < 0 || boons > 5) {
-        if (!silent) showToast('Boons must be between 0 and 5.', 'error');
+        if (!silent) showToast(i18nText("feature.characters.roller.boonsMustBeBetween0And5", null, "Boons must be between 0 and 5."), 'error');
         return null;
     }
     
@@ -935,7 +936,7 @@ export function customRoll(config = {}) {
             character, attrKey: attrName || null, skillKey, armorType, weaponClass, weaponTags, weaponRange, shieldType, physicalSkill
         });
         if (!result) {
-            if (!silent) showToast('Roll failed: dice pool must be at least 1 die.', 'error');
+            if (!silent) showToast(i18nText("feature.characters.roller.rollFailedDicePoolMustBeAt", null, "Roll failed: dice pool must be at least 1 die."), 'error');
             return null;
         }
 
@@ -964,7 +965,7 @@ export function customRoll(config = {}) {
         return result;
     } catch (error) {
         console.error('[CharacterRoller] Error performing custom roll:', error);
-        if (!silent) showToast('Error performing roll.', 'error');
+        if (!silent) showToast(i18nText("feature.characters.roller.errorPerformingRoll", null, "Error performing roll."), 'error');
         return null;
     }
 }
@@ -975,7 +976,7 @@ export function customRoll(config = {}) {
 
 export function rollForCharacters(ids, options = {}) {
     if (!Array.isArray(ids) || ids.length === 0) {
-        showToast('No characters selected.', 'error');
+        showToast(i18nText("feature.characters.roller.noCharactersSelected", null, "No characters selected."), 'error');
         return [];
     }
     
@@ -993,7 +994,7 @@ export function rollForCharacters(ids, options = {}) {
         const totalBoons = results.reduce((sum, r) => sum + (r.boonsGained || 0), 0);
         
         showToast(
-            `Rolled for ${results.length}: ${cleanCount} success, ${partialCount} partial, ${missCount} miss | ${totalSB} SB to GM, +${totalBoons} Boons`,
+            i18nText("feature.characters.roller.rolledForValueValueSuccessValuePartial", { value0: results.length, value1: cleanCount, value2: partialCount, value3: missCount, value4: totalSB, value5: totalBoons }, "Rolled for {{value0}}: {{value1}} success, {{value2}} partial, {{value3}} miss | {{value4}} SB to GM, +{{value5}} Boons"),
             'info'
         );
     }
@@ -1038,8 +1039,8 @@ export async function renderRollerUI(el) {
         <div class="roller-container">
             <!-- Quick Roll Panel -->
             <div class="panel">
-                <h3 style="margin-top:0;">🎲 Quick Roll — Fate's Edge</h3>
-                <div class="info-box" style="background:var(--bg2);padding:0.6rem 0.8rem;border-radius:6px;border-left:3px solid var(--gold);margin-bottom:0.8rem;font-size:0.8rem;color:var(--text2);">
+                <h3 style="margin-top:0;" data-i18n="feature.characters.roller.quickRollFateSEdge">🎲 Quick Roll — Fate's Edge</h3>
+                <div class="info-box" style="background:var(--bg2);padding:0.6rem 0.8rem;border-radius:6px;border-inline-start:3px solid var(--gold);margin-bottom:0.8rem;font-size:0.8rem;color:var(--text2);">
                     <strong>Dice Pool = Attribute + Skill</strong> (d10s). 
                     <strong>6+</strong> = 1 success. <strong>10</strong> = 2 successes. 
                     <strong>1</strong> = Story Beat for GM.<br>
@@ -1049,63 +1050,63 @@ export async function renderRollerUI(el) {
                 
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.5rem;">
                     <div class="field">
-                        <label>Attribute</label>
+                        <label data-i18n="feature.characters.roller.attribute">Attribute</label>
                         <select id="roller-attr-select">${attrOptions}</select>
                     </div>
                     <div class="field">
-                        <label>Attr Value (1-5)</label>
+                        <label data-i18n="feature.characters.roller.attrValue15">Attr Value (1-5)</label>
                         <input type="number" id="roller-attr" value="3" min="1" max="5" />
                     </div>
                     <div class="field">
-                        <label>Skill</label>
+                        <label data-i18n="feature.characters.roller.skill">Skill</label>
                         <select id="roller-skill-select">${skillOptions}</select>
                     </div>
                     <div class="field">
-                        <label>Skill Value (0-5)</label>
+                        <label data-i18n="feature.characters.roller.skillValue05">Skill Value (0-5)</label>
                         <input type="number" id="roller-skill" value="0" min="0" max="5" />
                     </div>
                     <div class="field">
-                        <label>DV</label>
+                        <label data-i18n="feature.characters.roller.dv">DV</label>
                         <select id="roller-dv-select">${dvOptions}</select>
                     </div>
                     <div class="field">
-                        <label>Position</label>
+                        <label data-i18n="feature.characters.roller.position">Position</label>
                         <select id="roller-position">${positionOptions}</select>
                     </div>
                     <div class="field">
-                        <label>Boons to Spend</label>
-                        <input type="number" id="roller-boons" value="0" min="0" max="5" title="Pre-roll boon spend (e.g., +1d from boon)" />
+                        <label data-i18n="feature.characters.roller.boonsToSpend">Boons to Spend</label>
+                        <input type="number" id="roller-boons" value="0" min="0" max="5" title="Pre-roll boon spend (e.g., +1d from boon)" / data-i18n-attr="title:feature.characters.roller.preRollBoonSpendEG1d">
                     </div>
                     <div class="field">
-                        <label>Assist Dice</label>
-                        <input type="number" id="roller-assist" value="0" min="0" max="3" title="Up to 3 allies add +1d each" />
+                        <label data-i18n="feature.characters.roller.assistDice">Assist Dice</label>
+                        <input type="number" id="roller-assist" value="0" min="0" max="3" title="Up to 3 allies add +1d each" / data-i18n-attr="title:feature.characters.roller.upTo3AlliesAdd1dEach">
                     </div>
                     <div class="field">
-                        <label>Fatigue</label>
-                        <input type="number" id="roller-fatigue" value="0" min="0" max="5" title="Worsens Position; if Desperate, -1d per Fatigue" />
+                        <label data-i18n="feature.characters.roller.fatigue">Fatigue</label>
+                        <input type="number" id="roller-fatigue" value="0" min="0" max="5" title="Worsens Position; if Desperate, -1d per Fatigue" / data-i18n-attr="title:feature.characters.roller.worsensPositionIfDesperate1dPerFatigue">
                     </div>
                     <div class="field">
-                        <label>Harm (0-3)</label>
-                        <input type="number" id="roller-harm" value="0" min="0" max="3" title="Harm 1: -1d, Harm 2: -2d, Harm 3: Incapacitated" />
+                        <label data-i18n="feature.characters.roller.harm03">Harm (0-3)</label>
+                        <input type="number" id="roller-harm" value="0" min="0" max="3" title="Harm 1: -1d, Harm 2: -2d, Harm 3: Incapacitated" / data-i18n-attr="title:feature.characters.roller.harm11dHarm22dHarm">
                     </div>
                     <div class="field">
-                        <label>Effect</label>
+                        <label data-i18n="feature.characters.roller.effect">Effect</label>
                         <select id="roller-effect">${effectOptions}</select>
                     </div>
                     <div class="field">
-                        <label>Range (GM-set)</label>
+                        <label data-i18n="feature.characters.roller.rangeGMSet">Range (GM-set)</label>
                         <select id="roller-range" title="The narrative range the GM told you before rolling — applies your weapon's range bonus/penalty.">${rangeOptions}</select>
                     </div>
                 </div>
                 
                 <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;align-items:center;">
-                    <button class="btn btn-gold" id="roller-roll-btn">🎲 Roll Dice</button>
-                    <button class="btn btn-secondary" id="roller-generate-npc-btn">👤 Generate NPC Name</button>
-                    <button class="btn btn-secondary" id="roller-generate-names-btn">📋 Generate Names</button>
-                    <select id="roller-region-select" title="Region used for name generation" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem 0.5rem;font-size:0.85rem;">
+                    <button class="btn btn-gold" id="roller-roll-btn" data-i18n="feature.characters.roller.rollDice">🎲 Roll Dice</button>
+                    <button class="btn btn-secondary" id="roller-generate-npc-btn" data-i18n="feature.characters.roller.generateNPCName">👤 Generate NPC Name</button>
+                    <button class="btn btn-secondary" id="roller-generate-names-btn" data-i18n="feature.characters.roller.generateNames">📋 Generate Names</button>
+                    <select id="roller-region-select" title="Region used for name generation" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem 0.5rem;font-size:0.85rem;" data-i18n-attr="title:feature.characters.roller.regionUsedForNameGeneration">
                         ${regionNames.map(r => `<option value="${escHtml(r)}" ${r === selectedRegion ? 'selected' : ''}>${escHtml(r)}</option>`).join('')}
                     </select>
-                    <button class="btn btn-secondary" id="roller-save-macro-btn" title="Save the current Attribute/Skill/DV/Position/Boons/Assist/Fatigue/Harm as a one-click macro">⭐ Save as Macro</button>
+                    <button class="btn btn-secondary" id="roller-save-macro-btn" title="Save the current Attribute/Skill/DV/Position/Boons/Assist/Fatigue/Harm as a one-click macro" data-i18n-attr="title:feature.characters.roller.saveTheCurrentAttributeSkillDVPosition" data-i18n="feature.characters.roller.saveAsMacro">⭐ Save as Macro</button>
                 </div>
 
                 <!-- Macro Bar -->
@@ -1115,7 +1116,7 @@ export async function renderRollerUI(el) {
 
                 <!-- Rules Quick Reference -->
                 <details style="margin-top:0.8rem;">
-                    <summary style="cursor:pointer;font-size:0.85rem;color:var(--text2);">📖 Rules Quick Reference</summary>
+                    <summary style="cursor:pointer;font-size:0.85rem;color:var(--text2);" data-i18n="feature.characters.roller.rulesQuickReference">📖 Rules Quick Reference</summary>
                     <div style="padding:0.5rem;font-size:0.8rem;color:var(--text3);">
                         <p><strong>DV Ladder:</strong> 2 (Routine) | 3 (Default) | 4 (Hard) | 5 (Extreme) | 6+ (Mythic)</p>
                         <p><strong>Position:</strong> ${POSITIONS.map(p => `${p.label} (${p.desc})`).join(' | ')}</p>
@@ -1131,13 +1132,13 @@ export async function renderRollerUI(el) {
             
             <!-- Roll Result Panel -->
             <div class="panel" id="roller-result-panel" style="display:none;">
-                <h3 id="roller-result-title">Roll Result</h3>
+                <h3 id="roller-result-title" data-i18n="feature.characters.roller.rollResult">Roll Result</h3>
                 <div id="roller-result-content"></div>
             </div>
             
             <!-- Name Generation Panel -->
             <div class="panel" id="roller-name-panel" style="display:none;">
-                <h3>📋 Region Names</h3>
+                <h3 data-i18n="feature.characters.roller.regionNames">📋 Region Names</h3>
                 <div id="roller-name-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.3rem;max-height:200px;overflow-y:auto;"></div>
             </div>
         </div>
@@ -1284,7 +1285,7 @@ function handleSaveMacro() {
     const skillLabel = skillSelect?.selectedOptions[0]?.text?.split('(')[0]?.trim() || skillKey;
 
     const defaultLabel = skillLabel ? `${attrLabel} + ${skillLabel}` : attrLabel;
-    const label = prompt('Macro name:', defaultLabel);
+    const label = prompt(i18nText("feature.characters.roller.macroName", null, "Macro name:"), defaultLabel);
     if (label === null) return; // cancelled
     const trimmedLabel = label.trim() || defaultLabel;
 
@@ -1309,7 +1310,7 @@ function handleSaveMacro() {
 
     addMacro(macro);
     renderMacroBar();
-    showToast(`⭐ Saved macro "${trimmedLabel}".`, 'success');
+    showToast(i18nText("feature.characters.roller.savedMacroValue", { value0: trimmedLabel }, "⭐ Saved macro \"{{value0}}\"."), 'success');
 }
 
 function renderMacroBar() {
@@ -1345,7 +1346,7 @@ function renderMacroBar() {
 function handleFireMacro(macroId) {
     const macro = getMacros().find(m => m.id === macroId);
     if (!macro) {
-        showToast('Macro not found.', 'error');
+        showToast(i18nText("feature.characters.roller.macroNotFound", null, "Macro not found."), 'error');
         return;
     }
 
@@ -1384,7 +1385,7 @@ function handleFireMacro(macroId) {
 function handleGenerateNPC() {
     const region = selectedRegion || getRandomRegion();
     const name = generateRegionName(region);
-    showToast(`👤 Generated NPC: ${name} (${region})`, 'success');
+    showToast(i18nText("feature.characters.roller.generatedNPCValueValue", { value0: name, value1: region }, "👤 Generated NPC: {{value0}} ({{value1}})"), 'success');
     
     const panel = document.getElementById('roller-result-panel');
     const content = document.getElementById('roller-result-content');
@@ -1392,9 +1393,9 @@ function handleGenerateNPC() {
     
     if (panel && content && title) {
         panel.style.display = 'block';
-        title.textContent = '👤 Generated NPC';
+        title.textContent = i18nText("feature.characters.roller.generatedNPC", null, "👤 Generated NPC");
         content.innerHTML = `
-            <div style="background:var(--bg3);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);">
+            <div style="background:var(--bg3);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);">
                 <div style="font-size:1.4rem;font-weight:600;color:var(--gold);">${escHtml(name)}</div>
                 <div style="color:var(--text2);font-size:0.9rem;">Region: ${escHtml(region)}</div>
                 <div style="color:var(--text3);font-size:0.8rem;margin-top:0.3rem;">Click "Generate Names" for more options from this region.</div>
@@ -1419,7 +1420,7 @@ function handleGenerateNames() {
         `).join('');
         
         const title = panel.querySelector('h3');
-        if (title) title.textContent = `📋 Region Names (${region})`;
+        if (title) title.textContent = i18nText("feature.characters.roller.regionNamesValue", { value0: region }, "📋 Region Names ({{value0}})");
     }
 }
 
@@ -1435,7 +1436,7 @@ function displayRollResult(result, attrName = '', skillName = '') {
     if (!panel || !content || !title) return;
     
     panel.style.display = 'block';
-    title.textContent = '🎲 Roll Result';
+    title.textContent = i18nText("feature.characters.roller.rollResult_190jw", null, "🎲 Roll Result");
     
     const outcomeType = OUTCOME_TYPES[result.outcome] || OUTCOME_TYPES['miss'];
     
@@ -1522,14 +1523,14 @@ function displayRollResult(result, attrName = '', skillName = '') {
     }
     
     content.innerHTML = `
-        <div style="background:var(--bg3);padding:1rem;border-radius:var(--radius);border-left:4px solid ${outcomeType.color};">
+        <div style="background:var(--bg3);padding:1rem;border-radius:var(--radius);border-inline-start:4px solid ${outcomeType.color};">
             <!-- Outcome Header -->
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
                 <div>
                     <span style="font-size:1.5rem;">${outcomeType.emoji}</span>
                     <strong style="font-size:1.2rem;color:${outcomeType.color};">${outcomeType.label.toUpperCase()}</strong>
                 </div>
-                <div style="font-size:0.85rem;color:var(--text3);text-align:right;">
+                <div style="font-size:0.85rem;color:var(--text3);text-align: end;">
                     ${attrName && skillName ? `${attrName}+${skillName} = ${result.pool}d` : `${result.pool}d`} vs DV ${result.dv}<br>
                     Position: ${posInfo.label}${positionChanged ? ` → <span style="color:${effectivePosInfo.color};">${effectivePosInfo.label}</span> <small>(fatigue)</small>` : ''}
                     ${result.range ? `<br><span style="color:var(--gold);">📏 ${RANGE_BAND_LABEL_MAP[result.range] || result.range} range</span>` : ''}
@@ -1688,7 +1689,9 @@ export function clearRollHistory(id = null) {
         state.diceHistory = [];
     }
     saveState();
-    showToast(`Roll history ${id ? 'for character' : ''} cleared.`, 'success');
+    showToast(id
+        ? i18nText('feature.characters.roller.characterRollHistoryCleared', null, 'Character roll history cleared.')
+        : i18nText('feature.characters.roller.rollHistoryCleared', null, 'Roll history cleared.'), 'success');
 }
 
 export function exportRollHistory(id = null) {
@@ -1698,7 +1701,7 @@ export function exportRollHistory(id = null) {
     if (id) history = history.filter(r => r.characterId === id);
     
     if (history.length === 0) {
-        showToast('No roll history to export.', 'warning');
+        showToast(i18nText("feature.characters.roller.noRollHistoryToExport", null, "No roll history to export."), 'warning');
         return null;
     }
     
@@ -1741,7 +1744,7 @@ export function setupKeyboardShortcuts() {
             } else if (state.characters && state.characters.length > 0) {
                 rollForCharacter(state.characters[0].id, { note: 'Quick roll' });
             } else {
-                showToast('No characters available for quick roll.', 'warning');
+                showToast(i18nText("feature.characters.roller.noCharactersAvailableForQuickRoll", null, "No characters available for quick roll."), 'warning');
             }
         }
     };

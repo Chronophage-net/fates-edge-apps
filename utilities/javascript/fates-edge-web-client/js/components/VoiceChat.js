@@ -2,6 +2,7 @@
  * Voice Chat Component - WebRTC peer-to-peer voice
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { showToast } from './Toast.js';
 
 export class VoiceChat {
@@ -77,7 +78,7 @@ export class VoiceChat {
             // Start activity monitoring
             this.startActivityMonitoring();
             
-            showToast('Voice chat initialized.', 'success');
+            showToast(i18nText("feature.components.VoiceChat.voiceChatInitialized", null, "Voice chat initialized."), 'success');
             return true;
         } catch (err) {
             console.error('Voice init failed:', err);

@@ -34,6 +34,7 @@
  * *this* file — a static import the other way would be circular.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, addArchive, clearRollHistory, clearChatHistory, saveState, getStableClientId } from '@core/state.js';
 import { resetTalentCharges } from '@core/talent-effects.js';
 import {
@@ -182,9 +183,9 @@ function renderCurrentAdventurePanel() {
     if (!adventure) {
         return `
             <div class="panel">
-                <h3 class="panel-title">📖 Current Adventure</h3>
-                <p class="text-muted mt-1">No adventure is currently active. Start one from Adventure Manager.</p>
-                <button class="btn btn-sm btn-secondary mt-1" onclick="window.openAdventureManager()">📖 Open Adventure Manager</button>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.currentAdventure">📖 Current Adventure</h3>
+                <p class="text-muted mt-1" data-i18n="feature.gm-tools.noAdventureIsCurrentlyActiveStartOne">No adventure is currently active. Start one from Adventure Manager.</p>
+                <button class="btn btn-sm btn-secondary mt-1" onclick="window.openAdventureManager()" data-i18n="feature.gm-tools.openAdventureManager">📖 Open Adventure Manager</button>
             </div>
         `;
     }
@@ -195,22 +196,22 @@ function renderCurrentAdventurePanel() {
     const completedScenes = adventure.acts?.reduce((acc, a) => acc + (a.scenes?.filter(s => s.completed).length || 0), 0) || 0;
 
     return `
-        <div class="panel" style="border-left: 4px solid var(--gold);">
+        <div class="panel" style="border-inline-start: 4px solid var(--gold);">
             <div class="flex-between">
                 <h3 class="panel-title">📖 ${escHtml(adventure.title)}</h3>
                 <span class="text-xs text-muted">${completedScenes}/${sceneCount} scenes</span>
             </div>
             ${act && scene ? `
-                <div class="text-sm mt-1"><span class="text-muted">Act:</span> ${escHtml(act.title)}</div>
-                <div class="text-sm"><span class="text-muted">Scene:</span> ${escHtml(scene.title)}</div>
+                <div class="text-sm mt-1"><span class="text-muted" data-i18n="feature.gm-tools.act">Act:</span> ${escHtml(act.title)}</div>
+                <div class="text-sm"><span class="text-muted" data-i18n="feature.gm-tools.scene">Scene:</span> ${escHtml(scene.title)}</div>
                 <div class="flex gap-1 mt-2 flex-wrap">
                     <button class="btn btn-sm btn-danger" onclick="window.gmStartSceneEncounter()">⚔️ ${scene.encounterId ? 'Resume' : 'Start'} Encounter</button>
-                    ${!scene.completed ? `<button class="btn btn-sm btn-primary" onclick="window.gmCompleteScene()">✓ Complete Scene</button>` : `<span class="badge badge-gold">✅ Scene Complete</span>`}
-                    <button class="btn btn-sm btn-secondary" onclick="window.openAdventureManager()">📖 Full Details</button>
+                    ${!scene.completed ? `<button class="btn btn-sm btn-primary" onclick="window.gmCompleteScene()" data-i18n="feature.gm-tools.completeScene">✓ Complete Scene</button>` : `<span class="badge badge-gold" data-i18n="feature.gm-tools.sceneComplete">✅ Scene Complete</span>`}
+                    <button class="btn btn-sm btn-secondary" onclick="window.openAdventureManager()" data-i18n="feature.gm-tools.fullDetails">📖 Full Details</button>
                 </div>
             ` : `
-                <p class="text-muted mt-1">This adventure has no scenes defined yet.</p>
-                <button class="btn btn-sm btn-secondary mt-1" onclick="window.openAdventureManager()">📖 Open Adventure Manager</button>
+                <p class="text-muted mt-1" data-i18n="feature.gm-tools.thisAdventureHasNoScenesDefinedYet">This adventure has no scenes defined yet.</p>
+                <button class="btn btn-sm btn-secondary mt-1" onclick="window.openAdventureManager()" data-i18n="feature.gm-tools.openAdventureManager">📖 Open Adventure Manager</button>
             `}
         </div>
     `;
@@ -230,8 +231,8 @@ function renderAdventureIntelPanel(adventure) {
     if (knowledge.length === 0 && factions.length === 0) return '';
 
     const knowledgeHtml = knowledge.length ? `
-        <div class="panel" style="border-left:2px solid var(--red);">
-            <h4 style="margin:0;font-size:0.85rem;">🔒 Secrets (GM Only)</h4>
+        <div class="panel" style="border-inline-start:2px solid var(--red);">
+            <h4 style="margin:0;font-size:0.85rem;" data-i18n="feature.gm-tools.secretsGMOnly">🔒 Secrets (GM Only)</h4>
             <div style="max-height:220px;overflow-y:auto;margin-top:0.2rem;">
                 ${knowledge.map(k => `
                     <div style="font-size:0.7rem;padding:0.25rem 0;border-bottom:1px solid var(--border);">
@@ -248,8 +249,8 @@ function renderAdventureIntelPanel(adventure) {
     ` : '';
 
     const factionsHtml = factions.length ? `
-        <div class="panel" style="border-left:2px solid var(--purple);">
-            <h4 style="margin:0;font-size:0.85rem;">🏛️ Factions</h4>
+        <div class="panel" style="border-inline-start:2px solid var(--purple);">
+            <h4 style="margin:0;font-size:0.85rem;" data-i18n="feature.gm-tools.factions">🏛️ Factions</h4>
             <div style="max-height:160px;overflow-y:auto;margin-top:0.2rem;">
                 ${factions.map(f => `
                     <div style="font-size:0.7rem;padding:0.2rem 0;border-bottom:1px solid var(--border);">
@@ -293,7 +294,7 @@ function getSceneTags() {
 function addSceneTag(tag) {
     tag = tag.toUpperCase().trim();
     if (!tag) {
-        showToast('Please enter a tag name.', 'warning');
+        showToast(i18nText("feature.gm-tools.pleaseEnterATagName", null, "Please enter a tag name."), 'warning');
         return false;
     }
     const state = getState();
@@ -301,14 +302,14 @@ function addSceneTag(tag) {
     if (!state.campaign.state) state.campaign.state = {};
     if (!state.campaign.state.sceneTags) state.campaign.state.sceneTags = [];
     if (state.campaign.state.sceneTags.includes(tag)) {
-        showToast(`Tag [${tag}] already active.`, 'warning');
+        showToast(i18nText("feature.gm-tools.tagValueAlreadyActive", { value0: tag }, "Tag [{{value0}}] already active."), 'warning');
         return false;
     }
     state.campaign.state.sceneTags.push(tag);
     saveState();
     refreshView();
     logToSession(`🏷️ Tag applied: [${tag}]`, 'info');
-    showToast(`Tag [${tag}] applied.`, 'success');
+    showToast(i18nText("feature.gm-tools.tagValueApplied", { value0: tag }, "Tag [{{value0}}] applied."), 'success');
     return true;
 }
 
@@ -329,7 +330,7 @@ function clearSceneTags() {
     saveState();
     refreshView();
     logToSession('🏷️ All tags cleared.', 'info');
-    showToast('All tags cleared.', 'info');
+    showToast(i18nText("feature.gm-tools.allTagsCleared", null, "All tags cleared."), 'info');
 }
 
 function getTagEffects() {
@@ -400,7 +401,7 @@ function getCardMeaningFromRegion(suit, rank, regionData) {
 async function generateQuickNPC() {
     const region = getSelectedRegion() || 'Acasia';
     const data = getRegionData();
-    if (!data) return showToast('No region data loaded.', 'error');
+    if (!data) return showToast(i18nText("feature.gm-tools.noRegionDataLoaded", null, "No region data loaded."), 'error');
     
     try {
         const result = await quickDraw(2);
@@ -420,14 +421,14 @@ async function generateQuickNPC() {
         displayQuickGenResult(renderNPC({ ...names, motivation, complication }));
         logToSession(`👤 Generated NPC: ${names.name} "${names.epithet}"`, 'success');
     } catch (err) {
-        showToast('Error generating NPC.', 'error');
+        showToast(i18nText("feature.gm-tools.errorGeneratingNPC", null, "Error generating NPC."), 'error');
     }
 }
 
 async function generateQuickLocation() {
     const region = getSelectedRegion() || 'Acasia';
     const data = getRegionData();
-    if (!data) return showToast('No region data loaded.', 'error');
+    if (!data) return showToast(i18nText("feature.gm-tools.noRegionDataLoaded", null, "No region data loaded."), 'error');
     
     try {
         const result = await quickDraw(2);
@@ -446,14 +447,14 @@ async function generateQuickLocation() {
         displayQuickGenResult(renderLocation({ name, place, leverage, region }));
         logToSession(`📍 Generated Location: ${name}`, 'success');
     } catch (err) {
-        showToast('Error generating location.', 'error');
+        showToast(i18nText("feature.gm-tools.errorGeneratingLocation", null, "Error generating location."), 'error');
     }
 }
 
 async function generateQuickRumor() {
     const region = getSelectedRegion() || 'Acasia';
     const data = getRegionData();
-    if (!data) return showToast('No region data loaded.', 'error');
+    if (!data) return showToast(i18nText("feature.gm-tools.noRegionDataLoaded", null, "No region data loaded."), 'error');
     
     try {
         const result = await quickDraw(1);
@@ -467,7 +468,7 @@ async function generateQuickRumor() {
         displayQuickGenResult(renderRumor({ text: meaning, region }));
         logToSession(`📜 Generated Rumor: ${meaning.substring(0, 50)}...`, 'info');
     } catch (err) {
-        showToast('Error generating rumor.', 'error');
+        showToast(i18nText("feature.gm-tools.errorGeneratingRumor", null, "Error generating rumor."), 'error');
     }
 }
 
@@ -476,9 +477,9 @@ function renderNPC(npc) {
         <div class="flex flex-col gap-1">
             <strong class="text-gold">${npc.name} ${npc.surname}</strong>
             <em class="text-muted">“${npc.epithet}”</em>
-            <div class="text-sm mt-1"><span class="text-muted">🎯 Motivation:</span> ${npc.motivation}</div>
-            <div class="text-sm"><span class="text-muted">⚡ Complication:</span> ${npc.complication}</div>
-            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()">📌 Save to Adventure</button>
+            <div class="text-sm mt-1"><span class="text-muted" data-i18n="feature.gm-tools.motivation">🎯 Motivation:</span> ${npc.motivation}</div>
+            <div class="text-sm"><span class="text-muted" data-i18n="feature.gm-tools.complication">⚡ Complication:</span> ${npc.complication}</div>
+            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()" data-i18n="feature.gm-tools.saveToAdventure">📌 Save to Adventure</button>
         </div>
     `;
 }
@@ -488,9 +489,9 @@ function renderLocation(loc) {
         <div class="flex flex-col gap-1">
             <strong class="text-gold">📍 ${loc.name}</strong>
             <div class="text-sm text-muted">Region: ${loc.region}</div>
-            <div class="text-sm mt-1"><span class="text-muted">Place:</span> ${loc.place}</div>
-            <div class="text-sm"><span class="text-muted">Leverage:</span> ${loc.leverage}</div>
-            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()">📌 Save to Adventure</button>
+            <div class="text-sm mt-1"><span class="text-muted" data-i18n="feature.gm-tools.place">Place:</span> ${loc.place}</div>
+            <div class="text-sm"><span class="text-muted" data-i18n="feature.gm-tools.leverage">Leverage:</span> ${loc.leverage}</div>
+            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()" data-i18n="feature.gm-tools.saveToAdventure">📌 Save to Adventure</button>
         </div>
     `;
 }
@@ -500,7 +501,7 @@ function renderRumor(rumor) {
         <div class="flex flex-col gap-1">
             <div class="text-sm italic">“${rumor.text}”</div>
             <div class="text-xs text-muted">Region: ${rumor.region}</div>
-            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()">📌 Save to Adventure Notes</button>
+            <button class="btn btn-xs btn-primary mt-1" style="align-self:flex-start;" onclick="window.gmSaveQuickGenToAdventure()" data-i18n="feature.gm-tools.saveToAdventureNotes">📌 Save to Adventure Notes</button>
         </div>
     `;
 }
@@ -556,7 +557,7 @@ function tickActiveSceneTimer(adventureId, amount = 1) {
             saveState();
             // Check completion
             if (timer.current >= timer.segments) {
-                showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
+                showToast(i18nText("feature.gm-tools.timerValueCompleted", { value0: timer.name }, "⏱️ Timer \"{{value0}}\" completed!"), 'warning');
                 logToSession(`⏱️ Timer "${timer.name}" completed!`, 'warning');
                 // Optionally, dispatch an event for the adventure manager to handle scene transitions
                 document.dispatchEvent(new CustomEvent('timer-completed', { detail: { timerId: timer.id, adventureId: adventure.id } }));
@@ -567,7 +568,7 @@ function tickActiveSceneTimer(adventureId, amount = 1) {
         // Refresh the view to update progress bars
         refreshView();
         // Also show a toast for the tick
-        showToast(`⏱️ Timers ticked (${amount}) for "${adventure.title}"`, 'info');
+        showToast(i18nText("feature.gm-tools.timersTickedValueForValue", { value0: amount, value1: adventure.title }, "⏱️ Timers ticked ({{value0}}) for \"{{value1}}\""), 'info');
     }
     return ticked;
 }
@@ -594,7 +595,7 @@ function onSbGenerated(event) {
     const gmState = getGmState();
     const newTotal = (gmState.sbBank || 0) + count;
     updateGmState({ sbBank: newTotal });
-    showToast(`🎲 Story Beat +${count} (Total: ${newTotal})`, 'info');
+    showToast(i18nText("feature.gm-tools.storyBeatValueTotalValue", { value0: count, value1: newTotal }, "🎲 Story Beat +{{value0}} (Total: {{value1}})"), 'info');
     logToSession(`🎲 Story Beat +${count} (Bank: ${newTotal})`, 'success');
 }
 
@@ -635,26 +636,26 @@ function render(el) {
     container.innerHTML = `
         <div class="gm-tools-modern-layout flex flex-col gap-2">
             <header class="gm-tools-header">
-                <h1 class="page-title">⚙️ GM Tools</h1>
-                <p class="page-sub">Manage scenes, campaign tracking, whiteboard, Kanban board, and journey planning.</p>
+                <h1 class="page-title" data-i18n="feature.gm-tools.gmTools">⚙️ GM Tools</h1>
+                <p class="page-sub" data-i18n="feature.gm-tools.manageScenesCampaignTrackingWhiteboardKanbanBoard">Manage scenes, campaign tracking, whiteboard, Kanban board, and journey planning.</p>
                 ${isViewOnly ? `<div class="text-muted text-sm" style="color:var(--gold);">👁️ View-only mode: ${reason === 'gm-only' ? 'Only the GM can access these tools.' : 'You have hidden this feature from your sidebar.'}</div>` : ''}
                 <div class="flex gap-1 flex-center flex-wrap mt-1">
-                    <span class="text-sm text-muted">📍 Region:</span>
+                    <span class="text-sm text-muted" data-i18n="feature.gm-tools.region">📍 Region:</span>
                     <select id="gm-region-select" aria-label="Region for deck draws and quick generation" style="max-width:220px;" ${isViewOnly ? 'disabled' : ''}>
-                        <option value="">Loading regions…</option>
+                        <option value="" data-i18n="feature.gm-tools.loadingRegions">Loading regions…</option>
                     </select>
-                    <span class="text-muted text-xs">Shared with the Deck of Consequences.</span>
+                    <span class="text-muted text-xs" data-i18n="feature.gm-tools.sharedWithTheDeckOfConsequences">Shared with the Deck of Consequences.</span>
                 </div>
             </header>
 
             <div class="flex gap-1 flex-center flex-wrap" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
-                <button class="btn btn-sm btn-gold gm-tab active" data-view="scene">🎬 Scene</button>
-                <button class="btn btn-sm btn-secondary gm-tab" data-view="kanban">📋 Kanban</button>
-                <button class="btn btn-sm btn-secondary gm-tab" data-view="whiteboard">✏️ Whiteboard</button>
-                <button class="btn btn-sm btn-secondary gm-tab" data-view="campaign">🏛️ Campaign</button>
-                <button class="btn btn-sm btn-secondary gm-tab" data-view="consequences">🃏 Consequences</button>
-                <button class="btn btn-sm btn-secondary gm-tab" data-view="travel">🗺️ Travel</button>
-                <button class="btn btn-sm btn-secondary gm-tab" data-view="session">🎥 Session</button>
+                <button class="btn btn-sm btn-gold gm-tab active" data-view="scene" data-i18n="feature.gm-tools.scene_1np1h">🎬 Scene</button>
+                <button class="btn btn-sm btn-secondary gm-tab" data-view="kanban" data-i18n="feature.gm-tools.kanban">📋 Kanban</button>
+                <button class="btn btn-sm btn-secondary gm-tab" data-view="whiteboard" data-i18n="feature.gm-tools.whiteboard">✏️ Whiteboard</button>
+                <button class="btn btn-sm btn-secondary gm-tab" data-view="campaign" data-i18n="feature.gm-tools.campaign">🏛️ Campaign</button>
+                <button class="btn btn-sm btn-secondary gm-tab" data-view="consequences" data-i18n="feature.gm-tools.consequences">🃏 Consequences</button>
+                <button class="btn btn-sm btn-secondary gm-tab" data-view="travel" data-i18n="feature.gm-tools.travel">🗺️ Travel</button>
+                <button class="btn btn-sm btn-secondary gm-tab" data-view="session" data-i18n="feature.gm-tools.session">🎥 Session</button>
             </div>
 
             <div id="gm-view-container" class="flex flex-col gap-2">
@@ -712,26 +713,26 @@ function renderSafetyToolsPanel() {
     const safety = getCampaignSafety();
     return `
         <div class="panel">
-            <h3 class="panel-title">🛡️ Safety Tools</h3>
-            <p class="text-muted text-sm">Set your group's safety boundaries. These will be shown when the X‑Card is called.</p>
+            <h3 class="panel-title" data-i18n="feature.gm-tools.safetyTools">🛡️ Safety Tools</h3>
+            <p class="text-muted text-sm" data-i18n="feature.gm-tools.setYourGroupSSafetyBoundariesThese">Set your group's safety boundaries. These will be shown when the X‑Card is called.</p>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
                 <div>
-                    <label style="font-size:0.8rem;font-weight:600;">Lines (never to appear)</label>
+                    <label style="font-size:0.8rem;font-weight:600;" data-i18n="feature.gm-tools.linesNeverToAppear">Lines (never to appear)</label>
                     <textarea id="safety-lines" rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;font-size:0.8rem;">${escHtml(safety.lines || '')}</textarea>
-                    <span class="text-muted text-xs">Things that are absolutely off-limits.</span>
+                    <span class="text-muted text-xs" data-i18n="feature.gm-tools.thingsThatAreAbsolutelyOffLimits">Things that are absolutely off-limits.</span>
                 </div>
                 <div>
-                    <label style="font-size:0.8rem;font-weight:600;">Veils (fade to black)</label>
+                    <label style="font-size:0.8rem;font-weight:600;" data-i18n="feature.gm-tools.veilsFadeToBlack">Veils (fade to black)</label>
                     <textarea id="safety-veils" rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;font-size:0.8rem;">${escHtml(safety.veils || '')}</textarea>
-                    <span class="text-muted text-xs">Things that can happen off-screen.</span>
+                    <span class="text-muted text-xs" data-i18n="feature.gm-tools.thingsThatCanHappenOffScreen">Things that can happen off-screen.</span>
                 </div>
             </div>
 
-            <button class="btn btn-sm btn-primary mt-1" id="safety-save-btn">💾 Save Safety Settings</button>
+            <button class="btn btn-sm btn-primary mt-1" id="safety-save-btn" data-i18n="feature.gm-tools.saveSafetySettings">💾 Save Safety Settings</button>
 
             <details style="margin-top:0.5rem;">
-                <summary style="cursor:pointer;font-size:0.8rem;color:var(--text2);">📋 Session Zero Checklist</summary>
+                <summary style="cursor:pointer;font-size:0.8rem;color:var(--text2);" data-i18n="feature.gm-tools.sessionZeroChecklist">📋 Session Zero Checklist</summary>
                 <div style="padding:0.5rem 0.3rem;font-size:0.8rem;">
                     ${renderSessionZeroChecklist(safety.sessionZero || {})}
                 </div>
@@ -758,7 +759,7 @@ function renderSessionZeroChecklist(sessionZero) {
                 I have discussed consent with the group.
             </label>
         </div>
-        <button class="btn btn-xs btn-secondary" id="sz-save-btn">Save Session Zero</button>
+        <button class="btn btn-xs btn-secondary" id="sz-save-btn" data-i18n="feature.gm-tools.saveSessionZero">Save Session Zero</button>
     `;
 }
 // ============================================================
@@ -787,10 +788,10 @@ function renderSoundboardPanel(isViewOnly) {
 
     return `
         <div class="panel">
-            <h3 class="panel-title">🔊 Soundboard</h3>
+            <h3 class="panel-title" data-i18n="feature.gm-tools.soundboard">🔊 Soundboard</h3>
             <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.3rem;">
                 <div>
-                    <label style="font-size:0.75rem;color:var(--text2);">Ambience (loops)</label>
+                    <label style="font-size:0.75rem;color:var(--text2);" data-i18n="feature.gm-tools.ambienceLoops">Ambience (loops)</label>
                     <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;margin-top:0.2rem;">
                         <select id="sb-ambience-select" style="flex:1;min-width:140px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.2rem 0.4rem;font-size:0.8rem;" ${isViewOnly ? 'disabled' : ''}>
                             <option value="">${ambienceTracks.length ? '— choose ambience —' : 'No ambience tracks yet'}</option>
@@ -807,7 +808,7 @@ function renderSoundboardPanel(isViewOnly) {
                     })()}
                 </div>
                 <div>
-                    <label style="font-size:0.75rem;color:var(--text2);">SFX (one-shot)</label>
+                    <label style="font-size:0.75rem;color:var(--text2);" data-i18n="feature.gm-tools.sfxOneShot">SFX (one-shot)</label>
                     <div id="sb-sfx-list" style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.2rem;">
                         ${sfxButtons || '<span style="font-size:0.75rem;color:var(--text3);">No SFX yet.</span>'}
                     </div>
@@ -826,18 +827,18 @@ function handleOpenSoundSearch() {
         module.openSoundSearchModal({ onChange: refreshView });
     }).catch(err => {
         console.error('Failed to load sound search:', err);
-        showToast('Sound search not available.', 'error');
+        showToast(i18nText("feature.gm-tools.soundSearchNotAvailable", null, "Sound search not available."), 'error');
     });
 }
 
 function handleAddSound() {
-    const name = prompt('Sound name (e.g. "Tavern murmur", "Sword clash"):');
+    const name = prompt(i18nText("feature.gm-tools.soundNameEGTavernMurmurSword", null, "Sound name (e.g. \"Tavern murmur\", \"Sword clash\"):"));
     if (!name || !name.trim()) return;
-    const url = prompt('Audio URL (mp3/ogg/wav link):');
+    const url = prompt(i18nText("feature.gm-tools.audioURLMp3OggWavLink", null, "Audio URL (mp3/ogg/wav link):"));
     if (!url || !url.trim()) return;
-    const isAmbience = confirm('Is this a looping AMBIENCE track?\n\nOK = Ambience (loops)\nCancel = one-shot SFX');
+    const isAmbience = confirm(i18nText("feature.gm-tools.isThisALoopingAMBIENCETrackOK", null, "Is this a looping AMBIENCE track?\n\nOK = Ambience (loops)\nCancel = one-shot SFX"));
     addSoundTrack({ name: name.trim(), url: url.trim(), type: isAmbience ? 'ambience' : 'sfx' });
-    showToast(`🔊 Added "${name.trim()}" to the soundboard.`, 'success');
+    showToast(i18nText("feature.gm-tools.addedValueToTheSoundboard", { value0: name.trim() }, "🔊 Added \"{{value0}}\" to the soundboard."), 'success');
     refreshView();
 }
 
@@ -847,7 +848,7 @@ function attachSoundboardEvents() {
 
     document.getElementById('sb-ambience-play')?.addEventListener('click', () => {
         const id = document.getElementById('sb-ambience-select')?.value;
-        if (!id) { showToast('Choose an ambience track first.', 'warning'); return; }
+        if (!id) { showToast(i18nText("feature.gm-tools.chooseAnAmbienceTrackFirst", null, "Choose an ambience track first."), 'warning'); return; }
         playAmbience(id);
         refreshView();
     });
@@ -888,47 +889,47 @@ function renderSceneView() {
             ${renderAdventureIntelPanel(getRunningAdventure())}
 
             <div class="panel">
-                <h3 class="panel-title">⚙️ GM Settings</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.gmSettings">⚙️ GM Settings</h3>
                 <div class="flex gap-1 flex-center flex-wrap mt-1">
                     <label class="inline-check" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
                         <input type="checkbox" id="auto-tick-toggle" ${autoTick ? 'checked' : ''} ${isViewOnly ? 'disabled' : ''} />
                         <span>Auto-tick active timers on Partial/Miss</span>
                     </label>
-                    <span class="text-muted text-xs">(Story Beats auto‑increment the SB Bank)</span>
+                    <span class="text-muted text-xs" data-i18n="feature.gm-tools.storyBeatsAutoIncrementTheSBBank">(Story Beats auto‑increment the SB Bank)</span>
                 </div>
             </div>
             ${renderSafetyToolsPanel()}
             <div class="panel">
-                <h3 class="panel-title">⚡ Quick Actions</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.quickActions">⚡ Quick Actions</h3>
                 <div class="grid-2 mt-1">
                     <button class="btn btn-secondary" onclick="window.sceneEndTrimBoons()" ${isViewOnly ? 'disabled' : ''}>✂️ Trim Boons</button>
                     <button class="btn btn-secondary" onclick="window.resetAllTimers()" ${isViewOnly ? 'disabled' : ''}>⏱️ Reset Timers</button>
                     <button class="btn btn-secondary" onclick="window.newSession()" ${isViewOnly ? 'disabled' : ''}>📦 New Session</button>
                     <button class="btn btn-secondary" onclick="window.openCombatTracker()" ${isViewOnly ? 'disabled' : ''}>⚔️ Combat Tracker</button>
-                    <button class="btn btn-secondary" onclick="window.openKanban()">📋 Kanban Board</button>
-                    <button class="btn btn-secondary" onclick="window.openWhiteboard()">✏️ Whiteboard</button>
-                    <button class="btn btn-secondary" onclick="window.openCrownSpread()">👑 Crown Spread</button>
-                    <button class="btn btn-secondary" onclick="window.openTravelPlanner()">🗺️ Travel Planner</button>
+                    <button class="btn btn-secondary" onclick="window.openKanban()" data-i18n="feature.gm-tools.kanbanBoard">📋 Kanban Board</button>
+                    <button class="btn btn-secondary" onclick="window.openWhiteboard()" data-i18n="feature.gm-tools.whiteboard">✏️ Whiteboard</button>
+                    <button class="btn btn-secondary" onclick="window.openCrownSpread()" data-i18n="feature.gm-tools.crownSpread">👑 Crown Spread</button>
+                    <button class="btn btn-secondary" onclick="window.openTravelPlanner()" data-i18n="feature.gm-tools.travelPlanner">🗺️ Travel Planner</button>
                 </div>
             </div>
 
             ${renderSoundboardPanel(isViewOnly)}
 
             <div class="panel">
-                <h3 class="panel-title">⚡ Quick Generate</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.quickGenerate">⚡ Quick Generate</h3>
                 <div class="flex gap-1 flex-center flex-wrap mt-1">
                     <button class="btn btn-sm btn-gold" id="gen-npc-btn" ${isViewOnly ? 'disabled' : ''}>👤 NPC</button>
                     <button class="btn btn-sm btn-gold" id="gen-location-btn" ${isViewOnly ? 'disabled' : ''}>📍 Location</button>
                     <button class="btn btn-sm btn-gold" id="gen-rumor-btn" ${isViewOnly ? 'disabled' : ''}>📜 Rumor</button>
-                    <span class="text-muted text-sm mx-auto">Uses the region selected above</span>
+                    <span class="text-muted text-sm mx-auto" data-i18n="feature.gm-tools.usesTheRegionSelectedAbove">Uses the region selected above</span>
                 </div>
-                <div id="quick-gen-result" class="mt-1 panel" style="background:var(--bg3); border-left: 3px solid var(--border);">
-                    <span class="text-muted text-sm">Generate an NPC, Location, or Rumor.</span>
+                <div id="quick-gen-result" class="mt-1 panel" style="background:var(--bg3); border-inline-start: 3px solid var(--border);">
+                    <span class="text-muted text-sm" data-i18n="feature.gm-tools.generateAnNPCLocationOrRumor">Generate an NPC, Location, or Rumor.</span>
                 </div>
             </div>
 
             <div class="panel">
-                <h3 class="panel-title">🏷️ Scene Tags</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.sceneTags">🏷️ Scene Tags</h3>
                 <div class="flex gap-1 flex-center flex-wrap mt-1">
                     <input type="text" id="scene-tag-input" placeholder="e.g., WARD, FIRE, DARK" class="flex-1" style="min-width: 120px;" ${isViewOnly ? 'disabled' : ''} />
                     <button class="btn btn-sm btn-primary" id="scene-tag-add-btn" ${isViewOnly ? 'disabled' : ''}>+ Add Tag</button>
@@ -950,7 +951,7 @@ function renderSceneView() {
 
             <div class="panel">
                 <div class="flex-between">
-                    <h3 class="panel-title">⏱️ Active Timers</h3>
+                    <h3 class="panel-title" data-i18n="feature.gm-tools.activeTimers">⏱️ Active Timers</h3>
                     <button class="btn btn-sm btn-primary" onclick="window.addTimerFromScene()" ${isViewOnly ? 'disabled' : ''}>+ Add Timer</button>
                 </div>
                 ${activeTimers.length === 0 ? '<p class="text-muted mt-1">No active timers.</p>' : `
@@ -971,7 +972,7 @@ function renderSceneView() {
 
             <div class="panel">
                 <div class="flex-between">
-                    <h3 class="panel-title">⚔️ Active Encounters</h3>
+                    <h3 class="panel-title" data-i18n="feature.gm-tools.activeEncounters">⚔️ Active Encounters</h3>
                     <button class="btn btn-sm btn-primary" onclick="window.addEncounterFromScene()" ${isViewOnly ? 'disabled' : ''}>+ Add Encounter</button>
                 </div>
                 ${activeEncounters.length === 0 ? '<p class="text-muted mt-1">No active encounters.</p>' : `
@@ -989,7 +990,7 @@ function renderSceneView() {
             </div>
 
             <div class="panel">
-                <h3 class="panel-title">👤 Characters</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.characters">👤 Characters</h3>
                 <div class="flex flex-wrap gap-1 mt-1">
                     ${characters.map(c => `
                         <div class="panel flex gap-1 flex-center" style="padding: 0.3rem 0.6rem; background: var(--bg3);">
@@ -1015,8 +1016,8 @@ function renderKanbanView() {
         <div class="kanban-view">
             <div class="panel">
                 <div class="flex-between">
-                    <h3 class="panel-title">📋 Campaign Kanban</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.gmAddKanbanItem()">+ Add Item</button>
+                    <h3 class="panel-title" data-i18n="feature.gm-tools.campaignKanban">📋 Campaign Kanban</h3>
+                    <button class="btn btn-sm btn-primary" onclick="window.gmAddKanbanItem()" data-i18n="feature.gm-tools.addItem">+ Add Item</button>
                 </div>
                 <div class="grid-2 mt-1">
                     ${Object.entries(columns).map(([key, col]) => `
@@ -1025,7 +1026,7 @@ function renderKanbanView() {
                             <div class="flex flex-col gap-1 mt-1">
                                 ${col.items.length === 0 ? '<p class="text-muted text-xs">Empty</p>' : ''}
                                 ${col.items.map((item, idx) => `
-                                    <div class="panel" data-column="${key}" data-index="${idx}" style="padding: 0.5rem; background: var(--bg2); border-left: 3px solid var(--gold);">
+                                    <div class="panel" data-column="${key}" data-index="${idx}" style="padding: 0.5rem; background: var(--bg2); border-inline-start: 3px solid var(--gold);">
                                         <div class="text-sm font-bold">${escHtml(item.title)}</div>
                                         ${item.description ? `<div class="text-xs text-muted mt-1">${escHtml(item.description)}</div>` : ''}
                                         <div class="flex gap-1 mt-1 flex-center">
@@ -1053,7 +1054,7 @@ function renderWhiteboardView() {
         <div class="panel flex-center" style="min-height: 200px;">
             <div class="text-center">
                 <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
-                <p class="text-muted">Loading whiteboard...</p>
+                <p class="text-muted" data-i18n="feature.gm-tools.loadingWhiteboard">Loading whiteboard...</p>
             </div>
         </div>
     `;
@@ -1074,20 +1075,20 @@ function renderCampaignView() {
     return `
         <div class="flex flex-col gap-2">
             <div class="panel">
-                <h3 class="panel-title">📝 Campaign Notes</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.campaignNotes">📝 Campaign Notes</h3>
                 <textarea id="campaign-notes" rows="4" class="mt-1">${escHtml(campaign.notes || '')}</textarea>
-                <button class="btn btn-sm btn-primary mt-1" onclick="window.saveCampaignNotes()">💾 Save Notes</button>
+                <button class="btn btn-sm btn-primary mt-1" onclick="window.saveCampaignNotes()" data-i18n="feature.gm-tools.saveNotes">💾 Save Notes</button>
             </div>
 
             <div class="panel">
                 <div class="flex-between">
-                    <h3 class="panel-title">⚠️ Active Threats</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.addCampaignThreat()">+ Add Threat</button>
+                    <h3 class="panel-title" data-i18n="feature.gm-tools.activeThreats">⚠️ Active Threats</h3>
+                    <button class="btn btn-sm btn-primary" onclick="window.addCampaignThreat()" data-i18n="feature.gm-tools.addThreat">+ Add Threat</button>
                 </div>
                 ${threats.length === 0 ? '<p class="text-muted mt-1">No active threats.</p>' : `
                     <div class="flex flex-col gap-1 mt-1">
                         ${threats.map((t, idx) => `
-                            <div class="panel" style="padding: 0.5rem; background: var(--bg3); border-left: 4px solid ${t.severity === 'high' ? 'var(--red)' : t.severity === 'medium' ? 'var(--orange)' : 'var(--gold)'};">
+                            <div class="panel" style="padding: 0.5rem; background: var(--bg3); border-inline-start: 4px solid ${t.severity === 'high' ? 'var(--red)' : t.severity === 'medium' ? 'var(--orange)' : 'var(--gold)'};">
                                 <div class="flex gap-1 flex-center">
                                     <span class="text-sm flex-1">${escHtml(t.name)}</span>
                                     <span class="badge ${t.severity === 'high' ? 'badge-red' : 'badge-gold'}">${t.severity || 'medium'}</span>
@@ -1102,13 +1103,13 @@ function renderCampaignView() {
 
             <div class="panel">
                 <div class="flex-between">
-                    <h3 class="panel-title">🌟 Opportunities</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.addCampaignOpportunity()">+ Add Opportunity</button>
+                    <h3 class="panel-title" data-i18n="feature.gm-tools.opportunities">🌟 Opportunities</h3>
+                    <button class="btn btn-sm btn-primary" onclick="window.addCampaignOpportunity()" data-i18n="feature.gm-tools.addOpportunity">+ Add Opportunity</button>
                 </div>
                 ${opportunities.length === 0 ? '<p class="text-muted mt-1">No opportunities tracked.</p>' : `
                     <div class="flex flex-col gap-1 mt-1">
                         ${opportunities.map((o, idx) => `
-                            <div class="flex gap-1 flex-center panel" style="padding: 0.5rem; background: var(--bg3); border-left: 4px solid var(--green);">
+                            <div class="flex gap-1 flex-center panel" style="padding: 0.5rem; background: var(--bg3); border-inline-start: 4px solid var(--green);">
                                 <span class="text-sm flex-1">${escHtml(o.name)}</span>
                                 <button class="btn btn-xs btn-danger" onclick="window.removeCampaignOpportunity(${idx})">✕</button>
                             </div>
@@ -1119,8 +1120,8 @@ function renderCampaignView() {
 
             <div class="panel">
                 <div class="flex-between">
-                    <h3 class="panel-title">⏱️ Campaign Timers</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.addCampaignTimer()">+ Add Timer</button>
+                    <h3 class="panel-title" data-i18n="feature.gm-tools.campaignTimers">⏱️ Campaign Timers</h3>
+                    <button class="btn btn-sm btn-primary" onclick="window.addCampaignTimer()" data-i18n="feature.gm-tools.addTimer">+ Add Timer</button>
                 </div>
                 ${timers.length === 0 ? '<p class="text-muted mt-1">No campaign timers.</p>' : `
                     <div class="flex flex-col gap-1 mt-1">
@@ -1138,10 +1139,10 @@ function renderCampaignView() {
 
             <div class="panel">
                 <div class="flex-between">
-                    <h3 class="panel-title">📋 Session Log</h3>
+                    <h3 class="panel-title" data-i18n="feature.gm-tools.sessionLog">📋 Session Log</h3>
                     <div class="flex gap-1">
-                        <button class="btn btn-sm btn-secondary" onclick="window.copySessionLog()">📋 Copy</button>
-                        <button class="btn btn-sm btn-danger" onclick="window.clearSessionLog()">🗑️ Clear</button>
+                        <button class="btn btn-sm btn-secondary" onclick="window.copySessionLog()" data-i18n="feature.gm-tools.copy">📋 Copy</button>
+                        <button class="btn btn-sm btn-danger" onclick="window.clearSessionLog()" data-i18n="feature.gm-tools.clear">🗑️ Clear</button>
                     </div>
                 </div>
                 <div id="session-log-container" class="mt-1 panel" style="max-height:250px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;">
@@ -1170,53 +1171,53 @@ function renderConsequencesView() {
     return `
         <div class="flex flex-col gap-2">
             <div class="panel">
-                <h3 class="panel-title">🃏 Deck of Consequences</h3>
-                <p class="text-muted text-sm">Draw cards from the Deck of Consequences or use the Crown Spread.</p>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.deckOfConsequences">🃏 Deck of Consequences</h3>
+                <p class="text-muted text-sm" data-i18n="feature.gm-tools.drawCardsFromTheDeckOfConsequences">Draw cards from the Deck of Consequences or use the Crown Spread.</p>
                 
-                <div class="flex gap-1 flex-center flex-wrap mt-1 panel" style="background:var(--bg3); border-left: 3px solid var(--gold);">
-                    <span class="text-sm text-muted">📍 Region:</span>
+                <div class="flex gap-1 flex-center flex-wrap mt-1 panel" style="background:var(--bg3); border-inline-start: 3px solid var(--gold);">
+                    <span class="text-sm text-muted" data-i18n="feature.gm-tools.region">📍 Region:</span>
                     <select id="scene-consequences-region-select" class="flex-1" style="max-width: 200px;">
                         ${regionNames.map(name => `<option value="${name}" ${name === selectedRegion ? 'selected' : ''}>${name}</option>`).join('')}
                     </select>
                 </div>
                 
                 <div class="flex gap-1 flex-wrap mt-2">
-                    <button class="btn btn-sm btn-gold" onclick="window.quickDrawConsequence(1)">🃏 Draw 1</button>
-                    <button class="btn btn-sm btn-gold" onclick="window.quickDrawConsequence(2)">🃏 Draw 2</button>
-                    <button class="btn btn-sm btn-gold" onclick="window.quickDrawConsequence(3)">🃏 Draw 3</button>
-                    <button class="btn btn-sm btn-primary" onclick="window.quickCrownSpreadFromScene()">👑 Crown Spread</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.shuffleDeck()">🔀 Shuffle</button>
+                    <button class="btn btn-sm btn-gold" onclick="window.quickDrawConsequence(1)" data-i18n="feature.gm-tools.draw1">🃏 Draw 1</button>
+                    <button class="btn btn-sm btn-gold" onclick="window.quickDrawConsequence(2)" data-i18n="feature.gm-tools.draw2">🃏 Draw 2</button>
+                    <button class="btn btn-sm btn-gold" onclick="window.quickDrawConsequence(3)" data-i18n="feature.gm-tools.draw3">🃏 Draw 3</button>
+                    <button class="btn btn-sm btn-primary" onclick="window.quickCrownSpreadFromScene()" data-i18n="feature.gm-tools.crownSpread">👑 Crown Spread</button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.shuffleDeck()" data-i18n="feature.gm-tools.shuffle">🔀 Shuffle</button>
                 </div>
                 
                 <div id="consequence-result" class="mt-2 panel" style="min-height:80px; background:var(--bg3);">
-                    <p class="text-muted text-sm">Draw cards to see a consequence.</p>
+                    <p class="text-muted text-sm" data-i18n="feature.gm-tools.drawCardsToSeeAConsequence">Draw cards to see a consequence.</p>
                 </div>
                 
                 <div id="crown-spread-result" style="margin-top:1rem;display:none;" class="panel" style="border: 2px solid var(--gold);">
-                    <h4 class="text-gold">👑 Crown Spread</h4>
+                    <h4 class="text-gold" data-i18n="feature.gm-tools.crownSpread">👑 Crown Spread</h4>
                     <div id="crown-spread-cards" class="flex gap-1 flex-wrap flex-center mt-1"></div>
                     <div id="crown-spread-interpretation" class="text-muted mt-1 text-sm"></div>
                 </div>
             </div>
             
             <div class="panel">
-                <h3 class="panel-title">📋 Quick Reference</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.quickReference">📋 Quick Reference</h3>
                 <div class="grid-2 mt-1">
-                    <div class="panel" style="background:var(--bg3); border-left: 3px solid var(--gold);">
+                    <div class="panel" style="background:var(--bg3); border-inline-start: 3px solid var(--gold);">
                         <strong class="text-gold">1 SB</strong>
-                        <div class="text-sm text-muted mt-1">Minor pressure, noise, tick timer +1</div>
+                        <div class="text-sm text-muted mt-1" data-i18n="feature.gm-tools.minorPressureNoiseTickTimer1">Minor pressure, noise, tick timer +1</div>
                     </div>
-                    <div class="panel" style="background:var(--bg3); border-left: 3px solid var(--orange);">
+                    <div class="panel" style="background:var(--bg3); border-inline-start: 3px solid var(--orange);">
                         <strong style="color:var(--orange);">2 SB</strong>
-                        <div class="text-sm text-muted mt-1">Moderate setback, alarm, lesser foe</div>
+                        <div class="text-sm text-muted mt-1" data-i18n="feature.gm-tools.moderateSetbackAlarmLesserFoe">Moderate setback, alarm, lesser foe</div>
                     </div>
-                    <div class="panel" style="background:var(--bg3); border-left: 3px solid var(--red);">
+                    <div class="panel" style="background:var(--bg3); border-inline-start: 3px solid var(--red);">
                         <strong style="color:var(--red);">3 SB</strong>
-                        <div class="text-sm text-muted mt-1">Serious trouble, reinforcements, gear breaks</div>
+                        <div class="text-sm text-muted mt-1" data-i18n="feature.gm-tools.seriousTroubleReinforcementsGearBreaks">Serious trouble, reinforcements, gear breaks</div>
                     </div>
-                    <div class="panel" style="background:var(--bg3); border-left: 3px solid var(--purple);">
+                    <div class="panel" style="background:var(--bg3); border-inline-start: 3px solid var(--purple);">
                         <strong style="color:var(--purple);">4+ SB</strong>
-                        <div class="text-sm text-muted mt-1">Major turn, trap, authority arrives</div>
+                        <div class="text-sm text-muted mt-1" data-i18n="feature.gm-tools.majorTurnTrapAuthorityArrives">Major turn, trap, authority arrives</div>
                     </div>
                 </div>
             </div>
@@ -1233,8 +1234,8 @@ function renderTravelView() {
         <div class="panel flex-center" style="min-height: 200px;">
             <div class="text-center">
                 <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
-                <p class="text-muted">Loading travel planner...</p>
-                <button class="btn btn-sm btn-primary mt-2" onclick="window.loadTravelPlanner()">🔄 Load</button>
+                <p class="text-muted" data-i18n="feature.gm-tools.loadingTravelPlanner">Loading travel planner...</p>
+                <button class="btn btn-sm btn-primary mt-2" onclick="window.loadTravelPlanner()" data-i18n="feature.gm-tools.load">🔄 Load</button>
             </div>
         </div>
     `;
@@ -1254,13 +1255,13 @@ function renderSessionView() {
     return `
         <div class="flex flex-col gap-2">
             <div class="panel">
-                <h3 class="panel-title">🎙️ Session Recording</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.sessionRecording">🎙️ Session Recording</h3>
                 <p class="text-muted text-sm">Records screen + mic as a .webm, and logs in-app events (deck draws, timers, scene changes, etc.) to a synced SRT subtitle track. Stopping the recording downloads BOTH as one .zip bundle -- drop the SRT into Premiere/Resolve/etc. as a subtitle track.</p>
 
                 <div class="flex gap-1 flex-wrap mt-2">
                     <button class="btn btn-primary" id="session-record-btn" aria-label="Start screen and audio recording" ${recordingStatus.isRecording ? 'style="display:none;"' : ''}>🎤 Record</button>
                     <button class="btn btn-danger" id="session-stop-btn" aria-label="Stop recording" ${!recordingStatus.isRecording ? 'style="display:none;"' : ''}>⏹️ Stop</button>
-                    <button class="btn btn-secondary" id="session-clear-btn">🧹 Clear Session Log</button>
+                    <button class="btn btn-secondary" id="session-clear-btn" data-i18n="feature.gm-tools.clearSessionLog">🧹 Clear Session Log</button>
                 </div>
                 <label class="text-sm text-muted mt-1" style="display:flex;align-items:center;gap:0.4rem;${recordingStatus.isRecording ? 'opacity:0.5;pointer-events:none;' : ''}" title="${isLiveTranscriptionSupported() ? 'Adds best-effort speech-to-text lines to the SRT using your browser\'s built-in speech recognition. Not a substitute for a real transcription tool -- see the README.' : 'Not supported in this browser -- try Chrome or Edge.'}">
                     <input type="checkbox" id="session-live-transcription" ${isLiveTranscriptionSupported() ? '' : 'disabled'} />
@@ -1270,15 +1271,15 @@ function renderSessionView() {
                     ${recordingStatus.isRecording ? `🔴 Recording... (${Math.floor(recordingStatus.duration)}s)` : 'Not recording'}
                 </div>
 
-                <h4 class="mt-2" style="font-size:0.9rem;">📦 Session Log Export</h4>
+                <h4 class="mt-2" style="font-size:0.9rem;" data-i18n="feature.gm-tools.sessionLogExport">📦 Session Log Export</h4>
                 <p class="text-muted text-sm">Separately, export the text session log + VTT event history (not the video/SRT above) as JSON -- useful for your own records or tooling, independent of whether you recorded anything.</p>
                 <div class="flex gap-1 flex-wrap mt-1">
-                    <button class="btn btn-secondary" id="session-export-btn">📦 Export Session Log (JSON)</button>
+                    <button class="btn btn-secondary" id="session-export-btn" data-i18n="feature.gm-tools.exportSessionLogJSON">📦 Export Session Log (JSON)</button>
                 </div>
             </div>
             
             <div class="panel">
-                <h3 class="panel-title">📋 Session Log</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.sessionLog">📋 Session Log</h3>
                 <div id="session-log-display" class="mt-1 panel" style="max-height:200px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;">
                     ${sessionLog.length === 0 ? '<span class="text-muted text-sm">No events logged yet.</span>' : 
                         sessionLog.map(entry => `
@@ -1292,7 +1293,7 @@ function renderSessionView() {
             </div>
             
             <div class="panel">
-                <h3 class="panel-title">🎬 VTT Events</h3>
+                <h3 class="panel-title" data-i18n="feature.gm-tools.vttEvents">🎬 VTT Events</h3>
                 <div id="vtt-events-display" class="mt-1 panel" style="max-height:150px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;">
                     ${vttEvents.length === 0 ? '<span class="text-muted text-sm">No VTT events captured.</span>' : 
                         vttEvents.slice().reverse().map(evt => `
@@ -1338,19 +1339,19 @@ function exportSessionBundle() {
     a.download = `session_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Session log exported (JSON).', 'success');
+    showToast(i18nText("feature.gm-tools.sessionLogExportedJSON", null, "Session log exported (JSON)."), 'success');
     logToSession('📦 Session bundle exported.', 'success');
 }
 
 function clearSessionData() {
-    if (!confirm('Clear the session log and VTT events? This does not affect recordings.')) return;
+    if (!confirm(i18nText("feature.gm-tools.clearTheSessionLogAndVTTEvents", null, "Clear the session log and VTT events? This does not affect recordings."))) return;
     const state = getState();
     if (state.campaign?.state) {
         state.campaign.state.sessionLog = [];
         state.campaign.state.vttEvents = [];
         saveState();
         refreshView();
-        showToast('Session data cleared.', 'info');
+        showToast(i18nText("feature.gm-tools.sessionDataCleared", null, "Session data cleared."), 'info');
     }
 }
 
@@ -1365,7 +1366,7 @@ async function loadKanbanModule(containerEl) {
         moduleCache.kanban = module;
         module.render(containerEl);
     } catch (e) {
-        containerEl.innerHTML = `<div class="panel"><h3 class="panel-title">📋 Kanban Board</h3><p class="text-muted" style="color:var(--red);">Error loading: ${e.message}</p><button class="btn btn-sm btn-primary mt-1" onclick="window.loadKanban()">🔄 Retry</button></div>`;
+        containerEl.innerHTML = `<div class="panel"><h3 class="panel-title" data-i18n="feature.gm-tools.kanbanBoard">📋 Kanban Board</h3><p class="text-muted" style="color:var(--red);">Error loading: ${e.message}</p><button class="btn btn-sm btn-primary mt-1" onclick="window.loadKanban()" data-i18n="feature.gm-tools.retry">🔄 Retry</button></div>`;
     }
 }
 
@@ -1376,7 +1377,7 @@ async function loadWhiteboardModule(containerEl) {
         moduleCache.whiteboard = module;
         module.render(containerEl);
     } catch (e) {
-        containerEl.innerHTML = `<div class="panel"><h3 class="panel-title">✏️ Whiteboard</h3><p class="text-muted" style="color:var(--red);">Error loading: ${e.message}</p><button class="btn btn-sm btn-primary mt-1" onclick="window.loadWhiteboard()">🔄 Retry</button></div>`;
+        containerEl.innerHTML = `<div class="panel"><h3 class="panel-title" data-i18n="feature.gm-tools.whiteboard">✏️ Whiteboard</h3><p class="text-muted" style="color:var(--red);">Error loading: ${e.message}</p><button class="btn btn-sm btn-primary mt-1" onclick="window.loadWhiteboard()" data-i18n="feature.gm-tools.retry">🔄 Retry</button></div>`;
     }
 }
 
@@ -1387,9 +1388,9 @@ async function loadTravelPlannerModule(containerEl) {
         moduleCache.travel = module;
         if (module.render) module.render(containerEl);
         else if (module.default?.render) module.default.render(containerEl);
-        else containerEl.innerHTML = `<div class="panel"><h3 class="panel-title">🗺️ Travel Planner</h3><p class="text-muted">Render function not found.</p></div>`;
+        else containerEl.innerHTML = `<div class="panel"><h3 class="panel-title" data-i18n="feature.gm-tools.travelPlanner">🗺️ Travel Planner</h3><p class="text-muted" data-i18n="feature.gm-tools.renderFunctionNotFound">Render function not found.</p></div>`;
     } catch (e) {
-        containerEl.innerHTML = `<div class="panel"><h3 class="panel-title">🗺️ Travel Planner</h3><p class="text-muted" style="color:var(--red);">Error loading: ${e.message}</p><button class="btn btn-sm btn-primary mt-1" onclick="window.loadTravelPlanner()">🔄 Retry</button></div>`;
+        containerEl.innerHTML = `<div class="panel"><h3 class="panel-title" data-i18n="feature.gm-tools.travelPlanner">🗺️ Travel Planner</h3><p class="text-muted" style="color:var(--red);">Error loading: ${e.message}</p><button class="btn btn-sm btn-primary mt-1" onclick="window.loadTravelPlanner()" data-i18n="feature.gm-tools.retry">🔄 Retry</button></div>`;
     }
 }
 
@@ -1441,10 +1442,10 @@ async function chooseRegion(name) {
     if (!name) return;
     try {
         const ok = await setSelectedRegion(name);
-        if (!ok) return showToast(`Region "${name}" is not available.`, 'error');
-        showToast(`Region set to ${name}`, 'info');
+        if (!ok) return showToast(i18nText("feature.gm-tools.regionValueIsNotAvailable", { value0: name }, "Region \"{{value0}}\" is not available."), 'error');
+        showToast(i18nText("feature.gm-tools.regionSetToValue", { value0: name }, "Region set to {{value0}}"), 'info');
     } catch (err) {
-        showToast('Could not change region', 'error');
+        showToast(i18nText("feature.gm-tools.couldNotChangeRegion", null, "Could not change region"), 'error');
     }
 }
 
@@ -1545,11 +1546,11 @@ window.gmCompleteScene = async function() {
         // Ensure the adventure manager's cache is synced
         advModule.loadAdventuresFromState();
         const result = advModule.completeScene(adventure.id, adventure.currentAct, adventure.currentScene);
-        if (result) showToast('✅ Scene completed!', 'success');
+        if (result) showToast(i18nText("feature.gm-tools.sceneCompleted", null, "✅ Scene completed!"), 'success');
         refreshView();
     } catch (e) {
         console.error('[GM Tools] Could not complete scene:', e);
-        showToast('Adventure Manager not available.', 'error');
+        showToast(i18nText("feature.gm-tools.adventureManagerNotAvailable", null, "Adventure Manager not available."), 'error');
     }
 };
 
@@ -1564,7 +1565,7 @@ window.gmStartSceneEncounter = async function() {
         await advModule.startSceneEncounter(adventure.id, adventure.currentAct, adventure.currentScene);
     } catch (e) {
         console.error('[GM Tools] Could not start scene encounter:', e);
-        showToast('Adventure Manager not available.', 'error');
+        showToast(i18nText("feature.gm-tools.adventureManagerNotAvailable", null, "Adventure Manager not available."), 'error');
     }
 };
 
@@ -1574,7 +1575,7 @@ window.gmSaveQuickGenToAdventure = async function() {
     if (!lastQuickGenResult) return;
     const adventure = getRunningAdventure();
     if (!adventure) {
-        showToast('No active adventure to save to — start one in Adventure Manager first.', 'warning');
+        showToast(i18nText("feature.gm-tools.noActiveAdventureToSaveToStart", null, "No active adventure to save to — start one in Adventure Manager first."), 'warning');
         return;
     }
     try {
@@ -1584,19 +1585,19 @@ window.gmSaveQuickGenToAdventure = async function() {
         if (type === 'npc') {
             const npcs = [...(adventure.npcs || []), { id: 'npc_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...data }];
             advModule.updateAdventure(adventure.id, { npcs });
-            showToast(`👤 Saved "${data.name}" to "${adventure.title}"`, 'success');
+            showToast(i18nText("feature.gm-tools.savedValueToValue", { value0: data.name, value1: adventure.title }, "👤 Saved \"{{value0}}\" to \"{{value1}}\""), 'success');
         } else if (type === 'location') {
             const locations = [...(adventure.locations || []), { id: 'loc_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...data }];
             advModule.updateAdventure(adventure.id, { locations });
-            showToast(`📍 Saved "${data.name}" to "${adventure.title}"`, 'success');
+            showToast(i18nText("feature.gm-tools.savedValueToValue_i9zrj", { value0: data.name, value1: adventure.title }, "📍 Saved \"{{value0}}\" to \"{{value1}}\""), 'success');
         } else if (type === 'rumor') {
             const notes = `${adventure.notes || ''}\n\nRumor (${data.region}): ${data.text}`.trim();
             advModule.updateAdventure(adventure.id, { notes });
-            showToast(`📜 Saved rumor to "${adventure.title}" notes`, 'success');
+            showToast(i18nText("feature.gm-tools.savedRumorToValueNotes", { value0: adventure.title }, "📜 Saved rumor to \"{{value0}}\" notes"), 'success');
         }
     } catch (e) {
         console.error('[GM Tools] Could not save quick-gen result to adventure:', e);
-        showToast('Adventure Manager not available.', 'error');
+        showToast(i18nText("feature.gm-tools.adventureManagerNotAvailable", null, "Adventure Manager not available."), 'error');
     }
 };
 
@@ -1610,12 +1611,12 @@ window.gmBuildAdventureFromCrownSpread = async function() {
         const advModule = await import('@features/adventure-manager/index.js');
         const adventure = advModule.createAdventureFromCrownSpreadReading(lastCrownSpreadReading);
         if (adventure) {
-            showToast(`👑 Built "${adventure.title}" — opening Adventure Manager…`, 'success');
+            showToast(i18nText("feature.gm-tools.builtValueOpeningAdventureManager", { value0: adventure.title }, "👑 Built \"{{value0}}\" — opening Adventure Manager…"), 'success');
             window.location.hash = 'adventure-manager';
         }
     } catch (e) {
         console.error('[GM Tools] Could not build adventure from reading:', e);
-        showToast('Adventure Manager not available.', 'error');
+        showToast(i18nText("feature.gm-tools.adventureManagerNotAvailable", null, "Adventure Manager not available."), 'error');
     }
 };
 
@@ -1623,30 +1624,30 @@ window.openCombatTracker = function() {
     import('@features/encounters/combat.js').then(module => {
         if (module.default?.openTracker) module.default.openTracker(null);
         else if (module.openTracker) module.openTracker(null);
-        else showToast('Combat tracker not available', 'error');
-    }).catch(() => showToast('Combat tracker not available', 'error'));
+        else showToast(i18nText("feature.gm-tools.combatTrackerNotAvailable", null, "Combat tracker not available"), 'error');
+    }).catch(() => showToast(i18nText("feature.gm-tools.combatTrackerNotAvailable", null, "Combat tracker not available"), 'error'));
 };
 
 window.addTimerFromScene = function() {
     import('@features/timers/index.js').then(module => {
         if (module.openTimerEditor) module.openTimerEditor(null);
-        else showToast('Timer module not available', 'error');
-    }).catch(() => showToast('Timer module not available', 'error'));
+        else showToast(i18nText("feature.gm-tools.timerModuleNotAvailable", null, "Timer module not available"), 'error');
+    }).catch(() => showToast(i18nText("feature.gm-tools.timerModuleNotAvailable", null, "Timer module not available"), 'error'));
 };
 
 window.addEncounterFromScene = function() {
     import('@features/encounters/index.js').then(module => {
         if (module.openEncounterEditor) module.openEncounterEditor(null);
-        else showToast('Encounter module not available', 'error');
-    }).catch(() => showToast('Encounter module not available', 'error'));
+        else showToast(i18nText("feature.gm-tools.encounterModuleNotAvailable", null, "Encounter module not available"), 'error');
+    }).catch(() => showToast(i18nText("feature.gm-tools.encounterModuleNotAvailable", null, "Encounter module not available"), 'error'));
 };
 
 window.openEncounterTracker = function(id) {
     import('@features/encounters/combat.js').then(module => {
         if (module.default?.openTracker) module.default.openTracker(id);
         else if (module.openTracker) module.openTracker(id);
-        else showToast('Combat tracker not available', 'error');
-    }).catch(() => showToast('Combat tracker not available', 'error'));
+        else showToast(i18nText("feature.gm-tools.combatTrackerNotAvailable", null, "Combat tracker not available"), 'error');
+    }).catch(() => showToast(i18nText("feature.gm-tools.combatTrackerNotAvailable", null, "Combat tracker not available"), 'error'));
 };
 
 window.tickTimer = function(id) {
@@ -1657,7 +1658,7 @@ window.tickTimer = function(id) {
         saveState();
         if (timer.current >= timer.segments) {
             logToSession(`⏱️ Timer completed: ${timer.name}`, 'warning');
-            showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
+            showToast(i18nText("feature.gm-tools.timerValueCompleted", { value0: timer.name }, "⏱️ Timer \"{{value0}}\" completed!"), 'warning');
         }
         refreshView();
     }
@@ -1670,38 +1671,38 @@ window.completeTimer = function(id) {
         timer.current = timer.segments;
         saveState();
         logToSession(`⏱️ Timer completed: ${timer.name}`, 'warning');
-        showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
+        showToast(i18nText("feature.gm-tools.timerValueCompleted", { value0: timer.name }, "⏱️ Timer \"{{value0}}\" completed!"), 'warning');
         refreshView();
     }
 };
 
 window.gmAddKanbanItem = function() {
-    const title = prompt('Enter item title:');
+    const title = prompt(i18nText("feature.gm-tools.enterItemTitle", null, "Enter item title:"));
     if (!title) return;
-    const description = prompt('Enter description (optional):') || '';
-    const column = prompt('Select column (todo/doing/done/blocked):', 'todo') || 'todo';
-    if (!kanbanData.columns[column]) return showToast('Invalid column', 'error');
+    const description = prompt(i18nText("feature.gm-tools.enterDescriptionOptional", null, "Enter description (optional):")) || '';
+    const column = prompt(i18nText("feature.gm-tools.selectColumnTodoDoingDoneBlocked", null, "Select column (todo/doing/done/blocked):"), 'todo') || 'todo';
+    if (!kanbanData.columns[column]) return showToast(i18nText("feature.gm-tools.invalidColumn", null, "Invalid column"), 'error');
     kanbanData.columns[column].items.push({ title, description });
     saveCampaignData();
     refreshView();
-    showToast(`📋 Added "${title}" to ${column}`, 'success');
+    showToast(i18nText("feature.gm-tools.addedValueToValue", { value0: title, value1: column }, "📋 Added \"{{value0}}\" to {{value1}}"), 'success');
 };
 
 window.gmMoveKanbanItem = function(column, index, direction) {
     const cols = ['todo', 'doing', 'done', 'blocked'];
     const newIdx = cols.indexOf(column) + direction;
-    if (newIdx < 0 || newIdx >= cols.length) return showToast('Cannot move further', 'warning');
+    if (newIdx < 0 || newIdx >= cols.length) return showToast(i18nText("feature.gm-tools.cannotMoveFurther", null, "Cannot move further"), 'warning');
     const targetCol = cols[newIdx];
     const item = kanbanData.columns[column].items[index];
     kanbanData.columns[column].items.splice(index, 1);
     kanbanData.columns[targetCol].items.push(item);
     saveCampaignData();
     refreshView();
-    showToast(`📋 Moved to ${targetCol}`, 'success');
+    showToast(i18nText("feature.gm-tools.movedToValue", { value0: targetCol }, "📋 Moved to {{value0}}"), 'success');
 };
 
 window.gmRemoveKanbanItem = function(column, index) {
-    if (!confirm('Remove this item?')) return;
+    if (!confirm(i18nText("feature.gm-tools.removeThisItem", null, "Remove this item?"))) return;
     kanbanData.columns[column].items.splice(index, 1);
     saveCampaignData();
     refreshView();
@@ -1712,53 +1713,53 @@ window.saveCampaignNotes = function() {
     if (notes !== undefined) {
         campaignState.notes = notes;
         saveCampaignData();
-        showToast('💾 Campaign notes saved', 'success');
+        showToast(i18nText("feature.gm-tools.campaignNotesSaved", null, "💾 Campaign notes saved"), 'success');
     }
 };
 
 window.addCampaignThreat = function() {
-    const name = prompt('Enter threat name:');
+    const name = prompt(i18nText("feature.gm-tools.enterThreatName", null, "Enter threat name:"));
     if (!name) return;
-    const severity = prompt('Severity (low/medium/high):', 'medium') || 'medium';
-    const description = prompt('Description:') || '';
+    const severity = prompt(i18nText("feature.gm-tools.severityLowMediumHigh", null, "Severity (low/medium/high):"), 'medium') || 'medium';
+    const description = prompt(i18nText("feature.gm-tools.description", null, "Description:")) || '';
     campaignState.activeThreats.push({ name, severity, description });
     saveCampaignData();
     refreshView();
-    showToast(`⚠️ Added threat: ${name}`, 'success');
+    showToast(i18nText("feature.gm-tools.addedThreatValue", { value0: name }, "⚠️ Added threat: {{value0}}"), 'success');
 };
 
 window.removeCampaignThreat = function(index) {
-    if (!confirm(`Remove threat "${campaignState.activeThreats[index].name}"?`)) return;
+    if (!confirm(i18nText("feature.gm-tools.removeThreatValue", { value0: campaignState.activeThreats[index].name }, "Remove threat \"{{value0}}\"?"))) return;
     campaignState.activeThreats.splice(index, 1);
     saveCampaignData();
     refreshView();
 };
 
 window.addCampaignOpportunity = function() {
-    const name = prompt('Enter opportunity name:');
+    const name = prompt(i18nText("feature.gm-tools.enterOpportunityName", null, "Enter opportunity name:"));
     if (!name) return;
-    const description = prompt('Description:') || '';
+    const description = prompt(i18nText("feature.gm-tools.description", null, "Description:")) || '';
     campaignState.opportunities.push({ name, description });
     saveCampaignData();
     refreshView();
-    showToast(`🌟 Added opportunity: ${name}`, 'success');
+    showToast(i18nText("feature.gm-tools.addedOpportunityValue", { value0: name }, "🌟 Added opportunity: {{value0}}"), 'success');
 };
 
 window.removeCampaignOpportunity = function(index) {
-    if (!confirm(`Remove opportunity "${campaignState.opportunities[index].name}"?`)) return;
+    if (!confirm(i18nText("feature.gm-tools.removeOpportunityValue", { value0: campaignState.opportunities[index].name }, "Remove opportunity \"{{value0}}\"?"))) return;
     campaignState.opportunities.splice(index, 1);
     saveCampaignData();
     refreshView();
 };
 
 window.addCampaignTimer = function() {
-    const name = prompt('Enter timer name:');
+    const name = prompt(i18nText("feature.gm-tools.enterTimerName", null, "Enter timer name:"));
     if (!name) return;
-    const segments = parseInt(prompt('Segments:', '6') || '6');
+    const segments = parseInt(prompt(i18nText("feature.gm-tools.segments", null, "Segments:"), '6') || '6');
     campaignState.campaignTimers.push({ name, segments, current: 0 });
     saveCampaignData();
     refreshView();
-    showToast(`⏱️ Added timer: ${name}`, 'success');
+    showToast(i18nText("feature.gm-tools.addedTimerValue", { value0: name }, "⏱️ Added timer: {{value0}}"), 'success');
 };
 
 window.tickCampaignTimer = function(index) {
@@ -1766,13 +1767,13 @@ window.tickCampaignTimer = function(index) {
     if (timer) {
         timer.current = Math.min(timer.current + 1, timer.segments);
         saveCampaignData();
-        if (timer.current >= timer.segments) showToast(`⏱️ Campaign timer "${timer.name}" completed!`, 'warning');
+        if (timer.current >= timer.segments) showToast(i18nText("feature.gm-tools.campaignTimerValueCompleted", { value0: timer.name }, "⏱️ Campaign timer \"{{value0}}\" completed!"), 'warning');
         refreshView();
     }
 };
 
 window.removeCampaignTimer = function(index) {
-    if (!confirm(`Remove timer "${campaignState.campaignTimers[index].name}"?`)) return;
+    if (!confirm(i18nText("feature.gm-tools.removeTimerValue", { value0: campaignState.campaignTimers[index].name }, "Remove timer \"{{value0}}\"?"))) return;
     campaignState.campaignTimers.splice(index, 1);
     saveCampaignData();
     refreshView();
@@ -1781,18 +1782,18 @@ window.removeCampaignTimer = function(index) {
 window.copySessionLog = function() {
     const log = getState().campaign?.state?.sessionLog || [];
     const text = log.map(e => `[${e.time}] ${e.message}`).join('\n');
-    if (!text) return showToast('Session log is empty.', 'warning');
-    navigator.clipboard.writeText(text).then(() => showToast('Session log copied.', 'success')).catch(() => prompt('Copy the log:', text));
+    if (!text) return showToast(i18nText("feature.gm-tools.sessionLogIsEmpty", null, "Session log is empty."), 'warning');
+    navigator.clipboard.writeText(text).then(() => showToast(i18nText("feature.gm-tools.sessionLogCopied", null, "Session log copied."), 'success')).catch(() => prompt(i18nText("feature.gm-tools.copyTheLog", null, "Copy the log:"), text));
 };
 
 window.clearSessionLog = function() {
-    if (!confirm('Clear the session log?')) return;
+    if (!confirm(i18nText("feature.gm-tools.clearTheSessionLog", null, "Clear the session log?"))) return;
     const state = getState();
     if (state.campaign?.state) {
         state.campaign.state.sessionLog = [];
         saveState();
         refreshView();
-        showToast('Session log cleared.', 'info');
+        showToast(i18nText("feature.gm-tools.sessionLogCleared", null, "Session log cleared."), 'info');
     }
 };
 
@@ -1828,7 +1829,7 @@ window.quickDrawConsequence = async function(count = 1) {
                     <div class="p-1">
                         <div class="font-bold text-gold mb-1">🃏 ${count} Card${count > 1 ? 's' : ''} Drawn</div>
                         <div class="text-muted mb-1">${result.cardNames}</div>
-                        <div class="panel" style="background:var(--bg2); border-left: 3px solid var(--gold); white-space: pre-wrap;">${result.synthesis}</div>
+                        <div class="panel" style="background:var(--bg2); border-inline-start: 3px solid var(--gold); white-space: pre-wrap;">${result.synthesis}</div>
                         ${aceHtml}
                     </div>
                 `;
@@ -1837,7 +1838,7 @@ window.quickDrawConsequence = async function(count = 1) {
             if (crownEl) crownEl.style.display = 'none';
         }
     } catch (err) {
-        showToast('Could not draw cards', 'error');
+        showToast(i18nText("feature.gm-tools.couldNotDrawCards", null, "Could not draw cards"), 'error');
     }
 };
 
@@ -1859,7 +1860,7 @@ window.quickCrownSpreadFromScene = async function() {
                     <div class="p-1">
                         <div class="font-bold text-gold mb-1">👑 Crown Spread</div>
                         <div class="text-muted mb-1">${result.cardNames}</div>
-                        <div class="panel" style="background:var(--bg2); border-left: 3px solid var(--gold); white-space: pre-wrap;">${result.result.synthesis}</div>
+                        <div class="panel" style="background:var(--bg2); border-inline-start: 3px solid var(--gold); white-space: pre-wrap;">${result.result.synthesis}</div>
                     </div>
                 `;
             }
@@ -1877,12 +1878,12 @@ window.quickCrownSpreadFromScene = async function() {
                 // 👇 NEW: one-click path from "just drew this" to "now it's an adventure"
                 const interpEl = document.getElementById('crown-spread-interpretation');
                 if (interpEl) {
-                    interpEl.innerHTML = `<button class="btn btn-sm btn-gold" onclick="window.gmBuildAdventureFromCrownSpread()">📖 Build Adventure from this Reading</button>`;
+                    interpEl.innerHTML = `<button class="btn btn-sm btn-gold" onclick="window.gmBuildAdventureFromCrownSpread()" data-i18n="feature.gm-tools.buildAdventureFromThisReading">📖 Build Adventure from this Reading</button>`;
                 }
             }
         }
     } catch (err) {
-        showToast('Could not perform Crown Spread', 'error');
+        showToast(i18nText("feature.gm-tools.couldNotPerformCrownSpread", null, "Could not perform Crown Spread"), 'error');
     }
 };
 
@@ -1890,11 +1891,11 @@ window.shuffleDeck = function() {
     import('@features/decks/index.js').then(module => {
         if (module.resetDeck || module.default?.resetDeck) {
             (module.resetDeck || module.default.resetDeck)();
-            showToast('🔀 Deck shuffled', 'success');
+            showToast(i18nText("feature.gm-tools.deckShuffled", null, "🔀 Deck shuffled"), 'success');
         } else {
-            showToast('Deck module not available', 'error');
+            showToast(i18nText("feature.gm-tools.deckModuleNotAvailable", null, "Deck module not available"), 'error');
         }
-    }).catch(() => showToast('Deck module not available', 'error'));
+    }).catch(() => showToast(i18nText("feature.gm-tools.deckModuleNotAvailable", null, "Deck module not available"), 'error'));
 };
 
 // ============================================================
@@ -1912,23 +1913,23 @@ function sceneEndTrimBoons() {
         c.talentUses = resetTalentCharges(c, 'once-scene');
     });
     saveState();
-    if (trimmed > 0) showToast(`Scene end: trimmed ${trimmed} excess Boons, refreshed once/scene talents.`, 'success');
-    else showToast('Scene end: Boons already trimmed; refreshed once/scene talents.', 'info');
+    if (trimmed > 0) showToast(i18nText("feature.gm-tools.sceneEndTrimmedValueExcessBoonsRefreshed", { value0: trimmed }, "Scene end: trimmed {{value0}} excess Boons, refreshed once/scene talents."), 'success');
+    else showToast(i18nText("feature.gm-tools.sceneEndBoonsAlreadyTrimmedRefreshedOnce", null, "Scene end: Boons already trimmed; refreshed once/scene talents."), 'info');
 }
 
 function resetAllTimers() {
-    if (!confirm('Reset every timer to zero segments?')) return;
+    if (!confirm(i18nText("feature.gm-tools.resetEveryTimerToZeroSegments", null, "Reset every timer to zero segments?"))) return;
     const state = getState();
     (state.timers || []).forEach(t => t.current = 0);
     saveState();
-    showToast('All timers reset.', 'success');
+    showToast(i18nText("feature.gm-tools.allTimersReset", null, "All timers reset."), 'success');
 }
 
 function newSession() {
     const state = getState();
-    if ((state.rollHistory || []).length === 0 && (state.chatHistory || []).length === 0) return showToast('No data to archive.', 'info');
+    if ((state.rollHistory || []).length === 0 && (state.chatHistory || []).length === 0) return showToast(i18nText("feature.gm-tools.noDataToArchive", null, "No data to archive."), 'info');
 
-    const label = prompt('Session label:', `Session ${state.sessionId || 1}`) || `Session ${state.sessionId || 1}`;
+    const label = prompt(i18nText("feature.gm-tools.sessionLabel", null, "Session label:"), `Session ${state.sessionId || 1}`) || `Session ${state.sessionId || 1}`;
     addArchive({ id: Date.now(), timestamp: Date.now(), rollHistory: [...(state.rollHistory || [])], chatHistory: [...(state.chatHistory || [])], label });
     clearRollHistory();
     clearChatHistory();
@@ -1938,7 +1939,7 @@ function newSession() {
         c.talentUses = resetTalentCharges(c, 'once-scene');
     });
     saveState();
-    showToast('New session started; previous archived; refreshed once/session (and once/scene) talents.', 'success');
+    showToast(i18nText("feature.gm-tools.newSessionStartedPreviousArchivedRefreshedOnce", null, "New session started; previous archived; refreshed once/session (and once/scene) talents."), 'success');
 }
 
 // ============================================================
@@ -2016,7 +2017,9 @@ function attachEvents() {
     if (autoTickToggle) {
         autoTickToggle.addEventListener('change', (e) => {
             updateGmState({ autoTickTimers: e.target.checked });
-            showToast(`Auto-tick ${e.target.checked ? 'enabled' : 'disabled'}.`, 'info');
+            showToast(e.target.checked
+                ? i18nText('feature.gm-tools.autoTickEnabled', null, 'Auto-tick enabled.')
+                : i18nText('feature.gm-tools.autoTickDisabled', null, 'Auto-tick disabled.'), 'info');
         });
     }
     
@@ -2039,7 +2042,7 @@ function attachEvents() {
         const lines = document.getElementById('safety-lines')?.value || '';
         const veils = document.getElementById('safety-veils')?.value || '';
         saveCampaignSafety({ lines, veils });
-        showToast('Safety settings saved.', 'success');
+        showToast(i18nText("feature.gm-tools.safetySettingsSaved", null, "Safety settings saved."), 'success');
     });
 
     document.getElementById('sz-save-btn')?.addEventListener('click', () => {
@@ -2048,7 +2051,7 @@ function attachEvents() {
         const characterHooks = document.getElementById('sz-characterHooks')?.value || '';
         const consent = document.getElementById('sz-consent')?.checked || false;
         saveCampaignSafety({ sessionZero: { tone, length, characterHooks, consent } });
-        showToast('Session Zero saved.', 'success');
+        showToast(i18nText("feature.gm-tools.sessionZeroSaved", null, "Session Zero saved."), 'success');
     });
 }
 

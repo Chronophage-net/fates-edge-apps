@@ -10,8 +10,9 @@
 
 import { ALL_SKILLS, HERITAGES, getTierFromXp } from './editor.js';
 import { showToast } from '@components/Toast.js';
+import { t as i18nText } from '@core/i18n.js';
 
-const PAGE = { width: 792, height: 612, left: 30, right: 762, top: 34, bottom: 580 };
+const PAGE = { width: 792, height: 612, left: 30, right: 762, top: 34, bottom: 580 }; // rtl-physical: PDF page coordinates
 const COLORS = {
     ink: [36, 31, 26],
     red: [122, 37, 38],
@@ -148,7 +149,7 @@ function table(doc, x, y, width, columns, body, options = {}) {
     });
     doc.autoTable({
         startY: y,
-        margin: { left: x, right: PAGE.width - x - width },
+        margin: { left: x, right: PAGE.width - x - width }, // rtl-physical: PDF page coordinates
         tableWidth: width,
         head,
         body,
@@ -512,7 +513,7 @@ function safeFilename(c) {
 export function exportCharacterPDF(c) {
     const doc = buildCharacterPDF(c);
     if (!doc) {
-        showToast('PDF export is still loading. Try again in a moment.', 'error');
+        showToast(i18nText('feature.characters.pdf.exportLoading', null, 'PDF export is still loading. Try again in a moment.'), 'error');
         return;
     }
     doc.save(safeFilename(c));
@@ -521,12 +522,12 @@ export function exportCharacterPDF(c) {
 export function printCharacterPDF(c) {
     const doc = buildCharacterPDF(c);
     if (!doc) {
-        showToast('Printable sheets are still loading. Try again in a moment.', 'error');
+        showToast(i18nText('feature.characters.pdf.printLoading', null, 'Printable sheets are still loading. Try again in a moment.'), 'error');
         return;
     }
     if (typeof doc.autoPrint === 'function') doc.autoPrint();
     const printWindow = window.open(doc.output('bloburl'), '_blank');
     if (!printWindow) {
-        showToast('The printable sheet was blocked by the browser. Use Download PDF instead.', 'error');
+        showToast(i18nText('feature.characters.pdf.popupBlocked', null, 'The printable sheet was blocked by the browser. Use Download PDF instead.'), 'error');
     }
 }

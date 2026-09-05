@@ -14,11 +14,10 @@
  *      the English (i.e. copied and not yet translated), and which are
  *      stale keys that no longer exist in the source catalogue.
  *
- *   2. EXTRACTION COVERAGE — how much of the interface has been routed
- *      through t()/data-i18n at all. The app was written in English inline,
- *      so this number starts low and is meant to climb; it is reported
- *      rather than enforced so that adding a feature never fails the build
- *      for not being translated on day one.
+ *   2. EXTRACTION COVERAGE — whether first-party interface surfaces use
+ *      t()/tn()/data-i18n, and whether known message boundaries still pass
+ *      raw English. Authored game data and printable source material are a
+ *      deliberate boundary; their surrounding controls are still checked.
  *
  * Deliberately dependency-free and read-only: it never rewrites a
  * catalogue, because silently reformatting a translator's file is a good
@@ -136,31 +135,74 @@ function scanShell() {
     const tagWithText = /<(\w+)([^>]*)>([^<>]{2,})</g;
     let m;
     while ((m = tagWithText.exec(body))) {
-        const [, , attrs, text] = m;
+        const [, tag, attrs, text] = m;
         const trimmed = text.trim();
         if (!trimmed) continue;
         if (!/[A-Za-z]{2}/.test(trimmed)) continue;      // emoji/glyph-only nodes
+        if (tag.toLowerCase() === 'kbd' || tag.toLowerCase() === 'title') continue;
         if (/data-i18n/.test(attrs)) continue;
         untranslated.push(trimmed.replace(/\s+/g, ' ').slice(0, 60));
     }
     return untranslated;
 }
 
-/** Rough count of literal strings still rendered straight from feature code. */
-function scanFeatures() {
+const NON_UI_FILES = /(?:^|\/)(?:tools|tests)(?:\/|$)|(?:^|\/)(?:data|state|constants|engine|region-parser)\.js$/;
+const GENERIC_BOUNDARIES = new Set([
+    'js/components/Toast.js',
+    'js/components/Dice3D.js',
+    'js/core/a11y-announce.js',
+    'js/core/highlight-tags.js',
+    'js/core/i18n.js',
+    'js/core/theme-manager.js',
+    'js/core/utils.js',
+    'js/core/version.js'
+]);
+
+/**
+ * Scan only modules that actually render UI or emit a user-facing message.
+ * Generic sinks (Toast, announce, DOM utility helpers) are checked at their
+ * callers, otherwise a translated value passed through a variable looks
+ * indistinguishable from raw copy here.
+ */
+function scanInterface() {
     const files = walkFiles(path.join(ROOT, 'js'), n => n.endsWith('.js'));
-    let usingT = 0;
-    const worst = [];
+    const candidates = [];
+    const unhooked = [];
+    const rawMessages = [];
+    let annotations = 0;
+    let calls = 0;
+
     for (const file of files) {
+        const relative = path.relative(ROOT, file);
+        if (NON_UI_FILES.test(relative) || GENERIC_BOUNDARIES.has(relative)) continue;
         const src = fs.readFileSync(file, 'utf8');
-        const tCalls = (src.match(/\b(?:t|tn|translate)\(\s*['"`]/g) || []).length;
-        // Sentence-ish literals: several words, at least one space, letters.
-        const literals = (src.match(/['"`][A-Z][a-z]+(?:[^'"`\n]{4,80})['"`]/g) || []).length;
-        if (tCalls) usingT++;
-        if (literals > 20) worst.push([path.relative(ROOT, file), literals, tCalls]);
+        const isCandidate = /(?:\.innerHTML\s*=|insertAdjacentHTML\s*\(|\bsetHtml\s*\(|\b(?:showToast|_showToast|confirm|prompt|alert|announce)\s*\(|\.textContent\s*=|\.innerText\s*=)/.test(src);
+        if (!isCandidate) continue;
+        candidates.push(relative);
+
+        const fileAnnotations = (src.match(/data-i18n(?:-html|-attr)?=/g) || []).length;
+        const fileCalls = (src.match(/\b(?:i18nText|i18nPlural|t|tn|translate)\(\s*['"`]/g) || []).length;
+        annotations += fileAnnotations;
+        calls += fileCalls;
+        if (!fileAnnotations && !fileCalls) unhooked.push(relative);
+
+        const rawPatterns = [
+            /\b(?:showToast|_showToast|confirm|prompt|alert|announce)\s*\(\s*(['"`])([^\n]*?)\1/g,
+            /\.(?:textContent|innerText)\s*=\s*(['"`])([^\n]*?)\1/g
+        ];
+        for (const pattern of rawPatterns) {
+            let match;
+            while ((match = pattern.exec(src))) {
+                const value = match[2].replace(/\\['"`]/g, '').trim();
+                if (!/[A-Za-z]{2}/.test(value)) continue;
+                // CSS belongs to presentation, not the language catalogue.
+                if (/\{[\s\S]*:[^}]+;/.test(value)) continue;
+                const line = src.slice(0, match.index).split('\n').length;
+                rawMessages.push({ file: relative, line, value: value.slice(0, 72) });
+            }
+        }
     }
-    worst.sort((a, b) => b[1] - a[1]);
-    return { files: files.length, usingT, worst: worst.slice(0, 10) };
+    return { candidates, unhooked, rawMessages, annotations, calls };
 }
 
 // ------------------------------------------------------------
@@ -175,21 +217,27 @@ async function main() {
     for (const text of shell.slice(0, 12)) console.log(`       "${text}"`);
     if (shell.length > 12) console.log(`       … and ${shell.length - 12} more`);
 
-    const feat = scanFeatures();
-    console.log(`   js/: ${feat.usingT}/${feat.files} modules call t()`);
-    if (feat.worst.length) {
-        console.log('   Largest pockets of inline English (translate these next):');
-        for (const [file, literals, tCalls] of feat.worst) {
-            console.log(`       ${String(literals).padStart(4)} literals, ${tCalls} t() calls  ${file}`);
-        }
+    const extraction = scanInterface();
+    const hooked = extraction.candidates.length - extraction.unhooked.length;
+    console.log(`   UI modules: ${hooked}/${extraction.candidates.length} use translation hooks`);
+    console.log(`   Extracted hooks: ${extraction.annotations} markup annotations, ${extraction.calls} t()/tn() calls`);
+    console.log(`   Raw message boundaries: ${extraction.rawMessages.length === 0 ? 'none ✓' : extraction.rawMessages.length}`);
+    for (const item of extraction.rawMessages.slice(0, 12)) {
+        console.log(`       ${item.file}:${item.line}  "${item.value}"`);
+    }
+    if (extraction.rawMessages.length > 12) console.log(`       … and ${extraction.rawMessages.length - 12} more`);
+    if (extraction.unhooked.length) {
+        console.log('   UI modules without an extraction hook:');
+        for (const file of extraction.unhooked.slice(0, 12)) console.log(`       ${file}`);
     }
 
-    console.log('\n   Switch to the "Pseudo (translation test)" locale in Settings → Language');
-    console.log('   to see which of these are actually on screen. Anything still in plain');
-    console.log('   English there has not been through t() yet.\n');
+    console.log('\n   Use the LTR and RTL pseudolocales in Settings → Language to inspect');
+    console.log('   extraction, text expansion, and mirrored layout. Anything still in');
+    console.log('   plain English has not been through t() yet.\n');
 
-    if (STRICT && incomplete > 0) {
-        console.error(`✗ ${incomplete} locale(s) incomplete (--strict).`);
+    const extractionGaps = shell.length + extraction.unhooked.length + extraction.rawMessages.length;
+    if (STRICT && (incomplete > 0 || extractionGaps > 0)) {
+        console.error(`✗ strict check failed: ${incomplete} incomplete locale(s), ${extractionGaps} extraction gap(s).`);
         process.exitCode = 1;
     }
 }

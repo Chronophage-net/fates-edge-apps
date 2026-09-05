@@ -71,13 +71,15 @@ Because the server owns the shared truth and every interface is just a client of
 npm run demo
 ```
 
-[![Screenshot of the AI GM bot narrating a live reply in the Fate's Edge web client, linking to a video demo](docs/media/demo-thumbnail.png)](docs/media/demo.mp4)
+[![The guided Fate's Edge toolkit tour, linking to a video demo](docs/media/demo-thumbnail.png)](docs/media/demo.mp4)
 
-*Click to play `docs/media/demo.mp4` — the AI GM bot joining room `DEMO` and narrating a live reply, generated entirely by a local Ollama instance. No API keys, nothing cloud-hosted.*
+*Click to play `docs/media/demo.mp4` — a short, silent walk through the current browser toolkit.*
 
 This brings up the web client, the real-time server, Redis, a local Ollama instance, and the AI GM bot (cloned automatically as a sibling directory if it isn't already there), wired together with working defaults. Open `http://localhost:8080`, create or join room `DEMO`, and the AI GM bot takes the GM seat within about ten seconds. The first run also builds three Docker images and pulls a small local model (~1.3GB) — a few minutes, not literally two. Every run after that reuses the cache. See `docker-compose.full.yml`'s header comment and `.env.demo.example` for the full set of knobs (including a `DEMO_LEVEL=light`/`quality` preset), and `npm run demo -- --down` to tear it down.
 
 Add `-- --voice` or `-- --voice-rvc` to hear the GM speak in a cloned voice via a local Chatterbox TTS container — see [`fates-edge-ai-gm-bot/docs/local-voice-cloning/VOICE-CLONING-LOCAL-SETUP.md`](https://github.com/Chronophage-net/fates-edge-ai-gm-bot/blob/main/docs/local-voice-cloning/VOICE-CLONING-LOCAL-SETUP.md) for what that's actually doing.
+
+To recapture the guided-tour video after changing the interface, leave the demo running and use `npm run demo:record` in another terminal. It drives the live client with local Chrome or Chromium and assembles the new MP4 with ffmpeg; set `DEMO_URL` if the client is not on port 8080.
 
 ### Run it for real
 

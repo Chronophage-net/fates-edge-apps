@@ -59,6 +59,7 @@ const registry = new Map();
 let currentPreference = null; // 'auto', or a locale code
 let currentLocale = FALLBACK_LOCALE; // the code actually in effect
 const warnedKeys = new Set();
+let translationObserver = null;
 
 // ============================================================
 // CATALOGUE SHAPE
@@ -323,7 +324,13 @@ export function applyTranslations(root) {
 
     const each = (selector, fn) => {
         let nodes = [];
-        try { nodes = Array.from(scope.querySelectorAll(selector) || []); } catch { return; }
+        try {
+            nodes = Array.from(scope.querySelectorAll(selector) || []);
+            // MutationObserver hands us the element that was inserted. A
+            // querySelectorAll() only sees its descendants, so include the
+            // root itself when it carries the annotation.
+            if (typeof scope.matches === 'function' && scope.matches(selector)) nodes.unshift(scope);
+        } catch { return; }
         for (const el of nodes) {
             try { if (fn(el)) touched++; } catch { /* one bad node must not stop the pass */ }
         }
@@ -385,6 +392,34 @@ function applyLocaleToDocument() {
         }
     } catch { /* headless test shim has no documentElement */ }
     applyTranslations();
+}
+
+/**
+ * Feature screens update pieces of themselves after their initial render
+ * (timer ticks, search results, socket events, editor validation). Observe
+ * inserted markup so explicit data-i18n annotations on those later nodes are
+ * translated too. The observer never guesses at unannotated text, which is
+ * what keeps user-authored names and game content outside localization.
+ */
+function observeDynamicTranslations() {
+    if (translationObserver || typeof MutationObserver === 'undefined') return;
+    const target = typeof document !== 'undefined' ? document.body : null;
+    if (!target) return;
+
+    translationObserver = new MutationObserver(records => {
+        for (const record of records) {
+            for (const node of record.addedNodes || []) {
+                // Text-node insertions are commonly the result of a live
+                // status update. Reapplying the parent's static annotation
+                // there would replace the new status with its original
+                // label. Newly inserted elements are the useful boundary:
+                // they cover innerHTML/render updates without trampling
+                // textContent that was already translated at assignment.
+                if (node?.nodeType === 1) applyTranslations(node);
+            }
+        }
+    });
+    translationObserver.observe(target, { childList: true, subtree: true });
 }
 
 // ============================================================
@@ -501,6 +536,7 @@ export async function initI18n() {
 
         const stored = getStorage(STORAGE_KEY, null);
         await setLocale(stored || 'auto', { persist: false });
+        observeDynamicTranslations();
     } catch (e) {
         console.warn('[i18n] Initialisation failed — the interface stays in English.', e);
         currentLocale = FALLBACK_LOCALE;
@@ -511,6 +547,8 @@ export async function initI18n() {
 
 /** Test seam: drop all state so a suite can start from a clean registry. */
 export function __resetI18nForTests() {
+    if (translationObserver) translationObserver.disconnect();
+    translationObserver = null;
     catalogs.clear();
     registry.clear();
     warnedKeys.clear();

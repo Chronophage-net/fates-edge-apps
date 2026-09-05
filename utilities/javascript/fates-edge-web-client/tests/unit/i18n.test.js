@@ -23,6 +23,8 @@ import {
     hasKey,
     isRTL,
     formatNumber,
+    formatDate,
+    detectBrowserLocale,
     __resetI18nForTests,
 } from '../../js/core/i18n.js';
 
@@ -40,6 +42,11 @@ function fakeElement({ text = '', html = '', attrs = {} } = {}) {
             return Object.prototype.hasOwnProperty.call(this._attrs, name) ? this._attrs[name] : null;
         },
         setAttribute(name, value) { this._attrs[name] = String(value); },
+        querySelectorAll() { return []; },
+        matches(selector) {
+            const attr = selector.replace(/^\[|\]$/g, '');
+            return this.getAttribute(attr) !== null;
+        },
     };
 }
 
@@ -56,6 +63,7 @@ async function freshEnglish() {
     __resetI18nForTests();
     try { localStorage.removeItem('fates-edge-locale'); } catch { /* no storage */ }
     await initI18n();
+    await setLocale('en', { persist: false });
 }
 
 describe('i18n: lookup and fallback', () => {
@@ -182,6 +190,15 @@ describe('i18n: shipped catalogues', () => {
         assertEqual(getCoverage('en-x-pseudo'), 1);
     });
 
+    it('ships an equally complete RTL layout pseudolocale', async () => {
+        await freshEnglish();
+        const loaded = await loadLocale('en-x-pseudo-rtl');
+        assertTrue(loaded, 'RTL pseudolocale did not load');
+        assertEqual(getCoverage('en-x-pseudo-rtl'), 1);
+        await setLocale('en-x-pseudo-rtl', { persist: false });
+        assertTrue(isRTL('en-x-pseudo-rtl'));
+    });
+
     it('the pseudolocale leaves placeholders intact', async () => {
         await freshEnglish();
         await setLocale('en-x-pseudo', { persist: false });
@@ -192,7 +209,113 @@ describe('i18n: shipped catalogues', () => {
     });
 });
 
+describe('i18n: regional English', () => {
+    it('loads complete regional catalogues with matching placeholders and markup', async () => {
+        await freshEnglish();
+        const { default: source } = await import('../../locales/en.json', { with: { type: 'json' } });
+        const flatten = (obj, prefix = '', out = {}) => {
+            for (const [key, value] of Object.entries(obj)) {
+                if (key.startsWith('$')) continue;
+                const path = prefix ? `${prefix}.${key}` : key;
+                if (typeof value === 'object') flatten(value, path, out);
+                else out[path] = value;
+            }
+            return out;
+        };
+        const original = flatten(source);
+        for (const code of ['en-US', 'en-GB']) {
+            await setLocale(code, { persist: false });
+            assertEqual(getLocale(), code);
+            assertEqual(getCoverage(code), 1);
+            const { LOADERS } = await import('../../locales/index.js');
+            const translated = flatten((await LOADERS[code]()).default);
+            assertEqual(JSON.stringify(Object.keys(translated)), JSON.stringify(Object.keys(original)));
+            for (const [key, text] of Object.entries(original)) {
+                const tokens = value => JSON.stringify(value.match(/\{\{[^}]+\}\}|<[^>]+>/g) || []);
+                assertEqual(tokens(translated[key]), tokens(text), `${code}: ${key}`);
+            }
+        }
+        await setLocale('en', { persist: false });
+    });
+
+    it('switches regional spelling and date order', async () => {
+        await freshEnglish();
+        const date = new Date('2026-09-05T12:00:00Z');
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' };
+        await setLocale('en-US', { persist: false });
+        assertEqual(t('feature.characters.editor.armor'), 'Armor');
+        assertEqual(formatDate(date, options), '09/05/2026');
+        await setLocale('en-GB', { persist: false });
+        assertEqual(t('feature.characters.editor.armor'), 'Armour');
+        assertEqual(formatDate(date, options), '05/09/2026');
+        await setLocale('en', { persist: false });
+    });
+});
+
+describe('i18n: Spanish catalogue', () => {
+    it('ships every source key and preserves placeholders, markup, and numeric limits', async () => {
+        await freshEnglish();
+        const { default: en } = await import('../../locales/en.json', { with: { type: 'json' } });
+        const { default: es } = await import('../../locales/es.json', { with: { type: 'json' } });
+        const flatten = (obj, prefix = '', out = {}) => {
+            for (const [key, value] of Object.entries(obj)) {
+                if (key.startsWith('$')) continue;
+                const full = prefix ? `${prefix}.${key}` : key;
+                if (value && typeof value === 'object') flatten(value, full, out);
+                else out[full] = value;
+            }
+            return out;
+        };
+        const source = flatten(en);
+        const spanish = flatten(es);
+        assertEqual(JSON.stringify(Object.keys(spanish)), JSON.stringify(Object.keys(source)));
+        for (const [key, original] of Object.entries(source)) {
+            const translated = spanish[key];
+            assertTrue(typeof translated === 'string' && translated.trim().length > 0, key);
+            for (const pattern of [/\{\{[^}]+\}\}/g, /<[^>]+>/g]) {
+                assertEqual(JSON.stringify(translated.match(pattern) || []), JSON.stringify(original.match(pattern) || []), key);
+            }
+            const numbers = text => (text.replace(/\{\{[^}]+\}\}/g, '').match(/\d+/g) || []).sort().join(',');
+            assertEqual(numbers(translated), numbers(original), `${key}: numeric limits changed`);
+            assertEqual(/\[ZX\d+\]|⁇/.test(translated), false, `${key}: translation artifact`);
+        }
+        await setLocale('es', { persist: false });
+        assertEqual(getLocale(), 'es');
+        assertEqual(getCoverage('es'), 1);
+        assertEqual(t('common.save'), 'Guardar');
+        assertEqual(t('settings.language.changed', { language: 'Español' }), 'Idioma de la interfaz cambiado a Español.');
+        assertEqual(tn('plurals.characterCount', 1), '1 personaje');
+        assertEqual(tn('plurals.characterCount', 2), '2 personajes');
+        assertEqual(isRTL(), false);
+        await setLocale('en', { persist: false });
+    });
+
+    it('matches a regional Spanish browser preference to the shared Spanish catalogue', async () => {
+        await freshEnglish();
+        const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+        try {
+            Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { languages: ['es-MX'], language: 'es-MX' } });
+            assertEqual(detectBrowserLocale(), 'es');
+            await setLocale('auto', { persist: false });
+            assertEqual(getLocale(), 'es');
+        } finally {
+            if (descriptor) Object.defineProperty(globalThis, 'navigator', descriptor);
+            else delete globalThis.navigator;
+            await setLocale('en', { persist: false });
+        }
+    });
+});
+
 describe('i18n: DOM application', () => {
+    it('translates an inserted annotated root, not only its descendants', async () => {
+        await freshEnglish();
+        registerLocale({ code: 'zz', name: 'Test', nativeName: 'Test' }, { nav: { home: { label: 'Accueil' } } });
+        const el = fakeElement({ text: 'Home', attrs: { 'data-i18n': 'nav.home.label' } });
+        await setLocale('zz', { persist: false });
+        applyTranslations(el);
+        assertEqual(el.textContent, 'Accueil');
+    });
+
     it('translates text nodes and remembers the original English', async () => {
         await freshEnglish();
         registerLocale({ code: 'zz', name: 'Test', nativeName: 'Test' }, { nav: { home: { label: 'Accueil' } } });

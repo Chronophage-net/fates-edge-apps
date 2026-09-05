@@ -25,7 +25,13 @@ const fs = require('fs');
 const path = require('path');
 const security = require('../server/security.js');
 
-const { checkEventPermission, permissionDeniedMessage, GM_GATED_EVENTS, STORY_AUTHORITY_EVENTS } = security;
+const {
+    checkEventPermission,
+    permissionDeniedMessage,
+    GM_GATED_EVENTS,
+    STORY_AUTHORITY_EVENTS,
+    SPECTATOR_READ_EVENTS,
+} = security;
 
 const ALLOWED = null;
 const allowed = (event, role) => checkEventPermission(event, role) === ALLOWED;
@@ -111,6 +117,51 @@ describe('ordinary play is untouched', () => {
     });
 });
 
+describe('spectators are server-enforced read-only observers', () => {
+    test('the explicit public-query allow-list remains readable', () => {
+        for (const event of SPECTATOR_READ_EVENTS) {
+            assert.ok(allowed(event, 'spectator'), `${event} must remain readable to spectators`);
+        }
+    });
+
+    test('ordinary participation and shared-state writes are refused', () => {
+        const writes = [
+            'chat-message',
+            'roll-dice',
+            'character-select',
+            'claim-character',
+            'release-character',
+            'whiteboard-update',
+            'sync-state',
+            'state-updated',
+            'presence',
+            'voice-offer',
+            'voice-status',
+            'request_gm',
+            'role_change_request',
+            'turn-credentials-request',
+            'event',
+        ];
+        for (const event of writes) {
+            const denied = checkEventPermission(event, 'spectator');
+            assert.deepEqual(denied, { event, requires: 'participant' });
+        }
+    });
+
+    test('GM reference data and a repeated plain-WS handshake are refused', () => {
+        assert.ok(checkEventPermission('adventure-reference', 'spectator'));
+        assert.ok(checkEventPermission('adventure-reference-request', 'spectator'));
+        assert.ok(checkEventPermission('handshake', 'spectator'));
+    });
+
+    test('new or unknown events fail closed for spectators', () => {
+        assert.deepEqual(
+            checkEventPermission('future-feature-write', 'spectator'),
+            { event: 'future-feature-write', requires: 'participant' }
+        );
+    });
+});
+
 describe('the table and the handlers agree', () => {
     // Coverage guard. Both transports consult one table, but nothing
     // stops someone adding a new deck-* or adventure-* handler and
@@ -156,6 +207,40 @@ describe('the table and the handlers agree', () => {
                 `${f} must consult security.js's permission table`);
         }
     });
+
+    test('plain WebSocket cannot send room events while its async handshake is unresolved', () => {
+        const ws = read('ws-handlers.js');
+        assert.match(ws, /ws\.handshakeStarted = false/);
+        assert.match(ws, /!ws\.handshakeComplete && messageType !== 'ping'/);
+        assert.match(ws, /code: 'HANDSHAKE_REQUIRED'/);
+        assert.match(ws, /code: 'HANDSHAKE_ALREADY_STARTED'/);
+        assert.match(ws, /ws\.handshakeComplete = true/);
+        assert.ok(
+            ws.indexOf("code: 'HANDSHAKE_REQUIRED'") < ws.indexOf('const denied = checkEventPermission'),
+            'the handshake gate must run before ordinary event authorization/dispatch'
+        );
+    });
+
+    test('Socket.IO remembers a session-only Spectator role across same-connection rejoins', () => {
+        const io = read('socketio-handlers.js');
+        assert.match(io, /socket\.sessionRoomRoles = new Map\(\)/);
+        assert.match(io, /socket\.sessionRoomRoles\.get\(roomKey\) === 'spectator'/);
+        assert.match(io, /socket\.sessionRoomRoles\.set\(roomKey, assignedRole\)/);
+    });
+
+    test('account-authenticated REST room mutations enforce the same Spectator boundary', () => {
+        const api = read('api.js');
+        assert.match(api, /function requireRoomParticipant/);
+        assert.match(api, /code: 'SPECTATOR_READ_ONLY'/);
+        assert.match(
+            api,
+            /router\.post\('\/api\/rooms\/:code\/claim-character', requireAccountSupport, auth\.requireAuth, requireRoomParticipant/
+        );
+        assert.match(
+            api,
+            /router\.delete\('\/api\/rooms\/:code\/claim-character', requireAccountSupport, auth\.requireAuth, requireRoomParticipant/
+        );
+    });
 });
 
 describe('refusals explain themselves', () => {
@@ -168,6 +253,10 @@ describe('refusals explain themselves', () => {
         const gmOnly = permissionDeniedMessage(checkEventPermission('adventure-reset', 'player'));
         assert.match(gmOnly, /adventure-reset/);
         assert.match(gmOnly, /Co-GM/);
+
+        const spectator = permissionDeniedMessage(checkEventPermission('chat-message', 'spectator'));
+        assert.match(spectator, /Spectators can watch/);
+        assert.match(spectator, /chat-message/);
     });
 
     test('an allowed event produces no message', () => {

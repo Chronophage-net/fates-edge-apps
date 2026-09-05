@@ -28,6 +28,7 @@
 //   controller.onChange(cb)         -> returns an unsubscribe function
 //   controller.destroy()            -> optional cleanup
 
+import { t as i18nText } from '@core/i18n.js';
 import {
     TollVeilEngine, aiChooseBid, aiChoosePlay, legalPlaysForSeat,
     MIN_SEATS, MAX_SEATS, cardDisplay, TRICKS_PER_HAND, MAX_BID,
@@ -124,7 +125,7 @@ function injectStyle() {
         #tv-modal .tv-scroll::-webkit-scrollbar-thumb { background:#3a3b4a; border-radius:4px; }
         #tv-modal .tv-seat { border:1px solid var(--line); border-radius:8px; padding:8px 10px; min-width:110px; }
         #tv-modal .tv-seat.active { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
-        #tv-modal .tv-marker { display:inline-block; padding:2px 7px; border-radius:10px; font-size:11px; margin-left:4px; }
+        #tv-modal .tv-marker { display:inline-block; padding:2px 7px; border-radius:10px; font-size:11px; margin-inline-start:4px; }
         #tv-modal .tv-marker.on { background:var(--gold); color:#1a1400; font-weight:700; }
         #tv-modal .tv-marker.off { background:#2a2b38; color:var(--muted); }
     `;
@@ -140,8 +141,8 @@ function renderSetupScreen(root, onStart) {
     root.innerHTML = `
         <div style="text-align:center; color:var(--muted); font-size:13px; margin-bottom:10px;">Choose how to play.</div>
         <div style="display:flex; gap:8px; justify-content:center; margin-bottom:14px;">
-            <button class="tv-btn primary" id="tv-mode-passplay">👥 Pass &amp; Play</button>
-            <button class="tv-btn" id="tv-mode-vsai">🤖 Solo vs AI</button>
+            <button class="tv-btn primary" id="tv-mode-passplay" data-i18n="feature.kon-reh.toll-and-veil.passPlay">👥 Pass &amp; Play</button>
+            <button class="tv-btn" id="tv-mode-vsai" data-i18n="feature.kon-reh.toll-and-veil.soloVsAI">🤖 Solo vs AI</button>
         </div>
         <div style="display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:14px; font-size:13px; color:var(--muted);">
             <span>Seats:</span>
@@ -255,7 +256,7 @@ function renderGame(root, controller, closeFn) {
     root.innerHTML = `
         <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div>
-                <h2 style="color:var(--gold); margin:0; font-size:20px; letter-spacing:0.02em;">Toll &amp; Veil</h2>
+                <h2 style="color:var(--gold); margin:0; font-size:20px; letter-spacing:0.02em;" data-i18n="feature.kon-reh.toll-and-veil.tollVeil">Toll &amp; Veil</h2>
                 <span style="color:var(--muted); font-size:12px;">Target: ${view.winningScore} points · ${stakeLabel}</span>
             </div>
             <button class="tv-btn" id="tv-close">✕</button>

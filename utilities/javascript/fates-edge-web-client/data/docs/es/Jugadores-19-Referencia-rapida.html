@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — Guía del jugador — Referencia rápida (Español)</title>
+<style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+        h5 { font-size: 0.88rem; color: var(--text2); margin-top: 0.5rem; }
+        p.subtitle { color: var(--text2); margin-bottom: 1rem; font-size: 1rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        p { margin: 0.5rem 0; }
+        ul, ol { margin: 0.4rem 0 0.6rem 1.5rem; }
+        li { margin: 0.2rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.7rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.7rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+            text-align: center;
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .entry { margin: 0.8rem 0; }
+        .entry-title { font-weight: 700; color: var(--text); }
+        .card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.9rem;
+            margin: 0.6rem 0;
+        }
+        .card .fill { color: var(--text3); }
+        .spell {
+            background: var(--bg3);
+            border-left: 3px solid var(--purple);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.8rem;
+            margin: 0.5rem 0;
+        }
+        .spell .spell-name { font-weight: 700; color: var(--gold); }
+        .spell .spell-tags { color: var(--purple); font-family: monospace; font-size: 0.85rem; }
+        footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body><aside class="translation-notice" lang="es">Versión en español. Traducción asistida; revisión editorial integral pendiente. <a href="../players-guide/Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html" hreflang="en">Consultar el original en inglés</a></aside>
+<h1>Apéndice: Rápida Referencia</h1>
+<p class="subtitle">Fate's Edge Guía del jugador — Apéndice</p>
+<h2 id="player-tools-and-quick-reference">Herramientas del reproductor y referencia rápida</h2>
+<p>Este apéndice proporciona herramientas ligeras y fáciles de usar para rastrear el progreso del personaje, el estado de la campaña y las reglas de momento a momento. Imprimir, fotocopia o copiar a tarjetas de índice para su uso en la tabla.</p>
+<h3>Recomendaciones del rastreador físico</h3>
+<p>Muchos grupos encuentran que los rastreadores físicos, táctiles aceleran el juego y reducen la carga mental.</p>
+<ul>
+<li><strong>chips de póker o cuentas de cristal</strong> Bonos y Puntos narrativos (SB). <em>Mantenga un pequeño tazón de fichas en el centro de la mesa — gastar y ganar visiblemente.</em></li>
+<li><strong>Tablas de secado o láminas laminadas</strong> para temporizadores (4/6/8 círculos de segmento). <em>Usa un marcador de lana húmeda; dibuja un nuevo temporizador cada escena.</em></li>
+<li><strong>Tarjetas de índice (3×5</strong> para recursos y seguidores. <em>Escriba el nombre recurso, uso libre y aumento en un lado; voltee cuando se utiliza.</em></li>
+<li><strong>Pincclips coloreados o clips de carpeta</strong> sobre las hojas de personajes para Fatiga y Daño pistas. <em>Deslice el clip hacia arriba o hacia abajo — no borrando.</em></li>
+<li><strong>Ruedas para imprimir “timer”</strong> (un círculo dividido en 4/6/8 cuñas) colocado dentro de una página protector. <em>Marcar cuñas con un marcador de la era seca, borrar con tejido.</em></li>
+<li><strong>D10 dados</strong> para rastrear los modificadores temporales (Posición, Efecto o Momentum). <em>Coloque la muerte al lado del rastreador relevante y cosquillese hacia arriba o abajo.</em></li>
+</ul>
+<h3>Índice de Resolución Tarjeta</h3>
+<div class="card">
+<p><strong>Declare → DJ sets DV y Posición → tirada Atributo + Habilidad en d10 → contar.</strong></p>
+<p>Cada uno <strong>6–9</strong> es el éxito 1. <strong>10</strong> 2. Cada signo <strong>1</strong> DJ 1 SB.</p>
+<p>Compare los éxitos (S) a la promesa <strong>DV</strong>:</p>
+<p>S ≥ DV, no 1s → <strong>Éxito limpio</strong><br/>
+S ≥ DV, uno o más 1s → <strong>Éxito con SB</strong> — lo entiendes, el mundo empuja hacia atrás<br/>
+0 &lt; S &lt; DV → <strong>Resultado parcial</strong> — progreso, no llegada; + 1 Bono<br/>
+S = 0 → <strong>Fallo</strong> — falla y empeora; + 2 Bonos</p>
+<p><strong>DV</strong> 2 rutina • 3 predeterminado • 4 duro • 5 + extremo. <strong>Posición</strong> Dominante (re-rollar un fallo) / Controlado / Desesperado (re-rollar un éxito).</p>
+<p><strong>SB</strong> es la piscina de DJ: complicaciones, escalada, timers.</p>
+</div>
+<h3>Fatiga y Daño</h3>
+<div class="card">
+<p><strong>Fatiga:</strong> <span class="fill">________</span> (Máx. = Cuerpo)<br/>
+<strong>Estrado mental:</strong> <span class="fill">________</span><br/>
+<strong>Daño:</strong> [ ] Daño 1 (− 1 morir, acciones relacionadas] [ ] Daño 2 (− 1 morir, la mayoría de las acciones) [ ] Daño 3 (incapacitado o moribundo)</p>
+<p>Cuando las pistas se llenan:</p>
+<ul>
+<li>Fatiga desbordamiento → aumento Daño por 1, claro Fatiga.</li>
+<li>El estrecho mental → causa inestabilidad o desventaja.</li>
+<li>Daño 3 → Reclamación del último Stand o Patron (véase “Muerte del personaje de jugador opcional” en las reglas básicas).</li>
+</ul>
+</div>
+<h3>SB y Momentum Tracking genes</h3>
+<div class="card">
+<p><strong>Actual SB (DJ piscina):</strong> <span class="fill">______</span><br/>
+<strong>Momentum (bomba de fiesta, opcional — Ch.18:</strong> <span class="fill">______</span> (máx 2 bancario por sesión)<br/>
+<strong>Usado esta sesión:</strong> <span class="fill">______</span></p>
+</div>
+<h3>Progresión de talentos</h3>
+<div class="table-wrap">
+<table>
+<tr><th>XP Costo</th><th>Tipo de talento / Impacto</th></tr>
+<tr><td>2–3 XP</td><td>Minor Talent — un bono situacional, un truco de firma</td></tr>
+<tr><td>4–6 XP</td><td>Mayor Talento — una especialización, un fuerte efecto permanente</td></tr>
+<tr><td>7–10 XP</td><td>Prestige Talent — campaña-definición, generalmente cerrado detrás de un requisito</td></tr>
+<tr><td colspan="2"><em>Los talentos de acceso mágico se valoran individualmente:</em> Familiar 2 • Pact-Whisperer 2 • Lesser Pactwright 2 • Codex 4 • El símbolo del patrón 4 • Spellcraft 6 • Sendero del Cantor 8</td></tr>
+</table>
+</div>
+<h3>Carte de objetivos de personaje</h3>
+<div class="card">
+<p><strong>Nombre:</strong> <span class="fill">____________</span><br/>
+<strong>Motivación central:</strong> <span class="fill">____________</span><br/>
+<strong>Objetivo a corto plazo (1–2 sessions):</strong> <span class="fill">____________</span><br/>
+<strong>Objetivo a largo plazo (arc):</strong> <span class="fill">____________</span><br/>
+<strong>Conclusión de fondo:</strong> <span class="fill">____________</span><br/>
+<strong>Relación que importa:</strong> <span class="fill">____________</span></p>
+</div>
+<p><em>Consejo físico:</em> Imprima esta tarjeta en cardstock, dobla en la mitad, y ponla delante de ti como un recordatorio.</p>
+<h3>Faction Attitude Cardiera</h3>
+<div class="card">
+<p><strong>Nombre de la Facción:</strong> <span class="fill">_________</span><br/>
+Attitud: −3 −2 −1 0 +1 +2 +3<br/>
+Notas: <span class="fill">____________________</span></p>
+</div>
+<h3>Tarjeta de orientación del jugador (Principios rápidos)</h3>
+<div class="card">
+<p><strong>1. Declara una acción audaz</strong> — Conducir la ficción hacia adelante.<br/>
+<strong>2. Aceptar las consecuencias</strong> — Las complicaciones crean historia.<br/>
+<strong>3. Spend Puntos narrativos</strong> — Hacer momentos importan.<br/>
+<strong>4. Use Bonos</strong> — Re-rollar, mejorar la posición, activar recursos.<br/>
+<strong>5. Compartir el Spotlight</strong> — Ayuda, vínculo, establecer aliados.</p>
+</div>
+<h3>Clase / Arquetipo Recursos Referencia rápida</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Arquetipo</th><th>Recurso principal</th></tr>
+<tr><td>Fighter / Warrior multilaterales</td><td>Maniobras, Fatiga, Weapon Mastery</td></tr>
+<tr><td>Rogue / Exploración</td><td>Posicionamiento, Stealth, Backstab</td></tr>
+<tr><td>Caster (forma libre)</td><td>Spellcraft, Elemental Tags, Repercusión</td></tr>
+<tr><td>guardián de runas</td><td>Ritos, Obligación, Codex cobra</td></tr>
+<tr><td>Invocadores</td><td>Rituales, Símbolo de Patron, Atrapa el Sealismo</td></tr>
+<tr><td>Cantor</td><td>Canciones, temporizador de corrupción, Repertoire</td></tr>
+<tr><td>Invocador</td><td>Leash Timer, Spirit vínculo, Pacto</td></tr>
+</table>
+</div>
+<h3>Cómo participar con el DJ (Player Prompts)</h3>
+<ul>
+<li><strong>Pregunta:</strong> “¿Qué necesito para tirar los dados?” — conseguir el DV y la Posición.</li>
+<li><strong>Proponer:</strong> “ ¿Puedo pasar SB para lograr X?” — negociar impulsos narrativos.</li>
+<li><strong>Declarar:</strong> “ Aquí está mi intención y método.” — siempre declara lo que quieres pasar.</li>
+<li><strong>Oferta:</strong> “ Voy a tomar una complicación si Y sucede.” — invitar a Bargains de Devil.</li>
+<li><strong>Aclarar:</strong> “¿Qué hay en riesgo si fallo?” — conoce las apuestas antes de tirar los dados.</li>
+</ul>
+<h3>tiempo entre aventuras Project Tracker genes</h3>
+<div class="card">
+<p><strong>Nombre:</strong> <span class="fill">___________</span>    <strong>Segmentos:</strong> [ ] [ ] [ ] [ ] [ ] [ ]<br/>
+<strong>Objetivo:</strong> <span class="fill">___________</span><br/>
+<strong>Obstáculos / Recursos Necesitados:</strong> <span class="fill">________</span></p>
+</div>
+<p><em>Consejo físico:</em> Usar un temporizador de pizarra de pizarra 6-segment. Cada vez que se invierte, borrar un segmento y tirar los dados para el progreso.</p>
+<h3>¿Qué Consequencia Aceptas? (Menu para DJ)</h3>
+<p>Cuando un jugador falla o tiene éxitos parciales, el DJ puede ofrecer una opción de esta lista (o inventar una personalizada):</p>
+<ul>
+<li>Daño (nivel 1 o 2</li>
+<li>Fatiga (1 o 2</li>
+<li>Perdido ventaja (la pobreza empeora, un tiempo avanza)</li>
+<li>Retrasos del tiempo (una garrapata del tiempo, un plazo ajusta)</li>
+<li>Exposición / Calor (atención de enemigos, recompensa)</li>
+<li>Recurso (supply timer tick, engranaje comprometido)</li>
+<li>Estreno de relaciones (una actitud de unión o de facción empeora)</li>
+</ul>
+<h3>Maneras de brillar en Fate's Edge</h3>
+<ul>
+<li>Tie actions to your drives and backstory — invoke your Background Bono.</li>
+<li>Ofrezca complicaciones y acepte — ganar Bonos.</li>
+<li>Pasar SB para escalar o transformar la escena — hacer el fracaso memorable.</li>
+<li>Utilice su recurso de clase temprano y a menudo — no acapara.</li>
+<li>Conecta escenas a temas de campaña — nombre de la facción o lugar.</li>
+<li>Haz que otros personajes se vean geniales — asistir, configurar, pasar el foco.</li>
+</ul>
+<h3>Tarjetas de índice de jugadores de blanco (para notas rápidas)</h3>
+<div class="card" style="text-align:center;">Nombre / Bonos / Fatiga / Daño</div>
+<div class="card" style="text-align:center;">Timers / Obligación / Notas de escena</div>
+<h3>Reminder final</h3>
+<p><strong>Su ficha de personaje no es su personaje.</strong> Es una herramienta para ayudarte a expresar quiénes han sido, a quién se están convirtiendo, y cómo sus opciones cambian el mundo.</p>
+<p>Utilice estas herramientas para hacer que esa expresión sea vívida, consecutiva y memorable.</p>
+<h2 id="magic-systems-reference">Referencia de sistemas de magia</h2>
+<p>La magia en Fate's Edge es plural. Diferentes tradiciones canal de poder a través de diferentes estructuras metafísicas, pero todos obedecen la misma verdad:</p>
+<blockquote><em>El poder tiene un costo, y la magia forma al que lo controla.</em></blockquote>
+<p>Este apéndice proporciona herramientas de referencia rápida para los jugadores usando sistemas afiliados a la magia, talismanos, ritos y prácticas ocultas.</p>
+<h3>Principios mágicos básicos</h3>
+<div class="card">
+<ul>
+<li>Magic expresa <strong>identidad y creencias</strong>.</li>
+<li>Casting siempre crea <strong>consecuencias en algún lugar</strong>.</li>
+<li>La magia reescribe la realidad a través de <strong>intención, estructura, o sacrificio</strong>.</li>
+<li>Energía excesiva erodeslizantes <strong>elección</strong> (ver Iconic Ascension sidebar en las reglas completas).</li>
+</ul>
+</div>
+<h3>Referencia universal de fundición</h3>
+<div class="card">
+<p><strong>Plantilla de Declaración de Castigo:</strong></p>
+<ol>
+<li><strong>Intención</strong> — ¿Qué cambio buscas?</li>
+<li><strong>Forma</strong> — ¿Cómo lo expresa su tradición?</li>
+<li><strong>Costo</strong> — ¿Qué es lo que se arriesga o expulsa?</li>
+<li><strong>Resolución</strong> — Test; aplicar reglas de Posición/Efecto.</li>
+<li><strong>Reflujo</strong> — Mark Fatiga, SB presión, tabú, inestabilidad o negociación.</li>
+</ol>
+</div>
+<h3>Magic Tradition Quick Referencia</h3>
+<div class="entry">
+<p class="entry-title">Arcana libre (hechicería)</p>
+<p><em>Creativos, racionales, deliberados.</em> Herramientas: Glyphs, estructuras, metáforas. Costos: Fatiga, realidad recoil, SB inestabilidad. <strong>Jugar Cue:</strong> Diagrama tu hechizo o declara su simbolismo. Grandes hechizos distorsionan el destino — aceptar SB picos.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Innato Arcana (Sorcería)</p>
+<p><em>Emocional, instintivo, ligado a la sangre.</em> Herramientas: Respiración, impulso, resonancia. Costos: Fatiga, retrolash impredecible. <strong>Jugar Cue:</strong> Trate la magia como un reflejo. Empuja tus límites — esperan consecuencias.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Invocación (Priest / Paladin / Medium)</p>
+<p><em>Petición, oración, pacto, rite.</em> Herramientas: Símbolos, votos, lugares de poder. Costos: Presiones de tabú, temporizadores de obligaciones. <strong>Jugar Cue:</strong> Su magia no es su propio — enmarcarlo como una petición. Violar su ethos dibuja consecuencias.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Consagración Runica (Runekeeping)</p>
+<p><em>Métodos, sellos, contratos.</em> Herramientas: Pasos rituales, códices, cláusulas vinculantes. Costos: Temporizadores de hambre, bucles de escalada. <strong>Jugar Cue:</strong> La magia es <em>procedimiento</em>. Esperar que el sistema retroceda.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Transformación / poder druídico</p>
+<p><em>Resonancia con lugar, elemento, ciclo.</em> Herramientas: Marcas, ofrendas, ritos estacionales. Costos: eco ambiental, consecuencia territorial. <strong>Jugar Cue:</strong> Declarar lo que la tierra quiere — entonces negociar.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Pauta de fijación (Warlock / Avatar)</p>
+<p><em>Cambio, hambre, transformación.</em> Herramientas: Tokens, firmas, marcas de reflexión. Costos: Autonomía, riesgo de ascensión. <strong>Jugar Cue:</strong> Pregunta: “¿Qué obtiene mi patrón?” La deuda se convierte en parcela.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Invocación (Medium / Necromancer / Shaman)</p>
+<p><em>Invocación de entidades, vinculantes, acción vasalla.</em> Herramientas: Círculos, gangas, linternas, llamadas ancestrales. Costos: Temporizadores de atención, riesgo de violación. <strong>Jugar Cue:</strong> Dar a la llamada una personalidad — su ayuda viene con demandas.</p>
+</div>
+<h3>Reglas Mutuas de Costo Mágico</h3>
+<p style="text-align:center;"><strong>Ninguna magia es gratis.</strong></p>
+<div class="table-wrap">
+<table>
+<tr><th>Costo tipo</th><th>Ejemplos en Play construct</th></tr>
+<tr><td>Fatiga</td><td>Oleaje de agotamiento, foco de agitación, cuerpo de cepa</td></tr>
+<tr><td>SB Presión</td><td>DJ provoca complicaciones o temporizadores (retrofacciónelemental, Patron omens)</td></tr>
+<tr><td>Taboo / Obligación</td><td>Mandamientos, ritos, castigo por mal uso, Patron exige</td></tr>
+<tr><td>Atención / Backwash</td><td>Los Espíritus notan; garrapatas del libro de ledes cósmicos; conciencia de la facción</td></tr>
+<tr><td>Anomalía / Distorsión</td><td>Lugares reaccionan, verrugas de realidad, rituales eco — etiquetas de escena cambian valores</td></tr>
+<tr><td>Erosión de identidad</td><td>Actos compelidos, inclinación de alineación, riesgo de ascensión Iconic</td></tr>
+</table>
+</div>
+<h3>Sinergias de sistema cruzado</h3>
+<p>Todos los sistemas mágicos pueden mezclarse. Un guardián de runas puede emular a un Cleric o Druid; un Invoker puede operar como un Paladín o Profeta; un Sorcerer puede parecer como una Bruja, Elementalista, o Psion.</p>
+<p>Al combinar sistemas:</p>
+<ol>
+<li>Elija su <strong>principal expresión</strong> (creencia, intelecto, instinto, ritual).</li>
+<li>Describir hechizos a través de esa lente.</li>
+<li>Dejar que los costos reflejen su sistema.</li>
+<li>Rastrear las consecuencias por separado — los sistemas de mezcla aumenta el riesgo.</li>
+</ol>
+<h3>DJ Recordatorios para Magic ganancias</h3>
+<ul>
+<li>Magic crea la historia — recompensa su uso con consecuencias e impulso.</li>
+<li>Los jugadores deben narrar el método, no sólo efecto.</li>
+<li>Los grandes momentos deben cambiar escenas, no sólo números.</li>
+<li>La magia debe tentar a la castra — hacer eco de sus impulsos y fallas.</li>
+</ul>
+<h3>Recordatorios de jugadores para Magic inminente</h3>
+<ul>
+<li>Inclinar en el costo — la magia se siente significativa cuando duele.</li>
+<li>Hacer magia personal — describir cómo se ve y se siente.</li>
+<li>Vincula los poderes a la identidad, las creencias, el trauma, el deber o el legado.</li>
+<li>Deja que la magia cambie tu personaje con el tiempo.</li>
+</ul>
+<h2 id="pre-made-spells-with-tags-and-dv-math">Palabras pre-hechadas con TAGS y DV Matemáticas</h2>
+<p>Los siguientes ejemplos ilustran cómo el escalado TAGS, DV y la intención del hechizo interactúan dentro del sistema de fundición. Úsalos como inspiración o como plantillas para tus propios hechizos.</p>
+<h3>Cómo leer un Spell Entry</h3>
+<p>Cada entrada incluye:</p>
+<ul>
+<li><strong>Nombre</strong> y <strong>Tradición</strong> (opcional)</li>
+<li><strong>ETIQUETAS</strong> — los componentes que definen el efecto.</li>
+<li><strong>Efecto</strong> — resultado de lenguaje simple.</li>
+<li><strong>DV</strong> — cálculo base (1 + número de TAGS; etiquetas peligrosas añadir +2).</li>
+<li><strong>Notas</strong> — rango típico, duración o consideraciones especiales.</li>
+</ul>
+<h3>Tier I: Menor Utilidad (DV 2–3</h3>
+<div class="spell">
+<p class="spell-name">Luz sencilla <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Luz)</span></p>
+<p class="spell-tags">[ILLUMINATE]</p>
+<p><strong>Efecto:</strong> Crear una pequeña luz sostenida (torch-brightness) para la escena.<br/>
+<strong>DV:</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notas:</strong> No hay riesgo de reacción; dura hasta que se despide.</p>
+</div>
+<div class="spell">
+<p class="spell-name">HEAL Menor Wounds tienden <span class="text-muted" style="color:var(--text3);font-weight:400;">(Vida + HEAL)</span></p>
+<p class="spell-tags">[HEAL]</p>
+<p><strong>Efecto:</strong> Cierre un pequeño corte o moretón; reduzca 1 Fatiga (Minor).<br/>
+<strong>DV:</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notas:</strong> Requiere tocar.</p>
+</div>
+<div class="panel panel-orange">
+<h4>Sanación Daño y Fatiga</h4>
+<p><strong>Calentar como un Cantrip.</strong> El <code>HEAL</code> etiqueta (Vida) se puede fundir como un cantrip de una sola acción (DV 2). <strong>1 Fatiga</strong> esto no puede sanar Daño.</p>
+<p><strong>Sanación Daño (1 nivel).</strong> Para restaurar un nivel de Daño, usted debe incluir la <code>HEAL</code> etiqueta y bien:</p>
+<ul>
+<li>añadir a <strong>+ 2 DV modificador</strong> al hechizo, o</li>
+<li>combinar <code>HEAL</code> con una segunda etiqueta apropiada (por ejemplo, <code>Purify</code>, <code>Strengthen</code>, <code>Cleanse</code>).</li>
+</ul>
+<p>El DJ establece el final DV basado en las etiquetas y la gravedad de la herida.</p>
+<p><em>¿Por qué?</em> Fatiga es el agotamiento — un encanto rápido puede aliviar los músculos cansados. Daño es la lesión — las heridas de cierre demanda más poder y riesgo. Esto mantiene la curación significativa sin abrumar la resistencia marcial.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Mensaje sobre Wind <span class="text-muted" style="color:var(--text3);font-weight:400;">(Aire + Velo)</span></p>
+<p class="spell-tags">[WHISPER]</p>
+<p><strong>Efecto:</strong> Llevar un breve mensaje susurrado 100 pies sobre corrientes de viento.<br/>
+<strong>DV:</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notas:</strong> Comunicación de un solo sentido; 30 duración de segundos.</p>
+</div>
+<h3>Tier II: Combat Utility (DV 3–4</h3>
+<div class="spell">
+<p class="spell-name">Blade Flame avance <span class="text-muted" style="color:var(--text3);font-weight:400;">(Fuego + Golpe)</span></p>
+<p class="spell-tags">[BURNING] [STRIKE]</p>
+<p><strong>Efecto:</strong> Coat un arma en fuego, añadiendo + 1 Daño y [BURN] al siguiente ataque de melee.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notas:</strong> Dura un intercambio.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Escudo de Aire Libre <span class="text-muted" style="color:var(--text3);font-weight:400;">(Aire + Muro)</span></p>
+<p class="spell-tags">[WARD] [DEFEND]</p>
+<p><strong>Efecto:</strong> Crear una barrera de aire comprimido; ganar Posición +1 en la siguiente defensa.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notas:</strong> Un solo uso.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Paso veloz <span class="text-muted" style="color:var(--text3);font-weight:400;">(Aire + Salto)</span></p>
+<p class="spell-tags">[HASTE] [MOVE]</p>
+<p><strong>Efecto:</strong> Doble velocidad de movimiento para un intercambio.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notas:</strong> Requiere zona abierta.</p>
+</div>
+<h3>Tier III: Control de área (DV 4–5)</h3>
+<div class="spell">
+<p class="spell-name">Muro de Piedra <span class="text-muted" style="color:var(--text3);font-weight:400;">(Tierra + Wall)</span></p>
+<p class="spell-tags">[BARIER] [FORTIFY]</p>
+<p><strong>Efecto:</strong> Invocar un muro de piedra 10-pie (cerca; duración de la escena).<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Peligroso DV:</em> <strong>4</strong> (bloqueo de combate).<br/>
+<strong>Notas:</strong> Proporciona cobertura; obstruye el movimiento.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Gentle táctil del sueño <span class="text-muted" style="color:var(--text3);font-weight:400;">(Agua + Mente)</span></p>
+<p class="spell-tags">[DREAM] [COMMAND]</p>
+<p><strong>Efecto:</strong> Un objetivo se queda dormido (duración de la escena; Resistir: Espíritu + Insight DV 2).<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Peligroso DV:</em> <strong>4</strong> (consumo de combate).<br/>
+<strong>Notas:</strong> Daño despierta objetivo.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Manto de llamas <span class="text-muted" style="color:var(--text3);font-weight:400;">(Fuego + Área)</span></p>
+<p class="spell-tags">[BURNING] [AREA]</p>
+<p><strong>Efecto:</strong> 6-pie radio de calor intenso; los enemigos sufren −1 mueren para acercarse.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Peligroso DV:</em> <strong>4</strong> (si los aliados están cerca).<br/>
+<strong>Notas:</strong> Crea terreno difícil.</p>
+</div>
+<h3>Tier IV: Battlefield Shaping (DV 5–6</h3>
+<div class="spell">
+<p class="spell-name">El Tremor Tierra <span class="text-muted" style="color:var(--text3);font-weight:400;">(Tierra + Fuerza)</span></p>
+<p class="spell-tags">[QUAKE] [AREA]</p>
+<p><strong>Efecto:</strong> 20-pie tremor; enemigos prueban Cuerpo + Atléticos (DV 3) o caída prone.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Peligroso DV:</em> <strong>5</strong>.<br/>
+<strong>Notas:</strong> Destabiliza las estructuras; afecta a todos en la zona.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Furia de tormenta <span class="text-muted" style="color:var(--text3);font-weight:400;">(Aire + Tormenta)</span></p>
+<p class="spell-tags">[STORM] [AREA] [FORCE]</p>
+<p><strong>Efecto:</strong> 30-pie nube de tormenta; el relámpago golpea objetivos aleatorios (Daño 2).<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>. <em>Peligroso DV:</em> <strong>6</strong>.<br/>
+<strong>Notas:</strong> Última escena; reduce la visibilidad.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Círculo de curación <span class="text-muted" style="color:var(--text3);font-weight:400;">(Vida + Área)</span></p>
+<p class="spell-tags">[HEAL] [AREA] [CLEANSE]</p>
+<p><strong>Efecto:</strong> Allies in 15-foot radius heal 1 Daño and clear 1 Fatiga.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notas:</strong> Mayor efecto positivo justifica alta DV.</p>
+</div>
+<h3>Tier V: Efectos de Dominio-Nivel (DV 5)</h3>
+<div class="spell">
+<p class="spell-name">Puerta de paso <span class="text-muted" style="color:var(--text3);font-weight:400;">(Aire + Pliegue)</span></p>
+<p class="spell-tags">[GATE] [TRANSPORT] [AREA]</p>
+<p><strong>Efecto:</strong> Abrir un portal de dos vías 20 pies de ancho que unen dos ubicaciones.<br/>
+<strong>DV:</strong> 1 + 2 + 1 + 1 = <strong>5</strong>. <em>Peligroso DV:</em> <strong>7</strong>.<br/>
+<strong>Notas:</strong> Requiere concentración; puede desestabilizar.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Ejército de Piedra <span class="text-muted" style="color:var(--text3);font-weight:400;">(Tierra + Summon)</span></p>
+<p class="spell-tags">[CONJURE] [AREA] [GUARD]</p>
+<p><strong>Efecto:</strong> Invocar a los guardianes de piedra 4 (Cap 2) para seguir simples comandos.<br/>
+<strong>DV:</strong> 1 + 2 + 1 + 1 = <strong>5</strong>. <em>Peligroso DV:</em> <strong>6</strong>.<br/>
+<strong>Notas:</strong> Duración de la escena; concentración.</p>
+</div>
+<div class="spell">
+<p class="spell-name">La mente Dominion prevalece <span class="text-muted" style="color:var(--text3);font-weight:400;">(Destino + Mente)</span></p>
+<p class="spell-tags">[COMMAND] [AREA] [CURSE]</p>
+<p><strong>Efecto:</strong> Todos los enemigos en 25-pie prueba de radio Espíritu + Insight (DV 4) o obedecen un solo comando.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 2 = <strong>5</strong>. <em>Peligroso DV:</em> <strong>7</strong>.<br/>
+<strong>Notas:</strong> Riesgo ético significativo; probablemente retroceso.</p>
+</div>
+<h3>Firma / Palabras personales (Custom)</h3>
+<div class="spell">
+<p class="spell-name">El guardián vínculo <span class="text-muted" style="color:var(--text3);font-weight:400;">(Vida + Bind) — Sanación Cantor</span></p>
+<p class="spell-tags">[HEAL] [BIND] [GUARD]</p>
+<p><strong>Efecto:</strong> Curar 2 Daño y enlazar el caster al blanco — el siguiente Daño que toman, el caster sufre 1 en su lugar.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notas:</strong> Protección Sacrifica.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Paso de la sombra <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Veil) — Trickster Patrón</span></p>
+<p class="spell-tags">[VEIL] [MOVE] [LEAP]</p>
+<p><strong>Efecto:</strong> Convertirse en invisible y teleport 30 pies; ganar +2 dados a la siguiente acción de Stealth.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notas:</strong> Requiere sombra o luz dim.</p>
+</div>
+<div class="spell">
+<p class="spell-name">La verdad de la forja <span class="text-muted" style="color:var(--text3);font-weight:400;">(Fuego + Revelar) — Fabricación del artífice</span></p>
+<p class="spell-tags">[REVEAL] [HEAL] [FORTIFY]</p>
+<p><strong>Efecto:</strong> Ver defectos en un objeto y reparación como si 2 Niveles de habilidad superiores (escena).<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notas:</strong> Funciona en objetos mágicos (con riesgo).</p>
+</div>
+<h3>Repercusión y Empujar las directrices específicas</h3>
+<h4>Repercusión Ejemplos de Tier genes</h4>
+<ul>
+<li><strong>Nivel I–II:</strong> fatiga menor, breve efecto elemental (moke, chill, static).</li>
+<li><strong>Nivel III–IV:</strong> Daño 1, condición temporal, peligro ambiental.</li>
+<li><strong>Tier V: avance</strong> Daño 2, condición principal, cambio ambiental significativo.</li>
+</ul>
+<h4>Opciones de empuje (Acelerar o amplificar)</h4>
+<ul>
+<li><strong>+1 Efecto:</strong> Aumentar el radio, la duración o potencia un paso.</li>
+<li><strong>+1 muere:</strong> Mejorar el tirada de fundición (costo: + 1 Fatiga).</li>
+<li><strong>Instantáneo:</strong> Resolver inmediatamente (coste: +1 Daño).</li>
+<li><strong>Sostenimiento:</strong> Mantener el efecto con la concentración (+1 Fatiga/round).</li>
+</ul>
+<p>Este marco proporciona ejemplos de hechizos concretos y demuestra cómo el escalado TAGS, DV y la ambición interactúan dentro del sistema mágico.</p>
+<h2 id="free-casting-tags-system">Casting libre (TAGS System)</h2>
+<p>Algunas casters forman fuerzas crudas a través de gramática arcana compartida conocida como <strong>ETIQUETAS</strong>. Construir un hechizo en la tabla usando una frase corta de TAGS.</p>
+<h3>Estructura de salto</h3>
+<p><strong>Intención</strong> + <strong>Objetivo</strong> + <strong>Etiquetas</strong> = efecto. Ejemplo: <em>“Desato Quemar • Zona • Fuerza contra los marauders.”</em></p>
+<h3>Valor de dificultad de base (DV)</h3>
+<p style="text-align:center;font-size:1.05rem;"><strong>DV = 1 + número de TAGSMOS</strong></p>
+<p>TAGS peligrosos (Teleportación, Transformación, Dominación) añadir + 2 DV en lugar de +1.</p>
+<h3>Rolling Rolling</h3>
+<p>Tirar <strong>Ingenio +</strong> (o similar). El éxito = ortografía. Fallo o cualquier 1 = Repercusión.</p>
+<h3>Repercusión para Casters Libres</h3>
+<p>Elija uno:</p>
+<ul>
+<li>Daño 2 (Arcane)</li>
+<li>+ 2 Fatiga</li>
+<li>Corrupción +1</li>
+<li>Efecto secundario catastrófico (DJ describe)</li>
+</ul>
+<p>Si el hechizo incluye un “Dangerous” TAG, Repercusión dispara sobre prendas <em>mixto</em> resultados también.</p>
+<h3>Biblioteca TAG (Abridged)</h3>
+<div class="table-wrap">
+<table>
+<tr><th>TAG Categoría</th><th>Ejemplos</th></tr>
+<tr><td>Elemental</td><td>Quemaduras, Freezing, Storm, Stone, Wave, Wind, Earth, Fire, Water, Air, Lightning, Ash inevitable</td></tr>
+<tr><td>Fuerza</td><td>Fuerza, área, huelga, pared, borda, disip, empuje, tira, cepillo, escudo</td></tr>
+<tr><td>Mente &amp; Veil penetra</td><td>Veil, Scry, Memory, Command, Miedo, Glamour, Dream, Whisper, Reveal, Esconder confianza</td></tr>
+<tr><td>La vida &amp; Cuerpo inminente</td><td>HEAL, Purify, Strengthening, Waken, Beast, Heal, Poison, Rot, Numb, Sicken hábitos</td></tr>
+<tr><td>Space &amp; Motion (dangerous, + 2 DV</td><td>Salto, Doblado, Puerta, Gravedad, Fase, Teleport, Blink, Anchor determinación</td></tr>
+<tr><td>Creación &amp; Transformación (dangerous, + 2 DV)</td><td>Crea, Invoca, Transmute, Animate, Conjure, Forma, Injerto, Fleshcraft</td></tr>
+<tr><td>Ilusión &amp; Decepción</td><td>Mirage, Echo, Máscara, Copia, Fantasma, Glimmer</td></tr>
+<tr><td>Protección &amp; Warding select</td><td>Ward, Defend, Seal, Barrier, Santuario, Negate vencer</td></tr>
+<tr><td>Tiempo (raro, peligroso, + 2 DV</td><td>Rápido, lento, alto, rebobinado, edad</td></tr>
+<tr><td>Curse &amp; Hex ganancias</td><td>Maldición, Jinx, Bind, Misfortune, Taint, Corrupt consistente</td></tr>
+<tr><td>Información</td><td>Saber, Sentido, Localizar, Recordar, Traducir</td></tr>
+</table>
+</div>
+<h3>Ejemplo de los discursos por DV</h3>
+<ul>
+<li><strong>Ligera</strong> [Iluminar] — DV 2 (1 etiqueta)</li>
+<li><strong>Mensaje sobre Wind</strong> [Susurro] — DV 2</li>
+<li><strong>Escudo de Aire Libre</strong> [Protección] [Defensa] — DV 3</li>
+<li><strong>Manto de llamas</strong> [Quemar] [Área] — DV 3</li>
+<li><strong>Muro de Piedra</strong> [Barrier] [Fortificar] — DV 3 (dos etiquetas), o DV 4 si las reglas DJ combaten el bloqueo como peligrosas ganancias</li>
+<li><strong>Teletransportar</strong> [Salto] [Veil] — [Salto] solo ya es una etiqueta peligrosa (+2), así que total DV 3 en lugar de la naiva 1 + 2 + 1 = 4</li>
+</ul>
+<footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Utilizado con permiso, Todos los derechos reservados.</footer>
+</body>
+</html>
+

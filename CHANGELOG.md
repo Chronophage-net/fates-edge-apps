@@ -5,11 +5,14 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 
 ## [5.0.10] - 2026-09-04
 
+### Fixed
+- Enforce Spectator read-only status on both socket transports, restore saved Spectator roles on reconnect, and hold plain-WebSocket room events until role resolution completes.
+
 ### Other
 - Copy quality pass
 - Updated HTML and JSON files.
 - Add workflow to delete GitHub Actions caches
-- Localization preperation
+- Completed first-party interface localization extraction, with a 2,593-key English catalogue, LTR and RTL pseudolocales, logical-direction layout, strict coverage/audit reports, and translator tooling.
 
 ## [5.0.9] - 2026-09-02
 
@@ -571,4 +574,3 @@ Crafting decay/forage-limit system tied to GM Downtime (Faction Turn), CSS modul
 - Actual tests
 - Repo hygiene: fix .gitignore (stale paths, env/venv split, *.db), untrack campaigns.db, drop stray fs npm-security-placeholder dependency
 - Updated manifest
-

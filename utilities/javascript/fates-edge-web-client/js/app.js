@@ -11,6 +11,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { initMediaModule } from './core/media.js';
 import { APP_VERSION, applyDisplayedVersion } from './core/version.js';
 import './core/highlight-tags.js';
@@ -51,7 +52,7 @@ function initializeRouter() {
 
 function onUnlockSuccess() {
     console.log('🔓 Toolkit unlocked');
-    showToast('Welcome back!', 'success');
+    showToast(i18nText("feature.app.welcomeBack", null, "Welcome back!"), 'success');
     initializeRouter();
 }
 
@@ -91,13 +92,13 @@ async function init() {
             onSave((status) => {
                 saveStatus.className = 'saved-indicator';
                 if (status === 'saving') {
-                    saveStatus.textContent = '○ Saving…';
+                    saveStatus.textContent = i18nText("feature.app.saving", null, "○ Saving…");
                     saveStatus.classList.add('saving');
                 } else if (status === 'saved') {
-                    saveStatus.textContent = '● Saved';
+                    saveStatus.textContent = i18nText("feature.app.saved", null, "● Saved");
                     saveStatus.classList.add('saved');
                 } else {
-                    saveStatus.textContent = '⚠ Error';
+                    saveStatus.textContent = i18nText("feature.app.error", null, "⚠ Error");
                     saveStatus.classList.add('error');
                 }
             });
@@ -153,7 +154,7 @@ async function init() {
         console.log(`✅ Fate's Edge Toolkit v${APP_VERSION} — Ready`);
     } catch (error) {
         console.error('❌ Failed to initialize app:', error);
-        showToast('Failed to initialize application. Please refresh.', 'error');
+        showToast(i18nText("feature.app.failedToInitializeApplicationPleaseRefresh", null, "Failed to initialize application. Please refresh."), 'error');
     }
 }
 
@@ -242,7 +243,7 @@ function updateXCardContent() {
     if (existing) existing.remove();
     const info = document.createElement('div');
     info.className = 'xcard-safety-info';
-    info.style.cssText = 'margin-top:1rem;text-align:left;font-size:0.85rem;background:rgba(255,255,255,0.05);padding:0.8rem;border-radius:8px;border-left:3px solid var(--gold);';
+    info.style.cssText = 'margin-top:1rem;text-align: start;font-size:0.85rem;background:rgba(255,255,255,0.05);padding:0.8rem;border-radius:8px;border-inline-start:3px solid var(--gold);';
     info.innerHTML = `
         <div><strong style="color:var(--gold);">Lines:</strong> ${escHtml(lines)}</div>
         <div><strong style="color:var(--gold);">Veils:</strong> ${escHtml(veils)}</div>
@@ -275,7 +276,7 @@ function openXCard(announce = true) {
         }
         postXCardNoticeToVTT(`🛑 ${escHtml(from)} called an X-Card — pausing the scene. Check in before continuing.`);
     } else {
-        showToast('🛑 An X-Card was called at the table — scene paused.', 'warning');
+        showToast(i18nText("feature.app.anXCardWasCalledAtThe", null, "🛑 An X-Card was called at the table — scene paused."), 'warning');
     }
 }
 
@@ -295,7 +296,7 @@ function resumeXCard(announce = true) {
         }
         postXCardNoticeToVTT(`✅ ${escHtml(from)} resumed the scene.`);
     } else {
-        showToast('✅ The table resumed — X-Card cleared.', 'success');
+        showToast(i18nText("feature.app.theTableResumedXCardCleared", null, "✅ The table resumed — X-Card cleared."), 'success');
     }
 }
 
@@ -400,7 +401,7 @@ function showPasswordOverlay(state) {
     overlay.innerHTML = `
         <div class="gate-box">
             <span class="gate-icon">🔐</span>
-            <h2 class="gate-title">Password Required</h2>
+            <h2 class="gate-title" data-i18n="feature.app.passwordRequired">Password Required</h2>
             <p class="gate-sub">This toolkit is password protected. Enter the password to continue.</p>
 
             <div id="passwordError" class="gate-error"></div>
@@ -413,7 +414,7 @@ function showPasswordOverlay(state) {
                     placeholder="Enter password..."
                     autofocus
                     autocomplete="current-password"
-                />
+                / data-i18n-attr="placeholder:feature.app.enterPassword">
                 <button type="submit" id="passwordSubmitBtn" class="gate-btn">
                     🔓 Unlock
                 </button>
@@ -454,7 +455,7 @@ async function handlePasswordSubmit(state) {
     const password = input.value.trim();
 
     if (!password) {
-        errorEl.textContent = '⚠️ Please enter a password.';
+        errorEl.textContent = i18nText("feature.app.pleaseEnterAPassword", null, "⚠️ Please enter a password.");
         input.classList.add('error');
         setTimeout(() => input.classList.remove('error'), 1000);
         return;
@@ -462,7 +463,7 @@ async function handlePasswordSubmit(state) {
 
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = '⏳ Checking...';
+        submitBtn.textContent = i18nText("feature.app.checking", null, "⏳ Checking...");
     }
 
     try {
@@ -479,22 +480,24 @@ async function handlePasswordSubmit(state) {
             }
             onUnlockSuccess();
         } else {
-            errorEl.textContent = '❌ ' + (result.error || 'Invalid password. Please try again.');
+            errorEl.textContent = i18nText('feature.app.value', {
+                value0: result.error || i18nText('feature.app.invalidPassword', null, 'Invalid password. Please try again.')
+            }, '❌ {{value0}}');
             input.value = '';
             input.classList.add('error');
             setTimeout(() => input.classList.remove('error'), 1000);
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '🔓 Unlock';
+                submitBtn.textContent = i18nText("feature.app.unlock", null, "🔓 Unlock");
             }
             setTimeout(() => input.focus(), 100);
         }
     } catch (error) {
         console.error('Password check error:', error);
-        errorEl.textContent = '❌ An error occurred. Please try again.';
+        errorEl.textContent = i18nText("feature.app.anErrorOccurredPleaseTryAgain", null, "❌ An error occurred. Please try again.");
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = '🔓 Unlock';
+            submitBtn.textContent = i18nText("feature.app.unlock", null, "🔓 Unlock");
         }
     }
 }
@@ -608,7 +611,7 @@ function setupImportExport() {
                 if (exportAllData) exportAllData();
             } catch (error) {
                 console.error('Failed to export data:', error);
-                showToast('Failed to export data', 'error');
+                showToast(i18nText("feature.app.failedToExportData", null, "Failed to export data"), 'error');
             }
         });
     }
@@ -621,7 +624,7 @@ function setupImportExport() {
                 if (importAllData) importAllData(event);
             } catch (error) {
                 console.error('Failed to import data:', error);
-                showToast('Failed to import data', 'error');
+                showToast(i18nText("feature.app.failedToImportData", null, "Failed to import data"), 'error');
             }
         });
     }
@@ -744,38 +747,38 @@ function renderSyncUI() {
     syncPanel.className = 'panel';
     syncPanel.id = 'sync-panel';
     syncPanel.innerHTML = `
-        <h3>🌐 Live Campaign</h3>
-        <p class="text-muted small">Connect to a campaign server for real-time collaboration with your group.</p>
+        <h3 data-i18n="feature.app.liveCampaign">🌐 Live Campaign</h3>
+        <p class="text-muted small" data-i18n="feature.app.connectToACampaignServerForReal">Connect to a campaign server for real-time collaboration with your group.</p>
 
         <div class="form-row">
             <div class="field large">
-                <label>Server URL</label>
-                <input type="text" id="sync-server-url" placeholder="ws://localhost:3000 or https://your-server.com" />
+                <label data-i18n="feature.app.serverURL">Server URL</label>
+                <input type="text" id="sync-server-url" placeholder="ws://localhost:3000 or https://your-server.com" / data-i18n-attr="placeholder:feature.app.wsLocalhost3000OrHttpsYourServer">
             </div>
             <div class="field">
-                <label>Campaign Code</label>
-                <input type="text" id="sync-campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" />
+                <label data-i18n="feature.app.campaignCode">Campaign Code</label>
+                <input type="text" id="sync-campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" / data-i18n-attr="placeholder:feature.app.ac12">
             </div>
             <div class="field">
-                <label>Password</label>
-                <input type="password" id="sync-password" placeholder="Campaign password" />
+                <label data-i18n="feature.app.password">Password</label>
+                <input type="password" id="sync-password" placeholder="Campaign password" / data-i18n-attr="placeholder:feature.app.campaignPassword">
             </div>
         </div>
 
         <div class="form-row">
             <div class="field large">
-                <label>Your Email <span class="text-muted small">(for Gravatar avatar)</span></label>
+                <label>Your Email <span class="text-muted small" data-i18n="feature.app.forGravatarAvatar">(for Gravatar avatar)</span></label>
                 <input type="email" id="sync-user-email" placeholder="your@email.com" value="${savedEmail}" />
             </div>
             <div class="field" style="flex:0 0 auto;align-self:end;">
-                <button class="btn btn-sm" id="sync-update-avatar-btn">🔄 Update Avatar</button>
+                <button class="btn btn-sm" id="sync-update-avatar-btn" data-i18n="feature.app.updateAvatar">🔄 Update Avatar</button>
             </div>
         </div>
 
         <div class="flex">
-            <button class="btn btn-gold" id="sync-connect-btn">🔗 Connect</button>
-            <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;">⛔ Disconnect</button>
-            <button class="btn btn-sm" id="sync-refresh-btn">↻ Refresh</button>
+            <button class="btn btn-gold" id="sync-connect-btn" data-i18n="feature.app.connect">🔗 Connect</button>
+            <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;" data-i18n="feature.app.disconnect">⛔ Disconnect</button>
+            <button class="btn btn-sm" id="sync-refresh-btn" data-i18n="feature.app.refresh">↻ Refresh</button>
         </div>
 
         <div id="sync-status" class="mt-1" style="font-size:0.9rem;padding:0.3rem 0.6rem;border-radius:var(--radius);background:var(--bg3);">
@@ -784,7 +787,7 @@ function renderSyncUI() {
 
         <div class="mt-1">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
-                <h4 style="margin:0;font-size:0.95rem;">👥 Online Players</h4>
+                <h4 style="margin:0;font-size:0.95rem;" data-i18n="feature.app.onlinePlayers">👥 Online Players</h4>
                 <label class="inline-check" style="font-size:0.8rem;">
                     <input type="checkbox" id="sync-show-avatars" checked />
                     Show avatars
@@ -832,7 +835,7 @@ function renderSyncUI() {
                 if (syncManager.isConnected) {
                     syncManager.setEmail(email);
                 }
-                showToast('Avatar updated!', 'success');
+                showToast(i18nText("feature.app.avatarUpdated", null, "Avatar updated!"), 'success');
             }
         });
     }
@@ -854,11 +857,11 @@ function renderSyncUI() {
             const email = emailInput ? emailInput.value.trim() : '';
 
             if (!url) {
-                showToast('Please enter a server URL.', 'error');
+                showToast(i18nText("feature.app.pleaseEnterAServerURL", null, "Please enter a server URL."), 'error');
                 return;
             }
             if (!code) {
-                showToast('Please enter a campaign code.', 'error');
+                showToast(i18nText("feature.app.pleaseEnterACampaignCode", null, "Please enter a campaign code."), 'error');
                 return;
             }
 
@@ -867,20 +870,20 @@ function renderSyncUI() {
             if (email) setStorage('fates-edge-user-email', email);
 
             connectBtn.disabled = true;
-            connectBtn.textContent = 'Connecting…';
+            connectBtn.textContent = i18nText("feature.app.connecting", null, "Connecting…");
 
             try {
                 await syncManager.connect(url, code, password, { email: email });
                 connectBtn.style.display = 'none';
                 disconnectBtn.style.display = 'inline-flex';
                 updateSyncStatusUI({ connected: true, campaignCode: code });
-                showToast('Connected to campaign!', 'success');
+                showToast(i18nText("feature.app.connectedToCampaign", null, "Connected to campaign!"), 'success');
             } catch (e) {
-                showToast('Connection failed: ' + e.message, 'error');
+                showToast(i18nText("feature.app.connectionFailedValue", { value0: e.message }, "Connection failed: {{value0}}"), 'error');
                 updateSyncStatusUI({ connected: false, reason: e.message });
             } finally {
                 connectBtn.disabled = false;
-                connectBtn.textContent = '🔗 Connect';
+                connectBtn.textContent = i18nText("feature.app.connect", null, "🔗 Connect");
             }
         });
     }
@@ -891,7 +894,7 @@ function renderSyncUI() {
             connectBtn.style.display = 'inline-flex';
             disconnectBtn.style.display = 'none';
             updateSyncStatusUI({ connected: false });
-            showToast('Disconnected.', 'info');
+            showToast(i18nText("feature.app.disconnected", null, "Disconnected."), 'info');
         });
     }
 
@@ -899,9 +902,9 @@ function renderSyncUI() {
         refreshBtn.addEventListener('click', () => {
             if (syncManager.isConnected) {
                 syncManager.requestFullSync();
-                showToast('Requesting full sync…', 'info');
+                showToast(i18nText("feature.app.requestingFullSync", null, "Requesting full sync…"), 'info');
             } else {
-                showToast('Not connected.', 'warning');
+                showToast(i18nText("feature.app.notConnected", null, "Not connected."), 'warning');
             }
         });
     }
@@ -937,11 +940,11 @@ function setupSyncEventListeners() {
     });
 
     syncManager.on('sync_ready', (data) => {
-        showToast('Sync ready! Connected to ' + (data.clients?.length || 0) + ' other users.', 'success');
+        showToast(i18nText("feature.app.syncReadyConnectedToValueOtherUsers", { value0: data.clients?.length || 0 }, "Sync ready! Connected to {{value0}} other users."), 'success');
     });
 
     syncManager.on('sync_error', (error) => {
-        showToast('Sync error: ' + error.message, 'error');
+        showToast(i18nText("feature.app.syncErrorValue", { value0: error.message }, "Sync error: {{value0}}"), 'error');
     });
 }
 
@@ -1036,8 +1039,8 @@ function showConflictModal(conflicts) {
     modal.innerHTML = `
         <div class="editor-screen" style="max-width: 600px;margin:0 auto;">
             <div class="modal-header">
-                <button class="btn btn-secondary editor-back modal-close">← Back</button>
-                <h3>⚠️ Sync Conflict Detected</h3>
+                <button class="btn btn-secondary editor-back modal-close" data-i18n="feature.app.back">← Back</button>
+                <h3 data-i18n="feature.app.syncConflictDetected">⚠️ Sync Conflict Detected</h3>
             </div>
             <div class="modal-body">
                 ${conflicts.map(c => `
@@ -1057,9 +1060,9 @@ function showConflictModal(conflicts) {
                 `).join('')}
             </div>
             <div class="modal-footer">
-                <button class="btn" id="conflict-keep-local">Keep Yours</button>
-                <button class="btn" id="conflict-use-remote">Use Remote</button>
-                <button class="btn btn-gold" id="conflict-merge">Merge Both</button>
+                <button class="btn" id="conflict-keep-local" data-i18n="feature.app.keepYours">Keep Yours</button>
+                <button class="btn" id="conflict-use-remote" data-i18n="feature.app.useRemote">Use Remote</button>
+                <button class="btn btn-gold" id="conflict-merge" data-i18n="feature.app.mergeBoth">Merge Both</button>
             </div>
         </div>
     `;
@@ -1083,17 +1086,17 @@ function showConflictModal(conflicts) {
     conflicts.forEach(c => {
         modal.querySelector('#conflict-keep-local').addEventListener('click', () => {
             resolveConflict(c.id, 'local');
-            showToast('Kept local version.', 'info');
+            showToast(i18nText("feature.app.keptLocalVersion", null, "Kept local version."), 'info');
             closeConflictModal();
         });
         modal.querySelector('#conflict-use-remote').addEventListener('click', () => {
             resolveConflict(c.id, 'remote');
-            showToast('Applied remote version.', 'info');
+            showToast(i18nText("feature.app.appliedRemoteVersion", null, "Applied remote version."), 'info');
             closeConflictModal();
         });
         modal.querySelector('#conflict-merge').addEventListener('click', () => {
             resolveConflict(c.id, 'merge');
-            showToast('Merged both versions.', 'success');
+            showToast(i18nText("feature.app.mergedBothVersions", null, "Merged both versions."), 'success');
             closeConflictModal();
         });
     });

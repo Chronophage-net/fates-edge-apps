@@ -5,6 +5,7 @@
  * Updated for unified WebSocket module.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { initMediaModule } from '@core/media.js';
 import { getState, getStableClientId } from '@core/state.js';
 import { VoiceChat } from '@components/VoiceChat.js';
@@ -126,7 +127,7 @@ export async function initVoice() {
     }
 
     if (!isConnectedToServer()) {
-        showToast('Connect to a server first before starting voice.', 'error');
+        showToast(i18nText("feature.vtt.voice.connectToAServerFirstBeforeStarting", null, "Connect to a server first before starting voice."), 'error');
         return false;
     }
 
@@ -144,7 +145,7 @@ export async function initVoice() {
         voiceChat = new VoiceChat(extraIceServers);
         const success = await voiceChat.init();
         if (!success) {
-            showToast('Failed to initialize voice chat.', 'error');
+            showToast(i18nText("feature.vtt.voice.failedToInitializeVoiceChat", null, "Failed to initialize voice chat."), 'error');
             return false;
         }
 
@@ -175,11 +176,11 @@ export async function initVoice() {
             });
         }
 
-        showToast('🎤 Voice chat ready!', 'success');
+        showToast(i18nText("feature.vtt.voice.voiceChatReady", null, "🎤 Voice chat ready!"), 'success');
         return true;
     } catch (err) {
         console.error('[Voice] Init error:', err);
-        showToast('Failed to initialize voice: ' + err.message, 'error');
+        showToast(i18nText("feature.vtt.voice.failedToInitializeVoiceValue", { value0: err.message }, "Failed to initialize voice: {{value0}}"), 'error');
         return false;
     }
 }
@@ -201,7 +202,7 @@ function setupVoiceEvents() {
         if (from === getSocketId()) return;
 
         if (!isInitialized || !voiceChat) {
-            showToast('Voice not initialized. Start voice first.', 'warning');
+            showToast(i18nText("feature.vtt.voice.voiceNotInitializedStartVoiceFirst", null, "Voice not initialized. Start voice first."), 'warning');
             return;
         }
 
@@ -488,12 +489,12 @@ function onConnectionStateChange(clientId, state) {
  */
 export async function initiateVoiceCall(targetClientId) {
     if (!isInitialized || !voiceChat) {
-        showToast('Voice not initialized.', 'error');
+        showToast(i18nText("feature.vtt.voice.voiceNotInitialized", null, "Voice not initialized."), 'error');
         return false;
     }
 
     if (!targetClientId || targetClientId === getSocketId()) {
-        showToast('Invalid client.', 'error');
+        showToast(i18nText("feature.vtt.voice.invalidClient", null, "Invalid client."), 'error');
         return false;
     }
 
@@ -527,7 +528,7 @@ export async function initiateVoiceCall(targetClientId) {
         return true;
     } catch (err) {
         console.error('[Voice] Call init error:', err);
-        showToast('Failed to start voice call.', 'error');
+        showToast(i18nText("feature.vtt.voice.failedToStartVoiceCall", null, "Failed to start voice call."), 'error');
         return false;
     }
 }
@@ -537,7 +538,7 @@ export async function initiateVoiceCall(targetClientId) {
  */
 export function toggleMute() {
     if (!isInitialized || !voiceChat) {
-        showToast('Voice not initialized.', 'error');
+        showToast(i18nText("feature.vtt.voice.voiceNotInitialized", null, "Voice not initialized."), 'error');
         return false;
     }
     const muted = voiceChat.toggleMute();
@@ -631,7 +632,7 @@ export function cleanupVoice() {
         });
     } catch (e) { /* ignore */ }
 
-    showToast('Voice stopped.', 'info');
+    showToast(i18nText("feature.vtt.voice.voiceStopped", null, "Voice stopped."), 'info');
 }
 
 // ============================================================

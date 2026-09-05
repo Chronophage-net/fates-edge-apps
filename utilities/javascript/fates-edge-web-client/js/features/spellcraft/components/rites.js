@@ -42,6 +42,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState, getCharacter, updateCharacter } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml, safeParseInt } from '@core/utils.js';
@@ -320,7 +321,7 @@ function buildGiftCardHtml(title, patronName, patronIcon, effect, costDetails, e
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--border);
-            border-left:4px solid var(--gold);
+            border-inline-start:4px solid var(--gold);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             max-width: 450px;
             margin:0.1rem 0;
@@ -347,7 +348,7 @@ function buildRiteCardHtml(riteName, patronName, patronIcon, effect, costDetails
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--border);
-            border-left:4px solid var(--gold);
+            border-inline-start:4px solid var(--gold);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             max-width: 450px;
             margin:0.1rem 0;
@@ -480,7 +481,7 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
                 <div style="font-size:1.5rem;">🔮</div>
                 <p>No patron data found for any of the provided IDs.</p>
                 <p style="font-size:0.85rem;">Try refreshing the patrons tab or check the console for details.</p>
-                <button class="btn btn-sm btn-secondary" onclick="window.refreshPatrons && window.refreshPatrons()">🔄 Refresh Patrons</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.refreshPatrons && window.refreshPatrons()" data-i18n="feature.spellcraft.components.rites.refreshPatrons">🔄 Refresh Patrons</button>
             </div>
         `;
         return;
@@ -498,7 +499,7 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
         const warnings = getRivalryWarnings(patronIds);
         if (warnings.length > 0) {
             html += `
-                <div class="info-box" style="border-left-color:var(--orange);margin-bottom:0.5rem;">
+                <div class="info-box" style="border-inline-start-color:var(--orange);margin-bottom:0.5rem;">
                     <strong>⚠️ Cross-Resonance Warning:</strong> Carrying symbols from rival patrons:
                     ${warnings.map(([a, b]) => {
                         const nameA = getPatronName(a, state);
@@ -559,15 +560,15 @@ function renderPatronGiftsForSinglePatron(char, patronData, path, characterId) {
     const costDesc = safeString(gift.cost || '+1 Obligation');
 
     const costOptionsHtml = `
-        <option value="boon">1 Boon</option>
-        <option value="fatigue">1 Fatigue</option>
+        <option value="boon" data-i18n="feature.spellcraft.components.rites.1Boon">1 Boon</option>
+        <option value="fatigue" data-i18n="feature.spellcraft.components.rites.1Fatigue">1 Fatigue</option>
     `;
 
     const isCompromised = isInvoker && (char.compromisedSymbols || []).includes(patronId);
     const borrowedGraceUsed = !!(char.sceneFlags && char.sceneFlags.borrowedGrace);
 
     return `
-        <div class="patron-gifts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);margin-bottom:0.3rem;">
+        <div class="patron-gifts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);margin-bottom:0.3rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">${isRunekeeper ? '🔮 Patron\'s Gift' : '🎴 Borrowed Grace (Symbol)'}</span>
                 <span style="font-size:0.6rem;color:var(--text3);">${isInvoker && borrowedGraceUsed ? 'used this scene' : ''}</span>
@@ -622,7 +623,7 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
 
     if (rites.length === 0) {
         return `
-            <div class="rites-patron-block" style="border-left:3px solid ${color};padding-left:0.5rem;background:var(--bg2);border-radius:var(--radius);padding:0.5rem;">
+            <div class="rites-patron-block" style="border-inline-start:3px solid ${color};padding-inline-start:0.5rem;background:var(--bg2);border-radius:var(--radius);padding:0.5rem;">
                 <div style="display:flex;align-items:center;gap:0.5rem;">
                     <span style="font-size:1.2rem;">${escHtml(icon)}</span>
                     <span style="font-weight:600;color:${color};">${escHtml(name)}</span>
@@ -644,13 +645,13 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
     });
 
     let html = `
-        <div class="rites-patron-block" style="border-left:3px solid ${color};padding-left:0.5rem;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
+        <div class="rites-patron-block" style="border-inline-start:3px solid ${color};padding-inline-start:0.5rem;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;">
             <!-- Header -->
             <div class="rites-header" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:0.2rem;margin-bottom:0.2rem;">
                 <span style="font-size:1.2rem;">${escHtml(icon)}</span>
                 <span style="font-weight:600;font-size:1rem;color:${color};">${escHtml(name)}</span>
                 ${domain ? `<span style="font-size:0.7rem;color:var(--text3);">— ${escHtml(domain)}</span>` : ''}
-                <span style="font-size:0.65rem;color:var(--text3);margin-left:auto;">${rites.length} rites · Obligation: ${obligation}</span>
+                <span style="font-size:0.65rem;color:var(--text3);margin-inline-start:auto;">${rites.length} rites · Obligation: ${obligation}</span>
             </div>
 
             <!-- ─── Obligation Controls ────────────────────────── -->
@@ -661,12 +662,12 @@ function renderSinglePatronRites(patronData, characterId, charName, allPatronIds
                 <button class="btn btn-xs btn-secondary" onclick="window.addRiteObligation('${patronId}', -1, '${characterId}')">−1</button>
                 <button class="btn btn-xs btn-ghost" onclick="window.clearRiteObligation('${patronId}', '${characterId}')" style="color:var(--red);">✕ Clear</button>
                 ${isInvoker ? `
-                    <span style="font-size:0.55rem;color:var(--text3);margin-left:0.3rem;">
+                    <span style="font-size:0.55rem;color:var(--text3);margin-inline-start:0.3rem;">
                         (${isMultiPatron ? `Symbol ${allPatronIds.indexOf(patronId) + 1}/${allPatronIds.length}` : 'Single Symbol'})
                     </span>
                 ` : ''}
                 ${isInvoker && isMultiPatron ? `
-                    <span style="font-size:0.55rem;color:var(--orange);margin-left:0.3rem;">
+                    <span style="font-size:0.55rem;color:var(--orange);margin-inline-start:0.3rem;">
                         ⚡ Cross-Resonance possible
                     </span>
                 ` : ''}
@@ -783,7 +784,7 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char, isFir
                         📡
                     </button>
                     ${tierLocked ? `
-                        <span style="font-size:0.65rem;color:var(--red);" title="High Rites require Tier III or higher">
+                        <span style="font-size:0.65rem;color:var(--red);" title="High Rites require Tier III or higher" data-i18n-attr="title:feature.spellcraft.components.rites.highRitesRequireTierIIIOrHigher">
                             🔒 Requires Tier III (currently Tier ${escHtml(charTierDisplay)})
                         </span>
                     ` : !isKnown ? `
@@ -807,7 +808,7 @@ function renderRiteItem(rite, patronId, idx, isInvoker, characterId, char, isFir
     }
 
     return `
-        <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:2px solid ${color};margin-bottom:0.1rem;${isKnown ? '' : 'opacity:0.75;'}">
+        <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-inline-start:2px solid ${color};margin-bottom:0.1rem;${isKnown ? '' : 'opacity:0.75;'}">
             <div class="rite-header" style="display:flex;justify-content:space-between;align-items:center;cursor:${hasDetails ? 'pointer' : 'default'};">
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                     <span class="rite-name" style="font-weight:600;font-size:0.85rem;">${escHtml(name)}</span>
@@ -871,27 +872,27 @@ function attachRiteToggleEvents(el) {
 window.usePatronGift = async function(patronId, characterId) {
     const char = getState().characters?.find(c => c.id === characterId);
     if (!char) {
-        showToast('Character not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.characterNotFound", null, "Character not found."), 'error');
         return;
     }
     if (char.magicPath !== 'runekeeper') {
-        showToast('Only Runekeepers can use Patron\'s Gift.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.onlyRunekeepersCanUsePatronSGift", null, "Only Runekeepers can use Patron's Gift."), 'error');
         return;
     }
     if (!(char.learnedTalents || []).includes('familiar')) {
-        showToast('You need a Familiar (Thiasos) to use Patron\'s Gift.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.youNeedAFamiliarThiasosToUse", null, "You need a Familiar (Thiasos) to use Patron's Gift."), 'error');
         return;
     }
 
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
-        showToast('Patron not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.patronNotFound", null, "Patron not found."), 'error');
         return;
     }
     const gift = getPatronGift(patronData);
     if (!gift) {
-        showToast('This patron has no Gift defined.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.thisPatronHasNoGiftDefined", null, "This patron has no Gift defined."), 'error');
         return;
     }
 
@@ -904,7 +905,7 @@ window.usePatronGift = async function(patronId, characterId) {
     const effect = safeString(gift.effect || 'The item glows with patron\'s favor.');
     const costDetails = `Obligation +1 (now ${currentObligation + 1})`;
 
-    showToast(`✨ ${name}: ${effect} (Obligation +1)`, 'success');
+    showToast(i18nText("feature.spellcraft.components.rites.valueValueObligation1", { value0: name, value1: effect }, "✨ {{value0}}: {{value1}} (Obligation +1)"), 'success');
 
     // Send VTT card
     const cardHtml = buildGiftCardHtml(
@@ -935,16 +936,16 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
     if (!char) return;
 
     if (char.magicPath !== 'invoker') {
-        showToast('Only Invokers can use Borrowed Grace.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.onlyInvokersCanUseBorrowedGrace", null, "Only Invokers can use Borrowed Grace."), 'error');
         return;
     }
     if (!(char.symbols || []).includes(patronId)) {
-        showToast('You do not carry a Symbol for this patron.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.youDoNotCarryASymbolFor", null, "You do not carry a Symbol for this patron."), 'error');
         return;
     }
 
     if (char.sceneFlags && char.sceneFlags.borrowedGrace) {
-        showToast('Borrowed Grace has already been used this scene. Start a New Scene to use it again.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.borrowedGraceHasAlreadyBeenUsedThis", null, "Borrowed Grace has already been used this scene. Start a New Scene to use it again."), 'error');
         return;
     }
 
@@ -954,7 +955,7 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
     if (costType === 'boon') {
         const boons = char.boons || 0;
         if (boons < 1) {
-            showToast('Not enough Boons! Need 1 Boon.', 'error');
+            showToast(i18nText("feature.spellcraft.components.rites.notEnoughBoonsNeed1Boon", null, "Not enough Boons! Need 1 Boon."), 'error');
             return;
         }
         char.boons = boons - 1;
@@ -962,12 +963,12 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
         const fatigue = char.fatigue || 0;
         const maxFatigue = char.attributes?.body || 1;
         if (fatigue >= maxFatigue) {
-            showToast('Fatigue track is full!', 'error');
+            showToast(i18nText("feature.spellcraft.components.rites.fatigueTrackIsFull", null, "Fatigue track is full!"), 'error');
             return;
         }
         char.fatigue = fatigue + 1;
     } else {
-        showToast('Invalid cost type. Choose boon or fatigue.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.invalidCostTypeChooseBoonOrFatigue", null, "Invalid cost type. Choose boon or fatigue."), 'error');
         return;
     }
 
@@ -983,12 +984,12 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
-        showToast('Patron not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.patronNotFound", null, "Patron not found."), 'error');
         return;
     }
     const gift = getPatronGift(patronData);
     if (!gift) {
-        showToast('This patron has no Gift defined.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.thisPatronHasNoGiftDefined", null, "This patron has no Gift defined."), 'error');
         return;
     }
 
@@ -997,7 +998,7 @@ window.useBorrowedGrace = async function(patronId, costType, characterId = 'defa
     const costDetails = `Cost: 1 ${costType}, Obligation +1 (now ${currentObligation + 1})`;
     const penaltyNote = isCompromised ? '⚠️ Symbol is Compromised — this applies at −1 die.' : '';
 
-    showToast(`🎴 ${name}: ${effect}${penaltyNote ? ' ' + penaltyNote : ''} (Cost: 1 ${costType}, Obligation +1)`, 'success');
+    showToast(i18nText("feature.spellcraft.components.rites.valueValueValueCost1ValueObligation", { value0: name, value1: effect, value2: penaltyNote ? ' ' + penaltyNote : '', value3: costType }, "🎴 {{value0}}: {{value1}}{{value2}} (Cost: 1 {{value3}}, Obligation +1)"), 'success');
 
     // Send VTT card
     const cardHtml = buildGiftCardHtml(
@@ -1035,7 +1036,7 @@ window.startNewScene = function(characterId = 'default-character') {
 
     char.sceneFlags = {};
     saveState();
-    showToast('🎬 New scene — once-per-scene abilities (like Borrowed Grace) are available again.', 'info');
+    showToast(i18nText("feature.spellcraft.components.rites.newSceneOncePerSceneAbilitiesLike", null, "🎬 New scene — once-per-scene abilities (like Borrowed Grace) are available again."), 'info');
 
     const container = document.getElementById('spellcraft-content');
     if (container) {
@@ -1053,33 +1054,33 @@ window.learnRite = function(patronId, riteIndex, characterId = 'default-characte
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
-        showToast('Patron not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.patronNotFound", null, "Patron not found."), 'error');
         return;
     }
 
     const rite = patronData.rites?.[riteIndex];
     if (!rite) {
-        showToast('Rite not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.riteNotFound", null, "Rite not found."), 'error');
         return;
     }
 
     const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
     if (!char) {
-        showToast('Character not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.characterNotFound", null, "Character not found."), 'error');
         return;
     }
 
     const riteName = safeString(rite.name);
     if (!char.rites) char.rites = [];
     if (isRiteKnown(char, patronId, riteName)) {
-        showToast(`"${riteName}" is already known.`, 'info');
+        showToast(i18nText("feature.spellcraft.components.rites.valueIsAlreadyKnown", { value0: riteName }, "\"{{value0}}\" is already known."), 'info');
         return;
     }
 
     // RULES FIX: High Rites require Tier III+.
     const riteTier = safeString(rite.tier || '');
     if (riteTier.toLowerCase() === 'high' && !meetsTierRequirement(char, 'III')) {
-        showToast(`"${riteName}" is a High Rite and requires Tier III (you're Tier ${getCharacterTier(char)}).`, 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.valueIsAHighRiteAndRequires", { value0: riteName, value1: getCharacterTier(char) }, "\"{{value0}}\" is a High Rite and requires Tier III (you're Tier {{value1}})."), 'error');
         return;
     }
 
@@ -1089,16 +1090,16 @@ window.learnRite = function(patronId, riteIndex, characterId = 'default-characte
     const available = totalXp - spent;
 
     if (xpCost > 0 && available < xpCost) {
-        showToast(`Not enough XP. Need ${xpCost}, have ${available} available.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.notEnoughXPNeedValueHaveValue", { value0: xpCost, value1: available }, "Not enough XP. Need {{value0}}, have {{value1}} available."), 'error');
         return;
     }
 
-    if (!confirm(`Learn "${riteName}" (${rite.tier || ''}) for ${xpCost} XP?`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.rites.learnValueValueForValueXP", { value0: riteName, value1: rite.tier || '', value2: xpCost }, "Learn \"{{value0}}\" ({{value1}}) for {{value2}} XP?"))) return;
 
     char.rites.push(riteKey(patronId, riteName));
     char.xpSpent = spent + xpCost;
     saveState();
-    showToast(`📖 Learned "${riteName}" (${xpCost} XP spent).`, 'success');
+    showToast(i18nText("feature.spellcraft.components.rites.learnedValueValueXPSpent", { value0: riteName, value1: xpCost }, "📖 Learned \"{{value0}}\" ({{value1}} XP spent)."), 'success');
 
     const container = document.getElementById('spellcraft-content');
     if (container) {
@@ -1120,20 +1121,20 @@ window.invokeRite = function(patronId, riteIndex, characterId = 'default-charact
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
-        showToast('Patron not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.patronNotFound", null, "Patron not found."), 'error');
         return;
     }
 
     const rite = patronData.rites?.[riteIndex];
     if (!rite) {
-        showToast('Rite not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.riteNotFound", null, "Rite not found."), 'error');
         return;
     }
 
     const riteName = safeString(rite.name);
     const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
     if (!char || !isRiteKnown(char, patronId, riteName)) {
-        showToast(`You haven't learned "${riteName}" yet — learn it first.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.youHavenTLearnedValueYetLearn", { value0: riteName }, "You haven't learned \"{{value0}}\" yet — learn it first."), 'error');
         return;
     }
 
@@ -1142,7 +1143,7 @@ window.invokeRite = function(patronId, riteIndex, characterId = 'default-charact
     const newObligation = currentObligation + baseCost;
     const actionText = safeString(rite.action || '');
 
-    if (!confirm(`Invoke "${riteName}"${actionText ? ` (${actionText})` : ''}?\n\nCost: +${baseCost} Obligation (total: ${currentObligation} → ${newObligation}).`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.rites.invokeValueValueCostValueObligationTotal", { value0: riteName, value1: actionText ? ` (${actionText})` : '', value2: baseCost, value3: currentObligation, value4: newObligation }, "Invoke \"{{value0}}\"{{value1}}?\n\nCost: +{{value2}} Obligation (total: {{value3}} → {{value4}})."))) return;
 
     setPatronObligation(characterId, patronId, newObligation);
     savePatronData();
@@ -1151,7 +1152,7 @@ window.invokeRite = function(patronId, riteIndex, characterId = 'default-charact
     const effect = safeString(rite.effect || rite.description || 'The rite resolves.');
     const extraNote = [actionText, safeString(rite.range || '')].filter(Boolean).join(' · ');
 
-    showToast(`📜 "${riteName}" invoked. Obligation +${baseCost} (now ${newObligation}).`, 'success');
+    showToast(i18nText("feature.spellcraft.components.rites.valueInvokedObligationValueNowValue", { value0: riteName, value1: baseCost, value2: newObligation }, "📜 \"{{value0}}\" invoked. Obligation +{{value1}} (now {{value2}})."), 'success');
 
     // Send VTT card
     const cardHtml = buildRiteCardHtml(
@@ -1184,13 +1185,13 @@ window.sendRiteCard = function(patronId, riteIndex, characterId = 'default-chara
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
-        showToast('Patron not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.patronNotFound", null, "Patron not found."), 'error');
         return;
     }
 
     const rite = patronData.rites?.[riteIndex];
     if (!rite) {
-        showToast('Rite not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.riteNotFound", null, "Rite not found."), 'error');
         return;
     }
 
@@ -1211,20 +1212,20 @@ window.sendRiteCard = function(patronId, riteIndex, characterId = 'default-chara
         detailsNote
     );
     sendVTTMessage(cardHtml);
-    showToast(`📡 "${riteName}" sent to VTT as a reference card.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.rites.valueSentToVTTAsAReference", { value0: riteName }, "📡 \"{{value0}}\" sent to VTT as a reference card."), 'success');
 };
 
 window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-character') {
     const state = getState();
     const patronData = findPatronData(state, patronId);
     if (!patronData) {
-        showToast('Patron not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.patronNotFound", null, "Patron not found."), 'error');
         return;
     }
 
     const rite = patronData.rites?.[riteIndex];
     if (!rite) {
-        showToast('Rite not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.riteNotFound", null, "Rite not found."), 'error');
         return;
     }
 
@@ -1232,7 +1233,7 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
 
     const char = state.characters?.find(c => c.id === characterId) || state.characters?.[characterId];
     if (!char || !isRiteKnown(char, patronId, riteName)) {
-        showToast(`You haven't learned "${riteName}" yet — learn it first.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.rites.youHavenTLearnedValueYetLearn", { value0: riteName }, "You haven't learned \"{{value0}}\" yet — learn it first."), 'error');
         return;
     }
     const tier = safeString(rite.tier || '');
@@ -1244,7 +1245,10 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
     const currentObligation = getPatronObligation(characterId, patronId);
     const newObligation = currentObligation + crackCost;
 
-    if (!confirm(`💥 Crack the Seal: invoke "${riteName}" instantly?\n\nThis rite's base cost is ${baseCost} Obligation. Crack the Seal doubles it (minimum +${minimum}${isHighTier ? ' for High Rites' : ''}), costing +${crackCost} Obligation this time (total: ${currentObligation} → ${newObligation}). The Symbol becomes Compromised.`)) return;
+    const highRiteMinimum = isHighTier
+        ? i18nText('feature.spellcraft.components.rites.forHighRites', null, ' for High Rites')
+        : '';
+    if (!confirm(i18nText("feature.spellcraft.components.rites.crackTheSealInvokeValueInstantlyThis", { value0: riteName, value1: baseCost, value2: minimum, value3: highRiteMinimum, value4: crackCost, value5: currentObligation, value6: newObligation }, "💥 Crack the Seal: invoke \"{{value0}}\" instantly?\n\nThis rite's base cost is {{value1}} Obligation. Crack the Seal doubles it (minimum +{{value2}}{{value3}}), costing +{{value4}} Obligation this time (total: {{value5}} → {{value6}}). The Symbol becomes Compromised."))) return;
 
     setPatronObligation(characterId, patronId, newObligation);
     savePatronData();
@@ -1266,7 +1270,7 @@ window.crackTheSeal = function(patronId, riteIndex, characterId = 'default-chara
     const effect = safeString(rite.effect || rite.description || 'The rite resolves instantly.');
     const extraNote = `Crack the Seal — ${isHighTier ? 'High' : 'Standard'} Rite, instant action.`;
 
-    showToast(`💥 "${riteName}" invoked instantly! Obligation +${crackCost} (now ${newObligation}). Symbol is now Compromised (−1 die on Borrowed Grace until restored).`, 'warning');
+    showToast(i18nText("feature.spellcraft.components.rites.valueInvokedInstantlyObligationValueNowValue", { value0: riteName, value1: crackCost, value2: newObligation }, "💥 \"{{value0}}\" invoked instantly! Obligation +{{value1}} (now {{value2}}). Symbol is now Compromised (−1 die on Borrowed Grace until restored)."), 'warning');
 
     // Send VTT card
     const cardHtml = buildRiteCardHtml(
@@ -1296,7 +1300,7 @@ window.addRiteObligation = function(patronId, amount = 1, characterId = 'default
     const current = getPatronObligation(characterId, patronId);
     setPatronObligation(characterId, patronId, Math.max(0, current + amount));
     savePatronData();
-    showToast(`Obligation ${amount > 0 ? '+' : ''}${amount} for ${patronId}`, amount > 0 ? 'success' : 'info');
+    showToast(i18nText("feature.spellcraft.components.rites.obligationValueValueForValue", { value0: amount > 0 ? '+' : '', value1: amount, value2: patronId }, "Obligation {{value0}}{{value1}} for {{value2}}"), amount > 0 ? 'success' : 'info');
     
     const container = document.getElementById('spellcraft-content');
     if (container) {
@@ -1309,7 +1313,7 @@ window.addRiteObligation = function(patronId, amount = 1, characterId = 'default
 window.clearRiteObligation = function(patronId, characterId = 'default-character') {
     setPatronObligation(characterId, patronId, 0);
     savePatronData();
-    showToast(`Obligation cleared for ${patronId}`, 'info');
+    showToast(i18nText("feature.spellcraft.components.rites.obligationClearedForValue", { value0: patronId }, "Obligation cleared for {{value0}}"), 'info');
     
     const container = document.getElementById('spellcraft-content');
     if (container) {

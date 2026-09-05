@@ -102,18 +102,18 @@ function buildModal() {
             max-width:480px; width:90%; position:relative;
         ">
             <button id="whiteboard-onboarding-close" title="Close" style="
-                position:absolute; top:10px; right:12px; background:none; border:none;
+                position:absolute; top:10px; inset-inline-end:12px; background:none; border:none;
                 color:var(--text3, #888); cursor:pointer; font-size:1rem; line-height:1;
-            ">✕</button>
+            " data-i18n-attr="title:feature.whiteboard.modules.onboarding.close">✕</button>
             <div style="font-size:2rem; margin-bottom:0.4rem;" id="whiteboard-onboarding-icon"></div>
             <h2 style="margin:0 0 0.6rem 0; font-size:1.15rem; color:var(--gold, #d4af37);" id="whiteboard-onboarding-title"></h2>
             <div style="line-height:1.55; font-size:0.9rem; color:var(--text2, #ccc); min-height:70px;" id="whiteboard-onboarding-body"></div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.4rem;">
                 <div id="whiteboard-onboarding-dots" style="display:flex; gap:5px;"></div>
                 <div style="display:flex; gap:6px;">
-                    <button class="btn btn-sm btn-ghost" id="whiteboard-onboarding-skip">Skip</button>
-                    <button class="btn btn-sm btn-secondary" id="whiteboard-onboarding-back">Back</button>
-                    <button class="btn btn-sm btn-gold" id="whiteboard-onboarding-next">Next</button>
+                    <button class="btn btn-sm btn-ghost" id="whiteboard-onboarding-skip" data-i18n="feature.whiteboard.modules.onboarding.skip">Skip</button>
+                    <button class="btn btn-sm btn-secondary" id="whiteboard-onboarding-back" data-i18n="feature.whiteboard.modules.onboarding.back">Back</button>
+                    <button class="btn btn-sm btn-gold" id="whiteboard-onboarding-next" data-i18n="feature.whiteboard.modules.onboarding.next">Next</button>
                 </div>
             </div>
         </div>
@@ -135,8 +135,11 @@ function buildModal() {
     document.addEventListener('keydown', (e) => {
         if (!modalEl || modalEl.style.display === 'none') return;
         if (e.key === 'Escape') hideOnboardingModal(true);
-        else if (e.key === 'ArrowRight') modalEl.querySelector('#whiteboard-onboarding-next')?.click();
-        else if (e.key === 'ArrowLeft') modalEl.querySelector('#whiteboard-onboarding-back')?.click();
+        const rtl = document.documentElement?.dir === 'rtl';
+        const nextKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+        const backKey = rtl ? 'ArrowRight' : 'ArrowLeft';
+        if (e.key === nextKey) modalEl.querySelector('#whiteboard-onboarding-next')?.click();
+        else if (e.key === backKey) modalEl.querySelector('#whiteboard-onboarding-back')?.click();
     });
 }
 

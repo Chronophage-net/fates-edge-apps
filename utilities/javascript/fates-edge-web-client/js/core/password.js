@@ -1,3 +1,4 @@
+import { t as i18nText } from '@core/i18n.js';
 /**
  * Password Module - Secure toolkit access
  * 
@@ -275,7 +276,7 @@ export function unlockToolkit() {
     notifyUnlocked();
     
     // Show success message
-    showToast('Toolkit unlocked successfully!', 'success');
+    showToast(i18nText("feature.core.password.toolkitUnlockedSuccessfully", null, "Toolkit unlocked successfully!"), 'success');
     
     console.log('✅ Toolkit unlocked');
     return true;
@@ -448,7 +449,7 @@ export function lockToolkit() {
     unlockState.unlockTime = null;
     localStorage.removeItem('fates-edge-unlock');
     notifyLocked();
-    showToast('Toolkit locked', 'info');
+    showToast(i18nText("feature.core.password.toolkitLocked", null, "Toolkit locked"), 'info');
 }
 
 /**
@@ -467,7 +468,7 @@ export async function clearPassword() {
         unlockState.isUnlocked = true;
         unlockState.unlockTime = Date.now();
         
-        showToast('Password cleared', 'success');
+        showToast(i18nText("feature.core.password.passwordCleared", null, "Password cleared"), 'success');
         notifyUnlocked();
         return true;
     } catch (e) {
@@ -491,7 +492,7 @@ function showPasswordOverlay(passwordHash, onUnlock, onLock) {
         overlay.style.cssText = `
             position: fixed;
             top: 0;
-            left: 0;
+            inset-inline-start: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.85);
@@ -542,7 +543,7 @@ function showPasswordOverlay(passwordHash, onUnlock, onLock) {
                                        transition: border-color 0.2s;
                                        box-sizing: border-box;
                                    " 
-                                   autofocus />
+                                   autofocus / data-i18n-attr="placeholder:feature.core.password.enterPassword">
                         </div>
                         <div style="display: flex; gap: 0.5rem;">
                             <button id="password-submit" style="
@@ -556,7 +557,7 @@ function showPasswordOverlay(passwordHash, onUnlock, onLock) {
                                 font-size: 1rem;
                                 cursor: pointer;
                                 transition: opacity 0.2s;
-                            ">Unlock</button>
+                            " data-i18n="feature.core.password.unlock">Unlock</button>
                             ${!unlockState.buildLocked ? `<button id="password-clear" style="
                                 padding: 0.8rem 1.2rem;
                                 background: var(--bg4, #555);
@@ -566,7 +567,7 @@ function showPasswordOverlay(passwordHash, onUnlock, onLock) {
                                 cursor: pointer;
                                 font-size: 1rem;
                                 transition: opacity 0.2s;
-                            ">Clear</button>` : ''}
+                            " data-i18n="feature.core.password.clear">Clear</button>` : ''}
                         </div>
                     </div>
                     <div id="password-error" style="
@@ -623,7 +624,7 @@ function showPasswordOverlay(passwordHash, onUnlock, onLock) {
         
         if (clearBtn) {
             clearBtn.addEventListener('click', async () => {
-                if (confirm('Clear the password? This will remove the password protection.')) {
+                if (confirm(i18nText("feature.core.password.clearThePasswordThisWillRemoveThe", null, "Clear the password? This will remove the password protection."))) {
                     await clearPassword();
                     if (onUnlock) onUnlock();
                     removePasswordOverlay();
@@ -645,7 +646,7 @@ async function handlePasswordSubmit(password, passwordHash, onUnlock, onLock) {
         
         if (!password || password.length < 1) {
             if (errorEl) {
-                errorEl.textContent = 'Please enter a password.';
+                errorEl.textContent = i18nText("feature.core.password.pleaseEnterAPassword", null, "Please enter a password.");
                 errorEl.style.display = 'block';
             }
             return;
@@ -667,7 +668,7 @@ async function handlePasswordSubmit(password, passwordHash, onUnlock, onLock) {
                 errorEl.style.display = 'block';
             }
             if (attemptsEl && result.attempts !== undefined) {
-                attemptsEl.textContent = `Attempts: ${result.attempts}/${CONFIG.MAX_ATTEMPTS}`;
+                attemptsEl.textContent = i18nText("feature.core.password.attemptsValueValue", { value0: result.attempts, value1: CONFIG.MAX_ATTEMPTS }, "Attempts: {{value0}}/{{value1}}");
             }
             if (input) {
                 input.value = '';
@@ -681,7 +682,7 @@ async function handlePasswordSubmit(password, passwordHash, onUnlock, onLock) {
         console.error('Error in password submission:', e);
         const { errorEl } = window.__passwordOverlay || {};
         if (errorEl) {
-            errorEl.textContent = 'System error. Please try again.';
+            errorEl.textContent = i18nText("feature.core.password.systemErrorPleaseTryAgain", null, "System error. Please try again.");
             errorEl.style.display = 'block';
         }
     }
@@ -760,7 +761,7 @@ export async function setupPassword(password) {
         localStorage.removeItem('fates-edge-unlock');
         unlockState.isUnlocked = false;
         
-        showToast('Password set successfully', 'success');
+        showToast(i18nText("feature.core.password.passwordSetSuccessfully", null, "Password set successfully"), 'success');
         return true;
     } catch (e) {
         console.error('Failed to set password:', e);

@@ -10,12 +10,11 @@
  * - Psion: Mental Strain, max
  * - Cantor: Corruption + Bloom Count (NEW)
  *
- * "The ledger always balances. The question is what you're willing to pay."
- * – The Gray Wanderer
  */
 
 import { getCharacterData } from '@features/spellcraft/index.js';
 import { escHtml } from '@core/utils.js';
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 
 // ============================================================
 // HELPER
@@ -35,7 +34,7 @@ function safeString(val) {
 export function renderTrackers(el) {
     const char = getCharacterData();
     if (!char) {
-        el.innerHTML = `<p style="color:var(--text3);">Select a character to view tracks.</p>`;
+        el.innerHTML = `<p style="color:var(--text3);">${i18nText('feature.spellcraft.components.trackers.selectCharacter', null, 'Select a character to view tracks.')}</p>`;
         return;
     }
 
@@ -89,7 +88,7 @@ export function renderTrackers(el) {
     html += `
         <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                <span>💪 Fatigue</span>
+                <span>💪 ${i18nText('feature.spellcraft.components.trackers.fatigue', null, 'Fatigue')}</span>
                 <span>${fatigue}/${fatigueMax}</span>
             </div>
             <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
@@ -103,7 +102,7 @@ export function renderTrackers(el) {
     html += `
         <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                <span>🩸 Harm</span>
+                <span>🩸 ${i18nText('feature.spellcraft.components.trackers.harm', null, 'Harm')}</span>
                 <span>${harm}/${harmMax}</span>
             </div>
             <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
@@ -128,7 +127,7 @@ export function renderTrackers(el) {
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>⛓️ Obligation</span>
+                    <span>⛓️ ${i18nText('feature.spellcraft.components.trackers.obligation', null, 'Obligation')}</span>
                     <span>${obligation}/${obligationMax}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
@@ -144,7 +143,7 @@ export function renderTrackers(el) {
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>🎵 Corruption</span>
+                    <span>🎵 ${i18nText('feature.spellcraft.components.trackers.corruption', null, 'Corruption')}</span>
                     <span>${corruption}/${corruptionMax}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
@@ -156,11 +155,11 @@ export function renderTrackers(el) {
         // ─── Cantor: Bloom Count ────────────────────────────
         // Show bloom count as a small pill next to corruption
         if (bloomCount > 0) {
-            const fugalLabel = bloomCount >= 7 ? ' ✨Fugal' : '';
+            const fugalLabel = bloomCount >= 7 ? ` ✨${i18nText('feature.spellcraft.components.trackers.fugal', null, 'Fugal')}` : '';
             html += `
                 <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
                     <div style="display:flex;justify-content:space-between;font-size:0.75rem;align-items:center;gap:0.2rem;">
-                        <span>🌸 Blooms</span>
+                        <span>🌸 ${i18nText('feature.spellcraft.components.trackers.blooms', null, 'Blooms')}</span>
                         <span style="font-weight:600;color:${bloomCount >= 7 ? 'var(--gold)' : 'var(--text2)'};">${bloomCount}${fugalLabel}</span>
                     </div>
                 </div>
@@ -170,7 +169,7 @@ export function renderTrackers(el) {
             html += `
                 <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
                     <div style="display:flex;justify-content:space-between;font-size:0.75rem;align-items:center;gap:0.2rem;">
-                        <span>🌸 Blooms</span>
+                        <span>🌸 ${i18nText('feature.spellcraft.components.trackers.blooms', null, 'Blooms')}</span>
                         <span style="color:var(--text3);">0</span>
                     </div>
                 </div>
@@ -184,13 +183,13 @@ export function renderTrackers(el) {
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>👁️ Leash</span>
+                    <span>👁️ ${i18nText('feature.spellcraft.components.trackers.leash', null, 'Leash')}</span>
                     <span>${leash}/${leashMax}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
                     <div style="width:${pct}%;height:100%;background:${pct > 80 ? 'var(--red)' : 'var(--gold)'};border-radius:3px;"></div>
                 </div>
-                ${boundSpirits > 0 ? `<div style="font-size:0.6rem;color:var(--text3);">${boundSpirits} spirit${boundSpirits > 1 ? 's' : ''} bound</div>` : ''}
+                ${boundSpirits > 0 ? `<div style="font-size:0.6rem;color:var(--text3);">${i18nPlural('feature.spellcraft.components.trackers.spiritsBound', boundSpirits, null, '{{count}} spirits bound')}</div>` : ''}
             </div>
         `;
     }
@@ -201,7 +200,7 @@ export function renderTrackers(el) {
         html += `
             <div class="tracker-item" style="flex:1;min-width:80px;max-width:140px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>🧠 Mental Strain</span>
+                    <span>🧠 ${i18nText('feature.spellcraft.components.trackers.mentalStrain', null, 'Mental Strain')}</span>
                     <span>${mentalStrain}/${mentalStrainMax}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
@@ -218,7 +217,7 @@ export function renderTrackers(el) {
         html += `
             <div class="tracker-item" style="flex:1;min-width:70px;max-width:120px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>🌑 Shadow</span>
+                    <span>🌑 ${i18nText('feature.spellcraft.components.trackers.shadow', null, 'Shadow')}</span>
                     <span>${shadow}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
@@ -231,7 +230,7 @@ export function renderTrackers(el) {
         html += `
             <div class="tracker-item" style="flex:1;min-width:70px;max-width:120px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>😞 Shame</span>
+                    <span>😞 ${i18nText('feature.spellcraft.components.trackers.shame', null, 'Shame')}</span>
                     <span>${shame}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
@@ -244,13 +243,13 @@ export function renderTrackers(el) {
         html += `
             <div class="tracker-item" style="flex:1;min-width:70px;max-width:120px;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>🌀 Identity</span>
+                    <span>🌀 ${i18nText('feature.spellcraft.components.trackers.identity', null, 'Identity')}</span>
                     <span>${identityStrain}</span>
                 </div>
                 <div style="width:100%;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
                     <div style="width:${idPct}%;height:100%;background:${identityStrain >= 4 ? 'var(--red)' : 'var(--gold)'};border-radius:3px;"></div>
                 </div>
-                ${identityStrain >= 4 ? `<div style="font-size:0.55rem;color:var(--red);">⚠️ Threshold!</div>` : ''}
+                ${identityStrain >= 4 ? `<div style="font-size:0.55rem;color:var(--red);">⚠️ ${i18nText('feature.spellcraft.components.trackers.threshold', null, 'Threshold!')}</div>` : ''}
             </div>
         `;
         // Promise Timers
@@ -258,7 +257,7 @@ export function renderTrackers(el) {
             html += `
                 <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
                     <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                        <span>⏳ Promises</span>
+                        <span>⏳ ${i18nText('feature.spellcraft.components.trackers.promises', null, 'Promises')}</span>
                         <span>${promiseTimers}</span>
                     </div>
                 </div>
@@ -269,16 +268,16 @@ export function renderTrackers(el) {
     // ─── Monk: Breath State, Scars, Corruption ──────────────
     if (path === 'monk' || char.monasticTradition) {
         const breathLabels = {
-            'entering': '🌬️ Entering',
-            'holding': '🫁 Holding',
-            'releasing': '💨 Releasing',
-            'empty': '🌌 Empty'
+            'entering': `🌬️ ${i18nText('feature.spellcraft.components.trackers.entering', null, 'Entering')}`,
+            'holding': `🫁 ${i18nText('feature.spellcraft.components.trackers.holding', null, 'Holding')}`,
+            'releasing': `💨 ${i18nText('feature.spellcraft.components.trackers.releasing', null, 'Releasing')}`,
+            'empty': `🌌 ${i18nText('feature.spellcraft.components.trackers.empty', null, 'Empty')}`
         };
         const label = breathLabels[breathState] || breathState;
         html += `
             <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
                 <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                    <span>🫁 Breath</span>
+                    <span>🫁 ${i18nText('feature.spellcraft.components.trackers.breath', null, 'Breath')}</span>
                     <span>${label}</span>
                 </div>
             </div>
@@ -287,7 +286,7 @@ export function renderTrackers(el) {
             html += `
                 <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
                     <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                        <span>⚡ Scars</span>
+                        <span>⚡ ${i18nText('feature.spellcraft.components.trackers.scars', null, 'Scars')}</span>
                         <span>${breathScars.length}</span>
                     </div>
                 </div>
@@ -297,8 +296,8 @@ export function renderTrackers(el) {
             html += `
                 <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
                     <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                        <span>⚠️ Corruption</span>
-                        <span>Tier ${monkCorruptionTier}</span>
+                        <span>⚠️ ${i18nText('feature.spellcraft.components.trackers.corruption', null, 'Corruption')}</span>
+                        <span>${i18nText('feature.spellcraft.components.trackers.tierValue', { tier: monkCorruptionTier }, 'Tier {{tier}}')}</span>
                     </div>
                 </div>
             `;
@@ -307,7 +306,7 @@ export function renderTrackers(el) {
             html += `
                 <div class="tracker-item" style="flex:0 0 auto;padding:0 0.2rem;">
                     <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-                        <span>🧘 Progress</span>
+                        <span>🧘 ${i18nText('feature.spellcraft.components.trackers.progress', null, 'Progress')}</span>
                         <span>${meditationProgress}</span>
                     </div>
                 </div>

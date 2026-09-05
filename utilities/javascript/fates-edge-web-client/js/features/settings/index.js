@@ -10,9 +10,10 @@
  * - Session archives
  * - Theme switching
  * - License display
- * - Tours & Onboarding (Welcome Tour + Magic Paths Tour)
+ * - Tours & Onboarding (Product Tour + Welcome Tour + Magic Paths Tour)
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { 
     getState as getAppState,
     getArchives, 
@@ -150,19 +151,19 @@ async function loadAdventureLibrary() {
 
 async function handleAdventureInstall(id, btn) {
     if (!isGMForLibrary()) {
-        showToast('Only the GM can install adventure modules.', 'error');
+        showToast(i18nText("feature.settings.onlyTheGMCanInstallAdventureModules", null, "Only the GM can install adventure modules."), 'error');
         return;
     }
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Installing…'; }
+    if (btn) { btn.disabled = true; btn.textContent = i18nText("feature.settings.installing", null, "⏳ Installing…"); }
     try {
         const installed = await loadAdventureFromFile(id);
         if (installed) {
-            showToast(`📚 Installed "${installed.title}" into your adventure library.`, 'success');
+            showToast(i18nText("feature.settings.installedValueIntoYourAdventureLibrary", { value0: installed.title }, "📚 Installed \"{{value0}}\" into your adventure library."), 'success');
         } else {
-            showToast(`Failed to install "${id}" — check the console for details.`, 'error');
+            showToast(i18nText("feature.settings.failedToInstallValueCheckTheConsole", { value0: id }, "Failed to install \"{{value0}}\" — check the console for details."), 'error');
         }
     } catch (e) {
-        showToast(`Failed to install "${id}": ${e.message || e}`, 'error');
+        showToast(i18nText("feature.settings.failedToInstallValueValue", { value0: id, value1: e.message || e }, "Failed to install \"{{value0}}\": {{value1}}"), 'error');
     }
     render(container);
 }
@@ -499,7 +500,7 @@ export function render(el) {
                     font-size: 0.75rem;
                 }
                 .pack-document-item .doc-title { color: var(--text); }
-                .pack-document-item .doc-category { color: var(--text3); margin-left: 0.3rem; font-size: 0.65rem; }
+                .pack-document-item .doc-category { color: var(--text3); margin-inline-start: 0.3rem; font-size: 0.65rem; }
                 .campaign-feedback {
                     padding: 0.3rem 0.6rem;
                     border-radius: var(--radius);
@@ -522,7 +523,7 @@ export function render(el) {
                     padding: 0.7rem 0.9rem;
                     border-radius: var(--radius);
                     border: 1px solid var(--border);
-                    border-left: 3px solid var(--gold);
+                    border-inline-start: 3px solid var(--gold);
                 }
                 .bundled-packs-hint code {
                     background: var(--bg4);
@@ -558,23 +559,23 @@ export function render(el) {
                     background: var(--bg4);
                     padding: 0.05rem 0.4rem;
                     border-radius: 8px;
-                    margin-left: 0.2rem;
+                    margin-inline-start: 0.2rem;
                 }
             </style>
 
             <header class="settings-header">
-                <h1 class="page-title">⚙️ Settings</h1>
-                <p class="page-sub">Manage your data, backups, and preferences.</p>
+                <h1 class="page-title" data-i18n="feature.settings.settings">⚙️ Settings</h1>
+                <p class="page-sub" data-i18n="feature.settings.manageYourDataBackupsAndPreferences">Manage your data, backups, and preferences.</p>
             </header>
 
             <!-- ============================================================
                  QUICK STATS BAR
                  ============================================================ -->
             <div class="settings-stats">
-                <div class="stat-item"><span class="stat-label">💾 Storage</span><span class="stat-value">Local</span></div>
-                <div class="stat-item"><span class="stat-label">📦 Archives</span><span class="stat-value">${archives.length}</span></div>
-                <div class="stat-item"><span class="stat-label">📚 Packs</span><span class="stat-value">${installedPacks.length}</span></div>
-                <div class="stat-item"><span class="stat-label">🔐 Password</span><span class="stat-value ${state.passwordHash ? 'enabled' : 'disabled'}">${state.passwordHash ? '✅ Set' : '❌ Not set'}</span></div>
+                <div class="stat-item"><span class="stat-label" data-i18n="feature.settings.storage">💾 Storage</span><span class="stat-value">Local</span></div>
+                <div class="stat-item"><span class="stat-label" data-i18n="feature.settings.archives">📦 Archives</span><span class="stat-value">${archives.length}</span></div>
+                <div class="stat-item"><span class="stat-label" data-i18n="feature.settings.packs">📚 Packs</span><span class="stat-value">${installedPacks.length}</span></div>
+                <div class="stat-item"><span class="stat-label" data-i18n="feature.settings.password_1gy4a">🔐 Password</span><span class="stat-value ${state.passwordHash ? 'enabled' : 'disabled'}">${state.passwordHash ? '✅ Set' : '❌ Not set'}</span></div>
             </div>
             
             <!-- ============================================================
@@ -582,10 +583,10 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel" id="pack-management-panel">
                 <div class="panel-header">
-                    <h3>📦 Pack Management</h3>
+                    <h3 data-i18n="feature.settings.packManagement">📦 Pack Management</h3>
                     <span class="badge pack-count">${installedPacks.length} installed</span>
                 </div>
-                <p class="text-muted small">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
+                <p class="text-muted small" data-i18n="feature.settings.installCustomPacksToExtendTheToolkit">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
 
                 <div class="bundled-packs-hint mt-1">
                     <strong style="color:var(--gold);">📚 What a pack contains</strong>
@@ -595,21 +596,21 @@ export function render(el) {
 
                 <div class="form-row">
                     <div class="field" style="flex:3;">
-                        <label>Install Pack</label>
+                        <label data-i18n="feature.settings.installPack">Install Pack</label>
                         <input type="file" id="pack-file-input" accept=".zip" />
-                        <div class="field-hint">Select a .zip pack file to install</div>
+                        <div class="field-hint" data-i18n="feature.settings.selectAZipPackFileToInstall">Select a .zip pack file to install</div>
                     </div>
                 </div>
                 
                 <div class="flex">
-                    <button class="btn btn-gold" id="pack-install-btn">📦 Install Pack</button>
-                    <button class="btn btn-sm btn-secondary" id="pack-refresh-btn">↻ Refresh</button>
+                    <button class="btn btn-gold" id="pack-install-btn" data-i18n="feature.settings.installPack_1eguc">📦 Install Pack</button>
+                    <button class="btn btn-sm btn-secondary" id="pack-refresh-btn" data-i18n="feature.settings.refresh">↻ Refresh</button>
                 </div>
                 
                 <div id="pack-install-feedback" class="mt-1" style="min-height:1.5rem;"></div>
                 
                 <div class="mt-1">
-                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📋 Installed Packs</h4>
+                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;" data-i18n="feature.settings.installedPacks">📋 Installed Packs</h4>
                     <div id="pack-list" class="pack-list">
                         ${installedPacks.length === 0 ? '<div class="text-muted small">No packs installed.</div>' : ''}
                         ${installedPacks.map(pack => `
@@ -630,7 +631,7 @@ export function render(el) {
                 </div>
                 
                 <div class="mt-1">
-                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">📄 Pack Documents</h4>
+                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;" data-i18n="feature.settings.packDocuments">📄 Pack Documents</h4>
                     <div id="pack-documents-list">
                         ${packDocuments.length === 0 ? '<div class="text-muted small">No documents loaded from packs.</div>' : ''}
                         ${packDocuments.map(doc => `
@@ -648,7 +649,7 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel" id="adventure-library-panel">
                 <div class="panel-header">
-                    <h3>🗺️ Adventure Module Library</h3>
+                    <h3 data-i18n="feature.settings.adventureModuleLibrary">🗺️ Adventure Module Library</h3>
                     <span class="badge">${installedAdventureIds.size} installed</span>
                 </div>
                 <p class="text-muted small">Browse adventure modules bundled in the local <code>${ADVENTURE_LIBRARY_PATH}</code> folder and install them into your library in one click — no manual JSON placement or modal needed.</p>
@@ -690,25 +691,25 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>🔗 WebSocket Connection</h3>
+                    <h3 data-i18n="feature.settings.websocketConnection">🔗 WebSocket Connection</h3>
                     <span class="badge ${wsConnected ? 'connected' : 'disconnected'}">${wsConnected ? '🟢 Connected' : '🔴 Disconnected'}</span>
                 </div>
                 <p class="text-muted small">Configure the WebSocket server for real-time VTT features. Default: <strong>${DEFAULT_WS_URL}</strong></p>
                 
                 <div class="form-row">
                     <div class="field" style="flex:3;">
-                        <label>WebSocket Server URL</label>
+                        <label data-i18n="feature.settings.websocketServerURL">WebSocket Server URL</label>
                         <input type="text" id="settings-ws-url" 
                                value="${escHtml(settings.wsUrl || DEFAULT_WS_URL)}" 
                                placeholder="${DEFAULT_WS_URL}" />
-                        <div class="field-hint">The WebSocket server URL for VTT synchronization</div>
+                        <div class="field-hint" data-i18n="feature.settings.theWebSocketServerURLForVTTSynchronization">The WebSocket server URL for VTT synchronization</div>
                     </div>
                     <div class="field" style="flex:1;">
-                        <label>Room Name</label>
+                        <label data-i18n="feature.settings.roomName">Room Name</label>
                         <input type="text" id="settings-ws-room" 
                                value="${escHtml(settings.wsRoom || DEFAULT_WS_ROOM)}" 
                                placeholder="${DEFAULT_WS_ROOM}" />
-                        <div class="field-hint">Room to join for multiplayer</div>
+                        <div class="field-hint" data-i18n="feature.settings.roomToJoinForMultiplayer">Room to join for multiplayer</div>
                     </div>
                 </div>
                 
@@ -726,7 +727,7 @@ export function render(el) {
                              isLocalOnlyMode()/setLocalOnlyMode()) -- spelled
                              out here since "Enable WebSocket" alone doesn't
                              make that clear from Settings. -->
-                        <div class="field-hint">Unchecking this fully disables auto-connect and background reconnect attempts &mdash; use it to work offline with no connection noise.</div>
+                        <div class="field-hint" data-i18n="feature.settings.uncheckingThisFullyDisablesAutoConnectAnd">Unchecking this fully disables auto-connect and background reconnect attempts &mdash; use it to work offline with no connection noise.</div>
                     </div>
                     <div class="field" style="flex:0 0 auto;">
                         <label class="inline-check">
@@ -736,18 +737,18 @@ export function render(el) {
                         </label>
                     </div>
                     <div class="field" style="flex:0 0 120px;">
-                        <label>Reconnect Interval</label>
+                        <label data-i18n="feature.settings.reconnectInterval">Reconnect Interval</label>
                         <input type="number" id="settings-ws-interval" 
                                value="${settings.wsReconnectInterval || 3000}" 
                                min="1000" max="10000" step="500" />
-                        <div class="field-hint">ms between reconnect attempts</div>
+                        <div class="field-hint" data-i18n="feature.settings.msBetweenReconnectAttempts">ms between reconnect attempts</div>
                     </div>
                 </div>
                 
                 <div class="flex">
-                    <button class="btn btn-sm btn-secondary" id="settings-ws-test">🔍 Test Connection</button>
-                    <button class="btn btn-sm btn-gold" id="settings-ws-connect">🔗 Connect</button>
-                    <button class="btn btn-sm btn-secondary" id="settings-ws-disconnect">🔌 Disconnect</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-ws-test" data-i18n="feature.settings.testConnection">🔍 Test Connection</button>
+                    <button class="btn btn-sm btn-gold" id="settings-ws-connect" data-i18n="feature.settings.connect">🔗 Connect</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-ws-disconnect" data-i18n="feature.settings.disconnect">🔌 Disconnect</button>
                     <span id="settings-ws-status" class="status-badge ${wsConnected ? 'connected' : 'disconnected'}">
                         ${wsConnected ? '🟢 Connected' : '🔴 Disconnected'}
                     </span>
@@ -761,7 +762,7 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel" id="account-panel">
                 <div class="panel-header">
-                    <h3>🔐 Account <span class="text-muted small">(optional)</span></h3>
+                    <h3>🔐 Account <span class="text-muted small" data-i18n="feature.settings.optional">(optional)</span></h3>
                     <span id="account-status-badge" class="badge ${accountUsername ? '' : 'disconnected'}">${accountUsername ? `✅ ${escHtml(accountUsername)}` : '🔴 Not logged in'}</span>
                 </div>
                 <p class="text-muted small">
@@ -778,17 +779,17 @@ export function render(el) {
                 ` : `
                 <div class="form-row">
                     <div class="field">
-                        <label>Username</label>
-                        <input type="text" id="account-username" placeholder="3-32 chars, letters/numbers/_/-" />
+                        <label data-i18n="feature.settings.username">Username</label>
+                        <input type="text" id="account-username" placeholder="3-32 chars, letters/numbers/_/-" / data-i18n-attr="placeholder:feature.settings.332CharsLettersNumbers">
                     </div>
                     <div class="field">
-                        <label>Password</label>
-                        <input type="password" id="account-password" placeholder="8+ characters" />
+                        <label data-i18n="feature.settings.password">Password</label>
+                        <input type="password" id="account-password" placeholder="8+ characters" / data-i18n-attr="placeholder:feature.settings.8Characters">
                     </div>
                 </div>
                 <div class="flex">
-                    <button class="btn btn-sm btn-gold" id="account-login-btn">🔑 Log In</button>
-                    <button class="btn btn-sm btn-secondary" id="account-register-btn">✨ Register</button>
+                    <button class="btn btn-sm btn-gold" id="account-login-btn" data-i18n="feature.settings.logIn">🔑 Log In</button>
+                    <button class="btn btn-sm btn-secondary" id="account-register-btn" data-i18n="feature.settings.register">✨ Register</button>
                 </div>
                 <div id="account-result" class="mt-1" style="display:none;"></div>
                 `}
@@ -799,34 +800,34 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel" id="sync-panel">
                 <div class="panel-header">
-                    <h3>🌐 Live Campaign</h3>
-                    <span id="sync-status-badge" class="badge disconnected">🔴 Disconnected</span>
+                    <h3 data-i18n="feature.settings.liveCampaign">🌐 Live Campaign</h3>
+                    <span id="sync-status-badge" class="badge disconnected" data-i18n="feature.settings.disconnected">🔴 Disconnected</span>
                 </div>
                 <p class="text-muted small">Connect to a campaign server for real-time collaboration with your group. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
                 
                 <!-- User Profile Settings -->
                 <div class="form-row" style="margin-bottom:0.6rem;">
                     <div class="field">
-                        <label>Your Name</label>
+                        <label data-i18n="feature.settings.yourName">Your Name</label>
                         <input type="text" id="sync-user-name" placeholder="Your display name" value="${escHtml(userName)}" />
                     </div>
                     <div class="field">
-                        <label>Your Email <span class="text-muted small">(for Gravatar)</span></label>
+                        <label>Your Email <span class="text-muted small" data-i18n="feature.settings.forGravatar">(for Gravatar)</span></label>
                         <input type="email" id="sync-user-email" placeholder="your@email.com" value="${escHtml(userEmail)}" />
                     </div>
                     <div class="field" style="flex:0 0 auto;align-self:end;">
-                        <button class="btn btn-sm btn-primary" id="sync-save-profile-btn">💾 Save Profile</button>
+                        <button class="btn btn-sm btn-primary" id="sync-save-profile-btn" data-i18n="feature.settings.saveProfile">💾 Save Profile</button>
                     </div>
                 </div>
 
                 <div class="field" style="flex:0 0 120px;">
-                    <label>Role</label>
+                    <label data-i18n="feature.settings.role">Role</label>
                     <select id="sync-user-role" style="height: 38px;">
                         <option value="player" ${localStorage.getItem('fates-edge-client-role') === 'player' ? 'selected' : ''}>👤 Player</option>
                         <option value="gm" ${localStorage.getItem('fates-edge-client-role') === 'gm' ? 'selected' : ''}>🎯 GM</option>
                         <option value="spectator" ${localStorage.getItem('fates-edge-client-role') === 'spectator' ? 'selected' : ''}>👁️ Spectator</option>
                     </select>
-                    <p class="text-muted small" style="font-size:0.7rem;margin:0.2rem 0 0;">Co-GM isn't self-selectable here — it's granted by the room's GM after you join.</p>
+                    <p class="text-muted small" style="font-size:0.7rem;margin:0.2rem 0 0;" data-i18n="feature.settings.coGMIsnTSelfSelectableHere">Co-GM isn't self-selectable here — it's granted by the room's GM after you join.</p>
                 </div>
  
                 <!-- Avatar Preview -->
@@ -854,23 +855,23 @@ export function render(el) {
                 <!-- Connection Settings -->
                 <div class="form-row">
                     <div class="field large">
-                        <label>Server URL</label>
+                        <label data-i18n="feature.settings.serverURL">Server URL</label>
                         <input type="text" id="sync-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" />
                     </div>
                     <div class="field">
-                        <label>Campaign Code</label>
-                        <input type="text" id="sync-campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" />
+                        <label data-i18n="feature.settings.campaignCode">Campaign Code</label>
+                        <input type="text" id="sync-campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" / data-i18n-attr="placeholder:feature.settings.ac12">
                     </div>
                     <div class="field">
-                        <label>Password</label>
-                        <input type="password" id="sync-password" placeholder="Campaign password" />
+                        <label data-i18n="feature.settings.password">Password</label>
+                        <input type="password" id="sync-password" placeholder="Campaign password" / data-i18n-attr="placeholder:feature.settings.campaignPassword">
                     </div>
                 </div>
                 
                 <div class="flex">
-                    <button class="btn btn-gold" id="sync-connect-btn">🔗 Connect</button>
-                    <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;">⛔ Disconnect</button>
-                    <button class="btn btn-sm btn-secondary" id="sync-refresh-btn">↻ Refresh</button>
+                    <button class="btn btn-gold" id="sync-connect-btn" data-i18n="feature.settings.connect">🔗 Connect</button>
+                    <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;" data-i18n="feature.settings.disconnect_y1yd4">⛔ Disconnect</button>
+                    <button class="btn btn-sm btn-secondary" id="sync-refresh-btn" data-i18n="feature.settings.refresh">↻ Refresh</button>
                 </div>
                 
                 <div id="sync-status" class="sync-status disconnected">
@@ -878,7 +879,7 @@ export function render(el) {
                 </div>
                 
                 <div class="mt-1">
-                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;">👥 Online Players</h4>
+                    <h4 style="margin:0.5rem 0 0.2rem;font-size:0.95rem;" data-i18n="feature.settings.onlinePlayers">👥 Online Players</h4>
                     <div id="presence-list" class="presence-list text-muted small">
                         No other users online
                     </div>
@@ -890,17 +891,17 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>📦 Campaign Sharing (HTTP)</h3>
+                    <h3 data-i18n="feature.settings.campaignSharingHTTP">📦 Campaign Sharing (HTTP)</h3>
                 </div>
                 <p class="text-muted small">Upload your current toolkit state to a campaign server, then share the generated code with your group. They can load it with the same code. Default: <strong>${DEFAULT_SERVER_URL}</strong></p>
                 <div class="form-row">
-                    <div class="field large"><label>Server URL</label><input type="text" id="campaign-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" /></div>
-                    <div class="field" style="flex:0 0 120px;"><label>Campaign Code</label><input type="text" id="campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" /></div>
+                    <div class="field large"><label data-i18n="feature.settings.serverURL">Server URL</label><input type="text" id="campaign-server-url" placeholder="${DEFAULT_SERVER_URL}" value="${escHtml(serverUrl)}" /></div>
+                    <div class="field" style="flex:0 0 120px;"><label data-i18n="feature.settings.campaignCode">Campaign Code</label><input type="text" id="campaign-code" placeholder="AC12" maxlength="6" style="text-transform:uppercase;" / data-i18n-attr="placeholder:feature.settings.ac12"></div>
                 </div>
                 <div class="flex">
-                    <button class="btn btn-gold" id="campaign-upload-btn">⬆ Upload Current State</button>
-                    <button class="btn btn-primary" id="campaign-load-btn">⬇ Load State</button>
-                    <button class="btn btn-danger" id="campaign-delete-btn">🗑️ Delete Campaign</button>
+                    <button class="btn btn-gold" id="campaign-upload-btn" data-i18n="feature.settings.uploadCurrentState">⬆ Upload Current State</button>
+                    <button class="btn btn-primary" id="campaign-load-btn" data-i18n="feature.settings.loadState">⬇ Load State</button>
+                    <button class="btn btn-danger" id="campaign-delete-btn" data-i18n="feature.settings.deleteCampaign">🗑️ Delete Campaign</button>
                 </div>
                 <div id="campaign-feedback" class="campaign-feedback mt-1"></div>
             </div>
@@ -910,15 +911,16 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel settings-tours">
                 <div class="panel-header">
-                    <h3>🎭 Tours & Onboarding</h3>
+                    <h3 data-i18n="feature.settings.toursOnboarding">🎭 Tours & Onboarding</h3>
                 </div>
-                <p class="text-muted small">Re‑open the introductory tours if you dismissed them earlier.</p>
+                <p class="text-muted small" data-i18n="feature.settings.reOpenTheIntroductoryToursIfYou">Re‑open the introductory tours if you dismissed them earlier.</p>
                 <div class="flex">
-                    <button class="btn btn-sm btn-secondary" id="settings-show-welcome-tour">📜 Show Welcome Tour</button>
-                    <button class="btn btn-sm btn-secondary" id="settings-show-magic-tour">🧙 Show Magic Paths Tour</button>
+                    <button class="btn btn-sm btn-gold" id="settings-show-product-tour" data-i18n="feature.settings.takeTheProductTour">Take the Product Tour</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-show-welcome-tour" data-i18n="feature.settings.showWelcomeCard">Show Welcome Card</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-show-magic-tour" data-i18n="feature.settings.showMagicPathsGuide">Show Magic Paths Guide</button>
                 </div>
                 <div class="text-muted small mt-1" style="font-size:0.7rem;">
-                    The Welcome Tour appears on the Home tab. The Magic Paths Tour appears in the Spellcraft tab.
+                    The product tour visits the table tools. The welcome card appears on Home; the Magic Paths guide appears in Spellcraft.
                 </div>
             </div>
             
@@ -927,21 +929,21 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel" id="password-settings-panel">
                 <div class="panel-header">
-                    <h3>🔐 Password Protection</h3>
+                    <h3 data-i18n="feature.settings.passwordProtection">🔐 Password Protection</h3>
                     <span id="passwordStatusBadge" class="password-status-badge ${state.passwordHash ? 'enabled' : 'disabled'}">
                         ${state.passwordHash ? '🔒 Enabled' : '🔓 Disabled'}
                     </span>
                 </div>
-                <p class="text-muted small">Require a password to access the entire toolkit. Ideal for sharing with playtesters.</p>
+                <p class="text-muted small" data-i18n="feature.settings.requireAPasswordToAccessTheEntire">Require a password to access the entire toolkit. Ideal for sharing with playtesters.</p>
                 <div id="passwordSettingsContent">
                     <div class="password-settings-row">
-                        <div class="field"><label>Current Password <span class="text-muted small">(required to change)</span></label><input type="password" id="ps-current-pw" placeholder="Enter current password" autocomplete="current-password" /></div>
-                        <div class="field"><label>New Password</label><input type="password" id="ps-new-pw" placeholder="New password (min 4 chars)" autocomplete="new-password" /></div>
-                        <div class="field"><label>Confirm</label><input type="password" id="ps-confirm-pw" placeholder="Confirm new password" autocomplete="new-password" /></div>
+                        <div class="field"><label>Current Password <span class="text-muted small" data-i18n="feature.settings.requiredToChange">(required to change)</span></label><input type="password" id="ps-current-pw" placeholder="Enter current password" autocomplete="current-password" / data-i18n-attr="placeholder:feature.settings.enterCurrentPassword"></div>
+                        <div class="field"><label data-i18n="feature.settings.newPassword">New Password</label><input type="password" id="ps-new-pw" placeholder="New password (min 4 chars)" autocomplete="new-password" / data-i18n-attr="placeholder:feature.settings.newPasswordMin4Chars"></div>
+                        <div class="field"><label data-i18n="feature.settings.confirm">Confirm</label><input type="password" id="ps-confirm-pw" placeholder="Confirm new password" autocomplete="new-password" / data-i18n-attr="placeholder:feature.settings.confirmNewPassword"></div>
                     </div>
                     <div class="flex">
-                        <button class="btn btn-gold" id="ps-save-btn">🔑 Set / Change Password</button>
-                        <button class="btn btn-danger" id="ps-remove-btn">🗝️ Remove Password</button>
+                        <button class="btn btn-gold" id="ps-save-btn" data-i18n="feature.settings.setChangePassword">🔑 Set / Change Password</button>
+                        <button class="btn btn-danger" id="ps-remove-btn" data-i18n="feature.settings.removePassword">🗝️ Remove Password</button>
                     </div>
                     <div id="passwordSettingsFeedback" class="mt-1 small" style="min-height:1.4rem;"></div>
                 </div>
@@ -952,12 +954,12 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>🌐 Document Base URL</h3>
+                    <h3 data-i18n="feature.settings.documentBaseURL">🌐 Document Base URL</h3>
                 </div>
-                <p class="text-muted small">Set the base URL used when generating shareable document links. Leave empty to auto-detect from the browser.</p>
+                <p class="text-muted small" data-i18n="feature.settings.setTheBaseURLUsedWhenGenerating">Set the base URL used when generating shareable document links. Leave empty to auto-detect from the browser.</p>
                 <div class="form-row">
-                    <div class="field large"><label>Base URL</label><input type="text" id="ps-base-url" placeholder="e.g. https://yourdomain.com/fates-edge/" value="${escHtml(state.baseUrl || '')}" /></div>
-                    <div class="field" style="flex:0 0 auto;align-self:end;"><button class="btn btn-primary" id="ps-base-url-btn">💾 Save</button></div>
+                    <div class="field large"><label data-i18n="feature.settings.baseURL">Base URL</label><input type="text" id="ps-base-url" placeholder="e.g. https://yourdomain.com/fates-edge/" value="${escHtml(state.baseUrl || '')}" /></div>
+                    <div class="field" style="flex:0 0 auto;align-self:end;"><button class="btn btn-primary" id="ps-base-url-btn" data-i18n="feature.settings.save">💾 Save</button></div>
                 </div>
                 <div id="baseUrlFeedback" class="mt-1 small" style="min-height:1.2rem;"></div>
                 <div class="text-muted small mt-1">Current document links will use: <span id="currentBaseUrlDisplay" style="color:var(--gold);">${getBaseUrl()}</span></div>
@@ -968,11 +970,11 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>📦 Session Archives</h3>
+                    <h3 data-i18n="feature.settings.sessionArchives">📦 Session Archives</h3>
                     <span class="badge">${archives.length} archives</span>
                 </div>
                 <div id="session-archives"></div>
-                <button class="btn btn-sm btn-primary mt-1" id="settings-new-session">📦 New Session (archive current)</button>
+                <button class="btn btn-sm btn-primary mt-1" id="settings-new-session" data-i18n="feature.settings.newSessionArchiveCurrent">📦 New Session (archive current)</button>
             </div>
 
             <!-- ============================================================
@@ -984,14 +986,14 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>💾 Data Management</h3>
+                    <h3 data-i18n="feature.settings.dataManagement">💾 Data Management</h3>
                 </div>
-                <p class="text-muted small">Back up everything (characters, campaign state, settings) to a file, restore from a backup, or wipe all local data.</p>
+                <p class="text-muted small" data-i18n="feature.settings.backUpEverythingCharactersCampaignStateSettings">Back up everything (characters, campaign state, settings) to a file, restore from a backup, or wipe all local data.</p>
                 <div class="flex" style="gap:0.5rem;flex-wrap:wrap;">
-                    <button class="btn btn-sm btn-primary" id="settings-export-btn">⬇️ Export All Data</button>
-                    <button class="btn btn-sm btn-secondary" id="settings-import-btn">⬆️ Import Data</button>
+                    <button class="btn btn-sm btn-primary" id="settings-export-btn" data-i18n="feature.settings.exportAllData">⬇️ Export All Data</button>
+                    <button class="btn btn-sm btn-secondary" id="settings-import-btn" data-i18n="feature.settings.importData">⬆️ Import Data</button>
                     <input type="file" id="settings-import-file" accept="application/json" style="display:none;" />
-                    <button class="btn btn-sm btn-danger" id="settings-clear-btn">🗑️ Clear All Data</button>
+                    <button class="btn btn-sm btn-danger" id="settings-clear-btn" data-i18n="feature.settings.clearAllData">🗑️ Clear All Data</button>
                 </div>
             </div>
             
@@ -1035,14 +1037,14 @@ export function render(el) {
                 <p class="text-xs text-muted" style="margin:0.5rem 0 0;">
                     ${escHtml(translate('settings.language.contribute', null, 'Adding a language takes one JSON file — see TRANSLATION.md in the web client.'))}
                     <a href="#" id="locale-dev-toggle" style="color:inherit;text-decoration:underline;cursor:pointer;">${escHtml(devLocalesVisible()
-                        ? translate('settings.language.hideDevLocale', null, 'Hide the translation-test locale')
-                        : translate('settings.language.showDevLocale', null, 'Show the translation-test locale'))}</a>.
+                        ? translate('settings.language.hideDevLocale', null, 'Hide the translation-test locales')
+                        : translate('settings.language.showDevLocale', null, 'Show the translation-test locales'))}</a>.
                 </p>
             </div>
 
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>🎨 Theme & Appearance</h3>
+                    <h3 data-i18n="feature.settings.themeAppearance">🎨 Theme & Appearance</h3>
                     <span class="badge" id="theme-count-badge">${getThemes().length} installed</span>
                 </div>
                 <p class="text-muted small">Pick from any built-in theme, or a theme registered by an installed pack (see Pack Management above). "Auto" follows your system's light/dark preference.</p>
@@ -1059,7 +1061,7 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>📜 License & Copyright</h3>
+                    <h3 data-i18n="feature.settings.licenseCopyright">📜 License & Copyright</h3>
                 </div>
                 <div class="license-box">
                     <p><strong>Fate's Edge</strong> is © Nicholas A. Gasper. <strong>Used with permission, All rights reserved.</strong></p>
@@ -1067,8 +1069,8 @@ export function render(el) {
                     <p>All other content — setting lore, original characters, proprietary magic systems, artwork, etc. — is <strong>All Rights Reserved</strong>.</p>
                     <p><strong>Code:</strong> MIT License</p>
                     <div class="flex" style="gap:0.5rem;margin-top:0.5rem;">
-                        <button class="btn btn-sm btn-secondary" id="settings-license-btn">📜 Full License</button>
-                        <button class="btn btn-sm btn-secondary" id="settings-license-summary-btn">📋 Summary</button>
+                        <button class="btn btn-sm btn-secondary" id="settings-license-btn" data-i18n="feature.settings.fullLicense">📜 Full License</button>
+                        <button class="btn btn-sm btn-secondary" id="settings-license-summary-btn" data-i18n="feature.settings.summary">📋 Summary</button>
                     </div>
                 </div>
             </div>
@@ -1078,7 +1080,7 @@ export function render(el) {
                  ============================================================ -->
             <div class="panel settings-panel">
                 <div class="panel-header">
-                    <h3>ℹ️ About Fate's Edge</h3>
+                    <h3 data-i18n="feature.settings.aboutFateSEdge">ℹ️ About Fate's Edge</h3>
                 </div>
                 <div style="display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem;">
                     <span style="font-size:2.5rem;">🐉</span>
@@ -1109,7 +1111,7 @@ export function render(el) {
                         first software project. Every layer of it exists because a rule, a tool, or a table
                         actually needed it.
                     </p>
-                    <blockquote style="margin:0.8rem 0; padding:0.8rem 1rem; background:rgba(201,168,76,0.05); border-left:3px solid var(--gold); border-radius:4px; font-style:italic; color:var(--text2); font-size:0.9rem;">
+                    <blockquote style="margin:0.8rem 0; padding:0.8rem 1rem; background:rgba(201,168,76,0.05); border-inline-start:3px solid var(--gold); border-radius:4px; font-style:italic; color:var(--text2); font-size:0.9rem;">
                         <p style="margin:0;">
                             “Keep It Stupid — minimal but not fragile. Work from user needs, 
                             set a feature limit, build in layers. I'm not a developer by trade, 
@@ -1157,7 +1159,7 @@ async function handlePackInstall() {
     
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
         feedback.innerHTML = '<span style="color:var(--red);">❌ Please select a .zip pack file.</span>';
-        showToast('Please select a pack file', 'error');
+        showToast(i18nText("feature.settings.pleaseSelectAPackFile", null, "Please select a pack file"), 'error');
         return;
     }
     
@@ -1165,7 +1167,7 @@ async function handlePackInstall() {
     
     if (!file.name.endsWith('.zip')) {
         feedback.innerHTML = '<span style="color:var(--red);">❌ File must be a .zip archive.</span>';
-        showToast('Invalid pack format', 'error');
+        showToast(i18nText("feature.settings.invalidPackFormat", null, "Invalid pack format"), 'error');
         return;
     }
     
@@ -1178,12 +1180,12 @@ async function handlePackInstall() {
             <span style="color:var(--green);">✅ Pack "${result.name}" v${result.version} installed successfully!</span>
             <span class="text-muted small"> ${result.modules?.length || 0} modules, ${result.documents?.length || 0} documents</span>
         `;
-        showToast(`Pack "${result.name}" installed!`, 'success');
+        showToast(i18nText("feature.settings.packValueInstalled", { value0: result.name }, "Pack \"{{value0}}\" installed!"), 'success');
         fileInput.value = '';
         render(container);
     } catch (err) {
         feedback.innerHTML = `<span style="color:var(--red);">❌ ${err.message}</span>`;
-        showToast('Install failed: ' + err.message, 'error');
+        showToast(i18nText("feature.settings.installFailedValue", { value0: err.message }, "Install failed: {{value0}}"), 'error');
     } finally {
         installBtn.disabled = false;
     }
@@ -1194,15 +1196,15 @@ function handlePackUninstall(packId) {
     try {
         uninstallPack(packId);
         setTimeout(() => render(container), 500);
-        showToast('Pack uninstalled', 'success');
+        showToast(i18nText("feature.settings.packUninstalled", null, "Pack uninstalled"), 'success');
     } catch (e) {
-        showToast('Uninstall failed: ' + e.message, 'error');
+        showToast(i18nText("feature.settings.uninstallFailedValue", { value0: e.message }, "Uninstall failed: {{value0}}"), 'error');
     }
 }
 
 function refreshPackList() {
     render(container);
-    showToast('Pack list refreshed', 'info');
+    showToast(i18nText("feature.settings.packListRefreshed", null, "Pack list refreshed"), 'info');
 }
 
 // ============================================================
@@ -1224,7 +1226,7 @@ function initSyncUI() {
             statusEl.innerHTML = `🟢 Connected to ${status.campaignCode || 'campaign'}`;
             statusEl.className = 'sync-status connected';
             if (badgeEl) {
-                badgeEl.textContent = `🟢 Connected`;
+                badgeEl.textContent = i18nText("feature.settings.connected", null, "🟢 Connected");
                 badgeEl.className = 'badge connected';
             }
             connectBtn.style.display = 'none';
@@ -1256,7 +1258,7 @@ function initSyncUI() {
             statusEl.innerHTML = '🔴 Disconnected';
             statusEl.className = 'sync-status disconnected';
             if (badgeEl) {
-                badgeEl.textContent = '🔴 Disconnected';
+                badgeEl.textContent = i18nText("feature.settings.disconnected", null, "🔴 Disconnected");
                 badgeEl.className = 'badge disconnected';
             }
             connectBtn.style.display = 'inline-block';
@@ -1297,7 +1299,7 @@ function initSyncUI() {
                 statusEl.className = 'sync-status error';
             }
             if (badgeEl) {
-                badgeEl.textContent = '⚠️ Unavailable';
+                badgeEl.textContent = i18nText("feature.settings.unavailable", null, "⚠️ Unavailable");
                 badgeEl.className = 'badge error';
             }
         });
@@ -1335,7 +1337,7 @@ async function submitAccountAuth(mode) {
     const resultEl = document.getElementById('account-result');
 
     if (!username || !password) {
-        showToast('Enter a username and password', 'error');
+        showToast(i18nText("feature.settings.enterAUsernameAndPassword", null, "Enter a username and password"), 'error');
         return;
     }
 
@@ -1392,7 +1394,7 @@ async function logoutAccount() {
         const { syncManager } = await import('@core/sync/index.js');
         syncManager.authToken = '';
     } catch (e) { /* fine */ }
-    showToast('Logged out', 'info');
+    showToast(i18nText("feature.settings.loggedOut", null, "Logged out"), 'info');
     render(container);
 }
 
@@ -1409,7 +1411,7 @@ async function connectToSyncServer() {
     const userRole = document.getElementById('sync-user-role')?.value || 'player';
 
     if (!serverUrl || !campaignCode) {
-        showToast('Please enter server URL and campaign code', 'error');
+        showToast(i18nText("feature.settings.pleaseEnterServerURLAndCampaignCode", null, "Please enter server URL and campaign code"), 'error');
         return;
     }
 
@@ -1435,13 +1437,13 @@ async function connectToSyncServer() {
             authToken: localStorage.getItem('fates-edge-auth-token') || ''
         });
 
-        showToast('Connected to campaign!', 'success');
+        showToast(i18nText("feature.settings.connectedToCampaign", null, "Connected to campaign!"), 'success');
     } catch (e) {
         if (statusEl) {
             statusEl.innerHTML = `❌ ${e.message}`;
             statusEl.className = 'sync-status disconnected';
         }
-        showToast(`Connection failed: ${e.message}`, 'error');
+        showToast(i18nText("feature.settings.connectionFailedValue", { value0: e.message }, "Connection failed: {{value0}}"), 'error');
     }
 }
 
@@ -1453,9 +1455,9 @@ async function disconnectFromSyncServer() {
     try {
         const { syncManager } = await import('@core/sync/index.js');
         syncManager.disconnect();
-        showToast('Disconnected from campaign', 'info');
+        showToast(i18nText("feature.settings.disconnectedFromCampaign", null, "Disconnected from campaign"), 'info');
     } catch (e) {
-        showToast(`Disconnect failed: ${e.message}`, 'error');
+        showToast(i18nText("feature.settings.disconnectFailedValue", { value0: e.message }, "Disconnect failed: {{value0}}"), 'error');
     }
 }
 
@@ -1505,7 +1507,7 @@ function saveUserProfile() {
         }
     }).catch(() => {});
     
-    showToast('Profile saved!', 'success');
+    showToast(i18nText("feature.settings.profileSaved", null, "Profile saved!"), 'success');
 }
 
 // ============================================================
@@ -1552,7 +1554,7 @@ async function testWSConnectionHandler() {
     const resultDiv = document.getElementById('settings-ws-result');
     
     if (!url) {
-        showToast('Please enter a WebSocket URL', 'error');
+        showToast(i18nText("feature.settings.pleaseEnterAWebSocketURL", null, "Please enter a WebSocket URL"), 'error');
         return;
     }
     
@@ -1570,14 +1572,14 @@ async function testWSConnectionHandler() {
                     ✅ Connection successful! Server is reachable.
                 </div>
             `;
-            showToast('Connection test successful!', 'success');
+            showToast(i18nText("feature.settings.connectionTestSuccessful", null, "Connection test successful!"), 'success');
         } else {
             resultDiv.innerHTML = `
                 <div style="color:var(--red);padding:0.5rem;background:var(--bg3);border-radius:4px;">
                     ❌ Connection failed: ${result.error || 'Unknown error'}
                 </div>
             `;
-            showToast('Connection test failed', 'error');
+            showToast(i18nText("feature.settings.connectionTestFailed", null, "Connection test failed"), 'error');
         }
     }
 }
@@ -1594,24 +1596,24 @@ function connectWSHandler() {
     localStorage.setItem('fates-edge-ws-enabled', String(settings.wsEnabled));
     
     if (!settings.wsEnabled) {
-        showToast('WebSocket is disabled in settings', 'warning');
+        showToast(i18nText("feature.settings.websocketIsDisabledInSettings", null, "WebSocket is disabled in settings"), 'warning');
         return;
     }
     
     if (!settings.wsUrl) {
-        showToast('Please enter a WebSocket URL', 'error');
+        showToast(i18nText("feature.settings.pleaseEnterAWebSocketURL", null, "Please enter a WebSocket URL"), 'error');
         return;
     }
     
     connectWebSocket(settings.wsRoom);
     updateWSStatusDisplay();
-    showToast('Connecting to WebSocket...', 'info');
+    showToast(i18nText("feature.settings.connectingToWebSocket", null, "Connecting to WebSocket..."), 'info');
 }
 
 function disconnectWSHandler() {
     disconnectWebSocket();
     updateWSStatusDisplay();
-    showToast('WebSocket disconnected', 'info');
+    showToast(i18nText("feature.settings.websocketDisconnected", null, "WebSocket disconnected"), 'info');
 }
 
 function updateWSStatusDisplay() {
@@ -1652,7 +1654,7 @@ function saveWSSettings() {
     }
     
     updateWSStatusDisplay();
-    showToast('WebSocket settings saved!', 'success');
+    showToast(i18nText("feature.settings.websocketSettingsSaved", null, "WebSocket settings saved!"), 'success');
 }
 
 // ============================================================
@@ -1717,10 +1719,10 @@ export function attachEvents() {
         import('@core/sync/index.js').then(module => {
             if (module.syncManager && module.syncManager.requestFullSync) {
                 module.syncManager.requestFullSync();
-                showToast('Refreshing sync...', 'info');
+                showToast(i18nText("feature.settings.refreshingSync", null, "Refreshing sync..."), 'info');
             }
         }).catch(() => {
-            showToast('Sync module not available', 'warning');
+            showToast(i18nText("feature.settings.syncModuleNotAvailable", null, "Sync module not available"), 'warning');
         });
     });
     
@@ -1796,6 +1798,12 @@ export function attachEvents() {
     });
     
     // ─── NEW: Tours & Onboarding ──────────────────────────────────────
+    document.getElementById('settings-show-product-tour')?.addEventListener('click', () => {
+        import('@core/product-tour.js')
+            .then(module => module.startProductTour())
+            .catch(() => showToast(i18nText("feature.settings.theProductTourCouldNotBeOpened", null, "The product tour could not be opened."), 'error'));
+    });
+
     document.getElementById('settings-show-welcome-tour')?.addEventListener('click', () => {
         const state = getAppState();
         if (!state.app) state.app = {};
@@ -1812,7 +1820,7 @@ export function attachEvents() {
                 });
             }
         }, 200);
-        showToast('Welcome Tour re‑enabled – go to the Home tab.', 'success');
+        showToast(i18nText("feature.settings.welcomeTourReEnabledGoToThe", null, "Welcome Tour re‑enabled – go to the Home tab."), 'success');
     });
 
     document.getElementById('settings-show-magic-tour')?.addEventListener('click', () => {
@@ -1831,7 +1839,7 @@ export function attachEvents() {
                 });
             }
         }, 200);
-        showToast('Magic Paths Tour re‑enabled – go to the Spellcraft tab.', 'success');
+        showToast(i18nText("feature.settings.magicPathsTourReEnabledGoTo", null, "Magic Paths Tour re‑enabled – go to the Spellcraft tab."), 'success');
     });
     
     setTimeout(updateWSStatusDisplay, 200);
@@ -1849,7 +1857,7 @@ export function exportAllData() {
     a.download = `fates-edge-backup-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
-    showToast('Data exported.', 'success');
+    showToast(i18nText("feature.settings.dataExported", null, "Data exported."), 'success');
 }
 
 export function importAllData(event) {
@@ -1862,10 +1870,10 @@ export function importAllData(event) {
             const data = JSON.parse(e.target.result);
             if (!data || typeof data !== 'object') throw new Error('Invalid data file.');
             importData(data);
-            showToast('Data imported successfully!', 'success');
+            showToast(i18nText("feature.settings.dataImportedSuccessfully", null, "Data imported successfully!"), 'success');
             render(container);
         } catch (err) {
-            showToast('Error importing: ' + err.message, 'error');
+            showToast(i18nText("feature.settings.errorImportingValue", { value0: err.message }, "Error importing: {{value0}}"), 'error');
         }
     };
     reader.readAsText(file);
@@ -1873,9 +1881,9 @@ export function importAllData(event) {
 }
 
 function clearAllDataHandler() {
-    if (!confirm('Delete ALL data? This cannot be undone.')) return;
+    if (!confirm(i18nText("feature.settings.deleteALLDataThisCannotBeUndone", null, "Delete ALL data? This cannot be undone."))) return;
     clearAllData();
-    showToast('All data cleared.', 'success');
+    showToast(i18nText("feature.settings.allDataCleared", null, "All data cleared."), 'success');
     render(container);
 }
 
@@ -1895,30 +1903,30 @@ async function savePasswordSettings() {
     
     if (state.passwordHash) {
         if (!currentPw) {
-            feedback.textContent = '❌ Current password is required to change it.';
+            feedback.textContent = i18nText("feature.settings.currentPasswordIsRequiredToChangeIt", null, "❌ Current password is required to change it.");
             feedback.style.color = 'var(--red)';
             return;
         }
         const currentHash = await hashPassword(currentPw);
         if (currentHash !== state.passwordHash) {
-            feedback.textContent = '❌ Current password is incorrect.';
+            feedback.textContent = i18nText("feature.settings.currentPasswordIsIncorrect", null, "❌ Current password is incorrect.");
             feedback.style.color = 'var(--red)';
             return;
         }
     }
     
     if (!newPw) {
-        feedback.textContent = '❌ New password cannot be empty.';
+        feedback.textContent = i18nText("feature.settings.newPasswordCannotBeEmpty", null, "❌ New password cannot be empty.");
         feedback.style.color = 'var(--red)';
         return;
     }
     if (newPw.length < 4) {
-        feedback.textContent = '❌ Password must be at least 4 characters.';
+        feedback.textContent = i18nText("feature.settings.passwordMustBeAtLeast4Characters", null, "❌ Password must be at least 4 characters.");
         feedback.style.color = 'var(--red)';
         return;
     }
     if (newPw !== confirmPw) {
-        feedback.textContent = '❌ Passwords do not match.';
+        feedback.textContent = i18nText("feature.settings.passwordsDoNotMatch", null, "❌ Passwords do not match.");
         feedback.style.color = 'var(--red)';
         return;
     }
@@ -1926,45 +1934,45 @@ async function savePasswordSettings() {
     try {
         const hash = await hashPassword(newPw);
         setPasswordHash(hash);
-        feedback.textContent = '✅ Password updated successfully!';
+        feedback.textContent = i18nText("feature.settings.passwordUpdatedSuccessfully", null, "✅ Password updated successfully!");
         feedback.style.color = 'var(--green)';
         document.getElementById('ps-current-pw').value = '';
         document.getElementById('ps-new-pw').value = '';
         document.getElementById('ps-confirm-pw').value = '';
-        showToast('Password updated.', 'success');
+        showToast(i18nText("feature.settings.passwordUpdated", null, "Password updated."), 'success');
         render(container);
     } catch (e) {
-        feedback.textContent = '⚠️ Error hashing password.';
+        feedback.textContent = i18nText("feature.settings.errorHashingPassword", null, "⚠️ Error hashing password.");
         feedback.style.color = 'var(--red)';
     }
 }
 
 async function removePassword() {
-    if (!confirm('Remove password protection? Anyone will be able to access the toolkit.')) return;
+    if (!confirm(i18nText("feature.settings.removePasswordProtectionAnyoneWillBeAble", null, "Remove password protection? Anyone will be able to access the toolkit."))) return;
     const state = getAppState();
     if (!state.passwordHash) {
-        showToast('No password is set.', 'info');
+        showToast(i18nText("feature.settings.noPasswordIsSet", null, "No password is set."), 'info');
         return;
     }
     
     const currentPw = document.getElementById('ps-current-pw').value.trim();
     if (!currentPw) {
-        showToast('Please enter your current password to remove it.', 'error');
+        showToast(i18nText("feature.settings.pleaseEnterYourCurrentPasswordToRemove", null, "Please enter your current password to remove it."), 'error');
         return;
     }
     
     try {
         const currentHash = await hashPassword(currentPw);
         if (currentHash !== state.passwordHash) {
-            showToast('Current password incorrect.', 'error');
+            showToast(i18nText("feature.settings.currentPasswordIncorrect", null, "Current password incorrect."), 'error');
             return;
         }
         setPasswordHash(null);
         document.getElementById('ps-current-pw').value = '';
-        showToast('Password removed.', 'success');
+        showToast(i18nText("feature.settings.passwordRemoved", null, "Password removed."), 'success');
         render(container);
     } catch (e) {
-        showToast('Error: ' + e.message, 'error');
+        showToast(i18nText("feature.settings.errorValue", { value0: e.message }, "Error: {{value0}}"), 'error');
     }
 }
 
@@ -1978,10 +1986,10 @@ function saveBaseUrl() {
     let url = input.value.trim();
     if (url && !url.endsWith('/')) url += '/';
     setBaseUrl(url);
-    feedback.textContent = '✅ Base URL saved.';
+    feedback.textContent = i18nText("feature.settings.baseURLSaved", null, "✅ Base URL saved.");
     feedback.style.color = 'var(--green)';
     document.getElementById('currentBaseUrlDisplay').textContent = getBaseUrl();
-    showToast('Base URL updated.', 'success');
+    showToast(i18nText("feature.settings.baseURLUpdated", null, "Base URL updated."), 'success');
 }
 
 // ============================================================
@@ -1993,7 +2001,7 @@ async function campaignUpload() {
     const feedback = document.getElementById('campaign-feedback');
     const btn = document.getElementById('campaign-upload-btn');
     btn.disabled = true;
-    feedback.textContent = 'Uploading…';
+    feedback.textContent = i18nText("feature.settings.uploading", null, "Uploading…");
     feedback.className = 'campaign-feedback mt-1';
 
     try {
@@ -2011,11 +2019,11 @@ async function campaignUpload() {
         document.getElementById('campaign-code').value = result.code;
         feedback.innerHTML = `✅ Uploaded! Share code: <strong>${result.code}</strong>`;
         feedback.className = 'campaign-feedback mt-1 success';
-        showToast(`Campaign uploaded with code ${result.code}`, 'success');
+        showToast(i18nText("feature.settings.campaignUploadedWithCodeValue", { value0: result.code }, "Campaign uploaded with code {{value0}}"), 'success');
     } catch (err) {
-        feedback.textContent = '❌ ' + err.message;
+        feedback.textContent = i18nText("feature.settings.value", { value0: err.message }, "❌ {{value0}}");
         feedback.className = 'campaign-feedback mt-1 error';
-        showToast('Upload failed: ' + err.message, 'error');
+        showToast(i18nText("feature.settings.uploadFailedValue", { value0: err.message }, "Upload failed: {{value0}}"), 'error');
     } finally {
         btn.disabled = false;
     }
@@ -2027,12 +2035,12 @@ async function campaignLoad() {
     const feedback = document.getElementById('campaign-feedback');
     const btn = document.getElementById('campaign-load-btn');
     if (!code) {
-        feedback.textContent = '❌ Please enter a campaign code.';
+        feedback.textContent = i18nText("feature.settings.pleaseEnterACampaignCode", null, "❌ Please enter a campaign code.");
         feedback.className = 'campaign-feedback mt-1 error';
         return;
     }
     btn.disabled = true;
-    feedback.textContent = 'Loading…';
+    feedback.textContent = i18nText("feature.settings.loading", null, "Loading…");
     feedback.className = 'campaign-feedback mt-1';
 
     try {
@@ -2046,11 +2054,11 @@ async function campaignLoad() {
         importData(data);
         feedback.innerHTML = `✅ Loaded campaign <strong>${code}</strong> successfully!`;
         feedback.className = 'campaign-feedback mt-1 success';
-        showToast('Campaign loaded!', 'success');
+        showToast(i18nText("feature.settings.campaignLoaded", null, "Campaign loaded!"), 'success');
     } catch (err) {
-        feedback.textContent = '❌ ' + err.message;
+        feedback.textContent = i18nText("feature.settings.value", { value0: err.message }, "❌ {{value0}}");
         feedback.className = 'campaign-feedback mt-1 error';
-        showToast('Load failed: ' + err.message, 'error');
+        showToast(i18nText("feature.settings.loadFailedValue", { value0: err.message }, "Load failed: {{value0}}"), 'error');
     } finally {
         btn.disabled = false;
     }
@@ -2062,13 +2070,13 @@ async function campaignDelete() {
     const feedback = document.getElementById('campaign-feedback');
     const btn = document.getElementById('campaign-delete-btn');
     if (!code) {
-        feedback.textContent = '❌ Please enter a campaign code to delete.';
+        feedback.textContent = i18nText("feature.settings.pleaseEnterACampaignCodeToDelete", null, "❌ Please enter a campaign code to delete.");
         feedback.className = 'campaign-feedback mt-1 error';
         return;
     }
-    if (!confirm(`Delete campaign ${code} from the server?`)) return;
+    if (!confirm(i18nText("feature.settings.deleteCampaignValueFromTheServer", { value0: code }, "Delete campaign {{value0}} from the server?"))) return;
     btn.disabled = true;
-    feedback.textContent = 'Deleting…';
+    feedback.textContent = i18nText("feature.settings.deleting", null, "Deleting…");
     feedback.className = 'campaign-feedback mt-1';
 
     try {
@@ -2081,11 +2089,11 @@ async function campaignDelete() {
         feedback.innerHTML = `✅ Campaign <strong>${code}</strong> deleted.`;
         feedback.className = 'campaign-feedback mt-1 success';
         document.getElementById('campaign-code').value = '';
-        showToast('Campaign deleted.', 'success');
+        showToast(i18nText("feature.settings.campaignDeleted", null, "Campaign deleted."), 'success');
     } catch (err) {
-        feedback.textContent = '❌ ' + err.message;
+        feedback.textContent = i18nText("feature.settings.value", { value0: err.message }, "❌ {{value0}}");
         feedback.className = 'campaign-feedback mt-1 error';
-        showToast('Delete failed: ' + err.message, 'error');
+        showToast(i18nText("feature.settings.deleteFailedValue", { value0: err.message }, "Delete failed: {{value0}}"), 'error');
     } finally {
         btn.disabled = false;
     }
@@ -2121,16 +2129,16 @@ function renderSessionArchives() {
             const id = parseInt(btn.dataset.id);
             const archive = getArchives().find(a => a.id === id);
             if (archive) {
-                showToast(`Viewing archive: ${archive.label}`, 'info');
+                showToast(i18nText("feature.settings.viewingArchiveValue", { value0: archive.label }, "Viewing archive: {{value0}}"), 'info');
             }
         });
     });
     el.querySelectorAll('.delete-archive-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            if (confirm('Delete this archive?')) {
+            if (confirm(i18nText("feature.settings.deleteThisArchive", null, "Delete this archive?"))) {
                 deleteArchive(parseInt(btn.dataset.id));
                 renderSessionArchives();
-                showToast('Archive deleted.', 'success');
+                showToast(i18nText("feature.settings.archiveDeleted", null, "Archive deleted."), 'success');
             }
         });
     });
@@ -2139,10 +2147,10 @@ function renderSessionArchives() {
 function newSessionHandler() {
     const state = getAppState();
     if (state.rollHistory.length === 0 && state.chatHistory.length === 0) {
-        showToast('No data to archive.', 'info');
+        showToast(i18nText("feature.settings.noDataToArchive", null, "No data to archive."), 'info');
         return;
     }
-    const label = prompt('Session label:', `Session ${getArchives().length + 1}`) || `Session ${getArchives().length + 1}`;
+    const label = prompt(i18nText("feature.settings.sessionLabel", null, "Session label:"), `Session ${getArchives().length + 1}`) || `Session ${getArchives().length + 1}`;
     const archive = {
         id: Date.now(),
         timestamp: Date.now(),
@@ -2155,7 +2163,7 @@ function newSessionHandler() {
     state.chatHistory = [];
     saveState();
     renderSessionArchives();
-    showToast('New session started; previous archived.', 'success');
+    showToast(i18nText("feature.settings.newSessionStartedPreviousArchived", null, "New session started; previous archived."), 'success');
 }
 
 // ============================================================
@@ -2179,7 +2187,7 @@ function newSessionHandler() {
 
 const DEV_LOCALES_KEY = 'fates-edge-i18n-dev';
 
-/** The pseudolocale is a developer tool, not a language; hidden by default. */
+/** Pseudolocales are developer tools, not languages; hidden by default. */
 function devLocalesVisible() {
     return !!getStorage(DEV_LOCALES_KEY, false);
 }
@@ -2198,7 +2206,7 @@ function renderLocaleButtons() {
         const label = locale.nativeName && locale.nativeName !== locale.name
             ? `${escHtml(locale.nativeName)} <span class="text-muted small">(${escHtml(locale.name)})</span>`
             : escHtml(locale.name);
-        return `<button class="btn btn-sm locale-btn${active}" data-locale="${escHtml(locale.code)}" lang="${escHtml(locale.code)}">${label}</button>`;
+        return `<button class="btn btn-sm locale-btn${active}" data-locale="${escHtml(locale.code)}" lang="${escHtml(locale.code)}" dir="${locale.dir === 'rtl' ? 'rtl' : 'ltr'}">${label}</button>`;
     });
     buttons.push(
         `<button class="btn btn-sm locale-btn${preference === 'auto' || !preference ? ' active' : ''}" data-locale="auto">${escHtml(translate('settings.language.auto', null, '🔄 Match my browser'))}</button>`
@@ -2300,7 +2308,7 @@ function renderThemeStatusLine() {
         ? ` <span class="text-muted small">(Auto — matches your system's ${resolvedId === 'dark' ? 'dark' : 'light'} preference)</span>`
         : '';
     const sourceNote = source.pack
-        ? `<span class="source-tag" title="Registered by this pack">${escHtml(source.pack.name)} v${escHtml(source.pack.version)}</span>`
+        ? `<span class="source-tag" title="Registered by this pack" data-i18n-attr="title:feature.settings.registeredByThisPack">${escHtml(source.pack.name)} v${escHtml(source.pack.version)}</span>`
         : `<span class="source-tag">${escHtml(source.label)}</span>`;
 
     return `
@@ -2314,7 +2322,7 @@ function renderThemeStatusLine() {
 
 function refreshThemeStatus() {
     const badge = document.getElementById('theme-count-badge');
-    if (badge) badge.textContent = `${getThemes().length} installed`;
+    if (badge) badge.textContent = i18nText("feature.settings.valueInstalled", { value0: getThemes().length }, "{{value0}} installed");
     const statusLine = document.getElementById('theme-status-line');
     if (statusLine) statusLine.innerHTML = renderThemeStatusLine();
 }

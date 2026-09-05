@@ -37,6 +37,7 @@
  *    your table before using it as written.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { vttStore } from '@core/vtt-store.js';
 import { q, qa } from './vtt-core.js';
 import { escHtml } from '@core/utils.js';
@@ -132,7 +133,7 @@ function markUsed(charId, talentName) {
 /** Call this from the "Scene End" button so once-per-scene talents refresh. */
 export function resetCombatScene() {
     sceneUseCounts.clear();
-    showToast('⚔️ Combat Actions: per-scene talent uses reset.', 'info');
+    showToast(i18nText("feature.vtt.combat-actions.combatActionsPerSceneTalentUsesReset", null, "⚔️ Combat Actions: per-scene talent uses reset."), 'info');
     renderCombatActions();
 }
 
@@ -271,7 +272,7 @@ async function renderForCharacter(container, char) {
     // ---- Range / Target picker ----
     const targetOptions = targets.length
         ? targets.map(t => `<option value="${escHtml(t.name)}" ${t.name === currentTargetName ? 'selected' : ''}>${escHtml(t.name)}${t.position ? ` (${t.position})` : ''}</option>`).join('')
-        : `<option value="">No live targets (open GM's Combat Tracker to sync)</option>`;
+        : `<option value="" data-i18n="feature.vtt.combat-actions.noLiveTargetsOpenGMSCombat">No live targets (open GM's Combat Tracker to sync)</option>`;
 
     const rangeChips = RANGE_BANDS.map(b => `
         <button class="btn btn-xs combat-range-btn" data-range="${b.key}"
@@ -433,7 +434,7 @@ function attachActionEvents(container, char) {
                 const combat = await getCombatModule();
                 const newPos = combat?.worsenTrackerPositionByName?.(char.name);
                 if (newPos) {
-                    showToast(`🧭 ${char.name}'s Position worsened to ${newPos} (synced to GM Tracker).`, 'warning');
+                    showToast(i18nText("feature.vtt.combat-actions.valueSPositionWorsenedToValueSynced", { value0: char.name, value1: newPos }, "🧭 {{value0}}'s Position worsened to {{value1}} (synced to GM Tracker)."), 'warning');
                     renderForCharacter(container, char);
                 }
             }
@@ -447,7 +448,7 @@ function attachActionEvents(container, char) {
             if (!talent) return;
             const limit = talent.useLimit || 'custom';
             if (limit === 'once-scene' && getUseCount(char.id, name) >= 1) {
-                showToast(`${name} has already been used this scene.`, 'warning');
+                showToast(i18nText("feature.vtt.combat-actions.valueHasAlreadyBeenUsedThisScene", { value0: name }, "{{value0}} has already been used this scene."), 'warning');
                 return;
             }
             markUsed(char.id, name);
@@ -458,7 +459,7 @@ function attachActionEvents(container, char) {
                 const skillInput = q('#vtt-skill');
                 if (skillInput) skillInput.value = (parseInt(skillInput.value, 10) || 0) + bonus;
             }
-            showToast(`⚡ ${name}: ${talent.effect || talent.description || 'Activated.'}`, 'success');
+            showToast(i18nText("feature.vtt.combat-actions.valueValue", { value0: name, value1: talent.effect || talent.description || i18nText('common.activated', null, 'Activated.') }, "⚡ {{value0}}: {{value1}}"), 'success');
             renderForCharacter(container, char);
         });
     });

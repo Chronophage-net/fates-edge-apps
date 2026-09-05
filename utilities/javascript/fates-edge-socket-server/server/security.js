@@ -235,11 +235,10 @@ function createConnectionMessageLimiter({ windowMs = 10 * 1000, max = 120 } = {}
 // check at the call site (see room.js's handleGmApproval /
 // handleRoleChangeRequest) -- everything else that used to check
 // `role === 'gm'` should switch to isGmLike(role) below.
-// 'assistant-gm' (v4.12) is deliberately NOT included here -- it's a
-// role for the AI GM Bot's own client that grants no elevated server-side
-// permissions at all (character-edit rights, GM-only data, etc. all stay
-// gated the same as 'player'). Its actual effect is entirely on the bot's
-// own in-process narration behavior; see fates-edge-ai-gm-bot's README.
+// 'assistant-gm' (v4.12) is deliberately NOT included here. It has the
+// narrow STORY_AUTHORITY_EVENTS grant below, used by the AI GM Bot for
+// narration, but gets no GM-like character-edit, roster, secret-data, or
+// shared-record authority.
 const GM_LIKE_ROLES = new Set(['gm', 'co-gm']);
 
 function isGmLike(role) {
@@ -290,9 +289,12 @@ function isSpectator(role) {
 // room) stays on canManageGmSeat() at its own call sites and is NOT
 // listed here.
 //
-// An event absent from both sets is deliberately open to any member:
-// rolls, chat, character claims, voice signalling, whiteboard strokes,
-// and every *-request / *-list read.
+// Players may use events absent from both authority sets. Spectators are
+// different: read-only is a server guarantee, not a client convention. A
+// spectator therefore gets a small allow-list of lifecycle and query events;
+// every other inbound event is denied before either transport reaches a
+// handler. Keeping this list positive (rather than trying to enumerate every
+// write) also means a newly-added event is safe by default.
 
 const STORY_AUTHORITY_EVENTS = new Set([
     'deck-draw',
@@ -334,6 +336,28 @@ const GM_GATED_EVENTS = new Set([
 
 const STORY_AUTHORITY_ROLES = new Set(['gm', 'co-gm', 'assistant-gm']);
 
+const SPECTATOR_READ_EVENTS = new Set([
+    // Socket.IO room lifecycle. Plain WebSocket performs its initial
+    // connection before a role exists; a second handshake from an already-
+    // assigned spectator is intentionally refused so it cannot be used to
+    // self-reassign the connection.
+    'join-room',
+    'leave-room',
+    'ping',
+
+    // Public snapshots and metadata only. In particular,
+    // adventure-reference[-request] is NOT here: getReferenceData() contains
+    // unrevealed GM knowledge, while adventure-state is the filtered public
+    // view.
+    'get-clients',
+    'sync-request',
+    'deck-history',
+    'adventure-state',
+    'adventure-state-request',
+    'adhoc-timer-request',
+    'module-list',
+]);
+
 /**
  * Permission check for one inbound event.
  *
@@ -343,6 +367,9 @@ const STORY_AUTHORITY_ROLES = new Set(['gm', 'co-gm', 'assistant-gm']);
  *   keeps this pure and testable without a socket.
  */
 function checkEventPermission(event, role) {
+    if (isSpectator(role) && !SPECTATOR_READ_EVENTS.has(event)) {
+        return { event, requires: 'participant' };
+    }
     if (GM_GATED_EVENTS.has(event)) {
         return isGmLike(role) ? null : { event, requires: 'gm' };
     }
@@ -356,6 +383,9 @@ function checkEventPermission(event, role) {
  *  can't drift between them. */
 function permissionDeniedMessage(reason) {
     if (!reason) return '';
+    if (reason.requires === 'participant') {
+        return `Spectators can watch but cannot send ${reason.event}.`;
+    }
     return reason.requires === 'gm'
         ? `Only the GM or a Co-GM can do that (${reason.event}).`
         : `Only the GM, a Co-GM, or the Assistant GM can do that (${reason.event}).`;
@@ -383,6 +413,7 @@ module.exports = {
     isSpectator,
     STORY_AUTHORITY_EVENTS,
     GM_GATED_EVENTS,
+    SPECTATOR_READ_EVENTS,
     checkEventPermission,
     permissionDeniedMessage,
     sanitizeCharacterSelection,

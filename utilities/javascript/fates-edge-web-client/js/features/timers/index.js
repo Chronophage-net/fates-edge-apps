@@ -6,6 +6,7 @@
  * v2 – Role‑based gating: non‑GM cannot create, edit, or delete timers.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, addTimer, deleteTimer, updateTimer, saveState } from '@core/state.js';
 import { createTimerWidget } from '@components/TimerWidget.js';
 import { escHtml, safeParseInt, generateId } from '@core/utils.js';
@@ -96,8 +97,8 @@ function getModalTemplate() {
     return `
         <div class="modal-content">
             <div class="modal-header">
-                <button id="timerModalClose" class="btn btn-secondary editor-back">← Back</button>
-                <h3 id="timer-modal-title">Timer</h3>
+                <button id="timerModalClose" class="btn btn-secondary editor-back" data-i18n="feature.timers.back">← Back</button>
+                <h3 id="timer-modal-title" data-i18n="feature.timers.timer">Timer</h3>
             </div>
             <div id="timer-editor-content" class="modal-body"></div>
             <div class="modal-footer"></div>
@@ -172,10 +173,10 @@ export function render(el) {
     container.innerHTML = `
         <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
             <div>
-                <h1 class="page-title">⏱️ Timers</h1>
-                <p class="page-sub">Track scene pressure and faction clocks.</p>
+                <h1 class="page-title" data-i18n="feature.timers.timers">⏱️ Timers</h1>
+                <p class="page-sub" data-i18n="feature.timers.trackScenePressureAndFactionClocks">Track scene pressure and faction clocks.</p>
             </div>
-            ${canEdit ? `<button class="btn btn-gold" id="add-timer-btn">+ New Timer</button>` : ''}
+            ${canEdit ? `<button class="btn btn-gold" id="add-timer-btn" data-i18n="feature.timers.newTimer">+ New Timer</button>` : ''}
         </div>
         <div class="panel" id="timer-list-container">
             <div id="timer-list"></div>
@@ -237,7 +238,7 @@ function tickTimer(id) {
     saveState();
     renderTimers();
     if (timer.current >= timer.segments) {
-        showToast(`⏱️ Timer "${timer.name}" completed!`, 'warning');
+        showToast(i18nText("feature.timers.timerValueCompleted", { value0: timer.name }, "⏱️ Timer \"{{value0}}\" completed!"), 'warning');
     }
 }
 
@@ -248,25 +249,25 @@ function resetTimer(id) {
     timer.current = 0;
     saveState();
     renderTimers();
-    showToast(`Timer "${timer.name}" reset.`, 'info');
+    showToast(i18nText("feature.timers.timerValueReset", { value0: timer.name }, "Timer \"{{value0}}\" reset."), 'info');
 }
 
 function deleteTimerHandler(id) {
     if (!isGM()) {
-        showToast('Only the GM can delete timers.', 'error');
+        showToast(i18nText("feature.timers.onlyTheGMCanDeleteTimers", null, "Only the GM can delete timers."), 'error');
         return;
     }
-    if (!confirm('Delete this timer?')) return;
+    if (!confirm(i18nText("feature.timers.deleteThisTimer", null, "Delete this timer?"))) return;
     deleteTimer(id);
     renderTimers();
-    showToast('Timer deleted.', 'success');
+    showToast(i18nText("feature.timers.timerDeleted", null, "Timer deleted."), 'success');
 }
 
 // ─── Editor ────────────────────────────────────────────────────────────
 
 export function openTimerEditor(timerId = null) {
     if (!isGM()) {
-        showToast('Only the GM can create or edit timers.', 'error');
+        showToast(i18nText("feature.timers.onlyTheGMCanCreateOrEdit", null, "Only the GM can create or edit timers."), 'error');
         return;
     }
 
@@ -286,7 +287,7 @@ export function openTimerEditor(timerId = null) {
 
         if (!title || !content || !footer) {
             console.error('[Timers] Missing modal elements – aborting');
-            showToast('Could not open timer editor – missing modal parts.', 'error');
+            showToast(i18nText("feature.timers.couldNotOpenTimerEditorMissingModal", null, "Could not open timer editor – missing modal parts."), 'error');
             return;
         }
 
@@ -302,11 +303,11 @@ export function openTimerEditor(timerId = null) {
         content.innerHTML = `
             <div class="form-row">
                 <div class="field">
-                    <label>Name</label>
+                    <label data-i18n="feature.timers.name">Name</label>
                     <input id="te-name" value="${escHtml(timer?.name || '')}" placeholder="Timer name" />
                 </div>
                 <div class="field small">
-                    <label>Segments</label>
+                    <label data-i18n="feature.timers.segments">Segments</label>
                     <input type="number" id="te-segments" value="${timer?.segments || 4}" min="1" max="24" />
                 </div>
             </div>
@@ -315,7 +316,7 @@ export function openTimerEditor(timerId = null) {
 
         footer.innerHTML = `
             <button class="btn btn-gold" id="te-save-btn">${isEdit ? '💾 Update' : '➕ Create'}</button>
-            <button class="btn" id="te-cancel-btn">Cancel</button>
+            <button class="btn" id="te-cancel-btn" data-i18n="feature.timers.cancel">Cancel</button>
         `;
 
         // 5. Open the modal
@@ -349,13 +350,13 @@ export function openTimerEditor(timerId = null) {
         console.log('[Timers] Editor opened successfully');
     } catch (err) {
         console.error('[Timers] openTimerEditor error:', err);
-        showToast('Failed to open timer editor.', 'error');
+        showToast(i18nText("feature.timers.failedToOpenTimerEditor", null, "Failed to open timer editor."), 'error');
     }
 }
 
 function onSave() {
     if (!isGM()) {
-        showToast('Only the GM can save timer changes.', 'error');
+        showToast(i18nText("feature.timers.onlyTheGMCanSaveTimerChanges", null, "Only the GM can save timer changes."), 'error');
         closeModal();
         return;
     }
@@ -375,9 +376,9 @@ function onSave() {
                 timer.segments = segments;
                 if (timer.current > segments) timer.current = segments;
                 saveState();
-                showToast(`Timer "${name}" updated.`, 'success');
+                showToast(i18nText("feature.timers.timerValueUpdated", { value0: name }, "Timer \"{{value0}}\" updated."), 'success');
             } else {
-                showToast('Timer not found.', 'error');
+                showToast(i18nText("feature.timers.timerNotFound", null, "Timer not found."), 'error');
                 return;
             }
         } else {
@@ -387,14 +388,14 @@ function onSave() {
                 segments,
                 current: 0
             });
-            showToast(`Timer "${name}" created.`, 'success');
+            showToast(i18nText("feature.timers.timerValueCreated", { value0: name }, "Timer \"{{value0}}\" created."), 'success');
         }
 
         closeModal();
         renderTimers();
     } catch (err) {
         console.error('[Timers] Save error:', err);
-        showToast('Error saving timer.', 'error');
+        showToast(i18nText("feature.timers.errorSavingTimer", null, "Error saving timer."), 'error');
     }
 }
 

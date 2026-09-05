@@ -56,6 +56,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
 import { getCharacter, 
 	addCharacter, 
@@ -310,7 +311,7 @@ function ensureRunekeeperPatron(char) {
 export function getMagicPathsReferenceHtml(highlightId = null) {
     const paths = Object.entries(MAGIC_PATHS).filter(([id]) => id !== 'none');
     return `
-        <div class="magic-paths-reference" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.4rem;text-align:left;">
+        <div class="magic-paths-reference" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.4rem;text-align: start;">
             ${paths.map(([id, info]) => `
                 <div style="padding:0.4rem 0.5rem;border-radius:var(--radius);background:var(--bg2);border:1px solid ${id === highlightId ? 'var(--gold)' : 'var(--border)'};">
                     <div style="display:flex;align-items:center;gap:0.3rem;">
@@ -353,13 +354,13 @@ export function render(el) {
         <div class="characters-header">
             <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
                 <div>
-                    <h1 class="page-title" style="margin:0;">👤 Characters</h1>
-                    <p class="page-sub" style="margin:0.2rem 0 0;">Create and manage your party. Starting XP: 32 (max 36 with bonds/complications).</p>
+                    <h1 class="page-title" style="margin:0;" data-i18n="feature.characters.characters">👤 Characters</h1>
+                    <p class="page-sub" style="margin:0.2rem 0 0;" data-i18n="feature.characters.createAndManageYourPartyStartingXP">Create and manage your party. Starting XP: 32 (max 36 with bonds/complications).</p>
                 </div>
                 <div class="flex" style="gap:0.4rem;flex-wrap:wrap;">
-                    <button class="btn btn-gold" id="wizardCharBtn">+ New Character (Wizard)</button>
-                    <button class="btn btn-sm" id="openEditorBtn">📝 Blank Editor</button>
-                    <button class="btn btn-sm btn-primary" id="openTalentsBtn">🧙‍♂️ Talents</button>
+                    <button class="btn btn-gold" id="wizardCharBtn" data-i18n="feature.characters.newCharacterWizard">+ New Character (Wizard)</button>
+                    <button class="btn btn-sm" id="openEditorBtn" data-i18n="feature.characters.blankEditor">📝 Blank Editor</button>
+                    <button class="btn btn-sm btn-primary" id="openTalentsBtn" data-i18n="feature.characters.talents">🧙‍♂️ Talents</button>
                 </div>
             </div>
         </div>
@@ -367,7 +368,7 @@ export function render(el) {
         <!-- Party Overview -->
         <div class="panel" id="party-overview-panel" style="margin-bottom:0.8rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem;">
-                <h3 style="margin:0;">⚔️ Party Composition</h3>
+                <h3 style="margin:0;" data-i18n="feature.characters.partyComposition">⚔️ Party Composition</h3>
                 <span class="text-muted" style="font-size:0.8rem;" id="party-size"></span>
             </div>
             <div id="party-roles-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.4rem;"></div>
@@ -376,7 +377,7 @@ export function render(el) {
         <!-- Character List -->
         <div class="panel" id="char-list-container">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem;">
-                <h3 style="margin:0;">Your Characters</h3>
+                <h3 style="margin:0;" data-i18n="feature.characters.yourCharacters">Your Characters</h3>
                 <div style="display:flex;gap:0.3rem;font-size:0.8rem;align-items:center;">
                     <span id="char-count" class="text-muted"></span>
                     <span class="text-muted">|</span>
@@ -390,19 +391,19 @@ export function render(el) {
         <div class="panel" id="talent-panel" style="position:relative;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
                 <div style="display:flex;align-items:center;gap:0.5rem;">
-                    <h3 style="margin:0;">🧠 Talent Catalog</h3>
+                    <h3 style="margin:0;" data-i18n="feature.characters.talentCatalog">🧠 Talent Catalog</h3>
                     <span class="text-muted" style="font-size:0.7rem;" id="talent-count"></span>
                 </div>
                 <div style="display:flex;gap:0.3rem;">
-                    <button class="btn btn-sm btn-ghost" id="talent-toggle-btn" title="Toggle talent list visibility">−</button>
-                    <button class="btn btn-sm btn-ghost" id="talent-add-btn" title="Add custom talent">+ Talent</button>
-                    <button class="btn btn-sm btn-ghost" id="talent-clone-all-btn" title="Clone all talents from the wiki that are not yet cloned" style="color:var(--gold);">📋 Clone All</button>
+                    <button class="btn btn-sm btn-ghost" id="talent-toggle-btn" title="Toggle talent list visibility" data-i18n-attr="title:feature.characters.toggleTalentListVisibility">−</button>
+                    <button class="btn btn-sm btn-ghost" id="talent-add-btn" title="Add custom talent" data-i18n-attr="title:feature.characters.addCustomTalent" data-i18n="feature.characters.talent">+ Talent</button>
+                    <button class="btn btn-sm btn-ghost" id="talent-clone-all-btn" title="Clone all talents from the wiki that are not yet cloned" style="color:var(--gold);" data-i18n-attr="title:feature.characters.cloneAllTalentsFromTheWikiThat" data-i18n="feature.characters.cloneAll">📋 Clone All</button>
                 </div>
             </div>
             
             <!-- Talent Tier Filter -->
             <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.5rem;" id="talent-filters">
-                <button class="btn btn-xs btn-gold talent-filter-btn active" data-filter="all">All</button>
+                <button class="btn btn-xs btn-gold talent-filter-btn active" data-filter="all" data-i18n="feature.characters.all">All</button>
                 ${TALENT_TIERS.map(t => 
                     `<button class="btn btn-xs talent-filter-btn" data-filter="${t.id}" style="border-color:${t.color};">${t.label} (${t.xpRange})</button>`
                 ).join('')}
@@ -433,7 +434,7 @@ function renderPartyOverview() {
     
     const sizeEl = document.getElementById('party-size');
     if (sizeEl) {
-        sizeEl.textContent = `${characters.length} member${characters.length !== 1 ? 's' : ''}`;
+        sizeEl.textContent = i18nPlural('feature.characters.memberCount', characters.length, null, '{{count}} members');
     }
     
     const grid = document.getElementById('party-roles-grid');
@@ -459,7 +460,7 @@ function renderPartyOverview() {
                 <div style="display:flex;align-items:center;gap:0.3rem;">
                     <span style="font-size:1rem;">${role.icon}</span>
                     <strong>${role.label}</strong>
-                    <span style="margin-left:auto;color:var(--text3);font-size:0.7rem;">${role.attr}</span>
+                    <span style="margin-inline-start:auto;color:var(--text3);font-size:0.7rem;">${role.attr}</span>
                 </div>
                 <div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">${role.desc}</div>
                 ${isFilled 
@@ -493,7 +494,7 @@ export function renderCharList() {
     // Update count
     const countEl = document.getElementById('char-count');
     if (countEl) {
-        countEl.textContent = `${characters.length} character${characters.length !== 1 ? 's' : ''}`;
+        countEl.textContent = i18nPlural('feature.characters.characterCount', characters.length, null, '{{count}} characters');
     }
     
     // XP summary
@@ -503,7 +504,7 @@ export function renderCharList() {
             const xpValues = characters.map(c => c.totalXp || 32);
             const totalXp = xpValues.reduce((a, b) => a + b, 0);
             const avgXp = Math.round(totalXp / characters.length);
-            xpEl.textContent = `Avg XP: ${avgXp}`;
+            xpEl.textContent = i18nText("feature.characters.avgXPValue", { value0: avgXp }, "Avg XP: {{value0}}");
         } else {
             xpEl.textContent = '';
         }
@@ -518,7 +519,7 @@ export function renderCharList() {
                     Click "New Character (Wizard)" for guided creation, or "Blank Editor" for the full editor.<br>
                     Starting XP: 32 (max 36 with up to 2 Bonds and 2 Complications).
                 </div>
-                <div style="margin-top:1rem;text-align:left;">
+                <div style="margin-top:1rem;text-align: start;">
                     ${getMagicPathsReferenceHtml()}
                 </div>
             </div>
@@ -663,17 +664,17 @@ function createCharacterSummary(char) {
     const fatigueColor = fatigue >= fatigueMax ? 'var(--red)' : fatigue > 0 ? 'var(--orange)' : 'var(--text2)';
 
     div.innerHTML = `
-        <span style="background:rgba(255,255,255,0.05);padding:0.1rem 0.4rem;border-radius:3px;font-size:0.7rem;" title="Party role">${roleIcon} ${role}</span>
+        <span style="background:rgba(255,255,255,0.05);padding:0.1rem 0.4rem;border-radius:3px;font-size:0.7rem;" title="Party role" data-i18n-attr="title:feature.characters.partyRole">${roleIcon} ${role}</span>
         <span style="background:${tier.color};color:#000;padding:0.1rem 0.4rem;border-radius:3px;font-weight:600;font-size:0.7rem;" title="Tier based on ${xpTotal} XP">T${tier.tier} ${tier.name}</span>
-        <span style="color:var(--text3);" title="Total XP / XP spent">${xpTotal} XP ${xpSpent !== xpTotal ? `(${xpSpent} spent)` : ''}</span>
-        <span style="color:var(--text2);" title="Body / Wits / Spirit / Presence"><strong>B</strong>${char.body||1} <strong>W</strong>${char.wits||1} <strong>S</strong>${char.spirit||1} <strong>P</strong>${char.presence||1}</span>
+        <span style="color:var(--text3);" title="Total XP / XP spent" data-i18n-attr="title:feature.characters.totalXPXPSpent">${xpTotal} XP ${xpSpent !== xpTotal ? `(${xpSpent} spent)` : ''}</span>
+        <span style="color:var(--text2);" title="Body / Wits / Spirit / Presence" data-i18n-attr="title:feature.characters.bodyWitsSpiritPresence"><strong>B</strong>${char.body||1} <strong>W</strong>${char.wits||1} <strong>S</strong>${char.spirit||1} <strong>P</strong>${char.presence||1}</span>
         ${magicPath.icon ? `<span title="${magicPath.label}">${magicPath.icon} ${magicPath.label}</span>` : ''}
         ${pathStats}
         <span style="color:${harmColor};font-weight:${harm>0?'600':'400'};" title="Harm level (0-3)">${harm===0?'✓':'💔'} Harm ${harm}/3</span>
         <span style="color:${fatigueColor};" title="Fatigue (max = Body = ${fatigueMax}). Full → Harm+1, clear">😓 ${fatigue}/${fatigueMax}</span>
-        ${boons > 0 ? `<span style="color:var(--gold);" title="Boons (max 5). Spend: re-roll, Position, Asset, 2→1 XP">⭐ ${boons}/5</span>` : ''}
+        ${boons > 0 ? `<span style="color:var(--gold);" title="Boons (max 5). Spend: re-roll, Position, Asset, 2→1 XP" data-i18n-attr="title:feature.characters.boonsMax5SpendReRollPosition">⭐ ${boons}/5</span>` : ''}
         ${obligInfo.current > 0 ? `<span style="color:${obligColor};" title="Obligation (capacity = Spirit + Presence). Over cap: 1 Fatigue/segment. Double: Patron intrusion">⛓️ ${obligInfo.current}/${obligInfo.capacity}</span>` : ''}
-        ${char.vtt ? `<span style="color:var(--green);" title="Pushed to VTT">📡</span>` : ''}
+        ${char.vtt ? `<span style="color:var(--green);" title="Pushed to VTT" data-i18n-attr="title:feature.characters.pushedToVTT">📡</span>` : ''}
     `;
     return div;
 }
@@ -739,7 +740,7 @@ export function renderTalentList() {
         const tierBreakdown = TALENT_TIERS.map(t => 
             `${t.label}: ${tierCounts[t.id]}`
         ).join(' | ');
-        countEl.textContent = `(${total} total — ${tierBreakdown})`;
+        countEl.textContent = i18nText("feature.characters.valueTotalValue", { value0: total, value1: tierBreakdown }, "({{value0}} total — {{value1}})");
     }
     
     if (total === 0) {
@@ -878,10 +879,10 @@ function openCharacterEditor(id) {
         if (module.openEditor) {
             module.openEditor(id);
         } else {
-            showToast('Editor module not available.', 'error');
+            showToast(i18nText("feature.characters.editorModuleNotAvailable", null, "Editor module not available."), 'error');
         }
     }).catch(() => {
-        showToast('Failed to load editor.', 'error');
+        showToast(i18nText("feature.characters.failedToLoadEditor", null, "Failed to load editor."), 'error');
     });
 }
 
@@ -890,11 +891,11 @@ function deleteCharacterHandler(id) {
     if (!char) return;
     
     const tier = getTierFromXp(char.totalXp || 32);
-    if (!confirm(`Delete "${char.name || 'character'}" (Tier ${tier.tier} ${tier.name})?`)) return;
+    if (!confirm(i18nText("feature.characters.deleteValueTierValueValue", { value0: char.name || i18nText('common.character', null, 'character'), value1: tier.tier, value2: tier.name }, "Delete \"{{value0}}\" (Tier {{value1}} {{value2}})?"))) return;
     
     deleteCharacter(id);
     renderCharList();
-    showToast(`"${char.name || 'Character'}" deleted.`, 'success');
+    showToast(i18nText("feature.characters.valueDeleted", { value0: char.name || i18nText('common.characterCapitalized', null, 'Character') }, "\"{{value0}}\" deleted."), 'success');
 }
 
 function togglePushToVTT(id) {
@@ -921,10 +922,10 @@ function rollForCharacter(id) {
         if (module.rollForCharacter) {
             module.rollForCharacter(id);
         } else {
-            showToast('Roller module not available.', 'error');
+            showToast(i18nText("feature.characters.rollerModuleNotAvailable", null, "Roller module not available."), 'error');
         }
     }).catch(() => {
-        showToast('Failed to load roller.', 'error');
+        showToast(i18nText("feature.characters.failedToLoadRoller", null, "Failed to load roller."), 'error');
     });
 }
 
@@ -951,7 +952,7 @@ function createInlineTalentEditor(id) {
     const talents = state.talents || [];
     const talent = talents.find(t => String(t.id) === String(id));
     if (!talent) {
-        showToast('Talent not found.', 'error');
+        showToast(i18nText("feature.characters.talentNotFound", null, "Talent not found."), 'error');
         return;
     }
     
@@ -975,8 +976,8 @@ function createInlineTalentEditor(id) {
                 <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.3rem;">
                     <input type="text" id="talent-edit-name" value="${escHtml(talent.name)}" style="flex:2;min-width:100px;font-size:0.8rem;" placeholder="Talent name" />
                     <input type="number" id="talent-edit-cost" value="${talent.cost || 0}" style="width:60px;font-size:0.8rem;" placeholder="XP" min="2" title="XP cost (Minor: 2-3, Major: 4-6, Prestige: 7-10, Epic: 11+)" />
-                    <select id="talent-edit-tier" style="width:100px;font-size:0.75rem;" title="Talent tier">${tierOptions}</select>
-                    <select id="talent-edit-activation" style="width:90px;font-size:0.75rem;" title="Activation type">${activationOptions}</select>
+                    <select id="talent-edit-tier" style="width:100px;font-size:0.75rem;" title="Talent tier" data-i18n-attr="title:feature.characters.talentTier">${tierOptions}</select>
+                    <select id="talent-edit-activation" style="width:90px;font-size:0.75rem;" title="Activation type" data-i18n-attr="title:feature.characters.activationType">${activationOptions}</select>
                 </div>
                 <input type="text" id="talent-edit-prereq" value="${escHtml(talent.prerequisites || '')}" style="width:100%;font-size:0.75rem;margin-bottom:0.3rem;" placeholder="Prerequisites (e.g., 'Melee 2+, Body 3+')" />
                 <input type="text" id="talent-edit-desc" value="${escHtml(talent.description || '')}" style="width:100%;font-size:0.75rem;margin-bottom:0.3rem;" placeholder="Description" />
@@ -1018,7 +1019,7 @@ function createInlineTalentEditor(id) {
                 const activationEl = document.getElementById('talent-edit-activation');
                 
                 if (!nameEl || !nameEl.value.trim()) {
-                    showToast('Talent name is required.', 'error');
+                    showToast(i18nText("feature.characters.talentNameIsRequired", null, "Talent name is required."), 'error');
                     return;
                 }
                 
@@ -1026,8 +1027,7 @@ function createInlineTalentEditor(id) {
                 const tier = TALENT_TIERS.find(t => t.id === tierEl?.value);
                 if (tier && (cost < tier.min || cost > tier.max)) {
                     const proceed = confirm(
-                        `XP cost ${cost} doesn't match ${tier.label} tier (${tier.xpRange}).\n` +
-                        `Save anyway? (GM may allow custom costs.)`
+                        i18nText("feature.characters.xpCostValueDoesnTMatchValue", { value0: cost, value1: tier.label, value2: tier.xpRange }, "XP cost {{value0}} doesn't match {{value1}} tier ({{value2}}).\nSave anyway? (GM may allow custom costs.)")
                     );
                     if (!proceed) return;
                 }
@@ -1042,7 +1042,7 @@ function createInlineTalentEditor(id) {
                 state.talents = talents;
                 saveState();
                 renderTalentList();
-                showToast(`Talent "${talent.name}" updated.`, 'success');
+                showToast(i18nText("feature.characters.talentValueUpdated", { value0: talent.name }, "Talent \"{{value0}}\" updated."), 'success');
             });
         }
         
@@ -1061,12 +1061,12 @@ function deleteTalentHandler(id) {
     const talent = talents.find(t => String(t.id) === String(id));
     if (!talent) return;
     
-    if (!confirm(`Delete talent "${talent.name}" (${talent.cost || 0} XP)?`)) return;
+    if (!confirm(i18nText("feature.characters.deleteTalentValueValueXP", { value0: talent.name, value1: talent.cost || 0 }, "Delete talent \"{{value0}}\" ({{value1}} XP)?"))) return;
     
     state.talents = talents.filter(t => String(t.id) !== String(id));
     saveState();
     renderTalentList();
-    showToast('Talent deleted.', 'success');
+    showToast(i18nText("feature.characters.talentDeleted", null, "Talent deleted."), 'success');
 }
 
 // FIX (see header note #2): this used to hardcode `activation: 'passive'`
@@ -1092,13 +1092,13 @@ function cloneTalentFromWiki(remoteIdOrObject) {
         remote = remoteIdOrObject;
         // ensure it's a valid talent entry
         if (!remote || !remote.tags || !remote.tags.includes('talent')) {
-            showToast('Invalid talent object.', 'error');
+            showToast(i18nText("feature.characters.invalidTalentObject", null, "Invalid talent object."), 'error');
             return false;
         }
     }
     
     if (!remote) {
-        showToast('Wiki talent not found.', 'error');
+        showToast(i18nText("feature.characters.wikiTalentNotFound", null, "Wiki talent not found."), 'error');
         return false;
     }
     
@@ -1146,7 +1146,7 @@ function cloneAllTalentsFromWiki() {
     );
     
     if (remoteTalents.length === 0) {
-        showToast('No talents found in the wiki.', 'warning');
+        showToast(i18nText("feature.characters.noTalentsFoundInTheWiki", null, "No talents found in the wiki."), 'warning');
         return;
     }
     
@@ -1158,7 +1158,7 @@ function cloneAllTalentsFromWiki() {
     const toClone = remoteTalents.filter(t => !existingClones.includes(t.id));
     
     if (toClone.length === 0) {
-        showToast('All wiki talents are already cloned.', 'info');
+        showToast(i18nText("feature.characters.allWikiTalentsAreAlreadyCloned", null, "All wiki talents are already cloned."), 'info');
         return;
     }
     
@@ -1172,10 +1172,10 @@ function cloneAllTalentsFromWiki() {
     }
     
     if (clonedCount > 0) {
-        showToast(`Cloned ${clonedCount}/${totalToClone} talents from wiki.`, 'success');
+        showToast(i18nText("feature.characters.clonedValueValueTalentsFromWiki", { value0: clonedCount, value1: totalToClone }, "Cloned {{value0}}/{{value1}} talents from wiki."), 'success');
         renderTalentList();
     } else {
-        showToast('No new talents were cloned (maybe all are duplicates).', 'info');
+        showToast(i18nText("feature.characters.noNewTalentsWereClonedMaybeAll", null, "No new talents were cloned (maybe all are duplicates)."), 'info');
     }
 }
 
@@ -1246,10 +1246,10 @@ export async function attachEvents() {
                 } else if (module.default && module.default.openWizard) {
                     module.default.openWizard();
                 } else {
-                    showToast('Wizard module has no openWizard export.', 'error');
+                    showToast(i18nText("feature.characters.wizardModuleHasNoOpenWizardExport", null, "Wizard module has no openWizard export."), 'error');
                 }
             } catch (err) {
-                showToast('Failed to load wizard: ' + (err.message || err), 'error');
+                showToast(i18nText("feature.characters.failedToLoadWizardValue", { value0: err.message || err }, "Failed to load wizard: {{value0}}"), 'error');
             }
         }
 
@@ -1263,12 +1263,12 @@ export async function attachEvents() {
                 } else if (module.default && typeof module.default === 'function') {
                     module.default(null);
                 } else {
-                    showToast('Editor module loaded but no openEditor export.', 'error');
+                    showToast(i18nText("feature.characters.editorModuleLoadedButNoOpenEditorExport", null, "Editor module loaded but no openEditor export."), 'error');
                     console.warn('[Characters] Available exports:', Object.keys(module));
                 }
             } catch (err) {
                 console.error('[Characters] Failed to load editor:', err);
-                showToast('Failed to load editor: ' + (err.message || 'unknown error'), 'error');
+                showToast(i18nText("feature.characters.failedToLoadEditorValue", { value0: err.message || i18nText('common.unknownError', null, 'unknown error') }, "Failed to load editor: {{value0}}"), 'error');
             }
         }
 

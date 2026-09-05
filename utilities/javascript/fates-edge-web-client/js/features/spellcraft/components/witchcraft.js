@@ -79,6 +79,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
 import { escHtml, generateId, safeParseInt } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -294,7 +295,7 @@ const MAGIC_PATH_REFERENCE = [
 
 function renderMagicPathReferenceHtml(highlightLabel) {
     return `
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem;text-align:left;margin-top:0.8rem;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem;text-align: start;margin-top:0.8rem;">
             ${MAGIC_PATH_REFERENCE.map(p => `
                 <div style="padding:0.4rem 0.5rem;border-radius:var(--radius);background:var(--bg2);border:1px solid ${p.label === highlightLabel ? 'var(--gold)' : 'var(--border)'};">
                     <div style="display:flex;align-items:center;gap:0.3rem;">
@@ -401,13 +402,13 @@ export async function renderWitchcraft(el) {
                     <span style="font-size:1.4rem;">🧹</span>
                     <div>
                         <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Hedge Magic</span>
-                        <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${isWitch ? 'Witch' : hasHedgeAccess ? 'Hedge-Gifted' : 'Any character'}</span>
+                        <span style="font-size:0.7rem;color:var(--text3);margin-inline-start:0.3rem;">${isWitch ? 'Witch' : hasHedgeAccess ? 'Hedge-Gifted' : 'Any character'}</span>
                         ${witchcraftData ? `<span style="font-size:0.6rem;color:var(--text3);">· ${witchcraftData.patron.name}</span>` : ''}
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     ${hasHedgeAccess ? `<button class="btn btn-sm btn-primary" onclick="window.witchQuickWork()">${craftShowQuickWorkForm ? '✕ Cancel' : '⚡ Quick Work'}</button>` : ''}
-                    <button class="btn btn-sm btn-ghost" onclick="window.witchRefresh()" title="Reloads patron data from disk, bypassing any cached copy">🔄</button>
+                    <button class="btn btn-sm btn-ghost" onclick="window.witchRefresh()" title="Reloads patron data from disk, bypassing any cached copy" data-i18n-attr="title:feature.spellcraft.components.witchcraft.reloadsPatronDataFromDiskBypassingAny">🔄</button>
                 </div>
             </div>
 
@@ -447,9 +448,9 @@ export async function renderWitchcraft(el) {
 
             ${hasHedgeAccess ? `
                 <!-- ─── The Gray Wanderer's Wisdom ──────────────────── -->
-                <div class="witchcraft-wisdom" style="background:var(--bg2);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:4px solid var(--gold);font-size:0.7rem;color:var(--text3);font-style:italic;">
+                <div class="witchcraft-wisdom" style="background:var(--bg2);border-radius:var(--radius);padding:0.2rem 0.5rem;border-inline-start:4px solid var(--gold);font-size:0.7rem;color:var(--text3);font-style:italic;">
                     "${witchcraftData?.witchcraft?.quote || 'The hedge is what keeps the wolves from the flock. I am the one who tends the hedge.'}"
-                    <span style="display:block;text-align:right;font-size:0.6rem;color:var(--text2);">— The Gray Wanderer</span>
+                    <span style="display:block;text-align: end;font-size:0.6rem;color:var(--text2);">— The Gray Wanderer</span>
                 </div>
             ` : ''}
 
@@ -472,7 +473,7 @@ function renderWeaver(witchcraftData, char) {
     const hedgeGifts = wc.hedge_gifts || [];
 
     return `
-        <div class="witchcraft-weaver" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid ${color};border:1px solid var(--border);">
+        <div class="witchcraft-weaver" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid ${color};border:1px solid var(--border);">
             <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                 <span style="font-size:1.2rem;">${icon}</span>
                 <span style="font-weight:600;font-size:0.95rem;color:${color};">${name}</span>
@@ -497,11 +498,11 @@ function renderNoWeaver(allPatrons) {
             <p>No weaver selected. Choose a patron who offers witchcraft.</p>
             <button class="btn btn-sm btn-primary" onclick="window.witchChooseWeaver()">${craftShowWeaverPicker ? 'Hide Weavers' : 'Choose Weaver'}</button>
             ${craftShowWeaverPicker ? `
-                <div style="display:flex;flex-direction:column;gap:0.2rem;margin-top:0.4rem;text-align:left;max-height:180px;overflow-y:auto;padding:0.2rem;">
+                <div style="display:flex;flex-direction:column;gap:0.2rem;margin-top:0.4rem;text-align: start;max-height:180px;overflow-y:auto;padding:0.2rem;">
                     ${allPatrons.length === 0 ? `
                         <div style="font-size:0.7rem;color:var(--text3);padding:0.3rem;">No patrons with witchcraft found. Check your patron JSON files.</div>
                     ` : allPatrons.map(p => `
-                        <button class="btn btn-xs btn-secondary" style="text-align:left;justify-content:flex-start;display:flex;align-items:center;gap:0.3rem;" onclick="window.witchSelectWeaver('${escHtml(p.patronId)}')">
+                        <button class="btn btn-xs btn-secondary" style="text-align: start;justify-content:flex-start;display:flex;align-items:center;gap:0.3rem;" onclick="window.witchSelectWeaver('${escHtml(p.patronId)}')">
                             <span>${p.patronIcon}</span>
                             <span>${escHtml(p.patronName)}</span>
                             <span style="color:var(--text3);font-size:0.6rem;">— ${escHtml(p.witchcraft.name || 'Witchcraft')}${p.religion ? ` · ${escHtml(p.religion)}` : ''}</span>
@@ -536,7 +537,7 @@ function renderHedgeGiftsSection(gifts, uniqueGifts) {
                     <select id="witch-gift-select" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.3rem;max-width:140px;">
                         ${uniqueGifts.map(g => `<option value="${g.id}">${g.name}</option>`).join('')}
                     </select>
-                    <button class="btn btn-xs btn-secondary" onclick="window.witchAddGiftFromSelect()">+ Add</button>
+                    <button class="btn btn-xs btn-secondary" onclick="window.witchAddGiftFromSelect()" data-i18n="feature.spellcraft.components.witchcraft.add">+ Add</button>
                 </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:0.15rem;max-height:200px;overflow-y:auto;">
@@ -586,14 +587,14 @@ function renderPromiseTimersSection(timers) {
             </div>
             ${craftShowTimerForm ? `
                 <div class="craft-inline-form" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.4rem;display:flex;flex-direction:column;gap:0.25rem;margin-bottom:0.3rem;border:1px solid var(--border);">
-                    <input id="timer-name" type="text" placeholder="Promise name (e.g. Debt to the Web)" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" />
+                    <input id="timer-name" type="text" placeholder="Promise name (e.g. Debt to the Web)" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" / data-i18n-attr="placeholder:feature.spellcraft.components.witchcraft.promiseNameEGDebtToThe">
                     <label style="font-size:0.65rem;color:var(--text3);">Segments
                         <input id="timer-segments" type="number" min="1" value="4" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;margin-top:0.1rem;" />
                     </label>
                     <input id="timer-description" type="text" placeholder="What happens when it's full?" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" />
                     <div style="display:flex;gap:0.3rem;">
-                        <button class="btn btn-xs btn-gold" onclick="window.witchSubmitTimer()">⏳ Create</button>
-                        <button class="btn btn-xs btn-ghost" onclick="window.witchAddTimer()">Cancel</button>
+                        <button class="btn btn-xs btn-gold" onclick="window.witchSubmitTimer()" data-i18n="feature.spellcraft.components.witchcraft.create">⏳ Create</button>
+                        <button class="btn btn-xs btn-ghost" onclick="window.witchAddTimer()" data-i18n="feature.spellcraft.components.witchcraft.cancel">Cancel</button>
                     </div>
                 </div>
             ` : ''}
@@ -631,10 +632,10 @@ function renderPriceTracksSection(prices, identityThreshold) {
             <div style="display:flex;gap:0.2rem;align-items:center;justify-content:center;">
                 ${craftConfirmClearPrices ? `
                     <span style="font-size:0.6rem;color:var(--red);">Clear all?</span>
-                    <button class="btn btn-xs btn-danger" onclick="window.witchClearPrices()">Yes</button>
-                    <button class="btn btn-xs btn-ghost" onclick="window.witchCancelClearPrices()">No</button>
+                    <button class="btn btn-xs btn-danger" onclick="window.witchClearPrices()" data-i18n="feature.spellcraft.components.witchcraft.yes">Yes</button>
+                    <button class="btn btn-xs btn-ghost" onclick="window.witchCancelClearPrices()" data-i18n="feature.spellcraft.components.witchcraft.no">No</button>
                 ` : `
-                    <button class="btn btn-xs btn-ghost" onclick="window.witchClearPrices()">✕ Clear</button>
+                    <button class="btn btn-xs btn-ghost" onclick="window.witchClearPrices()" data-i18n="feature.spellcraft.components.witchcraft.clear">✕ Clear</button>
                 `}
             </div>
         </div>
@@ -646,26 +647,26 @@ function renderQuickWorkForm() {
         <div class="craft-inline-form" style="background:var(--bg2);border:1px solid var(--gold);border-radius:var(--radius);padding:0.4rem 0.5rem;display:flex;flex-direction:column;gap:0.3rem;">
             <div style="font-weight:600;font-size:0.8rem;color:var(--gold);">⚡ Quick Working</div>
             <label style="font-size:0.7rem;color:var(--text2);">Threshold
-                <input id="qw-threshold" type="text" value="door" placeholder="door, tide line, wound, vow, breath..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;margin-top:0.1rem;" />
+                <input id="qw-threshold" type="text" value="door" placeholder="door, tide line, wound, vow, breath..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;margin-top:0.1rem;" / data-i18n-attr="placeholder:feature.spellcraft.components.witchcraft.doorTideLineWoundVowBreath">
             </label>
             <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                 <label style="font-size:0.7rem;color:var(--text2);flex:1;min-width:140px;">Layer
                     <select id="qw-layer" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;margin-top:0.1rem;">
-                        <option value="Echo">Echo — past memory</option>
-                        <option value="Veil" selected>Veil — present boundary</option>
-                        <option value="Flow">Flow — future direction</option>
+                        <option value="Echo" data-i18n="feature.spellcraft.components.witchcraft.echoPastMemory">Echo — past memory</option>
+                        <option value="Veil" selected data-i18n="feature.spellcraft.components.witchcraft.veilPresentBoundary">Veil — present boundary</option>
+                        <option value="Flow" data-i18n="feature.spellcraft.components.witchcraft.flowFutureDirection">Flow — future direction</option>
                     </select>
                 </label>
                 <label style="font-size:0.7rem;color:var(--text2);flex:1;min-width:120px;">Tag
-                    <input id="qw-tag" type="text" value="BIND" placeholder="BIND, LIGHT, SILENCE..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;margin-top:0.1rem;" />
+                    <input id="qw-tag" type="text" value="BIND" placeholder="BIND, LIGHT, SILENCE..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;margin-top:0.1rem;" / data-i18n-attr="placeholder:feature.spellcraft.components.witchcraft.bindLIGHTSILENCE">
                 </label>
             </div>
             <label style="font-size:0.7rem;color:var(--text2);display:flex;align-items:center;gap:0.35rem;">
                 <input type="checkbox" id="qw-desperate" /> Desperate position (threatened — DV 4 instead of 3)
             </label>
             <div style="display:flex;gap:0.3rem;">
-                <button class="btn btn-sm btn-gold" onclick="window.witchSubmitQuickWork()">⚡ Work It</button>
-                <button class="btn btn-sm btn-ghost" onclick="window.witchQuickWork()">Cancel</button>
+                <button class="btn btn-sm btn-gold" onclick="window.witchSubmitQuickWork()" data-i18n="feature.spellcraft.components.witchcraft.workIt">⚡ Work It</button>
+                <button class="btn btn-sm btn-ghost" onclick="window.witchQuickWork()" data-i18n="feature.spellcraft.components.witchcraft.cancel">Cancel</button>
             </div>
         </div>
     `;
@@ -674,21 +675,21 @@ function renderQuickWorkForm() {
 function renderRitualForm() {
     return `
         <div class="craft-inline-form" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.45rem;display:flex;flex-direction:column;gap:0.25rem;margin-bottom:0.25rem;">
-            <input id="ritual-threshold" type="text" placeholder="Threshold (door, crossroads, grave, hearth...)" value="Crossroads" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" />
-            <input id="ritual-witness" type="text" placeholder="Witness (person, spirit, Hollowed...)" value="The Pale Shepherd" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" />
-            <input id="ritual-will" type="text" placeholder="Will — what do you intend to change?" value="Heal the land" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" />
-            <input id="ritual-price" type="text" placeholder="Price (memory, name, lock of hair, promise, blood...)" value="Memory of a childhood home" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" />
+            <input id="ritual-threshold" type="text" placeholder="Threshold (door, crossroads, grave, hearth...)" value="Crossroads" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" / data-i18n-attr="placeholder:feature.spellcraft.components.witchcraft.thresholdDoorCrossroadsGraveHearth">
+            <input id="ritual-witness" type="text" placeholder="Witness (person, spirit, Hollowed...)" value="The Pale Shepherd" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" / data-i18n-attr="placeholder:feature.spellcraft.components.witchcraft.witnessPersonSpiritHollowed">
+            <input id="ritual-will" type="text" placeholder="Will — what do you intend to change?" value="Heal the land" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" / data-i18n-attr="placeholder:feature.spellcraft.components.witchcraft.willWhatDoYouIntendToChange">
+            <input id="ritual-price" type="text" placeholder="Price (memory, name, lock of hair, promise, blood...)" value="Memory of a childhood home" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;" / data-i18n-attr="placeholder:feature.spellcraft.components.witchcraft.priceMemoryNameLockOfHairPromise">
             <label style="font-size:0.7rem;color:var(--text2);">Difficulty
                 <select id="ritual-dv" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.35rem;font-size:0.75rem;margin-top:0.1rem;">
-                    <option value="3">DV 3</option>
-                    <option value="4" selected>DV 4</option>
-                    <option value="5">DV 5</option>
-                    <option value="6">DV 6</option>
+                    <option value="3" data-i18n="feature.spellcraft.components.witchcraft.dv3">DV 3</option>
+                    <option value="4" selected data-i18n="feature.spellcraft.components.witchcraft.dv4">DV 4</option>
+                    <option value="5" data-i18n="feature.spellcraft.components.witchcraft.dv5">DV 5</option>
+                    <option value="6" data-i18n="feature.spellcraft.components.witchcraft.dv6">DV 6</option>
                 </select>
             </label>
             <div style="display:flex;gap:0.3rem;">
-                <button class="btn btn-sm btn-gold" onclick="window.witchSubmitRitual()">🕯️ Perform Ritual</button>
-                <button class="btn btn-sm btn-ghost" onclick="window.witchFullRitual()">Cancel</button>
+                <button class="btn btn-sm btn-gold" onclick="window.witchSubmitRitual()" data-i18n="feature.spellcraft.components.witchcraft.performRitual">🕯️ Perform Ritual</button>
+                <button class="btn btn-sm btn-ghost" onclick="window.witchFullRitual()" data-i18n="feature.spellcraft.components.witchcraft.cancel">Cancel</button>
             </div>
         </div>
     `;
@@ -743,7 +744,7 @@ window.witchAddGiftFromSelect = function() {
         t.name === 'Craft of the Hedge' || t.id === 'craft-of-the-hedge'
     );
     if (!hasCraft && char.magicPath !== 'witch') {
-        showToast('Learn the "Craft of the Hedge" talent first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.witchcraft.learnTheCraftOfTheHedgeTalent", null, "Learn the \"Craft of the Hedge\" talent first."), 'error');
         return;
     }
 
@@ -755,19 +756,19 @@ window.witchAddGiftFromSelect = function() {
     const available = [...UNIVERSAL_HEDGE_GIFTS, ...patronGifts];
     const selected = available.find(g => g.id === giftId);
     if (!selected) {
-        showToast('Gift not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.witchcraft.giftNotFound", null, "Gift not found."), 'error');
         return;
     }
 
     const gifts = getHedgeGifts(char);
     if (gifts.some(g => g.name === selected.name)) {
-        showToast('Already learned this gift.', 'warning');
+        showToast(i18nText("feature.spellcraft.components.witchcraft.alreadyLearnedThisGift", null, "Already learned this gift."), 'warning');
         return;
     }
 
     gifts.push({ ...selected, id: generateId('gift_') });
     saveCharacter({ witch: char.witch });
-    showToast(`🌿 Learned "${selected.name}"`, 'success');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.learnedValue", { value0: selected.name }, "🌿 Learned \"{{value0}}\""), 'success');
     refreshWitchcraftPanel();
 };
 
@@ -778,7 +779,7 @@ window.witchRemoveGift = function(giftId) {
     gifts = gifts.filter(g => g.id !== giftId && g.name !== giftId);
     char.witch.hedgeGifts = gifts;
     saveCharacter({ witch: char.witch });
-    showToast('Removed gift.', 'info');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.removedGift", null, "Removed gift."), 'info');
     refreshWitchcraftPanel();
 };
 
@@ -834,7 +835,7 @@ window.witchSubmitQuickWork = function() {
         if (priceApplied) {
             saveCharacter({ witch: char.witch });
             if (prices.identityStrain >= 3) {
-                showToast('🌀 Identity Strain threshold reached! Risk losing something of yourself.', 'error');
+                showToast(i18nText("feature.spellcraft.components.witchcraft.identityStrainThresholdReachedRiskLosingSomething", null, "🌀 Identity Strain threshold reached! Risk losing something of yourself."), 'error');
             }
         }
     }
@@ -879,7 +880,7 @@ window.witchFullRitual = function() {
     if (!char) return;
 
     if (char.magicPath !== 'witch') {
-        showToast('Full rituals require the Witch magic path.', 'error');
+        showToast(i18nText("feature.spellcraft.components.witchcraft.fullRitualsRequireTheWitchMagicPath", null, "Full rituals require the Witch magic path."), 'error');
         return;
     }
 
@@ -923,7 +924,7 @@ window.witchSubmitRitual = function() {
     prices.identityStrain += 1;
     saveCharacter({ witch: char.witch });
     if (prices.identityStrain >= 3) {
-        showToast('🌀 Identity Strain threshold reached! Risk losing something of yourself.', 'error');
+        showToast(i18nText("feature.spellcraft.components.witchcraft.identityStrainThresholdReachedRiskLosingSomething", null, "🌀 Identity Strain threshold reached! Risk losing something of yourself."), 'error');
     }
 
     if (boons > 0) {
@@ -985,7 +986,7 @@ window.witchSubmitTimer = function() {
 
     const name = (document.getElementById('timer-name')?.value || '').trim();
     if (!name) {
-        showToast('Give the promise a name.', 'error');
+        showToast(i18nText("feature.spellcraft.components.witchcraft.giveThePromiseAName", null, "Give the promise a name."), 'error');
         return;
     }
     const segments = Math.max(1, safeParseInt(document.getElementById('timer-segments')?.value, 4));
@@ -1002,7 +1003,7 @@ window.witchSubmitTimer = function() {
     });
     saveCharacter({ witch: char.witch });
     craftShowTimerForm = false;
-    showToast(`⏳ Promise "${name}" created.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.promiseValueCreated", { value0: name }, "⏳ Promise \"{{value0}}\" created."), 'success');
     refreshWitchcraftPanel();
 };
 
@@ -1011,11 +1012,11 @@ window.witchTickTimer = function(timerId) {
     if (!char) return;
     const timers = getPromiseTimers(char);
     const timer = timers.find(t => t.id === timerId);
-    if (!timer) return showToast('Timer not found.', 'error');
+    if (!timer) return showToast(i18nText("feature.spellcraft.components.witchcraft.timerNotFound", null, "Timer not found."), 'error');
 
     timer.current = (timer.current || 0) + 1;
     if (timer.current >= timer.segments) {
-        showToast(`⏳ "${timer.name}" is full! The price comes due.`, 'warning');
+        showToast(i18nText("feature.spellcraft.components.witchcraft.valueIsFullThePriceComesDue", { value0: timer.name }, "⏳ \"{{value0}}\" is full! The price comes due."), 'warning');
     }
     saveCharacter({ witch: char.witch });
     refreshWitchcraftPanel();
@@ -1028,7 +1029,7 @@ window.witchRemoveTimer = function(timerId) {
     timers = timers.filter(t => t.id !== timerId);
     char.witch.promiseTimers = timers;
     saveCharacter({ witch: char.witch });
-    showToast('Timer removed.', 'info');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.timerRemoved", null, "Timer removed."), 'info');
     refreshWitchcraftPanel();
 };
 
@@ -1048,7 +1049,7 @@ window.witchClearPrices = function() {
     prices.identityStrain = 0;
     saveCharacter({ witch: char.witch });
     craftConfirmClearPrices = false;
-    showToast('Prices cleared.', 'info');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.pricesCleared", null, "Prices cleared."), 'info');
     refreshWitchcraftPanel();
 };
 
@@ -1073,17 +1074,17 @@ window.witchSelectWeaver = function(patronId) {
     craftShowWeaverPicker = false;
 
     const selected = getAllWitchcraftPatrons().find(p => p.patronId === patronId);
-    showToast(`🧙 Chosen weaver: ${selected ? selected.patronName : patronId}`, 'success');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.chosenWeaverValue", { value0: selected ? selected.patronName : patronId }, "🧙 Chosen weaver: {{value0}}"), 'success');
     refreshWitchcraftPanel();
 };
 
 // ─── Refresh (forces a real data reload — patron data) ─────────
 
 window.witchRefresh = async function() {
-    showToast('🔄 Reloading patron data…', 'info');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.reloadingPatronData", null, "🔄 Reloading patron data…"), 'info');
     await ensurePatronDataLoaded(true);
     await refreshWitchcraftPanel();
-    showToast('✅ Hedge magic refreshed.', 'success');
+    showToast(i18nText("feature.spellcraft.components.witchcraft.hedgeMagicRefreshed", null, "✅ Hedge magic refreshed."), 'success');
 };
 
 // ============================================================
@@ -1100,7 +1101,7 @@ function showToastWithHTML(html, type = 'info') {
     const modal = document.createElement('div');
     modal.className = 'custom-toast-modal';
     modal.style.cssText = `
-        position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
+        position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 9999;
         animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
@@ -1110,7 +1111,7 @@ function showToastWithHTML(html, type = 'info') {
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;
     `;
-    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('.custom-toast-modal').remove()">Close</button>`;
+    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('.custom-toast-modal').remove()" data-i18n="feature.spellcraft.components.witchcraft.close">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
 

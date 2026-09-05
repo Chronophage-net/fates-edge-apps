@@ -1,4 +1,5 @@
 // modules/undo.js
+import { t as i18nText } from '@core/i18n.js';
 import { state, getActiveSheet } from './state.js';
 import { saveWhiteboardData } from './persistence.js';
 import { restoreDrawings, renderOverlay, updateStats } from './renderer.js';
@@ -30,7 +31,7 @@ export function pushUndoSnapshot() {
 
 export function undo() {
     const h = getUndoHistory(state.activeSheetId);
-    if (h.undo.length === 0) { showToast('Nothing to undo', 'info'); return; }
+    if (h.undo.length === 0) { showToast(i18nText("feature.whiteboard.modules.undo.nothingToUndo", null, "Nothing to undo"), 'info'); return; }
     h.redo.push(snapshotForUndo());
     const prev = h.undo.pop();
     state.drawings = prev.drawings;
@@ -45,7 +46,7 @@ export function undo() {
 
 export function redo() {
     const h = getUndoHistory(state.activeSheetId);
-    if (h.redo.length === 0) { showToast('Nothing to redo', 'info'); return; }
+    if (h.redo.length === 0) { showToast(i18nText("feature.whiteboard.modules.undo.nothingToRedo", null, "Nothing to redo"), 'info'); return; }
     h.undo.push(snapshotForUndo());
     const next = h.redo.pop();
     state.drawings = next.drawings;

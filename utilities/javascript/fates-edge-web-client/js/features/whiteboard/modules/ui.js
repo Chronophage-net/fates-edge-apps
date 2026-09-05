@@ -4,6 +4,7 @@
  * Holds the DOM references, event bindings, and high‑level UI state.
  * Delegates all core logic to the other modules.
  */
+import { t as i18nText } from '@core/i18n.js';
 import { state, setContainer, setCanvas, setCtx, playerViewActive, setPlayerViewActive, getActiveSheet, setCurrentTool as setSharedTool, setTableModeActive as setSharedTableMode } from './state.js';
 import { loadWhiteboardData, saveWhiteboardData, setupWebSocketSync, forceSync, onActivate, onDeactivate } from './persistence.js';
 import { renderSheetTabs, addSheet, renameSheet, duplicateSheet, deleteSheet, switchToSheet } from './sheets.js';
@@ -177,7 +178,7 @@ function renderLightsPanel() {
     const fog = state.gridCombat?.fogOfWar;
     const lights = fog?.lightSources || [];
     if (lights.length === 0) {
-        panel.innerHTML = `<div class="text-muted text-sm">No light sources placed. Use the 💡 Light tool to add one.</div>`;
+        panel.innerHTML = `<div class="text-muted text-sm" data-i18n="feature.whiteboard.modules.ui.noLightSourcesPlacedUseTheLight">No light sources placed. Use the 💡 Light tool to add one.</div>`;
         return;
     }
     const cellSize = state.gridCombat.cellSize || 40;
@@ -190,11 +191,11 @@ function renderLightsPanel() {
             ${lights.map((light, idx) => `
                 <div class="flex gap-2 flex-center" style="padding:4px 0; border-bottom:1px solid var(--border);">
                     <span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${light.color || 'rgba(255,220,150,0.25)'};border:1px solid var(--gold);"></span>
-                    <label class="text-muted text-xs" title="Radius in cells">R:</label>
+                    <label class="text-muted text-xs" title="Radius in cells" data-i18n-attr="title:feature.whiteboard.modules.ui.radiusInCells">R:</label>
                     <input type="range" min="1" max="20" step="0.5" value="${light.radius / cellSize}" 
                            data-light-idx="${idx}" data-prop="radius" style="width:60px;" aria-label="Radius in cells for light ${idx + 1}" />
                     <span class="text-xs">${(light.radius / cellSize).toFixed(1)}</span>
-                    <label class="text-muted text-xs">Int:</label>
+                    <label class="text-muted text-xs" data-i18n="feature.whiteboard.modules.ui.int">Int:</label>
                     <input type="range" min="0.1" max="1" step="0.05" value="${light.intensity ?? 1}" 
                            data-light-idx="${idx}" data-prop="intensity" style="width:50px;" aria-label="Intensity for light ${idx + 1}" />
                     <span class="text-xs">${(light.intensity ?? 1).toFixed(2)}</span>
@@ -279,7 +280,7 @@ export function renderVttCombatToolbar() {
         darknessSlider.style.display = showFog ? 'inline-block' : 'none';
         if (fog) {
             darknessSlider.value = fog.darkness;
-            if (darknessLabel) darknessLabel.textContent = Math.round(fog.darkness * 100) + '%';
+            if (darknessLabel) darknessLabel.textContent = i18nText("feature.whiteboard.modules.ui.value", { value0: Math.round(fog.darkness * 100) }, "{{value0}}%");
         }
     }
     if (manageLightsBtn) {
@@ -339,8 +340,8 @@ export function render(el) {
         <div id="whiteboard-modern-layout" class="whiteboard-modern-layout flex flex-col gap-2">
             <header class="flex-between" id="whiteboard-header">
                 <div>
-                    <h1 class="page-title">Campaign Whiteboard</h1>
-                    <p class="page-sub">Draw, note, and plan your tactical encounters visually.</p>
+                    <h1 class="page-title" data-i18n="feature.whiteboard.modules.ui.campaignWhiteboard">Campaign Whiteboard</h1>
+                    <p class="page-sub" data-i18n="feature.whiteboard.modules.ui.drawNoteAndPlanYourTacticalEncounters">Draw, note, and plan your tactical encounters visually.</p>
                 </div>
                 <div class="flex gap-1 flex-center">
                     <span class="status-badge badge ${isConnected ? 'badge-green' : 'badge-red'}">${isConnected ? '🟢 Live' : '📡 Local'}</span>
@@ -352,9 +353,9 @@ export function render(el) {
                 <span style="font-size: 1.5rem;">📡</span>
                 <div class="flex-1">
                     <div class="text-gold font-bold">Local Mode</div>
-                    <div class="text-muted text-sm">Whiteboard is saved locally. Connect to server for real-time collaboration.</div>
+                    <div class="text-muted text-sm" data-i18n="feature.whiteboard.modules.ui.whiteboardIsSavedLocallyConnectToServer">Whiteboard is saved locally. Connect to server for real-time collaboration.</div>
                 </div>
-                <button class="btn btn-sm btn-primary" id="whiteboard-connect-btn">🔗 Connect</button>
+                <button class="btn btn-sm btn-primary" id="whiteboard-connect-btn" data-i18n="feature.whiteboard.modules.ui.connect">🔗 Connect</button>
             </div>
 
             <div class="panel flex flex-wrap gap-2 wb-toolbar" id="whiteboard-toolbar" style="padding:0.5rem;">
@@ -364,7 +365,7 @@ export function render(el) {
                      so opening/closing a section is purely cosmetic and doesn't affect wiring. -->
 
                 <details class="wb-toolbar-section" open>
-                    <summary>✏️ Draw</summary>
+                    <summary data-i18n="feature.whiteboard.modules.ui.draw">✏️ Draw</summary>
                     <div class="wb-toolbar-section-body">
                         <div class="flex gap-1 flex-center">
                             <button class="btn btn-sm ${currentTool === 'pen' ? 'btn-gold' : 'btn-secondary'}" data-tool="pen" title="Freehand pen">✏️</button>
@@ -393,15 +394,15 @@ export function render(el) {
                         </div>
 
                         <div class="flex gap-1 flex-center">
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-undo" title="Undo (Ctrl+Z)">↶</button>
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-redo" title="Redo (Ctrl+Y)">↷</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-undo" title="Undo (Ctrl+Z)" data-i18n-attr="title:feature.whiteboard.modules.ui.undoCtrlZ">↶</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-redo" title="Redo (Ctrl+Y)" data-i18n-attr="title:feature.whiteboard.modules.ui.redoCtrlY">↷</button>
                             <label class="text-muted text-sm flex gap-1 flex-center"><input type="checkbox" id="whiteboard-grid" ${state.settings.gridSnap ? 'checked' : ''} style="width:auto;"/> Snap</label>
                         </div>
                     </div>
                 </details>
 
                 <details class="wb-toolbar-section">
-                    <summary>⚔️ Tokens &amp; Combat</summary>
+                    <summary data-i18n="feature.whiteboard.modules.ui.tokensCombat">⚔️ Tokens &amp; Combat</summary>
                     <div class="wb-toolbar-section-body">
                         <div class="flex gap-1 flex-center">
                             <button class="btn btn-sm ${isGridCombatActive() ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-grid-combat">${isGridCombatActive() ? '⚔️ Combat ON' : '⚔️ Combat OFF'}</button>
@@ -414,7 +415,7 @@ export function render(el) {
                             <button class="btn btn-sm btn-secondary" id="whiteboard-import-tracker" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🔗 Import Tracker</button>
                             <button class="btn btn-sm ${isKonrehActive() ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
                             <button class="btn btn-sm btn-secondary" id="whiteboard-konreh-challenge" title="Challenge another connected player to a real-time Kon'reh match" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Challenge Player</button>
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil">🃏 Toll &amp; Veil</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil" data-i18n="feature.whiteboard.modules.ui.tollVeil">🃏 Toll &amp; Veil</button>
                             <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil-host" title="Host a Toll &amp; Veil table for the group over the existing VTT connection" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Host Table</button>
                             <span id="whiteboard-tracker-link-status" class="text-muted text-sm"></span>
                         </div>
@@ -422,7 +423,7 @@ export function render(el) {
                 </details>
 
                 <details class="wb-toolbar-section">
-                    <summary>🌫️ Fog &amp; Light</summary>
+                    <summary data-i18n="feature.whiteboard.modules.ui.fogLight">🌫️ Fog &amp; Light</summary>
                     <div class="wb-toolbar-section-body">
                         <div class="flex gap-1 flex-center">
                             <button class="btn btn-sm ${state.gridCombat.fogOfWar?.enabled ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-fog-toggle">${state.gridCombat.fogOfWar?.enabled ? '🌫️ Fog ON' : '🌫️ Fog OFF'}</button>
@@ -431,33 +432,33 @@ export function render(el) {
                                 <option value="token-vision" ${state.gridCombat.fogOfWar?.mode === 'token-vision' ? 'selected' : ''}>👁️ Token Vision</option>
                                 <option value="line-of-sight" ${state.gridCombat.fogOfWar?.mode === 'line-of-sight' ? 'selected' : ''}>📡 Line of Sight</option>
                             </select>
-                            <button class="btn btn-sm btn-secondary" data-tool="fog-reveal" title="Paint revealed areas">✨ Reveal</button>
-                            <button class="btn btn-sm btn-secondary" data-tool="fog-hide" title="Hide areas">🌑 Hide</button>
-                            <label class="text-muted text-sm flex gap-1 flex-center" title="Brush size for Reveal/Hide, in cells">Brush
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-reveal" title="Paint revealed areas" data-i18n-attr="title:feature.whiteboard.modules.ui.paintRevealedAreas" data-i18n="feature.whiteboard.modules.ui.reveal">✨ Reveal</button>
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-hide" title="Hide areas" data-i18n-attr="title:feature.whiteboard.modules.ui.hideAreas" data-i18n="feature.whiteboard.modules.ui.hide">🌑 Hide</button>
+                            <label class="text-muted text-sm flex gap-1 flex-center" title="Brush size for Reveal/Hide, in cells" data-i18n-attr="title:feature.whiteboard.modules.ui.brushSizeForRevealHideInCells">Brush
                                 <input type="number" id="whiteboard-fog-brush" min="1" max="5" value="${state.gridCombat.fogOfWar?.fogBrushSize ?? 1}" style="width:36px;" />
                             </label>
-                            <button class="btn btn-sm btn-secondary" data-tool="fog-wall" title="Draw LoS wall">🧱 Wall</button>
-                            <button class="btn btn-sm btn-secondary" data-tool="fog-light" title="Place light source">💡 Light</button>
-                            <label class="text-muted text-sm flex gap-1 flex-center" title="Remember areas tokens have seen (dimmed instead of pitch black)">
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-wall" title="Draw LoS wall" data-i18n-attr="title:feature.whiteboard.modules.ui.drawLoSWall" data-i18n="feature.whiteboard.modules.ui.wall">🧱 Wall</button>
+                            <button class="btn btn-sm btn-secondary" data-tool="fog-light" title="Place light source" data-i18n-attr="title:feature.whiteboard.modules.ui.placeLightSource" data-i18n="feature.whiteboard.modules.ui.light">💡 Light</button>
+                            <label class="text-muted text-sm flex gap-1 flex-center" title="Remember areas tokens have seen (dimmed instead of pitch black)" data-i18n-attr="title:feature.whiteboard.modules.ui.rememberAreasTokensHaveSeenDimmedInstead">
                                 <input type="checkbox" id="whiteboard-fog-remember" ${state.gridCombat.fogOfWar?.rememberExplored !== false ? 'checked' : ''} style="width:auto;" /> Remember explored
                             </label>
-                            <button class="btn btn-sm btn-ghost" id="whiteboard-fog-clear" title="Clear all fog data">Clear Fog</button>
+                            <button class="btn btn-sm btn-ghost" id="whiteboard-fog-clear" title="Clear all fog data" data-i18n-attr="title:feature.whiteboard.modules.ui.clearAllFogData" data-i18n="feature.whiteboard.modules.ui.clearFog">Clear Fog</button>
                         </div>
                         <div class="flex gap-1 flex-center">
-                            <label class="text-muted text-sm flex gap-1 flex-center" title="Darkness level">Dark <input type="range" id="whiteboard-fog-darkness" min="0" max="1" step="0.01" value="${state.gridCombat.fogOfWar?.darkness ?? 0.85}" style="width:80px;" aria-label="Fog darkness level" /><span id="whiteboard-darkness-value" class="text-xs" style="min-width:30px;">${Math.round((state.gridCombat.fogOfWar?.darkness ?? 0.85) * 100)}%</span></label>
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-manage-lights">💡 Manage Lights</button>
+                            <label class="text-muted text-sm flex gap-1 flex-center" title="Darkness level" data-i18n-attr="title:feature.whiteboard.modules.ui.darknessLevel">Dark <input type="range" id="whiteboard-fog-darkness" min="0" max="1" step="0.01" value="${state.gridCombat.fogOfWar?.darkness ?? 0.85}" style="width:80px;" aria-label="Fog darkness level" /><span id="whiteboard-darkness-value" class="text-xs" style="min-width:30px;">${Math.round((state.gridCombat.fogOfWar?.darkness ?? 0.85) * 100)}%</span></label>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-manage-lights" data-i18n="feature.whiteboard.modules.ui.manageLights">💡 Manage Lights</button>
                         </div>
                     </div>
                 </details>
 
                 <details class="wb-toolbar-section">
-                    <summary>🖥️ View</summary>
+                    <summary data-i18n="feature.whiteboard.modules.ui.view">🖥️ View</summary>
                     <div class="wb-toolbar-section-body">
                         <div class="flex gap-1 flex-center">
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-layers">🗂️ Layers</button>
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-player-view">👁️ Player View</button>
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-roster">👥 Roster</button>
-                            <button class="btn btn-sm btn-ghost" id="whiteboard-help" title="How to use the Whiteboard">❓ Help</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-layers" data-i18n="feature.whiteboard.modules.ui.layers">🗂️ Layers</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-player-view" data-i18n="feature.whiteboard.modules.ui.playerView">👁️ Player View</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-toggle-roster" data-i18n="feature.whiteboard.modules.ui.roster">👥 Roster</button>
+                            <button class="btn btn-sm btn-ghost" id="whiteboard-help" title="How to use the Whiteboard" data-i18n-attr="title:feature.whiteboard.modules.ui.howToUseTheWhiteboard" data-i18n="feature.whiteboard.modules.ui.help">❓ Help</button>
                         </div>
                     </div>
                 </details>
@@ -467,26 +468,26 @@ export function render(el) {
             <div class="panel" id="whiteboard-layers-panel" style="display:none; padding:0.5rem;"></div>
             <div id="whiteboard-roster-panel" class="panel" style="display:none; padding:0.5rem; max-height:300px; overflow-y:auto;"></div>
 
-            <div id="whiteboard-sheet-tabs" style="display:flex; align-items:flex-end; padding-left:4px; margin-bottom:-1px; position:relative; z-index:2;"></div>
+            <div id="whiteboard-sheet-tabs" style="display:flex; align-items:flex-end; padding-inline-start:4px; margin-bottom:-1px; position:relative; z-index:2;"></div>
 
             <div class="panel relative overflow-hidden" id="whiteboard-canvas-container" style="height: ${tableModeActive ? '92vh' : '65vh'}; min-height: 400px; padding: 0;">
                 <canvas id="whiteboard-canvas" style="width:100%;height:100%;display:block;cursor:crosshair;"></canvas>
-                <div id="whiteboard-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></div>
-                ${!isConnected ? `<div class="absolute flex-center" style="top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0.1;font-size:4rem;font-weight:bold;color:var(--text3);white-space:nowrap;">LOCAL MODE</div>` : ''}
-                <button id="whiteboard-table-mode" title="Maximize board" style="position:absolute; top:10px; right:10px; z-index:30; padding:0.4rem 0.8rem; background:rgba(10,10,15,0.75); color:var(--text); border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; font-size:0.85rem;">${tableModeActive ? '🖥️ Exit Table Mode' : '🖥️ Table Mode'}</button>
+                <div id="whiteboard-overlay" style="position:absolute;top:0;inset-inline-start:0;width:100%;height:100%;pointer-events:none;"></div>
+                ${!isConnected ? `<div class="absolute flex-center" style="top:50%;left:50%;transform:translate(-50%,-50%);/* rtl-physical: viewport centering */pointer-events:none;opacity:0.1;font-size:4rem;font-weight:bold;color:var(--text3);white-space:nowrap;">LOCAL MODE</div>` : ''}
+                <button id="whiteboard-table-mode" title="Maximize board" style="position:absolute; top:10px; inset-inline-end:10px; z-index:30; padding:0.4rem 0.8rem; background:rgba(10,10,15,0.75); color:var(--text); border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; font-size:0.85rem;" data-i18n-attr="title:feature.whiteboard.modules.ui.maximizeBoard">${tableModeActive ? '🖥️ Exit Table Mode' : '🖥️ Table Mode'}</button>
             </div>
 
             <div class="panel flex gap-1 flex-center" id="whiteboard-controls-bar">
-                <button class="btn btn-sm btn-primary" id="whiteboard-add-note">📝 Add Note</button>
-                <button class="btn btn-sm btn-secondary" id="whiteboard-upload-image">🖼️ Upload Map</button>
-                <button class="btn btn-sm btn-ghost" id="whiteboard-clear-drawings">🧹 Clear Draw</button>
-                <button class="btn btn-sm btn-ghost" id="whiteboard-clear" title="Clear All">🗑️ Clear All</button>
-                <button class="btn btn-sm btn-gold" id="whiteboard-export" title="Export as Image">💾 Export</button>
-                <button class="btn btn-sm btn-secondary" id="whiteboard-sync-btn" title="Force sync">🔄 Sync</button>
+                <button class="btn btn-sm btn-primary" id="whiteboard-add-note" data-i18n="feature.whiteboard.modules.ui.addNote">📝 Add Note</button>
+                <button class="btn btn-sm btn-secondary" id="whiteboard-upload-image" data-i18n="feature.whiteboard.modules.ui.uploadMap">🖼️ Upload Map</button>
+                <button class="btn btn-sm btn-ghost" id="whiteboard-clear-drawings" data-i18n="feature.whiteboard.modules.ui.clearDraw">🧹 Clear Draw</button>
+                <button class="btn btn-sm btn-ghost" id="whiteboard-clear" title="Clear All" data-i18n-attr="title:feature.whiteboard.modules.ui.clearAll" data-i18n="feature.whiteboard.modules.ui.clearAll_snr9n">🗑️ Clear All</button>
+                <button class="btn btn-sm btn-gold" id="whiteboard-export" title="Export as Image" data-i18n-attr="title:feature.whiteboard.modules.ui.exportAsImage" data-i18n="feature.whiteboard.modules.ui.export">💾 Export</button>
+                <button class="btn btn-sm btn-secondary" id="whiteboard-sync-btn" title="Force sync" data-i18n-attr="title:feature.whiteboard.modules.ui.forceSync" data-i18n="feature.whiteboard.modules.ui.sync">🔄 Sync</button>
                 <span class="text-muted whiteboard-stats text-sm flex-1 text-right">${state.drawings.length} drawings, ${state.notes.length} notes, ${state.images.length} images, ${state.characterTokens.length} tokens</span>
             </div>
 
-            <div id="grid-combat-legend" style="position:absolute;bottom:10px;right:10px;background:rgba(10,10,15,0.8);padding:0.3rem 0.6rem;border-radius:var(--radius-sm);font-size:0.65rem;color:var(--text3);display:${isGridCombatActive() ? 'block' : 'none'};border:1px solid var(--border);pointer-events:none;z-index:20;">
+            <div id="grid-combat-legend" style="position:absolute;bottom:10px;inset-inline-end:10px;background:rgba(10,10,15,0.8);padding:0.3rem 0.6rem;border-radius:var(--radius-sm);font-size:0.65rem;color:var(--text3);display:${isGridCombatActive() ? 'block' : 'none'};border:1px solid var(--border);pointer-events:none;z-index:20;">
                 <div><span style="color:var(--red);">⬤</span> Enemy ZoC | <span style="color:var(--blue);">⬤</span> Ally ZoC</div>
                 <div><span style="color:var(--gold);">▭</span> Flanked (Dominant)</div>
                 <div id="fog-legend" style="display:${state.gridCombat.fogOfWar?.enabled ? 'block' : 'none'};"><span style="color:rgba(255,220,100,0.8);">💡</span> Light | <span style="color:rgba(196,90,90,0.8);">🧱</span> LoS Wall</div>
@@ -550,7 +551,7 @@ export function attachEvents() {
 
             if (['fog-reveal', 'fog-hide', 'fog-wall', 'fog-light'].includes(tool)) {
                 if (!canControlFog()) {
-                    showToast('Only the GM can edit fog of war', 'warning');
+                    showToast(i18nText("feature.whiteboard.modules.ui.onlyTheGMCanEditFogOf", null, "Only the GM can edit fog of war"), 'warning');
                     return;
                 }
                 const fog = state.gridCombat.fogOfWar;
@@ -560,7 +561,7 @@ export function attachEvents() {
                     renderVttCombatToolbar();
                     restoreDrawings();
                     renderGridCombat();
-                    showToast('🌫️ Fog of War enabled', 'success');
+                    showToast(i18nText("feature.whiteboard.modules.ui.fogOfWarEnabled", null, "🌫️ Fog of War enabled"), 'success');
                 }
             }
 
@@ -601,7 +602,7 @@ export function attachEvents() {
         currentOpacity = parseFloat(e.target.value);
         setCurrentOpacity(currentOpacity);
         const opacityLabel = document.getElementById('whiteboard-opacity-value');
-        if (opacityLabel) opacityLabel.textContent = `${Math.round(currentOpacity * 100)}%`;
+        if (opacityLabel) opacityLabel.textContent = i18nText("feature.whiteboard.modules.ui.value", { value0: Math.round(currentOpacity * 100) }, "{{value0}}%");
     });
     document.getElementById('whiteboard-grid')?.addEventListener('change', (e) => {
         state.settings.gridSnap = e.target.checked;
@@ -617,7 +618,7 @@ export function attachEvents() {
         saveWhiteboardData();
         restoreDrawings();
         renderGridCombat();
-        showToast(`Grid type set to ${e.target.value}`, 'info');
+        showToast(i18nText("feature.whiteboard.modules.ui.gridTypeSetToValue", { value0: e.target.value }, "Grid type set to {{value0}}"), 'info');
     });
     document.getElementById('whiteboard-import-tracker')?.addEventListener('click', importFromTracker);
     document.getElementById('whiteboard-konreh')?.addEventListener('click', () => {
@@ -633,7 +634,7 @@ export function attachEvents() {
         if (started) {
             postToVTTChat(`🌀🌐 ${name} is challenging the table to a real-time game of Kon'reh! Anyone else can accept from the banner that just appeared.`);
         } else {
-            showToast("Can't start a challenge right now (not connected, or already in a match).", 'error');
+            showToast(i18nText("feature.whiteboard.modules.ui.canTStartAChallengeRightNow", null, "Can't start a challenge right now (not connected, or already in a match)."), 'error');
         }
     });
 
@@ -646,21 +647,21 @@ export function attachEvents() {
     // see js/features/kon-reh/toll-veil-vtt-bridge.js for the lobby protocol.
     document.getElementById('whiteboard-tollveil-host')?.addEventListener('click', () => {
         const name = getWhiteboardSenderName();
-        const seatsInput = window.prompt('How many seats (3-5)?', '4');
+        const seatsInput = window.prompt(i18nText("feature.whiteboard.modules.ui.howManySeats35", null, "How many seats (3-5)?"), '4');
         const numSeats = Math.min(5, Math.max(3, parseInt(seatsInput, 10) || 3));
-        const stakeChoice = (window.prompt('Stakes — type "points" (default), "xp", or "string":', 'points') || 'points').trim().toLowerCase();
+        const stakeChoice = (window.prompt(i18nText("feature.whiteboard.modules.ui.stakesTypePointsDefaultXpOrString", null, "Stakes — type \"points\" (default), \"xp\", or \"string\":"), 'points') || 'points').trim().toLowerCase();
         let stakeConfig = { mode: 'points' };
         if (stakeChoice === 'xp') {
-            const capInput = window.prompt('XP wager cap per player:', '2');
+            const capInput = window.prompt(i18nText("feature.whiteboard.modules.ui.xpWagerCapPerPlayer", null, "XP wager cap per player:"), '2');
             stakeConfig = { mode: 'xp', xpCap: Math.max(1, parseInt(capInput, 10) || 1) };
         } else if (stakeChoice === 'string') {
             stakeConfig = { mode: 'string' };
         }
         const started = openTollVeilTable({ hostName: name, numSeats, stakeConfig });
         if (started) {
-            showToast('Toll & Veil table opened — waiting for players to join.', 'info');
+            showToast(i18nText("feature.whiteboard.modules.ui.tollVeilTableOpenedWaitingForPlayers", null, "Toll & Veil table opened — waiting for players to join."), 'info');
         } else {
-            showToast("Can't host a table right now (not connected, or already hosting/in one).", 'error');
+            showToast(i18nText("feature.whiteboard.modules.ui.canTHostATableRightNow", null, "Can't host a table right now (not connected, or already hosting/in one)."), 'error');
         }
     });
 
@@ -698,7 +699,7 @@ export function attachEvents() {
         saveWhiteboardData();
         restoreDrawings();
         renderGridCombat();
-        showToast(`Fog mode: ${e.target.value}`, 'info');
+        showToast(i18nText("feature.whiteboard.modules.ui.fogModeValue", { value0: e.target.value }, "Fog mode: {{value0}}"), 'info');
     });
 
     document.getElementById('whiteboard-fog-darkness')?.addEventListener('input', (e) => {
@@ -714,7 +715,7 @@ export function attachEvents() {
     document.getElementById('whiteboard-fog-clear')?.addEventListener('click', () => {
         const fog = state.gridCombat.fogOfWar;
         if (!fog) return;
-        if (!confirm('Clear all fog data (revealed areas, light sources, walls, and explored memory)?')) return;
+        if (!confirm(i18nText("feature.whiteboard.modules.ui.clearAllFogDataRevealedAreasLight", null, "Clear all fog data (revealed areas, light sources, walls, and explored memory)?"))) return;
         fog.revealed = [];
         fog.lightSources = [];
         fog.walls = [];
@@ -722,7 +723,7 @@ export function attachEvents() {
         saveWhiteboardData();
         restoreDrawings();
         renderGridCombat();
-        showToast('🌫️ Fog data cleared', 'info');
+        showToast(i18nText("feature.whiteboard.modules.ui.fogDataCleared", null, "🌫️ Fog data cleared"), 'info');
         postToVTTChat('🌫️ The GM cleared all fog data on the map.');
     });
 
@@ -840,10 +841,10 @@ export function attachEvents() {
         const note = state.notes.find(n => n.id === id);
         if (note) {
             if (state.layers.find(l => l.id === note.layerId)?.locked) {
-                showToast('This layer is locked', 'warning');
+                showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
                 return;
             }
-            const newContent = prompt('Edit note:', note.content);
+            const newContent = prompt(i18nText("feature.whiteboard.modules.ui.editNote", null, "Edit note:"), note.content);
             if (newContent !== null) {
                 pushUndoSnapshot();
                 note.content = newContent;
@@ -855,7 +856,7 @@ export function attachEvents() {
     window.deleteWhiteboardNote = (id) => {
         const note = state.notes.find(n => n.id === id);
         if (note && state.layers.find(l => l.id === note.layerId)?.locked) {
-            showToast('This layer is locked', 'warning');
+            showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
             return;
         }
         pushUndoSnapshot();
@@ -867,7 +868,7 @@ export function attachEvents() {
     window.deleteWhiteboardImage = (id) => {
         const img = state.images.find(i => i.id === id);
         if (img && state.layers.find(l => l.id === img.layerId)?.locked) {
-            showToast('This layer is locked', 'warning');
+            showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
             return;
         }
         pushUndoSnapshot();
@@ -879,7 +880,7 @@ export function attachEvents() {
     window.deleteCharacterToken = (id) => {
         const token = state.characterTokens.find(t => t.id === id);
         if (token && state.layers.find(l => l.id === token.layerId)?.locked) {
-            showToast('This layer is locked', 'warning');
+            showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
             return;
         }
         pushUndoSnapshot();
@@ -894,7 +895,7 @@ export function attachEvents() {
         const note = state.notes.find(n => n.id === id);
         if (!note) return;
         const layer = state.layers.find(l => l.id === note.layerId);
-        if (layer?.locked) { showToast('This layer is locked', 'warning'); return; }
+        if (layer?.locked) { showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning'); return; }
         event.stopPropagation();
         pushUndoSnapshot();
         isDraggingObject = true;
@@ -922,7 +923,7 @@ export function attachEvents() {
         const img = state.images.find(i => i.id === id);
         if (!img) return;
         const layer = state.layers.find(l => l.id === img.layerId);
-        if (layer?.locked) { showToast('This layer is locked', 'warning'); return; }
+        if (layer?.locked) { showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning'); return; }
         event.stopPropagation();
         pushUndoSnapshot();
         isDraggingObject = true;
@@ -950,7 +951,7 @@ export function attachEvents() {
         const token = state.characterTokens.find(t => t.id === id);
         if (!token) return;
         const layer = state.layers.find(l => l.id === token.layerId);
-        if (layer?.locked) { showToast('This layer is locked', 'warning'); return; }
+        if (layer?.locked) { showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning'); return; }
         event.stopPropagation();
         pushUndoSnapshot();
         isDraggingObject = true;
@@ -982,9 +983,9 @@ export function attachEvents() {
         if (overlay) overlay.style.display = connected ? 'none' : 'flex';
         if (connected) {
             setupWebSocketSync();
-            showToast('🔄 Whiteboard reconnected and syncing', 'success');
+            showToast(i18nText("feature.whiteboard.modules.ui.whiteboardReconnectedAndSyncing", null, "🔄 Whiteboard reconnected and syncing"), 'success');
         } else {
-            showToast('📡 Whiteboard in local mode', 'info');
+            showToast(i18nText("feature.whiteboard.modules.ui.whiteboardInLocalMode", null, "📡 Whiteboard in local mode"), 'info');
         }
         renderVttCombatToolbar();
         populateRoster();
@@ -1022,7 +1023,7 @@ function startDrawing(e) {
                 fog.lightSources = fog.lightSources.filter(ls => ls !== clickedLight);
                 saveWhiteboardData();
                 restoreDrawings();
-                showToast('💡 Light source removed', 'info');
+                showToast(i18nText("feature.whiteboard.modules.ui.lightSourceRemoved", null, "💡 Light source removed"), 'info');
                 return;
             }
             isDraggingLight = true;
@@ -1035,7 +1036,7 @@ function startDrawing(e) {
     // Fog tools
     if (['fog-reveal','fog-hide','fog-wall','fog-light'].includes(currentTool)) {
         if (!canControlFog()) {
-            showToast('Only GM can edit fog of war', 'warning');
+            showToast(i18nText("feature.whiteboard.modules.ui.onlyGMCanEditFogOfWar", null, "Only GM can edit fog of war"), 'warning');
             return;
         }
         if (!fog) return;
@@ -1049,7 +1050,7 @@ function startDrawing(e) {
             });
             saveWhiteboardData();
             restoreDrawings();
-            showToast('💡 Light source placed (dbl-click to edit)', 'success');
+            showToast(i18nText("feature.whiteboard.modules.ui.lightSourcePlacedDblClickToEdit", null, "💡 Light source placed (dbl-click to edit)"), 'success');
             return;
         }
 
@@ -1074,7 +1075,7 @@ function startDrawing(e) {
         );
         if (clickedToken) {
             if (state.layers.find(l => l.id === (clickedToken.layerId || 'tokens'))?.locked) {
-                showToast('Tokens & Grid layer is locked', 'warning');
+                showToast(i18nText("feature.whiteboard.modules.ui.tokensGridLayerIsLocked", null, "Tokens & Grid layer is locked"), 'warning');
                 return;
             }
             isDraggingToken = true;
@@ -1099,7 +1100,7 @@ function startDrawing(e) {
     // ── Pen / Eraser / Shapes ──
     const activeLayer = state.layers.find(l => l.id === activeLayerId);
     if (activeLayer?.locked) {
-        showToast('This layer is locked', 'warning');
+        showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
         return;
     }
 
@@ -1291,11 +1292,11 @@ function endDrawing(e) {
                         draggedToken.y = toY * cellSize;
                     }
                     logRecordingEvent('konreh_move', `Moved ${draggedToken.label} to (${toX}, ${toY}).`);
-                    showToast(`Valid Kon'reh Move`, 'success');
+                    showToast(i18nText("feature.whiteboard.modules.ui.validKonRehMove", null, "Valid Kon'reh Move"), 'success');
                 } else {
                     draggedToken.x = tokenStartPos.x;
                     draggedToken.y = tokenStartPos.y;
-                    showToast("Invalid Kon'reh move!", 'error');
+                    showToast(i18nText("feature.whiteboard.modules.ui.invalidKonRehMove", null, "Invalid Kon'reh move!"), 'error');
                 }
                 saveWhiteboardData();
                 restoreDrawings();
@@ -1313,10 +1314,10 @@ function endDrawing(e) {
                 const tacStatus = checkTacticalStatus(draggedToken);
                 if (tacStatus.isFlanked) {
                     logRecordingEvent('tactical_event', `${draggedToken.label} is now FLANKED!`);
-                    showToast(`${draggedToken.label} is Flanked!`, 'warning');
+                    showToast(i18nText("feature.whiteboard.modules.ui.valueIsFlanked", { value0: draggedToken.label }, "{{value0}} is Flanked!"), 'warning');
                 } else if (tacStatus.inEnemyZoC) {
                     logRecordingEvent('tactical_event', `${draggedToken.label} entered enemy ZoC.`);
-                    showToast(`${draggedToken.label} entered ZoC!`, 'warning');
+                    showToast(i18nText("feature.whiteboard.modules.ui.valueEnteredZoC", { value0: draggedToken.label }, "{{value0}} entered ZoC!"), 'warning');
                 }
                 saveWhiteboardData();
             }
@@ -1338,7 +1339,7 @@ function endDrawing(e) {
         if (e?.shiftKey) {
             const activeLayer = state.layers.find(l => l.id === activeLayerId);
             if (activeLayer?.locked) {
-                showToast('This layer is locked — measurement not pinned', 'warning');
+                showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLockedMeasurementNotPinned", null, "This layer is locked — measurement not pinned"), 'warning');
             } else {
                 pushUndoSnapshot();
                 state.drawings.push({
@@ -1354,7 +1355,7 @@ function endDrawing(e) {
                 });
                 saveWhiteboardData();
                 updateStats();
-                showToast('📌 Measurement pinned to the map', 'success');
+                showToast(i18nText("feature.whiteboard.modules.ui.measurementPinnedToTheMap", null, "📌 Measurement pinned to the map"), 'success');
             }
         }
         isDrawing = false;
@@ -1378,7 +1379,7 @@ function endDrawing(e) {
                 x2: pos.x, y2: pos.y
             });
             saveWhiteboardData();
-            showToast('🧱 LoS wall added', 'success');
+            showToast(i18nText("feature.whiteboard.modules.ui.losWallAdded", null, "🧱 LoS wall added"), 'success');
         }
         isDrawing = false;
         fogWallStart = null;
@@ -1472,10 +1473,10 @@ function handlePing(pos) {
 export function addWhiteboardNote() {
     const activeLayer = state.layers.find(l => l.id === activeLayerId);
     if (activeLayer?.locked) {
-        showToast('This layer is locked', 'warning');
+        showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
         return;
     }
-    const content = prompt('Note content:', 'New note');
+    const content = prompt(i18nText("feature.whiteboard.modules.ui.noteContent", null, "Note content:"), 'New note');
     if (!content) return;
     const containerEl = document.getElementById('whiteboard-canvas-container');
     const rect = containerEl.getBoundingClientRect();
@@ -1495,7 +1496,7 @@ export function addWhiteboardNote() {
 export function uploadWhiteboardImage() {
     const activeLayer = state.layers.find(l => l.id === activeLayerId);
     if (activeLayer?.locked) {
-        showToast('This layer is locked', 'warning');
+        showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
         return;
     }
     const input = document.createElement('input');
@@ -1506,7 +1507,7 @@ export function uploadWhiteboardImage() {
         if (!file) return;
         // SECURITY: block SVG uploads
         if (file.type === 'image/svg+xml') {
-            showToast('SVG uploads are not allowed for security reasons.', 'error');
+            showToast(i18nText("feature.whiteboard.modules.ui.svgUploadsAreNotAllowedForSecurity", null, "SVG uploads are not allowed for security reasons."), 'error');
             return;
         }
         const reader = new FileReader();
@@ -1524,7 +1525,7 @@ export function uploadWhiteboardImage() {
             saveWhiteboardData();
             renderOverlay();
             updateStats();
-            showToast('🖼️ Image uploaded', 'success');
+            showToast(i18nText("feature.whiteboard.modules.ui.imageUploaded", null, "🖼️ Image uploaded"), 'success');
         };
         reader.readAsDataURL(file);
     };
@@ -1532,7 +1533,7 @@ export function uploadWhiteboardImage() {
 }
 
 export function clearWhiteboardDrawings() {
-    if (!confirm('Clear all drawings only?')) return;
+    if (!confirm(i18nText("feature.whiteboard.modules.ui.clearAllDrawingsOnly", null, "Clear all drawings only?"))) return;
     pushUndoSnapshot();
     state.drawings = [];
     saveWhiteboardData();
@@ -1541,7 +1542,7 @@ export function clearWhiteboardDrawings() {
 }
 
 export function clearWhiteboardAll() {
-    if (!confirm('Delete everything (drawings, notes, images, tokens, character tokens) on this sheet?')) return;
+    if (!confirm(i18nText("feature.whiteboard.modules.ui.deleteEverythingDrawingsNotesImagesTokensCharacter", null, "Delete everything (drawings, notes, images, tokens, character tokens) on this sheet?"))) return;
     pushUndoSnapshot();
     state.drawings = [];
     state.notes = [];
@@ -1559,7 +1560,7 @@ export function clearWhiteboardAll() {
     renderOverlay();
     updateStats();
     renderVttCombatToolbar();
-    showToast('🗑️ Whiteboard cleared', 'info');
+    showToast(i18nText("feature.whiteboard.modules.ui.whiteboardCleared", null, "🗑️ Whiteboard cleared"), 'info');
 }
 
 export function exportWhiteboard() {
@@ -1576,7 +1577,7 @@ export function exportWhiteboard() {
     link.download = 'whiteboard-' + Date.now() + '.png';
     link.href = tempCanvas.toDataURL('image/png');
     link.click();
-    showToast('💾 Whiteboard exported', 'success');
+    showToast(i18nText("feature.whiteboard.modules.ui.whiteboardExported", null, "💾 Whiteboard exported"), 'success');
 }
 
 export function pinNoteToBoard(content) {
@@ -1585,7 +1586,7 @@ export function pinNoteToBoard(content) {
     if (!activeSheet) return;
     const layer = state.layers.find(l => l.id === 'notes');
     if (layer?.locked) {
-        showToast('Notes layer is locked', 'warning');
+        showToast(i18nText("feature.whiteboard.modules.ui.notesLayerIsLocked", null, "Notes layer is locked"), 'warning');
         return;
     }
     let x = 60, y = 60;
@@ -1605,7 +1606,7 @@ export function pinNoteToBoard(content) {
     saveWhiteboardData();
     renderOverlay();
     updateStats();
-    showToast('📌 Pinned to Whiteboard', 'success');
+    showToast(i18nText("feature.whiteboard.modules.ui.pinnedToWhiteboard", null, "📌 Pinned to Whiteboard"), 'success');
 }
 
 // ============================================================

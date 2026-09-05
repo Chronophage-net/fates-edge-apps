@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — Inicio rápido (Español)</title>
+<style>
+        :root {
+            --bg1: #0d0d1a; --bg2: #1a1a2e; --bg3: #252540; --bg4: #2f2f4a;
+            --text: #e8e8f0; --text2: #b8b8c8; --text3: #8888a0;
+            --gold: #c9a84c; --gold-hover: #d4b85c; --border: #333355;
+            --red: #c0392b; --green: #27ae60; --blue: #2980b9; --purple: #8e44ad; --orange: #e67e22;
+            --radius: 8px; --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg1); color: var(--text); font-family: var(--font); padding: 1.5rem; max-width: 900px; margin: 0 auto; line-height: 1.6; }
+        h1, h2, h3 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.1rem; }
+        h3 { font-size: 1rem; margin-top: 0.6rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        p { margin: 0.35rem 0; }
+        ul, ol { margin: 0.3rem 0 0.3rem 1.3rem; }
+        li { margin: 0.15rem 0; }
+        .panel { background: var(--bg2); border-radius: var(--radius); padding: 0.6rem 0.8rem; border: 1px solid var(--border); margin: 0.5rem 0; }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .badge { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 12px; font-size: 0.65rem; font-weight: 600; background: var(--bg4); color: var(--text3); border: 1px solid var(--border); }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .text-muted { color: var(--text3); }
+        table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; font-size: 0.9rem; }
+        th, td { padding: 0.35rem 0.55rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        blockquote { font-style: italic; border-left: 4px solid var(--gold); padding: 0.5rem 1rem; margin: 0.5rem 0; background: var(--bg2); border-radius: var(--radius); color: var(--text2); }
+        .step-box { background: var(--bg3); border-radius: var(--radius); padding: 0.45rem 0.7rem; margin: 0.4rem 0; border-left: 4px solid var(--gold); }
+        .step-num { font-weight: 600; color: var(--gold); margin-right: 0.4rem; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+    </style>
+</head>
+<body>
+<aside class="translation-notice">Versión en español. <a href="../quickstart/Fates_-_Edge_-_-Quickstart.html" hreflang="en">Consultar el original en inglés</a>.</aside>
+<h1>Fate's Edge — Inicio rápido</h1>
+<p class="text-muted" style="margin-bottom:0.8rem;"><span class="badge badge-gold">Lectura de 15 minutos</span> <span class="badge badge-gold">Una mesa, una sesión</span></p>
+<p style="color:var(--text2);">Aquí tienes lo necesario para dirigir una partida autoconclusiva esta noche. Se omiten las tablas completas de Fatiga y Daño, la conversión de armadura y los cálculos de progresión. Para consultar todas las reglas, abre la <a href="Guia-esencial.html">Guía esencial</a>. Si buscas una aventura lista para jugar, ve a <a href="../adventures/Fates_-_Edge_-_-Lantern-_-at-_-Dusk.html" hreflang="en">El farol al anochecer (en inglés)</a>.</p>
+<blockquote>«La moneda que nunca se gasta es la que no recuerdas haber tomado.»<span style="display:block; color:var(--text3); font-size:0.85rem; margin-top:0.2rem;">— Serafine del Toque de Terciopelo</span></blockquote>
+<h2>1. Qué es este juego</h2>
+<p>Fate's Edge da prioridad a la narración: los dados hacen avanzar la historia, además de indicar si tienes éxito o fracasas. La partida no se detiene: un fallo aumenta la tensión en lugar de cerrar el camino, y un éxito todavía puede tener un coste.</p>
+<h2>2. El ciclo básico</h2>
+<div class="step-box"><span class="step-num">1.</span> <strong>Di qué quieres y cómo vas a hacerlo.</strong> («Quiero pasar junto al guardia sin que me vea, usando Ingenio + Sigilo»).</div>
+<div class="step-box"><span class="step-num">2.</span> <strong>El DJ establece la Posición y la dificultad (DV).</strong> Consulta las tablas siguientes.</div>
+<div class="step-box"><span class="step-num">3.</span> <strong>Tira tantos d10 como Atributo + Habilidad.</strong> 6–9 = 1 éxito, 10 = 2 éxitos, 1 = 1 Punto narrativo para el DJ.</div>
+<div class="step-box"><span class="step-num">4.</span> <strong>Compara los éxitos con la DV</strong> usando la tabla de resultados.</div>
+<div class="step-box"><span class="step-num">5.</span> <strong>El DJ gasta Puntos narrativos</strong> en complicaciones; el jugador anota sus Bonos.</div>
+<h3>Valor de dificultad (DV)</h3>
+<table><tr><th>DV</th><th>Situación</th></tr>
+<tr><td>2</td><td>Rutinaria, casi garantizada</td></tr>
+<tr><td>3</td><td>Predeterminada: oposición leve, cierto riesgo</td></tr>
+<tr><td>4</td><td>Difícil: oposición seria o una mala posición de partida</td></tr>
+<tr><td>5+</td><td>Extrema: enemigo principal o apuesta dramática</td></tr></table>
+<h3>Posición</h3>
+<table><tr><th>Posición</th><th>Marco</th><th>Efecto</th></tr>
+<tr><td>Dominante</td><td>Aprovechas tu ventaja</td><td>Vuelve a tirar un dado fallido</td></tr>
+<tr><td>Controlada</td><td>Equilibrada, normal</td><td>Sin repeticiones de dados</td></tr>
+<tr><td>Desesperada</td><td>Actúas bajo presión</td><td>Vuelve a tirar un dado con éxito</td></tr></table>
+<p class="text-muted">Gasta 1 Bono para mejorar tu Posición un nivel antes de tirar.</p>
+<h3>Resultado</h3>
+<table><tr><th>Tirada</th><th>Resultado</th><th>Qué ocurre</th></tr>
+<tr><td>Éxitos ≥ DV, ningún 1</td><td>Éxito limpio</td><td>Consigues lo que querías, sin complicaciones</td></tr>
+<tr><td>Éxitos ≥ DV, algún 1</td><td>Éxito + Punto narrativo</td><td>Lo consigues, pero el DJ gasta SB en una complicación</td></tr>
+<tr><td>0 &lt; Éxitos &lt; DV</td><td>Resultado parcial</td><td>Avanzas; obtienes 1 Bono</td></tr>
+<tr><td>0 éxitos</td><td>Fallo</td><td>No avanzas; obtienes 2 Bonos; el DJ aumenta la tensión</td></tr></table>
+<h2>3. Bonos y Puntos narrativos</h2>
+<div class="panel panel-gold"><strong>Bonos (tuyos):</strong> los obtienes con resultados parciales, fallos y al interpretar tus vínculos. Gástalos para volver a tirar un dado, mejorar tu Posición o activar un recurso. Puedes conservar un máximo de 5; al final de una escena, reduce la reserva a 2.</div>
+<div class="panel panel-red"><strong>Puntos narrativos (del DJ):</strong> se obtienen cada vez que alguien saca un 1. Gasta 1 SB en una complicación menor, 2 en una moderada y 3+ en una importante. Úsalos con decisión: la presión que no se emplea es impulso desaprovechado.</div>
+<h2>4. Crea un personaje en 5 minutos</h2>
+<p>La opción más rápida es elegir un <a href="#pregens">personaje pregenerado</a> de la tabla siguiente, o puedes crear uno desde cero con 32 XP:</p>
+<ol>
+<li>Un concepto en una frase (origen + profesión + rasgo).</li>
+<li>Atributos (Cuerpo/Ingenio/Espíritu/Presencia, base 1): pon uno a 3 y otro a 2. (~21 XP)</li>
+<li>Habilidades (0–5): elige 2–3 habilidades clave a 1–2 cada una. (~8–12 XP)</li>
+<li>De 0 a 3 talentos si quedan XP: son opcionales y no hacen falta para ser eficaz.</li>
+<li>1 vínculo con otro PJ (+2 XP) y, opcionalmente, 1 complicación (+2 XP).</li>
+<li>Equipo inicial: ropa, un arma, armadura ligera y equipo de aventurero.</li>
+</ol>
+<h2 id="pregens">5. Personajes listos para jugar</h2>
+<table><tr><th>Nombre</th><th>Concepto</th><th>Especialidad</th></tr>
+<tr><td>Levi</td><td>Soldado: antes legionario, ahora mercenario</td><td>Combate cuerpo a cuerpo</td></tr>
+<tr><td>Lyra</td><td>Erudita: expulsada por una investigación prohibida</td><td>Saber e investigación</td></tr>
+<tr><td>Sera</td><td>Sombra: antigua ladrona de un gremio</td><td>Sigilo y subterfugio</td></tr>
+<tr><td>Mira</td><td>Sanadora: acusada de brujería</td><td>Medicina y perspicacia</td></tr>
+<tr><td>Kael</td><td>Guardián de runas: un errante que ha jurado lealtad a un patrón</td><td>Magia (opcional, nivel II)</td></tr></table>
+<p class="text-muted">Las fichas completas están en el capítulo 4 de la <a href="Guia-esencial.html">Guía esencial</a>.</p>
+<h2>6. Seguridad en la mesa: versión rápida</h2>
+<p>Mantén una <strong>Tarjeta X</strong> a la vista. Cualquier persona puede decir «X» para saltarse un contenido que le incomode, sin tener que dar explicaciones. Antes de empezar, acordad las <strong>Líneas</strong> (límites que no se cruzan) y los <strong>Velos</strong> (momentos que se resuelven con un fundido a negro).</p>
+<hr/>
+<p class="text-muted">Ese es el juego completo. El resto —Fatiga, Daño, armadura, sendas mágicas y progresión— se añade sobre este ciclo sin cambiarlo. Puedes jugar con las herramientas del navegador, que incluyen dados, fichas de personaje y temporizadores.</p>
+</body>
+</html>
+

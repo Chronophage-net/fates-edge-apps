@@ -23,6 +23,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { showToast } from './components/Toast.js';
 import { moduleLoader } from './module-loader.js';
 import { isFeatureVisible, getFeatureLockMessage } from './core/feature-toggles.js';
@@ -152,9 +153,9 @@ export async function navigate(tab, options = {}) {
         const contentEl = getOrCreateContentElement(resolved);
         contentEl.innerHTML = `
             <div class="panel">
-                <h3>📄 Unknown Route</h3>
+                <h3 data-i18n="feature.router.unknownRoute">📄 Unknown Route</h3>
                 <p class="text-muted">The route "${resolved}" is not registered.</p>
-                <button class="btn btn-sm mt-1" onclick="window.location.hash='home'">🏠 Go Home</button>
+                <button class="btn btn-sm mt-1" onclick="window.location.hash='home'" data-i18n="feature.router.goHome">🏠 Go Home</button>
             </div>
         `;
         return;
@@ -196,7 +197,7 @@ export async function navigate(tab, options = {}) {
         await moduleLoader.renderModule(resolved, contentEl);
         activeCallbacks.forEach(cb => cb(resolved, moduleLoader.getModule(resolved)));
         if (isRedirect) {
-            showToast(`↪️ Redirected to ${resolved}`, 'info');
+            showToast(i18nText("feature.router.redirectedToValue", { value0: resolved }, "↪️ Redirected to {{value0}}"), 'info');
         }
 
         // NEW: a11y focus management -- see file header note. Skipped on
@@ -207,12 +208,12 @@ export async function navigate(tab, options = {}) {
                 contentEl.setAttribute('tabindex', '-1');
             }
             contentEl.focus({ preventScroll: false });
-            announce(`Navigated to ${activeLabel}`);
+            announce(i18nText("feature.router.navigatedToValue", { value0: activeLabel }, "Navigated to {{value0}}"));
         }
     } catch (err) {
         // The loader already shows an error UI, but we also want to log and notify
         console.error(`Router: Error rendering module "${resolved}":`, err);
-        showToast(`Failed to load ${resolved}: ${err.message}`, 'error');
+        showToast(i18nText("feature.router.failedToLoadValueValue", { value0: resolved, value1: err.message }, "Failed to load {{value0}}: {{value1}}"), 'error');
     }
 }
 

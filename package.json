@@ -11,6 +11,7 @@
     "ci": "npm run lint:ci && npm run test:ci",
     "version:bump": "node tools/bump-version.mjs",
     "demo": "bash tools/demo.sh",
+    "demo:record": "node tools/record-demo.mjs",
     "demo:voice": "bash tools/demo.sh --voice",
     "demo:voice-rvc": "bash tools/demo.sh --voice-rvc",
     "demo:down": "bash tools/demo.sh --down"

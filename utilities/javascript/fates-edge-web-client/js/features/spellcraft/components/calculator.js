@@ -18,6 +18,7 @@
  * - Gamble: simulate the roll and see the outcome
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml, generateId } from '@core/utils.js';
@@ -186,7 +187,7 @@ const MAGIC_PATH_REFERENCE = [
 
 function renderMagicPathReferenceHtml(highlightLabel) {
     return `
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem;text-align:left;margin-top:0.8rem;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem;text-align: start;margin-top:0.8rem;">
             ${MAGIC_PATH_REFERENCE.map(p => `
                 <div style="padding:0.4rem 0.5rem;border-radius:var(--radius);background:var(--bg2);border:1px solid ${p.label === highlightLabel ? 'var(--gold)' : 'var(--border)'};">
                     <div style="display:flex;align-items:center;gap:0.3rem;">
@@ -273,11 +274,11 @@ const TAG_HINTS = {
 function calculatorAddTag(tag) {
     const upper = tag.toUpperCase();
     if (!tagDefinitions || !tagDefinitions.has(upper)) {
-        showToast(`Unknown tag: "${tag}" — check the lexicon.`, 'warning');
+        showToast(i18nText("feature.spellcraft.components.calculator.unknownTagValueCheckTheLexicon", { value0: tag }, "Unknown tag: \"{{value0}}\" — check the lexicon."), 'warning');
         return;
     }
     if (activeTags.includes(upper)) {
-        showToast(`"${tag}" already added.`, 'info');
+        showToast(i18nText("feature.spellcraft.components.calculator.valueAlreadyAdded", { value0: tag }, "\"{{value0}}\" already added."), 'info');
         return;
     }
     activeTags.push(upper);
@@ -303,7 +304,7 @@ function calculatorClear() {
 function calculatorRefresh() {
     activeTags = [];
     if (calculatorContainer) renderCalculator(calculatorContainer);
-    showToast('🔄 Calculator refreshed.', 'info');
+    showToast(i18nText("feature.spellcraft.components.calculator.calculatorRefreshed", null, "🔄 Calculator refreshed."), 'info');
 }
 
 function calculatorShowHint(tag) {
@@ -337,7 +338,7 @@ function calculatorClearHint() {
 
 function calculatorSaveSpell() {
     if (activeTags.length === 0) {
-        showToast('Add some tags first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.calculator.addSomeTagsFirst", null, "Add some tags first."), 'error');
         return;
     }
 
@@ -346,9 +347,9 @@ function calculatorSaveSpell() {
 
     const spellName = activeTags.join(' ');
     const defaultName = spellName.length > 40 ? spellName.substring(0, 37) + '...' : spellName;
-    const name = prompt('Spell name:', defaultName);
+    const name = prompt(i18nText("feature.spellcraft.components.calculator.spellName", null, "Spell name:"), defaultName);
     if (!name) return;
-    const description = prompt('Effect description:', generateSpellDescription(activeTags)) || '';
+    const description = prompt(i18nText("feature.spellcraft.components.calculator.effectDescription", null, "Effect description:"), generateSpellDescription(activeTags)) || '';
 
     // Compute DV
     const result = calculateDV(activeTags);
@@ -374,7 +375,7 @@ function calculatorSaveSpell() {
     // Avoid duplicates
     const existing = char.spellbook.findIndex(s => s.name === newSpell.name && s.tags?.join(',') === newSpell.tags.join(','));
     if (existing >= 0) {
-        if (!confirm(`"${newSpell.name}" already exists in your spellbook. Overwrite?`)) return;
+        if (!confirm(i18nText("feature.spellcraft.components.calculator.valueAlreadyExistsInYourSpellbookOverwrite", { value0: newSpell.name }, "\"{{value0}}\" already exists in your spellbook. Overwrite?"))) return;
         char.spellbook[existing] = newSpell;
     } else {
         char.spellbook.push(newSpell);
@@ -384,14 +385,14 @@ function calculatorSaveSpell() {
     // Update history
     spellHistory = char.spellbook.filter(s => s.source === 'calculator' || s.source === 'custom');
     
-    showToast(`✨ "${newSpell.name}" saved to spellbook (DV ${dv}).`, 'success');
+    showToast(i18nText("feature.spellcraft.components.calculator.valueSavedToSpellbookDVValue", { value0: newSpell.name, value1: dv }, "✨ \"{{value0}}\" saved to spellbook (DV {{value1}})."), 'success');
     activeTags = [];
     updateResult();
 }
 
 function calculatorTestCast() {
     if (activeTags.length === 0) {
-        showToast('Add some tags first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.calculator.addSomeTagsFirst", null, "Add some tags first."), 'error');
         return;
     }
 
@@ -406,7 +407,7 @@ function calculatorTestCast() {
     const pool = wits + arcana;
 
     if (pool < 1) {
-        showToast('Dice pool must be at least 1 die. Increase your Wits or Arcana.', 'error');
+        showToast(i18nText("feature.spellcraft.components.calculator.dicePoolMustBeAtLeast1", null, "Dice pool must be at least 1 die. Increase your Wits or Arcana."), 'error');
         return;
     }
 
@@ -484,7 +485,7 @@ function calculatorTestCast() {
 
 function calculatorGamble() {
     if (activeTags.length === 0) {
-        showToast('Add some tags first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.calculator.addSomeTagsFirst", null, "Add some tags first."), 'error');
         return;
     }
 
@@ -497,7 +498,7 @@ function calculatorGamble() {
     const pool = wits + arcana;
 
     if (pool < 1) {
-        showToast('Dice pool must be at least 1 die. Increase your Wits or Arcana.', 'error');
+        showToast(i18nText("feature.spellcraft.components.calculator.dicePoolMustBeAtLeast1", null, "Dice pool must be at least 1 die. Increase your Wits or Arcana."), 'error');
         return;
     }
 
@@ -535,7 +536,7 @@ function calculatorGamble() {
             <div style="font-size:0.65rem;color:var(--text3);font-style:italic;">
                 ${dv <= 3 ? 'Lysandra’s note: You may survive this one.' : dv <= 5 ? 'Lysandra’s note: Possible is not the same as wise.' : 'Lysandra’s note: Write a will first.'}
             </div>
-            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.calculator.close">Close</button>
         </div>
     `;
 
@@ -552,7 +553,7 @@ function calculatorShowHistory() {
     }
 
     if (spellHistory.length === 0) {
-        showToast('No spells created with the calculator yet.', 'info');
+        showToast(i18nText("feature.spellcraft.components.calculator.noSpellsCreatedWithTheCalculatorYet", null, "No spells created with the calculator yet."), 'info');
         return;
     }
     
@@ -583,7 +584,7 @@ function calculatorShowHistory() {
             <div style="font-size:0.65rem;color:var(--text3);font-style:italic;margin-top:0.1rem;">
                 "Every cast is a lesson." – Lysandra
             </div>
-            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.calculator.close">Close</button>
         </div>
     `, 'info');
 }
@@ -654,18 +655,18 @@ async function renderCalculator(el) {
                     <span style="font-size:1.4rem;">🔮</span>
                     <div>
                         <span style="font-weight:600;font-size:1.1rem;color:var(--gold);">The Weave's Grammar</span>
-                        <span style="font-size:0.7rem;color:var(--text3);margin-left:0.5rem;">TAGS Calculator</span>
+                        <span style="font-size:0.7rem;color:var(--text3);margin-inline-start:0.5rem;">TAGS Calculator</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-secondary" onclick="window.calculatorClear()">✕ Clear</button>
-                    <button class="btn btn-xs btn-secondary" onclick="window.calculatorRefresh()">🔄 Refresh</button>
+                    <button class="btn btn-xs btn-secondary" onclick="window.calculatorClear()" data-i18n="feature.spellcraft.components.calculator.clear">✕ Clear</button>
+                    <button class="btn btn-xs btn-secondary" onclick="window.calculatorRefresh()" data-i18n="feature.spellcraft.components.calculator.refresh">🔄 Refresh</button>
                 </div>
             </div>
 
             <!-- ─── Quick Templates ───────────────────────────── -->
             <div style="display:flex;gap:0.2rem;flex-wrap:wrap;padding:0.1rem 0;border-bottom:1px solid var(--border);">
-                <span style="font-size:0.65rem;color:var(--text3);padding-right:0.3rem;">⚡ Quick:</span>
+                <span style="font-size:0.65rem;color:var(--text3);padding-inline-end:0.3rem;">⚡ Quick:</span>
                 ${SPELL_TEMPLATES.map(t => `
                     <button class="btn btn-xs btn-ghost template-btn" style="font-size:0.6rem;padding:0.05rem 0.4rem;" data-tags="${t.tags.join(',')}">${escHtml(t.name)}</button>
                 `).join('')}
@@ -678,10 +679,10 @@ async function renderCalculator(el) {
                     <div style="font-size:0.75rem;color:var(--text3);">"Name your tags. The Weave listens."</div>
                     <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                         <div style="flex:1;min-width:120px;position:relative;">
-                            <input type="text" id="tags-input" placeholder="Type a tag..." style="width:100%;font-size:0.85rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.25rem 0.5rem;color:var(--text);" />
-                            <div id="tag-suggestions" style="position:absolute;top:100%;left:0;right:0;background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);max-height:150px;overflow-y:auto;display:none;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
+                            <input type="text" id="tags-input" placeholder="Type a tag..." style="width:100%;font-size:0.85rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.25rem 0.5rem;color:var(--text);" / data-i18n-attr="placeholder:feature.spellcraft.components.calculator.typeATag">
+                            <div id="tag-suggestions" style="position:absolute;top:100%;inset-inline:0;background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);max-height:150px;overflow-y:auto;display:none;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                         </div>
-                        <button class="btn btn-sm btn-primary" id="add-tag-btn">➕ Add</button>
+                        <button class="btn btn-sm btn-primary" id="add-tag-btn" data-i18n="feature.spellcraft.components.calculator.add">➕ Add</button>
                     </div>
                     <div id="active-tags" style="display:flex;flex-wrap:wrap;gap:0.2rem;min-height:2.2rem;padding:0.2rem;background:var(--bg2);border-radius:var(--radius);border:1px dashed var(--border);">
                         <span style="font-size:0.65rem;color:var(--text3);">Add tags to build your spell.</span>
@@ -704,11 +705,11 @@ async function renderCalculator(el) {
 
             <!-- ─── Actions ────────────────────────────────────── -->
             <div style="display:flex;gap:0.3rem;flex-wrap:wrap;padding:0.2rem 0;">
-                <button class="btn btn-sm btn-gold" id="save-spell-btn">💾 Save as Spell</button>
-                <button class="btn btn-sm btn-secondary" id="roll-test-btn">🎲 Test Cast</button>
-                <button class="btn btn-sm btn-secondary" id="gamble-btn">🎰 Gamble</button>
-                <button class="btn btn-sm btn-secondary" id="clear-tags-btn">🧹 Clear</button>
-                <button class="btn btn-sm btn-ghost" onclick="window.calculatorShowHistory()">📜 History</button>
+                <button class="btn btn-sm btn-gold" id="save-spell-btn" data-i18n="feature.spellcraft.components.calculator.saveAsSpell">💾 Save as Spell</button>
+                <button class="btn btn-sm btn-secondary" id="roll-test-btn" data-i18n="feature.spellcraft.components.calculator.testCast">🎲 Test Cast</button>
+                <button class="btn btn-sm btn-secondary" id="gamble-btn" data-i18n="feature.spellcraft.components.calculator.gamble">🎰 Gamble</button>
+                <button class="btn btn-sm btn-secondary" id="clear-tags-btn" data-i18n="feature.spellcraft.components.calculator.clear_nv42f">🧹 Clear</button>
+                <button class="btn btn-sm btn-ghost" onclick="window.calculatorShowHistory()" data-i18n="feature.spellcraft.components.calculator.history">📜 History</button>
             </div>
 
             <!-- ─── Tag Library ────────────────────────────────── -->
@@ -761,7 +762,7 @@ function renderTagLibrary() {
         const color = CATEGORY_COLORS[category] || 'var(--text3)';
         const icon = CATEGORY_ICONS[category] || '📌';
         html += `
-            <div style="display:flex;align-items:center;gap:0.2rem;margin-right:0.3rem;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:0.2rem;margin-inline-end:0.3rem;flex-wrap:wrap;">
                 <span style="font-size:0.6rem;color:${color};font-weight:600;">${icon} ${category}</span>
                 <span style="display:flex;gap:0.1rem;flex-wrap:wrap;">
                     ${tags.map(t => `
@@ -872,7 +873,7 @@ function attachEvents(el) {
                 }
             }
             updateResult();
-            showToast(`Loaded template: ${btn.textContent.trim()}`, 'info');
+            showToast(i18nText("feature.spellcraft.components.calculator.loadedTemplateValue", { value0: btn.textContent.trim() }, "Loaded template: {{value0}}"), 'info');
         });
     });
 
@@ -1047,7 +1048,7 @@ function showToastWithHTML(html, type = 'info') {
     // with a backdrop blocking the rest of the page.
     const modal = document.createElement('div');
     modal.style.cssText = `
-        position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
+        position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 9999;
         animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
@@ -1057,7 +1058,7 @@ function showToastWithHTML(html, type = 'info') {
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;
     `;
-    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>`;
+    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.calculator.close">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
 

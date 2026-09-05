@@ -25,6 +25,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
 import { escHtml } from '@core/utils.js';
 import { getState, saveState } from '@core/state.js';
@@ -354,7 +355,7 @@ function buildPsionCardHtml(title, patronName, target, effect, rollSummary, cost
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--border);
-            border-left:4px solid var(--blue);
+            border-inline-start:4px solid var(--blue);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             max-width: 450px;
             margin:0.1rem 0;
@@ -477,17 +478,17 @@ export async function renderPsion(el) {
                     <span style="font-size:1.4rem;">🧠</span>
                     <div>
                         <span style="font-weight:600;font-size:1.05rem;color:var(--blue);">Psion</span>
-                        ${order ? `<span style="font-size:0.75rem;color:var(--text3);margin-left:0.3rem;">(${SILENT_ORDERS.find(o => o.id === order)?.label || order})</span>` : ''}
-                        <span style="font-size:0.75rem;color:var(--text3);margin-left:0.3rem;">Skill: ${psionicsSkill}</span>
+                        ${order ? `<span style="font-size:0.75rem;color:var(--text3);margin-inline-start:0.3rem;">(${SILENT_ORDERS.find(o => o.id === order)?.label || order})</span>` : ''}
+                        <span style="font-size:0.75rem;color:var(--text3);margin-inline-start:0.3rem;">Skill: ${psionicsSkill}</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-secondary" onclick="window.psionRefresh()">🔄 Refresh</button>
+                    <button class="btn btn-xs btn-secondary" onclick="window.psionRefresh()" data-i18n="feature.spellcraft.components.psionics.refresh">🔄 Refresh</button>
                 </div>
             </div>
 
             <!-- ─── Mental Strain Track ────────────────────────── -->
-            <div class="psion-strain-track" style="background:var(--bg2);border-radius:var(--radius);padding:0.4rem 0.6rem;border-left:4px solid var(--blue);">
+            <div class="psion-strain-track" style="background:var(--bg2);border-radius:var(--radius);padding:0.4rem 0.6rem;border-inline-start:4px solid var(--blue);">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         <span style="font-size:0.85rem;font-weight:600;color:var(--blue);">🧠 Mental Strain</span>
@@ -495,8 +496,8 @@ export async function renderPsion(el) {
                         ${mentalStrain >= mentalStrainMax ? `<span style="font-size:0.7rem;color:var(--red);font-weight:600;">⚠️ OVERFLOW – Risk of Harm!</span>` : ''}
                     </div>
                     <div style="display:flex;gap:0.2rem;align-items:center;">
-                        <button class="btn btn-xs btn-secondary" onclick="window.psionAdjustStrain(1)" title="Increase Strain">+</button>
-                        <button class="btn btn-xs btn-secondary" onclick="window.psionAdjustStrain(-1)" title="Decrease Strain">−</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.psionAdjustStrain(1)" title="Increase Strain" data-i18n-attr="title:feature.spellcraft.components.psionics.increaseStrain">+</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.psionAdjustStrain(-1)" title="Decrease Strain" data-i18n-attr="title:feature.spellcraft.components.psionics.decreaseStrain">−</button>
                     </div>
                 </div>
                 <div style="width:100%;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-top:0.2rem;">
@@ -509,7 +510,7 @@ export async function renderPsion(el) {
             </div>
 
             <!-- ─── Arts List ───────────────────────────────────── -->
-            <div class="psion-arts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--blue);">
+            <div class="psion-arts" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--blue);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;flex-wrap:wrap;gap:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--blue);">🧩 Psionic Arts</span>
                     <span style="font-size:0.6rem;color:var(--text3);">${Object.keys(ARTS).length} arts · ${learnedArts.length} learned</span>
@@ -531,7 +532,7 @@ export async function renderPsion(el) {
                             return `<option value="${i}" data-dv="${dv}" data-strain="${strain}">${escHtml(ex)}</option>`;
                         }).join('');
                         return `
-                            <div class="psion-art-item" data-art-id="${artId}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-left:3px solid ${isLearned ? 'var(--blue)' : 'var(--text3)'};${isLearned ? '' : 'opacity:0.5;'}">
+                            <div class="psion-art-item" data-art-id="${artId}" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.5rem;border-inline-start:3px solid ${isLearned ? 'var(--blue)' : 'var(--text3)'};${isLearned ? '' : 'opacity:0.5;'}">
                                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                                     <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                                         <span style="font-weight:600;font-size:0.85rem;">${escHtml(art.label)}</span>
@@ -556,7 +557,7 @@ export async function renderPsion(el) {
                                         <select class="psion-effect-select" style="font-size:0.7rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
                                             ${effectOptionsHtml}
                                         </select>
-                                        <input type="text" class="psion-target-input" placeholder="Target" style="font-size:0.7rem;width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
+                                        <input type="text" class="psion-target-input" placeholder="Target" style="font-size:0.7rem;width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;" data-i18n-attr="placeholder:feature.spellcraft.components.psionics.target">
                                         <button class="btn btn-xs btn-primary" onclick="window.psionPerformArtFromInline('${artId}', this)">⚡ Use</button>
                                     </div>
                                 ` : ''}
@@ -567,7 +568,7 @@ export async function renderPsion(el) {
             </div>
 
             <!-- ─── Psion Talents ───────────────────────────────── -->
-            <div class="psion-talents" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--blue);">
+            <div class="psion-talents" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--blue);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--blue);">⚡ Psion Talents</span>
                     <span style="font-size:0.6rem;color:var(--text3);">${talents.length} talents · ${learnedTalents.length} learned</span>
@@ -580,14 +581,14 @@ export async function renderPsion(el) {
                         const isLearned = learnedTalents.includes(t.id || name);
                         const isOrder = t.tags && t.tags.includes('order');
                         return `
-                            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);${isLearned ? 'background:var(--bg3);border-left:3px solid var(--blue);' : ''}">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);${isLearned ? 'background:var(--bg3);border-inline-start:3px solid var(--blue);' : ''}">
                                 <div style="flex:1;min-width:0;">
                                     <span style="font-weight:${isLearned ? '600' : '400'};color:${isLearned ? 'var(--blue)' : 'var(--text)'};">${escHtml(name)}</span>
-                                    ${isLearned ? `<span style="font-size:0.55rem;color:var(--blue);margin-left:0.2rem;">✓ Learned</span>` : ''}
-                                    ${isOrder ? `<span style="font-size:0.55rem;color:var(--gold);margin-left:0.2rem;">🏛️ Order</span>` : ''}
+                                    ${isLearned ? `<span style="font-size:0.55rem;color:var(--blue);margin-inline-start:0.2rem;">✓ Learned</span>` : ''}
+                                    ${isOrder ? `<span style="font-size:0.55rem;color:var(--gold);margin-inline-start:0.2rem;">🏛️ Order</span>` : ''}
                                     <div style="font-size:0.65rem;color:var(--text2);">${formatText(description)}</div>
                                 </div>
-                                <div style="display:flex;align-items:center;gap:0.2rem;flex-shrink:0;margin-left:0.3rem;">
+                                <div style="display:flex;align-items:center;gap:0.2rem;flex-shrink:0;margin-inline-start:0.3rem;">
                                     <span style="font-size:0.65rem;color:var(--gold);">${cost} XP</span>
                                     <button class="btn btn-xs ${isLearned ? 'btn-secondary' : 'btn-primary'}" onclick="window.psionToggleTalent('${escHtml(t.id || name)}')" style="font-size:0.55rem;padding:0.05rem 0.3rem;">
                                         ${isLearned ? '✕ Unlearn' : '✓ Learn'}
@@ -601,11 +602,11 @@ export async function renderPsion(el) {
             </div>
 
             <!-- ─── Psion Wisdom ─────────────────────────────────── -->
-            <div class="psion-wisdom" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--blue);">
+            <div class="psion-wisdom" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--blue);">
                 <div style="display:flex;flex-direction:column;gap:0.1rem;">
                     <div style="font-size:0.7rem;color:var(--text3);font-style:italic;">
                         "I carry no Symbol. My ledger is my skull, and it comes due in headaches, not obligations."
-                        <span style="display:block;text-align:right;font-size:0.6rem;color:var(--text2);">— The Gray Wanderer</span>
+                        <span style="display:block;text-align: end;font-size:0.6rem;color:var(--text2);">— The Gray Wanderer</span>
                     </div>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.6rem;color:var(--text3);border-top:1px solid var(--border);padding-top:0.15rem;">
                         <span>🧠 <strong>Mental Strain:</strong> Overflow causes Harm</span>
@@ -631,33 +632,33 @@ window.psionPerformArtFromInline = function(artId, buttonElement) {
 
     const art = getArtDisplay(artId);
     if (!art) {
-        showToast('Art not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.psionics.artNotFound", null, "Art not found."), 'error');
         return;
     }
 
     const psionicsSkill = getPsionicsSkill(char);
     if (psionicsSkill < 1) {
-        showToast('You need at least 1 point in Psionics skill to use Arts.', 'error');
+        showToast(i18nText("feature.spellcraft.components.psionics.youNeedAtLeast1PointIn", null, "You need at least 1 point in Psionics skill to use Arts."), 'error');
         return;
     }
 
     const learnedArts = getLearnedArts(char);
     if (!learnedArts.includes(artId)) {
-        showToast('You have not learned this Art.', 'error');
+        showToast(i18nText("feature.spellcraft.components.psionics.youHaveNotLearnedThisArt", null, "You have not learned this Art."), 'error');
         return;
     }
 
     // Find the parent art item and get the select and input
     const artItem = buttonElement.closest('.psion-art-item');
     if (!artItem) {
-        showToast('Could not find art controls.', 'error');
+        showToast(i18nText("feature.spellcraft.components.psionics.couldNotFindArtControls", null, "Could not find art controls."), 'error');
         return;
     }
 
     const select = artItem.querySelector('.psion-effect-select');
     const targetInput = artItem.querySelector('.psion-target-input');
     if (!select) {
-        showToast('Effect selection not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.psionics.effectSelectionNotFound", null, "Effect selection not found."), 'error');
         return;
     }
 
@@ -678,7 +679,7 @@ window.psionPerformArtFromInline = function(artId, buttonElement) {
 function performPsionicAction(char, artId, dv, strainCost, target) {
     const art = getArtDisplay(artId);
     if (!art) {
-        showToast('Art not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.psionics.artNotFound", null, "Art not found."), 'error');
         return;
     }
 
@@ -780,11 +781,11 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
             <div style="font-size:0.75rem;color:var(--text2);">${detail}</div>
             <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.75rem;">
                 <span style="color:var(--blue);">🧠 Mental Strain +${strainCost}</span>
-                <span style="color:var(--text3);margin-left:0.5rem;">(${char.mentalStrain}/${getMentalStrainMax(char)})</span>
-                ${sb > 0 ? `<span style="color:var(--gold);margin-left:0.5rem;">🎲 ${sb} SB</span>` : ''}
+                <span style="color:var(--text3);margin-inline-start:0.5rem;">(${char.mentalStrain}/${getMentalStrainMax(char)})</span>
+                ${sb > 0 ? `<span style="color:var(--gold);margin-inline-start:0.5rem;">🎲 ${sb} SB</span>` : ''}
             </div>
             ${char.mentalStrain >= getMentalStrainMax(char) ? '<div style="color:var(--red);font-weight:600;font-size:0.8rem;">⚠️ Mental Strain at maximum! Further strain will cause Harm or Fatigue.</div>' : ''}
-            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.psionics.close">Close</button>
         </div>
     `, success ? 'success' : 'warning');
 
@@ -809,9 +810,9 @@ window.psionUseArt = function(artId) {
             controls.style.background = 'var(--gold)';
             setTimeout(() => { controls.style.background = ''; }, 600);
         }
-        showToast('Use the dropdown and target field below the art description.', 'info');
+        showToast(i18nText("feature.spellcraft.components.psionics.useTheDropdownAndTargetFieldBelow", null, "Use the dropdown and target field below the art description."), 'info');
     } else {
-        showToast('Art not found. Please refresh.', 'error');
+        showToast(i18nText("feature.spellcraft.components.psionics.artNotFoundPleaseRefresh", null, "Art not found. Please refresh."), 'error');
     }
 };
 
@@ -828,16 +829,16 @@ window.psionToggleArt = function(artId) {
     const index = char.learnedArts.indexOf(artId);
     if (index >= 0) {
         char.learnedArts.splice(index, 1);
-        showToast(`Unlearned: ${artId}`, 'info');
+        showToast(i18nText("feature.spellcraft.components.psionics.unlearnedValue", { value0: artId }, "Unlearned: {{value0}}"), 'info');
     } else {
         // Check if Craft of the Psion is learned
         const learnedTalents = char.learnedTalents || [];
         if (!learnedTalents.includes('craft-of-the-psion')) {
-            showToast('You must learn Craft of the Psion first.', 'error');
+            showToast(i18nText("feature.spellcraft.components.psionics.youMustLearnCraftOfThePsion", null, "You must learn Craft of the Psion first."), 'error');
             return;
         }
         char.learnedArts.push(artId);
-        showToast(`Learned Art: ${artId}`, 'success');
+        showToast(i18nText("feature.spellcraft.components.psionics.learnedArtValue", { value0: artId }, "Learned Art: {{value0}}"), 'success');
     }
 
     saveCharacter({ learnedArts: char.learnedArts });
@@ -861,17 +862,17 @@ window.psionToggleTalent = function(talentId) {
             // Clear any order-specific flags? Not needed.
         }
         char.learnedTalents.splice(index, 1);
-        showToast(`Unlearned: ${talentId}`, 'info');
+        showToast(i18nText("feature.spellcraft.components.psionics.unlearnedValue", { value0: talentId }, "Unlearned: {{value0}}"), 'info');
     } else {
         // Learn
         if (talentId === 'craft-of-the-psion') {
             if (!char.psionics || char.psionics < 1) {
                 char.psionics = 1;
-                showToast('Craft of the Psion learned! Psionics skill set to 1.', 'success');
+                showToast(i18nText("feature.spellcraft.components.psionics.craftOfThePsionLearnedPsionicsSkill", null, "Craft of the Psion learned! Psionics skill set to 1."), 'success');
             }
         }
         char.learnedTalents.push(talentId);
-        showToast(`Learned: ${talentId} ✨`, 'success');
+        showToast(i18nText("feature.spellcraft.components.psionics.learnedValue", { value0: talentId }, "Learned: {{value0}} ✨"), 'success');
     }
 
     saveCharacter({ learnedTalents: char.learnedTalents, psionics: char.psionics });
@@ -890,13 +891,13 @@ window.psionAdjustStrain = function(amount) {
     const max = getMentalStrainMax(char);
     let newStrain = Math.max(0, Math.min(current + amount, max));
     if (amount > 0 && current >= max) {
-        showToast('Mental Strain already at maximum!', 'warning');
+        showToast(i18nText("feature.spellcraft.components.psionics.mentalStrainAlreadyAtMaximum", null, "Mental Strain already at maximum!"), 'warning');
         return;
     }
     char.mentalStrain = newStrain;
     saveCharacter({ mentalStrain: char.mentalStrain });
     window.psionRefresh();
-    showToast(`Mental Strain: ${newStrain}/${max}`, 'info');
+    showToast(i18nText("feature.spellcraft.components.psionics.mentalStrainValueValue", { value0: newStrain, value1: max }, "Mental Strain: {{value0}}/{{value1}}"), 'info');
 };
 
 // ============================================================
@@ -908,7 +909,7 @@ window.psionRefresh = function() {
     if (el) {
         renderPsion(el);
     }
-    showToast('🔄 Psionics refreshed.', 'info');
+    showToast(i18nText("feature.spellcraft.components.psionics.psionicsRefreshed", null, "🔄 Psionics refreshed."), 'info');
 };
 
 // ============================================================
@@ -925,7 +926,7 @@ function showToastWithHTML(html, type = 'info') {
     // with a backdrop blocking the rest of the page.
     const modal = document.createElement('div');
     modal.style.cssText = `
-        position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
+        position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 9999;
         animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
@@ -935,7 +936,7 @@ function showToastWithHTML(html, type = 'info') {
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;
     `;
-    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>`;
+    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.psionics.close">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
 

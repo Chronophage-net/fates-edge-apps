@@ -13,6 +13,7 @@
  * - Supports both global catalog and character-specific editing
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml, safeParseInt, clamp } from '@core/utils.js';
@@ -210,7 +211,7 @@ function openCharacterEditor(characterId, talentIndex) {
     const state = getState();
     const character = state.characters?.find(c => c.id === characterId);
     if (!character) {
-        showToast('Character not found.', 'error');
+        showToast(i18nText("feature.characters.talent-editor.characterNotFound", null, "Character not found."), 'error');
         return;
     }
 
@@ -285,12 +286,12 @@ function showEditorModal(talent, isNew, mode) {
     const tierInfo = TALENT_TIERS.find(t => t.id === (talent.tier || 'minor')) || TALENT_TIERS[0];
 
     modal.innerHTML = `
-        <button class="btn btn-secondary editor-back" id="talent-editor-close">← Back</button>
+        <button class="btn btn-secondary editor-back" id="talent-editor-close" data-i18n="feature.characters.talent-editor.back">← Back</button>
         <h2>${isNew ? '➕ Add Talent' : '✏️ Edit Talent'}</h2>
         
         <!-- Guide Reference -->
         <details style="margin-bottom:0.8rem;">
-            <summary style="cursor:pointer;font-size:0.85rem;color:var(--text2);">📖 Talent Rules Reference</summary>
+            <summary style="cursor:pointer;font-size:0.85rem;color:var(--text2);" data-i18n="feature.characters.talent-editor.talentRulesReference">📖 Talent Rules Reference</summary>
             <div style="padding:0.5rem;font-size:0.8rem;color:var(--text3);background:var(--bg2);border-radius:6px;margin-top:0.3rem;">
                 <p><strong>Talent Tiers:</strong></p>
                 ${TALENT_TIERS.map(t => 
@@ -311,14 +312,14 @@ function showEditorModal(talent, isNew, mode) {
         <form id="talent-editor-form">
             <!-- Name -->
             <div class="form-group">
-                <label for="talent-name">Talent Name *</label>
+                <label for="talent-name" data-i18n="feature.characters.talent-editor.talentName">Talent Name *</label>
                 <input type="text" id="talent-name" value="${escHtml(talent.name || '')}" placeholder="e.g., Keen Senses, Weapon Mastery, Backstab" required autofocus />
             </div>
             
             <!-- XP Cost and Tier -->
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <div class="form-group" style="flex:1;min-width:100px;">
-                    <label for="talent-cost">XP Cost</label>
+                    <label for="talent-cost" data-i18n="feature.characters.talent-editor.xpCost">XP Cost</label>
                     <input type="number" id="talent-cost" value="${talent.cost ?? 2}" min="2" max="50" 
                         style="font-size:1.1rem;font-weight:600;color:var(--gold);" 
                         title="XP cost. Minor: 2-3, Major: 4-6, Prestige: 7-10, Epic: 11+" />
@@ -327,7 +328,7 @@ function showEditorModal(talent, isNew, mode) {
                     </div>
                 </div>
                 <div class="form-group" style="flex:1;min-width:140px;">
-                    <label for="talent-tier">Talent Tier</label>
+                    <label for="talent-tier" data-i18n="feature.characters.talent-editor.talentTier">Talent Tier</label>
                     <select id="talent-tier" style="font-weight:600;">${tierOptions}</select>
                     <div id="talent-tier-info" style="font-size:0.75rem;margin-top:0.2rem;color:${tierInfo.color};">
                         ${escHtml(tierInfo.desc)}
@@ -336,18 +337,18 @@ function showEditorModal(talent, isNew, mode) {
             </div>
             
             <!-- Tier Examples -->
-            <div id="talent-tier-examples" style="font-size:0.75rem;color:var(--text3);padding:0.3rem 0.5rem;background:var(--bg2);border-radius:4px;margin:0.3rem 0;border-left:3px solid ${tierInfo.color};">
+            <div id="talent-tier-examples" style="font-size:0.75rem;color:var(--text3);padding:0.3rem 0.5rem;background:var(--bg2);border-radius:4px;margin:0.3rem 0;border-inline-start:3px solid ${tierInfo.color};">
                 <strong>Examples:</strong> ${escHtml(tierInfo.examples)}
             </div>
             
             <!-- Activation and Use Limit -->
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <div class="form-group" style="flex:1;min-width:150px;">
-                    <label for="talent-activation">Activation Type</label>
+                    <label for="talent-activation" data-i18n="feature.characters.talent-editor.activationType">Activation Type</label>
                     <select id="talent-activation">${activationOptions}</select>
                 </div>
                 <div class="form-group" style="flex:1;min-width:150px;">
-                    <label for="talent-use-limit">Use Limit</label>
+                    <label for="talent-use-limit" data-i18n="feature.characters.talent-editor.useLimit">Use Limit</label>
                     <select id="talent-use-limit">${useLimitOptions}</select>
                 </div>
             </div>
@@ -355,18 +356,18 @@ function showEditorModal(talent, isNew, mode) {
             <!-- Category and Source -->
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <div class="form-group" style="flex:1;min-width:150px;">
-                    <label for="talent-category">Category</label>
+                    <label for="talent-category" data-i18n="feature.characters.talent-editor.category">Category</label>
                     <select id="talent-category">${categoryOptions}</select>
                 </div>
                 <div class="form-group" style="flex:1;min-width:120px;">
-                    <label for="talent-source">Source</label>
+                    <label for="talent-source" data-i18n="feature.characters.talent-editor.source">Source</label>
                     <select id="talent-source">${sourceOptions}</select>
                 </div>
             </div>
             
             <!-- Tags -->
             <div class="form-group">
-                <label for="talent-tags">Tags</label>
+                <label for="talent-tags" data-i18n="feature.characters.talent-editor.tags">Tags</label>
                 <input type="text" id="talent-tags" value="${escHtml((talent.tags || []).join(', '))}"
                     placeholder="e.g., melee, once-per-scene, stealth, cantor" />
                 <div style="font-size:0.75rem;color:var(--text3);margin-top:0.2rem;">
@@ -378,7 +379,7 @@ function showEditorModal(talent, isNew, mode) {
 
             <!-- Prerequisites -->
             <div class="form-group">
-                <label for="talent-prereq">Prerequisites</label>
+                <label for="talent-prereq" data-i18n="feature.characters.talent-editor.prerequisites">Prerequisites</label>
                 <input type="text" id="talent-prereq" value="${escHtml(talent.prerequisites || talent.prereq || '')}" 
                     placeholder="e.g., Melee 2+, Body 3+ | Requires: Spellcraft | Requires: Familiar or Patron's Symbol" />
                 <div style="font-size:0.75rem;color:var(--text3);margin-top:0.2rem;">
@@ -389,7 +390,7 @@ function showEditorModal(talent, isNew, mode) {
             
             <!-- Effect Summary -->
             <div class="form-group">
-                <label for="talent-effect">Effect Summary (mechanical)</label>
+                <label for="talent-effect" data-i18n="feature.characters.talent-editor.effectSummaryMechanical">Effect Summary (mechanical)</label>
                 <input type="text" id="talent-effect" value="${escHtml(talent.effect || '')}"
                     placeholder="e.g., +1d Stealth | ignore armor penalty | improve Position by 1 step | reroll on a Miss" />
                 <div style="font-size:0.75rem;color:var(--text3);margin-top:0.2rem;">
@@ -403,21 +404,21 @@ function showEditorModal(talent, isNew, mode) {
             
             <!-- Description -->
             <div class="form-group">
-                <label for="talent-description">Full Description</label>
+                <label for="talent-description" data-i18n="feature.characters.talent-editor.fullDescription">Full Description</label>
                 <textarea id="talent-description" rows="4" 
-                    placeholder="Describe the talent in detail — how it works, when to use it, what happens on activation...">${escHtml(talent.description || '')}</textarea>
+                    placeholder="Describe the talent in detail — how it works, when to use it, what happens on activation..." data-i18n-attr="placeholder:feature.characters.talent-editor.describeTheTalentInDetailHowIt">${escHtml(talent.description || '')}</textarea>
             </div>
             
             <!-- Stacking Notice -->
-            <div style="font-size:0.75rem;color:var(--text3);padding:0.3rem 0.5rem;background:rgba(255,193,7,0.08);border-radius:4px;border-left:2px solid var(--gold);margin-bottom:0.5rem;">
+            <div style="font-size:0.75rem;color:var(--text3);padding:0.3rem 0.5rem;background:rgba(255,193,7,0.08);border-radius:4px;border-inline-start:2px solid var(--gold);margin-bottom:0.5rem;">
                 <strong>Stacking:</strong> ${STACKING_RULES}
             </div>
             
             <!-- Buttons -->
             <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-                <button type="submit" class="btn btn-gold">💾 Save Talent</button>
-                <button type="button" class="btn" id="talent-editor-cancel">Cancel</button>
-                ${!isNew ? `<button type="button" class="btn btn-danger" id="talent-editor-delete">🗑️ Delete</button>` : ''}
+                <button type="submit" class="btn btn-gold" data-i18n="feature.characters.talent-editor.saveTalent">💾 Save Talent</button>
+                <button type="button" class="btn" id="talent-editor-cancel" data-i18n="feature.characters.talent-editor.cancel">Cancel</button>
+                ${!isNew ? `<button type="button" class="btn btn-danger" id="talent-editor-delete" data-i18n="feature.characters.talent-editor.delete">🗑️ Delete</button>` : ''}
             </div>
         </form>
     `;
@@ -444,7 +445,7 @@ function showEditorModal(talent, isNew, mode) {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
             const name = talent?.name || 'Untitled';
-            if (confirm(`Delete talent "${name}"? This cannot be undone.`)) {
+            if (confirm(i18nText("feature.characters.talent-editor.deleteTalentValueThisCannotBeUndone", { value0: name }, "Delete talent \"{{value0}}\"? This cannot be undone."))) {
                 deleteTalent(talent, mode);
                 closeModal();
             }
@@ -572,7 +573,7 @@ function saveTalent(originalTalent, isNew, mode) {
     const name = nameInput?.value?.trim() || '';
     
     if (!name) {
-        showToast('Please enter a talent name.', 'error');
+        showToast(i18nText("feature.characters.talent-editor.pleaseEnterATalentName", null, "Please enter a talent name."), 'error');
         if (nameInput) {
             nameInput.style.borderColor = 'var(--red)';
             nameInput.focus();
@@ -588,8 +589,7 @@ function saveTalent(originalTalent, isNew, mode) {
     // Validate cost against tier
     if (cost < tier.min || cost > tier.max) {
         const proceed = confirm(
-            `XP cost ${cost} doesn't match ${tier.label} tier (${tier.xpRange}).\n\n` +
-            `Save anyway? (GM may allow custom costs.)`
+            i18nText("feature.characters.talent-editor.xpCostValueDoesnTMatchValue", { value0: cost, value1: tier.label, value2: tier.xpRange }, "XP cost {{value0}} doesn't match {{value1}} tier ({{value2}}).\n\nSave anyway? (GM may allow custom costs.)")
         );
         if (!proceed) return;
     }
@@ -633,19 +633,19 @@ function saveTalent(originalTalent, isNew, mode) {
         if (isNew) {
             talentData.id = talentData.id || generateId('talent_');
             state.talents.push(talentData);
-            showToast(`✅ Added talent "${name}" (${tier.label}, ${cost} XP) to catalog`, 'success');
+            showToast(i18nText("feature.characters.talent-editor.addedTalentValueValueValueXPTo", { value0: name, value1: tier.label, value2: cost }, "✅ Added talent \"{{value0}}\" ({{value1}}, {{value2}} XP) to catalog"), 'success');
         } else {
             const idx = currentEditContext.talentIndex;
             if (idx >= 0 && idx < state.talents.length) {
                 state.talents[idx] = { ...state.talents[idx], ...talentData };
-                showToast(`✅ Updated talent "${name}" (${tier.label}, ${cost} XP)`, 'success');
+                showToast(i18nText("feature.characters.talent-editor.updatedTalentValueValueValueXP", { value0: name, value1: tier.label, value2: cost }, "✅ Updated talent \"{{value0}}\" ({{value1}}, {{value2}} XP)"), 'success');
             }
         }
     } else if (mode === 'character') {
         // Save to character
         const character = state.characters?.find(c => c.id === currentEditContext.characterId);
         if (!character) {
-            showToast('Character not found.', 'error');
+            showToast(i18nText("feature.characters.talent-editor.characterNotFound", null, "Character not found."), 'error');
             return;
         }
         
@@ -654,10 +654,10 @@ function saveTalent(originalTalent, isNew, mode) {
         
         if (isNew || talentIndex < 0) {
             character.talents.push(talentData);
-            showToast(`✅ Added talent "${name}" (${tier.label}, ${cost} XP) to ${character.name}`, 'success');
+            showToast(i18nText("feature.characters.talent-editor.addedTalentValueValueValueXPTo_zan35", { value0: name, value1: tier.label, value2: cost, value3: character.name }, "✅ Added talent \"{{value0}}\" ({{value1}}, {{value2}} XP) to {{value3}}"), 'success');
         } else {
             character.talents[talentIndex] = { ...character.talents[talentIndex], ...talentData };
-            showToast(`✅ Updated talent "${name}" on ${character.name}`, 'success');
+            showToast(i18nText("feature.characters.talent-editor.updatedTalentValueOnValue", { value0: name, value1: character.name }, "✅ Updated talent \"{{value0}}\" on {{value1}}"), 'success');
         }
     }
     
@@ -676,7 +676,7 @@ function deleteTalent(talent, mode) {
         if (idx >= 0 && idx < state.talents.length) {
             state.talents.splice(idx, 1);
             saveState();
-            showToast(`🗑️ Talent "${talent.name}" deleted from catalog.`, 'success');
+            showToast(i18nText("feature.characters.talent-editor.talentValueDeletedFromCatalog", { value0: talent.name }, "🗑️ Talent \"{{value0}}\" deleted from catalog."), 'success');
             document.dispatchEvent(new CustomEvent('character-updated'));
             document.dispatchEvent(new CustomEvent('talent-updated'));
         }
@@ -687,7 +687,7 @@ function deleteTalent(talent, mode) {
         if (talentIndex >= 0 && talentIndex < character.talents.length) {
             character.talents.splice(talentIndex, 1);
             saveState();
-            showToast(`🗑️ Talent "${talent.name}" removed from ${character.name}.`, 'success');
+            showToast(i18nText("feature.characters.talent-editor.talentValueRemovedFromValue", { value0: talent.name, value1: character.name }, "🗑️ Talent \"{{value0}}\" removed from {{value1}}."), 'success');
             document.dispatchEvent(new CustomEvent('character-updated'));
         }
     }

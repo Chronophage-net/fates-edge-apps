@@ -33,6 +33,7 @@
  * given card means in a given region.
  */
 
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { logRecordingEvent } from '@core/media.js';
 import { showToast } from '@components/Toast.js';
 import { addTimer } from '@core/state.js';
@@ -873,13 +874,13 @@ function generateLeg(sources, legIndex) {
 
 async function generateJourneyAsync(startRegion, destRegion, numLegs = 3) {
     if (!startRegion || !destRegion) {
-        showToast('Please select both start and destination regions.', 'error');
+        showToast(i18nText("feature.travel-planner.pleaseSelectBothStartAndDestinationRegions", null, "Please select both start and destination regions."), 'error');
         return null;
     }
 
     const destData = await fetchRegionData(destRegion);
     if (!destData) {
-        showToast('Could not load region data.', 'error');
+        showToast(i18nText("feature.travel-planner.couldNotLoadRegionData", null, "Could not load region data."), 'error');
         return null;
     }
 
@@ -996,7 +997,7 @@ function resolveItineraryLeg(legDef) {
 async function generateItineraryJourneyAsync(itineraryKey) {
     const itinerary = WORKED_ITINERARIES.find(it => it.key === itineraryKey);
     if (!itinerary) {
-        showToast('Unknown itinerary.', 'error');
+        showToast(i18nText("feature.travel-planner.unknownItinerary", null, "Unknown itinerary."), 'error');
         return null;
     }
 
@@ -1025,7 +1026,7 @@ async function generateItineraryJourneyAsync(itineraryKey) {
             getData(resolved.spade), getData(resolved.heart), getData(resolved.club), getData(resolved.diamond)
         ]);
         if (!spadeData || !heartData || !clubData || !diamondData) {
-            showToast(`Could not load region data for "${resolved.label}".`, 'error');
+            showToast(i18nText("feature.travel-planner.couldNotLoadRegionDataForValue", { value0: resolved.label }, "Could not load region data for \"{{value0}}\"."), 'error');
             return null;
         }
 
@@ -1159,11 +1160,11 @@ export async function render(el) {
     container.innerHTML = `
         <div class="travel-planner">
             <div class="travel-planner-header">
-                <h1 class="page-title">🗺️ Travel Planner</h1>
-                <p class="page-sub">Plan journeys using the Cartomancy system. Draw cards to generate places, actors, pressures, and leverage for each leg.</p>
+                <h1 class="page-title" data-i18n="feature.travel-planner.travelPlanner">🗺️ Travel Planner</h1>
+                <p class="page-sub" data-i18n="feature.travel-planner.planJourneysUsingTheCartomancySystemDraw">Plan journeys using the Cartomancy system. Draw cards to generate places, actors, pressures, and leverage for each leg.</p>
             </div>
             
-            <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
+            <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-inline-start:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                     <span style="font-size:0.8rem;color:var(--text2);">
                         ${isDeterministic ? '🎲 Deterministic RNG (seeded)' : '🔀 Cryptographic RNG (random)'}
@@ -1175,9 +1176,9 @@ export async function render(el) {
             <div class="panel">
                 <h3>🗒️ Worked Itinerary <span style="font-size:0.75rem;color:var(--text3);font-weight:normal;">(named journeys from the Travel Reference chapter — travel here is charted as an itinerary of waypoints and gates, not a map)</span></h3>
                 <div class="field">
-                    <label>Itinerary</label>
+                    <label data-i18n="feature.travel-planner.itinerary">Itinerary</label>
                     <select id="travel-itinerary-select">
-                        <option value="">— Freeform Journey (Core Travel Procedure) —</option>
+                        <option value="" data-i18n="feature.travel-planner.freeformJourneyCoreTravelProcedure">— Freeform Journey (Core Travel Procedure) —</option>
                         ${WORKED_ITINERARIES.map(it => `<option value="${it.key}" ${it.key === selectedItinerary ? 'selected' : ''}>${it.name}</option>`).join('')}
                     </select>
                 </div>
@@ -1185,23 +1186,23 @@ export async function render(el) {
             </div>
 
             <div class="panel" id="travel-freeform-panel" style="${selectedItinerary ? 'display:none;' : ''}">
-                <h3>Journey Configuration</h3>
+                <h3 data-i18n="feature.travel-planner.journeyConfiguration">Journey Configuration</h3>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;">
                     <div class="field" style="flex:1;min-width:150px;">
-                        <label>Start Region</label>
+                        <label data-i18n="feature.travel-planner.startRegion">Start Region</label>
                         <select id="travel-start-region">
                             ${regionNames.map(name => `<option value="${name}" ${name === selectedStartRegion ? 'selected' : ''}>${name}</option>`).join('')}
                         </select>
                     </div>
                     <div style="font-size:1.5rem;color:var(--text3);">→</div>
                     <div class="field" style="flex:1;min-width:150px;">
-                        <label>Destination Region</label>
+                        <label data-i18n="feature.travel-planner.destinationRegion">Destination Region</label>
                         <select id="travel-dest-region">
                             ${regionNames.map(name => `<option value="${name}" ${name === selectedDestRegion ? 'selected' : ''}>${name}</option>`).join('')}
                         </select>
                     </div>
                     <div class="field" style="flex:0 0 120px;">
-                        <label>Number of Legs</label>
+                        <label data-i18n="feature.travel-planner.numberOfLegs">Number of Legs</label>
                         <select id="travel-legs">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -1214,12 +1215,12 @@ export async function render(el) {
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;margin-top:0.7rem;">
                     <div class="field" style="display:flex;align-items:center;gap:0.4rem;">
                         <input type="checkbox" id="travel-policed-route" ${policedRoute ? 'checked' : ''}>
-                        <label for="travel-policed-route" style="margin:0;">Strongly Policed Route</label>
+                        <label for="travel-policed-route" style="margin:0;" data-i18n="feature.travel-planner.stronglyPolicedRoute">Strongly Policed Route</label>
                     </div>
                     <div class="field" style="flex:1;min-width:180px;">
                         <label>Gateway Authority <span style="color:var(--text3);font-weight:normal;">(who gates this route — defaults to destination)</span></label>
                         <select id="travel-gateway-region">
-                            <option value="">Same as Destination</option>
+                            <option value="" data-i18n="feature.travel-planner.sameAsDestination">Same as Destination</option>
                             ${regionNames.map(name => `<option value="${name}" ${name === gatewayRegion ? 'selected' : ''}>${name}</option>`).join('')}
                         </select>
                     </div>
@@ -1234,8 +1235,8 @@ export async function render(el) {
 
             <div class="panel">
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                    <button class="btn btn-gold" id="travel-generate-btn">🃏 Generate Journey</button>
-                    <button class="btn" id="travel-reshuffle-btn">↺ Reshuffle</button>
+                    <button class="btn btn-gold" id="travel-generate-btn" data-i18n="feature.travel-planner.generateJourney">🃏 Generate Journey</button>
+                    <button class="btn" id="travel-reshuffle-btn" data-i18n="feature.travel-planner.reshuffle">↺ Reshuffle</button>
                 </div>
             </div>
 
@@ -1245,38 +1246,38 @@ export async function render(el) {
                     <div class="field" style="flex:1;min-width:180px;">
                         <label>Region <span style="color:var(--text3);font-weight:normal;">(optional — leave blank for universal meanings)</span></label>
                         <select id="travel-spread-region">
-                            <option value="">— Universal (no region) —</option>
+                            <option value="" data-i18n="feature.travel-planner.universalNoRegion">— Universal (no region) —</option>
                             ${regionNames.map(name => `<option value="${name}">${name}</option>`).join('')}
                         </select>
                     </div>
-                    <button class="btn btn-secondary" id="travel-spread-btn">🔮 Draw Traveler's Spread</button>
+                    <button class="btn btn-secondary" id="travel-spread-btn" data-i18n="feature.travel-planner.drawTravelerSSpread">🔮 Draw Traveler's Spread</button>
                 </div>
                 <div id="travel-spread-display" style="margin-top:0.6rem;display:none;"></div>
             </div>
 
             <div id="travel-journey-display" class="panel" style="display:none;">
                 <div id="travel-journey-header">
-                    <h3 id="travel-journey-title">Journey</h3>
+                    <h3 id="travel-journey-title" data-i18n="feature.travel-planner.journey">Journey</h3>
                     <div id="travel-journey-meta" style="font-size:0.9rem;color:var(--text2);"></div>
                 </div>
                 <div id="travel-journey-legs" style="margin-top:0.5rem;"></div>
-                <div id="travel-journey-synthesis" style="margin-top:0.8rem;background:var(--bg3);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);white-space:pre-wrap;"></div>
-                <div id="travel-timer-result" style="margin-top:0.5rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-left:4px solid var(--accent);"></div>
+                <div id="travel-journey-synthesis" style="margin-top:0.8rem;background:var(--bg3);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);white-space:pre-wrap;"></div>
+                <div id="travel-timer-result" style="margin-top:0.5rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--accent);"></div>
                 <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-                    <button class="btn btn-sm btn-primary" id="travel-add-timer-btn">⏱️ Add Timer</button>
-                    <button class="btn btn-sm btn-secondary" id="travel-copy-btn">📋 Copy Summary</button>
-                    <button class="btn btn-sm btn-secondary" id="travel-export-btn">📤 Export</button>
-                    <button class="btn btn-sm btn-secondary" id="travel-import-btn">📥 Import</button>
+                    <button class="btn btn-sm btn-primary" id="travel-add-timer-btn" data-i18n="feature.travel-planner.addTimer">⏱️ Add Timer</button>
+                    <button class="btn btn-sm btn-secondary" id="travel-copy-btn" data-i18n="feature.travel-planner.copySummary">📋 Copy Summary</button>
+                    <button class="btn btn-sm btn-secondary" id="travel-export-btn" data-i18n="feature.travel-planner.export">📤 Export</button>
+                    <button class="btn btn-sm btn-secondary" id="travel-import-btn" data-i18n="feature.travel-planner.import">📥 Import</button>
                 </div>
             </div>
             
             <div class="panel">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                    <h3 style="margin:0;">📜 Journey History</h3>
-                    <button class="btn btn-sm" id="travel-history-clear-btn">Clear History</button>
+                    <h3 style="margin:0;" data-i18n="feature.travel-planner.journeyHistory">📜 Journey History</h3>
+                    <button class="btn btn-sm" id="travel-history-clear-btn" data-i18n="feature.travel-planner.clearHistory">Clear History</button>
                 </div>
                 <div id="travel-history" style="max-height:200px;overflow-y:auto;margin-top:0.5rem;font-size:0.85rem;">
-                    <span class="text-muted">No journeys planned yet.</span>
+                    <span class="text-muted" data-i18n="feature.travel-planner.noJourneysPlannedYet">No journeys planned yet.</span>
                 </div>
             </div>
         </div>
@@ -1418,24 +1419,30 @@ function renderItineraryPreview() {
 
 async function handleGenerate() {
     if (selectedItinerary) {
-        showToast('Generating journey...', 'info');
+        showToast(i18nText("feature.travel-planner.generatingJourney", null, "Generating journey..."), 'info');
         try {
             const itinerary = WORKED_ITINERARIES.find(it => it.key === selectedItinerary);
             const journey = await generateItineraryJourneyAsync(selectedItinerary);
             if (!journey) {
-                showToast('Failed to generate journey.', 'error');
+                showToast(i18nText("feature.travel-planner.failedToGenerateJourney", null, "Failed to generate journey."), 'error');
                 return;
             }
             displayJourney(journey);
             addToHistory(journey);
             const aceCount = journey.aceEffects ? journey.aceEffects.length : 0;
-            showToast(`"${itinerary.name}" generated (${journey.numLegs} legs). ${aceCount > 0 ? `♠️ ${aceCount} Ace effect(s) triggered!` : ''}`, 'success');
+            const aceNotice = aceCount > 0
+                ? i18nPlural('feature.travel-planner.aceEffectsTriggered', aceCount, null, '♠️ {{count}} Ace effects triggered!')
+                : '';
+            showToast(i18nPlural('feature.travel-planner.itineraryGenerated', journey.numLegs, {
+                name: itinerary.name,
+                aceNotice
+            }, '"{{name}}" generated ({{count}} legs). {{aceNotice}}'), 'success');
             if (typeof logRecordingEvent === 'function') {
                 logRecordingEvent('travel_planner_generate', `User generated worked itinerary: ${itinerary.name}`);
             }
         } catch (err) {
             console.error('Error generating journey:', err);
-            showToast('Error generating journey.', 'error');
+            showToast(i18nText("feature.travel-planner.errorGeneratingJourney", null, "Error generating journey."), 'error');
         }
         return;
     }
@@ -1445,7 +1452,7 @@ async function handleGenerate() {
     const legsSelect = document.getElementById('travel-legs');
 
     if (!startSelect || !destSelect || !legsSelect) {
-        showToast('Form elements not found.', 'error');
+        showToast(i18nText("feature.travel-planner.formElementsNotFound", null, "Form elements not found."), 'error');
         return;
     }
 
@@ -1454,29 +1461,36 @@ async function handleGenerate() {
     const numLegs = parseInt(legsSelect.value, 10) || 3;
 
     if (start === dest) {
-        showToast('Start and destination regions must be different.', 'warning');
+        showToast(i18nText("feature.travel-planner.startAndDestinationRegionsMustBeDifferent", null, "Start and destination regions must be different."), 'warning');
         return;
     }
 
-    showToast('Generating journey...', 'info');
+    showToast(i18nText("feature.travel-planner.generatingJourney", null, "Generating journey..."), 'info');
 
     try {
         const journey = await generateJourneyAsync(start, dest, numLegs);
         if (!journey) {
-            showToast('Failed to generate journey.', 'error');
+            showToast(i18nText("feature.travel-planner.failedToGenerateJourney", null, "Failed to generate journey."), 'error');
             return;
         }
         displayJourney(journey);
         addToHistory(journey);
         const aceCount = journey.aceEffects ? journey.aceEffects.length : 0;
-        showToast(`Journey from ${start} to ${dest} generated with ${numLegs} leg(s). ${aceCount > 0 ? `♠️ ${aceCount} Ace effect(s) triggered!` : ''}`, 'success');
+        const aceNotice = aceCount > 0
+            ? i18nPlural('feature.travel-planner.aceEffectsTriggered', aceCount, null, '♠️ {{count}} Ace effects triggered!')
+            : '';
+        showToast(i18nPlural('feature.travel-planner.journeyGenerated', numLegs, {
+            start,
+            destination: dest,
+            aceNotice
+        }, 'Journey from {{start}} to {{destination}} generated with {{count}} legs. {{aceNotice}}'), 'success');
 
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('travel_planner_generate', `User generated journey: ${start} → ${dest} (${numLegs} legs)`);
         }
     } catch (err) {
         console.error('Error generating journey:', err);
-        showToast('Error generating journey.', 'error');
+        showToast(i18nText("feature.travel-planner.errorGeneratingJourney", null, "Error generating journey."), 'error');
     }
 }
 
@@ -1488,15 +1502,17 @@ async function handleTravelersSpread() {
     const regionSelect = document.getElementById('travel-spread-region');
     const regionName = regionSelect ? (regionSelect.value || null) : null;
 
-    showToast("Drawing the Traveler's Spread...", 'info');
+    showToast(i18nText("feature.travel-planner.drawingTheTravelerSSpread", null, "Drawing the Traveler's Spread..."), 'info');
 
     try {
         const reading = await generateTravelersSpread(regionName);
         displayTravelersSpread(reading);
-        showToast(`Traveler's Spread drawn${regionName ? ` for ${regionName}` : ''}.`, 'success');
+        showToast(regionName
+            ? i18nText('feature.travel-planner.travelersSpreadDrawnForRegion', { region: regionName }, "Traveler's Spread drawn for {{region}}.")
+            : i18nText('feature.travel-planner.travelersSpreadDrawn', null, "Traveler's Spread drawn."), 'success');
     } catch (err) {
         console.error("Error generating Traveler's Spread:", err);
-        showToast("Error drawing the Traveler's Spread.", 'error');
+        showToast(i18nText("feature.travel-planner.errorDrawingTheTravelerSSpread", null, "Error drawing the Traveler's Spread."), 'error');
     }
 }
 
@@ -1513,7 +1529,7 @@ function displayTravelersSpread(reading) {
         ` : ''}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;">
             ${reading.cards.map(c => `
-                <div style="background:var(--bg2);border-radius:var(--radius);padding:0.6rem;border-left:4px solid ${c.color};">
+                <div style="background:var(--bg2);border-radius:var(--radius);padding:0.6rem;border-inline-start:4px solid ${c.color};">
                     <div style="font-size:0.75rem;color:var(--text3);">${c.position.icon} ${c.position.label}</div>
                     <div style="font-size:0.8rem;font-style:italic;color:var(--text2);margin:0.15rem 0;">${c.position.prompt}</div>
                     <div style="font-weight:bold;margin-top:0.2rem;">${getRankName(c.card.rank)} ${c.symbol} of ${getSuitName(c.card.suit)}</div>
@@ -1527,10 +1543,10 @@ function displayTravelersSpread(reading) {
 
 function handleClearHistory() {
     if (journeyHistory.length === 0) return;
-    if (confirm('Clear all journey history?')) {
+    if (confirm(i18nText("feature.travel-planner.clearAllJourneyHistory", null, "Clear all journey history?"))) {
         journeyHistory = [];
         renderHistory();
-        showToast('History cleared.', 'info');
+        showToast(i18nText("feature.travel-planner.historyCleared", null, "History cleared."), 'info');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('travel_history_cleared', 'Journey history cleared');
         }
@@ -1539,7 +1555,7 @@ function handleClearHistory() {
 
 function handleAddTimer() {
     if (!currentJourney) {
-        showToast('No journey to add timer from.', 'error');
+        showToast(i18nText("feature.travel-planner.noJourneyToAddTimerFrom", null, "No journey to add timer from."), 'error');
         return;
     }
     const timerName = `Travel: ${currentJourney.startRegion} → ${currentJourney.destRegion}`;
@@ -1552,16 +1568,16 @@ function handleAddTimer() {
                 segments: segments,
                 current: 0
             });
-            showToast(`⏱️ Opening Timer Editor...`, 'info');
+            showToast(i18nText("feature.travel-planner.openingTimerEditor", null, "⏱️ Opening Timer Editor..."), 'info');
         } else {
             const createdTimer = addTimer({ name: timerName, segments, current: 0 });
             document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: createdTimer } }));
-            showToast(`⏱️ Timer created: ${createdTimer.name} (${segments} segments)`, 'success');
+            showToast(i18nText("feature.travel-planner.timerCreatedValueValueSegments", { value0: createdTimer.name, value1: segments }, "⏱️ Timer created: {{value0}} ({{value1}} segments)"), 'success');
         }
     }).catch(() => {
         const createdTimer = addTimer({ name: timerName, segments, current: 0 });
         document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: createdTimer } }));
-        showToast(`⏱️ Timer created: ${createdTimer.name} (${segments} segments)`, 'success');
+        showToast(i18nText("feature.travel-planner.timerCreatedValueValueSegments", { value0: createdTimer.name, value1: segments }, "⏱️ Timer created: {{value0}} ({{value1}} segments)"), 'success');
     });
 
     if (typeof logRecordingEvent === 'function') {
@@ -1571,17 +1587,17 @@ function handleAddTimer() {
 
 function handleCopy() {
     if (!currentJourney) {
-        showToast('No journey to copy.', 'error');
+        showToast(i18nText("feature.travel-planner.noJourneyToCopy", null, "No journey to copy."), 'error');
         return;
     }
     const summary = generateJourneySummary(currentJourney);
     navigator.clipboard.writeText(summary).then(() => {
-        showToast('Journey summary copied to clipboard.', 'success');
+        showToast(i18nText("feature.travel-planner.journeySummaryCopiedToClipboard", null, "Journey summary copied to clipboard."), 'success');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('travel_summary_copied', 'Journey summary copied to clipboard');
         }
     }).catch(() => {
-        prompt('Copy the following summary:', summary);
+        prompt(i18nText("feature.travel-planner.copyTheFollowingSummary", null, "Copy the following summary:"), summary);
     });
 }
 
@@ -1591,7 +1607,7 @@ function handleCopy() {
 
 function handleExport() {
     if (!currentJourney) {
-        showToast('No journey to export.', 'error');
+        showToast(i18nText("feature.travel-planner.noJourneyToExport", null, "No journey to export."), 'error');
         return;
     }
     
@@ -1608,13 +1624,13 @@ function handleExport() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        showToast('Journey exported successfully.', 'success');
+        showToast(i18nText("feature.travel-planner.journeyExportedSuccessfully", null, "Journey exported successfully."), 'success');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('travel_export', `Exported journey: ${currentJourney.startRegion} → ${currentJourney.destRegion} (${currentJourney.numLegs} legs)`);
         }
     } catch (err) {
         console.error('Export error:', err);
-        showToast('Error exporting journey.', 'error');
+        showToast(i18nText("feature.travel-planner.errorExportingJourney", null, "Error exporting journey."), 'error');
     }
 }
 
@@ -1640,13 +1656,13 @@ function handleImport() {
                 const required = ['startRegion', 'destRegion', 'legs', 'totalSegments', 'numLegs', 'timestamp'];
                 const missing = required.filter(field => !(field in data));
                 if (missing.length > 0) {
-                    showToast(`Invalid journey file: missing fields: ${missing.join(', ')}`, 'error');
+                    showToast(i18nText("feature.travel-planner.invalidJourneyFileMissingFieldsValue", { value0: missing.join(', ') }, "Invalid journey file: missing fields: {{value0}}"), 'error');
                     document.body.removeChild(input);
                     return;
                 }
                 
                 if (!Array.isArray(data.legs) || data.legs.length === 0) {
-                    showToast('Invalid journey file: legs must be a non-empty array.', 'error');
+                    showToast(i18nText("feature.travel-planner.invalidJourneyFileLegsMustBeA", null, "Invalid journey file: legs must be a non-empty array."), 'error');
                     document.body.removeChild(input);
                     return;
                 }
@@ -1656,7 +1672,7 @@ function handleImport() {
                     const leg = data.legs[i];
                     const missingLeg = legRequired.filter(f => !(f in leg));
                     if (missingLeg.length > 0) {
-                        showToast(`Invalid journey file: leg ${i+1} missing fields: ${missingLeg.join(', ')}`, 'error');
+                        showToast(i18nText("feature.travel-planner.invalidJourneyFileLegValueMissingFields", { value0: i+1, value1: missingLeg.join(', ') }, "Invalid journey file: leg {{value0}} missing fields: {{value1}}"), 'error');
                         document.body.removeChild(input);
                         return;
                     }
@@ -1668,19 +1684,19 @@ function handleImport() {
                 displayJourney(data);
                 addToHistory(data);
                 
-                showToast(`Journey imported: ${data.startRegion} → ${data.destRegion} (${data.numLegs} legs)`, 'success');
+                showToast(i18nText("feature.travel-planner.journeyImportedValueValueValueLegs", { value0: data.startRegion, value1: data.destRegion, value2: data.numLegs }, "Journey imported: {{value0}} → {{value1}} ({{value2}} legs)"), 'success');
                 if (typeof logRecordingEvent === 'function') {
                     logRecordingEvent('travel_import', `Imported journey: ${data.startRegion} → ${data.destRegion} (${data.numLegs} legs)`);
                 }
             } catch (err) {
                 console.error('Import error:', err);
-                showToast('Error parsing journey file.', 'error');
+                showToast(i18nText("feature.travel-planner.errorParsingJourneyFile", null, "Error parsing journey file."), 'error');
             }
             document.body.removeChild(input);
         };
         
         reader.onerror = function() {
-            showToast('Error reading file.', 'error');
+            showToast(i18nText("feature.travel-planner.errorReadingFile", null, "Error reading file."), 'error');
             document.body.removeChild(input);
         };
         
@@ -1709,13 +1725,13 @@ function displayJourney(journey) {
     if (meta) {
         meta.innerHTML = `
             <span>Legs: ${journey.numLegs}</span>
-            <span style="margin-left:1rem;">Total Timer: ${journey.totalSegments} segments</span>
-            <span style="margin-left:1rem;">Highest Card: ${journey.highestCard}</span>
+            <span style="margin-inline-start:1rem;">Total Timer: ${journey.totalSegments} segments</span>
+            <span style="margin-inline-start:1rem;">Highest Card: ${journey.highestCard}</span>
             ${journey.itineraryName ? '' : `
-                <span style="margin-left:1rem;">♣ Pressure from: ${journey.policedRoute ? journey.destRegion + ' (policed)' : 'The Wilds'}</span>
-                <span style="margin-left:1rem;">♦ Gateway: ${journey.gatewayRegion}</span>
+                <span style="margin-inline-start:1rem;">♣ Pressure from: ${journey.policedRoute ? journey.destRegion + ' (policed)' : 'The Wilds'}</span>
+                <span style="margin-inline-start:1rem;">♦ Gateway: ${journey.gatewayRegion}</span>
             `}
-            ${journey.aceEffects && journey.aceEffects.length > 0 ? `<span style="margin-left:1rem;color:var(--gold);">♠️ ${journey.aceEffects.length} Ace effect(s) — the Hollow's Attention (GM +${journey.aceEffects.length} SB)</span>` : ''}
+            ${journey.aceEffects && journey.aceEffects.length > 0 ? `<span style="margin-inline-start:1rem;color:var(--gold);">♠️ ${journey.aceEffects.length} Ace effect(s) — the Hollow's Attention (GM +${journey.aceEffects.length} SB)</span>` : ''}
         `;
     }
     
@@ -1724,7 +1740,7 @@ function displayJourney(journey) {
         legsContainer.innerHTML = journey.legs.map((leg, idx) => {
             const hasAce = !!leg.aceEffect;
             return `
-            <div style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.5rem;border-left:4px solid ${hasAce ? 'var(--gold)' : 'var(--border)'};">
+            <div style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;margin-bottom:0.5rem;border-inline-start:4px solid ${hasAce ? 'var(--gold)' : 'var(--border)'};">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
                     <strong style="font-size:1rem;">${leg.legLabel ? `Leg ${idx+1}: ${leg.legLabel}` : `Leg ${idx+1}`}</strong>
                     <span style="font-size:0.8rem;color:var(--text3);">Timer: ${leg.timerSegments} segments (${leg.timerCard})</span>
@@ -1736,22 +1752,22 @@ function displayJourney(journey) {
                     </div>
                 ` : ''}
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5rem;margin-top:0.3rem;">
-                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.spade.color};">
+                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-inline-start:3px solid ${leg.cardDetails.spade.color};">
                         <span style="font-weight:bold;">♠ Place:</span> ${leg.place}
                         <div style="font-size:0.7rem;color:var(--text3);">from ${leg.spadeSource}</div>
                         ${leg.cardDetails.spade.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.spade.faceNote}</div>` : ''}
                     </div>
-                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.heart.color};">
+                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-inline-start:3px solid ${leg.cardDetails.heart.color};">
                         <span style="font-weight:bold;">♥ Actor:</span> ${leg.actor}
                         <div style="font-size:0.7rem;color:var(--text3);">from ${leg.heartSource}</div>
                         ${leg.cardDetails.heart.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.heart.faceNote}</div>` : ''}
                     </div>
-                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.club.color};">
+                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-inline-start:3px solid ${leg.cardDetails.club.color};">
                         <span style="font-weight:bold;">♣ Pressure:</span> ${leg.pressure}
                         <div style="font-size:0.7rem;color:var(--text3);">from ${leg.clubSource}</div>
                         ${leg.cardDetails.club.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.club.faceNote}</div>` : ''}
                     </div>
-                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-left:3px solid ${leg.cardDetails.diamond.color};">
+                    <div style="background:var(--bg3);padding:0.3rem 0.5rem;border-radius:4px;border-inline-start:3px solid ${leg.cardDetails.diamond.color};">
                         <span style="font-weight:bold;">♦ Leverage:</span> ${leg.leverage}
                         <div style="font-size:0.7rem;color:var(--text3);">from ${leg.diamondSource}</div>
                         ${leg.cardDetails.diamond.faceNote ? `<div style="margin-top:0.2rem;font-size:0.7rem;color:var(--text3);">${leg.cardDetails.diamond.faceNote}</div>` : ''}
@@ -1802,7 +1818,7 @@ function renderHistory() {
             <span style="font-weight:500;">${j.startRegion} → ${j.destRegion}</span>
             <span style="font-size:0.8rem;color:var(--text2);">(${j.numLegs} legs, ${j.totalSegments} segments)</span>
             ${aceCount > 0 ? `<span style="color:var(--gold);font-size:0.8rem;">♠️ ${aceCount} Ace</span>` : ''}
-            <button class="btn btn-xs btn-ghost" data-journey-index="${realIdx}" style="margin-left:auto;">👁️ View</button>
+            <button class="btn btn-xs btn-ghost" data-journey-index="${realIdx}" style="margin-inline-start:auto;">👁️ View</button>
         </div>
     `}).join('');
     
@@ -1813,7 +1829,7 @@ function renderHistory() {
             if (journey) {
                 displayJourney(journey);
                 currentJourney = journey;
-                showToast(`Loaded journey: ${journey.startRegion} → ${journey.destRegion}`, 'info');
+                showToast(i18nText("feature.travel-planner.loadedJourneyValueValue", { value0: journey.startRegion, value1: journey.destRegion }, "Loaded journey: {{value0}} → {{value1}}"), 'info');
             }
         });
     });

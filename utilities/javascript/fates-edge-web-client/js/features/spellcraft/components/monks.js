@@ -41,6 +41,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
 import { escHtml, generateId, safeParseInt } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -122,7 +123,7 @@ function buildMonkCardHtml(title, patronName, patronIcon, effect, costDetails, e
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--border);
-            border-left:4px solid var(--gold);
+            border-inline-start:4px solid var(--gold);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             max-width: 450px;
             margin:0.1rem 0;
@@ -593,9 +594,9 @@ export async function renderMonks(el) {
 
     // Meditation DV options
     const dvOptionsHtml = `
-        <option value="3">Clarity (DV 3)</option>
-        <option value="4">Healing (DV 4)</option>
-        <option value="5">Transcendence (DV 5)</option>
+        <option value="3" data-i18n="feature.spellcraft.components.monks.clarityDV3">Clarity (DV 3)</option>
+        <option value="4" data-i18n="feature.spellcraft.components.monks.healingDV4">Healing (DV 4)</option>
+        <option value="5" data-i18n="feature.spellcraft.components.monks.transcendenceDV5">Transcendence (DV 5)</option>
     `;
 
     // Build talent dropdown (all unlearned talents that are learnable)
@@ -630,7 +631,7 @@ export async function renderMonks(el) {
             `<option value="${l}">${labels[l]} — ${tradition.techniques[l]?.name || l} (${xpMap[l]} XP)</option>`
         ).join('');
         if (!techniqueOptionsHtml) {
-            techniqueOptionsHtml = `<option value="">All techniques learned!</option>`;
+            techniqueOptionsHtml = `<option value="" data-i18n="feature.spellcraft.components.monks.allTechniquesLearned">All techniques learned!</option>`;
         }
     }
 
@@ -643,22 +644,22 @@ export async function renderMonks(el) {
                     <span style="font-size:1.4rem;">🧘</span>
                     <div>
                         <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Monastic Path</span>
-                        <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${traditionData ? traditionData.patronName : 'No Tradition'}</span>
+                        <span style="font-size:0.7rem;color:var(--text3);margin-inline-start:0.3rem;">${traditionData ? traditionData.patronName : 'No Tradition'}</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
                     <select id="monk-meditation-dv-select" style="font-size:0.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;">
                         ${dvOptionsHtml}
                     </select>
-                    <button class="btn btn-sm btn-gold" onclick="window.monkMeditateFromSelect()">🧘 Meditate</button>
-                    <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()">📿 Tradition</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.monkRefresh()" title="Reloads patron data from disk, bypassing any cached copy">🔄 Refresh</button>
+                    <button class="btn btn-sm btn-gold" onclick="window.monkMeditateFromSelect()" data-i18n="feature.spellcraft.components.monks.meditate">🧘 Meditate</button>
+                    <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()" data-i18n="feature.spellcraft.components.monks.tradition">📿 Tradition</button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.monkRefresh()" title="Reloads patron data from disk, bypassing any cached copy" data-i18n-attr="title:feature.spellcraft.components.monks.reloadsPatronDataFromDiskBypassingAny" data-i18n="feature.spellcraft.components.monks.refresh">🔄 Refresh</button>
                 </div>
             </div>
 
             <!-- ─── Breath State + Flow ────────────────────────── -->
             <div style="display:grid;grid-template-columns:2fr 1fr;gap:0.3rem;">
-                <div class="monks-breath" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+                <div class="monks-breath" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                         <div>
                             <div style="font-size:0.8rem;font-weight:600;">${BREATH_LABELS[breathState] || 'Unknown Breath'}</div>
@@ -666,7 +667,7 @@ export async function renderMonks(el) {
                         </div>
                         <div style="display:flex;gap:0.2rem;align-items:center;">
                             <span style="font-size:0.6rem;color:var(--text3);">${breathScars.length > 0 ? `⚠️ Scars: ${breathScars.join(', ')}` : 'No scars'}</span>
-                            <button class="btn btn-xs btn-ghost" onclick="window.monkAdvanceBreath()" title="Advance to next breath state">→</button>
+                            <button class="btn btn-xs btn-ghost" onclick="window.monkAdvanceBreath()" title="Advance to next breath state" data-i18n-attr="title:feature.spellcraft.components.monks.advanceToNextBreathState">→</button>
                         </div>
                     </div>
                     <div style="display:flex;gap:0.2rem;margin-top:0.1rem;font-size:0.6rem;color:var(--text3);">
@@ -676,13 +677,13 @@ export async function renderMonks(el) {
                     </div>
                 </div>
 
-                <div class="monks-flow" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--blue);text-align:center;">
+                <div class="monks-flow" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--blue);text-align:center;">
                     <div style="font-size:0.7rem;color:var(--text3);">🌀 Flow Points</div>
                     <div style="font-size:1.2rem;font-weight:600;color:var(--blue);">${flowPoints} / ${maxFlowPoints}</div>
                     <div style="display:flex;gap:0.2rem;justify-content:center;margin-top:0.1rem;flex-wrap:wrap;">
                         <button class="btn btn-xs btn-secondary" onclick="window.monkAddFlow(1)">+</button>
                         <button class="btn btn-xs btn-secondary" onclick="window.monkAddFlow(-1)">−</button>
-                        <button class="btn btn-xs btn-gold" onclick="window.monkUseFlow()">🌀 Use Flow</button>
+                        <button class="btn btn-xs btn-gold" onclick="window.monkUseFlow()" data-i18n="feature.spellcraft.components.monks.useFlow">🌀 Use Flow</button>
                         <span style="font-size:0.55rem;color:var(--text3);">(Spend 1 to avoid Fatigue)</span>
                     </div>
                 </div>
@@ -695,16 +696,16 @@ export async function renderMonks(el) {
             <div style="display:flex;gap:0.3rem;align-items:center;background:var(--bg2);border-radius:var(--radius);padding:0.2rem 0.5rem;border:1px solid var(--border);flex-wrap:wrap;">
                 <span style="font-size:0.7rem;color:var(--text3);">📿 Set Tradition:</span>
                 <select id="monk-tradition-select" style="flex:1;min-width:150px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.7rem;">
-                    <option value="">— Choose a tradition —</option>
+                    <option value="" data-i18n="feature.spellcraft.components.monks.chooseATradition">— Choose a tradition —</option>
                     ${traditionOptionsHtml}
                 </select>
-                <button class="btn btn-xs btn-primary" onclick="window.monkSetTraditionFromSelect()">Set</button>
-                ${traditionData ? `<button class="btn btn-xs btn-ghost" onclick="window.monkClearTradition()" style="color:var(--red);">✕ Clear</button>` : ''}
+                <button class="btn btn-xs btn-primary" onclick="window.monkSetTraditionFromSelect()" data-i18n="feature.spellcraft.components.monks.set">Set</button>
+                ${traditionData ? `<button class="btn btn-xs btn-ghost" onclick="window.monkClearTradition()" style="color:var(--red);" data-i18n="feature.spellcraft.components.monks.clear">✕ Clear</button>` : ''}
             </div>
 
             <!-- ─── GM Intrusion ────────────────────────────────── -->
             ${randomIntrusion ? `
-                <div class="monks-intrusion" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--orange);font-size:0.75rem;color:var(--text2);">
+                <div class="monks-intrusion" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--orange);font-size:0.75rem;color:var(--text2);">
                     <span style="font-weight:600;color:var(--orange);">⚠️ GM Intrusion:</span> "${formatText(randomIntrusion)}"
                 </div>
             ` : ''}
@@ -724,7 +725,7 @@ export async function renderMonks(el) {
                             <select id="monk-talent-select" style="font-size:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.2rem;max-width:200px;">
                                 ${talentOptionsHtml}
                             </select>
-                            <button class="btn btn-xs btn-primary" onclick="window.monkLearnTalentFromSelect()">Learn</button>
+                            <button class="btn btn-xs btn-primary" onclick="window.monkLearnTalentFromSelect()" data-i18n="feature.spellcraft.components.monks.learn">Learn</button>
                         ` : `
                             <span style="font-size:0.6rem;color:var(--text3);">All talents learned!</span>
                         `}
@@ -808,7 +809,7 @@ function renderOnboarding(el, char) {
                 </div>
             </div>
 
-            <div style="font-size:0.7rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+            <div style="font-size:0.7rem;color:var(--text3);background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
                 A Foundation talent costs 2 XP and opens Breath States, Meditation, and Techniques.
                 Choose the discipline your character would actually practice.
             </div>
@@ -829,7 +830,7 @@ function renderTraditionDisplay(traditionData, char) {
     const color = tradition.color || 'var(--gold)';
 
     return `
-        <div class="monks-tradition" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid ${color};">
+        <div class="monks-tradition" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid ${color};">
             <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                 <span style="font-size:1.2rem;">${traditionData.patronIcon}</span>
                 <span style="font-weight:600;font-size:0.95rem;color:${color};">${escHtml(tradition.name)}</span>
@@ -843,7 +844,7 @@ function renderTraditionDisplay(traditionData, char) {
                 <span style="color:${hasAdvanced ? 'var(--green)' : 'var(--text3)'};">${hasAdvanced ? '✅' : '⬜'} Advanced</span>
                 <span style="color:${hasMaster ? 'var(--gold)' : 'var(--text3)'};">${hasMaster ? '⭐' : '⬜'} Master</span>
             </div>
-            ${tradition.quote ? `<blockquote style="margin:0.15rem 0;padding:0.15rem 0.5rem;font-size:0.7rem;color:var(--text3);border-left:2px solid ${color};">"${escHtml(tradition.quote)}"</blockquote>` : ''}
+            ${tradition.quote ? `<blockquote style="margin:0.15rem 0;padding:0.15rem 0.5rem;font-size:0.7rem;color:var(--text3);border-inline-start:2px solid ${color};">"${escHtml(tradition.quote)}"</blockquote>` : ''}
         </div>
     `;
 }
@@ -876,7 +877,7 @@ function renderTalents(char) {
                 ${talents.map(t => {
                     const has = owned.includes(t.id);
                     return `
-                        <div class="talent-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;${has ? 'border-left:3px solid var(--gold);background:var(--bg3);' : ''}">
+                        <div class="talent-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;${has ? 'border-inline-start:3px solid var(--gold);background:var(--bg3);' : ''}">
                             <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                                 <span>${has ? '✅' : '⬜'}</span>
                                 <span style="${has ? 'font-weight:600;' : ''}">${escHtml(t.name)}</span>
@@ -918,7 +919,7 @@ function renderTechniques(traditionData, char) {
         const effect = tech.effect || tech.description || '';
         const cost = tech.cost || '';
         return `
-            <div class="technique-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;${has ? `border-left:3px solid ${color};background:var(--bg3);` : ''}">
+            <div class="technique-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.1rem 0.3rem;border-bottom:1px solid var(--border);font-size:0.75rem;${has ? `border-inline-start:3px solid ${color};background:var(--bg3);` : ''}">
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;flex:1;min-width:0;">
                     <span>${has ? '✅' : '⬜'}</span>
                     <span style="${has ? 'font-weight:600;' : ''}">${escHtml(tech.name)}</span>
@@ -927,7 +928,7 @@ function renderTechniques(traditionData, char) {
                     ${effect ? `<div style="width:100%;font-size:0.6rem;color:var(--text2);">${formatText(effect)}</div>` : ''}
                     ${cost ? `<div style="font-size:0.6rem;color:var(--text3);">Cost: ${formatText(cost)}</div>` : ''}
                 </div>
-                <div style="display:flex;gap:0.2rem;flex-shrink:0;margin-left:0.3rem;">
+                <div style="display:flex;gap:0.2rem;flex-shrink:0;margin-inline-start:0.3rem;">
                     ${has ? `<button class="btn btn-xs btn-gold" onclick="window.monkUseTechnique('${patronId}','${level}')">Use</button>` : ''}
                     ${!has && canLearn ? `<button class="btn btn-xs btn-gold" onclick="window.monkBuyTechnique('${patronId}','${level}')">Learn</button>` : ''}
                     ${!has && !canLearn ? `<span style="font-size:0.55rem;color:var(--text3);">${level === 'advanced' ? 'Requires Basic' : 'Requires Advanced'}</span>` : ''}
@@ -943,7 +944,7 @@ function renderCorruption(traditionData, tier) {
     if (!current) return '';
 
     return `
-        <div class="monks-corruption" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--red);">
+        <div class="monks-corruption" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--red);">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <span style="font-size:0.8rem;font-weight:600;color:var(--red);">⚠️ Mark of the Path — Tier ${tier} / ${entries.length}</span>
                 <span style="font-size:0.65rem;color:var(--text3);">"The path leaves its mark."</span>
@@ -978,7 +979,7 @@ window.monkSetTraditionFromSelect = function() {
     if (!char) return;
 
     if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent before choosing a tradition.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAFoundationTalentBeforeChoosingA", null, "Learn a Foundation talent before choosing a tradition."), 'error');
         return;
     }
 
@@ -986,7 +987,7 @@ window.monkSetTraditionFromSelect = function() {
     if (!select) return;
     const patronId = select.value;
     if (!patronId) {
-        showToast('Please select a tradition.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.pleaseSelectATradition", null, "Please select a tradition."), 'error');
         return;
     }
 
@@ -996,7 +997,7 @@ window.monkSetTraditionFromSelect = function() {
         monasticTradition: patronId,
         monkTechniques: char.monkTechniques
     });
-    showToast(`📿 Chosen tradition.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.monks.chosenTradition", null, "📿 Chosen tradition."), 'success');
     renderMonks(container);
 };
 
@@ -1005,11 +1006,11 @@ window.monkSetTraditionFromSelect = function() {
 window.monkClearTradition = function() {
     const char = getCharacterData();
     if (!char) return;
-    if (!confirm('Clear your monastic tradition? This will remove all techniques.')) return;
+    if (!confirm(i18nText("feature.spellcraft.components.monks.clearYourMonasticTraditionThisWillRemove", null, "Clear your monastic tradition? This will remove all techniques."))) return;
     char.monasticTradition = null;
     char.monkTechniques = {};
     saveCharacter({ monasticTradition: null, monkTechniques: {} });
-    showToast('Tradition cleared.', 'info');
+    showToast(i18nText("feature.spellcraft.components.monks.traditionCleared", null, "Tradition cleared."), 'info');
     renderMonks(container);
 };
 
@@ -1020,9 +1021,9 @@ window.monkChooseTradition = function() {
     if (select) {
         // If there's already a selection, scroll to it and highlight.
         select.focus();
-        showToast('Select a tradition from the dropdown above.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.selectATraditionFromTheDropdownAbove", null, "Select a tradition from the dropdown above."), 'info');
     } else {
-        showToast('Please refresh the panel to use the dropdown.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.pleaseRefreshThePanelToUseThe", null, "Please refresh the panel to use the dropdown."), 'info');
     }
 };
 
@@ -1034,7 +1035,7 @@ window.monkMeditateFromSelect = async function() {
     if (!char) return;
 
     if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent before meditating.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAFoundationTalentBeforeMeditating", null, "Learn a Foundation talent before meditating."), 'error');
         return;
     }
 
@@ -1042,14 +1043,14 @@ window.monkMeditateFromSelect = async function() {
     if (!select) return;
     const dv = parseInt(select.value);
     if (isNaN(dv) || dv < 3 || dv > 5) {
-        showToast('Invalid DV. Choose 3, 4, or 5.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.invalidDVChoose34Or5", null, "Invalid DV. Choose 3, 4, or 5."), 'error');
         return;
     }
 
     const result = performMeditation(char, dv);
 
     let resultHtml = `
-        <div style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem;border-left:4px solid ${result.achieved ? 'var(--green)' : 'var(--red)'};">
+        <div style="background:var(--bg2);border-radius:var(--radius);padding:0.5rem;border-inline-start:4px solid ${result.achieved ? 'var(--green)' : 'var(--red)'};">
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-weight:600;">🧘 Meditation Results</span>
                 <span style="font-size:0.7rem;color:var(--text3);">DV ${dv}</span>
@@ -1068,7 +1069,7 @@ window.monkMeditateFromSelect = async function() {
             ${result.sbCount > 0 ? `
                 <div style="font-size:0.65rem;color:var(--text3);">GM gains ${result.sbCount} Story Beat${result.sbCount > 1 ? 's' : ''}.</div>
             ` : ''}
-            <button class="btn btn-xs btn-secondary" onclick="this.closest('#monk-meditation-results').style.display='none'">Close</button>
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('#monk-meditation-results').style.display='none'" data-i18n="feature.spellcraft.components.monks.close">Close</button>
         </div>
     `;
 
@@ -1084,7 +1085,7 @@ window.monkMeditateFromSelect = async function() {
         if (dv === 4 && char.conditions) {
             const removable = ['Fear', 'Shaken', 'Guilty'];
             const hasCondition = removable.some(c => char.conditions.includes(c));
-            if (hasCondition && confirm('Remove a minor condition (Fear, Shaken, Guilty)?')) {
+            if (hasCondition && confirm(i18nText("feature.spellcraft.components.monks.removeAMinorConditionFearShakenGuilty", null, "Remove a minor condition (Fear, Shaken, Guilty)?"))) {
                 char.conditions = char.conditions.filter(c => !removable.includes(c));
             }
         }
@@ -1122,7 +1123,7 @@ window.monkMeditateFromSelect = async function() {
         );
         sendVTTMessage(cardHtml);
 
-        showToast(`🧘 Meditation successful! Breath advanced to ${BREATH_LABELS[next]}`, 'success');
+        showToast(i18nText("feature.spellcraft.components.monks.meditationSuccessfulBreathAdvancedToValue", { value0: BREATH_LABELS[next] }, "🧘 Meditation successful! Breath advanced to {{value0}}"), 'success');
     } else if (result.achieved && result.drained) {
         // Drained: no net benefit, but still advances breath
         const states = Object.values(BREATH_STATES);
@@ -1145,9 +1146,9 @@ window.monkMeditateFromSelect = async function() {
         );
         sendVTTMessage(cardHtml);
 
-        showToast(`⚠️ Meditation drained, but breath advanced to ${BREATH_LABELS[next]}`, 'warning');
+        showToast(i18nText("feature.spellcraft.components.monks.meditationDrainedButBreathAdvancedToValue", { value0: BREATH_LABELS[next] }, "⚠️ Meditation drained, but breath advanced to {{value0}}"), 'warning');
     } else {
-        showToast('❌ Meditation failed. Try again after rest.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.meditationFailedTryAgainAfterRest", null, "❌ Meditation failed. Try again after rest."), 'error');
     }
 
     renderMonks(container);
@@ -1160,7 +1161,7 @@ window.monkMeditate = function() {
     if (select) {
         window.monkMeditateFromSelect();
     } else {
-        showToast('Please refresh the panel to use the dropdown.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.pleaseRefreshThePanelToUseThe", null, "Please refresh the panel to use the dropdown."), 'info');
     }
 };
 
@@ -1171,7 +1172,7 @@ window.monkAdvanceBreath = function() {
     if (!char) return;
 
     if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAFoundationTalentFirst", null, "Learn a Foundation talent first."), 'error');
         return;
     }
 
@@ -1182,7 +1183,7 @@ window.monkAdvanceBreath = function() {
 
     char.breathState = next;
     saveCharacter({ breathState: next });
-    showToast(`🫁 Advanced to: ${BREATH_LABELS[next]}`, 'success');
+    showToast(i18nText("feature.spellcraft.components.monks.advancedToValue", { value0: BREATH_LABELS[next] }, "🫁 Advanced to: {{value0}}"), 'success');
     renderMonks(container);
 };
 
@@ -1193,7 +1194,7 @@ window.monkAddFlow = function(amount) {
     if (!char) return;
 
     if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAFoundationTalentFirst", null, "Learn a Foundation talent first."), 'error');
         return;
     }
 
@@ -1204,7 +1205,7 @@ window.monkAddFlow = function(amount) {
     char.flowPoints = newVal;
     saveCharacter({ flowPoints: newVal });
     renderMonks(container);
-    showToast(`🌀 Flow: ${newVal}/${max}`, 'info');
+    showToast(i18nText("feature.spellcraft.components.monks.flowValueValue", { value0: newVal, value1: max }, "🌀 Flow: {{value0}}/{{value1}}"), 'info');
 };
 
 // ─── Use Flow (spend 1 to avoid Fatigue) ──────────────────────
@@ -1215,13 +1216,13 @@ window.monkUseFlow = async function() {
     if (!char) return;
 
     if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAFoundationTalentFirst", null, "Learn a Foundation talent first."), 'error');
         return;
     }
 
     const current = getFlowPoints(char);
     if (current < 1) {
-        showToast('No Flow points available.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.noFlowPointsAvailable", null, "No Flow points available."), 'error');
         return;
     }
 
@@ -1242,7 +1243,7 @@ window.monkUseFlow = async function() {
     );
     sendVTTMessage(cardHtml);
 
-    showToast(`🌀 Spent 1 Flow. ${char.flowPoints}/${getMaxFlowPoints(char)} remaining.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.monks.spent1FlowValueValueRemaining", { value0: char.flowPoints, value1: getMaxFlowPoints(char) }, "🌀 Spent 1 Flow. {{value0}}/{{value1}} remaining."), 'success');
     renderMonks(container);
 };
 
@@ -1256,7 +1257,7 @@ window.monkLearnTalentFromSelect = function() {
     if (!select) return;
     const talentId = select.value;
     if (!talentId) {
-        showToast('No learnable talents available.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.noLearnableTalentsAvailable", null, "No learnable talents available."), 'info');
         return;
     }
     window.monkBuyTalent(talentId);
@@ -1272,7 +1273,7 @@ window.monkLearnTechniqueFromSelect = function(traditionId) {
     if (!select) return;
     const level = select.value;
     if (!level) {
-        showToast('No learnable techniques available.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.noLearnableTechniquesAvailable", null, "No learnable techniques available."), 'info');
         return;
     }
     window.monkBuyTechnique(traditionId, level);
@@ -1285,16 +1286,16 @@ window.monkBuyTalent = function(talentId) {
     if (!char) return;
 
     const talent = getTalentById(talentId);
-    if (!talent) return showToast('Talent not found.', 'error');
+    if (!talent) return showToast(i18nText("feature.spellcraft.components.monks.talentNotFound", null, "Talent not found."), 'error');
 
     if (hasTalent(char, talentId)) {
-        showToast('Already learned this talent.', 'warning');
+        showToast(i18nText("feature.spellcraft.components.monks.alreadyLearnedThisTalent", null, "Already learned this talent."), 'warning');
         return;
     }
 
     const missing = missingPrereqCategory(char, talent.category);
     if (missing) {
-        showToast(`Learn a ${CATEGORY_LABELS[missing]} talent first.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAValueTalentFirst", { value0: CATEGORY_LABELS[missing] }, "Learn a {{value0}} talent first."), 'error');
         return;
     }
 
@@ -1303,11 +1304,11 @@ window.monkBuyTalent = function(talentId) {
     const available = totalXp - spent;
 
     if (available < talent.xp) {
-        showToast(`Not enough XP. Need ${talent.xp}, have ${available} available.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.notEnoughXPNeedValueHaveValue", { value0: talent.xp, value1: available }, "Not enough XP. Need {{value0}}, have {{value1}} available."), 'error');
         return;
     }
 
-    if (!confirm(`Learn "${talent.name}" for ${talent.xp} XP?`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.monks.learnValueForValueXP", { value0: talent.name, value1: talent.xp }, "Learn \"{{value0}}\" for {{value1}} XP?"))) return;
 
     const wasInitiate = isMonkInitiate(char);
 
@@ -1327,9 +1328,9 @@ window.monkBuyTalent = function(talentId) {
     });
 
     if (!wasInitiate) {
-        showToast(`🥋 You have begun the Way. Learned "${talent.name}"`, 'success');
+        showToast(i18nText("feature.spellcraft.components.monks.youHaveBegunTheWayLearnedValue", { value0: talent.name }, "🥋 You have begun the Way. Learned \"{{value0}}\""), 'success');
     } else {
-        showToast(`✅ Learned "${talent.name}"`, 'success');
+        showToast(i18nText("feature.spellcraft.components.monks.learnedValue", { value0: talent.name }, "✅ Learned \"{{value0}}\""), 'success');
     }
     renderMonks(container);
 };
@@ -1342,9 +1343,9 @@ window.monkLearnTalent = function(category) {
     if (select) {
         // Try to filter the dropdown to just this category? We'll just focus it.
         select.focus();
-        showToast('Select a talent from the dropdown above.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.selectATalentFromTheDropdownAbove", null, "Select a talent from the dropdown above."), 'info');
     } else {
-        showToast('Please refresh the panel to use the dropdown.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.pleaseRefreshThePanelToUseThe", null, "Please refresh the panel to use the dropdown."), 'info');
     }
 };
 
@@ -1355,27 +1356,27 @@ window.monkBuyTechnique = async function(traditionId, level) {
     if (!char) return;
 
     if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent before pursuing techniques.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAFoundationTalentBeforePursuingTechniques", null, "Learn a Foundation talent before pursuing techniques."), 'error');
         return;
     }
 
     const traditionData = await findPatronTradition(traditionId);
-    if (!traditionData) return showToast('Tradition not found.', 'error');
+    if (!traditionData) return showToast(i18nText("feature.spellcraft.components.monks.traditionNotFound", null, "Tradition not found."), 'error');
 
     const tech = traditionData.tradition.techniques?.[level];
-    if (!tech) return showToast('Technique not found.', 'error');
+    if (!tech) return showToast(i18nText("feature.spellcraft.components.monks.techniqueNotFound", null, "Technique not found."), 'error');
 
     if (hasTechnique(char, traditionId, level)) {
-        showToast('Already learned this technique.', 'warning');
+        showToast(i18nText("feature.spellcraft.components.monks.alreadyLearnedThisTechnique", null, "Already learned this technique."), 'warning');
         return;
     }
 
     if (level === 'advanced' && !hasTechnique(char, traditionId, 'basic')) {
-        showToast('Must learn Basic technique first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.mustLearnBasicTechniqueFirst", null, "Must learn Basic technique first."), 'error');
         return;
     }
     if (level === 'master' && !hasTechnique(char, traditionId, 'advanced')) {
-        showToast('Must learn Advanced technique first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.mustLearnAdvancedTechniqueFirst", null, "Must learn Advanced technique first."), 'error');
         return;
     }
 
@@ -1385,11 +1386,11 @@ window.monkBuyTechnique = async function(traditionId, level) {
     const available = totalXp - spent;
 
     if (available < xpCost) {
-        showToast(`Not enough XP. Need ${xpCost}, have ${available} available.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.notEnoughXPNeedValueHaveValue", { value0: xpCost, value1: available }, "Not enough XP. Need {{value0}}, have {{value1}} available."), 'error');
         return;
     }
 
-    if (!confirm(`Learn "${tech.name}" for ${xpCost} XP?`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.monks.learnValueForValueXP", { value0: tech.name, value1: xpCost }, "Learn \"{{value0}}\" for {{value1}} XP?"))) return;
 
     if (!char.monkTechniques) char.monkTechniques = {};
     if (!char.monkTechniques[traditionId]) char.monkTechniques[traditionId] = [];
@@ -1406,7 +1407,7 @@ window.monkBuyTechnique = async function(traditionId, level) {
         xpSpent: char.xpSpent,
         monkCorruptionTier: char.monkCorruptionTier
     });
-    showToast(`✅ Learned "${tech.name}"`, 'success');
+    showToast(i18nText("feature.spellcraft.components.monks.learnedValue", { value0: tech.name }, "✅ Learned \"{{value0}}\""), 'success');
     renderMonks(container);
 };
 
@@ -1418,18 +1419,18 @@ window.monkUseTechnique = async function(traditionId, level) {
     if (!char) return;
 
     if (!isMonkInitiate(char)) {
-        showToast('Learn a Foundation talent first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.learnAFoundationTalentFirst", null, "Learn a Foundation talent first."), 'error');
         return;
     }
 
     const traditionData = await findPatronTradition(traditionId);
-    if (!traditionData) return showToast('Tradition not found.', 'error');
+    if (!traditionData) return showToast(i18nText("feature.spellcraft.components.monks.traditionNotFound", null, "Tradition not found."), 'error');
 
     const tech = traditionData.tradition.techniques?.[level];
-    if (!tech) return showToast('Technique not found.', 'error');
+    if (!tech) return showToast(i18nText("feature.spellcraft.components.monks.techniqueNotFound", null, "Technique not found."), 'error');
 
     if (!hasTechnique(char, traditionId, level)) {
-        showToast('You haven\'t learned this technique.', 'error');
+        showToast(i18nText("feature.spellcraft.components.monks.youHavenTLearnedThisTechnique", null, "You haven't learned this technique."), 'error');
         return;
     }
 
@@ -1450,7 +1451,7 @@ window.monkUseTechnique = async function(traditionId, level) {
     );
     sendVTTMessage(cardHtml);
 
-    showToast(`🧘 Used "${name}" — VTT card sent.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.monks.usedValueVTTCardSent", { value0: name }, "🧘 Used \"{{value0}}\" — VTT card sent."), 'success');
 };
 
 // ─── Legacy Learn Technique (redirects to dropdown) ───────────
@@ -1459,9 +1460,9 @@ window.monkLearnTechnique = function(traditionId) {
     const select = document.getElementById('monk-technique-select');
     if (select) {
         select.focus();
-        showToast('Select a technique from the dropdown above.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.selectATechniqueFromTheDropdownAbove", null, "Select a technique from the dropdown above."), 'info');
     } else {
-        showToast('Please refresh the panel to use the dropdown.', 'info');
+        showToast(i18nText("feature.spellcraft.components.monks.pleaseRefreshThePanelToUseThe", null, "Please refresh the panel to use the dropdown."), 'info');
     }
 };
 
@@ -1472,10 +1473,10 @@ window.monkLearnTechnique = function(traditionId) {
 // consistent with cantor.js/rites.js/witchcraft.js's refresh behavior.
 
 window.monkRefresh = async function() {
-    showToast('🔄 Reloading patron data from disk…', 'info');
+    showToast(i18nText("feature.spellcraft.components.monks.reloadingPatronDataFromDisk", null, "🔄 Reloading patron data from disk…"), 'info');
     await ensurePatronDataLoaded(true);
     if (container) await renderMonks(container);
-    showToast('✅ Monks refreshed.', 'success');
+    showToast(i18nText("feature.spellcraft.components.monks.monksRefreshed", null, "✅ Monks refreshed."), 'success');
 };
 
 // ============================================================

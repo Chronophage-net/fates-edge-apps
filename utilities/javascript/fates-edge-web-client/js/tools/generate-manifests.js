@@ -27,6 +27,7 @@ const EXCLUDED_FILE_PATTERN = /manifest.*\.json(\.tmp)?$/i;
 
 // ─── Category mapping: subdir → category info ────────────────────
 const CATEGORY_MAP = {
+  'es': { id: 'es', label: 'Español', path: '/data/docs/es/' },
   'core': { id: 'core', label: 'Core', path: '/data/docs/core/' },
   'quickstart': { id: 'quickstart', label: 'Quickstart', path: '/data/docs/quickstart/' },
   'players-guide': { id: 'players-guide', label: 'Player\'s Guide', path: '/data/docs/players-guide/', book: true },
@@ -181,7 +182,11 @@ function generateDocsManifest(docsPath) {
       if (EXCLUDED_FILES.has(file)) continue;
       if (file.toLowerCase() === 'index.html') continue;
 
-      const title = getDocTitle(file);
+      // Spanish editions carry their accented, reader-facing title in the HTML.
+      const localizedTitle = subdir === 'es' && file.endsWith('.html')
+        ? fs.readFileSync(path.join(subPath, file), 'utf8').match(/<title>([^<]+)<\/title>/i)?.[1]
+        : null;
+      const title = localizedTitle || getDocTitle(file);
       const id = generateId(title);
       const isCore = subdir === 'core';
 

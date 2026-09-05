@@ -35,6 +35,7 @@
  *   - rivalries: [{ patron, description }]
  *   - _license: string */
  
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
@@ -497,7 +498,7 @@ async function loadRemotePatrons(force = false) {
             if (cosmicPatrons.length === 0) {
                 cosmicPatrons = DEFAULT_COSMIC_PATRONS.map(normalizePatron);
                 state.usingFallback = true;
-                showToast('⚠️ No cosmic patron files found. Using defaults.', 'warning');
+                showToast(i18nText("feature.patrons.noCosmicPatronFilesFoundUsingDefaults", null, "⚠️ No cosmic patron files found. Using defaults."), 'warning');
             }
             state.cosmicPatrons = cosmicPatrons.sort(sortByName);
  
@@ -522,7 +523,7 @@ async function loadRemotePatrons(force = false) {
             if (terrestrialPatrons.length === 0) {
                 terrestrialPatrons = DEFAULT_TERRESTRIAL_PATRONS.map(normalizePatron);
                 state.usingFallback = true;
-                showToast('⚠️ No terrestrial patron files found. Using defaults.', 'warning');
+                showToast(i18nText("feature.patrons.noTerrestrialPatronFilesFoundUsingDefaults", null, "⚠️ No terrestrial patron files found. Using defaults."), 'warning');
             }
             state.terrestrialPatrons = terrestrialPatrons.sort(sortByName);
  
@@ -544,7 +545,7 @@ async function loadRemotePatrons(force = false) {
             if (religions.length === 0) {
                 religions = DEFAULT_RELIGIONS;
                 state.usingFallback = true;
-                showToast('⚠️ No religion files found. Using defaults.', 'warning');
+                showToast(i18nText("feature.patrons.noReligionFilesFoundUsingDefaults", null, "⚠️ No religion files found. Using defaults."), 'warning');
             }
             state.religions = religions.sort(sortByName);
 
@@ -554,7 +555,7 @@ async function loadRemotePatrons(force = false) {
         } catch (error) {
             console.warn('Failed to load remote patrons:', error);
             loadDefaultPatrons();
-            showToast('⚠️ Error loading patrons. Using defaults.', 'error');
+            showToast(i18nText("feature.patrons.errorLoadingPatronsUsingDefaults", null, "⚠️ Error loading patrons. Using defaults."), 'error');
         } finally {
             state.isLoading = false;
         }
@@ -625,16 +626,16 @@ export function render(el) {
     container.innerHTML = `
         <div class="patrons-modern-layout">
             <header class="patrons-header" style="margin-bottom:0.5rem;">
-                <h1 class="patrons-title">👁️ Patrons</h1>
-                <p class="patrons-subtitle">The powers, houses, and faiths that may put a claim on a character.</p>
+                <h1 class="patrons-title" data-i18n="feature.patrons.patrons">👁️ Patrons</h1>
+                <p class="patrons-subtitle" data-i18n="feature.patrons.thePowersHousesAndFaithsThatMay">The powers, houses, and faiths that may put a claim on a character.</p>
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading data...</p>' : `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial, ${state.religions.length} religions</p>`}
                 ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ Using fallback defaults for some data.</div>` : ''}
             </header>
  
             <div class="patrons-tabs" style="display:flex;gap:0.3rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-                <button class="patrons-tab active" data-view="cosmic">🌟 Cosmic</button>
-                <button class="patrons-tab" data-view="terrestrial">🏛️ Terrestrial</button>
-                <button class="patrons-tab" data-view="religions">⛪ Religions</button>
+                <button class="patrons-tab active" data-view="cosmic" data-i18n="feature.patrons.cosmic">🌟 Cosmic</button>
+                <button class="patrons-tab" data-view="terrestrial" data-i18n="feature.patrons.terrestrial">🏛️ Terrestrial</button>
+                <button class="patrons-tab" data-view="religions" data-i18n="feature.patrons.religions">⛪ Religions</button>
             </div>
  
             <div id="patrons-view-container" class="patrons-view-container">
@@ -683,7 +684,7 @@ function renderCosmicPatrons() {
             <div class="patrons-empty">
                 <div style="font-size:3rem;">🌟</div>
                 <div>No cosmic patrons loaded.</div>
-                <button class="btn btn-primary" onclick="window.loadDefaultPatrons()">📥 Load Defaults</button>
+                <button class="btn btn-primary" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -700,8 +701,8 @@ function renderCosmicPatrons() {
                 placeholder="e.g. 'a courier who never refuses shelter'"
                 onkeydown="if(event.key==='Enter') window.runPatronRecommender()"
                 style="flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.4rem;font-size:0.75rem;" />
-            <button class="btn btn-xs btn-primary" onclick="window.runPatronRecommender()">Search</button>
-            ${rec.active ? `<button class="btn btn-xs btn-ghost" onclick="window.clearPatronRecommender()" style="color:var(--text3);">✕ Clear</button>` : ''}
+            <button class="btn btn-xs btn-primary" onclick="window.runPatronRecommender()" data-i18n="feature.patrons.search">Search</button>
+            ${rec.active ? `<button class="btn btn-xs btn-ghost" onclick="window.clearPatronRecommender()" style="color:var(--text3);" data-i18n="feature.patrons.clear">✕ Clear</button>` : ''}
         </div>
     `;
 
@@ -715,7 +716,7 @@ function renderCosmicPatrons() {
         ninthRevealed = true;
         // Optional: show a cryptic toast
         setTimeout(() => {
-            showToast('The count is wrong.', 'info');
+            showToast(i18nText("feature.patrons.theCountIsWrong", null, "The count is wrong."), 'info');
         }, 300);
     }
 
@@ -738,7 +739,7 @@ function renderCosmicPatrons() {
         
         if (visibleResults.length === 0 && rec.results.length > 0) {
             // This handles the case where the only match was The Ninth
-            resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.3rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--purple);">
+            resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.3rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:3px solid var(--purple);">
                 No patron answers. The index insists that nothing is missing.
             </div>`;
             gridPatrons = displayPatrons;
@@ -787,8 +788,8 @@ function renderCosmicPatrons() {
                     const isNinth = isTheNinth(p);
                     
                     return `
-                        <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${color};transition:all 0.2s;${matched ? 'border:1px solid var(--gold);' : ''}${isNinth ? 'border:1px solid var(--purple);position:relative;' : ''}">
-                            ${isNinth ? `<div style="position:absolute;top:-6px;right:-4px;font-size:0.7rem;color:var(--purple);">🔮</div>` : ''}
+                        <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-inline-start:3px solid ${color};transition:all 0.2s;${matched ? 'border:1px solid var(--gold);' : ''}${isNinth ? 'border:1px solid var(--purple);position:relative;' : ''}">
+                            ${isNinth ? `<div style="position:absolute;top:-6px;inset-inline-end:-4px;font-size:0.7rem;color:var(--purple);">🔮</div>` : ''}
                             ${icon ? `<div style="font-size:1.5rem;">${safeString(icon)}</div>` : ''}
                             <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
                             <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
@@ -800,14 +801,14 @@ function renderCosmicPatrons() {
                 }).join('')}
             </div>
  
-            <div id="cosmic-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);min-height:80px;">
+            <div id="cosmic-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);min-height:80px;">
                 <p style="color:var(--text2);font-style:italic;margin:0;">Select a patron above to see their description and details.</p>
             </div>
  
             <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                <button class="btn btn-primary btn-sm" onclick="window.addCosmicPatron()">➕ Add Cosmic</button>
-                <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()">🔄 Refresh</button>
-                <button class="btn btn-secondary btn-sm" onclick="window.loadDefaultPatrons()">📥 Load Defaults</button>
+                <button class="btn btn-primary btn-sm" onclick="window.addCosmicPatron()" data-i18n="feature.patrons.addCosmic">➕ Add Cosmic</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
             </div>
         </div>
     `;
@@ -823,8 +824,8 @@ function renderTerrestrialPatrons() {
             <div class="patrons-empty">
                 <div style="font-size:3rem;">🏛️</div>
                 <div>No terrestrial patrons loaded.</div>
-                <button class="btn btn-primary" onclick="window.addTerrestrialPatron()">➕ Add Terrestrial</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultPatrons()">📥 Load Defaults</button>
+                <button class="btn btn-primary" onclick="window.addTerrestrialPatron()" data-i18n="feature.patrons.addTerrestrial">➕ Add Terrestrial</button>
+                <button class="btn btn-secondary" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -838,7 +839,7 @@ function renderTerrestrialPatrons() {
                     const icon = getPatronIcon(p) || '🏛️';
                     const color = p.color || '#2980b9';
                     return `
-                        <div class="patron-tile" onclick="window.viewTerrestrial('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-left:3px solid ${color};transition:all 0.2s;">
+                        <div class="patron-tile" onclick="window.viewTerrestrial('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-inline-start:3px solid ${color};transition:all 0.2s;">
                             <div style="font-size:1.5rem;">${safeString(icon)}</div>
                             <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
                             <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
@@ -848,13 +849,13 @@ function renderTerrestrialPatrons() {
                 }).join('')}
             </div>
  
-            <div id="terrestrial-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);min-height:80px;">
+            <div id="terrestrial-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);min-height:80px;">
                 <p style="color:var(--text2);font-style:italic;margin:0;">Select a terrestrial patron to see details.</p>
             </div>
  
             <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                <button class="btn btn-primary btn-sm" onclick="window.addTerrestrialPatron()">➕ Add Terrestrial</button>
-                <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()">🔄 Refresh</button>
+                <button class="btn btn-primary btn-sm" onclick="window.addTerrestrialPatron()" data-i18n="feature.patrons.addTerrestrial">➕ Add Terrestrial</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
             </div>
         </div>
     `;
@@ -870,7 +871,7 @@ function renderReligions() {
             <div class="patrons-empty">
                 <div style="font-size:3rem;">⛪</div>
                 <div>No religions loaded.</div>
-                <button class="btn btn-primary" onclick="window.addReligion()">➕ Add Religion</button>
+                <button class="btn btn-primary" onclick="window.addReligion()" data-i18n="feature.patrons.addReligion">➕ Add Religion</button>
             </div>
         `;
     }
@@ -882,7 +883,7 @@ function renderReligions() {
                 const orders = r.orders ? r.orders.length : 0;
                 const icon = r.icon || '⛪';
                 return `
-                    <div class="religion-card" onclick="window.viewReligion('${r.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.5rem;cursor:pointer;border-left:3px solid var(--gold);">
+                    <div class="religion-card" onclick="window.viewReligion('${r.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.5rem;cursor:pointer;border-inline-start:3px solid var(--gold);">
                         <div style="font-size:1.5rem;">${safeString(icon)}</div>
                         <div style="font-weight:600;">${escHtml(name)}</div>
                         <div style="font-size:0.7rem;color:var(--text3);">${orders} Orders</div>
@@ -891,8 +892,8 @@ function renderReligions() {
             }).join('')}
         </div>
         <div class="patrons-actions" style="margin-top:0.5rem;">
-            <button class="btn btn-primary" onclick="window.addReligion()">➕ Add Religion</button>
-            <button class="btn btn-secondary" onclick="window.refreshPatrons()">🔄 Refresh</button>
+            <button class="btn btn-primary" onclick="window.addReligion()" data-i18n="feature.patrons.addReligion">➕ Add Religion</button>
+            <button class="btn btn-secondary" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
         </div>
     `;
 }
@@ -904,7 +905,7 @@ function renderReligions() {
 function renderPatronDetail(patronId) {
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (!patron) {
-        showToast('Patron not found', 'error');
+        showToast(i18nText("feature.patrons.patronNotFound", null, "Patron not found"), 'error');
         return;
     }
  
@@ -922,7 +923,7 @@ function renderPatronDetail(patronId) {
             <span style="font-size:1.5rem;">${safeString(icon)}</span>
             <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
             <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
-            <span style="color:var(--text3);font-size:0.75rem;margin-left:auto;">Obligation: ${getPatronObligation('default-character', patron.id)}</span>
+            <span style="color:var(--text3);font-size:0.75rem;margin-inline-start:auto;">Obligation: ${getPatronObligation('default-character', patron.id)}</span>
             <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation('default-character', '${patron.id}', 1)">➕</button>
             <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation('default-character', '${patron.id}', 1)">➖</button>
             <button class="btn btn-xs btn-ghost" onclick="window.openPatronDetailModal('${patron.id}')">📖 Full Details</button>
@@ -1000,7 +1001,7 @@ window.collapseAllRites = function() {
 window.openPatronDetailModal = function(patronId) {
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (!patron) {
-        showToast('Patron not found', 'error');
+        showToast(i18nText("feature.patrons.patronNotFound", null, "Patron not found"), 'error');
         return;
     }
  
@@ -1022,7 +1023,7 @@ window.openPatronDetailModal = function(patronId) {
  
     modal.innerHTML = `
         <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
-            <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+            <button class="modal-close" onclick="window.closePatronModal()" style="float: inline-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
  
             <!-- Header -->
             <div class="patron-detail-header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
@@ -1052,7 +1053,7 @@ window.openPatronDetailModal = function(patronId) {
             <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
                 <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')">✏️ Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="window.deletePatron('${patron.id}')">🗑️ Delete</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()">Close</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" data-i18n="feature.patrons.close">Close</button>
             </div>
         </div>
     `;
@@ -1080,7 +1081,7 @@ function fillCrossResonance(patron) {
         if (rivals.length === 0) return;
 
         const rows = rivals.map(r => `
-            <div style="margin:0.3rem 0;padding:0.4rem 0.6rem;background:var(--bg3);border-radius:var(--radius);border-left:2px solid var(--orange);">
+            <div style="margin:0.3rem 0;padding:0.4rem 0.6rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:2px solid var(--orange);">
                 <div><strong>${escHtml(r.rival)}</strong>${r.domains && r.domains.length
                     ? ` <span style="color:var(--text3);font-size:0.8rem;">(${escHtml(r.domains.join(', '))})</span>` : ''}</div>
                 <div style="font-size:0.82rem;color:var(--text2);margin-top:0.15rem;"><em>Edge loci:</em> ${escHtml(r.loci)}</div>
@@ -1091,12 +1092,12 @@ function fillCrossResonance(patron) {
             `<li><strong>${escHtml(r.name)}.</strong> ${escHtml(r.text)}</li>`).join('');
 
         slot.innerHTML = `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--orange);">
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--orange);">
                 <h3 style="margin:0 0 0.3rem 0;color:var(--orange);">⚔️ Cross-Resonance <span style="font-weight:400;color:var(--text3);font-size:0.8rem;">${rivals.length} rival${rivals.length === 1 ? '' : 's'}</span></h3>
                 <p style="margin:0 0 0.4rem 0;font-size:0.85rem;color:var(--text2);">Carrying Symbols from rival Patrons generates friction. <em>Edge loci</em> are where one side starts a step better in Position; the prompts are for spending Story Beats, not penalties to apply.</p>
                 ${rows}
                 <details style="margin-top:0.5rem;">
-                    <summary style="cursor:pointer;color:var(--text2);font-size:0.85rem;">Quick rulings</summary>
+                    <summary style="cursor:pointer;color:var(--text2);font-size:0.85rem;" data-i18n="feature.patrons.quickRulings">Quick rulings</summary>
                     <ul style="margin:0.3rem 0 0 1.1rem;font-size:0.82rem;color:var(--text2);">${rulings}</ul>
                 </details>
             </div>`;
@@ -1114,11 +1115,11 @@ function buildPatronSections(patron) {
     if (patron.lore) {
         const lore = patron.lore;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📚 Lore</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.patrons.lore">📚 Lore</h3>
                 ${lore.description ? `<p style="margin:0.3rem 0;white-space:pre-wrap;">${formatText(lore.description)}</p>` : ''}
                 ${lore.followers ? `<p style="margin:0.3rem 0;white-space:pre-wrap;"><strong>Followers:</strong> ${formatText(lore.followers)}</p>` : ''}
-                ${lore.quote ? `<blockquote style="margin:0.3rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-left:4px solid var(--gold);"><em>${formatText(lore.quote)}</em></blockquote>` : ''}
+                ${lore.quote ? `<blockquote style="margin:0.3rem 0;padding:0.5rem 1rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:4px solid var(--gold);"><em>${formatText(lore.quote)}</em></blockquote>` : ''}
                 ${lore.names_across_regions ? `
                     <div style="margin:0.3rem 0;"><strong>Names Across Regions:</strong></div>
                     ${Object.entries(lore.names_across_regions).map(([region, name]) =>
@@ -1127,13 +1128,13 @@ function buildPatronSections(patron) {
                 ` : ''}
                 ${lore.signs && lore.signs.length > 0 ? `
                     <div style="margin:0.3rem 0;"><strong>Signs:</strong></div>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         ${lore.signs.map(s => `<li>${formatText(s)}</li>`).join('')}
                     </ul>
                 ` : ''}
                 ${lore.quotes && lore.quotes.length > 0 ? `
                     <div style="margin:0.3rem 0;"><strong>Quotes:</strong></div>
-                    ${lore.quotes.map(q => `<blockquote style="margin:0.3rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);font-size:0.85rem;">${formatText(q)}</blockquote>`).join('')}
+                    ${lore.quotes.map(q => `<blockquote style="margin:0.3rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:3px solid var(--gold);font-size:0.85rem;">${formatText(q)}</blockquote>`).join('')}
                 ` : ''}
             </div>
         `;
@@ -1142,9 +1143,9 @@ function buildPatronSections(patron) {
     // ─── Domain Focus ──────────────────────────────────────────
     if (patron.domain_focus && patron.domain_focus.length > 0) {
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎯 Domain Focus</h3>
-                <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.patrons.domainFocus">🎯 Domain Focus</h3>
+                <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                     ${patron.domain_focus.map(d => `<li>${escHtml(safeString(d))}</li>`).join('')}
                 </ul>
             </div>
@@ -1155,8 +1156,8 @@ function buildPatronSections(patron) {
     if (patron.patrons_gift) {
         const gift = patron.patrons_gift;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎁 Patron's Gift</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.patrons.patronSGift">🎁 Patron's Gift</h3>
                 ${gift.name ? `<p style="margin:0.2rem 0;"><strong>${escHtml(gift.name)}</strong></p>` : ''}
                 ${gift.description ? `<p style="margin:0.2rem 0;">${formatText(gift.description)}</p>` : ''}
                 ${gift.effect ? `<p style="margin:0.2rem 0;"><strong>Effect:</strong> ${formatText(gift.effect)}</p>` : ''}
@@ -1170,12 +1171,12 @@ function buildPatronSections(patron) {
         const hasDetailedRites = typeof patron.rites[0] === 'object' && patron.rites[0].effect !== undefined;
         if (hasDetailedRites) {
             html += `
-                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 0.5rem 0;flex-wrap:wrap;gap:0.3rem;">
                         <h3 style="margin:0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
                         <div style="display:flex;gap:0.3rem;">
-                            <button class="btn btn-xs btn-secondary" onclick="window.expandAllRites()">📖 Expand All</button>
-                            <button class="btn btn-xs btn-secondary" onclick="window.collapseAllRites()">📕 Collapse All</button>
+                            <button class="btn btn-xs btn-secondary" onclick="window.expandAllRites()" data-i18n="feature.patrons.expandAll">📖 Expand All</button>
+                            <button class="btn btn-xs btn-secondary" onclick="window.collapseAllRites()" data-i18n="feature.patrons.collapseAll">📕 Collapse All</button>
                         </div>
                     </div>
                     <div class="rites-list" style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1216,7 +1217,7 @@ function buildPatronSections(patron) {
                                 `;
                             }
                             return `
-                                <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.8rem;border-left:3px solid ${tierColor};">
+                                <div class="rite-item ${hasDetails ? 'rite-expandable' : ''}" data-rite-id="${escHtml(riteId)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.4rem 0.8rem;border-inline-start:3px solid ${tierColor};">
                                     <div class="rite-header" ${hasDetails ? `onclick="window.toggleRite(this)"` : ''} style="display:flex;justify-content:space-between;align-items:center;cursor:${hasDetails ? 'pointer' : 'default'};">
                                         <span class="rite-name" style="font-weight:600;">${escHtml(riteName)}</span>
                                         <span style="display:flex;align-items:center;gap:0.5rem;">
@@ -1234,9 +1235,9 @@ function buildPatronSections(patron) {
             `;
         } else {
             html += `
-                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
                     <h3 style="margin:0 0 0.5rem 0;color:var(--gold);">🔮 Rites (${patron.rites.length})</h3>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         ${patron.rites.map(r => `<li>${escHtml(safeString(r))}</li>`).join('')}
                     </ul>
                 </div>
@@ -1248,8 +1249,8 @@ function buildPatronSections(patron) {
     if (patron.runekeeper_options) {
         const rko = patron.runekeeper_options;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">📜 Runekeeper Options</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.patrons.runekeeperOptions">📜 Runekeeper Options</h3>
                 ${rko.thiasos ? `
                     <div style="margin-bottom:0.5rem;">
                         <strong>🐾 Thiasos (Familiar):</strong>
@@ -1271,10 +1272,10 @@ function buildPatronSections(patron) {
     // ─── Corruption ────────────────────────────────────────────
     if (patron.corruption && patron.corruption.length > 0) {
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--red);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--red);">⚠️ Corruption</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--red);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--red);" data-i18n="feature.patrons.corruption">⚠️ Corruption</h3>
                 <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
-                    <thead><tr style="border-bottom:2px solid var(--border);"><th style="text-align:left;padding:0.2rem 0.4rem;">Tier</th><th style="text-align:left;padding:0.2rem 0.4rem;">Benefit</th><th style="text-align:left;padding:0.2rem 0.4rem;">Cost / Quirk</th></tr></thead>
+                    <thead><tr style="border-bottom:2px solid var(--border);"><th style="text-align: start;padding:0.2rem 0.4rem;" data-i18n="feature.patrons.tier">Tier</th><th style="text-align: start;padding:0.2rem 0.4rem;" data-i18n="feature.patrons.benefit">Benefit</th><th style="text-align: start;padding:0.2rem 0.4rem;" data-i18n="feature.patrons.costQuirk">Cost / Quirk</th></tr></thead>
                     <tbody>${patron.corruption.map(c => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:0.2rem 0.4rem;font-weight:600;">${escHtml(safeString(c.tier))}</td><td style="padding:0.2rem 0.4rem;color:var(--gold);">${escHtml(safeString(c.benefit))}</td><td style="padding:0.2rem 0.4rem;color:var(--red);">${escHtml(safeString(c.cost))}</td></tr>`).join('')}</tbody>
                 </table>
             </div>
@@ -1286,12 +1287,12 @@ function buildPatronSections(patron) {
         const wc = patron.witchcraft;
         const wcColor = wc.color || '#27ae60';
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid ${wcColor};">
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid ${wcColor};">
                 <h3 style="margin:0 0 0.3rem 0;color:${wcColor};">🧹 ${wc.name || 'Witchcraft'}</h3>
                 ${wc.description ? `<p style="margin:0.2rem 0;">${formatText(wc.description)}</p>` : ''}
                 ${wc.lore ? `<p style="margin:0.2rem 0;font-size:0.85rem;color:var(--text2);">${formatText(wc.lore)}</p>` : ''}
                 ${wc.signature_rite ? `<p style="margin:0.2rem 0;"><strong>Signature Rite:</strong> ${escHtml(wc.signature_rite)}</p>` : ''}
-                ${wc.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid ${wcColor};font-size:0.85rem;">${formatText(wc.quote)}</blockquote>` : ''}
+                ${wc.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:3px solid ${wcColor};font-size:0.85rem;">${formatText(wc.quote)}</blockquote>` : ''}
                 ${wc.tools ? `
                     <div style="margin:0.3rem 0;"><strong>🛠️ Tools:</strong></div>
                     ${Object.entries(wc.tools).map(([key, tool]) => `
@@ -1303,7 +1304,7 @@ function buildPatronSections(patron) {
                 ` : ''}
                 ${wc.hedge_gifts && wc.hedge_gifts.length > 0 ? `
                     <div style="margin:0.3rem 0;"><strong>🌿 Hedge Gifts:</strong></div>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         ${wc.hedge_gifts.map(g => `<li><strong>${escHtml(safeString(g.name))}</strong> (${escHtml(safeString(g.xp))} XP): ${formatText(safeString(g.description))}</li>`).join('')}
                     </ul>
                 ` : ''}
@@ -1316,10 +1317,10 @@ function buildPatronSections(patron) {
         const mt = patron.monastic_tradition;
         const mtColor = mt.color || '#f39c12';
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid ${mtColor};">
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid ${mtColor};">
                 <h3 style="margin:0 0 0.3rem 0;color:${mtColor};">⛩️ ${mt.name || 'Monastic Tradition'}</h3>
                 ${mt.description ? `<p style="margin:0.2rem 0;">${formatText(mt.description)}</p>` : ''}
-                ${mt.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid ${mtColor};font-size:0.85rem;">${formatText(mt.quote)}</blockquote>` : ''}
+                ${mt.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:3px solid ${mtColor};font-size:0.85rem;">${formatText(mt.quote)}</blockquote>` : ''}
                 ${mt.prerequisites ? `<p style="margin:0.2rem 0;"><strong>Prerequisites:</strong> ${escHtml(mt.prerequisites)}</p>` : ''}
                 ${mt.debt_resistant_frame ? `<p style="margin:0.2rem 0;color:var(--text2);">${formatText(mt.debt_resistant_frame)}</p>` : ''}
                 ${mt.techniques ? `
@@ -1328,7 +1329,7 @@ function buildPatronSections(patron) {
                         const tech = mt.techniques[level];
                         const levelLabel = level.charAt(0).toUpperCase() + level.slice(1);
                         return `
-                            <div style="margin:0.1rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);border-left:2px solid ${mtColor};">
+                            <div style="margin:0.1rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:2px solid ${mtColor};">
                                 <strong>${levelLabel}: ${escHtml(tech.name)}</strong>
                                 ${tech.xp ? `<span style="font-size:0.7rem;color:var(--text3);">(${tech.xp} XP)</span>` : ''}
                                 <p style="margin:0.1rem 0;font-size:0.85rem;color:var(--text2);">${formatText(tech.description)}</p>
@@ -1339,7 +1340,7 @@ function buildPatronSections(patron) {
                     }).join('')}
                 ` : ''}
                 ${mt.master_technique ? `
-                    <div style="margin:0.3rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);">
+                    <div style="margin:0.3rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:3px solid var(--gold);">
                         <strong>🏆 Master Technique: ${escHtml(mt.master_technique.name)}</strong>
                         ${mt.master_technique.xp ? `<span style="font-size:0.7rem;color:var(--text3);">(${mt.master_technique.xp} XP)</span>` : ''}
                         <p style="margin:0.1rem 0;font-size:0.85rem;color:var(--text2);">${formatText(mt.master_technique.description)}</p>
@@ -1349,7 +1350,7 @@ function buildPatronSections(patron) {
                 ${mt.corruption && mt.corruption.length > 0 ? `
                     <div style="margin:0.3rem 0;"><strong>⚠️ Tradition Corruption:</strong></div>
                     <table style="width:100%;border-collapse:collapse;font-size:0.75rem;">
-                        <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:0.1rem 0.3rem;">Tier</th><th style="text-align:left;padding:0.1rem 0.3rem;">Benefit</th><th style="text-align:left;padding:0.1rem 0.3rem;">Cost</th></tr></thead>
+                        <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align: start;padding:0.1rem 0.3rem;" data-i18n="feature.patrons.tier">Tier</th><th style="text-align: start;padding:0.1rem 0.3rem;" data-i18n="feature.patrons.benefit">Benefit</th><th style="text-align: start;padding:0.1rem 0.3rem;" data-i18n="feature.patrons.cost">Cost</th></tr></thead>
                         <tbody>${mt.corruption.map(c => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:0.1rem 0.3rem;">${escHtml(safeString(c.tier))}</td><td style="padding:0.1rem 0.3rem;color:var(--gold);">${escHtml(safeString(c.benefit))}</td><td style="padding:0.1rem 0.3rem;color:var(--red);">${escHtml(safeString(c.cost))}</td></tr>`).join('')}</tbody>
                     </table>
                 ` : ''}
@@ -1361,8 +1362,8 @@ function buildPatronSections(patron) {
     if (patron.cantors_and_cults) {
         const cc = patron.cantors_and_cults;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎶 Cantors & Cults</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.patrons.cantorsCults">🎶 Cantors & Cults</h3>
                 ${cc.cantors ? `
                     <div style="margin:0.2rem 0;">
                         <strong>🎵 ${cc.cantors.name || 'Cantors'}:</strong>
@@ -1389,8 +1390,8 @@ function buildPatronSections(patron) {
     if ((patron.also_known_as && patron.also_known_as.length) || patron.names_note || guises.length) {
         const aka = (patron.also_known_as || []).filter(a => a && a !== patron.title);
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--purple);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--purple);">🜂 Names</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--purple);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--purple);" data-i18n="feature.patrons.names">🜂 Names</h3>
                 ${guises.length ? `
                     <ul style="margin:0.2rem 0 0.3rem 1.1rem;font-size:0.88rem;color:var(--text2);">
                         ${guises.map(g => `<li><strong>${escHtml(g.name || '')}</strong> — ${escHtml(g.among || '')}${g.note ? `. ${escHtml(g.note)}` : ''}</li>`).join('')}
@@ -1407,8 +1408,8 @@ function buildPatronSections(patron) {
         const paras = ['origin', 'summary', 'the_migration', 'why_it_took', 'note']
             .map(k => pv[k]).filter(Boolean);
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🧭 Provenance</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.provenance">🧭 Provenance</h3>
                 ${paras.map(t => formatText(t)).join('')}
             </div>
         `;
@@ -1423,7 +1424,7 @@ function buildPatronSections(patron) {
         const paras = ['summary', 'the_point', 'the_third_thing', 'at_the_table']
             .map(k => ph[k]).filter(Boolean);
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--red);">
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--red);">
                 <h3 style="margin:0 0 0.3rem 0;color:var(--red);">⚖️ ${escHtml(ph.name || 'Philosophy')}</h3>
                 ${paras.map(t => formatText(t)).join('')}
             </div>
@@ -1440,8 +1441,8 @@ function buildPatronSections(patron) {
     // ─── Rivalries (patron-authored, where present) ───────────
     if (patron.rivalries && patron.rivalries.length > 0) {
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--orange);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--orange);">⚔️ Rivalries</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--orange);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--orange);" data-i18n="feature.patrons.rivalries">⚔️ Rivalries</h3>
                 ${patron.rivalries.map(r => `
                     <div style="margin:0.1rem 0;padding:0.2rem 0.5rem;background:var(--bg3);border-radius:var(--radius);">
                         <strong>${escHtml(safeString(r.patron))}</strong>
@@ -1456,12 +1457,12 @@ function buildPatronSections(patron) {
     if (patron.playstyle_notes) {
         const pn = patron.playstyle_notes;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎮 Playstyle Notes</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.patrons.playstyleNotes">🎮 Playstyle Notes</h3>
                 ${pn.description ? `<p style="margin:0.2rem 0;">${formatText(pn.description)}</p>` : ''}
                 ${pn.emphasizes && pn.emphasizes.length > 0 ? `
                     <div style="margin:0.2rem 0;"><strong>Emphasizes:</strong></div>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         ${pn.emphasizes.map(e => `<li>${formatText(e)}</li>`).join('')}
                     </ul>
                 ` : ''}
@@ -1473,11 +1474,11 @@ function buildPatronSections(patron) {
     if (patron.sample_adventure) {
         const sa = patron.sample_adventure;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--gold);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);">🎲 Sample Adventure</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.patrons.sampleAdventure">🎲 Sample Adventure</h3>
                 ${sa.title ? `<p style="margin:0.2rem 0;"><strong>${escHtml(sa.title)}</strong></p>` : ''}
                 ${sa.description ? `<p style="margin:0.2rem 0;">${formatText(sa.description)}</p>` : ''}
-                ${sa.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-left:3px solid var(--gold);font-size:0.85rem;">${formatText(sa.quote)}</blockquote>` : ''}
+                ${sa.quote ? `<blockquote style="margin:0.2rem 0;padding:0.3rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:3px solid var(--gold);font-size:0.85rem;">${formatText(sa.quote)}</blockquote>` : ''}
             </div>
         `;
     }
@@ -1486,13 +1487,13 @@ function buildPatronSections(patron) {
     if (patron.optional_campaign_arc) {
         const oca = patron.optional_campaign_arc;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--purple);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--purple);">🌅 Optional Campaign Arc</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--purple);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--purple);" data-i18n="feature.patrons.optionalCampaignArc">🌅 Optional Campaign Arc</h3>
                 ${oca.title ? `<p style="margin:0.2rem 0;"><strong>${escHtml(oca.title)}</strong></p>` : ''}
                 ${oca.description ? `<p style="margin:0.2rem 0;">${formatText(oca.description)}</p>` : ''}
                 ${oca.signs && oca.signs.length > 0 ? `
                     <div style="margin:0.2rem 0;"><strong>Signs:</strong></div>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         ${oca.signs.map(s => `<li>${formatText(s)}</li>`).join('')}
                     </ul>
                 ` : ''}
@@ -1505,19 +1506,19 @@ function buildPatronSections(patron) {
     if (patron.temporary_anima_system) {
         const tas = patron.temporary_anima_system;
         html += `
-            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⚡ Temporary Anima System</h3>
+            <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.temporaryAnimaSystem">⚡ Temporary Anima System</h3>
                 ${tas.title ? `<p style="margin:0.2rem 0;"><strong>${escHtml(tas.title)}</strong></p>` : ''}
                 ${tas.description ? `<p style="margin:0.2rem 0;">${formatText(tas.description)}</p>` : ''}
                 ${tas.core_principles && tas.core_principles.length > 0 ? `
                     <div style="margin:0.2rem 0;"><strong>Core Principles:</strong></div>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         ${tas.core_principles.map(p => `<li>${formatText(p)}</li>`).join('')}
                     </ul>
                 ` : ''}
                 ${tas.effects && tas.effects.length > 0 ? `
                     <div style="margin:0.2rem 0;"><strong>Effects:</strong></div>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         ${tas.effects.map(e => `<li><strong>${escHtml(e.name)}</strong>: ${formatText(e.effect)}</li>`).join('')}
                     </ul>
                 ` : ''}
@@ -1535,7 +1536,7 @@ function buildPatronSections(patron) {
 window.viewTerrestrial = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) {
-        showToast('Terrestrial patron not found', 'error');
+        showToast(i18nText("feature.patrons.terrestrialPatronNotFound", null, "Terrestrial patron not found"), 'error');
         return;
     }
  
@@ -1550,7 +1551,7 @@ window.viewTerrestrial = function(id) {
                 <span style="font-size:1.5rem;">${safeString(icon)}</span>
                 <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
                 <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
-                <button class="btn btn-xs btn-ghost" onclick="window.openTerrestrialDetailModal('${patron.id}')" style="margin-left:auto;">📖 Full Details</button>
+                <button class="btn btn-xs btn-ghost" onclick="window.openTerrestrialDetailModal('${patron.id}')" style="margin-inline-start:auto;">📖 Full Details</button>
             </div>
             <div style="margin:0.3rem 0 0 0;color:var(--text2);font-size:0.9rem;line-height:1.5;overflow-y:auto;">
                 ${formatText(desc)}
@@ -1562,7 +1563,7 @@ window.viewTerrestrial = function(id) {
 window.openTerrestrialDetailModal = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) {
-        showToast('Terrestrial patron not found', 'error');
+        showToast(i18nText("feature.patrons.terrestrialPatronNotFound", null, "Terrestrial patron not found"), 'error');
         return;
     }
  
@@ -1577,7 +1578,7 @@ window.openTerrestrialDetailModal = function(id) {
  
     modal.innerHTML = `
         <div class="modal-content patron-detail" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
-            <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+            <button class="modal-close" onclick="window.closePatronModal()" style="float: inline-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
             <div class="patron-detail-header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
                 <div style="font-size:3rem;">${escHtml(icon)}</div>
                 <div>
@@ -1589,46 +1590,46 @@ window.openTerrestrialDetailModal = function(id) {
  
             <div class="patron-detail-body" style="display:flex;flex-direction:column;gap:0.8rem;">
                 ${desc ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📖 Description</h3>
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.description">📖 Description</h3>
                         <p style="margin:0;white-space:pre-wrap;">${formatText(desc)}</p>
                     </div>
                 ` : ''}
                 ${patron.location ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📍 Location</h3>
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.location">📍 Location</h3>
                         <p style="margin:0;">${escHtml(patron.location)}</p>
                     </div>
                 ` : ''}
                 ${patron.leverage ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">💰 Leverage</h3>
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.leverage">💰 Leverage</h3>
                         <p style="margin:0;">${escHtml(patron.leverage)}</p>
                     </div>
                 ` : ''}
                 ${patron.debtTrigger ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⚡ Debt Trigger</h3>
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.debtTrigger">⚡ Debt Trigger</h3>
                         <p style="margin:0;">${escHtml(patron.debtTrigger)}</p>
                     </div>
                 ` : ''}
                 ${patron.quirk ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🌀 Quirk</h3>
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.quirk">🌀 Quirk</h3>
                         <p style="margin:0;">${escHtml(patron.quirk)}</p>
                     </div>
                 ` : ''}
-                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                    <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">📊 Stats</h3>
-                    <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                    <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.stats">📊 Stats</h3>
+                    <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                         <li>Asset Slots: ${escHtml(patron.assetSlots || 0)}</li>
                         <li>Max Asset Tier: ${escHtml(patron.maxAssetTier || 'Minor')}</li>
                         <li>Obligation Capacity: ${escHtml(patron.obligationCapacity || 'Spirit+Presence')}</li>
                     </ul>
                 </div>
                 ${patron.agendaTimer ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">⏱️ Agenda Timer</h3>
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.agendaTimer">⏱️ Agenda Timer</h3>
                         <div style="margin:0.3rem 0;">${safeString(patron.agendaTimer.current || 0)}/${safeString(patron.agendaTimer.segments || 6)}</div>
                         <div class="timer-bar" style="width:100%;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;">
                             <div class="timer-bar-fill" style="height:100%;width:${((patron.agendaTimer?.current||0)/(patron.agendaTimer?.segments||6))*100}%;background:var(--gold);"></div>
@@ -1636,17 +1637,17 @@ window.openTerrestrialDetailModal = function(id) {
                     </div>
                 ` : ''}
                 ${patron.keyNPCs && patron.keyNPCs.length > 0 ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">👤 Key NPCs</h3>
-                        <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.keyNPCs">👤 Key NPCs</h3>
+                        <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                             ${patron.keyNPCs.map(n => `<li>${escHtml(safeString(n))}</li>`).join('')}
                         </ul>
                     </div>
                 ` : ''}
                 ${patron.hooks && patron.hooks.length > 0 ? `
-                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-left:4px solid var(--blue);">
-                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);">🔗 Hooks</h3>
-                        <ul style="margin:0;padding-left:1.2rem;list-style-type:disc;">
+                    <div class="patron-detail-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);">
+                        <h3 style="margin:0 0 0.3rem 0;color:var(--blue);" data-i18n="feature.patrons.hooks">🔗 Hooks</h3>
+                        <ul style="margin:0;padding-inline-start:1.2rem;list-style-type:disc;">
                             ${patron.hooks.map(h => `<li>${escHtml(safeString(h))}</li>`).join('')}
                         </ul>
                     </div>
@@ -1656,7 +1657,7 @@ window.openTerrestrialDetailModal = function(id) {
             <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
                 <button class="btn btn-sm" onclick="window.editTerrestrial('${patron.id}')">✏️ Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="window.deleteTerrestrial('${patron.id}')">🗑️ Delete</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()">Close</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" data-i18n="feature.patrons.close">Close</button>
             </div>
         </div>
     `;
@@ -1673,14 +1674,14 @@ window.openTerrestrialDetailModal = function(id) {
 window.viewReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
     if (!religion) {
-        showToast('Religion not found', 'error');
+        showToast(i18nText("feature.patrons.religionNotFound", null, "Religion not found"), 'error');
         return;
     }
     const modal = document.getElementById('patron-modal');
     modal.style.display = 'block';
     modal.innerHTML = `
         <div class="modal-content" style="width:90%;max-width:600px;max-height:90vh;overflow-y:auto;background:var(--bg1);padding:1.5rem;border-radius:var(--radius);">
-            <button class="modal-close" onclick="window.closePatronModal()" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
+            <button class="modal-close" onclick="window.closePatronModal()" style="float: inline-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
             <h2 style="color:var(--gold);">${escHtml(religion.name)}</h2>
             <div style="font-size:1.5rem;">${safeString(religion.icon || '⛪')}</div>
             ${religion.description ? `<p>${formatText(religion.description)}</p>` : ''}
@@ -1688,7 +1689,7 @@ window.viewReligion = function(id) {
             ${religion.doctrines ? `<div><strong>Doctrines:</strong><ul>${religion.doctrines.map(d => `<li>${escHtml(d)}</li>`).join('')}</ul></div>` : ''}
             ${religion.practices ? `<div><strong>Practices:</strong><ul>${religion.practices.map(p => `<li>${escHtml(p)}</li>`).join('')}</ul></div>` : ''}
             ${religion.orders ? `<div><strong>Orders:</strong><ul>${religion.orders.map(o => `<li>${escHtml(o.name)} (${escHtml(o.role)})</li>`).join('')}</ul></div>` : ''}
-            <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="margin-top:0.5rem;">Close</button>
+            <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="margin-top:0.5rem;" data-i18n="feature.patrons.close">Close</button>
         </div>
     `;
     modal.onclick = (e) => {
@@ -1724,14 +1725,14 @@ window.addPatronObligation = function(characterId, patronId, amount = 1) {
     addPatronObligation(characterId, patronId, amount);
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (patron) renderPatronDetail(patronId);
-    showToast(`Added ${amount} Obligation to ${patronId}`, 'success');
+    showToast(i18nText("feature.patrons.addedValueObligationToValue", { value0: amount, value1: patronId }, "Added {{value0}} Obligation to {{value1}}"), 'success');
 };
  
 window.clearPatronObligation = function(characterId, patronId, amount = 1) {
     clearPatronObligation(characterId, patronId, amount);
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (patron) renderPatronDetail(patronId);
-    showToast(`Cleared ${amount} Obligation from ${patronId}`, 'info');
+    showToast(i18nText("feature.patrons.clearedValueObligationFromValue", { value0: amount, value1: patronId }, "Cleared {{value0}} Obligation from {{value1}}"), 'info');
 };
  
 // ============================================================
@@ -1739,174 +1740,174 @@ window.clearPatronObligation = function(characterId, patronId, amount = 1) {
 // ============================================================
  
 window.addCosmicPatron = function() {
-    const name = prompt('Enter patron name:');
+    const name = prompt(i18nText("feature.patrons.enterPatronName", null, "Enter patron name:"));
     if (!name) return;
-    const domain = prompt('Enter patron domain:') || 'Unknown';
-    const icon = prompt('Enter patron icon (emoji):') || '🌟';
+    const domain = prompt(i18nText("feature.patrons.enterPatronDomain", null, "Enter patron domain:")) || 'Unknown';
+    const icon = prompt(i18nText("feature.patrons.enterPatronIconEmoji", null, "Enter patron icon (emoji):")) || '🌟';
  
     state.cosmicPatrons.push(normalizePatron({
         id: 'patron-' + Date.now(),
         name,
         domain,
         icon,
-        description: prompt('Enter description:') || 'A cosmic patron of the Amaranthine.',
-        rites: prompt('Enter rites (comma-separated):')?.split(',').map(s => s.trim()) || [],
-        rivals: prompt('Enter rivals (comma-separated):')?.split(',').map(s => s.trim()) || [],
-        sigil: prompt('Enter sigil description:') || 'Unknown',
-        corruption: prompt('Enter corruption effect:') || 'None',
+        description: prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:")) || 'A cosmic patron of the Amaranthine.',
+        rites: prompt(i18nText("feature.patrons.enterRitesCommaSeparated", null, "Enter rites (comma-separated):"))?.split(',').map(s => s.trim()) || [],
+        rivals: prompt(i18nText("feature.patrons.enterRivalsCommaSeparated", null, "Enter rivals (comma-separated):"))?.split(',').map(s => s.trim()) || [],
+        sigil: prompt(i18nText("feature.patrons.enterSigilDescription", null, "Enter sigil description:")) || 'Unknown',
+        corruption: prompt(i18nText("feature.patrons.enterCorruptionEffect", null, "Enter corruption effect:")) || 'None',
         source: 'local'
     }));
     state.cosmicPatrons.sort(sortByName);
     savePatronData();
     refreshView();
-    showToast(`Added patron: ${name}`, 'success');
+    showToast(i18nText("feature.patrons.addedPatronValue", { value0: name }, "Added patron: {{value0}}"), 'success');
 };
  
 window.editPatron = function(id) {
     const patron = state.cosmicPatrons.find(p => p.id === id);
     if (!patron) return;
-    const name = prompt('Enter patron name:', patron.name || patron.title);
+    const name = prompt(i18nText("feature.patrons.enterPatronName", null, "Enter patron name:"), patron.name || patron.title);
     if (!name) return;
     patron.name = name;
     patron.title = name;
-    patron.domain = prompt('Enter patron domain:', patron.domain || patron.subtitle) || patron.domain;
-    patron.icon = prompt('Enter patron icon:', patron.icon) || patron.icon;
-    patron.description = prompt('Enter description:', patron.description) || patron.description;
-    patron.sigil = prompt('Enter sigil:', patron.sigil) || patron.sigil;
-    patron.corruption = prompt('Enter corruption:', patron.corruption) || patron.corruption;
+    patron.domain = prompt(i18nText("feature.patrons.enterPatronDomain", null, "Enter patron domain:"), patron.domain || patron.subtitle) || patron.domain;
+    patron.icon = prompt(i18nText("feature.patrons.enterPatronIcon", null, "Enter patron icon:"), patron.icon) || patron.icon;
+    patron.description = prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:"), patron.description) || patron.description;
+    patron.sigil = prompt(i18nText("feature.patrons.enterSigil", null, "Enter sigil:"), patron.sigil) || patron.sigil;
+    patron.corruption = prompt(i18nText("feature.patrons.enterCorruption", null, "Enter corruption:"), patron.corruption) || patron.corruption;
     patron.source = 'local';
     state.cosmicPatrons.sort(sortByName);
     savePatronData();
     refreshView();
     window.closePatronModal();
-    showToast(`Updated patron: ${name}`, 'success');
+    showToast(i18nText("feature.patrons.updatedPatronValue", { value0: name }, "Updated patron: {{value0}}"), 'success');
 };
  
 window.deletePatron = function(id) {
     const patron = state.cosmicPatrons.find(p => p.id === id);
     if (!patron) return;
-    if (!confirm(`Delete patron "${patron.name || patron.title}"?`)) return;
+    if (!confirm(i18nText("feature.patrons.deletePatronValue", { value0: patron.name || patron.title }, "Delete patron \"{{value0}}\"?"))) return;
     state.cosmicPatrons = state.cosmicPatrons.filter(p => p.id !== id);
     state.cosmicPatrons.sort(sortByName);
     savePatronData();
     refreshView();
     window.closePatronModal();
-    showToast(`Deleted patron: ${patron.name || patron.title}`, 'info');
+    showToast(i18nText("feature.patrons.deletedPatronValue", { value0: patron.name || patron.title }, "Deleted patron: {{value0}}"), 'info');
 };
  
 window.addTerrestrialPatron = function() {
-    const name = prompt('Enter terrestrial patron name:');
+    const name = prompt(i18nText("feature.patrons.enterTerrestrialPatronName", null, "Enter terrestrial patron name:"));
     if (!name) return;
  
     state.terrestrialPatrons.push(normalizePatron({
         id: 'terr-' + Date.now(),
         name,
-        type: prompt('Enter type (creditor/fence/sanctuary/military/tribal):') || 'patron',
-        tier: prompt('Enter tier (I-V):') || 'I',
-        description: prompt('Enter description:') || 'A terrestrial patron of the Amaranthine.',
-        location: prompt('Enter location:') || 'Unknown',
-        leverage: prompt('Enter leverage:') || 'None listed',
-        debtTrigger: prompt('Enter debt trigger:') || 'When Obligation fills, they call in a debt.',
-        quirk: prompt('Enter quirk:') || '',
-        assetSlots: parseInt(prompt('Enter asset slots:') || '2'),
-        maxAssetTier: prompt('Enter max asset tier (Minor/Standard/Major):') || 'Minor',
-        obligationCapacity: prompt('Enter obligation capacity (Spirit+Presence or fixed):') || 'Spirit+Presence',
+        type: prompt(i18nText("feature.patrons.enterTypeCreditorFenceSanctuaryMilitaryTribal", null, "Enter type (creditor/fence/sanctuary/military/tribal):")) || 'patron',
+        tier: prompt(i18nText("feature.patrons.enterTierIV", null, "Enter tier (I-V):")) || 'I',
+        description: prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:")) || 'A terrestrial patron of the Amaranthine.',
+        location: prompt(i18nText("feature.patrons.enterLocation", null, "Enter location:")) || 'Unknown',
+        leverage: prompt(i18nText("feature.patrons.enterLeverage", null, "Enter leverage:")) || 'None listed',
+        debtTrigger: prompt(i18nText("feature.patrons.enterDebtTrigger", null, "Enter debt trigger:")) || 'When Obligation fills, they call in a debt.',
+        quirk: prompt(i18nText("feature.patrons.enterQuirk", null, "Enter quirk:")) || '',
+        assetSlots: parseInt(prompt(i18nText("feature.patrons.enterAssetSlots", null, "Enter asset slots:")) || '2'),
+        maxAssetTier: prompt(i18nText("feature.patrons.enterMaxAssetTierMinorStandardMajor", null, "Enter max asset tier (Minor/Standard/Major):")) || 'Minor',
+        obligationCapacity: prompt(i18nText("feature.patrons.enterObligationCapacitySpiritPresenceOrFixed", null, "Enter obligation capacity (Spirit+Presence or fixed):")) || 'Spirit+Presence',
         source: 'local'
     }));
     state.terrestrialPatrons.sort(sortByName);
     savePatronData();
     refreshView();
-    showToast(`Added terrestrial patron: ${name}`, 'success');
+    showToast(i18nText("feature.patrons.addedTerrestrialPatronValue", { value0: name }, "Added terrestrial patron: {{value0}}"), 'success');
 };
  
 window.editTerrestrial = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) return;
-    const name = prompt('Enter name:', patron.name || patron.title);
+    const name = prompt(i18nText("feature.patrons.enterName", null, "Enter name:"), patron.name || patron.title);
     if (!name) return;
     patron.name = name;
     patron.title = name;
-    patron.type = prompt('Enter type:', patron.type) || patron.type;
-    patron.tier = prompt('Enter tier:', patron.tier) || patron.tier;
-    patron.description = prompt('Enter description:', patron.description) || patron.description;
-    patron.location = prompt('Enter location:', patron.location) || patron.location;
-    patron.leverage = prompt('Enter leverage:', patron.leverage) || patron.leverage;
-    patron.debtTrigger = prompt('Enter debt trigger:', patron.debtTrigger) || patron.debtTrigger;
-    patron.quirk = prompt('Enter quirk:') || patron.quirk;
-    patron.assetSlots = parseInt(prompt('Enter asset slots:', patron.assetSlots) || '2');
-    patron.maxAssetTier = prompt('Enter max asset tier:', patron.maxAssetTier) || patron.maxAssetTier;
-    patron.obligationCapacity = prompt('Enter obligation capacity:', patron.obligationCapacity) || patron.obligationCapacity;
+    patron.type = prompt(i18nText("feature.patrons.enterType", null, "Enter type:"), patron.type) || patron.type;
+    patron.tier = prompt(i18nText("feature.patrons.enterTier", null, "Enter tier:"), patron.tier) || patron.tier;
+    patron.description = prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:"), patron.description) || patron.description;
+    patron.location = prompt(i18nText("feature.patrons.enterLocation", null, "Enter location:"), patron.location) || patron.location;
+    patron.leverage = prompt(i18nText("feature.patrons.enterLeverage", null, "Enter leverage:"), patron.leverage) || patron.leverage;
+    patron.debtTrigger = prompt(i18nText("feature.patrons.enterDebtTrigger", null, "Enter debt trigger:"), patron.debtTrigger) || patron.debtTrigger;
+    patron.quirk = prompt(i18nText("feature.patrons.enterQuirk", null, "Enter quirk:")) || patron.quirk;
+    patron.assetSlots = parseInt(prompt(i18nText("feature.patrons.enterAssetSlots", null, "Enter asset slots:"), patron.assetSlots) || '2');
+    patron.maxAssetTier = prompt(i18nText("feature.patrons.enterMaxAssetTier", null, "Enter max asset tier:"), patron.maxAssetTier) || patron.maxAssetTier;
+    patron.obligationCapacity = prompt(i18nText("feature.patrons.enterObligationCapacity", null, "Enter obligation capacity:"), patron.obligationCapacity) || patron.obligationCapacity;
     patron.source = 'local';
     state.terrestrialPatrons.sort(sortByName);
     savePatronData();
     refreshView();
     window.closePatronModal();
-    showToast(`Updated terrestrial patron: ${name}`, 'success');
+    showToast(i18nText("feature.patrons.updatedTerrestrialPatronValue", { value0: name }, "Updated terrestrial patron: {{value0}}"), 'success');
 };
  
 window.deleteTerrestrial = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
     if (!patron) return;
-    if (!confirm(`Delete terrestrial patron "${patron.name || patron.title}"?`)) return;
+    if (!confirm(i18nText("feature.patrons.deleteTerrestrialPatronValue", { value0: patron.name || patron.title }, "Delete terrestrial patron \"{{value0}}\"?"))) return;
     state.terrestrialPatrons = state.terrestrialPatrons.filter(p => p.id !== id);
     state.terrestrialPatrons.sort(sortByName);
     savePatronData();
     refreshView();
     window.closePatronModal();
-    showToast(`Deleted terrestrial patron: ${patron.name || patron.title}`, 'info');
+    showToast(i18nText("feature.patrons.deletedTerrestrialPatronValue", { value0: patron.name || patron.title }, "Deleted terrestrial patron: {{value0}}"), 'info');
 };
  
 window.addReligion = function() {
-    const name = prompt('Enter religion name:');
+    const name = prompt(i18nText("feature.patrons.enterReligionName", null, "Enter religion name:"));
     if (!name) return;
-    const icon = prompt('Enter icon (emoji):') || '⛪';
+    const icon = prompt(i18nText("feature.patrons.enterIconEmoji", null, "Enter icon (emoji):")) || '⛪';
  
     state.religions.push({
         id: 'religion-' + Date.now(),
         name,
         icon,
-        description: prompt('Enter description:') || 'A religion of the Amaranthine.',
-        lore: prompt('Enter lore:') || '',
-        doctrines: prompt('Enter doctrines (comma-separated):')?.split(',').map(s => s.trim()) || [],
-        practices: prompt('Enter practices (comma-separated):')?.split(',').map(s => s.trim()) || [],
+        description: prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:")) || 'A religion of the Amaranthine.',
+        lore: prompt(i18nText("feature.patrons.enterLore", null, "Enter lore:")) || '',
+        doctrines: prompt(i18nText("feature.patrons.enterDoctrinesCommaSeparated", null, "Enter doctrines (comma-separated):"))?.split(',').map(s => s.trim()) || [],
+        practices: prompt(i18nText("feature.patrons.enterPracticesCommaSeparated", null, "Enter practices (comma-separated):"))?.split(',').map(s => s.trim()) || [],
         orders: [],
         source: 'local'
     });
     state.religions.sort(sortByName);
     savePatronData();
     refreshView();
-    showToast(`Added religion: ${name}`, 'success');
+    showToast(i18nText("feature.patrons.addedReligionValue", { value0: name }, "Added religion: {{value0}}"), 'success');
 };
  
 window.editReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
     if (!religion) return;
-    const name = prompt('Enter religion name:', religion.name);
+    const name = prompt(i18nText("feature.patrons.enterReligionName", null, "Enter religion name:"), religion.name);
     if (!name) return;
     religion.name = name;
-    religion.icon = prompt('Enter icon:', religion.icon) || religion.icon;
-    religion.description = prompt('Enter description:', religion.description) || religion.description;
-    religion.lore = prompt('Enter lore:', religion.lore) || religion.lore;
-    religion.doctrines = prompt('Enter doctrines (comma-separated):', religion.doctrines.join(','))?.split(',').map(s => s.trim()) || [];
-    religion.practices = prompt('Enter practices (comma-separated):', religion.practices.join(','))?.split(',').map(s => s.trim()) || [];
+    religion.icon = prompt(i18nText("feature.patrons.enterIcon", null, "Enter icon:"), religion.icon) || religion.icon;
+    religion.description = prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:"), religion.description) || religion.description;
+    religion.lore = prompt(i18nText("feature.patrons.enterLore", null, "Enter lore:"), religion.lore) || religion.lore;
+    religion.doctrines = prompt(i18nText("feature.patrons.enterDoctrinesCommaSeparated", null, "Enter doctrines (comma-separated):"), religion.doctrines.join(','))?.split(',').map(s => s.trim()) || [];
+    religion.practices = prompt(i18nText("feature.patrons.enterPracticesCommaSeparated", null, "Enter practices (comma-separated):"), religion.practices.join(','))?.split(',').map(s => s.trim()) || [];
     religion.source = 'local';
     state.religions.sort(sortByName);
     savePatronData();
     refreshView();
     window.closePatronModal();
-    showToast(`Updated religion: ${name}`, 'success');
+    showToast(i18nText("feature.patrons.updatedReligionValue", { value0: name }, "Updated religion: {{value0}}"), 'success');
 };
  
 window.deleteReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
     if (!religion) return;
-    if (!confirm(`Delete religion "${religion.name}"?`)) return;
+    if (!confirm(i18nText("feature.patrons.deleteReligionValue", { value0: religion.name }, "Delete religion \"{{value0}}\"?"))) return;
     state.religions = state.religions.filter(r => r.id !== id);
     state.religions.sort(sortByName);
     savePatronData();
     refreshView();
     window.closePatronModal();
-    showToast(`Deleted religion: ${religion.name}`, 'info');
+    showToast(i18nText("feature.patrons.deletedReligionValue", { value0: religion.name }, "Deleted religion: {{value0}}"), 'info');
 };
  
 // ============================================================
@@ -1922,7 +1923,7 @@ window.runPatronRecommender = function() {
     if (!input) return;
     const query = input.value.trim();
     if (!query) {
-        showToast('Describe the character first — for example, “a courier who never refuses shelter.”', 'info');
+        showToast(i18nText("feature.patrons.describeTheCharacterFirstForExampleA", null, "Describe the character first — for example, “a courier who never refuses shelter.”"), 'info');
         return;
     }
 
@@ -1932,9 +1933,9 @@ window.runPatronRecommender = function() {
     state.recommender.active = true;
 
     if (results.length === 0) {
-        showToast(`No patrons matched "${query}". Showing the full list — try different words.`, 'info');
+        showToast(i18nText("feature.patrons.noPatronsMatchedValueShowingTheFull", { value0: query }, "No patrons matched \"{{value0}}\". Showing the full list — try different words."), 'info');
     } else {
-        showToast(`Found ${results.length} match${results.length === 1 ? '' : 'es'}.`, 'success');
+        showToast(i18nPlural('feature.patrons.matchCount', results.length, null, 'Found {{count}} matches.'), 'success');
     }
 
     refreshView();
@@ -1973,13 +1974,13 @@ window.refreshPatrons = function() {
  
     loadPatronData(true);
     refreshView();
-    showToast('🔄 Patrons refreshed from disk', 'success');
+    showToast(i18nText("feature.patrons.patronsRefreshedFromDisk", null, "🔄 Patrons refreshed from disk"), 'success');
 };
  
 window.loadDefaultPatrons = function() {
     loadDefaultPatrons();
     refreshView();
-    showToast('Loaded default patrons', 'success');
+    showToast(i18nText("feature.patrons.loadedDefaultPatrons", null, "Loaded default patrons"), 'success');
 };
  
 // ============================================================
@@ -2056,7 +2057,7 @@ export function destroy() {
 export function revealNinth() {
     ninthRevealed = true;
     refreshView();
-    showToast('🔮 The Ninth has revealed itself to you.', 'info');
+    showToast(i18nText("feature.patrons.theNinthHasRevealedItselfToYou", null, "🔮 The Ninth has revealed itself to you."), 'info');
 }
 
 export function isNinthRevealed() {

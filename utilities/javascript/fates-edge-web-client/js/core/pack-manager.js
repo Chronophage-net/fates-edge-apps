@@ -10,6 +10,7 @@
  * - Merges data files
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from './state.js';
 import { showToast } from '@components/Toast.js';
 import { registerRoute } from '@js/router.js';
@@ -237,7 +238,7 @@ export async function installPack(file) {
                     
                     // Check if already installed
                     if (packRegistry.has(manifest.id)) {
-                        if (!confirm(`Pack "${manifest.name}" is already installed. Reinstall?`)) {
+                        if (!confirm(i18nText("feature.core.pack-manager.packValueIsAlreadyInstalledReinstall", { value0: manifest.name }, "Pack \"{{value0}}\" is already installed. Reinstall?"))) {
                             reject(new Error('Installation cancelled'));
                             return;
                         }
@@ -410,7 +411,7 @@ export async function installPack(file) {
                     }
 
                     // Show success
-                    showToast(`📦 Pack "${manifest.name}" installed successfully!`, 'success');
+                    showToast(i18nText("feature.core.pack-manager.packValueInstalledSuccessfully", { value0: manifest.name }, "📦 Pack \"{{value0}}\" installed successfully!"), 'success');
                     resolve(packInfo);
                     
                 } catch (err) {
@@ -515,11 +516,11 @@ export function getDocuments() {
 export function uninstallPack(packId) {
     const pack = packRegistry.get(packId);
     if (!pack) {
-        showToast('Pack not found', 'error');
+        showToast(i18nText("feature.core.pack-manager.packNotFound", null, "Pack not found"), 'error');
         return;
     }
     
-    if (!confirm(`Uninstall "${pack.name}"? This will remove all associated modules and data.`)) {
+    if (!confirm(i18nText("feature.core.pack-manager.uninstallValueThisWillRemoveAllAssociated", { value0: pack.name }, "Uninstall \"{{value0}}\"? This will remove all associated modules and data."))) {
         return;
     }
     
@@ -548,7 +549,7 @@ export function uninstallPack(packId) {
     installedPacks = installedPacks.filter(p => p.id !== packId);
     saveInstalledPacks();
     
-    showToast(`🗑️ Pack "${pack.name}" uninstalled.`, 'info');
+    showToast(i18nText("feature.core.pack-manager.packValueUninstalled", { value0: pack.name }, "🗑️ Pack \"{{value0}}\" uninstalled."), 'info');
     
     // Reload to clean up
     setTimeout(() => {

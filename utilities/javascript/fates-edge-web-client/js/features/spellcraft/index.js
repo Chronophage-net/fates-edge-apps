@@ -18,6 +18,7 @@
  * - NEW: Magic Paths Tour – a full-screen slide-show introduction to each tradition
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { vttStore } from '@core/vtt-store.js';
 import { getState, getCharacter, updateCharacter, addCharacter, saveState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
@@ -342,7 +343,7 @@ function ensureStyles() {
             padding: 0.6rem 0.8rem;
             background: var(--bg2);
             border-radius: var(--radius);
-            border-left: 4px solid var(--gold);
+            border-inline-start: 4px solid var(--gold);
         }
         .path-finder-header h2 {
             margin: 0;
@@ -369,7 +370,7 @@ function ensureStyles() {
             display: flex;
             flex-direction: column;
             gap: 0.2rem;
-            text-align: left;
+            text-align: start;
         }
 
         /* ─── Path dropdown styling ───────────────────────────── */
@@ -430,7 +431,7 @@ function ensureStyles() {
             color: var(--text);
         }
         .magic-tour-card .tour-header .tour-count {
-            margin-left: auto;
+            margin-inline-start: auto;
             font-size: 0.8rem;
             color: var(--text3);
             background: var(--bg3);
@@ -450,7 +451,7 @@ function ensureStyles() {
             background: var(--bg2);
             padding: 0.8rem 1rem;
             border-radius: 8px;
-            border-left: 3px solid var(--gold);
+            border-inline-start: 3px solid var(--gold);
             max-height: 260px;
             overflow-y: auto;
         }
@@ -549,12 +550,12 @@ export function getCharacterData(options = {}) {
     const { silent = false } = options;
     const id = vttStore.getSelectedCharacterId();
     if (!id) {
-        if (!silent) showToast('Select a character first.', 'error');
+        if (!silent) showToast(i18nText("feature.spellcraft.selectACharacterFirst", null, "Select a character first."), 'error');
         return null;
     }
     const char = getCharacter(id);
     if (!char) {
-        if (!silent) showToast('Character not found.', 'error');
+        if (!silent) showToast(i18nText("feature.spellcraft.characterNotFound", null, "Character not found."), 'error');
         return null;
     }
     return char;
@@ -614,7 +615,7 @@ export function showMagicTour() {
     if (tourActive) return;
     const char = getCharacterData({ silent: true });
     if (!char) {
-        showToast('Select a character to explore magic paths.', 'info');
+        showToast(i18nText("feature.spellcraft.selectACharacterToExploreMagicPaths", null, "Select a character to explore magic paths."), 'info');
         return;
     }
 
@@ -680,15 +681,15 @@ function renderTourSlide(char) {
                 ${meta.recommendations && meta.recommendations.length ? `
                     <div class="tour-rec">
                         <strong>You might like this if:</strong>
-                        ${meta.recommendations.map(r => `<div style="padding-left:0.5rem;">• ${escHtml(r)}</div>`).join('')}
+                        ${meta.recommendations.map(r => `<div style="padding-inline-start:0.5rem;">• ${escHtml(r)}</div>`).join('')}
                     </div>
                 ` : ''}
             </div>
             <div class="tour-nav">
                 <button class="btn btn-secondary" id="tour-prev" ${tourSlideIndex === 0 ? 'disabled' : ''}>← Previous</button>
-                <button class="btn tour-choose" id="tour-choose">✨ Choose This Path</button>
+                <button class="btn tour-choose" id="tour-choose" data-i18n="feature.spellcraft.chooseThisPath">✨ Choose This Path</button>
                 <button class="btn btn-secondary" id="tour-next">${tourSlideIndex === total - 1 ? 'Finish Tour →' : 'Next →'}</button>
-                <button class="tour-skip" id="tour-skip">Skip Tour</button>
+                <button class="tour-skip" id="tour-skip" data-i18n="feature.spellcraft.skipTour">Skip Tour</button>
             </div>
         </div>
     `;
@@ -714,20 +715,20 @@ function renderTourSlide(char) {
 
     overlay.querySelector('#tour-choose')?.addEventListener('click', () => {
         if (pathId === currentPath) {
-            showToast(`Already on the ${meta.label} path.`, 'info');
+            showToast(i18nText("feature.spellcraft.alreadyOnTheValuePath", { value0: meta.label }, "Already on the {{value0}} path."), 'info');
             setMagicTourSeen(true);
             closeTour();
             return;
         }
         const result = updateCharacter(char.id, { magicPath: pathId });
         if (result) {
-            showToast(`✨ Chosen: ${meta.label}`, 'success');
+            showToast(i18nText("feature.spellcraft.chosenValue", { value0: meta.label }, "✨ Chosen: {{value0}}"), 'success');
             setMagicTourSeen(true);
             closeTour();
             // Re-render the main view
             if (container) render(container);
         } else {
-            showToast('Failed to update character.', 'error');
+            showToast(i18nText("feature.spellcraft.failedToUpdateCharacter", null, "Failed to update character."), 'error');
         }
     });
 
@@ -756,7 +757,7 @@ function renderNoCharacterView() {
 
     return `
         <div class="spellcraft-empty" style="padding:1.5rem 1.5rem 2rem;text-align:center;color:var(--text3);background:var(--bg2);border-radius:var(--radius);border:1px dashed var(--border);">
-            <h2 style="margin:0.5rem 0;color:var(--text);">Select a Character</h2>
+            <h2 style="margin:0.5rem 0;color:var(--text);" data-i18n="feature.spellcraft.selectACharacter">Select a Character</h2>
             <p style="margin:0 0 0.8rem;">${characters.length > 0
                 ? 'Choose one below, or select a character card in the VTT.'
                 : 'Magic here belongs to a character. Make one first.'}</p>
@@ -764,7 +765,7 @@ function renderNoCharacterView() {
             <div style="display:flex;gap:0.4rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
                 ${characters.length > 0 ? `
                     <select id="spellcraft-char-select" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.6rem;font-size:0.85rem;min-width:220px;">
-                        <option value="">— Choose a character —</option>
+                        <option value="" data-i18n="feature.spellcraft.chooseACharacter">— Choose a character —</option>
                         ${characters.map(c => {
                             const pathLabel = c.magicPath && c.magicPath !== 'none'
                                 ? (PATH_META[c.magicPath]?.label || c.magicPath)
@@ -778,7 +779,7 @@ function renderNoCharacterView() {
                     : '<button class="btn btn-gold" id="go-to-characters-btn">Create a character</button>'}
             </div>
 
-            <div style="text-align:left;max-width:960px;margin:0 auto;">
+            <div style="text-align: start;max-width:960px;margin:0 auto;">
                 <div style="font-weight:600;color:var(--gold);margin-bottom:0.5rem;text-align:center;">Magic paths at a glance</div>
                 <div class="path-info-grid">
                     ${Object.entries(PATH_META)
@@ -877,12 +878,12 @@ export function render(el) {
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
-                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path">
+                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path" data-i18n-attr="title:feature.spellcraft.changeMagicPath">
                         ${pathOptionsHtml}
                     </select>
-                    <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path">Set Path</button>
-                    <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
-                    <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour">🎭 Tour</button>
+                    <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path" data-i18n-attr="title:feature.spellcraft.setMagicPath" data-i18n="feature.spellcraft.setPath">Set Path</button>
+                    <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh" data-i18n-attr="title:feature.spellcraft.refresh">↻</button>
+                    <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour" data-i18n-attr="title:feature.spellcraft.magicPathsTour" data-i18n="feature.spellcraft.tour">🎭 Tour</button>
                 </div>
             </header>
 
@@ -906,7 +907,7 @@ export function render(el) {
                     ${patron ? `<span>🔮 <strong>Patron:</strong> ${escHtml(patron)}</span>` : ''}
                     <span>📊 <strong>Tracks:</strong> ${escHtml(getTrackSummary(char))}</span>
                 </div>
-                <div style="text-align:right;font-style:italic;">
+                <div style="text-align: end;font-style:italic;">
                     "The Weave remembers." – Lysandra
                 </div>
             </div>
@@ -942,12 +943,12 @@ function renderPathFinder(char, name, pathMeta, patron) {
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
-                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path">
+                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path" data-i18n-attr="title:feature.spellcraft.changeMagicPath">
                         ${pathOptionsHtml}
                     </select>
-                    <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path">Set Path</button>
-                    <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh">↻</button>
-                    <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour">🎭 Tour</button>
+                    <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path" data-i18n-attr="title:feature.spellcraft.setMagicPath" data-i18n="feature.spellcraft.setPath">Set Path</button>
+                    <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh" data-i18n-attr="title:feature.spellcraft.refresh">↻</button>
+                    <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour" data-i18n-attr="title:feature.spellcraft.magicPathsTour" data-i18n="feature.spellcraft.tour">🎭 Tour</button>
                 </div>
             </header>
 
@@ -955,7 +956,7 @@ function renderPathFinder(char, name, pathMeta, patron) {
             <div class="path-finder-body" style="display:flex;flex-direction:column;gap:0.8rem;">
 
                 <div class="path-finder-header">
-                    <h2>🧙 Choose Your Magical Path</h2>
+                    <h2 data-i18n="feature.spellcraft.chooseYourMagicalPath">🧙 Choose Your Magical Path</h2>
                     <p>
                         Your path defines how you interact with the Weave – and what it costs you.
                         Each path offers a different experience, from the structured covenants of the
@@ -989,7 +990,7 @@ function renderPathFinder(char, name, pathMeta, patron) {
                                     ${meta.recommendations && meta.recommendations.length > 0 ? `
                                         <div class="path-rec">
                                             <strong>You might like this if:</strong>
-                                            ${meta.recommendations.slice(0, 2).map(r => `<div style="padding-left:0.5rem;">• ${escHtml(r)}</div>`).join('')}
+                                            ${meta.recommendations.slice(0, 2).map(r => `<div style="padding-inline-start:0.5rem;">• ${escHtml(r)}</div>`).join('')}
                                         </div>
                                     ` : ''}
                                     <button class="path-choose-btn" data-path="${id}">${isActive ? '✓ Selected' : 'Choose This Path'}</button>
@@ -998,8 +999,8 @@ function renderPathFinder(char, name, pathMeta, patron) {
                         }).join('')}
                 </div>
 
-                <div style="padding:0.5rem;background:var(--bg2);border-radius:var(--radius);border-left:4px solid var(--gold);font-size:0.8rem;color:var(--text3);">
-                    <strong>💡 Not sure?</strong> Take the <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn-inline" style="font-size:0.7rem;padding:0.05rem 0.5rem;">🎭 Magic Paths Tour</button> to explore each tradition in depth.
+                <div style="padding:0.5rem;background:var(--bg2);border-radius:var(--radius);border-inline-start:4px solid var(--gold);font-size:0.8rem;color:var(--text3);">
+                    <strong>💡 Not sure?</strong> Take the <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn-inline" style="font-size:0.7rem;padding:0.05rem 0.5rem;" data-i18n="feature.spellcraft.magicPathsTour_poyxc">🎭 Magic Paths Tour</button> to explore each tradition in depth.
                 </div>
 
                 <!-- ─── Tracks (minimal) ──────────────────────────── -->
@@ -1025,7 +1026,7 @@ function renderPathFinder(char, name, pathMeta, patron) {
                     ${patron ? `<span>🔮 <strong>Patron:</strong> ${escHtml(patron)}</span>` : ''}
                     <span>📊 <strong>Status:</strong> Choose a path to unlock full features</span>
                 </div>
-                <div style="text-align:right;font-style:italic;">
+                <div style="text-align: end;font-style:italic;">
                     "The Weave remembers." – Lysandra
                 </div>
             </div>
@@ -1068,17 +1069,17 @@ function selectPathForCharacter(pathId) {
     if (!char) return;
 
     if (pathId === char.magicPath) {
-        showToast(`Already on the ${PATH_META[pathId]?.label || pathId} path.`, 'info');
+        showToast(i18nText("feature.spellcraft.alreadyOnTheValuePath", { value0: PATH_META[pathId]?.label || pathId }, "Already on the {{value0}} path."), 'info');
         return;
     }
 
     const result = updateCharacter(char.id, { magicPath: pathId });
     if (result) {
-        showToast(`✨ Path changed to ${PATH_META[pathId]?.label || pathId}`, 'success');
+        showToast(i18nText("feature.spellcraft.pathChangedToValue", { value0: PATH_META[pathId]?.label || pathId }, "✨ Path changed to {{value0}}"), 'success');
         setMagicTourSeen(true);
         render(container);
     } else {
-        showToast('Failed to change path.', 'error');
+        showToast(i18nText("feature.spellcraft.failedToChangePath", null, "Failed to change path."), 'error');
     }
 }
 
@@ -1333,7 +1334,7 @@ function attachEvents() {
                 break;
             case 'spellcraft-refresh':
                 renderAll();
-                showToast('🔄 Refreshed', 'info');
+                showToast(i18nText("feature.spellcraft.refreshed", null, "🔄 Refreshed"), 'info');
                 break;
             case 'spellcraft-set-path':
                 setPathFromSelect();
@@ -1384,7 +1385,7 @@ function setPathFromSelect() {
     if (!char) return;
 
     if (pathId === char.magicPath) {
-        showToast(`Already on the ${PATH_META[pathId]?.label || pathId} path.`, 'info');
+        showToast(i18nText("feature.spellcraft.alreadyOnTheValuePath", { value0: PATH_META[pathId]?.label || pathId }, "Already on the {{value0}} path."), 'info');
         return;
     }
 
@@ -1392,10 +1393,10 @@ function setPathFromSelect() {
     if (result) {
         activeTab = 'spellbook';
         setMagicTourSeen(true);
-        showToast(`⚙️ Magic path changed to ${PATH_META[pathId]?.label || pathId}`, 'success');
+        showToast(i18nText("feature.spellcraft.magicPathChangedToValue", { value0: PATH_META[pathId]?.label || pathId }, "⚙️ Magic path changed to {{value0}}"), 'success');
         render(container);
     } else {
-        showToast('Failed to update character.', 'error');
+        showToast(i18nText("feature.spellcraft.failedToUpdateCharacter", null, "Failed to update character."), 'error');
     }
 }
 
@@ -1404,9 +1405,9 @@ function changeMagicPath() {
     const select = document.getElementById('spellcraft-path-select');
     if (select) {
         select.focus();
-        showToast('Select a path from the dropdown and click "Set Path".', 'info');
+        showToast(i18nText("feature.spellcraft.selectAPathFromTheDropdownAnd", null, "Select a path from the dropdown and click \"Set Path\"."), 'info');
     } else {
-        showToast('Please refresh the panel to use the dropdown.', 'info');
+        showToast(i18nText("feature.spellcraft.pleaseRefreshThePanelToUseThe", null, "Please refresh the panel to use the dropdown."), 'info');
     }
 }
 

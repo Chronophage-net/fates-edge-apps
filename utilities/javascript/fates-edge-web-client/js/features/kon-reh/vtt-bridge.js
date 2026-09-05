@@ -73,7 +73,7 @@ function showChallengeBanner(fromName, onAccept, onDecline) {
     const el = document.createElement('div');
     el.id = 'konreh-challenge-banner';
     el.style.cssText = `
-        position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+        position: fixed; top: 16px; left: 50%; transform: translateX(-50%); /* rtl-physical: viewport centering */
         z-index: 10001; background: #1b1c26; border: 1px solid #d4af37;
         border-radius: 10px; padding: 12px 16px; display: flex; align-items: center;
         gap: 12px; color: #e8e6df; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -81,8 +81,8 @@ function showChallengeBanner(fromName, onAccept, onDecline) {
     `;
     el.innerHTML = `
         <span>🌀 <b>${escHtml(fromName)}</b> is challenging you to Kon'reh!</span>
-        <button id="konreh-accept-btn" style="background:#d4af37;color:#1a1400;border:none;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer;">Accept</button>
-        <button id="konreh-decline-btn" style="background:#2a2b38;color:#e8e6df;border:1px solid #3a3b4a;border-radius:6px;padding:6px 12px;cursor:pointer;">Decline</button>
+        <button id="konreh-accept-btn" style="background:#d4af37;color:#1a1400;border:none;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer;" data-i18n="feature.kon-reh.vtt-bridge.accept">Accept</button>
+        <button id="konreh-decline-btn" style="background:#2a2b38;color:#e8e6df;border:1px solid #3a3b4a;border-radius:6px;padding:6px 12px;cursor:pointer;" data-i18n="feature.kon-reh.vtt-bridge.decline">Decline</button>
     `;
     document.body.appendChild(el);
     challengeBanner = el;

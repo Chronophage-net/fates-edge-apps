@@ -44,6 +44,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
 import { escHtml, safeParseInt } from '@core/utils.js';
 import { getState, saveState } from '@core/state.js';
@@ -208,7 +209,7 @@ const MAGIC_PATH_REFERENCE = [
 
 function renderMagicPathReferenceHtml(highlightLabel) {
     return `
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem;text-align:left;margin-top:0.8rem;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem;text-align: start;margin-top:0.8rem;">
             ${MAGIC_PATH_REFERENCE.map(p => `
                 <div style="padding:0.4rem 0.5rem;border-radius:var(--radius);background:var(--bg2);border:1px solid ${p.label === highlightLabel ? 'var(--gold)' : 'var(--border)'};">
                     <div style="display:flex;align-items:center;gap:0.3rem;">
@@ -241,7 +242,7 @@ function buildSongCardHtml(songName, patronName, patronIcon, effect, costDetails
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--border);
-            border-left:4px solid var(--gold);
+            border-inline-start:4px solid var(--gold);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             max-width: 450px;
             margin:0.1rem 0;
@@ -268,7 +269,7 @@ function buildBloomCardHtml(patronName, patronIcon, bloomCount, tierUnlocked, co
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--gold);
-            border-left:4px solid var(--gold);
+            border-inline-start:4px solid var(--gold);
             box-shadow: 0 2px 12px rgba(212,175,55,0.3);
             max-width: 450px;
             margin:0.1rem 0;
@@ -522,18 +523,18 @@ export async function renderCantor(el) {
                     <span style="font-size:1.4rem;">🎵</span>
                     <div>
                         <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Cantor</span>
-                        ${isBound ? `<span style="font-size:0.75rem;color:var(--text3);margin-left:0.3rem;">of ${escHtml(boundPatronData.name || boundPatronId)}</span>` : `<span style="font-size:0.75rem;color:var(--text3);margin-left:0.3rem;">of the Weave (unbound)</span>`}
-                        ${isHighCantor ? `<span style="font-size:0.65rem;color:var(--gold);margin-left:0.2rem;">✨ High Cantor</span>` : ''}
-                        ${isBound ? `<span style="font-size:0.65rem;color:var(--text2);margin-left:0.2rem;">🎯 +1/-1 position</span>` : ''}
+                        ${isBound ? `<span style="font-size:0.75rem;color:var(--text3);margin-inline-start:0.3rem;">of ${escHtml(boundPatronData.name || boundPatronId)}</span>` : `<span style="font-size:0.75rem;color:var(--text3);margin-inline-start:0.3rem;">of the Weave (unbound)</span>`}
+                        ${isHighCantor ? `<span style="font-size:0.65rem;color:var(--gold);margin-inline-start:0.2rem;">✨ High Cantor</span>` : ''}
+                        ${isBound ? `<span style="font-size:0.65rem;color:var(--text2);margin-inline-start:0.2rem;">🎯 +1/-1 position</span>` : ''}
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-secondary" onclick="window.cantorRefresh()" title="Reloads patron data from disk, bypassing any cached copy">🔄 Refresh</button>
+                    <button class="btn btn-xs btn-secondary" onclick="window.cantorRefresh()" title="Reloads patron data from disk, bypassing any cached copy" data-i18n-attr="title:feature.spellcraft.components.cantor.reloadsPatronDataFromDiskBypassingAny" data-i18n="feature.spellcraft.components.cantor.refresh">🔄 Refresh</button>
                 </div>
             </div>
 
             <!-- ─── Corruption Track ───────────────────────────── -->
-            <div class="cantor-corruption-track" style="background:var(--bg2);border-radius:var(--radius);padding:0.4rem 0.6rem;border-left:4px solid ${isBound ? 'var(--purple)' : 'var(--text3)'};">
+            <div class="cantor-corruption-track" style="background:var(--bg2);border-radius:var(--radius);padding:0.4rem 0.6rem;border-inline-start:4px solid ${isBound ? 'var(--purple)' : 'var(--text3)'};">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         <span style="font-size:0.85rem;font-weight:600;color:${isBound ? 'var(--purple)' : 'var(--text3)'};">🎵 Corruption</span>
@@ -542,9 +543,9 @@ export async function renderCantor(el) {
                     </div>
                     <div style="display:flex;gap:0.2rem;align-items:center;">
                         ${isBound ? `<span style="font-size:0.65rem;color:var(--text3);">Tier ${unlockedTier}/${corruptionTable.length}</span>` : `<span style="font-size:0.65rem;color:var(--text3);">Unfocused</span>`}
-                        <button class="btn btn-xs btn-secondary" onclick="window.cantorAdvanceCorruption(1)" title="Advance corruption">+</button>
-                        <button class="btn btn-xs btn-secondary" onclick="window.cantorAdvanceCorruption(-1)" title="Reduce corruption">−</button>
-                        <button class="btn btn-xs btn-ghost" onclick="window.cantorSimulatePush()" style="color:var(--gold);font-size:0.6rem;" title="Preview odds for a normal (un-Pushed) Performance roll">⚡ Simulate Roll</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.cantorAdvanceCorruption(1)" title="Advance corruption" data-i18n-attr="title:feature.spellcraft.components.cantor.advanceCorruption">+</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.cantorAdvanceCorruption(-1)" title="Reduce corruption" data-i18n-attr="title:feature.spellcraft.components.cantor.reduceCorruption">−</button>
+                        <button class="btn btn-xs btn-ghost" onclick="window.cantorSimulatePush()" style="color:var(--gold);font-size:0.6rem;" title="Preview odds for a normal (un-Pushed) Performance roll" data-i18n-attr="title:feature.spellcraft.components.cantor.previewOddsForANormalUnPushed" data-i18n="feature.spellcraft.components.cantor.simulateRoll">⚡ Simulate Roll</button>
                     </div>
                 </div>
                 <div style="width:100%;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-top:0.2rem;">
@@ -569,7 +570,7 @@ export async function renderCantor(el) {
 
             <!-- ─── Corruption Table (only if bound) ──────────── -->
             ${isBound && corruptionTable.length > 0 ? `
-                <div class="cantor-corruption-table" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--purple);">
+                <div class="cantor-corruption-table" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--purple);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
                         <span style="font-size:0.8rem;font-weight:600;color:var(--purple);">⚠️ The Bloom: Corruption Tiers</span>
                         <span style="font-size:0.65rem;color:var(--text3);">Unlocked: ${unlockedTier} / ${corruptionTable.length}</span>
@@ -582,7 +583,7 @@ export async function renderCantor(el) {
                             const cost = safeString(c.cost);
                             const isCurrent = isUnlocked && (idx + 1) === unlockedTier;
                             return `
-                                <div style="display:grid;grid-template-columns:1fr 2fr 2fr;gap:0.2rem;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);${isCurrent ? 'background:var(--bg3);border-left:3px solid var(--gold);' : ''}${isUnlocked ? '' : 'opacity:0.5;'}">
+                                <div style="display:grid;grid-template-columns:1fr 2fr 2fr;gap:0.2rem;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);${isCurrent ? 'background:var(--bg3);border-inline-start:3px solid var(--gold);' : ''}${isUnlocked ? '' : 'opacity:0.5;'}">
                                     <span style="font-weight:${isUnlocked ? '600' : '400'};color:${isCurrent ? 'var(--gold)' : isUnlocked ? 'var(--text)' : 'var(--text3)'};">Tier ${tier}</span>
                                     <span style="color:${isUnlocked ? 'var(--text)' : 'var(--text3)'};">${escHtml(benefit)}</span>
                                     <span style="color:${isUnlocked ? 'var(--red)' : 'var(--text3)'};">${escHtml(cost)}</span>
@@ -598,19 +599,19 @@ export async function renderCantor(el) {
                     ` : ''}
                 </div>
             ` : (isBound ? '' : `
-                <div class="cantor-corruption-unbound" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--text3);font-size:0.75rem;color:var(--text3);">
+                <div class="cantor-corruption-unbound" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--text3);font-size:0.75rem;color:var(--text3);">
                     🌿 Unbound – your corruption is not tied to any patron’s bloom. No tiers or benefits.
                 </div>
             `)}
 
             <!-- ─── Songs / Rites ──────────────────────────────── -->
-            <div class="cantor-songs" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+            <div class="cantor-songs" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;flex-wrap:wrap;gap:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">🎶 Songs (Rites)</span>
                     <span style="font-size:0.6rem;color:var(--text3);">${rites.length} songs${isBound ? '' : ` (${tierLabel})`}${isHighCantor ? ' · ✨ Standard included' : ''}</span>
                     <div style="display:flex;gap:0.2rem;">
-                        <button class="btn btn-xs btn-secondary" onclick="window.cantorMarkResonant()">🔮 Resonant Rite</button>
-                        <button class="btn btn-xs btn-ghost" onclick="window.cantorResetCorruption()" style="color:var(--red);">✕ Reset</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.cantorMarkResonant()" data-i18n="feature.spellcraft.components.cantor.resonantRite">🔮 Resonant Rite</button>
+                        <button class="btn btn-xs btn-ghost" onclick="window.cantorResetCorruption()" style="color:var(--red);" data-i18n="feature.spellcraft.components.cantor.reset">✕ Reset</button>
                     </div>
                 </div>
                 <div id="cantor-rites-container" style="display:flex;flex-direction:column;gap:0.3rem;"></div>
@@ -618,7 +619,7 @@ export async function renderCantor(el) {
 
             <!-- ─── Resonant Rites Tracker ──────────────────────── -->
             ${resonantRites.length > 0 ? `
-                <div class="cantor-resonant" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+                <div class="cantor-resonant" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <span style="font-size:0.8rem;font-weight:600;color:var(--gold);">🔮 Resonant Rites Performed</span>
                         <span style="font-size:0.7rem;color:var(--text3);">${resonantRites.length}</span>
@@ -635,7 +636,7 @@ export async function renderCantor(el) {
             ` : ''}
 
             <!-- ─── Cantor Talents ──────────────────────────────── -->
-            <div class="cantor-talents" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+            <div class="cantor-talents" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;">
                     <span style="font-size:0.85rem;font-weight:600;color:var(--gold);">⚡ Cantor Talents</span>
                     <span style="font-size:0.6rem;color:var(--text3);">${talents.length} talents · ${learnedTalents.length} learned</span>
@@ -649,14 +650,14 @@ export async function renderCantor(el) {
                         const isBoundPatron = (t.id === 'bound-patron');
                         const isBound = !!char.boundPatron;
                         return `
-                            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);${isLearned ? 'background:var(--bg3);border-left:3px solid var(--gold);' : ''}">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.15rem 0.3rem;border-bottom:1px solid var(--border);${isLearned ? 'background:var(--bg3);border-inline-start:3px solid var(--gold);' : ''}">
                                 <div style="flex:1;min-width:0;">
                                     <span style="font-weight:${isLearned ? '600' : '400'};color:${isLearned ? 'var(--gold)' : 'var(--text)'};">${escHtml(name)}</span>
-                                    ${isLearned ? `<span style="font-size:0.55rem;color:var(--gold);margin-left:0.2rem;">✓ Learned</span>` : ''}
-                                    ${isBoundPatron && isBound ? `<span style="font-size:0.55rem;color:var(--text2);margin-left:0.2rem;">(Bound to ${escHtml(char.boundPatron)})</span>` : ''}
+                                    ${isLearned ? `<span style="font-size:0.55rem;color:var(--gold);margin-inline-start:0.2rem;">✓ Learned</span>` : ''}
+                                    ${isBoundPatron && isBound ? `<span style="font-size:0.55rem;color:var(--text2);margin-inline-start:0.2rem;">(Bound to ${escHtml(char.boundPatron)})</span>` : ''}
                                     <div style="font-size:0.65rem;color:var(--text2);">${formatText(description)}</div>
                                 </div>
-                                <div style="display:flex;align-items:center;gap:0.2rem;flex-shrink:0;margin-left:0.3rem;">
+                                <div style="display:flex;align-items:center;gap:0.2rem;flex-shrink:0;margin-inline-start:0.3rem;">
                                     <span style="font-size:0.65rem;color:var(--gold);">${cost} XP</span>
                                     <button class="btn btn-xs ${isLearned ? 'btn-secondary' : 'btn-primary'}" onclick="window.cantorToggleTalent('${escHtml(t.id || name)}')" style="font-size:0.55rem;padding:0.05rem 0.3rem;">
                                         ${isLearned ? '✕ Unlearn' : '✓ Learn'}
@@ -670,11 +671,11 @@ export async function renderCantor(el) {
             </div>
 
             <!-- ─── Cantor Wisdom ──────────────────────────────── -->
-            <div class="cantor-wisdom" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+            <div class="cantor-wisdom" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
                 <div style="display:flex;flex-direction:column;gap:0.1rem;">
                     <div style="font-size:0.7rem;color:var(--text3);font-style:italic;">
                         "${formatText(patronQuote)}"
-                        <span style="display:block;text-align:right;font-size:0.6rem;color:var(--text2);">— ${isBound ? (boundPatronData.name || boundPatronId) : 'The Weave'}</span>
+                        <span style="display:block;text-align: end;font-size:0.6rem;color:var(--text2);">— ${isBound ? (boundPatronData.name || boundPatronId) : 'The Weave'}</span>
                     </div>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.6rem;color:var(--text3);border-top:1px solid var(--border);padding-top:0.15rem;">
                         <span>💡 <strong>Push It:</strong> Resolves instantly, no roll — mark Fatigue + Corruption, GM gains 1 SB</span>
@@ -751,12 +752,12 @@ function renderCantorRitesGrouped(container, rites, char) {
         const riteCount = group.rites.length;
 
         html += `
-            <details class="patron-group" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.4rem;border-left:4px solid ${group.color};">
+            <details class="patron-group" style="background:var(--bg3);border-radius:var(--radius);padding:0.2rem 0.4rem;border-inline-start:4px solid ${group.color};">
                 <summary style="cursor:pointer;font-weight:600;font-size:0.85rem;color:var(--text);display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0;">
                     <span>${groupName}</span>
                     <span style="font-size:0.7rem;color:var(--text3);font-weight:400;">${riteCount} rite${riteCount > 1 ? 's' : ''}</span>
                 </summary>
-                <div style="display:flex;flex-direction:column;gap:0.3rem;margin-top:0.3rem;padding-left:0.3rem;">
+                <div style="display:flex;flex-direction:column;gap:0.3rem;margin-top:0.3rem;padding-inline-start:0.3rem;">
                     ${group.rites.map(rite => renderRiteItem(rite, char)).join('')}
                 </div>
             </details>
@@ -789,7 +790,7 @@ function renderRiteItem(rite, char) {
     const isKnown = repertoire.includes(name);
 
     return `
-        <div class="rite-item" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:3px solid ${color};${isResonant ? 'border-right:3px solid var(--gold);' : ''}${isKnown ? '' : 'opacity:0.75;'}">
+        <div class="rite-item" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:3px solid ${color};${isResonant ? 'border-inline-end:3px solid var(--gold);' : ''}${isKnown ? '' : 'opacity:0.75;'}">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
                     ${patronIcon ? `<span style="font-size:1rem;">${patronIcon}</span>` : ''}
@@ -857,7 +858,7 @@ window.cantorLearnSong = function(riteName, xpCost) {
 
     if (!char.repertoire) char.repertoire = [];
     if (char.repertoire.includes(riteName)) {
-        showToast(`"${riteName}" is already in your Repertoire.`, 'info');
+        showToast(i18nText("feature.spellcraft.components.cantor.valueIsAlreadyInYourRepertoire", { value0: riteName }, "\"{{value0}}\" is already in your Repertoire."), 'info');
         return;
     }
 
@@ -866,16 +867,16 @@ window.cantorLearnSong = function(riteName, xpCost) {
     const available = totalXp - spent;
 
     if (xpCost > 0 && available < xpCost) {
-        showToast(`Not enough XP. Need ${xpCost}, have ${available} available.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.cantor.notEnoughXPNeedValueHaveValue", { value0: xpCost, value1: available }, "Not enough XP. Need {{value0}}, have {{value1}} available."), 'error');
         return;
     }
 
-    if (!confirm(`Add "${riteName}" to your Repertoire for ${xpCost} XP?`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.cantor.addValueToYourRepertoireForValue", { value0: riteName, value1: xpCost }, "Add \"{{value0}}\" to your Repertoire for {{value1}} XP?"))) return;
 
     char.repertoire.push(riteName);
     char.xpSpent = spent + xpCost;
     saveCharacter({ repertoire: char.repertoire, xpSpent: char.xpSpent });
-    showToast(`🎶 "${riteName}" added to your Repertoire (${xpCost} XP spent).`, 'success');
+    showToast(i18nText("feature.spellcraft.components.cantor.valueAddedToYourRepertoireValueXP", { value0: riteName, value1: xpCost }, "🎶 \"{{value0}}\" added to your Repertoire ({{value1}} XP spent)."), 'success');
     window.cantorRefresh();
 };
 
@@ -885,13 +886,13 @@ window.cantorPushRite = function(riteName, buttonElement) {
 
     const rite = window._cantorRiteCache?.get(riteName);
     if (!rite) {
-        showToast('Rite not found. Please refresh.', 'error');
+        showToast(i18nText("feature.spellcraft.components.cantor.riteNotFoundPleaseRefresh", null, "Rite not found. Please refresh."), 'error');
         return;
     }
 
     // RULES FIX: only Songs in the Repertoire can be sung at all.
     if (!(char.repertoire || []).includes(riteName)) {
-        showToast(`You haven't learned "${riteName}" yet — add it to your Repertoire first.`, 'error');
+        showToast(i18nText("feature.spellcraft.components.cantor.youHavenTLearnedValueYetAdd", { value0: riteName }, "You haven't learned \"{{value0}}\" yet — add it to your Repertoire first."), 'error');
         return;
     }
 
@@ -899,7 +900,7 @@ window.cantorPushRite = function(riteName, buttonElement) {
     const fatigueMax = (char.body || 1);
 
     if (fatigue >= fatigueMax) {
-        showToast('Cannot Push — Fatigue track is full!', 'error');
+        showToast(i18nText("feature.spellcraft.components.cantor.cannotPushFatigueTrackIsFull", null, "Cannot Push — Fatigue track is full!"), 'error');
         return;
     }
 
@@ -931,12 +932,12 @@ window.cantorPushRite = function(riteName, buttonElement) {
             <div style="font-size:0.7rem;color:var(--text3);">${formatText(pushEffect)}</div>
             <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.75rem;">
                 <span style="color:var(--orange);">💪 Fatigue +1</span>
-                <span style="color:var(--purple);margin-left:0.5rem;">🎵 Corruption +1</span>
-                <span style="color:var(--red);margin-left:0.5rem;">🎭 GM gains 1 SB</span>
-                <span style="color:var(--text3);margin-left:0.5rem;">(${char.fatigue}/${fatigueMax} Fatigue · ${char.corruption}/${char.corruptionMax || char.spirit || 1} Corruption)</span>
+                <span style="color:var(--purple);margin-inline-start:0.5rem;">🎵 Corruption +1</span>
+                <span style="color:var(--red);margin-inline-start:0.5rem;">🎭 GM gains 1 SB</span>
+                <span style="color:var(--text3);margin-inline-start:0.5rem;">(${char.fatigue}/${fatigueMax} Fatigue · ${char.corruption}/${char.corruptionMax || char.spirit || 1} Corruption)</span>
             </div>
             ${char.corruption >= (char.corruptionMax || char.spirit || 1) ? `<div style="color:var(--red);font-weight:600;font-size:0.8rem;">${char.boundPatron ? '🌸 The bloom is near! Perform a Resonant Rite to transform.' : '🌿 Corruption peaked – but without a bound patron, there is no bloom.'}</div>` : ''}
-            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.cantor.close">Close</button>
         </div>
     `, 'success');
 
@@ -1006,7 +1007,7 @@ window.cantorSimulatePush = function() {
             <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.75rem;color:var(--text3);">
                 <strong>Reminder:</strong> Pushing a Song skips this roll entirely and guarantees success, for Fatigue +1, Corruption +1, and the GM gaining 1 SB.
             </div>
-            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
+            <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.cantor.close">Close</button>
         </div>
     `;
 
@@ -1025,7 +1026,7 @@ window.cantorToggleResonantRite = function(riteName) {
     if (index >= 0) {
         char.resonantRites.splice(index, 1);
         saveCharacter({ resonantRites: char.resonantRites });
-        showToast(`"${riteName}" unmarked as Resonant.`, 'info');
+        showToast(i18nText("feature.spellcraft.components.cantor.valueUnmarkedAsResonant", { value0: riteName }, "\"{{value0}}\" unmarked as Resonant."), 'info');
     } else {
         const isBound = !!(char.boundPatron || char.patron);
         const corruption = char.corruption || 0;
@@ -1076,7 +1077,7 @@ window.cantorToggleResonantRite = function(riteName) {
                         <div style="font-size:0.65rem;color:var(--text3);font-style:italic;text-align:center;">
                             "The bloom is not an ending. It is a beginning."
                         </div>
-                        <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
+                        <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.cantor.close">Close</button>
                     </div>
                 `, 'success');
             } else {
@@ -1088,12 +1089,12 @@ window.cantorToggleResonantRite = function(riteName) {
                             Your corruption is full, but without a bound patron, there is no bloom.
                             You remain unbound.
                         </div>
-                        <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>
+                        <button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.cantor.close">Close</button>
                     </div>
                 `, 'warning');
             }
         } else {
-            showToast(`🔮 "${riteName}" marked as Resonant! Corruption +1.`, 'info');
+            showToast(i18nText("feature.spellcraft.components.cantor.valueMarkedAsResonantCorruption1", { value0: riteName }, "🔮 \"{{value0}}\" marked as Resonant! Corruption +1."), 'info');
         }
     }
 
@@ -1103,7 +1104,7 @@ window.cantorToggleResonantRite = function(riteName) {
 // ─── Mark Resonant (helper) ──────────────────────────────────
 
 window.cantorMarkResonant = function() {
-    showToast('Click the 🔮 button on a rite to mark it as Resonant.', 'info');
+    showToast(i18nText("feature.spellcraft.components.cantor.clickTheButtonOnARiteTo", null, "Click the 🔮 button on a rite to mark it as Resonant."), 'info');
 };
 
 // ─── Advance Corruption ───────────────────────────────────────
@@ -1121,12 +1122,12 @@ window.cantorAdvanceCorruption = function(amount = 1) {
 
     if (char.corruption >= corruptionMax) {
         if (char.boundPatron || char.patron) {
-            showToast('🌸 Corruption is full! Perform a Resonant Rite to bloom.', 'warning');
+            showToast(i18nText("feature.spellcraft.components.cantor.corruptionIsFullPerformAResonantRite", null, "🌸 Corruption is full! Perform a Resonant Rite to bloom."), 'warning');
         } else {
-            showToast('🌿 Corruption is full – but you are unbound. No bloom.', 'warning');
+            showToast(i18nText("feature.spellcraft.components.cantor.corruptionIsFullButYouAreUnbound", null, "🌿 Corruption is full – but you are unbound. No bloom."), 'warning');
         }
     } else {
-        showToast(`Corruption: ${char.corruption}/${corruptionMax}`, 'info');
+        showToast(i18nText("feature.spellcraft.components.cantor.corruptionValueValue", { value0: char.corruption, value1: corruptionMax }, "Corruption: {{value0}}/{{value1}}"), 'info');
     }
 };
 
@@ -1135,13 +1136,13 @@ window.cantorAdvanceCorruption = function(amount = 1) {
 window.cantorResetCorruption = function() {
     const char = getCharacterData();
     if (!char) return;
-    if (!confirm('Reset Corruption, Resonant Rites, and Bloom count?')) return;
+    if (!confirm(i18nText("feature.spellcraft.components.cantor.resetCorruptionResonantRitesAndBloomCount", null, "Reset Corruption, Resonant Rites, and Bloom count?"))) return;
 
     char.corruption = 0;
     char.resonantRites = [];
     char.bloomCount = 0;
     saveCharacter({ corruption: 0, resonantRites: [], bloomCount: 0 });
-    showToast('Corruption reset.', 'info');
+    showToast(i18nText("feature.spellcraft.components.cantor.corruptionReset", null, "Corruption reset."), 'info');
     window.cantorRefresh();
 };
 
@@ -1160,7 +1161,7 @@ window.cantorToggleFugalControl = function() {
     if (!char) return;
 
     if ((char.bloomCount || 0) < 7) {
-        showToast('Fugal Self only applies once you have bloomed 7 times.', 'info');
+        showToast(i18nText("feature.spellcraft.components.cantor.fugalSelfOnlyAppliesOnceYouHave", null, "Fugal Self only applies once you have bloomed 7 times."), 'info');
         return;
     }
 
@@ -1192,13 +1193,13 @@ window.cantorToggleTalent = function(talentId) {
             saveCharacter({ boundPatron: null });
         }
         char.learnedTalents.splice(index, 1);
-        showToast(`Unlearned: ${talentId}`, 'info');
+        showToast(i18nText("feature.spellcraft.components.cantor.unlearnedValue", { value0: talentId }, "Unlearned: {{value0}}"), 'info');
     } else {
         if (talentId === 'bound-patron') {
             const state = getState();
             const allPatrons = getAllPatrons(state);
             if (allPatrons.length === 0) {
-                showToast('No patrons available. Please load patron data first.', 'error');
+                showToast(i18nText("feature.spellcraft.components.cantor.noPatronsAvailablePleaseLoadPatronData", null, "No patrons available. Please load patron data first."), 'error');
                 return;
             }
             const modalHtml = `
@@ -1208,8 +1209,8 @@ window.cantorToggleTalent = function(talentId) {
                         ${allPatrons.map(p => `<option value="${p.id}">${p.icon || '🔮'} ${p.name || p.title}</option>`).join('')}
                     </select>
                     <div style="display:flex;gap:0.5rem;">
-                        <button class="btn btn-primary" id="bound-patron-confirm">Bind</button>
-                        <button class="btn btn-secondary" id="bound-patron-cancel">Cancel</button>
+                        <button class="btn btn-primary" id="bound-patron-confirm" data-i18n="feature.spellcraft.components.cantor.bind">Bind</button>
+                        <button class="btn btn-secondary" id="bound-patron-cancel" data-i18n="feature.spellcraft.components.cantor.cancel">Cancel</button>
                     </div>
                 </div>
             `;
@@ -1228,7 +1229,7 @@ window.cantorToggleTalent = function(talentId) {
                                 char.learnedTalents.push(talentId);
                             }
                             saveCharacter({ boundPatron: selected, boundPatronBonus: 1, learnedTalents: char.learnedTalents });
-                            showToast(`Bound to ${selected}`, 'success');
+                            showToast(i18nText("feature.spellcraft.components.cantor.boundToValue", { value0: selected }, "Bound to {{value0}}"), 'success');
                             window.cantorRefresh();
                             const toast = document.querySelector('.toast-container')?.lastElementChild;
                             if (toast) toast.remove();
@@ -1245,7 +1246,7 @@ window.cantorToggleTalent = function(talentId) {
             return;
         } else {
             char.learnedTalents.push(talentId);
-            showToast(`Learned: ${talentId} ✨`, 'success');
+            showToast(i18nText("feature.spellcraft.components.cantor.learnedValue", { value0: talentId }, "Learned: {{value0}} ✨"), 'success');
         }
     }
 
@@ -1263,13 +1264,13 @@ window.cantorToggleTalent = function(talentId) {
 // refresh button instead. Now this forces a real reload from disk first.
 
 window.cantorRefresh = async function() {
-    showToast('🔄 Reloading patron data from disk…', 'info');
+    showToast(i18nText("feature.spellcraft.components.cantor.reloadingPatronDataFromDisk", null, "🔄 Reloading patron data from disk…"), 'info');
     await loadPatronData(true);
     const el = document.querySelector('.cantor-container')?.parentElement || document.getElementById('spellcraft-content');
     if (el) {
         await renderCantor(el);
     }
-    showToast('✅ Cantor refreshed.', 'success');
+    showToast(i18nText("feature.spellcraft.components.cantor.cantorRefreshed", null, "✅ Cantor refreshed."), 'success');
 };
 
 // ============================================================
@@ -1286,7 +1287,7 @@ function showToastWithHTML(html, type = 'info') {
     // with a backdrop blocking the rest of the page.
     const modal = document.createElement('div');
     modal.style.cssText = `
-        position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
+        position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 9999;
         animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
@@ -1296,7 +1297,7 @@ function showToastWithHTML(html, type = 'info') {
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;
     `;
-    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()">Close</button>`;
+    inner.innerHTML = html + `<br><button class="btn btn-xs btn-secondary" onclick="this.closest('div').parentElement.remove()" data-i18n="feature.spellcraft.components.cantor.close">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
 

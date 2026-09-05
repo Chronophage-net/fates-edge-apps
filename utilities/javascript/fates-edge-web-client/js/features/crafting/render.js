@@ -29,13 +29,13 @@ export function renderRoot(char, tabContentHtml, uiState) {
                 <div class="crafting-header-left">
                     <span class="crafting-icon-lg">🔨</span>
                     <div>
-                        <span class="crafting-header-title">Crafting</span>
+                        <span class="crafting-header-title" data-i18n="feature.crafting.render.crafting">Crafting</span>
                         <span class="crafting-header-sub">${escHtml(char.name || 'Unnamed')}</span>
                     </div>
                 </div>
                 <div class="crafting-header-actions">
                     <span class="crafting-xp-display">${availableXp(char)} XP available</span>
-                    <button class="btn btn-ghost btn-xs" id="craft-refresh-btn" title="Reload wiki data">🔄</button>
+                    <button class="btn btn-ghost btn-xs" id="craft-refresh-btn" title="Reload wiki data" data-i18n-attr="title:feature.crafting.render.reloadWikiData">🔄</button>
                 </div>
             </div>
             <div class="crafting-tabs">
@@ -90,21 +90,21 @@ export function renderCraftingTab(char, ingredientMap, recipeMap, refinementMap,
                 <select id="craft-buy-select" class="crafting-select">
                     ${Object.values(ingredientMap).filter(i => !i.common).map(i => `<option value="${escHtml(i.name)}">${i.icon} ${escHtml(i.name)} — ${i.cost} XP</option>`).join('')}
                 </select>
-                <button class="btn btn-secondary btn-xs" id="craft-buy-btn">💰 Buy</button>
+                <button class="btn btn-secondary btn-xs" id="craft-buy-btn" data-i18n="feature.crafting.render.buy">💰 Buy</button>
             </div>
             <div class="crafting-inline-group">
-                <span class="crafting-hint">Batch:</span>
+                <span class="crafting-hint" data-i18n="feature.crafting.render.batch">Batch:</span>
                 <input type="number" id="craft-batch-qty" class="crafting-input crafting-input-narrow" value="${uiState.batchQuantity}" min="1" max="10" />
             </div>
             ${uiState.craftCombineSelection.length > 0 ? `
                 <button class="btn btn-gold btn-xs" id="craft-combine-btn">⚗️ Combine (${uiState.craftCombineSelection.length})</button>
                 <button class="btn btn-ghost btn-xs" id="craft-clear-combine-btn">✕</button>
-            ` : `<span class="crafting-hint">Check ingredients below to combine (up to 3)</span>`}
+            ` : `<span class="crafting-hint" data-i18n="feature.crafting.render.checkIngredientsBelowToCombineUpTo">Check ingredients below to combine (up to 3)</span>`}
         </div>
 
         <div class="panel">
             <div class="flex-between">
-                <span class="panel-title">📦 Inventory</span>
+                <span class="panel-title" data-i18n="feature.crafting.render.inventory">📦 Inventory</span>
                 <span class="crafting-hint">${ingredients.length} items</span>
             </div>
             <div class="craft-inventory-grid">
@@ -126,8 +126,8 @@ export function renderCraftingTab(char, ingredientMap, recipeMap, refinementMap,
         ${refinements.length > 0 ? `
             <div class="panel">
                 <div class="flex-between">
-                    <span class="panel-title">⚗️ Refinement (ingredient crafting)</span>
-                    <span class="crafting-hint">Turn base ingredients into advanced reagents</span>
+                    <span class="panel-title" data-i18n="feature.crafting.render.refinementIngredientCrafting">⚗️ Refinement (ingredient crafting)</span>
+                    <span class="crafting-hint" data-i18n="feature.crafting.render.turnBaseIngredientsIntoAdvancedReagents">Turn base ingredients into advanced reagents</span>
                 </div>
                 <div class="craft-refinement-grid">
                     ${refinements.map(r => renderRefinementCard(r, counts, char)).join('')}
@@ -137,7 +137,7 @@ export function renderCraftingTab(char, ingredientMap, recipeMap, refinementMap,
 
         <div class="panel">
             <div class="flex-between">
-                <span class="panel-title">📜 Recipes</span>
+                <span class="panel-title" data-i18n="feature.crafting.render.recipes">📜 Recipes</span>
                 <div class="crafting-inline-group crafting-recipe-filters">
                     <input type="text" id="recipe-search" class="crafting-input" placeholder="Search..." value="${escHtml(uiState.recipeSearchQuery)}" />
                     <select id="recipe-skill-filter" class="crafting-select">
@@ -158,7 +158,7 @@ export function renderCraftingTab(char, ingredientMap, recipeMap, refinementMap,
 
         <div class="panel">
             <div class="flex-between">
-                <span class="panel-title">🎒 Crafted Items</span>
+                <span class="panel-title" data-i18n="feature.crafting.render.craftedItems">🎒 Crafted Items</span>
                 <span class="crafting-hint">${crafted.length} on hand</span>
             </div>
             <div class="craft-crafted-list">
@@ -169,7 +169,7 @@ export function renderCraftingTab(char, ingredientMap, recipeMap, refinementMap,
 
         ${log.length > 0 ? `
             <div class="crafting-log">
-                <div class="crafting-log-title">📋 Recent Crafts</div>
+                <div class="crafting-log-title" data-i18n="feature.crafting.render.recentCrafts">📋 Recent Crafts</div>
                 ${log.slice(0, 5).map(entry => `
                     <div class="crafting-log-entry">
                         <span>${entry.icon || '🔧'} ${escHtml(entry.name)}${entry.quality ? ` (${entry.quality})` : ''}</span>
@@ -298,7 +298,7 @@ export function renderCodexTab(char, codex, uiState) {
     return `
         <div class="panel">
             <div class="flex-between">
-                <span class="panel-title">🔗 Attuned Items</span>
+                <span class="panel-title" data-i18n="feature.crafting.render.attunedItems">🔗 Attuned Items</span>
                 <span class="crafting-hint">${attuned.length}/${ATTUNEMENT_LIMIT}</span>
             </div>
             <div class="attuned-list">
@@ -309,8 +309,8 @@ export function renderCodexTab(char, codex, uiState) {
 
         <div class="panel">
             <div class="flex-between">
-                <span class="panel-title">📖 Codex</span>
-                <span class="crafting-hint">Magic items, consumables &amp; artifacts</span>
+                <span class="panel-title" data-i18n="feature.crafting.render.codex">📖 Codex</span>
+                <span class="crafting-hint" data-i18n="feature.crafting.render.magicItemsConsumablesArtifacts">Magic items, consumables &amp; artifacts</span>
             </div>
             <div class="codex-filters">
                 ${Object.keys(CATEGORY_META).map(cat => `
@@ -403,16 +403,16 @@ export function renderNoCharacterView(characters) {
     return `
         <div class="crafting-container crafting-empty-state">
             <div class="crafting-empty-icon">🔨</div>
-            <h2 class="crafting-empty-title">Select a Character</h2>
+            <h2 class="crafting-empty-title" data-i18n="feature.crafting.render.selectACharacter">Select a Character</h2>
             <p class="crafting-empty-text">Pick a character to forage ingredients, work recipes, and browse the Codex.</p>
             <div class="crafting-empty-actions">
                 ${characters.length > 0 ? `
                     <select id="crafting-char-select" class="crafting-select crafting-char-select">
-                        <option value="">— Choose a character —</option>
+                        <option value="" data-i18n="feature.crafting.render.chooseACharacter">— Choose a character —</option>
                         ${characters.map(c => `<option value="${escHtml(c.id)}">${escHtml(c.name || 'Unnamed')}</option>`).join('')}
                     </select>
                 ` : `<p class="crafting-empty-text">No characters yet — create one on the Characters tab first.</p>`}
-                <button class="btn btn-gold" id="craft-go-to-vtt-btn">🎯 Go to VTT</button>
+                <button class="btn btn-gold" id="craft-go-to-vtt-btn" data-i18n="feature.crafting.render.goToVTT">🎯 Go to VTT</button>
             </div>
         </div>
     `;
@@ -438,7 +438,7 @@ export function renderCraftResultToast({ recipe, quantity, pool, dv, position, r
             ${missing.length > 0 ? `<div class="craft-result-missing">Working without: ${missing.map(escHtml).join(', ')} — that is why this was Desperate</div>` : ''}
             ${(itemsCreated[0] && itemsCreated[0].flaw) ? `<div class="craft-result-missing"><strong>Flaw — ${escHtml(itemsCreated[0].flaw.name)}:</strong> ${escHtml(itemsCreated[0].flaw.effect)}</div>` : ''}
             ${itemsCreated.length > 0 ? `<div class="craft-result-created">Created ${itemsCreated.length} item${itemsCreated.length > 1 ? 's' : ''}</div>` : ''}
-            <button class="btn btn-secondary btn-xs craft-result-close" type="button">Close</button>
+            <button class="btn btn-secondary btn-xs craft-result-close" type="button" data-i18n="feature.crafting.render.close">Close</button>
         </div>
     `;
 }

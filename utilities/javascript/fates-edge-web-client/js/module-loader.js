@@ -2,6 +2,7 @@
 
 import { setHtml } from './core/utils.js';
 import { syncManager } from './core/sync/index.js';
+import { applyTranslations } from './core/i18n.js';
 
 class ModuleLoader {
     constructor() {
@@ -118,8 +119,8 @@ class ModuleLoader {
                     setHtml(el, `
                         <div class="panel">
                             <h3>📄 ${moduleName}</h3>
-                            <p class="text-muted">Module loaded but no render function found.</p>
-                            <p class="text-muted small" style="font-size:0.8rem;color:var(--text3);">Please check exports.</p>
+                            <p class="text-muted" data-i18n="feature.module-loader.moduleLoadedButNoRenderFunctionFound">Module loaded but no render function found.</p>
+                            <p class="text-muted small" style="font-size:0.8rem;color:var(--text3);" data-i18n="feature.module-loader.pleaseCheckExports">Please check exports.</p>
                         </div>
                     `);
                 };
@@ -147,6 +148,7 @@ class ModuleLoader {
                         const container = this._container;
                         const scrollPos = container.scrollTop;
                         await this.render(container);
+                        applyTranslations(container);
                         if (scrollPos > 0) container.scrollTop = scrollPos;
                         this._lastRender = Date.now();
                     }
@@ -207,7 +209,7 @@ class ModuleLoader {
             } else {
                 setHtml(container, `
                     <div class="panel">
-                        <h3>⚠️ Error</h3>
+                        <h3 data-i18n="feature.module-loader.error">⚠️ Error</h3>
                         <p class="text-muted">Module "${moduleName}" has no render function.</p>
                     </div>
                 `);
@@ -217,6 +219,11 @@ class ModuleLoader {
             if (typeof module.onActivate === 'function') {
                 await module.onActivate();
             }
+
+            // Feature modules build most of their interface at runtime. Apply
+            // their data-i18n annotations after both render and activation so
+            // a newly opened route appears directly in the active language.
+            applyTranslations(container);
 
             // Let collaborators see which tab everyone's looking at (richer presence).
             // Best-effort: setActiveView() itself no-ops safely if sync isn't connected.
@@ -231,8 +238,8 @@ class ModuleLoader {
         } catch (error) {
             console.error(`Failed to render module "${moduleName}":`, error);
             setHtml(container, `
-                <div class="panel" style="border-left:4px solid var(--danger);">
-                    <h3 style="color:var(--danger);">❌ Error loading module</h3>
+                <div class="panel" style="border-inline-start:4px solid var(--danger);">
+                    <h3 style="color:var(--danger);" data-i18n="feature.module-loader.errorLoadingModule">❌ Error loading module</h3>
                     <p class="text-muted">${error.message || 'Unknown error'}</p>
                     <pre style="font-size:0.7rem;background:var(--bg3);padding:0.5rem;overflow:auto;max-height:150px;">${error.stack || ''}</pre>
                     <button class="btn btn-primary mt-1" onclick="window.moduleLoader?.retryModule('${moduleName}')">
@@ -272,6 +279,7 @@ class ModuleLoader {
             await module.render(module._container);
             module._lastRender = Date.now();
         }
+        if (module._container) applyTranslations(module._container);
     }
 
     /**
@@ -290,6 +298,7 @@ class ModuleLoader {
             await module.render(module._container);
             module._lastRender = Date.now();
         }
+        if (module._container) applyTranslations(module._container);
     }
 
     /**

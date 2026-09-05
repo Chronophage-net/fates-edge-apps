@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — Guía del jugador — Capítulo 2: Creación de personajes (Español)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    p.subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 1rem; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    dl { margin: 0.4rem 0 0.6rem 0.4rem; }
+    dt { color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1.2rem; color: var(--text2); }
+    .multicols { column-count: 2; column-gap: 2rem; }
+    @media (max-width: 600px) { .multicols { column-count: 1; } }
+    .tree { margin: 0.4rem 0 0.4rem 1rem; }
+    .tree ul { list-style: none; border-left: 1px dashed var(--border); margin-left: 0.6rem; padding-left: 0.9rem; }
+    .tree > ul { border-left: none; margin-left: 0; padding-left: 0; }
+    .tree li { margin: 0.25rem 0; }
+    .branch-label { color: var(--orange); font-weight: 600; font-size: 0.8rem; }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body><aside class="translation-notice" lang="es">Versión en español. Traducción asistida; revisión editorial integral pendiente. <a href="../players-guide/Players-_-Guide-_-02-_-Character-_-Creation.html" hreflang="en">Consultar el original en inglés</a></aside>
+<h1>Características de creación Resumen</h1>
+<p class="subtitle">Fate's Edge Guía del jugador — Capítulo 2</p>
+<div class="panel panel-blue">
+<span class="panel-title">Inicio rápido</span>
+    Este capítulo te lleva a través de la construcción de un personaje en aproximadamente 10–15 minutos. Siga los pasos en orden. La mayoría de las opciones son guiadas por su concepto de personaje; los números vienen más tarde.
+</div>
+<h2 id="mindset">Cómo pensar como un Fate's Edge Jugador Principal</h2>
+<p>Antes de asignar un solo punto de XP, tome un momento para entender la mentalidad que hace que Fate's Edge cante. Esto no es un juego de optimización o construcción perfecta — es un juego de opciones significativas, riesgos dramáticos, y narración compartida.</p>
+<h3>Abrace la Ficción</h3>
+<p>Tu personaje no es una colección de números — son una historia viviente. Cuando declaras una acción, piensa primero en lo que tu personaje haría en este momento, y sólo entonces deja que los mecánicos sigan. Los dados no son una barrera para tu creatividad; son un compañero de conversación. Un tirada de 1 no es un fracaso — es una invitación para que el mundo vuelva a empujar, y que empujar hacia atrás es lo que hace la historia memorable.</p>
+<h3>Pasa tu Bonos</h3>
+<p>Bonos no son XP tokens. Son combustible dramático. Acercándolos para la conversión (2 Bonos → 1 XP) muere de hambre la mesa de la tensión y le roba de su red de seguridad. Bono gastado para re-rollar un fallo crítico o mejorar la Posición antes de una apuesta desesperada crea un momento que todos en la mesa recordarán. XP vendrá de tus aventuras; el Bonos son para las historias que cuenta ahora mismo.</p>
+<h3>Acepta el fallo</h3>
+<p>Un fallo nunca es "nada sucede." Es una oportunidad para que el DJ escalar, para que su personaje aprenda, y para que la fiesta se adapte. Cuando usted falla, usted gana 2 Bonos — el sistema le recompensa por apoyarse en el riesgo. Trate cada fallo como un regalo: cambia la situación, le da recursos, y hace el éxito final.</p>
+<h3>Eres un Co-Creator</h3>
+<p>El DJ enmarca la presión; usted conduce la ficción. Usted no está tratando de "comer" el juego o supera el ritmo DJ. Usted está colaborando para contar una historia convincente. Cuando usted describe sus acciones con detalles — mostrando el polvo en tus ojos, el temblor en tu brazo, la oración desesperada que murmuras — que da la DJ permiso para recompensarte con Posición, Efecto, o incluso con un BonoFlavor es gratis, y es tu mayor herramienta.</p>
+<h3>Conozca sus recursos</h3>
+<p>Usted rastrea su propia Obligación, Fatiga, Daño, y Bonos. Mantenga su hoja visible y sus rastreadores hasta la fecha. Cuando su Obligación está cerca de la capacidad, eso no es una advertencia — es una promesa de aventura futura. Cuando su Fatiga es alta, eso no es una penalización — es una oportunidad para un regreso dramático y utilizar sus recursos narrativos.</p>
+<h3>Confiar en el sistema</h3>
+<p>El bucle de núcleo (Attribute + La habilidad, la posición, DV, Matriz de Resultado) es lo suficientemente robusto para llevar cualquier escena. Si olvidas una regla, retrocede sobre la Regla de Oro: haz la elección que sirve la historia. El resto seguirá.</p>
+<h3>Juega a Find Out</h3>
+<p>No sabes cómo terminará la escena más que lo que hace DJ. Esa incertidumbre es el latido del juego. Inclínate en ella. Haz preguntas, toma riesgos y deja que los dados canten. Las sesiones más memorables vienen de personajes que actúan audazmente y aceptan las consecuencias.</p>
+<blockquote>
+"El camino no promete un viaje seguro — sólo un verdadero."
+<span class="attribution">— El Gray Wanderer sugiere</span>
+</blockquote>
+<h2 id="engagement-flowchart">Participación del jugador Flowchart genes</h2>
+<p>Fate's Edge es modular por diseño. Puedes jugar con sólo el bucle de resolución central y nada más — o puedes añadir capas de complejidad a medida que tu tabla se sienta cómoda. El siguiente diagrama de flujo te ayuda a navegar esa opción. Empieza en la parte superior y sigue el camino que coincide con tu estilo de juego preferido. Recuerda: siempre puedes optar por (o salir) de subsistemas a medida que tu personaje evoluciona y la demanda de campaña.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Complejidad Opt-In Flowchart para Fate's Edge Jugadores</span>
+<div class="tree">
+<ul>
+<li><strong>Empieza aquí:</strong> ¿Qué quieres?
+            <ul>
+<li><span class="branch-label">¿Sólo juega con la resolución central?</span>
+<ul>
+<li><span class="branch-label">Sí →</span> <strong>Core Loop Sólo existe</strong> — Atributos + Habilidades, no talentos, no activos.</li>
+<li><span class="branch-label">No →</span> ¿Quieres un borde de firma?
+                            <ul>
+<li><span class="branch-label">No →</span> Toma 1–2 <strong>Los talentos menores</strong>, luego continuar: ¿Quieres magia?</li>
+<li><span class="branch-label">Sí →</span> ¿Quieres magia?
+                                    <ul>
+<li><span class="branch-label">No →</span> Elija un elemento <strong>Patron + un camino mágico</strong>, luego continuar: ¿Quieres influencia fuera de la pantalla?</li>
+<li><span class="branch-label">Sí →</span> ¿Quieres influencia fuera de la pantalla?
+                                            <ul>
+<li><span class="branch-label">No →</span> Adquirir un compromiso <strong>recurso o Follower</strong>, luego continuar: ¿Quieres construir un legado compartido?</li>
+<li><span class="branch-label">Sí →</span> ¿Quieres construir un legado compartido?
+                                                    <ul>
+<li><span class="branch-label">No →</span> Forma a una <strong>Confianza</strong> con su partido.</li>
+<li><span class="branch-label">Sí →</span> <strong>¡Mezcla y combina todas las capas!</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<h3>Cómo utilizar este Flowchart genes</h3>
+<ul>
+<li><strong>Sólo loop de núcleo:</strong> Perfecto para unas fotos o jugadores que quieren una experiencia narrativa pura. Todavía eres totalmente eficaz en cualquier escena — Los atributos y habilidades te dan un montón de dados.</li>
+<li><strong>Talentos menores:</strong> Agregue uno o dos movimientos de firma (por ejemplo, Keen Senses, Second Wind) para darle a su personaje una identidad mecánica sin mucho sobrecabezamiento.</li>
+<li><strong>Patron + Magic: ganancias</strong> Elige un Patrón y uno de los cinco caminos mágicos (guardián de runas, Invoker, Cantor, Summoner, o Free Caster). Esto añade seguimiento de recursos (Obligación, Corrupción, etc.) pero abre nuevas posibilidades narrativas y mecánicas.</li>
+<li><strong>recursos/Siguientes:</strong> Extender su influencia más allá de su ficha de personajes. recursos son recursos fuera de pantalla; Los seguidores son aliados en pantalla. Ambos requieren mantenimiento pero proporcionan una ventaja duradera.</li>
+<li><strong>Confianzas:</strong> Pool XP con su partido para construir una organización compartida — un gremio, una empresa mercante, una red de espías. Esto es para campañas a largo plazo y legado colectivo.</li>
+<li><strong>Mezcla y partido:</strong> Usted puede combinar cualquiera o todas estas capas. El sistema es modular; usted no está encerrado en un solo camino. Usted puede comenzar simple y añadir complejidad a medida que su campaña evoluciona.</li>
+</ul>
+<h3>Una nota sobre la evolución</h3>
+<p>Nunca se penaliza por elegir un camino más simple. Un personaje con altos atributos y habilidades es tan capaz como uno con muchos talentos y patrones — simplemente expresan su poder de manera diferente. El juego equilibra la amplitud contra la profundidad, y ambos son válidos. Elige lo que te excita y cambia de opinión más tarde. El camino es largo, y el Gray Wanderer lo camina con usted.</p>
+<h2 id="overview">Información general</h2>
+<p>Con la filosofía y el marco de opt-in en mente, usted está listo para construir su personaje. Usted comienza en <strong>Tier I (Novicio)</strong> con <strong>32 puntos de experiencia (XP)</strong>. vínculos y las complicaciones pueden añadir hasta <strong>+ 4 XP</strong> entre ellos — +2 una pieza, cuatro totales, sin embargo usted los dividió (ver Paso 8). Máximo comienzo XP: <strong>36</strong>.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Paso</th><th>Dónde encontrar reglas</th><th>Tiempo</th></tr></thead>
+<tbody>
+<tr><td><a href="#step1">1. Concepto &amp;</a></td><td>Aquí; tabla patrimonial en el Capítulo 12</td><td>2 min vender</td></tr>
+<tr><td><a href="#step2">2.</a></td><td>Core Mechanics capítulo</td><td>2 min vender</td></tr>
+<tr><td><a href="#step3">3. Habilidades</a></td><td>Core Mechanics capítulo</td><td>2 min vender</td></tr>
+<tr><td><a href="#step4">4. Talentos (opcional)</a></td><td>Talentos capítulo interino</td><td>3 min vender</td></tr>
+<tr><td><a href="#step5">5. Patron (opcional)</a></td><td>Capítulo Poderes del mundo y patrones</td><td>2 min vender</td></tr>
+<tr><td><a href="#step6">6. Afinidad cultural</a></td><td>Mundo, Regiones &amp; Culturas capítulo interino</td><td>1 min vender</td></tr>
+<tr><td><a href="#step7">7. recursos &amp; Seguidores (opcional)</a></td><td>recursos &amp;</td><td>1 min vender</td></tr>
+<tr><td><a href="#step8">8. vínculos &amp;</a></td><td>Aquí</td><td>2 min vender</td></tr>
+<tr><td><a href="#step9">9. Engranaje &amp;</a></td><td>Aquí</td><td>1 min vender</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="step1">Paso 1 — Concepto &amp;</h2>
+<p>Escribe una frase que describe el comportamiento de tu personaje <strong>origen, profesión y una característica determinante</strong>. Ejemplos:</p>
+<ul>
+<li>"Un túnel de Aeler que perdió su cuenta de aliento y ahora escucha la piedra cantar."</li>
+<li>"Un duelista Vhasian con una cara asustada y un voto para no perder nunca más."</li>
+<li>"Un portaaviones ykrul que le debe un precio de sangre a un clan rival".</li>
+</ul>
+<p>Entonces elija su compromiso <strong>patrimonio</strong> — la gente a la que naciste. El patrimonio no cuesta nada y no concede dados. <strong>Posición</strong>: un paso mejor en los tiradas que juegan a las fortalezas de tu gente, un paso peor en lo que nunca fueron construidos para.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Herencia</th><th>Afinidad (+1 Posición)</th><th>Límite (−1 Posición)</th></tr></thead>
+<tbody>
+<tr><td><strong>Aeler avance</strong> (bajo la montaña)</td><td>Cuerpo <em>o</em> Artesanía</td><td>Presencia</td></tr>
+<tr><td><strong>Aelinnel avance</strong> (pequeño folk, protocolo)</td><td>Ingenio <em>o</em> Artesanía</td><td>Cuerpo</td></tr>
+<tr><td><strong>Aelaerem vencer</strong> (pequeño pueblo, corazón)</td><td>Presencia <em>o</em> Sigilo</td><td>Cuerpo</td></tr>
+<tr><td><strong>Lethai-al</strong> (de los bosques)</td><td>Ingenio <em>o</em> Sigilo</td><td>Presencia</td></tr>
+<tr><td><strong>Lethai-thora</strong> (de las escuelas)</td><td>Ingenio <em>o</em> Saber</td><td>Cuerpo</td></tr>
+<tr><td><strong>Lethai-ar</strong> (del Valle de Crimson)</td><td>Presencia <em>o</em> Subterfugio</td><td>Espíritu</td></tr>
+<tr><td><strong>Ykrul encargada</strong> (de la estepa)</td><td>Cuerpo <em>o</em> Aguante</td><td>Presencia</td></tr>
+<tr><td><strong>Narethi</strong></td><td>Espíritu <em>o</em> Arcana</td><td>Cuerpo</td></tr>
+<tr><td><strong>Humano</strong> (cualquier cultura)</td><td>Cualquier habilidad en la que usted tiene <em>no</em> clasificación</td><td>Ninguno</td></tr>
+<tr><td><strong>Mezclado</strong></td><td>Un padre es Affinity</td><td>El límite del otro padre</td></tr>
+</tbody>
+</table>
+</div>
+<div class="panel panel-gold">
+<span class="panel-title">Cómo Afinidad y Limit Labor</span>
+<ul>
+<li>Cada uno es uno <strong>Atributo</strong> y (para la afinidad) una sola <strong>Habilidad</strong>. Si el tirada usa, el paso se aplica.</li>
+<li><strong>Ellos cancelan.</strong> Un tirada que toca tanto su Afinidad como su Límite es simplemente sin modificar.</li>
+<li><strong>No apilan con ellos mismos.</strong> Un tirada usando tu Affinity Attribute genes <em>y</em> tu habilidad de afinidad todavía mejora la posición por un paso, no dos.</li>
+<li><strong>La escalera termina.</strong> La posición corre Desesperada → Controlada → Dominant. Mejor que Dominant es todavía Dominant; nunca se convierte en dados.</li>
+</ul>
+<p class="mt-1 text-sm text-muted">Los escritos completos de cada pueblo están en el Capítulo 12 (Mundo, Regiones y Culturas).</p>
+</div>
+<h2 id="step2">Paso 2 —</h2>
+<p>Tienes cuatro personajes <strong>Atributos</strong> (1–5). Pasar XP para elevarlos de una base de 1 cada uno.</p>
+<p><strong>Costo:</strong> Cada paso cuesta <strong>× 3 XP</strong>. Esto es incremental:</p>
+<ul>
+<li>1 → 2 cuesta 6 XP (2 × 3)</li>
+<li>2 → 3 cuesta 9 XP (3 × 3)</li>
+<li>3 → 4 cuesta 12 XP (4 × 3)</li>
+<li>4 → 5 cuesta 15 XP (5 × 3)</li>
+</ul>
+<p>Así que la crianza de un atributo de 1 a 3 costos 6 + 9 = <strong>15 XP en total</strong>.</p>
+<p><strong>Rangos de inicio recomendados:</strong></p>
+<ul>
+<li>Atributo primario (el que más usas): <strong>3</strong> (costos 15 XP total: 1→ 2 = 6, 2→ 3 = 9)</li>
+<li>Atributos secundarios: <strong>2</strong> cada uno (costos 6 XP cada uno: 1→ 2 = 6)</li>
+</ul>
+<p><strong>Ejemplo:</strong> Body 3 (en inglés)1→2 = 6, 2→3 = 9 → total 15 XP), Ingenio 2 (en inglés)1→2 = 6 XP) → 21 XP el Espíritu y la Presencia permanecen en 1.</p>
+<h2 id="step3">Paso 3 — Habilidades específicas</h2>
+<p>Elija <strong>Habilidades</strong> (0–5) que coinciden con su concepto. <strong>Principales habilidades</strong> (utilizado a menudo) debe ser 2–3; otros 0–1.</p>
+<p><strong>Costo:</strong> Cada paso cuesta <strong>nuevo nivel × 2 XP</strong>. Esto es incremental:</p>
+<ul>
+<li>0 → 1 cuesta 2 XP (1 × 2)</li>
+<li>1 → 2 cuesta 4 XP (2 × 2)</li>
+<li>2 → 3 cuesta 6 XP (3 × 2)</li>
+<li>3 → 4 cuesta 8 XP (4 × 2)</li>
+<li>4 → 5 cuesta 10 XP (5 × 2)</li>
+</ul>
+<p>Así que la elevación de una habilidad de 0 a 2 costos 2 + 4 = <strong>6 XP en total</strong>.</p>
+<p><strong>Total de inicio recomendado:</strong> Gastar <strong>8–12 XP</strong> sobre habilidades.</p>
+<p><strong>Ejemplo:</strong> Melee 2 (en inglés)0→1 = 2, 1→2 = 4 → total 6 XP), Atletismo 1 (en inglés)0→1 = 2 XPEndurance 1 (en inglés)0→1 = 2 XP) → total 10 XP.</p>
+<h2 id="step4">Paso 4 —</h2>
+<div class="panel panel-blue">
+<span class="panel-title">No necesitas talentos para ser eficaz</span>
+    Un personaje con <strong>sólo atributos y habilidades</strong> es un personaje completo y viable — <em>especialmente en Tier I</em>.
+    <p class="mt-1">Los talentos son corrientes <strong>extras opcionales</strong>. Ellos le dan un filo de firma, pero no son necesarios para contribuir significativamente a la fiesta. Un Cuerpo 3 + Melee 2 guerrero sin Talentos todavía está tirando los dados 5 dados en combate. Un Espíritu 3 + Lore 2 académico sin Talentos todavía está tirando los dados 5 dados para recordar secretos antiguos.</p>
+<p class="mt-1"><strong>Comience simple.</strong> Tomar 0–2 Talentos. Añadir más a medida que creces. El sistema está diseñado para que los atributos y habilidades hagan el levantamiento pesado.</p>
+</div>
+<p>Los talentos son habilidades especiales. <strong>0–3 talentos</strong>. Muchos conceptos funcionan bien con dos talentos menores (2–3 XP cada uno) o con un talento importante (4–6 XP). <strong>cero</strong> Talentos — sus Atributos y Habilidades son suficientes.</p>
+<p><strong>talentos de acceso mágico (si quieres magia):</strong></p>
+<ul>
+<li><strong>Spellcraft (6 XP</strong> — casting libre</li>
+<li><strong>Familiar (2 XP) + Códice (4 XP)</strong> — guardián de runas (rites)</li>
+<li><strong>Símbolo del patrón (4 XP)</strong> — Invocador (rituales)</li>
+<li><strong>Sendero del Cantor (8 XP)</strong> — Cantor (canciones)</li>
+<li><strong>Pact-Whisperer (2 XP) + Menosser Pactwright (2 XP)</strong> — Invocador</li>
+</ul>
+<p><strong>talentos no mágicos (ejemplos):</strong></p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Talento</th><th>Costo</th><th>Efecto</th></tr></thead>
+<tbody>
+<tr><td><em>Ninguno</em></td><td><em>0 XP</em></td><td><em>Un personaje válido y completo. Atributos + Las habilidades hacen el trabajo.</em></td></tr>
+<tr><td>Keen Senses prevalece</td><td>2 XP</td><td>+1 mueren a las comprobaciones de percepción.</td></tr>
+<tr><td>Defensivo Survival</td><td>3 XP</td><td>+1 mueren a la defensa de la melee, convierten Daño a Fatiga.</td></tr>
+<tr><td>Weapon Mastery guiar</td><td>5 XP</td><td>+2 dados con un arma elegida.</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-muted">Vea el capítulo de Talentos para la lista completa.</p>
+<h2 id="step5">Paso 5 — Patron (Optional)</h2>
+<p>Si tu personaje usa magia a través de un signo <strong>Patrón</strong>, elegir uno (ver el capítulo de Poderes y Obligación Mundial). Los seis recomendados para los primeros personajes son:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Patrón</th><th>El me</th></tr></thead>
+<tbody>
+<tr><td>El juramento de la llama &amp; Luz</td><td>votos, radiancia, smiting</td></tr>
+<tr><td>El viajero</td><td>caminos, paso seguro</td></tr>
+<tr><td>Inaea (Ángel de la Araña)</td><td>misericordia, comunidad</td></tr>
+<tr><td>El testigo</td><td>verdad, memoria</td></tr>
+<tr><td>Rey de la Carroña</td><td>decaimiento, renovación</td></tr>
+<tr><td>Ikasha (Ella que duerme)</td><td>sombras, secretos</td></tr>
+</tbody>
+</table>
+</div>
+<p>Tú lo haces <strong>no</strong> necesita un Patrón si usted es una castra libre (Spellcraft) o una psion (opcional).</p>
+<h2 id="step6">Paso 6 — Afinidad cultural</h2>
+<p>Tu herencia es quién es tu gente. <strong>afinidad cultural</strong> es donde usted fue criado — y que a menudo no son el mismo lugar. Elija una región del Capítulo 12 (Mundo, Regiones y Culturas). Concede un beneficio una vez por sesión extraído de cómo ese lugar realmente hace las cosas.</p>
+<p><strong>Acumulación.</strong> Su herencia Afinidad y su afinidad cultural son cosas separadas y ambos pueden aparecer en una escena — pero si ambos mejorarían la Posición en el mismo tirada, usted obtiene ganancias <strong>un paso, no dos</strong>. Posición tiene tres peldaños; no hay ninguna parte por encima de Dominant para ir.</p>
+<h2 id="step7">Paso 7 — recursos &amp;</h2>
+<p>Usted puede pasar XP en:</p>
+<ul>
+<li><strong>Menor recurso (4 XP)</strong> —, por ejemplo, un refugio, un taller comercial</li>
+<li><strong>Seguidor (Cap² XP</strong> —, por ejemplo, Cap 2 scout (4 XP), Teniente Cap 3 (9 XP)</li>
+</ul>
+<p>La mayoría de los personajes iniciales saltan estos o toman un activo menor. Vea el recursos &amp;</p>
+<h2 id="step8">Paso 8 — vínculos &amp;</h2>
+<p><strong>vínculos:</strong> Establecer <strong>hasta dos lazos</strong> con otros personajes de jugador. Cada bono otorga un único por sesión Bono cuando actúa en él con una descripción intrincada. En los bonos Tier III (90 + XP) también permiten transferencias Bono.</p>
+<p><strong>Complicaciones:</strong> Usted puede tomar hasta llegar a <strong>dos complicaciones</strong> (por ejemplo, una pelea, un objeto maldecido, una deuda). <strong>+ 2 XP</strong> pero cada personaje con una complicación añade <strong>+1 banked Punto narrativo</strong> trabajar con su DJ.</p>
+<p class="text-sm text-muted">Vea el capítulo de Antecedentes para ejemplos.</p>
+<h2 id="step9">Paso 9 — Engranaje &amp; Final Touches</h2>
+<p><strong>Aparatos de arranque (supuesto):</strong></p>
+<ul>
+<li>Un conjunto de ropa apropiada para su cultura</li>
+<li>Un arma de meleo ligero o arma de alcance con municiones</li>
+<li>Armadura ligera (si su concepto lo exige)</li>
+<li>Una mochila, una piel de agua, 1d6 días de raciones, un cuchillo de la utilidad, peinado y acero, una pequeña linterna o vela anticipada</li>
+<li>Cualquier herramienta necesaria para sus habilidades (por ejemplo, cerraduras, kit de sanador, materiales de escritura)</li>
+</ul>
+<p>Para equipo especial (armas pesadas, armas pesadas, objetos mágicos), gastar XP o adquirirlos a través del juego.</p>
+<p><strong>Recuento final de XP:</strong></p>
+<ul>
+<li>Comienzo con <strong>32 XP</strong>.</li>
+<li>Añadir <strong>+ 2 XP</strong> para cada vínculo o Complicación que usted toma, a un máximo combinado de <strong>+4</strong>.</li>
+<li>Inicio máximo XP: <strong>36</strong>.</li>
+</ul>
+<p><strong>Pasarlo todo.</strong> Comenzando XP no se puede financiar — nada que deje unspent simplemente se ha ido.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Desembarco exactamente en 32</span>
+    Los atributos cuestan en varios de 3 y Habilidades en múltiples de 2, por lo que los edificios tienen un hábito de detener un punto corto. Dos maneras baratas de cerrar la brecha: a <strong>Cap 1 Seguidor</strong> (1 XP — un aprendiz, un sabueso, un corredor que conoce los callejones) o un Talento con un precio impar, como demuestra <em>Defensivo Survival</em> (3 XP <em>Weapon Mastery guiar</em> (5 XP). Ambos se muestran en las construcciones siguientes.
+</div>
+<h2 id="build-examples">Construir Ejemplos</h2>
+<p>Seis personajes completos, cada gasto <strong>exactamente 32 XP</strong>. Cada uno de ellos hace tirar los dados un cinco-reserva de dados en su especialidad. Ninguno de ellos necesita más de un Talento; dos no necesitan nada. Cada entrada termina con lo que hacer con el método <strong>+ 4 XP</strong> si su mesa toma vínculos y Complicaciones.</p>
+<h3>Construir 1: El Duelista</h3>
+<ul>
+<li><strong>Atributos:</strong> Cuerpo 3 (15), Ingenio 2 (6) → <strong>21</strong></li>
+<li><strong>Habilidades:</strong> Melee 2 (en inglés)6) → <strong>6</strong></li>
+<li><strong>Talentos:</strong> Mastería de arma (5) → <strong>5</strong></li>
+<li><strong>Total: 32 XP</strong></li>
+</ul>
+<p><strong>Piscina:</strong> Cuerpo 3 + Melee 2 = 5 dados — 7 con su hoja elegida. Cerebro y letal: ella tiene una respuesta, y es una respuesta muy buena.</p>
+<p><strong>Con + 4:</strong> Atletismo 1 (2) y resistencia 1 (2), para que pueda perseguir y para que pueda durar.</p>
+<h3>Build 2: El Scholar vender <span class="text-sm text-muted">(sin talentos)</span></h3>
+<ul>
+<li><strong>Atributos:</strong> Ingenio 2 (6), Espíritu 2 (6), Presencia 2 (6) → <strong>18</strong></li>
+<li><strong>Habilidades:</strong> Saber 3 (12), Perspicacia 1 (2) → <strong>14</strong></li>
+<li><strong>Total: 32 XP</strong></li>
+</ul>
+<p><strong>Piscina:</strong> Ingenio 2 + Lore 3 = 5 dados. Tenga en cuenta el comercio: compró profundidad en el <em>Habilidad</em> más que el Atributo, que es más barato, y pasó la diferencia en ser competente en todas partes. Los mismos cinco dados en su especialidad; un personaje mucho más redondo fuera de ella.</p>
+<p><strong>Con + 4:</strong> Insight 1 (2) y Sway 1 (2) — las dos habilidades que convierten lo que sabe en lo que hace la gente.</p>
+<h3>Construir 3: El Explorador</h3>
+<ul>
+<li><strong>Atributos:</strong> Ingenio 3 (15), Body 2 (6) → <strong>21</strong></li>
+<li><strong>Habilidades:</strong> Sigilo 2 (6), Atletismo 1 (2) → <strong>8</strong></li>
+<li><strong>Talentos:</strong> Sentidos agudos (2) → <strong>2</strong></li>
+<li><strong>Seguidor:</strong> rastreo de sabuesos, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Total: 32 XP</strong></li>
+</ul>
+<p><strong>Piscina:</strong> Ingenio 3 + Stealth 2 = 5 dados; 6 cuando ella está buscando algo. El sabueso es el punto extraño, y será la razón por la que sobrevive una noche.</p>
+<p><strong>Con + 4:</strong> La resistencia 1 (2) e Insight 1 (2) — las piernas a seguir y el sentido a saber cuándo no hacerlo.</p>
+<h3>Construir 4: El curador</h3>
+<ul>
+<li><strong>Atributos:</strong> Espíritu 3 (15), Ingenio 2 (6) → <strong>21</strong></li>
+<li><strong>Habilidades:</strong> Artesanía 2 (6), Insight 1 (2) → <strong>8</strong></li>
+<li><strong>Talentos:</strong> Sobrevivencia defensiva (3) → <strong>3</strong></li>
+<li><strong>Total: 32 XP</strong></li>
+</ul>
+<p><strong>Piscina:</strong> Spirit 3 + Artesanía 2 = 5 dados. Survival defensivo le permite convertir Daño a Fatiga, que es todo el trabajo: él es el que todavía tiene que estar de pie después.</p>
+<p><strong>Con + 4:</strong> Lore 1 (2) y Athletics 1 (2) — o Familiar (2) más un punto de habilidad, si se dirige hacia el camino guardián de runas.</p>
+<h3>Construir 5: El Comandante interino</h3>
+<ul>
+<li><strong>Atributos:</strong> Presencia 3 (15), Ingenio 2 (6) → <strong>21</strong></li>
+<li><strong>Habilidades:</strong> Persuasión 2 (6), Perspicacia 1 (2), Saber 1 (2) → <strong>10</strong></li>
+<li><strong>Seguidor:</strong> heraldo, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Total: 32 XP</strong></li>
+</ul>
+<p><strong>Piscina:</strong> Presencia 3 + Sway 2 = 5 dados. Sin talentos en absoluto. El heraldo no es una guardaespaldas — es una voz que llega antes de que lo haga, que es a menudo el arma más útil.</p>
+<p><strong>Con + 4:</strong> Presencia del Comando (4), si la campaña de su DJ tiene un campo de batalla en él. De lo contrario Decepción 1 y Melee 1.</p>
+<h3>Construir 6: El Rogue</h3>
+<ul>
+<li><strong>Atributos:</strong> Ingenio 3 (15), Body 2 (6) → <strong>21</strong></li>
+<li><strong>Habilidades:</strong> Sigilo 2 (6), Engaño 1 (2), Perspicacia 1 (2) → <strong>10</strong></li>
+<li><strong>Seguidor:</strong> informante callejero, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Total: 32 XP</strong></li>
+</ul>
+<p><strong>Piscina:</strong> Ingenio 3 + Stealth 2 = 5 dados. La vista está ahí porque saber cuando estás siendo mentido es la misma habilidad que mentir bien, vista desde el otro lado.</p>
+<p><strong>Con + 4:</strong> Subterfugio a 2 (4). Uno más muere donde más importa.</p>
+<div class="panel panel-blue">
+<span class="panel-title">Lo que estos Seis tienen en común</span>
+    Cinco dados en lo que son para. Ese es el número a apuntar, y hay varios caminos a él: Attribute 3 + Habilidad 2, o Attribute 2 + Habilidad 3 (cheaper, y deja el cambio para la anchura). Todo lo demás en estas hojas — el Talento, el sabueso, el heraldo — es personaje, no competencia.
+</div>
+<h2 id="starting-gear">Inicio Opciones de engranaje</h2>
+<h3>Armas y armaduras</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Artículo</th><th>XP Costo</th><th>Notas</th></tr></thead>
+<tbody>
+<tr><td>Ligero arma (dagger, abreviatura)</td><td>Libre (o 4 XP para especial)</td><td>Daño 1, +2d Close, +1d Cerca de comer</td></tr>
+<tr><td>Armas medias (palabra larga, lanza)</td><td>Libre (o 8 XP para especial)</td><td>Daño 2, +1d Cerrar, +2d Cerca de comer</td></tr>
+<tr><td>Arma pesada (graatsword, halberd)</td><td>12 XP</td><td>Daño 3, -1d Cerrar, +3d Cerca de comer</td></tr>
+<tr><td>Armadura ligera</td><td>4 XP</td><td>Daño 1 → Fatiga 1</td></tr>
+<tr><td>Armadura mediana</td><td>8 XP</td><td>Daño 2 → Fatiga 1</td></tr>
+<tr><td>Armadura pesada</td><td>12 XP</td><td>Daño 3 → Fatiga 2</td></tr>
+</tbody>
+</table>
+</div>
+<p>La mayoría de los personajes iniciales toman un arma de Luz libre y armadura de Luz. Armas pesadas y armadura son inversiones significativas.</p>
+<div class="panel panel-green">
+<span class="panel-title">El consejo de Gray Wanderer</span>
+    "Toma el arma libre. Doce experiencia compra una gran espada, y una gran espada te compra un punto más de Daño y un tiempo peor en cada puerta, callejón, y escalera en el mundo. Pasarlo en la armadura si debes gastarlo. Pasarlo en un amigo si tienes el sentido."
+</div>
+<h2 id="next-steps">Siguientes pasos</h2>
+<ul>
+<li>Lea el capítulo Mecánica Central para aprender a tirar los dados dados, usar la Posición y pasar Bonos.</li>
+<li>Lea el capítulo Mágico si su personaje usa magia.</li>
+<li>Lea el capítulo de Interacción Mundial para viajes, tiempo y reglas sociales.</li>
+<li>Trabaja con tu DJ para decidir sobre la situación inicial y los temporizadores de campaña.</li>
+</ul>
+<div class="panel panel-green">
+<span class="panel-title">El consejo de Gray Wanderer</span>
+    "No trates de construir un personaje perfecto. Construir a uno que debe algo, lleva una cicatriz, y tiene un nombre que alguien más dirá en voz alta. Los números siguen la historia. Ellos nunca la han guiado."
+</div>
+<h2 id="party-composition">Guía de Composición del Partido</h2>
+<div class="panel panel-blue">
+<span class="panel-title">Construyendo un Partido Balanceado</span>
+    Fate's Edge no requiere un partido "balanceado" en el sentido tradicional. Un partido de cuatro duelistas es viable — que simplemente resolverá problemas con el acero en lugar de palabras. Sin embargo, las partes que cubren múltiples roles tienen más herramientas y son más resistentes cuando las cosas van mal.
+    <p class="mt-1">Esta guía le ayuda a pensar en qué roles puede cubrir su partido, cómo se construye un personaje diferente puede llenar esos roles, y — crucialmente — cómo avanzar <strong>Seguidores</strong> puede llenar las brechas cuando ningún personaje de jugador cubre un papel necesario. Utilízalo como un principiante de conversación durante la sesión Zero.</p>
+</div>
+<h3>Los cinco roles supremos</h3>
+<div class="panel panel-blue">
+<span class="panel-title">Lea estos como Attribute + Skill</span>
+    Cada papel a continuación es uno <strong>Atributo</strong> y uno o dos <strong>Habilidades clave</strong>. Ese emparejamiento es el papel; los Talentos enumerados son sazonar. Un tanque es Cuerpo y Melee. Un soporte es Espíritu y Medicina. Si usted tiene el par, usted tiene el trabajo.
+</div>
+<p>Fate's Edge personajes son definidos por <em>acercamiento</em>, no por clase. Los mismos mecánicos pueden soportar diferentes estilos de juego. Piense en estos roles como <strong>lo que haces en la mesa</strong>, no como <strong>lo que tu personaje es</strong>.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Función</th><th>Atributos primarios</th><th>Lo que haces</th></tr></thead>
+<tbody>
+<tr><td><strong>Tanque</strong></td><td>Cuerpo</td><td>Párese en frente, absorba el daño, protege todos los aspectos</td></tr>
+<tr><td><strong>Striker cobra</strong></td><td>Cuerpo o Ingenio</td><td>Daño en el trato, eliminar amenazas, romper líneas</td></tr>
+<tr><td><strong>Controlador</strong></td><td>Espíritu o Presencia</td><td>Forma el campo de batalla, impone condiciones, gestiona el miedo</td></tr>
+<tr><td><strong>Apoyo</strong></td><td>Espíritu</td><td>Curar, eliminar las condiciones, transferir cargas</td></tr>
+<tr><td><strong>Utility basada</strong></td><td>Ingenio o Espíritu</td><td>Reunir información, resolver puzzles, negociar con espíritus</td></tr>
+</tbody>
+</table>
+</div>
+<h4>Tanque — El Muro cobra</h4>
+<p>Usted se interpone entre el peligro y la gente que protege. Usted no necesita hacer frente al más daño — usted necesita ser el más difícil de matar.</p>
+<p><strong>Mecánica de claves:</strong></p>
+<ul>
+<li>Cuerpo Alto (4+ para Fatiga pista y defensa)</li>
+<li>Armadura pesada (convierte Daño a Fatiga)</li>
+<li>talentos defensivos (supervivencia defensiva, portador de escudo) — opcional</li>
+</ul>
+<p><strong>Ejemplo de construcción (32 XP):</strong> Cuerpo 3 (15), Espíritu 2 (6), Melee 2 (6), Resistencia 1 (2), Supervivencia Defensiva (3) = <strong>32 XP</strong>. Con +4: Atletismo 1 (2) y Armadura Media está fuera de alcance, por lo que el vínculo XP en Atletismo e Insight en lugar — o guardar hacia armadura pesada (12) en juego.</p>
+<p><strong>Piscina de dados:</strong> Cuerpo 3 + Melee 2 = 5 dados. Defensivo Survival convierte Daño a Fatiga, que es lo que realmente hace una pared un muro.</p>
+<h4>Striker — La Blade vender</h4>
+<p>Eliminas las amenazas. Ya sea a través de la precisión o la fuerza abrumadora, tu trabajo es acabar con las peleas.</p>
+<p><strong>Mecánica de claves:</strong></p>
+<ul>
+<li>Cuerpo Alto (melee) o Ingenio (ranged)</li>
+<li>Mastería de arma (opcional — añade + 2 dados)</li>
+</ul>
+<p><strong>Ejemplo de construcción (32 XP):</strong> Cuerpo 3 (15), Ingenio 2 (6), Melee 2 (6), Weapon Mastery (5) = <strong>32 XP</strong> — esto es Construir 1 (El Duelista) arriba. Con + 4: Atlética 1 (2) y Stealth 1 (2), por lo que puede alcanzar la lucha y dejarla.</p>
+<p><strong>Piscina de dados:</strong> Cuerpo 3 + Melee 2 + Weapon Mastery 2 = 7 dados con el arma elegida.</p>
+<h4>Controlador — El Weaver</h4>
+<p>Formas el campo de batalla. El miedo, las condiciones y el posicionamiento son tus armas.</p>
+<p><strong>Mecánica de claves:</strong></p>
+<ul>
+<li>Espíritu alto (poder de voluntad) o Presencia (intimidación)</li>
+<li>Las habilidades sociales (Sway, Deception) son la fundación</li>
+</ul>
+<p><strong>Ejemplo de construcción (32 XP):</strong> Presencia 3 (15), Espíritu 2 (6), Sway 2 (6), Decepción 1 (2), Insight 1 (2), más un Cap 1 Seguidor (1) = <strong>32 XP</strong>. Con +4: Presencia del Mando (4).</p>
+<p><strong>Piscina de dados:</strong> Presencia 3 + Sway 2 = 5 dados.</p>
+<h4>Soporte — El Mender genes</h4>
+<p>Usted mantiene a la fiesta en sus pies. Sanación, eliminación de condiciones y transferencia de carga son su dominio.</p>
+<p><strong>Mecánica de claves:</strong></p>
+<ul>
+<li>Espíritu alto (poder de voluntad) o Ingenio (medicina)</li>
+<li>La habilidad de la artesanía es el fundamento</li>
+</ul>
+<p><strong>Ejemplo de construcción (32 XP):</strong> Spirit 3 (15), Ingenio 2 (6), Craft 2 (6), Insight 1 (2), Defensive Survival (3) = <strong>32 XP</strong> — esto es Construir 4 (El Sanador) arriba. Con + 4: Lore 1 (2) y Atletismo 1 (2).</p>
+<p><strong>Piscina de dados:</strong> Spirit 3 + Artesanía 2 = 5 dados.</p>
+<h4>Utilidad — Los ojos y los oídos tienden</h4>
+<p>Solución de problemas que no pueden resolverse con el acero. Información, negociación y consulta espiritual son sus herramientas.</p>
+<p><strong>Mecánica de claves:</strong></p>
+<ul>
+<li>Alto Ingenio (percepción) o Espíritu (intuición)</li>
+<li>Las habilidades de conocimiento (Lore, Insight) son la fundación</li>
+</ul>
+<p><strong>Ejemplo de construcción (32 XP):</strong> Ingenio 3 (en inglés)15), Espíritu Santo 2 (en inglés)6), Lore 2 (en inglés)6), Insight 1 (en inglés)2), Insight 1 (en inglés)2), además de un capitán 1 Follower — un informante, el aprendiz de un archivista (1) = <strong>32 XP</strong>. Con +4: Sway 1 (2) y Stealth 1 (2).</p>
+<p><strong>Piscina de dados:</strong> Ingenio 3 + Lore 2 = 5 dados. Construir 2 (El Scholar) alcanza la misma piscina por menos, comprando Lore 3 sobre un Ingenio 2 — compararlos.</p>
+<h3>Filling Gaps con seguidores</h3>
+<p>No todos los partidos tienen un jugador que quiere jugar todos los papeles. <strong>Seguidores</strong> (ver Capítulo 10, recursos &amp; Seguidores] vienen. Un seguidor bien elegido puede cubrir un papel perdido, proporcionar asistencia especializada, o manejar tareas que ningún personaje jugador quiere hacer.</p>
+<h4>Cuándo utilizar un seguidor</h4>
+<ul>
+<li><strong>Nadie quiere jugar Apoyo:</strong> Un seguidor con Medicina o Ritos curativos puede mantener vivo a la fiesta.</li>
+<li><strong>Nadie quiere jugar a Tank:</strong> Un seguidor con armadura pesada y un escudo puede mantener la línea.</li>
+<li><strong>Nadie tiene investigación alta:</strong> Un explorador o informante El seguidor puede reunir información fuera de pantalla.</li>
+<li><strong>Nadie habla un idioma particular o conoce las costumbres de una región:</strong> Un guía local El seguidor puede navegar por las trampas culturales.</li>
+<li><strong>El partido necesita un especialista para una sola misión:</strong> Un seguidor puede ser contratado durante la tarea.</li>
+</ul>
+<h4>Funciones de seguimiento (por Capability)</h4>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Seguidor tipo</th><th>Intervalo de Cap</th><th>Lo que pueden hacer</th></tr></thead>
+<tbody>
+<tr><td><strong>Guardaespaldas (tanque)</strong></td><td>2–3</td><td>Sostenga una línea, absorba el daño, protege un PJ</td></tr>
+<tr><td><strong>Scout (Utilidad)</strong></td><td>2–3</td><td>Reunir información, navegar, detectar peligros</td></tr>
+<tr><td><strong>Calentador (Apoyo)</strong></td><td>2–3</td><td>Estabilizar las heridas, limpiar Fatiga, eliminar las condiciones específicas</td></tr>
+<tr><td><strong>Erudito (utilidad)</strong></td><td>2–3</td><td>Investigación, traducir, identificar relics ganancias</td></tr>
+<tr><td><strong>Mercenario (Striker)</strong></td><td>2–3</td><td>Daños en combate, seguir órdenes</td></tr>
+<tr><td><strong>Guía (Utilidad)</strong></td><td>2–3</td><td>Terreno navegable, interpretar costumbres locales, traducir</td></tr>
+<tr><td><strong>Perista (control/utilidad)</strong></td><td>2</td><td>Acceso a los mercados negros, difundir rumores, crear ventaja</td></tr>
+<tr><td><strong>Aprendiz (Any)</strong></td><td>1–2</td><td>Ayudar a PJ en su especialidad (adds assist dados)</td></tr>
+</tbody>
+</table>
+</div>
+<h4>Costos de seguimiento y Upkeep supuestamente</h4>
+<p>Los seguidores son adquiridos por gasto XP: Cap² XP (Capitán 1 = 1 XP, Cap 2 = 4 XP, Cap 3 = 9 XP). Requieren mantenimiento:</p>
+<ul>
+<li><strong>Eficiente:</strong> Pagar max(1, adquisición XP ÷ 3, redondeado) por tiempo de inactividad — 1 XP en Cap 1, 2 en Cap 2, 3 en Cap 3. No se requiere escena.</li>
+<li><strong>Intensivo:</strong> Pagar 1 XP y pasar una escena manteniendo la relación (entrenamiento, compartir una comida, resolver un problema personal).</li>
+</ul>
+<p><strong>Consecuencias del descuido:</strong></p>
+<ul>
+<li>La lealtad empeora: Fiel → Strained → Broken.</li>
+<li>Un seguidor estratado ayuda a -1 morir; un seguidor roto deja o se vuelve hostil.</li>
+<li>Si un seguidor es descuidado por dos horas de inactividad consecutivas, se van permanentemente (o peor — se unen a un rival).</li>
+</ul>
+<div class="panel panel-gold">
+<span class="panel-title">Tip del jugador: El seguidor como sucesor</span>
+    A Cap 3+ El seguidor puede convertirse en su sucesor cuando su personaje se jubilegue o caiga. Ellos heredan su posición de facción, una carga sin resolver, y un Legacy vínculo. Si usted está jugando una larga campaña, considerar la inversión en un seguidor usted confiaría en llevar su banner. Véase Capítulo 17 (El motor de Legacy) para reglas completas.
+</div>
+<h3>Composición de la fiesta en un glacialismo</h3>
+<p>Use esta tabla para ver si su partido tiene lagunas. Un personaje puede cubrir múltiples roles. Los seguidores pueden llenar los huecos marcados con (F).</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Tamaño de la fiesta</th><th>Cobertura recomendada</th></tr></thead>
+<tbody>
+<tr><td><strong>2 jugadores</strong></td><td>1 Tank/Striker + 1 Soporte/Controlador (F para funciones desaparecidas)</td></tr>
+<tr><td><strong>3 jugadores</strong></td><td>Tanque + Striker + Apoyo (o Controlador); F para el papel perdido</td></tr>
+<tr><td><strong>4 jugadores</strong></td><td>Tanque + Striker + Controlador + Soporte (Utilidad a menudo se dobla en Soporte o Controlador)</td></tr>
+<tr><td><strong>5 + jugadores</strong></td><td>Todas las funciones abarcadas; considerar funciones secundarias</td></tr>
+</tbody>
+</table>
+</div>
+<h3>Composiciones del partido de muestra</h3>
+<h4>El Partido Equilibrado (4 Jugadores, 32 XP cada uno)</h4>
+<ul>
+<li><strong>Tanque:</strong> Cuerpo 3, Melee 2 (5 dados).</li>
+<li><strong>Atacante:</strong> Cuerpo 3, Melee 2 (5 dados).</li>
+<li><strong>Apoyo:</strong> Espíritu 3, Artesanía 2 (5 dados).</li>
+<li><strong>Utilidad:</strong> Ingenio 3, Lore 2 (5 dados). Investigación.</li>
+</ul>
+<p><strong>Nota:</strong> Ninguno de estos cuatro tiene un Talento, y los cuatro son totalmente eficaces. <strong>27–29 XP</strong> en el emparejado arriba, que deja tres a cinco puntos por una segunda habilidad, un Cap 1 seguidor, o un pequeño Talento — que el personaje desee, en lugar de lo que necesite la fiesta.</p>
+<h4>El Partido Agresivo (3 Jugadores + Seguidor)</h4>
+<ul>
+<li><strong>Atacante/tanque:</strong> Cuerpo 3, Melee 2 (5 dados). Armadura media.</li>
+<li><strong>Atacante:</strong> Ingenio 3, Stealth 2 (5 dados). Armas ligeras.</li>
+<li><strong>Utilidad/Apoyo:</strong> Espíritu 3, Arcana 2 (5 dados). Spellcraft.</li>
+<li><strong>Seguidor: Sanador (Cap 2, 4 XP</strong> — mantiene viva a la fiesta.</li>
+</ul>
+<h4>El Partido Social (3 Jugadores +</h4>
+<ul>
+<li><strong>Controlador:</strong> Presencia 3, Sway 2 (5 dados).</li>
+<li><strong>Utilidad:</strong> Ingenio 3, Decepción 2 (5 dados).</li>
+<li><strong>Apoyo/Utilidad:</strong> Espíritu 3, Lore 2 (5 dados).</li>
+<li><strong>Follower: Bodyguard (Cap 2, 4 XP</strong> — protege a los diplomáticos.</li>
+</ul>
+<h3>Consejos finales del Gray Wanderer</h3>
+<blockquote>
+"No obsesione sobre la composición del partido. El juego es flexible. Un partido de cuatro duelistas es viable — simplemente resolver problemas con el acero en lugar de palabras. Una parte de cuatro eruditos es viable — negociarán, investigarán y encontrarán el camino que evite el combate por completo. La pregunta no es si su partido está "balanceado". La pregunta es si su partido está preparado para el tipo de problemas que su clientela DJ hablará con su objetivo DJPregunte qué tipo de campaña están ejecutando. Entonces construya en consecuencia. Y si usted está perdiendo un papel, contrate a un seguidor. Ellos no son tan fuertes como un signo PJ, pero son mejores que nada — y pueden convertirse en algo más.
+<p class="mt-1">"Un seguidor no es un sirviente. Un seguidor es una relación. Trátelos bien, y ellos salvarán tu vida. Trátelos mal, y ellos recordarán. El camino es largo. Camina con gente en la que confías — o al menos pagar a tiempo."</p>
+</blockquote>
+<h3>Gaps de cobertura con seguidores (referencia rápida)</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Desaparecimiento del papel</th><th>Seguimiento recomendado</th><th>Lo que hacen</th></tr></thead>
+<tbody>
+<tr><td>Sin tanque</td><td>Bodyguard (Cap 2–3</td><td>Mantenga la línea, absorba el daño, protege un PJ</td></tr>
+<tr><td>Sin Striker</td><td>Mercenario (Cap 2–3)</td><td>Daños en combate, seguir órdenes</td></tr>
+<tr><td>No controlador</td><td>Interrogador o Bruja (Cap 2–3</td><td>Imposible miedo, manejar condiciones, manipular</td></tr>
+<tr><td>No Soporte</td><td>Calentador (Cap 2–3)</td><td>Estabilizar, limpiar Fatiga, eliminar Condiciones</td></tr>
+<tr><td>No Utility roba</td><td>Scholar o Guide (Cap 2–3)</td><td>Investigación, traducción, navegación, identificación</td></tr>
+</tbody>
+</table>
+</div>
+<footer class="doc-footer">
+    Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Utilizado con permiso, Todos los derechos reservados.
+</footer>
+</body>
+</html>
+

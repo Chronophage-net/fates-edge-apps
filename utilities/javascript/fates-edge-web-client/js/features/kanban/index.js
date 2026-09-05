@@ -10,6 +10,7 @@
  * - Campaign progress visualization
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
@@ -199,15 +200,15 @@ export function render(el) {
         <div class="kanban-modern-layout">
             <!-- Header -->
             <header class="kanban-header">
-                <h1 class="kanban-title">📋 Campaign Board</h1>
-                <p class="kanban-subtitle">Track campaign progress, timers, and scene clocks.</p>
+                <h1 class="kanban-title" data-i18n="feature.kanban.campaignBoard">📋 Campaign Board</h1>
+                <p class="kanban-subtitle" data-i18n="feature.kanban.trackCampaignProgressTimersAndSceneClocks">Track campaign progress, timers, and scene clocks.</p>
             </header>
 
             <!-- Navigation Tabs -->
             <div class="kanban-tabs">
-                <button class="kanban-tab active" data-view="kanban">📋 Board</button>
-                <button class="kanban-tab" data-view="clocks">⏱️ Clocks</button>
-                <button class="kanban-tab" data-view="timeline">📊 Timeline</button>
+                <button class="kanban-tab active" data-view="kanban" data-i18n="feature.kanban.board">📋 Board</button>
+                <button class="kanban-tab" data-view="clocks" data-i18n="feature.kanban.clocks">⏱️ Clocks</button>
+                <button class="kanban-tab" data-view="timeline" data-i18n="feature.kanban.timeline">📊 Timeline</button>
             </div>
 
             <!-- View Container -->
@@ -241,8 +242,8 @@ function renderKanbanView() {
     return `
         <div class="kanban-board-view">
             <div class="kanban-toolbar">
-                <button class="btn btn-sm btn-primary" onclick="window.addKanbanItem()">➕ Add Item</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.refreshKanban()">🔄 Refresh</button>
+                <button class="btn btn-sm btn-primary" onclick="window.addKanbanItem()" data-i18n="feature.kanban.addItem">➕ Add Item</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.refreshKanban()" data-i18n="feature.kanban.refresh">🔄 Refresh</button>
                 <span class="text-muted" style="font-size:0.8rem;">${state.items.length} items</span>
             </div>
             <div class="kanban-board-grid">
@@ -327,8 +328,8 @@ function renderClocksView() {
     return `
         <div class="clocks-view">
             <div class="clocks-toolbar">
-                <button class="btn btn-sm btn-primary" onclick="window.addClock()">➕ Add Clock</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.refreshKanban()">🔄 Refresh</button>
+                <button class="btn btn-sm btn-primary" onclick="window.addClock()" data-i18n="feature.kanban.addClock">➕ Add Clock</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.refreshKanban()" data-i18n="feature.kanban.refresh">🔄 Refresh</button>
             </div>
             <div class="clocks-grid">
                 ${state.clocks.map(clock => {
@@ -396,23 +397,23 @@ function renderTimelineView() {
             <div class="timeline-stats">
                 <div class="stat-card">
                     <span class="stat-value">${total}</span>
-                    <span class="stat-label">Total Items</span>
+                    <span class="stat-label" data-i18n="feature.kanban.totalItems">Total Items</span>
                 </div>
-                <div class="stat-card" style="border-left:3px solid var(--green);">
+                <div class="stat-card" style="border-inline-start:3px solid var(--green);">
                     <span class="stat-value">${done}</span>
-                    <span class="stat-label">Done</span>
+                    <span class="stat-label" data-i18n="feature.kanban.done">Done</span>
                 </div>
-                <div class="stat-card" style="border-left:3px solid var(--gold);">
+                <div class="stat-card" style="border-inline-start:3px solid var(--gold);">
                     <span class="stat-value">${active}</span>
-                    <span class="stat-label">In Progress</span>
+                    <span class="stat-label" data-i18n="feature.kanban.inProgress">In Progress</span>
                 </div>
-                <div class="stat-card" style="border-left:3px solid var(--red);">
+                <div class="stat-card" style="border-inline-start:3px solid var(--red);">
                     <span class="stat-value">${blocked}</span>
-                    <span class="stat-label">Blocked</span>
+                    <span class="stat-label" data-i18n="feature.kanban.blocked">Blocked</span>
                 </div>
-                <div class="stat-card" style="border-left:3px solid var(--text3);">
+                <div class="stat-card" style="border-inline-start:3px solid var(--text3);">
                     <span class="stat-value">${backlog}</span>
-                    <span class="stat-label">Backlog</span>
+                    <span class="stat-label" data-i18n="feature.kanban.backlog">Backlog</span>
                 </div>
             </div>
 
@@ -432,7 +433,7 @@ function renderTimelineView() {
             </div>
 
             <div class="timeline-items">
-                <h3 style="color:var(--gold);margin-bottom:0.5rem;">📋 Recent Activity</h3>
+                <h3 style="color:var(--gold);margin-bottom:0.5rem;" data-i18n="feature.kanban.recentActivity">📋 Recent Activity</h3>
                 ${state.items.slice().sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 10).map(item => `
                     <div class="timeline-item" onclick="window.editKanbanItem('${item.id}')">
                         <span class="item-status ${item.column}">${COLUMNS[item.column]?.icon || '📋'}</span>
@@ -452,7 +453,7 @@ function renderTimelineView() {
 function renderItemDetail(itemId) {
     const item = state.items.find(i => i.id === itemId);
     if (!item) {
-        showToast('Item not found', 'error');
+        showToast(i18nText("feature.kanban.itemNotFound", null, "Item not found"), 'error');
         return;
     }
 
@@ -468,12 +469,12 @@ function renderItemDetail(itemId) {
             
             <div class="item-detail-body">
                 <div class="item-detail-section">
-                    <h3>📖 Description</h3>
+                    <h3 data-i18n="feature.kanban.description">📖 Description</h3>
                     <p>${escHtml(item.description || 'No description.')}</p>
                 </div>
                 
                 <div class="item-detail-section">
-                    <h3>📊 Status</h3>
+                    <h3 data-i18n="feature.kanban.status">📊 Status</h3>
                     <p>Column: ${COLUMNS[item.column]?.title || item.column}</p>
                     <p>Created: ${new Date(item.createdAt).toLocaleString()}</p>
                     <p>Updated: ${new Date(item.updatedAt).toLocaleString()}</p>
@@ -481,7 +482,7 @@ function renderItemDetail(itemId) {
                 
                 ${item.timer ? `
                 <div class="item-detail-section">
-                    <h3>⏱️ Timer</h3>
+                    <h3 data-i18n="feature.kanban.timer">⏱️ Timer</h3>
                     <div class="timer-display">
                         <span>${item.timer.current}/${item.timer.segments}</span>
                         <div class="timer-bar">
@@ -497,13 +498,13 @@ function renderItemDetail(itemId) {
                 
                 ${item.blockReason ? `
                 <div class="item-detail-section">
-                    <h3>🚫 Blocked Reason</h3>
+                    <h3 data-i18n="feature.kanban.blockedReason">🚫 Blocked Reason</h3>
                     <p>${escHtml(item.blockReason)}</p>
                 </div>
                 ` : ''}
                 
                 <div class="item-detail-section">
-                    <h3>🏷️ Tags</h3>
+                    <h3 data-i18n="feature.kanban.tags">🏷️ Tags</h3>
                     <div class="tag-list">
                         ${(item.tags || []).map(t => `<span class="tag">#${escHtml(t)}</span>`).join('')}
                         ${(item.tags || []).length === 0 ? '<span class="text-muted">No tags</span>' : ''}
@@ -516,7 +517,7 @@ function renderItemDetail(itemId) {
                 <button class="btn btn-secondary" onclick="window.moveKanbanItem('${item.id}', 'left')">⬅️ Move Left</button>
                 <button class="btn btn-secondary" onclick="window.moveKanbanItem('${item.id}', 'right')">➡️ Move Right</button>
                 <button class="btn btn-danger" onclick="window.deleteKanbanItem('${item.id}')">🗑️ Delete</button>
-                <button class="btn btn-ghost" onclick="window.closeKanbanModal()">Close</button>
+                <button class="btn btn-ghost" onclick="window.closeKanbanModal()" data-i18n="feature.kanban.close">Close</button>
             </div>
         </div>
     `;
@@ -529,7 +530,7 @@ function renderItemDetail(itemId) {
 function renderClockDetail(clockId) {
     const clock = state.clocks.find(c => c.id === clockId);
     if (!clock) {
-        showToast('Clock not found', 'error');
+        showToast(i18nText("feature.kanban.clockNotFound", null, "Clock not found"), 'error');
         return;
     }
 
@@ -551,12 +552,12 @@ function renderClockDetail(clockId) {
             
             <div class="clock-detail-body">
                 <div class="clock-detail-section">
-                    <h3>📖 Description</h3>
+                    <h3 data-i18n="feature.kanban.description">📖 Description</h3>
                     <p>${escHtml(clock.description || 'No description.')}</p>
                 </div>
                 
                 <div class="clock-detail-section">
-                    <h3>⏱️ Progress</h3>
+                    <h3 data-i18n="feature.kanban.progress">⏱️ Progress</h3>
                     <div class="clock-progress-large">
                         <div class="clock-track">
                             <div class="clock-fill" style="width:${pct}%;background:${pct >= 100 ? 'var(--red)' : pct >= 80 ? 'var(--orange)' : 'var(--gold)'};"></div>
@@ -574,7 +575,7 @@ function renderClockDetail(clockId) {
             <div class="clock-detail-actions">
                 <button class="btn btn-primary" onclick="window.editClock('${clock.id}')">✏️ Edit</button>
                 <button class="btn btn-danger" onclick="window.deleteClock('${clock.id}')">🗑️ Delete</button>
-                <button class="btn btn-ghost" onclick="window.closeKanbanModal()">Close</button>
+                <button class="btn btn-ghost" onclick="window.closeKanbanModal()" data-i18n="feature.kanban.close">Close</button>
             </div>
         </div>
     `;
@@ -601,15 +602,15 @@ window.viewClock = function(id) {
 };
 
 window.addKanbanItem = function() {
-    const title = prompt('Enter item title:');
+    const title = prompt(i18nText("feature.kanban.enterItemTitle", null, "Enter item title:"));
     if (!title) return;
-    const description = prompt('Enter description:') || '';
-    const column = prompt('Enter column (backlog/planning/active/blocked/review/done):', 'backlog') || 'backlog';
-    const priority = prompt('Enter priority (critical/high/medium/low):', 'medium') || 'medium';
-    const hasTimer = confirm('Add a timer?');
+    const description = prompt(i18nText("feature.kanban.enterDescription", null, "Enter description:")) || '';
+    const column = prompt(i18nText("feature.kanban.enterColumnBacklogPlanningActiveBlockedReview", null, "Enter column (backlog/planning/active/blocked/review/done):"), 'backlog') || 'backlog';
+    const priority = prompt(i18nText("feature.kanban.enterPriorityCriticalHighMediumLow", null, "Enter priority (critical/high/medium/low):"), 'medium') || 'medium';
+    const hasTimer = confirm(i18nText("feature.kanban.addATimer", null, "Add a timer?"));
     let timer = null;
     if (hasTimer) {
-        const segments = parseInt(prompt('Timer segments (4,6,8,10):', '4') || '4');
+        const segments = parseInt(prompt(i18nText("feature.kanban.timerSegments46810", null, "Timer segments (4,6,8,10):"), '4') || '4');
         timer = { segments, current: 0 };
     }
 
@@ -620,44 +621,44 @@ window.addKanbanItem = function() {
         column,
         priority,
         timer,
-        tags: prompt('Tags (comma-separated):')?.split(',').map(t => t.trim()).filter(Boolean) || [],
+        tags: prompt(i18nText("feature.kanban.tagsCommaSeparated", null, "Tags (comma-separated):"))?.split(',').map(t => t.trim()).filter(Boolean) || [],
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        blockReason: column === 'blocked' ? prompt('Blocked reason:') || '' : ''
+        blockReason: column === 'blocked' ? prompt(i18nText("feature.kanban.blockedReason_iuglo", null, "Blocked reason:")) || '' : ''
     });
     saveKanbanData();
     refreshView();
-    showToast(`📋 Added "${title}"`, 'success');
+    showToast(i18nText("feature.kanban.addedValue", { value0: title }, "📋 Added \"{{value0}}\""), 'success');
 };
 
 window.editKanbanItem = function(id) {
     const item = state.items.find(i => i.id === id);
     if (!item) return;
-    const title = prompt('Enter title:', item.title);
+    const title = prompt(i18nText("feature.kanban.enterTitle", null, "Enter title:"), item.title);
     if (!title) return;
     item.title = title;
-    item.description = prompt('Enter description:', item.description) || item.description;
-    item.column = prompt('Enter column (backlog/planning/active/blocked/review/done):', item.column) || item.column;
-    item.priority = prompt('Enter priority (critical/high/medium/low):', item.priority) || 'medium';
+    item.description = prompt(i18nText("feature.kanban.enterDescription", null, "Enter description:"), item.description) || item.description;
+    item.column = prompt(i18nText("feature.kanban.enterColumnBacklogPlanningActiveBlockedReview", null, "Enter column (backlog/planning/active/blocked/review/done):"), item.column) || item.column;
+    item.priority = prompt(i18nText("feature.kanban.enterPriorityCriticalHighMediumLow", null, "Enter priority (critical/high/medium/low):"), item.priority) || 'medium';
     if (item.column === 'blocked') {
-        item.blockReason = prompt('Blocked reason:', item.blockReason) || '';
+        item.blockReason = prompt(i18nText("feature.kanban.blockedReason_iuglo", null, "Blocked reason:"), item.blockReason) || '';
     }
     item.updatedAt = Date.now();
     saveKanbanData();
     refreshView();
     closeKanbanModal();
-    showToast(`✏️ Updated "${title}"`, 'success');
+    showToast(i18nText("feature.kanban.updatedValue", { value0: title }, "✏️ Updated \"{{value0}}\""), 'success');
 };
 
 window.deleteKanbanItem = function(id) {
     const item = state.items.find(i => i.id === id);
     if (!item) return;
-    if (!confirm(`Delete "${item.title}"?`)) return;
+    if (!confirm(i18nText("feature.kanban.deleteValue", { value0: item.title }, "Delete \"{{value0}}\"?"))) return;
     state.items = state.items.filter(i => i.id !== id);
     saveKanbanData();
     refreshView();
     closeKanbanModal();
-    showToast(`🗑️ Deleted "${item.title}"`, 'info');
+    showToast(i18nText("feature.kanban.deletedValue", { value0: item.title }, "🗑️ Deleted \"{{value0}}\""), 'info');
 };
 
 window.moveKanbanItem = function(id, direction) {
@@ -668,19 +669,19 @@ window.moveKanbanItem = function(id, direction) {
     if (currentIdx === -1) return;
     const newIdx = direction === 'left' ? currentIdx - 1 : currentIdx + 1;
     if (newIdx < 0 || newIdx >= columns.length) {
-        showToast('Cannot move further', 'warning');
+        showToast(i18nText("feature.kanban.cannotMoveFurther", null, "Cannot move further"), 'warning');
         return;
     }
     // Skip blocked column - items in blocked stay blocked until unblocked
     const targetCol = columns[newIdx];
     if (targetCol === 'blocked' && direction !== 'left') {
-        showToast('Item must be moved to blocked manually with a reason', 'warning');
+        showToast(i18nText("feature.kanban.itemMustBeMovedToBlockedManually", null, "Item must be moved to blocked manually with a reason"), 'warning');
         return;
     }
     item.column = targetCol;
     item.updatedAt = Date.now();
     if (targetCol === 'blocked' && !item.blockReason) {
-        item.blockReason = prompt('Blocked reason:') || 'Blocked';
+        item.blockReason = prompt(i18nText("feature.kanban.blockedReason_iuglo", null, "Blocked reason:")) || 'Blocked';
     }
     if (targetCol !== 'blocked') {
         item.blockReason = '';
@@ -688,7 +689,7 @@ window.moveKanbanItem = function(id, direction) {
     saveKanbanData();
     refreshView();
     closeKanbanModal();
-    showToast(`📋 Moved "${item.title}" to ${COLUMNS[targetCol]?.title || targetCol}`, 'success');
+    showToast(i18nText("feature.kanban.movedValueToValue", { value0: item.title, value1: COLUMNS[targetCol]?.title || targetCol }, "📋 Moved \"{{value0}}\" to {{value1}}"), 'success');
 };
 
 window.tickItemTimer = function(id) {
@@ -699,7 +700,7 @@ window.tickItemTimer = function(id) {
     saveKanbanData();
     refreshView();
     if (item.timer.current >= item.timer.segments) {
-        showToast(`⏱️ Timer for "${item.title}" completed!`, 'warning');
+        showToast(i18nText("feature.kanban.timerForValueCompleted", { value0: item.title }, "⏱️ Timer for \"{{value0}}\" completed!"), 'warning');
     }
 };
 
@@ -711,16 +712,16 @@ window.resetItemTimer = function(id) {
     saveKanbanData();
     refreshView();
     closeKanbanModal();
-    showToast(`⟳ Timer reset for "${item.title}"`, 'info');
+    showToast(i18nText("feature.kanban.timerResetForValue", { value0: item.title }, "⟳ Timer reset for \"{{value0}}\""), 'info');
 };
 
 // Clock functions
 window.addClock = function() {
-    const type = prompt('Enter clock type (campaign/scene/situation):', 'situation') || 'situation';
-    const name = prompt('Enter clock name:');
+    const type = prompt(i18nText("feature.kanban.enterClockTypeCampaignSceneSituation", null, "Enter clock type (campaign/scene/situation):"), 'situation') || 'situation';
+    const name = prompt(i18nText("feature.kanban.enterClockName", null, "Enter clock name:"));
     if (!name) return;
-    const segments = parseInt(prompt('Segments (4/6/8/10):', '6') || '6');
-    const description = prompt('Description:') || '';
+    const segments = parseInt(prompt(i18nText("feature.kanban.segments46810", null, "Segments (4/6/8/10):"), '6') || '6');
+    const description = prompt(i18nText("feature.kanban.description_15hww", null, "Description:")) || '';
     
     state.clocks.push({
         id: 'clock-' + Date.now(),
@@ -734,33 +735,33 @@ window.addClock = function() {
     });
     saveKanbanData();
     refreshView();
-    showToast(`⏱️ Added "${name}" clock`, 'success');
+    showToast(i18nText("feature.kanban.addedValueClock", { value0: name }, "⏱️ Added \"{{value0}}\" clock"), 'success');
 };
 
 window.editClock = function(id) {
     const clock = state.clocks.find(c => c.id === id);
     if (!clock) return;
-    const name = prompt('Enter name:', clock.name);
+    const name = prompt(i18nText("feature.kanban.enterName", null, "Enter name:"), clock.name);
     if (!name) return;
     clock.name = name;
-    clock.type = prompt('Enter type (campaign/scene/situation):', clock.type) || clock.type;
-    clock.segments = parseInt(prompt('Segments:', clock.segments) || '6');
-    clock.description = prompt('Description:', clock.description) || '';
+    clock.type = prompt(i18nText("feature.kanban.enterTypeCampaignSceneSituation", null, "Enter type (campaign/scene/situation):"), clock.type) || clock.type;
+    clock.segments = parseInt(prompt(i18nText("feature.kanban.segments", null, "Segments:"), clock.segments) || '6');
+    clock.description = prompt(i18nText("feature.kanban.description_15hww", null, "Description:"), clock.description) || '';
     saveKanbanData();
     refreshView();
     closeKanbanModal();
-    showToast(`✏️ Updated "${name}" clock`, 'success');
+    showToast(i18nText("feature.kanban.updatedValueClock", { value0: name }, "✏️ Updated \"{{value0}}\" clock"), 'success');
 };
 
 window.deleteClock = function(id) {
     const clock = state.clocks.find(c => c.id === id);
     if (!clock) return;
-    if (!confirm(`Delete clock "${clock.name}"?`)) return;
+    if (!confirm(i18nText("feature.kanban.deleteClockValue", { value0: clock.name }, "Delete clock \"{{value0}}\"?"))) return;
     state.clocks = state.clocks.filter(c => c.id !== id);
     saveKanbanData();
     refreshView();
     closeKanbanModal();
-    showToast(`🗑️ Deleted "${clock.name}" clock`, 'info');
+    showToast(i18nText("feature.kanban.deletedValueClock", { value0: clock.name }, "🗑️ Deleted \"{{value0}}\" clock"), 'info');
 };
 
 window.tickClock = function(id) {
@@ -770,7 +771,7 @@ window.tickClock = function(id) {
     saveKanbanData();
     refreshView();
     if (clock.current >= clock.segments) {
-        showToast(`⏱️ Clock "${clock.name}" completed!`, 'warning');
+        showToast(i18nText("feature.kanban.clockValueCompleted", { value0: clock.name }, "⏱️ Clock \"{{value0}}\" completed!"), 'warning');
     }
 };
 
@@ -789,13 +790,13 @@ window.resetClock = function(id) {
     saveKanbanData();
     refreshView();
     closeKanbanModal();
-    showToast(`⟳ Clock "${clock.name}" reset`, 'info');
+    showToast(i18nText("feature.kanban.clockValueReset", { value0: clock.name }, "⟳ Clock \"{{value0}}\" reset"), 'info');
 };
 
 window.refreshKanban = function() {
     loadKanbanData();
     refreshView();
-    showToast('🔄 Kanban refreshed', 'success');
+    showToast(i18nText("feature.kanban.kanbanRefreshed", null, "🔄 Kanban refreshed"), 'success');
 };
 
 // ============================================================
@@ -856,7 +857,7 @@ export function attachEvents() {
             if (item && item.column !== column) {
                 // Skip blocked column check
                 if (column === 'blocked') {
-                    const reason = prompt('Blocked reason:') || 'Blocked';
+                    const reason = prompt(i18nText("feature.kanban.blockedReason_iuglo", null, "Blocked reason:")) || 'Blocked';
                     item.blockReason = reason;
                 } else {
                     item.blockReason = '';
@@ -865,7 +866,7 @@ export function attachEvents() {
                 item.updatedAt = Date.now();
                 saveKanbanData();
                 refreshView();
-                showToast(`📋 Moved "${item.title}" to ${COLUMNS[column]?.title || column}`, 'success');
+                showToast(i18nText("feature.kanban.movedValueToValue", { value0: item.title, value1: COLUMNS[column]?.title || column }, "📋 Moved \"{{value0}}\" to {{value1}}"), 'success');
             }
         });
     });

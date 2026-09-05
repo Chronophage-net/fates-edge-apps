@@ -18,6 +18,7 @@
  * v11 – Exposed global window.sendToVTT() for other modules to post messages/cards.
  */
 
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { vttStore, MAX_CONTROLLED_CHARACTERS } from '@core/vtt-store.js';
 import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId, onCharacterChange } from '@core/state.js';
 import { performRoll } from '@core/dice.js';
@@ -223,16 +224,16 @@ async function renderMiniTracker() {
                     // players see the right terminology (e.g. lockpick's "Tumblers").
                     const progressPill = c.harm > 0
                         ? (isCombat
-                            ? `<span class="text-muted text-sm" style="color:var(--red);" title="Harm">H${c.harm}</span>`
+                            ? `<span class="text-muted text-sm" style="color:var(--red);" title="Harm" data-i18n-attr="title:feature.vtt.vtt-connected.harm">H${c.harm}</span>`
                             : `<span class="text-muted text-sm" style="color:var(--orange);" title="${escHtml(objType.progressLabel)}">${objType.icon}${c.harm}/${c.maxHarm}</span>`)
                         : '';
                     return `
-                        <div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.3rem;border-radius:4px;${isActive ? 'background:var(--bg4);border-left:2px solid var(--gold);' : ''}font-size:0.85rem;">
+                        <div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.3rem;border-radius:4px;${isActive ? 'background:var(--bg4);border-inline-start:2px solid var(--gold);' : ''}font-size:0.85rem;">
                             <span style="flex:0 0 1.1rem;text-align:center;">${isActive ? '▶' : ''}</span>
                             <span style="flex:0 0 auto;color:${c.type === 'player' ? 'var(--blue)' : 'var(--red)'};">${weaponGlyph}</span>
                             <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(c.name)}</span>
                             ${progressPill}
-                            ${(isCombat && c.fatigue > 0) ? `<span class="text-muted text-sm" title="Fatigue">F${c.fatigue}</span>` : ''}
+                            ${(isCombat && c.fatigue > 0) ? `<span class="text-muted text-sm" title="Fatigue" data-i18n-attr="title:feature.vtt.vtt-connected.fatigue">F${c.fatigue}</span>` : ''}
                             ${rangeHtml}
                         </div>
                     `;
@@ -318,7 +319,7 @@ export function sendMessage(text, sender, recipient = 'all', metadata = {}) {
             }, 500);
         } catch (error) {
             console.warn('[VTT Connected] Failed to send via WebSocket:', error);
-            showToast('Message failed to send. Check connection.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.messageFailedToSendCheckConnection", null, "Message failed to send. Check connection."), 'error');
             const msgEl = q(`[data-msg-id="${msg.id}"]`);
             if (msgEl) {
                 const statusEl = msgEl.querySelector('.msg-status');
@@ -378,9 +379,9 @@ async function handleDeckDraw(count = 1, region = null) {
         try {
             const result = await drawCards(count, regionName);
             if (result && result.error) {
-                showToast(`Deck draw failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.deckDrawFailedValue", { value0: result.error }, "Deck draw failed: {{value0}}"), 'error');
             } else {
-                showToast(`🃏 Drew ${count} card${count > 1 ? 's' : ''} from ${regionName}`, 'success');
+                showToast(i18nPlural('feature.vtt.vtt-connected.cardsDrawnFromRegion', count, { region: regionName }, '🃏 Drew {{count}} cards from {{region}}'), 'success');
                 if (result && result.remaining !== undefined) {
                     deckState.remaining = result.remaining;
                     updateDeckUI();
@@ -388,7 +389,7 @@ async function handleDeckDraw(count = 1, region = null) {
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to send deck draw:', error);
-            showToast('Deck draw failed. Check connection.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.deckDrawFailedCheckConnection", null, "Deck draw failed. Check connection."), 'error');
         }
     } else {
         const cards = buildLocalDeck(count);
@@ -411,9 +412,9 @@ async function handleCrownSpread(region = null) {
         try {
             const result = await drawCrownSpread(regionName);
             if (result && result.error) {
-                showToast(`Crown Spread failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.crownSpreadFailedValue", { value0: result.error }, "Crown Spread failed: {{value0}}"), 'error');
             } else {
-                showToast(`👑 Crown Spread from ${regionName}`, 'success');
+                showToast(i18nText("feature.vtt.vtt-connected.crownSpreadFromValue", { value0: regionName }, "👑 Crown Spread from {{value0}}"), 'success');
                 if (result && result.remaining !== undefined) {
                     deckState.remaining = result.remaining;
                     updateDeckUI();
@@ -421,10 +422,10 @@ async function handleCrownSpread(region = null) {
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to send Crown Spread:', error);
-            showToast('Crown Spread failed. Check connection.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.crownSpreadFailedCheckConnection", null, "Crown Spread failed. Check connection."), 'error');
         }
     } else {
-        showToast('Crown Spread requires server connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.crownSpreadRequiresServerConnection", null, "Crown Spread requires server connection."), 'error');
     }
 }
 
@@ -436,9 +437,9 @@ async function handleDeckShuffle() {
         try {
             const result = await shuffleDeck();
             if (result && result.error) {
-                showToast(`Shuffle failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.shuffleFailedValue", { value0: result.error }, "Shuffle failed: {{value0}}"), 'error');
             } else {
-                showToast('🔀 Deck shuffled.', 'success');
+                showToast(i18nText("feature.vtt.vtt-connected.deckShuffled", null, "🔀 Deck shuffled."), 'success');
                 if (result && result.remaining !== undefined) {
                     deckState.remaining = result.remaining;
                     updateDeckUI();
@@ -446,10 +447,10 @@ async function handleDeckShuffle() {
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to shuffle deck:', error);
-            showToast('Deck shuffle failed.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.deckShuffleFailed", null, "Deck shuffle failed."), 'error');
         }
     } else {
-        showToast('Deck shuffle requires server connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.deckShuffleRequiresServerConnection", null, "Deck shuffle requires server connection."), 'error');
     }
 }
 
@@ -461,24 +462,24 @@ async function handleDeckHistory() {
         try {
             const result = await getDeckHistory();
             if (result && result.error) {
-                showToast(`History failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.historyFailedValue", { value0: result.error }, "History failed: {{value0}}"), 'error');
             } else if (result && result.history) {
                 const history = result.history;
                 if (history.length === 0) {
-                    showToast('📜 No deck history available.', 'info');
+                    showToast(i18nText("feature.vtt.vtt-connected.noDeckHistoryAvailable", null, "📜 No deck history available."), 'info');
                 } else {
                     const entries = history.slice(-5).map(h => 
                         `${h.type}: ${h.cards}`
                     ).join('\n');
-                    showToast(`📜 Recent draws:\n${entries}`, 'info');
+                    showToast(i18nText("feature.vtt.vtt-connected.recentDrawsValue", { value0: entries }, "📜 Recent draws:\n{{value0}}"), 'info');
                 }
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to get deck history:', error);
-            showToast('Failed to get deck history.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.failedToGetDeckHistory", null, "Failed to get deck history."), 'error');
         }
     } else {
-        showToast('Deck history requires server connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.deckHistoryRequiresServerConnection", null, "Deck history requires server connection."), 'error');
     }
 }
 
@@ -490,16 +491,16 @@ async function handleClearDeckHistory() {
         try {
             const result = await clearDeckHistory();
             if (result && result.error) {
-                showToast(`Clear history failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.clearHistoryFailedValue", { value0: result.error }, "Clear history failed: {{value0}}"), 'error');
             } else {
-                showToast('🗑️ Deck history cleared.', 'success');
+                showToast(i18nText("feature.vtt.vtt-connected.deckHistoryCleared", null, "🗑️ Deck history cleared."), 'success');
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to clear deck history:', error);
-            showToast('Failed to clear deck history.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.failedToClearDeckHistory", null, "Failed to clear deck history."), 'error');
         }
     } else {
-        showToast('Clear history requires server connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.clearHistoryRequiresServerConnection", null, "Clear history requires server connection."), 'error');
     }
 }
 
@@ -546,23 +547,23 @@ async function handleModuleList() {
         try {
             const result = await listModules();
             if (result && result.error) {
-                showToast(`List modules failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.listModulesFailedValue", { value0: result.error }, "List modules failed: {{value0}}"), 'error');
             } else if (result && result.modules) {
                 loadedModules = result.modules;
                 const count = loadedModules.length;
                 if (count === 0) {
-                    showToast('📦 No modules loaded.', 'info');
+                    showToast(i18nText("feature.vtt.vtt-connected.noModulesLoaded", null, "📦 No modules loaded."), 'info');
                 } else {
                     const names = loadedModules.map(m => m.name || m.id).join(', ');
-                    showToast(`📦 ${count} module${count > 1 ? 's' : ''} loaded: ${names}`, 'info');
+                    showToast(i18nPlural('feature.vtt.vtt-connected.modulesLoaded', count, { names }, '📦 {{count}} modules loaded: {{names}}'), 'info');
                 }
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to list modules:', error);
-            showToast('Failed to list modules.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.failedToListModules", null, "Failed to list modules."), 'error');
         }
     } else {
-        showToast('Module list requires server connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.moduleListRequiresServerConnection", null, "Module list requires server connection."), 'error');
     }
 }
 
@@ -574,11 +575,11 @@ async function handleModulePush(moduleId) {
         try {
             const result = await requestModulePush(moduleId);
             if (result && result.error) {
-                showToast(`Module push failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.modulePushFailedValue", { value0: result.error }, "Module push failed: {{value0}}"), 'error');
                 return;
             }
 
-            showToast(`📦 Module pushed: ${moduleId}`, 'success');
+            showToast(i18nText("feature.vtt.vtt-connected.modulePushedValue", { value0: moduleId }, "📦 Module pushed: {{value0}}"), 'success');
 
             // FIX: the server's broadcast excludes the sender (standard
             // "don't echo my own action back to me" pattern -- see
@@ -597,10 +598,10 @@ async function handleModulePush(moduleId) {
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to push module:', error);
-            showToast('Module push failed.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.modulePushFailed", null, "Module push failed."), 'error');
         }
     } else {
-        showToast('Module push requires server connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.modulePushRequiresServerConnection", null, "Module push requires server connection."), 'error');
     }
 }
 
@@ -612,16 +613,16 @@ async function handleModuleCleanup(moduleId) {
         try {
             const result = await requestModuleCleanup(moduleId);
             if (result && result.error) {
-                showToast(`Module cleanup failed: ${result.error}`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.moduleCleanupFailedValue", { value0: result.error }, "Module cleanup failed: {{value0}}"), 'error');
             } else {
-                showToast(`🧹 Module cleanup: ${moduleId}`, 'success');
+                showToast(i18nText("feature.vtt.vtt-connected.moduleCleanupValue", { value0: moduleId }, "🧹 Module cleanup: {{value0}}"), 'success');
             }
         } catch (error) {
             console.warn('[VTT Connected] Failed to cleanup module:', error);
-            showToast('Module cleanup failed.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.moduleCleanupFailed", null, "Module cleanup failed."), 'error');
         }
     } else {
-        showToast('Module cleanup requires server connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.moduleCleanupRequiresServerConnection", null, "Module cleanup requires server connection."), 'error');
     }
 }
 
@@ -665,7 +666,7 @@ function rollConnected(postToChat = true) {
 
     const result = performRoll(attr, skill, dv, pos, boons);
     if (!result) {
-        showToast('Pool must be at least 1 die.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.poolMustBeAtLeast1Die", null, "Pool must be at least 1 die."), 'error');
         return;
     }
 
@@ -679,7 +680,7 @@ function rollConnected(postToChat = true) {
         }).join('');
         out.innerHTML = `
             <div class="vtt-roll-result">
-                <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.9rem;margin-right:0.4rem;background:${getOutcomeColor(result.outcome)};">
+                <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.9rem;margin-inline-end:0.4rem;background:${getOutcomeColor(result.outcome)};">
                     ${result.outcome}
                 </span>
                 <div class="vtt-roll-dice">${diceHtml}</div>
@@ -760,7 +761,7 @@ function handleSlash(text) {
             const boons = parseInt(parts[5], 10) || 0;
             const note = parts.slice(6).join(' ') || '';
             const result = performRoll(attr, skill, dv, pos, boons);
-            if (!result) { showToast('Pool must be at least 1 die.', 'error'); return; }
+            if (!result) { showToast(i18nText("feature.vtt.vtt-connected.poolMustBeAtLeast1Die", null, "Pool must be at least 1 die."), 'error'); return; }
             const msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → ${result.dice.join(' ')} (S:${result.successes} SB:${result.storyBeats})${result.critical ? ' | 💥 CRIT' : ''}${note ? ' — ' + note : ''}`;
             sendMessage(msg, sender, 'all', {
                 rollData: {
@@ -783,7 +784,7 @@ function handleSlash(text) {
         }
         // ... (other slash commands unchanged)
         default: {
-            showToast('Unknown command. Try /help', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.unknownCommandTryHelp", null, "Unknown command. Try /help"), 'error');
         }
     }
 }
@@ -801,7 +802,7 @@ async function pushCharactersToServer() {
 
     let apiKey = localStorage.getItem('fates-edge-api-key');
     if (!apiKey) {
-        const input = prompt('Enter the server API key (or leave blank if not required):', 'your-secret-key-here');
+        const input = prompt(i18nText("feature.vtt.vtt-connected.enterTheServerAPIKeyOrLeave", null, "Enter the server API key (or leave blank if not required):"), 'your-secret-key-here');
         if (input !== null) {
             apiKey = input.trim();
             if (apiKey) localStorage.setItem('fates-edge-api-key', apiKey);
@@ -891,20 +892,20 @@ async function pushCharactersToServer() {
         if (response.ok) {
             console.log(`✅ Pushed ${Object.keys(updates).length} characters to room ${roomCode}.`);
             if (!charactersPushed) {
-                showToast(`📤 Characters synced to server for room ${roomCode}.`, 'success');
+                showToast(i18nText("feature.vtt.vtt-connected.charactersSyncedToServerForRoomValue", { value0: roomCode }, "📤 Characters synced to server for room {{value0}}."), 'success');
                 charactersPushed = true;
             }
         } else {
             const text = await response.text();
             console.warn(`❌ Failed to push characters: ${response.status} ${text}`);
             if (!charactersPushed) {
-                showToast(`❌ Failed to sync characters (${response.status}). Check API key.`, 'error');
+                showToast(i18nText("feature.vtt.vtt-connected.failedToSyncCharactersValueCheckAPI", { value0: response.status }, "❌ Failed to sync characters ({{value0}}). Check API key."), 'error');
             }
         }
     } catch (e) {
         console.warn('❌ Error pushing characters:', e);
         if (!charactersPushed) {
-            showToast('❌ Error syncing characters. Check connection.', 'error');
+            showToast(i18nText("feature.vtt.vtt-connected.errorSyncingCharactersCheckConnection", null, "❌ Error syncing characters. Check connection."), 'error');
         }
     }
 }
@@ -1078,7 +1079,7 @@ function setupWebSocketSync() {
         if (charArray) {
             receiveCharacters(charArray);
         }
-        showToast('📋 Sync complete.', 'info');
+        showToast(i18nText("feature.vtt.vtt-connected.syncComplete", null, "📋 Sync complete."), 'info');
     };
     onWSEvent('sync-state', syncStateHandler);
     wsListeners.set('sync-state', syncStateHandler);
@@ -1117,7 +1118,7 @@ function setupWebSocketSync() {
     // ─── ROLL RESULTS ──────────────────────────────
     const rollHandler = (rollData) => {
         if (isDestroyed) return;
-        showToast(`🎲 ${rollData.sender || 'Player'} rolled ${rollData.outcome}`, 'info');
+        showToast(i18nText("feature.vtt.vtt-connected.valueRolledValue", { value0: rollData.sender || i18nText('common.player', null, 'Player'), value1: rollData.outcome }, "🎲 {{value0}} rolled {{value1}}"), 'info');
     };
     onWSEvent('roll-result', rollHandler);
     wsListeners.set('roll-result', rollHandler);
@@ -1140,7 +1141,7 @@ function setupWebSocketSync() {
         const msg = `🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''} from ${region}: ${cardNames}\n\n${synthesis}`;
         sendMessage(msg, 'Deck', 'all');
         updateDeckUI();
-        showToast(`🃏 Drew ${cards.length} cards from ${region}`, 'success');
+        showToast(i18nText("feature.vtt.vtt-connected.drewValueCardsFromValue", { value0: cards.length, value1: region }, "🃏 Drew {{value0}} cards from {{value1}}"), 'success');
     };
     onWSEvent('deck-drawn', deckDrawHandler);
     wsListeners.set('deck-drawn', deckDrawHandler);
@@ -1156,7 +1157,7 @@ function setupWebSocketSync() {
         const msg = '🔀 Deck shuffled.';
         sendMessage(msg, 'Deck', 'all');
         updateDeckUI();
-        showToast('🔀 Deck shuffled', 'success');
+        showToast(i18nText("feature.vtt.vtt-connected.deckShuffled_p6yh1", null, "🔀 Deck shuffled"), 'success');
     };
     onWSEvent('deck-shuffled', deckShuffleHandler);
     wsListeners.set('deck-shuffled', deckShuffleHandler);
@@ -1172,7 +1173,7 @@ function setupWebSocketSync() {
         const msg = `👑 Crown Spread: ${data.result?.synthesis || 'A powerful reading...'}`;
         sendMessage(msg, 'Deck', 'all');
         updateDeckUI();
-        showToast('👑 Crown Spread delivered', 'success');
+        showToast(i18nText("feature.vtt.vtt-connected.crownSpreadDelivered", null, "👑 Crown Spread delivered"), 'success');
     };
     onWSEvent('crown-spread', crownSpreadHandler);
     wsListeners.set('crown-spread', crownSpreadHandler);
@@ -1213,7 +1214,7 @@ function setupWebSocketSync() {
             sent: true,
             suggestionData: { id, kind, preview: preview || label, status: 'pending' },
         });
-        showToast(`📋 Assistant GM proposal: ${label || kind}`, 'info');
+        showToast(i18nText("feature.vtt.vtt-connected.assistantGMProposalValue", { value0: label || kind }, "📋 Assistant GM proposal: {{value0}}"), 'info');
     };
     onWSEvent('assistant-suggestion-created', suggestionCreatedHandler);
     wsListeners.set('assistant-suggestion-created', suggestionCreatedHandler);
@@ -1267,7 +1268,7 @@ function setupWebSocketSync() {
                 return;
             }
             playAmbienceTrack(data.trackId, { transitionDuration });
-            if (data?.mood) showToast(`🎵 Ambience shifting to "${data.mood}"`, 'info');
+            if (data?.mood) showToast(i18nText("feature.vtt.vtt-connected.ambienceShiftingToValue", { value0: data.mood }, "🎵 Ambience shifting to \"{{value0}}\""), 'info');
             return;
         }
 
@@ -1279,7 +1280,9 @@ function setupWebSocketSync() {
                 setTrackAttribution(track.id, data.attribution);
             }
             playAmbienceTrack(track.id, { transitionDuration });
-            showToast(`🎵 AI GM auto-selected "${name}"${data?.mood ? ` for "${data.mood}"` : ''}`, 'info');
+            showToast(data?.mood
+                ? i18nText('feature.vtt.vtt-connected.aiGmSelectedForMood', { name, mood: data.mood }, '🎵 AI GM auto-selected "{{name}}" for "{{mood}}"')
+                : i18nText('feature.vtt.vtt-connected.aiGmSelected', { name }, '🎵 AI GM auto-selected "{{name}}"'), 'info');
         }
     };
     onWSEvent('soundboard-ambience', soundboardAmbienceHandler);
@@ -1294,7 +1297,7 @@ function setupWebSocketSync() {
 
     const deckHistoryClearedHandler = (data) => {
         if (isDestroyed) return;
-        showToast('🗑️ Deck history cleared', 'info');
+        showToast(i18nText("feature.vtt.vtt-connected.deckHistoryCleared_1s7w3", null, "🗑️ Deck history cleared"), 'info');
     };
     onWSEvent('deck-history-cleared', deckHistoryClearedHandler);
     wsListeners.set('deck-history-cleared', deckHistoryClearedHandler);
@@ -1305,10 +1308,10 @@ function setupWebSocketSync() {
         loadedModules = data.modules || [];
         const count = loadedModules.length;
         if (count === 0) {
-            showToast('📦 No modules loaded.', 'info');
+            showToast(i18nText("feature.vtt.vtt-connected.noModulesLoaded", null, "📦 No modules loaded."), 'info');
         } else {
             const names = loadedModules.map(m => m.name || m.id).join(', ');
-            showToast(`📦 ${count} module${count > 1 ? 's' : ''} loaded: ${names}`, 'info');
+            showToast(i18nPlural('feature.vtt.vtt-connected.modulesLoaded', count, { names }, '📦 {{count}} modules loaded: {{names}}'), 'info');
         }
     };
     onWSEvent('module-list', moduleListHandler);
@@ -1331,7 +1334,7 @@ function setupWebSocketSync() {
         const adventureJson = module.files && module.files['adventure.json'];
 
         if (!adventureJson) {
-            showToast(`📦 Module pushed: ${name} (no adventure.json to auto-install)`, 'info');
+            showToast(i18nText("feature.vtt.vtt-connected.modulePushedValueNoAdventureJsonTo", { value0: name }, "📦 Module pushed: {{value0}} (no adventure.json to auto-install)"), 'info');
             return;
         }
 
@@ -1343,7 +1346,7 @@ function setupWebSocketSync() {
             });
         } catch (err) {
             console.warn('[VTT] Failed to auto-install pushed module:', err);
-            showToast(`📦 Module pushed: ${name} (auto-install failed: ${err.message})`, 'warning');
+            showToast(i18nText("feature.vtt.vtt-connected.modulePushedValueAutoInstallFailedValue", { value0: name, value1: err.message }, "📦 Module pushed: {{value0}} (auto-install failed: {{value1}})"), 'warning');
         }
     };
     onWSEvent('module-push', modulePushHandler);
@@ -1358,7 +1361,7 @@ function setupWebSocketSync() {
             showToast(removed ? `🧹 Module removed: ${moduleId}` : `🧹 Module cleanup: ${moduleId} (was not installed here)`, 'info');
         } catch (err) {
             console.warn('[VTT] Failed to clean up module:', err);
-            showToast(`🧹 Module cleanup: ${moduleId}`, 'info');
+            showToast(i18nText("feature.vtt.vtt-connected.moduleCleanupValue", { value0: moduleId }, "🧹 Module cleanup: {{value0}}"), 'info');
         }
     };
     onWSEvent('module-cleanup', moduleCleanupHandler);
@@ -1371,7 +1374,7 @@ function setupWebSocketSync() {
             defaultRegion = data.region;
             const regionDisplay = q('#vtt-region-display');
             if (regionDisplay) regionDisplay.textContent = defaultRegion;
-            showToast(`📍 Region updated to: ${defaultRegion}`, 'info');
+            showToast(i18nText("feature.vtt.vtt-connected.regionUpdatedToValue", { value0: defaultRegion }, "📍 Region updated to: {{value0}}"), 'info');
         }
     };
     onWSEvent('region-updated', regionUpdateHandler);
@@ -1473,7 +1476,7 @@ function setupWebSocketSync() {
                 gmState.requests.push({ requesterId, requesterName });
             }
             updateGMUI();
-            showToast(`👑 ${requesterName} requests to become GM.`, 'info');
+            showToast(i18nText("feature.vtt.vtt-connected.valueRequestsToBecomeGM", { value0: requesterName }, "👑 {{value0}} requests to become GM."), 'info');
             playNotificationSound();
         }
     };
@@ -1494,7 +1497,7 @@ function setupWebSocketSync() {
             gmState.currentGmName = 'You';
         }
         updateGMUI();
-        showToast(`Your role is now: ${role.toUpperCase()}`, 'success');
+        showToast(i18nText("feature.vtt.vtt-connected.yourRoleIsNowValue", { value0: role.toUpperCase() }, "Your role is now: {{value0}}"), 'success');
     };
     onWSEvent('gm_role_update', gmRoleHandler);
     wsListeners.set('gm_role_update', gmRoleHandler);
@@ -1516,7 +1519,12 @@ function setupWebSocketSync() {
             gmState.myRole = role;
             document.dispatchEvent(new CustomEvent('gmRoleUpdate', { detail: { role } }));
             const roleLabel = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' }[role] || role;
-            showToast(`Your role is now: ${roleLabel}${(role === 'co-gm' || role === 'assistant-gm') ? (persist ? ' (saved)' : ' (this session only)') : ''}`, 'success');
+            const roleScope = (role === 'co-gm' || role === 'assistant-gm')
+                ? (persist
+                    ? i18nText('feature.vtt.vtt-connected.savedRole', null, ' (saved)')
+                    : i18nText('feature.vtt.vtt-connected.sessionOnlyRole', null, ' (this session only)'))
+                : '';
+            showToast(i18nText("feature.vtt.vtt-connected.yourRoleIsNowValueValue", { value0: roleLabel, value1: roleScope }, "Your role is now: {{value0}}{{value1}}"), 'success');
         }
         updateGMUI();
         renderLocalPresence();
@@ -1590,7 +1598,7 @@ function setupWebSocketSync() {
         vttStore.updateCharacters(chars);
         vttStore.updateTimers(state.timers || []);
         vttStore.setConnectionStatus('connected');
-        showToast('Reconnected to server!', 'success');
+        showToast(i18nText("feature.vtt.vtt-connected.reconnectedToServer", null, "Reconnected to server!"), 'success');
         charactersPushed = false;
         pushCharactersToServer();
         sendClientName();
@@ -1605,7 +1613,7 @@ function setupWebSocketSync() {
     const disconnectHandler = () => {
         if (isDestroyed) return;
         vttStore.setConnectionStatus('local');
-        showToast('Disconnected from server. Messages will be local.', 'warning');
+        showToast(i18nText("feature.vtt.vtt-connected.disconnectedFromServerMessagesWillBeLocal", null, "Disconnected from server. Messages will be local."), 'warning');
         charactersPushed = false;
     };
     onWSEvent('disconnected', disconnectHandler);
@@ -1648,9 +1656,9 @@ function updateGMUI() {
     const actions = q('#gm-actions');
     if (actions) {
         if (gmState.myRole === 'gm') {
-            actions.innerHTML = `<button class="btn btn-sm btn-danger" id="vtt-gm-resign">Resign GM</button>`;
+            actions.innerHTML = `<button class="btn btn-sm btn-danger" id="vtt-gm-resign" data-i18n="feature.vtt.vtt-connected.resignGM">Resign GM</button>`;
         } else {
-            actions.innerHTML = `<button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>`;
+            actions.innerHTML = `<button class="btn btn-sm btn-gold" id="vtt-gm-request" data-i18n="feature.vtt.vtt-connected.requestGM">Request GM</button>`;
         }
     }
     
@@ -1692,7 +1700,7 @@ async function toggleVoice() {
             voiceInitialized = true;
             const toggleBtn = q('#vtt-voice-toggle');
             if (toggleBtn) {
-                toggleBtn.textContent = '🎤 Voice On';
+                toggleBtn.textContent = i18nText("feature.vtt.vtt-connected.voiceOn", null, "🎤 Voice On");
                 toggleBtn.className = 'btn btn-sm btn-primary';
             }
             const containerEl = q('.flex-between .flex:last-child');
@@ -1700,24 +1708,24 @@ async function toggleVoice() {
                 const muteBtn = document.createElement('button');
                 muteBtn.id = 'vtt-mute-toggle';
                 muteBtn.className = 'btn btn-sm btn-green';
-                muteBtn.textContent = '🎙️ Live';
+                muteBtn.textContent = i18nText("feature.vtt.vtt-connected.live", null, "🎙️ Live");
                 muteBtn.addEventListener('click', toggleMuteVoice);
                 containerEl.appendChild(muteBtn);
             }
-            showToast('Voice chat enabled!', 'success');
+            showToast(i18nText("feature.vtt.vtt-connected.voiceChatEnabled", null, "Voice chat enabled!"), 'success');
         }
     } else {
         cleanupVoice();
         voiceInitialized = false;
         const toggleBtn = q('#vtt-voice-toggle');
         if (toggleBtn) {
-            toggleBtn.textContent = '🎤 Voice Off';
+            toggleBtn.textContent = i18nText("feature.vtt.vtt-connected.voiceOff", null, "🎤 Voice Off");
             toggleBtn.className = 'btn btn-sm';
         }
         const muteBtn = q('#vtt-mute-toggle');
         if (muteBtn) muteBtn.remove();
         vttStore.updateVoiceClients([]);
-        showToast('Voice chat disabled.', 'info');
+        showToast(i18nText("feature.vtt.vtt-connected.voiceChatDisabled", null, "Voice chat disabled."), 'info');
     }
 }
 
@@ -1737,35 +1745,35 @@ function toggleMuteVoice() {
     const btn = q('#vtt-mute-toggle');
     if (!btn) return;
     if (muted) {
-        btn.textContent = '🔇 Muted';
+        btn.textContent = i18nText("feature.vtt.vtt-connected.muted", null, "🔇 Muted");
         btn.className = 'btn btn-sm btn-danger';
     } else {
-        btn.textContent = '🎙️ Live';
+        btn.textContent = i18nText("feature.vtt.vtt-connected.live", null, "🎙️ Live");
         btn.className = 'btn btn-sm btn-green';
     }
 }
 
 function callVoiceClient(clientId) {
     if (!voiceInitialized) {
-        showToast('Enable voice first.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.enableVoiceFirst", null, "Enable voice first."), 'error');
         return;
     }
     const client = getVoiceClient(clientId);
     if (!client) {
-        showToast('Client not found.', 'error');
+        showToast(i18nText("feature.vtt.vtt-connected.clientNotFound", null, "Client not found."), 'error');
         return;
     }
     if (client.connectionState === 'connected') {
-        showToast('Already connected to ' + client.name, 'info');
+        showToast(i18nText("feature.vtt.vtt-connected.alreadyConnectedToValue", { value0: client.name }, "Already connected to {{value0}}"), 'info');
         return;
     }
     initiateVoiceCall(clientId);
-    showToast(`Calling ${client.name}...`, 'info');
+    showToast(i18nText("feature.vtt.vtt-connected.callingValue", { value0: client.name }, "Calling {{value0}}..."), 'info');
     // NEW: the toast above is visual-only -- a screen-reader user tabbing
     // through the party roster and pressing the call button got no
     // confirmation the call actually started. announce() mirrors it to the
     // sr-only live region the way chat/roll events already do.
-    announce(`Calling ${client.name}...`);
+    announce(i18nText("feature.vtt.vtt-connected.callingValue", { value0: client.name }, "Calling {{value0}}..."));
 }
 
 // ============================================================
@@ -1807,28 +1815,28 @@ function attachEvents() {
         const id = target.id;
         switch (id) {
             case 'chat-send-btn': e.preventDefault(); handleSendMessage(); break;
-            case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast('Chat cleared.', 'success'); break;
+            case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast(i18nText("feature.vtt.vtt-connected.chatCleared", null, "Chat cleared."), 'success'); break;
             case 'vtt-refresh-btn': {
                 const chars = getCharacters();
                 vttStore.updateCharacters(chars);
                 vttStore.updateTimers(getState().timers || []);
                 populateChatRecipients();
-                showToast('VTT refreshed.', 'info');
+                showToast(i18nText("feature.vtt.vtt-connected.vttRefreshed", null, "VTT refreshed."), 'info');
                 break;
             }
             case 'vtt-roll-post-btn': rollConnected(true); break;
             case 'vtt-roll-only-btn': rollConnected(false); break;
             case 'vtt-add-timer': import('@core/state.js').then(m => {
                 const state = m.getState();
-                const name = prompt('Timer name:', 'Scene Timer');
+                const name = prompt(i18nText("feature.vtt.vtt-connected.timerName", null, "Timer name:"), 'Scene Timer');
                 if (name) {
-                    const segments = parseInt(prompt('Segments:', '6') || '6');
+                    const segments = parseInt(prompt(i18nText("feature.vtt.vtt-connected.segments", null, "Segments:"), '6') || '6');
                     const timer = { id: 'timer-' + Date.now(), name, segments, current: 0 };
                     m.addTimer(timer);
                     vttStore.updateTimers(state.timers || []);
-                    showToast(`Timer "${name}" created.`, 'success');
+                    showToast(i18nText("feature.vtt.vtt-connected.timerValueCreated", { value0: name }, "Timer \"{{value0}}\" created."), 'success');
                 }
-            }).catch(() => showToast('Timer feature not available', 'error')); break;
+            }).catch(() => showToast(i18nText("feature.vtt.vtt-connected.timerFeatureNotAvailable", null, "Timer feature not available"), 'error')); break;
             case 'vtt-scene-end': {
                 const state = getState();
                 (state.characters || []).forEach(c => {
@@ -1842,7 +1850,7 @@ function attachEvents() {
                 try {
                     sendEvent({ type: 'state-updated', state: state });
                 } catch (e) { /* ignore */ }
-                showToast('Scene ended, boons trimmed.', 'info');
+                showToast(i18nText("feature.vtt.vtt-connected.sceneEndedBoonsTrimmed", null, "Scene ended, boons trimmed."), 'info');
                 break;
             }
             case 'vtt-voice-toggle': toggleVoice(); break;
@@ -1857,15 +1865,15 @@ function attachEvents() {
             case 'vtt-modules-list': handleModuleList(); break;
             case 'vtt-gm-request': {
                 if (!isConnectedToServer()) {
-                    showToast('Not connected to server.', 'error');
+                    showToast(i18nText("feature.vtt.vtt-connected.notConnectedToServer", null, "Not connected to server."), 'error');
                     return;
                 }
                 sendWSMessage({ type: 'request_gm' });
-                showToast('Request sent to GM.', 'info');
+                showToast(i18nText("feature.vtt.vtt-connected.requestSentToGM", null, "Request sent to GM."), 'info');
                 break;
             }
             case 'vtt-gm-resign': {
-                showToast('To step down, approve a pending request or promote another player.', 'info');
+                showToast(i18nText("feature.vtt.vtt-connected.toStepDownApproveAPendingRequest", null, "To step down, approve a pending request or promote another player."), 'info');
                 break;
             }
         }
@@ -1882,11 +1890,11 @@ function attachEvents() {
             sendWSMessage({ type: 'approve_gm', targetId });
             gmState.requests = gmState.requests.filter(r => r.requesterId !== targetId);
             updateGMUI();
-            showToast(`Approved ${targetId} as GM.`, 'success');
+            showToast(i18nText("feature.vtt.vtt-connected.approvedValueAsGM", { value0: targetId }, "Approved {{value0}} as GM."), 'success');
         } else if (rejectBtn) {
             gmState.requests = gmState.requests.filter(r => r.requesterId !== targetId);
             updateGMUI();
-            showToast(`Rejected request from ${targetId}.`, 'info');
+            showToast(i18nText("feature.vtt.vtt-connected.rejectedRequestFromValue", { value0: targetId }, "Rejected request from {{value0}}."), 'info');
         }
     };
 
@@ -2000,15 +2008,15 @@ export function render(el) {
             ${isConnected ? '🌐 Connected' : '📡 Local'}
             </span>
             <span class="vtt-stat-pill mode-label">${mode}</span>
-            <button class="btn btn-sm btn-ghost" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
+            <button class="btn btn-sm btn-ghost" onclick="window.location.hash='whiteboard'" title="Open Whiteboard" data-i18n-attr="title:feature.vtt.vtt-connected.openWhiteboard" data-i18n="feature.vtt.vtt-connected.whiteboard">✏️ Whiteboard</button>
         </h1>
-        <p class="page-sub">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
+        <p class="page-sub" data-i18n="feature.vtt.vtt-connected.chatPartyStatusQuickDieRollerDeck">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
         </div>
 
         <!-- Table Status -->
         <div class="panel vtt-card status-panel">
         <div class="vtt-card-header">
-            <span class="vtt-card-title">🛰️ Table Status</span>
+            <span class="vtt-card-title" data-i18n="feature.vtt.vtt-connected.tableStatus">🛰️ Table Status</span>
             <span class="vtt-stat-pill">
             <span class="vtt-dot connection-status" style="background:${isConnected ? 'var(--vtt-green)' : 'var(--vtt-red)'};"></span>
             ${isConnected ? '🟢 Connected' : '🔴 Disconnected'}
@@ -2044,7 +2052,7 @@ export function render(el) {
         </div>
         <div class="vtt-divider"></div>
         <div class="vtt-card-header" style="margin-bottom:0.35rem;">
-            <span class="vtt-card-title" style="font-size:1rem;">👥 Party Members</span>
+            <span class="vtt-card-title" style="font-size:1rem;" data-i18n="feature.vtt.vtt-connected.partyMembers">👥 Party Members</span>
             <span class="vtt-stat-pill" id="vtt-mode-badge">${isConnected ? '🌐 Online' : '📡 Local'}</span>
         </div>
         <div id="presence-list"></div>
@@ -2059,15 +2067,15 @@ export function render(el) {
             </span>
             <span id="gm-actions" class="vtt-btn-row">
             ${gmState.myRole === 'gm' ? `
-                <button class="btn btn-sm btn-danger" id="vtt-gm-resign">Resign GM</button>
+                <button class="btn btn-sm btn-danger" id="vtt-gm-resign" data-i18n="feature.vtt.vtt-connected.resignGM">Resign GM</button>
             ` : `
-                <button class="btn btn-sm btn-gold" id="vtt-gm-request">Request GM</button>
+                <button class="btn btn-sm btn-gold" id="vtt-gm-request" data-i18n="feature.vtt.vtt-connected.requestGM">Request GM</button>
             `}
             </span>
         </div>
         <div id="gm-requests" style="display:none;">
             <div class="vtt-divider"></div>
-            <span class="text-muted" style="font-size:0.85rem;">Pending requests:</span>
+            <span class="text-muted" style="font-size:0.85rem;" data-i18n="feature.vtt.vtt-connected.pendingRequests">Pending requests:</span>
             <div id="gm-requests-list"></div>
         </div>
         </div>
@@ -2077,10 +2085,10 @@ export function render(el) {
         <!-- Chat Column -->
         <div class="chat-box vtt-card" style="display:flex;flex-direction:column;min-height:min(55vh, 500px);">
             <div class="vtt-card-header">
-            <span class="vtt-card-title">💬 Chat</span>
+            <span class="vtt-card-title" data-i18n="feature.vtt.vtt-connected.chat">💬 Chat</span>
             <div class="vtt-btn-row" style="align-items:center;">
-                <span class="text-muted" id="message-count">0 messages</span>
-                <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
+                <span class="text-muted" id="message-count" data-i18n="feature.vtt.vtt-connected.0Messages">0 messages</span>
+                <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat" data-i18n-attr="title:feature.vtt.vtt-connected.clearChat">🗑️</button>
             </div>
             </div>
             <!-- Viewport-relative sizing — see vtt-local.js for the same change.
@@ -2088,14 +2096,14 @@ export function render(el) {
                  screen readers announce each new chat message as it's appended,
                  with no JS changes needed to chatHandler below -- the standard
                  ARIA pattern for a persistently-visible, append-only log. -->
-            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);"></div>
+            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);" data-i18n-attr="aria-label:feature.vtt.vtt-connected.chatMessages"></div>
             <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
             <div class="chat-input-row" style="display:flex;gap:0.4rem;">
-            <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
+            <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" / data-i18n-attr="placeholder:feature.vtt.vtt-connected.typeRollTimerDeckHelp">
             <select id="chatRecipient" style="flex:0 0 120px;font-size:1rem;">
-                <option value="all">All</option>
+                <option value="all" data-i18n="feature.vtt.vtt-connected.all">All</option>
             </select>
-            <button class="btn btn-gold" id="chat-send-btn">Send</button>
+            <button class="btn btn-gold" id="chat-send-btn" data-i18n="feature.vtt.vtt-connected.send">Send</button>
             </div>
             <div class="flex mt-1" style="flex-wrap:wrap;gap:0.9rem;font-size:0.9rem;align-items:center;">
             <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
@@ -2104,7 +2112,7 @@ export function render(el) {
                  the browser's speechSynthesis so a player who typed instead
                  of speaking (deaf, mute, or just not on voice) is heard by
                  anyone listening, not only anyone reading. -->
-            <label class="inline-check" title="Reads new chat messages aloud, so a player who types instead of speaking is still heard"><input type="checkbox" id="vtt-speak-messages" /> 🔊 Read aloud</label>
+            <label class="inline-check" title="Reads new chat messages aloud, so a player who types instead of speaking is still heard" data-i18n-attr="title:feature.vtt.vtt-connected.readsNewChatMessagesAloudSoA"><input type="checkbox" id="vtt-speak-messages" /> 🔊 Read aloud</label>
             </div>
             <div class="vtt-hint">Try <code>/roll 3 2 3</code>, <code>/deck 1</code>, <code>/crown</code>, or <code>/help</code> for the full command list.</div>
         </div>
@@ -2115,8 +2123,8 @@ export function render(el) {
             <!-- Party Status -->
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
-                <span class="vtt-card-title" style="font-size:1.05rem;">👥 Party</span>
-                <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
+                <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-connected.party">👥 Party</span>
+                <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh" data-i18n-attr="title:feature.vtt.vtt-connected.refresh">↻</button>
                 </div>
                 <div id="vttCharGrid" class="vtt-char-grid"></div>
                 <!-- NEW: detail panel for selected character -->
@@ -2126,7 +2134,7 @@ export function render(el) {
             <!-- Combat Actions -->
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
-                <span class="vtt-card-title" style="font-size:1.05rem;">⚔️ Combat Actions</span>
+                <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-connected.combatActions">⚔️ Combat Actions</span>
                 </div>
                 <div id="vtt-combat-actions" style="min-height:2.5rem;"></div>
             </div>
@@ -2137,8 +2145,8 @@ export function render(el) {
                  encounters/combat.js in-memory session (SPA-wide singleton). -->
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
-                <span class="vtt-card-title" style="font-size:1.05rem;">🗡️ Combat Tracker</span>
-                <button class="btn btn-sm btn-ghost" onclick="window.location.hash='encounters'" title="Open full Encounters tracker">↗️</button>
+                <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-connected.combatTracker">🗡️ Combat Tracker</span>
+                <button class="btn btn-sm btn-ghost" onclick="window.location.hash='encounters'" title="Open full Encounters tracker" data-i18n-attr="title:feature.vtt.vtt-connected.openFullEncountersTracker">↗️</button>
                 </div>
                 <div id="vtt-mini-tracker-body" style="min-height:2rem;"></div>
             </div>
@@ -2146,56 +2154,56 @@ export function render(el) {
             <!-- Quick Roller -->
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
-                <span class="vtt-card-title" style="font-size:1.05rem;">🎲 Quick Roller</span>
+                <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-connected.quickRoller">🎲 Quick Roller</span>
                 </div>
                 <div class="vtt-dice-row">
                 <div class="vtt-field">
-                    <label>Attr</label>
+                    <label data-i18n="feature.vtt.vtt-connected.attr">Attr</label>
                     <input type="number" id="vtt-attr" value="3" min="1" max="8" style="width:100%;" />
                 </div>
                 <div class="vtt-field">
-                    <label>Skill</label>
+                    <label data-i18n="feature.vtt.vtt-connected.skill">Skill</label>
                     <input type="number" id="vtt-skill" value="2" min="0" max="12" style="width:100%;" />
                 </div>
                 <div class="vtt-field" style="flex:0 0 80px;">
-                    <label>DV</label>
+                    <label data-i18n="feature.vtt.vtt-connected.dv">DV</label>
                     <select id="vtt-dv">
                     <option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5+</option>
                     </select>
                 </div>
                 <div class="vtt-field" style="flex:0 0 90px;">
-                    <label>Pos</label>
+                    <label data-i18n="feature.vtt.vtt-connected.pos">Pos</label>
                     <select id="vtt-pos">
-                    <option value="dominant">Dom</option><option value="controlled" selected>Ctrl</option><option value="desperate">Desp</option>
+                    <option value="dominant" data-i18n="feature.vtt.vtt-connected.dom">Dom</option><option value="controlled" selected data-i18n="feature.vtt.vtt-connected.ctrl">Ctrl</option><option value="desperate" data-i18n="feature.vtt.vtt-connected.desp">Desp</option>
                     </select>
                 </div>
                 <div class="vtt-field" style="flex:0 0 70px;">
-                    <label>Boons</label>
+                    <label data-i18n="feature.vtt.vtt-connected.boons">Boons</label>
                     <input type="number" id="vtt-boons" value="0" min="0" max="5" />
                 </div>
                 </div>
                 <div class="vtt-dice-row" style="margin-top:0.4rem;">
                 <div class="vtt-field" style="flex:1 1 140px;">
-                    <label>Weapon</label>
+                    <label data-i18n="feature.vtt.vtt-connected.weapon">Weapon</label>
                     <select id="vtt-attack-type" title="Weapon weight class — drives the range bonus below (Player's Guide §3.12.1-3.12.3).">
                     <option value="">— N/A —</option>
-                    <option value="light">🗡️ Light</option>
-                    <option value="medium">⚔️ Medium</option>
-                    <option value="heavy">🔨 Heavy</option>
-                    <option value="ranged">🏹 Ranged</option>
+                    <option value="light" data-i18n="feature.vtt.vtt-connected.light">🗡️ Light</option>
+                    <option value="medium" data-i18n="feature.vtt.vtt-connected.medium">⚔️ Medium</option>
+                    <option value="heavy" data-i18n="feature.vtt.vtt-connected.heavy">🔨 Heavy</option>
+                    <option value="ranged" data-i18n="feature.vtt.vtt-connected.ranged">🏹 Ranged</option>
                     </select>
                 </div>
                 <div class="vtt-field" style="flex:1 1 160px;">
-                    <label>Range (GM-set)</label>
-                    <select id="vtt-range" title="The narrative range the GM told you before rolling.">
+                    <label data-i18n="feature.vtt.vtt-connected.rangeGMSet">Range (GM-set)</label>
+                    <select id="vtt-range" title="The narrative range the GM told you before rolling." data-i18n-attr="title:feature.vtt.vtt-connected.theNarrativeRangeTheGMToldYou">
                     ${RANGE_BAND_OPTIONS.map(r => `<option value="${r.key}">${r.label}</option>`).join('')}
                     </select>
                 </div>
                 </div>
                 <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
                 <div class="vtt-btn-row" style="margin-top:0.5rem;">
-                <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn">Roll &amp; Post</button>
-                <button class="btn btn-sm" id="vtt-roll-only-btn">Roll Only</button>
+                <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-connected.rollPost">Roll &amp; Post</button>
+                <button class="btn btn-sm" id="vtt-roll-only-btn" data-i18n="feature.vtt.vtt-connected.rollOnly">Roll Only</button>
                 </div>
                 <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>
             </div>
@@ -2203,14 +2211,14 @@ export function render(el) {
             <!-- Deck Panel -->
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
-                <span class="vtt-card-title" style="font-size:1.05rem;">🃏 Deck</span>
+                <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-connected.deck">🃏 Deck</span>
                 <span class="vtt-stat-pill">📍 <strong id="vtt-region-display">${defaultRegion}</strong></span>
                 </div>
                 <div class="vtt-btn-row">
-                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-1">Draw 1</button>
-                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-2">Draw 2</button>
-                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-3">Draw 3</button>
-                <button class="btn btn-sm btn-primary" id="vtt-deck-crown">👑 Crown</button>
+                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-1" data-i18n="feature.vtt.vtt-connected.draw1">Draw 1</button>
+                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-2" data-i18n="feature.vtt.vtt-connected.draw2">Draw 2</button>
+                <button class="btn btn-sm btn-gold" id="vtt-deck-draw-3" data-i18n="feature.vtt.vtt-connected.draw3">Draw 3</button>
+                <button class="btn btn-sm btn-primary" id="vtt-deck-crown" data-i18n="feature.vtt.vtt-connected.crown">👑 Crown</button>
                 <button class="btn btn-sm" id="vtt-deck-shuffle">🔀</button>
                 <button class="btn btn-sm btn-ghost" id="vtt-deck-history">📜</button>
                 <button class="btn btn-sm btn-ghost" id="vtt-modules-list">📦</button>
@@ -2221,12 +2229,12 @@ export function render(el) {
             <!-- Timers -->
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
-                <span class="vtt-card-title" style="font-size:1.05rem;">⏱️ Scene Timers</span>
+                <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-connected.sceneTimers">⏱️ Scene Timers</span>
                 </div>
                 <div id="vttTimerList"></div>
                 <div class="vtt-btn-row" style="margin-top:0.5rem;">
-                <button class="btn btn-sm" id="vtt-add-timer">+ Add Timer</button>
-                <button class="btn btn-sm" id="vtt-scene-end">🌅 Scene End</button>
+                <button class="btn btn-sm" id="vtt-add-timer" data-i18n="feature.vtt.vtt-connected.addTimer">+ Add Timer</button>
+                <button class="btn btn-sm" id="vtt-scene-end" data-i18n="feature.vtt.vtt-connected.sceneEnd">🌅 Scene End</button>
                 </div>
             </div>
             </div>

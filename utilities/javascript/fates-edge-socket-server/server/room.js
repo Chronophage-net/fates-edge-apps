@@ -418,6 +418,9 @@ const ASSIGNABLE_ROLES = new Set(['co-gm', 'assistant-gm', 'player', 'spectator'
 function _applyRoleChange(room, target, targetId, role, persist, byId) {
     const previousRole = target.role;
     target.role = role;
+    if (target.type === 'socket.io' && target.socket?.sessionRoomRoles instanceof Map) {
+        target.socket.sessionRoomRoles.set(room.code, role);
+    }
     room.clients.set(targetId, target);
 
     // Demotions (anything moving OFF co-gm or assistant-gm) always write

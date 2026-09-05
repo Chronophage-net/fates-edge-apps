@@ -1,3 +1,4 @@
+import { t as i18nText } from '@core/i18n.js';
 // ============================================================
 //  KON'REH ENGINE — implementation of the official LaTeX rulebook
 //  ("Corpus Canré Scholiatum" / Kon'reh Core Rules §1–9)
@@ -1561,16 +1562,16 @@ export function openKonrehModal(netConfig = null) {
     #konreh-modal .kr-btn:hover { background:#34364a; }
     #konreh-modal .kr-btn.primary { background:var(--gold); color:#1a1400; border-color:var(--gold); font-weight:600; }
     #konreh-modal .kr-btn.primary:hover { background:#e6c250; }
-    #konreh-modal .kr-choice { display:block; width:100%; text-align:left; margin-bottom:6px; }
+    #konreh-modal .kr-choice { display:block; width:100%; text-align: start; margin-bottom:6px; }
     #konreh-modal .kr-badge { display:inline-block; font-size:11px; padding:1px 6px; border-radius:10px;
-                    background:#2a2b38; color:var(--muted); margin-left:6px; }
+                    background:#2a2b38; color:var(--muted); margin-inline-start:6px; }
     #konreh-modal .kr-log { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:11.5px;
                     line-height:1.55; color:#b9b8c8; }
     #konreh-modal .kr-log .p1 { color:#e9c46a; }
     #konreh-modal .kr-log .p2 { color:#e18a95; }
     #konreh-modal .kr-scroll::-webkit-scrollbar { width:8px; }
     #konreh-modal .kr-scroll::-webkit-scrollbar-thumb { background:#3a3b4a; border-radius:4px; }
-    #konreh-modal .kr-coach-tip { background:#1a2a1a; border-left: 3px solid #4ecdc4; padding: 6px 10px; border-radius: 4px; font-size: 12px; color: #b8e6e0; margin-top: 6px; min-height: 28px; transition: all 0.15s; }
+    #konreh-modal .kr-coach-tip { background:#1a2a1a; border-inline-start: 3px solid #4ecdc4; padding: 6px 10px; border-radius: 4px; font-size: 12px; color: #b8e6e0; margin-top: 6px; min-height: 28px; transition: all 0.15s; }
   `;
   document.head.appendChild(style);
 
@@ -1607,10 +1608,10 @@ export function openKonrehModal(netConfig = null) {
   const titleRow = document.createElement('div');
   titleRow.style.cssText = 'width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;';
   const title = document.createElement('h2');
-  title.textContent = "Kon'reh";
+  title.textContent = i18nText("feature.kon-reh.konReh", null, "Kon'reh");
   title.style.cssText = 'color: var(--gold); margin:0; font-size:20px; letter-spacing:0.02em;';
   const subtitle = document.createElement('span');
-  subtitle.textContent = 'Apex, Sanctum, and Reforge';
+  subtitle.textContent = i18nText("feature.kon-reh.apexSanctumAndReforge", null, "Apex, Sanctum, and Reforge");
   subtitle.style.cssText = 'color: var(--muted); font-size:12px;';
   const titleWrap = document.createElement('div');
   titleWrap.appendChild(title);
@@ -1632,17 +1633,17 @@ export function openKonrehModal(netConfig = null) {
 
   const setupIntro = document.createElement('div');
   setupIntro.style.cssText = 'text-align:center; color:var(--muted); font-size:13px;';
-  setupIntro.textContent = 'Choose how to play.';
+  setupIntro.textContent = i18nText("feature.kon-reh.chooseHowToPlay", null, "Choose how to play.");
   setupScreen.appendChild(setupIntro);
 
   const modeRow = document.createElement('div');
   modeRow.style.cssText = 'display:flex; gap:10px;';
   const twoPlayerBtn = document.createElement('button');
   twoPlayerBtn.className = 'kr-btn primary';
-  twoPlayerBtn.textContent = '👥 Two Players';
+  twoPlayerBtn.textContent = i18nText("feature.kon-reh.twoPlayers", null, "👥 Two Players");
   const vsAiBtn = document.createElement('button');
   vsAiBtn.className = 'kr-btn';
-  vsAiBtn.textContent = '🤖 vs Computer';
+  vsAiBtn.textContent = i18nText("feature.kon-reh.vsComputer", null, "🤖 vs Computer");
   modeRow.appendChild(twoPlayerBtn);
   modeRow.appendChild(vsAiBtn);
   setupScreen.appendChild(modeRow);
@@ -1658,7 +1659,7 @@ export function openKonrehModal(netConfig = null) {
   const coachLabelEl = document.createElement('label');
   coachLabelEl.htmlFor = 'kr-coach-toggle';
   coachLabelEl.style.cursor = 'pointer';
-  coachLabelEl.textContent = '💡 Coach Mode — live move suggestions & teaching';
+  coachLabelEl.textContent = i18nText("feature.kon-reh.coachModeLiveMoveSuggestionsTeaching", null, "💡 Coach Mode — live move suggestions & teaching");
   coachToggleRow.appendChild(coachCheck);
   coachToggleRow.appendChild(coachLabelEl);
   coachPanel.appendChild(coachToggleRow);
@@ -1666,7 +1667,7 @@ export function openKonrehModal(netConfig = null) {
   const coachSchoolRow = document.createElement('div');
   coachSchoolRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted);';
   const coachSchoolLabel = document.createElement('span');
-  coachSchoolLabel.textContent = 'Coached by:';
+  coachSchoolLabel.textContent = i18nText("feature.kon-reh.coachedBy", null, "Coached by:");
   const coachSchoolSelect = document.createElement('select');
   coachSchoolSelect.id = 'kr-coach-school';
   coachSchoolSelect.disabled = true;
@@ -1674,7 +1675,7 @@ export function openKonrehModal(netConfig = null) {
   Object.entries(SCHOOLS).forEach(([id, school]) => {
     const opt = document.createElement('option');
     opt.value = id;
-    opt.textContent = `${school.name} — ${school.tagline}`;
+    opt.textContent = i18nText("feature.kon-reh.valueValue", { value0: school.name, value1: school.tagline }, "{{value0}} — {{value1}}");
     coachSchoolSelect.appendChild(opt);
   });
   coachSchoolRow.appendChild(coachSchoolLabel);
@@ -1694,7 +1695,7 @@ export function openKonrehModal(netConfig = null) {
 
   const schoolLabel = document.createElement('div');
   schoolLabel.style.cssText = 'color:var(--gold); font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; align-self:flex-start;';
-  schoolLabel.textContent = 'Choose a School';
+  schoolLabel.textContent = i18nText("feature.kon-reh.chooseASchool", null, "Choose a School");
   schoolPanel.appendChild(schoolLabel);
 
   const schoolGrid = document.createElement('div');
@@ -1710,7 +1711,7 @@ export function openKonrehModal(netConfig = null) {
   Object.entries(SCHOOLS).forEach(([id, school]) => {
     const card = document.createElement('button');
     card.className = 'kr-btn';
-    card.style.cssText = 'text-align:left; padding:10px 12px; display:flex; flex-direction:column; gap:3px; border:1px solid #3a3b4a;';
+    card.style.cssText = 'text-align: start; padding:10px 12px; display:flex; flex-direction:column; gap:3px; border:1px solid #3a3b4a;';
     card.innerHTML = `<div style="font-weight:700; color:var(--gold);">${school.name}</div><div style="font-size:11px; color:var(--muted); font-weight:400;">${school.tagline}</div>`;
     card.onclick = () => {
       chosenSchool = id;
@@ -1738,13 +1739,13 @@ export function openKonrehModal(netConfig = null) {
   const sideRow = document.createElement('div');
   sideRow.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); flex-wrap:wrap; justify-content:center;';
   const sideLabel = document.createElement('span');
-  sideLabel.textContent = 'Computer plays:';
+  sideLabel.textContent = i18nText("feature.kon-reh.computerPlays", null, "Computer plays:");
   const p1SideBtn = document.createElement('button');
   p1SideBtn.className = 'kr-btn';
-  p1SideBtn.textContent = 'Player 1 (first)';
+  p1SideBtn.textContent = i18nText("feature.kon-reh.player1First", null, "Player 1 (first)");
   const p2SideBtn = document.createElement('button');
   p2SideBtn.className = 'kr-btn primary';
-  p2SideBtn.textContent = 'Player 2 (second, opening double-move)';
+  p2SideBtn.textContent = i18nText("feature.kon-reh.player2SecondOpeningDoubleMove", null, "Player 2 (second, opening double-move)");
   p1SideBtn.onclick = () => { chosenAiPlayer = 1; p1SideBtn.className = 'kr-btn primary'; p2SideBtn.className = 'kr-btn'; };
   p2SideBtn.onclick = () => { chosenAiPlayer = 2; p2SideBtn.className = 'kr-btn primary'; p1SideBtn.className = 'kr-btn'; };
   sideRow.appendChild(sideLabel);
@@ -1754,7 +1755,7 @@ export function openKonrehModal(netConfig = null) {
 
   const startBtn = document.createElement('button');
   startBtn.className = 'kr-btn primary';
-  startBtn.textContent = '▶ Start Game';
+  startBtn.textContent = i18nText("feature.kon-reh.startGame", null, "▶ Start Game");
   startBtn.style.cssText = 'margin-top:4px;';
   schoolPanel.appendChild(startBtn);
 
@@ -1776,7 +1777,7 @@ export function openKonrehModal(netConfig = null) {
   // Coach tip div – shows the suggestion and also the selected piece coordinates
   const coachTipDiv = document.createElement('div');
   coachTipDiv.className = 'kr-coach-tip';
-  coachTipDiv.textContent = '💡 Coach will suggest moves when it\'s your turn.';
+  coachTipDiv.textContent = i18nText("feature.kon-reh.coachWillSuggestMovesWhenItS", null, "💡 Coach will suggest moves when it's your turn.");
   coachTipDiv.style.display = 'none';
   boardContainer.appendChild(coachTipDiv);
 
@@ -1795,7 +1796,7 @@ export function openKonrehModal(netConfig = null) {
   controlsRow.style.cssText = 'width:100%; display:flex; gap:8px; margin-top:14px; justify-content:center;';
   const resetBtn = document.createElement('button');
   resetBtn.className = 'kr-btn';
-  resetBtn.textContent = '🔄 New Game';
+  resetBtn.textContent = i18nText("feature.kon-reh.newGame", null, "🔄 New Game");
   controlsRow.appendChild(resetBtn);
   boardContainer.appendChild(controlsRow);
 
@@ -1806,7 +1807,7 @@ export function openKonrehModal(netConfig = null) {
   sidebar.style.cssText = 'flex: 1 1 260px; min-width:240px; display: flex; flex-direction: column; gap: 12px; max-height: 84vh;';
 
   const logHeader = document.createElement('div');
-  logHeader.textContent = 'Move Log';
+  logHeader.textContent = i18nText("feature.kon-reh.moveLog", null, "Move Log");
   logHeader.style.cssText = 'color:var(--gold); font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;';
   sidebar.appendChild(logHeader);
 
@@ -1838,7 +1839,7 @@ export function openKonrehModal(netConfig = null) {
   talkInput.style.cssText = 'flex:1; min-width:0; background:#101119; border:1px solid var(--line); border-radius:6px; padding:6px 8px; color:var(--ink); font-size:12px;';
   const talkSendBtn = document.createElement('button');
   talkSendBtn.className = 'kr-btn';
-  talkSendBtn.textContent = 'Send';
+  talkSendBtn.textContent = i18nText("feature.kon-reh.send", null, "Send");
   talkInputRow.appendChild(talkInput);
   talkInputRow.appendChild(talkSendBtn);
   talkBody.appendChild(talkInputRow);
@@ -1852,7 +1853,7 @@ export function openKonrehModal(netConfig = null) {
   });
 
   const rulesHeader = document.createElement('div');
-  rulesHeader.textContent = 'Quick Rules';
+  rulesHeader.textContent = i18nText("feature.kon-reh.quickRules", null, "Quick Rules");
   rulesHeader.style.cssText = 'color:var(--gold); font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px;';
   sidebar.appendChild(rulesHeader);
 
@@ -1962,7 +1963,7 @@ export function openKonrehModal(netConfig = null) {
     if (activePlayer !== aiConfig.player) return;
 
     aiThinking = true;
-    statusDiv.textContent = `${SCHOOLS[aiConfig.schoolId].name} is thinking…`;
+    statusDiv.textContent = i18nText("feature.kon-reh.valueIsThinking", { value0: SCHOOLS[aiConfig.schoolId].name }, "{{value0}} is thinking…");
     setTimeout(() => {
       if (game.winner) { aiThinking = false; render(); return; }
       if (game.pendingReforge) {
@@ -2330,7 +2331,7 @@ export function openKonrehModal(netConfig = null) {
 
     // Update status with selected piece coords (if any)
     if (selectedPiece) {
-      statusDiv.textContent += `  |  Selected: (${selectedPiece.x}, ${selectedPiece.y})`;
+      statusDiv.textContent += i18nText("feature.kon-reh.selectedValueValue", { value0: selectedPiece.x, value1: selectedPiece.y }, "  |  Selected: ({{value0}}, {{value1}})");
     }
   }
 
@@ -2430,7 +2431,7 @@ export function openKonrehModal(netConfig = null) {
       }
       const cancel = document.createElement('button');
       cancel.className = 'kr-btn kr-choice';
-      cancel.textContent = 'Cancel';
+      cancel.textContent = i18nText("feature.kon-reh.cancel", null, "Cancel");
       cancel.onclick = () => { pendingChoice = null; render(); };
       choicePanel.appendChild(cancel);
     }
@@ -2687,7 +2688,7 @@ async function launchTollVeil() {
     openTollVeilModal({});
   } catch (err) {
     console.error('[Toll & Veil] Failed to open:', err);
-    alert(`Toll & Veil failed to open: ${err.message}\n(See browser console for details.)`);
+    alert(i18nText("feature.kon-reh.tollVeilFailedToOpenValueSee", { value0: err.message }, "Toll & Veil failed to open: {{value0}}\n(See browser console for details.)"));
   }
 }
 
@@ -2718,23 +2719,23 @@ export default {
 
     container.innerHTML = `
       <div class="panel" style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 1.5rem;">
-        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;">🌀 Kon'reh</h2>
+        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;" data-i18n="feature.kon-reh.konReh_olaj2">🌀 Kon'reh</h2>
         <p style="color:var(--text2);margin-top:0;">A game of Apex, Sanctum, and Reforge</p>
-        <button id="konreh-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;">▶ Play Kon'reh</button>
+        <button id="konreh-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;" data-i18n="feature.kon-reh.playKonReh">▶ Play Kon'reh</button>
         <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Local hot‑seat, vs‑computer Schools, or challenge a connected player from the Whiteboard's 🌀 Kon'reh toggle.</p>
       </div>
       <div class="panel" style="max-width:720px;margin:1rem auto 0;text-align:center;padding:2rem 1.5rem;">
-        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;">🃏 Toll &amp; Veil</h2>
+        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;" data-i18n="feature.kon-reh.tollVeil">🃏 Toll &amp; Veil</h2>
         <p style="color:var(--text2);margin-top:0;">A 3-5 player trick-taking card game of bids, trump, and nerve</p>
-        <button id="tollveil-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;">▶ Play Toll &amp; Veil</button>
+        <button id="tollveil-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;" data-i18n="feature.kon-reh.playTollVeil">▶ Play Toll &amp; Veil</button>
         <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Pass &amp; play, solo vs AI, or host a table for the group from the Whiteboard's 🃏 Toll &amp; Veil toggle — points-only by default, with optional capped-XP or narrative "String" stakes.</p>
       </div>
-      <div class="panel" id="konreh-rules-panel" style="max-width:720px;margin:1rem auto 0;padding:1.25rem 1.5rem;text-align:left;font-size:0.85rem;line-height:1.5;">
-        <h3 style="color:var(--gold);margin-top:0;">Kon'reh — How to Play</h3>
+      <div class="panel" id="konreh-rules-panel" style="max-width:720px;margin:1rem auto 0;padding:1.25rem 1.5rem;text-align: start;font-size:0.85rem;line-height:1.5;">
+        <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.konRehHowToPlay">Kon'reh — How to Play</h3>
         ${getRulesText()}
       </div>
-      <div class="panel" id="tollveil-rules-panel" style="max-width:720px;margin:1rem auto 2rem;padding:1.25rem 1.5rem;text-align:left;font-size:0.85rem;line-height:1.5;">
-        <h3 style="color:var(--gold);margin-top:0;">Toll &amp; Veil — How to Play</h3>
+      <div class="panel" id="tollveil-rules-panel" style="max-width:720px;margin:1rem auto 2rem;padding:1.25rem 1.5rem;text-align: start;font-size:0.85rem;line-height:1.5;">
+        <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.tollVeilHowToPlay">Toll &amp; Veil — How to Play</h3>
         ${getTollVeilRulesText()}
       </div>
     `;

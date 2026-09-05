@@ -49,6 +49,7 @@
 //   // later, to tear down:
 //   connection.destroy();
 
+import { t as i18nText } from '@core/i18n.js';
 import { openKonrehModal } from './index.js';
 
 export const KONREH_CONNECTED_PROTOCOL_VERSION = 1;
@@ -100,13 +101,13 @@ export function openKonrehModalConnected(transport, options = {}) {
     // Small corner indicator — not a full-screen pop-up — while we wait for
     // the remote peer's state sync.
     connectingEl.style.cssText = `
-      position: fixed; bottom: 1rem; right: 1rem; z-index: 10000;
+      position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 10000;
       background: #1b1c26; border: 1px solid #d4af37; border-radius: 10px;
       padding: 10px 16px; color: #e8e6df;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     `;
-    connectingEl.textContent = 'Connecting to game…';
+    connectingEl.textContent = i18nText("feature.kon-reh.kon-reh-connected.connectingToGame", null, "Connecting to game…");
     document.body.appendChild(connectingEl);
   }
   function hideConnectingIndicator() {

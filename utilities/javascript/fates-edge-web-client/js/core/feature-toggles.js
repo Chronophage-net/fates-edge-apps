@@ -28,6 +28,7 @@
  */
 
 import { isConnectedToServer, onEvent } from './websocket.js';
+import { t } from './i18n.js';
 
 const DISABLED_KEY = 'fates-edge-disabled-features';
 const ROLE_KEY = 'fates-edge-my-role';
@@ -172,8 +173,8 @@ export function isFeatureVisible(featureId) {
 /** Human-readable message for whichever reason a feature is unavailable. */
 export function getFeatureLockMessage(featureId) {
     const { reason } = getFeatureAccess(featureId);
-    if (reason === 'gm-only') return 'Only the GM can access this.';
-    if (reason === 'gm-hidden') return 'You\'ve hidden this from your own sidebar — re-enable it from your GM panel.';
+    if (reason === 'gm-only') return t('feature.core.feature-toggles.gmOnly', null, 'Only the GM can access this.');
+    if (reason === 'gm-hidden') return t('feature.core.feature-toggles.gmHidden', null, 'You\'ve hidden this from your own sidebar — re-enable it from your GM panel.');
     return null;
 }
 

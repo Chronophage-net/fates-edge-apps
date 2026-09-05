@@ -31,6 +31,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '@core/state.js';
 import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -458,14 +459,14 @@ function renderTalentFilterBar(allAvailable) {
             value="${escHtml(talentFilterState.search)}"
             style="flex:1;min-width:100px;font-size:0.75rem;padding:0.2rem 0.4rem;" />
         <select id="ce-talent-filter-category" style="font-size:0.75rem;padding:0.2rem;">
-            <option value="">All categories</option>
+            <option value="" data-i18n="feature.characters.editor.allCategories">All categories</option>
             ${categoryOptions}
         </select>
         <select id="ce-talent-filter-tag" style="font-size:0.75rem;padding:0.2rem;">
-            <option value="">All tags</option>
+            <option value="" data-i18n="feature.characters.editor.allTags">All tags</option>
             ${tagOptions}
         </select>
-        ${showClear ? `<button type="button" class="btn btn-xs" id="ce-talent-filter-clear">Clear</button>` : ''}
+        ${showClear ? `<button type="button" class="btn btn-xs" id="ce-talent-filter-clear" data-i18n="feature.characters.editor.clear">Clear</button>` : ''}
     `;
 
     document.getElementById('ce-talent-filter-search')?.addEventListener('input', (e) => {
@@ -571,11 +572,11 @@ function renderTalentList(tierAvailableArg) {
             ${header}
             <div class="talent-catalog-item" style="display:flex;align-items:center;padding:0.3rem 0.5rem;font-size:0.8rem;border-bottom:1px solid var(--border);${t._affordable ? '' : 'opacity:0.55;'}">
                 <div class="talent-info" style="flex:1;">
-                    ${t._recommended ? '<span title="Common starting talent" style="margin-right:0.2rem;">⭐</span>' : ''}
+                    ${t._recommended ? '<span title="Common starting talent" style="margin-inline-end:0.2rem;">⭐</span>' : ''}
                     <span style="font-weight:500;">${escHtml(t.name)}</span>
-                    <span style="color:var(--gold); margin-left:0.3rem;">${cost} XP</span>
-                    <span style="color:var(--text3); font-size:0.75rem; margin-left:0.3rem;">(${tierLabel})</span>
-                    ${!t._affordable ? `<span style="color:var(--text3); font-size:0.7rem; margin-left:0.3rem;">— need ${cost - (remainingXp || 0)} more XP</span>` : ''}
+                    <span style="color:var(--gold); margin-inline-start:0.3rem;">${cost} XP</span>
+                    <span style="color:var(--text3); font-size:0.75rem; margin-inline-start:0.3rem;">(${tierLabel})</span>
+                    ${!t._affordable ? `<span style="color:var(--text3); font-size:0.7rem; margin-inline-start:0.3rem;">— need ${cost - (remainingXp || 0)} more XP</span>` : ''}
                     ${t.description ? `<div style="color:var(--text2); font-size:0.7rem;">${escHtml(t.description)}</div>` : ''}
                     ${t.prerequisites ? `<div style="color:var(--text3); font-size:0.65rem;">Requires: ${escHtml(t.prerequisites)}</div>` : ''}
                     ${Array.isArray(t.tags) && t.tags.length ? `<div style="margin-top:0.15rem;">${t.tags.map(tg =>
@@ -617,7 +618,7 @@ function renderTalentList(tierAvailableArg) {
  */
 function addTalentFromCatalog(talent) {
     if (!editorState.currentId) {
-        showToast('Open a character first.', 'error');
+        showToast(i18nText("feature.characters.editor.openACharacterFirst", null, "Open a character first."), 'error');
         return;
     }
     const c = getCharacter(editorState.currentId);
@@ -635,7 +636,7 @@ function addTalentFromCatalog(talent) {
     updateCharacter(editorState.currentId, { talents: c.talents });
     renderCETalentList();
     recalculateXpBudget();
-    showToast(`Added "${talent.name}" (${safeParseInt(talent.cost, 0)} XP)`, 'success');
+    showToast(i18nText("feature.characters.editor.addedValueValueXP", { value0: talent.name, value1: safeParseInt(talent.cost, 0) }, "Added \"{{value0}}\" ({{value1}} XP)"), 'success');
 }
 
 /**
@@ -660,16 +661,16 @@ function renderCETalentList() {
         let chargeBadge = '';
         if (isLimited) {
             chargeBadge = spent
-                ? `<span title="Charge spent — refreshes at ${t.useLimit.replace('once-', '')} end" style="color:var(--text3);font-size:0.7rem;margin-left:0.3rem;">○ spent</span>
+                ? `<span title="Charge spent — refreshes at ${t.useLimit.replace('once-', '')} end" style="color:var(--text3);font-size:0.7rem;margin-inline-start:0.3rem;">○ spent</span>
                    <button type="button" class="btn btn-xs ce-talent-refresh-btn" data-index="${i}" title="Manually refresh this charge">↻</button>`
-                : `<span title="Charge available" style="color:var(--green);font-size:0.7rem;margin-left:0.3rem;">● ready</span>`;
+                : `<span title="Charge available" style="color:var(--green);font-size:0.7rem;margin-inline-start:0.3rem;" data-i18n-attr="title:feature.characters.editor.chargeAvailable">● ready</span>`;
         }
         return `
             <div class="dynamic-row ce-talent-row" data-index="${i}" style="display:flex;align-items:center;gap:0.4rem;padding:0.2rem 0;">
                 <div style="flex:2;">
                     <span style="font-weight:500;">${escHtml(t.name)}</span>
-                    ${tierLabel ? `<span style="color:var(--text3);font-size:0.7rem;margin-left:0.3rem;">(${escHtml(tierLabel)})</span>` : ''}
-                    ${hasMechanicalEffect ? `<span title="Has a mechanical effect the dice roller applies automatically" style="margin-left:0.3rem;">⚙️</span>` : ''}
+                    ${tierLabel ? `<span style="color:var(--text3);font-size:0.7rem;margin-inline-start:0.3rem;">(${escHtml(tierLabel)})</span>` : ''}
+                    ${hasMechanicalEffect ? `<span title="Has a mechanical effect the dice roller applies automatically" style="margin-inline-start:0.3rem;" data-i18n-attr="title:feature.characters.editor.hasAMechanicalEffectTheDiceRoller">⚙️</span>` : ''}
                     ${chargeBadge}
                     ${t.effect ? `<div style="color:var(--text3);font-size:0.7rem;">${escHtml(t.effect)}</div>` : ''}
                 </div>
@@ -1005,7 +1006,7 @@ function updateDerivedStats() {
     const corruptionMax = document.getElementById('ce-corruption-max');
     const mentalStrainMax = document.getElementById('ce-mental-strain-max');
     if (fatigueMax) fatigueMax.textContent = body;
-    if (obligationCap) obligationCap.textContent = spirit + presence;
+    if (obligationCap) obligationCap.textContent = i18nText("feature.characters.editor.valueValue", { value0: spirit, value1: presence }, "{{value0}}{{value1}}");
     if (corruptionMax) corruptionMax.textContent = spirit;
     if (mentalStrainMax) mentalStrainMax.textContent = spirit;
     recalculateXpBudget();
@@ -1015,7 +1016,7 @@ function updateTierDisplay() {
     const xp = safeParseInt(document.getElementById('ce-total-xp')?.value, 32);
     const { tier, name } = getTierFromXp(xp);
     const tierDisplay = document.getElementById('ce-tier-display');
-    if (tierDisplay) tierDisplay.textContent = `Tier ${tier}: ${name}`;
+    if (tierDisplay) tierDisplay.textContent = i18nText("feature.characters.editor.tierValueValue", { value0: tier, value1: name }, "Tier {{value0}}: {{value1}}");
     renderTalentCatalog();
 }
 
@@ -1034,7 +1035,7 @@ function updateWeaponMods() {
     const weapon = WEAPON_CLASSES.find(w => w.id === weaponId);
     const infoEl = document.getElementById('ce-weapon-info');
     if (infoEl && weapon) {
-        infoEl.textContent = `Close: ${weapon.close} | Near: ${weapon.near} | ${weapon.notes}`;
+        infoEl.textContent = i18nText("feature.characters.editor.closeValueNearValueValue", { value0: weapon.close, value1: weapon.near, value2: weapon.notes }, "Close: {{value0}} | Near: {{value1}} | {{value2}}");
     }
     recalculateXpBudget();
 }
@@ -1069,7 +1070,7 @@ function updateHeritageNote() {
 export function addCEDynamic(type) {
     const container = document.getElementById('ce-' + type + '-list');
     if (!container) {
-        showToast(`List for "${type}" not found.`, 'error');
+        showToast(i18nText("feature.characters.editor.listForValueNotFound", { value0: type }, "List for \"{{value0}}\" not found."), 'error');
         return;
     }
     const idx = container.children.length;
@@ -1087,12 +1088,12 @@ export function addCEDynamicFromWiki(type, entryId) {
     const wikiEntries = state.wikiEntries || [];
     const entry = wikiEntries.find(e => String(e.id) === String(entryId));
     if (!entry) {
-        showToast('Wiki entry not found.', 'error');
+        showToast(i18nText("feature.characters.editor.wikiEntryNotFound", null, "Wiki entry not found."), 'error');
         return;
     }
     const container = document.getElementById('ce-' + type + '-list');
     if (!container) {
-        showToast(`List for "${type}" not found.`, 'error');
+        showToast(i18nText("feature.characters.editor.listForValueNotFound", { value0: type }, "List for \"{{value0}}\" not found."), 'error');
         return;
     }
     const idx = container.children.length;
@@ -1100,7 +1101,7 @@ export function addCEDynamicFromWiki(type, entryId) {
     const div = document.createElement('div');
     div.innerHTML = dynamicRowHTML(type, idx, { name: entry.title, cost });
     container.appendChild(div.firstElementChild);
-    showToast(`Added "${entry.title}" from wiki.`, 'success');
+    showToast(i18nText("feature.characters.editor.addedValueFromWiki", { value0: entry.title }, "Added \"{{value0}}\" from wiki."), 'success');
     recalculateXpBudget();
 }
 
@@ -1206,9 +1207,9 @@ function createModal() {
         margin: 0 auto;
     `;
     modal.innerHTML = `
-        <button id="charModalClose" class="btn btn-secondary editor-back">← Back</button>
+        <button id="charModalClose" class="btn btn-secondary editor-back" data-i18n="feature.characters.editor.back">← Back</button>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-            <h2 id="char-modal-title" style="margin:0;color:var(--gold);">Character Editor</h2>
+            <h2 id="char-modal-title" style="margin:0;color:var(--gold);" data-i18n="feature.characters.editor.characterEditor">Character Editor</h2>
         </div>
         <div id="char-editor-content" style="max-height:80vh; overflow-y:auto;"></div>
     `;
@@ -1317,7 +1318,7 @@ function buildEditorHTML(c) {
                     <div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">Portrait</div>
                 </div>
                 <div style="flex:1;">
-                    <label>Portrait URL</label>
+                    <label data-i18n="feature.characters.editor.portraitURL">Portrait URL</label>
                     <input id="ce-avatar" value="${escHtml(c.avatar || '')}" placeholder="https://... image link (optional)" />
                 </div>
             </div>
@@ -1325,40 +1326,40 @@ function buildEditorHTML(c) {
             <!-- Identity -->
             <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
-                    <label>Name *</label>
+                    <label data-i18n="feature.characters.editor.name">Name *</label>
                     <input id="ce-name" value="${escHtml(c.name)}" placeholder="Character name" />
                 </div>
                 <div>
-                    <label>Heritage</label>
+                    <label data-i18n="feature.characters.editor.heritage">Heritage</label>
                     <select id="ce-heritage">${heritageOptions}</select>
                     <div id="ce-heritage-note" style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">${heritage?.note || ''}</div>
                 </div>
                 <div>
-                    <label>Region</label>
+                    <label data-i18n="feature.characters.editor.region">Region</label>
                     <select id="ce-region">${regionOptions}</select>
                 </div>
                 <div>
-                    <label>Cultural Affinity</label>
+                    <label data-i18n="feature.characters.editor.culturalAffinity">Cultural Affinity</label>
                     <input id="ce-cultural-affinity" value="${escHtml(c.culturalAffinity || '')}" placeholder="Cultural trait" />
                 </div>
                 <div>
-                    <label>Background</label>
+                    <label data-i18n="feature.characters.editor.background">Background</label>
                     <input id="ce-background" value="${escHtml(c.background || '')}" placeholder="Background name" />
                 </div>
                 <div>
-                    <label>Background Tags</label>
+                    <label data-i18n="feature.characters.editor.backgroundTags">Background Tags</label>
                     <input id="ce-background-tags" value="${escHtml(backgroundTags.join(', '))}" placeholder="e.g., Veteran, Muster Papers" />
                 </div>
                 <div>
-                    <label>Signature Contact</label>
+                    <label data-i18n="feature.characters.editor.signatureContact">Signature Contact</label>
                     <input id="ce-background-contact" value="${escHtml(c.backgroundContact || '')}" placeholder="Contact name" />
                 </div>
                 <div>
-                    <label>Background Boon</label>
+                    <label data-i18n="feature.characters.editor.backgroundBoon">Background Boon</label>
                     <input id="ce-background-boon" value="${escHtml(c.backgroundBoon || '')}" placeholder="Once/session benefit" />
                 </div>
                 <div style="grid-column:1/-1;">
-                    <label>Obligation Timer Seed</label>
+                    <label data-i18n="feature.characters.editor.obligationTimerSeed">Obligation Timer Seed</label>
                     <input id="ce-background-obligation" value="${escHtml(c.backgroundObligation || '')}" placeholder="Starting complication" />
                 </div>
             </div>
@@ -1376,7 +1377,7 @@ function buildEditorHTML(c) {
 
             <!-- Skills -->
             <div>
-                <h4 style="margin:0.3rem 0;">Skills</h4>
+                <h4 style="margin:0.3rem 0;" data-i18n="feature.characters.editor.skills">Skills</h4>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.3rem;">
                     ${skillsHtml}
                 </div>
@@ -1385,11 +1386,11 @@ function buildEditorHTML(c) {
             <!-- Magic Path -->
             <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
-                    <label>Magic Path</label>
+                    <label data-i18n="feature.characters.editor.magicPath">Magic Path</label>
                     <select id="ce-magic-path">${magicPathOptions}</select>
                 </div>
                 <div>
-                    <label>Patron</label>
+                    <label data-i18n="feature.characters.editor.patron">Patron</label>
                     <select id="ce-patron">${patronOptions}</select>
                     <div id="ce-patron-hint" style="display:${isInvoker ? 'block' : 'none'};font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">
                         Runekeeper/Cantor only — Invokers use Symbols below.
@@ -1401,11 +1402,11 @@ function buildEditorHTML(c) {
             <div id="ce-runekeeper-fields" style="display:${isRunekeeper ? 'block' : 'none'};">
                 <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                     <div>
-                        <label>Thiasos (Familiar)</label>
+                        <label data-i18n="feature.characters.editor.thiasosFamiliar">Thiasos (Familiar)</label>
                         <input id="ce-thiasos" value="${escHtml(c.thiasos || '')}" placeholder="e.g., white-hound, garden-spider" />
                     </div>
                     <div>
-                        <label>Codex</label>
+                        <label data-i18n="feature.characters.editor.codex">Codex</label>
                         <input id="ce-codex" value="${escHtml(c.codex || '')}" placeholder="e.g., iron-bound-ledger, frame-loom" />
                     </div>
                 </div>
@@ -1416,19 +1417,19 @@ function buildEditorHTML(c) {
                 <h5 style="margin:0.2rem 0;">🎵 Cantor</h5>
                 <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                     <div>
-                        <label>Bound Patron</label>
+                        <label data-i18n="feature.characters.editor.boundPatron">Bound Patron</label>
                         <select id="ce-bound-patron">${boundPatronOptions}</select>
                     </div>
                     <div>
-                        <label>Position Bonus</label>
+                        <label data-i18n="feature.characters.editor.positionBonus">Position Bonus</label>
                         <input type="number" id="ce-bound-patron-bonus" value="${c.boundPatronBonus ?? 1}" min="0" max="3" />
                     </div>
                     <div>
-                        <label>Bloom Count</label>
+                        <label data-i18n="feature.characters.editor.bloomCount">Bloom Count</label>
                         <input type="number" id="ce-bloom-count" value="${c.bloomCount || 0}" min="0" />
                     </div>
                     <div>
-                        <label>Resonant Rites</label>
+                        <label data-i18n="feature.characters.editor.resonantRites">Resonant Rites</label>
                         <input id="ce-resonant-rites" value="${escHtml((c.resonantRites || []).join(', '))}" placeholder="Comma-separated" />
                     </div>
                 </div>
@@ -1442,12 +1443,12 @@ function buildEditorHTML(c) {
                 </div>
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.3rem;">
                     <select id="ce-add-symbol-select" style="flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:0.1rem 0.3rem;">
-                        <option value="">— Select a patron —</option>
+                        <option value="" data-i18n="feature.characters.editor.selectAPatron">— Select a patron —</option>
                         ${getPatronOptions().filter(p => p.id).map(p => 
                             `<option value="${p.id}">${escHtml(p.label)}</option>`
                         ).join('')}
                     </select>
-                    <button class="btn btn-sm btn-primary" id="ce-add-symbol-btn">➕ Add Symbol</button>
+                    <button class="btn btn-sm btn-primary" id="ce-add-symbol-btn" data-i18n="feature.characters.editor.addSymbol">➕ Add Symbol</button>
                 </div>
                 <div id="ce-symbol-list">${symbolRows}</div>
                 <div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;">
@@ -1458,16 +1459,16 @@ function buildEditorHTML(c) {
             <!-- Combat Loadout -->
             <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
                 <div>
-                    <label>Armor</label>
+                    <label data-i18n="feature.characters.editor.armor">Armor</label>
                     <select id="ce-armor-type">${armorOptions}</select>
                     <div id="ce-armor-info" style="font-size:0.7rem;color:var(--text3);">${armor?.conversion || ''}</div>
                 </div>
                 <div>
-                    <label>Shield</label>
+                    <label data-i18n="feature.characters.editor.shield">Shield</label>
                     <select id="ce-shield-type">${shieldOptions}</select>
                 </div>
                 <div>
-                    <label>Weapon</label>
+                    <label data-i18n="feature.characters.editor.weapon">Weapon</label>
                     <select id="ce-weapon-class">${weaponOptions}</select>
                     <div id="ce-weapon-info" style="font-size:0.7rem;color:var(--text3);">${weapon?.notes || ''}</div>
                 </div>
@@ -1475,38 +1476,38 @@ function buildEditorHTML(c) {
 
             <!-- Talents -->
             <div>
-                <h4 style="margin:0.3rem 0;">🧠 Talents</h4>
+                <h4 style="margin:0.3rem 0;" data-i18n="feature.characters.editor.talents">🧠 Talents</h4>
                 <div id="ce-talent-filter-bar" style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.3rem;"></div>
                 <div id="ce-talent-catalog" class="talent-catalog" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;background:var(--bg3);margin-bottom:0.3rem;"></div>
                 <div id="ce-talent-list"></div>
-                <button type="button" class="btn btn-sm btn-secondary" id="ce-add-custom-talent">+ Add Custom Talent</button>
+                <button type="button" class="btn btn-sm btn-secondary" id="ce-add-custom-talent" data-i18n="feature.characters.editor.addCustomTalent">+ Add Custom Talent</button>
             </div>
 
             <!-- Assets -->
             <div>
-                <h4 style="margin:0.3rem 0;">🏰 Assets</h4>
+                <h4 style="margin:0.3rem 0;" data-i18n="feature.characters.editor.assets">🏰 Assets</h4>
                 <div id="ce-asset-list">${assetRows}</div>
-                <button class="btn btn-sm btn-secondary" data-editor-add="asset">+ Add Asset</button>
+                <button class="btn btn-sm btn-secondary" data-editor-add="asset" data-i18n="feature.characters.editor.addAsset">+ Add Asset</button>
             </div>
 
             <!-- Equipment -->
             <div>
-                <h4 style="margin:0.3rem 0;">🎒 Equipment</h4>
+                <h4 style="margin:0.3rem 0;" data-i18n="feature.characters.editor.equipment">🎒 Equipment</h4>
                 <div id="ce-equip-list">${equipRows}</div>
-                <button class="btn btn-sm btn-secondary" data-editor-add="equipment">+ Add Equipment</button>
+                <button class="btn btn-sm btn-secondary" data-editor-add="equipment" data-i18n="feature.characters.editor.addEquipment">+ Add Equipment</button>
             </div>
 
             <!-- Bonds & Complications -->
             <div class="ce-fixed-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
-                    <h4 style="margin:0.3rem 0;">🤝 Bonds</h4>
+                    <h4 style="margin:0.3rem 0;" data-i18n="feature.characters.editor.bonds">🤝 Bonds</h4>
                     <div id="ce-bond-list">${bondRows}</div>
-                    <button class="btn btn-sm btn-secondary" data-editor-add="bond">+ Add Bond</button>
+                    <button class="btn btn-sm btn-secondary" data-editor-add="bond" data-i18n="feature.characters.editor.addBond">+ Add Bond</button>
                 </div>
                 <div>
-                    <h4 style="margin:0.3rem 0;">⚠️ Complications</h4>
+                    <h4 style="margin:0.3rem 0;" data-i18n="feature.characters.editor.complications">⚠️ Complications</h4>
                     <div id="ce-complication-list">${compRows}</div>
-                    <button class="btn btn-sm btn-secondary" data-editor-add="complication">+ Add Complication</button>
+                    <button class="btn btn-sm btn-secondary" data-editor-add="complication" data-i18n="feature.characters.editor.addComplication">+ Add Complication</button>
                 </div>
             </div>
 
@@ -1521,7 +1522,7 @@ function buildEditorHTML(c) {
 
             <!-- Total XP -->
             <div>
-                <label>Total XP</label>
+                <label data-i18n="feature.characters.editor.totalXP">Total XP</label>
                 <input type="number" id="ce-total-xp" value="${c.totalXp || 32}" min="0" max="999" />
             </div>
 
@@ -1532,14 +1533,14 @@ function buildEditorHTML(c) {
 
             <!-- Buttons -->
             <div style="display:flex;gap:0.5rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);flex-wrap:wrap;">
-                <button class="btn btn-gold" id="ce-save-btn">💾 Save</button>
-                <button class="btn btn-secondary" id="ce-cancel-btn">Cancel</button>
+                <button class="btn btn-gold" id="ce-save-btn" data-i18n="feature.characters.editor.save">💾 Save</button>
+                <button class="btn btn-secondary" id="ce-cancel-btn" data-i18n="feature.characters.editor.cancel">Cancel</button>
                 <!-- Print / PDF: character data is the player's own, so unlike
                      the docs library (see js/features/docs/index.js's
                      PRINTABLE_DOC_IDS) there's no licensing reason to gate
                      these behind anything. -->
-                <button class="btn btn-secondary" id="ce-print-btn" title="Print this character sheet" style="margin-left:auto;">🖨️ Print</button>
-                <button class="btn btn-secondary" id="ce-pdf-btn" title="Download this character sheet as a PDF">⬇️ PDF</button>
+                <button class="btn btn-secondary" id="ce-print-btn" title="Print this character sheet" style="margin-inline-start:auto;" data-i18n-attr="title:feature.characters.editor.printThisCharacterSheet" data-i18n="feature.characters.editor.print">🖨️ Print</button>
+                <button class="btn btn-secondary" id="ce-pdf-btn" title="Download this character sheet as a PDF" data-i18n-attr="title:feature.characters.editor.downloadThisCharacterSheetAsAPDF" data-i18n="feature.characters.editor.pdf">⬇️ PDF</button>
             </div>
         </div>
     `;
@@ -1581,7 +1582,7 @@ export async function openEditor(id) {
     const content = document.getElementById('char-editor-content');
 
     if (!modal || !title || !content) {
-        showToast('Editor modal not found. Please refresh.', 'error');
+        showToast(i18nText("feature.characters.editor.editorModalNotFoundPleaseRefresh", null, "Editor modal not found. Please refresh."), 'error');
         return;
     }
 
@@ -1589,18 +1590,18 @@ export async function openEditor(id) {
     if (id) {
         c = getCharacter(id);
         if (!c) {
-            showToast('Character not found', 'error');
+            showToast(i18nText("feature.characters.editor.characterNotFound", null, "Character not found"), 'error');
             return;
         }
         editorState.currentId = id;
         editorState.isNew = false;
-        title.textContent = 'Edit Character';
+        title.textContent = i18nText("feature.characters.editor.editCharacter", null, "Edit Character");
     } else {
         c = createNewCharacter();
         addCharacter(c);
         editorState.currentId = c.id;
         editorState.isNew = true;
-        title.textContent = 'New Character';
+        title.textContent = i18nText("feature.characters.editor.newCharacter", null, "New Character");
     }
 
     if (!c.learnedTalents) c.learnedTalents = [];
@@ -1620,7 +1621,7 @@ export async function openEditor(id) {
         html = buildEditorHTML(c);
     } catch (err) {
         console.error('[Editor] buildEditorHTML failed:', err, 'Character data:', c);
-        showToast('Error building the character editor. Please refresh and try again.', 'error');
+        showToast(i18nText("feature.characters.editor.errorBuildingTheCharacterEditorPleaseRefresh", null, "Error building the character editor. Please refresh and try again."), 'error');
         modal.remove();
         return;
     }
@@ -1695,7 +1696,7 @@ export function saveEditor() {
 
     const name = v('#ce-name');
     if (!name || !name.trim()) {
-        showToast('Character name is required.', 'error');
+        showToast(i18nText("feature.characters.editor.characterNameIsRequired", null, "Character name is required."), 'error');
         const nameInput = document.querySelector('#ce-name');
         if (nameInput) {
             nameInput.style.borderColor = 'var(--red)';
@@ -1707,7 +1708,7 @@ export function saveEditor() {
 
     let c = getCharacter(editorState.currentId);
     if (!c) {
-        showToast('Character not found', 'error');
+        showToast(i18nText("feature.characters.editor.characterNotFound", null, "Character not found"), 'error');
         return;
     }
 
@@ -1829,7 +1830,7 @@ export function saveEditor() {
 
             if (c.xpSpent > c.startingXp) {
                 const over = c.xpSpent - c.startingXp;
-                if (!confirm(`This character is ${over} XP over budget (${c.xpSpent} spent, ${c.startingXp} available).\n\nSave anyway?`)) {
+                if (!confirm(i18nText("feature.characters.editor.thisCharacterIsValueXPOverBudget", { value0: over, value1: c.xpSpent, value2: c.startingXp }, "This character is {{value0}} XP over budget ({{value1}} spent, {{value2}} available).\n\nSave anyway?"))) {
                     return;
                 }
             }
@@ -1843,11 +1844,11 @@ export function saveEditor() {
             if (module.renderCharList) module.renderCharList();
         }).catch(() => {});
 
-        showToast(`Character "${c.name}" saved successfully. (Tier ${c.tier}: ${c.tierName})`, 'success');
+        showToast(i18nText("feature.characters.editor.characterValueSavedSuccessfullyTierValueValue", { value0: c.name, value1: c.tier, value2: c.tierName }, "Character \"{{value0}}\" saved successfully. (Tier {{value1}}: {{value2}})"), 'success');
 
     } catch (error) {
         console.error('[Editor] Error saving:', error);
-        showToast('Error saving character. Please try again.', 'error');
+        showToast(i18nText("feature.characters.editor.errorSavingCharacterPleaseTryAgain", null, "Error saving character. Please try again."), 'error');
     }
 }
 
@@ -1870,7 +1871,7 @@ function attachEditorEvents() {
         printBtn.addEventListener('click', () => {
             const c = getCharacter(editorState.currentId);
             if (!c) {
-                showToast('Character not found.', 'error');
+                showToast(i18nText("feature.characters.editor.characterNotFound_1onhc", null, "Character not found."), 'error');
                 return;
             }
             printCharacterPDF(c);
@@ -1882,7 +1883,7 @@ function attachEditorEvents() {
         pdfBtn.addEventListener('click', () => {
             const c = getCharacter(editorState.currentId);
             if (!c) {
-                showToast('Character not found.', 'error');
+                showToast(i18nText("feature.characters.editor.characterNotFound_1onhc", null, "Character not found."), 'error');
                 return;
             }
             exportCharacterPDF(c);
@@ -1985,7 +1986,7 @@ function attachEditorEvents() {
             if (!select) return;
             const patronId = select.value;
             if (!patronId) {
-                showToast('Please select a patron.', 'warning');
+                showToast(i18nText("feature.characters.editor.pleaseSelectAPatron", null, "Please select a patron."), 'warning');
                 return;
             }
             // Check if already added
@@ -1996,7 +1997,7 @@ function attachEditorEvents() {
             for (const row of existingRows) {
                 const sel = row.querySelector('.ce-symbol-patron');
                 if (sel && sel.value === patronId) {
-                    showToast('Symbol already added.', 'info');
+                    showToast(i18nText("feature.characters.editor.symbolAlreadyAdded", null, "Symbol already added."), 'info');
                     return;
                 }
             }
@@ -2007,14 +2008,14 @@ function attachEditorEvents() {
             row.innerHTML = `
                 <select class="ce-symbol-patron" style="flex:1;">${patronOptions}</select>
                 <select class="ce-symbol-state" style="width:100px;">
-                    <option value="active" selected>Active</option>
-                    <option value="compromised">Compromised</option>
-                    <option value="shattered">Shattered</option>
+                    <option value="active" selected data-i18n="feature.characters.editor.active">Active</option>
+                    <option value="compromised" data-i18n="feature.characters.editor.compromised">Compromised</option>
+                    <option value="shattered" data-i18n="feature.characters.editor.shattered">Shattered</option>
                 </select>
                 <button class="btn btn-xs editor-remove-btn">✕</button>
             `;
             list.appendChild(row);
-            showToast(`Added Symbol of ${select.options[select.selectedIndex].text}`, 'success');
+            showToast(i18nText("feature.characters.editor.addedSymbolOfValue", { value0: select.options[select.selectedIndex].text }, "Added Symbol of {{value0}}"), 'success');
             recalculateXpBudget();
         });
     }
@@ -2025,7 +2026,7 @@ function attachEditorEvents() {
             const checked = document.querySelectorAll('.ce-weapon-tag:checked');
             if (checked.length > 2) {
                 cb.checked = false;
-                showToast('Weapon Tags are capped at 2.', 'warning');
+                showToast(i18nText("feature.characters.editor.weaponTagsAreCappedAt2", null, "Weapon Tags are capped at 2."), 'warning');
             }
             recalculateXpBudget();
         });

@@ -1,0 +1,1412 @@
+<!-- ============ Fates_-_Edge_-_-Essentials.html ============ -->
+<!DOCTYPE html>
+
+<html dir="ltr" lang="es" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc 3.10" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — Guía esencial (Español)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.5rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .toc {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.5rem 0;
+    }
+    .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+    .toc summary:hover { color: var(--gold-hover); }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
+    .titlepage h1 { font-size: 2.5rem; border-bottom: none; margin-bottom: 0.1rem; }
+    .titlepage h2 { font-size: 1.8rem; font-weight: normal; border-bottom: none; margin-top: 0; }
+    .copyright-page { text-align: center; margin: 1rem 0; padding: 1rem 0; border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+    .copyright-page h1 { border-bottom: none; }
+    .warningbox { background: var(--bg3); border-left: 4px solid var(--red); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .tipbox { background: var(--bg3); border-left: 4px solid var(--gold); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .srd-reference { background: var(--bg2); border: 1px solid var(--gold); padding: 0.5rem 1rem; margin: 1rem 0; border-radius: var(--radius); }
+    .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
+    .back-to-top:hover { background: var(--gold); color: var(--bg1); }
+    .search-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem; color: var(--text); width: 100%; max-width: 300px; }
+    .search-box:focus { outline: none; border-color: var(--gold); }
+    .highlight { background: var(--bg4); border-left: 3px solid var(--gold); padding-left: 0.5rem; }
+</style>
+</head>
+<body><aside class="translation-notice" lang="es">Versión en español. Traducción asistida; revisión editorial integral pendiente. <a href="../resources/Fates_-_Edge_-_-Essentials.html" hreflang="en">Consultar el original en inglés</a></aside>
+<a class="back-to-top" href="#">⬆</a>
+<div id="main-content">
+<!-- ==================== TITLE PAGE ==================== -->
+<div class="titlepage">
+<h1>Fate's Edge</h1>
+<h2>Guía esencial</h2>
+<p>Una versión completa de la Juego</p>
+<p class="author" style="color:var(--text2);">Nicholas A. Gasper converge</p>
+<p class="date text-muted">2026-07-10</p>
+</div>
+<!-- ==================== COPYRIGHT PAGE ==================== -->
+<div class="copyright-page">
+<h1>Fate's Edge: Guía esencial</h1>
+<p>Copyright © Nicholas A. Gasper</p>
+<p><em>Primera edición, junio 2026</em></p>
+<hr style="width: 60%; margin: 1em auto; border-color: var(--gold);"/>
+<p><strong>Aviso de licencia importante</strong></p>
+<div class="license-text" style="max-width:700px;margin:0 auto;font-size:0.9rem;line-height:1.5;">
+<p>El <em>Fate's Edge Documento de referencia del sistema (SRD)</em> porciones de este trabajo<br/>
+        (claramente marcada con <code>[SRD]</code> las etiquetas a lo largo de todo) están bajo la licencia<br/>
+<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Atribución-NoComercial-Compartir Igual 4.0 Licencia Internacional</a>.<br/>
+        Para ver una copia de esta licencia, visite <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">http://creativecommons.org/licenses/by-nc-sa/4.0/</a>.</p>
+<p>Todo otro contenido— incluyendo pero no limitado a fijar lore, personajes originales,<br/>
+        aventuras, arte, mapas, y mecánica patentada—es <strong>© Nicholas A. Gasper. Todos los derechos reservados</strong>.<br/>
+        Este contenido patentado no puede ser reproducido, distribuido o transmitido<br/>
+        sin previo permiso por escrito, excepto por breves citas en comentarios<br/>
+        y ciertos otros usos no comerciales permitidos por ley de derechos de autor.</p>
+<p><strong>El SRD también está disponible como una descarga gratuita independiente</strong><br/>
+        a <a href="https://chronophage.github.io/kon-reh/build/html/srd.html">https://chronophage.github.io/kon-reh/build/html/srd.html</a>.<br/>
+        Para solicitudes de permiso en relación con el contenido patentado, contacte con el autor<br/>
+        a través del sitio web del editor o en la dirección proporcionada en la edición comercial.</p>
+</div>
+<hr style="width: 50%; margin: 1em auto; border-color: var(--gold);"/>
+<p><em>"La moneda que nunca pasa es la que no recuerdas tomar."</em><br/>
+    — Serafine of the Velvet Touch</p>
+</div>
+<!-- ==================== SRD REFERENCE ==================== -->
+<div class="srd-reference">
+<h2 style="text-align:center;border-bottom:none;">Documento de referencia del sistema (SRD)</h2>
+<ul>
+<li><strong>¿Qué es el SRD?</strong> La porción abierta de esta obra (CC BY-NC-SA 4.0), destinada a los creadores de terceros. <em>Todo el contenido de SRD está marcado con <code>[SRD]</code> etiquetas en este libro.</em></li>
+<li><strong>Contenido SRD Verificado Incluye:</strong>
+<ul>
+<li>Mecánica de resolución básica (grupos de índices, Posición, DV, Matriz de resultado)</li>
+<li>Bono y Punto narrativo economías</li>
+<li>Fatiga, Daño, y sistemas de conversión de armadura</li>
+<li>Atributos y descripciones de habilidad</li>
+<li>Reglas básicas de combate y economía de acción</li>
+<li>Mecánica mágica universal (TAGS, DV cálculo, Repercusión)</li>
+<li>PNJ plantillas y encontrar directrices</li>
+<li>Equipo y mesas de engranaje</li>
+<li>Marco de creación de personajes</li>
+</ul>
+</li>
+<li><strong>Contenido extendido (No SRD - Proprietary):</strong>
+<ul>
+<li>Posición de loro (Facciones de Acasia, La maldición, detalles regionales)</li>
+<li>personajes originales, PNJ, y figuras nombrados</li>
+<li>Módulos de aventura y ganchos de escenario</li>
+<li>Descripción del patrón, Ritos, y exclusivo contenido mecánico</li>
+<li>Sistemas mágicos apropiados (guardián de runas, Invoker, Cantor, Summoner-specific)</li>
+<li>Obras de arte, mapas y elementos gráficos</li>
+<li>Descripciones de facción y contenido específico de campaña</li>
+<li>Prose original, dispositivos de encuadre, y texto narrativo</li>
+<li><em>Nota: Los sistemas opcionales como Mazo de Consecuencias, Tirada de la Corona y Travel Framework son contenidos patentados.</em></li>
+</ul>
+</li>
+<li><strong>Resumen de la licencia:</strong> Contenido SRD licenciado bajo observación <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. Todo el contenido extendido es conveniente <strong>© Nicholas A. Gasper. Todos los derechos reservados</strong>. Ver página de derechos de autor para texto de licencia completa.</li>
+</ul>
+<hr style="width: 50%; margin: 1em auto; border-color: var(--gold);"/>
+<p><em>"La moneda que nunca pasa es la que no recuerdas tomar."</em><br/>
+    — Serafine of the Velvet Touch</p>
+</div>
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<details class="toc">
+<summary>📑 Tabla de contenidos</summary>
+<a href="#ch:welcome">Bienvenido a Fate's Edge</a>
+<a href="#ch:core-mechanics">Mecánicas básicas</a>
+<a href="#ch:character-creation">Creación de personajes</a>
+<a href="#ch:pregens">Personajes pre-Generados</a>
+<a href="#ch:lantern-at-dusk">Aventura de inicio: La Linterna en Dusk</a>
+<a href="#ch:simplified-magic">Magia simplificada</a>
+<a href="#ch:gm-tips">DJ Consejos: Correr su primer juego</a>
+<a href="#ch:next-steps">Lo que viene después</a>
+<a href="#ch:quick-reference">Referencia rápida</a>
+</details>
+<!-- ==================== MAIN CONTENT ==================== -->
+<blockquote>
+<p>"La moneda que nunca pasa es la que no recuerdas tomar."<br/>
+    — Serafine of the Velvet Touch</p>
+</blockquote>
+<section class="level1" id="ch:welcome">
+<h1>Bienvenido a Fate's Edge</h1>
+<section class="level2" id="what-is-this-game">
+<h2>¿Qué es este juego?</h2>
+<p><strong>Fate's Edge</strong> es un juego de rol en la mesa donde
+<em>cada elección lleva peso</em>. Usted no está jugando un juego de mesa o un simulador táctico. Usted está contando una historia juntos — una historia de riesgo, consecuencia, y legado.</p>
+<p>En este juego juegas exiliados, pícaros, sobrevivientes y héroes en un mundo de magia antigua, imperios caídos y culturas vibrantes.El mundo recuerda lo que haces. Cada juramento, cada traición, cada juego desesperado se hace eco.</p>
+<section class="level3 unnumbered" id="core-philosophy-narrative-first">
+<h3 class="unnumbered">Filosofía Central: Narrative First genes</h3>
+<p>La historia es la razón por la que existen las reglas, no la otra manera. Cuando te sientas a jugar, no estás tirando los dados dados para ver lo que sucede — estás contando una historia, con dados como tus co-autores.</p>
+<p><strong>Los mecánicos sirven a la historia.</strong> Un tirada de dados nunca es simplemente paso/fail. Cambia el paisaje ficticio.</p>
+<ul>
+<li><p><strong>Éxito limpio</strong> — El plan funciona como se pretendía.</p></li>
+<li><p><strong>Éxito y SB</strong> — Tienes lo que quieres, pero el mundo vuelve a empujar.</p></li>
+<li><p><strong>Resultado parcial</strong> — Haces progresos, pero la situación sigue sin resolverse.</p></li>
+<li><p><strong>Fallo</strong> — Usted falla, y la situación escala.</p></li>
+</ul>
+<p>Cada tirada importa. La historia nunca se detiene; evoluciona.</p>
+</section>
+<section class="level3 unnumbered" id="risk-as-the-engine-of-drama">
+<h3 class="unnumbered">Riesgo como el motor de Drama incumbe</h3>
+<p>Fate's Edge se construye sobre un riesgo significativo. La seguridad es aburrida. Cuando tu personaje tiene algo que perder — reputación, aliados, ideales, vida — sus acciones se vuelven heroicas o dramáticamente memorables.</p>
+<p>Su principal herramienta para gestionar el riesgo es la medida <strong>Punto narrativo (SB</strong> economía. Cuando los dados muestran un 1, el mundo reacciona. El DJ gana SB para introducir complicaciones, escalar amenazas, o revelar peligros ocultos.</p>
+<div class="warningbox">
+<p><strong>Importante:</strong> SB se generan en <em>cualquier</em> tirada que produce un 1, ya sea que el tirada general tenga éxito o falla. No son castigo; son combustible para una narrativa impredecible y receptiva.</p>
+</div>
+</section>
+<section class="level3 unnumbered" id="characters-who-change-the-world">
+<h3 class="unnumbered">Personajes que cambian el mundo</h3>
+<p>El crecimiento del personaje en Fate's Edge no se trata de acumular poder abstracto. Es crecimiento significativo arraigado en la historia.
+<strong>Puntos de experiencia (XP)</strong> Usted gasta XP para mejorar las capacidades, adquirir activos o desbloquear los talentos culturales.</p>
+<p>Avances ligados directamente a la narrativa. Un personaje se convierte en un legendario comandante por los ejércitos líderes, no por moler monstruos.</p>
+</section>
+<section class="level3 unnumbered" id="key-concepts-at-a-glance">
+<h3 class="unnumbered">Conceptos clave en un glaciar</h3>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">reserva de dados</span> Attribute + Habilidad d10. 6+ = Éxito. 1 = Punto narrativo (en inglés)SB) para el baile DJ.</p></li>
+<li><p><span class="badge badge-blue">Posición &amp; Efecto inminente</span> Posición (Dominant/Controlled/Desperate) define las apuestas del fracaso. Efecto (Limited/Standard/Great) describe lo que un éxito limpio logra.</p></li>
+<li><p><span class="badge badge-purple">Temporizadores</span> Rastreadores visuales para los desafíos en curso (por ejemplo, un bloqueo 4-segment, un 8-segment faction rise).</p></li>
+<li><p><span class="badge badge-green">Bonos</span> Narrative tokens you earn by embracing risk. Spend them to re-roll dados, improve Position, or activate recursos.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="safety-tools-lines-veils-x-card">
+<h2>Herramientas de seguridad: Líneas, Veils &amp; Tarjeta X</h2>
+<p>Fate's Edge explora temas maduros — conflicto, pérdida, horror, traición y opciones difíciles. La tabla debe sentirse siempre segura. Utilice estas tres herramientas simples.</p>
+<section class="level3 unnumbered" id="x-card">
+<h3 class="unnumbered">Tarjeta X</h3>
+<p>Cualquier jugador (incluyendo el DJ) puede [SRD] dibujar una X en una tarjeta o simplemente decir “X” cuando un momento los hace incómodos. [/SRD]El contenido descrito se elimina de la ficción — no hay preguntas, ninguna explicación. La escena es retconectada o redireccionada inmediatamente.</p>
+</section>
+<section class="level3 unnumbered" id="lines">
+<h3 class="unnumbered">Líneas</h3>
+<p>Una línea es un límite difícil: contenido que no aparecerá en el juego en absoluto. Ejemplos: “No violencia sexual,” “Ningún daño a los niños,” “ No horror corporal.” Los jugadores llaman sus líneas antes de la campaña; el grupo los honra.</p>
+</section>
+<section class="level3 unnumbered" id="veils">
+<h3 class="unnumbered">Velos</h3>
+<p>Un Veil es un límite suave: contenido que puede suceder “off screen” o desvanecerse a negro. El evento se reconoce pero no se describe. Ejemplo: “Una escena romántica puede suceder, pero se desvanece a negro antes de que se haga explícito.”</p>
+</section>
+<section class="level3 unnumbered" id="how-to-use-these-tools">
+<h3 class="unnumbered">Cómo utilizar estas herramientas específicas</h3>
+<div class="panel panel-purple">
+<ul>
+<li><p>Establezca líneas y velos en la sesión Zero. Escríbalos donde todos puedan verlas.</p></li>
+<li><p>Mantenga un Tarjeta X visible en la mesa.</p></li>
+<li><p>Recordar jugadores que pueden utilizar el Tarjeta X en cualquier momento.</p></li>
+<li><p>Cuando el Tarjeta X se utiliza, pausa, rebobinar si es necesario, y seguir adelante. No interrogue.</p></li>
+<li><p>El DJ es también un jugador; pueden utilizar el Tarjeta X para su propia comodidad.</p></li>
+</ul>
+</div>
+<p class="text-sm text-muted">Estas herramientas no se refieren a la censura — se trata de consentimiento. Permiten que la mesa cuente historias más oscuras y más intensas porque todos saben que pueden sacar provecho.</p>
+</section>
+</section>
+<section class="level2" id="session-zero-the-foundation-of-play">
+<h2>Sesión Cero: La Fundación de Play ganancias</h2>
+<p>Antes de su primer lanzamiento de dados, reúnanse para una sesión cero. Aquí es donde construyen el entendimiento compartido que hace Fate's Edge cantar.</p>
+<section class="level3 unnumbered" id="session-zero-checklist">
+<h3 class="unnumbered">Sesión Zero Checklist</h3>
+<div class="panel panel-blue">
+<ol>
+<li><p><strong>Líneas &amp; Veils:</strong> ¿Qué contenido está fuera de límites (Lines) o sólo implícito (Veils)?</p></li>
+<li><p><strong>Tono:</strong> ¿Acción cinematográfica? ¿Sobrevivencia a la luz? ¿Intriga política?</p></li>
+<li><p><strong>Longitud de la campaña:</strong> ¿Sesiones de arco corto y corto (3–6), o larga campaña?</p></li>
+<li><p><strong>Ganchos de personaje:</strong> Cada jugador comparte un objetivo y un miedo por su personaje.</p></li>
+<li><p><strong>Situación inicial:</strong> ¿Dónde comienza la historia?</p></li>
+<li><p><strong>Programación:</strong> ¿Con qué frecuencia te encuentras? ¿Qué pasa si un jugador pierde?</p></li>
+</ol>
+<p class="text-sm text-muted mt-1">Tomar treinta minutos para la sesión Zero ahorrará horas de fricción media-campaña.</p>
+</div>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:core-mechanics">
+<h1>Mecánicas básicas</h1>
+<div class="panel panel-gold">
+<p><strong>El bucle de núcleo en 90 Seconds</strong></p>
+<ol>
+<li><p>El jugador declara la intención y el enfoque (Attribute + Habilidad).</p></li>
+<li><p>DJ establece Posición (Dominant/Controlled/Desperate) y Dificultad (DV 2-5+).</p></li>
+<li><p>tiradas de jugador reserva de dados (Attribute + Habilidad d10).</p></li>
+<li><p>Conteo de éxitos (6 + = éxito, 10 = 2 éxitos) y Puntos narrativos (1s).</p></li>
+<li><p>Compare los éxitos a DV utilizando la matriz de resultados.</p></li>
+<li><p>DJ gasta Puntos narrativos (SB) para complicaciones.</p></li>
+<li><p>Los jugadores marcan recursos (Bonos, Fatiga, Daño).</p></li>
+</ol>
+</div>
+<section class="level2" id="the-resolution-loop">
+<h2>La Resolución Loop</h2>
+<p>Cada acción significativa sigue este simple ciclo:</p>
+<section class="level3 unnumbered" id="declare-intent-and-approach">
+<h3 class="unnumbered">1. Declarar Intent y Enfoque</h3>
+<p>El jugador afirma lo que quieren lograr y cómo (Attribute + Habilidad). Ejemplo: <em>“ Quiero pasar por la guardia (Ingenio + Stealth).”</em></p>
+</section>
+<section class="level3 unnumbered" id="set-difficulty-value-dv">
+<h3 class="unnumbered">2. Valor de Dificultad (DV)</h3>
+<p>El DJ establece el número de éxitos necesarios.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>DV</strong></th><th style="text-align: left;"><strong>Situación</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">2</td><td style="text-align: left;">Rutina, sin presión, casi garantizado.</td></tr>
+<tr><td style="text-align: left;">3</td><td style="text-align: left;">Default — leve oposición, algún riesgo.</td></tr>
+<tr><td style="text-align: left;">4</td><td style="text-align: left;">Duro — oposición seria o mal ángulo.</td></tr>
+<tr><td style="text-align: left;">5+</td><td style="text-align: left;">Extremo — jefe principal o jugada dramática.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="set-position">
+<h3 class="unnumbered">3. Establecer posición</h3>
+<p>La posición te dice lo arriesgado que es la acción y cambia cómo se comportan los dados.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Posición</strong></th><th style="text-align: left;"><strong>Marco narrativo</strong></th><th style="text-align: left;"><strong>Efecto mecánico</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Dominante</td><td style="text-align: left;">Usted presiona ventaja</td><td style="text-align: left;">Re-rollar un fallo.</td></tr>
+<tr><td style="text-align: left;">Controlada</td><td style="text-align: left;">Equilibrado, normal</td><td style="text-align: left;">Sin repeticiones de dados.</td></tr>
+<tr><td style="text-align: left;">Desesperada</td><td style="text-align: left;">Actúas bajo duressiera</td><td style="text-align: left;">Re-rollar un éxito.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Usted puede pasar 1 Bono para mejorar la Posición por un paso antes de tirar los dados.</p>
+</section>
+<section class="level3 unnumbered" id="roll-the-dice">
+<h3 class="unnumbered">4. Rodear los dados</h3>
+<p>Roll Attribute + Habilidad d10.</p>
+<ul>
+<li><p>Cada muerte mostrando 6-9 = 1 éxito.</p></li>
+<li><p>Cada muerte mostrando 10 = 2 éxitos (critical).</p></li>
+<li><p>Cada muerte mostrando 1 = 1 Punto narrativo (SB) para el DJ.</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="apply-the-outcome">
+<h3 class="unnumbered">5. Aplicar el Resultado</h3>
+<p>Compare los éxitos a DV:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Resultado de la tirada</strong></th><th style="text-align: left;"><strong>Resultado</strong></th><th style="text-align: left;"><strong>Qué ocurre</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Siendo <span class="math inline">≥</span> DV, SB = 0</td><td style="text-align: left;">Éxito limpio</td><td style="text-align: left;">Logras tu intención sin complicaciones.</td></tr>
+<tr><td style="text-align: left;">Siendo <span class="math inline">≥</span> DV, SB &gt; 0</td><td style="text-align: left;">Éxito con SB</td><td style="text-align: left;">Intent achieved; DJ gasta SB para complicación.</td></tr>
+<tr><td style="text-align: left;">0 &lt; S &lt; DV</td><td style="text-align: left;">Resultado parcial</td><td style="text-align: left;">Avances realizados; gana el jugador 1 Bono.</td></tr>
+<tr><td style="text-align: left;">S = 0</td><td style="text-align: left;">Fallo</td><td style="text-align: left;">No hay progreso; el jugador gana 2 Bonos; DJ escala.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section class="level2" id="boons-player-resource">
+<h2>Bonos (recurso del jugador)</h2>
+<p>Bonos representa el impulso y el apalancamiento narrativo. Usted puede mantener hasta 5 Bonos.</p>
+<section class="level3 unnumbered" id="earning-boons">
+<h3 class="unnumbered">Ganancia Bonos</h3>
+<div class="panel panel-green">
+<ul>
+<li><p><span class="badge badge-green">+1</span> <strong>resultado parcial:</strong> Ganar 1 Bono.</p></li>
+<li><p><span class="badge badge-green">+2</span> <strong>fallo:</strong> Ganar 2 Bonos.</p></li>
+<li><p><span class="badge badge-green">+1</span> <strong>vínculo acción impulsada:</strong> Una vez por bono por sesión, ganar 1 Bono.</p></li>
+<li><p><strong>DJ premio:</strong> Para la creatividad, el sacrificio o el juego narrativo fuerte.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="spending-boons">
+<h3 class="unnumbered">Gasto Bonos</h3>
+<ul>
+<li><p>Re-rollar una sola muerte (después de ver el resultado).</p></li>
+<li><p>Activar una pantalla recurso (1 Bono).</p></li>
+<li><p>Mejorar la posición por un paso antes de un tirada.</p></li>
+<li><p>Potencia ciertos Ritos o habilidades.</p></li>
+<li><p>Convertir 2 Bonos <span class="math inline">→</span> 1 XP (una vez por sesión, max 2 XP a través de la conversión).</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="limits">
+<h3 class="unnumbered">Límites</h3>
+<div class="panel panel-red">
+<ul>
+<li><p>Maximum 5 Bonos held.</p></li>
+<li><p>Al final de cada escena, reduzca Bonos al máximo 2 (exceso perdido).</p></li>
+<li><p>En la mayoría 2 Bonos de fallas por personaje por escena.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="story-beats-gm-resource">
+<h2>Puntos narrativos (recurso del DJ)</h2>
+<p>Cada vez que un jugador roda un 1, el DJ gana un Punto narrativo (SB). Pasar SB para introducir complicaciones o escalar la presión.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>SB Costeado</strong></th><th style="text-align: left;"><strong>Efecto</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">1 SB</td><td style="text-align: left;">Menor: ruido, traza, marca un temporizador +1.</td></tr>
+<tr><td style="text-align: left;">2 SB</td><td style="text-align: left;">Moderado: alarma levantada, perder Posición, menor enemigo aparece.</td></tr>
+<tr><td style="text-align: left;">3 + SB</td><td style="text-align: left;">Mayor: refuerzos, turnos de escena, romper un activo.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="tipbox">
+<p><strong>Ser agresivo con Puntos narrativos.</strong> La presión no usada se desperdicia el impulso. Un fuerte golpe es mejor que muchas pequeñas penalizaciones, pero tienes que construir hacia ellos.</p>
+</div>
+</section>
+<section class="level2" id="fatigue-and-harm">
+<h2>Fatiga y Daño</h2>
+<section class="level3 unnumbered" id="fatigue">
+<h3 class="unnumbered">Fatiga</h3>
+<p>Cada personaje tiene una pista Fatiga igual a su atributo corporal.</p>
+<ul>
+<li><p>Cada punto de Fatiga empeora su posición por un paso (Dominant ganancias
+<span class="math inline">→</span> Controlada <span class="math inline">→</span> Desesperada).</p></li>
+<li><p>Si ya Desesperado, cada uno adicional Fatiga impone –1 muere.</p></li>
+<li><p>Cuando la pista Fatiga llena, aumentar Daño por 1 y limpiar todo Fatiga.</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="harm">
+<h3 class="unnumbered">Daño</h3>
+<p>Daño representa una lesión grave.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Daño Nivel nominal</strong></th><th style="text-align: left;"><strong>Efecto</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Daño 1</td><td style="text-align: left;">–1 mueren en acciones relacionadas.</td></tr>
+<tr><td style="text-align: left;">Daño 2</td><td style="text-align: left;">–1 muere en la mayoría de las acciones.</td></tr>
+<tr><td style="text-align: left;">Daño 3</td><td style="text-align: left;">Incapacitados o moribundos.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="armor-conversion">
+<h3 class="unnumbered">Armor Conversión</h3>
+<p>Armor no reduce Daño directamente. En lugar de eso, convierte Daño a Fatiga.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Armor Tipo</strong></th><th style="text-align: left;"><strong>Daño 1</strong></th><th style="text-align: left;"><strong>Daño 2</strong></th><th style="text-align: left;"><strong>Daño 3</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Ligera</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Daño 1 + Fatiga 1</td><td style="text-align: left;">Daño 2 + Fatiga 1</td></tr>
+<tr><td style="text-align: left;">Media</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Daño 2 + Fatiga 1</td></tr>
+<tr><td style="text-align: left;">Pesada</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Fatiga 2</td></tr>
+</tbody>
+</table>
+</div>
+<p><em>Mínimo 1 Fatiga por golpe, incluso si la conversión daría 0.</em></p>
+</section>
+<section class="level3 unnumbered" id="recovery">
+<h3 class="unnumbered">Recuperación</h3>
+<div class="panel panel-green">
+<ul>
+<li><p><span class="badge badge-green">Fatiga</span> Descanso corto (1 hora) elimina 2 Fatiga. Noche completa’ descanso elimina todo.</p></li>
+<li><p><span class="badge badge-red">Daño</span> Requiere atención médica (tirada de la craft) o curación mágica. La recuperación natural lleva una semana por nivel.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="timers">
+<h3 class="unnumbered">Temporizadores</h3>
+<p>Las máquinas son rastreadores visuales para los desafíos en curso y acumular presión.</p>
+<section class="level4 unnumbered" id="timer-sizes">
+<h4 class="unnumbered">Tamaños del temporizador</h4>
+<ul>
+<li><p><span class="badge badge-green">4 segmentos atractivos</span> Presión a corto plazo (una patrulla de guardia llega, una puerta rompe).</p></li>
+<li><p><span class="badge badge-gold">6 segmentos atractivos</span> Temporizador de escena estándar (un ritual completa, un rival escapa).</p></li>
+<li><p><span class="badge badge-red">8 + segmentos</span> Multi-escena o temporizador de campaña (una facción consolida poder).</p></li>
+</ul>
+</section>
+<section class="level4 unnumbered" id="when-to-tick-a-timer">
+<h4 class="unnumbered">Cuándo atajar un temporizador</h4>
+<ul>
+<li><p>En un resultado parcial o fallo.</p></li>
+<li><p>Cuando gastas Puntos narrativos (1 SB = 1 garrapata típicamente).</p></li>
+<li><p>Cuando la ficción lo exige: <em>“Mientras usted argumenta, el fuego se propaga.”</em></p></li>
+</ul>
+</section>
+<section class="level4 unnumbered" id="when-a-timer-fills">
+<h4 class="unnumbered">Cuando un temporizador se ajusta</h4>
+<p>El evento definido sucede. El evento debe ser visible y cambiar la situación.</p>
+<p><strong>Ejemplos:</strong></p>
+<ul>
+<li><p>A <strong>Patrol de guardia [4</strong> timer fills: los guardias llegan.</p></li>
+<li><p>A <strong>Compleción ritual [6</strong> timer fills: el ritual termina.</p></li>
+<li><p>An <strong>Alianza formando [8</strong> timer fills: una facción se compromete a la acción.</p></li>
+</ul>
+<div class="tipbox">
+<p><strong>Las máquinas son visibles.</strong> Enséñalos a los jugadores. Escribe
+<em>Culto Influencia [6</em> en una tarjeta de índice y colocarla en la tabla. <em>“El canto del culto’ crece más alto — los avances rituales.”</em></p>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:character-creation">
+<h1>Creación de personajes</h1>
+<section class="level2" id="overview">
+<h2>Información general</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Tier I conveniencia</span> <span class="badge badge-gold">32 XP</span> Los personajes comienzan en Tier I (Novicio) con <strong>32 puntos de experiencia (XP)</strong>. Usted puede ganar hasta + 4 XP tomando significado vínculos (con otros personajes de jugador) y Complicaciones.</p>
+</div>
+</section>
+<section class="level2" id="step-1-concept">
+<h2>Paso 1: Concepto propuesto</h2>
+<p>Escribe una frase que describe tu personaje ’s origen, profesión y un rasgo que define.</p>
+<p>Ejemplos:</p>
+<ul>
+<li><p><em>“Un túnel de Aeler que perdió su cuenta de aliento y ahora escucha la piedra cantar.”</em></p></li>
+<li><p><em>“Un duelista Vhasian con una cara asustada y un voto para no perder nunca más.”</em></p></li>
+</ul>
+</section>
+<section class="level2" id="step-2-attributes">
+<h2>Paso 2: Atributos</h2>
+<p>Usted tiene cuatro atributos (1-5). Pase XP para elevarlos de una base de 1 cada uno.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Atributo</strong></th><th style="text-align: left;"><strong>Descripción</strong></th><th style="text-align: left;"><strong>Costo</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Cuerpo</td><td style="text-align: left;">Fuerza, resistencia, resistencia física.</td><td style="text-align: left;">nueva calificación <span class="math inline">×</span> 3 XP</td></tr>
+<tr><td style="text-align: left;">Ingenio</td><td style="text-align: left;">Percepción, velocidad, pensamiento rápido.</td><td style="text-align: left;">nueva calificación <span class="math inline">×</span> 3 XP</td></tr>
+<tr><td style="text-align: left;">Espíritu</td><td style="text-align: left;">Poder de voluntad, enfoque, conexión a lo intangible.</td><td style="text-align: left;">nueva calificación <span class="math inline">×</span> 3 XP</td></tr>
+<tr><td style="text-align: left;">Presencia</td><td style="text-align: left;">Charisma, comando, fuerza de la personalidad.</td><td style="text-align: left;">nueva calificación <span class="math inline">×</span> 3 XP</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Costo es incremental:</strong></p>
+<ul>
+<li><p>1 <span class="math inline">→</span> 2 cuesta 6 XP (2 <span class="math inline">×</span> 3)</p></li>
+<li><p>2 <span class="math inline">→</span> 3 cuesta 9 XP (3 <span class="math inline">×</span> 3)</p></li>
+<li><p>3 <span class="math inline">→</span> 4 cuesta 12 XP (4 <span class="math inline">×</span> 3)</p></li>
+</ul>
+<p><strong>Rangos de inicio recomendados:</strong></p>
+<ul>
+<li><p>Atributo primario (utilizado la mayoría): <strong>3</strong> (costos 15 XP total: 1<span class="math inline">→</span>2 = 6, 2<span class="math inline">→</span>3 = 9)</p></li>
+<li><p>Atributos secundarios: <strong>2</strong> cada uno (costos 6 XP cada uno)</p></li>
+</ul>
+</section>
+<section class="level2" id="step-3-skills">
+<h2>Paso 3: Habilidades específicas</h2>
+<p>Elija Habilidades (0-5) que coincidan con su concepto. Las habilidades clave deben ser 2-3; otros 0-1.</p>
+<ul>
+<li><p>Costo: <strong>nuevo nivel <span class="math inline">×</span> 2 XP</strong> (incremental)</p></li>
+<li><p>Total de inicio recomendado: Pasar 8-12 XP sobre habilidades.</p></li>
+</ul>
+<p><strong>Costo es incremental:</strong></p>
+<ul>
+<li><p>0 <span class="math inline">→</span> 1 cuesta 2 XP (1 <span class="math inline">×</span> 2)</p></li>
+<li><p>1 <span class="math inline">→</span> 2 cuesta 4 XP (2 <span class="math inline">×</span> 2)</p></li>
+<li><p>2 <span class="math inline">→</span> 3 cuesta 6 XP (3 <span class="math inline">×</span> 2)</p></li>
+</ul>
+<section class="level3 unnumbered" id="core-skill-list">
+<h3 class="unnumbered">Lista de habilidad básica</h3>
+<p>Las dieciséis habilidades básicas se agrupan por tema:</p>
+<div class="grid-2">
+<div>
+<p><span class="badge badge-red">Combatir</span></p>
+<ul>
+<li><p>Cuerpo a cuerpo</p></li>
+<li><p>A distancia</p></li>
+<li><p>Unrmed</p></li>
+</ul>
+<p><span class="badge badge-orange">Física</span></p>
+<ul>
+<li><p>Atletismo</p></li>
+<li><p>Sigilo</p></li>
+<li><p>Aguante</p></li>
+<li><p>Artesanía</p></li>
+</ul>
+</div>
+<div>
+<p><span class="badge badge-blue">Social</span></p>
+<ul>
+<li><p>Persuasión</p></li>
+<li><p>Decepción</p></li>
+<li><p>Subterfugio</p></li>
+<li><p>Interpretación</p></li>
+<li><p>Perspicacia</p></li>
+</ul>
+<p><span class="badge badge-gold">Conocimiento</span></p>
+<ul>
+<li><p>Saber</p></li>
+<li><p>Investigación</p></li>
+<li><p>Medicina</p></li>
+</ul>
+<p><span class="badge badge-purple">Magia</span></p>
+<ul>
+<li><p>Arcana</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section class="level2" id="step-4-talents">
+<h2>Paso 4: Talentos cobran</h2>
+<div class="tipbox">
+<p><strong>Usted don’ no necesita Talentos para ser eficaz.</strong> Un personaje con sólo Atributos y Habilidades es un personaje completo y viable—especialmente en Tier I.</p>
+</div>
+<p>Los talentos son habilidades especiales. <strong>0–3 talentos</strong>.</p>
+<section class="level3 unnumbered" id="sample-talents">
+<h3 class="unnumbered">Talentos de muestra</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Talento</strong></th><th style="text-align: left;"><strong>Costo</strong></th><th style="text-align: left;"><strong>Efecto</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;"><em>Ninguno</em></td><td style="text-align: left;"><em>0 XP</em></td><td style="text-align: left;"><em>Un personaje válido y completo.</em></td></tr>
+<tr><td style="text-align: left;">Keen Senses prevalece</td><td style="text-align: left;">2 XP</td><td style="text-align: left;">+1 mueren a las comprobaciones de percepción.</td></tr>
+<tr><td style="text-align: left;">Weapon Mastery guiar</td><td style="text-align: left;">5 XP</td><td style="text-align: left;">+2 dados con un arma elegida.</td></tr>
+<tr><td style="text-align: left;">Segundo viento</td><td style="text-align: left;">2 XP</td><td style="text-align: left;">Despejado 1 Fatiga una vez por escena.</td></tr>
+<tr><td style="text-align: left;">Tongue de plata</td><td style="text-align: left;">2 XP</td><td style="text-align: left;">+1 mueren a los intentos de persuasión.</td></tr>
+<tr><td style="text-align: left;">Presencia del Comando</td><td style="text-align: left;">4 XP</td><td style="text-align: left;">+1 mueren a la dirección e intimidación.</td></tr>
+<tr><td style="text-align: left;">Defensivo Survival</td><td style="text-align: left;">3 XP</td><td style="text-align: left;">+1 a la defensa DV en melee.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section class="level2" id="step-5-bonds-and-complications">
+<h2>Paso 5: vínculos y complicaciones</h2>
+<section class="level3 unnumbered" id="bonds">
+<h3 class="unnumbered">Vínculos</h3>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">1-2 vínculos</span> Establezca los enlaces 1-2 con otros personajes de jugador. Cada bono otorga una vez por sesión Bono cuando actúa en él con descripción intrincada.</p>
+<p><strong>vínculo Ejemplo:</strong> <em>“Ella me ayudó a escapar del juicio que arruinó a mi familia.”</em></p>
+</div>
+</section>
+<section class="level3 unnumbered" id="complications">
+<h3 class="unnumbered">Complicaciones</h3>
+<div class="panel panel-red">
+<p><span class="badge badge-red">+ 2 XP cada uno</span> Usted puede tomar hasta dos complicaciones (por ejemplo, una pelea, un objeto maldecido, una deuda). +2 XP pero cada personaje con una complicación añade +1 banked Punto narrativo a escenas tempranas.</p>
+<p><strong>Ejemplo de complicación:</strong> <em>“El magistrado que condenó a mi familia todavía me persigue.”</em></p>
+</div>
+</section>
+</section>
+<section class="level2" id="step-6-gear">
+<h2>Paso 6: Gear inminente</h2>
+<p>Usted comienza con:</p>
+<ul>
+<li><p>Un conjunto de ropa apropiada para su cultura.</p></li>
+<li><p>Un arma de meleo (Luz o Media) o un arma con municiones.</p></li>
+<li><p>Armadura ligera.</p></li>
+<li><p>Una mochila, sandkin, 1d6 días de raciones, un cuchillo, un peinado y acero, una pequeña linterna o vela.</p></li>
+<li><p>Cualquier herramienta necesaria para sus habilidades (por ejemplo, cerraduras, sanador ’s kit).</p></li>
+</ul>
+</section>
+<section class="level2" id="build-examples">
+<h2>Construir Ejemplos</h2>
+<section class="level3 unnumbered" id="the-duelist-32-xp">
+<h3 class="unnumbered">El Duelista (32 XP</h3>
+<div class="panel panel-red">
+<p><span class="badge badge-red">Total: 31 XP</span></p>
+<ul>
+<li><p>Cuerpo 3 (15 XP), Ingenio 2 (6 XP) <span class="math inline">→</span>
+21 XP</p></li>
+<li><p>Melee 2 (6 XP), Athletics 1 (2 XP), Endurance 1 (2 XP] <span class="math inline">→</span> 10 XP</p></li>
+<li><p><strong>Total:</strong> 31 XP (banco 1 XP</p></li>
+</ul>
+<p class="text-sm text-muted"><em>Añada un vínculo para + 2 XP para llegar 33 XP.</em></p>
+</div>
+</section>
+<section class="level3 unnumbered" id="the-scholar-32-xp">
+<h3 class="unnumbered">El becario (32 XP</h3>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Total: 31 XP</span></p>
+<ul>
+<li><p>Ingenio 3 (15 XP), Espíritu 2 (6 XP) <span class="math inline">→</span> 21 XP</p></li>
+<li><p>Lore 2 (6 XP), Insight 1 (2 XP), Insight 1 (2 XP <span class="math inline">→</span> 10 XP</p></li>
+<li><p><strong>Total:</strong> 31 XP (banco 1 XP</p></li>
+</ul>
+<p class="text-sm text-muted"><em>Añada un vínculo para + 2 XP para llegar 33 XP.</em></p>
+</div>
+</section>
+<section class="level3 unnumbered" id="the-scout-32-xp">
+<h3 class="unnumbered">El Scout (32 XP</h3>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Total: 29 XP</span></p>
+<ul>
+<li><p>Ingenio 3 (15 XP), Cuerpo 2 (6 XP) <span class="math inline">→</span>
+21 XP</p></li>
+<li><p>Stealth 2 (6 XP), Insight 1 (2 XP <span class="math inline">→</span> 8 XP</p></li>
+<li><p><strong>Total:</strong> 29 XP (banco 3 XP</p></li>
+</ul>
+<p class="text-sm text-muted"><em>Añada Keen Senses (2 XP) y un vínculo (+ 2 XP) para 33 XP.</em></p>
+</div>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:pregens">
+<h1>Personajes pre-Generados</h1>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">3 Bonos</span> <span class="badge badge-blue">0 Fatiga/Daño</span> Elija uno. Todos están equilibrados para la aventura inicial. Cada PJ comienza con ingredientes <strong>3 Bonos</strong> y <strong>0 Fatiga/Daño</strong>.</p>
+</div>
+<div class="grid-2">
+<div class="panel panel-red">
+<section class="level2 unnumbered" id="levi-soldier">
+<h2 class="unnumbered">1. Levi — Soldado</h2>
+<p><span class="badge badge-red">Cuerpo a cuerpo</span> <em>Una vez un legionario, ahora una palabra de venta.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Cuerpo</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Ingenio</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Espíritu</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Presencia</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Habilidades:</strong> Melee 2, Atletismo 1, Resistencia 1, Insight 1 (para leer oponentes)</p>
+<p><strong>Talento — Instintos de batalla:</strong> Una vez por escena, rerolle un fallido tirada de defensa.</p>
+<p><strong>recurso — Fideicomiso Blade:</strong> Tu espada nunca se rompe en un fallo.</p>
+<p><strong>vínculos:</strong> (coose uno con otro PJ <em>“Salvé tu vida fuera de Millhaven.”</em></p>
+<p><strong>XP:</strong> Body 3 (en inglés)15), Ingenio 2 (en inglés)6) = 21 XP. Melee encargada 2 (en inglés)6), Atlética 1 (en inglés)2), Endurance 1 (en inglés)2), Insight 1 (en inglés)2) = 12 XP. Instintos de la batalla2 XP). <strong>Total: 35 XP</strong> (con una vínculo).</p>
+</section>
+</div>
+<div class="panel panel-blue">
+<section class="level2 unnumbered" id="lyra-scholar">
+<h2 class="unnumbered">2. Lyra —</h2>
+<p><span class="badge badge-blue">Conocimiento</span> <em>Expeled from the Academy for prohibited research.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Ingenio</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Espíritu</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Cuerpo</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Presencia</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Habilidades:</strong> Saber 2, Arcana 1, Perspicacia 1, Perspicacia 1</p>
+<p><strong>Talento — Lorekeeper:</strong> Una vez por sesión, recuerde historia oscura sin tirar los dados.</p>
+<p><strong>recurso — Scholar’s Satchel:</strong> Contiene libros, reactivos, un pequeño telescopio.</p>
+<p><strong>vínculos:</strong> <em>“ Ambos perdimos nuestro lugar en Silkstrand.”</em></p>
+<p><strong>XP:</strong> Ingenio 3 (en inglés)15), Espíritu Santo 2 (en inglés)6) = 21 XP. Lore 2 (en inglés)6), Arcana tuya 1 (en inglés)2), Insight 1 (en inglés)2), Insight 1 (en inglés)2) = 12 XP. Lorekeeper2 XP). <strong>Total: 35 XP</strong> (con una vínculo).</p>
+</section>
+</div>
+</div>
+<div class="grid-2">
+<div class="panel panel-purple">
+<section class="level2 unnumbered" id="sera-shadow">
+<h2 class="unnumbered">3. Sera —</h2>
+<p><span class="badge badge-purple">Sigilo</span> <em>Ex ladrón de gremios, ahora un vagabundo.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Ingenio</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Cuerpo</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Espíritu</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Presencia</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Habilidades:</strong> Stealth 2, Deception 2, Insight 1 (para leer marcas)</p>
+<p><strong>Talento — Lengua de Plata:</strong> +1 mueren para persuadir o engañar a través del discurso.</p>
+<p><strong>recurso — Shadow’s Cloak:</strong> +1 mueren para los tiradas de sigilo en luz dim.</p>
+<p><strong>vínculos:</strong> <em>“Guardaste mi secreto cuando vinieron los guardias.”</em></p>
+<p><strong>XP:</strong> Ingenio 3 (en inglés)15), Body 2 (en inglés)6) = 21 XP. Stealth conveniencia 2 (en inglés)6), Decepción 2 (en inglés)6), Insight 1 (en inglés)2) = 14 XP. Lengua de Plata (propiedad)2 XP).
+<strong>Total: 37 XP</strong> (con un vínculo — ajustarse bajando Insight a 0 para 35 XP).</p>
+</section>
+</div>
+<div class="panel panel-green">
+<section class="level2 unnumbered" id="mira-healer">
+<h2 class="unnumbered">4. Mira —</h2>
+<p><span class="badge badge-green">Medicina</span> <em>Acusado de brujería para curar lo incurable.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Espíritu</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Ingenio</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Cuerpo</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Presencia</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Habilidades:</strong> Artesanía 2, Insight 1 (para el diagnóstico), Insight 2</p>
+<p><strong>Talento — Iron Stomach:</strong> Inmune a venenos mundanos y comida malcriada.</p>
+<p><strong>recurso — Healer’s Kit:</strong> Bandages, hierbas, suministros médicos básicos.</p>
+<p><strong>vínculos:</strong> <em>“ Confiabas en mí cuando nadie más lo haría.”</em></p>
+<p><strong>XP:</strong> Spirit 3 (en inglés)15), Ingenio 2 (en inglés)6) = 21 XP. Artesanía 2 (en inglés)6), Insight 1 (en inglés)2), Insight 2 (en inglés)6) = 14 XP. Iron Stomach3 XP).
+<strong>Total: 38 XP</strong> (con un vínculo — ajuste: gota Insight a 1 para 35 XP).</p>
+</section>
+</div>
+</div>
+<div class="panel panel-gold">
+<section class="level2 unnumbered" id="kael-runekeeper-optional-magic-user">
+<h2 class="unnumbered">5. Kael — guardián de runas (Optional Magic User)</h2>
+<p><span class="badge badge-gold">Magia</span> <span class="badge badge-orange">Ajuste del nivel II necesitado</span> <em>Un vagabundo juró al Viajero.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Espíritu</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Ingenio</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Cuerpo</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Presencia</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Habilidades:</strong> Saber 2, Arcana 1, Perspicacia 1, Perspicacia 1</p>
+<p><strong>Talentos:</strong> Familiar (2 XP), Codex (4 XP</p>
+<p><strong>Ritos:</strong> Road-Sense (4 XP), Traveler’s Bono (5 XP) – son habilidades especiales, no habilidades.</p>
+<p><strong>vínculos:</strong> <em>“ El camino nos unió.”</em></p>
+<p><strong>XP:</strong> Spirit 3 (en inglés)15), Ingenio 2 (en inglés)6) = 21 XP. Lore 2 (en inglés)6), Arcana tuya 1 (en inglés)2), Insight 1 (en inglés)2), Insight 1 (en inglés)2) = 12 XP. Familiar ( conveniencia)2), Codex (4) = 6 XP. Road-Sense4), Traveler’s Bono (en inglés)5) = 9 XP.
+<strong>Total: 48 XP</strong> (requiere ajuste DJ o comenzar en Tier II).</p>
+</section>
+</div>
+</section>
+<section class="level1" id="ch:lantern-at-dusk">
+<h1>Aventura de inicio: La Linterna en Dusk</h1>
+<p class="flex"><span class="badge badge-gold">Tier I conveniencia</span> <span class="badge badge-blue">Partida autoconclusiva</span> <span class="badge badge-purple">2-3 Hora Session</span></p>
+<section class="level2" id="setup">
+<h2>Configuración</h2>
+<p>La fiesta es contratada por <strong>Elder Sarai prevalece</strong> de la remota aldea de <strong>Duskwood</strong>. Una terrible plaga se extiende desde la vieja ceja en las colinas — la misma ceja donde una linterna malvada fue sepultada hace siglos. La linterna debe ser llevada a un círculo de piedra en el valle para romper la maldición. Pero la ceja no está vacía.</p>
+</section>
+<section class="level2" id="what-the-party-knows">
+<h2>Lo que el Partido conoce</h2>
+<div class="panel panel-blue">
+<ul>
+<li><p>La linterna está en la cámara central del barrow.</p></li>
+<li><p>La barriga está custodiada por espíritus inquietos (la
+<strong>Duskwights tienden</strong>).</p></li>
+<li><p>Un cazador de tesoros rival, <strong>Lena rápida</strong>, también ha entrado en el barrow.</p></li>
+<li><p>La maldición matará a los cultivos de la aldea’ en tres días.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="timers-1">
+<h2>Temporizadores</h2>
+<div class="panel panel-red">
+<ul>
+<li><p><span class="badge badge-red">Barrow Collapse [6</span> marca cuando la fiesta falla un tirada dentro (DJ avanza 1 segmento por fallo). En 6, la entrada sella — escape se convierte en una acción de grupo desesperado.</p></li>
+<li><p><span class="badge badge-orange">La agenda de Lena [4</span> Al final de cada escena dentro de la barriga. Cuando se llena, Lena ya ha tomado la linterna; la fiesta debe perseguirla.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-1-the-entry">
+<h2>Escena 1 — La Entry</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-blue">Controlada</span></p>
+<p>La entrada de la ceja es un paso estrecho de piedra. Un brillo verde débil pulsa desde el interior más profundo.</p>
+<p><strong>Obstáculo:</strong> Una caverna bloquea el camino.</p>
+<ul>
+<li><p><strong>Tirada:</strong> Cuerpo + Atletismo (DV 3, Controlado).</p></li>
+<li><p><span class="badge badge-green">Éxito limpio</span> Limpia los escombros y entra.</p></li>
+<li><p><span class="badge badge-gold">Resultado parcial</span> Usted consigue a través pero perturbar los escombros — garrapata Barrow Collapse +1.</p></li>
+<li><p><span class="badge badge-red">Fallo</span> Usted está clavado por una marca rock — Daño 1 y garrapata Collapse +1.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-2-the-spirit-corridor">
+<h2>Escena 2 — El Espíritu Corridor</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-blue">Controlada</span></p>
+<p>El pasaje se ensancha en un pasillo donde tres corrientes
+<strong>Duskwights tienden</strong> no atacan a menos que sean provocados, pero no dejarán que nadie pase sin una ofrenda.</p>
+<p><strong>Ofrecer un recuerdo o un secreto.</strong></p>
+<ul>
+<li><p><strong>Tirada:</strong> Presencia + Sway (DV 3, Controlled).</p></li>
+<li><p><span class="badge badge-green">Éxito limpio</span> Se inclinan y te dejan pasar.</p></li>
+<li><p><span class="badge badge-gold">Resultado parcial</span> Toman su oferta, pero también roban un equipo aleatorio (DJ elige).</p></li>
+<li><p><span class="badge badge-red">Fallo</span> Atacan como una sola turba (Cap 2, Daño 1 cada una, 2 Fatiga cada una en golpe).</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-3-the-lantern-chamber">
+<h2>Escena 3 —</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-blue">Controlada</span></p>
+<p>La linterna se sienta sobre un altar de piedra. <strong>Lena rápida</strong> está ahí, tratando de hacerlo suelto.</p>
+<p><strong>Enfrentarse a Lena:</strong> No es una luchadora.</p>
+<ul>
+<li><p><strong>Tirada:</strong> Presencia + Sway (DV 3, Controlada) para ofrecer un trato o intimidarla.</p></li>
+<li><p><span class="badge badge-green">Éxito limpio</span> Ella sale pacíficamente, pero advierte que “ otros vendrán por ella.”</p></li>
+<li><p><span class="badge badge-gold">Resultado parcial</span> Ella está de acuerdo en dividir cualquier recompensa pero exige un favor más tarde (comenzar un Timer Debt [4]).</p></li>
+<li><p><span class="badge badge-red">Fallo</span> Ella activa una trampa — una puerta de piedra comienza a cerrar (tick Collapse +2).</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-4-escape">
+<h2>Escena 4 — Escape</h2>
+<div class="panel panel-red">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-red">Desesperada</span> <span class="badge badge-orange">3 Los éxitos antes 2</span></p>
+<p>Después de tomar la linterna, la ceja comienza a colapsar en serio.</p>
+<p><strong>Desafío de habilidad de grupo:</strong> El partido necesita 3 éxitos antes de 2 fracasos de escape. Cada PJ describe cómo ayudan (por ejemplo, Atletismo para abrir una puerta, Investigación para leer antiguas pistas de escape).</p>
+<ul>
+<li><p><strong>Tirada:</strong> Atributo apropiado + Habilidad (DV 3, Posición Desesperada).</p></li>
+<li><p>Cada falla marca colapsar +1.</p></li>
+<li><p>Si Collapse llega 6 antes de escapar, los sellos de entrada — debe encontrar otra manera (comenzar un segundo temporizador [4]] para excavar, cada éxito elimina 1 segmento; en el fracaso, marca Fatiga).</p></li>
+</ul>
+<p><span class="badge badge-green">Éxito</span> Vas a la luz de la luna, linterna en la mano.</p>
+<p><span class="badge badge-red">Fracaso</span> Usted escapa, pero alguien se deja atrás — capturado o perdido. El partido restante debe rescatarlos más tarde.</p>
+</div>
+</section>
+<section class="level2" id="resolution">
+<h2>Resolución</h2>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">DV 2</span></p>
+<p>Regresar la linterna al círculo de piedra. Romper la maldición requiere un simple ritual.</p>
+<ul>
+<li><p><strong>Tirada:</strong> Espíritu + Lore (DV 2) o Espíritu + Arcana si utiliza conocimiento mágico.</p></li>
+<li><p><span class="badge badge-green">Éxito limpio</span> El anciano Sarai recompensa cada PJ con un criterio <strong>Hilo</strong> — “ El pueblo le debe.”</p></li>
+<li><p><span class="badge badge-gold">Resultado parcial</span> La maldición levanta, pero la linterna no puede ser destruida — atraerá pronto otro peligro.</p></li>
+<li><p><span class="badge badge-red">Fallo</span> La maldición sólo es empujada hacia atrás un año. Un espíritu oscuro escapa y se convertirá en un enemigo recurrente.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="advancement">
+<h2>Progresión</h2>
+<p><span class="badge badge-gold">6–10 XP</span> Cada PJ gana ganancias <strong>6–10 XP</strong> al final. XP se puede gastar:</p>
+<ul>
+<li><p>Aumentar un atributo: nueva calificación <span class="math inline">×</span>
+3 XP (tiempo inicial = nuevos días de calificación).</p></li>
+<li><p>Aumentar una habilidad: nuevo nivel <span class="math inline">×</span> 2 XP (tiempo interior = nuevos días de nivel).</p></li>
+<li><p>Aprende un talento menor (2–4 XP) — ejemplos: <em>Keen Senses prevalece</em>,
+<em>Segundo viento</em>, <em>Reflexes de combate</em>.</p></li>
+<li><p>Adquire a Minoristas recurso (en inglés)4 XP) — caja fuerte, contacto o herramienta especial.</p></li>
+</ul>
+<div class="tipbox">
+<p><strong>Regla de rubor:</strong> Pasar el tiempo de inactividad aceptando un criterio <em>Haste timer [4</em>. Si se llena antes de terminar, la nueva habilidad tiene un defecto (DJ’ elección).</p>
+</div>
+</section>
+</section>
+<section class="level1" id="ch:simplified-magic">
+<h1>Magia simplificada</h1>
+<p>Este capítulo cubre dos enfoques de la magia: <strong>Libre fundición</strong> para los jugadores que quieren improvisar hechizos, y
+<strong>Regalos de cobertura</strong> para los jugadores que quieren trucos mágicos confiables y de bajo costo sin comprometerse a un camino mágico completo.</p>
+<section class="level2" id="free-casting-spellcraft">
+<h2>Casting libre (Spellcraft)</h2>
+<p>Si un jugador quiere un personaje mágico improvisado, utilice estas reglas simplificadas (basadas en el criterio <em>Caster libre</em> para los sistemas de magia completa (Runekeepers, Invokers, Cantors), ver el completo
+<em>Fate's Edge Jugador’</em>.</p>
+<section class="level3 unnumbered" id="spellcasting">
+<h3 class="unnumbered">Lanzamiento de conjuros</h3>
+<p>Elija una magia <strong>Elemento</strong> (Fire, Agua, Tierra, Aire, Fate, Vida, Suerte, Muerte). Describe tu hechizo utilizando
+<strong>ETIQUETAS</strong>Cada etiqueta aumenta DV por 1. Etiquetas peligrosas (Teleport, Transform, Dominate) aumentan DV por +2 en lugar.</p>
+<p><span class="math display">DV = 1 + number of tags</span></p>
+<p>(maximum 6). <strong>Espíritu + Arcana</strong>.</p>
+</section>
+<section class="level3 unnumbered" id="example">
+<h3 class="unnumbered">Ejemplo</h3>
+<p><em>“ Yo tiro un [Burning] [Area] blast”</em> = DV 3</p>
+</section>
+<section class="level3 unnumbered" id="backlash">
+<h3 class="unnumbered">Repercusión</h3>
+<div class="warningbox">
+<p>Si rodas un fallo o el DJ pasa SB, fuegos artificiales mágicos: prendas</p>
+<ul>
+<li><p><span class="badge badge-orange">1–2 SB</span> pequeña bengala, Fatiga 1, sonido eerie.</p></li>
+<li><p><span class="badge badge-red">3 + SB</span> Daño 1, el hechizo afecta a un aliado, o aparece un omen de Patron.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="sample-spells-dv-24">
+<h3 class="unnumbered">Muestras (DV 2–4)</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Conjuro</strong></th><th style="text-align: left;"><strong>ETIQUETAS</strong></th><th style="text-align: left;"><strong>DV</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Ligera</td><td style="text-align: left;">[Iluminar]</td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;">HEAL</td><td style="text-align: left;">[HEAL]</td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;">Escudo de Aire Libre</td><td style="text-align: left;">[Protección] [Defensa]</td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;">Manto de llamas</td><td style="text-align: left;">[Quemar] [Área]</td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;">Teletransportar</td><td style="text-align: left;">[Salto] [Sí mismo]</td><td style="text-align: left;">4</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="light-illuminate-dv-2">
+<h3 class="unnumbered">Luz [Illuminate] — DV 2</h3>
+<p>Crear una luz pequeña y sostenida.</p>
+</section>
+<section class="level3 unnumbered" id="heal-heal-dv-2">
+<h3 class="unnumbered">HEAL [HEAL] — DV 2</h3>
+<p>Curar 1 Fatiga de ti mismo o un aliado tocado.</p>
+</section>
+<section class="level3 unnumbered" id="shield-of-air-ward-defend-dv-3">
+<h3 class="unnumbered">Escudo de aire [Protección] [Defensa] — DV 3</h3>
+<p>Posición de ganancia +1 en la siguiente defensa.</p>
+</section>
+<section class="level3 unnumbered" id="flame-cloak-burning-area-dv-3">
+<h3 class="unnumbered">Flame Cloak [Burning] — DV 3</h3>
+<p>Los enemigos sufren –1 mueren para acercarse.</p>
+</section>
+</section>
+<section class="level2" id="hedge-gifts-simplified-witchcraft">
+<h2>Regalos de cobertura (Simplified Witchcraft)</h2>
+<p>Los regalos de cobertura son habilidades mágicas simples y no-roll. Un personaje con la ventaja <strong>Artesanía del Hedge vencer</strong> El talento aprende dos regalos de Hedge de su elección. Estos son efectos pequeños y fiables que nunca requieren tiradas de dados y nunca incurren en Obligación.</p>
+<section class="level3 unnumbered" id="requirements">
+<h3 class="unnumbered">Requisitos</h3>
+<div class="panel panel-purple">
+<ul>
+<li><p><span class="badge badge-purple">4 XP</span> <strong>Artesanía del Hedge:</strong> Requiere Lore 1+ o Insight 1+.</p></li>
+<li><p>Usted aprende <strong>dos regalos de cobertura</strong> de su elección.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="hedge-gifts">
+<h3 class="unnumbered">Regalos de cobertura</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Regalo</strong></th><th style="text-align: left;"><strong>Efecto</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;"><strong>Mano firme</strong></td><td style="text-align: left;">Una vez por escena, toque a una persona herida (incluido usted mismo) y retire 1 Fatiga. No hay tirada. No se puede utilizar en la misma persona dos veces en una escena.</td></tr>
+<tr><td style="text-align: left;"><strong>Knot of Favor prevalece</strong></td><td style="text-align: left;">Una vez por escena, atar un nudo en un cordón, un hilo o un paño. Los aliados dentro de la ganancia cercana +1 mueren a un único tipo de tirada (agustar cuando se ata: sigilo, persuasión, defensa o navegación). El nudo debe permanecer ligado.</td></tr>
+<tr><td style="text-align: left;"><strong>Mano cálida</strong></td><td style="text-align: left;">Una vez por escena, toca a alguien. Su siguiente acción física gana + 1 muere (comfort) o sufre – 1 muere (aprendizaje).</td></tr>
+<tr><td style="text-align: left;"><strong>Sentido del hogar</strong></td><td style="text-align: left;">Una vez por escena, pregunte al DJ un sí/no pregunta sobre un umbral, límite, o promesa en la escena actual. El DJ debe responder sinceramente.</td></tr>
+<tr><td style="text-align: left;"><strong>Línea de sal</strong></td><td style="text-align: left;">Una vez por escena, verter un puñado de sal en una línea continua (acción del amor). Cualquier espíritu, fantasma o criatura maldicida que intenta cruzar debe probar Espíritu + Insight (DV 3) o ser detenido para ese intercambio.</td></tr>
+<tr><td style="text-align: left;"><strong>El Candelabro Inalterado</strong></td><td style="text-align: left;">Una vez por sesión, declarar que una fuente de luz que se puede ver (lanterna, vela, antorcha) falters o extingues. Esto crea una zona de luz o oscuridad en rango cercano para un intercambio.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="example-build-the-hedge-witch-32-xp">
+<h3 class="unnumbered">Ejemplo de construcción: El Hedge-Witch (32 XP</h3>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Total: 33 XP</span></p>
+<ul>
+<li><p><strong>Atributos:</strong> Espíritu 3 (15 XP), Ingenio 2 (6 XP)
+<span class="math inline">→</span> 21 XP</p></li>
+<li><p><strong>Habilidades:</strong> Saber 2 (6 XP), Perspicacia 1 (2 XP) <span class="math inline">→</span> 8 XP</p></li>
+<li><p><strong>Talento:</strong> Artesanía del Hedge (4 XP) <span class="math inline">→</span> 4 XP</p></li>
+<li><p><strong>Regalos de cobertura:</strong> Mano firme, nudo de favor</p></li>
+<li><p><strong>Total:</strong> 21 + 8 + 4 = <strong>33 XP</strong></p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="promise-timers">
+<h3 class="unnumbered">Promesa Timers</h3>
+<div class="tipbox">
+<p><span class="badge badge-gold">Prometidor [4</span> Algunos efectos de regalo de cobertura o rituales crean obligaciones. Representar estos con un patrón <strong>Prometidor del tiempo</strong> (típicamente 4 segmentos):</p>
+<ul>
+<li><p>Marca el temporizador cuando la promesa es ignorada, diferida o desrespetada.</p></li>
+<li><p>Cuando se llena, el precio viene debido — social, espiritualmente, o narrativamente.</p></li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:gm-tips">
+<h1>DJ Consejos: Correr su primer juego</h1>
+<section class="level2" id="before-you-start">
+<h2>Antes de comenzar</h2>
+<section class="level3 unnumbered" id="read-the-adventure-first">
+<h3 class="unnumbered">Lea la aventura primero</h3>
+<p>Leer a través de <em>El Linterna en Dusk</em> (Capítulo 5) al menos dos veces. Usted don’ no necesita memorizarlo, pero usted debe conocer las escenas principales y los temporizadores.</p>
+</section>
+<section class="level3 unnumbered" id="know-the-core-rules">
+<h3 class="unnumbered">Conocer las reglas básicas</h3>
+<p>Los mecánicos centrales (capítulo 2) son su motor. Si olvida una regla, predeterminado a:</p>
+<p class="flex"><span class="badge badge-gold">DV = 3</span> <span class="badge badge-blue">Posición = Controlada</span> <span class="badge badge-green">Efecto = Estándar</span></p>
+<p class="text-sm text-muted">Puedes revisar la regla después de la sesión.</p>
+</section>
+<section class="level3 unnumbered" id="print-the-reference-sheet">
+<h3 class="unnumbered">Imprima la hoja de referencia</h3>
+<p>Mantenga la referencia rápida (capítulo 9) a mano en la tabla.</p>
+</section>
+</section>
+<section class="level2" id="during-the-session">
+<h2>Durante la sesión</h2>
+<section class="level3 unnumbered" id="start-strong">
+<h3 class="unnumbered">Inicio Strong</h3>
+<p>Usar un frío abierto: <em>“La ceja’s manchas de luz verde. Hueles a podredumbre. ¿Qué haces?”</em></p>
+</section>
+<section class="level3 unnumbered" id="set-dv-to-3-by-default">
+<h3 class="unnumbered">Set DV a 3 por Default genes</h3>
+<p>Sólo elevar a 4 o 5 si la tarea es verdaderamente legendaria. Su trabajo no es desafiar a los jugadores con números altos — es desafiarlos con opciones interesantes.</p>
+</section>
+<section class="level3 unnumbered" id="spend-story-beats-early-and-often">
+<h3 class="unnumbered">Spend Puntos narrativos Temprano y a menudo</h3>
+<p>Un solo SB puede convertir una escena tranquila en una tensa. Don’t acapararlos.</p>
+</section>
+<section class="level3 unnumbered" id="fail-forward">
+<h3 class="unnumbered">Avanzar con el fallo</h3>
+<div class="tipbox">
+<p>En un fallo, nunca decir “ nada sucede.” Siempre introducir una nueva complicación o avanzar un temporizador.</p>
+</div>
+</section>
+<section class="level3 unnumbered" id="use-the-pre-gens">
+<h3 class="unnumbered">Usar el pre-Genes ambientales</h3>
+<p>Los personajes pregenerados (Chapter 4) están diseñados para mostrar diferentes estilos de juego. Dejar que los jugadores elijan uno.</p>
+</section>
+<section class="level3 unnumbered" id="keep-the-spotlight-moving">
+<h3 class="unnumbered">Mantenga el foco Moving</h3>
+<p>Pregunte a los jugadores silenciosos directamente: <em>“Sera, ¿qué estás haciendo mientras esto sucede?”</em></p>
+</section>
+<section class="level3 unnumbered" id="end-on-a-cliffhanger">
+<h3 class="unnumbered">Fin en un Cliffhanger</h3>
+<p>Cuando se levanta la linterna, describa el grieta de techo — y diga “ que se continúe.”</p>
+</section>
+<section class="level3 unnumbered" id="using-timers-at-the-table">
+<h3 class="unnumbered">Usando Timers en la tabla</h3>
+<p>Las máquinas son su principal herramienta para crear presión.</p>
+<ul>
+<li><p><strong>Nombrarlos descriptivamente:</strong> <em>“Conclusión ritual”</em> no <em>“Timer 3 ”</em>.</p></li>
+<li><p><strong>Tick them aloud: inevitable</strong> <em>“ El canto del culto’ crece más alto — La compleción ritual avanza a 4 de 6.”</em></p></li>
+<li><p><strong>Link timer avanza a la ficción: ganancias</strong> Nunca digas nada.
+<em>«avanza el temporizador».</em> Describe lo que cambia.</p></li>
+<li><p><strong>Localizar los rastreadores centralmente:</strong> Utilice tarjetas de índice, fichas de póquer, o tablas de lana seca donde todos los jugadores pueden verlos.</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="the-three-timer-rule">
+<h3 class="unnumbered">La regla de tres tiempos</h3>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Max 3 Activos Timers</span> En cualquier momento dado, mantener en la mayoría de tres temporizadores activos en una escena. Más crea sobrecarga cognitiva.</p>
+<ul>
+<li><p><strong>Temporizador de situación:</strong> Rastrea el progreso hacia el objetivo inmediato de la escena’.</p></li>
+<li><p><strong>Reloj opuesto:</strong> Rastrea la presión de la oposición.</p></li>
+<li><p><strong>Hora de campaña:</strong> Rastrea la presión delantera a largo plazo.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="common-pitfalls-and-fixes">
+<h2>Pitfalls comunes y fijares</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Error frecuente</strong></th><th style="text-align: left;"><strong>Fix</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Mantenerse en SB por un “ momento grande”</td><td style="text-align: left;">Spend SB temprano. Presión crea drama.</td></tr>
+<tr><td style="text-align: left;">Ajuste DV demasiado alto (4-5 para rutina)</td><td style="text-align: left;">Usa DV 3 como valor predeterminado. Ajusta la Posición para crear tensión.</td></tr>
+<tr><td style="text-align: left;">No conocer una regla basada</td><td style="text-align: left;">Hacer un fallo que mantiene la historia en movimiento.</td></tr>
+<tr><td style="text-align: left;">Los jugadores se han pegado</td><td style="text-align: left;">Pregunta: <em>“¿Qué?’¿Tu objetivo?”</em> Entonces nombre el obstáculo más simple.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="handling-player-creativity">
+<h2>Manejo de la creatividad del jugador</h2>
+<div class="panel panel-green">
+<ul>
+<li><p><strong>Diga “Sí, pero ” no “No.”</strong> Ofrezca un costo, un temporizador o una complicación.</p></li>
+<li><p><strong>Use Configuración y Asistencia de acciones.</strong> Dejar que los no especialistas contribuyan significativamente.</p></li>
+<li><p><strong>Abrace soluciones inesperadas.</strong> Si un jugador aprueba un encuentro planificado, déjalo funcionar — luego escalar en otro lugar.</p></li>
+<li><p><strong>Fail hacia adelante.</strong> Un tirada perdido nunca debe detener la historia; debe cambiar de dirección.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="after-the-session">
+<h2>Después de la sesión</h2>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">6–10 XP</span> Premio XP por jugador.</p></li>
+<li><p>Avances o temporizadores activos claros.</p></li>
+<li><p>Preguntar jugadores: <em>“Una cosa que amabas, una cosa que quieres más de.”</em></p></li>
+<li><p>Observe cualquier fallo que haya tomado para reconciliarse con el texto de las reglas más adelante.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level1" id="ch:next-steps">
+<h1>Lo que viene después</h1>
+<section class="level2" id="ready-for-more">
+<h2>¿Listo para Más?</h2>
+<p>Esta Guía Esencial le da una primera sesión completa. Para la experiencia completa:</p>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">Guía del jugador</span> Atributos, Habilidades, Talentos, sistemas mágicos, avance de personaje, y el mundo.</p></li>
+<li><p><span class="badge badge-blue">DJ Guía basada</span> Timers, fronts, avanzado Punto narrativo gestión, reglas de facción y juego de alto nivel.</p></li>
+<li><p><span class="badge badge-purple">Aventuras</span> <em>Sangre y seda</em> (defensiva de aldea), <em>Más allá de Millhaven</em> (mediación) <em>La Puerta de Brass</em>
+(heist)</p></li>
+</ul>
+</div>
+<p class="text-sm text-muted">Todo disponible bajo CC-BY del autor.</p>
+</section>
+<section class="level2" id="where-to-go-next">
+<h2>Dónde ir Siguiente</h2>
+<section class="level3 unnumbered" id="build-your-own-character">
+<h3 class="unnumbered">Construya su propio personaje</h3>
+<p>Utilice las reglas de creación de personajes en Capítulo 3 para construir un personaje personalizado. Experimente con diferentes atributos, habilidades y talentos.</p>
+</section>
+<section class="level3 unnumbered" id="run-your-own-adventure">
+<h3 class="unnumbered">Ejecuta tu propia aventura</h3>
+<p>Utilice el marco del Capítulo 5 para diseñar sus propias aventuras:</p>
+<div class="panel panel-blue">
+<ul>
+<li><p>Definir un problema (la plaga, la linterna maldecida).</p></li>
+<li><p>Define una ubicación (el barrow).</p></li>
+<li><p>Define a un rival (Quick Lena).</p></li>
+<li><p>Establece temporizadores (Barrow Collapse, Lena’s Agenda).</p></li>
+<li><p>Deja que los jugadores elijan su camino.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="expand-the-world">
+<h3 class="unnumbered">Ampliar el mundo</h3>
+<p>Fate's Edge se encuentra en un mundo rico de magia antigua, imperios caídos y culturas vibrantes. Explore las regiones del Amaranthine: Ecktoria’s salas de mármol, los Mistlands envueltos en niebla, el reino fracturado de Vhasia, y mucho más.</p>
+</section>
+</section>
+<section class="level2" id="final-thought">
+<h2>Pensamiento final</h2>
+<p>Tienes todo lo que necesitas para jugar Fate's Edge. Ahora recoge tus dados, respira y entra en el Edge. El mundo está esperando.</p>
+</section>
+</section>
+<section class="level1" id="ch:quick-reference">
+<h1>Referencia rápida</h1>
+<section class="level2" id="core-resolution">
+<h2>Resolución básica</h2>
+<div class="panel panel-gold">
+<ol>
+<li><p>Declare la intención y el enfoque (Attribute + Habilidad).</p></li>
+<li><p>DJ establece Posición y DV.</p></li>
+<li><p>Roll reserva de dados.</p></li>
+<li><p>Contables éxitos (6+; 10 = 2 éxitos) y Puntos narrativos (1s).</p></li>
+<li><p>Aplicar Matrix Resultado.</p></li>
+<li><p>DJ gasta SB.</p></li>
+<li><p>Los jugadores marcan recursos.</p></li>
+</ol>
+</div>
+</section>
+<section class="level2" id="difficulty-value-dv">
+<h2>Valor de dificultad (DV)</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>DV</strong></th><th style="text-align: left;"><strong>Situación</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">2</td><td style="text-align: left;">Rutina, sin presión.</td></tr>
+<tr><td style="text-align: left;">3</td><td style="text-align: left;">Default — leve oposición.</td></tr>
+<tr><td style="text-align: left;">4</td><td style="text-align: left;">Resistencia seria dura —.</td></tr>
+<tr><td style="text-align: left;">5+</td><td style="text-align: left;">Extrema — juego dramático.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="position">
+<h2>Posición</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Posición</strong></th><th style="text-align: left;"><strong>Narrativa</strong></th><th style="text-align: left;"><strong>Efecto</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Dominante</td><td style="text-align: left;">Ventaja</td><td style="text-align: left;">Re-rollar un fallo.</td></tr>
+<tr><td style="text-align: left;">Controlada</td><td style="text-align: left;">Normal</td><td style="text-align: left;">Sin repeticiones de dados.</td></tr>
+<tr><td style="text-align: left;">Desesperada</td><td style="text-align: left;">Bajo las duresas</td><td style="text-align: left;">Re-rollar un éxito.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="outcome-matrix">
+<h2>Matriz de resultados</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Resultado de la tirada</strong></th><th style="text-align: left;"><strong>Resultado</strong></th><th style="text-align: left;"><strong>Qué ocurre</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Siendo <span class="math inline">≥</span> DV, SB = 0</td><td style="text-align: left;">Éxito limpio</td><td style="text-align: left;">Intención alcanzada.</td></tr>
+<tr><td style="text-align: left;">Siendo <span class="math inline">≥</span> DV, SB &gt; 0</td><td style="text-align: left;">Éxito con SB</td><td style="text-align: left;">Intent achieved; DJ gasta SB.</td></tr>
+<tr><td style="text-align: left;">0 &lt; S &lt; DV</td><td style="text-align: left;">Resultado parcial</td><td style="text-align: left;">Progresos; ganancia 1 Bono.</td></tr>
+<tr><td style="text-align: left;">S = 0</td><td style="text-align: left;">Fallo</td><td style="text-align: left;">No progreso; ganancia 2 Bonos; DJ escala.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="boons">
+<h2>Bonos</h2>
+<div class="panel panel-green">
+<ul>
+<li><p><span class="badge badge-green">Max sostuvo: 5</span></p></li>
+<li><p><strong>Obtener:</strong> resultado parcial (1 Bono), fallo (2 Bonos), vínculo-driven action (1 Bono).</p></li>
+<li><p><strong>Gastar:</strong> Re-rollar una muerte, mejorar la posición, activar recurso.</p></li>
+<li><p><strong>Convertir:</strong> 2 Bonos <span class="math inline">→</span> 1 XP (una vez por sesión, max 2 XP a través de la conversión).</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="fatigue-and-harm-1">
+<h2>Fatiga y Daño</h2>
+<div class="panel panel-red">
+<ul>
+<li><p>Fatiga track = Body.</p></li>
+<li><p>Cada Fatiga empeora Posición (o –1 muere si ya está desesperado).</p></li>
+<li><p>Fatiga sobreflujo <span class="math inline">→</span> Daño + 1, claro Fatiga.</p></li>
+<li><p>Daño: 1 (– 1 die), 2 (– 1 die), 3 (incapacitado).</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="armor-conversion-1">
+<h2>Armor Conversión</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Armadura</strong></th><th style="text-align: left;"><strong>Daño 1</strong></th><th style="text-align: left;"><strong>Daño 2</strong></th><th style="text-align: left;"><strong>Daño 3</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Ligera</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Daño 1 + Fatiga 1</td><td style="text-align: left;">Daño 2 + Fatiga 1</td></tr>
+<tr><td style="text-align: left;">Media</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Daño 2 + Fatiga 1</td></tr>
+<tr><td style="text-align: left;">Pesada</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Fatiga 1</td><td style="text-align: left;">Fatiga 2</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="recovery-1">
+<h2>Recuperación</h2>
+<ul>
+<li><p><strong>Fatiga:</strong> Descanso corto (1 hora) elimina 2. Noche completa elimina todos.</p></li>
+<li><p><strong>Daño:</strong> Cuidado médico o curación mágica. Recuperación natural: 1 semana por nivel.</p></li>
+</ul>
+</section>
+<section class="level2" id="combat-quick-reference">
+<h2>Combatir la referencia rápida</h2>
+<div class="panel panel-red">
+<ul>
+<li><p><strong>Turno:</strong> 1 Acción + 1 Move.</p></li>
+<li><p><strong>Mover:</strong> Shift una banda de gama (Close <span class="math inline">↔︎</span> Cerca de <span class="math inline">↔︎</span>
+Alcance <span class="math inline">↔︎</span> Far).</p></li>
+<li><p><strong>Dash (Acción):</strong> Mueva dos bandas; siguiente defensa Desesperada.</p></li>
+<li><p><strong>Separación (Acción):</strong> Mover no provoca ataques de oportunidad.</p></li>
+<li><p><strong>Ataque de oportunidad:</strong> Salir de cerca sin separación provoca un ataque libre de melee.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="timers-quick-reference">
+<h2>Timers Quick Referencia</h2>
+<div class="panel panel-purple">
+<ul>
+<li><p><span class="badge badge-green">4 segmentos atractivos</span> Corto plazo (patrulla de guardia, puerta de rotura)</p></li>
+<li><p><span class="badge badge-gold">6 segmentos atractivos</span> Escena estándar (ritual, escape)</p></li>
+<li><p><span class="badge badge-red">8 + segmentos</span> A largo plazo (facción, campaña)</p></li>
+<li><p><strong>Tick en:</strong> resultado parcial/fallo, SB gastar, la demanda de ficción</p></li>
+<li><p><strong>Cuando esté lleno:</strong> Definido evento se produce</p></li>
+<li><p><strong>Límite:</strong> 3 temporizadores activos por escena máxima</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="hedge-gifts-quick-reference">
+<h2>Regalos de cobertura rápida Referencia</h2>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">4 XP</span> <strong>Artesanía del Hedge:</strong> Aprende dos regalos de cobertura.</p></li>
+<li><p><strong>Sin tirada, sin costo.</strong> Los regalos trabajan dentro de sus límites declarados.</p></li>
+<li><p><strong>Mano de la Mancha:</strong> Remove 1 Fatiga (once/scene).</p></li>
+<li><p><strong>Nudo de favor:</strong> +1 muere a un tipo de tirada (once/scene).</p></li>
+<li><p><strong>Mano de calentamiento:</strong> La siguiente acción física +1 muere o –1 muere.</p></li>
+<li><p><strong>Sentido del hogar:</strong> Hacer un sí/no pregunta acerca de un umbral.</p></li>
+<li><p><strong>Línea de sal:</strong> Dejar los espíritus de cruzar.</p></li>
+<li><p><strong>El Candelabro Inalterado:</strong> Extinguir una fuente de luz (una vez/sesión).</p></li>
+</ul>
+</div>
+</section>
+</section>
+</div>
+<script>
+    function searchContent() {
+        const query = document.getElementById('searchInput')?.value.toLowerCase();
+        const content = document.getElementById('main-content');
+        if (!content || !query) return;
+        const elements = content.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote');
+        for (let el of elements) {
+            const text = el.textContent.toLowerCase();
+            if (text.includes(query)) {
+                el.classList.add('highlight');
+            } else {
+                el.classList.remove('highlight');
+            }
+        }
+    }
+</script>
+</body>
+</html>
+

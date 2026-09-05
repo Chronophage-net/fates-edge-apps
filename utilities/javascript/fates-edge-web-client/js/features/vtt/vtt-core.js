@@ -17,6 +17,7 @@
  * - IMPROVED: Character sheet layout now looks like a TTRPG sheet with styled blocks.
  */
 
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { vttStore, MAX_CONTROLLED_CHARACTERS } from '@core/vtt-store.js';
 import { escHtml, getStorage, setStorage, setHtml, createElement, sanitizeHtml } from '@core/utils.js';
 import { isConnectedToServer, getRoomCode, getSocketId, getConnectionMode, changeRole } from '@core/websocket.js';
@@ -132,7 +133,7 @@ function escapeKeepingAllowedTags(text) {
 // literal square brackets sitting in the middle of a chat line.
 function renderChatBracketAnnotations(html) {
     return html.replace(/\[([A-Za-z][A-Za-z ]{0,20}):\s*([^\]]+)\]/g, (match, label, detail) => `
-        <span style="display:inline-block;margin:0.1rem 0.15rem 0.1rem 0;padding:0.05rem 0.45rem;background:var(--bg4);border-radius:10px;border-left:2px solid var(--gold);font-size:0.85em;">
+        <span style="display:inline-block;margin:0.1rem 0.15rem 0.1rem 0;padding:0.05rem 0.45rem;background:var(--bg4);border-radius:10px;border-inline-start:2px solid var(--gold);font-size:0.85em;">
             <strong style="color:var(--gold);">${label}:</strong> ${detail}
         </span>
     `);
@@ -170,7 +171,7 @@ function renderCrownSpreadChatHtml(text) {
         const isHighlight = marker === '🌟' || marker === '⏱️' || marker === '♠️';
 
         return `
-            <div style="padding:0.3rem 0.5rem;margin:0.2rem 0;border-radius:6px;background:${isHighlight ? 'var(--bg4)' : 'var(--bg2)'};border-left:2px solid ${isHighlight ? 'var(--gold)' : 'var(--border)'};">
+            <div style="padding:0.3rem 0.5rem;margin:0.2rem 0;border-radius:6px;background:${isHighlight ? 'var(--bg4)' : 'var(--bg2)'};border-inline-start:2px solid ${isHighlight ? 'var(--gold)' : 'var(--border)'};">
                 ${label ? `<div style="font-weight:600;color:var(--gold);font-size:0.8rem;">${marker || ''} ${escHtml(label)}</div>` : ''}
                 <div style="font-size:0.85rem;line-height:1.4;">${withChips}</div>
             </div>
@@ -336,7 +337,7 @@ export function renderChat() {
                         ${avatarHtml}
                         <span style="font-weight:700;font-size:1rem;">${escHtml(char.name)}</span>
                         <span style="font-size:0.7rem;color:var(--text2);">(selected)</span>
-                        <button class="btn btn-xs btn-ghost" id="clear-selected-char" title="Deselect" style="padding:0 0.3rem;">✕</button>
+                        <button class="btn btn-xs btn-ghost" id="clear-selected-char" title="Deselect" style="padding:0 0.3rem;" data-i18n-attr="title:feature.vtt.vtt-core.deselect">✕</button>
                     </div>
                 `;
                 const clearBtn = selectedDisplay.querySelector('#clear-selected-char');
@@ -402,7 +403,7 @@ export function renderChat() {
                     <div style="font-size:1.1rem;">No messages yet</div>
                     <div style="font-size:0.9rem;margin-top:0.3rem;">
                         ${isConnected ? `🌐 Connected to server${roomCode ? ` (${roomCode})` : ''}` : '📡 Messages stay local'}
-                        <span style="color:var(--text4);margin-left:0.3rem;">via ${mode}</span>
+                        <span style="color:var(--text4);margin-inline-start:0.3rem;">via ${mode}</span>
                     </div>
                     <div style="font-size:0.8rem;margin-top:0.5rem;color:var(--text4);">
                         Type /help for commands
@@ -441,11 +442,11 @@ export function renderChat() {
 
             let modeBadge = '';
             if (isLocal && !isConnected) {
-                modeBadge = ` <span class="mode-badge local" style="font-size:0.65rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--border);">📡 local</span>`;
+                modeBadge = ` <span class="mode-badge local" style="font-size:0.65rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-inline-start:0.3rem;border:1px solid var(--border);" data-i18n="feature.vtt.vtt-core.local">📡 local</span>`;
             } else if (isLocal && isConnected) {
-                modeBadge = ` <span class="mode-badge local-ws" style="font-size:0.65rem;color:var(--gold);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--gold);">📡 local</span>`;
+                modeBadge = ` <span class="mode-badge local-ws" style="font-size:0.65rem;color:var(--gold);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-inline-start:0.3rem;border:1px solid var(--gold);" data-i18n="feature.vtt.vtt-core.local">📡 local</span>`;
             } else if (!isLocal && isConnected) {
-                modeBadge = ` <span class="mode-badge synced" style="font-size:0.65rem;color:var(--green);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-left:0.3rem;border:1px solid var(--green);">🌐 synced</span>`;
+                modeBadge = ` <span class="mode-badge synced" style="font-size:0.65rem;color:var(--green);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:10px;margin-inline-start:0.3rem;border:1px solid var(--green);" data-i18n="feature.vtt.vtt-core.synced">🌐 synced</span>`;
             }
 
             let statusIcon = '✓';
@@ -476,7 +477,7 @@ export function renderChat() {
                         <strong style="color:${senderColor};font-size:1rem;">${escHtml(sender)}${recipient}:</strong>
                         <div style="word-break:break-word;font-size:1rem;flex:1 1 auto;min-width:0;">${whisper}${renderChatMessageText(text, sender, msg.verifiedGM === true)}</div>
                         ${modeBadge}
-                        <span class="msg-status" style="font-size:0.7rem;color:${statusColor};margin-left:auto;" title="${statusTitle}">${statusIcon}</span>
+                        <span class="msg-status" style="font-size:0.7rem;color:${statusColor};margin-inline-start:auto;" title="${statusTitle}">${statusIcon}</span>
                     </div>
                     ${msg.rollData ? renderRollDetails(msg.rollData) : ''}
                     ${msg.deckData ? renderDeckDetails(msg.deckData) : ''}
@@ -550,7 +551,7 @@ function renderDeckDetails(deckData) {
     return `
         <div style="margin-top:0.3rem;padding:0.3rem 0.5rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
             <span>🃏 ${cardNames}</span>
-            ${deckData.remaining !== undefined ? `<span style="margin-left:0.5rem;">Remaining: ${deckData.remaining}</span>` : ''}
+            ${deckData.remaining !== undefined ? `<span style="margin-inline-start:0.5rem;">Remaining: ${deckData.remaining}</span>` : ''}
         </div>
     `;
 }
@@ -573,7 +574,7 @@ function renderSuggestionDetails(suggestionData) {
         return `
             <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
                 <span class="outcome-tag" style="font-weight:600;">${outcomeLabel}</span>
-                <span style="margin-left:0.4rem;color:var(--text4);">[${kindLabel}]</span>
+                <span style="margin-inline-start:0.4rem;color:var(--text4);">[${kindLabel}]</span>
                 ${previewHtml}
             </div>
         `;
@@ -825,7 +826,7 @@ export function renderVTTChars() {
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;border-bottom:2px solid var(--gold);padding-bottom:0.3rem;">
                     <div>
                         <span style="font-size:1.2rem;font-weight:700;color:var(--gold);">${escHtml(char.name)}</span>
-                        <span style="font-size:0.7rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:12px;margin-left:0.5rem;">Tier ${char.tier || 1}</span>
+                        <span style="font-size:0.7rem;color:var(--text3);background:var(--bg4);padding:0.05rem 0.5rem;border-radius:12px;margin-inline-start:0.5rem;">Tier ${char.tier || 1}</span>
                     </div>
                     <button class="btn btn-xs btn-ghost" id="vtt-close-detail" style="font-size:1rem;padding:0.1rem 0.4rem;">✕</button>
                 </div>
@@ -873,7 +874,7 @@ function followerClickHandler(e) {
     const btn = e.currentTarget;
     const charName = btn.dataset.char;
     const followerName = btn.dataset.follower;
-    const message = window.prompt(`What does ${followerName} say?`, '');
+    const message = window.prompt(i18nText("feature.vtt.vtt-core.whatDoesValueSay", { value0: followerName }, "What does {{value0}} say?"), '');
     if (message && message.trim()) {
         document.dispatchEvent(new CustomEvent('follower-chat', {
             detail: { characterName: charName, followerName, message: message.trim() }
@@ -991,7 +992,7 @@ export function renderVTTTimers() {
     if (timerUnsubscribe) timerUnsubscribe();
     timerUnsubscribe = vttStore.subscribe('timers', (timers) => {
         if (!timers || timers.length === 0) {
-            setHtml(list, `<div class="empty-state" style="text-align:center;padding:0.8rem;color:var(--text3);font-size:0.9rem;">⏱️ No active timers</div>`);
+            setHtml(list, `<div class="empty-state" style="text-align:center;padding:0.8rem;color:var(--text3);font-size:0.9rem;" data-i18n="feature.vtt.vtt-core.noActiveTimers">⏱️ No active timers</div>`);
             return;
         }
         let html = '';
@@ -1041,7 +1042,7 @@ export function renderLocalPresence() {
         if (!presence || presence.length === 0) {
             setHtml(presenceList, `
                 <details class="vtt-presence-details" style="margin-top:0.2rem;">
-                    <summary style="cursor:pointer;font-weight:600;color:var(--text2);font-size:0.9rem;">👥 Party Members</summary>
+                    <summary style="cursor:pointer;font-weight:600;color:var(--text2);font-size:0.9rem;" data-i18n="feature.vtt.vtt-core.partyMembers">👥 Party Members</summary>
                     <div style="color:var(--text3);padding:0.4rem 0;font-size:0.9rem;">
                         ${isConnected ? '🌐 Connected, no other players' : '📡 Local mode'}
                         ${roomCode ? ` (${roomCode})` : ''}
@@ -1085,7 +1086,7 @@ export function renderLocalPresence() {
                         <option value="player" ${role === 'player' ? 'selected' : ''}>Player</option>
                         <option value="spectator" ${role === 'spectator' ? 'selected' : ''}>Spectator</option>
                     </select>
-                    <label style="display:flex;align-items:center;gap:0.1rem;font-size:0.6rem;color:var(--text3);white-space:nowrap;cursor:pointer;" title="Persist this grant across reconnects (demotions always persist)">
+                    <label style="display:flex;align-items:center;gap:0.1rem;font-size:0.6rem;color:var(--text3);white-space:nowrap;cursor:pointer;" title="Persist this grant across reconnects (demotions always persist)" data-i18n-attr="title:feature.vtt.vtt-core.persistThisGrantAcrossReconnectsDemotionsAlways">
                         <input type="checkbox" class="vtt-role-persist" data-client-id="${p.id}" style="margin:0;" /> save
                     </label>
                     <button class="btn btn-xs btn-primary vtt-role-apply" data-client-id="${p.id}" style="font-size:0.65rem;padding:0.05rem 0.4rem;">Set</button>
@@ -1114,11 +1115,11 @@ export function renderLocalPresence() {
                                 ${characters.map(c => `<option value="${escHtml(c.name)}" ${currentChars.includes(c.name) ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('')}
                             </select>`
                         : `<select class="vtt-char-select" data-client-id="${p.id}" style="font-size:0.75rem;padding:0.05rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);max-width:120px;">
-                                <option value="">— Select —</option>
+                                <option value="" data-i18n="feature.vtt.vtt-core.select">— Select —</option>
                                 ${characters.map(c => `<option value="${escHtml(c.name)}" ${c.name === currentChar ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('')}
                             </select>`;
                     charDisplayHtml = `
-                        <label style="display:flex;align-items:center;gap:0.2rem;font-size:0.65rem;color:var(--text3);white-space:nowrap;cursor:pointer;" title="Allow this client to control more than one character at once">
+                        <label style="display:flex;align-items:center;gap:0.2rem;font-size:0.65rem;color:var(--text3);white-space:nowrap;cursor:pointer;" title="Allow this client to control more than one character at once" data-i18n-attr="title:feature.vtt.vtt-core.allowThisClientToControlMoreThan">
                             <input type="checkbox" class="vtt-remote-toggle" ${isRemoteEnabled ? 'checked' : ''} style="margin:0;" />
                             Remote
                         </label>
@@ -1127,7 +1128,7 @@ export function renderLocalPresence() {
                 } else {
                     charDisplayHtml = `
                         <span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">No characters</span>
-                        <button class="btn btn-xs btn-primary" onclick="window.location.hash='characters'" style="font-size:0.6rem;padding:0.05rem 0.4rem;white-space:nowrap;">+ Create</button>
+                        <button class="btn btn-xs btn-primary" onclick="window.location.hash='characters'" style="font-size:0.6rem;padding:0.05rem 0.4rem;white-space:nowrap;" data-i18n="feature.vtt.vtt-core.create">+ Create</button>
                     `;
                 }
             } else {
@@ -1146,7 +1147,7 @@ export function renderLocalPresence() {
                     <span style="font-weight:${isSelf ? '600' : '400'};font-size:0.9rem;white-space:nowrap;">${escHtml(playerName)}${isSelf ? ' (you)' : ''}</span>
                     ${roleBadge}
                     ${roleControlHtml}
-                    <span style="flex:1;text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:0.4rem;font-size:0.85rem;">
+                    <span style="flex:1;text-align: end;display:flex;justify-content:flex-end;align-items:center;gap:0.4rem;font-size:0.85rem;">
                         <span style="color:var(--text3);">Character:</span>
                         ${charDisplayHtml}
                     </span>
@@ -1201,7 +1202,7 @@ function handleCharSelect(e) {
     if (select.multiple) {
         selection = Array.from(select.selectedOptions).map(o => o.value).filter(Boolean);
         if (selection.length > MAX_CONTROLLED_CHARACTERS) {
-            showToast(`You can only control up to ${MAX_CONTROLLED_CHARACTERS} characters at once.`, 'warning');
+            showToast(i18nText("feature.vtt.vtt-core.youCanOnlyControlUpToValue", { value0: MAX_CONTROLLED_CHARACTERS }, "You can only control up to {{value0}} characters at once."), 'warning');
             selection = selection.slice(0, MAX_CONTROLLED_CHARACTERS);
             // Reflect the trim back into the widget itself, since the
             // browser already applied the user's (over-)selection.
@@ -1256,15 +1257,18 @@ function handleRoleApply(e) {
     const persist = !!persistBox?.checked;
     if (!role) return;
     if (!isConnectedToServer()) {
-        showToast('Not connected to server.', 'error');
+        showToast(i18nText("feature.vtt.vtt-core.notConnectedToServer", null, "Not connected to server."), 'error');
         return;
     }
     const ROLE_LABELS = { 'co-gm': 'Co-GM', 'assistant-gm': 'Assistant GM', player: 'Player', spectator: 'Spectator' };
     const ok = changeRole(clientId, role, persist);
     if (ok) {
-        showToast(`Requested: role → ${ROLE_LABELS[role] || role}${persist ? ' (saved)' : ''}.`, 'info');
+        showToast(i18nText("feature.vtt.vtt-core.requestedRoleValueValue", {
+            value0: ROLE_LABELS[role] || role,
+            value1: persist ? i18nText('feature.vtt.vtt-core.savedRole', null, ' (saved)') : ''
+        }, "Requested: role → {{value0}}{{value1}}."), 'info');
     } else {
-        showToast('Failed to send role change -- check your connection.', 'error');
+        showToast(i18nText("feature.vtt.vtt-core.failedToSendRoleChangeCheckYour", null, "Failed to send role change -- check your connection."), 'error');
     }
 }
 
@@ -1281,7 +1285,7 @@ export function renderVoiceClients() {
 
     if (voiceUnsubscribe) voiceUnsubscribe();
     voiceUnsubscribe = vttStore.subscribe('voiceClients', (clients) => {
-        countEl.textContent = `${clients.length} voice user${clients.length !== 1 ? 's' : ''}`;
+        countEl.textContent = i18nPlural('feature.vtt.vtt-core.voiceUserCount', clients.length, null, '{{count}} voice users');
         if (!clients || clients.length === 0) {
             setHtml(listEl, `<span style="color:var(--text3);font-size:0.85rem;">No other voice clients.</span>`);
             return;
@@ -1357,7 +1361,7 @@ export function updateMessageCount() {
     if (countUnsubscribe) countUnsubscribe();
     countUnsubscribe = vttStore.subscribe('chatMessages', (messages) => {
         const count = messages ? messages.length : 0;
-        countEl.textContent = `${count} message${count !== 1 ? 's' : ''}`;
+        countEl.textContent = i18nPlural('feature.vtt.vtt-core.messageCount', count, null, '{{count}} messages');
     });
 }
 

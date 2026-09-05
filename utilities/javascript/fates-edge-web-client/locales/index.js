@@ -34,13 +34,17 @@
 export const LOCALES = [
     { code: 'en', name: 'English', nativeName: 'English', dir: 'ltr' },
 
-    // A machine-generated accented/padded rendering of English. It is not a
-    // language: it exists so that translation problems can be found before
-    // any translator is paid. Every string that shows up unaccented is a
-    // string still hardcoded somewhere, and every clipped button is a layout
-    // that will break in German. Hidden from the normal Settings picker —
-    // see settings/index.js's shouldShowDevLocales().
+    { code: 'en-US', name: 'English (United States)', nativeName: 'English (United States)', dir: 'ltr' },
+    { code: 'en-GB', name: 'English (United Kingdom)', nativeName: 'English (United Kingdom)', dir: 'ltr' },
+
+    { code: 'es', name: 'Spanish', nativeName: 'Español', dir: 'ltr' },
+
+    // Machine-generated accented/padded renderings of English. They are not
+    // languages: the LTR version exposes missing translations and cramped
+    // controls; the RTL version exercises the same catalogue with the page's
+    // writing direction reversed. Hidden from the normal Settings picker.
     { code: 'en-x-pseudo', name: 'Pseudo (translation test)', nativeName: 'Pseudolocale', dir: 'ltr', dev: true },
+    { code: 'en-x-pseudo-rtl', name: 'Pseudo RTL (layout test)', nativeName: 'RTL Pseudolocale', dir: 'rtl', dev: true },
 ];
 
 /**
@@ -48,7 +52,11 @@ export const LOCALES = [
  * @type {Record<string, () => Promise<any>>}
  */
 export const LOADERS = {
+    'es': () => import('./es.json', { with: { type: 'json' } }),
+    'en-US': () => import('./en-US.json', { with: { type: 'json' } }),
+    'en-GB': () => import('./en-GB.json', { with: { type: 'json' } }),
     'en-x-pseudo': () => import('./en-x-pseudo.js'),
+    'en-x-pseudo-rtl': () => import('./en-x-pseudo-rtl.js'),
 };
 
 export default { LOCALES, LOADERS };

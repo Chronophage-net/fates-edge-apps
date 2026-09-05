@@ -1,4 +1,5 @@
 import { escHtml } from '@core/utils.js';
+import { t as i18nText } from '@core/i18n.js';
 
 /**
  * Render a character's avatar as an <img> if char.avatar is set, or a
@@ -41,20 +42,26 @@ export function createCharacterCard(char, { onEdit, onDelete, onToggleVTT, onRol
     
     const vttBadge = char.vtt ? '<span style="font-size:0.7rem;background:var(--gold);color:#1a141a;padding:0.1rem 0.4rem;border-radius:12px;">VTT</span>' : '';
     const avatarHtml = renderAvatar(char, 40);
+    const unnamed = i18nText('feature.components.CharacterCard.unnamed', null, 'Unnamed');
+    const tier = i18nText('feature.components.CharacterCard.tier', null, 'Tier');
+    const push = i18nText('feature.components.CharacterCard.pushToVtt', null, 'Push');
+    const edit = i18nText('feature.components.CharacterCard.edit', null, 'Edit character');
+    const roll = i18nText('feature.components.CharacterCard.roll', null, 'Roll for character');
+    const remove = i18nText('feature.components.CharacterCard.delete', null, 'Delete character');
 
     div.innerHTML = `
         <div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;">
             ${avatarHtml}
             <div style="min-width:0;">
-                <div class="name">${escHtml(char.name || 'Unnamed')} ${vttBadge}</div>
-                <div class="meta">${escHtml(char.heritage || '')} · Tier ${char.tier || 'I'} · XP ${char.xp || 32} · ❤️${char.harm || 0} ⚡${char.fatigue || 0} 🎲${char.boons || 0} · ${(char.bonds || []).length}B · ${(char.complications || []).length}C</div>
+                <div class="name">${escHtml(char.name || unnamed)} ${vttBadge}</div>
+                <div class="meta">${escHtml(char.heritage || '')} · ${tier} ${char.tier || 'I'} · XP ${char.xp || 32} · ❤️${char.harm || 0} ⚡${char.fatigue || 0} 🎲${char.boons || 0} · ${(char.bonds || []).length}B · ${(char.complications || []).length}C</div>
             </div>
         </div>
         <div class="actions">
-            <button class="btn btn-sm ${char.vtt ? 'btn-green' : 'btn-primary'}" data-action="toggle-vtt">${char.vtt ? '✓ VTT' : '💬 Push'}</button>
-            <button class="btn btn-sm btn-primary" data-action="edit">✏️</button>
-            <button class="btn btn-sm btn-primary" data-action="roll">🎲</button>
-            <button class="btn btn-sm btn-danger" data-action="delete">🗑️</button>
+            <button class="btn btn-sm ${char.vtt ? 'btn-green' : 'btn-primary'}" data-action="toggle-vtt">${char.vtt ? '✓ VTT' : `💬 ${push}`}</button>
+            <button class="btn btn-sm btn-primary" data-action="edit" title="${edit}" aria-label="${edit}">✏️</button>
+            <button class="btn btn-sm btn-primary" data-action="roll" title="${roll}" aria-label="${roll}">🎲</button>
+            <button class="btn btn-sm btn-danger" data-action="delete" title="${remove}" aria-label="${remove}">🗑️</button>
         </div>
     `;
     

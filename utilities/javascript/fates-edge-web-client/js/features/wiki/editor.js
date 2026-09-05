@@ -4,6 +4,7 @@
  * Includes HTML sanitization to prevent XSS from markdown content.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, addWikiEntry, updateWikiEntry, saveState } from '@core/state.js';
 import { escHtml } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -65,19 +66,19 @@ function createEditorModal(entry, isNew) {
     const titleText = isNew ? '📝 Create Wiki Entry' : `✏️ Edit: ${entry.title}`;
 
     modal.innerHTML = `
-        <button class="btn btn-secondary editor-back" id="wiki-editor-close">← Back</button>
+        <button class="btn btn-secondary editor-back" id="wiki-editor-close" data-i18n="feature.wiki.editor.back">← Back</button>
         <h2>${titleText}</h2>
 
         <form id="wiki-editor-form">
             <!-- Title -->
             <div class="form-group">
-                <label for="wiki-editor-title">Title *</label>
+                <label for="wiki-editor-title" data-i18n="feature.wiki.editor.title">Title *</label>
                 <input type="text" id="wiki-editor-title" value="${escHtml(entry.title)}" placeholder="Entry title" required />
             </div>
 
             <!-- Category -->
             <div class="form-group">
-                <label for="wiki-editor-category">Category</label>
+                <label for="wiki-editor-category" data-i18n="feature.wiki.editor.category">Category</label>
                 <select id="wiki-editor-category">
                     <option value="rules" ${entry.category === 'rules' ? 'selected' : ''}>📜 Rules</option>
                     <option value="patrons" ${entry.category === 'patrons' ? 'selected' : ''}>👁️ Patrons</option>
@@ -96,30 +97,30 @@ function createEditorModal(entry, isNew) {
 
             <!-- Tags -->
             <div class="form-group">
-                <label for="wiki-editor-tags">Tags (comma separated)</label>
+                <label for="wiki-editor-tags" data-i18n="feature.wiki.editor.tagsCommaSeparated">Tags (comma separated)</label>
                 <input type="text" id="wiki-editor-tags" value="${escHtml((entry.tags || []).join(', '))}" placeholder="e.g., combat, magic, reference" />
             </div>
 
             <!-- Cost -->
-            <div class="form-group" style="display:inline-block;width:48%;margin-right:2%;">
-                <label for="wiki-editor-cost">XP Cost</label>
+            <div class="form-group" style="display:inline-block;width:48%;margin-inline-end:2%;">
+                <label for="wiki-editor-cost" data-i18n="feature.wiki.editor.xpCost">XP Cost</label>
                 <input type="number" id="wiki-editor-cost" value="${entry.cost != null ? entry.cost : ''}" placeholder="e.g., 5" min="0" />
             </div>
 
             <!-- Slot -->
             <div class="form-group" style="display:inline-block;width:48%;">
-                <label for="wiki-editor-slot">Slot</label>
+                <label for="wiki-editor-slot" data-i18n="feature.wiki.editor.slot">Slot</label>
                 <input type="text" id="wiki-editor-slot" value="${escHtml(entry.slot || '')}" placeholder="e.g., Head, Weapon" />
             </div>
 
             <!-- Body -->
             <div class="form-group">
-                <label for="wiki-editor-body">Content (Markdown supported)</label>
+                <label for="wiki-editor-body" data-i18n="feature.wiki.editor.contentMarkdownSupported">Content (Markdown supported)</label>
                 <div style="display:flex;gap:0.5rem;margin-bottom:0.3rem;">
-                    <button type="button" class="btn btn-xs btn-ghost markdown-help-btn" title="Markdown help">ℹ️</button>
+                    <button type="button" class="btn btn-xs btn-ghost markdown-help-btn" title="Markdown help" data-i18n-attr="title:feature.wiki.editor.markdownHelp">ℹ️</button>
                     <span style="font-size:0.7rem;color:var(--text3);">Supports: **bold**, *italic*, # headings, - lists, [links](url)</span>
                 </div>
-                <textarea id="wiki-editor-body" rows="12" placeholder="Write your wiki content here...">${escHtml(entry.body || '')}</textarea>
+                <textarea id="wiki-editor-body" rows="12" placeholder="Write your wiki content here..." data-i18n-attr="placeholder:feature.wiki.editor.writeYourWikiContentHere">${escHtml(entry.body || '')}</textarea>
             </div>
 
             <!-- Preview -->
@@ -135,9 +136,9 @@ function createEditorModal(entry, isNew) {
 
             <!-- Buttons -->
             <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-                <button type="submit" class="btn btn-gold" id="wiki-editor-save">💾 Save Entry</button>
+                <button type="submit" class="btn btn-gold" id="wiki-editor-save" data-i18n="feature.wiki.editor.saveEntry">💾 Save Entry</button>
                 <button type="button" class="btn btn-danger" id="wiki-editor-delete" style="${isNew ? 'display:none;' : ''}">🗑️ Delete</button>
-                <button type="button" class="btn" id="wiki-editor-cancel">Cancel</button>
+                <button type="button" class="btn" id="wiki-editor-cancel" data-i18n="feature.wiki.editor.cancel">Cancel</button>
             </div>
         </form>
     `;
@@ -199,12 +200,12 @@ function setupEditorEvents(entry, isNew) {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
             const id = modalOverlay.querySelector('.modal')?.dataset?.entryId;
-            if (id && confirm('Delete this entry?')) {
+            if (id && confirm(i18nText("feature.wiki.editor.deleteThisEntry", null, "Delete this entry?"))) {
                 const state = getState();
                 state.wikiEntries = (state.wikiEntries || []).filter(e => String(e.id) !== String(id));
                 saveState();
                 removeEditorModal();
-                showToast('🗑️ Entry deleted.', 'success');
+                showToast(i18nText("feature.wiki.editor.entryDeleted", null, "🗑️ Entry deleted."), 'success');
                 import('./index.js').then(module => {
                     if (module.renderWiki) module.renderWiki();
                 });
@@ -245,7 +246,7 @@ function saveEntry(isNew) {
 
     const title = titleInput.value.trim();
     if (!title) {
-        showToast('Please enter a title.', 'error');
+        showToast(i18nText("feature.wiki.editor.pleaseEnterATitle", null, "Please enter a title."), 'error');
         titleInput.focus();
         return;
     }
@@ -256,7 +257,7 @@ function saveEntry(isNew) {
     if (isNew) {
         const exists = entries.some(e => e.title.toLowerCase() === title.toLowerCase());
         if (exists) {
-            showToast(`Entry "${title}" already exists.`, 'error');
+            showToast(i18nText("feature.wiki.editor.entryValueAlreadyExists", { value0: title }, "Entry \"{{value0}}\" already exists."), 'error');
             titleInput.focus();
             return;
         }
@@ -278,16 +279,16 @@ function saveEntry(isNew) {
         entryId = newId;
         entryData.id = newId;
         addWikiEntry(entryData);
-        showToast(`✅ Created "${title}"`, 'success');
+        showToast(i18nText("feature.wiki.editor.createdValue", { value0: title }, "✅ Created \"{{value0}}\""), 'success');
     } else {
         const id = modalOverlay.querySelector('.modal')?.dataset?.entryId;
         if (!id) {
-            showToast('Error: Entry ID not found.', 'error');
+            showToast(i18nText("feature.wiki.editor.errorEntryIDNotFound", null, "Error: Entry ID not found."), 'error');
             return;
         }
         entryId = id;
         updateWikiEntry(id, entryData);
-        showToast(`✅ Updated "${title}"`, 'success');
+        showToast(i18nText("feature.wiki.editor.updatedValue", { value0: title }, "✅ Updated \"{{value0}}\""), 'success');
     }
 
     saveState();
@@ -358,7 +359,7 @@ function renderPreview(text, container) {
 function showMarkdownHelp() {
     const helpHtml = `
         <div style="font-size:0.85rem;line-height:1.6;">
-            <h4>Markdown Quick Reference</h4>
+            <h4 data-i18n="feature.wiki.editor.markdownQuickReference">Markdown Quick Reference</h4>
             <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
                 <tr><td><code>**bold**</code></td><td><strong>bold</strong></td></tr>
                 <tr><td><code>*italic*</code></td><td><em>italic</em></td></tr>
@@ -452,7 +453,7 @@ export default {
         }
         #wiki-editor-modal .modal .close {
             position: sticky;
-            float: right;
+            float: inline-end;
             top: 0;
             z-index: 10;
         }
@@ -493,11 +494,11 @@ export default {
             text-decoration: underline;
         }
         #wiki-editor-preview ul, #wiki-editor-preview ol {
-            padding-left: 1.5rem;
+            padding-inline-start: 1.5rem;
         }
         #wiki-editor-preview blockquote {
-            border-left: 3px solid var(--gold);
-            padding-left: 1rem;
+            border-inline-start: 3px solid var(--gold);
+            padding-inline-start: 1rem;
             color: var(--text2);
             margin: 0.5rem 0;
         }

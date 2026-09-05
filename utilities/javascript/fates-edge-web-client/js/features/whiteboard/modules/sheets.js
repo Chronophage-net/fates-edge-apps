@@ -1,4 +1,5 @@
 // modules/sheets.js
+import { t as i18nText } from '@core/i18n.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
 import { state, syncActiveSheetRefs, getActiveSheet, getLayer } from './state.js';
@@ -129,7 +130,7 @@ export function renderSheetTabs() {
     bar.innerHTML = state.sheets.map(s => `
         <span class="wb-sheet-tab ${s.id === state.activeSheetId ? 'active' : ''}" data-sheet-id="${s.id}"
               style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px 6px 0 0;
-                     cursor:pointer;font-size:0.78rem;margin-right:2px;
+                     cursor:pointer;font-size:0.78rem;margin-inline-end:2px;
                      background:${s.id === state.activeSheetId ? 'var(--panel-2, #24242e)' : 'transparent'};
                      border:1px solid var(--border); border-bottom:${s.id === state.activeSheetId ? 'none' : '1px solid var(--border)'};
                      color:${s.id === state.activeSheetId ? 'var(--gold)' : 'var(--text3)'};">
@@ -141,7 +142,7 @@ export function renderSheetTabs() {
     `).join('') + `
         <button id="whiteboard-add-sheet" title="Add sheet"
                 style="display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px 6px 0 0;
-                       cursor:pointer;font-size:0.85rem;background:transparent;border:1px dashed var(--border);color:var(--text3);">➕</button>
+                       cursor:pointer;font-size:0.85rem;background:transparent;border:1px dashed var(--border);color:var(--text3);" data-i18n-attr="title:feature.whiteboard.modules.sheets.addSheet">➕</button>
     `;
     bar.querySelectorAll('.wb-sheet-tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
@@ -156,19 +157,19 @@ export function renderSheetTabs() {
 }
 
 export function addSheet() {
-    const name = prompt('New sheet name:', `Sheet ${state.sheets.length + 1}`);
+    const name = prompt(i18nText("feature.whiteboard.modules.sheets.newSheetName", null, "New sheet name:"), `Sheet ${state.sheets.length + 1}`);
     if (!name) return;
     saveWhiteboardData();
     const sheet = createDefaultSheet(name);
     state.sheets.push(sheet);
     switchToSheet(sheet.id);
-    showToast(`📄 Sheet "${name}" created`, 'success');
+    showToast(i18nText("feature.whiteboard.modules.sheets.sheetValueCreated", { value0: name }, "📄 Sheet \"{{value0}}\" created"), 'success');
 }
 
 export function renameSheet(sheetId) {
     const sheet = state.sheets.find(s => s.id === sheetId);
     if (!sheet) return;
-    const name = prompt('Rename sheet:', sheet.name);
+    const name = prompt(i18nText("feature.whiteboard.modules.sheets.renameSheet", null, "Rename sheet:"), sheet.name);
     if (!name) return;
     sheet.name = name;
     saveWhiteboardData();
@@ -185,17 +186,17 @@ export function duplicateSheet(sheetId) {
     state.sheets.splice(idx + 1, 0, copy);
     saveWhiteboardData();
     switchToSheet(copy.id);
-    showToast(`📄 Duplicated "${sheet.name}"`, 'success');
+    showToast(i18nText("feature.whiteboard.modules.sheets.duplicatedValue", { value0: sheet.name }, "📄 Duplicated \"{{value0}}\""), 'success');
 }
 
 export function deleteSheet(sheetId) {
     if (state.sheets.length <= 1) {
-        showToast('Cannot delete the only sheet', 'error');
+        showToast(i18nText("feature.whiteboard.modules.sheets.cannotDeleteTheOnlySheet", null, "Cannot delete the only sheet"), 'error');
         return;
     }
     const sheet = state.sheets.find(s => s.id === sheetId);
     if (!sheet) return;
-    if (!confirm(`Delete sheet "${sheet.name}" and everything on it?`)) return;
+    if (!confirm(i18nText("feature.whiteboard.modules.sheets.deleteSheetValueAndEverythingOnIt", { value0: sheet.name }, "Delete sheet \"{{value0}}\" and everything on it?"))) return;
     const idx = state.sheets.findIndex(s => s.id === sheetId);
     state.sheets.splice(idx, 1);
     // undoHistory is managed in undo.js - we'll call a delete function from there.
@@ -213,5 +214,5 @@ export function deleteSheet(sheetId) {
     }
     saveWhiteboardData();
     renderSheetTabs();
-    showToast('🗑️ Sheet deleted', 'info');
+    showToast(i18nText("feature.whiteboard.modules.sheets.sheetDeleted", null, "🗑️ Sheet deleted"), 'info');
 }

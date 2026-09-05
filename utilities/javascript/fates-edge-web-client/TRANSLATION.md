@@ -10,6 +10,31 @@ state in which a missing translation blanks out the interface.
 
 ---
 
+## Shipped English locales
+
+Settings → Language offers English, English (United States) (`en-US`), and
+English (United Kingdom) (`en-GB`). Browser detection selects the regional
+locale when it matches. The regional catalogues cover every interface key,
+including American/British spellings such as armor/armour and color/colour.
+Date and number helpers use the selected regional locale. Authored game data
+remains in its original language.
+
+Keep both regional JSON catalogues aligned when changing `en.json`. Most
+values intentionally match the source; identical-English counts in the
+coverage report do not indicate unfinished regional translations.
+
+## Spanish and contribution guide
+
+Spanish (`es`, **Español**) is available in Settings → Language. The initial
+catalogue is machine-assisted with targeted terminology corrections; complete
+key coverage does not mean every screen has received editorial review. Spanish
+document editions are listed separately under **Docs → Español**.
+
+Start with the [translator contribution guide](https://dev.fates-edge.com/translations),
+or read [the Spanish instructions](TRANSLATIONS.es.md) and
+[Spanish glossary](locales/GLOSARIO.es.md). The guide includes language priorities,
+review tasks, and ways to contribute without using Git.
+
 ## For translators
 
 1. Ask a maintainer to run:
@@ -20,6 +45,13 @@ state in which a missing translation blanks out the interface.
 
    That creates `locales/fr.json`: the complete list of interface strings,
    with the English still in place as a starting point.
+
+   For an Arabic, Hebrew, Persian, Urdu, or other right-to-left locale, add
+   `--rtl`:
+
+   ```bash
+   npm run i18n:new -- ar "Arabic" "العربية" --rtl
+   ```
 
 2. Translate the **values**. Leave everything else exactly as it is:
 
@@ -67,11 +99,11 @@ state in which a missing translation blanks out the interface.
 - **Length matters.** Sidebar labels and buttons are laid out for English.
   If your translation is much longer, say so — widening a control is a
   small CSS change, but nobody will know it is needed unless you mention it.
-- **Right-to-left languages** are wired up as far as `dir="rtl"` on the
-  document, but the stylesheet still uses physical `left`/`right`
-  properties in places. An RTL translation will need a CSS pass alongside
-  it; please open an issue before starting one so that work can be
-  scheduled together.
+- **Right-to-left languages** set `dir="rtl"` on the document. The interface
+  uses logical spacing, borders, alignment, and edge positioning; directional
+  keyboard navigation follows the active writing direction. Whiteboard and
+  printable-sheet coordinates remain physical on purpose so an existing map
+  or page does not move when the interface language changes.
 
 ---
 
@@ -84,7 +116,9 @@ state in which a missing translation blanks out the interface.
 | `js/core/i18n.js` | The runtime: `t()`, `setLocale()`, `applyTranslations()`. No dependencies. |
 | `locales/en.json` | The source catalogue. Every other locale is a translation of this file. |
 | `locales/index.js` | The list of shipped languages and how to load each one. |
-| `locales/en-x-pseudo.js` | A generated pseudolocale used to find untranslated UI. |
+| `locales/en-x-pseudo.js` | A generated pseudolocale used to find untranslated UI and cramped layouts. |
+| `locales/en-x-pseudo-rtl.js` | The same complete test catalogue with RTL layout enabled. |
+| `js/tools/i18n-extract-features.js` | Conservative extractor for first-party UI (`npm run i18n:extract`). |
 | `js/tools/i18n-report.js` | Coverage report (`npm run i18n:report`). |
 | `js/tools/i18n-new-locale.js` | Scaffolds a new language (`npm run i18n:new`). |
 
@@ -110,6 +144,12 @@ Annotate the element and leave the English inline as the fallback:
 The first pass records the original English in `data-i18n-src`, so switching
 back to English restores exactly what was authored. An element whose key
 resolves to nothing is left completely untouched.
+
+Feature renders use the same annotations. The module loader translates each
+new screen after render, and a small observer handles explicitly annotated
+elements inserted later by timers, socket events, and editor validation. The
+observer never guesses at unannotated content, so character names and loaded
+game prose are not mistaken for interface copy.
 
 A unit test (`tests/unit/i18n.test.js`) fails the build if a `data-i18n` key
 is missing from `en.json`, or if the inline English and the catalogue text
@@ -144,22 +184,47 @@ are simply re-rendered. Modules do not need their own listener.
 
 ### Finding what is left
 
-Most of the app is still English inline — this was introduced into a working
-codebase, and extraction is meant to happen feature by feature.
+The first-party interface has been extracted. New UI should be added through
+the same boundary. The extractor is deliberately conservative: it handles
+short control text, translated attributes, notifications, confirmations,
+prompts, announcements, and direct text updates. It does not extract arbitrary
+English literals or authored game content.
+
+Preview what the extractor would change:
+
+```bash
+npm run i18n:extract
+```
+
+Review that list, then apply it and review the resulting English catalogue:
+
+```bash
+npm run i18n:extract -- --write
+```
+
+Do not broaden the extractor over `data/`, rule tables, adventures, patron or
+region prose, or printable source material. Those are authored works, not UI.
+Their surrounding buttons, errors, and status messages still belong in the
+interface catalogue.
 
 ```bash
 npm run i18n:report
 ```
 
-reports both translation coverage and extraction coverage, and names the
-files with the most inline English left.
+reports both translation coverage and extraction coverage. `--strict` also
+fails when a UI module has no translation hook, a known message boundary still
+receives raw English, or the shell has unannotated visible copy:
 
-For a visual answer, switch to **Pseudo (translation test)** in
-Settings → Language (click "Show the translation-test locale" first). Every
-string that goes through `t()` becomes `[Ŝèttîngš ··]`; anything still in
-plain English has not been extracted yet. The padding also shows which
-layouts break when words get ~30% longer, which is roughly what German and
-Finnish do to English copy.
+```bash
+npm run i18n:report -- --strict
+```
+
+For a visual answer, enable the translation-test locales in Settings →
+Language. **Pseudo (translation test)** exposes untranslated strings and
+cramped controls; **Pseudo RTL (layout test)** adds mirrored layout and
+directional navigation. Anything that goes through `t()` becomes
+`[Ŝèttîngš ··]`; plain English has not been extracted yet. The padding also
+shows which layouts break when words get ~30% longer.
 
 ### Adding a language in code
 

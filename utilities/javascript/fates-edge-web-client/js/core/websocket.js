@@ -15,6 +15,7 @@
  * - Whiteboard sync (whiteboard-update, sync-request)
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, importData, saveState, updateState } from './state.js';
 import { showToast } from '@components/Toast.js';
 
@@ -329,7 +330,7 @@ export function connectWebSocket(room = null, url = null) {
                 ws.close();
                 wsStatus = 'timeout';
                 triggerEvent('error', { message: 'Connection timeout' });
-                showToast('WebSocket connection timeout', 'error');
+                showToast(i18nText("feature.core.websocket.websocketConnectionTimeout", null, "WebSocket connection timeout"), 'error');
             }
         }, CONFIG.CONNECTION_TIMEOUT);
         
@@ -372,7 +373,7 @@ export function connectWebSocket(room = null, url = null) {
                 url: fullUrl
             });
             
-            showToast('Connected to server', 'success');
+            showToast(i18nText("feature.core.websocket.connectedToServer", null, "Connected to server"), 'success');
         };
         
         ws.onclose = (event) => {
@@ -404,7 +405,7 @@ export function connectWebSocket(room = null, url = null) {
                 console.log('❌ Max reconnect attempts reached');
                 wsStatus = 'failed';
                 triggerEvent('error', { message: 'Max reconnect attempts reached' });
-                showToast('WebSocket reconnection failed', 'error');
+                showToast(i18nText("feature.core.websocket.websocketReconnectionFailed", null, "WebSocket reconnection failed"), 'error');
             }
         };
         
@@ -500,25 +501,25 @@ function handleWebSocketMessage(data) {
             
         case 'module-push':
             triggerEvent('module-push', data);
-            showToast(`Module ${data.module?.manifest?.name || 'unknown'} loaded`, 'success');
+            showToast(i18nText("feature.core.websocket.moduleValueLoaded", { value0: data.module?.manifest?.name || i18nText('common.unknown', null, 'unknown') }, "Module {{value0}} loaded"), 'success');
             break;
             
         case 'module-cleanup':
             triggerEvent('module-cleanup', data);
-            showToast(`Module ${data.moduleId || 'unknown'} unloaded`, 'info');
+            showToast(i18nText("feature.core.websocket.moduleValueUnloaded", { value0: data.moduleId || i18nText('common.unknown', null, 'unknown') }, "Module {{value0}} unloaded"), 'info');
             break;
             
         case 'player-joined':
             triggerEvent('player-joined', data);
             if (data.clientName) {
-                showToast(`Player ${data.clientName} joined`, 'success');
+                showToast(i18nText("feature.core.websocket.playerValueJoined", { value0: data.clientName }, "Player {{value0}} joined"), 'success');
             }
             break;
             
         case 'player-left':
             triggerEvent('player-left', data);
             if (data.clientName) {
-                showToast(`Player ${data.clientName} left`, 'info');
+                showToast(i18nText("feature.core.websocket.playerValueLeft", { value0: data.clientName }, "Player {{value0}} left"), 'info');
             }
             break;
             
@@ -891,7 +892,7 @@ export function initSocketIO(serverUrl = null, options = {}) {
                         url: normalizedUrl
                     });
                     
-                    showToast('Connected to server', 'success');
+                    showToast(i18nText("feature.core.websocket.connectedToServer", null, "Connected to server"), 'success');
                     
                     if (roomCode) {
                         joinRoom(roomCode);
@@ -910,7 +911,7 @@ export function initSocketIO(serverUrl = null, options = {}) {
                             message: 'Failed to connect to server', 
                             error 
                         });
-                        showToast('Failed to connect to server', 'error');
+                        showToast(i18nText("feature.core.websocket.failedToConnectToServer", null, "Failed to connect to server"), 'error');
                         reject(error);
                     }
                 });
@@ -928,7 +929,7 @@ export function initSocketIO(serverUrl = null, options = {}) {
                     triggerEvent('disconnected', { reason });
                     
                     if (reason !== 'io client disconnect') {
-                        showToast('Disconnected from server', 'warning');
+                        showToast(i18nText("feature.core.websocket.disconnectedFromServer", null, "Disconnected from server"), 'warning');
                     }
                 });
                 
@@ -969,7 +970,7 @@ function setupSocketIOListeners() {
     socket.on('room-state', (data) => {
         if (data && data.data) {
             importData(data.data);
-            showToast('Campaign state loaded from server', 'success');
+            showToast(i18nText("feature.core.websocket.campaignStateLoadedFromServer", null, "Campaign state loaded from server"), 'success');
         }
         triggerEvent('room-state', data);
     });
@@ -985,14 +986,14 @@ function setupSocketIOListeners() {
     socket.on('player-joined', (data) => {
         triggerEvent('player-joined', data);
         if (data.clientName) {
-            showToast(`Player ${data.clientName} joined`, 'success');
+            showToast(i18nText("feature.core.websocket.playerValueJoined", { value0: data.clientName }, "Player {{value0}} joined"), 'success');
         }
     });
     
     socket.on('player-left', (data) => {
         triggerEvent('player-left', data);
         if (data.clientName) {
-            showToast(`Player ${data.clientName} left`, 'info');
+            showToast(i18nText("feature.core.websocket.playerValueLeft", { value0: data.clientName }, "Player {{value0}} left"), 'info');
         }
     });
     
@@ -1035,12 +1036,12 @@ function setupSocketIOListeners() {
     // Module events
     socket.on('module-push', (data) => {
         triggerEvent('module-push', data);
-        showToast(`Module ${data.module?.manifest?.name || 'unknown'} loaded`, 'success');
+        showToast(i18nText("feature.core.websocket.moduleValueLoaded", { value0: data.module?.manifest?.name || i18nText('common.unknown', null, 'unknown') }, "Module {{value0}} loaded"), 'success');
     });
     
     socket.on('module-cleanup', (data) => {
         triggerEvent('module-cleanup', data);
-        showToast(`Module ${data.moduleId || 'unknown'} unloaded`, 'info');
+        showToast(i18nText("feature.core.websocket.moduleValueUnloaded", { value0: data.moduleId || i18nText('common.unknown', null, 'unknown') }, "Module {{value0}} unloaded"), 'info');
     });
     
     // Chat and rolls
@@ -1160,7 +1161,7 @@ function setupSocketIOListeners() {
     
     socket.on('room-closed', () => {
         triggerEvent('room-closed');
-        showToast('Room closed by host', 'warning');
+        showToast(i18nText("feature.core.websocket.roomClosedByHost", null, "Room closed by host"), 'warning');
         isConnected = false;
         socketId = null;
         roomCode = null;

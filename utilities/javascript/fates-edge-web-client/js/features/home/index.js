@@ -4,6 +4,7 @@
  * Includes first‑start welcome overlay with Quick Start.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { showToast } from '@components/Toast.js';
 import { getState, saveState } from '@core/state.js';
 import { escHtml } from '@core/utils.js';
@@ -15,6 +16,7 @@ const SELECTORS = {
   RULES_LINK: '[data-action="rules-link"]',
   TOOLKIT_LINK: '[data-action="toolkit-link"]',
   QUICK_START: '[data-action="quick-start"]',
+  PRODUCT_TOUR: '[data-action="product-tour"]',
 };
 
 // ─── State ─────────────────────────────────────────────────────────────
@@ -33,9 +35,9 @@ const CAMPFIRE_DOC_URL = '/data/docs/quickstart/Fates_-_Edge_-_-Campfire_Mode.ht
 function buildHTML() {
   return `
     <!-- SLIDE 1: HERO -->
-    <section class="home-slide home-hero" id="slide-hero" role="region" aria-label="Hero">
+    <section class="home-slide home-hero" id="slide-hero" role="region" aria-label="Hero" data-i18n-attr="aria-label:feature.home.hero">
       <div class="slide-content">
-        <div class="hero-badge">A roleplaying game of the Amaranthine</div>
+        <div class="hero-badge" data-i18n="feature.home.aRoleplayingGameOfTheAmaranthine">A roleplaying game of the Amaranthine</div>
         <h1 class="hero-title"><span class="gold">Fate's</span> Edge</h1>
         <p class="hero-subtitle">
           Dice and cards settle the danger. What you owe one another is harder.
@@ -45,10 +47,11 @@ function buildHTML() {
           <p>“Eight is the world. Nobody sensible counts past it.”</p>
         </div>
         <div class="hero-actions">
-          <a href="#slide-rules" class="btn btn-gold" data-action="rules-link">Read the rules</a>
-          <a href="#" class="btn btn-primary" data-action="create-char">Make someone</a>
-          <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link">Open the toolkit</a>
-          <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">Begin — The Lantern at Dusk</button>
+          <a href="#slide-rules" class="btn btn-gold" data-action="rules-link" data-i18n="feature.home.readTheRules">Read the rules</a>
+          <a href="#" class="btn btn-primary" data-action="create-char" data-i18n="feature.home.makeSomeone">Make someone</a>
+          <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link" data-i18n="feature.home.openTheToolkit">Open the toolkit</a>
+          <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;" data-i18n="feature.home.beginTheLanternAtDusk">Begin — The Lantern at Dusk</button>
+          <button class="btn btn-secondary" data-action="product-tour" data-i18n="feature.home.takeTheTour">Take the tour</button>
         </div>
       </div>
       <div class="scroll-indicator" aria-hidden="true">
@@ -58,11 +61,11 @@ function buildHTML() {
     </section>
 
     <!-- SLIDE 2: CORE RULES -->
-    <section class="home-slide home-rules" id="slide-rules" role="region" aria-label="Core Rules">
+    <section class="home-slide home-rules" id="slide-rules" role="region" aria-label="Core Rules" data-i18n-attr="aria-label:feature.home.coreRules">
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">01</span>
-          <h2>Core Mechanics</h2>
+          <h2 data-i18n="feature.home.coreMechanics">Core Mechanics</h2>
           <p>One roll answers two questions: did you do it, and what did it set loose?</p>
         </div>
         <div class="golden-rule">
@@ -76,17 +79,17 @@ function buildHTML() {
         </div>
         ${buildOutcomeMatrix()}
         <div class="rules-nav">
-          <a href="#slide-characters" class="btn btn-primary" data-action="create-char">Build a character →</a>
+          <a href="#slide-characters" class="btn btn-primary" data-action="create-char" data-i18n="feature.home.buildACharacter">Build a character →</a>
         </div>
       </div>
     </section>
 
     <!-- SLIDE 3: CHARACTER CREATION -->
-    <section class="home-slide home-characters" id="slide-characters" role="region" aria-label="Character Creation">
+    <section class="home-slide home-characters" id="slide-characters" role="region" aria-label="Character Creation" data-i18n-attr="aria-label:feature.home.characterCreation">
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">02</span>
-          <h2>Character Creation</h2>
+          <h2 data-i18n="feature.home.characterCreation">Character Creation</h2>
           <p>Start with a person, then spend 32 XP deciding what they can do.</p>
         </div>
         <div class="quick-start">
@@ -99,17 +102,17 @@ function buildHTML() {
           ${buildCreationCard('', 'Bonds & Complications', 'Take up to two of each. Every one gives 2 more XP, to a maximum of 36.', '“I left my brother at the gate.” · “The magistrate knows my old name.”')}
         </div>
         <div class="creation-actions">
-          <button class="btn btn-primary btn-large" data-action="create-char">Start building</button>
+          <button class="btn btn-primary btn-large" data-action="create-char" data-i18n="feature.home.startBuilding">Start building</button>
         </div>
       </div>
     </section>
 
     <!-- SLIDE 4: DIGITAL TOOLKIT (NEW) -->
-    <section class="home-slide home-toolkit" id="slide-toolkit" role="region" aria-label="Digital Toolkit">
+    <section class="home-slide home-toolkit" id="slide-toolkit" role="region" aria-label="Digital Toolkit" data-i18n-attr="aria-label:feature.home.digitalToolkit">
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">03</span>
-          <h2>The toolkit</h2>
+          <h2 data-i18n="feature.home.theToolkit">The toolkit</h2>
           <p>The things most likely to slow a session down, kept in one place.</p>
         </div>
         <div class="toolkit-grid">
@@ -120,7 +123,7 @@ function buildHTML() {
         </div>
         <div class="toolkit-cta">
           <p>Your table stays in your browser. There is no account to make, and the source is open.</p>
-          <a href="#" class="btn btn-primary" data-action="create-char">Open the character editor</a>
+          <a href="#" class="btn btn-primary" data-action="create-char" data-i18n="feature.home.openTheCharacterEditor">Open the character editor</a>
         </div>
       </div>
     </section>
@@ -130,7 +133,7 @@ function buildHTML() {
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">04</span>
-          <h2>What it plays like</h2>
+          <h2 data-i18n="feature.home.whatItPlaysLike">What it plays like</h2>
           <p>Three things you will notice in the first hour.</p>
         </div>
         <div class="why-grid">
@@ -146,11 +149,11 @@ function buildHTML() {
     </section>
 
     <!-- SLIDE 6: ABOUT THE CREATOR (trimmed, more inviting) -->
-    <section class="home-slide home-about" id="slide-about" role="region" aria-label="About the Creator">
+    <section class="home-slide home-about" id="slide-about" role="region" aria-label="About the Creator" data-i18n-attr="aria-label:feature.home.aboutTheCreator">
       <div class="slide-content">
         <div class="section-header">
           <span class="section-number">05</span>
-          <h2>About the Creator</h2>
+          <h2 data-i18n="feature.home.aboutTheCreator">About the Creator</h2>
           <p>Who made this, and why it is free.</p>
         </div>
         <div class="about-grid">
@@ -227,14 +230,14 @@ function buildToolkitCard(icon, title, desc) {
 function buildOutcomeMatrix() {
   return `
     <div class="matrix-section">
-      <h3>Outcome Matrix</h3>
+      <h3 data-i18n="feature.home.outcomeMatrix">Outcome Matrix</h3>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Result</th>
-              <th>Outcome</th>
-              <th>What Happens</th>
+              <th data-i18n="feature.home.result">Result</th>
+              <th data-i18n="feature.home.outcome">Outcome</th>
+              <th data-i18n="feature.home.whatHappens">What Happens</th>
             </tr>
           </thead>
           <tbody>
@@ -315,7 +318,7 @@ function injectStyles() {
     .scroll-indicator {
       position: absolute;
       bottom: 2rem;
-      left: 50%;
+      left: 50%; /* rtl-physical: viewport centering */
       transform: translateX(-50%);
       display: flex;
       flex-direction: column;
@@ -445,8 +448,8 @@ function injectStyles() {
       padding-top: 1.5rem;
       border-top: 1px solid var(--border);
       max-width: 620px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-inline-start: auto;
+      margin-inline-end: auto;
       font-style: italic;
       color: var(--text2);
       font-size: 0.9rem;
@@ -482,7 +485,7 @@ function injectStyles() {
       padding: 1rem 1.5rem;
       background: var(--bg2);
       border-radius: var(--radius);
-      border-left: 3px solid var(--gold);
+      border-inline-start: 3px solid var(--gold);
     }
     .golden-rule p { margin: 0; color: var(--text); }
 
@@ -537,7 +540,7 @@ function injectStyles() {
     .table-wrap th {
       padding: 0.6rem 1rem;
       border: 1px solid var(--border);
-      text-align: left;
+      text-align: start;
       background: rgba(201,168,76,0.06);
       font-weight: 600;
       color: var(--gold);
@@ -545,7 +548,7 @@ function injectStyles() {
     .table-wrap td {
       padding: 0.6rem 1rem;
       border: 1px solid var(--border);
-      text-align: left;
+      text-align: start;
     }
     .result-symbol { color: var(--gold-light); font-weight: 500; }
     .matrix-tip {
@@ -553,7 +556,7 @@ function injectStyles() {
       padding: 1rem;
       background: var(--bg3);
       border-radius: var(--radius);
-      border-left: 2px solid var(--gold);
+      border-inline-start: 2px solid var(--gold);
       font-size: 0.85rem;
       color: var(--text2);
     }
@@ -709,7 +712,7 @@ function injectStyles() {
       font-size: 1rem;
       font-weight: 400;
       color: var(--text2);
-      margin-left: 0.3rem;
+      margin-inline-start: 0.3rem;
     }
     .about-role {
       font-size: 0.8rem;
@@ -729,11 +732,11 @@ function injectStyles() {
       padding: 1rem 1.5rem;
       background: rgba(201,168,76,0.04);
       border-radius: var(--radius);
-      border-left: 3px solid var(--gold);
+      border-inline-start: 3px solid var(--gold);
       font-style: italic;
       color: var(--text2);
       font-size: 0.9rem;
-      text-align: left;
+      text-align: start;
     }
     .about-contact {
       margin: 1rem 0 0.5rem;
@@ -779,8 +782,8 @@ function injectStyles() {
     }
     .welcome-card .welcome-docs {
       background: var(--bg3); padding: 1rem; border-radius: 8px;
-      border-left: 4px solid var(--gold); margin: 1.2rem 0;
-      text-align: left;
+      border-inline-start: 4px solid var(--gold); margin: 1.2rem 0;
+      text-align: start;
     }
     .welcome-card .welcome-docs ul {
       margin: 0.5rem 0 0 1.2rem; padding: 0; color: var(--text2);
@@ -849,7 +852,7 @@ function showWelcomeOverlay() {
   overlay.innerHTML = `
     <div class="welcome-card">
       <span style="font-size:2.6rem;color:var(--gold-dark);" aria-hidden="true">&#10022;</span>
-      <h1>Welcome to Fate's Edge</h1>
+      <h1 data-i18n="feature.home.welcomeToFateSEdge">Welcome to Fate's Edge</h1>
       <p style="color:var(--text2);font-size:1.05rem;margin:0;">
         Read first, or sit down and play.
       </p>
@@ -934,7 +937,7 @@ function renderQuickStartConfirmation(overlayEl, { character, adventure }) {
     : `<strong>${escHtml(adventure.title)}</strong> is loaded. Choose or make a character when you are ready.`;
   card.innerHTML = `
     <span style="font-size:3rem;">🏮</span>
-    <h1>The table is set.</h1>
+    <h1 data-i18n="feature.home.theTableIsSet">The table is set.</h1>
     <p style="color:var(--text2);font-size:1.05rem;margin:0;">
       ${charLine}
     </p>
@@ -1009,7 +1012,7 @@ async function quickStart() {
             const loaded = await advModule.loadAdventureFromFile('lantern_at_dusk');
             if (!loaded) {
                 console.error('[QuickStart] loadAdventureFromFile failed.');
-                showToast('Could not load the starter adventure. Check that lantern_at_dusk.json exists in /data/adventures/.', 'error');
+                showToast(i18nText("feature.home.couldNotLoadTheStarterAdventureCheck", null, "Could not load the starter adventure. Check that lantern_at_dusk.json exists in /data/adventures/."), 'error');
                 return null;
             }
             // Re-fetch state after load
@@ -1017,7 +1020,7 @@ async function quickStart() {
             adventure = newState.adventures?.find(a => a.id === 'lantern_at_dusk');
             if (!adventure) {
                 console.error('[QuickStart] Adventure still not found after loading.');
-                showToast('Starter adventure not found after loading.', 'error');
+                showToast(i18nText("feature.home.starterAdventureNotFoundAfterLoading", null, "Starter adventure not found after loading."), 'error');
                 return null;
             }
             console.log('[QuickStart] Adventure loaded successfully:', adventure.title);
@@ -1059,7 +1062,7 @@ async function quickStart() {
                 }
             } else {
                 console.warn('[QuickStart] Pre-gen fetch failed with status:', response.status);
-                showToast('Could not load pre‑gens (HTTP ' + response.status + ').', 'warning');
+                showToast(i18nText("feature.home.couldNotLoadPreGensHTTPValue", { value0: response.status }, "Could not load pre‑gens (HTTP {{value0}})."), 'warning');
             }
         } catch (e) {
             console.warn('[QuickStart] Pre‑gen load error:', e);
@@ -1072,7 +1075,7 @@ async function quickStart() {
         console.log('[QuickStart] startAdventure returned:', started);
         if (!started) {
             console.error('[QuickStart] startAdventure failed.');
-            showToast('Failed to start adventure. Check console for errors.', 'error');
+            showToast(i18nText("feature.home.failedToStartAdventureCheckConsoleFor", null, "Failed to start adventure. Check console for errors."), 'error');
             return null;
         }
 
@@ -1081,7 +1084,7 @@ async function quickStart() {
 
     } catch (error) {
         console.error('[QuickStart] Unhandled error:', error);
-        showToast('Quick Start failed: ' + (error.message || 'unknown error'), 'error');
+        showToast(i18nText("feature.home.quickStartFailedValue", { value0: error.message || i18nText('common.unknownError', null, 'unknown error') }, "Quick Start failed: {{value0}}"), 'error');
         return null;
     }
 }
@@ -1098,7 +1101,7 @@ async function quickStartAndGo() {
     markWelcomeSeen();
     window.location.hash = 'adventure-manager';
     const who = result.character ? ` as ${result.character.name}` : '';
-    showToast(`Underway — "${result.adventure.title}"${who}`, 'success');
+    showToast(i18nText("feature.home.underwayValueValue", { value0: result.adventure.title, value1: who }, "Underway — \"{{value0}}\"{{value1}}"), 'success');
 }
 // ─── Event Handling ──────────────────────────────────────────────────
 
@@ -1112,7 +1115,7 @@ function navigateToCharacters() {
   // Fallback: use router
   import('@js/router.js')
     .then(module => module.navigate('characters'))
-    .catch(() => showToast('Character editor not available', 'error'));
+    .catch(() => showToast(i18nText("feature.home.characterEditorNotAvailable", null, "Character editor not available"), 'error'));
 }
 
 /** Scroll to any slide by its ID */
@@ -1150,6 +1153,11 @@ function handleContainerClick(e) {
     if (!document.getElementById('welcome-overlay')) {
       quickStartAndGo();
     }
+  } else if (action === 'product-tour') {
+    e.preventDefault();
+    import('@core/product-tour.js')
+      .then(module => module.startProductTour())
+      .catch(() => showToast(i18nText("feature.home.theTourCouldNotBeOpened", null, "The tour could not be opened."), 'error'));
   } else if (action === 'dismiss-welcome') {
     e.preventDefault();
     const overlay = document.getElementById('welcome-overlay');

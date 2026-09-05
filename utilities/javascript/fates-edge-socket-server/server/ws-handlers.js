@@ -99,6 +99,11 @@ function setupWSS(wss, appConfig) {
             type: 'ws',
             ws
         };
+        // The account/membership handshake below is asynchronous. Until it
+        // resolves, this connection has no authoritative room role and must
+        // not be allowed to act as the temporary default Player.
+        ws.handshakeStarted = false;
+        ws.handshakeComplete = false;
         currentRoom.clients.set(clientId, ws.clientData);
         socketStats.wsConnections++;
         socketStats.totalConnections++;
@@ -182,6 +187,28 @@ function setupWSS(wss, appConfig) {
                 const messageType = data.type || 'unknown';
                 const currentRoom = room.rooms.get(roomKey);
                 if (!currentRoom) return;
+
+                // Prevent pre-auth writes and repeated role assignment. A
+                // persisted spectator could otherwise race a room event in
+                // before handleHandshake() restored the read-only role.
+                if (messageType === 'handshake') {
+                    if (ws.handshakeStarted) {
+                        ws.send(JSON.stringify({
+                            type: 'error',
+                            message: 'Handshake already started for this connection.',
+                            code: 'HANDSHAKE_ALREADY_STARTED'
+                        }));
+                        return;
+                    }
+                    ws.handshakeStarted = true;
+                } else if (!ws.handshakeComplete && messageType !== 'ping') {
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        message: 'Complete the handshake before sending room events.',
+                        code: 'HANDSHAKE_REQUIRED'
+                    }));
+                    return;
+                }
 
                 // ─── Permission gate ──────────────────────────────────
                 // Checked here, before the switch, so it covers every case
@@ -910,14 +937,7 @@ async function handleHandshake(ws, roomState, data) {
     // 'assistant-gm' is never trusted unless it's already saved on this
     // account's membership row (a grant made via room.handleRoleChangeRequest
     // with persist:true).
-    const PROMOTED_ONLY_ROLES = new Set(['co-gm', 'assistant-gm']);
-    let assignedRole = auth.isValidRole(data.role) ? data.role : 'player';
-    if (PROMOTED_ONLY_ROLES.has(assignedRole) && membership?.role !== assignedRole) {
-        assignedRole = 'player';
-    }
-    if (assignedRole !== 'gm' && PROMOTED_ONLY_ROLES.has(membership?.role)) {
-        assignedRole = membership.role;
-    }
+    let assignedRole = auth.resolveRoomJoinRole(data.role, membership?.role);
     const existingGm = room.getExistingGm(roomState);
     if (assignedRole === 'gm' && existingGm) {
         assignedRole = 'player';
@@ -931,6 +951,7 @@ async function handleHandshake(ws, roomState, data) {
     ws.clientData.userId = authUser ? authUser.userId : null;
     // selectedCharacter remains empty initially
     roomState.clients.set(ws.clientId, ws.clientData);
+    ws.handshakeComplete = true;
 
     if (authUser && hasAccountSupport()) {
         storage.upsertMembership(roomState.code, authUser.userId, {}).catch(e =>

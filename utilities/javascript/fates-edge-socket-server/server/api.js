@@ -23,7 +23,7 @@ const crypto = require('crypto');
 const room = require('./room.js');
 const deck = require('./deck.js');
 const deckRng = require('./rng.js'); // NEW: per-room-seedable shuffle RNG (see rng.js)
-const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS, createRateLimiter, MAX_NAME_LENGTH } = require('./security.js');
+const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS, createRateLimiter, MAX_NAME_LENGTH, isSpectator } = require('./security.js');
 const adventure = require('./adventure.js');
 const timers = require('./timers.js'); // NEW: ad-hoc timers -- deliberately separate from adventure.js, see server/timers.js header
 const { deriveManifestFromContent } = require('./module-manifest-utils.js');
@@ -202,6 +202,20 @@ function createApiRouter(appConfig) {
         }
         next();
     }
+    async function requireRoomParticipant(req, res, next) {
+        try {
+            const membership = await storage.getMembership(req.params.code.toUpperCase(), req.user.userId);
+            if (isSpectator(membership?.role)) {
+                return res.status(403).json({
+                    error: 'Spectators can watch this room but cannot change it.',
+                    code: 'SPECTATOR_READ_ONLY'
+                });
+            }
+            next();
+        } catch (err) {
+            next(err);
+        }
+    }
 
     // NEW: /api/auth/login and /api/auth/register are the only routes in
     // this file that are reachable WITHOUT the admin x-api-key -- by
@@ -356,7 +370,7 @@ function createApiRouter(appConfig) {
     // connection), so a player can claim a character before ever opening
     // a room connection; socketio-handlers.js / ws-handlers.js re-resolve
     // the claim automatically against the live room on join/rejoin.
-    router.post('/api/rooms/:code/claim-character', requireAccountSupport, auth.requireAuth, async (req, res) => {
+    router.post('/api/rooms/:code/claim-character', requireAccountSupport, auth.requireAuth, requireRoomParticipant, async (req, res) => {
         try {
             const roomCode = req.params.code.toUpperCase();
             const { characterId } = req.body || {};
@@ -391,7 +405,7 @@ function createApiRouter(appConfig) {
         }
     });
 
-    router.delete('/api/rooms/:code/claim-character', requireAccountSupport, auth.requireAuth, async (req, res) => {
+    router.delete('/api/rooms/:code/claim-character', requireAccountSupport, auth.requireAuth, requireRoomParticipant, async (req, res) => {
         try {
             const roomCode = req.params.code.toUpperCase();
             const existing = await storage.getCharacterClaim(roomCode, req.user.userId);

@@ -52,6 +52,10 @@ function setupSocketIO(io, appConfig) {
             type: 'socket.io',
             socket: socket
         };
+        // Session-only roles are still roles for the life of this
+        // connection. Remember them per room so a Spectator cannot launder
+        // the restriction by emitting join-room again with role:'player'.
+        socket.sessionRoomRoles = new Map();
 
         // ─── Rate-limit gate ────────────────────────────────────────────
         // socket.use() is inbound middleware: it runs for EVERY event this
@@ -276,15 +280,9 @@ function setupSocketIO(io, appConfig) {
             // GM_LIKE_ROLES), but it WOULD let any client masquerade as the
             // AI GM Bot's own recognized seat, which is still not something
             // a self-declaration alone should be able to do.
-            const PROMOTED_ONLY_ROLES = new Set(['co-gm', 'assistant-gm']);
-            let assignedRole = auth.isValidRole(playerRole) ? playerRole : 'player';
-            if (PROMOTED_ONLY_ROLES.has(assignedRole) && membership?.role !== assignedRole) {
-                assignedRole = 'player';
-            }
-            // A returning member with a saved Co-GM/Assistant GM grant gets
-            // it back automatically, even if their client didn't ask for it.
-            if (assignedRole !== 'gm' && PROMOTED_ONLY_ROLES.has(membership?.role)) {
-                assignedRole = membership.role;
+            let assignedRole = auth.resolveRoomJoinRole(playerRole, membership?.role);
+            if (socket.sessionRoomRoles.get(roomKey) === 'spectator') {
+                assignedRole = 'spectator';
             }
             const existingGm = room.getExistingGm(currentRoom);
             if (assignedRole === 'gm' && existingGm) {
@@ -305,6 +303,7 @@ function setupSocketIO(io, appConfig) {
             socket.clientData.email = playerEmail;
             socket.clientData.userId = authUser ? authUser.userId : null;
             currentRoom.clients.set(socket.id, socket.clientData);
+            socket.sessionRoomRoles.set(roomKey, assignedRole);
             currentRoom.lastActivity = Date.now();
 
             if (authUser && hasAccountSupport()) {

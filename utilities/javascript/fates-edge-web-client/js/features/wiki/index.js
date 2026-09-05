@@ -4,6 +4,7 @@
  * FIXED: Proper event listener cleanup.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, addWikiEntry, updateWikiEntry, deleteWikiEntry, saveState } from '@core/state.js';
 import { escHtml, debounce } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -22,23 +23,23 @@ export function render(el) {
     container.innerHTML = `
         <div class="wiki-modern-layout">
             <header class="wiki-header">
-                <h1 class="wiki-title">📖 Wiki</h1>
-                <p class="wiki-subtitle">Reference rules, patrons, regions, equipment, talents, assets, and more. Markdown supported.</p>
+                <h1 class="wiki-title" data-i18n="feature.wiki.wiki">📖 Wiki</h1>
+                <p class="wiki-subtitle" data-i18n="feature.wiki.referenceRulesPatronsRegionsEquipmentTalentsAssets">Reference rules, patrons, regions, equipment, talents, assets, and more. Markdown supported.</p>
             </header>
 
             <div class="wiki-grid">
                 <!-- Sidebar -->
                 <aside class="wiki-sidebar">
                     <div class="wiki-sidebar-section">
-                        <h3>📂 Categories</h3>
+                        <h3 data-i18n="feature.wiki.categories">📂 Categories</h3>
                         <ul class="wiki-category-list" id="wiki-category-list"></ul>
                     </div>
                     <div class="wiki-sidebar-section">
-                        <h3>🏷️ Tags</h3>
+                        <h3 data-i18n="feature.wiki.tags">🏷️ Tags</h3>
                         <div class="wiki-tag-cloud" id="wiki-tag-cloud"></div>
                     </div>
                     <div class="wiki-sidebar-section">
-                        <h3>ℹ️ Stats</h3>
+                        <h3 data-i18n="feature.wiki.stats">ℹ️ Stats</h3>
                         <div id="wiki-stats-sidebar">
                             <div>Total: <span id="wiki-total-count">0</span></div>
                             <div>Local: <span id="wiki-local-count">0</span></div>
@@ -47,9 +48,9 @@ export function render(el) {
                         </div>
                     </div>
                     <div class="wiki-sidebar-section">
-                        <button class="btn btn-primary btn-sm" id="wiki-add-btn" style="width:100%;">+ Add Entry</button>
-                        <button class="btn btn-sm btn-secondary" id="wiki-reload-btn" style="width:100%;margin-top:0.3rem;">🔄 Reload Bundled</button>
-                        <button class="btn btn-sm btn-ghost" id="wiki-import-btn" style="width:100%;margin-top:0.3rem;">📥 Import All</button>
+                        <button class="btn btn-primary btn-sm" id="wiki-add-btn" style="width:100%;" data-i18n="feature.wiki.addEntry">+ Add Entry</button>
+                        <button class="btn btn-sm btn-secondary" id="wiki-reload-btn" style="width:100%;margin-top:0.3rem;" data-i18n="feature.wiki.reloadBundled">🔄 Reload Bundled</button>
+                        <button class="btn btn-sm btn-ghost" id="wiki-import-btn" style="width:100%;margin-top:0.3rem;" data-i18n="feature.wiki.importAll">📥 Import All</button>
                     </div>
                 </aside>
 
@@ -57,22 +58,22 @@ export function render(el) {
                 <main class="wiki-content">
                     <div class="wiki-toolbar">
                         <div class="wiki-search-wrap">
-                            <input type="text" id="wiki-search" placeholder="🔍 Search wiki…" class="wiki-search-input" />
+                            <input type="text" id="wiki-search" placeholder="🔍 Search wiki…" class="wiki-search-input" / data-i18n-attr="placeholder:feature.wiki.searchWiki">
                         </div>
                         <div class="wiki-filter-wrap">
                             <select id="wiki-cat-filter" class="wiki-filter-select">
-                                <option value="">All Categories</option>
-                                <option value="rules">📜 Rules</option>
-                                <option value="patrons">👁️ Patrons</option>
-                                <option value="regions">🌍 Regions</option>
-                                <option value="magic">🔮 Magic</option>
-                                <option value="combat">⚔️ Combat</option>
-                                <option value="lore">📚 Lore</option>
-                                <option value="talents">🧠 Talents</option>
-                                <option value="assets">🏛️ Assets</option>
-                                <option value="equipment">⚒️ Equipment</option>
-                                <option value="characters">👤 Characters</option>
-                                <option value="monsters">🐉 Monsters</option>
+                                <option value="" data-i18n="feature.wiki.allCategories">All Categories</option>
+                                <option value="rules" data-i18n="feature.wiki.rules">📜 Rules</option>
+                                <option value="patrons" data-i18n="feature.wiki.patrons">👁️ Patrons</option>
+                                <option value="regions" data-i18n="feature.wiki.regions">🌍 Regions</option>
+                                <option value="magic" data-i18n="feature.wiki.magic">🔮 Magic</option>
+                                <option value="combat" data-i18n="feature.wiki.combat">⚔️ Combat</option>
+                                <option value="lore" data-i18n="feature.wiki.lore">📚 Lore</option>
+                                <option value="talents" data-i18n="feature.wiki.talents">🧠 Talents</option>
+                                <option value="assets" data-i18n="feature.wiki.assets">🏛️ Assets</option>
+                                <option value="equipment" data-i18n="feature.wiki.equipment">⚒️ Equipment</option>
+                                <option value="characters" data-i18n="feature.wiki.characters">👤 Characters</option>
+                                <option value="monsters" data-i18n="feature.wiki.monsters">🐉 Monsters</option>
                             </select>
                         </div>
                         <div id="wiki-status" class="wiki-status"></div>
@@ -95,7 +96,7 @@ export function render(el) {
 
 export function loadRemoteWiki() {
     const status = document.getElementById('wiki-status');
-    if (status) status.textContent = '📥 Loading bundled wiki…';
+    if (status) status.textContent = i18nText("feature.wiki.loadingBundledWiki", null, "📥 Loading bundled wiki…");
 
     return fetch(WIKI_REMOTE_URL)
         .then(res => {
@@ -158,15 +159,15 @@ export function loadRemoteWiki() {
                 added++;
             });
             saveState();
-            if (status) status.textContent = `✅ Loaded ${added} bundled entries.`;
+            if (status) status.textContent = i18nText("feature.wiki.loadedValueBundledEntries", { value0: added }, "✅ Loaded {{value0}} bundled entries.");
             renderWiki();
-            if (added > 0) showToast(`📥 Loaded ${added} bundled wiki entries.`, 'success');
+            if (added > 0) showToast(i18nText("feature.wiki.loadedValueBundledWikiEntries", { value0: added }, "📥 Loaded {{value0}} bundled wiki entries."), 'success');
             return { added, total: entries.length };
         })
         .catch(err => {
             console.warn('Remote wiki load failed:', err);
             const status = document.getElementById('wiki-status');
-            if (status) status.textContent = `⚠️ Could not load bundled wiki (${err.message}). Using local entries only.`;
+            if (status) status.textContent = i18nText("feature.wiki.couldNotLoadBundledWikiValueUsing", { value0: err.message }, "⚠️ Could not load bundled wiki ({{value0}}). Using local entries only.");
             renderWiki();
             return { added: 0, total: 0, error: err };
         });
@@ -199,8 +200,8 @@ export function renderWiki() {
         if (isHidden) return '';
 
         const sourceBadge = isRemote
-            ? `<span class="badge badge-remote">📦 Bundled</span>`
-            : `<span class="badge badge-local">📝 Local</span>`;
+            ? `<span class="badge badge-remote" data-i18n="feature.wiki.bundled">📦 Bundled</span>`
+            : `<span class="badge badge-local" data-i18n="feature.wiki.local">📝 Local</span>`;
         const costBadge = e.cost != null ? `<span class="badge badge-cost">${e.cost} XP</span>` : '';
         const tagBadges = (e.tags || []).slice(0, 4).map(t => `<span class="badge badge-tag">#${escHtml(t)}</span>`).join('');
         const moreTags = (e.tags || []).length > 4 ? `<span class="badge badge-more">+${(e.tags || []).length - 4}</span>` : '';
@@ -209,7 +210,7 @@ export function renderWiki() {
         if (isRemote) {
             const isCloned = isEntryCloned(e);
             if (isCloned) {
-                actions = `<span class="badge badge-cloned" style="color:var(--green);">✅ Cloned</span>`;
+                actions = `<span class="badge badge-cloned" style="color:var(--green);" data-i18n="feature.wiki.cloned">✅ Cloned</span>`;
             } else {
                 actions = `
                     <button class="btn btn-xs btn-primary wiki-clone-btn" data-action="clone" data-id="${escHtml(String(e.id))}">📋 Clone</button>
@@ -434,12 +435,12 @@ function cloneRemoteWikiEntry(remoteId) {
     const remote = entries.find(w => String(w.id) === String(remoteId) && w.source === 'remote');
 
     if (!remote) {
-        showToast('Bundled entry not found.', 'error');
+        showToast(i18nText("feature.wiki.bundledEntryNotFound", null, "Bundled entry not found."), 'error');
         return;
     }
 
     if (isEntryCloned(remote)) {
-        showToast(`"${remote.title}" already cloned.`, 'warning');
+        showToast(i18nText("feature.wiki.valueAlreadyCloned", { value0: remote.title }, "\"{{value0}}\" already cloned."), 'warning');
         return;
     }
 
@@ -454,7 +455,7 @@ function cloneRemoteWikiEntry(remoteId) {
     state.wikiEntries.push(clone);
     saveState();
     renderWiki();
-    showToast(`📋 Cloned "${remote.title}" from bundled wiki.`, 'success');
+    showToast(i18nText("feature.wiki.clonedValueFromBundledWiki", { value0: remote.title }, "📋 Cloned \"{{value0}}\" from bundled wiki."), 'success');
 
     setTimeout(() => openWikiEditor(clone.id), 300);
 }
@@ -470,7 +471,7 @@ function hideRemoteEntry(remoteId) {
     state.wikiEntries = entries.filter(e => String(e.id) !== String(remoteId));
     saveState();
     renderWiki();
-    showToast(`🚫 Hidden "${entry.title}" from view.`, 'info');
+    showToast(i18nText("feature.wiki.hiddenValueFromView", { value0: entry.title }, "🚫 Hidden \"{{value0}}\" from view."), 'info');
 }
 
 function deleteWikiHandler(id) {
@@ -480,14 +481,14 @@ function deleteWikiHandler(id) {
     if (!entry) return;
 
     if (entry.source === 'remote') {
-        if (!confirm(`Hide bundled entry "${entry.title}"?`)) return;
+        if (!confirm(i18nText("feature.wiki.hideBundledEntryValue", { value0: entry.title }, "Hide bundled entry \"{{value0}}\"?"))) return;
         hideRemoteEntry(id);
     } else {
-        if (!confirm(`Delete wiki entry "${entry.title}"?`)) return;
+        if (!confirm(i18nText("feature.wiki.deleteWikiEntryValue", { value0: entry.title }, "Delete wiki entry \"{{value0}}\"?"))) return;
         state.wikiEntries = entries.filter(e => String(e.id) !== String(id));
         saveState();
         renderWiki();
-        showToast(`🗑️ Deleted "${entry.title}".`, 'success');
+        showToast(i18nText("feature.wiki.deletedValue", { value0: entry.title }, "🗑️ Deleted \"{{value0}}\"."), 'success');
     }
 }
 
@@ -497,18 +498,18 @@ function importAllFromWiki() {
     const remoteEntries = entries.filter(e => e.source === 'remote');
 
     if (remoteEntries.length === 0) {
-        showToast('No bundled entries to import.', 'warning');
+        showToast(i18nText("feature.wiki.noBundledEntriesToImport", null, "No bundled entries to import."), 'warning');
         return;
     }
 
     const toImport = remoteEntries.filter(remote => !isEntryCloned(remote));
 
     if (toImport.length === 0) {
-        showToast('All bundled entries already cloned.', 'info');
+        showToast(i18nText("feature.wiki.allBundledEntriesAlreadyCloned", null, "All bundled entries already cloned."), 'info');
         return;
     }
 
-    if (!confirm(`Import all ${toImport.length} bundled entries?`)) return;
+    if (!confirm(i18nText("feature.wiki.importAllValueBundledEntries", { value0: toImport.length }, "Import all {{value0}} bundled entries?"))) return;
 
     let imported = 0;
     toImport.forEach(remote => {
@@ -524,7 +525,7 @@ function importAllFromWiki() {
 
     saveState();
     renderWiki();
-    showToast(`📥 Imported ${imported} bundled entries.`, 'success');
+    showToast(i18nText("feature.wiki.importedValueBundledEntries", { value0: imported }, "📥 Imported {{value0}} bundled entries."), 'success');
 }
 
 // ─── Toggle Body ──────────────────────────────────────────────────────
@@ -552,12 +553,12 @@ export function openWikiEditor(id) {
             if (module.openEditor) {
                 module.openEditor(id);
             } else {
-                showToast('Editor module not available.', 'error');
+                showToast(i18nText("feature.wiki.editorModuleNotAvailable", null, "Editor module not available."), 'error');
             }
         })
         .catch(err => {
             console.error('Failed to load editor:', err);
-            showToast('Failed to load editor. Please check console.', 'error');
+            showToast(i18nText("feature.wiki.failedToLoadEditorPleaseCheckConsole", null, "Failed to load editor. Please check console."), 'error');
         });
 }
 

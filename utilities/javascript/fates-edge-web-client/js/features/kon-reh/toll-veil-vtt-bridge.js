@@ -21,6 +21,7 @@
 // real game protocol traffic, handed straight to whichever
 // host/guest controller is currently live (see toll-and-veil-connected.js).
 
+import { t as i18nText } from '@core/i18n.js';
 import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '@core/websocket.js';
 import { createTollVeilHost, createTollVeilGuest } from './toll-and-veil-connected.js';
 import { openTollVeilModal, closeTollVeilModal } from './toll-and-veil.js';
@@ -124,7 +125,7 @@ function renderLobbyBanner() {
     const el = document.createElement('div');
     el.id = 'tollveil-lobby-banner';
     el.style.cssText = `
-        position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+        position: fixed; top: 16px; left: 50%; transform: translateX(-50%); /* rtl-physical: viewport centering */
         z-index: 10001; background: #1b1c26; border: 1px solid #d4af37;
         border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;
         color: #e8e6df; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -144,7 +145,7 @@ function renderLobbyBanner() {
 
     el.querySelector('#tv-lobby-start')?.addEventListener('click', () => startTable());
     el.querySelector('#tv-lobby-join')?.addEventListener('click', () => {
-        const name = window.prompt('Join as:', 'Player') || 'Player';
+        const name = window.prompt(i18nText("feature.kon-reh.toll-veil-vtt-bridge.joinAs", null, "Join as:"), 'Player') || 'Player';
         send('table-join', { name });
     });
     el.querySelector('#tv-lobby-dismiss')?.addEventListener('click', () => {

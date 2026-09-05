@@ -5,6 +5,7 @@
  * Followers, Assets, Scene Tools, VTT, and Campaign Status
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { escHtml } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -23,11 +24,11 @@ export function render(el) {
         <div class="dashboard-modern-layout">
             <!-- Header -->
             <header class="dashboard-header">
-                <h1 class="page-title">The Table</h1>
-                <p class="page-sub">Where the campaign stands tonight.</p>
+                <h1 class="page-title" data-i18n="feature.dashboard.theTable">The Table</h1>
+                <p class="page-sub" data-i18n="feature.dashboard.whereTheCampaignStandsTonight">Where the campaign stands tonight.</p>
                 <div class="dashboard-status-bar">
-                    <span class="status-badge" id="dash-status">● Live</span>
-                    <span class="status-badge" id="dash-sync-status">● Local</span>
+                    <span class="status-badge" id="dash-status" data-i18n="feature.dashboard.live">● Live</span>
+                    <span class="status-badge" id="dash-sync-status" data-i18n="feature.dashboard.local">● Local</span>
                     <span class="status-badge" id="dash-timestamp">Updated: ${new Date().toLocaleTimeString()}</span>
                 </div>
             </header>
@@ -40,7 +41,7 @@ export function render(el) {
             <!-- Quick Actions (Player‑Facing) -->
             <div class="panel" id="dash-actions-panel">
                 <div class="panel-header">
-                    <h3 class="panel-title">To hand</h3>
+                    <h3 class="panel-title" data-i18n="feature.dashboard.toHand">To hand</h3>
                     <div class="panel-actions">
                         <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
                     </div>
@@ -50,37 +51,37 @@ export function render(el) {
                 <div class="quick-actions-grid">
                     <button class="quick-action-btn" onclick="window.sceneEndTrimBoons()">
                         <span class="qa-icon">✂️</span>
-                        <span class="qa-label">Trim Boons</span>
+                        <span class="qa-label" data-i18n="feature.dashboard.trimBoons">Trim Boons</span>
                         <span class="qa-desc">Set all Boons to 2</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.resetAllTimers()">
                         <span class="qa-icon" aria-hidden="true">&#9719;</span>
-                        <span class="qa-label">Reset Timers</span>
+                        <span class="qa-label" data-i18n="feature.dashboard.resetTimers">Reset Timers</span>
                         <span class="qa-desc">Zero all timers</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.newSession()">
                         <span class="qa-icon" aria-hidden="true">&#9707;</span>
-                        <span class="qa-label">New Session</span>
+                        <span class="qa-label" data-i18n="feature.dashboard.newSession">New Session</span>
                         <span class="qa-desc">Archive and reset</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.openCombatTracker()">
                         <span class="qa-icon" aria-hidden="true">&#8224;</span>
-                        <span class="qa-label">Combat Tracker</span>
+                        <span class="qa-label" data-i18n="feature.dashboard.combatTracker">Combat Tracker</span>
                         <span class="qa-desc">Open combat tracker</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.location.hash='dice'">
                         <span class="qa-icon">🎲</span>
-                        <span class="qa-label">Dice Roller</span>
+                        <span class="qa-label" data-i18n="feature.dashboard.diceRoller">Dice Roller</span>
                         <span class="qa-desc">Roll some dice</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.location.hash='vtt'">
                         <span class="qa-icon">🌐</span>
-                        <span class="qa-label">VTT</span>
+                        <span class="qa-label" data-i18n="feature.dashboard.vtt">VTT</span>
                         <span class="qa-desc">Virtual Tabletop</span>
                     </button>
                     <button class="quick-action-btn" onclick="window.location.hash='whiteboard'">
                         <span class="qa-icon">✏️</span>
-                        <span class="qa-label">Whiteboard</span>
+                        <span class="qa-label" data-i18n="feature.dashboard.whiteboard">Whiteboard</span>
                         <span class="qa-desc">Visual planning</span>
                     </button>
                 </div>
@@ -93,37 +94,37 @@ export function render(el) {
                     <!-- Characters -->
                     <div class="panel" id="dash-characters-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">Characters</h3>
+                            <h3 class="panel-title" data-i18n="feature.dashboard.characters">Characters</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openCharacterBuilder()">+ New</button>
+                                <button class="btn btn-sm btn-primary" onclick="window.openCharacterBuilder()" data-i18n="feature.dashboard.new">+ New</button>
                             </div>
                         </div>
-                        <div id="dash-chars"><span class="text-muted">Loading…</span></div>
+                        <div id="dash-chars"><span class="text-muted" data-i18n="feature.dashboard.loading">Loading…</span></div>
                     </div>
 
                     <!-- Active Timers -->
                     <div class="panel" id="dash-timers-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">Running</h3>
+                            <h3 class="panel-title" data-i18n="feature.dashboard.running">Running</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.addTimerFromDash()">+ Add</button>
+                                <button class="btn btn-sm btn-primary" onclick="window.addTimerFromDash()" data-i18n="feature.dashboard.add">+ Add</button>
                             </div>
                         </div>
-                        <div id="dash-timers"><span class="text-muted">Nothing running. Quiet season.</span></div>
+                        <div id="dash-timers"><span class="text-muted" data-i18n="feature.dashboard.nothingRunningQuietSeason">Nothing running. Quiet season.</span></div>
                     </div>
 
                     <!-- Active Encounters -->
                     <div class="panel" id="dash-encounters-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">In play</h3>
+                            <h3 class="panel-title" data-i18n="feature.dashboard.inPlay">In play</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.addEncounterFromDash()">+ Add</button>
+                                <button class="btn btn-sm btn-primary" onclick="window.addEncounterFromDash()" data-i18n="feature.dashboard.add">+ Add</button>
                             </div>
                         </div>
-                        <div id="dash-encounters"><span class="text-muted">Nothing in play.</span></div>
+                        <div id="dash-encounters"><span class="text-muted" data-i18n="feature.dashboard.nothingInPlay">Nothing in play.</span></div>
                     </div>
                 </div>
 
@@ -132,37 +133,37 @@ export function render(el) {
                     <!-- Factions -->
                     <div class="panel" id="dash-factions-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">🏛️ Factions</h3>
+                            <h3 class="panel-title" data-i18n="feature.dashboard.factions">🏛️ Factions</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openFactions()">View All</button>
+                                <button class="btn btn-sm btn-primary" onclick="window.openFactions()" data-i18n="feature.dashboard.viewAll">View All</button>
                             </div>
                         </div>
-                        <div id="dash-factions"><span class="text-muted">No factions being watched yet.</span></div>
+                        <div id="dash-factions"><span class="text-muted" data-i18n="feature.dashboard.noFactionsBeingWatchedYet">No factions being watched yet.</span></div>
                     </div>
 
                     <!-- Patrons -->
                     <div class="panel" id="dash-patrons-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">🌟 Patrons</h3>
+                            <h3 class="panel-title" data-i18n="feature.dashboard.patrons">🌟 Patrons</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openPatrons()">View All</button>
+                                <button class="btn btn-sm btn-primary" onclick="window.openPatrons()" data-i18n="feature.dashboard.viewAll">View All</button>
                             </div>
                         </div>
-                        <div id="dash-patrons"><span class="text-muted">Nobody is listening yet.</span></div>
+                        <div id="dash-patrons"><span class="text-muted" data-i18n="feature.dashboard.nobodyIsListeningYet">Nobody is listening yet.</span></div>
                     </div>
 
                     <!-- Followers & Assets -->
                     <div class="panel" id="dash-followers-assets-panel">
                         <div class="panel-header">
-                            <h3 class="panel-title">Followers and assets</h3>
+                            <h3 class="panel-title" data-i18n="feature.dashboard.followersAndAssets">Followers and assets</h3>
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" onclick="window.dashboardRefresh()">🔄</button>
-                                <button class="btn btn-sm btn-primary" onclick="window.openFactions()">Manage</button>
+                                <button class="btn btn-sm btn-primary" onclick="window.openFactions()" data-i18n="feature.dashboard.manage">Manage</button>
                             </div>
                         </div>
-                        <div id="dash-followers-assets"><span class="text-muted">No followers or assets.</span></div>
+                        <div id="dash-followers-assets"><span class="text-muted" data-i18n="feature.dashboard.noFollowersOrAssets">No followers or assets.</span></div>
                     </div>
                 </div>
             </div>
@@ -245,8 +246,7 @@ function injectDashboardStyles() {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
-            right: 0;
+            inset-inline: 0;
             height: 2px;
             background: linear-gradient(90deg, var(--gold), var(--accent), var(--gold));
             opacity: 0.3;
@@ -572,43 +572,43 @@ function renderStats() {
         <div class="stat-card">
             <span class="stat-icon" aria-hidden="true">&#10022;</span>
             <span class="stat-value">${characters.length}</span>
-            <span class="stat-label">Characters</span>
+            <span class="stat-label" data-i18n="feature.dashboard.characters">Characters</span>
         </div>
         <div class="stat-card">
             <span class="stat-icon" aria-hidden="true">&#9719;</span>
             <span class="stat-value">${activeTimers.length}</span>
-            <span class="stat-label">Active Timers</span>
+            <span class="stat-label" data-i18n="feature.dashboard.activeTimers">Active Timers</span>
             <span class="stat-sub">${completedTimers.length} completed</span>
         </div>
         <div class="stat-card">
             <span class="stat-icon" aria-hidden="true">&#8224;</span>
             <span class="stat-value">${encounters.length}</span>
-            <span class="stat-label">Encounters</span>
+            <span class="stat-label" data-i18n="feature.dashboard.encounters">Encounters</span>
         </div>
         <div class="stat-card">
             <span class="stat-icon">🏛️</span>
             <span class="stat-value">${factions.length}</span>
-            <span class="stat-label">Factions</span>
+            <span class="stat-label" data-i18n="feature.dashboard.factions_121cs">Factions</span>
         </div>
         <div class="stat-card">
             <span class="stat-icon">🌟</span>
             <span class="stat-value">${patrons.length}</span>
-            <span class="stat-label">Patrons</span>
+            <span class="stat-label" data-i18n="feature.dashboard.patrons_1nmsr">Patrons</span>
         </div>
         <div class="stat-card">
             <span class="stat-icon" aria-hidden="true">&#10022;</span>
             <span class="stat-value">${followers.length}</span>
-            <span class="stat-label">Followers</span>
+            <span class="stat-label" data-i18n="feature.dashboard.followers">Followers</span>
         </div>
         <div class="stat-card">
             <span class="stat-icon" aria-hidden="true">&#9707;</span>
             <span class="stat-value">${assets.length}</span>
-            <span class="stat-label">Assets</span>
+            <span class="stat-label" data-i18n="feature.dashboard.assets">Assets</span>
         </div>
         <div class="stat-card">
             <span class="stat-icon" aria-hidden="true">&#8801;</span>
             <span class="stat-value">${state.rollHistory?.length || 0}</span>
-            <span class="stat-label">Rolls</span>
+            <span class="stat-label" data-i18n="feature.dashboard.rolls">Rolls</span>
             <span class="stat-sub">${state.chatHistory?.length || 0} chat</span>
         </div>
     `;
@@ -655,7 +655,7 @@ function updateCharacters() {
                 <div class="char-stats">
                     <span class="char-stat boon ${boonClass}" title="Boons">🪙 ${boons}</span>
                     <span class="char-stat fatigue ${fatigueClass}" title="Fatigue">&#9650; ${fatigue}</span>
-                    <span class="char-stat harm" title="Harm">❤️ ${harm}</span>
+                    <span class="char-stat harm" title="Harm" data-i18n-attr="title:feature.dashboard.harm">❤️ ${harm}</span>
                     ${c.vtt ? '<span class="char-stat vtt" title="VTT Connected">🟢</span>' : ''}
                 </div>
             </div>
@@ -879,7 +879,7 @@ function startAutoRefresh() {
 
 window.dashboardRefresh = function() {
     update();
-    showToast('🔄 Dashboard refreshed', 'info');
+    showToast(i18nText("feature.dashboard.dashboardRefreshed", null, "🔄 Dashboard refreshed"), 'info');
 };
 
 // Simple cross-tab navigation — matches the window.location.hash pattern

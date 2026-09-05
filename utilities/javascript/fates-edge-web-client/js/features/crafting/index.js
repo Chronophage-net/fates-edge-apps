@@ -66,6 +66,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { vttStore } from '@core/vtt-store.js';
 import { getState, getCharacter, updateCharacter } from '@core/state.js';
 import { escHtml, generateId, safeParseInt } from '@core/utils.js';
@@ -148,12 +149,12 @@ function getCharacterData(options = {}) {
     const { silent = false } = options;
     const id = vttStore.getSelectedCharacterId();
     if (!id) {
-        if (!silent) showToast('Select a character first.', 'error');
+        if (!silent) showToast(i18nText("feature.crafting.selectACharacterFirst", null, "Select a character first."), 'error');
         return null;
     }
     const char = getCharacter(id);
     if (!char) {
-        if (!silent) showToast('Character not found.', 'error');
+        if (!silent) showToast(i18nText("feature.crafting.characterNotFound", null, "Character not found."), 'error');
         return null;
     }
     return char;
@@ -228,30 +229,30 @@ function attachNoCharacterEvents() {
 
 function forageIngredient(char, ingredientMap) {
     if (!canForage(char)) {
-        return showToast(`No forage attempts left this downtime (${FORAGE_LIMIT_PER_DOWNTIME}/${FORAGE_LIMIT_PER_DOWNTIME} used). Wait for the next GM Downtime.`, 'warning');
+        return showToast(i18nText("feature.crafting.noForageAttemptsLeftThisDowntimeValue", { value0: FORAGE_LIMIT_PER_DOWNTIME, value1: FORAGE_LIMIT_PER_DOWNTIME }, "No forage attempts left this downtime ({{value0}}/{{value1}} used). Wait for the next GM Downtime."), 'warning');
     }
     const common = Object.values(ingredientMap).filter(i => i.common);
-    if (common.length === 0) return showToast('No common ingredients defined.', 'error');
+    if (common.length === 0) return showToast(i18nText("feature.crafting.noCommonIngredientsDefined", null, "No common ingredients defined."), 'error');
     const picked = common[Math.floor(Math.random() * common.length)];
     const ingredients = getIngredients(char);
     ingredients.push(picked.name);
     const count = recordForageAttempt(char);
     saveCharacter({ crafting: char.crafting });
-    showToast(`🌿 Foraged ${picked.icon} ${picked.name} (${count}/${FORAGE_LIMIT_PER_DOWNTIME} this downtime)`, 'success');
+    showToast(i18nText("feature.crafting.foragedValueValueValueValueThisDowntime", { value0: picked.icon, value1: picked.name, value2: count, value3: FORAGE_LIMIT_PER_DOWNTIME }, "🌿 Foraged {{value0}} {{value1}} ({{value2}}/{{value3}} this downtime)"), 'success');
     refreshPanel();
 }
 
 function purchaseIngredient(char, ingredientMap) {
     const select = document.getElementById('craft-buy-select');
-    if (!select || !select.value) return showToast('Choose a rare ingredient to buy first.', 'error');
+    if (!select || !select.value) return showToast(i18nText("feature.crafting.chooseARareIngredientToBuyFirst", null, "Choose a rare ingredient to buy first."), 'error');
     const picked = ingredientMap[select.value];
-    if (!picked) return showToast('Ingredient not found.', 'error');
-    if (availableXp(char) < picked.cost) return showToast(`Not enough XP. Need ${picked.cost}, have ${availableXp(char)}.`, 'error');
+    if (!picked) return showToast(i18nText("feature.crafting.ingredientNotFound", null, "Ingredient not found."), 'error');
+    if (availableXp(char) < picked.cost) return showToast(i18nText("feature.crafting.notEnoughXPNeedValueHaveValue", { value0: picked.cost, value1: availableXp(char) }, "Not enough XP. Need {{value0}}, have {{value1}}."), 'error');
     char.xpSpent = (char.xpSpent || 0) + picked.cost;
     const ingredients = getIngredients(char);
     ingredients.push(picked.name);
     saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-    showToast(`💰 Purchased ${picked.icon} ${picked.name} for ${picked.cost} XP`, 'success');
+    showToast(i18nText("feature.crafting.purchasedValueValueForValueXP", { value0: picked.icon, value1: picked.name, value2: picked.cost }, "💰 Purchased {{value0}} {{value1}} for {{value2}} XP"), 'success');
     refreshPanel();
 }
 
@@ -262,14 +263,14 @@ function removeIngredientAt(char, index) {
     char.crafting.ingredients = ingredients;
     uiState.craftCombineSelection = uiState.craftCombineSelection.filter(i => i !== index).map(i => (i > index ? i - 1 : i));
     saveCharacter({ crafting: char.crafting });
-    showToast(`Removed ${removed}.`, 'info');
+    showToast(i18nText("feature.crafting.removedValue", { value0: removed }, "Removed {{value0}}."), 'info');
     refreshPanel();
 }
 
 function toggleCombineSelect(index) {
     const pos = uiState.craftCombineSelection.indexOf(index);
     if (pos === -1) {
-        if (uiState.craftCombineSelection.length >= 3) return showToast('You can combine up to 3 ingredients at once.', 'warning');
+        if (uiState.craftCombineSelection.length >= 3) return showToast(i18nText("feature.crafting.youCanCombineUpTo3Ingredients", null, "You can combine up to 3 ingredients at once."), 'warning');
         uiState.craftCombineSelection.push(index);
     } else {
         uiState.craftCombineSelection.splice(pos, 1);
@@ -278,7 +279,7 @@ function toggleCombineSelect(index) {
 }
 
 function combineIngredients(char, recipeMap) {
-    if (uiState.craftCombineSelection.length === 0) return showToast('Check at least one ingredient below to combine.', 'warning');
+    if (uiState.craftCombineSelection.length === 0) return showToast(i18nText("feature.crafting.checkAtLeastOneIngredientBelowTo", null, "Check at least one ingredient below to combine."), 'warning');
     const ingredients = getIngredients(char);
     const indices = [...new Set(uiState.craftCombineSelection)].filter(i => i >= 0 && i < ingredients.length).sort((a, b) => b - a);
     const selectedNames = indices.map(i => ingredients[i]).reverse();
@@ -300,7 +301,7 @@ function combineIngredients(char, recipeMap) {
         crafted.push({ id: generateId('crafted_'), name: matchedRecipe.name, effect: matchedRecipe.effect, quality: 'standard', uses: matchedRecipe.tier === 'standard' ? 2 : 1, recipe: matchedRecipe.id, icon: matchedRecipe.icon || '🔧', createdAt: Date.now() });
         addToCraftingLog(char, { name: matchedRecipe.name, quality: 'standard', icon: matchedRecipe.icon });
         saveCharacter({ crafting: char.crafting });
-        showToast(`⚗️ Successfully crafted ${matchedRecipe.icon} ${matchedRecipe.name}!`, 'success');
+        showToast(i18nText("feature.crafting.successfullyCraftedValueValue", { value0: matchedRecipe.icon, value1: matchedRecipe.name }, "⚗️ Successfully crafted {{value0}} {{value1}}!"), 'success');
     } else {
         const randomEffects = [
             'A bubbly green liquid that smells of mint; drink it to restore 1 Fatigue.',
@@ -314,21 +315,21 @@ function combineIngredients(char, recipeMap) {
         crafted.push({ id: generateId('crafted_'), name: '🧪 Unknown Concoction', effect, quality: 'flawed', uses: 1, recipe: null, icon: '🧪', createdAt: Date.now() });
         addToCraftingLog(char, { name: 'Unknown Concoction', quality: 'flawed', icon: '🧪' });
         saveCharacter({ crafting: char.crafting });
-        showToast(`⚗️ You created an unknown concoction: ${effect}`, 'info');
+        showToast(i18nText("feature.crafting.youCreatedAnUnknownConcoctionValue", { value0: effect }, "⚗️ You created an unknown concoction: {{value0}}"), 'info');
     }
     refreshPanel();
 }
 
 function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
     const recipe = recipeMap[recipeId];
-    if (!recipe) return showToast('Recipe not found.', 'error');
+    if (!recipe) return showToast(i18nText("feature.crafting.recipeNotFound", null, "Recipe not found."), 'error');
 
     const required = recipe.ingredients || [];
     const ingredients = getIngredients(char);
     const missing = required.filter(req => !ingredients.some(i => i.toLowerCase() === req.toLowerCase()));
     const totalXpCost = recipe.xpCost * quantity;
 
-    if (availableXp(char) < totalXpCost) return showToast(`Not enough XP. Need ${totalXpCost}, have ${availableXp(char)}.`, 'error');
+    if (availableXp(char) < totalXpCost) return showToast(i18nText("feature.crafting.notEnoughXPNeedValueHaveValue", { value0: totalXpCost, value1: availableXp(char) }, "Not enough XP. Need {{value0}}, have {{value1}}."), 'error');
 
     // One roll for the whole batch (rolling per-item would be more
     // granular but adds a lot of UI noise for little mechanical payoff).
@@ -445,8 +446,8 @@ function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
 function useCraftedItem(char, itemId) {
     const crafted = getCraftedItems(char);
     const item = crafted.find(c => c.id === itemId);
-    if (!item) return showToast('Item not found.', 'error');
-    showToast(`🧪 Used "${item.name}": ${item.effect || 'The item is used.'}`, 'success');
+    if (!item) return showToast(i18nText("feature.crafting.itemNotFound", null, "Item not found."), 'error');
+    showToast(i18nText("feature.crafting.usedValueValue", { value0: item.name, value1: item.effect || i18nText('feature.crafting.itemUsed', null, 'The item is used.') }, "🧪 Used \"{{value0}}\": {{value1}}"), 'success');
     item.uses = (item.uses || 1) - 1;
     if (item.uses <= 0) {
         char.crafting.crafted = crafted.filter(c => c.id !== itemId);
@@ -458,7 +459,7 @@ function useCraftedItem(char, itemId) {
 function removeCraftedItem(char, itemId) {
     char.crafting.crafted = getCraftedItems(char).filter(c => c.id !== itemId);
     saveCharacter({ crafting: char.crafting });
-    showToast('Item removed.', 'info');
+    showToast(i18nText("feature.crafting.itemRemoved", null, "Item removed."), 'info');
     refreshPanel();
 }
 
@@ -466,12 +467,12 @@ function removeCraftedItem(char, itemId) {
 
 function refineIngredient(char, recipeMap, recipeId) {
     const recipe = recipeMap[recipeId];
-    if (!recipe || !recipe.outputIngredient) return showToast('Not a refinement recipe.', 'error');
+    if (!recipe || !recipe.outputIngredient) return showToast(i18nText("feature.crafting.notARefinementRecipe", null, "Not a refinement recipe."), 'error');
     const required = recipe.ingredients || [];
     const ingredients = getIngredients(char);
     const missing = required.filter(req => !ingredients.some(i => i.toLowerCase() === req.toLowerCase()));
-    if (missing.length > 0) return showToast(`Missing ingredients: ${missing.join(', ')}`, 'error');
-    if (availableXp(char) < recipe.xpCost) return showToast(`Not enough XP. Need ${recipe.xpCost}.`, 'error');
+    if (missing.length > 0) return showToast(i18nText("feature.crafting.missingIngredientsValue", { value0: missing.join(', ') }, "Missing ingredients: {{value0}}"), 'error');
+    if (availableXp(char) < recipe.xpCost) return showToast(i18nText("feature.crafting.notEnoughXPNeedValue", { value0: recipe.xpCost }, "Not enough XP. Need {{value0}}."), 'error');
 
     for (const req of required) {
         const idx = ingredients.findIndex(i => i.toLowerCase() === req.toLowerCase());
@@ -481,7 +482,7 @@ function refineIngredient(char, recipeMap, recipeId) {
     char.xpSpent = (char.xpSpent || 0) + recipe.xpCost;
     addToCraftingLog(char, { name: recipe.outputIngredient, quality: 'refined', icon: recipe.icon });
     saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-    showToast(`⚗️ Refined ${recipe.outputIngredient} from ${required.join(', ')}.`, 'success');
+    showToast(i18nText("feature.crafting.refinedValueFromValue", { value0: recipe.outputIngredient, value1: required.join(', ') }, "⚗️ Refined {{value0}} from {{value1}}."), 'success');
     refreshPanel();
 }
 
@@ -489,16 +490,16 @@ function refineIngredient(char, recipeMap, recipeId) {
 
 function toggleAttune(char, codex, entryId) {
     const entry = codex.find(e => e.id === entryId);
-    if (!entry) return showToast('Item not found in the Codex.', 'error');
+    if (!entry) return showToast(i18nText("feature.crafting.itemNotFoundInTheCodex", null, "Item not found in the Codex."), 'error');
     const attuned = getAttunedItems(char);
     const idx = attuned.findIndex(a => a.id === entryId);
     if (idx !== -1) {
         attuned.splice(idx, 1);
-        showToast(`Broke attunement with ${entry.title}.`, 'info');
+        showToast(i18nText("feature.crafting.brokeAttunementWithValue", { value0: entry.title }, "Broke attunement with {{value0}}."), 'info');
     } else {
-        if (!canAttune(attuned, entryId)) return showToast(`Already attuned to ${ATTUNEMENT_LIMIT} items — break one first.`, 'warning');
+        if (!canAttune(attuned, entryId)) return showToast(i18nText("feature.crafting.alreadyAttunedToValueItemsBreakOne", { value0: ATTUNEMENT_LIMIT }, "Already attuned to {{value0}} items — break one first."), 'warning');
         attuned.push({ id: entry.id, name: entry.title, cost: entry.cost, tier: entry.tier, icon: entry.icon, category: entry.category, condition: 'maintained', paidUpkeepThisDowntime: false, attunedAt: Date.now() });
-        showToast(`🔗 Attuned to ${entry.title}.`, 'success');
+        showToast(i18nText("feature.crafting.attunedToValue", { value0: entry.title }, "🔗 Attuned to {{value0}}."), 'success');
     }
     saveCharacter({ crafting: char.crafting });
     refreshPanel();
@@ -507,28 +508,28 @@ function toggleAttune(char, codex, entryId) {
 function payUpkeep(char, itemId, mode) {
     const attuned = getAttunedItems(char);
     const item = attuned.find(a => a.id === itemId);
-    if (!item) return showToast('Item not found.', 'error');
+    if (!item) return showToast(i18nText("feature.crafting.itemNotFound", null, "Item not found."), 'error');
 
     // Compromised items don't come back from paying upkeep — items.tex:
     // "requires a quest to restore". Send the player to restoreCompromisedItem().
     if (item.condition === 'compromised') {
-        return showToast(`${item.name} is Compromised — upkeep won't fix it. It requires a quest to restore.`, 'warning');
+        return showToast(i18nText("feature.crafting.valueIsCompromisedUpkeepWonTFix", { value0: item.name }, "{{value0}} is Compromised — upkeep won't fix it. It requires a quest to restore."), 'warning');
     }
 
     if (mode === 'efficient') {
         const cost = upkeepCostFor(item);
-        if (availableXp(char) < cost) return showToast(`Not enough XP for upkeep. Need ${cost}.`, 'error');
+        if (availableXp(char) < cost) return showToast(i18nText("feature.crafting.notEnoughXPForUpkeepNeedValue", { value0: cost }, "Not enough XP for upkeep. Need {{value0}}."), 'error');
         char.xpSpent = (char.xpSpent || 0) + cost;
         item.condition = 'maintained';
         item.paidUpkeepThisDowntime = true;
         saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-        showToast(`💰 Paid ${cost} XP upkeep for ${item.name}.`, 'success');
+        showToast(i18nText("feature.crafting.paidValueXPUpkeepForValue", { value0: cost, value1: item.name }, "💰 Paid {{value0}} XP upkeep for {{value1}}."), 'success');
     } else {
         char.xpSpent = (char.xpSpent || 0) + intensiveUpkeepCostFor(item);
         item.condition = 'maintained';
         item.paidUpkeepThisDowntime = true;
         saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-        showToast(`🕯️ Spent a downtime scene maintaining ${item.name}.`, 'success');
+        showToast(i18nText("feature.crafting.spentADowntimeSceneMaintainingValue", { value0: item.name }, "🕯️ Spent a downtime scene maintaining {{value0}}."), 'success');
     }
     refreshPanel();
 }
@@ -540,12 +541,12 @@ function payUpkeep(char, itemId, mode) {
 function restoreCompromisedItem(char, itemId) {
     const attuned = getAttunedItems(char);
     const item = attuned.find(a => a.id === itemId);
-    if (!item) return showToast('Item not found.', 'error');
-    if (item.condition !== 'compromised') return showToast(`${item.name} isn't Compromised.`, 'info');
+    if (!item) return showToast(i18nText("feature.crafting.itemNotFound", null, "Item not found."), 'error');
+    if (item.condition !== 'compromised') return showToast(i18nText("feature.crafting.valueIsnTCompromised", { value0: item.name }, "{{value0}} isn't Compromised."), 'info');
     item.condition = 'maintained';
     item.paidUpkeepThisDowntime = true;
     saveCharacter({ crafting: char.crafting });
-    showToast(`✨ ${item.name} restored after a quest to fix it.`, 'success');
+    showToast(i18nText("feature.crafting.valueRestoredAfterAQuestToFix", { value0: item.name }, "✨ {{value0}} restored after a quest to fix it."), 'success');
     refreshPanel();
 }
 
@@ -559,7 +560,9 @@ function retireItem(char, itemId) {
         char.xpSpent = Math.max(0, (char.xpSpent || 0) - refund);
     }
     saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-    showToast(`Retired ${item.name}${refund > 0 ? ` — regained ${refund} XP` : ''}.`, 'info');
+    showToast(refund > 0
+        ? i18nText('feature.crafting.retiredWithRefund', { item: item.name, refund }, 'Retired {{item}} — regained {{refund}} XP.')
+        : i18nText('feature.crafting.retired', { item: item.name }, 'Retired {{item}}.'), 'info');
     refreshPanel();
 }
 
@@ -587,9 +590,9 @@ function handleDowntimeTick() {
         updateCharacter(char.id, { crafting: char.crafting });
     }
     if (anyDecay) {
-        showToast('🕯️ Downtime passed — some attuned items decayed (unpaid upkeep). Forage attempts have reset.', 'warning');
+        showToast(i18nText("feature.crafting.downtimePassedSomeAttunedItemsDecayedUnpaid", null, "🕯️ Downtime passed — some attuned items decayed (unpaid upkeep). Forage attempts have reset."), 'warning');
     } else {
-        showToast('🕯️ Downtime passed — forage attempts have reset.', 'info');
+        showToast(i18nText("feature.crafting.downtimePassedForageAttemptsHaveReset", null, "🕯️ Downtime passed — forage attempts have reset."), 'info');
     }
     refreshPanel();
 }
@@ -630,10 +633,10 @@ function attachEvents() {
     // so its old listener goes away with the old element.
     const refreshBtn = document.getElementById('craft-refresh-btn');
     if (refreshBtn) refreshBtn.addEventListener('click', async () => {
-        showToast('🔄 Reloading crafting data…', 'info');
+        showToast(i18nText("feature.crafting.reloadingCraftingData", null, "🔄 Reloading crafting data…"), 'info');
         await ensureWikiLoaded(true);
         await refreshPanel();
-        showToast('✅ Crafting refreshed.', 'success');
+        showToast(i18nText("feature.crafting.craftingRefreshed", null, "✅ Crafting refreshed."), 'success');
     });
 
     if (container[BOUND_FLAG]) return;

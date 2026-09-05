@@ -11,7 +11,9 @@
  *   panel.innerHTML = `...`;
  *   // later
  *   closeInlineScreen('my-feature-screen');
- */
+*/
+
+import { t as i18nText } from '@core/i18n.js';
 
 const registry = new Map(); // id -> { panel, hiddenSiblings, host }
 
@@ -61,10 +63,11 @@ export function closeInlineScreen(id) {
  * Convenience: wraps HTML in the standard `.editor-screen` card with a
  * "← Back" button whose id is `${id}-back`.
  */
-export function inlineScreenShell(id, title, bodyHtml, { backLabel = '← Back', maxWidth = '700px' } = {}) {
+export function inlineScreenShell(id, title, bodyHtml, { backLabel = null, maxWidth = '700px' } = {}) {
+    const resolvedBackLabel = backLabel || i18nText('feature.components.InlineScreen.back', null, '← Back');
     return `
         <div class="editor-screen" style="max-width:${maxWidth};margin:0 auto;">
-            <button id="${id}-back" class="btn btn-secondary editor-back">${backLabel}</button>
+            <button id="${id}-back" class="btn btn-secondary editor-back">${resolvedBackLabel}</button>
             ${title ? `<h2>${title}</h2>` : ''}
             ${bodyHtml}
         </div>

@@ -18,6 +18,7 @@
  * REST route.
  */
 
+import { t as i18nText, formatNumber } from '@core/i18n.js';
 import { getApiBaseUrl } from '@core/websocket.js';
 import { escHtml } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -87,7 +88,7 @@ function buildApiUrl(pathAndQuery) {
 function getOrPromptApiKey() {
     let apiKey = localStorage.getItem(API_KEY_STORAGE);
     if (!apiKey) {
-        const input = prompt('Sound search needs this server\'s admin API key (the same one used for VTT character sync). Enter it:');
+        const input = prompt(i18nText("feature.gm-tools.sound-search.soundSearchNeedsThisServerSAdmin", null, "Sound search needs this server's admin API key (the same one used for VTT character sync). Enter it:"));
         if (input === null) return null;
         apiKey = input.trim();
         if (apiKey) localStorage.setItem(API_KEY_STORAGE, apiKey);
@@ -104,12 +105,12 @@ function modalTemplate() {
 
     return `
         <div class="modal" style="max-width:820px;">
-            <button class="modal-close" id="sound-search-close" aria-label="Close">&times;</button>
-            <h2>🔎 Search Sounds</h2>
+            <button class="modal-close" id="sound-search-close" aria-label="Close" data-i18n-attr="aria-label:feature.gm-tools.sound-search.close" data-i18n="feature.gm-tools.sound-search.message">&times;</button>
+            <h2 data-i18n="feature.gm-tools.sound-search.searchSounds">🔎 Search Sounds</h2>
             <div class="modal-body">
                 <div class="flex">
-                    <input type="text" id="sound-search-input" placeholder="Search Freesound (e.g. thunder, tavern murmur, sword clash)…" class="flex-1" style="min-width:220px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.4rem 0.6rem;color:var(--text);" />
-                    <button class="btn btn-gold" id="sound-search-btn">Search</button>
+                    <input type="text" id="sound-search-input" placeholder="Search Freesound (e.g. thunder, tavern murmur, sword clash)…" class="flex-1" style="min-width:220px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.4rem 0.6rem;color:var(--text);" / data-i18n-attr="placeholder:feature.gm-tools.sound-search.searchFreesoundEGThunderTavernMurmur">
+                    <button class="btn btn-gold" id="sound-search-btn" data-i18n="feature.gm-tools.sound-search.search">Search</button>
                 </div>
                 <div class="flex mt-1" style="font-size:0.8rem;">
                     <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;">
@@ -120,7 +121,7 @@ function modalTemplate() {
                     </label>
                 </div>
                 <div class="flex mt-1" style="align-items:center;padding-top:0.5rem;border-top:1px solid var(--border);">
-                    <label for="sb-crossfade-input" style="font-size:0.8rem;color:var(--text2);">🎵 Ambience crossfade:</label>
+                    <label for="sb-crossfade-input" style="font-size:0.8rem;color:var(--text2);" data-i18n="feature.gm-tools.sound-search.ambienceCrossfade">🎵 Ambience crossfade:</label>
                     <input type="number" id="sb-crossfade-input" value="${DEFAULT_CROSSFADE}" min="0" max="30000" step="500" style="width:80px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.2rem 0.4rem;color:var(--text);" />
                     <span style="font-size:0.75rem;color:var(--text3);">ms (0 = instant switch)</span>
                     <div class="flex" id="sb-crossfade-presets" style="gap:0.3rem;">${presetButtons}</div>
@@ -217,7 +218,7 @@ function stopPreview() {
 function playPreview(sound) {
     stopPreview();
     if (!sound.preview_url) {
-        showToast('No preview available for this sound.', 'error');
+        showToast(i18nText("feature.gm-tools.sound-search.noPreviewAvailableForThisSound", null, "No preview available for this sound."), 'error');
         return;
     }
     previewAudio = new Audio(sound.preview_url);
@@ -328,22 +329,22 @@ function addSoundFromResult(sound, type) {
     const allowAttribution = modalEl.querySelector('#sb-filter-attribution')?.checked ?? true;
 
     if (!info.commercial && !allowNonCommercial) {
-        showToast(`"${sound.name}" is non-commercial use only. Enable "Allow non-commercial-only sounds" to add it.`, 'warning');
+        showToast(i18nText("feature.gm-tools.sound-search.valueIsNonCommercialUseOnlyEnable", { value0: sound.name }, "\"{{value0}}\" is non-commercial use only. Enable \"Allow non-commercial-only sounds\" to add it."), 'warning');
         return;
     }
     if (info.attribution && !allowAttribution) {
-        showToast(`"${sound.name}" requires attribution. Enable "Allow attribution-required sounds" to add it.`, 'warning');
+        showToast(i18nText("feature.gm-tools.sound-search.valueRequiresAttributionEnableAllowAttributionRequired", { value0: sound.name }, "\"{{value0}}\" requires attribution. Enable \"Allow attribution-required sounds\" to add it."), 'warning');
         return;
     }
     if (!sound.preview_url) {
-        showToast(`"${sound.name}" has no playable audio available.`, 'error');
+        showToast(i18nText("feature.gm-tools.sound-search.valueHasNoPlayableAudioAvailable", { value0: sound.name }, "\"{{value0}}\" has no playable audio available."), 'error');
         return;
     }
 
     const name = sound.name.replace(/\.(wav|mp3|ogg|flac|aif|aiff)$/i, '').trim() || sound.name;
     const track = addSoundTrack({ name, url: sound.preview_url, type, volume: 1 });
     if (!track) {
-        showToast('Failed to add sound.', 'error');
+        showToast(i18nText("feature.gm-tools.sound-search.failedToAddSound", null, "Failed to add sound."), 'error');
         return;
     }
 
@@ -360,10 +361,15 @@ function addSoundFromResult(sound, type) {
     if (type === 'ambience') {
         const duration = parseInt(modalEl.querySelector('#sb-crossfade-input')?.value, 10) || 0;
         playAmbience(track.id, { transitionDuration: duration });
-        showToast(`🎵 Crossfading to "${name}"${duration ? ` (${(duration / 1000).toFixed(1)}s)` : ' (instant)'}`, 'success');
+        showToast(duration
+            ? i18nText('feature.gm-tools.sound-search.crossfadingWithDuration', {
+                name,
+                duration: `${formatNumber(duration / 1000, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`
+            }, '🎵 Crossfading to "{{name}}" ({{duration}})')
+            : i18nText('feature.gm-tools.sound-search.crossfadingInstantly', { name }, '🎵 Crossfading to "{{name}}" (instant)'), 'success');
     } else {
         playSfx(track.id);
-        showToast(`Added "${name}" to soundboard.`, 'success');
+        showToast(i18nText("feature.gm-tools.sound-search.addedValueToSoundboard", { value0: name }, "Added \"{{value0}}\" to soundboard."), 'success');
     }
 
     onChangeCallback?.();

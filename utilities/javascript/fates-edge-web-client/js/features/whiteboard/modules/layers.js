@@ -1,4 +1,5 @@
 // modules/layers.js
+import { t as i18nText } from '@core/i18n.js';
 import { state, getLayer, isLayerVisibleNow, layersInDrawOrder } from './state.js';
 import { saveWhiteboardData } from './persistence.js';
 import { restoreDrawings, renderOverlay, updateStats } from './renderer.js';
@@ -19,7 +20,7 @@ export function renderLayersPanel() {
     panel.innerHTML = `
         <div class="flex-between mb-1">
             <span class="text-gold font-bold text-sm">🗂️ Layers</span>
-            <button class="btn btn-xs btn-secondary" id="whiteboard-add-layer">➕ Add Layer</button>
+            <button class="btn btn-xs btn-secondary" id="whiteboard-add-layer" data-i18n="feature.whiteboard.modules.layers.addLayer">➕ Add Layer</button>
         </div>
         ${ordered.map((l, i) => `
             <div class="flex gap-1 flex-center" data-layer-row="${l.id}"
@@ -52,7 +53,7 @@ export function renderLayersPanel() {
     panel.querySelectorAll('.wb-layer-name').forEach(el => el.addEventListener('dblclick', () => {
         const layer = getLayer(el.dataset.layerId);
         if (!layer) return;
-        const name = prompt('Rename layer:', layer.name);
+        const name = prompt(i18nText("feature.whiteboard.modules.layers.renameLayer", null, "Rename layer:"), layer.name);
         if (!name) return;
         layer.name = name;
         saveWhiteboardData();
@@ -79,7 +80,7 @@ export function renderLayersPanel() {
         if (!layer) return;
         layer.opacity = parseFloat(inp.value);
         const valueLabel = panel.querySelector(`.wb-layer-opacity-value[data-layer-id="${inp.dataset.layerId}"]`);
-        if (valueLabel) valueLabel.textContent = `${Math.round(layer.opacity * 100)}%`;
+        if (valueLabel) valueLabel.textContent = i18nText("feature.whiteboard.modules.layers.value", { value0: Math.round(layer.opacity * 100) }, "{{value0}}%");
         saveWhiteboardData();
         restoreDrawings();
         renderOverlay();
@@ -98,9 +99,9 @@ export function toggleLayersPanel() {
 }
 
 function addLayer() {
-    const name = prompt('New layer name:', `Layer ${state.layers.length + 1}`);
+    const name = prompt(i18nText("feature.whiteboard.modules.layers.newLayerName", null, "New layer name:"), `Layer ${state.layers.length + 1}`);
     if (!name) return;
-    const isGM = confirm('Should this be a GM-only layer (hidden in Player View)?');
+    const isGM = confirm(i18nText("feature.whiteboard.modules.layers.shouldThisBeAGMOnlyLayer", null, "Should this be a GM-only layer (hidden in Player View)?"));
     const layer = {
         id: 'layer-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
         name,
@@ -114,12 +115,12 @@ function addLayer() {
     activeLayerId = layer.id;
     saveWhiteboardData();
     renderLayersPanel();
-    showToast(`🗂️ Layer "${name}" added`, 'success');
+    showToast(i18nText("feature.whiteboard.modules.layers.layerValueAdded", { value0: name }, "🗂️ Layer \"{{value0}}\" added"), 'success');
 }
 
 function deleteLayer(layerId) {
     if (DEFAULT_LAYER_DEFS.some(d => d.id === layerId)) {
-        showToast('Cannot delete a default layer', 'error');
+        showToast(i18nText("feature.whiteboard.modules.layers.cannotDeleteADefaultLayer", null, "Cannot delete a default layer"), 'error');
         return;
     }
     const layer = getLayer(layerId);
@@ -128,7 +129,7 @@ function deleteLayer(layerId) {
         state.notes.some(n => n.layerId === layerId) ||
         state.images.some(im => im.layerId === layerId) ||
         state.characterTokens.some(ct => ct.layerId === layerId);
-    if (hasContent && !confirm(`Layer "${layer.name}" has content on it. Delete the layer and everything on it?`)) return;
+    if (hasContent && !confirm(i18nText("feature.whiteboard.modules.layers.layerValueHasContentOnItDelete", { value0: layer.name }, "Layer \"{{value0}}\" has content on it. Delete the layer and everything on it?"))) return;
 
     state.drawings = state.drawings.filter(d => d.layerId !== layerId);
     state.notes = state.notes.filter(n => n.layerId !== layerId);

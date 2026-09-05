@@ -97,6 +97,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
 import { escHtml, generateId, safeParseInt } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -449,7 +450,7 @@ function renderRitesKnownSection(char, state) {
     });
 
     return `
-        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <span style="font-weight:600;color:var(--gold);">📜 Rites Known</span>
                 <span style="font-size:0.6rem;color:var(--text3);">${items.length} learned · manage new Rites in the Rites panel</span>
@@ -482,7 +483,7 @@ function renderRepertoireSection(char, state) {
     });
 
     return `
-        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid var(--gold);">
+        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <span style="font-weight:600;color:var(--gold);">🎶 Repertoire (Songs)</span>
                 <span style="font-size:0.6rem;color:var(--text3);">${items.length} learned · manage new Songs in the Cantor panel</span>
@@ -513,11 +514,11 @@ function renderSpiritRelationshipsSection(char) {
     const relationships = char.spiritRelationships || [];
 
     return `
-        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:4px solid #8e44ad;">
+        <div class="grimoire-collection-section" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid #8e44ad;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <span style="font-weight:600;color:#8e44ad;">👁️ Spirit Relationships</span>
                 ${hasTrueNameKeeper
-                    ? `<button class="btn btn-xs btn-primary" onclick="window.grimoireAddSpiritRelationship()">+ Record Spirit</button>`
+                    ? `<button class="btn btn-xs btn-primary" onclick="window.grimoireAddSpiritRelationship()" data-i18n="feature.spellcraft.components.spellbook.recordSpirit">+ Record Spirit</button>`
                     : `<span style="font-size:0.6rem;color:var(--text3);">Unlocks with True Name Keeper (15 XP)</span>`}
             </div>
 
@@ -625,7 +626,7 @@ function buildSpellCardHTML(spell, char) {
                 <strong>Recommended DV:</strong> ${recommendedDv} (1 + ${tags.length} tag${tags.length > 1 ? 's' : ''})
                 ${signature ? '<br>⭐ <strong>Signature:</strong> +1 die' : ''}
                 <br><strong>Roll options:</strong>
-                <ul style="margin:0.1rem 0;padding-left:1rem;">
+                <ul style="margin:0.1rem 0;padding-inline-start:1rem;">
                     <li><strong>Wits + Arcana:</strong> ${witsPool}d vs DV ${dv}</li>
                     <li><strong>Spirit + Arcana:</strong> ${spiritPool}d vs DV ${dv}</li>
                 </ul>
@@ -694,7 +695,7 @@ function buildSpellCardHTML(spell, char) {
             border-radius:var(--radius);
             padding:0.5rem 0.8rem;
             border:1px solid var(--border);
-            border-left:4px solid ${signature ? 'var(--gold)' : 'var(--text3)'};
+            border-inline-start:4px solid ${signature ? 'var(--gold)' : 'var(--text3)'};
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             max-width: 450px;
             margin:0.1rem 0;
@@ -716,7 +717,7 @@ function buildSpellCardHTML(spell, char) {
 
             ${tags.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.1rem;margin-top:0.1rem;">${tagBadges}</div>` : ''}
 
-            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;padding-left:0.1rem;">${escHtml(effect)}</div>` : ''}
+            ${effect ? `<div style="font-size:0.8rem;color:var(--text);margin-top:0.2rem;line-height:1.4;padding-inline-start:0.1rem;">${escHtml(effect)}</div>` : ''}
 
             ${pathInfo}
 
@@ -822,18 +823,18 @@ export async function renderSpellbook(el) {
                     <span style="font-size:1.4rem;">📖</span>
                     <div>
                         <span style="font-weight:600;font-size:1.05rem;color:var(--gold);">Grimoire</span>
-                        <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">${spells.length} spells</span>
+                        <span style="font-size:0.7rem;color:var(--text3);margin-inline-start:0.3rem;">${spells.length} spells</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
                     <span style="font-size:0.65rem;color:var(--text3);">⭐ ${signatureCount} sig.</span>
                     ${totalCasts > 0 ? `<span style="font-size:0.65rem;color:var(--text3);">🎯 ${successRate}%</span>` : ''}
-                    <button class="btn btn-sm btn-primary" onclick="window.spellbookAddSpell()">➕ Add</button>
-                    ${isFreeCaster ? `<button class="btn btn-sm btn-gold" onclick="window.spellbookFromTags()">🔮 From Tags</button>` : ''}
-                    <button class="btn btn-sm btn-secondary" onclick="window.spellbookTemplates()">📋 Templates</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.spellbookImport()">📥 Import</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.spellbookExport()">📤 Export</button>
-                    <button class="btn btn-sm btn-ghost" onclick="window.spellbookClearAll()" style="color:var(--red);" title="Clear all spells">🗑️</button>
+                    <button class="btn btn-sm btn-primary" onclick="window.spellbookAddSpell()" data-i18n="feature.spellcraft.components.spellbook.add">➕ Add</button>
+                    ${isFreeCaster ? `<button class="btn btn-sm btn-gold" onclick="window.spellbookFromTags()" data-i18n="feature.spellcraft.components.spellbook.fromTags">🔮 From Tags</button>` : ''}
+                    <button class="btn btn-sm btn-secondary" onclick="window.spellbookTemplates()" data-i18n="feature.spellcraft.components.spellbook.templates">📋 Templates</button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.spellbookImport()" data-i18n="feature.spellcraft.components.spellbook.import">📥 Import</button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.spellbookExport()" data-i18n="feature.spellcraft.components.spellbook.export">📤 Export</button>
+                    <button class="btn btn-sm btn-ghost" onclick="window.spellbookClearAll()" style="color:var(--red);" title="Clear all spells" data-i18n-attr="title:feature.spellcraft.components.spellbook.clearAllSpells">🗑️</button>
                 </div>
             </div>
 
@@ -860,9 +861,9 @@ export async function renderSpellbook(el) {
                     <option value="success" ${sortBy === 'success' ? 'selected' : ''}>Success Rate</option>
                 </select>
 
-                <span style="color:var(--text3);font-size:0.7rem;margin-left:0.3rem;">Filter:</span>
+                <span style="color:var(--text3);font-size:0.7rem;margin-inline-start:0.3rem;">Filter:</span>
                 <select id="spellbook-filter-tag" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.7rem;max-width:120px;">
-                    <option value="">All Tags</option>
+                    <option value="" data-i18n="feature.spellcraft.components.spellbook.allTags">All Tags</option>
                     ${tagOptions.map(t => `<option value="${escHtml(t)}" ${t === filterTag ? 'selected' : ''}>${escHtml(t)}</option>`).join('')}
                 </select>
 
@@ -872,7 +873,7 @@ export async function renderSpellbook(el) {
 
                 <input type="text" id="spellbook-filter-text" value="${escHtml(filterText)}" placeholder="Search..." style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.7rem;flex:1;min-width:100px;" />
 
-                <button class="btn btn-xs btn-ghost" onclick="window.spellbookClearFilters()" style="color:var(--text3);font-size:0.6rem;">✕ Clear</button>
+                <button class="btn btn-xs btn-ghost" onclick="window.spellbookClearFilters()" style="color:var(--text3);font-size:0.6rem;" data-i18n="feature.spellcraft.components.spellbook.clear">✕ Clear</button>
             </div>
 
             <!-- ─── Spell List ──────────────────────────────────── -->
@@ -888,8 +889,8 @@ export async function renderSpellbook(el) {
                 <p style="font-size:0.75rem;color:var(--text3);font-style:italic;">"The Weave does not reward empty pages." – Lysandra</p>
                 ${spells.length === 0 ? `
                     <div style="display:flex;gap:0.3rem;justify-content:center;margin-top:0.3rem;flex-wrap:wrap;">
-                        <button class="btn btn-sm btn-primary" onclick="window.spellbookAddSpell()">➕ Add Spell</button>
-                        <button class="btn btn-sm btn-gold" onclick="window.spellbookTemplates()">📋 Load Template</button>
+                        <button class="btn btn-sm btn-primary" onclick="window.spellbookAddSpell()" data-i18n="feature.spellcraft.components.spellbook.addSpell">➕ Add Spell</button>
+                        <button class="btn btn-sm btn-gold" onclick="window.spellbookTemplates()" data-i18n="feature.spellcraft.components.spellbook.loadTemplate">📋 Load Template</button>
                     </div>
                 ` : ''}
             </div>
@@ -914,7 +915,7 @@ export async function renderSpellbook(el) {
                 <select id="spellbook-template-select" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.3rem;font-size:0.75rem;">
                     ${templateOptionsHtml}
                 </select>
-                <button class="btn btn-xs btn-gold" onclick="window.spellbookLoadTemplateFromSelect()">Load</button>
+                <button class="btn btn-xs btn-gold" onclick="window.spellbookLoadTemplateFromSelect()" data-i18n="feature.spellcraft.components.spellbook.load">Load</button>
             </div>
 
             <!-- ─── Hidden category selector for forms ────────── -->
@@ -958,7 +959,7 @@ export async function renderSpellbook(el) {
                     <p style="font-size:0.75rem;color:var(--text3);font-style:italic;">
                         If you cannot repeat it, you have discovered an incident, not a spell. — Lysandra
                     </p>
-                    <button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove(); localStorage.setItem('fates-edge-spellbook-tutorial-shown', 'true');">Got it!</button>
+                    <button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove(); localStorage.setItem('fates-edge-spellbook-tutorial-shown', 'true');" data-i18n="feature.spellcraft.components.spellbook.gotIt">Got it!</button>
                 </div>
             `, 'info');
         }, 500);
@@ -1005,7 +1006,7 @@ function renderSpellItem(spell, index) {
     const sourceLabel = sourceLabels[source] || '📜';
 
     return `
-        <div class="spell-item" data-spell-id="${escHtml(id)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;border-left:3px solid ${signature ? 'var(--gold)' : 'var(--border)'};${signature ? 'border-right:2px solid var(--gold);' : ''}">
+        <div class="spell-item" data-spell-id="${escHtml(id)}" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:3px solid ${signature ? 'var(--gold)' : 'var(--border)'};${signature ? 'border-inline-end:2px solid var(--gold);' : ''}">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                 <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;min-width:0;">
                     ${signature ? '<span style="color:var(--gold);font-size:0.9rem;" title="Signature spell: +1 die when cast">⭐</span>' : ''}
@@ -1026,7 +1027,7 @@ function renderSpellItem(spell, index) {
                     <button class="btn btn-xs btn-ghost" onclick="window.spellbookDelete('${escHtml(id)}')" title="Delete" style="color:var(--red);font-size:0.6rem;">✕</button>
                 </div>
             </div>
-            ${description ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;line-height:1.4;padding-left:0.1rem;">${formatText(description)}</div>` : ''}
+            ${description ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;line-height:1.4;padding-inline-start:0.1rem;">${formatText(description)}</div>` : ''}
             ${tags.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.1rem;margin-top:0.1rem;">${tagBadges}</div>` : ''}
         </div>
     `;
@@ -1116,18 +1117,18 @@ window.spellbookAddSpell = async function() {
     const char = getCharacterData();
     if (!char) return;
 
-    const name = prompt('Spell name:');
+    const name = prompt(i18nText("feature.spellcraft.components.spellbook.spellName", null, "Spell name:"));
     if (!name) return;
 
-    const description = prompt('Description / Effect:') || '';
-    const tagsInput = prompt('Tags (space-separated, e.g., Burning Strike Area):') || '';
+    const description = prompt(i18nText("feature.spellcraft.components.spellbook.descriptionEffect", null, "Description / Effect:")) || '';
+    const tagsInput = prompt(i18nText("feature.spellcraft.components.spellbook.tagsSpaceSeparatedEGBurningStrike", null, "Tags (space-separated, e.g., Burning Strike Area):")) || '';
     const tags = tagsInput.trim() ? tagsInput.split(/\s+/) : [];
-    const dv = safeParseInt(prompt('DV (difficulty, default 2):') || '2', 2);
+    const dv = safeParseInt(prompt(i18nText("feature.spellcraft.components.spellbook.dvDifficultyDefault2", null, "DV (difficulty, default 2):")) || '2', 2);
 
     const category = await window.spellbookPromptCategory('Category:', 'Utility');
     if (category === null) return;
 
-    const costObligation = safeParseInt(prompt('Obligation cost (if any):') || '0', 0);
+    const costObligation = safeParseInt(prompt(i18nText("feature.spellcraft.components.spellbook.obligationCostIfAny", null, "Obligation cost (if any):")) || '0', 0);
 
     const newSpell = {
         id: generateId('spell_'),
@@ -1152,7 +1153,7 @@ window.spellbookAddSpell = async function() {
     if (!char.spellbook) char.spellbook = [];
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
-    showToast(`✨ "${name}" added to spellbook (DV ${dv}).`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.valueAddedToSpellbookDVValue", { value0: name, value1: dv }, "✨ \"{{value0}}\" added to spellbook (DV {{value1}})."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1161,20 +1162,20 @@ window.spellbookFromTags = async function() {
     const char = getCharacterData();
     if (!char) return;
 
-    const tagsInput = prompt('Enter TAGS (space-separated, e.g., Burning Strike Area):');
+    const tagsInput = prompt(i18nText("feature.spellcraft.components.spellbook.enterTAGSSpaceSeparatedEGBurning", null, "Enter TAGS (space-separated, e.g., Burning Strike Area):"));
     if (!tagsInput) return;
     const tags = tagsInput.trim().split(/\s+/).map(t => t.toUpperCase());
 
     const validTags = tags.filter(t => TAG_COLORS[t]);
     const invalidTags = tags.filter(t => !TAG_COLORS[t]);
     if (invalidTags.length > 0) {
-        showToast(`Unknown tags: ${invalidTags.join(', ')}. They will be included but have no color.`, 'warning');
+        showToast(i18nText("feature.spellcraft.components.spellbook.unknownTagsValueTheyWillBeIncluded", { value0: invalidTags.join(', ') }, "Unknown tags: {{value0}}. They will be included but have no color."), 'warning');
     }
 
     const dv = 1 + validTags.length;
-    const name = prompt('Spell name:', validTags.join(' ') || 'New Spell');
+    const name = prompt(i18nText("feature.spellcraft.components.spellbook.spellName", null, "Spell name:"), validTags.join(' ') || 'New Spell');
     if (!name) return;
-    const description = prompt('Description / Effect:') || '';
+    const description = prompt(i18nText("feature.spellcraft.components.spellbook.descriptionEffect", null, "Description / Effect:")) || '';
 
     const category = await window.spellbookPromptCategory('Category:', 'Utility');
     if (category === null) return;
@@ -1198,7 +1199,7 @@ window.spellbookFromTags = async function() {
     if (!char.spellbook) char.spellbook = [];
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
-    showToast(`🔮 "${name}" created from tags (DV ${dv}).`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.valueCreatedFromTagsDVValue", { value0: name, value1: dv }, "🔮 \"{{value0}}\" created from tags (DV {{value1}})."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1218,8 +1219,8 @@ window.spellbookTemplates = function() {
                     ${SPELL_TEMPLATES.map((t, i) => `<option value="${i}">${t.name} (DV ${t.dv}) — ${t.category}</option>`).join('')}
                 </select>
                 <div style="display:flex;gap:0.5rem;">
-                    <button class="btn btn-primary" id="template-prompt-confirm">Load</button>
-                    <button class="btn btn-secondary" id="template-prompt-cancel">Cancel</button>
+                    <button class="btn btn-primary" id="template-prompt-confirm" data-i18n="feature.spellcraft.components.spellbook.load">Load</button>
+                    <button class="btn btn-secondary" id="template-prompt-cancel" data-i18n="feature.spellcraft.components.spellbook.cancel">Cancel</button>
                 </div>
             </div>
         `;
@@ -1249,12 +1250,12 @@ window.spellbookTemplates = function() {
 window.spellbookLoadTemplateFromSelect = function() {
     const select = document.getElementById('spellbook-template-select');
     if (!select) {
-        showToast('Template dropdown not found. Please refresh.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.templateDropdownNotFoundPleaseRefresh", null, "Template dropdown not found. Please refresh."), 'error');
         return;
     }
     const idx = parseInt(select.value);
     if (isNaN(idx) || idx < 0 || idx >= SPELL_TEMPLATES.length) {
-        showToast('Invalid template selection.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.invalidTemplateSelection", null, "Invalid template selection."), 'error');
         return;
     }
     window.spellbookLoadTemplateByIndex(idx);
@@ -1284,7 +1285,7 @@ window.spellbookLoadTemplateByIndex = function(idx) {
     if (!char.spellbook) char.spellbook = [];
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
-    showToast(`📋 Template "${template.name}" added to spellbook.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.templateValueAddedToSpellbook", { value0: template.name }, "📋 Template \"{{value0}}\" added to spellbook."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1298,8 +1299,8 @@ window.spellbookPromptCategory = function(promptText, defaultValue = 'Utility') 
                     ${CATEGORIES.map(c => `<option value="${c}" ${c === defaultValue ? 'selected' : ''}>${getCategoryIcon(c)} ${c}</option>`).join('')}
                 </select>
                 <div style="display:flex;gap:0.5rem;">
-                    <button class="btn btn-primary" id="category-prompt-confirm">OK</button>
-                    <button class="btn btn-secondary" id="category-prompt-cancel">Cancel</button>
+                    <button class="btn btn-primary" id="category-prompt-confirm" data-i18n="feature.spellcraft.components.spellbook.ok">OK</button>
+                    <button class="btn btn-secondary" id="category-prompt-cancel" data-i18n="feature.spellcraft.components.spellbook.cancel">Cancel</button>
                 </div>
             </div>
         `;
@@ -1332,7 +1333,7 @@ window.spellbookCopySpell = function(id) {
     const char = getCharacterData();
     if (!char) return;
     const spell = char.spellbook.find(s => s.id === id);
-    if (!spell) return showToast('Spell not found.', 'error');
+    if (!spell) return showToast(i18nText("feature.spellcraft.components.spellbook.spellNotFound", null, "Spell not found."), 'error');
 
     const newSpell = {
         ...spell,
@@ -1347,7 +1348,7 @@ window.spellbookCopySpell = function(id) {
 
     char.spellbook.push(newSpell);
     saveCharacter({ spellbook: char.spellbook });
-    showToast(`📋 "${spell.name}" copied.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.valueCopied", { value0: spell.name }, "📋 \"{{value0}}\" copied."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1356,19 +1357,19 @@ window.spellbookEdit = async function(id) {
     const char = getCharacterData();
     if (!char) return;
     const spell = char.spellbook.find(s => s.id === id);
-    if (!spell) return showToast('Spell not found.', 'error');
+    if (!spell) return showToast(i18nText("feature.spellcraft.components.spellbook.spellNotFound", null, "Spell not found."), 'error');
 
-    const name = prompt('Spell name:', spell.name);
+    const name = prompt(i18nText("feature.spellcraft.components.spellbook.spellName", null, "Spell name:"), spell.name);
     if (name === null) return;
-    const description = prompt('Description:', spell.description || '') || '';
-    const tagsInput = prompt('Tags (space-separated):', (spell.tags || []).join(' ')) || '';
+    const description = prompt(i18nText("feature.spellcraft.components.spellbook.description", null, "Description:"), spell.description || '') || '';
+    const tagsInput = prompt(i18nText("feature.spellcraft.components.spellbook.tagsSpaceSeparated", null, "Tags (space-separated):"), (spell.tags || []).join(' ')) || '';
     const tags = tagsInput.trim() ? tagsInput.split(/\s+/) : [];
-    const dv = safeParseInt(prompt('DV:', spell.dv || 2), 2);
+    const dv = safeParseInt(prompt(i18nText("feature.spellcraft.components.spellbook.dv", null, "DV:"), spell.dv || 2), 2);
 
     const category = await window.spellbookPromptCategory('Category:', spell.category || 'Utility');
     if (category === null) return;
 
-    const costObligation = safeParseInt(prompt('Obligation cost:', spell.cost?.obligation || 0), 0);
+    const costObligation = safeParseInt(prompt(i18nText("feature.spellcraft.components.spellbook.obligationCost", null, "Obligation cost:"), spell.cost?.obligation || 0), 0);
 
     spell.name = name.trim();
     spell.description = description.trim();
@@ -1384,7 +1385,7 @@ window.spellbookEdit = async function(id) {
     spell.updatedAt = Date.now();
 
     saveCharacter({ spellbook: char.spellbook });
-    showToast('Spell updated.', 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.spellUpdated", null, "Spell updated."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1394,10 +1395,10 @@ window.spellbookDelete = function(id) {
     if (!char) return;
     const spell = char.spellbook.find(s => s.id === id);
     if (!spell) return;
-    if (!confirm(`Delete spell "${spell.name}"?`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.spellbook.deleteSpellValue", { value0: spell.name }, "Delete spell \"{{value0}}\"?"))) return;
     char.spellbook = char.spellbook.filter(s => s.id !== id);
     saveCharacter({ spellbook: char.spellbook });
-    showToast(`Deleted "${spell.name}"`, 'info');
+    showToast(i18nText("feature.spellcraft.components.spellbook.deletedValue", { value0: spell.name }, "Deleted \"{{value0}}\""), 'info');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1406,13 +1407,13 @@ window.spellbookClearAll = function() {
     const char = getCharacterData();
     if (!char) return;
     if (!char.spellbook || char.spellbook.length === 0) {
-        showToast('Spellbook is already empty.', 'info');
+        showToast(i18nText("feature.spellcraft.components.spellbook.spellbookIsAlreadyEmpty", null, "Spellbook is already empty."), 'info');
         return;
     }
-    if (!confirm('Delete ALL spells from your spellbook?')) return;
+    if (!confirm(i18nText("feature.spellcraft.components.spellbook.deleteALLSpellsFromYourSpellbook", null, "Delete ALL spells from your spellbook?"))) return;
     char.spellbook = [];
     saveCharacter({ spellbook: char.spellbook });
-    showToast('Spellbook cleared.', 'info');
+    showToast(i18nText("feature.spellcraft.components.spellbook.spellbookCleared", null, "Spellbook cleared."), 'info');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1445,23 +1446,23 @@ window.spellbookClearFilters = function() {
 window.spellbookSendToVTT = function(id) {
     const char = getCharacterData();
     if (!char) {
-        showToast('No character selected.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.noCharacterSelected", null, "No character selected."), 'error');
         return;
     }
     const spell = char.spellbook?.find(s => s.id === id);
     if (!spell) {
-        showToast('Spell not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.spellNotFound", null, "Spell not found."), 'error');
         return;
     }
 
     if (typeof window.sendToVTT !== 'function') {
-        showToast('VTT not available. Please open the VTT module first.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.vttNotAvailablePleaseOpenTheVTT", null, "VTT not available. Please open the VTT module first."), 'error');
         return;
     }
 
     const htmlCard = buildSpellCardHTML(spell, char);
     window.sendToVTT(htmlCard, 'System', { isHTML: true });
-    showToast(`📡 Spell card for "${spell.name}" sent to VTT.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.spellCardForValueSentToVTT", { value0: spell.name }, "📡 Spell card for \"{{value0}}\" sent to VTT."), 'success');
 };
 
 // ─── VTT Cast Button Listener ────────────────────────────────
@@ -1475,17 +1476,17 @@ document.addEventListener('click', function(e) {
     const spellId = target.dataset.spellId;
     const attr = target.dataset.attr; // 'wits' or 'spirit'
     if (!spellId) {
-        showToast('Spell ID missing.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.spellIDMissing", null, "Spell ID missing."), 'error');
         return;
     }
 
     const char = getCharacterData();
     if (!char) {
-        showToast('No character selected.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.noCharacterSelected", null, "No character selected."), 'error');
         return;
     }
     if ((char.magicPath || 'none') !== 'free-caster') {
-        showToast('Only Free Casters can cast spells.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.onlyFreeCastersCanCastSpells", null, "Only Free Casters can cast spells."), 'error');
         return;
     }
 
@@ -1500,7 +1501,7 @@ document.addEventListener('spell-cast-request', function(e) {
     const char = getCharacterData();
     if (!char) return;
     if ((char.magicPath || 'none') !== 'free-caster') {
-        showToast('Only Free Casters can cast spells.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.onlyFreeCastersCanCastSpells", null, "Only Free Casters can cast spells."), 'error');
         return;
     }
     window.spellbookUse(spellId, attribute);
@@ -1528,8 +1529,8 @@ window.spellbookUse = async function(id, attributeChoice) {
                     "The Weave answers those who speak its raw grammar." – Lysandra
                 </p>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-sm btn-primary" onclick="this.closest('.custom-toast-modal').remove(); window.location.hash='spellcraft';">📖 Go to Spellcraft</button>
-                    <button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove();">Close</button>
+                    <button class="btn btn-sm btn-primary" onclick="this.closest('.custom-toast-modal').remove(); window.location.hash='spellcraft';" data-i18n="feature.spellcraft.components.spellbook.goToSpellcraft">📖 Go to Spellcraft</button>
+                    <button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove();" data-i18n="feature.spellcraft.components.spellbook.close">Close</button>
                 </div>
             </div>
         `, 'warning');
@@ -1538,7 +1539,7 @@ window.spellbookUse = async function(id, attributeChoice) {
 
     const spell = char.spellbook.find(s => s.id === id);
     if (!spell) {
-        showToast('Spell not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.spellNotFound", null, "Spell not found."), 'error');
         return;
     }
 
@@ -1564,7 +1565,7 @@ window.spellbookUse = async function(id, attributeChoice) {
     const dv = spell.dv || 1;
 
     if (pool < 1) {
-        showToast('Dice pool must be at least 1 die. Increase your Wits/Spirit or Arcana.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.dicePoolMustBeAtLeast1", null, "Dice pool must be at least 1 die. Increase your Wits/Spirit or Arcana."), 'error');
         return;
     }
 
@@ -1603,7 +1604,7 @@ window.spellbookUse = async function(id, attributeChoice) {
     if (boonGain > 0) {
         char.boons = (char.boons || 0) + boonGain;
         if (char.boons > 5) char.boons = 5;
-        showToast(`+${boonGain} Boon${boonGain > 1 ? 's' : ''} gained.`, 'info');
+        showToast(i18nPlural('feature.spellcraft.components.spellbook.boonsGained', boonGain, null, '+{{count}} Boons gained.'), 'info');
     }
 
     saveCharacter({ spellbook: char.spellbook, boons: char.boons });
@@ -1674,7 +1675,7 @@ window.spellbookUse = async function(id, attributeChoice) {
 
     if (signatureBonus > 0 && outcome === 'clean') {
         setTimeout(() => {
-            showToast('⭐ Signature spell resonates! Extra die well spent.', 'success');
+            showToast(i18nText("feature.spellcraft.components.spellbook.signatureSpellResonatesExtraDieWellSpent", null, "⭐ Signature spell resonates! Extra die well spent."), 'success');
         }, 500);
     }
 
@@ -1694,8 +1695,8 @@ window.spellbookPromptAttribute = function() {
                     ${CAST_ATTRIBUTES.map(a => `<option value="${a.value}">${a.label}</option>`).join('')}
                 </select>
                 <div style="display:flex;gap:0.5rem;">
-                    <button class="btn btn-primary" id="attribute-prompt-confirm">Cast</button>
-                    <button class="btn btn-secondary" id="attribute-prompt-cancel">Cancel</button>
+                    <button class="btn btn-primary" id="attribute-prompt-confirm" data-i18n="feature.spellcraft.components.spellbook.cast">Cast</button>
+                    <button class="btn btn-secondary" id="attribute-prompt-cancel" data-i18n="feature.spellcraft.components.spellbook.cancel">Cancel</button>
                 </div>
             </div>
         `;
@@ -1732,14 +1733,14 @@ window.grimoireAddSpiritRelationship = function() {
     if (!char) return;
 
     if (!(char.learnedTalents || []).includes('true-name-keeper')) {
-        showToast('Requires the True Name Keeper talent (15 XP).', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.requiresTheTrueNameKeeperTalent15", null, "Requires the True Name Keeper talent (15 XP)."), 'error');
         return;
     }
 
-    const name = prompt('Spirit name/archetype (e.g., "Ashen Hollow-Wight"):');
+    const name = prompt(i18nText("feature.spellcraft.components.spellbook.spiritNameArchetypeEGAshenHollow", null, "Spirit name/archetype (e.g., \"Ashen Hollow-Wight\"):"));
     if (!name || !name.trim()) return;
-    const trueName = prompt('True Name (the word that binds it):') || '';
-    const nature = prompt('Nature (its temperament, domain, what it wants):') || '';
+    const trueName = prompt(i18nText("feature.spellcraft.components.spellbook.trueNameTheWordThatBindsIt", null, "True Name (the word that binds it):")) || '';
+    const nature = prompt(i18nText("feature.spellcraft.components.spellbook.natureItsTemperamentDomainWhatItWants", null, "Nature (its temperament, domain, what it wants):")) || '';
 
     if (!char.spiritRelationships) char.spiritRelationships = [];
     char.spiritRelationships.push({
@@ -1754,7 +1755,7 @@ window.grimoireAddSpiritRelationship = function() {
         createdAt: Date.now()
     });
     saveCharacter({ spiritRelationships: char.spiritRelationships });
-    showToast(`📖 "${name.trim()}" recorded in your Spirit Relationships.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.valueRecordedInYourSpiritRelationships", { value0: name.trim() }, "📖 \"{{value0}}\" recorded in your Spirit Relationships."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1763,15 +1764,15 @@ window.grimoireEditSpiritRelationship = function(id) {
     if (!char) return;
     const rel = (char.spiritRelationships || []).find(r => r.id === id);
     if (!rel) {
-        showToast('Spirit not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.spiritNotFound", null, "Spirit not found."), 'error');
         return;
     }
 
-    const name = prompt('Spirit name/archetype:', rel.name);
+    const name = prompt(i18nText("feature.spellcraft.components.spellbook.spiritNameArchetype", null, "Spirit name/archetype:"), rel.name);
     if (name === null) return;
-    const trueName = prompt('True Name:', rel.trueName || '');
-    const nature = prompt('Nature:', rel.nature || '');
-    const notes = prompt('Notes (history, debts, warnings):', rel.notes || '');
+    const trueName = prompt(i18nText("feature.spellcraft.components.spellbook.trueName", null, "True Name:"), rel.trueName || '');
+    const nature = prompt(i18nText("feature.spellcraft.components.spellbook.nature", null, "Nature:"), rel.nature || '');
+    const notes = prompt(i18nText("feature.spellcraft.components.spellbook.notesHistoryDebtsWarnings", null, "Notes (history, debts, warnings):"), rel.notes || '');
 
     rel.name = (name || rel.name).trim();
     rel.trueName = (trueName || '').trim();
@@ -1779,7 +1780,7 @@ window.grimoireEditSpiritRelationship = function(id) {
     rel.notes = (notes || '').trim();
 
     saveCharacter({ spiritRelationships: char.spiritRelationships });
-    showToast(`Updated "${rel.name}".`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.updatedValue", { value0: rel.name }, "Updated \"{{value0}}\"."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1790,7 +1791,7 @@ window.grimoireSetSpiritDisposition = function(id, disposition) {
     if (!rel) return;
     rel.disposition = disposition;
     saveCharacter({ spiritRelationships: char.spiritRelationships });
-    showToast(`"${rel.name}" is now ${disposition}.`, 'info');
+    showToast(i18nText("feature.spellcraft.components.spellbook.valueIsNowValue", { value0: rel.name, value1: disposition }, "\"{{value0}}\" is now {{value1}}."), 'info');
 };
 
 window.grimoireRecallSpirit = function(id) {
@@ -1798,22 +1799,22 @@ window.grimoireRecallSpirit = function(id) {
     if (!char) return;
 
     if (!(char.learnedTalents || []).includes('true-name-keeper')) {
-        showToast('Requires the True Name Keeper talent.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.requiresTheTrueNameKeeperTalent", null, "Requires the True Name Keeper talent."), 'error');
         return;
     }
 
     const rel = (char.spiritRelationships || []).find(r => r.id === id);
     if (!rel) {
-        showToast('Spirit not found.', 'error');
+        showToast(i18nText("feature.spellcraft.components.spellbook.spiritNotFound", null, "Spirit not found."), 'error');
         return;
     }
 
-    if (!confirm(`Call "${rel.name}" by its true name?\n\nPer True Name Keeper: Leash Capacity is reduced by 2 for this binding.`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.spellbook.callValueByItsTrueNamePer", { value0: rel.name }, "Call \"{{value0}}\" by its true name?\n\nPer True Name Keeper: Leash Capacity is reduced by 2 for this binding."))) return;
 
     rel.timesBound = (rel.timesBound || 0) + 1;
     rel.lastBound = Date.now();
     saveCharacter({ spiritRelationships: char.spiritRelationships });
-    showToast(`👁️ "${rel.name}" answers your call. (Leash Capacity −2 for this binding.) Set up the actual binding in the Summoning panel.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.valueAnswersYourCallLeashCapacity2", { value0: rel.name }, "👁️ \"{{value0}}\" answers your call. (Leash Capacity −2 for this binding.) Set up the actual binding in the Summoning panel."), 'success');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1822,10 +1823,10 @@ window.grimoireDeleteSpiritRelationship = function(id) {
     if (!char) return;
     const rel = (char.spiritRelationships || []).find(r => r.id === id);
     if (!rel) return;
-    if (!confirm(`Remove "${rel.name}" from your Spirit Relationships? This can't be undone.`)) return;
+    if (!confirm(i18nText("feature.spellcraft.components.spellbook.removeValueFromYourSpiritRelationshipsThis", { value0: rel.name }, "Remove \"{{value0}}\" from your Spirit Relationships? This can't be undone."))) return;
     char.spiritRelationships = (char.spiritRelationships || []).filter(r => r.id !== id);
     saveCharacter({ spiritRelationships: char.spiritRelationships });
-    showToast('Removed.', 'info');
+    showToast(i18nText("feature.spellcraft.components.spellbook.removed", null, "Removed."), 'info');
     renderSpellbook(getSpellbookMountEl());
 };
 
@@ -1838,7 +1839,7 @@ window.spellbookExport = function() {
     if (!char) return;
     const spells = char.spellbook || [];
     if (spells.length === 0) {
-        showToast('No spells to export.', 'info');
+        showToast(i18nText("feature.spellcraft.components.spellbook.noSpellsToExport", null, "No spells to export."), 'info');
         return;
     }
     const data = JSON.stringify(spells, null, 2);
@@ -1849,7 +1850,7 @@ window.spellbookExport = function() {
     a.download = `spellbook-${char.name || 'caster'}-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast(`📤 Exported ${spells.length} spells.`, 'success');
+    showToast(i18nText("feature.spellcraft.components.spellbook.exportedValueSpells", { value0: spells.length }, "📤 Exported {{value0}} spells."), 'success');
 };
 
 window.spellbookImport = function() {
@@ -1864,7 +1865,7 @@ window.spellbookImport = function() {
             try {
                 const imported = JSON.parse(ev.target.result);
                 if (!Array.isArray(imported)) {
-                    showToast('Invalid spellbook data.', 'error');
+                    showToast(i18nText("feature.spellcraft.components.spellbook.invalidSpellbookData", null, "Invalid spellbook data."), 'error');
                     return;
                 }
                 const char = getCharacterData();
@@ -1881,10 +1882,10 @@ window.spellbookImport = function() {
                     added++;
                 });
                 saveCharacter({ spellbook: char.spellbook });
-                showToast(`📥 Imported ${added} spells.`, 'success');
+                showToast(i18nText("feature.spellcraft.components.spellbook.importedValueSpells", { value0: added }, "📥 Imported {{value0}} spells."), 'success');
                 renderSpellbook(getSpellbookMountEl());
             } catch (err) {
-                showToast('Failed to parse spellbook JSON.', 'error');
+                showToast(i18nText("feature.spellcraft.components.spellbook.failedToParseSpellbookJSON", null, "Failed to parse spellbook JSON."), 'error');
             }
         };
         reader.readAsText(file);
@@ -1905,7 +1906,7 @@ function showToastWithHTML(html, type = 'info') {
     const modal = document.createElement('div');
     modal.className = 'custom-toast-modal';
     modal.style.cssText = `
-        position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
+        position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 9999;
         animation: toastFadeIn 0.2s ease;
     `;
     const inner = document.createElement('div');
@@ -1915,7 +1916,7 @@ function showToastWithHTML(html, type = 'info') {
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;
     `;
-    inner.innerHTML = html + `<br><button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove()">Close</button>`;
+    inner.innerHTML = html + `<br><button class="btn btn-sm btn-secondary" onclick="this.closest('.custom-toast-modal').remove()" data-i18n="feature.spellcraft.components.spellbook.close">Close</button>`;
     modal.appendChild(inner);
     document.body.appendChild(modal);
 

@@ -1,4 +1,5 @@
 // modules/persistence.js
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState as saveGlobalState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { isConnectedToServer, onWSEvent, offWSEvent, sendMessage } from '@core/websocket.js';
@@ -224,12 +225,12 @@ function broadcastWhiteboardUpdate() {
 
 export function forceSync() {
     if (isOfflineMode || !isConnectedToServer()) {
-        showToast('Cannot sync – you are offline', 'warning');
+        showToast(i18nText("feature.whiteboard.modules.persistence.cannotSyncYouAreOffline", null, "Cannot sync – you are offline"), 'warning');
         return;
     }
     broadcastWhiteboardUpdate();
     sendMessage({ type: 'sync-request', target: 'whiteboard' });
-    showToast('Whiteboard sync requested', 'success');
+    showToast(i18nText("feature.whiteboard.modules.persistence.whiteboardSyncRequested", null, "Whiteboard sync requested"), 'success');
 }
 
 // Placeholder for updateConnectionStatusUI - will be imported from ui later

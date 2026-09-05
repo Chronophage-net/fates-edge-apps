@@ -180,8 +180,8 @@ async function buildStatusHtml() {
     return `
         <div class="panel">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <h3>🩺 System Status</h3>
-                <button class="btn btn-sm" id="system-status-refresh">🔄 Refresh</button>
+                <h3 data-i18n="feature.system-status.systemStatus">🩺 System Status</h3>
+                <button class="btn btn-sm" id="system-status-refresh" data-i18n="feature.system-status.refresh">🔄 Refresh</button>
             </div>
             <p class="text-muted small">Auto-refreshes every ${REFRESH_INTERVAL_MS / 1000}s while this page is open.</p>
 
@@ -216,7 +216,7 @@ async function buildStatusHtml() {
                         <div class="status-row"><span>Status</span>${badge(sync.isConnected ? 'Connected' : (sync.isConnecting ? 'Connecting…' : 'Disconnected'), sync.isConnected ? 'green' : (sync.isConnecting ? 'gold' : 'red'))}</div>
                         <div class="status-row"><span>Queued (offline) ops</span>${badge(String(sync.offlineQueueSize ?? 0), sync.offlineQueueSize ? 'gold' : 'green')}</div>
                         <div class="status-row"><span>Pending acks</span>${badge(String(sync.pendingOperations ?? 0), 'blue')}</div>
-                    ` : `<p class="text-muted small">Sync manager unavailable.</p>`}
+                    ` : `<p class="text-muted small" data-i18n="feature.system-status.syncManagerUnavailable">Sync manager unavailable.</p>`}
                 </div>
 
                 <div class="panel">
@@ -236,11 +236,11 @@ async function buildStatusHtml() {
                     ${(searchStatus.solrConfigured || searchStatus.elasticsearchConfigured) ? `
                         <div class="status-row"><span>Solr configured</span>${badge(searchStatus.solrConfigured ? 'Yes' : 'No', searchStatus.solrConfigured ? 'green' : 'blue')}</div>
                         <div class="status-row"><span>Elasticsearch configured</span>${badge(searchStatus.elasticsearchConfigured ? 'Yes' : 'No', searchStatus.elasticsearchConfigured ? 'green' : 'blue')}</div>
-                    ` : `<p class="text-muted small">No external search backend configured — using the built-in local index.</p>`}
+                    ` : `<p class="text-muted small" data-i18n="feature.system-status.noExternalSearchBackendConfiguredUsingThe">No external search backend configured — using the built-in local index.</p>`}
                 </div>
 
                 <div class="panel">
-                    <h4>🌐 Browser Capabilities</h4>
+                    <h4 data-i18n="feature.system-status.browserCapabilities">🌐 Browser Capabilities</h4>
                     ${capabilityRow('WebRTC', caps.webrtc)}
                     ${capabilityRow('Microphone (getUserMedia)', caps.getUserMedia)}
                     ${capabilityRow('Screen capture (getDisplayMedia)', caps.displayMedia)}

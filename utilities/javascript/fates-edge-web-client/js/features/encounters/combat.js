@@ -10,6 +10,7 @@
  * ✅ Weapon range rules: melee vs ranged vs Reach-tagged weapons
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
@@ -86,7 +87,7 @@ function adjustSB(delta) {
 
 function spendSB(cost, label) {
     if (gmStoryBeats < cost) {
-        showToast(`Need ${cost} SB; only ${gmStoryBeats} available.`, 'warning');
+        showToast(i18nText("feature.encounters.combat.needValueSBOnlyValueAvailable", { value0: cost, value1: gmStoryBeats }, "Need {{value0}} SB; only {{value1}} available."), 'warning');
         return false;
     }
     gmStoryBeats -= cost;
@@ -97,7 +98,7 @@ function spendSB(cost, label) {
         logToSession(`💥 SB spent (${cost}): ${label}`, 'danger');
         addVTTEvent('sb_spent', { cost, label });
     } catch (e) { /* ignore */ }
-    showToast(`Spent ${cost} SB — ${label}`, 'success');
+    showToast(i18nText("feature.encounters.combat.spentValueSBValue", { value0: cost, value1: label }, "Spent {{value0}} SB — {{value1}}"), 'success');
     return true;
 }
 
@@ -373,7 +374,7 @@ function buildRangeGridHtml() {
             }).join('');
             return `
                 <tr>
-                    <th style="padding:0.4rem 0.6rem;text-align:right;font-size:0.8rem;color:var(--text);white-space:nowrap;">
+                    <th style="padding:0.4rem 0.6rem;text-align: end;font-size:0.8rem;color:var(--text);white-space:nowrap;">
                         ${escHtml(p.name)}
                     </th>
                     ${cells}
@@ -390,7 +391,7 @@ function buildRangeGridHtml() {
     }
 
     const legend = RANGE_BANDS.map(b => `
-        <span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--text2);margin-right:0.9rem;">
+        <span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--text2);margin-inline-end:0.9rem;">
             <span style="width:10px;height:10px;border-radius:3px;background:${b.color};display:inline-block;"></span>
             <strong style="color:var(--text);">${b.label}</strong> — ${b.desc}
         </span>`).join('');
@@ -476,7 +477,7 @@ export async function openTracker(encounterId) {
     const state = getState();
     const encounter = state.encounters?.find(e => String(e.id) === String(encounterId));
     if (!encounter) {
-        showToast('Encounter not found.', 'error');
+        showToast(i18nText("feature.encounters.combat.encounterNotFound", null, "Encounter not found."), 'error');
         return;
     }
 
@@ -708,7 +709,7 @@ function renderTracker() {
                                 border-radius: 4px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
                             "></div>
                         </div>
-                        <span style="font-size: 0.75rem; color: var(--text2); min-width: 40px; text-align: right;">
+                        <span style="font-size: 0.75rem; color: var(--text2); min-width: 40px; text-align: end;">
                             ${c.harm}/${c.maxHarm}
                         </span>
                     </div>
@@ -768,7 +769,7 @@ function renderTracker() {
                     </h2>
                     <div style="color:var(--text2);font-size:0.85rem;margin-top:0.25rem;">
                         ${combatants.length} combatants · Round ${round} · ${combatants.filter(c => c.status === 'active').length} active
-                        <span style="margin-left:0.5rem;font-size:0.7rem;color:var(--text3);">[Space: next · R: reset timer]</span>
+                        <span style="margin-inline-start:0.5rem;font-size:0.7rem;color:var(--text3);">[Space: next · R: reset timer]</span>
                     </div>
                 </div>
                 <button id="combat-close" style="
@@ -819,8 +820,8 @@ function renderTracker() {
                         </div>
                     </div>
                     <div style="display:flex;gap:0.5rem;">
-                        <button class="btn btn-sm btn-primary" id="combat-timer-tick" style="padding:0.4rem 0.75rem;font-size:0.85rem;">+1 Segment</button>
-                        <button class="btn btn-sm btn-ghost" id="combat-timer-reset" style="padding:0.4rem 0.75rem;font-size:0.85rem;">↺ Reset</button>
+                        <button class="btn btn-sm btn-primary" id="combat-timer-tick" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.1Segment">+1 Segment</button>
+                        <button class="btn btn-sm btn-ghost" id="combat-timer-reset" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.reset">↺ Reset</button>
                         <button class="btn btn-sm btn-ghost" id="combat-timer-rename" style="padding:0.4rem 0.75rem;font-size:0.85rem;">✏️</button>
                     </div>
                 </div>
@@ -842,17 +843,17 @@ function renderTracker() {
             <!-- Combatants -->
             <div style="margin-bottom: 1.25rem;">
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
-                    <h3 style="margin:0;color:var(--gold);">👾 Combatants</h3>
+                    <h3 style="margin:0;color:var(--gold);" data-i18n="feature.encounters.combat.combatants">👾 Combatants</h3>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                        <button class="btn btn-sm btn-primary" id="combat-add-combatant" style="padding:0.4rem 0.75rem;font-size:0.85rem;">+ Adversary</button>
-                        <button class="btn btn-sm btn-ghost" id="combat-add-player" style="padding:0.4rem 0.75rem;font-size:0.85rem;">👤 Player</button>
-                        <button class="btn btn-sm btn-ghost" id="combat-import-factions" style="padding:0.4rem 0.75rem;font-size:0.85rem;">🏛️ Import</button>
-                        <button class="btn btn-sm btn-ghost" id="combat-import-bestiary" style="padding:0.4rem 0.75rem;font-size:0.85rem;">📖 Bestiary</button>
-                        <button class="btn btn-sm btn-ghost" id="combat-sort" style="padding:0.4rem 0.75rem;font-size:0.85rem;">🔄 Sort</button>
+                        <button class="btn btn-sm btn-primary" id="combat-add-combatant" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.adversary">+ Adversary</button>
+                        <button class="btn btn-sm btn-ghost" id="combat-add-player" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.player">👤 Player</button>
+                        <button class="btn btn-sm btn-ghost" id="combat-import-factions" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.import">🏛️ Import</button>
+                        <button class="btn btn-sm btn-ghost" id="combat-import-bestiary" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.bestiary">📖 Bestiary</button>
+                        <button class="btn btn-sm btn-ghost" id="combat-sort" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.sort">🔄 Sort</button>
                         <button class="btn btn-sm ${rangeGridOpen ? 'btn-gold' : 'btn-ghost'}" id="combat-toggle-ranges" style="padding:0.4rem 0.75rem;font-size:0.85rem;">📏 Ranges</button>
                     </div>
                 </div>
-                <div id="combatant-list" style="max-height: 380px; overflow-y: auto; padding-right: 0.5rem;">
+                <div id="combatant-list" style="max-height: 380px; overflow-y: auto; padding-inline-end: 0.5rem;">
                     ${combatantsHtml || '<div style="color:var(--text3);padding:2rem;text-align:center;">No combatants. Add some to begin!</div>'}
                 </div>
             </div>
@@ -860,7 +861,7 @@ function renderTracker() {
             <!-- Story Beats Panel -->
             <div style="background:var(--bg3);padding:1rem;border-radius:12px;margin-bottom:1.25rem;border:1px solid var(--border);">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.6rem;">
-                    <h3 style="margin:0;color:var(--danger);">⚡ Story Beats</h3>
+                    <h3 style="margin:0;color:var(--danger);" data-i18n="feature.encounters.combat.storyBeats">⚡ Story Beats</h3>
                     <div style="display:flex;align-items:center;gap:0.3rem;">
                         <span style="font-size:0.8rem;color:var(--text2);">Bank:</span>
                         <button class="btn btn-xs btn-ghost sb-minus" style="font-weight:bold;">−</button>
@@ -887,10 +888,10 @@ function renderTracker() {
 
             <!-- Controls -->
             <div style="display:flex;flex-wrap:wrap;gap:0.75rem;border-top:1px solid var(--border);padding-top:1.25rem;">
-                <button class="btn btn-primary" id="combat-next" style="flex:1;min-width:100px;padding:0.6rem;">⏭️ Next Turn</button>
-                <button class="btn btn-ghost" id="combat-end-round" style="flex:1;min-width:100px;padding:0.6rem;">🔚 End Round</button>
-                <button class="btn btn-ghost" id="combat-clear-log" style="flex:0 0 auto;padding:0.6rem;">🗑️ Log</button>
-                <button class="btn btn-danger" id="combat-close-tracker" style="flex:1;min-width:100px;padding:0.6rem;">✖️ Close</button>
+                <button class="btn btn-primary" id="combat-next" style="flex:1;min-width:100px;padding:0.6rem;" data-i18n="feature.encounters.combat.nextTurn">⏭️ Next Turn</button>
+                <button class="btn btn-ghost" id="combat-end-round" style="flex:1;min-width:100px;padding:0.6rem;" data-i18n="feature.encounters.combat.endRound">🔚 End Round</button>
+                <button class="btn btn-ghost" id="combat-clear-log" style="flex:0 0 auto;padding:0.6rem;" data-i18n="feature.encounters.combat.log">🗑️ Log</button>
+                <button class="btn btn-danger" id="combat-close-tracker" style="flex:1;min-width:100px;padding:0.6rem;" data-i18n="feature.encounters.combat.close">✖️ Close</button>
             </div>
         </div>
 
@@ -900,6 +901,7 @@ function renderTracker() {
             @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
             .combatant-entry { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
             .combatant-entry:hover:not(.defeated) { background: var(--bg4) !important; transform: translateX(4px); }
+            [dir="rtl"] .combatant-entry:hover:not(.defeated) { transform: translateX(-4px); }
             .combatant-entry.active { border-color: var(--gold) !important; background: rgba(212,175,55,0.1) !important; }
             .combatant-entry.defeated .combatant-number { background: var(--bg4) !important; }
             #combatant-list::-webkit-scrollbar { width: 6px; }
@@ -933,18 +935,18 @@ function renderTracker() {
         timerSegments = Math.min(timerSegments + 1, timerMax);
         addLog('info', `Timer advanced to ${timerSegments}/${timerMax}`);
         renderTracker();
-        showToast(`⏱️ Timer advanced to ${timerSegments}/${timerMax}`, 'info');
+        showToast(i18nText("feature.encounters.combat.timerAdvancedToValueValue", { value0: timerSegments, value1: timerMax }, "⏱️ Timer advanced to {{value0}}/{{value1}}"), 'info');
     });
 
     modal.querySelector('#combat-timer-reset')?.addEventListener('click', () => {
         timerSegments = 0;
         addLog('info', 'Timer reset');
         renderTracker();
-        showToast('⏱️ Timer reset', 'info');
+        showToast(i18nText("feature.encounters.combat.timerReset", null, "⏱️ Timer reset"), 'info');
     });
 
     modal.querySelector('#combat-timer-rename')?.addEventListener('click', () => {
-        const newName = prompt('Enter timer name:', timerName);
+        const newName = prompt(i18nText("feature.encounters.combat.enterTimerName", null, "Enter timer name:"), timerName);
         if (newName) {
             timerName = newName;
             addLog('info', `Timer renamed to "${timerName}"`);
@@ -966,7 +968,7 @@ function renderTracker() {
         chip.addEventListener('click', (e) => {
             e.stopPropagation();
             if (!canSetRange()) {
-                showToast('Only the GM can change ranges.', 'warning');
+                showToast(i18nText("feature.encounters.combat.onlyTheGMCanChangeRanges", null, "Only the GM can change ranges."), 'warning');
                 return;
             }
             cycleRangeBand(chip.dataset.a, chip.dataset.b);
@@ -977,7 +979,7 @@ function renderTracker() {
         cell.addEventListener('click', (e) => {
             e.stopPropagation();
             if (!canSetRange()) {
-                showToast('Only the GM can change ranges.', 'warning');
+                showToast(i18nText("feature.encounters.combat.onlyTheGMCanChangeRanges", null, "Only the GM can change ranges."), 'warning');
                 return;
             }
             cycleRangeBand(cell.dataset.a, cell.dataset.b);
@@ -990,7 +992,7 @@ function renderTracker() {
     modal.querySelector('#combat-clear-log')?.addEventListener('click', () => {
         combatLog = [];
         renderTracker();
-        showToast('🧹 Combat log cleared', 'info');
+        showToast(i18nText("feature.encounters.combat.combatLogCleared", null, "🧹 Combat log cleared"), 'info');
     });
 
     // SB bank controls
@@ -1018,7 +1020,7 @@ function renderTracker() {
                 activeIndex = idx;
                 renderTracker();
                 addLog('info', `Focused on ${combatants[idx].name}`);
-                showToast(`🎯 Focused on ${combatants[idx].name}`, 'info');
+                showToast(i18nText("feature.encounters.combat.focusedOnValue", { value0: combatants[idx].name }, "🎯 Focused on {{value0}}"), 'info');
             }
         });
     });
@@ -1115,16 +1117,16 @@ export function logExternalAction(sender, message, type = 'info') {
 }
 
 function promptWeaponClass(defaultClass) {
-    const typePrompt = (prompt('Weapon class: light, medium, heavy, or ranged', defaultClass || 'medium') || defaultClass || 'medium').toLowerCase();
+    const typePrompt = (prompt(i18nText("feature.encounters.combat.weaponClassLightMediumHeavyOrRanged", null, "Weapon class: light, medium, heavy, or ranged"), defaultClass || 'medium') || defaultClass || 'medium').toLowerCase();
     return WEAPON_CLASS_LABEL[typePrompt] ? typePrompt : 'medium';
 }
 
 function addCombatant() {
-    const name = prompt('Enter adversary name:');
+    const name = prompt(i18nText("feature.encounters.combat.enterAdversaryName", null, "Enter adversary name:"));
     if (!name) return;
-    const initiative = parseInt(prompt('Enter initiative (1-20):', Math.floor(Math.random() * 20) + 1) || '10');
-    const harm = parseInt(prompt('Max Harm (1-20):', '3') || '3');
-    const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
+    const initiative = parseInt(prompt(i18nText("feature.encounters.combat.enterInitiative120", null, "Enter initiative (1-20):"), Math.floor(Math.random() * 20) + 1) || '10');
+    const harm = parseInt(prompt(i18nText("feature.encounters.combat.maxHarm120", null, "Max Harm (1-20):"), '3') || '3');
+    const armorPrompt = prompt(i18nText("feature.encounters.combat.armorTypeNoneLightMediumHeavyDefault", null, "Armor type: none, light, medium, heavy (default: none)"), 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
     const weaponClass = promptWeaponClass('medium');
 
@@ -1154,15 +1156,15 @@ function addCombatant() {
     sortCombatants();
     addLog('info', `Added adversary: ${name}`);
     renderTracker();
-    showToast(`👾 Added ${name}`, 'success');
+    showToast(i18nText("feature.encounters.combat.addedValue", { value0: name }, "👾 Added {{value0}}"), 'success');
 }
 
 function addPlayer() {
-    const name = prompt('Enter player name:');
+    const name = prompt(i18nText("feature.encounters.combat.enterPlayerName", null, "Enter player name:"));
     if (!name) return;
-    const initiative = parseInt(prompt('Enter initiative (1-20):', Math.floor(Math.random() * 20) + 1) || '10');
-    const harm = parseInt(prompt('Max Harm (1-20):', '4') || '4');
-    const armorPrompt = prompt('Armor type: none, light, medium, heavy (default: none)', 'none') || 'none';
+    const initiative = parseInt(prompt(i18nText("feature.encounters.combat.enterInitiative120", null, "Enter initiative (1-20):"), Math.floor(Math.random() * 20) + 1) || '10');
+    const harm = parseInt(prompt(i18nText("feature.encounters.combat.maxHarm120", null, "Max Harm (1-20):"), '4') || '4');
+    const armorPrompt = prompt(i18nText("feature.encounters.combat.armorTypeNoneLightMediumHeavyDefault", null, "Armor type: none, light, medium, heavy (default: none)"), 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
     const weaponClass = promptWeaponClass('medium');
 
@@ -1187,26 +1189,26 @@ function addPlayer() {
     sortCombatants();
     addLog('info', `Added player: ${name}`);
     renderTracker();
-    showToast(`👤 Added player ${name}`, 'success');
+    showToast(i18nText("feature.encounters.combat.addedPlayerValue", { value0: name }, "👤 Added player {{value0}}"), 'success');
 }
 
 function importFromFactions() {
     const state = getState();
     if (!state.factions) {
-        showToast('No factions data found.', 'warning');
+        showToast(i18nText("feature.encounters.combat.noFactionsDataFound", null, "No factions data found."), 'warning');
         return;
     }
     const factions = state.factions.factions || [];
     if (factions.length === 0) {
-        showToast('No factions to import from.', 'warning');
+        showToast(i18nText("feature.encounters.combat.noFactionsToImportFrom", null, "No factions to import from."), 'warning');
         return;
     }
     const options = factions.map((f, i) => `${i+1}. ${f.name}`).join('\n');
-    const choice = prompt(`Select a faction to import as a combatant:\n${options}\n\nEnter number:`);
+    const choice = prompt(i18nText("feature.encounters.combat.selectAFactionToImportAsA", { value0: options }, "Select a faction to import as a combatant:\n{{value0}}\n\nEnter number:"));
     if (!choice) return;
     const idx = parseInt(choice) - 1;
     if (idx < 0 || idx >= factions.length) {
-        showToast('Invalid selection', 'error');
+        showToast(i18nText("feature.encounters.combat.invalidSelection", null, "Invalid selection"), 'error');
         return;
     }
     const faction = factions[idx];
@@ -1233,13 +1235,13 @@ function importFromFactions() {
     sortCombatants();
     addLog('info', `Imported faction: ${faction.name}`);
     renderTracker();
-    showToast(`🏛️ Imported ${faction.name}`, 'success');
+    showToast(i18nText("feature.encounters.combat.importedValue", { value0: faction.name }, "🏛️ Imported {{value0}}"), 'success');
 }
 
 async function importFromBestiary() {
     const creatures = await loadBestiaryData();
     if (!creatures || creatures.length === 0) {
-        showToast('Bestiary not loaded yet.', 'error');
+        showToast(i18nText("feature.encounters.combat.bestiaryNotLoadedYet", null, "Bestiary not loaded yet."), 'error');
         return;
     }
 
@@ -1254,12 +1256,12 @@ async function importFromBestiary() {
         border: 1px solid var(--border); margin: 0.75rem auto 0; max-width: 520px;
     `;
     searchModal.innerHTML = `
-        <h3 style="margin-top:0;">📖 Import from Bestiary</h3>
+        <h3 style="margin-top:0;" data-i18n="feature.encounters.combat.importFromBestiary">📖 Import from Bestiary</h3>
         <input type="text" id="bestiary-import-search" placeholder="Search creatures..."
-               style="width:100%; padding:0.4rem; margin-bottom:0.5rem;">
+               style="width:100%; padding:0.4rem; margin-bottom:0.5rem;" data-i18n-attr="placeholder:feature.encounters.combat.searchCreatures">
         <div id="bestiary-import-list" style="max-height:300px; overflow-y:auto;"></div>
         <button id="bestiary-import-close" class="btn btn-sm btn-ghost"
-                style="margin-top:0.5rem;">Close</button>
+                style="margin-top:0.5rem;" data-i18n="feature.encounters.combat.close_q68uf">Close</button>
     `;
     modal?.appendChild(searchModal);
 
@@ -1353,7 +1355,7 @@ async function importFromBestiary() {
                 sortCombatants();
                 addLog('info', `Imported bestiary creature: ${entry.name}`);
                 renderTracker();
-                showToast(`📖 Imported ${entry.name}`, 'success');
+                showToast(i18nText("feature.encounters.combat.importedValue_pggae", { value0: entry.name }, "📖 Imported {{value0}}"), 'success');
                 searchModal.remove();
             });
         });
@@ -1375,13 +1377,13 @@ function sortCombatants() {
     activeIndex = 0;
     addLog('info', 'Sorted combatants by initiative');
     renderTracker();
-    showToast('🔄 Combatants sorted by initiative', 'info');
+    showToast(i18nText("feature.encounters.combat.combatantsSortedByInitiative", null, "🔄 Combatants sorted by initiative"), 'info');
 }
 
 function nextCombatant() {
     const active = combatants.filter(c => c.status === 'active');
     if (active.length === 0) {
-        showToast('No active combatants.', 'info');
+        showToast(i18nText("feature.encounters.combat.noActiveCombatants", null, "No active combatants."), 'info');
         return;
     }
     let nextIndex = (activeIndex + 1) % combatants.length;
@@ -1391,7 +1393,7 @@ function nextCombatant() {
             activeIndex = nextIndex;
             addLog('turn', `${combatants[activeIndex].name}'s turn`);
             renderTracker();
-            showToast(`⏭️ ${combatants[activeIndex].name}'s turn`, 'info');
+            showToast(i18nText("feature.encounters.combat.valueSTurn", { value0: combatants[activeIndex].name }, "⏭️ {{value0}}'s turn"), 'info');
             return;
         }
         nextIndex = (nextIndex + 1) % combatants.length;
@@ -1407,10 +1409,10 @@ function endRound() {
     addLog('info', `Round ${round} begins`);
     timerSegments = Math.min(timerSegments + 1, timerMax);
     renderTracker();
-    showToast(`🔚 Round ${round} begins`, 'info');
+    showToast(i18nText("feature.encounters.combat.roundValueBegins", { value0: round }, "🔚 Round {{value0}} begins"), 'info');
     if (timerSegments >= timerMax) {
         addLog('warning', 'Timer completed!');
-        showToast('⏱️ Timer completed!', 'warning');
+        showToast(i18nText("feature.encounters.combat.timerCompleted", null, "⏱️ Timer completed!"), 'warning');
     }
 }
 
@@ -1424,7 +1426,7 @@ function damageCombatant(idx) {
 
     const amount = parseInt(prompt(isCombat ? 'Damage amount:' : `${objType.progressLabel} amount:`, '1') || '1');
     if (isNaN(amount) || amount < 1) {
-        showToast('Invalid amount.', 'error');
+        showToast(i18nText("feature.encounters.combat.invalidAmount", null, "Invalid amount."), 'error');
         return;
     }
 
@@ -1439,9 +1441,9 @@ function damageCombatant(idx) {
             c.status = 'resolved';
             const maxIsSuccess = c.maxMeansSuccess === true;
             addLog('damage', `${c.name}'s ${objType.label} clock is full — ${maxIsSuccess ? 'succeeded' : 'failed'}!`);
-            showToast(`${maxIsSuccess ? '✅' : '❌'} ${c.name}'s ${objType.label} clock is full!`, maxIsSuccess ? 'success' : 'error');
+            showToast(i18nText("feature.encounters.combat.valueValueSValueClockIsFull", { value0: maxIsSuccess ? '✅' : '❌', value1: c.name, value2: objType.label }, "{{value0}} {{value1}}'s {{value2}} clock is full!"), maxIsSuccess ? 'success' : 'error');
         } else {
-            showToast(`${objType.icon} ${c.name}: ${objType.progressLabel} ${c.harm}/${c.maxHarm}`, 'warning');
+            showToast(i18nText("feature.encounters.combat.valueValueValueValueValue", { value0: objType.icon, value1: c.name, value2: objType.progressLabel, value3: c.harm, value4: c.maxHarm }, "{{value0}} {{value1}}: {{value2}} {{value3}}/{{value4}}"), 'warning');
         }
         renderTracker();
         return;
@@ -1462,14 +1464,14 @@ function damageCombatant(idx) {
         if (c.harm >= c.maxHarm && c.status !== 'defeated') {
             c.status = 'defeated';
             addLog('damage', `${c.name} is defeated!`);
-            showToast(`💀 ${c.name} is defeated!`, 'error');
+            showToast(i18nText("feature.encounters.combat.valueIsDefeated", { value0: c.name }, "💀 {{value0}} is defeated!"), 'error');
         } else {
-            showToast(`💥 ${c.name} takes ${converted.harm} harm (${c.harm}/${c.maxHarm})`, 'warning');
+            showToast(i18nText("feature.encounters.combat.valueTakesValueHarmValueValue", { value0: c.name, value1: converted.harm, value2: c.harm, value3: c.maxHarm }, "💥 {{value0}} takes {{value1}} harm ({{value2}}/{{value3}})"), 'warning');
         }
     } else if (converted.fatigue > 0) {
-        showToast(`🛡️ ${c.name} absorbs harm, gains ${converted.fatigue} Fatigue`, 'info');
+        showToast(i18nText("feature.encounters.combat.valueAbsorbsHarmGainsValueFatigue", { value0: c.name, value1: converted.fatigue }, "🛡️ {{value0}} absorbs harm, gains {{value1}} Fatigue"), 'info');
     } else {
-        showToast(`🛡️ ${c.name}'s armor completely absorbs the damage.`, 'info');
+        showToast(i18nText("feature.encounters.combat.valueSArmorCompletelyAbsorbsTheDamage", { value0: c.name }, "🛡️ {{value0}}'s armor completely absorbs the damage."), 'info');
     }
     renderTracker();
 }
@@ -1487,10 +1489,10 @@ function healCombatant(idx) {
         if (c.status === 'resolved' && c.harm < c.maxHarm) {
             c.status = 'active';
             addLog('heal', `${c.name}'s ${objType.label} clock reopens — no longer resolved.`);
-            showToast(`${objType.icon} ${c.name}'s clock reopens`, 'success');
+            showToast(i18nText("feature.encounters.combat.valueValueSClockReopens", { value0: objType.icon, value1: c.name }, "{{value0}} {{value1}}'s clock reopens"), 'success');
         } else {
             addLog('heal', `${c.name} ${objType.reliefVerb}s ${amount} ${objType.reliefLabel} (${c.harm}/${c.maxHarm})`);
-            showToast(`${objType.icon} ${c.name}: ${objType.reliefLabel} ${c.harm}/${c.maxHarm}`, 'success');
+            showToast(i18nText("feature.encounters.combat.valueValueValueValueValue", { value0: objType.icon, value1: c.name, value2: objType.reliefLabel, value3: c.harm, value4: c.maxHarm }, "{{value0}} {{value1}}: {{value2}} {{value3}}/{{value4}}"), 'success');
         }
         renderTracker();
         return;
@@ -1500,10 +1502,10 @@ function healCombatant(idx) {
     if (c.status === 'defeated' && c.harm < c.maxHarm) {
         c.status = 'active';
         addLog('heal', `${c.name} revived!`);
-        showToast(`💚 ${c.name} revived!`, 'success');
+        showToast(i18nText("feature.encounters.combat.valueRevived", { value0: c.name }, "💚 {{value0}} revived!"), 'success');
     } else {
         addLog('heal', `${c.name} healed for ${amount} (${c.harm}/${c.maxHarm})`);
-        showToast(`💚 ${c.name} healed for ${amount}`, 'success');
+        showToast(i18nText("feature.encounters.combat.valueHealedForValue", { value0: c.name, value1: amount }, "💚 {{value0}} healed for {{value1}}"), 'success');
     }
     renderTracker();
 }
@@ -1528,7 +1530,9 @@ function toggleCombatant(idx) {
         const c = combatants[idx];
         c.status = c.status === 'active' ? 'inactive' : 'active';
         addLog('info', `${c.name} ${c.status === 'active' ? 'activated' : 'deactivated'}`);
-        showToast(`${c.name} ${c.status === 'active' ? 'activated' : 'deactivated'}`, 'info');
+        showToast(c.status === 'active'
+            ? i18nText('feature.encounters.combat.combatantActivated', { name: c.name }, '{{name}} activated')
+            : i18nText('feature.encounters.combat.combatantDeactivated', { name: c.name }, '{{name}} deactivated'), 'info');
         renderTracker();
     }
 }
@@ -1546,7 +1550,7 @@ function cycleWeaponType(idx) {
 
 function removeCombatant(idx) {
     if (idx >= 0 && idx < combatants.length) {
-        if (confirm(`Remove ${combatants[idx].name}?`)) {
+        if (confirm(i18nText("feature.encounters.combat.removeValue", { value0: combatants[idx].name }, "Remove {{value0}}?"))) {
             const name = combatants[idx].name;
             const removedId = combatants[idx].id;
             combatants.splice(idx, 1);
@@ -1554,7 +1558,7 @@ function removeCombatant(idx) {
             if (activeIndex >= combatants.length) activeIndex = Math.max(0, combatants.length - 1);
             addLog('info', `Removed ${name}`);
             renderTracker();
-            showToast(`🗑️ Removed ${name}`, 'info');
+            showToast(i18nText("feature.encounters.combat.removedValue", { value0: name }, "🗑️ Removed {{value0}}"), 'info');
         }
     }
 }

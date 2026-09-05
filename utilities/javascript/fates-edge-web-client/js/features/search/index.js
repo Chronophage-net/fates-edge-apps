@@ -66,15 +66,15 @@ function getBackendPreference() { return window.__SEARCH_BACKEND || null; }
 export function render(el) {
     container = el;
     container.innerHTML = `
-        <h1 class="page-title">🔍 Search Everything</h1>
-        <p class="page-sub">Find rules, documents, wiki entries, and more.</p>
+        <h1 class="page-title" data-i18n="feature.search.searchEverything">🔍 Search Everything</h1>
+        <p class="page-sub" data-i18n="feature.search.findRulesDocumentsWikiEntriesAndMore">Find rules, documents, wiki entries, and more.</p>
         <div class="panel">
             <div class="form-row">
                 <div class="field large">
-                    <input type="text" id="search-input" placeholder="Type your search…" autofocus />
+                    <input type="text" id="search-input" placeholder="Type your search…" autofocus / data-i18n-attr="placeholder:feature.search.typeYourSearch">
                 </div>
-                <button class="btn btn-gold" id="search-button">Search</button>
-                <button class="btn btn-secondary" id="search-rebuild-btn">🔄 Rebuild Index</button>
+                <button class="btn btn-gold" id="search-button" data-i18n="feature.search.search">Search</button>
+                <button class="btn btn-secondary" id="search-rebuild-btn" data-i18n="feature.search.rebuildIndex">🔄 Rebuild Index</button>
             </div>
             <div id="search-status" class="text-muted small mt-1" style="padding:0.3rem 0;"></div>
             <div id="search-results" class="mt-1" style="max-height:500px;overflow-y:auto;"></div>

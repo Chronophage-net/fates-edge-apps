@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-04T14:22:38.739Z",
+  "generated": "2026-09-05T15:54:48.482Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -159,6 +159,116 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_documento_de_referencia_del_sistema_espa_ol",
+      "title": "Fate's Edge — Documento de referencia del sistema (Español)",
+      "file": "Documento-de-referencia-del-sistema.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_dj_cap_tulo_2_procedimientos_b_sicos_espa_ol",
+      "title": "Fate's Edge — Guía del DJ — Capítulo 2: Procedimientos básicos (Español)",
+      "file": "DJ-02-Procedimientos-basicos.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_dj_lista_de_comprobaci_n_de_la_sesi_n_cero_espa_ol",
+      "title": "Fate's Edge — Guía del DJ — Lista de comprobación de la sesión cero (Español)",
+      "file": "DJ-I-Sesion-cero.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_dj_seguridad_e_inclusi_n_espa_ol",
+      "title": "Fate's Edge — Guía del DJ — Seguridad e inclusión (Español)",
+      "file": "DJ-E-Seguridad-e-inclusion.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_dj_tablas_de_referencia_espa_ol",
+      "title": "Fate's Edge — Guía del DJ — Tablas de referencia (Español)",
+      "file": "DJ-A-Tablas-de-referencia.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_jugador_cap_tulo_1_inicio_r_pido_espa_ol",
+      "title": "Fate's Edge — Guía del jugador — Capítulo 1: Inicio rápido (Español)",
+      "file": "Jugadores-01-Inicio-rapido.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_jugador_cap_tulo_2_creaci_n_de_personajes_espa_ol",
+      "title": "Fate's Edge — Guía del jugador — Capítulo 2: Creación de personajes (Español)",
+      "file": "Jugadores-02-Creacion-de-personajes.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_jugador_cap_tulo_3_mec_nicas_b_sicas_espa_ol",
+      "title": "Fate's Edge — Guía del jugador — Capítulo 3: Mecánicas básicas (Español)",
+      "file": "Jugadores-03-Mecanicas-basicas.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_del_jugador_referencia_r_pida_espa_ol",
+      "title": "Fate's Edge — Guía del jugador — Referencia rápida (Español)",
+      "file": "Jugadores-19-Referencia-rapida.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_gu_a_esencial_espa_ol",
+      "title": "Fate's Edge — Guía esencial (Español)",
+      "file": "Guia-esencial.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fate_s_edge_inicio_r_pido_espa_ol",
+      "title": "Fate's Edge — Inicio rápido (Español)",
+      "file": "Inicio-rapido.html",
+      "path": "/data/docs/es/",
+      "category": "es",
+      "categoryLabel": "Español",
       "core": false,
       "active": true
     },
@@ -1050,7 +1160,7 @@
       "active": true
     }
   ],
-  "total_count": 69,
-  "active_count": 69,
+  "total_count": 80,
+  "active_count": 80,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

@@ -1,4 +1,5 @@
 // modules/combat.js
+import { t as i18nText } from '@core/i18n.js';
 import { state, ctx, canvas, getLayer, isLayerVisibleNow, layersInDrawOrder, isLayerLocked, tableModeActive } from './state.js';
 import { drawFogOfWar, paintFogCell } from './fog.js';
 import { GRID_COLORS } from './constants.js';
@@ -304,20 +305,20 @@ function drawKonrehBoardOverlay(cellSize) {
 // ── Token Management ──
 export function addGridToken() {
     if (!gridCombatActive || konrehActive) {
-        showToast('Disable Kon\'reh mode to add custom tokens', 'error');
+        showToast(i18nText("feature.whiteboard.modules.combat.disableKonRehModeToAddCustom", null, "Disable Kon'reh mode to add custom tokens"), 'error');
         return;
     }
     if (isLayerLocked('tokens')) {
-        showToast('Tokens & Grid layer is locked', 'warning');
+        showToast(i18nText("feature.whiteboard.modules.combat.tokensGridLayerIsLocked", null, "Tokens & Grid layer is locked"), 'warning');
         return;
     }
 
-    const name = prompt('Token label:', 'Guard');
+    const name = prompt(i18nText("feature.whiteboard.modules.combat.tokenLabel", null, "Token label:"), 'Guard');
     if (!name) return;
-    const faction = prompt('Faction (ally or enemy):', 'enemy')?.toLowerCase() || 'enemy';
-    const bodyStr = prompt('Body Attribute (for movement):', '3');
+    const faction = prompt(i18nText("feature.whiteboard.modules.combat.factionAllyOrEnemy", null, "Faction (ally or enemy):"), 'enemy')?.toLowerCase() || 'enemy';
+    const bodyStr = prompt(i18nText("feature.whiteboard.modules.combat.bodyAttributeForMovement", null, "Body Attribute (for movement):"), '3');
     const body = parseInt(bodyStr) || 3;
-    const visionStr = prompt('Vision radius in cells (0 = no vision, 3 = default for allies):',
+    const visionStr = prompt(i18nText("feature.whiteboard.modules.combat.visionRadiusInCells0NoVision", null, "Vision radius in cells (0 = no vision, 3 = default for allies):"),
         faction === 'ally' ? '3' : '0');
     const vision = parseInt(visionStr) || 0;
 
@@ -341,16 +342,16 @@ export function addGridToken() {
     saveWhiteboardData();
     renderGridCombat();
     logRecordingEvent('token_add', `${name} (${faction}) added.`);
-    showToast(`⚔️ Token "${name}" added`, 'success');
+    showToast(i18nText("feature.whiteboard.modules.combat.tokenValueAdded", { value0: name }, "⚔️ Token \"{{value0}}\" added"), 'success');
 }
 
 export function clearGridTokens() {
     if (!gridCombatActive) return;
-    if (!confirm('Remove all tokens?')) return;
+    if (!confirm(i18nText("feature.whiteboard.modules.combat.removeAllTokens", null, "Remove all tokens?"))) return;
     state.gridCombat.tokens = [];
     saveWhiteboardData();
     renderGridCombat();
-    showToast('🗑️ All tokens removed', 'info');
+    showToast(i18nText("feature.whiteboard.modules.combat.allTokensRemoved", null, "🗑️ All tokens removed"), 'info');
 }
 
 // ── Kon'reh Toggle ──
@@ -372,7 +373,7 @@ export function toggleKonreh() {
     if (konrehActive) {
         konrehActive = false;
         konrehGame = null;
-        showToast("Kon'reh mode disabled", 'info');
+        showToast(i18nText("feature.whiteboard.modules.combat.konRehModeDisabled", null, "Kon'reh mode disabled"), 'info');
         const btn = document.getElementById('whiteboard-konreh');
         if (btn) btn.className = 'btn btn-sm btn-secondary';
         document.getElementById('whiteboard-add-token').style.display = 'inline-block';
@@ -416,7 +417,7 @@ export function toggleKonreh() {
     restoreDrawings();
     renderGridCombat();
     import('./ui.js').then(ui => ui.renderVttCombatToolbar());
-    showToast("🌀 Kon'reh Mode enabled! Drag pieces to play.", 'success');
+    showToast(i18nText("feature.whiteboard.modules.combat.konRehModeEnabledDragPiecesTo", null, "🌀 Kon'reh Mode enabled! Drag pieces to play."), 'success');
 }
 
 // ── Tracker Import ──

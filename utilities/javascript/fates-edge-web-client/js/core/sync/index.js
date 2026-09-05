@@ -6,6 +6,7 @@
  * and presence tracking.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState, mergeState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { OfflineQueue } from './offline-queue.js';
@@ -617,7 +618,7 @@ export class SyncManager {
           this.startHeartbeat();
           
           this.notifyListeners('connection_change', this.getConnectionStatus());
-          this._showToast('Connected to campaign server!', 'success');
+          this._showToast(i18nText("feature.core.sync.connectedToCampaignServer", null, "Connected to campaign server!"), 'success');
           resolve();
         };
         
@@ -641,7 +642,7 @@ export class SyncManager {
             reason: event.reason || 'Connection closed'
           });
           
-          this._showToast('Disconnected from server. Reconnecting...', 'warning');
+          this._showToast(i18nText("feature.core.sync.disconnectedFromServerReconnecting", null, "Disconnected from server. Reconnecting..."), 'warning');
           this.handleReconnect();
         };
         
@@ -675,7 +676,7 @@ export class SyncManager {
     this.clientId = null;
     
     this.notifyListeners('connection_change', this.getConnectionStatus());
-    this._showToast('Disconnected from campaign.', 'info');
+    this._showToast(i18nText("feature.core.sync.disconnectedFromCampaign", null, "Disconnected from campaign."), 'info');
   }
 
   /**
@@ -858,9 +859,11 @@ buildWebSocketUrl(serverUrl, campaignCode) {
         state: getState()
       });
 
-      this._showToast('Sync ready!', 'success');
+      this._showToast(i18nText("feature.core.sync.syncReady", null, "Sync ready!"), 'success');
     } else {
-      this._showToast('Failed to join campaign: ' + (message.reason || 'Unknown error'), 'error');
+      this._showToast(i18nText('feature.core.sync.failedToJoinCampaignValue', {
+        value0: message.reason || i18nText('common.unknownError', null, 'Unknown error')
+      }, 'Failed to join campaign: {{value0}}'), 'error');
     }
   }
 
@@ -923,7 +926,7 @@ buildWebSocketUrl(serverUrl, campaignCode) {
         state: message.state,
         version: this.versionVector
       });
-      this._showToast('Full sync complete.', 'success');
+      this._showToast(i18nText("feature.core.sync.fullSyncComplete", null, "Full sync complete."), 'success');
     }
   }
 
@@ -951,7 +954,7 @@ buildWebSocketUrl(serverUrl, campaignCode) {
 
   handleError(message) {
     console.error('Server error:', message.error, message.details);
-    this._showToast('Server error: ' + message.error, 'error');
+    this._showToast(i18nText("feature.core.sync.serverErrorValue", { value0: message.error }, "Server error: {{value0}}"), 'error');
 
     const errorMessages = {
       'CAMPAIGN_NOT_FOUND': 'Campaign not found. Check your campaign code.',
@@ -1195,7 +1198,7 @@ buildWebSocketUrl(serverUrl, campaignCode) {
 
   async handleReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      this._showToast('Unable to reconnect after multiple attempts. Please refresh.', 'error');
+      this._showToast(i18nText("feature.core.sync.unableToReconnectAfterMultipleAttemptsPlease", null, "Unable to reconnect after multiple attempts. Please refresh."), 'error');
       return;
     }
 
@@ -1214,7 +1217,7 @@ buildWebSocketUrl(serverUrl, campaignCode) {
           })
             .then(() => {
               this.offlineQueue.flush((op) => this.send(op));
-              this._showToast('Reconnected to campaign!', 'success');
+              this._showToast(i18nText("feature.core.sync.reconnectedToCampaign", null, "Reconnected to campaign!"), 'success');
             })
             .catch(() => this.handleReconnect());
         }
@@ -1236,7 +1239,7 @@ buildWebSocketUrl(serverUrl, campaignCode) {
     };
 
     const handleOffline = () => {
-      this._showToast('You are offline. Changes will be queued.', 'warning');
+      this._showToast(i18nText("feature.core.sync.youAreOfflineChangesWillBeQueued", null, "You are offline. Changes will be queued."), 'warning');
     };
 
     safeAddEventListener(window, 'online', handleOnline);

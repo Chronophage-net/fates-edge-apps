@@ -35,6 +35,7 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
 import { getState, addCharacter } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
@@ -377,7 +378,7 @@ function injectModalStyles() {
             background: var(--bg2, #2a2a2a);
             padding: 0.6rem 0.8rem;
             border-radius: 6px;
-            border-left: 3px solid var(--gold, #c9a84c);
+            border-inline-start: 3px solid var(--gold, #c9a84c);
             margin: 0.5rem 0;
             font-size: 0.8rem;
             color: var(--text2, #aaa);
@@ -389,7 +390,7 @@ function injectModalStyles() {
             padding: 0.3rem 0.5rem;
             background: rgba(255,255,255,0.03);
             border-radius: 4px;
-            border-left: 2px solid var(--gold, #c9a84c);
+            border-inline-start: 2px solid var(--gold, #c9a84c);
         }
         .talent-catalog {
             max-height: 200px;
@@ -408,7 +409,7 @@ function injectModalStyles() {
         }
         .talent-catalog-item:last-child { border-bottom: none; }
         .talent-catalog-item .talent-info { flex: 1; }
-        .talent-catalog-item .btn-xs { margin-left: 0.3rem; }
+        .talent-catalog-item .btn-xs { margin-inline-start: 0.3rem; }
         /* Cantor fields style */
         .cantor-fields {
             border-top: 1px solid var(--border, #444);
@@ -436,17 +437,17 @@ function ensureModal() {
 
     modal.innerHTML = `
         <div class="wizard-content">
-            <button id="wizardModalClose" class="btn btn-secondary editor-back">← Cancel</button>
+            <button id="wizardModalClose" class="btn btn-secondary editor-back" data-i18n="feature.characters.wizard.cancel">← Cancel</button>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                <h3 id="wizard-title" style="margin:0;">Character Wizard</h3>
+                <h3 id="wizard-title" style="margin:0;" data-i18n="feature.characters.wizard.characterWizard">Character Wizard</h3>
             </div>
             <div id="wizard-progress" style="display:flex;gap:0.5rem;margin-bottom:1.2rem;justify-content:center;">
                 ${[1,2,3,4,5].map(() => `<div class="wizard-progress-step"></div>`).join('')}
             </div>
             <div id="wizard-steps"></div>
             <div style="display:flex;justify-content:space-between;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border, #444);">
-                <button id="wizard-back" class="btn btn-secondary">← Back</button>
-                <button id="wizard-next" class="btn btn-gold">Next →</button>
+                <button id="wizard-back" class="btn btn-secondary" data-i18n="feature.characters.wizard.back">← Back</button>
+                <button id="wizard-next" class="btn btn-gold" data-i18n="feature.characters.wizard.next">Next →</button>
             </div>
         </div>
     `;
@@ -579,7 +580,7 @@ export async function openWizard() {
         attachEvents();
     } catch (err) {
         console.error('[Wizard] openWizard error:', err);
-        showToast('Could not open the character wizard: ' + (err.message || err), 'error');
+        showToast(i18nText("feature.characters.wizard.couldNotOpenTheCharacterWizardValue", { value0: err.message || err }, "Could not open the character wizard: {{value0}}"), 'error');
     }
 }
 
@@ -609,7 +610,7 @@ export function wizardBack() {
 
 export function wizardNext() {
     if (!state.data) {
-        showToast('Wizard not initialized.', 'error');
+        showToast(i18nText("feature.characters.wizard.wizardNotInitialized", null, "Wizard not initialized."), 'error');
         return;
     }
     if (!collectStepData()) return;
@@ -637,7 +638,7 @@ function collectStepData() {
         }
     } catch (err) {
         console.error('[Wizard] collect error:', err);
-        showToast('Error collecting data. Try again.', 'error');
+        showToast(i18nText("feature.characters.wizard.errorCollectingDataTryAgain", null, "Error collecting data. Try again."), 'error');
         return false;
     }
 }
@@ -646,7 +647,7 @@ function collectIdentity(d) {
     const nameInput = document.querySelector('#wz-name');
     const name = nameInput?.value.trim() || '';
     if (!name) {
-        showToast('Character name is required.', 'error');
+        showToast(i18nText("feature.characters.wizard.characterNameIsRequired", null, "Character name is required."), 'error');
         if (nameInput) {
             nameInput.style.borderColor = 'var(--red)';
             nameInput.focus();
@@ -714,9 +715,9 @@ function collectTalentsAndLoadout(d) {
             d.patron = derived;
             const patronSelect = document.querySelector('#wz-patron');
             if (patronSelect) patronSelect.value = derived;
-            showToast(`🔮 Patron auto-set to ${derived} from Thiasos/Codex.`, 'info');
+            showToast(i18nText("feature.characters.wizard.patronAutoSetToValueFromThiasos", { value0: derived }, "🔮 Patron auto-set to {{value0}} from Thiasos/Codex."), 'info');
         } else if (d.thiasos || d.codex) {
-            showToast('⚠️ Thiasos/Codex selected but patron could not be auto-detected. Please select a patron.', 'warning');
+            showToast(i18nText("feature.characters.wizard.thiasosCodexSelectedButPatronCouldNot", null, "⚠️ Thiasos/Codex selected but patron could not be auto-detected. Please select a patron."), 'warning');
         }
     }
     
@@ -766,7 +767,7 @@ function collectBondsAndFinish(d) {
     
     if (spent > d.startingXp) {
         const over = spent - d.startingXp;
-        showToast(`Character is ${over} XP over budget (${spent} spent, ${d.startingXp} available). You can still save — GM may allow.`, 'warning');
+        showToast(i18nText("feature.characters.wizard.characterIsValueXPOverBudgetValue", { value0: over, value1: spent, value2: d.startingXp }, "Character is {{value0}} XP over budget ({{value1}} spent, {{value2}} available). You can still save — GM may allow."), 'warning');
     }
     
     return true;
@@ -848,11 +849,11 @@ function readCompList() {
 function finishWizard() {
     const d = state.data;
     if (!d) {
-        showToast('No character data to save.', 'error');
+        showToast(i18nText("feature.characters.wizard.noCharacterDataToSave", null, "No character data to save."), 'error');
         return;
     }
     if (!d.name || !d.name.trim()) {
-        showToast('Character name is required.', 'error');
+        showToast(i18nText("feature.characters.wizard.characterNameIsRequired", null, "Character name is required."), 'error');
         state.step = 0;
         renderStep();
         return;
@@ -899,16 +900,14 @@ function finishWizard() {
 
     if (d.xpSpent > d.startingXp) {
         const proceed = confirm(
-            `This character is ${d.xpSpent - d.startingXp} XP over budget.\n` +
-            `Spent: ${d.xpSpent} XP | Available: ${d.startingXp} XP\n\n` +
-            `Save anyway? (GM may allow overspend.)`
+            i18nText("feature.characters.wizard.thisCharacterIsValueXPOverBudget", { value0: d.xpSpent - d.startingXp, value1: d.xpSpent, value2: d.startingXp }, "This character is {{value0}} XP over budget.\nSpent: {{value1}} XP | Available: {{value2}} XP\n\nSave anyway? (GM may allow overspend.)")
         );
         if (!proceed) return;
     }
 
     try {
         addCharacter(d);
-        showToast(`✨ "${d.name}" created! Tier ${d.tier} (${d.tierName}), ${d.totalXp} XP.`, 'success');
+        showToast(i18nText("feature.characters.wizard.valueCreatedTierValueValueValueXP", { value0: d.name, value1: d.tier, value2: d.tierName, value3: d.totalXp }, "✨ \"{{value0}}\" created! Tier {{value1}} ({{value2}}), {{value3}} XP."), 'success');
         closeWizard();
 
         import('./index.js')
@@ -921,7 +920,7 @@ function finishWizard() {
         }
     } catch (err) {
         console.error('[Wizard] Save error:', err);
-        showToast('Error saving character. Please try again.', 'error');
+        showToast(i18nText("feature.characters.wizard.errorSavingCharacterPleaseTryAgain", null, "Error saving character. Please try again."), 'error');
     }
 }
 
@@ -939,7 +938,7 @@ function renderStep() {
     if (!stepsEl || !nextBtn || !backBtn) return;
 
     const stepNames = ['Identity', 'Attributes', 'Skills', 'Talents & Loadout', 'Bonds & Summary'];
-    titleEl.textContent = `Character Wizard — Step ${state.step + 1}: ${stepNames[state.step]}`;
+    titleEl.textContent = i18nText("feature.characters.wizard.characterWizardStepValueValue", { value0: state.step + 1, value1: stepNames[state.step] }, "Character Wizard — Step {{value0}}: {{value1}}");
     backBtn.style.display = state.step === 0 ? 'none' : 'inline-block';
     nextBtn.textContent = state.step === 4 ? '✨ Finish' : 'Next →';
 
@@ -1006,7 +1005,7 @@ function renderStep0Identity(d) {
     
     return `
         <div>
-            <h3 style="margin-top:0;">🪪 Step 1 — Identity & Concept</h3>
+            <h3 style="margin-top:0;" data-i18n="feature.characters.wizard.step1IdentityConcept">🪪 Step 1 — Identity & Concept</h3>
             <div class="info-box">
                 Write one sentence describing your character's origin, profession, and one defining trait.
                 Choose your ancestry — each heritage provides attribute adjustments and special abilities.
@@ -1016,10 +1015,10 @@ function renderStep0Identity(d) {
                 <div>
                     <label>Name <span style="color:var(--red);">*</span></label>
                     <input id="wz-name" value="${escHtml(d.name)}" placeholder="Enter character name..." autofocus />
-                    <span class="field-hint">Required</span>
+                    <span class="field-hint" data-i18n="feature.characters.wizard.required">Required</span>
                 </div>
                 <div>
-                    <label>Heritage / Ancestry</label>
+                    <label data-i18n="feature.characters.wizard.heritageAncestry">Heritage / Ancestry</label>
                     <select id="wz-heritage">${heritageOptions}</select>
                     <div class="heritage-note" id="wz-heritage-note">
                         <strong>Adjustments:</strong> ${escHtml(heritage?.adj || 'None')}<br>
@@ -1027,40 +1026,40 @@ function renderStep0Identity(d) {
                     </div>
                 </div>
                 <div>
-                    <label>Region of Origin</label>
+                    <label data-i18n="feature.characters.wizard.regionOfOrigin">Region of Origin</label>
                     <select id="wz-region">${regionOptions}</select>
-                    <span class="field-hint">Grants a once-per-session cultural benefit</span>
+                    <span class="field-hint" data-i18n="feature.characters.wizard.grantsAOncePerSessionCulturalBenefit">Grants a once-per-session cultural benefit</span>
                 </div>
                 <div>
-                    <label>Cultural Affinity</label>
+                    <label data-i18n="feature.characters.wizard.culturalAffinity">Cultural Affinity</label>
                     <input id="wz-cultural-affinity" value="${escHtml(d.culturalAffinity || '')}" placeholder="Specific cultural trait or benefit" />
                 </div>
             </div>
             
-            <h4 style="margin:0.8rem 0 0.3rem;">Background</h4>
+            <h4 style="margin:0.8rem 0 0.3rem;" data-i18n="feature.characters.wizard.background">Background</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Backgrounds provide: 2 Access Tags, 1 Signature Contact (+1d assist once/scene), 
                 1 Background Boon (+1d or DV−1 once/session), 1 Obligation Timer [4] (starting complication).
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
-                    <label>Background Name</label>
+                    <label data-i18n="feature.characters.wizard.backgroundName">Background Name</label>
                     <input id="wz-background" value="${escHtml(d.background || '')}" placeholder="e.g., Marcher Veteran, Merchant Factor" />
                 </div>
                 <div>
-                    <label>Background Tags</label>
+                    <label data-i18n="feature.characters.wizard.backgroundTags">Background Tags</label>
                     <input id="wz-background-tags" value="${escHtml(d.backgroundTags || '')}" placeholder="e.g., Veteran-of-the-Marches, Muster Papers" />
                 </div>
                 <div>
-                    <label>Signature Contact</label>
+                    <label data-i18n="feature.characters.wizard.signatureContact">Signature Contact</label>
                     <input id="wz-background-contact" value="${escHtml(d.backgroundContact || '')}" placeholder="Named NPC (Cap 1, +1d assist)" />
                 </div>
                 <div>
-                    <label>Background Boon</label>
+                    <label data-i18n="feature.characters.wizard.backgroundBoon">Background Boon</label>
                     <input id="wz-background-boon" value="${escHtml(d.backgroundBoon || '')}" placeholder="Once/session: +1d or DV−1" />
                 </div>
                 <div style="grid-column:1/-1;">
-                    <label>Obligation Timer [4] Seed</label>
+                    <label data-i18n="feature.characters.wizard.obligationTimer4Seed">Obligation Timer [4] Seed</label>
                     <input id="wz-background-obligation" value="${escHtml(d.backgroundObligation || '')}" placeholder="Starting complication: what debt follows you?" />
                 </div>
             </div>
@@ -1080,7 +1079,7 @@ function renderStep1Attributes(d) {
     
     return `
         <div>
-            <h3 style="margin-top:0;">⚡ Step 2 — Attributes (1–5)</h3>
+            <h3 style="margin-top:0;" data-i18n="feature.characters.wizard.step2Attributes15">⚡ Step 2 — Attributes (1–5)</h3>
             <div class="info-box">
                 <strong>Cost:</strong> Each step costs new rating × 3 XP. Base is 1 each.
                 <br>1→2 = 6 XP | 2→3 = 9 XP | 3→4 = 12 XP | 4→5 = 15 XP
@@ -1092,7 +1091,7 @@ function renderStep1Attributes(d) {
                     const val = d[attr.id] ?? 1;
                     const cost = calculateAttributeCost(1, val);
                     return `
-                        <div class="stat-item" style="text-align:left;">
+                        <div class="stat-item" style="text-align: start;">
                             <label style="font-weight:600;font-size:0.9rem;">${attr.name}</label>
                             <input type="number" id="wz-${attr.id}" value="${val}" min="1" max="5" 
                                 style="width:100%;text-align:center;font-size:1.2rem;" 
@@ -1140,7 +1139,7 @@ function renderStep2Skills(d) {
                 </div>
                 <input type="number" id="wz-sk-${key}" value="${val}" min="0" max="5" 
                     style="width:60px;text-align:center;" data-skill="${key}" data-attr="${attrId}" />
-                <div style="font-size:0.65rem;color:var(--gold);width:50px;text-align:right;" id="wz-sk-${key}-cost">
+                <div style="font-size:0.65rem;color:var(--gold);width:50px;text-align: end;" id="wz-sk-${key}-cost">
                     ${val > 0 ? `${cost}XP` : '—'}
                 </div>
             </div>
@@ -1149,7 +1148,7 @@ function renderStep2Skills(d) {
     
     return `
         <div>
-            <h3 style="margin-top:0;">📚 Step 3 — Skills (0–5)</h3>
+            <h3 style="margin-top:0;" data-i18n="feature.characters.wizard.step3Skills05">📚 Step 3 — Skills (0–5)</h3>
             <div class="info-box">
                 <strong>Cost:</strong> Each step costs new level × 2 XP. Base is 0.
                 <br>0→1 = 2 XP | 1→2 = 4 XP | 2→3 = 6 XP | 3→4 = 8 XP | 4→5 = 10 XP
@@ -1263,11 +1262,11 @@ function renderTalentCatalog() {
             ${header}
             <div class="talent-catalog-item" style="${t._affordable ? '' : 'opacity:0.55;'}">
                 <div class="talent-info">
-                    ${t._recommended ? '<span title="Common starting talent" style="margin-right:0.2rem;">⭐</span>' : ''}
+                    ${t._recommended ? '<span title="Common starting talent" style="margin-inline-end:0.2rem;">⭐</span>' : ''}
                     <span style="font-weight:500;">${escHtml(t.name)}</span>
-                    <span style="color:var(--gold); margin-left:0.3rem;">${cost} XP</span>
-                    <span style="color:var(--text3); font-size:0.75rem; margin-left:0.3rem;">(${tierLabel})</span>
-                    ${!t._affordable ? `<span style="color:var(--text3); font-size:0.7rem; margin-left:0.3rem;">— need ${cost - remainingXp} more XP</span>` : ''}
+                    <span style="color:var(--gold); margin-inline-start:0.3rem;">${cost} XP</span>
+                    <span style="color:var(--text3); font-size:0.75rem; margin-inline-start:0.3rem;">(${tierLabel})</span>
+                    ${!t._affordable ? `<span style="color:var(--text3); font-size:0.7rem; margin-inline-start:0.3rem;">— need ${cost - remainingXp} more XP</span>` : ''}
                     ${t.description ? `<div style="color:var(--text2); font-size:0.7rem;">${escHtml(t.description)}</div>` : ''}
                     ${t.prerequisites ? `<div style="color:var(--text3); font-size:0.65rem;">Requires: ${escHtml(t.prerequisites)}</div>` : ''}
                 </div>
@@ -1313,8 +1312,8 @@ export function addCustomTalentRow() {
     const row = document.createElement('div');
     row.className = 'dynamic-row wz-talent-row';
     row.innerHTML = `
-        <input type="text" class="wz-talent-name" placeholder="Talent name" style="flex:2;" />
-        <input type="number" class="wz-talent-cost" placeholder="XP" value="0" min="0" style="width:60px;" />
+        <input type="text" class="wz-talent-name" placeholder="Talent name" style="flex:2;" / data-i18n-attr="placeholder:feature.characters.wizard.talentName">
+        <input type="number" class="wz-talent-cost" placeholder="XP" value="0" min="0" style="width:60px;" / data-i18n-attr="placeholder:feature.characters.wizard.xp">
         <button class="wizard-remove-btn">✕</button>
     `;
     listEl.appendChild(row);
@@ -1356,12 +1355,12 @@ function renderStep3TalentsAndLoadout(d) {
             </div>
             <div style="display:flex; gap:0.4rem; margin-bottom:0.3rem;">
                 <select id="wz-add-symbol-select" style="flex:1;">
-                    <option value="">— Select a patron —</option>
+                    <option value="" data-i18n="feature.characters.wizard.selectAPatron">— Select a patron —</option>
                     ${getPatronOptions().filter(p => p.id).map(p => 
                         `<option value="${p.id}">${escHtml(p.label)}</option>`
                     ).join('')}
                 </select>
-                <button class="btn btn-sm btn-primary" id="wz-add-symbol-btn">➕ Add Symbol</button>
+                <button class="btn btn-sm btn-primary" id="wz-add-symbol-btn" data-i18n="feature.characters.wizard.addSymbol">➕ Add Symbol</button>
             </div>
             <div id="wz-symbol-list">
                 ${symbolRows}
@@ -1412,10 +1411,10 @@ function renderStep3TalentsAndLoadout(d) {
     
     return `
         <div>
-            <h3 style="margin-top:0;">🧩 Step 4 — Talents, Magic & Loadout</h3>
+            <h3 style="margin-top:0;" data-i18n="feature.characters.wizard.step4TalentsMagicLoadout">🧩 Step 4 — Talents, Magic & Loadout</h3>
             ${xpBudget}
             
-            <h4 style="margin:0.5rem 0 0.2rem;">🔮 Magic Path (Optional)</h4>
+            <h4 style="margin:0.5rem 0 0.2rem;" data-i18n="feature.characters.wizard.magicPathOptional">🔮 Magic Path (Optional)</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 You don't need magic to be effective. A Body 3 + Melee 2 warrior rolls 5 dice with no talents.
                 If you want magic, choose a path. Each path has different costs and risks.
@@ -1423,12 +1422,12 @@ function renderStep3TalentsAndLoadout(d) {
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                 <div>
-                    <label>Magic Path</label>
+                    <label data-i18n="feature.characters.wizard.magicPath">Magic Path</label>
                     <select id="wz-magic-path">${magicPathOptions}</select>
                     <div class="field-hint" id="wz-magic-path-note" style="margin-top:0.2rem;">${escHtml(path?.note || '')}</div>
                 </div>
                 <div>
-                    <label>Patron</label>
+                    <label data-i18n="feature.characters.wizard.patron">Patron</label>
                     <select id="wz-patron">${patronOptions}</select>
                     <div class="field-hint" style="margin-top:0.2rem;">
                         ${d.magicPath === 'invoker' ? 'Runekeeper/Cantor only — Invokers use Symbols below.' : 'Patrons loaded from /data/patrons/'}
@@ -1440,12 +1439,12 @@ function renderStep3TalentsAndLoadout(d) {
             <div id="wz-runekeeper-fields" style="display:${isRunekeeper ? 'block' : 'none'}; margin-top:0.3rem;">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                     <div>
-                        <label>Thiasos (Familiar)</label>
+                        <label data-i18n="feature.characters.wizard.thiasosFamiliar">Thiasos (Familiar)</label>
                         <input id="wz-thiasos" value="${escHtml(thiasos)}" placeholder="e.g., white-hound, garden-spider" />
                         <span style="font-size:0.65rem;color:var(--text3);">The patron's attention given form.</span>
                     </div>
                     <div>
-                        <label>Codex</label>
+                        <label data-i18n="feature.characters.wizard.codex">Codex</label>
                         <input id="wz-codex" value="${escHtml(codex)}" placeholder="e.g., iron-bound-ledger, frame-loom" />
                         <span style="font-size:0.65rem;color:var(--text3);">The covenant made visible.</span>
                     </div>
@@ -1459,23 +1458,23 @@ function renderStep3TalentsAndLoadout(d) {
                     <h5>🎵 Bound Patron (talent)</h5>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
                         <div>
-                            <label>Bound Patron</label>
+                            <label data-i18n="feature.characters.wizard.boundPatron">Bound Patron</label>
                             <select id="wz-bound-patron">${boundPatronOptions}</select>
                             <span style="font-size:0.65rem;color:var(--text3);">Set when Bound Patron talent is learned</span>
                         </div>
                         <div>
-                            <label>Position Bonus</label>
+                            <label data-i18n="feature.characters.wizard.positionBonus">Position Bonus</label>
                             <input type="number" id="wz-bound-patron-bonus" value="${boundPatronBonus}" min="0" max="3" />
                             <span style="font-size:0.65rem;color:var(--text3);">+1 die when singing bound patron's rites</span>
                         </div>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.3rem;">
                         <div>
-                            <label>Bloom Count (Fugal Self at 7+)</label>
+                            <label data-i18n="feature.characters.wizard.bloomCountFugalSelfAt7">Bloom Count (Fugal Self at 7+)</label>
                             <input type="number" id="wz-bloom-count" value="${bloomCount}" min="0" />
                         </div>
                         <div>
-                            <label>Resonant Rites (comma-separated)</label>
+                            <label data-i18n="feature.characters.wizard.resonantRitesCommaSeparated">Resonant Rites (comma-separated)</label>
                             <input id="wz-resonant-rites" value="${escHtml(resonantRites)}" placeholder="e.g., Cradle Song, Golden Tongue" />
                         </div>
                     </div>
@@ -1491,12 +1490,12 @@ function renderStep3TalentsAndLoadout(d) {
                     </div>
                     <div style="display:flex; gap:0.4rem; margin-bottom:0.3rem;">
                         <select id="wz-add-symbol-select" style="flex:1;">
-                            <option value="">— Select a patron —</option>
+                            <option value="" data-i18n="feature.characters.wizard.selectAPatron">— Select a patron —</option>
                             ${getPatronOptions().filter(p => p.id).map(p => 
                                 `<option value="${p.id}">${escHtml(p.label)}</option>`
                             ).join('')}
                         </select>
-                        <button class="btn btn-sm btn-primary" id="wz-add-symbol-btn">➕ Add Symbol</button>
+                        <button class="btn btn-sm btn-primary" id="wz-add-symbol-btn" data-i18n="feature.characters.wizard.addSymbol">➕ Add Symbol</button>
                     </div>
                     <div id="wz-symbol-list">
                         ${(d.symbols || []).map((patronId) => {
@@ -1516,7 +1515,7 @@ function renderStep3TalentsAndLoadout(d) {
                 </div>
             </div>
 
-            <h4 style="margin:0.8rem 0 0.2rem;">⚔️ Combat Loadout</h4>
+            <h4 style="margin:0.8rem 0 0.2rem;" data-i18n="feature.characters.wizard.combatLoadout">⚔️ Combat Loadout</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Starting gear (free): One set of clothing, a Light weapon, Light armor (if needed), 
                 backpack, waterskin, 1d6 rations, utility knife, flint & steel, lantern/candle, 
@@ -1524,22 +1523,22 @@ function renderStep3TalentsAndLoadout(d) {
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
                 <div>
-                    <label>Armor</label>
+                    <label data-i18n="feature.characters.wizard.armor">Armor</label>
                     <select id="wz-armor-type">${armorOptions}</select>
                     <div class="field-hint" id="wz-armor-info"></div>
                 </div>
                 <div>
-                    <label>Shield</label>
+                    <label data-i18n="feature.characters.wizard.shield">Shield</label>
                     <select id="wz-shield-type">${shieldOptions}</select>
                 </div>
                 <div>
-                    <label>Weapon Class</label>
+                    <label data-i18n="feature.characters.wizard.weaponClass">Weapon Class</label>
                     <select id="wz-weapon-class">${weaponOptions}</select>
                     <div class="field-hint" id="wz-weapon-info">${weapon?.note || ''} | Close: ${weapon?.close || ''} | Near: ${weapon?.near || ''}</div>
                 </div>
             </div>
             
-            <h4 style="margin:0.8rem 0 0.2rem;">🧠 Talents</h4>
+            <h4 style="margin:0.8rem 0 0.2rem;" data-i18n="feature.characters.wizard.talents">🧠 Talents</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Minor (2–3 XP): Small situational bonus | Major (4–6 XP): Strong upgrade | 
                 Prestige (7–10 XP): Campaign-defining | Epic (11+ XP): Legendary.
@@ -1551,21 +1550,21 @@ function renderStep3TalentsAndLoadout(d) {
             <div id="wz-talent-list">${talentRows}</div>
             
             <div style="display:flex; gap:0.4rem;">
-                <button class="btn btn-sm btn-secondary" id="wz-add-custom-talent">✏️ Add Custom Talent</button>
+                <button class="btn btn-sm btn-secondary" id="wz-add-custom-talent" data-i18n="feature.characters.wizard.addCustomTalent">✏️ Add Custom Talent</button>
             </div>
             
-            <h4 style="margin:0.8rem 0 0.2rem;">🏰 Assets (Optional)</h4>
+            <h4 style="margin:0.8rem 0 0.2rem;" data-i18n="feature.characters.wizard.assetsOptional">🏰 Assets (Optional)</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Minor Asset (4 XP): Safehouse, workshop, contact network | 
                 Standard (8 XP): Guild seat, spy ring | Major (12 XP): Fortress, charter.
                 Most starting characters skip these or take one minor asset.
             </div>
             <div id="wz-asset-list">${assetRows}</div>
-            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-asset">+ Add Asset</button>
+            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-asset" data-i18n="feature.characters.wizard.addAsset">+ Add Asset</button>
             
-            <h4 style="margin:0.8rem 0 0.2rem;">🎒 Additional Equipment</h4>
+            <h4 style="margin:0.8rem 0 0.2rem;" data-i18n="feature.characters.wizard.additionalEquipment">🎒 Additional Equipment</h4>
             <div id="wz-equip-list">${equipRows}</div>
-            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-equip">+ Add Equipment</button>
+            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-equip" data-i18n="feature.characters.wizard.addEquipment">+ Add Equipment</button>
         </div>
     `;
 }
@@ -1586,27 +1585,27 @@ function renderStep4BondsAndSummary(d) {
     
     return `
         <div>
-            <h3 style="margin-top:0;">📋 Step 5 — Bonds, Complications & Summary</h3>
+            <h3 style="margin-top:0;" data-i18n="feature.characters.wizard.step5BondsComplicationsSummary">📋 Step 5 — Bonds, Complications & Summary</h3>
             
-            <h4 style="margin:0.3rem 0 0.2rem;">🤝 Bonds</h4>
+            <h4 style="margin:0.3rem 0 0.2rem;" data-i18n="feature.characters.wizard.bonds">🤝 Bonds</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Establish up to 2 bonds with other characters. Each bond grants <strong>+2 XP</strong> at creation (max +4 from bonds).
                 In play: once per session per bond, act on it with intricate description → gain 1 Boon.
                 At Tier III+: transfer up to 2 Boons to a bonded PC (once/scene).
             </div>
             <div id="wz-bond-list">${bondRows}</div>
-            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-bond">+ Add Bond</button>
+            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-bond" data-i18n="feature.characters.wizard.addBond">+ Add Bond</button>
             
-            <h4 style="margin:0.8rem 0 0.2rem;">⚠️ Complications</h4>
+            <h4 style="margin:0.8rem 0 0.2rem;" data-i18n="feature.characters.wizard.complications">⚠️ Complications</h4>
             <div class="info-box" style="font-size:0.75rem;">
                 Take up to 2 complications (e.g., a feud, a cursed item, a debt). Each grants <strong>+2 XP</strong> at creation (max +4 from complications).
                 <strong>Warning:</strong> Each unresolved starting Complication adds +1 banked Story Beat to early scenes.
                 Maximum starting XP: <strong>36</strong> (32 base + 4 max from bonds/complications).
             </div>
             <div id="wz-comp-list">${compRows}</div>
-            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-comp">+ Add Complication</button>
+            <button class="btn btn-sm btn-secondary" data-wizard-add="wz-comp" data-i18n="feature.characters.wizard.addComplication">+ Add Complication</button>
             
-            <h4 style="margin:1rem 0 0.3rem;">📊 Character Summary</h4>
+            <h4 style="margin:1rem 0 0.3rem;" data-i18n="feature.characters.wizard.characterSummary">📊 Character Summary</h4>
             <div style="background:var(--bg2);padding:1rem;border-radius:var(--radius);">
                 <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
                     <div>
@@ -1623,22 +1622,22 @@ function renderStep4BondsAndSummary(d) {
                 </div>
                 <hr style="border-color:var(--border);margin:0.6rem 0;" />
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem 1rem;font-size:0.85rem;">
-                    <div><span class="text-muted">Attributes:</span> B${d.body} W${d.wits} S${d.spirit} P${d.presence}</div>
-                    <div><span class="text-muted">Skills with ranks:</span> ${skilledCount}/16</div>
-                    <div><span class="text-muted">Magic Path:</span> ${escHtml(MAGIC_PATHS.find(p => p.id === d.magicPath)?.label.split('(')[0] || 'None')}</div>
-                    <div><span class="text-muted">Patron:</span> ${escHtml(getPatronLabel(d.patron) || 'None')}</div>
-                    <div><span class="text-muted">Talents:</span> ${(d.talents || []).length}</div>
-                    <div><span class="text-muted">Assets:</span> ${(d.assets || []).length}</div>
-                    <div><span class="text-muted">Bonds:</span> ${(d.bonds || []).length} (${bondCount} for +XP)</div>
-                    <div><span class="text-muted">Complications:</span> ${(d.complications || []).length} (${compCount} for +XP)</div>
-                    <div><span class="text-muted">Armor:</span> ${escHtml(ARMOR_TYPES.find(a => a.id === d.armorType)?.label.split('(')[0] || 'None')}</div>
-                    <div><span class="text-muted">Weapon:</span> ${escHtml(WEAPON_CLASSES.find(w => w.id === d.weaponClass)?.label.split('(')[0] || 'Light')}</div>
-                    ${d.thiasos ? `<div><span class="text-muted">Thiasos:</span> ${escHtml(d.thiasos)}</div>` : ''}
-                    ${d.codex ? `<div><span class="text-muted">Codex:</span> ${escHtml(d.codex)}</div>` : ''}
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.attributes">Attributes:</span> B${d.body} W${d.wits} S${d.spirit} P${d.presence}</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.skillsWithRanks">Skills with ranks:</span> ${skilledCount}/16</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.magicPath_8q2qr">Magic Path:</span> ${escHtml(MAGIC_PATHS.find(p => p.id === d.magicPath)?.label.split('(')[0] || 'None')}</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.patron_1nmsr">Patron:</span> ${escHtml(getPatronLabel(d.patron) || 'None')}</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.talents_ee2oc">Talents:</span> ${(d.talents || []).length}</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.assets">Assets:</span> ${(d.assets || []).length}</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.bonds_15v65">Bonds:</span> ${(d.bonds || []).length} (${bondCount} for +XP)</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.complications_gdizb">Complications:</span> ${(d.complications || []).length} (${compCount} for +XP)</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.armor_148gn">Armor:</span> ${escHtml(ARMOR_TYPES.find(a => a.id === d.armorType)?.label.split('(')[0] || 'None')}</div>
+                    <div><span class="text-muted" data-i18n="feature.characters.wizard.weapon">Weapon:</span> ${escHtml(WEAPON_CLASSES.find(w => w.id === d.weaponClass)?.label.split('(')[0] || 'Light')}</div>
+                    ${d.thiasos ? `<div><span class="text-muted" data-i18n="feature.characters.wizard.thiasos">Thiasos:</span> ${escHtml(d.thiasos)}</div>` : ''}
+                    ${d.codex ? `<div><span class="text-muted" data-i18n="feature.characters.wizard.codex_15bxj">Codex:</span> ${escHtml(d.codex)}</div>` : ''}
                     ${d.magicPath === 'cantor' ? `
-                        <div><span class="text-muted">Bound Patron:</span> ${escHtml(getPatronLabel(d.boundPatron) || 'None')}</div>
-                        <div><span class="text-muted">Bloom Count:</span> ${d.bloomCount || 0}</div>
-                        <div><span class="text-muted">Resonant Rites:</span> ${(d.resonantRites || []).length}</div>
+                        <div><span class="text-muted" data-i18n="feature.characters.wizard.boundPatron_1ojye">Bound Patron:</span> ${escHtml(getPatronLabel(d.boundPatron) || 'None')}</div>
+                        <div><span class="text-muted" data-i18n="feature.characters.wizard.bloomCount">Bloom Count:</span> ${d.bloomCount || 0}</div>
+                        <div><span class="text-muted" data-i18n="feature.characters.wizard.resonantRites">Resonant Rites:</span> ${(d.resonantRites || []).length}</div>
                     ` : ''}
                 </div>
                 <hr style="border-color:var(--border);margin:0.6rem 0;" />
@@ -1811,7 +1810,7 @@ function bondRowHtml(idx, item = {}) {
         <div class="dynamic-row wz-bond-row" data-index="${idx}">
             <input type="text" class="wz-bond-name" placeholder="Bond name (with PC or NPC)" value="${escHtml(item.name || '')}" style="flex:1;min-width:100px;" />
             <input type="text" class="wz-bond-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;min-width:120px;" />
-            <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;" title="+2 XP at creation (max 2 bonds)">
+            <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;" title="+2 XP at creation (max 2 bonds)" data-i18n-attr="title:feature.characters.wizard.2XPAtCreationMax2Bonds">
                 <input type="checkbox" class="wz-bond-start" ${item.start !== false ? 'checked' : ''} /> +2 XP
             </label>
             <button class="wizard-remove-btn">✕</button>
@@ -1824,7 +1823,7 @@ function compRowHtml(idx, item = {}) {
         <div class="dynamic-row wz-comp-row" data-index="${idx}">
             <input type="text" class="wz-comp-name" placeholder="Complication name" value="${escHtml(item.name || '')}" style="flex:1;min-width:100px;" />
             <input type="text" class="wz-comp-desc" placeholder="Description" value="${escHtml(item.desc || '')}" style="flex:2;min-width:120px;" />
-            <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;" title="+2 XP at creation (max 2). Adds +1 banked SB to early scenes.">
+            <label style="font-size:0.8rem;display:flex;align-items:center;gap:0.2rem;" title="+2 XP at creation (max 2). Adds +1 banked SB to early scenes." data-i18n-attr="title:feature.characters.wizard.2XPAtCreationMax2Adds">
                 <input type="checkbox" class="wz-comp-start" ${item.start !== false ? 'checked' : ''} /> +2 XP
             </label>
             <button class="wizard-remove-btn">✕</button>
@@ -1907,7 +1906,7 @@ function attachEvents() {
                             state.data.assets = state.data.assets.filter(a => a.name !== assetName);
                         }
                         renderStep();
-                        showToast(`Removed Symbol of ${patronName}`, 'info');
+                        showToast(i18nText("feature.characters.wizard.removedSymbolOfValue", { value0: patronName }, "Removed Symbol of {{value0}}"), 'info');
                     }
                 } else {
                     // Regular dynamic row removal (talents, assets, equipment)
@@ -1977,7 +1976,7 @@ function attachEvents() {
             const weapon = WEAPON_CLASSES.find(w => w.id === target.value);
             const infoEl = document.getElementById('wz-weapon-info');
             if (infoEl && weapon) {
-                infoEl.textContent = `${weapon.note} | Close: ${weapon.close} | Near: ${weapon.near}`;
+                infoEl.textContent = i18nText("feature.characters.wizard.valueCloseValueNearValue", { value0: weapon.note, value1: weapon.close, value2: weapon.near }, "{{value0}} | Close: {{value1}} | Near: {{value2}}");
             }
             return;
         }
@@ -2004,12 +2003,12 @@ function attachEvents() {
             if (!select) return;
             const patronId = select.value;
             if (!patronId) {
-                showToast('Please select a patron.', 'warning');
+                showToast(i18nText("feature.characters.wizard.pleaseSelectAPatron", null, "Please select a patron."), 'warning');
                 return;
             }
             if (!state.data.symbols) state.data.symbols = [];
             if (state.data.symbols.includes(patronId)) {
-                showToast('Symbol already added.', 'info');
+                showToast(i18nText("feature.characters.wizard.symbolAlreadyAdded", null, "Symbol already added."), 'info');
                 return;
             }
             state.data.symbols.push(patronId);
@@ -2021,7 +2020,7 @@ function attachEvents() {
                 state.data.assets.push({ name: assetName, cost: 0 });
             }
             renderStep();
-            showToast(`Added Symbol of ${patronName}`, 'success');
+            showToast(i18nText("feature.characters.wizard.addedSymbolOfValue", { value0: patronName }, "Added Symbol of {{value0}}"), 'success');
             e.preventDefault();
             return;
         }

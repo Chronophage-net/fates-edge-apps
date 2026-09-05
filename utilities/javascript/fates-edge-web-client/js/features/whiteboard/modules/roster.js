@@ -1,4 +1,5 @@
 // modules/roster.js
+import { t as i18nText } from '@core/i18n.js';
 import { getState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
@@ -78,7 +79,7 @@ export function handleRosterDrop(e) {
         const y = e.clientY - rect.top;
         const layer = getLayer('characters') || getLayer('drawing');
         if (layer && layer.locked) {
-            showToast('Character layer is locked', 'warning');
+            showToast(i18nText("feature.whiteboard.modules.roster.characterLayerIsLocked", null, "Character layer is locked"), 'warning');
             return false;
         }
         pushUndoSnapshot();
@@ -94,7 +95,7 @@ export function handleRosterDrop(e) {
         saveWhiteboardData();
         renderOverlay();
         updateStats();
-        showToast(`Token "${item.name}" placed`, 'success');
+        showToast(i18nText("feature.whiteboard.modules.roster.tokenValuePlaced", { value0: item.name }, "Token \"{{value0}}\" placed"), 'success');
         return true;
     } catch (err) {
         console.warn('Roster drop parse error', err);

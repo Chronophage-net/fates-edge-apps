@@ -161,10 +161,29 @@ fi
 # will actually be used, not just the compose file's own fallback
 # syntax -- .env.demo is a file this script generates itself from a
 # known-safe template, so sourcing it directly is fine.
+# Preserve a one-run shell override. Without this, sourcing .env.demo
+# silently replaced `DEMO_LEVEL=light npm run demo` with the value in the
+# file, which made the documented quick override look as though it worked
+# while the heavier settings were still used.
+DEMO_LEVEL_OVERRIDE="${DEMO_LEVEL:-}"
 set -a
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 set +a
+if [[ -n "$DEMO_LEVEL_OVERRIDE" ]]; then
+    export DEMO_LEVEL="$DEMO_LEVEL_OVERRIDE"
+fi
+
+# Apple-silicon laptops can run the whole stack, but Docker has no Metal
+# passthrough and local generation is CPU-bound. Use the light context by
+# default there; an explicit DEMO_LEVEL=default or quality still wins.
+if [[ -z "$DEMO_LEVEL_OVERRIDE" && "${DEMO_LEVEL:-default}" == "default" \
+      && "$(uname -s)" == "Darwin" && "$(uname -m)" == "arm64" ]]; then
+    export DEMO_LEVEL="light"
+    echo "Apple silicon detected -- using DEMO_LEVEL=light for this run."
+    echo "Set DEMO_LEVEL=default or quality explicitly to override it."
+    echo
+fi
 
 # ─── DEMO_LEVEL: an all-or-nothing preset over the three Ollama knobs ──
 # (DEMO_OLLAMA_MODEL / _CONTEXT_WINDOW / _TIMEOUT_MS). Doesn't probe your

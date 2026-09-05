@@ -2,6 +2,20 @@
 
 > **Status: both implemented, both opt-in, both off by default.** A single instance / single process (the only thing most self-hosted tables ever need) requires nothing from this document — no Redis, no `CLUSTER_WORKERS`, no extra configuration. This only matters once you're trying to use more than one CPU core (see "Multi-core scaling" below) or run more than one server process behind a load balancer (see "Horizontal scaling" further down).
 
+The cluster manager proposed in the docs repository adds a third, deliberately separate model for
+managed rooms: every socket server registers a stable, opaque `server_id`, and every room placement
+names that server plus a monotonically increasing `placement_version`. Its connect response returns
+the selected server ID and endpoint. A direct client reconnects to that endpoint; a shared load
+balancer uses the manager's signed affinity cookie (or trusted-client affinity headers) to keep the
+room on the selected server. The room token and socket handshake repeat both values so routing can
+never substitute for authorization. See `fates-edge-docs/SAAS_MANAGER.md` at the workspace root for
+the source-of-truth design.
+
+That proposed room-placement model does not silently change the Redis mode documented below.
+Today's Redis implementation lets any replica serve a room and relays broadcasts between replicas;
+a managed deployment will instead give one server the authoritative placement and fence the old
+placement before moving it. Local and unmanaged deployments keep the existing behavior.
+
 ---
 
 ## Do you actually need either of these?

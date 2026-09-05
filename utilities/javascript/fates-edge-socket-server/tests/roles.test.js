@@ -11,6 +11,8 @@
  */
 const { test, describe, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('fs');
+const path = require('path');
 
 process.env.AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || 'test-secret-for-unit-tests';
 
@@ -19,7 +21,7 @@ const security = require('../server/security.js');
 const room = require('../server/room.js');
 
 describe('security.js role helpers', () => {
-    test('isGmLike() is true for gm and co-gm only -- assistant-gm grants no elevated permissions', () => {
+    test('isGmLike() is true for gm and co-gm only -- assistant-gm is limited to its separate story-authority set', () => {
         assert.equal(security.isGmLike('gm'), true);
         assert.equal(security.isGmLike('co-gm'), true);
         assert.equal(security.isGmLike('assistant-gm'), false);
@@ -57,6 +59,33 @@ describe('auth.js isValidRole()', () => {
         assert.equal(auth.isValidRole(''), false);
         assert.equal(auth.isValidRole(null), false);
         assert.equal(auth.isValidRole(42), false);
+    });
+});
+
+describe('auth.js resolveRoomJoinRole()', () => {
+    test('a persisted spectator restriction wins over reconnect claims', () => {
+        assert.equal(auth.resolveRoomJoinRole('player', 'spectator'), 'spectator');
+        assert.equal(auth.resolveRoomJoinRole('gm', 'spectator'), 'spectator');
+        assert.equal(auth.resolveRoomJoinRole('co-gm', 'spectator'), 'spectator');
+    });
+
+    test('promoted roles require and restore a matching saved grant', () => {
+        assert.equal(auth.resolveRoomJoinRole('co-gm', 'player'), 'player');
+        assert.equal(auth.resolveRoomJoinRole('player', 'co-gm'), 'co-gm');
+        assert.equal(auth.resolveRoomJoinRole('player', 'assistant-gm'), 'assistant-gm');
+    });
+
+    test('ordinary anonymous role selection remains compatible', () => {
+        assert.equal(auth.resolveRoomJoinRole('player'), 'player');
+        assert.equal(auth.resolveRoomJoinRole('spectator'), 'spectator');
+        assert.equal(auth.resolveRoomJoinRole('junk'), 'player');
+    });
+
+    test('both socket transports use the same join-role resolver', () => {
+        for (const file of ['ws-handlers.js', 'socketio-handlers.js']) {
+            const source = fs.readFileSync(path.join(__dirname, '..', 'server', file), 'utf8');
+            assert.match(source, /auth\.resolveRoomJoinRole\(/);
+        }
     });
 });
 
@@ -168,6 +197,20 @@ describe('room.js handleRoleChangeRequest()', () => {
         assert.equal(result.ok, true);
         assert.equal(result.persist, true); // demotions always persist, per §2.5
         assert.equal(r.clients.get(cogm.id).role, 'player');
+    });
+
+    test('a session-only Socket.IO Spectator role is remembered for rejoins to the same room', () => {
+        const gm = makeClient('gm-1', 'gm');
+        const socket = { sessionRoomRoles: new Map(), emit() {} };
+        const viewer = makeClient('s-1', 'player', { type: 'socket.io', socket });
+        r.clients.set(gm.id, gm);
+        r.clients.set(viewer.id, viewer);
+
+        assert.equal(room.handleRoleChangeRequest(r, gm.id, viewer.id, 'spectator', false).ok, true);
+        assert.equal(socket.sessionRoomRoles.get(r.code), 'spectator');
+
+        assert.equal(room.handleRoleChangeRequest(r, gm.id, viewer.id, 'player', false).ok, true);
+        assert.equal(socket.sessionRoomRoles.get(r.code), 'player');
     });
 });
 

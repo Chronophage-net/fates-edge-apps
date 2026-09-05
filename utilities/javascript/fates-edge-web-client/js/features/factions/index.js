@@ -14,6 +14,7 @@
  * tab content area (swap-in "screens"), consistent with the rest of the app.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
@@ -419,7 +420,7 @@ async function loadRemoteFactions() {
             console.warn('📥 No factions discovered. Using defaults.');
             state.usingFallback = true;
             loadDefaultFactions();
-            showToast('⚠️ No faction files found. Using default factions.', 'warning');
+            showToast(i18nText("feature.factions.noFactionFilesFoundUsingDefaultFactions", null, "⚠️ No faction files found. Using default factions."), 'warning');
         } else {
             state.factions = factions;
             state.dataLoaded = true;
@@ -456,7 +457,7 @@ async function loadRemoteFactions() {
         console.warn('Failed to load remote factions:', error);
         state.usingFallback = true;
         loadDefaultFactions();
-        showToast('⚠️ Error loading factions. Using defaults.', 'error');
+        showToast(i18nText("feature.factions.errorLoadingFactionsUsingDefaults", null, "⚠️ Error loading factions. Using defaults."), 'error');
     } finally {
         state.isLoading = false;
     }
@@ -499,18 +500,18 @@ function renderShell() {
     container.innerHTML = `
         <div class="factions-modern-layout">
             <header class="factions-header">
-                <h1 class="factions-title">🏛️ Factions & Assets</h1>
-                <p class="factions-subtitle">Manage factions, assets, followers, and trusts.</p>
+                <h1 class="factions-title" data-i18n="feature.factions.factionsAssets">🏛️ Factions & Assets</h1>
+                <p class="factions-subtitle" data-i18n="feature.factions.manageFactionsAssetsFollowersAndTrusts">Manage factions, assets, followers, and trusts.</p>
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading faction data...</p>' :
                   `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers</p>`}
                 ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ No faction files found – using fallback defaults.</div>` : ''}
             </header>
 
             <div class="factions-tabs">
-                <button class="factions-tab active" data-view="factions">🏛️ Factions</button>
-                <button class="factions-tab" data-view="assets">📦 Assets</button>
-                <button class="factions-tab" data-view="followers">👤 Followers</button>
-                <button class="factions-tab" data-view="trusts">🤝 Trusts</button>
+                <button class="factions-tab active" data-view="factions" data-i18n="feature.factions.factions">🏛️ Factions</button>
+                <button class="factions-tab" data-view="assets" data-i18n="feature.factions.assets">📦 Assets</button>
+                <button class="factions-tab" data-view="followers" data-i18n="feature.factions.followers">👤 Followers</button>
+                <button class="factions-tab" data-view="trusts" data-i18n="feature.factions.trusts">🤝 Trusts</button>
             </div>
 
             <div id="factions-view-container" class="factions-view-container">
@@ -549,7 +550,7 @@ function renderListView(view) {
             <div class="factions-empty">
                 <div style="font-size:3rem;">⏳</div>
                 <div>Loading faction data...</div>
-                <div class="text-muted" style="font-size:0.85rem;">Please wait</div>
+                <div class="text-muted" style="font-size:0.85rem;" data-i18n="feature.factions.pleaseWait">Please wait</div>
             </div>
         `;
     }
@@ -579,8 +580,8 @@ function renderFactions() {
             <div class="factions-empty">
                 <div style="font-size:3rem;">🏛️</div>
                 <div>No factions tracked yet.</div>
-                <button class="btn btn-primary" onclick="window.addFaction()">➕ Add Faction</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()">📥 Load Defaults</button>
+                <button class="btn btn-primary" onclick="window.addFaction()" data-i18n="feature.factions.addFaction">➕ Add Faction</button>
+                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -594,7 +595,7 @@ function renderFactions() {
         <div class="factions-summary">
             <div class="summary-card">
                 <span class="summary-icon">📈</span>
-                <span class="summary-label">Mandate</span>
+                <span class="summary-label" data-i18n="feature.factions.mandate">Mandate</span>
                 <span class="summary-value">${mandate}/6</span>
                 <div class="summary-bar">
                     <div class="summary-bar-fill" style="width:${(mandate/6)*100}%;background:var(--green);"></div>
@@ -602,7 +603,7 @@ function renderFactions() {
             </div>
             <div class="summary-card">
                 <span class="summary-icon">⚠️</span>
-                <span class="summary-label">Crisis</span>
+                <span class="summary-label" data-i18n="feature.factions.crisis">Crisis</span>
                 <span class="summary-value">${crisis}/6</span>
                 <div class="summary-bar">
                     <div class="summary-bar-fill" style="width:${(crisis/6)*100}%;background:var(--red);"></div>
@@ -610,7 +611,7 @@ function renderFactions() {
             </div>
             <div class="summary-card">
                 <span class="summary-icon">🏛️</span>
-                <span class="summary-label">Factions</span>
+                <span class="summary-label" data-i18n="feature.factions.factions_121cs">Factions</span>
                 <span class="summary-value">${state.factions.length}</span>
                 <div class="summary-bar"><div class="summary-bar-fill" style="width:100%;background:var(--gold);"></div></div>
             </div>
@@ -629,7 +630,7 @@ function renderFactions() {
                             </span>
                         </div>
                         <div class="faction-agenda">
-                            <span class="agenda-label">Agenda:</span>
+                            <span class="agenda-label" data-i18n="feature.factions.agenda">Agenda:</span>
                             <span class="agenda-text">${escHtml(f.agenda || 'None')}</span>
                         </div>
                         <div class="faction-timer">
@@ -651,10 +652,10 @@ function renderFactions() {
         </div>
 
         <div class="factions-actions">
-            <button class="btn btn-primary" onclick="window.addFaction()">➕ Add Faction</button>
-            <button class="btn btn-secondary" onclick="window.factionTurn()" title="Advances faction agendas/standing AND fires a downtime-tick other features (e.g. Crafting's magic item upkeep) listen for — see Player's Guide ch. 11 Downtime, 'the world may advance timers while you rest'.">🔄 GM Downtime (Faction Turn)</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()">🔄 Refresh</button>
-            <button class="btn btn-secondary" onclick="window.loadDefaultFactions()">📥 Load Defaults</button>
+            <button class="btn btn-primary" onclick="window.addFaction()" data-i18n="feature.factions.addFaction">➕ Add Faction</button>
+            <button class="btn btn-secondary" onclick="window.factionTurn()" title="Advances faction agendas/standing AND fires a downtime-tick other features (e.g. Crafting's magic item upkeep) listen for — see Player's Guide ch. 11 Downtime, 'the world may advance timers while you rest'." data-i18n="feature.factions.gmDowntimeFactionTurn">🔄 GM Downtime (Faction Turn)</button>
+            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
+            <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
         </div>
     `;
 }
@@ -669,8 +670,8 @@ function renderAssets() {
             <div class="factions-empty">
                 <div style="font-size:3rem;">📦</div>
                 <div>No assets tracked yet.</div>
-                <button class="btn btn-primary" onclick="window.addAsset()">➕ Add Asset</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()">📥 Load Defaults</button>
+                <button class="btn btn-primary" onclick="window.addAsset()" data-i18n="feature.factions.addAsset">➕ Add Asset</button>
+                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -693,8 +694,8 @@ function renderAssets() {
         </div>
 
         <div class="factions-actions">
-            <button class="btn btn-primary" onclick="window.addAsset()">➕ Add Asset</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()">🔄 Refresh</button>
+            <button class="btn btn-primary" onclick="window.addAsset()" data-i18n="feature.factions.addAsset">➕ Add Asset</button>
+            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
         </div>
     `;
 }
@@ -709,8 +710,8 @@ function renderFollowers() {
             <div class="factions-empty">
                 <div style="font-size:3rem;">👤</div>
                 <div>No followers tracked yet.</div>
-                <button class="btn btn-primary" onclick="window.addFollower()">➕ Add Follower</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()">📥 Load Defaults</button>
+                <button class="btn btn-primary" onclick="window.addFollower()" data-i18n="feature.factions.addFollower">➕ Add Follower</button>
+                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -739,8 +740,8 @@ function renderFollowers() {
         </div>
 
         <div class="factions-actions">
-            <button class="btn btn-primary" onclick="window.addFollower()">➕ Add Follower</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()">🔄 Refresh</button>
+            <button class="btn btn-primary" onclick="window.addFollower()" data-i18n="feature.factions.addFollower">➕ Add Follower</button>
+            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
         </div>
     `;
 }
@@ -755,8 +756,8 @@ function renderTrusts() {
             <div class="factions-empty">
                 <div style="font-size:3rem;">🤝</div>
                 <div>No trusts created yet.</div>
-                <button class="btn btn-primary" onclick="window.addTrust()">➕ Create Trust</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()">📥 Load Defaults</button>
+                <button class="btn btn-primary" onclick="window.addTrust()" data-i18n="feature.factions.createTrust">➕ Create Trust</button>
+                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -779,8 +780,8 @@ function renderTrusts() {
         </div>
 
         <div class="factions-actions">
-            <button class="btn btn-primary" onclick="window.addTrust()">➕ Create Trust</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()">🔄 Refresh</button>
+            <button class="btn btn-primary" onclick="window.addTrust()" data-i18n="feature.factions.createTrust">➕ Create Trust</button>
+            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
         </div>
     `;
 }
@@ -806,7 +807,7 @@ function renderDetailScreen(kind, id) {
 function renderFactionDetail(factionId) {
     const faction = state.factions.find(f => f.id === factionId);
     if (!faction) {
-        showToast('Faction not found', 'error');
+        showToast(i18nText("feature.factions.factionNotFound", null, "Faction not found"), 'error');
         return renderListView('factions');
     }
 
@@ -826,12 +827,12 @@ function renderFactionDetail(factionId) {
 
             <div class="faction-detail-body">
                 <div class="faction-detail-section">
-                    <h3>🎯 Agenda</h3>
+                    <h3 data-i18n="feature.factions.agenda_6de6r">🎯 Agenda</h3>
                     <p>${escHtml(faction.agenda || 'None')}</p>
                 </div>
 
                 <div class="faction-detail-section">
-                    <h3>⏱️ Progress</h3>
+                    <h3 data-i18n="feature.factions.progress">⏱️ Progress</h3>
                     <div class="timer-display">
                         <span>${faction.agendaTimer?.current || 0}/${faction.agendaTimer?.segments || 6}</span>
                         <div class="timer-bar">
@@ -846,7 +847,7 @@ function renderFactionDetail(factionId) {
                 </div>
 
                 <div class="faction-detail-section">
-                    <h3>👤 Key NPCs</h3>
+                    <h3 data-i18n="feature.factions.keyNPCs">👤 Key NPCs</h3>
                     <ul>
                         ${(faction.keyNPCs || []).map(npc => `<li>${escHtml(npc)}</li>`).join('')}
                         ${(faction.keyNPCs || []).length === 0 ? '<li class="text-muted">No NPCs listed</li>' : ''}
@@ -854,24 +855,24 @@ function renderFactionDetail(factionId) {
                 </div>
 
                 <div class="faction-detail-section">
-                    <h3>💪 Resources</h3>
+                    <h3 data-i18n="feature.factions.resources">💪 Resources</h3>
                     <p>${escHtml(faction.resources || 'None listed')}</p>
                 </div>
 
                 <div class="faction-detail-section">
-                    <h3>🔗 Hooks</h3>
+                    <h3 data-i18n="feature.factions.hooks">🔗 Hooks</h3>
                     <ul>
                         ${(faction.hooks || []).map(h => `<li>🔗 ${escHtml(h)}</li>`).join('')}
                         ${(faction.hooks || []).length === 0 ? '<li class="text-muted">No hooks yet.</li>' : ''}
                     </ul>
                     <form class="inline-add-form" onsubmit="window.addFactionHook(event, '${faction.id}')">
-                        <input type="text" name="hook" placeholder="New hook..." required />
-                        <button type="submit" class="btn btn-sm btn-primary">➕ Add Hook</button>
+                        <input type="text" name="hook" placeholder="New hook..." required / data-i18n-attr="placeholder:feature.factions.newHook">
+                        <button type="submit" class="btn btn-sm btn-primary" data-i18n="feature.factions.addHook">➕ Add Hook</button>
                     </form>
                 </div>
 
                 <div class="faction-detail-section">
-                    <h3>📊 Standing</h3>
+                    <h3 data-i18n="feature.factions.standing">📊 Standing</h3>
                     <div class="standing-controls">
                         <button class="btn btn-sm btn-secondary" onclick="window.changeFactionStanding('${faction.id}', -1)">➖</button>
                         <span style="font-weight:600;color:${standing.color};">${standing.icon} ${standing.label}</span>
@@ -892,7 +893,7 @@ function renderFactionDetail(factionId) {
 function renderAssetDetail(assetId) {
     const asset = state.assets.find(a => a.id === assetId);
     if (!asset) {
-        showToast('Asset not found', 'error');
+        showToast(i18nText("feature.factions.assetNotFound", null, "Asset not found"), 'error');
         return renderListView('assets');
     }
 
@@ -910,17 +911,17 @@ function renderAssetDetail(assetId) {
 
             <div class="asset-detail-body">
                 <div class="asset-detail-section">
-                    <h3>📖 Description</h3>
+                    <h3 data-i18n="feature.factions.description">📖 Description</h3>
                     <p>${escHtml(asset.description || 'No description.')}</p>
                 </div>
 
                 <div class="asset-detail-section">
-                    <h3>💰 Cost</h3>
+                    <h3 data-i18n="feature.factions.cost">💰 Cost</h3>
                     <p>${asset.cost || 4} XP</p>
                 </div>
 
                 <div class="asset-detail-section">
-                    <h3>📊 Status</h3>
+                    <h3 data-i18n="feature.factions.status">📊 Status</h3>
                     <p class="asset-status" style="color:${status.color};">${status.icon} ${status.label}</p>
                     <div class="status-controls">
                         <button class="btn btn-sm btn-secondary" onclick="window.changeAssetStatus('${asset.id}', 'maintained')">✅ Maintained</button>
@@ -931,14 +932,14 @@ function renderAssetDetail(assetId) {
 
                 ${asset.freeUse ? `
                 <div class="asset-detail-section">
-                    <h3>🔄 Free Use</h3>
+                    <h3 data-i18n="feature.factions.freeUse">🔄 Free Use</h3>
                     <p>${escHtml(asset.freeUse)}</p>
                 </div>
                 ` : ''}
 
                 ${asset.sceneSurge ? `
                 <div class="asset-detail-section">
-                    <h3>⚡ Scene Surge</h3>
+                    <h3 data-i18n="feature.factions.sceneSurge">⚡ Scene Surge</h3>
                     <p>${escHtml(asset.sceneSurge)}</p>
                 </div>
                 ` : ''}
@@ -958,7 +959,7 @@ function renderAssetDetail(assetId) {
 function renderFollowerDetail(followerId) {
     const follower = state.followers.find(f => f.id === followerId);
     if (!follower) {
-        showToast('Follower not found', 'error');
+        showToast(i18nText("feature.factions.followerNotFound", null, "Follower not found"), 'error');
         return renderListView('followers');
     }
 
@@ -978,19 +979,19 @@ function renderFollowerDetail(followerId) {
 
             <div class="follower-detail-body">
                 <div class="follower-detail-section">
-                    <h3>📖 Description</h3>
+                    <h3 data-i18n="feature.factions.description">📖 Description</h3>
                     <p>${escHtml(follower.description || 'No description.')}</p>
                 </div>
 
                 <div class="follower-detail-section">
-                    <h3>📊 States</h3>
+                    <h3 data-i18n="feature.factions.states">📊 States</h3>
                     <div class="state-grid">
                         <div class="state-item">
-                            <span class="state-label">Loyalty</span>
+                            <span class="state-label" data-i18n="feature.factions.loyalty">Loyalty</span>
                             <span class="state-value" style="color:${loyalty.color};">${loyalty.icon} ${loyalty.label}</span>
                         </div>
                         <div class="state-item">
-                            <span class="state-label">Fitness</span>
+                            <span class="state-label" data-i18n="feature.factions.fitness">Fitness</span>
                             <span class="state-value" style="color:${fitness.color};">${fitness.icon} ${fitness.label}</span>
                         </div>
                     </div>
@@ -1015,7 +1016,7 @@ function renderFollowerDetail(followerId) {
 function renderTrustDetail(trustId) {
     const trust = state.trusts.find(t => t.id === trustId);
     if (!trust) {
-        showToast('Trust not found', 'error');
+        showToast(i18nText("feature.factions.trustNotFound", null, "Trust not found"), 'error');
         return renderListView('trusts');
     }
 
@@ -1035,23 +1036,23 @@ function renderTrustDetail(trustId) {
 
             <div class="trust-detail-body">
                 <div class="trust-detail-section">
-                    <h3>📖 Description</h3>
+                    <h3 data-i18n="feature.factions.description">📖 Description</h3>
                     <p>${escHtml(trust.description || 'A player trust.')}</p>
                 </div>
 
                 <div class="trust-detail-section">
-                    <h3>📊 Stats</h3>
+                    <h3 data-i18n="feature.factions.stats">📊 Stats</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <span class="stat-label">Asset Slots</span>
+                            <span class="stat-label" data-i18n="feature.factions.assetSlots">Asset Slots</span>
                             <span class="stat-value">${trust.maxAssets || 2}</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Max Asset Tier</span>
+                            <span class="stat-label" data-i18n="feature.factions.maxAssetTier">Max Asset Tier</span>
                             <span class="stat-value">${trust.maxAssetTier || 'Standard'}</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Obligation</span>
+                            <span class="stat-label" data-i18n="feature.factions.obligation">Obligation</span>
                             <span class="stat-value">${trust.obligation || 0}/${trust.capacity || 4}</span>
                         </div>
                     </div>
@@ -1070,10 +1071,10 @@ function renderTrustDetail(trustId) {
                     ${availableAssets.length > 0 ? `
                         <form class="inline-add-form" onsubmit="window.addTrustAsset(event, '${trust.id}')">
                             <select name="assetId" required>
-                                <option value="" disabled selected>Select an asset…</option>
+                                <option value="" disabled selected data-i18n="feature.factions.selectAnAsset">Select an asset…</option>
                                 ${availableAssets.map(a => `<option value="${a.id}">${escHtml(a.name)} (${escHtml(a.tier || 'Minor')})</option>`).join('')}
                             </select>
-                            <button type="submit" class="btn btn-sm btn-primary">➕ Add Asset</button>
+                            <button type="submit" class="btn btn-sm btn-primary" data-i18n="feature.factions.addAsset">➕ Add Asset</button>
                         </form>
                     ` : '<p class="text-muted" style="font-size:0.85rem;">No available assets to add.</p>'}
                 </div>
@@ -1091,10 +1092,10 @@ function renderTrustDetail(trustId) {
                     ${availableFollowers.length > 0 ? `
                         <form class="inline-add-form" onsubmit="window.addTrustFollower(event, '${trust.id}')">
                             <select name="followerId" required>
-                                <option value="" disabled selected>Select a follower…</option>
+                                <option value="" disabled selected data-i18n="feature.factions.selectAFollower">Select a follower…</option>
                                 ${availableFollowers.map(f => `<option value="${f.id}">${escHtml(f.name)} (Cap ${f.cap})</option>`).join('')}
                             </select>
-                            <button type="submit" class="btn btn-sm btn-primary">➕ Add Follower</button>
+                            <button type="submit" class="btn btn-sm btn-primary" data-i18n="feature.factions.addFollower">➕ Add Follower</button>
                         </form>
                     ` : '<p class="text-muted" style="font-size:0.85rem;">No available followers to add.</p>'}
                 </div>
@@ -1157,8 +1158,8 @@ function renderFactionForm(id) {
                     <input type="text" name="icon" value="${escHtml(f.icon || '🏛️')}" />
                 </label>
                 <div class="fe-form-actions">
-                    <button type="submit" class="btn btn-primary">💾 Save</button>
-                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('faction')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="feature.factions.save">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('faction')" data-i18n="feature.factions.cancel">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1197,8 +1198,8 @@ function renderAssetForm(id) {
                     <input type="text" name="sceneSurge" value="${escHtml(a.sceneSurge || '')}" />
                 </label>
                 <div class="fe-form-actions">
-                    <button type="submit" class="btn btn-primary">💾 Save</button>
-                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('asset')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="feature.factions.save">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('asset')" data-i18n="feature.factions.cancel">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1238,8 +1239,8 @@ function renderFollowerForm(id) {
                     </select>
                 </label>
                 <div class="fe-form-actions">
-                    <button type="submit" class="btn btn-primary">💾 Save</button>
-                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('follower')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="feature.factions.save">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('follower')" data-i18n="feature.factions.cancel">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1278,8 +1279,8 @@ function renderTrustForm(id) {
                     <input type="number" name="capacity" min="0" value="${t.capacity ?? 4}" />
                 </label>
                 <div class="fe-form-actions">
-                    <button type="submit" class="btn btn-primary">💾 Save</button>
-                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('trust')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="feature.factions.save">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeFactionScreen('trust')" data-i18n="feature.factions.cancel">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1303,7 +1304,7 @@ window.viewTrust = function(id) { goTo('view', 'trust', id); };
 window.loadDefaultFactions = function() {
     loadDefaultFactions();
     refreshView();
-    showToast('Loaded default factions', 'success');
+    showToast(i18nText("feature.factions.loadedDefaultFactions", null, "Loaded default factions"), 'success');
 };
 
 // ============================================================
@@ -1333,7 +1334,7 @@ window.submitFactionForm = function(evt, id) {
         const faction = state.factions.find(f => f.id === id);
         if (!faction) return;
         Object.assign(faction, data, { source: 'local' });
-        showToast(`Updated faction: ${name}`, 'success');
+        showToast(i18nText("feature.factions.updatedFactionValue", { value0: name }, "Updated faction: {{value0}}"), 'success');
     } else {
         state.factions.push({
             id: 'faction-' + Date.now(),
@@ -1342,7 +1343,7 @@ window.submitFactionForm = function(evt, id) {
             hooks: [],
             source: 'local'
         });
-        showToast(`Added faction: ${name}`, 'success');
+        showToast(i18nText("feature.factions.addedFactionValue", { value0: name }, "Added faction: {{value0}}"), 'success');
     }
     saveFactionData();
     state.viewMode = 'factions';
@@ -1352,12 +1353,12 @@ window.submitFactionForm = function(evt, id) {
 window.deleteFaction = function(id) {
     const faction = state.factions.find(f => f.id === id);
     if (!faction) return;
-    if (!confirm(`Delete faction "${faction.name}"?`)) return;
+    if (!confirm(i18nText("feature.factions.deleteFactionValue", { value0: faction.name }, "Delete faction \"{{value0}}\"?"))) return;
     state.factions = state.factions.filter(f => f.id !== id);
     saveFactionData();
     state.viewMode = 'factions';
     goTo(null);
-    showToast(`Deleted faction: ${faction.name}`, 'info');
+    showToast(i18nText("feature.factions.deletedFactionValue", { value0: faction.name }, "Deleted faction: {{value0}}"), 'info');
 };
 
 window.changeFactionStanding = function(id, delta) {
@@ -1366,7 +1367,7 @@ window.changeFactionStanding = function(id, delta) {
     faction.standing = Math.max(-3, Math.min(3, faction.standing + delta));
     saveFactionData();
     refreshView();
-    showToast(`${faction.name} standing: ${FACTION_STANDINGS[String(faction.standing)].label}`, 'info');
+    showToast(i18nText("feature.factions.valueStandingValue", { value0: faction.name, value1: FACTION_STANDINGS[String(faction.standing)].label }, "{{value0}} standing: {{value1}}"), 'info');
 };
 
 window.tickFactionTimer = function(id) {
@@ -1375,7 +1376,7 @@ window.tickFactionTimer = function(id) {
     if (!faction.agendaTimer) faction.agendaTimer = { segments: 6, current: 0 };
     faction.agendaTimer.current = Math.min(faction.agendaTimer.current + 1, faction.agendaTimer.segments);
     if (faction.agendaTimer.current >= faction.agendaTimer.segments) {
-        showToast(`⚠️ ${faction.name} has achieved its agenda!`, 'warning');
+        showToast(i18nText("feature.factions.valueHasAchievedItsAgenda", { value0: faction.name }, "⚠️ {{value0}} has achieved its agenda!"), 'warning');
         faction.agendaTimer.current = 0;
     }
     saveFactionData();
@@ -1410,7 +1411,7 @@ window.addFactionHook = function(evt, id) {
     faction.hooks.push(hook);
     saveFactionData();
     refreshView();
-    showToast(`Added hook: ${hook}`, 'success');
+    showToast(i18nText("feature.factions.addedHookValue", { value0: hook }, "Added hook: {{value0}}"), 'success');
 };
 
 // "Faction Turn" doubles as the app's stand-in for a GM-adjudicated
@@ -1453,9 +1454,9 @@ window.factionTurn = function() {
     saveFactionData();
     refreshView();
     if (changes.length > 0) {
-        showToast('🔄 Faction turn complete: ' + changes.join('; '), 'success');
+        showToast(i18nText("feature.factions.factionTurnCompleteValue", { value0: changes.join('; ') }, "🔄 Faction turn complete: {{value0}}"), 'success');
     } else {
-        showToast('🔄 Faction turn complete - no changes', 'info');
+        showToast(i18nText("feature.factions.factionTurnCompleteNoChanges", null, "🔄 Faction turn complete - no changes"), 'info');
     }
     // NEW: broadcast that a downtime has passed so unrelated features
     // (Crafting upkeep decay, and anything added later) can react.
@@ -1489,7 +1490,7 @@ window.submitAssetForm = function(evt, id) {
         const asset = state.assets.find(a => a.id === id);
         if (!asset) return;
         Object.assign(asset, data, { source: 'local' });
-        showToast(`Updated asset: ${name}`, 'success');
+        showToast(i18nText("feature.factions.updatedAssetValue", { value0: name }, "Updated asset: {{value0}}"), 'success');
     } else {
         state.assets.push({
             id: 'asset-' + Date.now(),
@@ -1497,7 +1498,7 @@ window.submitAssetForm = function(evt, id) {
             status: 'maintained',
             source: 'local'
         });
-        showToast(`Added asset: ${name}`, 'success');
+        showToast(i18nText("feature.factions.addedAssetValue", { value0: name }, "Added asset: {{value0}}"), 'success');
     }
     saveFactionData();
     state.viewMode = 'assets';
@@ -1507,12 +1508,12 @@ window.submitAssetForm = function(evt, id) {
 window.deleteAsset = function(id) {
     const asset = state.assets.find(a => a.id === id);
     if (!asset) return;
-    if (!confirm(`Delete asset "${asset.name}"?`)) return;
+    if (!confirm(i18nText("feature.factions.deleteAssetValue", { value0: asset.name }, "Delete asset \"{{value0}}\"?"))) return;
     state.assets = state.assets.filter(a => a.id !== id);
     saveFactionData();
     state.viewMode = 'assets';
     goTo(null);
-    showToast(`Deleted asset: ${asset.name}`, 'info');
+    showToast(i18nText("feature.factions.deletedAssetValue", { value0: asset.name }, "Deleted asset: {{value0}}"), 'info');
 };
 
 window.changeAssetStatus = function(id, status) {
@@ -1522,7 +1523,7 @@ window.changeAssetStatus = function(id, status) {
     saveFactionData();
     refreshView();
     const statusInfo = ASSET_STATUS[status];
-    showToast(`${asset.name}: ${statusInfo.icon} ${statusInfo.label}`, 'info');
+    showToast(i18nText("feature.factions.valueValueValue", { value0: asset.name, value1: statusInfo.icon, value2: statusInfo.label }, "{{value0}}: {{value1}} {{value2}}"), 'info');
 };
 
 // ============================================================
@@ -1551,14 +1552,14 @@ window.submitFollowerForm = function(evt, id) {
         const follower = state.followers.find(f => f.id === id);
         if (!follower) return;
         Object.assign(follower, data, { source: 'local' });
-        showToast(`Updated follower: ${name}`, 'success');
+        showToast(i18nText("feature.factions.updatedFollowerValue", { value0: name }, "Updated follower: {{value0}}"), 'success');
     } else {
         state.followers.push({
             id: 'follower-' + Date.now(),
             ...data,
             source: 'local'
         });
-        showToast(`Added follower: ${name}`, 'success');
+        showToast(i18nText("feature.factions.addedFollowerValue", { value0: name }, "Added follower: {{value0}}"), 'success');
     }
     saveFactionData();
     state.viewMode = 'followers';
@@ -1568,12 +1569,12 @@ window.submitFollowerForm = function(evt, id) {
 window.deleteFollower = function(id) {
     const follower = state.followers.find(f => f.id === id);
     if (!follower) return;
-    if (!confirm(`Delete follower "${follower.name}"?`)) return;
+    if (!confirm(i18nText("feature.factions.deleteFollowerValue", { value0: follower.name }, "Delete follower \"{{value0}}\"?"))) return;
     state.followers = state.followers.filter(f => f.id !== id);
     saveFactionData();
     state.viewMode = 'followers';
     goTo(null);
-    showToast(`Deleted follower: ${follower.name}`, 'info');
+    showToast(i18nText("feature.factions.deletedFollowerValue", { value0: follower.name }, "Deleted follower: {{value0}}"), 'info');
 };
 
 window.changeFollowerState = function(id, type) {
@@ -1589,7 +1590,7 @@ window.changeFollowerState = function(id, type) {
     saveFactionData();
     refreshView();
     const label = type === 'loyalty' ? 'Loyalty' : 'Fitness';
-    showToast(`${label}: ${current} → ${next}`, 'info');
+    showToast(i18nText("feature.factions.valueValueValue_ugjwv", { value0: label, value1: current, value2: next }, "{{value0}}: {{value1}} → {{value2}}"), 'info');
 };
 
 // ============================================================
@@ -1619,7 +1620,7 @@ window.submitTrustForm = function(evt, id) {
         const trust = state.trusts.find(t => t.id === id);
         if (!trust) return;
         Object.assign(trust, data, { source: 'local' });
-        showToast(`Updated trust: ${name}`, 'success');
+        showToast(i18nText("feature.factions.updatedTrustValue", { value0: name }, "Updated trust: {{value0}}"), 'success');
     } else {
         state.trusts.push({
             id: 'trust-' + Date.now(),
@@ -1629,7 +1630,7 @@ window.submitTrustForm = function(evt, id) {
             obligation: 0,
             source: 'local'
         });
-        showToast(`Created trust: ${name}`, 'success');
+        showToast(i18nText("feature.factions.createdTrustValue", { value0: name }, "Created trust: {{value0}}"), 'success');
     }
     saveFactionData();
     state.viewMode = 'trusts';
@@ -1639,12 +1640,12 @@ window.submitTrustForm = function(evt, id) {
 window.deleteTrust = function(id) {
     const trust = state.trusts.find(t => t.id === id);
     if (!trust) return;
-    if (!confirm(`Delete trust "${trust.name}"?`)) return;
+    if (!confirm(i18nText("feature.factions.deleteTrustValue", { value0: trust.name }, "Delete trust \"{{value0}}\"?"))) return;
     state.trusts = state.trusts.filter(t => t.id !== id);
     saveFactionData();
     state.viewMode = 'trusts';
     goTo(null);
-    showToast(`Deleted trust: ${trust.name}`, 'info');
+    showToast(i18nText("feature.factions.deletedTrustValue", { value0: trust.name }, "Deleted trust: {{value0}}"), 'info');
 };
 
 window.addTrustAsset = function(evt, trustId) {
@@ -1659,12 +1660,12 @@ window.addTrustAsset = function(evt, trustId) {
     trust.assets.push(selected.id);
 
     if (trust.assets.length > (trust.maxAssets || 2)) {
-        showToast(`Warning: Trust now has ${trust.assets.length} assets, exceeding its capacity of ${trust.maxAssets || 2}.`, 'warning');
+        showToast(i18nText("feature.factions.warningTrustNowHasValueAssetsExceeding", { value0: trust.assets.length, value1: trust.maxAssets || 2 }, "Warning: Trust now has {{value0}} assets, exceeding its capacity of {{value1}}."), 'warning');
     }
 
     saveFactionData();
     refreshView();
-    showToast(`Added ${selected.name} to ${trust.name}`, 'success');
+    showToast(i18nText("feature.factions.addedValueToValue", { value0: selected.name, value1: trust.name }, "Added {{value0}} to {{value1}}"), 'success');
 };
 
 window.addTrustFollower = function(evt, trustId) {
@@ -1680,7 +1681,7 @@ window.addTrustFollower = function(evt, trustId) {
 
     saveFactionData();
     refreshView();
-    showToast(`Added ${selected.name} to ${trust.name}`, 'success');
+    showToast(i18nText("feature.factions.addedValueToValue", { value0: selected.name, value1: trust.name }, "Added {{value0}} to {{value1}}"), 'success');
 };
 
 // ============================================================
@@ -1692,7 +1693,7 @@ window.refreshFactions = function() {
     localStorage.removeItem(CACHE_KEY);
     loadFactionData();
     refreshView();
-    showToast('Factions refreshed', 'success');
+    showToast(i18nText("feature.factions.factionsRefreshed", null, "Factions refreshed"), 'success');
 };
 
 // ============================================================

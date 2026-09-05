@@ -35,6 +35,7 @@
  * here.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getSyncManager } from './sync/index.js';
 import { showToast } from '@components/Toast.js';
 // NEW: the recording-status overlay below is a visual-only pulsing badge
@@ -76,7 +77,7 @@ function createOverlay() {
     overlayElement.style.cssText = `
         position: fixed;
         top: 10px;
-        right: 10px;
+        inset-inline-end: 10px;
         z-index: 9999;
         background: rgba(180, 0, 0, 0.9);
         color: #fff;
@@ -129,9 +130,9 @@ function showOverlay(userId, userName = 'Someone') {
     const isSelf = userId === currentUserId;
     if (textEl) {
         if (isSelf) {
-            textEl.textContent = '🔴 You are recording';
+            textEl.textContent = i18nText("feature.core.media.youAreRecording", null, "🔴 You are recording");
         } else {
-            textEl.textContent = `🔴 ${userName} is recording`;
+            textEl.textContent = i18nText("feature.core.media.valueIsRecording", { value0: userName }, "🔴 {{value0}} is recording");
         }
     }
 
@@ -161,7 +162,7 @@ function hideOverlay() {
     if (timerEl) timerEl.textContent = '00:00';
 
     if (wasShowing) {
-        announce('Recording stopped.');
+        announce(i18nText("feature.core.media.recordingStopped", null, "Recording stopped."));
     }
 }
 
@@ -180,9 +181,9 @@ function startOverlayTimer() {
         const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
         const secs = String(elapsed % 60).padStart(2, '0');
         const timerEl = document.getElementById('media-recording-timer');
-        if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+        if (timerEl) timerEl.textContent = i18nText("feature.core.media.valueValue", { value0: mins, value1: secs }, "{{value0}}:{{value1}}");
         if (elapsed > 0 && elapsed % RECORDING_ANNOUNCE_INTERVAL_SEC === 0) {
-            announce(`Still recording — ${mins}:${secs} elapsed.`);
+            announce(i18nText("feature.core.media.stillRecordingValueValueElapsed", { value0: mins, value1: secs }, "Still recording — {{value0}}:{{value1}} elapsed."));
         }
     }, 1000);
 }
@@ -305,7 +306,7 @@ export function isLiveTranscriptionSupported() {
  */
 function startLiveTranscription() {
     if (!isLiveTranscriptionSupported()) {
-        showToast('Live transcription isn\'t supported in this browser (try Chrome/Edge). Recording continues without it.', 'warning');
+        showToast(i18nText("feature.core.media.liveTranscriptionIsnTSupportedInThis", null, "Live transcription isn't supported in this browser (try Chrome/Edge). Recording continues without it."), 'warning');
         return;
     }
     const SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -338,7 +339,7 @@ function startLiveTranscription() {
         speechRecognizer.start();
     } catch (e) {
         console.warn('[Media] Failed to start live transcription:', e);
-        showToast('Could not start live transcription. Recording continues without it.', 'warning');
+        showToast(i18nText("feature.core.media.couldNotStartLiveTranscriptionRecordingContinues", null, "Could not start live transcription. Recording continues without it."), 'warning');
     }
 }
 
@@ -479,7 +480,7 @@ export function initMediaModule(userId = 'local') {
  */
 export async function startRecording(userName = 'Player', { liveTranscription = false } = {}) {
     if (isRecording) {
-        showToast('Already recording.', 'warning');
+        showToast(i18nText("feature.core.media.alreadyRecording", null, "Already recording."), 'warning');
         return;
     }
 
@@ -544,18 +545,18 @@ export async function startRecording(userName = 'Player', { liveTranscription = 
             startLiveTranscription();
         }
 
-        showToast('🎥 Screen & Audio recording started.', 'success');
+        showToast(i18nText("feature.core.media.screenAudioRecordingStarted", null, "🎥 Screen & Audio recording started."), 'success');
 
     } catch (err) {
         console.error('[Media] Recording error:', err);
-        showToast('Screen capture canceled or failed.', 'error');
+        showToast(i18nText("feature.core.media.screenCaptureCanceledOrFailed", null, "Screen capture canceled or failed."), 'error');
         throw err;
     }
 }
 
 export function stopRecording() {
     if (!isRecording || !mediaRecorder) {
-        showToast('No recording in progress.', 'warning');
+        showToast(i18nText("feature.core.media.noRecordingInProgress", null, "No recording in progress."), 'warning');
         return;
     }
     
@@ -581,12 +582,12 @@ export function stopRecording() {
     }
     
     updateUIState(false);
-    showToast('⏹️ Recording stopped. Processing files...', 'info');
+    showToast(i18nText("feature.core.media.recordingStoppedProcessingFiles", null, "⏹️ Recording stopped. Processing files..."), 'info');
 }
 
 async function handleRecordingStop() {
     if (recordedChunks.length === 0) {
-        showToast('No video captured.', 'warning');
+        showToast(i18nText("feature.core.media.noVideoCaptured", null, "No video captured."), 'warning');
         return;
     }
 
@@ -602,7 +603,7 @@ async function handleRecordingStop() {
     recordedChunks = [];
     recordingEvents = [];
 
-    showToast('💾 Session recording bundle saved (.zip: video + SRT).', 'success');
+    showToast(i18nText("feature.core.media.sessionRecordingBundleSavedZipVideoSRT", null, "💾 Session recording bundle saved (.zip: video + SRT)."), 'success');
 }
 
 export function isCurrentlyRecording() {

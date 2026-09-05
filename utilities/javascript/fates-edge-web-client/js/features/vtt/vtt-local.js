@@ -17,6 +17,7 @@
  *      matching the connected mode; chat height increased.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { vttStore } from '@core/vtt-store.js';
 import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory, saveState } from '@core/state.js';
 import { performRoll } from '@core/dice.js';
@@ -98,16 +99,16 @@ async function renderMiniTracker() {
           const objType = resolveObjectiveType(c.objectiveType, c);
           const progressPill = c.harm > 0
             ? (isCombat
-                ? `<span class="text-muted text-sm" style="color:var(--red);" title="Harm">H${c.harm}</span>`
+                ? `<span class="text-muted text-sm" style="color:var(--red);" title="Harm" data-i18n-attr="title:feature.vtt.vtt-local.harm">H${c.harm}</span>`
                 : `<span class="text-muted text-sm" style="color:var(--orange);" title="${escHtml(objType.progressLabel)}">${objType.icon}${c.harm}/${c.maxHarm}</span>`)
             : '';
           return `
-            <div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.3rem;border-radius:4px;${isActive ? 'background:var(--bg4);border-left:2px solid var(--gold);' : ''}font-size:0.85rem;">
+            <div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.3rem;border-radius:4px;${isActive ? 'background:var(--bg4);border-inline-start:2px solid var(--gold);' : ''}font-size:0.85rem;">
               <span style="flex:0 0 1.1rem;text-align:center;">${isActive ? '▶' : ''}</span>
               <span style="flex:0 0 auto;color:${c.type === 'player' ? 'var(--blue)' : 'var(--red)'};">${weaponGlyph}</span>
               <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(c.name)}</span>
               ${progressPill}
-              ${(isCombat && c.fatigue > 0) ? `<span class="text-muted text-sm" title="Fatigue">F${c.fatigue}</span>` : ''}
+              ${(isCombat && c.fatigue > 0) ? `<span class="text-muted text-sm" title="Fatigue" data-i18n-attr="title:feature.vtt.vtt-local.fatigue">F${c.fatigue}</span>` : ''}
               ${rangeHtml}
             </div>
           `;
@@ -202,7 +203,7 @@ function rollLocal(postToChat = true) {
 
   const result = performRoll(attr, skill, dv, pos, boons);
   if (!result) {
-    showToast('Pool must be at least 1 die.', 'error');
+    showToast(i18nText("feature.vtt.vtt-local.poolMustBeAtLeast1Die", null, "Pool must be at least 1 die."), 'error');
     return;
   }
   if (out) {
@@ -215,7 +216,7 @@ function rollLocal(postToChat = true) {
     }).join('');
     out.innerHTML = `
       <div class="vtt-roll-result">
-        <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.9rem;margin-right:0.4rem;background:${getOutcomeColor(result.outcome)};">
+        <span class="outcome-tag ${result.outcomeClass}" style="display:inline-block;padding:0.15rem 0.8rem;border-radius:20px;font-weight:600;font-size:0.9rem;margin-inline-end:0.4rem;background:${getOutcomeColor(result.outcome)};">
           ${result.outcome}
         </span>
         <div class="vtt-roll-dice">${diceHtml}</div>
@@ -275,7 +276,7 @@ function handleSlash(text) {
       const boons = parseInt(parts[5], 10) || 0;
       const note = parts.slice(6).join(' ') || '';
       const result = performRoll(attr, skill, dv, pos, boons);
-      if (!result) { showToast('Pool must be at least 1 die.', 'error'); return; }
+      if (!result) { showToast(i18nText("feature.vtt.vtt-local.poolMustBeAtLeast1Die", null, "Pool must be at least 1 die."), 'error'); return; }
       const msg = `[${result.outcome}] ${attr}+${skill} vs DV${dv} (${pos}) → ${result.dice.join(' ')} (S:${result.successes} SB:${result.storyBeats})${result.critical ? ' | 💥 CRIT' : ''}${note ? ' — ' + note : ''}`;
       sendMessage(msg, sender, 'all', {
         rollData: {
@@ -301,9 +302,9 @@ function handleSlash(text) {
         state.timers.push(newTimer);
         vttStore.updateTimers(state.timers);
         sendMessage(`Timer created: ${name} (${segments} segments)`, 'System', 'all');
-        showToast(`Timer "${name}" created.`, 'success');
+        showToast(i18nText("feature.vtt.vtt-local.timerValueCreated", { value0: name }, "Timer \"{{value0}}\" created."), 'success');
       }).catch(err => {
-        showToast('Failed to create timer', 'error');
+        showToast(i18nText("feature.vtt.vtt-local.failedToCreateTimer", null, "Failed to create timer"), 'error');
       });
       break;
     }
@@ -338,11 +339,11 @@ function handleSlash(text) {
     case 'clear': {
       clearChatHistory?.();
       vttStore.clearChat();
-      showToast('Chat cleared.', 'success');
+      showToast(i18nText("feature.vtt.vtt-local.chatCleared", null, "Chat cleared."), 'success');
       break;
     }
     default: {
-      showToast('Unknown command. Try /help', 'error');
+      showToast(i18nText("feature.vtt.vtt-local.unknownCommandTryHelp", null, "Unknown command. Try /help"), 'error');
     }
   }
 }
@@ -359,7 +360,7 @@ async function toggleVoice() {
       voiceInitialized = true;
       const toggleBtn = q('#vtt-voice-toggle');
       if (toggleBtn) {
-        toggleBtn.textContent = '🎤 Voice On';
+        toggleBtn.textContent = i18nText("feature.vtt.vtt-local.voiceOn", null, "🎤 Voice On");
         toggleBtn.className = 'btn btn-sm btn-primary';
       }
       const containerEl = q('.flex-between .flex:last-child');
@@ -367,23 +368,23 @@ async function toggleVoice() {
         const muteBtn = document.createElement('button');
         muteBtn.id = 'vtt-mute-toggle';
         muteBtn.className = 'btn btn-sm btn-green';
-        muteBtn.textContent = '🎙️ Live';
+        muteBtn.textContent = i18nText("feature.vtt.vtt-local.live", null, "🎙️ Live");
         muteBtn.addEventListener('click', toggleMuteVoice);
         containerEl.appendChild(muteBtn);
       }
-      showToast('Voice chat enabled!', 'success');
+      showToast(i18nText("feature.vtt.vtt-local.voiceChatEnabled", null, "Voice chat enabled!"), 'success');
     }
   } else {
     cleanupVoice();
     voiceInitialized = false;
     const toggleBtn = q('#vtt-voice-toggle');
     if (toggleBtn) {
-      toggleBtn.textContent = '🎤 Voice Off';
+      toggleBtn.textContent = i18nText("feature.vtt.vtt-local.voiceOff", null, "🎤 Voice Off");
       toggleBtn.className = 'btn btn-sm';
     }
     const muteBtn = q('#vtt-mute-toggle');
     if (muteBtn) muteBtn.remove();
-    showToast('Voice chat disabled.', 'info');
+    showToast(i18nText("feature.vtt.vtt-local.voiceChatDisabled", null, "Voice chat disabled."), 'info');
   }
   updateVoiceUI();
 }
@@ -393,10 +394,10 @@ function toggleMuteVoice() {
   const btn = q('#vtt-mute-toggle');
   if (!btn) return;
   if (muted) {
-    btn.textContent = '🔇 Muted';
+    btn.textContent = i18nText("feature.vtt.vtt-local.muted", null, "🔇 Muted");
     btn.className = 'btn btn-sm btn-danger';
   } else {
-    btn.textContent = '🎙️ Live';
+    btn.textContent = i18nText("feature.vtt.vtt-local.live", null, "🎙️ Live");
     btn.className = 'btn btn-sm btn-green';
   }
 }
@@ -407,10 +408,10 @@ function updateVoiceUI() {
   const muteBtn = q('#vtt-mute-toggle');
   if (!muteBtn) return;
   if (status.muted) {
-    muteBtn.textContent = '🔇 Muted';
+    muteBtn.textContent = i18nText("feature.vtt.vtt-local.muted", null, "🔇 Muted");
     muteBtn.className = 'btn btn-sm btn-danger';
   } else {
-    muteBtn.textContent = '🎙️ Live';
+    muteBtn.textContent = i18nText("feature.vtt.vtt-local.live", null, "🎙️ Live");
     muteBtn.className = 'btn btn-sm btn-green';
   }
 }
@@ -450,20 +451,20 @@ function attachEvents() {
     const id = target.id;
     switch (id) {
       case 'chat-send-btn': e.preventDefault(); handleSendMessage(); break;
-      case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast('Chat cleared.', 'success'); break;
+      case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast(i18nText("feature.vtt.vtt-local.chatCleared", null, "Chat cleared."), 'success'); break;
       case 'vtt-refresh-btn': {
         const chars = getCharacters();
         vttStore.updateCharacters(chars);
         vttStore.updateTimers(getState().timers || []);
-        showToast('VTT refreshed.', 'info');
+        showToast(i18nText("feature.vtt.vtt-local.vttRefreshed", null, "VTT refreshed."), 'info');
         break;
       }
       case 'vtt-roll-post-btn': rollLocal(true); break;
       case 'vtt-roll-only-btn': rollLocal(false); break;
       case 'vtt-add-timer': {
-        const name = prompt('Timer name:', 'Scene Timer');
+        const name = prompt(i18nText("feature.vtt.vtt-local.timerName", null, "Timer name:"), 'Scene Timer');
         if (name) {
-          const segments = parseInt(prompt('Segments:', '6') || '6');
+          const segments = parseInt(prompt(i18nText("feature.vtt.vtt-local.segments", null, "Segments:"), '6') || '6');
           const state = getState();
           const newTimer = { 
             id: 'timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4), 
@@ -475,7 +476,7 @@ function attachEvents() {
           state.timers.push(newTimer);
           vttStore.updateTimers(state.timers);
           sendMessage(`Timer created: ${name} (${segments} segments)`, 'System', 'all');
-          showToast(`Timer "${name}" created.`, 'success');
+          showToast(i18nText("feature.vtt.vtt-local.timerValueCreated", { value0: name }, "Timer \"{{value0}}\" created."), 'success');
         }
         break;
       }
@@ -499,7 +500,7 @@ function attachEvents() {
           saveState();
           vttStore.updateCharacters(getCharacters());
           resetCombatScene();
-          showToast('Scene ended: Boons trimmed.', 'info');
+          showToast(i18nText("feature.vtt.vtt-local.sceneEndedBoonsTrimmed", null, "Scene ended: Boons trimmed."), 'info');
         });
         break;
       }
@@ -591,15 +592,15 @@ export function render(el) {
       <h1 class="page-title">
         💬 VTT – Live Table
         <span class="mode-indicator vtt-stat-pill local">📡 Local</span>
-        <button class="btn btn-sm btn-ghost" onclick="window.location.hash='whiteboard'" title="Open Whiteboard">✏️ Whiteboard</button>
+        <button class="btn btn-sm btn-ghost" onclick="window.location.hash='whiteboard'" title="Open Whiteboard" data-i18n-attr="title:feature.vtt.vtt-local.openWhiteboard" data-i18n="feature.vtt.vtt-local.whiteboard">✏️ Whiteboard</button>
       </h1>
-      <p class="page-sub">Chat, party status, quick die roller, and scene timers all in one view.</p>
+      <p class="page-sub" data-i18n="feature.vtt.vtt-local.chatPartyStatusQuickDieRollerAnd">Chat, party status, quick die roller, and scene timers all in one view.</p>
     </div>
 
     <!-- Table Status -->
     <div class="panel vtt-card status-panel">
       <div class="vtt-card-header">
-        <span class="vtt-card-title">🛰️ Table Status</span>
+        <span class="vtt-card-title" data-i18n="feature.vtt.vtt-local.tableStatus">🛰️ Table Status</span>
         <span class="vtt-stat-pill">
           <span class="vtt-dot" style="background:var(--vtt-gold);"></span>
           📡 Local mode (no server)
@@ -614,11 +615,11 @@ export function render(el) {
            rather set it there). -->
       <div class="vtt-stat-row" id="vtt-local-only-row" style="justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;margin-bottom:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);">
         ${isLocalOnlyMode() ? `
-          <span class="text-muted" style="font-size:0.85rem;">✅ Fully offline &mdash; no connection attempts, no reconnect loop.</span>
-          <button class="btn btn-sm btn-ghost" id="vtt-local-only-toggle" title="Allow connecting to a server again">🌐 Allow connecting</button>
+          <span class="text-muted" style="font-size:0.85rem;" data-i18n="feature.vtt.vtt-local.fullyOfflineNoConnectionAttemptsNoReconnect">✅ Fully offline &mdash; no connection attempts, no reconnect loop.</span>
+          <button class="btn btn-sm btn-ghost" id="vtt-local-only-toggle" title="Allow connecting to a server again" data-i18n-attr="title:feature.vtt.vtt-local.allowConnectingToAServerAgain" data-i18n="feature.vtt.vtt-local.allowConnecting">🌐 Allow connecting</button>
         ` : `
-          <span class="text-muted" style="font-size:0.85rem;">Still trying to reconnect in the background? Turn that off:</span>
-          <button class="btn btn-sm btn-ghost" id="vtt-local-only-toggle" title="Stop all connection attempts and stay fully offline">🔌 Work fully offline</button>
+          <span class="text-muted" style="font-size:0.85rem;" data-i18n="feature.vtt.vtt-local.stillTryingToReconnectInTheBackground">Still trying to reconnect in the background? Turn that off:</span>
+          <button class="btn btn-sm btn-ghost" id="vtt-local-only-toggle" title="Stop all connection attempts and stay fully offline" data-i18n-attr="title:feature.vtt.vtt-local.stopAllConnectionAttemptsAndStayFully" data-i18n="feature.vtt.vtt-local.workFullyOffline">🔌 Work fully offline</button>
         `}
       </div>
       <div class="vtt-stat-row" style="justify-content:space-between;">
@@ -631,7 +632,7 @@ export function render(el) {
       <div id="voice-clients-list" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">${voiceClientsHtml}</div>
       <div class="vtt-divider"></div>
       <div class="vtt-card-header" style="margin-bottom:0.35rem;">
-        <span class="vtt-card-title" style="font-size:1rem;">👥 Party Members</span>
+        <span class="vtt-card-title" style="font-size:1rem;" data-i18n="feature.vtt.vtt-local.partyMembers">👥 Party Members</span>
         <span class="vtt-stat-pill" id="vtt-mode-badge">📡 Local</span>
       </div>
       <div id="presence-list"></div>
@@ -642,10 +643,10 @@ export function render(el) {
       <!-- Chat Column -->
       <div class="chat-box vtt-card" style="display:flex;flex-direction:column;min-height:min(55vh, 500px);">
         <div class="vtt-card-header">
-          <span class="vtt-card-title">💬 Chat</span>
+          <span class="vtt-card-title" data-i18n="feature.vtt.vtt-local.chat">💬 Chat</span>
           <div class="vtt-btn-row" style="align-items:center;">
-            <span class="text-muted" id="message-count">0 messages</span>
-            <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat">🗑️</button>
+            <span class="text-muted" id="message-count" data-i18n="feature.vtt.vtt-local.0Messages">0 messages</span>
+            <button class="btn btn-sm btn-ghost" id="vtt-clear-chat" title="Clear chat" data-i18n-attr="title:feature.vtt.vtt-local.clearChat">🗑️</button>
           </div>
         </div>
         <!-- Viewport-relative sizing so short/mobile viewports don't force a
@@ -653,21 +654,21 @@ export function render(el) {
              capped so huge desktop monitors don't get an absurdly tall pane.
              NEW: role="log"/aria-live="polite"/aria-relevant="additions" —
              see the matching change in vtt-connected.js's header comment. -->
-        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);"></div>
+        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);" data-i18n-attr="aria-label:feature.vtt.vtt-local.chatMessages"></div>
         <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
         <div class="chat-input-row" style="display:flex;gap:0.4rem;">
-          <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" />
+          <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" / data-i18n-attr="placeholder:feature.vtt.vtt-local.typeRollTimerHelp">
           <select id="chatRecipient" style="flex:0 0 120px;font-size:1rem;">
-            <option value="all">All</option>
+            <option value="all" data-i18n="feature.vtt.vtt-local.all">All</option>
           </select>
-          <button class="btn btn-gold" id="chat-send-btn">Send</button>
+          <button class="btn btn-gold" id="chat-send-btn" data-i18n="feature.vtt.vtt-local.send">Send</button>
         </div>
         <div class="flex mt-1" style="flex-wrap:wrap;gap:0.9rem;font-size:0.9rem;align-items:center;">
           <label class="inline-check"><input type="checkbox" id="vtt-post-chat" checked /> Post rolls to chat</label>
           <label class="inline-check"><input type="checkbox" id="vtt-auto-scroll" checked /> Auto-scroll</label>
           <!-- NEW: "Type to Speak" -- see vtt-connected.js for the same
                checkbox and the reasoning behind it. -->
-          <label class="inline-check" title="Reads new chat messages aloud, so a player who types instead of speaking is still heard"><input type="checkbox" id="vtt-speak-messages" /> 🔊 Read aloud</label>
+          <label class="inline-check" title="Reads new chat messages aloud, so a player who types instead of speaking is still heard" data-i18n-attr="title:feature.vtt.vtt-local.readsNewChatMessagesAloudSoA"><input type="checkbox" id="vtt-speak-messages" /> 🔊 Read aloud</label>
         </div>
         <div class="vtt-hint">Try <code>/roll 3 2 3</code> or <code>/help</code> for the full command list.</div>
       </div>
@@ -678,8 +679,8 @@ export function render(el) {
           <!-- Party -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
-              <span class="vtt-card-title" style="font-size:1.05rem;">👥 Party</span>
-              <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh">↻</button>
+              <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-local.party">👥 Party</span>
+              <button class="btn btn-sm btn-ghost" id="vtt-refresh-btn" title="Refresh" data-i18n-attr="title:feature.vtt.vtt-local.refresh">↻</button>
             </div>
             <div id="vttCharGrid" class="vtt-char-grid"></div>
             <!-- NEW: detail panel for selected character (TTRPG sheet) -->
@@ -689,7 +690,7 @@ export function render(el) {
           <!-- Combat Actions -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
-              <span class="vtt-card-title" style="font-size:1.05rem;">⚔️ Combat Actions</span>
+              <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-local.combatActions">⚔️ Combat Actions</span>
             </div>
             <div id="vtt-combat-actions" style="min-height:2.5rem;"></div>
           </div>
@@ -700,8 +701,8 @@ export function render(el) {
                getTrackerState() there); safe no-op if none is active. -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
-              <span class="vtt-card-title" style="font-size:1.05rem;">🗡️ Combat Tracker</span>
-              <button class="btn btn-sm btn-ghost" onclick="window.location.hash='encounters'" title="Open full Encounters tracker">↗️</button>
+              <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-local.combatTracker">🗡️ Combat Tracker</span>
+              <button class="btn btn-sm btn-ghost" onclick="window.location.hash='encounters'" title="Open full Encounters tracker" data-i18n-attr="title:feature.vtt.vtt-local.openFullEncountersTracker">↗️</button>
             </div>
             <div id="vtt-mini-tracker-body" style="min-height:2rem;"></div>
           </div>
@@ -709,56 +710,56 @@ export function render(el) {
           <!-- Quick Roller -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
-              <span class="vtt-card-title" style="font-size:1.05rem;">🎲 Quick Roller</span>
+              <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-local.quickRoller">🎲 Quick Roller</span>
             </div>
             <div class="vtt-dice-row">
               <div class="vtt-field">
-                <label>Attr</label>
+                <label data-i18n="feature.vtt.vtt-local.attr">Attr</label>
                 <input type="number" id="vtt-attr" value="3" min="1" max="8" style="width:100%;" />
               </div>
               <div class="vtt-field">
-                <label>Skill</label>
+                <label data-i18n="feature.vtt.vtt-local.skill">Skill</label>
                 <input type="number" id="vtt-skill" value="2" min="0" max="12" style="width:100%;" />
               </div>
               <div class="vtt-field" style="flex:0 0 80px;">
-                <label>DV</label>
+                <label data-i18n="feature.vtt.vtt-local.dv">DV</label>
                 <select id="vtt-dv">
                   <option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5+</option>
                 </select>
               </div>
               <div class="vtt-field" style="flex:0 0 90px;">
-                <label>Pos</label>
+                <label data-i18n="feature.vtt.vtt-local.pos">Pos</label>
                 <select id="vtt-pos">
-                  <option value="dominant">Dom</option><option value="controlled" selected>Ctrl</option><option value="desperate">Desp</option>
+                  <option value="dominant" data-i18n="feature.vtt.vtt-local.dom">Dom</option><option value="controlled" selected data-i18n="feature.vtt.vtt-local.ctrl">Ctrl</option><option value="desperate" data-i18n="feature.vtt.vtt-local.desp">Desp</option>
                 </select>
               </div>
               <div class="vtt-field" style="flex:0 0 70px;">
-                <label>Boons</label>
+                <label data-i18n="feature.vtt.vtt-local.boons">Boons</label>
                 <input type="number" id="vtt-boons" value="0" min="0" max="5" />
               </div>
             </div>
             <div class="vtt-dice-row" style="margin-top:0.4rem;">
               <div class="vtt-field" style="flex:1 1 140px;">
-                <label>Weapon</label>
+                <label data-i18n="feature.vtt.vtt-local.weapon">Weapon</label>
                 <select id="vtt-attack-type" title="Weapon weight class — drives the range bonus below (Player's Guide §3.12.1-3.12.3).">
                   <option value="">— N/A —</option>
-                  <option value="light">🗡️ Light</option>
-                  <option value="medium">⚔️ Medium</option>
-                  <option value="heavy">🔨 Heavy</option>
-                  <option value="ranged">🏹 Ranged</option>
+                  <option value="light" data-i18n="feature.vtt.vtt-local.light">🗡️ Light</option>
+                  <option value="medium" data-i18n="feature.vtt.vtt-local.medium">⚔️ Medium</option>
+                  <option value="heavy" data-i18n="feature.vtt.vtt-local.heavy">🔨 Heavy</option>
+                  <option value="ranged" data-i18n="feature.vtt.vtt-local.ranged">🏹 Ranged</option>
                 </select>
               </div>
               <div class="vtt-field" style="flex:1 1 160px;">
-                <label>Range (GM-set)</label>
-                <select id="vtt-range" title="The narrative range the GM told you before rolling.">
+                <label data-i18n="feature.vtt.vtt-local.rangeGMSet">Range (GM-set)</label>
+                <select id="vtt-range" title="The narrative range the GM told you before rolling." data-i18n-attr="title:feature.vtt.vtt-local.theNarrativeRangeTheGMToldYou">
                   ${RANGE_BAND_OPTIONS.map(r => `<option value="${r.key}">${r.label}</option>`).join('')}
                 </select>
               </div>
             </div>
             <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
             <div class="vtt-btn-row" style="margin-top:0.5rem;">
-              <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn">Roll &amp; Post</button>
-              <button class="btn btn-sm" id="vtt-roll-only-btn">Roll Only</button>
+              <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-local.rollPost">Roll &amp; Post</button>
+              <button class="btn btn-sm" id="vtt-roll-only-btn" data-i18n="feature.vtt.vtt-local.rollOnly">Roll Only</button>
             </div>
             <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>
           </div>
@@ -766,12 +767,12 @@ export function render(el) {
           <!-- Timers -->
           <div class="vtt-panel vtt-card">
             <div class="vtt-card-header">
-              <span class="vtt-card-title" style="font-size:1.05rem;">⏱️ Scene Timers</span>
+              <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-local.sceneTimers">⏱️ Scene Timers</span>
             </div>
             <div id="vttTimerList"></div>
             <div class="vtt-btn-row" style="margin-top:0.5rem;">
-              <button class="btn btn-sm" id="vtt-add-timer">+ Add Timer</button>
-              <button class="btn btn-sm" id="vtt-scene-end">🌅 Scene End</button>
+              <button class="btn btn-sm" id="vtt-add-timer" data-i18n="feature.vtt.vtt-local.addTimer">+ Add Timer</button>
+              <button class="btn btn-sm" id="vtt-scene-end" data-i18n="feature.vtt.vtt-local.sceneEnd">🌅 Scene End</button>
             </div>
           </div>
         </div>

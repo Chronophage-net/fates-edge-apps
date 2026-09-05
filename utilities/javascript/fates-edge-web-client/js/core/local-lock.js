@@ -24,6 +24,7 @@
  * any changes needed here.
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { showToast } from '@components/Toast.js';
 
 const LOCK_HASH_KEY = 'fates-edge-local-lock-hash';
@@ -141,14 +142,14 @@ export async function lockApp() {
     let justSetPassword = false;
 
     if (!hasLocalLockPassword()) {
-        const pw = prompt('Set a local lock password (stored only on this device):');
+        const pw = prompt(i18nText("feature.core.local-lock.setALocalLockPasswordStoredOnly", null, "Set a local lock password (stored only on this device):"));
         if (!pw) {
-            showToast('Lock cancelled — no password set.', 'info');
+            showToast(i18nText("feature.core.local-lock.lockCancelledNoPasswordSet", null, "Lock cancelled — no password set."), 'info');
             return false;
         }
-        const confirmPw = prompt('Confirm password:');
+        const confirmPw = prompt(i18nText("feature.core.local-lock.confirmPassword", null, "Confirm password:"));
         if (confirmPw !== pw) {
-            showToast('Passwords did not match. Lock cancelled.', 'error');
+            showToast(i18nText("feature.core.local-lock.passwordsDidNotMatchLockCancelled", null, "Passwords did not match. Lock cancelled."), 'error');
             return false;
         }
         await setLocalLockPassword(pw);
@@ -194,7 +195,7 @@ export function initLocalLock() {
         if (ok) {
             unlock();
         } else {
-            if (errorEl) errorEl.textContent = '❌ Incorrect password.';
+            if (errorEl) errorEl.textContent = i18nText("feature.core.local-lock.incorrectPassword", null, "❌ Incorrect password.");
             input.value = '';
             input.focus();
         }
@@ -221,7 +222,7 @@ export function initLocalLock() {
             unlock('Unlocked via emergency reset. Set a new lock password when convenient.', 'warning');
             resetInput.value = '';
         } else {
-            if (errorEl) errorEl.textContent = '❌ Invalid reset code.';
+            if (errorEl) errorEl.textContent = i18nText("feature.core.local-lock.invalidResetCode", null, "❌ Invalid reset code.");
             resetInput.value = '';
         }
     }

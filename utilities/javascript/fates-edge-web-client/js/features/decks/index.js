@@ -35,6 +35,7 @@
  *   - A: Ace → 10 segments
  */
 
+import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { shuffleArray } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
 import { getState, addTimer } from '@core/state.js';
@@ -425,7 +426,7 @@ async function fetchRegionData(regionName) {
         console.warn(`[Decks] Could not load ${regionName}, using fallback.`, e);
         const fallback = createFallbackData(regionName);
         regionDataCache.set(regionName, fallback);
-        showToast(`⚠️ Could not load region "${regionName}". Using fallback.`, 'warning');
+        showToast(i18nText("feature.decks.couldNotLoadRegionValueUsingFallback", { value0: regionName }, "⚠️ Could not load region \"{{value0}}\". Using fallback."), 'warning');
         return fallback;
     }
 }
@@ -459,7 +460,7 @@ function escapeKeepingAllowedTags(text) {
 
 function renderBracketChips(html) {
     return html.replace(/\[([A-Za-z][A-Za-z ]{0,20}):\s*([^\]]+)\]/g, (match, label, detail) => `
-        <span style="display:inline-block;margin:0.15rem 0.25rem 0.15rem 0;padding:0.05rem 0.5rem;background:var(--bg4);border-radius:10px;border-left:2px solid var(--gold);font-size:0.85em;">
+        <span style="display:inline-block;margin:0.15rem 0.25rem 0.15rem 0;padding:0.05rem 0.5rem;background:var(--bg4);border-radius:10px;border-inline-start:2px solid var(--gold);font-size:0.85em;">
             <strong style="color:var(--gold);">${label}:</strong> ${detail}
         </span>
     `);
@@ -787,7 +788,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     `;
 
     const verticalLayout = positionCards.map(p => `
-        <div style="display:grid;grid-template-columns:100px 1fr;gap:0.5rem;padding:0.5rem;background:var(--bg2);border-radius:var(--radius);margin-bottom:0.3rem;border-left:4px solid ${p.isJoker ? 'var(--gold)' : p.color};">
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:0.5rem;padding:0.5rem;background:var(--bg2);border-radius:var(--radius);margin-bottom:0.3rem;border-inline-start:4px solid ${p.isJoker ? 'var(--gold)' : p.color};">
             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
                 <div style="font-size:1.5rem;color:${p.isJoker ? 'var(--gold)' : p.color};">${p.isJoker ? '🃏' : p.symbol}</div>
                 <div style="font-size:0.8rem;font-weight:600;color:var(--gold);">${p.isJoker ? 'Joker' : p.rankName}</div>
@@ -943,7 +944,7 @@ async function handleRegionChange() {
     const descEl = document.getElementById('region-description');
 
     if (!regionName) {
-        if (descEl) descEl.textContent = 'Select a region to display its description.';
+        if (descEl) descEl.textContent = i18nText("feature.decks.selectARegionToDisplayItsDescription", null, "Select a region to display its description.");
         return;
     }
 
@@ -973,8 +974,8 @@ export async function render(el) {
 
     container.innerHTML = `
         <div class="decks-header">
-            <h1 class="page-title">🃏 Deck of Consequences</h1>
-            <p class="page-sub">Loading regions...</p>
+            <h1 class="page-title" data-i18n="feature.decks.deckOfConsequences">🃏 Deck of Consequences</h1>
+            <p class="page-sub" data-i18n="feature.decks.loadingRegions">Loading regions...</p>
         </div>
         <div style="display:flex;justify-content:center;padding:2rem;">
             <span style="color:var(--text2);">📂 Discovering available regions…</span>
@@ -1000,20 +1001,20 @@ export async function render(el) {
     if (accessible) {
         controlsHtml = `
             <div class="panel">
-                <h3>Draw Type</h3>
+                <h3 data-i18n="feature.decks.drawType">Draw Type</h3>
                 <div class="deck-controls" style="display:flex;flex-wrap:wrap;gap:0.8rem;align-items:end;">
                     <div class="field" style="flex:0 0 200px;">
-                        <label>Cost / Draw</label>
+                        <label data-i18n="feature.decks.costDraw">Cost / Draw</label>
                         <select id="deck-draw-type">
-                            <option value="1">1 SB (1 card)</option>
-                            <option value="2" selected>2 SB (2 cards)</option>
-                            <option value="3">3 SB (3 cards)</option>
-                            <option value="crown">👑 Crown Spread (4+1 wildcard)</option>
+                            <option value="1" data-i18n="feature.decks.1SB1Card">1 SB (1 card)</option>
+                            <option value="2" selected data-i18n="feature.decks.2SB2Cards">2 SB (2 cards)</option>
+                            <option value="3" data-i18n="feature.decks.3SB3Cards">3 SB (3 cards)</option>
+                            <option value="crown" data-i18n="feature.decks.crownSpread41Wildcard">👑 Crown Spread (4+1 wildcard)</option>
                         </select>
                     </div>
-                    <button class="btn btn-gold" id="deck-draw-btn">🃏 Draw</button>
-                    <button class="btn" id="deck-reshuffle-btn">↺ Reshuffle</button>
-                    <span class="text-muted" id="deck-cards-remaining">54 cards</span>
+                    <button class="btn btn-gold" id="deck-draw-btn" data-i18n="feature.decks.draw">🃏 Draw</button>
+                    <button class="btn" id="deck-reshuffle-btn" data-i18n="feature.decks.reshuffle">↺ Reshuffle</button>
+                    <span class="text-muted" id="deck-cards-remaining" data-i18n="feature.decks.54Cards">54 cards</span>
                 </div>
                 <div id="spread-type-indicator" style="margin-top:0.4rem;font-size:0.85rem;color:var(--text2);">
                     <span id="spread-description">Single draw: one consequence</span>
@@ -1021,21 +1022,21 @@ export async function render(el) {
             </div>
 
             <div class="panel" id="consequence-display">
-                <h3 id="consequence-title">Cards Drawn</h3>
+                <h3 id="consequence-title" data-i18n="feature.decks.cardsDrawn">Cards Drawn</h3>
                 <div id="crown-spread-cards" style="margin:0.8rem 0;display:none;"></div>
                 <div class="card-grid" id="drawn-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.8rem;margin:0.8rem 0;"></div>
-                <div id="consequence-synthesis" class="consequence-synthesis" style="background:var(--bg3);border-left:4px solid var(--gold);padding:0.8rem 1rem;border-radius:var(--radius);margin-top:0.8rem;font-style:italic;white-space:pre-wrap;">
+                <div id="consequence-synthesis" class="consequence-synthesis" style="background:var(--bg3);border-inline-start:4px solid var(--gold);padding:0.8rem 1rem;border-radius:var(--radius);margin-top:0.8rem;font-style:italic;white-space:pre-wrap;">
                     Draw cards to see a complication.
                 </div>
                 <div id="crown-spread-details" style="margin-top:0.8rem;display:none;"></div>
-                <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-left:4px solid var(--accent);"></div>
+                <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--accent);"></div>
             </div>
         `;
     } else {
         controlsHtml = `
             <div class="panel" style="background:var(--bg2);border:2px dashed var(--border);text-align:center;padding:1.5rem;">
                 <div style="font-size:2rem;">🔒</div>
-                <h3 style="color:var(--text2);">Deck is GM‑only</h3>
+                <h3 style="color:var(--text2);" data-i18n="feature.decks.deckIsGMOnly">Deck is GM‑only</h3>
                 <p style="color:var(--text3);">Only the Game Master can draw cards in a connected session.</p>
                 <p style="font-size:0.8rem;color:var(--text3);">You can still browse regions and view the history.</p>
             </div>
@@ -1045,35 +1046,35 @@ export async function render(el) {
     // Assemble the full UI
     container.innerHTML = `
         <div class="decks-header">
-            <h1 class="page-title">🃏 Deck of Consequences</h1>
-            <p class="page-sub">Transform Story Beats (SB) into thematic complications. Choose a region and draw type.</p>
+            <h1 class="page-title" data-i18n="feature.decks.deckOfConsequences">🃏 Deck of Consequences</h1>
+            <p class="page-sub" data-i18n="feature.decks.transformStoryBeatsSBIntoThematicComplications">Transform Story Beats (SB) into thematic complications. Choose a region and draw type.</p>
         </div>
 
-        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-left:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
+        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-inline-start:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                 <span style="font-size:0.8rem;color:var(--text2);">
                     ${isDeterministic ? '🎲 Deterministic RNG (seeded)' : '🔀 Cryptographic RNG (random)'}
                     ${isDeterministic ? `<span style="font-size:0.6rem;color:var(--text3);font-family:monospace;">seed: ${_deckSeedState.seed.substring(0, 8)}...</span>` : ''}
                 </span>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-ghost" id="deck-seed-regenerate" title="Regenerate seed">🔄 New Seed</button>
-                    <button class="btn btn-xs btn-ghost" id="deck-seed-clear" title="Clear seed (use crypto)">🧹 Clear Seed</button>
+                    <button class="btn btn-xs btn-ghost" id="deck-seed-regenerate" title="Regenerate seed" data-i18n-attr="title:feature.decks.regenerateSeed" data-i18n="feature.decks.newSeed">🔄 New Seed</button>
+                    <button class="btn btn-xs btn-ghost" id="deck-seed-clear" title="Clear seed (use crypto)" data-i18n-attr="title:feature.decks.clearSeedUseCrypto" data-i18n="feature.decks.clearSeed">🧹 Clear Seed</button>
                 </div>
             </div>
         </div>
 
         <div class="panel">
             <div class="field" style="max-width:300px;display:flex;align-items:center;gap:0.5rem;">
-                <label style="margin:0;">Region</label>
+                <label style="margin:0;" data-i18n="feature.decks.region">Region</label>
                 <select id="deck-region-select">
-                    <option value="">— Select Region —</option>
+                    <option value="" data-i18n="feature.decks.selectRegion">— Select Region —</option>
                     ${regionOptions}
                 </select>
-                <button class="btn btn-xs btn-ghost" id="deck-refresh-regions" title="Re-scan for region files">🔄</button>
+                <button class="btn btn-xs btn-ghost" id="deck-refresh-regions" title="Re-scan for region files" data-i18n-attr="title:feature.decks.reScanForRegionFiles">🔄</button>
                 <span style="font-size:0.7rem;color:var(--text3);white-space:nowrap;">(${regionCount} regions)</span>
             </div>
             ${regionNames.length === 0 ? `<div style="color:var(--warn);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
-            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-left:4px solid var(--gold);color:var(--text);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
+            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);color:var(--text);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
                 <span style="color:var(--text2);">Select a region to display its description.</span>
             </div>
         </div>
@@ -1082,8 +1083,8 @@ export async function render(el) {
 
         <div class="panel">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                <h3 style="margin:0;">📜 History</h3>
-                ${accessible ? `<button class="btn btn-sm" id="deck-history-clear-btn">Clear History</button>` : ''}
+                <h3 style="margin:0;" data-i18n="feature.decks.history">📜 History</h3>
+                ${accessible ? `<button class="btn btn-sm" id="deck-history-clear-btn" data-i18n="feature.decks.clearHistory">Clear History</button>` : ''}
             </div>
             <div class="deck-history" id="deck-history" style="max-height:200px;overflow-y:auto;margin-top:0.5rem;"></div>
         </div>
@@ -1118,18 +1119,18 @@ export async function render(el) {
             try { localStorage.setItem('fates-edge-seed', newSeed); } catch (e) { /* ignore */ }
             cardOffset = getDeckRandomInt(0, 1000);
             render(container);
-            showToast('🎲 New deck seed generated: ' + newSeed.substring(0, 8) + '...', 'success');
+            showToast(i18nText("feature.decks.newDeckSeedGeneratedValue", { value0: newSeed.substring(0, 8) }, "🎲 New deck seed generated: {{value0}}..."), 'success');
         });
     }
 
     const seedClear = document.getElementById('deck-seed-clear');
     if (seedClear) {
         seedClear.addEventListener('click', function() {
-            if (confirm('Clear the deterministic seed? This will use cryptographic RNG instead.')) {
+            if (confirm(i18nText("feature.decks.clearTheDeterministicSeedThisWillUse", null, "Clear the deterministic seed? This will use cryptographic RNG instead."))) {
                 setDeckSeed(null);
                 cardOffset = getDeckRandomInt(0, 1000);
                 render(container);
-                showToast('🧹 Deck seed cleared. Using cryptographic RNG.', 'info');
+                showToast(i18nText("feature.decks.deckSeedClearedUsingCryptographicRNG", null, "🧹 Deck seed cleared. Using cryptographic RNG."), 'info');
             }
         });
     }
@@ -1157,8 +1158,8 @@ export async function render(el) {
                 }
                 await handleRegionChange();
                 const countSpan = document.querySelector('#deck-region-select + span');
-                if (countSpan) countSpan.textContent = `(${regionNames.length} regions)`;
-                showToast('🗺️ Region list refreshed.', 'success');
+                if (countSpan) countSpan.textContent = i18nText("feature.decks.valueRegions", { value0: regionNames.length }, "({{value0}} regions)");
+                showToast(i18nText("feature.decks.regionListRefreshed", null, "🗺️ Region list refreshed."), 'success');
             }
         });
     }
@@ -1198,7 +1199,7 @@ function buildDeck() {
 
 function updateDeckCount() {
     const el = document.getElementById('deck-cards-remaining');
-    if (el) el.textContent = deck.length + ' cards';
+    if (el) el.textContent = i18nText("feature.decks.valueCards", { value0: deck.length }, "{{value0}} cards");
 }
 
 function updateSpreadDescription() {
@@ -1206,13 +1207,13 @@ function updateSpreadDescription() {
     const descEl = document.getElementById('spread-description');
     if (!descEl) return;
     if (type === 'crown') {
-        descEl.textContent = '👑 Crown Spread: 4 cards (Root, Crest, Crown, Left Hand) + 1 wildcard twist. Each card draws from the selected region\'s deck.';
+        descEl.textContent = i18nText("feature.decks.crownSpread4CardsRootCrestCrown", null, "👑 Crown Spread: 4 cards (Root, Crest, Crown, Left Hand) + 1 wildcard twist. Each card draws from the selected region's deck.");
     } else if (type === '2') {
-        descEl.textContent = 'Two draws: a complication with an additional twist.';
+        descEl.textContent = i18nText("feature.decks.twoDrawsAComplicationWithAnAdditional", null, "Two draws: a complication with an additional twist.");
     } else if (type === '3') {
-        descEl.textContent = 'Three draws: a chain of consequences.';
+        descEl.textContent = i18nText("feature.decks.threeDrawsAChainOfConsequences", null, "Three draws: a chain of consequences.");
     } else {
-        descEl.textContent = 'Single draw: one focused consequence.';
+        descEl.textContent = i18nText("feature.decks.singleDrawOneFocusedConsequence", null, "Single draw: one focused consequence.");
     }
 }
 
@@ -1223,12 +1224,12 @@ export async function drawConsequence() {
     // Extra safety – this should not be called if UI is disabled, but keep it.
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
-        showToast('Only the GM can draw cards.', 'error');
+        showToast(i18nText("feature.decks.onlyTheGMCanDrawCards", null, "Only the GM can draw cards."), 'error');
         return;
     }
 
     if (!selectedRegion) {
-        showToast('Please select a region first.', 'error');
+        showToast(i18nText("feature.decks.pleaseSelectARegionFirst", null, "Please select a region first."), 'error');
         return;
     }
     const data = await fetchRegionData(selectedRegion);
@@ -1241,7 +1242,7 @@ export async function drawConsequence() {
     if (type === 'crown') {
         isCrown = true;
         if (deck.length < 5) {
-            showToast('Deck running low! Reshuffling...', 'warning');
+            showToast(i18nText("feature.decks.deckRunningLowReshuffling", null, "Deck running low! Reshuffling..."), 'warning');
             buildDeck();
         }
         const mainCards = drawOneOfEachSuit();
@@ -1251,7 +1252,7 @@ export async function drawConsequence() {
     } else {
         const count = parseInt(type, 10) || 1;
         if (deck.length < count) {
-            showToast('Deck running low! Reshuffling...', 'warning');
+            showToast(i18nText("feature.decks.deckRunningLowReshuffling", null, "Deck running low! Reshuffling..."), 'warning');
             buildDeck();
         }
         for (let i = 0; i < count; i++) {
@@ -1310,7 +1311,7 @@ export async function drawConsequence() {
     if (aceEffect) {
         aceHtml = `\n\n♠️ **Ace Effect:** ${aceEffect.emoji} ${aceEffect.text}`;
         synthesis += aceHtml;
-        showToast(`♠️ Ace Effect: ${aceEffect.text}`, 'warning');
+        showToast(i18nText("feature.decks.aceEffectValue", { value0: aceEffect.text }, "♠️ Ace Effect: {{value0}}"), 'warning');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('deck_ace', `♠️ Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (${selectedRegion})`);
         }
@@ -1326,7 +1327,7 @@ export async function drawConsequence() {
         detailsEl.style.display = 'block';
         detailsEl.innerHTML = details;
         const titleEl = document.getElementById('consequence-title');
-        if (titleEl) titleEl.textContent = '👑 Crown Spread';
+        if (titleEl) titleEl.textContent = i18nText("feature.decks.crownSpread", null, "👑 Crown Spread");
     } else {
         if (detailsEl) detailsEl.style.display = 'none';
         const titleEl = document.getElementById('consequence-title');
@@ -1338,7 +1339,7 @@ export async function drawConsequence() {
         timerEl.style.display = 'block';
         timerEl.innerHTML = `
             <strong>⏱️ Suggested Timer:</strong> ${timer.segments} segments (from highest card: ${timer.card})
-            <button class="btn btn-sm btn-primary" id="create-timer-btn" style="margin-left:0.5rem;">➕ Add Timer</button>
+            <button class="btn btn-sm btn-primary" id="create-timer-btn" style="margin-inline-start:0.5rem;" data-i18n="feature.decks.addTimer">➕ Add Timer</button>
         `;
         const btn = timerEl.querySelector('#create-timer-btn');
         if (btn) {
@@ -1365,7 +1366,7 @@ export async function drawConsequence() {
     broadcastDraw(cards, type, selectedRegion, synthesis);
 
     const cardNames = cards.map(c => isJokerCard(c) ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
-    showToast(`🃏 Drew ${cards.length} card${cards.length > 1 ? 's' : ''}: ${cardNames}`, 'success');
+    showToast(i18nPlural('feature.decks.cardsDrawn', cards.length, { cards: cardNames }, '🃏 Drew {{count}} cards: {{cards}}'), 'success');
 }
 
 function synthesiseConsequence(cards, regionData) {
@@ -1401,7 +1402,7 @@ function renderCards(cards, isCrown) {
         let suitName = isJoker ? 'Joker' : (c.suitName || SUIT_NAMES[c.suit] || '');
 
         return `
-            <div class="${classes}" style="background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius);padding:0.4rem;text-align:center;font-weight:700;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color 0.2s, transform 0.2s;${!isJoker ? `border-left:6px solid ${borderColor};` : 'border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.3);'}">
+            <div class="${classes}" style="background:var(--bg3);border:2px solid var(--border);border-radius:var(--radius);padding:0.4rem;text-align:center;font-weight:700;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color 0.2s, transform 0.2s;${!isJoker ? `border-inline-start:6px solid ${borderColor};` : 'border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.3);'}">
                 <div class="rank" style="font-size:1rem;color:var(--text2);">${isJoker ? '' : rankDisplay}</div>
                 <div class="suit" style="font-size:2.5rem;line-height:1.2;color:${isJoker ? 'var(--gold)' : borderColor}">${symbolDisplay}</div>
                 <div class="label" style="font-size:0.65rem;color:var(--text3);">${isJoker ? 'Joker' : suitName}</div>
@@ -1414,7 +1415,7 @@ function createTimerFromCard(cardName, segments) {
     import('@features/timers/index.js').then(module => {
         if (module.openTimerEditor) {
             module.openTimerEditor({ name: `Crown Spread: ${cardName}`, segments, current: 0 });
-            showToast(`⏱️ Creating timer from ${cardName} (${segments} segments)`, 'success');
+            showToast(i18nText("feature.decks.creatingTimerFromValueValueSegments", { value0: cardName, value1: segments }, "⏱️ Creating timer from {{value0}} ({{value1}} segments)"), 'success');
             if (typeof logRecordingEvent === 'function') {
                 logRecordingEvent('timer_created', `Timer created from Crown Spread: ${cardName} (${segments} segments)`);
             }
@@ -1428,7 +1429,7 @@ function createTimerFromCard(cardName, segments) {
             };
             state.timers.push(newTimer);
             document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: newTimer } }));
-            showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
+            showToast(i18nText("feature.decks.timerCreatedValueValueSegments", { value0: newTimer.name, value1: segments }, "⏱️ Timer created: {{value0}} ({{value1}} segments)"), 'success');
             if (typeof logRecordingEvent === 'function') {
                 logRecordingEvent('timer_created', `Timer created: ${newTimer.name} (${segments} segments)`);
             }
@@ -1443,7 +1444,7 @@ function createTimerFromCard(cardName, segments) {
         };
         state.timers.push(newTimer);
         document.dispatchEvent(new CustomEvent('timer-added', { detail: { timer: newTimer } }));
-        showToast(`⏱️ Timer created: ${newTimer.name} (${segments} segments)`, 'success');
+        showToast(i18nText("feature.decks.timerCreatedValueValueSegments", { value0: newTimer.name, value1: segments }, "⏱️ Timer created: {{value0}} ({{value1}} segments)"), 'success');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('timer_created', `Timer created: ${newTimer.name} (${segments} segments)`);
         }
@@ -1472,7 +1473,7 @@ function renderDeckHistory() {
 function clearDeckHistory() {
     deckHistory = [];
     renderDeckHistory();
-    showToast('Deck history cleared.', 'success');
+    showToast(i18nText("feature.decks.deckHistoryCleared", null, "Deck history cleared."), 'success');
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('deck_history_cleared', 'Deck history cleared');
     }
@@ -1487,7 +1488,7 @@ export function resetDeck() {
     // Prevent non-GM from resetting
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
-        showToast('Only the GM can reset the deck.', 'error');
+        showToast(i18nText("feature.decks.onlyTheGMCanResetTheDeck", null, "Only the GM can reset the deck."), 'error');
         return;
     }
     cardOffset = getDeckRandomInt(0, 1000);
@@ -1506,7 +1507,7 @@ export function resetDeck() {
     const timer = document.getElementById('timer-result');
     if (timer) timer.style.display = 'none';
     const title = document.getElementById('consequence-title');
-    if (title) title.textContent = 'Cards Drawn';
+    if (title) title.textContent = i18nText("feature.decks.cardsDrawn", null, "Cards Drawn");
 
     broadcastReset();
 
@@ -1514,7 +1515,9 @@ export function resetDeck() {
         logRecordingEvent('deck_reset', 'Deck reset and reshuffled');
     }
 
-    showToast(`Deck reshuffled with new random seeds.${_deckSeedState.seed ? ' (deterministic)' : ''}`, 'success');
+    showToast(_deckSeedState.seed
+        ? i18nText('feature.decks.deckReshuffledDeterministic', null, 'Deck reshuffled with a new deterministic seed.')
+        : i18nText('feature.decks.deckReshuffled', null, 'Deck reshuffled with new random seeds.'), 'success');
 }
 
 export async function onActivate() {
@@ -1550,7 +1553,7 @@ export async function refresh() {
         }
         await handleRegionChange();
         const countSpan = document.querySelector('#deck-region-select + span');
-        if (countSpan) countSpan.textContent = `(${regionNames.length} regions)`;
+        if (countSpan) countSpan.textContent = i18nText("feature.decks.valueRegions", { value0: regionNames.length }, "({{value0}} regions)");
     }
 }
 
@@ -1600,7 +1603,7 @@ export function openCrownSpread() {
     // Only GM can open Crown Spread
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
-        showToast('Only the GM can open a Crown Spread.', 'error');
+        showToast(i18nText("feature.decks.onlyTheGMCanOpenACrown", null, "Only the GM can open a Crown Spread."), 'error');
         return;
     }
 
@@ -1640,7 +1643,7 @@ export function openCrownSpread() {
         crownSpreadModal.innerHTML = `
             <div style="background:var(--bg2);padding:2rem;border-radius:16px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
-                    <h2 style="color:var(--gold);margin:0;">👑 Crown Spread</h2>
+                    <h2 style="color:var(--gold);margin:0;" data-i18n="feature.decks.crownSpread">👑 Crown Spread</h2>
                     <button onclick="window.closeCrownSpread()"
                             style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:1.5rem;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;">
                         ✕
@@ -1664,7 +1667,7 @@ export function openCrownSpread() {
                     </div>
                 </div>
 
-                <div style="background:var(--bg3);border-radius:var(--radius);padding:1rem;border-left:4px solid var(--gold);">
+                <div style="background:var(--bg3);border-radius:var(--radius);padding:1rem;border-inline-start:4px solid var(--gold);">
                     ${result.positions.map((p, i) => `
                         <div style="margin-bottom:0.5rem;padding-bottom:0.5rem;${i < 3 ? 'border-bottom:1px solid var(--border);' : ''}">
                             <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -1672,7 +1675,7 @@ export function openCrownSpread() {
                                 <strong style="color:${p.isJoker ? 'var(--gold)' : p.color};">${p.position.label}</strong>
                                 <span style="color:var(--text3);font-size:0.8rem;">${p.rankName} of ${p.suitName}</span>
                             </div>
-                            <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-left:1.5rem;">${renderCardText(p.regionMeaning || p.description)}</div>
+                            <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-inline-start:1.5rem;">${renderCardText(p.regionMeaning || p.description)}</div>
                         </div>
                     `).join('')}
                     <div>
@@ -1680,20 +1683,20 @@ export function openCrownSpread() {
                             <span style="color:var(--gold);">🌟</span>
                             <strong style="color:var(--gold);">Wildcard Twist</strong>
                         </div>
-                        <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-left:1.5rem;">${renderCardText(result.wildcard)}</div>
+                        <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-inline-start:1.5rem;">${renderCardText(result.wildcard)}</div>
                     </div>
                 </div>
 
                 ${result.timer ? `
-                    <div style="margin-top:1rem;background:var(--bg3);border-radius:var(--radius);padding:0.5rem 1rem;border-left:4px solid var(--accent);">
+                    <div style="margin-top:1rem;background:var(--bg3);border-radius:var(--radius);padding:0.5rem 1rem;border-inline-start:4px solid var(--accent);">
                         <strong>⏱️ Suggested Timer:</strong> ${result.timer.segments} segments (from ${result.timer.card})
-                        <button class="btn btn-sm btn-primary" onclick="window.createTimerFromCard('${result.timer.card}', ${result.timer.segments})" style="margin-left:0.5rem;">➕ Add Timer</button>
+                        <button class="btn btn-sm btn-primary" onclick="window.createTimerFromCard('${result.timer.card}', ${result.timer.segments})" style="margin-inline-start:0.5rem;">➕ Add Timer</button>
                     </div>
                 ` : ''}
 
                 <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-                    <button class="btn btn-gold" onclick="window.closeCrownSpread(); setTimeout(window.openCrownSpread, 100);">🔄 New Spread</button>
-                    <button class="btn btn-secondary" onclick="window.closeCrownSpread();">Close</button>
+                    <button class="btn btn-gold" onclick="window.closeCrownSpread(); setTimeout(window.openCrownSpread, 100);" data-i18n="feature.decks.newSpread">🔄 New Spread</button>
+                    <button class="btn btn-secondary" onclick="window.closeCrownSpread();" data-i18n="feature.decks.close">Close</button>
                 </div>
             </div>
         `;
@@ -1793,7 +1796,7 @@ export async function quickDraw(count = 1, regionName = null) {
     // Quick draw is also GM‑only
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
-        showToast('Only the GM can draw cards.', 'error');
+        showToast(i18nText("feature.decks.onlyTheGMCanDrawCards", null, "Only the GM can draw cards."), 'error');
         return null;
     }
 
@@ -1802,13 +1805,13 @@ export async function quickDraw(count = 1, regionName = null) {
     await ensureRegionsReady();
     if (regionName) await setSelectedRegion(regionName);
     if (!selectedRegion) {
-        showToast('Please select a region first.', 'error');
+        showToast(i18nText("feature.decks.pleaseSelectARegionFirst", null, "Please select a region first."), 'error');
         return null;
     }
     const data = await fetchRegionData(selectedRegion);
     if (!data) return null;
     if (deck.length < count) {
-        showToast('Deck running low! Reshuffling...', 'warning');
+        showToast(i18nText("feature.decks.deckRunningLowReshuffling", null, "Deck running low! Reshuffling..."), 'warning');
         buildDeck();
     }
     const cards = [];
@@ -1827,7 +1830,7 @@ export async function quickDraw(count = 1, regionName = null) {
         const aceCard = aces[0];
         aceEffect = getAceEffect(selectedRegion, aceCard);
         synthesisWithAce += `\n\n♠️ **Ace Effect:** ${aceEffect.emoji} ${aceEffect.text}`;
-        showToast(`♠️ Ace Effect: ${aceEffect.text}`, 'warning');
+        showToast(i18nText("feature.decks.aceEffectValue", { value0: aceEffect.text }, "♠️ Ace Effect: {{value0}}"), 'warning');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('quick_draw_ace', `♠️ Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (${selectedRegion})`);
         }
@@ -1845,7 +1848,7 @@ export async function quickDraw(count = 1, regionName = null) {
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('quick_draw', `${count} card(s) drawn: ${cardNames} | Region: ${selectedRegion}`);
     }
-    showToast(`🎴 ${cardNames}`, 'success');
+    showToast(i18nText("feature.decks.value", { value0: cardNames }, "🎴 {{value0}}"), 'success');
     return { cards, synthesis: synthesisWithAce, cardNames, type: count, aceEffect };
 }
 
@@ -1853,7 +1856,7 @@ export async function quickCrownSpread(regionName = null) {
     // GM‑only
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
-        showToast('Only the GM can draw a Crown Spread.', 'error');
+        showToast(i18nText("feature.decks.onlyTheGMCanDrawACrown", null, "Only the GM can draw a Crown Spread."), 'error');
         return null;
     }
 
@@ -1862,13 +1865,13 @@ export async function quickCrownSpread(regionName = null) {
     await ensureRegionsReady();
     if (regionName) await setSelectedRegion(regionName);
     if (!selectedRegion) {
-        showToast('Please select a region first.', 'error');
+        showToast(i18nText("feature.decks.pleaseSelectARegionFirst", null, "Please select a region first."), 'error');
         return null;
     }
     const data = await fetchRegionData(selectedRegion);
     if (!data) return null;
     if (deck.length < 5) {
-        showToast('Deck running low! Reshuffling...', 'warning');
+        showToast(i18nText("feature.decks.deckRunningLowReshuffling", null, "Deck running low! Reshuffling..."), 'warning');
         buildDeck();
     }
     const mainCards = drawOneOfEachSuit();
@@ -1885,7 +1888,7 @@ export async function quickCrownSpread(regionName = null) {
         const aceCard = aces[0];
         aceEffect = getAceEffect(selectedRegion, aceCard);
         synthesisWithAce += `\n\n♠️ **Ace Effect:** ${aceEffect.emoji} ${aceEffect.text}`;
-        showToast(`♠️ Ace Effect: ${aceEffect.text}`, 'warning');
+        showToast(i18nText("feature.decks.aceEffectValue", { value0: aceEffect.text }, "♠️ Ace Effect: {{value0}}"), 'warning');
         if (typeof logRecordingEvent === 'function') {
             logRecordingEvent('crown_spread_ace', `♠️ Ace Effect: ${aceEffect.emoji} ${aceEffect.text} (${selectedRegion})`);
         }
@@ -1904,7 +1907,7 @@ export async function quickCrownSpread(regionName = null) {
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('crown_spread_quick', `Crown Spread: ${cardNames} | Region: ${selectedRegion}`);
     }
-    showToast(`👑 Crown Spread: ${cardNames}`, 'success');
+    showToast(i18nText("feature.decks.crownSpreadValue", { value0: cardNames }, "👑 Crown Spread: {{value0}}"), 'success');
     return { cards, mainCards, wildcard, result: { ...result, synthesis: synthesisWithAce }, cardNames, aceEffect };
 }
 

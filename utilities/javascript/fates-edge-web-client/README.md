@@ -1,5 +1,7 @@
 # Fate's Edge Web Client
 
+[Guía de inicio en español](README.es.md) · [Help translate](TRANSLATIONS.md)
+
 The main *Fate's Edge* application: character management, dice, encounters, the magic system, a virtual tabletop, and two standalone games, all running client-side in the browser. Connect it to the [socket server](../fates-edge-socket-server/) for shared, real-time campaigns, or use it entirely offline with data in `localStorage`.
 
 > Part of the [fates-edge-apps](../../../README.md) monorepo — see the repository root for the full ecosystem (server, VTT integrations, other clients) and licensing.
@@ -187,9 +189,11 @@ stays in the language it was written in.
 
 English is the source catalogue (`locales/en.json`) and the fallback for
 everything: any string without a translation is shown in English rather than
-left blank, so a partial translation is always safe to ship. A generated
-pseudolocale ("Pseudo (translation test)") is available for spotting
-untranslated text and layouts that break when words get longer.
+left blank, so a partial translation is always safe to ship. Generated LTR
+and RTL pseudolocales are available for spotting untranslated text, layouts
+that break when words get longer, and directionality regressions. The UI uses
+logical spacing and edge properties; map and printable-page coordinates stay
+physical so saved artifacts do not move when the interface language changes.
 
 Adding a language takes one JSON file. See [`TRANSLATION.md`](TRANSLATION.md)
 for the translator's guide and the developer notes on `t()`, `data-i18n` and

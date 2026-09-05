@@ -5,6 +5,7 @@
  * ✅ Preserves bestiary TL, class, category, stats, and sb_spends on adversaries
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { generateId, escHtml, safeParseInt } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -55,7 +56,7 @@ export function openEditor(id) {
     if (id) {
         encounter = state.encounters?.find(e => String(e.id) === String(id));
         if (!encounter) {
-            showToast('Encounter not found.', 'error');
+            showToast(i18nText("feature.encounters.editor.encounterNotFound", null, "Encounter not found."), 'error');
             return;
         }
         editingId = id;
@@ -121,34 +122,34 @@ function renderEditor(encounter) {
 
     modal.innerHTML = `
         <div class="editor-screen" style="max-width:680px;margin:0 auto;">
-            <button id="editor-close" class="btn btn-secondary editor-back">← Back</button>
+            <button id="editor-close" class="btn btn-secondary editor-back" data-i18n="feature.encounters.editor.back">← Back</button>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
                 <h2 style="margin:0;color:var(--gold);">${isNew ? 'New Encounter' : 'Edit Encounter'}</h2>
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
-                <label>Title *</label>
+                <label data-i18n="feature.encounters.editor.title">Title *</label>
                 <input id="enc-title" value="${attr(encounter.title)}" placeholder="Encounter name" style="width:100%;" />
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
-                <label>Description</label>
-                <textarea id="enc-body" rows="3" placeholder="Describe the encounter..." style="width:100%;">${attr(encounter.body || '')}</textarea>
+                <label data-i18n="feature.encounters.editor.description">Description</label>
+                <textarea id="enc-body" rows="3" placeholder="Describe the encounter..." style="width:100%;" data-i18n-attr="placeholder:feature.encounters.editor.describeTheEncounter">${attr(encounter.body || '')}</textarea>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
                 <div class="form-group">
-                    <label>Threat Level (1-10)</label>
+                    <label data-i18n="feature.encounters.editor.threatLevel110">Threat Level (1-10)</label>
                     <input type="number" id="enc-difficulty" value="${encounter.difficulty || 3}" min="1" max="10" />
                 </div>
                 <div class="form-group">
-                    <label>Location</label>
+                    <label data-i18n="feature.encounters.editor.location">Location</label>
                     <input id="enc-location" value="${attr(encounter.location || '')}" placeholder="Where?" />
                 </div>
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
-                <label title="What kind of clock is this? Combat keeps its real Harm/Fatigue/armor math; every other type is a labeled progress/setback track for the appropriate scene — a heist, a lock, a negotiation, etc.">
+                <label title="What kind of clock is this? Combat keeps its real Harm/Fatigue/armor math; every other type is a labeled progress/setback track for the appropriate scene — a heist, a lock, a negotiation, etc." data-i18n-attr="title:feature.encounters.editor.whatKindOfClockIsThisCombat">
                     Objective Type
                 </label>
                 <select id="enc-objective-type">
@@ -162,17 +163,17 @@ function renderEditor(encounter) {
 
             <div id="enc-custom-fields" style="display:${(encounter.type || DEFAULT_OBJECTIVE_TYPE) === 'custom' ? 'grid' : 'none'};grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
                 <div class="form-group">
-                    <label>Timer Label</label>
+                    <label data-i18n="feature.encounters.editor.timerLabel">Timer Label</label>
                     <input id="enc-custom-label" value="${attr(encounter.customLabel || '')}" placeholder="e.g. Ritual Completion" style="width:100%;" />
                 </div>
                 <div class="form-group">
-                    <label>Tick Label</label>
+                    <label data-i18n="feature.encounters.editor.tickLabel">Tick Label</label>
                     <input id="enc-custom-tick-label" value="${attr(encounter.customTickLabel || '')}" placeholder="e.g. chant" style="width:100%;" />
                 </div>
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
-                <label>Status</label>
+                <label data-i18n="feature.encounters.editor.status">Status</label>
                 <select id="enc-status">
                     <option value="draft" ${encounter.status === 'draft' ? 'selected' : ''}>Draft</option>
                     <option value="active" ${encounter.status === 'active' ? 'selected' : ''}>Active</option>
@@ -181,18 +182,18 @@ function renderEditor(encounter) {
             </div>
 
             <div style="margin-bottom:0.8rem;">
-                <label style="display:block;margin-bottom:0.3rem;">Adversaries</label>
+                <label style="display:block;margin-bottom:0.3rem;" data-i18n="feature.encounters.editor.adversaries">Adversaries</label>
                 <div id="adv-list">${advRows}</div>
                 <div style="display:flex;gap:0.5rem;margin-top:0.4rem;flex-wrap:wrap;">
-                    <button class="btn btn-sm" id="adv-add">+ Add Adversary</button>
-                    <button class="btn btn-sm btn-ghost" id="adv-import-bestiary">📖 Import from Bestiary</button>
+                    <button class="btn btn-sm" id="adv-add" data-i18n="feature.encounters.editor.addAdversary">+ Add Adversary</button>
+                    <button class="btn btn-sm btn-ghost" id="adv-import-bestiary" data-i18n="feature.encounters.editor.importFromBestiary">📖 Import from Bestiary</button>
                 </div>
             </div>
 
             <div style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;flex-wrap:wrap;">
-                <button class="btn btn-gold" id="editor-save">💾 Save</button>
-                <button class="btn btn-primary" id="editor-open-tracker">⚔️ Open Combat Tracker</button>
-                <button class="btn" id="editor-cancel">Cancel</button>
+                <button class="btn btn-gold" id="editor-save" data-i18n="feature.encounters.editor.save">💾 Save</button>
+                <button class="btn btn-primary" id="editor-open-tracker" data-i18n="feature.encounters.editor.openCombatTracker">⚔️ Open Combat Tracker</button>
+                <button class="btn" id="editor-cancel" data-i18n="feature.encounters.editor.cancel">Cancel</button>
             </div>
         </div>
     `;
@@ -227,8 +228,8 @@ function renderEditor(encounter) {
         div.className = 'adv-row';
         div.style.cssText = 'display:flex;gap:0.35rem;margin:0.3rem 0;align-items:center;flex-wrap:wrap;';
         div.innerHTML = `
-            <input type="text" class="adv-name" placeholder="Name" style="flex:2;min-width:120px;" />
-            <input type="text" class="adv-body" placeholder="Description / stats" style="flex:3;min-width:150px;" />
+            <input type="text" class="adv-name" placeholder="Name" style="flex:2;min-width:120px;" / data-i18n-attr="placeholder:feature.encounters.editor.name">
+            <input type="text" class="adv-body" placeholder="Description / stats" style="flex:3;min-width:150px;" / data-i18n-attr="placeholder:feature.encounters.editor.descriptionStats">
             <input type="hidden" class="adv-tl" value="" />
             <input type="hidden" class="adv-class" value="" />
             <input type="hidden" class="adv-category" value="" />
@@ -270,7 +271,7 @@ function updateCustomFieldsDisplay() {
 async function importFromBestiary() {
     const creatures = await loadBestiaryData();
     if (!creatures || creatures.length === 0) {
-        showToast('Bestiary not loaded yet.', 'error');
+        showToast(i18nText("feature.encounters.editor.bestiaryNotLoadedYet", null, "Bestiary not loaded yet."), 'error');
         return;
     }
 
@@ -286,12 +287,12 @@ async function importFromBestiary() {
         border: 1px solid var(--border); margin-top: 0.5rem;
     `;
     searchModal.innerHTML = `
-        <h3 style="margin-top:0;">📖 Import from Bestiary</h3>
+        <h3 style="margin-top:0;" data-i18n="feature.encounters.editor.importFromBestiary">📖 Import from Bestiary</h3>
         <input type="text" id="bestiary-import-search" placeholder="Search creatures..."
-               style="width:100%; padding:0.4rem; margin-bottom:0.5rem;">
+               style="width:100%; padding:0.4rem; margin-bottom:0.5rem;" data-i18n-attr="placeholder:feature.encounters.editor.searchCreatures">
         <div id="bestiary-import-list" style="max-height:300px; overflow-y:auto;"></div>
         <button id="bestiary-import-close" class="btn btn-sm btn-ghost"
-                style="margin-top:0.5rem;">Close</button>
+                style="margin-top:0.5rem;" data-i18n="feature.encounters.editor.close">Close</button>
     `;
     const advSection = modal?.querySelector('#adv-list')?.parentElement;
     (advSection || modal).appendChild(searchModal);
@@ -350,7 +351,7 @@ async function importFromBestiary() {
                     <button class="btn btn-xs btn-danger adv-remove">✕</button>
                 `;
                 list.appendChild(div);
-                showToast(`Added ${entry.name} to adversaries.`, 'success');
+                showToast(i18nText("feature.encounters.editor.addedValueToAdversaries", { value0: entry.name }, "Added {{value0}} to adversaries."), 'success');
                 searchModal.remove();
             });
         });
@@ -371,7 +372,7 @@ function saveEditor(baseEncounter, silent = false) {
     const title = document.getElementById('enc-title')?.value.trim();
     if (!title) {
         if (!silent) {
-            showToast('Title is required.', 'error');
+            showToast(i18nText("feature.encounters.editor.titleIsRequired", null, "Title is required."), 'error');
             const el = document.getElementById('enc-title');
             if (el) { el.focus(); el.style.borderColor = 'var(--red)'; }
         }
@@ -428,7 +429,7 @@ function saveEditor(baseEncounter, silent = false) {
         isNew = false;
         currentEncounter = newEnc;
         saved = true;
-        if (!silent) showToast(`✅ Encounter "${title}" created.`, 'success');
+        if (!silent) showToast(i18nText("feature.encounters.editor.encounterValueCreated", { value0: title }, "✅ Encounter \"{{value0}}\" created."), 'success');
     } else {
         const existing = state.encounters.find(e => String(e.id) === String(editingId));
         if (existing) {
@@ -443,9 +444,9 @@ function saveEditor(baseEncounter, silent = false) {
             existing.adversaries = adversaries;
             currentEncounter = existing;
             saved = true;
-            if (!silent) showToast(`✅ Encounter "${title}" updated.`, 'success');
+            if (!silent) showToast(i18nText("feature.encounters.editor.encounterValueUpdated", { value0: title }, "✅ Encounter \"{{value0}}\" updated."), 'success');
         } else {
-            if (!silent) showToast('Encounter not found.', 'error');
+            if (!silent) showToast(i18nText("feature.encounters.editor.encounterNotFound", null, "Encounter not found."), 'error');
             saved = false;
         }
     }

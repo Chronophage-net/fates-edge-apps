@@ -117,9 +117,29 @@ function isValidPassword(password) {
 // path) needs to be re-claimable directly at handshake on reconnect, not
 // just assignable via the in-room role_change_request promote flow.
 const VALID_ROLES = new Set(['gm', 'co-gm', 'assistant-gm', 'player', 'spectator']);
+const PROMOTED_ONLY_ROLES = new Set(['co-gm', 'assistant-gm']);
 
 function isValidRole(role) {
     return typeof role === 'string' && VALID_ROLES.has(role);
+}
+
+/** Resolve the role claimed during a room join against a stored membership.
+ * Co-GM and Assistant GM are grants, never self-declarations. Spectator is a
+ * stored restriction and therefore wins over every reconnect claim. The GM
+ * seat still goes through the room's one-seat conflict/election logic after
+ * this helper returns. */
+function resolveRoomJoinRole(requestedRole, membershipRole) {
+    let assignedRole = isValidRole(requestedRole) ? requestedRole : 'player';
+    if (PROMOTED_ONLY_ROLES.has(assignedRole) && membershipRole !== assignedRole) {
+        assignedRole = 'player';
+    }
+    if (assignedRole !== 'gm' && PROMOTED_ONLY_ROLES.has(membershipRole)) {
+        assignedRole = membershipRole;
+    }
+    if (membershipRole === 'spectator') {
+        assignedRole = 'spectator';
+    }
+    return assignedRole;
 }
 
 module.exports = {
@@ -133,4 +153,5 @@ module.exports = {
     isValidPassword,
     VALID_ROLES,
     isValidRole,
+    resolveRoomJoinRole,
 };

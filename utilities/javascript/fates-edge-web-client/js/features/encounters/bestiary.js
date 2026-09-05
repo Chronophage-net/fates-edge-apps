@@ -14,6 +14,7 @@
  * - Combat Tracker integration uses tl for default difficulty/HP
  */
 
+import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { escHtml } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
@@ -43,10 +44,10 @@ export const harmLevelsForTl = resilienceForTl;
 /**
  * Resilience off a creature record, whichever spelling it carries.
  *
- * Campaigns saved before the rename, installed packs, and hand-authored
- * bestiary JSON all still use `harm_levels`, and those files are the user's —
- * they are not migrated on load. Every read goes through here so both spellings
- * keep working indefinitely.
+ * The shipped bestiary uses `resilience`. Campaigns saved before the rename,
+ * installed packs, and hand-authored bestiaries may still use `harm_levels`;
+ * those files belong to the user and are not migrated on load. Every read goes
+ * through here so both spellings keep working indefinitely.
  */
 export function resilienceOf(entry) {
     if (!entry) return undefined;
@@ -105,7 +106,7 @@ function adjustStoryBeats(delta) {
 
 function spendStoryBeats(cost, label) {
     if (gmStoryBeats < cost) {
-        showToast(`Need ${cost} SB; only ${gmStoryBeats} available.`, 'warning');
+        showToast(i18nText("feature.encounters.bestiary.needValueSBOnlyValueAvailable", { value0: cost, value1: gmStoryBeats }, "Need {{value0}} SB; only {{value1}} available."), 'warning');
         return false;
     }
     gmStoryBeats -= cost;
@@ -115,7 +116,7 @@ function spendStoryBeats(cost, label) {
         logToSession(`💥 SB spent (${cost}): ${label}`, 'danger');
         addVTTEvent('sb_spent', { cost, label });
     } catch (e) { /* ignore */ }
-    showToast(`Spent ${cost} SB — ${label}`, 'success');
+    showToast(i18nText("feature.encounters.bestiary.spentValueSBValue", { value0: cost, value1: label }, "Spent {{value0}} SB — {{value1}}"), 'success');
     return true;
 }
 
@@ -384,31 +385,31 @@ export async function render(el) {
         <div class="bestiary-layout" style="padding:1rem;">
             <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
                 <div>
-                    <h1 class="page-title" style="margin:0;">📖 Bestiary</h1>
-                    <p class="page-sub" style="margin:0.2rem 0 0;">Creatures, monsters, and spirits of the Crown Spread.</p>
+                    <h1 class="page-title" style="margin:0;" data-i18n="feature.encounters.bestiary.bestiary">📖 Bestiary</h1>
+                    <p class="page-sub" style="margin:0.2rem 0 0;" data-i18n="feature.encounters.bestiary.creaturesMonstersAndSpiritsOfTheCrown">Creatures, monsters, and spirits of the Crown Spread.</p>
                 </div>
                 <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-                    <input type="text" id="bestiary-search" placeholder="🔍 Search…" style="font-size:0.9rem;padding:0.3rem 0.6rem;width:140px;" />
-                    <button class="btn btn-sm btn-ghost" id="bestiary-refresh" title="Refresh data">↻</button>
+                    <input type="text" id="bestiary-search" placeholder="🔍 Search…" style="font-size:0.9rem;padding:0.3rem 0.6rem;width:140px;" / data-i18n-attr="placeholder:feature.encounters.bestiary.search">
+                    <button class="btn btn-sm btn-ghost" id="bestiary-refresh" title="Refresh data" data-i18n-attr="title:feature.encounters.bestiary.refreshData">↻</button>
                 </div>
             </header>
 
             <!-- Filter Bar -->
             <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.8rem;align-items:center;background:var(--bg-panel);padding:0.4rem 0.6rem;border-radius:var(--radius-sm);border:1px solid var(--border);">
-                <span style="font-size:0.75rem;color:var(--text3);margin-right:0.2rem;">Filter:</span>
+                <span style="font-size:0.75rem;color:var(--text3);margin-inline-end:0.2rem;">Filter:</span>
                 <select id="bestiary-filter-tl" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
-                    <option value="all">All TL</option>
+                    <option value="all" data-i18n="feature.encounters.bestiary.allTL">All TL</option>
                     ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">TL ${n}</option>`).join('')}
                 </select>
                 <select id="bestiary-filter-nature" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;max-width:120px;">
-                    <option value="all">All Natures</option>
+                    <option value="all" data-i18n="feature.encounters.bestiary.allNatures">All Natures</option>
                     <!-- options will be populated from data -->
                 </select>
                 <select id="bestiary-filter-region" style="font-size:0.75rem;padding:0.1rem 0.3rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;max-width:120px;">
-                    <option value="all">All Regions</option>
+                    <option value="all" data-i18n="feature.encounters.bestiary.allRegions">All Regions</option>
                     <!-- options will be populated from data -->
                 </select>
-                <button class="btn btn-xs btn-secondary" id="bestiary-clear-filters" style="font-size:0.7rem;">✕ Clear</button>
+                <button class="btn btn-xs btn-secondary" id="bestiary-clear-filters" style="font-size:0.7rem;" data-i18n="feature.encounters.bestiary.clear">✕ Clear</button>
             </div>
 
             <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
@@ -420,11 +421,11 @@ export async function render(el) {
                 </div>
                 <div class="bestiary-sidebar" style="display:flex;flex-direction:column;gap:0.8rem;">
                     <div class="panel" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-                        <h3 style="margin-top:0;">📋 Quick Categories</h3>
+                        <h3 style="margin-top:0;" data-i18n="feature.encounters.bestiary.quickCategories">📋 Quick Categories</h3>
                         <div id="bestiary-categories" style="display:flex;flex-wrap:wrap;gap:0.3rem;"></div>
                     </div>
                     <div class="panel" id="bestiary-sb-panel" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-                        <h3 style="margin-top:0;">⚡ Story Beats</h3>
+                        <h3 style="margin-top:0;" data-i18n="feature.encounters.bestiary.storyBeats">⚡ Story Beats</h3>
                         <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;">
                             <span style="font-size:0.8rem;color:var(--text2);">Bank:</span>
                             <button class="btn btn-xs btn-ghost" id="sb-minus" style="font-weight:bold;">−</button>
@@ -437,16 +438,16 @@ export async function render(el) {
                         </div>
                     </div>
                     <div class="panel" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-                        <h3 style="margin-top:0;">🔗 Wiki Cross‑Reference</h3>
+                        <h3 style="margin-top:0;" data-i18n="feature.encounters.bestiary.wikiCrossReference">🔗 Wiki Cross‑Reference</h3>
                         <div id="bestiary-wiki-refs" style="font-size:0.85rem;color:var(--text2);">
                             Select a creature to see wiki links.
                         </div>
                     </div>
                     <div class="panel" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;">
-                        <h3 style="margin-top:0;">⚔️ Quick Actions</h3>
+                        <h3 style="margin-top:0;" data-i18n="feature.encounters.bestiary.quickActions">⚔️ Quick Actions</h3>
                         <div style="display:flex;flex-direction:column;gap:0.3rem;">
-                            <button class="btn btn-sm btn-gold" id="bestiary-add-encounter">+ Add as Encounter</button>
-                            <button class="btn btn-sm" id="bestiary-add-adversary">+ Add as Adversary</button>
+                            <button class="btn btn-sm btn-gold" id="bestiary-add-encounter" data-i18n="feature.encounters.bestiary.addAsEncounter">+ Add as Encounter</button>
+                            <button class="btn btn-sm" id="bestiary-add-adversary" data-i18n="feature.encounters.bestiary.addAsAdversary">+ Add as Adversary</button>
                         </div>
                     </div>
                 </div>
@@ -620,7 +621,7 @@ function renderBestiaryList() {
             const name = btn.dataset.name;
             const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
             if (entry) addCreatureAsAdversary(entry);
-            else showToast(`Creature "${name}" not found.`, 'error');
+            else showToast(i18nText("feature.encounters.bestiary.creatureValueNotFound", { value0: name }, "Creature \"{{value0}}\" not found."), 'error');
         });
     });
 
@@ -630,7 +631,7 @@ function renderBestiaryList() {
             const name = btn.dataset.name;
             const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
             if (entry) openTrackerForCreature(entry);
-            else showToast(`Creature "${name}" not found.`, 'error');
+            else showToast(i18nText("feature.encounters.bestiary.creatureValueNotFound", { value0: name }, "Creature \"{{value0}}\" not found."), 'error');
         });
     });
 
@@ -736,7 +737,7 @@ function showCreatureDetail(entry) {
     let summonerHtml = '';
     if (entry.nature || entry.services || entry.price) {
         summonerHtml = `<div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem;">
-            <h4 style="margin:0 0 0.3rem 0;color:var(--gold);">🔮 Summoner Notes</h4>`;
+            <h4 style="margin:0 0 0.3rem 0;color:var(--gold);" data-i18n="feature.encounters.bestiary.summonerNotes">🔮 Summoner Notes</h4>`;
         if (entry.nature) summonerHtml += `<div><strong>Nature:</strong> ${escHtml(entry.nature)}</div>`;
         if (entry.services && entry.services.length > 0) {
             summonerHtml += `<div><strong>Services:</strong> ${entry.services.map(s => escHtml(s)).join(', ')}</div>`;
@@ -765,7 +766,7 @@ function showCreatureDetail(entry) {
 
     overlay.innerHTML = `
         <div class="editor-screen" style="max-width:600px;margin:0 auto;">
-            <button class="btn btn-secondary editor-back creature-detail-close">← Back</button>
+            <button class="btn btn-secondary editor-back creature-detail-close" data-i18n="feature.encounters.bestiary.back">← Back</button>
             <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 ${escHtml(name)}
                 ${entry.tl ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tl}</span>` : ''}
@@ -773,13 +774,13 @@ function showCreatureDetail(entry) {
             </h2>
             ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="margin-bottom:0.5rem;">${escHtml(entry.category)}</span>` : ''}
             ${description ? `<div style="margin:0.5rem 0;line-height:1.5;">${escHtml(description)}</div>` : ''}
-            ${lore ? `<div style="margin:0.5rem 0;line-height:1.5;background:var(--bg2);padding:0.5rem;border-radius:var(--radius-sm);border-left:3px solid var(--gold);"><strong>Lore:</strong> ${lore}</div>` : ''}
+            ${lore ? `<div style="margin:0.5rem 0;line-height:1.5;background:var(--bg2);padding:0.5rem;border-radius:var(--radius-sm);border-inline-start:3px solid var(--gold);"><strong>Lore:</strong> ${lore}</div>` : ''}
             ${statsHtml}
             ${extraHtml}
             ${summonerHtml}
             ${wikiLink}
             <div style="margin-top:0.6rem;border-top:1px solid var(--border);padding-top:0.6rem;">
-                <h4 style="margin:0 0 0.4rem 0;color:var(--danger);">⚡ Story Beat Moves</h4>
+                <h4 style="margin:0 0 0.4rem 0;color:var(--danger);" data-i18n="feature.encounters.bestiary.storyBeatMoves">⚡ Story Beat Moves</h4>
                 ${sbMovesHtml}
             </div>
             <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
@@ -838,7 +839,7 @@ window.openWiki = function(name) {
 
 export function addCreatureAsAdversary(entry) {
     if (!entry || !entry.name) {
-        showToast('Invalid creature data.', 'error');
+        showToast(i18nText("feature.encounters.bestiary.invalidCreatureData", null, "Invalid creature data."), 'error');
         return;
     }
     const description = getCreatureDescription(entry);
@@ -884,19 +885,19 @@ export function addCreatureAsAdversary(entry) {
             }
         });
         saveState();
-        showToast(`⚔️ Added "${entry.name}" as adversary.`, 'success');
+        showToast(i18nText("feature.encounters.bestiary.addedValueAsAdversary", { value0: entry.name }, "⚔️ Added \"{{value0}}\" as adversary."), 'success');
         try {
             logToSession(`⚔️ Adversary added: ${entry.name}`, 'warning');
             addVTTEvent('adversary_added', { name: entry.name });
         } catch (e) { /* ignore */ }
     } else {
-        showToast(`"${entry.name}" already in encounter.`, 'info');
+        showToast(i18nText("feature.encounters.bestiary.valueAlreadyInEncounter", { value0: entry.name }, "\"{{value0}}\" already in encounter."), 'info');
     }
 }
 
 function addCreatureToEncounter(entry) {
     if (!entry || !entry.name) {
-        showToast('Invalid creature data.', 'error');
+        showToast(i18nText("feature.encounters.bestiary.invalidCreatureData", null, "Invalid creature data."), 'error');
         return;
     }
     const description = getCreatureDescription(entry);
@@ -921,7 +922,7 @@ function addCreatureToEncounter(entry) {
     };
     state.encounters.push(newEnc);
     saveState();
-    showToast(`📋 Created new encounter: ${newEnc.title}`, 'success');
+    showToast(i18nText("feature.encounters.bestiary.createdNewEncounterValue", { value0: newEnc.title }, "📋 Created new encounter: {{value0}}"), 'success');
     try {
         logToSession(`📋 Encounter created from bestiary: ${newEnc.title}`, 'info');
         addVTTEvent('encounter_created_from_bestiary', { name: newEnc.title });
@@ -938,7 +939,7 @@ function openTrackerForCreature(entry) {
     if (encounter) {
         openTracker(encounter.id);
     } else {
-        showToast('Could not find encounter to open tracker.', 'error');
+        showToast(i18nText("feature.encounters.bestiary.couldNotFindEncounterToOpenTracker", null, "Could not find encounter to open tracker."), 'error');
     }
 }
 
@@ -974,7 +975,7 @@ function attachEvents() {
             populateFilterOptions();
             renderBestiaryList();
             renderCategories();
-            showToast('Bestiary refreshed.', 'info');
+            showToast(i18nText("feature.encounters.bestiary.bestiaryRefreshed", null, "Bestiary refreshed."), 'info');
         });
     }
 
@@ -993,13 +994,13 @@ function attachEvents() {
     const addAdversaryBtn = document.getElementById('bestiary-add-adversary');
     if (addAdversaryBtn) {
         addAdversaryBtn.addEventListener('click', () => {
-            const name = prompt('Enter creature name to add as adversary:');
+            const name = prompt(i18nText("feature.encounters.bestiary.enterCreatureNameToAddAsAdversary", null, "Enter creature name to add as adversary:"));
             if (name) {
                 const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
                 if (entry) {
                     addCreatureAsAdversary(entry);
                 } else {
-                    showToast(`No creature found with name "${name}".`, 'error');
+                    showToast(i18nText("feature.encounters.bestiary.noCreatureFoundWithNameValue", { value0: name }, "No creature found with name \"{{value0}}\"."), 'error');
                 }
             }
         });

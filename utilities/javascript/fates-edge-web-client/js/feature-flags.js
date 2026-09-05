@@ -1,3 +1,4 @@
+import { t as i18nText } from '@core/i18n.js';
 // ttrpg/utilities/javascript/client/js/feature-flags.js
 
 /**
@@ -230,7 +231,7 @@ export function setFeatureFlag(key, value) {
   }
   
   // Reload to apply changes
-  if (confirm('Feature flag changed. Reload to apply?')) {
+  if (confirm(i18nText("feature.feature-flags.featureFlagChangedReloadToApply", null, "Feature flag changed. Reload to apply?"))) {
     window.location.reload();
   }
 }
@@ -379,7 +380,7 @@ export function getFeatureMigration(featureName) {
  */
 export function resetFeatureFlags() {
   localStorage.removeItem('FEATURE_FLAGS');
-  if (confirm('Feature flags reset to defaults. Reload to apply?')) {
+  if (confirm(i18nText("feature.feature-flags.featureFlagsResetToDefaultsReloadTo", null, "Feature flags reset to defaults. Reload to apply?"))) {
     window.location.reload();
   }
 }

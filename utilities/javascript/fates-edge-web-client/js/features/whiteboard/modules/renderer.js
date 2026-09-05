@@ -1,5 +1,6 @@
 
 // modules/renderer.js
+import { t as i18nText } from '@core/i18n.js';
 import { state, canvas, ctx, getLayer, isLayerVisibleNow, layersInDrawOrder, playerViewActive, currentTool } from './state.js';
 import { setCanvas, setCtx } from './state.js';
 import { GRID_COLORS } from './constants.js';
@@ -9,7 +10,7 @@ import { escHtml } from '@core/utils.js';
 export function updateStats() {
     const stats = document.querySelector('.whiteboard-stats');
     if (stats) {
-        stats.textContent = `${state.drawings.length} drawings, ${state.notes.length} notes, ${state.images.length} images, ${state.characterTokens.length} tokens`;
+        stats.textContent = i18nText("feature.whiteboard.modules.renderer.valueDrawingsValueNotesValueImagesValue", { value0: state.drawings.length, value1: state.notes.length, value2: state.images.length, value3: state.characterTokens.length }, "{{value0}} drawings, {{value1}} notes, {{value2}} images, {{value3}} tokens");
     }
 }
 
@@ -232,7 +233,7 @@ export function renderOverlay() {
         const locked = layer && layer.locked;
         const opacity = layer ? layer.opacity : 1;
         return `
-        <div class="glass" style="position:absolute;left:${note.x}px;top:${note.y}px;padding:0.4rem 0.6rem;border-radius:var(--radius-sm);min-width:80px;max-width:180px;cursor:${canDrag && !locked ? 'grab' : 'pointer'};z-index:10;color:var(--text);font-size:0.8rem;pointer-events:auto;border:1px solid var(--gold);opacity:${opacity};"
+        <div class="glass" style="position:absolute;left:${note.x}px;top:${note.y}px;/* rtl-physical: board coordinates */padding:0.4rem 0.6rem;border-radius:var(--radius-sm);min-width:80px;max-width:180px;cursor:${canDrag && !locked ? 'grab' : 'pointer'};z-index:10;color:var(--text);font-size:0.8rem;pointer-events:auto;border:1px solid var(--gold);opacity:${opacity};"
              ${canDrag && !locked ? `onmousedown="window.__wbStartDragNote('${note.id}', event)"` : ''}>
             <div>${escHtml(note.content)}</div>
             <div class="flex gap-1 mt-1">
@@ -250,10 +251,10 @@ export function renderOverlay() {
         const locked = layer && layer.locked;
         const opacity = layer ? layer.opacity : 1;
         return `
-        <div style="position:absolute;left:${img.x}px;top:${img.y}px;cursor:${canDrag && !locked ? 'grab' : 'pointer'};z-index:5;pointer-events:auto;opacity:${opacity};"
+        <div style="position:absolute;left:${img.x}px;top:${img.y}px;/* rtl-physical: board coordinates */cursor:${canDrag && !locked ? 'grab' : 'pointer'};z-index:5;pointer-events:auto;opacity:${opacity};"
              ${canDrag && !locked ? `onmousedown="window.__wbStartDragImage('${img.id}', event)"` : ''}>
             <img src="${img.data}" alt="Image pinned to the whiteboard" style="max-width:250px;max-height:250px;border-radius:4px;display:block;border:1px solid var(--border);" draggable="false" />
-            <button class="btn btn-xs btn-danger absolute" style="top:-8px;right:-8px;" onclick="window.deleteWhiteboardImage('${img.id}')">✕</button>
+            <button class="btn btn-xs btn-danger absolute" style="top:-8px;inset-inline-end:-8px;" onclick="window.deleteWhiteboardImage('${img.id}')">✕</button>
         </div>
     `;
     }).join('');
@@ -265,11 +266,11 @@ export function renderOverlay() {
         const locked = layer && layer.locked;
         const opacity = layer ? layer.opacity : 1;
         return `
-        <div style="position:absolute;left:${token.x}px;top:${token.y}px;cursor:${canDrag && !locked ? 'grab' : 'default'};z-index:15;pointer-events:auto;opacity:${opacity};display:flex;flex-direction:column;align-items:center;"
+        <div style="position:absolute;left:${token.x}px;top:${token.y}px;/* rtl-physical: board coordinates */cursor:${canDrag && !locked ? 'grab' : 'default'};z-index:15;pointer-events:auto;opacity:${opacity};display:flex;flex-direction:column;align-items:center;"
              ${canDrag && !locked ? `onmousedown="window.__wbStartDragToken('${token.id}', event)"` : ''}>
             <img src="${escHtml(token.imageData)}" alt="" style="width:48px;height:48px;border-radius:4px;border:2px solid var(--gold);object-fit:cover;" draggable="false" />
             <span style="font-size:0.7rem;color:var(--text);background:rgba(0,0,0,0.6);padding:0 4px;border-radius:2px;margin-top:2px;max-width:80px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${escHtml(token.name)}</span>
-            <button class="btn btn-xs btn-danger" style="position:absolute;top:-8px;right:-8px;padding:0 4px;font-size:0.6rem;border-radius:50%;" onclick="window.deleteCharacterToken('${token.id}')">✕</button>
+            <button class="btn btn-xs btn-danger" style="position:absolute;top:-8px;inset-inline-end:-8px;padding:0 4px;font-size:0.6rem;border-radius:50%;" onclick="window.deleteCharacterToken('${token.id}')">✕</button>
         </div>
     `;
     }).join('');
@@ -305,11 +306,11 @@ export function renderPingMarker(x, y) {
     const overlay = document.getElementById('whiteboard-overlay');
     if (!overlay) return;
     const marker = document.createElement('div');
-    marker.style.cssText = `position:absolute; left:${x}px; top:${y}px; width:0; height:0; pointer-events:none; z-index:50;`;
+    marker.style.cssText = `position:absolute; left:${x}px; top:${y}px; /* rtl-physical: board coordinates */ width:0; height:0; pointer-events:none; z-index:50;`;
     marker.innerHTML = `
-        <div class="wb-ping-ring" style="position:absolute; left:-18px; top:-18px; width:36px; height:36px;
+        <div class="wb-ping-ring" style="position:absolute; left:-18px; top:-18px; /* rtl-physical: marker-local coordinates */ width:36px; height:36px;
                     border:3px solid var(--gold); border-radius:50%; box-shadow:0 0 10px var(--gold);"></div>
-        <div style="position:absolute; left:-4px; top:-4px; width:8px; height:8px;
+        <div style="position:absolute; left:-4px; top:-4px; /* rtl-physical: marker-local coordinates */ width:8px; height:8px;
                     background:var(--gold); border-radius:50%; box-shadow:0 0 8px var(--gold);"></div>
     `;
     overlay.appendChild(marker);

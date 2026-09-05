@@ -12,6 +12,7 @@
  */
 
 import { generateId, getBaseUrl as utilsGetBaseUrl, getStorage, setStorage, removeStorage } from './utils.js';
+import { t as i18nText } from './i18n.js';
 
 // ============================================================
 // CONSTANTS
@@ -1380,7 +1381,7 @@ export function exportData() {
 }
 
 export function clearAllData() {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+    if (confirm(i18nText('feature.core.state.confirmClearAllData', null, 'Are you sure you want to clear all data? This cannot be undone.'))) {
         clearState();
         return true;
     }

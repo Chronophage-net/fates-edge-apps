@@ -1,4 +1,5 @@
 import { escHtml } from '@core/utils.js';
+import { t as i18nText } from '@core/i18n.js';
 
 /**
  * Create a timer widget DOM element
@@ -12,6 +13,10 @@ export function createTimerWidget(timer, { onTick, onReset, onDelete }, compact 
     const danger = ratio >= 0.75;
     const complete = ratio >= 1;
     const barClass = complete ? 'complete' : danger ? 'danger' : '';
+    const tick = i18nText('feature.components.TimerWidget.tickLabel', null, 'Tick');
+    const reset = i18nText('feature.components.TimerWidget.reset', null, 'Reset timer');
+    const remove = i18nText('feature.components.TimerWidget.delete', null, 'Delete timer');
+    const completeLabel = i18nText('feature.components.TimerWidget.complete', null, 'Complete');
     
     // Build segment display
     let segs = '';
@@ -27,8 +32,8 @@ export function createTimerWidget(timer, { onTick, onReset, onDelete }, compact 
                 <div style="display:flex;justify-content:space-between;align-items:center;">
                     <div><strong>${escHtml(timer.name)}</strong> <span class="text-muted">${timer.current}/${timer.segments}</span></div>
                     <div class="flex">
-                        <button class="btn btn-xs btn-primary" data-action="tick">+</button>
-                        <button class="btn btn-xs" data-action="reset">↺</button>
+                        <button class="btn btn-xs btn-primary" data-action="tick" aria-label="${tick}">+</button>
+                        <button class="btn btn-xs" data-action="reset" aria-label="${reset}">↺</button>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.4rem;align-items:center;margin:0.2rem 0;">
@@ -43,9 +48,9 @@ export function createTimerWidget(timer, { onTick, onReset, onDelete }, compact 
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;">
                     <div><strong>${escHtml(timer.name)}</strong> <span class="text-muted">${timer.current}/${timer.segments}</span></div>
                     <div class="flex">
-                        <button class="btn btn-sm btn-primary" data-action="tick">+ Tick</button>
-                        <button class="btn btn-sm" data-action="reset">↺</button>
-                        <button class="btn btn-sm btn-danger" data-action="delete">🗑️</button>
+                        <button class="btn btn-sm btn-primary" data-action="tick">+ ${tick}</button>
+                        <button class="btn btn-sm" data-action="reset" aria-label="${reset}">↺</button>
+                        <button class="btn btn-sm btn-danger" data-action="delete" aria-label="${remove}">🗑️</button>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.4rem;align-items:center;margin:0.4rem 0;">
@@ -53,7 +58,7 @@ export function createTimerWidget(timer, { onTick, onReset, onDelete }, compact 
                     <span class="timer-label">${Math.round(ratio * 100)}%</span>
                 </div>
                 <div class="timer-display">${segs}</div>
-                ${complete ? '<span style="font-size:0.7rem;color:var(--green);">✓ Complete</span>' : ''}
+                ${complete ? `<span style="font-size:0.7rem;color:var(--green);">✓ ${completeLabel}</span>` : ''}
             </div>
         `;
     }
