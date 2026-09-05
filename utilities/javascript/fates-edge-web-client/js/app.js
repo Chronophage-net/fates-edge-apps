@@ -89,7 +89,11 @@ async function init() {
         // 4. Setup save indicator
         const saveStatus = document.getElementById('save-status');
         if (saveStatus) {
+            // The live indicator supplies its own label once save events are wired.
+            const fallbackLabel = document.querySelector('.footer-status .status-label');
             onSave((status) => {
+                if (fallbackLabel) fallbackLabel.hidden = true;
+                saveStatus.setAttribute('data-i18n', status === 'saving' ? 'feature.app.saving' : status === 'saved' ? 'feature.app.saved' : 'feature.app.error');
                 saveStatus.className = 'saved-indicator';
                 if (status === 'saving') {
                     saveStatus.textContent = i18nText("feature.app.saving", null, "○ Saving…");

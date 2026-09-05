@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-05T15:54:48.482Z",
+  "generated": "2026-09-05T22:01:29.805Z",
   "documents": [
     {
       "id": "systems_reference_document",
@@ -920,8 +920,8 @@
       "title": "The Invokers Guide",
       "file": "Fates_-_Edge_-_-The-_-Invokers-_-Guide.html",
       "path": "/data/docs/",
-      "category": "other",
-      "categoryLabel": "📄 Other",
+      "category": "resources",
+      "categoryLabel": "Resources",
       "core": false,
       "active": true
     },

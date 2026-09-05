@@ -2679,6 +2679,17 @@
     "wiki.tags": "🏷️ Tags",
     "wiki.talents": "🧠 Talents",
     "wiki.valueAlreadyCloned": "\"{{value0}}\" already cloned.",
-    "wiki.wiki": "📖 Wiki"
+    "wiki.wiki": "📖 Wiki",
+    "settings.noArchivedSessions": "No archived sessions.",
+    "settings.themeIntro": "Pick from any built-in theme, or a theme registered by an installed pack (see Pack Management above). \"Auto\" follows your system's light/dark preference.",
+    "settings.themeDark": "Dark",
+    "settings.themeLight": "Light",
+    "settings.themeHighContrast": "High Contrast",
+    "settings.themeAuto": "Auto",
+    "settings.themeBuiltIn": "Built-in",
+    "settings.themeFromPack": "From Pack",
+    "settings.themeRegistered": "Registered",
+    "settings.themeAutoNote": "(Auto — matches your system's {{theme}} preference)",
+    "settings.themeActive": "Active:"
   }
 }

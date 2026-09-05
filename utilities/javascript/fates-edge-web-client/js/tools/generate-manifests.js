@@ -230,7 +230,7 @@ function generateDocsManifest(docsPath) {
       label = 'Core';
       path = '/data/docs/';
       core = true;
-    } else if (lower.includes('screen') || lower.includes('gm') || lower.includes('essential')) {
+    } else if (lower.includes('screen') || lower.includes('gm') || lower.includes('essential') || lower.includes('invoker')) {
       category = 'resources';
       label = 'Resources';
       path = '/data/docs/';

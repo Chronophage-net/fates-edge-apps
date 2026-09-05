@@ -584,7 +584,7 @@ export function render(el) {
             <div class="panel settings-panel" id="pack-management-panel">
                 <div class="panel-header">
                     <h3 data-i18n="feature.settings.packManagement">📦 Pack Management</h3>
-                    <span class="badge pack-count">${installedPacks.length} installed</span>
+                    <span class="badge pack-count">${escHtml(translate("feature.settings.valueInstalled", { value0: installedPacks.length }))}</span>
                 </div>
                 <p class="text-muted small" data-i18n="feature.settings.installCustomPacksToExtendTheToolkit">Install custom packs to extend the toolkit with new modules, documents, and data.</p>
 
@@ -650,7 +650,7 @@ export function render(el) {
             <div class="panel settings-panel" id="adventure-library-panel">
                 <div class="panel-header">
                     <h3 data-i18n="feature.settings.adventureModuleLibrary">🗺️ Adventure Module Library</h3>
-                    <span class="badge">${installedAdventureIds.size} installed</span>
+                    <span class="badge">${escHtml(translate("feature.settings.valueInstalled", { value0: installedAdventureIds.size }))}</span>
                 </div>
                 <p class="text-muted small">Browse adventure modules bundled in the local <code>${ADVENTURE_LIBRARY_PATH}</code> folder and install them into your library in one click — no manual JSON placement or modal needed.</p>
 
@@ -1045,9 +1045,9 @@ export function render(el) {
             <div class="panel settings-panel">
                 <div class="panel-header">
                     <h3 data-i18n="feature.settings.themeAppearance">🎨 Theme & Appearance</h3>
-                    <span class="badge" id="theme-count-badge">${getThemes().length} installed</span>
+                    <span class="badge" id="theme-count-badge">${escHtml(translate("feature.settings.valueInstalled", { value0: getThemes().length }))}</span>
                 </div>
-                <p class="text-muted small">Pick from any built-in theme, or a theme registered by an installed pack (see Pack Management above). "Auto" follows your system's light/dark preference.</p>
+                <p class="text-muted small" data-i18n="feature.settings.themeIntro">Pick from any built-in theme, or a theme registered by an installed pack (see Pack Management above). "Auto" follows your system's light/dark preference.</p>
                 <div class="flex" style="gap:0.5rem;flex-wrap:wrap;" id="theme-picker">
                     ${renderThemeButtons()}
                 </div>
@@ -2108,7 +2108,7 @@ function renderSessionArchives() {
     if (!el) return;
     const archives = getArchives();
     if (archives.length === 0) {
-        el.innerHTML = '<span class="text-muted">No archived sessions.</span>';
+        el.innerHTML = '<span class="text-muted" data-i18n="feature.settings.noArchivedSessions">No archived sessions.</span>';
         return;
     }
     el.innerHTML = archives.slice().reverse().map(a => `
@@ -2270,13 +2270,18 @@ async function pickLocale(codeOrAuto) {
     refreshLocaleStatus();
 }
 
+function localizedThemeLabel(theme) {
+    const keys = { dark: 'settings.themeDark', light: 'settings.themeLight', 'high-contrast': 'settings.themeHighContrast' };
+    return keys[theme.id] ? translate(`feature.${keys[theme.id]}`, null, theme.label) : theme.label;
+}
+
 function renderThemeButtons() {
     const current = getCurrentPreference();
     const buttons = getThemes().map(t =>
-        `<button class="btn btn-sm theme-btn${current === t.id ? ' active' : ''}" data-theme="${t.id}">${t.icon || '🎨'} ${escHtml(t.label)}</button>`
+        `<button class="btn btn-sm theme-btn${current === t.id ? ' active' : ''}" data-theme="${t.id}">${t.icon || '🎨'} ${escHtml(localizedThemeLabel(t))}</button>`
     );
     buttons.push(
-        `<button class="btn btn-sm theme-btn${current === 'auto' ? ' active' : ''}" data-theme="auto">🔄 Auto</button>`
+        `<button class="btn btn-sm theme-btn${current === 'auto' ? ' active' : ''}" data-theme="auto">🔄 ${escHtml(translate("feature.settings.themeAuto", null, "Auto"))}</button>`
     );
     return buttons.join('');
 }
@@ -2288,12 +2293,12 @@ function renderThemeButtons() {
  *  pack a non-built-in theme came from, rather than just "not built-in". */
 function getThemeSource(themeId) {
     if (themeId === 'dark' || themeId === 'light' || themeId === 'high-contrast') {
-        return { label: 'Built-in', pack: null };
+        return { label: translate('feature.settings.themeBuiltIn', null, 'Built-in'), pack: null };
     }
     const pack = getInstalledPacks().find(p => p.theme && p.theme.id === themeId);
     return pack
-        ? { label: 'From Pack', pack }
-        : { label: 'Registered', pack: null };
+        ? { label: translate('feature.settings.themeFromPack', null, 'From Pack'), pack }
+        : { label: translate('feature.settings.themeRegistered', null, 'Registered'), pack: null };
 }
 
 function renderThemeStatusLine() {
@@ -2303,9 +2308,9 @@ function renderThemeStatusLine() {
     const resolvedTheme = getTheme(resolvedId);
     const source = getThemeSource(resolvedId);
 
-    const label = resolvedTheme ? `${resolvedTheme.icon || '🎨'} ${escHtml(resolvedTheme.label)}` : escHtml(resolvedId);
+    const label = resolvedTheme ? `${resolvedTheme.icon || '🎨'} ${escHtml(localizedThemeLabel(resolvedTheme))}` : escHtml(resolvedId);
     const prefNote = isAuto
-        ? ` <span class="text-muted small">(Auto — matches your system's ${resolvedId === 'dark' ? 'dark' : 'light'} preference)</span>`
+        ? ` <span class="text-muted small">${escHtml(translate("feature.settings.themeAutoNote", { theme: localizedThemeLabel(resolvedTheme || { id: resolvedId, label: resolvedId }) }))}</span>`
         : '';
     const sourceNote = source.pack
         ? `<span class="source-tag" title="Registered by this pack" data-i18n-attr="title:feature.settings.registeredByThisPack">${escHtml(source.pack.name)} v${escHtml(source.pack.version)}</span>`
@@ -2314,7 +2319,7 @@ function renderThemeStatusLine() {
     return `
         <span class="theme-status-badge">
             <span class="dot"></span>
-            Active: <strong>${label}</strong>${prefNote}
+            ${escHtml(translate("feature.settings.themeActive", null, "Active:"))} <strong>${label}</strong>${prefNote}
             ${sourceNote}
         </span>
     `;

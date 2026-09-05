@@ -60,6 +60,13 @@ const UPLOADED_DOCS_KEY = 'fates-edge-uploaded-docs';
 
 // ─── Document Types (from build_config.toml) ────────────────
 const DOC_TYPES = {
+    es: {
+        label: 'Español',
+        group: 'Localized',
+        folder: 'es',
+        icon: '🌐',
+        description: 'Documentos en español'
+    },
     core: {
         label: '📘 Core',
         folder: 'core',
@@ -151,7 +158,7 @@ for (const [id, type] of Object.entries(DOC_TYPES)) {
 FOLDER_TO_TYPE['tollveil'] = 'other-games';
 
 // ─── Type order for sorting ──────────────────────────────────
-const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'travel', 'design', 'other-games', 'uploaded', 'other'];
+const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'travel', 'design', 'other-games', 'es', 'uploaded', 'other'];
 
 // ============================================================
 // STATE
@@ -191,7 +198,7 @@ function getDocTitle(file) {
 function getDocTypeFromFile(file) {
   const adventurePatterns = ['Saga', 'Dreams', 'Serpent', 'Blood', 'Carnival', 'Adventure', 'Coil', 'Lantern', 'Chronicle'];
   if (adventurePatterns.some(p => file.includes(p))) return 'adventures';
-  if (file.includes('Screen') || file.includes('GM')) return 'resources';
+  if (file.includes('Screen') || file.includes('GM') || /invoker/i.test(file)) return 'resources';
   if (file.includes('Reference') || file.includes('SRD') || file.includes('Essentials') || file.includes('Essential')) return 'core';
   return 'other';
 }
@@ -1295,12 +1302,23 @@ function populateTypeFilter(docs) {
         return ia - ib;
     });
 
+    const groups = new Map();
     sortedTypes.forEach(type => {
         const info = DOC_TYPES[type] || DOC_TYPES.other;
         const opt = document.createElement('option');
         opt.value = type;
         opt.textContent = info.label || type;
-        sel.appendChild(opt);
+        if (info.group) {
+            if (!groups.has(info.group)) {
+                const group = document.createElement('optgroup');
+                group.label = info.group;
+                sel.appendChild(group);
+                groups.set(info.group, group);
+            }
+            groups.get(info.group).appendChild(opt);
+        } else {
+            sel.appendChild(opt);
+        }
     });
 
     // A category is always selected -- there's no "All" option, since the
