@@ -14,6 +14,7 @@ const WebSocket = require('ws');
 const cors = require('cors');
 
 const config = require('./config.js').loadConfig();
+config.manager = require('./manager.js').fromEnvironment();
 const logger = require('./logger.js').createLogger(config.logLevel);
 const room = require('./room.js');
 const api = require('./api.js');
@@ -52,6 +53,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Mount API routes (health, rooms, deck, modules, characters, campaigns)
+if (config.manager) {
+    app.use(config.manager.httpGate);
+    config.manager.refresh().catch(() => console.warn('Manager unavailable; managed joins remain closed.'));
+}
 app.use(api.createApiRouter(config));
 
 // Root route – simple status (optional)
@@ -105,7 +110,18 @@ room.setScaling(effectiveScalingApi);
 // ---------- Plain WebSocket ----------
 // NEW: maxPayload -- see config.js's wsMaxPayloadBytes note. The plain-ws
 // transport has no default cap at all otherwise.
-const wss = new WebSocket.Server({ server, path: '/', maxPayload: config.wsMaxPayloadBytes });
+const wss = new WebSocket.Server(config.manager
+    ? { noServer: true, maxPayload: config.wsMaxPayloadBytes }
+    : { server, path: '/', maxPayload: config.wsMaxPayloadBytes });
+if (config.manager) {
+    // A second server-bound upgrade listener would reject Socket.IO's upgrade
+    // path. Dispatch only the plain-WebSocket path to this transport.
+    server.on('upgrade', (req, socket, head) => {
+        if (new URL(req.url, 'http://localhost').pathname === '/') {
+            wss.handleUpgrade(req, socket, head, ws => wss.emit('connection', ws, req));
+        }
+    });
+}
 wsHandlers.setupWSS(wss, config);
 
 // Prevent the WebSocket server from crashing on underlying HTTP errors
@@ -122,6 +138,7 @@ function gracefulShutdown(signal) {
     console.log(`\n🛑 Shutting down Fate's Edge server...`);
 
     if (effectiveScalingApi && effectiveScalingApi.close) effectiveScalingApi.close();
+    if (config.manager) config.manager.close();
 
     server.close((err) => {
         if (err) {

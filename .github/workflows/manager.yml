@@ -1,0 +1,34 @@
+name: Fate's Edge Manager
+on:
+  push:
+    paths:
+      - 'utilities/javascript/fates-edge-manager/**'
+      - 'utilities/javascript/fates-edge-socket-server/**'
+      - '.github/workflows/manager.yml'
+  pull_request:
+    paths:
+      - 'utilities/javascript/fates-edge-manager/**'
+      - 'utilities/javascript/fates-edge-socket-server/**'
+      - '.github/workflows/manager.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            utilities/javascript/fates-edge-manager/package-lock.json
+            utilities/javascript/fates-edge-socket-server/package-lock.json
+      - run: npm ci
+        working-directory: utilities/javascript/fates-edge-socket-server
+      - run: npm ci
+        working-directory: utilities/javascript/fates-edge-manager
+      - run: npm test
+        working-directory: utilities/javascript/fates-edge-manager
+      - run: npm test
+        working-directory: utilities/javascript/fates-edge-socket-server

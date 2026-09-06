@@ -43,7 +43,7 @@ function setupWSS(wss, appConfig) {
         ? createConnectionMessageLimiter({ windowMs: wssConfig.wsMessageRateWindowMs, max: wssConfig.wsMessageRateMax })
         : null;
 
-    wss.on('connection', (ws, req) => {
+    wss.on('connection', async (ws, req) => {
         const url = new URL(req.url, `http://${req.headers.host}`);
         let roomCode = url.searchParams.get('room');
         if (!roomCode) {
@@ -54,6 +54,37 @@ function setupWSS(wss, appConfig) {
         }
         const roomKey = (roomCode || 'default').toUpperCase();
         const clientId = `ws-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
+        let managedHandshake = null;
+        if (wssConfig.manager) {
+            try {
+                if (url.searchParams.has('token') || url.searchParams.has('apiKey')) throw new Error('Credentials must not be sent in URLs');
+                ws.send(JSON.stringify({ type: 'auth-required', mode: 'managed' }));
+                managedHandshake = await new Promise((resolve, reject) => {
+                    const timer = setTimeout(() => finish(new Error('Handshake timeout')), 10000);
+                    const closed = () => finish(new Error('Connection closed'));
+                    const message = raw => {
+                        try {
+                            if (raw.length > 16384) throw new Error('Handshake too large');
+                            const data = JSON.parse(raw);
+                            if (data.type !== 'handshake') throw new Error('Handshake required');
+                            finish(null, data);
+                        } catch (error) { finish(error); }
+                    };
+                    function finish(error, data) {
+                        clearTimeout(timer); ws.off('message', message); ws.off('close', closed); ws.off('error', closed);
+                        if (error) reject(error); else resolve(data);
+                    }
+                    ws.once('message', message); ws.once('close', closed); ws.once('error', closed);
+                });
+                ws.managerClaims = await wssConfig.manager.verify(managedHandshake.roomToken, roomKey);
+                if (ws.readyState !== WebSocket.OPEN) return;
+                ws.once('close', wssConfig.manager.track(ws.managerClaims, () => ws.close(4003, 'Room credential expired or revoked')));
+            } catch {
+                ws.close(4003, 'Managed room access rejected');
+                return;
+            }
+        }
 
         let currentRoom;
         try {
@@ -185,6 +216,10 @@ function setupWSS(wss, appConfig) {
 
                 const data = JSON.parse(message);
                 const messageType = data.type || 'unknown';
+                if (wssConfig.manager) {
+                    try { wssConfig.manager.permit(ws.managerClaims, messageType, roomKey); }
+                    catch { ws.send(JSON.stringify({ type: 'permission-denied', message: 'Managed room access rejected' })); return; }
+                }
                 const currentRoom = room.rooms.get(roomKey);
                 if (!currentRoom) return;
 
@@ -881,6 +916,7 @@ function setupWSS(wss, appConfig) {
         ws.on('error', (error) => {
             logger.error('Plain WS error', { clientId, room: roomKey, error: error.message });
         });
+        if (managedHandshake) ws.emit('message', Buffer.from(JSON.stringify(managedHandshake)));
     });
 }
 
@@ -890,14 +926,15 @@ function setupWSS(wss, appConfig) {
 // rationale. `data.authToken` is optional; everything here degrades to
 // exactly the previous anonymous behavior when it's absent or invalid.
 async function handleHandshake(ws, roomState, data) {
-    const authUser = auth.verifyTokenOptional(data.authToken);
+    const managerClaims = ws.managerClaims;
+    const authUser = managerClaims ? { userId: managerClaims.sub, username: data.clientName } : auth.verifyTokenOptional(data.authToken);
 
     // See socketio-handlers.js's identical comment: rooms get GC'd when
     // empty and recreated fresh (password: null) on the next connection,
     // so a persisted password needs to be rehydrated here before it's
     // checked below, or it would silently stop being enforced between
     // any two connections to an otherwise-empty room.
-    if (!roomState.password && hasAccountSupport()) {
+    if (!managerClaims && !roomState.password && hasAccountSupport()) {
         try {
             const persistedHash = await storage.getRoomPasswordHash(roomState.code);
             if (persistedHash) roomState.password = persistedHash;
@@ -908,8 +945,8 @@ async function handleHandshake(ws, roomState, data) {
 
     // Persistent ban check (by account -- survives reconnects/new
     // ephemeral clientIds, unlike the connection-time Set-based check).
-    let membership = null;
-    if (authUser && hasAccountSupport()) {
+    let membership = managerClaims ? { role: managerClaims.role } : null;
+    if (!managerClaims && authUser && hasAccountSupport()) {
         try {
             if (await storage.isMemberBanned(roomState.code, authUser.userId)) {
                 ws.send(JSON.stringify({ type: 'error', message: 'You are banned from this room.' }));
@@ -937,7 +974,7 @@ async function handleHandshake(ws, roomState, data) {
     // 'assistant-gm' is never trusted unless it's already saved on this
     // account's membership row (a grant made via room.handleRoleChangeRequest
     // with persist:true).
-    let assignedRole = auth.resolveRoomJoinRole(data.role, membership?.role);
+    let assignedRole = managerClaims ? managerClaims.role : auth.resolveRoomJoinRole(data.role, membership?.role);
     const existingGm = room.getExistingGm(roomState);
     if (assignedRole === 'gm' && existingGm) {
         assignedRole = 'player';
@@ -953,7 +990,7 @@ async function handleHandshake(ws, roomState, data) {
     roomState.clients.set(ws.clientId, ws.clientData);
     ws.handshakeComplete = true;
 
-    if (authUser && hasAccountSupport()) {
+    if (!managerClaims && authUser && hasAccountSupport()) {
         storage.upsertMembership(roomState.code, authUser.userId, {}).catch(e =>
             logger.warn('Failed to upsert room membership', { error: e.message })
         );
@@ -961,7 +998,7 @@ async function handleHandshake(ws, roomState, data) {
 
     // v4.8: re-resolve a previously-claimed character on rejoin -- see
     // socketio-handlers.js's join-room handler for the same logic.
-    if (authUser && hasAccountSupport() && typeof storage.getCharacterClaim === 'function') {
+    if (!managerClaims && authUser && hasAccountSupport() && typeof storage.getCharacterClaim === 'function') {
         try {
             const claim = await storage.getCharacterClaim(roomState.code, authUser.userId);
             if (claim) {
@@ -979,7 +1016,8 @@ async function handleHandshake(ws, roomState, data) {
     }
 
     const clientsList = room.getClientsList(roomState);
-    ws.send(JSON.stringify({ type: 'handshake_ack', success: true, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList }));
+    ws.send(JSON.stringify({ type: 'handshake_ack', success: true, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList,
+        ...(managerClaims ? { serverId: managerClaims.server_id, placementVersion: managerClaims.placement_version } : {}) }));
     room.broadcastToRoom(roomState.code, 'presence', { clients: clientsList }, ws.clientId);
     room.broadcastToRoom(roomState.code, 'player-joined', {
         clientId: ws.clientId,

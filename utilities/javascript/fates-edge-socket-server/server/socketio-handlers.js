@@ -56,6 +56,18 @@ function setupSocketIO(io, appConfig) {
         // connection. Remember them per room so a Spectator cannot launder
         // the restriction by emitting join-room again with role:'player'.
         socket.sessionRoomRoles = new Map();
+        if (ioConfig.manager) {
+            socket.use((packet, next) => {
+                if (packet[0] === 'join-room') return next();
+                try {
+                    ioConfig.manager.permit(socket.managerClaims, packet[0], socket.room);
+                    next();
+                } catch {
+                    socket.emit('permission-denied', { message: 'Managed room access rejected', event: packet[0] });
+                    next(new Error('permission_denied'));
+                }
+            });
+        }
 
         // ─── Rate-limit gate ────────────────────────────────────────────
         // socket.use() is inbound middleware: it runs for EVERY event this
@@ -167,7 +179,20 @@ function setupSocketIO(io, appConfig) {
                 return;
             }
             const roomKey = roomCode.toUpperCase();
-            const authUser = auth.verifyTokenOptional(authToken);
+            let managerClaims = null;
+            if (ioConfig.manager) {
+                if (socket.managerClaims) { socket.emit('error', { message: 'Reconnect to enter a managed room again' }); return; }
+                if (socket.managerJoining) return;
+                socket.managerJoining = true;
+                try { managerClaims = await ioConfig.manager.verify(data.roomToken, roomKey); }
+                catch { socket.emit('error', { message: 'Managed room access rejected' }); socket.managerJoining = false; return; }
+                socket.managerJoining = false;
+                socket.managerCleanup?.();
+                socket.managerClaims = managerClaims;
+                socket.managerCleanup = ioConfig.manager.track(managerClaims, () => socket.disconnect(true));
+                socket.once('disconnect', () => socket.managerCleanup?.());
+            }
+            const authUser = managerClaims ? { userId: managerClaims.sub, username: playerName } : auth.verifyTokenOptional(authToken);
 
             // Leave previous room
             if (socket.room) {
@@ -207,7 +232,7 @@ function setupSocketIO(io, appConfig) {
             // and the in-memory room in sync going forward, so this is
             // strictly "recover what we lost when the room object was
             // recreated", not a competing source of truth.
-            if (!currentRoom.password && hasAccountSupport()) {
+            if (!managerClaims && !currentRoom.password && hasAccountSupport()) {
                 try {
                     const persistedHash = await storage.getRoomPasswordHash(roomKey);
                     if (persistedHash) currentRoom.password = persistedHash;
@@ -239,8 +264,8 @@ function setupSocketIO(io, appConfig) {
             }
 
             // Persistent ban check (by account, survives reconnects/new socket ids)
-            let membership = null;
-            if (authUser && hasAccountSupport()) {
+            let membership = managerClaims ? { role: managerClaims.role } : null;
+            if (!managerClaims && authUser && hasAccountSupport()) {
                 try {
                     if (await storage.isMemberBanned(roomKey, authUser.userId)) {
                         socket.emit('error', { message: 'You are banned from this room.' });
@@ -280,7 +305,7 @@ function setupSocketIO(io, appConfig) {
             // GM_LIKE_ROLES), but it WOULD let any client masquerade as the
             // AI GM Bot's own recognized seat, which is still not something
             // a self-declaration alone should be able to do.
-            let assignedRole = auth.resolveRoomJoinRole(playerRole, membership?.role);
+            let assignedRole = managerClaims ? managerClaims.role : auth.resolveRoomJoinRole(playerRole, membership?.role);
             if (socket.sessionRoomRoles.get(roomKey) === 'spectator') {
                 assignedRole = 'spectator';
             }
@@ -306,7 +331,7 @@ function setupSocketIO(io, appConfig) {
             socket.sessionRoomRoles.set(roomKey, assignedRole);
             currentRoom.lastActivity = Date.now();
 
-            if (authUser && hasAccountSupport()) {
+            if (!managerClaims && authUser && hasAccountSupport()) {
                 storage.upsertMembership(roomKey, authUser.userId, {}).catch(e =>
                     logger.warn('Failed to upsert room membership', { error: e.message })
                 );
@@ -317,7 +342,7 @@ function setupSocketIO(io, appConfig) {
             // Best-effort -- a missing/renamed character or a fresh room
             // (whose in-memory roster doesn't have this claim's character
             // yet) just leaves the player unclaimed, same as a first join.
-            if (authUser && hasAccountSupport() && typeof storage.getCharacterClaim === 'function') {
+            if (!managerClaims && authUser && hasAccountSupport() && typeof storage.getCharacterClaim === 'function') {
                 try {
                     const claim = await storage.getCharacterClaim(roomKey, authUser.userId);
                     if (claim) {
@@ -349,6 +374,7 @@ function setupSocketIO(io, appConfig) {
             const charArray = currentRoom.characters ? Object.values(currentRoom.characters) : [];
 
             socket.emit('room-joined', {
+                ...(managerClaims ? { serverId: managerClaims.server_id, placementVersion: managerClaims.placement_version } : {}),
                 room: roomKey,
                 clients: clientsList,
                 clientRole: assignedRole,

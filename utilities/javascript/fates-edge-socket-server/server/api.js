@@ -43,6 +43,11 @@ function timingSafeEqual(a, b) {
 }
 
 function authenticate(req, res, next) {
+    if (config.manager) {
+        if (!req.managerClaims) return res.status(403).json({ error: 'Managed room token required' });
+        req.apiKeyData = { name: req.managerClaims.sub };
+        return next();
+    }
     const apiKey = req.headers['x-api-key'] || req.query.apiKey;
     if (!apiKey) return res.status(401).json({ error: 'API key required' });
     if (!config.apiKey || !timingSafeEqual(apiKey, config.apiKey)) {
