@@ -589,9 +589,31 @@ function onTimerTickRequest(event) {
     tickActiveSceneTimer(targetId, amount);
 }
 
-// Handle "sb-generated" events
+// Handle "sb-generated" events.
+//
+// This bank is the counter that matters. The die roller deliberately keeps no
+// standing total of its own -- it works out what a roll produced, once, after
+// every re-roll in the sequence, and hands the number here. A GM spends from
+// one place, so one place counts.
+//
+// Two feeders now reach this: the character roller, when a roll finishes, and
+// the VTT chat pipeline, when a roll message is processed. A roll made with
+// the VTT open goes through both, so the same beats would be banked twice.
+// Dedupe on the roll's own id rather than on the feeder, because which feeder
+// arrives first is a question of which tab is open.
+const bankedRollIds = new Set();
+const BANKED_ROLL_MEMORY = 200;   // plenty for a session; bounded so it cannot grow forever
+
 function onSbGenerated(event) {
-    const { count = 1 } = event.detail || {};
+    const { count = 1, rollId = null } = event.detail || {};
+    if (rollId) {
+        if (bankedRollIds.has(rollId)) return;
+        bankedRollIds.add(rollId);
+        if (bankedRollIds.size > BANKED_ROLL_MEMORY) {
+            // Drop the oldest; Set preserves insertion order.
+            bankedRollIds.delete(bankedRollIds.values().next().value);
+        }
+    }
     const gmState = getGmState();
     const newTotal = (gmState.sbBank || 0) + count;
     updateGmState({ sbBank: newTotal });

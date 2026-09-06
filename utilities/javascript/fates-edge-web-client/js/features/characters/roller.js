@@ -603,6 +603,11 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
     }
 
     return {
+        // A stable id for this whole roll -- pool, Position re-roll and any
+        // talent re-rolls together. The GM Tools SB Bank dedupes on it, so a
+        // roll that reaches the bank twice (once from here, once from the VTT
+        // chat pipeline) is still banked once.
+        rollId: `roll-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
         outcome,
         dice: dice.sort((a, b) => b - a),
         rawDice,
@@ -802,7 +807,33 @@ export function rollForCharacter(id, options = {}) {
         }
         
         const msg = buildRollMessage(c.name, result, attr, skill, dv, position, attrName, skillName);
-        
+
+        // Hand the Story Beats to the GM once, here, when the roll is
+        // complete -- after the Position re-roll and after any talent
+        // re-rolls, because a beat is owed for every 1 the dice ever showed
+        // and that total is not known until the sequence ends.
+        //
+        // The roller deliberately keeps no standing count of its own: it
+        // reports what this roll produced and hands the number over. The
+        // bank that matters is the GM's (gm-tools' SB Bank), which is where
+        // a GM actually spends from.
+        //
+        // Dispatched here rather than only from the VTT chat pipeline
+        // (vtt-core.js), which was the sole feeder: a roll made with the VTT
+        // tab closed produced beats that reached no bank at all. Fires for
+        // silent/batch rolls too -- the GM is owed those beats whether or not
+        // a toast was shown.
+        if (result.storyBeats > 0) {
+            document.dispatchEvent(new CustomEvent('sb-generated', {
+                detail: {
+                    count: result.storyBeats,
+                    source: 'character-roller',
+                    rollId: result.rollId,
+                    rollData: result
+                }
+            }));
+        }
+
         if (!silent) {
             sendToVTT(msg, result);
             const outcomeType = OUTCOME_TYPES[result.outcome] || OUTCOME_TYPES['miss'];
@@ -1633,6 +1664,7 @@ function sendToVTT(message, result) {
                     text: message,
                     sender: 'Roll',
                     rollData: {
+                        rollId: result.rollId,
                         outcome: result.outcome,
                         outcomeLabel: OUTCOME_TYPES[result.outcome]?.label || result.outcome,
                         dice: result.dice,
@@ -1648,6 +1680,7 @@ function sendToVTT(message, result) {
             } else if (module.sendMessage && typeof module.sendMessage === 'function') {
                 module.sendMessage(message, 'Roll', 'all', {
                     rollData: {
+                        rollId: result.rollId,
                         outcome: result.outcome,
                         outcomeLabel: OUTCOME_TYPES[result.outcome]?.label || result.outcome,
                         dice: result.dice,

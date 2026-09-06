@@ -386,6 +386,11 @@ export function renderChat() {
                     detail: {
                         count: rollData.storyBeats,
                         source: 'roll',
+                        // Carried through so gm-tools can tell this apart from
+                        // the same roll arriving straight from the character
+                        // roller, which now banks its own beats. Without it the
+                        // GM is credited twice for one roll.
+                        rollId: rollData.rollId || null,
                         rollData: rollData,
                         messageId: msg.id
                     }
