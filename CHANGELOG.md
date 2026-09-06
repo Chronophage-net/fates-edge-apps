@@ -3,6 +3,11 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.0.15] - 2026-09-06
+
+### Other
+- Updated/Fixed the SRD and added the SaaS manager
+
 ## [5.0.14] - 2026-09-06
 
 Story Beats handed to the GM bank once per roll
