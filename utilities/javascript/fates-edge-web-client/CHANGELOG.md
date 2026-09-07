@@ -10,6 +10,9 @@ All notable changes to the Fate's Edge Web Client are logged here. This file sta
   - **A character's Harm track is unaffected** — still Harm 0--3, still called Harm, in `characters/index.js` and in the wiki data.
 
 ### Fixed
+- `data/docs/Fates_-_Edge_-_-Systems_-_Reference_-_Document.html`: Character Creation Step 3's "Core skills include" list printed sixteen entries with four duplicates (Melee, Deception, Insight and Craft each appeared twice) — the skill restructure mapped the retired names onto the survivors without de-duplicating. Now the twelve, once each, six per column. Fixed in the docs repo's copy and mirrored here; the two copies are byte-identical. One stray "Investigation" in the travel table is now "Insight".
+
+### Fixed
 - The three built-in fallback creatures (Goblin Scavenger, Skeleton Knight, Thorn Dryad) carried their stat on a `harmLevels` key that no reader ever looked at, so their Resilience never rendered when the bestiary fell back to the built-in list.
 
 
