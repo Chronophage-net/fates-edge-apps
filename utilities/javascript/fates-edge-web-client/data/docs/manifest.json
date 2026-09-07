@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-07T13:00:10.481Z",
+  "generated": "2026-09-07T20:41:31.283Z",
   "documents": [
     {
       "id": "gm_guide",
@@ -284,6 +284,16 @@
       "id": "annotated_play_session",
       "title": "Annotated Play Session",
       "file": "Fates_-_Edge_-_-Annotated_-_Play_-_Session.html",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "annotated_play_session_epic_tier",
+      "title": "Annotated Play Session Epic Tier",
+      "file": "Fates_-_Edge_-_-Annotated_-_Play_-_Session_-_-Epic_-_Tier.html",
       "path": "/data/docs/resources/",
       "category": "resources",
       "categoryLabel": "Resources",
@@ -1170,7 +1180,7 @@
       "active": true
     }
   ],
-  "total_count": 81,
-  "active_count": 81,
+  "total_count": 82,
+  "active_count": 82,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
