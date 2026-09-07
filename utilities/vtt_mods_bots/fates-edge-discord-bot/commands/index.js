@@ -11,5 +11,6 @@ module.exports = {
     character: require('./character'),
     timer: require('./timer'),
     adventure: require('./adventure.js'),
-    admin: require('./admin')
+    admin: require('./admin'),
+    paperImport: require('./paper-import')
 };

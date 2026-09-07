@@ -7,6 +7,11 @@ const logger = require('../utils/logger');
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
+        if ((interaction.isModalSubmit() && interaction.customId === 'paper-import:input') ||
+            (interaction.isButton() && interaction.customId?.startsWith('paper-import:'))) {
+            return require('../commands/paper-import').handleInteraction(interaction, client);
+        }
+
         // NEW: Assistant GM suggestion Approve/Reject buttons (see
         // events/ready.js's assistantSuggestionCreated listener, which
         // posts these with customId `assistant_suggestion:<approve|

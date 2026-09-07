@@ -5,6 +5,7 @@
  */
 
 const WebSocket = require('ws');
+const { randomUUID } = require('node:crypto');
 const EventEmitter = require('events');
 const logger = require('./logger');
 
@@ -97,6 +98,38 @@ class VTTClient extends EventEmitter {
     send(type, data = {}) {
         const message = { type, ...data };
         this._sendMessage(message);
+    }
+
+    // Confirm a single paper entry with a receiving web client. Deliberately
+    // bypass the generic reconnect queue: uncertain imports must not replay.
+    sendPaperOperation(operation, timeoutMs = 8000) {
+        if (!this.connected || !this.clientId || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            return Promise.reject(new Error('VTT connection is not ready.'));
+        }
+        const fullOperation = { ...operation, id: randomUUID(), clientId: this.clientId,
+            clientName: this.config.botName || 'Discord Bot', timestamp: Date.now(), version: {} };
+        return new Promise((resolve, reject) => {
+            const finish = (error) => {
+                clearTimeout(timer);
+                this.off('operationAck', onAck);
+                this.off('disconnected', onDisconnect);
+                if (error) reject(error); else resolve();
+            };
+            const onAck = message => {
+                if (message.operationId === fullOperation.id) {
+                    finish(message.success === true ? null : new Error('Import was not acknowledged.'));
+                }
+            };
+            const onDisconnect = () => finish(new Error('Disconnected before delivery was confirmed.'));
+            const timer = setTimeout(() => finish(new Error('No receiving client acknowledged this entry.')), timeoutMs);
+            this.on('operationAck', onAck);
+            this.on('disconnected', onDisconnect);
+            try {
+                this.ws.send(JSON.stringify({ type: 'operation', operation: fullOperation }), error => {
+                    if (error) finish(error);
+                });
+            } catch (error) { finish(error); }
+        });
     }
 
     _sendMessage(message) {
@@ -373,6 +406,10 @@ class VTTClient extends EventEmitter {
                 break;
 
             // ─── Sync ──────────────────────────────────────────────
+            case 'operation_ack':
+                this.emit('operationAck', message);
+                break;
+
             case 'sync-state':
                 const state = message.state || {};
                 if (state.characters) {

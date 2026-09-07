@@ -352,3 +352,32 @@ Fork, branch, commit, push, open a pull request.
 <p align="center">
   <sub>Made with ❤️ by Nick Gasper</sub>
 </p>
+
+### Paper sheets: `/vttimport`
+
+A Discord member with **Manage Server** permission can run `/vttimport` to paste a transcribed sheet into a private form. The bot returns a private text attachment showing every proposed entry, generated ID, default value, and numeric OCR correction. Review it, then select **Import reviewed entries** or **Cancel**. Nothing is sent to the campaign before confirmation. The preview expires after five minutes and is tied to its author, Discord channel, and VTT connection.
+
+The bot must be connected to the intended VTT room, and a web client must have **Live Campaign Sync** connected to that same room to receive the entries. The bot waits for a web-client receipt for each entry. A receipt confirms client application, not a durable server backup. If delivery is uncertain, the bot stops; inspect the campaign against the preview before importing any missing entries. It does not automatically retry paper imports or replay them after reconnecting.
+
+Supported blocks are `=== Character ===`, `=== Timer ===`, and `=== Journal ===`, using the same English field labels as the web client's [Paper Import Reference](../../javascript/fates-edge-web-client/data/docs/resources/Paper-Import-Reference.html). This adapter **creates new entries only**. Exact-ID updates belong in the web client's import dialog, which can read current character data. An ID anywhere in a Discord import blocks the whole preview rather than risking an unintended update. Input is limited to 4,000 characters and 10 entries per import. Image uploads/OCR and Foundry integration remain separate follow-ups.
+
+```text
+=== Character ===
+Name: Rowan
+Body: 2
+Skills: Melee=2, Lore=1
+
+=== Timer ===
+Name: Patrol returns
+Segments: 6
+Current: 2
+
+=== Journal ===
+Title: Session at the bridge
+Content: We promised to return before dawn.
+Tags: session, bridge
+```
+
+The command is picked up by the existing bot command registration on restart, or by `npm run register`. No Discord registration or live campaign import is performed by the tests.
+
+**Maintainers:** `vendor/paper-import.mjs` is an exact distributable copy of the web client's pure parser, so the standalone bot Docker image does not need the web client. After changing the canonical parser, run `npm run sync:paper-parser` here. `npm test` from the full apps checkout checks parity and runs parser, permission, confirmation, and delivery tests without connecting to Discord or a campaign server.
