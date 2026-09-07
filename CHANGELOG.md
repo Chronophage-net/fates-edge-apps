@@ -3,6 +3,17 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.1.0] - 2026-09-07
+
+Multi-seat AI GM: seat presence, stable room identity, delegated side tasks, and the Discord paper-import adapter.
+
+### Added
+- /vttimport paper-import adapter
+- seat presence, stable room identity, and delegated side tasks
+
+### Docs
+- log the SRD Step 3 skill-list de-duplication
+
 ## [5.0.15] - 2026-09-06
 
 ### Other
