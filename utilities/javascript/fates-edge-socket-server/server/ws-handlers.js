@@ -222,7 +222,7 @@ function setupWSS(wss, appConfig) {
                 const data = JSON.parse(message);
                 const messageType = data.type || 'unknown';
                 if (wssConfig.manager) {
-                    try { wssConfig.manager.permit(ws.managerClaims, messageType, roomKey); }
+                    try { wssConfig.manager.permit(ws.managerClaims, messageType, room.rooms.get(roomKey)?.code); }
                     catch { ws.send(JSON.stringify({ type: 'permission-denied', message: 'Managed room access rejected' })); return; }
                 }
                 const currentRoom = room.rooms.get(roomKey);

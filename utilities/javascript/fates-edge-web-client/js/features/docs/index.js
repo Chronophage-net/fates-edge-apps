@@ -312,7 +312,58 @@ function isDangerousUrl(value) {
     return false;
 }
 
-function sanitizeHtml(html) {
+// A published document's own CSS lives in its <head>. Returning only
+// body.innerHTML dropped every one of those rules, so component classes the
+// documents define themselves -- .roll/.die in the annotated play session,
+// .tag and .badge in the expansions -- rendered as bare adjacent inline spans
+// and ran together ("64183" instead of "6 4 1 8 3").
+//
+// The CSS is carried across, but scoped to .integrated-document so a document
+// can never restyle the application around it. Page-level selectors are
+// remapped onto the container rather than dropped, and the viewer's own token
+// block is emitted AFTER this, so light/dark still wins over a document's
+// hardcoded palette.
+const SCOPE = '.integrated-document';
+
+export function scopeSelector(sel) {
+    return sel.split(',').map(part => {
+        const p = part.trim();
+        if (!p) return '';
+        if (/^(:root|html|body)$/i.test(p)) return SCOPE;
+        if (p === '*') return SCOPE + ' *';
+        if (/^(:root|html|body)\b/i.test(p)) return SCOPE + p.replace(/^(:root|html|body)/i, '');
+        return SCOPE + ' ' + p;
+    }).filter(Boolean).join(', ');
+}
+
+export function scopeCss(css) {
+    let out = '';
+    let i = 0;
+    while (i < css.length) {
+        const brace = css.indexOf('{', i);
+        if (brace === -1) break;
+        const prelude = css.slice(i, brace).trim();
+        // find the matching close brace
+        let depth = 1, j = brace + 1;
+        while (j < css.length && depth > 0) {
+            if (css[j] === '{') depth++;
+            else if (css[j] === '}') depth--;
+            j++;
+        }
+        const body = css.slice(brace + 1, j - 1);
+        if (/^@(media|supports|layer|container)/i.test(prelude)) {
+            out += prelude + '{' + scopeCss(body) + '}';
+        } else if (/^@(font-face|keyframes|-webkit-keyframes|charset|import|namespace|page)/i.test(prelude)) {
+            out += prelude + '{' + body + '}';
+        } else if (prelude) {
+            out += scopeSelector(prelude) + '{' + body + '}';
+        }
+        i = j;
+    }
+    return out;
+}
+
+export function sanitizeHtml(html) {
     if (!html) return '';
     let parsed;
     try {
@@ -344,7 +395,14 @@ function sanitizeHtml(html) {
         });
     });
 
-    return parsed.body ? parsed.body.innerHTML : '';
+    const css = Array.from(parsed.querySelectorAll('style'))
+        .map(el => el.textContent || '').join('\n');
+    parsed.querySelectorAll('style').forEach(el => el.remove());
+    const body = parsed.body ? parsed.body.innerHTML : '';
+    if (!css.trim()) return body;
+    let scoped = '';
+    try { scoped = scopeCss(css); } catch (_) { scoped = ''; }
+    return scoped ? `<style>${scoped}</style>${body}` : body;
 }
 
 function getDocType(doc) {

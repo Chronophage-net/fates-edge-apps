@@ -67,7 +67,7 @@ function setupSocketIO(io, appConfig) {
             socket.use((packet, next) => {
                 if (packet[0] === 'join-room') return next();
                 try {
-                    ioConfig.manager.permit(socket.managerClaims, packet[0], socket.room);
+                    ioConfig.manager.permit(socket.managerClaims, packet[0], room.rooms.get(socket.room)?.code);
                     next();
                 } catch {
                     socket.emit('permission-denied', { message: 'Managed room access rejected', event: packet[0] });
