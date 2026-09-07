@@ -3,6 +3,13 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.1.1] - 2026-09-07
+
+Published-corpus sync after the docs compliance sweep, plus the document-loader path fix.
+
+### Docs
+- sync published corpus after the compliance sweep
+
 ## [5.1.0] - 2026-09-07
 
 Multi-seat AI GM: seat presence, stable room identity, delegated side tasks, and the Discord paper-import adapter.
