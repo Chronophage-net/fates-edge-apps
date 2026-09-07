@@ -284,7 +284,7 @@ improve Position by one step.</p></li>
 complications:</p>
 <div class="table-wrap"><table>
 <thead>
-<tr><th style="text-align: left;"><strong>SB SB</strong></th><th style="text-align: left;"><strong>Effect</strong></th></tr>
+<tr><th style="text-align: left;"><strong>SB</strong></th><th style="text-align: left;"><strong>Effect</strong></th></tr>
 </thead>
 <tbody>
 <tr><td style="text-align: left;">1</td><td style="text-align: left;">Minor pressure: noise, trace, tick a 4–6 segment timer +1.</td></tr>
@@ -480,7 +480,7 @@ hide.”</p></li>
 <ul>
 <li><strong>Timer Limit:</strong> Maintain at most three active timers per scene. Combine redundant timers or treat additional timers as off-screen campaign timers (ticked between scenes as a result of scene outcomes).</li>
 <li><strong>SB Banking:</strong> Try to keep banked SB (unspent at scene end) under Tier + 1 (e.g., Tier I: max 2 SB, Tier II: max 3 SB). Unspent SB beyond this may carry over (GM discretion, max 4).</li>
-<li><strong>Terminology:</strong> Use &ldquo;Success with SB&rdquo; instead of &ldquo;Success &amp; Cost&rdquo; for clarity &mdash; it emphasizes the narrative opportunity rather than a penalty.</li>
+<li><strong>Terminology:</strong> Use &ldquo;Success with SB&rdquo; instead of &ldquo;Success with SB&rdquo; for clarity &mdash; it emphasizes the narrative opportunity rather than a penalty.</li>
 </ul>
 </section>
 
@@ -560,7 +560,7 @@ hide.”</p></li>
 <tr><td>5</td><td>Extreme &ndash; multiple constraints, dramatic gambles.</td></tr>
 </tbody>
 </table>
-<p><strong>The ladder ends at 5.</strong> There is no DV 5. A task harder than Extreme is not a bigger number &mdash; it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number &mdash; it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
 </div>
 </section>
 
@@ -1162,15 +1162,15 @@ number instead of describing the swing.</p>
 <tr><td>Melee</td><td>Attack with sword or axe</td><td>DV 3 (Controlled)</td></tr>
 <tr><td>Ranged</td><td>Shoot a bow at Near range</td><td>DV 3</td></tr>
 <tr><td>Athletics</td><td>Climb a wall, leap a gap</td><td>DV 3&ndash;4</td></tr>
-<tr><td>Stealth</td><td>Hide from guards</td><td>Opposed by Perception</td></tr>
-<tr><td>Survival</td><td>Track a creature, find water</td><td>DV 3&ndash;4</td></tr>
+<tr><td>Stealth</td><td>Hide from guards</td><td>Opposed by Insight</td></tr>
+<tr><td>Insight</td><td>Track a creature, find water</td><td>DV 3&ndash;4</td></tr>
 <tr><td>Sway</td><td>Persuade a guard to look away</td><td>DV 3 (varies by leverage)</td></tr>
 <tr><td>Insight</td><td>Detect a lie</td><td>DV 3 (opposed by Deception)</td></tr>
 <tr><td>Lore</td><td>Recall historical or cultural knowledge</td><td>DV 2&ndash;4</td></tr>
 <tr><td>Insight</td><td>Search a room for clues</td><td>DV 3&ndash;4</td></tr>
 <tr><td>Craft</td><td>Stabilize a dying ally</td><td>DV 3&ndash;5 (by severity)</td></tr>
 <tr><td>Arcana</td><td>Identify a magical effect</td><td>DV 4&ndash;5</td></tr>
-<tr><td>Ritual</td><td>Perform a consecration or exorcism</td><td>DV 4&ndash;6</td></tr>
+<tr><td>Lore</td><td>Perform a consecration or exorcism</td><td>DV 4&ndash;6</td></tr>
 </tbody>
 </table>
 </div>
@@ -1183,7 +1183,7 @@ number instead of describing the swing.</p>
 
 <section class="level2" id="assistance-and-skill-synergy">
 <h2>Assistance and Skill Synergy</h2>
-<p>When two characters cooperate using the same or complementary skills, the primary actor gains +1 die per assistant (up to the assist cap of +3). The GM may require each assistant to succeed on a small roll (DV 2) to provide meaningful help.</p>
+<p>One character may assist the primary actor using the same or a complementary skill, granting +1 die. Relevant talents may improve that contribution, up to the assist cap of +3 dice. The GM may require the helper to succeed on a small roll (DV 2) to provide meaningful help.</p>
 </section>
 </section>
 
@@ -2545,7 +2545,7 @@ number instead of describing the swing.</p>
 <section class="level3" id="talents-of-the-hedge">
 <h3>Talents of the Hedge</h3>
 <ul>
-<li><strong>Craft of the Hedge (4 XP):</strong> Requires Lore 1+ or Survival 1+. You learn two Hedge Gifts; you may perform Quick Workings; once per session, when you fail a Quick Working roll, you may convert the Miss into a Partial Success by marking 1 Fatigue.</li>
+<li><strong>Craft of the Hedge (4 XP):</strong> Requires Lore 1+ or Insight 1+. You learn two Hedge Gifts; you may perform Quick Workings; once per session, when you fail a Quick Working roll, you may convert the Miss into a Partial Success by marking 1 Fatigue.</li>
 <li><strong>Hedge Gift of the Patron (6 XP):</strong> Requires Craft of the Hedge and a Bond to a Patron. Once per session, when you would use a Hedge Gift, you may instead invoke your Patron's Imbuement. Gain +1 die to all actions tied to your Patron's domain for the scene, but mark +1 Obligation immediately. No action required.</li>
 </ul>
 </section>
@@ -2746,14 +2746,13 @@ number instead of describing the swing.</p>
 <tr><td>Light (Cantrip)</td><td><code>[FIRE][ILLUMINATE]</code></td><td>DV 3, one roll. Creates small, sustained light.</td></tr>
 <tr><td>Shield of Air</td><td><code>[AIR][DEFEND]</code></td><td>DV 3, one action. +1 die to next defense roll.</td></tr>
 <tr><td>Double Shield</td><td><code>[AIR][DEFEND][DEFEND]</code></td><td>DV 4, one action. +2 dice to next defense roll.</td></tr>
-<tr><td>Flame Cloak</td><td><code>[FIRE][AREA][DEFEND]</code></td><td>DV 4, two actions. Enemies –1 die to approach; caster +1 to defend. <span class="text-muted text-sm">(source text truncated at page break)</span></td></tr>
+<tr><td>Flame Cloak</td><td><code>[FIRE][AREA][DEFEND]</code></td><td>DV 4, two actions. Enemies –1 die to approach; caster +1 to defense DV against fire.</td></tr>
 <tr><td>Healing Touch</td><td><code>[LIFE][HEAL]</code></td><td>DV 3, one action. Removes 1 Fatigue from touched target.</td></tr>
-<tr><td>Mend Wound</td><td><code>[LIFE][HEAL][HEAL]</code></td><td>DV 4, one action (or scene). Removes 2 Fatigue, or downgrades a wound one step. <span class="text-muted text-sm">(source text truncated at page break)</span></td></tr>
-<tr><td>Teleport (Self)</td><td><code>[AIR][FOLD]</code></td><td><code>[FOLD]</code> dangerous (+2). DV = 1+1+2 = 4. Teleport self within short range. <span class="text-muted text-sm">(source text truncated at page break)</span></td></tr>
+<tr><td>Mend Wound</td><td><code>[LIFE][HEAL][HEAL]</code></td><td>DV 4, one action (or scene). Removes 2 Fatigue, or clears Harm 1 to Harm 0.</td></tr>
+<tr><td>Teleport (Self)</td><td><code>[AIR][FOLD]</code></td><td><code>[FOLD]</code> dangerous (+2). DV = 1+1+2 = 4. Teleport self within Near range.</td></tr>
 </tbody>
 </table>
 </div>
-<p class="text-sm text-muted">Note: several Effect cells in this table were cut off mid-sentence by the source PDF's page layout; the surviving text is transcribed above and the break is flagged rather than invented.</p>
 </section>
 
 <section class="level2" id="repair-restoration">
@@ -3326,7 +3325,7 @@ number instead of describing the swing.</p>
 <p>The GM sets a DV (typically 4&ndash;6) based on scope. The player rolls Spirit + Lore (or another appropriate skill).</p>
 <ul>
 <li><strong>Clean Success:</strong> The ritual works as intended.</li>
-<li><strong>Success &amp; Cost:</strong> Works, but with a cost (backlash, extra time, compromised component). GM spends SB.</li>
+<li><strong>Success with SB:</strong> Works, but with a cost (backlash, extra time, compromised component). GM spends SB.</li>
 <li><strong>Partial:</strong> Partial effect; player gains 1 Boon.</li>
 <li><strong>Miss:</strong> Fails; GM may impose a complication (wrong spirit answers, ward backfires). Player gains 2 Boons.</li>
 </ul>
@@ -3643,7 +3642,7 @@ number instead of describing the swing.</p>
 <h3>Lesser (TL 1)</h3>
 <div class="panel panel-green">
 <p><span class="badge badge-green">TL 1</span></p>
-<p><strong>Harm Levels:</strong> 3 (standard)</p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
 <ul>
 <li><strong>Shade:</strong> Stealthy scout; can pass through cracks; Harm 1, Leash = 1+Spirit.</li>
 <li><strong>Emberling:</strong> Small fire elemental; deals 1 Harm (fire) on touch; can ignite objects.</li>
@@ -3656,7 +3655,7 @@ number instead of describing the swing.</p>
 <h3>Greater (TL 3)</h3>
 <div class="panel panel-red">
 <p><span class="badge badge-red">TL 3</span></p>
-<p><strong>Harm Levels:</strong> 3 (standard)</p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
 <ul>
 <li><strong>Flame Elemental:</strong> Area fire attack (Harm 2 to all in Close); immune to mundane fire; Leash = 3+Spirit.</li>
 <li><strong>Shadow Hound:</strong> Track any scent; can move silently; attacks with Harm 2 (shadow bite).</li>
@@ -4169,7 +4168,7 @@ number instead of describing the swing.</p>
 <tr><td>Guide</td><td>Wits + Lore</td><td>Tick the Travel Timer +1.</td></tr>
 <tr><td>Scout</td><td>Wits + Stealth</td><td>Party cannot be surprised on the first encounter of the leg.</td></tr>
 <tr><td>Quartermaster</td><td>Wits + Craft</td><td>Prevent one Supply drop or recover 1 spent Supply.</td></tr>
-<tr><td>Watch</td><td>Presence + Notice</td><td>Party gains +1 Position on the first defense roll of any ambush.</td></tr>
+<tr><td>Watch</td><td>Presence + Insight</td><td>Party gains +1 Position on the first defense roll of any ambush.</td></tr>
 </tbody>
 </table>
 </div>
@@ -4280,7 +4279,7 @@ number instead of describing the swing.</p>
 <li><strong>State Intent &amp; Approach.</strong> What do you want to achieve, and how?</li>
 <li><strong>Set Position &amp; DV.</strong> GM determines risk (Dominant/Controlled/Desperate) and difficulty (2–7+).</li>
 <li><strong>Roll Attribute + Skill.</strong> Each 6+ = success; each 1 = SB for the GM.</li>
-<li><strong>Apply the Outcome Matrix.</strong> Clean Success, Success &amp; Cost, Partial, Miss.</li>
+<li><strong>Apply the Outcome Matrix.</strong> Clean Success, Success with SB, Partial, Miss.</li>
 <li><strong>Spend SB.</strong> GM introduces complications, shifts Position, or advances timers.</li>
 </ol>
 </section>
@@ -4376,7 +4375,7 @@ number instead of describing the swing.</p>
 <section class="level3" id="traps-and-wards">
 <h3>17.5.2 Traps and Wards</h3>
 <ul>
-<li><strong>Discover:</strong> Notice vs DV 4–6.</li>
+<li><strong>Discover:</strong> Wits + Insight vs DV 4–5.</li>
 <li><strong>Disable:</strong> Contested roll vs trap's tick. Clean Success = neutralized; Partial = disable but generate SB; Miss = trap activates.</li>
 <li><strong>Activation:</strong> GM spends SB to trigger trap (damage, condition, timer advance).</li>
 <li><strong>Wards:</strong> Magical barriers with a DV (3–6). Crossing without dispelling triggers the effect and ticks any relevant Leash by the ward's DV.</li>
@@ -5021,7 +5020,7 @@ number instead of describing the swing.</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>TL</th><th>What it is</th><th>Key Attributes</th><th>Harm it deals</th><th>Harm Levels it absorbs</th></tr></thead>
+<thead><tr><th>TL</th><th>What it is</th><th>Key Attributes</th><th>Harm it deals</th><th>Resilience</th></tr></thead>
 <tbody>
 <tr><td><strong>1</strong></td><td>Rabble &mdash; frightened, untrained, dangerous in numbers only</td><td>1&ndash;2</td><td>1</td><td>3 (standard)</td></tr>
 <tr><td><strong>2</strong></td><td>Minion &mdash; a guard, a thug, a hungry animal</td><td>2</td><td>1&ndash;2</td><td>3 (standard)</td></tr>
@@ -5037,17 +5036,17 @@ number instead of describing the swing.</p>
 </table>
 </div>
 
-<h3 id="srd-harm-levels-adv">Harm Levels, not Hit Points</h3>
-<p><strong>An adversary has no Hit Points.</strong> It has <strong>Harm Levels</strong>: the number of times it can be made to bleed, break, or bend before the fight is over. There are exactly four legal values, and every adversary has one of them:</p>
+<h3 id="srd-harm-levels-adv">Resilience, not Hit Points</h3>
+<p><strong>An adversary has no Hit Points.</strong> It has <strong>Resilience</strong>: the number of times it can be made to bleed, break, or bend before the fight is over. There are exactly four legal values, and every adversary has one of them:</p>
 <ul>
 <li><strong>3 (standard)</strong> &mdash; TL 1&ndash;4. Three good hits and it is done.</li>
 <li><strong>8 (advanced)</strong> &mdash; TL 5&ndash;6. Named things, meant to last.</li>
-<li><strong>8 per phase</strong> &mdash; TL 7&ndash;9. When a phase's Harm Levels are exhausted the phase ends and the next begins, with its own pool and its own moves.</li>
-<li><strong>None (puzzle)</strong> &mdash; the one override, and it is available at <em>any</em> TL. Use it when the fiction says the thing cannot be killed by hitting it: an Avatar, a demon that must be exorcised, an Echo that must be witnessed, a door that was never opened. It is resolved by a bargain, a true name, a witness, a debt paid &mdash; something other than attrition. A TL 2 spirit can be a puzzle; a TL 9 dragon can be a fight. If your adversary has no Harm Levels, it <em>must</em> have a stated Resolution.</li>
+<li><strong>8 per phase</strong> &mdash; TL 7&ndash;9. When a phase's Resilience is exhausted the phase ends and the next begins, with its own pool and its own moves.</li>
+<li><strong>None (puzzle)</strong> &mdash; the one override, and it is available at <em>any</em> TL. Use it when the fiction says the thing cannot be killed by hitting it: an Avatar, a demon that must be exorcised, an Echo that must be witnessed, a door that was never opened. It is resolved by a bargain, a true name, a witness, a debt paid &mdash; something other than attrition. A TL 2 spirit can be a puzzle; a TL 9 dragon can be a fight. If your adversary has no Resilience, it <em>must</em> have a stated Resolution.</li>
 
 </ul>
-<p>Apart from that one override, Harm Levels follow from TL. If you find yourself wanting a TL 3 creature with eight Harm Levels, you do not want a tougher TL 3 &mdash; you want a TL 5, and its attributes and Harm should come up to meet it.</p>
-<p>Note the two senses of the word and keep them apart on the page: <strong>Harm</strong> on a stat line is what the creature <em>deals</em>. <strong>Harm Levels</strong> is what it <em>absorbs</em>.</p>
+<p>Apart from that one override, Resilience follows from TL. If you find yourself wanting a TL 3 creature with eight Resilience, you do not want a tougher TL 3 &mdash; you want a TL 5, and its attributes and Harm should come up to meet it.</p>
+<p>Note the two senses of the word and keep them apart on the page: <strong>Harm</strong> on a stat line is what the creature <em>deals</em>. <strong>Resilience</strong> is what it <em>absorbs</em>.</p>
 
 <h3 id="srd-sb-moves">SB Moves</h3>
 <p>An adversary does not take turns. It <strong>costs Story Beats</strong>. Every stat block lists a short menu of things the GM can buy with the SB the players hand over by rolling 1s, and that menu is the creature's entire personality in mechanical form &mdash; write the moves that only <em>this</em> thing would make.</p>
@@ -5065,7 +5064,7 @@ number instead of describing the swing.</p>
 <p class="text-sm text-muted">Not to be confused with the <strong>block icons</strong> some supplements print beside an entry &mdash; <code>[W]</code> weakness, <code>[C]</code> timer, <code>[L]</code> lair, <code>[P]</code> phase, <code>[D]</code> drop. Those annotate the <em>entry</em>; these annotate a <em>move</em>.</p>
 
 <h3 id="srd-stat-defaults">Filling In the Numbers</h3>
-<p>Where a published creature gives no attributes, Harm or Fatigue, read them off its TL band and get on with the scene. The bestiary does exactly this: every entry carries a <strong>key attribute</strong>, <strong>Harm</strong> and <strong>Fatigue</strong> defaulted from its TL, and <strong>Armor: None</strong> unless the fiction says otherwise. They are starting points, not rulings &mdash; move any of them the moment the fiction wants it moved. What you may not move without changing the TL is <strong>Harm Levels</strong>.</p>
+<p>Where a published creature gives no attributes, Harm or Fatigue, read them off its TL band and get on with the scene. The bestiary does exactly this: every entry carries a <strong>key attribute</strong>, <strong>Harm</strong> and <strong>Fatigue</strong> defaulted from its TL, and <strong>Armor: None</strong> unless the fiction says otherwise. They are starting points, not rulings &mdash; move any of them the moment the fiction wants it moved. What you may not move without changing the TL is <strong>Resilience</strong>.</p>
 
 <h3 id="srd-npc-template">Template Format</h3>
 <div class="table-wrap">
@@ -5077,11 +5076,11 @@ number instead of describing the swing.</p>
 <tr><td><strong>Attributes</strong></td><td>Body / Wits / Spirit / Presence, and one or two key Skills. Only list what will actually be rolled.</td></tr>
 <tr><td><strong>Harm</strong></td><td>Damage on a successful hit.</td></tr>
 <tr><td><strong>Fatigue</strong></td><td>Which Attribute sets its Fatigue track.</td></tr>
-<tr><td><strong>Harm Levels</strong></td><td>3, 8, 8 per phase, or None. Mandatory.</td></tr>
+<tr><td><strong>Resilience</strong></td><td>3, 8, 8 per phase, or None. Mandatory.</td></tr>
 <tr><td><strong>Armor</strong></td><td>None / Light / Medium / Heavy, converting Harm to Fatigue as usual.</td></tr>
 <tr><td><strong>SB Moves</strong></td><td>Two to five things the GM can buy with Story Beats, priced 1&ndash;3.</td></tr>
 <tr><td><strong>Timer</strong></td><td>Optional. A named clock of 4, 6, 8 or 10 segments, and what happens when it fills.</td></tr>
-<tr><td><strong>Resolution</strong></td><td>How this ends, if not by Harm. <em>Required</em> when Harm Levels is None.</td></tr>
+<tr><td><strong>Resolution</strong></td><td>How this ends, if not by Harm. <em>Required</em> when Resilience is None.</td></tr>
 <tr><td><strong>Leash</strong></td><td>Spirits only, when bound by a Summoner: Leash = the binder's Spirit + the spirit's TL, in segments.</td></tr>
 </tbody>
 </table>
@@ -5154,9 +5153,9 @@ number instead of describing the swing.</p>
 <h3>Bandit</h3>
 <div class="panel panel-red">
 <p><span class="badge">TL 2</span></p>
-<p><strong>Harm Levels:</strong> 3 (standard)</p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Melee 2d (Body 2 + Melee 0), Ranged 2d (Wits 2 + Ranged 0)</p>
-<p><strong>Harm:</strong> 1 (club…)</p>
+<p><strong>Harm:</strong> 1 (club or short sword)</p>
 <p><strong>Armor:</strong> None (leather scraps, no conversion)</p>
 <p><strong>Special:</strong> Cowardly — when outnumbered or after taking Harm, must test Spirit (DV 3) or flee.</p>
 </div>
@@ -5166,11 +5165,11 @@ number instead of describing the swing.</p>
 <h3>Guard</h3>
 <div class="panel panel-red">
 <p><span class="badge">TL 3</span></p>
-<p><strong>Harm Levels:</strong> 3 (standard)</p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Melee 4d (Body 3 + Melee 1), Athletics 4d (Body 3 + Athletics 1)</p>
 <p><strong>Harm:</strong> 2 (spear or short sword)</p>
 <p><strong>Armor:</strong> Light (leather) — Harm 1 → Fatigue 1.</p>
-<p><strong>Special:</strong> Patrol Training — +1 die to Notice when searching an area.</p>
+<p><strong>Special:</strong> Patrol Training — +1 die to Wits + Insight when searching an area.</p>
 </div>
 </section>
 
@@ -5178,10 +5177,10 @@ number instead of describing the swing.</p>
 <h3>Knight</h3>
 <div class="panel panel-red">
 <p><span class="badge">TL 5</span></p>
-<p><strong>Harm Levels:</strong> 8 (advanced)</p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> Melee 6d (Body 3 + Melee 3), Sway 5d (Presence 3 + Sway 2)</p>
 <p><strong>Armor:</strong> Heavy (plate) — Harm 3 → Fatigue 2.</p>
-<p><strong>Special:</strong> Challenge — once per scene, force an enemy to engage in melee (Resist with Spirit, DV 4). Mounted — …</p>
+<p><strong>Special:</strong> Challenge — once per scene, force an enemy to engage in melee (Resist with Spirit, DV 4). Mounted — +2 dice when charging from Far to Near.</p>
 </div>
 </section>
 
@@ -5189,10 +5188,10 @@ number instead of describing the swing.</p>
 <h3>Cultist</h3>
 <div class="panel panel-purple">
 <p><span class="badge">TL 2&ndash;3</span></p>
-<p><strong>Harm Levels:</strong> 3 (standard)</p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Arcana 4d (Wits 3 + Arcana 1), Deception 4d (Presence 3 + Deception 1)</p>
 <p><strong>Armor:</strong> None (robes).</p>
-<p><strong>Special:</strong> Ritual Chant — when three or more cultists act together, they may perform a Low Rite as a group acti…</p>
+<p><strong>Special:</strong> Ritual Chant — when three or more cultists act together, they may perform a Low Rite as a group action (roll once with +2 dice). Fanatic — immune to fear effects from their Patron’s domain.</p>
 </div>
 </section>
 
@@ -5200,10 +5199,10 @@ number instead of describing the swing.</p>
 <h3>Bandit Leader</h3>
 <div class="panel panel-red">
 <p><span class="badge">TL 5</span></p>
-<p><strong>Harm Levels:</strong> 8 (advanced)</p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> Melee 6d (Body 3 + Melee 3), Sway 5d (Presence 3 + Sway 2)</p>
 <p><strong>Armor:</strong> Medium (chain) — Harm 2 → Fatigue 1.</p>
-<p><strong>Special:</strong> Rally — once per scene, restore 1 Morale to a nearby bandit. Dirty Fighting — may spend 1 Boon to im…</p>
+<p><strong>Special:</strong> Rally — once per scene, restore 1 Morale to a nearby bandit. Dirty Fighting — the GM may spend 1 SB to impose −1 die on an enemy’s next defense.</p>
 </div>
 </section>
 
@@ -5219,11 +5218,11 @@ number instead of describing the swing.</p>
 <h3>Lesser Spirit <span class="text-muted text-sm">(e.g., Shade, Emberling)</span></h3>
 <div class="panel panel-purple">
 <p><span class="badge">TL 2</span></p>
-<p><strong>Harm Levels:</strong> 3 (standard)</p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
 <p><strong>Dice:</strong> Stealth 5d (Wits 3 + Stealth 2), Arcana 4d (Spirit 3 + Arcana 1)</p>
 <p><strong>Armor:</strong> None (incorporeal — half physical Harm, rounded down)</p>
-<p><strong>Leash:</strong> your Spirit + 1 (the spirit's TL).</p>
-<p><strong>Special:</strong> Incorporeal Movement — passes through small gaps and obstacles. Sunlight Sensitivity — while in direc…</p>
+<p><strong>Leash:</strong> your Spirit + 2 (the spirit's TL).</p>
+<p><strong>Special:</strong> Incorporeal Movement — passes through small gaps and obstacles. Sunlight Sensitivity — while in direct sunlight, all actions are Desperate.</p>
 </div>
 </section>
 
@@ -5231,11 +5230,11 @@ number instead of describing the swing.</p>
 <h3>Greater Spirit <span class="text-muted text-sm">(e.g., Flame Elemental, Stone Guardian)</span></h3>
 <div class="panel panel-purple">
 <p><span class="badge">TL 5</span></p>
-<p><strong>Harm Levels:</strong> 8 (advanced)</p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> 7d in primary domain (e.g., Body + Melee for Guardian, Spirit + Arcana for Elemental)</p>
-<p><strong>Armor:</strong> Stone Guardian — Heavy (Harm 3 → Fatigue 2); Flame Elemental — Light (Harm 1 → Fatigue 1) + im…</p>
-<p><strong>Leash:</strong> your Spirit + 3 (the spirit's TL).</p>
-<p><strong>Special:</strong> Elemental Aura — creatures in Close range suffer 1 Fatigue per round. Immutable — cannot be poisone…</p>
+<p><strong>Armor:</strong> Stone Guardian — Heavy (Harm 3 → Fatigue 2); Flame Elemental — Light (Harm 1 → Fatigue 1) + immunity to fire.</p>
+<p><strong>Leash:</strong> your Spirit + 5 (the spirit's TL).</p>
+<p><strong>Special:</strong> Elemental Aura — creatures in Close range suffer 1 Fatigue per round. Immutable — cannot be poisoned or diseased.</p>
 </div>
 </section>
 
@@ -5243,7 +5242,7 @@ number instead of describing the swing.</p>
 <h3>Wraith</h3>
 <div class="panel panel-purple">
 <p><span class="badge">TL 3&ndash;5</span></p>
-<p><strong>Harm Levels:</strong> 8 (advanced)</p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
 <p><strong>Dice:</strong> Stealth 6d (Wits 3 + Stealth 3), Spirit + Endurance 6d (Spirit 3 + Endurance 3)</p>
 <p><strong>Armor:</strong> None (incorporeal — half physical Harm).</p>
 <p><strong>Special:</strong> Life Drain — on a successful touch attack, the target marks 1 Fatigue and the wraith clears 1 Fatigue.</p>
@@ -5262,10 +5261,10 @@ number instead of describing the swing.</p>
 <h3>Wolf</h3>
 <div class="panel panel-green">
 <p><span class="badge">TL 2&ndash;3</span></p>
-<p><strong>Harm Levels:</strong> 3 (standard)</p>
-<p><strong>Dice:</strong> Melee 5d (Body 3 + Brawl 2), Athletics 5d (Body 3 + Athletics 2)</p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<p><strong>Dice:</strong> Melee 5d (Body 3 + Melee 2), Athletics 5d (Body 3 + Athletics 2)</p>
 <p><strong>Armor:</strong> None (hide).</p>
-<p><strong>Special:</strong> Pack Tactics — when two or more wolves attack the same target, each gains +1 die. Blood Scent — +2…</p>
+<p><strong>Special:</strong> Pack Tactics — when two or more wolves attack the same target, each gains +1 die. Blood Scent — +2 dice to track wounded prey.</p>
 </div>
 </section>
 
@@ -5273,10 +5272,10 @@ number instead of describing the swing.</p>
 <h3>Dire Bear</h3>
 <div class="panel panel-green">
 <p><span class="badge">TL 6</span></p>
-<p><strong>Harm Levels:</strong> 8 (advanced)</p>
-<p><strong>Dice:</strong> Melee 8d (Body 4 + Brawl 4), Endurance 8d (Body 4 + Endurance 4)</p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
+<p><strong>Dice:</strong> Melee 8d (Body 4 + Melee 4), Endurance 8d (Body 4 + Endurance 4)</p>
 <p><strong>Armor:</strong> Medium (thick hide) — Harm 2 → Fatigue 1.</p>
-<p><strong>Special:</strong> Terrifying Roar — all creatures in Near range must test Resolve (DV 4) or become Shaken. Maul — on…</p>
+<p><strong>Special:</strong> Terrifying Roar — all creatures in Near range must test Spirit + Endurance (DV 4) or become Shaken. Maul — the GM may spend 2 SB after a successful attack to knock the target prone; the target must spend an action to stand.</p>
 </div>
 </section>
 
@@ -5291,9 +5290,9 @@ number instead of describing the swing.</p>
 <h3>Step 1: Choose Threat Level</h3>
 <p>TL sets how much the thing can take, how hard it hits, and how big its pools are.</p>
 <ul>
-<li>TL 1&ndash;3: rabble, guards, minor spirits. Dice pools 3&ndash;5; three Harm Levels.</li>
-<li>TL 4&ndash;6: elites, knights, greater spirits. Dice pools 6&ndash;8; three Harm Levels to TL 4, eight from TL 5.</li>
-<li>TL 7&ndash;10: bosses and powers. Dice pools 9&ndash;10; phased Harm Levels, or none at all.</li>
+<li>TL 1&ndash;3: rabble, guards, minor spirits. Dice pools 3&ndash;5; three Resilience.</li>
+<li>TL 4&ndash;6: elites, knights, greater spirits. Dice pools 6&ndash;8; three Resilience to TL 4, eight from TL 5.</li>
+<li>TL 7&ndash;10: bosses and powers. Dice pools 9&ndash;10; phased Resilience, or none at all.</li>
 </ul>
 </section>
 
@@ -5365,7 +5364,7 @@ number instead of describing the swing.</p>
 </thead>
 <tbody>
 <tr><td>Successes ≥ DV, SB = 0</td><td>Clean Success</td><td>Intent achieved; no complication.</td></tr>
-<tr><td>Successes ≥ DV, SB &gt; 0</td><td>Success &amp; Cost</td><td>Intent achieved; GM spends SB for complication.</td></tr>
+<tr><td>Successes ≥ DV, SB &gt; 0</td><td>Success with SB</td><td>Intent achieved; GM spends SB for complication.</td></tr>
 <tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; player gains 1 Boon.</td></tr>
 <tr><td>Successes = 0</td><td>Miss</td><td>No progress; player gains 2 Boons; GM escalates with SB.</td></tr>
 </tbody>
@@ -5389,7 +5388,7 @@ number instead of describing the swing.</p>
 <tr><td>5</td><td>Extreme — multiple constraints, dramatic gambles.</td></tr>
 </tbody>
 </table>
-<p><strong>The ladder ends at 5.</strong> There is no DV 5. A task harder than Extreme is not a bigger number &mdash; it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number &mdash; it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
 </div>
 </div>
 </section>
@@ -5492,14 +5491,13 @@ number instead of describing the swing.</p>
 <tr><th>Path</th><th>Cost</th><th>Risk</th><th>Speed</th><th>Flexibility</th></tr>
 </thead>
 <tbody>
-<tr><td>Caster (Freeform)</td><td>Spellcraft (6 XP)</td><td>Backlash</td><td>2 actions (1 for cantrip)</td><td>Ve…</td></tr>
-<tr><td>Runekeeper (Rites)</td><td>Familiar + Codex</td><td>Obligation</td><td>1 action</td><td>M…</td></tr>
-<tr><td>Invoker (Symbols)</td><td>Patron's Symbol (4 XP)</td><td>Ritual time / Symbol damage</td><td>Slow or instant (Crack)</td><td>M…</td></tr>
-<tr><td>Cantor (Songs)</td><td>Cantor's Path (8 XP)</td><td>Corruption</td><td>1 action (resolve next turn)</td><td>—</td></tr>
+<tr><td>Caster (Freeform)</td><td>Spellcraft (6 XP)</td><td>Backlash</td><td>2 actions (1 for cantrip)</td><td>Very high</td></tr>
+<tr><td>Runekeeper (Rites)</td><td>Familiar + Codex</td><td>Obligation</td><td>1 action</td><td>Moderate</td></tr>
+<tr><td>Invoker (Symbols)</td><td>Patron's Symbol (4 XP)</td><td>Ritual time / Symbol damage</td><td>Slow or instant (Crack)</td><td>Moderate</td></tr>
+<tr><td>Cantor (Songs)</td><td>Cantor's Path (8 XP)</td><td>Corruption</td><td>1 action (resolve next turn)</td><td>Low</td></tr>
 </tbody>
 </table>
 </div>
-<p class="text-xs text-muted">Source text for the Flexibility column is cut off after "Ve" / "M" / "M" (likely "Versatile" / "Moderate" / "Moderate"); the Cantor row's value is missing entirely in the extracted source.</p>
 </div>
 </section>
 
@@ -5628,13 +5626,12 @@ number instead of describing the swing.</p>
 <h1>Example Spells &amp; Rites</h1>
 
 <p>This appendix provides ready-to-use examples for each magical path. DVs and costs are guidelines; GMs may adjust based on fiction.</p>
-<p class="text-sm text-muted"><em>Note: several effect descriptions in the source tables were clipped by page-column extraction. Where a description is cut off mid-word, it is marked with an ellipsis (&hellip;) rather than invented.</em></p>
 
 <section class="level2" id="spark-cantrip">
 <h2>Spark (Cantrip)</h2>
 <div class="panel panel-red">
 <p><span class="badge badge-red">DV 3</span> <span class="text-sm text-muted">[FIRE][STRIKE]</span></p>
-<p>Ranged Harm 1 (fire) to one target within Near&hellip;</p>
+<p>Ranged Harm 1 (fire) to one target within Near.</p>
 </div>
 </section>
 
@@ -5642,7 +5639,7 @@ number instead of describing the swing.</p>
 <h2>Minor Illusion</h2>
 <div class="panel panel-blue">
 <p><span class="badge badge-blue">DV 3</span> <span class="text-sm text-muted">[WATER][VEIL]</span></p>
-<p>Create a simple sound or image within Near for one e&hellip;</p>
+<p>Create a simple sound or image within Near for one exchange.</p>
 </div>
 </section>
 
@@ -5650,7 +5647,7 @@ number instead of describing the swing.</p>
 <h2>Gust</h2>
 <div class="panel panel-green">
 <p><span class="badge badge-green">DV 3</span> <span class="text-sm text-muted">[AIR][PASSAGE]</span></p>
-<p>Push one object or creature of your size or smaller one&hellip;</p>
+<p>Push one object or creature of your size or smaller one band back.</p>
 </div>
 </section>
 
@@ -5658,7 +5655,7 @@ number instead of describing the swing.</p>
 <h2>Quick Patch</h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold">DV 3</span> <span class="text-sm text-muted">[LIFE][MEND]</span></p>
-<p>Temporarily repair one damaged item for the sc&hellip;</p>
+<p>Temporarily repair one damaged item for the scene.</p>
 </div>
 </section>
 
@@ -5666,7 +5663,7 @@ number instead of describing the swing.</p>
 <h2>Ember Cloak</h2>
 <div class="panel panel-red">
 <p><span class="badge badge-red">DV 3</span> <span class="text-sm text-muted">[FIRE][DEFEND]</span></p>
-<p>+1 to defense DV against cold or melee attacks for th&hellip;</p>
+<p>+1 to defense DV against cold or melee attacks for the scene.</p>
 </div>
 </section>
 
@@ -5674,7 +5671,7 @@ number instead of describing the swing.</p>
 <h2>Web of Fate</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">DV 3</span> <span class="text-sm text-muted">[FATE][BIND]</span></p>
-<p>Immobilize one target within Near; break free requires DV&hellip;</p>
+<p>Immobilize one target within Near; break free requires Body + Athletics against DV 4.</p>
 </div>
 </section>
 
@@ -5682,7 +5679,7 @@ number instead of describing the swing.</p>
 <h2>Healing Mist</h2>
 <div class="panel panel-blue">
 <p><span class="badge badge-blue">DV 4</span> <span class="text-sm text-muted">[WATER][HEAL][AREA]</span></p>
-<p>All allies in Close regain 1 Fatigue.</p>
+<p>All allies in Close clear 1 Fatigue.</p>
 </div>
 </section>
 
@@ -5690,7 +5687,7 @@ number instead of describing the swing.</p>
 <h2>Stone Shield</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">DV 3</span> <span class="text-sm text-muted">[EARTH][BARRIER]</span></p>
-<p>Create a stone wall with Integrity Timer [4] that blocks&hellip;</p>
+<p>Create a stone wall with Integrity Timer [4] that blocks movement.</p>
 </div>
 </section>
 
@@ -5698,7 +5695,7 @@ number instead of describing the swing.</p>
 <h2>Shadow Step</h2>
 <div class="panel panel-green">
 <p><span class="badge badge-green">DV 4</span> <span class="text-sm text-muted">[AIR][FOLD] (dangerous)</span></p>
-<p>Teleport self within Near range. Leaves faint afteri&hellip;</p>
+<p>Teleport self within Near range. Leaves faint afterimage.</p>
 </div>
 </section>
 
@@ -5706,7 +5703,7 @@ number instead of describing the swing.</p>
 <h2>Fate&rsquo;s Rebuke</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">DV 4</span> <span class="text-sm text-muted">[FATE][STRIKE][STRIKE]</span></p>
-<p>Ranged Harm 2 (psychic), ignores non-magical ar&hellip;</p>
+<p>Ranged Harm 2 (psychic), ignores non-magical armor.</p>
 </div>
 </section>
 
@@ -5714,7 +5711,7 @@ number instead of describing the swing.</p>
 <h2>Sleep</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">DV 3</span> <span class="text-sm text-muted">[DEATH][COMMAND]</span></p>
-<p>One target within Near falls into a natural sleep; lasts scene.</p>
+<p>One target within Near falls into a natural sleep; lasts scene or until harmed.</p>
 </div>
 </section>
 
@@ -5727,7 +5724,7 @@ number instead of describing the swing.</p>
 <h2>Sealed Threshold</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: Low</span></p>
-<p>Ward a doorway; unauthorized crossing requires Spirit + Res&hellip; <span class="text-xs text-muted">(elsewhere cited as a Endurance test)</span></p>
+<p>Ward a doorway; unauthorized crossing requires Spirit + Endurance (DV 4). Lasts scene.</p>
 </div>
 </section>
 
@@ -5735,7 +5732,7 @@ number instead of describing the swing.</p>
 <h2>Circle of Denial</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: Standard</span></p>
-<p>Protective circle vs Outsiders. To cross, the Outsider tests DV = its TL&hellip;</p>
+<p>Protective circle vs Outsiders. To cross, Outsider tests DV = its TL; on hit, add its TL to its Leash.</p>
 </div>
 </section>
 
@@ -5743,7 +5740,7 @@ number instead of describing the swing.</p>
 <h2>Banishment Knot</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: High</span></p>
-<p>Cast out a supernatural entity. Test Spirit + Arcana against the target's TL. On hit, entit&hellip;</p>
+<p>Cast out a supernatural entity. Test Spirit + Lore against the target&#x27;s TL. On hit, the entity departs (add its TL to its Leash if summoned).</p>
 </div>
 </section>
 
@@ -5769,7 +5766,7 @@ number instead of describing the swing.</p>
 <h2>Wave-Road Blessing</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: Standard</span></p>
-<p>Consecrate a sea lane; +2 dice to travel or evasion rolls on that route for one jo&hellip;</p>
+<p>Consecrate a sea lane; +2 dice to travel or evasion rolls on that route for one journey.</p>
 </div>
 </section>
 
@@ -5779,7 +5776,7 @@ number instead of describing the swing.</p>
 <h2>Touch the Umbral Veil</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: Low</span></p>
-<p>+1 die to one Stealth roll; soften a single n&hellip;</p>
+<p>+1 die to one Stealth roll; soften a single noise.</p>
 </div>
 </section>
 
@@ -5787,7 +5784,7 @@ number instead of describing the swing.</p>
 <h2>Crossroads Raven</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: Low</span></p>
-<p>Omen-raven appears. Gain +1 die to navigation or force one enem&hellip;</p>
+<p>Omen-raven appears. Gain +1 die to navigation or force one enemy to hesitate (Resist DV 4).</p>
 </div>
 </section>
 
@@ -5795,7 +5792,7 @@ number instead of describing the swing.</p>
 <h2>Become the Shadow at the Crossroads</h2>
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Tier: High</span></p>
-<p>Intangible to mundane harm; pass through gaps; +2 dice to&hellip;</p>
+<p>Intangible to mundane harm; pass through gaps; +2 dice to Stealth. Lasts scene.</p>
 </div>
 </section>
 
@@ -5806,7 +5803,7 @@ number instead of describing the swing.</p>
 <h2>Oath-Ward</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">Tier: Low</span> <span class="text-sm text-muted">Patron: Any with Law/Ward domain</span></p>
-<p>Chalk circle wards a small area (10ft radius). V&hellip;</p>
+<p>Chalk circle wards a small area (10ft radius). Violators test Spirit (DV 4) or cannot enter.</p>
 </div>
 </section>
 
@@ -5814,7 +5811,7 @@ number instead of describing the swing.</p>
 <h2>Wayfinder&rsquo;s Thread</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">Tier: Low</span> <span class="text-sm text-muted">Patron: The Traveler</span></p>
-<p>Knot a red cord thrice; create a tet&hellip;</p>
+<p>Knot a red cord thrice; create a tether to a safe path for one leg.</p>
 </div>
 </section>
 
@@ -5822,7 +5819,7 @@ number instead of describing the swing.</p>
 <h2>Salt-Cut</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">Tier: Low</span> <span class="text-sm text-muted">Patron: The Sealed Gate</span></p>
-<p>Sever a simple ongoing magical effect (rope&hellip;</p>
+<p>Sever a simple ongoing magical effect (rope, charm, weak ward). Consumes salt.</p>
 </div>
 </section>
 
@@ -5830,7 +5827,7 @@ number instead of describing the swing.</p>
 <h2>River&rsquo;s Memory</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">Tier: Standard</span> <span class="text-sm text-muted">Patron: Ra&eacute;yn</span></p>
-<p>Scry a recent event tied to a personal token.</p>
+<p>Scry a recent event tied to a personal token. Blurry but accurate. Costs 1 Fatigue.</p>
 </div>
 </section>
 
@@ -5838,7 +5835,7 @@ number instead of describing the swing.</p>
 <h2>Bargain-Bead</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">Tier: Standard</span> <span class="text-sm text-muted">Patron: Any Patron</span></p>
-<p>Invite a minor spirit to parley. Requires&hellip;</p>
+<p>Invite a minor spirit to parley. Requires two carved beads; one consumed.</p>
 </div>
 </section>
 
@@ -5846,7 +5843,7 @@ number instead of describing the swing.</p>
 <h2>Purge</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">Tier: Standard</span> <span class="text-sm text-muted">Patron: Oath of Flame &amp; Light</span></p>
-<p>Cleanse one level of taint, curse, or corruption from&hellip;</p>
+<p>Cleanse one level of taint, curse, or corruption from a creature or object. Caster marks 1 Fatigue.</p>
 </div>
 </section>
 
@@ -5854,7 +5851,7 @@ number instead of describing the swing.</p>
 <h2>Summoner&rsquo;s Gate</h2>
 <div class="panel panel-orange">
 <p><span class="badge badge-orange">Tier: High</span> <span class="text-sm text-muted">Patron: Any with Summoning domain</span></p>
-<p>Call a known entity safely. Requires circle and&hellip;</p>
+<p>Call a known entity safely. Requires circle and true name. Occupies a concurrency slot.</p>
 </div>
 </section>
 
@@ -5865,7 +5862,7 @@ number instead of describing the swing.</p>
 <h2>Hearth&rsquo;s Lullaby</h2>
 <div class="panel panel-blue">
 <p><span class="badge badge-blue">Patron/Theme: Mercy, Rest</span></p>
-<p>All allies within Near recover 1 Fatigue.</p>
+<p>All allies within Near clear 1 Fatigue.</p>
 </div>
 </section>
 
@@ -5897,7 +5894,7 @@ number instead of describing the swing.</p>
 <h2>Thread of Memory</h2>
 <div class="panel panel-blue">
 <p><span class="badge badge-blue">Patron/Theme: Knowledge, Truth</span></p>
-<p>Ask the GM one yes/no question about a past event in the current scen&hellip;</p>
+<p>Ask the GM one yes/no question about a past event in the current scene.</p>
 </div>
 </section>
 
@@ -5905,7 +5902,7 @@ number instead of describing the swing.</p>
 <h2>Bitter Dirge</h2>
 <div class="panel panel-blue">
 <p><span class="badge badge-blue">Patron/Theme: Death, Endings</span></p>
-<p>One enemy within Near suffers &ndash;1 die to their next action (fear).</p>
+<p>One enemy within Near suffers −1 die to their next action (fear).</p>
 </div>
 </section>
 
@@ -5916,7 +5913,7 @@ number instead of describing the swing.</p>
 <h2>Wayfinder&rsquo;s Thread <span class="text-sm text-muted">(Universal)</span></h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">1 min, red cord</span></p>
-<p>Tie thrice; create tether to a safe path. On s&hellip;</p>
+<p>Tie thrice; create tether to a safe path. On success, navigation rolls +1 die for one leg.</p>
 </div>
 </section>
 
@@ -5924,7 +5921,7 @@ number instead of describing the swing.</p>
 <h2>Oath-Ward <span class="text-sm text-muted">(Universal)</span></h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">5 min, chalk circle</span></p>
-<p>Ward small area; violators te&hellip;</p>
+<p>Ward small area; violators test Spirit (DV 4) to enter.</p>
 </div>
 </section>
 
@@ -5932,7 +5929,7 @@ number instead of describing the swing.</p>
 <h2>Ember-Glass</h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">1 min, smoked glass</span></p>
-<p>Sense heat sources throug&hellip;</p>
+<p>Sense heat sources through cover for one scene.</p>
 </div>
 </section>
 
@@ -5940,7 +5937,7 @@ number instead of describing the swing.</p>
 <h2>Salt-Cut <span class="text-sm text-muted">(Universal)</span></h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">1 min, salt, bronze knife</span></p>
-<p>Sever a simple ongoing effect (rope, c&hellip;</p>
+<p>Sever a simple ongoing effect (rope, charm, weak ward). Consumes salt.</p>
 </div>
 </section>
 
@@ -5948,7 +5945,7 @@ number instead of describing the swing.</p>
 <h2>River&rsquo;s Memory <span class="text-sm text-muted">(Universal)</span></h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">10 min, bowl, personal token</span></p>
-<p>Scry a recent event tied to token;&hellip;</p>
+<p>Scry a recent event tied to token; blurry vision. Token is ruined.</p>
 </div>
 </section>
 
@@ -5956,7 +5953,7 @@ number instead of describing the swing.</p>
 <h2>Bargain-Bead <span class="text-sm text-muted">(Universal)</span></h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">10 min, two carved beads</span></p>
-<p>Invite a minor spirit to parley. On success&hellip;</p>
+<p>Invite a minor spirit to parley. On success, spirit appears. Must offer concession.</p>
 </div>
 </section>
 
@@ -5964,7 +5961,7 @@ number instead of describing the swing.</p>
 <h2>Quiet Veil</h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">5 min, ash, muffled bell</span></p>
-<p>Muffle group sounds for one scen&hellip;</p>
+<p>Muffle group sounds for one scene; all gain +1 die to Stealth.</p>
 </div>
 </section>
 
@@ -5972,7 +5969,7 @@ number instead of describing the swing.</p>
 <h2>Dream-Way Marker</h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">10 min, inked sleep mask, water cadence</span></p>
-<p>Mark safe entrance to the Ways Between;&hellip;</p>
+<p>Mark safe entrance to the Ways Between; short transit possible. All wake Shaken.</p>
 </div>
 </section>
 
@@ -5980,7 +5977,7 @@ number instead of describing the swing.</p>
 <h2>Purge (Tainted Object)</h2>
 <div class="panel panel-gold">
 <p><span class="badge badge-gold text-xs">10 min, bitter herbs, clean blade</span></p>
-<p>Cleanse one level of taint from a small&hellip;</p>
+<p>Cleanse one level of taint from a small object. Caster takes minor backlash.</p>
 </div>
 </section>
 
@@ -6006,7 +6003,7 @@ number instead of describing the swing.</p>
 </div>
 
 <p><strong>Skills</strong></p>
-<p>Melee 2, Athletics 1, Endurance 1, Lore 1, Craft 1, Survival 1</p>
+<p>Melee 2, Athletics 1, Endurance 1, Lore 1, Craft 1, Insight 1</p>
 
 <p><strong>Talents</strong> <span class="badge badge-gold text-xs">12 XP total</span></p>
 <ul>

@@ -1,7 +1,255 @@
 {
   "version": "1.0",
-  "generated": "2026-09-05T22:16:14.096Z",
+  "generated": "2026-09-07T13:00:10.481Z",
   "documents": [
+    {
+      "id": "gm_guide",
+      "title": "GM Guide",
+      "subtitle": "A Comprehensive Guide for the Fate's Edge Game Master",
+      "file": "index.html",
+      "path": "/data/docs/gm-guide/",
+      "category": "gm-guide",
+      "categoryLabel": "GM Guide",
+      "core": true,
+      "active": true,
+      "book": true,
+      "pages": [
+        {
+          "file": "GM-_-Guide-_-01-_-Introduction.html",
+          "label": "Chapter 1",
+          "title": "Introduction"
+        },
+        {
+          "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
+          "label": "Chapter 2",
+          "title": "Core Procedures"
+        },
+        {
+          "file": "GM-_-Guide-_-03-_-Managing-_-Resources.html",
+          "label": "Chapter 3",
+          "title": "Managing Resources"
+        },
+        {
+          "file": "GM-_-Guide-_-04-_-Running-_-a-_-Currency-_-Free-_-Game.html",
+          "label": "Chapter 4",
+          "title": "Running a Currency Free Game"
+        },
+        {
+          "file": "GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html",
+          "label": "Chapter 5",
+          "title": "Magic and Backlash"
+        },
+        {
+          "file": "GM-_-Guide-_-06-_-Running-_-Scenarios.html",
+          "label": "Chapter 6",
+          "title": "Running Scenarios"
+        },
+        {
+          "file": "GM-_-Guide-_-07-_-Assets-_-and-_-Followers.html",
+          "label": "Chapter 7",
+          "title": "Assets and Followers"
+        },
+        {
+          "file": "GM-_-Guide-_-08-_-Travel-_-Framework.html",
+          "label": "Chapter 8",
+          "title": "Travel Framework"
+        },
+        {
+          "file": "GM-_-Guide-_-09-_-Downtime.html",
+          "label": "Chapter 9",
+          "title": "Downtime"
+        },
+        {
+          "file": "GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html",
+          "label": "Chapter 10",
+          "title": "Campaigns Timers Consequences"
+        },
+        {
+          "file": "GM-_-Guide-_-11-_-Epic-_-Tier-_-Adventures.html",
+          "label": "Chapter 11",
+          "title": "Epic Tier Adventures"
+        },
+        {
+          "file": "GM-_-Guide-_-12-_-Advanced-_-GM-_-Techniques.html",
+          "label": "Chapter 12",
+          "title": "Advanced GM Techniques"
+        },
+        {
+          "file": "GM-_-Guide-_-13-_-Player-_-Archetypes-_-at-_-the-_-Table.html",
+          "label": "Chapter 13",
+          "title": "Player Archetypes at the Table"
+        },
+        {
+          "file": "GM-_-Guide-_-14-_-Lore-_-Compendium.html",
+          "label": "Chapter 14",
+          "title": "Lore Compendium"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-A-_-Core-_-Reference-_-Tables.html",
+          "label": "Appendix A",
+          "title": "Core Reference Tables"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-B-_-Optional-_-Rules-_-and-_-Tactical-_-Tools.html",
+          "label": "Appendix B",
+          "title": "Optional Rules and Tactical Tools"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-C-_-Deck-_-and-_-Magic-_-Reference.html",
+          "label": "Appendix C",
+          "title": "Deck and Magic Reference"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-D-_-Campaign-_-Management.html",
+          "label": "Appendix D",
+          "title": "Campaign Management"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-E-_-Safety-_-and-_-Inclusivity.html",
+          "label": "Appendix E",
+          "title": "Safety and Inclusivity"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-F-_-Rival-_-Party-_-Generator.html",
+          "label": "Appendix F",
+          "title": "Rival Party Generator"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-G-_-One-_-Page-_-GM-_-Screen-_-Summary.html",
+          "label": "Appendix G",
+          "title": "One Page GM Screen Summary"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-H-_-Sample-_-Deck-_-Reading.html",
+          "label": "Appendix H",
+          "title": "Sample Deck Reading"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-I-_-Session-_-Zero-_-Checklist.html",
+          "label": "Appendix I",
+          "title": "Session Zero Checklist"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-J-_-Using-_-Expansions-_-and-_-Adversary-_-Templates.html",
+          "label": "Appendix J",
+          "title": "Using Expansions and Adversary Templates"
+        },
+        {
+          "file": "GM-_-Guide-_-App-_-K-_-Patron-_-Quick-_-Reference.html",
+          "label": "Appendix K",
+          "title": "Patron Quick Reference"
+        }
+      ]
+    },
+    {
+      "id": "players_guide",
+      "title": "Player's Guide",
+      "subtitle": "Your Path to Adventure in the Amaranthine Sea and Beyond",
+      "file": "index.html",
+      "path": "/data/docs/players-guide/",
+      "category": "players-guide",
+      "categoryLabel": "Player's Guide",
+      "core": true,
+      "active": true,
+      "book": true,
+      "pages": [
+        {
+          "file": "Players-_-Guide-_-01-_-Quickstart.html",
+          "label": "Chapter 1",
+          "title": "Quickstart"
+        },
+        {
+          "file": "Players-_-Guide-_-02-_-Character-_-Creation.html",
+          "label": "Chapter 2",
+          "title": "Character Creation"
+        },
+        {
+          "file": "Players-_-Guide-_-03-_-Core-_-Mechanics.html",
+          "label": "Chapter 3",
+          "title": "Core Mechanics"
+        },
+        {
+          "file": "Players-_-Guide-_-04-_-Magic.html",
+          "label": "Chapter 4",
+          "title": "Magic"
+        },
+        {
+          "file": "Players-_-Guide-_-05-_-Healing.html",
+          "label": "Chapter 5",
+          "title": "Healing"
+        },
+        {
+          "file": "Players-_-Guide-_-06-_-Talents.html",
+          "label": "Chapter 6",
+          "title": "Talents"
+        },
+        {
+          "file": "Players-_-Guide-_-07-_-Advancement.html",
+          "label": "Chapter 7",
+          "title": "Advancement"
+        },
+        {
+          "file": "Players-_-Guide-_-08-_-XP-_-Paths.html",
+          "label": "Chapter 8",
+          "title": "XP Paths"
+        },
+        {
+          "file": "Players-_-Guide-_-09-_-Your-_-First-_-Magical-_-Character.html",
+          "label": "Chapter 9",
+          "title": "Your First Magical Character"
+        },
+        {
+          "file": "Players-_-Guide-_-10-_-Assets-_-and-_-Followers.html",
+          "label": "Chapter 10",
+          "title": "Assets and Followers"
+        },
+        {
+          "file": "Players-_-Guide-_-11-_-Downtime.html",
+          "label": "Chapter 11",
+          "title": "Downtime"
+        },
+        {
+          "file": "Players-_-Guide-_-12-_-World-_-Regions-_-and-_-Cultures.html",
+          "label": "Chapter 12",
+          "title": "World Regions and Cultures"
+        },
+        {
+          "file": "Players-_-Guide-_-13-_-World-_-Powers-_-and-_-Patrons.html",
+          "label": "Chapter 13",
+          "title": "World Powers and Patrons"
+        },
+        {
+          "file": "Players-_-Guide-_-14-_-World-_-Interaction.html",
+          "label": "Chapter 14",
+          "title": "World Interaction"
+        },
+        {
+          "file": "Players-_-Guide-_-15-_-Currency-_-Free-_-Economy.html",
+          "label": "Chapter 15",
+          "title": "Currency Free Economy"
+        },
+        {
+          "file": "Players-_-Guide-_-16-_-Character-_-Backgrounds.html",
+          "label": "Chapter 16",
+          "title": "Character Backgrounds"
+        },
+        {
+          "file": "Players-_-Guide-_-17-_-The-_-Legacy-_-Engine.html",
+          "label": "Chapter 17",
+          "title": "The Legacy Engine"
+        },
+        {
+          "file": "Players-_-Guide-_-18-_-Enhanced-_-Player-_-Play.html",
+          "label": "Chapter 18",
+          "title": "Enhanced Player Play"
+        },
+        {
+          "file": "Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html",
+          "label": "Chapter 19",
+          "title": "Appendix Quick Reference"
+        }
+      ]
+    },
     {
       "id": "systems_reference_document",
       "title": "Systems Reference Document",
@@ -293,145 +541,6 @@
       "active": true
     },
     {
-      "id": "gm_guide",
-      "title": "GM Guide",
-      "subtitle": "A Comprehensive Guide for the Fate's Edge Game Master",
-      "file": "index.html",
-      "path": "/data/docs/gm-guide/",
-      "category": "gm-guide",
-      "categoryLabel": "GM Guide",
-      "core": false,
-      "active": true,
-      "book": true,
-      "pages": [
-        {
-          "file": "GM-_-Guide-_-01-_-Introduction.html",
-          "label": "Chapter 1",
-          "title": "Introduction"
-        },
-        {
-          "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
-          "label": "Chapter 2",
-          "title": "Core Procedures"
-        },
-        {
-          "file": "GM-_-Guide-_-03-_-Managing-_-Resources.html",
-          "label": "Chapter 3",
-          "title": "Managing Resources"
-        },
-        {
-          "file": "GM-_-Guide-_-04-_-Running-_-a-_-Currency-_-Free-_-Game.html",
-          "label": "Chapter 4",
-          "title": "Running a Currency Free Game"
-        },
-        {
-          "file": "GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html",
-          "label": "Chapter 5",
-          "title": "Magic and Backlash"
-        },
-        {
-          "file": "GM-_-Guide-_-06-_-Running-_-Scenarios.html",
-          "label": "Chapter 6",
-          "title": "Running Scenarios"
-        },
-        {
-          "file": "GM-_-Guide-_-07-_-Assets-_-and-_-Followers.html",
-          "label": "Chapter 7",
-          "title": "Assets and Followers"
-        },
-        {
-          "file": "GM-_-Guide-_-08-_-Travel-_-Framework.html",
-          "label": "Chapter 8",
-          "title": "Travel Framework"
-        },
-        {
-          "file": "GM-_-Guide-_-09-_-Downtime.html",
-          "label": "Chapter 9",
-          "title": "Downtime"
-        },
-        {
-          "file": "GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html",
-          "label": "Chapter 10",
-          "title": "Campaigns Timers Consequences"
-        },
-        {
-          "file": "GM-_-Guide-_-11-_-Epic-_-Tier-_-Adventures.html",
-          "label": "Chapter 11",
-          "title": "Epic Tier Adventures"
-        },
-        {
-          "file": "GM-_-Guide-_-12-_-Advanced-_-GM-_-Techniques.html",
-          "label": "Chapter 12",
-          "title": "Advanced GM Techniques"
-        },
-        {
-          "file": "GM-_-Guide-_-13-_-Player-_-Archetypes-_-at-_-the-_-Table.html",
-          "label": "Chapter 13",
-          "title": "Player Archetypes at the Table"
-        },
-        {
-          "file": "GM-_-Guide-_-14-_-Lore-_-Compendium.html",
-          "label": "Chapter 14",
-          "title": "Lore Compendium"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-A-_-Core-_-Reference-_-Tables.html",
-          "label": "Appendix A",
-          "title": "Core Reference Tables"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-B-_-Optional-_-Rules-_-and-_-Tactical-_-Tools.html",
-          "label": "Appendix B",
-          "title": "Optional Rules and Tactical Tools"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-C-_-Deck-_-and-_-Magic-_-Reference.html",
-          "label": "Appendix C",
-          "title": "Deck and Magic Reference"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-D-_-Campaign-_-Management.html",
-          "label": "Appendix D",
-          "title": "Campaign Management"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-E-_-Safety-_-and-_-Inclusivity.html",
-          "label": "Appendix E",
-          "title": "Safety and Inclusivity"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-F-_-Rival-_-Party-_-Generator.html",
-          "label": "Appendix F",
-          "title": "Rival Party Generator"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-G-_-One-_-Page-_-GM-_-Screen-_-Summary.html",
-          "label": "Appendix G",
-          "title": "One Page GM Screen Summary"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-H-_-Sample-_-Deck-_-Reading.html",
-          "label": "Appendix H",
-          "title": "Sample Deck Reading"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-I-_-Session-_-Zero-_-Checklist.html",
-          "label": "Appendix I",
-          "title": "Session Zero Checklist"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-J-_-Using-_-Expansions-_-and-_-Adversary-_-Templates.html",
-          "label": "Appendix J",
-          "title": "Using Expansions and Adversary Templates"
-        },
-        {
-          "file": "GM-_-Guide-_-App-_-K-_-Patron-_-Quick-_-Reference.html",
-          "label": "Appendix K",
-          "title": "Patron Quick Reference"
-        }
-      ]
-    },
-    {
       "id": "grey_wanderers_grimoire",
       "title": "Grey Wanderers Grimoire",
       "file": "Fates_-_Edge_-_-Grey-_-Wanderers-_-Grimoire.html",
@@ -571,115 +680,6 @@
       "core": false,
       "active": true,
       "isPDF": true
-    },
-    {
-      "id": "players_guide",
-      "title": "Player's Guide",
-      "subtitle": "Your Path to Adventure in the Amaranthine Sea and Beyond",
-      "file": "index.html",
-      "path": "/data/docs/players-guide/",
-      "category": "players-guide",
-      "categoryLabel": "Player's Guide",
-      "core": false,
-      "active": true,
-      "book": true,
-      "pages": [
-        {
-          "file": "Players-_-Guide-_-01-_-Quickstart.html",
-          "label": "Chapter 1",
-          "title": "Quickstart"
-        },
-        {
-          "file": "Players-_-Guide-_-02-_-Character-_-Creation.html",
-          "label": "Chapter 2",
-          "title": "Character Creation"
-        },
-        {
-          "file": "Players-_-Guide-_-03-_-Core-_-Mechanics.html",
-          "label": "Chapter 3",
-          "title": "Core Mechanics"
-        },
-        {
-          "file": "Players-_-Guide-_-04-_-Magic.html",
-          "label": "Chapter 4",
-          "title": "Magic"
-        },
-        {
-          "file": "Players-_-Guide-_-05-_-Healing.html",
-          "label": "Chapter 5",
-          "title": "Healing"
-        },
-        {
-          "file": "Players-_-Guide-_-06-_-Talents.html",
-          "label": "Chapter 6",
-          "title": "Talents"
-        },
-        {
-          "file": "Players-_-Guide-_-07-_-Advancement.html",
-          "label": "Chapter 7",
-          "title": "Advancement"
-        },
-        {
-          "file": "Players-_-Guide-_-08-_-XP-_-Paths.html",
-          "label": "Chapter 8",
-          "title": "XP Paths"
-        },
-        {
-          "file": "Players-_-Guide-_-09-_-Your-_-First-_-Magical-_-Character.html",
-          "label": "Chapter 9",
-          "title": "Your First Magical Character"
-        },
-        {
-          "file": "Players-_-Guide-_-10-_-Assets-_-and-_-Followers.html",
-          "label": "Chapter 10",
-          "title": "Assets and Followers"
-        },
-        {
-          "file": "Players-_-Guide-_-11-_-Downtime.html",
-          "label": "Chapter 11",
-          "title": "Downtime"
-        },
-        {
-          "file": "Players-_-Guide-_-12-_-World-_-Regions-_-and-_-Cultures.html",
-          "label": "Chapter 12",
-          "title": "World Regions and Cultures"
-        },
-        {
-          "file": "Players-_-Guide-_-13-_-World-_-Powers-_-and-_-Patrons.html",
-          "label": "Chapter 13",
-          "title": "World Powers and Patrons"
-        },
-        {
-          "file": "Players-_-Guide-_-14-_-World-_-Interaction.html",
-          "label": "Chapter 14",
-          "title": "World Interaction"
-        },
-        {
-          "file": "Players-_-Guide-_-15-_-Currency-_-Free-_-Economy.html",
-          "label": "Chapter 15",
-          "title": "Currency Free Economy"
-        },
-        {
-          "file": "Players-_-Guide-_-16-_-Character-_-Backgrounds.html",
-          "label": "Chapter 16",
-          "title": "Character Backgrounds"
-        },
-        {
-          "file": "Players-_-Guide-_-17-_-The-_-Legacy-_-Engine.html",
-          "label": "Chapter 17",
-          "title": "The Legacy Engine"
-        },
-        {
-          "file": "Players-_-Guide-_-18-_-Enhanced-_-Player-_-Play.html",
-          "label": "Chapter 18",
-          "title": "Enhanced Player Play"
-        },
-        {
-          "file": "Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html",
-          "label": "Chapter 19",
-          "title": "Appendix Quick Reference"
-        }
-      ]
     },
     {
       "id": "playing_and_running_fate_s_edge",

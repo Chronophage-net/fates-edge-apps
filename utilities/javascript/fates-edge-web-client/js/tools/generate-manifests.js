@@ -141,7 +141,7 @@ function readBookManifestEntry(subPath, category) {
     path: category.path,
     category: category.id,
     categoryLabel: category.label,
-    core: false,
+    core: ['players-guide', 'gm-guide', 'quickstart'].includes(category.id),
     active: true,
     book: true,
     pages: pages,

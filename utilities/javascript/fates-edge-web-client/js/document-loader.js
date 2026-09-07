@@ -48,8 +48,7 @@ class DocumentLoader {
       
       if (shouldLoadDocs) {
         // Load from multiple sources
-        await this.loadFromManifest('/manifest-full.json');
-        await this.loadFromManifest('/manifest-core.json');
+        await this.loadFromManifest('/data/docs/manifest.json');
         
         // Try to load pack manifests
         await this.loadPackManifests();
@@ -102,13 +101,8 @@ class DocumentLoader {
       
       // Process manifest entries
       for (const entry of manifest) {
-        // Skip if already loaded
-        if (this.documentCache.has(entry.path || entry.file)) {
-          continue;
-        }
-        
-        // Normalize entry
         const doc = this.normalizeDocumentEntry(entry);
+        if (this.documentCache.has(doc.path || doc.file)) continue;
         this.documents.push(doc);
         this.documentCache.set(doc.path || doc.file, doc);
       }
@@ -215,24 +209,17 @@ class DocumentLoader {
     const title = entry.title || file.replace(/\.html$/, '').replace(/_/g, ' ') || 'Untitled';
     const category = entry.category || 'other';
     
-    // Build path with /data/docs/ prefix
+    // Manifests use a directory path plus a file; pack entries may use a URL.
     let docPath = path;
-    
-    // If path is empty or doesn't start with /data/docs/, construct it
-    if (!docPath || docPath === '' || docPath === '#') {
-      const fileName = file || entry.id || title.replace(/\s+/g, '_').toLowerCase() + '.html';
-      docPath = `/data/docs/${fileName}`;
-    } else if (!docPath.startsWith('./data/docs/') && !docPath.startsWith('http') && !docPath.startsWith('#')) {
-      // Remove leading slash if present to avoid double slash
-      const cleanPath = docPath.startsWith('/') ? docPath.substring(1) : docPath;
-      docPath = `/data/docs/${cleanPath}`;
+    if (!docPath || docPath === '#') docPath = `/data/docs/${file}`;
+    else {
+      docPath = docPath.replace(/^\.\//, '/');
+      if (!docPath.startsWith('/') && !/^https?:\/\//i.test(docPath)) {
+        docPath = `/data/docs/${docPath}`;
+      }
+      if (docPath.endsWith('/')) docPath += file;
     }
-    
-    // Ensure path starts with /
-    if (!docPath.startsWith('/')) {
-      docPath = '/' + docPath;
-    }
-    
+
     return {
       ...entry,
       id: entry.id || file.replace(/\.html$/, ''),
