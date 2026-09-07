@@ -1,9 +1,6 @@
 # Use modern Node
 FROM node:24-alpine AS builder
 
-# Build argument: enable upload features
-ARG ENABLE_UPLOAD=false
-
 WORKDIR /app
 
 # ---------------------------------------------------------------
@@ -14,14 +11,6 @@ COPY package*.json ./
 # supported equivalent (was causing npm to print its help text and exit
 # non-zero on node:24-alpine's bundled npm).
 RUN npm ci --omit=dev
-
-# Optional upload tools
-RUN if [ "$ENABLE_UPLOAD" = "true" ]; then \
-        apk add --no-cache \
-            pdf2htmlEX \
-            poppler-utils \
-            && npm install multer --save-optional; \
-    fi
 
 # ---------------------------------------------------------------
 # Copy server files
@@ -74,7 +63,6 @@ VOLUME ["/app/data", "/app/logs", "/app/modules"]
 # Environment Variables
 # ---------------------------------------------------------------
 ENV PORT=3000
-ENV ENABLE_UPLOAD=${ENABLE_UPLOAD}
 ENV AUTO_CREATE_ROOMS=false
 ENV ENABLE_RATE_LIMITING=true
 ENV ENABLE_CACHING=false

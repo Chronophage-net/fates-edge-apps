@@ -1108,6 +1108,46 @@ function createApiRouter(appConfig) {
     // uses the /api/modules/:id/push route above, unchanged -- these
     // routes are for the LIVE, authoritative state instead.
 
+    router.post('/api/rooms/:code/public-memory/forget', authenticate, (req, res) => {
+        try {
+            const r=room.getRoom(req.params.code);
+            const query=String(req.body?.query || '').trim().toLowerCase();
+            if(!query || query.length>500)return res.status(400).json({error:'Supply a query up to 500 characters.'});
+            r.chatHistory=(r.chatHistory || []).filter(m=>!String(m.text||'').toLowerCase().includes(query));
+            room.broadcastToRoom(r.code,'public-memory-forgotten',{query});
+            res.json({success:true});
+        } catch(err){res.status(404).json({error:err.message});}
+    });
+
+    router.post('/api/rooms/:code/rotate-code', authenticate, (req, res) => {
+        // Managed/cluster placements must rotate through their shared manager, not this local directory.
+        if(config.manager || config.redisUrl || Number(process.env.CLUSTER_WORKERS || 0)>1 || process.env.CLUSTER_WORKERS==='auto')
+            return res.status(409).json({error:'Rotate through the placement manager in clustered deployments.'});
+        try { res.json(room.rotateRoomCode(req.params.code,String(req.body?.code || '').toUpperCase())); }
+        catch(err) { res.status(400).json({error:err.message}); }
+    });
+
+    router.get('/api/rooms/:code/public-sheet/:clientId', authenticate, (req, res) => {
+        try {
+            const r=room.getRoom(req.params.code), actor=r.clients.get(req.params.clientId);
+            const claim=actor?.userId && r.characterClaims?.[actor.userId];
+            const sheet=claim && r.characters?.[claim];
+            if(!sheet || (sheet.ownerId && String(sheet.ownerId)!==String(actor.userId)))return res.status(403).json({error:'Claim your own character before requesting its full sheet.'});
+            res.json(sheet);
+        } catch(err){res.status(404).json({error:err.message});}
+    });
+
+    router.get('/api/rooms/:code/public-context', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const knowledge = (r.data?.adventure?.module?.knowledge || []).filter(k => k.revealed === true)
+                .map(k => ({ id: k.id, revealed: true, text: String(k.gm || k.text || '') }));
+            const chat = (r.chatHistory || []).filter(m => !m.whisper && !m.privateOnly && (!m.recipient || m.recipient === 'all') && !/^!gm\b/i.test(m.text || ''))
+                .map(m => ({ id: m.id, text: m.text, sender: m.sender, timestamp: m.timestamp }));
+            res.json({ room_id: r.room_id, knowledge, chat });
+        } catch (err) { res.status(404).json({ error: err.message }); }
+    });
+
     router.get('/api/rooms/:code/adventure', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);

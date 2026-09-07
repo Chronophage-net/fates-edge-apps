@@ -4,6 +4,7 @@
  */
 
 const room = require('./room.js');
+const sideTasks = require('./side-tasks');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const fs = require('fs');
@@ -44,6 +45,12 @@ function setupSocketIO(io, appConfig) {
 
         logger.info('🔌 Socket.io client connected', { socketId: socket.id });
 
+        socket.on('bot-seat', data => {
+            const current = room.rooms.get(socket.room);
+            if (!current || !current.clients.has(socket.id)) return;
+            require('./seat-presence').update(current, socket.clientData, data);
+            room.broadcastToRoom(current.code, 'presence', { clients: room.getClientsList(current) });
+        });
         socket.clientData = {
             id: socket.id,
             name: 'Player',
@@ -178,7 +185,7 @@ function setupSocketIO(io, appConfig) {
                 socket.emit('error', { message: 'Invalid room code' });
                 return;
             }
-            const roomKey = roomCode.toUpperCase();
+            let roomKey = roomCode.toUpperCase();
             let managerClaims = null;
             if (ioConfig.manager) {
                 if (socket.managerClaims) { socket.emit('error', { message: 'Reconnect to enter a managed room again' }); return; }
@@ -221,6 +228,9 @@ function setupSocketIO(io, appConfig) {
                 currentRoom = room.createRoom(roomKey);
                 logger.info('📋 Room created via Socket.io', { room: roomKey });
             }
+
+            const sideAccess = sideTasks.access(currentRoom, authUser, data);
+            if (!sideAccess.allowed) return socket.emit('error', { message: 'Not invited to this side task' });
 
             // NEW: rooms are deleted from the in-memory Map whenever they
             // go empty (see the disconnect handler below) and rebuilt
@@ -305,7 +315,7 @@ function setupSocketIO(io, appConfig) {
             // GM_LIKE_ROLES), but it WOULD let any client masquerade as the
             // AI GM Bot's own recognized seat, which is still not something
             // a self-declaration alone should be able to do.
-            let assignedRole = managerClaims ? managerClaims.role : auth.resolveRoomJoinRole(playerRole, membership?.role);
+            let assignedRole = sideAccess.role || (managerClaims ? managerClaims.role : auth.resolveRoomJoinRole(playerRole, membership?.role));
             if (socket.sessionRoomRoles.get(roomKey) === 'spectator') {
                 assignedRole = 'spectator';
             }
@@ -315,6 +325,7 @@ function setupSocketIO(io, appConfig) {
                 socket.emit('error', { message: 'A GM is already hosting this room. You have joined as a Player.', code: 'GM_CONFLICT' });
             }
 
+            roomKey = currentRoom.room_id;
             socket.join(roomKey);
             socket.room = roomKey;
             // NEW: previously unbounded -- a client could send an
@@ -359,6 +370,12 @@ function setupSocketIO(io, appConfig) {
                 }
             }
 
+            Object.assign(socket.clientData, require('./seat-presence').metadata(data, ioConfig.apiKey));
+            if (socket.clientData.botSeatRejected) {
+                logger.warn('Rejected bot seat handshake', { reason: socket.clientData.botSeatRejected });
+                socket.emit('error', { message: `Bot seat rejected: ${socket.clientData.botSeatRejected}` });
+                return socket.disconnect(true);
+            }
             const clientsList = room.getClientsList(currentRoom);
 
             // Consistent handshake acknowledgment (like plain WebSocket)
@@ -366,6 +383,7 @@ function setupSocketIO(io, appConfig) {
                 success: true,
                 clientId: socket.id,
                 clientRole: assignedRole,
+                room_id: currentRoom.room_id,
                 versionVector: {},
                 activeClients: clientsList
             });
@@ -414,6 +432,8 @@ function setupSocketIO(io, appConfig) {
         // sanitizeCharacterSelection().
         socket.on('character-select', (data) => {
             const targetId = (data && data.clientId) || socket.id;
+            // Only the owning connection (or a GM) may point a presence row at a character.
+            if (targetId !== socket.id && !isGmLike(socket.clientData?.role)) return;
             const r = room.rooms.get(socket.room);
             if (!r) return;
             const clientEntry = r.clients.get(targetId);
@@ -986,7 +1006,12 @@ function setupSocketIO(io, appConfig) {
             // the real verdict too, not an absent/spoofed one.
             if (chatMsg && typeof chatMsg === 'object') {
                 chatMsg.verifiedGM = isGmLike(socket.clientData?.role);
+                chatMsg.senderRole = socket.clientData?.role || 'player';
+                chatMsg.senderClientId = socket.id;
+                chatMsg.senderUserId = socket.clientData?.userId == null ? null : String(socket.clientData.userId);
             }
+            if (!r) return;
+            if (require('./seat-presence').privateCommand(r, socket.clientData, chatMsg)) return;
             if (r) room.recordChatMessage(r, chatMsg, ioConfig.maxChatHistory);
             const payload = {
                 ...data,
@@ -1000,7 +1025,7 @@ function setupSocketIO(io, appConfig) {
             const whisperedPrivately = chatMsg && chatMsg.whisper && chatMsg.recipient
                 ? room.deliverWhisper(socket.room, 'chat-message', payload, socket.id, chatMsg.recipient)
                 : false;
-            if (!whisperedPrivately) {
+            if (!whisperedPrivately && !(chatMsg?.whisper && chatMsg?.privateOnly)) {
                 room.broadcastToRoom(socket.room, 'chat-message', payload, socket.id);
             }
         });
@@ -1157,7 +1182,7 @@ function setupSocketIO(io, appConfig) {
                         timestamp: Date.now()
                     }, socket.id);
                 }
-                if (r.clients.size === 0) {
+                if (r.clients.size === 0 && !r.sideTask) {
                     room.rooms.delete(targetRoom);
                     logger.info('🗑️ Room deleted (empty)', { room: targetRoom });
                 }
@@ -1194,7 +1219,7 @@ function setupSocketIO(io, appConfig) {
                             timestamp: Date.now()
                         }, socket.id);
                     }
-                    if (r.clients.size === 0) {
+                    if (r.clients.size === 0 && !r.sideTask) {
                         room.rooms.delete(socket.room);
                         logger.info('🗑️ Room deleted (empty)', { room: socket.room });
                     }

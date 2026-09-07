@@ -1217,3 +1217,38 @@ module.exports = {
     deleteCharacterClaim,
     getClaimsForRoom,
 };
+
+// One-release dual read: durable writes use UUID, legacy code rows are copied
+// forward on access. Schema column names remain compatible with existing DBs.
+const scopedReads = {
+ loadCampaign: 'saveCampaign', loadAutoSave: 'saveAutoSave',
+ getRoomPasswordHash: 'setRoomPasswordHash', getMembership: null,
+ getCharacterClaim: null, getClaimsForRoom: null
+};
+const originals = { ...module.exports };
+function identity(value) { return require('./room').identityFor(value); }
+for (const [name, writer] of Object.entries(scopedReads)) {
+ module.exports[name] = async (value, ...args) => {
+  const record=identity(value); let result; let firstError;
+  try { result=await originals[name](record.room_id,...args); } catch(e) { firstError=e; }
+  if(result != null && (!Array.isArray(result) || result.length))return result;
+  if(!record.legacy_code) {if(firstError)throw firstError;return result;}
+  let old;try {old=await originals[name](record.legacy_code,...args);}catch(e){if(firstError)throw firstError;throw e;}
+  if(old == null)return old;
+  if(writer)await originals[writer](record.room_id,...args,old);
+  else if(name==='getMembership') {
+   await originals.upsertMembership(record.room_id,args[0],{role:old.role});
+   if(old.banned)await originals.setMemberBanned(record.room_id,args[0],true);
+  } else if(name==='getCharacterClaim')await originals.setCharacterClaim(record.room_id,args[0],old.character_id || old.characterId);
+  else if(name==='getClaimsForRoom')for(const c of old)await originals.setCharacterClaim(record.room_id,c.userId,c.characterId);
+  return old;
+ };
+}
+for (const name of ['saveCampaign','saveAutoSave','setRoomPasswordHash','upsertMembership','setCharacterClaim','deleteCharacterClaim','setMemberBanned','setMemberRole']) {
+ module.exports[name]=async(value,...args)=>{
+  const record=identity(value);
+  if(['setMemberBanned','setMemberRole'].includes(name))await module.exports.getMembership(value,args[0]);
+  return originals[name](record.room_id,...args);
+ };
+}
+module.exports.isMemberBanned=async(value,userId)=>!!(await module.exports.getMembership(value,userId))?.banned;

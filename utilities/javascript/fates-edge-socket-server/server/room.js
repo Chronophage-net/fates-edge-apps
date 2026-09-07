@@ -45,11 +45,35 @@ const ALL_SKILLS = [
 const DEFAULT_SKILLS = Object.fromEntries(ALL_SKILLS.map(s => [s, 0]));
 
 // ---------- State ----------
-const rooms = new Map();
+const { UUID } = require('./room-identity');
+const { RoomDirectory } = require('./room-directory');
+let directory = new RoomDirectory();
+class RoomMap extends Map {
+    get(key) { try { return super.get(directory.resolve(key)); } catch { return undefined; } }
+    has(key) { try { return super.has(directory.resolve(key)); } catch { return false; } }
+    set(key, value) { return super.set(directory.resolve(key), value); }
+    delete(key) { return super.delete(directory.resolve(key)); }
+}
+const rooms = new RoomMap();
+function identityFor(value) { const id=directory.resolve(value); return directory.records.get(id) || directory.legacy(value); }
+function configureDirectory(file) { directory = new RoomDirectory(file); }
+function rotateRoomCode(id, code) {
+    const target=getRoom(id);
+    const record=directory.rotate(id, code);
+    target.code=record.room_code; target.room_code=record.room_code;
+    broadcastToRoom(target.room_id, 'room-code-rotated', { room_id: target.room_id, room_code: target.code });
+    return record;
+}
+function createOffshoot(parentId) {
+    const parent=getRoom(parentId);
+    const record=directory.create({parentId:parent.room_id});
+    const target=createRoom(record.room_id);target.parent_id=parent.room_id;return target;
+}
+
 
 // ---------- Helpers ----------
 function validateRoomCode(code) {
-    return typeof code === 'string' && code.length >= 4 && code.length <= 10 && /^[A-Z0-9]+$/.test(code);
+    return typeof code === 'string' && (UUID.test(code) || (code.length >= 4 && code.length <= 10 && /^[A-Z0-9]+$/.test(code)));
 }
 
 function getRoom(code) {
@@ -86,7 +110,12 @@ function getExistingGm(room) {
 function getClientsList(room) {
     return Array.from(room.clients.values()).map(c => ({
         id: c.id,
+        botMode: c.botMode || null,
+        botSeat: c.botSeat ?? null,
+        botCharacter: c.botCharacter || '',
+        botBusy: c.botBusy === true,
         name: c.name,
+        userId: c.userId == null ? null : String(c.userId),
         role: c.role,
         email: c.email || '',
         // NOTE: selectedCharacter was already being SET on the client entry
@@ -554,8 +583,7 @@ let scaling = null;
 function setScaling(scalingApi) { scaling = scalingApi && scalingApi.enabled ? scalingApi : null; }
 
 function deliverToLocalWsClients(roomCode, event, payload, senderId = null) {
-    const roomKey = roomCode.toUpperCase();
-    const room = rooms.get(roomKey);
+    const room = resolveRoom(roomCode);
     if (!room) return; // this instance isn't holding any clients for this room -- fine
     const message = JSON.stringify({ type: event, ...payload });
     for (const [, client] of room.clients) {
@@ -566,9 +594,31 @@ function deliverToLocalWsClients(roomCode, event, payload, senderId = null) {
     }
 }
 
+/** Resolve a room from any of its identifiers.
+ *
+ *  Callers disagree about which string they hold: the chat handlers pass
+ *  `room_id`, seat-presence passes `room.code`, the API passes the join
+ *  code. These coincide only while a room's UUID room_id IS its join code,
+ *  which stops being true under real UUID room identity -- and `room_code`
+ *  is deliberately rotatable, so `room.code` can drift from the map key it
+ *  was created under. A miss here is silent (a whisper simply never
+ *  arrives), so resolve by any identifier rather than one blessed one. */
+function resolveRoom(idOrCode) {
+    if (!idOrCode) return null;
+    if (typeof idOrCode === 'object') return idOrCode.clients ? idOrCode : null;
+    const key = String(idOrCode).toUpperCase();
+    const direct = rooms.get(key);
+    if (direct) return direct;
+    for (const room of rooms.values()) {
+        if (String(room.room_id || '').toUpperCase() === key) return room;
+        if (String(room.room_code || '').toUpperCase() === key) return room;
+        if (String(room.code || '').toUpperCase() === key) return room;
+    }
+    return null;
+}
+
 function broadcastToRoom(roomCode, event, data, senderId = null) {
-    const roomKey = roomCode.toUpperCase();
-    const room = rooms.get(roomKey);
+    const room = resolveRoom(roomCode);
     if (!room) return;
 
     const payload = { ...data };
@@ -581,16 +631,16 @@ function broadcastToRoom(roomCode, event, data, senderId = null) {
     // attached the Redis adapter (io.adapter(...)) -- no extra call
     // needed here either way.
     if (io) {
-        io.to(roomKey).emit(event, payload);
+        io.to(room.room_id).emit(event, payload);
     }
 
     // Plain-ws clients connected to THIS instance.
-    deliverToLocalWsClients(roomKey, event, payload, senderId);
+    deliverToLocalWsClients(room, event, payload, senderId);
 
     // Plain-ws clients connected to OTHER instances, only when Redis
     // scaling is enabled (see server/scaling.js).
     if (scaling) {
-        scaling.publish(roomKey, event, payload, senderId);
+        scaling.publish(room.room_id, event, payload, senderId);
     }
 }
 
@@ -642,8 +692,7 @@ function broadcastToRoom(roomCode, event, data, senderId = null) {
  */
 function deliverWhisper(roomCode, event, data, senderId, recipientClientId) {
     if (!recipientClientId) return false;
-    const roomKey = roomCode.toUpperCase();
-    const room = rooms.get(roomKey);
+    const room = resolveRoom(roomCode);
     if (!room) return false;
     const target = room.clients.get(recipientClientId);
     if (!target) return false;
@@ -678,10 +727,14 @@ function createRoom(roomCode) {
     const roomKey = roomCode.toUpperCase();
     if (rooms.has(roomKey)) return rooms.get(roomKey);
 
+    const identity = directory.legacy(roomKey);
     const { buildDeck } = require('./deck.js');
     const room = {
         name: `Room ${roomKey}`,
-        code: roomKey,
+        code: identity.room_code || identity.room_id,
+        room_code: identity.room_code,
+        room_id: identity.room_id,
+        parent_id: identity.parent_id,
         clients: new Map(),
         deck: buildDeck(),
         deckHistory: [],
@@ -752,6 +805,7 @@ function createDefaultWhiteboard() {
 function recordChatMessage(roomObj, message, maxHistory) {
     if (!roomObj || !maxHistory || maxHistory <= 0) return;
     if (!message || typeof message !== 'object') return;
+    if (message.whisper || message.privateOnly || (message.recipient && message.recipient !== 'all') || /^!gm\s+player\b/i.test(message.text || '')) return;
     if (!roomObj.chatHistory) roomObj.chatHistory = [];
     roomObj.chatHistory.push(message);
     if (roomObj.chatHistory.length > maxHistory) {
@@ -761,6 +815,8 @@ function recordChatMessage(roomObj, message, maxHistory) {
 
 // ---------- Exports ----------
 module.exports = {
+    resolveRoom,
+    identityFor, configureDirectory, rotateRoomCode, createOffshoot,
     rooms,
     validateRoomCode,
     getRoom,

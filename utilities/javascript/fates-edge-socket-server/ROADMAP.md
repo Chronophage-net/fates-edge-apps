@@ -7,9 +7,10 @@ If a feature isn't listed here and isn't described as implemented in [DESIGN.md]
 ## Open items
 
 - **Multi-instance integration test for [SCALING.md](SCALING.md)'s Redis relay and cluster relay.** `tests/scaling.test.js`/`tests/cluster.test.js` cover the no-op and graceful-fallback paths; there's no automated test that actually spins up multiple server processes (with or without Redis) and verifies cross-instance delivery. Worth adding once there's a real multi-instance/multi-worker deployment to validate against. (Manually verified once during development for the cluster path — see SCALING.md's "Multi-core scaling" section.)
-- **Dockerfile's `ENABLE_UPLOAD` build arg is currently dead weight.** It conditionally installs `pdf2htmlEX`/`poppler-utils` and optionally `multer`, but no route in `server/api.js` ever uses them — there's no PDF conversion feature behind it, despite what an earlier draft of DESIGN.md implied. Either build the feature for real (a genuine ask if GMs want to upload a PDF rulebook/handout and get back HTML) or remove the dead Dockerfile branch — currently unresolved, tracked here rather than left undocumented.
 - **Session Playback/Export** (cross-referenced from the root roadmap) — if this ends up needing server-side storage (rather than being purely a client-side export of locally-captured recordings), the pieces would land here.
 
 ## Explicitly not planned
+
+The unused Dockerfile `ENABLE_UPLOAD` branch was removed on 2026-09-06. It installed PDF conversion tools and `multer` without a consuming route; the image no longer advertises or installs this unimplemented feature.
 
 Cut from earlier drafts and not coming back unless someone actually wants them: Redis-backed API response caching, email notifications, background job scheduling (agenda), and server-side rendered PDF export of campaign data.

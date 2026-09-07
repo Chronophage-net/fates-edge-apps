@@ -17,6 +17,7 @@ const config = require('./config.js').loadConfig();
 config.manager = require('./manager.js').fromEnvironment();
 const logger = require('./logger.js').createLogger(config.logLevel);
 const room = require('./room.js');
+room.configureDirectory(process.env.ROOM_DIRECTORY_FILE || require('path').join(__dirname, 'campaigns', 'room-directory.json'));
 const api = require('./api.js');
 const wsHandlers = require('./ws-handlers.js');
 const ioHandlers = require('./socketio-handlers.js');

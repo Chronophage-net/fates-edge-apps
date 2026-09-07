@@ -8,6 +8,7 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
 const room = require('./room.js');
+const sideTasks = require('./side-tasks');
 const deck = require('./deck.js');
 const logger = require('./logger.js').createLogger(process.env.LOG_LEVEL || 'INFO');
 const { buildSafeDict, clampCount, isSafeModuleId, clampString, MAX_NAME_LENGTH, sanitizeCharacterSelection, isGmLike, createConnectionMessageLimiter, checkEventPermission, permissionDeniedMessage } = require('./security.js');
@@ -52,7 +53,7 @@ function setupWSS(wss, appConfig) {
                 roomCode = pathParts[1];
             }
         }
-        const roomKey = (roomCode || 'default').toUpperCase();
+        let roomKey = (roomCode || 'default').toUpperCase();
         const clientId = `ws-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 
         let managedHandshake = null;
@@ -119,6 +120,7 @@ function setupWSS(wss, appConfig) {
             return;
         }
 
+        roomKey = currentRoom.room_id;
         ws.clientId = clientId;
         ws.room = roomKey;
         ws.clientData = {
@@ -178,6 +180,7 @@ function setupWSS(wss, appConfig) {
         }));
 
         // ─── Send room state (includes whiteboard, region, characters) ──
+        ws.sendInitialState = () => {
         const charArray = currentRoom.characters ? Object.values(currentRoom.characters) : [];
         const roomStatePayload = {
             type: 'room-state',
@@ -195,6 +198,8 @@ function setupWSS(wss, appConfig) {
             roomStatePayload.region = currentRoom.data.region;
         }
         ws.send(JSON.stringify(roomStatePayload));
+        };
+        if (!currentRoom.sideTask) ws.sendInitialState();
 
         // ─── Message handler ──────────────────────────────────────────
         ws.on('message', (message) => {
@@ -279,6 +284,20 @@ function setupWSS(wss, appConfig) {
                         ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }));
                         break;
 
+                    case 'side-task':
+                        try {
+                            const result = sideTasks.request(currentRoom, currentRoom.clients.get(ws.clientId), data, wssConfig);
+                            ws.send(JSON.stringify({ type: 'side-task-ack', requestId: data.requestId, success: true, ...result }));
+                        } catch (error) {
+                            ws.send(JSON.stringify({ type: 'side-task-ack', requestId: data.requestId, success: false, error: error.message }));
+                        }
+                        break;
+
+                    case 'bot-seat': {
+                        require('./seat-presence').update(currentRoom, ws.clientData, data);
+                        room.broadcastToRoom(currentRoom.code, 'presence', { clients: room.getClientsList(currentRoom) });
+                        break;
+                    }
                     case 'handshake':
                         handleHandshake(ws, currentRoom, data);
                         break;
@@ -393,7 +412,12 @@ function setupWSS(wss, appConfig) {
                     // above (sent right after connect).
                     case 'chat-message': {
                         const chatMsg = (data && data.message) || data;
-                        room.recordChatMessage(currentRoom, chatMsg, wssConfig.maxChatHistory);
+                        // A `!gm player` message can carry a private GM brief. If the room
+                        // can't be resolved we DROP it -- falling through would record and
+                        // broadcast the brief to the whole table in the clear.
+                        const seats = require('./seat-presence');
+                        if (!currentRoom) { if (seats.isPrivateCommand(chatMsg)) break; }
+                        else if (seats.privateCommand(currentRoom, ws.clientData, chatMsg)) break;
                         // SECURITY FIX: see the matching comment in
                         // socketio-handlers.js's 'chat-message' handler --
                         // stamp the server's own authoritative role for this
@@ -402,7 +426,11 @@ function setupWSS(wss, appConfig) {
                         // (client-supplied) sender/role fields.
                         if (chatMsg && typeof chatMsg === 'object') {
                             chatMsg.verifiedGM = isGmLike(ws.clientData?.role);
+                chatMsg.senderRole = ws.clientData?.role || 'player';
+                            chatMsg.senderClientId = ws.clientId;
+                            chatMsg.senderUserId = ws.clientData?.userId == null ? null : String(ws.clientData.userId);
                         }
+                        room.recordChatMessage(currentRoom, chatMsg, wssConfig.maxChatHistory);
                         // Whisper with a resolvable live recipient (e.g. the AI GM
                         // bot's join greeting) -- deliver privately instead of to
                         // the whole room. See room.js's deliverWhisper() for what
@@ -411,7 +439,7 @@ function setupWSS(wss, appConfig) {
                         const whisperedPrivately = chatMsg && chatMsg.whisper && chatMsg.recipient
                             ? room.deliverWhisper(roomKey, messageType, data, ws.clientId, chatMsg.recipient)
                             : false;
-                        if (!whisperedPrivately) {
+                        if (!whisperedPrivately && !(chatMsg?.whisper && chatMsg?.privateOnly)) {
                             room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
                         }
                         break;
@@ -788,6 +816,7 @@ function setupWSS(wss, appConfig) {
                     // roster. `selectedCharacter` is kept in sync as the first
                     // selected name for older clients that only read that field.
                     case 'character-select':
+                        if (data.clientId !== ws.clientId && !isGmLike(ws.clientData?.role)) break;
                         if (data.clientId) {
                             const r = room.rooms.get(roomKey);
                             if (r) {
@@ -905,7 +934,7 @@ function setupWSS(wss, appConfig) {
                         timestamp: Date.now()
                     }, clientId);
                 }
-                if (r.clients.size === 0) {
+                if (r.clients.size === 0 && !r.sideTask) {
                     room.rooms.delete(roomKey);
                     logger.info('🗑️ Room deleted (empty)', { room: roomKey });
                 }
@@ -928,6 +957,9 @@ function setupWSS(wss, appConfig) {
 async function handleHandshake(ws, roomState, data) {
     const managerClaims = ws.managerClaims;
     const authUser = managerClaims ? { userId: managerClaims.sub, username: data.clientName } : auth.verifyTokenOptional(data.authToken);
+
+    const sideAccess = sideTasks.access(roomState, authUser, data);
+    if (!sideAccess.allowed) { ws.close(4003, 'Not invited to this side task'); return; }
 
     // See socketio-handlers.js's identical comment: rooms get GC'd when
     // empty and recreated fresh (password: null) on the next connection,
@@ -974,7 +1006,7 @@ async function handleHandshake(ws, roomState, data) {
     // 'assistant-gm' is never trusted unless it's already saved on this
     // account's membership row (a grant made via room.handleRoleChangeRequest
     // with persist:true).
-    let assignedRole = managerClaims ? managerClaims.role : auth.resolveRoomJoinRole(data.role, membership?.role);
+    let assignedRole = sideAccess.role || (managerClaims ? managerClaims.role : auth.resolveRoomJoinRole(data.role, membership?.role));
     const existingGm = room.getExistingGm(roomState);
     if (assignedRole === 'gm' && existingGm) {
         assignedRole = 'player';
@@ -1015,8 +1047,15 @@ async function handleHandshake(ws, roomState, data) {
         }
     }
 
+    if (roomState.sideTask) ws.sendInitialState?.();
+    Object.assign(ws.clientData, require('./seat-presence').metadata(data, wssConfig.apiKey));
+    if (ws.clientData.botSeatRejected) {
+        logger.warn('Rejected bot seat handshake', { reason: ws.clientData.botSeatRejected });
+        ws.send(JSON.stringify({ type: 'error', message: `Bot seat rejected: ${ws.clientData.botSeatRejected}` }));
+        return ws.close(4004, 'Invalid bot seat');
+    }
     const clientsList = room.getClientsList(roomState);
-    ws.send(JSON.stringify({ type: 'handshake_ack', success: true, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList,
+    ws.send(JSON.stringify({ type: 'handshake_ack', success: true, room_id: roomState.room_id, sideTasks: true, sideTaskId: roomState.sideTask?.id || null, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList,
         ...(managerClaims ? { serverId: managerClaims.server_id, placementVersion: managerClaims.placement_version } : {}) }));
     room.broadcastToRoom(roomState.code, 'presence', { clients: clientsList }, ws.clientId);
     room.broadcastToRoom(roomState.code, 'player-joined', {

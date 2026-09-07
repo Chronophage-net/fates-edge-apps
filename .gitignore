@@ -117,3 +117,6 @@ voice-tts-reference/*
 voice-rvc-models/*
 !voice-rvc-models/.gitkeep
 !voice-rvc-models/README.md
+
+# Runtime room identity registry
+utilities/javascript/fates-edge-socket-server/server/campaigns/room-directory.json*
