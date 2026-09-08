@@ -3805,3 +3805,156 @@ body::before {
     display: flex; flex-wrap: wrap; gap: 0.4rem;
     margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--border);
 }
+
+/* ============================================================================
+   Wiki
+   ----------------------------------------------------------------------------
+   .wiki-sidebar and .wiki-entry-card existed; the content column, the toolbar
+   and everything inside an entry did not.
+   ========================================================================== */
+.wiki-modern-layout { max-width: 1300px; }
+.wiki-header { margin-bottom: 0.6rem; }
+.wiki-title { display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.wiki-subtitle { color: var(--text2); margin: 0.15rem 0 0.4rem; }
+.wiki-content { min-width: 0; }
+.wiki-toolbar {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    margin-bottom: 0.7rem;
+}
+.wiki-search-wrap, .wiki-filter-wrap { display: flex; align-items: center; gap: 0.35rem; }
+.wiki-search-input { min-width: 220px; flex: 1 1 220px; }
+.wiki-filter-select { font-size: 0.85rem; }
+.wiki-empty-state {
+    color: var(--text3); font-style: italic; text-align: center;
+    background: var(--bg2); border: 1px dashed var(--border);
+    border-radius: var(--radius); padding: 1.6rem 1rem;
+}
+.wiki-entry-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 0.5rem; flex-wrap: wrap;
+}
+.wiki-entry-category {
+    font-size: 0.7rem; color: var(--gold); text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.wiki-entry-meta { font-size: 0.72rem; color: var(--text3); display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.wiki-entry-summary, .wiki-entry-preview { font-size: 0.88rem; color: var(--text2); margin: 0.25rem 0; }
+.wiki-entry-full { margin-top: 0.5rem; color: var(--text2); }
+.wiki-entry-full h1, .wiki-entry-full h2, .wiki-entry-full h3 { color: var(--gold); }
+.wiki-entry-tags { display: flex; flex-wrap: wrap; gap: 0.2rem; margin-top: 0.3rem; }
+.wiki-entry-actions { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.wiki-expand-btn, .wiki-hide-btn, .wiki-edit-btn,
+.wiki-clone-btn, .wiki-delete-btn, .markdown-help-btn { font-size: 0.75rem; }
+
+/* ============================================================================
+   Encounters
+   ========================================================================== */
+.encounters-header { margin-bottom: 0.6rem; }
+.encounters-layout {
+    display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 0.85rem; align-items: start;
+}
+@media (max-width: 1000px) { .encounters-layout { grid-template-columns: 1fr; } }
+.left-column, .right-column { display: flex; flex-direction: column; gap: 0.85rem; min-width: 0; }
+
+.bestiary-panel-wrapper { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+.bestiary-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+.bestiary-list-container { max-height: 22rem; overflow-y: auto; padding-inline-end: 0.15rem; }
+.bestiary-list { display: flex; flex-direction: column; gap: 0.3rem; }
+.bestiary-entry, .bestiary-import-item {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.5rem; flex-wrap: wrap;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.4rem 0.6rem;
+}
+.bestiary-entry:hover { border-color: var(--gold-dark); }
+.entry-main { display: flex; align-items: baseline; gap: 0.45rem; flex-wrap: wrap; min-width: 0; }
+.entry-actions { display: flex; gap: 0.2rem; flex-shrink: 0; }
+.bestiary-detail { background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.7rem 0.85rem; margin-top: 0.5rem; }
+
+.quick-adversary {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.35rem 0.6rem; cursor: pointer;
+    font-size: 0.85rem; transition: border-color .15s;
+}
+.quick-adversary:hover { border-color: var(--gold); }
+.saved-encounters { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.sb-bank-display {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.5rem 0.7rem;
+}
+.sb-move-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-inline-start: 3px solid var(--gold);
+    border-radius: var(--radius); padding: 0.45rem 0.7rem; margin-bottom: 0.35rem;
+}
+.sb-spend-btn { font-size: 0.78rem; }
+
+/* ============================================================================
+   Kon'reh and Toll & Veil — the two board games
+   ========================================================================== */
+.tv-card, .tv-seat {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.6rem 0.8rem;
+}
+.tv-seat { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.tv-scroll { max-height: 18rem; overflow-y: auto; padding-inline-end: 0.15rem; }
+.tv-log {
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--text2);
+    background: var(--bg3); border-radius: var(--radius); padding: 0.5rem 0.6rem;
+    max-height: 14rem; overflow-y: auto;
+}
+.tv-btn { font-size: 0.82rem; }
+.tv-marker { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+
+/* ============================================================================
+   Settings, product tour and the small shared components
+   ========================================================================== */
+.pack-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.pack-item {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem; flex-wrap: wrap;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.5rem 0.7rem;
+}
+.pack-info { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.pack-name { font-weight: 600; color: var(--text); }
+.pack-meta, .pack-version, .pack-count, .pack-type,
+.doc-category, .archive-info, .bundled-packs-hint { font-size: 0.75rem; color: var(--text3); }
+.doc-title { font-weight: 600; color: var(--text); }
+.pack-document-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; }
+.password-settings-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.password-status-badge {
+    font-size: 0.72rem; border-radius: 999px; padding: 0.05rem 0.5rem;
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+}
+.avatar-preview-container { display: flex; align-items: center; gap: 0.6rem; }
+.avatar-name { font-weight: 600; color: var(--text); }
+.avatar-email { font-size: 0.78rem; color: var(--text3); }
+.locale-btn { font-size: 0.82rem; }
+
+.product-tour-eyebrow {
+    font-size: 0.7rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.product-tour-progress { display: flex; align-items: center; gap: 0.5rem; }
+.product-tour-count { font-size: 0.75rem; color: var(--text3); }
+.product-tour-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.7rem; }
+
+.timer-bar-wrap { display: flex; align-items: center; gap: 0.5rem; }
+.timer-bar-fill { height: 100%; background: var(--gold); border-radius: 3px; transition: width .3s; }
+.timer-display { font-size: 0.8rem; color: var(--text3); white-space: nowrap; }
+.timer-label { font-weight: 600; color: var(--text); }
+.timer-seg {
+    display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+    background: var(--bg4); border: 1px solid var(--border);
+}
+.timer-seg.filled { background: var(--gold); border-color: var(--gold); }
+
+.form-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.inline-check { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+.empty-chat-state, .empty-state { color: var(--text3); text-align: center; padding: 1.5rem 1rem; font-style: italic; }
+.preset-rolls { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.crafting-empty-note { color: var(--text3); font-style: italic; font-size: 0.85rem; }
