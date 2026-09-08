@@ -3,6 +3,25 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## [5.1.2] - 2026-09-08
+
+### Fixed
+- carry a published document's own CSS, scoped
+
+### Chore
+- regenerate data manifests
+- regenerate data manifests
+- regenerate data manifests
+- regenerate data manifests after the talent sync
+
+### Other
+- CSS sweep and repiar.
+- Updated talents, added religions and Amaranthine setting book.
+- Added the Cartomancer's Compass
+- sync the Epic Tier escalation guidance
+- add the Epic Tier annotated play session
+- sync the reconciled talent corpus
+
 ## [5.1.1] - 2026-09-07
 
 Published-corpus sync after the docs compliance sweep, plus the document-loader path fix.
