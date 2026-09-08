@@ -323,6 +323,20 @@ export function renderChat() {
         });
     }
 
+    // The status card's <details> holds the voice controls, the connection
+    // toggle and the presence list. Collapsed by default so they stop eating
+    // the top of the table, but a GM who lives in them shouldn't have to
+    // re-open it every render, so the state is remembered per key.
+    currentContainer.querySelectorAll('details[data-vtt-remember]').forEach((d) => {
+        const key = d.getAttribute('data-vtt-remember');
+        try {
+            if (localStorage.getItem(key) === 'open') d.open = true;
+        } catch (_) { /* private mode: just use the default */ }
+        d.addEventListener('toggle', () => {
+            try { localStorage.setItem(key, d.open ? 'open' : 'closed'); } catch (_) {}
+        });
+    });
+
     const selectedDisplay = currentContainer.querySelector('#selected-character-display');
     if (selectedDisplay) {
         if (selectedCharUnsubscribe) selectedCharUnsubscribe();
@@ -333,10 +347,10 @@ export function renderChat() {
                     ? `<img src="${escHtml(char.avatar)}" alt="${escHtml(char.name)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);" />`
                     : `<span style="font-size:1.8rem;">🧑</span>`;
                 selectedDisplay.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:0.5rem;background:var(--bg3);padding:0.2rem 0.8rem;border-radius:20px;border:2px solid var(--gold);">
+                    <div class="vtt-speaking-as-pill">
                         ${avatarHtml}
+                        <span class="vtt-speaking-as-label">Speaking as</span>
                         <span style="font-weight:700;font-size:1rem;">${escHtml(char.name)}</span>
-                        <span style="font-size:0.7rem;color:var(--text2);">(selected)</span>
                         <button class="btn btn-xs btn-ghost" id="clear-selected-char" title="Deselect" style="padding:0 0.3rem;" data-i18n-attr="title:feature.vtt.vtt-core.deselect">✕</button>
                     </div>
                 `;
@@ -348,7 +362,11 @@ export function renderChat() {
                     });
                 }
             } else {
-                selectedDisplay.innerHTML = `<span style="color:var(--text3);font-size:0.9rem;">No character selected</span>`;
+                // Empty rather than "No character selected": this strip sits
+                // directly above the chat input, and a permanent band that
+                // reports the absence of a selection is the single largest
+                // piece of idle furniture in the view.
+                selectedDisplay.innerHTML = '';
             }
         });
     }

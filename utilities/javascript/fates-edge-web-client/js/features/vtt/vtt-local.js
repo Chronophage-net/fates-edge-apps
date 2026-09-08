@@ -613,6 +613,8 @@ export function render(el) {
            core/websocket.js's isLocalOnlyMode()/setLocalOnlyMode(); the
            Settings > WebSocket panel has the same toggle for anyone who'd
            rather set it there). -->
+      <details class="vtt-status-more" data-vtt-remember="vtt.status.open">
+      <summary><span data-i18n="feature.vtt.vtt-local.tableSettings">Voice, party &amp; connection</span></summary>
       <div class="vtt-stat-row" id="vtt-local-only-row" style="justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;margin-bottom:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);">
         ${isLocalOnlyMode() ? `
           <span class="text-muted" style="font-size:0.85rem;" data-i18n="feature.vtt.vtt-local.fullyOfflineNoConnectionAttemptsNoReconnect">✅ Fully offline &mdash; no connection attempts, no reconnect loop.</span>
@@ -633,9 +635,10 @@ export function render(el) {
       <div class="vtt-divider"></div>
       <div class="vtt-card-header" style="margin-bottom:0.35rem;">
         <span class="vtt-card-title" style="font-size:1rem;" data-i18n="feature.vtt.vtt-local.partyMembers">👥 Party Members</span>
-        <span class="vtt-stat-pill" id="vtt-mode-badge">📡 Local</span>
+        <span class="vtt-stat-pill" id="vtt-mode-badge" hidden>📡 Local</span>
       </div>
       <div id="presence-list"></div>
+      </details>
     </div>
 
     <!-- Main Grid -->
@@ -655,7 +658,7 @@ export function render(el) {
              NEW: role="log"/aria-live="polite"/aria-relevant="additions" —
              see the matching change in vtt-connected.js's header comment. -->
         <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);" data-i18n-attr="aria-label:feature.vtt.vtt-local.chatMessages"></div>
-        <div id="selected-character-display" style="margin-bottom:0.4rem;padding:0.2rem 0.4rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);min-height:2.5rem;"></div>
+        <div id="selected-character-display" class="vtt-speaking-as"></div>
         <div class="chat-input-row" style="display:flex;gap:0.4rem;">
           <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" / data-i18n-attr="placeholder:feature.vtt.vtt-local.typeRollTimerHelp">
           <select id="chatRecipient" style="flex:0 0 120px;font-size:1rem;">

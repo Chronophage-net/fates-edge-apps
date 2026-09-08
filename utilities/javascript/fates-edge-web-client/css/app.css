@@ -3042,3 +3042,299 @@ body::before {
 /* icon slots carry typographic glyphs now, not emoji — colour them with the
    theme so they read as ornament rather than as a second content stream. */
 .qa-icon, .stat-icon { color: var(--gold-dark); font-style: normal; }
+
+/* ============================================================================
+   VTT — Live Table
+   ----------------------------------------------------------------------------
+   The VTT markup in js/features/vtt/ has always been written against a
+   .vtt-* stylesheet that was never authored: `git log -S'.vtt-card'` finds
+   no commit that ever defined one. Every class below was being referenced
+   and resolving to nothing, so the tab rendered as one long unstyled stack —
+   .vtt-section-grid had no grid, which pushed the whole sidebar (Party,
+   Combat Actions, tracker) underneath the chat log instead of beside it;
+   .vtt-stat-pill had no pill, so the status row wrapped as loose text; and
+   the undefined --vtt-surface tokens made panel backgrounds transparent, so
+   the page showed through white against the app's dark chrome.
+
+   That missing hierarchy is what read as clutter. These rules map the
+   --vtt-* tokens onto the app palette above so the VTT themes with
+   everything else, and give the tab the two-column shape its markup
+   already assumes.
+   ========================================================================== */
+
+.vtt-live-table {
+    --vtt-surface: var(--bg2);
+    --vtt-surface2: var(--bg3);
+    --vtt-surface3: var(--bg4);
+    --vtt-text: var(--text);
+    --vtt-text2: var(--text2);
+    --vtt-text3: var(--text3);
+    --vtt-gold: var(--gold);
+    --vtt-green: var(--green);
+    --vtt-red: var(--red);
+    --vtt-border: var(--border);
+    --vtt-radius: 10px;
+    color: var(--vtt-text);
+}
+
+/* --- header ------------------------------------------------------------- */
+.vtt-header { margin-bottom: 0.75rem; }
+.vtt-header .page-title { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+.vtt-header .page-sub { color: var(--vtt-text3); font-size: 0.88rem; margin: 0.15rem 0 0; }
+
+/* --- cards -------------------------------------------------------------- */
+.vtt-card {
+    background: var(--vtt-surface);
+    border: 1px solid var(--vtt-border);
+    border-radius: var(--vtt-radius);
+    padding: 0.7rem 0.85rem;
+    margin-bottom: 0.75rem;
+}
+.vtt-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.5rem;
+}
+.vtt-card-title {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-weight: 600; font-size: 1.05rem; color: var(--vtt-gold);
+}
+.vtt-divider { height: 1px; background: var(--vtt-border); margin: 0.6rem 0; }
+.vtt-hint { color: var(--vtt-text3); font-size: 0.8rem; margin-top: 0.45rem; }
+.vtt-hint code {
+    background: var(--vtt-surface2); border: 1px solid var(--vtt-border);
+    border-radius: 4px; padding: 0 0.25rem; color: var(--gold-light);
+}
+
+/* --- pills and rows ----------------------------------------------------- */
+.vtt-stat-pill {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.12rem 0.6rem; border-radius: 999px;
+    background: var(--vtt-surface2); border: 1px solid var(--vtt-border);
+    color: var(--vtt-text2); font-size: 0.8rem; white-space: nowrap;
+}
+.vtt-stat-pill strong { color: var(--vtt-text); font-weight: 600; }
+/* .vtt-stat-pill sets display, which beats the UA's [hidden] rule — so a
+   pill hidden in the markup would still show. */
+.vtt-stat-pill[hidden], .mode-badge[hidden] { display: none; }
+.vtt-stat-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+.vtt-btn-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+.vtt-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.mode-badge, .mode-indicator, .mode-label {
+    font-size: 0.78rem; padding: 0.1rem 0.55rem; border-radius: 999px;
+}
+.mode-indicator.connected { border-color: var(--green); color: var(--green-light); }
+.mode-indicator.disconnected { border-color: var(--vtt-text3); }
+.gm-badge { border-color: var(--gold-dark); color: var(--gold-light); }
+
+/* --- the two-column table ----------------------------------------------- */
+.vtt-section-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    gap: 0.85rem;
+    align-items: start;
+}
+@media (max-width: 1100px) { .vtt-section-grid { grid-template-columns: 1fr; } }
+
+.vtt-sidebar { min-width: 0; }
+.vtt-sidebar-scroll {
+    position: sticky; top: 0.5rem;
+    max-height: calc(100vh - 1.5rem);
+    overflow-y: auto; padding-inline-end: 0.15rem;
+}
+@media (max-width: 1100px) {
+    .vtt-sidebar-scroll { position: static; max-height: none; overflow: visible; }
+}
+.vtt-panel { margin-bottom: 0.7rem; }
+.vtt-panel:last-child { margin-bottom: 0; }
+
+/* --- chat --------------------------------------------------------------- */
+.chat-box { min-width: 0; }
+.chat-messages { gap: 0.35rem; }
+.chat-input-row input, .chat-input-row select {
+    background: var(--vtt-surface2); border: 1px solid var(--vtt-border);
+    border-radius: 6px; color: var(--vtt-text);
+}
+
+/* --- party grid --------------------------------------------------------- */
+.vtt-char-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.4rem;
+}
+.vtt-char-card {
+    background: var(--vtt-surface2); border: 1px solid var(--vtt-border);
+    border-radius: 8px; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.vtt-char-card:hover { border-color: var(--gold-dark); background: var(--vtt-surface3); }
+.vtt-char-card[aria-selected="true"], .vtt-char-card.selected { border-color: var(--vtt-gold); }
+
+/* --- misc --------------------------------------------------------------- */
+.vtt-timer {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.3rem 0.4rem; border-radius: 6px; background: var(--vtt-surface2);
+    margin-bottom: 0.3rem;
+}
+.vtt-presence-details > summary {
+    cursor: pointer; color: var(--vtt-text2); font-size: 0.85rem; padding: 0.2rem 0;
+}
+.vtt-role-control, .vtt-role-persist { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+/* --- compacted status chrome -------------------------------------------- */
+/* The Table Status card used to stack the connection hint, the voice
+   controls, the voice-client list and the whole presence list above the
+   fold. Those now live behind this disclosure, which remembers whether it
+   was open (see bindStatusDisclosure in vtt-core.js). */
+.vtt-status-more { margin-top: 0.15rem; }
+.vtt-status-more > summary {
+    cursor: pointer; list-style: none;
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    color: var(--vtt-text3); font-size: 0.82rem;
+    padding: 0.15rem 0.1rem; border-radius: 6px;
+}
+.vtt-status-more > summary::-webkit-details-marker { display: none; }
+.vtt-status-more > summary::before { content: "▸"; font-size: 0.75rem; transition: transform .15s; }
+.vtt-status-more[open] > summary::before { transform: rotate(90deg); }
+.vtt-status-more > summary:hover { color: var(--vtt-text2); }
+.vtt-status-more > summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.vtt-status-more[open] { padding-bottom: 0.2rem; }
+
+/* the GM card is a name, a role and one button — a full card was too much */
+.gm-panel--compact { padding: 0.45rem 0.85rem; }
+.gm-panel--compact .vtt-card-header { margin-bottom: 0; }
+
+/* --- "speaking as" strip ------------------------------------------------- */
+/* Zero height when no character is selected; the element only takes space
+   once it has something to say. */
+.vtt-speaking-as:empty { display: none; }
+.vtt-speaking-as { margin-bottom: 0.4rem; }
+.vtt-speaking-as-pill {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--bg3); border: 1px solid var(--gold);
+    border-radius: 999px; padding: 0.15rem 0.7rem 0.15rem 0.25rem;
+}
+.vtt-speaking-as-label {
+    color: var(--text3); font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ============================================================================
+   Alias tokens
+   ----------------------------------------------------------------------------
+   Nineteen custom properties were referenced across the feature modules but
+   never defined. An undefined var() with no fallback makes the whole
+   declaration invalid, so these were silently dropping colours, fonts and
+   panel backgrounds in patrons, factions, decks, dashboard, encounters,
+   kon-reh, whiteboard, docs and the product tour. Each is aliased onto the
+   palette above rather than given a new value, so nothing changes hue.
+   ========================================================================== */
+:root {
+    --accent: var(--gold);
+    --accent-soft: var(--gold-glow);
+    --gold-hover: var(--gold-light);
+    --gold-dim: var(--gold-dark);
+    --warn: var(--orange);
+    --danger: var(--red);
+    --danger-soft: var(--red-glow);
+    --surface: var(--bg2);
+    --panel: var(--bg2);
+    --panel-2: var(--bg3);
+    --ink: var(--text);
+    --text-primary: var(--text);
+    --muted: var(--text2);
+    --text4: var(--text3);
+    --line: var(--border);
+    --bg1: var(--bg);
+    --codex-entry-accent: var(--gold-dark);
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+/* ============================================================================
+   Patrons, terrestrial powers and religions
+   ----------------------------------------------------------------------------
+   The module's markup carries these classes but app.css never defined them,
+   so the view tabs rendered as unstyled boxes with no active state and the
+   religion modal had no surface of its own to sit on.
+   ========================================================================== */
+.patrons-modern-layout { max-width: 1200px; }
+.patrons-header { margin-bottom: 0.6rem; }
+.patrons-title { display: flex; align-items: center; gap: 0.5rem; }
+.patrons-subtitle { color: var(--text2); margin: 0.15rem 0 0.4rem; }
+.patrons-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+
+.patrons-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.patrons-tab {
+    padding: 0.3rem 0.85rem; border-radius: 999px;
+    background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text2); font-size: 0.88rem; cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.patrons-tab:hover { color: var(--text); border-color: var(--gold-dark); }
+.patrons-tab.active {
+    background: var(--gold-glow); border-color: var(--gold);
+    color: var(--gold-light); font-weight: 600;
+}
+.patrons-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.patrons-scroll-grid { scrollbar-width: thin; }
+.patron-tile { transition: border-color .15s, transform .12s; }
+.patron-tile:hover { border-color: var(--gold) !important; transform: translateY(-1px); }
+.patrons-empty { color: var(--text3); font-style: italic; padding: 0.8rem 0; }
+
+.religions-grid { align-items: start; }
+.religion-card { transition: background .15s, transform .12s; }
+.religion-card:hover { background: var(--bg4); transform: translateY(-1px); }
+
+.patron-detail-header { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.patron-detail-icon { font-size: 1.6rem; line-height: 1; }
+.patron-detail-domain { color: var(--text2); font-size: 0.9rem; }
+.patron-detail-section { margin-top: 0.8rem; }
+.patron-detail-section > h4 {
+    color: var(--gold); font-size: 0.95rem; margin: 0 0 0.25rem;
+    text-transform: uppercase; letter-spacing: 0.03em;
+}
+.patron-detail-body { color: var(--text2); }
+.patron-detail-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+.patron-recommender { background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.6rem 0.8rem; margin-bottom: 0.6rem; }
+
+.badge-tag, .badge-religion {
+    display: inline-block; padding: 0.05rem 0.5rem; border-radius: 999px;
+    font-size: 0.72rem; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); margin: 0 0.2rem 0.2rem 0;
+}
+.badge-religion { border-color: var(--gold-dark); color: var(--gold-light); }
+
+.patrons-view-container { min-height: 6rem; }
+.rites-list { margin-top: 0.3rem; }
+.rite-item { transition: background .15s; }
+.rite-expandable:hover { background: var(--bg4) !important; }
+.rite-header { gap: 0.5rem; }
+.rite-name { color: var(--text); }
+.rite-meta, .rite-tags { color: var(--text3); font-size: 0.75rem; }
+.rite-details { margin-top: 0.4rem; }
+.rite-description { color: var(--text2); font-size: 0.9rem; }
+
+/* The patrons module builds its own modals rather than reusing .modal-overlay
+   / .modal, so #patron-modal had no backdrop and .modal-content no surface —
+   the religion dialog rendered transparent over the page beneath it. */
+.patron-modal {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    overflow-y: auto; padding: 2rem 1rem;
+}
+.patron-modal .modal-content {
+    margin: 0 auto;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px var(--shadow-strong);
+}
+.patron-modal .modal-content h2 { margin-top: 0; }
+.patron-modal .modal-content blockquote {
+    border-inline-start: 3px solid var(--gold);
+    padding-inline-start: 0.8rem; margin: 0.6rem 0;
+    color: var(--text2); font-style: italic;
+}
+.patron-modal .modal-content ul { margin: 0.3rem 0 0.3rem 1.2rem; color: var(--text2); }
+.patron-modal .modal-content li { margin: 0.25rem 0; }
+.patron-modal .modal-content li strong { color: var(--text); }

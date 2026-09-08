@@ -886,7 +886,7 @@ function renderReligions() {
                     <div class="religion-card" onclick="window.viewReligion('${r.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.5rem;cursor:pointer;border-inline-start:3px solid var(--gold);">
                         <div style="font-size:1.5rem;">${safeString(icon)}</div>
                         <div style="font-weight:600;">${escHtml(name)}</div>
-                        <div style="font-size:0.7rem;color:var(--text3);">${orders} Orders</div>
+                        <div style="font-size:0.7rem;color:var(--text3);">${orders} ${orders === 1 ? 'Order' : 'Orders'}</div>
                     </div>
                 `;
             }).join('')}
@@ -1679,17 +1679,86 @@ window.viewReligion = function(id) {
     }
     const modal = document.getElementById('patron-modal');
     modal.style.display = 'block';
+
+    // The shipped religion files key the display name as `title` (the grid
+    // above already reads `name || title`); this modal read only `name`, so
+    // every heading rendered empty. `lore` is likewise an object of
+    // description/followers/quote, not a string, and printing it whole gave
+    // the literal "[object Object]" under a "Lore:" label.
+    const name = safeString(religion.name || religion.title || 'Unnamed');
+    const lore = religion.lore && typeof religion.lore === 'object' ? religion.lore : null;
+    const summary = religion.description || (lore ? lore.description : religion.lore) || '';
+    const quote = lore && lore.quote ? lore.quote : '';
+
+    const list = (label, items) => (Array.isArray(items) && items.length)
+        ? `<div class="patron-detail-section"><h4>${escHtml(label)}</h4><ul>${
+            items.map(x => `<li>${escHtml(typeof x === 'string' ? x : (x.name || ''))}</li>`).join('')
+          }</ul></div>` : '';
+
+    const prose = (label, text) => text
+        ? `<div class="patron-detail-section"><h4>${escHtml(label)}</h4>
+             <div class="patron-detail-body">${formatText(String(text))}</div></div>` : '';
+
+    const salvation = religion.salvation ? `
+        <div class="patron-detail-section">
+          <h4>Salvation &mdash; ${escHtml(religion.salvation.name || '')}</h4>
+          <div class="patron-detail-body">
+            ${religion.salvation.shape ? `<p><em>${escHtml(religion.salvation.shape)}</em></p>` : ''}
+            ${religion.salvation.description ? `<p>${formatText(religion.salvation.description)}</p>` : ''}
+            ${religion.salvation.why_it_is_beautiful ? `<p><strong>Why it is beautiful.</strong> ${formatText(religion.salvation.why_it_is_beautiful)}</p>` : ''}
+            ${religion.salvation.why_it_is_terrible ? `<p><strong>Why it is terrible.</strong> ${formatText(religion.salvation.why_it_is_terrible)}</p>` : ''}
+          </div>
+        </div>` : '';
+
+    const orders = Array.isArray(religion.orders) && religion.orders.length ? `
+        <div class="patron-detail-section"><h4>Orders</h4><ul>${
+          religion.orders.map(o => `<li><strong>${escHtml(o.name || '')}</strong>${
+            o.role ? ` &mdash; ${escHtml(o.role)}` : ''}${
+            Array.isArray(o.patrons) && o.patrons.length
+              ? ` ${o.patrons.map(x => `<span class="badge-tag">${escHtml(x)}</span>`).join('')}` : ''}${
+            o.description ? `<div class="rite-description">${escHtml(o.description)}</div>` : ''}</li>`).join('')
+        }</ul></div>` : '';
+
+    const schism = religion.internal_schism ? `
+        <div class="patron-detail-section">
+          <h4>Internal schism &mdash; ${escHtml(religion.internal_schism.name || '')}</h4>
+          <div class="patron-detail-body">
+            ${religion.internal_schism.claim ? `<p><em>${escHtml(religion.internal_schism.claim)}</em></p>` : ''}
+            ${religion.internal_schism.description ? `<p>${formatText(religion.internal_schism.description)}</p>` : ''}
+          </div>
+        </div>` : '';
+
+    const regional = Array.isArray(religion.regional_variation) && religion.regional_variation.length ? `
+        <div class="patron-detail-section"><h4>As you travel</h4><ul>${
+          religion.regional_variation.map(r => `<li><strong>${escHtml(r.region || '')}</strong>${
+            r.character ? ` &mdash; ${escHtml(r.character)}` : ''}${
+            r.beauty ? `<div class="rite-description"><em>Beautiful:</em> ${escHtml(r.beauty)}</div>` : ''}${
+            r.ugliness ? `<div class="rite-description"><em>Ugly:</em> ${escHtml(r.ugliness)}</div>` : ''}</li>`).join('')
+        }</ul></div>` : '';
+
     modal.innerHTML = `
-        <div class="modal-content" style="width:90%;max-width:600px;max-height:90vh;overflow-y:auto;background:var(--bg1);padding:1.5rem;border-radius:var(--radius);">
+        <div class="modal-content" style="width:90%;max-width:640px;max-height:90vh;overflow-y:auto;padding:1.5rem;border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float: inline-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
-            <h2 style="color:var(--gold);">${escHtml(religion.name)}</h2>
-            <div style="font-size:1.5rem;">${safeString(religion.icon || '⛪')}</div>
-            ${religion.description ? `<p>${formatText(religion.description)}</p>` : ''}
-            ${religion.lore ? `<p><strong>Lore:</strong> ${formatText(religion.lore)}</p>` : ''}
-            ${religion.doctrines ? `<div><strong>Doctrines:</strong><ul>${religion.doctrines.map(d => `<li>${escHtml(d)}</li>`).join('')}</ul></div>` : ''}
-            ${religion.practices ? `<div><strong>Practices:</strong><ul>${religion.practices.map(p => `<li>${escHtml(p)}</li>`).join('')}</ul></div>` : ''}
-            ${religion.orders ? `<div><strong>Orders:</strong><ul>${religion.orders.map(o => `<li>${escHtml(o.name)} (${escHtml(o.role)})</li>`).join('')}</ul></div>` : ''}
-            <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" style="margin-top:0.5rem;" data-i18n="feature.patrons.close">Close</button>
+            <div class="patron-detail-header">
+                <span class="patron-detail-icon">${safeString(religion.icon || '⛪')}</span>
+                <h2 style="color:var(--gold);margin:0;">${escHtml(name)}</h2>
+            </div>
+            ${religion.subtitle ? `<p class="patron-detail-domain">${escHtml(religion.subtitle)}</p>` : ''}
+            ${quote ? `<blockquote>${escHtml(quote)}</blockquote>` : ''}
+            ${summary ? `<p class="patron-detail-body">${formatText(summary)}</p>` : ''}
+            ${religion.founding ? prose('Founding', religion.founding.description) : ''}
+            ${salvation}
+            ${list('Doctrines', religion.doctrines)}
+            ${list('Practices', religion.practices)}
+            ${orders}
+            ${prose('Orders are the masks', religion.orders_are_masks)}
+            ${list('Beauty', religion.beauty)}
+            ${list('Ugliness', religion.ugliness)}
+            ${schism}
+            ${regional}
+            <div class="patron-detail-actions">
+              <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" data-i18n="feature.patrons.close">Close</button>
+            </div>
         </div>
     `;
     modal.onclick = (e) => {
