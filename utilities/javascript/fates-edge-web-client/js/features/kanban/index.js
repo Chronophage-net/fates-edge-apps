@@ -255,7 +255,7 @@ function renderKanbanView() {
                     return `
                         <div class="kanban-col" data-column="${key}">
                             <div class="kanban-col-header" style="border-bottom:3px solid ${col.color};">
-                                <span class="col-title">${col.icon} ${col.title}</span>
+                                <span class="col-title">${col.title}</span>
                                 <span class="col-count">${totalItems}</span>
                                 ${activeItems > 0 ? `<span class="col-active" style="color:${col.color};">⚡${activeItems}</span>` : ''}
                             </div>

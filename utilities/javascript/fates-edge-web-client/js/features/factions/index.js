@@ -380,11 +380,15 @@ export function loadFactionData() {
             console.log(`📦 Loaded from state: ${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers, ${state.trusts.length} trusts`);
             state.dataLoaded = true;
             state.usingFallback = false;
-            return;
+            return Promise.resolve();
         }
     }
 
-    loadRemoteFactions();
+    // Return the in-flight load. render()/onActivate() draw the loading state
+    // synchronously and previously had nothing to wait on, so the tab sat on
+    // "Loading faction data..." until the user navigated away and back — the
+    // fetch resolved with no one left to re-render.
+    return loadRemoteFactions();
 }
 
 async function loadRemoteFactions() {
@@ -489,9 +493,14 @@ function saveFactionData() {
 
 export function render(el) {
     container = el;
-    loadFactionData();
+    const loading = loadFactionData();
     state.screen = null;
     renderShell();
+    // renderShell() paints the loading state; redraw when the data arrives so
+    // the shell's counts and the list both catch up without a tab round-trip.
+    if (loading && typeof loading.then === 'function') {
+        loading.then(() => { if (container === el) renderShell(); });
+    }
 }
 
 function renderShell() {
@@ -1723,7 +1732,7 @@ export function attachEvents() {
 export async function onActivate() {
     console.log('[Factions] Activated');
     if (!state.dataLoaded) {
-        loadFactionData();
+        await loadFactionData();
     }
     refreshView();
 
@@ -1734,10 +1743,8 @@ export async function onActivate() {
     const pendingFactionId = sessionStorage.getItem('fe-pending-faction-detail');
     if (pendingFactionId) {
         sessionStorage.removeItem('fe-pending-faction-detail');
-        for (let i = 0; i < 20 && !state.dataLoaded; i++) {
-            await new Promise(r => setTimeout(r, 150));
-        }
-        refreshView();
+        // loadFactionData() is awaited above now, so the data is already in
+        // hand here — no need to poll for it.
         window.viewFaction(pendingFactionId);
     }
 }

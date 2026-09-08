@@ -219,6 +219,11 @@ h1, h2, h3, h4, h5, h6 {
 .flex-center { display: flex; align-items: center; justify-content: center; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
 .flex-col { display: flex; flex-direction: column; }
+/* .flex sets align-items:center, which is right for a row and wrong for a
+   column: `class="flex flex-col"` wrappers were shrinking to their content
+   and centring, so the Kanban board (and anything else inside one) rendered
+   as a narrow centred strip instead of filling its container. */
+.flex.flex-col { align-items: stretch; }
 .flex-1 { flex: 1; }
 .flex-shrink-0 { flex-shrink: 0; }
 
@@ -3338,3 +3343,465 @@ body::before {
 .patron-modal .modal-content ul { margin: 0.3rem 0 0.3rem 1.2rem; color: var(--text2); }
 .patron-modal .modal-content li { margin: 0.25rem 0; }
 .patron-modal .modal-content li strong { color: var(--text); }
+
+/* ============================================================================
+   Factions, assets, followers and trusts
+   ----------------------------------------------------------------------------
+   The module's grids and cards were styled; everything inside them was not.
+   The summary strip rendered as three lines of plain text with invisible
+   progress bars, the view tabs had no active state, and the faction card's
+   structured content (header, agenda, timer, hooks) inherited the
+   centre-alignment of the simple patron/trust/asset card rule it shares —
+   which is right for an icon over a name and wrong for a paragraph.
+   ========================================================================== */
+.factions-modern-layout { max-width: 1200px; }
+.factions-header { margin-bottom: 0.6rem; }
+.factions-title { display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.factions-subtitle { color: var(--text2); margin: 0.15rem 0 0.3rem; }
+.factions-view-container { min-height: 8rem; }
+.factions-empty {
+    color: var(--text3); text-align: center; font-style: italic;
+    background: var(--bg2); border: 1px dashed var(--border);
+    border-radius: var(--radius); padding: 1.5rem 1rem; margin-bottom: 0.8rem;
+}
+.factions-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+
+.factions-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.7rem; }
+.factions-tab {
+    padding: 0.3rem 0.85rem; border-radius: 999px;
+    background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text2); font-size: 0.88rem; cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.factions-tab:hover { color: var(--text); border-color: var(--gold-dark); }
+.factions-tab.active {
+    background: var(--gold-glow); border-color: var(--gold);
+    color: var(--gold-light); font-weight: 600;
+}
+.factions-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* --- summary strip ------------------------------------------------------- */
+.factions-summary {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.6rem; margin-bottom: 0.9rem;
+}
+.summary-card {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+    gap: 0.15rem 0.5rem;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.5rem 0.7rem;
+}
+.summary-icon { font-size: 1.25rem; grid-row: span 2; }
+.summary-label { color: var(--text2); font-size: 0.82rem; }
+.summary-value { color: var(--text); font-weight: 700; font-size: 1rem; }
+.summary-bar {
+    grid-column: 2 / -1; height: 5px; border-radius: 3px;
+    background: var(--bg4); overflow: hidden;
+}
+.summary-bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+
+/* --- faction card contents ---------------------------------------------- */
+/* .faction-card shares a centred rule with the patron/trust/asset cards;
+   these cards carry structured content and need to read left. */
+.faction-card { align-items: stretch; text-align: start; gap: 0.45rem; }
+.faction-card-header {
+    display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+}
+.faction-card .faction-icon { font-size: 1.6rem; }
+.faction-card .faction-name { flex: 1 1 auto; min-width: 0; }
+.faction-standing { font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+
+.faction-agenda { font-size: 0.88rem; color: var(--text2); }
+.agenda-label { color: var(--text3); font-weight: 600; margin-inline-end: 0.25rem; }
+.agenda-text { color: var(--text2); }
+
+.faction-timer { font-size: 0.8rem; color: var(--text3); }
+.timer-bar {
+    height: 5px; border-radius: 3px; background: var(--bg4);
+    overflow: hidden; margin-top: 0.2rem;
+}
+.timer-bar-fill { height: 100%; background: var(--gold); border-radius: 3px; transition: width .3s; }
+
+.faction-hooks { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.hook-tag {
+    display: inline-block; font-size: 0.72rem; line-height: 1.35;
+    padding: 0.1rem 0.45rem; border-radius: 6px;
+    background: var(--bg2); border: 1px solid var(--border); color: var(--text3);
+}
+.badge-remote {
+    align-self: flex-start; font-size: 0.6rem; letter-spacing: 0.04em;
+    padding: 0.05rem 0.4rem; border-radius: 999px;
+    background: var(--bg4); border: 1px solid var(--border); color: var(--text3);
+}
+
+/* --- asset / follower / trust cards -------------------------------------- */
+.followers-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem; margin-bottom: 1rem;
+}
+.follower-card {
+    background: var(--bg3); border: 1px solid var(--border-color);
+    border-radius: var(--radius); padding: 0.8rem; cursor: pointer;
+    display: flex; flex-direction: column; gap: 0.35rem; transition: all .2s;
+}
+.follower-card:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: var(--shadow-glow); }
+.follower-card-header { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.follower-role, .asset-card-type { font-size: 0.78rem; color: var(--text3); }
+.follower-desc { font-size: 0.85rem; color: var(--text2); }
+.follower-states { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+.asset-card-name, .trust-card-name { font-size: 1rem; font-weight: 600; color: var(--text); }
+.asset-card-tier, .trust-card-tier {
+    font-size: 0.7rem; color: var(--gold); font-weight: 600;
+    background: var(--bg2); border-radius: 999px; padding: 0.05rem 0.5rem;
+    align-self: center;
+}
+.asset-card-status { font-size: 0.78rem; }
+.asset-card-cost { font-size: 0.75rem; color: var(--text3); }
+.trust-card-icon { font-size: 2rem; }
+.trust-card-stats { font-size: 0.78rem; color: var(--text3); }
+
+/* --- detail screens ------------------------------------------------------ */
+.faction-detail, .asset-detail, .follower-detail, .trust-detail {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.1rem;
+}
+.faction-detail-header, .asset-detail-header,
+.follower-detail-header, .trust-detail-header {
+    display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border); padding-bottom: 0.6rem; margin-bottom: 0.8rem;
+}
+.faction-detail-icon, .asset-detail-icon,
+.follower-detail-icon, .trust-detail-icon { font-size: 2rem; line-height: 1; }
+.faction-detail-standing, .asset-detail-tier,
+.follower-detail-role, .trust-detail-tier { font-size: 0.85rem; color: var(--text2); }
+.faction-detail-body, .asset-detail-body,
+.follower-detail-body, .trust-detail-body { display: flex; flex-direction: column; gap: 0.9rem; }
+.faction-detail-section, .asset-detail-section,
+.follower-detail-section, .trust-detail-section { }
+.faction-detail-section > h3, .asset-detail-section > h3,
+.follower-detail-section > h3, .trust-detail-section > h3,
+.faction-detail-section > h4, .asset-detail-section > h4,
+.follower-detail-section > h4, .trust-detail-section > h4 {
+    color: var(--gold); font-size: 0.9rem; margin: 0 0 0.3rem;
+    text-transform: uppercase; letter-spacing: 0.03em;
+}
+.faction-detail-actions, .asset-detail-actions,
+.follower-detail-actions, .trust-detail-actions {
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--border);
+}
+.timer-controls, .standing-controls, .status-controls, .state-controls {
+    display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-top: 0.4rem;
+}
+
+.state-grid, .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.5rem;
+}
+.state-item {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.45rem 0.6rem;
+}
+.state-label { display: block; font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.03em; }
+.state-value { display: block; font-size: 0.95rem; font-weight: 600; color: var(--text); }
+
+/* --- forms --------------------------------------------------------------- */
+.faction-form, .asset-form, .follower-form, .trust-form {
+    display: flex; flex-direction: column; gap: 0.7rem;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.1rem;
+}
+.faction-form label, .asset-form label, .follower-form label, .trust-form label {
+    display: block; font-size: 0.8rem; color: var(--text3); margin-bottom: 0.15rem;
+}
+
+.btn-warning {
+    background: var(--orange); border-color: var(--orange); color: #1a1204;
+}
+.btn-warning:hover { background: var(--orange-light); border-color: var(--orange-light); }
+
+/* ============================================================================
+   Shared utilities
+   ----------------------------------------------------------------------------
+   These names are used across most feature modules but were never defined —
+   .btn-primary and .btn-green in particular, which every module reaches for
+   and which were falling back to the bare .btn look, so a "primary" action
+   was indistinguishable from a secondary one.
+   ========================================================================== */
+.btn-primary {
+    background: var(--gold); border-color: var(--gold); color: var(--text-inverse);
+    font-weight: 600;
+}
+.btn-primary:hover { background: var(--gold-light); border-color: var(--gold-light); }
+.btn-green { background: var(--green); border-color: var(--green); color: var(--text-inverse); }
+.btn-green:hover { background: var(--green-light); border-color: var(--green-light); }
+.btn-large { padding: 0.7rem 1.4rem; font-size: 1.05rem; }
+
+.text-sm { font-size: 0.85rem; }
+.text-xs { font-size: 0.75rem; }
+.text-right { text-align: end; }
+.font-bold { font-weight: 700; }
+.italic { font-style: italic; }
+.flex-wrap { flex-wrap: wrap; }
+.ml-auto { margin-inline-start: auto; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.mt-1 { margin-top: 0.5rem; }
+.gold { color: var(--gold); }
+.table-wrap { overflow-x: auto; }
+
+.panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.5rem;
+}
+.panel-actions { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+
+/* stat tiles — dashboard's row of counts, and anywhere else that shows a
+   number over a label */
+.stat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.7rem 0.5rem; text-align: center;
+}
+.stat-value { display: block; font-size: 1.6rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+.stat-label { display: block; font-size: 0.7rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+.stat-sub { display: block; font-size: 0.68rem; color: var(--text3); margin-top: 0.1rem; }
+
+.status-badge {
+    display: inline-block; padding: 0.05rem 0.5rem; border-radius: 999px;
+    font-size: 0.7rem; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2);
+}
+.badge-cost, .badge-local, .badge-cloned, .badge-more, .tl-badge, .kr-badge, .creature-tag {
+    display: inline-block; padding: 0.05rem 0.45rem; border-radius: 999px;
+    font-size: 0.7rem; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); margin: 0 0.15rem 0.15rem 0;
+}
+
+/* Harm / Fatigue / Boon read-outs carry meaning; give them their colours. */
+.harm { color: var(--red); }
+.fatigue { color: var(--orange); }
+.boon { color: var(--gold); }
+
+.section-header {
+    display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;
+    margin: 1.2rem 0 0.5rem;
+}
+.section-number { color: var(--gold-dark); font-weight: 700; font-size: 0.85rem; }
+
+/* ============================================================================
+   Dashboard — "The Table"
+   ========================================================================== */
+.dashboard-modern-layout { max-width: 1300px; }
+.dashboard-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.8rem; flex-wrap: wrap;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.7rem 1rem; margin-bottom: 0.8rem;
+}
+.dashboard-status-bar {
+    display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+    font-size: 0.78rem; color: var(--text3);
+}
+.dashboard-stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.6rem; margin-bottom: 0.9rem;
+}
+
+.quick-actions-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+}
+.quick-action-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.6rem 0.5rem; cursor: pointer;
+    color: var(--text); text-align: center; transition: border-color .15s, background .15s;
+}
+.quick-action-btn:hover { border-color: var(--gold); background: var(--bg3); }
+.quick-action-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.qa-icon { font-size: 1.3rem; line-height: 1.2; }
+.qa-label { font-weight: 600; font-size: 0.9rem; }
+.qa-desc { font-size: 0.72rem; color: var(--text3); }
+
+.dashboard-main-grid {
+    display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 0.85rem; align-items: start;
+}
+@media (max-width: 1000px) { .dashboard-main-grid { grid-template-columns: 1fr; } }
+.dashboard-left, .dashboard-right { display: flex; flex-direction: column; gap: 0.85rem; min-width: 0; }
+
+/* rows inside the dashboard panels */
+.dashboard-char-item, .dashboard-timer-item,
+.dashboard-encounter-item, .dashboard-faction-item, .dashboard-patron-item,
+.dash-asset-item, .dash-follower-item {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem; flex-wrap: wrap;
+    padding: 0.45rem 0.2rem; border-bottom: 1px solid var(--border);
+}
+.dashboard-char-item:last-child, .dashboard-timer-item:last-child { border-bottom: none; }
+.dashboard-char-item { cursor: pointer; border-radius: 6px; transition: background .15s; }
+.dashboard-char-item:hover { background: var(--bg3); }
+
+.char-info { display: flex; align-items: baseline; gap: 0.45rem; flex-wrap: wrap; min-width: 0; }
+.char-name { font-weight: 600; color: var(--text); }
+.char-stats { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+.char-detail { font-size: 0.75rem; color: var(--text3); }
+
+.dashboard-timer-item { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+.timer-info { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.timer-name { font-weight: 600; color: var(--text); }
+.timer-progress-text { font-size: 0.78rem; color: var(--text3); }
+.timer-bar-track { height: 5px; border-radius: 3px; background: var(--bg4); overflow: hidden; }
+.timer-progress { height: 100%; background: var(--gold); border-radius: 3px; transition: width .3s; }
+.timer-actions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+.dash-assets-list, .dash-followers-list { display: flex; flex-direction: column; }
+.asset-name { font-weight: 600; color: var(--text); }
+.asset-status, .asset-tier { font-size: 0.75rem; color: var(--text3); }
+
+.adventures-modern-layout { max-width: 1300px; }
+.adventures-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.6rem;
+}
+
+/* ============================================================================
+   Campaign Board (Kanban), clocks and timeline
+   ----------------------------------------------------------------------------
+   None of this module's classes were defined, so the board — a four-column
+   drag-and-drop layout — rendered as one long single-column list, cards had
+   no surface to sit on, and tags ran together as "#factions#turn".
+   ========================================================================== */
+.kanban-modern-layout { max-width: 1300px; }
+.kanban-header { margin-bottom: 0.6rem; }
+.kanban-title { display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.kanban-subtitle { color: var(--text2); margin: 0.15rem 0 0.4rem; }
+.kanban-view-container { min-height: 10rem; }
+
+.kanban-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.kanban-tab {
+    padding: 0.25rem 0.8rem; border-radius: 999px;
+    background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text2); font-size: 0.85rem; cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.kanban-tab:hover { color: var(--text); border-color: var(--gold-dark); }
+.kanban-tab.active { background: var(--gold-glow); border-color: var(--gold); color: var(--gold-light); font-weight: 600; }
+.kanban-toolbar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.7rem; }
+
+/* --- the board ----------------------------------------------------------- */
+.kanban-board-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 0.7rem; align-items: start;
+}
+.kanban-col {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.5rem; min-width: 0;
+}
+.kanban-col-header {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding-bottom: 0.35rem; margin-bottom: 0.5rem;
+}
+.col-title { font-weight: 600; color: var(--text); flex: 1 1 auto; min-width: 0; }
+.col-count {
+    font-size: 0.72rem; color: var(--text3); background: var(--bg4);
+    border-radius: 999px; padding: 0.05rem 0.45rem;
+}
+.col-active { font-size: 0.75rem; font-weight: 600; }
+.kanban-col-items { display: flex; flex-direction: column; gap: 0.45rem; min-height: 2.5rem; }
+.kanban-empty {
+    color: var(--text3); font-size: 0.78rem; font-style: italic; text-align: center;
+    border: 1px dashed var(--border); border-radius: var(--radius); padding: 0.7rem 0.4rem;
+}
+
+/* --- cards --------------------------------------------------------------- */
+.kanban-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.5rem 0.6rem;
+    display: flex; flex-direction: column; gap: 0.3rem;
+    cursor: grab; transition: border-color .15s, box-shadow .15s;
+}
+.kanban-card:hover { border-color: var(--gold-dark); box-shadow: var(--shadow-glow); }
+.kanban-card:active { cursor: grabbing; }
+.card-header { display: flex; align-items: baseline; justify-content: space-between; gap: 0.4rem; }
+.card-title { font-weight: 600; color: var(--text); font-size: 0.92rem; }
+.card-priority { font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.card-description { font-size: 0.82rem; color: var(--text2); }
+.card-block-reason {
+    font-size: 0.78rem; color: var(--red-light);
+    background: var(--red-glow); border-radius: 6px; padding: 0.15rem 0.4rem;
+}
+.card-timer { font-size: 0.78rem; color: var(--text3); }
+.card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.4rem; flex-wrap: wrap; margin-top: 0.1rem;
+}
+.card-tags { display: flex; flex-wrap: wrap; gap: 0.2rem; min-width: 0; }
+.card-tag, .tag-list > span {
+    font-size: 0.68rem; color: var(--text3);
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.02rem 0.35rem;
+}
+.card-actions { display: flex; gap: 0.15rem; flex-shrink: 0; }
+.card-actions .btn { padding: 0 0.35rem; font-size: 0.75rem; }
+
+/* --- clocks -------------------------------------------------------------- */
+.clocks-toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.7rem; }
+.clocks-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.7rem;
+}
+.clock-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.6rem 0.7rem; cursor: pointer;
+    display: flex; flex-direction: column; gap: 0.35rem; transition: border-color .15s;
+}
+.clock-card:hover { border-color: var(--gold); }
+.clock-header { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.clock-icon { font-size: 1.3rem; }
+.clock-icon-large { font-size: 2.2rem; }
+.clock-name { font-weight: 600; color: var(--text); flex: 1 1 auto; min-width: 0; }
+.clock-type, .clock-detail-type { font-size: 0.72rem; color: var(--text3); }
+.clock-status { font-size: 0.72rem; }
+.clock-description { font-size: 0.82rem; color: var(--text2); }
+.clock-progress, .clock-progress-large { display: flex; align-items: center; gap: 0.5rem; }
+.clock-track { flex: 1 1 auto; height: 6px; border-radius: 3px; background: var(--bg4); overflow: hidden; }
+.clock-fill { height: 100%; background: var(--gold); border-radius: 3px; transition: width .3s; }
+.clock-value { font-size: 0.8rem; color: var(--text3); white-space: nowrap; }
+.clock-controls { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+/* --- timeline ------------------------------------------------------------ */
+.timeline-stats { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.timeline-progress { margin-bottom: 0.9rem; }
+.progress-bar { height: 7px; border-radius: 4px; background: var(--bg4); overflow: hidden; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text3); margin-top: 0.2rem; }
+.timeline-items { display: flex; flex-direction: column; gap: 0.4rem; }
+.timeline-item {
+    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.45rem 0.7rem; cursor: pointer;
+}
+.timeline-item:hover { border-color: var(--gold-dark); }
+.item-status { font-size: 0.9rem; }
+.item-title { font-weight: 600; color: var(--text); flex: 1 1 auto; min-width: 0; }
+.item-date { font-size: 0.75rem; color: var(--text3); }
+
+/* --- detail panes -------------------------------------------------------- */
+.item-detail, .clock-detail {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.1rem;
+}
+.item-detail-header, .clock-detail-header {
+    display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border); padding-bottom: 0.6rem; margin-bottom: 0.8rem;
+}
+.item-detail-body, .clock-detail-body { display: flex; flex-direction: column; gap: 0.9rem; }
+.item-detail-section > h4, .clock-detail-section > h4 {
+    color: var(--gold); font-size: 0.9rem; margin: 0 0 0.3rem;
+    text-transform: uppercase; letter-spacing: 0.03em;
+}
+.tag-list { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.item-detail-actions, .clock-detail-actions {
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--border);
+}
