@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-08T14:32:50.687Z",
+  "generated": "2026-09-08T18:19:06.078Z",
   "documents": [
     {
       "id": "gm_guide",
@@ -920,6 +920,95 @@
       "active": true
     },
     {
+      "id": "complete-worldbook",
+      "title": "The Complete Worldbook",
+      "subtitle": "A Gazetteer of the Known Realms",
+      "file": "index.html",
+      "path": "/data/docs/complete-worldbook/",
+      "category": "travel",
+      "categoryLabel": "Travel",
+      "core": false,
+      "active": true,
+      "book": true,
+      "pages": [
+        {
+          "file": "Worldbook-_-01-_-Preface-_-Four-_-Voices-_-At-_-One-_-Table.html",
+          "label": "Chapter 1",
+          "title": "Preface: Four Voices at One Table"
+        },
+        {
+          "file": "Worldbook-_-02-_-The-_-Cartomancers-_-Compass.html",
+          "label": "Chapter 2",
+          "title": "The Cartomancer's Compass"
+        },
+        {
+          "file": "Worldbook-_-03-_-On-_-Obligation-_-And-_-Trade.html",
+          "label": "Chapter 3",
+          "title": "On Obligation and Trade"
+        },
+        {
+          "file": "Worldbook-_-04-_-The-_-Amaranthine-_-Sea-_-&-_-Northern-_-Shores.html",
+          "label": "Chapter 4",
+          "title": "The Amaranthine Sea & Northern Shores"
+        },
+        {
+          "file": "Worldbook-_-05-_-The-_-Northern-_-Reaches.html",
+          "label": "Chapter 5",
+          "title": "The Northern Reaches"
+        },
+        {
+          "file": "Worldbook-_-06-_-The-_-Eastern-_-Dolmis-_-&-_-The-_-Valewood.html",
+          "label": "Chapter 6",
+          "title": "The Eastern Dolmis & The Valewood"
+        },
+        {
+          "file": "Worldbook-_-07-_-The-_-Southern-_-Realms-_-Akilan.html",
+          "label": "Chapter 7",
+          "title": "The Southern Realms (Akilan)"
+        },
+        {
+          "file": "Worldbook-_-08-_-The-_-Way-_-Of-_-Silk.html",
+          "label": "Chapter 8",
+          "title": "The Way of Silk"
+        },
+        {
+          "file": "Worldbook-_-09-_-Dhahara-_-The-_-Kingdom-_-Of-_-Brass.html",
+          "label": "Chapter 9",
+          "title": "Dhahara — The Kingdom of Brass"
+        },
+        {
+          "file": "Worldbook-_-10-_-The-_-Eastern-_-Realms.html",
+          "label": "Chapter 10",
+          "title": "The Eastern Realms"
+        },
+        {
+          "file": "Worldbook-_-11-_-The-_-Spaces-_-Between.html",
+          "label": "Chapter 11",
+          "title": "The Spaces Between"
+        },
+        {
+          "file": "Worldbook-_-12-_-World-_-Travel-_-&-_-Gateways.html",
+          "label": "Chapter 12",
+          "title": "World Travel & Gateways"
+        },
+        {
+          "file": "Worldbook-_-13-_-Story-_-Beat-_-SB-_-Menus.html",
+          "label": "Chapter 13",
+          "title": "Story Beat (SB) Menus"
+        },
+        {
+          "file": "Worldbook-_-14-_-The-_-Ninth-_-Words-_-Of-_-The-_-Black-_-Ledger-_-Of-_-Khasurah.html",
+          "label": "Chapter 14",
+          "title": "The Ninth Words of the Black Ledger of Khasurah"
+        },
+        {
+          "file": "Worldbook-_-15-_-Colophon.html",
+          "label": "Chapter 15",
+          "title": "Colophon"
+        }
+      ]
+    },
+    {
       "id": "the_concordance_fragments",
       "title": "The Concordance Fragments",
       "file": "Fates_-_Edge_-_-The-_-Concordance-_-Fragments.html",
@@ -1264,7 +1353,7 @@
       "active": true
     }
   ],
-  "total_count": 84,
-  "active_count": 84,
+  "total_count": 85,
+  "active_count": 85,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
