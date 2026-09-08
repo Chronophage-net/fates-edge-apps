@@ -51,6 +51,9 @@ const CATEGORY_MAP = {
   // Expansions folder even though each lives in its own book directory.
   'witnessed-prey': { id: 'expansions', label: 'Expansions', path: '/data/docs/witnessed-prey/', book: true },
   'saikou-compendium': { id: 'expansions', label: 'Expansions', path: '/data/docs/saikou-compendium/', book: true },
+  // The Amaranthine is the core setting book: a Travel-category book directory
+  // built by fates-edge-docs/tools/build_travel_books.py.
+  'amaranthine': { id: 'travel', label: 'Travel', path: '/data/docs/amaranthine/', book: true },
 };
 
 const SUBDIRS = Object.keys(CATEGORY_MAP);

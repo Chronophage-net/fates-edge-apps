@@ -290,5 +290,13 @@
   },
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
   "order": "beyond_the_triune",
-  "register": "unclassifiable"
+  "register": "unclassifiable",
+  "appears_in_religions": [
+    {
+      "religion": "still-road",
+      "order": "The Unbroken Way",
+      "note": "The disciplinary and martial Order, and the one outsiders always meet first."
+    }
+  ],
+  "orders_are_masks": "An Order is the shape this Patron takes inside a religion — the office through which it is approached, named and made respectable. The same Patron therefore appears in faiths that despise each other, and rarely at the same rank."
 }

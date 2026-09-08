@@ -247,5 +247,23 @@
   },
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
   "order": "chthonic",
-  "register": "fear"
+  "register": "fear",
+  "appears_in_religions": [
+    {
+      "religion": "twin-flames",
+      "order": "Watchers Against the Maw",
+      "note": "Invoked with the Inquisitor Prime against the unclean dead."
+    },
+    {
+      "religion": "salt-fire",
+      "order": "The Namers",
+      "note": "Keeps the Roll and walks the drowned out."
+    },
+    {
+      "religion": "still-road",
+      "order": "The Pale Shepherd",
+      "note": "Funerary Order; welcome in villages that will not let a monk past the gate."
+    }
+  ],
+  "orders_are_masks": "An Order is the shape this Patron takes inside a religion — the office through which it is approached, named and made respectable. The same Patron therefore appears in faiths that despise each other, and rarely at the same rank."
 }

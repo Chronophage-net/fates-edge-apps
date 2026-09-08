@@ -247,5 +247,13 @@
   },
   "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved.",
   "order": "seraphic",
-  "register": "conviction"
+  "register": "conviction",
+  "appears_in_religions": [
+    {
+      "religion": "covenant-of-mykkiel",
+      "order": "Mykkiel (Orthodox)",
+      "note": "Founder and orthodoxy both: the Arbiter who heard the founding case and found for the plaintiff."
+    }
+  ],
+  "orders_are_masks": "An Order is the shape this Patron takes inside a religion — the office through which it is approached, named and made respectable. The same Patron therefore appears in faiths that despise each other, and rarely at the same rank."
 }

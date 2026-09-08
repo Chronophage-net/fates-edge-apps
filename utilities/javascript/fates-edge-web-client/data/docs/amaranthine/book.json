@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "generated": "2026-09-08T14:35:20.455894+00:00",
+  "id": "amaranthine",
+  "title": "The Amaranthine",
+  "subtitle": "The Core Setting Book",
+  "index": "index.html",
+  "chapters": [
+    {
+      "file": "Amaranthine-_-01-_-Preface-_-Three-_-Voices.html",
+      "label": "Chapter 1",
+      "title": "Preface: Three Voices"
+    },
+    {
+      "file": "Amaranthine-_-02-_-Reference-_-And-_-Navigation.html",
+      "label": "Chapter 2",
+      "title": "Reference and Navigation"
+    },
+    {
+      "file": "Amaranthine-_-03-_-The-_-Cartomancers-_-Compass.html",
+      "label": "Chapter 3",
+      "title": "The Cartomancer's Compass"
+    },
+    {
+      "file": "Amaranthine-_-04-_-On-_-Obligation-_-And-_-Trade.html",
+      "label": "Chapter 4",
+      "title": "On Obligation and Trade"
+    },
+    {
+      "file": "Amaranthine-_-05-_-Travel-_-Reference.html",
+      "label": "Chapter 5",
+      "title": "Travel Reference"
+    },
+    {
+      "file": "Amaranthine-_-06-_-The-_-Amaranthine-_-Sea-_-&-_-Northern-_-Shores.html",
+      "label": "Chapter 6",
+      "title": "The Amaranthine Sea & Northern Shores"
+    },
+    {
+      "file": "Amaranthine-_-07-_-The-_-Northern-_-Reaches.html",
+      "label": "Chapter 7",
+      "title": "The Northern Reaches"
+    },
+    {
+      "file": "Amaranthine-_-08-_-The-_-Eastern-_-Dolmis.html",
+      "label": "Chapter 8",
+      "title": "The Eastern Dolmis"
+    },
+    {
+      "file": "Amaranthine-_-09-_-The-_-Spaces-_-Between.html",
+      "label": "Chapter 9",
+      "title": "The Spaces Between"
+    },
+    {
+      "file": "Amaranthine-_-10-_-The-_-Wilds-_-Dungeons-_-And-_-Ways-_-Between.html",
+      "label": "Chapter 10",
+      "title": "The Wilds, Dungeons, and Ways Between"
+    },
+    {
+      "file": "Amaranthine-_-11-_-The-_-Memory-_-Closes.html",
+      "label": "Chapter 11",
+      "title": "The Memory Closes"
+    },
+    {
+      "file": "Amaranthine-_-12-_-Coda-_-A-_-Random-_-Encounter-_-Not-_-Really-_-At-_-The-_-Three-_-Mugs-_-Inn.html",
+      "label": "Chapter 12",
+      "title": "Coda: A Random Encounter (Not Really) at the Three-Mugs Inn"
+    }
+  ]
+}

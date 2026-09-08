@@ -1,0 +1,160 @@
+{
+  "_comment": "Invoker archetypes: named Symbol combinations for the professional practitioner — the ward-setter with a shingle, the exorcist with a bag, the stage conjuror with a licence. Each is built on ONE canonical rivalry from patron-rivalries.json, so the character's central tension is already in the Cross-Resonance table, plus a third Symbol that complicates it. Three Symbols is 12 XP and deliberately one short of the four that would tax every scene.",
+  "design_note": {
+    "title": "Reading an Archetype",
+    "text": "An archetype is not a class. It is a purchase order: which Symbols to buy, in what order, and what the friction between them will cost you. Everything here resolves with the rules already in this guide — Symbols are 4 XP Minor Assets, invocation marks Obligation, displaying the Symbol buys DV −1 and Obligation −1, Crack the Seal buys instant resolution for +2 Obligation and a Compromised Symbol, and Obligation Capacity is Spirit + Presence. Nothing below adds a subsystem.",
+    "bullets": [
+      "<strong>Three, not four.</strong> Each archetype names three Symbols: 12 XP total, and one short of the four that make the first rite of every scene cost an extra Obligation. The fourth Symbol is available and is always a decision, never a bargain.",
+      "<strong>The spine is a rivalry.</strong> Two of the three Symbols are listed rivals in the Cross-Resonance table. Displaying one while invoking the other is Position one step worse and +1 Obligation. That is not a flaw in the build; it is the build.",
+      "<strong>Buy in order.</strong> The order given is the order the character learned the trade in, and a character partway through it is a perfectly good starting character. One Symbol is a practitioner. Two is a professional. Three is a reputation.",
+      "<strong>The trade is a trade.</strong> These are people with premises, fees, and a waiting list. Play the invoice as seriously as the invocation — half the drama of the profession is being paid in something other than money."
+    ]
+  },
+  "archetypes": [
+    {
+      "id": "doorwright",
+      "name": "The Doorwright",
+      "trade": "Ward-setter, seal-breaker, and unlicensed consultant to the watch",
+      "tagline": "I put the lock on. I know where the lock is weak. Those are the same job, and I charge for both.",
+      "concept": "A tradesman of thresholds. Doorwrights hang wards for merchant houses, seal the cellars of the recently and badly dead, and are called by watch sergeants who would rather not put a name in a report. The work is honest, dull, and steady — until the same skill that closes a door is the only skill on hand that can open one. Doorwrights are notorious for the second half of the job, and are hired anyway, and know it. They tend toward coat, cigarette, and a tone of voice their clients dislike and their clients' enemies dislike more.",
+      "symbols": [
+        {
+          "patron": "The Sealed Gate",
+          "domain": "Thresholds & Containment",
+          "xp": 4,
+          "role": "The trade. Rites that hang, test and hold a boundary. This is what is on the shingle and what pays the rent."
+        },
+        {
+          "patron": "The Riven Path",
+          "domain": "Passion & Power",
+          "xp": 4,
+          "role": "The second half of the job. A chain is not untied but broken. Bought quietly, and usually after a night the Doorwright does not discuss."
+        },
+        {
+          "patron": "Lucky Jack",
+          "domain": "Luck & The Heist",
+          "xp": 4,
+          "role": "The working practitioner's third Symbol: the coin that has never quite failed to land right. Cheap grace for a trade with no pension."
+        }
+      ],
+      "spine": {
+        "rivalry": "The Sealed Gate vs The Riven Path",
+        "canon_friction": "the gate exists to be shattered; closure is an insult; freedom has no lock",
+        "note": "The whole character is here. To ward a house the Doorwright must believe a boundary is sacred; to get into one they must believe no boundary is. Both Symbols are on the same belt. Every scene where both are in play is Position one step worse and an extra Obligation, and the Doorwright pays it without comment because the alternative is turning down work."
+      },
+      "build": {
+        "attributes": "Wits and Spirit lead; Body 2 for the parts of the job that involve a crowbar.",
+        "skills": "Arcana and Lore for the wards themselves; Insight for reading a room and a client; Craft for the physical half of a seal — chalk, salt, iron, mortar; Deception for the invoices.",
+        "obligation": "Capacity is Spirit + Presence, and the Doorwright's Presence is usually the weaker half. The classic failure is a practitioner with excellent judgement and no capacity to carry what that judgement costs."
+      },
+      "signature": {
+        "name": "Crack Your Own Seal",
+        "text": "The move the trade is named for. A Doorwright who hung the ward knows where it is thin, and may Crack the Seal on their own Sealed Gate Symbol to open a boundary they themselves set — instant, +2 Obligation, Symbol Compromised, and the GM gets an SB on the way through. The house they are burgling is usually a house they were paid to protect last season. The client is usually still alive."
+      },
+      "when_it_goes_wrong": "A Compromised Sealed Gate Symbol is an inert ward on the Doorwright's own door. Enemies learn this. The classic disaster is not the job going badly; it is the job going fine and the practitioner coming home to a threshold that no longer objects to visitors.",
+      "hooks": [
+        "A Silkstrand counting-house wants the ward it bought last year tested. The test will show the ward is sound. It will also show the second ward, hung inside the first, by someone else, facing inward.",
+        "A watch sergeant in Ecktoria needs a cellar opened without a Censorate writ, and is offering the one payment a Doorwright cannot refuse: a name struck from a parish register, put back.",
+        "A rival Doorwright is undercutting the fee across three wards and hanging seals that fail in eighteen months. Proving it means breaking one, and breaking one means the family inside is unwarded for a night."
+      ],
+      "homage": "The coat, the debt and the bad attitude; the practitioner listed in a directory who does jobs for the city watch; the abjurer who is best known for the doors he has opened."
+    },
+    {
+      "id": "quiet-coroner",
+      "name": "The Quiet Coroner",
+      "trade": "Exorcist, deposition-taker, and last physician to the already dead",
+      "tagline": "I am not here to release you. I am here to write down what you say, and then release you.",
+      "concept": "Someone has to sit with the ones who did not finish. Quiet Coroners are engaged by families, magistrates, harbour boards and occasionally by the dead themselves; they arrive with a bag, a chalk line, a cheap chair and no hurry. The work is half exorcism and half deposition, and the order matters: a soul that has been laid to rest cannot be questioned, and a soul that is still answering questions has not been laid to rest. The good ones are patient. The great ones are the sort of patient that frightens people.",
+      "symbols": [
+        {
+          "patron": "Varnek Karn, the Death's Negotiator",
+          "domain": "Bargains with the Departed",
+          "xp": 4,
+          "role": "The terms. Rites that hold a departed thing at the table long enough to reach an agreement with it."
+        },
+        {
+          "patron": "The Pale Shepherd",
+          "domain": "The Road Every Body Walks",
+          "xp": 4,
+          "role": "The release. Rites that open the way and walk the dead onto it. This is the half the family sees and the half they pay for."
+        },
+        {
+          "patron": "The Witness",
+          "domain": "Truth & Revelation",
+          "xp": 4,
+          "role": "The record. What was said, exactly, and by whom, in a form a magistrate will accept."
+        }
+      ],
+      "spine": {
+        "rivalry": "The Pale Shepherd vs Varnek Karn",
+        "canon_friction": "shepherd offers peace, Karn demands duty; soul cannot rest; death's duty vs death's silence",
+        "note": "The Coroner is paid twice for opposite things, usually by the same person. The widow wants her husband at peace. The magistrate wants to know who did it. Karn will hold him at the table as long as there are terms to argue; the Shepherd will open the road the moment it is asked. Doing both in one night is Position one step worse and an extra Obligation, and the Coroner does it in one night because the second night is when the family starts hearing him."
+      },
+      "build": {
+        "attributes": "Spirit and Wits; Presence matters more than practitioners expect, because Capacity is Spirit + Presence and this trade fills it fast.",
+        "skills": "Lore and Arcana for the rites; Insight for what the dead are not saying; Sway for the living, who are harder; Craft for the bag — chalk, salt, lamp-oil, the ring itself.",
+        "obligation": "Two death Patrons on one belt is the heaviest routine Obligation load in the guide. Coroners are the reason downtime exists. A Coroner who has not cleared Obligation in three sessions is a horror story about to happen to their own party."
+      },
+      "signature": {
+        "name": "The Deposition",
+        "text": "Ring of salt, one chair, one lamp, and a question list. Invoke Varnek Karn's Rite openly (Symbol displayed: DV −1, Obligation −1) to hold the departed to terms, then the Witness to fix what is said. On a Clean Success the testimony is admissible and true; on a Partial it is true and incomplete in the way that gets someone hanged; on a Miss the thing at the table answers a question that was not asked. Close by invoking the Shepherd. Coroners who skip the closing are called something else within a year."
+      },
+      "when_it_goes_wrong": "A Coroner who takes the testimony and does not open the road has, in the plain language of the trade, kept it. The dead do not object at first. The Shepherd does — a Compromised Shepherd Symbol means the next three funerals in that parish go badly, and everyone will know which practitioner attended the first one.",
+      "hooks": [
+        "A Zakov Namer wants a name added to the Roll of the Drowned, but the drowned man says he was not drowned, and will not say what he was.",
+        "A Covenant court will accept a deposition from the departed as evidence. The opposing advocate is a Recusant, and intends to argue that the witness cannot be sworn because the witness has no standing to lose.",
+        "Nine houses in one street have gone quiet in the polite way. The families are calm, well-fed, and have all engaged the same Coroner, who is very good, and who has not opened a road in a year."
+      ],
+      "homage": "The professional who arrives with a bag and a method; the ghost-finder with his chalk and his lamp and his notebook; the physician of souls who takes a case history first."
+    },
+    {
+      "id": "the-encore",
+      "name": "The Encore",
+      "trade": "Licensed stage conjuror, court entertainer, and occasional truth-teller",
+      "tagline": "Everything you have seen tonight was a trick. Watch closely: this next part is not.",
+      "concept": "A working magician in the vulgar sense — playbills, a hall, a season, a manager taking a cut. The Encore performs impossibilities for money in front of people who have paid to be fooled, which is the single best cover in the Amaranthine for performing an impossibility in front of people who have not. Ecktoria licenses them, Viterra distrusts them, Mab's court adores them, and the cleverest of them use the stage exactly as it was always used: to say the one true thing in a room where nobody is permitted to say true things, and to be applauded for it.",
+      "symbols": [
+        {
+          "patron": "Mab, Queen of Courts",
+          "domain": "Glamour & Bargain",
+          "xp": 4,
+          "role": "The act. Glamour, misdirection, the impossible thing at the end of the second half."
+        },
+        {
+          "patron": "Palinode, Queen of Encores",
+          "domain": "Performance & Rapture",
+          "xp": 4,
+          "role": "The house. Rites that take a room and hold it, and the terrible discipline of giving them what they came for."
+        },
+        {
+          "patron": "Solara, the Still Mirror",
+          "domain": "The Face Without Performance",
+          "xp": 4,
+          "role": "The turn. One moment, without glamour, without the act, looking at one person as yourself. This is the Symbol the profession does not talk about."
+        }
+      ],
+      "spine": {
+        "rivalry": "Mab vs Palinode",
+        "canon_friction": "glamour demands encore; truth offends mask; favour must be sung aloud; court erupts at song's climax",
+        "note": "The mask and the encore want opposite things. Mab's favour is granted quietly and must be repaid in kind; Palinode's is granted to a room and must be repaid in front of it. An Encore who works a masque carries both, and the moment the crowd demands the trick again is the moment the bargain becomes public. Position one step worse, an extra Obligation, and a standing ovation."
+      },
+      "build": {
+        "attributes": "Presence first and by a distance; Wits second. Presence also doubles the Obligation Capacity this build needs.",
+        "skills": "Performance is the trade; Deception is the craft; Sway for managers, censors and patrons; Insight for the one face in the third row that is not enjoying itself; Arcana for the parts that are not tricks.",
+        "obligation": "The most survivable of the three builds — Presence-heavy, so Capacity is generous — and the most likely to spend it all in one night, because Palinode's Obligation is incurred in front of witnesses who will remember the promise."
+      },
+      "signature": {
+        "name": "The Unglamoured Turn",
+        "text": "Once in a performance, drop the act. Display Solara's Symbol — no glamour, no patter, no misdirection — and address one person in the room directly. Treat as a Presence + Insight action at DV set by how badly that person does not want to be seen. A Clean Success means they are seen, by themselves as much as by you, and whatever they were about to do they do not do. It works exactly once per audience, and it works because the hall has spent two hours being lied to beautifully."
+      },
+      "when_it_goes_wrong": "Mab does not mind being used as a stage effect. Palinode does not mind being used as a stage effect. Both mind being used as an alibi. When the act is exposed as cover for real work, the Encore does not lose their power — they lose the hall, the licence and the manager, and a practitioner without a room is a practitioner carrying two Symbols that only function in front of a crowd.",
+      "hooks": [
+        "The company has a three-night licence in a city where the Censorate reads every playbill. Someone has bought the box directly above the stage for all three nights and has not attended.",
+        "A Chain-Lantern in the fourth row is not watching the trick. They are watching the wings, where a nine-year-old with a real talent is holding the props.",
+        "Mab's court has requested the act. Command performance, no fee, no refusal, and the favour will be granted before the encore rather than after — which every Encore knows is how the Queen makes a debt land in front of witnesses."
+      ],
+      "homage": "The evening-dress conjuror whose hypnosis is not a trick; the sorcerer who breaks his staff at the end of the show; the professional illusionist who is a magician twice, and only one of them is billed."
+    }
+  ],
+  "_license": "Fate's Edge Proprietary Content – © 2024 Nicholas A. Gasper. All rights reserved."
+}
