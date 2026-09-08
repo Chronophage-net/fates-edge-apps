@@ -35,6 +35,7 @@ import { showToast } from '@components/Toast.js';
 import { getUserAvatar } from '@core/gravatar.js';
 import {
     connectWebSocket,
+    connectManagedRoom,
     disconnectWebSocket,
     isWSConnected,
     getWSStatus,
@@ -853,6 +854,17 @@ export function render(el) {
                     </label>
                 </div>
                 
+                <details class="panel" id="managed-room-panel">
+                    <summary>Managed room</summary>
+                    <p>In your manager dashboard, open a room and choose <strong>Get connection</strong>. Paste it here to enter with your assigned role.</p>
+                    <label for="managed-room-credential">Room connection</label>
+                    <textarea id="managed-room-credential" rows="3" autocomplete="off" spellcheck="false" maxlength="18000" placeholder="Paste the connection copied from your manager"></textarea>
+                    <p class="text-muted small">Kept only for this connection. After ten minutes, get a fresh connection from the manager. Never paste your account password or an integration API key.</p>
+                    <button class="btn btn-primary" id="managed-room-connect">Enter managed room</button>
+                    <button class="btn btn-secondary" id="managed-room-disconnect">Leave managed room</button>
+                    <p id="managed-room-status" role="status" aria-live="polite"></p>
+                </details>
+
                 <!-- Connection Settings -->
                 <div class="form-row">
                     <div class="field large">
@@ -1716,6 +1728,27 @@ export function attachEvents() {
     document.getElementById('account-register-btn')?.addEventListener('click', registerAccount);
     document.getElementById('account-logout-btn')?.addEventListener('click', logoutAccount);
 
+    document.getElementById('managed-room-connect')?.addEventListener('click', async event => {
+        const field = document.getElementById('managed-room-credential');
+        const status = document.getElementById('managed-room-status');
+        const input = field.value;
+        field.value = '';
+        event.currentTarget.disabled = true;
+        const button = event.currentTarget;
+        try {
+            const { parseManagedConnection } = await import('@core/managed-connection.js');
+            const grant = parseManagedConnection(input);
+            status.textContent = `Connecting to ${grant.serverUrl}…`;
+            const result = await connectManagedRoom(input, document.getElementById('sync-user-name')?.value.trim() || 'Player');
+            status.textContent = `Connected to ${result.room} as ${result.role}. Connection expires at ${new Date(result.expiresAt).toLocaleTimeString()}.`;
+        } catch (error) { status.textContent = error.message; }
+        finally { button.disabled = false; }
+    });
+    document.getElementById('managed-room-disconnect')?.addEventListener('click', () => {
+        disconnectWebSocket();
+        document.getElementById('managed-room-credential').value = '';
+        document.getElementById('managed-room-status').textContent = 'Disconnected.';
+    });
     document.getElementById('sync-connect-btn')?.addEventListener('click', connectToSyncServer);
     document.getElementById('sync-disconnect-btn')?.addEventListener('click', disconnectFromSyncServer);
     document.getElementById('sync-refresh-btn')?.addEventListener('click', () => {

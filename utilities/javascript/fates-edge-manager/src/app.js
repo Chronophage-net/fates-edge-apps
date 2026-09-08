@@ -130,7 +130,7 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
     const claims = { sub: member.account_id, room_id: member.room_id, room_code: member.room_code,
       membership_id: member.id, role: member.role, scope: scopes, authz_version: member.authz_version,
       server_id: node.server_id, placement_version: placement.placement_version, ...(keyId ? { key_id: keyId } : {}) };
-    return { room_id: member.room_id, server_id: node.server_id, placement_version: placement.placement_version,
+    return { room_id: member.room_id, room_code: member.room_code, expires_in: 600, server_id: node.server_id, placement_version: placement.placement_version,
       socket_url: node.public_url, room_token: await tokens.sign(claims) };
   }
 
@@ -184,7 +184,7 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
     const member = await context(tx,req,req.params.roomId,false,true);
     const roster = ['owner','administrator'].includes(member.control_role) ? await many(tx, `SELECT m.account_id,a.username,m.role,m.control_role,m.status
       FROM room_memberships m JOIN accounts a ON a.id=m.account_id WHERE m.room_id=$1 ORDER BY a.username`,[member.room_id]) : [];
-    return { ...member, scopes:scopesFor(member), roster };
+    return { ...member, scopes:scopesFor(member), roster:roster.map(m=>({...m,scopes:scopesFor(m)})) };
   });
   route('patch', '/v1/rooms/:roomId', 'human', async (tx,req) => {
     const member=await context(tx,req,req.params.roomId,true,true);
@@ -242,15 +242,31 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   route('delete','/v1/rooms/:roomId/members/:accountId','human',(tx,req)=>updateMember(tx,req,true));
   route('get','/v1/rooms/:roomId/keys','human',async(tx,req)=>{
     const m=await context(tx,req,req.params.roomId,false,true);
-    return many(tx,`SELECT ${safeKeyFields} FROM api_keys WHERE membership_id=$1 ORDER BY created_at DESC`,[m.id]);
+    return many(tx,`SELECT ${safeKeyFields.split(', ').map(f => `k.${f}`).join(', ')},a.username,m.role,m.account_id
+      FROM api_keys k JOIN room_memberships m ON m.id=k.membership_id JOIN accounts a ON a.id=m.account_id
+      WHERE m.room_id=$1 AND ($2 OR m.account_id=$3) ORDER BY k.created_at DESC`,[m.room_id,m.control_role==='owner',req.account.id]);
   });
-  route('post','/v1/rooms/:roomId/keys','human',async(tx,req)=>issueKey(tx,req,await context(tx,req,req.params.roomId),req.body));
+  route('post','/v1/rooms/:roomId/keys','human',async(tx,req)=>{
+    const actor=await context(tx,req,req.params.roomId);
+    let member=actor;
+    if(req.body.account_id && req.body.account_id!==req.account.id){
+      requireThat(actor.control_role==='owner' && scopesFor(actor).includes('key:manage'),403,'Only the owner may issue another member’s key');
+      member=await one(tx,`SELECT m.* FROM room_memberships m JOIN accounts a ON a.id=m.account_id
+        WHERE m.room_id=$1 AND m.account_id=$2 AND m.status='active' AND a.status='active'`,[actor.room_id,uuid(req.body.account_id)]);
+      requireThat(member,404,'Active member not found');
+      await audit(tx,req,'key.issued-for-member',actor.room_id,member.account_id);
+    }
+    return issueKey(tx,req,member,req.body);
+  });
   async function ownedKey(tx,req) {
     const key=await one(tx,'SELECT * FROM api_keys WHERE id=$1',[uuid(req.params.keyId)]);
     requireThat(key,404,'Key not found');
-    const member=await one(tx,`SELECT m.*,r.room_code,r.authz_version,r.status AS room_status FROM room_memberships m
-      JOIN managed_rooms r ON r.id=m.room_id WHERE m.id=$1 AND m.account_id=$2 AND m.status='active'`,[key.membership_id,req.account.id]);
-    requireThat(member,404,'Key not found'); return {key,member};
+    const member=await one(tx,`SELECT m.*,r.room_code,r.authz_version,r.status AS room_status,a.status AS account_status FROM room_memberships m
+      JOIN managed_rooms r ON r.id=m.room_id JOIN accounts a ON a.id=m.account_id WHERE m.id=$1`,[key.membership_id]);
+    requireThat(member,404,'Key not found');
+    const actor=await context(tx,req,member.room_id,false,true);
+    requireThat(actor.account_id===member.account_id || actor.control_role==='owner',404,'Key not found');
+    return {key,member};
   }
   route('delete','/v1/keys/:keyId','human',async(tx,req)=>{
     const {key,member}=await ownedKey(tx,req);
@@ -258,7 +274,7 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   });
   route('post','/v1/keys/:keyId/rotate','human',async(tx,req)=>{
     const {key,member}=await ownedKey(tx,req);
-    requireThat(member.room_status==='active' && key.status==='active' && new Date(key.expires_at)>new Date(),409,'Key is not active');
+    requireThat(member.status==='active' && member.account_status==='active' && member.room_status==='active' && key.status==='active' && new Date(key.expires_at)>new Date(),409,'Key is not active');
     const replacement=await issueKey(tx,req,member,{label:key.label,scopes:key.scopes});
     await tx.query("UPDATE api_keys SET status='rotating',expires_at=LEAST(expires_at,$2) WHERE id=$1",[key.id,expires(300)]);
     await audit(tx,req,'key.rotated',member.room_id,key.id); return {...replacement,overlap_seconds:300};
@@ -284,6 +300,12 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   route('get','/v1/me/audit','human',(tx,req)=>many(tx,'SELECT action,occurred_at,request_id FROM audit_events WHERE actor_account_id=$1 ORDER BY occurred_at DESC LIMIT 100',[req.account.id]));
   route('get','/v1/nodes','operator',tx=>many(tx,`SELECT n.*,count(p.room_id)::int AS assigned_rooms,
     (n.last_heartbeat_at>now()-interval '60 seconds') AS healthy FROM socket_nodes n LEFT JOIN room_placements p ON p.server_id=n.server_id GROUP BY n.server_id ORDER BY n.name`));
+  route('get','/v1/nodes/:serverId/rooms','operator',async(tx,req)=>{
+    const id=uuid(req.params.serverId);
+    requireThat(await one(tx,'SELECT server_id FROM socket_nodes WHERE server_id=$1',[id]),404,'Node not found');
+    return many(tx,`SELECT r.id,r.name,r.room_code,r.status,p.placement_version,p.status AS placement_status
+      FROM room_placements p JOIN managed_rooms r ON r.id=p.room_id WHERE p.server_id=$1 ORDER BY r.name`,[id]);
+  });
   route('patch','/v1/nodes/:serverId','operator',async(tx,req)=>{
     requireThat(['ready','draining','offline'].includes(req.body.status),400,'Invalid node status');
     const row=await one(tx,'UPDATE socket_nodes SET status=$2 WHERE server_id=$1 RETURNING server_id',[uuid(req.params.serverId),req.body.status]);

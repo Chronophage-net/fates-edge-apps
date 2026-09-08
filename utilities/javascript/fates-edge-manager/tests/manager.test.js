@@ -174,3 +174,37 @@ test('real Socket.IO, plain WebSocket and REST enforce manager claims',async t=>
   assert.equal((await fetch(url.replace(roomA.room_code,roomB.room_code),{headers:{Authorization:`Bearer ${grant.data.room_token}`}})).status,403);
   assert.equal((await fetch(`${url}?apiKey=legacy`,{headers:{Authorization:`Bearer ${grant.data.room_token}`}})).status,403);
 });
+
+test('owners manage integration keys for active members without widening their scopes',async()=>{
+  const room=(await request('/v1/rooms','POST',{name:'Delegated integrations'},alice)).data;
+  const invite=await request(`/v1/rooms/${room.id}/invitations`,'POST',{username:'bob',role:'spectator'},alice);
+  await request(`/v1/invitations/${invite.data.invitation}/accept`,'POST',{},bob);
+  const body={account_id:ids.bob,label:'Bob reader',scopes:['room:connect','room:read']};
+  assert.equal((await request(`/v1/rooms/${room.id}/keys`,'POST',{...body,scopes:['campaign:write']},alice)).status,400);
+  assert.equal((await request(`/v1/rooms/${room.id}/keys`,'POST',{...body,account_id:ids.alice},bob)).status,403);
+  const created=await request(`/v1/rooms/${room.id}/keys`,'POST',body,alice);
+  assert.equal(created.status,200);
+  const visible=await request(`/v1/rooms/${room.id}/keys`,'GET',null,alice);
+  assert.equal(visible.data[0].username,'bob');assert.equal(visible.data[0].role,'spectator');
+  assert.equal(visible.data[0].secret,undefined);
+  assert.equal((await request(`/v1/rooms/${room.id}/keys`,'GET',null,bob)).data.length,1);
+  assert.equal((await request(`/v1/keys/${created.data.id}/rotate`,'POST',{},alice)).status,200);
+  assert.equal((await request(`/v1/keys/${created.data.id}`,'DELETE',null,alice)).status,200);
+  const log=await request(`/v1/rooms/${room.id}/audit`,'GET',null,alice);
+  assert.ok(log.data.some(e=>e.action==='key.issued-for-member' && e.target_id===ids.bob));
+  await request(`/v1/rooms/${room.id}/members/${ids.bob}`,'DELETE',null,alice);
+  assert.equal((await request(`/v1/rooms/${room.id}/keys`,'POST',body,alice)).status,404);
+});
+
+test('operators can inspect node placements; cancelled invites and archived rooms cannot grant access',async()=>{
+  const placements=await request(`/v1/nodes/${nodeId}/rooms`,'GET',null,alice);
+  assert.equal(placements.status,200);assert.ok(placements.data.some(r=>r.id===roomA.id));
+  assert.equal((await request(`/v1/nodes/${nodeId}/rooms`,'GET',null,bob)).status,403);
+  const room=(await request('/v1/rooms','POST',{name:'Closed table'},alice)).data;
+  const invite=await request(`/v1/rooms/${room.id}/invitations`,'POST',{username:'bob',role:'player'},alice);
+  assert.equal((await request(`/v1/rooms/${room.id}/members/${ids.bob}`,'DELETE',null,alice)).status,200);
+  assert.equal((await request(`/v1/invitations/${invite.data.invitation}/accept`,'POST',{},bob)).status,404);
+  assert.equal((await request(`/v1/rooms/${room.id}`,'PATCH',{status:'archived'},alice)).status,200);
+  assert.equal((await request(`/v1/rooms/${room.id}/connect`,'GET',null,alice)).status,409);
+  assert.equal((await request(`/v1/rooms/${room.id}/keys`,'POST',{label:'No',scopes:['room:connect']},alice)).status,409);
+});

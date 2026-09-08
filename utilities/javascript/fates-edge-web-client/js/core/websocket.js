@@ -18,6 +18,7 @@
 import { t as i18nText } from '@core/i18n.js';
 import { getState, importData, saveState, updateState } from './state.js';
 import { showToast } from '@components/Toast.js';
+import { parseManagedConnection } from './managed-connection.js';
 
 // ============================================================
 // CONFIGURATION
@@ -54,6 +55,8 @@ let reconnectAttempts = 0;
 let socketId = null;
 let connectionMode = 'websocket'; // 'socketio' or 'websocket'
 let reconnectTimer = null;
+let managedExpiryTimer = null;
+let cancelManagedConnect = null;
 let pingInterval = null;    // BUGFIX: moved here from inside ws.onopen — it
                              // used to be declared with `let` inside that
                              // closure, which meant the sibling ws.onclose
@@ -298,7 +301,16 @@ function getApiPortOverride() {
 /**
  * Connect to WebSocket server (plain WebSocket mode)
  */
-export function connectWebSocket(room = null, url = null) {
+export function connectManagedRoom(input, name = 'Player') {
+    const grant = parseManagedConnection(input);
+    disconnectWebSocket();
+    return new Promise((resolve, reject) => {
+        const client = connectWebSocket(grant.roomCode, grant.serverUrl, {grant, name, resolve, reject});
+        if (!client) reject(new Error('Could not open the managed room connection.'));
+    });
+}
+
+export function connectWebSocket(room = null, url = null, managed = null) {
     const config = getWSConfig();
     
     // Close existing connection
@@ -315,7 +327,10 @@ export function connectWebSocket(room = null, url = null) {
     clearInterval(pingInterval);
     pingInterval = null;
     clearTimeout(reconnectTimer);
-    
+    clearTimeout(managedExpiryTimer);
+    cancelManagedConnect?.();
+    cancelManagedConnect = managed ? () => managed.reject(new Error('Room connection cancelled.')) : null;
+    isConnected = false;
     const roomName = room || config.room;
     const wsUrl = url || config.url;
     const fullUrl = normalizeWSURL(wsUrl, roomName);
@@ -325,8 +340,13 @@ export function connectWebSocket(room = null, url = null) {
         wsStatus = 'connecting';
         connectionMode = 'websocket';
         
+        const client = ws;
+        let authenticated = false;
+        let pendingInitialState = null;
         const timeoutId = setTimeout(() => {
-            if (ws && ws.readyState !== WebSocket.OPEN) {
+            if (ws === client && (!authenticated && managed || ws.readyState !== WebSocket.OPEN)) {
+                managed?.reject(new Error('The server did not confirm room access.'));
+                if (managed) { disconnectWebSocket(); return; }
                 ws.close();
                 wsStatus = 'timeout';
                 triggerEvent('error', { message: 'Connection timeout' });
@@ -334,7 +354,9 @@ export function connectWebSocket(room = null, url = null) {
             }
         }, CONFIG.CONNECTION_TIMEOUT);
         
-        ws.onopen = () => {
+        const ready = () => {
+            authenticated = true;
+            cancelManagedConnect = null;
             clearTimeout(timeoutId);
             console.log('🔗 WebSocket connected to:', fullUrl);
             reconnectAttempts = 0;
@@ -344,7 +366,7 @@ export function connectWebSocket(room = null, url = null) {
             currentServerUrl = ws.url;          // Store the full WebSocket URL
             cachedApiBase = null;
 
-            socketId = `ws_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+            if (!managed) socketId = `ws_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
             
             const state = getState();
             state.wsStatus = 'connected';
@@ -376,7 +398,20 @@ export function connectWebSocket(room = null, url = null) {
             showToast(i18nText("feature.core.websocket.connectedToServer", null, "Connected to server"), 'success');
         };
         
+        ws.onopen = () => {
+            if (ws !== client) return;
+            if (!managed) { ready(); return; }
+            client.send(JSON.stringify({type:'handshake', roomToken:managed.grant.roomToken, clientName:managed.name}));
+            managedExpiryTimer = setTimeout(() => {
+                disconnectWebSocket();
+                showToast('Your room connection expired. Get a new connection from the manager.', 'warning');
+            }, Math.max(0, managed.grant.expiresAt - Date.now()));
+        };
+
         ws.onclose = (event) => {
+            if (ws !== client) return;
+            managed?.reject(new Error('The managed room connection closed.'));
+            cancelManagedConnect = null;
             clearInterval(pingInterval);
             pingInterval = null;
             clearTimeout(timeoutId);
@@ -393,13 +428,18 @@ export function connectWebSocket(room = null, url = null) {
                 reason: event.reason 
             });
             
+            if (managed && (!authenticated || event.code === 1008 || managed.grant.expiresAt <= Date.now())) {
+                disconnectWebSocket();
+                showToast('Get a new connection from the manager to rejoin this room.', 'warning');
+                return;
+            }
             if (config.reconnect && reconnectAttempts < CONFIG.MAX_RECONNECT) {
                 reconnectAttempts++;
                 const delay = config.reconnectInterval * reconnectAttempts;
                 console.log(`🔄 Reconnecting in ${delay}ms (attempt ${reconnectAttempts}/${CONFIG.MAX_RECONNECT})...`);
                 
                 reconnectTimer = setTimeout(() => {
-                    connectWebSocket(roomName, wsUrl);
+                    connectWebSocket(roomName, wsUrl, managed);
                 }, delay);
             } else if (reconnectAttempts >= CONFIG.MAX_RECONNECT) {
                 console.log('❌ Max reconnect attempts reached');
@@ -410,6 +450,8 @@ export function connectWebSocket(room = null, url = null) {
         };
         
         ws.onerror = (error) => {
+            if (ws !== client) return;
+            managed?.reject(new Error('Could not reach the managed room server.'));
             clearTimeout(timeoutId);
             console.error('WebSocket error:', error);
             wsStatus = 'error';
@@ -418,7 +460,30 @@ export function connectWebSocket(room = null, url = null) {
         
         ws.onmessage = (event) => {
             try {
+                if (ws !== client) return;
                 const data = JSON.parse(event.data);
+                if (managed && !authenticated) {
+                    if (data.type === 'handshake_ack') {
+                        const grant = managed.grant;
+                        if (!data.success || data.serverId !== grant.serverId || data.room_id !== grant.roomId || data.placementVersion !== grant.placementVersion) {
+                            managed.reject(new Error('The server did not confirm the assigned room. Get a new connection.'));
+                            disconnectWebSocket();
+                            return;
+                        }
+                        socketId = data.clientId;
+                        if (pendingInitialState) handleWebSocketMessage(pendingInitialState);
+                        pendingInitialState = null;
+                        ready();
+                        managed.resolve({room: grant.roomCode, role: data.clientRole, expiresAt: grant.expiresAt});
+                    } else if (data.type === 'error') {
+                        managed.reject(new Error('Room access was rejected. Get a new connection from the manager.'));
+                        disconnectWebSocket();
+                        return;
+                    } else {
+                        if (data.type === 'room-state') pendingInitialState = data;
+                        return;
+                    }
+                }
                 handleWebSocketMessage(data);
             } catch (e) {
                 console.error('Failed to parse WebSocket message:', e);
@@ -733,6 +798,10 @@ export function sendWSMessage(data, callback = null) {
  *    would just reconnect anyway, silently undoing the user's action.
  */
 export function disconnectWebSocket() {
+    cancelManagedConnect?.();
+    cancelManagedConnect = null;
+    clearTimeout(managedExpiryTimer);
+    managedExpiryTimer = null;
     clearInterval(pingInterval);
     pingInterval = null;
     clearTimeout(reconnectTimer);
