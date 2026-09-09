@@ -48,6 +48,12 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.1.4] - 2026-09-09
+
+### Other
+- Document revision; formatting for actual humans to read.
+- Added the guide to monks expansion
+
 ## [5.1.3] - 2026-09-09
 
 ### Fixed
