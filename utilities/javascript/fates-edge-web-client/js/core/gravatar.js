@@ -246,7 +246,7 @@ function md5(string) {
         a = md5II(a, b, c, d, x[i + 12], 6, 0x655B59C3);
         d = md5II(d, a, b, c, x[i + 3], 10, 0x8F0CCC92);
         c = md5II(c, d, a, b, x[i + 10], 15, 0xFFEFF47D);
-        b = md5II(b, c, d, a, x[i + 1], 21, 0x85845DD1);
+        b = md5II(b, c, d, a, x[i + 1], 21, 0x82845DD1);
         a = md5II(a, b, c, d, x[i + 8], 6, 0x6FA87E4F);
         d = md5II(d, a, b, c, x[i + 15], 10, 0xFE2CE6E0);
         c = md5II(c, d, a, b, x[i + 6], 15, 0xA3014314);
