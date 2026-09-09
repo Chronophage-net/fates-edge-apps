@@ -53,6 +53,17 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.1.5] - 2026-09-09
+
+### Other
+- Documentation sweep
+- Added copyrights to JSON files.
+- Updated CSS to hide mobile navigation on desktop browsers. Bug introduced two commits ago.
+- Added Epic Play beta doc
+- Updated the manifests
+- Updating broken dark mode for srd.
+- Add dark mode support for HTML SRD documents
+
 ## [5.1.4] - 2026-09-09
 
 ### Other
