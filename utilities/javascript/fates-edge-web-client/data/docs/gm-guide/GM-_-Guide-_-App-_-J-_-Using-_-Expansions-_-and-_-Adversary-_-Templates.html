@@ -1,9 +1,10 @@
 <!-- ============ GM-_-Guide-_-App-_-J-_-Using-_-Expansions-_-and-_-Adversary-_-Templates.html ============ -->
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Fate's Edge GM Guide — Appendix J: Using Expansions / Adversary Templates</title>
 <style>
     :root {
@@ -49,68 +50,77 @@
     hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
     footer { margin-top: 2rem; padding-top: 0.8rem; border-top: 1px solid var(--border); color: var(--text3); font-size: 0.75rem; text-align: center; }
 </style>
-</head>
-<body>
-
-<h1>Appendix J: Using Expansions — A Guide for the Overwhelmed GM</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Appendix J · Using Expansions and Adversary Templates</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-App-_-I-_-Session-_-Zero-_-Checklist.html">Previous chapter</a><a href="GM-_-Guide-_-App-_-K-_-Patron-_-Quick-_-Reference.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Appendix J: Using Expansions — A Guide for the Overwhelmed GM</a></li><li><a href="#reader-section-2">Core Principles</a></li><li><a href="#reader-section-3">The Hybrid Method: Core Story + Borrowed Mechanics</a></li><li><a href="#reader-section-4">Managing Player Expectations</a></li><li><a href="#reader-section-5">Pre-Session Integration Checklist</a></li><li><a href="#reader-section-6">Quick Reference: Expansion Mechanics by Page Count</a></li><li><a href="#reader-section-7">Magic Adjudication Quick Reference (GM)</a></li></ul></details>
+<h1 id="reader-section-1">Appendix J: Using Expansions — A Guide for the Overwhelmed GM</h1>
 <p class="subtitle">Fate's Edge GM Guide — Appendix J</p>
-
 <blockquote>
 <em>"I bought every expansion. Then I sat at my table with thirty-seven PDFs and a blank look. The players were waiting. The beer was warm. I learned that night: you don't use expansions. You borrow from them."</em>
-<span class="attribution">&mdash; The Gray Wanderer, from a letter found under a stack of printouts</span>
+<span class="attribution">— The Gray Wanderer, from a letter found under a stack of printouts</span>
 </blockquote>
-
-<h2>Core Principles</h2>
-<p>Every expansion is a toolbox, not a syllabus. You never <em>must</em> use any rule&mdash;only what solves your current problem.</p>
-
+<h2 id="reader-section-2">Core Principles</h2>
+<p>Every expansion is a toolbox, not a syllabus. You never <em>must</em> use any rule—only what solves your current problem.</p>
 <p><strong>Three Questions Before Opening Any PDF:</strong></p>
 <ol>
 <li><strong>What problem am I solving?</strong> (e.g., "combat feels same-y", "need sea travel").</li>
 <li><strong>What is the smallest piece that solves it?</strong> (e.g., "Seven Bell Court judging table", "Sea travel timers").</li>
 <li><strong>Can I explain it in one minute?</strong> If not, choose smaller.</li>
 </ol>
-
-<p><strong>The 10% Rule:</strong> Use <strong>at most 10% of any expansion per session</strong>. The rest is lore, alternatives, or depth&mdash;ignore it unless the fiction demands more later.</p>
-
-<h2>The Hybrid Method: Core Story + Borrowed Mechanics</h2>
-<p>Build adventures by taking <em>one core activity</em> (tournament, heist, travel) and borrowing <strong>1&ndash;2 mechanics</strong> from expansions that fill specific gaps.</p>
-
+<p><strong>The 10% Rule:</strong> Use <strong>at most 10% of any expansion per session</strong>. The rest is lore, alternatives, or depth—ignore it unless the fiction demands more later.</p>
+<h2 id="reader-section-3">The Hybrid Method: Core Story + Borrowed Mechanics</h2>
+<p>Build adventures by taking <em>one core activity</em> (tournament, heist, travel) and borrowing <strong>1–2 mechanics</strong> from expansions that fill specific gaps.</p>
 <p><strong>Hybrid Recipe:</strong></p>
 <ol>
 <li>Pick your core activity (e.g., "a murder mystery in a port city").</li>
 <li>Identify <em>one gap</em> in core rules (e.g., "investigation lacks clue variety").</li>
-<li>Read <strong>first 5&ndash;10 pages</strong> of 1&ndash;2 expansions until you find a usable mechanic (e.g., "Salt Ledger clue types").</li>
+<li>Read <strong>first 5–10 pages</strong> of 1–2 expansions until you find a usable mechanic (e.g., "Salt Ledger clue types").</li>
 <li>Add <strong>one cultural hook</strong> from lore (e.g., "in this city, sailors never whistle offshore").</li>
 <li>Add <strong>one talent</strong> from player-options (e.g., "give an NPC a talent from <em>Way of the Warrior</em>").</li>
 <li>Run the session. <strong>Ignore every other rule</strong> from the expansions.</li>
 </ol>
-
-<h2>Managing Player Expectations</h2>
+<h2 id="reader-section-4">Managing Player Expectations</h2>
 <p>When players ask for expansion content:</p>
 <ul>
-<li><strong>Yes, but later:</strong> "Yes&mdash;but you'll need to earn it. Find a teacher in the next town."</li>
-<li><strong>No, but:</strong> "No&mdash;but take this core talent and we'll reskin it."</li>
+<li><strong>Yes, but later:</strong> "Yes—but you'll need to earn it. Find a teacher in the next town."</li>
+<li><strong>No, but:</strong> "No—but take this core talent and we'll reskin it."</li>
 <li><strong>Later:</strong> "Not this session. Tell me about it in downtime; we'll build it into your arc."</li>
 </ul>
-
 <p><strong>Expansion Session Zero (start of arc):</strong> Ask players:</p>
 <ol>
 <li>"Which expansions have you read?"</li>
 <li>"What's <em>one thing</em> you'd love to see from an expansion?"</li>
 <li>"What's <em>one thing</em> you absolutely don't want?"</li>
 </ol>
-<p>Feature <em>one expansion</em> prominently for 2&ndash;3 sessions, then rotate.</p>
-
-<h2>Pre-Session Integration Checklist</h2>
-<p><strong>30&ndash;60 minutes before:</strong></p>
+<p>Feature <em>one expansion</em> prominently for 2–3 sessions, then rotate.</p>
+<h2 id="reader-section-5">Pre-Session Integration Checklist</h2>
+<p><strong>30–60 minutes before:</strong></p>
 <ul>
-<li>Select 1&ndash;3 expansions; write names on index card.</li>
-<li>Extract 1&ndash;2 mechanics per expansion; write as single sentences on card.</li>
+<li>Select 1–3 expansions; write names on index card.</li>
+<li>Extract 1–2 mechanics per expansion; write as single sentences on card.</li>
 <li>Prepare <strong>one page of reference</strong> (print only relevant tables/talent lists).</li>
 <li>Note page numbers for quick lookup.</li>
-<li>Check for mechanic conflicts (e.g., two Boon uses)&mdash;drop one if found.</li>
+<li>Check for mechanic conflicts (e.g., two Boon uses)—drop one if found.</li>
 </ul>
-
 <p><strong>During session:</strong></p>
 <ul>
 <li>Announce the mechanic: "Tonight we're using Seven Bell Court judging."</li>
@@ -118,37 +128,33 @@
 <li>Let players opt out (use core rules instead).</li>
 <li>If a mechanic slows play &gt;2 minutes, simplify or drop it for the scene.</li>
 </ul>
-
 <p><strong>Post-session (5 minutes):</strong></p>
 <ul>
 <li>Ask: "What expansion mechanic worked? What didn't?"</li>
-<li>Note which pages you <em>actually</em> used&mdash;toss the rest.</li>
+<li>Note which pages you <em>actually</em> used—toss the rest.</li>
 <li>Decide: reuse? If yes, file the page in your GM binder.</li>
 </ul>
-
-<h2>Quick Reference: Expansion Mechanics by Page Count</h2>
+<h2 id="reader-section-6">Quick Reference: Expansion Mechanics by Page Count</h2>
 <p><strong>If short on time, read only these pages:</strong></p>
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>Expansion</th><th>Key Pages to Read</th></tr></thead>
 <tbody>
-<tr><td>Seven Bell Court (duels/social combat)</td><td>5&ndash;7 (judging table: Form/Spirit/Intent)</td></tr>
-<tr><td>Vhasia: The Knave's Regret (honor, investigation)</td><td>1&ndash;3 (opening fiction), 25&ndash;27 (talents)</td></tr>
-<tr><td>The Amaranthine Sea (sea travel, naval combat)</td><td>9&ndash;11 (travel timers [4&ndash;8], Inspection procedure)</td></tr>
-<tr><td>Witches of Fate's Edge (threshold magic, curses)</td><td>i&ndash;iv (first principles), 89&ndash;91 (Threshold working)</td></tr>
-<tr><td>Horror Campaigns (psychological tension, dread)</td><td>5&ndash;6 (Dread Timer), 8&ndash;9 (breaking points)</td></tr>
-<tr><td>Dragon's Lair (dungeon crawling, ancient lairs)</td><td>3&ndash;5 (lair generator), 21 (dragon moves)</td></tr>
-<tr><td>The Salt Ledger (investigation, folk horror)</td><td><em>Any single story</em>&mdash;use as adventure seed</td></tr>
+<tr><td>Seven Bell Court (duels/social combat)</td><td>5–7 (judging table: Form/Spirit/Intent)</td></tr>
+<tr><td>Vhasia: The Knave's Regret (honor, investigation)</td><td>1–3 (opening fiction), 25–27 (talents)</td></tr>
+<tr><td>The Amaranthine Sea (sea travel, naval combat)</td><td>9–11 (travel timers [4–8], Inspection procedure)</td></tr>
+<tr><td>Witches of Fate's Edge (threshold magic, curses)</td><td>i–iv (first principles), 89–91 (Threshold working)</td></tr>
+<tr><td>Horror Campaigns (psychological tension, dread)</td><td>5–6 (Dread Timer), 8–9 (breaking points)</td></tr>
+<tr><td>Dragon's Lair (dungeon crawling, ancient lairs)</td><td>3–5 (lair generator), 21 (dragon moves)</td></tr>
+<tr><td>The Salt Ledger (investigation, folk horror)</td><td><em>Any single story</em>—use as adventure seed</td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
-
-<h2>Magic Adjudication Quick Reference (GM)</h2>
-
+<h2 id="reader-section-7">Magic Adjudication Quick Reference (GM)</h2>
 <div class="panel panel-red">
 <h3>Default Magic DV</h3>
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>Effect scope</th><th>DV</th></tr></thead>
 <tbody>
 <tr><td>Cantrip (1 tag)</td><td>2</td></tr>
@@ -156,32 +162,27 @@
 <tr><td>Ritual (small, 3 tags)</td><td>4</td></tr>
 <tr><td>Ritual (large, dangerous tags)</td><td>5+</td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
-
 <p><strong>Free Casting (TAGS):</strong></p>
 <p><code>DV = 1 + #tags (dangerous tags: +2 instead of +1)</code></p>
 <p><em>Dangerous tags:</em> Leap, Fold, Gate, Gravity, Create, Summon, Transmute, Animate, Transform, Dominate, Rewind, Resurrect.</p>
-
 <p><strong>Backlash:</strong> Spend SB from 1s. Severity by Position:</p>
 <ul>
 <li>Dominant: minor (one SB complication, a manageable cost)</li>
-<li>Controlled: moderate (1&ndash;2 SB, a temporary setback, a Condition)</li>
-<li>Desperate: severe (2&ndash;3 SB, lasting consequences &mdash; this is where Harm lives)</li>
+<li>Controlled: moderate (1–2 SB, a temporary setback, a Condition)</li>
+<li>Desperate: severe (2–3 SB, lasting consequences — this is where Harm lives)</li>
 </ul>
-
 <p><strong>Rites (Runekeepers &amp; Invokers):</strong></p>
-<p><code>DV = max(ObligationCost &minus; Spirit, Tier: Low=1, Standard=2, High=3)</code></p>
-<p><em>Obligation overflow:</em> Exceed Capacity (Spirit+Presence) &rarr; 1 Fatigue/segment. Exceed 2&times;Capacity &rarr; +1 Harm, Patron intrusion.</p>
-
+<p><code>DV = max(ObligationCost − Spirit, Tier: Low=1, Standard=2, High=3)</code></p>
+<p><em>Obligation overflow:</em> Exceed Capacity (Spirit+Presence) → 1 Fatigue/segment. Exceed 2×Capacity → +1 Harm, Patron intrusion.</p>
 <p><strong>Healing Magic:</strong></p>
 <ul>
 <li><strong>[HEAL] only:</strong> Restores 1 Fatigue. DV 2. 1 action.</li>
-<li><strong>Healing Harm:</strong> DV = 1 + number of tags, plus a <strong>+2 surcharge</strong>. <em>[HEAL]</em> alone is DV 4; <em>[HEAL][PURIFY]</em> is DV 5. A second tag is optional &mdash; it names what is wrong, and should do more than a generic mending. Requires two actions unless Pushed.</li>
+<li><strong>Healing Harm:</strong> DV = 1 + number of tags, plus a <strong>+2 surcharge</strong>. <em>[HEAL]</em> alone is DV 4; <em>[HEAL][PURIFY]</em> is DV 5. A second tag is optional — it names what is wrong, and should do more than a generic mending. Requires two actions unless Pushed.</li>
 <li><strong>Ritual healing (Harm 2+):</strong> Requires Extended ritual (timer), rare components.</li>
 </ul>
-
 <p><strong>Summoning:</strong></p>
 <ul>
 <li><strong>Call:</strong> 1 action, spirit manifests.</li>
@@ -190,15 +191,13 @@
 <li><strong>Boon Finesse:</strong> Once/round, spend 1 Boon to clear 1 Leash tick.</li>
 <li><strong>Leash full:</strong> Spirit acts once to its nature, then departs (or turns hostile).</li>
 </ul>
-
 <p><strong>Cantors (Songs):</strong></p>
 <ul>
-<li><strong>Sing:</strong> 1 action, resolves next turn. Roll Lore + Performance (DV 2&ndash;3).</li>
+<li><strong>Sing:</strong> 1 action, resolves next turn. Roll Lore + Performance (DV 2–3).</li>
 <li><strong>Push:</strong> Resolve immediately, mark 1 Fatigue, advance Corruption Timer by 1.</li>
-<li><strong>Corruption Timer:</strong> Size = Spirit. When full &rarr; bloom (gain benefit &amp; burden from last patron), reset to Tier (min 1).</li>
-<li><strong>Resonant Rite:</strong> Performance with 10+ witnesses &rarr; may found Chorus (minor follower benefit, Obligation to patron each session).</li>
+<li><strong>Corruption Timer:</strong> Size = Spirit. When full → bloom (gain benefit &amp; burden from last patron), reset to Tier (min 1).</li>
+<li><strong>Resonant Rite:</strong> Performance with 10+ witnesses → may found Chorus (minor follower benefit, Obligation to patron each session).</li>
 </ul>
-
 <p><strong>Patron Intrusions (Obligation overflow or GM spends 2+ SB):</strong></p>
 <ul>
 <li>Demand a quest ("Find my stolen symbol.")</li>
@@ -206,16 +205,13 @@
 <li>Send an omen ("Candles burn blue; you feel watched.")</li>
 <li>Summon a rival servant ("Another follower of Malachai is hunting you.")</li>
 </ul>
-
 <p><strong>Common Magic Rulings:</strong></p>
 <ul>
 <li><strong>Countermagic:</strong> [COUNTER] tag vs. DV = spell's DV. Success cancels.</li>
-<li><strong>Dispel:</strong> [DISPEL] vs. DV = effect's Tier (1&ndash;5). On hit, effect ends.</li>
+<li><strong>Dispel:</strong> [DISPEL] vs. DV = effect's Tier (1–5). On hit, effect ends.</li>
 <li><strong>Wards:</strong> [WARD] vs. Outsider. DV = target's Cap. Crosser adds DV to Leash.</li>
 <li><strong>Line of sight:</strong> Required for most spells; without it +1 DV.</li>
 </ul>
-
 <footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-
-</body>
+</article></body>
 </html>

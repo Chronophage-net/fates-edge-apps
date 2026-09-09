@@ -1,6 +1,7 @@
 <!-- ============ Fates_-_Edge_-_-Annotated_-_Play_-_Session_-_-Epic_-_Tier.html ============ -->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8"/>
 <meta content="Fate's Edge companion doc" name="generator"/>
@@ -204,16 +205,34 @@
     .tracker .box.filled-gold { background: var(--gold); border-color: var(--gold); }
     .tracker .box.filled-purple { background: var(--purple); border-color: var(--purple); }
 </style>
-</head>
-<body>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Resources · table aid</strong></p><p>Use this document for the task named in its title. A reference table or worked example is easier to use after you have read the corresponding procedure; return to the SRD or guides when timing or context is unclear.</p><nav aria-label="Library reading links"><a href="Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">🎲 Fate's Edge</a></li><li><a href="#reader-section-2">An Annotated Play Session — Epic Tier</a></li><li><a href="#how-to-use">📖 How to Use This Document</a></li><li><a href="#cast">🎭 The Table: Six Years Later</a></li><li><a href="#ledger">Scene 1 — The Ledger Room</a></li><li><a href="#vote">Scene 2 — The Vote of the Nine Cuffs</a></li><li><a href="#line">Scene 3 — Holding the Cut</a></li><li><a href="#price">Scene 4 — Inaea's Price</a></li><li><a href="#stand">Scene 5 — The Ward Beneath the Archivolt</a></li><li><a href="#wrap">Session Wrap-Up</a></li><li><a href="#gm-takeaways">🎬 GM Takeaways — What Changes at Tier IV</a></li><li><a href="#player-takeaways">🎲 Player Takeaways — Four Players, Six Years Later</a></li><li><a href="#cheatsheet">📋 Quick-Reference Cheat Sheet — Epic Tier</a></li></ul></details>
 <div class="wrap">
-
 <header>
-<h1>🎲 Fate's Edge</h1>
-<h2 class="subtitle">An Annotated Play Session — Epic Tier</h2>
+<h1 id="reader-section-1">🎲 Fate's Edge</h1>
+<h2 class="subtitle" id="reader-section-2">An Annotated Play Session — Epic Tier</h2>
 <p class="text-muted">Six years on from <em>The Approach</em>. Same table, same four characters, Tier IV.</p>
 </header>
-
 <details class="toc" open="open">
 <summary>Contents</summary>
 <a href="#how-to-use">How to Use This Document</a>
@@ -228,59 +247,48 @@
 <a href="#player-takeaways">Player Takeaways — Four Players, Six Years Later</a>
 <a href="#cheatsheet">Quick-Reference Cheat Sheet — Epic Tier</a>
 </details>
-
 <h2 id="how-to-use">📖 How to Use This Document</h2>
 <div class="panel panel-gold">
 <p>This is the sequel to <em>An Annotated Play Session</em>, and it assumes you have read it — or at least that you know how the 90-second loop, Position, DV and the Outcome Matrix work. Everything demonstrated there still applies here without restatement. What this document is <em>for</em> is the thing that surprises tables when they arrive: <strong>the rules do not change at Tier IV, and the game changes completely anyway.</strong></p>
 <p class="text-sm text-muted">Same three annotation colours: <span class="badge badge-gold">GM Guide</span> for a GM-facing procedure, <span class="badge badge-green">Player Guide</span> for a player-facing one, <span class="badge badge-purple">Rule</span> for a reminder of the underlying mechanic. Where this session leans on <em>GM Guide Chapter 11 — Tier IV &amp; V</em>, the box says so.</p>
 </div>
-
 <div class="panel panel-blue mt-1">
 <p><strong>The one-sentence version of Epic Tier:</strong> the party's dice pools got bigger, so the old work stopped paying — and the answer is not to accept poverty, it is to <em>go after bigger work</em>.</p>
 <p class="text-sm text-muted">Chapter 11 puts half of it plainly: <em>"Boons do not come from winning. They come from struggling."</em> A Tier IV party rolling eight dice against DV 3 succeeds cleanly all evening and earns nothing. The other half is the half tables miss: <strong>that is a signal, not a condition.</strong> A party permanently at zero Boons has outgrown its own scores. The cure is escalation — targets the party chooses that are genuinely harder — and what it buys back is the Misses and Partials that fund everything else.</p>
 </div>
-
 <div class="panel panel-orange mt-1">
 <p class="text-gold"><strong>Escalation is not inflation.</strong></p>
 <p class="text-sm">These get confused constantly, and they are opposites. <em>Inflation</em> is the GM quietly raising the DV on the same old obstacles so a powerful party still sweats — it starves the table and punishes the players for investing in their sheets. <em>Escalation</em> is the party going after a harder target, which is <em>allowed to be DV 4 or 5 because it is genuinely a harder target</em>. Chapter 2 gives the canonical shape: a Tier I rogue picks locks, a Tier III rogue picks <em>better</em> locks, and a Tier V rogue does not pick locks at all — she negotiates with the door's spirit or bribed the locksmith last month.</p>
 <p class="text-sm text-muted">Watch for it below. Everything the party runs into <em>incidentally</em> tonight is DV 3, or no roll at all. The two genuinely hard things — the vote and the ward under the Archivolt — are both things they <strong>went looking for</strong>, and both are priced accordingly. And the hardest of them is not a single roll at all: it is a Timer, which is what a truly epic obstacle should almost always be.</p>
 </div>
-
 <h2 id="cast">🎭 The Table: Six Years Later</h2>
 <p>Six years after the party took the Symbol out of Castellan Voss's reliquary, Silkstrand is theirs in every way that does not appear on a map. They hold charters, a garrison, a name. The Symbol they recovered made them creditors of a terrestrial patron — and creditors, in Silkstrand, eventually become debtors. Tonight the ledger is opened in public.</p>
 <p class="text-sm text-muted">Same GM (Jess), same four players, same four characters. Everyone is Tier IV (151–220 XP). Nobody has more than one Boon.</p>
-
 <div class="grid-2 mt-1">
-
 <div class="persona-card">
 <h4>🛡️ Mateo — <span class="text-muted">Warden of the Cut</span></h4>
 <div class="role">Body 5, Melee 4, Endurance 3. Heavy armour. Player: <strong>Priya</strong></div>
 <div class="attitude">Priya still plans, but what she plans is now other people. She commands the <strong>Cut Garrison</strong> (Cap 4 Follower) and holds the <strong>Iron Gate</strong> (Major Asset, Maintained). Her note card no longer tracks her Fatigue — it tracks two Battle Timers and whose turn it is to be relieved. Her Tier I habit of asking for the DV before committing has become asking <em>what happens on a Partial</em>, which is the Tier IV version of the same question.</div>
 </div>
-
 <div class="persona-card">
 <h4>🗡️ Lyra — <span class="text-muted">Thread-Holder</span></h4>
 <div class="role">Wits 4, Stealth 4, Insight 3, Body 2. Player: <strong>Devon</strong></div>
 <div class="attitude">Devon's improvising has not calmed down; it has gained infrastructure. He runs <strong>the Rust Thread</strong> (Cap 3 Follower network) and keeps a <strong>Cache</strong> (Standard Asset). He is also the player who adapted fastest to Boon scarcity, because he never hoarded them in the first place — Chapter 11 notes exactly this, that chaos players thrive at high tier. He spends what he has and then plays without a net, cheerfully.</div>
 </div>
-
 <div class="persona-card">
 <h4>🎻 Sera — <span class="text-muted">Voice of the Dyed Web</span></h4>
 <div class="role">Presence 5, Sway 4, Insight 3, Spirit 2. Obligation Capacity 7. Player: <strong>Naomi</strong></div>
 <div class="attitude">The quiet one is now the one who speaks. Naomi's character carries the party's terrestrial patronage — <strong>the Dyed Web of Silkstrand</strong> — which means the table's political scenes route through her by design, not by the GM dragging her in. Six years ago Jess had to ask her leading questions to get her into a scene. Tonight Jess's job is the opposite: give her the floor and get out of the way.</div>
 </div>
-
 <div class="persona-card">
 <h4>🐦‍⬛ Khor — <span class="text-muted">Pact-Whisperer of the Web</span></h4>
 <div class="role">Spirit 4, Presence 4, Arcana 4, Lore 3. Obligation Capacity 8. Player: <strong>Ollie</strong></div>
 <div class="attitude">Ollie spent six years treating Obligation as a resource to min-max. He is now bound to <strong>Inaea, Angel of the Spider</strong>, whose entire domain is <em>webs of obligation</em> — debts, promises, favours and the ties that bind. The character optimised for carrying debt now serves the thing that collects it. Jess did not engineer this to punish him; he built it, and she is simply letting it mean something.</div>
 </div>
-
 </div>
-
 <div class="panel panel-orange mt-1">
 <p><strong>What the party holds, and what holds them.</strong> Written on the table where everyone can see it, because at this tier the sheet is not where the interesting numbers live.</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>Held</th><th>What it is</th><th>What it costs</th></tr></thead>
 <tbody>
 <tr><td><strong>The Iron Gate</strong> <span class="badge badge-gold">Major Asset</span></td><td>The eastern gatehouse and its writ of toll. Free Use: passage and detention in the Cut without a roll.</td><td>Maintained only while the garrison is paid. Neglect ticks <em>Charter Review</em> <span class="badge badge-purple">[6]</span>.</td></tr>
@@ -289,363 +297,212 @@
 <tr><td><strong>The Dyed Web</strong> <span class="badge badge-green">Terrestrial patron</span></td><td>Guild and information network, Tier III. Forged seals, dock tariffs, the Archivolt's back rooms.</td><td>Party Obligation to the Web: <strong>4</strong>. When it fills, the Web names a single contract that cannot be refused.</td></tr>
 <tr><td><strong>Inaea</strong> <span class="badge badge-purple">Cosmic patron</span></td><td>The Angel of the Spider. Khor's rites, and the Web-Sense that reads a debt between two people like a drawn line.</td><td>Khor's personal Obligation: <strong>7</strong> of Capacity <strong>8</strong>.</td></tr>
 </tbody>
-</table></div>
+</table></div></div>
 </div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Do Not Design Adventures Like Tier I</span>Chapter 11 is blunt about it: <em>"Linear dungeons and small-scale fetch quests feel beneath legendary heroes. Instead, give them systemic problems."</em> The Tier I session was a building with a thing inside it. This one is a debt with a city around it. Notice that Jess did not make the <em>rolls</em> harder to earn that difference — she changed what a roll is <em>about</em>.</div>
-
 <div class="scene-banner">
 <h2 id="ledger">Scene 1 — The Ledger Room</h2>
 <div class="sub">Demonstrates: Boon scarcity as the real difficulty curve, abstracting the mundane, Asset Free Use, and asking for the Partial instead of the DV</div>
 </div>
-
 <div class="transcript">
-
 <div class="line gm"><span class="speaker">GM:</span> The Archivolt's ledger room, an hour before the guild sits. Four clerks, one door, and a strongbox that would have been the whole of a session six years ago. Lyra — you want the ledger.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> I want the ledger. Do I need to roll for the box?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> No. You've been opening boxes like that for six years and you have a Cache full of tools you made yourself. The box opens. What I want a roll for is the part that's actually uncertain: whether you can put it back in a state where nobody knows it was read.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Abstract the Mundane</span>Chapter 11: <em>"At high tiers, do not roll for climbing walls or picking common locks. Assume competence. Save rolls for choices that matter."</em> This is the single fastest way to make a table <em>feel</em> Tier IV, and it costs nothing. Jess did not give Lyra a bonus for being a legend — she stopped asking her to prove it, and moved the roll to the interesting half of the sentence.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Love that. Wits 4 + Stealth 4, eight dice. What am I rolling against?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Controlled, DV 3. And before you roll — a Partial here means you get the numbers but you leave a thread. Someone will know the box was read, they just won't know by whom, tonight.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> That's the question I want answered every time now, honestly. Not "what's the DV," but "what does a Partial cost me." At this tier the DV barely moves.</div>
-
 <div class="annotation playerside"><span class="tag">Player Guide — What to Ask For at Tier IV</span>Priya's habit has evolved correctly. At Tier I, knowing the DV told you whether to commit. At Tier IV your pool clears DV 3 most of the time, so the DV tells you almost nothing — the <em>consequence ladder</em> is where the information is. Chapter 11's scene-design questions are written for the GM, but they work just as well read aloud: what changes on a success, what compromises emerge on a Partial, what new danger arrives on a Miss.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Eight dice. <span class="roll">🎲 <span class="die die-success">9</span> <span class="die die-success">7</span> <span class="die die-success">6</span> <span class="die die-blank">5</span> <span class="die die-blank">4</span> <span class="die die-blank">3</span> <span class="die die-blank">2</span> <span class="die die-success">8</span></span> Four Successes, no ones. Clean.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Clean Success. You read it, you close it, and there is no thread. Here's what the ledger says: the Web has been paying the garrison's wages for eleven months. Not the city. The Web.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> ...and no Boon for that, right?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> No Boon. Four successes, no ones, no cost — the system gave you exactly what you asked for and nothing to spend later.</div>
-
 <div class="annotation rule"><span class="tag">Rule — Boons Come From Struggling</span>Miss: 2 Boons. Partial: 1 Boon. Clean Success or Success with SB: none. That is the whole curve, and it is why a Tier IV party is <em>poor</em>. Eight dice against DV 3 produces a Clean Success far more often than five dice did, so the party that rolls well all evening arrives at the hard scene with an empty pocket. Chapter 11 calls this brittleness and says to embrace it: <em>"your power comes from skill, not luck."</em></div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Wait. If the Web is paying my garrison, then when the Web calls its contract in, my ninety spears are — whose, exactly?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> That's the session. Do you want to check the wage rolls yourself, or do you want to be at the vote?</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Ardo checks the wage rolls. That's a Cap 4 follower doing exactly what a lieutenant is for — he rolls it while I'm in the room upstairs.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Good. Ardo rolls 4d10 against DV 3, off-screen, and I'll tell you what he finds when you next see him. That's the Iron Gate earning its keep, too — you don't roll to get into your own gatehouse's paymaster records.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 07 — Cap and Free Use</span>Two different tools in one beat. <strong>Cap</strong> governs what a Follower does unaided: a Cap 4 Follower rolls 4d10 at a DV you set, and is competent enough to be sent away with a job. <strong>Free Use</strong> is an Asset's standing benefit while it is <em>Maintained</em> — the Iron Gate's paymaster records are simply available, no roll, because the party holds the gatehouse. Delegating the boring roll to Ardo let Priya be in the scene that mattered without the party losing the information.</div>
-
 </div>
-
 <div class="scene-banner">
 <h2 id="vote">Scene 2 — The Vote of the Nine Cuffs</h2>
 <div class="sub">Demonstrates: scaling with stakes instead of DV, the Royal Vote pattern, faction timers, and a terrestrial patron with its own agenda</div>
 </div>
-
 <div class="transcript">
-
 <div class="line gm"><span class="speaker">GM:</span> Nine guild-cuffs around a table the colour of dried blood. Master Valeria has not worn gloves in thirty years and does not start tonight. The motion on the floor is whether the Cut's toll charter stays with your garrison or reverts to the guild. Sera — they're looking at you.</div>
-
 <div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Right. I'm not asking them to be generous, I'm reminding them what the Cut was like before we held it. Presence 5 + Sway 4 — nine dice.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Before you roll, here's the whole ladder, out loud, because you should be choosing whether to roll at all. Clean Success: the charter stays, unconditionally. Success with SB: it stays and I spend the beat — Valeria attaches a condition you will not like. Partial: the vote is <em>deferred</em>, and a new timer opens, <em>Charter Review</em> <span class="badge badge-purple">[6]</span>, which the guild advances whether or not you're in the room. Miss: it reverts, and the Web is your landlord by morning.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — The Royal Vote</span>This is Chapter 11's worked example, run at the table almost line for line: <em>"No DV was inflated. The stakes did the work."</em> The DV here is 4 — hard, hostile conditions, active resistance — and it would have been 4 for a Tier I party too. What makes it an epic scene is that all four rungs of the Outcome Matrix change the shape of the campaign, and the players can see that before they commit.</div>
-
 <div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Nine dice, DV 4. <span class="roll">🎲 <span class="die die-success">10</span> <span class="die die-success">8</span> <span class="die die-success">7</span> <span class="die die-blank">5</span> <span class="die die-blank">4</span> <span class="die die-blank">4</span> <span class="die die-blank">3</span> <span class="die die-blank">2</span> <span class="die die-sb">1</span></span> The 10 is two, plus the 8 and the 7 — four Successes, one Story Beat.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Four meets DV 4, and there's a 1 on the table. Success with SB. You keep the charter — and I'm spending that Beat now. Valeria signs, and as she signs she says: "The Cut keeps its gate. The Web keeps its wages. We will want a name from you before the season turns." She doesn't say whose name.</div>
-
 <div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Do I get a Boon for that?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> No — a Success with SB pays nothing. You won. Winning is the thing that doesn't pay.</div>
-
 <div class="annotation playerside"><span class="tag">Player Guide — Winning Is Not Income</span>Naomi asking is the right instinct and the answer is the lesson. A Tier I party that fought its way through a scene came out the far side <em>richer</em>, because it missed and partialed along the way. A Tier IV party that executes cleanly comes out with the win and nothing else. If you want a cushion for the end of the night, you cannot earn it by succeeding — you have to build it beforehand out of Assets, Followers and Bonds, or take on debt to buy it.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> I want to know who they're going to ask for. Web-Sense — I look at Valeria and the cuff to her left and I want the thread between them.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> That's a Corruption-tier benefit of Inaea's, once per scene, and it costs you Fatigue rather than a roll. You take 1 Fatigue and you see it: the debt runs from Valeria <em>to</em> the man on her left, not the other way around. She owes him. Whatever name they want, he chose it.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> Fatigue for information with no roll is a great trade and I'd like the record to show I said that before it goes wrong.</div>
-
 <div class="annotation rule"><span class="tag">Rule — Substituting Fatigue</span>A player may pay 1 Fatigue in place of 1 Boon, and Chapter 11 calls this a <em>lifeline</em> at high tiers precisely because Boons have dried up. Jess is applying it to a patron gift rather than a re-roll, which is the same principle: at Tier IV, Fatigue is the currency you still generate, so it becomes the one you spend. The guidance asks for a narrative cost attached, and this one arrives in Scene 4 rather than immediately.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Charter Review didn't open, though. We avoided the timer.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> You avoided <em>that</em> one. <em>The Web's Contract</em> <span class="badge badge-purple">[4]</span> has been running since before tonight and it's at three. It advances on the Web's schedule, not yours.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Faction Timers Advance Regardless</span><em>"Advance long-term threats (War [8]) regardless of player success in individual scenes."</em> This is how a GM keeps pressure on a party that is genuinely good at its job. The party can win every roll in the building and the faction timer still ticks, because it is not a measure of how the party is doing — it is a measure of what someone else is doing while they are busy. Jess showed the number rather than sprung it.</div>
-
 </div>
-
 <div class="scene-banner">
 <h2 id="line">Scene 3 — Holding the Cut</h2>
 <div class="sub">Demonstrates: armies as high-Cap Followers, Battle Timers, leadership rolls instead of soldier-by-soldier resolution, and Follower Sacrifice as a Boon substitute</div>
 </div>
-
 <div class="transcript">
-
 <div class="line gm"><span class="speaker">GM:</span> Two hours later, someone is testing the Cut. Not an army — forty men with a battering frame and no banner, which is worse, because a banner would tell you who to bill. Mateo, you're on the gate with Ardo and ninety spears.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Do I roll Melee forty times?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> You do not. Two timers. <em>Hold the Gate</em> <span class="badge badge-purple">[6]</span> — theirs, it fills as they get the frame into position. <em>Break Their Nerve</em> <span class="badge badge-purple">[4]</span> — yours, it fills as the garrison makes the cost of this obvious. You give orders; the garrison rolls. First order?</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Let Players Command Armies</span><em>"Treat armies as high-Cap followers. Use Battle Timers (4–6 segments) for skirmishes. Do not resolve each soldier's attack — abstract with leadership rolls."</em> Two opposed timers turn a battle into a race the whole table can read at a glance, and it puts the interesting decision — <em>what do I spend the garrison on</em> — where the player actually is. Note that Mateo is not rolling Melee at all in this scene. He is Body 5, Melee 4, and none of that is the point any more.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Ardo takes thirty spears to the flank stair and makes noise like there are ninety. Presence 3 + Sway... except that's not my strong pair. Can Ardo just do it?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> He can. Cap 4, rolling 4d10 unaided against DV 3 — that's what a lieutenant is <em>for</em>. Roll it.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Ardo, four dice. <span class="roll">🎲 <span class="die die-success">7</span> <span class="die die-blank">5</span> <span class="die die-blank">3</span> <span class="die die-success">6</span></span> Two Successes. Clears DV 3? No — two is under three.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Two against DV 3 is a Partial. He gets the noise made — <em>Break Their Nerve</em> ticks to 1 — but he's committed thirty spears to a stair he now can't pull them off quickly. And a Partial pays a Boon. To you, since it was your order.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> First Boon of the night. I'm writing it down like it's a birthday.</div>
-
 <div class="annotation rule"><span class="tag">Rule — Where the Boons Actually Come From at Tier IV</span>Look at where that Boon came from: not from a nine-dice hero roll, but from a Cap 4 Follower rolling four dice and coming up short. Followers have <em>small pools</em>, which means they Miss and Partial the way Tier I characters did — so a party that delegates generates income a party that solos does not. This is not a trick; it is the Boon curve doing exactly what it says. Delegation is the high-tier economy.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> I'm on the frame. Not fighting it — cutting the ropes on the near side so it slews when they push.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Wits + Stealth to get there unseen, then it's automatic; the ropes are ropes. Desperate, though — you're crossing open ground under a wall with archers on it.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Desperate means I re-roll a success, right, not a failure. Eight dice. <span class="roll">🎲 <span class="die die-success">9</span> <span class="die die-success">6</span> <span class="die die-blank">5</span> <span class="die die-blank">4</span> <span class="die die-blank">3</span> <span class="die die-blank">2</span> <span class="die die-blank">2</span> <span class="die die-blank">1</span></span> Two Successes and a 1 — and now I have to re-roll one of the successes.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> The lowest one that isn't a 10. Re-roll the 6.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> <span class="roll">🎲 → <span class="die die-blank">3</span></span> Down to one Success. DV was 3?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> DV 3, one Success — Partial. You reach the frame and you cut two ropes of three. It slews, it doesn't fall. <em>Hold the Gate</em> stops at 4 instead of filling. You take a Boon, and you're under the wall in the open with a knife and no plan.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Worsen Position, Don't Raise DV</span>Jess wanted this to be dangerous and reached for Position, not DV. Chapter 11: <em>"A Desperate roll already re-rolls successes — that is plenty."</em> The DV stayed at 3 all scene. Desperate turned a comfortable eight-dice roll into a Partial, which is both the danger she wanted <em>and</em> a Boon in Devon's pocket. Raising the DV to 5 instead would have produced the same Partial with none of the fiction and, over a whole session, would have starved the table.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Archers on the wall have you. Body + Athletics to get to cover, DV 3, still Desperate.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Body 2 + Athletics 2, four dice, and I'm Desperate. This is where I die, isn't it.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> No. Ardo's thirty are on that stair and they can put shields on the wall lip. He takes the arrows.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> That's a Follower Sacrifice, and I'll take it. Ardo's section eats the volley in place of the roll — Ardo takes Harm 1 and the Cut Garrison's Loyalty drops from Steady to Strained. Lyra gets to cover without rolling. Once tonight, Priya. Not twice.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Follower Sacrifice as Boon Substitute</span><em>"A loyal follower (Cap 3+) can take the consequence of a failed roll in place of a Boon. The follower suffers Harm 1 (or a Condition) and the player avoids spending a Boon. This should be used sparingly (once per session maximum) and only when the fiction supports it."</em> Jess applied all three limits out loud — Cap 3+, once per session, fiction supports it — and then charged for it in a currency Priya cares about more than Boons: her garrison's Loyalty, which is now Strained and will assist at −1 die until she fixes it.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Strained. So they assist at minus one, and I did that to them by using them as a shield.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> You did. They also held the gate. Both are true, and the second one is why they'll still be there in the morning.</div>
-
 </div>
-
 <div class="scene-banner">
 <h2 id="price">Scene 4 — Inaea's Price</h2>
 <div class="sub">Demonstrates: Obligation over Capacity, a cosmic patron collecting, and Bonds as the primary Boon engine at Tier IV</div>
 </div>
-
 <div class="transcript">
-
 <div class="line gm"><span class="speaker">GM:</span> The frame is burning and the forty are gone. Khor — you're at seven Obligation of eight, and the thing you serve is the Angel of the Spider, whose whole business is what people owe each other. She has been very patient. Tonight she is done being patient.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> I knew this was coming the second I took her. What does she want?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> A name. The same name the Web wants. Inaea does not want it <em>told</em> — she wants it <em>owed</em>. She wants you to put someone in her web, and she is content to let you choose who.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 03 — Obligation Is Plot, Not Punishment</span><em>"When a Patron calls in a debt, a story hook arrives. Embrace it."</em> Ollie spent six years optimising his Obligation ledger, and the temptation for a GM is to treat the moment it comes due as a comeuppance. Jess does the opposite — she hands him a <em>choice</em> with his name on it. The debt is not a tax on his cleverness; it is the adventure his cleverness bought.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> And if I refuse, I go over Capacity.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> If you refuse you mark the eighth, and the ninth after it, and past Capacity every mark is Fatigue and the ledger starts making choices you don't. But refusing is real. It's on the table.</div>
-
 <div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> Give her mine.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Say more.</div>
-
 <div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> The Web wants a name and Inaea wants someone owing her. Those are the same favour twice. So I go into the web instead of whoever they picked — I take the debt personally, in front of Valeria, and it's <em>mine</em>, and the party's ledger with the Dyed Web goes back to nothing.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> ...Naomi. Six years ago you asked me whether it was allowed to talk to a guard.</div>
-
 <div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> I've been paying attention.</div>
-
 <div class="annotation playerside"><span class="tag">Player Guide — Accepting Obligation for Advantage</span>Chapter 11 lists this among the ways a high-tier party generates Boons: <em>"Accept new obligations or narrative fallout in exchange for Boons."</em> Sera is not being noble at the cost of her character sheet — she is trading the one resource a Tier IV character still produces in quantity, which is <em>debt</em>, for the resource she cannot otherwise get. That is the intended shape of the economy, and a new player arriving at it on her own is the clearest sign a table has learned the system.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Then here's the mechanics of it. You take 2 Obligation to Inaea personally — you're Presence 5, Spirit 2, Capacity 7, so you can carry it. The party's Web Obligation clears to zero. And because you have put yourself into a web on Khor's behalf, the two of you have a Bond, and it is now the most valuable thing either of you owns.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> Which I want to use immediately, because Lyra is about to try something stupid and she has nothing left.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> She does have nothing left. Go on.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> I spend my action to push both my Boons to Lyra through the Bond. "You owe the Web a night's work — I'm buying it forward."</div>
-
 <div class="line gm"><span class="speaker">GM:</span> The Bond flares. Lyra has 2 Boons.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Bonds as the Primary Boon Engine</span>Chapter 11 gives this exact manoeuvre as its worked example, down to the shouted line about a debt owed. It matters because it converts backstory into a tactical resource: a Bond that exists only in a character's history does nothing, but a Bond that can move Boons across the table is the difference between a party that has spent everything and a party that has spent everything <em>except where it counts</em>. At Tier IV, expect this to be how most Boons reach the person who needs them.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> I would like to state for the record that I did not ask for help and I am taking it anyway.</div>
-
 </div>
-
 <div class="scene-banner">
 <h2 id="stand">Scene 5 — The Ward Beneath the Archivolt</h2>
 <div class="sub">Demonstrates: escalation as a player choice, an epic obstacle as a Timer rather than one high-DV roll, zero Boons, and letting a failure stand</div>
 </div>
-
 <div class="transcript">
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> Before we scatter — I want the door under the Archivolt. Not because anything is chasing us there. Because it's the hardest thing in this city and we've spent two years doing work that doesn't pay.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Seconded, loudly. I have picked nothing interesting since the spring.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Then let's be honest about what it is. It predates the guild and nobody living made it. This is not a lock — it's five bindings, and they have to come apart in order. <em>The Ward</em> <span class="badge badge-purple">[5]</span>, and every segment is a roll at <strong>DV 4</strong>. Each Miss or Partial ticks <em>The Archivolt Wakes</em> <span class="badge badge-purple">[4]</span>. And one of the five is DV 5 — I'll tell you when you reach it.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Escalation Is Not Inflation</span>This is the distinction the chapter turns on, and it is worth watching who initiated it: <strong>the players did.</strong> Chapter 2's rule is that a better lock is DV 4 <em>because it is a better lock</em>, and Chapter 11 adds that a DV 4 the party went looking for is escalation while a DV 4 on a pantry door is inflation. Jess did not raise a number to keep pace with the party. She priced the thing they asked for.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 02 — A Timer Beats an Inflated DV</span>Note the shape, too. Chapter 2 is explicit that the five wards on a vault door <em>are not a single DV check — they are a Timer</em>: <em>"A single roll to crack all five is a high DV, but it is also a boring roll."</em> Five segments at DV 4, with failures feeding an opposed clock, keeps eight dice rolling against a reasonable target while the difficulty lives in <em>accumulation</em>. This is what an epic obstacle should almost always look like. One mythic roll is the exception; the clock is the rule.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> Spirit 4 + Arcana 4 on the first binding. Eight dice, DV 4. <span class="roll">🎲 <span class="die die-success">9</span> <span class="die die-success">8</span> <span class="die die-success">7</span> <span class="die die-blank">5</span> <span class="die die-blank">4</span> <span class="die die-blank">3</span> <span class="die die-blank">2</span> <span class="die die-blank">2</span></span> Three Successes. That's under four.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Partial. The binding gives, but not cleanly — <em>The Ward</em> to 1, <em>The Archivolt Wakes</em> to 1. And you take a Boon.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> There it is. That's the first Boon I've earned by myself all night, and it's because we finally picked on something our own size.</div>
-
 <div class="annotation rule"><span class="tag">Rule — Escalation Restores the Economy</span>Watch the arithmetic change. Eight dice against DV 3 produced Clean Successes all evening and paid nothing. The same eight dice against DV 4 produce Partials — which pay. This is the whole argument for seeking harder work at high tier: <em>the Boon economy is fed by struggle, so a party that stops struggling stops being paid.</em> Escalation is not the GM being cruel; it is the players plugging their own income back in.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Second binding is mechanical — that's mine. Wits 4 + Craft 3, seven dice, DV 4. <span class="roll">🎲 <span class="die die-success">10</span> <span class="die die-success">8</span> <span class="die die-success">6</span> <span class="die die-blank">4</span> <span class="die die-blank">3</span> <span class="die die-blank">2</span> <span class="die die-sb">1</span></span> The 10 is two, plus the 8 and the 6 — four Successes, one Story Beat.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Four meets DV 4 — Success with SB. <em>The Ward</em> to 2, and I'm spending the Beat: the second binding was keyed to the third. It opens, and the third one <em>knows</em>. Skip ahead — the fourth and fifth come apart between you over the next hour, and now you're at the last one.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> This is the DV 5. <strong>It is the ceiling and it may fail.</strong> Khor, you're the only one who can read it, and you have one Boon.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — One DV 5, Telegraphed</span><em>"Even then, DV 5 is the ceiling — the ladder ends there — so telegraph clearly."</em> One DV 5 in a session, announced, at the end of a Timer the party chose to start, reads as a mythic obstacle. A session in which every roll crept toward 5 would read as arbitrary. Chapter 11's own test: <em>"If your Tier IV session has more than one DV 5 in it, you are almost certainly inflating rather than escalating."</em> This is Jess's one.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> Eight dice, DV 5. <span class="roll">🎲 <span class="die die-success">10</span> <span class="die die-success">8</span> <span class="die die-success">6</span> <span class="die die-blank">5</span> <span class="die die-blank">4</span> <span class="die die-blank">3</span> <span class="die die-blank">2</span> <span class="die die-sb">1</span></span> The 10 is two, the 8, the 6 — four Successes, one Story Beat. Four against five.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Partial. You have one Boon. Re-roll?</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> ...no. If I burn it here I've got nothing for whatever's behind the door, and I'd rather owe the story than owe the next scene.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Then the die is cast. Tell me what failure looks like.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Let the Roll Stand</span>Chapter 11 hands Jess this line nearly verbatim — <em>"You have 0 Boons left. The die is cast. What does failure look like?"</em> — and notes it <em>"forces players to engage with consequences rather than erase them."</em> Ollie has a Boon and declines to spend it, which is the more interesting version: at this tier a Boon is a decision about <em>which</em> scene you are willing to lose, and he chose this one.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> The last binding doesn't break, it <em>reads</em> me. It opens a hand's width — enough to see there's a stair — and it takes a thread out of me to do it. Inaea's thread. She's in the door now. She can see what's on the other side and I can't.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Yes. <em>The Ward</em> stops at 4 of 5 and will not close. And I'm spending your Story Beat to say what that costs: whatever the guild kept down there is now something anyone can reach, including the man on Valeria's left. <em>The Web's Contract</em> ticks to 4 and fills.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> So we didn't fail to open the door. We opened it for the wrong person.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> That's the Partial. You made progress and it cost you.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Failure Must Matter</span><em>"If failure merely delays action without changing the situation, you are not using the system to its full potential."</em> Compare the two available rulings. <em>"The ward holds, try again next session"</em> delays. <em>"The ward is open four-fifths and you no longer control who walks through it"</em> hands the party a worse world — a rival gained leverage, a secret became reachable, a faction timer filled. Same Partial, three of Chapter 11's four failure patterns at once.</div>
-
 <div class="line line-khor p-khor"><span class="speaker">Khor (Ollie):</span> And I take the Boon for the Partial, so I end on two. Which is more than I've had in a month, and I got it by picking a fight with a door.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Two Boons and a patron inside a door. That's where we're stopping.</div>
-
 </div>
-
 <div class="scene-banner">
 <h2 id="wrap">Session Wrap-Up</h2>
 <div class="sub">Demonstrates: Boon carryover, XP at Tier IV, Legacy Projects, and repairing what the session broke</div>
 </div>
-
 <div class="transcript">
-
 <div class="line gm"><span class="speaker">GM:</span> Scene ends, so trim to 2 Boons — nobody is anywhere near that. Khor has 1, Lyra has 1 left of the 2 she was given, everyone else has 0. That's a normal Tier IV night.</div>
-
 <div class="line line-mateo p-mateo"><span class="speaker">Mateo (Priya):</span> Downtime. I'm paying the garrison out of our own charter income, publicly, so the wages stop coming from the Web. That should take Loyalty back off Strained.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> It should, and it's a downtime scene rather than a roll — you're spending time and money on a thing that is entirely within your power. Loyalty goes back to Steady. The Iron Gate stays Maintained.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Embrace Longer Timelines</span>Downtime is a <em>phase</em> at this tier, not an epilogue. Chapter 11 uses it to advance faction timers, let rumours spread, and let players build legacies. Priya's repair costs no roll because nothing about it is uncertain — the uncertainty was whether she would notice she had to, and she did.</div>
-
 <div class="line line-sera p-sera"><span class="speaker">Sera (Naomi):</span> I want to start something. A house on the Cut that pays passage for people who can't — so the next time the Web wants a name, there are people who owe <em>us</em> instead.</div>
-
 <div class="line gm"><span class="speaker">GM:</span> That's a Legacy Project. Give it a timer — I'll say <span class="badge badge-purple">[8]</span>, advanced by downtime scenes and by fiction, and when it fills you have a Major Asset that generates its own obligations in your favour. It will also make you a target, because a rival web is still a web.</div>
-
 <div class="annotation gmside"><span class="tag">GM Guide 11 — Legacy Projects</span>Long-term timers that span sessions are how a high-tier party converts a night's work into permanent change. Note what Sera is really building: an <em>engine for the resource the party keeps running out of</em>. She is not asking for a fortress or a title. She is asking to be owed things. A player who designs their legacy around the scarce resource has read the tier correctly.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> XP?</div>
-
 <div class="line gm"><span class="speaker">GM:</span> Session award as usual, and you can convert 2 Boons to 1 XP in downtime, max 2 XP that way. Which none of you can do, because none of you have 2 Boons.</div>
-
 <div class="line line-lyra p-lyra"><span class="speaker">Lyra (Devon):</span> Every single session. It's honestly funny.</div>
-
 <div class="annotation rule"><span class="tag">Rule — Boon Conversion at Tier IV</span>2 Boons → 1 XP during downtime, capped at 2 XP per session by conversion, and it is functionally dead at high tier. That is not an oversight. A Tier I party can convert because it is failing enough to be rich; a Tier IV party earns its XP from play and legacy rather than from leftover currency. If your Tier IV table is regularly converting Boons to XP, they are struggling more than the tier expects — check whether DVs have crept up.</div>
-
 </div>
-
 <div class="scene-banner">
 <h2 id="gm-takeaways">🎬 GM Takeaways — What Changes at Tier IV</h2>
 <div class="sub">What Jess did on purpose, and what she deliberately did not do</div>
 </div>
-
 <div class="panel panel-gold">
 <p><strong>She never raised a DV to keep pace with the party — and she priced everything they went looking for honestly.</strong> The DVs across the night were 3, 4, 3, 4 and 5, and the split is the whole lesson. Everything the party met <em>incidentally</em> — the strongbox, the gate, crossing open ground — was DV 3 or no roll at all. The two things they <strong>chose</strong> — the vote and the ward — were DV 4 and DV 5, because a council and a ward that predates the guild are genuinely harder than a strongbox. That is escalation. Raising the strongbox to DV 4 because Lyra now rolls eight dice would have been inflation, and it would have starved them.</p>
 <p class="text-sm text-muted">Everything else that made the night dangerous came from somewhere other than the DV: Position (Lyra crossing open ground Desperate), timers (six of them, all visible), and stakes (a vote where every rung of the Outcome Matrix reshaped the campaign).</p>
 </div>
-
 <div class="panel panel-orange mt-1">
 <p class="text-gold"><strong>The party was broke until they picked on something their own size.</strong></p>
 <p class="text-sm">Track the Boons. Scenes 1 and 2 — eight and nine dice against DV 3 and 4, executed cleanly — paid <em>nothing</em>. The only income before the ward came from a Cap 4 Follower rolling four dice and from Lyra taking a Desperate. Then the party chose a DV 4 Timer and started earning immediately. If your Tier IV table complains that Epic Tier feels simultaneously easy and starved, this is the diagnosis: they have outgrown their own scores. Do not hand them Boons. Hand them a harder target — or better, ask them what they want to go after, because at this tier that question <em>is</em> the campaign.</p>
 </div>
-
 <div class="grid-2 mt-1">
-
 <div class="panel panel-blue">
 <p class="text-gold"><strong>Stop rolling for competence.</strong></p>
 <p class="text-sm">The strongbox opened without a roll. The paymaster records were simply available. Priya's garrison repair was a downtime scene, not a test. Every roll Jess <em>did</em> call for sat on a genuine uncertainty. This is the cheapest possible way to make a table feel legendary, and it also buys back the table-time that the bigger scenes need.</p>
 </div>
-
 <div class="panel panel-blue">
 <p class="text-gold"><strong>Show the timers.</strong></p>
 <p class="text-sm"><em>Hold the Gate</em> [6], <em>Break Their Nerve</em> [4], <em>The Web's Contract</em> [4], <em>Charter Review</em> [6] as a threat that never opened. Written where players can see them. A timer the party cannot see is a GM's private note; a timer on the table is a clock the party plays against, and at this tier it is the main way you apply pressure without touching a single number on anyone's sheet.</p>
 </div>
-
 <div class="panel panel-blue">
 <p class="text-gold"><strong>Let delegation pay.</strong></p>
 <p class="text-sm">The only Boons generated by the party all night came from Ardo's four-dice Partial and Lyra's Desperate one. Followers roll small pools; small pools Miss and Partial; Misses and Partials pay. A GM who quietly resolves Follower actions off-screen without rolling them removes the party's last reliable income. Roll them at the table.</p>
 </div>
-
 <div class="panel panel-blue">
 <p class="text-gold"><strong>Charge in the right currency.</strong></p>
 <p class="text-sm">Follower Sacrifice cost Priya her garrison's Loyalty, not a Boon. Web-Sense cost Khor a Fatigue. Sera's play cost her personal Obligation. At Tier IV the interesting prices are not on the character sheet's left column — they are attached to the things the party built, which is exactly why the party built them.</p>
 </div>
-
 </div>
-
 <div class="panel panel-orange mt-1">
 <p><strong>The one thing to watch for.</strong> A Tier IV party that is succeeding cleanly all night is a party with no Boons, and a GM who then springs an unwinnable scene has produced frustration rather than tension. The difference is <em>telegraphing</em>. Jess said "this is DV 5, it may fail" before the roll, laid out all four rungs of the vote before Sera committed, and put every timer where it could be read. The party lost the ward anyway — and it landed as drama rather than ambush, because they chose it with their eyes open.</p>
 </div>
-
 <h2 id="player-takeaways">🎲 Player Takeaways — Four Players, Six Years Later</h2>
-
 <div class="grid-2 mt-1">
-
 <div class="persona-card">
 <h4>If you plan, like Priya</h4>
 <div class="attitude">Your planning has to move up a level with your character. Tracking your own Fatigue was Tier I; tracking your <em>organisation's</em> state is Tier IV — Loyalty, Asset condition, who is where, which timer moves if you spend an hour. Ask what a Partial costs rather than what the DV is. And remember that everything you built is spendable: a garrison is a resource, and spending it has a price that is paid in Loyalty rather than dice.</div>
 </div>
-
 <div class="persona-card">
 <h4>If you improvise, like Devon</h4>
 <div class="attitude">Good news: the tier was built for you. Chapter 11 notes that chaos players thrive at high tier because they never hoarded Boons and adapt to scarcity by relying on skill and position instead. Keep spending. Keep taking Desperate for the better story — a Desperate Partial is a Boon in your pocket and a scene worth watching. And be the one who says <em>"let's go do the hard thing"</em>: at this tier the party's appetite for bigger targets is what keeps the economy running, and you are constitutionally suited to supplying it.</div>
 </div>
-
 <div class="persona-card">
 <h4>If you were the quiet one, like Naomi</h4>
 <div class="attitude">There is a moment in every long campaign where the person who needed to be invited into scenes becomes the person the scene belongs to. It arrives faster if your character holds something the table needs — a patronage, a name, a debt. Sera's biggest play of the night was not a roll. It was noticing that two factions wanted the same favour and offering to be the price. You are allowed to solve a scene by spending your own sheet.</div>
 </div>
-
 <div class="persona-card">
 <h4>If you chase the spotlight, like Ollie</h4>
 <div class="attitude">The thing you optimised will eventually be the thing that has you. That is not the GM punishing you — a resource with no teeth was never a resource. Ollie's Obligation ledger bought six years of advantage and then bought the best scene of the night. When your patron finally calls, take the hook rather than arguing the number, and notice the move that actually mattered: giving both his Boons away, right before he needed them.</div>
 </div>
-
 </div>
-
 <h2 id="cheatsheet">📋 Quick-Reference Cheat Sheet — Epic Tier</h2>
-
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>Situation</th><th>Tier I instinct</th><th>Tier IV practice</th></tr></thead>
 <tbody>
 <tr><td>Routine task in the character's specialty</td><td>Roll it</td><td>Don't roll it. Assume competence; roll the uncertain half.</td></tr>
@@ -660,20 +517,16 @@
 <tr><td>Patron debt comes due</td><td>A penalty lands</td><td>A hook arrives, with a choice attached and the player's name on it.</td></tr>
 <tr><td>End of session</td><td>Convert spare Boons to XP</td><td>There are no spare Boons. Advance Legacy Projects instead.</td></tr>
 </tbody>
-</table></div>
-
+</table></div></div>
 <div class="panel panel-gold mt-1">
 <p class="text-sm"><strong>Boon availability by tier</strong>, for calibration: Tier I earns 2–3 per scene, Tier II 1–2, Tier III about 1, Tier IV 0–1, Tier V often 0. Those numbers assume a party <em>working at its own level</em>. If your Tier IV table is permanently at zero, run Chapter 11's three checks in order: has anyone Missed in two sessions (if not, the work is too small); is the party naming its own targets (if not, the campaign has not turned Epic yet); and only then, have routine DVs crept above the fiction. If they are regularly holding three or more, something is over-generating — usually inflated DVs on ambient work, or Follower actions resolved without rolls.</p>
 </div>
-
 <div class="panel panel-blue mt-1">
 <p><strong>Where this session's rules live.</strong> <em>GM Guide Chapter 11 — Tier IV &amp; V Epic Adventures</em> for scaling, Boon scarcity, seeking harder challenges and the ladder of escalating targets, armies, Follower Sacrifice, letting the roll stand and Legacy Projects. <em>GM Guide Chapter 2 — Core Procedures</em> for when to raise a DV, and for why a vault is a Timer rather than one high roll. <em>GM Guide Chapter 3 — Managing Resources</em> for Obligation and Capacity. <em>GM Guide Chapter 7 — Assets and Followers</em> for Cap, Free Use and Asset condition. <em>GM Guide Chapter 10</em> for timers. The core loop, Position, DV and the Outcome Matrix are unchanged from the SRD and from the Tier I session — which is, in the end, the point of the whole document.</p>
 </div>
-
 <footer>
 <p class="text-sm text-muted">Fate's Edge — Annotated Play Session: Epic Tier · companion to <em>An Annotated Play Session</em> · © Nicholas A. Gasper — For use with the Fate's Edge RPG</p>
 </footer>
-
 </div>
-</body>
+</article></body>
 </html>

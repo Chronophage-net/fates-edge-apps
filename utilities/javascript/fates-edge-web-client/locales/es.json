@@ -2692,7 +2692,8 @@
     "wiki.tags": "🏷️ Etiquetas",
     "wiki.talents": "🧠 Talentos",
     "wiki.valueAlreadyCloned": "\"{{value0}}\" ya clonado.",
-    "wiki.wiki": "📖 Wiki ganancias"
+    "wiki.wiki": "📖 Wiki ganancias",
+    "docs.readingGuide": "🧭 Guía de lectura — por dónde empezar"
   },
   "paperImport": {
     "title": "Importar desde papel",

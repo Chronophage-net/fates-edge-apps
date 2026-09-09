@@ -1,3 +1,27 @@
+## Monk clarification and reader fixes — 2026-09-09
+
+- Use Spirit + Endurance (DV 3) for the monk’s Settle the Breath step; keep Psionics as the explicit extra skill. Update HTML and LaTeX together.
+- Clarify Psionics and Witchcraft DV ranges as 2–5, including Witchcraft’s Identity-Altering row at DV 5.
+- Enable Game Master Screen printing, remove its stray code fence, and size document tiles to the available pane width.
+
+## Book reading routes — 2026-09-09
+
+- Add tailored introductions and linked reading routes to the four main guide/setting contents pages and three specialist expansions, preserving existing rules.
+- Clarify The Amaranthine’s role as the core setting book and record exact backport destinations and unresolved rules questions.
+- Bring newly opened documents into view; verify library-to-book-to-chapter navigation and narrow-screen table layout in the local reader.
+
+## Library reading guide — 2026-09-09
+
+- Add a web-client reading guide with first-session routes and a clear explanation of Travel as the setting library.
+- Improve 167 English HTML documents with reading context, contents links, heading space, and accessible scrolling tables while preserving their original text.
+- Keep document links inside the reader and record HTML changes and pending LaTeX work in BACKPORT_DOCUMENTS.md.
+
+## SRD reader edition — 2026-09-09
+
+- Register the revised SRD as a core book with a guided opening and linked reference chapters, including crafting; preserve the old document entry URL.
+- Resolve document links relative to their chapter and open same-library book links inside the reader, including cross-chapter anchors.
+- Sync the reviewed docs edition without changing rule prose. The client build and 276 tests pass; browser visual review is pending because the host Mac is locked.
+
 # Changelog
 All notable changes to this project will be documented here.
 

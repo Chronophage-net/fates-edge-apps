@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Magic tags and effects</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Magic tags and effects</h1><p>This is a lookup library for magical effects. Read the magic procedure before assembling an effect; return here to check the exact tags and their requirements. The examples chapter shows finished workings alongside their printed mechanics.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="tags-effects">
+<h2>Tags &amp; Effects Library</h2>
+<p>Tags are keywords that define the mechanical and narrative behavior of spells, rites, talents, and assets. They do nothing on their own; they only function when granted by a rule (Spell, Rite, Talent, Ability). Unless noted otherwise, the Duration of a tag effect is Scene, and the DV for contests or resistances is set by the fiction (typical range 2–5).</p>
+<section class="level2" id="the-eight-elements">
+<h3 id="tags-effects-heading-1">The Eight Elements</h3>
+<p>Every spell or magical effect is built from one or more of the eight fundamental elements. The first four are physical; the second four are metaphysical.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Element</th><th>Domain</th><th>Typical Backlash</th></tr>
+</thead>
+<tbody>
+<tr><td>Air</td><td>Movement, sound, wind, speed</td><td>Scatter, vertigo, deafening gusts</td></tr>
+<tr><td>Fire</td><td>Energy, destruction, light, passion</td><td>Burns, smoke, uncontrolled blaze</td></tr>
+<tr><td>Earth</td><td>Solidity, stone, metal, endurance</td><td>Rubble, heavy footing, tremors</td></tr>
+<tr><td>Water</td><td>Fluidity, healing, cold, emotion</td><td>Flood, slippery ground, dampness</td></tr>
+<tr><td>Fortune</td><td>Chance, luck, unpredictability</td><td>Random mishap, fragile success</td></tr>
+<tr><td>Life</td><td>Vitality, growth, healing, nature</td><td>Overgrowth, fever, parasitic plants</td></tr>
+<tr><td>Fate</td><td>Destiny, inevitability, causality</td><td>Options close, fixed outcome</td></tr>
+<tr><td>Death/Dreams (Obishaal)</td><td>Endings, sleep, thresholds, memory</td><td>Whispers, numbness, threshold shifts</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="element-pairs">The Four and the Four</h4>
+<p>The two halves rhyme. Fire and Life both consume a fuel to make something; Air and Fortune both refuse to be aimed; Water and Obishaal both close over a thing and give nothing back on demand; Earth and Fate are both weight, and what weight does to whatever is near it.</p>
+<p>That is a way of remembering the list and a source of imagery for backlash. It is not a mechanic, and nothing in the game asks you to work out which half a given effect came from.</p>
+<h4 id="element-planes">The Elemental Planes</h4>
+<p><strong>Every element has a plane.</strong> Two of the eight have been described:</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Plane</th><th>Known as</th><th>Written up in</th></tr></thead>
+<tbody>
+<tr><td><strong>Obishaal</strong> (Death/Dreams)</td><td>The <strong>Ways Between</strong> — dream-roads and spirit-paths, where travel is measured in choices rather than miles: a wrong turn leads to yesterday, a right one to the version of you who decided differently.</td><td><em>Player's Guide</em> ch. 14, <em>GM Guide</em> ch. 8, and the Psionics chapter.</td></tr>
+<tr><td><strong>Fire</strong></td><td>The <strong>Realm of Fire</strong>, holding the <strong>City of Cinder</strong> — an infernal bazaar where the currency is concepts rather than coin.</td><td><em>Ashes of the Infernal Accord</em>, which is set there.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>The other six exist and are unwritten. Build them when a story needs them.</p>
+<div class="panel panel-gold">
+<p><strong>The metaphysics are deliberately forgiving.</strong> This game is for sharing stories, not for adjudicating whether the Realm of Fire is exothermic. There is no cosmological chart to be consistent with, no canonical count of layers, no correct answer about how the planes touch. If your table wants the plane of Fortune to be a card game that has been going on for nine thousand years, it is, and nothing in this book will contradict you.</p>
+<p>What the two described planes have in common is worth borrowing, not because it is a law but because it plays well: <strong>neither is reached by distance.</strong> The Ways Between charge you choices; the Realm of Fire charges you concessions. Arriving somewhere by paying for it is a scene. Arriving by walking a long way is a travel roll.</p>
+</div>
+<div class="panel panel-blue">
+<p><strong>One thing to get right.</strong> Unwritten is not the same as nonexistent. There are eight planes; six are simply waiting for somebody's story. A supplement should leave room for them rather than write past them.</p>
+</div>
+</section>
+<section class="level2" id="effect-tags">
+<h3 id="tags-effects-heading-4">Effect Tags</h3>
+<p>Effect tags describe what the magic does. They are combined with element tags to form spells.</p>
+<p><strong>Common Effect Tags:</strong></p>
+<p><code>[AREA]</code> <code>[MARK]</code> <code>[BANISH]</code> <code>[MEND]</code> <code>[BARRIER]</code> <code>[OATH]</code> <code>[BIND]</code> <code>[PASSAGE]</code> <code>[CLEANSE]</code> <code>[REPAIR]</code> <code>[COMMAND]</code> <code>[REVEAL]</code> <code>[CONJURE]</code> <code>[SANCTIFY]</code> <code>[COUNTER]</code> <code>[SEAL]</code> / <code>[UNSEAL]</code> <code>[CURSE]</code> <code>[DEFEND]</code> <code>[STRIKE]</code> <code>[DISPEL]</code> <code>[TRANSPORT]</code> <code>[FORTIFY]</code> <code>[VEIL]</code> <code>[HEAL]</code> <code>[WARD]</code></p>
+</section>
+<section class="level2" id="building-a-spell">
+<h3 id="tags-effects-heading-5">Building a Spell</h3>
+<p>A spell is a combination of one or more element tags and one or more effect tags. The base Difficulty Value is:</p>
+<p><code>DV = 1 + total number of tags (element + effect)</code></p>
+<section class="level3" id="dangerous-tags">
+<h4 id="tags-effects-heading-6">Dangerous Tags</h4>
+<p>Some effects are so powerful that each dangerous tag adds +2 DV instead of +1. Dangerous tags include: <code>[GATE]</code>, <code>[FOLD]</code>, <code>[LEAP]</code>, <code>[CREATE]</code>, <code>[SUMMON]</code>, <code>[TRANSMUTE]</code>, <code>[ANIMATE]</code>, <code>[TRANSFORM]</code>, <code>[DOMINATE]</code>, <code>[REWIND]</code>.</p>
+</section>
+<section class="level3" id="stacking-identical-effect-tags">
+<h4 id="tags-effects-heading-7">Stacking Identical Effect Tags</h4>
+<p>You may include the same effect tag multiple times to increase its potency. Each additional copy adds its normal DV cost. Example:</p>
+<ul>
+<li><code>[AIR][DEFEND]</code> – 2 tags → DV 3. Grants +1 die to one defense roll.</li>
+<li><code>[AIR][DEFEND][DEFEND]</code> – 3 tags → DV 4. Grants +2 dice to one defense roll.</li>
+</ul>
+<p>Stacking is limited by the caster's Tier (max 3 copies per effect at Tier III, 4 at Tier V).</p>
+</section>
+</section>
+<section class="level2" id="tags-effects-example-spells">
+<h3 id="tags-effects-heading-8">Example Spells</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Name</th><th>Tags</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Light (Cantrip)</td><td><code>[FIRE][ILLUMINATE]</code></td><td>DV 3, one roll. Creates small, sustained light.</td></tr>
+<tr><td>Shield of Air</td><td><code>[AIR][DEFEND]</code></td><td>DV 3, one action. +1 die to next defense roll.</td></tr>
+<tr><td>Double Shield</td><td><code>[AIR][DEFEND][DEFEND]</code></td><td>DV 4, one action. +2 dice to next defense roll.</td></tr>
+<tr><td>Flame Cloak</td><td><code>[FIRE][AREA][DEFEND]</code></td><td>DV 4, two actions. Enemies –1 die to approach; caster +1 die to Defend rolls against fire.</td></tr>
+<tr><td>Healing Touch</td><td><code>[LIFE][HEAL]</code></td><td>DV 3, one action. Removes 1 Fatigue from touched target.</td></tr>
+<tr><td>Mend Wound</td><td><code>[LIFE][HEAL][HEAL]</code></td><td>DV 4, one action (or scene). Removes 2 Fatigue, or clears Harm 1 to Harm 0.</td></tr>
+<tr><td>Teleport (Self)</td><td><code>[AIR][FOLD]</code></td><td><code>[FOLD]</code> dangerous (+2). DV = 1+1+2 = 4. Teleport self within Near range.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="repair-restoration">
+<h3 id="tags-effects-heading-9">Repair &amp; Restoration</h3>
+<p>Two tags handle mending objects: <code>[MEND]</code> for quick, temporary fixes in the field, and <code>[REPAIR]</code> for thorough, lasting restoration.</p>
+<section class="level3" id="tag-mend">
+<h4>[MEND] (Quick Fix)</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Quick Fix</span></p>
+<p>Restore a damaged object to functioning order for the duration of the scene.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (severity of damage, size, material). Typical DV 2–4.</li>
+<li><strong>Hit:</strong> Remove one level of Neglected or Compromised from a single item for the rest of the scene. The item works normally.</li>
+<li><strong>Partial:</strong> The item functions for the scene but becomes Neglected (or worsens one step) when the scene ends.</li>
+<li><strong>Miss:</strong> No repair; the item may become Compromised or break (GM discretion).</li>
+<li><strong>Duration:</strong> Scene. After the scene, the damage returns (or worsens) unless followed by a proper <code>[REPAIR]</code> during downtime.</li>
+</ul>
+<p class="text-sm text-muted">Example: A snapped bowstring is magically re-knotted for the remainder of the fight; the next day it frays again.</p>
+</div>
+</section>
+<section class="level3" id="tag-repair">
+<h4>[REPAIR] (Permanent Fix)</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Permanent Fix</span></p>
+<p>Fully restore a damaged object, tool, or piece of equipment.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (severity, material, magical nature). Typical DV 3–5. Magical items add +1 DV.</li>
+<li><strong>Time:</strong> One downtime action (a few hours of focused work). Can be used during a scene only if the caster has Significant Time and appropriate tools.</li>
+<li><strong>Hit:</strong> Remove all levels of Neglected and Compromised from a single item. The item is restored to full function.</li>
+<li><strong>Partial:</strong> Remove one level of damage (e.g., Compromised → Neglected), or the item becomes Neglected but usable.</li>
+<li><strong>Miss:</strong> No repair; the item may become Compromised or gain a new flaw (GM discretion).</li>
+</ul>
+<p class="text-sm text-muted">Example: A shattered shield is reforged overnight; a rusted lock is cleaned and oiled to working order.</p>
+</div>
+</section>
+</section>
+<section class="level2" id="influence-over-mortals">
+<h3 id="tags-effects-heading-12">Influence Over Mortals</h3>
+<p>These tags affect the minds and loyalties of living beings. Using them to alter free will carries narrative and ethical consequences.</p>
+<div class="grid-2">
+<section class="level3" id="tag-bond">
+<h4>[BOND]</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Beneficial</span></p>
+<p>Strengthen or create a positive emotional tie between a target and a person, place, or ideal.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (target's current loyalty, resistance to magic). Typical DV 3–5.</li>
+<li><strong>Hit:</strong> Increase a follower's Loyalty state by one step (e.g., Strained → Faithful). The target genuinely feels the bond.</li>
+<li><strong>Partial:</strong> The bond forms but is fragile; any subsequent external pressure may break it (GM may downgrade loyalty on a future setback).</li>
+<li><strong>Miss:</strong> No effect; the target may become suspicious or resistant to further magical influence.</li>
+<li><strong>Ethical note:</strong> Forcing loyalty removes agency. The GM may rule that such magic is taboo, attracts Patron attention, or creates hidden complications (e.g., the follower secretly resents the caster).</li>
+</ul>
+<p class="text-sm text-muted">Example: A Runekeeper of Inaea weaves a <code>[BOND]</code> rite to mend a hireling's shaken trust after a failed mission.</p>
+</div>
+</section>
+<section class="level3" id="tag-subvert">
+<h4>[SUBVERT]</h4>
+<div class="panel panel-red">
+<p><span class="badge badge-red">Dangerous (+2 DV)</span></p>
+<p>Coerce obedience or twist existing loyalties.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (target's will, opposing magic). Typical DV 5–7.</li>
+<li><strong>Hit:</strong> The target follows one simple command or shifts loyalty one step in the caster's favor (e.g., Faithful → Strained toward their original master). The effect lasts one scene or until the command is fulfilled.</li>
+<li><strong>Partial:</strong> The target hesitates, reveals information, or acts with clear reluctance; the compulsion is visible to observers.</li>
+<li><strong>Miss:</strong> The target resists; the caster marks 1 Fatigue and the target's original loyalty increases by one step (they become more devoted to their original cause).</li>
+<li><strong>Backlash:</strong> On any roll showing two or more 1s, the GM may impose a Patron's Disfavor or a Scandal timer (the act becomes known).</li>
+</ul>
+<p class="text-sm text-muted">Example: A desperate Invoker of Maelstraeus uses <code>[SUBVERT]</code> to force a gate guard to look away. The guard later testifies under oath, and a bounty appears.</p>
+</div>
+</section>
+</div>
+</section>
+<section class="level2" id="control-countermagic">
+<h3 id="tags-effects-heading-15">Control &amp; Countermagic</h3>
+<section class="level3" id="tag-dispel">
+<h4>[DISPEL]</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Countermagic</span></p>
+<p>End an ongoing magical effect or construct.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (usually equal to the effect's Tier or casting DV).</li>
+<li><strong>Hit:</strong> Effect ends or is suppressed per source text.</li>
+<li><strong>Partial:</strong> Effect suppressed briefly (one exchange) or reduced in scope.</li>
+<li><strong>Miss:</strong> No effect; GM may gain SB.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-counter">
+<h4>[COUNTER]</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Countermagic</span></p>
+<p>Interrupt a spell, rite, or ritual in progress.</p>
+<ul>
+<li><strong>Timing:</strong> During the casting window (declared action or ritual phase).</li>
+<li><strong>DV:</strong> by fiction (complexity of the interrupted effect).</li>
+<li><strong>Hit:</strong> Cancel the action; resources used are lost.</li>
+<li><strong>Partial:</strong> Worsen the caster's Position or impose Fatigue.</li>
+<li><strong>Miss:</strong> No interruption; GM may spend SB to escalate.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-barrier">
+<h4>[BARRIER]</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Control</span></p>
+<p>Create cover, obstruction, or a physical wall.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (size, material, duration).</li>
+<li><strong>Hit:</strong> Place a barrier with Integrity Timer <code>[2/4/6]</code>; blocks movement/attacks until cracked.</li>
+<li><strong>Partial:</strong> Barrier is fragile or has a gap.</li>
+<li><strong>Countered by:</strong> <code>[DISPEL]</code>, brute force (Athletics), or clever route.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-seal-unseal">
+<h4>[SEAL] / [UNSEAL]</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Control</span></p>
+<p>Magically lock or unlock a container, door, or portal (not spirits).</p>
+<ul>
+<li><strong>DV:</strong> by fiction (quality of lock, magical binding).</li>
+<li><strong>Hit:</strong> Locked/unlocked as intended; specify any bypass conditions.</li>
+<li><strong>Partial:</strong> Seal is temporary or leaks (can be forced open with +1 DV).</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="concealment-revelation">
+<h3 id="tags-effects-heading-20">Concealment &amp; Revelation</h3>
+<div class="grid-2">
+<section class="level3" id="tag-veil">
+<h4>[VEIL]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Concealment</span></p>
+<p>Obscure a person, object, or zone.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (scale, conditions).</li>
+<li><strong>Hit:</strong> Impose –1 die to Notice or perception rolls against the veiled subject; specify limits (angle, distance, scent).</li>
+<li><strong>Partial:</strong> Works only at a limited range or in dim light.</li>
+<li><strong>Countered by:</strong> <code>[REVEAL]</code>, strong light, physical proof.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-reveal">
+<h4>[REVEAL]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Revelation</span></p>
+<p>Expose illusions, disguises, or hidden clauses.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (complexity of the concealment).</li>
+<li><strong>Hit:</strong> Surface the truth; describe how the revelation manifests (brief glow, visible flaw, etc.).</li>
+<li><strong>Partial:</strong> A tell or clue, not the full picture.</li>
+</ul>
+</div>
+</section>
+</div>
+<section class="level3" id="tag-mark">
+<h4>[MARK]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Tracking</span></p>
+<p>Tag a target for tracking or leverage.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (resistance, visibility).</li>
+<li><strong>Hit:</strong> Place a visible or invisible mark; once per scene, you or an ally gain +1 die when acting directly against the Marked target.</li>
+<li><strong>Partial:</strong> Mark is noisy or short-lived.</li>
+<li><strong>Countered by:</strong> <code>[CLEANSE]</code>, <code>[DISPEL]</code>, or listed materials (salt, iron).</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="boons-burdens">
+<h3 id="tags-effects-heading-24">Boons &amp; Burdens</h3>
+<section class="level3" id="tag-curse">
+<h4>[CURSE]</h4>
+<div class="panel panel-red">
+<p><span class="badge badge-red">Hindrance</span></p>
+<p>Inflict a sticky hindrance with a clear release condition.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (severity, target's resilience).</li>
+<li><strong>Hit:</strong> Apply a named Condition (e.g., Shaken, Weakened) that persists until the release condition is met.</li>
+<li><strong>Partial:</strong> Condition is milder or intermittent.</li>
+<li><strong>Countered by:</strong> <code>[CLEANSE]</code> or the listed key (apology, theft return, pilgrimage).</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-cleanse">
+<h4>[CLEANSE]</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Beneficial</span></p>
+<p>Remove or suppress a Condition (poison, disease, curse, fear).</p>
+<ul>
+<li><strong>DV:</strong> by fiction (potency of the affliction).</li>
+<li><strong>Hit:</strong> Remove one named Condition.</li>
+<li><strong>Partial:</strong> Suppress or reduce severity for the scene.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-fortify">
+<h4>[FORTIFY]</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Beneficial</span></p>
+<p>Harden a person, place, or object against a specific vector (fire, blades, fear, persuasion).</p>
+<ul>
+<li><strong>DV:</strong> by fiction (scale, strength).</li>
+<li><strong>Hit:</strong> Raise Position by one step or reduce consequence severity for attacks of that vector this scene.</li>
+<li><strong>Partial:</strong> Limited scope (one ally, one doorway).</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="influence-oaths">
+<h3 id="tags-effects-heading-28">Influence &amp; Oaths</h3>
+<section class="level3" id="tag-command">
+<h4>[COMMAND]</h4>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Influence</span></p>
+<p>Issue a clear order to a sapient target.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (authority, leverage, fear, ritual standing).</li>
+<li><strong>Hit:</strong> Target complies now or suffers an immediate cost stated by the GM.</li>
+<li><strong>Partial:</strong> Target hesitates, bargains, or partially complies.</li>
+<li><strong>Miss:</strong> Refusal or blowback (GM may spend SB).</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-oath">
+<h4>[OATH]</h4>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Binding</span></p>
+<p>Bind parties to terms; breaking has teeth.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (witnesses, sanctity, stakes).</li>
+<li><strong>Hit:</strong> Enforceable pact with stated boon for keeping and consequence for breaking.</li>
+<li><strong>Partial:</strong> A loophole exists in the oath.</li>
+<li><strong>Countered by:</strong> Release clause, <code>[CLEANSE]</code> if text allows.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-sanctify">
+<h4>[SANCTIFY]</h4>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Consecration</span></p>
+<p>Consecrate a zone to a code or Patron.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (size, opposition).</li>
+<li><strong>Hit:</strong> Specify allowed/prohibited acts; violations start at Controlled Position or impose a soft consequence.</li>
+<li><strong>Partial:</strong> Patchy coverage (e.g., only the altar, not the whole room).</li>
+<li><strong>Countered by:</strong> Opposing rite, profanation (bloodshed, lies), time.</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="movement-making">
+<h3 id="tags-effects-heading-32">Movement &amp; Making</h3>
+<section class="level3" id="tag-passage">
+<h4>[PASSAGE]</h4>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Movement</span></p>
+<p>Declare a route as permitted or easy.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (length, danger).</li>
+<li><strong>Hit:</strong> Allies on that path gain improved flow (+1 Position or ignore one level of difficult terrain).</li>
+<li><strong>Partial:</strong> Only one ally or one segment benefits.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-transport">
+<h4>[TRANSPORT]</h4>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Movement</span></p>
+<p>Move a target across an obstacle (blink, lift, pull).</p>
+<ul>
+<li><strong>DV:</strong> by fiction (mass, range, warding).</li>
+<li><strong>Hit:</strong> Relocate within listed range; state any tells or costs (SB, Fatigue).</li>
+<li><strong>Partial:</strong> Arrive off-balance, drop gear, or suffer worse Position.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-conjure">
+<h4>[CONJURE]</h4>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Making</span></p>
+<p>Create a useful object, cover, or hazard.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (size, complexity).</li>
+<li><strong>Hit:</strong> Conjure an item or zone with Integrity Timer <code>[2/4/6]</code> (if destructible) or a ticking hazard (burn, freeze, haze).</li>
+<li><strong>Partial:</strong> Fragile or short-lived (lasts one exchange).</li>
+<li><strong>Countered by:</strong> <code>[DISPEL]</code>, force, time.</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="knowledge-movement-transformation">
+<h3 id="tags-effects-heading-36">Knowledge, Movement &amp; Transformation</h3>
+<section class="level3" id="tag-truth">
+<h4>[TRUTH]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Knowledge</span></p>
+<p>Ask the GM one yes/no or short-answer question about the present situation. The GM answers truthfully.</p>
+<ul>
+<li><strong>Hit:</strong> Full, clear answer.</li>
+<li><strong>Partial:</strong> Cryptic or incomplete answer (still true).</li>
+<li><strong>Miss:</strong> No answer; GM gains 1 SB.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-secret">
+<h4>[SECRET]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Knowledge</span></p>
+<p>Reveal a deeply hidden fact about a person, place, or object – something the target actively conceals.</p>
+<ul>
+<li><strong>Contest:</strong> Spirit+Lore vs. target's Spirit+Endurance (DV 4 for passive secrets).</li>
+<li><strong>Hit:</strong> GM reveals the secret.</li>
+<li><strong>Partial:</strong> A clue or hint toward the secret.</li>
+<li><strong>Miss:</strong> No information; the secret becomes harder to find (+1 DV next time).</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-read">
+<h4>[READ]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Knowledge</span></p>
+<p>Sense the target's current dominant emotion or a single surface thought. No roll required; narrative permission only. Cannot read deep secrets or memories.</p>
+</div>
+</section>
+<section class="level3" id="tag-omen">
+<h4>[OMEN]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Knowledge</span></p>
+<p>Glimpse a likely future tied to a specific action or decision.</p>
+<ul>
+<li><strong>Hit:</strong> GM gives a cryptic warning (one sentence). You may reroll one die later this session if it relates to the omen.</li>
+<li><strong>Partial:</strong> Omen is vague; no reroll.</li>
+<li><strong>Miss:</strong> False omen; GM may spend 1 SB to make you act on misinformation.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-liberate">
+<h4>[LIBERATE]</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Beneficial</span></p>
+<p>Automatically succeed on one attempt to escape mundane physical restraints (ropes, manacles, grapple). Magical restraints require a Spirit+Endurance test (DV 4) instead.</p>
+</div>
+</section>
+<section class="level3" id="tag-boost">
+<h4>[BOOST]</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Beneficial</span></p>
+<p>Gain +1 die on a single related roll, or clear 1 Fatigue. This tag does nothing on its own; the spell description must state which benefit applies.</p>
+</div>
+</section>
+<section class="level3" id="tag-transform">
+<h4>[TRANSFORM]</h4>
+<div class="panel panel-red">
+<p><span class="badge badge-red">Dangerous</span></p>
+<p>Take on a new form for the scene. Choose one benefit:</p>
+<ul>
+<li>+1 Armor</li>
+<li>+1 die to a specific skill (e.g., Stealth, Athletics)</li>
+<li>A minor supernatural ability (e.g., flight for one exchange, water breathing, claws that deal +1 Harm)</li>
+</ul>
+<p><strong>Partial:</strong> You gain the benefit but mark 1 Fatigue when the scene ends. <strong>Miss:</strong> No transformation; you mark 1 Fatigue.</p>
+</div>
+</section>
+<section class="level3" id="tag-erasure">
+<h4>[ERASURE] (Multi-Mode)</h4>
+<div class="panel panel-red">
+<p><span class="badge badge-red">Dangerous</span></p>
+<p>Choose one of the following when you cast:</p>
+<ul>
+<li><strong>Annihilate:</strong> Destroy a single mundane object (size chest). Magical objects resist with a <code>[DISPEL]</code> test (DV 4).</li>
+<li><strong>Oblivion:</strong> Erase a specific memory from a living target. Contest Spirit+Endurance (DV 4). On a Miss, you forget instead.</li>
+<li><strong>Nullify:</strong> Void a formal debt, oath, or contract. Requires the original document or a witnessed recitation.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-pressure">
+<h4>[PRESSURE]</h4>
+<div class="panel panel-red">
+<p><span class="badge badge-red">Battlefield Control</span></p>
+<p>All enemies within the affected zone suffer –1 die to physical actions (attacks, Athletics, etc.) for the duration.</p>
+</div>
+</section>
+<section class="level3" id="tag-dream">
+<h4>[DREAM]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Knowledge</span></p>
+<p>Enter a trance or dream state. Ask the GM one question about a past event or a possible future; the answer is always cryptic (one sentence). On a Hit, you may also ignore the first Fatigue from sleep deprivation this scene.</p>
+</div>
+</section>
+<section class="level3" id="tag-time">
+<h4>[TIME]</h4>
+<div class="panel panel-orange">
+<p><span class="badge badge-orange">Situational Danger</span></p>
+<p>Alter the flow of time in a small zone (Near range). Choose one:</p>
+<ul>
+<li><strong>Slow:</strong> Enemies act at Desperate Position for one exchange.</li>
+<li><strong>Haste:</strong> Allies gain +1 band of movement this turn.</li>
+</ul>
+<p class="text-sm text-muted">Dangerous tag: <code>[TIME]</code> adds +2 DV when used to rewind or stop time completely (GM discretion).</p>
+</div>
+</section>
+<section class="level3" id="tag-threshold">
+<h4>[THRESHOLD]</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Boundary</span></p>
+<p>Interact with a boundary – door, gate, portal, or conceptual threshold (e.g., between life and death).</p>
+<ul>
+<li><strong>Hit:</strong> You may open, close, or pass through a mundane threshold effortlessly. A magical threshold requires a Spirit+Endurance test (DV 4).</li>
+<li><strong>Partial:</strong> The threshold resists; you cross but mark 1 Fatigue.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-burden">
+<h4>[BURDEN]</h4>
+<div class="panel panel-orange">
+<p><span class="badge badge-orange">Self-Sacrifice</span></p>
+<p>Take a Condition (e.g., Poisoned, Cursed, Fear) or 1 Fatigue from an ally onto yourself. The ally is freed from that affliction. Cannot transfer Harm directly.</p>
+</div>
+</section>
+</section>
+<section class="level2" id="outsider-specific-tags">
+<h3 id="tags-effects-heading-50">Outsider-Specific Tags</h3>
+<section class="level3" id="tag-ward">
+<h4>[WARD]</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Control</span></p>
+<p>Challenge Outsiders crossing a warded edge or zone.</p>
+<ul>
+<li><strong>DV</strong> = the target's TL (1 for a Lesser Outsider, 3 for a Greater).</li>
+<li><strong>Hit:</strong> Crosses; add +DV segments to its Leash.</li>
+<li><strong>Partial:</strong> Crosses; add +1 segment.</li>
+<li><strong>Miss:</strong> Cannot cross this beat.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-banish">
+<h4>[BANISH]</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Control</span></p>
+<p>Drive a visible Outsider toward departure.</p>
+<ul>
+<li><strong>DV</strong> = the target's TL.</li>
+<li><strong>Hit:</strong> Add +DV to its Leash.</li>
+<li><strong>Partial:</strong> Add +1.</li>
+<li><strong>Miss:</strong> No effect.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="tag-unward">
+<h4>[UNWARD]</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Countermagic</span></p>
+<p>Unmake or suppress a <code>[WARD]</code> created by a Talent, Ability, or Spell.</p>
+<ul>
+<li><strong>DV:</strong> by fiction (strength of the ward).</li>
+<li><strong>Hit:</strong> Dismiss or suppress per source text.</li>
+<li><strong>Partial:</strong> Weaken or suppress briefly (one exchange).</li>
+<li><strong>Miss:</strong> No effect.</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="elemental-backlash-coloring">
+<h3 id="tags-effects-heading-54">Elemental Backlash Coloring (Quick Reference)</h3>
+<p>When a magical roll generates SB (1s) or when a Partial/Miss occurs, the GM may apply a thematic backlash based on the dominant element(s).</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Element</th><th>Minor / Major Backlash Examples</th></tr>
+</thead>
+<tbody>
+<tr><td>Earth</td><td>Rubble, pin, heavy footing; vs Air: sound carries, exposure</td></tr>
+<tr><td>Fire</td><td>Burns, flares; vs Water: slick, sputter, dim</td></tr>
+<tr><td>Air</td><td>Scatter, drop, vertigo; vs Earth: stuck, dust choke</td></tr>
+<tr><td>Water</td><td>Leak, flood, cold drag; vs Fire: smoke, shorted gear</td></tr>
+<tr><td>Fate</td><td>Options close, "only one way"; vs Fortune: mischance hits ally</td></tr>
+<tr><td>Fortune</td><td>Side-effect elsewhere, fragile success; vs Fate: harsher fixed outcome</td></tr>
+<tr><td>Life</td><td>Overgrowth, fever; vs Death/Dreams: numbness, sleep-tug</td></tr>
+<tr><td>Death/Dreams</td><td>Fade, threshold opens/closes; vs Life: pain returns, rot</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="stacking-duration-rules">
+<h3 id="tags-effects-heading-55">Stacking &amp; Duration Rules (Global)</h3>
+<ul>
+<li><strong>No Same-Source Stacking:</strong> Multiple scene-long effects from the same source do not stack; take the best instance.</li>
+<li><strong>Identical Tag Collision:</strong> If two abilities would grant the same Tag in the same window, use the stronger; the weaker is suppressed while it lasts.</li>
+<li><strong>Default Duration:</strong> Scene, unless a source states otherwise (e.g., "until the end of your next turn").</li>
+<li><strong>DV by Fiction:</strong> Potency, preparation, place, materials, and opposition set DV (typical 2–4; 5+ for set-pieces).</li>
+</ul>
+</section>
+</section></div><p>Continue: <a href="rites-and-summoning.html">Rites, invokers, and summoning</a></p></main></body></html>

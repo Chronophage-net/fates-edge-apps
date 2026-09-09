@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Fate's Edge — Sample Playthrough: The Broken Caravan</title>
 <style>
     :root {
@@ -96,111 +97,113 @@
     .dice { font-family: monospace; color: var(--text2); }
     .stat-line { color: var(--text3); font-size: 0.9rem; }
 </style>
-</head>
-<body>
-
-<h1>Sample Playthrough: The Broken Caravan</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Resources · table aid</strong></p><p>Use this document for the task named in its title. A reference table or worked example is easier to use after you have read the corresponding procedure; return to the SRD or guides when timing or context is unclear.</p><nav aria-label="Library reading links"><a href="Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Sample Playthrough: The Broken Caravan</a></li><li><a href="#scene1">Scene 1: The Bridge Dispute</a></li><li><a href="#scene2">Scene 2: The Hidden Threat</a></li><li><a href="#scene3">Scene 3: The Escape</a></li><li><a href="#travel-resolution">Travel Resolution</a></li><li><a href="#gm-reflection">GM Reflection</a></li></ul></details>
+<h1 id="reader-section-1">Sample Playthrough: The Broken Caravan</h1>
 <p class="subtitle">A Fate's Edge Annotated Narrative</p>
-
 <div class="panel">
-    <div class="panel-title">Session Setup</div>
-    <p>Our party consists of Kestra the Arcanist (Wits 4, Arcana 3), Theron the Scout (Wits 3, Insight 3), and Lyra the Blade (Body 4, Melee 3). They're traveling from Ecktoria to Silkstrand through Acasia.</p>
-    <p>We'll use the Acasia travel deck, drawing until we have all four suits for a Full Seed: Spade (6 &ndash; vine-terrace hillside with an abandoned press), Heart (5 &ndash; Free Company captain), Club (4 &ndash; bridge feud), Diamond (3 &ndash; monastery letter for bed-and-bread).</p>
-    <p>The highest rank is 6, so we have a 6-segment travel timer. The scene: the party approaches a bridge where two Free Company factions are engaged in a feud. They have a monastery letter that should grant them safe passage.</p>
+<div class="panel-title">Session Setup</div>
+<p>Our party consists of Kestra the Arcanist (Wits 4, Arcana 3), Theron the Scout (Wits 3, Insight 3), and Lyra the Blade (Body 4, Melee 3). They're traveling from Ecktoria to Silkstrand through Acasia.</p>
+<p>We'll use the Acasia travel deck, drawing until we have all four suits for a Full Seed: Spade (6 – vine-terrace hillside with an abandoned press), Heart (5 – Free Company captain), Club (4 – bridge feud), Diamond (3 – monastery letter for bed-and-bread).</p>
+<p>The highest rank is 6, so we have a 6-segment travel timer. The scene: the party approaches a bridge where two Free Company factions are engaged in a feud. They have a monastery letter that should grant them safe passage.</p>
 </div>
-
 <h2 id="scene1">Scene 1: The Bridge Dispute</h2>
 <p>As you crest the hill, you see the old stone bridge below, but it's blocked by two groups of mercenaries glaring at each other across the span. One group wears blue tabards, the other red. The bridge keeper looks nervous.</p>
-
 <div class="panel panel-gold">
-    <p><strong>Kestra:</strong> I'll try to use my monastery letter to get us safe passage. Presence + Sway.</p>
-    <p class="text-muted text-sm">Controlled position &mdash; they're clearly on edge. Difficulty Value 2.</p>
-    <p class="roll-line">Rolling Presence 3 + Sway 2 = 5 dice. <span class="dice">[8, 6, 4, 1, 1]</span></p>
-    <p><strong>Successes: 2</strong> &nbsp; <strong>SB: 2</strong> &nbsp; <strong>Outcome: Success with SB</strong></p>
-    <p>You approach with the letter, and the blue-tabard captain nods respectfully. &ldquo;Aye, we honor the brotherhood's seal.&rdquo; But as you start across, the red-tabard leader shouts, &ldquo;Hold! No one crosses without paying our toll!&rdquo; He draws his sword. <em>SB 1 spent:</em> the blue captain steps in front of you protectively, but now both groups are reaching for weapons.</p>
+<p><strong>Kestra:</strong> I'll try to use my monastery letter to get us safe passage. Presence + Sway.</p>
+<p class="text-muted text-sm">Controlled position — they're clearly on edge. Difficulty Value 2.</p>
+<p class="roll-line">Rolling Presence 3 + Sway 2 = 5 dice. <span class="dice">[8, 6, 4, 1, 1]</span></p>
+<p><strong>Successes: 2</strong>   <strong>SB: 2</strong>   <strong>Outcome: Success with SB</strong></p>
+<p>You approach with the letter, and the blue-tabard captain nods respectfully. “Aye, we honor the brotherhood's seal.” But as you start across, the red-tabard leader shouts, “Hold! No one crosses without paying our toll!” He draws his sword. <em>SB 1 spent:</em> the blue captain steps in front of you protectively, but now both groups are reaching for weapons.</p>
 </div>
-
 <div class="panel panel-gold">
-    <p><strong>Theron:</strong> I'll scout ahead to see if there's another way across or some advantage we can use. Wits + Stealth.</p>
-    <p class="text-muted text-sm">Controlled position, DV 2. The hillside is rocky but offers some cover.</p>
-    <p class="roll-line">Rolling Wits 3 + Stealth 3 = 6 dice. <span class="dice">[9, 7, 5, 3, 1, 1]</span></p>
-    <p><strong>Successes: 2</strong> &nbsp; <strong>SB: 2</strong> &nbsp; <strong>Outcome: Success with SB</strong></p>
-    <p>You slip away and spot a narrow path leading down to the riverbank below &mdash; you could ford the stream and climb up on the far side. But <em>SB 1:</em> the rocky descent is treacherous. <em>SB 2:</em> as you move, you dislodge a small rockslide that alerts both groups to your position.</p>
+<p><strong>Theron:</strong> I'll scout ahead to see if there's another way across or some advantage we can use. Wits + Stealth.</p>
+<p class="text-muted text-sm">Controlled position, DV 2. The hillside is rocky but offers some cover.</p>
+<p class="roll-line">Rolling Wits 3 + Stealth 3 = 6 dice. <span class="dice">[9, 7, 5, 3, 1, 1]</span></p>
+<p><strong>Successes: 2</strong>   <strong>SB: 2</strong>   <strong>Outcome: Success with SB</strong></p>
+<p>You slip away and spot a narrow path leading down to the riverbank below — you could ford the stream and climb up on the far side. But <em>SB 1:</em> the rocky descent is treacherous. <em>SB 2:</em> as you move, you dislodge a small rockslide that alerts both groups to your position.</p>
 </div>
-
 <div class="panel panel-gold">
-    <p><strong>Lyra:</strong> I say we charge through the middle. I'll lead the way with my blade. Body + Melee.</p>
-    <p class="text-muted text-sm">Desperate position &mdash; you're charging into an armed standoff. DV 3.</p>
-    <p class="roll-line">Rolling Body 4 + Melee 3 = 7 dice. <span class="dice">[10, 8, 6, 4, 3, 1, 1]</span></p>
-    <p><strong>Successes: 4</strong> <span class="text-muted text-sm">(the 10 counts as two)</span> &nbsp; <strong>SB: 2</strong> &nbsp; <strong>Outcome: Success with SB</strong></p>
-    <p>You leap down onto the bridge, blade singing. The red-tabard captain barely gets his sword up in time. Your fierce charge breaks their morale, and they fall back. But <em>SB 1:</em> one of the blue-tabards takes a crossbow bolt meant for you, crying out in pain. <em>SB 2:</em> your charge was so committed you're now surrounded by both groups, with no clear escape route.</p>
+<p><strong>Lyra:</strong> I say we charge through the middle. I'll lead the way with my blade. Body + Melee.</p>
+<p class="text-muted text-sm">Desperate position — you're charging into an armed standoff. DV 3.</p>
+<p class="roll-line">Rolling Body 4 + Melee 3 = 7 dice. <span class="dice">[10, 8, 6, 4, 3, 1, 1]</span></p>
+<p><strong>Successes: 4</strong> <span class="text-muted text-sm">(the 10 counts as two)</span>   <strong>SB: 2</strong>   <strong>Outcome: Success with SB</strong></p>
+<p>You leap down onto the bridge, blade singing. The red-tabard captain barely gets his sword up in time. Your fierce charge breaks their morale, and they fall back. But <em>SB 1:</em> one of the blue-tabards takes a crossbow bolt meant for you, crying out in pain. <em>SB 2:</em> your charge was so committed you're now surrounded by both groups, with no clear escape route.</p>
 </div>
-
 <h2 id="scene2">Scene 2: The Hidden Threat</h2>
-<p>As the standoff continues, you notice something odd. The monastery letter in Kestra's hand is&hellip; glowing faintly. Strange symbols are appearing on the parchment.</p>
-
+<p>As the standoff continues, you notice something odd. The monastery letter in Kestra's hand is… glowing faintly. Strange symbols are appearing on the parchment.</p>
 <div class="panel panel-gold">
-    <p><strong>Kestra:</strong> I recognize these markings &mdash; it's a geomantic ward that activates under stress! I can channel it to help us. Wits + Arcana.</p>
-    <p class="text-muted text-sm">Intricate action. This is Pressured (DV 2) since you're doing it in combat.</p>
-    <p class="roll-line">Rolling Wits 4 + Arcana 3 = 7 dice. <span class="dice">[9, 7, 6, 4, 3, 1, 1]</span></p>
-    <p><strong>Successes: 3</strong> &nbsp; <strong>SB: 2</strong> &nbsp; <strong>Outcome: Success with SB</strong></p>
-    <p>The letter blazes with light, and the ground beneath both mercenary groups shudders. Cracks spread across the bridge's stones. <em>SB 1:</em> the magical backlash leaves you dizzy and off-balance. <em>SB 2:</em> the bridge is now unstable &mdash; chunks of masonry have fallen into the river.</p>
+<p><strong>Kestra:</strong> I recognize these markings — it's a geomantic ward that activates under stress! I can channel it to help us. Wits + Arcana.</p>
+<p class="text-muted text-sm">Intricate action. This is Pressured (DV 2) since you're doing it in combat.</p>
+<p class="roll-line">Rolling Wits 4 + Arcana 3 = 7 dice. <span class="dice">[9, 7, 6, 4, 3, 1, 1]</span></p>
+<p><strong>Successes: 3</strong>   <strong>SB: 2</strong>   <strong>Outcome: Success with SB</strong></p>
+<p>The letter blazes with light, and the ground beneath both mercenary groups shudders. Cracks spread across the bridge's stones. <em>SB 1:</em> the magical backlash leaves you dizzy and off-balance. <em>SB 2:</em> the bridge is now unstable — chunks of masonry have fallen into the river.</p>
 </div>
-
 <div class="panel panel-gold">
-    <p><strong>Theron:</strong> Seeing the bridge weaken, I'll try to convince both groups to retreat before it collapses entirely. Wits + Sway.</p>
-    <p class="text-muted text-sm">Controlled position, DV 2. You're trying to reason with armed men while a bridge crumbles.</p>
-    <p class="roll-line">Rolling Wits 3 + Sway 2 = 5 dice. <span class="dice">[7, 6, 4, 2, 1]</span></p>
-    <p><strong>Successes: 2</strong> &nbsp; <strong>SB: 1</strong> &nbsp; <strong>Outcome: Success with SB</strong></p>
-    <p>Your voice carries over the noise: &ldquo;Do you want to be the last men standing on a broken bridge?&rdquo; The captains exchange glances. The red-tabard nods sharply and pulls his men back. But <em>SB 1:</em> in your focus on the mercenaries, you didn't notice the bridge's central support was already compromised.</p>
+<p><strong>Theron:</strong> Seeing the bridge weaken, I'll try to convince both groups to retreat before it collapses entirely. Wits + Sway.</p>
+<p class="text-muted text-sm">Controlled position, DV 2. You're trying to reason with armed men while a bridge crumbles.</p>
+<p class="roll-line">Rolling Wits 3 + Sway 2 = 5 dice. <span class="dice">[7, 6, 4, 2, 1]</span></p>
+<p><strong>Successes: 2</strong>   <strong>SB: 1</strong>   <strong>Outcome: Success with SB</strong></p>
+<p>Your voice carries over the noise: “Do you want to be the last men standing on a broken bridge?” The captains exchange glances. The red-tabard nods sharply and pulls his men back. But <em>SB 1:</em> in your focus on the mercenaries, you didn't notice the bridge's central support was already compromised.</p>
 </div>
-
 <h2 id="scene3">Scene 3: The Escape</h2>
 <p>With a grinding roar, the bridge's center span begins to collapse. You have seconds to get clear.</p>
-
 <div class="panel panel-gold">
-    <p><strong>Lyra:</strong> I'll help the wounded blue-tabard back from the edge. Body + Athletics.</p>
-    <p class="text-muted text-sm">Pressured action, DV 2. You're carrying extra weight while the ground shakes.</p>
-    <p class="roll-line">Rolling Body 4 + Athletics 2 = 6 dice. <span class="dice">[8, 6, 5, 3, 1, 1]</span></p>
-    <p><strong>Successes: 2</strong> &nbsp; <strong>SB: 2</strong> &nbsp; <strong>Outcome: Success with SB</strong></p>
-    <p>You grab the wounded man and haul him toward the shore just as the bridge span crashes into the river below. He's alive but injured. <em>SB 1:</em> the effort strains your shoulder. <em>SB 2:</em> as you reach safety, you realize the collapse has blocked the main road completely.</p>
+<p><strong>Lyra:</strong> I'll help the wounded blue-tabard back from the edge. Body + Athletics.</p>
+<p class="text-muted text-sm">Pressured action, DV 2. You're carrying extra weight while the ground shakes.</p>
+<p class="roll-line">Rolling Body 4 + Athletics 2 = 6 dice. <span class="dice">[8, 6, 5, 3, 1, 1]</span></p>
+<p><strong>Successes: 2</strong>   <strong>SB: 2</strong>   <strong>Outcome: Success with SB</strong></p>
+<p>You grab the wounded man and haul him toward the shore just as the bridge span crashes into the river below. He's alive but injured. <em>SB 1:</em> the effort strains your shoulder. <em>SB 2:</em> as you reach safety, you realize the collapse has blocked the main road completely.</p>
 </div>
-
 <div class="panel panel-blue">
-    <p><strong>Kestra:</strong> I'll use my geomancy to assess if there's a safe path through the rubble. Wits + Insight.</p>
-    <p class="text-muted text-sm">Controlled position (you're safely ashore), DV 3 &mdash; the default. You're safe from harm, but finding a viable path through a fresh rockfall is still a real question with a real answer, not a freebie.</p>
-    <p class="roll-line">Rolling Wits 4 + Insight 1 = 5 dice. <span class="dice">[9, 6, 4, 3, 2]</span></p>
-    <p><strong>Successes: 2</strong> &nbsp; <strong>SB: 0</strong> &nbsp; <strong>Outcome: Partial</strong></p>
-    <p>You spot a gap in the rubble where the old press's foundation created a natural tunnel &mdash; but you can't be sure it's stable, and you won't know until someone's committed to it. It'll let you continue toward Silkstrand, but at a cost: you gain 1 <span class="badge badge-gold">Boon</span>, and the tunnel's stability is an open question for later.</p>
+<p><strong>Kestra:</strong> I'll use my geomancy to assess if there's a safe path through the rubble. Wits + Insight.</p>
+<p class="text-muted text-sm">Controlled position (you're safely ashore), DV 3 — the default. You're safe from harm, but finding a viable path through a fresh rockfall is still a real question with a real answer, not a freebie.</p>
+<p class="roll-line">Rolling Wits 4 + Insight 1 = 5 dice. <span class="dice">[9, 6, 4, 3, 2]</span></p>
+<p><strong>Successes: 2</strong>   <strong>SB: 0</strong>   <strong>Outcome: Partial</strong></p>
+<p>You spot a gap in the rubble where the old press's foundation created a natural tunnel — but you can't be sure it's stable, and you won't know until someone's committed to it. It'll let you continue toward Silkstrand, but at a cost: you gain 1 <span class="badge badge-gold">Boon</span>, and the tunnel's stability is an open question for later.</p>
 </div>
-
 <h2 id="travel-resolution">Travel Resolution</h2>
 <div class="panel">
-    <p>Let's check our travel timer. We had 6 segments. We've resolved the major conflict, found an alternate route, and survived the encounter.</p>
-    <p>I'll tick 2 segments for successfully navigating the obstacle. The party earned 1 <span class="badge badge-gold">Boon</span> for creative problem-solving &mdash; the Boon from Kestra's Partial &mdash; and 2 XP for the Complication Dividend (face cards drawn).</p>
+<p>Let's check our travel timer. We had 6 segments. We've resolved the major conflict, found an alternate route, and survived the encounter.</p>
+<p>I'll tick 2 segments for successfully navigating the obstacle. The party earned 1 <span class="badge badge-gold">Boon</span> for creative problem-solving — the Boon from Kestra's Partial — and 2 XP for the Complication Dividend (face cards drawn).</p>
 </div>
-
 <h2 id="gm-reflection">GM Reflection</h2>
 <p>This scene demonstrates several key Fate's Edge principles:</p>
 <ul>
-    <li><strong>Risk as Drama:</strong> Every successful action still generated complications through SB.</li>
-    <li><strong>Player Agency:</strong> The players had multiple approaches (diplomacy, stealth, direct action) that all contributed meaningfully.</li>
-    <li><strong>Narrative Primacy:</strong> The collapsing bridge wasn't just a mechanical effect &mdash; it changed the story and forced new decisions.</li>
-    <li><strong>Meaningful Growth:</strong> XP was earned through engagement with complications, not just success.</li>
-    <li><strong>Collaborative Storytelling:</strong> The glowing letter was a player detail that the GM incorporated into the fiction to create new possibilities.</li>
+<li><strong>Risk as Drama:</strong> Every successful action still generated complications through SB.</li>
+<li><strong>Player Agency:</strong> The players had multiple approaches (diplomacy, stealth, direct action) that all contributed meaningfully.</li>
+<li><strong>Narrative Primacy:</strong> The collapsing bridge wasn't just a mechanical effect — it changed the story and forced new decisions.</li>
+<li><strong>Meaningful Growth:</strong> XP was earned through engagement with complications, not just success.</li>
+<li><strong>Collaborative Storytelling:</strong> The glowing letter was a player detail that the GM incorporated into the fiction to create new possibilities.</li>
 </ul>
-
 <p>Key mechanics shown:</p>
 <ul>
-    <li>Outcome Matrix application (Success with SB was the most common result, with one genuine Partial)</li>
-    <li>Story Beat spending to add tension and story elements</li>
-    <li>Description Ladder use (Intricate action for Kestra's geomancy)</li>
-    <li>Travel timer advancement based on resolution quality</li>
+<li>Outcome Matrix application (Success with SB was the most common result, with one genuine Partial)</li>
+<li>Story Beat spending to add tension and story elements</li>
+<li>Description Ladder use (Intricate action for Kestra's geomancy)</li>
+<li>Travel timer advancement based on resolution quality</li>
 </ul>
-
 <p>The session ended with the party making progress but also creating new story threads: an injured NPC to potentially care for, a blocked road that might affect future travelers, an unproven rubble tunnel, and questions about the magical monastery letter.</p>
-
 <footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-
-</body>
+</article></body>
 </html>

@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Character creation and advancement</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Character creation and advancement</h1><p>Build a character before browsing every possible ability. Read Character Creation in order, use Attributes and Skills to understand your choices, then consult the linked talent and equipment references when the creation procedure calls for them. Advancement explains what happens after play begins.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="character-creation">
+<h2>Character Creation</h2>
+<section class="level2" id="starting-build-points">
+<h3>Starting Build Points</h3>
+<p>Characters begin with 32 XP to allocate during initial creation. This represents a balanced baseline for competent starting characters.</p>
+</section>
+<section class="level2" id="enhanced-starting-builds">
+<h3>Enhanced Starting Builds</h3>
+<p>Players may exceed the standard 32 XP build through narrative engagement:</p>
+<ul>
+<li><strong>Bonds:</strong> Up to two player-defined mutual bonds may be taken for +2 XP total. (See the coordination rules for bond-driven Boon rules.)</li>
+<li><strong>Complications:</strong> Up to two initial complications may be accepted for +4 XP total. Scenes start with +1 banked SB per character with a complication until their complications have been resolved in play.</li>
+</ul>
+<p>This allows a maximum starting build of 36 XP. Players are encouraged to aim for 32 XP and use bonds and complications to enhance characterization rather than pure mechanical optimization.</p>
+<p>The starting caps — attribute 3, skill 2 — are not raised by any of this. The one exception is the <a href="talents.html#creation-only-talents">Prodigy</a> talent, which buys a single attribute at 4 and charges for it in breadth, permanence and attention.</p>
+</section>
+<section class="level2" id="step-by-step-creation">
+<h3>Step-by-Step Creation</h3>
+<section class="level3" id="step-1-concept-and-culture">
+<h4>Step 1: Concept and Culture</h4>
+<p>Describe your character in a sentence. Choose a cultural background (e.g., Aeler, Ykrul, Vilikari, Lethai). Cultural affinities provide narrative edges described in the full cultural guides.</p>
+</section>
+<section class="level3" id="step-2-attributes">
+<h4>Step 2: Attributes</h4>
+<p>Distribute 1, 2, 2, 3 among the four attributes (minimum 1, maximum 3 at start). Cost to raise attributes later is new rating × 3 XP.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Body</td><td>Strength, endurance, physical resilience.</td></tr>
+<tr><td>Wits</td><td>Perception, speed, quick thinking.</td></tr>
+<tr><td>Spirit</td><td>Willpower, focus, connection to the intangible.</td></tr>
+<tr><td>Presence</td><td>Charisma, command, force of personality.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="step-3-skills">
+<h4>Step 3: Skills</h4>
+<p>Distribute 6 points among skills (maximum 2 in any skill at start). Cost to raise skills later is new level × 2 XP.</p>
+<p>Core skills include:</p>
+<div class="grid-2">
+<ul>
+<li>Melee</li>
+<li>Ranged</li>
+<li>Athletics</li>
+<li>Stealth</li>
+<li>Endurance</li>
+<li>Craft</li>
+</ul>
+<ul>
+<li>Sway</li>
+<li>Deception</li>
+<li>Performance</li>
+<li>Insight</li>
+<li>Lore</li>
+<li>Arcana</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="step-4-talents">
+<h4>Step 4: Talents</h4>
+<p>Spend XP on talents. Recommended starting talents for common archetypes:</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Archetype</th><th>Recommended Talents</th></tr></thead>
+<tbody>
+<tr><td>Warrior</td><td>Weapon Master (5 XP), Effortless Charge (4 XP), Conditioning (4 XP)</td></tr>
+<tr><td>Rogue</td><td>Keen Senses (2 XP), Trackless Step (2 XP), Backstab (6 XP)</td></tr>
+<tr><td>Caster (Freeform)</td><td>Spellcraft (6 XP)</td></tr>
+<tr><td>Runekeeper</td><td>Familiar (2 XP) + Codex (4 XP)</td></tr>
+<tr><td>Invoker</td><td>Patron’s Symbol (4 XP)</td></tr>
+<tr><td>Summoner</td><td>Pact-Whisperer (2 XP) + Lesser Pactwright (2 XP)</td></tr>
+<tr><td>Support</td><td>Field Dressing (2 XP), Medic’s Hand (3 XP), Inspire (3 XP)</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="step-5-equipment">
+<h4>Step 5: Equipment</h4>
+<p>Choose starting equipment based on concept. See the equipment rules for weapon, armor, and gear tables.</p>
+</section>
+<section class="level3" id="step-6-bonds">
+<h4>Step 6: Bonds</h4>
+<p>Define 1–2 mutual bonds with other player characters. Each bond gives:</p>
+<ul>
+<li>Once per session, when you act meaningfully on the bond and provide an Intricate Description, gain 1 Boon.</li>
+<li>Bonded allies may gift 2 Boons per scene to each other (instead of the normal 1).</li>
+</ul>
+<p>A bond should include:</p>
+<ul>
+<li>A shared history or obligation.</li>
+<li>What each character gains from the bond.</li>
+<li>A potential source of tension.</li>
+</ul>
+</section>
+<section class="level3" id="step-7-complications-optional">
+<h4>Step 7: Complications (Optional)</h4>
+<p>Choose 0–2 complications. Each gives +2 XP at start. Complications should be narrative hooks, not purely mechanical penalties. Examples:</p>
+<ul>
+<li><strong>Debt to a Patron:</strong> You owe Obligation segments to a Patron before play begins.</li>
+<li><strong>Hunted:</strong> A faction or individual seeks you.</li>
+<li><strong>Forbidden Knowledge:</strong> You carry a secret that could destroy you if revealed.</li>
+<li><strong>Cursed Lineage:</strong> Ancestral curse manifests at dramatic moments.</li>
+<li><strong>Oath-Bound:</strong> A geas compels certain actions; breaking it has steep costs.</li>
+</ul>
+<p>For each complication taken, at the start of each scene the GM gains +1 SB until the complication is resolved in play.</p>
+</section>
+<section class="level3" id="step-8-finalize">
+<h4>Step 8: Finalize</h4>
+<p>Record starting Fatigue (0), Harm (0), Boons (0). Note any starting Assets or Followers.</p>
+</section>
+</section>
+<section class="level2" id="quick-build-templates">
+<h3>Quick Build Templates</h3>
+<div class="grid-2">
+<div class="panel panel-blue">
+<section class="level3" id="fighter">
+<h4>Fighter <span class="badge badge-gold">32 XP</span></h4>
+<p>Body 3, Wits 2, Spirit 2, Presence 2</p>
+<p><strong>Skills:</strong> Melee 2, Athletics 2, Endurance 1, Sway 1</p>
+<p><strong>Talents:</strong> Weapon Master (5 XP), Conditioning (4 XP), Effortless Charge (4 XP)</p>
+<p><strong>Equipment:</strong> Medium weapon, medium armor</p>
+<p><strong>Bond:</strong> One mutual bond</p>
+<p><strong>Complication:</strong> None</p>
+</section>
+</div>
+<div class="panel panel-purple">
+<section class="level3" id="rogue">
+<h4>Rogue <span class="badge badge-gold">32 XP</span></h4>
+<p>Body 2, Wits 4, Spirit 2, Presence 2</p>
+<p><strong>Skills:</strong> Stealth 2, Deception 2, Sway 2, Insight 1</p>
+<p><strong>Talents:</strong> Keen Senses (2 XP), Silk Palms (2 XP), Backstab (6 XP)</p>
+<p><strong>Equipment:</strong> Light weapons, light armor, lockpicks</p>
+<p><strong>Bond:</strong> One mutual bond</p>
+<p><strong>Complication:</strong> None</p>
+</section>
+</div>
+<div class="panel panel-green">
+<section class="level3" id="caster">
+<h4>Caster <span class="badge badge-gold">32 XP</span></h4>
+<p>Body 2, Wits 4, Spirit 3, Presence 1</p>
+<p><strong>Skills:</strong> Arcana 2, Lore 2, Insight 1, Insight 1</p>
+<p><strong>Talents:</strong> Spellcraft (6 XP)</p>
+<p><strong>Equipment:</strong> Staff, robes, focus (crystal, runestone, or inkpot)</p>
+<p><strong>Bond:</strong> One mutual bond</p>
+<p><strong>Complication:</strong> None</p>
+</section>
+</div>
+</div>
+</section>
+<section class="level2" id="learning-through-examples">
+<h3>Learning Through Examples</h3>
+<p>See how core mechanics apply to the QuickBuild Templates:</p>
+<div class="panel panel-blue">
+<p><strong>Lockpick Under Pressure (Lyra the Rogue):</strong></p>
+<blockquote>“Controlled, DV 3. On a miss, the guard hears you.”<span class="attribution">— GM</span></blockquote>
+<p>Lyra rolls [9, 6, 4, 2, 1] (Wits 4 + Deception 2 = 6 dice) → 2 successes (DV 3 Partial) → Gains 1 Boon.</p>
+<blockquote>“The lock clicks open, but the last pin squeals. I spend the SB: the guard stops and turns his head. You have one beat to hide.”<span class="attribution">— GM</span></blockquote>
+<p>The 1 gives GM 1 SB.</p>
+<p class="text-muted"><em>Teaches: Partial success = progress + Boon; 1s = GM currency for complications.</em></p>
+</div>
+<div class="panel panel-orange">
+<p><strong>Arcane Backlash (Sera the Caster):</strong></p>
+<p>Sera casts <code>[FIRE][STRIKE]</code> (DV 3) vs. a fire elemental → rolls [10, 1, 1] (Wits 4 + Arcana 2 = 6 dice) → 3 successes (10=2, 1s=2 SB) → Success with SB (GM spends 1 SB for complication).</p>
+<p><strong>Backlash:</strong> Dominant element is Fire → GM describes:</p>
+<blockquote>“The bolt hits, but the flash blinds you—your next action is Desperate. Smoke triggers a hanging lantern; the room starts catching fire (Clock: Fire Spread [4]).”<span class="attribution">— GM</span></blockquote>
+<p class="text-muted"><em>Teaches: 1s generate SB even on success; elemental backlash coloring; SB spent on visible consequences.</em></p>
+</div>
+<div class="panel panel-gold">
+<p><strong>Tip for New GMs:</strong> Run these examples at your table. Ask: “What would you do with Lyra’s Boon?” or “How does Sera’s backlash change the scene?”</p>
+</div>
+</section>
+<section class="level2" id="advanced-start-tier-ii">
+<h3>Advanced Start: Tier II (80 XP)</h3>
+<p>For campaigns beginning at higher power, characters may start with 80 XP. In addition to the 32 XP baseline, add:</p>
+<ul>
+<li>+2 attribute points (raise any attributes; maximum 4).</li>
+<li>+8 skill points (maximum skill 3 at start; raise to 4 later).</li>
+<li>Additional talents worth approximately 48 XP.</li>
+<li>One Minor Asset (4 XP) or one Follower (Cap 2).</li>
+<li>One additional bond or complication (narrative only; no extra XP).</li>
+</ul>
+</section>
+<section class="level2" id="session-zero-tips">
+<h3>Session Zero Tips</h3>
+<ul>
+<li>Establish the table’s tone and stakes; tie character goals to campaign fronts.</li>
+<li>Map Bonds among PCs; mark possible bond-driven Boon triggers.</li>
+<li>Seed 1–2 personal Complications per PC for early spotlight.</li>
+<li>Discuss Patron choices (if any) and what their omens look like.</li>
+<li>Review Safety Tools (Lines, Veils, X-Card) before play begins.</li>
+</ul>
+</section>
+<section class="level2" id="build-point-summary">
+<h3>Build Point Summary</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Element</th><th>Cost (XP)</th><th>Starting Max</th></tr></thead>
+<tbody>
+<tr><td>Attribute (per point)</td><td>3 × new rating</td><td>3</td></tr>
+<tr><td>Skill (per point)</td><td>2 × new level</td><td>2</td></tr>
+<tr><td>Talent</td><td>varies</td><td>—</td></tr>
+<tr><td>Bond (mutual)</td><td>+1 XP each (2 total)</td><td>2</td></tr>
+<tr><td>Complication</td><td>+2 XP each (2 total)</td><td>2</td></tr>
+<tr><td>Minor Asset</td><td>4 XP</td><td>1</td></tr>
+<tr><td>Follower (Cap 2)</td><td>2 XP</td><td>1</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+</section><section class="level1" id="attributes-and-skills">
+<h2>Attributes and Skills</h2>
+<section class="level2" id="attributes">
+<h3>Attributes</h3>
+<p>Every character has four attributes rated from 1 (weak) to 5 (exceptional). Attribute ratings determine the base number of dice for any action roll.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Body</td><td>Strength, endurance, and physical resilience. Used for melee combat, athletics, and resisting fatigue.</td></tr>
+<tr><td>Wits</td><td>Perception, speed, and quick thinking. Used for ranged combat, stealth, and noticing details.</td></tr>
+<tr><td>Spirit</td><td>Willpower, focus, and resolve. Used for magic, resisting fear, and maintaining composure.</td></tr>
+<tr><td>Presence</td><td>Charisma, command, and social influence. Used for persuasion, leadership, and deception.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="skills">
+<h3>Skills</h3>
+<p>There are <strong>twelve skills</strong>. Each is rated 0 (untrained) to 5 (master), and the rating is added to an attribute to form the dice pool. Twelve is deliberate: a shorter list means fewer arguments about which skill applies, and every one of these is broad enough that the interesting question at the table is <em>which attribute</em> you are bringing to it, not which skill you are allowed to use.</p>
+<h4 id="skills-combat">Combat</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td><strong>Melee</strong></td><td>Close-quarters fighting, armed or unarmed — swords, axes, spears, fists, grapples, improvised weapons.</td></tr>
+<tr><td><strong>Ranged</strong></td><td>Bows, crossbows, slings, thrown weapons, and firearms.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="skills-physical">Physical</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td><strong>Athletics</strong></td><td>Running, climbing, leaping, swimming, and sudden physical exertion.</td></tr>
+<tr><td><strong>Stealth</strong></td><td>Moving unseen, hiding, camouflage, and going unremarked.</td></tr>
+<tr><td><strong>Endurance</strong></td><td>Lasting. Resisting fatigue, poison, cold, hunger, fear and pressure — anything that asks how long you can hold. <em>Spirit + Endurance</em> is the standard test for holding yourself together.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="skills-practical">Practical</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td><strong>Craft</strong></td><td><strong>Lay knowledge.</strong> Making, mending, and tending: smithing, carpentry, masonry, cooking, brewing, locks and mechanisms — and medicine, which is the same skill pointed at a body. Craft is what a person knows by having done it.</td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="panel panel-gold">
+<p><strong>Craft is slow magic.</strong> A rite disturbs the Weave; a craft does not. That is the only real difference, and it is a difference of <em>speed</em> rather than of kind. The smith who has kept one fire for forty years and the witch who calls something up in an evening are reaching for the same thing by different roads — and the smith's road, being slower, leaves no wake for anything to notice.</p>
+<p>This is why dedication and mastery in a craft can produce results the world will call miraculous without a single tag being spent: a blade that will not dull, a hearth that will not go out, a splint that sets a bone straighter than it began. Mechanically these are <a href="crafting.html#srd-crafting">Wonders</a>, and they cost XP and Obligation like any other. Narratively, nobody involved would agree they were doing magic. The line between Craft and Witchcraft is genuinely blurred, and it is meant to stay that way — a Game Master should never have to rule on which side of it a village blacksmith's best work falls.</p>
+</div>
+<h4 id="skills-social">Social</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td><strong>Sway</strong></td><td>Moving people openly: persuasion, negotiation, charm, leadership, orders, and intimidation. Whether it reads as a plea, a command or a threat is a matter of attribute and fiction, not of skill.</td></tr>
+<tr><td><strong>Deception</strong></td><td>Moving people covertly: lying, bluffing, disguise, forgery, talking past a checkpoint, casing a routine, knowing who fences what.</td></tr>
+<tr><td><strong>Performance</strong></td><td>Singing, acting, oration, musical display, public speaking — and the Cantor's path, which is sung.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="skills-mental">Mental</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td><strong>Insight</strong></td><td>Reading what is in front of you — people, ground, evidence. Detecting a lie, picking the ambush lane, reconstructing a scene, interviewing a witness, tracking, reading weather. Deduction, from whatever the world has left lying about.</td></tr>
+<tr><td><strong>Lore</strong></td><td>Knowing what is not in front of you. History, custom, religion, law, legend, local knowledge — and the performance of rites, which is knowledge applied aloud. <em>Spirit + Lore</em> is the standard roll for ritual work.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="skills-magic">Magic</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td><strong>Arcana</strong></td><td>Magic theory, identifying spells and wards, counterspelling, and free casting. The Weave as an object of study rather than of practice.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="skills-expansion">Skills an expansion may add</h4>
+<p>Twelve is the <em>core</em> list, not a closed one. An expansion may introduce a thirteenth skill, and there is standing precedent for it — but the bar is deliberately high, because every added skill is a new argument at every table about which one applies.</p>
+<p>A new skill has to clear one test: <strong>it must not be expressible as an existing skill under a different attribute.</strong> "Resolve" failed that test — it was <em>Spirit + Endurance</em> wearing a hat. "Command" failed it — <em>Presence + Sway</em>. If your idea reduces to one of the twelve with the right attribute in front of it, you have found a good <em>use</em> of a skill, not a new skill.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Source</th><th>Why it earns a slot</th></tr></thead>
+<tbody>
+<tr><td><strong>Psionics</strong></td><td><em>Psionics</em> expansion</td><td>The worked example. It is not Arcana under a different attribute — Arcana studies the Weave, and psionics deliberately does not touch the Weave at all. Making it a separate skill is how the setting says so mechanically rather than only in prose. Trained only at tables using psionics.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm">Note the shape of that justification, because it is the one to copy: a new skill is warranted when it marks a genuine <em>metaphysical or structural</em> distinction the twelve cannot express. Craft and Arcana are already separated that way — see <em>Craft is slow magic</em> above — and Psionics is separated from both on the same grounds.</p>
+<div class="panel panel-blue">
+<p><strong>Insight and Lore are the pair to get right.</strong> Insight reads the room; Lore knows what the room is for. A character who has never left their valley can have Insight 4. A character who has read everything and understands nobody can have Lore 4. Most investigations want both, in that order.</p>
+</div>
+</section>
+<section class="level2" id="skill-uses-common-examples">
+<h3>Skill Uses (Common Examples)</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Skill</th><th>Common Actions</th><th>Typical Difficulty</th></tr></thead>
+<tbody>
+<tr><td>Melee</td><td>Attack with sword or axe</td><td>DV 3 (Controlled)</td></tr>
+<tr><td>Ranged</td><td>Shoot a bow at Near range</td><td>DV 3</td></tr>
+<tr><td>Athletics</td><td>Climb a wall, leap a gap</td><td>DV 3–4</td></tr>
+<tr><td>Stealth</td><td>Hide from guards</td><td>Opposed by Insight</td></tr>
+<tr><td>Insight</td><td>Track a creature, find water</td><td>DV 3–4</td></tr>
+<tr><td>Sway</td><td>Persuade a guard to look away</td><td>DV 3 (varies by leverage)</td></tr>
+<tr><td>Insight</td><td>Detect a lie</td><td>DV 3 (opposed by Deception)</td></tr>
+<tr><td>Lore</td><td>Recall historical or cultural knowledge</td><td>DV 2–4</td></tr>
+<tr><td>Insight</td><td>Search a room for clues</td><td>DV 3–4</td></tr>
+<tr><td>Craft</td><td>Stabilize a dying ally</td><td>DV 3–5 (by severity)</td></tr>
+<tr><td>Arcana</td><td>Identify a magical effect</td><td>DV 4–5</td></tr>
+<tr><td>Lore</td><td>Perform a consecration or exorcism</td><td>DV 4–6</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="default-skill-for-common-actions">
+<h3>Default Skill for Common Actions</h3>
+<p>If an action does not clearly match a listed skill, the GM may default to the most appropriate attribute alone (e.g., a raw Strength check uses Body with no skill). However, encourage players to justify skill use through their approach.</p>
+</section>
+<section class="level2" id="assistance-and-skill-synergy">
+<h3>Assistance and Skill Synergy</h3>
+<p>One character may assist the primary actor using the same or a complementary skill, granting +1 die. Relevant talents may improve that contribution, up to the assist cap of +3 dice. The GM may require the helper to succeed on a small roll (DV 2) to provide meaningful help.</p>
+</section>
+</section><section class="level1" id="advancement">
+<h2>Advancement &amp; XP</h2>
+<p>Advancement in Fate's Edge reflects meaningful growth in capability and standing. XP is awarded for table-facing accomplishments, hard choices, and the dramatic friction that defines your story. Boons can be converted sparingly to accelerate growth.</p>
+<section class="level2" id="awarding-xp">
+<h3 id="advancement-heading-1">Awarding XP</h3>
+<p>Choose a session pacing dial and stick to it for a campaign arc.</p>
+<ul>
+<li><strong>Gritty:</strong> 4–6 XP per session (slow burn).</li>
+<li><strong>Standard:</strong> 6–10 XP per session (default pace).</li>
+<li><strong>Heroic:</strong> 10–14 XP per session (fast growth).</li>
+</ul>
+<section class="level3" id="session-awards">
+<h4 id="advancement-heading-2">Session Awards (Guidelines)</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Award</th><th>XP</th></tr>
+</thead>
+<tbody>
+<tr><td>Table attendance</td><td>+2</td></tr>
+<tr><td>Major objective reached</td><td>+2–4</td></tr>
+<tr><td>Discovery or lore unlocked</td><td>+1–2</td></tr>
+<tr><td>Hard choice embraced</td><td>+1–2</td></tr>
+<tr><td>Complication spotlight</td><td>+1–3</td></tr>
+<tr><td>Bond or flag driven play</td><td>+1–2</td></tr>
+<tr><td>GM curveball award</td><td>+0–3</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="milestones">
+<h4 id="advancement-heading-3">Milestones</h4>
+<ul>
+<li>At the conclusion of a major story arc, award +8–12 XP to all players.</li>
+<li>Grant +2 XP to one player for a signature moment of the arc.</li>
+</ul>
+</section>
+<section class="level3" id="boon-conversion">
+<h4 id="advancement-heading-4">Boon Conversion</h4>
+<p>Once per session, during downtime, a character may convert 2 Boons → 1 XP (max 2 XP via conversion per session). All normal Boon limits apply (hold 5; trim to 2 at scene end).</p>
+<div class="panel panel-gold">
+<p><strong>Design Note:</strong> Boon conversion is a trickle, not a primary advancement path. The real value of Boons is in the moment—re-rolling a failure, activating an Asset, or improving Position. Hoarding Boons for conversion starves the table of drama. Spend them freely; the XP will come from your adventures. This is a trap.</p>
+</div>
+</section>
+</section>
+<section class="level2" id="spending-xp">
+<h3 id="advancement-heading-5">Spending XP</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Improvement</th><th>Cost</th><th>Downtime</th></tr>
+</thead>
+<tbody>
+<tr><td>Attribute increase</td><td>new rating × 3 XP</td><td>new rating (days)</td></tr>
+<tr><td>Skill increase</td><td>new level × 2 XP</td><td>new level (days)</td></tr>
+<tr><td>On-screen Follower</td><td>Cap2 XP</td><td>1–3 days (recruit and brief)</td></tr>
+<tr><td>Minor Asset</td><td>4 XP</td><td>1 day</td></tr>
+<tr><td>Standard Asset</td><td>8 XP</td><td>1 week</td></tr>
+<tr><td>Major Asset</td><td>12 XP</td><td>1 month</td></tr>
+<tr><td>Talent</td><td>as listed (2–12+ XP)</td><td>as listed</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="advancement-upkeep">
+<h3 id="advancement-heading-6">Upkeep</h3>
+<p>Upkeep is paid once per Downtime period per asset or follower.</p>
+<ul>
+<li><strong>Efficient (Higher XP, Less Time):</strong> <code>Upkeep XP = max(1, ⌈Acquisition XP ÷ 3⌉)</code>. Minimal effort.</li>
+<li><strong>Intensive (Lower XP, More Time):</strong> Cost = 1 XP. Requires a dedicated Downtime action with significant personal involvement.</li>
+</ul>
+<p><strong>Failure to pay:</strong> The resource degrades.</p>
+<ul>
+<li><strong>Follower:</strong> Loyalty worsens one step (Faithful → Strained → Broken).</li>
+<li><strong>Asset:</strong> Status worsens one step (Flourishing → Stable → Strained → Collapsed).</li>
+</ul>
+</section>
+<section class="level2" id="rush-rule">
+<h3 id="advancement-heading-7">Rush Rule</h3>
+<p>When you buy or upgrade an ability during downtime, you may skip the normal training time by accepting a risk.</p>
+<section class="level3" id="rush-rule-procedure">
+<h4 id="advancement-heading-8">Rush Rule Procedure</h4>
+<ol>
+<li><strong>Declare:</strong> The player states they are rushing their training.</li>
+<li><strong>Set Timer:</strong> The GM creates a Haste Timer <code>[4]</code>.</li>
+<li><strong>Push Forward:</strong> Each downtime action during the rush, the player rolls Spirit + Endurance (DV 3) to represent pushing through fatigue and distraction.
+<ul>
+<li><strong>Clean Success:</strong> No tick. Progress continues smoothly.</li>
+<li><strong>Partial:</strong> The timer ticks +1. The training is harder than expected.</li>
+<li><strong>Miss:</strong> The timer ticks +2. Something goes wrong—a pulled muscle, a broken tool, a moment of doubt.</li>
+</ul>
+</li>
+<li><strong>Complete:</strong> If the timer reaches 4 before training completes, the ability or asset is flawed.
+<ul>
+<li><strong>Attribute/Skill:</strong> The new rating is gained, but the character suffers a temporary -1 die penalty until they spend a full downtime session retraining (removing the flaw).</li>
+<li><strong>Asset:</strong> The asset is acquired but has a hidden complication (GM chooses: a rival knows about it, it requires unusual upkeep, or it's in a bad location).</li>
+<li><strong>Talent:</strong> The talent works, but the GM gains 2 SB to spend on a complication tied to its rushed nature (e.g., the technique is flashy but draws attention, or it leaves an opening).</li>
+</ul>
+</li>
+<li><strong>Clean Success:</strong> If the timer never ticks (0 ticks after all required downtime actions), the ability is learned without flaw.</li>
+</ol>
+</section>
+</section>
+<section class="level2" id="tiers-of-reputation">
+<h3 id="advancement-heading-9">Tiers of Reputation</h3>
+<p>Reputation tiers reflect how the world responds to you and what your character can accomplish.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Tier</th><th>XP Range</th><th>Standing</th><th>Mechanical Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-gold">I — Rookie</span></td><td>0–40</td><td>Local</td><td>Max dice pool 8d10; max 2 Followers; Prestige talents locked</td></tr>
+<tr><td><span class="badge badge-gold">II — Seasoned</span></td><td>41–90</td><td>Regional</td><td>Max dice pool 9d10; max 3 Followers; Prestige talents (7–10 XP) unlocked</td></tr>
+<tr><td><span class="badge badge-gold">III — Veteran</span></td><td>91–150</td><td>National</td><td>Max dice pool 10d10; max 4 Followers; Epic talents (11+ XP) unlocked</td></tr>
+<tr><td><span class="badge badge-gold">IV — Paragon</span></td><td>151–220</td><td>Continental</td><td>+1 max Boon hold (6); Factions respond to your requests</td></tr>
+<tr><td><span class="badge badge-gold">V — Mythic</span></td><td>221+</td><td>Legendary</td><td>+1 max Boon hold (7); World-shaping narrative permissions</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Note: the Mechanical Effect column for Tiers II and III was truncated mid-word in the source PDF's column layout ("un", "unloc"); reconstructed here as "unlocked."</p>
+</section>
+<section class="level2" id="high-tier-play-and-boons">
+<h3 id="advancement-heading-10">High-Tier Play and Boons</h3>
+<p>As characters advance, the role of Boons shifts.</p>
+<ul>
+<li>At early tiers, Boons primarily buy reliability — negating Fatigue, stabilizing risky actions, or nudging Position.</li>
+<li>At higher tiers, Boons increasingly buy authority. A single Boon may force a truth, seal a pact, redirect consequences, or resolve a phase of a conflict outright.</li>
+</ul>
+<p>High-tier characters typically have fewer Boons to rely on, but each spend carries greater narrative weight. This is intentional. Power at high tier comes from preparation, Bonds, oaths, and hard choices — not from inflating Difficulty Values. The world does not become harder to roll against simply because characters are stronger; instead, success and failure both reshape the story in larger ways.</p>
+<section class="level3" id="archmages-choice">
+<h4 id="advancement-heading-11">High-Tier Example: The Archmage's Choice</h4>
+<div class="panel panel-purple">
+<p>A Tier IV archmage attempts to counterspell a world-ending ritual. She has 0 Boons left. She rolls 8 dice (Wits 5 + Arcana 3) vs DV 4. Result: 3 successes — a Partial.</p>
+<p><strong>Without Boons:</strong> She cannot re-roll. The GM rules: "The ritual slows, but a backlash rips through the ley lines. A nearby village is consumed by wild magic. You save the world, but at a cost."</p>
+<p><strong>With a Boon:</strong> She could re-roll a failure and possibly achieve a Clean Success, avoiding the backlash.</p>
+<p class="text-sm text-muted">The scarcity of Boons made the Partial outcome feel meaningful, not like a failure. At high tiers, every Boon is precious—spend them wisely.</p>
+</div>
+</section>
+</section>
+<section class="level2" id="advancement-notes">
+<h3 id="advancement-heading-12">Advancement Notes</h3>
+<ul>
+<li>Attribute cost scaling encourages diversification over single-stat spikes.</li>
+<li>Skill mastery yields tangible, fiction-first benefits.</li>
+<li>Prestige abilities (6+ XP) should be gated by narrative milestones or patron bargains.</li>
+</ul>
+</section>
+</section></div><p>Continue: <a href="combat.html">Equipment, combat, and recovery</a></p></main></body></html>

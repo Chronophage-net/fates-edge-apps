@@ -1,9 +1,10 @@
 <!-- ============ GM-_-Guide-_-02-_-Core-_-Procedures.html ============ -->
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Fate's Edge GM Guide — Chapter 2: Core Procedures</title>
 <style>
     :root {
@@ -104,576 +105,525 @@
     .flow-list li { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.7rem; margin: 0.3rem 0; }
     .flow-list .flow-arrow { text-align: center; color: var(--text3); margin: 0.1rem 0; }
 </style>
-</head>
-<body>
-
-<h1>Chapter 2: Running the Game — Core Procedures</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 2 · Core Procedures</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-01-_-Introduction.html">Previous chapter</a><a href="GM-_-Guide-_-03-_-Managing-_-Resources.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Chapter 2: Running the Game — Core Procedures</a></li><li><a href="#mindset">How to Think in Fate's Edge</a></li><li><a href="#core-loop">The Core Loop</a></li><li><a href="#narrative-time">Narrative Time: Rounds, Turns, Scenes, and Arcs</a></li><li><a href="#resolution-cycle">The Core Resolution Cycle</a></li><li><a href="#position-dv">Position &amp; Difficulty Value</a></li><li><a href="#learning-examples">Learning Through Examples</a></li><li><a href="#risk">Risk</a></li></ul></details>
+<h1 id="reader-section-1">Chapter 2: Running the Game — Core Procedures</h1>
 <p class="subtitle">Fate's Edge GM Guide — Chapter 2</p>
-
 <div class="panel panel-blue">
-    <div class="panel-title">Running Fate's Edge — Core Procedures in Brief</div>
-    <p><strong>Your Job:</strong> Frame pressure, track consequences, let the fiction move forward.</p>
-    <p><strong>Default Settings</strong> — DV = 3 &middot; Position = Controlled &middot; One short Timer</p>
-    <p><strong>The Core Loop (every meaningful action)</strong></p>
-    <ol>
-        <li>Player declares intent &amp; approach (Attribute + Skill)</li>
-        <li>You state Position &amp; set relevant Timers</li>
-        <li>Player rolls d10s; count <strong>Successes</strong> (6&ndash;9 = 1, a 10 = 2) &amp; <strong>Story Beats (1s)</strong></li>
-        <li>Compare to DV → use the <strong>Outcome Matrix</strong></li>
-        <li>Apply consequences &amp; update the fiction</li>
-    </ol>
-    <p><strong>Outcome Matrix (what you do)</strong></p>
-    <ul>
-        <li><strong>Clean Success</strong> (S ≥ DV, SB=0) → intent achieved, no complication</li>
-        <li><strong>Success with SB</strong> (S ≥ DV, SB&gt;0) → intent achieved, spend SB for a twist</li>
-        <li><strong>Partial</strong> (0 &lt; S &lt; DV) → progress made, player gains 1 Boon</li>
-        <li><strong>Miss</strong> (S = 0) → no progress, player gains 2 Boons, spend SB to escalate</li>
-    </ul>
-    <p><strong>Story Beats (SB) — spend them to create drama</strong></p>
-    <ul>
-        <li><strong>1 SB:</strong> Minor — noise, tick a timer, small setback</li>
-        <li><strong>2 SB:</strong> Moderate — alarm raised, lose advantage, worsen Position</li>
-        <li><strong>3+ SB:</strong> Major — reinforcements, scene shift, break an asset</li>
-    </ul>
-    <p><strong>Golden Rule</strong><br/>
-    <em>When in doubt, make a ruling that keeps the story moving.</em><br/>
+<div class="panel-title">Running Fate's Edge — Core Procedures in Brief</div>
+<p><strong>Your Job:</strong> Frame pressure, track consequences, let the fiction move forward.</p>
+<p><strong>Default Settings</strong> — DV = 3 · Position = Controlled · One short Timer</p>
+<p><strong>The Core Loop (every meaningful action)</strong></p>
+<ol>
+<li>Player declares intent &amp; approach (Attribute + Skill)</li>
+<li>You state Position &amp; set relevant Timers</li>
+<li>Player rolls d10s; count <strong>Successes</strong> (6–9 = 1, a 10 = 2) &amp; <strong>Story Beats (1s)</strong></li>
+<li>Compare to DV → use the <strong>Outcome Matrix</strong></li>
+<li>Apply consequences &amp; update the fiction</li>
+</ol>
+<p><strong>Outcome Matrix (what you do)</strong></p>
+<ul>
+<li><strong>Clean Success</strong> (S ≥ DV, SB=0) → intent achieved, no complication</li>
+<li><strong>Success with SB</strong> (S ≥ DV, SB&gt;0) → intent achieved, spend SB for a twist</li>
+<li><strong>Partial</strong> (0 &lt; S &lt; DV) → progress made, player gains 1 Boon</li>
+<li><strong>Miss</strong> (S = 0) → no progress, player gains 2 Boons, spend SB to escalate</li>
+</ul>
+<p><strong>Story Beats (SB) — spend them to create drama</strong></p>
+<ul>
+<li><strong>1 SB:</strong> Minor — noise, tick a timer, small setback</li>
+<li><strong>2 SB:</strong> Moderate — alarm raised, lose advantage, worsen Position</li>
+<li><strong>3+ SB:</strong> Major — reinforcements, scene shift, break an asset</li>
+</ul>
+<p><strong>Golden Rule</strong><br/>
+<em>When in doubt, make a ruling that keeps the story moving.</em><br/>
     Set DV=3, Position=Controlled, ask for the roll, and resolve with the Outcome Matrix.</p>
 </div>
-
 <div class="panel">
-    <p><strong>Position</strong> (Dominant/Controlled/Desperate) = How risky is this action? — determines severity of failure and re-rolls.<br/>
-    <strong>Effect</strong> (Limited/Standard/Great) = How much do you achieve on a success? — determines scope, scale, or quality.</p>
-    <p class="text-sm"><em>Example:</em> Disarming a trap — Limited Effect lets one person cross, Standard lets two, Great lets all four.</p>
+<p><strong>Position</strong> (Dominant/Controlled/Desperate) = How risky is this action? — determines severity of failure and re-rolls.<br/>
+<strong>Effect</strong> (Limited/Standard/Great) = How much do you achieve on a success? — determines scope, scale, or quality.</p>
+<p class="text-sm"><em>Example:</em> Disarming a trap — Limited Effect lets one person cross, Standard lets two, Great lets all four.</p>
 </div>
-
 <div class="panel panel-green">
-    <div class="panel-title">First-Time GM? Start Here</div>
-    <p>You do not need to memorize this chapter before your first session. Here is what you actually need:</p>
-    <ol>
-        <li><strong>The Core Loop</strong> (above) — know the five steps.</li>
-        <li><strong>DV 3, Position Controlled</strong> — your default settings.</li>
-        <li><strong>The Outcome Matrix</strong> — Clean/SB/Partial/Miss.</li>
-        <li><strong>Spend SB early</strong> — one strong complication is better than three weak ones.</li>
-    </ol>
-    <p>Everything else in this chapter is reference material. <strong>You can run a complete session with just these four things.</strong> The examples at the end of the chapter will show you how.</p>
-    <p><em>When you forget a rule — and you will — fall back on the Golden Rule. The story comes first.</em></p>
+<div class="panel-title">First-Time GM? Start Here</div>
+<p>You do not need to memorize this chapter before your first session. Here is what you actually need:</p>
+<ol>
+<li><strong>The Core Loop</strong> (above) — know the five steps.</li>
+<li><strong>DV 3, Position Controlled</strong> — your default settings.</li>
+<li><strong>The Outcome Matrix</strong> — Clean/SB/Partial/Miss.</li>
+<li><strong>Spend SB early</strong> — one strong complication is better than three weak ones.</li>
+</ol>
+<p>Everything else in this chapter is reference material. <strong>You can run a complete session with just these four things.</strong> The examples at the end of the chapter will show you how.</p>
+<p><em>When you forget a rule — and you will — fall back on the Golden Rule. The story comes first.</em></p>
 </div>
-
 <div class="panel panel-red">
-    <div class="panel-title">Selling the Action — When Players Give You Gold</div>
-    <blockquote>"Don't just tell me you swing your sword. Show me the dust in your eyes, the tremble in your arm, the desperate prayer you whisper to the Traveler."<br/>
+<div class="panel-title">Selling the Action — When Players Give You Gold</div>
+<blockquote>"Don't just tell me you swing your sword. Show me the dust in your eyes, the tremble in your arm, the desperate prayer you whisper to the Traveler."<br/>
     "And don't just paint a pretty picture — show me what your character risks, fears, or loves in this moment."</blockquote>
-    <p>When a player <strong>sells the action</strong> — not by piling on adjectives, but by revealing what their character cares about, what they stand to lose, or why this moment matters — you have permission to give them a mechanical edge. This is a reward for <strong>roleplay investment</strong>, not vocabulary.</p>
-    <p><strong>How to Rule It</strong></p>
-    <ul>
-        <li><strong>Basic description:</strong> "I attack the goblin." — No bonus.</li>
-        <li><strong>Tactical description:</strong> The player uses the environment, positioning, or a clever tactic. <em>Example:</em> "I feint high, then drive my shoulder into the goblin's shield, shoving it aside to open its flank." → <strong>Improve Position by one step</strong> (e.g., Controlled → Dominant) for this roll.</li>
-        <li><strong>Character-driven description:</strong> The player states a stake, invokes a bond, reveals a fear, or makes a hard choice visible. <em>One heartfelt sentence counts more than a paragraph of adjectives.</em> <em>Example:</em> "I think of my mother, who died because I wasn't brave enough. I won't let that happen again. I plant my feet and dare the goblin to come through me." → <strong>Improve Position by one step <em>and</em> bank 1 Story Beat</strong> (or upgrade Effect by one step, your choice).</li>
-    </ul>
-    <p><strong>What Counts (and What Doesn't)</strong></p>
-    <p><strong>Counts:</strong></p>
-    <ul>
-        <li>Stating a clear stake ("If I fail, my sister doesn't eat.")</li>
-        <li>Invoking a bond mid-action ("I owe Michael my life. I'm not letting him face this alone.")</li>
-        <li>Revealing a fear or hope tied to the roll ("I'm terrified of fire, but I grab the beam — the children are behind me.")</li>
-        <li>Making a hard choice visible ("I could run, but I don't. Running is what got me exiled.")</li>
-    </ul>
-    <p><strong>Does not count:</strong></p>
-    <ul>
-        <li>Piling on adjectives ("gleaming," "mighty," "ancient") without stakes.</li>
-        <li>Passive sensory laundry lists ("the cold wind, the wet stones, the dim light").</li>
-        <li>Repeating the same florid description for every roll.</li>
-    </ul>
-    <p><strong>Guidelines for Fair Play</strong></p>
-    <ul>
-        <li><strong>No penalty for plain speech.</strong> Never punish a player who is tired, shy, or simply prefers quick resolution. The bonus is a gift, not a tax.</li>
-        <li><strong>Be consistent.</strong> Reward genuine investment, not vocabulary. A quiet player who delivers one honest sentence deserves the bonus as much as an eloquent storyteller.</li>
-        <li><strong>Let the fiction guide the bonus.</strong> A desperate, reckless action described with real stakes might upgrade Effect but worsen Position — the mechanics should mirror the fiction.</li>
-        <li><strong>Invite quiet players.</strong> Ask leading questions: "What's at stake for your character right now?" or "What are you afraid will happen if you fail?" Gentle prompts help shy players find their moment.</li>
-        <li><strong>Group "selling."</strong> If the whole table contributes to describing a group action (a coordinated ambush, a joint ritual), grant the bonus to the primary roller or give each participant a small benefit (e.g., a one-time +1 die).</li>
-    </ul>
-    <p><strong>Example</strong></p>
-    <blockquote>
-    <strong>Basic:</strong> "I sneak past the sentry." (No bonus, roll as normal.)<br/><br/>
-    <strong>Tactical:</strong> "I wait for the wind to rattle the shutters, then pad across the wet cobblestones — heel-toe, heel-toe — keeping the stack of barrels between me and the sentry's gaze." The GM nods: "Great. Because you're using the wind and the barrels, roll at <strong>Dominant Position</strong>."<br/><br/>
-    <strong>Character-driven:</strong> "My little brother is in that camp. I've hidden from every fight since we left home — but not this time. I creep forward, not quiet anymore, because he needs to know someone came for him." The GM: "That's the heart of it. Roll at <strong>Dominant Position</strong>, and I'll bank a Story Beat to make his reaction matter."
+<p>When a player <strong>sells the action</strong> — not by piling on adjectives, but by revealing what their character cares about, what they stand to lose, or why this moment matters — you have permission to give them a mechanical edge. This is a reward for <strong>roleplay investment</strong>, not vocabulary.</p>
+<p><strong>How to Rule It</strong></p>
+<ul>
+<li><strong>Basic description:</strong> "I attack the goblin." — No bonus.</li>
+<li><strong>Tactical description:</strong> The player uses the environment, positioning, or a clever tactic. <em>Example:</em> "I feint high, then drive my shoulder into the goblin's shield, shoving it aside to open its flank." → <strong>Improve Position by one step</strong> (e.g., Controlled → Dominant) for this roll.</li>
+<li><strong>Character-driven description:</strong> The player states a stake, invokes a bond, reveals a fear, or makes a hard choice visible. <em>One heartfelt sentence counts more than a paragraph of adjectives.</em> <em>Example:</em> "I think of my mother, who died because I wasn't brave enough. I won't let that happen again. I plant my feet and dare the goblin to come through me." → <strong>Improve Position by one step <em>and</em> bank 1 Story Beat</strong> (or upgrade Effect by one step, your choice).</li>
+</ul>
+<p><strong>What Counts (and What Doesn't)</strong></p>
+<p><strong>Counts:</strong></p>
+<ul>
+<li>Stating a clear stake ("If I fail, my sister doesn't eat.")</li>
+<li>Invoking a bond mid-action ("I owe Michael my life. I'm not letting him face this alone.")</li>
+<li>Revealing a fear or hope tied to the roll ("I'm terrified of fire, but I grab the beam — the children are behind me.")</li>
+<li>Making a hard choice visible ("I could run, but I don't. Running is what got me exiled.")</li>
+</ul>
+<p><strong>Does not count:</strong></p>
+<ul>
+<li>Piling on adjectives ("gleaming," "mighty," "ancient") without stakes.</li>
+<li>Passive sensory laundry lists ("the cold wind, the wet stones, the dim light").</li>
+<li>Repeating the same florid description for every roll.</li>
+</ul>
+<p><strong>Guidelines for Fair Play</strong></p>
+<ul>
+<li><strong>No penalty for plain speech.</strong> Never punish a player who is tired, shy, or simply prefers quick resolution. The bonus is a gift, not a tax.</li>
+<li><strong>Be consistent.</strong> Reward genuine investment, not vocabulary. A quiet player who delivers one honest sentence deserves the bonus as much as an eloquent storyteller.</li>
+<li><strong>Let the fiction guide the bonus.</strong> A desperate, reckless action described with real stakes might upgrade Effect but worsen Position — the mechanics should mirror the fiction.</li>
+<li><strong>Invite quiet players.</strong> Ask leading questions: "What's at stake for your character right now?" or "What are you afraid will happen if you fail?" Gentle prompts help shy players find their moment.</li>
+<li><strong>Group "selling."</strong> If the whole table contributes to describing a group action (a coordinated ambush, a joint ritual), grant the bonus to the primary roller or give each participant a small benefit (e.g., a one-time +1 die).</li>
+</ul>
+<p><strong>Example</strong></p>
+<blockquote>
+<strong>Basic:</strong> "I sneak past the sentry." (No bonus, roll as normal.)<br/><br/>
+<strong>Tactical:</strong> "I wait for the wind to rattle the shutters, then pad across the wet cobblestones — heel-toe, heel-toe — keeping the stack of barrels between me and the sentry's gaze." The GM nods: "Great. Because you're using the wind and the barrels, roll at <strong>Dominant Position</strong>."<br/><br/>
+<strong>Character-driven:</strong> "My little brother is in that camp. I've hidden from every fight since we left home — but not this time. I creep forward, not quiet anymore, because he needs to know someone came for him." The GM: "That's the heart of it. Roll at <strong>Dominant Position</strong>, and I'll bank a Story Beat to make his reaction matter."
     </blockquote>
-    <p class="text-sm"><em>The dice still decide success or failure. But a well-told action makes the story richer — and earns the player an edge when the dice fall.</em></p>
+<p class="text-sm"><em>The dice still decide success or failure. But a well-told action makes the story richer — and earns the player an edge when the dice fall.</em></p>
 </div>
-
 <h2 id="mindset">How to Think in Fate's Edge</h2>
-
 <p>Running <strong>Fate's Edge</strong> is less about adjudicating difficulty and more about managing momentum. Your primary job is not to block success, protect outcomes, or simulate realism—it is to <strong>frame pressure</strong>, <strong>track consequences</strong>, and <strong>let the fiction move forward</strong>.</p>
-
 <p>If you catch yourself asking "How hard should this be?" you are already one step behind. Instead ask:</p>
 <ul>
-    <li>What is at stake right now?</li>
-    <li>What happens if this goes wrong?</li>
-    <li>What pressure is already in play?</li>
+<li>What is at stake right now?</li>
+<li>What happens if this goes wrong?</li>
+<li>What pressure is already in play?</li>
 </ul>
 <p>The rules exist to answer those questions—not to replace them.</p>
-
 <div class="panel panel-blue">
-    <div class="panel-title">GM Mindset: The Pressure Engine</div>
-    <p>Think of each scene as a <strong>pressure engine</strong>:</p>
-    <div class="table-wrap">
-    <table>
-        <tbody>
-            <tr><td><strong>Dice</strong></td><td>create outcomes</td></tr>
-            <tr><td><strong>Timers</strong></td><td>track fallout</td></tr>
-            <tr><td><strong>Story Beats</strong></td><td>fuel escalation</td></tr>
-            <tr><td><strong>Boons</strong></td><td>reward risk</td></tr>
-        </tbody>
-    </table>
-    </div>
-    <p>Your job is to keep that engine turning—not to decide where it ends. Let the procedures do the work. Your attention belongs on the fiction.</p>
+<div class="panel-title">GM Mindset: The Pressure Engine</div>
+<p>Think of each scene as a <strong>pressure engine</strong>:</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr><td><strong>Dice</strong></td><td>create outcomes</td></tr>
+<tr><td><strong>Timers</strong></td><td>track fallout</td></tr>
+<tr><td><strong>Story Beats</strong></td><td>fuel escalation</td></tr>
+<tr><td><strong>Boons</strong></td><td>reward risk</td></tr>
+</tbody>
+</table></div>
 </div>
-
+<p>Your job is to keep that engine turning—not to decide where it ends. Let the procedures do the work. Your attention belongs on the fiction.</p>
+</div>
 <h2 id="core-loop">The Core Loop</h2>
 <p>The full procedure is <a href="#resolution-cycle">The Core Resolution Cycle</a>, below, and the panel at the top of this chapter is the version you keep on the screen. The thing worth saying here is what the loop is <em>for</em>:</p>
-<p><strong>Do not go looking for the right roll.</strong> If the action matters, the procedure applies &mdash; the same eight steps, whether it is a swordfight, a forged charter, or an apology. If the action does not matter, do not roll at all; say yes and move on.</p>
-
+<p><strong>Do not go looking for the right roll.</strong> If the action matters, the procedure applies — the same eight steps, whether it is a swordfight, a forged charter, or an apology. If the action does not matter, do not roll at all; say yes and move on.</p>
 <h3>Your Defaults</h3>
 <p>When in doubt, trust the fiction. The system will follow. Fall back on these defaults:</p>
 <ul>
-    <li><strong>DV</strong>: 3</li>
-    <li><strong>Position</strong>: Controlled</li>
-    <li><strong>Consequence</strong>: Fatigue, time pressure, or exposure</li>
-    <li><strong>Timers</strong>: One short timer tied to the scene</li>
+<li><strong>DV</strong>: 3</li>
+<li><strong>Position</strong>: Controlled</li>
+<li><strong>Consequence</strong>: Fatigue, time pressure, or exposure</li>
+<li><strong>Timers</strong>: One short timer tied to the scene</li>
 </ul>
 <p>Escalate only when the fiction demands it.</p>
-
 <h3>What You Are <em>Not</em> Doing</h3>
 <p>You are <em>not</em>:</p>
 <ul>
-    <li>calling for rolls to gate progress</li>
-    <li>inflating difficulty to "challenge" the players</li>
-    <li>protecting NPC plans from disruption</li>
-    <li>hiding information behind unnecessary checks</li>
+<li>calling for rolls to gate progress</li>
+<li>inflating difficulty to "challenge" the players</li>
+<li>protecting NPC plans from disruption</li>
+<li>hiding information behind unnecessary checks</li>
 </ul>
 <p>If the players act decisively, the world must respond decisively.</p>
-
 <h3>What You <em>Are</em> Doing</h3>
 <p>You <em>are</em>:</p>
 <ul>
-    <li>stating Position clearly and confidently</li>
-    <li>letting partials move the story forward</li>
-    <li>spending Story Beats to make failure interesting</li>
-    <li>allowing success to create new problems</li>
+<li>stating Position clearly and confidently</li>
+<li>letting partials move the story forward</li>
+<li>spending Story Beats to make failure interesting</li>
+<li>allowing success to create new problems</li>
 </ul>
 <p>The game works best when nothing stalls.</p>
-
 <h2 id="narrative-time">Narrative Time: Rounds, Turns, Scenes, and Arcs</h2>
-
 <p>Fate's Edge measures time by narrative weight, not real seconds. Use these shared definitions to keep the table aligned.</p>
-
 <dl>
-    <dt>Round</dt>
-    <dd>Spotlight turns for all participants in a conflict (including Actions, Moves, and Reactions). A round ends when everyone present has had an opportunity to act.</dd>
-    <dt>Turn</dt>
-    <dd>Spotlight for an individual player: one Action and one Move (see the Core Resolution Cycle in the SRD). Turns are the basic unit of player agency.</dd>
-    <dt>Significant Time</dt>
-    <dd>Three or more rounds of structured conflict, or any period outside of combat where extended effort is required (e.g., a ritual, a chase, or several hours of travel). Use Significant Time to trigger long-term timers and downtime actions.</dd>
-    <dt>Scene</dt>
-    <dd>A unit of narrative play covering a specific conflict, location, or situation. Equivalent to a D&amp;D "encounter" (but avoid that comparison; a scene may be social, exploratory, or a montage). A scene ends when its central question is resolved.</dd>
-    <dt>Session</dt>
-    <dd>One play session (typically 3–6 hours). A session may contain one major scene or several smaller scenes, and ends with Experience Point awards and timer updates.</dd>
-    <dt>Arc</dt>
-    <dd>A complete story arc (3–6 sessions) that advances character goals, resolves a major front, and moves a campaign timer. At the end of an arc, the GM may call a Crown Spread or trigger a finale.</dd>
+<dt>Round</dt>
+<dd>Spotlight turns for all participants in a conflict (including Actions, Moves, and Reactions). A round ends when everyone present has had an opportunity to act.</dd>
+<dt>Turn</dt>
+<dd>Spotlight for an individual player: one Action and one Move (see the Core Resolution Cycle in the SRD). Turns are the basic unit of player agency.</dd>
+<dt>Significant Time</dt>
+<dd>Three or more rounds of structured conflict, or any period outside of combat where extended effort is required (e.g., a ritual, a chase, or several hours of travel). Use Significant Time to trigger long-term timers and downtime actions.</dd>
+<dt>Scene</dt>
+<dd>A unit of narrative play covering a specific conflict, location, or situation. Equivalent to a D&amp;D "encounter" (but avoid that comparison; a scene may be social, exploratory, or a montage). A scene ends when its central question is resolved.</dd>
+<dt>Session</dt>
+<dd>One play session (typically 3–6 hours). A session may contain one major scene or several smaller scenes, and ends with Experience Point awards and timer updates.</dd>
+<dt>Arc</dt>
+<dd>A complete story arc (3–6 sessions) that advances character goals, resolves a major front, and moves a campaign timer. At the end of an arc, the GM may call a Crown Spread or trigger a finale.</dd>
 </dl>
-
 <h4>Significant Time in Play</h4>
 <p>When the fiction calls for Significant Time (e.g., performing a ritual, climbing a cliff, or resting for an hour), the GM may:</p>
 <ul>
-    <li>Advance a relevant timer by 1 segment.</li>
-    <li>Allow the party to clear 1–2 Fatigue (if conditions allow).</li>
-    <li>Call for a single roll to represent the entire extended effort (DV set by the scope of the task).</li>
+<li>Advance a relevant timer by 1 segment.</li>
+<li>Allow the party to clear 1–2 Fatigue (if conditions allow).</li>
+<li>Call for a single roll to represent the entire extended effort (DV set by the scope of the task).</li>
 </ul>
-
 <h2 id="resolution-cycle">The Core Resolution Cycle</h2>
-
 <p>When a player rolls, they engage the world through risk, consequence, and discovery.</p>
 <ol>
-    <li><strong>Declare Action &amp; Approach:</strong> Player states intent, Attribute + Skill.</li>
-    <li><strong>Set Difficulty Value (DV):</strong> Based on narrative stakes.</li>
-    <li><strong>Establish Position:</strong> Dominant, Controlled, or Desperate.</li>
-    <li><strong>Roll Pool of d10s.</strong></li>
-    <li><strong>Count Successes (6&ndash;9 = 1, a 10 = 2) and Story Beats (1s).</strong></li>
-    <li><strong>Check Against DV</strong> using the Outcome Matrix.</li>
-    <li><strong>Apply Outcome:</strong> Clean Success, Success with SB, Partial, or Miss.</li>
-    <li><strong>Spend SB</strong> for complications and twists.</li>
+<li><strong>Declare Action &amp; Approach:</strong> Player states intent, Attribute + Skill.</li>
+<li><strong>Set Difficulty Value (DV):</strong> Based on narrative stakes.</li>
+<li><strong>Establish Position:</strong> Dominant, Controlled, or Desperate.</li>
+<li><strong>Roll Pool of d10s.</strong></li>
+<li><strong>Count Successes (6–9 = 1, a 10 = 2) and Story Beats (1s).</strong></li>
+<li><strong>Check Against DV</strong> using the Outcome Matrix.</li>
+<li><strong>Apply Outcome:</strong> Clean Success, Success with SB, Partial, or Miss.</li>
+<li><strong>Spend SB</strong> for complications and twists.</li>
 </ol>
-
 <p><strong>Clean Success.</strong> The action succeeds as intended. No Story Beats generated unless specified. Fiction advances cleanly.</p>
 <p><strong>Success with SB.</strong> Action succeeds but generates <strong>Story Beats</strong>. Success stands; cost is GM spending those SB, ideally applied to the inciting action or its immediate consequences.</p>
 <p><strong>Miss.</strong> Action fails and generates <strong>Story Beats</strong>. GM uses those SB to introduce complications, advance opposition, or shift the situation against the character.</p>
 <p><strong>Partial Success (GM Adjudication).</strong> A Partial indicates progress but not full resolution. How that manifests is determined by the GM, based on context, scale, and narrative stakes.</p>
-
 <p>Partial results may:</p>
 <ul>
-    <li>Improve the character's <strong>Position</strong> on a follow-up attempt</li>
-    <li>Reduce the effective <strong>DV</strong> of the next roll</li>
-    <li>Achieve the goal at reduced scale or limited duration</li>
-    <li>Succeed fully but generate a <strong>Story Beat</strong> as cost or complication</li>
-    <li>Reveal information or create a new opportunity instead of immediate resolution</li>
+<li>Improve the character's <strong>Position</strong> on a follow-up attempt</li>
+<li>Reduce the effective <strong>DV</strong> of the next roll</li>
+<li>Achieve the goal at reduced scale or limited duration</li>
+<li>Succeed fully but generate a <strong>Story Beat</strong> as cost or complication</li>
+<li>Reveal information or create a new opportunity instead of immediate resolution</li>
 </ul>
-
 <p><strong>Guiding Principle.</strong> Partials represent <em>meaningful progress</em>. Convert progress into advantage, resolution, or complication, depending on what best serves the fiction.</p>
-
 <div class="panel">
-    <div class="panel-title">Position Effects</div>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>Position</th><th>Mechanical Effect</th></tr></thead>
-        <tbody>
-            <tr><td>Dominant</td><td>May re-roll one failure (die &lt; 6).</td></tr>
-            <tr><td>Controlled</td><td>Default state; no re-rolls.</td></tr>
-            <tr><td>Desperate</td><td>Must re-roll one success (a die of 6&ndash;9), keeping the second result. A 10 is never re-rolled.</td></tr>
-        </tbody>
-    </table>
-    </div>
+<div class="panel-title">Position Effects</div>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Position</th><th>Mechanical Effect</th></tr></thead>
+<tbody>
+<tr><td>Dominant</td><td>May re-roll one failure (die &lt; 6).</td></tr>
+<tr><td>Controlled</td><td>Default state; no re-rolls.</td></tr>
+<tr><td>Desperate</td><td>Must re-roll one success (a die of 6–9), keeping the second result. A 10 is never re-rolled.</td></tr>
+</tbody>
+</table></div>
 </div>
-
+</div>
 <div class="panel">
-    <div class="panel-title">Difficulty Ladder — Beginner Focus</div>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>DV</th><th>When to Use</th></tr></thead>
-        <tbody>
-            <tr><td>2</td><td>Routine: clear path, no pressure, almost guaranteed.</td></tr>
-            <tr><td>3</td><td>Default: mild challenge, some risk — use most often.</td></tr>
-            <tr><td>4</td><td>Hard: serious opposition, bad angle, or strong resistance.</td></tr>
-            <tr><td>5+</td><td>Extreme: major boss encounters or dramatic gambles.</td></tr>
-        </tbody>
-    </table>
-    </div>
+<div class="panel-title">Difficulty Ladder — Beginner Focus</div>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>DV</th><th>When to Use</th></tr></thead>
+<tbody>
+<tr><td>2</td><td>Routine: clear path, no pressure, almost guaranteed.</td></tr>
+<tr><td>3</td><td>Default: mild challenge, some risk — use most often.</td></tr>
+<tr><td>4</td><td>Hard: serious opposition, bad angle, or strong resistance.</td></tr>
+<tr><td>5+</td><td>Extreme: major boss encounters or dramatic gambles.</td></tr>
+</tbody>
+</table></div>
 </div>
-
+</div>
 <h2 id="position-dv">Position &amp; Difficulty Value</h2>
-
 <p>Position and DV are your primary dials for setting stakes and difficulty. They work together but answer different questions:</p>
 <ul>
-    <li><strong>DV (Difficulty Value)</strong> — How <em>hard</em> is the task? (2 = routine, 3 = pressured, 4 = hard, 5+ = extreme)</li>
-    <li><strong>Position</strong> — How <em>risky</em> is the attempt? (Dominant = safe, Controlled = balanced, Desperate = dangerous)</li>
+<li><strong>DV (Difficulty Value)</strong> — How <em>hard</em> is the task? (2 = routine, 3 = pressured, 4 = hard, 5+ = extreme)</li>
+<li><strong>Position</strong> — How <em>risky</em> is the attempt? (Dominant = safe, Controlled = balanced, Desperate = dangerous)</li>
 </ul>
-
 <h3>DV 3 as Default</h3>
 <p>Unless the fiction clearly indicates otherwise, start at <strong>DV 3</strong>. This gives a roughly 50–60% success rate for an average pool (4–6 dice) and leaves room for partials and misses. <strong>Do not inflate DV to "challenge" players</strong> — use Position, Timers, and SB spends instead.</p>
-
 <h3>When to Worsen Position</h3>
 <p>Worsen Position when the fiction puts the character at a disadvantage:</p>
 <ul>
-    <li>Exposed or surrounded → Desperate</li>
-    <li>Rushed or distracted → Controlled or Desperate</li>
-    <li>Surprised or ambushed → Desperate</li>
+<li>Exposed or surrounded → Desperate</li>
+<li>Rushed or distracted → Controlled or Desperate</li>
+<li>Surprised or ambushed → Desperate</li>
 </ul>
 <p><em>Never</em> worsen Position just to make a roll "harder." Position is about <strong>narrative danger</strong>, not arithmetic.</p>
-
 <h3>The Golden Rule</h3>
 <div class="panel panel-gold">
-    <div class="panel-title">Golden Rule</div>
-    <p><strong>When in doubt, make a ruling that keeps the story moving.</strong></p>
-    <p>If you cannot remember a rule, set DV = 3, Position = Controlled, and ask the player to roll. Resolve the outcome with the Outcome Matrix. You can look up the rule after the session.</p>
+<div class="panel-title">Golden Rule</div>
+<p><strong>When in doubt, make a ruling that keeps the story moving.</strong></p>
+<p>If you cannot remember a rule, set DV = 3, Position = Controlled, and ask the player to roll. Resolve the outcome with the Outcome Matrix. You can look up the rule after the session.</p>
 </div>
-
 <h3>Example: Using SB to Escalate a Scene</h3>
 <div class="panel">
-    <div class="panel-title">Spending SB for Drama (The Bridge)</div>
-    <p>The party is negotiating a narrow mountain bridge. A rival mercenary captain demands a bribe.</p>
-    <ul>
-        <li><strong>Player rolls a Partial.</strong> The GM gains 2 SB.</li>
-        <li><strong>GM spends 1 SB:</strong> "The captain leans on his sword — you notice his hand creeping toward the hilt. <em>Tensions rise</em>." (Tick a new timer: <strong>Tempers Flare [4]</strong>.)</li>
-        <li><strong>GM spends the second SB:</strong> "A loose stone falls from the bridge and splashes into the river far below. The captain's archers nock arrows. <strong>Position worsens to Desperate</strong>."</li>
-    </ul>
-    <p>The player still succeeded in negotiating a lower toll, but the GM used SB to introduce escalating pressure and a visible timer. The scene now crackles with danger.</p>
+<div class="panel-title">Spending SB for Drama (The Bridge)</div>
+<p>The party is negotiating a narrow mountain bridge. A rival mercenary captain demands a bribe.</p>
+<ul>
+<li><strong>Player rolls a Partial.</strong> The GM gains 2 SB.</li>
+<li><strong>GM spends 1 SB:</strong> "The captain leans on his sword — you notice his hand creeping toward the hilt. <em>Tensions rise</em>." (Tick a new timer: <strong>Tempers Flare [4]</strong>.)</li>
+<li><strong>GM spends the second SB:</strong> "A loose stone falls from the bridge and splashes into the river far below. The captain's archers nock arrows. <strong>Position worsens to Desperate</strong>."</li>
+</ul>
+<p>The player still succeeded in negotiating a lower toll, but the GM used SB to introduce escalating pressure and a visible timer. The scene now crackles with danger.</p>
 </div>
-
 <h3>Outcome Matrix</h3>
 <div class="panel">
-    <div class="panel-title">Outcome Matrix</div>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>Roll Result</th><th>What Happens</th></tr></thead>
-        <tbody>
-            <tr><td>Successes ≥ DV, SB = 0</td><td><strong>Clean Success</strong> — intent achieved, no complication.</td></tr>
-            <tr><td>Successes ≥ DV, SB &gt; 0</td><td><strong>Success with SB</strong> — intent achieved; GM spends SB for complication.</td></tr>
-            <tr><td>0 &lt; Successes &lt; DV</td><td><strong>Partial</strong> — progress with complication; player gains 1 Boon.</td></tr>
-            <tr><td>Successes = 0</td><td><strong>Miss</strong> — no progress; GM escalates with SB; player gains 2 Boons.</td></tr>
-        </tbody>
-    </table>
-    </div>
+<div class="panel-title">Outcome Matrix</div>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Roll Result</th><th>What Happens</th></tr></thead>
+<tbody>
+<tr><td>Successes ≥ DV, SB = 0</td><td><strong>Clean Success</strong> — intent achieved, no complication.</td></tr>
+<tr><td>Successes ≥ DV, SB &gt; 0</td><td><strong>Success with SB</strong> — intent achieved; GM spends SB for complication.</td></tr>
+<tr><td>0 &lt; Successes &lt; DV</td><td><strong>Partial</strong> — progress with complication; player gains 1 Boon.</td></tr>
+<tr><td>Successes = 0</td><td><strong>Miss</strong> — no progress; GM escalates with SB; player gains 2 Boons.</td></tr>
+</tbody>
+</table></div>
 </div>
-
+</div>
 <div class="panel panel-gold">
-    <p>Remind players that they can spend 1 <strong>Boon</strong> before a roll to increase Effect by one step.</p>
+<p>Remind players that they can spend 1 <strong>Boon</strong> before a roll to increase Effect by one step.</p>
 </div>
-
 <h3>Armor Conversion &amp; Fatigue Clearing</h3>
 <p><strong>Your job as GM is simple:</strong> When a player character takes a hit, you state the incoming Harm value. <strong>The player applies their own armor conversion</strong> using the Armor Conversion Table on their sheet. This keeps your hands free for narration and pacing.</p>
 <ol>
-    <li><strong>You say:</strong> "You're hit. Harm 3."</li>
-    <li><strong>The player:</strong> Consults their armor type on the table, applies the conversion, and describes the result.</li>
-    <li><strong>You:</strong> Narrate the fiction based on what they mark.</li>
+<li><strong>You say:</strong> "You're hit. Harm 3."</li>
+<li><strong>The player:</strong> Consults their armor type on the table, applies the conversion, and describes the result.</li>
+<li><strong>You:</strong> Narrate the fiction based on what they mark.</li>
 </ol>
 <p>The table itself is player-facing (see Appendix A.5). Your only responsibility is to announce the Harm value and trust the player to handle the math.</p>
-
 <div class="panel panel-gold">
-    <div class="panel-title">GM Tip: The Roller-Coaster Effect</div>
-    <p><strong>This creates dramatic narrative swings:</strong> When Harm is applied and armor conversion reduces it, the shock of injury may clear existing Fatigue. This represents a "second wind" — a character near collapse who takes a wound and suddenly finds clarity through adrenaline.</p>
-    <p><em>Let the player describe what this looks like.</em> A fighter who was gasping for breath (Fatigue 3) takes a glancing blow (Harm 1, converted to Fatigue 1, triggering overflow) and suddenly stands tall, bleeding but focused. The mechanics and the fiction reinforce each other.</p>
-    <p><strong>Your job:</strong> Ask the player: "What does that look like?" Let them own the moment.</p>
+<div class="panel-title">GM Tip: The Roller-Coaster Effect</div>
+<p><strong>This creates dramatic narrative swings:</strong> When Harm is applied and armor conversion reduces it, the shock of injury may clear existing Fatigue. This represents a "second wind" — a character near collapse who takes a wound and suddenly finds clarity through adrenaline.</p>
+<p><em>Let the player describe what this looks like.</em> A fighter who was gasping for breath (Fatigue 3) takes a glancing blow (Harm 1, converted to Fatigue 1, triggering overflow) and suddenly stands tall, bleeding but focused. The mechanics and the fiction reinforce each other.</p>
+<p><strong>Your job:</strong> Ask the player: "What does that look like?" Let them own the moment.</p>
 </div>
-
 <h2 id="learning-examples">Learning Through Examples</h2>
-
 <p>This section walks the same situation through multiple passes, adding one rule at a time. Use it as a mental template when you improvise.</p>
-
 <h4>Example 1 — No SB, No Boons</h4>
 <div class="panel">
-    <p>Lyra tries to sneak past a guardian in a narrow hallway. (Body + Stealth = 5d10).<br/>
+<p>Lyra tries to sneak past a guardian in a narrow hallway. (Body + Stealth = 5d10).<br/>
     GM: normal risk, DV 3, Controlled Position.<br/>
     Roll: 3, 5, 6, 7, 9 → 3 successes (6,7,9).<br/>
     DV 3 with 3 successes = <strong>Success</strong>.<br/>
     GM: "You slip past the guardian quietly. You're in position behind it if you want to act."</p>
 </div>
-
 <h4>Example 2 — Adding Story Beats</h4>
 <div class="panel">
-    <p>Same situation. Lyra rolls 5d10: 1, 4, 6, 6, 8.<br/>
+<p>Same situation. Lyra rolls 5d10: 1, 4, 6, 6, 8.<br/>
     Successes: 3 (6,6,8). One 1 → 1 SB for GM.<br/>
     DV 3 with 3 successes = <strong>Success</strong> with 1 SB.<br/>
     GM spend (1 SB = Minor): "You get past the guardian, but your cloak snags and tears. The sound echoes — the next room has a -1 Position penalty for stealth checks."</p>
 </div>
-
 <h4>Example 3 — Adding Boons</h4>
 <div class="panel">
-    <p>Later, Lyra scales a loose stone wall (Athletics + Body = 4d10). DV 3.<br/>
+<p>Later, Lyra scales a loose stone wall (Athletics + Body = 4d10). DV 3.<br/>
     Roll: 2,3,4,5 → 0 successes = <strong>Miss</strong>.<br/>
     GM awards <strong>2 Boons</strong>. "You slip and land hard, taking 1 Harm. Mark 2 Boons — you can use them later to turn the tide."<br/>
     Next attempt, Lyra spends 1 Boon to re-roll a die, turning failure into success.</p>
 </div>
-
 <h4>Example 4 — SB + Boons + Position</h4>
 <div class="panel">
-    <p>The party flees as the tower collapses. A crumbling staircase blocks the exit.<br/>
+<p>The party flees as the tower collapses. A crumbling staircase blocks the exit.<br/>
     GM: "Desperate. DV 4 to get everyone across safely."<br/>
     Lyra leads, rolling 6d10 (Body + Athletics + help): 1,2,6,7,7,9.<br/>
     4 successes vs DV 4 = Success. 1 rolled 1 = 1 SB to GM. Desperate Position.<br/>
     GM: "You all make it across, but the last step collapses behind you. I spend 1 SB: your exit path is gone. You'll need a new way out."<br/>
-    <strong>Lesson:</strong> Even on a success, SB let you bend the fiction toward drama without erasing the player's win.</p>
+<strong>Lesson:</strong> Even on a success, SB let you bend the fiction toward drama without erasing the player's win.</p>
 </div>
-
 <h3>Core Loop Flowchart</h3>
 <p class="text-sm text-muted">The following summarizes the chapter's core-loop flowchart as a linear procedure.</p>
 <ul class="flow-list">
-    <li><strong>Frame the scene</strong> (what's at stake?)</li>
-    <li class="flow-arrow">↓</li>
-    <li><strong>Player declares intent</strong> (Attribute + Skill)</li>
-    <li class="flow-arrow">↓</li>
-    <li><strong>GM sets Position</strong> (Dominant/Controlled/Desperate)</li>
-    <li class="flow-arrow">↓</li>
-    <li><strong>GM sets DV</strong> (default 3)</li>
-    <li class="flow-arrow">↓</li>
-    <li><strong>Player rolls dice pool</strong> — count successes (6&ndash;9 = 1, a 10 = 2) and 1s (SB)</li>
-    <li class="flow-arrow">↓</li>
-    <li><strong>Compare successes to DV:</strong>
-        <ul>
-            <li>S ≥ DV, SB = 0 → <strong>Clean Success</strong> (no SB)</li>
-            <li>S ≥ DV, SB &gt; 0 → <strong>Success with SB</strong></li>
-            <li>0 &lt; S &lt; DV → <strong>Partial</strong> (gain 1 Boon)</li>
-            <li>S = 0 → <strong>Miss</strong> (gain 2 Boons)</li>
-        </ul>
-    </li>
-    <li class="flow-arrow">↓</li>
-    <li>Clean Success passes directly to next player. Success with SB, Partial, and Miss route through: <strong>GM spends SB</strong> (complications, timers)</li>
-    <li class="flow-arrow">↓</li>
-    <li><strong>Pass spotlight to next player</strong></li>
+<li><strong>Frame the scene</strong> (what's at stake?)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Player declares intent</strong> (Attribute + Skill)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>GM sets Position</strong> (Dominant/Controlled/Desperate)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>GM sets DV</strong> (default 3)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Player rolls dice pool</strong> — count successes (6–9 = 1, a 10 = 2) and 1s (SB)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Compare successes to DV:</strong>
+<ul>
+<li>S ≥ DV, SB = 0 → <strong>Clean Success</strong> (no SB)</li>
+<li>S ≥ DV, SB &gt; 0 → <strong>Success with SB</strong></li>
+<li>0 &lt; S &lt; DV → <strong>Partial</strong> (gain 1 Boon)</li>
+<li>S = 0 → <strong>Miss</strong> (gain 2 Boons)</li>
 </ul>
-
+</li>
+<li class="flow-arrow">↓</li>
+<li>Clean Success passes directly to next player. Success with SB, Partial, and Miss route through: <strong>GM spends SB</strong> (complications, timers)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Pass spotlight to next player</strong></li>
+</ul>
 <div class="panel panel-blue">
-    <div class="panel-title">Chapter Summary: Core Procedures in One Page</div>
-    <ul>
-        <li><strong>Your job:</strong> Frame pressure, track consequences, keep the fiction moving.</li>
-        <li><strong>Default settings:</strong> DV 3, Controlled Position, one short timer.</li>
-        <li><strong>Core loop:</strong> Declare → Set Position/DV → Roll → Outcome → Consequences.</li>
-        <li><strong>Outcomes:</strong> Clean Success, Success with SB, Partial (gain 1 Boon), Miss (gain 2 Boons).</li>
-        <li><strong>Story Beats:</strong> Spend 1 (minor), 2 (moderate), 3+ (major).</li>
-        <li><strong>Golden Rule:</strong> When in doubt, rule in favor of the story. Look it up later.</li>
-    </ul>
+<div class="panel-title">Chapter Summary: Core Procedures in One Page</div>
+<ul>
+<li><strong>Your job:</strong> Frame pressure, track consequences, keep the fiction moving.</li>
+<li><strong>Default settings:</strong> DV 3, Controlled Position, one short timer.</li>
+<li><strong>Core loop:</strong> Declare → Set Position/DV → Roll → Outcome → Consequences.</li>
+<li><strong>Outcomes:</strong> Clean Success, Success with SB, Partial (gain 1 Boon), Miss (gain 2 Boons).</li>
+<li><strong>Story Beats:</strong> Spend 1 (minor), 2 (moderate), 3+ (major).</li>
+<li><strong>Golden Rule:</strong> When in doubt, rule in favor of the story. Look it up later.</li>
+</ul>
 </div>
-
 <h2 id="risk">Risk</h2>
-<p>Why risk is the engine of this game &mdash; and why safety is boring &mdash; is Chapter 1. What follows is the part you use at the table: what a Story Beat actually is, and when to spend one.</p>
-
+<p>Why risk is the engine of this game — and why safety is boring — is Chapter 1. What follows is the part you use at the table: what a Story Beat actually is, and when to spend one.</p>
 <h3>What Are Story Beats, Really?</h3>
-
 <p>New GMs often ask: <em>"What are Story Beats really? Are they just complications? Are they a resource I should hoard for the big moment?"</em></p>
-
 <p>The answer is simpler and more profound than you might expect. <strong>Story Beats are the game's permission to make things interesting.</strong></p>
-
 <p>Every time a player rolls a 1, they are inviting the world to push back. The dice have spoken: something has gone slightly wrong, or slightly awry, or slightly <em>unexpected</em>. The SB is your license to honor that invitation. It is not a punishment. It is not a penalty. It is the universe saying, <em>"Yes, and…"</em></p>
-
 <div class="panel panel-gold">
-    <div class="panel-title">The GM's Secret Weapon</div>
-    <p><strong>Story Beats are your primary pacing tool.</strong></p>
-    <p>A scene without SB is a scene where the players are in control. A scene with SB is a scene where the world pushes back. The two should alternate. If you spend SB early and often, you create pressure. If you hoard them, the scene feels flat.</p>
-    <blockquote><em>"Do not save your Story Beats for the climax. The climax is made of the Story Beats you spent along the way."</em>
-    <span class="attribution">— The Gray Wanderer</span></blockquote>
+<div class="panel-title">The GM's Secret Weapon</div>
+<p><strong>Story Beats are your primary pacing tool.</strong></p>
+<p>A scene without SB is a scene where the players are in control. A scene with SB is a scene where the world pushes back. The two should alternate. If you spend SB early and often, you create pressure. If you hoard them, the scene feels flat.</p>
+<blockquote><em>"Do not save your Story Beats for the climax. The climax is made of the Story Beats you spent along the way."</em>
+<span class="attribution">— The Gray Wanderer</span></blockquote>
 </div>
-
 <h4>What SB Are Not</h4>
 <p>SB are not:</p>
 <ul>
-    <li><strong>Punishments.</strong> They are not the GM's way of saying "you failed." They are the world's way of saying "something interesting happened."</li>
-    <li><strong>A finite resource.</strong> You are not limited by SB. If the fiction demands a complication, introduce it—even with 0 SB. SB simply tell you: <em>Players rolled 1s here; they want the world to push back.</em></li>
-    <li><strong>One-time effects.</strong> A single SB can create a complication that ripples through the entire session. A guard who is alerted now will be a problem later.</li>
+<li><strong>Punishments.</strong> They are not the GM's way of saying "you failed." They are the world's way of saying "something interesting happened."</li>
+<li><strong>A finite resource.</strong> You are not limited by SB. If the fiction demands a complication, introduce it—even with 0 SB. SB simply tell you: <em>Players rolled 1s here; they want the world to push back.</em></li>
+<li><strong>One-time effects.</strong> A single SB can create a complication that ripples through the entire session. A guard who is alerted now will be a problem later.</li>
 </ul>
-
 <h4>What SB Are</h4>
 <p>SB are:</p>
 <ul>
-    <li><strong>Narrative fuel.</strong> They give you permission to escalate, to twist, to surprise.</li>
-    <li><strong>Player-generated pressure.</strong> The players rolled 1s. They are telling you, <em>"Make this interesting."</em></li>
-    <li><strong>Tension creators.</strong> Each SB spent is a moment where the players' plans go slightly wrong—or become more complicated.</li>
-    <li><strong>Story seeds.</strong> A minor complication now can grow into a major plot thread later.</li>
+<li><strong>Narrative fuel.</strong> They give you permission to escalate, to twist, to surprise.</li>
+<li><strong>Player-generated pressure.</strong> The players rolled 1s. They are telling you, <em>"Make this interesting."</em></li>
+<li><strong>Tension creators.</strong> Each SB spent is a moment where the players' plans go slightly wrong—or become more complicated.</li>
+<li><strong>Story seeds.</strong> A minor complication now can grow into a major plot thread later.</li>
 </ul>
-
 <h4>A Practical Example</h4>
 <p>Imagine the party is sneaking past a guard. The rogue rolls Stealth and gets 3 successes against DV 3—a Clean Success. But one of the dice shows a 1. The GM gains 1 SB.</p>
 <p><em>What does the SB mean?</em></p>
 <p>It does not mean the rogue fails. It means the world notices. The guard does not see the rogue, but a loose stone skitters across the floor. The guard looks up, peers into the darkness, and mutters, <em>"Probably just a rat…"</em> before returning to his post. The guard is now <em>slightly suspicious</em>. Later, when the party is deeper in the compound, that guard will be more alert. A later failure might trigger a full alarm.</p>
 <p><strong>That is a Story Beat.</strong> A small consequence that grows over time. A seed planted for future drama.</p>
-
 <h3>The SB Spend Menu</h3>
 <p>Use this menu to guide your spending. The listed costs are guidelines, not rules. A 1 SB complication in one scene might be a 2 SB complication in another.</p>
 <div class="table-wrap">
-<table>
-    <thead><tr><th>SB Cost</th><th>Effect</th></tr></thead>
-    <tbody>
-        <tr><td>1 SB</td><td><strong>Minor pressure:</strong> Noise, distraction, tick a 4–6 segment timer +1, worsen Position by one step.</td></tr>
-        <tr><td>2 SB</td><td><strong>Moderate setback:</strong> Alarm raised, lose cover/advantage, lesser foe appears, split the party briefly.</td></tr>
-        <tr><td>3+ SB</td><td><strong>Serious trouble:</strong> Reinforcements arrive, key gear breaks, major twist shifts the scene, authority arrives, environment changes dramatically.</td></tr>
-    </tbody>
-</table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>SB Cost</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>1 SB</td><td><strong>Minor pressure:</strong> Noise, distraction, tick a 4–6 segment timer +1, worsen Position by one step.</td></tr>
+<tr><td>2 SB</td><td><strong>Moderate setback:</strong> Alarm raised, lose cover/advantage, lesser foe appears, split the party briefly.</td></tr>
+<tr><td>3+ SB</td><td><strong>Serious trouble:</strong> Reinforcements arrive, key gear breaks, major twist shifts the scene, authority arrives, environment changes dramatically.</td></tr>
+</tbody>
+</table></div>
 </div>
-
 <p><strong>Pro tip:</strong> One strong beat (e.g., 3 SB for reinforcements) creates more drama than three weak beats (1+1+1 SB for noise). Be generous—unused SB is wasted momentum. One strong beat creates a memory. Three weak beats create a blur. The players will remember the reinforcements. They will not remember the three times a guard looked up.</p>
-
 <p><em>Spend your SB. Spend them early. Spend them often. The big moment is made of the small moments you already spent. However, remember to have big moments.</em></p>
-
 <h3>The SB Cycle</h3>
 <p>The SB economy creates a virtuous cycle:</p>
 <ol>
-    <li><strong>Players roll.</strong> They succeed or fail, but the dice show 1s.</li>
-    <li><strong>GM gains SB.</strong> The world is given permission to push back.</li>
-    <li><strong>GM spends SB.</strong> A complication is introduced.</li>
-    <li><strong>Players react.</strong> They adapt, overcome, or fail again.</li>
-    <li><strong>The cycle repeats.</strong> Each roll generates new SB, new complications, new drama.</li>
+<li><strong>Players roll.</strong> They succeed or fail, but the dice show 1s.</li>
+<li><strong>GM gains SB.</strong> The world is given permission to push back.</li>
+<li><strong>GM spends SB.</strong> A complication is introduced.</li>
+<li><strong>Players react.</strong> They adapt, overcome, or fail again.</li>
+<li><strong>The cycle repeats.</strong> Each roll generates new SB, new complications, new drama.</li>
 </ol>
 <p>The cycle never stops because the dice never stop rolling. A Miss generates 2 Boons and the GM spends SB. A Partial generates 1 Boon. Even a Clean Success with a 1 generates SB. The story always moves forward.</p>
 <blockquote><em>"The SB economy is the engine of drama. It turns every roll into a question: What happens next?"</em>
 <span class="attribution">— The Gray Wanderer</span></blockquote>
-
 <h3>On Difficulty Values and Challenge</h3>
-
 <p>A player with 8 dice can handle DV 3 easily. That is not a problem. That is the system working as intended.</p>
-
 <h4>Do Not Inflate DVs Arbitrarily</h4>
-
 <p>The temptation is understandable: a player is rolling many dice, so you want to make things "harder." So you set DV 4 where DV 3 would do. Then DV 5 where DV 4 would do.</p>
 <p><strong>Do not do this.</strong></p>
 <p>Here is why:</p>
 <ul>
-    <li><strong>Low DVs are not a failure of challenge.</strong> A player who invested in a high dice pool <em>earned</em> the right to succeed routinely at baseline tasks. DV 3 is the default. That is intentional.</li>
-    <li><strong>Success with no Story Beats is still success.</strong> A Clean Success (S ≥ DV, SB = 0) is a valid outcome. The player succeeded cleanly. Their competence was rewarded.</li>
-    <li><strong>Clean Successes starve the Boon economy.</strong> If a player rolls 8 dice against DV 3 and succeeds cleanly, they earned no Boons. That is not a bug—it is the trade-off for being highly competent. They traded dramatic reversals for reliability.</li>
-    <li><strong>Arbitrary DV inflation breaks the math.</strong> If you set DV 4 for every routine lock, you are effectively punishing the player for investing in their skills. The game's probabilities assume DV 3 is the baseline.</li>
+<li><strong>Low DVs are not a failure of challenge.</strong> A player who invested in a high dice pool <em>earned</em> the right to succeed routinely at baseline tasks. DV 3 is the default. That is intentional.</li>
+<li><strong>Success with no Story Beats is still success.</strong> A Clean Success (S ≥ DV, SB = 0) is a valid outcome. The player succeeded cleanly. Their competence was rewarded.</li>
+<li><strong>Clean Successes starve the Boon economy.</strong> If a player rolls 8 dice against DV 3 and succeeds cleanly, they earned no Boons. That is not a bug—it is the trade-off for being highly competent. They traded dramatic reversals for reliability.</li>
+<li><strong>Arbitrary DV inflation breaks the math.</strong> If you set DV 4 for every routine lock, you are effectively punishing the player for investing in their skills. The game's probabilities assume DV 3 is the baseline.</li>
 </ul>
-
 <h4>When to Raise DV</h4>
 <p>Raise the Difficulty Value when the fiction demands it:</p>
 <ul>
-    <li>A mundane lock is DV 3.</li>
-    <li>A masterwork lock, crafted by a guild artisan, is DV 4.</li>
-    <li>A magically warded safe, sealed by a Runekeeper, is DV 5.</li>
-    <li>The five wards on the vault door are not a single DV check—they are a <strong>Timer</strong>.</li>
+<li>A mundane lock is DV 3.</li>
+<li>A masterwork lock, crafted by a guild artisan, is DV 4.</li>
+<li>A magically warded safe, sealed by a Runekeeper, is DV 5.</li>
+<li>The five wards on the vault door are not a single DV check—they are a <strong>Timer</strong>.</li>
 </ul>
 <p>The DV tells the player <em>how hard this specific lock is</em>. The fiction tells them <em>why</em>.</p>
-
 <h4>The Timer: A Better Tool Than Inflated DV</h4>
 <p>Consider the vault door with five wards. A single roll to crack all five is a high DV (5+), but it is also a boring roll. Instead:</p>
 <ol>
-    <li>Establish the goal: <em>"The vault has five wards. Each one must be broken in sequence."</em></li>
-    <li>Set a visible timer: <strong>Vault Wards [6]</strong>.</li>
-    <li>Each successful Craft or Arcana roll (DV 3–4) clears one segment of the timer.</li>
-    <li>Each failure ticks a Threat Timer: <strong>Guard Patrol [4]</strong> or <strong>Alarm Progress [4]</strong>.</li>
+<li>Establish the goal: <em>"The vault has five wards. Each one must be broken in sequence."</em></li>
+<li>Set a visible timer: <strong>Vault Wards [6]</strong>.</li>
+<li>Each successful Craft or Arcana roll (DV 3–4) clears one segment of the timer.</li>
+<li>Each failure ticks a Threat Timer: <strong>Guard Patrol [4]</strong> or <strong>Alarm Progress [4]</strong>.</li>
 </ol>
 <p>Now the player's 8 dice are still rolling against a reasonable DV (3–4), but the challenge is in the <em>accumulation</em> of successes, not the arbitrary height of a single target. The player feels competent. The tension is real. The story moves forward.</p>
-
 <h4>Players Should Seek Harder Challenges</h4>
 <p>As characters grow, players should <em>want</em> to seek out greater challenges—not because the GM has inflated DVs, but because the world presents them:</p>
 <ul>
-    <li>A Tier I rogue picks locks for a living. DV 3 is her bread and butter.</li>
-    <li>A Tier III rogue cracks vaults for a living. She does not pick the same locks—she picks <em>better</em> locks. The locks are DV 4 because they <em>are</em> better locks, not because the GM decided to make things harder.</li>
-    <li>A Tier V rogue does not pick locks at all. She negotiates with the door's spirit, or walks through the wall using a Rite, or has already bribed the locksmith. The challenge has transformed.</li>
+<li>A Tier I rogue picks locks for a living. DV 3 is her bread and butter.</li>
+<li>A Tier III rogue cracks vaults for a living. She does not pick the same locks—she picks <em>better</em> locks. The locks are DV 4 because they <em>are</em> better locks, not because the GM decided to make things harder.</li>
+<li>A Tier V rogue does not pick locks at all. She negotiates with the door's spirit, or walks through the wall using a Rite, or has already bribed the locksmith. The challenge has transformed.</li>
 </ul>
 <p>The GM's role is not to make old challenges harder. It is to present <em>new</em> challenges that match the characters' growth.</p>
-
 <h4>The Golden Rule of DV</h4>
 <div class="panel">
-    <div class="panel-title">The Golden Rule of DV</div>
-    <p><strong>Set DV based on the fiction, not the player's dice pool.</strong></p>
-    <p>A lock is DV 3 because it is a lock. A ward is DV 4 because it is a ward. A vault is a Timer because it is a vault.</p>
-    <p>If the player invested in a large dice pool, let them enjoy it. They earned it. Their reward is reliability—the ability to succeed at baseline tasks without drama.</p>
-    <p>If you want drama, use:</p>
-    <ul>
-        <li><strong>Position:</strong> Make it Desperate.</li>
-        <li><strong>Timers:</strong> Add a clock.</li>
-        <li><strong>Story Beats:</strong> Spend SB to complicate success.</li>
-        <li><strong>Fiction:</strong> Give them harder locks to pick, not harder rolls to make.</li>
-    </ul>
+<div class="panel-title">The Golden Rule of DV</div>
+<p><strong>Set DV based on the fiction, not the player's dice pool.</strong></p>
+<p>A lock is DV 3 because it is a lock. A ward is DV 4 because it is a ward. A vault is a Timer because it is a vault.</p>
+<p>If the player invested in a large dice pool, let them enjoy it. They earned it. Their reward is reliability—the ability to succeed at baseline tasks without drama.</p>
+<p>If you want drama, use:</p>
+<ul>
+<li><strong>Position:</strong> Make it Desperate.</li>
+<li><strong>Timers:</strong> Add a clock.</li>
+<li><strong>Story Beats:</strong> Spend SB to complicate success.</li>
+<li><strong>Fiction:</strong> Give them harder locks to pick, not harder rolls to make.</li>
+</ul>
 </div>
-
 <h4>A Practical Example</h4>
 <p>The party's rogue has <strong>Wits 4</strong> and <strong>Craft 3</strong>. She is rolling 7 dice to pick a lock.</p>
 <p><strong>Wrong:</strong> GM: "The lock is tricky. DV 4."</p>
 <p><strong>Right:</strong> GM: "The lock is a standard guild lock. DV 3. You pick it easily—Clean Success. No Boons. That's the benefit of being a master."</p>
 <p>Later: <em>"The vault door has five wards. Each one is a DV 3 check, but you have to clear all five before the guard patrol completes its circuit. I'm starting a Guard Patrol [6] timer."</em></p>
 <p>The player rolls 7 dice against DV 3, succeeds repeatedly, and clears the timer. She feels competent. The challenge was in the time pressure, not the arbitrary difficulty of a single roll.</p>
-
 <h4>Final Thought</h4>
 <p>Low DVs are not easy mode. They are the baseline. The player's high dice pool is not a problem to be solved—it is a feature to be celebrated.</p>
 <p>Let the player enjoy their competence. Then give them <em>new</em> problems that demand a different kind of skill.</p>
 <blockquote><em>"A master thief does not pick harder locks. She picks different locks—locks that guard secrets, locks that speak, locks that were never meant to be opened. The game is not about making the roll harder. It is about making the choice matter."</em>
 <span class="attribution">— The Gray Wanderer</span></blockquote>
-
 <h3>Can I Roll Fewer Dice? No!</h3>
-
 <p>A question that comes up often, especially from players who have experience with systems where rolling poorly is punished, is:</p>
 <p><em>"I'm rolling 8 dice. That's a lot of chances to roll 1s. Can I choose to roll fewer dice to avoid generating Story Beats?"</em></p>
 <p><strong>No. Absolutely not. Here is why.</strong></p>
 <p>In some games, rolling a 1 on a die is a <strong>failure state</strong>—it means something bad happens. Players learn to fear those faces. They try to minimize their dice pools to avoid bad outcomes. <strong>Fate's Edge is not that game.</strong></p>
 <p>In Fate's Edge, a 1 is <strong>not</strong> a failure. It is a <strong>Story Beat (SB)</strong>—a resource that fuels the narrative. When you roll a 1, you are not being punished. You are handing the GM a spark to light a fire that makes the story burn brighter.</p>
-
 <div class="panel">
-    <div class="panel-title">The Golden Rule of Dice Pools</div>
-    <p><strong>Never reduce a player's dice pool.</strong></p>
-    <p>The dice pool is the player's primary expression of their character's competence. A character with Body 4 and Melee 4 has invested significant XP—they have earned those 8 dice.</p>
-    <p>If you want to make a challenge more difficult, use:</p>
-    <ul>
-        <li><strong>Position:</strong> Make it Desperate. The player re-rolls successes.</li>
-        <li><strong>DV:</strong> Raise the Difficulty Value when the fiction demands it.</li>
-        <li><strong>Timers:</strong> Add a clock. The player must succeed before it fills.</li>
-        <li><strong>Story Beats:</strong> Spend SB to introduce complications.</li>
-    </ul>
-    <p><strong>Do not take away their dice. They earned them.</strong></p>
+<div class="panel-title">The Golden Rule of Dice Pools</div>
+<p><strong>Never reduce a player's dice pool.</strong></p>
+<p>The dice pool is the player's primary expression of their character's competence. A character with Body 4 and Melee 4 has invested significant XP—they have earned those 8 dice.</p>
+<p>If you want to make a challenge more difficult, use:</p>
+<ul>
+<li><strong>Position:</strong> Make it Desperate. The player re-rolls successes.</li>
+<li><strong>DV:</strong> Raise the Difficulty Value when the fiction demands it.</li>
+<li><strong>Timers:</strong> Add a clock. The player must succeed before it fills.</li>
+<li><strong>Story Beats:</strong> Spend SB to introduce complications.</li>
+</ul>
+<p><strong>Do not take away their dice. They earned them.</strong></p>
 </div>
-
 <p>A player who asks to roll fewer dice is asking for a <em>safe</em> outcome. They want to avoid complications. But Fate's Edge is not a game about safety—it is a game about risk, drama, and the joy of rolling a handful of dice and seeing what happens.</p>
 <blockquote><em>"The dice are not a resource to be rationed. They are a declaration of competence. Let the players roll their full pool. Then use Position, DV, and SB to shape the outcome. That is the game."</em>
 <span class="attribution">— The Gray Wanderer</span></blockquote>
-
 <footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-
-</body>
+</article></body>
 </html>

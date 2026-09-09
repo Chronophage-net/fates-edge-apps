@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Rites, invokers, and summoning</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Rites, invokers, and summoning</h1><p>These are detailed procedures for the characters and situations that use them. Read the relevant section in order rather than treating its tables as a substitute for the procedure. Moving this material out of the opening chapter changes neither its availability nor its rules.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="rites-invokers">
+<h2>Rites and Invokers</h2>
+<p>This chapter covers universal rituals (available to any character with time and components) and the Invoker path (characters who channel Patrons through consecrated Symbols).</p>
+<section class="level2" id="universal-rituals">
+<h3>Universal Rituals</h3>
+<p>Any character, regardless of magical talent, may attempt a universal ritual. Requirements:</p>
+<ul>
+<li>A clear intent (what you want to achieve).</li>
+<li>A method (e.g., summoning circle, prayer, sympathetic object).</li>
+<li>Components (consumed or used up).</li>
+<li>Time (at least one scene of uninterrupted work).</li>
+</ul>
+<section class="level3" id="ritual-resolution">
+<h4>Ritual Resolution</h4>
+<p>The GM sets a DV (typically 4–6) based on scope. The player rolls Spirit + Lore (or another appropriate skill).</p>
+<ul>
+<li><strong>Clean Success:</strong> The ritual works as intended.</li>
+<li><strong>Success with SB:</strong> Works, but with a cost (backlash, extra time, compromised component). GM spends SB.</li>
+<li><strong>Partial:</strong> Partial effect; player gains 1 Boon.</li>
+<li><strong>Miss:</strong> Fails; GM may impose a complication (wrong spirit answers, ward backfires). Player gains 2 Boons.</li>
+</ul>
+</section>
+<section class="level3" id="universal-rituals-table">
+<h4>Universal Rituals Table</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Ritual</th><th>Tier</th><th>Cast Time</th><th>Components &amp; Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Wayfinder’s Thread</td><td><span class="badge badge-green">Low</span></td><td>1 min</td><td>Red cord knotted thrice; whisper destination. Create tether to safe path. <strong>Cost:</strong> Fatigue if used &gt;1/scene. <strong>Push:</strong> +1 SB reveals shortcut.</td></tr>
+<tr><td>Oath-Ward</td><td><span class="badge badge-green">Low</span></td><td>5 min</td><td>Chalk circle; sworn phrase. Ward small area vs intrusion. <strong>Cost:</strong> Breaking oath triggers SB.</td></tr>
+<tr><td>Ember-Glass</td><td><span class="badge badge-green">Low</span></td><td>1 min</td><td>Smoked glass. Sense heat sources through cover. <strong>Cost:</strong> lose torch/tinder.</td></tr>
+<tr><td>Salt-Cut</td><td><span class="badge badge-green">Low</span></td><td>1 min</td><td>Salt, bronze knife. Sever simple ongoing effect (rope, charm). <strong>Cost:</strong> consume salt.</td></tr>
+<tr><td>River’s Memory</td><td><span class="badge badge-blue">Medium</span></td><td>10 min</td><td>Bowl, personal token. Scry recent event tied to token (blurry). <strong>Cost:</strong> token ruined.</td></tr>
+<tr><td>Bargain-Bead</td><td><span class="badge badge-blue">Medium</span></td><td>10 min</td><td>Two carved beads. Invite spirit to parley. <strong>Cost:</strong> give valuable concession or take SB.</td></tr>
+<tr><td>Quiet Veil</td><td><span class="badge badge-blue">Medium</span></td><td>5 min</td><td>Ash, muffled bell. Muffle group sounds for scene. <strong>Cost:</strong> Muted Condition.</td></tr>
+<tr><td>Dream-Way Marker</td><td><span class="badge badge-blue">Medium</span></td><td>10 min</td><td>Inked sleep mask, water cadence. Mark safe entrance to Ways Between; short transit. <strong>Cost:</strong> all Shaken on waking.</td></tr>
+<tr><td>Purge</td><td><span class="badge badge-blue">Medium</span></td><td>10 min</td><td>Bitter herbs, clean blade. Cleanse taint/curse one step. <strong>Cost:</strong> caster takes minor echo (–1 next action).</td></tr>
+<tr><td>Summoner’s Gate</td><td><span class="badge badge-purple">High</span></td><td>20 min</td><td>Circle, true-name sigil. Call known entity safely. <strong>Cost:</strong> occupies concurrency slot; breaking terms creates SB.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Source note: this table's rows were flattened by text extraction (ritual names, tiers, and cast times were grouped separately from their components/effect text, in matching sequential order). The pairings above were reconstructed by matching row order across the three original columns.</p>
+</section>
+</section>
+<section class="level2" id="invokers-symbol-path">
+<h3>Invokers (Symbol Path)</h3>
+<p>Invokers channel power through consecrated Symbols — physical tokens tied to a specific Patron.</p>
+<section class="level3" id="rites-invokers-invoker-requirements">
+<h4>Requirements</h4>
+<ul>
+<li><strong>Patron’s Symbol (4 XP each):</strong> Minor Asset. Grants ritual access to that Patron’s Rites.</li>
+<li>One Symbol per Patron; Invokers may carry Symbols of multiple Patrons.</li>
+</ul>
+</section>
+<section class="level3" id="rites-invokers-ritual-invocation">
+<h4>Ritual Invocation</h4>
+<ul>
+<li>Takes DV + 1 rounds to complete.</li>
+<li>Display the Symbol openly (visible).</li>
+<li>Always marks +1 Obligation to that Patron.</li>
+<li>If the Symbol is displayed, DV –1 and Obligation –1 (minimum 0 Obligation).</li>
+</ul>
+</section>
+<section class="level3" id="crack-the-seal">
+<h4>Crack the Seal (Instant Cast)</h4>
+<p>Resolve the Rite immediately (1 action) by:</p>
+<ul>
+<li>Marking +2 Obligation (+3 for High Rites).</li>
+<li>Setting the Symbol to Compromised (inert until restored).</li>
+<li>The GM may immediately spend 1 SB on a thematic complication.</li>
+</ul>
+</section>
+<section class="level3" id="restoring-a-symbol">
+<h4>Restoring a Symbol</h4>
+<ul>
+<li>Requires a Downtime action.</li>
+<li>Roll Wits + Arcana or Lore (DV 3).</li>
+<li><strong>Clean Success:</strong> Symbol returns to Maintained.</li>
+<li><strong>Partial:</strong> Symbol becomes Neglected (future rituals +1 Obligation).</li>
+<li><strong>Miss:</strong> Symbol remains Compromised; requires a quest or Patron service to restore.</li>
+</ul>
+</section>
+<section class="level3" id="multiple-symbols">
+<h4>Multiple Symbols</h4>
+<ul>
+<li>Carrying 4 or more different Symbols causes the first Invoker ritual each scene to mark +1 additional Obligation.</li>
+<li>Displaying a rival Patron’s Symbol while invoking another worsens Position by 1 and marks +1 Obligation to the current Patron. On any rolled 1, the GM may trigger a Patron omen or glitch.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="borrowed-grace">
+<h3>Borrowed Grace (Invoker Talent)</h3>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Minor Talent</span> <span class="text-sm text-muted">Cost: 3–5 XP</span></p>
+<p>Once per scene, spend 1 Boon or 1 Fatigue (1 action) to gain:</p>
+<ul>
+<li>+1 die to a single combat action, or</li>
+<li>+1 Effect to a social or stealth action.</li>
+</ul>
+<p>Requires visibly displaying your Patron’s Symbol. If the Symbol is Compromised, Borrowed Grace works at –1 die.</p>
+</div>
+</section>
+<section class="level2" id="the-traveler">
+<h3>The Traveler (Ways &amp; Journeys)</h3>
+<p>The Traveler grants rites of safe passage, wayfinding, and road covenants. All rites below are available to Runekeepers and Invokers sworn to The Traveler.</p>
+<section class="level3" id="traveler-low-rites">
+<h4>Low Rites</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Low</span> <strong>Rite of Road-Sense</strong> <span class="text-sm text-muted">(Obligation: 4)</span></p>
+<p class="text-sm text-muted">Instant; Self; No.</p>
+<p><code>[NAVIGATION]</code> <code>[AWARENESS]</code></p>
+<p><strong>Effect:</strong> You unerringly pick the fastest safe route in Near/Far range. Gain +1 die to avoid ambushes or delays. Create a 4-segment Path Memory timer to ignore one instance of difficult terrain.</p>
+<p><strong>Push It:</strong> Spot one hidden bypass, but generate 1 SB (Clubs).</p>
+<p class="text-sm text-muted"><strong>DV:</strong> max(4 – Spirit, 1).</p>
+</div>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Low</span> <strong>Rite of Traveler’s Boon</strong> <span class="text-sm text-muted">(Obligation: 5)</span></p>
+<p class="text-sm text-muted">Scene; Self/Ally; No.</p>
+<p><code>[MOVEMENT]</code> <code>[BOND]</code> <code>[HASTE]</code></p>
+<p><strong>Effect:</strong> Ignore one level of difficult terrain or bureaucratic delay. +1 Effect to travel or escape checks. If shared, create a 2-segment Shared Journey bond with an ally.</p>
+<p><strong>Push It:</strong> Extend to one more ally; mark 1 SB (Diamonds).</p>
+<p class="text-sm text-muted"><strong>DV:</strong> max(5 – Spirit, 1).</p>
+</div>
+</section>
+<section class="level3" id="traveler-standard-rite">
+<h4>Standard Rite</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Standard</span> <strong>Rite of the Waymark</strong> <span class="text-sm text-muted">(Obligation: 8)</span></p>
+<p class="text-sm text-muted">Scene; Near; No.</p>
+<p><code>[MARK]</code> <code>[GUIDANCE]</code> <code>[PASSAGE]</code></p>
+<p><strong>Effect:</strong> Declare a lane as permitted or easy. Allies gain improved Position/Effect or ignore one obstacle. Create a 6-segment Marked Path timer.</p>
+<p><strong>Push It:</strong> The lane persists between scenes; the first enemy to exploit it forces 1 SB (Spades).</p>
+<p class="text-sm text-muted"><strong>DV:</strong> max(8 – Spirit, 2).</p>
+</div>
+<p class="text-sm text-muted">Note: For all The Traveler’s rites, the Difficulty Value is calculated as DV = max(Obligation Cost – Spirit, Rite Tier), where Rite Tier is 1 for Low, 2 for Standard. Spirit reduces both the roll difficulty and the risk of Obligation overflow.</p>
+</section>
+</section>
+<section class="level2" id="sample-rites-by-patron">
+<h3>Additional Sample Rites by Patron</h3>
+<p>These Low and Standard Rites are examples. See the full Player’s Guide for complete lists.</p>
+<section class="level3" id="oath-of-flame-and-light-rites">
+<h4>Oath of Flame &amp; Light (Dawn, Vows)</h4>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Oath of Flame &amp; Light</span></p>
+<ul>
+<li><strong>Rite of Kindle Vow</strong> <span class="text-sm text-muted">(Low)</span>: Bind a scene-long vow; bearer gains +1 die when fulfilling it.</li>
+<li><strong>Rite of Lay on Hands</strong> <span class="text-sm text-muted">(Low)</span>: Cleanse affliction, reduce Harm by 1, or remove 1 Fatigue.</li>
+<li><strong>Rite of Radiant Smite</strong> <span class="text-sm text-muted">(Standard)</span>: Your next melee strike flares with dawnfire. Upgrade Effect by one step, add +1 Burn Harm, or –1 die to their next roll. Against undead, oathbreakers, or outsiders: oath-breakers suffer +1 Harm and –1 die, outsiders gain +1 leash ticks.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="the-sealed-gate-rites">
+<h4>The Sealed Gate (Thresholds, Wards)</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">The Sealed Gate</span></p>
+<ul>
+<li><strong>Rite of Sealed Threshold</strong> <span class="text-sm text-muted">(Low)</span>: Mark a doorway; unauthorized crossing requires Endurance test (DV 3).</li>
+<li><strong>Rite of Circle of Denial</strong> <span class="text-sm text-muted">(Standard)</span>: Protective circle; spirits/outsiders must resist (Resolve vs DV 4) to enter.</li>
+<li><strong>Rite of Banishment Knot</strong> <span class="text-sm text-muted">(High)</span>: Cast out a supernatural entity; test against its TL.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="raeyn-rites">
+<h4>Raéyn, Mistress of the Sea (Tides, Storms)</h4>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Raéyn</span></p>
+<ul>
+<li><strong>Rite of Tidemark’s Blessing</strong> <span class="text-sm text-muted">(Low)</span>: Steady footing on wet surfaces; +1 die to balance/climb.</li>
+<li><strong>Rite of Whispering Currents</strong> <span class="text-sm text-muted">(Low)</span>: Learn safest route on water; +1 die to navigation.</li>
+<li><strong>Rite of Wave-Road Blessing</strong> <span class="text-sm text-muted">(Standard)</span>: Consecrate a sea lane; +2 dice to travel or evasion.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="ikasha-rites">
+<h4>Ikasha, She Who Sleeps (Shadow, Secrets)</h4>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Ikasha</span></p>
+<ul>
+<li><strong>Touch the Umbral Veil</strong> <span class="text-sm text-muted">(Low)</span>: +1 die to one Stealth roll; soften a noise.</li>
+<li><strong>Rite of Crossroads Raven</strong> <span class="text-sm text-muted">(Low)</span>: Omen-raven gives +1 die to navigation or forces enemy hesitation.</li>
+<li><strong>Become the Shadow at the Crossroads</strong> <span class="text-sm text-muted">(High)</span>: Intangible to mundane harm; pass through gaps; +2 dice Stealth.</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="obligation-and-invokers">
+<h3>Obligation and Invokers</h3>
+<p>Invokers track Obligation per Patron. Each ritual invocation marks +1 Obligation (reduced by displaying the Symbol). Crack the Seal marks +2 Obligation (+3 for High Rites). Obligation Capacity = Spirit + Presence. Exceeding capacity causes Fatigue.</p>
+</section>
+<section class="level2" id="ritual-interruption-and-counterplay">
+<h3>Ritual Interruption and Counterplay</h3>
+<ul>
+<li>A ritual can be interrupted by damage, loud noise, or direct countermagic before completion.</li>
+<li>A character may use <code>[COUNTER]</code> to disrupt a ritual in progress.</li>
+<li>If interrupted, the ritual fails; components may be lost. The GM gains 1 SB.</li>
+</ul>
+</section>
+</section><section class="level1" id="summoning">
+<h2>Summoning</h2>
+<p>Summoning is the art of calling beings from beyond the mortal veil — spirits, elementals, the dead, fey, demons, or stranger entities. It is always dangerous, often costly, and never without consequence.</p>
+<section class="level2" id="who-can-summon">
+<h3>Who Can Summon?</h3>
+<p>Any character may attempt a summoning ritual, but only those with the Pact-Whisperer talent can reliably bind and command spirits in combat time. NPCs and plot events use the same principles: a summoner prepares a circle, pays a cost, and risks backlash.</p>
+</section>
+<section class="level2" id="summoning-for-narrative">
+<h3>Summoning for Narrative (Greater Powers)</h3>
+<p>Not all summonings are tactical. Sometimes the story demands calling a greater power — a patron-level entity, a forgotten god, or a primordial force. These rituals are not resolved with a single roll; they are extended challenges that drive the plot.</p>
+<section class="level3" id="ritual-structure-greater-summonings">
+<h4>Ritual Structure for Greater Summonings</h4>
+<ul>
+<li><strong>Preparation Timer [6–12]:</strong> The summoner gathers rare components, secures a threshold, and learns the entity’s true name (or equivalent).</li>
+<li><strong>The Calling:</strong> A dramatic scene where the summoner rolls Spirit + Lore vs. DV (set by the entity’s power). Failure may summon something else.</li>
+<li><strong>The Bargain:</strong> Greater powers do not serve for free. They demand a price — a memory, a firstborn, a deed, or an ongoing Obligation (tracked as a campaign front).</li>
+<li><strong>Consequences:</strong> On success, the entity manifests (briefly) and may grant a boon, answer a question, or perform a single impossible task. On failure, the entity corrupts, attacks, or curses the summoner.</li>
+</ul>
+<div class="panel panel-purple">
+<p><strong>Example: Summoning the Pale Shepherd’s Herald.</strong> A village elder attempts to summon a death-herald to save a dying child. Preparation timer [8]: gather grave-ash, a silver bell, and the child’s true name. Calling roll: Spirit 2 + Lore 3 = 5 dice vs DV 5 → Partial. The herald appears but demands a year of the elder’s remaining life. The elder accepts; the child lives.</p>
+</div>
+</section>
+</section>
+<section class="level2" id="pc-summoner">
+<h3>PC Summoner (Pact-Whisperer)</h3>
+<p>Player characters who specialize in summoning take the Pact-Whisperer talent (2 XP). This allows them to call and bind spirits for temporary aid in scenes.</p>
+<section class="level3" id="summoning-talents-summary">
+<h4>Summoning Talents (Summary)</h4>
+<p>The essential summoning talents are:</p>
+<ul>
+<li><strong>Pact-Whisperer (2 XP):</strong> Base access to summoning.</li>
+<li><strong>Lesser Pactwright (2 XP):</strong> Call spirits of TL 1.</li>
+<li><strong>Greater Pactwright (4 XP):</strong> Call spirits of TL 3.</li>
+<li><strong>Spirit Link (10 XP):</strong> Spirits act on your turn; all commands are free actions; reduce Leash ticking for natural behaviors by 1.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="core-mechanics-call-bind-leash">
+<h3>Core Mechanics – Call, Bind, and the Leash</h3>
+<p>Summoning a spirit follows three steps: Call, Bind, and Leash management.</p>
+<section class="level3" id="call-action">
+<h4 id="summoning-heading-7">Call (1 Action)</h4>
+<p>The spirit manifests at Near range. Choose a spirit template (see sample templates below).</p>
+</section>
+<section class="level3" id="bind-action">
+<h4 id="summoning-heading-8">Bind (1 Boon or 1 Fatigue)</h4>
+<p>Spend 1 Boon or mark 1 Fatigue to establish control. The spirit is now bound and will follow simple commands.</p>
+</section>
+<section class="level3" id="leash-capacity">
+<h4 id="summoning-heading-9">Leash Capacity</h4>
+<p>The spirit has a Leash — a track of segments equal to your Spirit + the spirit's TL. TL is 1 for a Lesser spirit, 3 for a Greater. The Leash represents the strain of keeping the spirit in the mortal world.</p>
+</section>
+<section class="level3" id="ticking-the-leash">
+<h4>Ticking the Leash</h4>
+<p>The Leash ticks forward (gains segments) under the following conditions:</p>
+<ul>
+<li>The spirit takes Harm (1 segment per level of Harm).</li>
+<li>You command the spirit to act against its nature (1 segment).</li>
+<li>You split focus — take another significant action while the spirit is acting (1 segment).</li>
+<li>The spirit crosses a <code>[WARD]</code> without dispelling it (DV = its TL; tick segments equal to the ward's DV).</li>
+<li>(Optional narrative trigger) A rival contests control, or the spirit moves too far from you.</li>
+</ul>
+</section>
+<section class="level3" id="when-the-leash-fills">
+<h4>When the Leash Fills</h4>
+<p>When the Leash reaches its capacity, the spirit acts once according to its nature (the GM decides the action, which is often destructive or self-serving), then departs immediately (or turns hostile at the GM’s discretion). The bond is broken.</p>
+</section>
+<section class="level3" id="boon-finesse">
+<h4>Boon Finesse</h4>
+<p>Once per round, you may spend 1 Boon to clear 1 tick from the current spirit’s Leash (cannot be used after the Leash has already filled). This represents appeasing the spirit, reaffirming control, or offering a small token.</p>
+</section>
+</section>
+<section class="level2" id="commanding-spirits">
+<h3>Commanding Spirits</h3>
+<ul>
+<li><strong>Quick Command:</strong> Simple orders (“attack that enemy”, “move there”, “defend me”, “retrieve that object”) do not consume your Action. You may issue one Quick Command per round as a free action.</li>
+<li><strong>Complex Command:</strong> If the order requires interpretation, multiple steps, or finesse (“guard this door and alert me if anyone passes”, “search the room for a hidden key”), it uses your Action for the turn.</li>
+<li><strong>Spirit Link (Major Talent):</strong> Spirits act on your turn; all commands are free actions; reduce Leash ticking for natural behaviors by 1.</li>
+</ul>
+</section>
+<section class="level2" id="spirit-bond-progression">
+<h3>Spirit Bond Progression</h3>
+<p>For spirits you summon regularly (e.g., a favoured elemental or a recurring shade), track a Spirit Bond Timer [4].</p>
+<ul>
+<li>Mark segments for successful commands, shared victories, or mutual aid (once per type per session).</li>
+<li><strong>At 2 segments:</strong> Gain +1 die to communicate with this spirit type.</li>
+<li><strong>At 4 segments:</strong> The spirit becomes Favored. Choose one: Leash Capacity +1, or –1 tick per command (minimum 0). Additionally, the spirit grants you +1 Boon when it departs naturally (not destroyed or forced out).</li>
+</ul>
+</section>
+<section class="level2" id="sample-spirit-templates">
+<h3>Sample Spirit Templates</h3>
+<div class="grid-2">
+<section class="level3" id="lesser-spirits">
+<h4>Lesser (TL 1)</h4>
+<div class="panel panel-green">
+<p><span class="badge badge-green">TL 1</span></p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<ul>
+<li><strong>Shade:</strong> Stealthy scout; can pass through cracks; Harm 1, Leash = 1+Spirit.</li>
+<li><strong>Emberling:</strong> Small fire elemental; deals 1 Harm (fire) on touch; can ignite objects.</li>
+<li><strong>Tangle-root:</strong> Plant spirit; can entangle one target (Entangled condition, Athletics DV 3 to break).</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="greater-spirits">
+<h4>Greater (TL 3)</h4>
+<div class="panel panel-red">
+<p><span class="badge badge-red">TL 3</span></p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<ul>
+<li><strong>Flame Elemental:</strong> Area fire attack (Harm 2 to all in Close); immune to mundane fire; Leash = 3+Spirit.</li>
+<li><strong>Shadow Hound:</strong> Track any scent; can move silently; attacks with Harm 2 (shadow bite).</li>
+<li><strong>Stone Guardian:</strong> High defense; can interpose and reduce Harm to an ally by 1 (once per round). Harm 1, but +2 Armor.</li>
+</ul>
+</div>
+</section>
+</div>
+</section>
+<section class="level2" id="spirit-specializations">
+<h3>Specializations (for recurring spirits)</h3>
+<p>Choose one specialization when a spirit becomes Favored:</p>
+<ul>
+<li><strong>Combat Specialist:</strong> +1 Harm on attacks; ignores first Harm 1 per scene.</li>
+<li><strong>Scout Form:</strong> Stealthy; a TL 1 spirit can carry 2 kg, a TL 3 spirit 10 kg; +2 dice to Stealth.</li>
+<li><strong>Utility Spirit:</strong> Can perform simple tasks (opening unlocked doors, carrying light objects, fetching items).</li>
+<li><strong>Shield Guardian:</strong> Once per round, interpose and convert an ally’s Harm 1 into Fatigue on the spirit.</li>
+</ul>
+</section>
+<section class="level2" id="gm-guidelines-summoning">
+<h3>GM Guidelines for Summoning</h3>
+<section class="level3" id="npc-summoners">
+<h4>NPC Summoners</h4>
+<p>Treat enemy summoners as having the same limitations: they must Call (action) and Bind (Boon or Fatigue). Their spirits have a Leash timer. The GM may choose not to track Leash for minor NPCs if the fiction does not demand it, but for major antagonists, use the same mechanics — this creates tactical choices (e.g., attack the summoner to break control, or force the spirit to cross a ward).</p>
+</section>
+<section class="level3" id="plot-level-summonings">
+<h4>Plot-Level Summonings</h4>
+<ul>
+<li>Create a Ritual Timer [6–12] that the party can disrupt.</li>
+<li>Each segment represents a component (blood sacrifice, alignment of stars, chanting cultists).</li>
+<li>The party can sabotage components, kill cultists, or break the circle to halt the summoning.</li>
+<li>If the timer fills, the entity arrives — now the party must bargain, fight, or flee.</li>
+</ul>
+</section>
+<section class="level3" id="hazards-of-greater-summoning">
+<h4>Hazards of Greater Summoning</h4>
+<ul>
+<li><strong>Uncontrolled Manifestation:</strong> The entity may be hostile to everyone, including the summoner.</li>
+<li><strong>Collateral Damage:</strong> Reality warps, wards fail, the dead rise, or the environment becomes a hazard.</li>
+<li><strong>Debt:</strong> Even if bound, the entity extracts a price — an Obligation timer that ticks per scene, demanding sacrifice or service.</li>
+</ul>
+<div class="panel panel-red">
+<p><strong>Example: The Cult of the Ninth Bell.</strong> Cultists attempt to summon a fragment of the Ninth (void entity). A 6-segment timer: collect nine souls (segment 1), ring the forbidden bell (segment 2), etc. The party can interrupt at any segment. If the timer fills, the Ninth Rim appears — treat as a Tier IV hazard with a Bargain (offer a memory) or a Catastrophe (reality starts erasing the town).</p>
+</div>
+</section>
+</section>
+</section></div><p>Continue: <a href="crafting.html">Crafting: projects and upkeep</a></p></main></body></html>

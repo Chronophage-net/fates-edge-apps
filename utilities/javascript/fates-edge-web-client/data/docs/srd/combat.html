@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Equipment, combat, and recovery</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Equipment, combat, and recovery</h1><p>Combat applies the core mechanic to immediate danger. Equipment tells you what your character brings; Action Economy explains a turn; Combat handles the situation around that turn; Health, Fatigue, and Harm explains its consequences. Detailed crafting projects have their own reference.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="equipment">
+<h2>Equipment</h2>
+<section class="level2" id="weapons-by-weight-class">
+<h3 id="equipment-heading-1">Weapons by Weight Class</h3>
+<p>A weapon's weight determines its Harm, its dice modifier at different ranges, and its tempo. Harm is applied directly when an attack hits; the dice modifier affects the attack roll, not damage.</p>
+<p><strong>Weight is not distance.</strong> Light, Medium and Heavy describe the weapon in your hands. Close, Near, Reach and Far describe the gap between you and the person you are trying to hit. The two sets of words never share a member, so "a Medium weapon at Near range" is unambiguous and always will be.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Weight</th><th>Harm</th><th>Close</th><th>Near</th><th>Reach</th><th>Tempo</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-green">Light</span></td><td>1</td><td>+2d</td><td>+1d</td><td>—</td><td>Fast</td></tr>
+<tr><td><span class="badge badge-gold">Medium</span></td><td>2</td><td>+1d</td><td>+2d</td><td>—</td><td>Standard</td></tr>
+<tr><td><span class="badge badge-red">Heavy</span></td><td>3</td><td>–1d</td><td>+3d</td><td>+0d</td><td>Slow</td></tr>
+</tbody>
+</table></div>
+</div>
+<section class="level3" id="weapon-weight-class-notes">
+<h4 id="equipment-heading-2">Notes</h4>
+<ul>
+<li>Fast tempo: You may move and attack in the same turn (Move + Action).</li>
+<li>Standard tempo: You may move or attack in a turn, not both.</li>
+<li>Slow tempo: Attacking requires a Set action before the attack. Set on one turn and swing on the next, ordered <em>Move then Set</em>, then <em>Swing then Move</em> — the two Actions land back to back (see 7.1) and you keep both Moves. You cannot Set and swing in the same turn unless a talent says otherwise.</li>
+<li>Heavy weapons at Close: Suffer –1d due to limited maneuvering room.</li>
+<li><strong>Reach is where a hafted weapon can still touch you.</strong> A Heavy melee weapon threatens the Reach band natively — halberd, greatsword, war-scythe. It does so at no bonus: Reach is where such a weapon <em>can</em> reach, not where it does its best work. That is still Near, where its momentum arrives.</li>
+<li>A Light or Medium weapon threatens Reach only if it carries the <code>Hafted</code> tag (spear, quarterstaff, light polearm), and then also at +0d.</li>
+<li>A weapon cannot attack beyond its maximum listed range unless a talent or special ammunition extends it. A dash (—) means the weapon does not threaten that band at all.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="ranged-weapons-and-ammunition">
+<h3 id="equipment-heading-3">Ranged Weapons and Ammunition</h3>
+<p>Ranged weapons use the same weight classes and the same tempo rules, but <strong>not the same range curve</strong> — a Heavy melee weapon is at its best at Near, while a Heavy ranged weapon is at its best at Far. They need their own table.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Weight</th><th>Tempo</th><th>Close</th><th>Near</th><th>Far</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-green">Light</span></td><td>Fast</td><td>Controlled</td><td>+1d</td><td>—</td></tr>
+<tr><td><span class="badge badge-gold">Medium</span></td><td>Standard</td><td>Desperate</td><td>+2d</td><td>+1d</td></tr>
+<tr><td><span class="badge badge-red">Heavy</span></td><td>Slow</td><td>Desperate</td><td>+1d</td><td>+3d</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Shooting into Close range moves <strong>Position</strong>, not dice: a Light ranged weapon manages it at Controlled, anything heavier at Desperate. A bow is not harder to aim at arm's length — it is harder to survive using.</p>
+<p><strong>Ranged weapons treat Reach as Near.</strong> An archer does not care whether the spear coming at them is at sword distance or haft distance; both are far too close. Reach is a melee band, and giving it a column here would be three numbers pretending to be a distinction.</p>
+<p>Ammunition is tracked abstractly as part of Supply (see Section 6.6 below). A character may run low on ammunition when the GM spends SB on resource strain or during extended travel.</p>
+</section>
+<section class="level2" id="equipment-armor">
+<h3 id="equipment-heading-4">Armor</h3>
+<p>Armor does not reduce Harm directly. Instead, it converts incoming Harm into Fatigue. See the Armor Conversion Table below.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-green">Light</span></td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td><span class="badge badge-gold">Medium</span></td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td><span class="badge badge-red">Heavy</span></td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
+</tbody>
+</table></div>
+</div>
+<section class="level3" id="armor-notes">
+<h4 id="equipment-heading-5">Notes</h4>
+<ul>
+<li>Minimum 1 Fatigue per hit, even if conversion would give 0.</li>
+<li>Light armor: –1d to physical actions (optional).</li>
+<li>Medium armor: –1d to physical actions, –1d to Stealth, and subterfuge.</li>
+<li>Heavy armor: –2d to physical actions, –2d to Stealth, and subterfuge; cannot sprint.</li>
+</ul>
+</section>
+<section class="level3" id="armor-conversion-examples">
+<h4 id="equipment-heading-6">Armor Conversion Examples</h4>
+<ul>
+<li>Light armor vs Harm 1: take 1 Fatigue. No Harm.</li>
+<li>Medium armor vs Harm 2: take 1 Fatigue. No Harm.</li>
+<li>Heavy armor vs Harm 3: take 2 Fatigue. No Harm.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="shields-optional">
+<h3 id="equipment-heading-7">Shields (Optional)</h3>
+<p>Shields are worn in the off-hand. Using a shield restricts weapon size to Light or Medium.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Shield</th><th>Benefit</th><th>Tradeoff</th></tr>
+</thead>
+<tbody>
+<tr><td>Buckler</td><td>+1d to Defend actions once per scene</td><td>Off-hand occupied; –1d to ranged attacks</td></tr>
+<tr><td>Heater</td><td>+1d to Defend actions; 1 Harm → Fatigue per scene</td><td>Off-hand occupied; –1d to ranged attacks</td></tr>
+<tr><td>Pavise</td><td>Plant to create heavy cover (one direction)</td><td>Bulky; cannot move while planted</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="mundane-gear">
+<h3 id="equipment-heading-8">Mundane Gear</h3>
+<p>Most gear is abstracted. When you need a specific item (rope, lockpicks, torch), assume you have it unless the fiction says otherwise or the GM spends SB to declare a shortage.</p>
+<p>The following items are tracked as part of Supply (see Section 6.6 below):</p>
+<ul>
+<li>Rations (1 day)</li>
+<li>Crowbar</li>
+<li>Torches (3)</li>
+<li>Hammer and spikes</li>
+<li>Waterskin</li>
+<li>Sack (large)</li>
+<li>Rope (10m)</li>
+<li>Grappling hook</li>
+<li>Tinderbox</li>
+<li>Lantern and oil</li>
+<li>Bedroll</li>
+<li>Healer's kit (3 uses)</li>
+</ul>
+</section>
+<section class="level2" id="supply-timer">
+<h3 id="equipment-heading-9">Supply Timer</h3>
+<div class="panel panel-gold">
+<p><strong>Supply Timer [4]</strong>: A shared party resource tracking access to food, water, ammunition, and basic gear. When the timer fills, the party runs out of a critical resource (GM chooses: food, water, ammunition, or a specific tool). Resupply at settlements, through successful foraging, or by spending a Cache token (see Asset rules).</p>
+<p>Each Supply segment represents approximately one day's worth of resources for the party.</p>
+</div>
+<p><strong>Ticking the Supply Timer:</strong></p>
+<ul>
+<li>The Quartermaster fails a travel roll (§16, Travel Framework).</li>
+<li>The GM spends SB on scarcity or resource strain.</li>
+<li>The party is forced to march without resupply.</li>
+<li>Extended travel through hostile or barren terrain.</li>
+</ul>
+<p><strong>Clearing Supply Segments:</strong></p>
+<ul>
+<li>Reaching a settlement resets the timer to Full (0 segments).</li>
+<li>A successful foraging roll (Wits + Lore, DV 3) clears 1 segment.</li>
+<li>Spending a Cache token (see Asset rules) clears 1 segment.</li>
+</ul>
+<p>When the Supply Timer is at 2 segments (Dangerous), each character gains 1 Fatigue per day until resupplied. At 3 segments (Empty), characters begin taking Harm 1 per day (starvation, dehydration, exposure).</p>
+</section>
+<section class="level2" id="equipment-condition">
+<h3 id="equipment-heading-10">Equipment Condition</h3>
+<p>All gear can become Neglected or Compromised.</p>
+<ul>
+<li><strong>Neglected:</strong> Weapons suffer –1 die on attack rolls; armor conversion worsens by one step (e.g., Light behaves as Unarmored). Neglected gear is usable but unreliable.</li>
+<li><strong>Compromised:</strong> Weapons suffer –1 die on the first attack each round; armor provides no conversion (all Harm applies directly). Compromised gear is barely functional.</li>
+</ul>
+<section class="level3" id="repair">
+<h4 id="equipment-heading-11">Repair</h4>
+<ul>
+<li>Neglected → Functional: Requires a short rest (1 hour) and access to basic tools.</li>
+<li>Compromised → Neglected: Requires a scene of dedicated work (Craft test, DV 3) or a visit to a smith.</li>
+<li>Compromised → Functional: Requires significant downtime (a full day) and a successful Craft test (DV 4) or a professional smith.</li>
+<li>Enchanted items require the same repairs; enchantments are inactive while the item is Compromised.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="magical-items-enchantments">
+<h3 id="equipment-heading-12">Magical Items (Enchantments)</h3>
+<p>Enchantments are permanent magical modifications treated as Minor or Standard Assets (§14.2). Each enchantment costs XP and counts toward the item's enchantment limit.</p>
+<section class="level3" id="enchantment-limits">
+<h4 id="equipment-heading-13">Enchantment Limits</h4>
+<ul>
+<li>Light item: maximum 1 enchantment.</li>
+<li>Medium item: maximum 2 enchantments.</li>
+<li>Heavy item: maximum 3 enchantments.</li>
+</ul>
+</section>
+<section class="level3" id="sample-enchantments">
+<h4 id="equipment-heading-14">Sample Enchantments</h4>
+<ul>
+<li><strong>Keen Edge (2 XP):</strong> +1 die when attacking armored targets.</li>
+<li><strong>Flaming Blade (4 XP):</strong> +1 Harm against creatures vulnerable to fire; +1 Effect against cold-based foes.</li>
+<li><strong>Soulfire Weapon (6 XP):</strong> Ignores 1 point of armor or resistance.</li>
+<li><strong>Shadowweave Armor (2 XP):</strong> +1 die to Stealth rolls while moving.</li>
+<li><strong>Runed Plate (4 XP):</strong> Reduce magical backlash severity by one step (e.g., Moderate → Minor).</li>
+<li><strong>Boots of Sure Step (3 XP):</strong> Ignore difficult terrain penalties.</li>
+</ul>
+</section>
+<section class="level3" id="removing-an-enchantment">
+<h4 id="equipment-heading-15">Removing an Enchantment</h4>
+<p>An enchantment can be removed with a ritual (Wits + Arcana, DV 4) costing 1 XP per enchantment level. The item is not damaged.</p>
+</section>
+</section>
+<section class="level2" id="weapon-and-armor-acquisition">
+<h3 id="equipment-heading-16">Weapon and Armor Acquisition</h3>
+<ul>
+<li>Mundane weapons and armor are acquired through play (found, looted, purchased with Supply, or granted as part of character background). No XP cost.</li>
+<li>Masterwork or enchanted items require XP expenditure (as Assets) or narrative quests.</li>
+<li>A character begins play with one Light or Medium weapon and one set of Light or Medium armor appropriate to their background.</li>
+</ul>
+</section>
+</section><section class="level1" id="action-economy">
+<h2>Action Economy</h2>
+<section class="level2" id="turn-structure">
+<h3 id="action-economy-heading-1">Turn Structure</h3>
+<p>Each character takes 1 Action and 1 Move on their turn. Actions and Moves may be taken in any order. A character may use a Boon to re-roll their action at the expense of their Move if they still have it available.</p>
+<div class="panel panel-gold">
+<p><strong>Ordering is the whole answer to two-part actions.</strong> Because the order is free, a character who takes <em>Move then Action</em> on one turn and <em>Action then Move</em> on the next has taken two Actions back to back, with nothing of their own in between, and still moved twice.</p>
+<p>That is how anything needing two Actions resolves — setting a Heavy weapon and swinging it, loading a Slow weapon and firing it, any talent that says "then, on your next turn". None of them need a rule of their own. They need the ordering freedom this section already grants, and a player who knows to use it.</p>
+<p>What it costs is not time but <strong>commitment</strong>. Everyone else in the round still acts between your two Actions. You have announced where you will be and what you are about to do, and the table gets a turn to make you regret it — which is the tension a slow weapon exists to create, and a good thing for the GM to spend a Story Beat on.</p>
+</div>
+</section>
+<section class="level2" id="move">
+<h3 id="action-economy-heading-2">Move</h3>
+<ul>
+<li>Shift one range band: Close ↔ Near ↔ Reach ↔ Far.</li>
+<li>Reposition within the same range band (e.g., from behind one tree to another). This does not change your range band but may affect cover or line of sight.</li>
+<li>Stand: Use your Move to stand from prone.</li>
+</ul>
+</section>
+<section class="level2" id="actions">
+<h3 id="action-economy-heading-3">Actions</h3>
+<section class="level3" id="attack">
+<h4 id="action-economy-heading-4">Attack</h4>
+<p>Make a melee or ranged attack versus DV set by the GM and fiction. Ranged attacks made while within Close range of an enemy are Desperate (re-roll one success).</p>
+</section>
+<section class="level3" id="disengage-action">
+<h4 id="action-economy-heading-5">Disengage</h4>
+<p>Action (not a Move). You prepare to retreat safely. After taking Disengage, your Move this turn does not provoke opportunity attacks. You cannot also Attack this turn.</p>
+</section>
+<section class="level3" id="dash">
+<h4 id="action-economy-heading-6">Dash</h4>
+<p>Action. Move two range bands (e.g., Close → Reach). Your next defense roll is Desperate.</p>
+</section>
+<section class="level3" id="charge-action-economy">
+<h4 id="action-economy-heading-7">Charge (Full Turn Action)</h4>
+<p>Move up to two range bands toward an enemy and make one melee attack. Costs 1 Fatigue. Your next defense is Desperate. Consumes both your Action and Move. Requires open ground (no difficult terrain). If your target is behind full cover, you cannot complete the Charge — you may move up to the cover and end your turn there; the attack is lost.</p>
+<p>Two bands is the limit, so a Charge from Far arrives at Near, not in the target's face. Crossing the last band to Close is another turn. This is correct: sprinting the length of a field into knife range, under whatever is being aimed at you, is not one beat of a fight.</p>
+</section>
+<section class="level3" id="skirmish-action-economy">
+<h4 id="action-economy-heading-8">Skirmish (Full Turn Action)</h4>
+<p>Move up to two range bands away from an enemy and make one ranged attack. Costs 1 Fatigue. Your next defense is Desperate. Consumes both Action and Move. Requires open ground. If you start your turn hidden, you may Skirmish: leave cover, move, shoot, and may end your turn in new cover if available. You are exposed during movement and the shot; opportunity attacks apply normally.</p>
+</section>
+<section class="level3" id="observe-change-position">
+<h4 id="action-economy-heading-9">Observe / Change Position</h4>
+<p>Take a beat to read the field or set angles. Gain +1 Position for one action this turn (e.g., Controlled → Dominant). Limit once per turn; cannot exceed Dominant.</p>
+</section>
+<section class="level3" id="setup-teamwork">
+<h4 id="action-economy-heading-10">Setup (Teamwork)</h4>
+<p>Create advantage for an ally. On success, grant their next action +1 Position or step up Effect (GM's call).</p>
+</section>
+<section class="level3" id="assist-teamwork">
+<h4 id="action-economy-heading-11">Assist (Teamwork)</h4>
+<p>Spend 1 Boon to give an ally +1 die on their current roll. You share appropriate risk or consequence.</p>
+</section>
+<section class="level3" id="protect-action-economy">
+<h4 id="action-economy-heading-12">Protect</h4>
+<p>Adopt a guarding stance or body-block. Choose a nearby ally. Until your next turn, you may intercept one hit targeting them and roll to resist it. On success, reduce or negate Harm; you take any fallout the GM assigns.</p>
+</section>
+<section class="level3" id="interact">
+<h4 id="action-economy-heading-13">Interact</h4>
+<p>Lift, pull, flip a lever, shove a foe, break an object, apply a poultice, reload, draw or stow a weapon, hide, or search. GM sets DV and Effect.</p>
+</section>
+<section class="level3" id="defend-action-economy">
+<h4 id="action-economy-heading-14">Defend</h4>
+<p>Spend your Action or Move to enter a defensive stance. Until your next turn, you count as Defending. When resisting any attack or effect, improve your Position by one step (or gain +1 die if already Dominant).</p>
+</section>
+<section class="level3" id="free-actions">
+<h4 id="action-economy-heading-15">Free Actions</h4>
+<p>Short shouts, dropping an item, a quick glance. Longer or tactical assessments require Observe / Change Position or Interact.</p>
+</section>
+</section>
+<section class="level2" id="reactions-out-of-turn">
+<h3 id="action-economy-heading-16">Reactions (Out of Turn)</h3>
+<ul>
+<li><strong>Opportunity Attack:</strong> When an enemy leaves your Close range without using Disengage, you may make one free melee attack (Controlled Position, no action cost). This does not consume your action for the round.</li>
+<li>Protection may trigger when an ally is hit and you are in position.</li>
+<li>Class and asset reactions fire as written (e.g., counter-runes, ripostes).</li>
+</ul>
+<p>Actions that provoke opportunity attacks when performed while engaged in Close with an enemy:</p>
+<ul>
+<li>Making a ranged attack (bow, crossbow, thrown weapon).</li>
+<li>Casting a spell that does not have the <code>[TOUCH]</code> or <code>[WARD]</code> tag.</li>
+</ul>
+</section>
+<section class="level2" id="sidestep-strike">
+<h3 id="action-economy-heading-17">Sidestep Strike</h3>
+<p>As part of a melee attack action, you may move one range band (Close ↔ Near, Near ↔ Reach, or Reach ↔ Far) without using your Move action for the turn. If you do so, your Position for that attack worsens by one step (e.g., Controlled becomes Desperate, Dominant becomes Controlled). You cannot also use your regular Move action in the same turn.</p>
+</section>
+<section class="level2" id="shove-action-economy">
+<h3 id="action-economy-heading-18">Shove</h3>
+<p>Action. Opposed Body + Athletics vs. target's Body + Athletics. On success, push the target back one range band (Close → Near). The target suffers –1 Position on their next action.</p>
+</section>
+<section class="level2" id="grapple-action-economy">
+<h3 id="action-economy-heading-19">Grapple</h3>
+<p>Action. Opposed Body + Melee vs. target's Body + Athletics. On success, both characters are engaged (cannot move apart). The grappled target suffers –1 die on all actions. Breaking free requires a new opposed roll as an action.</p>
+</section>
+<section class="level2" id="hiding-and-cover">
+<h3 id="action-economy-heading-20">Hiding and Cover</h3>
+<ul>
+<li>To hide, a character must be behind full cover (e.g., a large tree, a wall) or in heavy concealment (dense fog, darkness).</li>
+<li>Take the Interact action to hide, rolling Stealth (or appropriate skill) vs. the Perception of any observers.</li>
+<li>Once hidden, you are not a valid target for attacks unless an attacker first uses an action to Search (Perception vs. your Stealth) or you reveal yourself by attacking or moving into the open.</li>
+<li>If you move out of cover to attack, you are no longer hidden for the duration of the attack and may be subject to opportunity attacks if you leave an enemy's Close range.</li>
+</ul>
+</section>
+<section class="level2" id="ready-and-overwatch">
+<h3 id="action-economy-heading-21">Ready and Overwatch</h3>
+<p>Players may hold an action with a clear trigger (e.g., "I shoot the first enemy who comes through that door"). If the trigger occurs, resolve the held action before the next exchange starts.</p>
+</section>
+<section class="level2" id="refresh-windows">
+<h3 id="action-economy-heading-22">Refresh Windows</h3>
+<ul>
+<li>Once per scene effects reset at scene end.</li>
+<li>Once per exchange effects reset at the next beat.</li>
+</ul>
+</section>
+<section class="level2" id="summary-table-of-actions">
+<h3 id="action-economy-heading-23">Summary Table of Actions</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Action</th><th>Cost</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Attack</td><td>1 Action</td><td>Make melee or ranged attack.</td></tr>
+<tr><td>Disengage</td><td>1 Action</td><td>Move does not provoke opportunity attacks; cannot Attack.</td></tr>
+<tr><td>Dash</td><td>1 Action</td><td>Move two bands; next defense Desperate.</td></tr>
+<tr><td>Charge</td><td>Full turn (Action + Move), 1 Fatigue</td><td>Move two bands toward enemy + melee attack; next defense Desperate.</td></tr>
+<tr><td>Skirmish</td><td>Full turn (Action + Move), 1 Fatigue</td><td>Move two bands away + ranged attack; next defense Desperate.</td></tr>
+<tr><td>Observe</td><td>1 Action</td><td>+1 Position on next action this turn.</td></tr>
+<tr><td>Setup</td><td>1 Action</td><td>Grant ally +1 Position or +1 Effect.</td></tr>
+<tr><td>Assist</td><td>1 Boon</td><td>Grant ally +1 die on current roll.</td></tr>
+<tr><td>Protect</td><td>1 Action</td><td>Intercept one hit on nearby ally.</td></tr>
+<tr><td>Interact</td><td>1 Action</td><td>Manipulate environment, hide, search, etc.</td></tr>
+<tr><td>Defend</td><td>1 Action or Move</td><td>Defensive stance; +1 Position or +1 die to resist.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+</section><section class="level1" id="combat">
+<h2>Combat</h2>
+<p>Combat uses the same core resolution loop as any other encounter: declare intent, set Position and DV, roll, apply outcome. This section provides specific rules for violence, movement, and tactical positioning.</p>
+<section class="level2" id="rhythm-of-battle">
+<h3 id="combat-heading-1">Rhythm of Battle</h3>
+<p>Fate's Edge does not use fixed initiative. The GM spotlights characters based on the fiction, circumstances, and tension.</p>
+<ul>
+<li>Ambushers act first. Targets respond after the opening exchange.</li>
+<li>Spotlight shifts mid-scene if fictionally appropriate (e.g., reacting to a falling ceiling, seizing a moment).</li>
+<li>Players may suggest acting when it makes sense in the fiction.</li>
+</ul>
+</section>
+<section class="level2" id="turn-structure-combat">
+<h3 id="combat-heading-2">Turn Structure</h3>
+<p>Each character's turn consists of 1 Action and 1 Move. Actions and Moves may be taken in any order. Repeating the same Action is not allowed unless noted.</p>
+<section class="level3" id="move-combat">
+<h4 id="combat-heading-3">Move</h4>
+<p>Move up to one range band (Close → Near → Reach → Far, or vice versa). You may also use your Move to reposition within the same range band (e.g., from behind one tree to another at the same distance). This does not change your range band but may affect cover or line of sight.</p>
+<ul>
+<li>Stand: Use your Move to stand from prone.</li>
+<li>Dash (Action): Gain an extra Move. You may move two bands total in your turn. Your next defense roll is Desperate.</li>
+</ul>
+</section>
+<section class="level3" id="disengage-combat">
+<h4 id="combat-heading-4">Disengage (Action)</h4>
+<p>Prepare to retreat safely. After taking Disengage, your Move this turn does not provoke opportunity attacks. You cannot also Attack this turn.</p>
+</section>
+</section>
+<section class="level2" id="range-bands">
+<h3 id="combat-heading-5">Range Bands</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Band</th><th>Default</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-blue">Close</span></td><td>Touching</td><td>Grapples, knives, short weapons. Inside the arc of anything longer.</td></tr>
+<tr><td><span class="badge badge-green">Near</span></td><td>A step and a swing</td><td>One-handed weapons at their best. Thrown weapons, short bows, most magic.</td></tr>
+<tr><td><span class="badge badge-orange">Reach</span></td><td>A haft away</td><td>Where a spear, polearm or greatsword still touches you and a sword does not.</td></tr>
+<tr><td><span class="badge badge-red">Far</span></td><td>Distant (same site)</td><td>Beyond every melee weapon. Long bows, line spells; needs time or a route to close.</td></tr>
+<tr><td><span class="badge badge-purple">Absent</span></td><td>Off-screen</td><td>Outside the scene frame; needs travel or a cut to interact. A state, not a distance.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Four bands, and each is named for what crosses it.</strong> Close is decided by hands, Near by a sword, Reach by a haft, Far by a bow. Absent is not a fifth distance — it is the scene declining to contain someone.</p>
+<p>Reach exists because a polearm is not a long sword. A spear held at the haft governs a stretch of ground a blade cannot answer, and the person standing in it is in a fight the swordsman has not joined yet. A band is the honest way to say that: it is a place on the table that both players can point at, rather than an exception carried on one weapon's card.</p>
+<p class="text-sm text-muted"><strong>On names.</strong> Three vocabularies describe a weapon in play and they share no word between them. <strong>Distance</strong> is Close, Near, Reach, Far. <strong>Weight</strong> is Light, Medium, Heavy. <strong>Tags</strong> are <code>Hafted</code>, <code>Infighting</code>, <code>Accurate</code>, <code>Brutal</code>, and the rest. Any sentence combining them reads exactly one way, which is the whole reason the lists are kept apart.</p>
+</section>
+<section class="level2" id="melee-flag">
+<h3 id="combat-heading-6">Melee Flag</h3>
+<p>Two parties are "in Melee" when they are directly engaged and within a band each can threaten — Near for most weapons, Reach for a Heavy or <code>Hafted</code> one. A spearman at Reach against a swordsman is in Melee; the swordsman is not, until one of them closes.</p>
+<ul>
+<li>Enter Melee: 1 Move from Near (Controlled if under fire).</li>
+<li>Leave Melee: 1 Move to break off. If threatened, you must take the Disengage action. Without Disengage, leaving Close range provokes a free opportunity attack.</li>
+</ul>
+</section>
+<section class="level2" id="opportunity-attacks">
+<h3 id="combat-heading-7">Opportunity Attacks</h3>
+<p>Moving out of an enemy's Close range without using the Disengage action provokes one free melee attack from that enemy. The attack is resolved normally (Position usually Controlled) and does not consume the enemy's action for the round.</p>
+<p>Additionally, the following actions provoke an opportunity attack if performed while engaged in Close with an enemy:</p>
+<ul>
+<li>Making a ranged attack (bow, crossbow, thrown weapon).</li>
+<li>Casting a spell that does not have the <code>[TOUCH]</code> or <code>[WARD]</code> tag.</li>
+</ul>
+</section>
+<section class="level2" id="full-turn-actions">
+<h3 id="combat-heading-8">Full Turn Actions</h3>
+<section class="level3" id="charge-combat">
+<h4 id="combat-heading-9">Charge</h4>
+<p>Move up to two range bands toward an enemy (e.g., Far → Reach → Near) and make one melee attack. The track is four bands long, so a charge from Far arrives at Near — sword distance — and not in the target's face. Closing the last band takes another turn, or a talent.</p>
+<ul>
+<li>Costs 1 Fatigue.</li>
+<li>Your next defense is Desperate.</li>
+<li>Consumes both your Action and Move.</li>
+<li>Requires open ground (no difficult terrain) unless you have a talent that overrides this.</li>
+<li>If your target is hidden behind full cover, you cannot complete the Charge. You may move up to the cover and end your turn there; the attack is lost.</li>
+</ul>
+</section>
+<section class="level3" id="skirmish-combat">
+<h4 id="combat-heading-10">Skirmish</h4>
+<p>Move up to two range bands away from an enemy and make one ranged attack.</p>
+<ul>
+<li>Costs 1 Fatigue.</li>
+<li>Your next defense is Desperate.</li>
+<li>Consumes both your Action and Move.</li>
+<li>Requires open ground.</li>
+<li>If you start your turn hidden, you may Skirmish: leave cover, move, shoot, and may end your turn in new cover if available. You are exposed during movement and the shot; opportunity attacks apply normally.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="cover-and-hiding">
+<h3 id="combat-heading-11">Cover and Hiding</h3>
+<section class="level3" id="cover">
+<h4 id="combat-heading-12">Cover</h4>
+<ul>
+<li>Partial cover: +1 DV to target you.</li>
+<li>Full cover: You cannot be targeted directly.</li>
+</ul>
+</section>
+<section class="level3" id="hiding">
+<h4 id="combat-heading-13">Hiding</h4>
+<p>To hide, a character must be behind full cover or in heavy concealment (dense fog, darkness). Take the Interact action to hide, rolling Stealth (or appropriate skill) against the Perception of any observers.</p>
+<ul>
+<li>Once hidden, you are not a valid target unless an attacker first uses an action to Search (Perception vs. your Stealth) or you reveal yourself.</li>
+<li>Revealing yourself by attacking or moving into the open ends the hidden state. You are exposed for the duration of the attack and may provoke opportunity attacks if you leave an enemy's Close range.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="height-advantage">
+<h3 id="combat-heading-14">Height Advantage</h3>
+<p>Attacking from higher ground (e.g., a ledge, rooftop, or horse) grants +1 die or +1 Effect (GM's choice).</p>
+</section>
+<section class="level2" id="difficult-terrain">
+<h3 id="combat-heading-15">Difficult Terrain</h3>
+<ul>
+<li>Costs 2 Move actions to traverse one band (or a full action to Dash).</li>
+<li>Charge and Skirmish require open ground unless the character has the Relentless talent.</li>
+</ul>
+</section>
+<section class="level2" id="mounted-combat-simplified">
+<h3 id="combat-heading-16">Mounted Combat (Simplified)</h3>
+<p>If you have a War Mount and the Cavalier talent (or equivalent):</p>
+<ul>
+<li>Charging into melee from Far → Near: +2 dice.</li>
+<li>Firing while disengaging Near → Far: +2 dice.</li>
+</ul>
+<p>The bonus applies only when movement is part of the action. Misses and Partials often cost mount Fatigue, equipment damage, or narrative complications.</p>
+</section>
+<section class="level2" id="combat-action-options">
+<h3 id="combat-heading-17">Combat Action Options</h3>
+<p>In addition to standard actions (Attack, Disengage, Dash), characters may take:</p>
+<ul>
+<li><strong>Shove (Action):</strong> Opposed Body + Athletics vs. target's Body + Athletics. On success, push the target back one range band (Close → Near). The target suffers –1 Position on their next action.</li>
+<li><strong>Grapple (Action):</strong> Opposed Body + Melee vs. target's Body + Athletics. On success, both characters are engaged (cannot move apart). The grappled target suffers –1 die on all actions. Breaking free requires a new opposed roll as an action.</li>
+<li><strong>Protect (Action):</strong> Adopt a guarding stance. Choose a nearby ally; until your next turn you may intercept one hit on them and roll to resist it. On success, reduce or negate Harm; you take any fallout the GM assigns.</li>
+<li><strong>Setup (Action):</strong> Create advantage for an ally. On a success (appropriate roll, DV set by GM), grant their next action +1 Position or step up Effect.</li>
+<li><strong>Defend (Action or Move):</strong> Enter a defensive stance. Until your next turn, improve your Position by one step when resisting any attack or effect (or gain +1 die if already Dominant).</li>
+</ul>
+</section>
+<section class="level2" id="default-combat-assumptions">
+<h3 id="combat-heading-18">Default Combat Assumptions</h3>
+<p>To keep play moving, the GM may assume:</p>
+<ul>
+<li>Default range = Near.</li>
+<li>Default Position = Controlled.</li>
+<li>Default Effect = Standard.</li>
+<li>Move one band per Move action unless terrain or fiction says otherwise.</li>
+</ul>
+</section>
+<section class="level2" id="example-melee-exchange">
+<h3 id="combat-heading-19">Example: Melee Exchange</h3>
+<div class="panel panel-blue">
+<p>Thane charges a goblin archer.</p>
+<ul>
+<li>Thane declares Charge (Far → Near → Close). Costs 1 Fatigue.</li>
+<li>GM: "Controlled, DV 3. On a Miss, the goblin gets a parting shot."</li>
+<li>Thane rolls Body 3 + Melee 3 = 6 dice: 9, 7, 6, 4, 2, 1 → 3 successes vs DV 3. Clean Success.</li>
+<li>Thane deals his weapon's Harm (Medium weapon = Harm 2). The goblin is injured.</li>
+<li>Thane's next defense is Desperate due to Charge.</li>
+</ul>
+</div>
+</section>
+<section class="level2" id="integration-with-fatigue-and-harm">
+<h3 id="combat-heading-20">Integration with Fatigue and Harm</h3>
+<p>Combat frequently marks Fatigue (from Charge, Skirmish, and enemy abilities) and Harm (from successful attacks). See §9, Health, Fatigue, and Harm.</p>
+</section>
+</section><section class="level1" id="health-fatigue-harm">
+<h2>Health, Fatigue, and Harm</h2>
+<section class="level2" id="fatigue-track">
+<h3>Fatigue Track</h3>
+<p>Each character has a Fatigue track equal to their Body attribute (minimum 1). Fatigue represents exertion, strain, and the accumulation of minor physical toll.</p>
+<p><strong>Marking Fatigue:</strong> Mark Fatigue for the following:</p>
+<ul>
+<li>Performing a Charge or Skirmish action (1 Fatigue).</li>
+<li>Forced marches, extreme effort, or environmental strain (GM discretion).</li>
+<li>Magical costs (e.g., Pushing a Rite, Backlash, Obligation overflow).</li>
+<li>Converting a Boon effect to Fatigue (substitution rule).</li>
+</ul>
+</section>
+<section class="level2" id="effect-of-fatigue">
+<h3>Effect of Fatigue</h3>
+<p>Each point of Fatigue worsens your Position by one step:</p>
+<p><code>Dominant → Controlled → Desperate</code></p>
+<p>If you are already at Desperate Position, each additional point of Fatigue instead imposes a –1 die penalty on all your rolls (cumulative).</p>
+</section>
+<section class="level2" id="harm-levels">
+<h3>Harm Levels</h3>
+<p>Harm represents serious injury. There are three levels:</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Harm Level</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-orange">Harm 1</span></td><td>–1 die on actions directly related to the injury (GM discretion).</td></tr>
+<tr><td><span class="badge badge-red">Harm 2</span></td><td>–1 die on most actions until treated.</td></tr>
+<tr><td><span class="badge badge-red">Harm 3</span></td><td>Incapacitated or dying (cannot act; requires stabilization).</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="taking-harm-and-fatigue-the-procedure">
+<h3>Taking Harm and Fatigue — The Procedure</h3>
+<p>When you take Harm from an attack, hazard, or magical backlash, resolve in the following order:</p>
+<ol>
+<li><strong>Convert.</strong> Use the Armor Conversion Table to turn incoming Harm into Fatigue. Minimum 1 Fatigue per hit, even if conversion would give 0.</li>
+<li><strong>Apply remaining Harm.</strong> If any Harm remains after conversion:
+<ul>
+<li>Clear all existing Fatigue (the shock of a wound resets exhaustion).</li>
+<li>Increase your Harm level by the number of Harm points remaining.</li>
+</ul>
+</li>
+<li><strong>Add Fatigue.</strong> Add the Fatigue from step 1 to your Fatigue track.</li>
+<li><strong>Check for Overflow.</strong> If your Fatigue total equals or exceeds your Body (track size):
+<ul>
+<li>Increase Harm by one level.</li>
+<li>Clear all Fatigue.</li>
+<li>Any excess Fatigue beyond the track size is lost.</li>
+</ul>
+</li>
+</ol>
+<p class="text-muted text-sm">Overflow can occur multiple times from a single hit (e.g., with Body 1 or 2).</p>
+</section>
+<section class="level2" id="health-fatigue-harm-armor-conversion-table">
+<h3>Armor Conversion Table</h3>
+<p>Armor does not reduce incoming Harm directly. Instead, it converts Harm to Fatigue according to the table below.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
+</thead>
+<tbody>
+<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm"><em>Example:</em> Light armor vs Harm 2 becomes Harm 1 + Fatigue 1. Heavy armor vs Harm 3 becomes Fatigue 2.</p>
+</section>
+<section class="level2" id="health-fatigue-harm-recovery">
+<h3>Recovery</h3>
+<section class="level3" id="fatigue-recovery">
+<h4>Fatigue Recovery</h4>
+<ul>
+<li>Short rest (1 hour): Remove 2 Fatigue.</li>
+<li>Full night's rest (8 hours): Remove all Fatigue.</li>
+</ul>
+</section>
+<section class="level3" id="harm-recovery">
+<h4>Harm Recovery</h4>
+<ul>
+<li><strong>Medical care:</strong> A successful Craft roll (DV 3–5, depending on severity) can reduce Harm by one level after a scene of treatment. A critical success may remove two levels.</li>
+<li><strong>Magical healing:</strong> A <code>[HEAL]</code> spell or Rite can reduce Harm by one level (see Magic system).</li>
+<li><strong>Natural recovery:</strong> Without medical or magical aid, one level of Harm heals after one week of rest. Harm 3 requires intervention.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="substituting-fatigue-for-boons">
+<h3>Substituting Fatigue for Boons</h3>
+<p>If you have no Boons remaining (or wish to conserve them), you may pay 1 Fatigue in place of 1 Boon to activate an active, in-the-moment effect that normally costs a Boon:</p>
+<ul>
+<li>Re-rolling a die.</li>
+<li>Activating an Asset (GM discretion; delicate assets may not be usable while exhausted).</li>
+<li>Improving Position by one step before a roll.</li>
+<li>Powering a Rite or ability that explicitly requires a Boon.</li>
+</ul>
+<p>This substitution cannot be used for:</p>
+<ul>
+<li>Boon-to-XP conversion (downtime only).</li>
+<li>Effects that require a Boon as a narrative resource (e.g., certain Talents or Patron bargains).</li>
+</ul>
+<div class="panel panel-gold">
+<p>The GM may veto this substitution if the fiction makes it implausible (e.g., activating a delicate spy network while exhausted). This does not change the effect's outcome; it merely changes the resource spent.</p>
+</div>
+</section>
+<section class="level2" id="example-armor-and-overflow">
+<h3>Example: Armor and Overflow</h3>
+<div class="panel panel-blue">
+<p>Heavy armor, Body 2, currently Fatigue 1, Harm 0. Hit with Harm 3.</p>
+<ol>
+<li><strong>Convert:</strong> Harm 3 → Fatigue 2 (from table).</li>
+<li><strong>Apply remaining Harm:</strong> 0 remaining (all converted). No Harm applied, no Fatigue cleared.</li>
+<li><strong>Add Fatigue:</strong> 1 (current) + 2 = 3. Track size is 2 → overflow.</li>
+<li><strong>Overflow:</strong> Harm 0 → 1. Clear all Fatigue. Excess lost.</li>
+<li><strong>Result:</strong> Harm 1, Fatigue 0.</li>
+</ol>
+</div>
+</section>
+<section class="level2" id="death-and-dying">
+<h3>Death and Dying</h3>
+<p>At Harm 3, a character is incapacitated. They cannot take actions. They may still speak weakly or crawl at the GM's discretion.</p>
+<section class="level3" id="stabilization">
+<h4>Stabilization</h4>
+<p>An ally may use an action to stabilize the dying character with a successful Craft roll (DV 3).</p>
+<ul>
+<li><strong>On success:</strong> The character remains at Harm 3 but is stable (no further deterioration). They can be moved carefully but cannot act.</li>
+<li><strong>On failure:</strong> The dying character suffers 1 Fatigue (the effort of trying to save them takes a toll). The healer may attempt again, but each subsequent attempt increases the DV by 1 (DV 4, DV 5, etc.).</li>
+<li><strong>On a second consecutive failure:</strong> The character's condition worsens—they are now Dying and will die at the end of the current round unless stabilized by a Critical Success (three successes above DV) or magical intervention.</li>
+</ul>
+<p class="text-sm"><strong>Timing:</strong> Without stabilization, a character at Harm 3 will die within approximately 10 minutes of in-game time (or before the scene's tension resolves, whichever is shorter). The GM may extend this window if the fiction supports it (e.g., a skilled healer is nearby, a Patron intervenes).</p>
+</section>
+<section class="level3" id="raising-harm-above-3">
+<h4>Raising Harm Above 3</h4>
+<p>If a character at Harm 3 takes additional Harm, they die immediately. Resurrection or miraculous recovery is possible only through major rituals, Patron intervention, or narrative circumstances (GM discretion).</p>
+</section>
+</section>
+</section></div><p>Continue: <a href="running-the-game.html">Running the game</a></p></main></body></html>

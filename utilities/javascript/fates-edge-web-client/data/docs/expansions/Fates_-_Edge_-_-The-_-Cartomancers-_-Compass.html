@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>The Cartomancer's Compass — A Fate's Edge Expansion</title>
 <style>
 :root {
@@ -164,31 +165,45 @@ footer {
 .card-face .pip { display: block; font-size: 1.15rem; }
 .card-face.red { color: #97202a; }
 </style>
-</head>
-<body>
-
-<h1>🃏 The Cartomancer's Compass</h1>
-
-<aside class="panel" aria-label="Rules compatibility"><p><strong>Rules compatibility.</strong> The core rules comprise the SRD plus the extensions in the Player's Guide and GM Guide. This expansion applies only its stated additions and exceptions. Keep the core loop: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, resolve the outcome, and apply consequences.</p><p>Cartomancy adds no new resolution mechanic. Suits name the Place, Actor, Pressure and Leverage of a scene; rank sets a DV on the standard 2&ndash;5 ladder or converts to a Timer. Where a draw would push past DV&nbsp;5 it becomes a Timer instead &mdash; the ladder ends at 5. Readings are Quick Workings or Full Rituals as written in the Player's Guide, and every price they exact (SB to the GM, a Condition, Identity Strain, Obligation) is an existing currency, not a new one.</p></aside>
-
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Expansions · specialist reference</strong></p><p>Read the core rules first, then this document’s scope, prerequisites, and procedures. Apply only changes it explicitly states; a missing restatement is not a general exception. The SRD and extensions in the Player’s and GM Guides remain the core reference, and the core loop still applies.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">🃏 The Cartomancer's Compass</a></li><li><a href="#toc">📑 Table of Contents</a></li><li><a href="#perspective">1. A Tulkani Perspective on the Art</a></li><li><a href="#suits">2. The Four Suits: A Universal Grammar</a></li><li><a href="#witchcraft">3. Cartomancy as Witchcraft</a></li><li><a href="#rank">4. Rank and Severity: The Weight of the Card</a></li><li><a href="#faces">5. Card Faces: The Court as Character</a></li><li><a href="#aces">6. Aces and the Ninth: The Hollow's Attention</a></li><li><a href="#procedure">7. By the Numbers: Procedure for Any Generator</a></li><li><a href="#regional">8. Regional Flavors: How Suits Shift Meaning</a></li><li><a href="#unwritten">9. The Unwritten Suit: When a Draw Is Incomplete</a></li><li><a href="#quickdraw">10. Interpreting Any Draw, Any Region</a></li><li><a href="#traditions">11. Tulkani Cartomancy Traditions</a></li><li><a href="#guidance">12. Final Guidance: The Cards Are Oracles, Not Scripts</a></li><li><a href="#gmtools">13. GM Tools: Using Cartomancy at the Table</a></li><li><a href="#colophon">Colophon</a></li></ul></details>
+<h1 id="reader-section-1">🃏 The Cartomancer's Compass</h1>
+<aside aria-label="Rules compatibility" class="panel"><p><strong>Rules compatibility.</strong> The core rules comprise the SRD plus the extensions in the Player's Guide and GM Guide. This expansion applies only its stated additions and exceptions. Keep the core loop: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, resolve the outcome, and apply consequences.</p><p>Cartomancy adds no new resolution mechanic. Suits name the Place, Actor, Pressure and Leverage of a scene; rank sets a DV on the standard 2–5 ladder or converts to a Timer. Where a draw would push past DV 5 it becomes a Timer instead — the ladder ends at 5. Readings are Quick Workings or Full Rituals as written in the Player's Guide, and every price they exact (SB to the GM, a Condition, Identity Strain, Obligation) is an existing currency, not a new one.</p></aside>
 <p class="flex" style="margin-bottom:0.6rem;">
-  <span class="badge badge-gold">Generator Method</span>
-  <span class="badge badge-purple">Tulkani Cartomancy</span>
-  <span class="badge badge-blue">GM Tools</span>
-  <span class="badge badge-mist">Playable Tradition</span>
-  <span class="badge badge-gray">Author: Nicholas A. Gasper</span>
+<span class="badge badge-gold">Generator Method</span>
+<span class="badge badge-purple">Tulkani Cartomancy</span>
+<span class="badge badge-blue">GM Tools</span>
+<span class="badge badge-mist">Playable Tradition</span>
+<span class="badge badge-gray">Author: Nicholas A. Gasper</span>
 </p>
-
 <div class="panel panel-gold">
-  <strong>What This Is.</strong>
-  <p class="mt-1">The card-draw method that every regional generator in <em>Fate's Edge</em> is written against, gathered in one place: the four suits and what each one answers, how rank sets weight and Timers, how face cards and Aces behave, the step-by-step procedure for running any generator at the table, and the Tulkani tradition that treats a reading as witchcraft with a price. It ships inside both worldbooks and stands alone here.</p>
+<strong>What This Is.</strong>
+<p class="mt-1">The card-draw method that every regional generator in <em>Fate's Edge</em> is written against, gathered in one place: the four suits and what each one answers, how rank sets weight and Timers, how face cards and Aces behave, the step-by-step procedure for running any generator at the table, and the Tulkani tradition that treats a reading as witchcraft with a price. It ships inside both worldbooks and stands alone here.</p>
 </div>
-
 <blockquote>
-&ldquo;The world does not speak in words. It speaks in suits, ranks, and the spaces between. Every bridge, every bribe, every broken oath can be laid out on a table of felt and dealt from a worn deck. This is not superstition. It is method.&rdquo;<br>
-<span class="text-muted">&mdash; Mira of the Wandering Circle, Tulkani cartomancer</span>
+“The world does not speak in words. It speaks in suits, ranks, and the spaces between. Every bridge, every bribe, every broken oath can be laid out on a table of felt and dealt from a worn deck. This is not superstition. It is method.”<br/>
+<span class="text-muted">— Mira of the Wandering Circle, Tulkani cartomancer</span>
 </blockquote>
-
 <div class="toc">
 <h2 id="toc">📑 Table of Contents</h2>
 <div class="toc-sections">
@@ -208,77 +223,62 @@ footer {
 <a href="#colophon">Colophon</a>
 </div>
 </div>
-
 <div class="chapter-block">
 <h2 id="perspective">1. A Tulkani Perspective on the Art</h2>
-
-<p>I was seven when my grandmother first placed a deck in my hands. Not a new deck &mdash; a worn one, its edges soft as silk, its faces faded by a hundred thousand shuffles. &ldquo;This is your first threshold,&rdquo; she said. &ldquo;Learn to read it, and you will never be lost.&rdquo;</p>
-
-<p>The Tulkani do not build temples. We build fires. We do not carve scriptures into stone; we let the cards tell us what the road has seen. Cartomancy is our witch-work, our way of reading the Echo (what has been), steadying the Veil (what is), and leaning into Flow (what wishes to be). It is not fortune-telling. It is witnessing &mdash; a conversation with the world's memory, conducted through the language of suits and ranks.</p>
-
-<p>The other peoples of Fate's Edge have their own names for what we do. The Aeler call us &ldquo;thread-readers&rdquo; and hire us to audit their ledgers. The Ykrul call us &ldquo;bone-speakers&rdquo; and consult us before every migration. The Ecktorian Inquisition calls us heretics and burns our decks when they find them. We keep shuffling.</p>
-
-<p>This chapter is my gift to the road. It explains how to read the cards as we do &mdash; not as a tool for controlling fate, but as a way of listening to what the world has already decided to tell you.</p>
+<p>I was seven when my grandmother first placed a deck in my hands. Not a new deck — a worn one, its edges soft as silk, its faces faded by a hundred thousand shuffles. “This is your first threshold,” she said. “Learn to read it, and you will never be lost.”</p>
+<p>The Tulkani do not build temples. We build fires. We do not carve scriptures into stone; we let the cards tell us what the road has seen. Cartomancy is our witch-work, our way of reading the Echo (what has been), steadying the Veil (what is), and leaning into Flow (what wishes to be). It is not fortune-telling. It is witnessing — a conversation with the world's memory, conducted through the language of suits and ranks.</p>
+<p>The other peoples of Fate's Edge have their own names for what we do. The Aeler call us “thread-readers” and hire us to audit their ledgers. The Ykrul call us “bone-speakers” and consult us before every migration. The Ecktorian Inquisition calls us heretics and burns our decks when they find them. We keep shuffling.</p>
+<p>This chapter is my gift to the road. It explains how to read the cards as we do — not as a tool for controlling fate, but as a way of listening to what the world has already decided to tell you.</p>
 </div>
-
 <div class="chapter-block">
 <h2 id="suits">2. The Four Suits: A Universal Grammar</h2>
-
 <p>Every card in every generator carries the same four suit-meanings. They are the alphabet of the world's witness. In the Tulkani tradition, we say the suits are the four breaths of the world.</p>
-
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <caption>The four suits at a glance</caption>
 <thead><tr><th>Suit</th><th>Reads</th><th>Answers</th></tr></thead>
 <tbody>
-<tr><td><span class="suit suit-black">&spades;</span> <strong>Spades</strong></td><td>Place &mdash; the Stage</td><td><em>Where are we?</em></td></tr>
-<tr><td><span class="suit suit-red">&hearts;</span> <strong>Hearts</strong></td><td>Actor &mdash; the Face</td><td><em>Who is here?</em></td></tr>
-<tr><td><span class="suit suit-black">&clubs;</span> <strong>Clubs</strong></td><td>Pressure &mdash; the Complication</td><td><em>What goes wrong?</em></td></tr>
-<tr><td><span class="suit suit-red">&diams;</span> <strong>Diamonds</strong></td><td>Leverage &mdash; the Reward</td><td><em>What do you gain?</em></td></tr>
+<tr><td><span class="suit suit-black">♠</span> <strong>Spades</strong></td><td>Place — the Stage</td><td><em>Where are we?</em></td></tr>
+<tr><td><span class="suit suit-red">♥</span> <strong>Hearts</strong></td><td>Actor — the Face</td><td><em>Who is here?</em></td></tr>
+<tr><td><span class="suit suit-black">♣</span> <strong>Clubs</strong></td><td>Pressure — the Complication</td><td><em>What goes wrong?</em></td></tr>
+<tr><td><span class="suit suit-red">♦</span> <strong>Diamonds</strong></td><td>Leverage — the Reward</td><td><em>What do you gain?</em></td></tr>
 </tbody>
-</table>
-
-<h3><span class="suit suit-black">&spades;</span> Spades: Place &mdash; The Stage</h3>
+</table></div>
+<h3><span class="suit suit-black">♠</span> Spades: Place — The Stage</h3>
 <p>Where does the scene happen? Spades are the threshold, the landmark, the ground beneath the action.</p>
 <ul>
-<li><strong>High rank (10&ndash;A):</strong> A major landmark &mdash; a fortress, a capital, a haunted ruin. The place has a name that echoes in local songs.</li>
-<li><strong>Mid rank (6&ndash;9):</strong> A functional location &mdash; a ford, a market, a shrine. The place has a purpose and a keeper.</li>
-<li><strong>Low rank (2&ndash;5):</strong> A liminal or neglected place &mdash; a crossroads, a collapsed bridge, a smuggler's cove. The place is defined by what it lacks.</li>
+<li><strong>High rank (10–A):</strong> A major landmark — a fortress, a capital, a haunted ruin. The place has a name that echoes in local songs.</li>
+<li><strong>Mid rank (6–9):</strong> A functional location — a ford, a market, a shrine. The place has a purpose and a keeper.</li>
+<li><strong>Low rank (2–5):</strong> A liminal or neglected place — a crossroads, a collapsed bridge, a smuggler's cove. The place is defined by what it lacks.</li>
 </ul>
 <p class="text-sm text-muted">In the regional chapters, spade entries are always places. See the bridges and canals of Silkstrand, or the cairns and passes of Ubral.</p>
-
-<h3><span class="suit suit-red">&hearts;</span> Hearts: Actor &mdash; The Face</h3>
+<h3><span class="suit suit-red">♥</span> Hearts: Actor — The Face</h3>
 <p>Who drives the scene? Hearts are the person, the faction, the voice that speaks.</p>
 <ul>
-<li><strong>High rank (J&ndash;A):</strong> An elite, a ruler, a power-broker. The actor has authority and reach beyond the immediate scene.</li>
-<li><strong>Mid rank (6&ndash;10):</strong> A professional, a functionary, a skilled operator. The actor has a trade and a price.</li>
-<li><strong>Low rank (2&ndash;5):</strong> A commoner, an outcast, a victim. The actor needs something, or has been failed by someone.</li>
+<li><strong>High rank (J–A):</strong> An elite, a ruler, a power-broker. The actor has authority and reach beyond the immediate scene.</li>
+<li><strong>Mid rank (6–10):</strong> A professional, a functionary, a skilled operator. The actor has a trade and a price.</li>
+<li><strong>Low rank (2–5):</strong> A commoner, an outcast, a victim. The actor needs something, or has been failed by someone.</li>
 </ul>
 <p class="text-sm text-muted">In the regional chapters, heart entries are always people or factions. See the merchants and spies of the Brass Coast, or the spirit-wardens of the Mistlands.</p>
-
-<h3><span class="suit suit-black">&clubs;</span> Clubs: Pressure &mdash; The Complication</h3>
+<h3><span class="suit suit-black">♣</span> Clubs: Pressure — The Complication</h3>
 <p>What pushes back? Clubs are the storm, the burden, the knife in the dark.</p>
 <ul>
-<li><strong>High rank (10&ndash;A):</strong> A catastrophe, a betrayal, an invasion. The complication changes the shape of the journey.</li>
-<li><strong>Mid rank (6&ndash;9):</strong> A serious obstacle &mdash; a feud, a quarantine, a broken bridge. The complication costs time, resources, or reputation.</li>
-<li><strong>Low rank (2&ndash;5):</strong> A minor hazard &mdash; a sudden squall, a lost token, a raised toll. The complication is a nuisance, not a disaster.</li>
+<li><strong>High rank (10–A):</strong> A catastrophe, a betrayal, an invasion. The complication changes the shape of the journey.</li>
+<li><strong>Mid rank (6–9):</strong> A serious obstacle — a feud, a quarantine, a broken bridge. The complication costs time, resources, or reputation.</li>
+<li><strong>Low rank (2–5):</strong> A minor hazard — a sudden squall, a lost token, a raised toll. The complication is a nuisance, not a disaster.</li>
 </ul>
 <p class="text-sm text-muted">In the regional chapters, club entries are always complications or threats. See the river floods and witness-cord cuts of Ayokha, or the market riots of Silkstrand.</p>
-
-<h3><span class="suit suit-red">&diams;</span> Diamonds: Leverage &mdash; The Reward</h3>
+<h3><span class="suit suit-red">♦</span> Diamonds: Leverage — The Reward</h3>
 <p>What opens the door? Diamonds are the token, the writ, the secret that changes Position.</p>
 <ul>
-<li><strong>High rank (J&ndash;A):</strong> A major asset &mdash; a noble title, a keystone charter, a general pardon. The reward reshapes the party's standing.</li>
-<li><strong>Mid rank (6&ndash;10):</strong> A significant tool &mdash; a pass-stone, a witness cord, a lighthouse charter. The reward solves a specific class of problem.</li>
-<li><strong>Low rank (2&ndash;5):</strong> A minor advantage &mdash; a bridge token, a guest-cup, a rumor. The reward grants a single use of improved Position.</li>
+<li><strong>High rank (J–A):</strong> A major asset — a noble title, a keystone charter, a general pardon. The reward reshapes the party's standing.</li>
+<li><strong>Mid rank (6–10):</strong> A significant tool — a pass-stone, a witness cord, a lighthouse charter. The reward solves a specific class of problem.</li>
+<li><strong>Low rank (2–5):</strong> A minor advantage — a bridge token, a guest-cup, a rumor. The reward grants a single use of improved Position.</li>
 </ul>
 <p class="text-sm text-muted">In the regional chapters, diamond entries are always rewards or leverage. See the keystone charters of Ngomebe, or the water-share tablets of Fhara.</p>
 </div>
-
 <div class="chapter-block">
 <h2 id="witchcraft">3. Cartomancy as Witchcraft</h2>
-
-<p>In the Tulkani tradition, cartomancy is not separate from the craft &mdash; it <em>is</em> the craft. Every reading is a Quick Working, performed at a threshold: the table, the crossroads, the moment between decisions. The cards are the tools; the reader is the witness.</p>
-
+<p>In the Tulkani tradition, cartomancy is not separate from the craft — it <em>is</em> the craft. Every reading is a Quick Working, performed at a threshold: the table, the crossroads, the moment between decisions. The cards are the tools; the reader is the witness.</p>
 <h3>The Three Layers of Reading</h3>
 <p>Like all witchcraft, cartomancy operates across the three Concordant Layers.</p>
 <ul>
@@ -286,10 +286,9 @@ footer {
 <li><strong>Veil (what is):</strong> The cards show the present moment, the boundary between potential and actual. A club from Veil is a current threat; a diamond from Veil is an opportunity the party is ignoring.</li>
 <li><strong>Flow (what wishes to be):</strong> The cards reveal the direction of change. A high card from Flow is a promise; a low card is a warning.</li>
 </ul>
-
 <h3>The Reader's Price</h3>
 <div class="panel panel-red">
-<p><em>&ldquo;The cards do not give; they lend. And they always collect.&rdquo;</em></p>
+<p><em>“The cards do not give; they lend. And they always collect.”</em></p>
 </div>
 <p>Every reading exacts a price. When you read the cards, choose one of the Three Prices.</p>
 <ul>
@@ -297,173 +296,141 @@ footer {
 <li><strong>Shame:</strong> The reading reveals something you did not wish to know. You gain a Condition (Guilty, Haunted, or Doubtful) until you act on what you have learned.</li>
 <li><strong>Identity:</strong> The reading changes you. Mark 1 Identity Strain. You are not quite the same person who sat down at the table.</li>
 </ul>
-
 <h3>The Cartomancer's Gift</h3>
-<p>Once per session, a cartomancer may perform a full reading using the procedure in <a href="#procedure">&sect;7</a>. This is a Full Ritual: it requires Significant Time, a witness, and the willingness to pay the price. On a success, the GM must answer one question about the scene, the journey, or the campaign truthfully. On a partial, the answer is cryptic. On a miss, the cards show a false path &mdash; the GM gains 2 SB and may introduce a complication.</p>
+<p>Once per session, a cartomancer may perform a full reading using the procedure in <a href="#procedure">§7</a>. This is a Full Ritual: it requires Significant Time, a witness, and the willingness to pay the price. On a success, the GM must answer one question about the scene, the journey, or the campaign truthfully. On a partial, the answer is cryptic. On a miss, the cards show a false path — the GM gains 2 SB and may introduce a complication.</p>
 </div>
-
 <div class="chapter-block">
 <h2 id="rank">4. Rank and Severity: The Weight of the Card</h2>
-
-<p>The rank of a card &mdash; from Ace (high) to 2 (low) &mdash; sets the scale of its suit's meaning. The Tulkani say: <em>&ldquo;The rank is the breath; the suit is the voice. A high breath speaks louder; a low breath is a whisper.&rdquo;</em></p>
-
-<table>
+<p>The rank of a card — from Ace (high) to 2 (low) — sets the scale of its suit's meaning. The Tulkani say: <em>“The rank is the breath; the suit is the voice. A high breath speaks louder; a low breath is a whisper.”</em></p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <caption>Rank as narrative weight</caption>
 <thead><tr><th>Rank</th><th>Narrative weight</th></tr></thead>
 <tbody>
 <tr><td><strong>Ace</strong></td><td>Legendary, campaign-altering, mythic</td></tr>
 <tr><td><strong>King / Queen / Jack</strong></td><td>Major, faction-level, lasting consequences</td></tr>
-<tr><td><strong>10&ndash;7</strong></td><td>Significant, scene-defining, costly</td></tr>
-<tr><td><strong>6&ndash;4</strong></td><td>Moderate, manageable, a real cost</td></tr>
-<tr><td><strong>3&ndash;2</strong></td><td>Minor &mdash; a complication, but not a crisis</td></tr>
+<tr><td><strong>10–7</strong></td><td>Significant, scene-defining, costly</td></tr>
+<tr><td><strong>6–4</strong></td><td>Moderate, manageable, a real cost</td></tr>
+<tr><td><strong>3–2</strong></td><td>Minor — a complication, but not a crisis</td></tr>
 </tbody>
-</table>
-
+</table></div>
 <h3>Timer Conversion</h3>
 <p>When a generator instructs you to set a Timer by the highest rank, use this conversion.</p>
-<table>
-<caption>Highest rank drawn &rarr; Timer size</caption>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<caption>Highest rank drawn → Timer size</caption>
 <thead><tr><th>Highest rank</th><th>Timer</th><th>Scale</th></tr></thead>
 <tbody>
-<tr><td><strong>2&ndash;5</strong></td><td>4 segments</td><td>Short, local problem</td></tr>
-<tr><td><strong>6&ndash;10</strong></td><td>6 segments</td><td>Standard, journey-length</td></tr>
+<tr><td><strong>2–5</strong></td><td>4 segments</td><td>Short, local problem</td></tr>
+<tr><td><strong>6–10</strong></td><td>6 segments</td><td>Standard, journey-length</td></tr>
 <tr><td><strong>J, Q, K</strong></td><td>8 segments</td><td>Extended, regional problem</td></tr>
 <tr><td><strong>A</strong></td><td>10 segments</td><td>Epic, campaign-length</td></tr>
 </tbody>
-</table>
+</table></div>
 <div class="panel panel-gold">
 <strong>Weight is not DV.</strong>
-<p class="mt-1">A heavy card makes an obstacle <em>bigger</em>, not harder to touch. Scale it with segments, stakes and fiction &mdash; the DV ladder still ends at 5. An Ace is a 10-segment Timer the party has to work at from several angles, not a single DV 7 roll.</p>
+<p class="mt-1">A heavy card makes an obstacle <em>bigger</em>, not harder to touch. Scale it with segments, stakes and fiction — the DV ladder still ends at 5. An Ace is a 10-segment Timer the party has to work at from several angles, not a single DV 7 roll.</p>
 </div>
 </div>
-
 <div class="chapter-block">
 <h2 id="faces">5. Card Faces: The Court as Character</h2>
-
-<p>Face cards are not merely high ranks. They are <em>persons</em>, with agency, personality, and often a name. The Tulkani say: <em>&ldquo;The court does not sit in judgment of you. You sit in judgment of them.&rdquo;</em></p>
+<p>Face cards are not merely high ranks. They are <em>persons</em>, with agency, personality, and often a name. The Tulkani say: <em>“The court does not sit in judgment of you. You sit in judgment of them.”</em></p>
 <ul>
 <li><strong>Jack:</strong> An agent, a functionary, a messenger. The Jack acts on someone else's authority. Competent, but replaceable.</li>
 <li><strong>Queen:</strong> A power in their own right, with influence, resources, and a network. Not easily replaced.</li>
-<li><strong>King:</strong> The ultimate authority in their domain &mdash; the source of law, the peak of the hierarchy. To challenge a King is to challenge the order itself.</li>
+<li><strong>King:</strong> The ultimate authority in their domain — the source of law, the peak of the hierarchy. To challenge a King is to challenge the order itself.</li>
 </ul>
 <p>When a face card appears in a heart (actor) draw, give the NPC a name, a motive, and a quirk. When it appears in a spade (place) or club (pressure) draw, treat it as a <em>personified</em> force: a King of Clubs might be a feud that has lasted generations; a Queen of Spades might be a bridge that remembers every toll.</p>
 </div>
-
 <div class="chapter-block">
 <h2 id="aces">6. Aces and the Ninth: The Hollow's Attention</h2>
-
-<p>An Ace is not merely the highest rank. It is a <em>threshold</em>. <em>&ldquo;The Ace is the door that opens when you are not looking. Do not step through it lightly.&rdquo;</em></p>
-
+<p>An Ace is not merely the highest rank. It is a <em>threshold</em>. <em>“The Ace is the door that opens when you are not looking. Do not step through it lightly.”</em></p>
 <div class="panel panel-purple">
 <strong>When an Ace appears in any draw, the Hollow takes notice.</strong>
-<p class="mt-1">The GM gains 1 extra Story Beat &mdash; beyond any generated by rolled 1s &mdash; to spend on a supernatural complication: a ghostly procession, a bell that rings without a clapper, a shadow that walks independently.</p>
+<p class="mt-1">The GM gains 1 extra Story Beat — beyond any generated by rolled 1s — to spend on a supernatural complication: a ghostly procession, a bell that rings without a clapper, a shadow that walks independently.</p>
 </div>
-
 <p>In regions where the Ninth Taboo is strong (Theona, Aelinnel, the Ways Between), an Ace may also trigger a specific regional omen.</p>
 <ul>
-<li>In <strong>Theona</strong>, an Ace of <span class="suit suit-black">&spades;</span> might add a &ldquo;missing step&rdquo; to a bridge.</li>
-<li>In the <strong>Ways Between</strong>, an Ace of <span class="suit suit-red">&hearts;</span> might cause a reflection to speak.</li>
-<li>In the <strong>Mistlands</strong>, an Ace of <span class="suit suit-black">&clubs;</span> might cause a bell-line to fail.</li>
+<li>In <strong>Theona</strong>, an Ace of <span class="suit suit-black">♠</span> might add a “missing step” to a bridge.</li>
+<li>In the <strong>Ways Between</strong>, an Ace of <span class="suit suit-red">♥</span> might cause a reflection to speak.</li>
+<li>In the <strong>Mistlands</strong>, an Ace of <span class="suit suit-black">♣</span> might cause a bell-line to fail.</li>
 </ul>
 <p>Read an Ace as a signal to escalate the uncanny.</p>
 </div>
-
 <div class="chapter-block">
 <h2 id="procedure">7. By the Numbers: Procedure for Any Generator</h2>
-
-<p>When you sit down to generate a scene, a journey leg, or a settlement, follow this procedure. <em>&ldquo;The cards are not a script. They are a conversation. Listen to what they tell you, but do not let them speak for you.&rdquo;</em></p>
-
+<p>When you sit down to generate a scene, a journey leg, or a settlement, follow this procedure. <em>“The cards are not a script. They are a conversation. Listen to what they tell you, but do not let them speak for you.”</em></p>
 <ol>
 <li><strong>Name the destination.</strong> Which region? Which route? Which authority controls the gate?</li>
 <li><strong>Shuffle and draw.</strong> Draw cards face-up, one for each suit you need. Most generators require all four; some, like travel legs, use only three.</li>
-<li><strong>Read the <span class="suit suit-black">&spades;</span>.</strong> This is your place. Describe it first. Set the stage.</li>
-<li><strong>Read the <span class="suit suit-red">&hearts;</span>.</strong> This is your actor. Introduce them. What do they want? Why are they here?</li>
-<li><strong>Read the <span class="suit suit-black">&clubs;</span>.</strong> This is your pressure. Complicate the scene. What just went wrong, or what is about to?</li>
-<li><strong>Read the <span class="suit suit-red">&diams;</span>.</strong> This is your leverage. What can the players gain if they succeed? Be specific.</li>
-<li><strong>Set the Timer.</strong> Use the highest rank among the four cards to size the scene's primary Timer (see <a href="#rank">&sect;4</a>).</li>
+<li><strong>Read the <span class="suit suit-black">♠</span>.</strong> This is your place. Describe it first. Set the stage.</li>
+<li><strong>Read the <span class="suit suit-red">♥</span>.</strong> This is your actor. Introduce them. What do they want? Why are they here?</li>
+<li><strong>Read the <span class="suit suit-black">♣</span>.</strong> This is your pressure. Complicate the scene. What just went wrong, or what is about to?</li>
+<li><strong>Read the <span class="suit suit-red">♦</span>.</strong> This is your leverage. What can the players gain if they succeed? Be specific.</li>
+<li><strong>Set the Timer.</strong> Use the highest rank among the four cards to size the scene's primary Timer (see <a href="#rank">§4</a>).</li>
 <li><strong>Interpret faces and Aces.</strong> Give names to face cards. Apply regional Ace effects.</li>
 <li><strong>Play to find out.</strong> Use the generated elements as prompts, not scripts. The cards are seeds, not fences.</li>
 </ol>
 </div>
-
 <div class="chapter-block">
 <h2 id="regional">8. Regional Flavors: How Suits Shift Meaning</h2>
-
 <p>The core suit meanings hold everywhere, but each region inflects them with its own texture. A spade in Ecktoria is a forum or a coin-house; a spade in the Valewood is a phasing ruin or a star-road. A heart among the Black Banners is a mercenary captain or a condotta broker; a heart in Ykrul is a khatun or a bone-singer.</p>
-
-<blockquote>&ldquo;The same card speaks differently in every land. The fool who reads it the same way twice is a fool twice over.&rdquo;</blockquote>
-
-<p>Use the regional chapters as your lexicon. When you draw a card, consult the relevant table &mdash; the tables are built to evoke the specific flavor of the region.</p>
-
+<blockquote>“The same card speaks differently in every land. The fool who reads it the same way twice is a fool twice over.”</blockquote>
+<p>Use the regional chapters as your lexicon. When you draw a card, consult the relevant table — the tables are built to evoke the specific flavor of the region.</p>
 <h3>Example: A Draw in Acasia</h3>
 <p>You are running a journey through the Broken Marches. You draw:</p>
-
 <div class="card-row">
-  <div class="card-face"><span class="rank">7</span><span class="pip">&spades;</span></div>
-  <div class="card-face red"><span class="rank">J</span><span class="pip">&hearts;</span></div>
-  <div class="card-face"><span class="rank">4</span><span class="pip">&clubs;</span></div>
-  <div class="card-face red"><span class="rank">Q</span><span class="pip">&diams;</span></div>
+<div class="card-face"><span class="rank">7</span><span class="pip">♠</span></div>
+<div class="card-face red"><span class="rank">J</span><span class="pip">♥</span></div>
+<div class="card-face"><span class="rank">4</span><span class="pip">♣</span></div>
+<div class="card-face red"><span class="rank">Q</span><span class="pip">♦</span></div>
 </div>
-
 <ol>
-<li><strong><span class="suit suit-black">&spades;</span> 7 &mdash; Hill-Motte.</strong> Fresh palisade; ditch scattered with caltrops.</li>
-<li><strong><span class="suit suit-red">&hearts;</span> J &mdash; Bride with No Dowry but a Claim.</strong> Daggers in the wedding chest.</li>
-<li><strong><span class="suit suit-black">&clubs;</span> 4 &mdash; Wedding Turns Ambush.</strong> You are caught between two bloodlines.</li>
-<li><strong><span class="suit suit-red">&diams;</span> Q &mdash; Marriage Proxy.</strong> From the Margravine; bind a hill-king to your cause.</li>
+<li><strong><span class="suit suit-black">♠</span> 7 — Hill-Motte.</strong> Fresh palisade; ditch scattered with caltrops.</li>
+<li><strong><span class="suit suit-red">♥</span> J — Bride with No Dowry but a Claim.</strong> Daggers in the wedding chest.</li>
+<li><strong><span class="suit suit-black">♣</span> 4 — Wedding Turns Ambush.</strong> You are caught between two bloodlines.</li>
+<li><strong><span class="suit suit-red">♦</span> Q — Marriage Proxy.</strong> From the Margravine; bind a hill-king to your cause.</li>
 <li><strong>Highest rank:</strong> Queen. The scene's primary Timer is 8 segments: <em>The Feud Escalates [8]</em>.</li>
-<li><strong>Interpretation:</strong> The party arrives at a hill-fort on the eve of a wedding. The bride is caught between two feuding bloodlines. The wedding turns to violence. If the party survives the ambush and brokers peace, the Margravine grants them a Marriage Proxy &mdash; a powerful tool for binding a hill-king to their cause. The 8-segment Timer tracks how quickly the feud spirals into open war.</li>
+<li><strong>Interpretation:</strong> The party arrives at a hill-fort on the eve of a wedding. The bride is caught between two feuding bloodlines. The wedding turns to violence. If the party survives the ambush and brokers peace, the Margravine grants them a Marriage Proxy — a powerful tool for binding a hill-king to their cause. The 8-segment Timer tracks how quickly the feud spirals into open war.</li>
 </ol>
-
 <p>That is the generator at work: four cards, one scene, immediate fiction.</p>
 </div>
-
 <div class="chapter-block">
 <h2 id="unwritten">9. The Unwritten Suit: When a Draw Is Incomplete</h2>
-
 <p>Sometimes a generator does not require all four suits. A travel leg may need only spades, hearts and clubs; a social encounter, only hearts and clubs. When a suit is missing, treat its absence as a question.</p>
 <ul>
-<li><strong>No <span class="suit suit-black">&spades;</span>:</strong> The place is ambiguous, shifting, or hidden. The scene occurs in a liminal space &mdash; a crossroads, a fog-bank, a threshold.</li>
-<li><strong>No <span class="suit suit-red">&hearts;</span>:</strong> The actor is absent, silent, or dead. Pressure and place act without a face, which can be more frightening than a named NPC.</li>
-<li><strong>No <span class="suit suit-black">&clubs;</span>:</strong> The scene is calm, peaceful, or mercifully straightforward. This is rare in Fate's Edge. Treasure it.</li>
-<li><strong>No <span class="suit suit-red">&diams;</span>:</strong> The reward is not a token but an outcome. The players gain Position, information, or a cleared Timer rather than a physical asset.</li>
+<li><strong>No <span class="suit suit-black">♠</span>:</strong> The place is ambiguous, shifting, or hidden. The scene occurs in a liminal space — a crossroads, a fog-bank, a threshold.</li>
+<li><strong>No <span class="suit suit-red">♥</span>:</strong> The actor is absent, silent, or dead. Pressure and place act without a face, which can be more frightening than a named NPC.</li>
+<li><strong>No <span class="suit suit-black">♣</span>:</strong> The scene is calm, peaceful, or mercifully straightforward. This is rare in Fate's Edge. Treasure it.</li>
+<li><strong>No <span class="suit suit-red">♦</span>:</strong> The reward is not a token but an outcome. The players gain Position, information, or a cleared Timer rather than a physical asset.</li>
 </ul>
 </div>
-
 <div class="chapter-block">
 <h2 id="quickdraw">10. Interpreting Any Draw, Any Region</h2>
-
-<p>When you need a prompt in a hurry &mdash; a random encounter, a rumor at a tavern, a discovery in a ruin &mdash; draw a single card.</p>
-
-<table>
+<p>When you need a prompt in a hurry — a random encounter, a rumor at a tavern, a discovery in a ruin — draw a single card.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <caption>Single-card quick reference</caption>
 <thead><tr><th>Card</th><th>Ask</th></tr></thead>
 <tbody>
-<tr><td><span class="suit suit-black">&spades;</span> <strong>Spades</strong></td><td>A place or landmark. What is its name? What happened here?</td></tr>
-<tr><td><span class="suit suit-red">&hearts;</span> <strong>Hearts</strong></td><td>A person or faction. What do they want? What do they fear?</td></tr>
-<tr><td><span class="suit suit-black">&clubs;</span> <strong>Clubs</strong></td><td>A complication or threat. Who or what is the obstacle?</td></tr>
-<tr><td><span class="suit suit-red">&diams;</span> <strong>Diamonds</strong></td><td>A reward, token, or secret. What can be gained?</td></tr>
+<tr><td><span class="suit suit-black">♠</span> <strong>Spades</strong></td><td>A place or landmark. What is its name? What happened here?</td></tr>
+<tr><td><span class="suit suit-red">♥</span> <strong>Hearts</strong></td><td>A person or faction. What do they want? What do they fear?</td></tr>
+<tr><td><span class="suit suit-black">♣</span> <strong>Clubs</strong></td><td>A complication or threat. Who or what is the obstacle?</td></tr>
+<tr><td><span class="suit suit-red">♦</span> <strong>Diamonds</strong></td><td>A reward, token, or secret. What can be gained?</td></tr>
 </tbody>
-</table>
-
+</table></div>
 <p>The rank tells you the scale: low is local and personal, high is regional and political. A face card demands a name; an Ace demands the Hollow's attention.</p>
 </div>
-
 <div class="chapter-block">
 <h2 id="traditions">11. Tulkani Cartomancy Traditions</h2>
-
 <p>The Tulkani have developed practices around cartomancy that differ from the regional generators. These are the traditions my grandmother taught me.</p>
-
 <div class="grid-2">
 <div class="panel panel-blue">
 <strong>The Traveler's Spread</strong> <span class="tag">3 cards</span> <span class="tag">Quick Working</span>
 <ul class="mt-1">
-<li><strong>First card &mdash; the road behind.</strong> What have you left behind, and what follows you?</li>
-<li><strong>Second card &mdash; the road ahead.</strong> What waits for you, and what will you face?</li>
-<li><strong>Third card &mdash; the road beneath.</strong> What is true, whether you wish it or not?</li>
+<li><strong>First card — the road behind.</strong> What have you left behind, and what follows you?</li>
+<li><strong>Second card — the road ahead.</strong> What waits for you, and what will you face?</li>
+<li><strong>Third card — the road beneath.</strong> What is true, whether you wish it or not?</li>
 </ul>
 <p class="mt-1 text-sm">No roll required, but the reader must accept the Shadow price.</p>
 </div>
-
 <div class="panel panel-purple">
 <strong>The Hollow's Spread</strong> <span class="tag">5 cards</span> <span class="tag">Full Ritual</span>
 <ul class="mt-1">
@@ -476,66 +443,52 @@ footer {
 <p class="mt-1 text-sm">Requires Significant Time, a witness, and the acceptance of Identity Strain. On a success the GM must answer one question about the nature of the debt; on a partial the answer is cryptic; on a miss the reader becomes the debt's next collector, and a Complication Timer begins.</p>
 </div>
 </div>
-
 <h3>The Cartomancer's Deck as a Symbol</h3>
-<p>For Tulkani characters, a cartomancer's deck is a Symbol in the Invoker sense &mdash; a Minor Asset that grants:</p>
+<p>For Tulkani characters, a cartomancer's deck is a Symbol in the Invoker sense — a Minor Asset that grants:</p>
 <ul>
 <li>Access to the cartomancy rituals described above.</li>
 <li>A Patron's Gift (Imbuement) effect: once per scene, the cartomancer may spend an action to draw a card and gain +1 die to a related roll. The GM gains 1 SB.</li>
 <li>Obligation to the Hollow: each reading marks 1 Obligation, as the cartomancer borrows from the world's memory.</li>
 </ul>
 </div>
-
 <div class="chapter-block">
 <h2 id="guidance">12. Final Guidance: The Cards Are Oracles, Not Scripts</h2>
-
 <p>The generators are tools, not tyrants. If a draw gives you an entry that contradicts established fiction, or if you simply prefer a different interpretation, overrule it. The deck is a prompt, not a prison.</p>
-
-<p>But trust it, too. The most memorable sessions often come from the card you did not expect &mdash; the Ace that arrives at the wrong moment, the Jack who speaks a name no one wanted to hear, the diamond that glows with a secret.</p>
-
-<blockquote>&ldquo;The cards do not lie. But they do not tell the whole truth. The rest is yours to live.&rdquo;</blockquote>
-
+<p>But trust it, too. The most memorable sessions often come from the card you did not expect — the Ace that arrives at the wrong moment, the Jack who speaks a name no one wanted to hear, the diamond that glows with a secret.</p>
+<blockquote>“The cards do not lie. But they do not tell the whole truth. The rest is yours to live.”</blockquote>
 <p>Shuffle. Draw. Interpret. And let the road unfold.</p>
-
 <blockquote>
-&ldquo;The road is never closed. It is only passed to the next walker.&rdquo;<br>
-<span class="text-muted">&mdash; Mira of the Wandering Circle, on the eve of a journey she did not survive</span>
+“The road is never closed. It is only passed to the next walker.”<br/>
+<span class="text-muted">— Mira of the Wandering Circle, on the eve of a journey she did not survive</span>
 </blockquote>
 </div>
-
 <div class="chapter-block">
 <h2 id="gmtools">13. GM Tools: Using Cartomancy at the Table</h2>
-
 <h3>Reading the Cards as a GM</h3>
 <p>The cartomancy framework is for GMs as much as players. When you need a scene, a complication, or a reward, draw a card and interpret it through the lens of the region and the current fiction.</p>
 <div class="panel panel-mist">
 <strong>Example.</strong>
-<p class="mt-1">The party is in Vhasia, negotiating with a border patrol. You draw <span class="suit suit-black">&clubs;</span> 9. The entry reads: <em>&ldquo;Feud Spark &mdash; a name spoken wrong reopens an old debt; blood is the only coin that pays.&rdquo;</em> You interpret: the patrol captain's family has a blood feud with one of the party's allies. He recognizes the name and demands a price &mdash; a ransom, a duel, or a favor.</p>
+<p class="mt-1">The party is in Vhasia, negotiating with a border patrol. You draw <span class="suit suit-black">♣</span> 9. The entry reads: <em>“Feud Spark — a name spoken wrong reopens an old debt; blood is the only coin that pays.”</em> You interpret: the patrol captain's family has a blood feud with one of the party's allies. He recognizes the name and demands a price — a ransom, a duel, or a favor.</p>
 </div>
-
 <h3>Players as Cartomancers</h3>
 <p>If a player wants to play a Tulkani cartomancer, use this framework.</p>
 <ul>
-<li><strong>Affinity &mdash; Cartomancer's Eye:</strong> +1 die to Insight or Lore rolls involving patterns, hidden connections, or the weight of obligation.</li>
-<li><strong>Starting Talent &mdash; Cartomancy (4 XP):</strong> grants access to the Traveler's Spread and the Hollow's Spread.</li>
-<li><strong>Patron &mdash; The Hollow:</strong> the cartomancer's Obligation is to the memory of the world itself. The Hollow collects through readings.</li>
+<li><strong>Affinity — Cartomancer's Eye:</strong> +1 die to Insight or Lore rolls involving patterns, hidden connections, or the weight of obligation.</li>
+<li><strong>Starting Talent — Cartomancy (4 XP):</strong> grants access to the Traveler's Spread and the Hollow's Spread.</li>
+<li><strong>Patron — The Hollow:</strong> the cartomancer's Obligation is to the memory of the world itself. The Hollow collects through readings.</li>
 </ul>
-
 <h3>The Cost of Cartomancy</h3>
 <div class="panel panel-red">
 <p>Every reading is a transaction. The cards lend, and they collect. A player who reads too often, or who ignores what the cards reveal, will find the Hollow's attention turning their way.</p>
 </div>
 </div>
-
 <div class="chapter-block">
 <h2 id="colophon">Colophon</h2>
-<p class="lead">This chapter was written in a Tulkani wagon, parked at a crossroads where three roads meet and one does not. The ink is lamp-black and tears. The deck is worn smooth by a hundred thousand shuffles. The ninth card is missing &mdash; it always is.</p>
-<p class="text-muted">&mdash; Mira of the Wandering Circle, in the hour before the ninth bell</p>
+<p class="lead">This chapter was written in a Tulkani wagon, parked at a crossroads where three roads meet and one does not. The ink is lamp-black and tears. The deck is worn smooth by a hundred thousand shuffles. The ninth card is missing — it always is.</p>
+<p class="text-muted">— Mira of the Wandering Circle, in the hour before the ninth bell</p>
 </div>
-
 <footer>
 Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.
 </footer>
-
-</body>
+</article></body>
 </html>

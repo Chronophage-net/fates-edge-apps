@@ -1,9 +1,10 @@
 <!-- ============ GM-_-Guide-_-App-_-B-_-Optional-_-Rules-_-and-_-Tactical-_-Tools.html ============ -->
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Fate's Edge GM Guide — Appendix B: Optional Rules and Tactical Tools</title>
 <style>
     :root {
@@ -67,12 +68,30 @@
     .multicols p { margin: 0.2rem 0; break-inside: avoid; }
     footer { margin-top: 2rem; padding-top: 0.8rem; border-top: 1px solid var(--border); color: var(--text3); font-size: 0.75rem; text-align: center; }
 </style>
-</head>
-<body>
-
-<h1>Appendix B: Optional Rules and Tactical Tools</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Appendix B · Optional Rules and Tactical Tools</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-App-_-A-_-Core-_-Reference-_-Tables.html">Previous chapter</a><a href="GM-_-Guide-_-App-_-C-_-Deck-_-and-_-Magic-_-Reference.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside>
+<h1 id="reader-section-1">Appendix B: Optional Rules and Tactical Tools</h1>
 <p class="subtitle">Fate's Edge GM Guide — Appendix B</p>
-
 <div class="panel panel-gold">
 <h3>Grid-Based Combat (Optional)</h3>
 <p>Use a square or hex grid with Zones of Control (ZoC).</p>
@@ -83,72 +102,63 @@
 <li>Leaving a ZoC requires the Disengage action (DV 4) or spending 1 Boon.</li>
 <li>Flank: +1 die to attack. Rear: +1 die and +1 Effect.</li>
 </ul>
-<p><strong>Push-Through:</strong> Roll Body+Athletics vs. <strong>DV 4</strong>. Choose a cost on success: Position worsens by one step, &minus;1 die on the action, or the enemy gets a free opportunity attack. A tougher enemy does not raise the DV &mdash; it worsens your Position, as everywhere else in the game.</p>
+<p><strong>Push-Through:</strong> Roll Body+Athletics vs. <strong>DV 4</strong>. Choose a cost on success: Position worsens by one step, −1 die on the action, or the enemy gets a free opportunity attack. A tougher enemy does not raise the DV — it worsens your Position, as everywhere else in the game.</p>
 </div>
-
 <div class="panel panel-gold">
 <h3>Detailed Warfare (Mass Combat)</h3>
 <p>Treat an army as a Follower with a high <strong>Capability</strong> and its own timers. It assists at <strong>min(Cap, the relevant Skill)</strong> like any other Follower, and no roll takes more than +3 dice from all sources combined.</p>
 <ul>
-<li><strong>Supply Timer</strong> <span class="badge badge-gray">[6]</span> or <span class="badge badge-gray">[8]</span>: starts full and empties through use. When empty, the army suffers severe penalties &mdash; every roll it assists is one Position step worse.</li>
+<li><strong>Supply Timer</strong> <span class="badge badge-gray">[6]</span> or <span class="badge badge-gray">[8]</span>: starts full and empties through use. When empty, the army suffers severe penalties — every roll it assists is one Position step worse.</li>
 <li><strong>Morale Timer</strong> <span class="badge badge-gray">[6]</span> or <span class="badge badge-gray">[8]</span>: starts empty and fills through loss. When full, the army routs.</li>
 <li><strong>Sway rolls</strong> (Presence + Sway or Wits + Insight) advance objective timers (e.g., <em>Break Their Line</em> [6]).</li>
 <li><strong>Battle's Edge:</strong> Story Beats generated by command rolls can be spent on fog-of-war complications — false orders, broken supply wagons, or a messenger's death.</li>
 </ul>
 </div>
-
 <div class="panel panel-gold">
-<p class="text-sm"><strong>Worked example.</strong> <em>The Forge of Souls</em> is built entirely on this section plus Miniatures Mode below &mdash; forces as Followers with Supply and Morale, command rolls filling objective timers, and one module-specific consequence layered on top. Read it if you want to see the warfare rules carrying a whole adventure rather than a single battle.</p>
+<p class="text-sm"><strong>Worked example.</strong> <em>The Forge of Souls</em> is built entirely on this section plus Miniatures Mode below — forces as Followers with Supply and Morale, command rolls filling objective timers, and one module-specific consequence layered on top. Read it if you want to see the warfare rules carrying a whole adventure rather than a single battle.</p>
 <h3>Hex-Based Exploration</h3>
 <p>Map a region in 6-mile hexes. Entering a hex requires a Wits + Lore roll (DV set by terrain). Outcomes determine discovery (find a point of interest), danger (ambush, hazard), or becoming lost (add a timer segment to find the way out).</p>
 </div>
-
 <div class="panel panel-gold">
 <h3>Miniatures Mode — Speed Defaults</h3>
-<p><strong>Base DV:</strong> start at DV 3 and add 1 per complicating keyword (elevation, [WARD]), to a maximum of DV 5. Disengage is DV 4. A tougher opponent does not raise the DV &mdash; it worsens your Position, which is what Position is for.</p>
+<p><strong>Base DV:</strong> start at DV 3 and add 1 per complicating keyword (elevation, [WARD]), to a maximum of DV 5. Disengage is DV 4. A tougher opponent does not raise the DV — it worsens your Position, which is what Position is for.</p>
 <p><strong>Tens:</strong> a 10 is 2 successes, as everywhere else. In miniatures mode you may spend the surplus success to Push or Pull the target 1 hex.</p>
 <p><strong>Zone of Control (ZoC):</strong> Entering or leaving a hex adjacent to an enemy provokes one Reaction (Free Strike or Shove 1 hex).</p>
 <p><strong>Heat:</strong> On a critical hit, the GM may spend 1 Heat (a resource tracked per scene) to degrade Position or trigger a terrain hazard.</p>
 </div>
-
 <div class="panel panel-gold">
 <h3>Hex Keywords</h3>
 <p><strong>Difficult:</strong> Costs 2 movement points per hex.
 <strong>Elevation:</strong> Attacks from lower ground suffer +1 DV.
 <strong>ZoC:</strong> Provokes a Reaction on crossing.</p>
-<p><strong>Altar [WARD]:</strong> &minus;1 die to attacks (or attacker may spend 2 Fatigue to ignore).</p>
+<p><strong>Altar [WARD]:</strong> −1 die to attacks (or attacker may spend 2 Fatigue to ignore).</p>
 <p><strong>Incorporeal:</strong> Ignores Difficult terrain; can pass through occupied hexes but cannot end movement in one.</p>
 </div>
-
-<h2>Sample NPCs</h2>
-
+<h2 id="reader-section-2">Sample NPCs</h2>
 <div class="panel">
-<h3>Encounters (TL 2&ndash;4)</h3>
+<h3>Encounters (TL 2–4)</h3>
 <ul>
 <li><strong>Bandit Skirmisher:</strong> Body 2, Wits 2. Melee 2, Stealth 1.</li>
 <li><strong>Ykrul Rider:</strong> Body 4, Wits 3. Athletics 3, Melee 3.</li>
 <li><strong>Street Bravo:</strong> Presence 3, Body 2. Melee 3.</li>
 </ul>
 </div>
-
 <div class="panel">
-<h3>Foils &amp; Rivals (TL 4&ndash;6)</h3>
+<h3>Foils &amp; Rivals (TL 4–6)</h3>
 <ul>
 <li><strong>Ambitious Scribe:</strong> Wits 3, Presence 3. Deception 3, Lore 2.</li>
 <li><strong>Mercenary Captain:</strong> Body 4, Spirit 3. Sway 3, Melee 4.</li>
 <li><strong>Flame Preacher:</strong> Presence 4, Spirit 3. Performance 4, Lore 3.</li>
 </ul>
 </div>
-
 <div class="panel">
-<h3>Prestige NPCs (TL 7&ndash;9)</h3>
+<h3>Prestige NPCs (TL 7–9)</h3>
 <ul>
 <li><strong>High Elf Loremaster:</strong> Wits 5, Spirit 4. Lore 5, Arcana 4.</li>
 <li><strong>Dwarven Forge-Patriarch:</strong> Body 5, Spirit 4. Craft 5, Sway 4.</li>
 <li><strong>Ykrul Warglord:</strong> Body 5, Presence 4. Sway 4, Melee 5.</li>
 </ul>
 </div>
-
 <div class="panel panel-gold">
 <h3>Common Rolls (GM Screen Reference)</h3>
 <div class="multicols">
@@ -164,17 +174,14 @@
 <p><strong>Insight:</strong> read a room (<em>Wits</em>+Insight), pick the ambush lane (<em>Wits</em>+Insight), spot the tell (<em>Spirit</em>+Insight), reconstruct a scene (<em>Wits</em>+Insight), interview a witness (<em>Presence</em>+Insight)</p>
 <p><strong>Lore:</strong> cite local custom (<em>Presence</em>+Lore), read the weather (<em>Wits</em>+Lore), perform a rite (<em>Spirit</em>+Lore)</p>
 <p><strong>Arcana:</strong> read a ward anchor (<em>Wits</em>+Arcana), hold a rite steady (<em>Spirit</em>+Arcana)</p>
-
 </div>
 <p><strong>Fast Boundaries:</strong></p>
 <ul>
 <li><strong>Locks &amp; Traps:</strong> Mechanical = Attribute + Craft; Arcane = Attribute + Arcana.</li>
 <li><strong>People vs. Mechanisms:</strong> Deception for social infiltration; Stealth to avoid detection; Craft or Arcana to bypass a physical or magical barrier.</li>
-<li><strong>Formal vs. Informal:</strong> both are Sway &mdash; <em>Presence</em>+Sway for courts and treaties, <em>Wits</em>+Sway for bargaining and personal persuasion. The register is the attribute, not the skill.</li>
+<li><strong>Formal vs. Informal:</strong> both are Sway — <em>Presence</em>+Sway for courts and treaties, <em>Wits</em>+Sway for bargaining and personal persuasion. The register is the attribute, not the skill.</li>
 </ul>
 </div>
-
 <footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-
-</body>
+</article></body>
 </html>

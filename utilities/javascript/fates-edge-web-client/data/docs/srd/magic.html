@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Magic: choosing and using a path</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Magic: choosing and using a path</h1><p>Read the overview first, then the path your character actually uses. You do not need to learn every tradition before playing one. Follow the links to the tag library, rites, summoning, and worked examples when your chosen path calls for them. All printed costs, prerequisites, and consequences still apply.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="magic-system">
+<h2>Magic System</h2>
+<p>Magic in Fate's Edge is expressed through six interconnected paths. Each uses the same core resolution engine (Position, DV, Boons, SB) but manages risk differently.</p>
+<ul>
+<li><strong>Caster (Freeform):</strong> Flexible, improvisational magic. Risk of Backlash.</li>
+<li><strong>Runekeeper (Rites):</strong> Structured magic through a Patron's Codex. Risk of Obligation.</li>
+<li><strong>Invoker (Symbols):</strong> Ritual magic through consecrated Symbols. Slow but safe; can be forced.</li>
+<li><strong>Cantor (Songs):</strong> Perform Low Rites as songs. Risk of Corruption.</li>
+<li><strong>Witchcraft (Hedge Magic):</strong> Subtle, low-cost magic through thresholds and knots. No resource tracking.</li>
+<li><strong>Summoning:</strong> Bind and command spirits. Risk of the Leash.</li>
+</ul>
+<section class="level2" id="six-paths-at-a-glance">
+<h3>The Six Paths at a Glance</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Path</th><th>Prerequisite</th><th>Roll Skill</th><th>Risk Track</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-blue">Caster</span></td><td>Spellcraft (6 XP)</td><td>Arcana</td><td>Backlash (1s)</td></tr>
+<tr><td><span class="badge badge-gold">Runekeeper</span></td><td>Familiar + Codex</td><td>Ritual</td><td>Obligation (per Rite)</td></tr>
+<tr><td><span class="badge badge-gold">Invoker</span></td><td>Patron's Symbol</td><td>Ritual</td><td>Obligation + Symbol Compromise</td></tr>
+<tr><td><span class="badge badge-purple">Cantor</span></td><td>Cantor's Path (8 XP)</td><td>Performance + Lore</td><td>Corruption (Spirit-based track)</td></tr>
+<tr><td><span class="badge badge-green">Witchcraft</span></td><td>Craft of the Hedge (4 XP)</td><td>None (Gifts) / Wits+Lore (Workings)</td><td>None (Gifts); Promise Timers</td></tr>
+<tr><td><span class="badge badge-red">Summoning</span></td><td>Pact-Whisperer (2 XP)</td><td>Spirit + Lore</td><td>Leash (Spirit + TL)</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-muted text-xs">The final two columns in the source table ("Roll Skill" and "Risk Track" for Invoker and Cantor) were partially truncated in the original layout; "Symbol Compromise" and "Corruption (Spirit-based track)" are reconstructed from the fuller rules text below rather than quoted verbatim.</p>
+</section>
+<section class="level2" id="caster-freeform">
+<h3>Caster (Freeform / Weave &amp; Cast)</h3>
+<p>Free casters shape raw magic by combining elements and effects. They are flexible but unpredictable.</p>
+<section class="level3" id="caster-requirements">
+<h4>Requirements</h4>
+<ul>
+<li>Spellcraft (6 XP): Required for Weave &amp; Cast freeform magic.</li>
+</ul>
+</section>
+<section class="level3" id="caster-procedure">
+<h4>Procedure</h4>
+<ol>
+<li><strong>Weave (Action):</strong> Describe the spell and choose its tags.</li>
+<li><strong>Cast (Action):</strong> Roll Attribute (usually Wits or Spirit) + Arcana. The GM sets DV based on the tags.</li>
+</ol>
+<p><strong>Cantrip:</strong> A spell with a single tag can be cast as a Cantrip: one roll, standard action, no Weave phase. Cannot bypass wards or create large-scale effects.</p>
+</section>
+<section class="level3" id="spell-dv">
+<h4>Spell DV</h4>
+<p><code>DV = 1 + number of tags</code></p>
+<p>Dangerous tags (<code>[FOLD]</code>, <code>[GATE]</code>, <code>[LEAP]</code>, <code>[CREATE]</code>, <code>[SUMMON]</code>, <code>[TRANSMUTE]</code>, <code>[ANIMATE]</code>, <code>[TRANSFORM]</code>, <code>[DOMINATE]</code>, <code>[REWIND]</code>) add +2 DV each instead of +1.</p>
+</section>
+<section class="level3" id="caster-backlash">
+<h4>Backlash</h4>
+<p>On a Partial or Miss, or on a Hit that shows two or more 1s, the GM applies backlash colored by the dominant element(s). See <a href="magic.html#backlash-free-casting">Backlash (Free Casting)</a> for details.</p>
+</section>
+</section>
+<section class="level2" id="runekeeper-rites">
+<h3>Runekeeper (Rites)</h3>
+<p>Runekeepers bind structured magic through a Codex and a Thiasos (familiar spirit). They specialize in reliable, thematic magic.</p>
+<section class="level3" id="runekeeper-requirements">
+<h4>Requirements</h4>
+<ul>
+<li>Bond to a single Patron.</li>
+<li>Thiasos (Familiar talent, 2 XP): Enables Patron's Gift.</li>
+<li>Codex (4 XP): Grants access to the Patron's Rites and starts the Obligation ledger.</li>
+</ul>
+</section>
+<section class="level3" id="invoking-a-rite">
+<h4>Invoking a Rite</h4>
+<ol>
+<li>Declare the Rite (1 action).</li>
+<li>Mark the Rite's Obligation cost (listed in the rite description, e.g., <code>Obligation: 6 segments</code>).</li>
+<li>If the Rite calls for a roll, roll Attribute + Ritual. The GM sets DV using the formula:
+<p><code>DV = max(Obligation Cost − Spirit, Rite Tier)</code></p>
+<p>where Rite Tier is 1 for Low, 2 for Standard, 3 for High/Epic.</p>
+</li>
+</ol>
+<p><strong>Push It:</strong> Mark +1 additional Obligation to increase duration, range, or potency.</p>
+</section>
+<section class="level3" id="patrons-gift-imbuement">
+<h4>Patron's Gift (Imbuement)</h4>
+<p>Requires Thiasos. Once per scene as 1 action, imbue a held item with +1 Melee and +1 Thematic Skill (determined by your Patron) for the scene. Push It to extend one additional scene (+1 Obligation).</p>
+</section>
+</section>
+<section class="level2" id="invoker-symbols">
+<h3>Invoker (Symbols)</h3>
+<p>Invokers channel power through consecrated Symbols. Rituals are slow but safe; Crack the Seal offers desperate speed.</p>
+<section class="level3" id="invoker-requirements">
+<h4>Requirements</h4>
+<ul>
+<li>One or more Patron's Symbols (4 XP each). Each Symbol is a Minor Asset.</li>
+</ul>
+</section>
+<section class="level3" id="ritual-invocation">
+<h4>Ritual Invocation</h4>
+<ol>
+<li>Display the Symbol (must be visible).</li>
+<li>Perform the Rite. Takes DV + 1 rounds (Significant Time), where DV is calculated as above.</li>
+<li>Mark the Rite's Obligation cost (listed).</li>
+<li>If the Symbol is displayed openly during the ritual, reduce the Obligation cost by 1 (minimum 0).</li>
+</ol>
+</section>
+<section class="level3" id="crack-the-seal-instant-cast">
+<h4>Crack the Seal (Instant Cast)</h4>
+<ol>
+<li>Invoke the Rite as 1 action (instead of ritual time).</li>
+<li>Mark double the Rite's Obligation cost (or +2 minimum, +3 for High Rites if the base cost is unclear).</li>
+<li>The Symbol becomes Compromised (inert). Restore it during downtime (Arcana or Lore test, DV 3) or pay 1 XP.</li>
+</ol>
+</section>
+<section class="level3" id="borrowed-grace-invoker-talent">
+<h4>Borrowed Grace (Invoker Talent)</h4>
+<p>Once per scene, spend 1 Boon or 1 Fatigue (1 action) to gain +1 die on a combat action, or +1 Effect on a social or stealth action. Requires visibly displaying your Patron's Symbol. If the Symbol is Compromised, Borrowed Grace works at –1 die.</p>
+</section>
+</section>
+<section class="level2" id="cantor-songs">
+<h3>Cantor (Songs)</h3>
+<p>Cantors perform Low Rites as Songs, channeling power through voice and performance. They track Corruption instead of Obligation.</p>
+<section class="level3" id="cantor-requirements">
+<h4>Requirements</h4>
+<ul>
+<li>Cantor's Path (8 XP).</li>
+<li>Performance 2+, Lore 1+, Presence 2+.</li>
+</ul>
+</section>
+<section class="level3" id="singing-a-song">
+<h4>Singing a Song</h4>
+<ol>
+<li>Begin the Song (1 action). It resolves at the start of your next turn.</li>
+<li>Roll Lore + Performance vs DV (typically 2–3).</li>
+<li>On success, the Low Rite effect occurs. No Obligation cost.</li>
+<li>Mark Corruption accumulation (see below).</li>
+</ol>
+</section>
+<section class="level3" id="cantor-push-it">
+<h4>Push It</h4>
+<p>Resolve the Song immediately (instead of next turn). Mark 1 Fatigue and advance your Corruption Timer by 1 segment.</p>
+</section>
+<section class="level3" id="corruption-timer">
+<h4>Corruption Timer</h4>
+<p>Your Corruption Timer has segments equal to your Spirit attribute. Mark a segment when you:</p>
+<ul>
+<li>Push a Song.</li>
+<li>Perform a Resonant Rite (a powerful thematic working designated by your Patron).</li>
+<li>The GM spends a Story Beat on your occult activities.</li>
+</ul>
+<p>When the timer fills, you immediately gain a thematic boon and burden from the last Patron whose Rite you performed. Then reset the timer to zero (cannot go below your current Tier − 1).</p>
+</section>
+<section class="level3" id="cantor-corruption-examples">
+<h4>Cantor Corruption Examples (The Eight Core Patrons)</h4>
+<p>When a Cantor's Corruption Timer fills, they immediately gain a thematic boon (benefit) and burden (drawback) from the last Patron whose Rite they performed. The timer resets to zero, but the mark of Corruption remains—a permanent change to the character's voice, manner, or soul. The examples below are for the eight patrons recommended for first characters. The GM and player should collaborate to create blooms that fit the fiction.</p>
+<div class="grid-2">
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Oath of Flame &amp; Light (Dawn &amp; Vows)</span></p>
+<p><strong>Boon — Beacon's Gaze:</strong> Your eyes gleam with dawnlight. Once per session, you may force a single creature to speak truthfully to one question (Resist DV 4).</p>
+<p><strong>Burden — Unquenchable:</strong> You cannot knowingly tell a lie. Attempting to do so costs 1 Fatigue and the words burn in your throat.</p>
+</div>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">The Traveler (Ways &amp; Journeys)</span></p>
+<p><strong>Boon — Road's Memory:</strong> You can never be lost on a path you have walked before. +1 die to Navigation rolls on familiar routes.</p>
+<p><strong>Burden — Restless Feet:</strong> You cannot stay in one settlement for more than a week without marking 1 Fatigue. The road calls, and you must answer.</p>
+</div>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Inaea (Angel of the Spider)</span></p>
+<p><strong>Boon — Thread-Sight:</strong> You can perceive the emotional bonds between any two people within Near range (hostility, loyalty, love, debt). The GM describes what you see.</p>
+<p><strong>Burden — Tangled:</strong> You cannot ignore a plea for help from someone you have previously aided. Refusing costs 1 Fatigue and haunts your dreams.</p>
+</div>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">The Witness (Truth &amp; Revelation)</span></p>
+<p><strong>Boon — Unblinking:</strong> You instantly recognize when someone is lying to you. No roll required.</p>
+<p><strong>Burden — Cannot Look Away:</strong> You must correct any falsehood you hear, even if doing so is dangerous or socially ruinous. Remaining silent costs 1 Fatigue.</p>
+</div>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Carrion King (Decay &amp; Renewal)</span></p>
+<p><strong>Boon — Rot's Harvest:</strong> You can sense organic matter in decay within Near range. +1 die to Endurance rolls involving scavenging or foraging.</p>
+<p><strong>Burden — Compost-Stained:</strong> A faint scent of turned earth follows you. Animals are nervous around you (–1 die to Animal Handling), and you cannot enter consecrated ground without marking 1 Fatigue.</p>
+</div>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Ikasha (She Who Sleeps)</span></p>
+<p><strong>Boon — Shadow's Daughter:</strong> In dim light or darkness, you may reroll one failed Stealth roll per scene.</p>
+<p><strong>Burden — Unseen, Unheard:</strong> Your voice is barely above a whisper. Anyone trying to hear you outside of Close range suffers –1 die to Insight checks involving sound.</p>
+</div>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Grimmir (The Old Man of the Forest)</span></p>
+<p><strong>Boon — Season's Tongue:</strong> You instinctively know the weather for the next 24 hours and gain +1 die to all Insight rolls in natural terrain.</p>
+<p><strong>Burden — Bark-Skinned:</strong> Your skin grows rough and moss-flecked. –1 die to social rolls in civilized settings; you are visibly wild.</p>
+</div>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Palinode (Queen of Encores)</span></p>
+<p><strong>Boon — Perfect Phrase:</strong> Once per session, you may reroll any failed Performance or Sway roll. The second result stands.</p>
+<p><strong>Burden — Unfinished:</strong> You cannot leave a performance incomplete. If you begin singing, playing, or speaking in public, you must finish or mark 1 Fatigue.</p>
+</div>
+</div>
+<p class="text-xs text-muted">Source note: this table was flattened by text extraction (patron names were grouped separately from their boon/burden text). The pairings above were reconstructed by matching the order of patron headers to the order of subsequent boon/burden blocks; the Ikasha ↔ Shadow's Daughter pairing in particular is inferred from positional order rather than an explicit label.</p>
+<div class="panel panel-gold">
+<p><strong>Designer's Note:</strong> These blooms are intended to be dramatic, not punishing. A Corruption bloom should feel like a power surge with an interesting complication—not a penalty that discourages play. When a Cantor's timer fills, celebrate the transformation. The burden is a story hook, not a tax.</p>
+</div>
+</section>
+<section class="level3" id="inspire-chorus">
+<h4>Inspire Chorus</h4>
+<p>Once per scene, while actively singing a Song, all allies within Near range shift Position +1 for one exchange (cannot exceed Controlled).</p>
+</section>
+</section>
+<section class="level2" id="witchcraft-hedge-magic">
+<h3>Witchcraft (Hedge Magic)</h3>
+<p>Witchcraft is the magic of thresholds, knots, and small favors. It is subtle, low-cost, and accessible to any character who pays attention to the world's edges. Unlike other magical paths, Witchcraft requires no Patron, no Codex, and no resource track—just a talent and a willingness to work at the boundaries.</p>
+<section class="level3" id="two-speeds-of-witchcraft">
+<h4>The Two Speeds of Witchcraft</h4>
+<p>Witchcraft operates at two speeds:</p>
+<ul>
+<li><strong>Hedge Gifts:</strong> No-roll, no-cost magical effects that work within a limited scope. These are the "short road" of Witchcraft.</li>
+<li><strong>Quick Workings:</strong> Single-action rolls that produce subtle, scene-limited effects. These are the "short road" with a bit more power.</li>
+<li><strong>Full Rituals:</strong> Extended workings that require Significant Time, a threshold, and often a witness. These are the "long road" of Witchcraft.</li>
+</ul>
+</section>
+<section class="level3" id="witchcraft-requirements">
+<h4>Requirements</h4>
+<ul>
+<li>Craft of the Hedge (4 XP): Required for Hedge Gifts and Quick Workings.</li>
+<li>Optional: A witch mark (tattoo, scar, or birthmark) for flavor.</li>
+</ul>
+</section>
+<section class="level3" id="hedge-gifts">
+<h4>Hedge Gifts</h4>
+<p>Hedge Gifts are simple, reliable effects that require no roll. A character with Craft of the Hedge learns two Hedge Gifts of their choice. Additional Hedge Gifts cost 2 XP each.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Gift</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Steady Hand</strong></td><td>Once per scene, touch a wounded person (including yourself) and remove 1 Fatigue. No roll. May not be used on the same person twice in a scene.</td></tr>
+<tr><td><strong>Knot of Favor</strong></td><td>Once per scene, tie a knot in a cord, thread, or cloth. Allies within Near gain +1 die to a single type of roll (choose when tying: stealth, persuasion, defense, or navigation). The knot must remain tied.</td></tr>
+<tr><td><strong>Warm Hand</strong></td><td>Once per scene, touch someone. Their next physical action either gains +1 die (comfort) or suffers –1 die (warning). No roll.</td></tr>
+<tr><td><strong>Hearth-Sense</strong></td><td>Once per scene, ask the GM one yes/no question about a threshold, boundary, or promise in the current scene. The GM must answer truthfully.</td></tr>
+<tr><td><strong>Salt Line</strong></td><td>Once per scene, pour a handful of salt in a continuous line (move action). Any spirit, ghost, or cursed creature attempting to cross must test Spirit+Endurance (DV 3) or be stopped for that exchange.</td></tr>
+<tr><td><strong>The Unlit Candle</strong></td><td>Once per session, declare that a light source you can see (lantern, candle, torch) falters or extinguishes. This creates a zone of dim light or darkness in Near range for one exchange.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="quick-workings">
+<h4>Quick Workings</h4>
+<p>A Quick Working is a single-action roll that relies on the witch's knowledge of thresholds, elements, and will. Its effects are limited, subtle, and always carry the risk of consequence.</p>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>Name the Threshold: Door, tide line, wound, vow, breath.</li>
+<li>Choose a Layer: Echo (what has been), Veil (what is), or Flow (what wishes to be).</li>
+<li>Choose a Single Tag: From the magic tags list.</li>
+<li>Set Position: Controlled (if you have time) or Desperate (if threatened).</li>
+<li>Roll: Wits+Lore, Spirit+Insight, or Presence+Sway (GM's choice).</li>
+<li>Apply Outcome: Use the standard Outcome Matrix.</li>
+</ol>
+<p><strong>Example Effects:</strong></p>
+<ul>
+<li>A door sticks shut or opens.</li>
+<li>A candle gutters (brief darkness).</li>
+<li>A rope knot tightens or loosens.</li>
+<li>A pursuer's footing slips (1 Fatigue).</li>
+<li>A whispered name is heard or forgotten.</li>
+</ul>
+</section>
+<section class="level3" id="full-rituals">
+<h4>Full Rituals</h4>
+<p>A Full Ritual requires Significant Time, a proper threshold, and often a witness. Its effects are lasting or permanent: blessings, curses, bindings, or the hallowing of ground.</p>
+<p><strong>General Procedure:</strong></p>
+<ol>
+<li>Identify the Threshold: Name the edge, learn its disposition.</li>
+<li>Choose Your Witness: A person, spirit, or Hollowed who watches.</li>
+<li>Name Your Will: What change you intend.</li>
+<li>Set Your Price: Memory, name, lock of hair, promise, blood.</li>
+<li>Make the Exchange: Roll (Spirit+Lore, Spirit+Insight, or appropriate), resolve, pay the price on success or partial.</li>
+</ol>
+<p><strong>Example Rituals:</strong></p>
+<div class="panel panel-green">
+<p><strong>Unravel the Wound (Heal Harm)</strong></p>
+<p><strong>Requires:</strong> Significant Time, a threshold (doorway or basin of water), a witness.</p>
+<p><strong>Effect:</strong> Restores 1 level of Harm.</p>
+<p><strong>Price:</strong> A lock of hair, a memory of a childhood injury, a tear in a vial.</p>
+<p><strong>Roll:</strong> Spirit + Lore vs DV (3 for Harm 1, 4 for Harm 2, 5+ for Harm 3 requires a coven).</p>
+<p><strong>Success:</strong> Harm reduced; witch pays the price. <strong>Partial:</strong> Harm reduced, but witch gains a minor Condition or a Promise Timer. <strong>Miss:</strong> Wound does not heal; witch gains the Condition she tried to remove.</p>
+</div>
+<div class="panel panel-green">
+<p><strong>Hallow Threshold (Permanent Ward)</strong></p>
+<p><strong>Requires:</strong> Significant Time, a permanent threshold (door, well, bridge, hearthstone), a witness who will maintain the consecration, an offering (bread, salt, coin, spoken promise).</p>
+<p><strong>Effect:</strong> The blessing lasts until the threshold is physically broken or the offering removed.</p>
+<p><strong>Roll:</strong> Spirit + Lore vs DV 4 (home), 5 (village well), or 6 (city gate).</p>
+<p><strong>Success:</strong> Threshold hallowed. Spirits, undead, and cursed creatures crossing must test Spirit+Endurance (DV 5) or be turned back. <strong>Partial:</strong> Blessing holds but has a weakness (the witch names one thing that can bypass it). <strong>Miss:</strong> Blessing fails; threshold becomes cursed for one season (all who cross feel unease, –1 die to first action).</p>
+</div>
+</section>
+<section class="level3" id="promise-timers">
+<h4>Promise Timers</h4>
+<p>Many workings create obligations. Represent these with a Promise Timer (typically 4 segments):</p>
+<ul>
+<li>Mark the timer when the promise is ignored, deferred, or disrespected.</li>
+<li>When filled, the price comes due—socially, spiritually, or narratively.</li>
+<li>Examples: sharing grief, tending a grave, protecting a hearth, reconciling rivals.</li>
+</ul>
+</section>
+<section class="level3" id="talents-of-the-hedge">
+<h4>Talents of the Hedge</h4>
+<ul>
+<li><strong>Craft of the Hedge (4 XP):</strong> Requires Lore 1+ or Insight 1+. You learn two Hedge Gifts; you may perform Quick Workings; once per session, when you fail a Quick Working roll, you may convert the Miss into a Partial Success by marking 1 Fatigue.</li>
+<li><strong>Hedge Gift of the Patron (6 XP):</strong> Requires Craft of the Hedge and a Bond to a Patron. Once per session, when you would use a Hedge Gift, you may instead invoke your Patron's Imbuement. Gain +1 die to all actions tied to your Patron's domain for the scene, but mark +1 Obligation immediately. No action required.</li>
+</ul>
+</section>
+<section class="level3" id="threshold-magic-and-household-disposition">
+<h4>Threshold Magic and Household Disposition</h4>
+<p>Communities and dwellings possess a temperament. When entering a new settlement or threshold site, the GM may choose or roll for its disposition:</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Disposition</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Hungry</strong></td><td>Demands offerings; first working costs +1 Fatigue.</td></tr>
+<tr><td><strong>Grieving</strong></td><td>Magic requires memory or loss narrative.</td></tr>
+<tr><td><strong>Fearful</strong></td><td>First rite is Desperate Position.</td></tr>
+<tr><td><strong>Watching</strong></td><td>+1 Effect if the house is fed or soothed.</td></tr>
+<tr><td><strong>Young</strong></td><td>Chaotic outcomes on partials.</td></tr>
+<tr><td><strong>Old</strong></td><td>Weak boons but harsh backlash.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Household temperament can change through care, ritual, or story.</p>
+</section>
+</section>
+<section class="level2" id="obligation-runekeepers-invokers">
+<h3>Obligation (Runekeepers and Invokers)</h3>
+<p>Obligation measures a Patron's claim on a character. Track it per Patron. The default Obligation capacity is:</p>
+<p><code>Capacity = Spirit + Presence</code></p>
+<section class="level3" id="marking-obligation">
+<h4>Marking Obligation</h4>
+<p>Obligation is marked according to the specific Rite or action:</p>
+<ul>
+<li>Invoking a Rite (Runekeeper or Invoker): mark the Rite's listed Obligation cost (e.g., <code>Obligation: 6</code>).</li>
+<li>Pushing a Rite: mark +1 additional Obligation (added to the Rite's base cost).</li>
+<li>Crack the Seal: mark double the Rite's base cost (or +2 minimum, +3 for High Rites).</li>
+<li>Using Rites from two different Patrons in the same scene: mark +1 Obligation to the second Patron.</li>
+</ul>
+</section>
+<section class="level3" id="obligation-overflow">
+<h4>Overflow</h4>
+<p>If your total Obligation (across all Patrons) exceeds your Capacity:</p>
+<ul>
+<li>Mark 1 Fatigue per segment over Capacity.</li>
+<li>You cannot invoke new Rites or perform Patron rituals until Obligation is reduced below Capacity.</li>
+</ul>
+</section>
+<section class="level3" id="clearing-obligation">
+<h4>Clearing Obligation</h4>
+<ul>
+<li><strong>Off-screen:</strong> Perform an Act of Service aligned with the Patron (provide an Intricate Description). Clear 1 segment of that Patron's Obligation.</li>
+<li><strong>On-screen (Focused Devotion talent, 3–5 XP):</strong> Once per scene, spend 1 Boon to clear 1 segment (cannot clear segments accrued in the same scene).</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="backlash-free-casting">
+<h3>Backlash (Free Casting)</h3>
+<p>Backlash is the unpredictable fallout from shaping raw magic. It occurs on a Partial or Miss, or on a Hit that shows two or more 1s.</p>
+<section class="level3" id="backlash-menu">
+<h4>Backlash Menu (choose one on Partial, two on Miss)</h4>
+<div class="panel panel-red">
+<ul>
+<li><strong>Position Shift:</strong> Your Position worsens by one step for your current or next action.</li>
+<li><strong>Fleeting Harm/Condition:</strong> Minor injury (1 Fatigue or Harm 1) or a temporary Condition (Dazed, Singed, Disoriented).</li>
+<li><strong>Exposure/Noise:</strong> Draws unwanted attention — guards alerted, a door slams, a rival notices.</li>
+<li><strong>Resource Drain:</strong> Lose a component, a tool wears out, or mark 1 Fatigue.</li>
+<li><strong>Collateral Spark:</strong> A nearby ally, object, or environmental feature is threatened (GM describes).</li>
+</ul>
+</div>
+<p class="text-sm text-muted">All backlash is colored by the dominant element(s) used in the spell. See the Elemental Backlash table referenced elsewhere in the tags &amp; effects rules.</p>
+</section>
+</section>
+<section class="level2" id="obligation-capacity-overflow-summary">
+<h3>Obligation Capacity and Overflow Summary</h3>
+<p><code>Capacity = Spirit + Presence</code></p>
+<ul>
+<li><strong>Exceeding Capacity:</strong> Mark 1 Fatigue per segment over. Cannot invoke new Rites or perform Patron rituals until reduced.</li>
+<li><strong>Clearing:</strong> Act of Service (off-screen, 1 segment) or Focused Devotion talent (on-screen, 1 Boon per segment).</li>
+</ul>
+</section>
+<section class="level2" id="corruption-timer-summary">
+<h3>Corruption Timer Summary (Cantor)</h3>
+<p><code>Timer Size = Spirit</code></p>
+<ul>
+<li>Mark a segment when you Push a Song, perform a Resonant Rite, or when the GM spends SB on your occult activities.</li>
+<li>When full: gain a thematic boon and burden from your last Patron; reset timer to zero.</li>
+</ul>
+</section>
+</section></div><p>Continue: <a href="tags.html">Magic tags and effects</a></p></main></body></html>

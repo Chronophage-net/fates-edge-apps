@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Fate's Edge GM Guide — Chapter 8: Travel Framework</title>
 <style>
     :root {
@@ -98,20 +99,36 @@
     .toc a:hover { color: var(--gold); }
     footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
 </style>
-</head>
-<body>
-
-<h1>Chapter 8: World Interaction &amp; Travel Framework</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 8 · Travel Framework</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-07-_-Assets-_-and-_-Followers.html">Previous chapter</a><a href="GM-_-Guide-_-09-_-Downtime.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Chapter 8: World Interaction &amp; Travel Framework</a></li><li><a href="#known-world">The Known World: A Geographic Overview</a></li><li><a href="#core-journey">How to Travel: The Core Journey</a></li><li><a href="#game-structure">Game Structure and Time</a></li><li><a href="#movement">Movement and Positioning</a></li><li><a href="#narrative-time">Narrative Time</a></li><li><a href="#social-interactions">Social Interactions</a></li><li><a href="#supply">Supply and Resources</a></li><li><a href="#player-actions">Engaging the World — Player Actions</a></li><li><a href="#travel-quickref">Travel Quick Reference</a></li><li><a href="#summary-world">Summary</a></li></ul></details>
+<h1 id="reader-section-1">Chapter 8: World Interaction &amp; Travel Framework</h1>
 <p class="subtitle">Fate's Edge GM Guide — Chapter 8</p>
-
 <div class="panel panel-blue">
 <span class="panel-title">Using This Chapter</span>
 <p>This chapter gives you the tools to move through the world, interact with its people, and make your journey meaningful. For detailed descriptions of each region's culture, subgenre, and notable NPCs, see the Lore Compendium (World Regions and Cultures). The two chapters work together: this one covers <em>how</em> to travel and interact; the other tells you <em>where</em> and <em>with whom</em>.</p>
 <p><strong>Key Reference:</strong> For the complete travel procedure, see Appendix A.1 (Global Travel Procedures) in the Worldbook. This chapter provides the principles and cultural context; the appendix gives the step-by-step mechanic.</p>
 </div>
-
 <p>In <strong>Fate's Edge</strong>, the world is not a backdrop — it is a partner in the conversation. Dikes groan under black rain in Viterra, clan horns answer across Acasia's ridgelines, Ecktoria's marble halls echo with careful words, and Kahfagia's pilots read storms by taste. Wherever you go, place, culture, and pressure push back.</p>
-
 <div class="panel panel-gold">
 <span class="panel-title">GM Tip: Travel in 60 Seconds</span>
 <p>If you need to run a journey <em>right now</em>, here is the stripped-down procedure:</p>
@@ -125,10 +142,9 @@
 </ol>
 <p>For the full procedure, see the <strong>Travel Quick Reference</strong> at the end of this chapter.</p>
 </div>
-
 <h2 id="known-world">The Known World: A Geographic Overview</h2>
 <p>The following summary orients the major regions relative to one another. (See the Lore Compendium for cultural details.)</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Region</th><th>Overview</th></tr>
 <tr><td>Ecktoria</td><td>Temperate heartland of the old Utaran Imperium. Borders Acasia to the northeast and Kahfagia to the west. Marble cities, imperial roads, codified law.</td></tr>
 <tr><td>Acasia</td><td>Lowland of rivers and petty kingdoms, northeast of Ecktoria. Broken province of mercenary companies and border lords. Borders Vhasia to the east.</td></tr>
@@ -155,17 +171,14 @@
 <tr><td>Tulkani</td><td>Itinerant storytellers and dream-carriers. Wagon circles, memory-cords, and the Dreamer who sleeps beneath the road.</td></tr>
 <tr><td>Ngomebe</td><td>Walking cities of the southern plateau. Keystone chargers, roller-pits, and the Still Voice of abandoned stone.</td></tr>
 <tr><td>Dhahara (Nine Kingdoms)</td><td>Elephant kingdoms of the monsoon lowlands. Peacock Throne, river wars, and the ninth kingdom that was never whole.</td></tr>
-</table></div>
-
+</table></div></div>
 <h3 id="ways-between">The Ways Between</h3>
 <p>Beyond the physical map lie the Ways Between — the dream-roads and spirit-paths of Obishaal, realm of dreams and death. Travel here is measured not in miles but in choices. A wrong turn might lead to yesterday. A right turn might lead to a version of yourself who made a different decision and is still alive to regret it.</p>
 <p><strong>Entering the Ways:</strong> Thresholds exist in thin places — crossroads at midnight, bridges that appear only at low tide, caves behind waterfalls, or simply a mist that settles too thick and stays too long. A character may also enter through ritual, dream, or near-death experience.</p>
 <p><strong>Navigation in Obishaal:</strong> Use the standard travel procedures, but the GM may replace the Spades (place) draw with a <strong>Virtue Test</strong>. The road judges. Acts of honesty, courage, mercy, or self-sacrifice advance a personal <strong>Virtue Timer [4]</strong>; acts of greed, cowardice, cruelty, or despair advance a <strong>Vice Timer [4]</strong>. When one fills, the character ascends (Virtue) to a higher layer or falls (Vice) to a lower one.</p>
 <p><strong>The Thirteenth Stone:</strong> At the deepest layer, pressed into the silt of the oldest dream, lies the Thirteenth Stone — warm, pulsing, and whispering. Here, Ikasha, She Who Sleeps, dreams of freedom. Her voice offers bargains. Her freedom would remake the world.</p>
-
 <h2 id="core-journey">How to Travel: The Core Journey</h2>
 <p>A journey in Fate's Edge is a series of legs, each a self-contained scene with its own pressure. The full procedure is detailed in Appendix A.1 of the Worldbook; this section gives you the principles and a practical summary.</p>
-
 <h3>The Anatomy of a Leg</h3>
 <p>Each leg of a journey follows this rhythm:</p>
 <ol>
@@ -184,18 +197,16 @@
 <li><strong>Apply a hazard.</strong> Draw a Club from the regional deck or use a universal hazard.</li>
 <li><strong>Repeat until the timer fills.</strong> When it does, the party arrives.</li>
 </ol>
-
 <h3>Travel Roles</h3>
 <p>Assign one role per character each leg. Roles may rotate each leg.</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Role</th><th>Key Test</th><th>Benefit on Success</th></tr>
 <tr><td>Guide</td><td>Wits + Lore</td><td>Tick the Travel Timer +1.</td></tr>
 <tr><td>Scout</td><td>Wits + Stealth</td><td>Party cannot be surprised on the first encounter of the leg.</td></tr>
 <tr><td>Quartermaster</td><td>Wits + Craft</td><td>Prevent one Supply drop or recover 1 spent Supply.</td></tr>
 <tr><td>Watch</td><td>Presence + Insight</td><td>Party gains +1 Position on the first defense roll of any encounter.</td></tr>
-</table></div>
+</table></div></div>
 <p>Each role action requires a roll (Attribute + appropriate skill, DV set by the GM). Failure may tick the Travel Timer backwards or introduce a complication.</p>
-
 <h3>Travel Timer Integration</h3>
 <p>The Travel Timer is not isolated — it interacts with your campaign's other pressures. Use this guidance:</p>
 <ul>
@@ -204,33 +215,29 @@
 <li><strong>On a Miss:</strong> No progress on the Travel Timer. The player gains 2 Boons. The GM gains Story Beats (SB) and <strong>must</strong> advance a relevant campaign timer by 1 — the party's failure has cost them time, and the world has moved on.</li>
 <li><strong>When the Travel Timer Fills:</strong> The party arrives at their destination — but the journey has taken its toll. Mark 1 Fatigue per character for each segment beyond 4 (e.g., a 6-segment journey means 2 Fatigue, a 10-segment journey means 6 Fatigue). The GM may also spend accumulated SB to introduce a final complication: a welcoming party they did not expect, a change in the local situation, or a debt incurred on the road.</li>
 </ul>
-
 <div class="panel panel-gold">
 <span class="panel-title">GM Tip: Timers Talk to Each Other</span>
 <p>Your campaign timers (Mandate, Crisis, faction timers) should not sit idle while the party travels. A journey is not a pause — it is a pressure cooker. If the party is traveling to stop a ritual and the Travel Timer ticks slowly, the Ritual Completion timer should tick too. The road is not a safe space; it is a narrowing window.</p>
 </div>
-
 <h3>Encounters and Events</h3>
 <p>Every 1–2 segments filled, the GM introduces an encounter or hazard. At minimum, each leg should include <strong>one meaningful encounter</strong>.</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Type</th><th>Examples</th><th>Typical Resolution</th></tr>
 <tr><td>Discovery</td><td>Ruins, strange omens, hidden sites</td><td>Insight or exploration</td></tr>
 <tr><td>Hazard</td><td>Terrain challenge, illness, extreme weather</td><td>Endurance test; may use Supply</td></tr>
 <tr><td>Encounter</td><td>Bandits, emissaries, beasts, rival travelers</td><td>Combat or social resolution</td></tr>
 <tr><td>Complication</td><td>Bond tested, supplies strained, pursuit gains ground</td><td>Roleplay or skill challenge</td></tr>
-</table></div>
+</table></div></div>
 <p>On a failed travel roll, the GM may spend SB to introduce an encounter immediately.</p>
-
 <h3>Weather and Terrain Modifiers</h3>
 <p>The GM may apply modifiers based on conditions:</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Condition</th><th>Effect</th></tr>
 <tr><td>Difficult Terrain</td><td>Movement costs double; Charge/Skirmish requires a roll.</td></tr>
 <tr><td>Extreme Weather (rain, snow, heat)</td><td>First travel roll each leg is Desperate.</td></tr>
 <tr><td>Hazardous Weather (storm, blizzard, sandstorm)</td><td>Travel Timer ticks +1 at leg start; navigation rolls at −1 die.</td></tr>
 <tr><td>Favorable Weather</td><td>First travel roll each leg gains +1 Position.</td></tr>
-</table></div>
-
+</table></div></div>
 <h3>Foraging and Subsistence</h3>
 <p>A character may forage during a leg instead of taking a role action. Roll Wits + Lore (DV by terrain, typical 3–4):</p>
 <ul>
@@ -238,7 +245,7 @@
 <li><strong>Partial:</strong> Gain 1 Supply but mark 1 Fatigue (time or exposure).</li>
 <li><strong>Miss:</strong> No Supply; GM gains 1 SB (scarce resources, dangerous plant, predator sign).</li>
 </ul>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Region</th><th>Forage DV</th><th>Typical Finds</th></tr>
 <tr><td>Forest (Valewood, Aelinnel)</td><td>2–3</td><td>Berries, mushrooms, roots, small game</td></tr>
 <tr><td>Steppe (Ykrul, Kuvani)</td><td>3–4</td><td>Edible roots, tubers, small game</td></tr>
@@ -247,8 +254,7 @@
 <tr><td>Mountain (Ubral, Pereshi)</td><td>3–4</td><td>Mountain herbs, small game, clean springs</td></tr>
 <tr><td>Coast (Linn, Sidhi, Zakov)</td><td>2–3</td><td>Shellfish, seaweed, fish</td></tr>
 <tr><td>Tundra (Northern Violet Steppe)</td><td>4–5</td><td>Lichens, frozen berries, small game</td></tr>
-</table></div>
-
+</table></div></div>
 <h2 id="game-structure">Game Structure and Time</h2>
 <p>Understanding how time works in Fate's Edge helps you navigate both the mechanical and narrative flow of play.</p>
 <h3>Basic Units</h3>
@@ -260,7 +266,6 @@
 <dt>Downtime</dt><dd>The narrative time between scenes, used for recovery, advancement, and off-screen activities. Measured in days, weeks, or months depending on fiction.</dd>
 <dt>Campaign</dt><dd>Entire story arc (6–20+ sessions) with major character development and lasting consequences.</dd>
 </dl>
-
 <h2 id="movement">Movement and Positioning</h2>
 <p>Space is tracked with <strong>range bands</strong> and <strong>Position</strong> (see the core GM chapter for full rules).</p>
 <h3>Range Bands</h3>
@@ -288,7 +293,6 @@
 <li>Player can spend <strong>1 Boon</strong> to improve Position by one step (once per action).</li>
 <li>Narrative triggers (flanking, reinforcements, etc.) can shift Position without cost.</li>
 </ul>
-
 <h2 id="narrative-time">Narrative Time</h2>
 <p>Time is measured by <em>importance</em> rather than duration.</p>
 <dl>
@@ -297,12 +301,11 @@
 <dt>Significant Time</dt><dd>Hours of march, rites, audits, stakeouts.</dd>
 <dt>Days</dt><dd>Drills, recoveries, research, roadwork.</dd>
 </dl>
-
 <h2 id="social-interactions">Social Interactions</h2>
 <p>Social scenes use the same engine with <strong>cultural color</strong>.</p>
 <h3>Cultural Skill Emphases</h3>
 <p>Different regions value different approaches. Use the table in the Lore Compendium (World Regions and Cultures) to see what skills are most effective where. In general:</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Region</th><th>Valued Approach</th></tr>
 <tr><td>Viterra</td><td>Insight with parishes; Sway for markets; <em>Presence</em> + Sway under writ.</td></tr>
 <tr><td>Acasia</td><td>Insight for kin-bridges; <em>Presence</em> + Sway with banner-rights; Deception risks honor timers.</td></tr>
@@ -314,8 +317,7 @@
 <tr><td>Ykrul</td><td><em>Presence</em> + Sway for leadership; Performance for boast and saga; Lore for steppe navigation.</td></tr>
 <tr><td>Sidhi</td><td>Sway for negotiation; Deception for smuggling; Insight for lighthouse justice.</td></tr>
 <tr><td>Tulkani</td><td>Performance for storytelling; Insight for reading truth; Lore for road etiquette.</td></tr>
-</table></div>
-
+</table></div></div>
 <h3>Social Stakes &amp; Timers</h3>
 <p>Your GM may use visible timers to track social progress:</p>
 <ul>
@@ -326,22 +328,19 @@
 <li><strong>Courtesy Timer (Aelinnel):</strong> Fae negotiations — speak true or lose standing.</li>
 <li><strong>Hollow Attention Timer (Aelaerem/Mistlands):</strong> The uninvited guest draws near.</li>
 </ul>
-
 <h3>Hospitality as a Social Mechanic</h3>
 <p>In many cultures — especially Aelaerem, Ykrul, Tulkani, Ubral, and Fhara — hospitality is sacred. Accepting a cup, a meal, or a night's shelter creates a bond. Breaking hospitality is worse than breaking a sworn oath.</p>
 <p><strong>Hospitality Bond:</strong> When you accept hospitality (food, drink, or shelter) from a host in a culture that honors guest-right, you and the host gain a mutual <strong>Hospitality Bond [4]</strong>. While the bond has segments, neither party may take hostile action against the other. The bond ticks when either party lies to the other, breaks a promise made under the host's roof, or acts to harm the other's interests. When it fills, the bond snaps — and the violator gains a <strong>Black Mark</strong> in that culture (−1 die on all social rolls with that culture for one season).</p>
 <p><strong>Refusing Hospitality:</strong> Refusing an offered cup, meal, or shelter is a grave insult in hospitality cultures. The GM may spend 1 SB to worsen Position by one step in all social interactions with that host and their community for the remainder of the visit.</p>
-
 <h2 id="supply">Supply and Resources</h2>
 <p>Track scarcity with a <strong>Supply Timer</strong> shared by the party's expedition.</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Segments</th><th>State &amp; Effects</th></tr>
 <tr><td>0 (Full)</td><td>Well-provisioned; no penalty.</td></tr>
 <tr><td>1 (Low)</td><td>Minor frictions; −1 to resource checks.</td></tr>
 <tr><td>2 (Dangerous)</td><td>Each PC gains Fatigue 1.</td></tr>
 <tr><td>3 (Empty)</td><td>Severe penalties; desperate measures.</td></tr>
-</table></div>
-
+</table></div></div>
 <h2 id="player-actions">Engaging the World — Player Actions</h2>
 <ul>
 <li><strong>Scout &amp; Signal:</strong> A follower can make the next travel action <em>Dominant</em> (mark Exposure or Harm 1 on them — see the Assets and Followers chapter).</li>
@@ -351,10 +350,8 @@
 <li><strong>Follower Assistance:</strong> Have a follower assist your actions for bonus dice (max +3 from all sources).</li>
 <li><strong>Invoke Cultural Knowledge:</strong> If your character has a relevant background or has spent significant time in a region, you may ask the GM one straightforward yes/no question about local customs, taboos, or safe practices.</li>
 </ul>
-
 <h2 id="travel-quickref">Travel Quick Reference</h2>
 <p>This one-page summary consolidates the travel procedures. Keep it handy during sessions.</p>
-
 <h3>The Core Travel Loop</h3>
 <ol>
 <li>Name destination and route.</li>
@@ -372,46 +369,40 @@
 <li>Repeat until timer fills.</li>
 <li>Arrival: Mark Fatigue = segments beyond 4; GM spends accrued SB for final complication.</li>
 </ol>
-
 <h3>Role Benefits</h3>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Role</th><th>Benefit</th></tr>
 <tr><td>Guide</td><td>Tick Travel Timer +1 on success</td></tr>
 <tr><td>Scout</td><td>No surprise on first encounter</td></tr>
 <tr><td>Quartermaster</td><td>Prevent Supply drop or recover 1 Supply</td></tr>
 <tr><td>Watch</td><td>+1 Position on first defense roll</td></tr>
-</table></div>
-
+</table></div></div>
 <h3>Timer Integration</h3>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Result</th><th>Effect</th></tr>
 <tr><td>Clean Success</td><td>Tick Travel Timer +1</td></tr>
 <tr><td>Partial</td><td>Tick Travel Timer +1; GM may tick campaign timer +1</td></tr>
 <tr><td>Miss</td><td>No progress; GM <em>must</em> tick campaign timer +1</td></tr>
 <tr><td>Timer Fills</td><td>Arrival; mark Fatigue; GM spends SB for complication</td></tr>
-</table></div>
-
+</table></div></div>
 <h3>Range Bands</h3>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Band</th><th>Meaning</th></tr>
 <tr><td>Close</td><td>Touching distance</td></tr>
 <tr><td>Near</td><td>Same room/zone</td></tr>
 <tr><td>Far</td><td>Visible but distant</td></tr>
 <tr><td>Absent</td><td>Off-screen; requires scene change</td></tr>
-</table></div>
-
+</table></div></div>
 <h3>Position Effects</h3>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Position</th><th>Effect</th></tr>
 <tr><td>Dominant</td><td>Re-roll one failure</td></tr>
 <tr><td>Controlled</td><td>Normal</td></tr>
 <tr><td>Desperate</td><td>Re-roll one success</td></tr>
-</table></div>
-
+</table></div></div>
 <h2 id="summary-world">Summary</h2>
 <p>The world has opinions. Movement is timers and color, position rises and sinks with weather and words, and every suit you draw speaks in a regional accent. Ask the land for a favor — then pay it back on the road.</p>
 <p><strong>Remember:</strong> Every interaction with the world is an opportunity. Use your assets, deploy your followers, and engage with the setting actively. The world responds to your choices, and every journey changes both you and the places you pass through. The road is not a ledger — it is a conversation. Speak carefully. Listen closely. And always leave something behind for the next traveler.</p>
-
 <div class="panel panel-gold">
 <span class="panel-title">GM Tip: Simplify Travel for Your First Session</span>
 <p>If this is your first time running travel in Fate's Edge, use the <strong>stripped-down version</strong> from the opening of this chapter:</p>
@@ -424,8 +415,6 @@
 </ol>
 <p>Add Roles and full timer integration once you are comfortable. The system rewards depth, but it does not demand it.</p>
 </div>
-
 <footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-
-</body>
+</article></body>
 </html>

@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Running the game</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Running the game</h1><p>Begin with a situation the characters can act on. Use the encounter guidance to frame it, the core procedure to resolve uncertain actions, and complications and timers to track what changes. NPC templates are reference material to use when you need an opponent or supporting character, not a list to memorize.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="encounters">
+<h2>Encounters</h2>
+<p>All encounters — combat, social, environmental, magical — use the same core engine: Position, Effect, DV, Boons, and Story Beats (SB). Timers track progress toward resolution or the escalation of threats.</p>
+<section class="level2" id="common-framework">
+<h3 id="encounters-heading-1">Common Framework</h3>
+<ol>
+<li><strong>State Intent &amp; Approach.</strong> What do you want to achieve, and how?</li>
+<li><strong>Set Position &amp; DV.</strong> GM determines risk (Dominant/Controlled/Desperate) and difficulty (2–7+).</li>
+<li><strong>Roll Attribute + Skill.</strong> Each 6+ = success; each 1 = SB for the GM.</li>
+<li><strong>Apply the Outcome Matrix.</strong> Clean Success, Success with SB, Partial, Miss.</li>
+<li><strong>Spend SB.</strong> GM introduces complications, shifts Position, or advances timers.</li>
+</ol>
+</section>
+<section class="level2" id="timers-in-encounters">
+<h3 id="encounters-heading-2">Timers in Encounters</h3>
+<p>Timers track cumulative progress or increasing pressure.</p>
+<ul>
+<li><strong>Progress Timer</strong> (4–8 segments): Fill to succeed (e.g., persuasion, escaping a maze).</li>
+<li><strong>Threat Timer</strong> (4–8 segments): Fill to trigger a disaster (e.g., reinforcements, structural collapse).</li>
+<li><strong>Contest Timers:</strong> Two timers — one for each side; first to fill wins.</li>
+</ul>
+<p><strong>Ticking Timers:</strong></p>
+<ul>
+<li><strong>Partial:</strong> 1 tick (GM discretion).</li>
+<li><strong>Clean Success:</strong> 2 ticks.</li>
+<li><strong>Miss:</strong> may tick opposition timers.</li>
+<li><strong>GM may spend SB</strong> to tick a timer.</li>
+</ul>
+</section>
+<section class="level2" id="social-encounters">
+<h3 id="encounters-heading-3">Social Encounters</h3>
+<p>Use Persuasion Timers for extended negotiations, debates, or intimidation.</p>
+<section class="level3" id="social-setting-up">
+<h4 id="encounters-heading-4">Setting Up</h4>
+<ul>
+<li><strong>Target's Resolve:</strong> Easy (4-segment), Moderate (6-segment), Hard (8-segment).</li>
+<li><strong>Initial Position:</strong> Based on relationship, leverage, and setting (Dominant = mutual trust, Desperate = hostile audience).</li>
+<li><strong>DV:</strong> Standard ladder (3–7+) with modifiers for cultural gaps, time pressure, etc.</li>
+</ul>
+</section>
+<section class="level3" id="non-face-characters-can-help">
+<h4 id="encounters-heading-5">Non-Face Characters Can Help</h4>
+<ul>
+<li><strong>Setup:</strong> Create an advantage — produce evidence, cause a distraction, or perform a display of force. Roll an appropriate skill. On success, grant the primary speaker +1 Position or +1 die.</li>
+<li><strong>Assist:</strong> Spend 1 Boon to give +1 die (narrated as a timely interjection or meaningful glance).</li>
+<li><strong>Interrupt:</strong> On a Miss, a non-face character can take the fallout (e.g., absorb a social rebuke) by marking 1 Fatigue.</li>
+</ul>
+</section>
+<section class="level3" id="persuasion-rolls">
+<h4 id="encounters-heading-6">Persuasion Rolls</h4>
+<p>Each distinct argument or lever advances the timer:</p>
+<ul>
+<li><strong>Clean Success:</strong> +2 segments.</li>
+<li><strong>Partial:</strong> +1 segment; GM may spend SB for a complication (e.g., "They agree, but you will owe a favor").</li>
+<li><strong>Miss:</strong> No progress; GM may tick an Opposition Timer (4–6 segments).</li>
+</ul>
+<p>When the Opposition Timer fills, the target hardens — Position worsens or the ask becomes impossible. When the Persuasion Timer fills, the target agrees as framed.</p>
+</section>
+</section>
+<section class="level2" id="environmental-encounters">
+<h3 id="encounters-heading-7">Environmental Encounters</h3>
+<section class="level3" id="terrain-and-positioning">
+<h4 id="encounters-heading-8">Terrain and Positioning</h4>
+<ul>
+<li><strong>Height Advantage:</strong> +1 die or +1 Effect for attacks from above.</li>
+<li><strong>Cover:</strong> Partial cover (+1 DV to target you); Full cover (cannot be targeted directly). You may Hide behind full cover (Stealth vs Perception).</li>
+<li><strong>Difficult Terrain:</strong> Costs 2 Move actions to traverse one band (or a full action to Dash). Charge/Skirmish require open ground unless the Relentless talent is used.</li>
+</ul>
+</section>
+<section class="level3" id="hazards-and-timers">
+<h4 id="encounters-heading-9">Hazards and Timers</h4>
+<p>Active hazards (fire, flooding, toxic gas) are represented by Threat Timers:</p>
+<ul>
+<li>Tick the timer on missed rolls, GM SB spends, or at scene intervals.</li>
+<li>When the timer fills, the hazard triggers (e.g., collapse, wave of fire).</li>
+<li>Characters may attempt to slow or disable the hazard (e.g., Craft to seal a gas leak, Magic to freeze spreading flames). Treat as a Progress Timer.</li>
+</ul>
+<p class="text-sm text-muted">Example: Collapsing Bridge [6] — ticks on each Partial or Miss. At 3 segments, footing becomes Desperate; at 6, the bridge falls.</p>
+</section>
+</section>
+<section class="level2" id="magical-encounters">
+<h3 id="encounters-heading-10">Magical Encounters</h3>
+<section class="level3" id="adjudicating-spells-in-combat">
+<h4 id="encounters-heading-11">Adjudicating Spells in Combat</h4>
+<ul>
+<li><strong>Free Caster (Spellcraft):</strong> Weave then Cast (2 actions). Push (mark Fatigue) to compress to 1 action. Casting while Engaged worsens Position by one step unless the spell has <code>[TOUCH]</code> or <code>[WARD]</code>.</li>
+<li><strong>Runekeeper (Rites):</strong> Invoke a Rite as 1 action; mark Obligation. Push It (+1 Obligation) for increased effect.</li>
+<li><strong>Invoker (Symbols):</strong> Ritual takes DV+1 rounds. Crack the Seal (instant) marks +2 Obligation (+3 for High Rites); Symbol becomes Compromised.</li>
+<li><strong>Cantor (Songs):</strong> Sing a Song (1 action, resolves at start of next turn). Push to resolve immediately (mark Fatigue + advance Corruption).</li>
+</ul>
+</section>
+<section class="level3" id="traps-and-wards">
+<h4 id="encounters-heading-12">Traps and Wards</h4>
+<ul>
+<li><strong>Discover:</strong> Wits + Insight vs DV 4–5.</li>
+<li><strong>Disable:</strong> Contested roll vs trap's tick. Clean Success = neutralized; Partial = disable but generate SB; Miss = trap activates.</li>
+<li><strong>Activation:</strong> GM spends SB to trigger trap (damage, condition, timer advance).</li>
+<li><strong>Wards:</strong> Magical barriers with a DV (3–6). Crossing without dispelling triggers the effect and ticks any relevant Leash by the ward's DV.</li>
+</ul>
+</section>
+<section class="level3" id="summoning-and-spirits">
+<h4 id="encounters-heading-13">Summoning and Spirits</h4>
+<ul>
+<li><strong>Leash Capacity:</strong> Cap + Spirit segments.</li>
+<li><strong>Ticks:</strong> Spirit takes Harm (1 per Harm level); acts against its nature (1); crosses a ward without dispelling (ticks = ward's DV); split focus (1).</li>
+<li><strong>Leash fills:</strong> Spirit acts once to its nature (potentially hostile) then departs.</li>
+<li><strong>Boon Finesse:</strong> Summoner may spend 1 Boon to clear 1 tick (once per round).</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="extended-rituals-and-downtime-encounters">
+<h3 id="encounters-heading-14">Extended Rituals and Downtime Encounters</h3>
+<p>Use a Progress Timer (4–12 segments). Each segment represents a scene or a block of time. Players describe their approach and roll an appropriate skill; success advances the timer. Complications (GM SB) may add segments, require rare components, or draw unwanted attention.</p>
+</section>
+<section class="level2" id="quick-reference-table">
+<h3 id="encounters-heading-15">Quick Reference Table</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Encounter Type</th><th>DV (Default)</th><th>Typical Skills</th><th>Common Timers</th></tr>
+</thead>
+<tbody>
+<tr><td>Combat</td><td>3 (Controlled)</td><td>Melee, Ranged, Athletics, Sway</td><td>Mob Overwhelm [6], Hazard [4–8]</td></tr>
+<tr><td>Social</td><td>3 (Controlled)</td><td>Sway, Deception, Insight, Sway</td><td>Persuasion [4–8], Opposition [4]</td></tr>
+<tr><td>Environmental</td><td>3–4 (varies)</td><td>Athletics, Endurance, Craft, Stealth</td><td>Collapse [6], Flood [6], Chase [4]</td></tr>
+<tr><td>Magical</td><td>4–6 (specific)</td><td>Arcana, Lore, Spirit+Endurance</td><td>Leash [Spirit+TL], Ritual [6–12]</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="gm-reminders-encounters">
+<h3 id="encounters-heading-16">GM Reminders</h3>
+<ul>
+<li>Let non-specialists contribute — use Setup and Assist actions, and allow creative skill use.</li>
+<li>Spend SB to escalate, not punish. A well-spent SB changes the situation, creating new choices.</li>
+<li>Timers make progress visible. When a timer ticks, describe what changes in the fiction.</li>
+<li>Follow the procedure for Armor &amp; Fatigue: convert, apply remaining Harm (clears existing Fatigue), then add Fatigue. Minimum 1 Fatigue per hit.</li>
+</ul>
+</section>
+</section><section class="level1" id="complications-timers">
+<h2>Complications &amp; Timers</h2>
+<p>Complications are the narrative, mechanical, and environmental consequences that arise from failure, pressure, or the GM spending Story Beats. Timers are the primary tool for tracking accumulating threats or progress.</p>
+<section class="level2" id="complications-timers-story-beats-sb">
+<h3 id="complications-timers-heading-1">Story Beats (SB)</h3>
+<p>Story Beats are the GM's currency for introducing complications. Each die result of 1 generates 1 SB. Re-rolling a 1 does not erase its SB; if the re-rolled die also shows 1, it generates additional SB.</p>
+<section class="level3" id="sb-spend-menu">
+<h4 id="complications-timers-heading-2">SB Spend Menu</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>SB Cost</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge">1</span></td><td>Minor pressure: noise, trace, tick a 4–6 segment timer +1, worsen Position by one step.</td></tr>
+<tr><td><span class="badge">2</span></td><td>Moderate setback: alarm raised, lose cover/advantage, a lesser foe appears, split the party briefly.</td></tr>
+<tr><td><span class="badge">3</span></td><td>Serious trouble: reinforcements arrive, key gear breaks (temporarily), a major twist shifts the scene.</td></tr>
+<tr><td><span class="badge">4+</span></td><td>Scene-shaping turn: a trap springs, authority arrives, the environment changes dramatically, a Patron acts.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="limits-on-sb-per-scene">
+<h4 id="complications-timers-heading-3">Limits on SB per Scene</h4>
+<ul>
+<li>Base SB budget: 4 + highest character Tier (e.g., Tier I = 5, Tier III = 7).</li>
+<li>Maximum 12 SB for standard scenes, 16 SB for climactic scenes.</li>
+<li>Unspent SB may carry over between scenes (GM discretion, max 4).</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="complications-timers-boons-player-resource">
+<h3 id="complications-timers-heading-4">Boons (Player Resource)</h3>
+<p>Boons are the players' resource for mitigating complications or turning the tide. See §3, the Core Mechanic, for how they are earned and spent.</p>
+</section>
+<section class="level2" id="timers">
+<h3 id="complications-timers-heading-5">Timers</h3>
+<p>Timers track accumulating threats or progress. They are a visible way to manage pressure.</p>
+<section class="level3" id="when-to-use-a-timer">
+<h4 id="complications-timers-heading-6">When to Use a Timer</h4>
+<ul>
+<li><strong>Threat Timer</strong> (4–8 segments): Fills with enemy action, environmental decay, or social collapse. When full, a defined disaster occurs.</li>
+<li><strong>Progress Timer</strong> (4–8 segments): Fills with player successes to achieve a goal (e.g., escape, research, negotiation).</li>
+<li><strong>Contest Timers</strong>: Two timers race – first to fill wins.</li>
+</ul>
+</section>
+<section class="level3" id="ticking-timers">
+<h4 id="complications-timers-heading-7">Ticking Timers</h4>
+<p>Timers advance when:</p>
+<ul>
+<li>The GM spends SB (e.g., 1 SB = tick a relevant timer +1).</li>
+<li>A failed roll directly relates to the threat (GM discretion).</li>
+<li>A scene transition or scripted event occurs.</li>
+</ul>
+</section>
+<section class="level3" id="example-timers">
+<h4 id="complications-timers-heading-8">Example Timers</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Timer</th><th>Ticks On</th><th>On Fill</th></tr>
+</thead>
+<tbody>
+<tr><td>Guards Incoming <span class="badge">6</span></td><td>Noise or missed stealth</td><td>A patrol arrives.</td></tr>
+<tr><td>Collapsing Bridge <span class="badge">4</span></td><td>Failed Athletics or heavy impacts</td><td>Bridge falls.</td></tr>
+<tr><td>Patron's Patience <span class="badge">8</span></td><td>Each time Obligation is ignored</td><td>Patron demands service.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+</section>
+<section class="level2" id="hazards">
+<h3 id="complications-timers-heading-9">Hazards</h3>
+<p>Hazards are ongoing complications that require action to avoid or mitigate.</p>
+<section class="level3" id="environmental-hazards">
+<h4 id="complications-timers-heading-10">Environmental Hazards</h4>
+<div class="panel panel-red">
+<ul>
+<li><strong>Active:</strong> Fire spreading, flooding, toxic gas – represented by a Threat Timer that ticks each round or on SB spends.</li>
+<li><strong>Passive:</strong> Difficult terrain, darkness, extreme heat/cold – impose Position penalties or DV modifiers.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="social-hazards">
+<h4 id="complications-timers-heading-11">Social Hazards</h4>
+<div class="panel panel-red">
+<ul>
+<li><strong>Rumors:</strong> A timer that advances when the party fails social rolls; when full, a faction turns hostile.</li>
+<li><strong>Scrutiny:</strong> Worsens Position for stealth or deception.</li>
+<li><strong>Reputation Damage:</strong> Future social rolls start at worse Position.</li>
+</ul>
+</div>
+</section>
+<section class="level3" id="magical-hazards">
+<h4 id="complications-timers-heading-12">Magical Hazards</h4>
+<div class="panel panel-red">
+<ul>
+<li><strong>Backlash Zone:</strong> An area where free casting automatically generates +1 SB per spell.</li>
+<li><strong>Ward / Seal:</strong> Requires a roll to pass; failure triggers a consequence (harm, alarm, etc.).</li>
+<li><strong>Leaking Veil:</strong> Spirits or fey occasionally manifest spontaneously (GM spends SB to introduce).</li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="fear-effects">
+<h3 id="complications-timers-heading-13">Fear Effects</h3>
+<p>When a character escalates on the Fear Track (Shaken → Frightened → Panicked), roll or choose an effect from the table below. Apply to NPCs by default; PCs may adopt as narrative guidance.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>d10</th><th>Effect</th><th>Magic Tags</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Freeze: Cannot act this round, staring or trembling.</td><td>Silence, Stasis</td></tr>
+<tr><td>2</td><td>Flee: Must move at full speed away from the source of Fear.</td><td>Movement, Wind</td></tr>
+<tr><td>3</td><td>Drop: Drops what they are holding.</td><td>Disarm, Break</td></tr>
+<tr><td>4</td><td>Beg: Pleads or bargains incoherently.</td><td>Compulsion, Voice</td></tr>
+<tr><td>5</td><td>Hide: Seeks cover, concealment, or allies.</td><td>Shadow, Illusion</td></tr>
+<tr><td>6</td><td>Attack in Panic: Lashes out wildly at the nearest target.</td><td>Rage, Fire</td></tr>
+<tr><td>7</td><td>Blunder: Stumbles into danger (trap, hazard, off balance).</td><td>Chaos, Trickery</td></tr>
+<tr><td>8</td><td>Obey: Instinctively follows a simple command from the fear-causer.</td><td>Command, Charm</td></tr>
+<tr><td>9</td><td>Break Down: Sobs, prays, or becomes useless until aided.</td><td>Curse, Despair</td></tr>
+<tr><td>10</td><td>Catatonia: Becomes unresponsive, requiring intervention.</td><td>Sleep, Dream</td></tr>
+</tbody>
+</table></div>
+</div>
+<section class="level3" id="fear-track-escalation">
+<h4 id="complications-timers-heading-14">Fear Track Escalation</h4>
+<ul>
+<li><strong>Shaken:</strong> Apply minor effects (hesitation, –1 die, startled).</li>
+<li><strong>Frightened:</strong> Roll normally on the table.</li>
+<li><strong>Panicked:</strong> Apply severe or exaggerated results (e.g., 2 = reckless flight into danger, 6 = attacks allies).</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="deck-of-consequences-optional-preview">
+<h3 id="complications-timers-heading-15">The Deck of Consequences (Optional)</h3>
+<p>The Deck of Consequences is a narrative tool that turns Story Beats into thematic, unpredictable complications. It replaces or supplements GM fiat with randomized twists.</p>
+<section class="level3" id="deck-structure-preview">
+<h4 id="complications-timers-heading-16">Deck Structure</h4>
+<p>Use a standard 52-card deck (jokers optional). Suits map to complication themes:</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Suit</th><th>Theme</th></tr>
+</thead>
+<tbody>
+<tr><td>Hearts</td><td>Social / Emotional</td></tr>
+<tr><td>Spades</td><td>Physical / Harm</td></tr>
+<tr><td>Clubs</td><td>Material / Cost</td></tr>
+<tr><td>Diamonds</td><td>Magical / Spiritual</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="rank-severity-preview">
+<h4 id="complications-timers-heading-17">Rank Severity</h4>
+<ul>
+<li><strong>2–5:</strong> Minor inconvenience (noise, Fatigue 1, small delay).</li>
+<li><strong>6–10:</strong> Moderate setback (alarm raised, gear broken, Position worsened).</li>
+<li><strong>J, Q, K:</strong> Major consequence (reinforcements, key gear destroyed, front timer advanced).</li>
+<li><strong>A:</strong> Severe twist (trap springs, authority arrives, scene shifts).</li>
+</ul>
+</section>
+<section class="level3" id="when-to-draw-preview">
+<h4 id="complications-timers-heading-18">When to Draw</h4>
+<p>The GM may draw from the deck when:</p>
+<ul>
+<li>A roll shows two or more 1s.</li>
+<li>The GM spends 2+ Story Beats at once.</li>
+<li>A major timer fills (scene or campaign timer).</li>
+<li>During travel to generate an unexpected encounter.</li>
+</ul>
+<p class="text-muted text-sm">Aim for 1–2 draws per session; more if the tone skews chaotic.</p>
+</section>
+<section class="level3" id="procedure-preview">
+<h4 id="complications-timers-heading-19">Procedure</h4>
+<ol>
+<li>Note the number of SB spent (or generated).</li>
+<li>Draw a number of cards equal to the SB spent (minimum 1, maximum 3).</li>
+<li>Synthesize a single narrative complication from the combination of suits and the highest rank.</li>
+<li>Do not reshuffle until the deck runs out or the session ends – this creates a natural "fate budget."</li>
+</ol>
+</section>
+<section class="level3" id="shortcut-table-for-synthesis-preview">
+<h4 id="complications-timers-heading-20">Shortcut Table for Synthesis</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Suit</th><th>Low (2–5)</th><th>High (J–A)</th></tr>
+</thead>
+<tbody>
+<tr><td>Hearts</td><td>Awkward social moment</td><td>Betrayal, scandal, broken trust</td></tr>
+<tr><td>Spades</td><td>Bruise, small stumble</td><td>Serious injury, structural collapse</td></tr>
+<tr><td>Clubs</td><td>Minor loss (rations, coins)</td><td>Major asset destroyed, debt called</td></tr>
+<tr><td>Diamonds</td><td>Omen, eerie noise</td><td>Patron demand, reality bends</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+</section>
+<section class="level2" id="integrating-complications-with-sb-and-boons">
+<h3 id="complications-timers-heading-21">Integrating Complications with SB and Boons</h3>
+<ul>
+<li>SB and Boons create a push-pull: SB gives the GM tools to escalate; Boons give players tools to recover or resist.</li>
+<li>A well-spent SB should change the situation, not just punish. Offer the player a Devil's Bargain: <blockquote>"I will spend 2 SB to have the guard turn around – but you will owe a favor."</blockquote></li>
+<li>Timers make threat visible; when a timer ticks, describe what changes in the fiction.</li>
+</ul>
+</section>
+<section class="level2" id="example-complication-in-action">
+<h3 id="complications-timers-heading-22">Example: Complication in Action</h3>
+<div class="panel panel-blue">
+<p>Lyra misses a stealth roll (0 successes) while sneaking past a guard post. She gains 2 Boons. The GM spends 1 SB:</p>
+<blockquote>"Your foot scrapes a loose stone – the guard looks up."</blockquote>
+<p class="text-sm text-muted">(Tick Guards Alert [4] +1.)</p>
+<p>Later, the GM spends another 2 SB:</p>
+<blockquote>"The guard calls for backup – two more arrive. New timer: Reinforcements [6]."</blockquote>
+<p>Lyra uses 1 Boon to re-roll a failed athletics test to climb a wall, escaping just as the timer reaches 4.</p>
+<p>Another scene: Lyra rolls three 1s on a critical casting. The GM draws three cards from the Deck of Consequences: Knave of Hearts, 7 of Clubs, Ace of Spades. Synthesis:</p>
+<blockquote>"You slip past the first guard, but your cloak catches on a rusty nail (resource drain). Worse, the second guard recognizes your face from a wanted poster – she is your cousin (social betrayal). She hesitates, then shouts 'Traitor!' As she draws her blade, a hidden portcullis drops behind you (scene shift). You are trapped in the courtyard."</blockquote>
+</div>
+</section>
+</section><section class="level1" id="npc-templates">
+<h2>NPC Templates</h2>
+<p>This section provides ready-to-use templates for non-player characters, from common guards to supernatural spirits. Each template includes a Threat Level (capability tier), Harm output, typical dice pools, and special abilities. GMs may adjust values up or down by one step to suit the fiction.</p>
+<section class="level2" id="npc-template-format">
+<h3 id="srd-adversary-rating">Rating an Adversary: Threat Level</h3>
+<p>Every adversary in Fate's Edge is rated on <strong>one</strong> axis: <strong>Threat Level (TL)</strong>, an integer from 1 to 10. TL is the whole rating. It sets how hard the thing hits, roughly how big its pools are, and how much punishment it absorbs before the scene turns.</p>
+<p>Three words that look like ratings are <em>not</em> ratings, and never appear on an adversary:</p>
+<ul>
+<li><strong>Tier</strong> means a <em>player character's</em> progression band by XP (Tier I Novice through Tier V Mythic). A creature does not have a Tier.</li>
+<li><strong>Cap</strong> means a <em>Follower's</em> Capability, 1–5, bought at Cap² XP. A creature does not have a Cap. A Follower who fights is rated by Cap because you paid for them; an adversary is rated by TL because you did not.</li>
+<li><strong>Class</strong>, where it appears in older material, is a taxonomy — Class I spirits, Class IV spirits — not a difficulty. It is a name for a kind of thing, not a number.</li>
+</ul>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>TL</th><th>What it is</th><th>Key Attributes</th><th>Harm it deals</th><th>Resilience</th></tr></thead>
+<tbody>
+<tr><td><strong>1</strong></td><td>Rabble — frightened, untrained, dangerous in numbers only</td><td>1–2</td><td>1</td><td>3 (standard)</td></tr>
+<tr><td><strong>2</strong></td><td>Minion — a guard, a thug, a hungry animal</td><td>2</td><td>1–2</td><td>3 (standard)</td></tr>
+<tr><td><strong>3</strong></td><td>Standard — the competent professional; most of what fills a scene</td><td>2–3</td><td>2</td><td>3 (standard)</td></tr>
+<tr><td><strong>4</strong></td><td>Elite — a knight, a trained killer, a greater beast</td><td>3</td><td>2–3</td><td>3 (standard)</td></tr>
+<tr><td><strong>5</strong></td><td>Lieutenant — named, and worth naming</td><td>3–4</td><td>3</td><td>8 (advanced)</td></tr>
+<tr><td><strong>6</strong></td><td>Mini-boss — anchors an encounter by itself</td><td>4</td><td>3–4</td><td>8 (advanced)</td></tr>
+<tr><td><strong>7</strong></td><td>Boss — anchors a session</td><td>4–5</td><td>4–5</td><td>8 per phase, 2 phases</td></tr>
+<tr><td><strong>8</strong></td><td>Greater boss — anchors an arc</td><td>5</td><td>5–6</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>9</strong></td><td>Legendary — anchors a campaign</td><td>5–6</td><td>6–7</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>10</strong></td><td>Avatar or Power — the thing the campaign is <em>about</em></td><td>6+</td><td>8+</td><td>None — a puzzle, not a fight</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="srd-harm-levels-adv">Resilience, not Hit Points</h4>
+<p><strong>An adversary has no Hit Points.</strong> It has <strong>Resilience</strong>: the number of times it can be made to bleed, break, or bend before the fight is over. There are exactly four legal values, and every adversary has one of them:</p>
+<ul>
+<li><strong>3 (standard)</strong> — TL 1–4. Three good hits and it is done.</li>
+<li><strong>8 (advanced)</strong> — TL 5–6. Named things, meant to last.</li>
+<li><strong>8 per phase</strong> — TL 7–9. When a phase's Resilience is exhausted the phase ends and the next begins, with its own pool and its own moves.</li>
+<li><strong>None (puzzle)</strong> — the one override, and it is available at <em>any</em> TL. Use it when the fiction says the thing cannot be killed by hitting it: an Avatar, a demon that must be exorcised, an Echo that must be witnessed, a door that was never opened. It is resolved by a bargain, a true name, a witness, a debt paid — something other than attrition. A TL 2 spirit can be a puzzle; a TL 9 dragon can be a fight. If your adversary has no Resilience, it <em>must</em> have a stated Resolution.</li>
+</ul>
+<p>Apart from that one override, Resilience follows from TL. If you find yourself wanting a TL 3 creature with eight Resilience, you do not want a tougher TL 3 — you want a TL 5, and its attributes and Harm should come up to meet it.</p>
+<p>Note the two senses of the word and keep them apart on the page: <strong>Harm</strong> on a stat line is what the creature <em>deals</em>. <strong>Resilience</strong> is what it <em>absorbs</em>.</p>
+<h4 id="srd-sb-moves">SB Moves</h4>
+<p>An adversary does not take turns. It <strong>costs Story Beats</strong>. Every stat block lists a short menu of things the GM can buy with the SB the players hand over by rolling 1s, and that menu is the creature's entire personality in mechanical form — write the moves that only <em>this</em> thing would make.</p>
+<ul>
+<li><strong>Two to five moves.</strong> A TL 7+ creature may run to seven, because a boss needs options; below that, five is already generous and three is usually better.</li>
+<li><strong>Cost 1 to 3.</strong> One is a jab, two turns the scene, three changes the situation.</li>
+<li><strong>One Signature move</strong> may cost <strong>4 or 5</strong>, and only on a creature of <strong>TL 5 or higher</strong>. This is the thing it is remembered for. A creature gets one; there is no second Signature.</li>
+</ul>
+<h4 id="srd-move-tags">Move Tags</h4>
+<p>A move may be prefixed with a bracketed tag. Tags are a filing convenience, not a rule — nothing keys off them mechanically — but keeping to one vocabulary means a GM scanning a page finds the lever they want. There are two kinds, and they do not mix.</p>
+<p><strong>Function tags</strong> say what the move <em>does</em>, and are the ones worth being consistent about:</p>
+<p class="text-sm"><code>[TIMER]</code> advances or starts a clock • <code>[ENVIRONMENT]</code> changes the ground everyone is standing on • <code>[REINFORCEMENT]</code> brings more • <code>[AMBUSH]</code> arrives from somewhere unaccounted for • <code>[SOCIAL]</code> works on people rather than bodies • <code>[BARGAIN]</code> offers something, which is always worse than it sounds • <code>[HAUNT]</code> presses on the mind • <code>[POSSESSION]</code> takes a body • <code>[ILLUSION]</code> makes them wrong about what is there • <code>[MEMORY]</code> takes or rewrites what happened • <code>[CURSE]</code> leaves something behind • <code>[TRAP]</code> punishes a choice already made • <code>[TACTICS]</code> repositions • <code>[OMEN]</code> tells the truth about what is coming.</p>
+<p><strong>Flavour tags</strong> name the element or medium and are free-form — <code>[FIRE]</code>, <code>[ICE]</code>, <code>[STONE]</code>, <code>[WIND]</code>, <code>[TIDE]</code>, <code>[BLOOD]</code>, <code>[VENOM]</code>, <code>[SHADOW]</code>, <code>[DREAM]</code>, <code>[SONG]</code>, <code>[FEY]</code>, <code>[PRESSURE]</code>. Invent what you need.</p>
+<p class="text-sm text-muted">Not to be confused with the <strong>block icons</strong> some supplements print beside an entry — <code>[W]</code> weakness, <code>[C]</code> timer, <code>[L]</code> lair, <code>[P]</code> phase, <code>[D]</code> drop. Those annotate the <em>entry</em>; these annotate a <em>move</em>.</p>
+<h4 id="srd-stat-defaults">Filling In the Numbers</h4>
+<p>Where a published creature gives no attributes, Harm or Fatigue, read them off its TL band and get on with the scene. The bestiary does exactly this: every entry carries a <strong>key attribute</strong>, <strong>Harm</strong> and <strong>Fatigue</strong> defaulted from its TL, and <strong>Armor: None</strong> unless the fiction says otherwise. They are starting points, not rulings — move any of them the moment the fiction wants it moved. What you may not move without changing the TL is <strong>Resilience</strong>.</p>
+<h4 id="srd-npc-template">Template Format</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Line</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><strong>Name</strong></td><td>What it is, and what part of the world it stands for.</td></tr>
+<tr><td><strong>TL</strong></td><td>1–10, per the table above.</td></tr>
+<tr><td><strong>Attributes</strong></td><td>Body / Wits / Spirit / Presence, and one or two key Skills. Only list what will actually be rolled.</td></tr>
+<tr><td><strong>Harm</strong></td><td>Damage on a successful hit.</td></tr>
+<tr><td><strong>Fatigue</strong></td><td>Which Attribute sets its Fatigue track.</td></tr>
+<tr><td><strong>Resilience</strong></td><td>3, 8, 8 per phase, or None. Mandatory.</td></tr>
+<tr><td><strong>Armor</strong></td><td>None / Light / Medium / Heavy, converting Harm to Fatigue as usual.</td></tr>
+<tr><td><strong>SB Moves</strong></td><td>Two to five things the GM can buy with Story Beats, priced 1–3.</td></tr>
+<tr><td><strong>Timer</strong></td><td>Optional. A named clock of 4, 6, 8 or 10 segments, and what happens when it fills.</td></tr>
+<tr><td><strong>Resolution</strong></td><td>How this ends, if not by Harm. <em>Required</em> when Resilience is None.</td></tr>
+<tr><td><strong>Leash</strong></td><td>Spirits only, when bound by a Summoner: Leash = the binder's Spirit + the spirit's TL, in segments.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3 id="srd-unit-rating">Rating a Military Unit: Capability and Scale</h3>
+<p>Threat Level rates a <em>creature</em>. It does not rate an <em>army</em>, and trying to make it do both is how the war supplements ended up with three incompatible ladders. A body of troops is not a big monster; it is a <strong>Follower</strong> that happens to be several hundred people, and it is rated on two axes that answer two different questions.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Axis</th><th>Question</th><th>Range</th></tr></thead>
+<tbody>
+<tr><td><strong>Capability (Cap)</strong></td><td>How good are they?</td><td>1–5</td></tr>
+<tr><td><strong>Scale</strong></td><td>How many of them are there?</td><td>I–IV</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="srd-unit-cap">Capability — quality</h4>
+<p>Cap is the ordinary Follower Capability rating, applied to a formation — the same <strong>1–5</strong> scale bought at Cap² XP, not a parallel ladder. It behaves exactly as it does for any other Follower: the unit assists at <strong>min(Cap, the relevant Skill)</strong>, and no roll takes more than <strong>+3 dice</strong> from all sources combined. There is no Cap 0: a formation too poor to help is Cap 1 that the GM declines to let assist, which is a fiction call rather than a sixth rung.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Cap</th><th>Troops</th><th>What that means in play</th></tr></thead>
+<tbody>
+<tr><td><strong>1</strong></td><td>Levy</td><td>Armed, not trained. They will break, and they know it.</td></tr>
+<tr><td><strong>2</strong></td><td>Trained</td><td>Militia and town watch. They hold if nothing surprising happens.</td></tr>
+<tr><td><strong>3</strong></td><td>Veteran</td><td>They have done this before and expect to again.</td></tr>
+<tr><td><strong>4</strong></td><td>Elite</td><td>Guard and Chosen. A hold's whole military budget, standing in one place.</td></tr>
+<tr><td><strong>5</strong></td><td>Legend</td><td>Named formations that outlive their commanders.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4 id="srd-unit-scale">Scale — size</h4>
+<p>Scale is <em>only</em> size, and therefore only reach: how much ground a unit covers and how much of the field one order moves. It is never quality — a Scale IV levy is a large bad army, and the two facts are recorded separately because they matter separately.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead><tr><th>Scale</th><th>Formation</th><th>The scene it belongs to</th></tr></thead>
+<tbody>
+<tr><td><strong>I</strong></td><td>Squad or team</td><td>A skirmish. Individual characters still matter most.</td></tr>
+<tr><td><strong>II</strong></td><td>Platoon or company</td><td>A raid. The party commands and also fights.</td></tr>
+<tr><td><strong>III</strong></td><td>Wing or battalion</td><td>A battle. The party commands; fighting personally is a choice with a cost.</td></tr>
+<tr><td><strong>IV</strong></td><td>Host or army</td><td>A campaign. The party decides; someone else swings the swords.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Scale mismatch.</strong> When formations of different Scale meet, the difference changes <strong>Effect</strong>, never the DV and never the dice:</p>
+<ul>
+<li>One step larger: <strong>+1 Effect</strong> on anything that covers ground — volleys, charges, encirclement.</li>
+<li>One step smaller: <strong>−1 Effect</strong>, unless the action is precise rather than broad. A squad cannot rout a host, but it can absolutely kill the host's commander.</li>
+<li>Two or more steps apart: the smaller formation cannot engage the larger head-on at all. It can raid, scout, assassinate, sabotage or delay — and those are the interesting options anyway.</li>
+</ul>
+<div class="panel panel-gold">
+<p><strong>Units still use timers, not hit points.</strong> A formation tracks <strong>Supply</strong> and <strong>Morale</strong> as ordinary named clocks of 4, 6, 8 or 10 segments — Supply starts full and empties through use, Morale starts empty and fills through loss, and a unit whose Morale fills routs. Objectives are clocks too. Nothing about warfare needs a second resolution engine; it needs bigger clocks and someone willing to spend them.</p>
+</div>
+<div class="panel panel-blue">
+<p><strong>Where this is used.</strong> <em>The Art of War</em> and <em>Black Banners</em> are the two supplements that field armies, and both now read Cap and Scale from here rather than defining their own. <em>The Forge of Souls</em> runs its whole campaign layer on the same two axes plus <em>GM Guide Appendix B</em>. If you are rating a single creature, however large, you want <strong>Threat Level</strong> above, not Scale — a dragon is TL 9, not an army of one.</p>
+</div>
+<h3>Humanoid NPCs</h3>
+<div class="grid-2">
+<section class="level3" id="bandit">
+<h4>Bandit</h4>
+<div class="panel panel-red">
+<p><span class="badge">TL 2</span></p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<p><strong>Dice:</strong> Melee 2d (Body 2 + Melee 0), Ranged 2d (Wits 2 + Ranged 0)</p>
+<p><strong>Harm:</strong> 1 (club or short sword)</p>
+<p><strong>Armor:</strong> None (leather scraps, no conversion)</p>
+<p><strong>Special:</strong> Cowardly — when outnumbered or after taking Harm, must test Spirit (DV 3) or flee.</p>
+</div>
+</section>
+<section class="level3" id="guard">
+<h4>Guard</h4>
+<div class="panel panel-red">
+<p><span class="badge">TL 3</span></p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<p><strong>Dice:</strong> Melee 4d (Body 3 + Melee 1), Athletics 4d (Body 3 + Athletics 1)</p>
+<p><strong>Harm:</strong> 2 (spear or short sword)</p>
+<p><strong>Armor:</strong> Light (leather) — Harm 1 → Fatigue 1.</p>
+<p><strong>Special:</strong> Patrol Training — +1 die to Wits + Insight when searching an area.</p>
+</div>
+</section>
+<section class="level3" id="knight">
+<h4>Knight</h4>
+<div class="panel panel-red">
+<p><span class="badge">TL 5</span></p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
+<p><strong>Dice:</strong> Melee 6d (Body 3 + Melee 3), Sway 5d (Presence 3 + Sway 2)</p>
+<p><strong>Armor:</strong> Heavy (plate) — Harm 3 → Fatigue 2.</p>
+<p><strong>Special:</strong> Challenge — once per scene, force an enemy to engage in melee (Resist with Spirit, DV 4). Mounted — +2 dice when charging from Far to Near.</p>
+</div>
+</section>
+<section class="level3" id="cultist">
+<h4>Cultist</h4>
+<div class="panel panel-purple">
+<p><span class="badge">TL 2–3</span></p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<p><strong>Dice:</strong> Arcana 4d (Wits 3 + Arcana 1), Deception 4d (Presence 3 + Deception 1)</p>
+<p><strong>Armor:</strong> None (robes).</p>
+<p><strong>Special:</strong> Ritual Chant — when three or more cultists act together, they may perform a Low Rite as a group action (roll once with +2 dice). Fanatic — immune to fear effects from their Patron’s domain.</p>
+</div>
+</section>
+<section class="level3" id="bandit-leader">
+<h4>Bandit Leader</h4>
+<div class="panel panel-red">
+<p><span class="badge">TL 5</span></p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
+<p><strong>Dice:</strong> Melee 6d (Body 3 + Melee 3), Sway 5d (Presence 3 + Sway 2)</p>
+<p><strong>Armor:</strong> Medium (chain) — Harm 2 → Fatigue 1.</p>
+<p><strong>Special:</strong> Rally — once per scene, restore 1 Morale to a nearby bandit. Dirty Fighting — the GM may spend 1 SB to impose −1 die on an enemy’s next defense.</p>
+</div>
+</section>
+</div>
+</section>
+<section class="level2" id="supernatural-npcs">
+<h3>Supernatural NPCs</h3>
+<div class="grid-2">
+<section class="level3" id="lesser-spirit">
+<h4>Lesser Spirit <span class="text-muted text-sm">(e.g., Shade, Emberling)</span></h4>
+<div class="panel panel-purple">
+<p><span class="badge">TL 2</span></p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<p><strong>Dice:</strong> Stealth 5d (Wits 3 + Stealth 2), Arcana 4d (Spirit 3 + Arcana 1)</p>
+<p><strong>Armor:</strong> None (incorporeal — half physical Harm, rounded down)</p>
+<p><strong>Leash:</strong> your Spirit + 2 (the spirit's TL).</p>
+<p><strong>Special:</strong> Incorporeal Movement — passes through small gaps and obstacles. Sunlight Sensitivity — while in direct sunlight, all actions are Desperate.</p>
+</div>
+</section>
+<section class="level3" id="greater-spirit">
+<h4>Greater Spirit <span class="text-muted text-sm">(e.g., Flame Elemental, Stone Guardian)</span></h4>
+<div class="panel panel-purple">
+<p><span class="badge">TL 5</span></p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
+<p><strong>Dice:</strong> 7d in primary domain (e.g., Body + Melee for Guardian, Spirit + Arcana for Elemental)</p>
+<p><strong>Armor:</strong> Stone Guardian — Heavy (Harm 3 → Fatigue 2); Flame Elemental — Light (Harm 1 → Fatigue 1) + immunity to fire.</p>
+<p><strong>Leash:</strong> your Spirit + 5 (the spirit's TL).</p>
+<p><strong>Special:</strong> Elemental Aura — creatures in Close range suffer 1 Fatigue per round. Immutable — cannot be poisoned or diseased.</p>
+</div>
+</section>
+<section class="level3" id="wraith">
+<h4>Wraith</h4>
+<div class="panel panel-purple">
+<p><span class="badge">TL 3–5</span></p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
+<p><strong>Dice:</strong> Stealth 6d (Wits 3 + Stealth 3), Spirit + Endurance 6d (Spirit 3 + Endurance 3)</p>
+<p><strong>Armor:</strong> None (incorporeal — half physical Harm).</p>
+<p><strong>Special:</strong> Life Drain — on a successful touch attack, the target marks 1 Fatigue and the wraith clears 1 Fatigue.</p>
+</div>
+</section>
+</div>
+</section>
+<section class="level2" id="animal-npcs">
+<h3>Animal NPCs</h3>
+<div class="grid-2">
+<section class="level3" id="wolf">
+<h4>Wolf</h4>
+<div class="panel panel-green">
+<p><span class="badge">TL 2–3</span></p>
+<p><strong>Resilience:</strong> 3 (standard)</p>
+<p><strong>Dice:</strong> Melee 5d (Body 3 + Melee 2), Athletics 5d (Body 3 + Athletics 2)</p>
+<p><strong>Armor:</strong> None (hide).</p>
+<p><strong>Special:</strong> Pack Tactics — when two or more wolves attack the same target, each gains +1 die. Blood Scent — +2 dice to track wounded prey.</p>
+</div>
+</section>
+<section class="level3" id="dire-bear">
+<h4>Dire Bear</h4>
+<div class="panel panel-green">
+<p><span class="badge">TL 6</span></p>
+<p><strong>Resilience:</strong> 8 (advanced)</p>
+<p><strong>Dice:</strong> Melee 8d (Body 4 + Melee 4), Endurance 8d (Body 4 + Endurance 4)</p>
+<p><strong>Armor:</strong> Medium (thick hide) — Harm 2 → Fatigue 1.</p>
+<p><strong>Special:</strong> Terrifying Roar — all creatures in Near range must test Spirit + Endurance (DV 4) or become Shaken. Maul — the GM may spend 2 SB after a successful attack to knock the target prone; the target must spend an action to stand.</p>
+</div>
+</section>
+</div>
+</section>
+<section class="level2" id="building-custom-npcs">
+<h3>Building Custom NPCs</h3>
+<p>Use these guidelines to create your own NPCs quickly.</p>
+<section class="level3" id="step-1-choose-cap">
+<h4>Step 1: Choose Threat Level</h4>
+<p>TL sets how much the thing can take, how hard it hits, and how big its pools are.</p>
+<ul>
+<li>TL 1–3: rabble, guards, minor spirits. Dice pools 3–5; three Resilience.</li>
+<li>TL 4–6: elites, knights, greater spirits. Dice pools 6–8; three Resilience to TL 4, eight from TL 5.</li>
+<li>TL 7–10: bosses and powers. Dice pools 9–10; phased Resilience, or none at all.</li>
+</ul>
+</section>
+<section class="level3" id="step-2-set-harm-output">
+<h4>Step 2: Set Harm Output</h4>
+<ul>
+<li>Light weapon or minor attack: Harm 1–2.</li>
+<li>Standard weapon or magical strike: Harm 2–3.</li>
+<li>Heavy weapon or powerful magic: Harm 3–4.</li>
+</ul>
+</section>
+<section class="level3" id="step-3-assign-armor">
+<h4>Step 3: Assign Armor</h4>
+<ul>
+<li>None: No conversion.</li>
+<li>Light: Harm 1 → Fatigue 1.</li>
+<li>Medium: Harm 2 → Fatigue 1.</li>
+<li>Heavy: Harm 3 → Fatigue 2.</li>
+</ul>
+</section>
+<section class="level3" id="step-4-add-special-abilities">
+<h4>Step 4: Add 1–2 Special Abilities</h4>
+<p>Examples: Charge, Poison, Fear Aura, Regeneration, Spellcasting (Low Rite).</p>
+</section>
+<section class="level3" id="step-5-set-leash">
+<h4>Step 5: Set Leash (spirits only)</h4>
+<p>Leash = your Spirit + the spirit's TL, in segments.</p>
+</section>
+</section>
+<section class="level2" id="npc-quick-reference-table">
+<h3>NPC Quick Reference Table</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>NPC</th><th>TL</th><th>Harm</th><th>Armor</th><th>Special</th></tr>
+</thead>
+<tbody>
+<tr><td>Bandit</td><td>1</td><td>1</td><td>None</td><td>Cowardly</td></tr>
+<tr><td>Guard</td><td>2</td><td>2</td><td>Light</td><td>Patrol Training</td></tr>
+<tr><td>Knight</td><td>3</td><td>3</td><td>Heavy</td><td>Challenge, Mounted</td></tr>
+<tr><td>Cultist</td><td>1–2</td><td>1</td><td>None</td><td>Ritual Chant, Fanatic</td></tr>
+<tr><td>Lesser Spirit</td><td>1</td><td>1</td><td>None (incorporeal)</td><td>Sunlight Sensitivity</td></tr>
+<tr><td>Greater Spirit</td><td>3</td><td>3</td><td>Heavy (or Light + immunity)</td><td>Elemental Aura</td></tr>
+<tr><td>Wraith</td><td>2–3</td><td>2 + Fatigue</td><td>None (incorporeal)</td><td>Life Drain</td></tr>
+<tr><td>Wolf</td><td>1–2</td><td>2</td><td>None</td><td>Pack Tactics</td></tr>
+<tr><td>Dire Bear</td><td>4</td><td>4</td><td>Medium</td><td>Terrifying Roar, Maul</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+</section></div><p>Continue: <a href="talents.html">Talent reference</a></p></main></body></html>

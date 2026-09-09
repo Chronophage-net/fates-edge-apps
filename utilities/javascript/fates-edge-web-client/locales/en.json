@@ -2692,7 +2692,8 @@
     "wiki.tags": "🏷️ Tags",
     "wiki.talents": "🧠 Talents",
     "wiki.valueAlreadyCloned": "\"{{value0}}\" already cloned.",
-    "wiki.wiki": "📖 Wiki"
+    "wiki.wiki": "📖 Wiki",
+    "docs.readingGuide": "🧭 Reading guide — where to start"
   },
   "paperImport": {
     "title": "Import from Paper",

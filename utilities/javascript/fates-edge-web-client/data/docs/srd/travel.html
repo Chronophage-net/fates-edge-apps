@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Travel framework</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Travel framework</h1><p>Use this reference when a journey needs the travel framework. It brings the roles, legs, supply, and travel timers together on one page. Follow the framework’s own instructions about when and how it applies.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="travel-framework">
+<h2>Travel Framework</h2>
+<p>Journeys are more than distance; they are sequences of pressure, discovery, and consequence. The travel framework turns long roads into a series of dramatic legs without micromanaging miles.</p>
+<section class="level2" id="legs-and-travel-timers">
+<h3 id="travel-framework-heading-1">Legs and Travel Timers</h3>
+<ul>
+<li>Break a long journey into legs, each representing a significant change in terrain, danger, or political region.</li>
+<li>Each leg uses a Travel Timer (default size 4 segments).</li>
+<li>The timer advances through progress actions, encounters, or scene resolution.</li>
+<li>When the timer fills, the party arrives at the destination (or the next region). Unresolved complications carry forward.</li>
+</ul>
+</section>
+<section class="level2" id="roles-on-the-road">
+<h3 id="travel-framework-heading-2">Roles on the Road</h3>
+<p>Assign one role per character each leg. Roles may rotate each leg.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Role</th><th>Key Test</th><th>Benefit on Success</th></tr>
+</thead>
+<tbody>
+<tr><td>Guide</td><td>Wits + Lore</td><td>Tick the Travel Timer +1.</td></tr>
+<tr><td>Scout</td><td>Wits + Stealth</td><td>Party cannot be surprised on the first encounter of the leg.</td></tr>
+<tr><td>Quartermaster</td><td>Wits + Craft</td><td>Prevent one Supply drop or recover 1 spent Supply.</td></tr>
+<tr><td>Watch</td><td>Presence + Insight</td><td>Party gains +1 Position on the first defense roll of any ambush.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Each role action requires a roll (Attribute + appropriate skill, DV set by the GM). Failure may tick the Travel Timer backwards or introduce a complication.</p>
+</section>
+<section class="level2" id="travel-encounters-and-events">
+<h3 id="travel-framework-heading-3">Encounters and Events</h3>
+<p>Every 1–2 segments filled, the GM introduces an encounter or hazard. At minimum, each leg should include one meaningful encounter.</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Type</th><th>Examples</th><th>Typical Resolution</th></tr>
+</thead>
+<tbody>
+<tr><td>Discovery</td><td>Ruins, strange omens, hidden sites</td><td>Insight or exploration roll.</td></tr>
+<tr><td>Hazard</td><td>Terrain challenge, illness, extreme weather</td><td>Survival or Endurance test; may use a hazard timer.</td></tr>
+<tr><td>Encounter</td><td>Bandits, emissaries, beasts, rival travelers</td><td>Combat or social resolution.</td></tr>
+<tr><td>Complication</td><td>Bond tested, supplies strained, pursuit gains ground</td><td>Roleplay or skill challenge.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Encounters use the standard resolution loop (Position, DV, Outcome). On a failed travel roll, the GM may spend SB to introduce an encounter immediately.</p>
+</section>
+<section class="level2" id="supply-and-depletion">
+<h3 id="travel-framework-heading-4">Supply and Depletion</h3>
+<p>Track shared party supplies with a Supply Timer <code>[4]</code>.</p>
+<ul>
+<li>Tick the timer when the Quartermaster fails a roll, when the GM spends SB on scarcity, or when the party is forced to march without resupply.</li>
+<li>When the timer fills, the party runs out of a critical resource (food, water, fuel). Apply a Condition (Hungry, Thirsty, etc.) or mark 1 Fatigue per character.</li>
+<li>Resupply at settlements, through successful foraging, or by spending a Cache token (see Asset rules).</li>
+</ul>
+</section>
+<section class="level2" id="regional-travel-decks">
+<h3 id="travel-framework-heading-5">Optional: Regional Travel Decks</h3>
+<p>If using the optional Regional Decks, draw a card from the destination's deck when the Travel Timer ticks. Suits suggest the nature of the encounter:</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Suit</th><th>Theme</th></tr>
+</thead>
+<tbody>
+<tr><td>Spades</td><td>Place – a landmark, ruin, or terrain feature.</td></tr>
+<tr><td>Hearts</td><td>Actor – a traveler, patrol, or local guide.</td></tr>
+<tr><td>Clubs</td><td>Pressure – weather, injury, resource loss.</td></tr>
+<tr><td>Diamonds</td><td>Leverage – a shortcut, a cache, or a friendly face.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>The highest rank may set the Travel Timer size (e.g., 4 for 2–5, 6 for 6–10, 8 for Jack–King, 10 for Ace).</p>
+</section>
+<section class="level2" id="weather-and-terrain-modifiers">
+<h3 id="travel-framework-heading-6">Weather and Terrain Modifiers</h3>
+<p>The GM may apply modifiers based on conditions:</p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Condition</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Difficult Terrain</td><td>Movement costs double; Charge/Skirmish require open ground</td></tr>
+<tr><td>Extreme Weather (rain, snow, heat)</td><td>First travel roll each leg is Desperate.</td></tr>
+<tr><td>Hazardous Weather (storm, blizzard, sandstorm)</td><td>Travel Timer ticks +1 at leg start; navigation DV +1.</td></tr>
+<tr><td>Favorable Weather</td><td>First travel roll each leg gains +1 Position.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="foraging-and-subsistence">
+<h3 id="travel-framework-heading-7">Foraging and Subsistence</h3>
+<p>A character may forage during a leg instead of taking a role action. Roll Wits + Lore (DV by terrain, typical 3–4).</p>
+<ul>
+<li><strong>Clean Success:</strong> Gain 1 Supply.</li>
+<li><strong>Partial:</strong> Gain 1 Supply but mark 1 Fatigue (time or exposure).</li>
+<li><strong>Miss:</strong> No Supply; GM gains 1 SB (scarce resources, dangerous plant, predator sign).</li>
+</ul>
+</section>
+<section class="level2" id="gm-quick-cues-travel">
+<h3 id="travel-framework-heading-8">GM Quick Cues</h3>
+<ul>
+<li>Travel should advance story stakes, not pause them. Use legs to foreshadow threats, deepen bonds, or reveal Patron omens.</li>
+<li>Let players showcase talents in their chosen roles.</li>
+<li>Mix discovery and hardship to keep legs tense but rewarding.</li>
+<li>A failed travel roll should never result in "nothing happens." Use SB to introduce an encounter or tick a hazard timer.</li>
+</ul>
+</section>
+</section></div><p>Continue: <a href="optional-tools.html">Optional campaign tools</a></p></main></body></html>

@@ -1,7 +1,106 @@
 {
   "version": "1.0",
-  "generated": "2026-09-08T23:36:09.589Z",
+  "generated": "2026-09-09T14:50:17.078Z",
   "documents": [
+    {
+      "id": "srd",
+      "title": "Fate’s Edge SRD",
+      "subtitle": "Core rules and linked references",
+      "file": "index.html",
+      "path": "/data/docs/srd/",
+      "category": "core",
+      "categoryLabel": "Core",
+      "core": true,
+      "active": true,
+      "book": true,
+      "pages": [
+        {
+          "file": "index.html",
+          "label": "Start here",
+          "title": "Start here: the core mechanic"
+        },
+        {
+          "file": "characters.html",
+          "label": "Reference",
+          "title": "Character creation and advancement"
+        },
+        {
+          "file": "combat.html",
+          "label": "Reference",
+          "title": "Equipment, combat, and recovery"
+        },
+        {
+          "file": "running-the-game.html",
+          "label": "Reference",
+          "title": "Running the game"
+        },
+        {
+          "file": "talents.html",
+          "label": "Reference",
+          "title": "Talent reference"
+        },
+        {
+          "file": "magic.html",
+          "label": "Reference",
+          "title": "Magic: choosing and using a path"
+        },
+        {
+          "file": "tags.html",
+          "label": "Reference",
+          "title": "Magic tags and effects"
+        },
+        {
+          "file": "rites-and-summoning.html",
+          "label": "Reference",
+          "title": "Rites, invokers, and summoning"
+        },
+        {
+          "file": "crafting.html",
+          "label": "Reference",
+          "title": "Crafting: projects and upkeep"
+        },
+        {
+          "file": "followers-and-assets.html",
+          "label": "Reference",
+          "title": "Followers and assets"
+        },
+        {
+          "file": "travel.html",
+          "label": "Reference",
+          "title": "Travel framework"
+        },
+        {
+          "file": "optional-tools.html",
+          "label": "Reference",
+          "title": "Optional campaign tools"
+        },
+        {
+          "file": "quick-reference.html",
+          "label": "Reference",
+          "title": "Tables for use during play"
+        },
+        {
+          "file": "examples.html",
+          "label": "Reference",
+          "title": "Example spells and characters"
+        },
+        {
+          "file": "legacy-references.html",
+          "label": "Appendix",
+          "title": "Earlier section numbers"
+        },
+        {
+          "file": "license.html",
+          "label": "Appendix",
+          "title": "License and publication notices"
+        },
+        {
+          "file": "complete.html",
+          "label": "Appendix",
+          "title": "Complete reference"
+        }
+      ]
+    },
     {
       "id": "gm_guide",
       "title": "GM Guide",
@@ -722,6 +821,16 @@
       "active": true
     },
     {
+      "id": "reading_guide",
+      "title": "Reading Guide",
+      "file": "Reading-Guide.html",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "saikou-compendium",
       "title": "Saikou Ira's Compendium of the Veil",
       "subtitle": "An investigation into the unquiet dead, the cursed, and the hungry",
@@ -906,6 +1015,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_complete_guide_to_monks",
+      "title": "The Complete Guide To Monks",
+      "file": "Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Monks.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
       "core": false,
       "active": true
     },
@@ -1363,7 +1482,7 @@
       "active": true
     }
   ],
-  "total_count": 86,
-  "active_count": 86,
+  "total_count": 89,
+  "active_count": 89,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

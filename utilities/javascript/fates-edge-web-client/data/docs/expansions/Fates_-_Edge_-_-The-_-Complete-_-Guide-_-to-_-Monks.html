@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Unstruck Bell — A Monk's Guide to the Still Point</title>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Unstruck Bell — A Monk's Guide to the Still Point</title>
+<style>
         /* ─── resets & base ─── */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -200,506 +201,458 @@
             .monk .toc { flex-direction: column; gap: 0.2rem; }
         }
     </style>
-</head>
-<body>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Expansions · specialist reference</strong></p><p>Read the core rules first, then this document’s scope, prerequisites, and procedures. Apply only changes it explicitly states; a missing restatement is not a general exception. The SRD and extensions in the Player’s and GM Guides remain the core reference, and the core loop still applies.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">🔔 The Unstruck Bell</a></li><li><a href="#reading-route">How to use this book</a></li><li><a href="#philosophy">The Philosophy of the Still Point</a></li><li><a href="#talents">Monk Talents: The Unstruck Path</a></li><li><a href="#traditions">Monastic Traditions</a></li><li><a href="#psionic">The Psionic Monk — The Silent Mind</a></li><li><a href="#monastery">The Three-Temples Monastery</a></li><li><a href="#hooks">Adventure Hooks &amp; Rumors</a></li><li><a href="#sample">The Debt of the Sleeping Master — Sample Adventure</a></li></ul></details>
 <div class="monk">
-
-    <!-- ═══ TITLE ═══ -->
-    <h1>🔔 The Unstruck Bell</h1>
-    <p class="lede">
-        <span class="badge badge-gold">Monk</span>
-        <span class="badge badge-teal">Expansion</span>
-        <span class="badge badge-purple">The Still Point</span>
-        <span class="badge badge-blue">Unstruck Path</span>
-    </p>
-    <p class="lede"><em>A Monk’s Guide to the Still Point and the Open Hand</em><br />
+<!-- ═══ TITLE ═══ -->
+<h1 id="reader-section-1">🔔 The Unstruck Bell</h1><section aria-labelledby="reading-route" data-fe-reader-added="reading-route"><h2 id="reading-route">How to use this book</h2><p>This book combines Brother Tarn’s account of monastic life, character options, and GM material. The opening voice introduces the tradition; the mechanical entries state what a character can actually do.</p><ul><li><strong>Build a monk:</strong> read <a href="#philosophy">The Philosophy of the Still Point</a>, then <a href="#talents">Monk Talents</a> and <a href="#traditions">Monastic Traditions</a>. Keep each entry’s cost, frequency, and consequences beside its benefit.</li><li><strong>Combine paths:</strong> use <a href="#psionic">The Psionic Monk</a> alongside the <a href="Fates_-_Edge_-_-Psionics.html">Psionics expansion</a>, including that book’s Mental Strain and Art costs.</li><li><strong>Prepare a session:</strong> the <a href="#monastery">Three-Temples Monastery</a>, <a href="#hooks">Adventure Hooks &amp; Rumors</a>, and <a href="#sample">sample adventure</a> are GM preparation material and can reveal secrets.</li></ul><p><strong>Changes to keep visible:</strong> the meditation procedure, named Monk Talents, traditions, and psionic combinations are the additions described here. Read an explicit automatic effect or exception only within its own trigger, cost, and frequency; the surrounding fictional voice does not grant further exceptions.</p></section>
+<p class="lede">
+<span class="badge badge-gold">Monk</span>
+<span class="badge badge-teal">Expansion</span>
+<span class="badge badge-purple">The Still Point</span>
+<span class="badge badge-blue">Unstruck Path</span>
+</p>
+<p class="lede"><em>A Monk’s Guide to the Still Point and the Open Hand</em><br/>
     Three-Temples Monastery, Year of the Falling Bridge</p>
-
-    <div class="panel panel-gold">
-        <strong>Preface — Brother Tarn</strong>
-        <p>I was sixteen when I first struck a man. A tax collector from Kahfagia, fat with silver and arrogance. He never saw my palm close on his throat. I watched him crumple while his guards shouted at shadows. The Abbot made me scrub the courtyard stones for a month. Not because I had sinned, but because I had acted before I had thought.</p>
-        <p>They never caught me. Not because I was strong—I was not, not yet. Because I was still. A boy who learned that the greatest strength is not in the clenched fist but in the open hand. That is the first lesson of the monk: power is not in the strike. It is in the pause before the strike.</p>
-        <p>Twenty years later, I have broken twelve men with my bare hands and healed twice that many. The Abbot trusts me to teach the Way of the Open Palm. The Temple Council owes me three favors. And the Silkstrand thugs avoid the alley behind the Three-Temples Monastery because they know the sound of my sandals on wet stone.</p>
-        <p>I am Brother Tarn. They call me the Unstruck Bell because I have never taken a blow I did not choose.</p>
-        <p>This book is not for warriors. It is for those who understand that the world runs on breath, on balance, and on the careful stillness between action and consequence. I learned from the stone floors of the monastery. I learned from Grandmaster Ashara, who sleeps beneath the old oak, and from Sister Mira, who can stop a drawn sword with a single word. I learned that a breath can unmake a fortress, that a single finger can redirect a river, and that the strongest stance is the one that looks like rest.</p>
-        <p>You want to be a monk? Good. But first, forget everything you think you know about strength. The enemy is not the opponent. The enemy is the tension in your own shoulder.</p>
-        <p>The blow that never lands is the one you did not need to throw.</p>
-        <p style="margin-top:0.4rem;"><em>Brother Tarn<br />Three-Temples Monastery, Year of the Falling Bridge<br />The ink is lamp-black and my blood. The mirror is still.</em></p>
-    </div>
-
-    <!-- ═══ TOC ═══ -->
-    <div class="toc">
-        <strong>📑 Contents</strong>
-        <a href="#philosophy">The Philosophy of the Still Point</a>
-        <a href="#talents">Monk Talents</a>
-        <a href="#traditions">Monastic Traditions</a>
-        <a href="#psionic">The Psionic Monk</a>
-        <a href="#monastery">The Three-Temples Monastery</a>
-        <a href="#hooks">Adventure Hooks &amp; Rumors</a>
-        <a href="#sample">The Debt of the Sleeping Master</a>
-    </div>
-
-    <!-- ═══ PHILOSOPHY ═══ -->
-    <h2 id="philosophy">The Philosophy of the Still Point</h2>
-
-    <h3>On Stillness</h3>
-    <p>The first time you face a drawn blade, you will be afraid. Good. Fear keeps your breath short and your eyes wide. The moment you feel safe, you have already been struck.</p>
-    <p>A monk is not a soldier. We do not meet force with force. We redirect. Through a guard’s reach, through a gap in the formation, through the space between the blow and its target. The world is full of openings—the fist that overextends, the breath that comes too fast, the weight that shifts one inch too far.</p>
-
-    <div class="panel panel-silver">
-        <strong>Rules compatibility</strong>
-        <p class="text-muted">The core rules comprise the SRD plus the extensions in the Player’s Guide and GM Guide. This expansion applies only its stated additions and exceptions. Keep the core loop: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, resolve the outcome, and apply consequences.</p>
-        <p class="text-muted">Adds Monk Talents and the disciplines that chain them. Anything it introduces is an addition to the core loop, not a replacement for it: a named track or timer here is its own measure and never stands in for Fatigue, Harm or the Outcome Matrix, and no option waives the roll, the Story Beats it generates, or the stated cost unless it says so explicitly.</p>
-    </div>
-
-    <h3>The Three Principles of the Unstruck Bell</h3>
-
-    <div class="grid-2">
-        <div class="panel panel-gold">
-            <strong>The Coin That Does Not Move</strong>
-            <p class="text-muted">Never resist what cannot be stopped. A blade from a trained swordsman? He will strike where he expects resistance. When he finds none, he will stumble. A shove from a larger foe? He expects you to brace. When you yield, his own force becomes his downfall.</p>
-            <p class="text-muted">Redirect what you cannot stop. There is no shame in moving with the storm.</p>
-        </div>
-        <div class="panel panel-silver">
-            <strong>The Witness Who Breathes</strong>
-            <p class="text-muted">Every fight is witnessed. The trick is not to be invisible—it is to be unremarkable. A monk standing still in a courtyard. A beggar sleeping in a doorway. A servant carrying water. The guards see you. They simply do not register you as a threat.</p>
-            <p class="text-muted">Stillness is the greatest disguise.</p>
-        </div>
-        <div class="panel panel-red" style="grid-column: 1 / -1;">
-            <strong>The Debt That Is Never Incurred</strong>
-            <p class="text-muted">When you do not strike, you create no debt. Not yours, not theirs. They owe you nothing but the breath they wasted trying to hit you. A true monk does not seek victory. Victory is a chain. The open hand offers nothing, and so nothing can be taken from it.</p>
-        </div>
-    </div>
-
-    <h3>On Breath</h3>
-    <p>Before the fist comes the breath. Before the breath comes the stillness. A drowning man does not need a stronger kick; he needs to remember that the surface is only a few inches above his head.</p>
-
-    <h4>The Four Breaths</h4>
-    <dl style="margin:0.4rem 0 0.4rem 1.2rem; color:var(--grey);">
-        <dt style="color:var(--gold); font-weight:600;">The Entering Breath</dt>
-        <dd style="margin-bottom:0.4rem;">The inhale that takes in the world—its noise, its threat, its opportunity. Without this breath, you cannot see what is coming.</dd>
-        <dt style="color:var(--gold); font-weight:600;">The Holding Breath</dt>
-        <dd style="margin-bottom:0.4rem;">The pause between. This is where decisions are made. A long holding breath is patience; a short one is a trap.</dd>
-        <dt style="color:var(--gold); font-weight:600;">The Releasing Breath</dt>
-        <dd style="margin-bottom:0.4rem;">The exhale that becomes action. A punch is a breath released. A word is a breath released. A step is a breath released.</dd>
-        <dt style="color:var(--gold); font-weight:600;">The Empty Breath</dt>
-        <dd>The space after the exhale, before the next inhale. This is where monks live. The enemy expects you to inhale, to prepare, to telegraph. When you learn to act from the empty breath, you become invisible to their predictions.</dd>
-    </dl>
-
-    <h3>The Meditation Mini-Game</h3>
-    <p>To find the still point, you need three things:</p>
-    <ol style="color:var(--grey);">
-        <li><strong>Stillness</strong> — A quiet place where you will not be disturbed. (A crowded tavern can work, but the DV increases.)</li>
-        <li><strong>Time</strong> — At least ten minutes of uninterrupted meditation.</li>
-        <li><strong>Intent</strong> — A clear purpose for your meditation (healing, focus, clarity).</li>
-    </ol>
-
-    <div class="panel panel-purple">
-        <strong>The Four Breaths of Meditation</strong>
-        <p><strong>Step 1: Settle the Body</strong> (Wits + Craft, DV 2)<br />
-        Find a comfortable position and release physical tension. On a hit, gain +1 die to the Meditation roll. On a miss, you are distracted by an ache or itch—start with -1 die.</p>
-        <p><strong>Step 2: Settle the Breath</strong> (Spirit + Meditation skill, DV 3)<br />
-        Count your breaths. Each exhalation is a number. When you reach ten, begin again. On a hit, you enter a light meditative state. On a partial, your mind wanders—you may continue but the GM gains 1 Story Beat.</p>
-        <p><strong>Step 3: The Still Point</strong> (Spirit + Endurance, DV 4 for healing, DV 3 for clarity, DV 5 for transcendence)<br />
-        Roll to reach the deepest state. On a hit, you achieve your intent. On a partial, you achieve it but emerge drained (mark 1 Fatigue). On a miss, you fall asleep or become lost in thought; the GM gains 2 Story Beats.</p>
-        <p><strong>Step 4: Return</strong> (No roll, narrative)<br />
-        You open your eyes. The world is the same. You are not.</p>
-    </div>
-
-    <h4>Meditation Benefits</h4>
-    <ul style="color:var(--grey);">
-        <li><strong>Healing Meditation:</strong> Clear 1 Fatigue and, if you have a minor Condition (Fear, Shaken, Guilty), test Spirit+Endurance (DV 3) to remove it.</li>
-        <li><strong>Clarity Meditation:</strong> Gain +1 die to your next Wits-based roll.</li>
-        <li><strong>Transcendent Meditation:</strong> Once per session, reroll any single failed roll. The GM gains 1 Story Beat.</li>
-    </ul>
-
-    <!-- ═══ TALENTS ═══ -->
-    <h2 id="talents">Monk Talents: The Unstruck Path</h2>
-    <p class="lede">Foundations of the Still Point — suited for those who walk the edge of stillness and action. Not for brawlers or berserkers. For the patient, the balanced, and the breathless.</p>
-
-    <h3>2 XP Talents — Foundations</h3>
-    <table class="trait-table">
-        <tr><th class="trait-name">Talent</th><th>Effect</th></tr>
-        <tr>
-            <td class="trait-name">The Open Hand</td>
-            <td><em>Tags: Strike, BOD, Flow</em><br />Once per scene, when you attempt to parry, deflect, or disarm an opponent, treat your first Body or Melee roll as Position +1. The blow that never lands is the one you did not need to block.</td>
-        </tr>
-        <tr>
-            <td class="trait-name">Still Point Stance</td>
-            <td><em>Tags: Move, SPT, Flow</em><br />You understand the geometry of stillness. When you do not move during your turn, gain +1 die to your next defense roll. This benefit lasts until you move or take an aggressive action. The mountain does not chase the wind. The wind breaks against the mountain.</td>
-        </tr>
-        <tr>
-            <td class="trait-name">Monk's Breath</td>
-            <td><em>Tags: Heal, SPT, Restoration</em><br />You have learned to control your breath and heart rate. Once per session, you may clear 1 Fatigue by meditating for one minute uninterrupted. This does not require a roll. The breath that is held is a weapon. The breath that is released is a shield.</td>
-        </tr>
-    </table>
-
-    <h3>3-4 XP Talents — The Working Knife</h3>
-    <table class="trait-table">
-        <tr><th class="trait-name">Talent</th><th>Effect</th></tr>
-        <tr>
-            <td class="trait-name">Redirecting Current</td>
-            <td><em>Tags: Move, Flow, Gambit</em><br />When an enemy misses you with a melee attack, you may immediately reposition them one range band (Close ⇄ Near) in a direction of your choice. Describe how you use their momentum to guide them. Once per scene.</td>
-        </tr>
-        <tr>
-            <td class="trait-name">The Unarmoured Body</td>
-            <td><em>Tags: Armour, BOD, Flow</em><br />You have trained your body to absorb and redirect force. When unarmoured, convert the first point of Harm you would take each scene to Fatigue instead. Your skin is your armour; your breath is your shield.</td>
-        </tr>
-        <tr>
-            <td class="trait-name">Pressure Point Strike</td>
-            <td><em>Tags: Strike, AGI, Gambit</em><br />You know the map of the human body. When you make an unarmed attack, you may declare a Pressure Point Strike. On a hit, the target suffers -1 die on all physical actions until the end of their next turn. On a critical success, they lose their next minor action entirely.</td>
-        </tr>
-    </table>
-
-    <h3>5 XP Talents — Signature Moves</h3>
-    <table class="trait-table">
-        <tr><th class="trait-name">Talent</th><th>Effect</th></tr>
-        <tr>
-            <td class="trait-name">The Unstruck Bell</td>
-            <td><em>Tags: Defense, Flow, Overload</em><br />Once per session, when you would be hit by an attack, you may declare that the attack misses you entirely. Describe how you were not there—a step back, a breath held, a shift of weight that no one saw coming. The GM gains 1 Story Beat as a cost (the universe notices your impossible stillness).</td>
-        </tr>
-        <tr>
-            <td class="trait-name">Master of the Open Palm</td>
-            <td><em>Tags: Strike, Combo, Restoration</em><br />Your open hand can harm or heal. Once per session, you may convert a successful unarmed strike into a healing touch instead of dealing Harm. The target (ally or willing enemy) clears 1 Fatigue and, if they are suffering from a minor Condition (Fear, Shaken, Guilty), may roll Spirit+Endurance (DV 3) to remove it.</td>
-        </tr>
-    </table>
-
-    <h3>6 XP Talent — The Quiet Catastrophe</h3>
-    <table class="trait-table">
-        <tr><th class="trait-name">Talent</th><th>Effect</th></tr>
-        <tr>
-            <td class="trait-name">The Stillness That Moves</td>
-            <td><em>Tags: Move, Flow, Overload</em><br />Once per arc, you may move through a space that should be impassable—a crowd that does not part, a wall of blades, a locked door—as if you were never there. You do not break, force, or open. You simply arrive on the other side. The GM cannot retroactively place obstacles in your path for that scene. Cost: You must accept a permanent Breath Scar; you can never again be surprised, but neither can you ever truly rest.</td>
-        </tr>
-    </table>
-
-    <!-- ═══ TRADITIONS ═══ -->
-    <h2 id="traditions">Monastic Traditions</h2>
-    <p class="lede">A monk is defined not only by talents but by the tradition they follow—the philosophical and martial lineage that shapes their understanding of stillness. Each tradition offers a set of techniques, a patron affinity, and a corruption-like path of deepening mastery.</p>
-
-    <div class="panel panel-silver">
-        <strong>Using Monastic Traditions</strong>
-        <p class="text-muted">Each tradition is presented as a table of techniques, similar to the Patron's Gift and Signature Talent structures found elsewhere. A monk may learn techniques from their tradition by spending XP as follows:</p>
-        <ul class="text-muted">
-            <li><strong>Basic Technique (4–6 XP):</strong> A foundational ability that defines the tradition's core approach.</li>
-            <li><strong>Advanced Technique (8–10 XP):</strong> A more powerful or versatile ability, often requiring a minimum Tier or attribute.</li>
-            <li><strong>Master Technique (12+ XP):</strong> A campaign-defining ability that represents the pinnacle of that tradition's path.</li>
-        </ul>
-        <p class="text-muted">Unlike Patron obligations, tradition techniques do not generate Obligation or Corruption unless the tradition is tied to a specific Patron (as noted in the tradition's description). Instead, they cost Fatigue, Boons, or have narrative costs determined by the GM.</p>
-    </div>
-
-    <h3>Way of the Unstruck Bell (Ikasha — Shadow)</h3>
-    <p><em>Patron Affinity: Ikasha, She Who Sleeps</em></p>
-    <p>The Unstruck Bell tradition teaches that the greatest defense is to not be where the strike lands. Followers of this path learn to read the gaps in perception, to become forgettable, and to move through shadows as if the shadows themselves had parted for them.</p>
-
-    <h4>Basic Technique — Shadow Meld (6 XP)</h4>
-    <p><em>Prerequisite: Stealth 2+</em><br />Once per session as an action, step into any shadow larger than yourself and emerge from another shadow within Near range. You cannot be targeted while moving between shadows. Mark 1 Fatigue after using this technique.</p>
-
-    <h4>Advanced Technique — The Unobserved (8 XP)</h4>
-    <p><em>Prerequisite: Tier II, Stealth 3+</em><br />When you are Hidden, social Story Beats cannot be used to frame you for a crime you did not commit (unless you act first). Additionally, witnesses suffer -2 dice to recall your face or describe you to authorities.</p>
-
-    <h4>Master Technique — Threshold of Sleep (12 XP)</h4>
-    <p><em>Prerequisite: Tier III, Spirit 3+</em><br />Once per session, walk through a locked door, a guarded threshold, or a magical ward as if it were mist. This does not work on barriers specifically enchanted against shadow-walking (GM discretion). Mark 2 Fatigue and gain +1 Obligation to Ikasha after using this technique.</p>
-
-    <h4>Corruption of the Unstruck Bell</h4>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>Tier</th><th>Benefit</th><th>Cost / Quirk</th></tr></thead>
-        <tbody>
-            <tr><td>1</td><td>+1 die to Stealth in dim light or darkness.</td><td>Light Sensitivity: -1 die to Stealth in direct sunlight.</td></tr>
-            <tr><td>2</td><td>Once per scene, treat a failed Stealth roll as a success.</td><td>The Witness Debt: A raven appears to watch your next crime. If you fail that roll, the raven reports to a rival.</td></tr>
-            <tr><td>3</td><td>+2 dice to resist being tracked or identified.</td><td>Shadow Lag: Your shadow moves half a second behind you. Those who notice suffer -1 die to social rolls with you.</td></tr>
-            <tr><td>4</td><td>Once per session, become Hidden in plain sight (no roll required) in a crowd.</td><td>Hollow Attention: The Hollow begins to notice your erasures. GM gains 1 SB to spend on a pursuit complication.</td></tr>
-            <tr><td>5</td><td>Immune to mundane forms of surveillance (scrying, tracking dogs, witnesses).</td><td>Forgetful: You occasionally forget minor details of your own past. Mark 1 Fatigue when this happens.</td></tr>
-            <tr><td>6+</td><td>Once per session, become intangible to mundane harm for one scene.</td><td>Shadow's Price: Mark +2 Obligation to Ikasha. Your reflection no longer appears in mirrors.</td></tr>
-        </tbody>
-    </table>
-    </div>
-
-    <hr />
-
-    <h3>Way of the Iron Vow (Mykkiel / Oath of Flame — Law)</h3>
-    <p><em>Patron Affinity: Mykkiel, Arbiter of the Covenant, or the Oath of Flame &amp; Light</em></p>
-    <p>The Iron Vow tradition teaches that the body is a temple and the fist is a gavel. Followers of this path swear binding oaths that grant power in exchange for restriction. They are monks who serve as justiciars, bodyguards, and arbiters—their word is law, and their law is enforced by their palms.</p>
-
-    <h4>Basic Technique — Sworn Defender (6 XP)</h4>
-    <p><em>Prerequisite: Body 3+</em><br />When you take the Defend action, you also grant an adjacent ally +1 Armour until your next turn. This stacks with other sources of Armour.</p>
-
-    <h4>Advanced Technique — Unyielding Vow (8 XP)</h4>
-    <p><em>Prerequisite: Tier II, Spirit 3+</em><br />Swear a vow before a witness (a specific action you will accomplish or a person you will protect). While actively working toward that vow, you ignore the first point of Fatigue each scene that would come from exhaustion, fear, or despair. Breaking the vow voluntarily causes you to mark 1 Harm (Stress) and lose access to this technique until you complete a suitable penance.</p>
-
-    <h4>Master Technique — The Unbroken Covenant (12 XP)</h4>
-    <p><em>Prerequisite: Tier III, Mykkiel or Oath of Flame patron</em><br />Once per session, declare a single oath you have sworn as inviolable. For the remainder of the session, you gain +2 dice to all rolls that directly advance that oath, and you ignore the first Harm 2 each scene that would prevent you from fulfilling it. When the oath is fulfilled (or becomes impossible to fulfil), you immediately mark +2 Obligation to your patron.</p>
-
-    <h4>Corruption of the Iron Vow</h4>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>Tier</th><th>Benefit</th><th>Cost / Quirk</th></tr></thead>
-        <tbody>
-            <tr><td>1</td><td>+1 die to Insight when detecting lies or broken promises.</td><td>Rigid Honor: Must uphold vows even when disadvantageous; -1 die to flexible actions.</td></tr>
-            <tr><td>2</td><td>Once per scene, treat a failed Spirit + Endurance test as a success (you steel yourself).</td><td>Judge's Severity: Cannot easily overlook infractions; suffer 1 Fatigue if forced to.</td></tr>
-            <tr><td>3</td><td>+2 dice to Command when enforcing a sworn oath.</td><td>Suspicion: -1 die to social rolls with anyone you suspect of oathbreaking.</td></tr>
-            <tr><td>4</td><td>Once per session, force a target who just lied to you to test Spirit + Endurance (DV 4) or be unable to speak for one exchange.</td><td>Compelled to Correct: Must point out falsehoods when noticed, regardless of tact.</td></tr>
-            <tr><td>5</td><td>Your sworn vows gain supernatural weight. Breaking them causes you Harm 2 (Stress), but you may ignore one external compulsion per scene that would force you to break an oath.</td><td>Monomania: When you swear a vow, you suffer -2 dice to all actions not directly related to fulfilling it until it is complete.</td></tr>
-            <tr><td>6+</td><td>Once per session, render absolute judgment on a target who has broken an oath in your presence. They suffer -2 dice to all actions until they atone.</td><td>Instrument of Wrath: Mark +2 Obligation. Your voice now tolls like a bell when you speak judgment; those who hear you cannot interrupt until your sentence is complete.</td></tr>
-        </tbody>
-    </table>
-    </div>
-
-    <hr />
-
-    <h3>Way of the Endless Cup (Thrysos — Drunken Master)</h3>
-    <p><em>Patron Affinity: Thrysos, King of Revels</em></p>
-    <p>The Drunken Master tradition is perhaps the most misunderstood. Outsiders see a staggering fool; initiates see a fighter who has learned that predictability is death. By mimicking the unsteady gait of intoxication, the Drunken Master becomes impossible to anticipate. Every stumble is a feint, every spill a trip, every belch a battle cry.</p>
-
-    <h4>Basic Technique — Stagger Step (4 XP)</h4>
-    <p><em>Prerequisite: Body 3+</em><br />When an enemy misses you with a melee attack, you may immediately move one range band (Close ⇄ Near) without provoking opportunity attacks. Mark 1 Fatigue to use this technique (once per round).</p>
-
-    <h4>Advanced Technique — Drunken Fist (6 XP)</h4>
-    <p><em>Prerequisite: Body 3+, Spirit 2+</em><br />Your unarmed strikes gain +1 die and ignore the first point of Armour when you are at Fatigue 2 or more (the wine guides you). This is a passive ability.</p>
-
-    <h4>Master Technique — The Unbroken Bottle (12 XP)</h4>
-    <p><em>Prerequisite: Tier III, Drunken Fist</em><br />Once per session, you may ignore all penalties from Fatigue for one scene. While this is active, each time you would be hit by a melee attack, you may instead stagger out of the way and force the attacker to hit another adjacent creature of your choice (narrate the stumble). After the scene ends, you collapse with Harm 2 (Exhaustion) and cannot use this talent again until you have rested for a full night.</p>
-
-    <h4>Corruption of the Endless Cup</h4>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>Tier</th><th>Benefit</th><th>Cost / Quirk</th></tr></thead>
-        <tbody>
-            <tr><td>1</td><td>+1 die to social rolls in feasts, taverns, or celebrations.</td><td>Compulsive Toast: Must drink when offered or mark 1 Fatigue.</td></tr>
-            <tr><td>2</td><td>Ignore the first 1 Fatigue each scene.</td><td>Restless Appetite: -1 die when abstaining from indulgence (food, drink, or touch).</td></tr>
-            <tr><td>3</td><td>Once per scene, treat a failed Acrobatics or Athletics roll as a success (you stumble into success).</td><td>Masquerade: Cannot act without a role or guise; -1 die to plain sincerity.</td></tr>
-            <tr><td>4</td><td>Once per session, frenzy grants +2 dice to melee for one exchange.</td><td>Ecstatic Blindness: -1 die to perception outside the revel; you may not notice threats that require sobriety.</td></tr>
-            <tr><td>5</td><td>Once per session, all allies within Near clear 1 Fatigue when you share a drink with them.</td><td>Hungering Host: You consume twice as much; denial causes Harm 1 (Stress).</td></tr>
-            <tr><td>6+</td><td>Once per session, become an avatar of revels; all allies gain +2 dice, enemies suffer -2 dice to resist your social actions.</td><td>Tyrant of Pleasure: Mark +3 Obligation; the revel grows monstrous, demanding a sacrifice (an oath, a relationship, or a life).</td></tr>
-        </tbody>
-    </table>
-    </div>
-
-    <h3>Creating Your Own Tradition</h3>
-    <ol style="color:var(--grey);">
-        <li><strong>Choose a Core Philosophy.</strong> What does this tradition value? Stillness? Motion? Endurance? Deception?</li>
-        <li><strong>Select a Patron Affinity (Optional).</strong> Is the tradition tied to a specific Patron, or is it a purely mortal discipline?</li>
-        <li><strong>Design Three Techniques.</strong> Basic (4–6 XP), Advanced (8–10 XP), Master (12+ XP). Each should feel distinct and build on the tradition's core.</li>
-        <li><strong>Craft a Corruption Table (If Patron-Tied).</strong> Six tiers of deepening benefits and costs. The costs should be thematic and roleplay-heavy.</li>
-        <li><strong>Name It.</strong> The best tradition names suggest both a technique and a philosophy: "The Way of the Open Hand," "The Path of the Whispering Stone," "The School of the Falling Leaf."</li>
-    </ol>
-
-    <!-- ═══ PSIONIC ═══ -->
-    <h2 id="psionic">The Psionic Monk — The Silent Mind</h2>
-    <blockquote>"The mind that moves the mountain first learns to be still. The thought that bends the spoon first learns to be empty."</blockquote>
-    <p>The monk and the psion share a secret: both have looked inward and found a door. The monk opens it with breath; the psion opens it with will. At the intersection of these paths lies the psionic monk—a practitioner who has learned to weaponise the silence between thoughts.</p>
-
-    <h3>Integrating Psionics and Monk Talents</h3>
-    <p>A psionic monk treats their Mental Strain (see the Psionics chapter of the Gray Wanderer's Grimoire) as a secondary resource pool alongside Fatigue. The two are not interchangeable, but certain talents allow conversion:</p>
-    <ul style="color:var(--grey);">
-        <li><strong>Ki as Mental Strain:</strong> A monk with the Psionics skill may spend 1 Mental Strain instead of 1 Fatigue to power any monk talent with the [Flow] tag.</li>
-        <li><strong>Mental Stillness:</strong> Once per scene, a psionic monk may reduce their Mental Strain by 1 by spending one minute in meditation (no roll required). This cannot be done in combat.</li>
-    </ul>
-
-    <h3>Psionic Arts for Monks</h3>
-    <div class="table-wrap">
-    <table>
-        <thead><tr><th>Psionic Art</th><th>Monk Synergy</th></tr></thead>
-        <tbody>
-            <tr><td><strong>Telekinesis</strong></td><td>The Unseen Hand replaces physical strikes at range. A monk can use Telekinesis to parry arrows, trip enemies, or deliver "pressure point strikes" from across the room.</td></tr>
-            <tr><td><strong>Biofeedback</strong></td><td>The Inward Physician is meditation made flesh. Monks who master Biofeedback can heal their own wounds, purge poison with a breath, and slow their heartbeat to appear dead.</td></tr>
-            <tr><td><strong>Mind Shield</strong></td><td>The Walled Garden is the ultimate expression of Still Point Stance. A monk with Mind Shield can no longer be surprised, read, or mentally compelled.</td></tr>
-            <tr><td><strong>Precognition</strong></td><td>Reading the Weather of the Skull allows a monk to act before the enemy acts—the ultimate expression of the empty breath.</td></tr>
-            <tr><td><strong>Psychic Assault</strong></td><td>The Breaking Thought is the closed fist of the mind. A monk who masters this Art can stun, confuse, or simply drop an enemy with a glare.</td></tr>
-        </tbody>
-    </table>
-    </div>
-
-    <h3>Hybrid Build Examples</h3>
-
-    <div class="panel panel-blue">
-        <strong>The Shadow Telepath (Way of Unstruck Bell + Telepathy)</strong>
-        <p><em>Core Talents:</em> Shadow Meld, The Unobserved, Telepathy (Surface Thoughts, Emotional State)</p>
-        <p><em>Playstyle:</em> You are an infiltrator who doesn't need to pick locks or disable alarms. You read the guard's surface thoughts to learn the patrol route. You sense the captain's emotional state to know when he is distracted. When discovered, you step into a shadow and emerge behind them, delivering a Pressure Point Strike before they can raise the alarm.</p>
-        <p><em>Sample Progression:</em> Monk's Breath (2) → Shadow Meld (4) → Telepathy (6) → Pressure Point Strike (8) → Emotional State (10) → The Unobserved (12)</p>
-    </div>
-
-    <div class="panel panel-gold">
-        <strong>The Iron Mind Shield (Way of Iron Vow + Mind Shield)</strong>
-        <p><em>Core Talents:</em> Sworn Defender, Unyielding Vow, Mind Shield (Resist Intrusion, Shelter Allies)</p>
-        <p><em>Playstyle:</em> You are the party's mental bastion. While the mages cast and the rogues sneak, you stand in the doorway and refuse to move. Enemies cannot read your allies' minds because you have erected a Walled Garden around them. When a psychic assault targets the group, you absorb the strain and convert it to Fuel for your Iron Vow.</p>
-        <p><em>Sample Progression:</em> The Open Hand (2) → Sworn Defender (4) → Mind Shield (6) → Unyielding Vow (8) → Shelter Allies (10) → The Unbroken Covenant (12)</p>
-    </div>
-
-    <div class="panel panel-orange">
-        <strong>The Drunken Precog (Way of Endless Cup + Precognition)</strong>
-        <p><em>Core Talents:</em> Stagger Step, Drunken Fist, Precognition (Advantage on future rolls, Avoid named dangers)</p>
-        <p><em>Playstyle:</em> You stagger not because you are drunk, but because you have already seen where the blade will fall. Your Precognition tells you that the enemy will swing high; you stumble low. It tells you that the floor will give way; you "accidentally" step around the weak spot. To observers, you are a lucky fool. To your enemies, you are a nightmare who cannot be touched.</p>
-        <p><em>Sample Progression:</em> Stagger Step (2) → Monk's Breath (4) → Precognition (6) → Drunken Fist (8) → Avoid Named Dangers (10) → The Unbroken Bottle (12)</p>
-    </div>
-
-    <div class="panel panel-red">
-        <strong>The Silent Mind's Burden</strong>
-        <p>A psionic monk walks two paths simultaneously, and each path demands its price. The monk pays in Fatigue and obligation; the psion pays in Mental Strain and the slow erosion of the self. When both debts come due at once—when the Fatigue track fills and the Mental Strain overflows—the monk risks becoming a hollow vessel: still breathing, still standing, but no longer present.</p>
-        <p>The Gray Wanderer once described meeting such a monk in the catacombs beneath Thepyrgos: "He sat in perfect lotus, eyes open, pulse steady. But when I spoke, he did not answer. When I touched his shoulder, he did not blink. The body was a temple, but the god had moved out. I left a coin on his palm and walked away. The coin was still there when I returned a year later."</p>
-        <p>Walk both paths if you must. But keep one foot on stone at all times.</p>
-    </div>
-
-    <!-- ═══ MONASTERY ═══ -->
-    <h2 id="monastery">The Three-Temples Monastery</h2>
-    <p>The Three-Temples Monastery is not a fortress. It is a collection of stones, oak trees, and breath. It has no walls, no guards, no treasury. Its only defense is the reputation of its monks: those who enter with violence in their hearts find that violence returned to them tenfold, and those who enter with empty hands find tea and a place to sleep.</p>
-    <p>I am Brother Tarn, and I hold the rank of Keeper of the Unstruck Bell. Below me are the Five Elders, each responsible for a tradition. Below them, the monks who have taken vows. And at the bottom, the novices who scrub the floors and learn to breathe.</p>
-
-    <h3>The Hierarchy of Breath</h3>
-    <dl style="margin:0.4rem 0 0.4rem 1.2rem; color:var(--grey);">
-        <dt style="color:var(--gold); font-weight:600;">Novice (First Breath)</dt>
-        <dd>The novice learns to sit still for one hour. Most fail. Those who succeed begin to learn the Entering Breath.</dd>
-        <dt style="color:var(--gold); font-weight:600;">Initiate (Holding Breath)</dt>
-        <dd>The initiate learns to hold their breath for three minutes while meditating. This is not a physical test; it is a test of the mind's ability to override the body's panic.</dd>
-        <dt style="color:var(--gold); font-weight:600;">Brother/Sister (Releasing Breath)</dt>
-        <dd>The monk takes their first vow: "I will not strike first." They learn to redirect force, to parry, to disarm. They may leave the monastery but must return each season to renew the vow.</dd>
-        <dt style="color:var(--gold); font-weight:600;">Elder (Empty Breath)</dt>
-        <dd>The monk has learned to act from the space between thoughts. They are unpredictable, uncanny, and feared even by the other Elders. There are rarely more than five Elders at any time.</dd>
-        <dt style="color:var(--gold); font-weight:600;">Keeper (The Unstruck Bell)</dt>
-        <dd>There is only one Keeper. I hold the position now. When I die—or when I vanish into the hills to die alone—the Elders will choose another. Or they will not. The monastery has survived without a Keeper before.</dd>
-    </dl>
-
-    <h3>The Monastery's Assets</h3>
-    <div class="grid-2">
-        <div class="panel panel-gold">
-            <strong>The Breath Registry</strong>
-            <p class="text-muted">A record of every trained monk in the region, their vows, and their current location. Useful for finding allies or tracking fugitives.</p>
-        </div>
-        <div class="panel panel-silver">
-            <strong>The Silent Passages</strong>
-            <p class="text-muted">A network of hidden paths beneath the city that only monks know. These passages allow stealthy movement between any two locations in the city that have a shrine or meditation alcove.</p>
-        </div>
-        <div class="panel panel-blue">
-            <strong>The Novice Network</strong>
-            <p class="text-muted">A group of young monks who act as messengers, lookouts, and distraction. Each is Cap 1, good for reconnaissance but not combat.</p>
-        </div>
-        <div class="panel panel-green">
-            <strong>The Healing House</strong>
-            <p class="text-muted">A clinic run by the monastery where the sick and injured are treated without question. Monks may use the Healing House to recover Fatigue twice as fast (1 Fatigue per hour instead of per rest).</p>
-        </div>
-        <div class="panel panel-purple" style="grid-column: 1 / -1;">
-            <strong>The Unstruck Bell</strong>
-            <p class="text-muted">A legendary artifact—a bell that rings only in the mind. Once per session, a monk may ring the Unstruck Bell (as an action) to impose -2 dice on all fear-based effects against the party for one scene. The bell's location is a secret known only to the Keeper.</p>
-        </div>
-    </div>
-
-    <h3>Notable Monks of the Three-Temples</h3>
-
-    <div class="panel panel-gold">
-        <strong>Brother Tarn (Keeper of the Unstruck Bell)</strong>
-        <p><em>Tier: IV</em><br />
-        <em>Motivation:</em> Maintain the balance between the monastery and the city; prevent the Hollow from noticing the thresholds.<br />
-        <em>Leverage:</em> He knows the true names of every monk in the region, and the location of every hidden meditation cell.<br />
-        <em>Quirk:</em> He has never been seen eating. The novices whisper that he doesn't need to.</p>
-    </div>
-
-    <div class="panel panel-blue">
-        <strong>Sister Mira (Elder of the Open Hand)</strong>
-        <p><em>Tier: III</em><br />
-        <em>Motivation:</em> Heal the sick, protect the innocent, and remind the powerful that they are mortal.<br />
-        <em>Leverage:</em> She trained half the healers in the city. They owe her favors, and she calls them in.<br />
-        <em>Quirk:</em> She carries a small wooden bird that she carved as a novice. When she meditates, the bird sometimes sings.</p>
-    </div>
-
-    <div class="panel panel-silver">
-        <strong>Brother Stone (Elder of the Iron Vow)</strong>
-        <p><em>Tier: III</em><br />
-        <em>Motivation:</em> Enforce the monastery's oaths, hunt down those who have broken their vows, and protect the Keeper.<br />
-        <em>Leverage:</em> He holds the Breath Registry and knows which monks have failed their vows. He does not forgive.<br />
-        <em>Quirk:</em> He has not spoken in seven years. He communicates through hand signs and a small slate. The other Elders say his silence is a vow, not a wound.</p>
-    </div>
-
-    <div class="panel panel-red">
-        <strong>The Abbot of the Empty Breath (Secret)</strong>
-        <p><em>Tier: ?</em><br />
-        <em>Motivation:</em> Unknown. Some say the Abbot is dead. Others say the Abbot never existed—that the Empty Breath is simply the space where a Keeper should be.<br />
-        <em>Leverage:</em> Letters signed "The Abbot" arrive on warm paper, as if freshly pressed. They contain instructions that the Keeper always follows. No one has ever seen the Abbot.<br />
-        <em>Quirk:</em> The Abbot's seal is a blank circle. A bell that cannot ring.</p>
-    </div>
-
-    <!-- ═══ HOOKS ═══ -->
-    <h2 id="hooks">Adventure Hooks &amp; Rumors</h2>
-
-    <h3>Jobs from the Monastery (d12)</h3>
-    <ol style="color:var(--grey);">
-        <li><strong>The Broken Vow.</strong> A former monk has broken their oath of non-violence and is terrorising the docks. Bring them back alive. The Elders will decide their penance.</li>
-        <li><strong>The Poisoned Breath.</strong> Someone is poisoning the monastery's well. The water tastes of iron, and novices are falling into comas. Find the source.</li>
-        <li><strong>The Silent Passage Thief.</strong> Someone has learned the secret of the Silent Passages and is using them to rob merchant caravans. The thieves' guild is not responsible—someone else is wearing their mask.</li>
-        <li><strong>The Wandering Keeper.</strong> Brother Tarn has disappeared. He left a note: "The bell tolls for me. Choose the next Keeper, or don't." The Elders cannot agree. They need the party to find him—or confirm his death.</li>
-        <li><strong>The Rival School.</strong> A new martial arts school has opened in the city. They teach the "Way of the Closed Fist"—aggression, dominance, and the exploitation of weakness. They are recruiting from the monastery's novice pool.</li>
-        <li><strong>The Haunted Meditation Cell.</strong> One of the monastery's meditation rooms is now haunted. Monks who enter hear whispers that sound like their own thoughts. Something is feeding on their stillness.</li>
-        <li><strong>The Debt of the Sleeping Master.</strong> An old monk lies in a coma, kept alive by the monastery's healers. His debt to a Patron has come due, and the Patron is sending a collector. The party must protect the sleeping man—or negotiate with the collector.</li>
-        <li><strong>The Hollow Tithe.</strong> The Hollow has noticed the monastery's thresholds. Once a year, the monks leave a basket of bread at the crossroads. This year, the basket came back empty—but something was inside the bread.</li>
-        <li><strong>The Stolen Breath.</strong> A thief has stolen the Breath Registry. Without it, the monastery cannot track its monks' vows. The thief is demanding ransom—but the registry cannot be copied. The party must retrieve the original.</li>
-        <li><strong>The Novice's Vision.</strong> A novice has had a prophetic vision: the monastery will burn within the month. The Elders dismiss it as fever dreams. The novice is terrified. The party must investigate—or prepare for fire.</li>
-        <li><strong>The Inquisition's Visit.</strong> The Chain-Lanterns of Ecktoria have arrived. They have heard rumors of "unsanctioned psionic activity" within the monastery. They demand to search the cells. The Elders refuse. The party is caught between.</li>
-        <li><strong>The Unstruck Bell's Secret.</strong> The Unstruck Bell has been stolen—or has it? The bell cannot be moved; it is a concept, not an object. But the Keeper swears it is gone. The party must discover what "missing" means for a bell that only rings in the mind.</li>
-    </ol>
-
-    <h3>Rumors Heard in the Monastery Courtyard (d12)</h3>
-    <ul style="color:var(--grey);">
-        <li>Sister Mira once healed a dying warlord. He repaid her by burning a village. She does not heal anyone who carries a weapon anymore.</li>
-        <li>Brother Stone took his vow of silence after accidentally killing a student during a sparring match. The student was his son.</li>
-        <li>The Abbot of the Empty Breath is actually the ghost of the monastery's founder. He has been dead for two hundred years. The Keeper is the only one who can see him.</li>
-        <li>The Silent Passages lead not only under the city, but into the Ways Between. Monks who walk too far sometimes come back with empty eyes.</li>
-        <li>The monastery's well was dug on the site of an ancient execution ground. That is why the water tastes of iron—and why the Hollowed sometimes gather at midnight to drink.</li>
-        <li>The Unstruck Bell was not forged. It was found. It lay in a field, half-buried, next to a skeleton in gray robes. The skeleton wore the Abbot's seal.</li>
-        <li>There is a meditation cell that no one uses. The door is locked. The key was thrown into the well. The novice who asked why was expelled.</li>
-        <li>Brother Tarn is not the first Keeper to disappear. The previous Keeper walked into the hills thirty years ago. Some say he is still walking.</li>
-        <li>The Drunken Master tradition was not invented by the monastery. It was borrowed from a wandering beggar who beat three Elders with a broken bottle and then asked for tea.</li>
-        <li>The Hollow does not collect debts from monks. It is afraid of them. This is not a rumor. This is a warning.</li>
-        <li>The monastery has a secret library beneath the courtyard. The books are written in a language that changes depending on who reads them. The Abbot keeps the key.</li>
-        <li>The Gray Wanderer once stayed at the monastery for three days. He meditated in the courtyard, spoke to no one, and left a single coin on the well. The coin is still there. No one will touch it.</li>
-    </ul>
-
-    <!-- ═══ SAMPLE ═══ -->
-    <h2 id="sample">The Debt of the Sleeping Master — Sample Adventure</h2>
-
-    <h3>The Setup</h3>
-    <p>The party is summoned to the monastery's infirmary. An old monk lies on a pallet of gray wool, eyes open but unseeing, lips moving in a language none of the novices recognize. His name is Master Kai, and he was once a teacher of the Way of the Unstruck Bell. Thirty years ago, he walked into the hills and did not return. Last night, a shepherd found him sitting cross-legged in a field, still breathing, still warm, but utterly absent.</p>
-    <p>Brother Tarn stands at the bedside. "He is not asleep," the Keeper says. "He is hiding. Something from his past has caught up with him, and he has run into the only place it cannot follow: his own memory. You must go in after him."</p>
-
-    <h3>The Threshold</h3>
-    <p>The party must enter Master Kai's mind. This requires a psionic anchor (a character with the Psionics skill and the Telepathy Art) who can pull the others into the dream. The anchor pays 1 Mental Strain per passenger (minimum 1). Non-psions cannot use psionic Arts inside the dream, but they can see, speak, fight, and interact with the environment normally.</p>
-    <p>The threshold is the pallet. The witnesses are each other. The price is one memory of comfort associated with the Master, which will be lost forever.</p>
-
-    <h3>The Dream Heist</h3>
-    <p>Once inside, the party appears in a memory version of the monastery's meditation hall. They must descend through nine chambers, each representing a hidden debt or unspoken regret of Master Kai's past. The final chamber contains the secret he has been hiding: the name of a woman he swore to protect during the Ashaani purges, and then abandoned.</p>
-    <p>Until the name is spoken aloud in the heart of the dream, the Master cannot wake—and the Spector (a gray figure representing his un-faced death) will stalk the party through the chambers.</p>
-
-    <h4>Mechanics</h4>
-    <ul style="color:var(--grey);">
-        <li><strong>Master's Breath Timer [8]:</strong> Ticks every scene. When full, the Master's body stops breathing. The dream collapses; all PCs mark 2 Harm and gain the Haunted condition.</li>
-        <li><strong>Debt's Approach Timer [6]:</strong> Ticks when the party speaks a lie, fails a Spirit + Endurance test, or damages a dream-construct. When full, the woman's spirit manifests and attacks.</li>
-        <li><strong>Name Unspoken Timer [4]:</strong> Fills as the party discovers clues about the woman's identity. When full, the name is known and can be spoken in the final chamber.</li>
-    </ul>
-
-    <h3>Resolution</h3>
-    <p>If the party speaks the name, the Master's eyes close, then open. He looks at Brother Tarn and says, "I am ready now." He dies within the hour, at peace. The party gains +1 Favor with the monastery and may each clear 1 Obligation or Corruption segment.</p>
-    <p>If the party fails—if the Master's Breath timer fills before the name is spoken—they wake to find the Master dead, his eyes still open, his lips still moving. The Spector has claimed him. The monastery will remember the party's failure for a generation.</p>
-
-    <div class="callout">
-        <strong>🧘 The Gray Wanderer's Note on the Adventure</strong>
-        <p>"I have been inside three dying minds. Two of them were gardens—overgrown, yes, but still growing. The third was a courtroom where the judge had been dead for forty years and the jury was made of the people he had wronged. That one took three days to escape. The trick is to remember that the dream is not real, but the debt is. You cannot argue with a ghost about whether you owe it. You can only pay."</p>
-    </div>
-
-    <!-- ═══ LAST WORDS ═══ -->
-    <hr />
-
-    <div class="panel panel-gold">
-        <strong>Last Words from Brother Tarn</strong>
-        <p>You have read the techniques. You have seen the traditions. You know the price of the Unstruck Bell and the weight of the Iron Vow. Now close the book.</p>
-        <p>The monastery is not a place. It is a relationship with stillness. You can practice the Entering Breath in a crowded tavern, the Holding Breath in a prison cell, the Releasing Breath on a battlefield. The Empty Breath? That one you must find for yourself. I cannot teach it. No one can. The best I can do is point at the moon and hope you look up instead of at my finger.</p>
-        <p>Go. Make mistakes. Get hit. Learn why you should not have been there when the blow landed. Come back if you survive. I will keep the tea warm.</p>
-        <p style="margin-top:0.4rem;"><em>Brother Tarn<br />Keeper of the Unstruck Bell<br />Three-Temples Monastery<br />The ink is dry. The mirror is still. The bell does not ring.</em></p>
-    </div>
-
-    <footer>
-        Fate's Edge Proprietary Content — © 2026 Nicholas A. Gasper. All rights reserved.<br />
-        <em>The Unstruck Bell</em> · A Monk's Guide to the Still Point and the Open Hand
-    </footer>
-
+<div class="panel panel-gold">
+<strong>Preface — Brother Tarn</strong>
+<p>I was sixteen when I first struck a man. A tax collector from Kahfagia, fat with silver and arrogance. He never saw my palm close on his throat. I watched him crumple while his guards shouted at shadows. The Abbot made me scrub the courtyard stones for a month. Not because I had sinned, but because I had acted before I had thought.</p>
+<p>They never caught me. Not because I was strong—I was not, not yet. Because I was still. A boy who learned that the greatest strength is not in the clenched fist but in the open hand. That is the first lesson of the monk: power is not in the strike. It is in the pause before the strike.</p>
+<p>Twenty years later, I have broken twelve men with my bare hands and healed twice that many. The Abbot trusts me to teach the Way of the Open Palm. The Temple Council owes me three favors. And the Silkstrand thugs avoid the alley behind the Three-Temples Monastery because they know the sound of my sandals on wet stone.</p>
+<p>I am Brother Tarn. They call me the Unstruck Bell because I have never taken a blow I did not choose.</p>
+<p>This book is not for warriors. It is for those who understand that the world runs on breath, on balance, and on the careful stillness between action and consequence. I learned from the stone floors of the monastery. I learned from Grandmaster Ashara, who sleeps beneath the old oak, and from Sister Mira, who can stop a drawn sword with a single word. I learned that a breath can unmake a fortress, that a single finger can redirect a river, and that the strongest stance is the one that looks like rest.</p>
+<p>You want to be a monk? Good. But first, forget everything you think you know about strength. The enemy is not the opponent. The enemy is the tension in your own shoulder.</p>
+<p>The blow that never lands is the one you did not need to throw.</p>
+<p style="margin-top:0.4rem;"><em>Brother Tarn<br/>Three-Temples Monastery, Year of the Falling Bridge<br/>The ink is lamp-black and my blood. The mirror is still.</em></p>
 </div>
-</body>
+<!-- ═══ TOC ═══ -->
+<div class="toc">
+<strong>📑 Contents</strong>
+<a href="#philosophy">The Philosophy of the Still Point</a>
+<a href="#talents">Monk Talents</a>
+<a href="#traditions">Monastic Traditions</a>
+<a href="#psionic">The Psionic Monk</a>
+<a href="#monastery">The Three-Temples Monastery</a>
+<a href="#hooks">Adventure Hooks &amp; Rumors</a>
+<a href="#sample">The Debt of the Sleeping Master</a>
+</div>
+<!-- ═══ PHILOSOPHY ═══ -->
+<h2 id="philosophy">The Philosophy of the Still Point</h2>
+<h3>On Stillness</h3>
+<p>The first time you face a drawn blade, you will be afraid. Good. Fear keeps your breath short and your eyes wide. The moment you feel safe, you have already been struck.</p>
+<p>A monk is not a soldier. We do not meet force with force. We redirect. Through a guard’s reach, through a gap in the formation, through the space between the blow and its target. The world is full of openings—the fist that overextends, the breath that comes too fast, the weight that shifts one inch too far.</p>
+<div class="panel panel-silver">
+<strong>Rules compatibility</strong>
+<p class="text-muted">The core rules comprise the SRD plus the extensions in the Player’s Guide and GM Guide. This expansion applies only its stated additions and exceptions. Keep the core loop: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, resolve the outcome, and apply consequences.</p>
+<p class="text-muted">Adds Monk Talents and the disciplines that chain them. Anything it introduces is an addition to the core loop, not a replacement for it: a named track or timer here is its own measure and never stands in for Fatigue, Harm or the Outcome Matrix, and no option waives the roll, the Story Beats it generates, or the stated cost unless it says so explicitly.</p>
+</div>
+<h3>The Three Principles of the Unstruck Bell</h3>
+<div class="grid-2">
+<div class="panel panel-gold">
+<strong>The Coin That Does Not Move</strong>
+<p class="text-muted">Never resist what cannot be stopped. A blade from a trained swordsman? He will strike where he expects resistance. When he finds none, he will stumble. A shove from a larger foe? He expects you to brace. When you yield, his own force becomes his downfall.</p>
+<p class="text-muted">Redirect what you cannot stop. There is no shame in moving with the storm.</p>
+</div>
+<div class="panel panel-silver">
+<strong>The Witness Who Breathes</strong>
+<p class="text-muted">Every fight is witnessed. The trick is not to be invisible—it is to be unremarkable. A monk standing still in a courtyard. A beggar sleeping in a doorway. A servant carrying water. The guards see you. They simply do not register you as a threat.</p>
+<p class="text-muted">Stillness is the greatest disguise.</p>
+</div>
+<div class="panel panel-red" style="grid-column: 1 / -1;">
+<strong>The Debt That Is Never Incurred</strong>
+<p class="text-muted">When you do not strike, you create no debt. Not yours, not theirs. They owe you nothing but the breath they wasted trying to hit you. A true monk does not seek victory. Victory is a chain. The open hand offers nothing, and so nothing can be taken from it.</p>
+</div>
+</div>
+<h3>On Breath</h3>
+<p>Before the fist comes the breath. Before the breath comes the stillness. A drowning man does not need a stronger kick; he needs to remember that the surface is only a few inches above his head.</p>
+<h4>The Four Breaths</h4>
+<dl style="margin:0.4rem 0 0.4rem 1.2rem; color:var(--grey);">
+<dt style="color:var(--gold); font-weight:600;">The Entering Breath</dt>
+<dd style="margin-bottom:0.4rem;">The inhale that takes in the world—its noise, its threat, its opportunity. Without this breath, you cannot see what is coming.</dd>
+<dt style="color:var(--gold); font-weight:600;">The Holding Breath</dt>
+<dd style="margin-bottom:0.4rem;">The pause between. This is where decisions are made. A long holding breath is patience; a short one is a trap.</dd>
+<dt style="color:var(--gold); font-weight:600;">The Releasing Breath</dt>
+<dd style="margin-bottom:0.4rem;">The exhale that becomes action. A punch is a breath released. A word is a breath released. A step is a breath released.</dd>
+<dt style="color:var(--gold); font-weight:600;">The Empty Breath</dt>
+<dd>The space after the exhale, before the next inhale. This is where monks live. The enemy expects you to inhale, to prepare, to telegraph. When you learn to act from the empty breath, you become invisible to their predictions.</dd>
+</dl>
+<h3>The Meditation Mini-Game</h3>
+<p>To find the still point, you need three things:</p>
+<ol style="color:var(--grey);">
+<li><strong>Stillness</strong> — A quiet place where you will not be disturbed. (A crowded tavern can work, but the DV increases.)</li>
+<li><strong>Time</strong> — At least ten minutes of uninterrupted meditation.</li>
+<li><strong>Intent</strong> — A clear purpose for your meditation (healing, focus, clarity).</li>
+</ol>
+<div class="panel panel-purple">
+<strong>The Four Breaths of Meditation</strong>
+<p><strong>Step 1: Settle the Body</strong> (Wits + Craft, DV 2)<br/>
+        Find a comfortable position and release physical tension. On a hit, gain +1 die to the Meditation roll. On a miss, you are distracted by an ache or itch—start with -1 die.</p>
+<p><strong>Step 2: Settle the Breath</strong> (Spirit + Endurance, DV 3)<br/>
+        Count your breaths. Each exhalation is a number. When you reach ten, begin again. On a hit, you enter a light meditative state. On a partial, your mind wanders—you may continue but the GM gains 1 Story Beat.</p>
+<p><strong>Step 3: The Still Point</strong> (Spirit + Endurance, DV 4 for healing, DV 3 for clarity, DV 5 for transcendence)<br/>
+        Roll to reach the deepest state. On a hit, you achieve your intent. On a partial, you achieve it but emerge drained (mark 1 Fatigue). On a miss, you fall asleep or become lost in thought; the GM gains 2 Story Beats.</p>
+<p><strong>Step 4: Return</strong> (No roll, narrative)<br/>
+        You open your eyes. The world is the same. You are not.</p>
+</div>
+<h4>Meditation Benefits</h4>
+<ul style="color:var(--grey);">
+<li><strong>Healing Meditation:</strong> Clear 1 Fatigue and, if you have a minor Condition (Fear, Shaken, Guilty), test Spirit+Endurance (DV 3) to remove it.</li>
+<li><strong>Clarity Meditation:</strong> Gain +1 die to your next Wits-based roll.</li>
+<li><strong>Transcendent Meditation:</strong> Once per session, reroll any single failed roll. The GM gains 1 Story Beat.</li>
+</ul>
+<!-- ═══ TALENTS ═══ -->
+<h2 id="talents">Monk Talents: The Unstruck Path</h2>
+<p class="lede">Foundations of the Still Point — suited for those who walk the edge of stillness and action. Not for brawlers or berserkers. For the patient, the balanced, and the breathless.</p>
+<h3>2 XP Talents — Foundations</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table class="trait-table">
+<tr><th class="trait-name">Talent</th><th>Effect</th></tr>
+<tr>
+<td class="trait-name">The Open Hand</td>
+<td><em>Tags: Strike, BOD, Flow</em><br/>Once per scene, when you attempt to parry, deflect, or disarm an opponent, treat your first Body or Melee roll as Position +1. The blow that never lands is the one you did not need to block.</td>
+</tr>
+<tr>
+<td class="trait-name">Still Point Stance</td>
+<td><em>Tags: Move, SPT, Flow</em><br/>You understand the geometry of stillness. When you do not move during your turn, gain +1 die to your next defense roll. This benefit lasts until you move or take an aggressive action. The mountain does not chase the wind. The wind breaks against the mountain.</td>
+</tr>
+<tr>
+<td class="trait-name">Monk's Breath</td>
+<td><em>Tags: Heal, SPT, Restoration</em><br/>You have learned to control your breath and heart rate. Once per session, you may clear 1 Fatigue by meditating for one minute uninterrupted. This does not require a roll. The breath that is held is a weapon. The breath that is released is a shield.</td>
+</tr>
+</table></div>
+<h3>3-4 XP Talents — The Working Knife</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table class="trait-table">
+<tr><th class="trait-name">Talent</th><th>Effect</th></tr>
+<tr>
+<td class="trait-name">Redirecting Current</td>
+<td><em>Tags: Move, Flow, Gambit</em><br/>When an enemy misses you with a melee attack, you may immediately reposition them one range band (Close ⇄ Near) in a direction of your choice. Describe how you use their momentum to guide them. Once per scene.</td>
+</tr>
+<tr>
+<td class="trait-name">The Unarmoured Body</td>
+<td><em>Tags: Armour, BOD, Flow</em><br/>You have trained your body to absorb and redirect force. When unarmoured, convert the first point of Harm you would take each scene to Fatigue instead. Your skin is your armour; your breath is your shield.</td>
+</tr>
+<tr>
+<td class="trait-name">Pressure Point Strike</td>
+<td><em>Tags: Strike, AGI, Gambit</em><br/>You know the map of the human body. When you make an unarmed attack, you may declare a Pressure Point Strike. On a hit, the target suffers -1 die on all physical actions until the end of their next turn. On a critical success, they lose their next minor action entirely.</td>
+</tr>
+</table></div>
+<h3>5 XP Talents — Signature Moves</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table class="trait-table">
+<tr><th class="trait-name">Talent</th><th>Effect</th></tr>
+<tr>
+<td class="trait-name">The Unstruck Bell</td>
+<td><em>Tags: Defense, Flow, Overload</em><br/>Once per session, when you would be hit by an attack, you may declare that the attack misses you entirely. Describe how you were not there—a step back, a breath held, a shift of weight that no one saw coming. The GM gains 1 Story Beat as a cost (the universe notices your impossible stillness).</td>
+</tr>
+<tr>
+<td class="trait-name">Master of the Open Palm</td>
+<td><em>Tags: Strike, Combo, Restoration</em><br/>Your open hand can harm or heal. Once per session, you may convert a successful unarmed strike into a healing touch instead of dealing Harm. The target (ally or willing enemy) clears 1 Fatigue and, if they are suffering from a minor Condition (Fear, Shaken, Guilty), may roll Spirit+Endurance (DV 3) to remove it.</td>
+</tr>
+</table></div>
+<h3>6 XP Talent — The Quiet Catastrophe</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table class="trait-table">
+<tr><th class="trait-name">Talent</th><th>Effect</th></tr>
+<tr>
+<td class="trait-name">The Stillness That Moves</td>
+<td><em>Tags: Move, Flow, Overload</em><br/>Once per arc, you may move through a space that should be impassable—a crowd that does not part, a wall of blades, a locked door—as if you were never there. You do not break, force, or open. You simply arrive on the other side. The GM cannot retroactively place obstacles in your path for that scene. Cost: You must accept a permanent Breath Scar; you can never again be surprised, but neither can you ever truly rest.</td>
+</tr>
+</table></div>
+<!-- ═══ TRADITIONS ═══ -->
+<h2 id="traditions">Monastic Traditions</h2>
+<p class="lede">A monk is defined not only by talents but by the tradition they follow—the philosophical and martial lineage that shapes their understanding of stillness. Each tradition offers a set of techniques, a patron affinity, and a corruption-like path of deepening mastery.</p>
+<div class="panel panel-silver">
+<strong>Using Monastic Traditions</strong>
+<p class="text-muted">Each tradition is presented as a table of techniques, similar to the Patron's Gift and Signature Talent structures found elsewhere. A monk may learn techniques from their tradition by spending XP as follows:</p>
+<ul class="text-muted">
+<li><strong>Basic Technique (4–6 XP):</strong> A foundational ability that defines the tradition's core approach.</li>
+<li><strong>Advanced Technique (8–10 XP):</strong> A more powerful or versatile ability, often requiring a minimum Tier or attribute.</li>
+<li><strong>Master Technique (12+ XP):</strong> A campaign-defining ability that represents the pinnacle of that tradition's path.</li>
+</ul>
+<p class="text-muted">Unlike Patron obligations, tradition techniques do not generate Obligation or Corruption unless the tradition is tied to a specific Patron (as noted in the tradition's description). Instead, they cost Fatigue, Boons, or have narrative costs determined by the GM.</p>
+</div>
+<h3>Way of the Unstruck Bell (Ikasha — Shadow)</h3>
+<p><em>Patron Affinity: Ikasha, She Who Sleeps</em></p>
+<p>The Unstruck Bell tradition teaches that the greatest defense is to not be where the strike lands. Followers of this path learn to read the gaps in perception, to become forgettable, and to move through shadows as if the shadows themselves had parted for them.</p>
+<h4>Basic Technique — Shadow Meld (6 XP)</h4>
+<p><em>Prerequisite: Stealth 2+</em><br/>Once per session as an action, step into any shadow larger than yourself and emerge from another shadow within Near range. You cannot be targeted while moving between shadows. Mark 1 Fatigue after using this technique.</p>
+<h4>Advanced Technique — The Unobserved (8 XP)</h4>
+<p><em>Prerequisite: Tier II, Stealth 3+</em><br/>When you are Hidden, social Story Beats cannot be used to frame you for a crime you did not commit (unless you act first). Additionally, witnesses suffer -2 dice to recall your face or describe you to authorities.</p>
+<h4>Master Technique — Threshold of Sleep (12 XP)</h4>
+<p><em>Prerequisite: Tier III, Spirit 3+</em><br/>Once per session, walk through a locked door, a guarded threshold, or a magical ward as if it were mist. This does not work on barriers specifically enchanted against shadow-walking (GM discretion). Mark 2 Fatigue and gain +1 Obligation to Ikasha after using this technique.</p>
+<h4>Corruption of the Unstruck Bell</h4>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Tier</th><th>Benefit</th><th>Cost / Quirk</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>+1 die to Stealth in dim light or darkness.</td><td>Light Sensitivity: -1 die to Stealth in direct sunlight.</td></tr>
+<tr><td>2</td><td>Once per scene, treat a failed Stealth roll as a success.</td><td>The Witness Debt: A raven appears to watch your next crime. If you fail that roll, the raven reports to a rival.</td></tr>
+<tr><td>3</td><td>+2 dice to resist being tracked or identified.</td><td>Shadow Lag: Your shadow moves half a second behind you. Those who notice suffer -1 die to social rolls with you.</td></tr>
+<tr><td>4</td><td>Once per session, become Hidden in plain sight (no roll required) in a crowd.</td><td>Hollow Attention: The Hollow begins to notice your erasures. GM gains 1 SB to spend on a pursuit complication.</td></tr>
+<tr><td>5</td><td>Immune to mundane forms of surveillance (scrying, tracking dogs, witnesses).</td><td>Forgetful: You occasionally forget minor details of your own past. Mark 1 Fatigue when this happens.</td></tr>
+<tr><td>6+</td><td>Once per session, become intangible to mundane harm for one scene.</td><td>Shadow's Price: Mark +2 Obligation to Ikasha. Your reflection no longer appears in mirrors.</td></tr>
+</tbody>
+</table></div>
+</div>
+<hr/>
+<h3>Way of the Iron Vow (Mykkiel / Oath of Flame — Law)</h3>
+<p><em>Patron Affinity: Mykkiel, Arbiter of the Covenant, or the Oath of Flame &amp; Light</em></p>
+<p>The Iron Vow tradition teaches that the body is a temple and the fist is a gavel. Followers of this path swear binding oaths that grant power in exchange for restriction. They are monks who serve as justiciars, bodyguards, and arbiters—their word is law, and their law is enforced by their palms.</p>
+<h4>Basic Technique — Sworn Defender (6 XP)</h4>
+<p><em>Prerequisite: Body 3+</em><br/>When you take the Defend action, you also grant an adjacent ally +1 Armour until your next turn. This stacks with other sources of Armour.</p>
+<h4>Advanced Technique — Unyielding Vow (8 XP)</h4>
+<p><em>Prerequisite: Tier II, Spirit 3+</em><br/>Swear a vow before a witness (a specific action you will accomplish or a person you will protect). While actively working toward that vow, you ignore the first point of Fatigue each scene that would come from exhaustion, fear, or despair. Breaking the vow voluntarily causes you to mark 1 Harm (Stress) and lose access to this technique until you complete a suitable penance.</p>
+<h4>Master Technique — The Unbroken Covenant (12 XP)</h4>
+<p><em>Prerequisite: Tier III, Mykkiel or Oath of Flame patron</em><br/>Once per session, declare a single oath you have sworn as inviolable. For the remainder of the session, you gain +2 dice to all rolls that directly advance that oath, and you ignore the first Harm 2 each scene that would prevent you from fulfilling it. When the oath is fulfilled (or becomes impossible to fulfil), you immediately mark +2 Obligation to your patron.</p>
+<h4>Corruption of the Iron Vow</h4>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Tier</th><th>Benefit</th><th>Cost / Quirk</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>+1 die to Insight when detecting lies or broken promises.</td><td>Rigid Honor: Must uphold vows even when disadvantageous; -1 die to flexible actions.</td></tr>
+<tr><td>2</td><td>Once per scene, treat a failed Spirit + Endurance test as a success (you steel yourself).</td><td>Judge's Severity: Cannot easily overlook infractions; suffer 1 Fatigue if forced to.</td></tr>
+<tr><td>3</td><td>+2 dice to Command when enforcing a sworn oath.</td><td>Suspicion: -1 die to social rolls with anyone you suspect of oathbreaking.</td></tr>
+<tr><td>4</td><td>Once per session, force a target who just lied to you to test Spirit + Endurance (DV 4) or be unable to speak for one exchange.</td><td>Compelled to Correct: Must point out falsehoods when noticed, regardless of tact.</td></tr>
+<tr><td>5</td><td>Your sworn vows gain supernatural weight. Breaking them causes you Harm 2 (Stress), but you may ignore one external compulsion per scene that would force you to break an oath.</td><td>Monomania: When you swear a vow, you suffer -2 dice to all actions not directly related to fulfilling it until it is complete.</td></tr>
+<tr><td>6+</td><td>Once per session, render absolute judgment on a target who has broken an oath in your presence. They suffer -2 dice to all actions until they atone.</td><td>Instrument of Wrath: Mark +2 Obligation. Your voice now tolls like a bell when you speak judgment; those who hear you cannot interrupt until your sentence is complete.</td></tr>
+</tbody>
+</table></div>
+</div>
+<hr/>
+<h3>Way of the Endless Cup (Thrysos — Drunken Master)</h3>
+<p><em>Patron Affinity: Thrysos, King of Revels</em></p>
+<p>The Drunken Master tradition is perhaps the most misunderstood. Outsiders see a staggering fool; initiates see a fighter who has learned that predictability is death. By mimicking the unsteady gait of intoxication, the Drunken Master becomes impossible to anticipate. Every stumble is a feint, every spill a trip, every belch a battle cry.</p>
+<h4>Basic Technique — Stagger Step (4 XP)</h4>
+<p><em>Prerequisite: Body 3+</em><br/>When an enemy misses you with a melee attack, you may immediately move one range band (Close ⇄ Near) without provoking opportunity attacks. Mark 1 Fatigue to use this technique (once per round).</p>
+<h4>Advanced Technique — Drunken Fist (6 XP)</h4>
+<p><em>Prerequisite: Body 3+, Spirit 2+</em><br/>Your unarmed strikes gain +1 die and ignore the first point of Armour when you are at Fatigue 2 or more (the wine guides you). This is a passive ability.</p>
+<h4>Master Technique — The Unbroken Bottle (12 XP)</h4>
+<p><em>Prerequisite: Tier III, Drunken Fist</em><br/>Once per session, you may ignore all penalties from Fatigue for one scene. While this is active, each time you would be hit by a melee attack, you may instead stagger out of the way and force the attacker to hit another adjacent creature of your choice (narrate the stumble). After the scene ends, you collapse with Harm 2 (Exhaustion) and cannot use this talent again until you have rested for a full night.</p>
+<h4>Corruption of the Endless Cup</h4>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Tier</th><th>Benefit</th><th>Cost / Quirk</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>+1 die to social rolls in feasts, taverns, or celebrations.</td><td>Compulsive Toast: Must drink when offered or mark 1 Fatigue.</td></tr>
+<tr><td>2</td><td>Ignore the first 1 Fatigue each scene.</td><td>Restless Appetite: -1 die when abstaining from indulgence (food, drink, or touch).</td></tr>
+<tr><td>3</td><td>Once per scene, treat a failed Acrobatics or Athletics roll as a success (you stumble into success).</td><td>Masquerade: Cannot act without a role or guise; -1 die to plain sincerity.</td></tr>
+<tr><td>4</td><td>Once per session, frenzy grants +2 dice to melee for one exchange.</td><td>Ecstatic Blindness: -1 die to perception outside the revel; you may not notice threats that require sobriety.</td></tr>
+<tr><td>5</td><td>Once per session, all allies within Near clear 1 Fatigue when you share a drink with them.</td><td>Hungering Host: You consume twice as much; denial causes Harm 1 (Stress).</td></tr>
+<tr><td>6+</td><td>Once per session, become an avatar of revels; all allies gain +2 dice, enemies suffer -2 dice to resist your social actions.</td><td>Tyrant of Pleasure: Mark +3 Obligation; the revel grows monstrous, demanding a sacrifice (an oath, a relationship, or a life).</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Creating Your Own Tradition</h3>
+<ol style="color:var(--grey);">
+<li><strong>Choose a Core Philosophy.</strong> What does this tradition value? Stillness? Motion? Endurance? Deception?</li>
+<li><strong>Select a Patron Affinity (Optional).</strong> Is the tradition tied to a specific Patron, or is it a purely mortal discipline?</li>
+<li><strong>Design Three Techniques.</strong> Basic (4–6 XP), Advanced (8–10 XP), Master (12+ XP). Each should feel distinct and build on the tradition's core.</li>
+<li><strong>Craft a Corruption Table (If Patron-Tied).</strong> Six tiers of deepening benefits and costs. The costs should be thematic and roleplay-heavy.</li>
+<li><strong>Name It.</strong> The best tradition names suggest both a technique and a philosophy: "The Way of the Open Hand," "The Path of the Whispering Stone," "The School of the Falling Leaf."</li>
+</ol>
+<!-- ═══ PSIONIC ═══ -->
+<h2 id="psionic">The Psionic Monk — The Silent Mind</h2>
+<blockquote>"The mind that moves the mountain first learns to be still. The thought that bends the spoon first learns to be empty."</blockquote>
+<p>The monk and the psion share a secret: both have looked inward and found a door. The monk opens it with breath; the psion opens it with will. At the intersection of these paths lies the psionic monk—a practitioner who has learned to weaponise the silence between thoughts.</p>
+<h3>Integrating Psionics and Monk Talents</h3>
+<p>A psionic monk treats their Mental Strain (see the Psionics chapter of the Gray Wanderer's Grimoire) as a secondary resource pool alongside Fatigue. The two are not interchangeable, but certain talents allow conversion:</p>
+<ul style="color:var(--grey);">
+<li><strong>Ki as Mental Strain:</strong> A monk with the Psionics skill may spend 1 Mental Strain instead of 1 Fatigue to power any monk talent with the [Flow] tag.</li>
+<li><strong>Mental Stillness:</strong> Once per scene, a psionic monk may reduce their Mental Strain by 1 by spending one minute in meditation (no roll required). This cannot be done in combat.</li>
+</ul>
+<h3>Psionic Arts for Monks</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Psionic Art</th><th>Monk Synergy</th></tr></thead>
+<tbody>
+<tr><td><strong>Telekinesis</strong></td><td>The Unseen Hand replaces physical strikes at range. A monk can use Telekinesis to parry arrows, trip enemies, or deliver "pressure point strikes" from across the room.</td></tr>
+<tr><td><strong>Biofeedback</strong></td><td>The Inward Physician is meditation made flesh. Monks who master Biofeedback can heal their own wounds, purge poison with a breath, and slow their heartbeat to appear dead.</td></tr>
+<tr><td><strong>Mind Shield</strong></td><td>The Walled Garden is the ultimate expression of Still Point Stance. A monk with Mind Shield can no longer be surprised, read, or mentally compelled.</td></tr>
+<tr><td><strong>Precognition</strong></td><td>Reading the Weather of the Skull allows a monk to act before the enemy acts—the ultimate expression of the empty breath.</td></tr>
+<tr><td><strong>Psychic Assault</strong></td><td>The Breaking Thought is the closed fist of the mind. A monk who masters this Art can stun, confuse, or simply drop an enemy with a glare.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Hybrid Build Examples</h3>
+<div class="panel panel-blue">
+<strong>The Shadow Telepath (Way of Unstruck Bell + Telepathy)</strong>
+<p><em>Core Talents:</em> Shadow Meld, The Unobserved, Telepathy (Surface Thoughts, Emotional State)</p>
+<p><em>Playstyle:</em> You are an infiltrator who doesn't need to pick locks or disable alarms. You read the guard's surface thoughts to learn the patrol route. You sense the captain's emotional state to know when he is distracted. When discovered, you step into a shadow and emerge behind them, delivering a Pressure Point Strike before they can raise the alarm.</p>
+<p><em>Sample Progression:</em> Monk's Breath (2) → Shadow Meld (4) → Telepathy (6) → Pressure Point Strike (8) → Emotional State (10) → The Unobserved (12)</p>
+</div>
+<div class="panel panel-gold">
+<strong>The Iron Mind Shield (Way of Iron Vow + Mind Shield)</strong>
+<p><em>Core Talents:</em> Sworn Defender, Unyielding Vow, Mind Shield (Resist Intrusion, Shelter Allies)</p>
+<p><em>Playstyle:</em> You are the party's mental bastion. While the mages cast and the rogues sneak, you stand in the doorway and refuse to move. Enemies cannot read your allies' minds because you have erected a Walled Garden around them. When a psychic assault targets the group, you absorb the strain and convert it to Fuel for your Iron Vow.</p>
+<p><em>Sample Progression:</em> The Open Hand (2) → Sworn Defender (4) → Mind Shield (6) → Unyielding Vow (8) → Shelter Allies (10) → The Unbroken Covenant (12)</p>
+</div>
+<div class="panel panel-orange">
+<strong>The Drunken Precog (Way of Endless Cup + Precognition)</strong>
+<p><em>Core Talents:</em> Stagger Step, Drunken Fist, Precognition (Advantage on future rolls, Avoid named dangers)</p>
+<p><em>Playstyle:</em> You stagger not because you are drunk, but because you have already seen where the blade will fall. Your Precognition tells you that the enemy will swing high; you stumble low. It tells you that the floor will give way; you "accidentally" step around the weak spot. To observers, you are a lucky fool. To your enemies, you are a nightmare who cannot be touched.</p>
+<p><em>Sample Progression:</em> Stagger Step (2) → Monk's Breath (4) → Precognition (6) → Drunken Fist (8) → Avoid Named Dangers (10) → The Unbroken Bottle (12)</p>
+</div>
+<div class="panel panel-red">
+<strong>The Silent Mind's Burden</strong>
+<p>A psionic monk walks two paths simultaneously, and each path demands its price. The monk pays in Fatigue and obligation; the psion pays in Mental Strain and the slow erosion of the self. When both debts come due at once—when the Fatigue track fills and the Mental Strain overflows—the monk risks becoming a hollow vessel: still breathing, still standing, but no longer present.</p>
+<p>The Gray Wanderer once described meeting such a monk in the catacombs beneath Thepyrgos: "He sat in perfect lotus, eyes open, pulse steady. But when I spoke, he did not answer. When I touched his shoulder, he did not blink. The body was a temple, but the god had moved out. I left a coin on his palm and walked away. The coin was still there when I returned a year later."</p>
+<p>Walk both paths if you must. But keep one foot on stone at all times.</p>
+</div>
+<!-- ═══ MONASTERY ═══ -->
+<h2 id="monastery">The Three-Temples Monastery</h2>
+<p>The Three-Temples Monastery is not a fortress. It is a collection of stones, oak trees, and breath. It has no walls, no guards, no treasury. Its only defense is the reputation of its monks: those who enter with violence in their hearts find that violence returned to them tenfold, and those who enter with empty hands find tea and a place to sleep.</p>
+<p>I am Brother Tarn, and I hold the rank of Keeper of the Unstruck Bell. Below me are the Five Elders, each responsible for a tradition. Below them, the monks who have taken vows. And at the bottom, the novices who scrub the floors and learn to breathe.</p>
+<h3>The Hierarchy of Breath</h3>
+<dl style="margin:0.4rem 0 0.4rem 1.2rem; color:var(--grey);">
+<dt style="color:var(--gold); font-weight:600;">Novice (First Breath)</dt>
+<dd>The novice learns to sit still for one hour. Most fail. Those who succeed begin to learn the Entering Breath.</dd>
+<dt style="color:var(--gold); font-weight:600;">Initiate (Holding Breath)</dt>
+<dd>The initiate learns to hold their breath for three minutes while meditating. This is not a physical test; it is a test of the mind's ability to override the body's panic.</dd>
+<dt style="color:var(--gold); font-weight:600;">Brother/Sister (Releasing Breath)</dt>
+<dd>The monk takes their first vow: "I will not strike first." They learn to redirect force, to parry, to disarm. They may leave the monastery but must return each season to renew the vow.</dd>
+<dt style="color:var(--gold); font-weight:600;">Elder (Empty Breath)</dt>
+<dd>The monk has learned to act from the space between thoughts. They are unpredictable, uncanny, and feared even by the other Elders. There are rarely more than five Elders at any time.</dd>
+<dt style="color:var(--gold); font-weight:600;">Keeper (The Unstruck Bell)</dt>
+<dd>There is only one Keeper. I hold the position now. When I die—or when I vanish into the hills to die alone—the Elders will choose another. Or they will not. The monastery has survived without a Keeper before.</dd>
+</dl>
+<h3>The Monastery's Assets</h3>
+<div class="grid-2">
+<div class="panel panel-gold">
+<strong>The Breath Registry</strong>
+<p class="text-muted">A record of every trained monk in the region, their vows, and their current location. Useful for finding allies or tracking fugitives.</p>
+</div>
+<div class="panel panel-silver">
+<strong>The Silent Passages</strong>
+<p class="text-muted">A network of hidden paths beneath the city that only monks know. These passages allow stealthy movement between any two locations in the city that have a shrine or meditation alcove.</p>
+</div>
+<div class="panel panel-blue">
+<strong>The Novice Network</strong>
+<p class="text-muted">A group of young monks who act as messengers, lookouts, and distraction. Each is Cap 1, good for reconnaissance but not combat.</p>
+</div>
+<div class="panel panel-green">
+<strong>The Healing House</strong>
+<p class="text-muted">A clinic run by the monastery where the sick and injured are treated without question. Monks may use the Healing House to recover Fatigue twice as fast (1 Fatigue per hour instead of per rest).</p>
+</div>
+<div class="panel panel-purple" style="grid-column: 1 / -1;">
+<strong>The Unstruck Bell</strong>
+<p class="text-muted">A legendary artifact—a bell that rings only in the mind. Once per session, a monk may ring the Unstruck Bell (as an action) to impose -2 dice on all fear-based effects against the party for one scene. The bell's location is a secret known only to the Keeper.</p>
+</div>
+</div>
+<h3>Notable Monks of the Three-Temples</h3>
+<div class="panel panel-gold">
+<strong>Brother Tarn (Keeper of the Unstruck Bell)</strong>
+<p><em>Tier: IV</em><br/>
+<em>Motivation:</em> Maintain the balance between the monastery and the city; prevent the Hollow from noticing the thresholds.<br/>
+<em>Leverage:</em> He knows the true names of every monk in the region, and the location of every hidden meditation cell.<br/>
+<em>Quirk:</em> He has never been seen eating. The novices whisper that he doesn't need to.</p>
+</div>
+<div class="panel panel-blue">
+<strong>Sister Mira (Elder of the Open Hand)</strong>
+<p><em>Tier: III</em><br/>
+<em>Motivation:</em> Heal the sick, protect the innocent, and remind the powerful that they are mortal.<br/>
+<em>Leverage:</em> She trained half the healers in the city. They owe her favors, and she calls them in.<br/>
+<em>Quirk:</em> She carries a small wooden bird that she carved as a novice. When she meditates, the bird sometimes sings.</p>
+</div>
+<div class="panel panel-silver">
+<strong>Brother Stone (Elder of the Iron Vow)</strong>
+<p><em>Tier: III</em><br/>
+<em>Motivation:</em> Enforce the monastery's oaths, hunt down those who have broken their vows, and protect the Keeper.<br/>
+<em>Leverage:</em> He holds the Breath Registry and knows which monks have failed their vows. He does not forgive.<br/>
+<em>Quirk:</em> He has not spoken in seven years. He communicates through hand signs and a small slate. The other Elders say his silence is a vow, not a wound.</p>
+</div>
+<div class="panel panel-red">
+<strong>The Abbot of the Empty Breath (Secret)</strong>
+<p><em>Tier: ?</em><br/>
+<em>Motivation:</em> Unknown. Some say the Abbot is dead. Others say the Abbot never existed—that the Empty Breath is simply the space where a Keeper should be.<br/>
+<em>Leverage:</em> Letters signed "The Abbot" arrive on warm paper, as if freshly pressed. They contain instructions that the Keeper always follows. No one has ever seen the Abbot.<br/>
+<em>Quirk:</em> The Abbot's seal is a blank circle. A bell that cannot ring.</p>
+</div>
+<!-- ═══ HOOKS ═══ -->
+<h2 id="hooks">Adventure Hooks &amp; Rumors</h2>
+<h3>Jobs from the Monastery (d12)</h3>
+<ol style="color:var(--grey);">
+<li><strong>The Broken Vow.</strong> A former monk has broken their oath of non-violence and is terrorising the docks. Bring them back alive. The Elders will decide their penance.</li>
+<li><strong>The Poisoned Breath.</strong> Someone is poisoning the monastery's well. The water tastes of iron, and novices are falling into comas. Find the source.</li>
+<li><strong>The Silent Passage Thief.</strong> Someone has learned the secret of the Silent Passages and is using them to rob merchant caravans. The thieves' guild is not responsible—someone else is wearing their mask.</li>
+<li><strong>The Wandering Keeper.</strong> Brother Tarn has disappeared. He left a note: "The bell tolls for me. Choose the next Keeper, or don't." The Elders cannot agree. They need the party to find him—or confirm his death.</li>
+<li><strong>The Rival School.</strong> A new martial arts school has opened in the city. They teach the "Way of the Closed Fist"—aggression, dominance, and the exploitation of weakness. They are recruiting from the monastery's novice pool.</li>
+<li><strong>The Haunted Meditation Cell.</strong> One of the monastery's meditation rooms is now haunted. Monks who enter hear whispers that sound like their own thoughts. Something is feeding on their stillness.</li>
+<li><strong>The Debt of the Sleeping Master.</strong> An old monk lies in a coma, kept alive by the monastery's healers. His debt to a Patron has come due, and the Patron is sending a collector. The party must protect the sleeping man—or negotiate with the collector.</li>
+<li><strong>The Hollow Tithe.</strong> The Hollow has noticed the monastery's thresholds. Once a year, the monks leave a basket of bread at the crossroads. This year, the basket came back empty—but something was inside the bread.</li>
+<li><strong>The Stolen Breath.</strong> A thief has stolen the Breath Registry. Without it, the monastery cannot track its monks' vows. The thief is demanding ransom—but the registry cannot be copied. The party must retrieve the original.</li>
+<li><strong>The Novice's Vision.</strong> A novice has had a prophetic vision: the monastery will burn within the month. The Elders dismiss it as fever dreams. The novice is terrified. The party must investigate—or prepare for fire.</li>
+<li><strong>The Inquisition's Visit.</strong> The Chain-Lanterns of Ecktoria have arrived. They have heard rumors of "unsanctioned psionic activity" within the monastery. They demand to search the cells. The Elders refuse. The party is caught between.</li>
+<li><strong>The Unstruck Bell's Secret.</strong> The Unstruck Bell has been stolen—or has it? The bell cannot be moved; it is a concept, not an object. But the Keeper swears it is gone. The party must discover what "missing" means for a bell that only rings in the mind.</li>
+</ol>
+<h3>Rumors Heard in the Monastery Courtyard (d12)</h3>
+<ul style="color:var(--grey);">
+<li>Sister Mira once healed a dying warlord. He repaid her by burning a village. She does not heal anyone who carries a weapon anymore.</li>
+<li>Brother Stone took his vow of silence after accidentally killing a student during a sparring match. The student was his son.</li>
+<li>The Abbot of the Empty Breath is actually the ghost of the monastery's founder. He has been dead for two hundred years. The Keeper is the only one who can see him.</li>
+<li>The Silent Passages lead not only under the city, but into the Ways Between. Monks who walk too far sometimes come back with empty eyes.</li>
+<li>The monastery's well was dug on the site of an ancient execution ground. That is why the water tastes of iron—and why the Hollowed sometimes gather at midnight to drink.</li>
+<li>The Unstruck Bell was not forged. It was found. It lay in a field, half-buried, next to a skeleton in gray robes. The skeleton wore the Abbot's seal.</li>
+<li>There is a meditation cell that no one uses. The door is locked. The key was thrown into the well. The novice who asked why was expelled.</li>
+<li>Brother Tarn is not the first Keeper to disappear. The previous Keeper walked into the hills thirty years ago. Some say he is still walking.</li>
+<li>The Drunken Master tradition was not invented by the monastery. It was borrowed from a wandering beggar who beat three Elders with a broken bottle and then asked for tea.</li>
+<li>The Hollow does not collect debts from monks. It is afraid of them. This is not a rumor. This is a warning.</li>
+<li>The monastery has a secret library beneath the courtyard. The books are written in a language that changes depending on who reads them. The Abbot keeps the key.</li>
+<li>The Gray Wanderer once stayed at the monastery for three days. He meditated in the courtyard, spoke to no one, and left a single coin on the well. The coin is still there. No one will touch it.</li>
+</ul>
+<!-- ═══ SAMPLE ═══ -->
+<h2 id="sample">The Debt of the Sleeping Master — Sample Adventure</h2>
+<h3>The Setup</h3>
+<p>The party is summoned to the monastery's infirmary. An old monk lies on a pallet of gray wool, eyes open but unseeing, lips moving in a language none of the novices recognize. His name is Master Kai, and he was once a teacher of the Way of the Unstruck Bell. Thirty years ago, he walked into the hills and did not return. Last night, a shepherd found him sitting cross-legged in a field, still breathing, still warm, but utterly absent.</p>
+<p>Brother Tarn stands at the bedside. "He is not asleep," the Keeper says. "He is hiding. Something from his past has caught up with him, and he has run into the only place it cannot follow: his own memory. You must go in after him."</p>
+<h3>The Threshold</h3>
+<p>The party must enter Master Kai's mind. This requires a psionic anchor (a character with the Psionics skill and the Telepathy Art) who can pull the others into the dream. The anchor pays 1 Mental Strain per passenger (minimum 1). Non-psions cannot use psionic Arts inside the dream, but they can see, speak, fight, and interact with the environment normally.</p>
+<p>The threshold is the pallet. The witnesses are each other. The price is one memory of comfort associated with the Master, which will be lost forever.</p>
+<h3>The Dream Heist</h3>
+<p>Once inside, the party appears in a memory version of the monastery's meditation hall. They must descend through nine chambers, each representing a hidden debt or unspoken regret of Master Kai's past. The final chamber contains the secret he has been hiding: the name of a woman he swore to protect during the Ashaani purges, and then abandoned.</p>
+<p>Until the name is spoken aloud in the heart of the dream, the Master cannot wake—and the Spector (a gray figure representing his un-faced death) will stalk the party through the chambers.</p>
+<h4>Mechanics</h4>
+<ul style="color:var(--grey);">
+<li><strong>Master's Breath Timer [8]:</strong> Ticks every scene. When full, the Master's body stops breathing. The dream collapses; all PCs mark 2 Harm and gain the Haunted condition.</li>
+<li><strong>Debt's Approach Timer [6]:</strong> Ticks when the party speaks a lie, fails a Spirit + Endurance test, or damages a dream-construct. When full, the woman's spirit manifests and attacks.</li>
+<li><strong>Name Unspoken Timer [4]:</strong> Fills as the party discovers clues about the woman's identity. When full, the name is known and can be spoken in the final chamber.</li>
+</ul>
+<h3>Resolution</h3>
+<p>If the party speaks the name, the Master's eyes close, then open. He looks at Brother Tarn and says, "I am ready now." He dies within the hour, at peace. The party gains +1 Favor with the monastery and may each clear 1 Obligation or Corruption segment.</p>
+<p>If the party fails—if the Master's Breath timer fills before the name is spoken—they wake to find the Master dead, his eyes still open, his lips still moving. The Spector has claimed him. The monastery will remember the party's failure for a generation.</p>
+<div class="callout">
+<strong>🧘 The Gray Wanderer's Note on the Adventure</strong>
+<p>"I have been inside three dying minds. Two of them were gardens—overgrown, yes, but still growing. The third was a courtroom where the judge had been dead for forty years and the jury was made of the people he had wronged. That one took three days to escape. The trick is to remember that the dream is not real, but the debt is. You cannot argue with a ghost about whether you owe it. You can only pay."</p>
+</div>
+<!-- ═══ LAST WORDS ═══ -->
+<hr/>
+<div class="panel panel-gold">
+<strong>Last Words from Brother Tarn</strong>
+<p>You have read the techniques. You have seen the traditions. You know the price of the Unstruck Bell and the weight of the Iron Vow. Now close the book.</p>
+<p>The monastery is not a place. It is a relationship with stillness. You can practice the Entering Breath in a crowded tavern, the Holding Breath in a prison cell, the Releasing Breath on a battlefield. The Empty Breath? That one you must find for yourself. I cannot teach it. No one can. The best I can do is point at the moon and hope you look up instead of at my finger.</p>
+<p>Go. Make mistakes. Get hit. Learn why you should not have been there when the blow landed. Come back if you survive. I will keep the tea warm.</p>
+<p style="margin-top:0.4rem;"><em>Brother Tarn<br/>Keeper of the Unstruck Bell<br/>Three-Temples Monastery<br/>The ink is dry. The mirror is still. The bell does not ring.</em></p>
+</div>
+<footer>
+        Fate's Edge Proprietary Content — © 2026 Nicholas A. Gasper. All rights reserved.<br/>
+<em>The Unstruck Bell</em> · A Monk's Guide to the Still Point and the Open Hand
+    </footer>
+</div>
+</article></body>
 </html>

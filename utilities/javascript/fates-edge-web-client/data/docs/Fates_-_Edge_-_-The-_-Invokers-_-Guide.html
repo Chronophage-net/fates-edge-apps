@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Invoker's Guide &mdash; Fate's Edge</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Invoker's Guide — Fate's Edge</title>
 <style>
 :root{--bg1:#0b0d12;--bg2:#12141c;--bg3:#181b25;--text:#e8e3d6;--text2:#a49d8b;
 --text3:#8b8573;--gold:#c9a227;--border:#2a2d3a;--red:#8e2a2a;--green:#3d7a52;
@@ -59,773 +60,577 @@ th,td{border:1px solid #999}
 .noprint{display:none!important}
 }
 </style>
-</head>
-<body>
-
-<h1>The Invoker's Guide</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Expansions · specialist reference</strong></p><p>Read the core rules first, then this document’s scope, prerequisites, and procedures. Apply only changes it explicitly states; a missing restatement is not a general exception. The SRD and extensions in the Player’s and GM Guides remain the core reference, and the core loop still applies.</p><nav aria-label="Library reading links"><a href="resources/Reading-Guide.html">Where to start: library reading guide</a><a href="srd/index.html">Core mechanic</a><a href="complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">The Invoker's Guide</a></li><li><a href="#reader-section-2">The Triune</a></li><li><a href="#reader-section-3">The Seraphic Order</a></li><li><a href="#reader-section-4">The Empyreal Order</a></li><li><a href="#reader-section-5">The Chthonic Order</a></li><li><a href="#reader-section-6">Beyond the Triune</a></li><li><a href="#reader-section-7">Archetypes: The Carried Trade</a></li><li><a href="#reader-section-8">Cross-Resonance</a></li></ul></details>
+<h1 id="reader-section-1">The Invoker's Guide</h1>
 <p class="text-sm text-muted">
 <span class="badge badge-gold">Reference</span>
 <span class="badge badge-blue">51 Patrons</span>
 <span class="badge badge-purple">Generated</span>
 <span class="badge">Author: Nicholas A. Gasper</span>
 </p>
-
-<blockquote>&ldquo;I have carried a dozen Symbols and broken half of them. The weight
+<blockquote>“I have carried a dozen Symbols and broken half of them. The weight
 does not diminish; it only redistributes. This is the Invoker's art: to know which
 Patron to call, when to call them, and what they will demand in return. The Triune
-is not a religion. It is a map.&rdquo;</blockquote>
-
+is not a religion. It is a map.”</blockquote>
 <p>For the Invoker, the Patrons are not gods to be worshipped but <em>forces to be
-understood</em> &mdash; tides, storms, laws, hungers and silences, each with its own
+understood</em> — tides, storms, laws, hungers and silences, each with its own
 nature, its own demands and its own price. The Invoker does not kneel. They study.
 They learn the shape of a Patron's attention, the weight of its Obligation, and the
 exact moment a Symbol must be shown, a Rite invoked, or a Seal cracked.</p>
-
 <div class="panel">
 <p><strong>This document is built, not written.</strong> Every Patron below is
 generated from the same files the toolkit reads, so the catalogue cannot drift out
 of step with the Patron browser, and adding a Patron adds it here for free. What is
 authored here is the frame: the Triune, the archetypes, and the Cross-Resonance table.</p>
 </div>
-
-<h2>The Triune</h2>
+<h2 id="reader-section-2">The Triune</h2>
 <p>The Triune divides the Patrons into three Orders, each ruled by one of the three
 sisters who are not sisters, the three angels who are not angels. It is a framework
-of <em>comprehension</em> rather than worship &mdash; a way of predicting what a
+of <em>comprehension</em> rather than worship — a way of predicting what a
 Patron will ask before you are standing in front of it.</p>
 <p>Beyond the three lie Patrons the architecture cannot hold. The wise Invoker knows
 when to reach for the known and when to reach for the strange.</p>
-
 <section class="level1" id="order-seraphic">
-<h2>The Seraphic Order</h2>
-<blockquote><em>Ruled by Inaea, Angel of the Spider</em><br>&ldquo;In the web, all vows are caught.&rdquo;</blockquote>
+<h2 id="reader-section-3">The Seraphic Order</h2>
+<blockquote><em>Ruled by Inaea, Angel of the Spider</em><br/>“In the web, all vows are caught.”</blockquote>
 <p class="gloss">Law, flame, and connection — the principles that bind and structure.</p>
 <p>Seraphic Patrons offer reliable, structured power. Their Rites are predictable, their Obligation costs moderate, their Acts of Service plain. The price is <em>accountability</em>: these Patrons remember what you swore, and they will hold you to it.</p>
 <p class="text-sm text-muted">11 Patrons.</p>
-
 <div class="panel patron" id="patron-inaea-angel-of-spiders">
-  <h3>Inaea, Angel of the Spider <span class="text-muted text-sm">&mdash; The Patience of the Web</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne I</span> <span class="badge badge-blue">8 Rites</span> <span class="badge badge-green">Gift: Thread of Binding</span></p>
-  <p>Inaea sits in patient silence at the center of the unseen lattice. Where others see isolation, she sees threads—debt, affection, rivalry, loyalty—all binding mortals to one another.</p>
-  <ul class='domain-list'><li>Webs of Obligation: debts, promises, favors, and the ties that bind</li><li>Patient Predation: setting traps, waiting for the moment to strike</li><li>Unseen Connections: sensing hidden relationships, leverage, and weakness</li><li>Mercy as Control: healing and aid that leave lasting threads</li></ul>
-  
-  
-  
+<h3>Inaea, Angel of the Spider <span class="text-muted text-sm">— The Patience of the Web</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne I</span> <span class="badge badge-blue">8 Rites</span> <span class="badge badge-green">Gift: Thread of Binding</span></p>
+<p>Inaea sits in patient silence at the center of the unseen lattice. Where others see isolation, she sees threads—debt, affection, rivalry, loyalty—all binding mortals to one another.</p>
+<ul class="domain-list"><li>Webs of Obligation: debts, promises, favors, and the ties that bind</li><li>Patient Predation: setting traps, waiting for the moment to strike</li><li>Unseen Connections: sensing hidden relationships, leverage, and weakness</li><li>Mercy as Control: healing and aid that leave lasting threads</li></ul>
 </div>
-
 <div class="panel patron" id="patron-mykkiel-arbiter-of-the-covenant">
-  <h3>Mykkiel — Arbiter of the Covenant <span class="text-muted text-sm">&mdash; Law &amp; Zeal</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne II</span> <span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Covenant's Edge</span></p>
-  <p>Mykkiel is the unwavering judge of covenants, the divine lawgiver whose scales and sword uphold sacred order. He is not good, nor evil – he is the law. Mercy without justice is weakness; justice without law is chaos.</p>
-  <ul class='domain-list'><li>Divine Law: sacred commandments, contractual obligations, ritual purity</li><li>Zealous Justice: righteous judgment, purge of impurity, holy retribution</li><li>Covenant Bonds: sacred oaths, tribal loyalty, the chosen community</li><li>Absolute Order: hierarchy, tradition, unchanging truth</li></ul>
-  
-  
-  
+<h3>Mykkiel — Arbiter of the Covenant <span class="text-muted text-sm">— Law &amp; Zeal</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne II</span> <span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Covenant's Edge</span></p>
+<p>Mykkiel is the unwavering judge of covenants, the divine lawgiver whose scales and sword uphold sacred order. He is not good, nor evil – he is the law. Mercy without justice is weakness; justice without law is chaos.</p>
+<ul class="domain-list"><li>Divine Law: sacred commandments, contractual obligations, ritual purity</li><li>Zealous Justice: righteous judgment, purge of impurity, holy retribution</li><li>Covenant Bonds: sacred oaths, tribal loyalty, the chosen community</li><li>Absolute Order: hierarchy, tradition, unchanging truth</li></ul>
 </div>
-
 <div class="panel patron" id="patron-oath-of-flame-light">
-  <h3>Oath of Flame &amp; Light <span class="text-muted text-sm">&mdash; Dawn &amp; Vows</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne III</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Oath's Blessing</span></p>
-  <p>There is a kind of person who cannot bear to be doubted, and a kind who cannot bear to have doubted themselves. The Oath takes both. It is not a god and has never claimed to be.</p>
-  <ul class='domain-list'><li>Sacred Vows: oath-keeping, truth-speaking, binding promises</li><li>Divine Justice: retribution, smiting evil, protecting the innocent</li><li>Radiant Power: healing light, purification, revealing truth</li><li>Dawn's Hope: renewal, protection, driving back darkness</li></ul>
-  
-  
-  
+<h3>Oath of Flame &amp; Light <span class="text-muted text-sm">— Dawn &amp; Vows</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne III</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Oath's Blessing</span></p>
+<p>There is a kind of person who cannot bear to be doubted, and a kind who cannot bear to have doubted themselves. The Oath takes both. It is not a god and has never claimed to be.</p>
+<ul class="domain-list"><li>Sacred Vows: oath-keeping, truth-speaking, binding promises</li><li>Divine Justice: retribution, smiting evil, protecting the innocent</li><li>Radiant Power: healing light, purification, revealing truth</li><li>Dawn's Hope: renewal, protection, driving back darkness</li></ul>
 </div>
-
 <div class="panel patron" id="patron-confessor-beneath-the-bell">
-  <h3>The Confessor Beneath the Bell <span class="text-muted text-sm">&mdash; Burden &amp; Exchange</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne IV</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Confessor's Silence</span></p>
-  <p>The Confessor waits in places where guilt gathers — under church spires, in confessionals long abandoned, in the echo of unspoken sins. He does not judge, nor absolve. He takes.</p>
-  <ul class='domain-list'><li>Sin Eating: absorbing guilt, shame, and spiritual debt</li><li>Burden Transfer: moving conditions, curses, and story beats from one creature to another</li><li>Confessional Exchange: hearing secrets, trading silence for obligation</li><li>Weight of Ages: the slow accumulation of sin that must eventually be released</li></ul>
-  
-  
-  
+<h3>The Confessor Beneath the Bell <span class="text-muted text-sm">— Burden &amp; Exchange</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne IV</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Confessor's Silence</span></p>
+<p>The Confessor waits in places where guilt gathers — under church spires, in confessionals long abandoned, in the echo of unspoken sins. He does not judge, nor absolve. He takes.</p>
+<ul class="domain-list"><li>Sin Eating: absorbing guilt, shame, and spiritual debt</li><li>Burden Transfer: moving conditions, curses, and story beats from one creature to another</li><li>Confessional Exchange: hearing secrets, trading silence for obligation</li><li>Weight of Ages: the slow accumulation of sin that must eventually be released</li></ul>
 </div>
-
 <div class="panel patron" id="patron-gallows-bell-justice-judgment">
-  <h3>The Gallow's Bell <span class="text-muted text-sm">&mdash; Justice &amp; Judgment</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne V</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Bell's Verdict</span></p>
-  <p>The Bell does not rage; it tolls. Cold and impartial, it measures all accounts in time. Its keepers are silent arbiters who weigh deeds against consequence, not out of anger but out of inevitability.</p>
-  <ul class='domain-list'><li>Weighing of Deeds: measuring action against consequence, debt against payment</li><li>Solemn Judgment: verdicts that cannot be appealed, sentences that must be carried out</li><li>Compelled Truth: forcing honesty under threat of the Bell's toll</li><li>Iron Witness: the Bell as an impartial recorder of oaths, lies, and reckonings</li></ul>
-  
-  
-  
+<h3>The Gallow's Bell <span class="text-muted text-sm">— Justice &amp; Judgment</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne V</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Bell's Verdict</span></p>
+<p>The Bell does not rage; it tolls. Cold and impartial, it measures all accounts in time. Its keepers are silent arbiters who weigh deeds against consequence, not out of anger but out of inevitability.</p>
+<ul class="domain-list"><li>Weighing of Deeds: measuring action against consequence, debt against payment</li><li>Solemn Judgment: verdicts that cannot be appealed, sentences that must be carried out</li><li>Compelled Truth: forcing honesty under threat of the Bell's toll</li><li>Iron Witness: the Bell as an impartial recorder of oaths, lies, and reckonings</li></ul>
 </div>
-
 <div class="panel patron" id="patron-inquisitor-prime-iron-hand-of-purity">
-  <h3>The Inquisitor Prime — The Iron Hand of Purity <span class="text-muted text-sm">&mdash; Purity &amp; Domination</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Iron Hand</span></p>
-  <p>Among the Aeler Iron Avengers, zealots, and witch-hunters, the Inquisitor Prime is venerated as the hand of absolute purity and the sword of uncompromising order.</p>
-  <ul class='domain-list'><li>Purity and Order: eradicating corruption, enforcing sacred law</li><li>Judgment: condemning the guilty, burning the heretical</li><li>Protection from the Tainted: warding against the supernatural</li><li>Domination: binding the impure to serve the pure</li></ul>
-  
-  
-  
+<h3>The Inquisitor Prime — The Iron Hand of Purity <span class="text-muted text-sm">— Purity &amp; Domination</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Iron Hand</span></p>
+<p>Among the Aeler Iron Avengers, zealots, and witch-hunters, the Inquisitor Prime is venerated as the hand of absolute purity and the sword of uncompromising order.</p>
+<ul class="domain-list"><li>Purity and Order: eradicating corruption, enforcing sacred law</li><li>Judgment: condemning the guilty, burning the heretical</li><li>Protection from the Tainted: warding against the supernatural</li><li>Domination: binding the impure to serve the pure</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-sacred-geometry-architect-of-perfect-forms">
-  <h3>The Sacred Geometry, Architect of Perfect Forms <span class="text-muted text-sm">&mdash; Harmony &amp; Immutable Law</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VII</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Geometry's Blessing</span></p>
-  <p>The Sacred Geometry teaches that perfect forms underlie all seeming chaos: the divine ratios that steer the spiral of galaxies, the symmetry that lattices frost, the measures that turn sound into song.</p>
-  <ul class='domain-list'><li>Perfect Proportion: building and reading ideal ratios and harmonious relationships</li><li>Pattern Recognition: discerning the structures that govern complex phenomena</li><li>Harmonic Resonance: working with natural frequencies and number-made consonance</li><li>Form Architecture: imposing clear structure on tangled situations</li></ul>
-  <div class="names"><p><strong>Also known as:</strong> The Sacred Geometry, Kon'reh</p><p><strong>The Sacred Geometry is the Ykrul name for Kon'reh.</strong> To a Ykrul this is not a comparison and not a metaphor: the board is the shape of the world, so the Patron of perfect forms and the eight figures on the board are the same subject, approached with a stone in your hand instead of a prayer. They will tell you a well-played game is an act of devotion and mean it literally, and they are not troubled that this makes every teahouse a shrine.</p><p>The Aelinnel use the same term and are not clear about what it means. Ask three of them and you will get an order of architects, a discipline of measure, and a game — with no sense from any of them that these are supposed to be one answer. Whether the meaning was lost on the way west or was never as fixed as the Ykrul believe is exactly the sort of question the Sacred Geometry is unhelpful about.</p><p>This is also why the Ninth Rim opposes it. The board has eight figures. The Ninth is the rim past the edge of a thing that was supposed to contain everything, and there is no polite way for the architecture to hold that.</p></div>
-  
-  
+<h3>The Sacred Geometry, Architect of Perfect Forms <span class="text-muted text-sm">— Harmony &amp; Immutable Law</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VII</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Geometry's Blessing</span></p>
+<p>The Sacred Geometry teaches that perfect forms underlie all seeming chaos: the divine ratios that steer the spiral of galaxies, the symmetry that lattices frost, the measures that turn sound into song.</p>
+<ul class="domain-list"><li>Perfect Proportion: building and reading ideal ratios and harmonious relationships</li><li>Pattern Recognition: discerning the structures that govern complex phenomena</li><li>Harmonic Resonance: working with natural frequencies and number-made consonance</li><li>Form Architecture: imposing clear structure on tangled situations</li></ul>
+<div class="names"><p><strong>Also known as:</strong> The Sacred Geometry, Kon'reh</p><p><strong>The Sacred Geometry is the Ykrul name for Kon'reh.</strong> To a Ykrul this is not a comparison and not a metaphor: the board is the shape of the world, so the Patron of perfect forms and the eight figures on the board are the same subject, approached with a stone in your hand instead of a prayer. They will tell you a well-played game is an act of devotion and mean it literally, and they are not troubled that this makes every teahouse a shrine.</p><p>The Aelinnel use the same term and are not clear about what it means. Ask three of them and you will get an order of architects, a discipline of measure, and a game — with no sense from any of them that these are supposed to be one answer. Whether the meaning was lost on the way west or was never as fixed as the Ykrul believe is exactly the sort of question the Sacred Geometry is unhelpful about.</p><p>This is also why the Ninth Rim opposes it. The board has eight figures. The Ninth is the rim past the edge of a thing that was supposed to contain everything, and there is no polite way for the architecture to hold that.</p></div>
 </div>
-
 <div class="panel patron" id="patron-the-sealed-gate">
-  <h3>The Sealed Gate <span class="text-muted text-sm">&mdash; Thresholds &amp; Containment</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VIII</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Gate's Blessing</span></p>
-  <p>The Sealed Gate stands where realities meet, embodying the sacred power of thresholds, boundaries, and containment.</p>
-  <ul class='domain-list'><li>Thresholds: doors, portals, borders between realms</li><li>Containment: wards, bindings, imprisonment of dangerous forces</li><li>Exclusion: banishment, quarantine, protection through separation</li><li>Permission: safe passage, authorized access, controlled crossing</li></ul>
-  
-  
-  
+<h3>The Sealed Gate <span class="text-muted text-sm">— Thresholds &amp; Containment</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VIII</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Gate's Blessing</span></p>
+<p>The Sealed Gate stands where realities meet, embodying the sacred power of thresholds, boundaries, and containment.</p>
+<ul class="domain-list"><li>Thresholds: doors, portals, borders between realms</li><li>Containment: wards, bindings, imprisonment of dangerous forces</li><li>Exclusion: banishment, quarantine, protection through separation</li><li>Permission: safe passage, authorized access, controlled crossing</li></ul>
 </div>
-
 <div class="panel patron" id="patron-silent-choir-keeper-of-unspoken-truths">
-  <h3>The Silent Choir <span class="text-muted text-sm">&mdash; What Mercy Leaves Unsaid</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne IX</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Stillness</span></p>
-  <p>The Silent Choir is the gathered voice of truths wisely left unsaid, confessions granted mercy, and secrets kept to spare a life from breaking.</p>
-  <ul class='domain-list'><li>Protective Silence: when and how to keep counsel for others' good</li><li>Merciful Omission: judging truths that harm when spoken</li><li>Confidential Guardianship: safeguarding people and perilous knowledge</li><li>Restraint Wisdom: the power of what is not said or done</li></ul>
-  
-  
-  
+<h3>The Silent Choir <span class="text-muted text-sm">— What Mercy Leaves Unsaid</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne IX</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Stillness</span></p>
+<p>The Silent Choir is the gathered voice of truths wisely left unsaid, confessions granted mercy, and secrets kept to spare a life from breaking.</p>
+<ul class="domain-list"><li>Protective Silence: when and how to keep counsel for others' good</li><li>Merciful Omission: judging truths that harm when spoken</li><li>Confidential Guardianship: safeguarding people and perilous knowledge</li><li>Restraint Wisdom: the power of what is not said or done</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-witness">
-  <h3>The Witness <span class="text-muted text-sm">&mdash; Truth &amp; Revelation</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne X</span> <span class="badge badge-blue">7 Rites</span> <span class="badge badge-green">Gift: Word of Truth</span></p>
-  <p>The Witness remembers what others bury. Every shadow cast and oath broken is a line in her unending ledger.</p>
-  <ul class='domain-list'><li>Truth Revelation: exposing lies, uncovering secrets, forcing confessions</li><li>Memory Keeping: preserving knowledge, recalling forgotten facts</li><li>Inconvenient Knowledge: learning what others wish to hide</li><li>Prophetic Warning: seeing the consequences of hidden truths</li></ul>
-  
-  
-  
+<h3>The Witness <span class="text-muted text-sm">— Truth &amp; Revelation</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne X</span> <span class="badge badge-blue">7 Rites</span> <span class="badge badge-green">Gift: Word of Truth</span></p>
+<p>The Witness remembers what others bury. Every shadow cast and oath broken is a line in her unending ledger.</p>
+<ul class="domain-list"><li>Truth Revelation: exposing lies, uncovering secrets, forcing confessions</li><li>Memory Keeping: preserving knowledge, recalling forgotten facts</li><li>Inconvenient Knowledge: learning what others wish to hide</li><li>Prophetic Warning: seeing the consequences of hidden truths</li></ul>
 </div>
-
 <div class="panel patron" id="patron-varnek-karn-the-deaths-negotiator">
-  <h3>Varnek Karn, the Death's Negotiator <span class="text-muted text-sm">&mdash; Bargains with the Departed</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne XI</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Varnek's Blessing</span></p>
-  <p>Varnek Karn dwells in the gray between life and death, where the newly departed linger with unfinished business and elder shades guard secrets dearer than gold.</p>
-  <ul class='domain-list'><li>Post-Mortem Diplomacy: parleys with ghosts and recent dead</li><li>Ancestral Wisdom: counsel from forebears and keeping of funerary law</li><li>Unfinished Business: resolving the concerns that bind spirits</li><li>Death-Bound Contracts: obligations that outlive the flesh</li></ul>
-  
-  
-  
+<h3>Varnek Karn, the Death's Negotiator <span class="text-muted text-sm">— Bargains with the Departed</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne XI</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Varnek's Blessing</span></p>
+<p>Varnek Karn dwells in the gray between life and death, where the newly departed linger with unfinished business and elder shades guard secrets dearer than gold.</p>
+<ul class="domain-list"><li>Post-Mortem Diplomacy: parleys with ghosts and recent dead</li><li>Ancestral Wisdom: counsel from forebears and keeping of funerary law</li><li>Unfinished Business: resolving the concerns that bind spirits</li><li>Death-Bound Contracts: obligations that outlive the flesh</li></ul>
 </div>
 </section>
-
 <section class="level1" id="order-empyreal">
-<h2>The Empyreal Order</h2>
-<blockquote><em>Ruled by Ikasha, She Who Sleeps</em><br>&ldquo;In shadow and silence, all things move.&rdquo;</blockquote>
+<h2 id="reader-section-4">The Empyreal Order</h2>
+<blockquote><em>Ruled by Ikasha, She Who Sleeps</em><br/>“In shadow and silence, all things move.”</blockquote>
 <p class="gloss">Motion, desire, and performance — the forces that drive and transform.</p>
 <p>Empyreal Patrons offer flexibility and passion. Their Rites reward you but rarely the way you expected; their costs are moderate and their demands are <em>emotional</em>. The price is <em>vulnerability</em>: they ask you to feel, to want, to risk.</p>
 <p class="text-sm text-muted">11 Patrons.</p>
-
 <div class="panel patron" id="patron-aveh-rider-behind-the-storm">
-  <h3>Aveh, the Rider Behind the Storm <span class="text-muted text-sm">&mdash; The Freedom That Forgets Your Name</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne I</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Aveh's Unbinding</span></p>
-  <p>Aveh is the faceless rider at the horizon's edge, neither man nor woman, both and neither. The Ykrul call them Aveh, a liminal spirit beyond hearth and vow, a storm-shadow that offers liberty at the cost of belonging.</p>
-  <ul class='domain-list'><li>Freedom from Bonds: escape, liberation, shedding constraints</li><li>Erasure: becoming forgotten, removing traces, vanishing from memory</li><li>Liminal Identity: non-conforming, genderless, between categories</li><li>Storm as Shelter: the chaos that hides and the wind that carries away</li></ul>
-  
-  
-  
+<h3>Aveh, the Rider Behind the Storm <span class="text-muted text-sm">— The Freedom That Forgets Your Name</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne I</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Aveh's Unbinding</span></p>
+<p>Aveh is the faceless rider at the horizon's edge, neither man nor woman, both and neither. The Ykrul call them Aveh, a liminal spirit beyond hearth and vow, a storm-shadow that offers liberty at the cost of belonging.</p>
+<ul class="domain-list"><li>Freedom from Bonds: escape, liberation, shedding constraints</li><li>Erasure: becoming forgotten, removing traces, vanishing from memory</li><li>Liminal Identity: non-conforming, genderless, between categories</li><li>Storm as Shelter: the chaos that hides and the wind that carries away</li></ul>
 </div>
-
 <div class="panel patron" id="patron-grimmir-the-old-man-of-the-forest">
-  <h3>Grimmir, the Old Man of the Forest <span class="text-muted text-sm">&mdash; Blood at Midwinter</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne II</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Grimmir's Blessing</span></p>
-  <p>Grimmir is the Old Man of the Forest, the Alder King, the presence that watches from the shadow of the oldest oak, the cold breath on the back of the neck when the path grows dark.</p>
-  <ul class='domain-list'><li>Seasonal Sacrifice: the old ways of blood and offering, the turning wheel that demands payment</li><li>Folk Horror: the terror of the unseen, the ritual that must be performed, the boundary that must not be crossed</li><li>Primal Mystery: knowledge hidden in root and stone, the language of omens and portents</li><li>Growth from Death: the forest floor as a stomach; decay as the engine of new life</li></ul>
-  
-  
-  
+<h3>Grimmir, the Old Man of the Forest <span class="text-muted text-sm">— Blood at Midwinter</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne II</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Grimmir's Blessing</span></p>
+<p>Grimmir is the Old Man of the Forest, the Alder King, the presence that watches from the shadow of the oldest oak, the cold breath on the back of the neck when the path grows dark.</p>
+<ul class="domain-list"><li>Seasonal Sacrifice: the old ways of blood and offering, the turning wheel that demands payment</li><li>Folk Horror: the terror of the unseen, the ritual that must be performed, the boundary that must not be crossed</li><li>Primal Mystery: knowledge hidden in root and stone, the language of omens and portents</li><li>Growth from Death: the forest floor as a stomach; decay as the engine of new life</li></ul>
 </div>
-
 <div class="panel patron" id="patron-ikasha-she-who-sleeps">
-  <h3>Ikasha, She Who Sleeps <span class="text-muted text-sm">&mdash; The Hush Before the Choice</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne III</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Ikasha's Whisper</span></p>
-  <p>Ikasha is the hush between footfalls, the patience of dark water, the black-feathered watcher at every threshold. In stillness she gathers what might be, at crossroads she whispers of what may yet come.</p>
-  <ul class='domain-list'><li>Latent Potential: the power of what is not yet, the seed of action, the whisper before the scream</li><li>Shadow as Shelter: concealment, secrets, and the spaces between notice</li><li>Thresholds of Change: doors, crossroads, dreams, and the boundaries of sleep</li><li>Raven's Witness: omens, messages, and the weight of secrets shared</li></ul>
-  
-  
-  
+<h3>Ikasha, She Who Sleeps <span class="text-muted text-sm">— The Hush Before the Choice</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne III</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Ikasha's Whisper</span></p>
+<p>Ikasha is the hush between footfalls, the patience of dark water, the black-feathered watcher at every threshold. In stillness she gathers what might be, at crossroads she whispers of what may yet come.</p>
+<ul class="domain-list"><li>Latent Potential: the power of what is not yet, the seed of action, the whisper before the scream</li><li>Shadow as Shelter: concealment, secrets, and the spaces between notice</li><li>Thresholds of Change: doors, crossroads, dreams, and the boundaries of sleep</li><li>Raven's Witness: omens, messages, and the weight of secrets shared</li></ul>
 </div>
-
 <div class="panel patron" id="patron-livaea-crimson-courtier">
-  <h3>Livaea — The Crimson Courtier <span class="text-muted text-sm">&mdash; Seduction &amp; Social Binding</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne IV</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Word of Yearning</span></p>
-  <p>In salons where laughter cuts deeper than daggers and promises bind tighter than chains, the Crimson Courtier reigns.</p>
-  <ul class='domain-list'><li>Seductive Arts: charm, persuasion, reading desire, emotional manipulation</li><li>Social Binding: oaths of affection, courtly promises, emotional debts</li><li>Performance and Glamour: dance, music, appearance enhancement, the weapons of the stage and salon</li><li>Court Intrigue: gossip, reputation, the velvet knives of the drawing room</li></ul>
-  
-  
-  
+<h3>Livaea — The Crimson Courtier <span class="text-muted text-sm">— Seduction &amp; Social Binding</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne IV</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Word of Yearning</span></p>
+<p>In salons where laughter cuts deeper than daggers and promises bind tighter than chains, the Crimson Courtier reigns.</p>
+<ul class="domain-list"><li>Seductive Arts: charm, persuasion, reading desire, emotional manipulation</li><li>Social Binding: oaths of affection, courtly promises, emotional debts</li><li>Performance and Glamour: dance, music, appearance enhancement, the weapons of the stage and salon</li><li>Court Intrigue: gossip, reputation, the velvet knives of the drawing room</li></ul>
 </div>
-
 <div class="panel patron" id="patron-mab-queen-of-courts">
-  <h3>Mab, Queen of Courts <span class="text-muted text-sm">&mdash; Glamour &amp; Bargain</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne V</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Mab's Jest</span></p>
-  <p>Mab keeps the Hazel Court, and she keeps it the way a very good hostess does: by arranging things so that no one can say afterward at what moment they became a guest. She does not command.</p>
-  <ul class='domain-list'><li>Fae Glamour: illusions, enchantments, the art of seeming</li><li>Social Bargains: oaths, promises, debt as social glue</li><li>Courtly Intrigue: etiquette, wordplay, the game of masks</li><li>Trickster Arts: mischief, cleverness, the twist in the tale</li></ul>
-  
-  
-  
+<h3>Mab, Queen of Courts <span class="text-muted text-sm">— Glamour &amp; Bargain</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne V</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Mab's Jest</span></p>
+<p>Mab keeps the Hazel Court, and she keeps it the way a very good hostess does: by arranging things so that no one can say afterward at what moment they became a guest. She does not command.</p>
+<ul class="domain-list"><li>Fae Glamour: illusions, enchantments, the art of seeming</li><li>Social Bargains: oaths, promises, debt as social glue</li><li>Courtly Intrigue: etiquette, wordplay, the game of masks</li><li>Trickster Arts: mischief, cleverness, the twist in the tale</li></ul>
 </div>
-
 <div class="panel patron" id="patron-maelstraeus-infernal-bargainer">
-  <h3>Maelstraeus — The Infernal Bargainer <span class="text-muted text-sm">&mdash; Commerce &amp; Exchange</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Clause of Interest</span></p>
-  <p>Maelstraeus is the Infernal Bargainer, the Prince of Ledgers, the shadow at every crossroads of exchange. He was born from the first inequity, when one gave and another took, and debt was chained into existence.</p>
-  <ul class='domain-list'><li>Commerce as Conflict: negotiation, leverage, hidden clauses</li><li>Debt as Power: obligation as currency, interest as weapon</li><li>Inevitability: all accounts are settled, sooner or later</li><li>Infernal Bargains: Faustian pacts, soul ledgers, cursed credit</li></ul>
-  
-  
-  
+<h3>Maelstraeus — The Infernal Bargainer <span class="text-muted text-sm">— Commerce &amp; Exchange</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Clause of Interest</span></p>
+<p>Maelstraeus is the Infernal Bargainer, the Prince of Ledgers, the shadow at every crossroads of exchange. He was born from the first inequity, when one gave and another took, and debt was chained into existence.</p>
+<ul class="domain-list"><li>Commerce as Conflict: negotiation, leverage, hidden clauses</li><li>Debt as Power: obligation as currency, interest as weapon</li><li>Inevitability: all accounts are settled, sooner or later</li><li>Infernal Bargains: Faustian pacts, soul ledgers, cursed credit</li></ul>
 </div>
-
 <div class="panel patron" id="patron-morag-the-hag">
-  <h3>Morag the Hag <span class="text-muted text-sm">&mdash; Faerie Bargains &amp; Hidden Costs</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VII</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Hidden Clause</span></p>
-  <p>She is the grandmother, and she is not a sweet one. You come to her in the hour between twilight and dawn because you have made a mess of something and everyone kinder has run out of ideas. She lets you in.</p>
-  <ul class='domain-list'><li>Hidden Obligations: reading the unspoken costs in every bargain</li><li>Faerie Cunning: strict courtesy, sharp clauses, old road law</li><li>Hearth_Way Wisdom: folk practice for spirits, thresholds, and natural justice</li><li>Consequential Magic: power that always arrives with strings attached</li></ul>
-  
-  
-  
+<h3>Morag the Hag <span class="text-muted text-sm">— Faerie Bargains &amp; Hidden Costs</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VII</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Hidden Clause</span></p>
+<p>She is the grandmother, and she is not a sweet one. You come to her in the hour between twilight and dawn because you have made a mess of something and everyone kinder has run out of ideas. She lets you in.</p>
+<ul class="domain-list"><li>Hidden Obligations: reading the unspoken costs in every bargain</li><li>Faerie Cunning: strict courtesy, sharp clauses, old road law</li><li>Hearth_Way Wisdom: folk practice for spirits, thresholds, and natural justice</li><li>Consequential Magic: power that always arrives with strings attached</li></ul>
 </div>
-
 <div class="panel patron" id="patron-palinode-queen-of-encores">
-  <h3>Palinode, Queen of Encores <span class="text-muted text-sm">&mdash; Performance &amp; Rapture</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VIII</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Palinode's Blessing</span></p>
-  <p>Once a road-cantor who swore to reconcile feuding towns with procession and song, Palinode died between feasts with a chorus unfinished.</p>
-  <ul class='domain-list'><li>Ecstatic Performance: music, dance, theater, and the rapture of creation</li><li>Unfinished Art: the power of the incomplete, the encore that never ends</li><li>Audience Binding: captivating crowds, turning spectators into participants</li><li>Inspired Craft: works that transcend their maker's intention</li></ul>
-  
-  
-  
+<h3>Palinode, Queen of Encores <span class="text-muted text-sm">— Performance &amp; Rapture</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VIII</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Palinode's Blessing</span></p>
+<p>Once a road-cantor who swore to reconcile feuding towns with procession and song, Palinode died between feasts with a chorus unfinished.</p>
+<ul class="domain-list"><li>Ecstatic Performance: music, dance, theater, and the rapture of creation</li><li>Unfinished Art: the power of the incomplete, the encore that never ends</li><li>Audience Binding: captivating crowds, turning spectators into participants</li><li>Inspired Craft: works that transcend their maker's intention</li></ul>
 </div>
-
 <div class="panel patron" id="patron-raeyn-mistress-of-the-sea">
-  <h3>Raéyn — Mistress of the Sea <span class="text-muted text-sm">&mdash; Tides &amp; Change</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne IX</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Promise of Safe Passage</span></p>
-  <p>She arrives. That is the first thing and most of the rest of it.</p>
-  <ul class='domain-list'><li>Tides and Currents: change, opportunity, the rhythm of the sea</li><li>Maritime Trade and Travel: safe passage, navigation, weather</li><li>Storm and Calm: the duality of protection and wrath</li><li>Motherhood and Loss: fierce love, grief for Khemesh, the weight of a divided heart</li></ul>
-  
-  
-  
+<h3>Raéyn — Mistress of the Sea <span class="text-muted text-sm">— Tides &amp; Change</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne IX</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Promise of Safe Passage</span></p>
+<p>She arrives. That is the first thing and most of the rest of it.</p>
+<ul class="domain-list"><li>Tides and Currents: change, opportunity, the rhythm of the sea</li><li>Maritime Trade and Travel: safe passage, navigation, weather</li><li>Storm and Calm: the duality of protection and wrath</li><li>Motherhood and Loss: fierce love, grief for Khemesh, the weight of a divided heart</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-traveler">
-  <h3>The Traveler <span class="text-muted text-sm">&mdash; Ways &amp; Journeys</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne X</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Traveler's Blessing</span></p>
-  <p>The Traveler is the eternal guide of the road, guardian of those who walk the paths between what is and what might be.</p>
-  <ul class='domain-list'><li>Wayfinding: navigation, route-finding, safe passage</li><li>Journeys: travel, pilgrimage, exploration</li><li>Thresholds of Movement: doors, bridges, crossroads, borders</li><li>Road Covenants: promises made on the road, hospitality to travelers</li></ul>
-  
-  
-  
+<h3>The Traveler <span class="text-muted text-sm">— Ways &amp; Journeys</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne X</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Traveler's Blessing</span></p>
+<p>The Traveler is the eternal guide of the road, guardian of those who walk the paths between what is and what might be.</p>
+<ul class="domain-list"><li>Wayfinding: navigation, route-finding, safe passage</li><li>Journeys: travel, pilgrimage, exploration</li><li>Thresholds of Movement: doors, bridges, crossroads, borders</li><li>Road Covenants: promises made on the road, hospitality to travelers</li></ul>
 </div>
-
 <div class="panel patron" id="patron-thrysos-king-of-revels">
-  <h3>Thrysos, King of Revels <span class="text-muted text-sm">&mdash; Ecstasy &amp; Excess</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne XI</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Thrysos's Blessing</span></p>
-  <p>Where torches flare and cups spill, where dancers stamp until dawn, there strides Thrysos crowned with ivy and horn. He is both host and beast, a patron of license who laughs at law.</p>
-  <ul class='domain-list'><li>Ecstatic Release: dance, intoxication, the shedding of inhibition (and clothing)</li><li>Masked Freedom: identity as performance, truth through disguise, the thrill of the anonymous encounter</li><li>Feast and Famine: excess, appetite, lust, and the cost of indulgence</li><li>Ritual Frenzy: communal ecstasy that transforms participants into something feral and beautiful</li></ul>
-  
-  
-  
+<h3>Thrysos, King of Revels <span class="text-muted text-sm">— Ecstasy &amp; Excess</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne XI</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Thrysos's Blessing</span></p>
+<p>Where torches flare and cups spill, where dancers stamp until dawn, there strides Thrysos crowned with ivy and horn. He is both host and beast, a patron of license who laughs at law.</p>
+<ul class="domain-list"><li>Ecstatic Release: dance, intoxication, the shedding of inhibition (and clothing)</li><li>Masked Freedom: identity as performance, truth through disguise, the thrill of the anonymous encounter</li><li>Feast and Famine: excess, appetite, lust, and the cost of indulgence</li><li>Ritual Frenzy: communal ecstasy that transforms participants into something feral and beautiful</li></ul>
 </div>
 </section>
-
 <section class="level1" id="order-chthonic">
-<h2>The Chthonic Order</h2>
-<blockquote><em>Ruled by the deep and the ending</em><br>&ldquo;What is buried is not gone.&rdquo;</blockquote>
+<h2 id="reader-section-5">The Chthonic Order</h2>
+<blockquote><em>Ruled by the deep and the ending</em><br/>“What is buried is not gone.”</blockquote>
 <p class="gloss">Depth, memory, and endings — the powers that dissolve and renew.</p>
 <p>Chthonic Patrons offer transformative, absolute power. Their Rites are potent and expensive, their Obligation heavy, their Acts of Service demanding. The price is <em>transformation</em>: they ask you to change, to shed, to end.</p>
 <p class="text-sm text-muted">11 Patrons.</p>
-
 <div class="panel patron" id="patron-isoka-angel-of-serpents">
-  <h3>Isoka, Angel of Serpents <span class="text-muted text-sm">&mdash; The Skin Left on the Road</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne I</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Isoka's Blessing</span></p>
-  <p>Isoka, sister to Ikasha (Shadow) and Inaea (Mercy), completes the Triad of Transformation.</p>
-  <ul class='domain-list'><li>Serpentine Transformation: shedding identity, renewal through dissolution</li><li>Venom as Catalyst: poison that heals or destroys, the paradox of change</li><li>Shedding the Past: erasing debts, memories, and old allegiances</li><li>Healthy Change to Monstrous Rebirth: from gentle alchemy to sword-and-sorcery cults</li></ul>
-  
-  
-  
+<h3>Isoka, Angel of Serpents <span class="text-muted text-sm">— The Skin Left on the Road</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne I</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Isoka's Blessing</span></p>
+<p>Isoka, sister to Ikasha (Shadow) and Inaea (Mercy), completes the Triad of Transformation.</p>
+<ul class="domain-list"><li>Serpentine Transformation: shedding identity, renewal through dissolution</li><li>Venom as Catalyst: poison that heals or destroys, the paradox of change</li><li>Shedding the Past: erasing debts, memories, and old allegiances</li><li>Healthy Change to Monstrous Rebirth: from gentle alchemy to sword-and-sorcery cults</li></ul>
 </div>
-
 <div class="panel patron" id="patron-khemesh-the-abyssal-maw">
-  <h3>Khemesh — The Abyssal Maw <span class="text-muted text-sm">&mdash; Where Sound Cannot Follow</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne II</span> <span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: Khemesh's Blessing</span></p>
-  <p>Everyone imagines the deep as open. It is the opposite of open.</p>
-  <ul class='domain-list'><li>Depths and Pressure: crushing weight, darkness, the alien geometry of the abyss</li><li>Inexorability: slow, unstoppable processes; the certainty of sinking</li><li>Eldritch Terror: madness, whispers, perception beyond mortal limits</li><li>Consumption: hunger that devours matter, memory, and hope</li></ul>
-  
-  
-  
+<h3>Khemesh — The Abyssal Maw <span class="text-muted text-sm">— Where Sound Cannot Follow</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne II</span> <span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: Khemesh's Blessing</span></p>
+<p>Everyone imagines the deep as open. It is the opposite of open.</p>
+<ul class="domain-list"><li>Depths and Pressure: crushing weight, darkness, the alien geometry of the abyss</li><li>Inexorability: slow, unstoppable processes; the certainty of sinking</li><li>Eldritch Terror: madness, whispers, perception beyond mortal limits</li><li>Consumption: hunger that devours matter, memory, and hope</li></ul>
 </div>
-
 <div class="panel patron" id="patron-malachai-the-cruel-messenger">
-  <h3>Malachai, the Cruel Messenger <span class="text-muted text-sm">&mdash; The Truth, Sweetened</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne III</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Malachai's Honeyed Word</span></p>
-  <p>She was a herald, and her office was to arrive with the thing that could not be softened: the death, the verdict, the year the crop would fail. She was not cruel.</p>
-  <ul class='domain-list'><li>Cursed Gifts: Faustian bargains, power with hidden costs</li><li>Corruptive Power: tainted blessings, addictive magic</li><li>False Salvation: hope that destroys, beautiful lies</li><li>Supernatural Afflictions: vampirism, lycanthropy, and other curses</li></ul>
-  
-  
-  
+<h3>Malachai, the Cruel Messenger <span class="text-muted text-sm">— The Truth, Sweetened</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne III</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Malachai's Honeyed Word</span></p>
+<p>She was a herald, and her office was to arrive with the thing that could not be softened: the death, the verdict, the year the crop would fail. She was not cruel.</p>
+<ul class="domain-list"><li>Cursed Gifts: Faustian bargains, power with hidden costs</li><li>Corruptive Power: tainted blessings, addictive magic</li><li>False Salvation: hope that destroys, beautiful lies</li><li>Supernatural Afflictions: vampirism, lycanthropy, and other curses</li></ul>
 </div>
-
 <div class="panel patron" id="patron-moriraath-the-destroyer">
-  <h3>Mor'iraath — The Destroyer <span class="text-muted text-sm">&mdash; Annihilation &amp; Inferno</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne IV</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Word of Unmaking</span></p>
-  <p>Mor'iraath is the demon of absolute destruction—not the slow decay of rot, nor the patient erosion of water, but the joyful, all-consuming fire that reduces everything to ash and memory.</p>
-  <ul class='domain-list'><li>Fiery Annihilation: fire that consumes utterly, leaving only ash</li><li>Absolute Endings: no trace, no memory, no return</li><li>Cleansing Flame: burning away corruption, weakness, and existence</li><li>Inferno as Art: the beauty of a perfect, final combustion</li></ul>
-  
-  
-  
+<h3>Mor'iraath — The Destroyer <span class="text-muted text-sm">— Annihilation &amp; Inferno</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne IV</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: Word of Unmaking</span></p>
+<p>Mor'iraath is the demon of absolute destruction—not the slow decay of rot, nor the patient erosion of water, but the joyful, all-consuming fire that reduces everything to ash and memory.</p>
+<ul class="domain-list"><li>Fiery Annihilation: fire that consumes utterly, leaving only ash</li><li>Absolute Endings: no trace, no memory, no return</li><li>Cleansing Flame: burning away corruption, weakness, and existence</li><li>Inferno as Art: the beauty of a perfect, final combustion</li></ul>
 </div>
-
 <div class="panel patron" id="patron-myrmis">
-  <h3>Myrmis, the Bloody-Handed Matron <span class="text-muted text-sm">&mdash; Sacrifice &amp; Revelation</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne V</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Matron's Resolve</span></p>
-  <p>The Earls will tell you Myrmis was not born of heaven's grace but carved from the granite of the Viterran highlands, where the wind carries the names of the dead and the soil drinks deeply of the fallen.</p>
-  <ul class='domain-list'><li>Sacrifice and Necessity: the willingness to give what must be given</li><li>The Revelation of Violence: truth that cannot be spoken, only shown</li><li>The Bloody Arithmetic: war as a calculus of costs and gains</li><li>Hidden Justice: the cult that judges what the law cannot reach</li></ul>
-  <div class="names"><p><strong>Guises</strong></p><ul class='domain-list'><li><strong>The Bloody-Handed Matron</strong> &mdash; The Northern Earls. Her oldest continuous worship, in the hills and highlands between Ubral and Viterra. The Earls are hill-king stock and keep her the way they keep everything — quietly, at home, and not in front of the Crown. Among the Renards she is a grandmother rather than a goddess: consulted before a feud, blamed after it, and never mentioned to a bishop.</li><li><strong>The Debt</strong> &mdash; The Mound (her cult). Her organised worship, and barely a name at all — which is the point. Faith kept in secret becomes bookkeeping: the Mound speaks of what she is owed and when she will collect, and has largely stopped speaking of her. This is the guise a devotee slides into when the Cold Hand is the only one they are still willing to hold.</li><li><strong>The Bloodied Mother</strong> &mdash; Vhasia. Answers prayers in kind, not in mercy. Vhasian worship of her is disproportionately Renard and disproportionately deniable.</li><li><strong>Myrmis Aecuta, the Reckoner</strong> &mdash; Thepyrgos. Her imperial name, and effectively an academic one now. In the city she is a subject rather than a patron: cited in old proofs about supply and attrition, taught in a footnote, prayed to by nobody. Thepyrgos is not hostile to her. It has simply moved on, which she would recognise as a kind of ending and might even approve of.</li></ul></div>
-  <div class="names"><p><strong>Provenance</strong></p><p>Thepyric, of the Astroegro imperial period.</p><p>She is a southern goddess. Astroegro was a war-empire before it was a cautionary tale, and Myrmis is what its war looked like when it was still working — the drill and the ledger and the burning village, held together in one pair of hands and called a virtue. When the last emperor broke his covenant and the empire went into the water, most of its gods went with it. Hers did not. Her cult walked.</p><p>The Earls say she <em>crawled north</em>, which is their phrase and is not meant literally — it is how highlanders describe something that arrives slowly, from below, and is in the house before anyone agrees to have let it in. What actually travelled was worship: veterans, camp-followers, a handful of masks, and a practice of putting a stone down afterward. It took root in the Viterran Highlands because the Earls had a use for it and no bishop close enough to object.</p><p>A goddess who counts the dead is portable in a way a goddess of imperial victory is not. Astroegro's Myrmis was the patron of an army that won; what survived the empire was the half of her that knew what winning cost, which is exactly the half a hill country full of feuding earls could use. She lost an empire and kept the arithmetic.</p><p>Thepyrgos remembers her the way a university remembers a discipline it no longer teaches: there are proofs with her name on them and nobody left who prays.</p></div>
-  <div class="names"><p><strong>The Two Hands</strong></p><p>Myrmis holds war with both hands and refuses to put either down. The <strong>Red Hand</strong> is war as it is suffered: wrath, the thing that happens to people, the scream and the burning thatch. The <strong>Cold Hand</strong> is war as it is made: a craft with tolerances, supply lines, siege geometry, a mind that can look at a valley and see how many days it feeds an army.</p><p>Every atrocity in the world's history was authored by someone holding one hand and disclaiming the other. The planner says he only drew the lines. The soldier says she only did as she was told. Both are lying, and both believe themselves. Myrmis will not let either of them put the other hand down: to take her Symbol is to accept that the plan and the scream are one act, and that you did it.</p><p>Then she counts the dead. The Cairn-Mother's grief is not softness bolted onto a war-goddess — it is what makes the arithmetic honest. A calculus that never tallies the cost is not a calculus, it is an excuse, and her devotees are required to walk the field afterward and put a stone on every one of them. Her cruelty and her mourning are the same discipline observed at different hours.</p><p>She is the patron for a character who intends to do something terrible on purpose and for a reason they can state out loud. She is wrong for a character who wants the reason without the doing, or the doing without the reckoning. When a player asks whether Myrmis approves, the question to hand back is always: <em>and afterwards, who carries the stones?</em></p></div>
+<h3>Myrmis, the Bloody-Handed Matron <span class="text-muted text-sm">— Sacrifice &amp; Revelation</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne V</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Matron's Resolve</span></p>
+<p>The Earls will tell you Myrmis was not born of heaven's grace but carved from the granite of the Viterran highlands, where the wind carries the names of the dead and the soil drinks deeply of the fallen.</p>
+<ul class="domain-list"><li>Sacrifice and Necessity: the willingness to give what must be given</li><li>The Revelation of Violence: truth that cannot be spoken, only shown</li><li>The Bloody Arithmetic: war as a calculus of costs and gains</li><li>Hidden Justice: the cult that judges what the law cannot reach</li></ul>
+<div class="names"><p><strong>Guises</strong></p><ul class="domain-list"><li><strong>The Bloody-Handed Matron</strong> — The Northern Earls. Her oldest continuous worship, in the hills and highlands between Ubral and Viterra. The Earls are hill-king stock and keep her the way they keep everything — quietly, at home, and not in front of the Crown. Among the Renards she is a grandmother rather than a goddess: consulted before a feud, blamed after it, and never mentioned to a bishop.</li><li><strong>The Debt</strong> — The Mound (her cult). Her organised worship, and barely a name at all — which is the point. Faith kept in secret becomes bookkeeping: the Mound speaks of what she is owed and when she will collect, and has largely stopped speaking of her. This is the guise a devotee slides into when the Cold Hand is the only one they are still willing to hold.</li><li><strong>The Bloodied Mother</strong> — Vhasia. Answers prayers in kind, not in mercy. Vhasian worship of her is disproportionately Renard and disproportionately deniable.</li><li><strong>Myrmis Aecuta, the Reckoner</strong> — Thepyrgos. Her imperial name, and effectively an academic one now. In the city she is a subject rather than a patron: cited in old proofs about supply and attrition, taught in a footnote, prayed to by nobody. Thepyrgos is not hostile to her. It has simply moved on, which she would recognise as a kind of ending and might even approve of.</li></ul></div>
+<div class="names"><p><strong>Provenance</strong></p><p>Thepyric, of the Astroegro imperial period.</p><p>She is a southern goddess. Astroegro was a war-empire before it was a cautionary tale, and Myrmis is what its war looked like when it was still working — the drill and the ledger and the burning village, held together in one pair of hands and called a virtue. When the last emperor broke his covenant and the empire went into the water, most of its gods went with it. Hers did not. Her cult walked.</p><p>The Earls say she <em>crawled north</em>, which is their phrase and is not meant literally — it is how highlanders describe something that arrives slowly, from below, and is in the house before anyone agrees to have let it in. What actually travelled was worship: veterans, camp-followers, a handful of masks, and a practice of putting a stone down afterward. It took root in the Viterran Highlands because the Earls had a use for it and no bishop close enough to object.</p><p>A goddess who counts the dead is portable in a way a goddess of imperial victory is not. Astroegro's Myrmis was the patron of an army that won; what survived the empire was the half of her that knew what winning cost, which is exactly the half a hill country full of feuding earls could use. She lost an empire and kept the arithmetic.</p><p>Thepyrgos remembers her the way a university remembers a discipline it no longer teaches: there are proofs with her name on them and nobody left who prays.</p></div>
+<div class="names"><p><strong>The Two Hands</strong></p><p>Myrmis holds war with both hands and refuses to put either down. The <strong>Red Hand</strong> is war as it is suffered: wrath, the thing that happens to people, the scream and the burning thatch. The <strong>Cold Hand</strong> is war as it is made: a craft with tolerances, supply lines, siege geometry, a mind that can look at a valley and see how many days it feeds an army.</p><p>Every atrocity in the world's history was authored by someone holding one hand and disclaiming the other. The planner says he only drew the lines. The soldier says she only did as she was told. Both are lying, and both believe themselves. Myrmis will not let either of them put the other hand down: to take her Symbol is to accept that the plan and the scream are one act, and that you did it.</p><p>Then she counts the dead. The Cairn-Mother's grief is not softness bolted onto a war-goddess — it is what makes the arithmetic honest. A calculus that never tallies the cost is not a calculus, it is an excuse, and her devotees are required to walk the field afterward and put a stone on every one of them. Her cruelty and her mourning are the same discipline observed at different hours.</p><p>She is the patron for a character who intends to do something terrible on purpose and for a reason they can state out loud. She is wrong for a character who wants the reason without the doing, or the doing without the reckoning. When a player asks whether Myrmis approves, the question to hand back is always: <em>and afterwards, who carries the stones?</em></p></div>
 </div>
-
 <div class="panel patron" id="patron-nidhoggr-the-world-worm">
-  <h3>Nidhoggr — The World-Worm <span class="text-muted text-sm">&mdash; Dreaming Antiquity</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Stone's Memory</span></p>
-  <p>Beneath stone and sleep coils Nidhoggr, who gnaws at the roots of time. He does not speak quickly; he dreams in centuries. To press your ear to the earth is to risk drowning in the silence of eons.</p>
-  <ul class='domain-list'><li>Ancient Knowledge: forgotten histories, buried truths, ancestral memory</li><li>Stone Communion: speaking with earth, reading geological memory, stone lore</li><li>Temporal Perception: seeing echoes of the past, prophetic dreams, slow time</li><li>Cyclical Power: seasonal magic, ritual timing, patience as virtue</li></ul>
-  
-  
-  
+<h3>Nidhoggr — The World-Worm <span class="text-muted text-sm">— Dreaming Antiquity</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Stone's Memory</span></p>
+<p>Beneath stone and sleep coils Nidhoggr, who gnaws at the roots of time. He does not speak quickly; he dreams in centuries. To press your ear to the earth is to risk drowning in the silence of eons.</p>
+<ul class="domain-list"><li>Ancient Knowledge: forgotten histories, buried truths, ancestral memory</li><li>Stone Communion: speaking with earth, reading geological memory, stone lore</li><li>Temporal Perception: seeing echoes of the past, prophetic dreams, slow time</li><li>Cyclical Power: seasonal magic, ritual timing, patience as virtue</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-carrion-king-lord-of-decay-and-renewal">
-  <h3>The Carrion King — Lord of Decay and Renewal</h3>
-  <p class="meta"><span class="badge badge-gold">Throne VII</span> <span class="badge badge-blue">7 Rites</span> <span class="badge badge-green">Gift: Carrion's Blessing</span></p>
-  <p>The Carrion King does not rule. He waits. He is the patience of the forest floor, the hunger of the root, the slow, inevitable turning of flesh to soil. He is not evil—he is necessary. Without decay, there is no growth.</p>
-  <ul class='domain-list'><li>Decay and Renewal: the cycle of death, rot, and new growth</li><li>Carrion as Resource: using what others discard—bodies, waste, forgotten things</li><li>The Patient Hunger: slow, inevitable consumption that nurtures rather than destroys</li><li>Ecological Balance: understanding that death feeds life, and that preservation without decay is stagnation</li></ul>
-  
-  
-  
+<h3>The Carrion King — Lord of Decay and Renewal</h3>
+<p class="meta"><span class="badge badge-gold">Throne VII</span> <span class="badge badge-blue">7 Rites</span> <span class="badge badge-green">Gift: Carrion's Blessing</span></p>
+<p>The Carrion King does not rule. He waits. He is the patience of the forest floor, the hunger of the root, the slow, inevitable turning of flesh to soil. He is not evil—he is necessary. Without decay, there is no growth.</p>
+<ul class="domain-list"><li>Decay and Renewal: the cycle of death, rot, and new growth</li><li>Carrion as Resource: using what others discard—bodies, waste, forgotten things</li><li>The Patient Hunger: slow, inevitable consumption that nurtures rather than destroys</li><li>Ecological Balance: understanding that death feeds life, and that preservation without decay is stagnation</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-clockwork-monad-the-iterative-forge">
-  <h3>The Clockwork Monad, the Iterative Forge <span class="text-muted text-sm">&mdash; Again, Better</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne VIII</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Monad's Blessing</span></p>
-  <p>The Clockwork Monad is the eternal pressure toward improvement: the whisper between inspiration and execution that urges every maker to refine, optimize, and iterate.</p>
-  <ul class='domain-list'><li>Iterative Design: the endless cycle of improvement and refinement</li><li>Progressive Creation: building toward ever-greater perfection</li><li>Optimization Pressure: making systems more efficient</li><li>Craft Evolution: simple ideas transformed through repeated passes</li></ul>
-  
-  
-  
+<h3>The Clockwork Monad, the Iterative Forge <span class="text-muted text-sm">— Again, Better</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne VIII</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Monad's Blessing</span></p>
+<p>The Clockwork Monad is the eternal pressure toward improvement: the whisper between inspiration and execution that urges every maker to refine, optimize, and iterate.</p>
+<ul class="domain-list"><li>Iterative Design: the endless cycle of improvement and refinement</li><li>Progressive Creation: building toward ever-greater perfection</li><li>Optimization Pressure: making systems more efficient</li><li>Craft Evolution: simple ideas transformed through repeated passes</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-ninth">
-  <h3>The Ninth — Beyond Comprehension <span class="text-muted text-sm">&mdash; Infinite Information &amp; Unknowable Truths</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne IX</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: The Overflowing Cup</span></p>
-  <p>Beyond the eighth figure of Sacred Geometry lies a rim no compass will hold. The Ninth is not absence but surplus: knowledge poured past the lip of any vessel, truth that overgrows the frame that seeks to bind it.</p>
-  <ul class='domain-list'><li>Hyperdimensional Knowledge: reckonings that do not fit a single plane or proof</li><li>Incomprehensible Truths: insights that demand the seer be changed to hold them</li><li>Information Overflow: boon and peril of minds run past their brim</li><li>Conceptual Transcendence: thinking beyond the usual ledgers and names</li></ul>
-  <div class="names"><p><strong>Also known as:</strong> The Ninth, The Ninth Rim, Ninth Rim</p><p>Two names, two registers. <strong>The Ninth</strong> is the general name — the thing behind the Taboo, spoken of by people who have no board in front of them and would rather not be specific. <strong>The Ninth Rim</strong> is the Kon'reh term: the rim beyond the eighth figure, off the edge of a board that only has eight — that board being the Sacred Geometry, which is the Ykrul name for Kon'reh. The Ykrul hold that Kon'reh is not a game about the world but a model of it, so a word for something off the edge of the board is a word for something off the edge of everything. To a Ykrul the two names are the same statement made at different volumes; to anyone else, the Kon'reh term is the one that sounds like it means less, which is why it survives in places the other cannot be said aloud.</p></div>
-  
-  
+<h3>The Ninth — Beyond Comprehension <span class="text-muted text-sm">— Infinite Information &amp; Unknowable Truths</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne IX</span> <span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: The Overflowing Cup</span></p>
+<p>Beyond the eighth figure of Sacred Geometry lies a rim no compass will hold. The Ninth is not absence but surplus: knowledge poured past the lip of any vessel, truth that overgrows the frame that seeks to bind it.</p>
+<ul class="domain-list"><li>Hyperdimensional Knowledge: reckonings that do not fit a single plane or proof</li><li>Incomprehensible Truths: insights that demand the seer be changed to hold them</li><li>Information Overflow: boon and peril of minds run past their brim</li><li>Conceptual Transcendence: thinking beyond the usual ledgers and names</li></ul>
+<div class="names"><p><strong>Also known as:</strong> The Ninth, The Ninth Rim, Ninth Rim</p><p>Two names, two registers. <strong>The Ninth</strong> is the general name — the thing behind the Taboo, spoken of by people who have no board in front of them and would rather not be specific. <strong>The Ninth Rim</strong> is the Kon'reh term: the rim beyond the eighth figure, off the edge of a board that only has eight — that board being the Sacred Geometry, which is the Ykrul name for Kon'reh. The Ykrul hold that Kon'reh is not a game about the world but a model of it, so a word for something off the edge of the board is a word for something off the edge of everything. To a Ykrul the two names are the same statement made at different volumes; to anyone else, the Kon'reh term is the one that sounds like it means less, which is why it survives in places the other cannot be said aloud.</p></div>
 </div>
-
 <div class="panel patron" id="patron-the-pale-shepherd">
-  <h3>The Pale Shepherd — Guide of Transitions <span class="text-muted text-sm">&mdash; The Road Every Body Walks</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne X</span> <span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Shepherd's Staff</span></p>
-  <p>The Pale Shepherd walks the seam between all things – life and death, joy and sorrow, memory and forgetting, the known and the unmarked.</p>
-  <ul class='domain-list'><li>Liminal Navigation: walking and reading thresholds, dusk-roads, and in-betweens</li><li>Passage Guidance: steadying hands through grief, change, and transformation</li><li>Melancholic Wisdom: understanding born of farewells and last looks</li><li>Memory Shepherding: gathering, carrying, and setting down weighted moments</li></ul>
-  
-  
-  
+<h3>The Pale Shepherd — Guide of Transitions <span class="text-muted text-sm">— The Road Every Body Walks</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne X</span> <span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Shepherd's Staff</span></p>
+<p>The Pale Shepherd walks the seam between all things – life and death, joy and sorrow, memory and forgetting, the known and the unmarked.</p>
+<ul class="domain-list"><li>Liminal Navigation: walking and reading thresholds, dusk-roads, and in-betweens</li><li>Passage Guidance: steadying hands through grief, change, and transformation</li><li>Melancholic Wisdom: understanding born of farewells and last looks</li><li>Memory Shepherding: gathering, carrying, and setting down weighted moments</li></ul>
 </div>
-
 <div class="panel patron" id="patron-vorthak-the-hunger-unbound">
-  <h3>Vorthak — The Hunger Unbound <span class="text-muted text-sm">&mdash; Hunger Becomes Its Meal</span></h3>
-  <p class="meta"><span class="badge badge-gold">Throne XI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Word of Consumption</span></p>
-  <p>Vorthak is the principle of absolute consumption: an appetite that devours not only what is, but the very potential of what might be. Each feeding transforms both eater and eaten.</p>
-  <ul class='domain-list'><li>Metamorphic Consumption: transformation through ingestion of matter, energy, or concepts</li><li>Essence Absorption: gaining properties by consuming them utterly</li><li>Hunger Propagation: spreading consumption as a force of change</li><li>Identity Metabolism: consuming and adopting aspects of others' natures</li></ul>
-  
-  
-  
+<h3>Vorthak — The Hunger Unbound <span class="text-muted text-sm">— Hunger Becomes Its Meal</span></h3>
+<p class="meta"><span class="badge badge-gold">Throne XI</span> <span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Word of Consumption</span></p>
+<p>Vorthak is the principle of absolute consumption: an appetite that devours not only what is, but the very potential of what might be. Each feeding transforms both eater and eaten.</p>
+<ul class="domain-list"><li>Metamorphic Consumption: transformation through ingestion of matter, energy, or concepts</li><li>Essence Absorption: gaining properties by consuming them utterly</li><li>Hunger Propagation: spreading consumption as a force of change</li><li>Identity Metabolism: consuming and adopting aspects of others' natures</li></ul>
 </div>
 </section>
-
 <section class="level1" id="order-beyond-the-triune">
-<h2>Beyond the Triune</h2>
+<h2 id="reader-section-6">Beyond the Triune</h2>
 <p class="gloss">Older than the taxonomy, or too singular to sit inside it.</p>
 <p>These Patrons offer specialised, unorthodox power. Their Rites are often unique, their costs vary wildly, and their Acts of Service are cut to their own peculiar shape. The price is <em>singularity</em>: they ask you to accept their particular vision of the world. They are not lesser. They are unclassifiable, and an Invoker who understands them holds what the orthodox do not.</p>
 <p class="text-sm text-muted">18 Patrons.</p>
-
 <div class="panel patron" id="patron-gaila-the-laughing-light">
-  <h3>Gaila, the Laughing Light <span class="text-muted text-sm">&mdash; The Joke Shared at the Wrong Time</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Gaila's Spark</span></p>
-  <p>In sun-dappled meadows where laughter rings like wind bells and shared silliness feels like a secret language, the Laughing Light reigns.</p>
-  <ul class='domain-list'><li>Playful Intimacy: shared laughter, inside jokes, the joy of simple companionship</li><li>Lighthearted Bonding: oaths of mirth, playful teasing as affection, the magic of mundane happiness</li><li>Rituals of Delight: games, shared silliness, spontaneous merriment, the sacred ordinary</li><li>Healing Through Joy: dissolving tension with humor, restoring lightness after sorrow, communal buoyancy</li></ul>
-  
-  
-  
+<h3>Gaila, the Laughing Light <span class="text-muted text-sm">— The Joke Shared at the Wrong Time</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Gaila's Spark</span></p>
+<p>In sun-dappled meadows where laughter rings like wind bells and shared silliness feels like a secret language, the Laughing Light reigns.</p>
+<ul class="domain-list"><li>Playful Intimacy: shared laughter, inside jokes, the joy of simple companionship</li><li>Lighthearted Bonding: oaths of mirth, playful teasing as affection, the magic of mundane happiness</li><li>Rituals of Delight: games, shared silliness, spontaneous merriment, the sacred ordinary</li><li>Healing Through Joy: dissolving tension with humor, restoring lightness after sorrow, communal buoyancy</li></ul>
 </div>
-
 <div class="panel patron" id="patron-ibeji-the-twin-stones">
-  <h3>Ibeji, the Twin Stones <span class="text-muted text-sm">&mdash; Two Hands Beneath One Weight</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Ibeji's Union</span></p>
-  <p>Ibeji are twin spirits — one of stone, one of gear — who dance together to keep the walking cities of Ngomebe alive. They were not born; they were carved.</p>
-  <ul class='domain-list'><li>Partnership: two hands, two crafts, two wills working as one</li><li>Balance: equal weight, equal credit, equal sacrifice</li><li>The Union of Aeler and Ngomebe: stone and gear, mountain and plateau</li><li>The Twin Keystone: the joint that bears the load; break one, and both fall</li></ul>
-  
-  
-  
+<h3>Ibeji, the Twin Stones <span class="text-muted text-sm">— Two Hands Beneath One Weight</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Ibeji's Union</span></p>
+<p>Ibeji are twin spirits — one of stone, one of gear — who dance together to keep the walking cities of Ngomebe alive. They were not born; they were carved.</p>
+<ul class="domain-list"><li>Partnership: two hands, two crafts, two wills working as one</li><li>Balance: equal weight, equal credit, equal sacrifice</li><li>The Union of Aeler and Ngomebe: stone and gear, mountain and plateau</li><li>The Twin Keystone: the joint that bears the load; break one, and both fall</li></ul>
 </div>
-
 <div class="panel patron" id="patron-kuva-sky-that-takes-many-names">
-  <h3>Kuva, the Sky That Takes Many Names <span class="text-muted text-sm">&mdash; The Sky Hears Every Promise</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Kuva's Watching Sky</span></p>
-  <p>Kuva is the dome above all roads — the endless blue, the monsoon wrath, the night's silent gaze. To the Kuvani of the eastern steppe, Kuva is a stern witness who hears every promise made under open heaven.</p>
-  <ul class='domain-list'><li>Witness of Oaths: promises made under open sky are binding</li><li>Storm &amp; Weather: rain, lightning, wind, and the monsoon's rhythm</li><li>Sky as Ledger: the dome records every deed, every lie, every breath</li><li>Threshold of the Hollow: where the sky's gaze ends, the Hollow begins</li></ul>
-  
-  
-  
+<h3>Kuva, the Sky That Takes Many Names <span class="text-muted text-sm">— The Sky Hears Every Promise</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Kuva's Watching Sky</span></p>
+<p>Kuva is the dome above all roads — the endless blue, the monsoon wrath, the night's silent gaze. To the Kuvani of the eastern steppe, Kuva is a stern witness who hears every promise made under open heaven.</p>
+<ul class="domain-list"><li>Witness of Oaths: promises made under open sky are binding</li><li>Storm &amp; Weather: rain, lightning, wind, and the monsoon's rhythm</li><li>Sky as Ledger: the dome records every deed, every lie, every breath</li><li>Threshold of the Hollow: where the sky's gaze ends, the Hollow begins</li></ul>
 </div>
-
 <div class="panel patron" id="patron-lucky-jack-the-lord-of-thieves">
-  <h3>Lucky Jack — The Lord of Thieves <span class="text-muted text-sm">&mdash; Luck &amp; The Heist</span></h3>
-  <p class="meta"><span class="badge badge-blue">8 Rites</span> <span class="badge badge-green">Gift: Jack's Luck</span></p>
-  <p>Lucky Jack was once a mortal — a thief so skilled that even the gods took notice. He stole a coin from the Hollow's own pocket, and the Hollow laughed. 'You are clever,' it said. 'But cleverness is a debt.</p>
-  <ul class='domain-list'><li>The Heist: planning, execution, and the perfect getaway</li><li>Luck as Resource: borrowing fortune, repaying obligation, the gamble that pays off</li><li>The Unpayable Debt: every favor must be repaid; every stroke of luck is a loan with interest</li><li>The Underworld: gutters, rooftops, and the spaces between laws</li></ul>
-  
-  
-  
+<h3>Lucky Jack — The Lord of Thieves <span class="text-muted text-sm">— Luck &amp; The Heist</span></h3>
+<p class="meta"><span class="badge badge-blue">8 Rites</span> <span class="badge badge-green">Gift: Jack's Luck</span></p>
+<p>Lucky Jack was once a mortal — a thief so skilled that even the gods took notice. He stole a coin from the Hollow's own pocket, and the Hollow laughed. 'You are clever,' it said. 'But cleverness is a debt.</p>
+<ul class="domain-list"><li>The Heist: planning, execution, and the perfect getaway</li><li>Luck as Resource: borrowing fortune, repaying obligation, the gamble that pays off</li><li>The Unpayable Debt: every favor must be repaid; every stroke of luck is a loan with interest</li><li>The Underworld: gutters, rooftops, and the spaces between laws</li></ul>
 </div>
-
 <div class="panel patron" id="patron-lunara-the-silver-quiet">
-  <h3>Lunara, the Silver Quiet <span class="text-muted text-sm">&mdash; Moon &amp; Mystery</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Lunara's Silver Word</span></p>
-  <p>Lunara walks where torchlight falters: crossroads, tidal edges, shadowed sanctuaries. She is the whisper beneath silver skies, a torch-bearing guide to mysteries that lie between waking and dream.</p>
-  <ul class='domain-list'><li>Moonlight Revelation: truth, hidden things, the seen in darkness</li><li>Liminal Passage: thresholds, dreams, the space between waking and sleep</li><li>Silver Mystery: reflection, illusion, the mirror's truth</li><li>Lunar Cycles: change, phases, the passage of time as a gentle guide</li></ul>
-  
-  
-  
+<h3>Lunara, the Silver Quiet <span class="text-muted text-sm">— Moon &amp; Mystery</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Lunara's Silver Word</span></p>
+<p>Lunara walks where torchlight falters: crossroads, tidal edges, shadowed sanctuaries. She is the whisper beneath silver skies, a torch-bearing guide to mysteries that lie between waking and dream.</p>
+<ul class="domain-list"><li>Moonlight Revelation: truth, hidden things, the seen in darkness</li><li>Liminal Passage: thresholds, dreams, the space between waking and sleep</li><li>Silver Mystery: reflection, illusion, the mirror's truth</li><li>Lunar Cycles: change, phases, the passage of time as a gentle guide</li></ul>
 </div>
-
 <div class="panel patron" id="patron-nimorinth-the-gray-benefactor">
-  <h3>Nimorith, the Gray Benefactor <span class="text-muted text-sm">&mdash; Absence &amp; Threshold</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Nimorith's Absence</span></p>
-  <p>Fae magic has two hands. The courts are famous for the one that gives — the glamour, the seeming, the face over the face, the gold that is leaves in the morning. Everything Mab is celebrated for is addition.</p>
-  <ul class='domain-list'><li>Thresholds &amp; Liminality: doors, gates, moments of transition, the unseen</li><li>Absence &amp; Omission: erasure, forgetting, silence, what is not said</li><li>Memory &amp; Witness: testimony, collateral, the price of truth</li><li>Subtlety &amp; Misdirection: stealth, deception by omission, unseen paths</li></ul>
-  
-  
-  
+<h3>Nimorith, the Gray Benefactor <span class="text-muted text-sm">— Absence &amp; Threshold</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Nimorith's Absence</span></p>
+<p>Fae magic has two hands. The courts are famous for the one that gives — the glamour, the seeming, the face over the face, the gold that is leaves in the morning. Everything Mab is celebrated for is addition.</p>
+<ul class="domain-list"><li>Thresholds &amp; Liminality: doors, gates, moments of transition, the unseen</li><li>Absence &amp; Omission: erasure, forgetting, silence, what is not said</li><li>Memory &amp; Witness: testimony, collateral, the price of truth</li><li>Subtlety &amp; Misdirection: stealth, deception by omission, unseen paths</li></ul>
 </div>
-
 <div class="panel patron" id="patron-oath-of-mercy-and-grace">
-  <h3>Oath of Mercy and Grace <span class="text-muted text-sm">&mdash; Forgiveness &amp; Healing</span></h3>
-  <p class="meta"><span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Unbroken Thread</span></p>
-  <p>The Oath of Mercy and Grace is the gentler face of divine law—a patron of healing, compassion, and second chances. Where the Oath of Flame &amp; Light burns with righteous fire, this Oath offers cool water to the weary.</p>
-  <ul class='domain-list'><li>Forgiveness: absolution, redemption, letting go of guilt</li><li>Healing: mending wounds, calming minds, restoring hope</li><li>Compassion: empathy, presence, the simple act of being there</li><li>Second Chances: offering grace to those who have erred, believing in the possibility of change</li></ul>
-  
-  
-  
+<h3>Oath of Mercy and Grace <span class="text-muted text-sm">— Forgiveness &amp; Healing</span></h3>
+<p class="meta"><span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Unbroken Thread</span></p>
+<p>The Oath of Mercy and Grace is the gentler face of divine law—a patron of healing, compassion, and second chances. Where the Oath of Flame &amp; Light burns with righteous fire, this Oath offers cool water to the weary.</p>
+<ul class="domain-list"><li>Forgiveness: absolution, redemption, letting go of guilt</li><li>Healing: mending wounds, calming minds, restoring hope</li><li>Compassion: empathy, presence, the simple act of being there</li><li>Second Chances: offering grace to those who have erred, believing in the possibility of change</li></ul>
 </div>
-
 <div class="panel patron" id="patron-oya-the-wind-of-the-sahel">
-  <h3>Oya, the Wind of the Sahel <span class="text-muted text-sm">&mdash; Liberation &amp; Dust</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Oya's Breath</span></p>
-  <p>Oya is the harmattan — the dry wind that sweeps the grasslands, carrying red dust from the Ashaani desert. She is neither cruel nor kind.</p>
-  <ul class='domain-list'><li>Dust and Wind: the harmattan, sandstorms, the dry breath of the Sahel</li><li>Change: destroying the old to make way for the new</li><li>Liberation: breaking chains, opening locked doors, scattering what binds</li><li>Cleansing: burning corrupt contracts, erasing false ledgers, the red dust that covers old tracks</li></ul>
-  
-  
-  
+<h3>Oya, the Wind of the Sahel <span class="text-muted text-sm">— Liberation &amp; Dust</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Oya's Breath</span></p>
+<p>Oya is the harmattan — the dry wind that sweeps the grasslands, carrying red dust from the Ashaani desert. She is neither cruel nor kind.</p>
+<ul class="domain-list"><li>Dust and Wind: the harmattan, sandstorms, the dry breath of the Sahel</li><li>Change: destroying the old to make way for the new</li><li>Liberation: breaking chains, opening locked doors, scattering what binds</li><li>Cleansing: burning corrupt contracts, erasing false ledgers, the red dust that covers old tracks</li></ul>
 </div>
-
 <div class="panel patron" id="patron-solara-the-still-mirror">
-  <h3>Solara, the Still Mirror <span class="text-muted text-sm">&mdash; The Face Without Performance</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Seeing</span></p>
-  <p>In spaces where masks fall like dead leaves and souls meet without performance, the Still Mirror reigns.</p>
-  <ul class='domain-list'><li>Radical Presence: active witnessing, holding space for truth, the courage to be seen</li><li>Authentic Connection: mutual recognition, vulnerability as gift, the power of being known</li><li>Rituals of Witnessing: shared silence, eye contact without agenda, truth-telling without judgment</li><li>Healing Through Recognition: soothing isolation, restoring self-trust, communal clarity</li></ul>
-  
-  
-  
+<h3>Solara, the Still Mirror <span class="text-muted text-sm">— The Face Without Performance</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Seeing</span></p>
+<p>In spaces where masks fall like dead leaves and souls meet without performance, the Still Mirror reigns.</p>
+<ul class="domain-list"><li>Radical Presence: active witnessing, holding space for truth, the courage to be seen</li><li>Authentic Connection: mutual recognition, vulnerability as gift, the power of being known</li><li>Rituals of Witnessing: shared silence, eye contact without agenda, truth-telling without judgment</li><li>Healing Through Recognition: soothing isolation, restoring self-trust, communal clarity</li></ul>
 </div>
-
 <div class="panel patron" id="patron-breath-of-the-first-forge">
-  <h3>The Breath of the First Forge — The Spark in the Maker's Hand <span class="text-muted text-sm">&mdash; The First Good Mistake</span></h3>
-  <p class="meta"><span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Maker's Spark</span></p>
-  <p>Before the first hammer struck, before the first wheel turned, before the first seed was planted in the furrow, there was the Breath. It was not flame—flame came later, when the Breath met kindling.</p>
-  <ul class='domain-list'><li>Creative Inspiration: the spark of new ideas and novel approaches</li><li>The Joy of Making: the pleasure and satisfaction of creating</li><li>Ingenuity: finding unconventional solutions to problems</li><li>Primal Craft: making as a fundamental human (and inhuman) act</li></ul>
-  
-  
-  
+<h3>The Breath of the First Forge — The Spark in the Maker's Hand <span class="text-muted text-sm">— The First Good Mistake</span></h3>
+<p class="meta"><span class="badge badge-blue">4 Rites</span> <span class="badge badge-green">Gift: The Maker's Spark</span></p>
+<p>Before the first hammer struck, before the first wheel turned, before the first seed was planted in the furrow, there was the Breath. It was not flame—flame came later, when the Breath met kindling.</p>
+<ul class="domain-list"><li>Creative Inspiration: the spark of new ideas and novel approaches</li><li>The Joy of Making: the pleasure and satisfaction of creating</li><li>Ingenuity: finding unconventional solutions to problems</li><li>Primal Craft: making as a fundamental human (and inhuman) act</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-riven-path">
-  <h3>The Riven Path <span class="text-muted text-sm">&mdash; Passion &amp; Power</span></h3>
-  <p class="meta"><span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: The Broken Chain</span></p>
-  <p>The Riven Path does not command. It offers. It is the heat in the blood, the fire in the belly, the voice that whispers 'Take what is yours.' Those who walk this path learn that power is not given—it is seized.</p>
-  <ul class='domain-list'><li>Liberation Through Power: freedom as the right of the strong, justice as the will of the victorious</li><li>Passion as Fuel: anger, desire, fear, and love—all are fires to be stoked and aimed</li><li>Crushing Dominance: victory through overwhelming force, intimidation, and the willing display of power</li><li>Self_Determination: no chains, no masters, no debt that is not paid in blood</li></ul>
-  
-  
-  
+<h3>The Riven Path <span class="text-muted text-sm">— Passion &amp; Power</span></h3>
+<p class="meta"><span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: The Broken Chain</span></p>
+<p>The Riven Path does not command. It offers. It is the heat in the blood, the fire in the belly, the voice that whispers 'Take what is yours.' Those who walk this path learn that power is not given—it is seized.</p>
+<ul class="domain-list"><li>Liberation Through Power: freedom as the right of the strong, justice as the will of the victorious</li><li>Passion as Fuel: anger, desire, fear, and love—all are fires to be stoked and aimed</li><li>Crushing Dominance: victory through overwhelming force, intimidation, and the willing display of power</li><li>Self_Determination: no chains, no masters, no debt that is not paid in blood</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-savage-heart-red-maw">
-  <h3>The Savage Heart <span class="text-muted text-sm">&mdash; Red Maw</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Hunter's Promise</span></p>
-  <p>The Savage Heart is the truth behind the green veil: nature not as garden, but as gullet. It is the claw that tears, the fang that crushes, the hunger that stalks without malice and kills without mercy.</p>
-  <ul class='domain-list'><li>Apex Predation: hunting, stalking, dominating the food chain</li><li>Red Tooth: killing as nature's sacrament, strength proven through violence</li><li>Scavenger's Wisdom: using death for growth, nothing wasted</li><li>Territory and Pack: dominance over a domain, leadership of the hunt</li></ul>
-  
-  
-  
+<h3>The Savage Heart <span class="text-muted text-sm">— Red Maw</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Hunter's Promise</span></p>
+<p>The Savage Heart is the truth behind the green veil: nature not as garden, but as gullet. It is the claw that tears, the fang that crushes, the hunger that stalks without malice and kills without mercy.</p>
+<ul class="domain-list"><li>Apex Predation: hunting, stalking, dominating the food chain</li><li>Red Tooth: killing as nature's sacrament, strength proven through violence</li><li>Scavenger's Wisdom: using death for growth, nothing wasted</li><li>Territory and Pack: dominance over a domain, leadership of the hunt</li></ul>
 </div>
-
 <div class="panel patron" id="patron-seal-breaker-forgotten-names-broken-seals">
-  <h3>The Seal-Breaker <span class="text-muted text-sm">&mdash; Forgotten Names &amp; Broken Seals</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Erasing Word</span></p>
-  <p>When a dynasty falls, the first thing the conquerors burn is the seal of the old emperor.</p>
-  <ul class='domain-list'><li>Forgotten Names: erasure, anonymity, the power of being unwitnessed</li><li>Broken Seals: freeing what was bound, opening what was locked</li><li>False Contracts: destroying oaths that were never just</li><li>The Space Between Dynasties: interregnums, ruins, and the silence after a seal cracks</li></ul>
-  
-  
-  
+<h3>The Seal-Breaker <span class="text-muted text-sm">— Forgotten Names &amp; Broken Seals</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Erasing Word</span></p>
+<p>When a dynasty falls, the first thing the conquerors burn is the seal of the old emperor.</p>
+<ul class="domain-list"><li>Forgotten Names: erasure, anonymity, the power of being unwitnessed</li><li>Broken Seals: freeing what was bound, opening what was locked</li><li>False Contracts: destroying oaths that were never just</li><li>The Space Between Dynasties: interregnums, ruins, and the silence after a seal cracks</li></ul>
 </div>
-
 <div class="panel patron" id="patron-the-unbroken-way">
-  <h3>The Unbroken Way <span class="text-muted text-sm">&mdash; Balance &amp; Control</span></h3>
-  <p class="meta"><span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: The Still Hand</span></p>
-  <p>The Unbroken Way does not speak. It listens. It is the pause between breaths, the space between thoughts, the stillness at the heart of motion.</p>
-  <ul class='domain-list'><li>Perfect Balance: equilibrium in all things, neither too much nor too little</li><li>Disciplined Restraint: power held in reserve, strength shown through mercy</li><li>Clear Perception: seeing without judgment, acting without attachment</li><li>Protective Service: guarding the innocent, teaching the willing, guiding the lost</li></ul>
-  
-  
-  
+<h3>The Unbroken Way <span class="text-muted text-sm">— Balance &amp; Control</span></h3>
+<p class="meta"><span class="badge badge-blue">6 Rites</span> <span class="badge badge-green">Gift: The Still Hand</span></p>
+<p>The Unbroken Way does not speak. It listens. It is the pause between breaths, the space between thoughts, the stillness at the heart of motion.</p>
+<ul class="domain-list"><li>Perfect Balance: equilibrium in all things, neither too much nor too little</li><li>Disciplined Restraint: power held in reserve, strength shown through mercy</li><li>Clear Perception: seeing without judgment, acting without attachment</li><li>Protective Service: guarding the innocent, teaching the willing, guiding the lost</li></ul>
 </div>
-
 <div class="panel patron" id="patron-varash-the-unmaker">
-  <h3>Varash the Unmaker <span class="text-muted text-sm">&mdash; The Wrong Shape Under the Mountain</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word Beneath the Seal</span></p>
-  <p>Deep beneath the Himadri foothills, sealed by Covenant wax and Aeler iron, lies a fragment of Varash the Unmaker — a being of cosmic indifference that fed on the civilisation that turned the Red Desert to glass.</p>
-  <ul class='domain-list'><li>Cosmic Indifference: power offered without judgment, malice, or investment in the outcome</li><li>Fragmentation: a whole intelligence scattered into shards, seals, and relics that still bargain independently</li><li>The Fine Print: bargains that are technically honored and existentially ruinous</li><li>Sealed Things Listening: the horror of ancient containment that is aware, patient, and already halfway loose</li></ul>
-  
-  
-  
+<h3>Varash the Unmaker <span class="text-muted text-sm">— The Wrong Shape Under the Mountain</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word Beneath the Seal</span></p>
+<p>Deep beneath the Himadri foothills, sealed by Covenant wax and Aeler iron, lies a fragment of Varash the Unmaker — a being of cosmic indifference that fed on the civilisation that turned the Red Desert to glass.</p>
+<ul class="domain-list"><li>Cosmic Indifference: power offered without judgment, malice, or investment in the outcome</li><li>Fragmentation: a whole intelligence scattered into shards, seals, and relics that still bargain independently</li><li>The Fine Print: bargains that are technically honored and existentially ruinous</li><li>Sealed Things Listening: the horror of ancient containment that is aware, patient, and already halfway loose</li></ul>
 </div>
-
 <div class="panel patron" id="patron-venara-the-unbroken-thread">
-  <h3>Venara, the Unbroken Thread <span class="text-muted text-sm">&mdash; The Thread That Holds</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Remaining</span></p>
-  <p>In hearths where silence speaks louder than words and hands clasped in storm weather the fiercest gales, the Unbroken Thread reigns.</p>
-  <ul class='domain-list'><li>Steadfast Bonding: oaths of loyalty, healing through presence, enduring commitments</li><li>Nurturing Presence: active listening, emotional holding space, comfort through proximity</li><li>Rituals of Care: shared meals, mending crafts, vigils, the sacred ordinary</li><li>Healing Through Connection: soothing distress, restoring trust after fracture, communal resilience</li></ul>
-  
-  
-  
+<h3>Venara, the Unbroken Thread <span class="text-muted text-sm">— The Thread That Holds</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Remaining</span></p>
+<p>In hearths where silence speaks louder than words and hands clasped in storm weather the fiercest gales, the Unbroken Thread reigns.</p>
+<ul class="domain-list"><li>Steadfast Bonding: oaths of loyalty, healing through presence, enduring commitments</li><li>Nurturing Presence: active listening, emotional holding space, comfort through proximity</li><li>Rituals of Care: shared meals, mending crafts, vigils, the sacred ordinary</li><li>Healing Through Connection: soothing distress, restoring trust after fracture, communal resilience</li></ul>
 </div>
-
 <div class="panel patron" id="patron-xhakthul-the-thunderspeaker">
-  <h3>Xhak'Thul, the Thunder-Speaker <span class="text-muted text-sm">&mdash; Storm, Shock &amp; Awe</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Xhak'Thul's Blessing</span></p>
-  <p>Before words, there was thunder. Before scripture, lightning carved its commandments into the bones of the world.</p>
-  <ul class='domain-list'><li>Primal Power: storm, thunder, lightning, earthquake, wildfire</li><li>Shock and Awe: overwhelming sensory impact, terror as a weapon</li><li>Fear-Eater: absorbing panic to fuel strength</li><li>Immediate Magic: no rituals, no books — only emotion, movement, and the moment</li></ul>
-  
-  
-  
+<h3>Xhak'Thul, the Thunder-Speaker <span class="text-muted text-sm">— Storm, Shock &amp; Awe</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: Xhak'Thul's Blessing</span></p>
+<p>Before words, there was thunder. Before scripture, lightning carved its commandments into the bones of the world.</p>
+<ul class="domain-list"><li>Primal Power: storm, thunder, lightning, earthquake, wildfire</li><li>Shock and Awe: overwhelming sensory impact, terror as a weapon</li><li>Fear-Eater: absorbing panic to fuel strength</li><li>Immediate Magic: no rituals, no books — only emotion, movement, and the moment</li></ul>
 </div>
-
 <div class="panel patron" id="patron-zephyria-the-first-bloom">
-  <h3>Zephyria, the First Bloom <span class="text-muted text-sm">&mdash; The First Courage of Spring</span></h3>
-  <p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Almost</span></p>
-  <p>In gardens where petals fall like whispered promises and every glance holds the weight of a thousand unsaid words, the First Bloom reigns.</p>
-  <ul class='domain-list'><li>Courtship Rituals: the language of glances, exchanged tokens, the art of near-miss</li><li>Anticipation as Power: building tension through withdrawal, the potency of unfulfilled promise</li><li>Beauty in Transience: celebrating fleeting moments, the poignancy of impermanence</li><li>Mutual Discovery: learning another through shared vulnerability, not declaration</li></ul>
-  
-  
-  
+<h3>Zephyria, the First Bloom <span class="text-muted text-sm">— The First Courage of Spring</span></h3>
+<p class="meta"><span class="badge badge-blue">5 Rites</span> <span class="badge badge-green">Gift: The Word of Almost</span></p>
+<p>In gardens where petals fall like whispered promises and every glance holds the weight of a thousand unsaid words, the First Bloom reigns.</p>
+<ul class="domain-list"><li>Courtship Rituals: the language of glances, exchanged tokens, the art of near-miss</li><li>Anticipation as Power: building tension through withdrawal, the potency of unfulfilled promise</li><li>Beauty in Transience: celebrating fleeting moments, the poignancy of impermanence</li><li>Mutual Discovery: learning another through shared vulnerability, not declaration</li></ul>
 </div>
 </section>
-
 <section class="level1" id="archetypes">
-<h2>Archetypes: The Carried Trade</h2>
+<h2 id="reader-section-7">Archetypes: The Carried Trade</h2>
 <p>Most Invokers in play are not scholars of the Triune. They are tradespeople who
-carry two or three Symbols because two or three Symbols is what the work takes &mdash;
+carry two or three Symbols because two or three Symbols is what the work takes —
 the ward-setter with a shingle, the exorcist with a bag, the conjuror with a licence
 and a season. What follows are 3 such combinations, each built on a
 rivalry from the table below, because the friction between a practitioner's own
 Symbols is the most reliable trouble in the game.</p>
-
 <p>An archetype is not a class. It is a purchase order: which Symbols to buy, in what order, and what the friction between them will cost you. Everything here resolves with the rules already in this guide — Symbols are 4 XP Minor Assets, invocation marks Obligation, displaying the Symbol buys DV −1 and Obligation −1, Crack the Seal buys instant resolution for +2 Obligation and a Compromised Symbol, and Obligation Capacity is Spirit + Presence. Nothing below adds a subsystem.</p>
 <div class="panel"><p><strong>Reading an Archetype.</strong></p><ul><li><strong>Three, not four.</strong> Each archetype names three Symbols: 12 XP total, and one short of the four that make the first rite of every scene cost an extra Obligation. The fourth Symbol is available and is always a decision, never a bargain.</li><li><strong>The spine is a rivalry.</strong> Two of the three Symbols are listed rivals in the Cross-Resonance table. Displaying one while invoking the other is Position one step worse and +1 Obligation. That is not a flaw in the build; it is the build.</li><li><strong>Buy in order.</strong> The order given is the order the character learned the trade in, and a character partway through it is a perfectly good starting character. One Symbol is a practitioner. Two is a professional. Three is a reputation.</li><li><strong>The trade is a trade.</strong> These are people with premises, fees, and a waiting list. Play the invoice as seriously as the invocation — half the drama of the profession is being paid in something other than money.</li></ul></div>
 <div class="panel patron" id="archetype-doorwright">
-  <h3>The Doorwright <span class="text-muted text-sm">&mdash; Ward-setter, seal-breaker, and unlicensed consultant to the watch</span></h3>
-  <blockquote>&ldquo;I put the lock on. I know where the lock is weak. Those are the same job, and I charge for both.&rdquo;</blockquote>
-  <p>A tradesman of thresholds. Doorwrights hang wards for merchant houses, seal the cellars of the recently and badly dead, and are called by watch sergeants who would rather not put a name in a report. The work is honest, dull, and steady — until the same skill that closes a door is the only skill on hand that can open one. Doorwrights are notorious for the second half of the job, and are hired anyway, and know it. They tend toward coat, cigarette, and a tone of voice their clients dislike and their clients' enemies dislike more.</p>
-  <p class="meta"><span class="badge badge-gold">3 Symbols</span>
-     <span class="badge badge-blue">12 XP</span>
-     <span class="badge badge-purple">Spine: The Sealed Gate vs The Riven Path</span></p>
-  <div class="table-wrap"><table>
-  <thead><tr><th>Symbol</th><th>Cost</th><th>What it is for</th></tr></thead>
-  <tbody><tr><td><strong>The Sealed Gate</strong><br><span class='text-muted text-sm'>Thresholds &amp; Containment</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The trade. Rites that hang, test and hold a boundary. This is what is on the shingle and what pays the rent.</td></tr><tr><td><strong>The Riven Path</strong><br><span class='text-muted text-sm'>Passion &amp; Power</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The second half of the job. A chain is not untied but broken. Bought quietly, and usually after a night the Doorwright does not discuss.</td></tr><tr><td><strong>Lucky Jack</strong><br><span class='text-muted text-sm'>Luck &amp; The Heist</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The working practitioner's third Symbol: the coin that has never quite failed to land right. Cheap grace for a trade with no pension.</td></tr></tbody></table></div>
-  <div class="names">
-    <p><strong>The spine &mdash; The Sealed Gate vs The Riven Path.</strong> <em>the gate exists to be shattered; closure is an insult; freedom has no lock.</em></p>
-    <p>The whole character is here. To ward a house the Doorwright must believe a boundary is sacred; to get into one they must believe no boundary is. Both Symbols are on the same belt. Every scene where both are in play is Position one step worse and an extra Obligation, and the Doorwright pays it without comment because the alternative is turning down work.</p>
-  </div>
-  <p><strong>Attributes.</strong> Wits and Spirit lead; Body 2 for the parts of the job that involve a crowbar.</p>
-  <p><strong>Skills.</strong> Arcana and Lore for the wards themselves; Insight for reading a room and a client; Craft for the physical half of a seal — chalk, salt, iron, mortar; Deception for the invoices.</p>
-  <p><strong>Obligation.</strong> Capacity is Spirit + Presence, and the Doorwright's Presence is usually the weaker half. The classic failure is a practitioner with excellent judgement and no capacity to carry what that judgement costs.</p>
-  <div class="panel"><p><strong>Signature: Crack Your Own Seal.</strong> The move the trade is named for. A Doorwright who hung the ward knows where it is thin, and may Crack the Seal on their own Sealed Gate Symbol to open a boundary they themselves set — instant, +2 Obligation, Symbol Compromised, and the GM gets an SB on the way through. The house they are burgling is usually a house they were paid to protect last season. The client is usually still alive.</p></div>
-  <p><strong>When it goes wrong.</strong> A Compromised Sealed Gate Symbol is an inert ward on the Doorwright's own door. Enemies learn this. The classic disaster is not the job going badly; it is the job going fine and the practitioner coming home to a threshold that no longer objects to visitors.</p>
-  <p><strong>The job.</strong></p><ul><li>A Silkstrand counting-house wants the ward it bought last year tested. The test will show the ward is sound. It will also show the second ward, hung inside the first, by someone else, facing inward.</li><li>A watch sergeant in Ecktoria needs a cellar opened without a Censorate writ, and is offering the one payment a Doorwright cannot refuse: a name struck from a parish register, put back.</li><li>A rival Doorwright is undercutting the fee across three wards and hanging seals that fail in eighteen months. Proving it means breaking one, and breaking one means the family inside is unwarded for a night.</li></ul>
-  <p class="text-sm text-muted"><strong>Played straight, this is:</strong> The coat, the debt and the bad attitude; the practitioner listed in a directory who does jobs for the city watch; the abjurer who is best known for the doors he has opened.</p>
+<h3>The Doorwright <span class="text-muted text-sm">— Ward-setter, seal-breaker, and unlicensed consultant to the watch</span></h3>
+<blockquote>“I put the lock on. I know where the lock is weak. Those are the same job, and I charge for both.”</blockquote>
+<p>A tradesman of thresholds. Doorwrights hang wards for merchant houses, seal the cellars of the recently and badly dead, and are called by watch sergeants who would rather not put a name in a report. The work is honest, dull, and steady — until the same skill that closes a door is the only skill on hand that can open one. Doorwrights are notorious for the second half of the job, and are hired anyway, and know it. They tend toward coat, cigarette, and a tone of voice their clients dislike and their clients' enemies dislike more.</p>
+<p class="meta"><span class="badge badge-gold">3 Symbols</span>
+<span class="badge badge-blue">12 XP</span>
+<span class="badge badge-purple">Spine: The Sealed Gate vs The Riven Path</span></p>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Symbol</th><th>Cost</th><th>What it is for</th></tr></thead>
+<tbody><tr><td><strong>The Sealed Gate</strong><br/><span class="text-muted text-sm">Thresholds &amp; Containment</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The trade. Rites that hang, test and hold a boundary. This is what is on the shingle and what pays the rent.</td></tr><tr><td><strong>The Riven Path</strong><br/><span class="text-muted text-sm">Passion &amp; Power</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The second half of the job. A chain is not untied but broken. Bought quietly, and usually after a night the Doorwright does not discuss.</td></tr><tr><td><strong>Lucky Jack</strong><br/><span class="text-muted text-sm">Luck &amp; The Heist</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The working practitioner's third Symbol: the coin that has never quite failed to land right. Cheap grace for a trade with no pension.</td></tr></tbody></table></div></div>
+<div class="names">
+<p><strong>The spine — The Sealed Gate vs The Riven Path.</strong> <em>the gate exists to be shattered; closure is an insult; freedom has no lock.</em></p>
+<p>The whole character is here. To ward a house the Doorwright must believe a boundary is sacred; to get into one they must believe no boundary is. Both Symbols are on the same belt. Every scene where both are in play is Position one step worse and an extra Obligation, and the Doorwright pays it without comment because the alternative is turning down work.</p>
+</div>
+<p><strong>Attributes.</strong> Wits and Spirit lead; Body 2 for the parts of the job that involve a crowbar.</p>
+<p><strong>Skills.</strong> Arcana and Lore for the wards themselves; Insight for reading a room and a client; Craft for the physical half of a seal — chalk, salt, iron, mortar; Deception for the invoices.</p>
+<p><strong>Obligation.</strong> Capacity is Spirit + Presence, and the Doorwright's Presence is usually the weaker half. The classic failure is a practitioner with excellent judgement and no capacity to carry what that judgement costs.</p>
+<div class="panel"><p><strong>Signature: Crack Your Own Seal.</strong> The move the trade is named for. A Doorwright who hung the ward knows where it is thin, and may Crack the Seal on their own Sealed Gate Symbol to open a boundary they themselves set — instant, +2 Obligation, Symbol Compromised, and the GM gets an SB on the way through. The house they are burgling is usually a house they were paid to protect last season. The client is usually still alive.</p></div>
+<p><strong>When it goes wrong.</strong> A Compromised Sealed Gate Symbol is an inert ward on the Doorwright's own door. Enemies learn this. The classic disaster is not the job going badly; it is the job going fine and the practitioner coming home to a threshold that no longer objects to visitors.</p>
+<p><strong>The job.</strong></p><ul><li>A Silkstrand counting-house wants the ward it bought last year tested. The test will show the ward is sound. It will also show the second ward, hung inside the first, by someone else, facing inward.</li><li>A watch sergeant in Ecktoria needs a cellar opened without a Censorate writ, and is offering the one payment a Doorwright cannot refuse: a name struck from a parish register, put back.</li><li>A rival Doorwright is undercutting the fee across three wards and hanging seals that fail in eighteen months. Proving it means breaking one, and breaking one means the family inside is unwarded for a night.</li></ul>
+<p class="text-sm text-muted"><strong>Played straight, this is:</strong> The coat, the debt and the bad attitude; the practitioner listed in a directory who does jobs for the city watch; the abjurer who is best known for the doors he has opened.</p>
 </div>
 <div class="panel patron" id="archetype-quiet-coroner">
-  <h3>The Quiet Coroner <span class="text-muted text-sm">&mdash; Exorcist, deposition-taker, and last physician to the already dead</span></h3>
-  <blockquote>&ldquo;I am not here to release you. I am here to write down what you say, and then release you.&rdquo;</blockquote>
-  <p>Someone has to sit with the ones who did not finish. Quiet Coroners are engaged by families, magistrates, harbour boards and occasionally by the dead themselves; they arrive with a bag, a chalk line, a cheap chair and no hurry. The work is half exorcism and half deposition, and the order matters: a soul that has been laid to rest cannot be questioned, and a soul that is still answering questions has not been laid to rest. The good ones are patient. The great ones are the sort of patient that frightens people.</p>
-  <p class="meta"><span class="badge badge-gold">3 Symbols</span>
-     <span class="badge badge-blue">12 XP</span>
-     <span class="badge badge-purple">Spine: The Pale Shepherd vs Varnek Karn</span></p>
-  <div class="table-wrap"><table>
-  <thead><tr><th>Symbol</th><th>Cost</th><th>What it is for</th></tr></thead>
-  <tbody><tr><td><strong>Varnek Karn, the Death's Negotiator</strong><br><span class='text-muted text-sm'>Bargains with the Departed</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The terms. Rites that hold a departed thing at the table long enough to reach an agreement with it.</td></tr><tr><td><strong>The Pale Shepherd</strong><br><span class='text-muted text-sm'>The Road Every Body Walks</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The release. Rites that open the way and walk the dead onto it. This is the half the family sees and the half they pay for.</td></tr><tr><td><strong>The Witness</strong><br><span class='text-muted text-sm'>Truth &amp; Revelation</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The record. What was said, exactly, and by whom, in a form a magistrate will accept.</td></tr></tbody></table></div>
-  <div class="names">
-    <p><strong>The spine &mdash; The Pale Shepherd vs Varnek Karn.</strong> <em>shepherd offers peace, Karn demands duty; soul cannot rest; death's duty vs death's silence.</em></p>
-    <p>The Coroner is paid twice for opposite things, usually by the same person. The widow wants her husband at peace. The magistrate wants to know who did it. Karn will hold him at the table as long as there are terms to argue; the Shepherd will open the road the moment it is asked. Doing both in one night is Position one step worse and an extra Obligation, and the Coroner does it in one night because the second night is when the family starts hearing him.</p>
-  </div>
-  <p><strong>Attributes.</strong> Spirit and Wits; Presence matters more than practitioners expect, because Capacity is Spirit + Presence and this trade fills it fast.</p>
-  <p><strong>Skills.</strong> Lore and Arcana for the rites; Insight for what the dead are not saying; Sway for the living, who are harder; Craft for the bag — chalk, salt, lamp-oil, the ring itself.</p>
-  <p><strong>Obligation.</strong> Two death Patrons on one belt is the heaviest routine Obligation load in the guide. Coroners are the reason downtime exists. A Coroner who has not cleared Obligation in three sessions is a horror story about to happen to their own party.</p>
-  <div class="panel"><p><strong>Signature: The Deposition.</strong> Ring of salt, one chair, one lamp, and a question list. Invoke Varnek Karn's Rite openly (Symbol displayed: DV −1, Obligation −1) to hold the departed to terms, then the Witness to fix what is said. On a Clean Success the testimony is admissible and true; on a Partial it is true and incomplete in the way that gets someone hanged; on a Miss the thing at the table answers a question that was not asked. Close by invoking the Shepherd. Coroners who skip the closing are called something else within a year.</p></div>
-  <p><strong>When it goes wrong.</strong> A Coroner who takes the testimony and does not open the road has, in the plain language of the trade, kept it. The dead do not object at first. The Shepherd does — a Compromised Shepherd Symbol means the next three funerals in that parish go badly, and everyone will know which practitioner attended the first one.</p>
-  <p><strong>The job.</strong></p><ul><li>A Zakov Namer wants a name added to the Roll of the Drowned, but the drowned man says he was not drowned, and will not say what he was.</li><li>A Covenant court will accept a deposition from the departed as evidence. The opposing advocate is a Recusant, and intends to argue that the witness cannot be sworn because the witness has no standing to lose.</li><li>Nine houses in one street have gone quiet in the polite way. The families are calm, well-fed, and have all engaged the same Coroner, who is very good, and who has not opened a road in a year.</li></ul>
-  <p class="text-sm text-muted"><strong>Played straight, this is:</strong> The professional who arrives with a bag and a method; the ghost-finder with his chalk and his lamp and his notebook; the physician of souls who takes a case history first.</p>
+<h3>The Quiet Coroner <span class="text-muted text-sm">— Exorcist, deposition-taker, and last physician to the already dead</span></h3>
+<blockquote>“I am not here to release you. I am here to write down what you say, and then release you.”</blockquote>
+<p>Someone has to sit with the ones who did not finish. Quiet Coroners are engaged by families, magistrates, harbour boards and occasionally by the dead themselves; they arrive with a bag, a chalk line, a cheap chair and no hurry. The work is half exorcism and half deposition, and the order matters: a soul that has been laid to rest cannot be questioned, and a soul that is still answering questions has not been laid to rest. The good ones are patient. The great ones are the sort of patient that frightens people.</p>
+<p class="meta"><span class="badge badge-gold">3 Symbols</span>
+<span class="badge badge-blue">12 XP</span>
+<span class="badge badge-purple">Spine: The Pale Shepherd vs Varnek Karn</span></p>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Symbol</th><th>Cost</th><th>What it is for</th></tr></thead>
+<tbody><tr><td><strong>Varnek Karn, the Death's Negotiator</strong><br/><span class="text-muted text-sm">Bargains with the Departed</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The terms. Rites that hold a departed thing at the table long enough to reach an agreement with it.</td></tr><tr><td><strong>The Pale Shepherd</strong><br/><span class="text-muted text-sm">The Road Every Body Walks</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The release. Rites that open the way and walk the dead onto it. This is the half the family sees and the half they pay for.</td></tr><tr><td><strong>The Witness</strong><br/><span class="text-muted text-sm">Truth &amp; Revelation</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The record. What was said, exactly, and by whom, in a form a magistrate will accept.</td></tr></tbody></table></div></div>
+<div class="names">
+<p><strong>The spine — The Pale Shepherd vs Varnek Karn.</strong> <em>shepherd offers peace, Karn demands duty; soul cannot rest; death's duty vs death's silence.</em></p>
+<p>The Coroner is paid twice for opposite things, usually by the same person. The widow wants her husband at peace. The magistrate wants to know who did it. Karn will hold him at the table as long as there are terms to argue; the Shepherd will open the road the moment it is asked. Doing both in one night is Position one step worse and an extra Obligation, and the Coroner does it in one night because the second night is when the family starts hearing him.</p>
+</div>
+<p><strong>Attributes.</strong> Spirit and Wits; Presence matters more than practitioners expect, because Capacity is Spirit + Presence and this trade fills it fast.</p>
+<p><strong>Skills.</strong> Lore and Arcana for the rites; Insight for what the dead are not saying; Sway for the living, who are harder; Craft for the bag — chalk, salt, lamp-oil, the ring itself.</p>
+<p><strong>Obligation.</strong> Two death Patrons on one belt is the heaviest routine Obligation load in the guide. Coroners are the reason downtime exists. A Coroner who has not cleared Obligation in three sessions is a horror story about to happen to their own party.</p>
+<div class="panel"><p><strong>Signature: The Deposition.</strong> Ring of salt, one chair, one lamp, and a question list. Invoke Varnek Karn's Rite openly (Symbol displayed: DV −1, Obligation −1) to hold the departed to terms, then the Witness to fix what is said. On a Clean Success the testimony is admissible and true; on a Partial it is true and incomplete in the way that gets someone hanged; on a Miss the thing at the table answers a question that was not asked. Close by invoking the Shepherd. Coroners who skip the closing are called something else within a year.</p></div>
+<p><strong>When it goes wrong.</strong> A Coroner who takes the testimony and does not open the road has, in the plain language of the trade, kept it. The dead do not object at first. The Shepherd does — a Compromised Shepherd Symbol means the next three funerals in that parish go badly, and everyone will know which practitioner attended the first one.</p>
+<p><strong>The job.</strong></p><ul><li>A Zakov Namer wants a name added to the Roll of the Drowned, but the drowned man says he was not drowned, and will not say what he was.</li><li>A Covenant court will accept a deposition from the departed as evidence. The opposing advocate is a Recusant, and intends to argue that the witness cannot be sworn because the witness has no standing to lose.</li><li>Nine houses in one street have gone quiet in the polite way. The families are calm, well-fed, and have all engaged the same Coroner, who is very good, and who has not opened a road in a year.</li></ul>
+<p class="text-sm text-muted"><strong>Played straight, this is:</strong> The professional who arrives with a bag and a method; the ghost-finder with his chalk and his lamp and his notebook; the physician of souls who takes a case history first.</p>
 </div>
 <div class="panel patron" id="archetype-the-encore">
-  <h3>The Encore <span class="text-muted text-sm">&mdash; Licensed stage conjuror, court entertainer, and occasional truth-teller</span></h3>
-  <blockquote>&ldquo;Everything you have seen tonight was a trick. Watch closely: this next part is not.&rdquo;</blockquote>
-  <p>A working magician in the vulgar sense — playbills, a hall, a season, a manager taking a cut. The Encore performs impossibilities for money in front of people who have paid to be fooled, which is the single best cover in the Amaranthine for performing an impossibility in front of people who have not. Ecktoria licenses them, Viterra distrusts them, Mab's court adores them, and the cleverest of them use the stage exactly as it was always used: to say the one true thing in a room where nobody is permitted to say true things, and to be applauded for it.</p>
-  <p class="meta"><span class="badge badge-gold">3 Symbols</span>
-     <span class="badge badge-blue">12 XP</span>
-     <span class="badge badge-purple">Spine: Mab vs Palinode</span></p>
-  <div class="table-wrap"><table>
-  <thead><tr><th>Symbol</th><th>Cost</th><th>What it is for</th></tr></thead>
-  <tbody><tr><td><strong>Mab, Queen of Courts</strong><br><span class='text-muted text-sm'>Glamour &amp; Bargain</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The act. Glamour, misdirection, the impossible thing at the end of the second half.</td></tr><tr><td><strong>Palinode, Queen of Encores</strong><br><span class='text-muted text-sm'>Performance &amp; Rapture</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The house. Rites that take a room and hold it, and the terrible discipline of giving them what they came for.</td></tr><tr><td><strong>Solara, the Still Mirror</strong><br><span class='text-muted text-sm'>The Face Without Performance</span></td><td><span class='badge badge-gold'>4 XP</span></td><td>The turn. One moment, without glamour, without the act, looking at one person as yourself. This is the Symbol the profession does not talk about.</td></tr></tbody></table></div>
-  <div class="names">
-    <p><strong>The spine &mdash; Mab vs Palinode.</strong> <em>glamour demands encore; truth offends mask; favour must be sung aloud; court erupts at song's climax.</em></p>
-    <p>The mask and the encore want opposite things. Mab's favour is granted quietly and must be repaid in kind; Palinode's is granted to a room and must be repaid in front of it. An Encore who works a masque carries both, and the moment the crowd demands the trick again is the moment the bargain becomes public. Position one step worse, an extra Obligation, and a standing ovation.</p>
-  </div>
-  <p><strong>Attributes.</strong> Presence first and by a distance; Wits second. Presence also doubles the Obligation Capacity this build needs.</p>
-  <p><strong>Skills.</strong> Performance is the trade; Deception is the craft; Sway for managers, censors and patrons; Insight for the one face in the third row that is not enjoying itself; Arcana for the parts that are not tricks.</p>
-  <p><strong>Obligation.</strong> The most survivable of the three builds — Presence-heavy, so Capacity is generous — and the most likely to spend it all in one night, because Palinode's Obligation is incurred in front of witnesses who will remember the promise.</p>
-  <div class="panel"><p><strong>Signature: The Unglamoured Turn.</strong> Once in a performance, drop the act. Display Solara's Symbol — no glamour, no patter, no misdirection — and address one person in the room directly. Treat as a Presence + Insight action at DV set by how badly that person does not want to be seen. A Clean Success means they are seen, by themselves as much as by you, and whatever they were about to do they do not do. It works exactly once per audience, and it works because the hall has spent two hours being lied to beautifully.</p></div>
-  <p><strong>When it goes wrong.</strong> Mab does not mind being used as a stage effect. Palinode does not mind being used as a stage effect. Both mind being used as an alibi. When the act is exposed as cover for real work, the Encore does not lose their power — they lose the hall, the licence and the manager, and a practitioner without a room is a practitioner carrying two Symbols that only function in front of a crowd.</p>
-  <p><strong>The job.</strong></p><ul><li>The company has a three-night licence in a city where the Censorate reads every playbill. Someone has bought the box directly above the stage for all three nights and has not attended.</li><li>A Chain-Lantern in the fourth row is not watching the trick. They are watching the wings, where a nine-year-old with a real talent is holding the props.</li><li>Mab's court has requested the act. Command performance, no fee, no refusal, and the favour will be granted before the encore rather than after — which every Encore knows is how the Queen makes a debt land in front of witnesses.</li></ul>
-  <p class="text-sm text-muted"><strong>Played straight, this is:</strong> The evening-dress conjuror whose hypnosis is not a trick; the sorcerer who breaks his staff at the end of the show; the professional illusionist who is a magician twice, and only one of them is billed.</p>
+<h3>The Encore <span class="text-muted text-sm">— Licensed stage conjuror, court entertainer, and occasional truth-teller</span></h3>
+<blockquote>“Everything you have seen tonight was a trick. Watch closely: this next part is not.”</blockquote>
+<p>A working magician in the vulgar sense — playbills, a hall, a season, a manager taking a cut. The Encore performs impossibilities for money in front of people who have paid to be fooled, which is the single best cover in the Amaranthine for performing an impossibility in front of people who have not. Ecktoria licenses them, Viterra distrusts them, Mab's court adores them, and the cleverest of them use the stage exactly as it was always used: to say the one true thing in a room where nobody is permitted to say true things, and to be applauded for it.</p>
+<p class="meta"><span class="badge badge-gold">3 Symbols</span>
+<span class="badge badge-blue">12 XP</span>
+<span class="badge badge-purple">Spine: Mab vs Palinode</span></p>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Symbol</th><th>Cost</th><th>What it is for</th></tr></thead>
+<tbody><tr><td><strong>Mab, Queen of Courts</strong><br/><span class="text-muted text-sm">Glamour &amp; Bargain</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The act. Glamour, misdirection, the impossible thing at the end of the second half.</td></tr><tr><td><strong>Palinode, Queen of Encores</strong><br/><span class="text-muted text-sm">Performance &amp; Rapture</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The house. Rites that take a room and hold it, and the terrible discipline of giving them what they came for.</td></tr><tr><td><strong>Solara, the Still Mirror</strong><br/><span class="text-muted text-sm">The Face Without Performance</span></td><td><span class="badge badge-gold">4 XP</span></td><td>The turn. One moment, without glamour, without the act, looking at one person as yourself. This is the Symbol the profession does not talk about.</td></tr></tbody></table></div></div>
+<div class="names">
+<p><strong>The spine — Mab vs Palinode.</strong> <em>glamour demands encore; truth offends mask; favour must be sung aloud; court erupts at song's climax.</em></p>
+<p>The mask and the encore want opposite things. Mab's favour is granted quietly and must be repaid in kind; Palinode's is granted to a room and must be repaid in front of it. An Encore who works a masque carries both, and the moment the crowd demands the trick again is the moment the bargain becomes public. Position one step worse, an extra Obligation, and a standing ovation.</p>
+</div>
+<p><strong>Attributes.</strong> Presence first and by a distance; Wits second. Presence also doubles the Obligation Capacity this build needs.</p>
+<p><strong>Skills.</strong> Performance is the trade; Deception is the craft; Sway for managers, censors and patrons; Insight for the one face in the third row that is not enjoying itself; Arcana for the parts that are not tricks.</p>
+<p><strong>Obligation.</strong> The most survivable of the three builds — Presence-heavy, so Capacity is generous — and the most likely to spend it all in one night, because Palinode's Obligation is incurred in front of witnesses who will remember the promise.</p>
+<div class="panel"><p><strong>Signature: The Unglamoured Turn.</strong> Once in a performance, drop the act. Display Solara's Symbol — no glamour, no patter, no misdirection — and address one person in the room directly. Treat as a Presence + Insight action at DV set by how badly that person does not want to be seen. A Clean Success means they are seen, by themselves as much as by you, and whatever they were about to do they do not do. It works exactly once per audience, and it works because the hall has spent two hours being lied to beautifully.</p></div>
+<p><strong>When it goes wrong.</strong> Mab does not mind being used as a stage effect. Palinode does not mind being used as a stage effect. Both mind being used as an alibi. When the act is exposed as cover for real work, the Encore does not lose their power — they lose the hall, the licence and the manager, and a practitioner without a room is a practitioner carrying two Symbols that only function in front of a crowd.</p>
+<p><strong>The job.</strong></p><ul><li>The company has a three-night licence in a city where the Censorate reads every playbill. Someone has bought the box directly above the stage for all three nights and has not attended.</li><li>A Chain-Lantern in the fourth row is not watching the trick. They are watching the wings, where a nine-year-old with a real talent is holding the props.</li><li>Mab's court has requested the act. Command performance, no fee, no refusal, and the favour will be granted before the encore rather than after — which every Encore knows is how the Queen makes a debt land in front of witnesses.</li></ul>
+<p class="text-sm text-muted"><strong>Played straight, this is:</strong> The evening-dress conjuror whose hypnosis is not a trick; the sorcerer who breaks his staff at the end of the show; the professional illusionist who is a magician twice, and only one of them is billed.</p>
 </div>
 </section>
-
 <section class="level1" id="cross-resonance">
-<h2>Cross-Resonance</h2>
+<h2 id="reader-section-8">Cross-Resonance</h2>
 <p>Carrying Symbols from rival Patrons generates friction. That friction is the
 point: it is what an Invoker trades for reach. <strong>Edge Loci</strong> are places
 where one side starts a step better in Position; the <strong>Friction</strong> column
 is a set of prompts for spending Story Beats, not a list of penalties to apply.</p>
-
 <div class="panel">
 <p><strong>Quick rulings.</strong></p>
 <ul><li><strong>Position Nudge.</strong> In a home locus, start one step better; in a rival's locus, one step worse.</li><li><strong>Effect Shade.</strong> Where a Patron dominates, consider an Effect bump; where opposed, consider Limited Effect unless it is paid for.</li><li><strong>Symbol Interference.</strong> Carrying both sides' Symbols raises the noise: the first rite each scene may mark +1 Obligation, at the GM's call.</li><li><strong>SB Colour.</strong> When spending SB in these matchups, prefer the suit that fits — Hearts for social, Spades for harm and escalation, Clubs for material cost, Diamonds for numinous disturbance.</li></ul>
 </div>
-
 <p class="text-sm text-muted">81 pairings. Relationships are
-symmetric &mdash; find a Patron on either side of the table.</p>
-
+symmetric — find a Patron on either side of the table.</p>
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>Patron</th><th>Rival</th><th>Edge Loci</th><th>Friction &amp; Prompts (SB)</th></tr></thead>
 <tbody>
-<tr><td>Aveh <span class='text-muted text-sm'>(Freedom, Erasure)</span></td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Crossroads, abandoned gates, wind-scoured battlefields.</td><td>vows dissolve in the storm; liberty shatters oaths; the dawn sears absence into memory.</td></tr>
-<tr><td>Aveh <span class='text-muted text-sm'>(Freedom, Erasure)</span></td><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Forgotten cairns, erased ledgers, storm-blown libraries.</td><td>records fade into silence; the storm devours testimony; archive cannot hold the exiled.</td></tr>
-<tr><td>Aveh <span class='text-muted text-sm'>(Freedom, Erasure)</span></td><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Crumbling thresholds, broken wards, breached tombs.</td><td>the Rider tramples seals; closure collapses to exile; freedom births chaos beyond boundary.</td></tr>
-<tr><td>Aveh <span class='text-muted text-sm'>(Freedom, Erasure)</span></td><td>Carrion King <span class='text-muted text-sm'>(Decay, Renewal)</span></td><td>Open steppes, plague winds, unmarked graves.</td><td>storm scatters the feast; renewal has no soil to root; liberty dissolves the cycle into absence.</td></tr>
-<tr><td>Aveh <span class='text-muted text-sm'>(Freedom, Erasure)</span></td><td>Gallows Bell <span class='text-muted text-sm'>(Justice, Judgment)</span></td><td>Storm-dark tribunals, deserted execution grounds.</td><td>judgment unheard in storm's roar; rope snaps in gale; freedom mocks justice, leaving silence.</td></tr>
+<tr><td>Aveh <span class="text-muted text-sm">(Freedom, Erasure)</span></td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Crossroads, abandoned gates, wind-scoured battlefields.</td><td>vows dissolve in the storm; liberty shatters oaths; the dawn sears absence into memory.</td></tr>
+<tr><td>Aveh <span class="text-muted text-sm">(Freedom, Erasure)</span></td><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Forgotten cairns, erased ledgers, storm-blown libraries.</td><td>records fade into silence; the storm devours testimony; archive cannot hold the exiled.</td></tr>
+<tr><td>Aveh <span class="text-muted text-sm">(Freedom, Erasure)</span></td><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Crumbling thresholds, broken wards, breached tombs.</td><td>the Rider tramples seals; closure collapses to exile; freedom births chaos beyond boundary.</td></tr>
+<tr><td>Aveh <span class="text-muted text-sm">(Freedom, Erasure)</span></td><td>Carrion King <span class="text-muted text-sm">(Decay, Renewal)</span></td><td>Open steppes, plague winds, unmarked graves.</td><td>storm scatters the feast; renewal has no soil to root; liberty dissolves the cycle into absence.</td></tr>
+<tr><td>Aveh <span class="text-muted text-sm">(Freedom, Erasure)</span></td><td>Gallows Bell <span class="text-muted text-sm">(Justice, Judgment)</span></td><td>Storm-dark tribunals, deserted execution grounds.</td><td>judgment unheard in storm's roar; rope snaps in gale; freedom mocks justice, leaving silence.</td></tr>
 <tr><td>Breath of the First Forge</td><td>Clockwork Monad</td><td>Forges, workshops, design studios.</td><td>perfection chokes inspiration; the spark stutters under endless refinement; the gear grinds the nascent idea.</td></tr>
-<tr><td>Breath of the First Forge</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Altars, consecrated fires, vow-stones.</td><td>the flame demands purity; the Breath craves experimentation; the vow sears the playful spark.</td></tr>
+<tr><td>Breath of the First Forge</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Altars, consecrated fires, vow-stones.</td><td>the flame demands purity; the Breath craves experimentation; the vow sears the playful spark.</td></tr>
 <tr><td>Breath of the First Forge</td><td>Seal-Breaker</td><td>Forgotten ledgers, shattered seals, silent archives.</td><td>the Breath builds upon fragments; the Seal-Breaker unbuilds what the Breath has just made; creation meets erasure.</td></tr>
 <tr><td>Breath of the First Forge</td><td>The Witness</td><td>Tribunal halls, truth-telling circles, places of record.</td><td>the Witness demands accountability; the Breath rewards the attempt; truth can cage the joyful spark.</td></tr>
 <tr><td>Breath of the First Forge</td><td>Savage Heart</td><td>Hunting grounds, sacrificial altars, places of primal consumption.</td><td>the Maw consumes the unfinished; the Breath cherishes the half-made; hunger clashes with the joy of making.</td></tr>
-<tr><td>Carrion King <span class='text-muted text-sm'>(Decay, Renewal)</span></td><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Catacombs, bone-fields, ossuary halls.</td><td>the feast of decay disputes record; skulls reorder themselves; scavengers mock the archive.</td></tr>
+<tr><td>Carrion King <span class="text-muted text-sm">(Decay, Renewal)</span></td><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Catacombs, bone-fields, ossuary halls.</td><td>the feast of decay disputes record; skulls reorder themselves; scavengers mock the archive.</td></tr>
 <tr><td>Clockwork Monad</td><td>The Traveler</td><td>Caravans, milestones, repeating relays.</td><td>schedule collapses; detour offers safety; routine blinds to ambush.</td></tr>
-<tr><td>Confessor</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Burnt confessionals, sunrise absolutions, bells that toll at false dawn.</td><td>vows cleanse through pain; guilt burns but leaves ash; the penitent's light blinds the absolver.</td></tr>
+<tr><td>Confessor</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Burnt confessionals, sunrise absolutions, bells that toll at false dawn.</td><td>vows cleanse through pain; guilt burns but leaves ash; the penitent's light blinds the absolver.</td></tr>
 <tr><td>Confessor</td><td>The Witness</td><td>Tribunal halls, bloodied ledgers, whispered testimonies.</td><td>confession births revelation; truth festers in silence; guilt migrates from sinner to judge.</td></tr>
 <tr><td>Confessor</td><td>Silent Choir</td><td>Shuttered sanctuaries, wordless absolutions, drowned bells.</td><td>mercy silences guilt before forgiveness is granted; silence absolves but leaves the soul hollow.</td></tr>
-<tr><td>Confessor</td><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Locked confessionals, sealed reliquaries, hidden sins.</td><td>penance denied; the gate holds sin too tightly; absolution festers within confinement.</td></tr>
-<tr><td>Gallows Bell <span class='text-muted text-sm'>(Justice, Judgment)</span></td><td>Mykkiel</td><td>Courts, tribunals, execution grounds.</td><td>judgment pronounced but precedent denied; sentence demands haunting; writ echoes in the toll.</td></tr>
+<tr><td>Confessor</td><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Locked confessionals, sealed reliquaries, hidden sins.</td><td>penance denied; the gate holds sin too tightly; absolution festers within confinement.</td></tr>
+<tr><td>Gallows Bell <span class="text-muted text-sm">(Justice, Judgment)</span></td><td>Mykkiel</td><td>Courts, tribunals, execution grounds.</td><td>judgment pronounced but precedent denied; sentence demands haunting; writ echoes in the toll.</td></tr>
 <tr><td>Grimmir</td><td>Inquisitor Prime</td><td>Hedge-rows, forest shrines, contested boundaries between field and wood.</td><td>the wild refuses the flame; order chokes root and vine; persecution kindles a green wrath.</td></tr>
-<tr><td>Grimmir</td><td>Carrion King <span class='text-muted text-sm'>(Decay, Renewal)</span></td><td>Rotting groves, compost-heaps, seasonal decay.</td><td>decay feasts where the wild weeps; renewal becomes carrion; the season turns on itself.</td></tr>
-<tr><td>Ikasha</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Twilight thresholds, oath-fires, vigil sites.</td><td>light corners a secret; vow drags shadow forth; escape costs more than silence.</td></tr>
+<tr><td>Grimmir</td><td>Carrion King <span class="text-muted text-sm">(Decay, Renewal)</span></td><td>Rotting groves, compost-heaps, seasonal decay.</td><td>decay feasts where the wild weeps; renewal becomes carrion; the season turns on itself.</td></tr>
+<tr><td>Ikasha</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Twilight thresholds, oath-fires, vigil sites.</td><td>light corners a secret; vow drags shadow forth; escape costs more than silence.</td></tr>
 <tr><td>Ikasha</td><td>The Witness</td><td>Silent cloisters, shaded rooms, hidden alcoves.</td><td>hush worsens Position; shadows betray your step; deferred answers arrive with weight.</td></tr>
 <tr><td>Inaea</td><td>Livaea</td><td>Feasting halls, chambers of intimacy, hearth-feasts.</td><td>desire strains hospitality; passion corrodes mercy; kindness is answered with demand.</td></tr>
 <tr><td>Inquisitor Prime</td><td>Morag the Hag</td><td>Crossroads, trial fires, cursed markets.</td><td>bargain taints purification; soul scoured clean but scarred; purity test twists to hunger.</td></tr>
-<tr><td>Isoka</td><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Doorways of shed skin, ritual molting chambers, thresholds of identity.</td><td>the shed skin slips the gate; closure cannot hold what has already left; the serpent mocks the seal.</td></tr>
+<tr><td>Isoka</td><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Doorways of shed skin, ritual molting chambers, thresholds of identity.</td><td>the shed skin slips the gate; closure cannot hold what has already left; the serpent mocks the seal.</td></tr>
 <tr><td>Isoka</td><td>Oath of Mercy and Grace</td><td>Sickbeds where change is refused, hospices of last rites.</td><td>mercy seeks to heal; Isoka sheds the wound whole; forgiveness becomes a second skin.</td></tr>
 <tr><td>Khemesh</td><td>Raéyn</td><td>Lightless holds, trenches, flooded caverns.</td><td>abyss groans; storm maps fail; pressure crushes speech; tide demands oath.</td></tr>
 <tr><td>Kuva</td><td>Khemesh</td><td>Ship decks during storms, high peaks above deep chasms, places where sky meets sea.</td><td>the dome witnesses, the abyss swallows; lightning illuminates the deep, but pressure drags the light down.</td></tr>
-<tr><td>Kuva</td><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Unroofed thresholds, doorways open to the sky, bridges without walls.</td><td>the gate bars passage; the sky demands witness; closure cannot seal what is already witnessed by the dome.</td></tr>
+<tr><td>Kuva</td><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Unroofed thresholds, doorways open to the sky, bridges without walls.</td><td>the gate bars passage; the sky demands witness; closure cannot seal what is already witnessed by the dome.</td></tr>
 <tr><td>Kuva</td><td>The Witness</td><td>Hilltop tribunals, open-air courts, storm-lit confessions.</td><td>two witnesses compete: one records facts, the other remembers oaths; the sky judges where ink fails.</td></tr>
 <tr><td>Livaea</td><td>Maelstraeus</td><td>Masked balls, deal-feasts, salons.</td><td>desire sweetens the bargain; pact sealed in touch not ink; temptation costs more than coin.</td></tr>
 <tr><td>Lucky Jack</td><td>Maelstraeus</td><td>Gambling dens, counting-houses, deal-tables.</td><td>luck bends the contract; the Infernal Bargainer's fine print crumbles against a lucky roll; the coin spins until someone loses.</td></tr>
-<tr><td>Lucky Jack</td><td>Gallows Bell <span class='text-muted text-sm'>(Justice, Judgment)</span></td><td>Courtrooms, execution grounds, places of final judgment.</td><td>justice demands a verdict; luck offers a reprieve; the Bell tolls but the coin is still in the air.</td></tr>
+<tr><td>Lucky Jack</td><td>Gallows Bell <span class="text-muted text-sm">(Justice, Judgment)</span></td><td>Courtrooms, execution grounds, places of final judgment.</td><td>justice demands a verdict; luck offers a reprieve; the Bell tolls but the coin is still in the air.</td></tr>
 <tr><td>Lucky Jack</td><td>The Witness</td><td>Interrogation rooms, truth-telling circles, places where secrets are exposed.</td><td>luck hides the truth; the Witness demands it; a fortunate slip of the tongue or a misplaced piece of evidence alters the outcome.</td></tr>
 <tr><td>Lunara</td><td>The Witness</td><td>Mirrored chambers, silver pools, moonlit halls.</td><td>reflection shows harsher truth; seams shine; witness misses what Lunara reveals.</td></tr>
 <tr><td>Mab</td><td>Palinode</td><td>Masques, salons, theaters.</td><td>glamour demands encore; truth offends mask; favour must be sung aloud; court erupts at song's climax.</td></tr>
-<tr><td>Maelstraeus</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Oath-stones, consecrated doors, witness trees.</td><td>vow sears loophole shut; bargain price due early; sacred contract becomes trap.</td></tr>
-<tr><td>Malachai</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Desecrated shrines, dawn-lit altars, sacred vows broken.</td><td>a vow sanctifies but inflicts pain; the flame purges yet leaves despair.</td></tr>
+<tr><td>Maelstraeus</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Oath-stones, consecrated doors, witness trees.</td><td>vow sears loophole shut; bargain price due early; sacred contract becomes trap.</td></tr>
+<tr><td>Malachai</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Desecrated shrines, dawn-lit altars, sacred vows broken.</td><td>a vow sanctifies but inflicts pain; the flame purges yet leaves despair.</td></tr>
 <tr><td>Malachai</td><td>The Witness</td><td>Confessionals, false miracles, dark reliquaries.</td><td>a blessing unmasks a curse; truth corrodes faith; relics mock salvation; the witness must name corruption.</td></tr>
 <tr><td>Morag the Hag</td><td>Maelstraeus</td><td>Markets, bargain-halls, crossroads.</td><td>deal's true cost unveiled; haste breeds ruin; balance exacts more than offered.</td></tr>
 <tr><td>Mor'iraath</td><td>Sacred Geometry</td><td>Shattered temples, collapsing bridges, ruined cities.</td><td>pattern dissolves into static; perfect form breaks; compass needle spins; order devoured by entropy.</td></tr>
 <tr><td>Mykkiel</td><td>The Witness</td><td>Courtrooms, sealed archives, oath-bound chambers.</td><td>judgment meets unblinking truth; the writ cannot hide; the covenant bleeds under witness.</td></tr>
 <tr><td>Nidhoggr</td><td>The Witness</td><td>Ruins, ancestor shrines, truth-seeing rites.</td><td>revelation awakens the old; myth proven or destroyed; ancestor demands speech.</td></tr>
 <tr><td>Oath of Mercy and Grace</td><td>Inquisitor Prime</td><td>Hospice doorways, plague villages, sites of public mercy.</td><td>mercy accused of weakness; forgiveness seen as treason; the Inquisitor demands payment where the Oath accepts tears.</td></tr>
-<tr><td>Oath of Mercy and Grace</td><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Gravesides, funerary crypts, deathbeds.</td><td>the dead owed nothing but the Weepers weep anyway; Karn's ledger rejects tears as legal tender; forgiveness becomes a debt to the archive.</td></tr>
+<tr><td>Oath of Mercy and Grace</td><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Gravesides, funerary crypts, deathbeds.</td><td>the dead owed nothing but the Weepers weep anyway; Karn's ledger rejects tears as legal tender; forgiveness becomes a debt to the archive.</td></tr>
 <tr><td>Oath of Mercy and Grace</td><td>Silent Choir</td><td>Shuttered hospices, wordless vigils, places where mercy is performed in silence.</td><td>mercy without witness fades; silence answers the spiral; the Choir forgives by forgetting; the Oath forgives by remembering the debt.</td></tr>
-<tr><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Memorial crypts, plague pits, testaments.</td><td>bone ledger demands payment; consecration threatens archive; unfinished oath resurrects feud.</td></tr>
+<tr><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Memorial crypts, plague pits, testaments.</td><td>bone ledger demands payment; consecration threatens archive; unfinished oath resurrects feud.</td></tr>
 <tr><td>Oya</td><td>Inquisitor Prime</td><td>Desert courts, open-air prisons, sites of public flogging.</td><td>the wind scatters the inquisitor's writ; chains rust in the harmattan; persecution chokes on dust.</td></tr>
-<tr><td>Oya</td><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Unlocked thresholds, breached quarantines, desert border posts.</td><td>the gate holds but the wind erodes; closure cannot seal what the storm has already opened; Oya laughs at locks.</td></tr>
+<tr><td>Oya</td><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Unlocked thresholds, breached quarantines, desert border posts.</td><td>the gate holds but the wind erodes; closure cannot seal what the storm has already opened; Oya laughs at locks.</td></tr>
 <tr><td>Oya</td><td>The Witness</td><td>Burned courthouses, vanished evidence, sand-covered ledgers.</td><td>the witness records, but Oya scatters; truth buried under red dust; revelation arrives too late, erased by wind.</td></tr>
-<tr><td>Pale Shepherd</td><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Graveyards, liminal crossroads, shrines of passage.</td><td>shepherd offers peace, Karn demands duty; soul cannot rest; death's duty vs death's silence.</td></tr>
+<tr><td>Pale Shepherd</td><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Graveyards, liminal crossroads, shrines of passage.</td><td>shepherd offers peace, Karn demands duty; soul cannot rest; death's duty vs death's silence.</td></tr>
 <tr><td>Palinode</td><td>Sacred Geometry</td><td>Concert halls, ritual theaters, metered dances.</td><td>form clashes with feeling; perfection dulls art; audience craves chaos in pattern.</td></tr>
 <tr><td>Palinode</td><td>Thrysos</td><td>Festival grounds, taverns, moots.</td><td>song feeds revel; revel swallows song; crowd erupts beyond control; inspiration burns to mania.</td></tr>
-<tr><td>Raéyn</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Consecrated decks, sunrise rites at sea.</td><td>dawn sears back abyss; vow drags crew into peril; storm promises aid with debt.</td></tr>
+<tr><td>Raéyn</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Consecrated decks, sunrise rites at sea.</td><td>dawn sears back abyss; vow drags crew into peril; storm promises aid with debt.</td></tr>
 <tr><td>Riven Path</td><td>Unbroken Way</td><td>Crossroads of choice, meditation chambers, arenas of contest.</td><td>passion shatters stillness; control chokes the breaking wave; the closed fist and open hand meet—one yields, one takes, neither forgets.</td></tr>
-<tr><td>Riven Path</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Desecrated shrines, battlefields, sites of broken oaths.</td><td>vows are chains to be broken; the dawn reveals the wound; passion answers duty with fire.</td></tr>
-<tr><td>Riven Path</td><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Prison walls, sealed vaults, thresholds that deny passage.</td><td>the gate exists to be shattered; closure is an insult; freedom has no lock.</td></tr>
+<tr><td>Riven Path</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Desecrated shrines, battlefields, sites of broken oaths.</td><td>vows are chains to be broken; the dawn reveals the wound; passion answers duty with fire.</td></tr>
+<tr><td>Riven Path</td><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Prison walls, sealed vaults, thresholds that deny passage.</td><td>the gate exists to be shattered; closure is an insult; freedom has no lock.</td></tr>
 <tr><td>Sacred Geometry</td><td>Ninth Rim</td><td>Perfect temples, empty circles, still points of order.</td><td>the pattern confronts absence; form trembles at the void; nothing is measured and found wanting.</td></tr>
 <tr><td>Sacred Geometry</td><td>Silent Choir</td><td>Anechoic chambers, silent scriptoria, libraries of frozen light.</td><td>silence perfects form; the pattern prays without words; mercy becomes structure, structure becomes mercy.</td></tr>
-<tr><td>Savage Heart</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Blood-soaked altars, sacred hunting grounds, sites of sacrifice.</td><td>the flame judges but the Maw consumes; vows of mercy break on fangs; dawn reveals the kill.</td></tr>
+<tr><td>Savage Heart</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Blood-soaked altars, sacred hunting grounds, sites of sacrifice.</td><td>the flame judges but the Maw consumes; vows of mercy break on fangs; dawn reveals the kill.</td></tr>
 <tr><td>Savage Heart</td><td>Grimmir</td><td>Wilderness edges, territory lines, places where predator and prey meet.</td><td>the wild speaks of balance; the Red Maw answers with hunger; the season turns red.</td></tr>
-<tr><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Ninth Rim</td><td>Failing wards, thinning thresholds, sealed vaults.</td><td>door rattles; ward flickers; void slips past; seal admits what it bars.</td></tr>
-<tr><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>The Traveler</td><td>Customs houses, locks, liminal crossings.</td><td>ledger wrong; key refuses; toll extracted; desire path collapses to law.</td></tr>
+<tr><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Ninth Rim</td><td>Failing wards, thinning thresholds, sealed vaults.</td><td>door rattles; ward flickers; void slips past; seal admits what it bars.</td></tr>
+<tr><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>The Traveler</td><td>Customs houses, locks, liminal crossings.</td><td>ledger wrong; key refuses; toll extracted; desire path collapses to law.</td></tr>
 <tr><td>Seal-Breaker</td><td>The Witness</td><td>Erased ledgers, burnt archives, silent testimonies.</td><td>the witness records, the seal-breaker erases; truth and oblivion contest every memory; the Hollow collects what both leave behind.</td></tr>
 <tr><td>Seal-Breaker</td><td>Mykkiel</td><td>Voided contracts, broken seals, courts without record.</td><td>the writ binds but the seal-breaker cracks; law without witness is void; obligation erased from the ledger.</td></tr>
-<tr><td>Seal-Breaker</td><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Unmarked graves, forgotten cairns, archives where names fade.</td><td>the dead owe nothing to the forgotten; Karn's ledger holds empty pages; the Seal-Breaker speaks and the record simply stops.</td></tr>
+<tr><td>Seal-Breaker</td><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Unmarked graves, forgotten cairns, archives where names fade.</td><td>the dead owe nothing to the forgotten; Karn's ledger holds empty pages; the Seal-Breaker speaks and the record simply stops.</td></tr>
 <tr><td>Silent Choir</td><td>The Witness</td><td>Echoing cloisters, confessionals with sealed lips, mirrors that reflect no mouth.</td><td>truth yearns to speak but mercy stills the tongue; revelation shatters peace; silence becomes its own confession.</td></tr>
 <tr><td>Silent Choir</td><td>Inaea</td><td>Shuttered hearths, mourning halls, letters never sent.</td><td>mercy divides; the hearth forgives through warmth, the Choir through forgetting; love dies in gentleness unspoken.</td></tr>
-<tr><td>Silent Choir</td><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Catacombs of still air, funerary archives where the names are erased.</td><td>the Choir hums among the bones; records fall mute; memory yields to rest; death and mercy share the same hymn.</td></tr>
+<tr><td>Silent Choir</td><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Catacombs of still air, funerary archives where the names are erased.</td><td>the Choir hums among the bones; records fall mute; memory yields to rest; death and mercy share the same hymn.</td></tr>
 <tr><td>Silent Choir</td><td>Sacred Geometry</td><td>Anechoic temples, fractal vaults that swallow sound.</td><td>silence perfects form; entropy refines design; mercy becomes architecture; the pattern prays without words.</td></tr>
-<tr><td>Silent Choir</td><td>Aveh <span class='text-muted text-sm'>(Freedom, Erasure)</span></td><td>Ruined cloisters, desert shrines scoured by wind.</td><td>silence liberates; erasure redeems; mercy untethers the self until nothing remains but peace.</td></tr>
-<tr><td>Thrysos</td><td>Carrion King <span class='text-muted text-sm'>(Decay, Renewal)</span></td><td>Feast halls, bonfires, festival graves.</td><td>revel spills to carrion; death becomes dance; feast breeds seed of decay.</td></tr>
+<tr><td>Silent Choir</td><td>Aveh <span class="text-muted text-sm">(Freedom, Erasure)</span></td><td>Ruined cloisters, desert shrines scoured by wind.</td><td>silence liberates; erasure redeems; mercy untethers the self until nothing remains but peace.</td></tr>
+<tr><td>Thrysos</td><td>Carrion King <span class="text-muted text-sm">(Decay, Renewal)</span></td><td>Feast halls, bonfires, festival graves.</td><td>revel spills to carrion; death becomes dance; feast breeds seed of decay.</td></tr>
 <tr><td>Thrysos</td><td>Livaea</td><td>Bacchic revels, decadent salons, wine-feasts.</td><td>revel loosens restraint; passion binds harder; temptation drunk becomes vow.</td></tr>
 <tr><td>Ninth Rim</td><td>The Witness</td><td>Forgotten vaults, failing records, silent ruins.</td><td>truth swallows itself; record fades to dust; memory refuses recall.</td></tr>
 <tr><td>The Traveler</td><td>Clockwork Monad</td><td>Pilgrim routes, caravans, timetables.</td><td>routine bends to detour; detour grants swiftness but ambush; schedule cannot hold.</td></tr>
 <tr><td>Unbroken Way</td><td>Riven Path</td><td>Meditation chambers, arenas, thresholds of choice.</td><td>stillness meets the breaking wave; control denies passion; the open hand refuses to close, and the closed fist refuses to open.</td></tr>
 <tr><td>Unbroken Way</td><td>Malachai</td><td>Desecrated shrines, sites of fallen meditation, places where balance shattered.</td><td>calm resists the curse; corruption stains the still point; the Way absorbs and redirects, but the Chained Angel's hunger is patient.</td></tr>
 <tr><td>Unbroken Way</td><td>Savage Heart</td><td>Wilderness edges, hunting grounds, places where predator meets prey.</td><td>the Way deflects; the Maw consumes; balance and hunger circle each other—neither yields, neither forgets.</td></tr>
-<tr><td>Varnek Karn <span class='text-muted text-sm'>(Death, Arbitration)</span></td><td>Mykkiel</td><td>Audit halls, courts martial, ledger-vaults.</td><td>writ binds restless; sentence offends precedent; archive haunts judgment.</td></tr>
-<tr><td>Vorthak</td><td>Sealed Gate <span class='text-muted text-sm'>(Boundaries, Closure)</span></td><td>Wards, vaults, guarded thresholds.</td><td>hunger devours lock; seal becomes meal; barrier broken by appetite.</td></tr>
-<tr><td>Xhak'Thul</td><td>Oath of Flame &amp; Light <span class='text-muted text-sm'>(Dawn, Vows)</span></td><td>Storm-lit altars, dawn-thunder battles, sites of primal oaths sworn under sky.</td><td>lightning sanctifies but burns the vow-breaker; storm drowns the dawn-cry; thunder answers fire with its own judgment.</td></tr>
+<tr><td>Varnek Karn <span class="text-muted text-sm">(Death, Arbitration)</span></td><td>Mykkiel</td><td>Audit halls, courts martial, ledger-vaults.</td><td>writ binds restless; sentence offends precedent; archive haunts judgment.</td></tr>
+<tr><td>Vorthak</td><td>Sealed Gate <span class="text-muted text-sm">(Boundaries, Closure)</span></td><td>Wards, vaults, guarded thresholds.</td><td>hunger devours lock; seal becomes meal; barrier broken by appetite.</td></tr>
+<tr><td>Xhak'Thul</td><td>Oath of Flame &amp; Light <span class="text-muted text-sm">(Dawn, Vows)</span></td><td>Storm-lit altars, dawn-thunder battles, sites of primal oaths sworn under sky.</td><td>lightning sanctifies but burns the vow-breaker; storm drowns the dawn-cry; thunder answers fire with its own judgment.</td></tr>
 <tr><td>Xhak'Thul</td><td>Raéyn</td><td>Storm-tossed seas, coastal cliffs, places where sky and water meet.</td><td>lightning splits the waves; storm-queen and thunder-speaker contest the wind; the crew prays to both, and both demand a price.</td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </section>
-
-<footer>Fate's Edge Copyright &mdash; &copy; 2024&ndash;2026 Nicholas A. Gasper.
+<footer>Fate's Edge Copyright — © 2024–2026 Nicholas A. Gasper.
 All rights reserved. Generated by <code>tools/build_invokers_guide.py</code> from
 <code>data/patrons/</code>, <code>data/patron-rivalries.json</code> and
 <code>data/invoker-archetypes.json</code>; edit those,
 not this file.</footer>
-
-</body>
+</article></body>
 </html>

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fate's Edge — The Witnessed Prey, a Hunter's Guide — Chapter 12: Adversary Templates & Quick Generators</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — The Witnessed Prey, a Hunter's Guide — Chapter 12: Adversary Templates &amp; Quick Generators</title>
 <style>
     :root {
         --bg1: #0d0d1a;
@@ -100,84 +101,85 @@
     hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
     footer { text-align: center; color: var(--text3); font-size: 0.8rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
 </style>
-</head>
-<body>
-<h1>Adversary Templates & Quick Generators</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Expansions · The Witnessed Prey</strong></p><p>Use this specialist book alongside the core rules. Begin with its introduction and requirements before looking up a technique. Keep any explicitly stated additions or changes visible to the table; do not infer an unstated exception to the core loop.</p><p><strong>The Witnessed Prey, a Hunter's Guide</strong> · Chapter 12 · Adversary Templates &amp; Quick Generators</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="Witnessed-_-Prey-_-11-_-Epic-_-&amp;-_-Unique-_-Bosses.html">Previous chapter</a><a href="Witnessed-_-Prey-_-13-_-Constructs-_-and-_-Golems-_-The-_-Unwitnessed-_-Servants.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Adversary Templates &amp; Quick Generators</a></li><li><a href="#threat-level-scaling-table">Threat Level Scaling Table</a></li><li><a href="#harm-levels-how-much-a-thing-can-take">Harm Levels (How Much a Thing Can Take)</a></li><li><a href="#boss-design-checklist">Boss Design Checklist</a></li><li><a href="#random-adversary-generator">Random Adversary Generator</a></li><li><a href="#deploying-adversaries-with-timers">Deploying Adversaries with Timers</a></li><li><a href="#quick-adversary-cards-reference">Quick Adversary Cards (Reference)</a></li><li><a href="#tl-quick-ref">Quick Threat Level Reference</a></li><li><a href="#final-advice-from-the-marginal-voices">Final Advice from the Marginal Voices</a></li></ul></details>
+<h1 id="reader-section-1">Adversary Templates &amp; Quick Generators</h1>
 <p class="subtitle">The Witnessed Prey, a Hunter's Guide — Chapter 12</p>
-<blockquote>&ldquo;The bestiary is a memory. The templates are its bones. The generator is the hand that gives it flesh. Use them when the hour is late and the players have taken a road you did not expect.&rdquo;<span class="attribution">&mdash;Lerris Fenwood, marginal note</span></blockquote>
-
+<blockquote>“The bestiary is a memory. The templates are its bones. The generator is the hand that gives it flesh. Use them when the hour is late and the players have taken a road you did not expect.”<span class="attribution">—Lerris Fenwood, marginal note</span></blockquote>
 <p>I have spent more hours than I care to count building adversaries from scratch. The work is good for the soul, but the soul is not always what the table needs. Sometimes it needs a bandit captain in thirty seconds. Sometimes it needs a boss whose phases fit on an index card. This chapter is for those times.</p>
-
 <p>What follows are templates, generators, and procedures. They are not polished. They are <strong>field tools</strong>. Use them, bend them, discard them. The Gray Wanderer would approve. Saikou Ira would ask for a silver mirror. Dusana would ask for a story. I ask only that you count to eight before you roll.</p>
-
 <h2 id="threat-level-scaling-table">Threat Level Scaling Table</h2>
-<p>Every adversary in this compendium is rated by <strong>Threat Level (TL)</strong>, 1 to 10. It is the whole rating &mdash; the compendium no longer carries a separate Tier, Cap or Danger, because those were three names for the same question and they disagreed. The table is the SRD's:</p>
+<p>Every adversary in this compendium is rated by <strong>Threat Level (TL)</strong>, 1 to 10. It is the whole rating — the compendium no longer carries a separate Tier, Cap or Danger, because those were three names for the same question and they disagreed. The table is the SRD's:</p>
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>TL</th><th>What it is</th><th>Key Attributes</th><th>Harm it deals</th><th>Harm Levels it absorbs</th></tr></thead>
 <tbody>
-<tr><td><strong>1</strong></td><td>Rabble &mdash; frightened, untrained, dangerous in numbers only</td><td>1&ndash;2</td><td>1</td><td>3 (standard)</td></tr>
-<tr><td><strong>2</strong></td><td>Minion &mdash; a guard, a thug, a hungry animal</td><td>2</td><td>1&ndash;2</td><td>3 (standard)</td></tr>
-<tr><td><strong>3</strong></td><td>Standard &mdash; the competent professional; most of what fills a scene</td><td>2&ndash;3</td><td>2</td><td>3 (standard)</td></tr>
-<tr><td><strong>4</strong></td><td>Elite &mdash; a knight, a trained killer, a greater beast</td><td>3</td><td>2&ndash;3</td><td>3 (standard)</td></tr>
-<tr><td><strong>5</strong></td><td>Lieutenant &mdash; named, and worth naming</td><td>3&ndash;4</td><td>3</td><td>8 (advanced)</td></tr>
-<tr><td><strong>6</strong></td><td>Mini-boss &mdash; anchors an encounter by itself</td><td>4</td><td>3&ndash;4</td><td>8 (advanced)</td></tr>
-<tr><td><strong>7</strong></td><td>Boss &mdash; anchors a session</td><td>4&ndash;5</td><td>4&ndash;5</td><td>8 per phase, 2 phases</td></tr>
-<tr><td><strong>8</strong></td><td>Greater boss &mdash; anchors an arc</td><td>5</td><td>5&ndash;6</td><td>8 per phase, 3 phases</td></tr>
-<tr><td><strong>9</strong></td><td>Legendary &mdash; anchors a campaign</td><td>5&ndash;6</td><td>6&ndash;7</td><td>8 per phase, 3 phases</td></tr>
-<tr><td><strong>10</strong></td><td>Avatar or Power &mdash; the thing the campaign is <em>about</em></td><td>6+</td><td>8+</td><td>None &mdash; a puzzle, not a fight</td></tr>
+<tr><td><strong>1</strong></td><td>Rabble — frightened, untrained, dangerous in numbers only</td><td>1–2</td><td>1</td><td>3 (standard)</td></tr>
+<tr><td><strong>2</strong></td><td>Minion — a guard, a thug, a hungry animal</td><td>2</td><td>1–2</td><td>3 (standard)</td></tr>
+<tr><td><strong>3</strong></td><td>Standard — the competent professional; most of what fills a scene</td><td>2–3</td><td>2</td><td>3 (standard)</td></tr>
+<tr><td><strong>4</strong></td><td>Elite — a knight, a trained killer, a greater beast</td><td>3</td><td>2–3</td><td>3 (standard)</td></tr>
+<tr><td><strong>5</strong></td><td>Lieutenant — named, and worth naming</td><td>3–4</td><td>3</td><td>8 (advanced)</td></tr>
+<tr><td><strong>6</strong></td><td>Mini-boss — anchors an encounter by itself</td><td>4</td><td>3–4</td><td>8 (advanced)</td></tr>
+<tr><td><strong>7</strong></td><td>Boss — anchors a session</td><td>4–5</td><td>4–5</td><td>8 per phase, 2 phases</td></tr>
+<tr><td><strong>8</strong></td><td>Greater boss — anchors an arc</td><td>5</td><td>5–6</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>9</strong></td><td>Legendary — anchors a campaign</td><td>5–6</td><td>6–7</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>10</strong></td><td>Avatar or Power — the thing the campaign is <em>about</em></td><td>6+</td><td>8+</td><td>None — a puzzle, not a fight</td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
-<p class="text-sm text-muted">This table is the SRD's, reproduced. <strong>Threat Level is the whole rating</strong> &mdash; there is no separate Tier, Cap or Danger for a creature. <em>Harm</em> is what it deals; <em>Harm Levels</em> is what it absorbs. <em>None (puzzle)</em> is the one override on the last column and is legal at any TL, but a creature with no Harm Levels must state how it <em>is</em> resolved.</p>
+<p class="text-sm text-muted">This table is the SRD's, reproduced. <strong>Threat Level is the whole rating</strong> — there is no separate Tier, Cap or Danger for a creature. <em>Harm</em> is what it deals; <em>Harm Levels</em> is what it absorbs. <em>None (puzzle)</em> is the one override on the last column and is legal at any TL, but a creature with no Harm Levels must state how it <em>is</em> resolved.</p>
 <p>To move an adversary up or down the scale, read across to its new row and take those numbers. You are not adding a bonus to a base creature; you are looking up what a creature of that weight is.</p>
-
-
 <blockquote>Threat Level is a lie. The real threat is the story. But the lie helps the dice.<span class="attribution">The Gray Wanderer</span></blockquote>
-
 <h2 id="harm-levels-how-much-a-thing-can-take">Harm Levels (How Much a Thing Can Take)</h2>
-
-<p>An adversary does not have Hit Points. It has <strong>Harm Levels</strong> &mdash; the number of times it can be made to bleed, break, or bend before the fight is over. This is separate from the Harm an adversary <em>deals</em> (see the Threat Level table above); Harm Levels are what it <em>absorbs</em>.</p>
-
+<p>An adversary does not have Hit Points. It has <strong>Harm Levels</strong> — the number of times it can be made to bleed, break, or bend before the fight is over. This is separate from the Harm an adversary <em>deals</em> (see the Threat Level table above); Harm Levels are what it <em>absorbs</em>.</p>
 <ul>
-<li><strong>Standard threats</strong> (TL 1&ndash;3, most of what fills a scene) have <strong>3 Harm Levels</strong>. Three good hits and it is done.</li>
-<li><strong>Mini-bosses and advanced adversaries</strong> (TL 3&ndash;4, named lieutenants, the tall folk, anything meant to anchor a whole encounter) have <strong>8 Harm Levels</strong>.</li>
-<li><strong>Epic creatures and true bosses</strong> are <strong>multi-phasic</strong>: they do not have one pool of Harm Levels, they have several, one per phase (see the Boss Design Checklist below). A boss can easily carry many Harm Levels across its full fight, but the party never faces them all at once &mdash; only the phase in front of them. When a phase&rsquo;s Harm Levels are exhausted, the phase ends and the next begins, changed by what was done to reach it.</li>
-<li><strong>Patrons, Avatars, and other unkillable powers</strong> have no Harm Levels at all. They cannot be brought down by Harm, full stop. They are <strong>puzzles</strong>, not fights &mdash; resolved by a name spoken, a bargain kept or broken, a truth offered, a rite performed. Treat any attempt to simply out-damage one as a sign the table has misread the scene.</li>
+<li><strong>Standard threats</strong> (TL 1–3, most of what fills a scene) have <strong>3 Harm Levels</strong>. Three good hits and it is done.</li>
+<li><strong>Mini-bosses and advanced adversaries</strong> (TL 3–4, named lieutenants, the tall folk, anything meant to anchor a whole encounter) have <strong>8 Harm Levels</strong>.</li>
+<li><strong>Epic creatures and true bosses</strong> are <strong>multi-phasic</strong>: they do not have one pool of Harm Levels, they have several, one per phase (see the Boss Design Checklist below). A boss can easily carry many Harm Levels across its full fight, but the party never faces them all at once — only the phase in front of them. When a phase’s Harm Levels are exhausted, the phase ends and the next begins, changed by what was done to reach it.</li>
+<li><strong>Patrons, Avatars, and other unkillable powers</strong> have no Harm Levels at all. They cannot be brought down by Harm, full stop. They are <strong>puzzles</strong>, not fights — resolved by a name spoken, a bargain kept or broken, a truth offered, a rite performed. Treat any attempt to simply out-damage one as a sign the table has misread the scene.</li>
 </ul>
-
-<blockquote>I have never once seen a number tell a player what a monster is. But I have seen a player&rsquo;s face when I said &ldquo;it doesn&rsquo;t have a health bar &mdash; it has a phase, and you just ended it.&rdquo; That is the only math that matters here.<span class="attribution">The Gray Wanderer</span></blockquote>
-
+<blockquote>I have never once seen a number tell a player what a monster is. But I have seen a player’s face when I said “it doesn’t have a health bar — it has a phase, and you just ended it.” That is the only math that matters here.<span class="attribution">The Gray Wanderer</span></blockquote>
 <h2 id="boss-design-checklist">Boss Design Checklist</h2>
-
 <p>Use this checklist when building a custom boss. Keep the answer to each question to one sentence. If you cannot, the boss is too complicated.</p>
-
 <ol>
 <li><strong>Name &amp; Nature</strong>: What is the boss, and what system (organ) of the story does it represent?</li>
-<li><strong>Phase Timer </strong>: 6, 8, or 10? Write the phase names (e.g., <em>Whisper</em> &rarr; <em>Offer</em> &rarr; <em>Claim</em>).</li>
+<li><strong>Phase Timer </strong>: 6, 8, or 10? Write the phase names (e.g., <em>Whisper</em> → <em>Offer</em> → <em>Claim</em>).</li>
 <li><strong>Three Moves</strong>: One space-control, one resource-tax, one identity/knowledge twist.</li>
-<li><strong>Two Lair Actions</strong>: Environmental toggles keyed to this boss&rsquo;s lair.</li>
+<li><strong>Two Lair Actions</strong>: Environmental toggles keyed to this boss’s lair.</li>
 <li><strong>Counters</strong>: A courtesy, a tool, a sacrifice. Players should be able to discover these through play.</li>
-<li><strong>Drop</strong>: A Diamond (see Chapter 1&ndash;6) or a bespoke boon tied to the organ.</li>
+<li><strong>Drop</strong>: A Diamond (see Chapter 1–6) or a bespoke boon tied to the organ.</li>
 </ol>
-
-<p><strong>Example (Abbreviated &ndash; The Ember Prefect from Chapter 6):</strong></p>
-
-<pre><code>1. Ember Prefect &ndash; schismatic inquisitor, represents the Church&rsquo;s hunger for purity.
-2. Phase Timer [8]: Citation &rarr; Censure &rarr; Auto-da-fé &rarr; Purge.
+<p><strong>Example (Abbreviated – The Ember Prefect from Chapter 6):</strong></p>
+<pre><code>1. Ember Prefect – schismatic inquisitor, represents the Church’s hunger for purity.
+2. Phase Timer [8]: Citation → Censure → Auto-da-fé → Purge.
 3. Moves: Name reading (social), flame test (resource), purge (identity).
 4. Lair: Candle Count (space), Shadow timer (resource).
 5. Counters: relic provenance, crowd favor, rival sermon.
 6. Drop: black record page, candle that never goes out.</code></pre>
-
 <blockquote>I have used this checklist seven times. The seventh boss killed two PCs. I do not blame the checklist. I blame the dice. The dice do not apologize.<span class="attribution">Saikou Ira</span></blockquote>
-
 <h2 id="random-adversary-generator">Random Adversary Generator</h2>
-
-<p>For when the players take a road you did not map. Roll 1d6 on each table. The result is not a full stat block &ndash; it is a <strong>spark</strong>. You provide the Threat Level, the Harm, and the fiction.</p>
-
-<h3>d6 &ndash; Creature Type</h3>
-
+<p>For when the players take a road you did not map. Roll 1d6 on each table. The result is not a full stat block – it is a <strong>spark</strong>. You provide the Threat Level, the Harm, and the fiction.</p>
+<h3>d6 – Creature Type</h3>
 <ol>
 <li>Mortal (humanoid, mercenary, cultist)</li>
 <li>Unquiet Dead (ghost, ghoul, poltergeist)</li>
@@ -186,9 +188,7 @@
 <li>Fae or Threshold Spirit</li>
 <li>Dungeon or Living Infrastructure</li>
 </ol>
-
-<h3>d6 &ndash; Descriptor</h3>
-
+<h3>d6 – Descriptor</h3>
 <ol>
 <li>Patient (waits, observes, follows)</li>
 <li>Hungry (attacks without warning, prefers the weak)</li>
@@ -197,20 +197,16 @@
 <li>Bound (cannot leave a location or object)</li>
 <li>Echo (repeats the last words of its victims)</li>
 </ol>
-
-<h3>d6 &ndash; Motivation</h3>
-
+<h3>d6 – Motivation</h3>
 <ol>
 <li>Protects a threshold (door, ford, grave)</li>
 <li>Hungers for memory (names, faces, secrets)</li>
 <li>Seeks a witness (wants a confession or a story)</li>
 <li>Obeys a patron (unseen master, forgotten oath)</li>
-<li>Collects what&rsquo;s owed (silver, blood, promises)</li>
+<li>Collects what’s owed (silver, blood, promises)</li>
 <li>Simply wants to be left alone (will attack if provoked)</li>
 </ol>
-
-<h3>d6 &ndash; Weakness</h3>
-
+<h3>d6 – Weakness</h3>
 <ol>
 <li>Silver (weapon or touch)</li>
 <li>Fire (or sunlight)</li>
@@ -219,98 +215,64 @@
 <li>A memory (offered freely, not taken)</li>
 <li>Fresh water (poured or splashed)</li>
 </ol>
-
-<h3>d6 &ndash; Timer Size (for the encounter)</h3>
-
+<h3>d6 – Timer Size (for the encounter)</h3>
 <ol>
-<li>4 segments &mdash; short, a minor threat</li>
-<li>6 segments &mdash; standard</li>
-<li>6 segments &mdash; standard</li>
-<li>8 segments &mdash; extended</li>
-<li>10 segments &mdash; epic, a boss</li>
-<li>Your choice of 4&ndash;10, but the timer is <em>visible</em> and ticks only on player failures</li>
+<li>4 segments — short, a minor threat</li>
+<li>6 segments — standard</li>
+<li>6 segments — standard</li>
+<li>8 segments — extended</li>
+<li>10 segments — epic, a boss</li>
+<li>Your choice of 4–10, but the timer is <em>visible</em> and ticks only on player failures</li>
 </ol>
-
-<p><strong>Worked Example</strong>: Roll 3, 2, 5, 4, 1 &rarr; Type: Cursed; Descriptor: Hungry; Motivation: Collects what&rsquo;s owed; Weakness: A true name; Timer : 4 segments. Result: A starving ghoul that once was a toll-keeper. It demands payment from anyone who crosses its bridge. Its true name is carved on the underside of the keystone. The players have four segments to find the name or feed it a memory.</p>
-
-<blockquote>I rolled this generator once and got &ldquo;Fae, Patient, Seeks a witness, A correct count, 6 segments.&rdquo; The result was a Trow who asked every player to count to eight. One player sneezed on seven. The Trow took his shadow. He got it back after three sessions. The shadow was taller.<span class="attribution">The Gray Wanderer</span></blockquote>
-
+<p><strong>Worked Example</strong>: Roll 3, 2, 5, 4, 1 → Type: Cursed; Descriptor: Hungry; Motivation: Collects what’s owed; Weakness: A true name; Timer : 4 segments. Result: A starving ghoul that once was a toll-keeper. It demands payment from anyone who crosses its bridge. Its true name is carved on the underside of the keystone. The players have four segments to find the name or feed it a memory.</p>
+<blockquote>I rolled this generator once and got “Fae, Patient, Seeks a witness, A correct count, 6 segments.” The result was a Trow who asked every player to count to eight. One player sneezed on seven. The Trow took his shadow. He got it back after three sessions. The shadow was taller.<span class="attribution">The Gray Wanderer</span></blockquote>
 <h2 id="deploying-adversaries-with-timers">Deploying Adversaries with Timers</h2>
-
 <p>A timer is not a countdown. It is a <strong>promise</strong>. Use timers to make adversaries feel inevitable without being unfair. Below are common timer patterns.</p>
-
 <h3>Arrival Timer (Reinforcements)</h3>
-
 <p><strong>Name</strong>: <em>Patrol Arrives [6]</em>. Ticks when the party makes noise, leaves evidence, or fails a Stealth roll. When full, 1d4 guards or a lieutenant arrives.</p>
-
 <h3>Doom Timer (Environmental)</h3>
-
 <p><strong>Name</strong>: <em>Collapse [8]</em>. Ticks when the party fails a Body + Athletics roll or when the boss uses a specific lair action. When full, the ceiling falls (Harm 2 to everyone, terrain becomes Difficult).</p>
-
 <h3>Hunger Timer (Boss Enrage)</h3>
-
 <p><strong>Name</strong>: <em>Bloodlust [6]</em>. Ticks each time the boss takes Harm. When full, the boss gains +1 die to all attacks and −1 to defense DV (frenzy).</p>
-
 <h3>Reckoning Timer (Negotiation)</h3>
-
-<p><strong>Name</strong>: <em>The Hollow&rsquo;s Due [4]</em>. Ticks each time a character accepts a gift, breaks a promise, or lies. When full, an Oath-Keeper appears and demands payment. The party can clear ticks by telling a true story or offering a memory.</p>
-
+<p><strong>Name</strong>: <em>The Hollow’s Due [4]</em>. Ticks each time a character accepts a gift, breaks a promise, or lies. When full, an Oath-Keeper appears and demands payment. The party can clear ticks by telling a true story or offering a memory.</p>
 <h3>Witness Timer (Social Pressure)</h3>
-
 <p><strong>Name</strong>: <em>Crowd Turns [6]</em>. Ticks each time a character fails a social roll or is witnessed committing a crime. When full, bystanders become hostile or flee, and guards are summoned.</p>
-
 <blockquote>A timer is a leash. The players hold the other end. If they forget, the leash tightens. I have seen a party ignore a <em>Collapse</em> timer. The roof fell. They survived. The treasure did not.<span class="attribution">Saikou Ira</span></blockquote>
-
 <h2 id="quick-adversary-cards-reference">Quick Adversary Cards (Reference)</h2>
-
 <p>The following cards are reproduced from the GM Guide, Chapter 6, for quick reference. Print them, cut them, keep them behind the screen.</p>
-
-<div class="panel"><strong>Bandit Captain</strong> (TL 4 &bull; Harm 3 &bull; 3 Harm Levels)<br> Body 3, Melee 2<br> <em>Rabble Rouser</em> &ndash; On a Hit, rally 1d4 bandits.<br> <em>Cowardly</em> &ndash; Flees if outnumbered.</div>
-
-<div class="panel"><strong>Ghostly Anchor</strong> (TL 3 &bull; Harm 2 &bull; Harm Levels: None &mdash; a puzzle)<br> Spirit 4, Lore 2<br> <em>Unfinished Business</em> &ndash; Cannot be harmed <em>at all</em> until its anchor is addressed. <strong>Resolution:</strong> find what holds it here and settle it.<br> <em>Bargain</em> &ndash; May offer a deal.</div>
-
-<div class="panel"><strong>Slasher</strong> (TL 6 &bull; Harm 4 &bull; 8 Harm Levels)<br> Body 4, Melee 3<br> <em>Regeneration</em> &ndash; Ignores first 2 Harm per scene.<br> <em>Hunger Timer [6]</em> &ndash; When full, frenzy.</div>
-
-<div class="panel"><strong>Oath-Keeper</strong> (TL 5 &bull; Harm 2 &bull; Harm Levels: None &mdash; a puzzle)<br> Presence 4, Sway 3. Cannot be fought.<br> <em>Demand</em> &ndash; One story, memory, or confession.<br> <em>Weakness</em> &ndash; Answer what was first taken.</div>
-
-<div class="panel"><strong>Thorn Courtier</strong> (TL 6 &bull; Harm 3 &bull; 8 Harm Levels)<br> Presence 4, Sway 3<br> <em>Courteous Snare</em> &ndash; A gift accepted binds the taker.<br> <em>Iron Offence</em> &ndash; Brandishing iron gives the GM 2 SB.</div>
-
-<div class="panel"><strong>Salt Prince Enforcer</strong> (TL 4 &bull; Harm 3 &bull; 3 Harm Levels)<br> Body 3, Melee 2<br> <em>Marked</em> &ndash; Knows where you sleep.<br> <em>Brine Curse</em> &ndash; Test Spirit + Insight (DV 3) or gain Salt-Tongue.</div>
-
+<div class="panel"><strong>Bandit Captain</strong> (TL 4 • Harm 3 • 3 Harm Levels)<br/> Body 3, Melee 2<br/> <em>Rabble Rouser</em> – On a Hit, rally 1d4 bandits.<br/> <em>Cowardly</em> – Flees if outnumbered.</div>
+<div class="panel"><strong>Ghostly Anchor</strong> (TL 3 • Harm 2 • Harm Levels: None — a puzzle)<br/> Spirit 4, Lore 2<br/> <em>Unfinished Business</em> – Cannot be harmed <em>at all</em> until its anchor is addressed. <strong>Resolution:</strong> find what holds it here and settle it.<br/> <em>Bargain</em> – May offer a deal.</div>
+<div class="panel"><strong>Slasher</strong> (TL 6 • Harm 4 • 8 Harm Levels)<br/> Body 4, Melee 3<br/> <em>Regeneration</em> – Ignores first 2 Harm per scene.<br/> <em>Hunger Timer [6]</em> – When full, frenzy.</div>
+<div class="panel"><strong>Oath-Keeper</strong> (TL 5 • Harm 2 • Harm Levels: None — a puzzle)<br/> Presence 4, Sway 3. Cannot be fought.<br/> <em>Demand</em> – One story, memory, or confession.<br/> <em>Weakness</em> – Answer what was first taken.</div>
+<div class="panel"><strong>Thorn Courtier</strong> (TL 6 • Harm 3 • 8 Harm Levels)<br/> Presence 4, Sway 3<br/> <em>Courteous Snare</em> – A gift accepted binds the taker.<br/> <em>Iron Offence</em> – Brandishing iron gives the GM 2 SB.</div>
+<div class="panel"><strong>Salt Prince Enforcer</strong> (TL 4 • Harm 3 • 3 Harm Levels)<br/> Body 3, Melee 2<br/> <em>Marked</em> – Knows where you sleep.<br/> <em>Brine Curse</em> – Test Spirit + Insight (DV 3) or gain Salt-Tongue.</div>
 <h2 id="tl-quick-ref">Quick Threat Level Reference</h2>
 <p>The same table again, because you will want it on the screen and not in the book.</p>
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>TL</th><th>What it is</th><th>Key Attributes</th><th>Harm it deals</th><th>Harm Levels it absorbs</th></tr></thead>
 <tbody>
-<tr><td><strong>1</strong></td><td>Rabble &mdash; frightened, untrained, dangerous in numbers only</td><td>1&ndash;2</td><td>1</td><td>3 (standard)</td></tr>
-<tr><td><strong>2</strong></td><td>Minion &mdash; a guard, a thug, a hungry animal</td><td>2</td><td>1&ndash;2</td><td>3 (standard)</td></tr>
-<tr><td><strong>3</strong></td><td>Standard &mdash; the competent professional; most of what fills a scene</td><td>2&ndash;3</td><td>2</td><td>3 (standard)</td></tr>
-<tr><td><strong>4</strong></td><td>Elite &mdash; a knight, a trained killer, a greater beast</td><td>3</td><td>2&ndash;3</td><td>3 (standard)</td></tr>
-<tr><td><strong>5</strong></td><td>Lieutenant &mdash; named, and worth naming</td><td>3&ndash;4</td><td>3</td><td>8 (advanced)</td></tr>
-<tr><td><strong>6</strong></td><td>Mini-boss &mdash; anchors an encounter by itself</td><td>4</td><td>3&ndash;4</td><td>8 (advanced)</td></tr>
-<tr><td><strong>7</strong></td><td>Boss &mdash; anchors a session</td><td>4&ndash;5</td><td>4&ndash;5</td><td>8 per phase, 2 phases</td></tr>
-<tr><td><strong>8</strong></td><td>Greater boss &mdash; anchors an arc</td><td>5</td><td>5&ndash;6</td><td>8 per phase, 3 phases</td></tr>
-<tr><td><strong>9</strong></td><td>Legendary &mdash; anchors a campaign</td><td>5&ndash;6</td><td>6&ndash;7</td><td>8 per phase, 3 phases</td></tr>
-<tr><td><strong>10</strong></td><td>Avatar or Power &mdash; the thing the campaign is <em>about</em></td><td>6+</td><td>8+</td><td>None &mdash; a puzzle, not a fight</td></tr>
+<tr><td><strong>1</strong></td><td>Rabble — frightened, untrained, dangerous in numbers only</td><td>1–2</td><td>1</td><td>3 (standard)</td></tr>
+<tr><td><strong>2</strong></td><td>Minion — a guard, a thug, a hungry animal</td><td>2</td><td>1–2</td><td>3 (standard)</td></tr>
+<tr><td><strong>3</strong></td><td>Standard — the competent professional; most of what fills a scene</td><td>2–3</td><td>2</td><td>3 (standard)</td></tr>
+<tr><td><strong>4</strong></td><td>Elite — a knight, a trained killer, a greater beast</td><td>3</td><td>2–3</td><td>3 (standard)</td></tr>
+<tr><td><strong>5</strong></td><td>Lieutenant — named, and worth naming</td><td>3–4</td><td>3</td><td>8 (advanced)</td></tr>
+<tr><td><strong>6</strong></td><td>Mini-boss — anchors an encounter by itself</td><td>4</td><td>3–4</td><td>8 (advanced)</td></tr>
+<tr><td><strong>7</strong></td><td>Boss — anchors a session</td><td>4–5</td><td>4–5</td><td>8 per phase, 2 phases</td></tr>
+<tr><td><strong>8</strong></td><td>Greater boss — anchors an arc</td><td>5</td><td>5–6</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>9</strong></td><td>Legendary — anchors a campaign</td><td>5–6</td><td>6–7</td><td>8 per phase, 3 phases</td></tr>
+<tr><td><strong>10</strong></td><td>Avatar or Power — the thing the campaign is <em>about</em></td><td>6+</td><td>8+</td><td>None — a puzzle, not a fight</td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
-<p class="text-sm text-muted">This table is the SRD's, reproduced. <strong>Threat Level is the whole rating</strong> &mdash; there is no separate Tier, Cap or Danger for a creature. <em>Harm</em> is what it deals; <em>Harm Levels</em> is what it absorbs. <em>None (puzzle)</em> is the one override on the last column and is legal at any TL, but a creature with no Harm Levels must state how it <em>is</em> resolved.</p>
-
-
+<p class="text-sm text-muted">This table is the SRD's, reproduced. <strong>Threat Level is the whole rating</strong> — there is no separate Tier, Cap or Danger for a creature. <em>Harm</em> is what it deals; <em>Harm Levels</em> is what it absorbs. <em>None (puzzle)</em> is the one override on the last column and is legal at any TL, but a creature with no Harm Levels must state how it <em>is</em> resolved.</p>
 <blockquote>I keep this table taped inside my GM screen. The tape is old. The table is worn. The numbers are still legible. That is enough.<span class="attribution">Lerris Fenwood</span></blockquote>
-
 <h2 id="final-advice-from-the-marginal-voices">Final Advice from the Marginal Voices</h2>
-
-<p>The Gray Wanderer: <em>&ldquo;Templates are not a substitute for attention. A bandit captain generated in thirty seconds will still kill a careless party. The dice do not care about your prep.&rdquo;</em></p>
-
-<p>Saikou Ira: <em>&ldquo;I have faced a Oath-Keeper generated from these tables. The generator said &rdquo;Clock: 4 segments.&ldquo; The walker stayed for three sessions. The timer was a lie. What was owed was real.&rdquo;</em></p>
-
-<p>Dusana of the Raven Road: <em>&ldquo;The best adversary I ever ran was a hungry goat with a three-timer. The players still tell stories about it. The generator did not make the goat. The story did.&rdquo;</em></p>
-
-<p>Lerris Fenwood: <em>&ldquo;Use these tools. Then put them away. The adversary is not the template. The adversary is the witness. And the witness is always watching.&rdquo;</em></p>
-
-<footer>Fate's Edge Copyright &mdash; (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-</body>
+<p>The Gray Wanderer: <em>“Templates are not a substitute for attention. A bandit captain generated in thirty seconds will still kill a careless party. The dice do not care about your prep.”</em></p>
+<p>Saikou Ira: <em>“I have faced a Oath-Keeper generated from these tables. The generator said ”Clock: 4 segments.“ The walker stayed for three sessions. The timer was a lie. What was owed was real.”</em></p>
+<p>Dusana of the Raven Road: <em>“The best adversary I ever ran was a hungry goat with a three-timer. The players still tell stories about it. The generator did not make the goat. The story did.”</em></p>
+<p>Lerris Fenwood: <em>“Use these tools. Then put them away. The adversary is not the template. The adversary is the witness. And the witness is always watching.”</em></p>
+<footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
+</article></body>
 </html>

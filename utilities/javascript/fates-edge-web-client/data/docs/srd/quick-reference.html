@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Tables for use during play</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Tables for use during play</h1><p>These tables are reminders after you have read the relevant procedure. If a table leaves you unsure about timing or context, follow the chapter links and read the surrounding explanation.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="quick-reference">
+<h2>Quick Reference</h2>
+<section class="level2" id="core-outcome-matrix">
+<h3>Core Outcome Matrix</h3>
+<div class="panel panel-gold">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Roll Result</th><th>Outcome</th><th>What Happens</th></tr>
+</thead>
+<tbody>
+<tr><td>Successes ≥ DV, SB = 0</td><td>Clean Success</td><td>Intent achieved; no complication.</td></tr>
+<tr><td>Successes ≥ DV, SB &gt; 0</td><td>Success with SB</td><td>Intent achieved; GM spends SB for complication.</td></tr>
+<tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; player gains 1 Boon.</td></tr>
+<tr><td>Successes = 0</td><td>Miss</td><td>No progress; player gains 2 Boons; GM escalates with SB.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</section>
+<section class="level2" id="difficulty-value-ladder">
+<h3>Difficulty Value (DV) Ladder</h3>
+<div class="panel panel-gold">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>DV</th><th>Situation</th></tr>
+</thead>
+<tbody>
+<tr><td>2</td><td>Routine, low stakes, nearly guaranteed.</td></tr>
+<tr><td>3</td><td>Default — pressured or minor opposition.</td></tr>
+<tr><td>4</td><td>Hard — hostile conditions, active resistance.</td></tr>
+<tr><td>5</td><td>Extreme — multiple constraints, dramatic gambles.</td></tr>
+</tbody>
+</table></div>
+<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+</div>
+</div>
+</section>
+<section class="level2" id="quick-reference-position-and-effect">
+<h3>Position &amp; Effect</h3>
+<div class="panel panel-gold">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Position</th><th>Narrative Frame</th><th>Mechanical Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Dominant</td><td>You press your advantage</td><td>Re-roll one failure.</td></tr>
+<tr><td>Controlled</td><td>Balanced, normal risk</td><td>No re-rolls.</td></tr>
+<tr><td>Desperate</td><td>You act under duress</td><td>Re-roll one success.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">A die showing 10 is never re-rolled.</p>
+</div>
+</section>
+<section class="level2" id="quick-reference-range-bands">
+<h3>Range Bands</h3>
+<div class="panel panel-gold">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Band</th><th>Default Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Close</td><td>Touching; grapples, knives. Inside the arc of anything longer.</td></tr>
+<tr><td>Near</td><td>A step and a swing; one-handed weapons at their best.</td></tr>
+<tr><td>Reach</td><td>A haft away; spear, polearm, greatsword. Ranged weapons treat this as Near.</td></tr>
+<tr><td>Far</td><td>Distant same site; beyond every melee weapon. Needs time or a route.</td></tr>
+<tr><td>Absent</td><td>Off-screen; needs cut or travel to interact.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</section>
+<section class="level2" id="quick-reference-armor-conversion-table">
+<h3>Armor Conversion Table</h3>
+<div class="panel panel-gold">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
+</thead>
+<tbody>
+<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Minimum 1 Fatigue per hit, even if conversion would give 0.</p>
+</div>
+</section>
+<section class="level2" id="quick-reference-fatigue-and-harm">
+<h3>Fatigue and Harm</h3>
+<div class="panel panel-gold">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Fatigue</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>1 (Winded)</td><td>Dominant → Controlled.</td></tr>
+<tr><td>2 (Strained)</td><td>Controlled rolls generate +1 SB on 1s.</td></tr>
+<tr><td>3 (Exhausted)</td><td>Controlled → Desperate.</td></tr>
+<tr><td>4+ (Collapse)</td><td>Body test DV 3 or Severe Harm.</td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Harm Level</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Harm 1</td><td>–1 die on actions directly related to the injury.</td></tr>
+<tr><td>Harm 2</td><td>–1 die on most actions until treated.</td></tr>
+<tr><td>Harm 3</td><td>Incapacitated or dying.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</section>
+<section class="level2" id="magic-paths-comparison">
+<h3>Magic Paths Comparison</h3>
+<div class="panel panel-gold">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Path</th><th>Cost</th><th>Risk</th><th>Speed</th><th>Flexibility</th></tr>
+</thead>
+<tbody>
+<tr><td>Caster (Freeform)</td><td>Spellcraft (6 XP)</td><td>Backlash</td><td>2 actions (1 for cantrip)</td><td>Very high</td></tr>
+<tr><td>Runekeeper (Rites)</td><td>Familiar + Codex</td><td>Obligation</td><td>1 action</td><td>Moderate</td></tr>
+<tr><td>Invoker (Symbols)</td><td>Patron's Symbol (4 XP)</td><td>Ritual time / Symbol damage</td><td>Slow or instant (Crack)</td><td>Moderate</td></tr>
+<tr><td>Cantor (Songs)</td><td>Cantor's Path (8 XP)</td><td>Corruption</td><td>1 action (resolve next turn)</td><td>Low</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</section>
+<section class="level2" id="summoning-leash">
+<h3>Summoning Leash</h3>
+<div class="panel panel-purple">
+<ul>
+<li><strong>Capacity:</strong> Cap + Spirit segments.</li>
+<li><strong>Ticks:</strong>
+<ul>
+<li>Spirit takes Harm: 1 tick per Harm level.</li>
+<li>Command against nature: 1 tick.</li>
+<li>Split focus: 1 tick.</li>
+<li>Crosses a ward without dispelling: ticks = ward's DV.</li>
+</ul>
+</li>
+<li><strong>Leash fills:</strong> Spirit acts once to its nature, then departs.</li>
+<li><strong>Boon Finesse:</strong> Spend 1 Boon to clear 1 tick (once per round).</li>
+</ul>
+</div>
+</section>
+<section class="level2" id="quick-reference-action-economy">
+<h3>Action Economy (Quick)</h3>
+<div class="panel panel-blue">
+<ul>
+<li>Each turn: 1 Action + 1 Move.</li>
+<li>Move: shift one range band (Close ↔ Near ↔ Reach ↔ Far).</li>
+<li>Dash (Action): move two bands; next defense Desperate.</li>
+<li>Disengage (Action): then Move does not provoke opportunity attacks; cannot Attack this turn.</li>
+<li>Charge/Skirmish (Full Turn): move two bands and attack; costs 1 Fatigue; next defense Desperate; requires open ground.</li>
+</ul>
+</div>
+</section>
+<section class="level2" id="quick-reference-opportunity-attacks">
+<h3>Opportunity Attacks</h3>
+<div class="panel panel-blue">
+<p>Moving out of an enemy's Close range without Disengage provokes one free melee attack (Controlled Position). The following actions also provoke if performed while engaged in Close with an enemy:</p>
+<ul>
+<li>Making a ranged attack.</li>
+<li>Casting a spell without [TOUCH] or [WARD].</li>
+</ul>
+</div>
+</section>
+<section class="level2" id="story-beat-spend-menu">
+<h3>Story Beat (SB) Spend Menu</h3>
+<div class="panel panel-orange">
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>SB Cost</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Minor pressure: noise, trace, tick a 4–6 segment timer +1.</td></tr>
+<tr><td>2</td><td>Moderate setback: alarm raised, lose Position, lesser foe appears.</td></tr>
+<tr><td>3</td><td>Serious trouble: reinforcements, key gear breaks, advance a campaign timer.</td></tr>
+<tr><td>4+</td><td>Major turn: trap springs, authority arrives, environment shifts dramatically.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</section>
+<section class="level2" id="boons-at-a-glance">
+<h3>Boons at a Glance</h3>
+<div class="panel panel-orange">
+<ul>
+<li><strong>Earn:</strong> Partial = 1 Boon; Miss = 2 Boons.</li>
+<li><strong>Hold:</strong> max 5; trim to 2 at scene end.</li>
+<li><strong>Spend 1 Boon:</strong> re-roll a die, activate an Asset, improve Position by one step.</li>
+<li><strong>Spend 2 Boons:</strong> convert to 1 XP (downtime, max 2 XP per session).</li>
+</ul>
+</div>
+</section>
+<section class="level2" id="default-values-gm-cues">
+<h3>Default Values (GM Cues)</h3>
+<div class="panel panel-gold">
+<ul>
+<li>Default DV = 3.</li>
+<li>Default Position = Controlled.</li>
+<li>Default Effect = Standard.</li>
+<li>Default Range = Near.</li>
+</ul>
+</div>
+</section>
+<section class="level2" id="tags-quick-reference">
+<h3>Tags Quick Reference (Abridged)</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Tag</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge">AREA</span></td><td>Affects all in a zone; collateral risk.</td></tr>
+<tr><td><span class="badge">BANISH</span></td><td>Drive an Outsider toward departure; DV = the target's TL.</td></tr>
+<tr><td><span class="badge">BARRIER</span></td><td>Creates cover/obstruction with Integrity Timer.</td></tr>
+<tr><td><span class="badge">BIND</span></td><td>Immobilizes target until broken.</td></tr>
+<tr><td><span class="badge">CLEANSE</span></td><td>Remove or suppress a Condition.</td></tr>
+<tr><td><span class="badge">COMMAND</span></td><td>Issue a clear order; resolve as social contest.</td></tr>
+<tr><td><span class="badge">CONJURE</span></td><td>Create a useful object, cover, or hazard.</td></tr>
+<tr><td><span class="badge">COUNTER</span></td><td>Interrupt a spell or rite in progress.</td></tr>
+<tr><td><span class="badge">CURSE</span></td><td>Inflict a sticky hindrance with a clear release condition.</td></tr>
+<tr><td><span class="badge">DISPEL</span></td><td>End or suppress an ongoing magical effect.</td></tr>
+<tr><td><span class="badge">FORTIFY</span></td><td>Harden a target against a specific vector.</td></tr>
+<tr><td><span class="badge">MARK</span></td><td>Tag a target; once/scene +1 die against it.</td></tr>
+<tr><td><span class="badge">OATH</span></td><td>Bind parties to terms; breaking has teeth.</td></tr>
+<tr><td><span class="badge">PASSAGE</span></td><td>Declare a route as permitted or easy.</td></tr>
+<tr><td><span class="badge">REVEAL</span></td><td>Expose illusions, disguises, or hidden clauses.</td></tr>
+<tr><td><span class="badge">SANCTIFY</span></td><td>Consecrate a zone to a code or Patron.</td></tr>
+<tr><td><span class="badge">SEAL</span>/<span class="badge">UNSEAL</span></td><td>Magically lock or unlock a container / door.</td></tr>
+<tr><td><span class="badge">TRANSPORT</span></td><td>Move a target across an obstacle.</td></tr>
+<tr><td><span class="badge">VEIL</span></td><td>Obscure a person, object, or zone (–1 die to Notice).</td></tr>
+<tr><td><span class="badge">WARD</span></td><td>Blocks specific entities (DV = the target's TL to cross).</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+</section></div><p>Continue: <a href="examples.html">Example spells and characters</a></p></main></body></html>

@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fate’s Edge SRD — Start here: the core mechanic</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: #26242b; background: #fffdf8; }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid #c7bca4; line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: #71510c; text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: #f3eee2; padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid #c7bca4; padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid #997623; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: #6b5c3e; }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Start here: the core mechanic</h1><p>Fate’s Edge is a tabletop roleplaying game about what people attempt, what they achieve, and what their actions set in motion. One person acts as Game Master (GM), presenting the world and its responses; the other players describe their characters’ intentions and approaches. Start with the quickstart below, then read the full resolution procedure. The same procedure supports a fight, a negotiation, a journey, or a magical working.</p><aside class="reading-guide"><h2>How to read this book</h2><p>You do not need to memorize this reference. Learn the core loop, create a character, and look up a subsystem when it enters play. Difficulty Value (DV), Position, Boons, and Story Beats (SB) recur throughout the book; the quickstart introduces them below.</p><ol><li><strong>Everyone:</strong> read this opening chapter and its example of play.</li><li><strong>Players:</strong> continue to <a href="characters.html">Character Creation</a>, then <a href="combat.html">equipment and combat</a>. Consult <a href="talents.html">talents</a> and <a href="magic.html">magic</a> for your chosen character.</li><li><strong>Game Masters:</strong> read <a href="running-the-game.html">Running the Game</a>. Keep the <a href="quick-reference.html">table reference</a> nearby during play.</li><li><strong>When needed:</strong> open <a href="crafting.html">crafting</a>, <a href="followers-and-assets.html">followers and assets</a>, or <a href="travel.html">travel</a>. Read <a href="optional-tools.html">optional campaign tools</a> before using them.</li></ol><p><strong>What changed in this edition?</strong> Organization, navigation, and explanatory introductions. The rule text, costs, limits, examples, and tables are preserved. A separate reference page is not a waiver of a rule: use each subsystem’s own applicability and requirements. The <a href="license.html">existing licensing notices</a> still apply.</p><p>Headings use descriptive names consistently. For citations to numbered sections in an earlier edition, use the <a href="legacy-references.html">section-number concordance</a>.</p></aside><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1 unnumbered" id="quickstart">
+<h2 class="unnumbered">Quickstart</h2>
+<section class="level2 unnumbered" id="the-core-loop-in-brief">
+<h3 class="unnumbered">The Core Loop in Brief</h3>
+<ol>
+<li><p><strong>Declare intent and approach.</strong> What do you do and
+how?</p></li>
+<li><p><strong>GM sets Position and Difficulty (DV).</strong></p>
+<ul>
+<li><p>Position: <strong>Dominant</strong> (advantage),
+<strong>Controlled</strong> (balanced), <strong>Desperate</strong> (high
+risk).</p></li>
+<li><p>DV: 2 (routine) to 5+ (extreme). Default DV = 3.</p></li>
+</ul></li>
+<li><p><strong>Roll dice.</strong> Pool = Attribute + Skill (d10s). Each
+6–9 = 1 success; each 10 = 2 successes.</p></li>
+<li><p><strong>Count Story Beats (SB).</strong> Each die showing a 1
+gives the GM 1 SB.</p></li>
+<li><p><strong>Compare successes to DV.</strong> Use the outcome
+matrix.</p></li>
+</ol>
+</section>
+<section class="level2 unnumbered" id="outcome-matrix">
+<h3 class="unnumbered">Outcome Matrix</h3>
+<div class="table-wrap"><div class="table-scroll"><table>
+<thead>
+<tr><th style="text-align: left;"><strong>Roll Result</strong></th><th style="text-align: left;"><strong>Outcome</strong></th><th style="text-align: left;"><strong>What Happens</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Successes <span class="math inline">≥</span> DV, SB = 0</td><td style="text-align: left;">Clean Success</td><td style="text-align: left;">Intent achieved; no complication.</td></tr>
+<tr><td style="text-align: left;">Successes <span class="math inline">≥</span> DV, SB <span class="math inline">&gt;</span> 0</td><td style="text-align: left;">Success &amp; SB</td><td style="text-align: left;">Intent achieved; GM spends SB to add a complication.</td></tr>
+<tr><td style="text-align: left;"><span class="math inline">0&lt;</span> Successes <span class="math inline">&lt;</span> DV</td><td style="text-align: left;">Partial</td><td style="text-align: left;">Make progress, but with a cost; player gains 1 Boon.</td></tr>
+<tr><td style="text-align: left;">Successes = 0</td><td style="text-align: left;">Miss</td><td style="text-align: left;">No progress; GM escalates with SB; player gains 2 Boons.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+<section class="level2 unnumbered" id="boons-player-resource">
+<h3 class="unnumbered">Boons (Player Resource)</h3>
+<ul>
+<li><p>Earn 1 Boon on a <strong>Partial</strong>, 2 Boons on a
+<strong>Miss</strong>.</p></li>
+<li><p>Maximum 5 Boons; trim to 2 at scene end.</p></li>
+<li><p>Spend 1 Boon to: re-roll a single die, activate an Asset, or
+improve Position by one step.</p></li>
+<li><p>During downtime, convert 2 Boons <span class="math inline">→</span> 1 XP (max 2 XP per session).</p></li>
+</ul>
+</section>
+<section class="level2 unnumbered" id="story-beats-gm-resource">
+<h3 class="unnumbered">Story Beats (GM Resource)</h3>
+<p>Each 1 on a player’s die gives the GM 1 SB. Spend SB to introduce
+complications:</p>
+<div class="table-wrap"><div class="table-scroll"><table>
+<thead>
+<tr><th style="text-align: left;"><strong>SB</strong></th><th style="text-align: left;"><strong>Effect</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">1</td><td style="text-align: left;">Minor pressure: noise, trace, tick a 4–6 segment timer +1.</td></tr>
+<tr><td style="text-align: left;">2</td><td style="text-align: left;">Moderate setback: alarm raised, lose Position, a lesser foe appears.</td></tr>
+<tr><td style="text-align: left;">3</td><td style="text-align: left;">Serious trouble: reinforcements, key gear breaks, advance a campaign timer.</td></tr>
+<tr><td style="text-align: left;">4+</td><td style="text-align: left;">Major turn: trap springs, authority arrives, environment shifts dramatically.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+<section class="level2 unnumbered" id="position-and-effect">
+<h3 class="unnumbered">Position and Effect</h3>
+<ul>
+<li><p><strong>Position</strong> (risk): Dominant (safe), Controlled
+(normal), Desperate (high stakes).</p></li>
+<li><p><strong>Effect</strong> (reward): Limited, Standard,
+Great.</p></li>
+<li><p>Spending 1 Boon before a roll improves Position by one
+step.</p></li>
+<li><p>The GM may spend SB to worsen Position.</p></li>
+</ul>
+</section>
+<section class="level2 unnumbered" id="fatigue-and-harm">
+<h3 class="unnumbered">Fatigue and Harm</h3>
+<ul>
+<li><p><strong>Fatigue</strong> track = Body. Each Fatigue point worsens
+Position by one step. At Desperate, each Fatigue gives -1 die.</p></li>
+<li><p><strong>Harm</strong> levels: 1 (-1 die on related actions), 2
+(-1 die on most actions), 3 (incapacitated).</p></li>
+<li><p><strong>Armor converts Harm to Fatigue.</strong> Minimum 1
+Fatigue per hit.</p></li>
+<li><p>Taking Harm clears all existing Fatigue (the shock of injury
+resets exhaustion).</p></li>
+</ul>
+</section>
+<section class="level2 unnumbered" id="armor-conversion-table">
+<h3 class="unnumbered">Armor Conversion Table</h3>
+<div class="table-wrap"><div class="table-scroll"><table>
+<thead>
+<tr><th style="text-align: left;"><strong>Armor Type</strong></th><th style="text-align: center;"><strong>Harm 1</strong></th><th style="text-align: center;"><strong>Harm 2</strong></th><th style="text-align: center;"><strong>Harm 3</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Light</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Harm 1 + Fatigue 1</td><td style="text-align: center;">Harm 2 + Fatigue 1</td></tr>
+<tr><td style="text-align: left;">Medium</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Harm 2 + Fatigue 1</td></tr>
+<tr><td style="text-align: left;">Heavy</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 2</td></tr>
+</tbody>
+</table></div></div>
+</section>
+<section class="level2 unnumbered" id="quick-reference-defaults">
+<h3 class="unnumbered">Quick Reference: Defaults</h3>
+<ul>
+<li><p>Default DV = 3.</p></li>
+<li><p>Default Position = Controlled.</p></li>
+<li><p>Default Effect = Standard.</p></li>
+<li><p>Default Range = Near (unless otherwise stated).</p></li>
+</ul>
+</section>
+<section class="level2 unnumbered" id="example-of-play-one-minute">
+<h3 class="unnumbered">Example of Play (One Minute)</h3>
+<p><em>Lyra (Wits 3 + Craft 2 = 5 dice) tries to pick a lock while a
+guard patrol approaches.</em></p>
+<ul>
+<li><p>GM: “Controlled, DV 3. On a Miss, the guard hears you.”</p></li>
+<li><p>Roll: 9, 6, 4, 2, 1 <span class="math inline">→</span> 2
+successes vs DV 3 <span class="math inline">→</span> <em>Partial</em>.
+Lyra gains 1 Boon. The 1 gives the GM 1 SB.</p></li>
+<li><p>GM: “The lock clicks open, but the last pin squeals. I spend the
+SB: the guard stops and turns his head. You have one beat to
+hide.”</p></li>
+</ul>
+</section>
+</section><section class="level1" id="core-principles">
+<h2>Core Principles</h2>
+<section class="level2" id="safety-tools-lines-veils-x-card">
+<h3>Safety Tools: Lines, Veils &amp; X-Card</h3>
+<p>Before play, establish how the table handles sensitive content. Fate’s Edge uses three standard tools.</p>
+<p><strong>X-Card.</strong> Any player (including the GM) may draw an X on a card or simply say “X” when a moment makes them uncomfortable. When the X-Card is shown, the described content is removed from the fiction — no questions, no explanations, no judgments. The scene is retconned or redirected immediately.</p>
+<p><strong>Lines.</strong> A Line is a hard boundary: content that will not appear in the game at all. Examples: “No sexual violence,” “No harm to children,” “No body horror.” Before the campaign or a session, players name their Lines. The GM and group honor them completely.</p>
+<p><strong>Veils.</strong> A Veil is a soft boundary: content that can happen off screen or fade to black. The event is acknowledged but not described in detail. Example: “A romantic scene can happen, but fade to black before it becomes explicit.” Veils allow the story to acknowledge mature themes without forcing players to roleplay through them.</p>
+</section>
+<section class="level2" id="player-managed-modules">
+<h3>Player-Managed Modules</h3>
+<p>Players track their character-facing resources to reduce GM overhead and keep play flowing:</p>
+<ul>
+<li>Obligation (per Patron, marked when Rites are invoked/pushed).</li>
+<li>Corruption Timer (for Cantors, marked when pushing Songs or GM spends SB on occult actions).</li>
+<li>Leash (for Summoners, marked when spirits take harm, act against nature, split focus, or cross wards).</li>
+<li>Asset States (Symbol/Item condition: Maintained, Neglected, or Compromised).</li>
+</ul>
+<p>GMs retain all world-facing elements: Timers, NPCs, faction moves, Patron intrusions, and narrative consequences. Why this matters: when players manage their own modules, the GM spends less time bookkeeping and more time driving the story. Always verify player tracking at scene start/end.</p>
+<div class="panel panel-purple">
+<p><strong>Design Note.</strong> This rule prevents “GM as auditor” syndrome. If a player forgets to track a module, the GM does not correct it mid-scene — instead, note it for downtime resolution. Trust fosters faster play.</p>
+</div>
+</section>
+<section class="level2" id="what-is-fates-edge">
+<h3>What Is Fate’s Edge?</h3>
+<p>Fate’s Edge is a narrative-first tabletop roleplaying system where every action carries weight, every choice has consequence, and even failure feeds the story. Dice are not merely success meters — they are instruments of fate, weaving opportunity with risk.</p>
+<blockquote>
+<p>“The road remembers. Every broken wheel leaves a mark and every lit lamp had someone behind it. The only question is which of those you mean to be.”</p>
+</blockquote>
+</section>
+<section class="level2" id="the-central-question">
+<h3>The Central Question</h3>
+<p>What are you willing to risk, and what are you willing to surrender, to reshape the world around you?</p>
+</section>
+<section class="level2" id="tone-of-play">
+<h3>Tone of Play</h3>
+<ul>
+<li><strong>Cinematic:</strong> Scenes breathe; tense exchanges resolve in moments.</li>
+<li><strong>Consequential:</strong> A whispered secret can topple a kingdom; a missed roll can spare a life.</li>
+<li><strong>Collaborative:</strong> The GM sets stakes; the players drive the fiction.</li>
+</ul>
+</section>
+<section class="level2" id="key-concepts">
+<h3>Key Concepts</h3>
+<section class="level3" id="narrative-time">
+<h4>Narrative Time</h4>
+<p>Time is measured by story weight, not by timers:</p>
+<ul>
+<li><strong>A Moment:</strong> a heartbeat, a strike, a whispered word.</li>
+<li><strong>Some Time:</strong> a few minutes — a skirmish, a careful lockpick, a short negotiation.</li>
+<li><strong>Significant Time:</strong> hours — travel between locations, a ritual, an interrogation.</li>
+<li><strong>Days:</strong> marches across countryside, training a cadre, recovery from serious harm.</li>
+</ul>
+</section>
+<section class="level3" id="story-beats-sb">
+<h4>Story Beats (SB)</h4>
+<p>Every time a player rolls a 1 on a die, the GM gains a Story Beat. SB are narrative currency — spend them to introduce complications, escalate tension, shift Position, or advance timers.</p>
+</section>
+<section class="level3" id="affinity">
+<h4>Affinity</h4>
+<p>Each culture grants an Affinity — a narrative edge or metaphysical bond that makes certain actions more reliable (e.g., Aeler stone-sense, Aelaerem hearth-luck). Affinities are described in the full cultural guides.</p>
+<div class="panel panel-blue">
+<p><strong>Note on Stacking.</strong> If your ancestral gift (from your people) and your cultural affinity provide the same benefit (e.g., both improve Position), they do not stack. You may use one per scene. Choose which applies when you need it.</p>
+</div>
+</section>
+<section class="level3" id="prestige-abilities">
+<h4>Prestige Abilities</h4>
+<p>High-level talents unlocked by mastering cultural or arcane arts. They are narrative milestones as much as mechanical upgrades.</p>
+</section>
+<section class="level3" id="on-screen-vs-off-screen">
+<h4>On-Screen vs. Off-Screen</h4>
+<ul>
+<li><strong>On-Screen:</strong> followers, allies, companions who stand beside you in a scene.</li>
+<li><strong>Off-Screen:</strong> assets, titles, informants, safe houses — resources that act when you spend Boons or during downtime.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="boons-overview">
+<h3>Boons Overview</h3>
+<p>Boons are narrative tokens earned primarily by failing rolls with meaningful consequences. They represent momentum, luck, or a second wind.</p>
+<p><strong>Earning Boons:</strong></p>
+<ul>
+<li>Partial (0 &lt; successes &lt; DV): Gain 1 Boon.</li>
+<li>Miss (successes = 0): Gain 2 Boons (provided the roll was meaningful and generated at least one SB).</li>
+<li>Bond-driven action: Once per bond per session, when you act meaningfully on a Mutual Bond and provide an Intricate Description, gain 1 Boon.</li>
+<li>GM award: For creative solutions, sacrifices, or outstanding roleplay.</li>
+</ul>
+<p><strong>Spending Boons:</strong></p>
+<ul>
+<li>Re-roll a single die after seeing the pool.</li>
+<li>Activate an on-screen Asset.</li>
+<li>Improve Position by one step before a roll.</li>
+<li>Power certain Rites or abilities as described in their text.</li>
+<li>During downtime, convert 2 Boons → 1 XP (once per session; max 2 XP per session via conversion).</li>
+</ul>
+<p><strong>Limits:</strong></p>
+<ul>
+<li>Maximum 5 Boons held at any time.</li>
+<li>At the end of each scene, reduce held Boons to a maximum of 2 (excess are lost).</li>
+<li>At most 2 Boons from failures per character per scene.</li>
+<li>Repetition rule: the same action with the same stakes in the same scene cannot award another Boon.</li>
+</ul>
+</section>
+<section class="level2" id="gm-guidelines-for-timers-and-sb">
+<h3>GM Guidelines for Timers and SB</h3>
+<p>To keep the game flowing and avoid overwhelming the table:</p>
+<ul>
+<li><strong>Timer Limit:</strong> Maintain at most three active timers per scene. Combine redundant timers or treat additional timers as off-screen campaign timers (ticked between scenes as a result of scene outcomes).</li>
+<li><strong>SB Banking:</strong> Try to keep banked SB (unspent at scene end) under Tier + 1 (e.g., Tier I: max 2 SB, Tier II: max 3 SB). Unspent SB beyond this may carry over (GM discretion, max 4).</li>
+<li><strong>Terminology:</strong> Use “Success with SB” instead of “Success with SB” for clarity — it emphasizes the narrative opportunity rather than a penalty.</li>
+</ul>
+</section>
+<section class="level2" id="fail-forward-every-roll-matters">
+<h3>Fail Forward: Every Roll Matters</h3>
+<ul>
+<li>A <strong>Clean Success</strong> advances the fiction without added friction.</li>
+<li>A <strong>Success with SB</strong> achieves the goal but introduces a complication (GM spends SB).</li>
+<li>A <strong>Partial</strong> makes meaningful progress and gives the player a Boon.</li>
+<li>A <strong>Miss</strong> fails to achieve the goal, gives the player 2 Boons, and gives the GM SB to escalate.</li>
+</ul>
+</section>
+<section class="level2" id="selling-the-action">
+<h3>Selling the Action</h3>
+<p>When a player provides an intricate description that reveals stakes, risks, or character investment, the GM may grant a mechanical edge — improving Position by one step, granting +1 die, or banking a Story Beat. This is a reward for engagement, not a tax for shy players. A simple ‘I attack’ is always valid.</p>
+<p>No roll should result in “nothing happens.” Every outcome changes the situation.</p>
+<div class="panel panel-gold">
+<p><strong>What Are Story Beats, Really?</strong> Story Beats (SB) are the game’s permission to make things interesting. Every time a player rolls a 1, they are inviting the world to push back. SB are not punishments — they are narrative fuel generated by player dice, telling you: “Make this interesting.” Spend them to introduce complications, escalate threats, or reveal hidden dangers. Do not hoard SB for the climax — the climax is made of the SB you spent along the way. A scene without SB is a scene where players are in control; a scene with SB is where the world pushes back. They are your primary pacing tool.</p>
+</div>
+</section>
+<section class="level2" id="can-i-roll-fewer-dice-no">
+<h3>Can I Roll Fewer Dice? No!</h3>
+<p>Never reduce a player’s dice pool. A player who asks to roll fewer dice to avoid Story Beats misunderstands the system. In Fate’s Edge, a 1 is not a failure — it is narrative fuel. Reducing dice pools breaks the math: Boons become scarce, SB dry up, and the player’s investment is undermined.</p>
+<p>If you want tension, use Position, DV, Timers, and SB — never reduce the player’s dice pool. They earned those dice. Let them roll them.</p>
+</section>
+</section><section class="level1" id="core-mechanic">
+<h2>Core Mechanic</h2>
+<section class="level2" id="the-resolution-loop">
+<h3>The Resolution Loop</h3>
+<p>Every action that carries risk and uncertainty follows these five steps.</p>
+<ol>
+<li><strong>Declare intent and approach.</strong> The player states what they want to accomplish and how (Attribute + Skill).</li>
+<li><strong>GM sets Position and Difficulty (DV).</strong>
+<ul>
+<li>Position: Dominant (advantage), Controlled (normal), Desperate (high risk).</li>
+<li>DV: 2 (routine) to 5+ (extreme). Default DV = 3.</li>
+</ul>
+</li>
+<li><strong>Roll dice.</strong> Pool = Attribute + Skill (d10s). Count successes:
+<ul>
+<li>6–9 = 1 success.</li>
+<li>10 = 2 successes.</li>
+</ul>
+</li>
+<li><strong>Count Story Beats (SB).</strong> Each die showing a 1 gives the GM 1 SB.</li>
+<li><strong>Apply the Outcome Matrix.</strong></li>
+</ol>
+</section>
+<section class="level2" id="critical-success">
+<h3>Critical Success</h3>
+<p>Rolling a 10 (counting as 2 successes) creates additional benefits:</p>
+<ul>
+<li><strong>One 10:</strong> Choose one – gain a free Boon, improve Position by one step, or add a narrative flourish.</li>
+<li><strong>Two 10s:</strong> Choose two benefits or one powerful effect (e.g., ignore armor + gain tactical advantage).</li>
+<li><strong>Three+ 10s:</strong> Legendary success – resolve the conflict dramatically and advance a secondary timer or create a significant story development.</li>
+</ul>
+<p class="text-muted">Note: 10s are never re-rolled (even in Desperate position). Critical effects apply only if the roll succeeds (Successes ≥ DV).</p>
+</section>
+<section class="level2" id="difficulty-values-dv">
+<h3>Difficulty Values (DV)</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>DV</th><th>Situation</th></tr>
+</thead>
+<tbody>
+<tr><td>2</td><td>Routine, low stakes, nearly guaranteed.</td></tr>
+<tr><td>3</td><td>Default – pressured or minor opposition.</td></tr>
+<tr><td>4</td><td>Hard – hostile conditions, active resistance.</td></tr>
+<tr><td>5</td><td>Extreme – multiple constraints, dramatic gambles.</td></tr>
+</tbody>
+</table></div>
+<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+</div>
+</section>
+<section class="level2" id="core-mechanic-position-and-effect">
+<h3>Position &amp; Effect</h3>
+<div class="grid-2">
+<div class="panel">
+<p><strong>Position (Risk)</strong></p>
+<ul>
+<li><strong>Dominant:</strong> Re-roll one failure (die ≤ 5).</li>
+<li><strong>Controlled:</strong> No re-rolls.</li>
+<li><strong>Desperate:</strong> Re-roll one success (die ≥ 6). 10s are never re-rolled.</li>
+</ul>
+</div>
+<div class="panel">
+<p><strong>Effect (Reward)</strong></p>
+<ul>
+<li><strong>Limited:</strong> Minimal outcome.</li>
+<li><strong>Standard:</strong> Expected outcome.</li>
+<li><strong>Great:</strong> Strong outcome with additional benefit.</li>
+</ul>
+</div>
+</div>
+<p><strong>Modifiers:</strong></p>
+<ul>
+<li>Player may spend 1 Boon before rolling to improve Position by one step.</li>
+<li>GM may spend SB to worsen Position or reduce Effect.</li>
+<li><strong>The ladder ends.</strong> Position never rises above Dominant or falls below Desperate. At either end further modifiers do nothing; they do not convert into dice.</li>
+<li>This matters because your pool is only ever what you paid for. A character with Attribute 1 and Skill 0 rolls one die at their worst, never none — so the question is always <em>how badly can this go</em>, and never <em>may I attempt it at all</em>. It is also what lets heritage, cultural affinity, assists and gear all push on Position without any of them touching the dice.</li>
+<li>A fourth source of advantage on an already-Dominant roll is not wasted. It is the GM's cue to lower the DV, widen the Effect, or just say yes.</li>
+</ul>
+<div class="panel">
+<p><strong>Effect is spoken, not tracked.</strong></p>
+<p>Position has three named steps because you need to know which one you
+are on before you roll. Effect has three named steps for the opposite
+reason: so the table has words for a swing after it lands. There is no
+Effect track, no Effect rating, and nothing to write down. The GM says
+it — <em>“that's Great Effect, they're outnumbered three to
+one”</em> — the table hears it, and the fiction carries it
+from there.</p>
+<p>This is why Scale mismatch moves Effect and never the DV or the dice.
+A giant swinging at a man and a man swinging at a giant are the same
+roll against the same difficulty; what differs is how much a hit
+accomplishes. Putting that on the dice would make the giant hard to
+hit, which is not what being large means.</p>
+<p>Say it in the fiction and give the reason. Digital tools may announce
+an Effect call to the table, but none of them store it, on purpose: the
+moment Effect becomes a number somebody owns, the table argues about the
+number instead of describing the swing.</p>
+</div>
+</section>
+<section class="level2" id="core-mechanic-outcome-matrix">
+<h3>Outcome Matrix</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Roll Result</th><th>Outcome</th><th>What Happens</th></tr>
+</thead>
+<tbody>
+<tr><td>Successes ≥ DV, SB = 0</td><td>Clean Success</td><td>Intent achieved; no complication.</td></tr>
+<tr><td>Successes ≥ DV, SB &gt; 0</td><td>Success with SB</td><td>Intent achieved; GM spends SB for a complication.</td></tr>
+<tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; player gains 1 Boon.</td></tr>
+<tr><td>Successes = 0</td><td>Miss</td><td>No progress; player gains 2 Boons; GM escalates with SB.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="core-mechanic-boons-player-resource">
+<h3>Boons (Player Resource)</h3>
+<section class="level3" id="earning-boons">
+<h4>Earning Boons</h4>
+<ul>
+<li>Partial: gain 1 Boon.</li>
+<li>Miss: gain 2 Boons (if the roll was meaningful and generated at least one SB).</li>
+<li>Bond-driven action (once per bond per session): gain 1 Boon.</li>
+<li>GM award (creative solutions, sacrifices, outstanding roleplay).</li>
+</ul>
+</section>
+<section class="level3" id="spending-boons">
+<h4>Spending Boons</h4>
+<ul>
+<li>Re-roll a single die after seeing the pool (keep second result; new 1s generate additional SB).</li>
+<li>Activate an Asset (on-screen).</li>
+<li>Improve Position by one step before a roll.</li>
+<li>Power certain Rites or abilities.</li>
+<li>Convert 2 Boons → 1 XP (downtime, once per session, max 2 XP).</li>
+</ul>
+</section>
+<section class="level3" id="boon-limits">
+<h4>Limits</h4>
+<ul>
+<li>Max 5 Boons held.</li>
+<li>At end of each scene, reduce to max 2 (excess lost).</li>
+<li>At most 2 Boons from failures per character per scene (repetition of same action + stakes does not award another Boon).</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="core-mechanic-story-beats-gm-resource">
+<h3>Story Beats (GM Resource)</h3>
+<p>Every die showing a 1 gives the GM 1 Story Beat (SB). Spend SB to introduce complications or escalate pressure.</p>
+<p><strong>Guidelines:</strong></p>
+<ul>
+<li><span class="badge badge-green">1 SB</span> minor – noise, trace, tick a 4–6 segment timer +1.</li>
+<li><span class="badge badge-blue">2 SB</span> moderate – alarm raised, lose Position, lesser foe appears.</li>
+<li><span class="badge badge-orange">3 SB</span> serious – reinforcements, key gear breaks, advance a campaign timer.</li>
+<li><span class="badge badge-red">4+ SB</span> major – trap springs, authority arrives, environment shifts dramatically.</li>
+</ul>
+</section>
+<section class="level2" id="npcs-and-resources">
+<h3>NPCs and Resources</h3>
+<p>Non-player characters do not track Fatigue or Boons. If an ability would cause an NPC to lose these resources, convert it into a narrative consequence:</p>
+<ul>
+<li>Instead of “loses 1 Boon” → “hesitates – loses next action”.</li>
+<li>Instead of “marks 1 Fatigue” → “staggers – next attack at Desperate Position”.</li>
+<li>Instead of “loses 1 Boon and marks 1 Fatigue” → “drops weapon (disarmed) and stumbles back one range band”.</li>
+</ul>
+</section>
+<section class="level2" id="npc-special-abilities-as-sb-spends">
+<h3>NPC Special Abilities as SB Spends</h3>
+<p>Instead of rolling for NPC abilities, the GM may spend Story Beats to trigger narrative events.</p>
+<p><strong>Example SB Spends:</strong></p>
+<ul>
+<li><span class="badge badge-green">1 SB</span> “The cultist’s eyes burn – mark 1 Fatigue (near miss).”</li>
+<li><span class="badge badge-blue">2 SB</span> “The spider drops on you – you are Grappled (escape DV 3).”</li>
+<li><span class="badge badge-orange">3 SB</span> “The drake breathes frost – everyone in Near, test Body+Athletics (DV 3) or take Harm 2.”</li>
+<li><span class="badge badge-red">4+ SB</span> “The lich raises its hand – test Spirit+Endurance (DV 5) or be Paralyzed for 1 exchange.”</li>
+</ul>
+<p class="text-muted">The GM narrates the effect; players roll to resist.</p>
+</section>
+<section class="level2" id="assistance">
+<h3>Assistance</h3>
+<ul>
+<li>One helper per action.</li>
+<li>Total assist dice capped at +3 (unless a talent says otherwise).</li>
+<li>Assistant accepts any risk named by the GM.</li>
+</ul>
+</section>
+<section class="level2" id="core-mechanic-fatigue-and-harm">
+<h3>Fatigue and Harm</h3>
+<section class="level3" id="fatigue">
+<h4>Fatigue</h4>
+<ul>
+<li>Track size = Body (minimum 1).</li>
+<li>Each point worsens Position by one step (Dominant → Controlled → Desperate).</li>
+<li>If already Desperate, each additional Fatigue imposes –1 die on all rolls.</li>
+</ul>
+</section>
+<section class="level3" id="harm">
+<h4>Harm</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Harm Level</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>–1 die on related actions (GM discretion).</td></tr>
+<tr><td>2</td><td>–1 die on most actions until treated.</td></tr>
+<tr><td>3</td><td>Incapacitated or dying.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="taking-harm-clears-fatigue">
+<h4>Taking Harm Clears Fatigue (Roller-Coaster)</h4>
+<ol>
+<li>Convert incoming Harm to Fatigue using the Armor Conversion Table.</li>
+<li>Apply any remaining Harm. If Harm remains, clear all existing Fatigue, then increase Harm level by amount taken.</li>
+<li>Add Fatigue from step 1 to the Fatigue track. If the track fills, increase Harm by 1 and clear all Fatigue.</li>
+</ol>
+</section>
+<section class="level3" id="armor">
+<h4>Armor</h4>
+<p><strong>Armor Conversion Table</strong></p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Armor</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
+</thead>
+<tbody>
+<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Minimum 1 Fatigue per hit, even if conversion would give 0.</p>
+</section>
+<section class="level3" id="recovery">
+<h4>Recovery</h4>
+<ul>
+<li><strong>Fatigue:</strong> Short rest (1 hour) removes 2; full night’s rest removes all.</li>
+<li><strong>Harm:</strong> Requires medical care (Craft roll) or magical healing; natural recovery takes one week per level.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="wards-and-traps">
+<h3>Wards and Traps</h3>
+<p>Wards are magical barriers that block passage, teleportation, and shadow-walking. Traps are mundane or magical hazards that trigger on intrusion. Both use the same base resolution structure.</p>
+<section class="level3" id="wards-magical-barriers">
+<h4>Wards (Magical Barriers)</h4>
+<p>A ward is defined by its Base DV (2–5), chosen by the GM when the ward is placed. The ward’s other properties derive from this DV:</p>
+<ul>
+<li><strong>Harm:</strong> A creature that triggers the ward suffers Harm equal to max(0, Base DV – 2).</li>
+<li><strong>Spirit Leash:</strong> A spirit (including summoned creatures) attempting to cross the ward suffers Leash ticks equal to the ward’s Base DV.</li>
+</ul>
+<p><strong>Crossing a Ward.</strong> A creature cannot teleport, shadow-walk, or use any effect that bypasses intervening space to cross a ward without first overcoming it. To cross, the creature must succeed on a test of the appropriate attribute (usually Wits or Presence) + Spirit against the ward’s Base DV. On a failure, the crossing fails and the creature suffers the ward’s Harm (if any). On a success, the creature crosses but may still suffer other consequences (e.g., alerting the ward’s creator).</p>
+<p><strong>Disabling a Ward.</strong> A character may attempt to disable a ward with a Wits + Arcana test against the ward’s Base DV. Success renders the ward inert for one scene (or permanently, at the GM’s discretion for non-recurring wards). Alternatively, a spell with the <code>[DISPEL]</code> or <code>[FATE]</code> tags may suppress or destroy the ward as described in the spell’s effect.</p>
+</section>
+<section class="level3" id="traps-mundane-or-magical">
+<h4>Traps (Mundane or Magical)</h4>
+<p>Traps function similarly to wards but do not impede teleportation or shadow-walking, nor do they inflict Leash ticks on spirits. A trap has a Base DV (2–5) and deals Harm equal to max(0, Base DV – 2) when triggered.</p>
+<p><strong>Disarming a Trap.</strong> A trap can be disarmed with a Wits + Deception test against its Base DV. On a success, the trap is neutralised. On a failure, the trap may trigger (GM’s discretion).</p>
+<div class="panel panel-green">
+<p><strong>Example.</strong> A Lesser Wardstone (DV 3) bars a doorway. A character attempting to shadow-walk past must roll Wits + Spirit (DV 3). Failure inflicts Harm 1 (since 3–2 = 1). A spirit crossing the same ward gains 3 Leash ticks. A Wits + Arcana (DV 3) success disables the ward.</p>
+</div>
+</section>
+</section>
+<section class="level2" id="maximum-dice-pool">
+<h3>Maximum Dice Pool</h3>
+<p>Maximum die pool = 10d10. Any additional dice beyond 10 become automatic successes (1 auto-success per extra die).</p>
+</section>
+</section></div><p>Continue: <a href="characters.html">Character creation and advancement</a></p></main></body></html>

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -53,9 +54,29 @@
     a{color:#000;text-decoration:none}
   }
 </style>
-</head>
-<body>
-<h1>🎡 The Paper Table</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Resources · table aid</strong></p><p>Use this document for the task named in its title. A reference table or worked example is easier to use after you have read the corresponding procedure; return to the SRD or guides when timing or context is unclear.</p><nav aria-label="Library reading links"><a href="Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">🎡 The Paper Table</a></li><li><a href="#wheel">1. The Wheel</a></li><li><a href="#nothing">2. If you have no spinner at all</a></li><li><a href="#pool">3. Rolling a pool</a></li><li><a href="#fast">4. The fast table — two spins for any pool</a></li><li><a href="#trackers">5. Paper trackers</a></li><li><a href="#scrounge">6. Trackers you already own</a></li><li><a href="#d6">7. If you have six-siders but not ten</a></li><li><a href="#print">8. Printing notes</a></li><li><a href="#paper-import">9. Sending a paper session to the web client</a></li></ul></details>
+<h1 id="reader-section-1">🎡 The Paper Table</h1>
 <p class="text-sm text-muted"><span class="badge badge-gold">Resource</span> <span class="badge badge-blue">Printable</span> <span class="badge badge-green">No dice required</span> <span class="badge badge-purple">Accessibility</span> <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
 <blockquote style="border-left:3px solid var(--gold);padding-left:1rem;margin:.8rem 0;font-style:italic;color:var(--text2)">Where dice are dangerous.</blockquote>
 <div class="panel panel-gold">
@@ -67,36 +88,36 @@ Fatigue. Print it in black and white; nothing here depends on colour.</p>
 <p class="text-sm">Fate's Edge is played with ten-sided dice, and dice are not always available. Some
 tables have lost them, or travel light, or are playing on a bus. Some are playing where dice often
 aren't allowed. And some people simply read pips faster than they read small engraved numerals. The
-game does not actually require the objects &mdash; it requires a fair way to get a number from 1 to 10,
+game does not actually require the objects — it requires a fair way to get a number from 1 to 10,
 and there are many.</p>
 </div>
 <h2 id="wheel">1. The Wheel</h2>
-<p>Cut it out, or just lay the page flat and spin on it. Each sector is one tenth of the circle, so every number is equally likely &mdash; this <em>is</em> a d10, drawn instead of moulded.</p>
+<p>Cut it out, or just lay the page flat and spin on it. Each sector is one tenth of the circle, so every number is equally likely — this <em>is</em> a d10, drawn instead of moulded.</p>
 <div class="cutrow">
-<div class="cut"><svg viewBox="0 0 340 340" width="340" height="340" role="img" aria-label="ten-sector spinner" class="wheel">
-<circle cx="170.0" cy="170.0" r="156.0" fill="#fff" stroke="#000" stroke-width="3"/>
-<path d="M170.0,170.0 L170.0,14.0 A156.0,156.0 0 0,1 261.7,43.8 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="203.7" y="66.1" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">1</text>
-<path d="M170.0,170.0 L261.7,43.8 A156.0,156.0 0 0,1 318.4,121.8 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="258.3" y="105.8" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">2</text>
-<path d="M170.0,170.0 L318.4,121.8 A156.0,156.0 0 0,1 318.4,218.2 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="279.2" y="170.0" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">3</text>
-<path d="M170.0,170.0 L318.4,218.2 A156.0,156.0 0 0,1 261.7,296.2 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="258.3" y="234.2" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">4</text>
-<path d="M170.0,170.0 L261.7,296.2 A156.0,156.0 0 0,1 170.0,326.0 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="203.7" y="273.9" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">5</text>
-<path d="M170.0,170.0 L170.0,326.0 A156.0,156.0 0 0,1 78.3,296.2 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="136.3" y="273.9" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">6</text>
-<path d="M170.0,170.0 L78.3,296.2 A156.0,156.0 0 0,1 21.6,218.2 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="81.7" y="234.2" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">7</text>
-<path d="M170.0,170.0 L21.6,218.2 A156.0,156.0 0 0,1 21.6,121.8 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="60.8" y="170.0" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">8</text>
-<path d="M170.0,170.0 L21.6,121.8 A156.0,156.0 0 0,1 78.3,43.8 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="81.7" y="105.8" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">9</text>
-<path d="M170.0,170.0 L78.3,43.8 A156.0,156.0 0 0,1 170.0,14.0 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="136.3" y="66.1" text-anchor="middle" dominant-baseline="central" font-size="41" font-weight="700" fill="#000">10</text>
-<circle cx="170.0" cy="170.0" r="5.5" fill="#000"/>
-<circle cx="170.0" cy="170.0" r="12" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="3 3"/>
+<div class="cut"><svg aria-label="ten-sector spinner" class="wheel" height="340" role="img" viewbox="0 0 340 340" width="340">
+<circle cx="170.0" cy="170.0" fill="#fff" r="156.0" stroke="#000" stroke-width="3"></circle>
+<path d="M170.0,170.0 L170.0,14.0 A156.0,156.0 0 0,1 261.7,43.8 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="203.7" y="66.1">1</text>
+<path d="M170.0,170.0 L261.7,43.8 A156.0,156.0 0 0,1 318.4,121.8 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="258.3" y="105.8">2</text>
+<path d="M170.0,170.0 L318.4,121.8 A156.0,156.0 0 0,1 318.4,218.2 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="279.2" y="170.0">3</text>
+<path d="M170.0,170.0 L318.4,218.2 A156.0,156.0 0 0,1 261.7,296.2 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="258.3" y="234.2">4</text>
+<path d="M170.0,170.0 L261.7,296.2 A156.0,156.0 0 0,1 170.0,326.0 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="203.7" y="273.9">5</text>
+<path d="M170.0,170.0 L170.0,326.0 A156.0,156.0 0 0,1 78.3,296.2 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="136.3" y="273.9">6</text>
+<path d="M170.0,170.0 L78.3,296.2 A156.0,156.0 0 0,1 21.6,218.2 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="81.7" y="234.2">7</text>
+<path d="M170.0,170.0 L21.6,218.2 A156.0,156.0 0 0,1 21.6,121.8 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="60.8" y="170.0">8</text>
+<path d="M170.0,170.0 L21.6,121.8 A156.0,156.0 0 0,1 78.3,43.8 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="81.7" y="105.8">9</text>
+<path d="M170.0,170.0 L78.3,43.8 A156.0,156.0 0 0,1 170.0,14.0 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="41" font-weight="700" text-anchor="middle" x="136.3" y="66.1">10</text>
+<circle cx="170.0" cy="170.0" fill="#000" r="5.5"></circle>
+<circle cx="170.0" cy="170.0" fill="none" r="12" stroke="#000" stroke-dasharray="3 3" stroke-width="1"></circle>
 </svg></div>
 <div style="flex:1;min-width:240px">
 <h3>Three ways to spin it</h3>
@@ -109,8 +130,8 @@ centre, and drop it. Read where the point lands; drop again if it misses the cir
 fairest of the three if your spinner is warped.</p>
 <div class="panel panel-blue" style="margin-top:.6rem">
 <p class="text-xs"><strong>Is it actually fair?</strong> A spinner is fair if the sectors are equal and
-the spin is long enough to lose its starting position &mdash; two or three full turns is plenty. Sectors
-here are exactly 36&deg;. The usual way a paper spinner goes wrong is a bent clip or a soft centre hole
+the spin is long enough to lose its starting position — two or three full turns is plenty. Sectors
+here are exactly 36°. The usual way a paper spinner goes wrong is a bent clip or a soft centre hole
 that drags; if one number starts coming up more than its share, re-cut the centre or switch to dropping.</p>
 </div>
 </div>
@@ -122,7 +143,7 @@ that drags; if one number starts coming up more than its share, re-cut the centr
 <strong>The book.</strong>
 <p class="text-sm mt-1">Let a thick book fall open and read the <em>last digit</em> of the left-hand page
 number. 0 counts as 10. Any book over about two hundred pages works, and page numbers are uniform in
-their last digit regardless of where the spine likes to open &mdash; which is why this method is more
+their last digit regardless of where the spine likes to open — which is why this method is more
 robust than it looks.</p>
 <p class="text-xs text-muted">Two digits, for the table in section 4: read the last digit of the left page,
 then the last digit of the right page.</p>
@@ -135,43 +156,43 @@ a hand's height and read the nearest number. Re-drop if it lands off the page.</
 <div class="panel panel-green">
 <strong>The clock.</strong>
 <p class="text-sm mt-1">If you can see a second hand, glance away, then look: the seconds' last digit is
-your number, 0 counting as 10. Fair, instant, and needs nothing at all &mdash; but only once every few
+your number, 0 counting as 10. Fair, instant, and needs nothing at all — but only once every few
 seconds, so it suits one-off rolls rather than a full pool.</p>
 </div>
 <div class="panel panel-red">
 <strong>What doesn't work.</strong>
 <p class="text-sm mt-1">Picking a number "at random" in your head, or stabbing a numbered grid with your
-eyes shut. People are reliably biased at both &mdash; middling numbers come up far too often and edges
+eyes shut. People are reliably biased at both — middling numbers come up far too often and edges
 almost never. If it feels random, it probably isn't; use one of the three above.</p>
 </div>
 </div>
 <h2 id="pool">3. Rolling a pool</h2>
 <p>A Fate's Edge roll is <em>Attribute + Skill</em> dice, so most rolls are four to seven spins.
-Spin that many times and tally as you go &mdash; a stroke for each success, a dot for each 1:</p>
-<div class="table-wrap"><table>
+Spin that many times and tally as you go — a stroke for each success, a dot for each 1:</p>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th class="c">Spin</th><th>Counts as</th></tr>
 <tr><td class="c">1</td><td>No success, and <strong>1 Story Beat to the GM</strong></td></tr>
-<tr><td class="c">2&ndash;5</td><td>Nothing</td></tr>
-<tr><td class="c">6&ndash;9</td><td><strong>1 success</strong></td></tr>
+<tr><td class="c">2–5</td><td>Nothing</td></tr>
+<tr><td class="c">6–9</td><td><strong>1 success</strong></td></tr>
 <tr><td class="c">10</td><td><strong>2 successes</strong></td></tr>
-</table></div>
-<p class="text-sm"><strong>Position works normally.</strong> Dominant: re-spin one failure (a 1&ndash;5),
-your choice. Desperate: re-spin one success (a 6&ndash;9); a 10 is never re-spun. A re-spun 1
-<strong>keeps</strong> its Story Beat &mdash; mark the dot before you re-spin, and mark another if the new
+</table></div></div>
+<p class="text-sm"><strong>Position works normally.</strong> Dominant: re-spin one failure (a 1–5),
+your choice. Desperate: re-spin one success (a 6–9); a 10 is never re-spun. A re-spun 1
+<strong>keeps</strong> its Story Beat — mark the dot before you re-spin, and mark another if the new
 spin is also a 1.</p>
-<h2 id="fast">4. The fast table &mdash; two spins for any pool</h2>
+<h2 id="fast">4. The fast table — two spins for any pool</h2>
 <p>Spinning eight times gets old. This resolves an entire pool in <strong>two spins</strong>: the first
 is the tens digit, the second the units, giving a number from 01 to 00 (that is, 100). Read your pool's
 column and take the successes and Story Beats straight off it.</p>
 <div class="panel panel-blue">
 <p class="text-sm"><strong>What this is, exactly.</strong> Each column is the true probability distribution
 of that pool, computed by enumerating every possible roll, then divided into a hundred slots. It is not an
-approximation of the <em>game</em> &mdash; it is the same maths the dice do, sampled in one step instead of
+approximation of the <em>game</em> — it is the same maths the dice do, sampled in one step instead of
 eight. Slot allocation rounds each outcome to the nearest percent, so any single line is at most about one
 percentage point off, which is far below what anyone notices at a table.</p>
 <p class="text-sm"><strong>Slot 00 is not a rounding bin.</strong> The very best and very worst results are
 rarer than one percent and would round away to nothing, so instead of quietly deleting them the table
-sends you to <strong>00: spin the long way</strong> &mdash; one spin per die, per section 3. It comes up
+sends you to <strong>00: spin the long way</strong> — one spin per die, per section 3. It comes up
 about one roll in a hundred and it is the only way the spectacular results stay reachable.</p>
 </div>
 <p class="text-sm"><strong>These columns are for Controlled Position.</strong> For Dominant or Desperate,
@@ -179,242 +200,241 @@ spin the pool the long way and apply the re-spin; Position turns on a single die
 already added them up cannot tell you which one to change.</p>
 <div class="cols3">
 <div><strong class="text-sm">Pool of 2</strong>
-<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
-<tr><td class="c">01&ndash;16</td><td class="c">0</td><td class="c">0</td></tr>
-<tr><td class="c">17&ndash;24</td><td class="c">0</td><td class="c">1</td></tr>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01–16</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">17–24</td><td class="c">0</td><td class="c">1</td></tr>
 <tr><td class="c">25</td><td class="c">0</td><td class="c">2</td></tr>
-<tr><td class="c">26&ndash;56</td><td class="c">1</td><td class="c">0</td></tr>
-<tr><td class="c">57&ndash;64</td><td class="c">1</td><td class="c">1</td></tr>
-<tr><td class="c">65&ndash;88</td><td class="c">2</td><td class="c">0</td></tr>
-<tr><td class="c">89&ndash;90</td><td class="c">2</td><td class="c">1</td></tr>
-<tr><td class="c">91&ndash;98</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">26–56</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">57–64</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">65–88</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">89–90</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">91–98</td><td class="c">3</td><td class="c">0</td></tr>
 <tr><td class="c">99</td><td class="c">4</td><td class="c">0</td></tr>
 <tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
-</table></div>
+</table></div></div>
 <div><strong class="text-sm">Pool of 3</strong>
-<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
-<tr><td class="c">01&ndash;06</td><td class="c">0</td><td class="c">0</td></tr>
-<tr><td class="c">07&ndash;11</td><td class="c">0</td><td class="c">1</td></tr>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01–06</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">07–11</td><td class="c">0</td><td class="c">1</td></tr>
 <tr><td class="c">12</td><td class="c">0</td><td class="c">2</td></tr>
-<tr><td class="c">13&ndash;31</td><td class="c">1</td><td class="c">0</td></tr>
-<tr><td class="c">32&ndash;41</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">13–31</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">32–41</td><td class="c">1</td><td class="c">1</td></tr>
 <tr><td class="c">42</td><td class="c">1</td><td class="c">2</td></tr>
-<tr><td class="c">43&ndash;66</td><td class="c">2</td><td class="c">0</td></tr>
-<tr><td class="c">67&ndash;73</td><td class="c">2</td><td class="c">1</td></tr>
-<tr><td class="c">74&ndash;89</td><td class="c">3</td><td class="c">0</td></tr>
-<tr><td class="c">90&ndash;92</td><td class="c">3</td><td class="c">1</td></tr>
-<tr><td class="c">93&ndash;98</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">43–66</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">67–73</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">74–89</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">90–92</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">93–98</td><td class="c">4</td><td class="c">0</td></tr>
 <tr><td class="c">99</td><td class="c">5</td><td class="c">0</td></tr>
 <tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
-</table></div>
+</table></div></div>
 <div><strong class="text-sm">Pool of 4</strong>
-<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
-<tr><td class="c">01&ndash;03</td><td class="c">0</td><td class="c">0</td></tr>
-<tr><td class="c">04&ndash;06</td><td class="c">0</td><td class="c">1</td></tr>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<tr><td class="c">01–03</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">04–06</td><td class="c">0</td><td class="c">1</td></tr>
 <tr><td class="c">07</td><td class="c">0</td><td class="c">2</td></tr>
-<tr><td class="c">08&ndash;17</td><td class="c">1</td><td class="c">0</td></tr>
-<tr><td class="c">18&ndash;25</td><td class="c">1</td><td class="c">1</td></tr>
-<tr><td class="c">26&ndash;27</td><td class="c">1</td><td class="c">2</td></tr>
-<tr><td class="c">28&ndash;45</td><td class="c">2</td><td class="c">0</td></tr>
-<tr><td class="c">46&ndash;55</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">08–17</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">18–25</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">26–27</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">28–45</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">46–55</td><td class="c">2</td><td class="c">1</td></tr>
 <tr><td class="c">56</td><td class="c">2</td><td class="c">2</td></tr>
-<tr><td class="c">57&ndash;74</td><td class="c">3</td><td class="c">0</td></tr>
-<tr><td class="c">75&ndash;80</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">57–74</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">75–80</td><td class="c">3</td><td class="c">1</td></tr>
 <tr><td class="c">81</td><td class="c">3</td><td class="c">2</td></tr>
-<tr><td class="c">82&ndash;92</td><td class="c">4</td><td class="c">0</td></tr>
-<tr><td class="c">93&ndash;94</td><td class="c">4</td><td class="c">1</td></tr>
-<tr><td class="c">95&ndash;98</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">82–92</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">93–94</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">95–98</td><td class="c">5</td><td class="c">0</td></tr>
 <tr><td class="c">99</td><td class="c">6</td><td class="c">0</td></tr>
 <tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
-</table></div>
+</table></div></div>
 <div><strong class="text-sm">Pool of 5</strong>
-<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
 <tr><td class="c">01</td><td class="c">0</td><td class="c">0</td></tr>
 <tr><td class="c">02</td><td class="c">0</td><td class="c">1</td></tr>
 <tr><td class="c">03</td><td class="c">0</td><td class="c">2</td></tr>
-<tr><td class="c">04&ndash;08</td><td class="c">1</td><td class="c">0</td></tr>
-<tr><td class="c">09&ndash;13</td><td class="c">1</td><td class="c">1</td></tr>
-<tr><td class="c">14&ndash;15</td><td class="c">1</td><td class="c">2</td></tr>
-<tr><td class="c">16&ndash;27</td><td class="c">2</td><td class="c">0</td></tr>
-<tr><td class="c">28&ndash;36</td><td class="c">2</td><td class="c">1</td></tr>
-<tr><td class="c">37&ndash;38</td><td class="c">2</td><td class="c">2</td></tr>
-<tr><td class="c">39&ndash;53</td><td class="c">3</td><td class="c">0</td></tr>
-<tr><td class="c">54&ndash;62</td><td class="c">3</td><td class="c">1</td></tr>
-<tr><td class="c">63&ndash;64</td><td class="c">3</td><td class="c">2</td></tr>
-<tr><td class="c">65&ndash;77</td><td class="c">4</td><td class="c">0</td></tr>
-<tr><td class="c">78&ndash;83</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">04–08</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">09–13</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">14–15</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">16–27</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">28–36</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">37–38</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">39–53</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">54–62</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">63–64</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">65–77</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">78–83</td><td class="c">4</td><td class="c">1</td></tr>
 <tr><td class="c">84</td><td class="c">4</td><td class="c">2</td></tr>
-<tr><td class="c">85&ndash;92</td><td class="c">5</td><td class="c">0</td></tr>
-<tr><td class="c">93&ndash;94</td><td class="c">5</td><td class="c">1</td></tr>
-<tr><td class="c">95&ndash;97</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">85–92</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">93–94</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">95–97</td><td class="c">6</td><td class="c">0</td></tr>
 <tr><td class="c">98</td><td class="c">6</td><td class="c">1</td></tr>
 <tr><td class="c">99</td><td class="c">7</td><td class="c">0</td></tr>
 <tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
-</table></div>
+</table></div></div>
 <div><strong class="text-sm">Pool of 6</strong>
-<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
 <tr><td class="c">01</td><td class="c">0</td><td class="c">1</td></tr>
-<tr><td class="c">02&ndash;03</td><td class="c">1</td><td class="c">0</td></tr>
-<tr><td class="c">04&ndash;06</td><td class="c">1</td><td class="c">1</td></tr>
-<tr><td class="c">07&ndash;08</td><td class="c">1</td><td class="c">2</td></tr>
-<tr><td class="c">09&ndash;15</td><td class="c">2</td><td class="c">0</td></tr>
-<tr><td class="c">16&ndash;22</td><td class="c">2</td><td class="c">1</td></tr>
-<tr><td class="c">23&ndash;25</td><td class="c">2</td><td class="c">2</td></tr>
-<tr><td class="c">26&ndash;36</td><td class="c">3</td><td class="c">0</td></tr>
-<tr><td class="c">37&ndash;45</td><td class="c">3</td><td class="c">1</td></tr>
-<tr><td class="c">46&ndash;48</td><td class="c">3</td><td class="c">2</td></tr>
-<tr><td class="c">49&ndash;61</td><td class="c">4</td><td class="c">0</td></tr>
-<tr><td class="c">62&ndash;69</td><td class="c">4</td><td class="c">1</td></tr>
-<tr><td class="c">70&ndash;71</td><td class="c">4</td><td class="c">2</td></tr>
-<tr><td class="c">72&ndash;81</td><td class="c">5</td><td class="c">0</td></tr>
-<tr><td class="c">82&ndash;86</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">02–03</td><td class="c">1</td><td class="c">0</td></tr>
+<tr><td class="c">04–06</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">07–08</td><td class="c">1</td><td class="c">2</td></tr>
+<tr><td class="c">09–15</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">16–22</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">23–25</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">26–36</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">37–45</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">46–48</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">49–61</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">62–69</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">70–71</td><td class="c">4</td><td class="c">2</td></tr>
+<tr><td class="c">72–81</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">82–86</td><td class="c">5</td><td class="c">1</td></tr>
 <tr><td class="c">87</td><td class="c">5</td><td class="c">2</td></tr>
-<tr><td class="c">88&ndash;93</td><td class="c">6</td><td class="c">0</td></tr>
-<tr><td class="c">94&ndash;95</td><td class="c">6</td><td class="c">1</td></tr>
-<tr><td class="c">96&ndash;97</td><td class="c">7</td><td class="c">0</td></tr>
+<tr><td class="c">88–93</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">94–95</td><td class="c">6</td><td class="c">1</td></tr>
+<tr><td class="c">96–97</td><td class="c">7</td><td class="c">0</td></tr>
 <tr><td class="c">98</td><td class="c">7</td><td class="c">1</td></tr>
 <tr><td class="c">99</td><td class="c">8</td><td class="c">0</td></tr>
 <tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
-</table></div>
+</table></div></div>
 <div><strong class="text-sm">Pool of 7</strong>
-<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
 <tr><td class="c">01</td><td class="c">1</td><td class="c">0</td></tr>
-<tr><td class="c">02&ndash;03</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">02–03</td><td class="c">1</td><td class="c">1</td></tr>
 <tr><td class="c">04</td><td class="c">1</td><td class="c">2</td></tr>
-<tr><td class="c">05&ndash;08</td><td class="c">2</td><td class="c">0</td></tr>
-<tr><td class="c">09&ndash;13</td><td class="c">2</td><td class="c">1</td></tr>
-<tr><td class="c">14&ndash;15</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">05–08</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">09–13</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">14–15</td><td class="c">2</td><td class="c">2</td></tr>
 <tr><td class="c">16</td><td class="c">2</td><td class="c">3</td></tr>
-<tr><td class="c">17&ndash;23</td><td class="c">3</td><td class="c">0</td></tr>
-<tr><td class="c">24&ndash;31</td><td class="c">3</td><td class="c">1</td></tr>
-<tr><td class="c">32&ndash;34</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">17–23</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">24–31</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">32–34</td><td class="c">3</td><td class="c">2</td></tr>
 <tr><td class="c">35</td><td class="c">3</td><td class="c">3</td></tr>
-<tr><td class="c">36&ndash;45</td><td class="c">4</td><td class="c">0</td></tr>
-<tr><td class="c">46&ndash;54</td><td class="c">4</td><td class="c">1</td></tr>
-<tr><td class="c">55&ndash;57</td><td class="c">4</td><td class="c">2</td></tr>
-<tr><td class="c">58&ndash;67</td><td class="c">5</td><td class="c">0</td></tr>
-<tr><td class="c">68&ndash;74</td><td class="c">5</td><td class="c">1</td></tr>
-<tr><td class="c">75&ndash;76</td><td class="c">5</td><td class="c">2</td></tr>
-<tr><td class="c">77&ndash;84</td><td class="c">6</td><td class="c">0</td></tr>
-<tr><td class="c">85&ndash;88</td><td class="c">6</td><td class="c">1</td></tr>
+<tr><td class="c">36–45</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">46–54</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">55–57</td><td class="c">4</td><td class="c">2</td></tr>
+<tr><td class="c">58–67</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">68–74</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">75–76</td><td class="c">5</td><td class="c">2</td></tr>
+<tr><td class="c">77–84</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">85–88</td><td class="c">6</td><td class="c">1</td></tr>
 <tr><td class="c">89</td><td class="c">6</td><td class="c">2</td></tr>
-<tr><td class="c">90&ndash;93</td><td class="c">7</td><td class="c">0</td></tr>
-<tr><td class="c">94&ndash;95</td><td class="c">7</td><td class="c">1</td></tr>
-<tr><td class="c">96&ndash;97</td><td class="c">8</td><td class="c">0</td></tr>
+<tr><td class="c">90–93</td><td class="c">7</td><td class="c">0</td></tr>
+<tr><td class="c">94–95</td><td class="c">7</td><td class="c">1</td></tr>
+<tr><td class="c">96–97</td><td class="c">8</td><td class="c">0</td></tr>
 <tr><td class="c">98</td><td class="c">8</td><td class="c">1</td></tr>
 <tr><td class="c">99</td><td class="c">9</td><td class="c">0</td></tr>
 <tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
-</table></div>
+</table></div></div>
 <div><strong class="text-sm">Pool of 8</strong>
-<table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th class="c">Spin</th><th class="c">Succ.</th><th class="c">SB</th></tr>
 <tr><td class="c">01</td><td class="c">1</td><td class="c">0</td></tr>
 <tr><td class="c">02</td><td class="c">1</td><td class="c">1</td></tr>
 <tr><td class="c">03</td><td class="c">1</td><td class="c">2</td></tr>
-<tr><td class="c">04&ndash;05</td><td class="c">2</td><td class="c">0</td></tr>
-<tr><td class="c">06&ndash;08</td><td class="c">2</td><td class="c">1</td></tr>
-<tr><td class="c">09&ndash;10</td><td class="c">2</td><td class="c">2</td></tr>
+<tr><td class="c">04–05</td><td class="c">2</td><td class="c">0</td></tr>
+<tr><td class="c">06–08</td><td class="c">2</td><td class="c">1</td></tr>
+<tr><td class="c">09–10</td><td class="c">2</td><td class="c">2</td></tr>
 <tr><td class="c">11</td><td class="c">2</td><td class="c">3</td></tr>
-<tr><td class="c">12&ndash;16</td><td class="c">3</td><td class="c">0</td></tr>
-<tr><td class="c">17&ndash;22</td><td class="c">3</td><td class="c">1</td></tr>
-<tr><td class="c">23&ndash;25</td><td class="c">3</td><td class="c">2</td></tr>
+<tr><td class="c">12–16</td><td class="c">3</td><td class="c">0</td></tr>
+<tr><td class="c">17–22</td><td class="c">3</td><td class="c">1</td></tr>
+<tr><td class="c">23–25</td><td class="c">3</td><td class="c">2</td></tr>
 <tr><td class="c">26</td><td class="c">3</td><td class="c">3</td></tr>
-<tr><td class="c">27&ndash;33</td><td class="c">4</td><td class="c">0</td></tr>
-<tr><td class="c">34&ndash;41</td><td class="c">4</td><td class="c">1</td></tr>
-<tr><td class="c">42&ndash;45</td><td class="c">4</td><td class="c">2</td></tr>
+<tr><td class="c">27–33</td><td class="c">4</td><td class="c">0</td></tr>
+<tr><td class="c">34–41</td><td class="c">4</td><td class="c">1</td></tr>
+<tr><td class="c">42–45</td><td class="c">4</td><td class="c">2</td></tr>
 <tr><td class="c">46</td><td class="c">4</td><td class="c">3</td></tr>
-<tr><td class="c">47&ndash;55</td><td class="c">5</td><td class="c">0</td></tr>
-<tr><td class="c">56&ndash;63</td><td class="c">5</td><td class="c">1</td></tr>
-<tr><td class="c">64&ndash;66</td><td class="c">5</td><td class="c">2</td></tr>
-<tr><td class="c">67&ndash;74</td><td class="c">6</td><td class="c">0</td></tr>
-<tr><td class="c">75&ndash;80</td><td class="c">6</td><td class="c">1</td></tr>
-<tr><td class="c">81&ndash;82</td><td class="c">6</td><td class="c">2</td></tr>
-<tr><td class="c">83&ndash;88</td><td class="c">7</td><td class="c">0</td></tr>
-<tr><td class="c">89&ndash;91</td><td class="c">7</td><td class="c">1</td></tr>
+<tr><td class="c">47–55</td><td class="c">5</td><td class="c">0</td></tr>
+<tr><td class="c">56–63</td><td class="c">5</td><td class="c">1</td></tr>
+<tr><td class="c">64–66</td><td class="c">5</td><td class="c">2</td></tr>
+<tr><td class="c">67–74</td><td class="c">6</td><td class="c">0</td></tr>
+<tr><td class="c">75–80</td><td class="c">6</td><td class="c">1</td></tr>
+<tr><td class="c">81–82</td><td class="c">6</td><td class="c">2</td></tr>
+<tr><td class="c">83–88</td><td class="c">7</td><td class="c">0</td></tr>
+<tr><td class="c">89–91</td><td class="c">7</td><td class="c">1</td></tr>
 <tr><td class="c">92</td><td class="c">7</td><td class="c">2</td></tr>
-<tr><td class="c">93&ndash;95</td><td class="c">8</td><td class="c">0</td></tr>
-<tr><td class="c">96&ndash;97</td><td class="c">8</td><td class="c">1</td></tr>
+<tr><td class="c">93–95</td><td class="c">8</td><td class="c">0</td></tr>
+<tr><td class="c">96–97</td><td class="c">8</td><td class="c">1</td></tr>
 <tr><td class="c">98</td><td class="c">9</td><td class="c">0</td></tr>
 <tr><td class="c">99</td><td class="c">9</td><td class="c">1</td></tr>
 <tr><td class="c">00</td><td class="c" colspan="2">spin the long way</td></tr>
-</table></div>
+</table></div></div>
 </div>
 <h2 id="trackers">5. Paper trackers</h2>
-<p>Cut these out, or copy them by hand &mdash; they are only boxes. Fill a box with a stroke; erase or cross out to clear. Clocks come in four legal sizes and no others.</p>
+<p>Cut these out, or copy them by hand — they are only boxes. Fill a box with a stroke; erase or cross out to clear. Clocks come in four legal sizes and no others.</p>
 <div class="grid2">
-<div class="trk"><div class="lbl"><strong>Clock [4]</strong> &mdash; The shortest legal clock.</div><svg viewBox="0 0 119 32" width="119" height="32" role="img" aria-label="four-segment clock" class="clockstrip">
-<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<div class="trk"><div class="lbl"><strong>Clock [4]</strong> — The shortest legal clock.</div><svg aria-label="four-segment clock" class="clockstrip" height="32" role="img" viewbox="0 0 119 32" width="119">
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="3" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="32" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="61" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="90" y="3"></rect>
 </svg></div>
-<div class="trk"><div class="lbl"><strong>Clock [6]</strong> &mdash; The workhorse.</div><svg viewBox="0 0 177 32" width="177" height="32" role="img" aria-label="six-segment clock" class="clockstrip">
-<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="119" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="148" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<div class="trk"><div class="lbl"><strong>Clock [6]</strong> — The workhorse.</div><svg aria-label="six-segment clock" class="clockstrip" height="32" role="img" viewbox="0 0 177 32" width="177">
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="3" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="32" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="61" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="90" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="119" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="148" y="3"></rect>
 </svg></div>
-<div class="trk"><div class="lbl"><strong>Clock [8]</strong> &mdash; Long pressure.</div><svg viewBox="0 0 235 32" width="235" height="32" role="img" aria-label="eight-segment clock" class="clockstrip">
-<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="119" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="148" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="177" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="206" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<div class="trk"><div class="lbl"><strong>Clock [8]</strong> — Long pressure.</div><svg aria-label="eight-segment clock" class="clockstrip" height="32" role="img" viewbox="0 0 235 32" width="235">
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="3" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="32" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="61" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="90" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="119" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="148" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="177" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="206" y="3"></rect>
 </svg></div>
-<div class="trk"><div class="lbl"><strong>Clock [10]</strong> &mdash; A campaign can end inside one.</div><svg viewBox="0 0 293 32" width="293" height="32" role="img" aria-label="ten-segment clock" class="clockstrip">
-<rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="32" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="61" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="90" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="119" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="148" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="177" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="206" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="235" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
-<rect x="264" y="3" width="26" height="26" fill="#fff" stroke="#000" stroke-width="1.8" rx="3"/>
+<div class="trk"><div class="lbl"><strong>Clock [10]</strong> — A campaign can end inside one.</div><svg aria-label="ten-segment clock" class="clockstrip" height="32" role="img" viewbox="0 0 293 32" width="293">
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="3" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="32" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="61" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="90" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="119" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="148" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="177" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="206" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="235" y="3"></rect>
+<rect fill="#fff" height="26" rx="3" stroke="#000" stroke-width="1.8" width="26" x="264" y="3"></rect>
 </svg></div>
 </div>
 <div class="grid2">
-<div class="trk"><div class="lbl"><strong>Boons</strong> &mdash; max 5; trim to 2 at scene end.</div><svg viewBox="0 0 100.0 22.0" width="100.0" height="22.0" role="img" aria-label="five boxes" class="boxrow">
-<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="61.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="80.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<div class="trk"><div class="lbl"><strong>Boons</strong> — max 5; trim to 2 at scene end.</div><svg aria-label="five boxes" class="boxrow" height="22.0" role="img" viewbox="0 0 100.0 22.0" width="100.0">
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="2.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="22.0" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="41.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="61.0" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="80.5" y="2.5"></rect>
 </svg></div>
-<div class="trk"><div class="lbl"><strong>Story Beats</strong> &mdash; the GM's pool.</div><svg viewBox="0 0 119.5 22.0" width="119.5" height="22.0" role="img" aria-label="six boxes" class="boxrow">
-<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="61.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="80.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="100.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<div class="trk"><div class="lbl"><strong>Story Beats</strong> — the GM's pool.</div><svg aria-label="six boxes" class="boxrow" height="22.0" role="img" viewbox="0 0 119.5 22.0" width="119.5">
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="2.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="22.0" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="41.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="61.0" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="80.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="100.0" y="2.5"></rect>
 </svg></div>
-<div class="trk"><div class="lbl"><strong>Harm</strong> &mdash; 1, 2, 3. Three levels only.</div><svg viewBox="0 0 61.0 22.0" width="61.0" height="22.0" role="img" aria-label="three boxes" class="boxrow">
-<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<div class="trk"><div class="lbl"><strong>Harm</strong> — 1, 2, 3. Three levels only.</div><svg aria-label="three boxes" class="boxrow" height="22.0" role="img" viewbox="0 0 61.0 22.0" width="61.0">
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="2.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="22.0" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="41.5" y="2.5"></rect>
 </svg></div>
-<div class="trk"><div class="lbl"><strong>Fatigue</strong> &mdash; track size equals Body.</div><svg viewBox="0 0 119.5 22.0" width="119.5" height="22.0" role="img" aria-label="six boxes" class="boxrow">
-<rect x="2.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="22.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="41.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="61.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="80.5" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
-<rect x="100.0" y="2.5" width="17" height="17" fill="#fff" stroke="#000" stroke-width="1.5" rx="2"/>
+<div class="trk"><div class="lbl"><strong>Fatigue</strong> — track size equals Body.</div><svg aria-label="six boxes" class="boxrow" height="22.0" role="img" viewbox="0 0 119.5 22.0" width="119.5">
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="2.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="22.0" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="41.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="61.0" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="80.5" y="2.5"></rect>
+<rect fill="#fff" height="17" rx="2" stroke="#000" stroke-width="1.5" width="17" x="100.0" y="2.5"></rect>
 </svg></div>
 </div>
 <h2 id="scrounge">6. Trackers you already own</h2>
-<p>The printed strips in section 5 work, but anything you can move or stack works better &mdash; a filled
+<p>The printed strips in section 5 work, but anything you can move or stack works better — a filled
 box has to be erased, and a bead just gets picked up. Two lists: things a game shop sells or another game
 already contains, and things that are simply lying around.</p>
-
 <h3>From a game shop, or another game on the shelf</h3>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Item</th><th>Best used as</th><th>Why</th></tr>
 <tr><td><strong>Glass gems / bingo chips</strong></td><td>Boons, Story Beats</td><td>The default. Two colours covers both economies at once, and they stack.</td></tr>
 <tr><td><strong>Wooden cubes</strong> (from almost any Euro board game)</td><td>Clock segments</td><td>Small enough that a [10] clock still fits on a character sheet.</td></tr>
@@ -424,63 +444,59 @@ already contains, and things that are simply lying around.</p>
 <tr><td><strong>Condition rings</strong> (sold for other systems)</td><td>Harm on a miniature</td><td>If you are already using minis, they keep Harm on the figure instead of the sheet.</td></tr>
 <tr><td><strong>Scrabble tiles</strong></td><td>Named clocks</td><td>Spell the clock's name; flip tiles as it fills.</td></tr>
 <tr><td><strong>A dry-erase sleeve</strong></td><td>Everything</td><td>Slide this document in and the trackers in section 5 become reusable.</td></tr>
-</table></div>
-
+</table></div></div>
 <div class="panel panel-gold">
 <strong>A deck of cards is also a d10.</strong>
 <p class="text-sm mt-1">Ace through 10 of one suit, shuffled, is a perfectly uniform ten-sided die: draw
 one, read it, put it back, shuffle. If you would rather not reshuffle between every die, take
-<strong>Ace through 10 in all four suits</strong> &mdash; forty cards &mdash; shuffle, and deal one card per
+<strong>Ace through 10 in all four suits</strong> — forty cards — shuffle, and deal one card per
 die in your pool. That is sampling without replacement, so it is very slightly tighter than real dice
 (drawing a 10 makes the next 10 marginally less likely), but at a pool of eight from forty cards the
 difference is far too small to see across a session. Reshuffle between rolls, not between dice.</p>
-<p class="text-sm">This is worth knowing because Fate's Edge already asks for a deck &mdash; the Crown
+<p class="text-sm">This is worth knowing because Fate's Edge already asks for a deck — the Crown
 Spread and the Deck of Consequences both use one. If you own the cards for those, you own the dice too.</p>
 </div>
-
 <h3>From around the house</h3>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Item</th><th>Best used as</th><th>Note</th></tr>
 <tr><td><strong>Dried beans, rice, pasta</strong></td><td>Boons, Story Beats</td><td>Free, quiet, and endless. Different shapes for different currencies.</td></tr>
 <tr><td><strong>Coins</strong></td><td>Boons, clock segments</td><td>Denominations separate the economies. A stack is also a legible count from a distance.</td></tr>
 <tr><td><strong>Buttons</strong></td><td>Anything</td><td>The classic. A button tin usually has enough variety to give every track its own look.</td></tr>
-<tr><td><strong>Toothpicks or matchsticks</strong></td><td>Clock segments</td><td>Lay them side by side and remove them as the clock fills &mdash; or build the clock up as it advances, which some tables find more legible.</td></tr>
+<tr><td><strong>Toothpicks or matchsticks</strong></td><td>Clock segments</td><td>Lay them side by side and remove them as the clock fills — or build the clock up as it advances, which some tables find more legible.</td></tr>
 <tr><td><strong>Bottle caps, bread tags</strong></td><td>Harm, Fatigue</td><td>Distinct enough that nobody confuses them with the Boon pile.</td></tr>
 <tr><td><strong>Torn paper scraps</strong></td><td>Named clocks</td><td>Write the clock's name on it; tear one corner off per segment.</td></tr>
 <tr><td><strong>Paperclips</strong></td><td>Clock position on a printed strip</td><td>Clip it to the strip and slide it along. Doubles as the spinner arrow in section 1.</td></tr>
-<tr><td><strong>A pencil and a margin</strong></td><td>Everything</td><td>Tally marks have never failed anyone &mdash; though remember the game only uses clocks of 4, 6, 8 and 10, so the usual gate-of-five grouping cuts across every legal size. Group in pairs instead.</td></tr>
-</table></div>
-
+<tr><td><strong>A pencil and a margin</strong></td><td>Everything</td><td>Tally marks have never failed anyone — though remember the game only uses clocks of 4, 6, 8 and 10, so the usual gate-of-five grouping cuts across every legal size. Group in pairs instead.</td></tr>
+</table></div></div>
 <div class="panel panel-blue">
 <p class="text-sm"><strong>One rule for whatever you use.</strong> Boons and Story Beats should never look
 alike. They move in opposite directions and are spent by different people, and the single most common
 tracking mistake at a real table is a player scooping up a Story Beat because it was the same colour as
-their Boons. Different object, different colour, or different side of the table &mdash; pick one and keep
+their Boons. Different object, different colour, or different side of the table — pick one and keep
 it.</p>
 </div>
-
 <h2 id="d6">7. If you have six-siders but not ten</h2>
-<p>A board-game box usually has d6s in it. <a href="../expansions/Fates_-_Edge_-_-The-_-Peoples-_-Die.html"><em>The People's Die</em></a> is a complete d6 conversion of the game &mdash; and if you have no d6s either, here is the wheel for it. Six sectors, same three spinning methods.</p>
-<div class="cut"><svg viewBox="0 0 250 250" width="250" height="250" role="img" aria-label="six-sector spinner" class="wheel">
-<circle cx="125.0" cy="125.0" r="111.0" fill="#fff" stroke="#000" stroke-width="3"/>
-<path d="M125.0,125.0 L125.0,14.0 A111.0,111.0 0 0,1 221.1,69.5 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="163.8" y="57.7" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">1</text>
-<path d="M125.0,125.0 L221.1,69.5 A111.0,111.0 0 0,1 221.1,180.5 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="202.7" y="125.0" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">2</text>
-<path d="M125.0,125.0 L221.1,180.5 A111.0,111.0 0 0,1 125.0,236.0 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="163.8" y="192.3" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">3</text>
-<path d="M125.0,125.0 L125.0,236.0 A111.0,111.0 0 0,1 28.9,180.5 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="86.2" y="192.3" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">4</text>
-<path d="M125.0,125.0 L28.9,180.5 A111.0,111.0 0 0,1 28.9,69.5 Z" fill="#fff" stroke="#000" stroke-width="1.6"/>
-<text x="47.3" y="125.0" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">5</text>
-<path d="M125.0,125.0 L28.9,69.5 A111.0,111.0 0 0,1 125.0,14.0 Z" fill="#ececec" stroke="#000" stroke-width="1.6"/>
-<text x="86.1" y="57.7" text-anchor="middle" dominant-baseline="central" font-size="29" font-weight="700" fill="#000">6</text>
-<circle cx="125.0" cy="125.0" r="5.5" fill="#000"/>
-<circle cx="125.0" cy="125.0" r="12" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="3 3"/>
+<p>A board-game box usually has d6s in it. <a href="../expansions/Fates_-_Edge_-_-The-_-Peoples-_-Die.html"><em>The People's Die</em></a> is a complete d6 conversion of the game — and if you have no d6s either, here is the wheel for it. Six sectors, same three spinning methods.</p>
+<div class="cut"><svg aria-label="six-sector spinner" class="wheel" height="250" role="img" viewbox="0 0 250 250" width="250">
+<circle cx="125.0" cy="125.0" fill="#fff" r="111.0" stroke="#000" stroke-width="3"></circle>
+<path d="M125.0,125.0 L125.0,14.0 A111.0,111.0 0 0,1 221.1,69.5 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="29" font-weight="700" text-anchor="middle" x="163.8" y="57.7">1</text>
+<path d="M125.0,125.0 L221.1,69.5 A111.0,111.0 0 0,1 221.1,180.5 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="29" font-weight="700" text-anchor="middle" x="202.7" y="125.0">2</text>
+<path d="M125.0,125.0 L221.1,180.5 A111.0,111.0 0 0,1 125.0,236.0 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="29" font-weight="700" text-anchor="middle" x="163.8" y="192.3">3</text>
+<path d="M125.0,125.0 L125.0,236.0 A111.0,111.0 0 0,1 28.9,180.5 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="29" font-weight="700" text-anchor="middle" x="86.2" y="192.3">4</text>
+<path d="M125.0,125.0 L28.9,180.5 A111.0,111.0 0 0,1 28.9,69.5 Z" fill="#fff" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="29" font-weight="700" text-anchor="middle" x="47.3" y="125.0">5</text>
+<path d="M125.0,125.0 L28.9,69.5 A111.0,111.0 0 0,1 125.0,14.0 Z" fill="#ececec" stroke="#000" stroke-width="1.6"></path>
+<text dominant-baseline="central" fill="#000" font-size="29" font-weight="700" text-anchor="middle" x="86.1" y="57.7">6</text>
+<circle cx="125.0" cy="125.0" fill="#000" r="5.5"></circle>
+<circle cx="125.0" cy="125.0" fill="none" r="12" stroke="#000" stroke-dasharray="3 3" stroke-width="1"></circle>
 </svg></div>
 <h2 id="print">8. Printing notes</h2>
 <ul class="text-sm">
-<li>Print at 100% &mdash; "fit to page" will shrink the wheel and skew the sectors slightly.</li>
+<li>Print at 100% — "fit to page" will shrink the wheel and skew the sectors slightly.</li>
 <li>Black and white is fine. Nothing in this document carries meaning in colour alone.</li>
 <li>Card or a glued-on cereal box back makes a wheel that lasts; plain paper works for a session.</li>
 <li>The wheel is about 3.5 inches across. Two fit side by side on a sheet if you want a spare.</li>
@@ -490,7 +506,7 @@ put it in a zine, mail it to somebody.</li>
 <div class="panel panel-gold">
 <strong>A note for whoever is running this.</strong>
 <p class="text-sm mt-1">None of the above changes a single rule. The dice pool, the Outcome Matrix,
-Position, Boons and Story Beats are all exactly as written in the core book &mdash; a spinner is just a
+Position, Boons and Story Beats are all exactly as written in the core book — a spinner is just a
 d10 that lies flat, and the table in section 4 is the same distribution the dice produce. A character
 built at a paper table is playable at any other table, and the reverse. That is the whole point: the
 rules were never the part that needed the equipment.</p>
@@ -524,8 +540,7 @@ Title: Session at the bridge
 Content: We promised to return before dawn.
 Tags: session, bridge</pre>
 <p>Check the recipient's campaign connection before importing: these changes use the existing campaign sync and offline queue. Review OCR output carefully. In numeric fields only, O becomes 0 and I, l or | becomes 1; every such repair appears in the preview. Unknown labels, invalid values and repeated fields block the import. Other ambiguous text must be corrected by the transcriber. Import each block once; pending delivery is not a reason to import it again. This flow accepts text, not image uploads.</p>
-
-<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
-<div style="font-size:.75rem;color:var(--text3);text-align:center;padding:1rem 0">The Paper Table &mdash; a Fate's Edge resource<br>&copy; Nicholas A. Gasper &mdash; CC BY-NC-SA 4.0</div>
-</body>
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0"/>
+<div style="font-size:.75rem;color:var(--text3);text-align:center;padding:1rem 0">The Paper Table — a Fate's Edge resource<br/>© Nicholas A. Gasper — CC BY-NC-SA 4.0</div>
+</article></body>
 </html>

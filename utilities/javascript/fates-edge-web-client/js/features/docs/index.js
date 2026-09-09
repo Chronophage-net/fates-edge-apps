@@ -46,6 +46,8 @@ import { printWithChromeHidden } from '@core/print.js';
 const PRINTABLE_DOC_IDS = new Set([
     'systems_reference_document', 'srd', 'essentials', 'campfire_mode',
     'the_paper_table', 'the_peoples_die', 'paper_import_reference',
+    // The author also designates the GM screen as a printable table aid.
+    'game_master_screen', 'essential_gm_screen',
 ]);
 
 // ============================================================
@@ -95,7 +97,7 @@ const DOC_TYPES = {
         label: '🗺️ Travel',
         folder: 'travel',
         icon: '🗺️',
-        description: 'World guides, regional information, and travel content'
+        description: 'The setting: worldbooks, regions, and journeys'
     },
     design: {
         label: '🎨 Design',
@@ -444,15 +446,11 @@ export function render(el) {
 
     container.innerHTML = `
         <style>
-            /* One category showing at a time, as a tile pane -- 6 columns
-               on wide screens, capped to roughly two rows tall (~12 tiles
-               visible) with its own vertical scrollbar for anything past
-               that. Selecting a different category in the dropdown swaps
-               the whole pane's contents rather than everything living in
-               one long, ever-growing accordion. */
+            /* Fit columns to the pane's available width, including when
+               the app sidebar leaves less space than the viewport. */
             .doc-grid {
                 display: grid;
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
                 grid-auto-rows: minmax(160px, auto);
                 gap: 0.75rem;
                 padding: 0.5rem 0.2rem 1rem 0.2rem;
@@ -460,14 +458,12 @@ export function render(el) {
                 overflow-y: auto;
                 overflow-x: hidden;
             }
-            @media (max-width: 1100px) { .doc-grid { grid-template-columns: repeat(4, 1fr); } }
-            @media (max-width: 700px)  { .doc-grid { grid-template-columns: repeat(2, 1fr); } }
-            @media (max-width: 420px)  { .doc-grid { grid-template-columns: 1fr; } }
-            .doc-card { width: 100%; }
+            .doc-grid .doc-card { width: 100%; min-width: 0; max-width: none; box-sizing: border-box; }
         </style>
         <h1 class="page-title" data-i18n="feature.docs.documentLibrary">📄 Document Library</h1>
         <p class="page-sub" data-i18n="feature.docs.browseUploadAndManageYourFateS">Browse, upload, and manage your Fate's Edge documents.</p>
 
+        <p><button class="btn btn-primary" id="doc-reading-guide" data-i18n="feature.docs.readingGuide">🧭 Reading guide — where to start</button></p>
         <!-- Toolbar -->
         <div class="docs-toolbar" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:0.6rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1rem;">
             <button class="btn btn-sm btn-primary" id="doc-upload-btn" data-i18n="feature.docs.uploadDoc">📤 Upload Doc</button>
@@ -946,6 +942,7 @@ function setupThemeObserver() {
 // ============================================================
 
 function attachDocEvents() {
+    document.getElementById('doc-reading-guide')?.addEventListener('click', () => loadDocument('/data/docs/resources/Reading-Guide.html'));
     const typeFilter = document.getElementById('docsTypeFilter');
     const searchInput = document.getElementById('docsSearchInput');
     const clearBtn = document.getElementById('docsClearFiltersBtn');
@@ -1443,7 +1440,47 @@ function hideChapterNav() {
     if (nav) nav.style.display = 'none';
 }
 
-function loadBookChapter(doc, chapterIndex, preserveTheme = false) {
+// Resolve chapter links against their document, not the toolkit's index URL.
+function wireDocumentLinks(viewer, docPath) {
+    const base = new URL(docPath, window.location.href);
+    viewer.querySelectorAll('a[href]').forEach(link => {
+        const raw = link.getAttribute('href');
+        let target;
+        try { target = new URL(raw, base); } catch { return; }
+        if (!['http:', 'https:'].includes(target.protocol)) return;
+        link.href = target.href;
+        if (target.origin !== base.origin) return;
+        link.addEventListener('click', event => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            let anchor;
+            try { anchor = decodeURIComponent(target.hash.slice(1)); } catch { return; }
+            if (target.pathname === base.pathname) {
+                event.preventDefault();
+                scrollDocumentAnchor(viewer, anchor);
+                return;
+            }
+            const book = allDocs.find(item => item.book && item.pages?.some(page =>
+                new URL(item.path + page.file, base).pathname === target.pathname));
+            if (!book) {
+                if (target.pathname.startsWith(DOCS_BASE_PATH) && /\.html?$/i.test(target.pathname)) {
+                    event.preventDefault();
+                    loadDocument(target.pathname, false, anchor);
+                }
+                return;
+            }
+            const index = book.pages.findIndex(page => new URL(book.path + page.file, base).pathname === target.pathname);
+            event.preventDefault();
+            loadBookChapter(book, index, false, anchor);
+        });
+    });
+}
+
+function scrollDocumentAnchor(viewer, anchor) {
+    const target = anchor ? Array.from(viewer.querySelectorAll('[id]')).find(el => el.id === anchor) : viewer;
+    target?.scrollIntoView({ block: 'start' });
+}
+
+function loadBookChapter(doc, chapterIndex, preserveTheme = false, anchor = '') {
     if (!doc || !Array.isArray(doc.pages) || !doc.pages[chapterIndex]) return;
 
     currentBookDoc = doc;
@@ -1461,6 +1498,8 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false) {
 
     viewerContainer.style.display = 'block';
     updateChapterNav(doc, chapterIndex);
+    const printBtn = document.getElementById('doc-print-btn');
+    if (printBtn) printBtn.style.display = PRINTABLE_DOC_IDS.has(doc.id) ? '' : 'none';
     titleEl.textContent = preserveTheme ? titleEl.textContent : 'Loading…';
     if (!preserveTheme) {
         viewer.innerHTML = '<div class="loading" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text2);font-style:italic;padding:2rem;">Loading chapter…</div>';
@@ -1485,6 +1524,8 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false) {
             }
             const sanitized = sanitizeHtml(html);
             viewer.innerHTML = injectThemeAndStyles(sanitized, chapterPath);
+            wireDocumentLinks(viewer, chapterPath);
+            if (anchor || !preserveTheme) scrollDocumentAnchor(viewer, anchor);
             titleEl.textContent = i18nText("feature.docs.valueValueValue", { value0: doc.title, value1: chapter.label ? `${chapter.label}: ` : '', value2: chapter.title }, "{{value0}} — {{value1}}{{value2}}");
             if (!preserveTheme) {
                 showToast(i18nText("feature.docs.loadedValue", { value0: chapter.title }, "📖 Loaded: {{value0}}"), 'success');
@@ -1508,7 +1549,7 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false) {
 // LOAD DOCUMENT
 // ============================================================
 
-export function loadDocument(docPath, preserveTheme = false) {
+export function loadDocument(docPath, preserveTheme = false, anchor = '') {
     currentDocPath = docPath;
     currentBookDoc = null;
     currentChapterIndex = -1;
@@ -1655,6 +1696,8 @@ export function loadDocument(docPath, preserveTheme = false) {
             const sanitized = sanitizeHtml(html);
             const themedHtml = injectThemeAndStyles(sanitized, fetchPath);
             viewer.innerHTML = themedHtml;
+            wireDocumentLinks(viewer, fetchPath);
+            if (anchor || !preserveTheme) scrollDocumentAnchor(viewer, anchor);
 
             if (doc) {
                 titleEl.textContent = doc.title;

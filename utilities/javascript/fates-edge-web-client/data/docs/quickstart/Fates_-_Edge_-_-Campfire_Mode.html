@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Fate's Edge — Campfire Mode</title>
 <style>
     :root {
@@ -100,208 +101,206 @@
     hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
     footer { text-align: center; color: var(--text3); font-size: 0.8rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
 </style>
-</head>
-<body>
-
-<h1>Campfire Mode</h1>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Quickstart · entry point</strong></p><p>Read this document’s stated scope before using it. A quickstart is a starting point; follow its references when you need detail, and keep the full rules available for questions that a short introduction does not cover.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Campfire Mode</a></li><li><a href="#base-character">The Base Character (for everyone)</a></li><li><a href="#resolution-loop">The Resolution Loop</a></li><li><a href="#two-treasuries">The Two Treasuries</a></li><li><a href="#expansion-packs">Expansion Packs (add complexity later)</a></li><li><a href="#gm-tips">GM Tips for Mixed-Experience Tables</a></li><li><a href="#quick-reference">Quick Reference (for kids &amp; everyone)</a></li></ul></details>
+<h1 id="reader-section-1">Campfire Mode</h1>
 <p class="subtitle">One table, any playstyle — a guide for mixed-ability groups</p>
-
 <div class="panel panel-gold">
-    <div class="panel-title">The Golden Rule</div>
-    <p><strong>Everyone at this table uses the exact same dice roll.</strong> Pick your <strong>Attribute</strong> + <strong>Skill</strong>. Roll that many d10s. Count <strong>6&ndash;9</strong> as 1 success, <strong>10</strong> as 2 successes, and every <strong>1</strong> as a Story Beat for the GM. Compare your successes to the <strong>Difficulty Value (DV)</strong> the GM set.</p>
-    <p class="text-muted text-sm">That's it. The dice always speak the same language, whether the character sheet behind them is one line or ten.</p>
-    <p class="text-muted text-sm">Every word on this page is a real word from the full rules. Campfire Mode does not use a simpler <em>vocabulary</em> &mdash; it uses <em>fewer</em> of the same things. Nothing here has to be unlearned later.</p>
+<div class="panel-title">The Golden Rule</div>
+<p><strong>Everyone at this table uses the exact same dice roll.</strong> Pick your <strong>Attribute</strong> + <strong>Skill</strong>. Roll that many d10s. Count <strong>6–9</strong> as 1 success, <strong>10</strong> as 2 successes, and every <strong>1</strong> as a Story Beat for the GM. Compare your successes to the <strong>Difficulty Value (DV)</strong> the GM set.</p>
+<p class="text-muted text-sm">That's it. The dice always speak the same language, whether the character sheet behind them is one line or ten.</p>
+<p class="text-muted text-sm">Every word on this page is a real word from the full rules. Campfire Mode does not use a simpler <em>vocabulary</em> — it uses <em>fewer</em> of the same things. Nothing here has to be unlearned later.</p>
 </div>
-
 <h2 id="base-character">The Base Character <span class="text-muted text-sm">(for everyone)</span></h2>
 <p>Fits on an index card. Distribute <strong>1, 2, 2, 3</strong> among the four attributes.</p>
-
 <h3>1. Pick Your Stats</h3>
 <div class="panel">
-    <dl>
-        <dt>Body</dt>
-        <dd>Being strong, tough, and athletic.</dd>
-        <dt>Wits</dt>
-        <dd>Being quick, sneaky, and perceptive.</dd>
-        <dt>Spirit</dt>
-        <dd>Being brave, focused, and magical.</dd>
-        <dt>Presence</dt>
-        <dd>Being charming, scary, and commanding.</dd>
-    </dl>
+<dl>
+<dt>Body</dt>
+<dd>Being strong, tough, and athletic.</dd>
+<dt>Wits</dt>
+<dd>Being quick, sneaky, and perceptive.</dd>
+<dt>Spirit</dt>
+<dd>Being brave, focused, and magical.</dd>
+<dt>Presence</dt>
+<dd>Being charming, scary, and commanding.</dd>
+</dl>
 </div>
-
 <h3>2. Pick Your Skills <span class="text-muted text-sm">(6 points, max 2 per skill)</span></h3>
 <div class="panel">
-    <ul>
-        <li><strong>Melee</strong> &mdash; sword, axe, spear, or fists</li>
-        <li><strong>Athletics</strong> &mdash; climb, run, swim, sneak, keep going</li>
-        <li><strong>Sway</strong> &mdash; persuade, lie, perform, command a room</li>
-        <li><strong>Insight</strong> &mdash; spot clues, read people, know things</li>
-        <li><strong>Arcana</strong> &mdash; weave spells, read runes, work rites</li>
-        <li><strong>Craft</strong> &mdash; pick locks, build traps, fix gear, mend a body</li>
-    </ul>
+<ul>
+<li><strong>Melee</strong> — sword, axe, spear, or fists</li>
+<li><strong>Athletics</strong> — climb, run, swim, sneak, keep going</li>
+<li><strong>Sway</strong> — persuade, lie, perform, command a room</li>
+<li><strong>Insight</strong> — spot clues, read people, know things</li>
+<li><strong>Arcana</strong> — weave spells, read runes, work rites</li>
+<li><strong>Craft</strong> — pick locks, build traps, fix gear, mend a body</li>
+</ul>
 </div>
-<p class="text-sm">The full game has <strong>twelve</strong> skills. These six are those twelve gathered into groups, so each one you learn here is a real skill with a real name &mdash; you never have to trade in a word. When you want finer control, the group splits:</p>
+<p class="text-sm">The full game has <strong>twelve</strong> skills. These six are those twelve gathered into groups, so each one you learn here is a real skill with a real name — you never have to trade in a word. When you want finer control, the group splits:</p>
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead><tr><th>Here</th><th>Splits into</th></tr></thead>
 <tbody>
-<tr><td><strong>Melee</strong></td><td>Melee &middot; <em>Ranged</em></td></tr>
-<tr><td><strong>Athletics</strong></td><td>Athletics &middot; <em>Stealth</em> &middot; <em>Endurance</em></td></tr>
-<tr><td><strong>Sway</strong></td><td>Sway &middot; <em>Deception</em> &middot; <em>Performance</em></td></tr>
-<tr><td><strong>Insight</strong></td><td>Insight &middot; <em>Lore</em></td></tr>
+<tr><td><strong>Melee</strong></td><td>Melee · <em>Ranged</em></td></tr>
+<tr><td><strong>Athletics</strong></td><td>Athletics · <em>Stealth</em> · <em>Endurance</em></td></tr>
+<tr><td><strong>Sway</strong></td><td>Sway · <em>Deception</em> · <em>Performance</em></td></tr>
+<tr><td><strong>Insight</strong></td><td>Insight · <em>Lore</em></td></tr>
 <tr><td><strong>Arcana</strong></td><td>Arcana (rites use <em>Spirit + Lore</em> in the full game)</td></tr>
 <tr><td><strong>Craft</strong></td><td>Craft</td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
 <p class="text-sm text-muted">So a bow is Melee here and Ranged there; sneaking is Athletics here and Stealth there. Same character, finer grain.</p>
-
 <h3>Health Track (Stamina + Wounds)</h3>
 <div class="panel">
-    <ul>
-        <li><strong>Fatigue</strong> &mdash; you get tired. Track = your <strong>Body</strong>. Mark it when you push hard. <strong>Each mark drops your Spot by one step</strong> (see below): tired people are in worse trouble. A night's sleep clears all of it.</li>
-        <li><strong>Harm</strong> &mdash; you get hurt. <strong>Harm 1</strong> = &minus;1 die on anything the wound touches. <strong>Harm 2</strong> = &minus;1 die on nearly everything until you are patched up. <strong>Harm 3</strong> = down and out of the fight.</li>
-    </ul>
+<ul>
+<li><strong>Fatigue</strong> — you get tired. Track = your <strong>Body</strong>. Mark it when you push hard. <strong>Each mark drops your Spot by one step</strong> (see below): tired people are in worse trouble. A night's sleep clears all of it.</li>
+<li><strong>Harm</strong> — you get hurt. <strong>Harm 1</strong> = −1 die on anything the wound touches. <strong>Harm 2</strong> = −1 die on nearly everything until you are patched up. <strong>Harm 3</strong> = down and out of the fight.</li>
+</ul>
 </div>
-
 <h2 id="resolution-loop">The Resolution Loop</h2>
 <div class="panel">
-    <ol>
-        <li><strong>Step 1:</strong> The GM sets the scene. &ldquo;What do you do?&rdquo;</li>
-        <li><strong>Step 2:</strong> Pick your <strong>Attribute + Skill</strong>.</li>
-        <li><strong>Step 3:</strong> The GM says the Difficulty Value (<strong>DV</strong>) and your <strong>Spot</strong>.
+<ol>
+<li><strong>Step 1:</strong> The GM sets the scene. “What do you do?”</li>
+<li><strong>Step 2:</strong> Pick your <strong>Attribute + Skill</strong>.</li>
+<li><strong>Step 3:</strong> The GM says the Difficulty Value (<strong>DV</strong>) and your <strong>Spot</strong>.
             <ul>
-                <li><strong>DV 2</strong> &mdash; Easy (kick open a rickety door)</li>
-                <li><strong>DV 3</strong> &mdash; Normal (fight a guard)</li>
-                <li><strong>DV 4</strong> &mdash; Hard (climb a cliff in the rain)</li>
-                <li><strong>DV 5</strong> &mdash; Extreme (convince a king to surrender)</li>
-            </ul>
-            <p class="text-sm text-muted" style="margin:.3rem 0 0;"><strong>There is no DV 6.</strong> If something is harder than Extreme, it isn't a bigger number &mdash; it's several rolls, a worse Spot, or just &ldquo;no&rdquo;.</p>
-        </li>
-        <li><strong>Step 4:</strong> Roll the dice!</li>
-        <li><strong>Step 5:</strong> Look at the result (see table below).</li>
-    </ol>
+<li><strong>DV 2</strong> — Easy (kick open a rickety door)</li>
+<li><strong>DV 3</strong> — Normal (fight a guard)</li>
+<li><strong>DV 4</strong> — Hard (climb a cliff in the rain)</li>
+<li><strong>DV 5</strong> — Extreme (convince a king to surrender)</li>
+</ul>
+<p class="text-sm text-muted" style="margin:.3rem 0 0;"><strong>There is no DV 6.</strong> If something is harder than Extreme, it isn't a bigger number — it's several rolls, a worse Spot, or just “no”.</p>
+</li>
+<li><strong>Step 4:</strong> Roll the dice!</li>
+<li><strong>Step 5:</strong> Look at the result (see table below).</li>
+</ol>
 </div>
-
 <div class="panel panel-blue">
-    <div class="panel-title">Your Spot <span class="text-muted text-sm">(the full game calls this Position)</span></div>
-    <p class="text-sm">Before you roll, the GM says what kind of spot you're in. It doesn't change your dice &mdash; it changes what the dice are allowed to do to you.</p>
-    <ul class="text-sm">
-        <li><strong>Dominant</strong> &mdash; a good spot. Re-roll <em>one</em> die that failed.</li>
-        <li><strong>Controlled</strong> &mdash; a normal spot. Roll as they land.</li>
-        <li><strong>Desperate</strong> &mdash; a bad spot. Re-roll <em>one</em> die that succeeded. (Never a 10 &mdash; a 10 is yours to keep.)</li>
-    </ul>
-    <p class="text-sm text-muted" style="margin:0;">The ladder stops at both ends. Nothing is better than Dominant or worse than Desperate, and extra advantages never turn into extra dice. <strong>Re-rolling a 1 does not take back the Story Beat it already gave the GM</strong> &mdash; and if it comes up 1 again, that's another one.</p>
+<div class="panel-title">Your Spot <span class="text-muted text-sm">(the full game calls this Position)</span></div>
+<p class="text-sm">Before you roll, the GM says what kind of spot you're in. It doesn't change your dice — it changes what the dice are allowed to do to you.</p>
+<ul class="text-sm">
+<li><strong>Dominant</strong> — a good spot. Re-roll <em>one</em> die that failed.</li>
+<li><strong>Controlled</strong> — a normal spot. Roll as they land.</li>
+<li><strong>Desperate</strong> — a bad spot. Re-roll <em>one</em> die that succeeded. (Never a 10 — a 10 is yours to keep.)</li>
+</ul>
+<p class="text-sm text-muted" style="margin:0;">The ladder stops at both ends. Nothing is better than Dominant or worse than Desperate, and extra advantages never turn into extra dice. <strong>Re-rolling a 1 does not take back the Story Beat it already gave the GM</strong> — and if it comes up 1 again, that's another one.</p>
 </div>
-
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead>
-<tr><th>Roll Result</th><th>What Happens</th><th>You Get&hellip;</th></tr>
+<tr><th>Roll Result</th><th>What Happens</th><th>You Get…</th></tr>
 </thead>
 <tbody>
-<tr><td><strong>Hit</strong> (Successes &ge; DV)</td><td>You do it! No problem.</td><td>Nothing extra.</td></tr>
-<tr><td><strong>Success with SB</strong> (Successes &ge; DV, and you rolled at least one 1)</td><td>You do it! &hellip;but <em>something</em> goes wrong.</td><td>Nothing extra for you.</td></tr>
+<tr><td><strong>Hit</strong> (Successes ≥ DV)</td><td>You do it! No problem.</td><td>Nothing extra.</td></tr>
+<tr><td><strong>Success with SB</strong> (Successes ≥ DV, and you rolled at least one 1)</td><td>You do it! …but <em>something</em> goes wrong.</td><td>Nothing extra for you.</td></tr>
 <tr><td><strong>Partial</strong> (0 &lt; Successes &lt; DV)</td><td>You <em>sort of</em> do it, but it costs you.</td><td>You get 1 <span class="badge badge-gold">Boon</span> (luck coin)</td></tr>
 <tr><td><strong>Miss</strong> (Successes = 0)</td><td>You don't do it. Things get worse.</td><td>You get 2 <span class="badge badge-gold">Boons</span></td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
-<p class="text-sm"><strong>Story Beats are counted separately, every time.</strong> Each <strong>1</strong> on the table gives the GM one <span class="badge badge-red">Story Beat</span> &mdash; on a hit, on a miss, on anything. That is the only place they come from, and three 1s means three of them. The outcome row tells you what <em>you</em> get; the 1s tell you what the <em>GM</em> gets.</p>
-
+<p class="text-sm"><strong>Story Beats are counted separately, every time.</strong> Each <strong>1</strong> on the table gives the GM one <span class="badge badge-red">Story Beat</span> — on a hit, on a miss, on anything. That is the only place they come from, and three 1s means three of them. The outcome row tells you what <em>you</em> get; the 1s tell you what the <em>GM</em> gets.</p>
 <h2 id="two-treasuries">The Two Treasuries</h2>
 <div class="panel panel-gold">
-    <div class="panel-title">Player's Boons <span class="text-muted text-sm">(luck coins)</span></div>
-    <ul>
-        <li>Get them on <strong>Partial</strong> (1) or <strong>Miss</strong> (2).</li>
-        <li>Hold up to <strong>5</strong>. At the end of each scene, drop back to <strong>2</strong> &mdash; luck does not keep.</li>
-        <li><strong>Spend 1</strong> to: re-roll a die you already rolled, improve your <strong>Spot</strong> by one step <em>before</em> you roll, or switch on a special item or pet.</li>
-        <li class="text-muted text-sm">Note that a Boon buys you a better <em>Spot</em>, never extra dice. Your dice are your Attribute + Skill and nothing else &mdash; that is what keeps everyone's rolls readable at one table.</li>
-        <li class="text-muted text-sm">(Veterans: convert 2 Boons &rarr; 1 XP at end of session!)</li>
-    </ul>
+<div class="panel-title">Player's Boons <span class="text-muted text-sm">(luck coins)</span></div>
+<ul>
+<li>Get them on <strong>Partial</strong> (1) or <strong>Miss</strong> (2).</li>
+<li>Hold up to <strong>5</strong>. At the end of each scene, drop back to <strong>2</strong> — luck does not keep.</li>
+<li><strong>Spend 1</strong> to: re-roll a die you already rolled, improve your <strong>Spot</strong> by one step <em>before</em> you roll, or switch on a special item or pet.</li>
+<li class="text-muted text-sm">Note that a Boon buys you a better <em>Spot</em>, never extra dice. Your dice are your Attribute + Skill and nothing else — that is what keeps everyone's rolls readable at one table.</li>
+<li class="text-muted text-sm">(Veterans: convert 2 Boons → 1 XP at end of session!)</li>
+</ul>
 </div>
 <div class="panel panel-red">
-    <div class="panel-title">GM's Story Beats <span class="text-muted text-sm">(trouble tokens)</span></div>
-    <ul>
-        <li>Get one for <strong>every 1</strong> the players roll. Always. They bank up.</li>
-        <li><strong>Spend 1</strong> &mdash; &ldquo;A guard turns around.&rdquo; (a nudge, or tick a timer)</li>
-        <li><strong>Spend 2</strong> &mdash; &ldquo;The alarm goes up.&rdquo; (you lose your Spot, or a small enemy arrives)</li>
-        <li><strong>Spend 3</strong> &mdash; &ldquo;Reinforcements. Real ones.&rdquo; (something serious breaks)</li>
-        <li><strong>Spend 4+</strong> &mdash; &ldquo;The floor collapses!&rdquo; (the scene turns over)</li>
-    </ul>
+<div class="panel-title">GM's Story Beats <span class="text-muted text-sm">(trouble tokens)</span></div>
+<ul>
+<li>Get one for <strong>every 1</strong> the players roll. Always. They bank up.</li>
+<li><strong>Spend 1</strong> — “A guard turns around.” (a nudge, or tick a timer)</li>
+<li><strong>Spend 2</strong> — “The alarm goes up.” (you lose your Spot, or a small enemy arrives)</li>
+<li><strong>Spend 3</strong> — “Reinforcements. Real ones.” (something serious breaks)</li>
+<li><strong>Spend 4+</strong> — “The floor collapses!” (the scene turns over)</li>
+</ul>
 </div>
-
 <h2 id="expansion-packs">Expansion Packs <span class="text-muted text-sm">(add complexity later)</span></h2>
 <p>Players who want to keep it simple just use the Base Character above. Players who want more crunch can pick one of these packs.</p>
-
 <div class="panel panel-blue">
-    <div class="panel-title">Pack 1: The Talented <span class="text-muted text-sm">(simple feats)</span></div>
-    <ul>
-        <li><strong>Pick 3 cool things</strong> your character is great at. (e.g. &ldquo;Duelist: +1 die when fighting one enemy&rdquo;, &ldquo;Thief: pick any normal lock without rolling&rdquo;)</li>
-        <li><strong>Mechanic:</strong> When you use a Stunt, you just say &ldquo;I use my X&rdquo; and roll with advantage (e.g. +1 die, or ignore a negative modifier).</li>
-    </ul>
+<div class="panel-title">Pack 1: The Talented <span class="text-muted text-sm">(simple feats)</span></div>
+<ul>
+<li><strong>Pick 3 cool things</strong> your character is great at. (e.g. “Duelist: +1 die when fighting one enemy”, “Thief: pick any normal lock without rolling”)</li>
+<li><strong>Mechanic:</strong> When you use a Stunt, you just say “I use my X” and roll with advantage (e.g. +1 die, or ignore a negative modifier).</li>
+</ul>
 </div>
-
 <div class="panel panel-blue">
-    <div class="panel-title">Pack 2: The Free Caster <span class="text-muted text-sm">(easy magic)</span></div>
-    <ul>
-        <li>You know <strong>2 simple spells</strong> (e.g. <em>Fire Bolt</em>, <em>Healing Touch</em>).</li>
-        <li>Roll <strong>Wits + Arcana</strong>. DV is usually <strong>3</strong> for a cool trick, <strong>4</strong> for a big blast.</li>
-        <li><strong>Backlash:</strong> If you roll a <strong>1</strong>, the GM does something annoying (your robe catches fire, you get pushed back). Improvise it!</li>
-    </ul>
+<div class="panel-title">Pack 2: The Free Caster <span class="text-muted text-sm">(easy magic)</span></div>
+<ul>
+<li>You know <strong>2 simple spells</strong> (e.g. <em>Fire Bolt</em>, <em>Healing Touch</em>).</li>
+<li>Roll <strong>Wits + Arcana</strong>. DV is usually <strong>3</strong> for a cool trick, <strong>4</strong> for a big blast.</li>
+<li><strong>Backlash:</strong> If you roll a <strong>1</strong>, the GM does something annoying (your robe catches fire, you get pushed back). Improvise it!</li>
+</ul>
 </div>
-
 <div class="panel panel-blue">
-    <div class="panel-title">Pack 3: The Runekeeper <span class="text-muted text-sm">(obligation)</span></div>
-    <ul>
-        <li>You made a deal with a patron. You have <strong>3 special moves</strong> (Rites).</li>
-        <li>To use a Rite: roll <strong>Spirit + Arcana</strong> (DV 3). <span class="text-muted text-sm">(The full game rolls rites on Spirit + Lore.)</span></li>
-        <li><strong>Obligation:</strong> Mark a box (track = Spirit + Presence). If it fills, take 1 Fatigue. Clear it by doing a small favor for your patron.</li>
-    </ul>
+<div class="panel-title">Pack 3: The Runekeeper <span class="text-muted text-sm">(obligation)</span></div>
+<ul>
+<li>You made a deal with a patron. You have <strong>3 special moves</strong> (Rites).</li>
+<li>To use a Rite: roll <strong>Spirit + Arcana</strong> (DV 3). <span class="text-muted text-sm">(The full game rolls rites on Spirit + Lore.)</span></li>
+<li><strong>Obligation:</strong> Mark a box (track = Spirit + Presence). If it fills, take 1 Fatigue. Clear it by doing a small favor for your patron.</li>
+</ul>
 </div>
-
 <div class="panel panel-blue">
-    <div class="panel-title">Pack 4: The Summoner <span class="text-muted text-sm">(monster buddy)</span></div>
-    <ul>
-        <li>You have a cool monster buddy (spirit). <strong>Summon it:</strong> spend 1 Boon (or take 1 Fatigue).</li>
-        <li>The buddy has <strong>3 Health</strong> (Leash). It can do one simple thing per round (attack, scout, carry).</li>
-        <li>If it gets hit, it loses 1 Health. If it loses all Health, it vanishes and you take 1 Fatigue.</li>
-        <li><em>Veteran upgrade:</em> track a full &ldquo;Leash&rdquo; track &mdash; but for kids, it's just &ldquo;pet with 3 HP.&rdquo;</li>
-    </ul>
+<div class="panel-title">Pack 4: The Summoner <span class="text-muted text-sm">(monster buddy)</span></div>
+<ul>
+<li>You have a cool monster buddy (spirit). <strong>Summon it:</strong> spend 1 Boon (or take 1 Fatigue).</li>
+<li>The buddy has <strong>3 Health</strong> (Leash). It can do one simple thing per round (attack, scout, carry).</li>
+<li>If it gets hit, it loses 1 Health. If it loses all Health, it vanishes and you take 1 Fatigue.</li>
+<li><em>Veteran upgrade:</em> track a full “Leash” track — but for kids, it's just “pet with 3 HP.”</li>
+</ul>
 </div>
-
 <div class="panel panel-blue">
-    <div class="panel-title">Pack 5: The Prodigy <span class="text-muted text-sm">(great at one thing)</span></div>
-    <ul>
-        <li>Instead of <strong>1, 2, 2, 3</strong>, spread your attributes <strong>1, 2, 2, 4</strong>. You are better at one thing than anyone your age has any business being.</li>
-        <li><strong>That 4 does not go up.</strong> It is already as good as it gets for a long while. Everything else about you improves normally; the gift waits.</li>
-        <li><strong>People notice.</strong> The GM starts every scene with <strong>1 extra Story Beat</strong> to spend on you being noticed &mdash; someone who wants to test you, hire you, beat you, or warn you.</li>
-        <li>Pick this at the start or not at all. You cannot decide later that you were always gifted.</li>
-    </ul>
+<div class="panel-title">Pack 5: The Prodigy <span class="text-muted text-sm">(great at one thing)</span></div>
+<ul>
+<li>Instead of <strong>1, 2, 2, 3</strong>, spread your attributes <strong>1, 2, 2, 4</strong>. You are better at one thing than anyone your age has any business being.</li>
+<li><strong>That 4 does not go up.</strong> It is already as good as it gets for a long while. Everything else about you improves normally; the gift waits.</li>
+<li><strong>People notice.</strong> The GM starts every scene with <strong>1 extra Story Beat</strong> to spend on you being noticed — someone who wants to test you, hire you, beat you, or warn you.</li>
+<li>Pick this at the start or not at all. You cannot decide later that you were always gifted.</li>
+</ul>
 </div>
-
 <h2 id="gm-tips">GM Tips for Mixed-Experience Tables</h2>
 <div class="panel">
-    <p><strong>1. The Spotlight Shift</strong><br>
+<p><strong>1. The Spotlight Shift</strong><br/>
     Rotate the spotlight. Let the simple Fighter roll a huge <strong>Body + Melee</strong>. Then let the complex Summoner roll <strong>Spirit + Arcana</strong>. They both roll the same dice, but the narrative looks different.</p>
-
-    <p><strong>2. Color the Consequences</strong><br>
-    When the simple player rolls a 1, the problem is physical (&ldquo;Your sword gets stuck&rdquo;). When the complex player rolls a 1, the problem is mystical (&ldquo;Your patron glares at you&rdquo;).</p>
-
-    <p><strong>3. The &ldquo;Fiction First&rdquo; Rule</strong><br>
-    If a player doesn't understand their Rite, revert to the core rule. <em>&ldquo;What do you want to happen?&rdquo;</em> &rarr; &ldquo;I want to make the enemy fall asleep.&rdquo; &rarr; &ldquo;Cool. Roll Spirit + Arcana. DV 3. If you hit, they sleep. If you roll a 1, they get angry.&rdquo;</p>
-
-    <p><strong>4. Don't Track Resources for Everyone</strong><br>
+<p><strong>2. Color the Consequences</strong><br/>
+    When the simple player rolls a 1, the problem is physical (“Your sword gets stuck”). When the complex player rolls a 1, the problem is mystical (“Your patron glares at you”).</p>
+<p><strong>3. The “Fiction First” Rule</strong><br/>
+    If a player doesn't understand their Rite, revert to the core rule. <em>“What do you want to happen?”</em> → “I want to make the enemy fall asleep.” → “Cool. Roll Spirit + Arcana. DV 3. If you hit, they sleep. If you roll a 1, they get angry.”</p>
+<p><strong>4. Don't Track Resources for Everyone</strong><br/>
     The kid tracks Boons + Fatigue. The veteran tracks Boons, Fatigue, Leash, <em>and</em> Obligation. That's their job, not yours.</p>
-
-    <p><strong>5. End of Session</strong><br>
+<p><strong>5. End of Session</strong><br/>
     Give everyone the <strong>same XP</strong> (e.g. 6 XP). The kid buys a new Stunt; the veteran buys a new Rite. They progress together.</p>
 </div>
-
 <h2 id="quick-reference">Quick Reference <span class="text-muted text-sm">(for kids &amp; everyone)</span></h2>
 <div class="table-wrap">
-<table>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <thead>
 <tr><th>Action</th><th>Roll</th></tr>
 </thead>
@@ -320,23 +319,18 @@
 <tr><td>Remember an old story</td><td>Wits + Insight</td></tr>
 <tr><td>Lift a heavy gate</td><td>Body + Athletics</td></tr>
 </tbody>
-</table>
+</table></div>
 </div>
-
 <div class="panel">
-    <span class="badge badge-green">6&ndash;9</span> = 1 Success &nbsp;&nbsp;
-    <span class="badge badge-gold">10</span> = 2 Successes &nbsp;&nbsp;
+<span class="badge badge-green">6–9</span> = 1 Success   
+    <span class="badge badge-gold">10</span> = 2 Successes   
     <span class="badge badge-red">1</span> = 1 Story Beat for the GM (every time)
 </div>
-
-<hr>
-
+<hr/>
 <blockquote>
-    &ldquo;The road remembers every traveler, no matter how they walk it.&rdquo;
-    <span class="attribution">Start simple. If the kid wants to learn Summoner later, let them &ldquo;upgrade&rdquo; mid-campaign. If the veteran wants to play a basic Fighter to take a break, let them do that too.</span>
+    “The road remembers every traveler, no matter how they walk it.”
+    <span class="attribution">Start simple. If the kid wants to learn Summoner later, let them “upgrade” mid-campaign. If the veteran wants to play a basic Fighter to take a break, let them do that too.</span>
 </blockquote>
-
 <footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-
-</body>
+</article></body>
 </html>

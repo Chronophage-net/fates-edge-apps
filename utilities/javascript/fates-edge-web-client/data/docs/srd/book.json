@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "id": "srd",
+  "title": "Fate’s Edge SRD",
+  "subtitle": "Core rules and linked references",
+  "index": "index.html",
+  "chapters": [
+    {
+      "file": "index.html",
+      "label": "Start here",
+      "title": "Start here: the core mechanic"
+    },
+    {
+      "file": "characters.html",
+      "label": "Reference",
+      "title": "Character creation and advancement"
+    },
+    {
+      "file": "combat.html",
+      "label": "Reference",
+      "title": "Equipment, combat, and recovery"
+    },
+    {
+      "file": "running-the-game.html",
+      "label": "Reference",
+      "title": "Running the game"
+    },
+    {
+      "file": "talents.html",
+      "label": "Reference",
+      "title": "Talent reference"
+    },
+    {
+      "file": "magic.html",
+      "label": "Reference",
+      "title": "Magic: choosing and using a path"
+    },
+    {
+      "file": "tags.html",
+      "label": "Reference",
+      "title": "Magic tags and effects"
+    },
+    {
+      "file": "rites-and-summoning.html",
+      "label": "Reference",
+      "title": "Rites, invokers, and summoning"
+    },
+    {
+      "file": "crafting.html",
+      "label": "Reference",
+      "title": "Crafting: projects and upkeep"
+    },
+    {
+      "file": "followers-and-assets.html",
+      "label": "Reference",
+      "title": "Followers and assets"
+    },
+    {
+      "file": "travel.html",
+      "label": "Reference",
+      "title": "Travel framework"
+    },
+    {
+      "file": "optional-tools.html",
+      "label": "Reference",
+      "title": "Optional campaign tools"
+    },
+    {
+      "file": "quick-reference.html",
+      "label": "Reference",
+      "title": "Tables for use during play"
+    },
+    {
+      "file": "examples.html",
+      "label": "Reference",
+      "title": "Example spells and characters"
+    },
+    {
+      "file": "legacy-references.html",
+      "label": "Appendix",
+      "title": "Earlier section numbers"
+    },
+    {
+      "file": "license.html",
+      "label": "Appendix",
+      "title": "License and publication notices"
+    },
+    {
+      "file": "complete.html",
+      "label": "Appendix",
+      "title": "Complete reference"
+    }
+  ]
+}

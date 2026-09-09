@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fate's Edge — Quickstart</title>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — Quickstart</title>
+<style>
         :root {
             --bg1: #0d0d1a; --bg2: #1a1a2e; --bg3: #252540; --bg4: #2f2f4a;
             --text: #e8e8f0; --text2: #b8b8c8; --text3: #8888a0;
@@ -40,105 +41,114 @@
         .step-num { font-weight: 600; color: var(--gold); margin-right: 0.4rem; }
         hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
     </style>
-</head>
-<body>
-    <h1>Fate's Edge — Quickstart</h1>
-    <p class="text-muted" style="margin-bottom:0.8rem;">
-        <span class="badge badge-gold">15-minute read</span>
-        <span class="badge badge-gold">One table, one session</span>
-    </p>
-    <p style="color:var(--text2);">
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Quickstart · entry point</strong></p><p>Read this document’s stated scope before using it. A quickstart is a starting point; follow its references when you need detail, and keep the full rules available for questions that a short introduction does not cover.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Fate's Edge — Quickstart</a></li><li><a href="#reader-section-2">1. What This Game Is</a></li><li><a href="#reader-section-3">2. The Core Loop</a></li><li><a href="#reader-section-4">3. Boons &amp; Story Beats</a></li><li><a href="#reader-section-5">4. Build a Character in 5 Minutes</a></li><li><a href="#pregens">5. Grab-and-Go Pregens</a></li><li><a href="#reader-section-7">6. Table Safety, Fast Version</a></li></ul></details>
+<h1 id="reader-section-1">Fate's Edge — Quickstart</h1>
+<p class="text-muted" style="margin-bottom:0.8rem;">
+<span class="badge badge-gold">15-minute read</span>
+<span class="badge badge-gold">One table, one session</span>
+</p>
+<p style="color:var(--text2);">
         This is everything you need to run a one-shot tonight. It skips the full Fatigue/Harm tables, armor
         conversion, and advancement math — for the complete rules, see the
         <a href="../resources/Fates_-_Edge_-_-Essentials.html">Essential Guide</a>. For a ready-to-play scenario,
         jump to <a href="../adventures/Fates_-_Edge_-_-Lantern-_-at-_-Dusk.html">The Lantern at Dusk</a>.
     </p>
-
-    <blockquote>
+<blockquote>
         "The coin that never spends is the one you don't remember taking."
         <span style="display:block; color:var(--text3); font-size:0.85rem; margin-top:0.2rem;">— Serafine of the Velvet Touch</span>
-    </blockquote>
-
-    <h2>1. What This Game Is</h2>
-    <p>
+</blockquote>
+<h2 id="reader-section-2">1. What This Game Is</h2>
+<p>
         Fate's Edge is narrative-first: dice never just mean pass/fail, they push the story somewhere. Nothing
         stalls at the table — a miss escalates instead of dead-ending, and a success can still cost you something.
     </p>
-
-    <h2>2. The Core Loop</h2>
-    <div class="step-box"><span class="step-num">1.</span> <strong>Say what you want and how.</strong> ("I want to sneak past the guard, using Wits + Stealth.")</div>
-    <div class="step-box"><span class="step-num">2.</span> <strong>GM sets Position &amp; Difficulty (DV).</strong> See tables below.</div>
-    <div class="step-box"><span class="step-num">3.</span> <strong>Roll Attribute + Skill in d10s.</strong> 6–9 = 1 success, 10 = 2 successes, 1 = 1 Story Beat for the GM.</div>
-    <div class="step-box"><span class="step-num">4.</span> <strong>Compare successes to DV</strong> using the Outcome table.</div>
-    <div class="step-box"><span class="step-num">5.</span> <strong>GM spends Story Beats</strong> for complications; player marks Boons.</div>
-
-    <h3>Difficulty Value (DV)</h3>
-    <table>
-        <tr><th>DV</th><th>Situation</th></tr>
-        <tr><td>2</td><td>Routine, almost guaranteed</td></tr>
-        <tr><td>3</td><td>Default — mild opposition, some risk</td></tr>
-        <tr><td>4</td><td>Hard — serious opposition or bad angle</td></tr>
-        <tr><td>5+</td><td>Extreme — major boss or dramatic gamble</td></tr>
-    </table>
-
-    <h3>Position</h3>
-    <table>
-        <tr><th>Position</th><th>Frame</th><th>Effect</th></tr>
-        <tr><td>Dominant</td><td>You press the advantage</td><td>Re-roll one failure</td></tr>
-        <tr><td>Controlled</td><td>Balanced, normal</td><td>No re-rolls</td></tr>
-        <tr><td>Desperate</td><td>You act under duress</td><td>Re-roll one success</td></tr>
-    </table>
-    <p class="text-muted">Spend 1 Boon to improve Position by one step before you roll.</p>
-
-    <h3>Outcome</h3>
-    <table>
-        <tr><th>Result</th><th>Outcome</th><th>What Happens</th></tr>
-        <tr><td>Successes ≥ DV, no 1s</td><td>Clean Success</td><td>You get what you wanted, no complication</td></tr>
-        <tr><td>Successes ≥ DV, some 1s</td><td>Success + Story Beat</td><td>You get it, but the GM spends SB on a complication</td></tr>
-        <tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; you gain 1 Boon</td></tr>
-        <tr><td>0 Successes</td><td>Miss</td><td>No progress; you gain 2 Boons; GM escalates</td></tr>
-    </table>
-
-    <h2>3. Boons &amp; Story Beats</h2>
-    <div class="panel panel-gold">
-        <strong>Boons (yours):</strong> earned on Partials, Misses, and playing your Bonds. Spend to re-roll a die,
+<h2 id="reader-section-3">2. The Core Loop</h2>
+<div class="step-box"><span class="step-num">1.</span> <strong>Say what you want and how.</strong> ("I want to sneak past the guard, using Wits + Stealth.")</div>
+<div class="step-box"><span class="step-num">2.</span> <strong>GM sets Position &amp; Difficulty (DV).</strong> See tables below.</div>
+<div class="step-box"><span class="step-num">3.</span> <strong>Roll Attribute + Skill in d10s.</strong> 6–9 = 1 success, 10 = 2 successes, 1 = 1 Story Beat for the GM.</div>
+<div class="step-box"><span class="step-num">4.</span> <strong>Compare successes to DV</strong> using the Outcome table.</div>
+<div class="step-box"><span class="step-num">5.</span> <strong>GM spends Story Beats</strong> for complications; player marks Boons.</div>
+<h3>Difficulty Value (DV)</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>DV</th><th>Situation</th></tr>
+<tr><td>2</td><td>Routine, almost guaranteed</td></tr>
+<tr><td>3</td><td>Default — mild opposition, some risk</td></tr>
+<tr><td>4</td><td>Hard — serious opposition or bad angle</td></tr>
+<tr><td>5+</td><td>Extreme — major boss or dramatic gamble</td></tr>
+</table></div>
+<h3>Position</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Position</th><th>Frame</th><th>Effect</th></tr>
+<tr><td>Dominant</td><td>You press the advantage</td><td>Re-roll one failure</td></tr>
+<tr><td>Controlled</td><td>Balanced, normal</td><td>No re-rolls</td></tr>
+<tr><td>Desperate</td><td>You act under duress</td><td>Re-roll one success</td></tr>
+</table></div>
+<p class="text-muted">Spend 1 Boon to improve Position by one step before you roll.</p>
+<h3>Outcome</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Result</th><th>Outcome</th><th>What Happens</th></tr>
+<tr><td>Successes ≥ DV, no 1s</td><td>Clean Success</td><td>You get what you wanted, no complication</td></tr>
+<tr><td>Successes ≥ DV, some 1s</td><td>Success + Story Beat</td><td>You get it, but the GM spends SB on a complication</td></tr>
+<tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; you gain 1 Boon</td></tr>
+<tr><td>0 Successes</td><td>Miss</td><td>No progress; you gain 2 Boons; GM escalates</td></tr>
+</table></div>
+<h2 id="reader-section-4">3. Boons &amp; Story Beats</h2>
+<div class="panel panel-gold">
+<strong>Boons (yours):</strong> earned on Partials, Misses, and playing your Bonds. Spend to re-roll a die,
         improve Position, or activate an Asset. Hold at most 5; drop to 2 at the end of a scene.
     </div>
-    <div class="panel panel-red">
-        <strong>Story Beats (GM's):</strong> earned whenever anyone rolls a 1. Spend 1 SB for a minor complication,
+<div class="panel panel-red">
+<strong>Story Beats (GM's):</strong> earned whenever anyone rolls a 1. Spend 1 SB for a minor complication,
         2 for moderate, 3+ for major. Be aggressive with them — unused pressure is wasted momentum.
     </div>
-
-    <h2>4. Build a Character in 5 Minutes</h2>
-    <p>Fastest path: grab a <a href="#pregens">pregen</a> below, or build from scratch with 32 XP:</p>
-    <ol>
-        <li>One sentence concept (origin + profession + trait).</li>
-        <li>Attributes (Body/Wits/Spirit/Presence, base 1): put one at 3, one at 2. (~21 XP)</li>
-        <li>Skills (0–5): 2–3 key skills at 1–2 each. (~8–12 XP)</li>
-        <li>0–3 Talents if any XP is left — optional, not required to be effective.</li>
-        <li>1 Bond with another PC (+2 XP), optionally 1 Complication (+2 XP).</li>
-        <li>Starting gear: clothes, a weapon, light armor, adventuring kit.</li>
-    </ol>
-
-    <h2 id="pregens">5. Grab-and-Go Pregens</h2>
-    <table>
-        <tr><th>Name</th><th>Concept</th><th>Best At</th></tr>
-        <tr><td>Levi</td><td>Soldier — once a legionary, now a sellsword</td><td>Melee combat</td></tr>
-        <tr><td>Lyra</td><td>Scholar — expelled for forbidden research</td><td>Lore &amp; investigation</td></tr>
-        <tr><td>Sera</td><td>Shadow — former guild thief</td><td>Stealth &amp; subterfuge</td></tr>
-        <tr><td>Mira</td><td>Healer — accused of witchcraft</td><td>Medicine &amp; insight</td></tr>
-        <tr><td>Kael</td><td>Runekeeper — wanderer sworn to a patron</td><td>Magic (optional, Tier II)</td></tr>
-    </table>
-    <p class="text-muted">Full stat blocks are in the <a href="../resources/Fates_-_Edge_-_-Essentials.html">Essential Guide</a>, Chapter 4.</p>
-
-    <h2>6. Table Safety, Fast Version</h2>
-    <p>
+<h2 id="reader-section-5">4. Build a Character in 5 Minutes</h2>
+<p>Fastest path: grab a <a href="#pregens">pregen</a> below, or build from scratch with 32 XP:</p>
+<ol>
+<li>One sentence concept (origin + profession + trait).</li>
+<li>Attributes (Body/Wits/Spirit/Presence, base 1): put one at 3, one at 2. (~21 XP)</li>
+<li>Skills (0–5): 2–3 key skills at 1–2 each. (~8–12 XP)</li>
+<li>0–3 Talents if any XP is left — optional, not required to be effective.</li>
+<li>1 Bond with another PC (+2 XP), optionally 1 Complication (+2 XP).</li>
+<li>Starting gear: clothes, a weapon, light armor, adventuring kit.</li>
+</ol>
+<h2 id="pregens">5. Grab-and-Go Pregens</h2>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Name</th><th>Concept</th><th>Best At</th></tr>
+<tr><td>Levi</td><td>Soldier — once a legionary, now a sellsword</td><td>Melee combat</td></tr>
+<tr><td>Lyra</td><td>Scholar — expelled for forbidden research</td><td>Lore &amp; investigation</td></tr>
+<tr><td>Sera</td><td>Shadow — former guild thief</td><td>Stealth &amp; subterfuge</td></tr>
+<tr><td>Mira</td><td>Healer — accused of witchcraft</td><td>Medicine &amp; insight</td></tr>
+<tr><td>Kael</td><td>Runekeeper — wanderer sworn to a patron</td><td>Magic (optional, Tier II)</td></tr>
+</table></div>
+<p class="text-muted">Full stat blocks are in the <a href="../resources/Fates_-_Edge_-_-Essentials.html">Essential Guide</a>, Chapter 4.</p>
+<h2 id="reader-section-7">6. Table Safety, Fast Version</h2>
+<p>
         Keep an <strong>X-Card</strong> visible — anyone can say "X" to skip past uncomfortable content, no
         questions asked. Agree on <strong>Lines</strong> (hard no's) and <strong>Veils</strong> (fade-to-black
         moments) before you start.
     </p>
-
-    <hr>
-    <p class="text-muted">That's the whole game. Everything else — Fatigue, Harm, armor, magic paths, advancement — layers on top of this loop without changing it. Run it in the browser toolkit: dice, character sheets, and timers included.</p>
-</body>
+<hr/>
+<p class="text-muted">That's the whole game. Everything else — Fatigue, Harm, armor, magic paths, advancement — layers on top of this loop without changing it. Run it in the browser toolkit: dice, character sheets, and timers included.</p>
+</article></body>
 </html>
