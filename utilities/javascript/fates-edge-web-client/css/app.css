@@ -75,6 +75,7 @@
     --radius-md: 9px;
     --radius-full: 9999px;
     --sidebar-width: 240px;
+    --sidebar-collapsed: 64px;
     --content-max-width: 1200px;
     --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -399,11 +400,22 @@ h1, h2, h3, h4, h5, h6 {
     flex: 1;
     overflow-y: auto;
     padding: 0.75rem 0.5rem;
+    /* CRITICAL FIX: Ensure nav items stack vertically, not horizontally */
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 .sidebar-nav::-webkit-scrollbar { width: 4px; }
 .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
 .nav-group {
     margin-bottom: 1.35rem;
+    /* CRITICAL FIX: Each group is a vertical stack */
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+.nav-group:last-child {
+    margin-bottom: 0;
 }
 .nav-group-title {
     display: block;
@@ -415,6 +427,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0 0.75rem;
     margin-bottom: 0.45rem;
 }
+/* CRITICAL FIX: nav-item is a full-width block in the vertical stack */
 .nav-item {
     width: 100%;
     display: flex;
@@ -429,9 +442,11 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
     font-size: 0.9rem;
     transition: all var(--transition);
-    margin-bottom: 2px;
     font-family: inherit;
     text-align: start;
+    /* Prevent flex shrinkage that could cause horizontal cramming */
+    flex-shrink: 0;
+    min-height: 2.6rem;
 }
 .nav-item:hover {
     background: var(--gold-glow);
@@ -462,8 +477,52 @@ h1, h2, h3, h4, h5, h6 {
     outline: none;
     box-shadow: inset 0 0 0 2px var(--gold-glow-strong);
 }
-.nav-icon { font-size: 1.05rem; width: 20px; text-align: center; flex-shrink: 0; }
-.nav-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-icon { 
+    font-size: 1.05rem; 
+    width: 20px; 
+    text-align: center; 
+    flex-shrink: 0; 
+}
+.nav-label { 
+    flex: 1; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    /* Ensure label text doesn't get squashed */
+    min-width: 0;
+}
+
+/* Mobile hamburger toggle – hidden on desktop by default */
+.mobile-nav-toggle {
+    display: none;
+    position: fixed;
+    top: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 100;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    color: var(--text);
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    align-items: center;
+    justify-content: center;
+}
+.mobile-nav-toggle:hover {
+    border-color: var(--gold);
+    background: var(--gold-glow);
+}
+.mobile-nav-toggle:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+/* Close button inside the mobile sidebar – hidden on desktop */
+.mobile-nav-close {
+    display: none;
+}
 
 .sidebar-footer {
     padding: 0.75rem 1rem;
@@ -1098,4 +1157,186 @@ select {
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
+}
+
+/* ============================================================
+   RESPONSIVE – Mobile-first sidebar & navigation
+   ============================================================ */
+
+/* Tablets and smaller: collapse sidebar into a hamburger menu */
+@media (max-width: 1024px) {
+    .mobile-nav-toggle {
+        display: flex;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        inset-inline-start: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        transform: translateX(-100%);
+        transition: transform var(--transition-slow), box-shadow var(--transition-slow);
+        box-shadow: none;
+        border-inline-end: 1px solid var(--border-color);
+        z-index: 90;
+    }
+    /* RTL support */
+    [dir="rtl"] .sidebar {
+        transform: translateX(100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .mobile-nav-close {
+        display: flex;
+        position: absolute;
+        top: 0.75rem;
+        inset-inline-end: 0.75rem;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        transition: all var(--transition);
+    }
+    .mobile-nav-close:hover {
+        color: var(--text);
+        background: var(--bg3);
+    }
+
+    /* Scrim (backdrop) when sidebar is open on mobile */
+    .sidebar-scrim {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 89;
+    }
+    .sidebar-scrim.active {
+        display: block;
+    }
+
+    .main-content {
+        padding: 1rem 1.25rem;
+        padding-top: 4.5rem;
+    }
+}
+
+/* Small phones: tighter spacing */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 0.75rem 0.75rem;
+        padding-top: 4rem;
+    }
+    .panel {
+        padding: 1rem 1.2rem;
+    }
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    .modal {
+        padding: 1rem 1.25rem;
+        max-width: 100%;
+        margin: 0.5rem;
+        max-height: 90vh;
+    }
+    .modal-content {
+        padding: 1rem 1.25rem;
+        max-width: 100%;
+        margin: 0.5rem;
+    }
+    .sidebar {
+        width: 85vw;
+        max-width: 300px;
+    }
+    .shortcuts-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    .shortcuts-row dt {
+        min-width: unset;
+        white-space: normal;
+    }
+}
+
+/* Desktop: ensure sidebar is always visible and correctly positioned */
+@media (min-width: 1025px) {
+    .sidebar {
+        position: relative;
+        transform: none !important;
+        box-shadow: none !important;
+        border-inline-end: 1px solid var(--border-color);
+        width: var(--sidebar-width);
+        flex-shrink: 0;
+        /* Restore full height within app-shell */
+        height: 100vh;
+    }
+    .sidebar.open {
+        transform: none !important;
+    }
+    .sidebar-scrim {
+        display: none !important;
+    }
+    .mobile-nav-toggle {
+        display: none !important;
+    }
+    .mobile-nav-close {
+        display: none !important;
+    }
+    .main-content {
+        padding: 2rem 3rem;
+        padding-top: 2rem;
+    }
+}
+/* Hide player navigation on desktop by default */
+.player-nav {
+    display: none;
+}
+
+/* Show it as a bottom bar on mobile/tablet */
+@media (max-width: 768px) {
+    .player-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--bg-glass);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid var(--border);
+        padding: 0.4rem 0.5rem;
+        z-index: 100;
+        /* adjust to your needs */
+    }
+    .player-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.7rem;
+        color: var(--text2);
+        text-decoration: none;
+        padding: 0.2rem 0.4rem;
+    }
+    .player-nav a[aria-current="page"] {
+        color: var(--gold);
+    }
+    .player-nav-label {
+        display: block;
+        font-size: 0.6rem;
+        margin-top: 0.1rem;
+    }
 }
