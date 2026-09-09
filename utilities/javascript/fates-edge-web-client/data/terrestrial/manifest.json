@@ -1,13 +1,10 @@
-{
-  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
-  "data": [
-    "silkstrand-dyers-guild",
-    "the-ash-coalition",
-    "the-chart-keepers-of-the-wood",
-    "the-grey-guild",
-    "the-harrowed-fleet",
-    "the-iron-breath-commune",
-    "the-lesser-court",
-    "veldts-escort-company"
-  ]
-}
+[
+  "silkstrand-dyers-guild",
+  "the-ash-coalition",
+  "the-chart-keepers-of-the-wood",
+  "the-grey-guild",
+  "the-harrowed-fleet",
+  "the-iron-breath-commune",
+  "the-lesser-court",
+  "veldts-escort-company"
+]

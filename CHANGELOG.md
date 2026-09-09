@@ -1,3 +1,8 @@
+## Class adaptation guide and introduction backports — 2026-09-09
+
+- Rework the subclass guide around adapting other TTRPG classes into Fate’s Edge builds, with feature mapping, worked outlines, and a conversion worksheet. Preserve the earlier collection separately and retain old fragment destinations.
+- Add a Way of Warrior reading route and backport eight reviewed book introductions to LaTeX. Generate the new subclass HTML and LaTeX from shared prose.
+
 ## Monk clarification and reader fixes — 2026-09-09
 
 - Use Spirit + Endurance (DV 3) for the monk’s Settle the Breath step; keep Psionics as the explicit extra skill. Update HTML and LaTeX together.

@@ -1,11 +1,9 @@
-{
-  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
-  "data": [
-    "bloody-fist",
-    "ecktorian-censorate",
-    "gray-ash",
-    "house-contarini",
-    "iron-league",
-    "velvet-court"
-  ]
-}
+[
+  "bloody-fist",
+  "ecktorian-censorate",
+  "factions-manifest",
+  "gray-ash",
+  "house-contarini",
+  "iron-league",
+  "velvet-court"
+]
