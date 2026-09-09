@@ -115,5 +115,5 @@
       "releaseType": "release"
     }
   },
-  "_license": "MIT (code only -- see LICENSE.code in the fates-edge-apps repo root). This package contains no bundled Copyright or SRD data of its own (the renderer/ it packages is copied from fates-edge-web-client's build output at build time, not committed here), so the Copyright notice this field previously carried didn't apply to it; matches the top-level \"license\": \"MIT\" field above."
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

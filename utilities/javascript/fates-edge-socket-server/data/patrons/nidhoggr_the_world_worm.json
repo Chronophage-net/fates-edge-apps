@@ -57,7 +57,11 @@
       "action": "Scene",
       "range": "Touch/Self",
       "resist": "Yes",
-      "tags": ["TRUTH", "DREAM", "TIME"],
+      "tags": [
+        "TRUTH",
+        "DREAM",
+        "TIME"
+      ],
       "materials": "Dust from weathered stone or an ancient artifact; or water poured over ancient stone, consumed ritually.",
       "effect": "Choose one: Stone's Whisper: Stone reveals one hidden fact about its history. Gain +1 die to Lore about this object's origin and purpose. Dreaming Deep: Enter a brief trance to witness echoes of local history. Ask one specific question about past events here.",
       "push_it": "Stone: The vision includes sensory details from the past. Dream: The vision reveals additional context or hidden connections; mark 1 SB (Clubs). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -73,7 +77,11 @@
       "action": "Scene",
       "range": "Zone",
       "resist": "No",
-      "tags": ["TRUTH", "AREA", "TIME"],
+      "tags": [
+        "TRUTH",
+        "AREA",
+        "TIME"
+      ],
       "materials": "An ear pressed to bedrock or an ancient structure.",
       "effect": "Read accumulated memories in stone. Ask up to 3 questions about significant events witnessed here. Creates a 6-segment Memory Resonance timer.",
       "push_it": "One memory unfolds with perfect clarity. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -89,7 +97,12 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "No",
-      "tags": ["TRUTH", "AREA", "TIME", "BOOST"],
+      "tags": [
+        "TRUTH",
+        "AREA",
+        "TIME",
+        "BOOST"
+      ],
       "materials": "A chalk spiral, four local stones, an hour of meditation.",
       "effect": "The area replays ghostly echoes of a chosen past event. All witnesses gain +2 dice to Investigate/Recall related checks. Creates an 8-segment Echo Stability timer.",
       "push_it": "View events from multiple perspectives. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -105,7 +118,12 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "Yes",
-      "tags": ["TRUTH", "DREAM", "TIME", "PROPHECY"],
+      "tags": [
+        "TRUTH",
+        "DREAM",
+        "TIME",
+        "PROPHECY"
+      ],
       "materials": "A circle of ancient stones, a night of vigil under stars.",
       "effect": "Access deep geological memory. Ask 3 questions about ancient history or receive a prophetic dream. Creates a 10-segment Deep Dream timer.",
       "push_it": "Gain temporary skill mastery (+3 dice to one historical action). Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -121,7 +139,12 @@
       "action": "Extended",
       "range": "Large Zone",
       "resist": "No",
-      "tags": ["TRUTH", "AREA", "TIME", "PRESSURE"],
+      "tags": [
+        "TRUTH",
+        "AREA",
+        "TIME",
+        "PRESSURE"
+      ],
       "materials": "Stones from three ancient sites, the blood of a history-keeper (a scholar, a chronicler, or a witness).",
       "effect": "Overlay a past reality onto the present location. Ruins partially reform, ghostly figures manifest. Allies gain +2 dice to Lore/Investigate; any modern technology or recent construction suffers –2 dice to function within the zone.",
       "push_it": "The effect lasts until the next lunar cycle; start a Temporal Instability [8] timer. When it fills, the past and present become dangerously entangled – a location may become inaccessible or a relic may begin to fade. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",

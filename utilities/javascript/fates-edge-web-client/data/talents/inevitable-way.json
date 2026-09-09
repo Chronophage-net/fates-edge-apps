@@ -16,5 +16,6 @@
   "effect": "+2 dice to unarmed attacks; ignore 1 Armor; you may counterattack whenever you score a Clean Success defending against that enemy.",
   "effects": [],
   "description": "+2 dice to unarmed attacks; ignore 1 Armor; you may counterattack whenever you score a Clean Success defending against that enemy. From the Book of Talents (Talents and Special Abilities).",
-  "source": "talents-and-special-abilities"
+  "source": "talents-and-special-abilities",
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

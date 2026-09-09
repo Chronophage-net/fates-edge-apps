@@ -33,75 +33,538 @@
     ]
   },
   "quotes": [
-    { "speaker": "Banner-Captain (Elite)", "text": "A contract is only as good as the next payday, and a grudge is only as sharp as the sword backing it. In this game, we sell steel by the season and vendettas by the year. But a captain who forgets the men in the mud won't last the winter." },
-    { "speaker": "Veteran Sergeant (Commoner)", "text": "I've seen three captains rise and fall in the time it takes to grow a beard. The mud stays the same. The pay comes when it pleases. But the men? They remember who shared their fire and who ate alone. Keep your blade sharp and your word sharper. The camp sings? You live. They stop singing? Even the best charter bleeds." }
+    {
+      "speaker": "Banner-Captain (Elite)",
+      "text": "A contract is only as good as the next payday, and a grudge is only as sharp as the sword backing it. In this game, we sell steel by the season and vendettas by the year. But a captain who forgets the men in the mud won't last the winter."
+    },
+    {
+      "speaker": "Veteran Sergeant (Commoner)",
+      "text": "I've seen three captains rise and fall in the time it takes to grow a beard. The mud stays the same. The pay comes when it pleases. But the men? They remember who shared their fire and who ate alone. Keep your blade sharp and your word sharper. The camp sings? You live. They stop singing? Even the best charter bleeds."
+    }
   ],
   "names": {
-    "first_male": ["Rurik", "Dragan", "Sebastian", "Vladan", "Temur", "Caspian"],
-    "first_female": ["Svetlana", "Mira", "Olena", "Zoya", "Nadezhda", "Rada"],
-    "banner_names": ["Blackwolf", "Ironhand", "Rustcloak", "Ashbanner", "Greyboar", "Redtally"],
-    "epithets": ["the Unpaid", "the Scarred", "Bell-Heart", "the Silent", "Six-Fingers", "the Lame"],
+    "first_male": [
+      "Rurik",
+      "Dragan",
+      "Sebastian",
+      "Vladan",
+      "Temur",
+      "Caspian"
+    ],
+    "first_female": [
+      "Svetlana",
+      "Mira",
+      "Olena",
+      "Zoya",
+      "Nadezhda",
+      "Rada"
+    ],
+    "banner_names": [
+      "Blackwolf",
+      "Ironhand",
+      "Rustcloak",
+      "Ashbanner",
+      "Greyboar",
+      "Redtally"
+    ],
+    "epithets": [
+      "the Unpaid",
+      "the Scarred",
+      "Bell-Heart",
+      "the Silent",
+      "Six-Fingers",
+      "the Lame"
+    ],
     "note": "Mercenary names are often aliases, nicknames from past campaigns, or the color of a faded banner. Surnames are rare; epithets are everything."
   },
   "places": [
-    { "rank": 2, "suit": "spade", "title": "Burned Village", "subtitle": "[DEATH]", "description": "Field hospital; flies, tinctures, fever-prayers.", "flavor": "The dead whisper the names of the careless.", "mechanical_hook": "Start a Camp Fever [4] timer. Each failed Medicine roll ticks it." },
-    { "rank": 3, "suit": "spade", "title": "Frozen Ford", "subtitle": "[DEATH] [WEATHER]", "description": "Last month's dead held under glass; standards trapped in the ice.", "flavor": "The dead whisper a name — the next Desertion check is at −1 die.", "mechanical_hook": "Crossing costs +1 Fatigue." },
-    { "rank": 4, "suit": "spade", "title": "Latrine Row", "subtitle": "[SOCIAL]", "description": "Mud, shame, whispered mutiny; a sergeant who hears too well.", "flavor": "The smell is a warning.", "mechanical_hook": "Any failed social roll here ticks Cohesion +1 (soldiers lose faith)." },
-    { "rank": 5, "suit": "spade", "title": "Crater Pasture", "subtitle": "[MAGIC]", "description": "Alchemical barrage aftermath; glass flowers sprout like guilt.", "flavor": "Veterans avoid it.", "mechanical_hook": "Scavenging here gives a Glass Shard (1 use: +1 die to intimidate), but ticks Supplies +1 (poisoned ground)." },
-    { "rank": 6, "suit": "spade", "title": "Supply Road", "subtitle": "[TRAVEL]", "description": "Twelve broken wagons; oxen nose the wreckage for salt.", "flavor": "The crows are fat.", "mechanical_hook": "First scavenge roll of the scene is Controlled; on a Miss, tick Supplies +1." },
-    { "rank": 7, "suit": "spade", "title": "Half-Raised Siege Tower", "subtitle": "[COMBAT]", "description": "Abandoned camp; every rung creaks with grudges.", "flavor": "The ghosts of sappers still work the ropes.", "mechanical_hook": "Climbing costs 2 Fatigue; on a Partial, the tower leans — next attack from it is Desperate." },
-    { "rank": 8, "suit": "spade", "title": "Salt-Cured Cache", "subtitle": "[DEATH]", "description": "Behind the surgeon's tent; wrong kind of maggots move.", "flavor": "The surgeon's face goes pale.", "mechanical_hook": "Opening it gives 1 Supplies but starts a Disease [4] timer (the maggots carry rot)." },
-    { "rank": 9, "suit": "spade", "title": "Command Tent", "subtitle": "[SOCIAL]", "description": "Maps show borders diplomacy erased.", "flavor": "The tent smells of fear and bad wine.", "mechanical_hook": "A player who studies the map for a scene may ask one question about enemy intentions; on a Miss, the map is a decoy — start False Orders [4]." },
-    { "rank": 10, "suit": "spade", "title": "Watch-Tower", "subtitle": "[WAR]", "description": "Stacked from skulls and slate; crows know the countersign.", "flavor": "The watchman never sleeps.", "mechanical_hook": "The crows will warn of ambush once, but only if fed a memory (erase a minor fact)." },
-    { "rank": 11, "suit": "spade", "title": "Ancient March-Keep", "subtitle": "[DEATH]", "description": "Held by a skeleton garrison of veterans; they remember when banners were gold.", "flavor": "Their captain has no shadow.", "mechanical_hook": "They will fight for you if you swear an oath to restore their banner — start Oath Share [6]." },
-    { "rank": 12, "suit": "spade", "title": "The Bone Fields", "subtitle": "[DEATH] [OATH]", "description": "Ykrul elders parley among cairns; reckon oaths with the dead.", "flavor": "The wind carries their voices.", "mechanical_hook": "The dead vote on any dispute. Roll Spirit+Lore (DV 4). On success, they side with you (+1 Position on next parley). On failure, they demand a blood-price." },
-    { "rank": 13, "suit": "spade", "title": "Marcher's Fortress", "subtitle": "[COMBAT]", "description": "Three walls, two sieges' scars, one gate that opens inward only.", "flavor": "The stones weep when an agreement is broken.", "mechanical_hook": "The gate opens inward so the dead can leave. Living who enter without permission take Harm 1 (spiritual backlash)." },
-    { "rank": 14, "suit": "spade", "title": "The Singing Wastes", "subtitle": "[MAGIC] [DEATH]", "description": "Fallen weapons hum with voices of their last wielders.", "flavor": "The song is a lament.", "mechanical_hook": "Each weapon can answer one question about its owner's death. After three questions, the Wastes awaken — start Wrath of the Fallen [8]." }
+    {
+      "rank": 2,
+      "suit": "spade",
+      "title": "Burned Village",
+      "subtitle": "[DEATH]",
+      "description": "Field hospital; flies, tinctures, fever-prayers.",
+      "flavor": "The dead whisper the names of the careless.",
+      "mechanical_hook": "Start a Camp Fever [4] timer. Each failed Medicine roll ticks it."
+    },
+    {
+      "rank": 3,
+      "suit": "spade",
+      "title": "Frozen Ford",
+      "subtitle": "[DEATH] [WEATHER]",
+      "description": "Last month's dead held under glass; standards trapped in the ice.",
+      "flavor": "The dead whisper a name — the next Desertion check is at −1 die.",
+      "mechanical_hook": "Crossing costs +1 Fatigue."
+    },
+    {
+      "rank": 4,
+      "suit": "spade",
+      "title": "Latrine Row",
+      "subtitle": "[SOCIAL]",
+      "description": "Mud, shame, whispered mutiny; a sergeant who hears too well.",
+      "flavor": "The smell is a warning.",
+      "mechanical_hook": "Any failed social roll here ticks Cohesion +1 (soldiers lose faith)."
+    },
+    {
+      "rank": 5,
+      "suit": "spade",
+      "title": "Crater Pasture",
+      "subtitle": "[MAGIC]",
+      "description": "Alchemical barrage aftermath; glass flowers sprout like guilt.",
+      "flavor": "Veterans avoid it.",
+      "mechanical_hook": "Scavenging here gives a Glass Shard (1 use: +1 die to intimidate), but ticks Supplies +1 (poisoned ground)."
+    },
+    {
+      "rank": 6,
+      "suit": "spade",
+      "title": "Supply Road",
+      "subtitle": "[TRAVEL]",
+      "description": "Twelve broken wagons; oxen nose the wreckage for salt.",
+      "flavor": "The crows are fat.",
+      "mechanical_hook": "First scavenge roll of the scene is Controlled; on a Miss, tick Supplies +1."
+    },
+    {
+      "rank": 7,
+      "suit": "spade",
+      "title": "Half-Raised Siege Tower",
+      "subtitle": "[COMBAT]",
+      "description": "Abandoned camp; every rung creaks with grudges.",
+      "flavor": "The ghosts of sappers still work the ropes.",
+      "mechanical_hook": "Climbing costs 2 Fatigue; on a Partial, the tower leans — next attack from it is Desperate."
+    },
+    {
+      "rank": 8,
+      "suit": "spade",
+      "title": "Salt-Cured Cache",
+      "subtitle": "[DEATH]",
+      "description": "Behind the surgeon's tent; wrong kind of maggots move.",
+      "flavor": "The surgeon's face goes pale.",
+      "mechanical_hook": "Opening it gives 1 Supplies but starts a Disease [4] timer (the maggots carry rot)."
+    },
+    {
+      "rank": 9,
+      "suit": "spade",
+      "title": "Command Tent",
+      "subtitle": "[SOCIAL]",
+      "description": "Maps show borders diplomacy erased.",
+      "flavor": "The tent smells of fear and bad wine.",
+      "mechanical_hook": "A player who studies the map for a scene may ask one question about enemy intentions; on a Miss, the map is a decoy — start False Orders [4]."
+    },
+    {
+      "rank": 10,
+      "suit": "spade",
+      "title": "Watch-Tower",
+      "subtitle": "[WAR]",
+      "description": "Stacked from skulls and slate; crows know the countersign.",
+      "flavor": "The watchman never sleeps.",
+      "mechanical_hook": "The crows will warn of ambush once, but only if fed a memory (erase a minor fact)."
+    },
+    {
+      "rank": 11,
+      "suit": "spade",
+      "title": "Ancient March-Keep",
+      "subtitle": "[DEATH]",
+      "description": "Held by a skeleton garrison of veterans; they remember when banners were gold.",
+      "flavor": "Their captain has no shadow.",
+      "mechanical_hook": "They will fight for you if you swear an oath to restore their banner — start Oath Share [6]."
+    },
+    {
+      "rank": 12,
+      "suit": "spade",
+      "title": "The Bone Fields",
+      "subtitle": "[DEATH] [OATH]",
+      "description": "Ykrul elders parley among cairns; reckon oaths with the dead.",
+      "flavor": "The wind carries their voices.",
+      "mechanical_hook": "The dead vote on any dispute. Roll Spirit+Lore (DV 4). On success, they side with you (+1 Position on next parley). On failure, they demand a blood-price."
+    },
+    {
+      "rank": 13,
+      "suit": "spade",
+      "title": "Marcher's Fortress",
+      "subtitle": "[COMBAT]",
+      "description": "Three walls, two sieges' scars, one gate that opens inward only.",
+      "flavor": "The stones weep when an agreement is broken.",
+      "mechanical_hook": "The gate opens inward so the dead can leave. Living who enter without permission take Harm 1 (spiritual backlash)."
+    },
+    {
+      "rank": 14,
+      "suit": "spade",
+      "title": "The Singing Wastes",
+      "subtitle": "[MAGIC] [DEATH]",
+      "description": "Fallen weapons hum with voices of their last wielders.",
+      "flavor": "The song is a lament.",
+      "mechanical_hook": "Each weapon can answer one question about its owner's death. After three questions, the Wastes awaken — start Wrath of the Fallen [8]."
+    }
   ],
   "people_and_factions": [
-    { "rank": 2, "suit": "heart", "title": "Young Cadet", "subtitle": "[SOCIAL]", "description": "Father's sword, mother's share, hunger to prove himself.", "flavor": "He has never seen a man die.", "debt": "Mentor him in a downtime scene and he becomes a Cap 1 follower.", "price": "Ignore him and he joins a rival company — tick Rival Agenda +1." },
-    { "rank": 3, "suit": "heart", "title": "Veteran Sergeant", "subtitle": "[COMBAT] [SOCIAL]", "description": "Counts scars like medals; spends them on whiskey and mercy.", "flavor": "She will fight for you, but at end of scene demands a story about a battle you survived.", "debt": "Fights at your side for the scene.", "price": "If you cannot provide a story, she takes a button from your coat — a promise." },
-    { "rank": 4, "suit": "heart", "title": "Ecktorian Banner-Captain", "subtitle": "[LAW]", "description": "Griffon standard, roster of noble grudges, smile like winter.", "flavor": "His boots are always clean.", "debt": "He offers a Letter of Marque (once: ignore one legal complication).", "price": "Accepting starts his Favor Share [4] — he will call in a favor during a critical moment." },
-    { "rank": 5, "suit": "heart", "title": "Condotta Broker", "subtitle": "[SOCIAL]", "description": "Changes colors when wind turns, always lands on his feet.", "flavor": "He has three names and uses none.", "debt": "He will flip a contract for you.", "price": "A Black Mark (reputation stain)." },
-    { "rank": 6, "suit": "heart", "title": "Ykrul Clan Emissary", "subtitle": "[SOCIAL] [OATH]", "description": "Speaks in riddled proverbs; pays in copper from a cursed mine.", "flavor": "The horse you ride will remember.", "debt": "He offers a Safe-Conduct Token (one free passage through Ykrul land).", "price": "Accepting marks Obligation [2]." },
-    { "rank": 7, "suit": "heart", "title": "Vilikari War-Chief's Second Son", "subtitle": "[SOCIAL]", "description": "Honor burns brighter than his father's patience.", "flavor": "His axe has a name.", "debt": "He will join your next battle as a Cap 2 ally.", "price": "If he takes Harm, start a Blood Feud [6] with his clan." },
-    { "rank": 8, "suit": "heart", "title": "Surgeon of the Red Tally", "subtitle": "[SHARE]", "description": "Treats friend and foe; her record balances in blood.", "flavor": "Her hands never shake.", "debt": "She can heal 1 Harm.", "price": "The patient's name is added to her roll; once per arc, she calls in the share — a dangerous mission." },
-    { "rank": 9, "suit": "heart", "title": "Quartermaster", "subtitle": "[SHARE]", "description": "Knows where every coin went and every man will fall.", "flavor": "He never eats with the men.", "debt": "Spend 1 Boon to cancel one Supplies tick.", "price": "He now has a String on you." },
-    { "rank": 10, "suit": "heart", "title": "Tribune's Aide-de-Camp", "subtitle": "[SOCIAL]", "description": "Sealed orders contradict the general's intent.", "flavor": "His seal ring is warm.", "debt": "He will leak the real orders for a Favor Share [4].", "price": "The leak may be a trap." },
-    { "rank": 11, "suit": "heart", "title": "The Black Colonel", "subtitle": "[LEGEND]", "description": "Legendary commander not seen in months, yet his banner rides.", "flavor": "He never lost a battle — only his way home.", "debt": "Follow the banner and find a cache (gain 1 Diamond of your choice).", "price": "Following it three times summons his ghost." },
-    { "rank": 12, "suit": "heart", "title": "Ykrul Clan-Mother", "subtitle": "[OATH]", "description": "Weaves war-braids from hair of oath-breakers.", "flavor": "Her braids have nine knots.", "debt": "She can witness any oath.", "price": "Breaking a witnessed oath gives her power over you — she may demand a service." },
-    { "rank": 13, "suit": "heart", "title": "Vilikari High Chief", "subtitle": "[SOCIAL]", "description": "Trades mercenaries like game pieces; never tips the board.", "flavor": "His smile is an agreement.", "debt": "He offers a Trading Charter (buy/sell anything in any camp).", "price": "Using it ticks Cohesion +1 (soldiers suspect you of corruption)." },
-    { "rank": 14, "suit": "heart", "title": "The Bannerless One", "subtitle": "[LEGEND]", "description": "Commands loyalty without rank or flag.", "flavor": "Her face is never the same twice.", "debt": "She appears when the camp is darkest and clears one segment of the pay cycle.", "price": "You incur a Price of Mercy [4]. When it fills, she asks for a prisoner — or a promise." }
+    {
+      "rank": 2,
+      "suit": "heart",
+      "title": "Young Cadet",
+      "subtitle": "[SOCIAL]",
+      "description": "Father's sword, mother's share, hunger to prove himself.",
+      "flavor": "He has never seen a man die.",
+      "debt": "Mentor him in a downtime scene and he becomes a Cap 1 follower.",
+      "price": "Ignore him and he joins a rival company — tick Rival Agenda +1."
+    },
+    {
+      "rank": 3,
+      "suit": "heart",
+      "title": "Veteran Sergeant",
+      "subtitle": "[COMBAT] [SOCIAL]",
+      "description": "Counts scars like medals; spends them on whiskey and mercy.",
+      "flavor": "She will fight for you, but at end of scene demands a story about a battle you survived.",
+      "debt": "Fights at your side for the scene.",
+      "price": "If you cannot provide a story, she takes a button from your coat — a promise."
+    },
+    {
+      "rank": 4,
+      "suit": "heart",
+      "title": "Ecktorian Banner-Captain",
+      "subtitle": "[LAW]",
+      "description": "Griffon standard, roster of noble grudges, smile like winter.",
+      "flavor": "His boots are always clean.",
+      "debt": "He offers a Letter of Marque (once: ignore one legal complication).",
+      "price": "Accepting starts his Favor Share [4] — he will call in a favor during a critical moment."
+    },
+    {
+      "rank": 5,
+      "suit": "heart",
+      "title": "Condotta Broker",
+      "subtitle": "[SOCIAL]",
+      "description": "Changes colors when wind turns, always lands on his feet.",
+      "flavor": "He has three names and uses none.",
+      "debt": "He will flip a contract for you.",
+      "price": "A Black Mark (reputation stain)."
+    },
+    {
+      "rank": 6,
+      "suit": "heart",
+      "title": "Ykrul Clan Emissary",
+      "subtitle": "[SOCIAL] [OATH]",
+      "description": "Speaks in riddled proverbs; pays in copper from a cursed mine.",
+      "flavor": "The horse you ride will remember.",
+      "debt": "He offers a Safe-Conduct Token (one free passage through Ykrul land).",
+      "price": "Accepting marks Obligation [2]."
+    },
+    {
+      "rank": 7,
+      "suit": "heart",
+      "title": "Vilikari War-Chief's Second Son",
+      "subtitle": "[SOCIAL]",
+      "description": "Honor burns brighter than his father's patience.",
+      "flavor": "His axe has a name.",
+      "debt": "He will join your next battle as a Cap 2 ally.",
+      "price": "If he takes Harm, start a Blood Feud [6] with his clan."
+    },
+    {
+      "rank": 8,
+      "suit": "heart",
+      "title": "Surgeon of the Red Tally",
+      "subtitle": "[SHARE]",
+      "description": "Treats friend and foe; her record balances in blood.",
+      "flavor": "Her hands never shake.",
+      "debt": "She can heal 1 Harm.",
+      "price": "The patient's name is added to her roll; once per arc, she calls in the share — a dangerous mission."
+    },
+    {
+      "rank": 9,
+      "suit": "heart",
+      "title": "Quartermaster",
+      "subtitle": "[SHARE]",
+      "description": "Knows where every coin went and every man will fall.",
+      "flavor": "He never eats with the men.",
+      "debt": "Spend 1 Boon to cancel one Supplies tick.",
+      "price": "He now has a String on you."
+    },
+    {
+      "rank": 10,
+      "suit": "heart",
+      "title": "Tribune's Aide-de-Camp",
+      "subtitle": "[SOCIAL]",
+      "description": "Sealed orders contradict the general's intent.",
+      "flavor": "His seal ring is warm.",
+      "debt": "He will leak the real orders for a Favor Share [4].",
+      "price": "The leak may be a trap."
+    },
+    {
+      "rank": 11,
+      "suit": "heart",
+      "title": "The Black Colonel",
+      "subtitle": "[LEGEND]",
+      "description": "Legendary commander not seen in months, yet his banner rides.",
+      "flavor": "He never lost a battle — only his way home.",
+      "debt": "Follow the banner and find a cache (gain 1 Diamond of your choice).",
+      "price": "Following it three times summons his ghost."
+    },
+    {
+      "rank": 12,
+      "suit": "heart",
+      "title": "Ykrul Clan-Mother",
+      "subtitle": "[OATH]",
+      "description": "Weaves war-braids from hair of oath-breakers.",
+      "flavor": "Her braids have nine knots.",
+      "debt": "She can witness any oath.",
+      "price": "Breaking a witnessed oath gives her power over you — she may demand a service."
+    },
+    {
+      "rank": 13,
+      "suit": "heart",
+      "title": "Vilikari High Chief",
+      "subtitle": "[SOCIAL]",
+      "description": "Trades mercenaries like game pieces; never tips the board.",
+      "flavor": "His smile is an agreement.",
+      "debt": "He offers a Trading Charter (buy/sell anything in any camp).",
+      "price": "Using it ticks Cohesion +1 (soldiers suspect you of corruption)."
+    },
+    {
+      "rank": 14,
+      "suit": "heart",
+      "title": "The Bannerless One",
+      "subtitle": "[LEGEND]",
+      "description": "Commands loyalty without rank or flag.",
+      "flavor": "Her face is never the same twice.",
+      "debt": "She appears when the camp is darkest and clears one segment of the pay cycle.",
+      "price": "You incur a Price of Mercy [4]. When it fills, she asks for a prisoner — or a promise."
+    }
   ],
   "complications": [
-    { "rank": 2, "suit": "club", "title": "Payday Delayed", "subtitle": "[SHARE]", "description": "Supplies dwindle before coin arrives.", "flavor": "The captain blames the weather.", "mechanical_hook": "Tick Payday +1. On fill, a squad deserts — lose 1 Supplies and gain a Black Mark." },
-    { "rank": 3, "suit": "club", "title": "False Orders", "subtitle": "[SOCIAL]", "description": "Your target is now your ally — on paper.", "flavor": "The messenger's hands are clean.", "mechanical_hook": "The first command this scene is misinterpreted unless countered with a Diamond (cipher, cantor, witness)." },
-    { "rank": 4, "suit": "club", "title": "Blizzard Pins", "subtitle": "[WEATHER] [COMBAT]", "description": "Two rival companies, one cloister; vows and knives both come out.", "flavor": "The snow is red by dawn.", "mechanical_hook": "Tick Cohesion +1. The abbot will sell safe passage to the highest bidder — start an Auction [4] timer." },
-    { "rank": 5, "suit": "club", "title": "Ykrul Counter-Offer", "subtitle": "[SOCIAL] [SHARE]", "description": "Better terms than Ecktoria; your contract becomes a liability.", "flavor": "The horses watch you decide.", "mechanical_hook": "Accept (gain +1 Effect, mark Obligation [2]) or refuse (tick the pay timer +1)." },
-    { "rank": 6, "suit": "club", "title": "Condotta Flip", "subtitle": "[COMBAT]", "description": "Unit switches colors mid-battle; your 'relief' hits your flank.", "flavor": "Their old banner burns in your camp.", "mechanical_hook": "On a Miss, the unit attacks you. On a Partial, they demand double compensation — tick Payday +1." },
-    { "rank": 7, "suit": "club", "title": "Camp Fever", "subtitle": "[DEATH]", "description": "Blooms in the surgeon's tent; the counting-house for the dead.", "flavor": "The surgeon weeps in silence.", "mechanical_hook": "Start Camp Fever [4]. Each failed Endurance test ticks it. At 4, a key NPC dies." },
-    { "rank": 8, "suit": "club", "title": "Vilikari Raid", "subtitle": "[COMBAT] [TRAVEL]", "description": "Cuts your supply road; winter moves the schedule.", "flavor": "The stew tastes of revenge.", "mechanical_hook": "Tick Supplies +1. The raiders left a recipe — cooking it gives 1 Supplies but starts a Rival Hunt [4]." },
-    { "rank": 9, "suit": "club", "title": "Honor Code Collision", "subtitle": "[SOCIAL]", "description": "Ecktorian ideals vs. mercenary pragmatism; the camp splits by doctrine.", "flavor": "The men watch which way you lean.", "mechanical_hook": "Choose Honor (tick Supplies +1, logistics suffer) or Pragmatism (gain +1 Effect now, but start Parley Divided [4])." },
-    { "rank": 10, "suit": "club", "title": "Tribune Captured", "subtitle": "[SOCIAL] [SHARE]", "description": "The aide must choose: the rescue or the war.", "flavor": "His ghost will remember.", "mechanical_hook": "Rescue him: lose 1 Supplies. Abandon him: gain Black Mark but tick the pay timer −1." },
-    { "rank": 11, "suit": "club", "title": "Black Colonel's Banner", "subtitle": "[COMBAT]", "description": "Appears on the wrong field; confusion is a weapon.", "flavor": "The banner has no shadow.", "mechanical_hook": "Roll 1d6. On 1–3, the enemy believes you have reinforcements (+1 Position). On 4–6, your own side hesitates (−1 die on first attack)." },
-    { "rank": 12, "suit": "club", "title": "Blood-Feast", "subtitle": "[OATH] [SOCIAL]", "description": "Clan-Mother calls it; all contracts suspended until dawn's judgment.", "flavor": "The meat is always fresh.", "mechanical_hook": "The feast is a trial. Each PC must confess a broken oath or take Harm 1 (the clan judges)." },
-    { "rank": 13, "suit": "club", "title": "High Chief's Game", "subtitle": "[SOCIAL] [SHARE]", "description": "Plays companies against each other; 'winner' takes obligations, not spoils.", "flavor": "The game has no rules — only winners.", "mechanical_hook": "The 'winner' inherits an Obligation Timer [6] from the loser. Refusing the game starts a Vendetta [4]." },
-    { "rank": 14, "suit": "club", "title": "The Singing Wastes Awaken", "subtitle": "[MAGIC] [DEATH]", "description": "Every fallen blade rises to seek its last hand.", "flavor": "The song is a scream.", "mechanical_hook": "The blades attack everyone for 1 round. Afterward, any PC may claim a Cursed Blade (+1 die, but the blade whispers secrets — the GM gains 1 SB per scene)." }
+    {
+      "rank": 2,
+      "suit": "club",
+      "title": "Payday Delayed",
+      "subtitle": "[SHARE]",
+      "description": "Supplies dwindle before coin arrives.",
+      "flavor": "The captain blames the weather.",
+      "mechanical_hook": "Tick Payday +1. On fill, a squad deserts — lose 1 Supplies and gain a Black Mark."
+    },
+    {
+      "rank": 3,
+      "suit": "club",
+      "title": "False Orders",
+      "subtitle": "[SOCIAL]",
+      "description": "Your target is now your ally — on paper.",
+      "flavor": "The messenger's hands are clean.",
+      "mechanical_hook": "The first command this scene is misinterpreted unless countered with a Diamond (cipher, cantor, witness)."
+    },
+    {
+      "rank": 4,
+      "suit": "club",
+      "title": "Blizzard Pins",
+      "subtitle": "[WEATHER] [COMBAT]",
+      "description": "Two rival companies, one cloister; vows and knives both come out.",
+      "flavor": "The snow is red by dawn.",
+      "mechanical_hook": "Tick Cohesion +1. The abbot will sell safe passage to the highest bidder — start an Auction [4] timer."
+    },
+    {
+      "rank": 5,
+      "suit": "club",
+      "title": "Ykrul Counter-Offer",
+      "subtitle": "[SOCIAL] [SHARE]",
+      "description": "Better terms than Ecktoria; your contract becomes a liability.",
+      "flavor": "The horses watch you decide.",
+      "mechanical_hook": "Accept (gain +1 Effect, mark Obligation [2]) or refuse (tick the pay timer +1)."
+    },
+    {
+      "rank": 6,
+      "suit": "club",
+      "title": "Condotta Flip",
+      "subtitle": "[COMBAT]",
+      "description": "Unit switches colors mid-battle; your 'relief' hits your flank.",
+      "flavor": "Their old banner burns in your camp.",
+      "mechanical_hook": "On a Miss, the unit attacks you. On a Partial, they demand double compensation — tick Payday +1."
+    },
+    {
+      "rank": 7,
+      "suit": "club",
+      "title": "Camp Fever",
+      "subtitle": "[DEATH]",
+      "description": "Blooms in the surgeon's tent; the counting-house for the dead.",
+      "flavor": "The surgeon weeps in silence.",
+      "mechanical_hook": "Start Camp Fever [4]. Each failed Endurance test ticks it. At 4, a key NPC dies."
+    },
+    {
+      "rank": 8,
+      "suit": "club",
+      "title": "Vilikari Raid",
+      "subtitle": "[COMBAT] [TRAVEL]",
+      "description": "Cuts your supply road; winter moves the schedule.",
+      "flavor": "The stew tastes of revenge.",
+      "mechanical_hook": "Tick Supplies +1. The raiders left a recipe — cooking it gives 1 Supplies but starts a Rival Hunt [4]."
+    },
+    {
+      "rank": 9,
+      "suit": "club",
+      "title": "Honor Code Collision",
+      "subtitle": "[SOCIAL]",
+      "description": "Ecktorian ideals vs. mercenary pragmatism; the camp splits by doctrine.",
+      "flavor": "The men watch which way you lean.",
+      "mechanical_hook": "Choose Honor (tick Supplies +1, logistics suffer) or Pragmatism (gain +1 Effect now, but start Parley Divided [4])."
+    },
+    {
+      "rank": 10,
+      "suit": "club",
+      "title": "Tribune Captured",
+      "subtitle": "[SOCIAL] [SHARE]",
+      "description": "The aide must choose: the rescue or the war.",
+      "flavor": "His ghost will remember.",
+      "mechanical_hook": "Rescue him: lose 1 Supplies. Abandon him: gain Black Mark but tick the pay timer −1."
+    },
+    {
+      "rank": 11,
+      "suit": "club",
+      "title": "Black Colonel's Banner",
+      "subtitle": "[COMBAT]",
+      "description": "Appears on the wrong field; confusion is a weapon.",
+      "flavor": "The banner has no shadow.",
+      "mechanical_hook": "Roll 1d6. On 1–3, the enemy believes you have reinforcements (+1 Position). On 4–6, your own side hesitates (−1 die on first attack)."
+    },
+    {
+      "rank": 12,
+      "suit": "club",
+      "title": "Blood-Feast",
+      "subtitle": "[OATH] [SOCIAL]",
+      "description": "Clan-Mother calls it; all contracts suspended until dawn's judgment.",
+      "flavor": "The meat is always fresh.",
+      "mechanical_hook": "The feast is a trial. Each PC must confess a broken oath or take Harm 1 (the clan judges)."
+    },
+    {
+      "rank": 13,
+      "suit": "club",
+      "title": "High Chief's Game",
+      "subtitle": "[SOCIAL] [SHARE]",
+      "description": "Plays companies against each other; 'winner' takes obligations, not spoils.",
+      "flavor": "The game has no rules — only winners.",
+      "mechanical_hook": "The 'winner' inherits an Obligation Timer [6] from the loser. Refusing the game starts a Vendetta [4]."
+    },
+    {
+      "rank": 14,
+      "suit": "club",
+      "title": "The Singing Wastes Awaken",
+      "subtitle": "[MAGIC] [DEATH]",
+      "description": "Every fallen blade rises to seek its last hand.",
+      "flavor": "The song is a scream.",
+      "mechanical_hook": "The blades attack everyone for 1 round. Afterward, any PC may claim a Cursed Blade (+1 die, but the blade whispers secrets — the GM gains 1 SB per scene)."
+    }
   ],
   "rewards": [
-    { "rank": 2, "suit": "diamond", "title": "Emergency Requisition", "subtitle": "[SHARE]", "description": "Strip a fallen company; their ghosts watch.", "flavor": "He asks for his boots back.", "curse_cost": "After use, the quartermaster's ghost haunts you for 1d4 scenes (−1 die on stealth)." },
-    { "rank": 3, "suit": "diamond", "title": "Dual Contract", "subtitle": "[SOCIAL] [SHARE]", "description": "Serve two masters whose goals cannot both be met.", "flavor": "The second master always cheats.", "curse_cost": "Gain +2 dice on one negotiation, but start a Double Charter [6] — when it fills, both masters seek recompense." },
-    { "rank": 4, "suit": "diamond", "title": "Honor Dispensation", "subtitle": "[SOCIAL]", "description": "Your acts are justified regardless of code (for now).", "flavor": "The sound is a lie.", "curse_cost": "Once, ignore a Black Mark consequence. The dispensation is a bell — ring it, and the tribunal looks away. The bell then cracks." },
-    { "rank": 5, "suit": "diamond", "title": "Condotta Rider's Pass", "subtitle": "[STEALTH]", "description": "Cross any camp perimeter unchallenged.", "flavor": "The smoke spells a name.", "curse_cost": "Use it once; then the feather burns." },
-    { "rank": 6, "suit": "diamond", "title": "Ykrul Safe-Conduct Token", "subtitle": "[TRAVEL]", "description": "Pass a named clan's lands unmolested (until the moon changes).", "flavor": "The horse still whinnies at midnight.", "curse_cost": "The token is a horse's tooth; it turns to dust after one use." },
-    { "rank": 7, "suit": "diamond", "title": "Vilikari War-Mark", "subtitle": "[TRAVEL] [SHARE]", "description": "Their scouts guide you through hostile hills — and remember the favor.", "flavor": "The ridge is haunted.", "curse_cost": "Gain +1 Effect on one navigation roll; the favor will be called at dawn — they will demand a ridge or a bridge." },
-    { "rank": 8, "suit": "diamond", "title": "Surgeon's Note", "subtitle": "[SHARE]", "description": "Medical care when no coin remains; the interest is names.", "flavor": "She never forgets a face.", "curse_cost": "Heal 1 Harm now; the note is a name — the surgeon will collect it later (GM gains a String on you)." },
-    { "rank": 9, "suit": "diamond", "title": "Tribune's Cipher Ring", "subtitle": "[SOCIAL]", "description": "Decode orders that do not exist yet.", "flavor": "The message was always a lie.", "curse_cost": "Once, treat a False Orders complication as Clean Success. The ring is warm — it cools after use." },
-    { "rank": 10, "suit": "diamond", "title": "Banner-Captain's Seal", "subtitle": "[AUTHORITY]", "description": "Commandeer resources from junior companies (and their resentment).", "flavor": "The seal is a wolf's head. It bites.", "curse_cost": "Gain +1 Supplies now, but start a Jealousy [4] timer (junior officers scheme against you)." },
-    { "rank": 11, "suit": "diamond", "title": "Field Promotion Warrant", "subtitle": "[AUTHORITY] [SHARE]", "description": "Assume command of a shattered unit, inherit its timers.", "flavor": "The sergeant has seen too much.", "curse_cost": "You gain a Cap 2 follower (the unit's sergeant), but inherit their pay timer [2/4] and Black Mark [1]." },
-    { "rank": 12, "suit": "diamond", "title": "Clan-Mother's War-Braids", "subtitle": "[COMBAT] [SOCIAL]", "description": "Her chosen fight beside you this battle, then judge you after.", "flavor": "The braid is warm.", "curse_cost": "Gain a Cap 3 ally for one battle. Afterward, on a Miss, she takes a war-braid from you (lose 1 Boon)." },
-    { "rank": 13, "suit": "diamond", "title": "High Chief's Trading Charter", "subtitle": "[TRADE]", "description": "Buy or sell anything in any camp, no questions asked aloud.", "flavor": "The charter is written on skin.", "curse_cost": "Once per arc, treat a market roll as Clean Success; the answers are compensated in silence (GM gains 1 SB)." },
-    { "rank": 14, "suit": "diamond", "title": "The Bannerless Word", "subtitle": "[LEGEND]", "description": "Loyalty that outruns rank, law, and coin.", "flavor": "The men will not speak of it.", "curse_cost": "Once, when all other resources are exhausted, whisper this word to rally a shattered company; afterward, the word is forgotten — you cannot use it again." }
+    {
+      "rank": 2,
+      "suit": "diamond",
+      "title": "Emergency Requisition",
+      "subtitle": "[SHARE]",
+      "description": "Strip a fallen company; their ghosts watch.",
+      "flavor": "He asks for his boots back.",
+      "curse_cost": "After use, the quartermaster's ghost haunts you for 1d4 scenes (−1 die on stealth)."
+    },
+    {
+      "rank": 3,
+      "suit": "diamond",
+      "title": "Dual Contract",
+      "subtitle": "[SOCIAL] [SHARE]",
+      "description": "Serve two masters whose goals cannot both be met.",
+      "flavor": "The second master always cheats.",
+      "curse_cost": "Gain +2 dice on one negotiation, but start a Double Charter [6] — when it fills, both masters seek recompense."
+    },
+    {
+      "rank": 4,
+      "suit": "diamond",
+      "title": "Honor Dispensation",
+      "subtitle": "[SOCIAL]",
+      "description": "Your acts are justified regardless of code (for now).",
+      "flavor": "The sound is a lie.",
+      "curse_cost": "Once, ignore a Black Mark consequence. The dispensation is a bell — ring it, and the tribunal looks away. The bell then cracks."
+    },
+    {
+      "rank": 5,
+      "suit": "diamond",
+      "title": "Condotta Rider's Pass",
+      "subtitle": "[STEALTH]",
+      "description": "Cross any camp perimeter unchallenged.",
+      "flavor": "The smoke spells a name.",
+      "curse_cost": "Use it once; then the feather burns."
+    },
+    {
+      "rank": 6,
+      "suit": "diamond",
+      "title": "Ykrul Safe-Conduct Token",
+      "subtitle": "[TRAVEL]",
+      "description": "Pass a named clan's lands unmolested (until the moon changes).",
+      "flavor": "The horse still whinnies at midnight.",
+      "curse_cost": "The token is a horse's tooth; it turns to dust after one use."
+    },
+    {
+      "rank": 7,
+      "suit": "diamond",
+      "title": "Vilikari War-Mark",
+      "subtitle": "[TRAVEL] [SHARE]",
+      "description": "Their scouts guide you through hostile hills — and remember the favor.",
+      "flavor": "The ridge is haunted.",
+      "curse_cost": "Gain +1 Effect on one navigation roll; the favor will be called at dawn — they will demand a ridge or a bridge."
+    },
+    {
+      "rank": 8,
+      "suit": "diamond",
+      "title": "Surgeon's Note",
+      "subtitle": "[SHARE]",
+      "description": "Medical care when no coin remains; the interest is names.",
+      "flavor": "She never forgets a face.",
+      "curse_cost": "Heal 1 Harm now; the note is a name — the surgeon will collect it later (GM gains a String on you)."
+    },
+    {
+      "rank": 9,
+      "suit": "diamond",
+      "title": "Tribune's Cipher Ring",
+      "subtitle": "[SOCIAL]",
+      "description": "Decode orders that do not exist yet.",
+      "flavor": "The message was always a lie.",
+      "curse_cost": "Once, treat a False Orders complication as Clean Success. The ring is warm — it cools after use."
+    },
+    {
+      "rank": 10,
+      "suit": "diamond",
+      "title": "Banner-Captain's Seal",
+      "subtitle": "[AUTHORITY]",
+      "description": "Commandeer resources from junior companies (and their resentment).",
+      "flavor": "The seal is a wolf's head. It bites.",
+      "curse_cost": "Gain +1 Supplies now, but start a Jealousy [4] timer (junior officers scheme against you)."
+    },
+    {
+      "rank": 11,
+      "suit": "diamond",
+      "title": "Field Promotion Warrant",
+      "subtitle": "[AUTHORITY] [SHARE]",
+      "description": "Assume command of a shattered unit, inherit its timers.",
+      "flavor": "The sergeant has seen too much.",
+      "curse_cost": "You gain a Cap 2 follower (the unit's sergeant), but inherit their pay timer [2/4] and Black Mark [1]."
+    },
+    {
+      "rank": 12,
+      "suit": "diamond",
+      "title": "Clan-Mother's War-Braids",
+      "subtitle": "[COMBAT] [SOCIAL]",
+      "description": "Her chosen fight beside you this battle, then judge you after.",
+      "flavor": "The braid is warm.",
+      "curse_cost": "Gain a Cap 3 ally for one battle. Afterward, on a Miss, she takes a war-braid from you (lose 1 Boon)."
+    },
+    {
+      "rank": 13,
+      "suit": "diamond",
+      "title": "High Chief's Trading Charter",
+      "subtitle": "[TRADE]",
+      "description": "Buy or sell anything in any camp, no questions asked aloud.",
+      "flavor": "The charter is written on skin.",
+      "curse_cost": "Once per arc, treat a market roll as Clean Success; the answers are compensated in silence (GM gains 1 SB)."
+    },
+    {
+      "rank": 14,
+      "suit": "diamond",
+      "title": "The Bannerless Word",
+      "subtitle": "[LEGEND]",
+      "description": "Loyalty that outruns rank, law, and coin.",
+      "flavor": "The men will not speak of it.",
+      "curse_cost": "Once, when all other resources are exhausted, whisper this word to rally a shattered company; afterward, the word is forgotten — you cannot use it again."
+    }
   ],
   "quick_use_notes": {
     "draw_rules": "Draw until you have all four suits. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
@@ -137,19 +600,89 @@
     "centering_actions": "Settle arrears on-screen, return prisoners with witness, fulfill a broken writ at cost. Move the dial one step toward center. The campfire remembers."
   },
   "superstitions": [
-    { "name": "Bread to the Bell", "effect": "Crumble a crust at a camp's bell post. Ignore the first Payday Delayed penalty.", "cost": "Burn for +1 die once" },
-    { "name": "Knot the Roster", "effect": "Tie a single knot in the company roster. Cancel Condotta Flip or take −1 die on your next negotiation (your choice).", "cost": "Burn for +1 die once" },
-    { "name": "Name to the Mud", "effect": "Whisper a dead captain's name into the latrine trench. Gain +1 Effect when rallying the company this scene, but mark Obligation to the Bannerless One.", "cost": "Burn for +1 die once" }
+    {
+      "name": "Bread to the Bell",
+      "effect": "Crumble a crust at a camp's bell post. Ignore the first Payday Delayed penalty.",
+      "cost": "Burn for +1 die once"
+    },
+    {
+      "name": "Knot the Roster",
+      "effect": "Tie a single knot in the company roster. Cancel Condotta Flip or take −1 die on your next negotiation (your choice).",
+      "cost": "Burn for +1 die once"
+    },
+    {
+      "name": "Name to the Mud",
+      "effect": "Whisper a dead captain's name into the latrine trench. Gain +1 Effect when rallying the company this scene, but mark Obligation to the Bannerless One.",
+      "cost": "Burn for +1 die once"
+    }
   ],
   "pursuit_ladder": [
-    { "move": "Advance/Withdraw (Wits + Ride or Stealth)", "effect": "On a hit, shift one band. On a strong hit, also impose Dust Cloud (cover retreat)." },
-    { "move": "Cut the Contract (Presence + Sway)", "effect": "On a hit, freeze range for one exchange; if a Condotta Rider's Pass is in your possession, +1 die." },
-    { "move": "Weather the Blizzard (Endurance + Survival)", "effect": "On a hit in Blizzard Pins, you pick who finds shelter; on a miss, the GM does." }
+    {
+      "move": "Advance/Withdraw (Wits + Ride or Stealth)",
+      "effect": "On a hit, shift one band. On a strong hit, also impose Dust Cloud (cover retreat)."
+    },
+    {
+      "move": "Cut the Contract (Presence + Sway)",
+      "effect": "On a hit, freeze range for one exchange; if a Condotta Rider's Pass is in your possession, +1 die."
+    },
+    {
+      "move": "Weather the Blizzard (Endurance + Survival)",
+      "effect": "On a hit in Blizzard Pins, you pick who finds shelter; on a miss, the GM does."
+    }
   ],
   "boss_archetypes": [
-    { "name": "The Coin-Captain", "tags": ["Mercenary", "Turncoat"], "description": "A charming officer who has already sold your company's position twice.", "phases": ["Fair Offer", "Betrayal Clause", "Payday Massacre"], "cracks": ["expose his dual contract before the company", "pay off his debt to the Condotta Broker", "outbid him for his own loyalty"] },
-    { "name": "The Quartermaster-Provost", "tags": ["Logistics", "Tyrant"], "description": "A logistics officer who has turned hunger into a weapon.", "phases": ["Supply Freeze", "Ration Cuts", "Starvation Siege"], "cracks": ["steal his secret ledger", "rally the men with a shared meal (spend 1 Supplies)", "break his control of the supply route"] },
-    { "name": "The Singing Wakes", "tags": ["Weapon-Host", "Uncanny"], "description": "A chorus of fallen blades that has learned to want.", "phases": ["Whisper", "Chorus", "Scream"], "cracks": ["perform the Three Silencing Acts (funeral honors for a fallen blade, bury a broken standard, ring the wind-break bell)"] }
+    {
+      "name": "The Coin-Captain",
+      "tags": [
+        "Mercenary",
+        "Turncoat"
+      ],
+      "description": "A charming officer who has already sold your company's position twice.",
+      "phases": [
+        "Fair Offer",
+        "Betrayal Clause",
+        "Payday Massacre"
+      ],
+      "cracks": [
+        "expose his dual contract before the company",
+        "pay off his debt to the Condotta Broker",
+        "outbid him for his own loyalty"
+      ]
+    },
+    {
+      "name": "The Quartermaster-Provost",
+      "tags": [
+        "Logistics",
+        "Tyrant"
+      ],
+      "description": "A logistics officer who has turned hunger into a weapon.",
+      "phases": [
+        "Supply Freeze",
+        "Ration Cuts",
+        "Starvation Siege"
+      ],
+      "cracks": [
+        "steal his secret ledger",
+        "rally the men with a shared meal (spend 1 Supplies)",
+        "break his control of the supply route"
+      ]
+    },
+    {
+      "name": "The Singing Wakes",
+      "tags": [
+        "Weapon-Host",
+        "Uncanny"
+      ],
+      "description": "A chorus of fallen blades that has learned to want.",
+      "phases": [
+        "Whisper",
+        "Chorus",
+        "Scream"
+      ],
+      "cracks": [
+        "perform the Three Silencing Acts (funeral honors for a fallen blade, bury a broken standard, ring the wind-break bell)"
+      ]
+    }
   ],
   "gm_tools": {
     "field_procedures": [
@@ -168,9 +701,21 @@
   "patronage_and_power": "In the Black Banners, power flows through agreements, coin chests, and the weight of a reputation — but also through the sergeant who knows each man's name, the cook who stretches the rations, the smith who works through the night. A Banner-Captain's authority rests on the number of companies he commands; a Condotta Broker's on the thickness of his roster. Yet loyalty is not bought — it is earned in the mud, at the latrine, across a shared fire. **For the GM:** Power in the Black Banners is measured in payday timers, broker's favors, and the length of a duel record — but also in the camp's mood, the quartermaster's ledger, and the stories the veterans tell. Patronage often takes the form of dual contracts, emergency requisitions, or the Bannerless Word — each tied to a specific company, broker, or share. Use the pay and supply timers as visible pressure. Enforce Allegiances in Flux — every scene, loyalties may shift. Let Honor vs. Pragmatism be a dial the party can slide through their actions. Track Black Marks as a persistent reputation score. Remember the human element: the soldier who shares his last ration, the captain who stands in the line, the surgeon who weeps in private. These are the ties that outlast coin. In the Black Banners, the camp sings when pay arrives — and falls silent when the coin chest is empty. But the camp also sings when a wounded friend survives, when the supply train arrives, when the snow melts and the road opens. The song is never just about coin.",
   "final_gm_mantra": "The camp sings when pay arrives — and falls silent when the chest is empty. Set DV low. Use Allegiances in Flux every scene. Let Payday, Supplies, and Cohesion be visible. Spend SB as false orders, cut supply lines, or camp fever. And remember: in the Black Banners, a broken agreement costs more than a broken blade — but a broken trust costs more than either.",
   "index": [
-    "Black Banners", "Condotta and Crowns generator", "Theme generator", "Places!Black Banners", "People!Black Banners",
-    "Complications!Black Banners", "Rewards!Black Banners", "Banner-Captain", "Condotta Broker", "Quartermaster",
-    "Payday timer", "Cohesion timer", "Camp event generator", "Allegiances in Flux", "Honor vs. Pragmatism dial",
+    "Black Banners",
+    "Condotta and Crowns generator",
+    "Theme generator",
+    "Places!Black Banners",
+    "People!Black Banners",
+    "Complications!Black Banners",
+    "Rewards!Black Banners",
+    "Banner-Captain",
+    "Condotta Broker",
+    "Quartermaster",
+    "Payday timer",
+    "Cohesion timer",
+    "Camp event generator",
+    "Allegiances in Flux",
+    "Honor vs. Pragmatism dial",
     "Local Patrons!Black Banners"
   ],
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."

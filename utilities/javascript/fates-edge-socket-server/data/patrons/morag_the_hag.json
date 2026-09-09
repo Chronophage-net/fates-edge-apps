@@ -60,7 +60,12 @@
       "action": "Scene",
       "range": "Near/Touch",
       "resist": "Yes",
-      "tags": ["BARGAIN", "BOOST", "DEBT", "FATE"],
+      "tags": [
+        "BARGAIN",
+        "BOOST",
+        "DEBT",
+        "FATE"
+      ],
       "materials": "A half_written contract or a promise spoken but not sealed; or a token of good fortune from someone who recently succeeded.",
       "effect": "Frame a bargain with an escape clause only you understand. Gain +1 die when the other party acts to fulfill their obligation; you may interpret ambiguous terms in your favor.",
       "push_it": "Instead of the clause, you may borrow another's fresh luck: gain +2 dice on one roll that benefits from their good fortune, but the original bearer suffers misfortune later. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -76,7 +81,12 @@
       "action": "Scene",
       "range": "Near",
       "resist": "Yes",
-      "tags": ["BIND", "DEBT", "FEAR", "FATE"],
+      "tags": [
+        "BIND",
+        "DEBT",
+        "FEAR",
+        "FATE"
+      ],
       "materials": "Cord or thread tied with counted knots while speaking the bargain.",
       "effect": "Bind a promise with fae knots that tighten when broken. Both parties gain +1 die while keeping the bargain; breaking it escalates consequences (Harm 1, then Harm 2, then Curse).",
       "push_it": "The knots grow willful and seek payment from the breaker's kin; mark +1 Obligation. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -92,7 +102,12 @@
       "action": "Scene",
       "range": "Near",
       "resist": "Yes",
-      "tags": ["TRADE", "DEBT", "BOOST", "FATE"],
+      "tags": [
+        "TRADE",
+        "DEBT",
+        "BOOST",
+        "FATE"
+      ],
       "materials": "Three items of equal seeming value but different true worth.",
       "effect": "Broker a trade where each party yields hidden value. All participants gain +1 die when the exchange benefits them; Morag claims the difference in true worth as her tithe.",
       "push_it": "The exchange binds across generations; mark 1 SB (Spades) as ancestral debts stir. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -108,7 +123,13 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "Yes",
-      "tags": ["CRAFT", "HEAL", "DEBT", "FATE", "SACRIFICE"],
+      "tags": [
+        "CRAFT",
+        "HEAL",
+        "DEBT",
+        "FATE",
+        "SACRIFICE"
+      ],
       "materials": "A cauldron never yet empty, ingredients dearer than coin, and a willing gift of time.",
       "effect": "Brew a solution to any problem, but the cauldron asks one more ingredient—one the brewer does not realize they are providing until too late (a memory, a name, a year of life).",
       "push_it": "The remedy works perfectly but breeds dependence—users must return or suffer withdrawal. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -124,7 +145,13 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "Yes",
-      "tags": ["AREA", "BARGAIN", "DEBT", "FATE", "FEAR"],
+      "tags": [
+        "AREA",
+        "BARGAIN",
+        "DEBT",
+        "FATE",
+        "FEAR"
+      ],
       "materials": "A true crossroads at twilight, offerings set to the four ways, and the tears of one who bargained thrice.",
       "effect": "Convene Morag's court: all present must bargain. Each pact grants a marked boon and hides a cost that will ripen at the worst time (the GM notes the cost; it becomes due when dramatically appropriate).",
       "push_it": "Judgments bind across realms and seasons; mark +2 Obligation and begin Entangled Fates [6]. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",

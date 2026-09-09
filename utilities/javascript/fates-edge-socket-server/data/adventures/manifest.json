@@ -1,9 +1,12 @@
-[
-  "blood_and_silk_saga",
-  "carnival_of_broken_dreams",
-  "censors_daughter",
-  "grumbling_vault",
-  "lantern_at_dusk",
-  "serpents_coil",
-  "whispers_in_the_tunnels"
-]
+{
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
+  "data": [
+    "blood_and_silk_saga",
+    "carnival_of_broken_dreams",
+    "censors_daughter",
+    "grumbling_vault",
+    "lantern_at_dusk",
+    "serpents_coil",
+    "whispers_in_the_tunnels"
+  ]
+}

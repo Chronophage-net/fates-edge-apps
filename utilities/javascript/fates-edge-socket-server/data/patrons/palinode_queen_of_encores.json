@@ -58,7 +58,11 @@
       "action": "Scene",
       "range": "Near",
       "resist": "No",
-      "tags": ["FEAR", "COMMAND", "RADIANT"],
+      "tags": [
+        "FEAR",
+        "COMMAND",
+        "RADIANT"
+      ],
       "materials": "A lit taper or a bell.",
       "effect": "Begin a hymn or chant. Allies in Near gain +2 dice to resist Fear this scene. On a 10, they may ignore Fear entirely for one round.",
       "push_it": "Allies who benefit also clear 1 Fatigue or 1 Complication point; you gain 1 Fatigue at the scene's end. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -74,7 +78,11 @@
       "action": "Instant",
       "range": "Self",
       "resist": "No",
-      "tags": ["PERFORMANCE", "BOOST", "BURDEN"],
+      "tags": [
+        "PERFORMANCE",
+        "BOOST",
+        "BURDEN"
+      ],
       "materials": "A note held until your voice frays.",
       "effect": "For one scene you cannot produce an imperfect sound: all Performance rolls +2 dice. All other rolls –1 die from intrusive perfection.",
       "push_it": "Extend to one ally; both mark 1 SB (Diamonds). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -90,7 +98,11 @@
       "action": "Scene",
       "range": "Near",
       "resist": "Yes",
-      "tags": ["COMMAND", "READ", "FEAR"],
+      "tags": [
+        "COMMAND",
+        "READ",
+        "FEAR"
+      ],
       "materials": "A melody braided from the listener's secret want.",
       "effect": "Presence + Command vs. Resolve (DV 3). Success: target joins in. Partial: they resist but suffer –1 die to social rolls this scene. Failure: they follow entranced.",
       "push_it": "Affects all in Near; start Compelled Audience [6] timer. Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -106,7 +118,11 @@
       "action": "Scene",
       "range": "Self",
       "resist": "No",
-      "tags": ["BIND", "FOCUS", "BOOST"],
+      "tags": [
+        "BIND",
+        "FOCUS",
+        "BOOST"
+      ],
       "materials": "Your hair woven into your instrument or tool.",
       "effect": "Enter ruthless focus: creative rolls +2 dice; ignore first 2 Fatigue from exertion. You are [BIND] to the piece until completion or ruin.",
       "push_it": "One ally is also bound; both mark 1 SB (Diamonds). Cost: Mark +1 Obligation (total +2) or Mark +1 Fatigue.",
@@ -122,7 +138,12 @@
       "action": "Extended",
       "range": "Zone",
       "resist": "No",
-      "tags": ["WARD", "AREA", "BOOST", "SACRIFICE"],
+      "tags": [
+        "WARD",
+        "AREA",
+        "BOOST",
+        "SACRIFICE"
+      ],
       "materials": "A stage kissed with the blood of sworn singers.",
       "effect": "Hallow a venue. All performances +2 dice, +1 Effect. The space is [WARD]ed: any disruption spawns 2 SB. The ward collapses if the performance ends.",
       "push_it": "The stage sustains itself but drains life; start Performance Hunger [8] timer. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",
@@ -138,7 +159,12 @@
       "action": "Extended",
       "range": "Touch",
       "resist": "No",
-      "tags": ["TRANSFORM", "FATE", "SACRIFICE", "BOOST"],
+      "tags": [
+        "TRANSFORM",
+        "FATE",
+        "SACRIFICE",
+        "BOOST"
+      ],
       "materials": "Your greatest work and regret, destroyed together.",
       "effect": "Birth a transcendent masterpiece: +2 dice to creative rolls this session; immune to social manipulation. But all lesser works falter (mundane actions not directly related to the masterpiece suffer –1 die).",
       "push_it": "The piece wakes and demands; mark Harm 1 (Stress); start Demanding Creation [6] timer. Cost: Mark +1 Obligation (total +3) or Mark +1 Fatigue.",

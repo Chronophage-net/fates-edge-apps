@@ -1,5 +1,8 @@
-[
-  "everflame",
-  "temple_of_light",
-  "the_covenant_of_mykkiel"
-]
+{
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
+  "data": [
+    "everflame",
+    "temple_of_light",
+    "the_covenant_of_mykkiel"
+  ]
+}

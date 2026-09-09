@@ -35,7 +35,7 @@
     "node": ">=18.0.0"
   },
   "license": "MIT",
-  "_license": "Code: MIT. Game content: CC BY-NC-SA 4.0 (SRD) / All Rights Reserved (proprietary). © 2024 - 2026 Nicholas A. Gasper.",
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
   "author": "Nicholas A. Gasper",
   "overrides": {
     "node-gyp": "^11.2.0",

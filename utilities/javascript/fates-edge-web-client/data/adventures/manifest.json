@@ -1,17 +1,20 @@
-[
-  "ashes_of_infernal_accord",
-  "blood_and_silk_saga",
-  "carnival_of_broken_dreams",
-  "censors_daughter",
-  "cursed_caravan",
-  "dwarven-debt",
-  "grumbling_vault",
-  "hazel_root",
-  "lantern_at_dusk",
-  "ninth_proof",
-  "serpents_coil",
-  "silent-court",
-  "the_hollowed_saga",
-  "usurpers-gambit",
-  "whispers_in_the_tunnels"
-]
+{
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
+  "data": [
+    "ashes_of_infernal_accord",
+    "blood_and_silk_saga",
+    "carnival_of_broken_dreams",
+    "censors_daughter",
+    "cursed_caravan",
+    "dwarven-debt",
+    "grumbling_vault",
+    "hazel_root",
+    "lantern_at_dusk",
+    "ninth_proof",
+    "serpents_coil",
+    "silent-court",
+    "the_hollowed_saga",
+    "usurpers-gambit",
+    "whispers_in_the_tunnels"
+  ]
+}

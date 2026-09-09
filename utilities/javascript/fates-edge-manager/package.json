@@ -26,5 +26,6 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.14",
     "socket.io-client": "^4.8.1"
-  }
+  },
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
