@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fate's Edge — Epic Play Expansion</title>
+  <style>
+    /* –– Reset & base –– */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d0f14;
+      color: #d6dce5;
+      font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 2rem 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    a { color: #eac784; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* –– Layout –– */
+    header, footer {
+      border-bottom: 1px solid #2a2f3a;
+      padding: 1rem 0 0.5rem;
+      margin-bottom: 2rem;
+    }
+    footer {
+      border-top: 1px solid #2a2f3a;
+      border-bottom: none;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #6a7180;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #f0e6d0;
+      margin-bottom: 0.25rem;
+    }
+    h1 small {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #a8b0c0;
+      display: block;
+      margin-top: 0.2rem;
+      letter-spacing: 0;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #eac784;
+      margin: 2rem 0 0.75rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid #2a2f3a;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #d0d8e0;
+      margin: 1.5rem 0 0.5rem;
+    }
+    p, li {
+      margin-bottom: 0.6rem;
+      color: #c8ced8;
+    }
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    li { margin-bottom: 0.3rem; }
+
+    /* –– Highlight boxes –– */
+    .callout {
+      background: #181e26;
+      border-left: 4px solid #eac784;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .callout strong {
+      color: #f0e6d0;
+    }
+    .callout.warning {
+      border-left-color: #d47a6a;
+    }
+    .callout.success {
+      border-left-color: #7ab88a;
+    }
+
+    /* –– Tables –– */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #2a2f3a;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #1a2028;
+      color: #eac784;
+      font-weight: 500;
+    }
+    td {
+      background: #11171f;
+    }
+
+    /* –– Worksheets –– */
+    .worksheet {
+      background: #141a22;
+      border: 1px solid #2a2f3a;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .worksheet h4 {
+      color: #eac784;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .worksheet .field {
+      margin: 0.4rem 0;
+      padding: 0.3rem 0;
+      border-bottom: 1px dashed #2a2f3a;
+      display: flex;
+      gap: 0.5rem;
+      align-items: baseline;
+    }
+    .worksheet .field .label {
+      font-weight: 500;
+      color: #b8c0cc;
+      min-width: 140px;
+    }
+    .worksheet .field .value {
+      color: #d6dce5;
+      font-style: italic;
+    }
+
+    /* –– Responsive –– */
+    @media (max-width: 700px) {
+      body { padding: 1rem; }
+      h1 { font-size: 1.8rem; }
+      .worksheet .field { flex-wrap: wrap; }
+      .worksheet .field .label { min-width: 100px; }
+    }
+
+    /* –– Misc –– */
+    hr {
+      border: none;
+      border-top: 1px solid #2a2f3a;
+      margin: 2rem 0;
+    }
+    .toc {
+      background: #11171f;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    }
+    .toc ul {
+      list-style: none;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+    }
+    .toc li a {
+      color: #b8c0cc;
+      font-size: 0.95rem;
+    }
+    .toc li a:hover {
+      color: #eac784;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Epic Play Expansion <small>For Fate's Edge — Tier IV+ Campaigns</small></h1>
+  <p style="color:#a8b0c0; margin-top:0.25rem;">
+    A toolkit for GMs running high‑level, system‑shaking stories.
+  </p>
+</header>
+
+<!-- Table of Contents -->
+<div class="toc">
+  <ul>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#systemic">Systemic Problems</a></li>
+    <li><a href="#resource">Resource Shift</a></li>
+    <li><a href="#obligation">Obligation at High Tier</a></li>
+    <li><a href="#escalation">Escalation Without Inflation</a></li>
+    <li><a href="#player-evolution">Player Evolution</a></li>
+    <li><a href="#gm-advice">GM Advice</a></li>
+    <li><a href="#worksheets">Worksheets</a></li>
+  </ul>
+</div>
+
+<hr id="intro" />
+
+<h2>Introduction</h2>
+<p>
+  At Tier IV and beyond, the game changes. Not because the rules are different—they aren't—but because <strong>what the game asks of you</strong> shifts fundamentally.
+</p>
+<p>
+  The core loop remains: Declare → Set Position/DV → Roll → Outcome. But the <em>problems</em> are no longer locked doors or guard patrols. They are debts, votes, charters, and successions. The <em>resources</em> are no longer Boons alone—they are Assets, Followers, and Obligation. And the <em>consequences</em> of every roll ripple across the campaign, not just the scene.
+</p>
+<div class="callout">
+  <strong>The key insight:</strong> A Clean Success at Epic Tier can be the <em>most dangerous</em> outcome, because it gives the players no Boons and the GM no Story Beats—they arrive at the climax with empty hands.
+</div>
+
+<hr id="systemic" />
+
+<h2>Systemic Problems</h2>
+<p>
+  A systemic problem is one that cannot be solved with a single roll—it must be <em>architected</em>. The GM designs a web of stakeholders, timers, and consequences, and the players navigate it.
+</p>
+
+<h3>The Anatomy of a Systemic Problem</h3>
+<ul>
+  <li><strong>What is the problem?</strong> A debt, a vote, a charter, a succession, a border dispute, a faction shift.</li>
+  <li><strong>Who are the stakeholders?</strong> Factions, Followers, Patrons, named NPCs.</li>
+  <li><strong>What are the possible outcomes?</strong> Map each rung of the Outcome Matrix to a <em>campaign‑level</em> change.</li>
+  <li><strong>What timers are ticking?</strong> What ticks them? What happens when they fill?</li>
+  <li><strong>What resources are at play?</strong> Assets, Followers, Obligation, Boons.</li>
+</ul>
+
+<div class="callout success">
+  <strong>Example — The Cut Vote (from the Epic session):</strong><br>
+  <strong>Problem:</strong> The party's charter is under review by the guild.<br>
+  <strong>Stakeholders:</strong> The Cut Garrison (Follower), The Rust Thread (Follower), The Iron Gate (Asset), The Dyed Web (terrestrial patron).<br>
+  <strong>Outcomes:</strong> Clean → charter unconditional; SB → condition attached; Partial → a timer opens; Miss → charter reverts.<br>
+  <strong>Timer:</strong> The vote itself is the timer—every scene advances it.
+</div>
+
+<hr id="resource" />
+
+<h2>Resource Shift: Boons → Infrastructure</h2>
+<p>
+  At Epic Tier, success is cheap. Players have 6–10 dice in their core pools. They <em>will</em> succeed on DV 3 obstacles. The challenge is making that success <em>meaningful</em>.
+</p>
+<ul>
+  <li><strong>Assume competence.</strong> Don't roll for things the character is guaranteed to do. Lyra doesn't roll to open a lockbox—she rolls to put it back without anyone knowing it was read.</li>
+  <li><strong>Delegate the mundane.</strong> Followers roll off‑screen for wage rolls, research, and grunt work.</li>
+  <li><strong>Use Fatigue as currency.</strong> When Boons are scarce, pay Fatigue for extra effort (like Khor's Web‑Sense).</li>
+  <li><strong>Build cushions.</strong> Assets, Followers, and Bonds replace Boons as the primary resource pool.</li>
+  <li><strong>"I know a guy who knows a guy."</strong> The real power at high tier is the network, not the dice.</li>
+</ul>
+
+<div class="callout">
+  <strong>Boons do not come from winning. They come from struggling.</strong><br>
+  A party that rolls cleanly all evening arrives at the hard scene with an empty pocket. That's the design.
+</div>
+
+<hr id="obligation" />
+
+<h2>Obligation at High Tier</h2>
+<p>
+  Obligation is built into the architecture of Fate's Edge—but at Epic Tier, its implications deserve special attention.
+</p>
+<ul>
+  <li><strong>The larder is empty.</strong> The party that has cleared all its Obligation has no resources left. Taking on new debt is a <em>statement</em>: "I am willing to be vulnerable to win this."</li>
+  <li><strong>Terrestrial vs. supernatural.</strong> Fighters take on mortal debts (guilds, lords, syndicates); casters carry cosmic debts (Patrons, Rites). Both use the same mechanics; the <em>flavour</em> is what differentiates them.</li>
+  <li><strong>The clean party runs out of fuel.</strong> At Tier IV, a party that refuses to owe anything will find itself without Boons, without Favours, and without leverage by the climax.</li>
+  <li><strong>Obligation is plot, not punishment.</strong> When a Patron calls in a debt, it's not a penalty—it's a story hook.</li>
+</ul>
+
+<div class="callout warning">
+  <strong>Warning:</strong> Don't let players hoard Obligation capacity. The game is designed to <em>demand</em> they spend it. If they're never called upon, they never engage with the Hollow Economy.
+</div>
+
+<hr id="escalation" />
+
+<h2>Escalation Without Inflation</h2>
+<p>
+  The GM's trap at Epic Tier is raising Difficulty Values on the same old obstacles. That's <strong>inflation</strong>, and it punishes players for investing in their sheets.
+</p>
+<p>
+  Instead, <strong>escalate</strong>—change <em>what the game is about</em>.
+</p>
+
+<table>
+  <tr>
+    <th>Tier</th>
+    <th>What is the obstacle?</th>
+    <th>What is the roll about?</th>
+  </tr>
+  <tr>
+    <td><strong>I</strong></td>
+    <td>A locked door</td>
+    <td>Can you open it?</td>
+  </tr>
+  <tr>
+    <td><strong>II</strong></td>
+    <td>A locked door</td>
+    <td>Who has the key, and what do they want?</td>
+  </tr>
+  <tr>
+    <td><strong>III</strong></td>
+    <td>A locked door</td>
+    <td>What noble owns the door, and why are they locking it?</td>
+  </tr>
+  <tr>
+    <td><strong>IV</strong></td>
+    <td>A locked door</td>
+    <td>What guild vote decides who gets to open doors in the city?</td>
+  </tr>
+</table>
+
+<p>
+  The DV for a Tier I lock might be 3. The DV for a Tier IV guild vote might <em>also</em> be 3. The difference is the <strong>consequences</strong> of success and failure.
+</p>
+
+<hr id="player-evolution" />
+
+<h2>Player Evolution</h2>
+<p>
+  Players don't just get better at the rules—they get better at <em>what the game asks of them</em>.
+</p>
+
+<ul>
+  <li><strong>From asking for DV to asking for consequence ladders.</strong> Priya's Tier I habit of "what's the DV?" evolved into "what does a Partial <em>cost</em> me?"</li>
+  <li><strong>From improvisation to improvisation with infrastructure.</strong> Devon still plays fast and loose—but now he has a network of Followers and a Cache Asset.</li>
+  <li><strong>From quiet to carrying the table's patronage.</strong> Naomi went from needing a GM invitation to holding the party's terrestrial debt and playing it with confidence.</li>
+  <li><strong>From optimisation to serving the thing that collects.</strong> Ollie min‑maxed his Obligation capacity—and now he's bound to a cosmic Patron that will eventually call it in.</li>
+</ul>
+
+<div class="callout">
+  <strong>The GM's job at Epic Tier is not to teach the rules.</strong> It's to give the players the floor and get out of the way.
+</div>
+
+<hr id="gm-advice" />
+
+<h2>GM Advice for Epic Sessions</h2>
+
+<ul>
+  <li><strong>State the full Outcome Matrix upfront.</strong> Players need to see all four rungs (Clean, SB, Partial, Miss) before they commit. It makes the choice meaningful.</li>
+  <li><strong>Let Followers handle the boring rolls.</strong> If it's a wage roll or a research check, it happens off‑screen. The spotlight belongs on the <em>interesting</em> scenes.</li>
+  <li><strong>Use Fatigue as a currency.</strong> When Boons are scarce, let players pay Fatigue for extra effort or narrative control.</li>
+  <li><strong>Don't hoard Story Beats.</strong> Spend them early to build tension. The climax is made of the SB you spent along the way.</li>
+  <li><strong>Change what the game is about.</strong> At Tier IV, the lock is not the problem—the person who owns the lock is the problem.</li>
+  <li><strong>Assume competence.</strong> Don't ask for a roll unless failure is interesting. Let the players succeed and let that success <em>mean something</em>.</li>
+</ul>
+
+<hr id="worksheets" />
+
+<h2>Worksheets</h2>
+
+<div class="worksheet">
+  <h4>Worksheet 1 — Designing a Systemic Problem</h4>
+  <div class="field"><span class="label">What is the problem?</span><span class="value">A debt / vote / charter / succession / border / faction shift</span></div>
+  <div class="field"><span class="label">Who are the stakeholders?</span><span class="value">List factions, Followers, Patrons, named NPCs</span></div>
+  <div class="field"><span class="label">What are the outcomes?</span><span class="value">Clean → ?  |  SB → ?  |  Partial → ?  |  Miss → ?</span></div>
+  <div class="field"><span class="label">What timers are ticking?</span><span class="value">What ticks them? What happens when they fill?</span></div>
+  <div class="field"><span class="label">What resources are at play?</span><span class="value">Assets / Followers / Obligation / Boons</span></div>
+</div>
+
+<div class="worksheet">
+  <h4>Worksheet 2 — Asset‑Follower Economy</h4>
+  <div class="field"><span class="label">Major Assets</span><span class="value">List with state (Flourishing / Stable / Strained / Collapsed)</span></div>
+  <div class="field"><span class="label">Standard Assets</span><span class="value">List with state</span></div>
+  <div class="field"><span class="label">Minor Assets</span><span class="value">List with state</span></div>
+  <div class="field"><span class="label">Followers</span><span class="value">Name &amp; Cap rating; what do they roll off‑screen?</span></div>
+  <div class="field"><span class="label">Terrestrial Patrons</span><span class="value">Obligation capacity; what do they demand?</span></div>
+  <div class="field"><span class="label">Cosmic Patrons</span><span class="value">Obligation capacity; what do they demand?</span></div>
+  <div class="field"><span class="label">Outstanding Obligation</span><span class="value">What's owed, to whom, how to clear it</span></div>
+</div>
+
+<div class="worksheet">
+  <h4>Worksheet 3 — Escalation Ladder</h4>
+  <div class="field"><span class="label">Tier I obstacle</span><span class="value">A locked door → Cut to lockpicking</span></div>
+  <div class="field"><span class="label">Tier II obstacle</span><span class="value">A locked door → Cut to the guard with the key</span></div>
+  <div class="field"><span class="label">Tier III obstacle</span><span class="value">A locked door → Cut to the noble who owns the door</span></div>
+  <div class="field"><span class="label">Tier IV obstacle</span><span class="value">A locked door → Cut to the guild vote that decides who opens doors</span></div>
+</div>
+
+<hr />
+
+<h2>Final Word</h2>
+<p>
+  The Epic Play Expansion is not about new rules—it's about a new <em>relationship</em> to the rules. At Tier I, the GM teaches the players how to roll dice and spend Boons. At Tier IV, the GM teaches the players how to build infrastructure, take on debt, and win by <strong>architecture</strong>, not luck.
+</p>
+<p>
+  The annotated Epic session is the proof of concept. This expansion is the toolkit to let you run that session yourself.
+</p>
+
+<footer>
+  <p>Fate's Edge — Epic Play Expansion &bull; For GMs running Tier IV+ campaigns</p>
+  <p style="margin-top:0.2rem; font-size:0.85rem; color:#5a6270;">
+    Based on the Annotated Epic Session and the GM Guide philosophy.
+  </p>
+</footer>
+
+</body>
+</html>
