@@ -24,6 +24,18 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.1.3] - 2026-09-09
+
+### Fixed
+- write the missing module stylesheets, and stop the board centring itself
+
+### Other
+- Added mobile interface. Concluded CSS sweep
+- Added mobile interface. Concluded CSS sweep
+- Manager work
+- Updates to the core rulebook
+- CSS audit/fix
+
 ## [5.1.2] - 2026-09-08
 
 ### Fixed
