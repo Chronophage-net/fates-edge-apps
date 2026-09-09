@@ -8,6 +8,7 @@ import { t as i18nText } from '@core/i18n.js';
 import { getState, addWikiEntry, updateWikiEntry, saveState } from '@core/state.js';
 import { escHtml } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
+import { renderWikiMarkdown } from './markdown.js';
 
 let modalOverlay = null;
 let currentEntryId = null;
@@ -67,7 +68,7 @@ function createEditorModal(entry, isNew) {
 
     modal.innerHTML = `
         <button class="btn btn-secondary editor-back" id="wiki-editor-close" data-i18n="feature.wiki.editor.back">← Back</button>
-        <h2>${titleText}</h2>
+        <h2>${escHtml(titleText)}</h2>
 
         <form id="wiki-editor-form">
             <!-- Title -->
@@ -104,7 +105,7 @@ function createEditorModal(entry, isNew) {
             <!-- Cost -->
             <div class="form-group" style="display:inline-block;width:48%;margin-inline-end:2%;">
                 <label for="wiki-editor-cost" data-i18n="feature.wiki.editor.xpCost">XP Cost</label>
-                <input type="number" id="wiki-editor-cost" value="${entry.cost != null ? entry.cost : ''}" placeholder="e.g., 5" min="0" />
+                <input type="number" id="wiki-editor-cost" value="${escHtml(String(entry.cost ?? ''))}" placeholder="e.g., 5" min="0" />
             </div>
 
             <!-- Slot -->
@@ -299,57 +300,9 @@ function saveEntry(isNew) {
     });
 }
 
-// ============================================================
-// SANITIZE HTML (prevents XSS from markdown)
-// ============================================================
-
-function sanitizeHtml(html) {
-    if (!html) return '';
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-
-    // Remove all <script> tags
-    temp.querySelectorAll('script').forEach(el => el.remove());
-
-    // Remove all on* attributes and sanitize dangerous URIs
-    temp.querySelectorAll('*').forEach(el => {
-        for (const attr of el.attributes) {
-            if (attr.name.startsWith('on')) {
-                el.removeAttribute(attr.name);
-            }
-            if (attr.name === 'href' || attr.name === 'src') {
-                const val = attr.value.trim().toLowerCase();
-                if (val.startsWith('javascript:')) {
-                    el.removeAttribute(attr.name);
-                }
-            }
-        }
-    });
-
-    return temp.innerHTML;
-}
-
-// ============================================================
-// RENDER PREVIEW (with sanitization)
-// ============================================================
-
+// Shared with the saved-entry view, including the safe no-library fallback.
 function renderPreview(text, container) {
-    try {
-        if (window.marked) {
-            let html;
-            if (typeof window.marked.parse === 'function') {
-                html = window.marked.parse(text);
-            } else if (typeof window.marked === 'function') {
-                html = window.marked(text);
-            }
-            const safeHtml = html ? sanitizeHtml(html) : '';
-            container.innerHTML = safeHtml || '<em>Empty content</em>';
-        } else {
-            container.innerHTML = escHtml(text).replace(/\n/g, '<br>');
-        }
-    } catch (e) {
-        container.innerHTML = escHtml(text).replace(/\n/g, '<br>');
-    }
+    container.innerHTML = renderWikiMarkdown(text) || '<em>Empty content</em>';
 }
 
 // ============================================================

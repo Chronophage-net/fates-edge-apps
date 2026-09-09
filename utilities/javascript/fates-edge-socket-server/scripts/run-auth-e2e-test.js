@@ -35,6 +35,13 @@ async function waitForHealth(url, timeoutMs = 15000) {
 }
 
 async function main() {
+    try { require('sqlite3').verbose(); }
+    catch (error) {
+        console.error('Authentication tests require a working SQLite native driver. Rebuild sqlite3 for this host before retrying.');
+        console.error(error.message);
+        process.exitCode = 1;
+        return;
+    }
     const server = spawn(process.execPath, [path.join(__dirname, '..', 'server-start.js')], {
         env,
         stdio: ['ignore', 'pipe', 'pipe'],

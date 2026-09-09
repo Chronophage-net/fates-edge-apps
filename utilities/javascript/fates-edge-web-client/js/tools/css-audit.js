@@ -80,6 +80,13 @@ export function auditCss(root = ROOT) {
     for (const file of walk(root)) {
         const rel = path.relative(root, file);
         const t = fs.readFileSync(file, 'utf8');
+        // Standalone HTML games own their styles; keep those definitions local
+        // so they cannot accidentally hide a missing rule in another module.
+        const ownCss = file.endsWith('.html')
+            ? [...t.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n')
+            : '';
+        const ownClasses = new Set([...ownCss.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)].map(m => m[1]));
+        const ownVars = new Set([...ownCss.matchAll(/(--[\w-]+)\s*:/g)].map(m => m[1]));
         for (const m of t.matchAll(/class\s*=\s*(["'`])([\s\S]*?)\1/g)) {
             // look at the rest of the opening tag for a style attribute
             const tagEnd = t.indexOf('>', m.index + m[0].length);
@@ -87,17 +94,21 @@ export function auditCss(root = ROOT) {
             const inlineStyled = /\bstyle\s*=/.test(rest);
             for (const c of m[2].replace(/\$\{[^}]*\}/g, ' ').split(/\s+/)) {
                 if (!/^-?[_a-zA-Z][\w-]*$/.test(c)) continue;
+                if (ownClasses.has(c)) continue;
                 note(usedClasses, c, rel);
                 if (!inlineStyled) bareUse.add(c);
             }
         }
         for (const m of t.matchAll(/classList\.(?:add|toggle|remove)\(([^)]*)\)/g)) {
             for (const c of m[1].matchAll(/["']([\w-]+)["']/g)) {
+                if (ownClasses.has(c[1])) continue;
                 note(usedClasses, c[1], rel);
                 bareUse.add(c[1]);
             }
         }
-        for (const m of t.matchAll(/var\((--[\w-]+)/g)) note(usedVars, m[1], rel);
+        for (const m of t.matchAll(/var\((--[\w-]+)/g)) {
+            if (!ownVars.has(m[1])) note(usedVars, m[1], rel);
+        }
     }
     for (const m of allCss.matchAll(/var\((--[\w-]+)/g)) note(usedVars, m[1], 'css/app.css');
 

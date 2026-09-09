@@ -57,6 +57,7 @@ let connectionMode = 'websocket'; // 'socketio' or 'websocket'
 let reconnectTimer = null;
 let managedExpiryTimer = null;
 let cancelManagedConnect = null;
+let managedAwaitingAck = false;
 let pingInterval = null;    // BUGFIX: moved here from inside ws.onopen — it
                              // used to be declared with `let` inside that
                              // closure, which meant the sibling ws.onclose
@@ -331,6 +332,7 @@ export function connectWebSocket(room = null, url = null, managed = null) {
     cancelManagedConnect?.();
     cancelManagedConnect = managed ? () => managed.reject(new Error('Room connection cancelled.')) : null;
     isConnected = false;
+    managedAwaitingAck = Boolean(managed);
     const roomName = room || config.room;
     const wsUrl = url || config.url;
     const fullUrl = normalizeWSURL(wsUrl, roomName);
@@ -356,6 +358,7 @@ export function connectWebSocket(room = null, url = null, managed = null) {
         
         const ready = () => {
             authenticated = true;
+            managedAwaitingAck = false;
             cancelManagedConnect = null;
             clearTimeout(timeoutId);
             console.log('🔗 WebSocket connected to:', fullUrl);
@@ -392,7 +395,8 @@ export function connectWebSocket(room = null, url = null, managed = null) {
                 socketId, 
                 room: roomName,
                 mode: 'websocket',
-                url: fullUrl
+                url: fullUrl,
+                ...(managed ? {managed:true, expiresAt:managed.grant.expiresAt} : {})
             });
             
             showToast(i18nText("feature.core.websocket.connectedToServer", null, "Connected to server"), 'success');
@@ -746,7 +750,7 @@ function handleWebSocketMessage(data) {
  * Send a message via WebSocket with optional callback
  */
 export function sendWSMessage(data, callback = null) {
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
+    if (managedAwaitingAck || !ws || ws.readyState !== WebSocket.OPEN) {
         console.warn('WebSocket not connected');
         if (callback) callback({ error: 'Not connected' });
         return false;
@@ -800,6 +804,7 @@ export function sendWSMessage(data, callback = null) {
 export function disconnectWebSocket() {
     cancelManagedConnect?.();
     cancelManagedConnect = null;
+    managedAwaitingAck = false;
     clearTimeout(managedExpiryTimer);
     managedExpiryTimer = null;
     clearInterval(pingInterval);
@@ -1910,6 +1915,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 
 export default {
+    connectManagedRoom,
     // Plain WebSocket
     connectWebSocket,
     disconnectWebSocket,

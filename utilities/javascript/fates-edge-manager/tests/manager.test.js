@@ -192,7 +192,7 @@ test('owners manage integration keys for active members without widening their s
   assert.equal((await request(`/v1/keys/${created.data.id}`,'DELETE',null,alice)).status,200);
   const log=await request(`/v1/rooms/${room.id}/audit`,'GET',null,alice);
   assert.ok(log.data.some(e=>e.action==='key.issued-for-member' && e.target_id===ids.bob));
-  await request(`/v1/rooms/${room.id}/members/${ids.bob}`,'DELETE',null,alice);
+  assert.equal((await request(`/v1/rooms/${room.id}/members/${ids.bob}`,'DELETE',null,alice)).status,200);
   assert.equal((await request(`/v1/rooms/${room.id}/keys`,'POST',body,alice)).status,404);
 });
 

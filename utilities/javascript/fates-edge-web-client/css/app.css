@@ -1625,7 +1625,11 @@ select {
     .sidebar-brand .brand-text { display: none; }
     .nav-group-title { display: none; }
     .nav-item { justify-content: center; padding: 0.75rem 0; }
-    .nav-label { display: none; }
+    /* Keep translated tab names available to screen readers in the icon rail. */
+    .nav-label {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+    }
     .nav-icon { font-size: 1.3rem; width: auto; }
     .footer-status .status-label { display: none; }
     .main-content { padding: 1rem; }
@@ -3958,3 +3962,77 @@ body::before {
 .empty-chat-state, .empty-state { color: var(--text3); text-align: center; padding: 1.5rem 1rem; font-style: italic; }
 .preset-rolls { display: flex; gap: 0.3rem; flex-wrap: wrap; }
 .crafting-empty-note { color: var(--text3); font-style: italic; font-size: 0.85rem; }
+
+/* Player shell shares the same sheets, rolls and connection as the toolkit. */
+.player-nav { display: none; }
+.player-mode .sidebar { display: none; }
+.player-mode .app-shell { height: 100dvh; }
+.player-mode .main-content { min-width: 0; padding: max(1rem, env(safe-area-inset-top)) 1rem calc(6rem + env(safe-area-inset-bottom)); }
+.player-mode .player-nav { display: flex; position: fixed; inset-inline: 0; bottom: 0; z-index: 20; background: var(--bg2); border-top: 1px solid var(--border); padding: .4rem .25rem max(.4rem, env(safe-area-inset-bottom)); }
+.player-nav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .15rem; min-height: 48px; justify-content: center; text-decoration: none; color: var(--text2); font-size: .8rem; border-radius: .5rem; }
+.player-nav a span[aria-hidden] { font-size: 1.5rem; }
+.player-nav a[aria-current] { background: var(--bg3); color: var(--gold); }
+.player-mode :is(button, .btn, select) { min-height: 44px; }
+.player-mode :is(input, select, textarea) { font-size: 16px; max-width: 100%; }
+.player-mode #xcard-toggle { bottom: calc(5.5rem + env(safe-area-inset-bottom)) !important; }
+.player-home { max-width: 720px; margin-inline: auto; }
+.player-home h1 { font-size: clamp(2rem, 7vw, 3.5rem); line-height: 1.1; }
+.player-eyebrow { color: var(--gold); letter-spacing: .12em; font-size: .75rem; }
+.player-home .panel { margin-block: 1rem; }
+.player-home select { width: 100%; margin-block: .5rem; }
+.player-home .btn { margin: .3rem .2rem .3rem 0; }
+.player-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.player-stats div { background: var(--bg3); padding: .6rem; border-radius: .5rem; }
+.player-stats dt { font-size: .8rem; }
+.player-stats dd { margin: 0; font-size: 1.5rem; color: var(--gold); }
+.player-shortcuts { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.player-shortcuts .panel { margin: 0 0 .75rem; display: flex; justify-content: space-between; align-items: center; min-height: 64px; color: var(--text); text-decoration: none; }
+@media (max-width: 700px) {
+    .player-mode .grid-2, .player-mode .grid-3 { grid-template-columns: minmax(0, 1fr); }
+    .player-mode .panel { min-width: 0; overflow-wrap: anywhere; }
+    .player-mode .editor-screen-host { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+}
+@media print { .player-nav, .player-mode-switch { display: none !important; } }
+
+/* CSS audit completion: shared controls must work before visiting the wizard. */
+input[type="checkbox"], input[type="radio"] {
+    width: auto; flex: 0 0 auto; padding: 0; accent-color: var(--gold);
+}
+.dynamic-row {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 0.3rem; margin-block: 0.2rem; min-width: 0;
+}
+.dynamic-row input[type="text"] { flex: 1; min-width: min(100px, 100%); }
+.dynamic-row input[type="number"] { width: 60px; }
+.dynamic-row > :is(input, select) { max-width: 100%; }
+.dynamic-row > label { flex-shrink: 0; }
+
+/* VTT quick roller, shared by local and managed tables. */
+.vtt-dice-row { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem; }
+.vtt-field { display: flex; flex-direction: column; gap: 0.2rem; flex: 1 1 70px; min-width: 0; }
+.vtt-field label { color: var(--text2); font-size: 0.8rem; }
+.vtt-field :is(input, select) { width: 100%; min-width: 0; }
+.vtt-roll-result { display: flex; flex-direction: column; gap: 0.5rem; overflow-wrap: anywhere; }
+.vtt-roll-dice { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.vtt-roll-meta { color: var(--text2); font-size: 0.85rem; }
+.vtt-gm-request-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding-block: 0.35rem; }
+.vtt-gm-request-row > span { overflow-wrap: anywhere; min-width: 0; }
+.vtt-live-table .chat-input-row { flex-wrap: wrap; }
+.vtt-live-table .chat-input-row input { min-width: min(160px, 100%); }
+.vtt-char-grid > .empty-state { grid-column: 1 / -1; }
+
+/* The wiki toolbar must fit inside the content column on small screens. */
+.wiki-search-wrap { flex: 1 1 220px; min-width: 0; }
+.wiki-search-input { min-width: 0; width: 100%; }
+.wiki-filter-wrap { min-width: 0; max-width: 100%; }
+.wiki-filter-select { min-width: 0; max-width: 100%; }
+.wiki-tag-cloud { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.wiki-tag { cursor: pointer; color: var(--gold); overflow-wrap: anywhere; }
+.wiki-tag:hover { text-decoration: underline; }
+.wiki-status { color: var(--text3); font-size: 0.8rem; overflow-wrap: anywhere; }
+.wiki-entry-card { overflow-wrap: anywhere; }
+.vtt-roll-die {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 2rem; min-height: 2rem; padding: 0.2rem;
+    border-radius: 0.35rem; font-weight: 700; font-variant-numeric: tabular-nums;
+}

@@ -100,11 +100,12 @@ async function main() {
     console.log('\n== 3. Room creation + password gate (previously unreachable dead code!) ==');
     const createJoin = await wsConnect({ clientName: 'RoomCreator' });
     assert(createJoin.ok, `anonymous join with no password set succeeds (room auto-created)`);
-    if (createJoin.ws) createJoin.ws.close();
+    // Keep the room occupied while configuring its password; empty rooms are collected.
 
     const setPw = await api('POST', `/api/rooms/${ROOM}/password`, { password: 'roomsecret' }, { 'x-api-key': API_KEY });
     assert(setPw.status === 200 && setPw.body.passwordSet === true, `admin sets room password (got ${setPw.status} ${JSON.stringify(setPw.body)})`);
 
+    if (createJoin.ws) createJoin.ws.close();
     const noPw = await wsConnect({ clientName: 'NoPassword' });
     assert(!noPw.ok, `anonymous join with WRONG/no password is rejected (got ok=${noPw.ok})`);
 

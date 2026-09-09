@@ -3,6 +3,27 @@ All notable changes to this project will be documented here.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased — manager completion
+
+- Complete owner-facing member removal, invitation cancellation, administrator controls, archival, and member-key administration; expose node placement details to operators.
+- Add Settings → Managed room using a short-lived copied manager connection. Keep credentials in memory, wait for the assigned node acknowledgement, and stop at expiry or rejection.
+- Fix bodyless membership DELETE requests and escape manager secret-screen text, profile fields, connection errors, and wiki costs.
+- Harden wiki title expansion and VTT status rendering against imported or shared text being interpreted as markup or click-handler code.
+- Repair the authentication test's empty-room race and check native SQLite availability before starting it.
+- Validation: 15 manager integration tests, 271 web-client tests, and 218 server tests pass; web build succeeds. All SQLite authentication end-to-end checks pass after rebuilding the local native driver.
+
+### Wiki rendering audit
+- Sanitize saved wiki bodies and editor previews through one renderer; fall back to escaped text if Markdown or sanitization is unavailable.
+- Prevent entry HTML from embedding forms, overriding layout or impersonating wiki actions; escape editor headings and cost fields.
+- Render short wiki bodies once instead of duplicating the preview and full text.
+- Validation: 276 client tests pass; build succeeds. Browser preview retained bold text while removing an obfuscated JavaScript URL, iframe, form, styles, IDs and action attributes.
+
+### CSS audit follow-through
+- Finish local/managed VTT roller rows and dice results; wrap chat controls and restore natural checkbox/radio widths.
+- Make character-editor dynamic rows independent of visiting the wizard; fit wiki search, filters, tags and long text on narrow screens.
+- Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
+- Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
+
 ## [5.1.2] - 2026-09-08
 
 ### Fixed

@@ -45,6 +45,7 @@ export const ROUTE_REDIRECTS = {
 
 // Map of route names to module import paths (relative to js/)
 const ROUTE_IMPORTS = {
+    player: () => import('./features/player/index.js'),
     home:        () => import('./features/home/index.js'),
     dashboard:   () => import('./features/dashboard/index.js'),
     characters:  () => import('./features/characters/index.js'),
@@ -165,7 +166,7 @@ export async function navigate(tab, options = {}) {
     currentTab = resolved;
 
     // Update sidebar active state
-    let activeLabel = resolved;
+    let activeLabel = resolved === 'player' ? i18nText('player.mobile') : resolved;
     document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
         const btnTab = btn.dataset.tab;
         const isActive = btnTab === resolved || ROUTE_REDIRECTS[btnTab] === resolved;

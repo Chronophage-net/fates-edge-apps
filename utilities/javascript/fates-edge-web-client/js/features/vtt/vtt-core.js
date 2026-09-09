@@ -993,7 +993,7 @@ export function renderCommonRolls() {
                 }
                 const output = q('#vtt-roll-output');
                 if (output) {
-                    output.innerHTML = `<span style="color:var(--text2);">⚡ ${label} prepared (Attr ${attr} + Skill ${skill})</span>`;
+                    output.innerHTML = `<span style="color:var(--text2);">⚡ ${escHtml(label)} prepared (Attr ${attr} + Skill ${skill})</span>`;
                 }
                 const rollerPanel = q('.vtt-panel:has(#vtt-roll-output)');
                 if (rollerPanel) rollerPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });

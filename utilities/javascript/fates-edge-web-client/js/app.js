@@ -17,6 +17,7 @@ import { APP_VERSION, applyDisplayedVersion } from './core/version.js';
 import './core/highlight-tags.js';
 import { loadState, onSave, getState, mergeState, resolveConflict, saveState, getStableClientId } from './core/state.js';
 import { checkPasswordGate, isToolkitUnlocked, unlockToolkit } from './core/password.js';
+import { initPlayerMode } from './core/player-mode.js';
 import { initRouter, navigate, ROUTE_REDIRECTS, preloadModule } from './router.js';
 import { showToast } from './components/Toast.js';
 import { syncManager } from './core/sync/index.js';
@@ -46,6 +47,7 @@ function initializeRouter() {
     if (routerInitialized) return;
     routerInitialized = true;
     console.log('🔀 Initializing router...');
+    initPlayerMode();
     initRouter();
     // The router handles hash and initial navigation internally
 }

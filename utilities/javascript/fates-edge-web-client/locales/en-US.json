@@ -2719,5 +2719,36 @@
       "required": "Line {{line}}: Required field: {{value}}",
       "empty": "No import blocks found."
     }
+  },
+  "player": {
+    "navigation": "Player navigation",
+    "home": "Play",
+    "sheet": "Sheets",
+    "dice": "Dice",
+    "table": "Table",
+    "rules": "Rules",
+    "full": "Full toolkit",
+    "mobile": "Player view",
+    "edition": "PLAYER VIEW",
+    "ready": "Ready for your next move.",
+    "intro": "Your character, your dice, your table. Keep the essentials close.",
+    "connection": "Your table",
+    "connected": "Connected",
+    "offline": "Not connected to a table. You can still use your saved characters and dice.",
+    "join": "Join or manage connection",
+    "character": "Your character",
+    "choose": "Choose a character on this device",
+    "unnamed": "Unnamed",
+    "openSheet": "Open character sheet",
+    "empty": "Create a character or import one to get started.",
+    "manage": "Create or manage characters",
+    "roll": "Roll dice",
+    "settings": "Settings & language",
+    "body": "Body",
+    "wits": "Wits",
+    "spirit": "Spirit",
+    "presence": "Presence",
+    "fatigue": "Fatigue",
+    "boons": "Boons"
   }
 }

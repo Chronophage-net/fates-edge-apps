@@ -67,7 +67,19 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
 - [x] **`marked` was loaded completely unpinned** (`/npm/marked/marked.min.js`, which
       resolves to whatever is newest). Pinned to `marked@12.0.2`. The other six were
       already version-pinned.
-- [ ] **Audit `innerHTML` against `sanitizeHTML()`.** `js/core/utils.js` has a DOMPurify
+- [x] **Wiki list and editor HTML audit (2026-09-08).** Both views use one
+      DOMPurify-backed Markdown renderer; unavailable/failed libraries fall back to
+      escaped source text. Block embedded forms, styling, IDs, and delegated-action
+      attributes. Escape editor titles and cost attributes. Short entries render once.
+      Renderer regressions and a real-browser malicious-markup preview check pass.
+- [ ] **Audit `innerHTML` against `sanitizeHTML()`.** Partial sweep 2026-09-08:
+      profile name/email values and wiki XP costs are escaped, connection errors use
+      `textContent`, and manager one-time-secret headings/descriptions are escaped.
+      Wiki title clicks now use delegated data attributes instead of inline JavaScript,
+      and entry lookup treats IDs as data rather than CSS selectors. VTT combat/scene
+      status uses textContent; GM request IDs, room/region/deck labels, and prepared-roll
+      labels are escaped. The wider module-by-module audit remains open.
+ `js/core/utils.js` has a DOMPurify
       wrapper, but there are ~200 `innerHTML` assignments across the feature modules
       (settings 29, docs 22, decks 18, kon-reh 17, vtt 14, dashboard 14) and it is not
       established that user-supplied content — character names, wiki entries, adventure
@@ -125,9 +137,10 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
       not worth it when `overrides` clears the advisories anyway. Try it on a
       real build host, and check `require('sqlite3').verbose()` loads before
       trusting the test suite.
-- [ ] **`npm run test:auth` has 3 pre-existing failures**, unrelated to any of
-      the above and present before these changes: "admin sets room password"
-      gets 404 Room TESTROOM not found, and the two anonymous-join password
-      checks pass when they should be rejected. Worth a look — on the face of
-      it a room has to exist before a password can be set on it, and the
-      password gate may not be enforced for anonymous joins.
+- [x] **Complete the `npm run test:auth` host verification.** The 2026-09-08 fix keeps
+      the room creator connected until its password is set, removing the test's race
+      with empty-room collection. The runner now checks SQLite before starting and
+      reports an unusable native driver instead of cascading through misleading failures.
+      Rebuilt SQLite 5.1.7 using local Node and libuv headers on this Mac. All authentication
+      end-to-end checks pass, including registration, login, room passwords, persistent
+      membership, bans, character limits, and anonymous access. All 218 server tests pass.

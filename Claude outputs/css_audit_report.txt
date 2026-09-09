@@ -1,3 +1,34 @@
+CSS audit follow-through — 2026-09-08
+
+The report below is the original historical scan, not the current defect count.
+Claude's commits 0a6d408 and 1e2435f supplied the missing module stylesheets.
+
+Completed in this follow-through:
+- VTT quick-roll fields, results, dice badges and GM request rows now have layout rules.
+- Checkbox/radio controls no longer inherit the full width intended for text inputs.
+- Chat controls wrap on narrow screens, and empty party messages span the party grid.
+- Character-editor dynamic rows have shared CSS on first load, without opening the wizard.
+- Wiki search/filter controls can shrink; tags and long entry text wrap.
+- Mobile navigation labels remain available to assistive technology.
+- Standalone HTML game styles are recognized only in their own document. A regression
+  test ensures those styles cannot mask a missing rule/token in an app module.
+
+Validation: 274 client tests passed; production build passed. Browser checks covered
+VTT and wiki at desktop and 390px widths, including a rendered roll result. No page
+horizontal overflow was observed on the phone-width views.
+
+Current audit: zero undefined custom properties; 104 class candidates remain in the
+heuristic report. They are not 104 confirmed missing styles: action hooks inherit
+.btn, editor rows inherit .dynamic-row, selected bestiary filters use .btn-primary,
+and wrappers often need only normal block flow. Template fragments (ce-, -row,
+badge-) also appear. The script does not prove selector scope or runtime load order;
+its output remains a triage aid, not a zero-class release gate. Do not add empty CSS
+rules merely to suppress it. This verification does not cover every populated modal,
+external theme override, or published document stylesheet.
+
+Historical scan follows
+=======================
+
 undefined custom properties: 0
 
 undefined classes: 768

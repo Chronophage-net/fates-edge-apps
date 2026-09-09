@@ -2719,5 +2719,36 @@
       "required": "Línea {{line}}: Campo obligatorio: {{value}}",
       "empty": "No se encontraron bloques para importar."
     }
+  },
+  "player": {
+    "navigation": "Navegación de jugador",
+    "home": "Jugar",
+    "sheet": "Fichas",
+    "dice": "Dados",
+    "table": "Mesa",
+    "rules": "Reglas",
+    "full": "Herramientas completas",
+    "mobile": "Vista de jugador",
+    "edition": "VISTA DE JUGADOR",
+    "ready": "Todo listo para tu próximo movimiento.",
+    "intro": "Tu personaje, tus dados, tu mesa. Lo esencial a mano.",
+    "connection": "Tu mesa",
+    "connected": "Conectado",
+    "offline": "Sin conexión a una mesa. Puedes seguir usando tus personajes guardados y los dados.",
+    "join": "Unirse o gestionar la conexión",
+    "character": "Tu personaje",
+    "choose": "Elige un personaje de este dispositivo",
+    "unnamed": "Sin nombre",
+    "openSheet": "Abrir ficha de personaje",
+    "empty": "Crea o importa un personaje para empezar.",
+    "manage": "Crear o gestionar personajes",
+    "roll": "Tirar dados",
+    "settings": "Ajustes e idioma",
+    "body": "Cuerpo",
+    "wits": "Ingenio",
+    "spirit": "Espíritu",
+    "presence": "Presencia",
+    "fatigue": "Fatiga",
+    "boons": "Dones"
   }
 }

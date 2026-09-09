@@ -94,9 +94,21 @@ Use `Authorization: Bearer <room-token>`. Other legacy REST routes are closed on
 node, including deployment-wide API-key access. The existing game-event role policy still
 applies, narrowed by the key’s scopes. Seat/roster changes must go through the manager.
 
-The existing VTT login screen does not yet offer manager sign-in; use the connection response
-from a manager-aware client or integration. No credentials are handed to the VTT through a
-query parameter or saved in browser local storage.
+### Join from the web client
+
+1. Sign in to the manager, open your room, and choose **Get connection → Copy**.
+2. In the web client, open **Settings → Managed room** and paste the connection.
+3. Choose **Enter managed room**. The assigned socket node must confirm the room, node identity,
+   and placement version before the client displays or sends game state.
+
+The paste field clears immediately. Credentials stay in memory, never in query parameters or
+browser storage. The manager supplies the room code and game role; the local role selector
+cannot override them. Transient reconnects reuse the unexpired grant. At expiry or rejection,
+get a new connection from the manager and paste it again. **Leave managed room** clears the
+connection. Ordinary local/password rooms continue to use the existing connection controls.
+
+This release uses an explicit copy-and-paste handoff, not cross-origin manager sessions or
+silent refresh. Sign-in remains on the manager dashboard.
 
 ## Sign-in and operations
 
@@ -113,7 +125,14 @@ upgraded to Argon2id on successful sign-in. New passwords use Argon2id.
 
 Invitations name an existing username and are accepted while signed in to that exact account.
 Invite again to replace an expired invitation. Game role and room-administration role are
-separate. An owner can change their own game role without abandoning ownership.
+separate. An owner can change their own game role without abandoning ownership. Owners can grant or
+remove the separate administrator role, cancel invitations, remove members, and archive or
+reactivate rooms. Removing membership revokes its keys; archived rooms issue no connections.
+
+Owners see safe key metadata for every member of their room and may create, rotate, or revoke
+a member’s integration key. The key remains bound to that member and cannot exceed their
+permissions. Issuing it for another member is recorded explicitly in the room security history.
+Ordinary members see only their own keys. Operators can inspect each node’s assigned rooms.
 
 For OIDC, configure `MANAGER_OIDC_PROVIDERS` with provider name, issuer, client ID, display
 name, and optionally `client_secret_env`. Register this exact callback with the provider:

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-08T18:19:06.078Z",
+  "generated": "2026-09-08T23:36:09.589Z",
   "documents": [
     {
       "id": "gm_guide",
@@ -1049,6 +1049,16 @@
       "active": true
     },
     {
+      "id": "the_five_daughters_of_inaea",
+      "title": "The Five Daughters Of Inaea",
+      "file": "Fates_-_Edge_-_-The-_-Five-_-Daughters-_-of-_-Inaea.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_forge_of_souls",
       "title": "The Forge Of Souls",
       "file": "Fates_-_Edge_-_-The-_-Forge-_-of-_-Souls.html",
@@ -1353,7 +1363,7 @@
       "active": true
     }
   ],
-  "total_count": 85,
-  "active_count": 85,
+  "total_count": 86,
+  "active_count": 86,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

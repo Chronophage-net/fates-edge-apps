@@ -14,7 +14,7 @@ async function api(path,method='GET',body){
   if(!response.ok){if(response.status===401 && me){me=null;dialog.close();await login();}throw new Error(data.error || 'Request failed');} return data;
 }
 function modal(html){document.querySelector('#dialog-content').innerHTML=html;if(!dialog.open)dialog.showModal();}
-function reveal(title,value,description){modal(`<h2>${title}</h2><p>${description}</p><pre class="secret" id="one-time-secret"></pre><div class="actions">${button('copy-secret','Copy')}${button('download-secret','Download')}</div>`);document.querySelector('#one-time-secret').textContent=value;}
+function reveal(title,value,description){modal(`<h2>${esc(title)}</h2><p>${esc(description)}</p><pre class="secret" id="one-time-secret"></pre><div class="actions">${button('copy-secret','Copy')}${button('download-secret','Download')}</div>`);document.querySelector('#one-time-secret').textContent=value;}
 dialog.addEventListener('close',()=>{document.querySelector('#dialog-content').replaceChildren();dialog.querySelectorAll('[role=alert]').forEach(el=>el.remove());keyMembers=[];});
 function renderNav(){
   const view=location.hash.slice(1).split('/')[0]||'rooms';

@@ -22,7 +22,8 @@ export function parseManagedConnection(input, now = Date.now()) {
     if (!Number.isFinite(claims.exp) || claims.exp * 1000 <= now || claims.exp * 1000 > now + 610000) {
         throw new Error('This connection has expired. Get a new connection from the manager.');
     }
-    if (claims.room_id !== connection.room_id || claims.server_id !== connection.server_id ||
+    const validId = value => typeof value === 'string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value);
+    if (!validId(claims.room_id) || !validId(claims.server_id) || claims.room_id !== connection.room_id || claims.server_id !== connection.server_id ||
         claims.placement_version !== connection.placement_version || !Number.isInteger(claims.placement_version) ||
         typeof claims.room_code !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(claims.room_code) ||
         (connection.room_code && connection.room_code !== claims.room_code) ||

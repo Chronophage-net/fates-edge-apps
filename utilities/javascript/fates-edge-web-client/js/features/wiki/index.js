@@ -8,6 +8,7 @@ import { t as i18nText } from '@core/i18n.js';
 import { getState, addWikiEntry, updateWikiEntry, deleteWikiEntry, saveState } from '@core/state.js';
 import { escHtml, debounce } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
+import { renderWikiMarkdown as renderMarkdown } from './markdown.js';
 
 // ─── Configuration ──────────────────────────────────────────────────────
 
@@ -202,7 +203,7 @@ export function renderWiki() {
         const sourceBadge = isRemote
             ? `<span class="badge badge-remote" data-i18n="feature.wiki.bundled">📦 Bundled</span>`
             : `<span class="badge badge-local" data-i18n="feature.wiki.local">📝 Local</span>`;
-        const costBadge = e.cost != null ? `<span class="badge badge-cost">${e.cost} XP</span>` : '';
+        const costBadge = e.cost != null ? `<span class="badge badge-cost">${escHtml(String(e.cost))} XP</span>` : '';
         const tagBadges = (e.tags || []).slice(0, 4).map(t => `<span class="badge badge-tag">#${escHtml(t)}</span>`).join('');
         const moreTags = (e.tags || []).length > 4 ? `<span class="badge badge-more">+${(e.tags || []).length - 4}</span>` : '';
 
@@ -224,14 +225,14 @@ export function renderWiki() {
             `;
         }
 
-        const bodyPreview = e.body
+        const bodyPreview = e.body && e.body.length > 300
             ? `<div class="wiki-entry-preview">${escHtml(e.body.slice(0, 300))}${e.body.length > 300 ? '…' : ''}</div>`
             : '';
 
         return `
             <div class="wiki-entry-card" data-id="${escHtml(String(e.id))}">
                 <div class="wiki-entry-header">
-                    <h3 class="wiki-entry-title" onclick="window.toggleWikiBody('${escHtml(String(e.id))}')">
+                    <h3 class="wiki-entry-title" data-action="expand" data-id="${escHtml(String(e.id))}">
                         ${escHtml(e.title)}
                     </h3>
                     <div class="wiki-entry-meta">
@@ -401,23 +402,6 @@ function getFilteredEntries() {
     return entries;
 }
 
-function renderMarkdown(text) {
-    if (!text) return '';
-    try {
-        if (window.marked) {
-            if (typeof window.marked.parse === 'function') {
-                return window.marked.parse(text);
-            }
-            if (typeof window.marked === 'function') {
-                return window.marked(text);
-            }
-        }
-        return escHtml(text).replace(/\n/g, '<br>');
-    } catch (e) {
-        return escHtml(text);
-    }
-}
-
 // ─── Entry Management ──────────────────────────────────────────────────
 
 function isEntryCloned(entry) {
@@ -531,7 +515,7 @@ function importAllFromWiki() {
 // ─── Toggle Body ──────────────────────────────────────────────────────
 
 export function toggleWikiBody(id) {
-    const card = document.querySelector(`.wiki-entry-card[data-id="${id}"]`);
+    const card = Array.from(document.querySelectorAll('.wiki-entry-card')).find(el => el.dataset.id === String(id));
     if (!card) return;
     const fullBody = card.querySelector('.wiki-entry-full');
     const preview = card.querySelector('.wiki-entry-preview');

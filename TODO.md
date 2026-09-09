@@ -1,3 +1,13 @@
+## Manager completion — 2026-09-08
+
+- [x] Managed room handoff from the manager dashboard into Settings → Managed room in the web client.
+- [x] Keep room credentials in memory; verify the node/room/placement acknowledgement before releasing initial state; stop at expiry or denial.
+- [x] Owner key administration for active room members, with target-member scope limits and explicit audit events.
+- [x] Roster removal, invitation cancellation, administrator controls, room archival, and operator placement inspection in the dashboard.
+- [x] Regression coverage for bodyless DELETE requests, delegated keys, cancelled invitations, archived rooms, credential handling, and wrong-node rejection.
+- [ ] Optional follow-up: seamless manager-to-client handoff and automatic renewal (current handoff requires a fresh copied grant after ten minutes).
+- [ ] Later deployment work: signed webhooks, shared-load-balancer affinity, and fenced live migration. Direct node placement remains supported; never reassign a live room without its game state.
+
 ## Paper import — implemented 2026-09-05
 
 - [x] Settings → Data Management → Import from Paper: paste, preview, and import.

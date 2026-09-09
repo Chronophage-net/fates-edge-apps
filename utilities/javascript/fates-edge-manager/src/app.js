@@ -55,6 +55,7 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   function route(method, path, mode, fn) {
     app[method](path, async (req, res, next) => {
       try {
+        req.body ??= {};
         if (mode === 'public' || mode === 'key') await rate(req, path, mode === 'key' ? 60 : 10);
         const result = await db.transaction(async tx => {
           if (mode === 'human' || mode === 'operator') {

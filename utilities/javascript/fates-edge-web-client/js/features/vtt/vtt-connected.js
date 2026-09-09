@@ -978,12 +978,12 @@ function updateCombatStatusUI() {
         return;
     }
     const c = combatStatus;
-    const turnText = c.activeName ? `${escHtml(c.activeName)}'s turn` : 'awaiting turn order';
+    const turnText = c.activeName ? `${c.activeName}'s turn` : 'awaiting turn order';
     const timerText = c.timerMax > 0
-        ? ` · ⏱️ ${escHtml(c.timerName || 'Timer')} ${c.timerSegments}/${c.timerMax}`
+        ? ` · ⏱️ ${c.timerName || 'Timer'} ${c.timerSegments}/${c.timerMax}`
         : '';
     el.style.display = 'inline-flex';
-    el.innerHTML = `⚔️ Round ${c.round} — ${turnText}${timerText}`;
+    el.textContent = `⚔️ Round ${c.round} — ${turnText}${timerText}`;
 }
 
 function updateSceneStatusUI() {
@@ -995,10 +995,10 @@ function updateSceneStatusUI() {
         return;
     }
     const s = sceneStatus;
-    const parts = [s.actTitle, s.sceneTitle].filter(Boolean).map(escHtml);
-    const label = parts.length ? parts.join(' — ') : escHtml(s.adventureTitle || 'Adventure in progress');
+    const parts = [s.actTitle, s.sceneTitle].filter(Boolean);
+    const label = parts.length ? parts.join(' — ') : (s.adventureTitle || 'Adventure in progress');
     el.style.display = 'inline-flex';
-    el.innerHTML = `🎭 ${label}`;
+    el.textContent = `🎭 ${label}`;
 }
 
 // ============================================================
@@ -1670,8 +1670,8 @@ function updateGMUI() {
             <div class="vtt-gm-request-row">
                 <span>${escHtml(r.requesterName)}</span>
                 <div class="vtt-btn-row">
-                    <button class="btn btn-sm btn-green gm-approve" data-target="${r.requesterId}">Approve</button>
-                    <button class="btn btn-sm btn-danger gm-reject" data-target="${r.requesterId}">Reject</button>
+                    <button class="btn btn-sm btn-green gm-approve" data-target="${escHtml(String(r.requesterId))}">Approve</button>
+                    <button class="btn btn-sm btn-danger gm-reject" data-target="${escHtml(String(r.requesterId))}">Reject</button>
                 </div>
             </div>
         `).join('');
@@ -2007,7 +2007,7 @@ export function render(el) {
             <span class="mode-indicator vtt-stat-pill ${isConnected ? 'connected' : 'disconnected'}">
             ${isConnected ? '🌐 Connected' : '📡 Local'}
             </span>
-            <span class="vtt-stat-pill mode-label">${mode}</span>
+            <span class="vtt-stat-pill mode-label">${escHtml(String(mode))}</span>
             <button class="btn btn-sm btn-ghost" onclick="window.location.hash='whiteboard'" title="Open Whiteboard" data-i18n-attr="title:feature.vtt.vtt-connected.openWhiteboard" data-i18n="feature.vtt.vtt-connected.whiteboard">✏️ Whiteboard</button>
         </h1>
         <p class="page-sub" data-i18n="feature.vtt.vtt-connected.chatPartyStatusQuickDieRollerDeck">Chat, party status, quick die roller, deck, and scene timers all in one view.</p>
@@ -2023,10 +2023,10 @@ export function render(el) {
             </span>
         </div>
         <div class="vtt-stat-row">
-            ${roomCode ? `<span class="vtt-stat-pill">🔑 Room <strong>${roomCode}</strong></span>` : ''}
+            ${roomCode ? `<span class="vtt-stat-pill">🔑 Room <strong>${escHtml(String(roomCode))}</strong></span>` : ''}
             ${socketId ? `<span class="vtt-stat-pill">👤 <strong>${escHtml(getClientName())}</strong></span>` : ''}
-            <span class="vtt-stat-pill">📍 ${defaultRegion}</span>
-            <span class="vtt-stat-pill">🃏 <strong id="vtt-deck-count-header">${deckCount}</strong> cards</span>
+            <span class="vtt-stat-pill">📍 ${escHtml(String(defaultRegion))}</span>
+            <span class="vtt-stat-pill">🃏 <strong id="vtt-deck-count-header">${escHtml(String(deckCount))}</strong> cards</span>
             <span class="vtt-stat-pill" id="vtt-combat-status" style="display:none;background:var(--bg4);border:1px solid var(--red);"></span>
             <span class="vtt-stat-pill" id="vtt-scene-status" style="display:none;background:var(--bg4);border:1px solid var(--gold);"></span>
         </div>
@@ -2214,7 +2214,7 @@ export function render(el) {
             <div class="vtt-panel vtt-card">
                 <div class="vtt-card-header">
                 <span class="vtt-card-title" style="font-size:1.05rem;" data-i18n="feature.vtt.vtt-connected.deck">🃏 Deck</span>
-                <span class="vtt-stat-pill">📍 <strong id="vtt-region-display">${defaultRegion}</strong></span>
+                <span class="vtt-stat-pill">📍 <strong id="vtt-region-display">${escHtml(String(defaultRegion))}</strong></span>
                 </div>
                 <div class="vtt-btn-row">
                 <button class="btn btn-sm btn-gold" id="vtt-deck-draw-1" data-i18n="feature.vtt.vtt-connected.draw1">Draw 1</button>
@@ -2225,7 +2225,7 @@ export function render(el) {
                 <button class="btn btn-sm btn-ghost" id="vtt-deck-history">📜</button>
                 <button class="btn btn-sm btn-ghost" id="vtt-modules-list">📦</button>
                 </div>
-                <div class="vtt-hint">Cards remaining: <strong id="vtt-deck-count">${deckCount}</strong></div>
+                <div class="vtt-hint">Cards remaining: <strong id="vtt-deck-count">${escHtml(String(deckCount))}</strong></div>
             </div>
 
             <!-- Timers -->

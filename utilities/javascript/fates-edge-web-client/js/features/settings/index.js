@@ -837,8 +837,8 @@ export function render(el) {
                     <img id="avatar-preview" src="${getUserAvatar(userEmail, userName, 48)}" 
                          alt="Your avatar" />
                     <div>
-                        <div class="avatar-name" id="avatar-preview-name">${userName || 'You'}</div>
-                        <div class="avatar-email" id="avatar-preview-email">${userEmail || 'No email set'}</div>
+                        <div class="avatar-name" id="avatar-preview-name">${escHtml(userName || 'You')}</div>
+                        <div class="avatar-email" id="avatar-preview-email">${escHtml(userEmail || 'No email set')}</div>
                     </div>
                 </div>
                 
@@ -1454,7 +1454,7 @@ async function connectToSyncServer() {
         showToast(i18nText("feature.settings.connectedToCampaign", null, "Connected to campaign!"), 'success');
     } catch (e) {
         if (statusEl) {
-            statusEl.innerHTML = `❌ ${e.message}`;
+            statusEl.textContent = `❌ ${e.message}`;
             statusEl.className = 'sync-status disconnected';
         }
         showToast(i18nText("feature.settings.connectionFailedValue", { value0: e.message }, "Connection failed: {{value0}}"), 'error');
@@ -2440,3 +2440,9 @@ setInterval(() => {
 // ============================================================
 
 export default { render, attachEvents };
+
+// Registered once per module; status remains accurate after expiry or network loss.
+onWSEvent('disconnected', () => {
+    const status = document.getElementById('managed-room-status');
+    if (status && status.textContent) status.textContent = 'Disconnected. If your connection expired, get a new one from the manager.';
+});
