@@ -5,7 +5,7 @@
 > A modular, self-contained toolkit for running *Fate's Edge* TTRPG campaigns — real-time collaboration, VTT integrations, Game Master tooling, and a full in-browser magic/monastic-path system.
 
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE.code)
-[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/SRD-CC_BY--NC--SA_4.0-lightgrey.svg)](LICENSE.srd)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/SRD-CC_BY--NC--SA_4.0-lightgray.svg)](LICENSE.srd)
 [![License: All Rights Reserved](https://img.shields.io/badge/Content-All_Rights_Reserved-red.svg)](LICENSE.proprietary)
 [![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)

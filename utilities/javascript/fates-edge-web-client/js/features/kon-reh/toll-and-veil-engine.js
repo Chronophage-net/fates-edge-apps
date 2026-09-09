@@ -472,7 +472,7 @@ export function aiChooseBid(engine, seat) {
  * what's actually legal for `seat` to play right now, mirroring
  * playCard()'s own rules exactly (including the all-trump-hand escape
  * in both the leading and void-follow branches), annotated with whether
- * playing it would require spending Leap. The UI uses this to grey out
+ * playing it would require spending Leap. The UI uses this to gray out
  * illegal cards instead of letting the player click one and get
  * rejected; the AI uses it to pick from real legal options.
  *

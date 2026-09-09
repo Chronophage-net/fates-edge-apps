@@ -13,14 +13,14 @@
   "maxAssetTier": "Standard",
   "obligationCapacity": "Spirit + Presence",
   "keyNPCs": [
-    "Captain Kiran 'Grey-Mane' (disillusioned former Aelerian scout, speaks in eights and never lies)",
+    "Captain Kiran 'Gray-Mane' (disillusioned former Aelerian scout, speaks in eights and never lies)",
     "Alina the Warden (master of signal fires and short routes)",
     "Old Sokka (the only corporal who has never carried a weapon, but who has never lost a client)"
   ],
   "hooks": [
     "A Vilikari factor offers a fortune for a safe route through a newly contested pass—but the Company's own scouts are refusing to take the contract.",
     "A rival company is undercutting Veldt's prices and poisoning their wells. The Company needs 'unofficial' investigators.",
-    "Captain Grey-Mane has disappeared. His last signal was a single unlit beacon. He was tracking a herd of phase-panthers into the Mistlands."
+    "Captain Gray-Mane has disappeared. His last signal was a single unlit beacon. He was tracking a herd of phase-panthers into the Mistlands."
   ],
   "agendaTimer": {
     "segments": 6,

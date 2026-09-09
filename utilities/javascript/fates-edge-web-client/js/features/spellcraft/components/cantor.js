@@ -314,7 +314,7 @@ async function loadCantorTalents() {
 
 // NOTE ON THIS FALLBACK LIST: this is only shown if wiki.json fails to load.
 // Descriptions below have been checked against the Player's Guide and the
-// Grey Wanderer's Grimoire and corrected/annotated where they omitted a real
+// Gray Wanderer's Grimoire and corrected/annotated where they omitted a real
 // mechanical cost or prerequisite. 'Bound Patron' does not appear in any of
 // the three rulebooks — it's a homebrew addition, tagged as such below so it
 // isn't mistaken for an official talent if a player only ever sees this list.

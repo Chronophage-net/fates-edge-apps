@@ -20,7 +20,7 @@ The world runs on three ledgers: the coins you spend, the promises you keep, and
 
 - **Horror that watches** – The Dread Timer tracks your unraveling. The Reality Fracture Timer tracks the world's. The Hollow is patient. The Hollow is always counting.
 
-**You are not the first to walk this road.** The Grey Wanderer has worn a dozen faces. Saikou Ira has exorcised things you wouldn't name. Dusana of the Raven Road pays her debts in stories. This is their compendium. This is their warning.
+**You are not the first to walk this road.** The Gray Wanderer has worn a dozen faces. Saikou Ira has exorcised things you wouldn't name. Dusana of the Raven Road pays her debts in stories. This is their compendium. This is their warning.
 
 **The soup is always free.**  
 **The price never is.**

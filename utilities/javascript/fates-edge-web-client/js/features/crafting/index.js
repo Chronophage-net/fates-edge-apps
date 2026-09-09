@@ -305,7 +305,7 @@ function combineIngredients(char, recipeMap) {
     } else {
         const randomEffects = [
             'A bubbly green liquid that smells of mint; drink it to restore 1 Fatigue.',
-            'A grey powder that sparkles; it can be thrown to create a flash of light (distract enemies).',
+            'A gray powder that sparkles; it can be thrown to create a flash of light (distract enemies).',
             'A sticky tar that hardens on contact; can be used to patch a leak or jam a lock.',
             'A sweet syrup that induces vivid dreams; take it to gain +1 die on a future Wits roll.',
             'A bitter tonic that purges the system; removes one Poisoned condition (if any).'
