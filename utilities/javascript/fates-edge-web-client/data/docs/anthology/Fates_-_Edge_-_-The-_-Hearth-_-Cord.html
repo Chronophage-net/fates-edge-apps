@@ -142,7 +142,19 @@
             border-top: 1px solid var(--border);
         }
     </style>
-<style data-fe-reader-added="styles">
+<style id="fe-collection-style">.fe-collection-intro { max-width: 68ch; margin-block: 1.5rem 2rem; font-size: 1.05em; line-height: 1.8; }
+.fe-collection-bridge { max-width: 68ch; margin-block: 1.2rem 2rem; font-style: italic; line-height: 1.75; }
+.fe-collection-contents { margin-block: 1.5rem 3rem; padding: 1rem 1.25rem; border: 1px solid var(--border, currentColor); border-radius: .4rem; }
+.fe-collection-contents ul { columns: 2; column-gap: 2.5rem; padding-inline-start: 1.2rem; }
+.fe-collection-contents li { break-inside: avoid; margin-block: .45rem; }
+.fe-collection-notes { margin-block: 3rem; padding: 1.25rem; border: 1px solid var(--border, currentColor); }
+.fe-collection-notes summary { cursor: pointer; font-weight: 700; }
+.fe-story-pointer { margin-block: .8rem; font-size: .9em; }
+.fe-reading-document h4 { margin-block: 2rem .8rem; line-height: 1.4; break-after: avoid; }
+#the-road-to-rouen, #the-justicars-judgment { margin-top: 4rem; }
+@media (max-width: 650px) { .fe-collection-contents ul { columns: 1; } }
+@media print { .fe-collection-contents, .fe-story-pointer { display: none; } #the-road-to-rouen, #the-justicars-judgment { break-before: page; } }
+</style><style data-fe-reader-added="styles">
 .fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
 .fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
 .fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
@@ -164,7 +176,7 @@
 @media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
 </style></head>
 <body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Anthology · fiction and inspiration</strong></p><p>Read for atmosphere, voices, and ideas to bring to the table. Consult the SRD and guides for mechanical procedures rather than treating fictional description as an unstated rules change.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">The Hearth Cord</a></li><li><a href="#high-country">The High Country</a></li><li><a href="#hearth-harvest">Hearth &amp; Harvest</a></li><li><a href="#lethai">The Lethai Dominion</a></li><li><a href="#coast">Coast, Tide &amp; Sail</a></li><li><a href="#cities">The City-States</a></li><li><a href="#southern-courts">The Southern Courts</a></li><li><a href="#mist-threshold">The Mist and the Threshold</a></li></ul></details>
-<h1 id="reader-section-1">The Hearth Cord</h1>
+<h1 id="reader-section-1">The Hearth Cord</h1><div class="fe-collection-intro" data-fe-collection-added="intro"><p>Dusana gathers these accounts at the places where people stop travelling: a lamp-keeper’s room, a kitchen, the shore where a crew waits for weather. The teller’s words lead each piece; Dusana’s closing comes afterward, once the room has had its say. Follow the road through the whole book, or stop at one hearth. No later chapter is needed to finish the story told there.</p></div><nav aria-label="Collection contents" class="fe-collection-contents" data-fe-collection-added="contents" id="toc"><ul><li><a href="#high-country">The High Country</a></li><li><a href="#aeler">The Vent That Whispered</a></li><li><a href="#ykrul">The Warrior Who Refused to Call the Runner</a></li><li><a href="#vilikari">The Peddler's Swerve</a></li><li><a href="#hearth-harvest">Hearth &amp; Harvest</a></li><li><a href="#aelaerem">The Hollow Bride</a></li><li><a href="#oshiira">The Grain That Spoke</a></li><li><a href="#lethai">The Lethai Dominion</a></li><li><a href="#lethai-al">The Silk Witness</a></li><li><a href="#lethai-ar">The Bargain of the Shed Skin</a></li><li><a href="#lethai-thora">The Gloss That Ate a Name</a></li><li><a href="#coast">Coast, Tide &amp; Sail</a></li><li><a href="#linn">The Selkie's Oath</a></li><li><a href="#kahfagia">The Lantern That Remembered</a></li><li><a href="#zakov">The Coin That Came Back</a></li><li><a href="#zakov-laughing-eel">The Merry Crew of the Laughing Eel</a></li><li><a href="#cities">The City-States</a></li><li><a href="#ecktoria">The Reckoner's Mask</a></li><li><a href="#thepyrgos">The Stair That Was Not</a></li><li><a href="#vhasia">The Bride of Nine Knots</a></li><li><a href="#southern-courts">The Southern Courts</a></li><li><a href="#ashaan">The Veil and the Cradle</a></li><li><a href="#dhahara">The Ford That Moved</a></li><li><a href="#mist-threshold">The Mist and the Threshold</a></li><li><a href="#mistlands">The Bell That Never Rang</a></li><li><a href="#trow">The Bargain of the Unlit Lamp</a></li><li><a href="#hagmorag">The Soup That Was Free</a></li></ul></nav>
 <p class="subtitle">Tales of the Threshold Regions — Set down by Dusana of the Raven Road</p>
 <p class="flex" style="margin-bottom:0.8rem;">
 <span class="badge badge-gold">Anthology</span>
@@ -177,40 +189,10 @@
 <p>You travel. You sit by fires. Someone speaks. You write. The ash on your cuff becomes ink. That is all. That is enough. These tales were told by midwives, bell-wardens, hedge-mothers, cord-weavers, herders, and ferrymen, gathered on the road from one threshold to the next — one tale for nearly every region and people I have crossed, kept as they were told, or as close to it as ink allows.</p>
 <p>What follows is not the whole of what I carried home. It is the part worth keeping — the tales that still hold their heat when the fire has gone to coals. A gamemaster may use them as they were given to me: read aloud for flavor when the party arrives somewhere new, as a cold open before a session, or as the seed of a night's trouble in whatever region the road has brought your table to. Read them. Or do not. The hearth waits either way.</p>
 </div>
-<div class="toc">
-<div class="toc-title"><strong style="color:var(--gold);">Table of Contents</strong></div>
-<div class="toc-cluster">The High Country</div>
-<a href="#aeler">The Vent That Whispered — Aeler</a>
-<a href="#ykrul">The Warrior Who Refused to Call the Runner — Ykrul</a>
-<a href="#vilikari">The Peddler's Swerve — Vilikari</a>
-<div class="toc-cluster">Hearth &amp; Harvest</div>
-<a href="#aelaerem">The Hollow Bride — Aelaerem</a>
-<a href="#oshiira">The Grain That Spoke — Oshiira</a>
-<div class="toc-cluster">The Lethai Dominion</div>
-<a href="#lethai-al">The Silk Witness — Lethai-al</a>
-<a href="#lethai-ar">The Bargain of the Shed Skin — Lethai-ar</a>
-<a href="#lethai-thora">The Gloss That Ate a Name — Lethai-thora</a>
-<div class="toc-cluster">Coast, Tide &amp; Sail</div>
-<a href="#linn">The Selkie's Oath — Linn</a>
-<a href="#kahfagia">The Lantern That Remembered — Kahfagia</a>
-<a href="#zakov">The Coin That Came Back — Zakov</a>
-<a href="#zakov-laughing-eel">The Merry Crew of the Laughing Eel — Zakov</a>
-<div class="toc-cluster">The City-States</div>
-<a href="#ecktoria">The Reckoner's Mask — Ecktoria</a>
-<a href="#thepyrgos">The Stair That Was Not — Thepyrgos</a>
-<a href="#vhasia">The Bride of Nine Knots — Vhasia</a>
-<div class="toc-cluster">The Southern Courts</div>
-<a href="#ashaan">The Veil and the Cradle — Ashaan</a>
-<a href="#dhahara">The Ford That Moved — Dhahara</a>
-<div class="toc-cluster">The Mist and the Threshold</div>
-<a href="#mistlands">The Bell That Never Rang — Mistlands</a>
-<a href="#trow">The Bargain of the Unlit Lamp — Trow</a>
-<a href="#hagmorag">The Soup That Was Free — Hag Morag</a>
-</div>
 <hr/>
 <!-- ===================== THE HIGH COUNTRY ===================== -->
-<h2 id="high-country">The High Country</h2>
-<h3 id="aeler">The Vent That Whispered</h3>
+<h2 id="high-country">The High Country</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The first hearths are hard to reach. Wind and stone determine how close people sit and how long a visitor may stay.</p>
+<h3 data-fe-story="true" id="aeler">The Vent That Whispered</h3>
 <p class="region-tag">Aeler — the Aelerian Range</p>
 <p class="byline">Old Orra keeps the lamps on the Third Stack and has not gone below in thirty years. She still counts her breaths before sleep. She gave me this one in the dark and would not let me light a candle for it.</p>
 <div class="story">
@@ -228,7 +210,7 @@
 <p>She made me lamp-keeper after that. I never went down again. I tend the wicks. I count the hours. I do not breathe in rhythm.</p>
 </div>
 <div class="closing">"Stone remembers. So does the space between breaths. Answer neither. And if you must walk the deep, count to eight — then start over. The ninth is not for you."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="ykrul">The Warrior Who Refused to Call the Runner</h3>
+<h3 data-fe-story="true" id="ykrul">The Warrior Who Refused to Call the Runner</h3>
 <p class="region-tag">Ykrul — the steppe clans</p>
 <p class="byline">Temur Many-Scars wears his braid to the belt and taught me the board before he told me the tale. He was clear that the order mattered. The game is <em>kon'reh</em> that night. I lost every match.</p>
 <div class="story">
@@ -245,7 +227,7 @@
 <p>My cousin watched the sheep for three winters. He learned to count. He never played kon'reh again.</p>
 </div>
 <div class="closing">"A free War-Chief is a noose waiting for a neck. Call only when the shadow is yours. Always keep one cut for the door. The board is patient. It will wait for you to forget."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="vilikari">The Peddler's Swerve</h3>
+<h3 data-fe-story="true" id="vilikari">The Peddler's Swerve</h3>
 <p class="region-tag">Vilikari — the border ford</p>
 <p class="byline">Rusti the Factor is short one finger and has sold the same horse three times without at any point ceasing to own it. She does not call this theft. She calls it velocity, and she did not laugh when she said it.</p>
 <div class="story">
@@ -266,8 +248,8 @@
 <div class="closing">"Sell the hour, not the horse. Value is not in the thing. It is in the need. And need is a thing you can put in a barrel if you name it correctly."<span class="attrib">— the Witch's Closing</span></div>
 <hr/>
 <!-- ===================== HEARTH & HARVEST ===================== -->
-<h2 id="hearth-harvest">Hearth &amp; Harvest</h2>
-<h3 id="aelaerem">The Hollow Bride</h3>
+<h2 id="hearth-harvest">Hearth &amp; Harvest</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">Below the passes, the talk turns to food. Every household has a different account of what it must give back.</p>
+<h3 data-fe-story="true" id="aelaerem">The Hollow Bride</h3>
 <p class="region-tag">Aelaerem — the mill villages</p>
 <p class="byline">Mabs worked the grindstone through the whole of this, so some of it arrived under the noise and I have guessed at it. She says the Hollow talks to her at night. She would not tell me what it says, and was very pleasant about not telling me.</p>
 <div class="story">
@@ -289,7 +271,7 @@
 <p>So far, it's held. The Bride hasn't returned. But the miller says the well water tasted of salt last spring, and the sheep still won't drink.</p>
 </div>
 <div class="closing">"Hospitality is a thread. Tie it right, and it binds the guest. Tie it wrong, and it binds you. Never pour the ninth — not even to see what happens. Something always does."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="oshiira">The Grain That Spoke</h3>
+<h3 data-fe-story="true" id="oshiira">The Grain That Spoke</h3>
 <p class="region-tag">Oshiira — the grain country</p>
 <p class="byline">Granary-keeper Oris is a heavy man with a gentle voice and a count that has never once come out right. He says the silo talks to him when the wheat runs low, and that it does not whisper, it instructs. He is no longer certain there is a difference anymore.</p>
 <div class="story">
@@ -309,8 +291,8 @@
 <div class="closing">"Mercy enriches the giver — but only the mercy that costs something. The grain counts the name you chose to spare when the ledger told you to collect. The ninth name belongs to the silo. The silo never forgives."<span class="attrib">— the Witch's Closing</span></div>
 <hr/>
 <!-- ===================== THE LETHAI DOMINION ===================== -->
-<h2 id="lethai">The Lethai Dominion</h2>
-<h3 id="lethai-al">The Silk Witness</h3>
+<h2 id="lethai">The Lethai Dominion</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">In the Dominion, a servant may hear a story the person at the head of the table never hears. Listen for who is permitted to speak.</p>
+<h3 data-fe-story="true" id="lethai-al">The Silk Witness</h3>
 <p class="region-tag">Lethai-al — the Valewood</p>
 <p class="byline">Maer of the Root-Circle mends bridges and remembers every oath broken on one. Her hands did not stop the entire time — mending, knotting, untangling — and she never once looked down at them.</p>
 <div class="story">
@@ -326,7 +308,7 @@
 <p>Now they sing of it — not as a curse, but as a repair. Travelers leave a thread tied to the rail. One strand. White. Thin.</p>
 </div>
 <div class="closing">"Mercy with memory. That is the thread. Cut it, and you build alone. Heal it, and the road belongs to everyone. The eels remember both."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="lethai-ar">The Bargain of the Shed Skin</h3>
+<h3 data-fe-story="true" id="lethai-ar">The Bargain of the Shed Skin</h3>
 <p class="region-tag">Lethai-ar — the Coil Court</p>
 <p class="byline">Ashai keeps serpents, wears their scales tattooed to the elbow, and has shed three names. She remembers the first two. She gave me the second one and I have not written it down anywhere but here, and not here either.</p>
 <div class="story">
@@ -346,7 +328,7 @@
 <p>She still cannot sleep. The solitude is gone. But the faces in the shadows have returned — and now she knows their names.</p>
 </div>
 <div class="closing">"A shedding does not erase the debt. It only changes the skin you wear. The scales remember. The shadows keep count."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="lethai-thora">The Gloss That Ate a Name</h3>
+<h3 data-fe-story="true" id="lethai-thora">The Gloss That Ate a Name</h3>
 <p class="region-tag">Lethai-thora — the Still-Room of Thepyrgos</p>
 <p class="byline">Archivist Velynne never rises above a murmur and has ink to the second knuckle. She claims to have forgotten more languages than most people manage to learn, and I believe her, which is the trouble. She would not tell me what they commemorated.</p>
 <div class="story">
@@ -362,8 +344,8 @@
 <div class="closing">"Context is a key. Lose the key, lose the door. Lose the door, you are still in the room. The room does not mind. The room is patient."<span class="attrib">— the Witch's Closing</span></div>
 <hr/>
 <!-- ===================== COAST, TIDE & SAIL ===================== -->
-<h2 id="coast">Coast, Tide &amp; Sail</h2>
-<h3 id="linn">The Selkie's Oath</h3>
+<h2 id="coast">Coast, Tide &amp; Sail</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">At the coast, an empty chair may belong to someone still expected home. The tide does not tell the household when to clear it.</p>
+<h3 data-fe-story="true" id="linn">The Selkie's Oath</h3>
 <p class="region-tag">Linn — the fisher coast</p>
 <p class="byline">Captain Rana gave me this across two nights and a bad crossing, aboard the <em>Eel-Skiff</em>, a Linn woman with salt-bleached braids and a laugh like shingle in a storm. Never goes ashore without a knife. Never sleeps without the hatch cracked.</p>
 <div class="story">
@@ -382,7 +364,7 @@
 <p>The fisherman never asked again.</p>
 </div>
 <div class="closing">"Oaths change. So do the skins we wear. The sea does not care which — only that you choose, and that you choose while there is still breath."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="kahfagia">The Lantern That Remembered</h3>
+<h3 data-fe-story="true" id="kahfagia">The Lantern That Remembered</h3>
 <p class="region-tag">Kahfagia — the headland coast</p>
 <p class="byline">Pilot Seref has one eye and the coastline of three nations by heart. She runs a cutter called the <em>Red Wake</em>. Says the sea is a poor liar but an excellent witness.</p>
 <div class="story">
@@ -402,7 +384,7 @@
 <p>And the beacons — some of them — answered.</p>
 </div>
 <div class="closing">"Beacons are not marks. They are arguments. A mark says, 'You are here.' An argument says, 'You should be somewhere else.' If you do not listen, the beacon will argue without you — and the sea will agree with the oldest voice in the room."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="zakov">The Coin That Came Back</h3>
+<h3 data-fe-story="true" id="zakov">The Coin That Came Back</h3>
 <p class="region-tag">Zakov — the free waters</p>
 <p class="byline">Old Salt has drowned twice. The sea returned him both times and kept his left ear the second time, which he considers a fair settlement and will explain at length if you let him.</p>
 <div class="story">
@@ -419,7 +401,7 @@
 <p>But sometimes, on still nights, he hears a coin spinning on the deck. He does not look. He knows better. A coin that has been returned is not a coin that has been forgotten. It is a coin that is waiting.</p>
 </div>
 <div class="closing">"Not all treasure is worth its weight. Some coins carry a ticket, and the ticket is always for a destination you would not choose. The sea does not ask whether you want to go. It only asks whether you are ready to pay the fare."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="zakov-laughing-eel">The Merry Crew of the Laughing Eel</h3>
+<h3 data-fe-story="true" id="zakov-laughing-eel">The Merry Crew of the Laughing Eel</h3>
 <p class="region-tag">Zakov — Port Shed and the Drowned Quarter</p>
 <p class="byline">A Sidhi deckhand, the last of a crew that once numbered twelve, told me this while coiling rope and did not stop coiling to tell it.</p>
 <div class="story">
@@ -436,8 +418,8 @@
 <div class="closing">"A crew that laughs at everything has simply not yet met the one debt that laughs back. The sea keeps no count of its own. It borrows the Prince's, and the Prince has never once mislaid a name."<span class="attrib">— the Witch's Closing</span></div>
 <hr/>
 <!-- ===================== THE CITY-STATES ===================== -->
-<h2 id="cities">The City-States</h2>
-<h3 id="ecktoria">The Reckoner's Mask</h3>
+<h2 id="cities">The City-States</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The city offers another sort of shelter: a mask, a stair, a marriage. Each has a door that someone must keep.</p>
+<h3 data-fe-story="true" id="ecktoria">The Reckoner's Mask</h3>
 <p class="region-tag">Ecktoria — the assembly cities</p>
 <p class="byline">An old clerk feeds the pigeons by the plaza fountain. Children dare each other to ask him about the mask, and he always answers, which is how you know he was the worst of them.</p>
 <div class="story">
@@ -456,7 +438,7 @@
 <p>He served thirty more years — the most honest Reckoner the city ever had. He never wore the mask again. He didn't need to. It had taught him where to look.</p>
 </div>
 <div class="closing">"Judgment begins at home. The mask only shows what you already know — but will not say."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="thepyrgos">The Stair That Was Not</h3>
+<h3 data-fe-story="true" id="thepyrgos">The Stair That Was Not</h3>
 <p class="region-tag">Thepyrgos — the Collegium of Keys</p>
 <p class="byline">Scholar Lyra does not leave the library and reads by candle. She holds that there is a ninth aisle nobody has found. She has been looking for forty years. The candles are getting shorter and she has noticed.</p>
 <div class="story">
@@ -472,7 +454,7 @@
 <p>He never climbed a stair again without counting twice. He never stopped writing, either. Every page he wrote after that night carried a small mark in the corner — a dot so tiny only he could see it. A reminder that somewhere, in a room that existed and did not exist, someone was still reading. Still taking notes. Still being kind.</p>
 </div>
 <div class="closing">"A proof that cannot be improved is already dead. A scholar who cannot be wrong has stopped climbing. The stair judges — but it also teaches. Accept its edits, or stay in the basement. The basement has no windows."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="vhasia">The Bride of Nine Knots</h3>
+<h3 data-fe-story="true" id="vhasia">The Bride of Nine Knots</h3>
 <p class="region-tag">Vhasia — the red towers</p>
 <p class="byline">Lady Ysoria receives at dusk and at no other hour. Her left hand has six fingers; she says the extra was a wedding gift and did not say from whom, and the pause before she did not say it was the longest of the evening.</p>
 <div class="story">
@@ -491,8 +473,8 @@
 <div class="closing">"The ninth knot is the thread that holds the story closed. Cut it, and the story unravels — but not always in the direction you expect. The blade remembers who swung it."<span class="attrib">— the Witch's Closing</span></div>
 <hr/>
 <!-- ===================== THE SOUTHERN COURTS ===================== -->
-<h2 id="southern-courts">The Southern Courts</h2>
-<h3 id="ashaan">The Veil and the Cradle</h3>
+<h2 id="southern-courts">The Southern Courts</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">Farther south, the visitor is measured before the tea is poured. A cradle and a ford may carry more authority than the people appointed to guard them.</p>
+<h3 data-fe-story="true" id="ashaan">The Veil and the Cradle</h3>
 <p class="region-tag">Ashaan — the palace cities</p>
 <p class="byline">The Chancellor's widow keeps the mask on indoors and speaks through a curtain. Nobody has seen her face in twenty years. She says the one underneath is not the one she was born with. She does not say how it changed.</p>
 <div class="story">
@@ -510,7 +492,7 @@
 <p>The assassin was never found. His enemies remembered the veil differently afterward: a hiding place, certainly, but also a cradle, and sometimes a witness no one has thought to silence.</p>
 </div>
 <div class="closing">"The veil hides. The knife reveals. The cradle holds what cannot be seen. Choose which you carry — but know that the one who carries the veil also carries the weight of every face she has hidden from."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="dhahara">The Ford That Moved</h3>
+<h3 data-fe-story="true" id="dhahara">The Ford That Moved</h3>
 <p class="region-tag">Dhahara — the river roads</p>
 <p class="byline">Ferryman Dav has poled the same ford for fifty years. The river has changed course three times in that span and he can no longer say with confidence which change was which, though he can tell you what it cost each time.</p>
 <div class="story">
@@ -531,8 +513,8 @@
 <div class="closing">"A road is a covenant. A ford is a witness. The river remembers every name it has been given. It does not forget. It does not forgive. It only waits for the next traveler who thinks a grain of wheat is enough."<span class="attrib">— the Witch's Closing</span></div>
 <hr/>
 <!-- ===================== THE MIST AND THE THRESHOLD ===================== -->
-<h2 id="mist-threshold">The Mist and the Threshold</h2>
-<h3 id="mistlands">The Bell That Never Rang</h3>
+<h2 id="mist-threshold">The Mist and the Threshold</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The last rooms stand close to the mist. Dusana leaves each as she found it, except for the place where she sat.</p>
+<h3 data-fe-story="true" id="mistlands">The Bell That Never Rang</h3>
 <p class="region-tag">The Mistlands — the levee towers</p>
 <p class="byline">Bell-warden Hollis has soot under the nails and a cough that does not finish. Asked why he keeps no assistant, he said: "The last one asked too many questions. The bell answered one. Neither of us liked the answer."</p>
 <div class="story">
@@ -551,7 +533,7 @@
 <p>They buried him under the tower. The bell still hangs. No one has rung it. The dead girl's voice still calls on certain nights, when the fog rises and the fox runs. She does not ask for the bell anymore. She asks for the warden.</p>
 </div>
 <div class="closing">"Some warnings should never be spoken. The bell knew. So did he. But the girl did not know. That is the difference between the living and the dead. The dead learn too late."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="trow">The Bargain of the Unlit Lamp</h3>
+<h3 data-fe-story="true" id="trow">The Bargain of the Unlit Lamp</h3>
 <p class="region-tag">Trow — the crossroads folk</p>
 <p class="byline">A Trow gave me this and gave no name, smoking a pipe with no ember and no stem, in the corner of a tavern where its hat drank the light. I wrote down what I heard. By morning the ink had gone and I set it down again from a memory that was not entirely mine.</p>
 <div class="story">
@@ -570,7 +552,7 @@
 <p>He never bought from a Trow again. But on winter nights, when the wind was right, he would stand at his gate and look toward the crossroads. He could not see the lamp. It was too far. But he could feel it — waiting, burning, remembering everything he had been willing to forget.</p>
 </div>
 <div class="closing">"Trow trade in gaps. The gap that light fills is the gap where memory used to be. Do not buy a lamp from a creature that wears a hat made of starlight. The seller does not need your glove. The seller needs your forgetting."<span class="attrib">— the Witch's Closing</span></div>
-<h3 id="hagmorag">The Soup That Was Free</h3>
+<h3 data-fe-story="true" id="hagmorag">The Soup That Was Free</h3>
 <p class="region-tag">Hag Morag — the dry well</p>
 <p class="byline">The one who calls herself Hag Morag sits by a dry well stirring a pot with no fire under it. The soup is hot. The well is dry. She says the pot has been stirring itself longer than the village has stood. She does not explain further.</p>
 <div class="story">

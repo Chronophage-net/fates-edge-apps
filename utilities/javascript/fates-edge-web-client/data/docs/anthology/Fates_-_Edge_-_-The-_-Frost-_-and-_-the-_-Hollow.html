@@ -114,7 +114,19 @@ footer {
         blockquote.epigraph { border-left: 3px solid var(--gold, #c9a227); padding: 0.3rem 0 0.3rem 1rem; margin: 0.6rem 0 0.9rem; font-style: italic; color: var(--text2); }
         blockquote.epigraph cite { display:block; font-style:normal; font-size:0.78rem; color: var(--text3); margin-top:0.25rem; }
     </style>
-<style data-fe-reader-added="styles">
+<style id="fe-collection-style">.fe-collection-intro { max-width: 68ch; margin-block: 1.5rem 2rem; font-size: 1.05em; line-height: 1.8; }
+.fe-collection-bridge { max-width: 68ch; margin-block: 1.2rem 2rem; font-style: italic; line-height: 1.75; }
+.fe-collection-contents { margin-block: 1.5rem 3rem; padding: 1rem 1.25rem; border: 1px solid var(--border, currentColor); border-radius: .4rem; }
+.fe-collection-contents ul { columns: 2; column-gap: 2.5rem; padding-inline-start: 1.2rem; }
+.fe-collection-contents li { break-inside: avoid; margin-block: .45rem; }
+.fe-collection-notes { margin-block: 3rem; padding: 1.25rem; border: 1px solid var(--border, currentColor); }
+.fe-collection-notes summary { cursor: pointer; font-weight: 700; }
+.fe-story-pointer { margin-block: .8rem; font-size: .9em; }
+.fe-reading-document h4 { margin-block: 2rem .8rem; line-height: 1.4; break-after: avoid; }
+#the-road-to-rouen, #the-justicars-judgment { margin-top: 4rem; }
+@media (max-width: 650px) { .fe-collection-contents ul { columns: 1; } }
+@media print { .fe-collection-contents, .fe-story-pointer { display: none; } #the-road-to-rouen, #the-justicars-judgment { break-before: page; } }
+</style><style data-fe-reader-added="styles">
 .fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
 .fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
 .fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
@@ -136,49 +148,21 @@ footer {
 @media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
 </style></head>
 <body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Anthology · fiction and inspiration</strong></p><p>Read for atmosphere, voices, and ideas to bring to the table. Consult the SRD and guides for mechanical procedures rather than treating fictional description as an unstated rules change.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">The Frost and the Hollow</a></li><li><a href="#i-the-frost-roads">I. The Frost Roads</a></li><li><a href="#ii-the-hollow">II. The Hollow</a></li><li><a href="#iii-on-the-ninth-and-the-hollow">III. On the Ninth and the Hollow</a></li><li><a href="#iv-customs-of-the-northern-roads">IV. Customs of the Northern Roads</a></li></ul></details>
-<h1 id="reader-section-1">The Frost and the Hollow</h1>
+<h1 id="reader-section-1">The Frost and the Hollow</h1><div class="fe-collection-intro" data-fe-collection-added="intro"><p>The northern tales begin with people who can still name what they have lost. Farther into the book, the visitor at the door becomes less certain, and the teller has to choose how much to say. Each account keeps its own ending. Dusana’s closing words follow it; practical notes and customs wait until the journey is over.</p></div><nav aria-label="Collection contents" class="fe-collection-contents" data-fe-collection-added="contents" id="toc"><ul><li><a href="#i-the-frost-roads">I. The Frost Roads</a></li><li><a href="#the-ninth-rune">The Ninth Rune</a></li><li><a href="#the-mist-walker-s-gift">The Mist-Walker's Gift</a></li><li><a href="#the-valewood-hunt">The Valewood Hunt</a></li><li><a href="#the-skald-who-lost-her-tongue">The Skald Who Lost Her Tongue</a></li><li><a href="#ii-the-hollow">II. The Hollow</a></li><li><a href="#the-mother-s-needle">The Mother's Needle</a></li><li><a href="#the-guest-who-never-left">The Guest Who Never Left</a></li><li><a href="#the-song-the-dead-sing-to-calves">The Song the Dead Sing to Calves</a></li><li><a href="#the-bell-that-rings-backwards">The Bell That Rings Backwards</a></li><li><a href="#the-guest-who-left-a-shadow">The Guest Who Left a Shadow</a></li><li><a href="#the-door-that-opens-both-ways">The Door That Opens Both Ways</a></li><li><a href="#iii-on-the-ninth-and-the-hollow">III. On the Ninth and the Hollow</a></li><li><a href="#on-the-number-eight">On the Number Eight</a></li><li><a href="#on-the-ninth">On the Ninth</a></li><li><a href="#on-the-hollow">On the Hollow</a></li><li><a href="#on-warding-and-practice">On Warding and Practice</a></li><li><a href="#using-the-ninth-and-hollow-in-play">Using the Ninth and Hollow in Play</a></li><li><a href="#iv-customs-of-the-northern-roads">IV. Customs of the Northern Roads</a></li><li><a href="#customs-of-the-northern-roads">Customs of the Northern Roads</a></li></ul></nav>
 <p class="text-sm text-muted" style="margin-bottom:1rem;"><span class="badge badge-amber">Anthology</span>
 <span class="badge badge-blue">10 Tales</span>
 <span class="badge badge-purple">Northern Folklore</span>
 <span class="badge badge-red">The Ninth Taboo</span>
 <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
-<div class="frame">
-<p>The north keeps two kinds of story, and they are the same story told from opposite ends. One is about what the cold takes: ships, tongues, names, the road home. The other is about what refuses to be taken — a hearth that will not go out, an oath sworn by people nobody remembers, a rune that has no name because naming it would be answering it.</p>
-<p>This volume gathers the tales the earlier collections left behind. <em>Tales of the Threshold</em> took the best-known of the frost and hollow stories — the Draugr's silver, the shield that forgot, the thing that knocks four times — and printed them for travellers. What is here is the rest: the ones the rune-witches would only tell twice, and the ones the Linn tell at the back end of a long winter when everyone present already knows how they end.</p>
-<p>The third part is not a story at all. It is the reasoning behind them: the northern arithmetic of the Ninth and the Hollow, why eight is the number of the living, and what a household is actually doing when it lays a ninth place at the table. It is printed here because the tales do not make sense without it, and because a Game Master who understands the counting can improvise a hundred more of these.</p>
-</div>
-<div class="toc" id="toc">
-<h3>Contents</h3>
-<div class="toc-section">I. The Frost Roads</div>
-<a href="#the-ninth-rune">The Ninth Rune</a>
-<a href="#the-mist-walker-s-gift">The Mist-Walker's Gift</a>
-<a href="#the-valewood-hunt">The Valewood Hunt</a>
-<a href="#the-skald-who-lost-her-tongue">The Skald Who Lost Her Tongue</a>
-<div class="toc-section">II. The Hollow</div>
-<a href="#the-mother-s-needle">The Mother's Needle</a>
-<a href="#the-guest-who-never-left">The Guest Who Never Left</a>
-<a href="#the-song-the-dead-sing-to-calves">The Song the Dead Sing to Calves</a>
-<a href="#the-bell-that-rings-backwards">The Bell That Rings Backwards</a>
-<a href="#the-guest-who-left-a-shadow">The Guest Who Left a Shadow</a>
-<a href="#the-door-that-opens-both-ways">The Door That Opens Both Ways</a>
-<div class="toc-section">III. On the Ninth and the Hollow</div>
-<a href="#on-the-number-eight">On the Number Eight</a>
-<a href="#on-the-ninth">On the Ninth</a>
-<a href="#on-the-hollow">On the Hollow</a>
-<a href="#on-warding-and-practice">On Warding and Practice</a>
-<a href="#using-the-ninth-and-hollow-in-play">Using the Ninth and Hollow in Play</a>
-<div class="toc-section">IV. Customs of the Northern Roads</div>
-<a href="#customs-of-the-northern-roads">Customs of the Northern Roads</a>
-</div>
-<h2 id="i-the-frost-roads">I. The Frost Roads</h2>
-<h3 id="the-ninth-rune">The Ninth Rune</h3>
+<h2 id="i-the-frost-roads">I. The Frost Roads</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The fire is still warm enough for questions. These tellers remember the names they are reluctant to speak.</p>
+<h3 data-fe-story="true" id="the-ninth-rune">The Ninth Rune</h3>
 <blockquote class="epigraph">
 <p>“The ninth rune is the oath you owe to the ones you could not save. Do not carve it. Speak it.”</p>
 <cite>— The rune-witch of the Mistland</cite>
 </blockquote>
-<h5 id="told-by">Told by</h5>
+<span id="told-by"></span>
 <p>An old rune-witch who lived in a cairn at the edge of the Mistland. She had no name—or rather, she had nine, and she would not tell me which one was true.</p>
-<h5 id="the-tale">The Tale</h5>
+<span id="the-tale"></span>
 <p>The Linn have eight runes for the living. <em>Fehu</em> for wealth. <em>Uruz</em> for strength. <em>Thurisaz</em> for the thorn. <em>Ansuz</em> for the voice. <em>Raido</em> for the road. <em>Kenaz</em> for the torch. <em>Gebo</em> for the gift. <em>Wunjo</em> for the joy.</p>
 <p>The ninth rune is not for the living. It has no name. Carve it, and you speak to the dead.</p>
 <p>A skald—call him Egil—wanted to know the ninth rune. He was famous for his poems, his memory, his ability to make a jarl weep with a single verse. But he had never written a poem about his own son, who had drowned in a fjord when the boy was seven.</p>
@@ -197,26 +181,16 @@ footer {
 <p>He walked home. He wrote a poem about his son. It had no runes. It had only the boy's name, repeated nine times.</p>
 <p>The rune-witch read the poem. “You have found it,” she said. “Now forget it. The ninth rune is not for sharing.”</p>
 <p>Egil never carved the ninth rune. But every year on the anniversary of his son's drowning, he walked to the fjord and whispered the boy's name nine times. The water rippled. The fog lifted. And for one breath, he saw his son's face.</p>
-<h5 id="the-witch-s-closing">The Witch's Closing</h5>
+<span id="the-witch-s-closing"></span>
 <p>“The ninth rune is the oath you owe to the ones you could not save. Do not carve it. Speak it. And only speak it when you are alone.”</p>
-<h5 id="what-lurks-in-the-shadow-of-the-tale">What Lurks in the Shadow of the Tale</h5>
-<p><strong>The Ninth Rune</strong> — A standing stone in the Mistland that shows the name of a visitor's dead loved one. It cannot be used for divination, communication, or resurrection. It simply <em>witnesses</em>. The witness is enough to write a poem, but not to heal the wound.</p>
-<h6 id="tags-mechanics">Tags / Mechanics:</h6>
-<ul>
-<li>A character who touches the Ninth Rune sees the name of one person they have lost. They gain +1 die to all rolls related to mourning or memorializing that person for the next month.</li>
-<li>If the character attempts to carve the rune elsewhere, the rune fades—and the character forgets the dead person's name permanently.</li>
-<li><strong>Clock: The Rune's Jealousy [8]</strong> — Ticks each time a character uses the Ninth Rune for a practical purpose (e.g., to gain an advantage in negotiation by invoking the dead). When full, the rune vanishes from the stone. The character cannot return.</li>
-</ul>
-<h6 id="adventure-hook">Adventure Hook:</h6>
-<p>A skald has gone mad. He carved the ninth rune into his own chest. Now he cannot stop speaking the names of the dead—every name, every death, every grief. The party must find a way to silence him—or to help him un-carve the rune before he forgets his own name.</p>
-<h3 id="the-mist-walker-s-gift">The Mist-Walker's Gift</h3>
+<h3 data-fe-story="true" id="the-mist-walker-s-gift">The Mist-Walker's Gift</h3>
 <blockquote class="epigraph">
 <p>“The Mistland is a tally. Every breath is an entry. Every story is a payment. Do not walk in without something to tell.”</p>
 <cite>— Bone-reader of the Mistland</cite>
 </blockquote>
-<h5 id="told-by-2">Told by</h5>
+<span id="told-by-2"></span>
 <p>A bone-reader in a Mistland longhouse that had no door—only a hide hung over the threshold. She spoke in a whisper, and her hands never stopped moving, sorting knucklebones into patterns.</p>
-<h5 id="the-tale-2">The Tale</h5>
+<span id="the-tale-2"></span>
 <p>The Mistland is not a place. It is a <em>threshold</em>. The fog that covers it is not water. It is the breath of the dead, exhaled over centuries, waiting for someone to breathe it back in.</p>
 <p>A young Linn—call her Solveig—went into the Mistland to find her father. He had disappeared three winters ago, walking into the fog to hunt a white stag that had been seen near the Direwood.</p>
 <p>She walked for a day. The fog was cold and heavy. She called her father's name. No answer.</p>
@@ -238,26 +212,16 @@ footer {
 <p>The villagers told their stories. The best fisher. The oldest skald. The woman who had never spoken of her dead husband. They told nine stories.</p>
 <p>At dawn, the fog lifted. Solveig's father walked out of the Mistland. His eyes were clear. His mouth was closed.</p>
 <p>He never spoke of what he had seen. But every year, he walked to the edge of the fog and left a single coin—a toll for the next person who might get lost.</p>
-<h5 id="the-witch-s-closing-2">The Witch's Closing</h5>
+<span id="the-witch-s-closing-2"></span>
 <p>“The Mistland is a tally. Every breath is an entry. Every story is a payment. Do not walk in without something to tell.”</p>
-<h5 id="what-lurks-in-the-shadow-of-the-tale-2">What Lurks in the Shadow of the Tale</h5>
-<p><strong>The Fog's Breath</strong> — A curse that afflicts those who enter the Mistland without an offering. The fog takes one memory for every hour spent inside. To recover a memory, someone must tell a story that has never been told—a story good enough to make the fog listen.</p>
-<h6 id="tags-mechanics-2">Tags / Mechanics:</h6>
-<ul>
-<li>A character who enters the Mistland without an offering (a coin, a lock of hair, a written name) loses one memory per hour. The GM chooses the memory—a minor one at first (the name of a tavern, the face of a minor NPC), then progressively more significant.</li>
-<li>A character may recover one memory by telling a story. The story must be told to the fog itself (i.e., spoken aloud while in the Mistland). On a successful Spirit + Performance test (DV 5), the fog releases one memory.</li>
-<li><strong>Clock: The Fog's Hunger [8]</strong> — Ticks each hour a character spends in the Mistland without telling a story. When full, the character forgets their own name and becomes a Mist-Walker—a fog-spirit that cannot leave.</li>
-</ul>
-<h6 id="adventure-hook-2">Adventure Hook:</h6>
-<p>A Linn chieftain's son walked into the Mistland three days ago. The party must find him—but the fog is thick, and every hour costs a memory. They must tell stories to the fog to keep their own names—and to buy the son's freedom.</p>
-<h3 id="the-valewood-hunt">The Valewood Hunt</h3>
+<h3 data-fe-story="true" id="the-valewood-hunt">The Valewood Hunt</h3>
 <blockquote class="epigraph">
 <p>“The Valewood is a mirror. It shows you what you are afraid of—and then it shows you what you forgot.”</p>
 <cite>— Shield-maiden Gunnhild</cite>
 </blockquote>
-<h5 id="told-by-3">Told by</h5>
+<span id="told-by-3"></span>
 <p>A shield-maiden named Gunnhild, who had walked the Valewood and returned with her eyes still open. Her voice was rust, and her left hand had only three fingers.</p>
-<h5 id="the-tale-3">The Tale</h5>
+<span id="the-tale-3"></span>
 <p>The Valewood lies east of the Aberderrin Sea, a forest of silver-barked trees and empty cities that phase in and out of reality. The Aelinnel built those cities once. Now they are silent, save for the whisper of stone shifting between centuries.</p>
 <p>The Linn do not go to the Valewood for punishment. They go to prove they are not afraid.</p>
 <p>A warrior—call him Ragnar—boasted that he would spend a night in the Valewood and return with a relic from a phasing city. His jarl laughed. “You will return with nothing but a story you cannot tell.”</p>
@@ -275,27 +239,16 @@ footer {
 <p>The jarl stared at him. “You saw the queen?”</p>
 <p>“I saw her fountain. That was enough.”</p>
 <p>Ragnar never boasted again. But he never feared the Valewood either. He said, “The wood does not want your courage. It wants your attention. If you give it that, it will let you leave.”</p>
-<h5 id="the-witch-s-closing-3">The Witch's Closing</h5>
+<span id="the-witch-s-closing-3"></span>
 <p>“The Valewood is a mirror. It shows you what you are afraid of—and then it shows you what you forgot. Pay attention, but do not take anything. The queens of the empty cities are jealous.”</p>
-<h5 id="what-lurks-in-the-shadow-of-the-tale-3">What Lurks in the Shadow of the Tale</h5>
-<p><strong>The Phasing City</strong> — A Valewood ruin that appears and disappears at irregular intervals. Inside, relics of immense power lie unguarded—but taking one binds the thief to the city's queen, a shade who will hunt them through time and space until the relic is returned.</p>
-<h6 id="tags-mechanics-3">Tags / Mechanics:</h6>
-<ul>
-<li>A character who enters a phasing city may attempt to take a relic. On a success (Wits + Lore, DV 5), they acquire an ancient item (GM determines powers).</li>
-<li>However, taking the relic curses the character. They gain the Condition <strong>Hunted by the Queen</strong>. Once per session, the GM may have the queen appear nearby—a flicker of motion, a cold touch, a whisper. The character must test Spirit + Endurance (DV 4) or mark 1 Fatigue.</li>
-<li>The curse can only be lifted by returning the relic to the city—which may have phased elsewhere.</li>
-<li><strong>Clock: The Queen's Patience [8]</strong> — Ticks each time the relic is used. When full, the queen appears in person. She will take the relic by force—and the character's name as interest.</li>
-</ul>
-<h6 id="adventure-hook-3">Adventure Hook:</h6>
-<p>A Linn warrior took a bronze crown from a phasing city. Now the queen walks behind him—everywhere, always. He cannot sleep. The party must find the city again and return the crown before the queen takes more than a name.</p>
-<h3 id="the-skald-who-lost-her-tongue">The Skald Who Lost Her Tongue</h3>
+<h3 data-fe-story="true" id="the-skald-who-lost-her-tongue">The Skald Who Lost Her Tongue</h3>
 <blockquote class="epigraph">
 <p>“A tongue is a weapon. A whisper is a sharper one. Do not anger a skald. They remember your name—and names have weight.”</p>
 <cite>— Signy the Skald</cite>
 </blockquote>
-<h5 id="told-by-4">Told by</h5>
+<span id="told-by-4"></span>
 <p>A skald named Signy, who spoke through a bone whistle because her tongue had been cut out by a rival who was jealous of her verses.</p>
-<h5 id="the-tale-4">The Tale</h5>
+<span id="the-tale-4"></span>
 <p>A skald's tongue is not a muscle. It is a <em>bridge</em>—between the living and the dead, between the past and the future, between the meal and the song.</p>
 <p>Signy was the best skald in the fjord. She could make a jarl weep. She could make a thrall feel like a king. She could remember every oath spoken in her presence for forty years.</p>
 <p>A rival—a man named Gunnar—could not match her. So he cut her tongue out while she slept.</p>
@@ -312,23 +265,13 @@ footer {
 <p>She spoke one word: “Gunnar.”</p>
 <p>Gunnar died. The word was his true name, spoken by a tongue that had been paid in blood. The selkie laughed, took its skin back, and swam away.</p>
 <p>Signy became the most feared skald in the north. She never sang again. She only whispered. And when she whispered a name, that person forgot their own story.</p>
-<h5 id="the-witch-s-closing-4">The Witch's Closing</h5>
+<span id="the-witch-s-closing-4"></span>
 <p>“A tongue is a weapon. A whisper is a sharper one. Do not anger a skald. They remember your name—and names have weight.”</p>
-<h5 id="what-lurks-in-the-shadow-of-the-tale-4">What Lurks in the Shadow of the Tale</h5>
-<p><strong>The Blood Tongue</strong> — A selkie-woven replacement tongue that grants the bearer the power to speak a person's true name. When spoken, the target forgets their own story—their memories, their oaths, their loves. They become a blank slate.</p>
-<h6 id="tags-mechanics-4">Tags / Mechanics:</h6>
-<ul>
-<li>The Blood Tongue can be used once per session to speak a character's true name. The target must make a Spirit + Endurance test (DV 5). On a failure, the target loses one significant memory (GM's choice). On a critical failure, the target forgets their own name and cannot form new long-term memories for a week.</li>
-<li>Using the Blood Tongue costs 1 Corruption (the selkie's voice is hungry).</li>
-<li><strong>Clock: The Selkie's Price [8]</strong> — Ticks each time the Blood Tongue is used. When full, the selkie returns to claim its payment—a memory of the user's own, chosen by the GM.</li>
-</ul>
-<h6 id="adventure-hook-4">Adventure Hook:</h6>
-<p>A skald has been found dead—her tongue cut out, a selkie skin wrapped around her throat. The party must discover who killed her and why—and whether the killer now carries the Blood Tongue.</p>
-<h2 id="ii-the-hollow">II. The Hollow</h2>
-<h3 id="the-mother-s-needle">The Mother's Needle</h3>
-<h4 id="told-by-5">Told by</h4>
+<h2 id="ii-the-hollow">II. The Hollow</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The next accounts were told with an eye on the door. Their witnesses disagree about what entered, but not about the room it left behind.</p>
+<h3 data-fe-story="true" id="the-mother-s-needle">The Mother's Needle</h3>
+<span id="told-by-5"></span>
 <p>A lighthouse keeper's daughter on the Sidhi coast, who had seen her mother sew a dead man's mouth shut and then pretend it never happened.</p>
-<h4 id="the-tale-5">The Tale</h4>
+<span id="the-tale-5"></span>
 <p>The Sidhi say that a needle can sew more than cloth. It can sew a mouth closed. It can sew a shadow to a wall. It can sew a door shut from the inside.</p>
 <p>A seamstress — call her Yara — found a needle in her dead mother's sewing box. The needle was black, warm to the touch, and it had no eye. She could not thread it. But when she held it, she could feel it pull toward her mother's grave.</p>
 <p>She walked to the cemetery. The needle pulled her to a grave that was not her mother's. The name on the stone was worn away.</p>
@@ -346,21 +289,12 @@ footer {
 <p>“But she is dead,” Yara wrote.</p>
 <p>“Then find her ghost. And sew her mouth shut again. The first time, you sewed your mother. The second time, you must sew the teacher. The third time, you must sew the one who taught the teacher. Nine generations. Nine mouths. Nine needles.”</p>
 <p>Yara walked into the silence. She did not come back. But sometimes, on quiet nights, you can hear the sound of a needle piercing cloth — and a woman whispering, “Sew. Sew. Sew.”</p>
-<h4 id="the-witch-s-closing-5">The Witch's Closing</h4>
+<span id="the-witch-s-closing-5"></span>
 <p>“A needle with no eye is a door with no handle. Do not pick it up. Do not ask what it sews. The thread of unfinished business is unbreakable, and it is always long enough.”</p>
-<h4 id="what-lurks-in-the-shadow-of-the-tale-5">What Lurks in the Shadow of the Tale</h4>
-<p><strong>The Blind Needle</strong> — A black needle with no eye. It can sew any material, including flesh, shadow, and memory. Those who use it lose their voice until they sew nine mouths closed. The ninth mouth is always their own.</p>
-<p><strong>Tags / Mechanics:</strong></p>
-<ul>
-<li>A character who picks up the Blind Needle gains the Condition <em>Silenced</em> (cannot speak) until they sew nine mouths closed. Each mouth belongs to a dead person whose ghost is trapped in the place of unfinished things.</li>
-<li>To sew a mouth, the character must find the ghost and succeed on a <em>Wits + Craft</em> test (DV 5). On success, the ghost is released and the character may speak one sentence. On failure, the needle sews the character's own mouth partially closed (–1 die to all verbal rolls for a week).</li>
-<li><strong>Clock: The Hollow's Thread [8] — eight is the number of the living, so filling it <em>is</em> arriving at the Ninth</strong> – ticks each time a mouth is sewn. When full, the character's own mouth is sewn permanently. They can never speak again. The needle vanishes and appears in the hand of a loved one.</li>
-</ul>
-<p><strong>Adventure Hook:</strong> A Sidhi seamstress has stopped speaking. Her family found her holding a black needle, her mouth sewn with thread that cannot be cut. The party must learn who she was trying to silence — and whether the ninth mouth is worth the price.</p>
-<h3 id="the-guest-who-never-left">The Guest Who Never Left</h3>
-<h4 id="told-by-6">Told by</h4>
+<h3 data-fe-story="true" id="the-guest-who-never-left">The Guest Who Never Left</h3>
+<span id="told-by-6"></span>
 <p>A blind monk in the Pereshi highlands who lived alone in a temple with seven locked doors. He had not opened the seventh door in forty years.</p>
-<h4 id="the-tale-6">The Tale</h4>
+<span id="the-tale-6"></span>
 <p>A traveler came to a village in the monsoon season. He was wet, tired, and polite. He asked for shelter. A widow offered him her spare room.</p>
 <p>“Stay one night,” she said. “No more.”</p>
 <p>The traveler agreed. He slept. He ate. He thanked her. In the morning, he left.</p>
@@ -374,21 +308,12 @@ footer {
 <p>She returned to the village. She burned her house to the ground. The traveler stood in the ashes.</p>
 <p>“I told you,” he said. “I never left.”</p>
 <p>She stopped running. She sat down in the ashes. The traveler sat across from her. They are still sitting there, the widow and the guest, waiting for someone to invite them inside.</p>
-<h4 id="the-witch-s-closing-6">The Witch's Closing</h4>
+<span id="the-witch-s-closing-6"></span>
 <p>“Some guests do not need a door. They enter through your eyes. Do not look away from a stranger. The force is patient, and its guests are always polite.”</p>
-<h4 id="what-lurks-in-the-shadow-of-the-tale-6">What Lurks in the Shadow of the Tale</h4>
-<p><strong>The Polite Guest</strong> — A spirit that attaches itself to anyone who offers shelter to a stranger for more than one night. It cannot be seen directly, only in peripheral vision. It never attacks. It only waits. Its presence drives the victim mad.</p>
-<p><strong>Tags / Mechanics:</strong></p>
-<ul>
-<li>A character who offers shelter to a stranger for a second night gains the Condition <em>Watched</em>. The Guest appears in their peripheral vision once per day. The character must make a <em>Spirit + Endurance</em> test (DV 4) or mark 1 Fatigue (the stress of being watched).</li>
-<li>The Guest cannot be killed, banished, or reasoned with. It can only be passed on. If the character offers shelter to another stranger and the stranger accepts, the Guest transfers to the new host. The original host is freed.</li>
-<li><strong>Clock: The Guest's Patience [8]</strong> – ticks each day the Guest remains with a host. When full, the Guest becomes visible. The host sees it clearly for the first time. The sight causes permanent madness (the character loses 1 point of Spirit, minimum 1).</li>
-</ul>
-<p><strong>Adventure Hook:</strong> A Pereshi widow has not slept in three months. She sees a figure in the corner of her vision every time she closes her eyes. The party must find a stranger willing to take the Guest — or discover another way to break the hospitality of unfinished business.</p>
-<h3 id="the-song-the-dead-sing-to-calves">The Song the Dead Sing to Calves</h3>
-<h4 id="told-by-7">Told by</h4>
+<h3 data-fe-story="true" id="the-song-the-dead-sing-to-calves">The Song the Dead Sing to Calves</h3>
+<span id="told-by-7"></span>
 <p>A Tulkani herder who lost a third of his herd to a winter sickness. He swore the calves had heard something before they died.</p>
-<h4 id="the-tale-7">The Tale</h4>
+<span id="the-tale-7"></span>
 <p>The Tulkani say that the dead sing to calves. Not to cows. Not to bulls. Only to the young, the innocent, the ones who have not yet learned to fear.</p>
 <p>A herder — call him Ivan — woke to find his calves standing in a circle. They were not sleeping. They were listening. Their ears were turned toward the ground.</p>
 <p>“What do you hear?” Ivan asked.</p>
@@ -402,21 +327,12 @@ footer {
 <p>Ivan burned the calves. The ice melted. The ground thawed. But that night, he heard singing from his own bed. His daughter was sitting up, her mouth open, a thin thread of ice extending from her lips.</p>
 <p>He put his hand over her mouth. The ice cut him. He wrapped her in a blanket and held her until dawn. The singing stopped.</p>
 <p>His daughter never spoke again. But she never froze either. She grew up with a scar on her tongue where the ice had been.</p>
-<h4 id="the-witch-s-closing-7">The Witch's Closing</h4>
+<span id="the-witch-s-closing-7"></span>
 <p>“The dead sing to the young because the young still remember how to listen. Cover your children's ears when the ground is cold. The lullaby is sweet, and the sleep it offers is eternal.”</p>
-<h4 id="what-lurks-in-the-shadow-of-the-tale-7">What Lurks in the Shadow of the Tale</h4>
-<p><strong>The Frozen Lullaby</strong> — A song sung by the dead that rises from the ground on winter nights. It affects the young (children and animals) first. Those who hear it freeze from the inside out. The ice can be melted with fire, but the listener may lose their voice or their hearing.</p>
-<p><strong>Tags / Mechanics:</strong></p>
-<ul>
-<li>When the temperature drops below freezing, the GM may declare that the Hollow is singing. All children (NPCs) and young animals within earshot must make a <em>Spirit + Endurance</em> test (DV 5) or begin freezing. The character has one hour to warm them (fire, blankets, body heat) or they die.</li>
-<li>Adult characters who hear the song must also test (DV 4) or gain the Condition <em>Frost-Tongue</em> (cannot speak for 1d4 days; the vocal cords are damaged). Permanent loss of voice is possible on a critical failure.</li>
-<li>The song can be blocked by covering the ears with wax or cloth, but the song vibrates through the ground. Characters standing on bare earth cannot block it completely.</li>
-</ul>
-<p><strong>Adventure Hook:</strong> A Tulkani caravan has stopped in a valley where the ground never thaws. The children have stopped speaking. The calves are dead. The herders say they hear singing every night. The party must find the source of the song — and silence it before the next freeze.</p>
-<h3 id="the-bell-that-rings-backwards">The Bell That Rings Backwards</h3>
-<h4 id="told-by-8">Told by</h4>
+<h3 data-fe-story="true" id="the-bell-that-rings-backwards">The Bell That Rings Backwards</h3>
+<span id="told-by-8"></span>
 <p>An Aelinnel bell-tender who had lost three fingers to a frozen clapper. He spoke in a whisper, and his hands were wrapped in gray wool.</p>
-<h4 id="the-tale-8">The Tale</h4>
+<span id="the-tale-8"></span>
 <p>Bells are for the living. They ring forward, through time, from the strike to the echo. But there are bells that ring backwards.</p>
 <p>A gnome — call him Pim — found a bell in the ruins of a phasing city. The bell was small, bronze, and warm. He rang it once. The sound was wrong. It went from silence to ring, then from ring to silence, but the silence came before the ring.</p>
 <p>“It is ringing backwards,” his wife said. “Throw it away.”</p>
@@ -426,22 +342,12 @@ footer {
 <p>He rang it a third time. He forgot why he was holding the bell. He dropped it. It hit the ground and rang on its own. The ring was forward this time. It was a normal bell sound.</p>
 <p>Pim remembered his wife. He remembered his workshop. He remembered his name. But he could not find the bell. It had rolled into a crack in the pavement.</p>
 <p>He searched for years. He never found it. But sometimes, late at night, he hears a bell ringing backwards. He knows it is the bell of unfinished business, calling him home.</p>
-<h4 id="the-witch-s-closing-8">The Witch's Closing</h4>
+<span id="the-witch-s-closing-8"></span>
 <p>“A bell that rings backwards is a door that opens into yesterday. Do not ring it. Do not listen. Its time is not our time, and its memory is longer than yours.”</p>
-<h4 id="what-lurks-in-the-shadow-of-the-tale-8">What Lurks in the Shadow of the Tale</h4>
-<p><strong>The Backward Bell</strong> — A bronze bell that rings in reverse. Each ring erases a memory (starting with recent events, then names, then places). After three rings, the ringer forgets everything. The bell then rings forward, restoring all memories — but the bell disappears. It will reappear in another location, waiting for a new victim.</p>
-<p><strong>Tags / Mechanics:</strong></p>
-<ul>
-<li>Ringing the bell once erases one recent memory (GM's choice, minor). The character may spend 1 Boon to resist.</li>
-<li>Ringing the bell twice erases a significant memory (a name, a face, a skill). The character loses 1 XP (the memory is gone; the XP must be re-earned).</li>
-<li>Ringing the bell three times erases the character's identity. They become a blank slate. The bell then rings forward, restoring all memories — but the character must then find the bell again to regain what was lost. The bell will have moved.</li>
-<li><strong>Clock: The Hollow's Echo [4]</strong> – ticks each time the bell is rung. When full, the bell rings itself. Everyone within earshot loses one memory.</li>
-</ul>
-<p><strong>Adventure Hook:</strong> A gnome inventor has gone missing. His workshop is empty except for a hook on the wall where a bell once hung. The party must find the bell before it rings again — and before they forget why they were looking.</p>
-<h3 id="the-guest-who-left-a-shadow">The Guest Who Left a Shadow</h3>
-<h4 id="told-by-9">Told by</h4>
+<h3 data-fe-story="true" id="the-guest-who-left-a-shadow">The Guest Who Left a Shadow</h3>
+<span id="told-by-9"></span>
 <p>A Sidhi dock-worker who had once found a shadow pinned to a wall with a nail. The shadow still moved when the wind blew.</p>
-<h4 id="the-tale-9">The Tale</h4>
+<span id="the-tale-9"></span>
 <p>A woman — call her Sasha — opened her door to a stranger. The stranger was thin, pale, and wore a coat made of gray wool. He asked for water. She gave it. He asked for bread. She gave it. He asked for a place to sit.</p>
 <p>Sit by the fire,“ she said.</p>
 <p>The stranger sat. He did not warm his hands. He did not speak. He stared at the fire until it went out.</p>
@@ -458,21 +364,12 @@ footer {
 <p>He walked through the door. He pulled the nail from the wall. The shadow wrapped around him like a cloak. He smiled.</p>
 <p>“Thank you for keeping it warm.”</p>
 <p>He left. Sasha's own shadow was gone. She lived the rest of her life without one. In the sun, she looked like a hole in the world.</p>
-<h4 id="the-witch-s-closing-9">The Witch's Closing</h4>
+<span id="the-witch-s-closing-9"></span>
 <p>“Do not nail a shadow to a wall. You will only make it angry. The force does not forget its possessions. And a shadow is always its, no matter how long you keep it.”</p>
-<h4 id="what-lurks-in-the-shadow-of-the-tale-9">What Lurks in the Shadow of the Tale</h4>
-<p><strong>The Nailed Shadow</strong> — A shadow left behind by a Hollow traveler. It can be pinned with an iron nail, but the nail only holds the shadow for one night. The next night, the traveler returns to reclaim it. The person who nailed the shadow loses their own shadow forever.</p>
-<p><strong>Tags / Mechanics:</strong></p>
-<ul>
-<li>A character who nails a Hollow shadow to a wall gains the Condition <em>Shadowless</em>. They cast no shadow. This gives –1 die on Stealth rolls (no shadow to hide behind) and +1 die on social rolls involving fear (others are unsettled).</li>
-<li>The Hollow traveler will return at midnight to reclaim the shadow. The character may choose to fight the traveler (impossible to kill, but can be banished with a successful <em>Spirit + Lore</em> test, DV 5). On failure, the traveler takes the character's own shadow as interest.</li>
-<li><strong>Clock: The Shadow's Memory [4]</strong> – ticks each day the character is shadowless. When full, the character forgets what shadows are. They cannot recognize reflections, silhouettes, or any two-dimensional representation of a living thing.</li>
-</ul>
-<p><strong>Adventure Hook:</strong> A Sidhi innkeeper has a shadow nailed to her wall. She does not know whose it is, but every night at midnight, something knocks on her door. The party must decide: remove the nail and let the shadow go, or find a way to destroy it before the traveler returns.</p>
-<h3 id="the-door-that-opens-both-ways">The Door That Opens Both Ways</h3>
-<h4 id="told-by-10">Told by</h4>
+<h3 data-fe-story="true" id="the-door-that-opens-both-ways">The Door That Opens Both Ways</h3>
+<span id="told-by-10"></span>
 <p>The fire itself. Or so we dreamed. The flames were low, and the shadows were long, and when we woke, the story was already in our mouths.</p>
-<h4 id="the-tale-10">The Tale</h4>
+<span id="the-tale-10"></span>
 <p>There is a door in the Direwood that opens both ways. It is not a door of wood or stone. It is a door of air, of silence, of the space between two breaths.</p>
 <p>A hunter — call him Leif — found the door while chasing a white stag. The stag ran through the door. Leif followed.</p>
 <p>On the other side was the place of unfinished things. The sky was gray. The ground was gray. There were no trees, no birds, no wind. Only a path of gray stones leading into the distance.</p>
@@ -486,19 +383,10 @@ footer {
 <p>He had been gone for a hundred years. The door had opened into the future.</p>
 <p>Leif lived as a stranger in his own home. He died alone, and the villagers buried him at the edge of the woods. They did not mark the grave.</p>
 <p>The white stag still runs through the Direwood. And the door still opens both ways. If you find it, do not follow. The force does not care which direction you go. It only cares that you go.</p>
-<h4 id="the-witch-s-closing-10">The Witch's Closing</h4>
+<span id="the-witch-s-closing-10"></span>
 <p>“A door that opens both ways is a door that has no inside and no outside. Step through, and you will never be sure which side is home. The force does not lie. It simply does not tell you which way the door is facing.”</p>
-<h4 id="what-lurks-in-the-shadow-of-the-tale-10">What Lurks in the Shadow of the Tale</h4>
-<p><strong>The Two-Way Door</strong> — A threshold in the Direwood that leads to the Hollow. Stepping through from the mortal side leads to the Hollow. Stepping back from the Hollow leads to a random time and place (GM's choice). The door does not guarantee return to the same moment.</p>
-<p><strong>Tags / Mechanics:</strong></p>
-<ul>
-<li>A character who steps through the Two-Way Door must make a <em>Wits + Lore</em> test (DV 5) to understand where they are. On failure, they are lost in the Hollow for 1d10 days (mark 1 Fatigue per day). They emerge at a random location and time.</li>
-<li>Stepping back through the door from the Hollow side always leads to a different place and time than the one the character left. The GM chooses: up to 100 years forward or backward, or up to 1000 miles away.</li>
-<li>The door cannot be destroyed. It can be sealed with a ritual that requires the blood of a white stag and a promise never to hunt in the Direwood again. Breaking the promise unseals the door.</li>
-</ul>
-<p><strong>Adventure Hook:</strong> A hunter has been missing for three days. His wife found his tracks leading into the Direwood. The party must follow the tracks — but the tracks are a hundred years old, and the hunter's grandson is the one who hired them.</p>
-<h2 id="iii-on-the-ninth-and-the-hollow">III. On the Ninth and the Hollow</h2>
-<h3 id="on-the-number-eight">On the Number Eight</h3>
+<h2 id="iii-on-the-ninth-and-the-hollow">III. On the Ninth and the Hollow</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">Dusana’s notebook changes here. The stories have ended; what follows is the language people use when they try to compare what frightened them.</p>
+<h3 data-fe-story="true" id="on-the-number-eight">On the Number Eight</h3>
 <blockquote class="epigraph">
 <p>Count to eight. Then stop. The ninth is not for you.</p>
 <cite>— Aelaerem proverb</cite>
@@ -522,7 +410,7 @@ footer {
 <p>Whether the number is magic depends on whom you ask and how near the ninth bell. Northern children learn the count before they learn why their elders sometimes stop speaking halfway through an answer.</p>
 <p>The eighth step leaves your boot where you expected it. Ask no more of a road than that.</p>
 <p>The Aelaerem understand this better than most. We pour eight cups at a feast. We pour the ninth into the earth—or we do not pour it at all. The Hollow is patient. It does not need the cup. It will wait until you forget.</p>
-<h3 id="on-the-ninth">On the Ninth</h3>
+<h3 data-fe-story="true" id="on-the-ninth">On the Ninth</h3>
 <blockquote class="epigraph">
 <p>The ninth is not a number. It is a gap.</p>
 <cite>— Matron Alfiya</cite>
@@ -551,7 +439,7 @@ footer {
 <li><strong>It attracts obligation.</strong> The Ninth is the magnet for the Hollow. A character who becomes entangled with the Ninth finds themselves <em>owed</em>. Debts appear where none existed. Promises become binding. Witnesses appear to remember.</li>
 <li><strong>It invites notice.</strong> Those who insist upon the ninth occurrence often report being watched. The sensible ones decline to say by whom.</li>
 </ul>
-<h3 id="on-the-hollow">On the Hollow</h3>
+<h3 data-fe-story="true" id="on-the-hollow">On the Hollow</h3>
 <blockquote class="epigraph">
 <p>The Hollow is the hunger awakened by obligation.</p>
 <cite>— Matron Alfiya</cite>
@@ -564,7 +452,7 @@ footer {
 <p>The hunger is not malicious. It is simply <em>present</em>. It does not demand. It <em>attracts</em>. A character who owes a debt will find themselves in situations where that debt can be paid—usually at the worst possible moment. The Hollow does not need to chase them. They will come to it eventually.</p>
 <h5 id="the-hollow-and-the-ninth">The Hollow and the Ninth</h5>
 <p>Alfiya drew the Ninth as an open door and the Hollow as the unpainted space beyond it. In a later copy the labels are reversed. The correction is in her hand.</p>
-<h3 id="on-warding-and-practice">On Warding and Practice</h3>
+<h3 data-fe-story="true" id="on-warding-and-practice">On Warding and Practice</h3>
 <blockquote class="epigraph">
 <p>The eighth ward holds. The ninth ward is not for you to know.</p>
 <cite>— Matron Alfiya</cite>
@@ -586,7 +474,7 @@ footer {
 <p>The most powerful ward against the Ninth is silence. Not the silence of the grave—the silence of the <em>witness</em>. The act of <em>not drawing attention</em>.</p>
 <p>The Aelaerem speak broken promises softly, if at all. This may deny them power. It may merely deny one's neighbors useful gossip. Alfiya recommended the custom and declined to distinguish the two.</p>
 <p>This is why the Aelaerem do not speak of the Ninth. We acknowledge it. We respect it. We do not give it a name it can answer to.</p>
-<h3 id="using-the-ninth-and-hollow-in-play">Using the Ninth and Hollow in Play</h3>
+<h3 data-fe-story="true" id="using-the-ninth-and-hollow-in-play">Using the Ninth and Hollow in Play</h3>
 <blockquote class="epigraph">
 <p>The GM's job is not to punish. It is to make the world remember.</p>
 <cite>— Matron Alfiya</cite>
@@ -635,8 +523,8 @@ footer {
 <p>This is why the Aelaerem do not write about the Ninth. We speak about it, and we stop. We pour eight cups, and we do not pour the ninth. We count eight breaths, and we do not count the ninth.</p>
 <p>The ninth is not for you.</p>
 <p>— Matron Alfiya, Keeper of the Eight Doors</p>
-<h2 id="iv-customs-of-the-northern-roads">IV. Customs of the Northern Roads</h2>
-<h3 id="customs-of-the-northern-roads">Customs of the Northern Roads</h3>
+<h2 id="iv-customs-of-the-northern-roads">IV. Customs of the Northern Roads</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">Before leaving, she copied the instructions offered to a traveller: small acts, performed without explanation, that a household notices only when a guest forgets them.</p>
+<h3 data-fe-story="true" id="customs-of-the-northern-roads">Customs of the Northern Roads</h3>
 <div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><tr><th><strong>Custom</strong></th><th><strong>Culture</strong></th><th><strong>Consequence of Breaking</strong></th></tr><tr><td>Place a silver coin on the eyes of the dead</td><td>Linn (all)</td><td>The dead may rise as a draugr</td></tr><tr><td>Carve your life story into your shield</td><td>Linn (warriors)</td><td>You may forget your name</td></tr><tr><td>Do not carve the ninth rune</td><td>Linn (runes)</td><td>You speak to the dead. They may answer</td></tr><tr><td>Offer a story before entering the Mistland</td><td>Mistland (all)</td><td>The fog takes one memory per hour</td></tr><tr><td>Never take a relic from a phasing city</td><td>Valewood (all)</td><td>The queen hunts you until the relic is returned</td></tr><tr><td>Return an old ship to the forest</td><td>Linn (shipwrights)</td><td>The ship's spirit haunts the breaker</td></tr><tr><td>Do not cut a skald's tongue</td><td>Linn (skalds)</td><td>The skald may learn to whisper</td></tr><tr><td>Swear oaths before the hearth annually</td><td>Linn (longhouses)</td><td>The hearth goes cold; the longhouse burns</td></tr><tr><td>Ask the Direwood before taking its wood</td><td>Direwood (all)</td><td>The wraith-lord sends his hunters</td></tr></table></div></div>
 <p><em>These are not laws. They are courtesies extended to the dead, the forest, and the fog. Violate them, and the north will not punish you—it will simply stop being polite. An impolite north is the most dangerous place in the world.</em></p>
 <hr/>
@@ -644,5 +532,101 @@ footer {
     The Frost and the Hollow<br/>
     © Nicholas A. Gasper — For use with the Fate's Edge RPG
 </div>
-</article></body>
+<details class="fe-collection-notes" id="collection-table-notes"><summary>After the stories — notes for the table</summary><section><h5 id="what-lurks-in-the-shadow-of-the-tale">The Ninth Rune</h5>
+<p><strong>The Ninth Rune</strong> — A standing stone in the Mistland that shows the name of a visitor's dead loved one. It cannot be used for divination, communication, or resurrection. It simply <em>witnesses</em>. The witness is enough to write a poem, but not to heal the wound.</p>
+<h6 id="tags-mechanics">Tags / Mechanics:</h6>
+<ul>
+<li>A character who touches the Ninth Rune sees the name of one person they have lost. They gain +1 die to all rolls related to mourning or memorializing that person for the next month.</li>
+<li>If the character attempts to carve the rune elsewhere, the rune fades—and the character forgets the dead person's name permanently.</li>
+<li><strong>Clock: The Rune's Jealousy [8]</strong> — Ticks each time a character uses the Ninth Rune for a practical purpose (e.g., to gain an advantage in negotiation by invoking the dead). When full, the rune vanishes from the stone. The character cannot return.</li>
+</ul>
+<h6 id="adventure-hook">Adventure Hook:</h6>
+<p>A skald has gone mad. He carved the ninth rune into his own chest. Now he cannot stop speaking the names of the dead—every name, every death, every grief. The party must find a way to silence him—or to help him un-carve the rune before he forgets his own name.</p>
+</section><section><h5 id="what-lurks-in-the-shadow-of-the-tale-2">The Mist-Walker's Gift</h5>
+<p><strong>The Fog's Breath</strong> — A curse that afflicts those who enter the Mistland without an offering. The fog takes one memory for every hour spent inside. To recover a memory, someone must tell a story that has never been told—a story good enough to make the fog listen.</p>
+<h6 id="tags-mechanics-2">Tags / Mechanics:</h6>
+<ul>
+<li>A character who enters the Mistland without an offering (a coin, a lock of hair, a written name) loses one memory per hour. The GM chooses the memory—a minor one at first (the name of a tavern, the face of a minor NPC), then progressively more significant.</li>
+<li>A character may recover one memory by telling a story. The story must be told to the fog itself (i.e., spoken aloud while in the Mistland). On a successful Spirit + Performance test (DV 5), the fog releases one memory.</li>
+<li><strong>Clock: The Fog's Hunger [8]</strong> — Ticks each hour a character spends in the Mistland without telling a story. When full, the character forgets their own name and becomes a Mist-Walker—a fog-spirit that cannot leave.</li>
+</ul>
+<h6 id="adventure-hook-2">Adventure Hook:</h6>
+<p>A Linn chieftain's son walked into the Mistland three days ago. The party must find him—but the fog is thick, and every hour costs a memory. They must tell stories to the fog to keep their own names—and to buy the son's freedom.</p>
+</section><section><h5 id="what-lurks-in-the-shadow-of-the-tale-3">The Valewood Hunt</h5>
+<p><strong>The Phasing City</strong> — A Valewood ruin that appears and disappears at irregular intervals. Inside, relics of immense power lie unguarded—but taking one binds the thief to the city's queen, a shade who will hunt them through time and space until the relic is returned.</p>
+<h6 id="tags-mechanics-3">Tags / Mechanics:</h6>
+<ul>
+<li>A character who enters a phasing city may attempt to take a relic. On a success (Wits + Lore, DV 5), they acquire an ancient item (GM determines powers).</li>
+<li>However, taking the relic curses the character. They gain the Condition <strong>Hunted by the Queen</strong>. Once per session, the GM may have the queen appear nearby—a flicker of motion, a cold touch, a whisper. The character must test Spirit + Endurance (DV 4) or mark 1 Fatigue.</li>
+<li>The curse can only be lifted by returning the relic to the city—which may have phased elsewhere.</li>
+<li><strong>Clock: The Queen's Patience [8]</strong> — Ticks each time the relic is used. When full, the queen appears in person. She will take the relic by force—and the character's name as interest.</li>
+</ul>
+<h6 id="adventure-hook-3">Adventure Hook:</h6>
+<p>A Linn warrior took a bronze crown from a phasing city. Now the queen walks behind him—everywhere, always. He cannot sleep. The party must find the city again and return the crown before the queen takes more than a name.</p>
+</section><section><h5 id="what-lurks-in-the-shadow-of-the-tale-4">The Skald Who Lost Her Tongue</h5>
+<p><strong>The Blood Tongue</strong> — A selkie-woven replacement tongue that grants the bearer the power to speak a person's true name. When spoken, the target forgets their own story—their memories, their oaths, their loves. They become a blank slate.</p>
+<h6 id="tags-mechanics-4">Tags / Mechanics:</h6>
+<ul>
+<li>The Blood Tongue can be used once per session to speak a character's true name. The target must make a Spirit + Endurance test (DV 5). On a failure, the target loses one significant memory (GM's choice). On a critical failure, the target forgets their own name and cannot form new long-term memories for a week.</li>
+<li>Using the Blood Tongue costs 1 Corruption (the selkie's voice is hungry).</li>
+<li><strong>Clock: The Selkie's Price [8]</strong> — Ticks each time the Blood Tongue is used. When full, the selkie returns to claim its payment—a memory of the user's own, chosen by the GM.</li>
+</ul>
+<h6 id="adventure-hook-4">Adventure Hook:</h6>
+<p>A skald has been found dead—her tongue cut out, a selkie skin wrapped around her throat. The party must discover who killed her and why—and whether the killer now carries the Blood Tongue.</p>
+</section><section><h4 id="what-lurks-in-the-shadow-of-the-tale-5">The Mother's Needle</h4>
+<p><strong>The Blind Needle</strong> — A black needle with no eye. It can sew any material, including flesh, shadow, and memory. Those who use it lose their voice until they sew nine mouths closed. The ninth mouth is always their own.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who picks up the Blind Needle gains the Condition <em>Silenced</em> (cannot speak) until they sew nine mouths closed. Each mouth belongs to a dead person whose ghost is trapped in the place of unfinished things.</li>
+<li>To sew a mouth, the character must find the ghost and succeed on a <em>Wits + Craft</em> test (DV 5). On success, the ghost is released and the character may speak one sentence. On failure, the needle sews the character's own mouth partially closed (–1 die to all verbal rolls for a week).</li>
+<li><strong>Clock: The Hollow's Thread [8] — eight is the number of the living, so filling it <em>is</em> arriving at the Ninth</strong> – ticks each time a mouth is sewn. When full, the character's own mouth is sewn permanently. They can never speak again. The needle vanishes and appears in the hand of a loved one.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Sidhi seamstress has stopped speaking. Her family found her holding a black needle, her mouth sewn with thread that cannot be cut. The party must learn who she was trying to silence — and whether the ninth mouth is worth the price.</p>
+</section><section><h4 id="what-lurks-in-the-shadow-of-the-tale-6">The Guest Who Never Left</h4>
+<p><strong>The Polite Guest</strong> — A spirit that attaches itself to anyone who offers shelter to a stranger for more than one night. It cannot be seen directly, only in peripheral vision. It never attacks. It only waits. Its presence drives the victim mad.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who offers shelter to a stranger for a second night gains the Condition <em>Watched</em>. The Guest appears in their peripheral vision once per day. The character must make a <em>Spirit + Endurance</em> test (DV 4) or mark 1 Fatigue (the stress of being watched).</li>
+<li>The Guest cannot be killed, banished, or reasoned with. It can only be passed on. If the character offers shelter to another stranger and the stranger accepts, the Guest transfers to the new host. The original host is freed.</li>
+<li><strong>Clock: The Guest's Patience [8]</strong> – ticks each day the Guest remains with a host. When full, the Guest becomes visible. The host sees it clearly for the first time. The sight causes permanent madness (the character loses 1 point of Spirit, minimum 1).</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Pereshi widow has not slept in three months. She sees a figure in the corner of her vision every time she closes her eyes. The party must find a stranger willing to take the Guest — or discover another way to break the hospitality of unfinished business.</p>
+</section><section><h4 id="what-lurks-in-the-shadow-of-the-tale-7">The Song the Dead Sing to Calves</h4>
+<p><strong>The Frozen Lullaby</strong> — A song sung by the dead that rises from the ground on winter nights. It affects the young (children and animals) first. Those who hear it freeze from the inside out. The ice can be melted with fire, but the listener may lose their voice or their hearing.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>When the temperature drops below freezing, the GM may declare that the Hollow is singing. All children (NPCs) and young animals within earshot must make a <em>Spirit + Endurance</em> test (DV 5) or begin freezing. The character has one hour to warm them (fire, blankets, body heat) or they die.</li>
+<li>Adult characters who hear the song must also test (DV 4) or gain the Condition <em>Frost-Tongue</em> (cannot speak for 1d4 days; the vocal cords are damaged). Permanent loss of voice is possible on a critical failure.</li>
+<li>The song can be blocked by covering the ears with wax or cloth, but the song vibrates through the ground. Characters standing on bare earth cannot block it completely.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Tulkani caravan has stopped in a valley where the ground never thaws. The children have stopped speaking. The calves are dead. The herders say they hear singing every night. The party must find the source of the song — and silence it before the next freeze.</p>
+</section><section><h4 id="what-lurks-in-the-shadow-of-the-tale-8">The Bell That Rings Backwards</h4>
+<p><strong>The Backward Bell</strong> — A bronze bell that rings in reverse. Each ring erases a memory (starting with recent events, then names, then places). After three rings, the ringer forgets everything. The bell then rings forward, restoring all memories — but the bell disappears. It will reappear in another location, waiting for a new victim.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>Ringing the bell once erases one recent memory (GM's choice, minor). The character may spend 1 Boon to resist.</li>
+<li>Ringing the bell twice erases a significant memory (a name, a face, a skill). The character loses 1 XP (the memory is gone; the XP must be re-earned).</li>
+<li>Ringing the bell three times erases the character's identity. They become a blank slate. The bell then rings forward, restoring all memories — but the character must then find the bell again to regain what was lost. The bell will have moved.</li>
+<li><strong>Clock: The Hollow's Echo [4]</strong> – ticks each time the bell is rung. When full, the bell rings itself. Everyone within earshot loses one memory.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A gnome inventor has gone missing. His workshop is empty except for a hook on the wall where a bell once hung. The party must find the bell before it rings again — and before they forget why they were looking.</p>
+</section><section><h4 id="what-lurks-in-the-shadow-of-the-tale-9">The Guest Who Left a Shadow</h4>
+<p><strong>The Nailed Shadow</strong> — A shadow left behind by a Hollow traveler. It can be pinned with an iron nail, but the nail only holds the shadow for one night. The next night, the traveler returns to reclaim it. The person who nailed the shadow loses their own shadow forever.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who nails a Hollow shadow to a wall gains the Condition <em>Shadowless</em>. They cast no shadow. This gives –1 die on Stealth rolls (no shadow to hide behind) and +1 die on social rolls involving fear (others are unsettled).</li>
+<li>The Hollow traveler will return at midnight to reclaim the shadow. The character may choose to fight the traveler (impossible to kill, but can be banished with a successful <em>Spirit + Lore</em> test, DV 5). On failure, the traveler takes the character's own shadow as interest.</li>
+<li><strong>Clock: The Shadow's Memory [4]</strong> – ticks each day the character is shadowless. When full, the character forgets what shadows are. They cannot recognize reflections, silhouettes, or any two-dimensional representation of a living thing.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A Sidhi innkeeper has a shadow nailed to her wall. She does not know whose it is, but every night at midnight, something knocks on her door. The party must decide: remove the nail and let the shadow go, or find a way to destroy it before the traveler returns.</p>
+</section><section><h4 id="what-lurks-in-the-shadow-of-the-tale-10">The Door That Opens Both Ways</h4>
+<p><strong>The Two-Way Door</strong> — A threshold in the Direwood that leads to the Hollow. Stepping through from the mortal side leads to the Hollow. Stepping back from the Hollow leads to a random time and place (GM's choice). The door does not guarantee return to the same moment.</p>
+<p><strong>Tags / Mechanics:</strong></p>
+<ul>
+<li>A character who steps through the Two-Way Door must make a <em>Wits + Lore</em> test (DV 5) to understand where they are. On failure, they are lost in the Hollow for 1d10 days (mark 1 Fatigue per day). They emerge at a random location and time.</li>
+<li>Stepping back through the door from the Hollow side always leads to a different place and time than the one the character left. The GM chooses: up to 100 years forward or backward, or up to 1000 miles away.</li>
+<li>The door cannot be destroyed. It can be sealed with a ritual that requires the blood of a white stag and a promise never to hunt in the Direwood again. Breaking the promise unseals the door.</li>
+</ul>
+<p><strong>Adventure Hook:</strong> A hunter has been missing for three days. His wife found his tracks leading into the Direwood. The party must follow the tracks — but the tracks are a hundred years old, and the hunter's grandson is the one who hired them.</p>
+</section></details></article></body>
 </html>
