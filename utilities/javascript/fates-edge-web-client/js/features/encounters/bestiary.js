@@ -648,7 +648,7 @@ function renderBestiaryList() {
 // CATEGORY BADGE COLORS
 // ============================================================
 
-function getCategoryBadgeColor(category) {
+export function getCategoryBadgeColor(category) {
     if (!category) return 'gold';
     const map = {
         'beast': 'green',

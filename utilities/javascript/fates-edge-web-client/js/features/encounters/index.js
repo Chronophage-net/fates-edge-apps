@@ -17,7 +17,8 @@ import {
     loadBestiaryData, 
     loadWikiData, 
     addCreatureAsAdversary,
-    getCreatureDescription
+    getCreatureDescription,
+    getCategoryBadgeColor
 } from './bestiary.js';
 import { openTracker } from './combat.js';
 import { getObjectiveType, DEFAULT_OBJECTIVE_TYPE } from '@core/objective-types.js';

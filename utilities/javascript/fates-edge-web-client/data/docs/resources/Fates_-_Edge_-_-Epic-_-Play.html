@@ -1,187 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Fate's Edge — Epic Play Expansion</title>
-<style>
-    /* –– Reset & base –– */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0d0f14;
-      color: #d6dce5;
-      font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      padding: 2rem 1.5rem;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    a { color: #eac784; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* –– Layout –– */
-    header, footer {
-      border-bottom: 1px solid #2a2f3a;
-      padding: 1rem 0 0.5rem;
-      margin-bottom: 2rem;
-    }
-    footer {
-      border-top: 1px solid #2a2f3a;
-      border-bottom: none;
-      margin-top: 3rem;
-      padding-top: 1.5rem;
-      font-size: 0.9rem;
-      color: #6a7180;
-    }
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: #f0e6d0;
-      margin-bottom: 0.25rem;
-    }
-    h1 small {
-      font-size: 1rem;
-      font-weight: 400;
-      color: #a8b0c0;
-      display: block;
-      margin-top: 0.2rem;
-      letter-spacing: 0;
-    }
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 500;
-      color: #eac784;
-      margin: 2rem 0 0.75rem;
-      padding-bottom: 0.25rem;
-      border-bottom: 1px solid #2a2f3a;
-    }
-    h3 {
-      font-size: 1.2rem;
-      font-weight: 500;
-      color: #d0d8e0;
-      margin: 1.5rem 0 0.5rem;
-    }
-    p, li {
-      margin-bottom: 0.6rem;
-      color: #c8ced8;
-    }
-    ul, ol {
-      margin-left: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    li { margin-bottom: 0.3rem; }
-
-    /* –– Highlight boxes –– */
-    .callout {
-      background: #181e26;
-      border-left: 4px solid #eac784;
-      padding: 1rem 1.25rem;
-      margin: 1.5rem 0;
-      border-radius: 0 6px 6px 0;
-    }
-    .callout strong {
-      color: #f0e6d0;
-    }
-    .callout.warning {
-      border-left-color: #d47a6a;
-    }
-    .callout.success {
-      border-left-color: #7ab88a;
-    }
-
-    /* –– Tables –– */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
-      font-size: 0.95rem;
-    }
-    th, td {
-      padding: 0.6rem 0.8rem;
-      border: 1px solid #2a2f3a;
-      text-align: left;
-      vertical-align: top;
-    }
-    th {
-      background: #1a2028;
-      color: #eac784;
-      font-weight: 500;
-    }
-    td {
-      background: #11171f;
-    }
-
-    /* –– Worksheets –– */
-    .worksheet {
-      background: #141a22;
-      border: 1px solid #2a2f3a;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-    }
-    .worksheet h4 {
-      color: #eac784;
-      margin-top: 0;
-      margin-bottom: 0.75rem;
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .worksheet .field {
-      margin: 0.4rem 0;
-      padding: 0.3rem 0;
-      border-bottom: 1px dashed #2a2f3a;
-      display: flex;
-      gap: 0.5rem;
-      align-items: baseline;
-    }
-    .worksheet .field .label {
-      font-weight: 500;
-      color: #b8c0cc;
-      min-width: 140px;
-    }
-    .worksheet .field .value {
-      color: #d6dce5;
-      font-style: italic;
-    }
-
-    /* –– Responsive –– */
-    @media (max-width: 700px) {
-      body { padding: 1rem; }
-      h1 { font-size: 1.8rem; }
-      .worksheet .field { flex-wrap: wrap; }
-      .worksheet .field .label { min-width: 100px; }
-    }
-
-    /* –– Misc –– */
-    hr {
-      border: none;
-      border-top: 1px solid #2a2f3a;
-      margin: 2rem 0;
-    }
-    .toc {
-      background: #11171f;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-    }
-    .toc ul {
-      list-style: none;
-      margin: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem 1.5rem;
-    }
-    .toc li a {
-      color: #b8c0cc;
-      font-size: 0.95rem;
-    }
-    .toc li a:hover {
-      color: #eac784;
-    }
-  </style>
-<style data-fe-reader-added="styles">
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Epic Play — Campaigns, Pressure, and Legacy</title><style data-fe-reader-added="styles">
 .fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
 .fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
 .fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
@@ -201,190 +20,74 @@
 .fe-reading-document pre { max-width: 100%; overflow-x: auto; }
 @media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
 @media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
-</style></head>
-<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Resources · table aid</strong></p><p>Use this document for the task named in its title. A reference table or worked example is easier to use after you have read the corresponding procedure; return to the SRD or guides when timing or context is unclear.</p><nav aria-label="Library reading links"><a href="Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Epic Play Expansion For Fate's Edge — Tier IV+ Campaigns</a></li><li><a href="#reader-section-2">Introduction</a></li><li><a href="#reader-section-3">Systemic Problems</a></li><li><a href="#reader-section-4">Resource Shift: Boons → Infrastructure</a></li><li><a href="#reader-section-5">Obligation at High Tier</a></li><li><a href="#reader-section-6">Escalation Without Inflation</a></li><li><a href="#reader-section-7">Player Evolution</a></li><li><a href="#reader-section-8">GM Advice for Epic Sessions</a></li><li><a href="#reader-section-9">Worksheets</a></li><li><a href="#reader-section-10">Final Word</a></li></ul></details>
-<header>
-<h1 id="reader-section-1">Epic Play Expansion <small>For Fate's Edge — Tier IV+ Campaigns</small></h1>
-<p style="color:#a8b0c0; margin-top:0.25rem;">
-    A toolkit for GMs running high‑level, system‑shaking stories.
-  </p>
-</header>
-<!-- Table of Contents -->
-<div class="toc">
-<ul>
-<li><a href="#intro">Introduction</a></li>
-<li><a href="#systemic">Systemic Problems</a></li>
-<li><a href="#resource">Resource Shift</a></li>
-<li><a href="#obligation">Obligation at High Tier</a></li>
-<li><a href="#escalation">Escalation Without Inflation</a></li>
-<li><a href="#player-evolution">Player Evolution</a></li>
-<li><a href="#gm-advice">GM Advice</a></li>
-<li><a href="#worksheets">Worksheets</a></li>
-</ul>
-</div>
-<hr id="intro"/>
-<h2 id="reader-section-2">Introduction</h2>
-<p>
-  At Tier IV and beyond, the game changes. Not because the rules are different—they aren't—but because <strong>what the game asks of you</strong> shifts fundamentally.
-</p>
-<p>
-  The core loop remains: Declare → Set Position/DV → Roll → Outcome. But the <em>problems</em> are no longer locked doors or guard patrols. They are debts, votes, charters, and successions. The <em>resources</em> are no longer Boons alone—they are Assets, Followers, and Obligation. And the <em>consequences</em> of every roll ripple across the campaign, not just the scene.
-</p>
-<div class="callout">
-<strong>The key insight:</strong> A Clean Success at Epic Tier can be the <em>most dangerous</em> outcome, because it gives the players no Boons and the GM no Story Beats—they arrive at the climax with empty hands.
-</div>
-<hr id="systemic"/>
-<h2 id="reader-section-3">Systemic Problems</h2>
-<p>
-  A systemic problem is one that cannot be solved with a single roll—it must be <em>architected</em>. The GM designs a web of stakeholders, timers, and consequences, and the players navigate it.
-</p>
-<h3>The Anatomy of a Systemic Problem</h3>
-<ul>
-<li><strong>What is the problem?</strong> A debt, a vote, a charter, a succession, a border dispute, a faction shift.</li>
-<li><strong>Who are the stakeholders?</strong> Factions, Followers, Patrons, named NPCs.</li>
-<li><strong>What are the possible outcomes?</strong> Map each rung of the Outcome Matrix to a <em>campaign‑level</em> change.</li>
-<li><strong>What timers are ticking?</strong> What ticks them? What happens when they fill?</li>
-<li><strong>What resources are at play?</strong> Assets, Followers, Obligation, Boons.</li>
-</ul>
-<div class="callout success">
-<strong>Example — The Cut Vote (from the Epic session):</strong><br/>
-<strong>Problem:</strong> The party's charter is under review by the guild.<br/>
-<strong>Stakeholders:</strong> The Cut Garrison (Follower), The Rust Thread (Follower), The Iron Gate (Asset), The Dyed Web (terrestrial patron).<br/>
-<strong>Outcomes:</strong> Clean → charter unconditional; SB → condition attached; Partial → a timer opens; Miss → charter reverts.<br/>
-<strong>Timer:</strong> The vote itself is the timer—every scene advances it.
-</div>
-<hr id="resource"/>
-<h2 id="reader-section-4">Resource Shift: Boons → Infrastructure</h2>
-<p>
-  At Epic Tier, success is cheap. Players have 6–10 dice in their core pools. They <em>will</em> succeed on DV 3 obstacles. The challenge is making that success <em>meaningful</em>.
-</p>
-<ul>
-<li><strong>Assume competence.</strong> Don't roll for things the character is guaranteed to do. Lyra doesn't roll to open a lockbox—she rolls to put it back without anyone knowing it was read.</li>
-<li><strong>Delegate the mundane.</strong> Followers roll off‑screen for wage rolls, research, and grunt work.</li>
-<li><strong>Use Fatigue as currency.</strong> When Boons are scarce, pay Fatigue for extra effort (like Khor's Web‑Sense).</li>
-<li><strong>Build cushions.</strong> Assets, Followers, and Bonds replace Boons as the primary resource pool.</li>
-<li><strong>"I know a guy who knows a guy."</strong> The real power at high tier is the network, not the dice.</li>
-</ul>
-<div class="callout">
-<strong>Boons do not come from winning. They come from struggling.</strong><br/>
-  A party that rolls cleanly all evening arrives at the hard scene with an empty pocket. That's the design.
-</div>
-<hr id="obligation"/>
-<h2 id="reader-section-5">Obligation at High Tier</h2>
-<p>
-  Obligation is built into the architecture of Fate's Edge—but at Epic Tier, its implications deserve special attention.
-</p>
-<ul>
-<li><strong>The larder is empty.</strong> The party that has cleared all its Obligation has no resources left. Taking on new debt is a <em>statement</em>: "I am willing to be vulnerable to win this."</li>
-<li><strong>Terrestrial vs. supernatural.</strong> Fighters take on mortal debts (guilds, lords, syndicates); casters carry cosmic debts (Patrons, Rites). Both use the same mechanics; the <em>flavour</em> is what differentiates them.</li>
-<li><strong>The clean party runs out of fuel.</strong> At Tier IV, a party that refuses to owe anything will find itself without Boons, without Favours, and without leverage by the climax.</li>
-<li><strong>Obligation is plot, not punishment.</strong> When a Patron calls in a debt, it's not a penalty—it's a story hook.</li>
-</ul>
-<div class="callout warning">
-<strong>Warning:</strong> Don't let players hoard Obligation capacity. The game is designed to <em>demand</em> they spend it. If they're never called upon, they never engage with the Hollow Economy.
-</div>
-<hr id="escalation"/>
-<h2 id="reader-section-6">Escalation Without Inflation</h2>
-<p>
-  The GM's trap at Epic Tier is raising Difficulty Values on the same old obstacles. That's <strong>inflation</strong>, and it punishes players for investing in their sheets.
-</p>
-<p>
-  Instead, <strong>escalate</strong>—change <em>what the game is about</em>.
-</p>
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<tr>
-<th>Tier</th>
-<th>What is the obstacle?</th>
-<th>What is the roll about?</th>
-</tr>
-<tr>
-<td><strong>I</strong></td>
-<td>A locked door</td>
-<td>Can you open it?</td>
-</tr>
-<tr>
-<td><strong>II</strong></td>
-<td>A locked door</td>
-<td>Who has the key, and what do they want?</td>
-</tr>
-<tr>
-<td><strong>III</strong></td>
-<td>A locked door</td>
-<td>What noble owns the door, and why are they locking it?</td>
-</tr>
-<tr>
-<td><strong>IV</strong></td>
-<td>A locked door</td>
-<td>What guild vote decides who gets to open doors in the city?</td>
-</tr>
-</table></div>
-<p>
-  The DV for a Tier I lock might be 3. The DV for a Tier IV guild vote might <em>also</em> be 3. The difference is the <strong>consequences</strong> of success and failure.
-</p>
-<hr id="player-evolution"/>
-<h2 id="reader-section-7">Player Evolution</h2>
-<p>
-  Players don't just get better at the rules—they get better at <em>what the game asks of them</em>.
-</p>
-<ul>
-<li><strong>From asking for DV to asking for consequence ladders.</strong> Priya's Tier I habit of "what's the DV?" evolved into "what does a Partial <em>cost</em> me?"</li>
-<li><strong>From improvisation to improvisation with infrastructure.</strong> Devon still plays fast and loose—but now he has a network of Followers and a Cache Asset.</li>
-<li><strong>From quiet to carrying the table's patronage.</strong> Naomi went from needing a GM invitation to holding the party's terrestrial debt and playing it with confidence.</li>
-<li><strong>From optimisation to serving the thing that collects.</strong> Ollie min‑maxed his Obligation capacity—and now he's bound to a cosmic Patron that will eventually call it in.</li>
-</ul>
-<div class="callout">
-<strong>The GM's job at Epic Tier is not to teach the rules.</strong> It's to give the players the floor and get out of the way.
-</div>
-<hr id="gm-advice"/>
-<h2 id="reader-section-8">GM Advice for Epic Sessions</h2>
-<ul>
-<li><strong>State the full Outcome Matrix upfront.</strong> Players need to see all four rungs (Clean, SB, Partial, Miss) before they commit. It makes the choice meaningful.</li>
-<li><strong>Let Followers handle the boring rolls.</strong> If it's a wage roll or a research check, it happens off‑screen. The spotlight belongs on the <em>interesting</em> scenes.</li>
-<li><strong>Use Fatigue as a currency.</strong> When Boons are scarce, let players pay Fatigue for extra effort or narrative control.</li>
-<li><strong>Don't hoard Story Beats.</strong> Spend them early to build tension. The climax is made of the SB you spent along the way.</li>
-<li><strong>Change what the game is about.</strong> At Tier IV, the lock is not the problem—the person who owns the lock is the problem.</li>
-<li><strong>Assume competence.</strong> Don't ask for a roll unless failure is interesting. Let the players succeed and let that success <em>mean something</em>.</li>
-</ul>
-<hr id="worksheets"/>
-<h2 id="reader-section-9">Worksheets</h2>
-<div class="worksheet">
-<h4>Worksheet 1 — Designing a Systemic Problem</h4>
-<div class="field"><span class="label">What is the problem?</span><span class="value">A debt / vote / charter / succession / border / faction shift</span></div>
-<div class="field"><span class="label">Who are the stakeholders?</span><span class="value">List factions, Followers, Patrons, named NPCs</span></div>
-<div class="field"><span class="label">What are the outcomes?</span><span class="value">Clean → ?  |  SB → ?  |  Partial → ?  |  Miss → ?</span></div>
-<div class="field"><span class="label">What timers are ticking?</span><span class="value">What ticks them? What happens when they fill?</span></div>
-<div class="field"><span class="label">What resources are at play?</span><span class="value">Assets / Followers / Obligation / Boons</span></div>
-</div>
-<div class="worksheet">
-<h4>Worksheet 2 — Asset‑Follower Economy</h4>
-<div class="field"><span class="label">Major Assets</span><span class="value">List with state (Flourishing / Stable / Strained / Collapsed)</span></div>
-<div class="field"><span class="label">Standard Assets</span><span class="value">List with state</span></div>
-<div class="field"><span class="label">Minor Assets</span><span class="value">List with state</span></div>
-<div class="field"><span class="label">Followers</span><span class="value">Name &amp; Cap rating; what do they roll off‑screen?</span></div>
-<div class="field"><span class="label">Terrestrial Patrons</span><span class="value">Obligation capacity; what do they demand?</span></div>
-<div class="field"><span class="label">Cosmic Patrons</span><span class="value">Obligation capacity; what do they demand?</span></div>
-<div class="field"><span class="label">Outstanding Obligation</span><span class="value">What's owed, to whom, how to clear it</span></div>
-</div>
-<div class="worksheet">
-<h4>Worksheet 3 — Escalation Ladder</h4>
-<div class="field"><span class="label">Tier I obstacle</span><span class="value">A locked door → Cut to lockpicking</span></div>
-<div class="field"><span class="label">Tier II obstacle</span><span class="value">A locked door → Cut to the guard with the key</span></div>
-<div class="field"><span class="label">Tier III obstacle</span><span class="value">A locked door → Cut to the noble who owns the door</span></div>
-<div class="field"><span class="label">Tier IV obstacle</span><span class="value">A locked door → Cut to the guild vote that decides who opens doors</span></div>
-</div>
-<hr/>
-<h2 id="reader-section-10">Final Word</h2>
-<p>
-  The Epic Play Expansion is not about new rules—it's about a new <em>relationship</em> to the rules. At Tier I, the GM teaches the players how to roll dice and spend Boons. At Tier IV, the GM teaches the players how to build infrastructure, take on debt, and win by <strong>architecture</strong>, not luck.
-</p>
-<p>
-  The annotated Epic session is the proof of concept. This expansion is the toolkit to let you run that session yourself.
-</p>
-<footer>
-<p>Fate's Edge — Epic Play Expansion • For GMs running Tier IV+ campaigns</p>
-<p style="margin-top:0.2rem; font-size:0.85rem; color:#5a6270;">
-    Based on the Annotated Epic Session and the GM Guide philosophy.
-  </p>
-</footer>
-</article></body>
-</html>
+</style></head><body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Resources · table aid</strong></p><p>Use this document for the task named in its title. A reference table or worked example is easier to use after you have read the corresponding procedure; return to the SRD or guides when timing or context is unclear.</p><nav aria-label="Library reading links"><a href="Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Epic Play</a></li><li><a href="#introduction">What changes—and what stays</a></li><li><a href="#systemic-problems">Build systemic pressure from causes</a></li><li><a href="#campaign-review">The campaign turn (optional)</a></li><li><a href="#escalation">Escalation without inflation</a></li><li><a href="#resources">Run the infrastructure honestly</a></li><li><a href="#players">Advice for epic players</a></li><li><a href="#gm-advice">Advice for epic GMs</a></li><li><a href="#legacy-in-epic-play">Legacy is an institution, not just a replacement sheet</a></li><li><a href="#reader-section-10-section">Legacy at the table: the operating procedure</a></li><li><a href="#example">Worked campaign: the river that feeds the capital</a></li><li><a href="#worksheets">Preparation and review sheets</a></li></ul></details>
+<h1 id="reader-section-1">Epic Play</h1><p class="subtitle">Running campaigns and building a legacy at Tier IV and beyond</p>
+<p>Epic characters can win a battle and still have to decide who governs afterward. Their reach brings institutions, promises, communities, and future generations into the consequences of play. Give that reach real effects: an experienced party should solve familiar problems more easily, gain access their younger selves lacked, and change the conditions of the campaign.</p>
+<h2 id="introduction"><span id="reader-section-2"></span><span id="intro"></span>What changes—and what stays</h2>
+<p><strong>Rules compatibility.</strong> Use the SRD and extensions in the Player’s and GM Guides as the core. Tier IV and Tier V expand scope, not the numerical ceilings. DV still ends at 5; use the existing rules for attributes, skills, assistance, Harm, armor, Fatigue, Boons, and Story Beats. Continuing a Mythic campaign introduces no automatic sixth tier or unlimited ratings.</p>
+<p>This module adds an <strong>optional campaign review procedure</strong> and supplies the same clarified Legacy procedures published in the Player’s Guide. The Legacy project and crisis tick defaults apply only when that optional framework is chosen. Specific crafting, faction, asset, or adventure procedures take precedence for their own tracks; do not stack two progress engines on one project.</p>
+<p>Read the <a href="../gm-guide/index.html">GM Guide</a> for adjudication, the <a href="../players-guide/Players-_-Guide-_-17-_-The-_-Legacy-_-Engine.html">Legacy Engine</a> for character succession, and the <a href="../srd/index.html">SRD</a> for the core loop. The <a href="Fates_-_Edge_-_-Annotated_-_Play_-_Session_-_-Epic_-_Tier.html">annotated Epic session</a> is an example to discuss, not an additional source of automatic permissions.</p>
+<h2 id="systemic-problems"><span id="reader-section-3"></span><span id="systemic"></span>Build systemic pressure from causes</h2>
+<p>A systemic problem persists because several people and structures sustain it. A famine may involve a damaged canal, a grain monopoly, and a border closure. Killing the monopolist can change one part of that situation; it does not automatically repair the canal. Equally, a negotiated agreement that really removes the monopoly should work. Do not declare every problem immune to a decisive action merely to prolong a campaign.</p>
+<ol><li><strong>Name the threatened public good.</strong> Food, passage, lawful succession, shelter, or the reliability of a magical boundary. Identify who suffers now and who benefits from the current arrangement.</li><li><strong>Choose three active stakeholders.</strong> Give each a concrete demand, leverage, a limit they will not cross, and a concession they can offer. Include someone the players could plausibly cooperate with.</li><li><strong>Draw two or three dependencies.</strong> Explain why one success affects another problem: opening the pass restores grain deliveries; exposing the forged charter changes who can authorize repairs.</li><li><strong>Prepare no more than three visible pressure timers to begin.</strong> For each, name the trigger, review interval, warning sign, and event at completion. Reveal additional pressures when play discovers them rather than presenting a wall of clocks.</li><li><strong>Write exits.</strong> For every pressure, identify something that can stop, reduce, redirect, or resolve it. These are starting possibilities, not a list of the only permitted solutions.</li></ol>
+<p>A timer measures an impending event or unfinished work, not the GM’s desire for tension. Public facts and visible deadlines belong on the table. Secret plans still need observable signs before their consequences become unavoidable.</p>
+<h2 id="campaign-review">The campaign turn (optional)</h2>
+<p>Agree on a review interval such as one mission followed by downtime, a week of negotiations, or a season of travel. Changing the interval changes opportunities as well as pressure; announce that change before the players commit. It is not an extra source of actions or resource awards.</p>
+<ol><li><strong>Brief:</strong> show current pressures, completed gains, deadlines, obligations due, and choices that can wait. Ask each player what they want to protect or change.</li><li><strong>Commit:</strong> choose the party’s immediate objective and legitimate delegated tasks. Record who acts, what they can reach, their authority, and their resource costs.</li><li><strong>Play:</strong> resolve uncertain scenes with the core loop. Set the intent’s scope before rolling. Honor success at that scope, including when it eliminates an entire prepared obstacle.</li><li><strong>Maintain:</strong> resolve ordinary downtime, upkeep, recovery, and stated project progress. Followers retain their existing capability, assistance, delegation, and action limits.</li><li><strong>Review:</strong> check each declared scheduled trigger once. The default is one tick per affected pressure per review, not one tick per conversation, player, or ignored plot hook. Use a different rate only when explicitly declared by the chosen scenario or subsystem.</li><li><strong>Show the result:</strong> state what changed, why it changed, and what can now be done. Close solved pressures. Offer the next decision rather than requiring the same problem to be solved again.</li></ol>
+<p><strong>Keep a cause log.</strong> Scheduled ticks represent elapsed events; Story Beat spends represent consequences paid for under the normal rules. Neither manufactures SB. Do not charge the same disruption twice under two labels. An unrelated pressure can advance after a Clean Success because its previously announced deadline elapsed; that is not a complication attached to the successful roll.</p>
+<h2 id="escalation"><span id="reader-section-6"></span>Escalation without inflation</h2>
+<p>Increase the reach of decisions, conflicting commitments, and the need for coordination. Do not increase the DV of the same lock because a character improved their sheet. Roll only when uncertainty and consequences matter; a large dice pool is not itself a reason to call for repeated checks.</p>
+<ul><li><strong>Space:</strong> two communities need help at once. Let players choose, delegate, or create a third solution.</li><li><strong>Authority:</strong> the characters can defeat the guard, but need to decide whether force advances their goal of a legitimate peace.</li><li><strong>Duration:</strong> winning a harvest requires a workable supply arrangement afterward. Make the upkeep and handover visible.</li><li><strong>Values:</strong> two allies want incompatible terms. State the disagreement without secretly making every compromise worthless.</li><li><strong>Exposure:</strong> public victories draw attention. A specific foe may respond through established means; success does not automatically earn a punishment.</li></ul>
+<p>Split an undertaking into separate scenes only when each resolves a different uncertainty or commitment. “Roll again because this is epic” adds delay, not scale. For an impossible approach, explain the missing permission or capability and let the players change the situation; do not assign DV 6.</p>
+<h2 id="resources"><span id="reader-section-5"></span><span id="obligation"></span><span id="reader-section-4"></span><span id="resource"></span>Run the infrastructure honestly</h2>
+<p>Assets, Followers, Bonds, and Obligation give the characters options. They do not replace Boons or abolish individual costs. Use their published activation and upkeep rules. Delegation can move routine work off-screen, but does not grant limitless follower actions, waive a roll’s consequences, or let a follower exceed its capability.</p>
+<p>Fatigue may be paid only when a rule or explicitly agreed extension permits that expenditure. There is no general “buy narrative control with Fatigue” rule here. Apply overflow normally. Likewise, owing nothing does not mean a character has no resources: a solvent institution, a loyal ally, and a paid debt are meaningful achievements.</p>
+<p>Offer bargains with a named creditor, benefit, price, deadline, and way to discharge the obligation. Players can refuse. A creditor should pursue its interests rather than appear solely to drain a resource track. Distinguish mortal commitments from magical permissions and consequences; sharing a capacity formula does not make every pact interchangeable.</p>
+<p>Large pools can change how often particular outcomes occur, but do not guarantee Clean Success or empty resource pools. Count all rolled 1s and apply the outcome and Bond awards actually earned. Do not manufacture failed checks to refill Boons or invent extra SB because the GM wants a climax.</p>
+<h2 id="players"><span id="reader-section-7"></span><span id="player-evolution"></span>Advice for epic players</h2>
+<ul><li><strong>Declare both the immediate intent and the hoped-for public benefit.</strong> “Secure the river pilots’ agreement” is a resolvable step toward “keep the city fed.”</li><li><strong>Ask what is at risk.</strong> Clarify Position, DV, scope, costs, and likely fallout before committing. The GM need not disclose every hidden fact to make the decision intelligible.</li><li><strong>Give your power a steward.</strong> Name who manages an asset, who speaks when you are absent, and who can disagree with you. Use actual follower and asset rules where mechanical benefits are involved.</li><li><strong>Share decisive scenes.</strong> Expertise earns a spotlight, not every spotlight. Invite the player whose relationships or principles matter to lead the next decision.</li><li><strong>Make commitments legible.</strong> Keep a short ledger of promises, their beneficiaries, and deadlines. Negotiate a price you are willing to play through rather than assuming the GM must later forgive it.</li><li><strong>Choose an ending.</strong> Retirement, reform, succession, sacrifice, or a transformed purpose can be a victory. Remaining at the table need not mean endlessly accumulating power.</li></ul>
+<h2 id="gm-advice"><span id="reader-section-8"></span>Advice for epic GMs</h2>
+<p>Prepare actors and dependencies, not a predetermined chain of setbacks. Begin sessions with a concise state of the campaign and end with the concrete gains the party achieved. Spend SB according to their costs and the fiction, preserving achieved intent on Success &amp; SB. State likely Partial costs without replacing the outcome matrix with a custom success ladder.</p>
+<p>Keep one immediate scene playable at a time. Zoom in on a treaty’s disputed clause, a threatened evacuation, or a steward’s choice. Zoom out on routine travel and administration that the party has genuinely secured. Let characters enjoy the institutions they built before asking what those institutions will become.</p>
+<p>For Tier V and long-running Mythic play, change the campaign question: who inherits the peace, who gets access to the miracle, or who holds the founders accountable? World-changing power still needs a defined effect and a valid procedure. Revisit boundaries around mass harm, coercion, and irreversible personal sacrifice with the group rather than assuming epic scope authorizes every theme.</p>
+<h2 id="legacy-in-epic-play">Legacy is an institution, not just a replacement sheet</h2>
+<p>A legacy can be a school, a treaty, a refuge, an archive, or a practice that other people can sustain. Ask who benefits, who performs the work, who has a voice, and what happens when the founder leaves. A successful founder can hand over authority while remaining a PC; that is a transfer of responsibility, not a second character or a free resource refresh.</p>
+<p>The shared rules below are also part of the Player’s Guide. Use them for succession at any tier and for institutional projects when the optional timers suit the campaign.</p>
+<section id="legacy-procedures">
+<h2 id="reader-section-10-section">Legacy at the table: the operating procedure</h2>
+<p><strong>Scope and changes.</strong> These procedures clarify the Player’s Guide’s Legacy Engine. Succession remains a choice made through play. The additions specify a handover record, the Legacy Bond’s timing and limit, inheritance boundaries, and optional Growth and Crisis timers. Crisis is the former “Health” timer, renamed because filling it means trouble. No new skill, character tier, or replacement for the core loop is introduced.</p>
+<h3 id="legacy-record">1. Write a Legacy record</h3>
+<p>Record the predecessor, prospective successor, cause, one guiding value, one unresolved burden, and the people who recognize the succession. List each asset, follower, and obligation separately, with its current controller, condition, upkeep, creditor, and any dispute. Name the player who keeps the record. Review it at each succession and campaign downtime.</p>
+<p>A Cap 3+ follower is a well-established candidate, not a mandatory purchase. A family member, student, or other suitable character can succeed them. Becoming a PC ends that character’s follower entry: the same person cannot provide follower assistance to themselves, manage assets as an off-screen follower, and act as a PC simultaneously.</p>
+<h3 id="legacy-handover">2. Set the handover before building the successor</h3>
+<ol><li><strong>Agree on the replacement budget.</strong> Use the campaign’s current replacement-character creation procedure. Follower Cap and the predecessor’s spent XP are not a second XP allowance. If using the existing optional 4–8 XP inherited-training bonus, set the amount consistently for the campaign and grant it once on this successor’s creation; it does not accumulate through a chain of predecessors.</li><li><strong>Carry standing, not automatic obedience.</strong> Record inherited allies, enemies, and reputation. Identify which offices and relationships recognize the successor and which are contested. Resolve a contested claim through an appropriate scene; a failed trial complicates the claim rather than forbidding the player from playing their new character.</li><li><strong>Choose one burden.</strong> State who cares about it, what would discharge it, and what foreseeable event makes it urgent. The burden grants no automatic XP and imposes no blanket dice penalty. Existing debts and obligations remain on their own records; choosing one spotlight burden does not erase the others.</li><li><strong>Transfer custody explicitly.</strong> With the GM’s agreement and a credible handover, one existing Minor or Standard personal asset may carry over. Preserve its condition and upkeep; this transfers the same asset, not a duplicate or an XP refund. Major assets and disputed offices require recognition or securing control through play. Shared faction assets remain with their existing faction rather than becoming free personal purchases.</li><li><strong>Resolve personal commitments.</strong> A successor does not automatically inherit talents, rites, patron access, personal Boons, or another person’s magical bargain. Establish any new access under its normal rules. A debt changes debtor only when the relevant agreement permits it; otherwise record who still owes it and why the successor might choose to help.</li></ol>
+<p>Archive the predecessor’s sheet and mark transferred entries. Do not erase the history. A contact or inherited title is fictional access, not automatically a rated Asset or Follower. Use the acquisition rules when that mechanical benefit is desired.</p>
+<h3 id="legacy-bond-procedure">3. Invoke the Legacy Bond</h3>
+<p><strong>Once per player per session, across all Legacy Bonds:</strong> when your successor commits to a meaningful action upholding a recorded value of their predecessor, describe a specific memory and the risk or obligation you accept. Before resolving that action, gain <strong>1 Boon</strong> and mark the invocation used. It can be spent using the normal Boon rules, including on that action where timing permits. The normal cap and scene-end trim apply; there is no overflow store.</p>
+<p>The same action cannot also claim a separate Bond-driven Boon award for the same remembered relationship. Ordinary outcome awards still apply when earned. Repeating a safe gesture, invoking an additional predecessor, or switching characters does not refresh the session limit. Memories can always inform portrayal, but do not automatically reveal secrets, improve Effect, change DV, or guarantee a result.</p>
+<p>When the successor rejects or transforms the inherited value, discuss the new wording at downtime. Keep any resulting debts and relationships in the fiction. Rewriting the value grants no extra invocation and is not a refund of prior consequences.</p>
+<h3 id="legacy-growth">4. Build something that can outlast you (optional)</h3>
+<p>For a Legacy project, write a concrete public benefit, a steward, beneficiaries, necessary permissions or materials, an upkeep plan, and a completion condition. Choose a <strong>Growth [6]</strong> timer for a focused local institution or <strong>Growth [8]</strong> for a project with several substantial dependencies. A realm-wide undertaking should contain distinct projects with distinct benefits, not an arbitrarily huge timer.</p>
+<p>Agree on these lengths before work begins. One meaningful project action advances one Growth timer by <strong>2 on Clean Success or Success &amp; SB, 1 on Partial, and 0 on Miss</strong>. Apply the core outcome, awards, costs, and Story Beats as usual. These progress amounts are the optional Legacy project default, not a change to all timers or crafting. If a specific subsystem supplies its own project procedure, use that procedure instead.</p>
+<p>At most one action per project per campaign downtime can earn these default ticks. Extra PCs and followers can assist or resolve dependencies under their usual rules; they do not multiply the same action into several progress awards. A separately played milestone scene may also advance the project if its stake was agreed beforehand. Do not demand a roll for routine work with no meaningful uncertainty; an agreed completed milestone can receive its stated progress without manufacturing danger.</p>
+<p>A filled timer delivers its written benefit once. Establish prerequisites before attempting the finishing action; do not invent a missing permission after success. If work creates an opportunity to acquire a rated asset, write that explicitly as the benefit and use normal acquisition costs. If the project is being conducted under an acquisition procedure already paid for, do not charge twice. Record its steward and ordinary upkeep when it opens. Growth never creates free recurring XP, Boons, or additional actions.</p>
+<h3 id="legacy-crisis">5. Give institutions vulnerabilities (optional)</h3>
+<p>Use a <strong>Crisis [6]</strong> timer for a named threat to the institution. Write observable warning signs, the event at completion, and concrete triggers: an unpaid upkeep deadline, loss of a supplier, or a rival’s successful move. It is not a second health bar and does not replace an asset’s existing condition rules.</p>
+<p>At the campaign review, mark <strong>1 tick at most</strong> for a declared scheduled trigger that occurred during that review period. No trigger means no scheduled tick. An on-screen consequence or a legal Story Beat spend can also advance it when justified by the normal rules and the stated stakes. Log the cause: do not count one event twice as both a scheduled trigger and an extra consequence unless two distinct effects were declared.</p>
+<p>A successful action that removes the trigger prevents its future scheduled ticks. A meaningful crisis-reduction action removes <strong>2 ticks on Clean Success or Success &amp; SB, 1 on Partial, and 0 on Miss</strong>, to a minimum of zero; resolve other costs and consequences normally. These are Legacy defaults and apply only where the declared action can actually relieve that pressure. One such action per institution per campaign downtime earns these default reductions.</p>
+<p>At six ticks, play the announced crisis. Do not silently destroy every inherited resource. Record the actual outcome, use normal rules for any affected asset or follower, and close the timer when the crisis is resolved. A new threat needs a new trigger and warning; do not refill the same timer merely because the institution survived.</p>
+<h3 id="legacy-review">6. Review, then move the story forward</h3>
+<p>At downtime: resolve declared projects and recovery, pay or adjudicate upkeep, check each scheduled pressure trigger once, and record changed custody, debts, and relationships. Show the record to the players. On a generation jump, agree on the interval and resolve a small number of consequential turning points; do not mechanically charge decades of session-by-session upkeep or grant decades of free project actions.</p>
+<p>At campaign end, each player names one lasting mark supported by play and the people who maintain it. An epilogue is not a guaranteed permanent immunity from history. A later campaign can explore its fate without treating that possibility as a reason to deny the earlier characters their achieved ending.</p>
+</section>
+<h2 id="example">Worked campaign: the river that feeds the capital</h2>
+<p><strong>Situation:</strong> flood damage threatens the capital’s food supply. The canal guild wants recognition of its workers’ charter; the provincial council wants independent inspection; a merchant house profits from delay. The party wants a functioning canal under a durable agreement.</p>
+<p><strong>Visible setup:</strong> Restoration Growth [6] starts at 0; Hunger Crisis [6] starts at 2; Charter Hearing [4] starts at 0. Review once per mission plus downtime. Hunger’s scheduled trigger is “another review interval passes without sufficient deliveries.” The hearing advances one tick per review until it convenes. Its completion begins a decision scene; it does not dictate the vote.</p>
+<ol><li><strong>Obtain permission.</strong> The party negotiates access to the canal. A Clean Success secures the declared agreement. Do not secretly attach a new condition afterward. This milestone was declared to advance Restoration by 2, bringing it to 2/6.</li><li><strong>Organize repairs.</strong> A project action during downtime yields Success &amp; SB. Restoration gains 2 and reaches 4/6. The GM spends available SB under the ordinary costs on a distinct, foreshadowed complication: a rival learns which supplier supports the repairs. The repair progress stands.</li><li><strong>Review consequences.</strong> Deliveries are still insufficient, so Hunger advances once, to 3/6. The hearing advances to 1/4. The GM records the causes; the supplier’s exposure does not automatically add another Hunger tick.</li><li><strong>Make a meaningful choice.</strong> Next interval, temporary barges could restore deliveries and stop Hunger’s trigger, while permanent repairs still need work. Delegation is possible if a suitable follower has the authority and resources. The party chooses who handles which task under the normal limits.</li><li><strong>Complete the legacy.</strong> A later successful finishing action takes Restoration to 6/6 and opens the canal under the written agreement. Deliveries stop Hunger’s trigger. Its accumulated social damage does not vanish automatically; a declared relief action can reduce that Crisis. The guild becomes the named steward, with ordinary upkeep and accountability.</li></ol>
+<p><strong>A generation later:</strong> the founder retires. Her successor inherits the recorded standing and a burden to keep the inspection agreement, not her XP or magical access. A contested council seat is resolved in play. The canal remains a shared institution and is not duplicated onto the successor’s personal asset list.</p>
+<h2 id="worksheets"><span id="reader-section-10"></span><span id="reader-section-9"></span>Preparation and review sheets</h2>
+<h3>Campaign pressure record</h3><ul><li>Threatened public good and affected people:</li><li>Stakeholders, demands, leverage, and concessions:</li><li>Timer name, current ticks, length, review interval:</li><li>Scheduled trigger, visible warning, completion event:</li><li>Actions that can prevent, reduce, redirect, or resolve it:</li><li>Last change, cause, and resource or SB cost if any:</li></ul>
+<h3>Legacy project record</h3><ul><li>Cause, beneficiaries, steward, and successor:</li><li>Growth goal, length, prerequisites, and exact completion benefit:</li><li>Crisis trigger, warning signs, and threatened event:</li><li>Assets and followers: controller, condition, upkeep, delegated tasks:</li><li>Obligations: creditor, debtor, price, deadline, discharge:</li><li>Legacy value, spotlight burden, and Bond invocation used this session:</li><li>Last review’s gains, costs, unresolved disputes, and next decision:</li></ul>
+<p><strong>End on a changed world.</strong> Name what now works because of the characters, who can keep it working, and what remains open to the next generation. Epic play earns its scale through those changes.</p>
+<footer>Fate’s Edge © 2024–2026 Nicholas A. Gasper. Used with permission. All rights reserved.</footer>
+</article></body></html>

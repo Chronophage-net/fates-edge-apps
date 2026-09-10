@@ -1,3 +1,8 @@
+## Epic campaigns and Legacy — 2026-09-10
+
+- Expand Epic Play with systemic pressure, declared campaign reviews, Tier IV/V advice, institutional projects, a worked campaign, and GM/player records.
+- Strengthen the Player’s Guide Legacy rules with explicit inheritance, Bond timing, optional Growth/Crisis procedures, and succession bookkeeping. Keep shared mechanics identical in both publications and backport them to LaTeX.
+
 ## Class adaptation guide and introduction backports — 2026-09-09
 
 - Rework the subclass guide around adapting other TTRPG classes into Fate’s Edge builds, with feature mapping, worked outlines, and a conversion worksheet. Preserve the earlier collection separately and retain old fragment destinations.
