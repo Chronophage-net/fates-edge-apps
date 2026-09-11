@@ -1,6 +1,6 @@
 {
   "id": "vhasia-fractured-sun",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "generator",
   "title": "Vhasia — The Fractured Sun",
   "label": "chap:vhasia",
@@ -22,7 +22,8 @@
       "east": "Viterra — The Fenwood wound is still raw; the Warrior Queen's eyes watch the mountain passes. The Belworth is a border written in blood.",
       "north": "Aeler / Ubral — High passes funnel mercenaries and exiles into the fractured sun-kingdom. The mountain holds are a sieve, not a wall.",
       "south": "Thepyrgos (via Viterra) — Synod law and the Chain-Lanterns rarely venture this far north, but their scholars collect Vhasian ballads. The ninth verse is always censored."
-    }
+    },
+    "gm_guidance": "Honor that costs something\n\nVhasia asks whom people will follow when lawful claims and honorable conduct point in different directions. Keep birth, reputation, and public allegiance distinct. A convincing performance can win supporters without proving ancestry; proof can be genuine and politically unwelcome.\n\nBegin with a household offering shelter to an enemy’s wounded retainer on the eve of a claimant’s visit. Alain’s song can recall a disputed event or give someone courage to speak, but it need not function as a magical answer key. Let the players decide whether to protect a person, preserve an alliance, or expose a claim.\n\nTrack an immediate effort and the pressure opposing it; bring forward Armor Closes or Song Escapes when that front is relevant, rather than displaying every regional timer. Apply their existing triggers in context. Investigation does not itself manufacture the truth or require the realm to fracture.\n\nKeep the established Wymund → Herald → Baldvyn lineage and Valdais’s disputed paternity intact. Separate what an informant witnessed from what they infer. Decide what evidence can establish before using it, and leave the disputed Blood heir uncertain where the setting leaves it uncertain. A song heard through a closed door can carry more weight than a supernatural verdict."
   },
   "regional_diagnostic": {
     "current_hook": "The sun shattered at Lence. The pieces are still falling. Which shadow will catch you?",

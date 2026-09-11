@@ -1,0 +1,818 @@
+{
+  "id": "dhahara-elephant-kingdoms-iron-passes",
+  "version": "1.1.0",
+  "type": "generator",
+  "title": "Dhahara — The Elephant Kingdoms and the Iron Passes",
+  "label": "chap:dhahara",
+  "key_demographic": "Humans",
+  "capital": "Ahimsa (Peacock Throne) / Sarvistan (Mountain Satrapy)",
+  "manifest_path": "/data/docs/manifest.json",
+  "overview": {
+    "tagline": "The elephant remembers every path. The mountain counts every breath. The peacock watches the ninth throne.",
+    "genre": "Elephant warfare, monsoon ritual, honor as ancestral dharma, high-altitude survival horror, industrial colonialism.",
+    "mood": "The elephant remembers every path. The mountain counts every breath. The peacock watches the ninth throne.",
+    "starting_location": "The Peacock Throne Hall in Ahimsa, where a golden peacock with ruby eyes watches the court. The Maharaja's chamberlain approaches: \"The Maharaja wishes to renew the Nine-Kingdom Pact. But the King of Vajrapur has sent a forged genealogy. The Queen of Mahishmati has refused to attend. And the ninth kingdom—the one that is always missing—has sent a messenger. The messenger carries an old invitation. No one admits to having sent it. Meanwhile, Viceroy Thrain has sent a breath-counter and a demand: the iron due must be met. Speak carefully. The peacock is watching.\"",
+    "theme": "Between the high passes of the Aeler viceroyalty and the Brass Coast lies a fertile, contested lowland: the land of the Nine Kingdoms, the heart of Dhahara. Here, ancient dynasties still claim descent from the sun, and the Peacock Throne of Ahimsa casts its shadow over half a dozen rival courts. Rivers are borders; elephants are war machines; every harvest is a negotiation between kings who have never met but whose grandfathers swore blood oaths. North, in the high passes, the Aeler viceroys rule on behalf of the distant High King. Here, the air is thin and cold, the rivers run white with snowmelt, and the passes are measured in breath-counts rather than miles. Iron mines scar the hillsides, worked by Dhaharan laborers and overseen by Aeler engineers. The Aeler have established a viceroyalty here—not conquest, but a long lease, renewed every nine years. But both north and south share a common truth: the number \"nine\" is a wound—and a promise. There have never been nine kingdoms. The number is a ritual, a prayer that the Hollow will not notice that one of the nine is always missing. That missing kingdom changes. Sometimes it is a real kingdom that fell to plague or war; sometimes it is a kingdom that never was, a placeholder kept empty to satisfy the silence.\n\nWhat you notice first: The smell of jasmine and dust, and the ringing of iron hammers. The way every crossroads has a painted stone—a boundary marker, a warning, a prayer. The constant murmur of bazaars where haggling is a form of theater. The silence after a bell rings in the mountains—the silence is for the mountain to answer. The one rule that kills newcomers: Never count your breaths aloud in a mine. The mountain listens, and if it hears you reach the ninth, it will take one—a breath, a memory, a shadow. In the lowlands, never praise a king's elephant. The elephant is sacred; your praise will be taken as an insult to the king's own mount. Compliment the mahout.",
+    "gm_guidance": "A pact that must feed people\n\nBuild the campaign around the Peacock Throne, rival courts, and the people who keep their agreements workable. Bring those parts together around a decision with consequences beyond genealogy: where grain goes, which route stays open, and who may speak for an absent community.\n\nBegin at the pact renewal. The Chamberlain needs continuity, a rival ruler wants a concession that can be defended at home, and High Judge Vasu needs testimony that can withstand both courts. Let mahouts, farmers, dancers, and messengers carry knowledge their employers lack.\n\nUse Secure a workable pact [6] against The delegations depart [4]; the existing Empty Throne [6] is the Campaign front when its established triggers occur. Do not add a separate clock for each court. A missing seat is a question to investigate, not a faction whose supernatural identity must be settled immediately.\n\nA meal prepared for an absent delegation, a mahout recognizing an old command, or a river village omitted from a new map can make the missing kingdom felt. Keep the setting’s established secrets in GM preparation; characters encounter witnesses, omissions, and interested explanations rather than an opening lecture."
+  },
+  "regional_diagnostic": {
+    "current_hook": "The elephant remembers every path. The mountain counts every breath. The peacock watches the ninth throne.",
+    "core_conflict": "The Peacock Throne of Ahimsa has sat empty for seven years — the Maharaja's death concealed by nine courtier-ministers who rule in his name, while eight rival kings maneuver, marry, and forge genealogies to press claims on a throne no one admits is vacant. In the highlands, the Aeler viceroyalty's iron lease is renewed every nine years by treaties whose original signatories are all dead, and no one is certain the lease's authority still holds. Both crises share the same wound: legitimate rule sustained by silence, ritual counting, and a missing ninth that everyone pretends not to notice.",
+    "unique_feature": "The Missing Ninth: every count in Dhahara — kingdoms, breaths, ledger pages, elephants — stops at eight and skips the ninth. The gap is where the Hollow, and every unresolved succession claim, sits.",
+    "ninth_taboo": "Across Dhahara, the ninth breath taken in a mine is the mountain's, and the ninth golden elephant offered to the monsoon clouds is always hollow — filled, the old story says, with a dead king's ashes.",
+    "price": "Players sacrifice genealogy, breath, or standing to gain power in Dhahara; every reward here is entangled with a lease, a lineage, or a debt someone else is still counting."
+  },
+  "quotes": [
+    {
+      "speaker": "Maharaja Suryavarman (Elite):",
+      "text": "The Peacock Throne is not a seat. It is a promise made by the first sun king: that the nine kingdoms would remain nine, never one, never fewer. I do not rule. I hold the pattern. A peacock's tail has nine eyes. Each eye watches a different kingdom. When one closes, the throne weeps."
+    },
+    {
+      "speaker": "Viceroy Thrain (Aeler Elite):",
+      "text": "The passes do not care for your lineage or your gods. They care for iron, tea, and the heft of a sworn oath. Aeler and Dhaharan have bled into the same stone here. The mountain accepts both."
+    },
+    {
+      "speaker": "Elephant Mahout (Commoner):",
+      "text": "My grandfather drove elephants for the Sun Kings. My father drove them for the Aeler. I drive them for the Viceroy. The elephants do not care who holds the howdah. They remember the old songs—the ones about the ninth kingdom that never was."
+    }
+  ],
+  "succession_shadow_timer": {
+    "name": "The Empty Throne",
+    "max_segments": 6,
+    "advance_on": [
+      "A rival king produces a new genealogy or marriage claim on the Peacock Throne (+1)",
+      "Someone questions the Aeler iron-lease's continued legitimacy openly (+1)",
+      "A courtier-minister's concealment of the Maharaja's death is nearly exposed (+1)",
+      "The GM spends 2 SB to introduce a related complication (+1)"
+    ],
+    "thresholds": {
+      "3": "Whispers spread past the inner court; social rolls invoking the Maharaja's personal authority take -1 die.",
+      "6": "The Maharaja's death can no longer be concealed. The nine ministers, eight kings, and the Aeler viceroy all press claims at once, and the Succession Crisis begins."
+    },
+    "stirrs_table": [
+      {
+        "roll": 1,
+        "complication": "The eunuch minister who controls the palace guard is seen meeting a rival king's envoy in secret."
+      },
+      {
+        "roll": 2,
+        "complication": "A temple dancer's monsoon-ritual falters — and the priests debate whether the throne's emptiness is the cause."
+      },
+      {
+        "roll": 3,
+        "complication": "An Aeler breath-counter's ledger shows the iron lease's original seal does not match any living signatory."
+      },
+      {
+        "roll": 4,
+        "complication": "A forged genealogy naming a new claimant surfaces in Vajrapur, well-made enough to survive scrutiny."
+      },
+      {
+        "roll": 5,
+        "complication": "A courtier who helped conceal the Maharaja's death asks the party, quietly, to help him stop."
+      },
+      {
+        "roll": 6,
+        "complication": "The ninth kingdom's 'ghost messenger' arrives at court — someone claiming to speak for the kingdom no one admits is missing."
+      }
+    ]
+  },
+  "npcs": [
+    {
+      "name": "Maharaja Suryavarman",
+      "role": "King of Ahimsa (Peacock Throne)",
+      "motivation": "Unite the nine under his dynasty",
+      "quirk": "His pet peacock follows him; its cry is a warning of assassination attempts."
+    },
+    {
+      "name": "Viceroy Thrain",
+      "role": "Aeler governor of the Iron Passes",
+      "motivation": "Maximize ore output for the High King",
+      "quirk": "He wears a bell around his neck; it rings when he lies."
+    },
+    {
+      "name": "Rani Chandravati",
+      "role": "Queen of Vajrapur (Iron Kingdom), devout of Mykkiel",
+      "motivation": "Protect the iron mines from Aeler encroachment",
+      "quirk": "She wears a bracelet of dwarf teeth—each tooth is from an engineer she outwitted. She swears every treaty on Mykkiel's iron law, not the sun-cult of Ahimsa; Vajrapur answers to a different oath than the Peacock Throne does."
+    },
+    {
+      "name": "King Bhim",
+      "role": "Buffalo King of Mahishmati, servant of the local buffalo spirit",
+      "motivation": "Expand his pastoral kingdom into Anga",
+      "quirk": "He has never lost a buffalo race; his buffalo is named \"Conqueror.\" He keeps no temple to the sun kings — Mahishmati's court prays to a spirit with no name outside the herd, and Bhim finds Ahimsa's peacock theology faintly ridiculous."
+    },
+    {
+      "name": "Covenant High Judge Vasu",
+      "role": "Head of the Kosala sacred circuit",
+      "motivation": "Enforce contract law across the nine kingdoms",
+      "quirk": "He carries a scale that never balances; he says justice is never equal, only meted."
+    },
+    {
+      "name": "Temple Dancer Mira",
+      "role": "Devadasi of the Peacock Throne",
+      "motivation": "Keep the peace through ritual",
+      "quirk": "Her dance is said to bring rain; she has stopped three droughts. She dreams of the missing ninth."
+    },
+    {
+      "name": "Mine-Captain Korr",
+      "role": "Aeler engineer in the high passes",
+      "motivation": "Keep the tunnels safe and the quotas met",
+      "quirk": "He counts his breaths in eights; he has never reached nine."
+    },
+    {
+      "name": "Rani Jaya",
+      "role": "Local raja of the eastern hills (high passes)",
+      "motivation": "Balance tribute to Aeler with loyalty to her clan",
+      "quirk": "She lost an arm to a mine collapse; the prosthetic is a pickaxe."
+    },
+    {
+      "name": "The Ninth King's Herald (Ghost)",
+      "role": "A translucent messenger who appears at every succession crisis",
+      "motivation": "Remind the living that the missing kingdom still has a vote",
+      "quirk": "It speaks in the voice of the last king of the lost ninth. That voice changes each time."
+    }
+  ],
+  "names": {
+    "first_male": [
+      "Surya",
+      "Bhim",
+      "Vasu",
+      "Rajendra",
+      "Krishna",
+      "Karna",
+      "Thrain",
+      "Korr"
+    ],
+    "first_female": [
+      "Chandravati",
+      "Mira",
+      "Ganga",
+      "Lakshmi",
+      "Durga",
+      "Jaya",
+      "Jaya",
+      "Gaura"
+    ],
+    "surnames": [
+      "Somavamsi",
+      "Kalachuri",
+      "Yadava",
+      "Gupta",
+      "Pala",
+      "Malla",
+      "Ironfoot",
+      "Stonehand"
+    ],
+    "epithets": [
+      "the Peacock",
+      "Iron-Fisted",
+      "Buffalo-Loyal",
+      "the Coin-Eater",
+      "the Learned",
+      "the Unseen",
+      "the Bell-Breaker",
+      "Breath-Counter"
+    ]
+  },
+  "places": [
+    {
+      "rank": 2,
+      "suit": "spade",
+      "title": "Peacock Throne Hall",
+      "subtitle": "",
+      "description": "A vast chamber with pillars of carved marble; the throne is a peacock of gold and lapis lazuli.",
+      "flavor": "The peacock's eyes are rubies. They follow anyone who approaches the throne. The ninth eye is missing—it fell out during the last succession war and was never replaced.",
+      "mechanical_hook": "Test Presence + Etiquette (DV 4) to navigate the empty throne's court protocol without naming the Maharaja directly; misstep and a courtier-minister decides you're either a threat to the concealment or useful to it — and acts accordingly."
+    },
+    {
+      "rank": 3,
+      "suit": "spade",
+      "title": "Iron Gate Market (Vajrapur)",
+      "subtitle": "",
+      "description": "A bazaar outside the fortress; the smell of iron dust and spices.",
+      "flavor": "One slave collar is always empty—reserved for the ghost of the missing ninth kingdom.",
+      "mechanical_hook": "Test Insight + Streetwise (DV 4) to tell a Vajrapuri iron quota receipt from a forged one; fail and you've vouched for stamped ingots Queen Chandravati's rivals will later prove never left the mine."
+    },
+    {
+      "rank": 4,
+      "suit": "spade",
+      "title": "Buffalo Race Track (Mahishmati)",
+      "subtitle": "",
+      "description": "A dusty oval; the betting is fierce.",
+      "flavor": "The skeleton of an undefeated buffalo is on display. It sometimes snorts. When it does, a promise is about to be claimed.",
+      "mechanical_hook": "Test Presence + Persuasion (DV 4) to place a wager or make an introduction without invoking Ahimsa's sun-cult by mistake — Mahishmati bets on its buffalo spirit, not the Peacock Throne, and the distinction matters to King Bhim's court."
+    },
+    {
+      "rank": 5,
+      "suit": "spade",
+      "title": "Sacred City of Sravasti (Kosala)",
+      "subtitle": "",
+      "description": "A walled city with a thousand temples; the Covenant courthouse is here.",
+      "flavor": "The city has no bells. The Covenant forbids them. The ninth temple has no door.",
+      "mechanical_hook": "Test Insight + Lore (DV 4) to argue a contract dispute before High Judge Vasu's circuit; fail and his never-balancing scale finds against you on a technicality that favors whichever kingdom bribed the clerk first."
+    },
+    {
+      "rank": 6,
+      "suit": "spade",
+      "title": "Well of the Nine Kings",
+      "subtitle": "",
+      "description": "A deep stepwell with nine landings; each landing has a statue of a different king.",
+      "flavor": "The ninth landing shows only a reflection of the viewer—the missing king is always you.",
+      "mechanical_hook": "Test Resolve + Lore (DV 4) to look into the ninth landing's reflection without flinching; falter and whoever's watching decides your hesitation means you have a claim on the missing throne."
+    },
+    {
+      "rank": 7,
+      "suit": "spade",
+      "title": "Nine Kings' Tomb",
+      "subtitle": "",
+      "description": "A subterranean complex where the founders of each dynasty are buried.",
+      "flavor": "The ninth sarcophagus is empty. It waits.",
+      "mechanical_hook": "Test Body + Stealth (DV 4) to move through the founders' crypts without disturbing dust that hasn't settled in centuries; fail and the ninth sarcophagus's silence becomes a presence that follows you out."
+    },
+    {
+      "rank": 8,
+      "suit": "spade",
+      "title": "Iron Mine of the Crying Face",
+      "subtitle": "",
+      "description": "A deep shaft with a carved face above the entrance.",
+      "flavor": "A deep shaft with a carved face above the entrance.",
+      "mechanical_hook": "Test Body + Athletics (DV 4) to work a shift's quota without a beam-crack catching you mid-tunnel; fail and Mine-Captain Korr has to explain a labor shortfall to Viceroy Thrain by the week's iron count."
+    },
+    {
+      "rank": 9,
+      "suit": "spade",
+      "title": "Bridge of Nine Echoes",
+      "subtitle": "",
+      "description": "A rope bridge over a chasm; each step echoes nine times.",
+      "flavor": "A rope bridge over a chasm; each step echoes nine times.",
+      "mechanical_hook": "Test Resolve + Lore (DV 4) to cross while counting your own footsteps aloud; fail and the ninth echo answers with a name that isn't yours, and something now knows to expect you."
+    },
+    {
+      "rank": 10,
+      "suit": "spade",
+      "title": "Mine of the Ninth Seal",
+      "subtitle": "",
+      "description": "A sealed tunnel with a Covenant seal on the timbers.",
+      "flavor": "A sealed tunnel with a Covenant seal on the timbers.",
+      "mechanical_hook": "Test Resolve + Lore (DV 4) to approach the Covenant-sealed timbers without letting the demon's whisper finish a sentence; fail and you leave owing it an answer you didn't mean to give."
+    },
+    {
+      "rank": 11,
+      "suit": "spade",
+      "title": "The First Lease Stone",
+      "subtitle": "",
+      "description": "A monolith carved with the original treaty between Aeler and Dhahara.",
+      "flavor": "A monolith carved with the original treaty between Aeler and Dhahara.",
+      "mechanical_hook": "Test Insight + Lore (DV 4) to read the treaty's original clauses before a rival interpreter twists them; fail and the lease's legitimacy becomes a matter for the viceroy's court instead of the monolith's plain text."
+    },
+    {
+      "rank": 12,
+      "suit": "spade",
+      "title": "The Monsoon Granary",
+      "subtitle": "",
+      "description": "A raised storehouse serves villages claimed by two courts. Its keeper has chalked the waterline from the last flood above the door."
+    },
+    {
+      "rank": 13,
+      "suit": "spade",
+      "title": "The Mahouts’ Grove",
+      "subtitle": "",
+      "description": "Elephant handlers meet beneath shade trees beyond the palace. A retired animal stops at a patch of bare ground where no tether stands."
+    },
+    {
+      "rank": 14,
+      "suit": "spade",
+      "title": "The Unoccupied Landing",
+      "subtitle": "",
+      "description": "A landing is swept for a delegation no boatman recalls carrying. Fresh flowers arrive with the morning vegetables."
+    }
+  ],
+  "people_and_factions": [
+    {
+      "rank": 2,
+      "suit": "heart",
+      "title": "Peacock Throne Chamberlain",
+      "subtitle": "",
+      "description": "A eunuch in silk; he controls access to the king.",
+      "flavor": "He has seen nine assassins before they struck. He has not warned the king about the tenth. The tenth works for the missing kingdom.",
+      "what_they_carry": "Court access, a warning about which minister to avoid, or his silence about who else has visited the empty throne room.",
+      "what_they_ask": "That you carry a message to a rival king's envoy without asking why — he trades in errands he can't be seen running himself."
+    },
+    {
+      "rank": 3,
+      "suit": "heart",
+      "title": "Covenant Judge (High Judge Vasu)",
+      "subtitle": "",
+      "description": "A gray-haired man with a brass scale. He has never smiled.",
+      "flavor": "The ninth judgment he ever made was never recorded. It was for the missing kingdom.",
+      "what_they_carry": "A binding ruling that holds across all nine kingdoms' courts, backed by a Covenant seal even a rajah hesitates to ignore.",
+      "what_they_ask": "A case argued honestly in his circuit — win or lose, he wants the precedent, not the outcome, and he'll remember which you gave him."
+    },
+    {
+      "rank": 4,
+      "suit": "heart",
+      "title": "Temple Dancer (Mira)",
+      "subtitle": "",
+      "description": "A woman with anklets of silver and eyes lined with kohl.",
+      "flavor": "In the ninth step of her dance, she always stumbles slightly. No one knows why.",
+      "what_they_carry": "A dance-court verdict that can forgive a debt, or a warning about which kingdom's rain-offering failed this year and why.",
+      "what_they_ask": "That you witness her next monsoon ritual and tell no one what you see her stumble over on the ninth step."
+    },
+    {
+      "rank": 5,
+      "suit": "heart",
+      "title": "War Elephant Mahout",
+      "subtitle": "",
+      "description": "An old man who has never lost a battle. He whispers to his elephant in a language of clicks.",
+      "flavor": "The elephant's name is \"Sorry.\" It has trampled nine enemies. The ninth apology was accepted by a ghost.",
+      "what_they_carry": "Passage through territory his elephant has walked for thirty years, or a battlefield story that names which king broke an oath to his herd.",
+      "what_they_ask": "That you address his elephant by name before you address him — the elephant decides whether you're worth trusting, not the mahout."
+    },
+    {
+      "rank": 6,
+      "suit": "heart",
+      "title": "Ninth King's Ghost",
+      "subtitle": "",
+      "description": "A shade that walks the tomb. It points at the killer—but the killer is always a living king.",
+      "flavor": "The ninth time it points, it will point at the true killer. No one will believe it.",
+      "what_they_carry": "A pointed accusation naming the living king responsible for a specific unsolved murder — true, but never believed by anyone who hears it from a ghost.",
+      "what_they_ask": "That you repeat the accusation aloud to a living witness, knowing you'll be the one who takes the blame for saying it."
+    },
+    {
+      "rank": 7,
+      "suit": "heart",
+      "title": "Mine-Captain (Aeler)",
+      "subtitle": "",
+      "description": "A dwarf with a tuning fork and a level. He can hear a crack in a beam from a hundred paces.",
+      "flavor": "A dwarf with a tuning fork and a level. He can hear a crack in a beam from a hundred paces.",
+      "what_they_carry": "An honest assessment of a tunnel's structural risk, or advance warning of a quota shortfall before Viceroy Thrain hears of it.",
+      "what_they_ask": "That you help him make his numbers add up to eight before the count reaches nine — however that arithmetic gets done."
+    },
+    {
+      "rank": 8,
+      "suit": "heart",
+      "title": "Rani Jaya",
+      "subtitle": "",
+      "description": "A young woman in armor, riding a caparisoned elephant. She lost an arm to a mine collapse.",
+      "flavor": "A young woman in armor, riding a caparisoned elephant. She lost an arm to a mine collapse.",
+      "what_they_carry": "Safe passage through the eastern hill clans' territory, or her clan's read on whether the Aeler lease still holds legitimacy this season.",
+      "what_they_ask": "That you carry tribute to Viceroy Thrain on her behalf without letting her name appear in the ledger — her clan's loyalty is hers to spend, not his to log."
+    },
+    {
+      "rank": 9,
+      "suit": "heart",
+      "title": "Elephant Caravan Master (Tarkan)",
+      "subtitle": "",
+      "description": "Old, missing two fingers, tattooed with elephant footprints.",
+      "flavor": "Old, missing two fingers, tattooed with elephant footprints.",
+      "what_they_carry": "A caravan route between kingdoms that avoids every tax post, purchased in favors rather than coin.",
+      "what_they_ask": "That you carry a message between two rival courts without either side learning you served the other first."
+    },
+    {
+      "rank": 10,
+      "suit": "heart",
+      "title": "Demon's Whisper (from the Ninth Seal)",
+      "subtitle": "",
+      "description": "A voice heard in the sealed mine.",
+      "flavor": "A voice heard in the sealed mine.",
+      "what_they_carry": "Certainty — the absolute, seductive knowledge that a choice you're about to make is correct, freely offered and never free.",
+      "what_they_ask": "A name, a memory, or a promise; it never specifies which until you've already started talking."
+    },
+    {
+      "rank": 11,
+      "suit": "heart",
+      "title": "Granary Keeper",
+      "subtitle": "",
+      "description": "Wants the harvest distributed before soldiers requisition it. Can show which villages supplied it and which were left off the return list."
+    },
+    {
+      "rank": 12,
+      "suit": "heart",
+      "title": "Envoy of an Absent Court",
+      "subtitle": "",
+      "description": "Carries a worn invitation bearing a recognizable seal. Wants a hearing before anyone decides whom they represent."
+    },
+    {
+      "rank": 13,
+      "suit": "heart",
+      "title": "Retired Royal Mahout",
+      "subtitle": "",
+      "description": "Knows which mounts and handlers served together. Wants an injured elephant spared the renewal procession; will identify a familiar command if asked respectfully."
+    },
+    {
+      "rank": 14,
+      "suit": "heart",
+      "title": "Keeper of the Pact Copies",
+      "subtitle": "",
+      "description": "Has compared the copies retained by several courts. Wants the differences examined in front of witnesses, not quietly corrected."
+    }
+  ],
+  "complications": [
+    {
+      "rank": 2,
+      "suit": "club",
+      "title": "Elephant Stampede (Royal)",
+      "subtitle": "",
+      "description": "The king's elephants break loose; they are trained to kill.",
+      "flavor": "One elephant wears a saddle from the missing ninth kingdom.",
+      "mechanical_hook": "Test Presence + Animal Handling (DV 4) to turn the herd before it reaches the market crowd; fail and the saddle from the missing ninth kingdom is trampled into the mud along with anyone standing near it."
+    },
+    {
+      "rank": 3,
+      "suit": "club",
+      "title": "Covenant Excommunication",
+      "subtitle": "",
+      "description": "High Judge Vasu declares your contract void; your goods are seized.",
+      "flavor": "The merchant who paid the bribe wears a ninth ring on a hand that has only eight fingers.",
+      "mechanical_hook": "Test Insight + Lore (DV 4) to prove the ruling was bought before your goods are seized; fail and Vajrapur or Mahishmati — whichever bribed Vasu's clerk — walks away with your cargo and a legitimate-looking receipt."
+    },
+    {
+      "rank": 4,
+      "suit": "club",
+      "title": "Nine Kings' Tomb Robbers",
+      "subtitle": "",
+      "description": "Grave robbers break into the tomb. They seek the key word.",
+      "flavor": "The ninth sarcophagus is open. It is empty. The robbers did not open it.",
+      "mechanical_hook": "Test Body + Stealth (DV 4) to stop the robbers before they reach the founders' crypts; succeed and you learn they weren't after treasure — the ninth sarcophagus was already open when they arrived."
+    },
+    {
+      "rank": 5,
+      "suit": "club",
+      "title": "Peacock Throne Assassination Attempt",
+      "subtitle": "",
+      "description": "A courtier tries to kill the king.",
+      "flavor": "He has a ninth dagger hidden in his mirror-stick.",
+      "mechanical_hook": "Test Body + Athletics (DV 4) to intercept the courtier's mirror-stick dagger before it strikes; fail and a rival king's fingerprints — real or forged — are found on the blade."
+    },
+    {
+      "rank": 6,
+      "suit": "club",
+      "title": "Immortal Peacock's Cry",
+      "subtitle": "",
+      "description": "The peacock screams; the court panics.",
+      "flavor": "The peacock has not screamed in nine years. The last time it screamed, the ninth kingdom fell.",
+      "mechanical_hook": "Test Resolve + Lore (DV 4) to keep the court from panicking as the peacock screams for the first time in nine years; fail and half the ministers publicly declare it an omen for their preferred claimant."
+    },
+    {
+      "rank": 7,
+      "suit": "club",
+      "title": "Cave-In (Sabotage)",
+      "subtitle": "",
+      "description": "A tunnel collapses. The collapse was not an accident.",
+      "flavor": "The saboteur is in the party. Or the party is accused.",
+      "mechanical_hook": "Test Body + Athletics (DV 4) to dig clear before the tunnel finishes collapsing; fail and the accusation of sabotage lands on whichever kingdom's laborers were working that shift — possibly including you."
+    },
+    {
+      "rank": 8,
+      "suit": "club",
+      "title": "Ninth Echo",
+      "subtitle": "",
+      "description": "On the Bridge of Nine Echoes, someone counts the echoes. The ninth echo says a name.",
+      "flavor": "The name is the speaker's. They faint. The bridge remembers.",
+      "mechanical_hook": "Test Resolve + Lore (DV 4) to keep from repeating the ninth echo's spoken name aloud; fail and the bridge marks you as its next debt, to be collected on your next crossing."
+    },
+    {
+      "rank": 9,
+      "suit": "club",
+      "title": "Demon Wakes (Ninth Seal)",
+      "subtitle": "",
+      "description": "The sealed mine cracks open. A shadow escapes; it possesses the nearest Aeler engineer.",
+      "flavor": "The demon wants the lease broken.",
+      "mechanical_hook": "Test Resolve + Lore (DV 4) to keep the possessed engineer from reaching the lease stone before the demon's influence spreads; fail and it gets what it wants — the treaty questioned, the mountain's silence broken."
+    },
+    {
+      "rank": 10,
+      "suit": "club",
+      "title": "Lease Stone Cracks",
+      "subtitle": "",
+      "description": "The First Lease Stone glows red and splits. The treaty is void. War is coming.",
+      "flavor": "The party has one day to flee the passes before the Aeler and Dhaharan armies clash.",
+      "mechanical_hook": "Test Presence + Persuasion (DV 4) to convince both Aeler and Dhaharan commanders to hold their advance for one more day; fail and the party is caught between two armies who each believe the treaty's collapse proves their side was right all along."
+    },
+    {
+      "rank": 11,
+      "suit": "club",
+      "title": "Grain Boats Diverted",
+      "subtitle": "",
+      "description": "Soldiers redirect a village’s grain boats toward the capital. The order is authentic; the issuing court has not heard that the village’s own stores flooded."
+    },
+    {
+      "rank": 12,
+      "suit": "club",
+      "title": "Two Invitations, One Seat",
+      "subtitle": "",
+      "description": "Two envoys receive valid invitations assigning them the same place. Neither can yield publicly without appearing to abandon their people."
+    },
+    {
+      "rank": 13,
+      "suit": "club",
+      "title": "The Procession Cannot Pass",
+      "subtitle": "",
+      "description": "An injured elephant refuses a narrow approach. The mahout asks for space while officials demand that the ceremony proceed."
+    },
+    {
+      "rank": 14,
+      "suit": "club",
+      "title": "A Village Missing from the Pact",
+      "subtitle": "",
+      "description": "A renewal copy omits an inhabited riverside district. Its residents are present at the gates. Each court insists another court must speak for them."
+    }
+  ],
+  "rewards": [
+    {
+      "rank": 2,
+      "suit": "diamond",
+      "title": "Peacock Feather",
+      "subtitle": "",
+      "description": "A single iridescent feather from the immortal peacock. Present it to enter any court in the nine kingdoms.",
+      "flavor": "The ninth feather in the peacock's tail is invisible. If you find it, you can command the peacock to speak.",
+      "curse_cost": "Enter any of the nine courts once, but every kingdom now has a reason to ask how a foreigner came to carry a feather from the Ahimsa court."
+    },
+    {
+      "rank": 3,
+      "suit": "diamond",
+      "title": "Covenant Seal (Kosala)",
+      "subtitle": "",
+      "description": "A clay seal. Witness any contract in the sacred city.",
+      "flavor": "The ninth seal ever made is still intact. It seals a promise made with the missing kingdom.",
+      "curse_cost": "Any contract you witness with this seal is binding across all nine kingdoms — and Vasu's circuit now expects you to answer for how you use his authority."
+    },
+    {
+      "rank": 4,
+      "suit": "diamond",
+      "title": "Well Water (Vial)",
+      "subtitle": "",
+      "description": "A vial of black water from the Nine Kings' Well. Drink it to see the future.",
+      "flavor": "The ninth vial was never drawn. It is reserved for the king who will unite the nine.",
+      "curse_cost": "One true glimpse of the future, but the missing ninth kingdom's absence in that vision is a silence every rival claimant would kill to interpret first."
+    },
+    {
+      "rank": 5,
+      "suit": "diamond",
+      "title": "Nine Kings' Key Word",
+      "subtitle": "",
+      "description": "A single word: \"forgiveness.\" Speak it to open the tomb.",
+      "flavor": "The genealogy shows that every king of Ahimsa is a descendant of the missing ninth kingdom.",
+      "curse_cost": "The tomb opens for you once, and the genealogy inside names every current king's bloodline as descended from the missing ninth — knowledge that could unseat any of them."
+    },
+    {
+      "rank": 6,
+      "suit": "diamond",
+      "title": "Ninth King's Crown (Gold Circlet)",
+      "subtitle": "",
+      "description": "Found in the tomb. Wear it to command the ghosts of Rajagriha.",
+      "flavor": "The ninth ghost is the missing king himself. He will ask you one question: \"Why did you let me fall?\"",
+      "curse_cost": "The tomb's ghosts obey you, but the crown's rightful wearer asks his one question every time you put it on, and eventually you'll have to answer it."
+    },
+    {
+      "rank": 7,
+      "suit": "diamond",
+      "title": "Aeler Breath-Counter (Silver Bell)",
+      "subtitle": "",
+      "description": "Wear it to count your breaths in high altitude. The bell rings when you reach eight.",
+      "flavor": "Stop at eight. The ninth breath is the mountain's.",
+      "curse_cost": "Count safely to eight in the high passes, but the bell also announces to every Aeler engineer nearby that you're carrying viceroy-issued equipment — and they'll want to know how."
+    },
+    {
+      "rank": 8,
+      "suit": "diamond",
+      "title": "Toll Waiver (Brass Nail)",
+      "subtitle": "",
+      "description": "A brass nail. Present it to pass any Aeler bridge for free.",
+      "flavor": "The nail fits into a hole in the toll-keeper's scale. The hole is for bribes.",
+      "curse_cost": "Cross any Aeler bridge for free, but the toll-keeper's scale remembers exactly which bribe-hole the nail came from, and so does whoever's auditing that toll-keeper."
+    },
+    {
+      "rank": 9,
+      "suit": "diamond",
+      "title": "Viceroy's Forgiveness (Pardon)",
+      "subtitle": "",
+      "description": "A written pardon for any crime in the Satrapies.",
+      "flavor": "The condition is a secret mission. The mission is to assassinate a rival viceroy.",
+      "curse_cost": "Your crime in the Satrapies is erased on paper, but the pardon's condition — a secret mission against a rival viceroy — makes you complicit in exactly the kind of forged-legitimacy dispute you were just pardoned for."
+    },
+    {
+      "rank": 10,
+      "suit": "diamond",
+      "title": "Mahouts’ Introduction",
+      "subtitle": "",
+      "description": "A named handler introduces the party to their camp and offers one consultation about local elephants or routes. It grants trust for that meeting, not command of an animal.",
+      "leverage_types": [
+        "Knowledge"
+      ]
+    },
+    {
+      "rank": 11,
+      "suit": "diamond",
+      "title": "Granary Keeper’s Tally",
+      "subtitle": "",
+      "description": "A witnessed count identifies where the missing grain was redirected. It establishes that shipment’s destination, not the commander’s motive.",
+      "leverage_types": [
+        "Knowledge"
+      ]
+    },
+    {
+      "rank": 12,
+      "suit": "diamond",
+      "title": "Monsoon Shelter Ribbon",
+      "subtitle": "",
+      "description": "A host offers the party shelter at one named raised storehouse for the coming storm. The offer covers beds and dry storage, not immunity from pursuit.",
+      "leverage_types": [
+        "Protection"
+      ]
+    },
+    {
+      "rank": 13,
+      "suit": "diamond",
+      "title": "Pact Witness Copy",
+      "subtitle": "",
+      "description": "A witnessed copy establishes what one named court promised at the renewal. Presenting it supports that claim; enforcement remains a matter for the relevant parties.",
+      "leverage_types": [
+        "Authority"
+      ]
+    },
+    {
+      "rank": 14,
+      "suit": "diamond",
+      "title": "The Landing Keeper’s Chart",
+      "subtitle": "",
+      "description": "A working chart marks a usable river approach omitted from the court map. It enables planning a route; it does not remove weather or patrols.",
+      "leverage_types": [
+        "Knowledge"
+      ]
+    }
+  ],
+  "quick_use_notes": {
+    "draw_rules": "Draw until you have all four suits: Spade = place, Heart = actor, Club = pressure, Diamond = leverage. Highest rank sets the main Timer (2–5 → 4, 6–10 → 6, J/Q/K → 8, A → 10).",
+    "diamonds": "Diamonds are codified outcomes (charters, iron-leases, breath-tokens) that change position rather than call for a roll.",
+    "ace_rule": "If any Ace appears, echo Dhahara's central motif — the number nine is a wound and a promise; something is always missing, and the missing thing is always the one that mattered."
+  },
+  "additional_features": {
+    "notes": [
+      "Ancestral Honor (Reputation Track): Each PC has an Ancestral Honor score from (-3) (Heavy Burden) to (+3) (Bearer of Light). Gain Burden by: breaking a sworn oath, failing to protect a family member, disrespecting a temple. Gain Honor by: keeping a difficult promise, restoring a forgotten genealogy, donating to a royal archive.",
+      "+2 or +3 (Bearer of Light): +1 Position in social encounters with nobles and priests. You may call in one minor family favor per session.",
+      "-2 or -3 (Heavy Burden): Market prices double for you. You may be challenged to an honor-duel (combat or legal contest). If you refuse, you lose 1 permanent Reputation tier.",
+      "Elephant Community Share (Highland): Instead of individual ownership, elephant caravans operate on a share system. A character who helps the caravan gains a Share Token. Spend it to call on the caravan for a single favor: passage for a wagon, a day's fodder, or a warning about a rival. Share Tokens are reciprocity, not weight.",
+      "Breath-Oaths as Leverage (Highland): Aeler engineers use breath-oaths to secure contracts. A character who holds a breath-oath can demand a renegotiation of tolls, quotas, or labor terms. Breaking a breath-oath does not incur a curse; it simply ends the trust, and the other party will never deal with you again.",
+      "Local Patrons (Syncretic Names):",
+      "The Peacock's Eye — The Witness. The ruby that sees all false genealogies.",
+      "The Iron Queen — Mykkiel. The law that binds the nine kingdoms, even when kings forget.",
+      "The Monsoon Lord — Khemesh. The pressure that brings the rain—and the flood that follows.",
+      "The Ninth Throne — The Hollow. The empty chair. The unspoken promise. The kingdom that never was.",
+      "The Silent Bell — The Sealed Gate (Highland). The threshold that asks only that you stop at eight."
+    ]
+  },
+  "lore_echoes": [
+    {
+      "title": "The Nine Kings' Tomb and the Kalrantha Amulet",
+      "description": "The Nine Kings' Tomb and the Kalrantha Amulet: The tomb contains a map to the Himadri temple where the amulet was sealed. The map is tattooed on the inside of the Ninth King's ghost. You will need to ask politely. The ghost charges a memory for each word."
+    },
+    {
+      "title": "The Immortal Peacock and the Hollow",
+      "description": "The Immortal Peacock and the Hollow: The peacock is said to be the Hollow's original form—before it learned to hunger. Aelaerem hedge-keepers leave offerings of peacock feathers at the Hollow's gates. The ninth feather offered each year is returned, bloodied, to the Peacock Gardens."
+    },
+    {
+      "title": "The Ninth Seal Mine and the Kalrantha Amulet",
+      "description": "The Ninth Seal Mine and the Kalrantha Amulet: The demon sealed in the mine is a fragment of Varash the Unmaker. The Veiled Sisters want to free it. The Breath-less want to re-seal it."
+    }
+  ],
+  "superstitions": [
+    {
+      "name": "Bread to the Peacock",
+      "effect": "Bread to the Peacock: Crumble a crust before the throne. Ignore the first Elephant Stampede penalty. `[SUPERSTITION]`",
+      "cost": "Burn for +1 die once"
+    },
+    {
+      "name": "The Ninth Step (Lowland)",
+      "effect": "The Ninth Step (Lowland): When entering a court, take only eight steps. The ninth step is for the ghost of the missing king. If you take it, you will hear a whisper asking for a favor. `[SUPERSTITION]`",
+      "cost": "Burn for +1 die once"
+    },
+    {
+      "name": "Bread to the Mine (Highland)",
+      "effect": "Bread to the Mine (Highland): Crumble a crust into the tunnel mouth. Ignore the first Cave-In penalty. `[SUPERSTITION]`",
+      "cost": "Burn for +1 die once"
+    },
+    {
+      "name": "Knot the Bell Rope (Highland)",
+      "effect": "Knot the Bell Rope (Highland): Tie a knot in the rope of a shrine bell. Cancel Ninth Echo or take -1 die on your next stealth roll. `[SUPERSTITION]`",
+      "cost": "Burn for +1 die once"
+    }
+  ],
+  "decline_and_patronage": "Among the Dhaharan, power flows through genealogy, elephant herds, the honor of the court, and the slow pull of ancestral promise—and in the high passes, through iron, tea, and the lease. The Peacock Throne is the center, but the other eight kingdoms are competitors. And the missing ninth is the question that never stops echoing. For the GM: Power in Dhahara is measured in iron, buffalo, the thickness of a family's scroll collection, the number of forgotten promises in its bloodline, and the number of breaths a miner can hold.\n- Use the Ancestral Honor Dial as a visible track. High Honor opens doors; low Honor closes them—and may bring the Hollow's silent witnesses.\n- Track the Ninth Kingdom Timer as a slow-burn campaign timer. The party cannot stop it permanently—only delay it, redirect it, or prepare for the night when the missing kingdom returns.\n- In the high passes, use the Lease Timer to mirror the politics of the lowlands. The renewal of the lease is a recurring pressure point.\n- Emphasize that the Aeler are not conquerors—they are lessees, bound by treaty. Their engineers and viceroys are in Dhaharan territory on Dhaharan sufferance, renewed every nine years.\n\nIn Dhahara, the peacock remembers every eye, the well shows every death, the mountain takes every ninth breath, and the missing kingdom waits. Its question is never closed.",
+  "sb_spend_table": {
+    "minor_complications": [
+      "**Exposure:** Maharaja Suryavarman take notice of the party's actions.",
+      "**Noise:** The party's activity alerts nearby watchers or rivals.",
+      "**Trace:** Evidence of the party's passage marks their route for local trackers.",
+      "**Delay:** A brief but meaningful setback costs time or a favorable window.",
+      "**Supply Strain:** Mark +1 segment on a relevant resource timer."
+    ],
+    "moderate_setbacks": [
+      "**Alarm Raised:** Viceroy Thrain becomes aware and begins responding.",
+      "**Position Lost:** The party loses advantageous ground, cover, or standing.",
+      "**Foe Appears:** A rival or enforcer arrives on scene.",
+      "**Gear Trouble:** A piece of equipment becomes Compromised or Neglected.",
+      "**Lock/Barrier:** A simple obstacle now requires a test to overcome."
+    ],
+    "serious_trouble": [
+      "**Reinforcements:** Additional enforcers or rivals arrive.",
+      "**Key Gear Breaks:** A crucial tool or weapon becomes temporarily unusable.",
+      "**Major Twist:** The Ninth King (Unburied) — Phases: Tomb Robberies (→) Orchestrated Succession Crisis (→) Throne Coup. Secret: The Ninth King does not want",
+      "**Rail Tick:** Advance the region's central timer by 1 segment.",
+      "**Condition Applied:** Mark Fatigue 1/Harm 1/Condition appropriate to the fiction."
+    ],
+    "major_turns": [
+      "**Trap Springs:** A prepared danger activates with full effect.",
+      "**Authority Arrival:** King Bhim intervenes personally.",
+      "**Scene Shift:** The environment changes dramatically.",
+      "**Patron Omen:** An unseen power takes notice.",
+      "**Narrative Pivot:** The story reframes around a new legitimacy question."
+    ]
+  },
+  "boss_archetypes": [
+    {
+      "name": "The Ninth King (Unburied) — Phases: Tomb",
+      "tags": [],
+      "description": "The Ninth King (Unburied) — Phases: Tomb Robberies (→) Orchestrated Succession Crisis (→) Throne Coup. Secret: The Ninth King does not want to be restored to power—he wants his promise to the Hollow kept.",
+      "phases": [],
+      "cracks": []
+    },
+    {
+      "name": "The Breath-Eater",
+      "tags": [
+        "Nine Silence, Highland"
+      ],
+      "description": "A boss encounter built around The Breath-Eater.",
+      "phases": [
+        "Mines Collapsing (",
+        ") Orchestrated Cave-In (",
+        ") Pass Coup"
+      ],
+      "cracks": [
+        "find a lost breath-counter",
+        "expose a false lease",
+        "survive a count of nine."
+      ]
+    },
+    {
+      "name": "The Unsealed (Demon of the Ninth Seal, H",
+      "tags": [],
+      "description": "The Unsealed (Demon of the Ninth Seal, Highland) — Phases: Whispers in the Mine (→) Procession of Cracking Timbers (→) Iron-Baptism of a Viceroy.",
+      "phases": [],
+      "cracks": []
+    }
+  ],
+  "faction_entanglements": [
+    "**Maharaja Suryavarman:** Unite the nine under his dynasty",
+    "**Viceroy Thrain:** Maximize ore output for the High King",
+    "**Rani Chandravati:** Protect the iron mines from Aeler encroachment",
+    "**King Bhim:** Expand his pastoral kingdom into Anga",
+    "**Covenant High Judge Vasu:** Enforce contract law across the nine kingdoms"
+  ],
+  "cross_regional_ties": [
+    "The Nine Kings' Tomb and the Kalrantha Amulet: The tomb contains a map to the Himadri temple where the amulet was sealed. The map is tattooed on the inside of the Ninth King's ghost. You will need to ask politely. The ghost charges a memory for each word.",
+    "The Immortal Peacock and the Hollow: The peacock is said to be the Hollow's original form—before it learned to hunger. Aelaerem hedge-keepers leave offerings of peacock feathers at the Hollow's gates. The ninth feather offered each year is returned, bloodied, to the Peacock Gardens.",
+    "The Ninth Seal Mine and the Kalrantha Amulet: The demon sealed in the mine is a fragment of Varash the Unmaker. The Veiled Sisters want to free it. The Breath-less want to re-seal it."
+  ],
+  "patronage_and_power": {
+    "description": "Among the Dhaharan, power flows through genealogy, elephant herds, the honor of the court, and the slow pull of ancestral promise—and in the high passes, through iron, tea, and the lease. The Peacock Throne is the center, but the other eight kingdoms are competitors. And the missing ninth is the question that never stops echoing. For the GM: Power in Dhahara is measured in iron, buffalo, the thickness of a family's scroll collection, the number of forgotten promises in its bloodline, and the number of breaths a miner can hold.\n- Use the Ancestral Honor Dial as a visible track. High Honor opens doors; low Honor closes them—and may bring the Hollow's silent witnesses.\n- Track the Ninth Kingdom Timer as a slow-burn campaign timer. The party cannot stop it permanently—only delay it, redirect it, or prepare for the night when the missing kingdom returns.\n- In the high passes, use the Lease Timer to mirror the politics of the lowlands. The renewal of the lease is a recurring pressure point.\n- Emphasize that the Aeler are not conquerors—they are lessees, bound by treaty. Their engineers and viceroys are in Dhaharan territory on Dhaharan sufferance, renewed every nine years.\n\nIn Dhahara, the peacock remembers every eye, the well shows every death, the mountain takes every ninth breath, and the missing kingdom waits. Its question is never closed.",
+    "for_the_gm": [
+      "Use the **Dhahara's Reckoning** as a visible, ticking measure of Dhahara's legitimacy crisis.",
+      "Let Maharaja Suryavarman and rival claimants issue conflicting demands, forcing the party to choose whose authority they recognize.",
+      "Tie rewards to visible symbols of legitimate authority that can be challenged, stolen, or voided.",
+      "Use the region's boss archetypes as escalating expressions of the same underlying legitimacy question."
+    ]
+  },
+  "index": [
+    "Dhahara",
+    "The Elephant Kingdoms and the Iron Passes generator",
+    "Places!Dhahara",
+    "People!Dhahara",
+    "Complications!Dhahara",
+    "Rewards!Dhahara",
+    "Peacock Throne",
+    "Iron Passes",
+    "Nine Kingdoms"
+  ],
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
+  "campaign_preparation": {
+    "status": "Illustrative preparation; existing rules and Empty Throne triggers apply.",
+    "faction_triangle": [
+      {
+        "party": "Peacock Throne household",
+        "wants": "Keep the renewal credible and the government functioning.",
+        "can_offer": "A hearing and access to household witnesses."
+      },
+      {
+        "party": "Rival courts",
+        "wants": "Preserve autonomy while securing grain routes and recognition.",
+        "can_offer": "Local cooperation, provisions, or testimony; each ruler speaks for their own interests."
+      },
+      {
+        "party": "Kosala sacred circuit",
+        "wants": "An agreement whose witnesses and terms can be defended across jurisdictions.",
+        "can_offer": "Mediation through High Judge Vasu; it cannot make the rulers comply by itself."
+      }
+    ]
+  }
+}

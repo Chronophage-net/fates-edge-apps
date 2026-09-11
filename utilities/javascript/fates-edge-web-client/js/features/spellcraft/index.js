@@ -392,12 +392,12 @@ function ensureStyles() {
             color: var(--text);
         }
 
-        /* ─── Magic Paths Tour (inline screen, not a pop-up) ──────── */
+        /* Floating guide keeps the selected character and path controls visible. */
         .magic-tour-overlay {
             display: flex; align-items: center; justify-content: center;
             animation: magicTourFadeIn 0.4s ease;
-            padding: 1rem 0;
-            width: 100%;
+            position: fixed; bottom: 1rem; inset-inline-end: 1rem; z-index: 12000;
+            width: min(480px, calc(100vw - 2rem));
         }
         @keyframes magicTourFadeIn {
             from { opacity: 0; transform: scale(0.96); }
@@ -405,7 +405,7 @@ function ensureStyles() {
         }
         .magic-tour-card {
             background: var(--bg); color: var(--text);
-            max-width: 740px; width: 100%; max-height: 90vh;
+            max-width: 740px; width: 100%; max-height: 60dvh; box-sizing: border-box;
             padding: 2rem; border-radius: 16px;
             border: 1px solid var(--border);
             box-shadow: 0 20px 60px rgba(0,0,0,0.6);
@@ -624,16 +624,14 @@ export function showMagicTour() {
     renderTourSlide(char);
 }
 
-let tourHiddenSiblings = null;
+let tourPreviousFocus = null;
 
 function closeTour() {
     tourActive = false;
     const overlay = document.getElementById('magic-tour-overlay');
     if (overlay) overlay.remove();
-    if (tourHiddenSiblings) {
-        tourHiddenSiblings.forEach(ch => { ch.style.display = ''; });
-        tourHiddenSiblings = null;
-    }
+    if (tourPreviousFocus?.isConnected) tourPreviousFocus.focus({ preventScroll: true });
+    tourPreviousFocus = null;
     // Refocus on the main spellcraft container
     if (container) render(container);
 }
@@ -644,11 +642,16 @@ function renderTourSlide(char) {
         overlay = document.createElement('div');
         overlay.id = 'magic-tour-overlay';
         overlay.className = 'magic-tour-overlay';
-        const hostContainer = document.getElementById('app-content') || document.body;
-        tourHiddenSiblings = Array.from(hostContainer.children);
-        tourHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
-        hostContainer.appendChild(overlay);
-        window.scrollTo({ top: 0 });
+        tourPreviousFocus = document.activeElement;
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-label', 'Magic Paths guide');
+        overlay.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                event.preventDefault(); event.stopPropagation();
+                setMagicTourSeen(true); closeTour();
+            }
+        });
+        document.body.appendChild(overlay);
     }
 
     const pathId = TOUR_PATH_IDS[tourSlideIndex];
@@ -694,6 +697,7 @@ function renderTourSlide(char) {
         </div>
     `;
 
+    overlay.querySelector('#tour-next')?.focus({ preventScroll: true });
     // Attach events
     overlay.querySelector('#tour-prev')?.addEventListener('click', () => {
         if (tourSlideIndex > 0) {
@@ -744,7 +748,7 @@ function checkMagicTour() {
     // Only show if not seen and character has no path or is on 'none'
     if (!getMagicTourSeen() && (char.magicPath === 'none' || !char.magicPath)) {
         // Small delay to let the UI render first
-        setTimeout(() => showMagicTour(), 400);
+        setTimeout(() => { if (container?.isConnected && !document.getElementById('fates-edge-product-tour')) showMagicTour(); }, 400);
     }
 }
 

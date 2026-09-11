@@ -535,6 +535,7 @@ function transformRegionData(raw) {
             if (raw.overview.lore.first_notice) desc += `<p><strong>What you notice first:</strong> ${escHtmlLocal(raw.overview.lore.first_notice)}</p>`;
             if (raw.overview.lore.rule_that_kills) desc += `<p><strong>Rule that kills:</strong> ${escHtmlLocal(raw.overview.lore.rule_that_kills)}</p>`;
         }
+        if (raw.overview.gm_guidance) desc += `<h3>Running this region</h3>${String(raw.overview.gm_guidance).split(/\n\s*\n/).map(paragraph => `<p>${escHtmlLocal(paragraph)}</p>`).join('')}`;
         transformed.description = desc;
         const text = JSON.stringify(raw.overview);
         transformed.tags = extractTags(text);
@@ -557,6 +558,7 @@ function transformRegionData(raw) {
             const rankKey = mapNumericRank(rawRank);
 
             let meaning = `${card.title || 'Untitled'}: ${card.description || ''}`;
+            if (Array.isArray(card.leverage_types)) meaning += ` [Leverage: ${card.leverage_types.join(' / ')}]`;
             if (card.flavor) meaning += ` <em>${card.flavor}</em>`;
             if (card.mechanical_hook) meaning += ` [Mechanic: ${card.mechanical_hook}]`;
             if (card.what_they_carry) meaning += ` [Carries: ${card.what_they_carry}]`;

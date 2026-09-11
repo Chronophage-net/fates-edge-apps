@@ -54,6 +54,7 @@ function stepText(step, field) {
 let stepIndex = 0;
 let previousFocus = null;
 let keyHandler = null;
+let navigating = false;
 
 function injectStyles() {
   if (document.getElementById(`${TOUR_ID}-styles`)) return;
@@ -61,6 +62,9 @@ function injectStyles() {
   style.id = `${TOUR_ID}-styles`;
   style.textContent = `
     #${TOUR_ID} {
+      box-sizing: border-box;
+      max-height: calc(100dvh - 2rem);
+      overflow: auto;
       position: fixed;
       inset-inline-end: clamp(1rem, 3vw, 2.25rem);
       bottom: clamp(1rem, 3vw, 2.25rem);
@@ -96,7 +100,7 @@ function injectStyles() {
       background: color-mix(in srgb, currentColor 22%, transparent);
     }
     #${TOUR_ID} .product-tour-progress span.done { background: var(--gold, #c9a227); }
-    #${TOUR_ID} .product-tour-actions { display: flex; align-items: center; gap: .5rem; }
+    #${TOUR_ID} .product-tour-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
     #${TOUR_ID} .product-tour-actions .btn:last-child { margin-inline-start: auto; }
     #${TOUR_ID} .product-tour-count { color: var(--text-muted, #aaa); font-size: .75rem; }
     .${HIGHLIGHT_CLASS} {
@@ -152,6 +156,9 @@ function tourHTML(step) {
 }
 
 async function showStep(index) {
+  if (navigating) return;
+  navigating = true;
+  try {
   stepIndex = Math.max(0, Math.min(index, STEPS.length - 1));
   const step = STEPS[stepIndex];
   const { navigate } = await import('../router.js');
@@ -163,6 +170,7 @@ async function showStep(index) {
   tour.innerHTML = tourHTML(step);
   highlightRoute(step.route);
   tour.querySelector('[data-tour-action="next"]')?.focus({ preventScroll: true });
+  } finally { navigating = false; }
 }
 
 export function closeProductTour() {
@@ -197,6 +205,8 @@ export async function startProductTour(options = {}) {
   });
 
   keyHandler = event => {
+    if (!tour.contains(event.target) || event.target.matches('input, textarea, select')) return;
+    if (['Escape', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); event.stopPropagation(); }
     if (event.key === 'Escape') closeProductTour();
     const rtl = document.documentElement?.dir === 'rtl';
     const backKey = rtl ? 'ArrowRight' : 'ArrowLeft';

@@ -64,3 +64,12 @@ Release validation: client 289/289; server 219/220, with the existing optional i
 ### Redis failure resolved
 
 The copyright tool had injected project metadata into installed `@ioredis/commands` data. Removed that injected key locally; the dependency code is unchanged. The tool now requires explicit data paths and excludes dependency/generated directories, symlinks, and package/manifest files. A regression test verifies those boundaries. All 220 server tests now pass, with no skips; this supersedes the earlier Redis limitation. Client checks remain 289/289. Fresh installations use the original package data.
+
+### Walkthrough repairs
+
+- [x] Keep the whiteboard visible under its guide; highlight each step’s real control and expand its toolbar section. Restore sections on exit and close the guide when leaving the board.
+- [x] Keep Magic Paths visible behind its guide, constrain guide height on small screens, and support Escape. Avoid opening the introductory path guide over the product tour.
+- [x] Scope guide arrow keys and character wizard Enter handling to their own controls; preserve previously hidden elements when leaving character creation.
+- [x] Bound the product tour to the viewport and prevent overlapping Next/Back navigation.
+
+Validation: client tests (289 passing), production build, and browser inspection of the whiteboard guide with its Combat control highlighted.

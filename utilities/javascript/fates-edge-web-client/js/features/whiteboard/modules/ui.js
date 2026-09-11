@@ -17,7 +17,7 @@ import {
     isGridCombatActive, isKonrehActive, canControlFog, setSpeakingNames
 } from './combat.js';
 import { populateRoster, toggleRosterPanel, handleRosterDrop } from './roster.js';
-import { maybeShowOnboarding, showOnboardingModal } from './onboarding.js';
+import { maybeShowOnboarding, showOnboardingModal, hideOnboardingModal } from './onboarding.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
 import { isConnectedToServer, sendMessage } from '@core/websocket.js';
@@ -1627,6 +1627,7 @@ export function refresh() {
 }
 
 export function destroy() {
+    hideOnboardingModal(false);
     const container = document.getElementById('whiteboard-modern-layout');
     if (container) container.innerHTML = '';
     saveWhiteboardData();

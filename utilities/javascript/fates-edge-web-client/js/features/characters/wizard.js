@@ -432,7 +432,7 @@ function ensureModal() {
     modal = document.createElement('div');
     modal.id = 'wizardModal';
     modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-modal', 'false');
     modal.style.display = 'none';
 
     modal.innerHTML = `
@@ -569,8 +569,8 @@ export async function openWizard() {
         // Hide whatever else is currently shown (e.g. the character list) —
         // the wizard takes over the view in place instead of floating above it.
         const hostContainer = document.getElementById('app-content') || document.body;
-        state._hiddenSiblings = Array.from(hostContainer.children).filter(ch => ch !== modal);
-        state._hiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+        state._hiddenSiblings = Array.from(hostContainer.children).filter(ch => ch !== modal).map(element => ({ element, display: element.style.display }));
+        state._hiddenSiblings.forEach(({ element }) => { element.style.display = 'none'; });
 
         modal.classList.add('open');
         modal.style.display = 'block';
@@ -593,7 +593,7 @@ export function closeWizard() {
         modal.style.display = 'none';
     }
     if (state._hiddenSiblings) {
-        state._hiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        state._hiddenSiblings.forEach(({ element, display }) => { element.style.display = display; });
         state._hiddenSiblings = null;
     }
     state.data = null;
@@ -1869,9 +1869,9 @@ function attachEvents() {
 
     // ─── Keyboard shortcuts ──────────────────────────────────────
     const keyHandler = (e) => {
-        if (!state.isOpen) return;
+        if (!state.isOpen || !modal.contains(e.target)) return;
         if (e.key === 'Escape') closeWizard();
-        else if (e.key === 'Enter' && !e.target.matches('textarea')) {
+        else if (e.key === 'Enter' && e.target.matches('input:not([type=button]):not([type=checkbox]):not([type=radio])')) {
             const next = document.getElementById('wizard-next');
             if (next) { e.preventDefault(); next.click(); }
         }

@@ -1,6 +1,6 @@
 {
   "id": "viterra-hedge-law-realm",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "generator",
   "title": "Viterra — The Hedge-Law Realm",
   "label": "chap:viterra",
@@ -23,7 +23,8 @@
       "north": "Ubral — The highland clans owe no allegiance to the crown; tax collectors go armed. The Queen's writ is respected only where her knights ride.",
       "south": "Thepyrgos — The Black River marks the boundary of Synod law; fugitives cross both ways. A Viterran warrant is kindling in Thepyrgos, and vice versa.",
       "theona": "Eastern Viterran earls clamor to dominate the isles; the Abbess plays a dangerous game."
-    }
+    },
+    "gm_guidance": "A judgment somebody must carry out\n\nViterra puts authority into use: whose boundary is recognized, who may muster, and whether a judgment protects anyone beyond the courtroom. Its ties to Vhasia remain important, but a local case can stand on its own. Winning the argument and securing a workable settlement are different achievements.\n\nBegin with two households using the same flooded meadow. An old survey supports one; years of witnessed use support the other. The official needs the road reopened before a muster. Ask what remedy each side would accept, not simply which document wins.\n\nState the disputed fact, the recognized authority, and the remedy sought. If sustained work is needed, use Establish the boundary [6] against The levy occupies the meadow [4]; bring forward Succession’s Shadow only when royal legitimacy is actually implicated. Use normal social, investigation, or combat procedures; a legal duel needs no separate mini-game.\n\nA hedge cut overnight, an old witness refusing a chair, or a seal no one wants to break can carry the unease. Do not make every case a hidden succession plot. If a charter plainly settles a right, honor it, then ask who will respect that right in practice."
   },
   "quotes": [
     {

@@ -1,10 +1,5 @@
 // modules/onboarding.js
-// A lightweight, self-contained intro wizard for the Whiteboard feature.
-// Deliberately built with plain DOM + inline styles rather than depending on
-// a shared Modal component (whose API we don't have visibility into here) —
-// swap it for your own modal component later if you'd like, the public
-// functions below (showOnboardingModal / maybeShowOnboarding) are the only
-// surface other modules need to touch.
+// A floating, interactive guide to the live whiteboard controls.
 
 const SEEN_KEY = 'wb-onboarding-seen-v1';
 
@@ -48,7 +43,17 @@ const STEPS = [
 
 let currentStep = 0;
 let modalEl = null;
-let onboardingHiddenSiblings = null;
+let previousFocus = null;
+let highlighted = null;
+let openedDetails = [];
+const TARGETS = ['whiteboard-toolbar', 'whiteboard-sheet-tabs', 'whiteboard-grid-combat', 'whiteboard-fog-toggle', 'whiteboard-player-view', 'whiteboard-toggle-roster', 'whiteboard-help'];
+
+function clearTarget() {
+    highlighted?.classList.remove('whiteboard-tour-target');
+    highlighted = null;
+    openedDetails.forEach(el => { el.open = false; });
+    openedDetails = [];
+}
 
 function hasSeenOnboarding() {
     try { return localStorage.getItem(SEEN_KEY) === '1'; } catch (e) { return false; }
@@ -67,48 +72,44 @@ export function showOnboardingModal() {
     currentStep = 0;
     if (!modalEl) buildModal();
 
-    // Hide whatever's currently shown (the whiteboard) — this takes over the
-    // view in place instead of floating above it as a pop-up.
-    const hostContainer = document.getElementById('app-content') || document.body;
-    onboardingHiddenSiblings = Array.from(hostContainer.children).filter(ch => ch !== modalEl);
-    onboardingHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
-    hostContainer.appendChild(modalEl);
-
+    previousFocus = document.activeElement;
+    document.body.appendChild(modalEl);
+    modalEl.style.display = 'block';
     renderStep();
-    modalEl.style.display = 'flex';
-    window.scrollTo({ top: 0 });
+    modalEl.querySelector('#whiteboard-onboarding-next').focus({ preventScroll: true });
 }
 
 export function hideOnboardingModal(markSeen = true) {
     if (modalEl) modalEl.style.display = 'none';
-    if (onboardingHiddenSiblings) {
-        onboardingHiddenSiblings.forEach(ch => { ch.style.display = ''; });
-        onboardingHiddenSiblings = null;
-    }
+    clearTarget();
+    if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    previousFocus = null;
     if (markSeen) markOnboardingSeen();
 }
 
 function buildModal() {
-    // Inline editor screen — not a pop-up. See showOnboardingModal for how
-    // it's inserted into the page in place of the whiteboard.
     modalEl = document.createElement('div');
     modalEl.id = 'whiteboard-onboarding-modal';
-    modalEl.className = 'editor-screen-host';
+    modalEl.setAttribute('role', 'dialog');
+    modalEl.setAttribute('aria-labelledby', 'whiteboard-onboarding-title');
     modalEl.style.cssText = `
-        display:none; align-items:center; justify-content:center; padding: 1rem 0;
+        display:none; position:fixed; bottom:1rem; inset-inline-end:1rem; z-index:12000; width:min(480px, calc(100vw - 2rem)); max-height:50dvh; overflow:auto; background:var(--bg2); color:var(--text); border:1px solid var(--gold); border-radius:12px; box-shadow:0 12px 40px #0008;
     `;
+    const style = document.createElement('style');
+    style.textContent = '.whiteboard-tour-target { outline:3px solid var(--gold, #d4af37) !important; outline-offset:3px; scroll-margin-top:1rem; }';
+    document.head.appendChild(style);
     modalEl.innerHTML = `
         <div id="whiteboard-onboarding-card" class="editor-screen" style="
-            max-width:480px; width:90%; position:relative;
+            box-sizing:border-box; width:100%; position:relative; padding:1.25rem;
         ">
             <button id="whiteboard-onboarding-close" title="Close" style="
                 position:absolute; top:10px; inset-inline-end:12px; background:none; border:none;
                 color:var(--text3, #888); cursor:pointer; font-size:1rem; line-height:1;
             " data-i18n-attr="title:feature.whiteboard.modules.onboarding.close">✕</button>
             <div style="font-size:2rem; margin-bottom:0.4rem;" id="whiteboard-onboarding-icon"></div>
-            <h2 style="margin:0 0 0.6rem 0; font-size:1.15rem; color:var(--gold, #d4af37);" id="whiteboard-onboarding-title"></h2>
+            <h2 style="margin:0 0 0.6rem 0; font-size:1.15rem; color:var(--gold, #d4af37);" id="whiteboard-onboarding-title" aria-live="polite"></h2>
             <div style="line-height:1.55; font-size:0.9rem; color:var(--text2, #ccc); min-height:70px;" id="whiteboard-onboarding-body"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.4rem;">
+            <div style="display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:space-between; align-items:center; margin-top:1.4rem;">
                 <div id="whiteboard-onboarding-dots" style="display:flex; gap:5px;"></div>
                 <div style="display:flex; gap:6px;">
                     <button class="btn btn-sm btn-ghost" id="whiteboard-onboarding-skip" data-i18n="feature.whiteboard.modules.onboarding.skip">Skip</button>
@@ -132,7 +133,8 @@ function buildModal() {
         renderStep();
     });
 
-    document.addEventListener('keydown', (e) => {
+    modalEl.addEventListener('keydown', (e) => {
+        if (['Escape', 'ArrowLeft', 'ArrowRight'].includes(e.key)) { e.preventDefault(); e.stopPropagation(); }
         if (!modalEl || modalEl.style.display === 'none') return;
         if (e.key === 'Escape') hideOnboardingModal(true);
         const rtl = document.documentElement?.dir === 'rtl';
@@ -144,6 +146,15 @@ function buildModal() {
 }
 
 function renderStep() {
+    clearTarget();
+    highlighted = document.getElementById(TARGETS[currentStep]);
+    if (highlighted) {
+        for (let el = highlighted.parentElement; el; el = el.parentElement) {
+            if (el.tagName === 'DETAILS' && !el.open) { openedDetails.push(el); el.open = true; }
+        }
+        highlighted.classList.add('whiteboard-tour-target');
+        highlighted.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
     const step = STEPS[currentStep];
     modalEl.querySelector('#whiteboard-onboarding-icon').textContent = step.icon;
     modalEl.querySelector('#whiteboard-onboarding-title').textContent = step.title;
@@ -152,6 +163,7 @@ function renderStep() {
     modalEl.querySelector('#whiteboard-onboarding-back').style.visibility = currentStep === 0 ? 'hidden' : 'visible';
     modalEl.querySelector('#whiteboard-onboarding-next').textContent = currentStep === STEPS.length - 1 ? 'Done' : 'Next';
     const dots = modalEl.querySelector('#whiteboard-onboarding-dots');
+    dots.setAttribute('aria-label', `Step ${currentStep + 1} of ${STEPS.length}`);
     dots.innerHTML = STEPS.map((_, i) => `
         <span style="width:6px;height:6px;border-radius:50%;display:inline-block;
             background:${i === currentStep ? 'var(--gold, #d4af37)' : 'var(--border, #444)'};"></span>
