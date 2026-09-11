@@ -58,6 +58,16 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.1.8] - 2026-09-11
+
+### Fixed
+- correct core skills and add First Play Kit resources
+
+### Other
+- Documentation consistency sweep.
+- Worldbook and regional updates
+- Worldbook and regional updates
+
 ## [5.1.7] - 2026-09-11
 
 Improve onboarding, guided session setup, and recoverable room joins.
