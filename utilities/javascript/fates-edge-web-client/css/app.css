@@ -1340,3 +1340,17 @@ select {
         margin-top: 0.1rem;
     }
 }
+
+
+/* Bestiary details keep the Encounters page visible beneath a native dialog. */
+dialog.creature-detail-dialog {
+    margin: auto;
+    width: min(600px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    box-sizing: border-box;
+    color: var(--text);
+}
+dialog.creature-detail-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}

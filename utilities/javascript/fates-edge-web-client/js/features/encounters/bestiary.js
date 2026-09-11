@@ -769,14 +769,14 @@ export function showCreatureDetail(entry, { readOnly = false } = {}) {
     const description = getCreatureDescription(entry);
     const lore = entry.lore ? formatText(entry.lore) : '';
 
-    // Inline editor screen — takes over the bestiary view in place instead
-    // of floating above it as a pop-up.
-    const overlay = document.createElement('div');
-    overlay.className = 'editor-screen-host';
+    // Keep the encounter list and its scroll position intact beneath the dialog.
+    const overlay = document.createElement('dialog');
+    overlay.className = 'modal creature-detail-dialog';
+    overlay.setAttribute('aria-label', name);
 
     overlay.innerHTML = `
-        <div class="editor-screen" style="max-width:600px;margin:0 auto;">
-            <button class="btn btn-secondary editor-back creature-detail-close" data-i18n="feature.encounters.bestiary.back">← Back</button>
+        <div style="max-width:600px;margin:0 auto;">
+            <button type="button" class="btn btn-secondary creature-detail-close" autofocus data-i18n="feature.encounters.bestiary.back">← Back</button>
             <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 ${escHtml(name)}
                 ${entry.tl ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tl}</span>` : ''}
@@ -801,16 +801,16 @@ export function showCreatureDetail(entry, { readOnly = false } = {}) {
         </div>
     `;
 
-    const hostContainer = document.getElementById('app-content') || document.body;
-    const hiddenSiblings = Array.from(hostContainer.children).map(element => ({ element, display: element.style.display }));
-    hiddenSiblings.forEach(({ element }) => { element.style.display = 'none'; });
-    hostContainer.appendChild(overlay);
-    window.scrollTo({ top: 0 });
-
-    const closeDetail = () => {
-        overlay.remove();
-        hiddenSiblings.forEach(({ element, display }) => { element.style.display = display; });
-    };
+    document.body.appendChild(overlay);
+    overlay.addEventListener('close', () => overlay.remove(), { once: true });
+    const closeDetail = () => overlay.close();
+    overlay.addEventListener('click', event => {
+        if (event.target !== overlay) return;
+        const bounds = overlay.getBoundingClientRect();
+        if (event.clientX < bounds.left || event.clientX > bounds.right ||
+            event.clientY < bounds.top || event.clientY > bounds.bottom) closeDetail();
+    });
+    overlay.showModal();
 
     overlay.querySelector('.creature-detail-close').addEventListener('click', closeDetail);
     if (readOnly) {
@@ -834,8 +834,8 @@ export function showCreatureDetail(entry, { readOnly = false } = {}) {
     });
 
     overlay.querySelector('.open-tracker-from-detail').addEventListener('click', () => {
+        closeDetail();
         openTrackerForCreature(entry);
-        overlay.remove();
     });
 
     overlay.querySelectorAll('.sb-spend-btn').forEach(btn => {
