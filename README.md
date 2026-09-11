@@ -1,4 +1,4 @@
-[![Build Apps and Packages](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml/badge.svg)](https://github.com/Chronophage-net/fates-edge-apps/actions/workflows/build-apps-and-packages.yml)
+[Developer portal — fates-edge-dev](https://github.com/Chronophage-net/fates-edge-dev)
 
 # Fate's Edge Toolkit
 

@@ -1,3 +1,7 @@
+## Developer portal link — 2026-09-11
+
+- Add Developer Portal link to README and Developer Portal note to CONTRIBUTING.md pointing to the developer portal and the fates-edge-ai-gm-bot companion repo. This helps contributors find canonical docs and coordinate cross-repo changes.
+
 ## Epic campaigns and Legacy — 2026-09-10
 
 - Expand Epic Play with systemic pressure, declared campaign reviews, Tier IV/V advice, institutional projects, a worked campaign, and GM/player records.
