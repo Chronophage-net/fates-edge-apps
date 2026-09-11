@@ -16,7 +16,7 @@ def fix_file(filepath):
             raw = f.read()
         # Find the start of the first JSON value
         decoder = json.JSONDecoder()
-        obj, end_idx = decoder.raw_decode(raw)
+        obj = json.loads(raw)
         # Now obj is the first JSON object/array, end_idx is where it ended
         if isinstance(obj, dict):
             obj["_license"] = LICENSE
@@ -33,8 +33,27 @@ def fix_file(filepath):
     except Exception as e:
         print(f"Error processing {filepath}: {e}", file=sys.stderr)
 
-for root, _, files in os.walk("."):
-    for f in files:
-        if f.lower().endswith(".json"):
-            path = os.path.join(root, f)
-            fix_file(path)
+EXCLUDED = {"node_modules", ".git", "venv", ".venv", "dist", "build", "coverage", "vendor", "site-packages"}
+
+
+def license_tree(directory):
+    """Only walk explicitly selected first-party data; never follow dependency trees."""
+    from pathlib import Path
+    base = Path(directory).resolve()
+    if any(part in EXCLUDED for part in base.parts):
+        raise ValueError("Refusing to stamp third-party or generated files")
+    for root, dirs, files in os.walk(base, followlinks=False):
+        dirs[:] = [name for name in dirs if name not in EXCLUDED and not Path(root, name).is_symlink()]
+        for name in files:
+            path = Path(root, name)
+            if path.is_symlink() or name in {"package.json", "package-lock.json", "manifest.json"}:
+                continue
+            if name.lower().endswith(".json"):
+                fix_file(path)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        sys.exit("Usage: add-copyright-to-json.py FIRST_PARTY_DATA_DIRECTORY [...]. Review schema compatibility before wrapping arrays.")
+    for directory in sys.argv[1:]:
+        license_tree(directory)

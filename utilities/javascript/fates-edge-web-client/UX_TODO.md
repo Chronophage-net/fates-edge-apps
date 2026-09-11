@@ -60,3 +60,7 @@ Overlapping Socket.IO joins now receive JOIN_IN_PROGRESS and can retry after the
 The guided UI and error formatter are shipped. Full browser-to-browser testing against hosted managed infrastructure remains an operational acceptance check; no hosted credentials were used. Other UX backlog items remain open as recorded above.
 
 Release validation: client 289/289; server 219/220, with the existing optional ioredis import failure; production build passes. Local two-client recovery passes.
+
+### Redis failure resolved
+
+The copyright tool had injected project metadata into installed `@ioredis/commands` data. Removed that injected key locally; the dependency code is unchanged. The tool now requires explicit data paths and excludes dependency/generated directories, symlinks, and package/manifest files. A regression test verifies those boundaries. All 220 server tests now pass, with no skips; this supersedes the earlier Redis limitation. Client checks remain 289/289. Fresh installations use the original package data.

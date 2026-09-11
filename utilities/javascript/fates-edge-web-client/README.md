@@ -235,4 +235,4 @@ See the printable [Paper Import Reference](data/docs/resources/Paper-Import-Refe
 
 The web client offers a focused Join a session flow, explicit starter-roster setup, and actionable connection errors. Socket.IO validates a destination before leaving the current room and rejects overlapping joins with `JOIN_IN_PROGRESS`; retry after the active request finishes. Bad destination passwords retain existing membership. Password whitespace is preserved.
 
-Validated with two real local Socket.IO clients, 289 client tests, and a production build. The server suite passes 219 of 220 tests in this environment; optional Redis initialization fails because ioredis cannot import. Hosted managed-room acceptance remains separate from local transport verification.
+Validated with two real local Socket.IO clients, 289 client tests, and a production build. All 220 server tests pass, including Redis initialization. The copyright tool now excludes dependencies; its accidental metadata injection into the installed Redis command table has been repaired. Hosted managed-room acceptance remains separate from local transport verification.

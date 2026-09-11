@@ -67,7 +67,7 @@ Improve onboarding, guided session setup, and recoverable room joins.
 - Consolidate theme tokens and repair RTL toast/mobile navigation styling.
 - Validate admission before leaving a room; reject overlapping joins and recheck capacity after asynchronous validation.
 - Provide stable admission codes and actionable retry guidance; preserve password whitespace.
-- Verify rejected switches and retries with two real local Socket.IO clients. The optional Redis test remains failing here because ioredis throws during import; no Redis scaling validation is claimed.
+- Verify rejected switches and retries with two real local Socket.IO clients. All 220 server tests pass, including Redis initialization (not a live multi-instance Redis deployment). Restrict copyright stamping to explicitly selected data directories and exclude dependencies, generated trees, symlinks, and package/manifest files. Repair the locally injected metadata that broke the Redis command table.
 
 ### Other
 - Fixed bestiary display and socket-server/client handshake issue for wss connections
