@@ -48,6 +48,8 @@ describe('RTL layout: source guard', () => {
         assertTrue(css.includes('[dir="rtl"] select { background-position: left'), 'select arrow should move to the inline end');
         assertTrue(css.includes('[dir="rtl"] .toast'), 'toast motion should enter and leave from the RTL edge');
         assertTrue(css.includes('[dir="rtl"] .nav-item:hover'), 'navigation hover motion should follow writing direction');
-        assertTrue(css.includes('[dir="rtl"] .bestiary-entry:hover'), 'list hover motion should follow writing direction');
+        const encounters = sources.find(item => item.file === 'js/features/encounters/index.js')?.source || '';
+        const hover = encounters.match(/\.bestiary-entry:hover\s*\{([^}]+)\}/)?.[1] || '';
+        assertTrue(!hover.includes('translateX') || css.includes('[dir="rtl"] .bestiary-entry:hover'), 'horizontal list hover motion needs an RTL counterpart');
     });
 });

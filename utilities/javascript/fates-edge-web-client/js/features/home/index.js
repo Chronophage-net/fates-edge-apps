@@ -1,3 +1,4 @@
+import { parsePregens, findExistingPregen } from './pregens.js';
 /**
  * Home feature module – Modern Reactive Landing Page
  * Provides a scrollable, single-page introduction to the game.
@@ -769,7 +770,7 @@ function injectStyles() {
       to { opacity: 1; transform: scale(1); }
     }
     .welcome-card {
-      background: var(--bg1); color: var(--text);
+      background: var(--bg); color: var(--text);
       max-width: 640px; width: 100%; max-height: 90vh;
       padding: 2rem; border-radius: 16px;
       border: 1px solid var(--border);
@@ -854,12 +855,13 @@ function showWelcomeOverlay() {
       <span style="font-size:2.6rem;color:var(--gold-dark);" aria-hidden="true">&#10022;</span>
       <h1 data-i18n="feature.home.welcomeToFateSEdge">Welcome to Fate's Edge</h1>
       <p style="color:var(--text2);font-size:1.05rem;margin:0;">
-        Read first, or sit down and play.
+        Try a starter adventure, join your group, or explore the rules.
       </p>
 
       <div class="welcome-docs">
         <p style="margin:0;font-weight:500;">The short ways in:</p>
         <ul>
+          <li><a href="/data/docs/resources/Reading-Guide.html" target="_blank" rel="noopener noreferrer">Reading guide</a> — where to find rules, setting, and table aids</li>
           <li><a href="/data/docs/resources/Fates_-_Edge_-_-Essentials.html" target="_blank" rel="noopener noreferrer">Essentials</a> — enough rules to begin</li>
           <li><a href="/data/docs/resources/Fates_-_Edge_-_-Playing-_-and-_-Running-_-Fate's-_-Edge.html" target="_blank" rel="noopener noreferrer">Playing &amp; Running Fate's Edge</a> — the complete rules</li>
           <li><a href="${CAMPFIRE_DOC_URL}" target="_blank" rel="noopener noreferrer">Campfire Mode</a> — a short version to print and pass around</li>
@@ -870,28 +872,40 @@ function showWelcomeOverlay() {
         <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">
           Start The Lantern at Dusk
         </button>
-        <p class="welcome-subtext">Loads a short one-shot and a ready-made character.</p>
+        <p class="welcome-subtext">Adds the starter adventure and the full ready-made character roster to this browser. Existing starter characters are kept. No account is needed to try it.</p>
+        <button class="btn btn-secondary" data-action="join-session">Join a session</button>
+        <p class="welcome-subtext">Have your host’s server address and room details ready. Choose server and campaign details, or paste a managed-room connection.</p>
         <button class="btn btn-secondary" data-action="dismiss-welcome">
           Take me to the toolkit
         </button>
       </div>
-      <p class="welcome-footer">You can return to this screen from Settings.</p>
+      <p class="welcome-footer">Solo work is saved in this browser. Use Export Data to keep a backup before changing devices or clearing browser data. Return here from Settings → Show Welcome Card.</p>
     </div>
   `;
 
   // Inline screen — takes over the home view in place instead of floating
   // above it as a pop-up.
   const hostContainer = document.getElementById('app-content') || document.body;
-  const welcomeHiddenSiblings = Array.from(hostContainer.children);
-  welcomeHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+  const welcomeHiddenSiblings = Array.from(hostContainer.children).map(element => ({ element, display: element.style.display }));
+  welcomeHiddenSiblings.forEach(({ element }) => { element.style.display = 'none'; });
+  overlay.restoreWelcomeView = () => welcomeHiddenSiblings.forEach(({ element, display }) => { element.style.display = display; });
   hostContainer.appendChild(overlay);
   window.scrollTo({ top: 0 });
 
   const closeWelcome = () => {
     overlay.remove();
     overlayShown = false;
-    welcomeHiddenSiblings.forEach(ch => { ch.style.display = ''; });
+    welcomeHiddenSiblings.forEach(({ element, display }) => { element.style.display = display; });
   };
+
+  const heading = overlay.querySelector('h1');
+  heading.tabIndex = -1;
+  heading.focus();
+  overlay.querySelector('[data-action="join-session"]')?.addEventListener('click', () => {
+    closeWelcome();
+    markWelcomeSeen();
+    window.location.hash = '#join';
+  });
 
   // Event listeners
   const quickBtn = overlay.querySelector('[data-action="quick-start"]');
@@ -918,6 +932,10 @@ function showWelcomeOverlay() {
 async function runQuickStart(overlayEl) {
   if (quickStartInFlight) return;
   quickStartInFlight = true;
+  const button = overlayEl?.querySelector('[data-action="quick-start"]');
+  const originalLabel = button?.textContent;
+  if (button) { button.disabled = true; button.textContent = 'Preparing your adventure…'; }
+  overlayEl?.setAttribute('aria-busy', 'true');
   try {
     const result = await quickStart();
     if (result && overlayEl?.isConnected) {
@@ -925,6 +943,8 @@ async function runQuickStart(overlayEl) {
     }
   } finally {
     quickStartInFlight = false;
+    overlayEl?.removeAttribute('aria-busy');
+    if (button?.isConnected) { button.disabled = false; button.textContent = originalLabel; }
   }
 }
 
@@ -952,13 +972,27 @@ function renderQuickStartConfirmation(overlayEl, { character, adventure }) {
       <button class="btn btn-gold btn-large" data-action="enter-game" style="font-weight:700;border-width:2px;">
         Enter the Game
       </button>
+      <button class="btn btn-secondary" data-setup-route="characters">Read your character</button>
+      <button class="btn btn-secondary" data-setup-route="dice">Make a practice roll</button>
+      <p class="welcome-subtext">The character roster contains the ready-made characters. The dice roller lets you try the core mechanic before opening a scene.</p>
     </div>
   `;
+  const confirmationHeading = card.querySelector('h1');
+  confirmationHeading.tabIndex = -1;
+  confirmationHeading.focus();
+  card.querySelectorAll('[data-setup-route]').forEach(button => {
+    button.addEventListener('click', () => {
+      overlayEl.remove();
+      overlayShown = false;
+      overlayEl.restoreWelcomeView?.();
+      markWelcomeSeen();
+      window.location.hash = button.dataset.setupRoute;
+    });
+  });
   card.querySelector('[data-action="enter-game"]')?.addEventListener('click', () => {
     overlayEl.remove();
     overlayShown = false;
-    const hostContainer = document.getElementById('app-content') || document.body;
-    Array.from(hostContainer.children).forEach(ch => { ch.style.display = ''; });
+    overlayEl.restoreWelcomeView?.();
     markWelcomeSeen();
     window.location.hash = 'adventure-manager';
   });
@@ -1012,7 +1046,7 @@ async function quickStart() {
             const loaded = await advModule.loadAdventureFromFile('lantern_at_dusk');
             if (!loaded) {
                 console.error('[QuickStart] loadAdventureFromFile failed.');
-                showToast(i18nText("feature.home.couldNotLoadTheStarterAdventureCheck", null, "Could not load the starter adventure. Check that lantern_at_dusk.json exists in /data/adventures/."), 'error');
+                showToast(i18nText("feature.home.couldNotLoadTheStarterAdventureCheck", null, "The starter adventure could not load. Check your connection and try again, or open Adventure Manager to choose an adventure."), 'error');
                 return null;
             }
             // Re-fetch state after load
@@ -1040,11 +1074,11 @@ async function quickStart() {
         try {
             const response = await fetch(PREGENS_URL);
             if (response.ok) {
-                const chars = await response.json();
+                const chars = parsePregens(await response.json());
                 if (Array.isArray(chars) && chars.length > 0) {
                     let added = 0;
                     chars.forEach(char => {
-                        const existing = state.characters.find(c => c.name === char.name);
+                        const existing = findExistingPregen(state.characters, char);
                         if (!existing) {
                             if (!char.id) char.id = 'pregen-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
                             state.characters.push(char);
@@ -1066,7 +1100,8 @@ async function quickStart() {
             }
         } catch (e) {
             console.warn('[QuickStart] Pre‑gen load error:', e);
-            // Non‑fatal — the adventure can still start without a character.
+            showToast('The adventure is available, but starter characters could not load. Retry when connected, or create a character from Characters.', 'warning');
+            // Non-fatal: the adventure remains usable without a pregen.
         }
 
         // 4. Start the adventure
@@ -1075,7 +1110,7 @@ async function quickStart() {
         console.log('[QuickStart] startAdventure returned:', started);
         if (!started) {
             console.error('[QuickStart] startAdventure failed.');
-            showToast(i18nText("feature.home.failedToStartAdventureCheckConsoleFor", null, "Failed to start adventure. Check console for errors."), 'error');
+            showToast(i18nText("feature.home.failedToStartAdventureCheckConsoleFor", null, "The adventure could not start. Try again, or open Adventure Manager to continue setup."), 'error');
             return null;
         }
 

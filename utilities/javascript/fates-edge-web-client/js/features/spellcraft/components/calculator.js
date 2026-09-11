@@ -680,7 +680,7 @@ async function renderCalculator(el) {
                     <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                         <div style="flex:1;min-width:120px;position:relative;">
                             <input type="text" id="tags-input" placeholder="Type a tag..." style="width:100%;font-size:0.85rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.25rem 0.5rem;color:var(--text);" / data-i18n-attr="placeholder:feature.spellcraft.components.calculator.typeATag">
-                            <div id="tag-suggestions" style="position:absolute;top:100%;inset-inline:0;background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);max-height:150px;overflow-y:auto;display:none;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
+                            <div id="tag-suggestions" style="position:absolute;top:100%;inset-inline:0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);max-height:150px;overflow-y:auto;display:none;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                         </div>
                         <button class="btn btn-sm btn-primary" id="add-tag-btn" data-i18n="feature.spellcraft.components.calculator.add">➕ Add</button>
                     </div>
@@ -1053,7 +1053,7 @@ function showToastWithHTML(html, type = 'info') {
     `;
     const inner = document.createElement('div');
     inner.style.cssText = `
-        background: var(--bg1); padding: 1.2rem; border-radius: var(--radius);
+        background: var(--bg); padding: 1.2rem; border-radius: var(--radius);
         max-width: 420px; width: 90vw; border: 1px solid var(--border);
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;

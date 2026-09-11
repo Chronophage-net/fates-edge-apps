@@ -2055,7 +2055,7 @@ function buildAdventureDetailHtml(adventure) {
             <div>
                 <span style="font-weight:600;font-size:0.8rem;">${escHtml(creature.name)}</span>
                 ${creature.tl ? `<span style="font-size:0.6rem;color:var(--red);">TL${creature.tl}</span>` : ''}
-                ${creature.class ? `<span style="font-size:0.6rem;color:var(--accent);">${escHtml(creature.class)}</span>` : ''}
+                ${creature.class ? `<span style="font-size:0.6rem;color:var(--gold);">${escHtml(creature.class)}</span>` : ''}
                 ${creature.category ? `<span style="font-size:0.6rem;color:var(--text3);">${escHtml(creature.category)}</span>` : ''}
                 ${creature.description ? `<div style="font-size:0.65rem;color:var(--text2);">${escHtml(creature.description.slice(0,60))}${creature.description.length>60?'…':''}</div>` : ''}
             </div>
@@ -2072,7 +2072,7 @@ function buildAdventureDetailHtml(adventure) {
         ? `${gmHints.tone.slice(0, 140)}${gmHints.tone.length > 140 ? '…' : ''}`
         : '';
     const gmHintsHtml = (canEdit && gmHints) ? `
-        <div class="panel" style="border-inline-start:2px solid var(--accent);">
+        <div class="panel" style="border-inline-start:2px solid var(--gold);">
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.gmHints">🧭 GM Hints</h4>
                 <button class="btn btn-xs btn-secondary" onclick="window.adventureOpenGmHints('${adventure.id}')">Expand ↗</button>

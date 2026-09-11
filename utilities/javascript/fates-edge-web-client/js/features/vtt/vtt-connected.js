@@ -2018,7 +2018,7 @@ export function render(el) {
         <div class="vtt-card-header">
             <span class="vtt-card-title" data-i18n="feature.vtt.vtt-connected.tableStatus">🛰️ Table Status</span>
             <span class="vtt-stat-pill">
-            <span class="vtt-dot connection-status" style="background:${isConnected ? 'var(--vtt-green)' : 'var(--vtt-red)'};"></span>
+            <span class="vtt-dot connection-status" style="background:${isConnected ? 'var(--green)' : 'var(--red)'};"></span>
             ${isConnected ? '🟢 Connected' : '🔴 Disconnected'}
             </span>
         </div>
@@ -2042,14 +2042,14 @@ export function render(el) {
             </div>
         </div>
         <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.5rem;">
-            <span style="font-size:0.9rem;color:var(--vtt-text3);">🎤</span>
-            <div style="flex:1;height:6px;background:var(--vtt-surface2);border-radius:3px;overflow:hidden;">
-            <div id="voice-activity-bar" style="width:0%;height:100%;background:var(--vtt-gold);border-radius:3px;transition:width 0.1s;"></div>
+            <span style="font-size:0.9rem;color:var(--text3);">🎤</span>
+            <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;">
+            <div id="voice-activity-bar" style="width:0%;height:100%;background:var(--gold);border-radius:3px;transition:width 0.1s;"></div>
             </div>
-            <span style="font-size:0.8rem;color:var(--vtt-text3);" id="voice-activity-label">idle</span>
+            <span style="font-size:0.8rem;color:var(--text3);" id="voice-activity-label">idle</span>
         </div>
         <div id="voice-clients-list" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
-            ${voiceClients.length === 0 ? '<span style="color:var(--vtt-text3);font-size:0.9rem;">No other voice clients.</span>' : voiceClientsHtml}
+            ${voiceClients.length === 0 ? '<span style="color:var(--text3);font-size:0.9rem;">No other voice clients.</span>' : voiceClientsHtml}
         </div>
         <div class="vtt-divider"></div>
         <div class="vtt-card-header" style="margin-bottom:0.35rem;">
@@ -2064,7 +2064,7 @@ export function render(el) {
         <div class="panel vtt-card gm-panel gm-panel--compact">
         <div class="vtt-card-header">
             <span class="vtt-card-title">👑 Game Master
-            <span id="gm-display" style="font-weight:600;font-size:0.95rem;color:var(--vtt-text2);">${gmState.currentGmName || 'None'}</span>
+            <span id="gm-display" style="font-weight:600;font-size:0.95rem;color:var(--text2);">${gmState.currentGmName || 'None'}</span>
             <span id="gm-role-badge" class="vtt-stat-pill gm-badge">${gmState.myRole === 'gm' ? 'You are GM' : 'Player'}</span>
             </span>
             <span id="gm-actions" class="vtt-btn-row">
@@ -2098,7 +2098,7 @@ export function render(el) {
                  screen readers announce each new chat message as it's appended,
                  with no JS changes needed to chatHandler below -- the standard
                  ARIA pattern for a persistently-visible, append-only log. -->
-            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);" data-i18n-attr="aria-label:feature.vtt.vtt-connected.chatMessages"></div>
+            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--bg3);border-radius:calc(var(--radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);" data-i18n-attr="aria-label:feature.vtt.vtt-connected.chatMessages"></div>
             <div id="selected-character-display" class="vtt-speaking-as"></div>
             <div class="chat-input-row" style="display:flex;gap:0.4rem;">
             <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /deck, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" / data-i18n-attr="placeholder:feature.vtt.vtt-connected.typeRollTimerDeckHelp">

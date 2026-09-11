@@ -248,7 +248,7 @@ function injectDashboardStyles() {
             top: 0;
             inset-inline: 0;
             height: 2px;
-            background: linear-gradient(90deg, var(--gold), var(--accent), var(--gold));
+            background: linear-gradient(90deg, var(--gold), var(--gold), var(--gold));
             opacity: 0.3;
         }
         
@@ -345,7 +345,7 @@ function injectDashboardStyles() {
             align-items: center;
             text-align: center;
             color: var(--text);
-            font-family: var(--font);
+            font-family: var(--font-ui);
         }
         
         .quick-action-btn:hover {

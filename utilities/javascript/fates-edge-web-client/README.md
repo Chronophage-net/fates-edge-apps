@@ -229,3 +229,10 @@ Before submitting a change: run the test suite, update this README or `DESIGN.md
 In **Settings → Data Management → Import from Paper**, paste a transcribed sheet, preview the entries and any OCR repairs, then import. The shared plain-text format supports character creation, exact-ID character updates, new timers, and journal entries. It uses existing campaign sync and queues offline changes. Image recognition and chat commands are future extensions.
 
 See the printable [Paper Import Reference](data/docs/resources/Paper-Import-Reference.html) for all fields and examples. The pure parser lives in `js/core/paper-import.js` for future client adapters.
+
+
+### 5.1.7: onboarding and connection recovery
+
+The web client offers a focused Join a session flow, explicit starter-roster setup, and actionable connection errors. Socket.IO validates a destination before leaving the current room and rejects overlapping joins with `JOIN_IN_PROGRESS`; retry after the active request finishes. Bad destination passwords retain existing membership. Password whitespace is preserved.
+
+Validated with two real local Socket.IO clients, 289 client tests, and a production build. The server suite passes 219 of 220 tests in this environment; optional Redis initialization fails because ioredis cannot import. Hosted managed-room acceptance remains separate from local transport verification.

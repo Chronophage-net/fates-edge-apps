@@ -2,6 +2,8 @@
    THEME SYSTEM – Color Tokens & Theme Switching
    ============================================================ */
 :root {
+    --font-ui: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-code: ui-monospace, SFMono-Regular, Consolas, monospace;
     /* Base palette (dark) */
     --bg: #0f1117;
     --bg2: #161823;
@@ -170,7 +172,7 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 body {
-    font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-ui);
     background: var(--bg-main);
     color: var(--text-main);
     line-height: 1.6;
@@ -1041,6 +1043,7 @@ select {
     pointer-events: auto;
     animation: slideInRight 0.3s ease-out;
 }
+[dir="rtl"] .toast { animation-name: slideInLeft; }
 .toast.success { border-inline-start-color: var(--accent-green); }
 .toast.error { border-inline-start-color: var(--accent-red); }
 .toast-info { border-inline-start-color: var(--blue); }
@@ -1126,7 +1129,7 @@ select {
 @media (prefers-color-scheme: dark) {
     .srd-book,
     .srd-book body {
-        background: var(--bg1, #0d0d1a);
+        background: var(--bg, #0d0d1a);
         color: var(--text, #e8e8f0);
     }
 
@@ -1313,8 +1316,7 @@ select {
         align-items: center;
         position: fixed;
         bottom: 0;
-        left: 0;
-        right: 0;
+        inset-inline: 0;
         background: var(--bg-glass);
         backdrop-filter: blur(8px);
         border-top: 1px solid var(--border);
@@ -1354,3 +1356,6 @@ dialog.creature-detail-dialog::backdrop {
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
 }
+
+/* Guided setup hides alternate forms even when they normally use flex/grid. */
+.settings-layout [hidden] { display: none !important; }

@@ -1,3 +1,4 @@
+import { connectionFeedback } from '@core/connection-feedback.js';
 /**
  * Settings Module – Data management, sync, preferences
  * 
@@ -1419,7 +1420,7 @@ async function logoutAccount() {
 async function connectToSyncServer() {
     const serverUrl = document.getElementById('sync-server-url')?.value.trim() || DEFAULT_SERVER_URL;
     const campaignCode = document.getElementById('sync-campaign-code')?.value.trim().toUpperCase();
-    const password = document.getElementById('sync-password')?.value.trim();
+    const password = document.getElementById('sync-password')?.value;
     const userName = document.getElementById('sync-user-name')?.value.trim() || 'Player';
     const userEmail = document.getElementById('sync-user-email')?.value.trim() || '';
     const userRole = document.getElementById('sync-user-role')?.value || 'player';
@@ -1454,7 +1455,7 @@ async function connectToSyncServer() {
         showToast(i18nText("feature.settings.connectedToCampaign", null, "Connected to campaign!"), 'success');
     } catch (e) {
         if (statusEl) {
-            statusEl.textContent = `❌ ${e.message}`;
+            statusEl.textContent = `❌ ${connectionFeedback(e)}`;
             statusEl.className = 'sync-status disconnected';
         }
         showToast(i18nText("feature.settings.connectionFailedValue", { value0: e.message }, "Connection failed: {{value0}}"), 'error');
@@ -2386,7 +2387,7 @@ function openLicenseModal() {
     const content = document.getElementById('licenseContent');
     if (content) {
         content.innerHTML = `
-            <div style="font-family:var(--font-mono);white-space:pre-wrap;font-size:0.85rem;line-height:1.6;color:var(--text2);">
+            <div style="font-family:var(--font-code);white-space:pre-wrap;font-size:0.85rem;line-height:1.6;color:var(--text2);">
                 ${LICENSE_TEXT}
             </div>
         `;
@@ -2400,7 +2401,7 @@ function openLicenseSummaryModal() {
     const content = document.getElementById('licenseContent');
     if (content) {
         content.innerHTML = `
-            <div style="font-family:var(--font-mono);white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:var(--text2);">
+            <div style="font-family:var(--font-code);white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:var(--text2);">
                 ${LICENSE_SUMMARY}
             </div>
         `;
@@ -2446,3 +2447,65 @@ onWSEvent('disconnected', () => {
     const status = document.getElementById('managed-room-status');
     if (status && status.textContent) status.textContent = 'Disconnected. If your connection expired, get a new one from the manager.';
 });
+
+
+/** Focused setup uses the same form and handlers as Settings, not a second connection client. */
+export function showConnectionSetup(host) {
+    const panel = host.querySelector('#sync-panel');
+    if (!panel || host.querySelector('.connection-setup-header')) return;
+    const siblings = Array.from(panel.parentElement.children)
+        .filter(element => element !== panel && element.tagName !== 'STYLE')
+        .map(element => ({ element, hidden: element.hidden }));
+    siblings.forEach(({ element }) => { element.hidden = true; });
+    const header = document.createElement('section');
+    header.className = 'panel connection-setup-header';
+    header.innerHTML = `
+        <h1>Join your table</h1>
+        <p>Choose the connection details your host gave you. Your local work stays in this browser.</p>
+        <div class="flex" role="group" aria-label="Connection method">
+            <button class="btn btn-primary" data-join-method="server" aria-pressed="true">Server and campaign code</button>
+            <button class="btn btn-secondary" data-join-method="managed" aria-pressed="false">Managed room connection</button>
+        </div>
+        <p><a href="#vtt">Return to the table</a> · <button class="btn btn-sm btn-secondary" data-all-settings>Show all settings</button></p>`;
+    panel.before(header);
+    const managed = panel.querySelector('#managed-room-panel');
+    const serverFields = panel.querySelector('#sync-server-url')?.closest('.form-row');
+    const serverActions = panel.querySelector('#sync-connect-btn')?.parentElement;
+    const original = [managed, serverFields, serverActions].filter(Boolean)
+        .map(element => ({ element, hidden: element.hidden }));
+    const managedOpen = managed?.open;
+    const setMethod = method => {
+        if (managed) { managed.hidden = method !== 'managed'; managed.open = method === 'managed'; }
+        if (serverFields) serverFields.hidden = method !== 'server';
+        if (serverActions) serverActions.hidden = method !== 'server';
+        header.querySelectorAll('[data-join-method]').forEach(button => {
+            const selected = button.dataset.joinMethod === method;
+            button.setAttribute('aria-pressed', String(selected));
+            button.classList.toggle('btn-primary', selected);
+            button.classList.toggle('btn-secondary', !selected);
+        });
+    };
+    header.querySelectorAll('[data-join-method]').forEach(button => {
+        button.addEventListener('click', () => setMethod(button.dataset.joinMethod));
+    });
+    header.querySelector('[data-all-settings]').addEventListener('click', () => {
+        [...siblings, ...original].forEach(({ element, hidden }) => { element.hidden = hidden; });
+        if (managed) managed.open = managedOpen;
+        header.remove();
+        const heading = host.querySelector('h1, h2, h3');
+        if (heading) { heading.tabIndex = -1; heading.focus(); }
+    });
+    for (const id of ['sync-user-name', 'sync-user-email', 'sync-server-url', 'sync-campaign-code', 'sync-password']) {
+        const input = panel.querySelector('#' + id);
+        const label = input?.closest('.field')?.querySelector('label');
+        if (label) label.htmlFor = id;
+    }
+    for (const id of ['sync-status', 'managed-room-status']) {
+        const status = panel.querySelector('#' + id);
+        if (status) { status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite'); }
+    }
+    setMethod('server');
+    const heading = header.querySelector('h1');
+    heading.tabIndex = -1;
+    heading.focus();
+}

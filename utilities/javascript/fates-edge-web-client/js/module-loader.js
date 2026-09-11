@@ -238,8 +238,8 @@ class ModuleLoader {
         } catch (error) {
             console.error(`Failed to render module "${moduleName}":`, error);
             setHtml(container, `
-                <div class="panel" style="border-inline-start:4px solid var(--danger);">
-                    <h3 style="color:var(--danger);" data-i18n="feature.module-loader.errorLoadingModule">❌ Error loading module</h3>
+                <div class="panel" style="border-inline-start:4px solid var(--red);">
+                    <h3 style="color:var(--red);" data-i18n="feature.module-loader.errorLoadingModule">❌ Error loading module</h3>
                     <p class="text-muted">${error.message || 'Unknown error'}</p>
                     <pre style="font-size:0.7rem;background:var(--bg3);padding:0.5rem;overflow:auto;max-height:150px;">${error.stack || ''}</pre>
                     <button class="btn btn-primary mt-1" onclick="window.moduleLoader?.retryModule('${moduleName}')">

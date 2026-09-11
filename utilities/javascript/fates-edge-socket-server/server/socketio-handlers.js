@@ -170,6 +170,12 @@ function setupSocketIO(io, appConfig) {
         // features to build on, though live GM election behavior itself
         // is unchanged.
         socket.on('join-room', async (data) => {
+            if (socket.joinInProgress) {
+                socket.emit('error', { code: 'JOIN_IN_PROGRESS', message: 'A room join is already in progress. Wait for its result before retrying.' });
+                return;
+            }
+            socket.joinInProgress = true;
+            try {
             // Flexible payload: accept either clientData object or flat fields
             const {
                 roomCode,
@@ -182,7 +188,7 @@ function setupSocketIO(io, appConfig) {
             } = data || {};
 
             if (!roomCode || !room.validateRoomCode(roomCode)) {
-                socket.emit('error', { message: 'Invalid room code' });
+                socket.emit('error', { message: 'Invalid room code. Check the code supplied by your host.', code: 'ROOM_CODE_INVALID' });
                 return;
             }
             let roomKey = roomCode.toUpperCase();
@@ -192,36 +198,11 @@ function setupSocketIO(io, appConfig) {
                 if (socket.managerJoining) return;
                 socket.managerJoining = true;
                 try { managerClaims = await ioConfig.manager.verify(data.roomToken, roomKey); }
-                catch { socket.emit('error', { message: 'Managed room access rejected' }); socket.managerJoining = false; return; }
+                catch { socket.emit('error', { message: 'Managed room access rejected. Get a fresh connection from the manager and try again.', code: 'MANAGED_ACCESS_REJECTED' }); socket.managerJoining = false; return; }
                 socket.managerJoining = false;
-                socket.managerCleanup?.();
-                socket.managerClaims = managerClaims;
-                socket.managerCleanup = ioConfig.manager.track(managerClaims, () => socket.disconnect(true));
-                socket.once('disconnect', () => socket.managerCleanup?.());
+
             }
             const authUser = managerClaims ? { userId: managerClaims.sub, username: playerName } : auth.verifyTokenOptional(authToken);
-
-            // Leave previous room
-            if (socket.room) {
-                socket.leave(socket.room);
-                const oldRoom = room.rooms.get(socket.room);
-                if (oldRoom) {
-                    const wasGm = oldRoom.clients.get(socket.id)?.role === 'gm';
-                    oldRoom.clients.delete(socket.id);
-                    const oldClientsList = room.getClientsList(oldRoom);
-                    room.broadcastToRoom(socket.room, 'player-left', {
-                        clientId: socket.id,
-                        clientName: socket.clientData?.name || 'Player',
-                        clients: oldClientsList
-                    }, socket.id);
-                    if (wasGm) {
-                        room.broadcastToRoom(socket.room, 'server_announcement', {
-                            message: 'The Game Master has disconnected.',
-                            timestamp: Date.now()
-                        }, socket.id);
-                    }
-                }
-            }
 
             let currentRoom = room.rooms.get(roomKey);
             if (!currentRoom) {
@@ -230,7 +211,7 @@ function setupSocketIO(io, appConfig) {
             }
 
             const sideAccess = sideTasks.access(currentRoom, authUser, data);
-            if (!sideAccess.allowed) return socket.emit('error', { message: 'Not invited to this side task' });
+            if (!sideAccess.allowed) return socket.emit('error', { message: 'Not invited to this side task. Ask the host for an invitation.', code: 'ROOM_INVITATION_REQUIRED' });
 
             // NEW: rooms are deleted from the in-memory Map whenever they
             // go empty (see the disconnect handler below) and rebuilt
@@ -253,23 +234,15 @@ function setupSocketIO(io, appConfig) {
 
             // Ban check (ephemeral, by socket id -- unaffected by accounts)
             if (room.isBanned(currentRoom, socket.id)) {
-                socket.emit('error', { message: 'You are banned from this room.' });
-                socket.disconnect(true);
+                socket.emit('error', { message: 'You are banned from this room.', code: 'ROOM_BANNED' });
+                if (!socket.room || socket.room === currentRoom.room_id) socket.disconnect(true);
                 return;
             }
 
-            // NEW: per-room client cap (MAX_CLIENTS_PER_ROOM, 0/unset =
-            // unlimited, unchanged default behavior). Checked before the
-            // password check below so a full room rejects immediately
-            // rather than doing a bcrypt compare first. This client's OWN
-            // previous connection (if any, handled by the "leave previous
-            // room" block above) has already been removed from whichever
-            // room it was in, so a client re-joining the SAME room via a
-            // fresh reconnect isn't double-counted against a stale entry
-            // from itself -- only genuinely distinct connections count.
-            if (ioConfig.maxClientsPerRoom > 0 && currentRoom.clients.size >= ioConfig.maxClientsPerRoom) {
+            // A same-socket rejoin already occupies a seat; new members obey the cap.
+            if (ioConfig.maxClientsPerRoom > 0 && currentRoom.clients.size >= ioConfig.maxClientsPerRoom && !currentRoom.clients.has(socket.id)) {
                 socket.emit('error', { message: 'This room is full.', code: 'ROOM_FULL' });
-                socket.disconnect(true);
+                if (!socket.room || socket.room === currentRoom.room_id) socket.disconnect(true);
                 return;
             }
 
@@ -278,8 +251,8 @@ function setupSocketIO(io, appConfig) {
             if (!managerClaims && authUser && hasAccountSupport()) {
                 try {
                     if (await storage.isMemberBanned(roomKey, authUser.userId)) {
-                        socket.emit('error', { message: 'You are banned from this room.' });
-                        socket.disconnect(true);
+                        socket.emit('error', { message: 'You are banned from this room.', code: 'ROOM_BANNED' });
+                        if (!socket.room || socket.room === currentRoom.room_id) socket.disconnect(true);
                         return;
                     }
                     membership = await storage.getMembership(roomKey, authUser.userId);
@@ -295,9 +268,44 @@ function setupSocketIO(io, appConfig) {
             if (currentRoom.password && !membership) {
                 const ok = await auth.verifyPassword(password, currentRoom.password);
                 if (!ok) {
-                    socket.emit('error', { message: 'Incorrect room password.' });
-                    socket.disconnect(true);
+                    socket.emit('error', { message: 'Incorrect room password. Check it with your host and try again.', code: 'ROOM_PASSWORD_INVALID' });
+                    if (!socket.room || socket.room === currentRoom.room_id) socket.disconnect(true);
                     return;
+                }
+            }
+
+            // Password/membership checks can yield; another client may have taken the last seat.
+            if (ioConfig.maxClientsPerRoom > 0 && currentRoom.clients.size >= ioConfig.maxClientsPerRoom && !currentRoom.clients.has(socket.id)) {
+                socket.emit('error', { code: 'ROOM_FULL', message: 'This room is full. Ask the host to free a seat before retrying.' });
+                return;
+            }
+            // Admission succeeded: only now replace the previous room membership.
+            if (socket.disconnected) return;
+            if (managerClaims) {
+                socket.managerCleanup?.();
+                socket.managerClaims = managerClaims;
+                socket.managerCleanup = ioConfig.manager.track(managerClaims, () => socket.disconnect(true));
+                socket.once('disconnect', () => socket.managerCleanup?.());
+            }
+            // Leave previous room
+            if (socket.room) {
+                socket.leave(socket.room);
+                const oldRoom = room.rooms.get(socket.room);
+                if (oldRoom) {
+                    const wasGm = oldRoom.clients.get(socket.id)?.role === 'gm';
+                    oldRoom.clients.delete(socket.id);
+                    const oldClientsList = room.getClientsList(oldRoom);
+                    room.broadcastToRoom(socket.room, 'player-left', {
+                        clientId: socket.id,
+                        clientName: socket.clientData?.name || 'Player',
+                        clients: oldClientsList
+                    }, socket.id);
+                    if (wasGm) {
+                        room.broadcastToRoom(socket.room, 'server_announcement', {
+                            message: 'The Game Master has disconnected.',
+                            timestamp: Date.now()
+                        }, socket.id);
+                    }
                 }
             }
 
@@ -418,6 +426,12 @@ function setupSocketIO(io, appConfig) {
                 role: socket.clientData.role,
                 clients: clientsList
             }, socket.id);
+            } catch (error) {
+                logger.warn('Room join failed', { name: error?.name });
+                socket.emit('error', { code: 'ROOM_JOIN_FAILED', message: 'The room could not be joined. Try again or contact the host.' });
+            } finally {
+                socket.joinInProgress = false;
+            }
         });
 
         // ─── Character selection ───────────────────────────────────

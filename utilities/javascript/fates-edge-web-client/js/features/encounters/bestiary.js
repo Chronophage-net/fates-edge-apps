@@ -266,7 +266,7 @@ function formatSBMove(move) {
             font-size:0.8rem;
         ">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:0.4rem;">
-                <strong style="color:var(--danger);">${escHtml(name)}</strong>
+                <strong style="color:var(--red);">${escHtml(name)}</strong>
                 <button class="btn btn-xs btn-danger sb-spend-btn" data-cost="${cost}" data-label="${escHtml(name)}" title="Spend ${cost} SB">
                     ${cost} SB
                 </button>
@@ -790,7 +790,7 @@ export function showCreatureDetail(entry, { readOnly = false } = {}) {
             ${summonerHtml}
             ${wikiLink}
             <div style="margin-top:0.6rem;border-top:1px solid var(--border);padding-top:0.6rem;">
-                <h4 style="margin:0 0 0.4rem 0;color:var(--danger);" data-i18n="feature.encounters.bestiary.storyBeatMoves">⚡ Story Beat Moves</h4>
+                <h4 style="margin:0 0 0.4rem 0;color:var(--red);" data-i18n="feature.encounters.bestiary.storyBeatMoves">⚡ Story Beat Moves</h4>
                 ${sbMovesHtml}
             </div>
             <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">

@@ -281,7 +281,7 @@ export async function render(el) {
                 font-size: 0.75rem;
             }
             .sb-move-card .cost {
-                color: var(--danger);
+                color: var(--red);
                 font-weight: 700;
             }
             .creature-tag {
@@ -293,12 +293,12 @@ export async function render(el) {
                 white-space: nowrap;
             }
             .tl-badge {
-                background: var(--danger-soft, var(--bg2));
-                color: var(--danger);
+                background: var(--red-glow, var(--bg2));
+                color: var(--red);
             }
             .class-badge {
-                background: var(--accent-soft, var(--bg2));
-                color: var(--accent);
+                background: var(--gold-glow, var(--bg2));
+                color: var(--gold);
             }
             .scale-table {
                 font-size: 0.7rem;

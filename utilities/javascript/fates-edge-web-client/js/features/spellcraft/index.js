@@ -332,7 +332,7 @@ function ensureStyles() {
             cursor: pointer;
         }
         .path-finder-card .path-choose-btn:hover {
-            background: var(--gold-hover);
+            background: var(--gold-light);
         }
 
         .path-finder-header {
@@ -388,7 +388,7 @@ function ensureStyles() {
             border-color: var(--gold);
         }
         .spellcraft-path-select option {
-            background: var(--bg1);
+            background: var(--bg);
             color: var(--text);
         }
 
@@ -404,7 +404,7 @@ function ensureStyles() {
             to { opacity: 1; transform: scale(1); }
         }
         .magic-tour-card {
-            background: var(--bg1); color: var(--text);
+            background: var(--bg); color: var(--text);
             max-width: 740px; width: 100%; max-height: 90vh;
             padding: 2rem; border-radius: 16px;
             border: 1px solid var(--border);
@@ -510,7 +510,7 @@ function ensureStyles() {
             cursor: pointer;
         }
         .magic-tour-card .tour-nav .tour-choose:hover {
-            background: var(--gold-hover);
+            background: var(--gold-light);
         }
         .magic-tour-card .tour-nav .tour-skip {
             color: var(--text3);

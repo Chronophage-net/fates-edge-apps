@@ -1,5 +1,7 @@
 # Fate's Edge Web Client – Implementation Roadmap (Archived)
 
+Current onboarding and usability work: [UX_TODO.md](UX_TODO.md).
+
 > **Status: fully shipped.** This was the original file-by-file implementation plan for bridging "The Lantern at Dusk" with automated *Essentials* mechanics. Every item below has since been built and verified against the current codebase (checked 2026-08-12, toolkit v4.8.3). Kept for historical reference — for what's actually still open, see the root [README's Roadmap section](../../../README.md#-roadmap), which is the maintained source of truth.
 
 ---

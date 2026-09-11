@@ -199,3 +199,10 @@ Environment variables (see `env-example.md` for the full list, `.env.example` fo
 
 **Enjoy your games!**
 — Nick Gasper
+
+
+### 5.1.7: onboarding and connection recovery
+
+The web client offers a focused Join a session flow, explicit starter-roster setup, and actionable connection errors. Socket.IO validates a destination before leaving the current room and rejects overlapping joins with `JOIN_IN_PROGRESS`; retry after the active request finishes. Bad destination passwords retain existing membership. Password whitespace is preserved.
+
+Validated with two real local Socket.IO clients, 289 client tests, and a production build. The server suite passes 219 of 220 tests in this environment; optional Redis initialization fails because ioredis cannot import. Hosted managed-room acceptance remains separate from local transport verification.

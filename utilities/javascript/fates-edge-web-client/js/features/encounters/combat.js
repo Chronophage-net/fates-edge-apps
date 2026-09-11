@@ -611,7 +611,7 @@ function renderTracker() {
         // ─── Armor & fatigue display ──────────────────────────────
         let armorLabel = '';
         if (c.armorType && c.armorType !== 'none') {
-            armorLabel = `<span style="font-size:0.6rem;background:rgba(100,180,255,0.15);color:var(--accent);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">🛡️ ${escHtml(c.armorType)}</span>`;
+            armorLabel = `<span style="font-size:0.6rem;background:rgba(100,180,255,0.15);color:var(--gold);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">🛡️ ${escHtml(c.armorType)}</span>`;
         }
         let fatigueLabel = '';
         if (c.fatigue > 0) {
@@ -687,7 +687,7 @@ function renderTracker() {
                                 transition: color 0.3s ease;
                             ">${escHtml(c.name)}</span>
                             ${c.tl !== undefined ? `<span class="creature-tag" style="font-size:0.62rem;background:rgba(255,100,100,0.15);color:var(--red);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">TL${c.tl}</span>` : ''}
-                            ${c.class ? `<span class="creature-tag" style="font-size:0.62rem;background:rgba(100,180,255,0.15);color:var(--accent);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">Class ${escHtml(c.class)}</span>` : ''}
+                            ${c.class ? `<span class="creature-tag" style="font-size:0.62rem;background:rgba(100,180,255,0.15);color:var(--gold);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">Class ${escHtml(c.class)}</span>` : ''}
                             ${c.category ? `<span class="badge badge-${getCategoryBadgeColor(c.category)}" style="font-size:0.55rem;flex-shrink:0;">${escHtml(c.category)}</span>` : ''}
                             ${armorLabel}
                             ${fatigueLabel}
@@ -861,7 +861,7 @@ function renderTracker() {
             <!-- Story Beats Panel -->
             <div style="background:var(--bg3);padding:1rem;border-radius:12px;margin-bottom:1.25rem;border:1px solid var(--border);">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.6rem;">
-                    <h3 style="margin:0;color:var(--danger);" data-i18n="feature.encounters.combat.storyBeats">⚡ Story Beats</h3>
+                    <h3 style="margin:0;color:var(--red);" data-i18n="feature.encounters.combat.storyBeats">⚡ Story Beats</h3>
                     <div style="display:flex;align-items:center;gap:0.3rem;">
                         <span style="font-size:0.8rem;color:var(--text2);">Bank:</span>
                         <button class="btn btn-xs btn-ghost sb-minus" style="font-weight:bold;">−</button>
@@ -1286,7 +1286,7 @@ async function importFromBestiary() {
                 <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                     <strong style="font-size:0.9rem;">${escHtml(c.name)}</strong>
                     ${c.tl !== undefined ? `<span style="font-size:0.65rem;color:var(--red);">TL${c.tl}</span>` : ''}
-                    ${c.class ? `<span style="font-size:0.65rem;color:var(--accent);">Class ${escHtml(c.class)}</span>` : ''}
+                    ${c.class ? `<span style="font-size:0.65rem;color:var(--gold);">Class ${escHtml(c.class)}</span>` : ''}
                     ${c.category ? `<span class="badge badge-${getCategoryBadgeColor(c.category)}" style="font-size:0.6rem;color:white;">${escHtml(c.category)}</span>` : ''}
                 </div>
                 <span style="font-size:0.75rem;color:var(--text3);max-width:220px;overflow:hidden;text-overflow:ellipsis;">

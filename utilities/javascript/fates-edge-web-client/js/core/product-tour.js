@@ -66,8 +66,8 @@ function injectStyles() {
       bottom: clamp(1rem, 3vw, 2.25rem);
       z-index: 12000;
       width: min(25rem, calc(100vw - 2rem));
-      color: var(--text-primary, #f4eee1);
-      background: color-mix(in srgb, var(--surface, #17181c) 94%, transparent);
+      color: var(--text, #f4eee1);
+      background: color-mix(in srgb, var(--bg2, #17181c) 94%, transparent);
       border: 1px solid var(--gold, #c9a227);
       border-radius: 12px;
       box-shadow: 0 22px 70px rgba(0, 0, 0, .55);

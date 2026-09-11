@@ -383,7 +383,7 @@ export default {
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--text);
-            font-family: var(--font);
+            font-family: var(--font-ui);
             font-size: 0.95rem;
             transition: border-color 0.2s;
         }
@@ -395,7 +395,7 @@ export default {
             box-shadow: 0 0 0 3px var(--gold-glow);
         }
         #wiki-editor-modal .form-group textarea {
-            font-family: var(--font-mono, monospace);
+            font-family: var(--font-code, monospace);
             font-size: 0.9rem;
             line-height: 1.6;
             resize: vertical;

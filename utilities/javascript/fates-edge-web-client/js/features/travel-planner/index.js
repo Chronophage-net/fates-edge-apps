@@ -1262,7 +1262,7 @@ export async function render(el) {
                 </div>
                 <div id="travel-journey-legs" style="margin-top:0.5rem;"></div>
                 <div id="travel-journey-synthesis" style="margin-top:0.8rem;background:var(--bg3);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);white-space:pre-wrap;"></div>
-                <div id="travel-timer-result" style="margin-top:0.5rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--accent);"></div>
+                <div id="travel-timer-result" style="margin-top:0.5rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);"></div>
                 <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
                     <button class="btn btn-sm btn-primary" id="travel-add-timer-btn" data-i18n="feature.travel-planner.addTimer">⏱️ Add Timer</button>
                     <button class="btn btn-sm btn-secondary" id="travel-copy-btn" data-i18n="feature.travel-planner.copySummary">📋 Copy Summary</button>

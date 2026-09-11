@@ -58,6 +58,20 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.1.7] - 2026-09-11
+
+Improve onboarding, guided session setup, and recoverable room joins.
+
+- Load licensed starter-character bundles, preserve renamed pregens, and offer character/practice-roll shortcuts.
+- Add focused connection setup, accessible status feedback, and local-backup guidance.
+- Consolidate theme tokens and repair RTL toast/mobile navigation styling.
+- Validate admission before leaving a room; reject overlapping joins and recheck capacity after asynchronous validation.
+- Provide stable admission codes and actionable retry guidance; preserve password whitespace.
+- Verify rejected switches and retries with two real local Socket.IO clients. The optional Redis test remains failing here because ioredis throws during import; no Redis scaling validation is claimed.
+
+### Other
+- Fixed bestiary display and socket-server/client handshake issue for wss connections
+
 ## [5.1.6] - 2026-09-11
 
 ### Other

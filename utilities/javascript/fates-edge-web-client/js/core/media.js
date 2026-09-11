@@ -83,7 +83,7 @@ function createOverlay() {
         color: #fff;
         padding: 8px 16px;
         border-radius: 8px;
-        font-family: var(--font, system-ui);
+        font-family: inherit;
         font-size: 14px;
         font-weight: 600;
         display: none;

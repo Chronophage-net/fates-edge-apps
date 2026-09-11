@@ -657,7 +657,7 @@ function createCharacterSummary(char) {
     // Build the HTML
     const div = document.createElement('div');
     div.className = 'char-summary';
-    div.style.cssText = 'padding:0.4rem 0.6rem;font-size:0.75rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;background:var(--bg1);';
+    div.style.cssText = 'padding:0.4rem 0.6rem;font-size:0.75rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;background:var(--bg);';
 
     const harmColor = harm === 0 ? 'var(--green)' : harm === 1 ? 'var(--gold)' : harm === 2 ? 'var(--orange)' : 'var(--red)';
     const obligColor = obligInfo.doubleCapacity ? 'var(--red)' : obligInfo.overCapacity ? 'var(--orange)' : 'var(--text2)';

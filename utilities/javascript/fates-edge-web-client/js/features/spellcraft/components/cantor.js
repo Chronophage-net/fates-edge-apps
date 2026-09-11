@@ -1292,7 +1292,7 @@ function showToastWithHTML(html, type = 'info') {
     `;
     const inner = document.createElement('div');
     inner.style.cssText = `
-        background: var(--bg1); padding: 1.2rem; border-radius: var(--radius);
+        background: var(--bg); padding: 1.2rem; border-radius: var(--radius);
         max-width: 420px; width: 90vw; border: 1px solid var(--border);
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;

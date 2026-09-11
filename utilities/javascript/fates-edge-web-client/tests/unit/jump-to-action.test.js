@@ -1,3 +1,4 @@
+import { parsePregens } from '../../js/features/home/pregens.js';
 import { describe, it, assert } from '../runner.js';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,12 +25,12 @@ describe('Jump to the Action: pre-gen data', () => {
     it('data/pre-gens.json exists and is valid JSON (regression: this file never existed before)', () => {
         assert(fs.existsSync(pregensPath), 'data/pre-gens.json should exist');
         const raw = fs.readFileSync(pregensPath, 'utf8');
-        const parsed = JSON.parse(raw);
+        const parsed = parsePregens(JSON.parse(raw));
         assert(Array.isArray(parsed) && parsed.length > 0, 'pre-gens.json should be a non-empty array');
     });
 
     it('every pregen has the fields quickStart()/the character roster depend on', () => {
-        const chars = JSON.parse(fs.readFileSync(pregensPath, 'utf8'));
+        const chars = parsePregens(JSON.parse(fs.readFileSync(pregensPath, 'utf8')));
         for (const c of chars) {
             assert(typeof c.id === 'string' && c.id.length > 0, `pregen missing id: ${JSON.stringify(c).slice(0, 80)}`);
             assert(typeof c.name === 'string' && c.name.length > 0, `pregen missing name: ${c.id}`);
@@ -40,7 +41,7 @@ describe('Jump to the Action: pre-gen data', () => {
     });
 
     it('exactly one pregen is flagged as the "Jump to the Action" default character', () => {
-        const chars = JSON.parse(fs.readFileSync(pregensPath, 'utf8'));
+        const chars = parsePregens(JSON.parse(fs.readFileSync(pregensPath, 'utf8')));
         const featured = chars.filter(c => c.recommendedFor === 'Jump to the Action');
         assert(featured.length === 1, `expected exactly 1 featured pregen, found ${featured.length}`);
     });
@@ -92,5 +93,34 @@ describe('Jump to the Action: welcome overlay wiring (source guard)', () => {
 
     it('quickStart() returns a result object instead of navigating directly, so the overlay can show its own confirmation step', () => {
         assert(/return \{ character: featuredCharacter, adventure \};/.test(homeSrc));
+    });
+});
+
+describe('Starter pack compatibility', () => {
+    it('accepts the licensed envelope and legacy arrays without changing characters', () => {
+        const character = { name: 'Traveler', skills: { lore: 1 }, talents: [] };
+        assert(parsePregens({ _license: 'notice', data: [character] })[0] === character);
+        assert(parsePregens([character])[0] === character);
+    });
+    it('rejects malformed packs so setup can show an actionable warning', () => {
+        for (const payload of [null, {}, { data: [] }, { data: [null, { name: 'Incomplete' }] }]) {
+            let rejected = false;
+            try { parsePregens(payload); } catch { rejected = true; }
+            assert(rejected, 'invalid pack must not silently succeed');
+        }
+    });
+});
+
+describe('Starter roster identity', () => {
+    it('recognizes a renamed starter character by stable ID', async () => {
+        const { findExistingPregen } = await import('../../js/features/home/pregens.js');
+        const renamed = { id: 'pregen-kessa', name: 'My own Kessa' };
+        assert(findExistingPregen([renamed], { id: 'pregen-kessa', name: 'Kessa' }) === renamed);
+    });
+    it('does not overwrite another character just because the names match', async () => {
+        const { findExistingPregen } = await import('../../js/features/home/pregens.js');
+        assert(!findExistingPregen([{ id: 'custom', name: 'Kessa' }], { id: 'pregen-kessa', name: 'Kessa' }));
+        const legacy = { name: 'Kessa' };
+        assert(findExistingPregen([legacy], { id: 'pregen-kessa', name: 'Kessa' }) === legacy);
     });
 });

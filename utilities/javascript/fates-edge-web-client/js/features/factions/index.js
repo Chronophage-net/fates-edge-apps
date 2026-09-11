@@ -513,7 +513,7 @@ function renderShell() {
                 <p class="factions-subtitle" data-i18n="feature.factions.manageFactionsAssetsFollowersAndTrusts">Manage factions, assets, followers, and trusts.</p>
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading faction data...</p>' :
                   `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.factions.length} factions, ${state.assets.length} assets, ${state.followers.length} followers</p>`}
-                ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ No faction files found – using fallback defaults.</div>` : ''}
+                ${usingFallback ? `<div style="color:var(--orange);font-size:0.85rem;margin-top:0.3rem;">⚠️ No faction files found – using fallback defaults.</div>` : ''}
             </header>
 
             <div class="factions-tabs">

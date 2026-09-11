@@ -1167,7 +1167,7 @@ function renderCampaignView() {
                         <button class="btn btn-sm btn-danger" onclick="window.clearSessionLog()" data-i18n="feature.gm-tools.clear">🗑️ Clear</button>
                     </div>
                 </div>
-                <div id="session-log-container" class="mt-1 panel" style="max-height:250px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;">
+                <div id="session-log-container" class="mt-1 panel" style="max-height:250px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-code); font-size: 0.85rem;">
                     ${sessionLog.length === 0 ? '<span class="text-muted text-sm">No events logged yet.</span>' : 
                         sessionLog.map(entry => `
                             <div style="padding:0.2rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;">
@@ -1302,7 +1302,7 @@ function renderSessionView() {
             
             <div class="panel">
                 <h3 class="panel-title" data-i18n="feature.gm-tools.sessionLog">📋 Session Log</h3>
-                <div id="session-log-display" class="mt-1 panel" style="max-height:200px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;">
+                <div id="session-log-display" class="mt-1 panel" style="max-height:200px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-code); font-size: 0.85rem;">
                     ${sessionLog.length === 0 ? '<span class="text-muted text-sm">No events logged yet.</span>' : 
                         sessionLog.map(entry => `
                             <div style="padding:0.2rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;">
@@ -1316,7 +1316,7 @@ function renderSessionView() {
             
             <div class="panel">
                 <h3 class="panel-title" data-i18n="feature.gm-tools.vttEvents">🎬 VTT Events</h3>
-                <div id="vtt-events-display" class="mt-1 panel" style="max-height:150px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;">
+                <div id="vtt-events-display" class="mt-1 panel" style="max-height:150px; overflow-y:auto; background:var(--bg2); padding: 0.5rem; font-family: var(--font-code); font-size: 0.85rem;">
                     ${vttEvents.length === 0 ? '<span class="text-muted text-sm">No VTT events captured.</span>' : 
                         vttEvents.slice().reverse().map(evt => `
                             <div style="padding:0.2rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;">

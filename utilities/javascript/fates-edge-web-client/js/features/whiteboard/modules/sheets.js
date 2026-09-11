@@ -131,7 +131,7 @@ export function renderSheetTabs() {
         <span class="wb-sheet-tab ${s.id === state.activeSheetId ? 'active' : ''}" data-sheet-id="${s.id}"
               style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px 6px 0 0;
                      cursor:pointer;font-size:0.78rem;margin-inline-end:2px;
-                     background:${s.id === state.activeSheetId ? 'var(--panel-2, #24242e)' : 'transparent'};
+                     background:${s.id === state.activeSheetId ? 'var(--bg3, #24242e)' : 'transparent'};
                      border:1px solid var(--border); border-bottom:${s.id === state.activeSheetId ? 'none' : '1px solid var(--border)'};
                      color:${s.id === state.activeSheetId ? 'var(--gold)' : 'var(--text3)'};">
             <span class="wb-sheet-tab-name">${escHtml(s.name)}</span>

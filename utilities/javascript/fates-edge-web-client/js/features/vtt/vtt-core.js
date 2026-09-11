@@ -426,9 +426,9 @@ export function renderChat() {
                     <div style="font-size:1.1rem;">No messages yet</div>
                     <div style="font-size:0.9rem;margin-top:0.3rem;">
                         ${isConnected ? `🌐 Connected to server${roomCode ? ` (${roomCode})` : ''}` : '📡 Messages stay local'}
-                        <span style="color:var(--text4);margin-inline-start:0.3rem;">via ${mode}</span>
+                        <span style="color:var(--text3);margin-inline-start:0.3rem;">via ${mode}</span>
                     </div>
-                    <div style="font-size:0.8rem;margin-top:0.5rem;color:var(--text4);">
+                    <div style="font-size:0.8rem;margin-top:0.5rem;color:var(--text3);">
                         Type /help for commands
                     </div>
                 </div>
@@ -597,7 +597,7 @@ function renderSuggestionDetails(suggestionData) {
         return `
             <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
                 <span class="outcome-tag" style="font-weight:600;">${outcomeLabel}</span>
-                <span style="margin-inline-start:0.4rem;color:var(--text4);">[${kindLabel}]</span>
+                <span style="margin-inline-start:0.4rem;color:var(--text3);">[${kindLabel}]</span>
                 ${previewHtml}
             </div>
         `;
@@ -605,7 +605,7 @@ function renderSuggestionDetails(suggestionData) {
 
     return `
         <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;border:1px solid var(--gold);font-size:0.85rem;">
-            <div><span style="color:var(--text4);">[${kindLabel}]</span> pending GM approval</div>
+            <div><span style="color:var(--text3);">[${kindLabel}]</span> pending GM approval</div>
             ${previewHtml}
             <div style="margin-top:0.4rem;display:flex;gap:0.4rem;">
                 <button class="btn btn-xs" data-suggestion-id="${escHtml(id)}" data-suggestion-action="approve" style="color:var(--green);border-color:var(--green);">✅ Approve</button>

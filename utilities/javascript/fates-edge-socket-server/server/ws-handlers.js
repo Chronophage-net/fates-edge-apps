@@ -82,6 +82,7 @@ function setupWSS(wss, appConfig) {
                 if (ws.readyState !== WebSocket.OPEN) return;
                 ws.once('close', wssConfig.manager.track(ws.managerClaims, () => ws.close(4003, 'Room credential expired or revoked')));
             } catch {
+                if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'error', code: 'MANAGED_ACCESS_REJECTED', message: 'Get a fresh room connection from the manager and try again.' }));
                 ws.close(4003, 'Managed room access rejected');
                 return;
             }
@@ -92,7 +93,7 @@ function setupWSS(wss, appConfig) {
             currentRoom = room.rooms.get(roomKey) || room.createRoom(roomKey);
         } catch (err) {
             logger.warn('🚫 Rejected connection with invalid room code', { roomKey, error: err.message });
-            ws.send(JSON.stringify({ type: 'error', message: 'Invalid room code format.' }));
+            ws.send(JSON.stringify({ type: 'error', code: 'ROOM_CODE_INVALID', message: 'Invalid room code format.' }));
             ws.close(4000, 'Invalid room code');
             return;
         }
@@ -103,7 +104,7 @@ function setupWSS(wss, appConfig) {
         // Check ban
         if (room.isBanned(currentRoom, clientId)) {
             logger.warn('🚫 Banned client attempted connection', { clientId, room: roomKey });
-            ws.send(JSON.stringify({ type: 'error', message: 'You are banned from this room.' }));
+            ws.send(JSON.stringify({ type: 'error', code: 'ROOM_BANNED', message: 'You are banned from this room.' }));
             ws.close(4002, 'Banned');
             return;
         }
@@ -981,7 +982,7 @@ async function handleHandshake(ws, roomState, data) {
     if (!managerClaims && authUser && hasAccountSupport()) {
         try {
             if (await storage.isMemberBanned(roomState.code, authUser.userId)) {
-                ws.send(JSON.stringify({ type: 'error', message: 'You are banned from this room.' }));
+                ws.send(JSON.stringify({ type: 'error', code: 'ROOM_BANNED', message: 'You are banned from this room.' }));
                 ws.close(4002, 'Banned');
                 return;
             }

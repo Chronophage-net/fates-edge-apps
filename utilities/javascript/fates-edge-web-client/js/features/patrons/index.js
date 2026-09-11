@@ -629,7 +629,7 @@ export function render(el) {
                 <h1 class="patrons-title" data-i18n="feature.patrons.patrons">👁️ Patrons</h1>
                 <p class="patrons-subtitle" data-i18n="feature.patrons.thePowersHousesAndFaithsThatMay">The powers, houses, and faiths that may put a claim on a character.</p>
                 ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading data...</p>' : `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial, ${state.religions.length} religions</p>`}
-                ${usingFallback ? `<div style="color:var(--warn);font-size:0.85rem;margin-top:0.3rem;">⚠️ Using fallback defaults for some data.</div>` : ''}
+                ${usingFallback ? `<div style="color:var(--orange);font-size:0.85rem;margin-top:0.3rem;">⚠️ Using fallback defaults for some data.</div>` : ''}
             </header>
  
             <div class="patrons-tabs" style="display:flex;gap:0.3rem;margin-bottom:0.5rem;flex-wrap:wrap;">
@@ -1022,7 +1022,7 @@ window.openPatronDetailModal = function(patronId) {
     const sectionsHtml = buildPatronSections(patron);
  
     modal.innerHTML = `
-        <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
+        <div class="modal-content patron-detail" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; background:var(--bg); padding:1.5rem; border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float: inline-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
  
             <!-- Header -->
@@ -1577,7 +1577,7 @@ window.openTerrestrialDetailModal = function(id) {
     const tier = safeString(patron.tier || 'I');
  
     modal.innerHTML = `
-        <div class="modal-content patron-detail" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; background:var(--bg1); padding:1.5rem; border-radius:var(--radius);">
+        <div class="modal-content patron-detail" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; background:var(--bg); padding:1.5rem; border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float: inline-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
             <div class="patron-detail-header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
                 <div style="font-size:3rem;">${escHtml(icon)}</div>

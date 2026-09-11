@@ -35,6 +35,7 @@ import { announce } from './core/a11y-announce.js';
 
 // Route redirects for backward compatibility
 export const ROUTE_REDIRECTS = {
+    'join': 'settings',
     'consequences': 'decks',
     'builder': 'characters',
     'regional': 'decks',
@@ -130,7 +131,7 @@ export async function navigate(tab, options = {}) {
         if (window.location.hash) {
             window.history.replaceState(null, '', `#${resolved}`);
         }
-        return navigate(resolved, { ...options, _fromRedirect: true });
+        return navigate(resolved, { ...options, connectionSetup: options.connectionSetup || tab === 'join', _fromRedirect: true });
     }
 
     // NEW: feature-access backstop — see file header note.
@@ -196,6 +197,10 @@ export async function navigate(tab, options = {}) {
     // Delegate rendering to moduleLoader
     try {
         await moduleLoader.renderModule(resolved, contentEl);
+        if (options.connectionSetup) {
+            const settings = await import('./features/settings/index.js');
+            settings.showConnectionSetup(contentEl);
+        }
         activeCallbacks.forEach(cb => cb(resolved, moduleLoader.getModule(resolved)));
         if (isRedirect) {
             showToast(i18nText("feature.router.redirectedToValue", { value0: resolved }, "↪️ Redirected to {{value0}}"), 'info');

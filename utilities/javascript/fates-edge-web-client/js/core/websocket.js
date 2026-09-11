@@ -1,3 +1,4 @@
+import { connectionFeedback } from './connection-feedback.js';
 /**
  * WebSocket Client Module
  * Handles real-time communication with the server
@@ -752,7 +753,7 @@ function handleWebSocketMessage(data) {
         case 'error':
             triggerEvent('error', data);
             if (data.message) {
-                showToast(data.message, 'error');
+                showToast(connectionFeedback(data), 'error');
             }
             break;
             
@@ -1032,8 +1033,8 @@ export function initSocketIO(serverUrl = null, options = {}) {
                 
                 socket.on('error', (error) => {
                     console.error('Socket.io error:', error);
-                    triggerEvent('error', { error });
-                    showToast(error.message || 'Server error', 'error');
+                    triggerEvent('error', { ...error, error, message: connectionFeedback(error) });
+                    showToast(connectionFeedback(error), 'error');
                 });
                 
                 setupSocketIOListeners();

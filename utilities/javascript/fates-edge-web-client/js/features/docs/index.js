@@ -1751,7 +1751,7 @@ function injectThemeAndStyles(content, docPath) {
 
     return `
         <div class="integrated-document ${themeClass}" style="
-            font-family: var(--font, 'Georgia', serif);
+            font-family: var(--font-ui, 'Georgia', serif);
             line-height: 1.7;
             color: var(--text, #222);
             background: var(--bg, #fafaf6);

@@ -406,7 +406,7 @@ export async function renderSummoning(el) {
         <div id="summoning-container" class="summoning-container" style="display:flex;flex-direction:column;gap:0.5rem;">
 
             <!-- ─── Header ─────────────────────────────────────── -->
-            <div class="summoning-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;background:linear-gradient(135deg, var(--bg2) 0%, var(--bg1) 100%);border-radius:var(--radius) var(--radius) 0 0;padding:0.3rem 0.8rem;">
+            <div class="summoning-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;background:linear-gradient(135deg, var(--bg2) 0%, var(--bg) 100%);border-radius:var(--radius) var(--radius) 0 0;padding:0.3rem 0.8rem;">
                 <div style="display:flex;align-items:center;gap:0.4rem;">
                     <span style="font-size:1.4rem;">👁️</span>
                     <div>
@@ -1052,7 +1052,7 @@ function showToastWithHTML(html, type = 'info') {
     `;
     const inner = document.createElement('div');
     inner.style.cssText = `
-        background: var(--bg1); padding: 1.5rem; border-radius: var(--radius);
+        background: var(--bg); padding: 1.5rem; border-radius: var(--radius);
         max-width: 420px; width: 90vw; border: 1px solid var(--border);
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         max-height: 60vh; overflow-y: auto;

@@ -114,7 +114,7 @@ function renderEditor(encounter) {
             <input type="hidden" class="adv-stats" value="${attr(JSON.stringify(a.stats || {}))}" />
             <input type="hidden" class="adv-sb-spends" value="${attr(JSON.stringify(a.sb_spends || []))}" />
             ${a.tl !== undefined ? `<span class="badge" style="font-size:0.65rem;background:rgba(255,100,100,0.15);color:var(--red);padding:0.05rem 0.4rem;border-radius:10px;">TL${a.tl}</span>` : ''}
-            ${a.class ? `<span class="badge" style="font-size:0.65rem;background:rgba(100,180,255,0.15);color:var(--accent);padding:0.05rem 0.4rem;border-radius:10px;">Class ${attr(a.class)}</span>` : ''}
+            ${a.class ? `<span class="badge" style="font-size:0.65rem;background:rgba(100,180,255,0.15);color:var(--gold);padding:0.05rem 0.4rem;border-radius:10px;">Class ${attr(a.class)}</span>` : ''}
             ${a.category ? `<span class="badge badge-${getCategoryBadgeColor(a.category)}" style="font-size:0.65rem;color:white;padding:0.05rem 0.4rem;border-radius:10px;">${escHtml(a.category)}</span>` : ''}
             <button class="btn btn-xs btn-danger adv-remove" data-index="${i}">✕</button>
         </div>
@@ -318,7 +318,7 @@ async function importFromBestiary() {
                 <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                     <strong style="font-size:0.9rem;">${escHtml(c.name)}</strong>
                     ${c.tl !== undefined ? `<span style="font-size:0.65rem;color:var(--red);">TL${c.tl}</span>` : ''}
-                    ${c.class ? `<span style="font-size:0.65rem;color:var(--accent);">Class ${escHtml(c.class)}</span>` : ''}
+                    ${c.class ? `<span style="font-size:0.65rem;color:var(--gold);">Class ${escHtml(c.class)}</span>` : ''}
                     ${c.category ? `<span class="badge badge-${getCategoryBadgeColor(c.category)}" style="font-size:0.6rem;color:white;">${escHtml(c.category)}</span>` : ''}
                 </div>
                 <span style="font-size:0.75rem;color:var(--text3);max-width:220px;overflow:hidden;text-overflow:ellipsis;">
@@ -346,7 +346,7 @@ async function importFromBestiary() {
                     <input type="hidden" class="adv-stats" value="${attr(JSON.stringify(entry.stats || {}))}" />
                     <input type="hidden" class="adv-sb-spends" value="${attr(JSON.stringify(entry.sb_spends || []))}" />
                     ${entry.tl !== undefined ? `<span class="badge" style="font-size:0.65rem;background:rgba(255,100,100,0.15);color:var(--red);padding:0.05rem 0.4rem;border-radius:10px;">TL${entry.tl}</span>` : ''}
-                    ${entry.class ? `<span class="badge" style="font-size:0.65rem;background:rgba(100,180,255,0.15);color:var(--accent);padding:0.05rem 0.4rem;border-radius:10px;">Class ${escHtml(entry.class)}</span>` : ''}
+                    ${entry.class ? `<span class="badge" style="font-size:0.65rem;background:rgba(100,180,255,0.15);color:var(--gold);padding:0.05rem 0.4rem;border-radius:10px;">Class ${escHtml(entry.class)}</span>` : ''}
                     ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;color:white;padding:0.05rem 0.4rem;border-radius:10px;">${escHtml(entry.category)}</span>` : ''}
                     <button class="btn btn-xs btn-danger adv-remove">✕</button>
                 `;

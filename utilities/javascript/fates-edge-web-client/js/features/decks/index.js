@@ -1029,7 +1029,7 @@ export async function render(el) {
                     Draw cards to see a complication.
                 </div>
                 <div id="crown-spread-details" style="margin-top:0.8rem;display:none;"></div>
-                <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--accent);"></div>
+                <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);"></div>
             </div>
         `;
     } else {
@@ -1073,7 +1073,7 @@ export async function render(el) {
                 <button class="btn btn-xs btn-ghost" id="deck-refresh-regions" title="Re-scan for region files" data-i18n-attr="title:feature.decks.reScanForRegionFiles">🔄</button>
                 <span style="font-size:0.7rem;color:var(--text3);white-space:nowrap;">(${regionCount} regions)</span>
             </div>
-            ${regionNames.length === 0 ? `<div style="color:var(--warn);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
+            ${regionNames.length === 0 ? `<div style="color:var(--orange);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
             <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);color:var(--text);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
                 <span style="color:var(--text2);">Select a region to display its description.</span>
             </div>
@@ -1688,7 +1688,7 @@ export function openCrownSpread() {
                 </div>
 
                 ${result.timer ? `
-                    <div style="margin-top:1rem;background:var(--bg3);border-radius:var(--radius);padding:0.5rem 1rem;border-inline-start:4px solid var(--accent);">
+                    <div style="margin-top:1rem;background:var(--bg3);border-radius:var(--radius);padding:0.5rem 1rem;border-inline-start:4px solid var(--gold);">
                         <strong>⏱️ Suggested Timer:</strong> ${result.timer.segments} segments (from ${result.timer.card})
                         <button class="btn btn-sm btn-primary" onclick="window.createTimerFromCard('${result.timer.card}', ${result.timer.segments})" style="margin-inline-start:0.5rem;">➕ Add Timer</button>
                     </div>
