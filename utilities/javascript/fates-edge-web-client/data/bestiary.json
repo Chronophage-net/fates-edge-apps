@@ -1204,7 +1204,7 @@
       "Promise-Eater Ogre": {
         "page": "Promise-Eater_Ogre",
         "summary": "An ogre drawn to broken promises, taking the memory of the broken promise.",
-        "lore": "Can be satisfied by speaking the broken promise aloud, even if you don't remember it.",
+        "lore": "It fixates on a particular broken promise, repeating scraps of its wording as if trying to remember the rest. Speaking that promise aloud can satisfy it, even when the speaker no longer remembers making it.",
         "locations": [
           "Acasia",
           "Ubral"
@@ -1242,7 +1242,7 @@
       "Flesh-Ogre": {
         "page": "Flesh-Ogre",
         "summary": "A huge, bloated ogre drawn to battlefields, scavenging the dead and living.",
-        "lore": "Driven off by fire or a more appealing offering.",
+        "lore": "It follows the smell of carrion and squats beside battlefields until disturbed. Fire drives it off; a more appealing offering can draw it away. Its demands arise from appetite, not a grievance against the party.",
         "locations": [
           "Black Banners",
           "Zakov"
@@ -1280,7 +1280,7 @@
       "Stone-Ogre": {
         "page": "Stone-Ogre",
         "summary": "An ogre covered in rocky hide, guarding places where the earth has been wounded.",
-        "lore": "Pacified by repairing the wound to the land.",
+        "lore": "It guards a damaged place as fiercely as another creature guards its young, blocking further intrusion and watching those who try to repair it. Mending the wound to the land can pacify it.",
         "locations": [
           "Aeler",
           "Ubral"
@@ -1356,7 +1356,7 @@
       "River Oni": {
         "page": "River_Oni",
         "summary": "A clever oni dwelling in deep pools, offering bargains to the lost and desperate.",
-        "lore": "Driven off by a true name.",
+        "lore": "It waits in deep pools for travelers to search the water for something lost. It delights in being needed and makes every kindness an invitation to return. A true name drives it off.",
         "locations": [
           "Ayokha",
           "Great rivers"
@@ -1393,7 +1393,7 @@
       "Dream Oni": {
         "page": "Dream_Oni",
         "summary": "An oni that appears in dreams, offering bargains and taking memories.",
-        "lore": "Banished by speaking a truth never told or by waking.",
+        "lore": "It seeks an intimate place in the sleeper’s life, borrowing familiar faces and recurring rooms until its presence feels inevitable. Speaking a truth never told or waking can banish it.",
         "locations": [
           "Ways Between",
           "Dreams"
@@ -1669,8 +1669,8 @@
     {
       "Fray-Hound": {
         "page": "Fray-Hound",
-        "summary": "Lean, wolf-like predators that patrol boundary edges, drawn to frayed balance.",
-        "lore": "Hunger's reminder. Respond to imbalance, not aggression.",
+        "summary": "Lean, watchful predators that linger at boundaries where a community refuses to acknowledge someone it has failed.",
+        "lore": "They watch reunions, shared meals, and funerals with the Hunger’s patient envy. Their attention can expose an exclusion or drive frightened neighbors to deepen it. They are witnesses, not rescuers.",
         "locations": [
           "Boundary edges",
           "Where balance has frayed"
@@ -1702,7 +1702,7 @@
       "Earth-Shark": {
         "page": "Earth-Shark",
         "summary": "A burrowing predator with a dorsal ridge like a plowshare.",
-        "lore": "Something older that learned hunger from the sea and brought it to land.",
+        "lore": "An ambush predator that reads movement through the ground. It favours isolated prey and avoids groups larger than three. Drumbeats or goat bells can confuse its tremorsense; fire drives it underground.",
         "locations": [
           "Steppe",
           "Tundra"
@@ -2439,7 +2439,7 @@
       "Dragon (High Wyrm)": {
         "page": "Dragon_(High_Wyrm)",
         "summary": "The eldest of the wyrms, wise and terrible. Only a handful remain in the world's deepest places.",
-        "lore": "The dragons were ancient when the first elves carved their star-roads. They sleep in forgotten halls, dreaming of the age before mortal memory.",
+        "lore": "Ancient before the first elves carved their star-roads, each elder has an obsession of its own: the last nesting ground, a vanished city’s music, a garden threatened by mortal settlements, or proof that the valley still fears it. Establish that desire before framing its demands.",
         "locations": [
           "Himadri peaks",
           "Valewood depths",
@@ -6438,7 +6438,7 @@
       "The Deep Warden": {
         "page": "The_Deep_Warden",
         "summary": "A towering figure of stone and rusted iron, the Deep Warden patrols the forgotten vaults beneath the Aelerian mountains. It was not created—it accumulated, layer by layer, from the sediment of broken oaths and forgotten contracts. It does not speak. It does not negotiate. It enforces.",
-        "lore": "The Deep Warden is not a servant of the Aeler. It is a consequence. When the Aeler built their vaults, they built them on the principle of 'enough.' But some debts are not paid. Some contracts are not fulfilled. The Deep Warden is the interest on those unpaid debts, made manifest.",
+        "lore": "The Deep Warden embodies the limits the vault-builders promised to respect. It stirs where excavation threatens the deep chambers and the living pretend not to hear the stone shift. Its persistence is the warning of a place pushed beyond what it can bear.",
         "locations": [
           "Aeler deep vaults",
           "Forgotten chambers",
@@ -6492,7 +6492,7 @@
     {
       "Mist King's Herald": {
         "page": "Mist_King's_Herald",
-        "summary": "A figure wrapped in fog, its face a mask of silvered mist, the Herald rides a horse made of fog and shadow. It appears when the Mistlands' bell-lines fail, riding from the Direwood to remind the living that some debts are older than the Mistlands themselves.",
+        "summary": "A rider wrapped in fog, with a face of silvered mist and a horse of moving shadow. When the bell-lines fail it emerges from the Direwood, following paths the living thought the forest had forgotten.",
         "lore": "The Mist King's Herald is the echo of the first warden—the one who forgot to count the ninth bell. It rides the border between the Mistlands and the Direwood, carrying messages between the dead and the living. Sometimes the messages are warnings. Sometimes they are demands.",
         "locations": [
           "The Mistlands",
@@ -6607,8 +6607,8 @@
     {
       "Chained Angel's Echo": {
         "page": "Chained_Angel's_Echo",
-        "summary": "A figure of shadow and chains, the Chained Angel's Echo appears in places where debts have been called in and payments have been refused. She does not speak—her chains do. Each rattle is a word, each clink a clause, each groan a consequence.",
-        "lore": "Malachai is the Chained Angel—a cosmic entity of obligation and consequence. The Echo is not Malachai herself, but a fragment of her will. It appears when debts have been called in and the one who owes has refused. The Echo does not bargain. It collects.",
+        "summary": "A figure of shadow and chains appearing where a binding obligation has been deliberately refused. She does not speak. Her chains tighten toward the person she has come to confront.",
+        "lore": "A fragment of Malachai’s will, the Echo embodies an obligation made inescapable. Establish the actual promise and its breach; its arrival is a particular consequence, not proof that every misfortune is deserved.",
         "locations": [
           "Where debts are called due",
           "The Well of Ichor",
@@ -6668,8 +6668,8 @@
     {
       "Hollow's Reckoning": {
         "page": "Hollow's_Reckoning",
-        "summary": "A manifestation of the Curse of Acasia—a debt collector of cosmic proportions. It appears when the Hollow's attention has been fully earned, and it does not leave until the debt is paid. It is a figure of gray mist and silence, and it has no face—only the shape of a face that once was.",
-        "lore": "The Hollow's Reckoning is the final stage of the Curse of Acasia. It is the consequence of a promise that was never kept, a debt that was never paid. It does not negotiate. It does not bargain. It collects—and it collects in full.",
+        "summary": "A faceless figure of gray mist that arrives when the Curse of Acasia reaches its final stage. Familiar paths empty before it, and the silence follows those who try to flee.",
+        "lore": "The Reckoning is the Hollow’s full attention given shape. It brings the unresolved promise that drew it into the present, stripping away the ordinary distractions that let people live around it. Its pursuit continues until that obligation is resolved.",
         "locations": [
           "Acasia",
           "Where promises are broken",
@@ -7634,7 +7634,7 @@
       "Coin-House Factor Cultist": {
         "page": "Coin-House_Factor_Cultist",
         "summary": "A merchant who has never lost a deal—because they have never made a fair one. They serve Maelstraeus as a broker of obligations.",
-        "lore": "They are a collector of debts and a whisperer of interest rates.",
+        "lore": "They cultivate dependency, offering rescue when refusal is hardest and using the resulting obligations to steer households and councils. They know exactly which kindness will be remembered.",
         "type": "Cult Leader",
         "locations": [
           "Silkstrand",
@@ -9396,7 +9396,7 @@
     {
       "Hollow's Reckoning Avatar": {
         "page": "Hollow's_Reckoning_Avatar",
-        "summary": "A manifestation of the Curse of Acasia—a debt collector of cosmic proportions. It appears when the Hollow's attention has been fully earned.",
+        "summary": "The Curse of Acasia made present: a faceless figure of gray mist, pursuing those who have drawn the Hollow’s full attention.",
         "lore": "It is a figure of gray mist and silence, and it has no face—only the shape of a face that once was.",
         "type": "Avatar of the Hollow",
         "locations": [

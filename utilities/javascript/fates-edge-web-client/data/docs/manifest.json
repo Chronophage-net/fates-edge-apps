@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-09T23:01:19.663Z",
+  "generated": "2026-09-11T13:54:52.642Z",
   "documents": [
     {
       "id": "srd",
@@ -483,6 +483,16 @@
       "id": "character_options_compendium",
       "title": "Character Options Compendium",
       "file": "Fates_-_Edge_-_-Character-_-Options-_-Compendium.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "cultural_builds",
+      "title": "Cultural Builds",
+      "file": "Fates_-_Edge_-_-Cultural-_-Builds.html",
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
@@ -1042,16 +1052,6 @@
       "id": "the_complete_guide_to_monks",
       "title": "The Complete Guide To Monks",
       "file": "Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Monks.html",
-      "path": "/data/docs/expansions/",
-      "category": "expansions",
-      "categoryLabel": "Expansions",
-      "core": false,
-      "active": true
-    },
-    {
-      "id": "the_complete_guide_to_subclasses",
-      "title": "The Complete Guide To Subclasses",
-      "file": "Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Subclasses.html",
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",

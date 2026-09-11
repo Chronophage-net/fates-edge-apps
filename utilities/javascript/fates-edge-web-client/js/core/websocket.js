@@ -57,7 +57,7 @@ let connectionMode = 'websocket'; // 'socketio' or 'websocket'
 let reconnectTimer = null;
 let managedExpiryTimer = null;
 let cancelManagedConnect = null;
-let managedAwaitingAck = false;
+let awaitingHandshakeAck = false;
 let pingInterval = null;    // BUGFIX: moved here from inside ws.onopen — it
                              // used to be declared with `let` inside that
                              // closure, which meant the sibling ws.onclose
@@ -332,7 +332,7 @@ export function connectWebSocket(room = null, url = null, managed = null) {
     cancelManagedConnect?.();
     cancelManagedConnect = managed ? () => managed.reject(new Error('Room connection cancelled.')) : null;
     isConnected = false;
-    managedAwaitingAck = Boolean(managed);
+    awaitingHandshakeAck = true;
     const roomName = room || config.room;
     const wsUrl = url || config.url;
     const fullUrl = normalizeWSURL(wsUrl, roomName);
@@ -346,7 +346,7 @@ export function connectWebSocket(room = null, url = null, managed = null) {
         let authenticated = false;
         let pendingInitialState = null;
         const timeoutId = setTimeout(() => {
-            if (ws === client && (!authenticated && managed || ws.readyState !== WebSocket.OPEN)) {
+            if (ws === client && (!authenticated || ws.readyState !== WebSocket.OPEN)) {
                 managed?.reject(new Error('The server did not confirm room access.'));
                 if (managed) { disconnectWebSocket(); return; }
                 ws.close();
@@ -358,7 +358,7 @@ export function connectWebSocket(room = null, url = null, managed = null) {
         
         const ready = () => {
             authenticated = true;
-            managedAwaitingAck = false;
+            awaitingHandshakeAck = false;
             cancelManagedConnect = null;
             clearTimeout(timeoutId);
             console.log('🔗 WebSocket connected to:', fullUrl);
@@ -369,7 +369,7 @@ export function connectWebSocket(room = null, url = null, managed = null) {
             currentServerUrl = ws.url;          // Store the full WebSocket URL
             cachedApiBase = null;
 
-            if (!managed) socketId = `ws_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+            // socketId comes from the server handshake acknowledgement.
             
             const state = getState();
             state.wsStatus = 'connected';
@@ -404,7 +404,15 @@ export function connectWebSocket(room = null, url = null, managed = null) {
         
         ws.onopen = () => {
             if (ws !== client) return;
-            if (!managed) { ready(); return; }
+            if (!managed) {
+                client.send(JSON.stringify({
+                    type: 'handshake',
+                    campaignCode: roomName,
+                    clientName: 'Player',
+                    authToken: localStorage.getItem('fates-edge-auth-token') || undefined
+                }));
+                return;
+            }
             client.send(JSON.stringify({type:'handshake', roomToken:managed.grant.roomToken, clientName:managed.name}));
             managedExpiryTimer = setTimeout(() => {
                 disconnectWebSocket();
@@ -466,6 +474,21 @@ export function connectWebSocket(room = null, url = null, managed = null) {
             try {
                 if (ws !== client) return;
                 const data = JSON.parse(event.data);
+                if (!managed && !authenticated) {
+                    if (data.type === 'handshake_ack' && data.success !== false) {
+                        socketId = data.clientId;
+                        ready();
+                        if (pendingInitialState) handleWebSocketMessage(pendingInitialState);
+                        pendingInitialState = null;
+                    } else if (data.type === 'error' || data.type === 'handshake_ack') {
+                        handleWebSocketMessage(data);
+                        if (data.code !== 'GM_CONFLICT') disconnectWebSocket();
+                        return;
+                    } else {
+                        if (data.type === 'room-state') pendingInitialState = data;
+                        return;
+                    }
+                }
                 if (managed && !authenticated) {
                     if (data.type === 'handshake_ack') {
                         const grant = managed.grant;
@@ -750,7 +773,7 @@ function handleWebSocketMessage(data) {
  * Send a message via WebSocket with optional callback
  */
 export function sendWSMessage(data, callback = null) {
-    if (managedAwaitingAck || !ws || ws.readyState !== WebSocket.OPEN) {
+    if (awaitingHandshakeAck || !ws || ws.readyState !== WebSocket.OPEN) {
         console.warn('WebSocket not connected');
         if (callback) callback({ error: 'Not connected' });
         return false;
@@ -804,7 +827,7 @@ export function sendWSMessage(data, callback = null) {
 export function disconnectWebSocket() {
     cancelManagedConnect?.();
     cancelManagedConnect = null;
-    managedAwaitingAck = false;
+    awaitingHandshakeAck = false;
     clearTimeout(managedExpiryTimer);
     managedExpiryTimer = null;
     clearInterval(pingInterval);

@@ -1,7 +1,7 @@
 /**
  * Encounters feature - Manage combat and social encounters
  * ✅ Integrated with Bestiary (panel below encounter list, left column)
- * ✅ Reads TL 1-10, Class I-X, sb_spends
+ * Reads Threat Level 1–10 and creature-specific Story Beat moves
  * ✅ Shared GM Story Beat bank with Bestiary
  * ✅ One-click "Open Tracker" from bestiary entries
  * ✅ Creature detail modal with SB spends
@@ -18,7 +18,8 @@ import {
     loadWikiData, 
     addCreatureAsAdversary,
     getCreatureDescription,
-    getCategoryBadgeColor
+    getCategoryBadgeColor,
+    showCreatureDetail
 } from './bestiary.js';
 import { openTracker } from './combat.js';
 import { getObjectiveType, DEFAULT_OBJECTIVE_TYPE } from '@core/objective-types.js';
@@ -378,19 +379,11 @@ export async function render(el) {
                                 <h4 style="margin:0;" data-i18n="feature.encounters.bestiary">📖 Bestiary</h4>
                                 <div style="display:flex; gap:0.3rem; align-items:center;">
                                     <input type="text" id="bestiary-search" placeholder="Search…" style="font-size:0.75rem; padding:0.15rem 0.4rem; width:100px;" / data-i18n-attr="placeholder:feature.encounters.search_8tlzy">
-                                    <select id="bestiary-filter-tl" style="font-size:0.7rem; padding:0.1rem 0.2rem;">
-                                        <option value="all" data-i18n="feature.encounters.tl">TL</option>
-                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n}</option>`).join('')}
+                                    <select id="bestiary-filter-tl" aria-label="Threat Level" style="font-size:0.7rem; padding:0.1rem 0.2rem;">
+                                        <option value="all" >All Threat Levels</option>
+                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">TL ${n}</option>`).join('')}
                                     </select>
                                     <button class="btn btn-sm btn-ghost" id="bestiary-refresh" style="font-size:0.7rem; padding:0.1rem 0.4rem;">↻</button>
-                                </div>
-                            </div>
-                            <div class="bestiary-filters">
-                                <span style="font-size:0.65rem; color:var(--text3);">Class:</span>
-                                <div id="bestiary-class-filters" style="display:flex; flex-wrap:wrap; gap:0.15rem;">
-                                    ${['I','II','III','IV','V','VI','VII','VIII','IX','X'].map(c => `
-                                        <button class="btn btn-xs class-filter-btn ${c === 'all' ? 'btn-primary' : 'btn-ghost'}" data-class="${c}" style="font-size:0.6rem; padding:0.05rem 0.3rem;">${c}</button>
-                                    `).join('')}
                                 </div>
                             </div>
                             <div class="bestiary-list-container">
@@ -556,7 +549,7 @@ export function renderEncounters() {
                 <button class="btn btn-xs btn-danger encounter-delete-btn" data-id="${e.id}" title="Delete">🗑️</button>
             `;
         } else {
-            actionsHtml = `<span style="font-size:0.65rem;color:var(--text3);">🔒</span>`;
+            actionsHtml = `<button class="btn btn-xs btn-primary bestiary-view-btn" data-name="${escHtml(safeName)}" title="Details">📄 Details</button>`;
         }
         
         return `
@@ -628,17 +621,13 @@ function renderBestiary() {
     const tlSelect = document.getElementById('bestiary-filter-tl');
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     const tlFilter = tlSelect ? tlSelect.value : 'all';
-    const activeClassBtn = document.querySelector('.class-filter-btn.active-class');
-    const classFilter = activeClassBtn ? activeClassBtn.dataset.class : 'all';
-
     filteredBestiary = bestiaryData.filter(entry => {
         const name = (entry.name || '').toLowerCase();
         const desc = (getCreatureDescription(entry) || '').toLowerCase();
         const category = (entry.category || '').toLowerCase();
         const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm) || category.includes(searchTerm);
         const matchesTL = tlFilter === 'all' || parseInt(entry.tl, 10) === parseInt(tlFilter, 10);
-        const matchesClass = classFilter === 'all' || (entry.class || '').toUpperCase() === classFilter;
-        return matchesSearch && matchesTL && matchesClass;
+        return matchesSearch && matchesTL;
     });
 
     if (!bestiaryData || bestiaryData.length === 0) {
@@ -665,8 +654,8 @@ function renderBestiary() {
 
     listEl.innerHTML = filteredBestiary.map(entry => {
         const name = entry.name || 'Unnamed';
-        const safeName = name.replace(/["']/g, '');
-        const tl = entry.tl !== undefined ? `TL ${entry.tl}` : '';
+        const safeName = name;
+        const tl = entry.tl != null ? `TL ${entry.tl}` : '';
         const cls = entry.class || '';
         const category = entry.category || '';
         const description = getCreatureDescription(entry);
@@ -679,7 +668,7 @@ function renderBestiary() {
                 <button class="btn btn-xs btn-green bestiary-open-tracker" data-name="${escHtml(safeName)}" title="Open Combat Tracker">🎯</button>
             `;
         } else {
-            actionsHtml = `<span style="font-size:0.65rem;color:var(--text3);">🔒</span>`;
+            actionsHtml = `<button class="btn btn-xs btn-primary bestiary-view-btn" data-name="${escHtml(safeName)}" title="Details">📄 Details</button>`;
         }
 
         return `
@@ -698,17 +687,17 @@ function renderBestiary() {
         `;
     }).join('');
 
-    // Only attach events if GM
-    if (canEdit) {
-        listEl.querySelectorAll('.bestiary-view-btn').forEach(btn => {
+    // Reference material is readable in every role.
+    listEl.querySelectorAll('.bestiary-view-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const name = btn.dataset.name;
                 const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
-                if (entry) showCreatureDetail(entry);
+                if (entry) showCreatureDetail(entry, { readOnly: !canEdit });
             });
         });
 
+    if (canEdit) {
         listEl.querySelectorAll('.bestiary-add-adversary').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -749,10 +738,6 @@ function renderBestiary() {
 // CREATURE DETAIL MODAL (with SB spends) – unchanged
 // ============================================================
 
-function showCreatureDetail(entry) {
-    // ... (unchanged – you already have the full function)
-    // Keep it as is – it uses the same spend logic.
-}
 
 // ============================================================
 // ENCOUNTER OPERATIONS – all guarded by isGM()
@@ -868,24 +853,13 @@ export function attachEvents() {
         tlSelect.addEventListener('change', renderBestiary);
     }
 
-    document.getElementById('bestiary-class-filters')?.addEventListener('click', (e) => {
-        if (e.target.closest('.class-filter-btn')) {
-            document.querySelectorAll('.class-filter-btn').forEach(b => {
-                b.classList.remove('btn-primary', 'active-class');
-                b.classList.add('btn-ghost');
-            });
-            const btn = e.target.closest('.class-filter-btn');
-            btn.classList.remove('btn-ghost');
-            btn.classList.add('btn-primary', 'active-class');
-            renderBestiary();
-        }
-    });
+
 
     const refreshBtn = document.getElementById('bestiary-refresh');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', async () => {
             try {
-                bestiaryData = await loadBestiaryData();
+                bestiaryData = await loadBestiaryData({ refresh: true });
                 await loadWikiData();
                 renderBestiary();
                 showToast(i18nText("feature.encounters.bestiaryRefreshed", null, "Bestiary refreshed."), 'info');

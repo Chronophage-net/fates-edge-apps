@@ -993,7 +993,24 @@ function attachDocEvents() {
     if (closeBtn) closeBtn.addEventListener('click', closeDocViewer);
 
     const printBtn = document.getElementById('doc-print-btn');
-    if (printBtn) printBtn.addEventListener('click', () => printWithChromeHidden());
+    if (printBtn) printBtn.addEventListener('click', () => {
+        if (document.querySelector('#doc-viewer .gm-print-sheets') && currentDocPath) {
+            // Print the original document: the reader has a clipped scrolling viewport
+            // and scopes document CSS, including rules intended for the printed page.
+            const printWindow = window.open(currentDocPath, '_blank');
+            if (printWindow) {
+                printWindow.addEventListener('load', async () => {
+                    await printWindow.document.fonts.ready;
+                    printWindow.focus();
+                    printWindow.print();
+                }, { once: true });
+            } else {
+                showToast('Allow this document to open in a new tab, then use Print.', 'warning');
+            }
+            return;
+        }
+        printWithChromeHidden();
+    });
 
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {

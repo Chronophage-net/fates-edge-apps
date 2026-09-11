@@ -1,6 +1,6 @@
 import { describe, it, assert, assertEqual } from '../runner.js';
 import { parseManagedConnection } from '../../js/core/managed-connection.js';
-import { connectManagedRoom, disconnectWebSocket, isWSConnected, sendWSMessage, onWSEvent, offWSEvent } from '../../js/core/websocket.js';
+import { connectWebSocket, connectManagedRoom, disconnectWebSocket, isWSConnected, sendWSMessage, onWSEvent, offWSEvent } from '../../js/core/websocket.js';
 
 function bundle(changes = {}) {
     const claims = { room_id: '11111111-1111-1111-1111-111111111111', server_id: '22222222-2222-2222-2222-222222222222', room_code: 'ABC1234567', placement_version: 1, role: 'player', exp: Math.floor(Date.now()/1000)+600, ...changes };
@@ -60,5 +60,55 @@ describe('Managed room connections', () => {
             let denied=false;try{await pending;}catch{denied=true;}
             assert(denied);assert(!isWSConnected());
         } finally {disconnectWebSocket();globalThis.WebSocket=Original;}
+    });
+});
+
+
+describe('Plain WebSocket handshake', () => {
+    it('waits for acknowledgement on every connection and stops on rejection', () => {
+        const Original = globalThis.WebSocket;
+        let client, connected = 0, states = 0;
+        class FakeWebSocket {
+            static OPEN = 1;
+            constructor(url) { this.url = url; this.readyState = 1; this.sent = []; client = this; }
+            send(value) { this.sent.push(JSON.parse(value)); }
+            close() { this.readyState = 3; }
+        }
+        const onConnected = () => { connected++; sendWSMessage({type: 'sync-request'}); };
+        const onState = () => states++;
+        globalThis.WebSocket = FakeWebSocket;
+        onWSEvent('connected', onConnected);
+        onWSEvent('room-state', onState);
+        try {
+            for (let attempt = 0; attempt < 2; attempt++) {
+                connectWebSocket('AC12', 'wss://example.test');
+                client.onopen();
+                assertEqual(client.sent[0].type, 'handshake');
+                assertEqual(client.sent[0].campaignCode, 'AC12');
+                assert(!isWSConnected());
+                assertEqual(sendWSMessage({type: 'sync-request'}), false);
+                client.onmessage({data: JSON.stringify({type: 'room-state', room: 'AC12'})});
+                assertEqual(states, attempt);
+                assertEqual(connected, attempt);
+                client.onmessage({data: JSON.stringify({type: 'handshake_ack', success: true, clientId: 'server-id'})});
+                assert(isWSConnected());
+                assertEqual(connected, attempt + 1);
+                assertEqual(states, attempt + 1);
+                assertEqual(client.sent.length, 2);
+                assertEqual(client.sent[1].type, 'sync-request');
+            }
+            connectWebSocket('AC12', 'wss://example.test');
+            client.onopen();
+            client.onmessage({data: JSON.stringify({type: 'error', message: 'Incorrect room password.'})});
+            assert(!isWSConnected());
+            assertEqual(client.readyState, 3);
+            assertEqual(connected, 2);
+            assertEqual(sendWSMessage({type: 'sync-request'}), false);
+        } finally {
+            disconnectWebSocket();
+            offWSEvent('connected', onConnected);
+            offWSEvent('room-state', onState);
+            globalThis.WebSocket = Original;
+        }
     });
 });

@@ -12,6 +12,7 @@
  *   2. The player-facing Harm track is still called Harm and still runs 0-3.
  */
 
+import { parseBestiary } from '../../js/features/encounters/bestiary-schema.js';
 import { describe, it, assert, assertEqual, assertTrue } from '../runner.js';
 import {
     resilienceOf,
@@ -67,7 +68,7 @@ describe('Resilience rename: shipped data', () => {
 
     it('every bestiary entry carries resilience and none is left on the old key', async () => {
         const raw = await loadBestiary();
-        const entries = Object.values(raw).map(o => Object.values(o)[0]).filter(Boolean);
+        const entries = parseBestiary(raw);
         assertTrue(entries.length > 200, `expected the full bestiary, got ${entries.length}`);
         const missing = entries.filter(e => !e.resilience);
         const stale = entries.filter(e => e.harm_levels !== undefined);
@@ -77,7 +78,7 @@ describe('Resilience rename: shipped data', () => {
 
     it('resilience values stay on the vocabulary the books use', async () => {
         const raw = await loadBestiary();
-        const entries = Object.values(raw).map(o => Object.values(o)[0]).filter(Boolean);
+        const entries = parseBestiary(raw);
         const odd = entries.filter(e => !/^(3 \(standard\)|8 \(advanced\)|8 per phase|None \(puzzle\))/.test(String(e.resilience)));
         assertTrue(odd.length < entries.length * 0.2,
             `unexpected resilience vocabulary in ${odd.length} entries, e.g. ${odd.slice(0, 3).map(e => e.resilience).join(' | ')}`);

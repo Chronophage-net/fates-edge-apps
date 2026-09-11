@@ -14,6 +14,7 @@
  * - Combat Tracker integration uses tl for default difficulty/HP
  */
 
+import { BESTIARY_CACHE_KEY, parseBestiary, normalizeBestiaryRecord } from './bestiary-schema.js';
 import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState } from '@core/state.js';
 import { escHtml } from '@core/utils.js';
@@ -134,7 +135,7 @@ const BESTIARY_PATHS = [
 ];
 
 const BESTIARY_INDIVIDUAL_PATH = './data/bestiary/';
-const CACHE_KEY = 'fates-edge-bestiary-cache';
+const CACHE_KEY = BESTIARY_CACHE_KEY;
 
 // Hardcoded fallback entries (if everything else fails)
 const FALLBACK_ENTRIES = [
@@ -196,7 +197,8 @@ function flattenWrappedEntry(raw) {
 
 function normalizeCreature(c) {
     if (!c) return c;
-    let result = flattenWrappedEntry(c);
+    let result = normalizeBestiaryRecord(flattenWrappedEntry(c));
+    if (!result) return null;
     result = { ...result };
     if (!result.name && result.title) result.name = result.title;
     if (result.description && typeof result.description === 'object') {
@@ -250,7 +252,8 @@ export function getCreatureDescription(entry) {
 }
 
 function formatSBMove(move) {
-    const cost = parseInt(move.cost, 10) || 1;
+    const parsedCost = Number(move.cost);
+    const cost = Number.isFinite(parsedCost) && parsedCost >= 0 ? parsedCost : 1;
     const name = move.name || 'Unnamed Move';
     const effect = move.effect || move.description || '';
     return `
@@ -285,8 +288,8 @@ async function loadBestiaryFromPaths() {
             const response = await fetch(url, { cache: 'no-cache' });
             if (response.ok) {
                 const data = await response.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    const flattened = data.map(flattenWrappedEntry).filter(e => e && e.name);
+                if (parseBestiary(data).length > 0) {
+                    const flattened = parseBestiary(data);
                     if (flattened.length > 0) {
                         console.log(`[Bestiary] Loaded from ${path} (${flattened.length} entries)`);
                         return flattened.map(normalizeCreature);
@@ -326,7 +329,10 @@ async function loadFallbackBestiary() {
     return FALLBACK_ENTRIES.map(normalizeCreature);
 }
 
-export async function loadBestiaryData() {
+export async function loadBestiaryData({ refresh = false } = {}) {
+    if (refresh) {
+        try { sessionStorage.removeItem(CACHE_KEY); } catch (_) {}
+    }
     // Try cache first (but only if not too old? we'll use it but still refresh)
     try {
         const cached = sessionStorage.getItem(CACHE_KEY);
@@ -334,7 +340,7 @@ export async function loadBestiaryData() {
             const data = JSON.parse(cached);
             if (Array.isArray(data) && data.length > 0) {
                 console.log(`[Bestiary] Loaded ${data.length} entries from cache`);
-                bestiaryData = data;
+                bestiaryData = parseBestiary(data).map(normalizeCreature).filter(Boolean);
                 return bestiaryData;
             }
         }
@@ -561,7 +567,7 @@ function renderBestiaryList() {
 
     listEl.innerHTML = filteredData.map(entry => {
         const name = entry.name || 'Unnamed';
-        const safeName = name.replace(/["']/g, '');
+        const safeName = name;
         const categoryBadge = entry.category
             ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;">${escHtml(entry.category)}</span>`
             : '';
@@ -589,7 +595,7 @@ function renderBestiaryList() {
                         ${escHtml(name)}
                         ${categoryBadge}
                         ${tlDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${tlDisplay}</span>` : ''}
-                        ${classDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${harmDisplay}</span>` : ''}
+                        ${harmDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${harmDisplay}</span>` : ''}
                         ${entry.nature ? `<span style="font-size:0.65rem;color:var(--text3);">${escHtml(entry.nature)}</span>` : ''}
                     </div>
                     <div style="font-size:0.8rem;color:var(--text2);">
@@ -707,22 +713,26 @@ function renderCategories() {
 // DETAIL VIEW (modal) – now shows all new fields + SB moves
 // ============================================================
 
-function showCreatureDetail(entry) {
+export function showCreatureDetail(entry, { readOnly = false } = {}) {
     const name = entry.name || 'Unnamed';
     const wikiEntry = wikiData[name] || wikiData[name.toLowerCase()] || null;
     const wikiLink = wikiEntry ? `<div style="margin-top:0.5rem;"><strong>Wiki:</strong> <a href="#" onclick="window.openWiki('${encodeURIComponent(name)}')">${escHtml(name)}</a></div>` : '';
 
-    // Build sections
+    // Shipped records keep these fields at the top level; older packs use stats.
+    const stats = { ...(entry.stats || {}) };
+    for (const key of ['key_attribute', 'harm', 'fatigue', 'armor']) {
+        if (entry[key] != null) stats[key.replaceAll('_', ' ')] = entry[key];
+    }
     let statsHtml = '';
-    if (entry.stats && typeof entry.stats === 'object') {
+    if (Object.keys(stats).length) {
         statsHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;font-size:0.85rem;">';
-        for (const [key, value] of Object.entries(entry.stats)) {
+        for (const [key, value] of Object.entries(stats)) {
             statsHtml += `<div style="font-weight:600;">${escHtml(key)}</div><div>${escHtml(String(value))}</div>`;
         }
         statsHtml += '</div>';
     }
 
-    let extraHtml = '';
+    let extraHtml = entry.resolution ? `<p><strong>Resolution:</strong> ${escHtml(entry.resolution)}</p>` : '';
     if (entry.locations && entry.locations.length > 0) {
         extraHtml += `<div style="margin-top:0.5rem;"><strong>Locations:</strong> ${entry.locations.map(l => escHtml(l)).join(', ')}</div>`;
     }
@@ -792,17 +802,26 @@ function showCreatureDetail(entry) {
     `;
 
     const hostContainer = document.getElementById('app-content') || document.body;
-    const hiddenSiblings = Array.from(hostContainer.children);
-    hiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
+    const hiddenSiblings = Array.from(hostContainer.children).map(element => ({ element, display: element.style.display }));
+    hiddenSiblings.forEach(({ element }) => { element.style.display = 'none'; });
     hostContainer.appendChild(overlay);
     window.scrollTo({ top: 0 });
 
     const closeDetail = () => {
         overlay.remove();
-        hiddenSiblings.forEach(ch => { ch.style.display = ''; });
+        hiddenSiblings.forEach(({ element, display }) => { element.style.display = display; });
     };
 
     overlay.querySelector('.creature-detail-close').addEventListener('click', closeDetail);
+    if (readOnly) {
+        overlay.querySelectorAll('.add-adversary-from-detail, .add-encounter-from-detail, .open-tracker-from-detail').forEach(button => button.remove());
+        overlay.querySelectorAll('.sb-spend-btn').forEach(button => {
+            const cost = document.createElement('span');
+            cost.textContent = button.textContent;
+            button.replaceWith(cost);
+        });
+        return;
+    }
 
     overlay.querySelector('.add-adversary-from-detail').addEventListener('click', () => {
         addCreatureAsAdversary(entry);
