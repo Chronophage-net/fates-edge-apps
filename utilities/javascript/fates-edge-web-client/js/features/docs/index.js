@@ -47,7 +47,7 @@ const PRINTABLE_DOC_IDS = new Set([
     'systems_reference_document', 'srd', 'essentials', 'campfire_mode',
     'the_paper_table', 'the_peoples_die', 'paper_import_reference',
     // The author also designates the GM screen as a printable table aid.
-    'game_master_screen', 'essential_gm_screen',
+    'game_master_screen', 'essential_gm_screen', 'first_play_kit',
 ]);
 
 // ============================================================

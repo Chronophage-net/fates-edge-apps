@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-11T13:54:52.642Z",
+  "generated": "2026-09-11T19:14:01.128Z",
   "documents": [
     {
       "id": "srd",
@@ -668,6 +668,17 @@
       "categoryLabel": "Adventures",
       "core": false,
       "active": true
+    },
+    {
+      "id": "first_play_kit",
+      "title": "First Play Kit",
+      "file": "Fates_-_Edge_-_-First-_-Play-_-Kit.pdf",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
+      "core": false,
+      "active": true,
+      "isPDF": true
     },
     {
       "id": "game_master_screen",
@@ -1502,7 +1513,7 @@
       "active": true
     }
   ],
-  "total_count": 91,
-  "active_count": 91,
+  "total_count": 92,
+  "active_count": 92,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

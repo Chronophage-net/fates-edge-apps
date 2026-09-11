@@ -51,6 +51,18 @@
       "categoryLabel": "Adventures",
       "core": false,
       "active": true
+    },
+    {
+      "id": "first_play_kit",
+      "title": "First Play Kit",
+      "subtitle": "A first session, rules reference, and five pregenerated characters",
+      "file": "Fates_-_Edge_-_-First-_-Play-_-Kit.pdf",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
+      "core": false,
+      "active": true,
+      "isPDF": true
     }
   ],
   "total_count": 5,
