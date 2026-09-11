@@ -62,6 +62,23 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.1.9] - 2026-09-11
+
+### Docs
+- Add canonical stat block schema for all adversaries
+- Add adversary action procedure and defense mechanics
+
+### Chore
+- sync canonical bestiary/adventure schema and Witnessed Prey HTML from fates-edge-docs
+
+### Other
+- Merge remote-tracking branch 'origin/add/dev-portal-link'
+- Merge remote-tracking branch 'origin/feat/bestiary-canonical-schema'
+- maintenance
+- document Developer Portal link addition
+- Add Developer portal note to CONTRIBUTING.md
+- Add Developer portal link to README
+
 ## [5.1.8] - 2026-09-11
 
 ### Fixed
