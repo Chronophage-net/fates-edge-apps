@@ -58,6 +58,19 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.1.6] - 2026-09-11
+
+### Other
+- Updated bestiary, anthologies, added cultural builds.
+- Updated anthologies
+- Updated installs
+- Updated anthologies
+- Encounters bugfix
+- More spleling...
+- Updated spellings.
+- Saikou's Dates
+- Braedyn
+
 ## [5.1.5] - 2026-09-09
 
 ### Other
