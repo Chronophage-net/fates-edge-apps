@@ -1,240 +1,29 @@
-<!-- ============ Fates_-_Edge_-_-Systems_-_Reference_-_Document.html ============ -->
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8"/>
-    <title>Fate's Edge SRD</title>
-    <style>
-        :root {
-            --bg1: #0d0d1a;
-            --bg2: #1a1a2e;
-            --bg3: #252540;
-            --bg4: #2f2f4a;
-            --text: #e8e8f0;
-            --text2: #b8b8c8;
-            --text3: #8888a0;
-            --gold: #c9a84c;
-            --gold-hover: #d4b85c;
-            --border: #333355;
-            --red: #c0392b;
-            --green: #27ae60;
-            --blue: #2980b9;
-            --purple: #8e44ad;
-            --orange: #e67e22;
-            --radius: 8px;
-            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: var(--bg1);
-            color: var(--text);
-            font-family: var(--font);
-            padding: 1.5rem;
-            max-width: 1100px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
-        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
-        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
-        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
-        h4 { font-size: 0.95rem; color: var(--text); }
-        a { color: var(--gold); text-decoration: none; }
-        a:hover { color: var(--gold-hover); text-decoration: underline; }
-        .panel {
-            background: var(--bg2);
-            border-radius: var(--radius);
-            padding: 0.6rem 0.8rem;
-            border: 1px solid var(--border);
-            margin: 0.5rem 0;
-        }
-        .panel-gold { border-left: 4px solid var(--gold); }
-        .panel-red { border-left: 4px solid var(--red); }
-        .panel-blue { border-left: 4px solid var(--blue); }
-        .panel-green { border-left: 4px solid var(--green); }
-        .panel-purple { border-left: 4px solid var(--purple); }
-        .badge {
-            display: inline-block;
-            padding: 0.05rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            background: var(--bg4);
-            color: var(--text3);
-            border: 1px solid var(--border);
-        }
-        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
-        .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
-        .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
-        .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
-        .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
-        .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
-        .text-muted { color: var(--text3); }
-        .text-gold { color: var(--gold); }
-        .text-sm { font-size: 0.85rem; }
-        .text-xs { font-size: 0.7rem; }
-        .mt-1 { margin-top: 0.5rem; }
-        .mb-1 { margin-bottom: 0.5rem; }
-        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
-        .toc {
-            background: var(--bg3);
-            border-radius: var(--radius);
-            padding: 0.5rem 0.8rem;
-            border: 1px solid var(--border);
-            margin: 0.5rem 0;
-        }
-        .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
-        .toc summary:hover { color: var(--gold-hover); }
-        .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
-        .toc a:hover { color: var(--gold); }
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
-        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
-        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
-        tr:nth-child(even) { background: var(--bg2); }
-        blockquote {
-            font-style: italic;
-            border-left: 4px solid var(--gold);
-            padding: 0.5rem 1rem;
-            margin: 0.5rem 0;
-            background: var(--bg2);
-            border-radius: var(--radius);
-            color: var(--text2);
-        }
-        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
-        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
-        pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
-        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
-        .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
-        .titlepage h1 { font-size: 2.5rem; border-bottom: none; margin-bottom: 0.1rem; }
-        .titlepage h2 { font-size: 1.8rem; font-weight: normal; border-bottom: none; margin-top: 0; }
-        .copyright-page { text-align: center; margin: 1rem 0; padding: 1rem 0; border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
-        .copyright-page h1 { border-bottom: none; }
-        .srd-reference { background: var(--bg2); border: 1px solid var(--gold); padding: 0.5rem 1rem; margin: 1rem 0; border-radius: var(--radius); }
-        .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
-        .back-to-top:hover { background: var(--gold); color: var(--bg1); }
-        .search-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem; color: var(--text); width: 100%; max-width: 300px; }
-        .search-box:focus { outline: none; border-color: var(--gold); }
-        .highlight { background: var(--bg4); border-left: 3px solid var(--gold); padding-left: 0.5rem; }
-        .multicols { column-count: 2; column-gap: 2rem; }
-        @media (max-width: 600px) { .multicols { column-count: 1; } }
-    </style>
-</head>
-<body>
-<a href="#" class="back-to-top">⬆</a>
-<div id="main-content">
 
-<!-- ==================== TITLE PAGE ==================== -->
-<div class="titlepage">
-    <h1>Fate's Edge</h1>
-    <h2>System Reference Document</h2>
-    <p class="author" style="color:var(--text2);">Nicholas A. Gasper</p>
-    <p class="date text-muted">2026-07-10</p>
-</div>
-
-<!-- ==================== COPYRIGHT PAGE ==================== -->
-<div class="copyright-page">
-    <h1>Fate's Edge System Reference Document</h1>
-    <p>Copyright &copy; Nicholas A. Gasper</p>
-    <p><em>First Edition, June 2026</em></p>
-    <hr style="width: 60%; margin: 1em auto; border-color: var(--gold);"/>
-    <p><strong>Important License Notice</strong></p>
-    <div class="license-text" style="max-width:700px;margin:0 auto;font-size:0.9rem;line-height:1.5;">
-        <p>The <em>Fate's Edge System Reference Document (SRD)</em> portions of this work<br/>
-        (clearly marked with <code>[SRD]</code> tags throughout) are licensed under the<br/>
-        <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.<br/>
-        To view a copy of this license, visit <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">http://creativecommons.org/licenses/by-nc-sa/4.0/</a>.</p>
-        <p>All other content—including but not limited to setting lore, original characters,<br/>
-        adventures, art, maps, and proprietary mechanics—is <strong>&copy; Nicholas A. Gasper, All Rights Reserved</strong>.<br/>
-        This Copyright may not be reproduced, distributed, or transmitted<br/>
-        without prior written permission, except for brief quotations in reviews<br/>
-        and certain other noncommercial uses permitted by copyright law.</p>
-        <p><strong>The SRD is also available as a standalone free download</strong><br/>
-        at <a href="https://chronophage.github.io/kon-reh/build/html/srd.html">https://chronophage.github.io/kon-reh/build/html/srd.html</a>.<br/>
-        For permission requests regarding Copyright, contact the author<br/>
-        through the publisher's website or at the address provided in the commercial edition.</p>
-    </div>
-    <hr style="width: 50%; margin: 1em auto; border-color: var(--gold);"/>
-    <p><em>"The coin that never spends is the one you don't remember taking."</em><br/>
-    — Serafine of the Velvet Touch</p>
-</div>
-
-<!-- ==================== SRD REFERENCE ==================== -->
-<div class="srd-reference">
-    <h2 style="text-align:center;border-bottom:none;">System Reference Document (SRD) Reference</h2>
-    <ul>
-        <li><strong>What is the SRD?</strong> The open-license portion of this work (CC BY-NC-SA 4.0), intended for third-party creators. <em>All SRD content is marked with <code>[SRD]</code> tags in this book.</em></li>
-        <li><strong>Verified SRD Content Includes:</strong>
-            <ul>
-                <li>Core resolution mechanics (dice pools, Position, DV, Outcome Matrix)</li>
-                <li>Boon and Story Beat economies</li>
-                <li>Fatigue, Harm, and Armor Conversion systems</li>
-                <li>Attribute and Skill descriptions</li>
-                <li>Basic combat and action economy rules</li>
-                <li>Universal magic mechanics (TAGS, DV calculation, Backlash)</li>
-                <li>NPC templates and encounter guidelines</li>
-                <li>Equipment and gear tables</li>
-                <li>Character creation framework</li>
-            </ul>
-        </li>
-        <li><strong>Extended Content (Not SRD - Proprietary):</strong>
-            <ul>
-                <li>Setting lore (Acasia factions, The Curse, regional details)</li>
-                <li>Original characters, NPCs, and named figures</li>
-                <li>Adventure modules and scenario hooks</li>
-                <li>Patron descriptions, Rites, and exclusive mechanical content</li>
-                <li>Proprietary magic systems (Runekeeper, Invoker, Cantor, Summoner-specific)</li>
-                <li>Artwork, maps, and graphical elements</li>
-                <li>Faction descriptions and campaign-specific content</li>
-                <li>Original prose, framing devices, and narrative text</li>
-                <li><em>Note: Optional systems like Deck of Consequences, Crown Spread, and Travel Framework are Copyright.</em></li>
-            </ul>
-        </li>
-        <li><strong>License Summary:</strong> SRD content licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. All extended content is <strong>&copy; Nicholas A. Gasper, All Rights Reserved</strong>. See copyright page for full license text.</li>
-    </ul>
-    <hr style="width: 50%; margin: 1em auto; border-color: var(--gold);"/>
-    <p><em>"The coin that never spends is the one you don't remember taking."</em><br/>
-    — Serafine of the Velvet Touch</p>
-</div>
-
-<!-- ==================== TOC ==================== -->
-<details class="toc">
-    <summary>📑 Table of Contents</summary>
-    <a href="#quickstart">Quickstart</a>
-    <a href="#core-principles">Core Principles</a>
-    <a href="#core-mechanic">Core Mechanic</a>
-    <a href="#character-creation">Character Creation</a>
-    <a href="#attributes-and-skills">Attributes and Skills</a>
-    <a href="#talents">Talents</a>
-    <a href="#equipment">Equipment</a>
-    <a href="#action-economy">Action Economy</a>
-    <a href="#combat">Combat</a>
-    <a href="#health-fatigue-harm">Health, Fatigue, and Harm</a>
-    <a href="#magic-system">Magic System</a>
-    <a href="#tags-effects">Tags &amp; Effects Library</a>
-    <a href="#rites-invokers">Rites and Invokers</a>
-    <a href="#summoning">Summoning</a>
-    <a href="#followers-assets">Followers and Assets</a>
-    <a href="#advancement">Advancement &amp; XP</a>
-    <a href="#travel-framework">Travel Framework</a>
-    <a href="#encounters">Encounters</a>
-    <a href="#complications-timers">Complications &amp; Timers</a>
-    <a href="#deck-consequences">Deck of Consequences</a>
-    <a href="#crown-spread">Crown Spread</a>
-    <a href="#archetypes">Player Archetypes</a>
-    <a href="#npc-templates">NPC Templates</a>
-    <a href="#quick-reference">Quick Reference</a>
-    <a href="#example-spells">Example Spells &amp; Rites</a>
-    <a href="#example-characters">Example Characters</a>
-</details>
-
-<!-- ==================== MAIN CONTENT ==================== -->
-<section class="level1 unnumbered" id="quickstart">
-<h1 class="unnumbered">Quickstart</h1>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Fate’s Edge SRD — Start here: the core mechanic</title><style>
+.srd-book { font-family: Georgia, serif; max-width: 76ch; margin: auto; padding: 1.5rem; line-height: 1.75; color: var(--text, #26242b); background: var(--bg, #fffdf8); }
+.srd-book h1 { font-size: 2.25rem; line-height: 1.2; margin: 1rem 0 1.5rem; }
+.srd-book h2 { margin: 3.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid var(--border, #c7bca4); line-height: 1.3; }
+.srd-book h3 { margin: 2.5rem 0 .8rem; line-height: 1.35; }
+.srd-book h4, .srd-book h5, .srd-book h6 { margin: 1.8rem 0 .6rem; line-height: 1.4; }
+.srd-book p, .srd-book ul, .srd-book ol { margin: .8rem 0; }
+.srd-book ul, .srd-book ol { padding-inline-start: 1.5rem; }
+.srd-book li { margin: .4rem 0; }
+.srd-book a { color: var(--gold, #71510c); text-decoration: underline; overflow-wrap: anywhere; }
+.srd-book nav, .srd-book .reading-guide { background: var(--bg2, #f3eee2); padding: 1rem 1.25rem; border-radius: .5rem; margin: 1.5rem 0; }
+.srd-book nav a { display: inline-block; margin: .2rem .7rem .2rem 0; }
+.srd-book table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.srd-book th, .srd-book td { border: 1px solid var(--border, #c7bca4); padding: .5rem; text-align: start; }
+.srd-book .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.srd-book blockquote { border-inline-start: 3px solid var(--gold, #997623); padding-inline-start: 1rem; margin: 1.5rem 0; }
+.srd-book :target { scroll-margin-top: 2rem; }
+.srd-book .chapter-label { font-family: system-ui, sans-serif; letter-spacing: .06em; color: var(--text2, #6b5c3e); }
+@media (max-width: 600px) { .srd-book { padding: 1rem; } .srd-book h1 { font-size: 1.8rem; } }
+@media print { .srd-book { max-width: none; --text: #000; --text2: #333; --bg: #fff; --bg2: #fff; --gold: #000; --border: #777; color: black; background: white; } .srd-book nav { display: none; } .srd-book h2 { break-after: avoid; } }
+</style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Start here: the core mechanic</h1><p>Fate’s Edge is a tabletop roleplaying game about what people attempt, what they achieve, and what their actions set in motion. One person acts as Game Master (GM), presenting the world and its responses; the other players describe their characters’ intentions and approaches. Start with the quickstart below, then read the full resolution procedure. The same procedure supports a fight, a negotiation, a journey, or a magical working.</p><aside class="reading-guide"><h2>How to read this book</h2><p>You do not need to memorize this reference. Learn the core loop, create a character, and look up a subsystem when it enters play. Difficulty Value (DV), Position, Boons, and Story Beats (SB) recur throughout the book; the quickstart introduces them below.</p><ol><li><strong>Everyone:</strong> read this opening chapter and its example of play.</li><li><strong>Players:</strong> continue to <a href="srd/characters.html">Character Creation</a>, then <a href="srd/combat.html">equipment and combat</a>. Consult <a href="srd/talents.html">talents</a> and <a href="srd/magic.html">magic</a> for your chosen character.</li><li><strong>Game Masters:</strong> read <a href="srd/running-the-game.html">Running the Game</a>. Keep the <a href="srd/quick-reference.html">table reference</a> nearby during play.</li><li><strong>When needed:</strong> open <a href="srd/crafting.html">crafting</a>, <a href="srd/followers-and-assets.html">followers and assets</a>, or <a href="srd/travel.html">travel</a>. Read <a href="srd/optional-tools.html">optional campaign tools</a> before using them.</li></ol><p><strong>What changed in this edition?</strong> Organization, navigation, and explanatory introductions. The rule text, costs, limits, examples, and tables are preserved. A separate reference page is not a waiver of a rule: use each subsystem’s own applicability and requirements. The <a href="srd/license.html">existing licensing notices</a> still apply.</p><p>Headings use descriptive names consistently. For citations to numbered sections in an earlier edition, use the <a href="srd/legacy-references.html">section-number concordance</a>.</p></aside><nav aria-label="SRD chapters"><a href="srd/index.html">Start here: the core mechanic</a><a href="srd/characters.html">Character creation and advancement</a><a href="srd/combat.html">Equipment, combat, and recovery</a><a href="srd/running-the-game.html">Running the game</a><a href="srd/talents.html">Talent reference</a><a href="srd/magic.html">Magic: choosing and using a path</a><a href="srd/tags.html">Magic tags and effects</a><a href="srd/rites-and-summoning.html">Rites, invokers, and summoning</a><a href="srd/crafting.html">Crafting: projects and upkeep</a><a href="srd/followers-and-assets.html">Followers and assets</a><a href="srd/travel.html">Travel framework</a><a href="srd/optional-tools.html">Optional campaign tools</a><a href="srd/quick-reference.html">Tables for use during play</a><a href="srd/examples.html">Example spells and characters</a><a href="srd/legacy-references.html">Earlier section numbers</a><a href="srd/license.html">License</a><a href="srd/complete.html">Complete reference</a></nav><div data-srd-rules=""><section class="level1 unnumbered" id="quickstart">
+<h2 class="unnumbered">Quickstart</h2>
 <section class="level2 unnumbered" id="the-core-loop-in-brief">
-<h2 class="unnumbered">The Core Loop in Brief</h2>
+<h3 class="unnumbered">The Core Loop in Brief</h3>
 <ol>
 <li><p><strong>Declare intent and approach.</strong> What do you do and
 how?</p></li>
@@ -254,8 +43,8 @@ matrix.</p></li>
 </ol>
 </section>
 <section class="level2 unnumbered" id="outcome-matrix">
-<h2 class="unnumbered">Outcome Matrix</h2>
-<div class="table-wrap"><table>
+<h3 class="unnumbered">Outcome Matrix</h3>
+<div class="table-wrap"><div class="table-scroll"><table>
 <thead>
 <tr><th style="text-align: left;"><strong>Roll Result</strong></th><th style="text-align: left;"><strong>Outcome</strong></th><th style="text-align: left;"><strong>What Happens</strong></th></tr>
 </thead>
@@ -265,10 +54,10 @@ matrix.</p></li>
 <tr><td style="text-align: left;"><span class="math inline">0&lt;</span> Successes <span class="math inline">&lt;</span> DV</td><td style="text-align: left;">Partial</td><td style="text-align: left;">Make progress, but with a cost; player gains 1 Boon.</td></tr>
 <tr><td style="text-align: left;">Successes = 0</td><td style="text-align: left;">Miss</td><td style="text-align: left;">No progress; GM escalates with SB; player gains 2 Boons.</td></tr>
 </tbody>
-</table></div>
+</table></div></div>
 </section>
 <section class="level2 unnumbered" id="boons-player-resource">
-<h2 class="unnumbered">Boons (Player Resource)</h2>
+<h3 class="unnumbered">Boons (Player Resource)</h3>
 <ul>
 <li><p>Earn 1 Boon on a <strong>Partial</strong>, 2 Boons on a
 <strong>Miss</strong>.</p></li>
@@ -279,12 +68,12 @@ improve Position by one step.</p></li>
 </ul>
 </section>
 <section class="level2 unnumbered" id="story-beats-gm-resource">
-<h2 class="unnumbered">Story Beats (GM Resource)</h2>
+<h3 class="unnumbered">Story Beats (GM Resource)</h3>
 <p>Each 1 on a player’s die gives the GM 1 SB. Spend SB to introduce
 complications:</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><div class="table-scroll"><table>
 <thead>
-<tr><th style="text-align: left;"><strong>SB SB</strong></th><th style="text-align: left;"><strong>Effect</strong></th></tr>
+<tr><th style="text-align: left;"><strong>SB</strong></th><th style="text-align: left;"><strong>Effect</strong></th></tr>
 </thead>
 <tbody>
 <tr><td style="text-align: left;">1</td><td style="text-align: left;">Minor pressure: noise, trace, tick a 4–6 segment timer +1.</td></tr>
@@ -292,10 +81,10 @@ complications:</p>
 <tr><td style="text-align: left;">3</td><td style="text-align: left;">Serious trouble: reinforcements, key gear breaks, advance a campaign timer.</td></tr>
 <tr><td style="text-align: left;">4+</td><td style="text-align: left;">Major turn: trap springs, authority arrives, environment shifts dramatically.</td></tr>
 </tbody>
-</table></div>
+</table></div></div>
 </section>
 <section class="level2 unnumbered" id="position-and-effect">
-<h2 class="unnumbered">Position and Effect</h2>
+<h3 class="unnumbered">Position and Effect</h3>
 <ul>
 <li><p><strong>Position</strong> (risk): Dominant (safe), Controlled
 (normal), Desperate (high stakes).</p></li>
@@ -307,7 +96,7 @@ step.</p></li>
 </ul>
 </section>
 <section class="level2 unnumbered" id="fatigue-and-harm">
-<h2 class="unnumbered">Fatigue and Harm</h2>
+<h3 class="unnumbered">Fatigue and Harm</h3>
 <ul>
 <li><p><strong>Fatigue</strong> track = Body. Each Fatigue point worsens
 Position by one step. At Desperate, each Fatigue gives -1 die.</p></li>
@@ -320,8 +109,8 @@ resets exhaustion).</p></li>
 </ul>
 </section>
 <section class="level2 unnumbered" id="armor-conversion-table">
-<h2 class="unnumbered">Armor Conversion Table</h2>
-<div class="table-wrap"><table>
+<h3 class="unnumbered">Armor Conversion Table</h3>
+<div class="table-wrap"><div class="table-scroll"><table>
 <thead>
 <tr><th style="text-align: left;"><strong>Armor Type</strong></th><th style="text-align: center;"><strong>Harm 1</strong></th><th style="text-align: center;"><strong>Harm 2</strong></th><th style="text-align: center;"><strong>Harm 3</strong></th></tr>
 </thead>
@@ -330,10 +119,10 @@ resets exhaustion).</p></li>
 <tr><td style="text-align: left;">Medium</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Harm 2 + Fatigue 1</td></tr>
 <tr><td style="text-align: left;">Heavy</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 2</td></tr>
 </tbody>
-</table></div>
+</table></div></div>
 </section>
 <section class="level2 unnumbered" id="quick-reference-defaults">
-<h2 class="unnumbered">Quick Reference: Defaults</h2>
+<h3 class="unnumbered">Quick Reference: Defaults</h3>
 <ul>
 <li><p>Default DV = 3.</p></li>
 <li><p>Default Position = Controlled.</p></li>
@@ -342,7 +131,7 @@ resets exhaustion).</p></li>
 </ul>
 </section>
 <section class="level2 unnumbered" id="example-of-play-one-minute">
-<h2 class="unnumbered">Example of Play (One Minute)</h2>
+<h3 class="unnumbered">Example of Play (One Minute)</h3>
 <p><em>Lyra (Wits 3 + Craft 2 = 5 dice) tries to pick a lock while a
 guard patrol approaches.</em></p>
 <ul>
@@ -355,34 +144,401 @@ SB: the guard stops and turns his head. You have one beat to
 hide.”</p></li>
 </ul>
 </section>
+</section><section class="level1" id="core-principles">
+<h2>Core Principles</h2>
+<section class="level2" id="safety-tools-lines-veils-x-card">
+<h3>Safety Tools: Lines, Veils &amp; X-Card</h3>
+<p>Before play, establish how the table handles sensitive content. Fate’s Edge uses three standard tools.</p>
+<p><strong>X-Card.</strong> Any player (including the GM) may draw an X on a card or simply say “X” when a moment makes them uncomfortable. When the X-Card is shown, the described content is removed from the fiction — no questions, no explanations, no judgments. The scene is retconned or redirected immediately.</p>
+<p><strong>Lines.</strong> A Line is a hard boundary: content that will not appear in the game at all. Examples: “No sexual violence,” “No harm to children,” “No body horror.” Before the campaign or a session, players name their Lines. The GM and group honor them completely.</p>
+<p><strong>Veils.</strong> A Veil is a soft boundary: content that can happen off screen or fade to black. The event is acknowledged but not described in detail. Example: “A romantic scene can happen, but fade to black before it becomes explicit.” Veils allow the story to acknowledge mature themes without forcing players to roleplay through them.</p>
 </section>
-
-<section class="level1" id="core-principles">
-<h1>Core Principles</h1>
-<!-- ... rest of SRD content ... -->
-<!-- Since the SRD is extremely long, I am truncating the full text here for brevity, but the structure and styling are applied consistently across the entire document. -->
-<p><em>Full SRD content continues with all rules, tables, and examples styled consistently.</em></p>
-</section>
-
-<!-- ==================== END MAIN CONTENT ==================== -->
+<section class="level2" id="player-managed-modules">
+<h3>Player-Managed Modules</h3>
+<p>Players track their character-facing resources to reduce GM overhead and keep play flowing:</p>
+<ul>
+<li>Obligation (per Patron, marked when Rites are invoked/pushed).</li>
+<li>Corruption Timer (for Cantors, marked when pushing Songs or GM spends SB on occult actions).</li>
+<li>Leash (for Summoners, marked when spirits take harm, act against nature, split focus, or cross wards).</li>
+<li>Asset States (Symbol/Item condition: Maintained, Neglected, or Compromised).</li>
+</ul>
+<p>GMs retain all world-facing elements: Timers, NPCs, faction moves, Patron intrusions, and narrative consequences. Why this matters: when players manage their own modules, the GM spends less time bookkeeping and more time driving the story. Always verify player tracking at scene start/end.</p>
+<div class="panel panel-purple">
+<p><strong>Design Note.</strong> This rule prevents “GM as auditor” syndrome. If a player forgets to track a module, the GM does not correct it mid-scene — instead, note it for downtime resolution. Trust fosters faster play.</p>
 </div>
-
-<script>
-    function searchContent() {
-        const query = document.getElementById('searchInput')?.value.toLowerCase();
-        const content = document.getElementById('main-content');
-        if (!content || !query) return;
-        const elements = content.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote');
-        for (let el of elements) {
-            const text = el.textContent.toLowerCase();
-            if (text.includes(query)) {
-                el.classList.add('highlight');
-            } else {
-                el.classList.remove('highlight');
-            }
-        }
-    }
-</script>
-
-</body>
-</html>
+</section>
+<section class="level2" id="what-is-fates-edge">
+<h3>What Is Fate’s Edge?</h3>
+<p>Fate’s Edge is a narrative-first tabletop roleplaying system where every action carries weight, every choice has consequence, and even failure feeds the story. Dice are not merely success meters — they are instruments of fate, weaving opportunity with risk.</p>
+<blockquote>
+<p>“The road remembers. Every broken wheel leaves a mark and every lit lamp had someone behind it. The only question is which of those you mean to be.”</p>
+</blockquote>
+</section>
+<section class="level2" id="the-central-question">
+<h3>The Central Question</h3>
+<p>What are you willing to risk, and what are you willing to surrender, to reshape the world around you?</p>
+</section>
+<section class="level2" id="tone-of-play">
+<h3>Tone of Play</h3>
+<ul>
+<li><strong>Cinematic:</strong> Scenes breathe; tense exchanges resolve in moments.</li>
+<li><strong>Consequential:</strong> A whispered secret can topple a kingdom; a missed roll can spare a life.</li>
+<li><strong>Collaborative:</strong> The GM sets stakes; the players drive the fiction.</li>
+</ul>
+</section>
+<section class="level2" id="key-concepts">
+<h3>Key Concepts</h3>
+<section class="level3" id="narrative-time">
+<h4>Narrative Time</h4>
+<p>Time is measured by story weight, not by timers:</p>
+<ul>
+<li><strong>A Moment:</strong> a heartbeat, a strike, a whispered word.</li>
+<li><strong>Some Time:</strong> a few minutes — a skirmish, a careful lockpick, a short negotiation.</li>
+<li><strong>Significant Time:</strong> hours — travel between locations, a ritual, an interrogation.</li>
+<li><strong>Days:</strong> marches across countryside, training a cadre, recovery from serious harm.</li>
+</ul>
+</section>
+<section class="level3" id="story-beats-sb">
+<h4>Story Beats (SB)</h4>
+<p>Every time a player rolls a 1 on a die, the GM gains a Story Beat. SB are narrative currency — spend them to introduce complications, escalate tension, shift Position, or advance timers.</p>
+</section>
+<section class="level3" id="affinity">
+<h4>Affinity</h4>
+<p>Each culture grants an Affinity — a narrative edge or metaphysical bond that makes certain actions more reliable (e.g., Aeler stone-sense, Aelaerem hearth-luck). Affinities are described in the full cultural guides.</p>
+<div class="panel panel-blue">
+<p><strong>Note on Stacking.</strong> If your ancestral gift (from your people) and your cultural affinity provide the same benefit (e.g., both improve Position), they do not stack. You may use one per scene. Choose which applies when you need it.</p>
+</div>
+</section>
+<section class="level3" id="prestige-abilities">
+<h4>Prestige Abilities</h4>
+<p>High-level talents unlocked by mastering cultural or arcane arts. They are narrative milestones as much as mechanical upgrades.</p>
+</section>
+<section class="level3" id="on-screen-vs-off-screen">
+<h4>On-Screen vs. Off-Screen</h4>
+<ul>
+<li><strong>On-Screen:</strong> followers, allies, companions who stand beside you in a scene.</li>
+<li><strong>Off-Screen:</strong> assets, titles, informants, safe houses — resources that act when you spend Boons or during downtime.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="boons-overview">
+<h3>Boons Overview</h3>
+<p>Boons are narrative tokens earned primarily by failing rolls with meaningful consequences. They represent momentum, luck, or a second wind.</p>
+<p><strong>Earning Boons:</strong></p>
+<ul>
+<li>Partial (0 &lt; successes &lt; DV): Gain 1 Boon.</li>
+<li>Miss (successes = 0): Gain 2 Boons (provided the roll was meaningful and generated at least one SB).</li>
+<li>Bond-driven action: Once per bond per session, when you act meaningfully on a Mutual Bond and provide an Intricate Description, gain 1 Boon.</li>
+<li>GM award: For creative solutions, sacrifices, or outstanding roleplay.</li>
+</ul>
+<p><strong>Spending Boons:</strong></p>
+<ul>
+<li>Re-roll a single die after seeing the pool.</li>
+<li>Activate an on-screen Asset.</li>
+<li>Improve Position by one step before a roll.</li>
+<li>Power certain Rites or abilities as described in their text.</li>
+<li>During downtime, convert 2 Boons → 1 XP (once per session; max 2 XP per session via conversion).</li>
+</ul>
+<p><strong>Limits:</strong></p>
+<ul>
+<li>Maximum 5 Boons held at any time.</li>
+<li>At the end of each scene, reduce held Boons to a maximum of 2 (excess are lost).</li>
+<li>At most 2 Boons from failures per character per scene.</li>
+<li>Repetition rule: the same action with the same stakes in the same scene cannot award another Boon.</li>
+</ul>
+</section>
+<section class="level2" id="gm-guidelines-for-timers-and-sb">
+<h3>GM Guidelines for Timers and SB</h3>
+<p>To keep the game flowing and avoid overwhelming the table:</p>
+<ul>
+<li><strong>Timer Limit:</strong> Maintain at most three active timers per scene. Combine redundant timers or treat additional timers as off-screen campaign timers (ticked between scenes as a result of scene outcomes).</li>
+<li><strong>SB Banking:</strong> Try to keep banked SB (unspent at scene end) under Tier + 1 (e.g., Tier I: max 2 SB, Tier II: max 3 SB). Unspent SB beyond this may carry over (GM discretion, max 4).</li>
+<li><strong>Terminology:</strong> Use “Success with SB” instead of “Success with SB” for clarity — it emphasizes the narrative opportunity rather than a penalty.</li>
+</ul>
+</section>
+<section class="level2" id="fail-forward-every-roll-matters">
+<h3>Fail Forward: Every Roll Matters</h3>
+<ul>
+<li>A <strong>Clean Success</strong> advances the fiction without added friction.</li>
+<li>A <strong>Success with SB</strong> achieves the goal but introduces a complication (GM spends SB).</li>
+<li>A <strong>Partial</strong> makes meaningful progress and gives the player a Boon.</li>
+<li>A <strong>Miss</strong> fails to achieve the goal, gives the player 2 Boons, and gives the GM SB to escalate.</li>
+</ul>
+</section>
+<section class="level2" id="selling-the-action">
+<h3>Selling the Action</h3>
+<p>When a player provides an intricate description that reveals stakes, risks, or character investment, the GM may grant a mechanical edge — improving Position by one step, granting +1 die, or banking a Story Beat. This is a reward for engagement, not a tax for shy players. A simple ‘I attack’ is always valid.</p>
+<p>No roll should result in “nothing happens.” Every outcome changes the situation.</p>
+<div class="panel panel-gold">
+<p><strong>What Are Story Beats, Really?</strong> Story Beats (SB) are the game’s permission to make things interesting. Every time a player rolls a 1, they are inviting the world to push back. SB are not punishments — they are narrative fuel generated by player dice, telling you: “Make this interesting.” Spend them to introduce complications, escalate threats, or reveal hidden dangers. Do not hoard SB for the climax — the climax is made of the SB you spent along the way. A scene without SB is a scene where players are in control; a scene with SB is where the world pushes back. They are your primary pacing tool.</p>
+</div>
+</section>
+<section class="level2" id="can-i-roll-fewer-dice-no">
+<h3>Can I Roll Fewer Dice? No!</h3>
+<p>Never reduce a player’s dice pool. A player who asks to roll fewer dice to avoid Story Beats misunderstands the system. In Fate’s Edge, a 1 is not a failure — it is narrative fuel. Reducing dice pools breaks the math: Boons become scarce, SB dry up, and the player’s investment is undermined.</p>
+<p>If you want tension, use Position, DV, Timers, and SB — never reduce the player’s dice pool. They earned those dice. Let them roll them.</p>
+</section>
+</section><section class="level1" id="core-mechanic">
+<h2>Core Mechanic</h2>
+<section class="level2" id="the-resolution-loop">
+<h3>The Resolution Loop</h3>
+<p>Every action that carries risk and uncertainty follows these five steps.</p>
+<ol>
+<li><strong>Declare intent and approach.</strong> The player states what they want to accomplish and how (Attribute + Skill).</li>
+<li><strong>GM sets Position and Difficulty (DV).</strong>
+<ul>
+<li>Position: Dominant (advantage), Controlled (normal), Desperate (high risk).</li>
+<li>DV: 2 (routine) to 5+ (extreme). Default DV = 3.</li>
+</ul>
+</li>
+<li><strong>Roll dice.</strong> Pool = Attribute + Skill (d10s). Count successes:
+<ul>
+<li>6–9 = 1 success.</li>
+<li>10 = 2 successes.</li>
+</ul>
+</li>
+<li><strong>Count Story Beats (SB).</strong> Each die showing a 1 gives the GM 1 SB.</li>
+<li><strong>Apply the Outcome Matrix.</strong></li>
+</ol>
+</section>
+<section class="level2" id="critical-success">
+<h3>Critical Success</h3>
+<p>Rolling a 10 (counting as 2 successes) creates additional benefits:</p>
+<ul>
+<li><strong>One 10:</strong> Choose one – gain a free Boon, improve Position by one step, or add a narrative flourish.</li>
+<li><strong>Two 10s:</strong> Choose two benefits or one powerful effect (e.g., ignore armor + gain tactical advantage).</li>
+<li><strong>Three+ 10s:</strong> Legendary success – resolve the conflict dramatically and advance a secondary timer or create a significant story development.</li>
+</ul>
+<p class="text-muted">Note: 10s are never re-rolled (even in Desperate position). Critical effects apply only if the roll succeeds (Successes ≥ DV).</p>
+</section>
+<section class="level2" id="difficulty-values-dv">
+<h3>Difficulty Values (DV)</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>DV</th><th>Situation</th></tr>
+</thead>
+<tbody>
+<tr><td>2</td><td>Routine, low stakes, nearly guaranteed.</td></tr>
+<tr><td>3</td><td>Default – pressured or minor opposition.</td></tr>
+<tr><td>4</td><td>Hard – hostile conditions, active resistance.</td></tr>
+<tr><td>5</td><td>Extreme – multiple constraints, dramatic gambles.</td></tr>
+</tbody>
+</table></div>
+<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+</div>
+</section>
+<section class="level2" id="core-mechanic-position-and-effect">
+<h3>Position &amp; Effect</h3>
+<div class="grid-2">
+<div class="panel">
+<p><strong>Position (Risk)</strong></p>
+<ul>
+<li><strong>Dominant:</strong> Re-roll one failure (die ≤ 5).</li>
+<li><strong>Controlled:</strong> No re-rolls.</li>
+<li><strong>Desperate:</strong> Re-roll one success (die ≥ 6). 10s are never re-rolled.</li>
+</ul>
+</div>
+<div class="panel">
+<p><strong>Effect (Reward)</strong></p>
+<ul>
+<li><strong>Limited:</strong> Minimal outcome.</li>
+<li><strong>Standard:</strong> Expected outcome.</li>
+<li><strong>Great:</strong> Strong outcome with additional benefit.</li>
+</ul>
+</div>
+</div>
+<p><strong>Modifiers:</strong></p>
+<ul>
+<li>Player may spend 1 Boon before rolling to improve Position by one step.</li>
+<li>GM may spend SB to worsen Position or reduce Effect.</li>
+<li><strong>The ladder ends.</strong> Position never rises above Dominant or falls below Desperate. At either end further modifiers do nothing; they do not convert into dice.</li>
+<li>This matters because your pool is only ever what you paid for. A character with Attribute 1 and Skill 0 rolls one die at their worst, never none — so the question is always <em>how badly can this go</em>, and never <em>may I attempt it at all</em>. It is also what lets heritage, cultural affinity, assists and gear all push on Position without any of them touching the dice.</li>
+<li>A fourth source of advantage on an already-Dominant roll is not wasted. It is the GM's cue to lower the DV, widen the Effect, or just say yes.</li>
+</ul>
+<div class="panel">
+<p><strong>Effect is spoken, not tracked.</strong></p>
+<p>Position has three named steps because you need to know which one you
+are on before you roll. Effect has three named steps for the opposite
+reason: so the table has words for a swing after it lands. There is no
+Effect track, no Effect rating, and nothing to write down. The GM says
+it — <em>“that's Great Effect, they're outnumbered three to
+one”</em> — the table hears it, and the fiction carries it
+from there.</p>
+<p>This is why Scale mismatch moves Effect and never the DV or the dice.
+A giant swinging at a man and a man swinging at a giant are the same
+roll against the same difficulty; what differs is how much a hit
+accomplishes. Putting that on the dice would make the giant hard to
+hit, which is not what being large means.</p>
+<p>Say it in the fiction and give the reason. Digital tools may announce
+an Effect call to the table, but none of them store it, on purpose: the
+moment Effect becomes a number somebody owns, the table argues about the
+number instead of describing the swing.</p>
+</div>
+</section>
+<section class="level2" id="core-mechanic-outcome-matrix">
+<h3>Outcome Matrix</h3>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Roll Result</th><th>Outcome</th><th>What Happens</th></tr>
+</thead>
+<tbody>
+<tr><td>Successes ≥ DV, SB = 0</td><td>Clean Success</td><td>Intent achieved; no complication.</td></tr>
+<tr><td>Successes ≥ DV, SB &gt; 0</td><td>Success with SB</td><td>Intent achieved; GM spends SB for a complication.</td></tr>
+<tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; player gains 1 Boon.</td></tr>
+<tr><td>Successes = 0</td><td>Miss</td><td>No progress; player gains 2 Boons; GM escalates with SB.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level2" id="core-mechanic-boons-player-resource">
+<h3>Boons (Player Resource)</h3>
+<section class="level3" id="earning-boons">
+<h4>Earning Boons</h4>
+<ul>
+<li>Partial: gain 1 Boon.</li>
+<li>Miss: gain 2 Boons (if the roll was meaningful and generated at least one SB).</li>
+<li>Bond-driven action (once per bond per session): gain 1 Boon.</li>
+<li>GM award (creative solutions, sacrifices, outstanding roleplay).</li>
+</ul>
+</section>
+<section class="level3" id="spending-boons">
+<h4>Spending Boons</h4>
+<ul>
+<li>Re-roll a single die after seeing the pool (keep second result; new 1s generate additional SB).</li>
+<li>Activate an Asset (on-screen).</li>
+<li>Improve Position by one step before a roll.</li>
+<li>Power certain Rites or abilities.</li>
+<li>Convert 2 Boons → 1 XP (downtime, once per session, max 2 XP).</li>
+</ul>
+</section>
+<section class="level3" id="boon-limits">
+<h4>Limits</h4>
+<ul>
+<li>Max 5 Boons held.</li>
+<li>At end of each scene, reduce to max 2 (excess lost).</li>
+<li>At most 2 Boons from failures per character per scene (repetition of same action + stakes does not award another Boon).</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="core-mechanic-story-beats-gm-resource">
+<h3>Story Beats (GM Resource)</h3>
+<p>Every die showing a 1 gives the GM 1 Story Beat (SB). Spend SB to introduce complications or escalate pressure.</p>
+<p><strong>Guidelines:</strong></p>
+<ul>
+<li><span class="badge badge-green">1 SB</span> minor – noise, trace, tick a 4–6 segment timer +1.</li>
+<li><span class="badge badge-blue">2 SB</span> moderate – alarm raised, lose Position, lesser foe appears.</li>
+<li><span class="badge badge-orange">3 SB</span> serious – reinforcements, key gear breaks, advance a campaign timer.</li>
+<li><span class="badge badge-red">4+ SB</span> major – trap springs, authority arrives, environment shifts dramatically.</li>
+</ul>
+</section>
+<section class="level2" id="npcs-and-resources">
+<h3>NPCs and Resources</h3>
+<p>Adversaries track listed Fatigue and Resilience, but no Boons or player Harm-level track. Apply Fatigue costs to their track. A Boon-loss effect becomes a fitting hesitation or loss of advantage, not an invented NPC Boon balance. See the adversary resolution procedure for Armor and overflow.</p>
+</section>
+<section class="level2" id="npc-special-abilities-as-sb-spends">
+<h3>NPC Special Abilities as SB Spends</h3>
+<p>Instead of rolling for NPC abilities, the GM may spend Story Beats to trigger narrative events.</p>
+<p><strong>Example SB Spends:</strong></p>
+<ul>
+<li><span class="badge badge-green">1 SB</span> “The cultist’s eyes burn – mark 1 Fatigue (near miss).”</li>
+<li><span class="badge badge-blue">2 SB</span> “The spider drops on you – you are Grappled (escape DV 3).”</li>
+<li><span class="badge badge-orange">3 SB</span> “The drake breathes frost – everyone in Near, test Body+Athletics (DV 3) or take Harm 2.”</li>
+<li><span class="badge badge-red">4+ SB</span> “The lich raises its hand – test Spirit+Endurance (DV 5) or be Paralyzed for 1 exchange.”</li>
+</ul>
+<p class="text-muted">The GM narrates the effect; players roll to resist.</p>
+</section>
+<section class="level2" id="assistance">
+<h3>Assistance</h3>
+<ul>
+<li>One helper per action.</li>
+<li>Total assist dice capped at +3 (unless a talent says otherwise).</li>
+<li>Assistant accepts any risk named by the GM.</li>
+</ul>
+</section>
+<section class="level2" id="core-mechanic-fatigue-and-harm">
+<h3>Fatigue and Harm</h3>
+<section class="level3" id="fatigue">
+<h4>Fatigue</h4>
+<ul>
+<li>Track size = Body (minimum 1).</li>
+<li>Each point worsens Position by one step (Dominant → Controlled → Desperate).</li>
+<li>If already Desperate, each additional Fatigue imposes –1 die on all rolls.</li>
+</ul>
+</section>
+<section class="level3" id="harm">
+<h4>Harm</h4>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Harm Level</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>–1 die on related actions (GM discretion).</td></tr>
+<tr><td>2</td><td>–1 die on most actions until treated.</td></tr>
+<tr><td>3</td><td>Incapacitated or dying.</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<section class="level3" id="taking-harm-clears-fatigue">
+<h4>Taking Harm Clears Fatigue (Roller-Coaster)</h4>
+<ol>
+<li>Convert incoming Harm to Fatigue using the Armor Conversion Table.</li>
+<li>Apply any remaining Harm. If Harm remains, clear all existing Fatigue, then increase Harm level by amount taken.</li>
+<li>Add Fatigue from step 1 to the Fatigue track. If the track fills, increase Harm by 1 and clear all Fatigue.</li>
+</ol>
+</section>
+<section class="level3" id="armor">
+<h4>Armor</h4>
+<p><strong>Armor Conversion Table</strong></p>
+<div class="table-wrap">
+<div class="table-scroll"><table>
+<thead>
+<tr><th>Armor</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
+</thead>
+<tbody>
+<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
+<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Minimum 1 Fatigue per hit, even if conversion would give 0.</p>
+</section>
+<section class="level3" id="recovery">
+<h4>Recovery</h4>
+<ul>
+<li><strong>Fatigue:</strong> Short rest (1 hour) removes 2; full night’s rest removes all.</li>
+<li><strong>Harm:</strong> Requires medical care (Craft roll) or magical healing; natural recovery takes one week per level.</li>
+</ul>
+</section>
+</section>
+<section class="level2" id="wards-and-traps">
+<h3>Wards and Traps</h3>
+<p>Wards are magical barriers that block passage, teleportation, and shadow-walking. Traps are mundane or magical hazards that trigger on intrusion. Both use the same base resolution structure.</p>
+<section class="level3" id="wards-magical-barriers">
+<h4>Wards (Magical Barriers)</h4>
+<p>A ward is defined by its Base DV (2–5), chosen by the GM when the ward is placed. The ward’s other properties derive from this DV:</p>
+<ul>
+<li><strong>Harm:</strong> A creature that triggers the ward suffers Harm equal to max(0, Base DV – 2).</li>
+<li><strong>Spirit Leash:</strong> A spirit (including summoned creatures) attempting to cross the ward suffers Leash ticks equal to the ward’s Base DV.</li>
+</ul>
+<p><strong>Crossing a Ward.</strong> A creature cannot teleport, shadow-walk, or use any effect that bypasses intervening space to cross a ward without first overcoming it. To cross, the creature must succeed on a test of the appropriate attribute (usually Wits or Presence) + Spirit against the ward’s Base DV. On a failure, the crossing fails and the creature suffers the ward’s Harm (if any). On a success, the creature crosses but may still suffer other consequences (e.g., alerting the ward’s creator).</p>
+<p><strong>Disabling a Ward.</strong> A character may attempt to disable a ward with a Wits + Arcana test against the ward’s Base DV. Success renders the ward inert for one scene (or permanently, at the GM’s discretion for non-recurring wards). Alternatively, a spell with the <code>[DISPEL]</code> or <code>[FATE]</code> tags may suppress or destroy the ward as described in the spell’s effect.</p>
+</section>
+<section class="level3" id="traps-mundane-or-magical">
+<h4>Traps (Mundane or Magical)</h4>
+<p>Traps function similarly to wards but do not impede teleportation or shadow-walking, nor do they inflict Leash ticks on spirits. A trap has a Base DV (2–5) and deals Harm equal to max(0, Base DV – 2) when triggered.</p>
+<p><strong>Disarming a Trap.</strong> A trap can be disarmed with a Wits + Deception test against its Base DV. On a success, the trap is neutralised. On a failure, the trap may trigger (GM’s discretion).</p>
+<div class="panel panel-green">
+<p><strong>Example.</strong> A Lesser Wardstone (DV 3) bars a doorway. A character attempting to shadow-walk past must roll Wits + Spirit (DV 3). Failure inflicts Harm 1 (since 3–2 = 1). A spirit crossing the same ward gains 3 Leash ticks. A Wits + Arcana (DV 3) success disables the ward.</p>
+</div>
+</section>
+</section>
+<section class="level2" id="maximum-dice-pool">
+<h3>Maximum Dice Pool</h3>
+<p>Maximum die pool = 10d10. Any additional dice beyond 10 become automatic successes (1 auto-success per extra die).</p>
+</section>
+</section></div><p>Continue: <a href="srd/characters.html">Character creation and advancement</a></p><details><summary>Links from the previous single-page edition</summary><p id="character-creation"><a href="srd/characters.html#character-creation">Open character creation</a></p><p id="starting-build-points"><a href="srd/characters.html#starting-build-points">Open starting build points</a></p><p id="enhanced-starting-builds"><a href="srd/characters.html#enhanced-starting-builds">Open enhanced starting builds</a></p><p id="step-by-step-creation"><a href="srd/characters.html#step-by-step-creation">Open step by step creation</a></p><p id="step-1-concept-and-culture"><a href="srd/characters.html#step-1-concept-and-culture">Open step 1 concept and culture</a></p><p id="step-2-attributes"><a href="srd/characters.html#step-2-attributes">Open step 2 attributes</a></p><p id="step-3-skills"><a href="srd/characters.html#step-3-skills">Open step 3 skills</a></p><p id="step-4-talents"><a href="srd/characters.html#step-4-talents">Open step 4 talents</a></p><p id="step-5-equipment"><a href="srd/characters.html#step-5-equipment">Open step 5 equipment</a></p><p id="step-6-bonds"><a href="srd/characters.html#step-6-bonds">Open step 6 bonds</a></p><p id="step-7-complications-optional"><a href="srd/characters.html#step-7-complications-optional">Open step 7 complications optional</a></p><p id="step-8-finalize"><a href="srd/characters.html#step-8-finalize">Open step 8 finalize</a></p><p id="quick-build-templates"><a href="srd/characters.html#quick-build-templates">Open quick build templates</a></p><p id="fighter"><a href="srd/characters.html#fighter">Open fighter</a></p><p id="rogue"><a href="srd/characters.html#rogue">Open rogue</a></p><p id="caster"><a href="srd/characters.html#caster">Open caster</a></p><p id="learning-through-examples"><a href="srd/characters.html#learning-through-examples">Open learning through examples</a></p><p id="advanced-start-tier-ii"><a href="srd/characters.html#advanced-start-tier-ii">Open advanced start tier ii</a></p><p id="session-zero-tips"><a href="srd/characters.html#session-zero-tips">Open session zero tips</a></p><p id="build-point-summary"><a href="srd/characters.html#build-point-summary">Open build point summary</a></p><p id="attributes-and-skills"><a href="srd/characters.html#attributes-and-skills">Open attributes and skills</a></p><p id="attributes"><a href="srd/characters.html#attributes">Open attributes</a></p><p id="skills"><a href="srd/characters.html#skills">Open skills</a></p><p id="skills-combat"><a href="srd/characters.html#skills-combat">Open skills combat</a></p><p id="skills-physical"><a href="srd/characters.html#skills-physical">Open skills physical</a></p><p id="skills-practical"><a href="srd/characters.html#skills-practical">Open skills practical</a></p><p id="skills-social"><a href="srd/characters.html#skills-social">Open skills social</a></p><p id="skills-mental"><a href="srd/characters.html#skills-mental">Open skills mental</a></p><p id="skills-magic"><a href="srd/characters.html#skills-magic">Open skills magic</a></p><p id="skills-expansion"><a href="srd/characters.html#skills-expansion">Open skills expansion</a></p><p id="skill-uses-common-examples"><a href="srd/characters.html#skill-uses-common-examples">Open skill uses common examples</a></p><p id="default-skill-for-common-actions"><a href="srd/characters.html#default-skill-for-common-actions">Open default skill for common actions</a></p><p id="assistance-and-skill-synergy"><a href="srd/characters.html#assistance-and-skill-synergy">Open assistance and skill synergy</a></p><p id="advancement"><a href="srd/characters.html#advancement">Open advancement</a></p><p id="awarding-xp"><a href="srd/characters.html#awarding-xp">Open awarding xp</a></p><p id="advancement-heading-1"><a href="srd/characters.html#advancement-heading-1">Open advancement heading 1</a></p><p id="session-awards"><a href="srd/characters.html#session-awards">Open session awards</a></p><p id="advancement-heading-2"><a href="srd/characters.html#advancement-heading-2">Open advancement heading 2</a></p><p id="milestones"><a href="srd/characters.html#milestones">Open milestones</a></p><p id="advancement-heading-3"><a href="srd/characters.html#advancement-heading-3">Open advancement heading 3</a></p><p id="boon-conversion"><a href="srd/characters.html#boon-conversion">Open boon conversion</a></p><p id="advancement-heading-4"><a href="srd/characters.html#advancement-heading-4">Open advancement heading 4</a></p><p id="spending-xp"><a href="srd/characters.html#spending-xp">Open spending xp</a></p><p id="advancement-heading-5"><a href="srd/characters.html#advancement-heading-5">Open advancement heading 5</a></p><p id="advancement-upkeep"><a href="srd/characters.html#advancement-upkeep">Open advancement upkeep</a></p><p id="advancement-heading-6"><a href="srd/characters.html#advancement-heading-6">Open advancement heading 6</a></p><p id="rush-rule"><a href="srd/characters.html#rush-rule">Open rush rule</a></p><p id="advancement-heading-7"><a href="srd/characters.html#advancement-heading-7">Open advancement heading 7</a></p><p id="rush-rule-procedure"><a href="srd/characters.html#rush-rule-procedure">Open rush rule procedure</a></p><p id="advancement-heading-8"><a href="srd/characters.html#advancement-heading-8">Open advancement heading 8</a></p><p id="tiers-of-reputation"><a href="srd/characters.html#tiers-of-reputation">Open tiers of reputation</a></p><p id="advancement-heading-9"><a href="srd/characters.html#advancement-heading-9">Open advancement heading 9</a></p><p id="high-tier-play-and-boons"><a href="srd/characters.html#high-tier-play-and-boons">Open high tier play and boons</a></p><p id="advancement-heading-10"><a href="srd/characters.html#advancement-heading-10">Open advancement heading 10</a></p><p id="archmages-choice"><a href="srd/characters.html#archmages-choice">Open archmages choice</a></p><p id="advancement-heading-11"><a href="srd/characters.html#advancement-heading-11">Open advancement heading 11</a></p><p id="advancement-notes"><a href="srd/characters.html#advancement-notes">Open advancement notes</a></p><p id="advancement-heading-12"><a href="srd/characters.html#advancement-heading-12">Open advancement heading 12</a></p><p id="equipment"><a href="srd/combat.html#equipment">Open equipment</a></p><p id="weapons-by-weight-class"><a href="srd/combat.html#weapons-by-weight-class">Open weapons by weight class</a></p><p id="equipment-heading-1"><a href="srd/combat.html#equipment-heading-1">Open equipment heading 1</a></p><p id="weapon-weight-class-notes"><a href="srd/combat.html#weapon-weight-class-notes">Open weapon weight class notes</a></p><p id="equipment-heading-2"><a href="srd/combat.html#equipment-heading-2">Open equipment heading 2</a></p><p id="ranged-weapons-and-ammunition"><a href="srd/combat.html#ranged-weapons-and-ammunition">Open ranged weapons and ammunition</a></p><p id="equipment-heading-3"><a href="srd/combat.html#equipment-heading-3">Open equipment heading 3</a></p><p id="equipment-armor"><a href="srd/combat.html#equipment-armor">Open equipment armor</a></p><p id="equipment-heading-4"><a href="srd/combat.html#equipment-heading-4">Open equipment heading 4</a></p><p id="armor-notes"><a href="srd/combat.html#armor-notes">Open armor notes</a></p><p id="equipment-heading-5"><a href="srd/combat.html#equipment-heading-5">Open equipment heading 5</a></p><p id="armor-conversion-examples"><a href="srd/combat.html#armor-conversion-examples">Open armor conversion examples</a></p><p id="equipment-heading-6"><a href="srd/combat.html#equipment-heading-6">Open equipment heading 6</a></p><p id="shields-optional"><a href="srd/combat.html#shields-optional">Open shields optional</a></p><p id="equipment-heading-7"><a href="srd/combat.html#equipment-heading-7">Open equipment heading 7</a></p><p id="mundane-gear"><a href="srd/combat.html#mundane-gear">Open mundane gear</a></p><p id="equipment-heading-8"><a href="srd/combat.html#equipment-heading-8">Open equipment heading 8</a></p><p id="supply-timer"><a href="srd/combat.html#supply-timer">Open supply timer</a></p><p id="equipment-heading-9"><a href="srd/combat.html#equipment-heading-9">Open equipment heading 9</a></p><p id="equipment-condition"><a href="srd/combat.html#equipment-condition">Open equipment condition</a></p><p id="equipment-heading-10"><a href="srd/combat.html#equipment-heading-10">Open equipment heading 10</a></p><p id="repair"><a href="srd/combat.html#repair">Open repair</a></p><p id="equipment-heading-11"><a href="srd/combat.html#equipment-heading-11">Open equipment heading 11</a></p><p id="magical-items-enchantments"><a href="srd/combat.html#magical-items-enchantments">Open magical items enchantments</a></p><p id="equipment-heading-12"><a href="srd/combat.html#equipment-heading-12">Open equipment heading 12</a></p><p id="enchantment-limits"><a href="srd/combat.html#enchantment-limits">Open enchantment limits</a></p><p id="equipment-heading-13"><a href="srd/combat.html#equipment-heading-13">Open equipment heading 13</a></p><p id="sample-enchantments"><a href="srd/combat.html#sample-enchantments">Open sample enchantments</a></p><p id="equipment-heading-14"><a href="srd/combat.html#equipment-heading-14">Open equipment heading 14</a></p><p id="removing-an-enchantment"><a href="srd/combat.html#removing-an-enchantment">Open removing an enchantment</a></p><p id="equipment-heading-15"><a href="srd/combat.html#equipment-heading-15">Open equipment heading 15</a></p><p id="weapon-and-armor-acquisition"><a href="srd/combat.html#weapon-and-armor-acquisition">Open weapon and armor acquisition</a></p><p id="equipment-heading-16"><a href="srd/combat.html#equipment-heading-16">Open equipment heading 16</a></p><p id="action-economy"><a href="srd/combat.html#action-economy">Open action economy</a></p><p id="turn-structure"><a href="srd/combat.html#turn-structure">Open turn structure</a></p><p id="action-economy-heading-1"><a href="srd/combat.html#action-economy-heading-1">Open action economy heading 1</a></p><p id="move"><a href="srd/combat.html#move">Open move</a></p><p id="action-economy-heading-2"><a href="srd/combat.html#action-economy-heading-2">Open action economy heading 2</a></p><p id="actions"><a href="srd/combat.html#actions">Open actions</a></p><p id="action-economy-heading-3"><a href="srd/combat.html#action-economy-heading-3">Open action economy heading 3</a></p><p id="attack"><a href="srd/combat.html#attack">Open attack</a></p><p id="action-economy-heading-4"><a href="srd/combat.html#action-economy-heading-4">Open action economy heading 4</a></p><p id="disengage-action"><a href="srd/combat.html#disengage-action">Open disengage action</a></p><p id="action-economy-heading-5"><a href="srd/combat.html#action-economy-heading-5">Open action economy heading 5</a></p><p id="dash"><a href="srd/combat.html#dash">Open dash</a></p><p id="action-economy-heading-6"><a href="srd/combat.html#action-economy-heading-6">Open action economy heading 6</a></p><p id="charge-action-economy"><a href="srd/combat.html#charge-action-economy">Open charge action economy</a></p><p id="action-economy-heading-7"><a href="srd/combat.html#action-economy-heading-7">Open action economy heading 7</a></p><p id="skirmish-action-economy"><a href="srd/combat.html#skirmish-action-economy">Open skirmish action economy</a></p><p id="action-economy-heading-8"><a href="srd/combat.html#action-economy-heading-8">Open action economy heading 8</a></p><p id="observe-change-position"><a href="srd/combat.html#observe-change-position">Open observe change position</a></p><p id="action-economy-heading-9"><a href="srd/combat.html#action-economy-heading-9">Open action economy heading 9</a></p><p id="setup-teamwork"><a href="srd/combat.html#setup-teamwork">Open setup teamwork</a></p><p id="action-economy-heading-10"><a href="srd/combat.html#action-economy-heading-10">Open action economy heading 10</a></p><p id="assist-teamwork"><a href="srd/combat.html#assist-teamwork">Open assist teamwork</a></p><p id="action-economy-heading-11"><a href="srd/combat.html#action-economy-heading-11">Open action economy heading 11</a></p><p id="protect-action-economy"><a href="srd/combat.html#protect-action-economy">Open protect action economy</a></p><p id="action-economy-heading-12"><a href="srd/combat.html#action-economy-heading-12">Open action economy heading 12</a></p><p id="interact"><a href="srd/combat.html#interact">Open interact</a></p><p id="action-economy-heading-13"><a href="srd/combat.html#action-economy-heading-13">Open action economy heading 13</a></p><p id="defend-action-economy"><a href="srd/combat.html#defend-action-economy">Open defend action economy</a></p><p id="action-economy-heading-14"><a href="srd/combat.html#action-economy-heading-14">Open action economy heading 14</a></p><p id="free-actions"><a href="srd/combat.html#free-actions">Open free actions</a></p><p id="action-economy-heading-15"><a href="srd/combat.html#action-economy-heading-15">Open action economy heading 15</a></p><p id="reactions-out-of-turn"><a href="srd/combat.html#reactions-out-of-turn">Open reactions out of turn</a></p><p id="action-economy-heading-16"><a href="srd/combat.html#action-economy-heading-16">Open action economy heading 16</a></p><p id="sidestep-strike"><a href="srd/combat.html#sidestep-strike">Open sidestep strike</a></p><p id="action-economy-heading-17"><a href="srd/combat.html#action-economy-heading-17">Open action economy heading 17</a></p><p id="shove-action-economy"><a href="srd/combat.html#shove-action-economy">Open shove action economy</a></p><p id="action-economy-heading-18"><a href="srd/combat.html#action-economy-heading-18">Open action economy heading 18</a></p><p id="grapple-action-economy"><a href="srd/combat.html#grapple-action-economy">Open grapple action economy</a></p><p id="action-economy-heading-19"><a href="srd/combat.html#action-economy-heading-19">Open action economy heading 19</a></p><p id="hiding-and-cover"><a href="srd/combat.html#hiding-and-cover">Open hiding and cover</a></p><p id="action-economy-heading-20"><a href="srd/combat.html#action-economy-heading-20">Open action economy heading 20</a></p><p id="ready-and-overwatch"><a href="srd/combat.html#ready-and-overwatch">Open ready and overwatch</a></p><p id="action-economy-heading-21"><a href="srd/combat.html#action-economy-heading-21">Open action economy heading 21</a></p><p id="refresh-windows"><a href="srd/combat.html#refresh-windows">Open refresh windows</a></p><p id="action-economy-heading-22"><a href="srd/combat.html#action-economy-heading-22">Open action economy heading 22</a></p><p id="summary-table-of-actions"><a href="srd/combat.html#summary-table-of-actions">Open summary table of actions</a></p><p id="action-economy-heading-23"><a href="srd/combat.html#action-economy-heading-23">Open action economy heading 23</a></p><p id="combat"><a href="srd/combat.html#combat">Open combat</a></p><p id="rhythm-of-battle"><a href="srd/combat.html#rhythm-of-battle">Open rhythm of battle</a></p><p id="combat-heading-1"><a href="srd/combat.html#combat-heading-1">Open combat heading 1</a></p><p id="turn-structure-combat"><a href="srd/combat.html#turn-structure-combat">Open turn structure combat</a></p><p id="combat-heading-2"><a href="srd/combat.html#combat-heading-2">Open combat heading 2</a></p><p id="move-combat"><a href="srd/combat.html#move-combat">Open move combat</a></p><p id="combat-heading-3"><a href="srd/combat.html#combat-heading-3">Open combat heading 3</a></p><p id="disengage-combat"><a href="srd/combat.html#disengage-combat">Open disengage combat</a></p><p id="combat-heading-4"><a href="srd/combat.html#combat-heading-4">Open combat heading 4</a></p><p id="range-bands"><a href="srd/combat.html#range-bands">Open range bands</a></p><p id="combat-heading-5"><a href="srd/combat.html#combat-heading-5">Open combat heading 5</a></p><p id="melee-flag"><a href="srd/combat.html#melee-flag">Open melee flag</a></p><p id="combat-heading-6"><a href="srd/combat.html#combat-heading-6">Open combat heading 6</a></p><p id="opportunity-attacks"><a href="srd/combat.html#opportunity-attacks">Open opportunity attacks</a></p><p id="combat-heading-7"><a href="srd/combat.html#combat-heading-7">Open combat heading 7</a></p><p id="full-turn-actions"><a href="srd/combat.html#full-turn-actions">Open full turn actions</a></p><p id="combat-heading-8"><a href="srd/combat.html#combat-heading-8">Open combat heading 8</a></p><p id="charge-combat"><a href="srd/combat.html#charge-combat">Open charge combat</a></p><p id="combat-heading-9"><a href="srd/combat.html#combat-heading-9">Open combat heading 9</a></p><p id="skirmish-combat"><a href="srd/combat.html#skirmish-combat">Open skirmish combat</a></p><p id="combat-heading-10"><a href="srd/combat.html#combat-heading-10">Open combat heading 10</a></p><p id="cover-and-hiding"><a href="srd/combat.html#cover-and-hiding">Open cover and hiding</a></p><p id="combat-heading-11"><a href="srd/combat.html#combat-heading-11">Open combat heading 11</a></p><p id="cover"><a href="srd/combat.html#cover">Open cover</a></p><p id="combat-heading-12"><a href="srd/combat.html#combat-heading-12">Open combat heading 12</a></p><p id="hiding"><a href="srd/combat.html#hiding">Open hiding</a></p><p id="combat-heading-13"><a href="srd/combat.html#combat-heading-13">Open combat heading 13</a></p><p id="height-advantage"><a href="srd/combat.html#height-advantage">Open height advantage</a></p><p id="combat-heading-14"><a href="srd/combat.html#combat-heading-14">Open combat heading 14</a></p><p id="difficult-terrain"><a href="srd/combat.html#difficult-terrain">Open difficult terrain</a></p><p id="combat-heading-15"><a href="srd/combat.html#combat-heading-15">Open combat heading 15</a></p><p id="mounted-combat-simplified"><a href="srd/combat.html#mounted-combat-simplified">Open mounted combat simplified</a></p><p id="combat-heading-16"><a href="srd/combat.html#combat-heading-16">Open combat heading 16</a></p><p id="combat-action-options"><a href="srd/combat.html#combat-action-options">Open combat action options</a></p><p id="combat-heading-17"><a href="srd/combat.html#combat-heading-17">Open combat heading 17</a></p><p id="default-combat-assumptions"><a href="srd/combat.html#default-combat-assumptions">Open default combat assumptions</a></p><p id="combat-heading-18"><a href="srd/combat.html#combat-heading-18">Open combat heading 18</a></p><p id="example-melee-exchange"><a href="srd/combat.html#example-melee-exchange">Open example melee exchange</a></p><p id="combat-heading-19"><a href="srd/combat.html#combat-heading-19">Open combat heading 19</a></p><p id="integration-with-fatigue-and-harm"><a href="srd/combat.html#integration-with-fatigue-and-harm">Open integration with fatigue and harm</a></p><p id="combat-heading-20"><a href="srd/combat.html#combat-heading-20">Open combat heading 20</a></p><p id="health-fatigue-harm"><a href="srd/combat.html#health-fatigue-harm">Open health fatigue harm</a></p><p id="fatigue-track"><a href="srd/combat.html#fatigue-track">Open fatigue track</a></p><p id="effect-of-fatigue"><a href="srd/combat.html#effect-of-fatigue">Open effect of fatigue</a></p><p id="harm-levels"><a href="srd/combat.html#harm-levels">Open harm levels</a></p><p id="taking-harm-and-fatigue-the-procedure"><a href="srd/combat.html#taking-harm-and-fatigue-the-procedure">Open taking harm and fatigue the procedure</a></p><p id="health-fatigue-harm-armor-conversion-table"><a href="srd/combat.html#health-fatigue-harm-armor-conversion-table">Open health fatigue harm armor conversion table</a></p><p id="health-fatigue-harm-recovery"><a href="srd/combat.html#health-fatigue-harm-recovery">Open health fatigue harm recovery</a></p><p id="fatigue-recovery"><a href="srd/combat.html#fatigue-recovery">Open fatigue recovery</a></p><p id="harm-recovery"><a href="srd/combat.html#harm-recovery">Open harm recovery</a></p><p id="substituting-fatigue-for-boons"><a href="srd/combat.html#substituting-fatigue-for-boons">Open substituting fatigue for boons</a></p><p id="example-armor-and-overflow"><a href="srd/combat.html#example-armor-and-overflow">Open example armor and overflow</a></p><p id="death-and-dying"><a href="srd/combat.html#death-and-dying">Open death and dying</a></p><p id="stabilization"><a href="srd/combat.html#stabilization">Open stabilization</a></p><p id="raising-harm-above-3"><a href="srd/combat.html#raising-harm-above-3">Open raising harm above 3</a></p><p id="encounters"><a href="srd/running-the-game.html#encounters">Open encounters</a></p><p id="common-framework"><a href="srd/running-the-game.html#common-framework">Open common framework</a></p><p id="encounters-heading-1"><a href="srd/running-the-game.html#encounters-heading-1">Open encounters heading 1</a></p><p id="timers-in-encounters"><a href="srd/running-the-game.html#timers-in-encounters">Open timers in encounters</a></p><p id="encounters-heading-2"><a href="srd/running-the-game.html#encounters-heading-2">Open encounters heading 2</a></p><p id="social-encounters"><a href="srd/running-the-game.html#social-encounters">Open social encounters</a></p><p id="encounters-heading-3"><a href="srd/running-the-game.html#encounters-heading-3">Open encounters heading 3</a></p><p id="social-setting-up"><a href="srd/running-the-game.html#social-setting-up">Open social setting up</a></p><p id="encounters-heading-4"><a href="srd/running-the-game.html#encounters-heading-4">Open encounters heading 4</a></p><p id="non-face-characters-can-help"><a href="srd/running-the-game.html#non-face-characters-can-help">Open non face characters can help</a></p><p id="encounters-heading-5"><a href="srd/running-the-game.html#encounters-heading-5">Open encounters heading 5</a></p><p id="persuasion-rolls"><a href="srd/running-the-game.html#persuasion-rolls">Open persuasion rolls</a></p><p id="encounters-heading-6"><a href="srd/running-the-game.html#encounters-heading-6">Open encounters heading 6</a></p><p id="environmental-encounters"><a href="srd/running-the-game.html#environmental-encounters">Open environmental encounters</a></p><p id="encounters-heading-7"><a href="srd/running-the-game.html#encounters-heading-7">Open encounters heading 7</a></p><p id="terrain-and-positioning"><a href="srd/running-the-game.html#terrain-and-positioning">Open terrain and positioning</a></p><p id="encounters-heading-8"><a href="srd/running-the-game.html#encounters-heading-8">Open encounters heading 8</a></p><p id="hazards-and-timers"><a href="srd/running-the-game.html#hazards-and-timers">Open hazards and timers</a></p><p id="encounters-heading-9"><a href="srd/running-the-game.html#encounters-heading-9">Open encounters heading 9</a></p><p id="magical-encounters"><a href="srd/running-the-game.html#magical-encounters">Open magical encounters</a></p><p id="encounters-heading-10"><a href="srd/running-the-game.html#encounters-heading-10">Open encounters heading 10</a></p><p id="adjudicating-spells-in-combat"><a href="srd/running-the-game.html#adjudicating-spells-in-combat">Open adjudicating spells in combat</a></p><p id="encounters-heading-11"><a href="srd/running-the-game.html#encounters-heading-11">Open encounters heading 11</a></p><p id="traps-and-wards"><a href="srd/running-the-game.html#traps-and-wards">Open traps and wards</a></p><p id="encounters-heading-12"><a href="srd/running-the-game.html#encounters-heading-12">Open encounters heading 12</a></p><p id="summoning-and-spirits"><a href="srd/running-the-game.html#summoning-and-spirits">Open summoning and spirits</a></p><p id="encounters-heading-13"><a href="srd/running-the-game.html#encounters-heading-13">Open encounters heading 13</a></p><p id="extended-rituals-and-downtime-encounters"><a href="srd/running-the-game.html#extended-rituals-and-downtime-encounters">Open extended rituals and downtime encounters</a></p><p id="encounters-heading-14"><a href="srd/running-the-game.html#encounters-heading-14">Open encounters heading 14</a></p><p id="quick-reference-table"><a href="srd/running-the-game.html#quick-reference-table">Open quick reference table</a></p><p id="encounters-heading-15"><a href="srd/running-the-game.html#encounters-heading-15">Open encounters heading 15</a></p><p id="gm-reminders-encounters"><a href="srd/running-the-game.html#gm-reminders-encounters">Open gm reminders encounters</a></p><p id="encounters-heading-16"><a href="srd/running-the-game.html#encounters-heading-16">Open encounters heading 16</a></p><p id="complications-timers"><a href="srd/running-the-game.html#complications-timers">Open complications timers</a></p><p id="complications-timers-story-beats-sb"><a href="srd/running-the-game.html#complications-timers-story-beats-sb">Open complications timers story beats sb</a></p><p id="complications-timers-heading-1"><a href="srd/running-the-game.html#complications-timers-heading-1">Open complications timers heading 1</a></p><p id="sb-spend-menu"><a href="srd/running-the-game.html#sb-spend-menu">Open sb spend menu</a></p><p id="complications-timers-heading-2"><a href="srd/running-the-game.html#complications-timers-heading-2">Open complications timers heading 2</a></p><p id="limits-on-sb-per-scene"><a href="srd/running-the-game.html#limits-on-sb-per-scene">Open limits on sb per scene</a></p><p id="complications-timers-heading-3"><a href="srd/running-the-game.html#complications-timers-heading-3">Open complications timers heading 3</a></p><p id="complications-timers-boons-player-resource"><a href="srd/running-the-game.html#complications-timers-boons-player-resource">Open complications timers boons player resource</a></p><p id="complications-timers-heading-4"><a href="srd/running-the-game.html#complications-timers-heading-4">Open complications timers heading 4</a></p><p id="timers"><a href="srd/running-the-game.html#timers">Open timers</a></p><p id="complications-timers-heading-5"><a href="srd/running-the-game.html#complications-timers-heading-5">Open complications timers heading 5</a></p><p id="when-to-use-a-timer"><a href="srd/running-the-game.html#when-to-use-a-timer">Open when to use a timer</a></p><p id="complications-timers-heading-6"><a href="srd/running-the-game.html#complications-timers-heading-6">Open complications timers heading 6</a></p><p id="ticking-timers"><a href="srd/running-the-game.html#ticking-timers">Open ticking timers</a></p><p id="complications-timers-heading-7"><a href="srd/running-the-game.html#complications-timers-heading-7">Open complications timers heading 7</a></p><p id="example-timers"><a href="srd/running-the-game.html#example-timers">Open example timers</a></p><p id="complications-timers-heading-8"><a href="srd/running-the-game.html#complications-timers-heading-8">Open complications timers heading 8</a></p><p id="hazards"><a href="srd/running-the-game.html#hazards">Open hazards</a></p><p id="complications-timers-heading-9"><a href="srd/running-the-game.html#complications-timers-heading-9">Open complications timers heading 9</a></p><p id="environmental-hazards"><a href="srd/running-the-game.html#environmental-hazards">Open environmental hazards</a></p><p id="complications-timers-heading-10"><a href="srd/running-the-game.html#complications-timers-heading-10">Open complications timers heading 10</a></p><p id="social-hazards"><a href="srd/running-the-game.html#social-hazards">Open social hazards</a></p><p id="complications-timers-heading-11"><a href="srd/running-the-game.html#complications-timers-heading-11">Open complications timers heading 11</a></p><p id="magical-hazards"><a href="srd/running-the-game.html#magical-hazards">Open magical hazards</a></p><p id="complications-timers-heading-12"><a href="srd/running-the-game.html#complications-timers-heading-12">Open complications timers heading 12</a></p><p id="fear-effects"><a href="srd/running-the-game.html#fear-effects">Open fear effects</a></p><p id="complications-timers-heading-13"><a href="srd/running-the-game.html#complications-timers-heading-13">Open complications timers heading 13</a></p><p id="fear-track-escalation"><a href="srd/running-the-game.html#fear-track-escalation">Open fear track escalation</a></p><p id="complications-timers-heading-14"><a href="srd/running-the-game.html#complications-timers-heading-14">Open complications timers heading 14</a></p><p id="deck-of-consequences-optional-preview"><a href="srd/running-the-game.html#deck-of-consequences-optional-preview">Open deck of consequences optional preview</a></p><p id="complications-timers-heading-15"><a href="srd/running-the-game.html#complications-timers-heading-15">Open complications timers heading 15</a></p><p id="deck-structure-preview"><a href="srd/running-the-game.html#deck-structure-preview">Open deck structure preview</a></p><p id="complications-timers-heading-16"><a href="srd/running-the-game.html#complications-timers-heading-16">Open complications timers heading 16</a></p><p id="rank-severity-preview"><a href="srd/running-the-game.html#rank-severity-preview">Open rank severity preview</a></p><p id="complications-timers-heading-17"><a href="srd/running-the-game.html#complications-timers-heading-17">Open complications timers heading 17</a></p><p id="when-to-draw-preview"><a href="srd/running-the-game.html#when-to-draw-preview">Open when to draw preview</a></p><p id="complications-timers-heading-18"><a href="srd/running-the-game.html#complications-timers-heading-18">Open complications timers heading 18</a></p><p id="procedure-preview"><a href="srd/running-the-game.html#procedure-preview">Open procedure preview</a></p><p id="complications-timers-heading-19"><a href="srd/running-the-game.html#complications-timers-heading-19">Open complications timers heading 19</a></p><p id="shortcut-table-for-synthesis-preview"><a href="srd/running-the-game.html#shortcut-table-for-synthesis-preview">Open shortcut table for synthesis preview</a></p><p id="complications-timers-heading-20"><a href="srd/running-the-game.html#complications-timers-heading-20">Open complications timers heading 20</a></p><p id="integrating-complications-with-sb-and-boons"><a href="srd/running-the-game.html#integrating-complications-with-sb-and-boons">Open integrating complications with sb and boons</a></p><p id="complications-timers-heading-21"><a href="srd/running-the-game.html#complications-timers-heading-21">Open complications timers heading 21</a></p><p id="example-complication-in-action"><a href="srd/running-the-game.html#example-complication-in-action">Open example complication in action</a></p><p id="complications-timers-heading-22"><a href="srd/running-the-game.html#complications-timers-heading-22">Open complications timers heading 22</a></p><p id="npc-templates"><a href="srd/running-the-game.html#npc-templates">Open npc templates</a></p><p id="npc-template-format"><a href="srd/running-the-game.html#npc-template-format">Open npc template format</a></p><p id="srd-adversary-rating"><a href="srd/running-the-game.html#srd-adversary-rating">Open srd adversary rating</a></p><p id="srd-harm-levels-adv"><a href="srd/running-the-game.html#srd-harm-levels-adv">Open srd harm levels adv</a></p><p id="srd-sb-moves"><a href="srd/running-the-game.html#srd-sb-moves">Open srd sb moves</a></p><p id="srd-move-tags"><a href="srd/running-the-game.html#srd-move-tags">Open srd move tags</a></p><p id="srd-stat-defaults"><a href="srd/running-the-game.html#srd-stat-defaults">Open srd stat defaults</a></p><p id="srd-npc-template"><a href="srd/running-the-game.html#srd-npc-template">Open srd npc template</a></p><p id="srd-unit-rating"><a href="srd/running-the-game.html#srd-unit-rating">Open srd unit rating</a></p><p id="srd-unit-cap"><a href="srd/running-the-game.html#srd-unit-cap">Open srd unit cap</a></p><p id="srd-unit-scale"><a href="srd/running-the-game.html#srd-unit-scale">Open srd unit scale</a></p><p id="bandit"><a href="srd/running-the-game.html#bandit">Open bandit</a></p><p id="guard"><a href="srd/running-the-game.html#guard">Open guard</a></p><p id="knight"><a href="srd/running-the-game.html#knight">Open knight</a></p><p id="cultist"><a href="srd/running-the-game.html#cultist">Open cultist</a></p><p id="bandit-leader"><a href="srd/running-the-game.html#bandit-leader">Open bandit leader</a></p><p id="supernatural-npcs"><a href="srd/running-the-game.html#supernatural-npcs">Open supernatural npcs</a></p><p id="lesser-spirit"><a href="srd/running-the-game.html#lesser-spirit">Open lesser spirit</a></p><p id="greater-spirit"><a href="srd/running-the-game.html#greater-spirit">Open greater spirit</a></p><p id="wraith"><a href="srd/running-the-game.html#wraith">Open wraith</a></p><p id="animal-npcs"><a href="srd/running-the-game.html#animal-npcs">Open animal npcs</a></p><p id="wolf"><a href="srd/running-the-game.html#wolf">Open wolf</a></p><p id="dire-bear"><a href="srd/running-the-game.html#dire-bear">Open dire bear</a></p><p id="building-custom-npcs"><a href="srd/running-the-game.html#building-custom-npcs">Open building custom npcs</a></p><p id="step-1-choose-cap"><a href="srd/running-the-game.html#step-1-choose-cap">Open step 1 choose cap</a></p><p id="step-2-set-harm-output"><a href="srd/running-the-game.html#step-2-set-harm-output">Open step 2 set harm output</a></p><p id="step-3-assign-armor"><a href="srd/running-the-game.html#step-3-assign-armor">Open step 3 assign armor</a></p><p id="step-4-add-special-abilities"><a href="srd/running-the-game.html#step-4-add-special-abilities">Open step 4 add special abilities</a></p><p id="step-5-set-leash"><a href="srd/running-the-game.html#step-5-set-leash">Open step 5 set leash</a></p><p id="npc-quick-reference-table"><a href="srd/running-the-game.html#npc-quick-reference-table">Open npc quick reference table</a></p><p id="talents"><a href="srd/talents.html#talents">Open talents</a></p><p id="talent-costs"><a href="srd/talents.html#talent-costs">Open talent costs</a></p><p id="creation-only-talents"><a href="srd/talents.html#creation-only-talents">Open creation only talents</a></p><p id="magic-access-talents"><a href="srd/talents.html#magic-access-talents">Open magic access talents</a></p><p id="striker-talents"><a href="srd/talents.html#striker-talents">Open striker talents</a></p><p id="defender-talents"><a href="srd/talents.html#defender-talents">Open defender talents</a></p><p id="controller-talents"><a href="srd/talents.html#controller-talents">Open controller talents</a></p><p id="support-talents"><a href="srd/talents.html#support-talents">Open support talents</a></p><p id="scout-talents"><a href="srd/talents.html#scout-talents">Open scout talents</a></p><p id="monk-talents"><a href="srd/talents.html#monk-talents">Open monk talents</a></p><p id="summoning-talents"><a href="srd/talents.html#summoning-talents">Open summoning talents</a></p><p id="cantor-talents"><a href="srd/talents.html#cantor-talents">Open cantor talents</a></p><p id="cooperative-talents"><a href="srd/talents.html#cooperative-talents">Open cooperative talents</a></p><p id="acquiring-new-talents"><a href="srd/talents.html#acquiring-new-talents">Open acquiring new talents</a></p><p id="magic-system"><a href="srd/magic.html#magic-system">Open magic system</a></p><p id="six-paths-at-a-glance"><a href="srd/magic.html#six-paths-at-a-glance">Open six paths at a glance</a></p><p id="caster-freeform"><a href="srd/magic.html#caster-freeform">Open caster freeform</a></p><p id="caster-requirements"><a href="srd/magic.html#caster-requirements">Open caster requirements</a></p><p id="caster-procedure"><a href="srd/magic.html#caster-procedure">Open caster procedure</a></p><p id="spell-dv"><a href="srd/magic.html#spell-dv">Open spell dv</a></p><p id="caster-backlash"><a href="srd/magic.html#caster-backlash">Open caster backlash</a></p><p id="runekeeper-rites"><a href="srd/magic.html#runekeeper-rites">Open runekeeper rites</a></p><p id="runekeeper-requirements"><a href="srd/magic.html#runekeeper-requirements">Open runekeeper requirements</a></p><p id="invoking-a-rite"><a href="srd/magic.html#invoking-a-rite">Open invoking a rite</a></p><p id="patrons-gift-imbuement"><a href="srd/magic.html#patrons-gift-imbuement">Open patrons gift imbuement</a></p><p id="invoker-symbols"><a href="srd/magic.html#invoker-symbols">Open invoker symbols</a></p><p id="invoker-requirements"><a href="srd/magic.html#invoker-requirements">Open invoker requirements</a></p><p id="ritual-invocation"><a href="srd/magic.html#ritual-invocation">Open ritual invocation</a></p><p id="crack-the-seal-instant-cast"><a href="srd/magic.html#crack-the-seal-instant-cast">Open crack the seal instant cast</a></p><p id="borrowed-grace-invoker-talent"><a href="srd/magic.html#borrowed-grace-invoker-talent">Open borrowed grace invoker talent</a></p><p id="cantor-songs"><a href="srd/magic.html#cantor-songs">Open cantor songs</a></p><p id="cantor-requirements"><a href="srd/magic.html#cantor-requirements">Open cantor requirements</a></p><p id="singing-a-song"><a href="srd/magic.html#singing-a-song">Open singing a song</a></p><p id="cantor-push-it"><a href="srd/magic.html#cantor-push-it">Open cantor push it</a></p><p id="corruption-timer"><a href="srd/magic.html#corruption-timer">Open corruption timer</a></p><p id="cantor-corruption-examples"><a href="srd/magic.html#cantor-corruption-examples">Open cantor corruption examples</a></p><p id="inspire-chorus"><a href="srd/magic.html#inspire-chorus">Open inspire chorus</a></p><p id="witchcraft-hedge-magic"><a href="srd/magic.html#witchcraft-hedge-magic">Open witchcraft hedge magic</a></p><p id="two-speeds-of-witchcraft"><a href="srd/magic.html#two-speeds-of-witchcraft">Open two speeds of witchcraft</a></p><p id="witchcraft-requirements"><a href="srd/magic.html#witchcraft-requirements">Open witchcraft requirements</a></p><p id="hedge-gifts"><a href="srd/magic.html#hedge-gifts">Open hedge gifts</a></p><p id="quick-workings"><a href="srd/magic.html#quick-workings">Open quick workings</a></p><p id="full-rituals"><a href="srd/magic.html#full-rituals">Open full rituals</a></p><p id="promise-timers"><a href="srd/magic.html#promise-timers">Open promise timers</a></p><p id="talents-of-the-hedge"><a href="srd/magic.html#talents-of-the-hedge">Open talents of the hedge</a></p><p id="threshold-magic-and-household-disposition"><a href="srd/magic.html#threshold-magic-and-household-disposition">Open threshold magic and household disposition</a></p><p id="obligation-runekeepers-invokers"><a href="srd/magic.html#obligation-runekeepers-invokers">Open obligation runekeepers invokers</a></p><p id="marking-obligation"><a href="srd/magic.html#marking-obligation">Open marking obligation</a></p><p id="obligation-overflow"><a href="srd/magic.html#obligation-overflow">Open obligation overflow</a></p><p id="clearing-obligation"><a href="srd/magic.html#clearing-obligation">Open clearing obligation</a></p><p id="backlash-free-casting"><a href="srd/magic.html#backlash-free-casting">Open backlash free casting</a></p><p id="backlash-menu"><a href="srd/magic.html#backlash-menu">Open backlash menu</a></p><p id="obligation-capacity-overflow-summary"><a href="srd/magic.html#obligation-capacity-overflow-summary">Open obligation capacity overflow summary</a></p><p id="corruption-timer-summary"><a href="srd/magic.html#corruption-timer-summary">Open corruption timer summary</a></p><p id="tags-effects"><a href="srd/tags.html#tags-effects">Open tags effects</a></p><p id="the-eight-elements"><a href="srd/tags.html#the-eight-elements">Open the eight elements</a></p><p id="tags-effects-heading-1"><a href="srd/tags.html#tags-effects-heading-1">Open tags effects heading 1</a></p><p id="element-pairs"><a href="srd/tags.html#element-pairs">Open element pairs</a></p><p id="element-planes"><a href="srd/tags.html#element-planes">Open element planes</a></p><p id="effect-tags"><a href="srd/tags.html#effect-tags">Open effect tags</a></p><p id="tags-effects-heading-4"><a href="srd/tags.html#tags-effects-heading-4">Open tags effects heading 4</a></p><p id="building-a-spell"><a href="srd/tags.html#building-a-spell">Open building a spell</a></p><p id="tags-effects-heading-5"><a href="srd/tags.html#tags-effects-heading-5">Open tags effects heading 5</a></p><p id="dangerous-tags"><a href="srd/tags.html#dangerous-tags">Open dangerous tags</a></p><p id="tags-effects-heading-6"><a href="srd/tags.html#tags-effects-heading-6">Open tags effects heading 6</a></p><p id="stacking-identical-effect-tags"><a href="srd/tags.html#stacking-identical-effect-tags">Open stacking identical effect tags</a></p><p id="tags-effects-heading-7"><a href="srd/tags.html#tags-effects-heading-7">Open tags effects heading 7</a></p><p id="tags-effects-example-spells"><a href="srd/tags.html#tags-effects-example-spells">Open tags effects example spells</a></p><p id="tags-effects-heading-8"><a href="srd/tags.html#tags-effects-heading-8">Open tags effects heading 8</a></p><p id="repair-restoration"><a href="srd/tags.html#repair-restoration">Open repair restoration</a></p><p id="tags-effects-heading-9"><a href="srd/tags.html#tags-effects-heading-9">Open tags effects heading 9</a></p><p id="tag-mend"><a href="srd/tags.html#tag-mend">Open tag mend</a></p><p id="tag-repair"><a href="srd/tags.html#tag-repair">Open tag repair</a></p><p id="influence-over-mortals"><a href="srd/tags.html#influence-over-mortals">Open influence over mortals</a></p><p id="tags-effects-heading-12"><a href="srd/tags.html#tags-effects-heading-12">Open tags effects heading 12</a></p><p id="tag-bond"><a href="srd/tags.html#tag-bond">Open tag bond</a></p><p id="tag-subvert"><a href="srd/tags.html#tag-subvert">Open tag subvert</a></p><p id="control-countermagic"><a href="srd/tags.html#control-countermagic">Open control countermagic</a></p><p id="tags-effects-heading-15"><a href="srd/tags.html#tags-effects-heading-15">Open tags effects heading 15</a></p><p id="tag-dispel"><a href="srd/tags.html#tag-dispel">Open tag dispel</a></p><p id="tag-counter"><a href="srd/tags.html#tag-counter">Open tag counter</a></p><p id="tag-barrier"><a href="srd/tags.html#tag-barrier">Open tag barrier</a></p><p id="tag-seal-unseal"><a href="srd/tags.html#tag-seal-unseal">Open tag seal unseal</a></p><p id="concealment-revelation"><a href="srd/tags.html#concealment-revelation">Open concealment revelation</a></p><p id="tags-effects-heading-20"><a href="srd/tags.html#tags-effects-heading-20">Open tags effects heading 20</a></p><p id="tag-veil"><a href="srd/tags.html#tag-veil">Open tag veil</a></p><p id="tag-reveal"><a href="srd/tags.html#tag-reveal">Open tag reveal</a></p><p id="tag-mark"><a href="srd/tags.html#tag-mark">Open tag mark</a></p><p id="boons-burdens"><a href="srd/tags.html#boons-burdens">Open boons burdens</a></p><p id="tags-effects-heading-24"><a href="srd/tags.html#tags-effects-heading-24">Open tags effects heading 24</a></p><p id="tag-curse"><a href="srd/tags.html#tag-curse">Open tag curse</a></p><p id="tag-cleanse"><a href="srd/tags.html#tag-cleanse">Open tag cleanse</a></p><p id="tag-fortify"><a href="srd/tags.html#tag-fortify">Open tag fortify</a></p><p id="influence-oaths"><a href="srd/tags.html#influence-oaths">Open influence oaths</a></p><p id="tags-effects-heading-28"><a href="srd/tags.html#tags-effects-heading-28">Open tags effects heading 28</a></p><p id="tag-command"><a href="srd/tags.html#tag-command">Open tag command</a></p><p id="tag-oath"><a href="srd/tags.html#tag-oath">Open tag oath</a></p><p id="tag-sanctify"><a href="srd/tags.html#tag-sanctify">Open tag sanctify</a></p><p id="movement-making"><a href="srd/tags.html#movement-making">Open movement making</a></p><p id="tags-effects-heading-32"><a href="srd/tags.html#tags-effects-heading-32">Open tags effects heading 32</a></p><p id="tag-passage"><a href="srd/tags.html#tag-passage">Open tag passage</a></p><p id="tag-transport"><a href="srd/tags.html#tag-transport">Open tag transport</a></p><p id="tag-conjure"><a href="srd/tags.html#tag-conjure">Open tag conjure</a></p><p id="knowledge-movement-transformation"><a href="srd/tags.html#knowledge-movement-transformation">Open knowledge movement transformation</a></p><p id="tags-effects-heading-36"><a href="srd/tags.html#tags-effects-heading-36">Open tags effects heading 36</a></p><p id="tag-truth"><a href="srd/tags.html#tag-truth">Open tag truth</a></p><p id="tag-secret"><a href="srd/tags.html#tag-secret">Open tag secret</a></p><p id="tag-read"><a href="srd/tags.html#tag-read">Open tag read</a></p><p id="tag-omen"><a href="srd/tags.html#tag-omen">Open tag omen</a></p><p id="tag-liberate"><a href="srd/tags.html#tag-liberate">Open tag liberate</a></p><p id="tag-boost"><a href="srd/tags.html#tag-boost">Open tag boost</a></p><p id="tag-transform"><a href="srd/tags.html#tag-transform">Open tag transform</a></p><p id="tag-erasure"><a href="srd/tags.html#tag-erasure">Open tag erasure</a></p><p id="tag-pressure"><a href="srd/tags.html#tag-pressure">Open tag pressure</a></p><p id="tag-dream"><a href="srd/tags.html#tag-dream">Open tag dream</a></p><p id="tag-time"><a href="srd/tags.html#tag-time">Open tag time</a></p><p id="tag-threshold"><a href="srd/tags.html#tag-threshold">Open tag threshold</a></p><p id="tag-burden"><a href="srd/tags.html#tag-burden">Open tag burden</a></p><p id="outsider-specific-tags"><a href="srd/tags.html#outsider-specific-tags">Open outsider specific tags</a></p><p id="tags-effects-heading-50"><a href="srd/tags.html#tags-effects-heading-50">Open tags effects heading 50</a></p><p id="tag-ward"><a href="srd/tags.html#tag-ward">Open tag ward</a></p><p id="tag-banish"><a href="srd/tags.html#tag-banish">Open tag banish</a></p><p id="tag-unward"><a href="srd/tags.html#tag-unward">Open tag unward</a></p><p id="elemental-backlash-coloring"><a href="srd/tags.html#elemental-backlash-coloring">Open elemental backlash coloring</a></p><p id="tags-effects-heading-54"><a href="srd/tags.html#tags-effects-heading-54">Open tags effects heading 54</a></p><p id="stacking-duration-rules"><a href="srd/tags.html#stacking-duration-rules">Open stacking duration rules</a></p><p id="tags-effects-heading-55"><a href="srd/tags.html#tags-effects-heading-55">Open tags effects heading 55</a></p><p id="rites-invokers"><a href="srd/rites-and-summoning.html#rites-invokers">Open rites invokers</a></p><p id="universal-rituals"><a href="srd/rites-and-summoning.html#universal-rituals">Open universal rituals</a></p><p id="ritual-resolution"><a href="srd/rites-and-summoning.html#ritual-resolution">Open ritual resolution</a></p><p id="universal-rituals-table"><a href="srd/rites-and-summoning.html#universal-rituals-table">Open universal rituals table</a></p><p id="invokers-symbol-path"><a href="srd/rites-and-summoning.html#invokers-symbol-path">Open invokers symbol path</a></p><p id="rites-invokers-invoker-requirements"><a href="srd/rites-and-summoning.html#rites-invokers-invoker-requirements">Open rites invokers invoker requirements</a></p><p id="rites-invokers-ritual-invocation"><a href="srd/rites-and-summoning.html#rites-invokers-ritual-invocation">Open rites invokers ritual invocation</a></p><p id="crack-the-seal"><a href="srd/rites-and-summoning.html#crack-the-seal">Open crack the seal</a></p><p id="restoring-a-symbol"><a href="srd/rites-and-summoning.html#restoring-a-symbol">Open restoring a symbol</a></p><p id="multiple-symbols"><a href="srd/rites-and-summoning.html#multiple-symbols">Open multiple symbols</a></p><p id="borrowed-grace"><a href="srd/rites-and-summoning.html#borrowed-grace">Open borrowed grace</a></p><p id="the-traveler"><a href="srd/rites-and-summoning.html#the-traveler">Open the traveler</a></p><p id="traveler-low-rites"><a href="srd/rites-and-summoning.html#traveler-low-rites">Open traveler low rites</a></p><p id="traveler-standard-rite"><a href="srd/rites-and-summoning.html#traveler-standard-rite">Open traveler standard rite</a></p><p id="sample-rites-by-patron"><a href="srd/rites-and-summoning.html#sample-rites-by-patron">Open sample rites by patron</a></p><p id="oath-of-flame-and-light-rites"><a href="srd/rites-and-summoning.html#oath-of-flame-and-light-rites">Open oath of flame and light rites</a></p><p id="the-sealed-gate-rites"><a href="srd/rites-and-summoning.html#the-sealed-gate-rites">Open the sealed gate rites</a></p><p id="raeyn-rites"><a href="srd/rites-and-summoning.html#raeyn-rites">Open raeyn rites</a></p><p id="ikasha-rites"><a href="srd/rites-and-summoning.html#ikasha-rites">Open ikasha rites</a></p><p id="obligation-and-invokers"><a href="srd/rites-and-summoning.html#obligation-and-invokers">Open obligation and invokers</a></p><p id="ritual-interruption-and-counterplay"><a href="srd/rites-and-summoning.html#ritual-interruption-and-counterplay">Open ritual interruption and counterplay</a></p><p id="summoning"><a href="srd/rites-and-summoning.html#summoning">Open summoning</a></p><p id="who-can-summon"><a href="srd/rites-and-summoning.html#who-can-summon">Open who can summon</a></p><p id="summoning-for-narrative"><a href="srd/rites-and-summoning.html#summoning-for-narrative">Open summoning for narrative</a></p><p id="ritual-structure-greater-summonings"><a href="srd/rites-and-summoning.html#ritual-structure-greater-summonings">Open ritual structure greater summonings</a></p><p id="pc-summoner"><a href="srd/rites-and-summoning.html#pc-summoner">Open pc summoner</a></p><p id="summoning-talents-summary"><a href="srd/rites-and-summoning.html#summoning-talents-summary">Open summoning talents summary</a></p><p id="core-mechanics-call-bind-leash"><a href="srd/rites-and-summoning.html#core-mechanics-call-bind-leash">Open core mechanics call bind leash</a></p><p id="call-action"><a href="srd/rites-and-summoning.html#call-action">Open call action</a></p><p id="summoning-heading-7"><a href="srd/rites-and-summoning.html#summoning-heading-7">Open summoning heading 7</a></p><p id="bind-action"><a href="srd/rites-and-summoning.html#bind-action">Open bind action</a></p><p id="summoning-heading-8"><a href="srd/rites-and-summoning.html#summoning-heading-8">Open summoning heading 8</a></p><p id="leash-capacity"><a href="srd/rites-and-summoning.html#leash-capacity">Open leash capacity</a></p><p id="summoning-heading-9"><a href="srd/rites-and-summoning.html#summoning-heading-9">Open summoning heading 9</a></p><p id="ticking-the-leash"><a href="srd/rites-and-summoning.html#ticking-the-leash">Open ticking the leash</a></p><p id="when-the-leash-fills"><a href="srd/rites-and-summoning.html#when-the-leash-fills">Open when the leash fills</a></p><p id="boon-finesse"><a href="srd/rites-and-summoning.html#boon-finesse">Open boon finesse</a></p><p id="commanding-spirits"><a href="srd/rites-and-summoning.html#commanding-spirits">Open commanding spirits</a></p><p id="spirit-bond-progression"><a href="srd/rites-and-summoning.html#spirit-bond-progression">Open spirit bond progression</a></p><p id="sample-spirit-templates"><a href="srd/rites-and-summoning.html#sample-spirit-templates">Open sample spirit templates</a></p><p id="lesser-spirits"><a href="srd/rites-and-summoning.html#lesser-spirits">Open lesser spirits</a></p><p id="greater-spirits"><a href="srd/rites-and-summoning.html#greater-spirits">Open greater spirits</a></p><p id="spirit-specializations"><a href="srd/rites-and-summoning.html#spirit-specializations">Open spirit specializations</a></p><p id="gm-guidelines-summoning"><a href="srd/rites-and-summoning.html#gm-guidelines-summoning">Open gm guidelines summoning</a></p><p id="npc-summoners"><a href="srd/rites-and-summoning.html#npc-summoners">Open npc summoners</a></p><p id="plot-level-summonings"><a href="srd/rites-and-summoning.html#plot-level-summonings">Open plot level summonings</a></p><p id="hazards-of-greater-summoning"><a href="srd/rites-and-summoning.html#hazards-of-greater-summoning">Open hazards of greater summoning</a></p><p id="crafting-reference"><a href="srd/crafting.html#crafting-reference">Open crafting reference</a></p><p id="srd-crafting"><a href="srd/crafting.html#srd-crafting">Open srd crafting</a></p><p id="crafting-reference-heading-1"><a href="srd/crafting.html#crafting-reference-heading-1">Open crafting reference heading 1</a></p><p id="crafting-reference-heading-2"><a href="srd/crafting.html#crafting-reference-heading-2">Open crafting reference heading 2</a></p><p id="crafting-reference-heading-3"><a href="srd/crafting.html#crafting-reference-heading-3">Open crafting reference heading 3</a></p><p id="crafting-reference-heading-4"><a href="srd/crafting.html#crafting-reference-heading-4">Open crafting reference heading 4</a></p><p id="crafting-reference-heading-5"><a href="srd/crafting.html#crafting-reference-heading-5">Open crafting reference heading 5</a></p><p id="crafting-reference-heading-6"><a href="srd/crafting.html#crafting-reference-heading-6">Open crafting reference heading 6</a></p><p id="crafting-reference-heading-7"><a href="srd/crafting.html#crafting-reference-heading-7">Open crafting reference heading 7</a></p><p id="followers-assets"><a href="srd/followers-and-assets.html#followers-assets">Open followers assets</a></p><p id="followers"><a href="srd/followers-and-assets.html#followers">Open followers</a></p><p id="followers-assets-heading-1"><a href="srd/followers-and-assets.html#followers-assets-heading-1">Open followers assets heading 1</a></p><p id="what-followers-do"><a href="srd/followers-and-assets.html#what-followers-do">Open what followers do</a></p><p id="followers-assets-heading-2"><a href="srd/followers-and-assets.html#followers-assets-heading-2">Open followers assets heading 2</a></p><p id="using-followers"><a href="srd/followers-and-assets.html#using-followers">Open using followers</a></p><p id="followers-assets-heading-3"><a href="srd/followers-and-assets.html#followers-assets-heading-3">Open followers assets heading 3</a></p><p id="follower-states"><a href="srd/followers-and-assets.html#follower-states">Open follower states</a></p><p id="followers-assets-heading-4"><a href="srd/followers-and-assets.html#followers-assets-heading-4">Open followers assets heading 4</a></p><p id="follower-limits"><a href="srd/followers-and-assets.html#follower-limits">Open follower limits</a></p><p id="followers-assets-heading-5"><a href="srd/followers-and-assets.html#followers-assets-heading-5">Open followers assets heading 5</a></p><p id="assets"><a href="srd/followers-and-assets.html#assets">Open assets</a></p><p id="followers-assets-heading-6"><a href="srd/followers-and-assets.html#followers-assets-heading-6">Open followers assets heading 6</a></p><p id="what-assets-do"><a href="srd/followers-and-assets.html#what-assets-do">Open what assets do</a></p><p id="followers-assets-heading-7"><a href="srd/followers-and-assets.html#followers-assets-heading-7">Open followers assets heading 7</a></p><p id="asset-status"><a href="srd/followers-and-assets.html#asset-status">Open asset status</a></p><p id="followers-assets-heading-8"><a href="srd/followers-and-assets.html#followers-assets-heading-8">Open followers assets heading 8</a></p><p id="activating-assets"><a href="srd/followers-and-assets.html#activating-assets">Open activating assets</a></p><p id="followers-assets-heading-9"><a href="srd/followers-and-assets.html#followers-assets-heading-9">Open followers assets heading 9</a></p><p id="followers-assets-upkeep"><a href="srd/followers-and-assets.html#followers-assets-upkeep">Open followers assets upkeep</a></p><p id="followers-assets-heading-10"><a href="srd/followers-and-assets.html#followers-assets-heading-10">Open followers assets heading 10</a></p><p id="terrestrial-patrons"><a href="srd/followers-and-assets.html#terrestrial-patrons">Open terrestrial patrons</a></p><p id="followers-assets-heading-11"><a href="srd/followers-and-assets.html#followers-assets-heading-11">Open followers assets heading 11</a></p><p id="how-terrestrial-patrons-work"><a href="srd/followers-and-assets.html#how-terrestrial-patrons-work">Open how terrestrial patrons work</a></p><p id="followers-assets-heading-12"><a href="srd/followers-and-assets.html#followers-assets-heading-12">Open followers assets heading 12</a></p><p id="followers-assets-clearing-obligation"><a href="srd/followers-and-assets.html#followers-assets-clearing-obligation">Open followers assets clearing obligation</a></p><p id="followers-assets-heading-13"><a href="srd/followers-and-assets.html#followers-assets-heading-13">Open followers assets heading 13</a></p><p id="benefits-of-terrestrial-patrons"><a href="srd/followers-and-assets.html#benefits-of-terrestrial-patrons">Open benefits of terrestrial patrons</a></p><p id="followers-assets-heading-14"><a href="srd/followers-and-assets.html#followers-assets-heading-14">Open followers assets heading 14</a></p><p id="player-trusts"><a href="srd/followers-and-assets.html#player-trusts">Open player trusts</a></p><p id="followers-assets-heading-15"><a href="srd/followers-and-assets.html#followers-assets-heading-15">Open followers assets heading 15</a></p><p id="forming-a-trust"><a href="srd/followers-and-assets.html#forming-a-trust">Open forming a trust</a></p><p id="followers-assets-heading-16"><a href="srd/followers-and-assets.html#followers-assets-heading-16">Open followers assets heading 16</a></p><p id="what-a-trust-can-buy"><a href="srd/followers-and-assets.html#what-a-trust-can-buy">Open what a trust can buy</a></p><p id="followers-assets-heading-17"><a href="srd/followers-and-assets.html#followers-assets-heading-17">Open followers assets heading 17</a></p><p id="upkeep-and-delegation"><a href="srd/followers-and-assets.html#upkeep-and-delegation">Open upkeep and delegation</a></p><p id="followers-assets-heading-18"><a href="srd/followers-and-assets.html#followers-assets-heading-18">Open followers assets heading 18</a></p><p id="dissolving-a-trust"><a href="srd/followers-and-assets.html#dissolving-a-trust">Open dissolving a trust</a></p><p id="followers-assets-heading-19"><a href="srd/followers-and-assets.html#followers-assets-heading-19">Open followers assets heading 19</a></p><p id="followers-vs-assets-vs-patrons-vs-trusts"><a href="srd/followers-and-assets.html#followers-vs-assets-vs-patrons-vs-trusts">Open followers vs assets vs patrons vs trusts</a></p><p id="followers-assets-heading-20"><a href="srd/followers-and-assets.html#followers-assets-heading-20">Open followers assets heading 20</a></p><p id="high-tier-play-followers-assets"><a href="srd/followers-and-assets.html#high-tier-play-followers-assets">Open high tier play followers assets</a></p><p id="followers-assets-heading-21"><a href="srd/followers-and-assets.html#followers-assets-heading-21">Open followers assets heading 21</a></p><p id="travel-framework"><a href="srd/travel.html#travel-framework">Open travel framework</a></p><p id="legs-and-travel-timers"><a href="srd/travel.html#legs-and-travel-timers">Open legs and travel timers</a></p><p id="travel-framework-heading-1"><a href="srd/travel.html#travel-framework-heading-1">Open travel framework heading 1</a></p><p id="roles-on-the-road"><a href="srd/travel.html#roles-on-the-road">Open roles on the road</a></p><p id="travel-framework-heading-2"><a href="srd/travel.html#travel-framework-heading-2">Open travel framework heading 2</a></p><p id="travel-encounters-and-events"><a href="srd/travel.html#travel-encounters-and-events">Open travel encounters and events</a></p><p id="travel-framework-heading-3"><a href="srd/travel.html#travel-framework-heading-3">Open travel framework heading 3</a></p><p id="supply-and-depletion"><a href="srd/travel.html#supply-and-depletion">Open supply and depletion</a></p><p id="travel-framework-heading-4"><a href="srd/travel.html#travel-framework-heading-4">Open travel framework heading 4</a></p><p id="regional-travel-decks"><a href="srd/travel.html#regional-travel-decks">Open regional travel decks</a></p><p id="travel-framework-heading-5"><a href="srd/travel.html#travel-framework-heading-5">Open travel framework heading 5</a></p><p id="weather-and-terrain-modifiers"><a href="srd/travel.html#weather-and-terrain-modifiers">Open weather and terrain modifiers</a></p><p id="travel-framework-heading-6"><a href="srd/travel.html#travel-framework-heading-6">Open travel framework heading 6</a></p><p id="foraging-and-subsistence"><a href="srd/travel.html#foraging-and-subsistence">Open foraging and subsistence</a></p><p id="travel-framework-heading-7"><a href="srd/travel.html#travel-framework-heading-7">Open travel framework heading 7</a></p><p id="gm-quick-cues-travel"><a href="srd/travel.html#gm-quick-cues-travel">Open gm quick cues travel</a></p><p id="travel-framework-heading-8"><a href="srd/travel.html#travel-framework-heading-8">Open travel framework heading 8</a></p><p id="deck-consequences"><a href="srd/optional-tools.html#deck-consequences">Open deck consequences</a></p><p id="deck-structure"><a href="srd/optional-tools.html#deck-structure">Open deck structure</a></p><p id="deck-consequences-heading-1"><a href="srd/optional-tools.html#deck-consequences-heading-1">Open deck consequences heading 1</a></p><p id="card-ranks-severity"><a href="srd/optional-tools.html#card-ranks-severity">Open card ranks severity</a></p><p id="deck-consequences-heading-2"><a href="srd/optional-tools.html#deck-consequences-heading-2">Open deck consequences heading 2</a></p><p id="jokers-optional"><a href="srd/optional-tools.html#jokers-optional">Open jokers optional</a></p><p id="deck-consequences-heading-3"><a href="srd/optional-tools.html#deck-consequences-heading-3">Open deck consequences heading 3</a></p><p id="when-to-draw"><a href="srd/optional-tools.html#when-to-draw">Open when to draw</a></p><p id="deck-consequences-heading-4"><a href="srd/optional-tools.html#deck-consequences-heading-4">Open deck consequences heading 4</a></p><p id="procedure"><a href="srd/optional-tools.html#procedure">Open procedure</a></p><p id="deck-consequences-heading-5"><a href="srd/optional-tools.html#deck-consequences-heading-5">Open deck consequences heading 5</a></p><p id="synthesizing-complications"><a href="srd/optional-tools.html#synthesizing-complications">Open synthesizing complications</a></p><p id="deck-consequences-heading-6"><a href="srd/optional-tools.html#deck-consequences-heading-6">Open deck consequences heading 6</a></p><p id="shortcut-table-for-fast-interpretation"><a href="srd/optional-tools.html#shortcut-table-for-fast-interpretation">Open shortcut table for fast interpretation</a></p><p id="deck-consequences-heading-7"><a href="srd/optional-tools.html#deck-consequences-heading-7">Open deck consequences heading 7</a></p><p id="integration-with-fiction"><a href="srd/optional-tools.html#integration-with-fiction">Open integration with fiction</a></p><p id="deck-consequences-heading-8"><a href="srd/optional-tools.html#deck-consequences-heading-8">Open deck consequences heading 8</a></p><p id="gm-quick-cues-deck"><a href="srd/optional-tools.html#gm-quick-cues-deck">Open gm quick cues deck</a></p><p id="deck-consequences-heading-9"><a href="srd/optional-tools.html#deck-consequences-heading-9">Open deck consequences heading 9</a></p><p id="crown-spread"><a href="srd/optional-tools.html#crown-spread">Open crown spread</a></p><p id="setup-crown"><a href="srd/optional-tools.html#setup-crown">Open setup crown</a></p><p id="crown-spread-heading-1"><a href="srd/optional-tools.html#crown-spread-heading-1">Open crown spread heading 1</a></p><p id="interpreting-the-spread"><a href="srd/optional-tools.html#interpreting-the-spread">Open interpreting the spread</a></p><p id="crown-spread-heading-2"><a href="srd/optional-tools.html#crown-spread-heading-2">Open crown spread heading 2</a></p><p id="using-the-spread-in-play"><a href="srd/optional-tools.html#using-the-spread-in-play">Open using the spread in play</a></p><p id="crown-spread-heading-3"><a href="srd/optional-tools.html#crown-spread-heading-3">Open crown spread heading 3</a></p><p id="campaign-timer"><a href="srd/optional-tools.html#campaign-timer">Open campaign timer</a></p><p id="crown-spread-heading-4"><a href="srd/optional-tools.html#crown-spread-heading-4">Open crown spread heading 4</a></p><p id="ending-legacy"><a href="srd/optional-tools.html#ending-legacy">Open ending legacy</a></p><p id="crown-spread-heading-5"><a href="srd/optional-tools.html#crown-spread-heading-5">Open crown spread heading 5</a></p><p id="gm-quick-cues-crown"><a href="srd/optional-tools.html#gm-quick-cues-crown">Open gm quick cues crown</a></p><p id="crown-spread-heading-6"><a href="srd/optional-tools.html#crown-spread-heading-6">Open crown spread heading 6</a></p><p id="archetypes"><a href="srd/optional-tools.html#archetypes">Open archetypes</a></p><p id="the-solo"><a href="srd/optional-tools.html#the-solo">Open the solo</a></p><p id="archetypes-heading-1"><a href="srd/optional-tools.html#archetypes-heading-1">Open archetypes heading 1</a></p><p id="the-mixed"><a href="srd/optional-tools.html#the-mixed">Open the mixed</a></p><p id="archetypes-heading-2"><a href="srd/optional-tools.html#archetypes-heading-2">Open archetypes heading 2</a></p><p id="the-mastermind"><a href="srd/optional-tools.html#the-mastermind">Open the mastermind</a></p><p id="archetypes-heading-3"><a href="srd/optional-tools.html#archetypes-heading-3">Open archetypes heading 3</a></p><p id="balancing-archetypes"><a href="srd/optional-tools.html#balancing-archetypes">Open balancing archetypes</a></p><p id="archetypes-heading-4"><a href="srd/optional-tools.html#archetypes-heading-4">Open archetypes heading 4</a></p><p id="gm-quick-cues-archetypes"><a href="srd/optional-tools.html#gm-quick-cues-archetypes">Open gm quick cues archetypes</a></p><p id="archetypes-heading-5"><a href="srd/optional-tools.html#archetypes-heading-5">Open archetypes heading 5</a></p><p id="scene-example-the-bridge-at-dusk"><a href="srd/optional-tools.html#scene-example-the-bridge-at-dusk">Open scene example the bridge at dusk</a></p><p id="archetypes-heading-6"><a href="srd/optional-tools.html#archetypes-heading-6">Open archetypes heading 6</a></p><p id="setup-bridge"><a href="srd/optional-tools.html#setup-bridge">Open setup bridge</a></p><p id="archetypes-heading-7"><a href="srd/optional-tools.html#archetypes-heading-7">Open archetypes heading 7</a></p><p id="player-action-1-lyra-scouts-ahead"><a href="srd/optional-tools.html#player-action-1-lyra-scouts-ahead">Open player action 1 lyra scouts ahead</a></p><p id="archetypes-heading-8"><a href="srd/optional-tools.html#archetypes-heading-8">Open archetypes heading 8</a></p><p id="player-action-2-thane-charges"><a href="srd/optional-tools.html#player-action-2-thane-charges">Open player action 2 thane charges</a></p><p id="archetypes-heading-9"><a href="srd/optional-tools.html#archetypes-heading-9">Open archetypes heading 9</a></p><p id="player-action-3-sera-casts-a-spell"><a href="srd/optional-tools.html#player-action-3-sera-casts-a-spell">Open player action 3 sera casts a spell</a></p><p id="archetypes-heading-10"><a href="srd/optional-tools.html#archetypes-heading-10">Open archetypes heading 10</a></p><p id="spending-story-beats"><a href="srd/optional-tools.html#spending-story-beats">Open spending story beats</a></p><p id="archetypes-heading-11"><a href="srd/optional-tools.html#archetypes-heading-11">Open archetypes heading 11</a></p><p id="resolution"><a href="srd/optional-tools.html#resolution">Open resolution</a></p><p id="archetypes-heading-12"><a href="srd/optional-tools.html#archetypes-heading-12">Open archetypes heading 12</a></p><p id="what-this-example-teaches"><a href="srd/optional-tools.html#what-this-example-teaches">Open what this example teaches</a></p><p id="archetypes-heading-13"><a href="srd/optional-tools.html#archetypes-heading-13">Open archetypes heading 13</a></p><p id="quick-reference"><a href="srd/quick-reference.html#quick-reference">Open quick reference</a></p><p id="core-outcome-matrix"><a href="srd/quick-reference.html#core-outcome-matrix">Open core outcome matrix</a></p><p id="difficulty-value-ladder"><a href="srd/quick-reference.html#difficulty-value-ladder">Open difficulty value ladder</a></p><p id="quick-reference-position-and-effect"><a href="srd/quick-reference.html#quick-reference-position-and-effect">Open quick reference position and effect</a></p><p id="quick-reference-range-bands"><a href="srd/quick-reference.html#quick-reference-range-bands">Open quick reference range bands</a></p><p id="quick-reference-armor-conversion-table"><a href="srd/quick-reference.html#quick-reference-armor-conversion-table">Open quick reference armor conversion table</a></p><p id="quick-reference-fatigue-and-harm"><a href="srd/quick-reference.html#quick-reference-fatigue-and-harm">Open quick reference fatigue and harm</a></p><p id="magic-paths-comparison"><a href="srd/quick-reference.html#magic-paths-comparison">Open magic paths comparison</a></p><p id="summoning-leash"><a href="srd/quick-reference.html#summoning-leash">Open summoning leash</a></p><p id="quick-reference-action-economy"><a href="srd/quick-reference.html#quick-reference-action-economy">Open quick reference action economy</a></p><p id="quick-reference-opportunity-attacks"><a href="srd/quick-reference.html#quick-reference-opportunity-attacks">Open quick reference opportunity attacks</a></p><p id="story-beat-spend-menu"><a href="srd/quick-reference.html#story-beat-spend-menu">Open story beat spend menu</a></p><p id="boons-at-a-glance"><a href="srd/quick-reference.html#boons-at-a-glance">Open boons at a glance</a></p><p id="default-values-gm-cues"><a href="srd/quick-reference.html#default-values-gm-cues">Open default values gm cues</a></p><p id="tags-quick-reference"><a href="srd/quick-reference.html#tags-quick-reference">Open tags quick reference</a></p><p id="example-spells"><a href="srd/examples.html#example-spells">Open example spells</a></p><p id="spark-cantrip"><a href="srd/examples.html#spark-cantrip">Open spark cantrip</a></p><p id="minor-illusion"><a href="srd/examples.html#minor-illusion">Open minor illusion</a></p><p id="gust"><a href="srd/examples.html#gust">Open gust</a></p><p id="quick-patch"><a href="srd/examples.html#quick-patch">Open quick patch</a></p><p id="ember-cloak"><a href="srd/examples.html#ember-cloak">Open ember cloak</a></p><p id="web-of-fate"><a href="srd/examples.html#web-of-fate">Open web of fate</a></p><p id="healing-mist"><a href="srd/examples.html#healing-mist">Open healing mist</a></p><p id="stone-shield"><a href="srd/examples.html#stone-shield">Open stone shield</a></p><p id="shadow-step"><a href="srd/examples.html#shadow-step">Open shadow step</a></p><p id="fates-rebuke"><a href="srd/examples.html#fates-rebuke">Open fates rebuke</a></p><p id="sleep-spell"><a href="srd/examples.html#sleep-spell">Open sleep spell</a></p><p id="sealed-threshold"><a href="srd/examples.html#sealed-threshold">Open sealed threshold</a></p><p id="circle-of-denial"><a href="srd/examples.html#circle-of-denial">Open circle of denial</a></p><p id="banishment-knot"><a href="srd/examples.html#banishment-knot">Open banishment knot</a></p><p id="tidemarks-blessing"><a href="srd/examples.html#tidemarks-blessing">Open tidemarks blessing</a></p><p id="whispering-currents"><a href="srd/examples.html#whispering-currents">Open whispering currents</a></p><p id="wave-road-blessing"><a href="srd/examples.html#wave-road-blessing">Open wave road blessing</a></p><p id="touch-the-umbral-veil"><a href="srd/examples.html#touch-the-umbral-veil">Open touch the umbral veil</a></p><p id="crossroads-raven"><a href="srd/examples.html#crossroads-raven">Open crossroads raven</a></p><p id="become-the-shadow-at-the-crossroads"><a href="srd/examples.html#become-the-shadow-at-the-crossroads">Open become the shadow at the crossroads</a></p><p id="oath-ward-invoker"><a href="srd/examples.html#oath-ward-invoker">Open oath ward invoker</a></p><p id="wayfinders-thread-invoker"><a href="srd/examples.html#wayfinders-thread-invoker">Open wayfinders thread invoker</a></p><p id="salt-cut-invoker"><a href="srd/examples.html#salt-cut-invoker">Open salt cut invoker</a></p><p id="rivers-memory-invoker"><a href="srd/examples.html#rivers-memory-invoker">Open rivers memory invoker</a></p><p id="bargain-bead-invoker"><a href="srd/examples.html#bargain-bead-invoker">Open bargain bead invoker</a></p><p id="purge-invoker"><a href="srd/examples.html#purge-invoker">Open purge invoker</a></p><p id="summoners-gate"><a href="srd/examples.html#summoners-gate">Open summoners gate</a></p><p id="hearths-lullaby"><a href="srd/examples.html#hearths-lullaby">Open hearths lullaby</a></p><p id="storms-call"><a href="srd/examples.html#storms-call">Open storms call</a></p><p id="ravens-omen"><a href="srd/examples.html#ravens-omen">Open ravens omen</a></p><p id="knot-of-silence"><a href="srd/examples.html#knot-of-silence">Open knot of silence</a></p><p id="thread-of-memory"><a href="srd/examples.html#thread-of-memory">Open thread of memory</a></p><p id="bitter-dirge"><a href="srd/examples.html#bitter-dirge">Open bitter dirge</a></p><p id="wayfinders-thread-universal"><a href="srd/examples.html#wayfinders-thread-universal">Open wayfinders thread universal</a></p><p id="oath-ward-universal"><a href="srd/examples.html#oath-ward-universal">Open oath ward universal</a></p><p id="ember-glass"><a href="srd/examples.html#ember-glass">Open ember glass</a></p><p id="salt-cut-universal"><a href="srd/examples.html#salt-cut-universal">Open salt cut universal</a></p><p id="rivers-memory-universal"><a href="srd/examples.html#rivers-memory-universal">Open rivers memory universal</a></p><p id="bargain-bead-universal"><a href="srd/examples.html#bargain-bead-universal">Open bargain bead universal</a></p><p id="quiet-veil"><a href="srd/examples.html#quiet-veil">Open quiet veil</a></p><p id="dream-way-marker"><a href="srd/examples.html#dream-way-marker">Open dream way marker</a></p><p id="purge-tainted-object"><a href="srd/examples.html#purge-tainted-object">Open purge tainted object</a></p><p id="example-characters"><a href="srd/examples.html#example-characters">Open example characters</a></p><p id="ellis-aeler-initiate"><a href="srd/examples.html#ellis-aeler-initiate">Open ellis aeler initiate</a></p><p id="lyra-vilikari-rover"><a href="srd/examples.html#lyra-vilikari-rover">Open lyra vilikari rover</a></p><p id="sera-lethai-thora-exile"><a href="srd/examples.html#sera-lethai-thora-exile">Open sera lethai thora exile</a></p></details></main></body></html>

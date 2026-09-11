@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-11T19:14:01.128Z",
+  "generated": "2026-09-11T19:33:43.218Z",
   "documents": [
     {
       "id": "srd",
@@ -366,6 +366,16 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "adversary_resolution",
+      "title": "Adversary Resolution",
+      "file": "Adversary-Resolution.html",
+      "path": "/data/docs/resources/",
+      "category": "resources",
+      "categoryLabel": "Resources",
       "core": false,
       "active": true
     },
@@ -1513,7 +1523,7 @@
       "active": true
     }
   ],
-  "total_count": 92,
-  "active_count": 92,
+  "total_count": 93,
+  "active_count": 93,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
