@@ -87,7 +87,7 @@ async function renderMiniTracker() {
       <div class="text-muted text-sm" style="margin-bottom:0.3rem;">Round ${trackerState.round || 0}</div>
       <div style="display:flex;flex-direction:column;gap:0.15rem;">
         ${trackerState.combatants.map(c => {
-          const isActive = c.id === trackerState.activeCombatantId;
+          const isActive = trackerState.activeCombatantIds ? trackerState.activeCombatantIds.includes(c.id) : c.id === trackerState.activeCombatantId;
           const weaponGlyph = { light: '🗡️', medium: '⚔️', heavy: '🔨', ranged: '🏹' }[c.weaponClass] || '';
           let rangeHtml = '';
           if (selfCombatant && selfCombatant.id !== c.id) {

@@ -209,7 +209,7 @@ async function renderMiniTracker() {
             <div class="text-muted text-sm" style="margin-bottom:0.3rem;">Round ${trackerState.round || 0}</div>
             <div style="display:flex;flex-direction:column;gap:0.15rem;">
                 ${trackerState.combatants.map(c => {
-                    const isActive = c.id === trackerState.activeCombatantId;
+                    const isActive = trackerState.activeCombatantIds ? trackerState.activeCombatantIds.includes(c.id) : c.id === trackerState.activeCombatantId;
                     const weaponGlyph = { light: '🗡️', medium: '⚔️', heavy: '🔨', ranged: '🏹' }[c.weaponClass] || '';
                     let rangeHtml = '';
                     if (selfCombatant && selfCombatant.id !== c.id) {
@@ -978,7 +978,7 @@ function updateCombatStatusUI() {
         return;
     }
     const c = combatStatus;
-    const turnText = c.activeName ? `${c.activeName}'s turn` : 'awaiting turn order';
+    const turnText = c.activeTurnText || (c.activeName ? `${c.activeName}'s turn` : 'awaiting turn order');
     const timerText = c.timerMax > 0
         ? ` · ⏱️ ${c.timerName || 'Timer'} ${c.timerSegments}/${c.timerMax}`
         : '';

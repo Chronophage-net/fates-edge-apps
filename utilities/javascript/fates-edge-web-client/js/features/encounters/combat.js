@@ -1,5 +1,5 @@
 /**
- * Combat Tracker - Advanced initiative and timer tracking
+ * Combat Tracker - Side-based turn order, obstacle tracking, and timer tracking
  * Integrated with Factions, Rivals, Followers, Assets, Patrons, and Bestiary
  * ✅ Supports TL 1-10, Class I-X, sb_spends
  * ✅ Shared GM Story Beat bank with bestiary.js
@@ -8,6 +8,12 @@
  * ✅ Import from Bestiary via searchable modal
  * ✅ Armor auto‑conversion (Essentials §2.4 & §A.7)
  * ✅ Weapon range rules: melee vs ranged vs Reach-tagged weapons
+ * ✅ Side-based turn order: players act in any order they choose, then the
+ *    GM narrates the adversary side's actions together as one turn — no
+ *    per-adversary initiative slot (see TURN_PHASES below).
+ * ✅ Obstacles (terrain, traps, doors, hazards) are tracked separately from
+ *    combatants — they can have Harm/status like anything else, but they
+ *    never appear in turn order and are never "active".
  */
 
 import { t as i18nText } from '@core/i18n.js';
@@ -26,6 +32,29 @@ import { getObjectiveType, resolveObjectiveType, isCombatType, DEFAULT_OBJECTIVE
 // OBJECTIVE_TYPES id), inherited from the encounter's `type` when the
 // combatant is added. Missing/unrecognized objectiveType == 'combat', for
 // exact back-compat with every encounter saved before this feature existed.
+//
+// Obstacles live in a separate array (`obstacles`, not `combatants`) — a
+// wall, trap, door or hazard has Harm/status worth tracking, but it never
+// takes a turn, so it was never a great fit for a list that's fundamentally
+// "who's up next". Splitting them out is what lets that list mean exactly
+// what it says.
+
+// ============================================================
+// TURN PHASES — side-based initiative
+// ============================================================
+// The whole player side acts first (in whatever order they choose among
+// themselves — the tracker doesn't police that), then the GM narrates the
+// whole adversary side's actions together as a single turn. That's it; no
+// per-adversary initiative slot, no rolling initiative for monsters. Round
+// advances (and the timer ticks) after the adversary phase.
+const TURN_PHASES = ['players', 'adversaries'];
+function phaseLabel(phase) {
+    return phase === 'adversaries' ? '👾 Adversaries' : '👤 Players';
+}
+function combatantsInPhase(phase) {
+    const wantType = phase === 'players' ? 'player' : 'adversary';
+    return combatants.filter(c => c.type === wantType);
+}
 
 /**
  * Range bands are the GM's call, not a shared table anyone at the table can
@@ -41,8 +70,9 @@ let modal = null;
 let trackerHiddenSiblings = null;
 let currentEncounterId = null;
 let combatants = [];
+let obstacles = [];
 let round = 0;
-let activeIndex = 0;
+let turnPhase = 'players'; // 'players' | 'adversaries' — see TURN_PHASES above
 let timerSegments = 0;
 let timerMax = 6;
 let timerName = 'Combat Timer';
@@ -230,6 +260,21 @@ const WEAPON_CLASS_RANGE_BONUS = {
 };
 const WEAPON_CLASS_GLYPH = { light: '🗡️', medium: '⚔️', heavy: '🔨', ranged: '🏹' };
 const WEAPON_CLASS_LABEL = { light: 'Light', medium: 'Medium', heavy: 'Heavy', ranged: 'Ranged' };
+
+// ============================================================
+// OBSTACLE DETECTION (best-effort migration for pre-existing encounters)
+// ============================================================
+//
+// Encounters saved before obstacles existed as their own thing have every
+// scenery element — a portcullis, a rope bridge, a rune-locked door — sitting
+// in `adversaries` next to actual foes. There's no reliable field to key off
+// of, so this is a guess from the name alone; the GM can flip any entry
+// between 👾 Adversary and 🧱 Obstacle by hand afterward (see the toggle in
+// the combatant/obstacle row).
+const OBSTACLE_NAME_HINTS = /\b(wall|door|gate|portcullis|drawbridge|bridge|trap|snare|hazard|barrier|obstacle|obstruction|rubble|debris|pit|chasm|brazier|torch|lever|switch|mechanism|winch|block(?:ade)?|barricade|cage|altar|shrine|totem|statue|pillar|column|crate|barrel|boulder|rockslide|ledge|chandelier|bookshelf|terrain)\b/i;
+function looksLikeObstacle(a) {
+    return OBSTACLE_NAME_HINTS.test(a?.name || '');
+}
 
 /**
  * Best-effort migration for combatants/adversary records saved before this
@@ -491,7 +536,7 @@ export async function openTracker(encounterId) {
     currentEncounterCustomLabel = encounter.customLabel || '';
     currentEncounterCustomTickLabel = encounter.customTickLabel || '';
 
-    combatants = (encounter.adversaries || []).map(a => {
+    const loadedAdversaries = (encounter.adversaries || []).map(a => {
         const creature = bestiaryCreatures.find(c =>
             (c.name || '').toLowerCase() === (a.name || '').toLowerCase()
         );
@@ -506,7 +551,6 @@ export async function openTracker(encounterId) {
         return {
             id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
             name: a.name || 'Adversary',
-            initiative: Math.floor(Math.random() * 20) + 1,
             harm: 0,
             fatigue: 0,                         // NEW
             armorType: a.armorType || 'none',   // NEW
@@ -514,7 +558,7 @@ export async function openTracker(encounterId) {
             maxHarm: tlToMaxHarm(tl),
             status: 'active',
             notes: body || '',
-            type: 'adversary',
+            type: a.type === 'obstacle' || looksLikeObstacle(a) ? 'obstacle' : 'adversary',
             objectiveType: a.objectiveType || encounterObjectiveType,
             customLabel: a.customLabel || currentEncounterCustomLabel,
             customTickLabel: a.customTickLabel || currentEncounterCustomTickLabel,
@@ -532,8 +576,16 @@ export async function openTracker(encounterId) {
         };
     });
 
+    // Best-effort split: anything that reads like scenery rather than a foe
+    // (name matches OBSTACLE_NAME_HINTS, or was explicitly saved with
+    // type: 'obstacle') goes to the obstacles list instead of combatants, so
+    // it never picks up a turn. This is a guess, not a rule — the 🧱/👾
+    // toggle on each entry lets the GM correct it either direction.
+    combatants = loadedAdversaries.filter(a => a.type !== 'obstacle');
+    obstacles = loadedAdversaries.filter(a => a.type === 'obstacle');
+
     round = 0;
-    activeIndex = 0;
+    turnPhase = 'players';
     timerSegments = 0;
     timerMax = 6;
     timerName = 'Combat Timer';
@@ -553,7 +605,7 @@ function broadcastCombatStatus() {
     if (!isConnectedToServer()) return;
     if (!combatants.length) return;
 
-    const active = combatants[activeIndex] || null;
+    const activeSide = combatantsInPhase(turnPhase).filter(c => c.status === 'active');
     const encounter = (getState().encounters || []).find(e => String(e.id) === String(currentEncounterId));
 
     try {
@@ -563,8 +615,11 @@ function broadcastCombatStatus() {
                 encounterId: currentEncounterId,
                 encounterTitle: encounter ? encounter.title : null,
                 round,
-                activeName: active ? active.name : null,
-                activeType: active ? active.type : null,
+                turnPhase,
+                activeTurnText: `${phaseLabel(turnPhase)}'s turn`,
+                activeName: phaseLabel(turnPhase),
+                activeType: turnPhase === 'players' ? 'player' : 'adversary',
+                activeCombatantIds: activeSide.map(c => c.id),
                 timerName,
                 timerSegments,
                 timerMax,
@@ -591,15 +646,18 @@ function renderTracker() {
     modal.className = 'editor-screen-host';
     modal.style.cssText = `width:100%;padding:1rem 0;animation:fadeIn 0.3s ease;`;
 
-    const focusCombatant = combatants[activeIndex] || null;
-
-    const combatantsHtml = combatants.map((c, i) => {
+    // Side-based turns: the whole player side is "active" together during the
+    // players phase, the whole adversary side together during the adversary
+    // phase. Obstacles are rendered separately below and are never active —
+    // see renderEntryRow's `list` param, which is 'combatants' or 'obstacles'.
+    function renderEntryRow(c, i, list) {
+        const isObstacle = list === 'obstacles';
         const objType = resolveObjectiveType(c.objectiveType, c);
         const isCombat = isCombatType(c.objectiveType);
-        const isActive = i === activeIndex && c.status === 'active';
+        const isActive = !isObstacle && c.status === 'active' &&
+            ((turnPhase === 'players' && c.type === 'player') || (turnPhase === 'adversaries' && c.type === 'adversary'));
         const isDefeated = c.status === 'defeated' || c.status === 'resolved';
         const harmPercent = (c.harm / c.maxHarm) * 100;
-        const hasLinks = c.linkedFaction || c.linkedPatron || c.linkedFollower || c.linkedAsset || c.linkedRival;
         // Non-combat clocks: whether hitting max is a good or bad outcome for
         // this particular clock is scenario-dependent (GM's call) — see
         // maxMeansSuccess toggle rendered in the actions row below.
@@ -618,31 +676,20 @@ function renderTracker() {
             fatigueLabel = `<span style="font-size:0.6rem;background:rgba(255,200,0,0.15);color:var(--gold);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;">💤 ${c.fatigue}</span>`;
         }
 
-        // ─── Weapon class toggle (Light / Medium / Heavy / Ranged) ────
-        const weaponLabel = `<button class="combat-weapon-toggle" data-index="${i}" title="${attr(weaponTypeLabel(c))} — click to change"
+        // ─── Weapon class toggle (Light / Medium / Heavy / Ranged) — only
+        // meaningful for actual combatants, not scenery.
+        const weaponLabel = isObstacle ? '' : `<button class="combat-weapon-toggle" data-list="${list}" data-index="${i}" title="${attr(weaponTypeLabel(c))} — click to change"
             style="font-size:0.6rem;background:rgba(212,175,55,0.12);color:var(--text2);border:1px solid var(--border);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;cursor:pointer;">${weaponToggleGlyph(c)}</button>`;
 
-        let rangeChip = '';
-        if (focusCombatant && focusCombatant.id !== c.id && focusCombatant.type !== c.type) {
-            const band = getRangeBand(c.id, focusCombatant.id);
-            const info = getRangeBandInfo(band);
-            const status = getWeaponRangeStatus(c, band);
-            const note = weaponRangeNote(status, c, info.label);
-            const glyph = status === 'blocked' ? '🚫' : status === 'penalty' ? '⚠️' : '📏';
-            const outline = status === 'blocked' ? 'outline:2px solid var(--red);outline-offset:1px;'
-                : status === 'penalty' ? 'outline:2px solid var(--orange);outline-offset:1px;' : '';
-            const chipGmOnly = !canSetRange();
-            const chipTitle = `Range to ${escHtml(focusCombatant.name)}: ${info.label} — ${info.desc}` +
-                (chipGmOnly ? ' (only the GM can change ranges)' : ' (click to cycle)') +
-                (note ? ` — ${escHtml(note)}` : '');
-            rangeChip = `<span class="range-chip" data-a="${attr(c.id)}" data-b="${attr(focusCombatant.id)}" data-gm-only="${chipGmOnly}"
-                title="${chipTitle}"
-                style="font-size:0.65rem; font-weight:700; color:white; background:${info.color};
-                       padding:0.05rem 0.4rem; border-radius:10px; flex-shrink:0; ${outline}
-                       ${chipGmOnly ? 'cursor:default;opacity:0.75;' : 'cursor:pointer;'}">
-                ${chipGmOnly ? '🔒 ' : ''}${glyph} ${info.label}
-            </span>`;
-        }
+        // ─── 🧱/👾 role-switch — corrects the best-effort obstacle guess
+        // made when an encounter is opened (see looksLikeObstacle above).
+        // Players can't be converted; the switch only exists between
+        // adversary and obstacle.
+        const roleSwitch = c.type === 'player' ? '' : `<button class="combat-role-toggle" data-list="${list}" data-index="${i}"
+            title="${isObstacle ? 'Not scenery — make this an adversary with a turn' : 'Not a foe — make this a passive obstacle with no turn'}"
+            style="font-size:0.6rem;background:var(--bg4);color:var(--text2);border:1px solid var(--border);padding:0.05rem 0.35rem;border-radius:10px;flex-shrink:0;cursor:pointer;">
+            ${isObstacle ? '🧱→👾' : '👾→🧱'}
+        </button>`;
 
         let linkBadges = '';
         if (c.linkedFaction) linkBadges += `<span class="badge faction-badge">🏛️</span>`;
@@ -652,7 +699,7 @@ function renderTracker() {
         if (c.linkedRival) linkBadges += `<span class="badge rival-badge">⚔️</span>`;
 
         return `
-            <div class="combatant-entry ${isActive ? 'active' : ''} ${isDefeated ? 'defeated' : ''}" data-index="${i}"
+            <div class="combatant-entry ${isActive ? 'active' : ''} ${isDefeated ? 'defeated' : ''}" data-list="${list}" data-index="${i}"
                  style="
                 display: flex; align-items: center; gap: 0.75rem;
                 padding: 0.75rem 1rem;
@@ -663,16 +710,15 @@ function renderTracker() {
                 transform: ${isActive ? 'scale(1.02)' : 'scale(1)'};
                 box-shadow: ${isActive ? '0 0 30px rgba(212,175,55,0.1)' : 'none'};
                 ${isDefeated ? 'opacity: 0.6;' : ''}
-                cursor: pointer;
             ">
                 <div class="combatant-number" style="
                     width: 32px; height: 32px; border-radius: 50%;
                     background: ${c.type === 'player' ? 'var(--blue)' : c.type === 'adversary' ? 'var(--red)' : 'var(--bg4)'};
                     display: flex; align-items: center; justify-content: center;
-                    font-weight: bold; font-size: 0.7rem; color: white;
+                    font-weight: bold; font-size: 0.85rem; color: white;
                     ${isActive ? 'box-shadow: 0 0 20px rgba(212,175,55,0.3);' : ''}
                 ">
-                    ${i + 1}
+                    ${isObstacle ? '🧱' : c.type === 'player' ? '👤' : '👾'}
                 </div>
 
                 <div style="flex: 1; min-width: 0;">
@@ -692,11 +738,10 @@ function renderTracker() {
                             ${armorLabel}
                             ${fatigueLabel}
                             ${weaponLabel}
+                            ${roleSwitch}
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0;">
                             ${linkBadges}
-                            ${rangeChip}
-                            <span style="font-size: 0.7rem; color: var(--text3);">Init ${c.initiative}</span>
                         </div>
                     </div>
 
@@ -718,22 +763,35 @@ function renderTracker() {
 
                 <div style="display: flex; gap: 0.25rem; flex-shrink: 0; flex-wrap: wrap; align-items:center;">
                     ${isCombat ? `
-                    <button class="btn btn-xs btn-ghost combat-damage-btn" data-index="${i}" title="Deal damage" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">💥</button>
-                    <button class="btn btn-xs btn-ghost combat-heal-btn" data-index="${i}" title="Heal" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">💚</button>
+                    <button class="btn btn-xs btn-ghost combat-damage-btn" data-list="${list}" data-index="${i}" title="Deal damage" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">💥</button>
+                    <button class="btn btn-xs btn-ghost combat-heal-btn" data-list="${list}" data-index="${i}" title="Heal" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">💚</button>
                     ` : `
-                    <button class="btn btn-xs btn-ghost combat-damage-btn" data-index="${i}" title="${escHtml(objType.progressLabel)} (${objType.progressVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--orange);">${objType.icon} ${escHtml(objType.progressLabel)}</button>
-                    <button class="btn btn-xs btn-ghost combat-heal-btn" data-index="${i}" title="${escHtml(objType.reliefLabel)} (${objType.reliefVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">↩️ ${escHtml(objType.reliefLabel)}</button>
-                    <button class="btn btn-xs btn-ghost combat-maxmeaning-btn" data-index="${i}" title="Toggle whether hitting max on this clock is success or failure"
+                    <button class="btn btn-xs btn-ghost combat-damage-btn" data-list="${list}" data-index="${i}" title="${escHtml(objType.progressLabel)} (${objType.progressVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--orange);">${objType.icon} ${escHtml(objType.progressLabel)}</button>
+                    <button class="btn btn-xs btn-ghost combat-heal-btn" data-list="${list}" data-index="${i}" title="${escHtml(objType.reliefLabel)} (${objType.reliefVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">↩️ ${escHtml(objType.reliefLabel)}</button>
+                    <button class="btn btn-xs btn-ghost combat-maxmeaning-btn" data-list="${list}" data-index="${i}" title="Toggle whether hitting max on this clock is success or failure"
                         style="padding: 0.25rem 0.4rem; font-size: 0.7rem; color: var(--text2); border: 1px solid var(--border); border-radius: 6px;">
                         Max = ${maxIsSuccess ? '✅ Success' : '❌ Failure'}
                     </button>
                     `}
-                    <button class="btn btn-xs btn-ghost combat-toggle-btn" data-index="${i}" title="Toggle active" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: ${c.status === 'active' ? 'var(--green)' : 'var(--text3)'};">${c.status === 'active' ? '●' : '○'}</button>
-                    <button class="btn btn-xs btn-ghost combat-remove-btn" data-index="${i}" title="Remove" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">✕</button>
+                    <button class="btn btn-xs btn-ghost combat-toggle-btn" data-list="${list}" data-index="${i}" title="Toggle active" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: ${c.status === 'active' ? 'var(--green)' : 'var(--text3)'};">${c.status === 'active' ? '●' : '○'}</button>
+                    <button class="btn btn-xs btn-ghost combat-remove-btn" data-list="${list}" data-index="${i}" title="Remove" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">✕</button>
                 </div>
             </div>
         `;
-    }).join('');
+    }
+
+    const playerEntries = combatants.map((c, i) => ({ c, i })).filter(({ c }) => c.type === 'player');
+    const adversaryEntries = combatants.map((c, i) => ({ c, i })).filter(({ c }) => c.type === 'adversary');
+
+    const playersHtml = playerEntries.length
+        ? playerEntries.map(({ c, i }) => renderEntryRow(c, i, 'combatants')).join('')
+        : '<div style="color:var(--text3);padding:1rem;text-align:center;font-size:0.85rem;">No players yet.</div>';
+    const adversariesHtml = adversaryEntries.length
+        ? adversaryEntries.map(({ c, i }) => renderEntryRow(c, i, 'combatants')).join('')
+        : '<div style="color:var(--text3);padding:1rem;text-align:center;font-size:0.85rem;">No adversaries yet.</div>';
+    const obstaclesHtml = obstacles.length
+        ? obstacles.map((c, i) => renderEntryRow(c, i, 'obstacles')).join('')
+        : '';
 
     const logHtml = combatLog.slice(-5).reverse().map(entry => `
         <div style="
@@ -768,7 +826,7 @@ function renderTracker() {
                         ⚔️ Combat Tracker
                     </h2>
                     <div style="color:var(--text2);font-size:0.85rem;margin-top:0.25rem;">
-                        ${combatants.length} combatants · Round ${round} · ${combatants.filter(c => c.status === 'active').length} active
+                        ${combatants.length} combatants${obstacles.length ? ` · ${obstacles.length} obstacles` : ''} · Round ${round} · ${combatants.filter(c => c.status === 'active').length} active
                         <span style="margin-inline-start:0.5rem;font-size:0.7rem;color:var(--text3);">[Space: next · R: reset timer]</span>
                     </div>
                 </div>
@@ -806,6 +864,24 @@ function renderTracker() {
                 </div>
             </div>
 
+            <!-- Turn Phase Banner: side-based — players act freely on their turn, -->
+            <!-- then the adversary side acts together as one turn. -->
+            <div style="
+                display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;
+                background: ${turnPhase === 'players' ? 'rgba(100,180,255,0.12)' : 'rgba(255,100,100,0.12)'};
+                border: 2px solid ${turnPhase === 'players' ? 'var(--blue)' : 'var(--red)'};
+                border-radius: 12px; padding: 0.85rem 1.1rem; margin-bottom: 1.25rem;
+            ">
+                <div style="font-size:1.1rem;font-weight:700;color:${turnPhase === 'players' ? 'var(--blue)' : 'var(--red)'};">
+                    ${phaseLabel(turnPhase)}'s Turn
+                </div>
+                <div style="font-size:0.75rem;color:var(--text2);">
+                    ${turnPhase === 'players'
+                        ? 'Players act in any order they choose.'
+                        : "GM narrates the adversary side's actions together."}
+                </div>
+            </div>
+
             <!-- Timer -->
             <div style="
                 background: var(--bg3); padding: 1rem; border-radius: 12px;
@@ -840,23 +916,44 @@ function renderTracker() {
                 ` : ''}
             </div>
 
-            <!-- Combatants -->
+            <!-- Combatants (turn order) -->
             <div style="margin-bottom: 1.25rem;">
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
-                    <h3 style="margin:0;color:var(--gold);" data-i18n="feature.encounters.combat.combatants">👾 Combatants</h3>
+                    <h3 style="margin:0;color:var(--gold);" data-i18n="feature.encounters.combat.combatants">⚔️ Combatants</h3>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                         <button class="btn btn-sm btn-primary" id="combat-add-combatant" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.adversary">+ Adversary</button>
                         <button class="btn btn-sm btn-ghost" id="combat-add-player" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.player">👤 Player</button>
+                        <button class="btn btn-sm btn-ghost" id="combat-add-obstacle" style="padding:0.4rem 0.75rem;font-size:0.85rem;">🧱 Obstacle</button>
                         <button class="btn btn-sm btn-ghost" id="combat-import-factions" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.import">🏛️ Import</button>
                         <button class="btn btn-sm btn-ghost" id="combat-import-bestiary" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.bestiary">📖 Bestiary</button>
-                        <button class="btn btn-sm btn-ghost" id="combat-sort" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.sort">🔄 Sort</button>
                         <button class="btn btn-sm ${rangeGridOpen ? 'btn-gold' : 'btn-ghost'}" id="combat-toggle-ranges" style="padding:0.4rem 0.75rem;font-size:0.85rem;">📏 Ranges</button>
                     </div>
                 </div>
-                <div id="combatant-list" style="max-height: 380px; overflow-y: auto; padding-inline-end: 0.5rem;">
-                    ${combatantsHtml || '<div style="color:var(--text3);padding:2rem;text-align:center;">No combatants. Add some to begin!</div>'}
+
+                <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin:0.5rem 0 0.35rem;">👤 Players</div>
+                <div id="combatant-list-players" style="max-height: 260px; overflow-y: auto; padding-inline-end: 0.5rem;">
+                    ${playersHtml}
+                </div>
+
+                <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin:0.85rem 0 0.35rem;">👾 Adversaries</div>
+                <div id="combatant-list-adversaries" style="max-height: 260px; overflow-y: auto; padding-inline-end: 0.5rem;">
+                    ${adversariesHtml}
                 </div>
             </div>
+
+            <!-- Obstacles: terrain, traps, doors, hazards — Harm/status tracked -->
+            <!-- like anything else, but never in turn order and never "active". -->
+            ${obstacles.length ? `
+            <div style="margin-bottom: 1.25rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+                    <h3 style="margin:0;color:var(--text2);">🧱 Obstacles</h3>
+                    <div style="font-size:0.7rem;color:var(--text3);">Never get a turn</div>
+                </div>
+                <div id="obstacle-list" style="max-height: 260px; overflow-y: auto; padding-inline-end: 0.5rem;">
+                    ${obstaclesHtml}
+                </div>
+            </div>
+            ` : ''}
 
             <!-- Story Beats Panel -->
             <div style="background:var(--bg3);padding:1rem;border-radius:12px;margin-bottom:1.25rem;border:1px solid var(--border);">
@@ -888,7 +985,9 @@ function renderTracker() {
 
             <!-- Controls -->
             <div style="display:flex;flex-wrap:wrap;gap:0.75rem;border-top:1px solid var(--border);padding-top:1.25rem;">
-                <button class="btn btn-primary" id="combat-next" style="flex:1;min-width:100px;padding:0.6rem;" data-i18n="feature.encounters.combat.nextTurn">⏭️ Next Turn</button>
+                <button class="btn btn-primary" id="combat-next" style="flex:1;min-width:100px;padding:0.6rem;">
+                    ${turnPhase === 'players' ? "⏭️ Adversaries' Turn" : '⏭️ New Round — Players'}
+                </button>
                 <button class="btn btn-ghost" id="combat-end-round" style="flex:1;min-width:100px;padding:0.6rem;" data-i18n="feature.encounters.combat.endRound">🔚 End Round</button>
                 <button class="btn btn-ghost" id="combat-clear-log" style="flex:0 0 auto;padding:0.6rem;" data-i18n="feature.encounters.combat.log">🗑️ Log</button>
                 <button class="btn btn-danger" id="combat-close-tracker" style="flex:1;min-width:100px;padding:0.6rem;" data-i18n="feature.encounters.combat.close">✖️ Close</button>
@@ -956,25 +1055,14 @@ function renderTracker() {
 
     modal.querySelector('#combat-add-combatant')?.addEventListener('click', addCombatant);
     modal.querySelector('#combat-add-player')?.addEventListener('click', addPlayer);
+    modal.querySelector('#combat-add-obstacle')?.addEventListener('click', addObstacle);
     modal.querySelector('#combat-import-factions')?.addEventListener('click', importFromFactions);
     modal.querySelector('#combat-import-bestiary')?.addEventListener('click', importFromBestiary);
-    modal.querySelector('#combat-sort')?.addEventListener('click', sortCombatants);
     modal.querySelector('#combat-toggle-ranges')?.addEventListener('click', () => {
         rangeGridOpen = !rangeGridOpen;
         renderTracker();
     });
 
-    modal.querySelectorAll('.range-chip').forEach(chip => {
-        chip.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (!canSetRange()) {
-                showToast(i18nText("feature.encounters.combat.onlyTheGMCanChangeRanges", null, "Only the GM can change ranges."), 'warning');
-                return;
-            }
-            cycleRangeBand(chip.dataset.a, chip.dataset.b);
-            renderTracker();
-        });
-    });
     modal.querySelectorAll('.range-cell').forEach(cell => {
         cell.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1011,38 +1099,33 @@ function renderTracker() {
         });
     });
 
-    // Focus / selection
-    modal.querySelectorAll('.combatant-entry').forEach(el => {
-        el.addEventListener('click', (e) => {
-            if (e.target.closest('button')) return;
-            const idx = parseInt(el.dataset.index);
-            if (!isNaN(idx) && idx >= 0 && idx < combatants.length && combatants[idx].status === 'active') {
-                activeIndex = idx;
-                renderTracker();
-                addLog('info', `Focused on ${combatants[idx].name}`);
-                showToast(i18nText("feature.encounters.combat.focusedOnValue", { value0: combatants[idx].name }, "🎯 Focused on {{value0}}"), 'info');
-            }
-        });
-    });
+    // Entry actions — every row carries data-list ('combatants' or
+    // 'obstacles') + data-index so the same handlers work for both lists.
+    // There's no more click-to-focus: side-based turns don't have a single
+    // "focused" combatant, so the range grid (📏 Ranges button) is the only
+    // place ranges are set now.
+    function listFor(el) { return el.dataset.list === 'obstacles' ? obstacles : combatants; }
 
-    // Combatant actions
     modal.querySelectorAll('.combat-damage-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.stopPropagation(); damageCombatant(parseInt(btn.dataset.index)); });
+        btn.addEventListener('click', (e) => { e.stopPropagation(); damageEntry(listFor(btn), parseInt(btn.dataset.index)); });
     });
     modal.querySelectorAll('.combat-heal-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.stopPropagation(); healCombatant(parseInt(btn.dataset.index)); });
+        btn.addEventListener('click', (e) => { e.stopPropagation(); healEntry(listFor(btn), parseInt(btn.dataset.index)); });
     });
     modal.querySelectorAll('.combat-toggle-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.stopPropagation(); toggleCombatant(parseInt(btn.dataset.index)); });
+        btn.addEventListener('click', (e) => { e.stopPropagation(); toggleEntry(listFor(btn), parseInt(btn.dataset.index)); });
     });
     modal.querySelectorAll('.combat-remove-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.stopPropagation(); removeCombatant(parseInt(btn.dataset.index)); });
+        btn.addEventListener('click', (e) => { e.stopPropagation(); removeEntry(btn.dataset.list, parseInt(btn.dataset.index)); });
     });
     modal.querySelectorAll('.combat-weapon-toggle').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.stopPropagation(); cycleWeaponType(parseInt(btn.dataset.index)); });
+        btn.addEventListener('click', (e) => { e.stopPropagation(); cycleWeaponType(listFor(btn), parseInt(btn.dataset.index)); });
     });
     modal.querySelectorAll('.combat-maxmeaning-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaxMeaning(parseInt(btn.dataset.index)); });
+        btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaxMeaning(listFor(btn), parseInt(btn.dataset.index)); });
+    });
+    modal.querySelectorAll('.combat-role-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); toggleObstacleRole(btn.dataset.list, parseInt(btn.dataset.index)); });
     });
 
     // Keyboard shortcuts
@@ -1124,7 +1207,6 @@ function promptWeaponClass(defaultClass) {
 function addCombatant() {
     const name = prompt(i18nText("feature.encounters.combat.enterAdversaryName", null, "Enter adversary name:"));
     if (!name) return;
-    const initiative = parseInt(prompt(i18nText("feature.encounters.combat.enterInitiative120", null, "Enter initiative (1-20):"), Math.floor(Math.random() * 20) + 1) || '10');
     const harm = parseInt(prompt(i18nText("feature.encounters.combat.maxHarm120", null, "Max Harm (1-20):"), '3') || '3');
     const armorPrompt = prompt(i18nText("feature.encounters.combat.armorTypeNoneLightMediumHeavyDefault", null, "Armor type: none, light, medium, heavy (default: none)"), 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
@@ -1133,7 +1215,6 @@ function addCombatant() {
     const newAdversary = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
         name,
-        initiative: Math.min(Math.max(initiative, 1), 20),
         harm: 0,
         fatigue: 0,
         armorType: armorType,
@@ -1153,7 +1234,6 @@ function addCombatant() {
     };
     combatants.push(newAdversary);
     initRangeForNewCombatant(newAdversary);
-    sortCombatants();
     addLog('info', `Added adversary: ${name}`);
     renderTracker();
     showToast(i18nText("feature.encounters.combat.addedValue", { value0: name }, "👾 Added {{value0}}"), 'success');
@@ -1162,7 +1242,6 @@ function addCombatant() {
 function addPlayer() {
     const name = prompt(i18nText("feature.encounters.combat.enterPlayerName", null, "Enter player name:"));
     if (!name) return;
-    const initiative = parseInt(prompt(i18nText("feature.encounters.combat.enterInitiative120", null, "Enter initiative (1-20):"), Math.floor(Math.random() * 20) + 1) || '10');
     const harm = parseInt(prompt(i18nText("feature.encounters.combat.maxHarm120", null, "Max Harm (1-20):"), '4') || '4');
     const armorPrompt = prompt(i18nText("feature.encounters.combat.armorTypeNoneLightMediumHeavyDefault", null, "Armor type: none, light, medium, heavy (default: none)"), 'none') || 'none';
     const armorType = ['none', 'light', 'medium', 'heavy'].includes(armorPrompt) ? armorPrompt : 'none';
@@ -1171,7 +1250,6 @@ function addPlayer() {
     const newPlayer = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
         name: `👤 ${name}`,
-        initiative: Math.min(Math.max(initiative, 1), 20),
         harm: 0,
         fatigue: 0,
         armorType: armorType,
@@ -1186,10 +1264,37 @@ function addPlayer() {
     };
     combatants.push(newPlayer);
     initRangeForNewCombatant(newPlayer);
-    sortCombatants();
     addLog('info', `Added player: ${name}`);
     renderTracker();
     showToast(i18nText("feature.encounters.combat.addedPlayerValue", { value0: name }, "👤 Added player {{value0}}"), 'success');
+}
+
+// Obstacles — terrain, traps, doors, hazards. Deliberately no initiative,
+// weapon class, or armor prompt: an obstacle never acts and never attacks,
+// it just has Harm/status like anything else worth tracking on the map.
+function addObstacle() {
+    const name = prompt('Enter obstacle name (e.g. "Barred door", "Rope bridge", "Collapsing ceiling"):');
+    if (!name) return;
+    const harm = parseInt(prompt('Max Harm/Structure (1-20):', '3') || '3');
+
+    const newObstacle = {
+        id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+        name,
+        harm: 0,
+        fatigue: 0,
+        armorType: 'none',
+        maxHarm: Math.min(Math.max(harm, 1), 20),
+        status: 'active',
+        notes: '',
+        type: 'obstacle',
+        objectiveType: currentEncounterObjectiveType,
+        customLabel: currentEncounterCustomLabel,
+        customTickLabel: currentEncounterCustomTickLabel
+    };
+    obstacles.push(newObstacle);
+    addLog('info', `Added obstacle: ${name}`);
+    renderTracker();
+    showToast(`🧱 Added ${name}`, 'success');
 }
 
 function importFromFactions() {
@@ -1215,7 +1320,6 @@ function importFromFactions() {
     const newFactionCombatant = {
         id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
         name: faction.name,
-        initiative: Math.floor(Math.random() * 20) + 5 + (faction.standing || 0),
         harm: 0,
         fatigue: 0,
         armorType: 'none',
@@ -1232,7 +1336,6 @@ function importFromFactions() {
     };
     combatants.push(newFactionCombatant);
     initRangeForNewCombatant(newFactionCombatant);
-    sortCombatants();
     addLog('info', `Imported faction: ${faction.name}`);
     renderTracker();
     showToast(i18nText("feature.encounters.combat.importedValue", { value0: faction.name }, "🏛️ Imported {{value0}}"), 'success');
@@ -1322,10 +1425,10 @@ async function importFromBestiary() {
                     }
                 }
 
+                const isObstacle = looksLikeObstacle(entry);
                 const newCombatant = {
                     id: 'combat-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
                     name: entry.name || 'Adversary',
-                    initiative: Math.floor(Math.random() * 20) + 1,
                     harm: 0,
                     fatigue: 0,
                     armorType: 'none',
@@ -1335,7 +1438,7 @@ async function importFromBestiary() {
                     maxHarm: tlToMaxHarm(entry.tl),
                     status: 'active',
                     notes: getCreatureDescription(entry) || '',
-                    type: 'adversary',
+                    type: isObstacle ? 'obstacle' : 'adversary',
                     objectiveType: currentEncounterObjectiveType,
                     customLabel: currentEncounterCustomLabel,
                     customTickLabel: currentEncounterCustomTickLabel,
@@ -1350,10 +1453,13 @@ async function importFromBestiary() {
                     linkedAsset: getLinkedAsset(entry.name),
                     linkedRival: getLinkedRival(entry.name)
                 };
-                combatants.push(newCombatant);
-                initRangeForNewCombatant(newCombatant);
-                sortCombatants();
-                addLog('info', `Imported bestiary creature: ${entry.name}`);
+                if (isObstacle) {
+                    obstacles.push(newCombatant);
+                } else {
+                    combatants.push(newCombatant);
+                    initRangeForNewCombatant(newCombatant);
+                }
+                addLog('info', `Imported bestiary ${isObstacle ? 'obstacle' : 'creature'}: ${entry.name}`);
                 renderTracker();
                 showToast(i18nText("feature.encounters.combat.importedValue_pggae", { value0: entry.name }, "📖 Imported {{value0}}"), 'success');
                 searchModal.remove();
@@ -1368,45 +1474,30 @@ async function importFromBestiary() {
     searchInput.focus();
 }
 
-function sortCombatants() {
-    combatants.sort((a, b) => {
-        if (a.status === 'defeated' && b.status !== 'defeated') return 1;
-        if (a.status !== 'defeated' && b.status === 'defeated') return -1;
-        return b.initiative - a.initiative;
-    });
-    activeIndex = 0;
-    addLog('info', 'Sorted combatants by initiative');
-    renderTracker();
-    showToast(i18nText("feature.encounters.combat.combatantsSortedByInitiative", null, "🔄 Combatants sorted by initiative"), 'info');
-}
-
+// Side-based turn order: exactly two phases per round (see TURN_PHASES).
+// "Next Turn" advances from players → adversaries, then from adversaries →
+// a new round back at players. Obstacles are never part of this — they
+// aren't in `combatants` at all.
 function nextCombatant() {
-    const active = combatants.filter(c => c.status === 'active');
-    if (active.length === 0) {
+    if (combatants.filter(c => c.status === 'active').length === 0) {
         showToast(i18nText("feature.encounters.combat.noActiveCombatants", null, "No active combatants."), 'info');
         return;
     }
-    let nextIndex = (activeIndex + 1) % combatants.length;
-    let attempts = 0;
-    while (attempts < combatants.length) {
-        if (combatants[nextIndex].status === 'active') {
-            activeIndex = nextIndex;
-            addLog('turn', `${combatants[activeIndex].name}'s turn`);
-            renderTracker();
-            showToast(i18nText("feature.encounters.combat.valueSTurn", { value0: combatants[activeIndex].name }, "⏭️ {{value0}}'s turn"), 'info');
-            return;
-        }
-        nextIndex = (nextIndex + 1) % combatants.length;
-        attempts++;
+    if (turnPhase === 'players') {
+        turnPhase = 'adversaries';
+        addLog('turn', `${phaseLabel('adversaries')}'s turn`);
+        renderTracker();
+        showToast(`⏭️ ${phaseLabel('adversaries')}'s turn`, 'info');
+        return;
     }
+    // Was the adversary phase — advancing ends the round.
     endRound();
 }
 
 function endRound() {
     round++;
-    const firstActive = combatants.findIndex(c => c.status === 'active');
-    if (firstActive !== -1) activeIndex = firstActive;
-    addLog('info', `Round ${round} begins`);
+    turnPhase = 'players';
+    addLog('info', `Round ${round} begins — ${phaseLabel('players')}'s turn`);
     timerSegments = Math.min(timerSegments + 1, timerMax);
     renderTracker();
     showToast(i18nText("feature.encounters.combat.roundValueBegins", { value0: round }, "🔚 Round {{value0}} begins"), 'info');
@@ -1416,11 +1507,12 @@ function endRound() {
     }
 }
 
-// ─── UPDATED damageCombatant with Armor Conversion ──────────────
+// ─── damageEntry/healEntry etc. work on either `combatants` or `obstacles` —
+// pass the list explicitly so one set of functions covers both. ──────────
 
-function damageCombatant(idx) {
-    if (idx < 0 || idx >= combatants.length) return;
-    const c = combatants[idx];
+function damageEntry(list, idx) {
+    if (idx < 0 || idx >= list.length) return;
+    const c = list[idx];
     const isCombat = isCombatType(c.objectiveType);
     const objType = resolveObjectiveType(c.objectiveType, c);
 
@@ -1476,9 +1568,9 @@ function damageCombatant(idx) {
     renderTracker();
 }
 
-function healCombatant(idx) {
-    if (idx < 0 || idx >= combatants.length) return;
-    const c = combatants[idx];
+function healEntry(list, idx) {
+    if (idx < 0 || idx >= list.length) return;
+    const c = list[idx];
     const isCombat = isCombatType(c.objectiveType);
     const objType = resolveObjectiveType(c.objectiveType, c);
 
@@ -1517,17 +1609,17 @@ function healCombatant(idx) {
  * clock hitting max is good. No-op for combat entries (defeat/revive is
  * the real mechanic there, not this toggle).
  */
-function toggleMaxMeaning(idx) {
-    if (idx < 0 || idx >= combatants.length) return;
-    const c = combatants[idx];
+function toggleMaxMeaning(list, idx) {
+    if (idx < 0 || idx >= list.length) return;
+    const c = list[idx];
     if (isCombatType(c.objectiveType)) return;
     c.maxMeansSuccess = !(c.maxMeansSuccess === true);
     renderTracker();
 }
 
-function toggleCombatant(idx) {
-    if (idx >= 0 && idx < combatants.length) {
-        const c = combatants[idx];
+function toggleEntry(list, idx) {
+    if (idx >= 0 && idx < list.length) {
+        const c = list[idx];
         c.status = c.status === 'active' ? 'inactive' : 'active';
         addLog('info', `${c.name} ${c.status === 'active' ? 'activated' : 'deactivated'}`);
         showToast(c.status === 'active'
@@ -1539,23 +1631,43 @@ function toggleCombatant(idx) {
 
 // Cycle a combatant's weapon: unset/other → Light → Medium → Heavy → Ranged → Light → ...
 const WEAPON_CLASS_CYCLE = ['light', 'medium', 'heavy', 'ranged'];
-function cycleWeaponType(idx) {
-    if (idx < 0 || idx >= combatants.length) return;
-    const c = combatants[idx];
+function cycleWeaponType(list, idx) {
+    if (idx < 0 || idx >= list.length) return;
+    const c = list[idx];
     const currentPos = WEAPON_CLASS_CYCLE.indexOf(c.weaponClass);
     c.weaponClass = WEAPON_CLASS_CYCLE[(currentPos + 1) % WEAPON_CLASS_CYCLE.length];
     addLog('info', `${c.name} switched to ${weaponTypeLabel(c)}`);
     renderTracker();
 }
 
-function removeCombatant(idx) {
-    if (idx >= 0 && idx < combatants.length) {
-        if (confirm(i18nText("feature.encounters.combat.removeValue", { value0: combatants[idx].name }, "Remove {{value0}}?"))) {
-            const name = combatants[idx].name;
-            const removedId = combatants[idx].id;
-            combatants.splice(idx, 1);
-            clearRangeForCombatant(removedId);
-            if (activeIndex >= combatants.length) activeIndex = Math.max(0, combatants.length - 1);
+// Correct the best-effort 👾/🧱 guess by moving an entry between the
+// combatants list (turn order) and the obstacles list (never a turn).
+function toggleObstacleRole(listName, idx) {
+    const fromList = listName === 'obstacles' ? obstacles : combatants;
+    if (idx < 0 || idx >= fromList.length) return;
+    const [entry] = fromList.splice(idx, 1);
+    if (listName === 'obstacles') {
+        entry.type = 'adversary';
+        combatants.push(entry);
+        initRangeForNewCombatant(entry);
+        addLog('info', `${entry.name} is now an adversary — it takes a turn.`);
+    } else {
+        clearRangeForCombatant(entry.id);
+        entry.type = 'obstacle';
+        obstacles.push(entry);
+        addLog('info', `${entry.name} is now an obstacle — it never takes a turn.`);
+    }
+    renderTracker();
+}
+
+function removeEntry(listName, idx) {
+    const list = listName === 'obstacles' ? obstacles : combatants;
+    if (idx >= 0 && idx < list.length) {
+        if (confirm(i18nText("feature.encounters.combat.removeValue", { value0: list[idx].name }, "Remove {{value0}}?"))) {
+            const name = list[idx].name;
+            const removedId = list[idx].id;
+            list.splice(idx, 1);
+            if (listName !== 'obstacles') clearRangeForCombatant(removedId);
             addLog('info', `Removed ${name}`);
             renderTracker();
             showToast(i18nText("feature.encounters.combat.removedValue", { value0: name }, "🗑️ Removed {{value0}}"), 'info');
@@ -1584,7 +1696,23 @@ export function getLiveCombatants() {
     return combatants.map(c => ({
         id: c.id, name: c.name, type: c.type, status: c.status,
         harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none',
-        initiative: c.initiative, weaponClass: c.weaponClass,
+        weaponClass: c.weaponClass,
+        objectiveType: c.objectiveType || DEFAULT_OBJECTIVE_TYPE,
+        customLabel: c.customLabel || '', customTickLabel: c.customTickLabel || '',
+        maxMeansSuccess: c.maxMeansSuccess === true
+    }));
+}
+
+/**
+ * Obstacles never take a turn, so they're not part of getTrackerState's
+ * `combatants`/turn-order data — but a VTT map view still wants their
+ * Harm/status. Exposed separately so a caller that only cares about turn
+ * order doesn't have to filter them back out.
+ */
+export function getLiveObstacles() {
+    return obstacles.map(c => ({
+        id: c.id, name: c.name, status: c.status,
+        harm: c.harm, maxHarm: c.maxHarm,
         objectiveType: c.objectiveType || DEFAULT_OBJECTIVE_TYPE,
         customLabel: c.customLabel || '', customTickLabel: c.customTickLabel || '',
         maxMeansSuccess: c.maxMeansSuccess === true
@@ -1596,26 +1724,33 @@ export function getLiveCombatants() {
  * elsewhere (e.g. the VTT sidebar's mini combat tracker card). The tracker
  * itself is a single module-level session — as long as the SPA page hasn't
  * been reloaded, this stays queryable even after the GM closes the modal, so
- * a player can glance at initiative order and their range without the
- * Encounters tab open. Returns combatants sorted by initiative (desc), with
- * the active-turn combatant's id flagged.
+ * a player can glance at whose turn it is and their range without the
+ * Encounters tab open.
+ *
+ * Turns are side-based (see TURN_PHASES): there's no single "active
+ * combatant" anymore, just an active side. `activeCombatantIds` lists every
+ * id on that side; `activeCombatantId` is kept (first of that list, or null)
+ * for older callers that only ever expected one.
  */
 export function getTrackerState() {
-    const sorted = [...combatants].sort((a, b) => (b.initiative || 0) - (a.initiative || 0));
-    const activeCombatant = combatants[activeIndex] || null;
+    const activeSide = combatantsInPhase(turnPhase).filter(c => c.status === 'active');
     return {
         encounterId: currentEncounterId,
         isModalOpen: !!modal,
         round,
-        activeCombatantId: activeCombatant?.id || null,
-        combatants: sorted.map(c => ({
+        turnPhase,
+        turnPhaseLabel: phaseLabel(turnPhase),
+        activeCombatantIds: activeSide.map(c => c.id),
+        activeCombatantId: activeSide[0]?.id || null,
+        combatants: combatants.map(c => ({
             id: c.id, name: c.name, type: c.type, status: c.status,
             harm: c.harm, maxHarm: c.maxHarm, fatigue: c.fatigue || 0, armorType: c.armorType || 'none',
-            initiative: c.initiative, weaponClass: c.weaponClass,
+            weaponClass: c.weaponClass,
             objectiveType: c.objectiveType || DEFAULT_OBJECTIVE_TYPE,
-        customLabel: c.customLabel || '', customTickLabel: c.customTickLabel || '',
-        maxMeansSuccess: c.maxMeansSuccess === true
-        }))
+            customLabel: c.customLabel || '', customTickLabel: c.customTickLabel || '',
+            maxMeansSuccess: c.maxMeansSuccess === true
+        })),
+        obstacles: getLiveObstacles()
     };
 }
 
