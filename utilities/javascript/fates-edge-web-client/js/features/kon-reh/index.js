@@ -1913,7 +1913,7 @@ export function openKonrehModal(netConfig = null) {
   }
 
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    return s.replace(/[&<>"']/g, c => ({ '&': '&', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
   function talkLine(html) {
@@ -2725,17 +2725,17 @@ export default {
         <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Local hot‑seat, vs‑computer Schools, or challenge a connected player from the Whiteboard's 🌀 Kon'reh toggle.</p>
       </div>
       <div class="panel" style="max-width:720px;margin:1rem auto 0;text-align:center;padding:2rem 1.5rem;">
-        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;" data-i18n="feature.kon-reh.tollVeil">🃏 Toll &amp; Veil</h2>
+        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;" data-i18n="feature.kon-reh.tollVeil">🃏 Toll & Veil</h2>
         <p style="color:var(--text2);margin-top:0;">A 3-5 player trick-taking card game of bids, trump, and nerve</p>
-        <button id="tollveil-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;" data-i18n="feature.kon-reh.playTollVeil">▶ Play Toll &amp; Veil</button>
-        <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Pass &amp; play, solo vs AI, or host a table for the group from the Whiteboard's 🃏 Toll &amp; Veil toggle — points-only by default, with optional capped-XP or narrative "String" stakes.</p>
+        <button id="tollveil-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;" data-i18n="feature.kon-reh.playTollVeil">▶ Play Toll & Veil</button>
+        <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Pass & play, solo vs AI, or host a table for the group from the Whiteboard's 🃏 Toll & Veil toggle — points-only by default, with optional capped-XP or narrative "String" stakes.</p>
       </div>
       <div class="panel" id="konreh-rules-panel" style="max-width:720px;margin:1rem auto 0;padding:1.25rem 1.5rem;text-align: start;font-size:0.85rem;line-height:1.5;">
         <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.konRehHowToPlay">Kon'reh — How to Play</h3>
         ${getRulesText()}
       </div>
       <div class="panel" id="tollveil-rules-panel" style="max-width:720px;margin:1rem auto 2rem;padding:1.25rem 1.5rem;text-align: start;font-size:0.85rem;line-height:1.5;">
-        <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.tollVeilHowToPlay">Toll &amp; Veil — How to Play</h3>
+        <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.tollVeilHowToPlay">Toll & Veil — How to Play</h3>
         ${getTollVeilRulesText()}
       </div>
     `;

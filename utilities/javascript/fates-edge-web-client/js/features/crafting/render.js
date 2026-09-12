@@ -310,7 +310,7 @@ export function renderCodexTab(char, codex, uiState) {
         <div class="panel">
             <div class="flex-between">
                 <span class="panel-title" data-i18n="feature.crafting.render.codex">📖 Codex</span>
-                <span class="crafting-hint" data-i18n="feature.crafting.render.magicItemsConsumablesArtifacts">Magic items, consumables &amp; artifacts</span>
+                <span class="crafting-hint" data-i18n="feature.crafting.render.magicItemsConsumablesArtifacts">Magic items, consumables & artifacts</span>
             </div>
             <div class="codex-filters">
                 ${Object.keys(CATEGORY_META).map(cat => `

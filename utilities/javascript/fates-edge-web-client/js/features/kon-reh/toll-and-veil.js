@@ -141,7 +141,7 @@ function renderSetupScreen(root, onStart) {
     root.innerHTML = `
         <div style="text-align:center; color:var(--muted); font-size:13px; margin-bottom:10px;">Choose how to play.</div>
         <div style="display:flex; gap:8px; justify-content:center; margin-bottom:14px;">
-            <button class="tv-btn primary" id="tv-mode-passplay" data-i18n="feature.kon-reh.toll-and-veil.passPlay">👥 Pass &amp; Play</button>
+            <button class="tv-btn primary" id="tv-mode-passplay" data-i18n="feature.kon-reh.toll-and-veil.passPlay">👥 Pass & Play</button>
             <button class="tv-btn" id="tv-mode-vsai" data-i18n="feature.kon-reh.toll-and-veil.soloVsAI">🤖 Solo vs AI</button>
         </div>
         <div style="display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:14px; font-size:13px; color:var(--muted);">
@@ -256,7 +256,7 @@ function renderGame(root, controller, closeFn) {
     root.innerHTML = `
         <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div>
-                <h2 style="color:var(--gold); margin:0; font-size:20px; letter-spacing:0.02em;" data-i18n="feature.kon-reh.toll-and-veil.tollVeil">Toll &amp; Veil</h2>
+                <h2 style="color:var(--gold); margin:0; font-size:20px; letter-spacing:0.02em;" data-i18n="feature.kon-reh.toll-and-veil.tollVeil">Toll & Veil</h2>
                 <span style="color:var(--muted); font-size:12px;">Target: ${view.winningScore} points · ${stakeLabel}</span>
             </div>
             <button class="tv-btn" id="tv-close">✕</button>

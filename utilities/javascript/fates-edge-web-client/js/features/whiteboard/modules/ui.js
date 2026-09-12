@@ -402,7 +402,7 @@ export function render(el) {
                 </details>
 
                 <details class="wb-toolbar-section">
-                    <summary data-i18n="feature.whiteboard.modules.ui.tokensCombat">⚔️ Tokens &amp; Combat</summary>
+                    <summary data-i18n="feature.whiteboard.modules.ui.tokensCombat">⚔️ Tokens & Combat</summary>
                     <div class="wb-toolbar-section-body">
                         <div class="flex gap-1 flex-center">
                             <button class="btn btn-sm ${isGridCombatActive() ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-grid-combat">${isGridCombatActive() ? '⚔️ Combat ON' : '⚔️ Combat OFF'}</button>
@@ -415,15 +415,15 @@ export function render(el) {
                             <button class="btn btn-sm btn-secondary" id="whiteboard-import-tracker" style="${isGridCombatActive() && !isKonrehActive() ? '' : 'display:none;'}">🔗 Import Tracker</button>
                             <button class="btn btn-sm ${isKonrehActive() ? 'btn-gold' : 'btn-secondary'}" id="whiteboard-konreh">🌀 Kon'reh</button>
                             <button class="btn btn-sm btn-secondary" id="whiteboard-konreh-challenge" title="Challenge another connected player to a real-time Kon'reh match" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Challenge Player</button>
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil" data-i18n="feature.whiteboard.modules.ui.tollVeil">🃏 Toll &amp; Veil</button>
-                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil-host" title="Host a Toll &amp; Veil table for the group over the existing VTT connection" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Host Table</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil" data-i18n="feature.whiteboard.modules.ui.tollVeil">🃏 Toll & Veil</button>
+                            <button class="btn btn-sm btn-secondary" id="whiteboard-tollveil-host" title="Host a Toll & Veil table for the group over the existing VTT connection" style="${isConnectedToServer() ? '' : 'display:none;'}">🌐 Host Table</button>
                             <span id="whiteboard-tracker-link-status" class="text-muted text-sm"></span>
                         </div>
                     </div>
                 </details>
 
                 <details class="wb-toolbar-section">
-                    <summary data-i18n="feature.whiteboard.modules.ui.fogLight">🌫️ Fog &amp; Light</summary>
+                    <summary data-i18n="feature.whiteboard.modules.ui.fogLight">🌫️ Fog & Light</summary>
                     <div class="wb-toolbar-section-body">
                         <div class="flex gap-1 flex-center">
                             <button class="btn btn-sm ${state.gridCombat.fogOfWar?.enabled ? 'btn-danger' : 'btn-secondary'}" id="whiteboard-fog-toggle">${state.gridCombat.fogOfWar?.enabled ? '🌫️ Fog ON' : '🌫️ Fog OFF'}</button>

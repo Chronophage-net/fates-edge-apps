@@ -2031,7 +2031,7 @@ export function render(el) {
             <span class="vtt-stat-pill" id="vtt-scene-status" style="display:none;background:var(--bg4);border:1px solid var(--gold);"></span>
         </div>
         <details class="vtt-status-more" data-vtt-remember="vtt.status.open">
-        <summary><span data-i18n="feature.vtt.vtt-connected.tableSettings">Voice, party &amp; connection</span></summary>
+        <summary><span data-i18n="feature.vtt.vtt-connected.tableSettings">Voice, party & connection</span></summary>
         <!-- Voice controls -->
         <div class="vtt-stat-row" style="justify-content:space-between;">
             <div class="vtt-btn-row" style="align-items:center;">
@@ -2204,7 +2204,7 @@ export function render(el) {
                 </div>
                 <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
                 <div class="vtt-btn-row" style="margin-top:0.5rem;">
-                <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-connected.rollPost">Roll &amp; Post</button>
+                <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-connected.rollPost">Roll & Post</button>
                 <button class="btn btn-sm" id="vtt-roll-only-btn" data-i18n="feature.vtt.vtt-connected.rollOnly">Roll Only</button>
                 </div>
                 <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>

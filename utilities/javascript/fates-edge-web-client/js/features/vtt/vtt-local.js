@@ -614,7 +614,7 @@ export function render(el) {
            Settings > WebSocket panel has the same toggle for anyone who'd
            rather set it there). -->
       <details class="vtt-status-more" data-vtt-remember="vtt.status.open">
-      <summary><span data-i18n="feature.vtt.vtt-local.tableSettings">Voice, party &amp; connection</span></summary>
+      <summary><span data-i18n="feature.vtt.vtt-local.tableSettings">Voice, party & connection</span></summary>
       <div class="vtt-stat-row" id="vtt-local-only-row" style="justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;margin-bottom:0.5rem;background:var(--bg3);border-radius:calc(var(--radius) - 2px);">
         ${isLocalOnlyMode() ? `
           <span class="text-muted" style="font-size:0.85rem;" data-i18n="feature.vtt.vtt-local.fullyOfflineNoConnectionAttemptsNoReconnect">✅ Fully offline &mdash; no connection attempts, no reconnect loop.</span>
@@ -761,7 +761,7 @@ export function render(el) {
             </div>
             <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
             <div class="vtt-btn-row" style="margin-top:0.5rem;">
-              <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-local.rollPost">Roll &amp; Post</button>
+              <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-local.rollPost">Roll & Post</button>
               <button class="btn btn-sm" id="vtt-roll-only-btn" data-i18n="feature.vtt.vtt-local.rollOnly">Roll Only</button>
             </div>
             <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>
