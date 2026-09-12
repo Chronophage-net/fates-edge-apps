@@ -1359,3 +1359,141 @@ dialog.creature-detail-dialog::backdrop {
 
 /* Guided setup hides alternate forms even when they normally use flex/grid. */
 .settings-layout [hidden] { display: none !important; }
+
+/* ============================================================
+   REGION DESCRIPTION (Decks feature) — formatting for the HTML
+   produced by js/features/decks/region-parser.js out of each
+   region's LaTeX-like source data. Previously unstyled: headings,
+   tables, lists, boxes and quotes all fell back to raw browser
+   defaults inside #region-description. Themed via the standard
+   --bg/--text/--gold variables so it follows dark/light mode.
+   ============================================================ */
+#region-description p {
+    margin: 0 0 0.85rem;
+}
+#region-description p:last-child {
+    margin-bottom: 0;
+}
+
+.region-title {
+    margin: 0 0 0.9rem;
+    padding-bottom: 0.5rem;
+    color: var(--gold);
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+}
+
+.region-section-heading {
+    margin: 1.1rem 0 0.4rem;
+    color: var(--gold);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+.region-section-heading:first-child {
+    margin-top: 0;
+}
+
+.region-section {
+    margin: 0 0 0.85rem;
+}
+.region-label {
+    color: var(--gold);
+    font-weight: 700;
+}
+.region-desc {
+    color: var(--text);
+}
+
+.region-box {
+    margin: 0.9rem 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+.region-box-title {
+    padding: 0.5rem 0.9rem;
+    background: var(--gold-glow);
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--border);
+}
+.region-box-content {
+    padding: 0.75rem 0.9rem;
+}
+.region-box-content p {
+    margin: 0 0 0.6rem;
+}
+.region-box-content p:last-child {
+    margin-bottom: 0;
+}
+
+.region-list {
+    margin: 0 0 0.85rem;
+    padding-inline-start: 1.4rem;
+}
+.region-list li {
+    margin-bottom: 0.4rem;
+    line-height: 1.5;
+}
+.region-list li::marker {
+    color: var(--gold);
+}
+
+.region-table {
+    width: 100%;
+    margin: 0.9rem 0;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.region-table th,
+.region-table td {
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--border);
+    text-align: start;
+    vertical-align: top;
+}
+.region-table th {
+    background: var(--bg3);
+    color: var(--gold);
+    font-weight: 700;
+}
+.region-table tbody tr:nth-child(even) {
+    background: var(--bg-glass-light);
+}
+
+.region-quote {
+    margin: 0.9rem 0;
+    padding: 0.7rem 1rem;
+    background: var(--bg2);
+    border-inline-start: 3px solid var(--gold);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.region-quote .quote-speaker {
+    margin-bottom: 0.3rem;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.region-quote .quote-text {
+    color: var(--text);
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.region-note {
+    margin: 0.6rem 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--gold-glow);
+    border-inline-start: 3px solid var(--gold);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text2);
+    font-size: 0.85rem;
+    font-style: italic;
+}

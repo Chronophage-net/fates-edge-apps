@@ -527,15 +527,39 @@ function transformRegionData(raw) {
 
     if (raw.overview) {
         let desc = '';
-        if (raw.overview.genre) desc += `<p><strong>Genre:</strong> ${escHtmlLocal(raw.overview.genre)}</p>`;
-        if (raw.overview.mood) desc += `<p><strong>Mood:</strong> ${escHtmlLocal(raw.overview.mood)}</p>`;
-        if (raw.overview.starting_location) desc += `<p><strong>Starting Location:</strong> ${escHtmlLocal(raw.overview.starting_location)}</p>`;
-        if (raw.overview.lore) {
-            if (raw.overview.lore.history) desc += `<p>${escHtmlLocal(raw.overview.lore.history)}</p>`;
-            if (raw.overview.lore.first_notice) desc += `<p><strong>What you notice first:</strong> ${escHtmlLocal(raw.overview.lore.first_notice)}</p>`;
-            if (raw.overview.lore.rule_that_kills) desc += `<p><strong>Rule that kills:</strong> ${escHtmlLocal(raw.overview.lore.rule_that_kills)}</p>`;
+
+        // "At a Glance" facts — grouped in a titled box (.region-box, styled
+        // in css/app.css) instead of a run of identical <p><strong> lines,
+        // so the region description reads as structured reference material
+        // rather than a flat wall of text. Genre/Mood are short tags and fit
+        // that box; starting_location is always a full narrative paragraph
+        // (every region file runs 400-800+ chars there) so it gets its own
+        // heading + prose block instead of being crammed into a fact row.
+        const facts = [];
+        if (raw.overview.genre) facts.push(['Genre', raw.overview.genre]);
+        if (raw.overview.mood) facts.push(['Mood', raw.overview.mood]);
+        if (facts.length) {
+            desc += `<div class="region-box"><div class="region-box-title">At a Glance</div><div class="region-box-content">` +
+                facts.map(([label, value]) => `<div class="region-section"><span class="region-label">${label}:</span> <span class="region-desc">${escHtmlLocal(value)}</span></div>`).join('') +
+                `</div></div>`;
         }
-        if (raw.overview.gm_guidance) desc += `<h3>Running this region</h3>${String(raw.overview.gm_guidance).split(/\n\s*\n/).map(paragraph => `<p>${escHtmlLocal(paragraph)}</p>`).join('')}`;
+        if (raw.overview.starting_location) {
+            desc += `<h4 class="region-section-heading">Starting Location</h4>` +
+                String(raw.overview.starting_location).split(/\n\s*\n/).map(paragraph => `<p>${escHtmlLocal(paragraph)}</p>`).join('');
+        }
+
+        if (raw.overview.lore) {
+            if (raw.overview.lore.history) {
+                desc += `<h4 class="region-section-heading">History</h4>` +
+                    String(raw.overview.lore.history).split(/\n\s*\n/).map(paragraph => `<p>${escHtmlLocal(paragraph)}</p>`).join('');
+            }
+            if (raw.overview.lore.first_notice) desc += `<div class="region-section"><span class="region-label">What you notice first:</span> <span class="region-desc">${escHtmlLocal(raw.overview.lore.first_notice)}</span></div>`;
+            // Called out (gold accent bar, same treatment as an "At N
+            // segments:" timer note) since it's the one line a GM most
+            // needs to not miss while skimming.
+            if (raw.overview.lore.rule_that_kills) desc += `<p class="region-note">⚠️ Rule that kills: ${escHtmlLocal(raw.overview.lore.rule_that_kills)}</p>`;
+        }
+        if (raw.overview.gm_guidance) desc += `<h4 class="region-section-heading">Running this region</h4>${String(raw.overview.gm_guidance).split(/\n\s*\n/).map(paragraph => `<p>${escHtmlLocal(paragraph)}</p>`).join('')}`;
         transformed.description = desc;
         const text = JSON.stringify(raw.overview);
         transformed.tags = extractTags(text);

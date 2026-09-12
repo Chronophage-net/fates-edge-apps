@@ -38,6 +38,7 @@ export const LOCALES = [
     { code: 'en-GB', name: 'English (United Kingdom)', nativeName: 'English (United Kingdom)', dir: 'ltr' },
 
     { code: 'es', name: 'Spanish', nativeName: 'Español', dir: 'ltr' },
+	{ code: 'zh-CN', name: 'Chinese (Simplified)', nativeName: '简体中文', dir: 'ltr' },
 
     // Machine-generated accented/padded renderings of English. They are not
     // languages: the LTR version exposes missing translations and cramped
@@ -53,6 +54,7 @@ export const LOCALES = [
  */
 export const LOADERS = {
     'es': () => import('./es.json', { with: { type: 'json' } }),
+    'zh-CN': () => import('./zh-CN.json', { with: { type: 'json' } }),
     'en-US': () => import('./en-US.json', { with: { type: 'json' } }),
     'en-GB': () => import('./en-GB.json', { with: { type: 'json' } }),
     'en-x-pseudo': () => import('./en-x-pseudo.js'),

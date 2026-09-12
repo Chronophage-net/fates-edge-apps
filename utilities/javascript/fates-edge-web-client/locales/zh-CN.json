@@ -1,0 +1,280 @@
+{
+  "$meta": {
+    "code": "zh-CN",
+    "name": "Chinese (Simplified)",
+    "nativeName": "简体中文",
+    "dir": "ltr",
+    "note": "简体中文界面目录。键名、占位符与标记结构保持与 en.json 对齐；仅翻译值。"
+  },
+  "app": {
+    "name": "Fate's Edge",
+    "title": "Fate's Edge 工具箱",
+    "skipToContent": "跳到主要内容"
+  },
+  "common": {
+    "close": "关闭",
+    "cancel": "取消",
+    "save": "保存",
+    "back": "← 返回",
+    "next": "下一步 →",
+    "language": "语言",
+    "unknown": "未知",
+    "unknownError": "未知错误",
+    "character": "角色",
+    "characterCapitalized": "角色",
+    "noneListed": "未列出",
+    "activated": "已激活。",
+    "remote": "远程",
+    "player": "玩家"
+  },
+  "nav": {
+    "main": "主导航",
+    "modules": "模块导航",
+    "groups": {
+      "core": "核心",
+      "world": "世界",
+      "table": "桌面",
+      "system": "系统"
+    },
+    "home": {
+      "label": "首页",
+      "title": "首页"
+    },
+    "dashboard": {
+      "label": "仪表盘",
+      "title": "仪表盘"
+    },
+    "characters": {
+      "label": "角色",
+      "title": "角色"
+    },
+    "dice": {
+      "label": "骰子",
+      "title": "掷骰器"
+    },
+    "encounters": {
+      "label": "遭遇",
+      "title": "遭遇"
+    },
+    "factions": {
+      "label": "势力",
+      "title": "势力与资产"
+    },
+    "wiki": {
+      "label": "百科",
+      "title": "百科"
+    },
+    "patrons": {
+      "label": "庇护者",
+      "title": "庇护者"
+    },
+    "spellcraft": {
+      "label": "法术",
+      "title": "法术与魔法"
+    },
+    "crafting": {
+      "label": "制作",
+      "title": "制作"
+    },
+    "vtt": {
+      "label": "VTT",
+      "title": "虚拟桌面"
+    },
+    "gmTools": {
+      "label": "GM 工具",
+      "title": "GM 工具"
+    },
+    "timers": {
+      "label": "计时器",
+      "title": "计时器"
+    },
+    "decks": {
+      "label": "牌组",
+      "title": "牌组"
+    },
+    "whiteboard": {
+      "label": "白板",
+      "title": "白板"
+    },
+    "adventureManager": {
+      "label": "冒险管理器",
+      "title": "冒险管理器"
+    },
+    "konReh": {
+      "label": "Kon'reh",
+      "title": "Kon'reh 策略游戏"
+    },
+    "search": {
+      "label": "搜索",
+      "title": "搜索"
+    },
+    "docs": {
+      "label": "文档",
+      "title": "文档"
+    },
+    "settings": {
+      "label": "设置",
+      "title": "设置"
+    },
+    "systemStatus": {
+      "label": "状态",
+      "title": "系统状态"
+    }
+  },
+  "footer": {
+    "saved": "已保存",
+    "export": {
+      "title": "导出 JSON",
+      "aria": "导出数据"
+    },
+    "import": {
+      "title": "导入 JSON",
+      "aria": "导入数据"
+    },
+    "theme": {
+      "title": "切换主题",
+      "aria": "切换主题"
+    },
+    "shortcuts": {
+      "title": "键盘快捷键（?）",
+      "aria": "键盘快捷键"
+    },
+    "lock": {
+      "title": "锁定屏幕",
+      "aria": "锁定屏幕"
+    }
+  },
+  "gate": {
+    "aria": "密码入口",
+    "title": "Fate's Edge",
+    "subtitle": "门是关着的。说出那句话，它就会打开。",
+    "placeholder": "请输入密码…",
+    "submit": "进入",
+    "foot": "✦ 目前仅限内测玩家 ✦"
+  },
+  "lock": {
+    "aria": "屏幕已锁定",
+    "title": "屏幕已锁定",
+    "subtitle": "什么都没有丢失。桌面就停在你离开时的位置。",
+    "placeholder": "请输入密码…",
+    "submit": "解锁",
+    "forgot": "忘记密码？紧急重置",
+    "resetHint": "请输入紧急重置码。设置此实例的人手上有它。",
+    "resetPlaceholder": "重置码…",
+    "resetSubmit": "重置并进入"
+  },
+  "modal": {
+    "character": "角色编辑器",
+    "timer": "计时器编辑器",
+    "wiki": "百科条目",
+    "talent": "天赋编辑器",
+    "wizard": "角色创建向导",
+    "encounter": "遭遇编辑器",
+    "npc": "NPC 编辑器",
+    "combat": "战斗追踪器",
+    "faction": "势力编辑器",
+    "license": "📜 许可声明"
+  },
+  "shortcuts": {
+    "title": "⌨️ 键盘快捷键",
+    "help": "打开此快捷键列表",
+    "escape": "关闭当前打开的对话框或面板",
+    "xcard": "在任何位置举起或恢复 X 卡（安全暂停）",
+    "nextCombatant": "战斗计时器打开时，切换到下一位战斗者",
+    "resetTimer": "战斗计时器打开时，重置战斗计时器",
+    "undo": "白板标签页打开时，撤销上一个白板操作",
+    "redo": "白板标签页打开时，重做",
+    "note": "标注「……打开时」的快捷键仅在该面板获得焦点或可见时生效，以免与在别处打字冲突。"
+  },
+  "xcard": {
+    "toggleTitle": "X 卡（Ctrl+Shift+X）",
+    "toggleAria": "切换 X 卡遮罩",
+    "overlayAria": "X 卡暂停",
+    "paused": "已暂停",
+    "message": "X 卡已被叫停。请暂停当前场景，与你的团队确认情况。",
+    "explainer": "X 卡是一种安全工具：任何玩家都可以随时叫停让自己感到不适的场景。无需任何解释。",
+    "resume": "继续游戏",
+    "shortcutHint": "按 <kbd>Ctrl+Shift+X</kbd> 关闭"
+  },
+  "settings": {
+    "language": {
+      "heading": "🌐 语言",
+      "badge": "{{count}} 种可用",
+      "intro": "选择工具箱界面的显示语言。游戏内容——冒险、百科条目、庇护者及其他数据——保持其撰写时的语言。尚未翻译的界面文本会回退到英文，因此不会有内容缺失。",
+      "auto": "🔄 跟随浏览器",
+      "status": "界面语言：",
+      "autoNote": "（跟随你的浏览器）",
+      "autoNoteUnsupported": "（跟随你的浏览器——它请求的语言尚未提供，因此使用英文）",
+      "coverage": "已翻译 {{percent}}%",
+      "coverageTitle": "未翻译的文本将回退到英文",
+      "changed": "界面语言已设置为 {{language}}。",
+      "contribute": "添加一种语言只需要一个 JSON 文件——参见网页客户端中的 TRANSLATION.md。",
+      "showDevLocale": "显示翻译测试语言",
+      "hideDevLocale": "隐藏翻译测试语言"
+    }
+  },
+  "plurals": {
+    "characterCount": {
+      "one": "{{count}} 个角色",
+      "other": "{{count}} 个角色"
+    }
+  },
+  "paperImport": {
+    "title": "从纸质导入",
+    "intro": "粘贴转录好的角色卡或 OCR 文本，预览每个值，然后导入。角色可以通过精确的 ID 更新；没有 ID 时，每个块都会新建一个条目。新角色对省略的字段使用常规默认值。计时器与日志均为新条目。导入前请检查战役连接；改动通过战役同步生效。",
+    "input": "纸质导入文本",
+    "example": "使用示例",
+    "preview": "预览",
+    "apply": "导入已审阅的条目",
+    "close": "关闭",
+    "create": "新建条目",
+    "update": "更新已有角色",
+    "saved": "已保存到本地；投递走战役同步。请勿为重试投递而重新粘贴相同块。",
+    "pending": "已保存到本地，但投递未确认。继续之前请检查同步状态；请勿再次导入这些块。",
+    "idError": "请检查 ID：角色 ID 必须已存在且仅出现一次。新建的计时器与日志块中请省略 ID。",
+    "issue": {
+      "size": "文本不得超过 50,000 个字符。",
+      "section": "第 {{line}} 行：未知段落：{{value}}",
+      "header": "第 {{line}} 行：需以 === Character ===、=== Timer === 或 === Journal === 开头。{{value}}",
+      "field": "第 {{line}} 行：未知或格式错误的字段：{{value}}",
+      "duplicate": "第 {{line}} 行：重复的字段：{{value}}",
+      "corrected": "第 {{line}} 行：请审核 OCR 修正：{{value}}",
+      "number": "第 {{line}} 行：无效数字：{{value}}",
+      "skill": "第 {{line}} 行：未知或格式错误的技能：{{value}}",
+      "required": "第 {{line}} 行：必填字段：{{value}}",
+      "empty": "未找到任何导入块。"
+    }
+  },
+  "player": {
+    "navigation": "玩家导航",
+    "home": "开始游戏",
+    "sheet": "角色卡",
+    "dice": "骰子",
+    "table": "桌面",
+    "rules": "规则",
+    "full": "完整工具箱",
+    "mobile": "玩家视图",
+    "edition": "玩家视图",
+    "ready": "准备好你的下一步了。",
+    "intro": "你的角色、你的骰子、你的桌面。把要紧的都放在手边。",
+    "connection": "你的桌面",
+    "connected": "已连接",
+    "offline": "未连接到桌面。你仍可使用已保存的角色与骰子。",
+    "join": "加入或管理连接",
+    "character": "你的角色",
+    "choose": "在此设备上选择一个角色",
+    "unnamed": "未命名",
+    "openSheet": "打开角色卡",
+    "empty": "创建一个角色或导入一个以开始。",
+    "manage": "创建或管理角色",
+    "roll": "掷骰",
+    "settings": "设置与语言",
+    "body": "体魄",
+    "wits": "机智",
+    "spirit": "精神",
+    "presence": "风度",
+    "fatigue": "疲劳",
+    "boons": "恩惠"
+  },
+  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
+}
