@@ -515,6 +515,7 @@ function transformRegionData(raw) {
 
     const transformed = {
         name: raw.title || raw.id || 'Unknown',
+        tagline: (raw.overview && raw.overview.tagline) || '',
         description: '',
         spades: {},
         hearts: {},
@@ -526,7 +527,6 @@ function transformRegionData(raw) {
 
     if (raw.overview) {
         let desc = '';
-        if (raw.overview.tagline) desc += `<p><em>${escHtmlLocal(raw.overview.tagline)}</em></p>`;
         if (raw.overview.genre) desc += `<p><strong>Genre:</strong> ${escHtmlLocal(raw.overview.genre)}</p>`;
         if (raw.overview.mood) desc += `<p><strong>Mood:</strong> ${escHtmlLocal(raw.overview.mood)}</p>`;
         if (raw.overview.starting_location) desc += `<p><strong>Starting Location:</strong> ${escHtmlLocal(raw.overview.starting_location)}</p>`;
@@ -944,13 +944,32 @@ async function handleRegionChange() {
     if (!select) return;
     const regionName = select.value;
     const descEl = document.getElementById('region-description');
+    const headerEl = document.getElementById('region-header');
 
     if (!regionName) {
         if (descEl) descEl.textContent = i18nText("feature.decks.selectARegionToDisplayItsDescription", null, "Select a region to display its description.");
+        if (headerEl) headerEl.innerHTML = '';
         return;
     }
 
     const data = await applyRegion(regionName);
+
+    // The dropdown itself can only show a slug-derived name (e.g. "Acasia"),
+    // cheaply, without fetching every region file just to populate a list.
+    // Once a region's actual JSON is in hand, though, show its full evocative
+    // title and one-line tagline up front -- previously the tagline was
+    // buried as the first line inside the long, scrolling description panel
+    // below, easy to miss entirely.
+    if (headerEl) {
+        const title = data && data.name;
+        const tagline = data && data.tagline;
+        headerEl.innerHTML = (title || tagline)
+            ? `<div style="display:flex;flex-direction:column;gap:0.15rem;">
+                ${title ? `<div style="font-size:1.1rem;font-weight:700;color:var(--gold);">${escHtmlLocal(title)}</div>` : ''}
+                ${tagline ? `<div style="font-size:0.9rem;font-style:italic;color:var(--text2);">${escHtmlLocal(tagline)}</div>` : ''}
+              </div>`
+            : '';
+    }
 
     if (descEl) {
         if (data && data.description) {
@@ -1076,7 +1095,8 @@ export async function render(el) {
                 <span style="font-size:0.7rem;color:var(--text3);white-space:nowrap;">(${regionCount} regions)</span>
             </div>
             ${regionNames.length === 0 ? `<div style="color:var(--orange);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
-            <div id="region-description" style="margin-top:0.8rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);color:var(--text);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
+            <div id="region-header" style="margin-top:0.6rem;"></div>
+            <div id="region-description" style="margin-top:0.5rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);color:var(--text);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
                 <span style="color:var(--text2);">Select a region to display its description.</span>
             </div>
         </div>

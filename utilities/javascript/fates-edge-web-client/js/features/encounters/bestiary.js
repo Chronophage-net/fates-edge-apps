@@ -55,6 +55,48 @@ export function resilienceOf(entry) {
     return entry.resilience != null ? entry.resilience : entry.harm_levels;
 }
 
+/**
+ * Turn a raw Resilience string ("3 (standard)", "8 (advanced)", "8 per
+ * phase", "None (puzzle)") into a short, scannable badge: a number (or "—")
+ * plus a color keyed to what that band actually means at the table --
+ * a flat wound-box pool grows more dangerous as TL rises, and a per-phase
+ * pool or a puzzle override behaves differently enough from either that a
+ * GM should be able to tell them apart without reading the full string
+ * mid-combat.
+ *
+ * Colors reuse the existing badge-* classes (see getCategoryBadgeColor)
+ * rather than inventing a new palette:
+ *   green  - standard pool (TL 1-3)
+ *   blue   - advanced pool (TL 4-6)
+ *   purple - per-phase pool (TL 7-9) -- regenerates/tracks by phase, not
+ *            a single flat number, so it's called out distinctly
+ *   gold   - "None (puzzle)" override -- not a wound pool at all
+ */
+export function resilienceDisplay(entry) {
+    const raw = resilienceOf(entry);
+    if (!raw) return null;
+    const text = String(raw).trim();
+
+    if (/^none/i.test(text)) {
+        return { text: '🧩 Puzzle', title: text, color: 'gold' };
+    }
+    if (/per\s*phase/i.test(text)) {
+        const n = (text.match(/\d+/) || [])[0];
+        return { text: `${n ? n + ' ' : ''}/phase`, title: text, color: 'purple' };
+    }
+    if (/advanced/i.test(text)) {
+        const n = (text.match(/\d+/) || [])[0];
+        return { text: `${n || text} Adv.`, title: text, color: 'blue' };
+    }
+    if (/standard/i.test(text)) {
+        const n = (text.match(/\d+/) || [])[0];
+        return { text: `${n || text} Std.`, title: text, color: 'green' };
+    }
+    // Unrecognized/legacy format (e.g. a bare number from an old save) --
+    // show it verbatim rather than guessing at a color.
+    return { text, title: text, color: 'gold' };
+}
+
 let container = null;
 let bestiaryData = [];
 let wikiData = {};
@@ -572,8 +614,10 @@ function renderBestiaryList() {
             ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="font-size:0.65rem;">${escHtml(entry.category)}</span>`
             : '';
         const tlDisplay = entry.tl ? `TL ${entry.tl}` : '';
-        const resilience = resilienceOf(entry);
-        const harmDisplay = resilience ? `Resilience ${resilience}` : '';
+        const resBadge = resilienceDisplay(entry);
+        const harmDisplay = resBadge
+            ? `<span title="Resilience: ${escHtml(resBadge.title)}" style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;border-inline-start:3px solid var(--${resBadge.color});">${escHtml(resBadge.text)}</span>`
+            : '';
         const description = getCreatureDescription(entry);
 
         return `
@@ -595,7 +639,7 @@ function renderBestiaryList() {
                         ${escHtml(name)}
                         ${categoryBadge}
                         ${tlDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${tlDisplay}</span>` : ''}
-                        ${harmDisplay ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.4rem;border-radius:12px;">${harmDisplay}</span>` : ''}
+                        ${harmDisplay}
                         ${entry.nature ? `<span style="font-size:0.65rem;color:var(--text3);">${escHtml(entry.nature)}</span>` : ''}
                     </div>
                     <div style="font-size:0.8rem;color:var(--text2);">
@@ -780,7 +824,7 @@ export function showCreatureDetail(entry, { readOnly = false } = {}) {
             <h2 style="margin-top:0;color:var(--gold);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 ${escHtml(name)}
                 ${entry.tl ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">TL ${entry.tl}</span>` : ''}
-                ${resilienceOf(entry) ? `<span style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;">Resilience: ${escHtml(resilienceOf(entry))}</span>` : ''}
+                ${(() => { const rb = resilienceDisplay(entry); return rb ? `<span title="Resilience: ${escHtml(rb.title)}" style="font-size:0.7rem;color:var(--text2);background:var(--bg2);padding:0.05rem 0.5rem;border-radius:12px;border-inline-start:3px solid var(--${rb.color});">Resilience: ${escHtml(rb.text)}</span>` : ''; })()}
             </h2>
             ${entry.category ? `<span class="badge badge-${getCategoryBadgeColor(entry.category)}" style="margin-bottom:0.5rem;">${escHtml(entry.category)}</span>` : ''}
             ${description ? `<div style="margin:0.5rem 0;line-height:1.5;">${escHtml(description)}</div>` : ''}
