@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-11T19:33:43.218Z",
+  "generated": "2026-09-12T00:03:31.659Z",
   "documents": [
     {
       "id": "srd",
@@ -982,7 +982,7 @@
       "file": "index.html",
       "path": "/data/docs/amaranthine/",
       "category": "travel",
-      "categoryLabel": "Travel",
+      "categoryLabel": "World",
       "core": false,
       "active": true,
       "book": true,
@@ -1086,7 +1086,7 @@
       "file": "index.html",
       "path": "/data/docs/complete-worldbook/",
       "category": "travel",
-      "categoryLabel": "Travel",
+      "categoryLabel": "World",
       "core": false,
       "active": true,
       "book": true,

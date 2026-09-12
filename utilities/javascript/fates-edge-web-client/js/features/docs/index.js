@@ -94,7 +94,7 @@ const DOC_TYPES = {
         description: 'Expansion content and supplementary rules'
     },
     travel: {
-        label: '🗺️ Travel',
+        label: '🗺️ World',
         folder: 'travel',
         icon: '🗺️',
         description: 'The setting: worldbooks, regions, and journeys'

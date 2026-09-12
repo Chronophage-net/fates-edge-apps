@@ -37,7 +37,7 @@ const CATEGORY_MAP = {
   'adventures': { id: 'adventures', label: 'Adventures', path: '/data/docs/adventures/' },
   'expansions': { id: 'expansions', label: 'Expansions', path: '/data/docs/expansions/' },
   'anthology': { id: 'anthology', label: 'Anthology', path: '/data/docs/anthology/' },
-  'travel': { id: 'travel', label: 'Travel', path: '/data/docs/travel/' },
+  'travel': { id: 'travel', label: 'World', path: '/data/docs/travel/' },
   'design': { id: 'design', label: 'Design', path: '/data/docs/design/' },
   // Kon'reh and Toll & Veil are each a single standalone mini-game
   // reference rather than a full expansion or line of their own -- they
@@ -54,8 +54,8 @@ const CATEGORY_MAP = {
   'saikou-compendium': { id: 'expansions', label: 'Expansions', path: '/data/docs/saikou-compendium/', book: true },
   // The Amaranthine is the core setting book: a Travel-category book directory
   // built by fates-edge-docs/tools/build_travel_books.py.
-  'complete-worldbook': { id: 'travel', label: 'Travel', path: '/data/docs/complete-worldbook/', book: true },
-  'amaranthine': { id: 'travel', label: 'Travel', path: '/data/docs/amaranthine/', book: true },
+  'complete-worldbook': { id: 'travel', label: 'World', path: '/data/docs/complete-worldbook/', book: true },
+  'amaranthine': { id: 'travel', label: 'World', path: '/data/docs/amaranthine/', book: true },
 };
 
 const SUBDIRS = Object.keys(CATEGORY_MAP);
