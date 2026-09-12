@@ -62,6 +62,17 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.2.0] - 2026-09-12
+
+### Added
+- clearer Resilience badges and a region header for the deck tool
+
+### Fixed
+- sync corrected talents-manifest.json (52 talents, was 10)
+
+### Chore
+- rename 'Travel' docs category label to 'World'
+
 ## [5.1.9] - 2026-09-11
 
 ### Docs
