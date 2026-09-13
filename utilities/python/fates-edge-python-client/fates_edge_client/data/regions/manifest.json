@@ -1,23 +1,20 @@
-{
-  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
-  "data": [
-    "acasia",
-    "aelaerem",
-    "aeler",
-    "aelinnel",
-    "dungeons",
-    "ecktoria",
-    "kahfagia",
-    "midh_ahkaz",
-    "mistlands",
-    "silkstrand",
-    "the_wilds",
-    "thepyrgos",
-    "ubral",
-    "valewood",
-    "vhasia",
-    "viterra",
-    "ykrul",
-    "zakov"
-  ]
-}
+[
+  "acasia",
+  "aelaerem",
+  "aeler",
+  "aelinnel",
+  "dungeons",
+  "ecktoria",
+  "kahfagia",
+  "midh_ahkaz",
+  "mistlands",
+  "silkstrand",
+  "the_wilds",
+  "thepyrgos",
+  "ubral",
+  "valewood",
+  "vhasia",
+  "viterra",
+  "ykrul",
+  "zakov"
+]

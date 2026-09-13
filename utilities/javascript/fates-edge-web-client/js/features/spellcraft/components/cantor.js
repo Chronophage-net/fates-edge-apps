@@ -292,13 +292,20 @@ function buildBloomCardHtml(patronName, patronIcon, bloomCount, tierUnlocked, co
 // TALENT LOADER (from wiki.json, with Bound Patron added)
 // ============================================================
 
+// wiki.json is a bare array. An old copyright-stamping script briefly
+// rewrote it as { _license, data: [...] }, so accept either shape.
+function asWikiArray(payload) {
+    return Array.isArray(payload) ? payload : (payload?.data ?? []);
+}
+
 async function loadCantorTalents() {
     try {
         const response = await fetch('./data/wiki.json');
         if (response.ok) {
             const data = await response.json();
-            if (data.data && Array.isArray(data.data)) {
-                return data.data.filter(entry =>
+            const entries = asWikiArray(data);
+            if (entries.length) {
+                return entries.filter(entry =>
                     entry.tags &&
                     Array.isArray(entry.tags) &&
                     (entry.tags.includes('cantor') || entry.tags.includes('magic')) &&

@@ -254,13 +254,20 @@ const SILENT_ORDERS = [
 // TALENT LOADER (includes psionic talents)
 // ============================================================
 
+// wiki.json is a bare array. An old copyright-stamping script briefly
+// rewrote it as { _license, data: [...] }, so accept either shape.
+function asWikiArray(payload) {
+    return Array.isArray(payload) ? payload : (payload?.data ?? []);
+}
+
 async function loadPsionTalents() {
     try {
         const response = await fetch('./data/wiki.json');
         if (response.ok) {
             const data = await response.json();
-            if (data.data && Array.isArray(data.data)) {
-                return data.data.filter(entry =>
+            const entries = asWikiArray(data);
+            if (entries.length) {
+                return entries.filter(entry =>
                     entry.tags &&
                     Array.isArray(entry.tags) &&
                     (entry.tags.includes('psion') || entry.tags.includes('magic')) &&

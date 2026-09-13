@@ -20,10 +20,13 @@ def fix_file(filepath):
         # Now obj is the first JSON object/array, end_idx is where it ended
         if isinstance(obj, dict):
             obj["_license"] = LICENSE
-        elif isinstance(obj, list):
-            obj = {"_license": LICENSE, "data": obj}
         else:
-            obj = {"_license": LICENSE, "value": obj}
+            # A top-level array or scalar has nowhere to put a key. Earlier
+            # versions wrapped it as {"_license":..., "data": [...]}, which
+            # silently changed the file's schema and broke every consumer
+            # that did `payload.forEach`. Never do that again -- skip it.
+            print(f"Skipped (top-level {type(obj).__name__}, cannot stamp): {filepath}")
+            return
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(obj, f, indent=2, ensure_ascii=False)
             f.write("\n")

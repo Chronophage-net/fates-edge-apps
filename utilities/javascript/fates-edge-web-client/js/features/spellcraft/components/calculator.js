@@ -47,6 +47,12 @@ let outsideClickHandler = null;
 // WIKI LOADER
 // ============================================================
 
+// wiki.json is a bare array. An old copyright-stamping script briefly
+// rewrote it as { _license, data: [...] }, so accept either shape.
+function asWikiArray(payload) {
+    return Array.isArray(payload) ? payload : (payload?.data ?? []);
+}
+
 async function loadWikiTags() {
     if (tagDefinitions) return tagDefinitions;
     
@@ -57,8 +63,9 @@ async function loadWikiTags() {
         const response = await fetch('./data/wiki.json');
         if (response.ok) {
             const data = await response.json();
-            if (data.data && Array.isArray(data.data)) {
-                for (const entry of data.data) {
+            const entries = asWikiArray(data);
+            if (entries.length) {
+                for (const entry of entries) {
                     // Only include entries that are actual tags (have a mod field)
                     if (entry.tags && entry.tags.includes('magic') && entry.mod !== undefined) {
                         const tagName = entry.title?.toUpperCase();

@@ -20,7 +20,8 @@ export async function ensureWikiLoaded(force = false) {
         const response = await fetch('/data/wiki.json');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        state.wikiEntries = data.data || [];
+        // wiki.json is a bare array; tolerate the legacy { _license, data } wrapper.
+        state.wikiEntries = Array.isArray(data) ? data : (data?.data ?? []);
         state.wikiData = data;
         saveState();
     } catch (err) {
