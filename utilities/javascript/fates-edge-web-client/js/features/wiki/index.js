@@ -49,9 +49,16 @@ export function render(el) {
                         </div>
                     </div>
                     <div class="wiki-sidebar-section">
-                        <button class="btn btn-primary btn-sm" id="wiki-add-btn" style="width:100%;" data-i18n="feature.wiki.addEntry">+ Add Entry</button>
-                        <button class="btn btn-sm btn-secondary" id="wiki-reload-btn" style="width:100%;margin-top:0.3rem;" data-i18n="feature.wiki.reloadBundled">🔄 Reload Bundled</button>
-                        <button class="btn btn-sm btn-ghost" id="wiki-import-btn" style="width:100%;margin-top:0.3rem;" data-i18n="feature.wiki.importAll">📥 Import All</button>
+                        <button class="btn btn-gold btn-sm wiki-sidebar-action" id="wiki-add-btn" data-i18n="feature.wiki.addEntry">+ Add entry</button>
+                        <!-- Reload and Import All are maintenance actions, not
+                             everyday ones: Import All copies every bundled
+                             entry into local storage and Reload re-fetches the
+                             bundle. Both are quiet utility controls so the one
+                             action people actually want stays the loud one. -->
+                        <div class="wiki-sidebar-utils">
+                            <button class="btn btn-xs btn-utility" id="wiki-reload-btn" title="Re-fetch the bundled wiki" data-i18n="feature.wiki.reloadBundled">Reload bundled</button>
+                            <button class="btn btn-xs btn-utility" id="wiki-import-btn" title="Copy every bundled entry into your own wiki" data-i18n="feature.wiki.importAll">Import all</button>
+                        </div>
                     </div>
                 </aside>
 
@@ -62,22 +69,26 @@ export function render(el) {
                             <input type="text" id="wiki-search" placeholder="🔍 Search wiki…" class="wiki-search-input" / data-i18n-attr="placeholder:feature.wiki.searchWiki">
                         </div>
                         <div class="wiki-filter-wrap">
+                            <!-- Options are filled from the entries that
+                                 actually exist (see refreshCategoryFilter).
+                                 This used to be a hardcoded list of eleven
+                                 categories, nine of which matched nothing in
+                                 the shipped data while four real categories
+                                 were missing from it entirely. -->
                             <select id="wiki-cat-filter" class="wiki-filter-select">
                                 <option value="" data-i18n="feature.wiki.allCategories">All Categories</option>
-                                <option value="rules" data-i18n="feature.wiki.rules">📜 Rules</option>
-                                <option value="patrons" data-i18n="feature.wiki.patrons">👁️ Patrons</option>
-                                <option value="regions" data-i18n="feature.wiki.regions">🌍 Regions</option>
-                                <option value="magic" data-i18n="feature.wiki.magic">🔮 Magic</option>
-                                <option value="combat" data-i18n="feature.wiki.combat">⚔️ Combat</option>
-                                <option value="lore" data-i18n="feature.wiki.lore">📚 Lore</option>
-                                <option value="talents" data-i18n="feature.wiki.talents">🧠 Talents</option>
-                                <option value="assets" data-i18n="feature.wiki.assets">🏛️ Assets</option>
-                                <option value="equipment" data-i18n="feature.wiki.equipment">⚒️ Equipment</option>
-                                <option value="characters" data-i18n="feature.wiki.characters">👤 Characters</option>
-                                <option value="monsters" data-i18n="feature.wiki.monsters">🐉 Monsters</option>
+                            </select>
+                        </div>
+                        <div class="wiki-filter-wrap">
+                            <select id="wiki-region-filter" class="wiki-filter-select">
+                                <option value="">All regions</option>
                             </select>
                         </div>
                         <div id="wiki-status" class="wiki-status"></div>
+                    </div>
+                    <div class="wiki-resultbar">
+                        <span id="wiki-result-count" class="wiki-result-count"></span>
+                        <span id="wiki-active-filters" class="wiki-active-filters"></span>
                     </div>
 
                     <div id="wiki-list-container">
@@ -149,12 +160,20 @@ export function loadRemoteWiki() {
                 state.wikiEntries.push({
                     id: remoteId,
                     title: entry.title,
+                    // Facets the bundled data carries and the card now shows:
+                    // a one-line subtitle, the region the entry belongs to,
+                    // and the suit/number of the draw card it came from.
+                    subtitle: entry.subtitle || '',
                     category: entry.category || 'lore',
                     body: entry.body || '',
                     tags: Array.isArray(entry.tags) ? entry.tags :
                           (entry.tags ? String(entry.tags).split(',').map(t => t.trim()).filter(Boolean) : []),
                     cost: entry.cost != null ? Number(entry.cost) : null,
                     slot: entry.slot || '',
+                    region: entry.region || '',
+                    suit: entry.suit || '',
+                    card: entry.card != null ? entry.card : null,
+                    stub: !!entry.stub,
                     source: 'remote'
                 });
                 added++;
@@ -174,6 +193,80 @@ export function loadRemoteWiki() {
         });
 }
 
+// ─── Card rendering ───────────────────────────────────────────────────
+
+const SUIT_GLYPH = { spades: '♠', hearts: '♥', diamonds: '♦', clubs: '♣' };
+
+// How much rendered body to show before the card offers to expand. The old
+// code cut at 300 characters of *raw* text and showed that slice escaped,
+// so every long entry displayed its Markdown source (asterisks, backticks,
+// list markers) until it was expanded, while short entries rendered
+// properly. Now both render, and the clamp is a CSS line-clamp instead —
+// the content is the same either way, only its height changes.
+const CLAMP_CHARS = 320;
+
+export function renderEntryCard(e) {
+    const isRemote = e.source === 'remote';
+    if (isRemote && (window._hiddenRemoteIds || []).includes(String(e.id))) return '';
+
+    const id = escHtml(String(e.id));
+    const body = e.body || '';
+    const isLong = body.length > CLAMP_CHARS;
+    const isStub = !!e.stub || !body.trim();
+
+    const suit = (e.suit || '').toLowerCase();
+    const pip = SUIT_GLYPH[suit]
+        ? `<span class="wiki-card-pip suit-${escHtml(suit)}" title="${escHtml(suit)}${e.card ? ' ' + e.card : ''}">${SUIT_GLYPH[suit]}${e.card ? `<span class="pip-num">${escHtml(String(e.card))}</span>` : ''}</span>`
+        : '';
+
+    const facets = [
+        e.region ? `<span class="wiki-facet wiki-facet-region">${escHtml(e.region)}</span>` : '',
+        e.cost != null ? `<span class="wiki-facet wiki-facet-cost">${escHtml(String(e.cost))} XP</span>` : '',
+        e.slot ? `<span class="wiki-facet">${escHtml(e.slot)}</span>` : '',
+    ].filter(Boolean).join('');
+
+    const tags = (e.tags || []);
+    const tagBadges = tags.slice(0, 5)
+        .map(t => `<button type="button" class="wiki-tag-chip" data-action="tag" data-tag="${escHtml(t)}">#${escHtml(t)}</button>`)
+        .join('');
+    const moreTags = tags.length > 5 ? `<span class="wiki-tag-more">+${tags.length - 5}</span>` : '';
+
+    // Destructive and hide controls are deliberately quiet: they sit in a
+    // hover-revealed strip rather than competing with the entry's content.
+    // See .wiki-entry-tools / .btn-danger in css/app.css.
+    const tools = isRemote
+        ? (isEntryCloned(e)
+            ? `<span class="wiki-cloned-note">Cloned</span>`
+            : `<button class="btn btn-xs btn-quiet" data-action="clone" data-id="${id}">Clone to my wiki</button>
+               <button class="btn btn-xs btn-danger btn-icon" data-action="hide" data-id="${id}" title="Hide this bundled entry" aria-label="Hide this bundled entry">✕</button>`)
+        : `<button class="btn btn-xs btn-quiet" data-action="edit" data-id="${id}">Edit</button>
+           <button class="btn btn-xs btn-danger btn-icon" data-action="delete" data-id="${id}" title="Delete this entry" aria-label="Delete this entry">🗑</button>`;
+
+    const summary = isStub
+        ? `<p class="wiki-entry-stub">No description recorded for this entry yet.</p>`
+        : `<div class="wiki-entry-body${isLong ? ' is-clamped' : ''}">${renderMarkdown(body)}</div>`;
+
+    return `
+        <article class="wiki-entry-card${isStub ? ' is-stub' : ''}" data-id="${id}">
+            <header class="wiki-entry-header">
+                ${pip}
+                <div class="wiki-entry-heading">
+                    <h3 class="wiki-entry-title">${escHtml(e.title)}</h3>
+                    ${e.subtitle ? `<p class="wiki-entry-subtitle">${escHtml(e.subtitle)}</p>` : ''}
+                </div>
+                <span class="wiki-entry-category" data-action="category" data-cat="${escHtml(e.category || 'uncategorized')}">${escHtml(e.category || 'uncategorized')}</span>
+            </header>
+            ${facets ? `<div class="wiki-entry-facets">${facets}</div>` : ''}
+            <div class="wiki-entry-summary">${summary}</div>
+            ${tags.length ? `<div class="wiki-entry-tags">${tagBadges}${moreTags}</div>` : ''}
+            <footer class="wiki-entry-tools">
+                ${isLong ? `<button class="btn btn-xs btn-quiet wiki-expand-btn" data-action="expand" data-id="${id}">Read more</button>` : '<span></span>'}
+                <span class="wiki-entry-actions">${tools}</span>
+            </footer>
+        </article>
+    `;
+}
+
 // ─── Render Wiki (exported) ───────────────────────────────────────────
 
 export function renderWiki() {
@@ -182,7 +275,9 @@ export function renderWiki() {
     if (!el) return;
 
     updateStats();
+    refreshFacetFilters();
     renderSidebar(entries);
+    updateResultBar(entries.length);
 
     if (entries.length === 0) {
         el.innerHTML = `
@@ -195,67 +290,7 @@ export function renderWiki() {
         return;
     }
 
-    el.innerHTML = entries.map(e => {
-        const isRemote = e.source === 'remote';
-        const isHidden = isRemote && (window._hiddenRemoteIds || []).includes(String(e.id));
-        if (isHidden) return '';
-
-        const sourceBadge = isRemote
-            ? `<span class="badge badge-remote" data-i18n="feature.wiki.bundled">📦 Bundled</span>`
-            : `<span class="badge badge-local" data-i18n="feature.wiki.local">📝 Local</span>`;
-        const costBadge = e.cost != null ? `<span class="badge badge-cost">${escHtml(String(e.cost))} XP</span>` : '';
-        const tagBadges = (e.tags || []).slice(0, 4).map(t => `<span class="badge badge-tag">#${escHtml(t)}</span>`).join('');
-        const moreTags = (e.tags || []).length > 4 ? `<span class="badge badge-more">+${(e.tags || []).length - 4}</span>` : '';
-
-        let actions = '';
-        if (isRemote) {
-            const isCloned = isEntryCloned(e);
-            if (isCloned) {
-                actions = `<span class="badge badge-cloned" style="color:var(--green);" data-i18n="feature.wiki.cloned">✅ Cloned</span>`;
-            } else {
-                actions = `
-                    <button class="btn btn-xs btn-primary wiki-clone-btn" data-action="clone" data-id="${escHtml(String(e.id))}">📋 Clone</button>
-                    <button class="btn btn-xs btn-ghost wiki-hide-btn" data-action="hide" data-id="${escHtml(String(e.id))}" title="Hide this entry">✕</button>
-                `;
-            }
-        } else {
-            actions = `
-                <button class="btn btn-xs btn-primary wiki-edit-btn" data-action="edit" data-id="${escHtml(String(e.id))}">✏️ Edit</button>
-                <button class="btn btn-xs btn-danger wiki-delete-btn" data-action="delete" data-id="${escHtml(String(e.id))}">🗑️</button>
-            `;
-        }
-
-        const bodyPreview = e.body && e.body.length > 300
-            ? `<div class="wiki-entry-preview">${escHtml(e.body.slice(0, 300))}${e.body.length > 300 ? '…' : ''}</div>`
-            : '';
-
-        return `
-            <div class="wiki-entry-card" data-id="${escHtml(String(e.id))}">
-                <div class="wiki-entry-header">
-                    <h3 class="wiki-entry-title" data-action="expand" data-id="${escHtml(String(e.id))}">
-                        ${escHtml(e.title)}
-                    </h3>
-                    <div class="wiki-entry-meta">
-                        <span class="wiki-entry-category">${escHtml(e.category || 'uncategorized')}</span>
-                        ${sourceBadge}
-                        ${costBadge}
-                    </div>
-                </div>
-                <div class="wiki-entry-tags">
-                    ${tagBadges}
-                    ${moreTags}
-                </div>
-                <div class="wiki-entry-summary" id="wiki-body-${escHtml(String(e.id))}">
-                    ${bodyPreview}
-                    ${e.body && e.body.length > 300 ? `<div class="wiki-entry-full" style="display:none;">${renderMarkdown(e.body)}</div>` : renderMarkdown(e.body)}
-                </div>
-                <div class="wiki-entry-actions">
-                    ${actions}
-                    ${e.body && e.body.length > 300 ? `<button class="btn btn-xs btn-ghost wiki-expand-btn" data-action="expand" data-id="${escHtml(String(e.id))}">▼ Expand</button>` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
+    el.innerHTML = entries.map(e => renderEntryCard(e)).filter(Boolean).join('');
 
     // Attach event listeners using delegation on the list container
     // Use click delegation to avoid re-binding each time
@@ -301,6 +336,16 @@ function attachWikiItemEvents() {
             case 'expand':
                 toggleWikiBody(id);
                 break;
+            case 'tag': {
+                const input = document.getElementById('wiki-search');
+                if (input) { input.value = target.dataset.tag || ''; renderWiki(); }
+                break;
+            }
+            case 'category': {
+                const select = document.getElementById('wiki-cat-filter');
+                if (select) { select.value = target.dataset.cat || ''; renderWiki(); }
+                break;
+            }
         }
     };
 
@@ -347,8 +392,8 @@ function renderSidebar(entries) {
         });
         const sortedTags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 20);
         tagCloud.innerHTML = sortedTags.map(([tag, count]) =>
-            `<span class="wiki-tag" data-tag="${escHtml(tag)}">#${escHtml(tag)} <span class="count">(${count})</span></span>`
-        ).join(' ');
+            `<button type="button" class="wiki-tag" data-tag="${escHtml(tag)}">#${escHtml(tag)} <span class="count">${count}</span></button>`
+        ).join('');
         tagCloud.querySelectorAll('.wiki-tag').forEach(el => {
             el.addEventListener('click', () => {
                 const search = document.getElementById('wiki-search');
@@ -361,6 +406,53 @@ function renderSidebar(entries) {
     }
 }
 
+/**
+ * Fill the category and region selects from the entries that exist, keeping
+ * whatever the user had chosen if it is still a valid option. Called on
+ * every render because the bundled wiki arrives asynchronously — the first
+ * render happens before it has loaded.
+ */
+function refreshFacetFilters() {
+    const all = getState().wikiEntries || [];
+    const fill = (selectId, values, allLabel) => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        const current = select.value;
+        const sorted = [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        const signature = sorted.join('|');
+        if (select.dataset.signature === signature) return;   // nothing changed
+        select.dataset.signature = signature;
+        select.innerHTML = `<option value="">${allLabel}</option>` +
+            sorted.map(v => `<option value="${escHtml(v)}">${escHtml(v)}</option>`).join('');
+        if (sorted.includes(current)) select.value = current;
+    };
+    fill('wiki-cat-filter', all.map(e => e.category), 'All categories');
+    fill('wiki-region-filter', all.map(e => e.region), 'All regions');
+}
+
+function updateResultBar(shown) {
+    const countEl = document.getElementById('wiki-result-count');
+    const total = (getState().wikiEntries || []).length;
+    if (countEl) {
+        countEl.textContent = shown === total
+            ? `${total} entries`
+            : `${shown} of ${total} entries`;
+    }
+    const chips = [];
+    const search = document.getElementById('wiki-search')?.value?.trim();
+    const cat = document.getElementById('wiki-cat-filter')?.value;
+    const region = document.getElementById('wiki-region-filter')?.value;
+    if (search) chips.push(['search', `“${search}”`]);
+    if (cat) chips.push(['cat', cat]);
+    if (region) chips.push(['region', region]);
+    const el = document.getElementById('wiki-active-filters');
+    if (el) {
+        el.innerHTML = chips.map(([kind, label]) =>
+            `<button type="button" class="wiki-filter-chip" data-action="clear-filter" data-kind="${kind}">${escHtml(label)} <span aria-hidden="true">×</span></button>`
+        ).join('');
+    }
+}
+
 function updateStats() {
     const state = getState();
     const entries = state.wikiEntries || [];
@@ -369,10 +461,18 @@ function updateStats() {
     const local = entries.filter(e => e.source !== 'remote').length;
     const remote = entries.filter(e => e.source === 'remote').length;
 
-    document.getElementById('wiki-total-count').textContent = total;
-    document.getElementById('wiki-local-count').textContent = local;
-    document.getElementById('wiki-remote-count').textContent = remote;
-    document.getElementById('wiki-hidden-count').textContent = hidden.length;
+    // Null-guarded: renderWiki() is also called from the editor after a
+    // save, and from loadRemoteWiki()'s async callback, either of which can
+    // land after the user has navigated away and the sidebar is gone. The
+    // unguarded version threw there, which aborted the whole render.
+    const setCount = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+    setCount('wiki-total-count', total);
+    setCount('wiki-local-count', local);
+    setCount('wiki-remote-count', remote);
+    setCount('wiki-hidden-count', hidden.length);
 }
 
 function getFilteredEntries() {
@@ -384,18 +484,29 @@ function getFilteredEntries() {
     if (search) {
         entries = entries.filter(e =>
             (e.title || '').toLowerCase().includes(search) ||
+            (e.subtitle || '').toLowerCase().includes(search) ||
             (e.body || '').toLowerCase().includes(search) ||
+            (e.region || '').toLowerCase().includes(search) ||
             (e.tags || []).some(t => t.toLowerCase().includes(search))
         );
     }
     if (cat) {
         entries = entries.filter(e => e.category === cat);
     }
+    const region = document.getElementById('wiki-region-filter')?.value || '';
+    if (region) {
+        entries = entries.filter(e => e.region === region);
+    }
 
     // Sort: local first, then remote, then by title
     entries.sort((a, b) => {
         if (a.source === 'remote' && b.source !== 'remote') return 1;
         if (a.source !== 'remote' && b.source === 'remote') return -1;
+        // Entries whose text has not been written yet sink below the ones
+        // that have something to read.
+        const aStub = !!a.stub || !(a.body || '').trim();
+        const bStub = !!b.stub || !(b.body || '').trim();
+        if (aStub !== bStub) return aStub ? 1 : -1;
         return (a.title || '').localeCompare(b.title || '');
     });
 
@@ -517,15 +628,11 @@ function importAllFromWiki() {
 export function toggleWikiBody(id) {
     const card = Array.from(document.querySelectorAll('.wiki-entry-card')).find(el => el.dataset.id === String(id));
     if (!card) return;
-    const fullBody = card.querySelector('.wiki-entry-full');
-    const preview = card.querySelector('.wiki-entry-preview');
+    const body = card.querySelector('.wiki-entry-body');
     const expandBtn = card.querySelector('.wiki-expand-btn');
-    if (fullBody) {
-        const isHidden = fullBody.style.display === 'none';
-        fullBody.style.display = isHidden ? 'block' : 'none';
-        if (preview) preview.style.display = isHidden ? 'none' : 'block';
-        if (expandBtn) expandBtn.textContent = isHidden ? '▲ Collapse' : '▼ Expand';
-    }
+    if (!body) return;
+    const clamped = body.classList.toggle('is-clamped');
+    if (expandBtn) expandBtn.textContent = clamped ? 'Read more' : 'Show less';
 }
 window.toggleWikiBody = toggleWikiBody;
 
@@ -560,6 +667,8 @@ export function attachEvents() {
 
     const search = document.getElementById('wiki-search');
     const cat = document.getElementById('wiki-cat-filter');
+    const region = document.getElementById('wiki-region-filter');
+    const filterBar = document.getElementById('wiki-active-filters');
     const addBtn = document.getElementById('wiki-add-btn');
     const reloadBtn = document.getElementById('wiki-reload-btn');
     const importBtn = document.getElementById('wiki-import-btn');
@@ -570,6 +679,18 @@ export function attachEvents() {
     }
     if (cat) {
         addEventListenerSafe(cat, 'change', renderWiki);
+    }
+    if (region) {
+        addEventListenerSafe(region, 'change', renderWiki);
+    }
+    if (filterBar) {
+        addEventListenerSafe(filterBar, 'click', (ev) => {
+            const chip = ev.target.closest('[data-action="clear-filter"]');
+            if (!chip) return;
+            const byKind = { search: 'wiki-search', cat: 'wiki-cat-filter', region: 'wiki-region-filter' };
+            const el = document.getElementById(byKind[chip.dataset.kind]);
+            if (el) { el.value = ''; renderWiki(); }
+        });
     }
     if (addBtn) {
         addEventListenerSafe(addBtn, 'click', () => openWikiEditor(null));
