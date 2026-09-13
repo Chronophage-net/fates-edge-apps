@@ -1786,7 +1786,7 @@ function renderAdventureList() {
                 ` : `
                     <span style="font-size:0.75rem;color:var(--text3);">🔒 Read‑only – only the GM can manage adventures.</span>
                 `}
-                <button class="btn btn-sm btn-secondary" id="adv-refresh-btn" data-i18n="feature.adventure-manager.refresh">🔄 Refresh</button>
+                <button class="btn btn-sm btn-utility" id="adv-refresh-btn" data-i18n="feature.adventure-manager.refresh">🔄 Refresh</button>
             </div>
 
             ${renderAdhocTimersPanel()}
@@ -2090,7 +2090,7 @@ function buildAdventureDetailHtml(adventure) {
     // ─── Action buttons ───────────────────────────────────────────
     const actionButtons = canEdit ? `
         ${!isActive && adventure.status !== 'completed' ? `<button class="btn btn-sm btn-gold" onclick="window.adventureStart('${adventure.id}')">▶️ Start</button>` : ''}
-        ${isActive ? `<button class="btn btn-sm btn-secondary" onclick="window.adventureReset('${adventure.id}')">🔄 Reset</button>` : ''}
+        ${isActive ? `<button class="btn btn-sm btn-utility" onclick="window.adventureReset('${adventure.id}')">🔄 Reset</button>` : ''}
         <button class="btn btn-sm btn-secondary" onclick="window.adventureExport('${adventure.id}')">📤 Export</button>
         <button class="btn btn-sm btn-secondary" onclick="window.adventureDuplicate('${adventure.id}')">📋 Duplicate</button>
         <button class="btn btn-sm btn-danger" onclick="window.adventureDelete('${adventure.id}')">🗑️ Delete</button>

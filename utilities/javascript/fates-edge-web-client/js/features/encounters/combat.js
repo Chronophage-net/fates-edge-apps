@@ -897,7 +897,7 @@ function renderTracker() {
                     </div>
                     <div style="display:flex;gap:0.5rem;">
                         <button class="btn btn-sm btn-primary" id="combat-timer-tick" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.1Segment">+1 Segment</button>
-                        <button class="btn btn-sm btn-ghost" id="combat-timer-reset" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.reset">↺ Reset</button>
+                        <button class="btn btn-sm btn-utility" id="combat-timer-reset" style="padding:0.4rem 0.75rem;font-size:0.85rem;" data-i18n="feature.encounters.combat.reset">↺ Reset</button>
                         <button class="btn btn-sm btn-ghost" id="combat-timer-rename" style="padding:0.4rem 0.75rem;font-size:0.85rem;">✏️</button>
                     </div>
                 </div>

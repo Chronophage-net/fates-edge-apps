@@ -590,7 +590,7 @@ function renderFactions() {
                 <div style="font-size:3rem;">🏛️</div>
                 <div>No factions tracked yet.</div>
                 <button class="btn btn-primary" onclick="window.addFaction()" data-i18n="feature.factions.addFaction">➕ Add Faction</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
+                <button class="btn btn-utility" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -663,8 +663,8 @@ function renderFactions() {
         <div class="factions-actions">
             <button class="btn btn-primary" onclick="window.addFaction()" data-i18n="feature.factions.addFaction">➕ Add Faction</button>
             <button class="btn btn-secondary" onclick="window.factionTurn()" title="Advances faction agendas/standing AND fires a downtime-tick other features (e.g. Crafting's magic item upkeep) listen for — see Player's Guide ch. 11 Downtime, 'the world may advance timers while you rest'." data-i18n="feature.factions.gmDowntimeFactionTurn">🔄 GM Downtime (Faction Turn)</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
-            <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
+            <button class="btn btn-utility" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
+            <button class="btn btn-utility" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
         </div>
     `;
 }
@@ -680,7 +680,7 @@ function renderAssets() {
                 <div style="font-size:3rem;">📦</div>
                 <div>No assets tracked yet.</div>
                 <button class="btn btn-primary" onclick="window.addAsset()" data-i18n="feature.factions.addAsset">➕ Add Asset</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
+                <button class="btn btn-utility" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -704,7 +704,7 @@ function renderAssets() {
 
         <div class="factions-actions">
             <button class="btn btn-primary" onclick="window.addAsset()" data-i18n="feature.factions.addAsset">➕ Add Asset</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
+            <button class="btn btn-utility" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
         </div>
     `;
 }
@@ -720,7 +720,7 @@ function renderFollowers() {
                 <div style="font-size:3rem;">👤</div>
                 <div>No followers tracked yet.</div>
                 <button class="btn btn-primary" onclick="window.addFollower()" data-i18n="feature.factions.addFollower">➕ Add Follower</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
+                <button class="btn btn-utility" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -750,7 +750,7 @@ function renderFollowers() {
 
         <div class="factions-actions">
             <button class="btn btn-primary" onclick="window.addFollower()" data-i18n="feature.factions.addFollower">➕ Add Follower</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
+            <button class="btn btn-utility" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
         </div>
     `;
 }
@@ -766,7 +766,7 @@ function renderTrusts() {
                 <div style="font-size:3rem;">🤝</div>
                 <div>No trusts created yet.</div>
                 <button class="btn btn-primary" onclick="window.addTrust()" data-i18n="feature.factions.createTrust">➕ Create Trust</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
+                <button class="btn btn-utility" onclick="window.loadDefaultFactions()" data-i18n="feature.factions.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -790,7 +790,7 @@ function renderTrusts() {
 
         <div class="factions-actions">
             <button class="btn btn-primary" onclick="window.addTrust()" data-i18n="feature.factions.createTrust">➕ Create Trust</button>
-            <button class="btn btn-secondary" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
+            <button class="btn btn-utility" onclick="window.refreshFactions()" data-i18n="feature.factions.refresh">🔄 Refresh</button>
         </div>
     `;
 }

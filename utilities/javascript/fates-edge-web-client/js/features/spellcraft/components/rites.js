@@ -481,7 +481,7 @@ export async function renderRites(el, patronIds, characterId, options = {}) {
                 <div style="font-size:1.5rem;">🔮</div>
                 <p>No patron data found for any of the provided IDs.</p>
                 <p style="font-size:0.85rem;">Try refreshing the patrons tab or check the console for details.</p>
-                <button class="btn btn-sm btn-secondary" onclick="window.refreshPatrons && window.refreshPatrons()" data-i18n="feature.spellcraft.components.rites.refreshPatrons">🔄 Refresh Patrons</button>
+                <button class="btn btn-sm btn-utility" onclick="window.refreshPatrons && window.refreshPatrons()" data-i18n="feature.spellcraft.components.rites.refreshPatrons">🔄 Refresh Patrons</button>
             </div>
         `;
         return;

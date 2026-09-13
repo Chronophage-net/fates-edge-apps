@@ -667,7 +667,7 @@ async function renderCalculator(el) {
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-xs btn-secondary" onclick="window.calculatorClear()" data-i18n="feature.spellcraft.components.calculator.clear">✕ Clear</button>
-                    <button class="btn btn-xs btn-secondary" onclick="window.calculatorRefresh()" data-i18n="feature.spellcraft.components.calculator.refresh">🔄 Refresh</button>
+                    <button class="btn btn-xs btn-utility" onclick="window.calculatorRefresh()" data-i18n="feature.spellcraft.components.calculator.refresh">🔄 Refresh</button>
                 </div>
             </div>
 

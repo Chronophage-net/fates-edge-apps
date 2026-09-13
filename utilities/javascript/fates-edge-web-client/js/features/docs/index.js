@@ -467,7 +467,7 @@ export function render(el) {
         <!-- Toolbar -->
         <div class="docs-toolbar" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:0.6rem 0.8rem;background:var(--bg3);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1rem;">
             <button class="btn btn-sm btn-primary" id="doc-upload-btn" data-i18n="feature.docs.uploadDoc">📤 Upload Doc</button>
-            <button class="btn btn-sm btn-secondary" id="doc-refresh-btn" data-i18n="feature.docs.refresh">🔄 Refresh</button>
+            <button class="btn btn-sm btn-utility" id="doc-refresh-btn" data-i18n="feature.docs.refresh">🔄 Refresh</button>
             <button class="btn btn-sm btn-secondary" id="doc-rebuild-btn" data-i18n="feature.docs.scanFilesystem">📋 Scan Filesystem</button>
             <span style="flex:1;"></span>
             <span id="docsTotalCount" style="font-size:0.75rem;color:var(--text3);"></span>

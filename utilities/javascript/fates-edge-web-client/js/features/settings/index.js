@@ -607,7 +607,7 @@ export function render(el) {
                 
                 <div class="flex">
                     <button class="btn btn-gold" id="pack-install-btn" data-i18n="feature.settings.installPack_1eguc">📦 Install Pack</button>
-                    <button class="btn btn-sm btn-secondary" id="pack-refresh-btn" data-i18n="feature.settings.refresh">↻ Refresh</button>
+                    <button class="btn btn-sm btn-utility" id="pack-refresh-btn" data-i18n="feature.settings.refresh">↻ Refresh</button>
                 </div>
                 
                 <div id="pack-install-feedback" class="mt-1" style="min-height:1.5rem;"></div>
@@ -885,7 +885,7 @@ export function render(el) {
                 <div class="flex">
                     <button class="btn btn-gold" id="sync-connect-btn" data-i18n="feature.settings.connect">🔗 Connect</button>
                     <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;" data-i18n="feature.settings.disconnect_y1yd4">⛔ Disconnect</button>
-                    <button class="btn btn-sm btn-secondary" id="sync-refresh-btn" data-i18n="feature.settings.refresh">↻ Refresh</button>
+                    <button class="btn btn-sm btn-utility" id="sync-refresh-btn" data-i18n="feature.settings.refresh">↻ Refresh</button>
                 </div>
                 
                 <div id="sync-status" class="sync-status disconnected">

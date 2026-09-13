@@ -490,7 +490,7 @@ export async function renderPsion(el) {
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-secondary" onclick="window.psionRefresh()" data-i18n="feature.spellcraft.components.psionics.refresh">🔄 Refresh</button>
+                    <button class="btn btn-xs btn-utility" onclick="window.psionRefresh()" data-i18n="feature.spellcraft.components.psionics.refresh">🔄 Refresh</button>
                 </div>
             </div>
 

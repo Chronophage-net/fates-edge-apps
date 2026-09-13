@@ -181,7 +181,7 @@ async function buildStatusHtml() {
         <div class="panel">
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <h3 data-i18n="feature.system-status.systemStatus">🩺 System Status</h3>
-                <button class="btn btn-sm" id="system-status-refresh" data-i18n="feature.system-status.refresh">🔄 Refresh</button>
+                <button class="btn btn-sm btn-utility" id="system-status-refresh" data-i18n="feature.system-status.refresh">🔄 Refresh</button>
             </div>
             <p class="text-muted small">Auto-refreshes every ${REFRESH_INTERVAL_MS / 1000}s while this page is open.</p>
 

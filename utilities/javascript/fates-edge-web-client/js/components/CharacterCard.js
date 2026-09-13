@@ -61,7 +61,7 @@ export function createCharacterCard(char, { onEdit, onDelete, onToggleVTT, onRol
             <button class="btn btn-sm ${char.vtt ? 'btn-green' : 'btn-primary'}" data-action="toggle-vtt">${char.vtt ? '✓ VTT' : `💬 ${push}`}</button>
             <button class="btn btn-sm btn-primary" data-action="edit" title="${edit}" aria-label="${edit}">✏️</button>
             <button class="btn btn-sm btn-primary" data-action="roll" title="${roll}" aria-label="${roll}">🎲</button>
-            <button class="btn btn-sm btn-danger" data-action="delete" title="${remove}" aria-label="${remove}">🗑️</button>
+            <button class="btn btn-sm btn-danger btn-icon" data-action="delete" title="${remove}" aria-label="${remove}">🗑️</button>
         </div>
     `;
     

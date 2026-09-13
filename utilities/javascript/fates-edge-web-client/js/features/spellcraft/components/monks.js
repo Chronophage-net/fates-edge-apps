@@ -653,7 +653,7 @@ export async function renderMonks(el) {
                     </select>
                     <button class="btn btn-sm btn-gold" onclick="window.monkMeditateFromSelect()" data-i18n="feature.spellcraft.components.monks.meditate">🧘 Meditate</button>
                     <button class="btn btn-sm btn-primary" onclick="window.monkChooseTradition()" data-i18n="feature.spellcraft.components.monks.tradition">📿 Tradition</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.monkRefresh()" title="Reloads patron data from disk, bypassing any cached copy" data-i18n-attr="title:feature.spellcraft.components.monks.reloadsPatronDataFromDiskBypassingAny" data-i18n="feature.spellcraft.components.monks.refresh">🔄 Refresh</button>
+                    <button class="btn btn-sm btn-utility" onclick="window.monkRefresh()" title="Reloads patron data from disk, bypassing any cached copy" data-i18n-attr="title:feature.spellcraft.components.monks.reloadsPatronDataFromDiskBypassingAny" data-i18n="feature.spellcraft.components.monks.refresh">🔄 Refresh</button>
                 </div>
             </div>
 

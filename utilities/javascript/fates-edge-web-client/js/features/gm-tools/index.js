@@ -925,7 +925,7 @@ function renderSceneView() {
                 <h3 class="panel-title" data-i18n="feature.gm-tools.quickActions">⚡ Quick Actions</h3>
                 <div class="grid-2 mt-1">
                     <button class="btn btn-secondary" onclick="window.sceneEndTrimBoons()" ${isViewOnly ? 'disabled' : ''}>✂️ Trim Boons</button>
-                    <button class="btn btn-secondary" onclick="window.resetAllTimers()" ${isViewOnly ? 'disabled' : ''}>⏱️ Reset Timers</button>
+                    <button class="btn btn-utility" onclick="window.resetAllTimers()" ${isViewOnly ? 'disabled' : ''}>⏱️ Reset Timers</button>
                     <button class="btn btn-secondary" onclick="window.newSession()" ${isViewOnly ? 'disabled' : ''}>📦 New Session</button>
                     <button class="btn btn-secondary" onclick="window.openCombatTracker()" ${isViewOnly ? 'disabled' : ''}>⚔️ Combat Tracker</button>
                     <button class="btn btn-secondary" onclick="window.openKanban()" data-i18n="feature.gm-tools.kanbanBoard">📋 Kanban Board</button>

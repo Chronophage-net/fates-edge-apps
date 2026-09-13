@@ -50,7 +50,7 @@ export function createTimerWidget(timer, { onTick, onReset, onDelete }, compact 
                     <div class="flex">
                         <button class="btn btn-sm btn-primary" data-action="tick">+ ${tick}</button>
                         <button class="btn btn-sm" data-action="reset" aria-label="${reset}">↺</button>
-                        <button class="btn btn-sm btn-danger" data-action="delete" aria-label="${remove}">🗑️</button>
+                        <button class="btn btn-sm btn-danger btn-icon" data-action="delete" aria-label="${remove}">🗑️</button>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.4rem;align-items:center;margin:0.4rem 0;">

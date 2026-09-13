@@ -419,7 +419,7 @@ export async function renderSummoning(el) {
                         ${costOptionsHtml}
                     </select>
                     <button class="btn btn-sm btn-gold" onclick="window.summonerBindRitualFromSelect()" data-i18n="feature.spellcraft.components.summoning.bindSpirit">🔮 Bind Spirit</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.summonerRefresh()" data-i18n="feature.spellcraft.components.summoning.refresh">🔄 Refresh</button>
+                    <button class="btn btn-sm btn-utility" onclick="window.summonerRefresh()" data-i18n="feature.spellcraft.components.summoning.refresh">🔄 Refresh</button>
                 </div>
             </div>
 

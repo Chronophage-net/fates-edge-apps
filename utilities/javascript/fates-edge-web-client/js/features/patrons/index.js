@@ -684,7 +684,7 @@ function renderCosmicPatrons() {
             <div class="patrons-empty">
                 <div style="font-size:3rem;">🌟</div>
                 <div>No cosmic patrons loaded.</div>
-                <button class="btn btn-primary" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
+                <button class="btn btn-utility" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -807,8 +807,8 @@ function renderCosmicPatrons() {
  
             <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                 <button class="btn btn-primary btn-sm" onclick="window.addCosmicPatron()" data-i18n="feature.patrons.addCosmic">➕ Add Cosmic</button>
-                <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
-                <button class="btn btn-secondary btn-sm" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
+                <button class="btn btn-utility btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
+                <button class="btn btn-utility btn-sm" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
             </div>
         </div>
     `;
@@ -825,7 +825,7 @@ function renderTerrestrialPatrons() {
                 <div style="font-size:3rem;">🏛️</div>
                 <div>No terrestrial patrons loaded.</div>
                 <button class="btn btn-primary" onclick="window.addTerrestrialPatron()" data-i18n="feature.patrons.addTerrestrial">➕ Add Terrestrial</button>
-                <button class="btn btn-secondary" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
+                <button class="btn btn-utility" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
             </div>
         `;
     }
@@ -855,7 +855,7 @@ function renderTerrestrialPatrons() {
  
             <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                 <button class="btn btn-primary btn-sm" onclick="window.addTerrestrialPatron()" data-i18n="feature.patrons.addTerrestrial">➕ Add Terrestrial</button>
-                <button class="btn btn-secondary btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
+                <button class="btn btn-utility btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
             </div>
         </div>
     `;
@@ -893,7 +893,7 @@ function renderReligions() {
         </div>
         <div class="patrons-actions" style="margin-top:0.5rem;">
             <button class="btn btn-primary" onclick="window.addReligion()" data-i18n="feature.patrons.addReligion">➕ Add Religion</button>
-            <button class="btn btn-secondary" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
+            <button class="btn btn-utility" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
         </div>
     `;
 }

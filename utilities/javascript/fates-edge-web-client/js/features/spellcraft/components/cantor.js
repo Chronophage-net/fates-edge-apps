@@ -536,7 +536,7 @@ export async function renderCantor(el) {
                     </div>
                 </div>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-secondary" onclick="window.cantorRefresh()" title="Reloads patron data from disk, bypassing any cached copy" data-i18n-attr="title:feature.spellcraft.components.cantor.reloadsPatronDataFromDiskBypassingAny" data-i18n="feature.spellcraft.components.cantor.refresh">🔄 Refresh</button>
+                    <button class="btn btn-xs btn-utility" onclick="window.cantorRefresh()" title="Reloads patron data from disk, bypassing any cached copy" data-i18n-attr="title:feature.spellcraft.components.cantor.reloadsPatronDataFromDiskBypassingAny" data-i18n="feature.spellcraft.components.cantor.refresh">🔄 Refresh</button>
                 </div>
             </div>
 
@@ -618,7 +618,7 @@ export async function renderCantor(el) {
                     <span style="font-size:0.6rem;color:var(--text3);">${rites.length} songs${isBound ? '' : ` (${tierLabel})`}${isHighCantor ? ' · ✨ Standard included' : ''}</span>
                     <div style="display:flex;gap:0.2rem;">
                         <button class="btn btn-xs btn-secondary" onclick="window.cantorMarkResonant()" data-i18n="feature.spellcraft.components.cantor.resonantRite">🔮 Resonant Rite</button>
-                        <button class="btn btn-xs btn-ghost" onclick="window.cantorResetCorruption()" style="color:var(--red);" data-i18n="feature.spellcraft.components.cantor.reset">✕ Reset</button>
+                        <button class="btn btn-xs btn-utility" onclick="window.cantorResetCorruption()" style="color:var(--red);" data-i18n="feature.spellcraft.components.cantor.reset">✕ Reset</button>
                     </div>
                 </div>
                 <div id="cantor-rites-container" style="display:flex;flex-direction:column;gap:0.3rem;"></div>

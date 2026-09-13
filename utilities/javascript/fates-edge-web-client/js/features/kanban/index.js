@@ -243,7 +243,7 @@ function renderKanbanView() {
         <div class="kanban-board-view">
             <div class="kanban-toolbar">
                 <button class="btn btn-sm btn-primary" onclick="window.addKanbanItem()" data-i18n="feature.kanban.addItem">➕ Add Item</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.refreshKanban()" data-i18n="feature.kanban.refresh">🔄 Refresh</button>
+                <button class="btn btn-sm btn-utility" onclick="window.refreshKanban()" data-i18n="feature.kanban.refresh">🔄 Refresh</button>
                 <span class="text-muted" style="font-size:0.8rem;">${state.items.length} items</span>
             </div>
             <div class="kanban-board-grid">
@@ -329,7 +329,7 @@ function renderClocksView() {
         <div class="clocks-view">
             <div class="clocks-toolbar">
                 <button class="btn btn-sm btn-primary" onclick="window.addClock()" data-i18n="feature.kanban.addClock">➕ Add Clock</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.refreshKanban()" data-i18n="feature.kanban.refresh">🔄 Refresh</button>
+                <button class="btn btn-sm btn-utility" onclick="window.refreshKanban()" data-i18n="feature.kanban.refresh">🔄 Refresh</button>
             </div>
             <div class="clocks-grid">
                 ${state.clocks.map(clock => {
@@ -491,7 +491,7 @@ function renderItemDetail(itemId) {
                     </div>
                     <div class="timer-controls">
                         <button class="btn btn-sm btn-primary" onclick="window.tickItemTimer('${item.id}')">+1</button>
-                        <button class="btn btn-sm btn-secondary" onclick="window.resetItemTimer('${item.id}')">⟳ Reset</button>
+                        <button class="btn btn-sm btn-utility" onclick="window.resetItemTimer('${item.id}')">⟳ Reset</button>
                     </div>
                 </div>
                 ` : ''}
