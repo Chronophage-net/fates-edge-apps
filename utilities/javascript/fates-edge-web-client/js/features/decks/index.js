@@ -521,6 +521,14 @@ function transformRegionData(raw) {
         hearts: {},
         clubs: {},
         diamonds: {},
+        // GM guidance for the draws whose adjudication is otherwise
+        // undefined -- riddles with no stated answer, prices with no rate,
+        // consequences an entry names and never defines. Kept beside the
+        // card meanings rather than inside them: this is advice to the
+        // person running the table, not a description of the card, and it
+        // is often several paragraphs. Authored in the docs repo
+        // (reference/generators/data/esoteric-entries.json).
+        gmNotes: { spades: {}, hearts: {}, clubs: {}, diamonds: {} },
         tags: [],
         metadata: { source_file: raw.id || 'unknown' }
     };
@@ -590,12 +598,7 @@ function transformRegionData(raw) {
             if (card.debt) meaning += ` [Debt: ${card.debt}]`;
             if (card.price) meaning += ` [Price: ${card.price}]`;
             if (card.curse_cost) meaning += ` [Cost: ${card.curse_cost}]`;
-            // GM guidance for the draws whose adjudication is otherwise
-            // undefined -- riddles with no answer, prices with no stated
-            // rate, consequences the entry names but never defines. Authored
-            // in the docs repo (reference/generators/data/esoteric-entries.json)
-            // and applied to the region files from there.
-            if (card.gm_note) meaning += ` [Running this: ${card.gm_note}]`;
+            if (card.gm_note) transformed.gmNotes[suit][rankKey] = card.gm_note;
             transformed[suit][rankKey] = meaning;
 
             const tags = [];
@@ -653,6 +656,38 @@ function getCardMeaningFromRegion(suit, rank, regionData) {
     const tier = tierInfo.tier;
     const segments = tierInfo.segments;
     return `${rankName} of ${suitName} (${archetype.label} – ${tier}): ${specific} (${segments} segments if highest).`;
+}
+
+/**
+ * The GM note for a drawn card, if this entry has one. Most do not: these
+ * are attached to the two or three draws per region whose flavour line is
+ * really an instruction ("the riddles have no answer -- only a choice") and
+ * which otherwise leave the GM to invent both a price and a consequence.
+ */
+function getGmNoteFromRegion(suit, rank, regionData) {
+    if (!regionData || !regionData.gmNotes) return null;
+    const bucket = regionData.gmNotes[suit];
+    if (!bucket) return null;
+    return bucket[rank] || null;
+}
+
+/**
+ * Render a GM note as its own collapsible block. Closed by default -- a GM
+ * scanning four drawn cards wants the meanings first, and the advice when
+ * they have decided which card they are actually running.
+ */
+function renderGmNote(note, { compact = false, heading = null } = {}) {
+    if (!note) return '';
+    const paragraphs = String(note).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
+        .map(p => `<p style="margin:0.35rem 0;line-height:1.55;">${renderCardText(p)}</p>`).join('');
+    return `
+        <details class="deck-gm-note" style="margin-top:0.4rem;background:var(--bg3);border:1px solid var(--border);border-inline-start:3px solid var(--gold);border-radius:var(--radius-sm, 6px);">
+            <summary style="cursor:pointer;padding:${compact ? '0.3rem 0.5rem' : '0.4rem 0.7rem'};color:var(--gold);font-size:${compact ? '0.72rem' : '0.78rem'};font-weight:600;letter-spacing:0.03em;text-transform:uppercase;list-style:none;">
+                Running this draw
+                <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">${heading ? ` — ${escHtmlLocal(heading)}` : ' — GM guidance'}</span>
+            </summary>
+            <div style="padding:0 ${compact ? '0.5rem' : '0.7rem'} 0.5rem;color:var(--text2);font-size:${compact ? '0.8rem' : '0.88rem'};">${paragraphs}</div>
+        </details>`;
 }
 
 function getWildcardMeaning(card, regionData) {
@@ -753,10 +788,12 @@ function interpretCrownCard(card, position, regionData) {
         return {
             title: '🃏 Joker — The Wildcard',
             description: 'The unexpected. The impossible. A force that does not follow the rules.',
-            regionMeaning: null
+            regionMeaning: null,
+            gmNote: null
         };
     }
     const regionMeaning = getCardMeaningFromRegion(card.suit, card.rank, regionData);
+    const gmNote = getGmNoteFromRegion(card.suit, card.rank, regionData);
     const rankName = RANK_NAMES[card.rank] || card.rank;
     const suitName = SUIT_NAMES[card.suit];
     const suitSymbol = SUIT_SYMBOLS[card.suit];
@@ -770,7 +807,7 @@ function interpretCrownCard(card, position, regionData) {
     const description = `${positionFraming[position.key]}\n\n${regionMeaning}`;
     return {
         title: `${suitSymbol} ${rankName} of ${suitName}`,
-        description, regionMeaning, suit: card.suit, rank: card.rank, color, symbol: suitSymbol
+        description, regionMeaning, gmNote, suit: card.suit, rank: card.rank, color, symbol: suitSymbol
     };
 }
 
@@ -829,6 +866,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
             <div style="display:flex;flex-direction:column;justify-content:center;">
                 <div style="font-size:0.8rem;color:var(--text2);font-weight:600;">${p.position.label}</div>
                 <div style="font-size:0.85rem;color:var(--text);line-height:1.4;">${renderCardText(p.regionMeaning || p.description)}</div>
+                ${renderGmNote(p.gmNote, { compact: true })}
             </div>
         </div>
     `).join('');
@@ -1317,6 +1355,7 @@ export async function drawConsequence() {
     renderCards(cards, isCrown);
 
     let synthesis, details = null, timer = null, cardDisplay = null;
+    let drawnGmNotes = [];
     let aceEffect = null;
 
     const aces = cards.filter(c => c.rank === 'A' && !isJokerCard(c));
@@ -1352,6 +1391,15 @@ export async function drawConsequence() {
         const cardsEl = document.getElementById('crown-spread-cards');
         if (cardsEl) cardsEl.style.display = 'none';
         synthesis = synthesiseConsequence(cards, data);
+        // A plain draw has no per-position layout to hang guidance off, so
+        // any notes for the drawn cards are gathered under the consequence.
+        drawnGmNotes = cards
+            .filter(c => !isJokerCard(c))
+            .map(c => ({
+                label: `${RANK_NAMES[c.rank] || c.rank} of ${SUIT_NAMES[c.suit] || c.suit}`,
+                note: getGmNoteFromRegion(c.suit, c.rank, data),
+            }))
+            .filter(x => x.note);
 
         if (typeof logRecordingEvent === 'function') {
             const cardNames = cards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
@@ -1371,7 +1419,9 @@ export async function drawConsequence() {
 
     const synthesisEl = document.getElementById('consequence-synthesis');
     if (synthesisEl) {
-        synthesisEl.innerHTML = `<strong>Consequence:</strong>${renderSynthesisHtml(synthesis)}`;
+        const notesHtml = drawnGmNotes.map(({ label, note }) =>
+            renderGmNote(note, { heading: label })).join('');
+        synthesisEl.innerHTML = `<strong>Consequence:</strong>${renderSynthesisHtml(synthesis)}${notesHtml}`;
     }
 
     const detailsEl = document.getElementById('crown-spread-details');
@@ -1728,6 +1778,7 @@ export function openCrownSpread() {
                                 <span style="color:var(--text3);font-size:0.8rem;">${p.rankName} of ${p.suitName}</span>
                             </div>
                             <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-inline-start:1.5rem;">${renderCardText(p.regionMeaning || p.description)}</div>
+                            <div style="margin-inline-start:1.5rem;">${renderGmNote(p.gmNote)}</div>
                         </div>
                     `).join('')}
                     <div>
@@ -1806,6 +1857,17 @@ export async function setSelectedRegion(regionName) {
     return true;
 }
 export function getRegionData() { return regionData; }
+/**
+ * The GM guidance for a drawn card, or null if this entry has none. Exposed
+ * so other tables-facing features (GM Tools' consequence panel, the paper
+ * table export) can show the same advice the Decks tab does rather than
+ * re-reading the region JSON themselves.
+ */
+export function getCardGmNote(suit, rank) {
+    if (!regionData) return null;
+    return getGmNoteFromRegion(suit, rank, regionData);
+}
+
 export function getCardMeaning(suit, rank) {
     if (!regionData) {
         const archetype = SUIT_ARCHETYPES[suit] || { label: 'Element', desc: 'a force' };
