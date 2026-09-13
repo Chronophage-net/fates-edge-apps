@@ -6,7 +6,13 @@ describe('Published bestiary parsing', () => {
     it('loads every shipped creature from the licensed data envelope, across TL 1–10', () => {
         const payload = JSON.parse(readFileSync(new URL('../../data/bestiary.json', import.meta.url), 'utf8'));
         const entries = parseBestiary(payload);
-        assertEqual(entries.length, payload.data.length);
+        // bestiary.json ships as a bare array. It briefly shipped wrapped as
+        // { _license, data: [...] } -- a copyright-stamping script rewrote
+        // every top-level array in the repo that way -- and parseBestiary()
+        // reads either (see the next test). Assert against whichever shape
+        // the file is actually in rather than hardcoding the wrapper.
+        const records = Array.isArray(payload) ? payload : payload.data;
+        assertEqual(entries.length, records.length);
         assertTrue(entries.length > 250);
         assertDeepEqual([...new Set(entries.map(e => e.tl))].sort((a,b) => a-b), [1,2,3,4,5,6,7,8,9,10]);
         assertEqual(entries.find(e => e.name === 'Dragon (High Wyrm)').tl, 8);

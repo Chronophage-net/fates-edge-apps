@@ -19,7 +19,6 @@ function createElementStub(tag) {
         attributes: {},
         style: {},
         className: '',
-        textContent: '',
         innerHTML: '',
         id: '',
         classList: {
@@ -53,6 +52,25 @@ function createElementStub(tag) {
         querySelector() { return null; },
         querySelectorAll() { return []; }
     };
+    // textContent has to mirror into innerHTML the way a real element does:
+    // core/utils.js's escHtml() escapes by round-tripping a string through
+    // `div.textContent = str; return div.innerHTML`. With two independent
+    // plain properties that returned an empty string, so every escHtml()
+    // call under test silently produced '' and no test could assert on the
+    // text inside rendered markup.
+    let text = '';
+    Object.defineProperty(el, 'textContent', {
+        get() { return text; },
+        set(value) {
+            text = value == null ? '' : String(value);
+            el.innerHTML = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        },
+        enumerable: true,
+        configurable: true,
+    });
     return el;
 }
 
