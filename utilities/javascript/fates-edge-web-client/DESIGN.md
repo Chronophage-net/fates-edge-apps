@@ -65,6 +65,74 @@ A feature module doesn't talk to the WebSocket directly. It reads and writes thr
 
 A third pattern sits between those two: some features send typed messages over that same low-level `sendEvent`/`onWSEvent` channel (`core/websocket.js`), but — unlike Kon'reh/Toll & Veil's opaque relay — the server actively interprets and authoritatively updates state for these types, without going through `OPERATION_TYPES`/`ConflictResolver` at all. The Adventure Manager's ad-hoc timers are the clearest example: `adhoc-timer-create/tick/remove` requests and `adhoc-timer-created/ticked/removed/state` broadcasts are handled by the server's `server/timers.js`, which is itself deliberately separate from the adventure engine's own pre-authored scene/campaign timers (those instead ride an `adventure-timer` event, handled by `server/adventure.js`). Because ad-hoc timers have no authored source to seed from, the feature module also does a one-shot `adhoc-timer-request` → `adhoc-timer-state` round trip on mount rather than relying solely on the reconnect handshake's full-state snapshot. This path is a reasonable fit for small, frequently-changing, low-stakes state that doesn't need conflict resolution (a timer tick from two clients is just two increments, not a collision) but does need a single, unambiguous, server-held answer — a middle ground between the full sync layer above and the client-only relay below.
 
+## Search: the background index
+
+Search used to build its index lazily — the first time someone opened the
+Search tab — into `sessionStorage`, and it only ever indexed each document's
+*title and one-line description* from `manifest-core.json`. Searching for a
+phrase that appears in the SRD, an expansion or an anthology therefore found
+nothing, and every new tab paid the build cost again.
+
+`core/search-index.js` inverts that. It is a standalone module with no DOM
+knowledge, started from `app.js` on an idle callback once boot is done:
+
+- **What it indexes.** Every document in `data/docs/manifest.json`, with the
+  multi-page books expanded into their individual pages, so a hit links to the
+  page it is actually on rather than the book's cover. Plus the wiki, factions,
+  patrons and regions, the last of these read from their manifest rather than
+  from a hardcoded id list.
+- **How it reads a document.** `DOMParser`, not a regex strip — script and
+  style bodies are often the largest thing in these files and are pure noise.
+  Navigation and the reader chrome every document shares are dropped too,
+  otherwise every document matches "Where to start" equally well. Headings are
+  kept separately from the body text, and the entry stores the opening ~2,400
+  characters; indexing whole documents would make the persisted index tens of
+  megabytes for a corpus this size.
+- **Where it lives.** IndexedDB, under a schema version that discards records
+  written by an older build. A returning visitor gets a warm index on first
+  paint.
+- **When it refreshes.** On a 30-minute interval, when the tab returns to the
+  foreground with a stale index, and whenever the docs manifest's fingerprint
+  changes. The fingerprint is derived from the manifest's own shape — it
+  deliberately does not hash document bodies, since that would mean fetching
+  everything to decide whether to fetch everything.
+- **How it stays polite.** Four fetches in flight at a time with an idle yield
+  between documents, and an `AbortController` so a rebuild can cancel one in
+  progress.
+
+The Search feature subscribes with `onIndexProgress()` and renders whatever
+state it finds; a build that completes while the tab is open swaps the live
+Fuse index underneath it. The Solr and Elasticsearch backends are unchanged and
+still win when configured — the background index is the zero-config path.
+
+## Control weight
+
+A control's prominence should match how often pressing it is the right move.
+The client had drifted the other way: "Save", "Delete", "Reset" and "Reload
+defaults" would render as four equally loud buttons, which is both visual noise
+and an easy way to lose work by aiming badly.
+
+Four classes in `css/app.css` express the hierarchy:
+
+| Class | For | Treatment |
+|---|---|---|
+| `.btn-gold` / `.btn-primary` | the action the screen exists for | filled / accented |
+| `.btn-quiet` | neutral secondary actions (Edit, Clone) | transparent until hover |
+| `.btn-utility` | refresh, reload, rebuild, load-defaults | transparent until hover, smaller |
+| `.btn-danger` | destructive | transparent and faint; red only on hover or keyboard focus |
+
+`.btn-danger` is *restyled* rather than replaced, so every destructive button in
+the app is covered without touching its markup. `.btn-danger.is-loud` opts back
+into a filled red button — use it for the confirming button *inside* a
+confirmation dialog, where being unmissable is the point. `.btn-icon` makes an
+icon-only square for the ✕ and 🗑 controls on list cards.
+
+Card-level tools go one step further: on wiki entries they sit at 45% opacity
+until the card is hovered or something inside it takes keyboard focus, and stay
+solid under `@media (hover: none)` so touch devices are unaffected. They remain
+in the tab order at all times — this is an emphasis change, not a discoverability
+one.
+
 ## What the player sees
 
 Connection state, presence, and conflicts surface without a player needing to think about any of the above: a toast when someone joins or leaves, a live-updating "who's online" list, a flash on a UI element someone else just changed, a banner when the connection drops, and a toast plus a brief resync when it comes back. Where a conflict can't resolve itself cleanly, the affected feature surfaces a choice rather than silently picking a side.

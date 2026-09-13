@@ -4,6 +4,35 @@ All notable changes to the Fate's Edge Web Client are logged here. This file sta
 
 ## [Unreleased]
 
+Background document indexing, a wiki that reflects its data, and a quieter control hierarchy
+
+### Added
+- **`js/core/search-index.js` — the search index is now built in the background and persisted.** It starts from `app.js` on an idle callback after boot, crawls every document in `data/docs/manifest.json` (expanding the seven multi-page books into their 112 pages so a hit links to the right page), and stores the result in IndexedDB. Refreshes on a 30-minute interval, on tab refocus when stale, and whenever the docs manifest's fingerprint changes. Four fetches in flight with an idle yield between documents, and an `AbortController` so a rebuild cancels one in progress. See `DESIGN.md` § "Search: the background index".
+- `js/tools/clean-wiki-data.js`, a repeatable repair pass for `data/wiki.json` (`--write` to apply, dry run by default). `DATA_SCHEMA.md` now documents the wiki entry shape and says to run it after regenerating the file.
+- 19 tests: `tests/unit/search-index.test.js` (manifest expansion incl. book pages, inactive documents, malformed manifests, sentence-aware previews, the progress-subscription contract) and `tests/unit/wiki-card.test.js` (card rendering, clamping, stub handling, title escaping, plus data-integrity assertions that fail if scrape artifacts reach the shipped `wiki.json`).
+
+### Fixed
+- **Documents were never actually searchable.** The old dynamic builder indexed each document's *title and one-line description* from `manifest-core.json`, so searching for any phrase from the SRD, an expansion or an anthology returned nothing. Document text is now indexed.
+- The search index lived in `sessionStorage` and was rebuilt from scratch in every new tab. It is now shared and persistent.
+- The dynamic builder carried fourteen region ids inline and silently missed every region added since. Regions now come from `data/regions/manifest.json`.
+- **The wiki page had no styling at all.** Its markup referenced ~45 `wiki-*` and `badge-*` classes that were defined nowhere, so the feature rendered as unstyled blocks. `css/app.css` now defines them: sticky sidebar, responsive card grid, suit pips, region/cost facets, clickable tag chips, and a result bar with dismissible filter chips. `js/tools/css-audit.js` no longer lists the wiki.
+- Wiki entries longer than 300 characters displayed their **Markdown source**, escaped — asterisks, backticks and list markers — until expanded, while shorter entries rendered normally. Both now render; length only changes whether the body is CSS line-clamped.
+- The wiki's category dropdown was a hardcoded list of eleven categories, nine of which matched nothing in the shipped data, while four real categories were missing from it. Category and region filters are now built from the entries that exist.
+- `updateStats()` dereferenced four sidebar elements without a null check, so a `renderWiki()` arriving after navigation (from the editor's post-save refresh, or `loadRemoteWiki()`'s async callback) threw and aborted the whole render.
+- `.btn-primary` was referenced in 154 places and never defined; those buttons fell back to bare `.btn`.
+- `tests/support/dom-shim.js`: `textContent` and `innerHTML` were independent plain properties, so `escHtml()` — which escapes by round-tripping through `div.textContent = str; return div.innerHTML` — returned an empty string under test, and no test could assert on text inside rendered markup. `textContent` now mirrors into `innerHTML` with escaping, as a real element does.
+- `tests/unit/bestiary-schema.test.js` asserted against `payload.data.length`, hardcoding the `{_license, data}` envelope that a copyright-stamping script had briefly imposed on every top-level array in the repo. It now reads whichever shape the file is in, matching `parseBestiary()`'s own tolerance.
+
+### Changed
+- **`data/wiki.json` cleaned** (307 entries, was 308 with one duplicate pair). 52 entries had an entire scraped card mashed into the `title` field with backslash separators — split into `title`, `subtitle`, `card` and a labelled body. TeX escaping (`\&`, ` ``quoted'' `, `---`) removed from every user-visible string. 34 patron entries backfilled with real lore from `data/patrons/*.json`. The 62 entries that genuinely have no text are marked `stub` and render as "No description recorded for this entry yet", sorted last, rather than as blank cards.
+- **Control weight is now a hierarchy** (`DESIGN.md` § "Control weight"). `.btn-danger` is restyled rather than rewritten at its 71 call sites: transparent and faint by default, red only on hover or keyboard focus, with `.btn-danger.is-loud` to opt back in for a confirmation dialog's confirming button. New `.btn-utility` (37 refresh/reload/rebuild/load-defaults buttons migrated to it), `.btn-quiet`, and `.btn-icon`. On wiki cards the per-entry tools fade to 45% until hover or focus-within, and stay solid on touch devices; they never leave the tab order.
+- Wiki search now matches subtitles and regions, not just title/body/tags, and entries whose text is missing sort below entries that have something to read.
+- The Search tab's "🔄 Rebuild Index" is now a quiet "Rebuild index" utility control, and its status line reports live indexing progress (`Indexing documents… 42/198`).
+
+### Notes
+- The Solr and Elasticsearch backends are untouched and still take precedence when configured. The background index is the zero-config path.
+- The indexer degrades quietly: a private window or blocked storage costs a rebuild next session, nothing more, and a corpus that can't be reached at all still leaves the tab usable on the built-in fallback entries.
+
 ### Changed
 - **Adversary `harm_levels` is now `resilience`**, matching the rules terminology pass in the docs repo (the word "Harm" was doing three jobs; only the adversary's damage-absorbing pool was renamed). All 257 `data/bestiary.json` entries are converted, and the Bestiary and Encounters panels now read "Resilience".
   - **Nothing existing breaks.** Saved campaigns, installed packs and hand-authored bestiary JSON are the user's files and are never rewritten on load: every read goes through a new `resilienceOf()` accessor that accepts either spelling, adversaries are written with both keys, and `harmLevelsForTl` remains as an alias of the renamed `resilienceForTl`. Nine unit tests pin this down.

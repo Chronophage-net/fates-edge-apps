@@ -49,6 +49,7 @@ Content will still show up as long as its slug is already in the hardcoded fallb
 | Talents | `data/talents/` | (loaded via `data/talents-manifest.json`, a slightly different convention — see the talents feature module) | |
 | Bestiary | `data/bestiary.json` | `discoverBestiary()` assumes one-file-per-creature under `data/bestiary/`, but the shipped data is actually a single `data/bestiary.json` dictionary keyed by creature name. If you're adding creatures today, add an entry to that dictionary rather than a new file — `discoverBestiary()` reflects an intended-but-unused per-file layout. | |
 | Adventures | `data/adventures/` | loaded via the Adventure Engine / `/api/modules`, not the discovery.js pattern — see [MODULES.md](../fates-edge-socket-server/MODULES.md) in the socket server for the adventure/module format. | |
+| Wiki | `data/wiki.json` | fetched whole by `js/features/wiki/index.js`; also indexed by `js/core/search-index.js` | A single flat array. See §3 below for the entry shape. |
 
 **Region deck files caveat:** `data/regions/hearts.json`, `clubs.json`, `diamonds.json`, and `spades.json` are Deck-of-Consequences suit-interpretation tables, not actual regions — despite living in the regions directory, don't use them as a template for a new region.
 
@@ -124,6 +125,46 @@ Regions use a large "generator" schema (~26 top-level keys in `acasia.json`) int
   "source": "guide"
 }
 ```
+
+### Wiki entry (`data/wiki.json`, add to the array)
+
+`data/wiki.json` is a flat array of entries. Only `title` is required; everything
+else is optional, and the card renderer adapts to what is present.
+
+```json
+{
+  "id": 104,
+  "title": "Broken Milestone",
+  "subtitle": "On the old Imperial Road; borders \u201cmoved\u201d overnight.",
+  "category": "locations",
+  "body": "The stone has been chiseled seven times.\n\n**Mechanical hook:** ...",
+  "tags": ["acasia", "spades", "locations"],
+  "region": "Acasia",
+  "suit": "spades",
+  "card": 2
+}
+```
+
+| Field | Purpose |
+|---|---|
+| `title` | Required. The entry name **only** — not the whole card. |
+| `subtitle` | One line under the title. |
+| `category` | Free text. The filter dropdown is built from the categories actually present, so a new one needs no code change. |
+| `body` | Markdown. Rendered through DOMPurify; long bodies are line-clamped with a "Read more" control. |
+| `tags` | Array of strings. Rendered as chips that filter the list when clicked. |
+| `region` | Shown as a facet, and populates the region filter. |
+| `suit` / `card` | For entries drawn from a suited random table: renders the card pip (`spades`/`hearts`/`diamonds`/`clubs` and 1–13). |
+| `cost` / `slot` | Shown as facets when present (XP cost, equipment slot). |
+| `patron_data` | Present on patron entries; `domain` is used to fill an otherwise empty body, and matching `data/patrons/<slug>.json` supplies the real lore. |
+| `stub` | `true` marks an entry whose text hasn't been written yet. The card says so plainly and sorts last, instead of rendering blank. |
+
+**This file is generated from the LaTeX sources and the scrape leaks.** If you
+regenerate it, run `node js/tools/clean-wiki-data.js --write` afterwards: it
+undoes TeX escaping (`\&`, ` ``quoted'' `, `---`), splits entries whose whole
+card was mashed into the `title` field with backslash separators, backfills
+patron bodies from `data/patrons/`, and marks empty entries as stubs.
+`tests/unit/wiki-card.test.js` fails if any of that damage reaches the shipped
+file.
 
 ### Bestiary entry (`data/bestiary.json`, add a key)
 
