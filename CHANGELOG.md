@@ -62,6 +62,24 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.3.0] - 2026-09-13
+
+Background document indexing, a wiki that reflects its data, and a quieter control hierarchy.
+
+### Added
+- match control prominence to how often pressing it is right
+- give the wiki a real design and clean the data behind it
+- crawl and persist a document index in the background
+
+### Fixed
+- make the DOM shim escape textContent into innerHTML
+
+### Docs
+- record the background index, the wiki data shape, and control weight
+
+### Chore
+- sync two stale lockfile versions to the released 5.2.5
+
 ## [5.2.5] - 2026-09-13
 
 ### Other

@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-client",
-  "version": "5.2.5",
+  "version": "5.3.0",
   "description": "Fate's Edge VTT Desktop Client",
   "main": "electron.js",
   "author": "Nicholas A. Gasper",
