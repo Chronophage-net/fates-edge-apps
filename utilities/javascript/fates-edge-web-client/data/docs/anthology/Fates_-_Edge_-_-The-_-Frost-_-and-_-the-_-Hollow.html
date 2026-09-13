@@ -102,6 +102,28 @@ blockquote {
     margin: 1.6rem 0;
     font-size: 0.9rem;
 }
+.tale-meta {
+    color: var(--text3);
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin: 0.1rem 0 0.55rem 0;
+}
+.tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+.tale-meta .long { color: var(--amber); }
+.marginalia {
+    border-left: 2px dashed var(--border);
+    padding: 0.1rem 0 0.1rem 0.7rem;
+    margin: 0.7rem 0 0.7rem 1.2rem;
+    color: var(--text2);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+.closing.fragment { border-left-color: var(--text3); }
+.reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+.reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+.reading-order li::before { counter-increment: ro; content: counter(ro); position: absolute; left: 0; color: var(--amber); font-size: 0.75rem; top: 0.3rem; }
+.reading-order .temp { color: var(--text3); font-style: italic; }
 footer {
     font-size: 0.75rem;
     color: var(--text3);
@@ -154,14 +176,27 @@ footer {
 <span class="badge badge-purple">Northern Folklore</span>
 <span class="badge badge-red">The Ninth Taboo</span>
 <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
+<div class="panel panel-blue">
+<strong>How this book is arranged</strong>
+<p class="text-sm" style="margin-top:0.4rem;">Stories first, then the language people use when they try to compare what frightened them. Each tale carries two notes at its head: how long it runs <em>spoken aloud</em> at an unhurried pace, and the tale's object — the needle, the nail, the bell, the blank space on the stone. The object is the hook.</p>
+<p class="text-sm" style="margin-top:0.4rem;">This book's tales open with the rule and then spend themselves demonstrating the cost of it, which is the northern shape and is not an accident. The closing line at the end is therefore not a summary of what you have just read; it is the rule again, with the part added that the teller would not say at the start because you would not have believed it yet. Compare the two. The gap between them is the tale.</p>
+<p class="text-sm" style="margin-top:0.4rem;">The essays in section III are Matron Alfiya's and not Dusana's, and they are argued with in the margins. The Rule of Eight is the most widely attested thing in these six collections and it is also disputed — by a mill country that calls it a fiction, a bamboo country that counts to six, and a river country that keeps the ninth as a paid office. Those three arguments are printed where they were given, in the other volumes, and the marginal notes here say where.</p>
+</div>
+<div class="panel panel-purple">
+<strong>A note on voices</strong>
+<p class="text-sm" style="margin-top:0.4rem;">The frost roads are written in the Icelandic and Norse saga manner: everyone named and placed before anything is allowed to happen to them, the marvel given no more weight than the weather, no narrator stepping in to say how to feel. The rune-witch's listing of the eight before she will begin follows the Norse and Sámi practice of naming a thing completely before using it. The Hollow's tales take the Scots and Orcadian nursery-terror shape — the rule stated in the first line, the tale as the price of breaking it. The Tulkani herder tells from the outside in, wagon-fashion. Alfiya's essays are written as a compiler's treatise of the sort kept in northern European folklore collections of the last two centuries, with the compiler's confidence and the compiler's blind spots both left in.</p>
+<p class="text-sm" style="margin-top:0.4rem;">These are cadences, not translations, and nothing here is a specific traditional tale carried across and renamed. The fuller account is printed in the front of <em>The Hearth Cord</em>.</p>
+<p class="text-sm" style="margin-top:0.4rem;">These were arranged, not merely collected. The tales answer one another, and two of them answer something in another volume. None of that is pointed out where it happens. It is there for the second reading.</p>
+</div>
 <h2 id="i-the-frost-roads">I. The Frost Roads</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The fire is still warm enough for questions. These tellers remember the names they are reluctant to speak.</p>
-<h3 data-fe-story="true" id="the-ninth-rune">The Ninth Rune</h3>
+<h3 data-fe-story="true" id="the-ninth-rune">The Ninth Rune</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A standing stone with eight runes cut and the ninth left blank. A poem containing one name, nine times.</span></p>
+
 <blockquote class="epigraph">
 <p>“The ninth rune is the oath you owe to the ones you could not save. Do not carve it. Speak it.”</p>
 <cite>— The rune-witch of the Mistland</cite>
 </blockquote>
 <span id="told-by"></span>
-<p>An old rune-witch who lived in a cairn at the edge of the Mistland. She had no name—or rather, she had nine, and she would not tell me which one was true.</p>
+<p class="byline">An old rune-witch who lived in a cairn at the edge of the Mistland. She had no name—or rather, she had nine, and she would not tell me which one was true. She listed the eight runes before she would begin, the way the northern tellers list a thing before they use it, and she made me say them back. I got two wrong. She made me say them back again.</p>
 <span id="the-tale"></span>
 <p>The Linn have eight runes for the living. <em>Fehu</em> for wealth. <em>Uruz</em> for strength. <em>Thurisaz</em> for the thorn. <em>Ansuz</em> for the voice. <em>Raido</em> for the road. <em>Kenaz</em> for the torch. <em>Gebo</em> for the gift. <em>Wunjo</em> for the joy.</p>
 <p>The ninth rune is not for the living. It has no name. Carve it, and you speak to the dead.</p>
@@ -182,14 +217,15 @@ footer {
 <p>The rune-witch read the poem. “You have found it,” she said. “Now forget it. The ninth rune is not for sharing.”</p>
 <p>Egil never carved the ninth rune. But every year on the anniversary of his son's drowning, he walked to the fjord and whispered the boy's name nine times. The water rippled. The fog lifted. And for one breath, he saw his son's face.</p>
 <span id="the-witch-s-closing"></span>
-<p>“The ninth rune is the oath you owe to the ones you could not save. Do not carve it. Speak it. And only speak it when you are alone.”</p>
-<h3 data-fe-story="true" id="the-mist-walker-s-gift">The Mist-Walker's Gift</h3>
+<p class="closing">“Do not carve it. Say it, aloud, on the day and at the water, and say only the name — no verse around it, nothing to make it easier to hear. Once a year is the whole of the rite. Twice is a man trying to get something back.”</p>
+<h3 data-fe-story="true" id="the-mist-walker-s-gift">The Mist-Walker's Gift</h3><p class="tale-meta">About 4 minutes read aloud &nbsp;·&nbsp; <span class="obj">Nine stories, gathered from a whole village. A single coin left at the fog's edge for whoever is next.</span></p>
+
 <blockquote class="epigraph">
 <p>“The Mistland is a tally. Every breath is an entry. Every story is a payment. Do not walk in without something to tell.”</p>
 <cite>— Bone-reader of the Mistland</cite>
 </blockquote>
 <span id="told-by-2"></span>
-<p>A bone-reader in a Mistland longhouse that had no door—only a hide hung over the threshold. She spoke in a whisper, and her hands never stopped moving, sorting knucklebones into patterns.</p>
+<p class="byline">A bone-reader in a Mistland longhouse that had no door—only a hide hung over the threshold. She spoke in a whisper, and her hands never stopped moving, sorting knucklebones into patterns. She told it flat and in order, saga-fashion, and gave the dead father exactly the same voice she gave the weather. When she reached the nine stories she stopped sorting for the first time, and counted them out on the bones, and then went back to sorting.</p>
 <span id="the-tale-2"></span>
 <p>The Mistland is not a place. It is a <em>threshold</em>. The fog that covers it is not water. It is the breath of the dead, exhaled over centuries, waiting for someone to breathe it back in.</p>
 <p>A young Linn—call her Solveig—went into the Mistland to find her father. He had disappeared three winters ago, walking into the fog to hunt a white stag that had been seen near the Direwood.</p>
@@ -213,14 +249,15 @@ footer {
 <p>At dawn, the fog lifted. Solveig's father walked out of the Mistland. His eyes were clear. His mouth was closed.</p>
 <p>He never spoke of what he had seen. But every year, he walked to the edge of the fog and left a single coin—a toll for the next person who might get lost.</p>
 <span id="the-witch-s-closing-2"></span>
-<p>“The Mistland is a tally. Every breath is an entry. Every story is a payment. Do not walk in without something to tell.”</p>
-<h3 data-fe-story="true" id="the-valewood-hunt">The Valewood Hunt</h3>
+<p class="closing">“Never go in with nothing to tell. Count what you owe on the way out — one story for every breath you took in there — and bring the village with you, because you will not have nine of your own. A coin left at the edge is not a payment. It is a courtesy to whoever goes in next.”</p>
+<h3 data-fe-story="true" id="the-valewood-hunt">The Valewood Hunt</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A bronze crown in a black fountain, taken, carried, and dropped before the gate.</span></p>
+
 <blockquote class="epigraph">
 <p>“The Valewood is a mirror. It shows you what you are afraid of—and then it shows you what you forgot.”</p>
 <cite>— Shield-maiden Gunnhild</cite>
 </blockquote>
 <span id="told-by-3"></span>
-<p>A shield-maiden named Gunnhild, who had walked the Valewood and returned with her eyes still open. Her voice was rust, and her left hand had only three fingers.</p>
+<p class="byline">A shield-maiden named Gunnhild, who had walked the Valewood and returned with her eyes still open. Her voice was rust, and her left hand had only three fingers.</p>
 <span id="the-tale-3"></span>
 <p>The Valewood lies east of the Aberderrin Sea, a forest of silver-barked trees and empty cities that phase in and out of reality. The Aelinnel built those cities once. Now they are silent, save for the whisper of stone shifting between centuries.</p>
 <p>The Linn do not go to the Valewood for punishment. They go to prove they are not afraid.</p>
@@ -240,14 +277,15 @@ footer {
 <p>“I saw her fountain. That was enough.”</p>
 <p>Ragnar never boasted again. But he never feared the Valewood either. He said, “The wood does not want your courage. It wants your attention. If you give it that, it will let you leave.”</p>
 <span id="the-witch-s-closing-3"></span>
-<p>“The Valewood is a mirror. It shows you what you are afraid of—and then it shows you what you forgot. Pay attention, but do not take anything. The queens of the empty cities are jealous.”</p>
-<h3 data-fe-story="true" id="the-skald-who-lost-her-tongue">The Skald Who Lost Her Tongue</h3>
+<p class="closing">“Give it your attention and nothing else. Do not lift anything out of a fountain, do not speak to what you meet on the paths, and if you have already taken something, put it down before you reach the gate — the gate is where it starts to cost. You will get out. You will not get out with it.”</p>
+<h3 data-fe-story="true" id="the-skald-who-lost-her-tongue">The Skald Who Lost Her Tongue</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A bone whistle. A selkie's skin wrapped round a throat. One word, spoken once.</span></p>
+
 <blockquote class="epigraph">
 <p>“A tongue is a weapon. A whisper is a sharper one. Do not anger a skald. They remember your name—and names have weight.”</p>
 <cite>— Signy the Skald</cite>
 </blockquote>
 <span id="told-by-4"></span>
-<p>A skald named Signy, who spoke through a bone whistle because her tongue had been cut out by a rival who was jealous of her verses.</p>
+<p class="byline">A skald named Signy, who spoke through a bone whistle because her tongue had been cut out by a rival who was jealous of her verses.</p>
 <span id="the-tale-4"></span>
 <p>A skald's tongue is not a muscle. It is a <em>bridge</em>—between the living and the dead, between the past and the future, between the meal and the song.</p>
 <p>Signy was the best skald in the fjord. She could make a jarl weep. She could make a thrall feel like a king. She could remember every oath spoken in her presence for forty years.</p>
@@ -266,11 +304,12 @@ footer {
 <p>Gunnar died. The word was his true name, spoken by a tongue that had been paid in blood. The selkie laughed, took its skin back, and swam away.</p>
 <p>Signy became the most feared skald in the north. She never sang again. She only whispered. And when she whispered a name, that person forgot their own story.</p>
 <span id="the-witch-s-closing-4"></span>
-<p>“A tongue is a weapon. A whisper is a sharper one. Do not anger a skald. They remember your name—and names have weight.”</p>
+<p class="closing">“Do not give a skald a grievance and then go on living within earshot. They keep every oath sworn in front of them for forty years and they do not need a tongue to spend one. If you have already done it, say the apology before she has finished being angry. Afterwards it is not an apology, it is a hostage.”</p>
 <h2 id="ii-the-hollow">II. The Hollow</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The next accounts were told with an eye on the door. Their witnesses disagree about what entered, but not about the room it left behind.</p>
-<h3 data-fe-story="true" id="the-mother-s-needle">The Mother's Needle</h3>
+<h3 data-fe-story="true" id="the-mother-s-needle">The Mother's Needle</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A black needle with no eye, and the black thread that sewed a shroud.</span></p>
+
 <span id="told-by-5"></span>
-<p>A lighthouse keeper's daughter on the Sidhi coast, who had seen her mother sew a dead man's mouth shut and then pretend it never happened.</p>
+<p class="byline">A lighthouse keeper's daughter on the Sidhi coast, who had seen her mother sew a dead man's mouth shut and then pretend it never happened.</p>
 <span id="the-tale-5"></span>
 <p>The Sidhi say that a needle can sew more than cloth. It can sew a mouth closed. It can sew a shadow to a wall. It can sew a door shut from the inside.</p>
 <p>A seamstress — call her Yara — found a needle in her dead mother's sewing box. The needle was black, warm to the touch, and it had no eye. She could not thread it. But when she held it, she could feel it pull toward her mother's grave.</p>
@@ -290,10 +329,11 @@ footer {
 <p>“Then find her ghost. And sew her mouth shut again. The first time, you sewed your mother. The second time, you must sew the teacher. The third time, you must sew the one who taught the teacher. Nine generations. Nine mouths. Nine needles.”</p>
 <p>Yara walked into the silence. She did not come back. But sometimes, on quiet nights, you can hear the sound of a needle piercing cloth — and a woman whispering, “Sew. Sew. Sew.”</p>
 <span id="the-witch-s-closing-5"></span>
-<p>“A needle with no eye is a door with no handle. Do not pick it up. Do not ask what it sews. The thread of unfinished business is unbreakable, and it is always long enough.”</p>
-<h3 data-fe-story="true" id="the-guest-who-never-left">The Guest Who Never Left</h3>
+<p class="closing">“A needle with no eye is a door with no handle. Do not pick it up. Do not ask what it sews. The thread of unfinished business is unbreakable, and it is always long enough.”</p>
+<h3 data-fe-story="true" id="the-guest-who-never-left">The Guest Who Never Left</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A spare room offered for one night, and a house burned down around the offer.</span></p>
+
 <span id="told-by-6"></span>
-<p>A blind monk in the Pereshi highlands who lived alone in a temple with seven locked doors. He had not opened the seventh door in forty years.</p>
+<p class="byline">A blind monk in the Pereshi highlands who lived alone in a temple with seven locked doors. He had not opened the seventh door in forty years.</p>
 <span id="the-tale-6"></span>
 <p>A traveler came to a village in the monsoon season. He was wet, tired, and polite. He asked for shelter. A widow offered him her spare room.</p>
 <p>“Stay one night,” she said. “No more.”</p>
@@ -309,10 +349,11 @@ footer {
 <p>“I told you,” he said. “I never left.”</p>
 <p>She stopped running. She sat down in the ashes. The traveler sat across from her. They are still sitting there, the widow and the guest, waiting for someone to invite them inside.</p>
 <span id="the-witch-s-closing-6"></span>
-<p>“Some guests do not need a door. They enter through your eyes. Do not look away from a stranger. The force is patient, and its guests are always polite.”</p>
-<h3 data-fe-story="true" id="the-song-the-dead-sing-to-calves">The Song the Dead Sing to Calves</h3>
+<p class="closing">“Some guests do not need a door. They enter through your eyes. Do not look away from a stranger. The force is patient, and its guests are always polite.”</p>
+<h3 data-fe-story="true" id="the-song-the-dead-sing-to-calves">The Song the Dead Sing to Calves</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A thread of ice running from an open mouth into the ground. A hand held over it.</span></p>
+
 <span id="told-by-7"></span>
-<p>A Tulkani herder who lost a third of his herd to a winter sickness. He swore the calves had heard something before they died.</p>
+<p class="byline">A Tulkani herder who lost a third of his herd to a winter sickness. He swore the calves had heard something before they died. He told it from the outside in, wagon-fashion — the herd first, then the circle, then the one animal, then the ear on the ground — and he did not arrive at his daughter until the last breath of it, which I think was not artistry but the only order in which he could get there at all.</p>
 <span id="the-tale-7"></span>
 <p>The Tulkani say that the dead sing to calves. Not to cows. Not to bulls. Only to the young, the innocent, the ones who have not yet learned to fear.</p>
 <p>A herder — call him Ivan — woke to find his calves standing in a circle. They were not sleeping. They were listening. Their ears were turned toward the ground.</p>
@@ -328,10 +369,11 @@ footer {
 <p>He put his hand over her mouth. The ice cut him. He wrapped her in a blanket and held her until dawn. The singing stopped.</p>
 <p>His daughter never spoke again. But she never froze either. She grew up with a scar on her tongue where the ice had been.</p>
 <span id="the-witch-s-closing-7"></span>
-<p>“The dead sing to the young because the young still remember how to listen. Cover your children's ears when the ground is cold. The lullaby is sweet, and the sleep it offers is eternal.”</p>
-<h3 data-fe-story="true" id="the-bell-that-rings-backwards">The Bell That Rings Backwards</h3>
+<p class="closing">“The dead sing to the young because the young still remember how to listen. Cover your children's ears when the ground is cold. The lullaby is sweet, and the sleep it offers is eternal.”</p>
+<h3 data-fe-story="true" id="the-bell-that-rings-backwards">The Bell That Rings Backwards</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A small bronze bell whose silence comes before its ring, lost in a crack in the pavement.</span></p>
+
 <span id="told-by-8"></span>
-<p>An Aelinnel bell-tender who had lost three fingers to a frozen clapper. He spoke in a whisper, and his hands were wrapped in gray wool.</p>
+<p class="byline">An Aelinnel bell-tender who had lost three fingers to a frozen clapper. He spoke in a whisper, and his hands were wrapped in gray wool.</p>
 <span id="the-tale-8"></span>
 <p>Bells are for the living. They ring forward, through time, from the strike to the echo. But there are bells that ring backwards.</p>
 <p>A gnome — call him Pim — found a bell in the ruins of a phasing city. The bell was small, bronze, and warm. He rang it once. The sound was wrong. It went from silence to ring, then from ring to silence, but the silence came before the ring.</p>
@@ -343,10 +385,11 @@ footer {
 <p>Pim remembered his wife. He remembered his workshop. He remembered his name. But he could not find the bell. It had rolled into a crack in the pavement.</p>
 <p>He searched for years. He never found it. But sometimes, late at night, he hears a bell ringing backwards. He knows it is the bell of unfinished business, calling him home.</p>
 <span id="the-witch-s-closing-8"></span>
-<p>“A bell that rings backwards is a door that opens into yesterday. Do not ring it. Do not listen. Its time is not our time, and its memory is longer than yours.”</p>
-<h3 data-fe-story="true" id="the-guest-who-left-a-shadow">The Guest Who Left a Shadow</h3>
+<p class="closing">“A bell that rings backwards is a door that opens into yesterday. Do not ring it. Do not listen. Its time is not our time, and its memory is longer than yours.”</p>
+<h3 data-fe-story="true" id="the-guest-who-left-a-shadow">The Guest Who Left a Shadow</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">An iron nail driven through a shadow's chest, and the shadow it did not hold.</span></p>
+
 <span id="told-by-9"></span>
-<p>A Sidhi dock-worker who had once found a shadow pinned to a wall with a nail. The shadow still moved when the wind blew.</p>
+<p class="byline">A Sidhi dock-worker who had once found a shadow pinned to a wall with a nail. The shadow still moved when the wind blew.</p>
 <span id="the-tale-9"></span>
 <p>A woman — call her Sasha — opened her door to a stranger. The stranger was thin, pale, and wore a coat made of gray wool. He asked for water. She gave it. He asked for bread. She gave it. He asked for a place to sit.</p>
 <p>Sit by the fire,“ she said.</p>
@@ -365,10 +408,11 @@ footer {
 <p>“Thank you for keeping it warm.”</p>
 <p>He left. Sasha's own shadow was gone. She lived the rest of her life without one. In the sun, she looked like a hole in the world.</p>
 <span id="the-witch-s-closing-9"></span>
-<p>“Do not nail a shadow to a wall. You will only make it angry. The force does not forget its possessions. And a shadow is always its, no matter how long you keep it.”</p>
-<h3 data-fe-story="true" id="the-door-that-opens-both-ways">The Door That Opens Both Ways</h3>
+<p class="closing">“Do not nail a shadow to a wall. You will only make it angry. The force does not forget its possessions. And a shadow is always its, no matter how long you keep it.”</p>
+<h3 data-fe-story="true" id="the-door-that-opens-both-ways">The Door That Opens Both Ways</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A door made of air in the Direwood, and a white stag standing at the far end of it.</span></p>
+
 <span id="told-by-10"></span>
-<p>The fire itself. Or so we dreamed. The flames were low, and the shadows were long, and when we woke, the story was already in our mouths.</p>
+<p class="byline">The fire itself. Or so we dreamed. The flames were low, and the shadows were long, and when we woke, the story was already in our mouths.</p>
 <span id="the-tale-10"></span>
 <p>There is a door in the Direwood that opens both ways. It is not a door of wood or stone. It is a door of air, of silence, of the space between two breaths.</p>
 <p>A hunter — call him Leif — found the door while chasing a white stag. The stag ran through the door. Leif followed.</p>
@@ -384,7 +428,7 @@ footer {
 <p>Leif lived as a stranger in his own home. He died alone, and the villagers buried him at the edge of the woods. They did not mark the grave.</p>
 <p>The white stag still runs through the Direwood. And the door still opens both ways. If you find it, do not follow. The force does not care which direction you go. It only cares that you go.</p>
 <span id="the-witch-s-closing-10"></span>
-<p>“A door that opens both ways is a door that has no inside and no outside. Step through, and you will never be sure which side is home. The force does not lie. It simply does not tell you which way the door is facing.”</p>
+<p class="closing">“If you find a door made of air, do not go through it to fetch something back. It opens both ways and neither of them is the way you came. Mark the spot, go home, and tell somebody where it is — that is the only useful thing anyone has ever done with one.”</p>
 <h2 id="iii-on-the-ninth-and-the-hollow">III. On the Ninth and the Hollow</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">Dusana’s notebook changes here. The stories have ended; what follows is the language people use when they try to compare what frightened them.</p>
 <h3 data-fe-story="true" id="on-the-number-eight">On the Number Eight</h3>
 <blockquote class="epigraph">
@@ -405,6 +449,7 @@ footer {
 </div>
 <p>Why eight? Alfiya's answer changed with the weather. Eight was enough. Eight belonged to the living. Eight was how many cups her mother owned before the soldiers came. On the last matter she refused all questions.</p>
 <p>The ninth comes after enough. Nothing good in the north comes after enough.</p>
+<p class="marginalia">Dusana, setting this down: I have carried Alfiya's Rule the length of two continents now and I am obliged to record that it is not agreed. In the mill country under the Scar there are households that pour the ninth cup deliberately, at wakes, as a courtesy to the dead, and have done so for four generations, and the one family I questioned closely about it has buried its people at ordinary ages in ordinary beds. Their millers told me to my face that the count is a tax levied by the old on the young and collected in fear. In the bamboo country east of the monsoon they do not count to nine at all; they count to six, and the door is the seventh, and the Keeper of it has a title. And on the river roads of Dhahara the ninth is not avoided but <em>employed</em> — a man is paid in grain to hold the place, and the count is spoken one higher than the number of people standing there, and thanked. Alfiya omitted all three. She would say omission is the point. I have printed the mill country's argument in <em>The Hearth Cord</em> and the bamboo country's in <em>The Salt and the Silk</em>, and I would rather you read them than take the Rule from me on trust.</p>
 <p>When you take the ninth step, you step off the map. When you pour the ninth cup, you invite a guest who does not drink. When you ring the ninth bell, you ring for something that does not answer—at least, not in words you want to hear.</p>
 <h5 id="why-the-number-matters">Why the Number Matters</h5>
 <p>Whether the number is magic depends on whom you ask and how near the ninth bell. Northern children learn the count before they learn why their elders sometimes stop speaking halfway through an answer.</p>
@@ -432,6 +477,7 @@ footer {
 </ul>
 </div>
 <p>Alfiya called these signs rather than omens. An omen warns. A sign assumes someone has already arrived.</p>
+<p class="marginalia">Note the shape of the list. Every entry is a thing that has been counted to nine <em>by a person, on purpose, out loud</em>. Nobody has yet given me a sign of the Ninth that occurred where no one was keeping count. I do not know what to do with that and I am recording it rather than reasoning from it.</p>
 <h5 id="what-the-ninth-does">What the Ninth Does</h5>
 <p>Reports agree only that the simple thing ceases to be simple. A promise develops a clause no speaker remembers. A straight road acquires a bend. A sealed deposition continues for one page beyond the clerk's signature.</p>
 <ul>

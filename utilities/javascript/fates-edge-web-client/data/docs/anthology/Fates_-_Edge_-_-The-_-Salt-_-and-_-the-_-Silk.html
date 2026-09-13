@@ -102,6 +102,28 @@ blockquote {
     margin: 1.6rem 0;
     font-size: 0.9rem;
 }
+.tale-meta {
+    color: var(--text3);
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin: 0.1rem 0 0.55rem 0;
+}
+.tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+.tale-meta .long { color: var(--amber); }
+.marginalia {
+    border-left: 2px dashed var(--border);
+    padding: 0.1rem 0 0.1rem 0.7rem;
+    margin: 0.7rem 0 0.7rem 1.2rem;
+    color: var(--text2);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+.closing.fragment { border-left-color: var(--text3); }
+.reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+.reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+.reading-order li::before { counter-increment: ro; content: counter(ro); position: absolute; left: 0; color: var(--amber); font-size: 0.75rem; top: 0.3rem; }
+.reading-order .temp { color: var(--text3); font-style: italic; }
 footer {
     font-size: 0.75rem;
     color: var(--text3);
@@ -154,10 +176,22 @@ footer {
 <span class="badge badge-purple">Southern &amp; Eastern Folklore</span>
 <span class="badge badge-green">Road Customs</span>
 <span class="badge badge-gray">Author: Nicholas A. Gasper</span></p>
+<div class="panel panel-blue">
+<strong>How this book is arranged</strong>
+<p class="text-sm" style="margin-top:0.4rem;">The contents run by water — salt roads, eastern waters, monsoon courts — because that is the order the road took. Each tale carries two notes at its head: how long it runs <em>spoken aloud</em> at an unhurried pace, and the tale's object. The object is the hook. The lamp, the rope of nine knots, the seal that says one thing and means another: put one on a table and the tale becomes a session.</p>
+<p class="text-sm" style="margin-top:0.4rem;">The closing line is not the moral. It is the rule the tale enacts. Every tale here stands alone and reads cold in under ten minutes. The customs tables at the back are for looking things up, not for reading aloud.</p>
+<p class="text-sm" style="margin-top:0.4rem;">One more thing, since it is the kind of thing a book ought to say about itself rather than leave to be discovered or not. These were arranged, not merely collected. Objects recur. Tellers turn up in each other's tales without being introduced. More than one closing is answered by a tale three sections away that appears to be about something else entirely, and at least one of them is answered by a tale in a different volume. None of that is necessary to enjoy any single piece, which is why none of it is pointed out where it happens. It is there for the second reading, and the second reading is the one the book was actually built for.</p>
+</div>
+<div class="panel panel-purple">
+<strong>A note on voices</strong>
+<p class="text-sm" style="margin-top:0.4rem;">The borrowing here is heaviest and should be named plainest. The Sidhi coast is written in the Swahili-coast manner of the Indian Ocean ports — the proverb set down and left standing, the tale walking up to meet it. Oshiira and Ngomebe draw on Bantu oral practice: the teller's pause where a listening room is supposed to answer, and the sense, from Kongo <em>minkisi</em> and the praise-poem traditions, that an object holds an obligation rather than merely recording one. Taharka is Nubian. The Pereshi speak in the balanced Persian court manner, every statement answered in its own breath. Fhara is Arabic and Bedouin desert telling, where the wager and the weather are the same argument. The eastern waters take their shape from Japanese and mainland Southeast Asian household tales — the escalating count, the shrine gate with the rule carved into it. The Kuva tell by stages, like Sogdian road-tellers, each day's march the same shape as the last. Dhahara is Indo-Persian.</p>
+<p class="text-sm" style="margin-top:0.4rem;">These are cadences, not translations. No tale here is a specific traditional story carried across and renamed; where a real form is used — call-and-response, proverb-first, the three refusals — it is used because it does something a flatter telling cannot, and it is named so that a gamemaster about to perform one aloud knows whose rhythm they have picked up. Departures are deliberate. Errors are the author's. The fuller account is printed in the front of <em>The Hearth Cord</em>, where the debt is largest.</p>
+</div>
 <h2 id="i-the-salt-roads">I. The Salt Roads</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">At the quay, everything has to be carried ashore. The first stories concern what a passenger can lose and still claim as their own.</p>
-<h3 data-fe-story="true" id="the-lighthouse-of-the-one-eyed-captain">The Lighthouse of the One-Eyed Captain</h3>
+<h3 data-fe-story="true" id="the-lighthouse-of-the-one-eyed-captain">The Lighthouse of the One-Eyed Captain</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A lamp turned a quarter degree south. A blind eye, and the truth that was cut out of it.</span></p>
+
 <span id="told-by"></span>
-<p>Captain Rana of the <em>Eel-Skiff</em>, the same woman who had carried me across the Dolmis. She told this tale at anchor, with her brass hook resting on the rail.</p>
+<p class="byline">Captain Rana of the <em>Eel-Skiff</em>, the same woman who had carried me across the Dolmis. She told this tale at anchor, with her brass hook resting on the rail.</p>
 <span id="the-tale"></span>
 <p>The Sidhi say that every lighthouse was built over a drowned sailor's grave. Not the famous sailors — the forgotten ones. The ones who washed ashore with no name and no country.</p>
 <p>A lighthouse keeper — call her Amara — tended a beacon on the Sidhi coast. She was old, blind in one eye, and she spoke to the light as if it were her daughter.</p>
@@ -173,10 +207,11 @@ footer {
 <p>Amara touched her blind eye. “Because I lost this eye to a lamp that would not speak for me. It saw a truth I did not want to see. So I cut the truth out. But the lamp — the lamp forgave me.”</p>
 <p>The magistrate freed her. The lamp still burns on that headland. And every Sidhi sailor knows: if the light shifts a quarter degree south, you reef your sails and pray you are not carrying stolen salt.</p>
 <span id="the-witch-s-closing"></span>
-<p>“A lamp that speaks is a witness. A witness that judges is a court. Do not ask for justice unless you are prepared to be judged.”</p>
-<h3 data-fe-story="true" id="the-carpet-that-remembers">The Carpet That Remembers</h3>
+<p class="closing">“Ask the lamp before you turn it, and turn it a quarter degree and no more. A lamp you have asked will answer for you at the Admiralty. A lamp you have merely used will be asked the same question, and will also answer.”</p>
+<h3 data-fe-story="true" id="the-carpet-that-remembers">The Carpet That Remembers</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A carpet whose border shows the faces of the men who died for the man who commissioned it.</span></p>
+
 <span id="told-by-2"></span>
-<p>Soraya the Weaver, a Pereshi woman whose family had woven carpets for seven generations. She spoke while her loom clicked, never looking up.</p>
+<p class="byline">Soraya the Weaver, a Pereshi woman whose family had woven carpets for seven generations. She spoke while her loom clicked, never looking up.</p>
 <span id="the-tale-2"></span>
 <p>The Pereshi say that a carpet is not a thing. It is a covenant between the weaver and the land. The wool is a promise. The dye is a memory. The pattern is a map of unsettled weights.</p>
 <p>A prince — call him Darius — commissioned a carpet from the greatest weaver in the mountains. He wanted a carpet that would remember his victories. The weaver agreed.</p>
@@ -189,10 +224,11 @@ footer {
 <p>The prince kept the carpet. He did not hang it. He stored it in a chest. But every night, he dreamed of the faces in the border. And every morning, he gave a coin to a widow.</p>
 <p>When he died, they unrolled the carpet one last time. The faces were gone. In their place was a single word, woven in gold thread: <em>Returned</em>.</p>
 <span id="the-witch-s-closing-2"></span>
-<p>“A carpet is a covenant. Walk on it, and you agree to its terms. Read the border before you step.”</p>
-<h3 data-fe-story="true" id="the-sidhi-freedman-s-seal">The Sidhi Freedman's Seal</h3>
+<p class="closing">“A carpet is a covenant. Walk on it, and you agree to its terms. Read the border before you step.”</p>
+<h3 data-fe-story="true" id="the-sidhi-freedman-s-seal">The Sidhi Freedman's Seal</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A brass disk stamped FREED BY LAW, lost at sea — and a rope with nine knots worn in its place.</span></p>
+
 <span id="told-by-3"></span>
-<p>An old Sidhi dock-worker in Port Shed, who showed me a scar on his wrist where a slave collar had been burned off.</p>
+<p class="byline">An old Sidhi dock-worker in Port Shed, who showed me a scar on his wrist where a slave collar had been burned off. He tells in the coast manner — a proverb set down first and left standing while he does something else, then the tale walked up to it from a long way off. He said <em>the sea does not ask for papers</em> and then spent a while coiling a line before he said anything more, and I have kept that pause in the telling because it is doing work.</p>
 <span id="the-tale-3"></span>
 <p>The Sidhi were slaves once. Not all of them, not forever — but long enough that every family has a story of the collar.</p>
 <p>A young Sidhi man — call him Elias — bought his freedom from an Ashaani master. He paid in silver and promises. The master gave him a seal — a brass disk stamped with the words <em>Freed by law</em>.</p>
@@ -210,10 +246,11 @@ footer {
 <p>The master looked at the rope. He looked at Elias. He said, “The law can do anything. But I am tired of this argument. Go. Keep your rope.”</p>
 <p>Elias became a legend. The Sidhi still tie ropes with nine knots — one for each of the original witnesses — and they wear them under their shirts. The law does not ask to see them. The law is afraid of what the knots remember.</p>
 <span id="the-witch-s-closing-3"></span>
-<p>“A seal is a promise. A memory is a witness. The law fears the witness more than the promise.”</p>
-<h3 data-fe-story="true" id="the-pereshi-fire-temple">The Pereshi Fire-Temple</h3>
+<p class="closing">“Do not carry your freedom in a thing that can sink. Put it in a rope — one knot for every person who will stand up in a hall and say your name aloud — and wear it under your shirt where it can be produced. Nine knots is enough. Nine has always been enough. The law will not ask to see it. The law is afraid of being made to count.”</p>
+<h3 data-fe-story="true" id="the-pereshi-fire-temple">The Pereshi Fire-Temple</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A fire three hundred years old that turns blue when you look at it directly.</span></p>
+
 <span id="told-by-4"></span>
-<p>A Pereshi priest of the Eternal Flame, who tended a fire that had not gone out in three hundred years. He spoke in a whisper, as if the fire were listening.</p>
+<p class="byline">A Pereshi priest of the Eternal Flame, who tended a fire that had not gone out in three hundred years. He spoke in a whisper, as if the fire were listening, and in the balanced court manner of that country, where every statement is given its counter-statement in the same breath — <em>worship is for gods; tending is for guests</em> — so that you cannot take half of it away with you.</p>
 <span id="the-tale-4"></span>
 <p>The Pereshi do not worship the fire. They tend it. There is a difference, they say. Worship is for gods. Tending is for guests.</p>
 <p>A traveler — call him Rostam — came to a fire-temple in the mountains. He was cold, hungry, and lost. The priest let him in.</p>
@@ -227,10 +264,11 @@ footer {
 <p>Rostam could not look away. He watched for an hour. When he finally turned, the priest was gone. The fire was orange again. He was alone.</p>
 <p>He left the temple. He walked home. He never told anyone what he had seen. But he stopped being afraid of dying. He said, “The fire is warm. The dead are waiting. There is nothing to fear.”</p>
 <span id="the-witch-s-closing-4"></span>
-<p>“Fire remembers. It does not judge. If you are not afraid of what it remembers, it will warm you. If you are, it will show you everything.”</p>
-<h3 data-fe-story="true" id="the-weigh-master-s-grain-oshiira">The Weigh-Master's Grain (Oshiira)</h3>
+<p class="closing">“Sit with your back to the flame. If you turn and look anyway, do not look away before it has finished with you — the ones who look away carry it out of the temple, and they do not know they are carrying it until somebody dies.”</p>
+<h3 data-fe-story="true" id="the-weigh-master-s-grain-oshiira">The Weigh-Master's Grain (Oshiira)</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A market scale, and the single grain of guilt that tips it.</span></p>
+
 <span id="told-by-5"></span>
-<p>A weigh-master in the Oshiiran city of Mbaro. Grain was her trade. Disputes came to her because a woman trusted with the market's measures soon learns how many respectable men press a thumb to the scale.</p>
+<p class="byline">A weigh-master in the Oshiiran city of Mbaro. Grain was her trade. Disputes came to her because a woman trusted with the market's measures soon learns how many respectable men press a thumb to the scale. She told it the way the grain country tells: the saying laid down first, then a pause in which a listening room is expected to answer — and when I did not answer, because I did not know I was supposed to, she said the line again and waited again, patiently, until I worked it out. The second time I said <em>we are listening</em> and she went on. I have not forgotten the lesson and I have answered every teller since.</p>
 <span id="the-tale-5"></span>
 <p>The Oshiira say that every grain of wheat has a weight. The weight is not the same for everyone. A rich man's grain is lighter than a poor man's. The scales know. The scales are honest.</p>
 <p>A merchant — call him Kwame — brought a shipment of grain to the weigh-house. The weigh-master put it on the scale. It balanced perfectly.</p>
@@ -241,10 +279,11 @@ footer {
 <p>“One grain of guilt,” she said. “The scale weighs truth, not wheat. Bring honest grain, and it will balance. Bring lies, and it will tip.”</p>
 <p>The merchant left. He came back a week later with a new shipment. The scale balanced. He settled his promise. And he never tried to cheat again — not because he was afraid of the law, but because he was afraid of the one grain that had tipped the scale.</p>
 <span id="the-witch-s-closing-5"></span>
-<p>“A scale is a witness. It does not care about your excuses. It cares about the weight of what you carry.”</p>
-<h3 data-fe-story="true" id="the-slave-who-named-the-veil-ashaan">The Slave Who Named the Veil (Ashaan)</h3>
+<p class="closing">“Set the load down and stand back from the beam. If one grain tips it, take the load home and come back in a week with a different one. Do not argue with the scale. It has heard your argument already, from better men, and it did not move for them either.”</p>
+<h3 data-fe-story="true" id="the-slave-who-named-the-veil-ashaan">The Slave Who Named the Veil (Ashaan)</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A black seal that says MINE and means BURDEN. A shard of it kept in a pocket afterward.</span></p>
+
 <span id="told-by-6"></span>
-<p>A Breath-less agent in the catacombs of Galanina, who spoke through a silk curtain and never showed her face.</p>
+<p class="byline">A Breath-less agent in the catacombs of Galanina, who spoke through a silk curtain and never showed her face.</p>
 <span id="the-tale-6"></span>
 <p>In Ashaan, the Veiled Sisters bind spirits to their will. They also bind people — but those are not called slaves. They are called “indentured.” The Sisters are very careful with words.</p>
 <p>A Sidhi man — call him Malik — was born into indenture. He worked the spice docks of Port Shed, loading cargo that would never be his. He learned to read and write by watching the merchants' clerks. He learned that a name is a kind of lock.</p>
@@ -263,10 +302,11 @@ footer {
 <p>“I do not need them to believe. I only need them to wonder.”</p>
 <p>Malik became a Breath-less agent. He never wore a seal again. But he carried a piece of black glass in his pocket — a shard from the seal he had thrown away. When he met a slave, he showed it to them. “This is what freedom looks like,” he said. “Broken.”</p>
 <span id="the-witch-s-closing-6"></span>
-<p>“A name is a lock. A veil is a key. Break the lock, and you are free. Lift the veil, and the Sister is afraid.”</p>
-<h3 data-fe-story="true" id="the-walking-city-s-keystone-ngomebe">The Walking City's Keystone (Ngomebe)</h3>
+<p class="closing">“Never wear a seal that somebody else had struck. If you are already wearing one, read what is actually written on it rather than what you were told, and then break it where they can see you do it. You do not need them to believe you afterwards. You only need them to be wondered about.”</p>
+<h3 data-fe-story="true" id="the-walking-city-s-keystone-ngomebe">The Walking City's Keystone (Ngomebe)</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A cracked keystone on a city that walks, and the name of whoever actually broke the vow.</span></p>
+
 <span id="told-by-7"></span>
-<p>An elder of the Mason-Kin, a woman whose hands were stained with granite dust and whose voice was the sound of stone grinding on stone.</p>
+<p class="byline">An elder of the Mason-Kin, a woman whose hands were stained with granite dust and whose voice was the sound of stone grinding on stone.</p>
 <span id="the-tale-7"></span>
 <p>The Ngomebe cities walk. They move across the plateau on rollers of petrified wood, pulled by oxen and the will of the ancestors. A city that stops walking is a city that dies.</p>
 <p>One city — call it Khazembo — stopped. The rollers locked. The oxen lowed. The stone-song fell silent.</p>
@@ -281,10 +321,11 @@ footer {
 <p>They retrieved the stone. The keystone healed. The city walked again.</p>
 <p>Nia became the keystone's keeper. She never lied to the stone again. And every mason knows: a crack in the city is a crack in someone's word.</p>
 <span id="the-witch-s-closing-7"></span>
-<p>“A walking city is a promise on wheels. A crack is a broken vow. Find the vow, and the city will heal itself.”</p>
-<h3 data-fe-story="true" id="the-aelinnel-and-the-aelaerem-the-ninth-door">The Aelinnel and the Aelaerem — The Ninth Door</h3>
+<p class="closing">“A walking city is a promise on wheels. A crack is a broken vow. Find the vow, and the city will heal itself.”</p>
+<h3 data-fe-story="true" id="the-aelinnel-and-the-aelaerem-the-ninth-door">The Aelinnel and the Aelaerem — The Ninth Door</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A bell that rings eight times. A cup that must not be filled past the brim. A warm stone carved BORROWED.</span></p>
+
 <span id="told-by-8"></span>
-<p>Two voices: a gnome bell-tender named Pim and a halfling hedge-witch named Celandine. They argued throughout the telling, corrected each other, and eventually agreed to disagree.</p>
+<p class="byline">Two voices: a gnome bell-tender named Pim and a halfling hedge-witch named Celandine. They argued throughout the telling, corrected each other, and eventually agreed to disagree.</p>
 <span id="the-tale-8"></span>
 <p>The Aelinnel build doors that count. The Aelaerem pour cups that cannot be counted. They have lived as neighbors for centuries, borrowing each other's thresholds and arguing about the number nine.</p>
 <p>A gnome — call him Tink — built a door for a halfling village. It was a fine door, made of living wood, with a bell that rang once for each opening. He counted the rings: one, two, three, four, five, six, seven, eight.</p>
@@ -300,11 +341,12 @@ footer {
 <p>“When you need to cross,” Tink said, “pour water into the cup. If it fills to the brim, the ninth is safe. If it overflows, the ninth is hungry.”</p>
 <p>The halflings agreed. They kept both doors. The gnomes used the bell door. The halflings used the cup door. And every harvest, they met at the threshold and argued about whether the cup had overflowed.</p>
 <span id="the-witch-s-closing-8"></span>
-<p>“A bridge between cultures is not a door. It is a cup. You must agree on what full means.”</p>
+<p class="closing">“Do not argue about the ninth with a neighbour who counts differently. Build the second door and keep both. Then meet at the threshold once a year and argue about whether the cup overflowed. The argument is the bridge. You will know the bridge has failed on the year nobody turns up to have it.”</p>
 <h2 id="ii-the-eastern-waters">II. The Eastern Waters</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">The road turns inland between crossings. Here a well or a patch of rice may hold news that has not yet reached the nearest town.</p>
-<h3 data-fe-story="true" id="the-mirror-in-the-rice-paddy">The Mirror in the Rice Paddy</h3>
+<h3 data-fe-story="true" id="the-mirror-in-the-rice-paddy">The Mirror in the Rice Paddy</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A flooded paddy that shows you yourself, older, and a story told into the water at the full moon.</span></p>
+
 <span id="told-by-9"></span>
-<p>Old Mei, a rice farmer in Ayokha who had never left her valley but knew the names of every spirit in the water.</p>
+<p class="byline">Old Mei, a rice farmer in Ayokha who had never left her valley but knew the names of every spirit in the water.</p>
 <span id="the-tale-9"></span>
 <p>In the monsoon season, the rice paddies become mirrors.</p>
 <p>You see the sky above you, the clouds, the birds. But sometimes — sometimes you see other things. A door that is not there. A face that does not belong to anyone you know. A version of yourself standing on the opposite bank, wearing different clothes.</p>
@@ -327,10 +369,11 @@ footer {
 <p>He did. He told the story of how his grandmother had found the land — not by conquest, not by purchase, but by saving a child from drowning. The child was the spirit's own. The spirit had never known.</p>
 <p>The water rippled. The reflection bowed. The land was his.</p>
 <span id="the-witch-s-closing-9"></span>
-<p>“Every field has a keeper. The keeper does not care about your deeds or your silver. It cares whether you know its name.”</p>
-<h3 data-fe-story="true" id="the-well-that-did-not-sing">The Well That Did Not Sing</h3>
+<p class="closing">“Every field has a keeper, and it does not read deeds. At the next full moon speak into the water the story of how your people first came to this ground — the true one, including the part you would rather leave out. If you do not know it, go and ask the oldest person who does, before there is nobody left to ask.”</p>
+<h3 data-fe-story="true" id="the-well-that-did-not-sing">The Well That Did Not Sing</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A well spirit with its mouth sewn shut in silver thread, and a confession twenty years late.</span></p>
+
 <span id="told-by-10"></span>
-<p>The daughter of a well-keeper in Ayokha, who learned the spirit's name from her mother and her mother's mother.</p>
+<p class="byline">The daughter of a well-keeper in Ayokha, who learned the spirit's name from her mother and her mother's mother.</p>
 <span id="the-tale-10"></span>
 <p>Every well has a singer. You cannot hear it unless you have drunk from the well and never wasted the water. The song is not music. It is the sound of the water remembering the sky.</p>
 <p>One well — in a village called Tham Luang — stopped singing.</p>
@@ -346,10 +389,11 @@ footer {
 <p>The thread dissolved. The well sang again.</p>
 <p>The village did not forgive her. But they did not throw her out either. They built a new well, and she became its keeper. She sang to it every morning. The song told the truth. No one asked her what it said.</p>
 <span id="the-witch-s-closing-10"></span>
-<p>“The well sings your secrets. If you do not want to hear them, do not drink.”</p>
-<h3 data-fe-story="true" id="the-fhara-water-clock">The Fhara Water-Clock</h3>
+<p class="closing">“The well sings your secrets. If you do not want to hear them, do not drink.”</p>
+<h3 data-fe-story="true" id="the-fhara-water-clock">The Fhara Water-Clock</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A brass-and-glass water-timer that lies at the solstice, and a cairn with one stone per lying hour.</span></p>
+
 <span id="told-by-11"></span>
-<p>Suleiman the Oasis-Master, a Fhara caravaneer who carried a water-timer made of brass and glass. He never arrived late to any rendezvous.</p>
+<p class="byline">Suleiman the Oasis-Master, a Fhara caravaneer who carried a water-timer made of brass and glass. He never arrived late to any rendezvous.</p>
 <span id="the-tale-11"></span>
 <p>The Fhara do not measure time by the sun. The sun lies. It moves differently in the desert than it does in the mountains, and it forgets to set when the wells are dry. Instead, they measure time by water.</p>
 <p>A water-timer is a vessel with a small hole in the bottom. It fills at dawn, empties by noon, and is refilled three times before the evening prayer. There is a story that the first water-timer was not a timer at all, but a marriage agreement.</p>
@@ -363,10 +407,11 @@ footer {
 <p>The merchant looked at the timer. The brass was hot. The water was gone. He had been tricked by his own agreement.</p>
 <p>He left. Fatima married a well-digger's son. They built a new water-timer that compensated for heat and cold. It is still used in that oasis, and every year on the solstice, they add a stone to a cairn — one for each hour the timer is allowed to lie.</p>
 <span id="the-witch-s-closing-11"></span>
-<p>“Time is water. Water is a promise. Read the current before you let it drip.”</p>
-<h3 data-fe-story="true" id="the-kuva-s-road">The Kuva's Road</h3>
+<p class="closing">“Never agree to a wager measured by a timer you did not fill yourself. Ask what day of the year it is. Ask what the sun does to brass. Then agree, and take your time going down the rope.”</p>
+<h3 data-fe-story="true" id="the-kuva-s-road">The Kuva's Road</h3><p class="tale-meta">About 3 minutes read aloud &nbsp;·&nbsp; <span class="obj">A sealed letter carried forty days and never opened, arriving too late to be worth anything.</span></p>
+
 <span id="told-by-12"></span>
-<p>An old Kuva woman at a caravanserai on the Way of Silk, who had walked from the Crimson Basin to the Inland Sea and back again. She smelled of cardamom and dust.</p>
+<p class="byline">An old Kuva woman at a caravanserai on the Way of Silk, who had walked from the Crimson Basin to the Inland Sea and back again. She smelled of cardamom and dust. Her people tell by stages, the way they travel — each refusal a day's march, each march the same shape as the last, so that by the third you are counting with the man and have begun to dread the fourth. There is no fourth. That is the trick of it, and it only works if the teller is patient enough to let you be wrong.</p>
 <span id="the-tale-12"></span>
 <p>The Kuva do not build roads. They walk them. And when they walk, they leave behind a trail not of stones but of promises.</p>
 <p>A young Kuva — call him Dastan — was tasked with delivering a message from the Satrapy of Dhahara to the court of the God-King in Ayokha. The message was sealed with brass and wax. He was not to open it.</p>
@@ -389,10 +434,11 @@ footer {
 <p>“Then you will be the son of this court. Rise. The treaty is expired. But a promise kept is worth more than a treaty signed. We will make a new one.”</p>
 <p>Dastan became the God-King's messenger. He never carried a sealed letter again. He carried only his own word — and it was enough.</p>
 <span id="the-witch-s-closing-12"></span>
-<p>“A borrowed road is not a stolen one. Walk it clean, and the road will remember. Walk it greedy, and the road will eat you.”</p>
-<h3 data-fe-story="true" id="the-bamboo-taboo">The Bamboo Taboo</h3>
+<p class="closing">“A borrowed road is not a stolen one. Walk it clean, and the road will remember. Walk it greedy, and the road will eat you.”</p>
+<h3 data-fe-story="true" id="the-bamboo-taboo">The Bamboo Taboo</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">Six sneezes and a rule carved into a shrine gate. A grandmother's name, given to a shadow in her granddaughter's place.</span></p>
+
 <span id="told-by-13"></span>
-<p>An Aelaerem hedge-witch who lived in a hollow tree and spoke only in odd numbers.</p>
+<p class="byline">An Aelaerem hedge-witch who lived in a hollow tree and spoke only in odd numbers, and who had the tale at third hand from the bamboo country and was scrupulous about saying so. She gave the escalation exactly as it was given to her, one step per breath, and would not be hurried through the middle of it, which is where the whole thing lives.</p>
 <span id="the-tale-13"></span>
 <p>In a village at the edge of the Bamboo Forest, there was a rule: never sneeze seven times in a row.</p>
 <p>If you sneezed once, you covered your mouth. Twice, you excused yourself. Thrice, you left the room. Four times, you drank ginger tea. Five times, you lay down. Six times, you called for the healer.</p>
@@ -406,12 +452,14 @@ footer {
 <p>“Because I do not need it. I am old. I have sneezed seven times many years ago. I have been borrowing time ever since.”</p>
 <p>The shadow took the grandmother's name. The grandmother forgot who she was. But the child lived.</p>
 <p>The village carved a new rule into the shrine gate: <em>Count to six. Stop. The seventh sneeze is a door.</em></p>
+<p class="marginalia">Set this beside the bell and the cup, two tales back, and beside anything you have been told about the ninth. The bamboo country counts to six. Its door is the seventh and it has a Keeper with a title and a job. The people there do not think they are the exception; they think the high passes are, and one grandmother told me so at length and with some heat. I have stopped assuming the count is one law with local dialects. It may be several laws that happen to rhyme. It may be one law that people have been mishearing in different directions for a very long time. I have printed the other version of this quarrel — a mill country that says the whole count is a fiction invented to frighten children off the ice — in <em>The Hearth Cord</em>, and I recommend reading the two arguments together and declining, as I have, to settle them.</p>
 <span id="the-witch-s-closing-13"></span>
-<p>“The body knows when to stop. The spirit knows when to ignore the body. Listen to both, or you will sneeze away something you cannot borrow back.”</p>
+<p class="closing">“Count to six and stop. The seventh is the door. And if a traveller tells you the number is nine, ask him whose grandmother it was — because it was not yours, and the shadow at the bamboo does not take appointments from the high passes.”</p>
 <h2 id="iii-the-monsoon-courts">III. The Monsoon Courts</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">Rain keeps the court indoors. A story told while everyone waits for the roads to open can become a question no official is willing to answer.</p>
-<h3 data-fe-story="true" id="the-viceroy-s-elephant">The Viceroy's Elephant</h3>
+<h3 data-fe-story="true" id="the-viceroy-s-elephant">The Viceroy's Elephant</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A pair of scales, an elephant on one side and a single grain of wheat on the other.</span></p>
+
 <span id="told-by-14"></span>
-<p>An old Aeler tunnel-wright who had served three viceroys and lost two fingers to a keystone. He spoke in a whisper, even though we were alone.</p>
+<p class="byline">An old Aeler tunnel-wright who had served three viceroys and lost two fingers to a keystone. He spoke in a whisper, even though we were alone.</p>
 <span id="the-tale-14"></span>
 <p>The Aeler came to Dhahara on the backs of elephants. Not war elephants — those came later. The first elephants were surveyors, carrying stone-cutters and record-books up the passes. The Aeler measured the mountains. Then they measured the people.</p>
 <p>A Dhaharan prince — call him Vikram — watched the viceroy's elephant trample his father's rice paddy. He did not speak. He walked to the viceroy's court and knelt.</p>
@@ -427,10 +475,11 @@ footer {
 <p>The viceroy paid. Vikram became a folk hero. He never challenged the viceroy again. But every time an Aeler elephant trampled a field, the farmers would whisper, “Weigh it against a grain.”</p>
 <p>The elephant never won again.</p>
 <span id="the-witch-s-closing-14"></span>
-<p>“An agreement is a scale. If you choose the wrong weight, you will always lose. Choose carefully. The Aeler do.”</p>
-<h3 data-fe-story="true" id="the-monsoon-s-daughter-taharka-ngomebe-ayokha">The Monsoon's Daughter (Taharka, Ngomebe, Ayokha)</h3>
+<p class="closing">“An agreement is a scale. If you choose the wrong weight, you will always lose. Choose carefully. The Aeler do.”</p>
+<h3 data-fe-story="true" id="the-monsoon-s-daughter-taharka-ngomebe-ayokha">The Monsoon's Daughter (Taharka, Ngomebe, Ayokha)</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A story told to the sea about a drowning that has not happened.</span></p>
+
 <span id="told-by-15"></span>
-<p>A Taharkan spice merchant who had sailed from the Monsoon Coast to the Inland Sea and back again. She smelled of cardamom and salt.</p>
+<p class="byline">A Taharkan spice merchant who had sailed from the Monsoon Coast to the Inland Sea and back again. She smelled of cardamom and salt.</p>
 <span id="the-tale-15"></span>
 <p>The monsoon is not a wind. It is a woman. She has three daughters: one who brings rain to Taharka, one who brings grain to Ngomebe, and one who brings ships to Ayokha.</p>
 <p>The eldest daughter — call her Rani — fell in love with a Dhaharan sailor. She followed his ship across the sea. The rain stopped in Taharka. The crops failed. The king sent a messenger.</p>
@@ -443,10 +492,11 @@ footer {
 <p>The king asked the storyteller, “What did you tell her?”</p>
 <p>“The truth,” the storyteller said. “A truth she had not yet lived. Sometimes that is enough.”</p>
 <span id="the-witch-s-closing-15"></span>
-<p>“The monsoon is a story. Tell it right, and it will rain. Tell it wrong, and the ships will wait.”</p>
-<h3 data-fe-story="true" id="the-aelinnel-bell-and-the-aelaerem-cup">The Aelinnel Bell and the Aelaerem Cup</h3>
+<p class="closing">“When somebody will not come home, do not send a messenger and do not send a king. Send the best teller you have, and have them tell the thing that has not happened yet. Then get out of the way; it is not your grief and you cannot help with it.”</p>
+<h3 data-fe-story="true" id="the-aelinnel-bell-and-the-aelaerem-cup">The Aelinnel Bell and the Aelaerem Cup</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A bell rung eight times and a cup poured eight times, and neither of them answered.</span></p>
+
 <span id="told-by-16"></span>
-<p>Two voices: an Aelinnel bell-tender named Greta and an Aelaerem hedge-witch named Thistle. They told the tale together, interrupting each other, finishing each other's sentences.</p>
+<p class="byline">Two voices: an Aelinnel bell-tender named Greta and an Aelaerem hedge-witch named Thistle. They told the tale together, interrupting each other, finishing each other's sentences.</p>
 <span id="the-tale-16"></span>
 <p>Aelinnel and Aelaerem have lived in Dhahara since before the hills had names. The Aelinnel count steps. The Aelaerem pour cups. They agree on very little.</p>
 <p>A famine came. The Aelinnel bell-tender rang her bell eight times. The Hollow did not answer. The hedge-witch poured eight cups. The Hollow did not drink.</p>
@@ -458,10 +508,11 @@ footer {
 <p>The bell-tender rang the bell for the witch. The witch poured a cup for the bell-tender. They shared the cup. The bell echoed.</p>
 <p>The Hollow did not stir. But the famine ended. The rains came. The Aelinnel and the Aelaerem did not become friends — but they became neighbors. And sometimes, that is enough.</p>
 <span id="the-witch-s-closing-16"></span>
-<p>“The Hollow is not the only listener. Sometimes the person next to you is enough.”</p>
-<h3 data-fe-story="true" id="the-lethai-ar-s-silk-bridge">The Lethai-ar's Silk Bridge</h3>
+<p class="closing">“Ring your eight. Pour your eight. Wait. If nothing answers, stop addressing it and address the person standing beside you, who has been in the room the entire time and has been waiting considerably longer.”</p>
+<h3 data-fe-story="true" id="the-lethai-ar-s-silk-bridge">The Lethai-ar's Silk Bridge</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A silk bridge with a man's name woven into it, which will hold for him and for nobody else.</span></p>
+
 <span id="told-by-17"></span>
-<p>A Lethai-ar silk-weaver who lived in the Crimson Valley. She spoke through a curtain of red thread, her voice soft as running water.</p>
+<p class="byline">A Lethai-ar silk-weaver who lived in the Crimson Valley. She spoke through a curtain of red thread, her voice soft as running water.</p>
 <span id="the-tale-17"></span>
 <p>The Lethai-ar do not build bridges of stone. Stone cracks. They build bridges of silk. Silk bends. Silk remembers.</p>
 <p>A Dhaharan prince — call him Arjun — needed to cross a gorge. The Aeler viceroy had sealed the mountain pass. The only other route was a Lethai-ar silk bridge, strung between two cliffs.</p>
@@ -475,10 +526,11 @@ footer {
 <p>Arjun led his army across. The bridge swayed. The silk sang. The Aeler pursuers tried to follow. The bridge dropped them into the gorge.</p>
 <p>Arjun won his kingdom. He never gave his name to anyone again. But he visited the Lethai-ar every year, and he always brought silk.</p>
 <span id="the-witch-s-closing-17"></span>
-<p>“A name woven into silk is a promise. The silk remembers. The bridge holds — or it does not.”</p>
-<h3 data-fe-story="true" id="the-viceroy-s-dream-ikasha">The Viceroy's Dream (Ikasha)</h3>
+<p class="closing">“A name woven into silk is a promise. The silk remembers. The bridge holds — or it does not.”</p>
+<h3 data-fe-story="true" id="the-viceroy-s-dream-ikasha">The Viceroy's Dream (Ikasha)</h3><p class="tale-meta">About 2 minutes read aloud &nbsp;·&nbsp; <span class="obj">A name whispered in the deep galleries, and a shift that runs slower the next day.</span></p>
+
 <span id="told-by-18"></span>
-<p>A Tulkani storyteller — myself — at a fire in the Himadri foothills. The audience was a group of Aeler miners who had not heard Ikasha's name before.</p>
+<p class="byline">A Tulkani storyteller — myself — at a fire in the Himadri foothills. The audience was a group of Aeler miners who had not heard Ikasha's name before.</p>
 <span id="the-tale-18"></span>
 <p>Ikasha sleeps. She has slept for a thousand years. But she dreams. And in her dreams, she whispers.</p>
 <p>A miner — call him Durin — worked in the deep galleries. He was tired. He was cold. He was afraid of the dark.</p>
@@ -498,7 +550,7 @@ footer {
 <p>The priest left. He did not report them. He whispered Ikasha's name that night in his own bed.</p>
 <p>The viceroy never found out. But the mines grew quieter. The miners worked slower. They were not afraid anymore. They were waiting.</p>
 <span id="the-witch-s-closing-18"></span>
-<p>“Ikasha does not command. She whispers. A whisper is not a rebellion. It is the seed of one.”</p>
+<p class="closing">“Say the name in the dark, to one other person, and then go back to work slower than you did yesterday. That is all of it. Do not write it down. Do not say it twice in the same shift. Do not say it to a priest until you have watched him for a season.”</p>
 <h2 id="iv-customs-of-the-southern-and-eastern-roads">IV. Customs of the Southern and Eastern Roads</h2><p class="fe-collection-bridge" data-fe-collection-added="bridge">After the tales come the habits their tellers lived beside: gestures observed at a doorway, a cup withheld, a route taken after dark.</p>
 <h3 data-fe-story="true" id="appendix-customs-of-the-southern-roads">Appendix: Customs of the Southern Roads</h3>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table><thead><tr><th>Custom</th><th>Culture</th><th>Consequence of Breaking</th></tr></thead><tbody>
