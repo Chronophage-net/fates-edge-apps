@@ -590,6 +590,12 @@ function transformRegionData(raw) {
             if (card.debt) meaning += ` [Debt: ${card.debt}]`;
             if (card.price) meaning += ` [Price: ${card.price}]`;
             if (card.curse_cost) meaning += ` [Cost: ${card.curse_cost}]`;
+            // GM guidance for the draws whose adjudication is otherwise
+            // undefined -- riddles with no answer, prices with no stated
+            // rate, consequences the entry names but never defines. Authored
+            // in the docs repo (reference/generators/data/esoteric-entries.json)
+            // and applied to the region files from there.
+            if (card.gm_note) meaning += ` [Running this: ${card.gm_note}]`;
             transformed[suit][rankKey] = meaning;
 
             const tags = [];
