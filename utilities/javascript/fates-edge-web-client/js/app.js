@@ -30,6 +30,7 @@ import { sendEvent, onWSEvent, isConnectedToServer } from './core/websocket.js';
 import { initTheme, setTheme, getCurrentPreference, getResolvedThemeId } from './core/theme-manager.js';
 import { initI18n, applyTranslations, t } from './core/i18n.js';
 import { initPackManager } from './core/pack-manager.js';
+import { startBackgroundIndexing } from './core/search-index.js';
 
 // ============================================================
 // TEST MODE HANDLING (disabled)
@@ -153,6 +154,17 @@ async function init() {
 
         // 7. Preload common modules in background (including Spellcraft)
         preloadCommonModules();
+
+        // 7b. Warm the search index in the background.
+        //
+        // The index used to be built lazily, the first time someone opened
+        // the Search tab, and it only ever covered document *titles* -- the
+        // documents' actual text was never indexed, so searching for a
+        // phrase from the SRD or an anthology returned nothing. Starting it
+        // here means the corpus is crawled once, on idle, persisted to
+        // IndexedDB, and refreshed periodically; by the time anyone reaches
+        // the Search tab it is usually already warm. See core/search-index.js.
+        startBackgroundIndexing();
 
         // 8. Sync event listeners
         setupSyncEventListeners();
@@ -784,7 +796,7 @@ function renderSyncUI() {
         <div class="flex">
             <button class="btn btn-gold" id="sync-connect-btn" data-i18n="feature.app.connect">🔗 Connect</button>
             <button class="btn btn-danger" id="sync-disconnect-btn" style="display:none;" data-i18n="feature.app.disconnect">⛔ Disconnect</button>
-            <button class="btn btn-sm" id="sync-refresh-btn" data-i18n="feature.app.refresh">↻ Refresh</button>
+            <button class="btn btn-sm btn-utility" id="sync-refresh-btn" data-i18n="feature.app.refresh">↻ Refresh</button>
         </div>
 
         <div id="sync-status" class="mt-1" style="font-size:0.9rem;padding:0.3rem 0.6rem;border-radius:var(--radius);background:var(--bg3);">

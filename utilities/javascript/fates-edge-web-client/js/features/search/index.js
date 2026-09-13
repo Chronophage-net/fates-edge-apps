@@ -3,8 +3,8 @@
  * ✅ Supports Solr backend (configurable via window.__SOLR_URL)
  * ✅ Supports Elasticsearch backend (configurable via window.__ES_URL)
  * ✅ Falls back to local Fuse.js index
- * ✅ Auto‑generates index from /data/ static files if missing
- * ✅ Uses sessionStorage cache for generated index
+ * ✅ Reads the shared background index (core/search-index.js), which
+ *    crawls the document corpus on idle and persists it to IndexedDB
  * ✅ Debug logging to help diagnose issues
  *
  * Both server backends are opt-in and mutually exclusive at query time —
@@ -26,6 +26,13 @@
  */
 
 import { escHtml, buildDocumentUrl, getBaseUrl } from '@core/utils.js';
+import {
+    loadIndex as loadSharedIndex,
+    buildIndex as buildSharedIndex,
+    rebuildIndex as rebuildSharedIndex,
+    getEntries as getSharedEntries,
+    onIndexProgress,
+} from '@core/search-index.js';
 
 let container = null;
 let fuse = null;
@@ -74,7 +81,7 @@ export function render(el) {
                     <input type="text" id="search-input" placeholder="Type your search…" autofocus / data-i18n-attr="placeholder:feature.search.typeYourSearch">
                 </div>
                 <button class="btn btn-gold" id="search-button" data-i18n="feature.search.search">Search</button>
-                <button class="btn btn-secondary" id="search-rebuild-btn" data-i18n="feature.search.rebuildIndex">🔄 Rebuild Index</button>
+                <button class="btn btn-utility btn-sm" id="search-rebuild-btn" title="Re-crawl the documents and rebuild the index" data-i18n="feature.search.rebuildIndex">Rebuild index</button>
             </div>
             <div id="search-status" class="text-muted small mt-1" style="padding:0.3rem 0;"></div>
             <div id="search-results" class="mt-1" style="max-height:500px;overflow-y:auto;"></div>
@@ -136,47 +143,67 @@ export async function loadSearchIndex() {
         return;
     }
 
-    // 3c. Try sessionStorage cache first (fastest)
-    const cached = sessionStorage.getItem('searchIndex');
-    if (cached) {
-        try {
-            const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                buildFuseIndex(FuseLib, parsed);
-                updateStatus(`✅ ${parsed.length} entries indexed (cache).`, 'success');
-                isInitialized = true;
-                isLoading = false;
-                return;
-            }
-        } catch (e) { /* ignore */ }
+    // 3c. Serve whatever the background indexer has already persisted.
+    //
+    // core/search-index.js starts crawling at app boot, so by the time
+    // anyone opens this tab the index is usually warm and this returns
+    // instantly from IndexedDB. If it is not warm yet we ask for a build
+    // and follow along via the progress subscription set up below.
+    let shared = getSharedEntries();
+    if (!shared.length) shared = await loadSharedIndex();
+
+    if (shared.length > 0) {
+        buildFuseIndex(FuseLib, shared);
+        updateStatus(`${shared.length} entries indexed.`, 'success');
+        isInitialized = true;
+        isLoading = false;
+        subscribeToIndexProgress();
+        return;
     }
 
-    // 3d. Try pre-built search_index.json
-    const prebuilt = await loadPrebuiltIndex();
-    if (prebuilt && prebuilt.length > 0) {
-        buildFuseIndex(FuseLib, prebuilt);
-        try { sessionStorage.setItem('searchIndex', JSON.stringify(prebuilt)); } catch (e) {}
-        updateStatus(`✅ ${prebuilt.length} entries indexed (pre-built).`, 'success');
+    // 3d. Nothing persisted yet -- build now and show progress as it goes.
+    subscribeToIndexProgress();
+    updateStatus('Indexing documents…', 'info');
+    const built = await buildSharedIndex();
+    if (built && built.length > 0) {
+        buildFuseIndex(FuseLib, built);
+        updateStatus(`${built.length} entries indexed.`, 'success');
         isInitialized = true;
         isLoading = false;
         return;
     }
 
-    // 3e. Dynamic index builder
-    updateStatus('🔍 Generating search index from data files…', 'info');
-    const dynamic = await buildDynamicIndex();
-    if (dynamic && dynamic.length > 0) {
-        try { sessionStorage.setItem('searchIndex', JSON.stringify(dynamic)); } catch (e) {}
-        buildFuseIndex(FuseLib, dynamic);
-        updateStatus(`✅ ${dynamic.length} entries indexed (dynamic).`, 'success');
-        isInitialized = true;
-        isLoading = false;
-        return;
-    }
-
-    // 3f. Everything failed → hardcoded fallback
-    updateStatus('⚠️ Using fallback index (search limited).', 'warning');
+    // 3e. Nothing indexable was reachable at all (offline, or the data
+    // directory is missing) -- keep the tab usable with the hardcoded
+    // starter entries rather than an empty box.
+    updateStatus('Using fallback index (search limited).', 'warning');
     useFallbackIndex();
+}
+
+// Keep the tab's Fuse index and status line in step with the background
+// indexer. Without this, a build that finishes while the Search tab is open
+// would sit in IndexedDB unused until the next navigation.
+let unsubscribeProgress = null;
+function subscribeToIndexProgress() {
+    if (unsubscribeProgress) return;
+    unsubscribeProgress = onIndexProgress((status) => {
+        if (status.phase === 'building') {
+            const { done, total } = status;
+            updateStatus(total ? `Indexing documents… ${done}/${total}` : 'Indexing documents…', 'info');
+            return;
+        }
+        if (status.phase === 'ready' && status.count) {
+            const fresh = getSharedEntries();
+            if (typeof Fuse !== 'undefined' && fresh.length) {
+                buildFuseIndex(Fuse, fresh);
+                isInitialized = true;
+            }
+            updateStatus(`${status.count} entries indexed.`, 'success');
+        }
+        if (status.phase === 'error') {
+            updateStatus('Indexing failed. Search is limited to what was already indexed.', 'warning');
+        }
+    });
 }
 
 function updateStatus(msg, type = 'info') {
@@ -310,167 +337,6 @@ async function loadFuseLibrary() {
 }
 
 // ------------------------------------------------------------------
-// 6. PRE‑BUILT INDEX LOADER
-// ------------------------------------------------------------------
-async function loadPrebuiltIndex() {
-    const baseUrl = getBaseUrl();
-    const paths = [
-        `${baseUrl}build/search_index.json`,
-        `${baseUrl}search_index.json`,
-        'build/search_index.json',
-        'search_index.json'
-    ];
-    for (const p of paths) {
-        try {
-            const res = await fetch(p, { cache: 'no-cache' });
-            if (!res.ok) continue;
-            const data = await res.json();
-            if (Array.isArray(data) && data.length > 0) return data;
-        } catch {}
-    }
-    return null;
-}
-
-// ------------------------------------------------------------------
-// 7. DYNAMIC INDEX BUILDER (from /data/ static files)
-// ------------------------------------------------------------------
-async function buildDynamicIndex() {
-    const entries = [];
-    const baseUrl = getBaseUrl();
-
-    // Helper to safely fetch and parse JSON
-    async function fetchJSON(url) {
-        try {
-            const res = await fetch(url, { cache: 'no-cache' });
-            if (!res.ok) return null;
-            return await res.json();
-        } catch { return null; }
-    }
-
-    // 7a. Wiki
-    const wikiData = await fetchJSON('./data/wiki.json');
-    if (Array.isArray(wikiData)) {
-        wikiData.forEach(item => {
-            entries.push({
-                title: item.title || item.name || 'Wiki Entry',
-                content: item.content || item.description || '',
-                url: item.url || '#',
-                type: 'wiki',
-                category: item.category || 'Wiki'
-            });
-        });
-    }
-
-    // 7b. Factions (manifest + individual files)
-    const factionManifest = await fetchJSON('./data/factions/manifest.json');
-    if (Array.isArray(factionManifest)) {
-        for (const f of factionManifest) {
-            const id = typeof f === 'string' ? f : f.id || f.name;
-            if (!id) continue;
-            // Try to load the actual faction file for more content
-            const factionData = await fetchJSON(`/data/factions/${id}.json`);
-            if (factionData) {
-                entries.push({
-                    title: factionData.name || id,
-                    content: factionData.description || factionData.agenda || '',
-                    url: `#/factions/${id}`,
-                    type: 'faction',
-                    category: 'Factions'
-                });
-            } else {
-                entries.push({
-                    title: id,
-                    content: '',
-                    url: `#/factions/${id}`,
-                    type: 'faction',
-                    category: 'Factions'
-                });
-            }
-        }
-    }
-
-    // 7c. Patrons (cosmic)
-    const patronManifest = await fetchJSON('./data/patrons/manifest.json');
-    if (Array.isArray(patronManifest)) {
-        for (const p of patronManifest) {
-            const id = typeof p === 'string' ? p : p.id || p.name;
-            if (!id) continue;
-            const patronData = await fetchJSON(`/data/patrons/${id}.json`);
-            if (patronData) {
-                // Extract description from nested structure
-                let desc = '';
-                if (patronData.lore && patronData.lore.description) desc = patronData.lore.description;
-                else if (patronData.description) desc = typeof patronData.description === 'string' ? patronData.description : JSON.stringify(patronData.description);
-                entries.push({
-                    title: patronData.name || patronData.title || id,
-                    content: desc || patronData.subtitle || '',
-                    url: `#/patrons/${id}`,
-                    type: 'patron',
-                    category: 'Patrons'
-                });
-            } else {
-                entries.push({
-                    title: id,
-                    content: '',
-                    url: `#/patrons/${id}`,
-                    type: 'patron',
-                    category: 'Patrons'
-                });
-            }
-        }
-    }
-
-    // 7d. Regions (try to find region files)
-    const knownRegions = ['acasia', 'ecktoria', 'silkstrand', 'vhasia', 'ykrul', 'valewood', 'aelinnel', 'aelaerem', 'aeler', 'mistlands', 'thepyrgos', 'ubral', 'zakov', 'kahfagia'];
-    for (const region of knownRegions) {
-        const regionData = await fetchJSON(`/data/regions/${region}.json`);
-        if (regionData) {
-            let desc = '';
-            if (regionData.overview) {
-                desc = regionData.overview.tagline || '';
-                if (regionData.overview.genre) desc += ' ' + regionData.overview.genre;
-                if (regionData.overview.mood) desc += ' ' + regionData.overview.mood;
-            }
-            entries.push({
-                title: regionData.title || regionData.name || region,
-                content: desc || '',
-                url: `#/regions/${region}`,
-                type: 'region',
-                category: 'Regions'
-            });
-        }
-    }
-
-    // 7e. Core documents from manifest
-    const docManifest = await fetchJSON('./data/docs/manifest-core.json');
-    if (docManifest && docManifest.documents) {
-        docManifest.documents.forEach(d => {
-            if (d.title) {
-                entries.push({
-                    title: d.title,
-                    content: d.description || d.title,
-                    url: buildDocumentUrl(`/data/docs/${d.file || d.id || ''}`),
-                    type: 'document',
-                    category: d.category || 'Documents'
-                });
-            }
-        });
-    }
-
-    // Deduplicate
-    const seen = new Set();
-    const deduped = entries.filter(e => {
-        const key = (e.title + e.type).toLowerCase();
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-    });
-
-    console.log(`[Search] Built dynamic index with ${deduped.length} entries`);
-    return deduped.length > 0 ? deduped : null;
-}
-
-// ------------------------------------------------------------------
 // 8. FUSE INDEX CREATION
 // ------------------------------------------------------------------
 function buildFuseIndex(FuseLib, indexData) {
@@ -562,7 +428,7 @@ function renderResults(items, query) {
             'region': '🗺️ Region'
         };
         const typeLabel = typeMap[item.type] || '📄 Document';
-        const preview = content.length > 200 ? content.substring(0, 200) + '…' : content;
+        const preview = item.preview || (content.length > 200 ? content.substring(0, 200) + '…' : content);
 
         return `
             <div class="search-result" style="padding:0.5rem 0;border-bottom:1px solid var(--border);">
@@ -608,17 +474,24 @@ export function attachEvents() {
         const newBtn = rebuildBtn.cloneNode(true);
         rebuildBtn.parentNode.replaceChild(newBtn, rebuildBtn);
         newBtn.addEventListener('click', async () => {
-            updateStatus('🔄 Rebuilding index…', 'info');
-            sessionStorage.removeItem('searchIndex');
+            newBtn.disabled = true;
+            updateStatus('Rebuilding index…', 'info');
             fuse = null;
             searchIndex = [];
             isInitialized = false;
             isLoading = false;
             const results = document.getElementById('search-results');
             if (results) results.innerHTML = '';
-            await loadSearchIndex();
-            if (isInitialized) {
-                updateStatus('✅ Index rebuilt successfully.', 'success');
+            subscribeToIndexProgress();
+            try {
+                const rebuilt = await rebuildSharedIndex();
+                if (rebuilt && rebuilt.length && typeof Fuse !== 'undefined') {
+                    buildFuseIndex(Fuse, rebuilt);
+                    isInitialized = true;
+                    updateStatus(`${rebuilt.length} entries indexed.`, 'success');
+                }
+            } finally {
+                newBtn.disabled = false;
             }
         });
     }
@@ -631,7 +504,6 @@ export function search(query) {
 
 export function reloadIndex() {
     fuse = null; searchIndex = []; isInitialized = false; isLoading = false; activeBackend = null;
-    sessionStorage.removeItem('searchIndex');
     loadSearchIndex();
 }
 
@@ -649,6 +521,7 @@ export function getSearchStatus() {
 }
 
 export function destroy() {
+    if (unsubscribeProgress) { unsubscribeProgress(); unsubscribeProgress = null; }
     container = null; fuse = null; searchIndex = []; isInitialized = false; isLoading = false; activeBackend = null;
 }
 
