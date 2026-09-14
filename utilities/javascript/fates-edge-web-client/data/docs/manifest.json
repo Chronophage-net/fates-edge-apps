@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-14T16:03:56.213Z",
+  "generated": "2026-09-14T16:52:51.552Z",
   "documents": [
     {
       "id": "srd",
@@ -506,6 +506,16 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "count_your_exits",
+      "title": "Count Your Exits",
+      "file": "Fates_-_Edge_-_-Count-_-Your-_-Exits.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
       "core": false,
       "active": true
     },
@@ -1543,7 +1553,7 @@
       "active": true
     }
   ],
-  "total_count": 95,
-  "active_count": 95,
+  "total_count": 96,
+  "active_count": 96,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

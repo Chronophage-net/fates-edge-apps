@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Count Your Exits — A Novella of the Belworth</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+</style>
+</head>
+<body>
+<h1>Count Your Exits</h1>
+<p class="subtitle">A Novella of the Belworth</p>
+<p class="marginalia"><em>Being an account of Veralyn Everblood, called Demoneye and Blackrose, from her eleventh year to her coronation; reconstructed from two folders of notation, a tourney roll, and the things people were willing to say afterward.</em></p>
+<p><em>Third of three. A companion to</em> The Widow's Hand <em>and</em> A Roll of the Fallen.</p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><em>Every ounce of gold is an ounce of grain. Opportunity is always cost.</em></p><p>— Sgt. Rekedim Many-Scars, <em>Canray by Convoy</em></p></div>
+<hr class="scene-rule"/>
+<p><strong>A note on the board.</strong> Kon'reh is the game of encirclement and escape. The Ykrul play it before they learn to hunt and the Vhas play it badly and the Viterrans mostly do not play it at all, which is one of the eleven reasons Viterra keeps losing arguments to people it has beaten in the field.</p>
+<p>It has pieces and it has a ring and it has four squares in the middle that everyone wants and that are worth less than they look. Its whole literature comes down to three sentences that a steppe child has by six years old: <em>count your exits before you enter; never commit to a single path; an ally untested is a blade without a sheath.</em></p>
+<p>The last of those is about people, and it is the one this book is about, and it is the one the Fenwoods have built a duchy on.</p>
+<p>There is a fourth sentence, but it is not in the literature, because it is not a move. It has no notation. Two people in this account are known to have played it and one of them wrote afterward, in a manual, in ink, that it must never be done.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT I</span>Mobilization</h2>
+<div class="panel panel-gold instrument"><p><em>Camp is a board. Count roads, not bread.</em></p></div>
+<p class="tale-meta place">Tarlington, in the Belworth. 828–830 AR.</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>She came up the Belworth road in October with eleven in the party, a led horse, a wooden sword she had been told to leave at Valora, and instructions from her father that had been read aloud to the Duke of the Belworth's steward and that amounted to: <em>keep her, correct her, and do not indulge the nonsense.</em></p>
+<p>She was eleven. She had been told it was a punishment. Everybody had been told it was a punishment; her father had said so at his own table in front of forty people, in the voice he used when he had decided a thing and wanted the deciding witnessed.</p>
+<p>Braedyn Fenwood read the letter standing in his own yard with his hat still on, took about four seconds over it, and understood exactly what it was.</p>
+<p>He said nothing whatever. A Fenwood does not.</p>
+<hr class="scene-rule"/>
+<p>Tarlington is not a castle. That is the first thing everyone gets wrong about the Fenwoods and they have never corrected anybody, because a house that is underestimated for four hundred years does not start correcting people in the fifth century.</p>
+<p>It is a <em>seat</em>: a great sprawling terraced thing on the last rise above the Fens, with four courts and a counting-house bigger than the chapel, and vineyards on the south slope, and below it four hundred square miles of drained black ground that was marsh when the Velvano came out of Ecktoria in their wagons and is now the richest farmland on either bank of the river. There is a canal. There are eleven miles of dyke maintained by a schedule that is two hundred years old and has never once been allowed to lapse. There is a bell that is rung when the water is wrong, and it has been rung nine times in forty years, and every time, within an hour, the duke has been standing on the dyke in the rain with his sleeves rolled.</p>
+<p>The Fenwoods are the richest house in Viterra and they came from farmers and they will tell you so before you have got your cloak off.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>There were four wards at Tarlington in her first year and she did not understand for a long time that they were a set.</p>
+<p><strong>Jaennis Fenwood</strong> was nine, and the duke's granddaughter, and small, and had been ill so often that her household had stopped reporting it upward. She had a face that made people carry things for her. She read enormously. She was in the muniment room more than the yard and she was in the yard more than anybody expected.</p>
+<p><strong>Tylan Vayle</strong> was fourteen and the second son of a house that had been nothing a generation before and was now a county, which is a sentence that sounds like good fortune and is in fact a description of a man standing on ice. He was already the size of a grown man and already better than the master-at-arms wanted to admit, and he was the most <em>prepared</em> person Veralyn had ever met — he carried a spare bowstring at eleven; he knew where the keys were; he had never in his life walked into a room he had not first worked out the shape of. She thought this was a temperament for about six years.</p>
+<p><strong>Elyas Everblood</strong> was twelve and was everybody's brother inside a fortnight. He was the youngest son of the Duke of Istovar. He was funny, and generous, and would carry your things, and got a laugh out of a room the way his father had at the same age; and he was a hostage, and every adult in that building knew it, and not one of them ever said the word.</p>
+<p>That is worth putting down plainly, because the book will not come back to it until it matters.</p>
+<p>Oswyn Everblood's armies sat across the Belworth from the Fens. They had sat there for thirty years. They were not aimed at anybody and Oswyn had never in his life broken a word — and Braedyn Fenwood, who had watched an entire generation of that family and had buried most of it, held the man's youngest son in his house and fed him well and had him taught, and the arrangement was called a wardship because that is what it is called.</p>
+<p>Elyas knew. He had known since he was nine. And he had decided, at nine, with the whole of his considerable intelligence, that the correct response to being collateral was to become the single most beloved person in the building — and he had done it, and it had worked, and it was going to go on working for another twenty-five years, and he never once let it show except twice, and the second time was at the end of this book.</p>
+<hr class="scene-rule"/>
+<p>And then there was the fourth thing, who was not a ward and was not a servant and had no office anybody could name, and who was the most consequential person in Veralyn Everblood's life.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>Rekedim came out into the yard on her second morning to watch the new one at the pells, because that is what everybody did, and stood at the rail with his arms folded and said nothing for about an hour and eleven minutes.</p>
+<p>He was eight-and-twenty. He had the steppe face and the steppe hands and not one word of the steppe language, because he had been born in the Fens.</p>
+<p>His father had been a war-leader of the Ykrul who came down on the wrong side of Kargath — Kargath the Last Blade, the one who ate the east for eleven years and whom Braedyn Fenwood and Baldvyn Everblood had met at twenty as two second sons in the Black Banners and had never afterward discussed. Rekedim's people had lost, and run, and come four hundred miles west with what they could carry; and a young Fenwood who had seen them from the other side of a river had taken them in and put them on ground he had drained himself.</p>
+<p>Rekedim was born in the third year after that. He grew up on Fenwood ground eating Fenwood grain and went for a soldier at seventeen into the same company his patron had served in, and came back at six-and-twenty a sergeant of the Red Bill Cadre with the scars that gave him the only name anybody uses.</p>
+<p>He was Elyas Everblood's bodyguard. That was his office. It is written in the household roll and it was true.</p>
+<p>It was also the neatest single arrangement Braedyn Fenwood ever made, and it took Veralyn nine years to see it: the Duke of the Belworth had put a permanent armed man at the shoulder of his most valuable hostage, and the man was somebody who owed the Fenwoods his family's continued existence — which meant Elyas was protected absolutely, and watched absolutely, by the same body, forever, and neither of them could ever raise it, and both of them liked each other enormously.</p>
+<p>That is Fenwood work. That is what they do. They do not build a wall and a gate; they build one thing that is both, and then they are generous about it for thirty years.</p>
+<hr class="scene-rule"/>
+<p>On the third morning Rekedim came to the rail again and this time, at the end, he said:</p>
+<p>"You are not slow."</p>
+<p>Veralyn, who was eleven, and who had been told she was very good by everybody at Valora for four years, said, "Thank you."</p>
+<p>"That was not praise," said Rekedim. "It is a measurement. You are not slow, you are strong for your frame, and your left hand does not know what your right is doing, which will be an advantage until you meet somebody who has noticed. Come and sit down."</p>
+<p>And he took her into the long room off the counting-house where there was a board, and he did not let her touch a piece for eleven days.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>What he taught her, for nine years, can be written on one side of a sheet, and he did in fact write it on one side of a sheet, eight years later, in a field, for soldiers.</p>
+<p><strong>Count to five.</strong> Every plan is a Reforge plan. If taking a thing today cannot be held for five of <em>their</em> turns, it is not a victory, it is a trap you have laid for yourself and walked into first.</p>
+<p><strong>Own the ring.</strong> The four squares in the middle are a lever. The ring is the road. Boys want the middle. Quartermasters want the ring. The middle is where you are seen; the ring is where you are supplied, and a man who is seen and not supplied is a story.</p>
+<p><strong>Weld in two plies.</strong> One piece to close the file, one piece to print a fork two moves ahead. Do that twice and a runner drowns.</p>
+<p><strong>Seed is a depot, not a daring.</strong></p>
+<p><strong>Exits before enemies.</strong> A closed line cuts on <em>their</em> turn, which is the half of the game that beginners never see. Count exits. Spend captures only where exits survive.</p>
+<p><strong>And respect stagger</strong> — which is the tenet nobody remembers, and which means: a piece that has just spent its second special is rooted, and if that piece is <em>yours</em> you planned badly, and if it is <em>theirs</em> you planned well, and the whole difference between the two sentences is whether you did the counting before or after.</p>
+<p>She lost every game for two years.</p>
+<p>She has said since that those two years were the happiest of her childhood and everyone assumes she is being wry.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>He was not kind to her and he was not unkind; he was the first adult in her life who was simply <em>indifferent to her rank</em>, and she was eleven, and it went through her like weather.</p>
+<p>At Valora she had been a problem. At Valora she had been a girl who wanted the pells, which her father could not look at, and a girl with her mother's face, which he could look at even less; and the whole apparatus of that court had been organised, kindly and constantly, around managing her.</p>
+<p>At Tarlington a Ykrul sergeant with no lands and no name beyond a nickname looked at her across a board and said <em>that is a bad move and here is why</em> in exactly the tone he used on Tylan and on Elyas and on a corporal, and did not adjust it by one degree in nine years, and never once in that time asked her how she was.</p>
+<p>She would have followed him into the sea.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>The first lesson he ever gave her he gave secondhand, and he told her so, which is the other reason she loved him.</p>
+<p>She had asked him — at twelve, over a board, losing — who had taught <em>him</em>.</p>
+<p>"A supply sergeant," said Rekedim. "Vhasian. Dead now. I was seventeen and I had two hundred men's bread to move on one road and I was very frightened and very loud about it."</p>
+<p>"What did he say?"</p>
+<p>"He said: <em>camp is a board. Count roads, not bread.</em>" Rekedim moved a piece and took something of hers that she had not been looking at. "Then he taught me the whole of it in about a quarter of an hour, under a canvas awning, on oat-sacks, with chalk on his knuckles. I led a piece to brush the middle and he grunted at me. <em>That is a cut</em> — he said — <em>now do not chase. Fork the far mouth. Two exits, both priced.</em>"</p>
+<p>"And then?"</p>
+<p>"And then," said Rekedim, "my hand went to the piece that wins games, and he caught my wrist."</p>
+<p>He looked up.</p>
+<p>"<em>Rent the middle</em>," he said. "<em>Do not buy it.</em>"</p>
+<hr class="scene-rule"/>
+<p>She was twelve. She did not understand it, and she said so, and he said that was correct and that she would understand it at about twenty and that he would remind her.</p>
+<p>He reminded her twice. The second time was the last conversation they had before the end of this book.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>Here is the thing about the four of them, and it is the reason this novella is the warmest of the three and the reason the ending is what it is.</p>
+<p>They were happy.</p>
+<p>Not in an idyll and not without quarrels; Tylan and Elyas did not speak for a fortnight in the second year over something neither of them would later admit the substance of, and Jaennis could be cold in a way that took two days to notice and four to forgive. But for nine years, on ground that had been marsh and was now the richest in Viterra, four children who each had a reason to be frightened were put in one house and given horses and books and a Ykrul with a board, and they were <em>happy</em>, and every one of them knew it at the time, which is rare.</p>
+<p>They had names for each other that nobody outside used. They had a place on the dyke. They stole wine at fourteen and were caught by Rekedim, who confiscated it, drank it himself in front of them over the following hour while explaining the correct way to steal wine, and then gave them a game each and beat all four in under forty moves.</p>
+<p>Veralyn Everblood was eleven when she came to Tarlington and twenty when she left it for the last time, and she has never in her life been at home anywhere else.</p>
+<p>That is the position at the start. Four pieces, well placed, on good ground, with a road behind them.</p>
+<p>Count the exits.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT II</span>The Seed</h2>
+<div class="panel panel-gold instrument"><p><em>Seed is a depot, not a daring. Seed only when the index is safe.</em></p></div>
+<p class="tale-meta place">Tarlington. 830–836 AR.</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>Jaennis Fenwood was nine when Veralyn came and she was the only one of the four who had not been sent.</p>
+<p>She lived there. Her father was the duke's heir and her father's foot had been born turned in, and Braedyn Fenwood had straightened it himself out of a Thepyrgan text when four masters said it could not be done, and Conlin Fenwood walked with a cane for the rest of his life and ran the duchy better than anybody but his father. Jaennis grew up in that house among people who took a difficulty as a specification.</p>
+<p>She was ill a great deal as a child. Fevers; a thing in the chest at six that nearly had her; a whole winter at seven when she was carried everywhere. By nine the household had stopped reporting it upward, in the way households do, and by eleven she had understood the mechanism of that and had begun using it, and by thirteen she was the only person at Tarlington who could disappear for four days and have nobody look.</p>
+<p>She was not a liar. It is important to be exact. In nineteen years nobody has produced a lie of hers. She is simply the finest living practitioner of a thing that is not lying, which is the arrangement of a room such that the true thing you are about to say will be understood as something else.</p>
+<p>Her grandfather saw it in her at about twelve and never told her so, and never told anybody else, and made one remark on the subject in his life, to his son, at a window, which Conlin wrote down:</p>
+<p class="marginalia"><em>"I have been given dutiful sons and clever daughters, and I am grateful. And I have been given one who is neither, and she is the best of us, and God help whoever is standing next to her when she finds out what she is for."</em></p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>They were sisters first and it was real.</p>
+<p>That has to be said flatly and defended, because everything afterward has been read backward by people with an interest, and because the alternative reading — that it was strategy from the first afternoon — is both more convenient and wrong.</p>
+<p>A sickly girl of nine and a hard-staring girl of eleven were put in the same wing of the same house and the older one could not sit still and the younger one could not go out. So the older one brought things in. Frogs, at first, and then, when that was discouraged, news; and then, when the news ran out, the games.</p>
+<p>Veralyn taught Jaennis Kon'reh in the second year because she wanted somebody to lose to her and Elyas would not take it seriously and Tylan would not lose.</p>
+<p>Jaennis beat her in eleven weeks and then, quite deliberately, stopped beating her for about a year and a half.</p>
+<p>Nobody knows this. There is no record of it anywhere. It is in this book because Jaennis Fenwood told one person, at thirty, in a bad hour, and that person wrote it down; and it is the earliest dated instance in the whole of her life of the thing she does.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>Here is what she had, and what it cost, and it is the debt that made her one of the four.</p>
+<p>At thirteen Jaennis Fenwood understood two facts about herself and put them together.</p>
+<p>The first was that she had been ill since infancy and was small and narrow and that the women of that household talked, over her head, as women do, about who was built for what.</p>
+<p>The second was that she was the granddaughter of a duke in a house that had doubled its holdings in two generations through marriages, and that her entire value — her <em>whole</em> value, the only column she appeared in — was as a carrier.</p>
+<p>She did the arithmetic at thirteen and arrived at a certainty that has never left her: that the thing she was for would kill her.</p>
+<p>She has never said this aloud to a living soul. She said it once to a physician in Faemley, at sixteen, in the guise of asking about a cousin; and what she took away from the interview was not comfort but a list, and she has been quietly, carefully, expensively obtaining items from that list for eleven years.</p>
+<p>That is the secret. It is not adultery and it is not murder and it is not treason. It is a small locked box of dried preparations, and the certain knowledge that if it were ever opened in front of her grandfather she would go from being the cleverest asset in the Belworth to being a defective one in about four seconds.</p>
+<p>Every single thing Jaennis Fenwood has ever done has been done by a woman standing on that box.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>The lane opened over four years and the reader should be able to see it and Veralyn could not.</p>
+<p>It went like this.</p>
+<p>At fourteen and twelve they shared a bed in winter because the east wing was cold and everybody in that house did, and nobody thought about it, including them.</p>
+<p>At fifteen and thirteen Jaennis began being unwell in a particular way — not falsely; she was unwell; she was simply unwell <em>on days that were arranged</em> — and Veralyn began sitting with her, which she had not done before, and which she was extremely bad at, and which Jaennis praised her for.</p>
+<p>At sixteen and fourteen there was a quarrel, the only real one, about nothing — about a horse — which Jaennis allowed to run for nine days and then ended by coming to the yard in the rain and saying one sentence that Veralyn has never repeated to anybody and has never forgotten.</p>
+<p>At seventeen and fifteen Veralyn went to Lence in a wagon and came back with a village behind her, and she did not speak for eleven days, and Jaennis was the only person she let into the room.</p>
+<p>And at eighteen and sixteen, in the spring, it was something else, and neither of them could have told you which week.</p>
+<p>Every step of it was deniable. Every step of it had an exit. At no point was there anything a hostile examiner could put in front of a duke. And every step of it was also <em>true</em> — Jaennis loved her then and loves her now and would say so under oath — which is exactly what makes it Fenwood work, because the house does not manufacture; it <em>arranges</em>, and the material it arranges is generally real.</p>
+<p>Veralyn Everblood experienced the whole of it as having been chosen.</p>
+<p>She had been a problem at Valora for eleven years. She had a face her father could not look at. She was very good at one thing and it was a thing nobody wanted her to be good at. And a clever, beautiful, subtle girl had looked across a house full of people and picked <em>her</em>.</p>
+<p>She has never, in twelve years, asked who opened the lane.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>Rekedim knew.</p>
+<p>He knew by the third year and he said nothing for six, because it was not his office, and because he had one rule about the four of them that he never broke, which was that he would teach them the board and he would not play them.</p>
+<p>He broke it once and it was not about this.</p>
+<p>But there is a moment, recorded in nobody's account except his own notation, which he kept the way he kept everything, and which survives because his papers came to the crown with the rest.</p>
+<p>In the sixth year he set Veralyn a problem. It is on the sheet in his hand and the sheet is dated. It is a standard tightening position, four moves from a weld, of the kind she could do in her head by then.</p>
+<p>And in the margin, beside her solution, which is correct and fast and brutal and takes the far mouth in three, he has written four words.</p>
+<p class="marginalia"><em>She never checks behind.</em></p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>Brightstride knew too, eventually, and later, and the book will come to it. He was her brother and they were strangers until they were twenty and he worked it out inside a month of having her at court, because he was not clever but he was <em>decent</em>, which is a different instrument and sometimes a sharper one.</p>
+<p>And he decided — and the reader will watch him decide — that a rumour is a thing that only exists once somebody official has looked at it, and that he was the only official person in the kingdom, and that he was therefore not going to look.</p>
+<p>He held to that for two years and it cost him more than anybody knew, and it is on the short list of things that killed him.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>One more thing about the Seed, and then the book will go to Lence.</p>
+<p>In the tenets it is the fourth, and it is the one that sounds least like the others, because it is not a warning against the enemy. It is a warning against <em>yourself</em>.</p>
+<p><em>Seed is a depot, not a daring.</em> You put a thing down on the board because you will need supply there later, when the fighting has moved, and the whole discipline of it is that you must do it on a quiet turn, when nothing is happening, when it is not exciting, when you have checked the index and your enemy's strongest piece is two moves off and out of tricks.</p>
+<p>If you plant because it feels bold, it is not a depot. It is a burned wagon eleven turns from now.</p>
+<p>Rekedim taught that to four children in a long room off a counting-house and every one of them learned it, and three of them applied it to the board only.</p>
+<p>Jaennis Fenwood applied it to a person, at nine years old, without being taught, and checked the index every single time for eleven years.</p>
+<p>She has never once planted on a loud turn.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT III</span>The Lane</h2>
+<div class="panel panel-gold instrument"><p><em>Own the ring. The four squares are a lever; the ring is the road.</em></p></div>
+<p class="tale-meta place">Lence, and a village in the royal domain. 832 AR.</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>The Sack of Lence is taught in two ways and both of them are wrong.</p>
+<p>In Viterra it is taught as an outrage that got out of hand: a proud house insulted, a quarrel over homage, a punitive ride that went further than anybody meant. In Vhasia it is taught as the end of the world, which is closer, and is also a description of the weather rather than of the cause.</p>
+<p>It was a Kon'reh position, and it was played by one man over thirty years, and the only thing about it that was not planned was the mirrors.</p>
+<hr class="scene-rule"/>
+<p>Set it out the way Rekedim set it out afterward for four students, on a board, in a long room, in the winter of the same year. He used the actual pieces. It took him an hour and eleven minutes and nobody interrupted.</p>
+<p><strong>The ring first.</strong> For thirty years the Fenwoods had not fought anybody. They had bought crossings. They had married Tirens and Ubrals and one Silkstrand girl with a shipping interest. They had taken the maintenance of roads nobody wanted the maintenance of, and had then, quietly, been the only people who knew where those roads went. By 830 you could not move a wagon from Aeler to the Vhasian grain country without paying a Fenwood twice, and half the men who paid did not know whom they were paying, because the Fenwoods had never once put their name on a toll-board.</p>
+<p><em>The ring is the road.</em> That is not a metaphor in the Belworth. It is a description of an account.</p>
+<p><strong>Then the lever.</strong> The Vhasian crown — which was in the last useful decade of the Sun Court and did not know it — rebuked House Fenwood for holding land in Vhasia and declining homage. The rebuke was correct. That is the second time in this trilogy that a crown has been entirely right about a tenure and has come off worst for it, and it will not be the last.</p>
+<p>Braedyn Fenwood had been waiting for that rebuke, in the specific sense that he had arranged the circumstances that made it inevitable and had then declined, for six years, to make it easy to withdraw.</p>
+<p><strong>Then the weld, in two plies.</strong> Istovar's great houses came in — they had been in the ring a decade. And then the Everbloods of Aberiel came in, under Wymund son of Oswyn, which was the piece nobody had counted, and which was the one that made the position unanswerable; and they came in because Braedyn Fenwood had spent thirty years being the best friend that family ever had and had never once asked them for anything.</p>
+<p><strong>And King Baldvyn did not call the banners of Viterra.</strong></p>
+<p>He was four-and-sixty and dying of a thing in his stomach and he had loved Braedyn Fenwood since they were two second sons in the Black Banners with the same scar across the same knuckle, and he did not call the banners, and he has never been forgiven for it in Vhasia and never been asked about it in Viterra.</p>
+<p><strong>Then they killed the Blue.</strong></p>
+<p>The Ford of Ashes, and the Sun King's army ground into the mud, and Lence, and the royal family dead — the last Blood King and every known cousin — and the great hall burning so hot that the mirrors ran down the walls and made the one image out of that year that everybody has.</p>
+<hr class="scene-rule"/>
+<p>"Now," said Rekedim, to four students, in the winter, with the pieces where he had put them. "What is the mistake?"</p>
+<p>Tylan said there wasn't one.</p>
+<p>"There is always one," said Rekedim. "Tenet the first."</p>
+<p>And Jaennis, who was thirteen, said: "He cannot hold it for five."</p>
+<p>"Go on."</p>
+<p>"He has killed their Blue and he has no claim," she said. "He does not want their throne and he has not got a man who does. So the board reforges, and it reforges <em>around</em> a hole, and everybody with a banner runs for the shortest lane at once." She put one finger on the board without moving anything. "He has not won Vhasia. He has <em>opened</em> it. And he is two-and-sixty."</p>
+<p>Rekedim looked at her for a moment.</p>
+<p>"That is correct," he said, "and it is not a mistake, and you will understand the difference when you are older." He began putting the pieces back in the box. "He is not playing to hold. He is playing to <em>reforge</em>, because the board as it stood could not be won and he knew that at thirty. He has taken a game he was losing slowly and turned it into a game where nobody is winning. Then he will be the best-supplied man in the wreck."</p>
+<p>"That is monstrous," said Elyas, cheerfully.</p>
+<p>"It is <em>quartermastery</em>," said Rekedim. "Which is monstrous. Yes."</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>Veralyn was not in the long room for that lesson. She was, but she was not; she had come back eleven weeks before and she sat at the end with her hands in her lap and did not say one word for the whole hour and eleven minutes, and Rekedim did not ask her to.</p>
+<p>Because she had been there.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>She went in a supply wagon. She was fifteen. She dressed as a page and she went with the Fenwood train because the Fenwood train was the only train anybody at Tarlington could get into, and she squired for Wymund the Red, who had known exactly who she was from the first morning and had taken about four seconds over it and had said nothing whatever, because he is his father's son.</p>
+<p>Lyonel Vayle went with her, squiring for Braedyn the Younger, and Lyonel Vayle went because Lyonel Vayle would go anywhere, loudly.</p>
+<p>Her father had expressly forbidden it. That is in three chronicles and it is true and it is also not the reason she went.</p>
+<p>She went because she was fifteen and had been drilled for four years by three masters and had never once been allowed to find out whether any of it was real, and because everybody she loved was going, and because the alternative was a winter at Tarlington being the girl who had not gone.</p>
+<p>There is no more mystery in it than that. The mystery is all afterward.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>The sack is not in this book.</p>
+<p>That is a decision and it is worth stating. There are four hundred pages of Lence in the other sources and every one of them is a man describing a city he was in for nine days, and there is nothing this novella can add to the burning of a hall except one more hand.</p>
+<p>What is in this book is what a girl of fifteen did with what she saw, and the answer is that for the first six days she did it very well.</p>
+<p>She was steady. She carried what she was told to carry. She was in the second rank at the Ford and was not blooded there and was not disappointed about it, which Wymund the Red remarked on afterward, twice, because it is not what fifteen usually does. She held horses. On the fourth night she sat up with a man of the Red Bill who was dying slowly of a gut wound and did it properly, without talking, for six hours, and he was forty and she was fifteen and she has never mentioned it to anybody.</p>
+<p>And on the seventh day the city went, and she was in it, and she came out of it at the end of the ninth day.</p>
+<p>She is reported to have killed two men in Lence. She has never confirmed or denied that and the book will leave it where she left it.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>Coldmorrow was a fortnight later and four days' ride, in the royal domain, and it was not part of the war.</p>
+<p>Somebody at the camp fire said a name.</p>
+<p>That is all it took. Somebody — a Fenwood captain, probably; it has never been established, which is itself worth noticing — said, in the way men do after a sack when they are telling each other who is who, that the last of the Thornhills was alive, and was a cooper, and was in a village in the royal domain about four days off, and that the old king had spared him in a yard at Brigh as an infant with his dagger already out.</p>
+<p class="marginalia"><em>He is a child. Prune him gently, or the root will spread.</em></p>
+<p>Veralyn Everblood was fifteen years old and had been taught for four years by a Ykrul logician that an account left open is a liability, and she had been taught for eleven years before that, at her father's court, by everybody, that the Thornhills had killed her family's kings.</p>
+<p>She took nine men and she went.</p>
+<hr class="scene-rule"/>
+<p>Logan Thornhill was a cooper of about five-and-thirty. He had a wife and a daughter of two. He had never in his life done anything to anybody. He had been spared in a yard before he could hold his head up, by a king, in front of four thousand people, as an act of mercy that the whole of Viterra could still quote.</p>
+<p>He fought badly and with everything he had, which is the only thing about him that anybody wrote down.</p>
+<p>He wounded Lyonel Vayle, who was seventeen and was showing off and had not counted anything.</p>
+<p>And Veralyn Everblood killed him with a mace, in single combat, in front of nine men, and it was clean and it was fast and she has always been able to describe it.</p>
+<hr class="scene-rule"/>
+<p><strong>And then she burned the village.</strong></p>
+<p>The whole of it. Eleven houses, a barn, a rope-walk and a mill. It took most of the afternoon. The people got out; there is no account anywhere of a death at Coldmorrow other than Logan's, and men who were there have said so under oath four separate times, and the book accepts it.</p>
+<p>But she burned it, at fifteen, for no reason that any of the nine men could afterward give, and one of them — the youngest, who was nineteen and who wept when he was asked about it eleven years later — said the only thing anybody has ever said about her state:</p>
+<p class="marginalia"><em>"She was not in a rage. Everyone says she was in a rage. She was giving orders."</em></p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>She cannot remember it.</p>
+<p>This is the fact the whole of the rest of this book turns on and the book is going to be exact about it, because the pamphlets have made it a wickedness and the apologists have made it a swoon and it is neither.</p>
+<p>She can remember Lence. She can remember the man on the fourth night and the gut wound and what he asked for. She can remember the ride, and the camp fire, and the name being said. She can remember Logan Thornhill's face and his hands and the way he came at her and exactly what she did and how long it took and what it sounded like, and she has described that, in daylight, to three different people, without a tremor.</p>
+<p>And then there is the afternoon, and there is nothing in it.</p>
+<p>Not a blank that frightens her. That would be manageable. What is in the place where the afternoon should be is a <strong>sentence</strong>, and it is always the same sentence, and it is not in her own cadence, and she has produced it verbatim for eight years whenever anybody raises the name:</p>
+<div class="panel panel-gold instrument"><p><em>"Seems I do recall Coldmorrow. It was a village near Lence. We burned it."</em></p></div>
+<p><em>Seems.</em> <em>We.</em></p>
+<p>She is the most direct person in two kingdoms. She has never in her life used <em>seems</em> about anything else, and she has never in her life hidden behind a plural.</p>
+<p>Somebody at some point wrote her a line, or she wrote it for herself at fifteen in a wagon on the way home, and she has been reading it off ever since, and she does not know she is reading.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>She came back to Tarlington in the autumn and did not speak for eleven days.</p>
+<p>Her father sent a letter. It is the coldest document in a family that produces cold documents and it does not mention Coldmorrow at all, which is the cruellest thing in it, because it means he had heard and had decided the offence was the disobedience.</p>
+<p>Braedyn Fenwood said nothing. Rekedim said nothing. Tylan Vayle, who was eighteen and had not been allowed to go and had been quietly furious about it for four months, took one look at her in the yard and went and sat on the dyke with her for an entire afternoon without saying a word, which is the single most useful thing anybody did for her that year and which she has never forgotten and has never repaid.</p>
+<p>Elyas made her laugh on the fourth day. It took him four days, which for Elyas Everblood is a catastrophic failure, and he was frightened by it, and he went away and worked at it and came back and managed it.</p>
+<p>And Jaennis Fenwood was the only person she let into the room.</p>
+<p>For eleven days, in the east wing, with the door shut. And whatever was said in there has never been reported by either of them.</p>
+<p>But this is what it did, and Jaennis did not plan it and could not have and has never claimed otherwise:</p>
+<p>It made her the safe place. Permanently. At the exact hour when a girl of fifteen came home with an afternoon missing out of her head, one person was inside the room and everybody else was outside it, and that arrangement has never since been altered by anything, including everything.</p>
+<p><em>Seed is a depot, not a daring.</em> You do not plant on a loud turn.</p>
+<p>It was the loudest turn of her life, and Jaennis Fenwood did not plant anything at all, and that is precisely why it held.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT IV</span>The Cross</h2>
+<div class="panel panel-gold instrument"><p><em>Exits before enemies. A closed line cuts on their turn. Count exits; spend captures only where exits survive.</em></p></div>
+<p class="tale-meta place">Valora, and the Eryas Citadel. 834–836 AR.</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>Baldvyn the Good knew he was dying for about a year and used it well, which is more than most men manage.</p>
+<p>He pardoned his wife. That is in the other book. He set his affairs in order in the way a king does, which is to say he made eleven appointments that outlived him by thirty years and that nobody noticed at the time. And then, because he was who he was, he threw the largest tourney in eighty years, and told the Chancellor it was for the kingdom's morale, and told Braedyn Fenwood at his own table, in four words, what it was actually for.</p>
+<p class="marginalia"><em>"I want a good week."</em></p>
+<hr class="scene-rule"/>
+<p>Veralyn was seventeen and had not been to court in six years.</p>
+<p>She asked to enter. She did it correctly: through the Earl Marshal, in writing, at the proper interval, in a letter Rekedim made her rewrite twice, the second time for being too clever.</p>
+<p>The Earl Marshal took it to the king because there was no rule to apply. The rule had never been written because the situation had never arisen, and a kingdom which has not written a rule has two choices, and Viterra's Parlement would have taken nine months over it.</p>
+<p>Baldvyn Everblood took four seconds.</p>
+<p>"She is an Everblood of the body," he said, "and she is not a knight, and there is nothing in the lists that says a man. Let her in and let us find out."</p>
+<p>Eleven people in that room assumed he was being indulgent with his granddaughter. Braedyn Fenwood, who had known him for eight-and-forty years, went and stood at a window afterward and laughed until he had to hold on to the sill, because he had watched the old man do that to people since they were twenty and it had never once been indulgence.</p>
+<p>He wanted to find out. That is all. He had heard about the girl for six years from a duke who does not exaggerate, and he was dying, and he wanted a good week, and the best entertainment available to a dying king is to open a door and see what comes through it.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>She unhorsed Sir Arin Tymber, who was a good lance and twenty-four and took it beautifully and has dined on it for six years.</p>
+<p>She unhorsed Sir Lerris Fenwood, who was bright and charming and shallow and who expected little and of whom little was expected, and who afterward described the experience in a phrase that got around: <em>"I did not lose to a woman. I lost to a Fenwood education, which is worse, because I had one."</em></p>
+<p>And she unhorsed Sir Ouen Longblood — Valdais's eldest, two-and-twenty, out of Adria — who had come past her in the lists on the second morning and said, not quite quietly enough, something about the look of Vhas in her face and what her mother's people were known for in the hills.</p>
+<p>She put him down in the second course and then killed his horse.</p>
+<p>It is the ugliest thing she did in public in her life and she has never explained it and never apologised for it and never once pretended it was an accident. The horse was worth eleven marks and she paid for it out of her own purse before the afternoon was over and had the receipt entered, which several people found colder than the act.</p>
+<p>Braedyn Fenwood, watching from the gallery, said one word, to nobody, which his granddaughter heard and repeated to exactly one person twenty years later.</p>
+<p>He said: <em>"Ah."</em></p>
+<hr class="scene-rule"/>
+<p>She was beaten in the fifth course by Tylan Vayle, who was twenty, four inches taller and two stone heavier, and who has never in twenty years let one single man say that he beat her on anything but reach — including once, at a table in Valora, to a lord who persisted, with a knife laid flat on the board between them and a silence of about nine seconds.</p>
+<p>They embraced in the lists. Everybody saw it. Everybody read it as chivalry.</p>
+<p>It was two children out of the same house, one of whom had just done a job.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>And then her father came down into the yard.</p>
+<p>Wyllmot Everblood, eight-and-thirty, King of Viterra in all but the crown his father was still wearing, who had exiled his daughter at eleven for wanting the pells and had not written her a warm sentence in six years — came down off the gallery in front of four thousand people, and walked the length of the lists, and took her head in both his hands, and put his forehead against hers.</p>
+<p>And said something nobody heard.</p>
+<p>She has never told anybody what it was. Not Jaennis. Not Rekedim. She was asked, once, at the worst possible moment, by somebody entitled to ask, and what she said was: "It was between him and me, and he is dead, and it is still between him and me."</p>
+<p>They were reconciled from that hour.</p>
+<p>It was two years. She did not know it was two years.</p>
+<hr class="scene-rule"/>
+<p>Baldvyn the Good died eleven weeks later.</p>
+<p>He was six-and-sixty and he had been king for seven-and-thirty years and had done exactly one thing that anybody remembers doing and it was a mercy in a yard at Brigh, and the root spread, and it was pulled out of the ground at Coldmorrow by his own granddaughter five-and-thirty years later, and he lived long enough to know that and never once mentioned it to her.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>The Seven Week Uprising began in the spring of the thirty-sixth year in the Aelerian foothills.</p>
+<p>There is a whole other book about why. It is in the other book. What the men at Valora knew, and all they knew, was that a sect of Myrmis-worshippers had begun killing nobility, that eleven shrine-houses had been granted out and their nails drawn on the king's ruling over the preceding four years, and that the sect had a champion who was a Renard of the Kaerndal line, third cousin to the queen.</p>
+<p>Wyllmot Everblood, who had come back from Galalina with God at eight-and-twenty and had been patient about it for six years, which for him was superhuman, was not patient about this.</p>
+<p>He took the field in nine days.</p>
+<p>Braedyn Fenwood counselled him to starve the citadel. It was a mountain fort in bad country with one road and a cistern; the Chancellor of Viterra, who had been ending sieges with a counting-house and two clerks since before the king was born, told him it would take eleven weeks and no assault at all.</p>
+<p>The king said that eleven weeks would be eleven weeks of the north watching him wait.</p>
+<p>And Braedyn Fenwood — who despised him, and had left a field and been sick behind a wall over his work at Charau fifteen years before, and who has never denied either — said the last thing he ever said to him, which is recorded because there were nine people in the tent:</p>
+<p class="marginalia"><em>"Your Grace, the mountain does not care how you look."</em></p>
+<p>Wyllmot went in on the fourth day, ahead of his own household, because the alternative was to stand in a field and be looked at.</p>
+<p>He was the third man of that line to do it and it is the third time in this trilogy and the reader is invited to notice that all three of them were right about something else at the time.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>Veralyn was nineteen and she was not there.</p>
+<p>She was at Valora holding the west road with two hundred horse, which was a real command and a correct one, and she got the word at the second hour and rode two hundred and forty miles in four days and came into a camp that had been leaderless for three of them and had begun, quietly, to come apart.</p>
+<p>What she did in the next nine weeks is the reason anybody in Viterra took her seriously afterward, and it is almost entirely logistics, and nobody sings about it.</p>
+<p>She did not assault the citadel. She sat down in front of it with her brother — who arrived on the sixth day, twenty-one years old, crowned in the field, and who had the good sense, which was considerable, to say in front of the whole camp <em>my sister has the dispositions</em> and then keep his word — and she starved it exactly as Braedyn Fenwood had said, in eleven weeks, less two days.</p>
+<p>And while it starved she took the foothills apart. Not with fire; she had done fire at fifteen and something in her would not go near it. She did it with the ring: the four passes, the two fords, the market at Cair, the dwarf-road tolls. She closed the lanes and she priced the exits and she let the sect's own people walk out of it in ones and twos over two months, and by the end of it the thing that had begun with eleven murders in a spring was four hundred hungry men in a rock with no road.</p>
+<p>Her own account of it, to Rekedim, in a letter, is one line and it is the proudest thing she ever wrote:</p>
+<p class="marginalia"><em>I did not chase. I forked the far mouth.</em></p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>On the last day she went into the citadel with eleven men and then, at the inner sanctum, with none.</p>
+<p>That is the fact that everybody knows and that everybody has read as swagger. It was not swagger and it was not madness. She had been in the place for two hours by then and it was over; the fighting had stopped; men were sitting down in corridors. She went the last forty feet alone because the man at the end of it was her cousin and because she had worked out — correctly, in about four seconds, on no information at all — that he would not draw if she came alone.</p>
+<p>He did not draw.</p>
+<p>Gelfrey Renard was three-and-thirty and devout and had been dull his entire life until sixteen years ago when somebody said eleven words to him in a passage, and he stood at his altar in his own sanctum with four hundred men starving behind him and he put his hands at his sides.</p>
+<p>She killed him with his own dagger, on the altar, through the heart.</p>
+<p>She has been asked about that a great many times, because it is the one thing in her life that looks like cruelty and reads like ritual. And what she has said, every time, in the same words, is that he had a dagger at his belt and she had come in without a weapon in her hand to make him not use it, and that when she got to him he would not take it out, and that somebody had to.</p>
+<p>Nobody has ever been able to find a fault in that answer. It is completely coherent. It accounts for every observed fact.</p>
+<p>It is also not what a person says about a thing they chose. It is what a person says about a thing that was arranged.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>And a sword was found beside the altar.</p>
+<p>Unmarked. Perfectly balanced. Light, and very sharp, and it will not chip. Nobody remembers carrying it in. Nobody has ever claimed it. The inventory of the citadel, which was taken in the proper form by a Fenwood clerk over three days because the Fenwoods inventory everything, does not list it, and the clerk was asked twice and said twice that he could not have missed it and that he must have.</p>
+<p>She picked it up because it was there and it was good and hers had gone into a man's ribs and stuck.</p>
+<p>She has not been more than a few feet from it since.</p>
+<p><strong>It has never done anything.</strong></p>
+<p>That has to be said plainly and it will be said again at the end of this book. In four years that sword has not glowed, moved, spoken, warmed, sung, resisted, or turned in her hand. It has never once been observed to do a thing that a very good sword would not do. Four hundred people have seen it. Two armourers have handled it. A Thepyrgan who does not believe in anything examined it for an hour at her own request and pronounced it the finest piece of work he had ever been allowed to hold and entirely ordinary.</p>
+<p>Nobody knows it is anything.</p>
+<p>Including her.</p>
+<hr class="scene-rule"/>
+<h3>viii.</h3>
+<p>Here is the one anomaly, and the book puts it here, once, in its proper place, and does not editorialise.</p>
+<p>Rekedim Many-Scars had kept her games since she was eleven. Not out of sentiment — he kept everybody's; he kept his own; his papers came to the crown in nine boxes and are the most complete record of a single player's development that exists in either kingdom. He kept them because he is a logician and because a man who does not write it down is guessing.</p>
+<p>In the winter after Eryas he did what he did every winter, which was to go through the year's sheets.</p>
+<p>And the shape had changed.</p>
+<p>Not the quality. Her play in 837 is not better than her play in 835; he has said so in writing, twice, and he was not a man who softened things. The positions she reaches are the positions she would have reached. The judgment is identical. He went over it for a month looking for a decline and did not find one and was, by his own account, relieved.</p>
+<p>What changed is the <strong>interval</strong>.</p>
+<p>He had been noting her deliberation times since she was thirteen, in the margin, in a shorthand of his own, because tempo is half the game and he wanted her to see her own habits. And for six years the notation shows the same profile: fast on the ring, fast on trades, and then, before the middle, a <em>pause</em> — three or four beats, sometimes longer, every time, without exception, the interval in which a player who has been properly taught counts her exits.</p>
+<p>After Eryas the pause is not there.</p>
+<p>Not shortened. Gone. She enters the middle at the same speed she posts a screen.</p>
+<p>And her moves are the same moves. That is the part he could not get past, and that is why there are four sheets in his hand where he has worked the same position eleven times looking for an error, and there is no error, and at the foot of the fourth sheet he has written, in the only piece of unprofessional prose in nine boxes:</p>
+<p class="marginalia"><em>She does not need the pause. Or she has stopped being able to take it. These are not the same and I cannot tell them apart from the outside.</em></p>
+<p>He raised it with her once, that winter, flatly, over a board, in about four sentences.</p>
+<p>She said she had got faster.</p>
+<p>He said, "Yes," and put the pieces away, and never raised it again in his life.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT V</span>The Weld</h2>
+<div class="panel panel-gold instrument"><p><em>One piece to close the file, one piece to print a fork two plies ahead. Do this twice and a runner drowns.</em></p></div>
+<p class="tale-meta place">Valora. 836–838 AR.</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>They were strangers.</p>
+<p>That is the fact people cannot hold on to, because by the end they were the closest thing either of them had, and because the songs have them as devoted from the cradle. They were not. They were fostered apart at eleven and nine and did not spend a consecutive month in the same building for ten years, and when Baldvyn Brightstride was crowned in a camp in the Aelerian foothills at one-and-twenty he was meeting his sister for the fourth or fifth time.</p>
+<p>He grew up beloved at Valora. She grew up useful at Tarlington. Those are two entirely different educations and they produce two people who cannot, at first, find anything at all to say to each other after the first quarter of an hour.</p>
+<p>What saved them was the siege.</p>
+<p>Nine weeks in front of a rock with nothing to do but the work, and a young king who had the enormous good sense to say <em>my sister has the dispositions</em> in front of the whole camp and then never once, in nine weeks, interfere with them. She had expected to have to fight him for it. She had drawn up, on the ride, a whole argument with exits in it.</p>
+<p>He gave it to her in a sentence and went and sat with the wounded, which he was better at than she was, which she noticed, which annoyed her, which was the beginning.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>He was Harald.</p>
+<p>Nobody at that court said so, because nobody at that court had known Harald the Bold, who reigned ten days and took an arrow at a gate nine-and-thirty years before anyone in the room was born. Two people knew. Braedyn Fenwood knew at second hand, through the only man who ever loved him. And the Queen-Mother knew out of the chronicles and had known since the boy was nine and had never said one word about it to anybody.</p>
+<p>He was decent the way water is wet. He was brave, and fair, and not very wise, and did not need to be. He was <em>thorough</em> — put a wrong thing in front of him and he could no more leave it than breathe — and he was liked, God, he was liked; he came into a hall and it improved.</p>
+<p>And he was trying, decently and vainly and with his whole chest, to hold together a court that had a Renard dowager in it, a Fenwood chancellor under it, a Longblood claimant west of it, earls in the north who had opinions about women, and a treasury with eleven years of Lence in it.</p>
+<hr class="scene-rule"/>
+<p>They worked out their division inside a season and it held for two years.</p>
+<p><strong>He thought he could temper her.</strong> He thought — and said, more than once, in the tone of a man who has read a little and believes it — that his sister was a magnificent instrument that went off too early, and that what she needed was somebody beside her saying <em>wait</em> at the right moments, and that he could be that.</p>
+<p><strong>She thought she could harden him.</strong> She thought — and never said, which is the difference between them — that her brother was the best man she had ever met and that being the best man you have ever met is a fatal condition in that family, and that if she stood close enough and did enough of the ugly work herself, he might get to forty.</p>
+<p>Both of them were half right. Both of them were running out of time, and neither knew it, and the awful thing about reading their correspondence is how much of it is about the spring planting.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>Her office had no name. In the rolls she is <em>the Duchess of Aberiel</em> from 837 and nothing else, and what she actually was, for two years, was the thing a decent king needs and cannot be.</p>
+<p>She went north in the first autumn and settled a two-hundred-year quarrel between two earls over a river by the simple method of buying the river. She sat in on the Parlement and said nothing for nine sessions and then said one thing in the tenth that ended a debate. She audited the Aberiel tolls herself, personally, over a winter, with two clerks, in the Fenwood manner, and found four thousand marks, and did not prosecute anybody, and made certain that eleven men knew she had found it. She broke a strike of the dyke-men in the Belworth by standing on the dyke in the rain with her sleeves rolled, which was theatre, and which she had got off a man who had done it for real nine times.</p>
+<p>And she closed things. That is what she was for.</p>
+<p>A quarrel gated here. A marriage held up there. A grant not refused but not signed. A pension continued at the old rate. A wardship "still under consideration" for four years. Nothing punitive; nothing anybody could point to; every single one of them a small perfectly legal act with a perfectly good reason, and every single one of them a file closed and a fork printed two moves ahead.</p>
+<p>By the summer of 838 there were — a clerk counted them afterward, for the crown, and the number is in the roll — <strong>nineteen</strong> open matters in the kingdom of Viterra in which the Duchess of Aberiel had an interest, none of which had moved in eighteen months, every one of which had a party who wanted it moved.</p>
+<p>Nineteen knots.</p>
+<hr class="scene-rule"/>
+<p><strong>Was she doing it on purpose?</strong></p>
+<p>The book will not say, because she does not know, and because the question is badly formed.</p>
+<p>Every one of the nineteen is defensible on its own merits and eleven of them she would have done identically as a private person. She was her brother's enforcer and she was loyal and she loved him and there is not one act in those two years that a hostile examiner could call disloyal.</p>
+<p>And she had been trained for nine years by a man whose fifth tenet is that a closed line cuts on the enemy's turn.</p>
+<p>Rekedim's note from the sixth year is four words and it was about a board.</p>
+<p class="marginalia"><em>She never checks behind.</em></p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>Jaennis came to court in the first spring, because her grandfather was Chancellor and because she was nineteen and because the reason she came is the reason that is written down.</p>
+<p>Baldvyn Brightstride had been in love with her since he was thirteen.</p>
+<p>That is not construction and it is not Fenwood work and it should be said kindly, because it is the one uncomplicated thing in this chapter. They had met four times as children; he had carried it around for eight years the way a decent boy does; and when he was crowned at one-and-twenty the first genuinely selfish thing he did in his life was to look down the list of what a king may have and find her name on it.</p>
+<p>And she had been in love with him since she was eleven. That is also true. Her own hand, in a letter she did not send, at seventeen.</p>
+<hr class="scene-rule"/>
+<p>So a young king married the Chancellor's granddaughter in the spring of 838 and the whole kingdom was delighted, and the Duchess of Aberiel stood four feet away in cloth of silver and was delighted, visibly, for nine hours.</p>
+<p>What Veralyn Everblood felt that day she has never described and this book will not invent it.</p>
+<p>It will only set down the three things that were true at once, because all three were, and because the inability of anybody involved to rank them is the whole of the Fenwood disease:</p>
+<p>That Jaennis loved him. That Jaennis loved her. And that a woman who has spent eleven years standing on a locked box of dried preparations had just married the one man in the world whose entire requirement of her was an heir.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>He knew.</p>
+<p>He worked it out inside a month of having them both at Valora, because he was not clever but he was decent, which is a different instrument and sometimes a sharper one; and because he was thorough; and because he had spent two years learning to read his sister and about four hours learning to read his wife, and had noticed that the two of them did not read at all in the same room.</p>
+<p>And he sat with it for eleven days.</p>
+<p>There is one witness to what he did at the end of the eleven days and it is his steward, Jaycen Wraith, who was in the room because a steward is furniture, and who told it twice in his life and both times the same.</p>
+<p>The king sent for nobody. He did not confront, and he did not ask, and he did not go to the Chancellor, and he did not — this is the part that matters — he did not <em>look</em>.</p>
+<p>He said, to his steward, apparently about something else entirely:</p>
+<p>"A rumour is not a thing until an official person has examined it."</p>
+<p>"Your Grace."</p>
+<p>"And there is one official person in this kingdom," said Baldvyn Brightstride, three-and-twenty years old, who had been king for two years and had a court coming apart in his hands and a sister who would have killed anybody he pointed at, "and it is me. And I am not going to."</p>
+<p>He kept that for the rest of his life.</p>
+<p>It cost him more than anyone knew. Jaycen Wraith, who was furniture for four kings, said at the end of his life that the young one aged a year in that fortnight and never got it back.</p>
+<p>And it is on the short list of things that killed him — not because keeping it was wrong, but because a man who has decided not to look at one thing has to decide, every single day, not to look at it, and he had eleven other things to look at, and there were only so many hours.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>The court in those two years is worth one page, because everything that comes in the last two movements is standing on it.</p>
+<p><strong>Alaysha Renard</strong>, the Queen-Mother, eight-and-thirty, freakishly tall, disliked and consulted, who was suspected within a fortnight of Eryas of having engineered the Uprising and who has never been charged with anything and never cleared of anything. She and her daughter were civil and careful, and there was a room in each of them the other had not been in.</p>
+<p><strong>Braedyn Fenwood</strong>, Chancellor, eight-and-sixty, arthritic from forty years of war and still touring his estates for half the year, who had put four children in one house nine years earlier and was now watching the return come in.</p>
+<p><strong>The northern and eastern earls</strong>, flinty, cold, fiercely Viterran, displaced by the Linns two centuries ago and skirmishing into Ubral ever since, who had swallowed a Vhasian queen-mother and had swallowed a Fenwood chancellor and who were not, when it came to it, going to swallow a queen.</p>
+<p><strong>Aleric Everblood</strong>, the king's cousin, nineteen, his father Arwyn reborn in every particular; and his aunt <strong>Aryka</strong>, who was born with a hole for a heart and a talent for strategy; and between them, in 837, the thing the court calls <em>the Incident</em>, which was a plot against Brightstride so badly constructed that Veralyn had it in eleven days. They were not executed. They were removed from the succession and exiled to the Petty Kingdoms, which the whole court read as the king's mercy and which was in fact his sister's arithmetic: <em>a dead cousin is a martyr and a living one is a debtor, and he is nineteen, and the Petty Kingdoms are nine hundred miles away, and I would like him alive and available.</em></p>
+<p>Available for what, she did not say, and may not have known.</p>
+<p><strong>And Ylena of Coldmorrow</strong>, who came to Valora in the spring of 838, in the train of the new queen, as her maid.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>She was twenty-two and she was very beautiful and she was extremely well-read and she had the kind of manners you do not get by accident.</p>
+<p>She had been taken in as a small child by a lady of the southern march, who had her educated, and who had had her trained — properly, expensively, in the Silkstrand manner — for a profession that does not appear in household rolls. She had two sparks, which is one more than most people ever get: she could make a room like her, and she could make a thing look like another thing.</p>
+<p>She came into the queen's household on a recommendation and the recommendation was in order.</p>
+<p>Her name was in the roll as <em>Ylena</em>. No house. Lots of people have no house.</p>
+<p>And in her first week at Valora she was presented, with eleven others, to the Duchess of Aberiel, who was one-and-twenty and had been at court for two years and was being polite about forty people in an afternoon.</p>
+<p>Somebody said, in the way people do, that the girl came from near Lence.</p>
+<p>And Veralyn Everblood — who was not paying attention, who was tired, who had nineteen open matters and a brother's wedding in her recent past — looked at the extremely beautiful young woman in front of her and produced, off the shelf, in a voice that was not quite her own, the sentence she had been producing for six years:</p>
+<div class="panel panel-gold instrument"><p><em>"Seems I do recall Coldmorrow. It was a village near Lence. We burned it."</em></p></div>
+<p>She said it pleasantly. That is the detail every witness agrees on: she said it <em>pleasantly</em>, as small talk, and moved on to the next person.</p>
+<p>Ylena of Coldmorrow made her courtesy.</p>
+<p>And that is the first move of a game that ran for three years, and one of the two players did not know a board had been set out, and would not know until the last week of it.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT VI</span>The Reforge</h2>
+<div class="panel panel-gold instrument"><p><em>Count to five. Every plan is a Reforge plan. If capturing their Blue today cannot be held for five of their turns, it is a trap for you.</em></p></div>
+<p class="tale-meta place">Valora. 838–840 AR.</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>He died in the autumn, of a fever, in nine days, three months married.</p>
+<p>The physicians said a fever and there was a fever; that is not in dispute and never has been. What is in dispute is what was in him before the fever, and the reason it is in dispute is that a young man of three-and-twenty who has never been ill does not generally die of one.</p>
+<p>Poison is assumed. It has been assumed since about a fortnight afterward and it will be assumed for four hundred years.</p>
+<p>There were four people with reasons.</p>
+<p><strong>Tylda Runemourn</strong>, whose son Aleric had been struck out of the succession and sent nine hundred miles away the year before, and who had said, at her own table, in front of six people, a sentence that she spent the rest of her life explaining.</p>
+<p><strong>Jaennis Fenwood</strong>, who was his wife, who loved him, who loved his sister, who was nineteen, and who was three months into a marriage whose sole requirement she had spent eleven years privately resolving never to meet — and who therefore had, whether or not she ever acted on it, the most complete motive in the kingdom and the one nobody could name aloud without naming the box.</p>
+<p><strong>Ylena of Coldmorrow</strong>, who had been in the queen's household for six months, who had access to everything a maid has access to, which is everything, and who had a reason nobody at that court knew about.</p>
+<p>And <strong>the kingdom of Vhasia</strong>, which is not a person, and which had been sacked six years earlier by a Viterran chancellor while a Viterran king declined to call his banners, and which contained a very large number of people who had lost everything and had nine words for what Lence was owed.</p>
+<p>Veralyn Everblood ran the investigation herself, for four months, in the Fenwood manner, with two clerks.</p>
+<p>She did not find it.</p>
+<p>That is the second thing in her life she could not resolve and it is the only one she has ever admitted to. Her own memorandum, in her own hand, at the end of it, is four lines and it ends:</p>
+<p class="marginalia"><em>The evidence is sufficient for suspicion against three and conclusive against none. I will not hang a woman on sufficiency. I record here that I have wanted to, twice, and that I have not, and that I do not know whether this is discipline or cowardice, and that it does not matter, because the result is the same and the result is that nobody has answered for my brother.</em></p>
+<p>She kept that memorandum. She kept it in the muniment room at Valora with the Belworth tolls, which is the least sentimental filing decision in this book.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>The crisis ran eighteen months.</p>
+<p>He had named her. That is the whole legal position and it is thinner than it sounds: a king of three-and-twenty with no children had, in the spring, at his own marriage, in the presence of the Parlement, said that failing issue of his body his sister was his heir — and had said it in eleven words, in good humour, on a happy day, because it was a formality and he was going to have sons.</p>
+<p>Eighteen months later eleven words on a happy day were the constitution of Viterra.</p>
+<p>Against her: <strong>Aleric Everblood</strong>, the oldest male of the line major, twenty, attainted of nothing, exiled by an act his own party called a fraud, who had done nothing at all since except be alive in the Petty Kingdoms and write eleven very good letters.</p>
+<p><strong>The northern and eastern earls</strong>, who did not put it in writing for a year and then did, and who did not use the word <em>woman</em> in the document, and who used it constantly everywhere else.</p>
+<p><strong>Valdais Longblood, Duke of Adria</strong>, four-and-forty, west of the Belworth, who said nothing whatever for eighteen months.</p>
+<p><strong>And Elianor Longblood, Duchess of Ethor</strong>, one-and-seventy, her own grandmother, who wrote to her twice.</p>
+<p>Both letters survive. They are the strangest documents in this trilogy. Neither mentions the succession. The first is four pages on the maintenance of crossings and contains, in the third paragraph, the sentence <em>you will find that the question is never who takes the toll but who may be sued for the state of the road</em>, which Veralyn read nine times.</p>
+<p>The second is one line.</p>
+<p class="marginalia"><em>They will tell you that being right is a form of power. It is not. It is a decoration, and I have worn one for five-and-fifty years, and it is heavy, and I should be glad to be wrong about you.</em></p>
+<hr class="scene-rule"/>
+<p>For her: House Fenwood, entire, and everything it had spent four hundred years buying.</p>
+<p>Braedyn Fenwood, at eight-and-sixty, did in eighteen months the last and best work of his life, and almost none of it was political in any sense a chronicler would recognise. He did not buy earls. He bought <em>roads</em>. He settled three inheritance suits in Argona that had been running for a generation, at his own cost, in favour of the parties who had the poorer case and the better position. He married a granddaughter into Ubral. He put Elyas Everblood on the Belworth for a year as his own deputy, which sent a message to Istovar that Istovar read correctly in about four seconds.</p>
+<p>And in the spring of the fortieth year, Veralyn Everblood was crowned at Valora, at three-and-twenty, with a black sword at her hip and a Ykrul at her shoulder, and about a third of her kingdom did not come.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>She was not sure she was anything but a killer.</p>
+<p>This is the part the songs have no use for and it is the truest thing about her in that year. She had two skills and both of them were violence — the hand and the board, the mace and the weld — and she had spent nine years being educated by a house that solves problems with money and a man who solves them with geometry, and she had come out of it able to do one thing superbly and had done it at Lence, and at Coldmorrow, and at Eryas with a dagger on an altar.</p>
+<p>She could run a siege. She could break a strike. She could find four thousand marks in a toll roll.</p>
+<p>She did not know whether she could be <em>liked</em>, and she had watched a man who was liked die of a fever at three-and-twenty and had not been able to find out who did it.</p>
+<p>She said one thing about it, to Rekedim, in the week before the coronation, in the long room at Valora with the board out, which he wrote down because he wrote everything down:</p>
+<p>"They are going to make me queen and I am a mace."</p>
+<p>And Rekedim Many-Scars, who was forty and had no lands and no name beyond a nickname, moved a piece and said:</p>
+<p>"A mace is a tool for a specific job and you are not a tool, you are the one holding it, which you have never once been able to remember." He took something of hers that she had not been looking at. "You have an entire kingdom's tolls in your head and you have settled nineteen matters without drawing anything and you starved a citadel in eleven weeks when a king could not do it in four days. You think that is not you because it did not frighten you."</p>
+<p>"That is not an argument."</p>
+<p>"No," he agreed. "It is a measurement. They are the only kind I make."</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>Here is Ylena of Coldmorrow's position in the spring of the fortieth year, set out as her opponent would have set it out if her opponent had known she was playing.</p>
+<p>She was four-and-twenty. She had been in the household of the Queen — first as the young queen's maid, then, after the young queen was widowed, as her companion, which is a promotion and is also proximity — for two years and one month. She was liked by everybody. She had never once been observed to seek anything.</p>
+<p>In those two years she had acquired, by her own hands, without an agent, without a single letter that could be produced:</p>
+<p>The names of the nine men who rode to Coldmorrow. She had six of them by the second winter. Two were dead. One was a gate-sergeant at Valora who had wept when he was asked and had told her everything, and who thought he was telling a kind young woman about a bad afternoon.</p>
+<p>The widow of Logan Thornhill, who was fifty and lived at Eldford under another name, and who had been brought twenty miles to a house in the southern march at Ylena's expense and had been kept there, comfortably, for nineteen months.</p>
+<p>Two Coldmorrow tenants, a cooper's apprentice and a woman who had been eleven years old on the day.</p>
+<p>And the most dangerous item, which she did not obtain, which she simply <em>knew</em> the existence of, because she had been in the room the first week and had watched the queen's own face produce a sentence in a voice that was not the queen's:</p>
+<p><strong>That Veralyn Everblood cannot remember the afternoon.</strong></p>
+<p>Everything else was arrangement. That was the position.</p>
+<hr class="scene-rule"/>
+<p>Her plan was not assassination and had never been. She had been within nine feet of the queen with a knife on a table perhaps two hundred times.</p>
+<p>Her plan was to stand up in the Parlement of Viterra, in front of the earls who wanted an excuse and the Vhasians who wanted a grievance and the men of the north who would not swallow a queen — and to take an afternoon out of the queen's head and put it on the floor where everybody could look at it. A sovereign who had burned a village of the royal domain in peacetime at fifteen and could not say why; who used <em>seems</em> and <em>we</em>; who would stand in front of the realm and be unable to account for her own hands.</p>
+<p>She was not going to survive it. She had known that from the first month and had arranged her affairs accordingly and had written it down in one line which was found afterward in her box:</p>
+<p class="marginalia"><em>I am not the blade. I am the hand that puts it where she has to look.</em></p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>They took her eleven days after the coronation, on a charge of regicide, and the thing that caught her was a list.</p>
+<p>In the autumn of 832, after the burning, a Fenwood clerk attached to Braedyn the Younger's train had gone down into the ash at Coldmorrow and taken an inventory. He did it because Fenwoods inventory everything; because a village in the royal domain is crown property and destroyed crown property is a claim; and because he was two-and-twenty and it was his job.</p>
+<p>He counted the houses, the barn, the rope-walk, the mill. And he counted the people, because a clerk counts the people, and he got their names.</p>
+<p>That roll went into a box at Tarlington and sat there for eight years.</p>
+<p>In the second winter of the crisis, two of Braedyn Fenwood's clerks were doing what Braedyn Fenwood's clerks had been doing for twenty months, which was going through every household at Valora one name at a time, because the Chancellor had told them to and had not told them what for.</p>
+<p>And a young man with no particular gifts, cross-checking a maid's recommendation against the roll of a lady of the southern march, found a girl of two years old on a list of Coldmorrow survivors with a different name and the same mother.</p>
+<p>That is the whole of it. There is no cleverness in it. The Fenwoods win the way water wins.</p>
+<hr class="scene-rule"/>
+<p>She did not deny who she was. She confirmed it in the first quarter of an hour, calmly, to the Earl Marshal, and gave her mother's name, and asked one question, which was whether her mother would be left alone. She was told that she would. She said <em>thank you</em>, and sat down, and did not speak again for four days.</p>
+<p>She never confessed to the poisoning. Not in eleven days of examination, not before the Parlement, not at the end.</p>
+<p>And the case against her, which had been <em>sufficient</em> and not conclusive for two years against three women, became — the instant the court knew whose daughter she was — conclusive against one, in every mind in that building.</p>
+<p>Veralyn Everblood knew exactly what had happened to that evidence. She wrote it down. It is four lines and it is the most frightening piece of self-knowledge in the whole of this book:</p>
+<p class="marginalia"><em>Nothing has been added. The same six items stand as stood in the winter of 838. What has changed is that they now have a story to sit in, and a story is not proof, and I have watched eleven clever men stop being able to tell the difference in a single afternoon, and I am not certain I am not one of them.</em></p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>The Parlement of Viterra sat on the matter in the second week of June.</p>
+<p>She was given her right to speak. It is an old right and it is absolute and it exists precisely so that a court cannot say afterward that nobody was allowed to say anything.</p>
+<p>And Ylena Thornhill of Coldmorrow, four-and-twenty, condemned in every face in that hall, stood up and spent it.</p>
+<hr class="scene-rule"/>
+<p>She did not mention the king.</p>
+<p>She spoke for about a quarter of an hour, in a clear pleasant voice, with no notes, and she spoke about an afternoon in the autumn of 832 in a village in the royal domain.</p>
+<p>She gave the names of the nine men and where four of them were now and what two of them had said. She gave the number of houses and the barn and the rope-walk and the mill. She said that the people got out and that nobody died, and she was scrupulous about that, and the scrupulousness is what made the rest of it land. She described the cooper's shop, which had her father's tools in it, and the order in which the roofs went, which she had from the gate-sergeant at Valora, who had wept.</p>
+<p>And she turned to the throne and asked the Queen of Viterra, in the form the right permits, one question.</p>
+<p>"Your Grace burned my village. I am not asking why. I am asking what you <em>saw</em>."</p>
+<hr class="scene-rule"/>
+<p>There is no account of the next interval that agrees with any other about how long it was.</p>
+<p>The shortest is the Earl Marshal's, who put it at four heartbeats. The longest is from a Vhasian observer who wrote that the hall was silent for the time it takes to say a paternoster, and who was hostile, and was exaggerating, and was also — every other witness agrees on the <em>feeling</em> of it — not exaggerating by much.</p>
+<p>What everybody agrees on is that the Queen did not move.</p>
+<p>And then she said:</p>
+<div class="panel panel-gold instrument"><p><strong>"I remember now, Coldmorrow. It seems I burned it."</strong></p></div>
+<hr class="scene-rule"/>
+<p>Read it beside the other one.</p>
+<p class="marginalia"><em>Seems I do recall Coldmorrow. It was a village near Lence. We burned it.</em></p>
+<p class="marginalia"><em>I remember now, Coldmorrow. It seems I burned it.</em></p>
+<p>The same four elements and every one of them has changed hands. <em>Seems</em> has come off the memory and gone on to the act, which is where it belongs, because she remembers it perfectly now and will for the rest of her life and cannot account for it at all. <em>We</em> has gone. <em>A village near Lence</em> — the distancing, the geography, the thing you say about somewhere you have heard of — has gone, and what is left is the name, first, on its own, the way you say the name of a person.</p>
+<p>She had been reading a line off a shelf for eight years.</p>
+<p>She put it down in front of four hundred people and said the true thing instead, and the true thing is worse in every particular, and it did not break her.</p>
+<hr class="scene-rule"/>
+<p>That is the moment. Everything in this book is on one side of it or the other.</p>
+<p>Ylena Thornhill had spent three years, her entire adult life, her liberty and her name and every hour she had, building a position of total encirclement around one fact: that the Queen of Viterra could not look at her own hands.</p>
+<p>And the Queen looked.</p>
+<p>She had paid in full — the exile, the training, the nineteen months of her father's widow kept comfortably in a house in the south, the two hundred afternoons within nine feet of a knife she never picked up — and she had priced it correctly, and the price was her life, and she had been entirely willing.</p>
+<p class="marginalia"><em>Paid: in full, and refused.</em></p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>The Parlement condemned her that afternoon, on the six items, unanimously, in under an hour.</p>
+<p>Whether she poisoned Baldvyn Brightstride is not known. It was not known then and it is not known now and it will never be known. The evidence was sufficient and was never conclusive; she never confessed; she was condemned in a hall in which every single person had learned four days earlier whose daughter she was.</p>
+<p>Veralyn Everblood understood all of that perfectly. She had written it down in April. She had it in her own hand in the muniment room ninety feet away.</p>
+<p>She confirmed the sentence.</p>
+<hr class="scene-rule"/>
+<p>And then she did the thing that put a full stop on it, which nobody in the hall had anticipated, and which the Earl Marshal tried for eleven minutes to prevent, and which was, when it was examined afterward by four separate authorities, entirely lawful.</p>
+<p>She did it herself.</p>
+<p>Same day. The yard at Valora, at about the sixth hour, with perhaps three hundred people present because word had gone round the palace in a quarter of an hour. Not a scaffold — there had been no time to build one; a block, and clean straw, and a queen of three-and-twenty in the clothes she had worn in the Parlement.</p>
+<p>She said one sentence to the condemned first and it was not heard by anybody except Ylena Thornhill and the two men holding her, and neither of them would ever say what it was, and one of them, asked directly by the Chancellor, said that he had not understood it.</p>
+<p>And she took up the black sword that had come out of an altar at Eryas and had never in four years done one single thing that a very good sword would not do.</p>
+<p>And she did it in one.</p>
+<hr class="scene-rule"/>
+<p>There is a detail here that the book is going to give, because every witness gives it and because it is the reason the yard at Valora was quiet for a very long time afterward.</p>
+<p>She did not hand the sword away.</p>
+<p>Executioners hand it away. That is the form; it is what the form is <em>for</em>; there is a man whose office is to take it, and he was standing there, and he had his hands out.</p>
+<p>She wiped it herself, on the straw, took about four seconds over it, and put it back at her hip.</p>
+<p>Then she looked up at three hundred people, and said — pleasantly, in the voice she used for small talk, which is the same voice she had used on a young woman with no house two years before —</p>
+<p>"My lords. We have a kingdom to hold. I shall be in the muniment room."</p>
+<p>And walked out.</p>
+<hr class="scene-rule"/>
+<h3>viii.</h3>
+<p>She had been Blackrose for six years.</p>
+<p>Nobody has called her Blackrose since that afternoon.</p>
+<p>What the north sent down within the month — the north that had not come to her coronation, that had put it in writing, that would not swallow a queen — was a phrase, and it was not affectionate and it was not intended as a submission and it stuck immediately and forever, in both kingdoms, in three languages:</p>
+<p><strong>the Warrior Queen.</strong></p>
+<hr class="scene-rule"/>
+<p>Here is what actually happened in that yard, and it is not a change of character, and anybody who reads it as a woman becoming cruel has not been paying attention for two hundred pages.</p>
+<p><strong>The two halves closed.</strong></p>
+<p>For nine years there had been a girl at Tarlington who tied knots — patient, ringwise, welding files two plies ahead, nineteen open matters and not one of them raised above a murmur — and a girl who entered without counting, who went in at Lence at fifteen and up the last forty feet at Eryas alone and killed a man with his own dagger because somebody had to.</p>
+<p>Everybody who knew her thought one of them was the real one. They disagreed about which. Her father thought the second and could not look at it. Her grandfather-in-law thought the first and invested a duchy in it. Rekedim Many-Scars, who was the only person who ever had both sets of numbers, thought they were the same girl and could not prove it and said so exactly once.</p>
+<p>In the Parlement she tied the knot. Lawfully, patiently, through a court, on evidence, with the Chancellor's clerks and a roll out of a box at Tarlington and a right of speech granted in the proper form to a woman she knew was going to spend it on her.</p>
+<p>And in the yard she cut it.</p>
+<p>Not in a rage. Not in a swoon. <em>Giving orders</em>, which is the word a nineteen-year-old used about a fifteen-year-old in an afternoon she could not remember, and which is the word for what she did at three-and-twenty in an afternoon she never afterward forgot a second of.</p>
+<p>The knot and the cut, in the same day, by the same hand, with the same face on.</p>
+<p>That is the Warrior Queen, and the north was right to be frightened of the phrase it had invented, and the north sent its levies in the autumn.</p>
+<hr class="scene-rule"/>
+<h3>ix.</h3>
+<p>Two more things and then the last movement.</p>
+<p><strong>The first.</strong> She never asked Jaennis.</p>
+<p>Ylena Thornhill came to Valora in the train of the new queen, on a recommendation, and somebody in that household had looked at the recommendation and been satisfied. Jaennis Fenwood has never been asked, under oath or otherwise, what she knew about her own maid, by anybody with the standing to make her answer. There is one person in the world with that standing.</p>
+<p>Veralyn Everblood sat with it for eleven days after the yard — the same eleven days her brother had sat with his own thing two years before, which she did not know, because the steward had not told her yet and would not for another nine years.</p>
+<p>And she inherited his decision without ever having heard it.</p>
+<p>She did not ask. She has never asked. They are together and they are careful, and there is a room in each of them the other has not been in, and a queen who has just proved that she is willing to look at the worst thing she ever did has chosen, deliberately, in daylight, with her eyes open, to leave exactly one file closed.</p>
+<p>It is the nineteenth knot. It is still tied. It is the only one she has never had any intention of cutting.</p>
+<p><strong>The second.</strong> Rekedim went through the year's sheets that winter, as he did every winter.</p>
+<p>The pause did not come back.</p>
+<p>He had half expected it to; he had written, in the autumn, in the margin of nothing, <em>if it returns after the yard then it was grief and I am a fool.</em> It did not return. She goes into the middle at the speed she posts a screen and her moves are the moves she would have made, and there is no error anywhere, and there has not been one for four years.</p>
+<p>He has two folders. He has never shown them to her.</p>
+<p>He has never shown them to anybody, which is why they were still in the ninth box when it came to the crown, and why this book has them.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT VII</span>The Cut</h2>
+<div class="panel panel-gold instrument"><p><em>Before you go inside the four, count the exits that cannot be sealed over their next two plies. If the count is nought, you are volunteering for a funeral.</em></p></div>
+<p class="tale-meta place">Valora, and the north road. 840 AR.</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>The earls rose in the autumn, six weeks after the yard.</p>
+<p>They did it properly. They put it in writing, they sealed it with eleven seals, they laid out four grievances and every one of the four was real: the Aberiel tolls, the Ubral border, the Parlement's handling of the Incident, and the crown's forty-year habit of settling northern suits in Valora by men who have never been north of the Belworth.</p>
+<p>And they did not use the word <em>woman</em> in the document, because they had a Fenwood-trained clerk draft it and he told them not to, and they used it constantly in every hall between Dornhall and Brigh, which is why the document fooled nobody.</p>
+<p>They had been treating with Adria for a year. Everybody knew. They knew everybody knew; that was rather the point of it — an earl's rebellion is a negotiation conducted at a higher volume, and the whole northern method for two hundred years has been to rise, be reduced, and be bought, and they had four grievances and a queen they did not want and a claimant across the Belworth who had been sending them very warm letters.</p>
+<p>What they did not know was what they were for.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>She had it in eleven days and she had it from the tolls.</p>
+<p>That is the sentence this whole book has been building toward and it is worth savouring, because everybody expects the Warrior Queen to work it out with a sword.</p>
+<p>Adria had been buying grain. Not much; not enough to notice; across four factors over fourteen months, in the Belworth crossings, at the wrong season, paid out of a coin-house at Fairport that had eleven years of Aeler notes on its books. Nobody at Valora would have seen it. The Queen of Viterra had personally audited the Aberiel tolls in the winter of 837 with two clerks and had the shape of that traffic in her head the way her grandmother had four hundred miles of tenure at sixteen, and she looked at a factor's return in October and stopped.</p>
+<p>Grain is not war. Grain is <em>five turns</em>.</p>
+<p>Valdais Longblood was provisioning to hold something for five of somebody else's turns, and you do not do that to support a rebellion four hundred miles away that you intend to reinforce. You do it when you intend to be <em>somewhere else entirely</em> and to still be there in the spring.</p>
+<hr class="scene-rule"/>
+<p>She put it to the council in about nine sentences and Braedyn Fenwood, who was seventy and arthritic and had been Chancellor for eleven years and had taught her master's master's doctrine to two generations, listened to the whole of it without moving and then said one word.</p>
+<p>He said: "Yes."</p>
+<p>And then, after a moment, to the table rather than to her:</p>
+<p>"He is not backing the earls. He is <em>spending</em> them. They will rise, and she will have to go north, because a queen who does not answer a northern rising in her first year is not a queen — and the day she is committed on that road, he crosses."</p>
+<p>The Earl Marshal said that surely the earls must see it.</p>
+<p>"They cannot see it," said Braedyn Fenwood. "They are not being deceived; nobody has lied to them; every letter he has written them is true and generous and will be produced afterward and will exonerate him completely. They are simply worth more to him as a distance than as an army, and there is no way to explain that to a man who is about to be one."</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>So: the position, in the first week of November, set out the way her master would have set it out, which is the way she now sets out everything.</p>
+<p>If she does not go north, she loses the north, and with it any claim to be queen of a country that begins at Dornhall; and Valdais crosses in the spring against a realm that has already shown it will not defend its own earls.</p>
+<p>If she goes north, she is committed four hundred miles from the Belworth with the whole of her levy on a bad road in winter, and Valdais crosses behind her into Aberiel — which is hers, which is the family's beachhead, which is the seam — and takes it in a fortnight against garrisons that have not been reinforced because the reinforcements are in the north.</p>
+<p>If she splits, she does neither thing and loses both, and every doctrine ever written says so.</p>
+<p>Exit certainty: nought.</p>
+<p class="marginalia"><em>If the count is nought, you are volunteering for a funeral.</em></p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>She went to Rekedim on the ninth of November, at night, in the long room at Valora, and set it out on a board.</p>
+<p>He was forty. He had been her bodyguard in the roll since the coronation, which was a joke they both enjoyed — the Ykrul at her shoulder, the household's own Kargath — and which was also perfectly true, because a man who has watched everything for nine years is the only bodyguard worth the salt.</p>
+<p>He looked at it for a long time.</p>
+<p>He did not say <em>you have missed something</em>, because she had not. He did not offer her a fourth line, because there was not one. He is not a man who manufactures comfort; she had come to him precisely because he never has.</p>
+<p>What he said, eventually, was:</p>
+<p>"Do you remember what I told you at twelve, that you would understand at twenty, and that I said I would remind you?"</p>
+<p>"Rent the middle. Do not buy it."</p>
+<p>"Yes." He turned a piece over in his fingers. "You have been trying to buy it since June. Viterra and Aberiel and the Belworth and the north and a claim on Vhasia because your brother had one. That is the whole middle of the board and nobody has ever held it, and your great-grandfather did not hold it, and the man who came nearest is sitting at this table with a bad hip." He put the piece down. "Ask yourself what you actually need to hold for five turns. Not what is yours. What you <em>need</em>."</p>
+<p>She was quiet for a while.</p>
+<p>Then she said: "I need him to move."</p>
+<p>And Rekedim Many-Scars said, "Ah."</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>Here is the move, and it is hers, and the book insists on that.</p>
+<p>Nobody gave it to her. It is not in the Field Manual — it is the thing the Field Manual forbids, in ink, in the fifth tenet, in the hand of the man sitting across the board. There is no notation for it. The steppe has played this game for six hundred years and has no symbol for what she did, and the reason is that it is not, in the technical sense, a move at all. It is a refusal to make one.</p>
+<p><strong>She went north with nothing behind her, on purpose, knowing.</strong></p>
+<p>Not as a gamble and not as a sacrifice and not because a rising had to be answered, though it did. She went because the one thing nobody in two kingdoms could establish — not his mother, who made him; not the Fenwoods, who know most things; not the men already riding under his banner — was <strong>what Valdais Longblood wanted</strong>.</p>
+<p>And a man's want is not a thing you can be told. It is a thing you read off what he spends.</p>
+<p>So she made herself worth spending on. She put the whole realm's strength on a bad road in winter four hundred miles from the seam and left Aberiel open, and she did it visibly, and slowly enough to be seen, and she made it impossible for him not to cross.</p>
+<p>Because a Valdais who has crossed has <em>committed</em>. And a man who has committed can be read. And she had spent nine years with a logician learning that you do not need to know your enemy's mind if you can price his choices, and eleven years before that watching a family tear itself apart over a question nobody could answer, and she is the first person in three generations to decide that the way to answer it is to make the man pay for the answer in front of witnesses.</p>
+<p>Exit certainty nought. On purpose. As the instrument.</p>
+<p><em>Opposing Apex is for bards and funerals</em>, Rekedim wrote, in a manual, for soldiers, and he had said it twice in her hearing in sixteen years, and when she stood up from the board on the ninth of November he said it a third time —</p>
+<p>— and she said, "Yes," and put her hand flat on the table the way an old woman in Ethor does when she is thinking, which she has never in her life seen anybody do and which is in her hands anyway.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>The earls came out in the second week of November.</p>
+<p>She went north on the nineteenth with the levy of four provinces, Tylan Vayle commanding the van, Elyas Everblood holding the Belworth behind her with a force that everybody in Vhasia could count and that was not enough, and Braedyn Fenwood, seventy years old, in a wagon, at his own insistence, with two clerks and the tolls.</p>
+<p>She left Jaennis at Valora with the seals.</p>
+<p>She has never explained that and nobody has ever asked her to, and the reader may make of it what they like. It is the nineteenth knot. It is still tied.</p>
+<hr class="scene-rule"/>
+<p>They drew her as far as Dornhall, and then further, because the north is large and an earl's rebellion is a negotiation and every day of it was a day she could not get back.</p>
+<p>And Valdais let them hang.</p>
+<p>He did not come. He wrote to them twice more on the road — warm, generous, entirely true letters, both of which were produced afterward and both of which exonerate him completely — and he did not move one man north, and by the first week of December the earls of Viterra understood, in a hall at Dornhall, all at once, what they had been for.</p>
+<p>Two of them came over to her that night. Two more sent sons. The document with eleven seals on it was worth nothing by Candlemas and four of the signatories died in the next eighteen months and not one of them died fighting her.</p>
+<hr class="scene-rule"/>
+<p>And on the fourteenth of December, with the Queen of Viterra three hundred and ninety miles from the Belworth on a frozen road, Valdais Longblood crossed at Avimont with nine thousand men and every canton of the west behind him, and took the seam in eleven days.</p>
+<p>The cry was <strong>Vhasia for Vhasians, and revenge for Lence.</strong></p>
+<p>It is a very good cry. It is the best cry anybody has raised in that country in two hundred years; it has a real grievance in it and a real corpse under it and it will carry a hundred thousand men who have never met him.</p>
+<p>And it is possibly not the reason.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>Nobody knows what Valdais Longblood wants.</p>
+<p>That is the third thing this trilogy will not tell you, and it is the one that is still open, and it is open in the world and not merely on the page.</p>
+<p><strong>That it is a throne.</strong> Which is what the heralds say, and the only answer that will fit in a proclamation, and the answer that requires nothing else to be true.</p>
+<p><strong>That it is the Viterran taint, out of Vhasia, at last</strong> — which is what the cantons have been saying since before there were cantons, and which is sincere in nine thousand mouths, and to which any Adrian will reply, correctly, if you observe that their duke is the son of a Viterran king, that <em>this has never been established</em>.</p>
+<p><strong>That it is his mother.</strong> Eleven years in a locked house with a guard on the stair. A clause she wrote on a Thursday in nine days to save his life by taking his crown away. A hand that was the fourth item on a list.</p>
+<p><strong>Or that it is four words in a good hand, under a signature, at his majority</strong>, which he has had six-and-twenty years to think about and which nobody has ever been able to read the bottom of.</p>
+<p class="marginalia"><em>As she was.</em></p>
+<p>He has been asked directly, twice, and answered both times in a way that would have made his mother proud and told the asker nothing.</p>
+<hr class="scene-rule"/>
+<h3>viii.</h3>
+<p>And the last question, which this book has been carrying since a girl of eleven came up the Belworth road with a wooden sword she had been told to leave behind, is not about him at all.</p>
+<p><strong>Is the Queen of Viterra playing, or being played?</strong></p>
+<p>Set it out flat, in a column, unranked, because that is how this family sets things out.</p>
+<p><strong>One.</strong> That she has been the most patient player on the board since she was eleven, and simply never narrated it to herself, which is what mastery looks like from the inside. Nineteen knots tied in two years without raising her voice. A rebellion read out of a grain return. A trap identified, priced, and entered as an instrument. There is a man with two folders who has thought this since she was thirteen and has never once said so out loud.</p>
+<p><strong>Two.</strong> That she has been played the whole way. By Jaennis, who opened a lane at nine and has checked the index every time for eleven years. By Braedyn, who put four children with debts in one house and has never been wrong about a return. By Ylena, who got two hundred moves in before anybody at that court knew a game was on. By a mother who knelt on cobbles at fifteen and asked for warriors.</p>
+<p><strong>Three.</strong> That the sword has been playing since an altar at Eryas — not moving her, never that, never one single decision that was not hers and reasoned and defensible — but simply <em>agreeing, instantly</em>, every time, for four years, which is the most dangerous counsel there is and is not detectable as counsel at all. She has not lost her judgment. She has lost the pause. And a player who has lost the pause will tie every knot she would have tied and cut every one she would have cut, and will do all of it about four seconds sooner, for the rest of her life.</p>
+<p><strong>Four.</strong> That there is no board. That a damaged, decent, extremely violent young woman has been doing her best in bad conditions, and that knots are simply what happens when nineteen things are difficult at once, and that every pattern in this book is a family of compulsive bookkeepers finding shapes in weather.</p>
+<p>Four readings. No method.</p>
+<p>Her grandmother asked which hand answered her and spent eight-and-twenty years on it with a thread and never got past six letters. Her great-grandmother asked what it cost and could not produce a figure.</p>
+<p>Veralyn Everblood has never asked.</p>
+<p>That is either the healthiest thing about her or the thing that kills her, and this book does not know, and the men on the frozen road do not know, and the man at Avimont does not know, and it is going to be settled somewhere south of the Belworth in the spring by people who are not reading.</p>
+<hr class="scene-rule"/>
+<h3>ix.</h3>
+<p>The last thing.</p>
+<p>On the morning of the nineteenth of November, in the yard at Valora, with four provinces on the road and the whole of it already in motion, Rekedim Many-Scars held her stirrup, which was his office, and looked up at her and said the only unprofessional thing he ever said to her in nine-and-twenty years.</p>
+<p>He said: "Count them for me. Once. Out loud. Even if it is nought."</p>
+<p>And Veralyn Everblood, three-and-twenty, Duchess of Aberiel, Queen of Viterra, with a black sword at her hip that has never done anything, looked north up a road she had already decided to take.</p>
+<p>"No," she said.</p>
+<p>And went.</p>
+<hr class="scene-rule"/>
+<h2>APPENDIX OF POSITIONS</h2>
+<p class="marginalia"><em>Seven sheets from the papers of Rekedim Many-Scars, which came to the crown in nine boxes and have never been published. The notation is his own. The glosses are his own except where marked.</em></p>
+<p class="marginalia"><em>A Game Master may hand a player one sheet and say nothing whatever. The last one is the whole handout.</em></p>
+<hr class="scene-rule"/>
+<h3>Position I — <em>Tarlington, the fourth month</em></h3>
+<div class="panel panel-gold instrument"><p>Black to move; loses in nineteen.</p><p><strong>Gloss.</strong> V.E., aged eleven, fourth recorded game. She has taken the Central Four on her sixth ply and holds all of it and will hold none of it by the twelfth. Every capture is correct. Every capture is paid for out of a road she has not looked at.</p><p><em>Counted nothing. Saw everything. This is the more difficult of the two faults to correct and I would rather have it than its opposite.</em></p></div>
+<hr class="scene-rule"/>
+<h3>Position II — <em>Tarlington, the third year</em></h3>
+<div class="panel panel-gold instrument"><p>Black to move; drawn in forty-one.</p><p><strong>Gloss.</strong> V.E. against J.F. J.F. has a weld available on the ninth and does not take it, and takes it instead on the twenty-second, when it is worth about a third as much and cannot be attributed to foresight.</p><p><em>I have not shown this sheet to either of them. The younger one is nine. I am recording it because I do not yet know what I am recording.</em></p></div>
+<hr class="scene-rule"/>
+<h3>Position III — <em>Tarlington, the winter after Lence</em></h3>
+<div class="panel panel-gold instrument"><p>A reconstruction. Not a game.</p><p><strong>Gloss.</strong> Thirty years of ring. One lever. Two welds in two plies — Istovar, then Aberiel, the second of which is not purchased but <em>owed</em>. Their Blue taken at the Ford. No claim, no candidate, no intention of holding.</p><p><em>Tenet the first says this cannot be held for five and is therefore a trap for the player. It cannot, and it is, and he has laid it deliberately and walked into it first, because the board as it stood could not be won by anybody and he is two-and-sixty.</em></p><p><em>He has not taken Vhasia. He has opened it. This is the finest thing I have ever been asked to look at and I would not have found it in a hundred years.</em></p></div>
+<hr class="scene-rule"/>
+<h3>Position IV — <em>Valora, the winter after Eryas</em></h3>
+<div class="panel panel-gold instrument"><p>Black to move; wins in eleven.</p><p><strong>Gloss.</strong> Sheet four of four. I have worked this position eleven times looking for the error. There is no error. The move is the move she would have made at fifteen and at nineteen and it is correct on every reading.</p><p><em>Deliberation: none recorded. The mark I have used since she was thirteen is not on this sheet or on any sheet after it.</em></p><p><em>She does not need the pause. Or she has stopped being able to take it. These are not the same and I cannot tell them apart from the outside.</em></p></div>
+<hr class="scene-rule"/>
+<h3>Position V — <em>Valora, the second year of the young king</em></h3>
+<div class="panel panel-gold instrument"><p>Not a game. A list.</p><p><strong>Gloss.</strong> Nineteen matters, gated. Nine of them she would have gated as a private person. Four are the Crown's business and would be gated by any competent officer. Six are neither, and in all six the file is closed against a party who wants it open, and in all six there is a fork printed two plies ahead which nobody at that court has seen.</p><p><em>She has never once mentioned any of this to me. I do not believe she is concealing it. I believe she does not know she is counting.</em></p><p><em>She never checks behind.</em></p></div>
+<hr class="scene-rule"/>
+<h3>Position VI — <em>Valora, June</em></h3>
+<div class="panel panel-gold instrument"><p>The Parlement, and the yard, on one sheet.</p><p><strong>Gloss.</strong> Knot and cut, four hours apart, one hand.</p><p><em>The court is calling it a change in her. It is not. It is the first time in nine years that both halves have been allowed to finish a sentence.</em></p><p><em>I note for the record that she wiped it herself. The form provides a man for that. She has used the form all her life and she is not careless and she did not forget.</em></p><p><em>(A second hand, later, in the margin, unsigned: "She is holding it the way a clerk holds a pen.")</em></p></div>
+<hr class="scene-rule"/>
+<h3>Position VII</h3>
+<div class="panel panel-gold instrument"><p><em>No annotation.</em></p><p><em>Black to move.</em></p><p><em>XS = 0.</em></p></div>
+<hr class="scene-rule"/>
+<h2>A NOTE ON THE TELLING</h2>
+<p>This is the third of three and the last, and it is the one with friends in it.</p>
+<p>That is the whole design. <em>The Widow's Hand</em> is a woman alone in a courtroom for fifty-five years. <em>A Roll of the Fallen</em> is a woman alone in a cold house with a book. Both of them are told in the voice of the instrument the woman used — the advocate's long declarative, the folk tale's flat brutality — and both of them are lonely on every page.</p>
+<p>This one is told in the coldest voice of the three and contains the warmest scenes, and the reason is arithmetic: if the reader does not love four children on a dyke in the Belworth, the last movement is a campaign map. The narration is a reconstruction — forensic, counting, faintly bloodless, the prose of somebody working a position up from two folders of notation and a tourney roll — and inside it are the only happy years anybody gets in eight hundred pages. The gap between those two registers is the book.</p>
+<p><strong>Kon'reh is not decoration and is not a metaphor.</strong> Every tenet quoted in these pages is in Rekedim's <em>Field Manual: Canray by Convoy</em>, which is in the <em>Concordance</em>, and can be looked up, and is a real doctrine that real Ykrul children have before they can hunt. The reader is never taught the game and should be able to see what Veralyn is doing about forty pages before she can, which is the correct relationship between a reader and a player.</p>
+<p><strong>The sword never performs.</strong> Not once, in three books. In four years it has not glowed, moved, warmed, sung, resisted, or turned in her hand; four hundred people have seen it and two armourers have handled it and a Thepyrgan sceptic pronounced it the finest ordinary object he had ever held. It is implied to be a player. It is never, at any point, permitted to take one decision away from her. What it may have done — deniably, unprovably, visible only in the margin of a logician's sheets — is remove four seconds. Every move in this book is hers, reasoned, and defensible. She has simply stopped counting, and the only man who ever measured her counting has two folders and no column for it.</p>
+<p><strong>And the three books withhold three things</strong>, and they are the same shape and they get worse.</p>
+<p><em>Whose son is Valdais</em> — which is a fact about the past, and is knowable in principle, and is simply lost.</p>
+<p><em>Which hand answered a girl of fifteen with a hound</em> — which is not knowable even in principle, because there is no office that takes the question.</p>
+<p><em>And whether the Queen of Viterra is the player or the piece</em> — which is not settled, is not settleable from the page, and is going to be decided south of the Belworth in the spring by people who are not reading.</p>
+<p>Her great-grandmother could not produce a figure. Her grandmother counted to six four hundred times and never got further. Veralyn Everblood has never asked the question at all, and that is either the healthiest thing about her or the thing that kills her.</p>
+<p>The trilogy's proverb, in its three dialects:</p>
+<div class="panel panel-gold instrument"><p><em>The soup is always free. The price never is.</em></p><p><em>A roll of the fallen; each name marked with the price paid.</em></p><p><em>Every ounce of gold is an ounce of grain. Opportunity is always cost.</em></p></div>
+<p>Three countries, three instruments, one law, and nobody anywhere in eight hundred pages who gets out of it without paying.</p>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>Here ends Count Your Exits, and the three books of the Belworth.</em></p>
+</body>
+</html>
