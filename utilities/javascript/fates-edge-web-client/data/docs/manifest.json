@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-14T00:48:26.383Z",
+  "generated": "2026-09-14T16:03:56.213Z",
   "documents": [
     {
       "id": "srd",
@@ -357,6 +357,16 @@
       "category": "core",
       "categoryLabel": "Core",
       "core": true,
+      "active": true
+    },
+    {
+      "id": "a_roll_of_the_fallen",
+      "title": "A Roll Of The Fallen",
+      "file": "Fates_-_Edge_-_-A-_-Roll-_-of-_-the-_-Fallen.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
+      "core": false,
       "active": true
     },
     {
@@ -1533,7 +1543,7 @@
       "active": true
     }
   ],
-  "total_count": 94,
-  "active_count": 94,
+  "total_count": 95,
+  "active_count": 95,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

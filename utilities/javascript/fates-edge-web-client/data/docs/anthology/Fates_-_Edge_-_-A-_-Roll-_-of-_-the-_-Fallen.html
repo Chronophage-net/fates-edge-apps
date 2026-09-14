@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>A Roll of the Fallen — A Novella of the Aelerian Foothills</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+</style>
+</head>
+<body>
+<h1>A Roll of the Fallen</h1>
+<p class="subtitle">A Novella of the Aelerian Foothills</p>
+<p class="marginalia"><em>Being five leaves from a codex sworn to Myrmis, with the matter between them; and concerning Alaysha Renard, who asked a question in the proper form and was answered, and could never afterward establish by whom.</em></p>
+<p><em>A companion to</em> The Widow's Hand.</p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><em>A codex sworn to Myrmis is never a book of prayers. It is a roll of the fallen — a list of names, each marked with the price paid.</em></p></div>
+<hr class="scene-rule"/>
+<p><strong>A note on the hands.</strong> A goddess of debt is not a person. She is an establishment, and establishments have offices, and the offices do not necessarily speak to one another. Somebody keeps the roll. Somebody collects on it. Somebody strikes when the scale goes over. There is no document anywhere, in Vhasia or Viterra or the Aelerian passes, that establishes those are the same hand — and there is a fourth hand that is not in the roll at all, and about which nothing whatever is known, including whether it exists.</p>
+<p>The Renards have been certain of their standing for two hundred years. They have never once asked which office answered them.</p>
+<p>This book is about the first one of them who did.</p>
+<hr class="scene-rule"/>
+<h2>THE FIRST LEAF</h2>
+<div class="panel panel-gold instrument"><p><strong>BRANTON THORNHILL</strong></p><p><em>Paid: his house. The north, for a generation. A king, at a ford.</em></p></div>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>There were three things at Kaerndal a child was not to touch.</p>
+<p>The iron nail in the lintel of the east door, which was old and square-headed and had been driven in crooked, and which the smith had twice offered to draw and reset and had twice been refused without explanation.</p>
+<p>The grey mare in the fourth stall, who was nineteen and blind and had killed a groom.</p>
+<p>And the small locked press in her father's muniment room, which was the size of a breadbox and was not a strongbox, because a strongbox is iron and this was wood, and because nobody locks a breadbox against thieves.</p>
+<p>Alaysha touched all three before she was seven. She was beaten for the mare. She was not beaten for the nail, because nobody saw. And she was not beaten for the press, because she did not touch it in the end; she stood in front of it for a long time with her hand out, at six years old, and then took her hand back, and went and sat down, and could not have told anybody why.</p>
+<p>That is the earliest thing in this book, and it is the whole of the book, and the reader is invited to walk past it and come back.</p>
+<hr class="scene-rule"/>
+<p>Kaerndal sits high. You come to it up nine miles of switchback from the Vhasian side and you come out of the last turn and there it is, grey on grey, with the Aelerian crags standing behind it like a jury.</p>
+<p>It is cold eight months of the year. The wind comes down off the passes at about the third hour and goes through stone. There are no orchards. There is a little barley, which is a courtesy. What there is, is the road — the dwarf-road, which comes down out of Aeler with iron and salt and worked glass on it and goes on west into Vhasia, and which has run under Renard hands for two hundred years and pays, and pays, and pays.</p>
+<p>The Renards are rich. Nobody who has been there ever believes it at first, because they can see the barley.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>Her father did not raise his voice.</p>
+<p>That is the first thing everyone says about Valeran Renard and it is always said as though it were praise. It is not. It is a description of a technique.</p>
+<p>She saw it done properly when she was eight, in the yard, to a man called Ennis who kept the tallies at the toll-house and had been keeping them for eleven years and had, over four of those years, in small sums, taken about forty marks.</p>
+<p>Her father had the rolls brought out and laid on a trestle in the yard in the cold. He read them. Ennis stood. Her father read them for perhaps a quarter of an hour, with everybody watching, and did not speak, and did not look up.</p>
+<p>Then he said: "The autumn of the year before last is a fair hand."</p>
+<p>Ennis said nothing.</p>
+<p>"It is the best of them," her father said. "It is better than the others. You were careful in that one." He turned a leaf. "Why were you careful in that one and not the rest?"</p>
+<p>Ennis began to talk. Her father let him talk for a while, and then said, without any change at all in his voice:</p>
+<p>"You have misunderstood the question. I am not asking whether you took it. I am asking why you stopped being careful. I should like to know at what point you decided I was not going to read them."</p>
+<p>Nobody in the yard moved.</p>
+<p>Her father closed the roll. "Go home, Ennis," he said. "Go on. Nobody will touch you."</p>
+<p>And nobody did. Ennis went home, and lived eleven more years in the village below, and was never charged and never beaten and never once employed again by anybody in three valleys; and his sons went away; and he used to come up the road on quarter-days and stand at the bottom of the switchback for a while and go down again.</p>
+<p>Alaysha was eight and she watched all of it and she remembered one thing, and it was not the mercy.</p>
+<p>It was that her father had been <em>interested</em>. He had wanted to know when Ennis stopped being careful. He had genuinely wanted to know, the way you want to know how a thing is made, and once he had his answer the man had no further use and went home.</p>
+<p>She thought about that for thirty years. She never once got to the bottom of it.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>Here is the other thing about Valeran Renard, and it took her until she was twenty-two to see it, and when she saw it she had to sit down.</p>
+<p>He was not trying to get anything.</p>
+<p>He plotted. He plotted constantly and expertly and at enormous expense. He had men in four households that were not his. He had money going east that his own steward could not account for. He had, by the time she was fifteen, made war on the crown of Viterra twice.</p>
+<p>And if you had put him in a chair and asked him what he wanted at the end of it — a crown, a duchy, a name, the west, revenge, God — he could not have told you. Not because he was concealing it. Because there was nothing there.</p>
+<p>He schemed the way other men breathe. It was not a means. It was a <em>function</em>, and it ran whether or not there was anywhere to go, and the only satisfaction he ever visibly took in forty years was the satisfaction of a mechanism running correctly.</p>
+<p>The Fenwoods have a phrase for this, which Braedyn Fenwood used about her, later, and unfairly: <em>the heir of madness.</em> He was wrong about her. He was not wrong about the house. But even the Fenwoods had the shape of it wrong, because they assumed madness meant disorder, and the Renard madness is the opposite of disorder.</p>
+<p>It is order with nothing at the end of it.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>Her mother was Mourne Renard, who was her father's second cousin, because the Renards marry Renards about every third generation and have done since before either kingdom existed, and who was the only person at Kaerndal that Alaysha ever saw her father defer to, on one subject, absolutely.</p>
+<p>Mourne was not mad in any way a physician would have written down. She ran a household of sixty. She kept accounts that the toll-house could have learned from. She was punctual, courteous, and completely reliable, and she had one habit, and the habit was this:</p>
+<p>She counted.</p>
+<p>Not aloud. You would only notice if you were in the room a long time and were the sort of child who watches hands. Her right thumb moved across the pads of her fingers, three and three and one, three and three and one, in the middle of a conversation about beef. She did it at mass. She did it at her own mother's burying. Alaysha watched her do it for eleven years before she asked what it was.</p>
+<p>Her mother said: "I am keeping the count."</p>
+<p>"Of what?"</p>
+<p>"Of what is owed," her mother said, and went back to the beef.</p>
+<hr class="scene-rule"/>
+<p>The east door of the hall at Kaerndal has an iron nail in the lintel.</p>
+<p>So does the mill at Cair. So does the grange at Ferrow, and a shepherd's bothy on the high pasture that has no roof now, and a house in the village below which has stood empty since before Alaysha was born and which nobody will take, and a cellar under the east range that is reached by a stair with a turn in it.</p>
+<p>Seven nails in eleven miles. She counted them herself when she was nine, walking it, in the cold, and told nobody, and that was the first work she ever did for anybody.</p>
+<p>She asked her mother about the nails when she was ten.</p>
+<p>Her mother said, "They mark a house where judgment is owed."</p>
+<p>"Owed to us?"</p>
+<p>Her mother stopped. It is the only time in Alaysha's childhood she ever saw her mother stop.</p>
+<p>"That," said Mourne Renard, after a moment, "is a better question than the one I asked, and I asked mine at twelve, and I have never had an answer. Go and see about the candles."</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>They told her about Brigh when she was eleven, and they told her badly, and in the wrong order, and by accident.</p>
+<p>She was born the year after it. Brigh was nine years dead when she came into the world and it was the loudest silence in that house: a thing everybody knew and nobody said, in a family where nobody said anything, so that it sat under the floor of her whole childhood like a stone under a rug — you do not see it and you trip on it once a year.</p>
+<p>What she got, at eleven, in the wash-house, from a woman called Nan Crowe who had drink taken and a grievance and a cousin who had gone north in the levy and not come back, was this:</p>
+<p>That there had been a rising in the north, in Viterra, at a place called Brigh, fourteen years before.</p>
+<p>That it had begun when Lord Branton Thornhill did a thing to his ward that a man does not do to a ward, and that the ward was a king's daughter.</p>
+<p>That the old king had gone north to avenge her and had died at a ford called Ubbin, and his heir had been crowned and had reigned eleven days and been shot through the eye at the gate of Brigh, and the next one had come and killed Branton Thornhill on foot in front of both armies, and burned the house out of the world.</p>
+<p>And that Branton Thornhill had been her father's man.</p>
+<p>Nan Crowe said it like that, at the end, as the punch line: <em>and he was your father's man, and where do you think the money came from, and my cousin is still up there.</em></p>
+<hr class="scene-rule"/>
+<p>Alaysha was eleven. She took it away and worked on it for a week, alone, the way that child worked on everything.</p>
+<p>And she got it wrong.</p>
+<p>She got it wrong in the most reasonable way available, and the error stood for twenty years and cost more than anything else in this book. What she concluded, at eleven, in the cold, was:</p>
+<p class="marginalia"><em>My father made a rising in the north and it failed, and he was not caught, and he is ashamed, and that is why no one says it.</em></p>
+<p>Every clause of that is false.</p>
+<p>He had not been ashamed for a single hour of his life. He was not ashamed of Brigh in particular; he considered Brigh a competent first attempt that had failed for reasons he had subsequently identified and corrected, and he spoke of it privately, to his sons, in exactly those terms. And nobody said it in the house not out of shame but because saying a thing aloud puts it in somebody's mouth, and Valeran Renard did not put things in mouths.</p>
+<p>But the piece she got most wrong was the smallest one.</p>
+<p>She assumed the rape had been Branton Thornhill's own doing — an animal act by a bad man, which had started a fire her father then tried to use.</p>
+<p>It had not started the fire. It had been the match, struck on purpose, by a man who had been told that the rising needed a cause that no Viterran earl could refuse to join, and who had been given a king's daughter under his roof and left alone with the arithmetic.</p>
+<p>Her father did not give the order. He would never in his life have given an order like that; it is not how he worked, and it is not how any of it worked, and this book will come back to that. He arranged a house, and a ward, and a want, and then he waited seventeen months and read the rolls.</p>
+<p>Alaysha learned this at one-and-thirty, from a dying man, in a room with a fire, and she had four days' warning that it was coming and she did not get up and leave.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>What she did do, at eleven, in the week after the wash-house, was the first genuinely dangerous thing she ever did, and nobody ever knew about it, and it worked.</p>
+<p>She went and stood in front of the locked press in her father's muniment room again.</p>
+<p>She did not touch it. She had learned, by then, that she was not going to touch it, and had stopped being curious about the reason and started being curious about the fact.</p>
+<p>And she said — out loud, alone, at eleven years old, to a box:</p>
+<p>"Whose is it?"</p>
+<p>And nothing whatever happened, which she would spend the rest of her life being unable to interpret.</p>
+<p>She went out. She closed the door. She went down to the yard where her brothers were at the pells, Ryger who was fourteen and Uthor who was twelve, and she watched them for a while, and she thought:</p>
+<p class="marginalia"><em>He will make something out of both of them and they will not notice it happening.</em></p>
+<p>Which was correct, and which was the first correct thing she ever thought about her family, and which she arrived at four days after getting the important thing entirely wrong.</p>
+<p>That is how it goes in that house. You are right about the near thing and wrong about the far one, and the far one is the one with the teeth.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>There is no temple to Myrmis. There has never been one anywhere. People assume this is because the worship is forbidden, and the worship is forbidden, but that is not the reason.</p>
+<p>It is because you do not build a house for a ledger. You put it on a shelf.</p>
+<p>What there was at Kaerndal was a book.</p>
+<p>It lived in the locked press in the muniment room, which is a breadbox made of wood, because you do not lock a ledger against thieves; thieves want silver. You lock it against readers.</p>
+<p>Her mother showed it to her when she was twelve, on an ordinary Tuesday, with no ceremony at all, in the way you would show a girl of twelve the household accounts, which is exactly what it was.</p>
+<p>It is not a large book. It is not beautiful. The binding has been renewed twice and the second renewal was done badly. Inside, there are names, one to a line, in a column; and beside each name, in a second column, what was paid.</p>
+<p>That is all. No prayers. No invocation. No god's name anywhere in it, from the first leaf to the last.</p>
+<p>Alaysha read the first page for about four minutes and then said the thing that she would still be saying at two-and-forty:</p>
+<p>"Who wrote this?"</p>
+<p>Her mother said, "Renards, mostly."</p>
+<p>"<em>Mostly.</em>"</p>
+<p>"Turn to the fourth quire," her mother said, "and look at the hands."</p>
+<hr class="scene-rule"/>
+<p>There are four hands in the codex at Kaerndal and three of them are not accounted for.</p>
+<p>The first is the house hand, which is obvious and which changes every generation the way any household hand changes: a Renard writes for forty years and then his daughter writes for forty years and you can see the handover. Fine. Unremarkable. The great bulk of it.</p>
+<p>The second is a very small upright hand that appears eleven times in two hundred years, always for a single line, always in the margin, and always to make a <strong>correction</strong> — a price adjusted, a name respelled, once a whole entry struck through with a single ruled line and rewritten two inches below with a different figure. It has never been seen to add anything. It only ever fixes.</p>
+<p>The third appears four times. It is large and it is slow, the way a man writes who is not often asked to. Every one of its four entries is a name with no price beside it and a blank left where the price should go.</p>
+<p>And the fourth is not a hand. It is a set of marks in the gutter of the tenth quire, at intervals, over about sixty years, which are not letters and are not numbers and are not, according to the only scholar who was ever shown them, anything at all.</p>
+<p>Alaysha asked, at twelve, the obvious question, which is: <em>who are the other three.</em></p>
+<p>And her mother — who ran a household of sixty, who was punctual and courteous and entirely reliable, and who kept the count on her fingers at mass — said:</p>
+<p>"There is the one who writes it down. There is the one who comes and collects. And there is the one who settles it when it will not come." She closed the book. "They are all of them Myrmis. It is not four gods. It is one establishment. But they are not the same hand, Alaysha, and nobody has ever been able to tell me they talk to one another."</p>
+<p>"And the marks?"</p>
+<p>"The marks," said Mourne Renard, "are not in the ledger."</p>
+<hr class="scene-rule"/>
+<p>That is the whole theology of a house that has held to a forbidden goddess for two hundred years: four hands, three unaccounted for, one not in the book at all. No catechism. No mystery. No comfort of any kind. An accounts problem with a blade in it somewhere.</p>
+<p>And this is the part that matters and that nobody outside the family has ever understood, including the Fenwoods, including the Unity, including the men who later burned the safehouses:</p>
+<p><strong>It never once occurred to any of them to ask which hand they were dealing with.</strong></p>
+<p>They knew there were four. They had a book that proved it. They had held the road and the passes and the money for two hundred years and they were certain — utterly, hereditarily, unexaminedly certain — that Myrmis favoured them.</p>
+<p>And favour from a clerk, favour from a creditor, and favour from a man who comes to settle what will not come are three entirely different conditions, and the Renards had never troubled to establish which one they were in, because from inside they look identical.</p>
+<p>They look identical from inside. Write that down; the whole of Alaysha Renard's life is in it.</p>
+<hr class="scene-rule"/>
+<h3>viii.</h3>
+<p>He began using her at thirteen and she did not notice for two years, which she afterward considered the most humiliating fact about her adolescence.</p>
+<p>It began with letters. Her hand was good. Her mother had seen to that. Her father began, once a month or so, to have her copy out a fair version of something — a lease, a return, a note to a factor at Faemley — and to hand it back to her with one word altered, and to have her copy it again.</p>
+<p>Then it was: <em>sit at the end while I see Talbot, you may keep the tally.</em></p>
+<p>Then it was: <em>what did you think of Talbot.</em></p>
+<p>And she told him, at fourteen, standing at the end of a table in the cold, exactly what she thought of Talbot — which was that he had lied about the state of the upper pasture, that he had lied about it in a way that would be found out by midsummer, and that a man who lies about a thing that will be found out by midsummer is either a fool or is buying eleven weeks, and that Talbot was not a fool.</p>
+<p>Her father looked at her for a moment.</p>
+<p>He said: "What is he buying them for?"</p>
+<p>"I don't know."</p>
+<p>"No," her father agreed. "Nor do I. Find out."</p>
+<p>It took her nine weeks and she found out — a marriage, a sister, a dowry that did not exist yet and would exist by Lammas — and she brought it to him, and he read it, and he said:</p>
+<p>"Good."</p>
+<p>That is all he said. She was fourteen and she went out of that room and stood in the passage and found that she was shaking, and she was not, in any sense she could have described, unhappy.</p>
+<p>That is how it is done. That is <em>exactly</em> how it is done, and she had watched him do the same thing to Ryger and Uthor from the gallery when she was eleven and had known precisely what she was seeing, and it made not one particle of difference when it was her turn, because being able to see the mechanism does not exempt you from it. It only means you are inside it with the lights on.</p>
+<hr class="scene-rule"/>
+<h3>ix.</h3>
+<p>There is a scene from her fifteenth year that she told once, at fifty, to her daughter, and that is the only reason anybody has it.</p>
+<p>Late autumn. First hard frost. Her father came out into the yard at the cold end of the day and stood with her a while, which he did not do, and looked down the switchback at the road, which was empty, and at the light going off the crags.</p>
+<p>And he said: "Your brothers are worth about what I put into them."</p>
+<p>She said nothing. You did not.</p>
+<p>"Ryger will hold what he is given and lose nothing and gain nothing. Uthor will get himself killed at some point in a way that will be entirely his own doing and will look like mine." He said this in the tone of a man reading a fodder return. "You are the good one. You have always been the good one. I believe I have told you that."</p>
+<p>He had not. He never did, then or afterward.</p>
+<p>"And a good one is worth more away than here," he said, "which is a thing you will want to have thought about before it happens to you, because it is going to."</p>
+<p>Then he went in to his supper.</p>
+<p>Alaysha Renard stood in the yard at fifteen in the first frost of the year and did the arithmetic, and got all of it right — and what she felt was not fear and was not grief.</p>
+<p>It was the same thing she had felt in the passage at fourteen with her hands shaking.</p>
+<p>She had been <em>seen</em>. In that house, by that man, once in fifteen years. And she found, standing there in the cold, that she would have paid a very great deal for it, and that some part of her had just quietly agreed to.</p>
+<p>Which is how these things are actually done, and why the leaf at the head of this chapter has a price on it and the price is not hers.</p>
+<p>Not yet.</p>
+<hr class="scene-rule"/>
+<h2>THE SECOND LEAF</h2>
+<div class="panel panel-gold instrument"><p><strong>ROCKE</strong></p><p><em>Paid: all of them, and it was not enough.</em></p></div>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>This part is told the way it is told, which is badly, and in the wrong order, and by people who were not there. There is no other version. The Renards did not write it down until it was four generations old, and by then what they wrote down was the story, and the story is not the same animal as the thing.</p>
+<p>So: the way it is told.</p>
+<hr class="scene-rule"/>
+<p>The Renards came east.</p>
+<p>They had been western once — old Vhas, older than Vhasia, a name in a place where names were not yet written. And they were pushed. That is the entire history of that family for three hundred years and they will tell you so themselves, with a peculiar pride, as though being pushed for three hundred years were a form of endurance rather than a form of losing: pushed off the good ground, pushed off the river, pushed off the second river, pushed up out of the grain country and into the hills where the barley is a courtesy.</p>
+<p>And in the hills they found the Rockes.</p>
+<p>The Rockes were there first. Everyone agrees about this, including the Renards, who put it in the story themselves, because in the story it is not a difficulty. In the story it is the <em>setting</em>.</p>
+<p>They were a small house. They had the high pasture, the two mills, the upper ford, and the shrine at the head of the pass, which was old and was not a Unity shrine and was not a Myrmis shrine and was nobody's now-living faith, and which the Rockes kept because their grandmothers had kept it.</p>
+<p>And they were, the story says, very hospitable. The story is quite particular about this. It puts it in three times.</p>
+<hr class="scene-rule"/>
+<p>The way it is told, there were three winters.</p>
+<p>In the first winter the Renards came up the road with their wagons and their sick and asked for shelter, and the Rockes gave it, and the two houses ate at one table, and old Rocke — he is never named; in two hundred years of telling nobody has ever given him a name — old Rocke said the thing that the story exists to record, which is:</p>
+<p class="marginalia"><em>"There is room in the hills. There has always been room in the hills."</em></p>
+<p>In the second winter the Renards asked for the upper ford, because their wagons could not take the low one, and the Rockes gave it, and there was a document, and the document was fair.</p>
+<p>And in the third winter the Renards asked for nothing at all.</p>
+<hr class="scene-rule"/>
+<p>You know how this ends. Everybody who has ever heard four sentences of it knows how it ends. That is what a folk tale is for: it is a machine for making you complicit in the ending before it arrives, so that when it comes you have been standing there waiting for it with your hands folded.</p>
+<p>It ended in nine days. The Renard telling is quite precise about the nine days and is vague about everything else, which is the correct proportion for a story that wants to be admired.</p>
+<p>The mills went first, then the pasture, then the hall. There is a detail in the telling about the shrine at the head of the pass that the Renards have never removed and that every generation of them has been faintly embarrassed by and none of them has been embarrassed enough: that the shrine was not thrown down, and not burned, and not defiled.</p>
+<p>An iron nail was driven into the lintel, and they went on.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>They did not get all of them.</p>
+<p>That is the only line in the Renard telling that admits a failure, and the family has always read it as a small administrative untidiness, the way you would read <em>and eleven sacks were spoiled</em>.</p>
+<p>What went north was perhaps forty people. Women, mostly; children; two men. They went over the passes into Ubral in the winter, which should have killed them and killed about half.</p>
+<p>And then they simply — lived.</p>
+<p>That is the whole of it. That is the entire haunting, and it has been going on for a hundred and sixty years, and it has never once involved a weapon.</p>
+<p>There are Rockes in Ubral. They are cottars. They are coopers, carters, a midwife at Arleigh, a family of drovers who bring beasts down through the passes twice a year and have done so for six generations. They are not numerous and they are not poor and they are not organised and, so far as anybody has ever been able to discover, they do not speak about it.</p>
+<p>But there is always one.</p>
+<p>There is a Rocke at the market at Cair on the third day. There is a Rocke who buys the wool. There was a Rocke among the drovers who came down in Valeran's grandfather's time and stood in the yard at Kaerndal for two hours waiting to be paid, and was paid, and went; and the old man asked afterward who he had been, and was told, and said nothing, and had the yard swept.</p>
+<p>They marry into the tenantry. Three valleys over, a girl is a Rocke on her mother's side and does not know it and her grandmother does. They turn up. They turn up the way weather turns up. Nobody threatens anybody. Nobody is owed anything out loud.</p>
+<p>And every Renard for six generations has known exactly how many Rockes are within a day's ride of Kaerndal at any given time, and not one of them has ever written the number down.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>Alaysha met one on the road when she was fourteen, in the spring, going up toward the Ubral side with two men and a led horse, on an errand of her father's about a marriage that did not exist yet.</p>
+<p>An old woman, walking down, with a basket and nothing in it.</p>
+<p>She stopped. Alaysha stopped, because you do. The two men did not stop, because men do not.</p>
+<p>And the old woman looked up at her for a while — not rudely, not long — and said, "Whose girl are you?"</p>
+<p>And Alaysha, who had been taught by her mother that you answer that question in the hills because not answering it is how you get a name you did not choose, said, "Renard. Of Kaerndal."</p>
+<p>The old woman said nothing at all.</p>
+<p>She did not react. She did not flinch and she did not harden and she did not do any of the eleven things Alaysha had already, at fourteen, learned to watch for. She looked at Alaysha for another moment with an expression of ordinary mild attention, the way you look at weather you have decided is not going to come to anything.</p>
+<p>Then she went on down the road.</p>
+<p>Alaysha rode on. About a mile up she turned in the saddle, for no reason she could name, and looked back.</p>
+<p>The road was empty. It is straight there for the better part of two miles in both directions and it was empty in both of them, and there is no turning, and the ground on the west side goes down forty feet to water.</p>
+<hr class="scene-rule"/>
+<p>Now.</p>
+<p>This book is going to be very careful here and it is going to be careful in the same way for the rest of its length, so the reader should understand the rule now and hold it to the end:</p>
+<p><strong>Nothing in that account is impossible.</strong></p>
+<p>She was fourteen. She had been in the saddle five hours. There are sheep paths off that road that a local woman would know and a Vhasian girl would not. A mile is a long way to see an old woman in grey against grey scree, and Alaysha had been thinking about a marriage that did not exist yet, and people who are thinking about something else see less than they believe they do.</p>
+<p>Every single event in this novella survives that treatment. Every one. There is not one moment in Alaysha Renard's life that a sensible man cannot explain to her, kindly, over supper, in under a minute.</p>
+<p>The horror is not that she is haunted.</p>
+<p>The horror is that she is the only person in the room who thinks there is anything to explain, and she cannot prove there is, and she is right.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>She went to the book when she got home. She had to wait nine days for her mother to be out of the muniment room, and she waited them, which at fourteen is its own small portrait.</p>
+<p>She turned to the fourth quire and found ROCKE.</p>
+<p>It is on the recto, eleven lines down, in the house hand. <em>Rocke. Paid: all of them, and it was not enough.</em></p>
+<p>She had read it before. Everyone in that family reads it before they are ten; it is one of the entries you are shown, because the Renards are proud of it, because they have always understood it to mean <em>we collected, and the collection was insufficient, and therefore more was owed</em> — which is a reading in which the Renards are the creditor, and which the family has held to for a hundred and sixty years, and which is the reading a proud house arrives at in about four seconds without checking.</p>
+<p>But she had never looked at it in the light.</p>
+<p>She looked at it in the light because of the road, and because of an old woman with an empty basket, and because she was fourteen and had nine days to think about what she was going to do when she got the room to herself.</p>
+<p>And under <em>Rocke</em> there is a strike.</p>
+<p>One ruled line, very fine, ink over ink. The second hand — the small upright one, the corrector, the one that has never in two hundred years added anything and only ever fixes. Somebody wrote an entry on that line, and somebody else came afterward and struck it through and wrote <em>Rocke</em> above it, and the strike is thorough.</p>
+<p>She took it to the window and held the leaf up against a grey Aelerian afternoon and worked on it for an hour and eleven minutes and got nothing.</p>
+<p>Nothing at all. Not one letter. Whoever ruled that line knew the business.</p>
+<p>So she did the only other thing available, which is the thing her mother had taught her to do with her thumb at mass, and which is the thing this family does instead of praying.</p>
+<p>She counted it.</p>
+<p>You cannot read a struck word. You can very often measure one. She measured the strike against the letters above it and below it and against four other entries in the same hand on the same leaf, and she did it three times over two days with a thread, and every time she got the same answer, and she has done it perhaps forty times since, at intervals, over eight-and-twenty years, in three houses and two kingdoms and once in a locked room with a guard on the stair.</p>
+<p><em>Rocke</em> is five letters.</p>
+<p>The word under it is six.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>She took it to her mother, because at fourteen you still do that.</p>
+<p>Mourne Renard listened to the whole of it — the road, the basket, the empty mile, the window, the thread, the count — without once interrupting, which took about a quarter of an hour.</p>
+<p>Then she said: "Six."</p>
+<p>"Six."</p>
+<p>"Yes," her mother said. "I make it six as well. I have made it six since I was sixteen." She took the book and closed it and put it back in the press and turned the key and put the key where it lived. "Now sit down, and I will tell you the four things I know, and then you will understand why I have never mentioned any of this to your father."</p>
+<p>And she told her, and they are worth having, because everything else in this book is downstream of them.</p>
+<p><strong>The first.</strong> A six-letter word beginning nothing and ending nothing is not evidence. It is a length. Four hundred names in Vhasia are six letters long. A flourish reads as a letter. A corrector's rule is not a measure of what is beneath it. Any scholar in Thepyrgos would take that leaf off you in a morning and hand it back with a sentence that made you feel like a child, and he would be <em>right</em>, and you would still be right, and both of those would be true at once.</p>
+<p><strong>The second.</strong> The entry as it stands says <em>it was not enough</em>. If we collected, the account closes. It does not say the account closed. It says it was not enough. An account that is not enough is an account that is <em>open</em>, and an open account has a debtor, and the entry does not tell you which side of it we are on.</p>
+<p><strong>The third.</strong> There is a hand in that book that only corrects. It has been into that leaf. Somebody, at some point, judged that the line as first written was wrong and set it right — and you may take from that whichever comfort you like, and Mourne Renard had taken one from it for thirty years, and the comfort is this: <em>a clerk corrected our page.</em> Somebody is keeping it properly. Somebody cares that it is accurate.</p>
+<p>Which is a comfort, until you have the fourth.</p>
+<p><strong>The fourth.</strong> "Your father," said Mourne Renard, "believes we are the hand that collects. His father believed it. So did his. They have not believed it because anybody told them; they believe it because we have the road and the passes and the money, and because a house that is doing well does not examine the ledger it is doing well out of."</p>
+<p>"And you?"</p>
+<p>Her mother looked at the press for a while.</p>
+<p>"I have counted to six," she said, "four hundred times, and I have never once been able to make myself finish the thought, and I am fifty-one years old. You will do better than that or you will not. But you will not do it here, and you will not do it married to a Renard, and I have told your father as much, and it is the only thing I have ever asked him for."</p>
+<hr class="scene-rule"/>
+<p>She was married at sixteen, to a king's heir, in another country, for reasons that had nothing whatsoever to do with her mother.</p>
+<p>But her mother had asked, and been heard, and Alaysha found that out at twenty — that in a house where nobody said anything, one person had said one thing once, on her account.</p>
+<p>It was not enough either. But she carried it for the rest of her life and she was buried with the thread.</p>
+<hr class="scene-rule"/>
+<h2>THE THIRD LEAF</h2>
+<div class="panel panel-gold instrument"><p><strong>ALAYSHA RENARD</strong></p><p><em>Paid: to the crown, in surety of the peace among the passes.</em></p></div>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>The Aelerian Rising ran two years and eleven weeks and was, by the standards of the century, a small thing.</p>
+<p>It began over the road.</p>
+<p>The crown had been trying for a generation to take the Aeler road into its own hand — not to close it, which would have been mad, but to farm the toll from Valora instead of from Kaerndal; and the argument was the same argument that has been had on every profitable crossing in both kingdoms since there have been crossings, which is whether the grant was made for the <em>maintenance</em> of the road or as a thing owned outright.</p>
+<p>It is worth saying, because nobody ever says it: <strong>the crown was right.</strong> The grant was for maintenance. The Renards had maintained nothing since Valeran's grandfather. Any competent clerk could have proved it in a fortnight, and one eventually did.</p>
+<p>Being right is not a form of power. There is a woman two hundred miles east who could have told them that at sixteen.</p>
+<hr class="scene-rule"/>
+<p>Her father had spent seventeen years correcting Brigh.</p>
+<p>He said so, out loud, to his sons, in the muniment room, and Alaysha heard it from the gallery when she was twelve; and it is the longest speech of his that anybody wrote down, and it was a <em>review</em>.</p>
+<p>Brigh had failed, he said, for three reasons.</p>
+<p>It had been begun by a man who was not answerable to him, which meant that when the man broke, the rising broke with him. It had been begun on a cause that could not be <em>sustained</em> — outrage burns nine weeks and then men remember the harvest. And it had been begun in the north, three hundred miles from anything of his, so that when it failed there was nothing to fall back into.</p>
+<p>"The next one," he said, "will be here. It will be on money, because money does not get tired. And it will have no cause at all, because a cause is a thing your enemy can take away from you by conceding it."</p>
+<p>Ryger asked what they would tell the men.</p>
+<p>And her father said: "That the crown is coming for the road." He turned a leaf. "Which will be true. That is the advantage of a grievance you have arranged to deserve."</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>So it ran on money and it did not get tired.</p>
+<p>Four Ubral houses came over the line, which was not loyalty but arithmetic: the Ubral border had been skirmished for two hundred years by Viterran earls trying to expand east, and a Renard rising was the only year in living memory when those earls would be looking the other way. Half the Aelerian tenantry came out and half did not, and the half that did not were not punished, which frightened people considerably more than punishing them would have.</p>
+<p>And it went on, and on, and did not resolve, and the crown could not get at it, because you cannot bring a battle to a man who does not want one. Valeran Renard fought exactly two engagements in two years and eleven weeks and lost both on purpose, at acceptable cost, in places that emptied his enemy's supply for a month.</p>
+<p>It ended because Braedyn Fenwood went and looked at the accounts.</p>
+<p>That is all. There is no battle at the end of the Aelerian Rising. There is a Fenwood of about three-and-forty, who had been educated at Thepyrgos and had understood before he was twenty that armies are not defeated but starved, sitting down in a counting-house at Faemley for nine days with two clerks and the customs rolls of the dwarf-road going back eleven years — and finding, on the fourth day, where the money crossed.</p>
+<p>He did not tell the king. He told the queen.</p>
+<p>He has never said why and the obvious answer is the correct one, which is that Elianor Longblood would know what to do with it by Tuesday and Baldvyn Everblood would want to ride somewhere.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>The terms came up the switchback in February, in a fair chancery hand, sealed at Valora, in the hand of a clerk.</p>
+<p>Alaysha was fifteen. She got them off the table in the muniment room at the second hour of the morning while the house slept, and read the whole instrument standing up in the cold, and put it back squared to the corner exactly as she had found it, and went to bed and did not sleep.</p>
+<p>It is a good document. That is the first thing she noticed and it took her eleven years to understand what she had noticed.</p>
+<p>The crown took the road. Of course it did; the crown had been right. But the Renards kept the tolls of the two upper crossings in fee, heritable, and the maintenance of the whole of it was charged on the crown, which meant that Kaerndal lost a great deal of money and lost no dignity at all, and could tell the hills it had held the passes. Four Ubral houses were pardoned by name. Nobody was attainted. Nobody hanged.</p>
+<p>And the surety was a marriage.</p>
+<p class="marginalia"><em>Item. The demoiselle Alaysha, daughter of Valeran, Lord of Kaerndal, of the house called Renard, to be given in marriage to the lord Wyllmot, son of the king's body, in surety of the peace among the passes; the said marriage to be solemnised at the feast of Saint Ossian following her sixteenth year; and by this the passes shall be held quiet, and the said house of Renard shall be held faithful, and the crown shall hold the said house in its grace.</em></p>
+<hr class="scene-rule"/>
+<p>She read it four times. Then she read it a fifth time and found the thing that was wrong with it.</p>
+<p>It was too good.</p>
+<p>Not the terms — the <em>drafting</em>. Her father's people did not write like that. The crown's clerks did not write like that either; she had read nine years of crown correspondence and it is competent and it is dead. This had been over somebody's desk who cared. There were two clauses in the schedule about her own dower that had no business being there at all, that cost the crown money, that nobody in the Aelerian passes had asked for and nobody in Valora had needed to give — held of her own right, and heritable by her daughters.</p>
+<p>She sat with that for a long time in the cold.</p>
+<p>She did not find out for eleven years who had put them there. When she did find out, she was one-and-twenty, and married, and at court, and standing about nine feet from the woman who had written them; and she looked across the room at Elianor Longblood, who had been Item the Fourth of the Peace of Belworth at sixteen years of age, and who had spent one-and-thirty years since making certain that she could never be struck out of an instrument again —</p>
+<p>— and who had sat down in the spring of the year and drafted, in a clean careful hand, the clause that conveyed another girl of sixteen from a cold house in the hills to a man she had never met.</p>
+<p>And had put two things in the schedule that did not have to be there.</p>
+<p>Alaysha never raised it. Not in nineteen years, not once, not even at the end. And <em>that</em> is what you need to know about the two of them, and it is worth more than any conversation they ever had.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>She asked her father for the audience herself, which was not done, and got it, which tells you something.</p>
+<p>He was at the long table with the instrument in front of him and a cup of the poor wine he preferred to the good wine because it cost less and he liked knowing that. She came in and stood at the end, where she had stood since she was thirteen.</p>
+<p>He said, "You have read it."</p>
+<p>"Twice," she said, which was a lie by three and the last one she ever told him.</p>
+<p>"And?"</p>
+<p>Now here is where the daughter of a house of lawyers would have argued.</p>
+<p>Elianor Longblood, at sixteen, in a muniment room two hundred miles east and one-and-thirty years earlier, had argued the instrument, the market, the man, and the boy; had won every point; had been told <em>yes, and you will go tomorrow</em>; and had spent the rest of her life converting that hour into a kingdom.</p>
+<p>Alaysha Renard had watched her father for fifteen years, and had watched him from the gallery when she was eleven, and had watched a toll-clerk called Ennis walk down a switchback into eleven years of nothing. And she understood — not cleverly, not as an insight, but the way you understand that a stove is hot — that arguing is a thing you do to a man who can be moved, and that she was standing in front of a mechanism.</p>
+<p>So she asked the only question there was.</p>
+<p>"What do I get?"</p>
+<p>Her father looked up.</p>
+<p>And this is the moment the whole of the rest of this book comes out of, because Valeran Renard did not say <em>you get nothing</em>, and did not say <em>you get the honour of your house</em>, and did not say any of the eleven things a father says.</p>
+<p>He set down the cup, and put his finger on the schedule, and answered her. Properly. At length. For about a quarter of an hour, in the tone he used for a fodder return.</p>
+<p>She got two crossings in fee, heritable, which would come to her second son if she had one and to her eldest daughter if she did not. She got a dower held of her own right that no husband could touch and no crown could resume. She got the naming of her own household. She got — and he was particular about this, and made her read the clause twice — the forbearance.</p>
+<p>"Your great-great-aunt bought it," he said. "Veralyn Renard, who married the Hog. She bought it with her body and it has held for four reigns and it is the only thing this family has ever bought that stayed bought. It is not in this instrument, because a thing like that is never in an instrument. It is in the marriage. While there is a Renard in that house, no man puts a torch to a shrine between here and the Belworth."</p>
+<p>He picked the cup back up.</p>
+<p>"That is what you get," he said. "It is more than I got and a very great deal more than your mother got. Do not let anybody tell you that you were given away."</p>
+<hr class="scene-rule"/>
+<p>She went out.</p>
+<p>In the passage she found that she was shaking again, exactly as she had at fourteen, and she stood there with her hand flat on the cold stone and worked out — at fifteen, in about four minutes, correctly — three things.</p>
+<p>That every word of it was true.</p>
+<p>That the word <em>bought</em> had been in his mouth twice, and the word <em>sold</em> had not been in it once, and that a man who is that careful about a word has thought about the word.</p>
+<p>And that he had been <em>pleased</em>. Not relieved. Pleased, the way he had been pleased about Talbot's nine weeks. The rising had not failed. The rising had produced an outcome, and the outcome was a Renard in the bed of the heir of Viterra with the forbearance riding on her, and if you went back and read the whole of the last two years with that at the end of it, it stopped looking like a defeat at all.</p>
+<p>She never once, in the remaining thirteen years of his life, asked him whether it had been the object from the beginning.</p>
+<p>She has been asked why, twice, by two different people. She gave two different answers and neither was the true one.</p>
+<p>The true one is that she already knew what he would say. He would have told her honestly, because he told her everything honestly, and what he would have said is:</p>
+<p class="marginalia"><em>"There was no object. There is never an object. There was a rising and it produced this, and had it produced something else I should have had that instead."</em></p>
+<p>And she could not have borne it. Not at fifteen and not at fifty. Because if there was no object then there was no plan, and if there was no plan then she had not been chosen, and being chosen — being <em>seen</em>, once, in fifteen years, in a cold yard at the frost — was the only thing she had ever been paid.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>They went east in the second week of April with eleven in the party and a led horse, down the switchback and out of the hills and into the grain country, four hundred miles, sixteen days.</p>
+<p>She has left no account of that road. There is no bad bed at a place called Corbenoit in this book, no sentence said to a dark ceiling, no girl deciding what she is going to be. Alaysha Renard was not a maker of resolutions; she was fifteen, and cold, and had a thread in a purse, and she spent most of that fortnight thinking about her mother's thumb.</p>
+<p>Only two things are known about it.</p>
+<p>The first is that on the ninth day, at an inn below Faemley, the innkeeper's wife made much of her, and gave her the good room, and asked her name; and Alaysha said <em>Renard</em>, and the woman said, "Ah — the road," the way you would say <em>the weather</em>, and went out.</p>
+<p>And Alaysha lay awake in the good room and understood, for the first time in her life, that her family was a thing that other people simply <em>had</em>, like a season, and had no feelings about, and were not frightened of at all once you got more than two days from the hills.</p>
+<p>The second is that on the fourteenth day she gave away the mare she had ridden out of Kaerndal on.</p>
+<p>She gave it to a drover's girl on the Ubral side who had walked beside the party for an hour asking sensible questions about the passes, and who could not have been more than ten, and who had an old plaid and a good eye and a family name that Alaysha did not ask for and did not need to.</p>
+<p>Her steward was appalled. The girl's father was appalled. Alaysha said it was lamed, which it was not, and then said nothing at all, in a manner which she had learned in a cold house from a man who never raised his voice, and the subject closed.</p>
+<p>She could not have told you why she did it. She said so, at fifty, to her daughter, and she said it in a tone the daughter afterward described as <em>the only time my mother ever sounded frightened</em>:</p>
+<p>"I have gone over it four hundred times. I did not think <em>Rocke</em>. I have never once been able to find the thought. I simply gave the child a horse."</p>
+<hr class="scene-rule"/>
+<h2>THE FOURTH LEAF</h2>
+<div class="panel panel-gold instrument"><p><strong>A HOUND</strong></p><p><em>Paid: in full, and refused.</em></p></div>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>The hound's name was Tally.</p>
+<p>Her father named her, which is exactly the joke you would expect and exactly as far as his humour ever went, and he was pleased with it for about a day and never thought about the animal again.</p>
+<p>She was a hill bitch, rough-coated, black and grey through the shoulder, with one ear that had been opened by something when she was young and had healed folded. She was not a good hunting dog. She was not a good anything dog. She had come to Kaerndal in a litter got by accident off a drover's animal and had been kept because a groom liked her and had then, in the way of such things, quietly transferred herself to a girl of nine who fed her at table and was not stopped.</p>
+<p>She had one real quality and it is the only one that matters in a book like this: she was <em>present</em>. She was under the table. She was on the stair. She was outside the muniment room for an hour and eleven minutes while a girl of fourteen held a leaf up to a grey window and counted a strike with a thread, and she was still there when the girl came out.</p>
+<p>She would not go into the cellar under the east range. Not ever, not once, not for meat. She was beaten for it twice by a steward who thought a dog should go where it is sent, and she took the beating both times and did not go in, and after the second time Alaysha put a stop to it in a voice that the steward reported upward and that got her a long look from her father at supper.</p>
+<p>Alaysha called her Tally in front of people, for eleven years.</p>
+<p>In private, alone, from the age of nine, she called her Bee. Nobody knew that. Not her mother, not her brothers, not a groom. It was the only thing in that house that was hers, entire, unentered, and not owed to anybody.</p>
+<p>She took her east. Sixteen days, four hundred miles, and the dog trotted the whole of it at the off-side stirrup with her folded ear and was ten years old and stiff in the mornings by the time they came down into the grain country and saw the towers of Valora.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>The wedding was at the feast of Saint Ossian, which is the date the crown of Viterra puts on every dynastic marriage it makes, because it is the date in the Peace of Belworth, and because there is a woman at that court who insisted on it thirty-one years ago and has never let anybody move it since.</p>
+<p>The night before, at about the third hour of the morning, Alaysha Renard went down into the stable court in a plain cloak with a hand-lamp and the dog and a bag.</p>
+<p>In the bag: an iron nail, square-headed, brought four hundred miles from a cold house in the hills. A small hammer. And a fold of paper with a single line on it in her own hand, which she had written in the muniment room at Kaerndal three weeks before and had not let out of her possession since, and which said what she wanted.</p>
+<p>Nobody stopped her. That is the part people find incredible and it is the least incredible part of the whole book: she was a duke's daughter in her own bridegroom's house on the eve of her wedding, walking about with her dog at three in the morning, and if a groom had seen her he would have looked away, because that is what a groom does.</p>
+<hr class="scene-rule"/>
+<p>There was no rite.</p>
+<p>This wants saying flatly, because four hundred years of hostile pamphlets have said otherwise and every one of them is describing something else. There is no circle, no chant, no candles, no blood-figure on a floor. A Renard at prayer looks like a clerk at a counter, and if you walked in on one you would apologise and withdraw and think nothing of it for the rest of your life.</p>
+<p>She found an outbuilding at the low end of the court — a tack-room, disused, with a stone lintel — and she set the lamp on the sill, and drove the nail in.</p>
+<p>Four blows. She had practised on a beam at home so that it would be four.</p>
+<p>Then she knelt on the cobbles and put her hand on the dog, and said what she wanted, out loud, in a level voice, in the form her mother had taught her, which is the form of a man entering a transaction with a house he intends to go on doing business with:</p>
+<p class="marginalia"><em>"I am Alaysha, of the Renards of Kaerndal. I am to be married tomorrow to Wyllmot, son of the king's body. I ask for two great warriors and three lovely daughters. I will pay for it now and in full and I am not asking for terms."</em></p>
+<p>And then, because the form requires that you name what you are paying with, and because you may not name it with a lie:</p>
+<p class="marginalia"><em>"Her name is Bee."</em></p>
+<hr class="scene-rule"/>
+<p>She did it herself.</p>
+<p>That is in every version, including the two hostile ones, and it is the only thing they all agree on. She did not have a servant do it, she did not have a priest do it, there was no priest within forty miles who would have been in that court for any money; she was fifteen years old and she put her arm round a ten-year-old hill bitch with a folded ear who had walked four hundred miles at her stirrup, and she did it herself, correctly, quickly, in one, the way she had been shown at eleven on a lamb.</p>
+<p>The dog did not struggle. Dogs mostly do not, for the person they will go anywhere with. That is the worst sentence in this book and it is going to be left exactly where it is.</p>
+<p>Afterward she sat down on the cobbles with the body across her knees for about half an hour, in the cold, with the lamp burning down, and did not weep, and was not seen.</p>
+<p>Then she carried her out beyond the wall herself and buried her, which took until nearly dawn, and came back, and washed, and was dressed at noon by four women she had never met and married in front of nine hundred people, and every account of that wedding says the same thing about the bride, which is that she was composed beyond her years.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>The nail is still there.</p>
+<p>That is not a flourish. There is an iron nail, square-headed, driven crooked into the stone lintel of a disused tack-room at the low end of the stable court at Valora, and it has been there for nine-and-twenty years, and it has survived two re-roofings and a steward's improvement and the Unity's purge of 836, during which men with mattocks went through that palace taking out everything they could find and did not find it, because it is a nail in a stable.</p>
+<p>Veralyn Everblood has walked past it perhaps four thousand times.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>Now the marriage, which lasted two-and-twenty years, and which this book proposes to describe honestly, which means it is going to be less interesting than the pamphlets.</p>
+<p>They were not cruel to each other. Not once. Not in twenty-two years.</p>
+<p>Wyllmot Everblood was fifteen when they married him and he was already six feet and a half and still growing, and he was decent about it in the way a well-raised boy is decent about a duty he did not choose, and for about two years they were something not far from friends. That is in nobody's account of them and it is true, and it is the reason the rest of it hurts.</p>
+<p>Here is what he was, and the court never got it right, and his own mother got it right and could not say so.</p>
+<p>He was <strong>Elianor, if she had been born a man and given hands.</strong></p>
+<p>The same engine exactly: the same total recall, the same refusal to let a thing go, the same absolute certainty that being correct is the same as being owed. Put a problem in front of Wyllmot Everblood and he would take it apart with the identical patient ferocity his mother used on a chamber roll — and then, because he was a man, and enormous, and had been handed a sword at seven and a province at twenty, he would <em>solve it by hitting it</em>, and it would work, and he would learn nothing.</p>
+<p>He was not stupid. This is the part everybody misses, including Braedyn Fenwood, who called him a pious brute for thirty years and was wrong about it in a way that Braedyn Fenwood was almost never wrong about anything. He was <em>quick</em>. He simply had never in his life been in a situation where thinking got him something that force would not, and so the faculty sat there unused, like a good hand at cards that nobody calls.</p>
+<p>And his mother could not look at him.</p>
+<p>Elianor Longblood had spent one-and-thirty years converting an hour in a cold muniment room into an instrument that could not be struck, and had done it because she was a woman and the law was the only lever on the table; and she had produced, out of her own body, at eight-and-twenty, a version of herself with four inches of reach and no need of the law at all.</p>
+<p>She was cold to him from his childhood and never explained it and he never stopped trying to earn it, and when he was about thirty he stopped trying and started to hate her instead, which was easier for both of them and which everybody at that court mistook for the beginning of the trouble rather than the end of it.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>The court at Valora in those years was the finest room in two kingdoms and Alaysha Renard was miserable in it for four years and competent in it for eighteen.</p>
+<p>She was freakishly tall. She has the look of Vhas — the long face, the black hair, the colourless eyes the Renards get and nobody else does — in a court full of red and fair Everbloods, and she came into a hall a head above most of the women and level with a good many of the men, and she never once in her life found a way to make that not be the first thing about her.</p>
+<p>She was clever and it did not read as clever. That was the real injury. Elianor Longblood could take a table apart with a joke and everyone left laughing; Alaysha said the same kind of thing in the same kind of room and it landed like a dropped plate, because she had learned her timing from a man who never raised his voice and never needed a room on his side. What is charm in a Vhasian queen is <em>cageyness</em> in an Aelerian bride, and she was two years at that court before she understood that the difference was not in her and not in the sentence.</p>
+<p>They called her sly. They called her the heir of madness, after Braedyn Fenwood said it once at his own table and it got out, and he was ashamed of that for the rest of his life and never apologised, because a Fenwood does not.</p>
+<p>And this is the exact, particular shape of her trap, and it is why this book exists.</p>
+<p><strong>The record was already owned.</strong></p>
+<p>The old queen held the household, the chancery, the victualling, the precedents, the memory, the jokes, and fifty years of men saying <em>ask the queen, she'll know</em>. Every route Elianor Longblood had cut through that court she had cut for herself alone, and she had cut them so well that there was no second path — not out of malice, not by design, not because she ever once tried to keep Alaysha down, but because an instrument that cannot be struck also cannot accommodate a second party.</p>
+<p>Alaysha spent four years looking for the lever and there was not one.</p>
+<p>There was no office she could take that was not already held. No knowledge she could acquire that was not already somebody's. No use she could make herself that was not, in that hall, covered — and <em>well</em> covered, and covered by a woman who was unfailingly, immaculately, publicly courteous to her for nineteen years.</p>
+<p>So at twenty she stopped looking for a lever in that room, and went and looked underneath it, which is where the Renards have always looked, and where there had been a nail in a lintel in the stable court since the night before her wedding.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>The Longblood Defiance came in her twenty-third year and she had no part in it whatever, which nobody has ever believed.</p>
+<p>She will not be defended here at length, because the defence is dull and complete: she was three-and-twenty, she had three children under seven, the rising was four hundred miles west of her in country she had never seen, it was raised by a queen who did not confide in her and fought over a quarrel she was not told the cause of, and there is not one sentence in any source that puts a Renard anywhere near it.</p>
+<p>What she did was watch her husband.</p>
+<p>Wyllmot Everblood was three-and-twenty also, and went west with his father, and came back in the spring with a reputation that outlived him by a century.</p>
+<p>It is recorded that he was thorough. It is recorded that at two places on the Adrian march he did things that his own father declined to write down, and that Braedyn Fenwood, who was at the second of them and who had by then seen forty years of war, left the field and was sick behind a wall and never afterward spoke to Wyllmot except on business.</p>
+<p>Alaysha was at Valora when he came home.</p>
+<p>She had expected — she said this once, at fifty, and it is the most honest thing anybody in this family ever said about another — she had expected to be frightened of him.</p>
+<p>She was not. He came in tired and civil and asked after the children and washed and ate, and was gentle with Brightstride, who was six, and let Veralyn, who was four, sit on the table while he ate, which he never allowed; and that night, late, he said one thing about it, once, into the dark, in the tone of a man reporting a fodder return:</p>
+<p>"She should have argued. She is the best arguer in the world. She could have had it all by arguing and she went and got horses."</p>
+<p>And Alaysha Renard lay in the dark beside her husband and understood two things at the same time and never told him either.</p>
+<p>The first was that he was not describing his mother. He was describing the thing he most feared about himself, and he had done it in eleven words, and he had no idea.</p>
+<p>The second was that he was <em>right</em>, and that being right was going to kill him, and that he came by it honestly, because it had very nearly killed the only other person in that family who was built this way — and <em>she</em> had survived it by becoming a lawyer, and he was never going to, because nobody had ever refused him anything he could reach.</p>
+<hr class="scene-rule"/>
+<p>Baldvyn pardoned his son Valdais and incarcerated his wife.</p>
+<p>The house they put her in has never been named in any source, which is itself remarkable in a kingdom that writes down the price of candles. There was a guard on the stair. It went on a long time. The Unity's Luminary was admitted four times and nobody else was admitted at all, and the whole court got very good at not asking, in the way that courts do.</p>
+<p>Alaysha went in the third year. She asked the king for leave and was given it in a single word and was not asked why, which she thought at the time was carelessness and understood later was mercy.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>She was three-and-twenty. The old queen was three-and-fifty and had been in that house two years and four months.</p>
+<p>It was a good room. That was the first thing and it is worth putting down, because everybody imagines a cell: it was a good room, warm, with a fire and a window with a view of nothing in particular, and there was a table, and on the table there were rolls, because somebody at the chancery had been sending her the fodder accounts of the northern garrisons for two years and nobody had ever given an order about it either way.</p>
+<p>Elianor Longblood was reading them when Alaysha came in, and finished the line she was on before she looked up, which Alaysha noted and filed and kept.</p>
+<p>"Madame."</p>
+<p>"Madame," said the old queen. "Sit down. They will give you an hour and they will mean forty minutes." She squared the roll to the corner of the table. "Are my grandchildren well?"</p>
+<p>"They are. Veralyn has had the fever and is over it. She is four and she has taken to going up things."</p>
+<p>"Ah," said Elianor. "The middle one."</p>
+<p>"Yes."</p>
+<p>"Keep an eye on that," said the old queen, and it is not recorded whether she meant the fever or the going up things, and Alaysha thought about the sentence for the next nineteen years.</p>
+<hr class="scene-rule"/>
+<p>They talked about the children for eleven minutes and about the garrisons for nine, and then Alaysha said what she had come four days' ride to say, which she had rehearsed and did not use, so that what came out was worse and better:</p>
+<p>"I cannot get any purchase in that house. I have been trying for seven years. I am not a fool and I am not lazy and there is nothing there. I have come to ask you how it is done, because you are the only person alive who has done it."</p>
+<p>And Elianor Longblood — imprisoned, three-and-fifty, two years from the nearest thing to a friend — did her the honour of taking the question seriously, which took about a quarter of an hour, and gave her the best answer there is.</p>
+<p>Own the record.</p>
+<p>Not the crown, not the council, not the army: the <em>record</em>. Learn what everything costs. Learn where the roads go and who owes what to whom and which clerk keeps which roll and what the livery schedule was fixed at seventy years ago. Be reliably right about facts, because a body of men who have decided you are reliable about facts will follow you where they would not follow someone they merely adore. And then, when it matters, be a <strong>term</strong> — get your name into the recitals of an instrument that cannot be unmade without collapsing four hundred miles of border, so that removing you becomes the expensive option.</p>
+<p>"It takes twenty years," she said. "It is not a plan. It is a trade. And you have the right temperament for it, which I saw the first afternoon, and I have been waiting seven years for you to come and ask."</p>
+<p>There was a pause of some length.</p>
+<p>"Madame," said Alaysha Renard, "you have just described a road with one lane on it."</p>
+<hr class="scene-rule"/>
+<p>She said it without heat. That is in her favour and it is also what made it unanswerable.</p>
+<p>She laid it out the way her father laid out a roll. The household was held. The chancery was held by affection and by fifty years of precedent that lived in one woman's head. The victualling of two realms was held. Every officer in that palace had been in his place since before she was born and every one of them had been put there, or confirmed there, or corrected there, by the same hand. There was not one lever in that hall that was not already somebody's, and the somebody was sitting in front of her reading the northern fodder accounts in a locked house, <em>and still holding them</em>.</p>
+<p>"You did not do it to me," she said. "I want that said, because I know it and I shall go on knowing it. You did not keep me out. You were courteous to me from the first day and you have never once been anything else and I have watched for it. But an instrument that cannot be struck cannot admit a second party, madame, and you built the only one there is, and you built it very well, and there is no room in it for me."</p>
+<p>Elianor Longblood sat with that.</p>
+<p>And then — and this is the reason this scene is in this book, and the reason there is a second book at all — she did the thing she had done perhaps four times in fifty years, which was to check.</p>
+<p>She went through it. You could watch her do it: the household, the chancery, the roads, the clerks, the diet rolls, the Gorget, the eleven ways in. It took her about ninety seconds and Alaysha sat and watched a mind that two kingdoms had been frightened of for thirty years go over a problem with the lights on.</p>
+<p>Then the old queen said: "You are right."</p>
+<p>"Yes."</p>
+<p>"I have never looked at it from that side. I did not build it to be the only one. I built it because it was the only one available to <em>me</em>, and then I was in it for thirty years, and it did not occur to me that the thing I made to keep from being struck out would sit in the doorway." She put two fingers on the edge of the table, the way her husband's second son used to put two fingers on the edge of a trestle. "That is a fault in the work. I am sorry for it. It is not a thing I can put right from here."</p>
+<p>"No."</p>
+<p>"And I will not insult you by telling you to wait for me to die," said Elianor, "because I am three-and-fifty and my mother's people last, and you would be six-and-forty, and by then you will be somebody else."</p>
+<hr class="scene-rule"/>
+<p>Forty minutes. The guard came to the stair.</p>
+<p>Alaysha stood and made her courtesy and got as far as the door, and then turned round, because she was a Renard and could no more leave a count unfinished than the old queen could leave a silence alone.</p>
+<p>"Madame. One question and you need not answer it."</p>
+<p>"Ask."</p>
+<p>"What did it cost?"</p>
+<p>Elianor looked up.</p>
+<p>"The instrument," said Alaysha. "Fifty years of it. Everything you have just described to me — the record, the terms, the clause that cannot be struck. What did you pay for it? Not what did it cost the kingdom. What did it cost <em>you</em>, itemised. I keep a book and I was raised to think in that column and I would like the figure, because I am three-and-twenty and I am about to start, and I should like to know the price before I go in."</p>
+<p>And Elianor Longblood — who knew what pepper had cost in nine separate years, who could give you the livery schedule of 720 from memory, who had reconstructed a night's traffic in a corridor out of a shilling and a load of firewood, and who had never in her life been unable to produce a number —</p>
+<p>— opened her mouth, and closed it.</p>
+<p>She did not answer. Not evasively, not proudly; she simply did not have it. Nobody had ever asked her to add it up. She had spent fifty years keeping the most exact accounts in two kingdoms and had never once opened a column for herself, and a girl of three-and-twenty from a cold house in the hills had walked in and asked her for a total and she could not produce one.</p>
+<p>The guard was on the stair.</p>
+<p>"Go on," said the old queen, quietly. "You will be late."</p>
+<hr class="scene-rule"/>
+<p>She thought about it for nineteen years. There is a line in a letter of hers, written at seventy to a man in a priory at Ancourt, that is the nearest she ever came:</p>
+<p class="marginalia"><em>I have been trying since the spring of the third year to draw up a particular account, at the instance of a lady who asked me for it very civilly and has never mentioned it since. I find I cannot arrive at a figure. I find I cannot arrive at the first entry. You will laugh at me; do, I should be glad of it.</em></p>
+<hr class="scene-rule"/>
+<p>Alaysha Renard rode home four days and did not sleep much.</p>
+<p>What she took away was not bitterness, and it was not triumph, and anybody who thinks she went into that house to score off an old woman has not been paying attention.</p>
+<p>What she took away was this:</p>
+<p>The most exact accountant in two kingdoms, asked for the price of her own life's work, <strong>could not produce the figure</strong>.</p>
+<p>So the record does not hold it. The record — the rolls, the chancery, the instruments, the whole enormous apparatus that Elianor Longblood had spent fifty years owning and that Alaysha had spent seven years failing to get a grip on — <em>does not have a column for what it costs</em>. It never did. It is a book of what was agreed and what was paid <em>to</em> people, and there is no page anywhere in it for what was paid <em>by</em> them, and there never will be, because nobody has ever wanted one.</p>
+<p>There is exactly one book in the world with that column in it.</p>
+<p>She began her own that winter, in her own hand, in a fair upright script her mother would have approved of, in a small locked press in her own chamber in a foreign palace; and the first leaf of it has one line, and the line is:</p>
+<p class="marginalia"><em>A hound. Paid: in full, and refused.</em></p>
+<p>She had already, by then, been waiting eight years for a receipt.</p>
+<hr class="scene-rule"/>
+<h2>THE FIFTH LEAF</h2>
+<div class="panel panel-gold instrument"><p><strong>ALAYSHA RENARD</strong></p><p><em>Paid:</em></p></div>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>She was answered.</p>
+<p>That has to be said first and said plainly, because the pamphlets have it that she was punished and the Unity has it that she was deceived and her own daughter has it, in the one letter where she touches on it at all, that she was <em>mocked</em>; and all three of those are readings, and the fact under all three of them is that she asked for something in the proper form and something happened.</p>
+<p><strong>Baldvyn</strong>, called Brightstride, in the first year: fair like his father's father, and enormous by twelve, and a peerless warrior by twenty. One.</p>
+<p><strong>Veralyn</strong>, in the third year.</p>
+<p><strong>Elysabeth</strong>, in the fifth: bright, cheery, stubborn about it, brave in a way that surprised everybody including her father.</p>
+<p><strong>Roslyn</strong>, in the eighth: anxious, spoiled, her mother's favourite, and the only one of the four that Alaysha could ever simply <em>hold</em>.</p>
+<p>Two great warriors. Three lovely daughters. That was the ask.</p>
+<p>She got three daughters, and one of them is a warrior, and she has been doing the arithmetic for five-and-twenty years and it has never once come out.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>The readings. There are four, she found all four before Veralyn was nine, and she has never been able to rank them.</p>
+<p>They are set down here the way she set them down, which is flat, in a column, in her own book, in the fair upright hand.</p>
+<p><strong>One.</strong> <em>The clerk.</em> The office that keeps the roll enters what is said, as said. She said <em>warriors</em>. She did not say <em>sons</em>. She was fifteen and had never heard a warrior-woman spoken of except as a scandal in Ykrul, and it did not occur to her that the word could take a daughter, and the entry is <em>correct</em>. There is no fault anywhere and no appeal, and the most frightening feature of this reading is that a court of law in either kingdom would arrive at it in a morning.</p>
+<p><strong>Two.</strong> <em>The creditor.</em> The hound was not a payment. It was a first instalment against a house account four generations overdue — ROCKE, all of them, and not enough — and the ask was honoured at the cheapest possible rate, one warrior and one daughter in a single body, <strong>precisely so that the account would remain open</strong>. Under this reading her children are not a gift. They are interest, and her family is still in arrears, and the goddess is being scrupulously fair.</p>
+<p><strong>Three.</strong> <em>The blade.</em> She did not ask for a blessing. In the form she used, in that court, at that hour, with a nail driven into a crown lintel, she <em>commissioned</em>. She asked for warriors and received the good one and the terrible one, and eighteen years later a sword that will not chip or dull came out of an altar in the Aelerian crags and attached itself to the terrible one — and under this reading Veralyn is not a receipt at all. She is the delivery. She is what the hand that strikes made out of a hound.</p>
+<p><strong>Four.</strong> <em>The left hand.</em> Nothing was entered. Nothing is owed. Nothing is coming. There is no ledger with her name in it and there never was, and every event in this book is weather, coincidence, a hard family, a bad marriage and a woman doing arithmetic on her own children.</p>
+<p>She can hold the first three for hours. She has held them for decades.</p>
+<p>She cannot hold the fourth for four minutes, and she has never been able to, and the reason is not theological. It is that the fourth is the only reading in which the dog died for nothing.</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>Veralyn has her face.</p>
+<p>Not a resemblance. The <em>face</em> — the long Vhas jaw, the black hair where every other Everblood in six generations came out red or fair, and the pale colourless Renard eyes that the hills give and nothing else does. Put them at opposite ends of a hall at the right angle and men stopped talking.</p>
+<p>And Wyllmot Everblood, who by then hated his wife with a cold and perfectly managed hatred that never once broke the surface in twenty-two years, had to look at that face across his own table every day of the child's life.</p>
+<p>He was not cruel to her. He was <em>suspicious</em> of her, which is worse, because cruelty is a thing a child can locate.</p>
+<p>He told himself it was the warrior business — that a daughter who wanted the pells was unnatural, that he would not have it, that he had a son for that. It was not the warrior business. His sister Aryka had gone the same road a generation before and he had merely disapproved. What he could not do was look at a girl with his enemy's face doing the one thing he himself was for, and not feel the floor move.</p>
+<p>So he sent her away at eleven to be trained by the Fenwoods, which he told everyone was a punishment and which Braedyn Fenwood understood in about four seconds was the best thing that ever happened to her, and which Alaysha did not oppose.</p>
+<p><strong>She did not oppose it.</strong> That is the entry in her own book for that year and it is one line and it has no price beside it, and it is the only entry in the whole codex where she has left the price column blank on purpose.</p>
+<p>Because she could not love that child properly and she knew it and she had known it since the birthing room, and she has written down why, once, and only once, and the sentence is:</p>
+<p class="marginalia"><em>I have tried for eleven years and I cannot look at her without looking for the answer, and a child is not a document, and I have made her one.</em></p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>The boy was Harald.</p>
+<p>Nobody said it aloud for the first fifteen years because nobody at that court in that generation had known Harald the Bold, who reigned ten days and was shot at a gate before Baldvyn Brightstride's grandfather was thirty. But Elianor had known him. Braedyn Fenwood had known him at second hand for sixty years through the only man who loved him. And Alaysha, who had read that family the way her father read rolls, had it out of the chronicles by the time the boy was nine, and then had to watch.</p>
+<p>He was decent. He was decent the way water is wet — without effort, without display, and without the smallest notion that it was remarkable. He was brave and he was fair-minded and he was not very wise and did not need to be. He was <em>thorough</em>, which is the Harald disease; put a wrong thing in front of him and he could no more leave it than breathe. And he was liked. God, he was liked. He came into a hall and it improved.</p>
+<p>And Alaysha Renard sat at the high table for three-and-twenty years watching the best-loved young man in Viterra grow into a copy of the best-loved young man in Viterra, and she had read what happened to the first one, and there was nothing whatever she could do about it, because the only way to warn him would have been to explain how she knew.</p>
+<p>There is one line in her book for the year he turned twenty-one. It is the shortest entry in the codex.</p>
+<p class="marginalia"><em>He is the good one. They kill the good one.</em></p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>The moment she gave up on compliance was not a cruelty and not a betrayal and did not happen to her.</p>
+<p>It was Oswyn's face at a wedding.</p>
+<p>She was about six-and-twenty; it was some cousin's marriage at Valora; and Oswyn Everblood came down from Istovar, as he did about twice a year, and stood through it. He was sixty-odd by then. He had renounced a crown for a canton at seven-and-thirty and had kept every word of it for thirty years and had never once, by any account anybody could produce, tried to get anything back.</p>
+<p>And he was <em>well</em>.</p>
+<p>That is the whole of it. He was heavier and quieter and a good deal more frightening than the man in the stories — an exact, formidable old duke who said perhaps four things in an evening and meant all of them — but he was himself, entire, unhollowed, running a province and outliving his relatives and occasionally saying something so dry that the table took a moment to catch it. He had been handed an instrument at seven-and-thirty and he had signed it and it had <em>worked</em>.</p>
+<p>Alaysha stood at the side of a hall and looked at him for a long time and did the sum, and the sum has four lines in it.</p>
+<p>He was a man. He was granted land — a canton, in fee, heritable, with the crossings and the tolls thereof. His name is in the recital. <em>Oswyn Everblood renounces.</em> Active voice, his own hand at the foot. He was a <strong>party</strong>.</p>
+<p>She was Item the Fourth. She was conveyed and delivered, and in consideration of her nothing whatever was granted <em>to</em> her, because nothing is ever granted to a surety; a surety is the consideration.</p>
+<p>So it is not true that compliance destroys you. She had the proof standing eleven feet away with a cup in his hand. Compliance works perfectly well.</p>
+<p>It works if you were ever a party.</p>
+<p>And she went home that night and did not weep and did not write anything down, and from that year forward she stopped, permanently, looking for a way to do it as the old queen had done it.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>Her father died in the thirtieth year of the century, at Kaerndal, of a thing in the gut that took four months.</p>
+<p>He sent for her in the last fortnight. She had four days' notice on the road of what was coming, because he had told the rider what to say, because he told everybody everything honestly; and she did not turn back.</p>
+<p>He was in the muniment room with a fire and had had the bed brought in, which is the only concession to comfort she ever saw him make, and the locked press was on the table beside him, open.</p>
+<p>They talked for two hours over three days and most of it was estate business, which was a courtesy on both sides.</p>
+<p>At the end of the second day he told her about Brigh.</p>
+<p>He told it as a review, the way he had told it to her brothers from the gallery when she was twelve — three reasons it failed, the corrections he had made — and in the middle of the second reason he said, in the tone of a man reading a fodder return, that the difficulty with Branton Thornhill had always been that Branton was not answerable to him, and that he had therefore had to be given a situation rather than an order.</p>
+<p>And Alaysha, who was one-and-thirty and had been a wife for sixteen years, said: "What situation?"</p>
+<p>"A house," her father said. "A ward. A want. And then you leave it seventeen months and you read the rolls."</p>
+<hr class="scene-rule"/>
+<p>She sat there.</p>
+<p>She has written down what she did next and it is four words: <em>I did not move.</em></p>
+<p>She did not get up and she did not say anything and she did not accuse him, and she stayed the third day as well, and did the estate business, and took his hand when it was time, and closed his eyes herself, and rode home.</p>
+<p>She was thirty years old and she had believed since she was eleven that her father had <em>used</em> a rising that a bad man started.</p>
+<p>He had arranged the conditions and waited and read the rolls. He had not given the order. He would never in his life have given an order like that — not from squeamishness; because an order is a thing that can be traced, and because it was more elegant not to, and because he genuinely wanted to know at what point the man would stop being careful.</p>
+<p>A girl of one-and-twenty, a king's daughter, in a house he had selected.</p>
+<p>And the thing Alaysha could not get past, then or ever, was not the horror of it. It was that her father had told her in the middle of the second reason, as an aside, to illustrate a point about command — and had then gone on to the third reason, which was about supply.</p>
+<hr class="scene-rule"/>
+<p>The entry she made for that year is the longest in her book and the only one with an erasure in it.</p>
+<p class="marginalia"><em>Alayse Everblood. Paid: ——</em></p>
+<p>And then, scraped out, illegible, in a hand not quite her own because her hand was not steady; and then, underneath, in the fair upright script:</p>
+<p class="marginalia"><em>I do not know what she paid. I know what was taken. I have no authority to enter it and I am entering it anyway, and if this is not my book to write in then let the one who keeps it come and correct me.</em></p>
+<p>Nobody ever did.</p>
+<p>She checked that leaf, at intervals, for eight years.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>Wyllmot went to Galalina in his eight-and-twentieth year and came back with God.</p>
+<p>It was not a pose and it was not politics and this book is not going to be clever about it. He went out a dutiful man who attended and came back a believer, and whatever happened on that road happened, and he never described it to anybody including his confessor, and he was better for it in eleven observable ways. He drank less. He gave more. He stopped, entirely, doing a particular thing with servants that he had done since he was nineteen and that his wife had been managing quietly for a decade.</p>
+<p>And he came back understanding, with total clarity and for the first time in his life, that there were shrines in his own kingdom to a goddess of debt and the final blow, and that they were tolerated, and that they were tolerated because his great-grandfather had married a Renard.</p>
+<p>He was patient about it for six years, which for Wyllmot Everblood is an act of superhuman restraint and which nobody has ever given him credit for.</p>
+<p>Then the forbearance went.</p>
+<hr class="scene-rule"/>
+<p>It went the way things go in Viterra: not by edict. There was no proclamation, no burning, no martyr. There was a ruling of the Parlement on a point of tenure, and then a second ruling, and then a visitation; and the safehouses in the Aelerian foothills with the iron nails in their lintels were found to be in the king's gift, and were granted out, and the grantees had the nails drawn because they were unsightly.</p>
+<p>Eleven houses in four years. Not one death. Perfectly legal, entirely correct, and done by a man who was right on the law.</p>
+<p>Alaysha Renard watched her husband take away the only thing that either of her family's two marriages into that crown had ever been for.</p>
+<p>And she did not oppose him, because there was nothing to oppose — you cannot argue a tenure ruling with a king who has read it — and because by then she had the whole shape of it and the shape was this:</p>
+<p>Her great-great-aunt sold her body for the forbearance. She sold hers for the same thing, and was told so, in a cold hall, by a man with a cup of poor wine, and had been proud of it at fifteen.</p>
+<p>The price had been paid twice.</p>
+<p>The thing was taken anyway.</p>
+<p>And there is no office anywhere — not in Valora, not in Vhasia, not in any codex in any locked press in the Aelerian passes — where you may go and ask what happens to an account when the consideration fails.</p>
+<hr class="scene-rule"/>
+<h3>viii.</h3>
+<p>Lence fell in her four-and-thirtieth year and her daughter was fifteen and in a supply wagon.</p>
+<p>Alaysha did not know until it was over. Nobody did; the girl went in a wagon, dressed as a page, and squired for Wymund the Red against her father's express command, and the first word that reached Valora was the sack.</p>
+<p>What came back with the reports, three weeks later, was a village called Coldmorrow.</p>
+<p>The facts are not in dispute and this book will not soften them. Veralyn Everblood, fifteen years old, tracked the last of the Thornhills — a cooper, a man of five-and-thirty who had been spared as an infant in a yard at Brigh by her own great-grandfather — to a village in the royal domain, and he wounded her cousin, and she killed him with a mace.</p>
+<p>And then she burned the village.</p>
+<hr class="scene-rule"/>
+<p>Alaysha had four days between the first report and the girl coming home, and she has recorded exactly what she did with them, and it is the single least defensible passage in her book and she did not scrape it out.</p>
+<p>She went through it as a ledger.</p>
+<p class="marginalia"><em>Thornhill. Entered at Brigh, in the first leaf. Spared by Baldvyn Everblood in the yard, five-and-thirty years ago, before witnesses, deliberately, with his dagger drawn: he is a child; prune him gently, or the root will spread. Settled at Coldmorrow by Veralyn Everblood, aged fifteen, with a mace.</em></p>
+<p>And she wrote underneath it:</p>
+<p class="marginalia"><em>The account is closed. It was left open for five-and-thirty years by a mercy and it has been closed by my daughter, who was not told about any of it and who has never heard the word Myrmis said aloud in her life.</em></p>
+<p class="marginalia"><em>If that is not the hand that strikes then I do not know what would be, and I am afraid, and I am also — and I will write this down because nobody else ever will — I am also relieved, because a hand that strikes is a hand that is keeping the count, and the alternative is that my daughter burned a village in a temper.</em></p>
+<p>When the girl came home Alaysha met her in the yard and put her hands on her face and looked at her, and Veralyn Everblood — fifteen years old, four weeks out of a burning — later told exactly one person what her mother's expression had been.</p>
+<p>She said it was the look of a woman reading a document.</p>
+<hr class="scene-rule"/>
+<h3>ix.</h3>
+<p>Baldvyn the Good died in her six-and-thirtieth year, and before he died he threw the greatest tourney in eighty years, because he knew what was coming and wanted the kingdom to remember something else.</p>
+<p>Veralyn was allowed to enter, which was a scandal, and which the old king permitted in three words at his own table. She was seventeen. She unhorsed Sir Arin Tymber and Sir Lerris Fenwood and Sir Ouen Longblood, and killed Ouen's horse after he said something about her mother's people, and was beaten in the end by Tylan Vayle, who was larger than she was and knew it and has never once in twenty years let anybody say he beat her on anything else.</p>
+<p>And Wyllmot Everblood, who had exiled his daughter for wanting the pells, watched the whole of it from the gallery, and went down afterward into the yard in front of four thousand people, and took her head in his two hands and put his forehead against hers and said something nobody heard.</p>
+<p>They were reconciled from that hour to his death. It was two years.</p>
+<p>Alaysha watched it from the gallery beside him.</p>
+<p>The entry in her book is one line and it is the only line in the whole codex written in anger:</p>
+<p class="marginalia"><em>Two years. She has been eleven years waiting for it and she has been given two years and I am to be glad.</em></p>
+<hr class="scene-rule"/>
+<h3>x.</h3>
+<p>The Seven Week Uprising began in the spring of the thirty-sixth year, when a sect of Myrmis-worshippers in the Aelerian foothills began killing nobility.</p>
+<p>They were not the Shadow-Court, whatever the Unity says. The Shadow-Court has never in four hundred years done anything in public; a thing that goes into the open has already failed. These were something newer and hotter and considerably stupider — men with a real grievance about eleven drawn nails and eleven granted-out houses, who had been told by somebody that the goddess keeps a ledger and had drawn from that the entirely mistaken conclusion that she wanted them to do the collecting.</p>
+<p>They had a champion. His name was Gelfrey Renard.</p>
+<p>He was her cousin. Third cousin; the Kaerndal line at one remove; he had come east twice as a young man and she had known him a little and had thought him devout and dull.</p>
+<hr class="scene-rule"/>
+<p>Now the thing that has to be set down, and the book will set it down once, in full, and not come back to it.</p>
+<p>In the twentieth year of the century — sixteen years before the Uprising; two years after her marriage; a fortnight after the first of the tenure rulings, though nobody then knew what they were the start of — Alaysha Renard, aged two-and-twenty, in a passage at Valora, in a temper, said a thing to Gelfrey Renard.</p>
+<p>She had been arguing with her husband. Wyllmot had been righteous at her for a quarter of an hour about her mother's people and had walked off satisfied, which was what he always did, and she had come round a corner and there was a devout dull cousin from home standing in a passage, and she said — in the flat, level, unraised voice she had learned from her father and used all her life, which is a voice that carries a very long way in a stone corridor —</p>
+<p class="marginalia"><em>"Somebody should show him what a broken shrine costs."</em></p>
+<p>That is all. Eleven words. She never said it again, to him or to anybody. She did not write to him. She did not send him money; the accounts have been gone through four times by four different sets of enemies and there is nothing, because there is nothing. She saw him twice more in sixteen years, at gatherings, and spoke to him about a horse and about his mother's health.</p>
+<p>Sixteen years later he raised a rebellion against her husband over broken shrines and it cost her husband his life.</p>
+<hr class="scene-rule"/>
+<p><strong>Did she do it?</strong></p>
+<p>The court's answer is yes and has been yes since about a fortnight after Eryas; the Renard Suspicion has been running at that court for two years and Braedyn Fenwood, who learned about the hound after the fact from a source he has never named, told Veralyn to trust her mother not at all, and Veralyn already knew and had already decided and it did not change a thing between them, because that is the kind of thing Veralyn is.</p>
+<p>The honest answer, which nobody has, and which this book has because it has her book, is that <strong>she does not know.</strong></p>
+<p>She has gone at it for two years the way her mother went at the strike on the ROCKE leaf: with a thread, in the light, again and again, getting the same unusable number.</p>
+<p>Eleven words in a passage. Sixteen years. No money, no letter, no second word. A man who was devout and dull and who had, in the interval, watched eleven houses granted out and eleven nails drawn by the king she had been complaining about — which is a cause, which is a <em>sufficient</em> cause, which would have been enough for him without her, and which she cannot prove was enough for him without her, because the one man who could say is dead on an altar with his own dagger in his heart, put there by her daughter.</p>
+<p>Set it out as a ledger and it will not resolve. She has set it out as a ledger four hundred times.</p>
+<p><em>If the clerk kept it,</em> then eleven words were entered in a corridor sixteen years ago and everything since is the entry being worked out, and she is the author.</p>
+<p><em>If the creditor kept it,</em> then the words were nothing, a coincidence of temper, and Wyllmot Everblood died because his house owed for the Rockes and for Alayse and for a spared infant and for eleven drawn nails, and she is merely the woman who happened to be married to the debtor.</p>
+<p><em>If the hand that strikes took it,</em> then she commissioned a second time without knowing she had, and it took sixteen years to fill the order, and her daughter carried it out.</p>
+<p><em>And if it was the left hand</em> — if nothing was ever entered — then a stupid young man heard an angry woman in a passage and remembered it for sixteen years and got four thousand people killed over it, and there is no goddess in it anywhere, and it is all just her.</p>
+<hr class="scene-rule"/>
+<h3>xi.</h3>
+<p>Wyllmot died storming the Eryas Citadel against Braedyn Fenwood's counsel of patience, at eight-and-thirty, going in ahead of his own household because the alternative was to stand in a field and be looked at.</p>
+<p>Alaysha was told by a rider at the fourth hour. She asked three questions: where, how long, and where were her children. She got the answers. Then she stood in the middle of a room with her hand on the back of a chair and did not move for perhaps a minute and a half, in a house four hundred miles from a cold yard where she had once watched her father look at a road.</p>
+<p>What she thought in that minute and a half she wrote down that night, and it is four words:</p>
+<p class="marginalia"><em>I wanted this once.</em></p>
+<p>Not <em>I did this</em>. Not <em>I did not do this</em>.</p>
+<p>She has never been able to get past those four words to either of the other two, in two years of trying, and she is the best keeper of accounts in the Aelerian passes, and she cannot close her own leaf.</p>
+<hr class="scene-rule"/>
+<p>Veralyn and Brightstride put the Uprising down in nine weeks.</p>
+<p>At the end of it Veralyn Everblood went into the inner sanctum at Eryas and faced Gelfrey Renard, who did not draw a weapon; and killed him on the altar with his own dagger; and a blade was found beside that altar afterward, unmarked, perfectly balanced, and remembered by no one as having been carried in.</p>
+<p>She has never been more than a few feet from it since.</p>
+<p>She does not know it is anything. Nobody does. It is a very good sword.</p>
+<hr class="scene-rule"/>
+<h3>xii.</h3>
+<p>Baldvyn Brightstride was crowned at one-and-twenty and married Jaennis Fenwood at three-and-twenty and died three months later of a fever, and the kingdom went to pieces over him in a way it has not gone to pieces over anybody in a hundred years, because he was the good one, and everybody knew it, and there was nothing else to say about him and nothing else needed saying.</p>
+<p>Poison is generally assumed. There are four people with reasons and no evidence against any of them.</p>
+<p>Alaysha Renard has not written one word in her codex about her elder son's death. Not a name, not a price, not a blank. There is a leaf left for it. It is empty, and it has been empty for two years, and her daughter has seen it.</p>
+<p>The only thing she has ever said about him aloud, in company, at table, in the hearing of nine people, was in answer to an ambassador who had ventured that the young king had been much loved.</p>
+<p>"He was the good one," said the Queen-Mother. "It is not a survivable condition in this family. We have produced two in four generations and buried them both before thirty, and the first one at least had the decency to be killed by an enemy."</p>
+<p>Nobody laughed. It was not a joke. Her jokes never did land and she stopped caring about that at thirty and never went back for it, which is a thing she has in common with an old duke in Istovar and with nobody else at that court.</p>
+<hr class="scene-rule"/>
+<h3>xiii.</h3>
+<p>She is two-and-forty.</p>
+<p>Her daughter was crowned in the spring. The court calls Alaysha the Queen Dowager, and a good many of them call her Alayne, which is not her name and which began as a chancery slip forty years ago and which she has never corrected, because a woman who lets a court get her name slightly wrong is a woman they stop looking at.</p>
+<p>She is rich, formidable, disliked, and consulted. She does not get on with her son's widow. She and her daughter are civil and careful and there is a room in each of them the other has not been in.</p>
+<p>Her father is dead. Her mother is dead. Her brothers are at court and are worth about what was put into them. There are Rockes in Ubral, and there is a woman of about forty with a good eye who was given a mare on the road once when she was ten and who has never told anybody, and who keeps beasts three valleys over from Kaerndal.</p>
+<p>The nail is in the lintel in the stable court and nobody has ever drawn it.</p>
+<p>The codex is in a locked press in her own chamber and it has four hands in it now, because she has been keeping it for nineteen years and the corrector has been in twice.</p>
+<p><strong>Twice.</strong></p>
+<p>The first was small and she can live with it. A name respelled — a tenant's name, entered by her wrong in the eleventh year, corrected in the margin in the small upright hand, and she found it four years later and sat with it for an afternoon and then, being her mother's daughter, went and checked the parish roll and found that the correction was right and hers had been wrong.</p>
+<p>She has taken a species of comfort from that for fifteen years. <em>Somebody is keeping it properly. Somebody cares that it is accurate.</em> It is the only comfort available in the whole of this religion and she has had the use of it exactly once.</p>
+<hr class="scene-rule"/>
+<p>The second was eleven days after her son's funeral.</p>
+<p>She had, in that fortnight, in a bad state, done the thing she had been not doing for nineteen years, which was to open her own book at her own leaf.</p>
+<p><em>ALAYSHA RENARD.</em> Her own hand, nineteen years old, fair and upright, at the head of the fifth quire. And the price column empty, as it had been since she ruled it, because you do not enter your own price; you are not the one who knows it.</p>
+<p>She looked at it for a while and closed the book and put it back and turned the key and put the key where it lives.</p>
+<p>Eleven days later she opened it again, for no reason, at the fourth hour of the morning, the way you do.</p>
+<p>There is a word in the price column.</p>
+<p>It is very small and very faint and it is in the small upright hand, and she has had it under a glass, and under four different lights, and in the sun at the window of a stone room at the hour when the sun is straight on it — and it is written so fine that she has never got a single letter of it, not one, in two years.</p>
+<p>So she did what she has done since she was fourteen, and what her mother did at mass, and what this family does instead of praying.</p>
+<p>She measured it. Against the entries above it. Against four other words in the same hand in the same quire. Three times, over two days, with a thread; and perhaps forty times since, at intervals, in three rooms, once with the door locked and her daughter waiting in the passage.</p>
+<p><strong>Six letters.</strong></p>
+<p>She has never got further and she is not going to. She has considered, and dismissed, and reconsidered every possibility that a woman with her training can generate: that it is a sum; that it is a name; that it is a word in the old Vhas that she would not know if she read it; that it is <em>ROCKES</em>, which is six; that it is <em>RENARD</em>, which is six; that it is nothing at all and she is a woman of two-and-forty who buried her son in the spring and has been holding a book up to a window ever since.</p>
+<p>And once — once, at the fourth hour, with the glass in her hand — it occurred to her that she had never established that the correction on the ROCKE leaf, made a hundred and sixty years ago in the same small upright hand, was a correction <em>of the Renards' error</em>.</p>
+<p>A clerk does not only fix the entry. A clerk fixes the <em>party</em>.</p>
+<p>She put the glass down that night and did not pick it up again for nine months.</p>
+<hr class="scene-rule"/>
+<p>She has one question left and there is no office in the world that takes it.</p>
+<p>Not <em>does the goddess exist</em>; she has long since stopped finding that one interesting, and she would tell you that people who ask it are asking about themselves.</p>
+<p>Not even <em>was I answered</em>; she was answered, there are four of them, two of them are warriors, and the arithmetic is on the table.</p>
+<p>The question is <strong>which hand</strong>, and there is no method.</p>
+<p>The clerk enters. The creditor collects. The one who settles it comes when it will not come. They are all of them Myrmis and they are not the same hand and nobody in two hundred years has been able to tell her that they speak to one another — and the fourth is not in the book, and if it was the fourth then there is no ledger, and a girl of fifteen knelt on cobbles in a foreign yard and cut the throat of the only thing in the world that was hers, in the dark, alone, correctly, in one —</p>
+<p>— for nothing.</p>
+<p>She has looked at it from every side there is. She has the codex, the thread, the count, eight-and-twenty years, the best head for accounts in the Aelerian passes and four hundred attempts.</p>
+<p>And when her daughter asked her, once, this spring, in the muniment room at Valora with a fire lit, at about the hour when they bring the lights — <em>Mother. What do you think it was?</em> — Alaysha Renard looked up from the leaf she was reading and gave her the only answer she has, which is the answer an old woman in Ethor gave to one person, once, about an entirely different matter, and which neither of them has ever known the other one said:</p>
+<p>"I have never been able to find out, and I have looked."</p>
+<hr class="scene-rule"/>
+<h2>APPENDIX OF LEAVES</h2>
+<p class="marginalia"><em>Taken from the codex at Kaerndal and from the codex kept at Valora in the Queen-Mother's own hand; reproduced as they stand, with the hands distinguished.</em></p>
+<p class="marginalia"><em>A Game Master may hand a player one leaf and say nothing whatever. The last one is the whole handout.</em></p>
+<hr class="scene-rule"/>
+<h3>The first leaf</h3>
+<div class="panel panel-gold instrument"><p><strong>BRANTON THORNHILL</strong></p><p><em>Paid: his house. The north, for a generation. A king, at a ford.</em></p></div>
+<p class="marginalia"><em>House hand. Entered by Valeran Renard in the year following Brigh, which is to say by the man who arranged the conditions and waited seventeen months and read the rolls.</em></p>
+<p class="marginalia"><em>Note what is not in it. Branton Thornhill did not pay a king at a ford; a king at a ford is what the entry cost somebody else. A Renard writing up a Renard's work enters the whole invoice under the other man's name and thinks nothing of it, and would be baffled to be told there was anything odd in that.</em></p>
+<p class="marginalia"><em>It is the only leaf in this appendix that can be read as simple bookkeeping, and it is the one that ought to frighten you most.</em></p>
+<hr class="scene-rule"/>
+<h3>The second leaf</h3>
+<div class="panel panel-gold instrument"><p><strong>ROCKE</strong></p><p><em>Paid: all of them, and it was not enough.</em></p></div>
+<p class="marginalia"><em>House hand, over a strike.</em></p>
+<p class="marginalia"><em>The strike is in the second hand: one fine ruled line, ink over ink, thorough. Nothing beneath it is legible and nothing ever has been.</em></p>
+<p class="marginalia"><em>The word beneath it is six letters long. Rocke is five. Four generations of that family have read this leaf as proof that they were the creditor, and two women in a hundred and sixty years have taken a thread to it, and both got six, and neither ever told a man.</em></p>
+<hr class="scene-rule"/>
+<h3>The third leaf</h3>
+<div class="panel panel-gold instrument"><p><strong>ALAYSHA RENARD</strong></p><p><em>Paid: to the crown, in surety of the peace among the passes.</em></p></div>
+<p class="marginalia"><em>House hand. Entered by Valeran Renard on the day the terms came up the switchback, which was three weeks before he told his daughter, and five months before the wedding, and which means the leaf was written before the girl was asked anything at all.</em></p>
+<p class="marginalia"><em>Compare Item the Fourth of the Peace of Belworth, in the other book. The wording is not similar. It is the same, allowing for a different clerk and one-and-thirty years, because both were drawn from the same formulary, which has been in use in that chancery since before either family existed and which will be in use after both of them are gone.</em></p>
+<p class="marginalia"><em>In surety. It is a good clause. It has never failed. It is not required to do anything for the person named in it.</em></p>
+<hr class="scene-rule"/>
+<h3>The fourth leaf</h3>
+<div class="panel panel-gold instrument"><p><strong>A HOUND</strong></p><p><em>Paid: in full, and refused.</em></p></div>
+<p class="marginalia"><em>Her own hand, aged three-and-twenty, four days after a conversation in a locked house with a guard on the stair; the first entry in a book she began that winter because the other book — the rolls, the chancery, the whole apparatus of two kingdoms — has no column for what a thing costs the person who pays it, and never has, and never will, because nobody has ever wanted one.</em></p>
+<p><em>Consider the last two words. She wrote</em> refused <em>at three-and-twenty, eight years after the night in the stable court, having then received exactly two children of the four and neither of them yet grown.</em></p>
+<p><em>She had decided on the reading before the evidence was in. She has spent the nineteen years since trying, with complete integrity and no success, to unmake that decision — and it is worth asking, before you pity her, whether</em> refused <em>was ever an observation at all, or whether a girl of fifteen who paid in full and heard nothing simply could not bear the third possibility, which is that the transaction went through perfectly and she is still inside it.</em></p>
+<hr class="scene-rule"/>
+<h3>The fifth leaf</h3>
+<div class="panel panel-gold instrument"><p><strong>ALAYSHA RENARD</strong></p><p><em>Paid:</em></p></div>
+<p class="marginalia"><em>Her own hand for the name; the price column ruled and left empty, because you do not enter your own.</em></p>
+<p class="marginalia"><em>There is a word in it now.</em></p>
+<p class="marginalia"><em>It is in the second hand — the corrector, the one that only ever fixes, that has been into this codex twice in nineteen years and into the one at Kaerndal eleven times in two hundred. It is written so fine that no one has got a letter of it under glass, in four lights, in two years.</em></p>
+<p class="marginalia"><em>It is six letters long.</em></p>
+<hr class="scene-rule"/>
+<h2>A NOTE ON THE TELLING</h2>
+<p>This is a companion and not a sequel, and it is built to be read either way round.</p>
+<p><em>The Widow's Hand</em> is written in the register of the Vhasian advocate: long stately declaratives that state what is on the record at length and arrange the flatness so that the omission has a shape. That is a courtroom voice, and Elianor Longblood lived and died inside a courtroom, and the prose is the instrument she used.</p>
+<p>This one is written in the other voice entirely, because Alaysha Renard was never allowed into that room. Short sentences. Weather. Iron. Animals. Things counted out loud. The cadence of a folk tale told by somebody who already knows how it ends and is not going to hurry for you — <em>and then the third winter came</em> — with the flat unbothered brutality the sagas use to report a killing. If you want the real-world ear for it, it is in the Carpathian and Polish wonder-tale, which is a form that has never once in its history pretended that the price was not going to be collected.</p>
+<p><strong>The magic never performs.</strong> Not once, from the first page to the last. Every supernatural event in this book survives a skeptical reading, the skeptical reading is always available, and it is always very slightly worse than the other one. An old woman on an empty road may have taken a sheep path. A word too fine to read may be a smudge. A dog that will not go into a cellar is a dog. A blade nobody remembers carrying in was carried in by somebody who has since died, which is what happens at a sack.</p>
+<p>Shadowsteel is the model for the whole book and it is the model on purpose: the finest blade anybody ever handled, carried for years by a woman who does not know it is anything, in a court of four hundred people of whom not one has ever suspected. That is the register. If the reader ever gets a moment where the goddess <em>does something</em>, the book has failed.</p>
+<p><strong>And nobody in it is a villain except Valeran Renard, who barely qualifies</strong> — because he wants nothing. He is not ambitious; ambition has an object and can be satisfied or thwarted. He is a mechanism with no destination, running correctly, for forty years, and the only pleasure he ever takes is in the running. Everything else in this book is done by people acting reasonably inside their roles: a king who is right about a tenure, a queen who built the one instrument available to her and could not have known it would sit in the doorway, a devout dull cousin who heard eleven words in a passage and kept them for sixteen years, and a girl of fifteen who was told what she was getting and thought it was a fair price.</p>
+<p>The book withholds one thing, and it withholds it from everybody including its own protagonist, and it is not the existence of the goddess.</p>
+<p>It is <strong>which hand</strong>.</p>
+<p>The clerk enters what is said. The creditor collects what is owed. The third comes and settles what will not come. And the fourth is not in the ledger and never has been, and if it was the fourth then nothing was recorded, nothing is owed, nobody is coming, and a hound died in a stable yard for nothing at all.</p>
+<p>Four readings. The book gives you all four, refuses to rank them, and offers no method, because a reader who has watched this family keep accounts for two hundred years should not be permitted to leave believing that motive is the sort of thing that gets established.</p>
+<p class="marginalia"><em>The soup is always free. The price never is.</em></p>
+<p>In Vhasia that is a proverb.</p>
+<p>In the Aelerian foothills it is a description of an office, and the office has more than one hand, and nobody has ever established that they speak to one another.</p>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>Here ends A Roll of the Fallen.</em></p>
+</body>
+</html>
