@@ -62,6 +62,11 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.7.2] - 2026-09-14
+
+### Chore
+- sync The Three Reckonings and rebuilt anthology from docs v0.16.0
+
 ## [5.7.1] - 2026-09-14
 
 ### Chore
