@@ -120,3 +120,7 @@ voice-rvc-models/*
 
 # Runtime room identity registry
 utilities/javascript/fates-edge-socket-server/server/campaigns/room-directory.json*
+
+# FUSE leftovers from the remote-device bridge
+.fuse_hidden*
+**/.fuse_hidden*
