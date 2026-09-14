@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Three Reckonings — Calendars of the Amaranthine World</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>The Three Reckonings</h1>
+<h4>Calendars of the Amaranthine World</h4>
+<hr class="scene-rule"/>
+<p>Three calendars are in daily use around the Amaranthine Sea, and a traveller who cannot handle all three will, sooner or later, miss a market, a muster, or a court date.</p>
+<p>They do not compete. They do different work. The <strong>Old Count</strong> measures labour and holds the festivals. The <strong>Civil Count</strong> measures law, tax and office. The <strong>Seven Wells</strong> measures the moon and the caravan. A Vhasian factor will sow by one, pay his tax by another, and settle with a Fharic spice-broker by a third, and think nothing of it.</p>
+<p>What they share is the year-number. Everything else is negotiable.</p>
+<hr class="scene-rule"/>
+<h2>The Year Everyone Agrees On</h2>
+<p>Years are counted in <strong>Amber Reckoning</strong> — <em>AR</em> — from the raising of the Amber Palace at Ecktoria.</p>
+<p>The number is imperial. The calendar underneath it is not. When the Utaran Empire absorbed the Amaranthine littoral it took the old littoral year-count wholesale, renamed it for its own palace, and then replaced the months with months of its own. The result is a reckoning in which the <em>years</em> are Ecktorian and the <em>days inside them</em> are older than Ecktoria by a long way, and every clerk from Kahfagia to the Belworth has learned to live with it.</p>
+<p>Both the Old Count and the Civil Count run to 365 days, and both add a day in one year of four. They do not drift apart. This is not a coincidence and was not a courtesy: the Empire's surveyors found the old year already correct and declined, in the only recorded instance, to improve it.</p>
+<p>The Seven Wells is lunar and drifts against both, on purpose.</p>
+<hr class="scene-rule"/>
+<h2>The Old Count</h2>
+<p class="marginalia"><em>The Amaranthine Reckoning. Called the Old Count, the Work Count, or — by Ecktorian clerks who do not like it — the Peasant Year.</em></p>
+<p>The Old Count is a calendar of labour. Its unit is not the week but the <strong>tenday</strong>: ten days of work, three tendays to a month, twelve months to a year. Three hundred and sixty days of counted work, and five days that are not counted at all.</p>
+<p>It is the oldest reckoning anyone can name, it is older than writing in most of the places that use it, and it is still how a crew is hired, a field is worked, a net is closed and a debt is called across two thirds of the Amaranthine world.</p>
+<h3>The Tenday</h3>
+<p>Ten days, each named for what is done on it. A tenday is a complete unit of work: a crew is taken on for a tenday, paid at its end, and either kept or let go.</p>
+<table class="reckoning"><thead><tr><th>Day</th><th>Name</th><th>What it is for</th></tr></thead><tbody><tr><td>1</td><td>Yoking</td><td>Work is set. Crews formed, tools issued, terms agreed.</td></tr><tr><td>2</td><td>Furrow</td><td>Ground work. Ploughing, digging, draining.</td></tr><tr><td>3</td><td>Water</td><td>Ditches, wells, weirs, nets, boats.</td></tr><tr><td>4</td><td>Stone</td><td>Building, walling, roadwork, quarry.</td></tr><tr><td>5</td><td>Market</td><td>The half-day. Goods move; debts are opened.</td></tr><tr><td>6</td><td>Hammer</td><td>Forge, mill, workshop, repair.</td></tr><tr><td>7</td><td>Tally</td><td>Accounts read aloud. Disputes heard. Debts called.</td></tr><tr><td>8</td><td>Road</td><td>Carting, droving, messages, travel.</td></tr><tr><td>9</td><td>Hearth</td><td>The household day. Brewing, baking, mending, the sick.</td></tr><tr><td>10</td><td>Still</td><td>No work. Nothing is owed on Still.</td></tr></tbody></table>
+<p>Most of this is now nominal — nobody quarries only on Stone — but the shape survives everywhere in law and habit. Markets open on Market. Manorial courts sit on Tally. Nothing may be distrained on Still, and a bailiff who tries it will find the whole village has read the same statute he has.</p>
+<p>The Fenwood chancery at Tarlington has sat on Tally for four hundred years, through two dynasties and an imperial calendar that has no such day, and has never given a reason for it because it has never been asked for one.</p>
+<h3>The Months</h3>
+<p>Three tendays each. Thirty days. The names are the work of the season and have not changed in living memory or out of it.</p>
+<table class="reckoning"><thead><tr><th>#</th><th>Month</th><th>Season</th><th>The work</th></tr></thead><tbody><tr><td>1</td><td>Mending</td><td>Deep winter</td><td>Tools, harness, nets, roofs. Indoor work.</td></tr><tr><td>2</td><td>Ashing</td><td>Late winter</td><td>Ash to the fields. Pruning. The lean month.</td></tr><tr><td>3</td><td>Thawing</td><td>Early spring</td><td>Ditching, flood work, first ground.</td></tr><tr><td>4</td><td>Planting</td><td>Spring</td><td>Sowing.</td></tr><tr><td>5</td><td>Greening</td><td>Late spring</td><td>Weeding, lambing, the first grazing.</td></tr><tr><td>6</td><td>Shearing</td><td>Early summer</td><td>Wool, first hay, road repair.</td></tr><tr><td>7</td><td>Haying</td><td>High summer</td><td>Hay in. The longest working days.</td></tr><tr><td>8</td><td>Firstfruits</td><td>Late summer</td><td>Orchard, early grain, the first tithe.</td></tr><tr><td>9</td><td>Reaping</td><td>Early autumn</td><td>Harvest.</td></tr><tr><td>10</td><td>Leafturn</td><td>Autumn</td><td>Threshing, ploughing-in, the rent term.</td></tr><tr><td>11</td><td>Salting</td><td>Late autumn</td><td>Slaughter, salting, smoking, storing.</td></tr><tr><td>12</td><td>Kindling</td><td>Early winter</td><td>Wood in. Fires banked. Accounts closed.</td></tr></tbody></table>
+<p>A date in the Old Count is written month, tenday, day: <em>Planting, Tenday II, Day 4</em> — which a Vhasian would say aloud as <strong>"Furrow of the second tenday of Planting."</strong></p>
+<p>Rents fall at Leafturn and Greening. Wages are paid at the tenday. Grain contracts run Kindling to Kindling, which is why an Amaranthine merchant who says "within the year" means something exact and an Ecktorian one does not.</p>
+<h3>The Five Days</h3>
+<p>Outside the months and outside the tendays are five days that belong to no count. No work is done on them, no wage accrues, no interest runs, and no court sits.</p>
+<ul><li><strong>Greenmeet</strong> — the spring equinox, when light and dark meet going up. Betrothals. The first fires laid outdoors.</li><li><strong>the Long Day</strong> — the summer solstice. The great fair days. The only night of the year when many villages do not post a watch, which has historically been a mistake.</li><li><strong>Goldmeet</strong> — the autumn equinox, when light and dark meet going down. Accounts are read publicly. Oaths of service begin and end.</li><li><strong>the Long Night</strong> — the winter solstice. The last day of the year. The dead are named. Nothing is lit that was not lit from a fire already burning.</li><li><strong>Winter's Crest</strong> — the first day of the year, and the only one of the five that is not astronomical. It is the day after the Long Night: the first morning on which the light is longer than it was. The name is exact. The year does not turn at the bottom of the dark; it turns at the moment the dark is proved to be ending.</li></ul>
+<p>The Long Night and Winter's Crest are kept as one festival of two days, and are the only nights of the year on which the littoral peoples will drink with people they have a case against.</p>
+<p>In one year of four a sixth day is added after Winter's Crest: <strong>the Borrowed Day</strong>.</p>
+<p>Nothing sworn on the Borrowed Day binds. Nothing lent on it is owed. Nothing conceived on it is legitimate and nothing witnessed on it is evidence. It is not a holiday and is not enjoyed. In most places it is simply got through, and in a few of the older places on the Aelerian side it is not spoken of at all, and the reason given — when a reason is given — is that a day nobody owns is a day something else might.</p>
+<hr class="scene-rule"/>
+<h2>The Civil Count</h2>
+<p class="marginalia"><em>The Ecktorian calendar. The law's calendar, and the tax's.</em></p>
+<p>Twelve months, three hundred and sixty-five days, a seven-day week, and a leap day inserted where nobody will notice. It is the calendar of the Utaran Empire and of every state that inherited its paperwork: Ecktoria, Vhasia, Viterra, Lence, the Cantons, Acasia, Thepyrgos, and the Aeler holds wherever they are dealing with any of those.</p>
+<p>It governs courts, writs, tax terms, musters, indictions, charters and the seating of magistrates. It does not govern sowing, and nobody has ever tried to make it.</p>
+<h3>The Months</h3>
+<table class="reckoning"><thead><tr><th>#</th><th>Month</th><th>Days</th><th>Roughly</th></tr></thead><tbody><tr><td>1</td><td>Portium</td><td>31</td><td>The gate-month. Magistrates seated; the year's writs opened.</td></tr><tr><td>2</td><td>Cinaria</td><td>28</td><td>The ash-month. The Everflame's fast. Debts confessed.</td></tr><tr><td>3</td><td>Verrus</td><td>31</td><td>The turning. Musters begin. Once the first month of the year.</td></tr><tr><td>4</td><td>Floralis</td><td>30</td><td>Games. The courts reopen after the fast.</td></tr><tr><td>5</td><td>Maiora</td><td>31</td><td>The great month. Processions, triumphs, the Senate's long session.</td></tr><tr><td>6</td><td>Lavius</td><td>30</td><td>Canal and roadwork; the stone tithes fall due.</td></tr><tr><td>7</td><td>Solaris</td><td>31</td><td>High summer. Campaign season. The courts adjourn.</td></tr><tr><td>8</td><td>Utaran</td><td>31</td><td>Named for the Empire itself, by an emperor who named it after himself.</td></tr><tr><td>9</td><td>Septhis</td><td>30</td><td>"The seventh."</td></tr><tr><td>10</td><td>Octis</td><td>31</td><td>"The eighth."</td></tr><tr><td>11</td><td>Nonis</td><td>30</td><td>"The ninth."</td></tr><tr><td>12</td><td>Decis</td><td>31</td><td>"The tenth."</td></tr></tbody></table>
+<p>The last four months are numbered wrongly and everyone knows it. The Ecktorian year once began at Verrus, which made Septhis the seventh month exactly; Portium and Cinaria were the dead end of the year, and were moved to the front of it some six centuries ago by a reform that renumbered nothing else. The Censor's Hall has twice proposed correcting the names. It has twice been pointed out that every charter, lease and indiction in the Empire's history is dated in the old names, and the proposal has twice been withdrawn.</p>
+<p>Dates are written day-of-month and month: <em>the third of Lavius</em>, <em>the ninth of Nonis</em>. The Ecktorian day begins at midnight, which the Fhara find affected.</p>
+<h3>The Week of the Seven Lamps</h3>
+<p>Seven days, named for the seven lamps of the Basilica, each of which is also an office of the city. What began as a rota of which lamp was tended by whom has become a rota of what the city does.</p>
+<table class="reckoning"><thead><tr><th>Day</th><th>Lamp</th><th>The city's business</th></tr></thead><tbody><tr><td>Prima</td><td>Waking</td><td>The courts open. Writs issued.</td></tr><tr><td>Fanis</td><td>Temple</td><td>Rites. The Synod sits. No suit may be filed.</td></tr><tr><td>Forensis</td><td>Forum</td><td>Markets, auctions, contracts.</td></tr><tr><td>Censis</td><td>Censor</td><td>Registration, audit, tax, the census roll.</td></tr><tr><td>Armis</td><td>Arms</td><td>Musters, drill, the watch reviewed.</td></tr><tr><td>Curis</td><td>Care</td><td>Alms, hospitals, guild relief, manumissions.</td></tr><tr><td>Vespris</td><td>Evening</td><td>The flame banked. Rest, of a sort.</td></tr></tbody></table>
+<p><em>Censis</em> has escaped the calendar entirely and become a word. A <strong>Censis face</strong> is the expression of a man being audited. To be <em>kept for Censis</em> is to be held without charge until someone can find a charge. The Vigil did not invent this usage and has never discouraged it.</p>
+<p>In one year of four an extra day is inserted at the end of Cinaria. It has no name in the statute, where it appears only as <em>the day inserted</em>; in common speech it is <strong>the Ash Day</strong>.</p>
+<p>The Censor's Hall does not number it. Therefore, in law, nothing registered on the Ash Day was registered, and a marriage, a manumission, a transfer of title or a confession dated to it is void — not disputed, not voidable: void, having never occurred. This has been used deliberately at least four times that the record admits.</p>
+<p>The Old Count also has a day that does not count, and it is holy. The Civil Count's is a filing convenience. Ecktorian jurists have written a great deal about the difference and have not, on the whole, enjoyed the exercise.</p>
+<hr class="scene-rule"/>
+<h2>The Seven Wells</h2>
+<p class="marginalia"><em>The Fharic reckoning. SWR. A pure calendar of the moon, and the only one of the three that does not pretend to describe the sun.</em></p>
+<p>Twelve lunar months of twenty-nine and thirty days alternating; three hundred and fifty-four days to the year; a leap day added in eleven years of each thirty. It is counted from the <strong>Covenant of the Seven Wells</strong>, when seven oasis courts agreed that water drawn is water owed.</p>
+<p>Because it is purely lunar, it walks backward through the seasons by about eleven days a year, and a Fharic month returns to the same season only once in thirty-three years. The Fhara are entirely aware of this and regard the fixing of a calendar to the sun as a form of cowardice. Their agricultural work is done by the date-palm and the star-risings, which are not the calendar's business.</p>
+<p><strong>The Fharic day begins at sunset.</strong> This is why Fharic documents are dated by night — <em>the twenty-ninth night of Shahr al-Hirr</em> — and why a Fharic contract signed on what an Ecktorian would call Tuesday evening is dated Wednesday. Whole cases have turned on this.</p>
+<table class="reckoning"><thead><tr><th>#</th><th>Month</th><th>Gloss</th><th>Note</th></tr></thead><tbody><tr><td>1</td><td>Shahr al-Nadi</td><td>Dew-Moon</td><td>The year opens. Wells measured.</td></tr><tr><td>2</td><td>Shahr al-Bard</td><td>Cold-Moon</td><td>Night travel; the long caravans are laid up.</td></tr><tr><td>3</td><td>Shahr al-Sayl</td><td>Flood-Moon</td><td>The dry beds run, when they run.</td></tr><tr><td>4</td><td>Shahr al-Nakhl</td><td>Palm-Moon</td><td>The groves worked and pollinated.</td></tr><tr><td>5</td><td>Shahr al-Wasm</td><td>Marking-Moon</td><td>Herds marked; shares of water reassigned.</td></tr><tr><td>6</td><td>Shahr al-Hirr</td><td>Heat-Moon</td><td>Nothing moves at noon.</td></tr><tr><td>7</td><td>Shahr al-Ghubar</td><td>Dust-Moon</td><td>The storms. Courts do not sit.</td></tr><tr><td>8</td><td>Shahr al-Rutab</td><td>Date-Moon</td><td>First soft dates. The year's wealth is known.</td></tr><tr><td>9</td><td>Shahr al-Mizan</td><td>Balance-Moon</td><td>Weighing. Accounts reconciled between oases.</td></tr><tr><td>10</td><td>Shahr al-Safar</td><td>Journey-Moon</td><td>The caravans go out.</td></tr><tr><td>11</td><td>Shahr al-Qafl</td><td>Return-Moon</td><td>The caravans come back. Tariffs paid.</td></tr><tr><td>12</td><td>Shahr al-'Ahd</td><td>Covenant-Moon</td><td>The water-oaths of the Seven Wells renewed.</td></tr></tbody></table>
+<p>A month begins when the first crescent is <em>seen</em>, not when it is calculated, and it is seen by a witness, and the witness is named. Two oases four days' travel apart can therefore begin a month on different evenings, and the settlement of which sighting governs a shared contract is the well-courts' single most common business. The Fhara consider this a feature. A calendar that requires a witness, they point out, is a calendar somebody is responsible for.</p>
+<h3>The Week</h3>
+<p>Six numbered days and one named.</p>
+<table class="reckoning"><thead><tr><th>Day</th><th>Name</th><th>Meaning</th></tr></thead><tbody><tr><td>1</td><td>Yawm al-Awwal</td><td>The first day</td></tr><tr><td>2</td><td>Yawm al-Thani</td><td>The second</td></tr><tr><td>3</td><td>Yawm al-Thalith</td><td>The third</td></tr><tr><td>4</td><td>Yawm al-Rabi'</td><td>The fourth</td></tr><tr><td>5</td><td>Yawm al-Khamis</td><td>The fifth</td></tr><tr><td>6</td><td>Yawm al-Sadis</td><td>The sixth</td></tr><tr><td>7</td><td>Yawm al-Qismah</td><td><strong>The Day of Portion</strong> — the well-courts sit and shares are measured.</td></tr></tbody></table>
+<hr class="scene-rule"/>
+<h2>Concordance</h2>
+<p>Anything can be converted except the moon, and the moon can be converted approximately and with a named witness.</p>
+<p><strong>Old Count to Civil Count.</strong> They share a year and a length, so the conversion is fixed and a clerk does it in his head. Winter's Crest falls on the twenty-second of Decis; the year of the Old Count therefore begins ten days before the year of the Civil Count, which is why Ecktorian charters occasionally carry two year-numbers and one of them is wrong.</p>
+<table class="reckoning"><thead><tr><th>Old Count</th><th>Civil Count</th></tr></thead><tbody><tr><td>Mending</td><td>late Decis – Portium</td></tr><tr><td>Ashing</td><td>Cinaria</td></tr><tr><td>Thawing</td><td>Verrus</td></tr><tr><td>Planting</td><td>Floralis</td></tr><tr><td>Greening</td><td>Maiora</td></tr><tr><td>Shearing</td><td>Lavius</td></tr><tr><td>Haying</td><td>Solaris</td></tr><tr><td>Firstfruits</td><td>Utaran</td></tr><tr><td>Reaping</td><td>Septhis</td></tr><tr><td>Leafturn</td><td>Octis</td></tr><tr><td>Salting</td><td>Nonis</td></tr><tr><td>Kindling</td><td>Decis</td></tr></tbody></table>
+<p><strong>Civil Count to Seven Wells.</strong> Approximate, by the drift. The standard scribal formula is <em>AR less five hundred and ninety-two, plus one year in each thirty-three</em>, and every scribe who uses it adds the word <strong>approximately</strong> because the sighting may fall either side of the evening. The year 840 AR corresponds to 249 or 250 SWR depending on whose crescent you accept.</p>
+<p><strong>Everyone else.</strong> The Ykrul keep none of the three. They count by grass, by foaling, by the freeze and the thaw of named crossings, and by remount — and their notation for a date is a place and a condition rather than a number, which is why steppe testimony is so difficult to enter in an Ecktorian court and so easy to check. The Aelers keep the Old Count with month-names of their own, which they have never given to a surveyor. The Linns keep the Old Count entire and regard the Civil Count as a tax document, which it is.</p>
+<p>The Dhaharan caravan houses keep the Old Count for wages, on tally-sheets that name nine days of the ten. The ninth is written as a space. Fharic clerks who have asked have been told that it is a scribal convention.</p>
+<hr class="scene-rule"/>
+<h2>A Note on Use</h2>
+<p>Three calendars is two more than most tables want, so the practical advice is this.</p>
+<p>Use <strong>the Old Count</strong> for anything that happens to people who work: hiring, harvest, rent, festivals, the length of a job, the day a body was found. <em>"He was taken on for a tenday at Yoking and was not at Tally"</em> is a complete and legible statement of a disappearance, and it dates it to within nine days without a single number.</p>
+<p>Use <strong>the Civil Count</strong> for anything with a seal on it. Writs, charters, indictions, muster rolls, the date on a warrant. It is the calendar of the paperwork the players will be handed, and its chief function at a table is to make a document feel like a document.</p>
+<p>Use <strong>the Seven Wells</strong> when a Fharic party is on the other side of the table, and use it specifically to create the problem it exists to create: two parties, one contract, two crescents, and a court that will want to know who saw what.</p>
+<p>And use <strong>the days that do not count</strong> — the Borrowed Day, the Ash Day — the way the setting uses them: as the one place in a world of ledgers where the ledger has a hole in it, and as a thing that several different kinds of people have noticed.</p>
+<hr class="scene-rule"/>
+<h2>DOCUMENTS</h2>
+<p class="marginalia"><em>Reference matter.</em></p>
+<hr class="scene-rule"/>
+<h2>THE YEAR AT A GLANCE</h2>
+<pre class="figure">   OLD COUNT                                   CIVIL COUNT
+   ---------                                   -----------
+   * Winter's Crest  [+ Borrowed Day 1-in-4]       22 Decis
+     1 Mending        deep winter                  Portium
+     2 Ashing         late winter                  Cinaria  [+ Ash Day 1-in-4]
+     3 Thawing        early spring                 Verrus
+   * Greenmeet       (spring equinox)
+     4 Planting       spring                       Floralis
+     5 Greening       late spring                  Maiora
+     6 Shearing       early summer                 Lavius
+   * the Long Day    (summer solstice)
+     7 Haying         high summer                  Solaris
+     8 Firstfruits    late summer                  Utaran
+     9 Reaping        early autumn                 Septhis
+   * Goldmeet        (autumn equinox)
+    10 Leafturn       autumn                       Octis
+    11 Salting        late autumn                  Nonis
+    12 Kindling       early winter                 Decis
+   * the Long Night  (winter solstice)  -- the year ends
+
+   Each month = 3 tendays = 30 days.   12 x 30 = 360, + 5 = 365.
+   Days marked * belong to no month and no tenday.</pre>
+<hr class="scene-rule"/>
+<h2>HOW A DATE IS SAID</h2>
+<pre class="figure">   OLD COUNT      Tally of the second tenday of Reaping, 840
+                  (written: Reaping, Tenday II, Day 7, 840 AR)
+
+   CIVIL COUNT    the ninth of Nonis, 840 AR
+                  (Censis, the ninth of Nonis, in the year 840
+                   of the Amber Reckoning)
+
+   SEVEN WELLS    the twenty-ninth night of Shahr al-Hirr,
+                  Year 249 of the Seven Wells
+                  (sighting witnessed at Qalat al-Waha)</pre>
+<hr class="scene-rule"/>
+<h2>A NOTE ON THE TELLING</h2>
+<p>The three calendars are meant to be used unevenly. No character knows all three well. A Vhasian bailiff knows the Old Count in his body and the Civil Count from a schedule nailed to a wall; a Fharic broker knows his own and converts the others with a formula he does not trust; an Aeler factor knows all three and says so only if paid.</p>
+<p><strong>Harald Everblood</strong> reigned ten days and is remembered as the Tenday King. That his reign was exactly one tenday of the Old Count is true, and was not arranged by anyone, and has been read as a judgement by four separate traditions, none of which agree about whose.</p>
+<p><strong>Rekedim's</strong> <em>Field Manual: Canray by Convoy</em> counts supply in tendays throughout and never once in weeks, which is a Ykrul writing in Vhasian for Vhasian soldiers and using a calendar that belongs to neither of them, because it is the one that counts work.</p>
+<p>The Old Count's five days, and the Borrowed Day, are the parts of this that will matter at a table. The month names are scenery. The hole in the ledger is not.</p>
+</body>
+</html>

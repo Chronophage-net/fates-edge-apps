@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-14T20:33:59.161Z",
+  "generated": "2026-09-14T21:12:52.737Z",
   "documents": [
     {
       "id": "srd",
@@ -1389,6 +1389,16 @@
       "active": true
     },
     {
+      "id": "the_three_reckonings",
+      "title": "The Three Reckonings",
+      "file": "Fates_-_Edge_-_-The-_-Three-_-Reckonings.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_usurper_s_gambit",
       "title": "The Usurper'S Gambit",
       "file": "Fates_-_Edge_-_-The-_-Usurper's-_-Gambit.html",
@@ -1563,7 +1573,7 @@
       "active": true
     }
   ],
-  "total_count": 97,
-  "active_count": 97,
+  "total_count": 98,
+  "active_count": 98,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
