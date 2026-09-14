@@ -62,6 +62,11 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.8.0] - 2026-09-14
+
+### Added
+- publish Political Intrigue to the web client (docs v0.17.0)
+
 ## [5.7.2] - 2026-09-14
 
 ### Chore
