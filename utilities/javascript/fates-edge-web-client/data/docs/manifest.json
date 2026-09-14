@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-14T16:52:51.552Z",
+  "generated": "2026-09-14T20:33:59.161Z",
   "documents": [
     {
       "id": "srd",
@@ -506,6 +506,16 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "commentary_on_the_belworth",
+      "title": "Commentary On The Belworth",
+      "file": "Fates_-_Edge_-_-Commentary-_-on-_-the-_-Belworth.html",
+      "path": "/data/docs/design/",
+      "category": "design",
+      "categoryLabel": "Design",
       "core": false,
       "active": true
     },
@@ -1553,7 +1563,7 @@
       "active": true
     }
   ],
-  "total_count": 96,
-  "active_count": 96,
+  "total_count": 97,
+  "active_count": 97,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
