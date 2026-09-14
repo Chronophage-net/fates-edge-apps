@@ -62,6 +62,11 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.6.0] - 2026-09-14
+
+### Added
+- publish Count Your Exits to the web client
+
 ## [5.5.0] - 2026-09-14
 
 ### Added
