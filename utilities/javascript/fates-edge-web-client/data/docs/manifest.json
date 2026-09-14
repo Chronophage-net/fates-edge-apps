@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-13T20:30:29.980Z",
+  "generated": "2026-09-14T00:48:26.383Z",
   "documents": [
     {
       "id": "srd",
@@ -1389,6 +1389,16 @@
       "active": true
     },
     {
+      "id": "the_widows_hand",
+      "title": "The Widows Hand",
+      "file": "Fates_-_Edge_-_-The-_-Widows-_-Hand.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "witnessed-prey",
       "title": "The Witnessed Prey, a Hunter's Guide",
       "subtitle": "A bestiary of debts, flesh, and thresholds",
@@ -1523,7 +1533,7 @@
       "active": true
     }
   ],
-  "total_count": 93,
-  "active_count": 93,
+  "total_count": 94,
+  "active_count": 94,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

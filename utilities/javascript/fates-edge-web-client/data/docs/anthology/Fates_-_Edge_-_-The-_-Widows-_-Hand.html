@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Widow's Hand — A Novella of the Belworth</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+</style>
+</head>
+<body>
+<h1>The Widow's Hand</h1>
+<p class="subtitle">A Novella of the Belworth</p>
+<p class="marginalia"><em>Being an account of Elianor Longblood of Adria, thrice married, twice queen, in the years between the Province Wars and the Defiance; assembled from the instruments themselves and from what the instruments omit.</em></p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><em>The soup is always free. The price never is.</em></p><p>— Adrian proverb, said at the banking of the fires</p></div>
+<hr class="scene-rule"/>
+<p><strong>A note on the seam.</strong> Wymund IV was King of Viterra and Duke of Aberiel in Vhasia, and the Belworth ran between the two like a stitch. He kept his court at Valora, in Viterra, and his duchy on the other bank. Whoever held the Viterran throne held the Vhasian duchy; whoever held Aberiel had the Belworth crossings; and whoever had the crossings could settle a quarrel among the western cantons without ever going near them. That is the whole of the politics of this book, and the three cantons — Adria, Ethor, Istovar — had been fighting one another about it, on and off, since before either kingdom existed, in a quarrel so old that it had stopped being political and become folklore. There are songs about it. Some of them are older than the crowns.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT I</span>The Instrument of Concession</h2>
+<p class="tale-meta place">Belworth, 780 AR</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>They put her in the side room because she was six-and-twenty and the terms had not been read yet, and a girl who has not yet been read aloud is not, strictly speaking, present.</p>
+<p>The side room at Belworth had been a chapel once and then a muniment room and then whatever it was now, which seemed to be a place for putting things that were about to become important. There were four chests against the wall with their lids up and nothing in them. There was a window of stained glass in which a saint was doing something to a serpent, or possibly for it — the glazier had been ambitious with the serpent and careless with the saint, so that after two hundred years the serpent was still magnificent and the saint had gone the greenish colour of old cheese. There was a dog asleep under the table. And there was a boy at the window with his back to the door, who did not turn around when she came in, which she found so restful that she nearly forgave him for being there.</p>
+<p>She sat down on a chest.</p>
+<p>"You are not supposed to sit on those," the boy said, without turning.</p>
+<p>"They are empty."</p>
+<p>"They are still chests."</p>
+<p>"They are empty chests," Elianor said, "in an empty room, at the end of a war that has killed nine thousand men, and you have decided that the great remaining question of the age is whether I may put my arse on one."</p>
+<p>Now he turned around.</p>
+<p>He was perhaps six-and-twenty, and he had the long Everblood face that looks solemn in repose and idiotic in surprise, and just at that moment it was doing the second thing very thoroughly. She watched him arrange it back into the first. It took him a moment. She counted the moment, because she had been raised in a house where you counted such things.</p>
+<p>"I beg your pardon," he said.</p>
+<p>"Granted. It cost me nothing." She looked at the window. "Is he killing it or curing it?"</p>
+<p>"What?"</p>
+<p>"The saint. Is he killing the serpent or curing it? He has his hand in its mouth. That is either a very brave physician or a very bad swordsman."</p>
+<p>The boy came and stood beside the window and looked up at it as though he had not been staring at it for the better part of an hour, which he had, and said, "I have never been able to decide. When I was small I decided it was a bargain. He puts his hand in, the serpent agrees not to bite, and they stand like that forever, and that is the peace."</p>
+<p>"That is a terrible peace."</p>
+<p>"It is the only kind that holds."</p>
+<p>"It holds until he gets tired," Elianor said. "Everyone gets tired. That is the entire trouble with hands."</p>
+<p>Somewhere beyond two doors a man's voice was reading something slowly and loudly, the way men read when they want to be seen to be reading and not to be understood. The dog under the table sighed in its sleep and its paws went briefly, absurdly, at some dream rabbit.</p>
+<p>"They will be at the marches by now," the boy said. "The marches take an hour. Then the moneys. Then the persons."</p>
+<p>"You have heard one of these before."</p>
+<p>"Three." He said it flatly, without boasting, which she noticed. "The persons are last. Nobody wants to begin with the persons. It makes the rest of it look like what it is."</p>
+<p>Elianor considered him. He had a good grey doublet and no chain, no ring, nothing that announced him, which at a signing meant either that he was nobody at all or that he was so far from nobody that announcing it would have been vulgar. His boots were the answer. His boots had been made for him by somebody who had measured his feet twice.</p>
+<p>"You are one of the king's," she said.</p>
+<p>"I am one of the king's."</p>
+<p>"Which one?"</p>
+<p>"The second one," he said, and something in the way he said it told her the whole of his life in four words, the way a single stone will tell you the whole of a wall. She decided, then and there, sitting on an empty chest in a cold room at the end of a war, that she was going to like him, and that liking him was going to be expensive, and that she was going to do it anyway.</p>
+<p>"Elianor," she said. "Longblood. Of Adria."</p>
+<p>"Baldvyn."</p>
+<p>"I know."</p>
+<p>"Then why did you ask which one?"</p>
+<p>"Because I wanted to hear how you said it," she said. "You can tell everything about a man from how he says his own brother's number."</p>
+<hr class="scene-rule"/>
+<p>They talked for an hour and eleven minutes. She knew it was an hour and eleven minutes because she could hear the chapel bell at Belworth through the shutters, and because she was the kind of person who, even at sixteen, even then, even while it was happening, kept some small clerk at the back of her skull writing it all down.</p>
+<p>They talked about the dog, whose name nobody knew and who belonged to the hall rather than to any person in it, and who had therefore eaten better through the entire war than most barons. They talked about the serpent. They talked about whether the Province Wars had possessed a reason at the beginning, and Baldvyn said that they had, and that the reason had been a question of the Belworth crossings and who might take toll at them, and Elianor said that nine thousand men was a great deal to pay in order not to pay a toll, and Baldvyn laughed — once, badly, as though the machinery were rusted — and said that was precisely the arithmetic, and that his father had said something very like it at the outset and then gone to war anyway because the alternative was to be a man who had been laughed at.</p>
+<p>"That is not a reason," Elianor said.</p>
+<p>"No. But it is a cause. They are not the same, and the second one is what actually moves the horses."</p>
+<p>She sat with that. It was the first genuinely useful thing anyone had said to her in a year, and it had come from a boy in an empty room who was not supposed to be talking to her.</p>
+<p>"My father broke the Ember Truce," she said.</p>
+<p>She had not intended to say it. It simply arrived, the way a stone arrives at the bottom of a well: you have been carrying it for so long that you stop noticing the weight until the moment you let go, and then the noise is terrible.</p>
+<p>Baldvyn did not flinch and did not soften. He said, "I know."</p>
+<p>"Everyone knows."</p>
+<p>"Yes."</p>
+<p>In Adria and Ethor and Istovar, when the first hard frost comes, the fires are banked and not fed, and the fighting stops, and the dead of the season go home over the roads unmolested with a man of the other side walking beside each cart so that nobody may say afterward that they were robbed. It is older than the cantons. It is older than Vhasia. There is no treaty for it anywhere; there has never needed to be one; it is a thing that grandmothers tell children about in the same voice they use for the tale of the girl and the nine doors, and no one in four hundred years had been sufficiently clever to see that this made it free.</p>
+<p>Duke Aymer Longblood of Adria had seen it. He had gone over the Ethorine line eleven days into the Truce, in the frost, with the fires banked, and taken the crossings at Vaury and Sainte-Orne against men who had sent half their strength home with the carts, and he had ended a war that had run for six years, in an afternoon, at a cost of perhaps four hundred lives, which is by any accounting a bargain.</p>
+<p>"They call it the Cold Harvest," Elianor said. "In Adria they call it that in front of him, now, and he smiles, because a man who smiles when you say it can pretend you were being affectionate." Her voice had gone somewhere flat and level that she did not recognise. "The crown is very grateful. It got its peace at four hundred instead of nine thousand, and it did not have to be the one who did it. And the proof of the crown's gratitude is that I have been brought here in a litter with new sleeves."</p>
+<p>"Yes," Baldvyn said again.</p>
+<p>"Are you going to tell me it was necessary?"</p>
+<p>"It was necessary," he said. "That is not the same as telling you. You already knew it was necessary. What you wanted to know is whether I would say the other thing as well."</p>
+<p>"And will you?"</p>
+<p>He looked at her for what felt like a long time, and later — years later, decades later, in a room with a fire and a document and a hand that shook a little now when she was tired — she would remember that this was the moment, and that it had not felt like a moment at all. It had felt like a small courtesy in a cold room.</p>
+<p>"It was necessary," Baldvyn said, "and there are four hundred people in Ethor who will not bank a fire again without thinking of your father, and both of those are true at once, and anyone who tells you that you must choose between them is selling you something."</p>
+<p>Elianor put her hand flat on the lid of the empty chest.</p>
+<p>"Well," she said. "Damn."</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>They came for her at the persons.</p>
+<p>A steward opened the door and did not look at her, because looking at her was not part of his office, and said, "Demoiselle," to a spot on the wall about a foot above her head, and stood aside.</p>
+<p>She stood. She smoothed the new sleeves. At the door she stopped, because there was one more thing and she had exactly the length of a doorway in which to say it.</p>
+<p>"When they read it," she said, "don't look at me."</p>
+<p>Baldvyn had not moved from the window. "No?"</p>
+<p>"No. If you look at me, every man in that hall will follow your eyes, and then there will be two things in the room: the treaty, and what you want. And they will begin to wonder which one they are actually buying." She adjusted a cuff that did not need adjusting. "Look at the serpent. You are good at that."</p>
+<p>She went out.</p>
+<hr class="scene-rule"/>
+<p>The great hall at Belworth was full of men who had been standing for three hours and had therefore stopped being noble somewhere around the second. It smelt of wet wool and old rushes and the particular sourness of important people who have not eaten. Her father was at the front, in Adrian blue, with his hands folded, wearing the expression of a man attending a mass in a language he has decided not to learn. The Duke of Aberiel's people stood on the Vhasian side and the same man's people stood on the Viterran side, in different coats, eleven feet apart, which was the single most Belworth thing in the building and which nobody but Elianor appeared to find funny.</p>
+<p>King Wymund, fourth of that name, was on the dais in a chair that was not a throne, because this was a treaty and not a court, and the distinction had been argued over for six weeks.</p>
+<p>She had never seen the king up close. He was six-and-forty and looked it in the way that only very healthy men do — not ruined, but <em>used</em>, like a good tool that has been left out in the weather by people who assumed it would be fine. He had a heavy, patient, disappointed face. When the reading reached the marches he closed his eyes, and she thought at first that he was praying, and then understood that he was resting, and that he had learned to do it standing up with an open hall in front of him, and that this was a skill you did not acquire in a happy life.</p>
+<p>Beside the dais, in harness, because he had come straight in off the road and had not troubled to change, stood the king's youngest brother.</p>
+<p>Oswyn Everblood was two-and-thirty and was the best lance in the family and had been since he was nineteen, and would go on being it for another twenty years, and had — so far as anyone could ever discover, then or in the sixty years afterward — no ambition of any kind whatsoever. He stood through the whole reading with his helm under his arm and his weight on one hip and an expression of pleasant, unhurried boredom, and he was the only man on that side of the hall who did not once look at the Adrian delegation.</p>
+<p>Elianor watched him for a while and could make nothing of him at all, which had happened to her perhaps four times in her life.</p>
+<p>Behind the king stood his elder son.</p>
+<p>Herald Everblood was eight-and-twenty, and he was the handsomest man in the room, and he was the only person on that dais who was watching the hall instead of the clerk. He had his mother's colouring and none of his father's patience, and he had spent the entire reading looking steadily from face to face along the front rank as though taking an inventory, which he was. Elianor had been watching him for two hours from the back and had formed one settled opinion, which fourteen years did nothing whatever to change:</p>
+<p class="marginalia"><em>That one is not stupid, and he is not cruel, and he will never in his life be able to let a thing alone.</em></p>
+<p>The clerk read the marches. It took an hour, as promised.</p>
+<p>The clerk read the moneys.</p>
+<p>The clerk drew breath and read the persons, and the fourth of the persons was:</p>
+<p class="marginalia"><em>Item. The demoiselle Elianor, daughter of Aymer, Duke of Adria, of the house called Longblood, to be given in marriage to the lord Baldvyn, second son of the king's body, in surety of the peace among the western cantons and of the quiet of the Belworth crossings; the said marriage to be solemnised at the feast of Saint Ossian following her seventeenth year; and by this the said crossings shall be held open, and the said house of Longblood shall be held faithful, and the crown shall hold the said house in its grace.</em></p>
+<p><em>In surety.</em> Three hundred men turned to look at her.</p>
+<p>She curtseyed to the dais, and rose, and held her face exactly as she had arranged it, which was the face of a girl who has been told something pleasant about her future by people who love her.</p>
+<p>She did not look at Baldvyn, who had come in at the back and was looking with great attention at nothing at all.</p>
+<p>She did look, for about a second, at Herald — because he was looking at her, and because he had been looking at her since the word <em>Elianor</em>, with frank, unhurried, entirely impersonal interest, the way a man looks at a horse he has just been told he is not getting.</p>
+<p>And her father, beside her, murmured without moving his lips, in the fond and easy voice he used in public: "Smile a little more, child. You are being bought, not buried."</p>
+<p>"I am aware of the difference, Father," she said, in the same fond and easy voice. "The buried are done paying."</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>She saw Baldvyn twice more that season, and both times it was arranged by a dog.</p>
+<p>The hall dog at Belworth had attached itself to her with the instant, shameless devotion of an animal that has correctly identified the one person in a building who will feed it from the table. Consequently she was often in the yard. Consequently the yard was often where Baldvyn was found to be, checking a horse he had already checked, in a stable he had no business in, with the profoundly unconvincing air of a man who has just remembered something about a girth strap.</p>
+<p>The first time they spoke of their marriage as a real thing that would occur, and discovered that neither of them knew how to do it, and ended up instead in a furious argument about whether the Belworth crossings ought to be farmed or taken in hand, which lasted forty minutes and which Elianor won.</p>
+<p>The second time — the last time, though neither of them had the courtesy of knowing it — it was raining, and they stood under the arch of the stable with the water coming off the slates in a grey rope, and he said:</p>
+<p>"Will you mind it?"</p>
+<p>"Mind what?"</p>
+<p>"Me."</p>
+<p>She thought about lying. She thought about all the ways there were to lie to that, which were many and which were all in current use by every woman she had ever met, and which were, she suspected, the reason so many of them had that particular look about the mouth by forty.</p>
+<p>"I have been mindful of this for eleven days," she said. "That I am the fourth item on a list, and that the list has made me happy. I have been trying to work out what that makes me. And I have decided that it makes me lucky, and that lucky is a much worse thing to be than people think, because the lucky have to be grateful, and the grateful can't complain, and a woman who can't complain has no instrument at all."</p>
+<p>"That isn't an answer."</p>
+<p>"No," she agreed. "It is better than an answer. Answers get repeated."</p>
+<p>The rain came off the slates. Somewhere in the yard a man was swearing at a cart.</p>
+<p>"I will mind it very much if it doesn't happen," Elianor said. "There. That's the answer. Do with it what you like, but I would be obliged if you did not repeat it, because if my father learns that I want this, he will find out what it is worth."</p>
+<p>Baldvyn said, "He already knows what it is worth. It is written down."</p>
+<p>And Elianor, who was six-and-twenty, and who was standing under an arch in the rain beside a boy she had decided to like, and who had not yet had the education, said:</p>
+<p>"Yes. That is what I mean. It is written down, so it is safe."</p>
+<hr class="scene-rule"/>
+<p>She would think about that sentence for the rest of her life. She thought about it in the birthing chamber at Valora. She thought about it in the cold antechamber where the King of Arms' clerk laid out her little knives of paper. She thought about it forty years later in a locked house with a guard on the stair, and at seventy-six in Ethor with a seal in her hand and the wax going soft, and each time she thought about it she felt the same thing, which was not grief and was not rage but was the specific, private, murderous embarrassment of having once been young out loud.</p>
+<p class="marginalia"><em>It is written down, so it is safe.</em></p>
+<p>God forgive her. She had been raised in a house of lawyers.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT II</span>The Deed of Conveyance</h2>
+<p class="tale-meta place">Adrecourt and Valora, 780–781 AR</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>The Queen of Viterra died in the second week of Lent, of a thing in her chest that the physicians called a congestion and that everyone else called eleven childbeds, of which four had lived: Herald, Baldvyn, a daughter married into Ubral, and Alayse, who was nine.</p>
+<p>The news came to Adrecourt on a Tuesday. Elianor was in the muniment room, where she spent most of her days now because it was the only warm room in the house that nobody wanted, doing the thing she had begun doing that winter out of boredom and had continued out of a dawning and unladylike appetite: reading her father's rolls.</p>
+<p>Not the accounts. Anyone could read accounts. She was reading the <em>pleadings</em> — the quarrels of Adria with Ethor and Istovar going back four generations and in three places going back eleven, every petty suit over a weir or a wood or a ford or a dowry; and what she had discovered, in the way one discovers that a language one has heard all one's life actually has grammar, was that they all had the same shape. Somebody wanted a thing. Somebody else had the thing. And in between there was a document, and the document was not a description of the world; the document was a <em>lever</em>, and the whole art consisted of knowing where to put the fulcrum.</p>
+<p>(There were older things in that room than documents. In the bottom of the third chest there was a bundle of tally-sticks from the Truce-keeping of a hundred and forty years before, notched with the count of carts and the count of the dead, split down the middle so that each side kept a half and neither could lie. Nobody had made one in four generations. Her father had left them in the chest. Her father, whatever else he was, had never once in his life thrown anything away.)</p>
+<p>She heard the rider come in. She heard her father's voice in the yard, and then his boots on the stair, which were coming up quickly, and her father never came up quickly.</p>
+<p>She put the roll down and stood, because she already knew.</p>
+<p>She did not know the particulars. She knew the shape. She had been reading the shape all winter.</p>
+<p>Her father came in with his hat still on and his face wet from the rain and an expression she had seen only once before, on a frost morning in the eleventh day of a Truce, when he had come back into the hall and everybody had stopped talking. It was not a cruel expression. That was the unbearable part, and it would stay unbearable for sixty years. It was the expression of a man who has just seen, with total clarity, the correct solution to a difficult problem, and who is <em>delighted</em>, and who has not yet had time to put the delight away.</p>
+<p>"Elianor," said Aymer, Duke of Adria. "The queen is dead."</p>
+<p>"I am sorry to hear it," Elianor said.</p>
+<p>"Are you." He took his hat off. He was already thinking past her; she could see it going on behind his eyes like weather over a field. "Sit down, child. We have a great deal to do and about nine days to do it in."</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>She let him talk for an hour. That was the first thing she got right, and afterward, in the long remainder of her life, she would think it was the only thing.</p>
+<p>He talked well. He was a clever man — that was the point of him, that was why the crown had wanted him and why Ethor had feared him and why, in the end, he had been able to sell a peace he had manufactured himself out of a broken custom and four hundred dead. He laid it out the way a good advocate lays out a case, which is to say he gave her all the damaging facts himself, first, before she could find them.</p>
+<p>The betrothal to Baldvyn was a promise made to a <em>prince</em>. It bound Adria to the second son of a living king. In twenty years, if all went as men expected, that would make her the sister-in-law of a king and the wife of a man with a good honour and a seat at council and nothing else — nothing else, forever, because that is what second sons are, they are the spare wheel on the cart, valuable only in the event of catastrophe and an embarrassment otherwise.</p>
+<p>Whereas.</p>
+<p>Whereas the king was six-and-forty and had two living sons of whom the elder was eight-and-twenty and unmarried, and whereas a king does not remain a widower, and whereas the realm would expect him to marry again within the year, and whereas the houses would now begin — were, at this moment, already, this very Tuesday, in eleven halls on both sides of the Belworth — begin the scramble.</p>
+<p>"He will want the crossings quiet," Aymer said. "He has always wanted the crossings quiet. It is the one thing he has wanted consistently for thirty years, and it is the reason your name is in that treaty at all. A man who is king on one bank and duke on the other cannot afford a burning bridge; it costs him twice. Now: I can give him the crossings quiet by giving you to his son, as agreed. Or I can give him the crossings quiet by giving you to <em>him</em>, and the difference between those two things, Elianor, is that in the first case I have bound Adria to a man, and in the second case I have bound Adria to the crown itself — to both of them at once, the kingdom and the duchy, which is the only bargain on this continent that pays in two currencies."</p>
+<p>"And in the second case," Elianor said, "any child of mine stands in the succession behind Herald and behind Baldvyn."</p>
+<p>Her father smiled at her, warmly, as a man smiles at an apt pupil.</p>
+<p>"Does it not," he said. "How very far ahead you think."</p>
+<p>She understood with a lurch like a missed stair that he was <em>proud of her for asking</em>, and that he had been waiting the whole hour for her to get there, and that he had not needed to say it himself, and that this was the first time in her life she had been used as a mouth.</p>
+<hr class="scene-rule"/>
+<p>Then she argued.</p>
+<p>She would be proud of the argument for the rest of her life, in the bleak way you are proud of a wound you took well. She was six-and-twenty years old and she had been reading pleadings all winter and she took her father's case apart joint by joint like a woman jointing a bird.</p>
+<p>She argued the instrument first, because she had learned that winter that you argue the instrument first. The concession was not a private betrothal; it was Item the Fourth of the Peace of Belworth, sealed by eleven houses and two crowns, and to alter it was not a domestic matter but an <em>amendment</em> — and an amendment required the parties, and the parties included Ethor and Istovar, who had been given her marriage as their surety and who would, the instant it was altered, and correctly, and loudly, ask what else in that document could be altered, and by whom, and for what. <em>You have just taught two cantons that your family's promises are provisional, Father, eleven weeks after teaching them that your family's customs are.</em></p>
+<p>She argued the market next. A house that trades a promise up is a house whose promises have a price, and once the price is known it is never again a secret and never again forgotten, and every man at every table thereafter would be calculating, while Aymer spoke, what it would take to buy the other side of him. <em>You did it once at the Truce, and it worked, and the crown paid you for it and has never turned its back on you since.</em> Do it twice and you would no longer be a clever man who broke a custom. You would be a commodity with a face.</p>
+<p>She argued the king. Wymund was six-and-forty and tired and had buried a wife of six-and-twenty years, and he did not want a woman of six-and-twenty; he wanted his crossings quiet and his council still and four months of peace to bury his wife in. To present him with a substitution at the graveside was to hand him an insult wrapped in a gift, and Wymund was a slow man but he was not a stupid one, and slow men remember insults longer because they take longer to finish reading them.</p>
+<p>And she argued — last, because you argue it last, because it is the weakest and the truest — the boy in the empty room.</p>
+<p>She did not say <em>I love him</em>. She was six-and-twenty but she was not a fool; she knew precisely what that sentence was worth in that room, which was less than nothing, which was a <em>lever handed to the other side</em>. What she said was:</p>
+<p>"And Baldvyn will remember it."</p>
+<p>Her father waved a hand. "Baldvyn is a second son."</p>
+<p>"Baldvyn is a second son <em>today</em>," said Elianor. "You have just spent an hour explaining to me that the great art is to be standing close when it matters. Very well. Baldvyn will stand close for the next forty years, Father, because that is what second sons do, they stand close and they wait and they are <em>extremely good at remembering</em>, it is the only thing they are permitted to be good at. You are proposing to take something from a man who will have nothing else to do for four decades but think about it."</p>
+<p>There was a silence.</p>
+<p>She had, she realised, with the small cold flare of triumph that she would spend her whole life learning to distrust, won every point. All of them. She had argued the instrument, the market, the man, and the boy, and she had not lost a single one of them, and her father — who was a clever man, who had taught her half of it himself — had not interrupted once.</p>
+<p>Aymer, Duke of Adria, looked at his daughter for a long moment with an expression of genuine, unfeigned pleasure.</p>
+<p>"That was very good," he said. "The third one especially. I had not thought about the graveside. I shall wait until after the month's mind; you are quite right, it costs us nothing and it buys his temper." He put his hands on his knees and stood, and his knees cracked, and he winced, and he was just then an ordinary man of three-and-fifty in a cold room.</p>
+<p>"Yes," said Aymer Longblood. "And you will go tomorrow."</p>
+<hr class="scene-rule"/>
+<p>She did not weep, then or later. It is recorded in three chronicles that Elianor of Adria did not weep at her wedding, and each of the three chroniclers takes it as evidence of a different thing — one says pride, one says piety, one says a cold and unwomanly nature — and none of them says the true thing, which is that she had used it all up in the muniment room in about ninety seconds and then stopped, permanently, the way a spring stops.</p>
+<p>What she felt, standing there, was not grief. Grief came later and took fourteen years and arrived in pieces. What she felt in that first moment was so specific and so strange that she had no word for it until she was nearly forty, when she found the word while reading something else entirely and put the book down and sat very still.</p>
+<p>The word was <em>demotion</em>.</p>
+<p>She had believed she was a party. She had believed — because the document said so, because it was written down, because she had been raised in a house of lawyers and had mistaken the family trade for a family faith — that she was a person in the case.</p>
+<p>She was not a person in the case. She was the case. She was the weir, the wood, the disputed ford. She had spent all winter reading four generations of quarrels about things, and she had been reading her own biography and had not recognised herself because she had been looking in the wrong column.</p>
+<p>Being correct, it turned out, was not a form of power. Being correct was a <em>decoration</em>. You could be entirely, brilliantly, unanswerably correct and go tomorrow.</p>
+<p>Very well, thought Elianor Longblood, standing in the cold muniment room with the rolls of four generations at her back and a bundle of split tally-sticks in the bottom of the third chest.</p>
+<p>Then what is?</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>They went east in nine days, which was six days of riding and three days of waiting outside towns so that she could be brought into each one in the morning, clean, in the litter, with the new sleeves, because a thing being conveyed must arrive looking like a gift and not like a journey.</p>
+<p>She learned a great deal on that road, all of it by watching.</p>
+<p>She learned that her father's household steward, Perrin, who had known her since she was born and who had taught her to count on an abacus, could not meet her eye for six days and could on the seventh, and that the seventh was the day the contracts came back sealed from Valora; and from this she learned that men become able to look at you again the moment the thing is <em>settled</em>, because their discomfort was never about the wrong, it was about the uncertainty, and uncertainty is the only thing a steward truly cannot bear.</p>
+<p>She learned that the crown's escort captain, a scarred and elderly person named Gervaise, addressed her from the first hour as <em>Majesty</em> although she was not yet anything of the kind, and that when she pointed this out he said, "I am escorting what I was told to escort, madame, and if I am wrong I shall be wrong for eleven days and correct for thirty years, and I am too old to take the other bet." And she laughed, out loud, for the first time since the muniment room, and Gervaise looked faintly alarmed, and she filed him away under a heading she was just then inventing, which was: <em>men who are honest because it is cheaper</em>.</p>
+<p>She learned that if she asked a question about the road — the state of a bridge, the tolls at Verrain, whose land they were crossing and on what tenure, which bank of the Belworth a village paid to and which it was buried on — she would be answered fully and at length and without suspicion, because a question about a bridge is not a political question. She asked a great many questions about bridges. By Valora she had the tenurial map of four hundred miles of the seam in her head and nobody had noticed her acquiring it, and <em>that</em> was the first genuinely useful thing she ever learned, and she had learned it from a girth strap and a boy in a stable and the discovery that men will tell you anything at all if you let them believe it is not about them.</p>
+<p>And she learned — on the fifth night, at the abbey guest-house at Corbenoit, lying awake on a bed that smelled of other people's journeys — what she was going to do.</p>
+<p>It was not a plan. She was six-and-twenty; she had no plan; a plan would have been a lie. It was one sentence, and she said it to the dark ceiling, and she kept it for the next sixty years and never told anybody it existed.</p>
+<p class="marginalia"><em>I am going to be so useful to them that removing me becomes the expensive option.</em></p>
+<p>That was all. It is not a noble sentence. There is no song in it. But it is the sentence that made a queen, and every single thing Elianor Longblood did afterward — every ledger she learned, every petitioner she received, every quartermaster she charmed, every grain convoy she personally routed, every one of the forty years in which the men of two kingdoms said <em>ask the queen, she'll know</em> — every bit of it came out of one girl on a bad bed at Corbenoit deciding that if she could not be a party to the contract she would become a <em>term that could not be struck without collapsing the whole document</em>.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>The wedding was at Valora at the feast of Saint Ossian, which was the date named in the original instrument. Her father had insisted on it. He had been very pleased with himself about it. <em>We honour the treaty</em>, he said, <em>to the very day. Only the name is different.</em></p>
+<p>She was fastened into the dress by four women she did not know.</p>
+<p>That is the part she remembered, and it is the part the chroniclers do not have, and it is the part that a certain kind of reader will notice recurring. It began at the wrists. There were eleven small covered buttons at each wrist and the women did them in pairs, two at each arm, working inward, and the sound was very small and very regular, like something eating. Then the back, which was laced and then hooked and then laced again over the hooks so that the hooks could not be seen, twenty-two eyes, and she counted them, because she counted things. Then the girdle, which had a clasp of two gold hands holding one another, which was traditional, and which she thought was the single most tasteless object she had ever been required to wear. Then the coif, pinned. Then the veil, pinned to the coif. Then the circlet, over the veil, to hold the whole apparatus shut.</p>
+<p>By the end she could turn her head about a third of the way in either direction and that was all.</p>
+<p>"There," said the eldest of the four women, stepping back, pleased, kind, entirely without malice. "Now you are closed."</p>
+<p>Elianor looked at herself in the glass for a long moment.</p>
+<p>"So I am," she said.</p>
+<hr class="scene-rule"/>
+<p>The chapel at Valora is very fine and she did not see any of it.</p>
+<p>She saw: the doorway, which was shut behind her. The screen, which was closed for the mass and opened for the vows. The king's hands, which were large and dry and had a signet on the third finger of the right, worn so smooth by use that it would not have taken a decent impression in wax any more — she noticed that; she thought, <em>you have not sealed anything with your own hand in years, they do it for you</em> — and her own hand, which was put into his hand by her father, palm down, as you present a hawk.</p>
+<p>And the ring, which was too large, and which the king pushed on and which turned at once on her finger so that the stone hung underneath, and which she wore that way for fourteen years because she never had it sized, and never afterward could have told anyone whether that was neglect or statement.</p>
+<p>She said the words in the correct order, in a clear voice, and afterward eleven separate people told her how well she had spoken, which she found funny then and hilarious later. It is the only performance anybody ever praised her for in which she had memorised the lines.</p>
+<p>And when they came out of the chapel into the bright hard spring light of the courtyard with the bells going, she raised her head as far as the circlet allowed, and she looked across four hundred people, and she found him, because of course she found him, she had known where he was standing since the moment she came in.</p>
+<p>Baldvyn Everblood, second son of the king's body, stood at the front of the household on the left side where protocol required a son to stand.</p>
+<p>He was not looking at her.</p>
+<p>He was looking at the middle distance, at nothing, with great attention, exactly as she had taught him to do in a side room at Belworth four months before; and it is a mark of what Elianor Longblood already was at seven-and-twenty that her first response, before the grief, before anything, was a small flash of pure professional satisfaction.</p>
+<p><em>Good boy</em>, she thought. <em>You remembered.</em></p>
+<p>Herald was looking at her. Herald was standing on the right side where protocol required an heir to stand, and he was looking at his father's bride with frank, unhurried, entirely impersonal interest, the way a man looks at a horse he has just been told he is not getting, and then at a horse that has been bought instead by somebody else in his household, and that he will therefore have to see every day for the rest of his life.</p>
+<p>He inclined his head to her. Perfectly correctly. She returned it.</p>
+<p>Fourteen years later he had ten days, and he spent four of them on her.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>Of the wedding night there is nothing to say that the parties themselves would have said, and they did not say it, and so it is not recorded.</p>
+<p>What can be recorded is this.</p>
+<p>Wymund IV, King of Viterra and Duke of Aberiel, was seven-and-forty years old. He had buried a wife of six-and-twenty years in the winter. He came to his new queen's chamber that night because the household and the realm and the treaty and the eleven houses required that he be seen to come to it, and he sat down on the end of the bed in his shirt, a big weathered patient man with a bad knee, and he was quiet for a while, and then he said:</p>
+<p>"You argued against this."</p>
+<p>Elianor's heart went entirely still. "Who told you that?"</p>
+<p>"Your father." Wymund rubbed his knee. "He was boasting. He thought it showed your quality — he said, <em>she made four arguments and three of them were good ones</em>." He glanced up. "Which was the bad one?"</p>
+<p>She thought: <em>here it is, the first one, the very first one, and it has come in the first hour.</em></p>
+<p>"The last," she said.</p>
+<p>"What was it?"</p>
+<p>"That your son would remember."</p>
+<p>And Wymund IV — who was slow, and who was tired, and who was not stupid, and who had spent thirty years being underestimated by cleverer men and outliving all of them — looked at his bride of seven-and-twenty for a long, long moment.</p>
+<p>"Which son?" he said.</p>
+<p>Elianor did not answer.</p>
+<p>"That one," said the king, "was the good one."</p>
+<p>He stood up, and his knee cracked the way her father's had, and he said, "I shall stay an hour. Nobody counts past an hour." And he went and sat in the chair by the fire, and put his head back, and slept — instantly, completely, the way she had seen him sleep standing up in the great hall at Belworth — and Elianor sat up in the bed with her hands in her lap and watched the fire burn down and understood that she had just been given a gift, and that she did not know yet whether it was mercy or a hostage, and that with this man she was probably never going to find out.</p>
+<p>In the event, she never did.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT III</span>The Letters Patent</h2>
+<p class="tale-meta place">Valora and the seam, 781–794 AR</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>It took her four years to take the court, and she did it the way you take a wall: from outside, patiently, noting every place the mortar was soft.</p>
+<p>The soft places were, in order: the kitchens, the stables, the wardrobe, the chancery, and the men who kept the crossings. Nobody had ever taken a court through the kitchens before, because nobody had ever thought of a court as a thing that ate.</p>
+<p>She began there because it was the only place she was permitted to go unaccompanied in her first year, being seven-and-twenty and Adrian and watched. The queen's oversight of the household was traditional and entirely nominal; it consisted of a weekly interview with the clerk of the spicery in which he told her that all was well and she said that she was glad. In the fourth week she asked him what the pepper had cost. He told her. In the fifth week she asked him what it had cost the year before, and he did not know, and came back the following week having found out, and was surprised, and said so.</p>
+<p>By the end of her first year she had the diet rolls of the royal household going back nine years laid out in the muniment room at Valora — she had asked for a muniment room and been given one instantly, because it was understood to be a harmless enthusiasm, a sort of indoor gardening — and she had discovered three things.</p>
+<p>That the household's expenditure on wine rose by a fifth in every year in which the court crossed the Belworth, and fell back in the years it did not, and that this was not because anybody drank more on the Vhasian bank but because the wine was bought by a man at Verrain who had understood, many years ago, that nobody in either kingdom ever compared one year with another.</p>
+<p>That the great officers of the crown were paid partly in <em>livery</em> — cloth, wax, candles, fodder — and that the value of the livery had been fixed in a schedule seventy years old, and that consequently half the men who ran the kingdom were being quietly, structurally cheated, and had been for three reigns, and were furious about it in the vague, chronic, unactionable way of men who know they are being robbed but cannot prove it before breakfast.</p>
+<p>And that if you fixed the second thing with the money from the first thing, sixty of the most important men on both banks would owe you personally for the difference in their household accounts, forever, and none of them would ever be able to say aloud what they owed you for, because the sum was undignified.</p>
+<p>She did it in her second year. It took eleven months and four memoranda and one extremely well-timed conversation with the king over a dish of eels.</p>
+<p>Afterward the Constable of Viterra, who had opposed her marriage and said so in council, sent her a boar he had killed himself, with a note that said only: <em>Madame, I am told my candles are now correct.</em></p>
+<p>She had that note until she died, which was not for a very long time.</p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>There was a thing the men of both kingdoms said about Elianor, and it began in those years, and it began in the stables and the chancery and not in any of the places a queen is supposed to be remarkable.</p>
+<p class="marginalia"><em>Ask the queen. She'll know.</em></p>
+<p>They said it first about roads. She had memorised four hundred miles of tenure on the way to her own wedding, and it turned out that nobody else had — that the knowledge of the seam lived in the heads of about nine men who each knew one stretch of it and distrusted the other eight. When Aberiel's people and the crown's people fell out over the Belworth crossings in her third year (she found this delicious; she had won the argument about the Belworth crossings at sixteen, in a stable, against a boy, in the rain) she was able to say, without notes, at table, that the crossings had been farmed since the reign of Aubric the Lesser, that the farm had been granted for the <em>maintenance</em> of the roads and not as a fee simple, and that the roads had not been maintained since anyone present had been born, and that therefore the question was not who should take the toll but who should be sued for the state of the highway.</p>
+<p>There was a silence of about four seconds at that table.</p>
+<p>Herald laughed first, which was generous of him, and which she never afterward forgot, because it was the only unguarded thing he ever did in her presence.</p>
+<p>They said it next about quartermasters. Viterra went to war twice in her first decade, both times briefly and badly, and both times she discovered the same thing, which is that armies are not defeated, they are <em>starved</em>, and that the men who understand this are always the men nobody invites to the council. She began inviting them. She had the victualling clerks of three campaigns to supper in her own chamber, privately, one at a time, and asked them what they would have done differently, and wrote it down, and then did it the following year; and when the second campaign went less badly than the first, the captains knew exactly why, because the captains had eaten.</p>
+<p>They did not love her. That is worth saying plainly, because the songs have it otherwise. The men who held the crossings were border men with three hundred years of opinions about Adrians, and what happened between them and Elianor was not love. It was something colder and far more durable: they found her <em>reliable about facts</em>, which is the only currency that sort of man has ever accepted, and once a body of men has decided that a person is reliable about facts they will follow that person into places they would not follow someone they merely adored.</p>
+<p>Old Gervaise, who had escorted her to her wedding and called her Majesty eleven days early, became her Master of Horse and then her friend, in that order, and it took nine years.</p>
+<p>"You are very patient, madame," he said to her once.</p>
+<p>"I am not remotely patient," said Elianor. "I am <em>slow</em>, which looks the same from outside and feels entirely different from within. Patience is a virtue, Gervaise. Slowness is a siege."</p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>She had two daughters, in the third year and the sixth, and she has never been forgiven for either of them by anyone who has written about her since, because what every chronicler wants to say about those daughters is that they were a disappointment, and the difficulty is that there is not one line anywhere suggesting that anybody at the time thought so.</p>
+<p>Wymund was pleased. He had had sons already and had buried a wife getting them; a daughter was, to a man of sixty, an unmixed pleasure and no work at all.</p>
+<p>Elianor was something more complicated than pleased, which she examined once and then left alone for fourteen years. She loved them both immoderately and taught them both to read a roll before they were nine, which in that generation was thought eccentric and in the next was thought to explain a great deal.</p>
+<p>And she acquired, in the same years and by accident, a third one.</p>
+<p>Alayse Everblood was nine when her mother died and eleven when it became apparent to the entire household that nobody had given the smallest thought to what should happen to her; and Elianor, who was twenty-one and had one baby and a muniment room and no more idea than anyone else, simply annexed her, the way she annexed everything, quietly, without an instrument, before it occurred to anybody that a thing had been annexed.</p>
+<p>She was a grave, funny, slightly deaf child who liked hawks and disliked music and could not be made to sit still for an hour together, and for eleven years she followed Elianor round two kingdoms, and it is Alayse Everblood's hand, not a clerk's, in the margin of the Valora diet roll for the eighth year, where somebody has totted a column wrong and somebody else has written <em>no</em> beside it, twice, with visible feeling.</p>
+<p>By the time she was nineteen she called the queen <em>madame</em> in company and something else in private, and neither of them ever wrote down what.</p>
+<p>There are two further things to say about Alayse Everblood at this point in the book and both of them are going to be paid for later, so they are set down plainly now.</p>
+<p>The first is that she was the only person in fourteen years to whom Elianor was ever careless.</p>
+<p>The second is that in the winter of the twelfth year, being twenty-one and unmarried and a king's daughter, she was placed as ward in the household of the Thornhills at Brigh, in the northwest of Viterra, among Linnic people who kept old custom; and that the arrangement was made by the Constable, and approved by the king, and thought excellent by everybody; and that Elianor, who was by then the most formidable political intelligence in either kingdom, looked at the proposal for four days and could find no fault in it, and said so, and let her go.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>In fourteen years she was alone with Baldvyn twice.</p>
+<p>She knew the number. Of course she knew the number; she was the woman who counted the buttons on her own wedding dress. She never wrote it down.</p>
+<p>Everything else was public. Twelve councils, nine feasts, four funerals, two weddings, one investiture, three formal receptions of embassies, six musters, and four occasions of the sort the chancery calls <em>incidental</em>, meaning that two people who both had legitimate business in the same corridor had it at the same moment.</p>
+<p>There was always a table.</p>
+<p>This became, over the years, a private joke of such savagery that neither of them ever said it aloud. At the council table he sat at the far end on the left, because he was a second son and that is where second sons sit. At the feast table there was the width of the dais. At funerals there was a coffin. At the muster at Verrain in the seventh year, out of doors, in a field, with no furniture for a mile in any direction, somebody had set up a trestle with a map on it, and they stood on opposite sides of it for two hours, and when it was finished and the captains had gone he put two fingers on the edge of the trestle and looked at it, just for a moment, and Elianor had to turn away and address a remark to a groom about the state of a hock, because if she had stayed she would have laughed, and if she had laughed she would not have stopped.</p>
+<p>They were never rude to one another and never warm. They developed, in public, the manner of two senior officials of a well-run department: brisk, exact, faintly impatient, entirely correct. Baldvyn would say, <em>Madame, the northern accounts</em>, and Elianor would say, <em>My lord, the northern accounts are three weeks late and I know whose fault it is and so do you</em>, and the whole court would think, with satisfaction, <em>the queen and the king's second son do not like one another</em>, which was a thing the whole court found extremely convenient to believe, and which was therefore never examined.</p>
+<p>Except by one person, who examined everything, and who could never in his life let a thing alone.</p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>Here is what the chronicles have.</p>
+<p class="marginalia"><em>In the seventh year of the reign, the queen being unwell, she kept the autumn at the abbey of Corbenoit, and did not appear at the feast of Saint Ossian, and the king kept the feast at Aberiel.</em></p>
+<p class="marginalia"><em>In the same year, at Candlemas, there came to the queen at Valora a gift of a psalter, very fine, with an ivory board, sent from Verrain; and no name with it; and she thanked God for it publicly and gave a cope to the chapel.</em></p>
+<p class="marginalia"><em>In the ninth year the king lay at Belworth in the month of August, going by the west road, which is longer.</em></p>
+<p class="marginalia"><em>In the ninth year, at Michaelmas, the lord Baldvyn was with the host in the north, and the queen also at Valora, and there was great sickness in the household, and eleven died.</em></p>
+<p class="marginalia"><em>In the tenth year the queen was delivered of a son at Valora, on the eve of Saint Ossian, and he was named Valdais; and there was great joy, and the king gave a hundred marks to the poor of the city, and a window to the chapel at Belworth.</em></p>
+<p>That is all there is. Four lines in an annal, an unattributed psalter, and a road that made no sense.</p>
+<p>Draw from it what you will. Herald did.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>The autumn at Corbenoit.</p>
+<p>She was three-and-thirty. She had been queen for seven years and had two daughters and had spent the summer in the kind of grey exhaustion that has no fever in it and therefore no name, and the physicians had said what physicians say, which is that the queen should have air.</p>
+<p>Corbenoit is an abbey on a hill with a guest-house on the south side and a walled orchard between the two, and she had slept there once before, on the fifth night of her wedding journey, on a bad bed, deciding what she was going to be.</p>
+<p>She noticed that. She noticed it the moment the horses came up the lane and she saw the wall.</p>
+<p>Baldvyn came on the ninth day, from the north, with four men and a legitimate errand — there was always a legitimate errand; there was, in fact, an errand, concerning the abbey's fishing rights, which was genuinely outstanding and which he genuinely settled and which is in the abbey's own cartulary to this day in a clerk's careful hand — and he stayed two nights, which was the correct number of nights for the errand, and he was lodged in the guest-house because there was nowhere else to lodge him.</p>
+<p>The orchard was between.</p>
+<p><em>What happened in the orchard at Corbenoit</em> is the title of one of the four songs, and the song has a nightingale in it, and a dropped glove, and a great deal about the moon. There was no nightingale; it was October. There was no glove.</p>
+<p>What there was, was this: two people in their twenties who had been standing on opposite sides of a table for seven years, walking up and down a walled orchard in the cold, four feet apart, in full view of anyone who cared to look out of a window, talking about the fishing rights.</p>
+<p>They talked about the fishing rights for a very long time.</p>
+<p>Then Elianor said, "I have a question and you are not obliged to answer it."</p>
+<p>"Ask."</p>
+<p>"Do you think about it?"</p>
+<p>"Yes," Baldvyn said.</p>
+<p>"How often?"</p>
+<p>"That is a second question."</p>
+<p>"It is the same question wearing a hat," said Elianor. "How often."</p>
+<p>He walked four more trees. Then he said: "There is a particular hour. It is the hour after supper before they bring the lights, when there is nothing to read and it is not yet time to go up. I have never found anything to put in it."</p>
+<p>Elianor Longblood stopped walking.</p>
+<p>"Seven years," she said, "and that is the first thing either of us has said."</p>
+<p>"Yes."</p>
+<p>"It is a good one."</p>
+<p>"It is the only one I have."</p>
+<p>"Well," said Elianor, "keep it. I shall not ask you for another." And then, because she was who she was, and because she had discovered at six-and-twenty that she could not leave a silence alone any more than she could leave a sum unchecked: "For what it is worth, mine is the quarter-hour before I am dressed. There is a point at which they have begun and not finished, and one is neither the thing one was nor the thing one is going to be, and I have found that I can think anything at all in there and it does not count."</p>
+<p>Baldvyn said, "Does it not?"</p>
+<p>"No," said Elianor. "Nothing counts until it is fastened."</p>
+<hr class="scene-rule"/>
+<p>The chronicle says the queen was unwell and kept the autumn at Corbenoit.</p>
+<p>The chronicle is not lying. Everything the chronicle says is true. She was unwell; she did keep the autumn; the fishing rights were settled; the abbey has the charter.</p>
+<p>This book will not tell you the rest, and not out of delicacy. It will not tell you because you already know, and because the knowing is the point, and because in a few pages' time a man who has been king for four days is going to sit down in a cold antechamber at Valora with the same four lines of annal that you have just read, and he is going to do exactly what you have just done.</p>
+<p>You should notice how it felt. You will want it later.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>She was delivered of Valdais on the eve of Saint Ossian in the tenth year of the reign, in the great chamber at Valora, at about four in the morning.</p>
+<p>It was a hard birth and a long one and she was thirty hours in it, and at the end of it she was so far past exhaustion that the world had gone very simple and very slow, the way it does, and she remembered afterward only a few things, arranged like objects on a shelf.</p>
+<p>She remembered the ceiling, which was painted with a vine, and which she had never looked at properly in ten years of living beneath it, and which she now knew better than her own hands.</p>
+<p>She remembered the midwife's forearms, which were extraordinary.</p>
+<p>She remembered that at some point in the night she had said something in the Adrian of her childhood, which she had not spoken aloud since she was seven-and-twenty, and that nobody in the room had understood a word of it, and that this had been an enormous relief.</p>
+<p>She remembered Alayse Everblood asleep sitting up in the window seat at about two in the morning with her mouth open, having refused for eleven hours to be sent to bed.</p>
+<p>And she remembered the moment they gave him to her, and the room went quiet, and every face in it — eleven faces, and she knew all eleven, because she had chosen all eleven — turned toward her to see what the queen would say.</p>
+<p>She looked at her son's face.</p>
+<p>The text will not tell you what she saw there, because she never told anybody, and because by the end even she was no longer certain whether what she saw was a likeness or the memory of having looked for one.</p>
+<p>What she said, in a clear voice, in the correct and formal words, was:</p>
+<p>"My lords, my ladies. Bear witness, that this is a son of the king's body, born of me, living and whole. Let it be recorded."</p>
+<p>And they sent for the king, because that is the form; and the king came, at half past four in the morning, in a bed-gown, with his hair on end, six-and-fifty years old and delighted; and he took the child up in both hands in front of eleven sworn witnesses and said the words of the Right of Acknowledgment, which in Viterra are eleven words long and have not changed in three hundred years, and which no power on earth can afterward unsay.</p>
+<p>That is the doctrine, and it is worth stating exactly, because everything in the second half of this book turns on it.</p>
+<p><strong>Under the Right of Acknowledgment, a child taken up and acknowledged by the father in his own voice, before the household, within the hour of the birth, is his; and the record of that acknowledgment cannot be impeached by later evidence of any kind, but only by proof that the acknowledgment itself did not occur.</strong></p>
+<p>Not <em>was mistaken</em>. Not <em>was procured by fraud</em>. Only: <strong>did not occur.</strong></p>
+<p>The doctrine is three hundred years old and it exists for an obvious reason, which is that a kingdom in which acknowledged sons can be unmade forty years later by an interested party with a clerk and a grievance is a kingdom that has a civil war every generation; and it works, and it has always worked, and the price of its working is that it is entirely indifferent to the truth.</p>
+<p>It has one door in it, and the door is very small, and it is this: the acknowledgment is a <em>fact in the world</em>, and facts in the world are proved by witnesses.</p>
+<p>Nine people in a room at half past four in the morning.</p>
+<hr class="scene-rule"/>
+<p>Now.</p>
+<p>Here is the sentence this book has been carrying since the muniment room at Adrecourt, and it is going to be set down quietly, in the middle of a paragraph, and the reader is invited to walk past it and come back later.</p>
+<p class="marginalia"><em>She had chosen all eleven.</em></p>
+<p>By custom the witnesses at a royal birth are the great ladies of the household, the king's physician, the abbot of the chapel royal, and such officers as the king appoints. By custom the queen has no voice in it whatever.</p>
+<p>Elianor had begun three years earlier, after the second daughter. She had begun with the most reasonable request in the world, which is that a woman in labour might have about her the women she knows. Nobody could refuse it; it was not a political request; it was a request about <em>comfort</em>, and there is no clause in any constitution of any realm on earth that protects a court from a queen asking for comfort.</p>
+<p>Over three years, by small degrees, entirely in the open, and without a single person in either kingdom noticing that anything at all was happening, the composition of the most legally consequential room in Viterra — the room in which the Right of Acknowledgment is established as a matter of record, by the sworn recollection of persons present — had passed, item by item, from the household of the king to the household of the queen.</p>
+<p>Mahaut of Adrecourt, her nurse, had been brought east in the eighth year.</p>
+<p>Brother Tomas, who had taught her Latin when she was nine, and who was now the queen's confessor, and who was the gentlest man she ever knew, had been given his place in the sixth.</p>
+<p>The king's physician was still the king's physician. But the king's physician was seventy-one and deaf in one ear and slept in a chair, and Elianor had not removed him, because a queen who removes a physician is doing something, and a queen who keeps a deaf old man out of loyalty is doing nothing at all.</p>
+<p>She had not done it <em>for this</em>. That is important and it is the most frightening thing about her. In the sixth year and the eighth year she had no reason on earth to think she would ever need it; Valdais was not conceived, not thought of, not possible. She had done it because she had decided at six-and-twenty on a bad bed that she would never again be an item in a room where she had no voice, and because the instinct of her life, formed in a cold muniment room at Adrecourt among four generations of quarrels about fords, was to <em>own the record</em>.</p>
+<p>She had built the room years before she needed it, for no reason, out of temperament.</p>
+<p>And on the eve of Saint Ossian in the tenth year of the reign she lay in it with her son on her chest and watched an old man in a bed-gown say eleven words in front of nine people she had put there herself, and there is no evidence — none, in any source, in anything she ever wrote or said or was reported to have said — that in that moment she understood what she had done.</p>
+<p>The evidence that she understood it comes four years later, and it took her about ninety seconds.</p>
+<hr class="scene-rule"/>
+<h3>viii.</h3>
+<p>He was a placid baby and became a watchful child. The king doted on him with the specific unembarrassed foolishness of a man who has had children at eighteen and is now having one at six-and-fifty — he carried him about, personally, which kings do not do; he had a small chair made for the council chamber, which was ridiculous; the Constable of Viterra was obliged on one occasion to deliver a report on the northern muster over the head of a two-year-old who was eating a fig.</p>
+<p>If you had asked any of the four hundred people at Valora in those years whether the king believed Valdais to be his son, they would not have understood the question. It would have been like asking whether the king believed the sun to be the sun.</p>
+<p>Elianor watched him dote and felt a thing she could not name and did not enjoy.</p>
+<p>It was not guilt, or not principally. She examined it more than once, in the quarter-hour before she was dressed, in the place where nothing counted, and what she arrived at eventually was this: she was watching a man be given something for nothing, and she had been raised to believe that nothing is given for nothing, and therefore she was watching a debt accrue, and she did not know who would be presented with it.</p>
+<p>She found out. But not for four years, and not from anyone she expected, and it took ten days.</p>
+<hr class="scene-rule"/>
+<h3>ix.</h3>
+<p>She was forty years old. She had been queen for fourteen years.</p>
+<p>She had, by then, the following: the household, entire; the chancery, by affection and by superior knowledge of its own precedents; the victualling of two realms, by right of having been the only person to take an interest; four lawsuits of her own, which she conducted personally and won three of; a daughter of eleven being negotiated over by four houses, whose contract Elianor read clause by clause and amended eleven times, and about which she said to the chancellor, in a voice that closed the discussion, <em>I am told it is customary for the bride's family to accept the draft as offered; you may tell them that I am aware of the custom, and that I am the custom's living objection</em>; and a reputation on both banks of the Belworth as a woman it was cheaper to consult than to oppose.</p>
+<p>She had also, by then, acquired the thing that everyone who met her in her later life remarked on, and which nobody who met her at six-and-twenty would have predicted, because at six-and-twenty she had been merely clever and furious.</p>
+<p>She had become extremely funny.</p>
+<p>It happened somewhere in her late twenties and it happened, as far as anyone could tell, on purpose. Wit is a weapon that does not leave a mark on the record; a queen who says a thing that makes forty men laugh has moved the room, and there is no clerk in either kingdom who can write down what she did. She worked at it the way she had worked at the diet rolls. She learned that the joke must come <em>after</em> the concession and never before it, so that the man being defeated leaves the table having laughed. She learned that a queen may say anything at all about herself and almost anything about the dead. She learned to keep three ready at all times, the way Gervaise kept three horses.</p>
+<p>When the Bishop of Verrain preached at Valora on the duty of wives, at length, at her, for fifty minutes, and came down from the pulpit and asked her with heavy sweetness whether she had found the sermon instructive, Elianor said:</p>
+<p>"Immensely, my lord. I had not understood before how very long the duty of wives goes on."</p>
+<p>When an Acasian envoy, attempting a compliment, said that she was said in his country to rule Viterra in all but name, she said:</p>
+<p>"Your country is misinformed, sir. I rule it in the name as well. The name is <em>the queen's grace</em>, and you may find it at the foot of any document in this kingdom that has actually been carried out."</p>
+<p>And when her father — Aymer, Duke of Adria, sixty, grey, still clever, still smiling, come east to ask a favour about a wardship — said to her across her own table, fondly, in front of eleven people, <em>You have done very well out of me, child</em>, Elianor said:</p>
+<p>"I have, Father. I have done splendidly out of you. And I think of it every day of my life, at about the hour when they bring the lights."</p>
+<p>And smiled at him.</p>
+<p>And gave him the wardship.</p>
+<p>Which is the whole of her, really: she let him have the wardship, because refusing it would have told the table there was a quarrel, and a quarrel told is a lever handed over; and she made him carry that sentence home in his baggage, where it could not be produced as evidence of anything, and where — she had every reason to believe, and she was right — it would keep.</p>
+<p>He never asked her what the hour of the lights meant. He assumed it was about him.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT IV</span>The Tenday</h2>
+<p class="tale-meta place">Valora and Brigh, 794 AR</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>Wymund IV, King of Viterra and Duke of Aberiel, died in the fourteenth year of his second marriage, aged sixty.</p>
+<p>He died of nothing. That is the thing about it that Elianor could never afterward get past, and that she raised, more than once, in the later years, with a kind of baffled anger, as though it were a procedural irregularity: <em>he died of nothing.</em></p>
+<p>He had a cold in the last week of February. He got over the cold. In the second week of March he was tired, and rode out anyway because he was always tired and had ridden out anyway for forty years, and came back tired, and ate a good supper, and said something about the fodder accounts that Elianor answered shortly because she was reading. He went up. In the night he woke his body-servant to say that the room was too warm. In the morning he was dead.</p>
+<p>The physicians said a great many things. The physicians always do; it is their function, as the clerk's is to enter and the confessor's is to be told. The truth, which Elianor knew and which was of no use to anybody, was that Wymund had been seven-and-forty years old on the night he sat down at the end of her bed in his shirt and said <em>nobody counts past an hour</em>, and that he had been tired then, and that some men are tired at seven-and-forty and go on being tired for fifteen years and then stop.</p>
+<p>She sat with the body for four hours, alone, at her own request, which caused some comment.</p>
+<p>What she did in those four hours she never said.</p>
+<p>What is known is that when she came out of that room the first words she spoke were not about the king.</p>
+<p>She said, to the captain of the guard in the corridor: "Where is my lord Herald?"</p>
+<p>"Madame, in the chamber. With the Constable and the Chancellor and—"</p>
+<p>"How long has he been in there?"</p>
+<p>The captain worked it out. "Since about the second hour, madame."</p>
+<p>Wymund had died between four and five in the morning.</p>
+<p>Elianor stood in the corridor outside her husband's death-chamber and performed, in about four seconds, the only calculation that mattered, which was this: <em>his father has been dead for perhaps six hours and he was in the council chamber before the body was cold, and he did not send for me, and he has had the Chancellor to himself for four of those hours, and the Chancellor keeps the chamber books.</em></p>
+<p>"Thank you," she said.</p>
+<p>She went to her own rooms and sent for nobody. She sat down at her table and drew a sheet toward her and wrote, at the top, in her own hand, the words <em>WHAT HE HAS</em>, and under them, over the next two hours, she wrote out the case against herself.</p>
+<p>She had been expecting to do this. She had been expecting to do it for four years, ever since a morning when an old man in a bed-gown had said eleven words in front of nine people. She had simply expected to have longer.</p>
+<hr class="scene-rule"/>
+<h3>ii. The First Day</h3>
+<p>They crowned Herald on the first day.</p>
+<p>It was done fast and it was done correctly and nobody thought anything of it; a kingdom with a duchy attached and an unquiet border does not leave a throne standing empty for the sake of ceremony, and a coronation postponed is a coronation argued about. He had been a king's son for two-and-forty years and ready for eleven of them.</p>
+<p>He was two-and-forty. He was still the handsomest man in the room.</p>
+<p>He sent for her on the evening of the first day.</p>
+<hr class="scene-rule"/>
+<p>They were alone, which surprised her, and the door was open, which did not.</p>
+<p>"Madame," said Herald, King of Viterra, Duke of Aberiel. "Sit down. I am going to tell you exactly what I am doing and exactly why, because I have watched you for fourteen years and I have concluded that lying to you would cost me more time than I have."</p>
+<p>"Your Grace is very direct."</p>
+<p>"My Grace has ten minutes before the Constable comes back, and about six weeks before this kingdom decides what sort of king it has got." He sat on the edge of the table, which no king of Viterra had ever done in that room. "I am going to inquire into the parentage of your son."</p>
+<p>Elianor said nothing at all.</p>
+<p>"Good," said Herald. "You have not gasped, or wept, or asked me what I can possibly mean, and I am grateful, because all three would have been extremely convincing and I should have had to sit through them." He folded his arms. "Here is my reason, madame, and I want you to have it in full, because I think you will find it a good one and I would rather be understood than feared. It is not that I dislike you. I like you a great deal. You are the best mind in this kingdom and you have run my father's household better than my mother did, and I have said so in company more than once."</p>
+<p>"You have. Thank you."</p>
+<p>"It is not that I want the boy dead, or exiled, or shamed; I have never in my life wanted a child harmed and I am not going to begin at two-and-forty." He held up one finger. "It is this. I am king. I am unmarried, and I shall marry within the year, and I shall have sons, God willing, and when I am dead there will be a boy of eight or nine on this throne with a regency round him like flies on a horse. And in that regency there will be a man of forty — your son — who is either my brother or not my brother, and the entire kingdom will have spent thirty years not being sure, and the not-being-sure will be <em>worth something</em>, madame, to somebody, and it will be spent. It is always spent. It was spent in my great-grandfather's time and it cost this house eleven years and a province."</p>
+<p>"So you would settle it."</p>
+<p>"So I would settle it <em>now</em>," said Herald, "while everyone who was in the room is alive. In thirty years they will all be dead and it will be unsettleable forever, and the doubt will be immortal, and it will kill somebody's grandson." He looked at her steadily. "Tell me that is not a good reason."</p>
+<p>"It is an excellent reason," said Elianor.</p>
+<p>"Then—"</p>
+<p>"It is the best reason anyone has ever given me for anything," she said, "and I want you to know that I mean that without irony, and I want you to know that I shall fight you with everything I have, and that neither of those cancels the other, and that anyone who tells you they must is selling you something."</p>
+<p>Herald Everblood looked at her for a moment.</p>
+<p>Then he laughed — a good laugh, an unguarded one, the second unguarded thing he ever did in her presence and the last — and said, "God, but my father was lucky. Do you know he never once knew what he had?"</p>
+<p>"He knew," said Elianor. "He simply never said so, which you will find is a different skill, and the one you are missing."</p>
+<hr class="scene-rule"/>
+<h3>iii. The Second Day</h3>
+<p>She had one defence and she had known what it was for four years.</p>
+<p><strong>The Right of Acknowledgment.</strong> A child taken up and acknowledged by the father in his own voice, before the household, within the hour of the birth, is his; and the record cannot be impeached by later evidence of any kind, but only by proof that the acknowledgment did not occur.</p>
+<p>Not that it was mistaken. Not that it was procured. Only that it <em>did not happen</em>.</p>
+<p>So it did not matter what Herald found in the annals. It did not matter what he made of an autumn at Corbenoit, or a psalter, or a king at Belworth by the west road in August, or thirty-eight days in which a second son was not written down anywhere. He could count on his fingers until his hands fell off. Counting was not a remedy. The law of Viterra had, three hundred years earlier, in its wisdom and its cynicism, built a door that arithmetic could not open.</p>
+<p>It had built one that could.</p>
+<p>Nine people had been in that chamber at half past four in the morning and had seen an old man in a bed-gown take a child up in both hands and say eleven words.</p>
+<p>Two of the eleven had died in the four years since.</p>
+<p>Of the nine living: Mahaut of Adrecourt, who was seventy-seven and would say anything Elianor asked her to and whose oath was therefore worth precisely nothing and who would be broken in a morning by a competent examiner. Brother Tomas, who was sixty-nine and incapable of the smallest lie in either direction. Four ladies of the queen's household, all of them hers, all of them clever, all of them entirely aware of what they were swearing to. The midwife, who had gone home to Verrain and set up as a woman of property on the strength of it. Gilles Hauvel, clerk of the chamber, who had made the entry in the chamber book that morning and had made eleven thousand other entries in nineteen years and had never had an opinion about any of them.</p>
+<p>And the king's physician: Maistre Corbet, now seventy-five, deaf in one ear and going in the other, who had been in the room and who had been asleep in a chair by the fire for most of the night and who had been woken by the noise.</p>
+<p>Elianor wrote out the nine names on the second day and looked at them for a long time, and then drew a line under the ninth, and sat back, and said aloud to the empty room:</p>
+<p>"Well. There you are."</p>
+<hr class="scene-rule"/>
+<h3>iv. The Third Day</h3>
+<p>Herald found Maistre Corbet on the third day. Of course he did. He found him in about four hours, because Herald Everblood was not stupid and had been making inventories of rooms since he was fourteen, and because the moment you write out those nine names the ninth one draws its own line under itself.</p>
+<p>The examination is not preserved in full. What survives is the memorandum the King of Arms made afterward, which is eleven lines long, and which ends:</p>
+<p class="marginalia"><em>Asked whether he heard the late king speak the words. Says he believes he did. Asked whether he heard them with his own ears or was told of them after. Says he does not now recall which. Asked again. Says he was much asleep, and the room was very full, and he is an old man, and he would not swear to it either way before God.</em></p>
+<p>That is the whole of it. Eleven lines, in a clerk's neat hand, and the kingdom of Viterra tilted about four degrees.</p>
+<p>He had not lied. He had not been bribed, or frightened, or coached. He was a decent, deaf, exhausted old physician of seventy-five who had been asked, four years after the fact, whether a thing he had half-heard through one working ear at half past four in the morning had actually reached him, and he had done the honest thing, which is the worst thing, which is to say <em>I don't know</em>.</p>
+<p>An acknowledgment must occur <em>before the household</em>. Nine witnesses. Eight now swearing, one unable to.</p>
+<p>It was not a crack. Not yet. It was a hairline, and it would have closed by itself in any ordinary year.</p>
+<p>But Herald was king, and Herald could not let a thing alone, and Herald had — though nobody in that building knew it, and he least of all — seven days.</p>
+<hr class="scene-rule"/>
+<h3>v. The Fourth Day</h3>
+<p>Elianor did not go near Maistre Corbet. She never spoke to him again in her life, which cost her something, because she had liked him.</p>
+<p>What she did on the fourth day was the thing she was for.</p>
+<p>She sent for the wardrobe clerk, the chandler, the two door-wards of the king's side, the man who had been the late king's body-servant, and a boy of nineteen who had been a boy of fifteen four years before and who had carried the king's candle that morning; and she put them in a room with the Chancellor's own clerk present as witness, so that nothing she did could ever be said to have been done privately; and she asked them, one at a time, a series of entirely boring questions about wax.</p>
+<p>Because here is the thing that nobody who has not run a household understands, and that Herald, who had run armies and councils and inventories of faces but had never in his life run a <em>house</em>, did not understand at all:</p>
+<p>A king does not move through a building without leaving a wake.</p>
+<p>At half past four in the morning on the eve of Saint Ossian in the tenth year of the reign, Wymund IV got out of his bed and walked ninety feet. And therefore:</p>
+<p>The king's chamber fire was fed at an hour when it is never fed, and the fuel account for that week shows it, because fuel is accounted by the load and an extra load in March is a thing a clerk writes down.</p>
+<p>Two door-wards stood aside for him, and the second of them had been reprimanded a fortnight later for something else entirely and remembered the week with great clarity, as men do when the week contains a reprimand.</p>
+<p>A boy carried a candle ahead of him and was given a shilling for it, and the shilling is in the chamber account under gratuities, at the foot, on that day, because it was the only shilling given that week.</p>
+<p>The king's body-servant dressed him in a bed-gown and was awake for the rest of the night and said so.</p>
+<p>And the wax drawn for the queen's chamber in that twenty-four hours was four times the ordinary rate, which is what happens when nine people stand in a room at half past four in the morning and somebody has to see.</p>
+<p>None of this proves that a man said eleven words.</p>
+<p>All of it proves, in four separate hands, in four separate offices, none of them communicating, none of them political, none of them ever intended to be read by anybody at all, that at half past four in the morning on the eve of Saint Ossian the King of Viterra walked ninety feet down a cold corridor in his bed-gown, with a boy and a candle, to a room full of women and a new-born child.</p>
+<p><em>And what</em>, Elianor wrote, at the foot of the fifth membrane, in a clean hand, <em>does the office suppose he went there to do?</em></p>
+<hr class="scene-rule"/>
+<p>She had it engrossed and sent to the King of Arms — not to Herald; to the office, with the references, the membrane numbers, and the names of the officers who kept each roll and whether they were living — and she included, unasked, at the head of it, the whole of the case against herself.</p>
+<p>The autumn at Corbenoit. The psalter. The king at Belworth by the west road in August of the ninth year, and the lord Baldvyn detached from the host on the twenty-ninth of July and unnoted anywhere until the sixth of September, and the birth on the eve of Saint Ossian following. She did the arithmetic explicitly, in the middle of the fourth membrane, with the days counted out, because she had understood four years earlier in the quarter-hour before she was dressed that the thing she could not prevent was a man counting on his fingers, and that the only thing more dangerous than a man counting on his fingers is a man who believes he has thought of it himself.</p>
+<p>And she wrote, underneath it:</p>
+<p class="marginalia"><em>I do not say that this closes the question of the common talk. It does not, and nothing ever will, and I have long since stopped expecting it to. I say that the common talk is not the matter before the office. The matter before the office is whether an old man walked ninety feet in March and spoke eleven words to a room, and I have shewn you his candle, and his fire, and his door-wards, and the shilling he gave the boy who lit him; and I say that a man does not get out of bed at six-and-fifty in the middle of the night to go and disown a child.</em></p>
+<p class="marginalia"><em>I lay the whole before the office, being all that I know, and such as I do not know I have marked so.</em></p>
+<p class="marginalia"><em>Elianor, dowager queen.</em></p>
+<hr class="scene-rule"/>
+<p>She had Gervaise carry it, and stood in the corridor while he took it in, and then went to her oratory and was sick, quietly, in a basin, and then went down and settled a dispute about the Verrain garrison's fodder, because the treasury was paying the garrisons on a warrant and somebody had to.</p>
+<p>It was the best thing she ever wrote. It is in the King of Arms' office to this day.</p>
+<p>It would not have been enough.</p>
+<p>It was not a bad case; it was a very good case; it was, on the evidence, probably the winning case. But the man on the other side of it was king, and had six days, and had the Chancellor, and had an old deaf physician who would not swear either way before God; and Elianor knew — she wrote it down, in the margin of her own copy, in three words that are still legible — exactly what her position was.</p>
+<p>The three words are: <em>Not enough. Time.</em></p>
+<hr class="scene-rule"/>
+<h3>vi. The Fifth Day</h3>
+<p>The news from Brigh came on the fifth day, in the afternoon, by a rider who had killed two horses getting there.</p>
+<p>The Thornhills were a Linnic house of the northwest, old, proud, land-poor, keepers of custom so old that half of it was not law anywhere and the other half had been law once and nobody had got round to repealing it. Their seat was at Brigh. Their head was Lord Branton Thornhill, who was fifty-one and had a reputation as a hard landlord and a good soldier and a man you did not cross at table.</p>
+<p>Alayse Everblood, daughter of Wymund IV, sister of the king, had been his ward for two years.</p>
+<p>The rider brought the fact itself and nothing else — the fact, and that she had got out, and that she had ridden to her own people at the priory at Elden with two women and no escort, and that the Thornhills had risen the same night and had Brigh shut, and that the northwest was up.</p>
+<hr class="scene-rule"/>
+<p>Elianor was in the muniment room when they told her.</p>
+<p>There is one witness to what she did in the next four minutes, and it is Gervaise, who was four-and-eighty, and who told it once, twenty years later, to somebody who wrote it down, and who prefaced it by saying that he had never in forty years been sorry to have seen a thing before.</p>
+<p>She stood up. She asked three questions: was the girl hurt, where was she now, and who was with her. She got the answers. She said, "Send for my horse and eleven of yours, we go tonight, I want the abbess at Elden warned by a rider who leaves before we do." All of that took about forty seconds and was, Gervaise said, the fastest he had ever seen anybody in his life do anything.</p>
+<p>And then she stopped.</p>
+<p>She stood in the middle of the muniment room with her hand on the back of a chair and did not move for perhaps a minute and a half.</p>
+<p>And Gervaise, who was not a clever man but who had escorted her when she was six-and-twenty and had spent thirty-eight years learning her face, said afterward that he had known exactly what was happening, because he had done the same sum himself in the yard before he came up, and had been ashamed of it, and had assumed he was the only one.</p>
+<p class="marginalia"><em>Herald will go north.</em></p>
+<p>That was all. It arrived uninvited, the way such things do, in the middle of a horror, in her own voice, in the place where nothing counts: <em>Herald will go north, and he will go tomorrow or the day after, because his sister has been ruined by his father's own vassal in the second week of his reign and there is not a man in Viterra who would not go, and the inquiry will stop, and I have been given by this the one thing I told the office I did not have, and I did not ask for it, and I would not have asked for it, and I am standing here in the first minute counting it.</em></p>
+<p>She said — to Gervaise, to the room, to nobody: "I want that back."</p>
+<p>And Gervaise said, "Madame?"</p>
+<p>"Nothing," said Elianor. "Get the horses."</p>
+<hr class="scene-rule"/>
+<p>She was at Elden by the second hour of the morning. She stayed eleven days, which meant that she was two hundred miles from Valora and three hundred from Brigh for the entire remainder of her stepson's reign, in a priory full of nuns, in the company of the injured party, visible to forty people a day, doing the single most defensible thing a woman in her position could possibly have been doing.</p>
+<p>Everyone who has ever written about Elianor Longblood has noticed this.</p>
+<p>She never once, in sixty years, offered anybody an explanation of it, and when a man was foolish enough to raise it at her table in her seventies she said, "Yes. It was very convenient. Shall I tell you what it cost?" — and then did not tell him, and turned to the person on her other side, and asked about his horses.</p>
+<hr class="scene-rule"/>
+<h3>vii. The Seventh Day</h3>
+<p>He came to Elden on the seventh day, on his way north, with four hundred horse on the road behind him and the Constable half a day ahead.</p>
+<p>He was with his sister for two hours. Nobody else was in the room. What passed there is not recorded anywhere and is none of this book's business, and the only thing that is known of it is that when he came out his face was the colour of the wall, and that he asked for water and could not hold the cup, and that he set it down and stood with both hands on the sill of the window for about a minute before he trusted himself to speak.</p>
+<p>Elianor was in the cloister. He came and found her.</p>
+<p>"Madame."</p>
+<p>"Your Grace."</p>
+<p>"Don't," said Herald. "Not here. I have four hundred men in a field and a bishop somewhere behind me and I have been <em>Your Grace</em> since the hour my father stopped breathing and I cannot have it in a cloister, tonight, from you. You have known me since I was eight-and-twenty and you brought that child up and I am not able to do the voice."</p>
+<p>So she said, "Sit down, then," and he sat down on the cloister wall like a boy, and put his head back against the pillar, and shut his eyes.</p>
+<p>After a while he said: "Was she happy there? At Brigh. The first year. She wrote that she was happy."</p>
+<p>"She wrote that to me also."</p>
+<p>"Was it true?"</p>
+<p>Elianor thought about the four days she had spent looking at the Thornhill proposal in the winter of the twelfth year, and finding no fault in it, and saying so.</p>
+<p>"I think it was true in the first year," she said. "I have gone over her letters twice since Tuesday. There is nothing in them until the autumn, and after the autumn there is nothing in them at all, which I did not notice, because a girl of one-and-twenty who stops writing about her hawks is a girl who has got interested in something, and I was pleased."</p>
+<p>"You did not notice."</p>
+<p>"No."</p>
+<p>"Nor did I," said Herald. "I read them too. She wrote to me every month and I read every one and I could not tell you now what was in a single one of them." He opened his eyes and looked at the roof of the cloister. "There it is. There is the whole of it. My sister wrote to the two cleverest people in this kingdom every month for two years and neither of us read a word."</p>
+<p>There was a long silence. An owl went over.</p>
+<p>"They will not fight you in the field," Elianor said.</p>
+<p>"No?"</p>
+<p>"No. They are land-poor and they are proud and they are Linnic, and they have a hundred and forty years of custom about sieges that nobody at Valora has ever read because it is not law and never was. They will shut Brigh and offer you <em>the parley of the third day</em>, and it is not a trick and it is not a surrender; it is an old form, and it requires the lord of the place to come out to a field between the lines with his household about him and be seen, and it requires you to come out likewise, and it is how these people have ended quarrels since before either of our houses existed." She paused. "It has been broken four times in a hundred and forty years, and every time by an outsider who did not know what it was, and every time the country round rose to a man afterward and stayed risen for a generation."</p>
+<p>Herald said, "You are telling me to go out into a field and stand in front of the man who did that to my sister and <em>be seen</em>."</p>
+<p>"I am telling you what the form is."</p>
+<p>"Because you think it will save time."</p>
+<p>"Because I think it will save the northwest," said Elianor, "and because you asked me nothing and I am telling you anyway, which you may take as you like."</p>
+<p>He looked at her.</p>
+<p>And this is the moment — this one, in a cloister at Elden on the seventh day of the shortest reign in the history of Viterra, with an owl going over and four hundred horse in a field — that Elianor Longblood carried for the next fifty years, and that she never once described to anybody, and that is the reason the question at the bottom of this book has no answer and can never be given one.</p>
+<p>Because she had said a true thing. Every word of it was true; it is in the Linnic custumals; it is still true; a scholar can look it up.</p>
+<p>And she had said it <em>in that tone</em> — the flat, brisk, faintly impatient tone of a senior official of a well-run department, the tone she had spent fourteen years building specifically so that nothing she said would ever sound like pleading — to a proud, clever, exhausted man who had just come out of a room where his sister was, and who had been told all his life that he was not as clever as she was, and who was at that moment quite incapable of taking advice from the one person in the kingdom he was currently trying to destroy.</p>
+<p>She knew all of that. She knew every part of it. She had known men for fourteen years; it was her trade; she could not not know it.</p>
+<p>Did she say it so that he would refuse?</p>
+<p>She did not know. That is the honest answer and she gave it, once, to one person, forty years later, and the person wrote it down, and the sentence is: <em>I have never been able to find out, and I have looked.</em></p>
+<p>"Thank you," said Herald. "No."</p>
+<p>"No?"</p>
+<p>"I am not going to stand in a field and be looked at by Branton Thornhill." He got up off the wall. "I am going to take Brigh."</p>
+<p>"Your Grace—"</p>
+<p>"There it is," he said, without heat. "There is the voice. I knew it would come back." He pulled his gloves out of his belt. "I shall be a fortnight. Three weeks at the outside; the Constable says less. The office has my instructions and Maistre Corbet is to be examined again when I return, in my presence, and I shall finish it then."</p>
+<p>"Yes."</p>
+<p>"I want you to know that I have read your membranes," said Herald. "All nine of them. Twice. The one about the candle is the best thing anybody has put in front of me since I was crowned, and it very nearly did for me, and I have not worked out the answer to it yet." He almost smiled. "I shall have a fortnight on the road to think about it. That is the only good thing about this whole business, madame: it is going to give me a fortnight to think."</p>
+<p>"And if you think of the answer?"</p>
+<p>"Then I shall come back and finish it, and you will fight me, and one of us will win, and the other will have been correct." He pulled the gloves on. "Look after her. Don't let them take her south, whatever the bishop says. She likes hawks. I never once found her a decent hawk in three-and-twenty years and I do not know why, it would have cost nothing."</p>
+<p>And Herald Everblood, King of Viterra, Duke of Aberiel, seventh day of his reign, went and got on his horse.</p>
+<hr class="scene-rule"/>
+<h3>viii. The Tenth Day</h3>
+<p>There are three accounts of what happened at Brigh and they do not agree.</p>
+<p>Four thousand men were within a mile of that gateway. Perhaps two hundred were close enough to see anything. Among them, eleven feet from the gate, on foot, having had his horse killed under him in the first rush, was Oswyn Everblood, the king's uncle, six-and-thirty years old, the best lance in the family and the finest close witness anybody could have asked for.</p>
+<p>He was examined by nobody, because there was no inquiry. He was asked privately, over the following forty-six years, by perhaps a dozen people, including two kings, one chronicler, and — in 812, at Istovar, at table, in front of nine people — his brother's widow.</p>
+<p>He gave the same answer every time, in the same pleasant unhurried voice, and it is the only sentence of his that anybody bothered to write down:</p>
+<p class="marginalia"><em>"It was very quick, madame, and there was a great deal of dust, and I would not swear to any of it before God."</em></p>
+<p>She never asked him again. She said afterward — to nobody, in the muniment room, some hours later — that it was the single most professional thing she had ever heard a man do, and that she had taught it to half the court herself, and that it served her entirely right.</p>
+<hr class="scene-rule"/>
+<p><strong>The Constable's dispatch</strong>, written that night, is the shortest: that the king came up on the tenth day, that the place was shut against him, that he ordered the assault at first light without offering terms, that the north gate was carried at the second attempt, and that the king was killed in the gateway by a quarrel from a window above, and that Branton Thornhill was taken alive an hour later and was hanged the following morning by the Constable's own order without reference to anybody.</p>
+<p><strong>The Viterran chronicle</strong>, compiled eleven years afterward from the recollections of men who had been there, says that the Thornhills offered the parley of the third day on the morning the king came up; that the king refused it; that the assault went in; and that the king was killed <em>in the gateway</em> — and then adds, in a sentence that has caused four hundred years of argument, <em>and some say not by a quarrel.</em></p>
+<p><strong>The Linnic telling</strong>, which is a song and is not evidence and which every serious historian has dismissed and every single one of them has quoted, says that the parley was offered and refused, and that the king came through the gate ahead of his own household, alone, faster than his men, into a yard full of people who had just been told that the form was broken and that there was therefore nothing left; and that what killed him was not any one hand.</p>
+<p><em>He went in before them,</em> the song says, <em>and they did not follow fast enough, and everyone who was in that yard has told it differently since, and God has not seen fit to correct any of them.</em></p>
+<hr class="scene-rule"/>
+<p>Here is what is not in dispute.</p>
+<p>The king was two-and-forty and had reigned ten days. He had been advised — by the Constable, by two of his own captains, and by the dowager queen at Elden on the seventh day — to take the parley, and had refused it on the same grounds each time, which was that he would not stand in a field and be looked at.</p>
+<p>No inquiry was ever held. Baldvyn was crowned inside the month and had a rising to finish and a kingdom to pick up, and an inquiry into the death of a king in a gateway during an assault he had personally ordered against advice is an inquiry with nothing at the end of it but a list of men who were standing nearby.</p>
+<p>And the one person in either kingdom with the appetite and the skill to take a thing like that apart, membrane by membrane, and find the truth at the bottom of it — the one person alive who could have done it, and who did that kind of work for pleasure, and who had once reconstructed a whole night's traffic in a corridor out of a shilling and a load of firewood —</p>
+<p>— never made the smallest attempt to.</p>
+<p>She was asked about it twice in her life. The first time she said, "I was at Elden." The second time, much later, she said: "Because there is no version of that inquiry which does not end with a clerk writing down what I gained by it, and I had already been given the gain. One does not audit a gift, sir. One merely carries it about for fifty years."</p>
+<hr class="scene-rule"/>
+<h3>ix.</h3>
+<p>Baldvyn came down from Brigh at the end of April, having taken the place, hanged four men, and stood in the yard for eleven minutes in front of the whole army with his dagger drawn over a Thornhill infant in a woman's arms, and put it away, and said the sentence that everyone in Viterra can still quote:</p>
+<p class="marginalia"><em>"He is a child. Prune him gently, or the root will spread."</em></p>
+<p>He was forty years old and had been king for nine days and it was the first thing he ever did in the office, and it was a good thing, and it was witnessed by four thousand people, and it was — this is in the nature of such acts and does not diminish it — also extremely useful to a man who needed the northwest quiet by harvest.</p>
+<p>The root spread. It took thirty-eight years, and it came out of the ground at Coldmorrow in the hand of his own granddaughter, and that is in the other books.</p>
+<p>The inquiry into the parentage of Valdais Everblood was never reopened.</p>
+<p>The King of Arms held the file for four years and then, under a general order for the clearing of the office made in the ordinary way by a clerk who had never heard of any of it, marked it <em>unconcluded, the party deceased</em>, and had it sewn into the back of the volume for the year, where it remains.</p>
+<p>Maistre Corbet died at seventy-nine, in his bed, having never been asked the question a second time.</p>
+<p>And Brother Tomas, who had been asked one question by a king on the fourth day and had answered it truthfully, and had then been asked a second and had refused it, and had known, in the refusing, precisely what he had done — Brother Tomas was still at Valora in the summer, in the queen's household, saying mass every morning in a chapel that nobody now had any reason to inquire into.</p>
+<p>He was made prior of the house at Ancourt in September, at the instance of the Bishop of Verrain, eleven days' ride to the south.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">MOVEMENT V</span>The Act of Settlement</h2>
+<p class="tale-meta place">Valora, 794 AR</p>
+<hr class="scene-rule"/>
+<h3>i.</h3>
+<p>They crowned Baldvyn at the end of May and Elianor watched it from the place appointed for a dowager queen, which is the second stall on the north side, behind a pillar.</p>
+<p>She had chosen the pillar herself. The Earl Marshal had offered to move her forward and she had declined, warmly, with thanks, and let him tell people she had declined, because a woman who takes the worse seat at a coronation is a woman about whom nothing needs to be said for six months.</p>
+<p>She had no office, no seal, no household charge, no dower yet assigned, and no legal existence beyond the right to be maintained; the whole apparatus she had spent fourteen years building had gone out of the door with Wymund's body, because everything she had held she had held by the sufferance of a man who was now in a stone box under the floor she was standing on.</p>
+<p>She had been, for ten days, the most dangerous person in Viterra.</p>
+<p>She was now, quite precisely, furniture.</p>
+<p>She stood behind her pillar and watched them put the crown on the head of a man who had once told her that he had never found anything to put in the hour before the lights, and she thought, with the clarity that comes to people who have not slept properly since March:</p>
+<p class="marginalia"><em>Well. Here we are again, then.</em></p>
+<p>And then, being who she was:</p>
+<p class="marginalia"><em>No. Not this time.</em></p>
+<hr class="scene-rule"/>
+<h3>ii.</h3>
+<p>She made the proposal herself, nine days later, in writing.</p>
+<p>This offended everybody who subsequently heard about it, and it is the detail the songs cannot accommodate at all, which is why in all four of them Baldvyn proposes — in a garden, in one version on his knees, in another during a storm. There was no garden. There was a memorandum.</p>
+<p>It ran to a page and a half and it began: <em>Sire. What follows is a matter of state and I have set it out as such, and I ask you to read the whole before you feel anything about it, because I have written it to be read in that order.</em></p>
+<p>It set out: that the crown required a marriage; that the crown's marriage was the last unspent asset of the accession and would be spent within two years whether the king willed it or not; that there were four candidates, of whom she named all four and assessed each in three lines, fairly, including the two that were better matches than herself; that a foreign match would cost him the western cantons within a generation for reasons she set out in eleven words; that the objection of affinity was grave, canonical, and purchasable, and she gave the price, in marks, and the name of the man to pay it to.</p>
+<p>And then the fifth paragraph, which is the only one that has ever been quoted:</p>
+<p class="marginalia"><em>I am forty. I may yet give you sons and I may not, and you must have sons, and if I cannot then the woman who does will be at your table for thirty years and I shall be at it also. I want you to have looked at that sentence, in daylight, on paper, before either of us says anything we cannot take back. I have looked at it. I looked at it for two days and then I wrote the rest of this.</em></p>
+<p class="marginalia"><em>If after that you still want it, then I tell you that I want it, and I have wanted it since I was a woman of six-and-twenty in a room with four empty chests in it, and I have never said so to any living soul including you, and I am saying it now in a memorandum because I do not trust myself to say it in a room.</em></p>
+<p class="marginalia"><em>The terms follow overleaf.</em></p>
+<hr class="scene-rule"/>
+<h3>iii.</h3>
+<p>There were twelve, and they were not a marriage contract. They were a peace treaty, because she had learned at seven-and-twenty that the difference between a party and a chattel is not affection, is not love, is not even power: it is whether your name appears in the recitals or in the schedule.</p>
+<p>Most of them were ordinary. Her dower, stated in lands and not in money, held of her own right and heritable by her daughters, which was unusual and which took four months and a threat to obtain. Her household, named, with the officers listed by name including Gervaise, who was by then five-and-eighty and appalled to find himself a clause. Her muniment room. (It is in the instrument. It is Clause the Eighth. <em>Item, the queen shall have the keeping of a chamber for her rolls, with a fire.</em> The chancery clerk who engrossed it assumed it was a jest and left a space in case it was struck out.)</p>
+<p>And then there were the two that settled the kingdom, and they are the reason this book exists.</p>
+<hr class="scene-rule"/>
+<p>Here was the tangle Baldvyn inherited, and it was not a moral tangle; it was a structural one, and it would have destroyed him inside fifteen years:</p>
+<p><strong>Oswyn Everblood</strong>, the late king's youngest brother, was six-and-forty. He was a capable knight, a better soldier than either of his nephews, popular with the border captains, entirely loyal, and — with Herald dead in a gateway and Baldvyn's own sons not yet born — standing about four feet from the throne of Viterra whether he wanted to or not. Nobody doubted Oswyn's loyalty. That was precisely the problem. Loyal men with claims do not need to be disloyal in order to be used; they only need to be <em>available</em>, and in thirty years, in a minority, with a bad harvest and a foreign purse, Oswyn Everblood or his sons would be available to somebody.</p>
+<p><strong>Valdais Everblood</strong> was four. He was an acknowledged son of the king's body under the Right of Acknowledgment, which could not be impeached; he therefore stood in the Viterran succession; and he was, as everyone from Valora to Acasia had been whispering for four years and would whisper for eighty, of disputed paternity — which meant that his place in the succession was simultaneously unassailable in law and universally doubted in fact, which is the exact chemical composition of a civil war.</p>
+<p>Elianor took four days over it and wrote the answer in a page.</p>
+<p><strong>Clause the Ninth.</strong> Oswyn Everblood renounces, for himself and the heirs of his body forever, all claim to the crown of Viterra; and in consideration thereof is granted the canton of Istovar, in Vhasia, to hold of the Duchy of Aberiel by the service of a knight's fee, with the crossings and the tolls thereof.</p>
+<p><strong>Clause the Tenth.</strong> Valdais Everblood, son of the late king, renounces likewise, for himself and the heirs of his body forever; and in consideration thereof is granted the canton of Adria, being the inheritance of his mother, the house of Longblood, to hold in the same manner.</p>
+<p><strong>Clause the Eleventh.</strong> <em>Whereas the estate of the lord Valdais, son of the late king's body, was acknowledged by the late king in his own voice before his household within the hour of the birth, according to the Right, and was so entered in the chamber book on the same day; the said Right and the said entry are recited in this instrument at length, and the parties do covenant and acknowledge the same; and this present marriage, and the peace of the western cantons and the quiet of the Belworth crossings thereupon depending, are made upon the faith of it.</em></p>
+<hr class="scene-rule"/>
+<p>Read the eleventh slowly. It is four lines and it took her eleven days, and it is the cleverest thing anyone did in Viterra in that century.</p>
+<p>The Right of Acknowledgment was a finding of law. Findings can be reopened. Herald had shown, in four days, exactly how: not by arithmetic, which the doctrine was proof against, but through the one small door — <em>did it occur</em> — and there would be another Herald. There is always another Herald. Kings die and offices are cleared and old physicians are asked things twice, and a hairline crack in a doctrine will be found again by somebody in the third generation with a clerk and a grievance and forty years.</p>
+<p>But a recital in the marriage settlement of the crown is not a finding. It is a <em>term</em>. And the peace of the cantons is made upon the faith of it, and the king's marriage is made upon the faith of it, and the dower of the queen and the inheritance of her daughters and the tenure of Istovar and the tenure of Adria are all made upon the faith of it; and therefore no man, in any future age, can pull upon the acknowledgment of Valdais without pulling upon the lawfulness of the king's marriage, and the legitimacy of every child that comes of it, and the title to four hundred miles of border, and the seat under his own duke.</p>
+<p>She had made her son a term that could not be struck without collapsing the whole document.</p>
+<p>She had been fourteen years getting there. She had begun on a bad bed at Corbenoit with a sentence said to a dark ceiling, and she had meant it, then, about herself; and somewhere in between she had found out that you cannot actually do it for yourself, that no woman can, that the instrument will always find a way to strike you —</p>
+<p>— but that you can do it for somebody else, if you are patient, and slow, and willing to pay, and if you have spent your whole life reading the pleadings and know exactly where to put the fulcrum.</p>
+<p>Clause the Eleventh has never been challenged in a hundred and forty years. It is still good law on both banks. It has outlived every person named in it.</p>
+<hr class="scene-rule"/>
+<h3>iv.</h3>
+<p>Now the other half of it, which nobody has ever written down properly, and which this book will now do.</p>
+<p>To buy Clause the Eleventh she had to write Clause the Tenth.</p>
+<p>There was no other coin. The doubt about Valdais could not be removed and she had stopped trying to remove it before he could walk; what could be done — the only thing that could ever be done — was to make the doubt <em>worthless</em>, by seeing to it that no faction on earth would ever have a reason to spend it. A boy who might be king is a weapon lying in a field where anybody can pick it up. A boy who has renounced, for himself and his heirs forever, in an instrument sealed by two crowns and eleven houses, in exchange for a duchy, is not a weapon. He is a duke.</p>
+<p>So on a Thursday in July, in her own hand, in a clean chancery draft, Elianor Longblood struck her four-year-old son out of the succession of Viterra.</p>
+<p>She did it without consulting him, obviously; he was four. She did it without consulting his father, either of them. She wrote it, and she carried it to the king herself rather than sending it, and Baldvyn read Clause the Tenth twice and put the sheet down and said:</p>
+<p>"You have thought about this."</p>
+<p>"For nine days."</p>
+<p>"He will hate you for it."</p>
+<p>"He may," said Elianor. "He will be alive to do it."</p>
+<p>And then she said the other thing, the one she had promised herself in the corridor she would not say, and said it anyway, because she was forty years old and had not slept properly since March:</p>
+<p>"My father made me the fourth item on a list, and I have spent fourteen years learning what it costs to be a thing that is exchanged. And I have just done it to my son, in my own hand, on a Thursday, and I did it in nine days, which is eight and a half days faster than it took my father." She put her finger on the membrane. "I want that written somewhere. Not in the instrument. Somewhere."</p>
+<p>"Elianor—"</p>
+<p>"It is written now," she said. "You heard it. You are the record."</p>
+<hr class="scene-rule"/>
+<p>Valdais was told when he was eleven. It is not recorded who told him.</p>
+<p>He held Adria for the rest of his life and ran it superbly, including the roads, which he repaired. He never made a claim on Viterra in his life — not in 821, when he had four thousand men and every provocation a man could ask for; not in 834; not ever. Whatever else the Defiance was about, it was never about that, and the clause held.</p>
+<p>His mother's inheritance came to him as a concession. He knew it. He signed it himself at his majority, in a good hand, and under his signature, where such a thing has no business being, he wrote four words that the enrolling clerk copied faithfully because clerks copy what is in front of them:</p>
+<p class="marginalia"><em>As she was. — V.</em></p>
+<hr class="scene-rule"/>
+<h3>v.</h3>
+<p>Brother Tomas came to say goodbye in September, in the small garden, where she was pretending to look at a pear tree.</p>
+<p>He was sixty-nine. He had taught her Latin at Adrecourt when she was nine years old, in the muniment room, out of a psalter with a broken board; he had come east to her in the sixth year of the reign at her asking and had been her confessor for eight years; he was the only person alive who had known her before she was an item on a list and after she had become a queen, and the only one who had never once, in either condition, wanted anything from her.</p>
+<p>He had been made prior of the house at Ancourt, in the far south, eleven days' ride, which was an honour, and a promotion, and entirely unexpected, and which had been procured for him by the Bishop of Verrain, who had in turn been moved to it by two conversations and a remark about candles.</p>
+<p>"They tell me it is very warm there," he said. "I am told one can grow a lemon."</p>
+<p>"So I understand."</p>
+<p>"I have never wanted a lemon."</p>
+<p>"No," said Elianor. "I don't suppose you have."</p>
+<p>They looked at the pear tree.</p>
+<p>"He asked me two questions," Brother Tomas said. "The king. In April. On the fourth day."</p>
+<p>"I know what the first one was."</p>
+<p>"Yes. He asked me whether I heard your husband speak the words of the Right, and I said that I did, because I did, clear as I hear you now; I was four feet from him." He folded his hands into his sleeves. "And then he asked me the second one. And I would not answer it. And I have thought since that a man who will answer the first and not the second has told you a great deal more than a man who answers neither."</p>
+<p>"You could not have answered it."</p>
+<p>"I could not have answered it," he agreed, "and I did not, and I would not have, and I want you to understand that I am not confessing anything to you now. I am telling you what a king heard in a room in April." He looked up at her with his mild, affectionate face. "And I have made a calculation, madame. I have never been good at sums; you know that; you used to do them for me when you were nine and pretend you had not. But I have made this one several times. It always comes out the same way. That man went north on the seventh day with two questions answered and one refused, and he meant to come back and finish it, and he did not come back; and I am going to Ancourt in a fortnight to grow a lemon."</p>
+<p>Elianor said nothing at all.</p>
+<p>"You might have asked me," he said. "That is the whole of what I came to say. You might have come to me in April and asked me to be ill, or to be absent, or to be stupid, and I would have refused you, and then we should both have been in a very great deal of trouble, and it would have been <em>honest</em> trouble, and I think I could have borne it and I am nearly certain you could." He said it gently. He was not capable of saying anything any other way, which was the entire cruelty of him. "You did not ask me. You have arranged the world so that nobody will ever have to ask me anything again, and you have done it so well that if I had not known you since you were nine I should believe the Bishop of Verrain thought of it himself."</p>
+<p>"Tomas—"</p>
+<p>"I am not reproaching you. I have nothing to reproach you with; you have given me a priory and a lemon tree." He shook his head slowly. "That is the difficulty, madame. I have gone over it a great many times and there is nothing to reproach. You have arranged it so that there is nothing."</p>
+<p>Elianor Longblood, who did not weep, stood in a garden and looked at a pear tree.</p>
+<p>"Will you give me your blessing?" she said at last.</p>
+<p>"Of course," said Brother Tomas, and gave it, entirely, without reservation, in the correct and formal words, as he had given it every week for eight years; and it was the last one she ever had from him, and she felt it land, and that was the punishment, and both of them knew it, and neither of them ever said another word about it as long as they lived.</p>
+<p>He wrote to her twice a year for eleven years. The letters were about the garden.</p>
+<hr class="scene-rule"/>
+<h3>vi.</h3>
+<p>The dispensation cost four thousand marks, a foundation at Verrain, and one afternoon.</p>
+<p>The afternoon was hers. The Bishop of Verrain — the same one who had preached for fifty minutes on the duty of wives — came to her with the drafted instrument and a face full of regret and explained that the impediment of affinity in the first degree was the gravest known to the canon, that it was scriptural, that it was not lightly to be dispensed, and that Holy Church, while sensible of the necessities of the realm, must be seen to weigh the matter with the fullest solemnity.</p>
+<p>"How long is the weighing, my lord?"</p>
+<p>"Madame, these things are not measured in—"</p>
+<p>"They are measured in exactly that," said Elianor. "Everything is measured in that. Let us not pretend we are at prayer; we are at market, and I have been at market since I was a girl, and I am extremely good at it, and you are going to find that I am better at it than you because I have never once in my life had the luxury of being able to walk away." She poured him wine herself, which alarmed him considerably. "Four thousand marks and a house at Verrain, with the advowson to your nephew. And I will tell you what you get that is not in the instrument, my lord, because it is the part you actually want."</p>
+<p>"Madame—"</p>
+<p>"You get to be the man who did it," said Elianor. "For thirty years. Every bishop on both banks will know that the marriage of the crown went through your hands, and none of them will ever be able to say a word about it in public, because the marriage will be lawful, and they will hate you for it in a way that is entirely indistinguishable from respect, and you will dine on it until you die." She sat back. "I have been hated in that way for fourteen years, my lord. It is not as pleasant as it looks, but it is <em>very filling</em>."</p>
+<p>The Bishop of Verrain drank his wine.</p>
+<p>"The advowson to my nephew," he said, "and the house not at Verrain but at Ancourt."</p>
+<p>"Ancourt," said Elianor, after a beat.</p>
+<p>"There is a priory there," said the bishop, blandly, "lately given to a very deserving man at your instance, madame, and it is in want of a patron, and I should like the credit of being one."</p>
+<p>And Elianor Longblood looked at the fat, worldly, unblushing old crook across her table and thought: <em>there it is. That is the price. It is not the four thousand marks; it is that from this afternoon until I die there will always be somebody in the room who knows one thing, and they will always mention it obliquely, and I shall always have to smile.</em></p>
+<p>"Ancourt," she said. "Done. And you will preach at the wedding, my lord."</p>
+<p>"Madame, I should be honoured."</p>
+<p>"You will preach on the duty of <em>husbands</em>," said Elianor. "For fifty minutes. I shall be counting."</p>
+<p>He did. It is in the chronicle. Eleven people recorded that the Bishop of Verrain's wedding sermon was thought over-long.</p>
+<hr class="scene-rule"/>
+<h3>vii.</h3>
+<p>She was married to Baldvyn, King of Viterra and Duke of Aberiel, in the chapel at Valora, six months to the day after his father's death, at the feast of Saint Ossian — which was the date named in the original instrument, fourteen years before. <em>The said marriage to be solemnised at the feast of Saint Ossian.</em></p>
+<p>She had insisted on the date. Nobody had argued; it was assumed to be sentiment.</p>
+<p>It was not sentiment. It was fourteen years late, and she wanted it on the record that it was fourteen years late, and it is, and every clerk who has ever copied the two instruments together has noticed, and that was the entire purpose.</p>
+<hr class="scene-rule"/>
+<p>She was fastened into the dress by four women.</p>
+<p>Three of them she had known for eleven years and the fourth was her elder daughter.</p>
+<p>It began at the wrists. There were eleven small covered buttons at each wrist and they did them in pairs, two at each arm, working inward, and the sound was very small and very regular, like something eating. Then the back, which was laced and then hooked and then laced again over the hooks so that the hooks could not be seen, twenty-two eyes, and she counted them, because she counted things, and because she had counted them once before in a cold room in that same house at seven-and-twenty with four strangers' hands on her and had promised herself nothing at all, because at seven-and-twenty she had not yet known what to promise.</p>
+<p>Then the girdle, with its clasp of two gold hands holding one another. She had kept it. She had had it out of the wardrobe herself and it had taken a clerk three days to find, and when he brought it to her he apologised for its being old-fashioned.</p>
+<p>Then the coif, pinned. Then the veil, pinned to the coif. Then the crown, over the veil, to hold the whole apparatus shut.</p>
+<p>By the end she could turn her head about a third of the way in either direction and that was all.</p>
+<p>"There," said the eldest of the four women, stepping back, pleased, kind, entirely without malice. "Now you are closed."</p>
+<p>Elianor looked at herself in the glass for a long moment.</p>
+<p>Then she reached across and undid one button at her left wrist.</p>
+<p>The eldest woman made a small distressed noise and came forward with her hands out.</p>
+<p>"No," said Elianor.</p>
+<p>"Madame, it will be noticed—"</p>
+<p>"Yes," said the Queen of Viterra. "It will."</p>
+<hr class="scene-rule"/>
+<p>The chapel at Valora is very fine and this time she saw all of it.</p>
+<p>She saw the doorway, which was shut behind her. She saw the screen, closed for the mass and opened for the vows. She saw the king's hands, which were his father's hands thirty years younger, with a signet not yet worn smooth. She saw her own hand, which was not given to her by anybody, because there was no one present entitled to give it — her father was at Adrecourt, old, and had written three times, and had not been invited — and so, by a small and perfectly lawful irregularity that the Earl Marshal fretted over for a fortnight, she walked up the chapel by herself and put her own hand into the king's hand, palm up, the way a party to a contract does.</p>
+<p>And the ring fitted. She had had it sized.</p>
+<p>She said the words in the correct order, in a clear voice, and afterward eleven separate people told her how well she had spoken.</p>
+<p>And when they came out into the hard bright light of the courtyard with the bells going, she raised her head as far as the crown allowed and looked across four hundred people; and every single one of them was looking at her, because that is what four hundred people do at a royal wedding, and there was no one in the world for her to find.</p>
+<p>So she looked at her husband instead.</p>
+<p>Baldvyn of Viterra was looking at her left wrist.</p>
+<p>She watched him find it — the one undone button, in the middle of a costume containing ninety-one fastenings, on the hand he had just been given. She watched him understand it, which took about a second and a half, which was exactly as long as it had taken him to put his face back together in a side room at Belworth when he was six-and-twenty.</p>
+<p>Then the King of Viterra laughed out loud, once, badly, as though the machinery were rusted, in his own chapel yard, at his own wedding, in front of two kingdoms.</p>
+<p>The court decided he had been overcome. Two chroniclers record the king's emotion at the moment of the queen's coming forth. One of them says he wept.</p>
+<p>Oswyn Everblood, newly Duke of Istovar, standing at the head of the household on the right side where protocol now required him to stand, having four months earlier signed away a crown for a canton and having been, by every account, perfectly cheerful about it — Oswyn also saw the button, because Oswyn saw everything and said nothing, which is how he came to outlive every other person in that courtyard.</p>
+<p>He sent her a hawk the following week. For Alayse.</p>
+<hr class="scene-rule"/>
+<h3>viii.</h3>
+<p>That night, very late, when the hall had finally emptied and the fire in the muniment room had been built up by somebody who had got Clause the Eighth right, Elianor Longblood sat down at a table with a fair-written petition in front of her.</p>
+<p>It was nothing. It was the first thing that had come to hand from the queen's chamber: a petition from the wardens of a bridge at Verrain, concerning the maintenance of the highway, and the question of whether the toll was granted for maintenance or held in fee simple.</p>
+<p>She read it twice. She smiled at the second reading, at something the reader will already have seen.</p>
+<p>She took up the pen and wrote in the margin, in her own hand, the four words that appear in that margin still: <em>Let them be sued.</em></p>
+<p>Then she reached for the wax and the taper, and let it fall, and took the seal of the Queen of Viterra — her seal, in her own right, by Clause the Fourth of an instrument she had written herself in eleven days at the age of forty — and set it in the wax, and put the weight of her hand on it, hard, the way you do when the wax has cooled a little and you want a clean impression.</p>
+<p>It made a small sound, which is not a sound that anyone has ever tried to describe, and which is something between a press and a snap, and which is the sound of a thing being fastened.</p>
+<p>Nobody heard it.</p>
+<p>She sat for a while afterward with her hand flat on the desk, an old habit from a cold room in Adria, and looked at the fire.</p>
+<p>The hand that had been the fourth item on a list.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">CODA</span>What Came After</h2>
+<p class="marginalia"><em>794–840 AR, and the rest is in the other books, and badly told there</em></p>
+<hr class="scene-rule"/>
+<h4>i.</h4>
+<p>She gave Baldvyn three children in the eight years after that wedding — Wyllmot, Aryka, Arwyn — which the physicians had thought unlikely and which she had privately thought impossible, and it nearly killed her twice, and she would say afterward, when she was very old and had stopped being careful, that it was the only period of her life in which she had been genuinely at the mercy of anybody, and that she had not cared for it.</p>
+<p>For twenty-seven years after that she ran two kingdoms.</p>
+<p>Not in name — in the name too, as she had told the Acasian envoy, but that had always been a joke and jokes are not evidence. She ran them the way she had learned to at twenty-two, through the kitchens and the stables and the wardrobe and the chancery, by being the one person on either bank who knew what everything cost and where the roads went and who owed what to whom, and by outliving everybody who might have objected.</p>
+<p>Baldvyn was a good king and a better one for her, and they quarrelled magnificently and in public for a quarter of a century, and on three occasions she left court for six months, and on one of them the whole court believed the marriage was finished and four separate houses began to reposition themselves and were still repositioning when she came back in the autumn and worked out exactly who had done what, and remembered all of it, forever, and used every single item of it, some of it as much as twenty years later, some of it on the children of the men who had done it.</p>
+<p>That is the part the songs leave out, and it is the part she would have wanted kept: <em>she never once forgot</em>. Her temper went soft with age, genuinely and completely; by sixty she was almost impossible to provoke, and men who had known her at thirty found the change remarkable and said so, and congratulated her on her serenity.</p>
+<p>Nothing had gone soft except the temper. The temper had only ever been the noise.</p>
+<hr class="scene-rule"/>
+<h4>ii.</h4>
+<p>Alayse Everblood lived at Elden for two years and then came back, and never married, and kept hawks, and ran the queen's household from about her thirtieth year until she was fifty, and was by every account the most competent person in it after Elianor herself and considerably better liked.</p>
+<p>She and Elianor did not speak of Brigh. Not once, in forty years, in either direction — and there is a letter of Alayse's, written to her in the last years, which contains one sentence that has been read four hundred different ways and will be read four hundred more:</p>
+<p class="marginalia"><em>I know what you gave up asking me, and I know why, and it was the kindest thing anybody has done for me in my life, and I have never been able to decide whether you did it for my sake.</em></p>
+<p>Elianor kept the letter. Of course she did. It was found among her papers.</p>
+<p>Her reply, if she made one, is not extant.</p>
+<hr class="scene-rule"/>
+<h4>iii.</h4>
+<p>Aymer, Duke of Adria, died at seventy-one, in his own hall at Adrecourt, of a stroke, in the middle of a sentence, with four clerks in the room and a case in front of him he was winning.</p>
+<p>His daughter did not come. She sent, at the correct interval, the correct things: a mass, a gift to the house at Adrecourt, and a letter of one paragraph to the household, entirely proper, which was read aloud and which nobody could find fault with.</p>
+<p>Adria went to Valdais, aged eight, as the instrument provided.</p>
+<p>It was remarked at the time that the queen took the news very calmly. She was in the muniment room. She read the letter, and set it down, and went on with what she had been doing, which was the fodder accounts for the northern garrisons.</p>
+<p>She said one thing. Gervaise was in the room — Gervaise was eighty-eight and mostly sat in a chair by then, which is why he was in the room — and he recorded it, and it is the last thing of hers he ever wrote down.</p>
+<p>"He never asked me," she said. "In eighteen years he never once asked me. He assumed it was about him."</p>
+<p>And after a while: "It was, rather. That is the humiliating part."</p>
+<hr class="scene-rule"/>
+<h4>iv.</h4>
+<p class="tale-meta place">The Defiance, 821 AR.</p>
+<p>She was seven-and-sixty, and she rose against her husband, and this book is not going to tell you why, because that is the other book's business and because the honest answer is that the causes were eleven and that she gave four of them publicly and that none of the four is the one her enemies believed and none of the eleven, taken alone, is sufficient.</p>
+<p>What can be said is the shape of it, because the shape is this book's business, and the shape is a mirror.</p>
+<p>Valdais — one-and-thirty, Duke of Adria, a man who had signed away a crown at his majority in a good hand — sided with his mother.</p>
+<p>Wyllmot — the undisputed son, the heir, six-and-twenty — sided with his father.</p>
+<p>The two of them met on the field at Charau in the autumn, on the wings of opposing armies, and everything Elianor Longblood had built in sixty years to make sure that her sons would never be set against one another over a doubt was set against a thing she did herself.</p>
+<p>Baldvyn won. It was not close.</p>
+<p>Braedyn Fenwood, aged about nine-and-forty, commanding the left, captured Valdais personally and had him alive on the ground and could have killed him, and did not, and said to the king afterward the sentence that has been in every Viterran mouth since: <em>"A debt unpaid is a leash."</em></p>
+<p>The leash held for thirteen years.</p>
+<p>Baldvyn pardoned the son and incarcerated the wife.</p>
+<hr class="scene-rule"/>
+<h4>v.</h4>
+<p>She was in a locked house with a guard on the stair for a long time. The sources disagree about how long and none of them agree about where.</p>
+<p>There is no account of those years from her side. There is nothing: not a letter, not a petition, not a remark handed down, not one of the jokes. It is the only silence of that length anywhere in her life, and every biographer has broken their teeth on it, and the most honest thing anyone has ever written about it is a marginal note by a clerk of the next century which says, in its entirety: <em>Here she is not in the record. Consider that she had made the record, and that this was done by men who had read her.</em></p>
+<p>What is known is that she came out of it.</p>
+<p>The marriage ended. No instrument for the ending of it survives, and there is no legal mechanism named in any source, and the reader who has come this far will understand exactly how unusual that is in a life this comprehensively documented, and is invited to draw their own conclusion about who arranged for there to be no document and why.</p>
+<p>And Elianor Longblood, in her sixties, went west — over the Belworth, out of Viterra, into Vhasia — and married the last Blood King of Vhasia, and held Ethor of him: the canton next to the one she was born in, on the western march, facing Acasia; her third marriage and her third instrument, and the first one, at last, in which she was the party of the first part.</p>
+<hr class="scene-rule"/>
+<h4>vi.</h4>
+<p>Lence fell in 832.</p>
+<p>Braedyn Fenwood brought ironshod cavalry over the Belworth — the crossings she had spent her girlhood arguing about in a stable in the rain, the crossings her father had broken a truce to take, the crossings that were Item the Fourth's whole reason — and ground the Sun King's army into the mud at the Ford of Ashes and burned Lence until the mirrors in the great hall ran down the walls.</p>
+<p>Her third husband died there. So did her royal Blood kin, every one of them that anybody could count.</p>
+<p>And after that, Valdais Longblood, Duke of Adria, who had renounced the crown of Viterra for himself and the heirs of his body forever at the age of eleven, in a good hand, with four words underneath it — found himself the nearest surviving claimant to the crown of <em>Vhasia</em>, through his mother's Blood kin.</p>
+<p>Through her. Not through the man who acknowledged him. Through <em>her</em>.</p>
+<p>She was eight-and-seventy when that became true, and she is on record as having said exactly one thing about it, at table, in Ethor, to a household that did not understand what they were hearing:</p>
+<p>"Well. He has gone round."</p>
+<p>Baldvyn the Good died in 834, having outlived the woman he did not divorce and could not un-marry, and the leash snapped, and that is the other book.</p>
+<hr class="scene-rule"/>
+<h4>vii.</h4>
+<p>She is alive.</p>
+<p>That is the correct tense, and it is the reason this book has no death in it and never will.</p>
+<p>She is six-and-eighty. She holds Ethor in the west, on the Acasian march, with alliances drawn from three marriages and sixty years of never once forgetting; the country calls her the Queen-Mother and means it in about four different ways at once, none of them entirely affectionate. Her son claims a crown in the west. Her great-great-grandson's cousin sits a throne in the east. Her husband's uncle Oswyn Everblood — who took a canton instead of a crown in 794 and was perfectly cheerful about it and has now outlived his brother, his two nephews, his great-nephew, and his great-great-nephew Brightstride — is Duke of Istovar still, ninety-two years old, deaf as a post, and the last living human being who stood in the courtyard at Valora and saw the button — and the last living human being who stood eleven feet from a gateway at Brigh in the dust and would not swear to it before God.</p>
+<p>He has had six-and-forty years to change that answer and has never altered a syllable of it, and Elianor Longblood, who taught two kingdoms how to do precisely that, has never once, in all that time, suggested that he should.</p>
+<p>And in her household at Ethor there is a boy.</p>
+<p>He may be the last Blood King's son. He may be nothing at all. She has never said which, and she has arranged the world so that nobody will ever have to ask her, and she has done it so well that a clerk in the next century will write in a margin that there is nothing to reproach.</p>
+<p>She was asked about him once, in 838, by an envoy who thought he was being subtle.</p>
+<p>"Sir," said Elianor Longblood, Duchess of Ethor, "I have buried three husbands, two kingdoms' worth of clever men, and every single person who ever told me what I was for. I am four-and-eighty years of age and I have been the fourth item on a list, and a term in a settlement, and a prisoner in a house with a guard on the stair, and I am now a rumour." She smiled at him, warmly. "You will forgive me if I have developed a certain fondness for questions that do not get answered."</p>
+<hr class="scene-rule"/>
+<h4>viii.</h4>
+<p>The jokes are the part everybody knows, because they are the part that travels.</p>
+<p>At eight-and-seventy, asked by an ambassador whether it was true that she had governed two realms for fifty years: "Certainly not. I governed them for eight-and-forty. For the first two I was merely correct, which is a different office and much less well paid."</p>
+<p>At one-and-eighty, when a nephew of the Constable's asked leave to write her life: "You may. Begin at the fourth item, young man. That is where I do."</p>
+<p>At three-and-eighty, in council in Ethor, when a churchman observed that a certain proposal was without precedent: "So was I."</p>
+<p>And at five-and-eighty, to a physician who told her with great delicacy that she must be tranquil now and set her affairs in order, Elianor Longblood — twice Queen of Viterra, thrice married, Duchess of Ethor, born the fourth item on a schedule, who had never in five-and-eighty years been able to leave a sum unchecked or a silence alone — looked up from the deed she was reading and said:</p>
+<p>"Set them in <em>order</em>? Sir, they have been in order since I was seven-and-twenty. It is everybody else's affairs that have been the trouble."</p>
+<hr class="scene-rule"/>
+<p>There is a petition on the table in front of her at Ethor, as this book closes. It is nothing — a small matter, a weir, four generations of quarrel.</p>
+<p>She has got as far as the margin.</p>
+<hr class="scene-rule"/>
+<h2>APPENDIX OF INSTRUMENTS</h2>
+<p class="marginalia"><em>Five documents, given at length. Each of them is a scene this book has already done to you. They are set down without commentary where commentary would be an insult; you have the novella, and you now know what every clause cost, and that is the only apparatus a reader of the Belworth needs.</em></p>
+<p class="marginalia"><em>A Game Master may hand any one of these to a player and say nothing whatever.</em></p>
+<hr class="scene-rule"/>
+<h3>The First Instrument</h3>
+<p class="tale-meta place">From the Peace of Belworth, 780 AR. Item the Fourth of the Persons.</p>
+<div class="panel panel-gold instrument"><p><em>Item. The demoiselle Elianor, daughter of Aymer, Duke of Adria, of the house called Longblood, to be given in marriage to the lord Baldvyn, second son of the king's body, in surety of the peace among the western cantons and of the quiet of the Belworth crossings; the said marriage to be solemnised at the feast of Saint Ossian following; and by this the said crossings shall be held open, and the said house of Longblood shall be held faithful, and the crown shall hold the said house in its grace.</em></p><p><em>And if the said marriage be not solemnised, for whatsoever cause, the surety shall be taken in such other manner as the parties shall then agree; and this Item shall not thereby be held to fail.</em></p></div>
+<p class="marginalia"><em>The second paragraph is standard. It appears in every treaty of that century. It is the clause that made everything in this book possible, and no one who drafted it, sealed it, or read it aloud in the great hall at Belworth to three hundred men gave it a single moment's thought.</em></p>
+<hr class="scene-rule"/>
+<h3>The Second Instrument</h3>
+<p class="tale-meta place">From the marriage settlement of King Wymund IV and Elianor of Adria, 781 AR. Recital and Clauses the First and Ninth.</p>
+<div class="panel panel-gold instrument"><p><em>Whereas by the Peace of Belworth it was provided that the demoiselle Elianor should be bestowed in surety of the crossings; and whereas the parties are agreed that the said surety is the better taken in the manner hereinafter set out; and whereas nothing herein shall be construed to impeach the said Peace, which standeth in all its parts—</em></p><p><em>Clause the First. The said demoiselle shall be conveyed to Valora, with such of her women and stuff as is set out in the schedule hereto, at the charge of her father, and there delivered.</em></p><p><em>Clause the Ninth. The said demoiselle shall have of the king, upon the solemnisation, the manors and issues set out in the second schedule, to be held of the crown during the king's pleasure, and at the king's pleasure to be resumed.</em></p></div>
+<p><em>Note the verbs. She is conveyed and delivered. She has of the king, during pleasure, and at pleasure it is taken back. The word</em> demoiselle <em>is used seven times in the instrument and the word</em> queen <em>does not occur in it at all.</em></p>
+<p class="marginalia"><em>Note also that the schedule of her women and stuff is the fourth schedule of the document. The first three are horses.</em></p>
+<hr class="scene-rule"/>
+<h3>The Third Instrument</h3>
+<p><strong>The Right of Acknowledgment, as stated in the custumal of Viterra.</strong></p>
+<div class="panel panel-gold instrument"><p><em>Where a man taketh up a child new-born, in his own voice, before his household, within the hour of the birth, and nameth it his, the child is his.</em></p><p><em>And this shall not be impeached afterward by any evidence of any kind, nor by likeness, nor by reckoning of days, nor by the common talk, nor by the oath of the mother, nor by the oath of the man himself; but only by proof that the said taking-up did not occur.</em></p><p><em>And the proof thereof is the household.</em></p></div>
+<p class="marginalia"><em>Three hundred years old. It exists because a kingdom in which acknowledged sons can be unmade in the third generation by an interested party with a clerk and a grievance is a kingdom that has a civil war every reign.</em></p>
+<p class="marginalia"><em>It works. It has always worked. The price of its working is that it is entirely indifferent to the truth.</em></p>
+<p class="marginalia"><em>It has one door in it, and the door is very small, and a clever, decent, fatally thorough young king found it in four days: the taking-up is a fact in the world, and facts in the world are proved by witnesses, and witnesses are old, and deaf, and honest.</em></p>
+<hr class="scene-rule"/>
+<h3>The Fourth Instrument</h3>
+<p class="tale-meta place">From the marriage settlement of King Baldvyn and Elianor, dowager queen, 794 AR. Recital, and Clauses the Fourth, Eighth, Ninth, Tenth and Eleventh.</p>
+<div class="panel panel-gold instrument"><p><em>Whereas the parties are of full age and of sound mind and are agreed between themselves, and the impediment of affinity is dispensed by the authority of Holy Church as by the instrument annexed; and whereas the queen hath herself proposed and drawn the heads of this agreement, which are entered in the recital at her instance and by her hand—</em></p><p><em>Clause the Fourth. The queen shall have her own seal, and the use of it, and the keeping of it in her own hand and in no other.</em></p><p><em>Clause the Eighth. Item, the queen shall have the keeping of a chamber for her rolls, with a fire.</em></p><p><em>Clause the Ninth. Oswyn Everblood, brother of the late king, doth renounce for himself and the heirs of his body forever all claim to the crown of Viterra; and in consideration thereof is granted the canton of Istovar, to hold of the Duchy of Aberiel by the service of a knight's fee, with the crossings and the tolls thereof.</em></p><p><em>Clause the Tenth. Valdais Everblood, son of the late king, doth renounce likewise, for himself and the heirs of his body forever; and in consideration thereof is granted the canton of Adria, being the inheritance of his mother of the house of Longblood, to hold in the same manner.</em></p><p><em>Clause the Eleventh. Whereas the estate of the lord Valdais was acknowledged by the late king in his own voice before his household within the hour of the birth, according to the Right, and was so entered in the chamber book on the same day; the said Right and the said entry are recited herein at length, and the parties do covenant and acknowledge the same; and this present marriage, and the peace of the western cantons and the quiet of the Belworth crossings thereupon depending, are made upon the faith of it.</em></p></div>
+<p class="marginalia"><em>Set the Fourth Instrument beside the Second. It is the same kind of document, engrossed in the same office, in the same hand-style, on the same quality of skin, and it disposes of the same woman.</em></p>
+<p class="marginalia"><em>In the Second she is conveyed and delivered, and has during pleasure.</em></p>
+<p><em>In the Fourth she</em> hath herself proposed and drawn the heads, <em>and she</em> shall have her own seal, and the keeping of it in her own hand and in no other.</p>
+<p class="marginalia"><em>Fourteen years, three deaths, ten days, one priory at Ancourt, and a chamber for her rolls, with a fire.</em></p>
+<p class="marginalia"><em>And Clause the Tenth, which she wrote on a Thursday, in nine days, in her own hand, and which does to a boy of four exactly what was done to her — and which is the only reason he lived at all.</em></p>
+<hr class="scene-rule"/>
+<h3>The Fifth Instrument</h3>
+<p class="tale-meta place">Endorsement on the counterpart of Clause the Tenth, at the majority of Valdais Everblood, Duke of Adria, 811 AR. In his own hand, beneath the signature.</p>
+<div class="panel panel-gold instrument"><p><em>As she was. — V.</em></p></div>
+<p class="marginalia"><em>The enrolling clerk copied it faithfully, because clerks copy what is in front of them.</em></p>
+<p class="marginalia"><em>Nobody has ever established whether it was an accusation, a thanks, or a joke.</em></p>
+<p class="marginalia"><em>Everyone who knew both of them has assumed it was all three, on the grounds that with those two it generally was.</em></p>
+<hr class="scene-rule"/>
+<h2>A NOTE ON THE TELLING</h2>
+<p>This is a long tale and it was written for the page. It is not meant to be read aloud and it will not survive the attempt; there is no scene in it that a table would let stand, because almost everything in it is a thing somebody does with a face, and faces do not carry across a hall.</p>
+<p>It is meant to be read alone, in one or two sittings, by somebody who will notice the second wedding.</p>
+<p>The cadence is borrowed openly. The Belworth country is a country of advocates on both banks, and an advocate's prose does two things at once and lets you find the second one yourself: it states, flatly and at length, what is on the record, and it arranges the flatness so that the omission has a shape. That is the war-song voice turned indoors — the same stately declarative line the old <em>chansons</em> use for a charge, pointed instead at a woman being buttoned into a dress. If you want the real-world ear for it, it is in the lais and the pleadings of the twelfth-century French: the marriage contract and the love song written in the same grammar by the same hand on the same afternoon, and only the reader to tell them apart.</p>
+<p>Underneath that, in Adria and Ethor and Istovar, there is something older and rougher, which surfaces four times in this book and is never explained: the Ember Truce, the tally-sticks in the third chest, the parley of the third day, and a song about a gateway that every serious historian has dismissed and every single one of them has quoted. Those cantons were kingdoms before either crown existed, and their customs are not law and never were, which is exactly why breaking one is free and why the bill always arrives anyway, four hundred dead or one king in a gate.</p>
+<p>The book withholds two facts, deliberately, in narration, in dialogue and in interiority, from the first page to the last.</p>
+<p>The first is the paternity of Valdais. It is not coy about withholding it: it gives you the dates on the fourth membrane, in a clean hand, counted out — and then makes you watch a clever, decent young king do exactly what you have just done, with exactly the same materials, and very nearly get there.</p>
+<p>The second is what happened in the gateway at Brigh, and — which is the harder and better question — what was in Elianor's voice in a cloister at Elden on the seventh day, when she gave a proud exhausted man perfectly sound advice in the one tone guaranteed to make him refuse it.</p>
+<p>She did not know. That is not an evasion; it is the point of the whole book. A woman who has spent forty years making certain that no one will ever have to ask her anything eventually arrives at a place where she cannot ask herself either, and the last honest thing left to her is the sentence she gave to one person, once: <em>I have never been able to find out, and I have looked.</em></p>
+<p>The love story is told in refusals. Elianor and Baldvyn speak plainly to one another four times in fourteen years — the empty room, the stable in the rain, the orchard at Corbenoit, and a memorandum — and on the fifth occasion neither of them says anything at all; there is only a button, and a man laughing badly in a chapel yard, and two kingdoms getting it wrong in writing.</p>
+<p>And nobody in it is a villain. Her father is doing arithmetic. Wymund is tired. Herald is right, about everything, for the best reasons anybody in the book has, and it kills him. The Bishop of Verrain is at market and says so. Oswyn takes the deal and is cheerful and outlives them all. Every harm here is done by somebody acting correctly within their role, and the largest of them is done by a woman writing a clause to save her son's life by taking his crown away.</p>
+<p class="marginalia"><em>The soup is always free. The price never is.</em></p>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>Here ends The Widow's Hand.</em></p>
+</body>
+</html>
