@@ -19,12 +19,27 @@ module.exports={metadata,update};
 // Commands that can contain a secret never enter room chat history or public broadcast.
 const RESERVATION_MS = 120000;
 /** True for any message that may carry a private GM brief. Callers MUST fail closed on it. */
-function isPrivateCommand(chat) { return /^!gm\s+player\b/i.test(chat?.text || ''); }
+function isPrivateCommand(chat) { return /^!gm\s+(?:player|delegate)\b/i.test(chat?.text || ''); }
 function privateCommand(roomState, actor, chat) {
  if (!isPrivateCommand(chat)) return false;
  const room = require('./room');
  const allowed = ['gm','co-gm','assistant-gm'].includes(actor?.role);
  const reply = text => room.deliverWhisper(roomState.room_id,'chat-message',{message:{sender:'Server',text,whisper:true,privateOnly:true,recipient:actor.id}},null,actor.id);
+ if (/^!gm\s+delegate\b/i.test(chat.text)) {
+  if (!actor?.userId || !['gm','co-gm'].includes(actor.role)) {
+   reply('Delegation requires a signed-in human GM.'); return true;
+  }
+  const hosts = [...roomState.clients.values()].filter(c => c.botMode === 'gm' && ['gm','co-gm','assistant-gm'].includes(c.role));
+  if (hosts.length !== 1) {
+   reply(hosts.length ? 'Keep one GM bot host in this room to use delegation.' : 'No GM bot host is available for delegation.'); return true;
+  }
+  const target = hosts[0];
+  room.deliverWhisper(roomState.room_id, 'chat-message', { message: {
+   ...chat, whisper: true, privateOnly: true, recipient: target.id, verifiedGM: true,
+   senderClientId: actor.id, senderRole: actor.role, senderUserId: String(actor.userId)
+  } }, null, target.id);
+  return true;
+ }
  if(!allowed) {reply('Only the GM or Assistant GM can manage bot-player seats.');return true;}
  const verb=chat.text.trim().split(/\s+/)[2]?.toLowerCase();
  if(verb==='new' && !chat.text.trim().split(/\s+/).slice(3).join(' ')){reply('Usage: !gm player new <brief>');return true;}

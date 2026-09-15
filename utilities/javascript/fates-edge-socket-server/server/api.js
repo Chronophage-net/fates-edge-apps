@@ -25,6 +25,7 @@ const deck = require('./deck.js');
 const deckRng = require('./rng.js'); // NEW: per-room-seedable shuffle RNG (see rng.js)
 const { safeAssign, buildSafeDict, isSafeModuleId, isSafeCampaignCode, clampCount, UNSAFE_KEYS, createRateLimiter, MAX_NAME_LENGTH, isSpectator } = require('./security.js');
 const adventure = require('./adventure.js');
+const adventureRecovery = require('./adventure-recovery.js');
 const timers = require('./timers.js'); // NEW: ad-hoc timers -- deliberately separate from adventure.js, see server/timers.js header
 const { deriveManifestFromContent } = require('./module-manifest-utils.js');
 const auth = require('./auth.js');
@@ -1157,6 +1158,21 @@ function createApiRouter(appConfig) {
         }
     });
 
+    router.get('/api/rooms/:code/adventure/full', authenticate, (req, res) => {
+        try { res.json(adventureRecovery.full(room.getRoom(req.params.code))); }
+        catch (err) { res.status(err.status || 404).json({ ok: false, error: err.message }); }
+    });
+
+    router.post('/api/rooms/:code/adventure/restore', authenticate, (req, res) => {
+        try {
+            const r = room.getRoom(req.params.code);
+            const result = adventureRecovery.restore(r, req.body?.snapshot, { force: req.body?.force === true });
+            room.broadcastToRoom(r.room_id, 'adventure-updated', { source: 'recovery', ...adventure.getPublicState(r) });
+            room.broadcastToRoom(r.room_id, 'timers-updated', timers.getPublicState(r));
+            res.json(result);
+        } catch (err) { res.status(err.status || 400).json({ ok: false, error: err.message }); }
+    });
+
     router.get('/api/rooms/:code/adventure/reference', authenticate, (req, res) => {
         try {
             const r = room.getRoom(req.params.code);
@@ -1884,8 +1900,8 @@ function createApiRouter(appConfig) {
     router.post('/api/rooms/:code/campaigns/auto-save', authenticate, async (req, res) => {
         try {
             const roomCode = req.params.code.toUpperCase();
-            room.getRoom(roomCode); // verify room exists
-            await storage.saveAutoSave(roomCode, req.body);
+            const r = room.getRoom(roomCode);
+            await storage.saveAutoSave(r.room_id, req.body);
             res.json({ success: true, room: roomCode, message: 'Campaign auto-saved' });
         } catch (err) {
             res.status(err.message.includes('not found') ? 404 : 500).json({ error: err.message });
@@ -1895,8 +1911,16 @@ function createApiRouter(appConfig) {
     router.get('/api/rooms/:code/campaigns/auto-save', authenticate, async (req, res) => {
         try {
             const roomCode = req.params.code.toUpperCase();
-            room.getRoom(roomCode); // verify room exists
-            const data = await storage.loadAutoSave(roomCode);
+            const r = room.getRoom(roomCode);
+            let data;
+            try { data = await storage.loadAutoSave(r.room_id); }
+            catch (err) {
+                if (!(err.code === 'ENOENT' || err.message.includes('not found'))) throw err;
+                // Read old slots once, then migrate to the stable room identity.
+                const legacyCode = r.legacy_code || r.code;
+                data = await storage.loadAutoSave(legacyCode);
+                await storage.saveAutoSave(r.room_id, data);
+            }
             res.json(data);
         } catch (err) {
             if (err.code === 'ENOENT' || err.message.includes('not found')) {

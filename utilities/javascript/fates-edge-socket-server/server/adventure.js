@@ -334,6 +334,7 @@ function loadAdventureModule(room, moduleId) {
 
     const adventure = ensureAdventureState(room);
     adventure.module = moduleCopy;
+    adventure.contentRef = null;
     adventure.currentAct = 0;
     adventure.currentScene = 0;
     adventure.activeEncounterRef = null;
@@ -398,6 +399,8 @@ function loadAdventureContent(room, content, options = {}) {
     resetKnowledgeState(moduleCopy);
 
     const adventure = ensureAdventureState(room);
+    room.data.customAdventures = { [moduleCopy.id]: { id: moduleCopy.id, content: JSON.parse(JSON.stringify(content)), pinned: true } };
+    adventure.contentRef = moduleCopy.id;
     adventure.module = moduleCopy;
     adventure.currentAct = 0;
     adventure.currentScene = 0;
@@ -950,6 +953,7 @@ function getPublicState(room) {
 
     return {
         moduleId: adventure.module.id,
+        startedAt: adventure.startedAt,
         title: adventure.module.title,
         description: adventure.module.description || '', // NEW: needed for !gm adventure preview
         tier: adventure.module.tier,
