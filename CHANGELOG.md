@@ -62,6 +62,11 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.9.6] - 2026-09-15
+
+### Chore
+- sync The Widow's Hand from docs v0.22.2
+
 ## [5.9.5] - 2026-09-15
 
 ### Chore
