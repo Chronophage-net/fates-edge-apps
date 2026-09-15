@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-web-client",
-  "version": "5.8.5",
+  "version": "5.9.0",
   "type": "module",
   "description": "Fate's Edge Toolkit Web Client",
   "scripts": {
