@@ -212,7 +212,7 @@ Remove a client ID from the ban list.
 List available modules — legacy folders under `server/modules/` plus standalone adventure JSON files under `data/adventures/`.
 
 **`POST /api/modules`**
-Permanently install an adventure module: writes `manifest.json` + `adventure.json` under `server/modules/<id>/`, so it's visible to everyone from then on (unlike `POST /api/rooms/:code/adventure/load-custom`, which only exists in one room's memory).
+Permanently install an adventure module: writes `manifest.json` + `adventure.json` under `server/modules/<id>/`, so it's visible to everyone from then on. `POST /api/rooms/:code/adventure/load-custom` uses one room's in-memory slot; the AI GM bot persists its adventure snapshot through campaign auto-save and restores it after a restart. See the socket server's [persistence design](utilities/javascript/fates-edge-socket-server/DESIGN.md#data-persistence).
 **Request body:**
 ```json
 {
@@ -262,6 +262,24 @@ Re-resolves a Freesound sound ID to its playable preview URL. Note: this is *not
 ---
 
 ### Adventure Engine
+
+**`GET /api/rooms/:code/adventure/full`** — authenticated private recovery snapshot, or `null`
+when nothing is loaded. Requires the existing API-key/managed-admin authentication; an anonymous
+player request is rejected. This is a read-only deep copy of the raw engine state (`module`,
+`currentAct`, `currentScene`, `activeEncounterRef`, status, logs and growth fields), with
+`snapshotVersion: 1`, stable `roomId`, `savedAt` (epoch milliseconds), `moduleId`, `contentRef`,
+the active custom source entry in `customAdventures`, and `adhocTimers: { list, log, updatedAt }`.
+Unlike the public projection, the module contains full GM knowledge and all appended content.
+
+**`POST /api/rooms/:code/adventure/restore`** — `{ snapshot, force?: boolean }`, same authentication.
+Validates the version (missing means 1), room identity, source content and every progress field
+before atomically replacing the adventure and ad-hoc timers. Custom snapshots must include the
+matching source entry; manifest sources must remain installed. Returns
+`{ ok: true, moduleId, title, status, warning? }`; an identical replay adds `unchanged: true`.
+Errors return `{ ok: false, error }`: 400 invalid/version-incompatible state, 403 wrong room,
+404 missing source, 409 a different adventure is already loaded. `force: true` overrides only
+the live-state conflict. Restored encounters include a grid-token replacement warning. Broadcasts
+existing public `adventure-state` and `adhoc-timer-state` events, never the raw snapshot.
 
 State machine defined in `server/adventure.js`. These routes let a GM's own tooling — or a fully automated/AI GM — drive an entire adventure through plain authenticated REST calls, and mirror the Socket.IO/WS events of the same name one-for-one: whichever path drove a change, everyone in the room sees the update via the matching broadcast event.
 

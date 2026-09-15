@@ -118,6 +118,23 @@ Room state lives entirely in memory (`server/room.js`) for whichever rooms this 
 
 ## Data persistence
 
+Adventure room state remains ephemeral by design. The AI GM bot is the persistence layer for
+adventure continuity: it stores the full room adventure snapshot in its campaign auto-save and
+restores it after a server restart with `POST /api/rooms/:code/adventure/restore`. This is a
+recovery contract for the existing durable campaign payload, not a second general room store.
+Custom snapshots include their original source entry because the in-memory custom registry also
+disappears on restart. The raw engine state preserves appended content and all progress fields.
+
+`server/adventure-recovery.js` validates a detached replacement before one assignment publishes
+it. Room UUID and schema-version checks cannot be forced; replacing different live state requires
+an explicit override, while identical retries are harmless. Only public projections are sent to
+clients. Grid tokens are deliberately excluded, with a warning when restoring an active encounter.
+Campaign auto-save and the room directory use stable UUIDs and durable storage. The main and demo
+Compose files mount a persistence volume for SQLite and the directory; migrate old container-local
+files before recreating existing installations. `tests/adventure-recovery.test.js` covers the
+contract and HTTP authorization; the bot's `npm run test:recovery` runs a killed-process/SQLite
+round trip across both repositories.
+
 Two layers serving different purposes: in-memory room state for live gameplay (fast, ephemeral, per-process), and `server/storage.js`'s durable store for anything that needs to survive a restart or be looked up outside a live room. Keeping these separate is deliberate — a chat message doesn't need a database write on every keystroke, but a character claim does need to still be true tomorrow.
 
 ## Performance notes

@@ -1,7 +1,5 @@
 'use strict';
 // Private, versioned recovery contract. Never broadcast this payload.
-const fs = require('node:fs');
-const path = require('node:path');
 const { isDeepStrictEqual } = require('node:util');
 const { isSafeModuleId } = require('./security');
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -38,9 +36,8 @@ function restore(room, snapshot, { force = false } = {}) {
     } else {
         const sourceId = s.moduleSourceId || s.moduleId;
         if (!isSafeModuleId(sourceId)) fail('Invalid module source id');
-        const filename = path.resolve(process.cwd(), 'data', 'adventures', `${sourceId}.json`);
-        if (!fs.existsSync(filename)) fail('Adventure module not found', 404);
-        base = JSON.parse(fs.readFileSync(filename, 'utf8'));
+        try { base = require('./adventure').readAdventureModule(sourceId); }
+        catch (error) { fail(error.message, /not found/.test(error.message) ? 404 : 400); }
     }
     if (!object(s.module) || s.module.id !== s.moduleId || !s.module.title || !Array.isArray(s.module.acts) || !s.module.acts.length) fail('Invalid adventure content');
     for (const act of s.module.acts) {

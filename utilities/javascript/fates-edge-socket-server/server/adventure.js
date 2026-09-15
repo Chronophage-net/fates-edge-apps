@@ -304,17 +304,22 @@ function enrichEncounter(adventure, encounter) {
  * finish, with no bot-generated additions. Only loadAdventureContent()
  * (AI-generated Crown Spread adventures) can opt into dynamic growth.
  */
-function loadAdventureModule(room, moduleId) {
+function readAdventureModule(moduleId) {
     if (!isSafeModuleId(moduleId)) {
         throw new Error('Invalid adventure id');
     }
 
-    const filePath = path.join(ADVENTURES_DIR, `${moduleId}.json`);
+    const standalone = path.join(ADVENTURES_DIR, `${moduleId}.json`);
+    const filePath = fs.existsSync(standalone) ? standalone : path.join(__dirname, 'modules', moduleId, 'adventure.json');
     if (!fs.existsSync(filePath)) {
         throw new Error(`Adventure "${moduleId}" not found (missing ${moduleId}.json)`);
     }
 
-    const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+}
+
+function loadAdventureModule(room, moduleId) {
+    const content = readAdventureModule(moduleId);
     const moduleCopy = JSON.parse(JSON.stringify(content)); // deep clone
     moduleCopy.id = moduleCopy.id || moduleId;
 
@@ -1039,6 +1044,7 @@ function getReferenceData(room) {
 }
 
 module.exports = {
+    readAdventureModule,
     ensureAdventureState,
     loadAdventureModule,
     loadAdventureContent,
