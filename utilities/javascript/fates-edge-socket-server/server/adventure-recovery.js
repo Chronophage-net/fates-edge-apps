@@ -36,7 +36,9 @@ function restore(room, snapshot, { force = false } = {}) {
         if (!custom || custom.id !== s.moduleId || !object(custom.content)) fail('Custom adventure contentRef is missing', 404);
         base = custom.content;
     } else {
-        const filename = path.resolve(process.cwd(), 'data', 'adventures', `${s.moduleId}.json`);
+        const sourceId = s.moduleSourceId || s.moduleId;
+        if (!isSafeModuleId(sourceId)) fail('Invalid module source id');
+        const filename = path.resolve(process.cwd(), 'data', 'adventures', `${sourceId}.json`);
         if (!fs.existsSync(filename)) fail('Adventure module not found', 404);
         base = JSON.parse(fs.readFileSync(filename, 'utf8'));
     }

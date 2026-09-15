@@ -62,6 +62,11 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.9.2] - 2026-09-15
+
+### Chore
+- sync Diwan revision and four-book commentary from docs v0.21.1
+
 ## [5.9.1] - 2026-09-15
 
 ### Chore
