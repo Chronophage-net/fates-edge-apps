@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Diwān of Roads — A Novella of the Way of Silk</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>The Diwān of Roads</h1>
+<p class="subtitle">A Novella of the Way of Silk</p>
+<hr class="scene-rule"/>
+<p><strong>A note on the sources.</strong> The short leaves of the <em>Diwān</em> are in the <em>Concordance</em>, and may be looked up, and are what the world has of Safiya al-Fhara. This is the long leaf. She made it late, kept it out of every copy she gave away, and it survives in one hand.</p>
+<p>The last page of it is a document you may already own. Read it again when you come to it. It is a different paper once you know who set it down, and how young she was, and what she had just buried.</p>
+<p>She does not give her birth name anywhere in it. That is not a gap in the record. That is the record.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">STAGE I</span>The Third Cup</h2>
+<p><strong>Ashaan. The Balance-Moon, 206 of the Seven Wells.</strong></p>
+<hr class="scene-rule"/>
+<p>My father was named for the balance and never kept one.</p>
+<p>Rashad al-Mizan, of the spice row, four rooms above a shop and a fig tree in the court. In Ashaan they say a man is weighed by what he sells and forgiven by what he pours. My father poured like a river and weighed like a poet, and the city forgave him for seven years, and then the city stopped.</p>
+<p>I loved him. I want that first, before the rest of it, the way you set water before a guest before you ask his business. He smelled of cardamom and the small bitter grain the Ashaani put in their coffee that no other people on earth will touch. He sang badly and often. He could not bear to be the one who noticed a thing — a short weight, a thin coin, a porter going home heavier than he came — and so he was robbed gently and continuously by people who loved him too, and he would rather have been robbed until the walls fell than say aloud at his own table that a guest had taken.</p>
+<p>That is not a fault of the heart. It is a fault of the ledger, and the ledger does not care which one it was.</p>
+<hr class="scene-rule"/>
+<p>Now the cups, because you are not Fhara, and without the cups the rest is only noise.</p>
+<p>We pour three.</p>
+<p>The first is welcome, and it is owed to every soul who comes in from the sun, including the man you mean to ruin before the lamps are lit. Water first, then the first cup. Nobody may be refused it.</p>
+<p>The second is the talking. It may be refused without insult, and often is, and a refusal of the second means nothing worse than <em>not today, friend, not today</em>.</p>
+<p>The third is the contract.</p>
+<p>You do not pour the third until the thing is agreed. You do not lift it unless you mean it. There is no court on the peninsula that will hear a case about a third cup and there does not need to be, because a man who takes the third and breaks the thing has done something the courts have no word for, and his own well will not have him, and he will go into the waste with his mouth full of it.</p>
+<p>Half our law is a beverage. We are careful people about it. We have to be.</p>
+<p>The men of the Black Hand came four times to my father's table in the last year, and three times he poured two cups.</p>
+<p>The fourth time I heard three.</p>
+<hr class="scene-rule"/>
+<p>I was on the stair with a basket of green pods and I heard the pot, which is a sound I could find in a storm. And I counted. I have always counted; it is the only thing I do that nobody taught me.</p>
+<p>Pour. Pause.</p>
+<p>Pour. Pause.</p>
+<p>Pour — and no pause at all after the third, because there was nothing left to say, because the saying was finished, because the thing had been agreed.</p>
+<p>He came out into the court grey and shining at once, which is a thing a face can do, and he put his hand flat on the top of my head the way you settle a lamp, and said that we were going to be well now, and that I was not to think about the shop, and that he had made an arrangement.</p>
+<p>He had taken the third cup from men who do not keep the third cup. Not because they are wicked — because they are not Fhara, because the form is not theirs, because to them the whole beauty of that little ceremony was that it bound him and not them.</p>
+<p>Here is the first thing the road taught me, and I did not learn it on the road; I learned it on a stair, at thirteen, with a basket of cardamom, and then spent six years refusing to know it.</p>
+<p><strong>A form is a wall to the people inside it and a handle to everyone else.</strong></p>
+<hr class="scene-rule"/>
+<p><strong>The Journey-Moon, and we did not journey.</strong></p>
+<p>They did not come for my father with knives.</p>
+<p>I say this because every pamphlet written about Ashaan since is full of knives, and what was done to my father was quieter than a knife and could not be washed out afterward.</p>
+<p>They took him off the rolls.</p>
+<p>There is an office for it. A real office, with a real clerk, and a window with a brass grille worn bright at the bottom edge where two centuries of hands have gone through. You may go there. You may put your paper through the grille and the clerk will read it and be perfectly courteous, and I did that four times in seven days, at thirteen, in the heat, with my hair covered like a woman because I thought it would help.</p>
+<p>The fourth time the clerk was a young man with ink on his thumb, and he read my paper, and then he looked at me the way you look at a child who is going to be hurt no matter what you say.</p>
+<p>"There is no entry."</p>
+<p>"He is my father."</p>
+<p>"I do not doubt you. There is no entry."</p>
+<p>I said the name again. It is not a difficult name. He wrote it on his own blotter to show me he had heard it right, and then he turned the great book around on the desk so that I could see it, which was against every rule that young man had, and which I have thought about longer than I have thought about almost anything.</p>
+<p>The page was not torn.</p>
+<p>No scrape. No pale place. No gap where a word had been lifted. The entries came down their columns and the columns closed over the place where my father had been, and the ruling did not jump, and the hand did not change, and the sentence still scanned.</p>
+<p>I have watched Aeler masons dress a stone so that a wet thread will not find the joint. This was neater than that. This was the finest work I have ever seen done by anybody, and it was done to erase a man who sang badly, and it took, I suppose, a morning.</p>
+<p>"Do you understand what you are looking at?" said the young man with the ink on his thumb.</p>
+<p>"Yes."</p>
+<p>"Then do not come back here," he said, "and do not say the name in the street."</p>
+<p>And he turned the book around again.</p>
+<p>I have never once been able to be angry at that clerk. He told me the terms. He told them plainly, at cost to himself, and did not soften them and did not repeat them.</p>
+<p>I was going to meet a great deal of that.</p>
+<hr class="scene-rule"/>
+<p>My mother had gone four years before.</p>
+<p>I am not going to make a tale of it. She went at night and in good order, with her own two boxes and none of my father's money, and she left a folded page on my pillow with eleven words on it in her own hand.</p>
+<p>I read them.</p>
+<p>Because she had taught me to read.</p>
+<p>That is the knot. That is the whole knot and I have never got it undone. She taught me my letters herself at five, at the low table under the fig, out of a book of poems and then out of the ledger, and she was hard about it in a way she was hard about nothing else in her life. She would make me copy a line three times and then say <em>again</em> about the third. I have never been as certain of anyone's whole attention as I was of hers across that table, with the pods drying on the tray and the light coming green through the leaves.</p>
+<p>Then she folded eleven words onto a pillow and went out of the country.</p>
+<p>So: the only thing she gave me, and the only thing she took. I have never been able to lift one of those without the other coming up in my hand.</p>
+<p>Remember it. Because in a little while I am going to tell you that in two years of the house on the dry canal the only thing I missed was books, and I do not want you to think me refined.</p>
+<p>I missed my mother. I could not say so. I had found a way of saying so that did not have her name in it.</p>
+<hr class="scene-rule"/>
+<p>They came for me on the seventh day of the Journey-Moon, and they were not rough, and they had a paper.</p>
+<p>I have seen that paper since. It is a good paper. It is correct in every particular. It disposes of a small asset belonging to an estate with no owner, there being no owner, there being no entry.</p>
+<p>I did one thing that day I am not ashamed of, and it is not very much.</p>
+<p>I took my mother's book of poems off the sill.</p>
+<p>It was worth nothing. The man with the paper looked at it and looked at me and let me keep it, because it cost him nothing to be decent in a small way, and because a girl who walks out of a house holding a book walks, and a girl holding nothing has to be carried.</p>
+<p>They took it from me at the gate of the house on the dry canal. In the first hour. It was the first thing that happened there.</p>
+<p>And I understood the place before I had crossed its yard, because a house that takes a worthless book off a girl at the gate is not taking a book. It is taking the reading.</p>
+<p>The gate-woman did not burn it. That house destroyed nothing. That house <em>kept</em>, and let you know that it kept, which is another instrument altogether.</p>
+<p>She put it in the cedar chest in the hall.</p>
+<p>I looked at that chest every day for two years.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">STAGE II</span>The House on the Dry Canal</h2>
+<p><strong>The Return-Moon, 206, to the Dust-Moon, 208.</strong></p>
+<hr class="scene-rule"/>
+<p>Sitt Amina al-Hawd was not cruel.</p>
+<p>I have had twenty years to take that back and I will not take it back. Whoever wants a monster here may go into the city and find one; they are cheap and there are several on every street. She was not cruel. She was something worse, and the worse thing has a name, and I will write that name three times in this book and not a fourth.</p>
+<p>She was Fhara, like me, out of a well two days south of Qalat al-Waha. Her name is a cistern — <em>al-Hawd</em>, the basin, the thing you fill and draw down and fill again. I do not think she chose it. I think it came to her the way a trade comes to a family, sideways, without asking.</p>
+<p>She was fifty or near it. She had the finest hands I have seen on a woman who did no work with them. She never once raised her voice in two years. And when she sat down across from you she did it in a way that made you sit up, the way a cat coming into a room makes a room have corners.</p>
+<p>And she told the truth.</p>
+<p>That is the whole of her. That is the door and the hinge and the wall, and it took me six years and a dead Aeler to understand what kind of thing it was.</p>
+<hr class="scene-rule"/>
+<p>On my first evening she had me brought to the small room off the hall, and she fed me.</p>
+<p>First. Before a word of terms, before I had stopped shaking — rice with a little mutton in it, more than I could eat, and a cup of water, and she sat across from me and watched me eat it and said nothing at all.</p>
+<p>There is a doctrine behind that meal. There is a name behind the doctrine. When I give it to you I want you to come back and look at that plate again.</p>
+<p>When I had finished she spoke, in the voice of a woman reading out a lading-bill.</p>
+<p>"You belong to this house. You will be here about two years.</p>
+<p>"You will be taught to carry yourself; to serve at a table; to dress a woman's hair; to reckon and keep a small account; and to hold your tongue.</p>
+<p>"At the end you will be sold. The price will be better than you think. You will most likely go where you are worked rather than used, because that is what the training is for and that is why it costs what it costs. Some are unlucky. The arithmetic is still better than the street, and you are welcome to go and test it.</p>
+<p>"You will not be struck in any way that leaves a mark, because a mark is money off. You will not be starved, for the same reason.</p>
+<p>"You will not be lied to by me. Not once, about anything, ever — and understand that this is not kindness but economy. A girl who has been lied to stops listening, and I need you listening.</p>
+<p>"You will not read. You will not be taught. If you are found with letters it will be the worst day you have had.</p>
+<p>"Those are the terms. They are complete. I will not say them twice and I will not be asked about them twice. Everything in this house that I have not just told you is written on the board in the hall, and you may look at it whenever you like."</p>
+<p>Then she stood and went out, and a woman took me up to a room with seven girls in it.</p>
+<p>That was my whole instruction in the terms of my life.</p>
+<p>She never broke one word of it. Not one syllable, in two years.</p>
+<hr class="scene-rule"/>
+<p>The board was cedar, waxed, on the long wall of the hall, above the chest with my mother's book in it. The letters were cut in and blacked so they would not go grey in the damp. A permanent board. A board made to be read for forty years.</p>
+<p>It was in a good clear Fharic hand.</p>
+<p>Every girl in that house walked past it seven times a day.</p>
+<p>Not one of us could read a word of it.</p>
+<hr class="scene-rule"/>
+<p>I will not make those two years into a lament. I have heard other women make laments out of years like mine and it made me want to break something in their houses.</p>
+<p>They were dull. That is the truth nobody wants. They were dull in a high polished way, like a long dinner with someone dangerous.</p>
+<p>We rose before the light. We were clean, and made clean, and inspected. We were fed properly and worked hard and taught real things by teachers who could do them: the woman who taught table service had spent eleven years in an Ecktorian legate's household and was the best instructor I have ever had of anything, and I can still lay a service for fourteen in the dark, and I have done it, twice, for money, in a country that had never seen a fork.</p>
+<p>And we were taught to count.</p>
+<p>Stop there with me a moment. She wanted us numerate. A numerate servant is worth a third again; a numerate servant catches a porter nine measures light and pays for herself in a season. And numbers on paper, Sitt Amina had decided, are not letters.</p>
+<p>That is the one mistake she made in two years, and she made it in good faith, and I did not know it was a mistake either.</p>
+<p>Numbers are letters. You only have to be shown once, by a bored old man on a road, and it takes an evening.</p>
+<hr class="scene-rule"/>
+<p>The punishments left no marks.</p>
+<p>There was a room. It was clean and dry, not cold, not dark. You were not struck. You were not touched. You were not spoken to. There was water. You were never in it long enough to be a story afterward.</p>
+<p>I am not going to describe it. Not out of delicacy — out of accounting. A thing described is a thing spent, and I have not yet decided what I am spending that on.</p>
+<p>Here is the useful part, and the rest is mine.</p>
+<p>Every girl who came out of that room came out <em>agreeing</em>. Not broken. Not frightened in the dog way. Agreeing — the way you agree with a wall you have walked into in the dark. She had found a method that produced consent and left the goods unmarked, and she used it seldom, and the seldomness was part of the method.</p>
+<p>I heard the name in that house once, and not from her.</p>
+<p>A girl called Barakah said it, sixteen, sold in the spring, flat in the dark the way you say a word you have decided to stop fearing: <em>she weaves for Morag, you know.</em> And then she turned over, and in the morning would not speak of it, and in the spring she was gone.</p>
+<p>I was fourteen and out of a merchant house and I thought it was a thing girls said.</p>
+<p>Here is what it is. I have since been in four countries that know the name, and every one of them says the same three things, and I had them at a fire from a woman with no reason to gentle them:</p>
+<p class="marginalia"><em>She will feed you first, because you are cold and stupid with fear and she is not a monster.</em></p>
+<p class="marginalia"><em>She will tell you the terms once, in plain words, whole, and she will not lie in any part of them.</em></p>
+<p class="marginalia"><em>And she will scratch them where a person in a hurry will not stop to read — and she holds the reading to be your work and not hers, for a woman who does your work has taught you nothing and will only have to do it again next winter.</em></p>
+<p>A meal, first, before terms.</p>
+<p>The terms, once, entire, true.</p>
+<p>And a board on the hall wall, in a good clear hand, above the chest, where you may look whenever you like.</p>
+<p>She never lied to me. She could not have lied to me; it was not permitted to her by the thing she served. She told me everything, and told me where the rest was written, and by the same act and in the same breath made sure I could not open it.</p>
+<p>That is not cruelty. Cruelty is cheap; any drunk can afford it. That is a <strong>design</strong>, and it is Hers, and the woman who kept that house was not a monster but an apprentice, doing well the work of a craft she had been admitted to.</p>
+<hr class="scene-rule"/>
+<p>Two years, then, and I was good at it.</p>
+<p>Quick and neat and silent. By the second winter I was near the head of the house and she had me serve when buyers were in, which is a compliment and a pricing and the same gesture.</p>
+<p>And the only thing I missed was books.</p>
+<p>I said it aloud once, to Barakah, in the dark, before the spring. She laughed at me — not unkindly; it is funny — and said, <em>books</em>, and I said yes, and she said:</p>
+<p class="marginalia"><em>You are the strangest girl in this house, and I hope you are sold to somebody who deserves you.</em></p>
+<p>I have carried that sentence twenty years and I still do not know which way she meant it.</p>
+<p>Not my father, who I had begun to be angry with in a slow cold way that frightened me. Not the shop. Not the fig in the court. Not my mother — obviously not, never, I was extremely clear with myself about that, daily, on a schedule.</p>
+<p>Books.</p>
+<p>Twenty-three months without a line I was permitted to look at, in a hall with a board on the wall and a chest beneath it. I used to stand there in the eighth hour pretending to wait for something, looking up at a shape I could not open, and feel my mother's hand come down over the back of my hand at the low table, and hear her say <em>again</em>.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">STAGE III</span>The Bazaar at Noon</h2>
+<p><strong>The twenty-seventh of the Dust-Moon, 208.</strong></p>
+<hr class="scene-rule"/>
+<p>At the end they send you out.</p>
+<p>Alone, with a purse and a list, into the city, to provision the house for the week: oil, rice, charcoal, lamp-wick, the good coffee and the middling coffee, spice by weight, sugar, salt, and the three things the cook will complain of whatever you bring. The list is read to you twice, because you cannot read it. There is no woman at your elbow. There is no man at the gate.</p>
+<p>It is the examination, and it is not a test of honesty; nobody in that house cared whether I was honest and it was priced in long before. It is a test of <em>carriage</em>. Can this one be sent into a city with silver and come back. Can she be spoken to by strangers. Can she be looked at and manage it. Can she reckon a price and not be shaved, and walk into a hall of buyers with her chin level.</p>
+<p>Pass, and you are finished goods.</p>
+<p>I have thought since what that hour must have cost Sitt Amina in nerve, over the years, and how many girls simply walked. Some must have. The city is very large. And I am nearly certain that she counted them the way you count spoilage, and knew that most of them came to a worse end within the season, and that this is precisely why she opened the door.</p>
+<p>The last lesson of that house was: <em>there is nowhere to go, and I will prove it to you by letting you out.</em></p>
+<hr class="scene-rule"/>
+<p>The bazaar of Ashaan at noon in the Dust-Moon is the loudest quiet place under the sky.</p>
+<p>Everything is roofed in old cloth and the light comes through it the colour of weak tea. The noise is enormous and made entirely of small sounds — brass, bargaining, a child, a goat, a man asleep and snoring under a stack of hides. Nobody hurries, because it is too hot to hurry and because everyone is doing three things at once. You may stand still in the middle of that river and be perfectly alone.</p>
+<p>I did the list first. I want that in the record. The whole list, correctly, at good prices, the heavy things sent, and seven copper over that were mine to carry home and that I was going to carry home.</p>
+<p>Then I went down the row of the paper-sellers.</p>
+<p>I did not decide to. I have told this part in company as a bold thing and it was not bold. I had finished early, I had seven copper, I had two years of an eighth-hour habit standing in front of a board, and my feet went down that row the way a horse goes to its own gate.</p>
+<p>The stall was a good one. Bindings, paper by the quire, and at the front the shallow tray of what does not sell: broken-backed devotionals, a pilot's book for a sea four hundred leagues off, somebody's ruined household accounts.</p>
+<p>And a fat brown book with a split board and its stitching going, and a title in a Fharic hand so plain that a child could read it — which is the point, which is why the man who made that book made it so.</p>
+<p class="marginalia"><em>THE DIWĀN OF ROADS.</em></p>
+<p>A woman came and bought forty sheets of the cheap paper and went away again. The stall-keeper spoke to me twice. I did not hear him either time.</p>
+<p>And then I did not snatch it and run, which is the other lie I have told about that afternoon.</p>
+<p>I stood there with my hands behind my back and I <em>read the first page</em>. Not touching. I could see it; the book lay open in the tray and had lain open in that tray a long while. The page was about a well at the edge of a salt pan, and the three ways you may divide the water of one well among men who have come to it in three different conditions — the thirsty, the dying, and the man with beasts.</p>
+<p>It was the most beautiful thing I had ever read.</p>
+<p>It was almost certainly not. I had not read anything in twenty-three months.</p>
+<p>I read the page three times, and then a fourth, and on the fourth I put my hand flat on it and lifted it and walked away with it under my arm with my heart going so hard I could hear it over the whole market.</p>
+<p>I got nine paces.</p>
+<hr class="scene-rule"/>
+<p>He was not hiding. That is the first thing to know about him and it stayed true until the day he died.</p>
+<p>He stood in the middle of the row like a man waiting for somebody, entirely at his leisure, in the heat, in a good coat that no sane person wears in Ashaan in the Dust-Moon. Aeler: short and wide and old, grey coming in, three little gold ringlets worked into his beard, and one eye looking at me and one eye not looking at anything at all, ever, because it was glass.</p>
+<p>He put out a hand. Not to seize — palm up, at the height of my elbow, the way you stop a horse that is not yours.</p>
+<p>"Are you a reader," he said, "or a thief?"</p>
+<p>I could not answer. I stood in the cloth-light shaking so hard I could hear my own teeth, with a stolen book under my arm and seven copper in my fist, and he waited, and did not fill the silence.</p>
+<p>I have never since met anybody so comfortable inside one. He would let a silence go on until it began to cost the other man money.</p>
+<p>"The Pereshi say a reader does not steal, and a thief does not read," he said. "It is a stupid proverb and they are very proud of it. But there is one good thing in it."</p>
+<p>He looked at the book. Then at me. And the seeing eye went over me openly, without any attempt to hide the going-over — which nobody had ever done to me in my life, and which had been done to me seven times a day for two years.</p>
+<p>"A reader is useful," he said. "A thief is a girl less a hand."</p>
+<p>And the book was out from under my arm before I had decided anything. Two fingers and a thumb on the split board; gently; gone. He tucked it under his own arm, and then he looked over my shoulder and said, loudly, in an entirely different voice, bored and aggrieved:</p>
+<p>"<em>No, no</em> — three quires, and it is not worth the half of what he says —"</p>
+<p>And Sitt Amina's woman came round the end of the row.</p>
+<p>He winked at me.</p>
+<p>Then he turned his back and walked off into the tea-coloured light with my book, and the woman took my arm above the elbow, which is how they take you, and said pleasantly, "You are late," and I said, "The charcoal man was slow," and she said, "Mm."</p>
+<p>We went home.</p>
+<hr class="scene-rule"/>
+<p>I was in the room a day and a night.</p>
+<p>She never asked what I had done. I do not know to this hour whether the woman saw the book, and I have come to think it did not matter, because the theft was not the crime.</p>
+<p>The crime was that I had stood in a public row, with a household purse on me, for the length of four readings of a page. Not moving. Not watching. Not carrying myself. <em>Gone out of the world entirely.</em></p>
+<p>That is the one thing that house existed to burn out of a girl, and she had spent two years and a great deal of silver on me, and I had gone to a paper-stall like a drunk to a door.</p>
+<p>When I came out she was in the small room off the hall and she had them bring me rice with a little mutton in it, and she sat and watched me eat it and said nothing.</p>
+<p>Then:</p>
+<p>"That was not punishment. That was the last of your instruction. It has cost me four days of your price and I want you to know that I knew what it would cost and did it anyway, because you will be worth more with it than without."</p>
+<p>She was telling me the truth. She was always telling me the truth.</p>
+<p>"You will not be sold this week. You will be sold next. Do you know why I am telling you instead of letting you find out?"</p>
+<p>"So that the waiting does the work."</p>
+<p>She looked at me for a long moment. Longer than she had ever looked at me.</p>
+<p>"Yes," said Sitt Amina al-Hawd. "You are the cleverest girl I have had in eleven years, and I am going to be careful where I put you."</p>
+<p>That is the last thing she ever said to me.</p>
+<hr class="scene-rule"/>
+<p>He came on the fourth day.</p>
+<p>I did not serve. I was not brought out. I heard it from the passage, the way I have heard everything of consequence in my life, standing with a jug in my hands, counting.</p>
+<p>One cup. A long pause.</p>
+<p>Two cups.</p>
+<p>A very long pause — voices under the door, his flat and unhurried, hers level as a rule.</p>
+<p>Then the third pour.</p>
+<p>And no pause at all after it.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">STAGE IV</span>The First Coin</h2>
+<p><strong>The Date-Moon, 208. The north road out of Ashaan.</strong></p>
+<hr class="scene-rule"/>
+<p>He paid four hundred and eleven in Ecktorian silver and a letter of credit on the house of Yazid at Khvarena, which was a great sum for a house-trained girl of sixteen and about half again what I was worth.</p>
+<p>He did not haggle. Not one word, in a country where a man who does not haggle has insulted you, your mother, and the goods. I have never settled whether that was courtesy to her, or contempt for the whole transaction, or an old man who simply could not be troubled.</p>
+<p>Nine days out I found the bill of sale in the bottom of a saddle-bag, looking for a whetstone.</p>
+<p>I could not read it.</p>
+<p>Hold that. It comes back at the end of the book and it comes back hard: <strong>I held in my two hands the paper that disposed of my body, and I could not read one word of it.</strong> I put it under the whetstone and said nothing, and we walked north.</p>
+<hr class="scene-rule"/>
+<p>There was no house.</p>
+<p>I had braced myself — the way you brace for a thing you cannot prevent — for another hall, another board, another woman at the head of another table. What there was instead was one old man, two mules, a tent that had been very fine fifteen years before, a folding table, and a chest of books with a lock nobody had turned in a decade.</p>
+<p>No cook. No guard. No servant but me, and I was not sure I was one.</p>
+<p>On the first evening out of the city he stopped at the ninth hour, which is absurdly early, and unloaded the mules himself while I stood there with my hands empty. Then he set the folding table up in the dust facing west, sat down at it, and said:</p>
+<p>"Well. Do you make coffee, or did they leave that out?"</p>
+<p>"I make coffee."</p>
+<p>"Then make coffee, and sit down, because I am not having somebody stand behind me for four hundred miles. It is bad for the neck and worse for the conversation."</p>
+<p>So I made coffee on the Ashaan road for a foreigner I had met twice.</p>
+<p>I poured the first cup and he drank it. I poured the second and he drank that. And then I sat with the pot in both hands and did not pour the third, because you do not pour the third until the thing is agreed, and I did not know what the thing was.</p>
+<p>He watched me not pour it.</p>
+<p>"Ah," he said. "Yes. I was told about this. Three cups, and the third one bites." He turned his own cup round on the table with two fingers, which is what that man did instead of gesturing. "Do not pour it. Not tonight, and not for a long while. I will tell you when — and when I do, you will be able to refuse me.</p>
+<p>"Write that down in whatever place you keep things. It is the first true thing I will say to you and you will not believe it for a year."</p>
+<p>Then he put the book on the table between us.</p>
+<p>Split board. Stitching going.</p>
+<p class="marginalia"><em>THE DIWĀN OF ROADS.</em></p>
+<p>"Your book."</p>
+<p>"It is not my book."</p>
+<p>"No," he agreed. "You stole it. And then a foreign man took it off you in the street, and then the foreign man walked back and paid the stall-keeper nine copper for it, which is four more than it was worth, because the stall-keeper had watched you read the first page four times and was going to put the price up in the morning." He pushed it an inch toward me. "So it is not your book. It is your book."</p>
+<p>I did not touch it.</p>
+<p>"I am not allowed to read."</p>
+<p>"You are not <em>able</em> to read," he said, "which is a different condition and a temporary one. I have bought a valet who knows her letters, at a price, and if it turns out I have been sold a girl who cannot, I shall want my money back and I shall not get it, because that woman does not lie." He drained the second cup. "Read me something. Anywhere. I do not care where."</p>
+<p>And now the truth, because I have told this gracefully in company and it was not graceful.</p>
+<p>I could not do it.</p>
+<p>I opened the book and looked at a page and the letters would not come apart. Twenty-three months. They sat in their rows being shapes, and I could hear my own breathing go wrong, and I sat in the dust at a folding table in front of a stranger who had just paid four hundred and eleven silver for this exact ability, and I could not get one word out of one line.</p>
+<p>He did not help me. He did not say a single kind thing.</p>
+<p>He turned his chair a little west, away from me, and looked at the light going, and said to the horizon, in a bored voice:</p>
+<p>"We have four hundred miles. It will come back on about the fifth evening. Pour the rest of that pot and do not make it so sweet tomorrow."</p>
+<p>It came back on the fourth.</p>
+<hr class="scene-rule"/>
+<p>Rurik Dornvael. On the road they called him <strong>Breath-Steady</strong>, and I heard it said to him in eleven accents over four years and never once turned it over, and it was sitting on the front of him the whole time like the glass eye, in public, being true.</p>
+<p>He gave me his account of himself in the first month, once, flatly, without being asked. He did that. He set out terms the way she had, and I did not notice that either.</p>
+<p>Sixty-eight years old. An Edgewalker — one of those the holds put out, or who put themselves out, for not abiding the counting — and forty years between the mountain and the lowlands doing what Edgewalkers do, which is to be the one Aeler a lowland lord can actually talk to, and to take a slice of every conversation for four decades.</p>
+<p>He had gone home rich. Unusably rich, in a hold where wealth is cut stone and breath-tallies and standing. He bought a vault and a deep good set of rooms and sat in them eleven years being congratulated.</p>
+<p>"And the road went on without me," he said, "which I had not expected, being under the impression that I was the interesting thing on it."</p>
+<p>He had one walk left. He knew roughly how many years he had, the way they do. He meant to go up the <em>reshima kah mharga</em> from the Ashaani end to the Nine Lanterns and past it if he lasted, as he had gone at nine-and-twenty, and he meant to do it slowly, and he meant to enjoy himself.</p>
+<p>And there were two difficulties, which he laid on the folding table on the fourth evening with his hands flat on either side of them.</p>
+<p>"My eye is old. The good one. It does very well for a road and a face. It will not do for a page, and it will not do for a hand I have not seen before, and there is not a way-house on this road that does not put a paper in front of you in a hand you have not seen before." He turned his hands over. "And these shake. Not at the wrist, where you would see it. At the small joint, on the downstroke. It makes a written line that nobody can read who did not watch it being made.</p>
+<p>"So I cannot read and I cannot write, and I am about to go four hundred miles through nine jurisdictions in which every single thing that matters is a piece of paper. I am not a fool and I did not come out here without a plan. You are the plan. You cost four hundred and eleven and you are cheaper than the alternative, which is trusting a way-house clerk, which I have done twice and will not do again as long as I live."</p>
+<p>I said — sixteen, four days out of that house, sitting in the dust — "And if I run?"</p>
+<p>And he said, with no change in his voice at all:</p>
+<p>"Then I shall be in a great deal of trouble and it will have been an expensive mistake. Do you want the road or not? I am too old to chase you and I am not going to pay a man to."</p>
+<hr class="scene-rule"/>
+<p>I did not believe a word of it.</p>
+<p>Not that night and not for four years, and I want that established now, on this page, early, because I am not building you a trapdoor. There is no moment later in this book where the girl gasps. The girl suspected him inside a fortnight and hunted him for two years and never once got him, and he knew she was hunting and enjoyed it more than anything else that happened on that road.</p>
+<p>The fortnight was the honorific.</p>
+<p>I heard it first at a way-house below the third stage, from a Kuvani who had known him thirty years: <em>Breath-Steady</em>. And I asked what it meant, because I asked what everything meant, and the man told me, at length, with his hands, the way men tell you about the mountain — that it is given in the holds for work done sealed and underground, where a shake in a man's hand is four dead and the whole gallery re-cut, and that it is not given twice, and never lightly, and never at all to a man whose hands are not.</p>
+<p>I went back to the tent and looked at the old fraud sitting there with his cup, and I thought: <em>you told me four days ago that your hands shake.</em></p>
+<p>And then I thought — because I was sixteen and wanted to be fair, and because being fair is how they get you — <em>well, a name is a thing a man keeps after the ability goes. My father was called the balance.</em></p>
+<p>So it proved nothing.</p>
+<p>It never proved anything. That is the shape of the next three years and I may as well give you the shape now.</p>
+<hr class="scene-rule"/>
+<p>The first trap was in the fifth month and it was not subtle, and I am still a little proud of it.</p>
+<p>I read him a toll-docket at a river crossing and I read it wrong on purpose. Four silver wrong, upward, in the second line, in a hand plain enough for a child.</p>
+<p>If the man could read, he would look at the page and see four silver walking out of his purse, and something would cross his face, and I would have him.</p>
+<p>He listened. He nodded. He said, "Pay it," and I paid it, and he was four silver down, and nothing crossed his face at all.</p>
+<p>Three stages later he said, out of nothing, to the road ahead:</p>
+<p>"That crossing was dear."</p>
+<p>"Yes."</p>
+<p>"Four silver dearer than the one above it, and the one above it has a better bank." He turned his head just enough. "Was it?"</p>
+<p>"I do not know," I said. "I only read what is on the paper."</p>
+<p>"<em>Mm</em>," said Rurik Dornvael, and that was all, and I have never in my life wanted so badly to hit an old man with a mule's bridle.</p>
+<p>He had paid four silver to win that. He did it cheerfully. He would have paid forty.</p>
+<hr class="scene-rule"/>
+<p>He was a scoundrel. I have put that off for four pages and it will not be put off further.</p>
+<p>Within a month I had watched him: sell a Kuvani factor a set of survey rights that were not in any meaningful sense his to sell, and then buy them back cheaper a year later from a man who had made money on them and was grateful; talk a customs officer at the river into inspecting the wrong cart, at length, thoroughly, with the officer's own lantern, while the right cart went by in the dark; lose at dice on purpose for three nights to a caravan master and win on the fourth in front of the man's own people, which cost him nothing and bought him a place at the head of the column for two hundred miles.</p>
+<p>He lied constantly and enormously and with obvious pleasure to strangers, and he did not once lie to me about anything small, which is how I came to be so certain he was not lying to me about anything large.</p>
+<p>And he was funny. That is the thing that does not survive into the <em>Diwān</em> and I am sorry for it. He was a filthy, quick, unkind, wonderful old man who could make a way-house yard laugh in a language he did not speak, and who could get a table of eight strangers telling him their business inside a cup and a half, and who did not do it for profit at all. He did it because he could not bear a room in which nothing was happening.</p>
+<p>He had spent eleven years in a warm stone room being agreed with.</p>
+<p>He was starving. I did not see it for two years, because a starving man with good manners looks exactly like a man who is enjoying his dinner.</p>
+<hr class="scene-rule"/>
+<p><strong>The first coin</strong> came in the ninth week, below the Pereshi wall, after an argument about our stabling that had gone an hour and that we had lost.</p>
+<p>I was furious. Fourteen weeks out of a house where I had no standing whatever, I had discovered on a road that I had opinions, and they came out of me like water out of a split pipe.</p>
+<p>He let me finish.</p>
+<p>"How much did we lose?"</p>
+<p>"Four in silver. Five, with the fodder."</p>
+<p>"And the man who beat us. What has he got?"</p>
+<p>"Four in silver. Five, with —"</p>
+<p>"No," said Rurik Dornvael. "That is what he <em>took</em>. What has he <em>got</em>?"</p>
+<p>I sat on the mounting-block in the cold and I did not answer.</p>
+<p>"He has a stable-yard at the foot of the Pereshi road," he said, "in which every soul coming down off the wall in winter must stand. And he has, as of this evening, a reputation in that yard as a man who will squeeze four silver out of a foreigner in front of seven witnesses." He held up one finger. "Now. Which of those two things did he spend tonight?"</p>
+<p>And I saw it whole, in a breath, sitting in the cold — the way you sometimes do, once or twice in a life.</p>
+<p>"The second one," I said. "He spent the second to get the first. And the second was worth more."</p>
+<p>"<em>Ha!</em>" — and he hit the table, and that is the only time in four years I ever surprised that man, and I lived on it for a month.</p>
+<p>"That is the first lesson and the only simple one," he said. "<strong>The best coin does not clink.</strong></p>
+<p>"It is the debt a way-house keeper believes you owe him. It is a ford-warden's opinion of your face. It is a stall-keeper putting a price up because he watched a girl read. No one can count it, no one can lift it out of your bag, it compounds while you sleep — and every fool on this road will trade a sack of it for four silver in front of witnesses, because silver makes a noise and the other thing does not."</p>
+<p>He drank his coffee.</p>
+<p>"We will have that stabling for nothing on the way back. Watch me."</p>
+<p>We did. It took eleven months and one civil letter, which I wrote, and I have never in my life enjoyed anything more.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">STAGE V</span>The Roof of the Way</h2>
+<p><strong>The Covenant-Moon, 208, to the Flood-Moon, 209. The Pereshi highlands.</strong></p>
+<hr class="scene-rule"/>
+<p>The Pereshi call their country the Roof of the Way, and it is not a boast; it is only where the road goes over.</p>
+<p>Everything that moves between the Amaranthine and the east goes up one side of that country and down the other, and has done for a thousand years, and the Pereshi have spent the thousand years perfecting the art of being enormously helpful to people who have no choice.</p>
+<p>They are the most courteous robbers on earth. They will take you out of the snow and feed you and dry your boots and mend your girth and refuse payment twice — and then charge you for the pass, and the charge will be, to the copper, exactly the most you can bear and still like them.</p>
+<p>I have never met better arithmetic anywhere, and I have lived among the Aeler, and the Aeler count air.</p>
+<p>We were four months on the Roof, because he would not be hurried, and because the Flood-Moon came early that year and shut the high stage for six weeks. Those six weeks made most of what I am.</p>
+<hr class="scene-rule"/>
+<p>I read to him every evening for six weeks.</p>
+<p>That is the whole of it, and set down flat it does not sound like anything at all.</p>
+<p>We had a room in a village whose name I will not write, because they have had visitors enough since on my account. A stove. A window the size of my two hands. Outside, snow coming down onto a road nobody was using. And every evening, the chest.</p>
+<p>Forty-one books. I will not list them. Nine were in tongues I could not read then and four are in tongues nobody can read now. Eleven were law — Aeler law, hold-law, the grey dull stuff — and he made me read those too, and would stop me in the middle of a clause and say <em>what does that stop a man doing?</em> and would not let me go on until I had answered.</p>
+<p>And the <em>Diwān of Roads</em> was in the chest, in the middle, on the top.</p>
+<hr class="scene-rule"/>
+<p>In the second week I found out who had written it.</p>
+<p>Nobody.</p>
+<p>It is not a book. It is a way-house register — a thing that begins when somebody with a decent hand in some caravanserai starts copying the useful things into the back of the ledger. Distances. Water-rights. The three ways of dividing a well. Then another hand adds to it. Then another. After eighty years somebody binds it and cuts a title into the board and it goes into a tray in a bazaar for five copper.</p>
+<p>I was angry about that for a day. I had made a holy object of it, in a hall, for two years, and it was a ledger with opinions in it.</p>
+<p>And then, in the third week, I understood that this was better, and it is the nearest thing to a religious hour I have ever had, and I am too old now to be shy about it.</p>
+<p>A book that anyone may add a true thing to is not a lesser book than a book one man wrote.</p>
+<p>It is a <strong>road</strong>.</p>
+<p>It is exactly and only a road: made by everyone who ever went along it, kept up by whoever is standing there, useful to a stranger who will never know your name, and nobody's.</p>
+<p>I began writing in it in the fourth week. In the margins, in pencil, in a bad hand. I have never taken those pages out and I never will. Somebody will read that original one day and find a girl of seventeen correcting a dead clerk about water, and will have no idea in the world who she was.</p>
+<p>Good.</p>
+<hr class="scene-rule"/>
+<p>The proverb is Pereshi and I had it from a Pereshi, and he did not say it the way Rurik said it.</p>
+<p>He kept the shrine at the head of the closed stage and came down to the village for the winter, and he gave it to me in the long form, which nobody uses on the road because it is long and because the short form is more comfortable:</p>
+<p class="marginalia"><em>A reader does not steal, and a thief does not read, and the road is full of both, and God has not yet told us which of them He sent.</em></p>
+<p>I asked him what it meant.</p>
+<p>"It means it is a stupid proverb," he said, "and we keep it because it makes people at the pass explain themselves."</p>
+<hr class="scene-rule"/>
+<p><strong>The second coin</strong> came at the end of the sixth week, out of a rude question, which is where most of my education has come from.</p>
+<p>He had been talking about the hold. He did that more as the winter went on. Never sentimentally — he was not a sentimental man and I never once heard him say he missed anything in his life. He spoke of the mountain the way a surveyor speaks of ground.</p>
+<p>And I said, being seventeen and warm and full of law and insufferable:</p>
+<p>"Then why did you leave it? You have eleven years of rooms and a vault and every man in the mountain saying your name. Why are you in a Pereshi village in the snow with a girl you bought?"</p>
+<p>He never took offence. In four years I never once got a rise out of him, and by the end I had stopped trying, and that was itself the lesson.</p>
+<p>"How much is in the vault?"</p>
+<p>"You have never told me."</p>
+<p>"No. Guess."</p>
+<p>I guessed high, to be rude. He laughed — one syllable, like a door — and said, "More. Considerably. Guess again." I guessed higher.</p>
+<p>"Yes," he said. "About that."</p>
+<p>And then:</p>
+<p>"<strong>And what has it done for eleven years?</strong>"</p>
+<p>I said nothing.</p>
+<p>"It has sat. In the dark. At a temperature. Behind a door with my seal on it. Twice a year a clerk I pay goes in and counts it, and every time he counts it, it is the same, and he writes the same number, and I initial the same page and give him a cup of something and ask after his mother."</p>
+<p>He turned the cup on the table with two fingers.</p>
+<p>"There is a word in the hold for a vault that has not moved in ten years. It is not a nice word and I am not going to teach it to you. The whole of our doctrine is that every square pays or it closes — that is the first line of the first thing a child in the mountain is taught, before the alphabet, before the bell-codes. And I had eleven years of squares that did not pay and did not close. I sat on them. I was congratulated for it by men I did not respect. And I began to be afraid of my own hall.</p>
+<p>"<strong>The worst coins are cold in a vault.</strong> Not because a vault is wicked. Because a coin that does not move is not wealth — it is the <em>memory</em> of wealth, and a man living on it is living on a memory. I have watched eleven of them do it and they die the same death, every one: bored, in a warm room, being agreed with."</p>
+<p>He looked out at the window the size of my two hands.</p>
+<p>"I am not going back," he said. "I have made arrangements. It will go where it does some good, and I shall not be there to be thanked for it, which is the only way I can do it without it turning into the other kind of coin altogether."</p>
+<p>I did not understand that last clause for four years.</p>
+<hr class="scene-rule"/>
+<p>I should say what that winter was, because I have made it sound like a course of study and it was also the first happiness I had had since I was eleven.</p>
+<p>He was not easy company. He was dry and watchful and often unkind, and he would let you be wrong for three days if he thought the walk to the answer was worth more than the answer, and he did not explain himself to anybody at all, ever.</p>
+<p>He never once said a warm word to me. Not one, in four years. I have been through everything I have of his and there is not a single sentence of the sort a person would show to somebody else.</p>
+<p>And he taught me K'thra on a slate on the stove-top with pebbles for pieces, badly, and lost to me in the fifth week, and was so disgusted that he did not speak for an entire evening — and then made me play the same position out seven times to prove I had won it by accident.</p>
+<p>I had won it by accident.</p>
+<p>That is the whole currency of his affection, and I had the exchange rate inside a month, and I have never in my life been better paid.</p>
+<hr class="scene-rule"/>
+<p>The traps were better on the Roof, because we were shut in and there was nothing else to do.</p>
+<p>I put a docket in front of him upside down. He took it, held it, turned it round without looking at it — which proved nothing, because a man's hands know which way a page goes the way they know which way a door opens — and said, "Read it to me."</p>
+<p>I left a paper of my own on the table overnight with a line in it that no honest man could have let stand, and in the morning it was where I had left it, untouched, with a cup on it. Nothing.</p>
+<p>I asked him to sign a receipt himself, once, at the pass, for a Pereshi who wanted the foreigner's own hand on it. He did. What came off that pen was a catastrophe, a spider dying, four inches of ruin — and the Pereshi was perfectly satisfied and I was not, because I had watched the <em>wrist</em>, and the wrist had not moved at all, and a shake at the small joint on the downstroke is not a thing you can see and he had told me so himself in the first month.</p>
+<p>He had told me himself. That is the part. <strong>Every lie that man told me came with the instructions for checking it</strong>, and every check came out ambiguous, and I have never decided whether that was carelessness or the finest work I have ever seen anybody do.</p>
+<p>So in the ninth week, in the snow, over the board, I asked him.</p>
+<p>"Are you lying to me about the eye and the hands?"</p>
+<p>He did not look up from the slate. He moved a pebble, badly, and said:</p>
+<p>"That is not the question."</p>
+<p>"It is my question."</p>
+<p>"It is a <em>bad</em> question," said Rurik Dornvael, "and you are better than it, and you have been circling it for nine months like a dog round a hedgehog. Suppose I say no. You will not believe me, and you should not. Suppose I say yes." He looked up then, with the one eye. "What have you got? A liar has told you he is a liar. Where does that leave you tomorrow morning when I hand you a docket?"</p>
+<p>"Then what is the question?"</p>
+<p>And he went back to the slate and said, with enormous satisfaction:</p>
+<p>"That is the trouble. You have not found it yet."</p>
+<p>I did not find it for four more years. It was not <em>does he lie</em>. Everybody lies; he lied to strangers eleven times a day and enjoyed every one. It was not even <em>is he lying to me</em>, because I had decided inside a fortnight that he was and had never once revised it.</p>
+<p>The question was <strong>what for</strong>.</p>
+<p>An old man goes into a market in a foreign city and spends four hundred and eleven silver and a letter of credit on a girl who can read, and then constructs — daily, carefully, at cost, in nine jurisdictions, for four years, without one slip — an elaborate and entirely unnecessary helplessness, and never once uses it to get anything out of her that he could not have had by asking.</p>
+<p class="marginalia"><em>What for.</em></p>
+<p>I put that in a margin in the tenth week, in pencil, in the <em>Diwān of Roads</em>, at the bottom of a page about the tolls of a pass. Four words and a question mark, in a bad seventeen-year-old hand.</p>
+<p>He never answered it.</p>
+<p>Every other note I made in four years, he answered. I did not know that at the time and I am telling you now because I do not want you to reach the end of this and feel that something was hidden from you. He answered them all, in pencil, in the gutter, at night. Every single one but that one.</p>
+<p>I have the page. The gutter beside it is empty and he took the trouble to leave it empty, which for that man was not silence. It was a closed door with a hand still on it.</p>
+<hr class="scene-rule"/>
+<p>There was a boy that winter.</p>
+<p>His name was Sohrab and he was seventeen and his mother kept the house we lodged in, and his work was wood — up the stack, down the stair, into the box beside the stove, three times a day, for six weeks.</p>
+<p>He began staying.</p>
+<p>Not for me. I want to be exact, because I have told it the other way in company and the other way is flattering and false. He stayed because I was reading aloud, and he had never heard anybody read aloud, and he would put the wood down and straighten up and then not go, and after the third evening Rurik stopped noticing him on purpose, which in that man was a whole speech.</p>
+<p>I read and he listened. That was the first three weeks of it. I have had a good deal of love since, in seven countries, and I will tell you without any embarrassment that being <em>listened to while reading</em> is the most erotic thing that has ever happened to me and that nothing since has come near it.</p>
+<p>The rest was in the fifth week, in the wood-store, in the cold, badly, and then rather better, and it is mine and you are not getting it.</p>
+<p>And I began writing verses. That is the other thing that started in that wood-store and I am not going to pretend the two are unrelated. Bad verses. Four lines, a refrain, the shape my mother's book of poems had, because that was the only shape I knew and I had it by heart from five years old and had not looked at it in six years. I put them in the margins of the <em>Diwān</em> with the water-rights, which scandalised a librarian at Khvarena forty years later.</p>
+<p>The pass opened in the Flood-Moon.</p>
+<p>I did not tell him we were going. I knew the evening before; Rurik had the mules looked at and that is always the sign. I lay awake with it and I made a list of the ways to say it, and there were three, and all three were possible, and in the morning I loaded a mule and went down the road.</p>
+<p>He came out. Of course he came out. He stood at the top of the village with the wood in his arms and did not call out, because he was a courteous boy, and I did not turn round, because I was not a courteous girl, and that is the whole of it and it took eleven minutes.</p>
+<p>I was seventeen. I had been the property of a house for two years and free for a year and a half without knowing it, and I had found something I wanted and I left it in the snow without a word, and I did not cry about it until the third stage down.</p>
+<p>I have done that eleven more times since.</p>
+<p>I am going to come back to this and it will not be pleasant.</p>
+<hr class="scene-rule"/>
+<p>One other thing from that winter, and then down off the Roof.</p>
+<p>There was a night — deep in it, the pass shut, the village under snow to the eaves, three people dead that month of the cough and everybody indoors and sour — when he took the folding table out into the yard, in the dark, in the cold, and set it up in the snow, and lit two lamps on it, and sat down at it and started a game of K'thra against nobody.</p>
+<p>Within half an hour there were four Pereshi standing round it arguing.</p>
+<p>Within an hour there were eleven, and somebody had brought out arak, and a woman who had not spoken to her brother in two years was leaning over his shoulder telling him he was a fool.</p>
+<p>Rurik Dornvael sat in the middle of that with snow in his beard, losing, at three in the morning, delighted, having said perhaps forty words the entire night.</p>
+<p>I understood him a little that night and not enough. I thought: <em>he cannot bear a room where nothing is happening.</em></p>
+<p>What I know now, at the age he was then, is the other half of it, which is that a man who makes the room happen is never in it. He is the one running it. He goes round the table filling cups and setting fires under people, and the warmth comes off it at him sideways, and it is real, and it is not the same thing as being sat with.</p>
+<p>He had spent forty years being the most welcome man in any room he entered, in nine countries, and then eleven years alone in a stone room with a door he had sealed himself.</p>
+<p>And then he bought a girl in a market, and made her sit down at the table.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">STAGE VI</span>The Lock-Camps</h2>
+<p><strong>The Palm-Moon, 209, to the Marking-Moon, 211. The Ykrul marches.</strong></p>
+<hr class="scene-rule"/>
+<p>Down off the Roof and east, the road stops belonging to anyone.</p>
+<p>This is the stretch the Fharan way-houses do not discuss and the Ecktorian maps draw as a dotted line, which is how a surveyor says <em>we do not know and will not admit it</em>. There are no jurisdictions out there. There is grass. There is water. There are the Ykrul.</p>
+<p>And there is a system of extraordinary precision, unwritten anywhere, which an outsider takes four years to notice and then spends the rest of his life explaining badly.</p>
+<p>I will not explain it badly. I will set down the one thing I learned in it, because the short form is in the <em>Diwān</em> and people have been quoting the short form at me for twenty years without the least idea what it cost to get.</p>
+<hr class="scene-rule"/>
+<p>We came into the first lock-camp in the Palm-Moon with a Kuvani caravan of fourteen carts, and were held.</p>
+<p>Not robbed. Held. The ford-wardens shut the crossing — four riders on the near bank, two on the far, and the thing simply closed — and fourteen carts of extremely expensive people sat down in the grass for nine days, and nobody explained anything to anybody.</p>
+<p>The Kuvani master lost his temper on the third day. That was the one genuinely dangerous hour of the entire road, and I have never seen a man talked out of dying as efficiently as Rurik Dornvael talked that man out of dying, using seven words and a cup of something.</p>
+<p>On the ninth day they opened it. We went over. Nothing had been asked of us and nothing paid.</p>
+<p>I asked. Of course I asked. I asked everybody, for weeks, in four languages, and got the shrug — which is a whole grammar among the Ykrul and means eleven different things depending on the shoulder.</p>
+<p>And then at the next camp an old ford-warden with a face like a dropped pot decided, for reasons I have never established, to answer me.</p>
+<p>There was a village nine miles downriver, he said. On the far side. It had the coughing sickness in it, badly, since the thaw.</p>
+<p>So they closed the road.</p>
+<p>Not the village. You cannot close a village; people walk out of one at night and who among us would not. You close the <strong>road</strong>. You shut the one crossing in sixty miles and you sit on it as long as it takes, and you let fourteen carts of furious Kuvani sit in the grass and hate you.</p>
+<p>And you do not tell them why.</p>
+<p>Because if you tell them why, they will go round — and going round is two hundred miles of grass, and a third of them die of the going round.</p>
+<p>And because a caravan that learns there was sickness at a ford carries that fact east, and the ford is avoided for nine years, and the villages that live on the ford starve in the third.</p>
+<p>So you say nothing. You close a road. You are hated for nine days by fourteen carts, and you spare a village, and no one ever knows, and there is not one word of thanks anywhere in it for anybody.</p>
+<p>I wrote that night, by a fire, in a margin, in pencil:</p>
+<p class="marginalia"><em>Close a road and spare a village.</em></p>
+<p>It is in the short <em>Diwān</em> in almost exactly those words. It is the line of mine that the world quotes most. I have never once told anybody where it came from until this page.</p>
+<p>It is not a saying about roads.</p>
+<hr class="scene-rule"/>
+<p>Aiyla kept the east depot with her brothers, and I am going to be brief about her, which is itself the confession.</p>
+<p>Kuvani. Two years older than me. Cart-wright's daughter, cart-wright herself, with the forearms for it and a laugh you could hear across a yard, and she ran that depot the way a good ford-warden runs a crossing — by knowing before you did what you were going to need.</p>
+<p>We were three months in and around that camp while Rurik did whatever he was doing with the brokers, and I spent most of it at her yard on the excuse of the paperwork, and there was a great deal of paperwork, and I did all of it, beautifully, and slowly.</p>
+<p>In the ninth week she offered me a half-share and the room over the yard.</p>
+<p>She did it well. She did not make a scene of it and she did not make it a question I had to answer that night. She said the thing, plainly, the way you set a price you mean, and then she got up and went and dealt with a wheel, and left me sitting on a stack of felloes in the sun with my whole life in my hands.</p>
+<p>I stayed nine weeks and then we went east.</p>
+<p>I did not tell her either. I told her we were going — I had learned that much in a year and a half, I had at least learned to say the sentence — and I did not answer the other thing, and she did not ask again, because she was prouder than the boy in the snow and older than me and she could see the whole of it from where she was standing.</p>
+<p>At the gate she said: "You will do this to somebody who cannot take it."</p>
+<p>I said I knew.</p>
+<p>She said: "That is worse," and kissed me, and went back to the wheel.</p>
+<hr class="scene-rule"/>
+<p>I want to put down what I understood four years later, at a shrine on a road in a country neither of us ever saw, because it is the only apology I have and it is thirty years late.</p>
+<p>I got it from him.</p>
+<p>Not the leaving — I had that from my mother, at eleven, off a pillow, in eleven words, and I have had twenty years of physicians of the soul explain that to me at length and for money.</p>
+<p>The <em>charm</em>. The particular instrument. The going into a room cold and warm by the second cup, and the table happening around you, and the whole yard laughing in a language you do not speak — and then the morning, and the mules, and the road, and the room going quiet behind you and staying warm for a week, and you gone.</p>
+<p>He was the best company I have ever known in my life and he was never, once, in four years, in the room.</p>
+<p>He was running it.</p>
+<p>And I watched him do it from sixteen to twenty at the age when you are still deciding what a person is, and I learned it perfectly, the way I learn things, and I have been doing it ever since in nine countries to people who deserved better, and I am very good at it, and it is the single thing I have from him that I would give back.</p>
+<hr class="scene-rule"/>
+<p><strong>The Five.</strong></p>
+<p>I began collecting them in the marches, because I was a chronicler by then whether or not I had the word for it, and because a woman who is behaving badly will always prefer to make it a subject of study.</p>
+<p>In Ecktoria the clergy will tell you that Inaea the Spider bore five daughters to five mortal lovers and each is a kind of love, and there are statues, and hymns, and feast-days with a great deal of wine, and it is a perfectly good story for a city.</p>
+<p>But I found them in the lock-camps.</p>
+<p>Not the names. Never the names; the names are Ecktorian and stop at the Belworth. But at a Ykrul camp in the Marking-Moon there is a five-part song the women sing over a new marriage, and the five parts are: <em>the one who is seen</em>, <em>the one who stays</em>, <em>the one who waits</em>, <em>the one who laughs</em>, and <em>the one who burns</em>.</p>
+<p>I sat down in the grass and wrote it out and my hand was shaking.</p>
+<p>I have since found them in nine places and I will give you three. The Pereshi keep a shrine at the head of a pass with five niches, four of them with lamps and the fifth left dark on purpose, and no two villages agree which one is dark. The Sihai canal-mothers have five knots and teach them in an order and will not teach the fifth to a foreigner. In my own country it is five wells, and the story is about water, and the fifth well is the one you do not drink from and do not fill in either.</p>
+<p>Five threads. Everywhere. Under every roof, in every tongue, with no traffic between them that any scholar has ever been able to show, and every people certain it is theirs.</p>
+<p>I do not think that means a goddess. I have never once thought that.</p>
+<p>I think it means there are five ways to hold a person and every people that has ever held anybody has had to count them.</p>
+<p>And here is why I wrote it out in the grass with my hand shaking, and it took me until the Nine Lanterns to be able to say it plainly:</p>
+<p>I am very good at three of them.</p>
+<p><strong>The one who waits</strong> — the breath before the thing, the week of almost; I am the best in the world at that week and I would live in it if a life could be made of weeks.</p>
+<p><strong>The one who burns</strong> — yes. Obviously. Next.</p>
+<p><strong>The one who laughs</strong> — the lightness, the yard, the thing that makes the weight bearable. I got that off a scoundrel and I have used it like a knife.</p>
+<p>And then there is <strong>the one who is seen</strong>, which requires somebody to look at you, and which I cannot survive; and <strong>the one who stays</strong>, which requires you to be there in the morning, and which I have never once managed in twenty years.</p>
+<p>Aiyla was the fourth and the fifth together, holding out both hands, on a stack of felloes, in the sun.</p>
+<p>I was nineteen and I went east.</p>
+<hr class="scene-rule"/>
+<p><strong>The third coin</strong> did not come as a lesson. It came as a refusal, and it is the only time in four years I saw that man angry.</p>
+<p>There was a broker at the east end of the marches. Perfectly pleasant. He dealt in what one deals in where there are no jurisdictions. He knew Rurik; they had done business somewhere in the last century and there was between them that particular warmth of two men who have each decided the other is useful and neither of whom would cross a street for the other.</p>
+<p>Over the second cup he offered us four people.</p>
+<p>I am not going to dress it. Two men and two women, Sihai, taken off a road somewhere east. He wanted them moved west. He was offering a share. He offered it the way a man offers a half-load of copper ingots, because that is what it was to him, and he had brought them out of the second tent so that we could look at them.</p>
+<p>We looked at them.</p>
+<p>And Rurik Dornvael said no.</p>
+<p>That is all, at first. <em>No</em> — flat, into the middle of the man's sentence, in a voice I had not heard out of him before and did not hear again.</p>
+<p>The broker laughed and began again, because he thought he had priced it wrong, and got four words out.</p>
+<p>And Rurik stood up.</p>
+<p>He was sixty-nine years old and half a head shorter than the broker, and he came up out of a folding chair in a tent in the grass, and the whole tent stopped.</p>
+<p>"The best coin does not clink," he said. "The worst coin is cold in a vault. And the very worst coin is <strong>warm, and alive</strong> — and the man who takes one has not made a profit. He has made a <em>creditor</em>. And he will be paid back in a currency he cannot refuse, at an hour he does not choose, and there is no court between here and the sea that will hear him complain of it.</p>
+<p>"Do not offer it to me again."</p>
+<p>We walked out into the grass. He did not speak for two hours. Then he said, "Make the coffee," in an ordinary voice, and that was the end of it, and we never discussed it, and I never learned what became of those four and I have made my peace with not knowing and the peace is poor.</p>
+<hr class="scene-rule"/>
+<p>I gave up the hunt in the marches, in the second year, and I gave it up in the middle of a trap.</p>
+<p>I had a good one. The best one. It involved a Sihai bill of lading, a quantity of indigo that did not exist, and nine days of preparation, and it would have caught any reading man alive.</p>
+<p>I had it in my hand at the fire and I was three words from springing it.</p>
+<p>And I looked across at him — sixty-nine years old, in the grass, at the end of the world, with his blind side to me and his cup turned on the table with two fingers, waiting, entirely at his leisure, the way he had waited in a bazaar in Ashaan for a girl who had got nine paces —</p>
+<p>— and he was so obviously, so thoroughly, so shamelessly <em>enjoying himself</em>.</p>
+<p>Two years of it. Every docket held upside down, every misread toll, every paper left overnight with a cup on it. He had counted every one. He had been keeping score. It was the best entertainment that old fraud had had in a decade and it was the only game he had ever been able to get me to play with him every single day, and it had never once crossed my mind that this was what I was to him: not a valet, not an investment, not a girl bought in a market.</p>
+<p>An opponent. Sitting down at the board every morning.</p>
+<p>I put the bill of lading in the fire.</p>
+<p>He watched me do it. He did not ask what it had been. He said, "<em>Ha</em>," once, quietly, more to the fire than to me, and then he said, "Make the coffee," and I made the coffee, and we sat there, and that is the closest thing to a conversation about love that either of us ever managed.</p>
+<p>I still did not believe him about the eye. I never did. I simply stopped needing to win.</p>
+<hr class="scene-rule"/>
+<p>I did the arithmetic that night. Of course I did. I had been doing it in the back of my head since Ashaan and it came up out of me at a fire in the grass with the pot in my hands.</p>
+<p class="marginalia"><em>Four hundred and eleven in Ecktorian silver, and a letter of credit on the house of Yazid at Khvarena.</em></p>
+<p>He was sitting across the fire with his blind side toward me.</p>
+<p>Which was where he sat. Always. Every fire, every way-house, every stage, since the first evening out of Ashaan — and I had noticed it within a month and thought it chance, and then thought it habit, and I want you to notice it now and hold on to it, because I did not hold on to it for four years.</p>
+<p>I did not say it.</p>
+<p>I have wondered since what would have come of saying it. Whether he had an answer ready. Whether he had been carrying one for two years, turning it on the table with two fingers, waiting for the girl to ask.</p>
+<p>I poured the second cup. I did not pour the third. He drank, and we went to our beds.</p>
+<p>That is the great regret of my life and I am not going to be graceful about it at this distance.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">STAGE VII</span>The Nine Lanterns</h2>
+<p><strong>The Heat-Moon, 212 of the Seven Wells.</strong></p>
+<hr class="scene-rule"/>
+<p>I am going to go fast over two years, and I am going fast on purpose.</p>
+<p>They were the best two years, and there is almost nothing in them that survives being written down, which is a thing about happiness nobody warns you of when you are sixteen and wretched and certain that the good part, when it comes, will come with a document.</p>
+<p>We went east to the end of the marches and a long way past where he had said we would stop. We wintered twice. He took a fever at a place I will not name and I nursed him through it with a Sihai physician who would not take money and took a letter instead — which I wrote, and which put that man's nephew into a canal-house nine hundred miles off, and which is the best piece of business I have ever done and did not cost one copper.</p>
+<p><strong>The best coin does not clink.</strong> He was insufferable about it for a month. He introduced me to strangers for a season as <em>my banker</em>.</p>
+<p>We turned west in the Journey-Moon of the year eleven. He did not announce it. We simply, one morning, went the other way. At noon he said, "Nine Lanterns," and I said, "Yes," and that was the whole conversation about it.</p>
+<p>He had begun to be old in the way that arrives all at once after arriving slowly. Not the hands — the hands were the last thing and had never gone at all, and I will come to that. The wind. The stages got shorter and there were more of them. He stopped unloading the mules. Then he stopped pretending that he had chosen not to.</p>
+<p>He never complained. Not one word in four years — not of the fever, not of the cold on the Roof, not of the food, not of the road, not of the dying.</p>
+<p>I used to think that was strength. It is not. It is a man who has decided that a complaint is a cup he does not intend to pour. It is an expensive habit. I have it now. I would rather not.</p>
+<hr class="scene-rule"/>
+<p>The Nine Lanterns Way-House stands where the <em>reshima kah mharga</em> comes down off the last high ground and meets the water-road. It is called that because there are nine lanterns, and they are lit at dusk by the youngest person on the premises, which is a job I have done.</p>
+<p>It is not beautiful. A long low yard, stabling on three sides, a well in the middle that is nine hundred years old, and a room at the north end with a fire in it. There has been something there as long as anyone has gone that way, and the lanterns have gone up every night of it, through two empires and the fall of both.</p>
+<p>We came in on the eleventh of the Heat-Moon.</p>
+<p>He was very tired and would not eat. I put him in the good room at the north end and paid for four nights and sat down outside the door on the step, and Marwa, who kept the house then and whose daughter keeps it now, came and sat on the step beside me and said nothing at all, which is the correct thing, and which way-house keepers know and nobody else does.</p>
+<hr class="scene-rule"/>
+<p>On the fourth evening he was better, the way they are.</p>
+<p>He had me carry the folding table out into the yard and he sat down at it facing west, which is where he always sat, and behind us the nine lanterns went up one at a time because it was dusk, and I made coffee.</p>
+<p>I poured the first cup. He drank it.</p>
+<p>I poured the second cup. He drank it.</p>
+<p>And then he put his hand flat on the table, which he did not do, which in four years I had never once seen him do, and said:</p>
+<p>"Pour the third."</p>
+<p>I sat there with the pot in both hands.</p>
+<p>"I told you at the beginning that I would tell you when," he said, "and that you would be able to refuse me. That was four years ago. I have paid for the first half of it. You will have to take my word on the second for another day or so."</p>
+<p>"What is the contract?"</p>
+<p>"Pour it first. Or do not. Both of those are answers and I will take either one."</p>
+<p>And here is the truth of that evening, which I have never dressed and will not dress now: <strong>I did not think.</strong></p>
+<p>I have a reputation on this road for being the most careful reader on it, and I did not think for the length of one breath. I poured the third cup, and I poured my own, and I set the pot down on the folding table in the dust at the Nine Lanterns.</p>
+<p>He drank it off.</p>
+<p>Then he said:</p>
+<p>"Do not take me back to the mountain."</p>
+<p>That was all of it. That was the only thing Rurik Dornvael asked me for in four years — at the end, over a third cup, from a girl he had bought in a market in Ashaan for four hundred and eleven in silver.</p>
+<p>"They will want to," he said. "There is a procedure. There will be a hold factor at Khvarena inside the year who will be extremely correct about it and will offer to pay the carriage, and he will be doing his work, and you are not to be rude to him about it.</p>
+<p>"But I have been under that mountain, and I have seen what they do down there with the ones who are carried home, and it is not for me. I would rather be in the dirt beside a road that people are still using."</p>
+<p>"Yes," I said.</p>
+<p>"You are not required —"</p>
+<p>"I have poured the third cup," I said. "Do not insult it."</p>
+<p>And he laughed — the one syllable, like a door — and said, "<em>Ha.</em> Good."</p>
+<p>Then he looked west at the last of the light and said, "It is an extremely ordinary view, and I thought about it for eleven years in a room made of stone."</p>
+<p>That is the last thing he said to me that was about anything.</p>
+<hr class="scene-rule"/>
+<p>He died two nights after, in the good room at the north end, somewhere between the eighth hour and the dawn, while the lanterns went out one at a time in the yard the way they do.</p>
+<p>I was asleep on the step outside the door.</p>
+<p>I have not forgiven myself for that. Everybody who has ever heard of it has told me it is not a thing to be forgiven, and they are right, and it does not help, and I have stopped raising it in company because of the look people get.</p>
+<hr class="scene-rule"/>
+<p>We put him in the ground east of the yard, above the water-road, on the fourteenth. Marwa's people dug it and would take nothing for the digging. There were seven of us.</p>
+<p>I read four lines out of the <em>Diwān of Roads</em> — the passage about the three ways of dividing a well, being the first thing I ever read in that book, and being the only scripture either of us had. He had no god that I ever heard him name, and I was not going to invent one for him at the graveside at the end of four years of not lying to each other.</p>
+<p>Then I went into the room at the north end with his chest and his papers, and began the work, because there is always work, and because I was twenty years old and owned nothing and had no country and did not yet know what I was.</p>
+<hr class="scene-rule"/>
+<p>The papers were in a leather wallet under the books. There were eleven of them and I read them in order, because I have always done things in order.</p>
+<p>Nine were unremarkable. Two letters of credit, one of them enormous. A deed. An instruction to a factor at Khvarena concerning a vault, which I did not entirely understand for four years and which I am not going to explain here, because it is not mine to explain, and because there are people alive today who have the good of it and do not know his name.</p>
+<p>The tenth was the bill of sale.</p>
+<p>And the first thing I noticed was not what it said.</p>
+<p>The first thing I noticed was that <strong>I could read it</strong>.</p>
+<p>I sat with that a long while before I read a word of the thing itself. That I was holding, in a way-house room, four years and a thousand miles from a dry canal in Ashaan, the paper that had disposed of my body — and that I could read every word of it — and that this was his doing, precisely and entirely, done on purpose, in stages, beginning on the fourth evening out of the city with a bored voice and a chair turned west.</p>
+<p>It is a correct bill. It is dated the fourth of the Date-Moon, in the year two hundred and eight of the Seven Wells, at the house on the dry canal, and it conveys one female, Fhara, of sixteen years, house-trained, in good condition and without mark, for four hundred and eleven in Ecktorian silver and a letter of credit upon the house of Yazid at Khvarena.</p>
+<p>It is signed by Amina al-Hawd in a beautiful hand.</p>
+<p>The eleventh paper lay underneath it.</p>
+<p>It is a <strong>deed of manumission</strong>. Drawn in the Ecktorian form, which is the form that is honoured everywhere from the Amaranthine to the marches; witnessed by two; sealed; entire; unanswerable in any court on this road or off it.</p>
+<p>It is in his own hand. Not a clerk's. His.</p>
+<p>And it is dated the fourth of the Date-Moon, in the year two hundred and eight of the Seven Wells.</p>
+<p>The same day.</p>
+<p>The same hour, by the order of the seals. He walked out of that house with one paper in his hand and sat down somewhere in Ashaan — in the street, I have decided; on a step, in the shade, with the awnings going and a boy shouting melons — and he wrote the other one before he came back for me.</p>
+<p>And then he put it in a wallet in the bottom of a chest under forty-one books, and did not mention it for four years.</p>
+<hr class="scene-rule"/>
+<p>Let me set down the arithmetic of that, since he did not live to give it to me and I have had to work it out myself, which is how he would have wanted it and which I resent to this day.</p>
+<p>He was sixty-eight, rich past any use, and he needed nothing.</p>
+<p>Not a valet. He had gone that road alone at nine-and-twenty and could have hired seven men at Khvarena with better hands and better eyes and their own mules.</p>
+<p>He wanted one walk, and he wanted somebody with him on it, and he had discovered in eleven years of a warm stone room that he could not buy that. Everything his money could reach came to him cold. He was the most welcome man in any room in nine countries and he had not been <em>sat with</em> in a decade.</p>
+<p>So he went into a market in Ashaan with no intention whatever, and he saw a girl read a page three times and then a fourth.</p>
+<p>And here is the thing he understood that took me ten years:</p>
+<p><strong>A bought companion is worth nothing to the man who bought her — and a freed one is worth nothing either, if she knows she was freed.</strong></p>
+<p>A gift that large is not a gift. It is a debt. A debt is a claim. And a claim on a person is the coin that is warm and alive, and he had stood up out of a folding chair in a tent in the grass and told a broker exactly what he thought of that.</p>
+<p>So he freed me within the hour, and told no one, and then spent four years making himself into a man who <em>needed</em> me.</p>
+<p>The eye. The hands.</p>
+<p>A rich old Aeler who cannot read a way-house docket and cannot sign a civil letter, going four hundred miles through nine jurisdictions in which every single thing that matters is a piece of paper — and who therefore requires, absolutely, at every stage, at all hours, without any possibility of doing without her, a girl who knows her letters.</p>
+<p>He paid me a wage I could not have refused and did not know I was drawing: the daily, hourly, entirely genuine condition of <strong>being necessary to somebody</strong>.</p>
+<p>Which is the one thing in the world that a person who has been an item on an inventory actually wants.</p>
+<p>Which cannot be handed over.</p>
+<p>Which he manufactured out of two lies and kept up for four years without one slip in front of me.</p>
+<hr class="scene-rule"/>
+<p>Now the two lies, which were never a secret and were never going to be the point.</p>
+<p>I had them inside a fortnight. I hunted them for two years. I lost. And the losing was the best thing in my life and I have set it down honestly in its place, and if you have come this far expecting a girl to gasp in a way-house room, I am sorry, and I did warn you.</p>
+<p>What I never had was the answer to four words in a margin.</p>
+<p>I have it now. It was underneath a bill of sale in a wallet in a chest, where it had been for four years, and it does not say a word about eyes or hands, and it explains both of them entirely.</p>
+<p>He was called <strong>Breath-Steady</strong>, which is given in the holds for work done sealed and underground and is not given to a man whose hands are not — and I heard it said to him in eleven accents and turned it over on the very first evening I heard it and could never make it prove anything, because a name outlives an ability and my own father was called the balance.</p>
+<p>And he sat with his blind side toward me. Every fire, every yard, every stage, four years.</p>
+<p>I tested that too. Of course I tested it; I tested everything. I moved round the fire once, in the marches, deliberately, to see whether he would move. He moved. He got up and shifted his chair to attend to a strap on the far side of the mule and sat back down with the glass toward me and never broke off what he was saying, and it took him perhaps four seconds, and I could not have proved it in any court on earth.</p>
+<p>What I could not do, at seventeen, or nineteen, was ask why a man would trouble to do that four hundred times.</p>
+<p>A man who cannot see does not have to choose which eye to point.</p>
+<p>He chose. Every evening, for four years, at some small cost in care.</p>
+<p>Because he had bought a girl in a market and knew exactly what he had done, and had decided that whatever else came of it, she was not going to be <em>watched</em> — not by him, not once, not for a moment, in the whole of the road.</p>
+<hr class="scene-rule"/>
+<p>The last of it, and then I am finished.</p>
+<p>I went through the forty-one books before I left the Nine Lanterns, because they were mine now, and because I needed to know what I was carrying over the water-road.</p>
+<p>The <em>Diwān of Roads</em> was in the middle, on the top. Split board. Stitching going.</p>
+<p>My pencil is all through it. Four years of it — corrections, distances, a note on Pereshi tolls, an argument with a dead clerk about water — in a hand that improves from Ashaan to the marches, and that I can now date to within a season by the letters.</p>
+<p>And under mine, in the margins, in a fine small dry grey hand that does not shake at any joint on any stroke, beginning in the first winter on the Roof: the answers.</p>
+<p>All of them. Every note I made in four years, taken seriously, argued with, corrected where I was wrong and conceded where I was not. In a book he could not read. By a man who could not write. Set down in pencil in the evening while I was asleep on the other side of a tent, and never once mentioned, and never going to be.</p>
+<p>I went through it that night at the Nine Lanterns page by page, from the back, the way you do when you are looking for a thing and dreading finding it.</p>
+<p>And on a page about the tolls of a Pereshi pass, at the bottom, in a bad seventeen-year-old hand, there are four words and a question mark.</p>
+<p class="marginalia"><em>What is it for?</em></p>
+<p>The gutter beside it is blank.</p>
+<p>He left it blank. That man, who answered everything, who could not let a wrong figure stand, who argued with me about water across a book for four years — he came to that page some night on the Roof with the pencil already in his hand, and read it, and put the pencil down, and left it.</p>
+<p>And then he went and slept, and in the morning he could not read and his hands shook, and we walked.</p>
+<p>I sat in a way-house room with the wallet in my lap and the answer in it, four years late, in his own writing, witnessed by a porter and a seller of melons.</p>
+<p class="marginalia"><em>She owes me nothing. She has never owed me anything.</em></p>
+<p>Four hundred and eleven in Ecktorian silver and a letter of credit on the house of Yazid at Khvarena.</p>
+<p>I have been twenty years on this road since, and I have never seen a worse piece of business, or a better one.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">CODA</span>And Boards</h2>
+<hr class="scene-rule"/>
+<p>I sat in the room at the north end for three days.</p>
+<p>Then I took the pen — his pen; I have it still and it is a very ordinary pen — and I opened the <em>Diwān of Roads</em> to the board, where somebody eighty years dead had cut the title in with a knife and blacked it so it would not go grey in the damp.</p>
+<p>And I added two words.</p>
+<p class="marginalia"><em>THE DIWĀN OF ROADS AND BOARDS.</em></p>
+<p>Because a road is one half of it and I had that from a book. And the other half is the board — the slate on a stove-top with pebbles for pieces, the thing the Ykrul call Kon'reh and the mountain calls K'thra and my own people call the Silk Tithe when they are selling you shade at noon and charging you for it.</p>
+<p>Which is to say: the road is where you go, and the board is what it costs, and no one has ever written a true book about either that did not have the other in it.</p>
+<p>I have been adding to it since. So have others. There are three hands in it now that are not mine and one of them is better than mine, and I have never met her and I hope I never do, because we would only argue about water.</p>
+<hr class="scene-rule"/>
+<p>Twenty years, then, in four lines, because you did not come here for them and because I am the one deciding what this paper holds.</p>
+<p>I went west, and then east again, and I have been on this road and its branches ever since, and I have made a life out of the two things that old man left me, which are a habit of writing down what is true and a talent for leaving.</p>
+<p>I am not famous and I am not poor. I write for way-houses, mostly — the registers, the water-rights, the distances, the corrections nobody thanks you for — and the houses feed me and put me in the good room and tell me things, because a woman who keeps a register is told everything by everybody within a cup and a half. That is a trade. It is a small honourable trade and I am the best in the world at it, and there are perhaps three of us.</p>
+<p>And I write verses, which is not a trade. The verses are in the same margins as the water-rights, which is where they belong and where they will stay, and men at Khvarena have twice offered to separate them out and bind them properly and I have twice refused, and the second time I was rude about it.</p>
+<p>I have had a great deal of love. I want that on the page, because a woman who writes about her own coldness is generally believed to have had none, and I have had a great deal, in seven countries, and most of it was good and all of it was mine and I regret almost none of it.</p>
+<p>I have never stayed.</p>
+<p>Not once. Not for the boy in the snow or the woman on the felloes or the seven after them, and not for the one at Qalat al-Waha who was very patient with me for three years and did not deserve the ending he got, and not for the Sihai physician's nephew, who grew up and found me at a way-house at nine-and-thirty and said the thing he had come nine hundred miles to say, and to whom I was kind, and left.</p>
+<p>It is the coin that is warm and alive. I have taken it eleven times and I have paid every one of them back in a currency I could not refuse, at an hour I did not choose, and there is no court between here and the sea that will hear me complain of it.</p>
+<p>He warned me. He warned me in a tent in the grass at the top of his voice, and I wrote it in a margin, and I have quoted it in four countries to people who needed it, and I have never once managed to apply it to myself.</p>
+<p>That is the last lesson of the road and nobody gives it to you.</p>
+<p><strong>You can hold a true thing in your hand for twenty years, and copy it out fair, and teach it to strangers, and it will not save you from being the person you were at eleven, on a morning, with a folded page on your pillow.</strong></p>
+<hr class="scene-rule"/>
+<p>I lit the lanterns that night. It is the job of the youngest on the premises and I was twenty and there was a boy of nine in the kitchen, and I did it anyway, and Marwa let me.</p>
+<p>Then I went west in the morning, and the road went on, being nobody's, and being kept up by whoever is standing there.</p>
+<hr class="scene-rule"/>
+<h2>DOCUMENTS</h2>
+<p class="marginalia"><em>Papers, and one page you may have read before. The story is over.</em></p>
+<hr class="scene-rule"/>
+<h2>THE TWO INSTRUMENTS</h2>
+<p class="marginalia"><em>Both are at Khvarena, in the same wallet, in the order in which she found them. They are reproduced here in the short form. The seals are described because the order of the seals is the only proof of the hour.</em></p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><strong>The first.</strong></p><p>At the house upon the dry canal, in the quarter of the water-gate, in the city, on the fourth day of the Date-Moon, in the year two hundred and eight of the Seven Wells.</p><p>Conveyed of Amina al-Hawd, of the house aforesaid, to Rurik Dornvael of the Aeler, one female, Fhara by nation, of sixteen years or thereabout, house-trained, in good condition, and without mark.</p><p>The price, four hundred and eleven in Ecktorian silver, and a letter of credit upon the house of Yazid at Khvarena, received in full.</p><p>No warranty is given as to temper.</p><p><em>— A. al-Hawd, her hand and seal.</em></p></div>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><strong>The second.</strong></p><p>Know all men by this writing, that I, Rurik Dornvael of the Aeler, being of sound mind and my own master, do this day set free and discharge forever the woman conveyed to me this same day by the instrument of Amina al-Hawd; and I do renounce for myself, my heirs, my kin, my hold and all claiming under me, every right, claim, service, price and interest in her person, absolutely, and without condition, and without any reservation whatsoever.</p><p>She owes me nothing. She has never owed me anything. If any man shall hereafter produce a paper to the contrary, this is the later paper.</p><p>Done at the city, on the fourth day of the Date-Moon, in the year two hundred and eight of the Seven Wells, before two witnesses, in my own hand.</p><p><em>— R. Dornvael.</em></p></div>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>The witnesses are a porter and a seller of melons. Neither could write; both made their marks, and both marks are steady. The wax of the second seal is set into a smear of the first, which is how the order of the hours is known.</em></p>
+<p class="marginalia"><em>Note the last line of the second instrument. It is not a legal formula. It is not in any form-book in four countries; I have looked. He put it in because he expected, one day, a man with a paper — and because the woman who would have to face that man could not, on the day he wrote it, read a word of what he was giving her.</em></p>
+<hr class="scene-rule"/>
+<h2>A PAGE OF THE DIWĀN OF ROADS</h2>
+<p class="marginalia"><em>From the original, which is at Khvarena and is not lent. The printed text is the eightieth-year hand, anonymous, of the way-house that first bound it. The pencil in the outer margin is hers, and can be dated by the letters. The pencil in the gutter is his.</em></p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><strong>Of a well, and of three who come to it.</strong></p><p>If three come to a well and the water is not enough for three, divide it so: first to the dying, that he may not die at your well and put a price on your water forever; second to the beasts, for a man may walk and a beast may not; third to the thirsty, who is only thirsty, and who will remember you.</p><p><em>[in the margin, in pencil, a young hand:]</em> This is not charity, it is pricing. He is not dividing water. He is dividing what is said about him afterward, and he has ranked the three by how loud each will be. — S.</p><p><em>[in the gutter, in pencil, small and dry:]</em> Yes. Now the harder question. He has ranked them correctly and he is still right to do it. Why? — R.D.</p><p><em>[below, in the young hand, later, the pencil sharper:]</em> Because the dying man is also dying.</p></div>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>And one more page, which is reproduced because of what is not on it. It is folio two hundred and nine of the original, concerning the tolls of a Pereshi pass, and it is the only page in the book that carries a note of hers with no answer under it.</em></p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><em>[outer margin, in pencil, a seventeen-year-old hand, at the foot of the page:]</em></p><p><strong>What is it for?</strong></p><p><em>[the gutter: blank. The page is otherwise annotated in both hands throughout, above and below this point, and the pencil is the same pencil.]</em></p></div>
+<hr class="scene-rule"/>
+<h2>FOUR VERSES FROM THE MARGINS</h2>
+<p class="marginalia"><em>She never permitted these to be separated out and bound, and they are printed here against her wishes, which are thirty years old and were expressed rudely. They stand in the original among the water-rights, in pencil, in the same hand and often on the same page, which she held to be the point.</em></p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p><strong>Written at a pass, going down</strong></p><p>The well does not ask where the water goes.</p><p>The well asks only that you draw, and go.</p><p>I have drawn at seven wells and gone from seven.</p><p>Say it is the road. It is not the road.</p><p><strong>Written at the east depot, in the Marking-Moon</strong></p><p>She offered me a room above a yard,</p><p>a half of what she had, and both her hands.</p><p>I counted it, because I count. It came out fair.</p><p>I have never in my life been offered better,</p><p>and I priced it, and I left, and it was fair,</p><p>and I am the one who could not pay.</p><p><strong>Written for a man who listened while I read</strong></p><p>There was snow, and a wood-store, and a boy with his arms full,</p><p>and he did not put the wood down for a week.</p><p>O you who read this in a warm room:</p><p>the week before is the whole of the week.</p><p>I have spent my life inside that week.</p><p>I have never once come out the other side of it and stayed.</p><p><strong>Written at the Nine Lanterns, the fourteenth night</strong></p><p>He would not be looked at. He sat with the blind side in.</p><p>Four years of fires and I took it for a habit.</p><p>Now I sit where he sat, and turn the cup with two fingers,</p><p>and the yard fills up and laughs, and I am running it,</p><p>and I am not in it,</p><p>and the lanterns go out one at a time, the way they do.</p></div>
+<hr class="scene-rule"/>
+<h2>THE LEAF AT THE NINE LANTERNS</h2>
+<p><em>This is in the</em> Concordance<em>. It is the best-known page she ever wrote and the shortest. She set it down in the room at the north end, in the week she buried him, at twenty years old, in a register she had learned off a stolen book.</em></p>
+<hr class="scene-rule"/>
+<div class="panel panel-gold instrument"><p>They call the long road many names. In the north wind it is <em>Kon'reh</em>; in the delta tongue, a market slang; among the Kuvani it is <em>reshima kah mharga</em> — the Way of Silk — where bells and hooves make a single script upon the dust.</p><p>I am Fhara, daughter of inns and ink, and I have kept more ledgers than winters.</p><p>In the Ykrul lock-camps the ford-wardens taught me a mercy that counts: close a road and spare a village.</p><p>I have seen drovers humble dukes, and a prince offer gold to keep a sanctum empty. If the road has taught me anything, it is this: the world remembers routes, not rulers. Count the ways forward, not the men before you. The rest is boast and weather.</p><p><em>Set at the Nine Lanterns Way-House on the reshima kah mharga.</em></p><p><em>The twenty-ninth night of Shahr al-Hirr, Year 212 of the Seven Wells.</em></p></div>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>Daughter of inns and ink.</em></p>
+<p class="marginalia"><em>She had been in an inn eleven days. The ink is the only true word in the line, and she had it off her mother, at a low table, under a fig tree, at five years old.</em></p>
+<hr class="scene-rule"/>
+<h2>A NOTE ON THE TELLING</h2>
+<p><strong>Order.</strong> This stands apart from the three books of the Belworth and is thirty years earlier. Nothing in it requires them and nothing in them requires this, except that the <em>Concordance</em> those books quote is built in part on folios that first appear in Safiya's <em>Diwān</em>, often without naming her, and the Second Fenwood Corpus of 877 is the worst offender.</p>
+<p><strong>The calendar</strong> is the Seven Wells, which is lunar, which is why the seasons slide backward under the months. <em>The Three Reckonings</em> has the whole of it. The drift is not an error and she would have noticed it.</p>
+<p><strong>The three coins</strong> are the spine and will carry a campaign on their own: the coin that does not clink, the coin that is cold in a vault, and the coin that is warm and alive. Hand a player the third one and see what they do.</p>
+<p><strong>There is no reveal.</strong> She suspects both lies inside a fortnight, tests them for two years, never lands one, and gives up the hunt in the middle of her best trap because she looks across a fire and understands that being hunted is the happiest that old man has been in a decade. What the ending supplies is not the lies. It is the answer to the question she wrote in a margin at seventeen and he refused to answer, and the reader has been carrying that question since the Roof of the Way. A table running this should keep the mystery and refuse the trapdoor: everyone at the table may know he is lying from the second session.</p>
+<p><strong>The Five Daughters</strong> are in this book the way she found them: as five threads that every people has had to count, under local names, with no traffic between them that anybody can demonstrate. The Ecktorian names are in <em>The Five Daughters of Inaea</em> and a table using both should keep them out of her mouth, because she never heard them. She is fluent in three of the five and cannot do the other two, and the book is largely about the cost of that.</p>
+<p><strong>The two instruments</strong> are the handout. Give them out together, in the order she found them, and say nothing.</p>
+</body>
+</html>
