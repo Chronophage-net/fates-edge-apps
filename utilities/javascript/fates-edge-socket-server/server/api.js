@@ -1167,8 +1167,8 @@ function createApiRouter(appConfig) {
         try {
             const r = room.getRoom(req.params.code);
             const result = adventureRecovery.restore(r, req.body?.snapshot, { force: req.body?.force === true });
-            room.broadcastToRoom(r.room_id, 'adventure-updated', { source: 'recovery', ...adventure.getPublicState(r) });
-            room.broadcastToRoom(r.room_id, 'timers-updated', timers.getPublicState(r));
+            room.broadcastToRoom(r.room_id, 'adventure-state', { source: 'recovery', ...adventure.getPublicState(r) });
+            room.broadcastToRoom(r.room_id, 'adhoc-timer-state', timers.getPublicState(r));
             res.json(result);
         } catch (err) { res.status(err.status || 400).json({ ok: false, error: err.message }); }
     });
@@ -1915,7 +1915,7 @@ function createApiRouter(appConfig) {
             let data;
             try { data = await storage.loadAutoSave(r.room_id); }
             catch (err) {
-                if (!(err.code === 'ENOENT' || err.message.includes('not found'))) throw err;
+                if (!(err.code === 'ENOENT' || /not found|no auto-saved campaign found/i.test(err.message))) throw err;
                 // Read old slots once, then migrate to the stable room identity.
                 const legacyCode = r.legacy_code || r.code;
                 data = await storage.loadAutoSave(legacyCode);
@@ -1923,7 +1923,7 @@ function createApiRouter(appConfig) {
             }
             res.json(data);
         } catch (err) {
-            if (err.code === 'ENOENT' || err.message.includes('not found')) {
+            if (err.code === 'ENOENT' || /not found|no auto-saved campaign found/i.test(err.message)) {
                 return res.status(404).json({ error: 'No auto-saved campaign found' });
             }
             res.status(500).json({ error: err.message });

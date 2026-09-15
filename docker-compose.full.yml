@@ -195,10 +195,13 @@ services:
       # required for a single-instance demo to work, but wired up so
       # the demo actually exercises it end to end.
       - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=/app/persistence/campaigns.db
+      - ROOM_DIRECTORY_FILE=/app/persistence/room-directory.json
     volumes:
       - ./utilities/javascript/fates-edge-socket-server/data:/app/data
       - demo-server-logs:/app/logs
       - demo-server-modules:/app/modules
+      - demo-server-persistence:/app/persistence
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:${SERVER_PORT:-10000}/healthz', r => process.exit(r.statusCode === 200 ? 0 : 1))"]
@@ -292,3 +295,4 @@ volumes:
   demo-ollama-data:
   demo-server-logs:
   demo-server-modules:
+  demo-server-persistence:

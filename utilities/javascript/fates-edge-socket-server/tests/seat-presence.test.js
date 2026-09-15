@@ -116,3 +116,26 @@ test('an assistant GM may read a dossier but not direct the seat', () => {
   assert.ok(replies.some(m => /Only the GM can direct a player seat/.test(m.text || '')));
   assert.ok(replies.some(m => /^!gm player dossier/i.test(m.text || '')), 'the dossier request reaches the seat');
 });
+
+test('delegation briefs go only to one authenticated GM bot, with server-owned sender authority', () => {
+  const r = room.createRoom('DLG123');
+  const gm = { id: 'human', userId: '100', role: 'co-gm' };
+  r.clients.set(gm.id, gm);
+  r.clients.set('host', { id: 'host', botMode: 'gm', role: 'assistant-gm' });
+  r.clients.set('player', { id: 'player', userId: '200', role: 'player' });
+  const sent = []; const original = room.deliverWhisper;
+  room.deliverWhisper = (_id, _event, data, _sender, recipient) => { sent.push({ ...data.message, recipient }); return true; };
+  try {
+    const chat = { text: '!gm delegate start 200 "Secret brief"', senderUserId: 'spoofed', verifiedGM: false };
+    assert.equal(seats.isPrivateCommand(chat), true);
+    assert.equal(seats.privateCommand(r, gm, chat), true);
+    assert.equal(sent[0].recipient, 'host'); assert.equal(sent[0].senderUserId, '100');
+    assert.equal(sent[0].verifiedGM, true); assert.equal(sent[0].privateOnly, true);
+    sent.length = 0;
+    seats.privateCommand(r, r.clients.get('player'), { ...chat, verifiedGM: true });
+    assert.equal(sent[0].recipient, 'player'); assert.match(sent[0].text, /signed-in human GM/);
+    r.clients.delete('host'); sent.length = 0;
+    seats.privateCommand(r, gm, chat);
+    assert.equal(sent[0].recipient, 'human'); assert.match(sent[0].text, /No GM bot/);
+  } finally { room.deliverWhisper = original; room.rooms.delete(r.room_id); }
+});
