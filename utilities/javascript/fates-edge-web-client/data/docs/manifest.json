@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-16T00:30:37.256Z",
+  "generated": "2026-09-16T13:36:35.476Z",
   "documents": [
     {
       "id": "srd",
@@ -821,6 +821,16 @@
       "active": true
     },
     {
+      "id": "paget",
+      "title": "Paget",
+      "file": "Fates_-_Edge_-_-Paget.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "paper_import_reference",
       "title": "Paper Import Reference",
       "file": "Paper-Import-Reference.html",
@@ -1603,7 +1613,7 @@
       "active": true
     }
   ],
-  "total_count": 101,
-  "active_count": 101,
+  "total_count": 102,
+  "active_count": 102,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

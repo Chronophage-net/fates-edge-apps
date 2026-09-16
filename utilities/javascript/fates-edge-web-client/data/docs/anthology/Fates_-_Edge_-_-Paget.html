@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Paget — A Correspondence of the Belworth</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>Paget</h1>
+<h4>A Correspondence of the Belworth, in five breaths</h4>
+<hr class="scene-rule"/>
+<p><strong>A note on the sources.</strong> What follows is the Avimont file: forty-one letters and one folder, kept together, kept in order, and kept by the woman who had the most to lose by keeping them.</p>
+<p>That is the first fact about Jaennis Fenwood and it should be set down before anything else. She retained every letter the girl sent her. She also retained press-copies of her own, in her own hand, which no one required of her and which no prudent person in her position would have made. The correspondence could have hanged her in any court that would have heard it. She wrote it out twice.</p>
+<p>Thirteen of the forty-one are Vaelrie Longblood's. Twenty-six are Jaennis's. Two are neither. The last document in the folder is not a letter.</p>
+<p>The letters are given here in the order the folder gives them, which is the order they were written, because Jaennis numbered them on the reverse in a small clean hand as they came in and went out. Where a letter is undated in the original that is noted. Where a date was added later, in different ink, that is noted too, and the reader may make of it what the reader likes.</p>
+<p><strong>A note on the names.</strong> The girl was christened Vaelrie Longblood, third child and second daughter of Valdais Longblood, Duke of Adria, by his first wife Madilyn of Ethor, who died before the child was two. She had a brother, Ouen, who would have Adria, and a sister, Maegwen, married into the Ravynes; and the woman who raised her was not her mother. She signed herself <em>Vaelrie</em> to strangers and <em>Paget</em> to her father's household, which called her nothing else, because she was never anywhere but at his elbow. A paget is a boy who carries a man's things and stands where he can be seen from. Her father gave her the name when she was six and meant it kindly.</p>
+<p>It is worth saying plainly, once, at the start: she was at his side for ten years and she knew where he would be and when, not because anyone told her, but because she was there.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">BREATH ONE</span>The Condolence</h2>
+<hr class="scene-rule"/>
+<p>The first letter in the folder is an instrument of state and reads like one. It is in the girl's hand and it is not in the girl's voice. The substance was certainly given to her; the phrase <em>the loss the realm has sustained</em> appears in four other Adrian condolences of that autumn, three of them signed by men, and one of them by her brother.</p>
+<hr class="scene-rule"/>
+<p><strong>I. Vaelrie Longblood to Jaennis Fenwood. Undated; docketed on receipt, the eleventh of Octis, 840.</strong></p>
+<p>Madame,</p>
+<p>I am desired by my father the Duke to convey to you his sorrow at the death of your grandfather, the Duke of the Belworth, and to say that whatever has stood between our houses, he was a great man and the realm is poorer.</p>
+<p>I add my own sorrow at the loss the realm has sustained, and at your own loss, which must be heavier.</p>
+<p>I remain, madame, your servant,</p>
+<p>Vaelrie Longblood</p>
+<hr class="scene-rule"/>
+<p>Jaennis answered in nine days. Her reply is four times the length of what it answers and it does not mention the Duke of the Belworth once.</p>
+<hr class="scene-rule"/>
+<p><strong>II. Jaennis Fenwood to Vaelrie Longblood. The twentieth of Octis, 840, from Valvano House.</strong></p>
+<p>My dear Vaelrie,</p>
+<p>Thank you. I will not pretend that letter was your idea, and I hope you will not be offended that I could tell; you have a good hand and a terrible time keeping somebody else's sentences in it. <em>The loss the realm has sustained.</em> I have had eleven of those this month. Yours is the only one that was copied out by a person who was bored.</p>
+<p>So let me answer the letter you did not write.</p>
+<p>My grandfather was old and he had been dying for a year and I had said everything to him that I wished to say, twice, and the second time he was asleep. I am told that this is a mercy. It may be. What I notice is that everyone who tells me it is a mercy has something they would like me to do next, and that the mercy is generally a preface to the doing.</p>
+<p>You lost your mother before you could keep her, which I am told is easier and which I do not believe for a moment. Grief you can at least carry about with you. What you have got instead is a hole with a woman standing in it, and everyone you have ever met has assumed you are sad about a person you cannot remember, and nobody has ever asked you what you are actually short of.</p>
+<p>I am told that you are sixteen. I was married at sixteen. Nobody asked me anything that year either.</p>
+<p>Write to me if you like. If you do not like, do not; I am not going to be one of those women who collects girls the way other people collect saints' bones. But you may write to me about anything at all and it will not be shown to anybody, and I will answer honestly, which is a thing I can promise and mean, and which you will find is rarer than you have been led to expect.</p>
+<p>Yours,</p>
+<p>Jaennis Fenwood</p>
+<hr class="scene-rule"/>
+<p>The reader will want to slow down here, because everything that is going to happen over the next nine months happens in that letter in miniature, and it happens in the open.</p>
+<p>She identifies the girl's true condition in four lines and names it. She refuses the office the letter came in. She gives a private grief of her own, unasked, and gives it exactly — the walking into a room — which is the coin she will spend all year and never counterfeit. She establishes the promise on which the entire correspondence runs: <em>I will answer honestly.</em> She keeps that promise. She keeps it for nine months and forty-one letters and she never once breaks it, and the reader is asked to hold both of those facts at the same time for the rest of this book.</p>
+<p>And she offers nothing. <em>Write to me if you like.</em> She does not ask a single question.</p>
+<hr class="scene-rule"/>
+<p><strong>III. Vaelrie Longblood to Jaennis Fenwood. Undated; docketed the second of Nonis, 840.</strong></p>
+<p>Madame,</p>
+<p>I copied it out twice and the second time I did it worse on purpose, which I see now was childish and also did not work, since you noticed the first thing and not the second.</p>
+<p>I am not offended. I would rather be found out than be thought to write like that.</p>
+<p>You are right that nobody asks me anything. You are the first person who has ever put it that way and I have read that sentence eleven times.</p>
+<p>I will tell you what happens in this house. My father asks me things constantly, which is why I am hardly ever asked anything by anyone else, because it is understood that the Duke has his Paget and the Paget has no opinions of her own, only his, kept warm. My brother Ouen says this at table about twice a month and finds it funny every time.</p>
+<p>My sister Maegwen is married into the Ravynes and has a boy of three and writes to me at the New Year.</p>
+<p>My stepmother asks me whether I am warm enough.</p>
+<p>That is all. That is the whole of it. <em>Are you warm enough, Vaelrie.</em> In Kindling, in Haying, at a funeral. I have begun to think she does not know any other sentence to say to me, and I have begun to think that is not an accident, because a woman who says <em>are you warm enough</em> cannot be accused of anything.</p>
+<p>You will say I am unfair. Everyone says I am unfair about Taliya.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>IV. Jaennis Fenwood to Vaelrie Longblood. The eleventh of Nonis, 840.</strong></p>
+<p>Vaelrie,</p>
+<p>I will not say you are unfair. I do not know the woman and I have no view.</p>
+<p>What I will say is this, and I want you to sit with it rather than answer it quickly, because it is the only unkind thing I intend to write to you this year and I would rather do it early, when it costs us nothing:</p>
+<p>You are not wrong. That is the difficulty with you.</p>
+<p>If you were wrong about your stepmother it would be a simple matter — you would be a girl of sixteen with a grievance, and grievances at sixteen are like weather, and one waits. But you are not wrong. She does say only that. She does say it so that nothing can be laid against her. You have seen a true thing about a person and nobody in that house will ever agree with you out loud, and so you will go on seeing it, alone, for years, and it will make you very sharp and very tired.</p>
+<p>I know because I did it in a bigger house with worse people.</p>
+<p>There is no remedy. I would give you one if there were. What I can give you is that I believe you, and that from here on, when you tell me a thing you have noticed about a person, I will not tell you that you are imagining it. I may tell you that you are right and that it does not matter. I will never tell you that you did not see it.</p>
+<p>Now. You are permitted one letter a fortnight in which you are entirely unfair about anybody you like. Spend it well. I recommend the brother.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>V. Vaelrie Longblood to Jaennis Fenwood. Undated; docketed the nineteenth of Nonis, 840.</strong></p>
+<p>Madame,</p>
+<p>I read that letter five times and then I went and sat in the stable because I did not want anyone to see my face, and Kellen who has the grey asked me if I had been thrown and I said yes.</p>
+<p>Nobody has ever said <em>you are not wrong</em> to me. My father says <em>you are very like your mother</em>, which he means as the highest praise available to him and which is also a way of not answering.</p>
+<p>I will spend the fortnight on Ouen.</p>
+<p>Ouen is two-and-twenty and he is going to have Adria and he is frightened of it, and because he is frightened of it he has decided that the way to be a duke is to be certain about everything in a loud voice. He is certain about horses, about which he knows less than Kellen. He is certain about my father's campaign, about which he knows nothing at all, because he has not been asked to come. He is certain about me. He has a wife of nineteen who agrees with him at dinner and a son of two who does not yet, and I have watched him become steadily more certain since the boy was born.</p>
+<p>He came in three days ago while I was writing to you and he stood behind me and read over my shoulder and said, <em>writing to the poisoner</em>, and laughed, and went out.</p>
+<p>I did not answer him. I am telling you because you said you would answer honestly and I thought it would be cowardly to have that said about you behind you and not in front of you.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>VI. Jaennis Fenwood to Vaelrie Longblood. The twenty-eighth of Nonis, 840.</strong></p>
+<p>Vaelrie,</p>
+<p>Good. Now I will do the same for you, and then we need not come back to it.</p>
+<p>They say I killed my husband. Some of them say it to my face and more of them say it four feet behind me, which in a court is the same as to my face and is meant to be.</p>
+<p>I am not going to tell you whether I did.</p>
+<p>Read that again, because I have thought about how to write it for three days and there is no gentler shape for it. I am not going to tell you I did not do it. I am not going to tell you I did. If I denied it you would believe me, because you are sixteen and you like me, and then I would have had something from you that I got by telling you a thing you could not check. I have decided that I am not going to do that to you, not this year and not ever, and this is the first place where the decision costs me something, so this is where I make it.</p>
+<p>What I will tell you, because it is true and because you will not have heard anyone say it:</p>
+<p>I do not think about it as often as you would expect.</p>
+<p>He was sixty-six and I was twenty-two and he was not unkind to me. He was not anything to me. That is the part nobody has a word for. People can imagine a cruel old husband and they can imagine a dear old husband and they have no picture at all for a man who was perfectly civil to you for four years and never once asked you a question. When he died the court decided I must have felt something enormous, and set about deciding which enormous thing it was, and settled on guilt because guilt is the most entertaining.</p>
+<p>I felt the room get bigger. That is all I felt. I have never said that to anybody and I am aware of what it looks like written down.</p>
+<p>So. Your brother is not wrong either. Everybody in this book is going to turn out to be not wrong. You may tell him, if you want to, that I said he could call me what he likes, and that I would rather be called a poisoner by a man who says it to my face than a good woman by the ones who say it the other way.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>VII. Vaelrie Longblood to Jaennis Fenwood. The fourth of Decis, 840.</strong></p>
+<p>Jaennis,</p>
+<p>I am not going to tell him anything. I am going to keep it.</p>
+<p>I have read your letter more times than the last one. I keep stopping at <em>I felt the room get bigger</em>.</p>
+<p>May I tell you something and you will not laugh. When I was nine I went into the press-room at the end of the east passage, which was my mother's and which nobody uses, because Ouen had told me it was full of her things and that I was too small to be let in.</p>
+<p>It was empty. Not emptied recently; empty the way a room is that has been empty for years. Boards and hooks and a smell of nothing.</p>
+<p>And I stood there and waited to feel something, because I had been told all my life what I had lost and I thought that in the room I would finally get it. And what I felt was: <em>there is a great deal of space in here.</em> And then I thought, quite calmly, that this room would be a good place to read in.</p>
+<p>I have been ashamed of that for seven years.</p>
+<p>I am not ashamed of it tonight.</p>
+<p>Also I have begun dating my letters, because you said you kept them in order and I do not want to make work for you.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p>The third hand in the folder is the girl's own, and it appears at the bottom of this letter, and what it has written is: <em>begun dating my letters.</em></p>
+<p>It is worth pausing on. Jaennis had not asked her to. Jaennis had mentioned, once, in passing, in the middle of a warm paragraph about something else, that she kept them in order. The girl supplied the rest herself, out of consideration, at sixteen, and thereby turned a bundle of affectionate paper into a dated record of the movements of a household at war.</p>
+<p>Nobody made her do it. It is the single most consequential act in this book and it was a courtesy.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">BREATH TWO</span>How a Room Is Arranged</h2>
+<hr class="scene-rule"/>
+<p>Winter quarters. The Duke of Adria came back to Avimont in the second week of Decis and the household closed around him, and for four months the correspondence has almost nothing in it but a house.</p>
+<p>This is the part of the file that the Censor's Hall, when it finally read the thing in 847, skipped. There is a marginal note in the Hall's hand at the head of Letter XII which says <em>domestic — no matter here</em>. The Hall was looking for the crossing. It found the crossing. It did not understand that the crossing is in these letters and not in the later ones, and that by the time anybody writes down a date the work has been done for five months.</p>
+<hr class="scene-rule"/>
+<p><strong>VIII. Jaennis Fenwood to Vaelrie Longblood. The ninth of Decis, 840.</strong></p>
+<p>Vaelrie,</p>
+<p>You are not to be ashamed of the press-room. Put it down.</p>
+<p>Here is a thing I know how to do and almost nobody does, and I am going to teach it to you because you are going to need it and because it will amuse you.</p>
+<p>I know how to arrange a room.</p>
+<p>I do not mean that I know where to put a vase. I mean that I can walk into a strange room, move four things, and then know in advance where every person who comes in will sit, how long they will stay, and which of them will talk.</p>
+<p>It is all in the chairs and the light. A chair with its back to a door is never chosen; a chair with its back to a wall and a view of the door is chosen first, by the most frightened person in the room, who does not know that is why they chose it. Put the good light on one seat only and the person who wants to be looked at will take it and the person who does not will take the one across from it, and now they are facing each other and you have not said a word. Leave one chair slightly too far from the fire. Someone will move it closer. Whoever moves a chair in a room that is not theirs has decided to stay.</p>
+<p>The rest is smaller. Where the wine is. Whether there is something to do with the hands.</p>
+<p>You will think this is a parlour trick. It is not. It is the whole of my trade and it is the only power I have ever had, and I want you to notice that I am telling you exactly how it works. I could simply do it to you. I am telling you instead, because I would rather you could see it.</p>
+<p>Practise on your brother.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>IX. Vaelrie Longblood to Jaennis Fenwood. The seventeenth of Decis, 840.</strong></p>
+<p>Jaennis,</p>
+<p>I moved the chair.</p>
+<p>There is a room off the long gallery at Avimont where my father does business in the winter and where nobody sits by choice, and I went in before supper and I put the second chair out of the draught and turned it a hand's-breadth toward the window, and I took the candle-stand off the press and put it on the table on that side, and I did nothing else.</p>
+<p>My father came in with Sir Harlan Tasford and my father went to his own chair which is his own chair and always will be. Sir Harlan stood. Then he sat in the one I turned. Then — Jaennis — then he moved it closer to the fire, exactly as you said, and he stayed two hours, and afterwards my father said, <em>that went better than it has gone in a year</em>, and had no idea why, and I stood there with my face on like a plate.</p>
+<p>I have never in my life done a thing and had it work.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>X. Jaennis Fenwood to Vaelrie Longblood. The twenty-sixth of Decis, 840.</strong></p>
+<p>Vaelrie,</p>
+<p>That is the best letter I have ever had from anybody and I have had one from a king.</p>
+<p>Yes. That is how it feels. Do not get used to how it feels, because it does not stay that bright; but the first one is like that for everybody, and everybody remembers theirs.</p>
+<p>Now attend, because there is a second half to the lesson and it is the half that matters.</p>
+<p>It works on you too.</p>
+<p>Every room you have ever been in was arranged by somebody, usually badly and by accident, occasionally well and on purpose. Your stepmother's rooms — I would wager the good light in her parlour falls on the seat nearest the door, and that guests do not stay long, and that this is not carelessness. Your brother's rooms will have too many chairs, because a man who is frightened of a duchy over-provides.</p>
+<p>And this room. This letter. You are sitting somewhere reading it, and I arranged where you are sitting nine letters ago, and you will notice that you have not yet told me one single thing about where you actually are.</p>
+<p>I am not asking. I am pointing at it. You should know, always, and about everybody, and especially about me: <em>someone put that chair there.</em></p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p>There is no honest way to read that letter except as what it is. She tells the girl the method, demonstrates the method, and then identifies herself as the one using it, correctly, in the third month of a nine-month operation.</p>
+<p>So let the thing be stated once, plainly, because it is the whole mechanism and a reader who has it will see the rest of the book working:</p>
+<p><strong>Jaennis Fenwood never lied to Vaelrie Longblood, and never broke a promise she made her, and that is the trap.</strong></p>
+<p>Not a trap she set around the honesty. The honesty <em>is</em> the trap. A lie can be caught, and a girl who catches you in a lie stops writing; so a woman who intends to be believed for nine months cannot afford one. Every true thing she gave — the dead husband, the room getting bigger, the method of the chairs, her own name for what she was doing, and at the end the flat unadorned <em>yes</em> — bought her the next letter, and every one of them was genuine, and every one of them was also spent.</p>
+<p>There is a woman in another country and another book, a keeper of a training house at Ashaan, of whom it is recorded that she never broke one word she said, and that this was the point of her. The two women never met and would have understood each other in about four minutes.</p>
+<p>The cruelty of it is not that the girl was deceived. She was not deceived about anything. She was told the truth continuously by someone who wanted something from her, and there is no defence against that at any age, and there is certainly none at sixteen.</p>
+<hr class="scene-rule"/>
+<p><strong>XI. Vaelrie Longblood to Jaennis Fenwood. The third of Portium, 841.</strong></p>
+<p>Jaennis,</p>
+<p>I am in the window-seat of the north closet with a blanket, and there is one candle because the other one is for the corridor, and my feet are cold, and now you know.</p>
+<p>I thought about not telling you, to be clever. Then I thought that being clever at you is like being tall at a wall.</p>
+<p>New Year here is a great production. My father sang. He always sings on the Crest and he sings badly on purpose for the first verse so that everybody relaxes and then he stops doing it and the room goes quiet, and he has done this every year of my life and every year it works on a hundred people who have watched him do it before.</p>
+<p>He sang the Blackthorn one, which is fourteen verses and nobody wants fourteen verses, and he did nine of them and stopped in the middle of the ninth with his hand up and said <em>the rest is worse</em> and sat down, and they would not let him sit down.</p>
+<p>Taliya laughed. I want to record that she laughed, because I have been unfair about her for three letters and she did laugh, and she laughed at the right place, and I hated it.</p>
+<p>Are you warm enough, Jaennis? That is a joke. I am allowed one.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>XII. Jaennis Fenwood to Vaelrie Longblood. The twelfth of Portium, 841.</strong></p>
+<p>Vaelrie,</p>
+<p>One candle is a scandal. Write to me in daylight; you will ruin your eyes and then you will be a girl who squints, and a girl who squints is thought to be disapproving, and people will stop telling her things, and where would we be.</p>
+<p>I am warm enough. That was very good.</p>
+<p>Tell me about him.</p>
+<p>Not the Duke. I have had the Duke from twenty men and I could recite him: the pardon at Charau, the eleven days in Aberiel, the good Duke, the beloved Duke, he-would-have-made-a-king. I am sick of him and I have never met him.</p>
+<p>Tell me about your father. What he is like at breakfast. Whether he is bearable in the morning. What he does with his hands when he is thinking. Whether he is funny on purpose or by accident. Whether he has ever bored you.</p>
+<p>I ask for a selfish reason and I will give it to you: I have never in my life seen a man of that sort from underneath. I was married to one from outside, at a distance of four feet, for four years. You have had one from the inside since you were six. I would like to know what it looks like.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>XIII. Vaelrie Longblood to Jaennis Fenwood. The twenty-first of Portium, 841.</strong></p>
+<p>Jaennis,</p>
+<p>Nobody has ever asked me that.</p>
+<p>He is not bearable in the morning. He is worse than not bearable, he is <em>cheerful</em>, and he sings in the passage, and he has a thing he does where he comes in and says <em>well</em> in a certain way that means the whole day has already been decided and you are going to enjoy it.</p>
+<p>His hands. When he is thinking he turns his ring, the plain one, not the seal. When he is thinking about something bad he stops turning it and puts his hand flat on the table, and if you see the flat hand you should not speak.</p>
+<p>He is funny on purpose. That is the thing people get wrong about him. They think he is delightful the way weather is delightful. He is not; he builds them, he knows exactly which of two words is funnier, he waits. He got it from grandmother. When she is at her worst she says a thing so dry that half the table does not know they have been cut, and he does the same thing but then he makes it warm at the end so that the man he has just cut laughs hardest. Grandmother has never once made it warm at the end in her life.</p>
+<p>Has he bored me. — Yes. He can talk about the drainage at Roulen for an hour and he does not notice.</p>
+<p>There is another thing and I do not know how to write it so I am going to write it badly.</p>
+<p>There are a great many women. There have always been a great many women. There are four children in this duchy that everybody knows of and my father has never once denied a single one of them, which the household thinks is the honourable part and which I think is the easy part, because denying would have taken effort and he has never in his life had to work for anybody's good opinion.</p>
+<p>Taliya has never said one word about it. Not one, in thirteen years, and her grace about it is the most frightening thing in this house.</p>
+<p>And the reason I am telling you, which I have not told anybody: grandmother says he is his father's son and means it as an insult about the women, and everybody hears her mean it that way, and lets it go past, and I have sat at that table and watched what she is actually doing, which is saying the other thing out loud in a room full of people who cannot hear it.</p>
+<p>And he is a coward about one thing, which is that he cannot bear anybody to be unhappy in front of him. He will give a person anything to stop them being unhappy where he can see it. Everyone thinks that is his great kindness. It is, mostly. It is also how Taliya gets what she wants, which is by being unhappy where he can see it, which I have never once in my life been able to do.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>XIV. Jaennis Fenwood to Vaelrie Longblood. The first of Cinaria, 841.</strong></p>
+<p>Vaelrie,</p>
+<p class="marginalia"><em>He makes it warm at the end.</em></p>
+<p>Thank you. That is worth more to me than you will understand for some years, and I am not going to explain it, and you are not to ask, and that is the first time I have refused you anything, and I want you to notice that I did it plainly and did not dress it as something else.</p>
+<p>Now. Your last four letters have had eleven people in them and I do not know which of them are which. Kellen has the grey. Sir Harlan sits by the fire. Somebody called Doubt brings the post and I refuse to believe that is a real name.</p>
+<p>Do me a kindness. Give me the household, the way you would tell it to a friend, first names and all, so that when you mention them I can see them. I am at Valvano House with four women and a cat and my entire society is written down; let me borrow yours.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p>The request is made in the fifth month. It is made warmly, it is made after an intimacy rather than before one, and it is made for a stated reason which is true: Jaennis Fenwood was in effect confined at Valvano House through that winter and her society was in fact written down.</p>
+<p>What she received, over the following three letters, was a complete list of the Duke of Adria's personal household — riders, body-servants, the two men who slept across his door, his physician, his post-rider, the boy who did his boots — in a hand that loved most of them, with the first names, the nicknames, the marriages, the habits, and the small failings that make a person real. It runs to eleven pages.</p>
+<p>Vaelrie Longblood did not give her father's household to an enemy. She gave her friends to a friend, because the friend was lonely and asked to meet them.</p>
+<p>That is not an excuse and it is not offered as one. It is only what happened.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">BREATH THREE</span>The Marriage of Vaelrie Longblood</h2>
+<hr class="scene-rule"/>
+<p>In Cinaria of 841 the Duchess of Adria opened negotiations for her stepdaughter's marriage.</p>
+<p>The man was Corbin Woodgate, forty-one, of the Ethorian Longbloods, a widower with land on the right side of the river and a temper that appears in two separate depositions and in none of the marriage papers. The match was sound. It cost Adria nothing and bought it a bridge.</p>
+<p>Everything after this point in the file happens under that clock, and the reader should keep it in view. The girl is not fleeing a story about her feelings. She is being sold to a man of forty-one and there is no procedure anywhere in her world by which she may decline.</p>
+<hr class="scene-rule"/>
+<p><strong>XV. Vaelrie Longblood to Jaennis Fenwood. The ninth of Cinaria, 841.</strong></p>
+<p>Jaennis,</p>
+<p>Taliya has found a man for me. Corbin Woodgate. He is forty-one and I have met him twice and both times he corrected me about something I was right about.</p>
+<p>I am to be pleased. I am pleased. I said I was pleased at dinner in a voice that everyone at the table understood and nobody remarked on.</p>
+<p>I went to my father afterwards.</p>
+<p>I am going to write down what happened exactly, because I have been telling myself a kinder version all evening and I would like one true copy of it somewhere.</p>
+<p>He was in the winter room with the drainage papers. I said I did not want to marry Corbin Woodgate. He put the papers down straight away, which he always does, and he said, <em>tell me.</em> And I told him. And he listened to all of it without once looking away, which nobody else in that house does.</p>
+<p>And then he turned his ring and he said: <em>Paget, your stepmother has been at this for eight months and she has done it well, and I have said yes.</em></p>
+<p>And I said, then say no.</p>
+<p>And he said, <em>if I say no I will have to give her something bigger, and I have not got anything bigger this year.</em></p>
+<p>And then he saw my face and he could not bear it, and he got up and put his arm round me and said all the warm things, that it would not be this year, that Woodgate would be taught manners or taught something else, that nobody in this world would ever make me do anything while he was standing up.</p>
+<p>And I believed all of it, Jaennis, for about four minutes. And then I walked back down the gallery and I thought: he did not say no.</p>
+<p>He has never said no to me and he has never once said yes either. He says warm things. And everyone in Vhasia would tell you he is the kindest man alive and they would be right, and I have just found out what the kindness is for.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>XVI. Jaennis Fenwood to Vaelrie Longblood. The eighteenth of Cinaria, 841.</strong></p>
+<p>Vaelrie,</p>
+<p>I am going to be very careful with this letter.</p>
+<p>First: I am not going to tell you that your father is a bad man, because he is not, and because if I said it you would defend him, and you would be right to, and I would lose you. Watch me not do it.</p>
+<p>Second: what you have found out is true and it is not about you.</p>
+<p>A man who cannot bear unhappiness in front of him will always, always spend the person who does not make a scene. Not because he loves them less. Because they cost less. You are the cheapest thing in that house, Vaelrie, and you are the cheapest thing in it <em>because you love him best</em>, and there is no way to make that not true and no way to stop it except to become expensive, and I do not think you are able to.</p>
+<p>Third — and this is the part I would like you to read twice, and then burn, and I mean burn:</p>
+<p>He did not say no because there is nothing bigger this year. Next year there may be. That is not comfort. That is arithmetic, and it says that whether you marry Corbin Woodgate depends on how your father's spring goes.</p>
+<p>Sit with that and tell me I am wrong.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>XVII. Vaelrie Longblood to Jaennis Fenwood. The twenty-seventh of Cinaria, 841.</strong></p>
+<p>You are not wrong.</p>
+<p>I did not burn it.</p>
+<p>V.</p>
+<hr class="scene-rule"/>
+<p><strong>XVIII. Jaennis Fenwood to Vaelrie Longblood. The sixth of Verrus, 841.</strong></p>
+<p>Vaelrie,</p>
+<p>Burn it.</p>
+<p>And then write to me about something else for a fortnight, because you have had a bad month and I have nothing useful to give you and I am not going to sit in it with you for the pleasure of the company. That is a real thing people do and it is a kind of feeding.</p>
+<p>Tell me about the boys. You have never once described your half-brothers and I have begun to be curious about what a person leaves out.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>XIX. Vaelrie Longblood to Jaennis Fenwood. The fifteenth of Verrus, 841.</strong></p>
+<p>Jaennis,</p>
+<p>Braymond is thirteen and Cullan is nine and they are hers, and here is what I left out:</p>
+<p>She is a good mother to them.</p>
+<p>I have watched her do it for thirteen years, up close, from four feet away, in the same house. She is patient with Cullan, who is slow at his letters and frightened of it. She has never once made Braymond feel that being the second house's son is a smaller thing than being Ouen. When Braymond broke his arm she sat up with him and did not make a performance of sitting up with him, which I know because I was awake too and I was looking for the performance.</p>
+<p>Braymond is not petty either. That is the trouble with Braymond. He is easy and he is good with horses and he does not want anything from me, and he calls me Paget without meaning it the way Ouen means it, and last winter when I had the fever he sat in the passage outside my door for two nights because Taliya would not let him in and he would not go away.</p>
+<p>I would like very much to hate him.</p>
+<p>Cullan is nine and a lump and he likes me.</p>
+<p>So there it is. She is warm to her own and correct to me, and correct is not a thing anyone can be accused of, and I have been alive sixteen years and I have never once had a fair reason to complain about her out loud.</p>
+<p>There. That is what I left out.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>XX. Jaennis Fenwood to Vaelrie Longblood. The twenty-fourth of Verrus, 841.</strong></p>
+<p>Vaelrie,</p>
+<p>You left it out because you are honest and it did not fit.</p>
+<p>Keep doing that. It is going to be the most valuable thing about you and it is going to make your life harder in every particular.</p>
+<p>I am going to tell you something now that I have decided to tell you, which means I have thought about whether to and concluded that I should, which means you should take it as seriously as I have.</p>
+<p>There is a room here on the second floor at the back, over the yard, which was my sister-in-law's and has been empty three years. It has a window that faces east, so it gets the morning and not the afternoon, which most people think is the wrong way round and which is right for a person who reads. It has a small grate that draws well. There is nothing in it at present but a bed and a press.</p>
+<p>I have had a chair put in it by the window.</p>
+<p>I am not asking you for anything and you are not to answer this at all if it makes you uncomfortable; I will not raise it again and I will not be wounded. But the chair is there, and it has been there since the third of Cinaria, which if you count is the day after your letter about Woodgate, and I would rather you knew the date than thought I had done it on an impulse.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>XXI. Vaelrie Longblood to Jaennis Fenwood. The second of Floralis, 841.</strong></p>
+<p>Jaennis.</p>
+<p>I read that in the north closet in daylight, as instructed, and I could not get up afterwards for a while.</p>
+<p>I am not going to answer it. You said I did not have to. I am doing what you said.</p>
+<p>But I am going to tell you what I did instead, which is that I went and stood in the press-room where my mother's clothes were, which has been empty seven years and which I have not gone into since I was nine, and I stood there and thought about a room with a chair in it and a window that gets the morning.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>XXII. Jaennis Fenwood to Vaelrie Longblood. The eleventh of Floralis, 841.</strong></p>
+<p>My dear,</p>
+<p>Good girl.</p>
+<p>Now let us have an ordinary letter, because you have had enough of the other kind for one spring and so have I.</p>
+<p>The campaign begins again, I suppose, once the roads are fit. Everybody here talks of nothing else and everybody here is wrong about all of it, which I find restful. Is he taking you? He must be taking you; the Paget goes where the Duke goes, it is practically an office of state.</p>
+<p>Write to me from wherever he puts you and tell me what the bed is like and whether the food is terrible. I want to know the small things. Everyone will write the large ones down without any help from us.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p>And there it is, in an ordinary letter, in the middle of a warm paragraph, phrased as an affectionate joke about an office of state:</p>
+<p class="marginalia"><em>Is he taking you?</em></p>
+<p>She never asks it again. She does not have to. From this letter to the end of the file the girl volunteers her own position — where she is, what the house is like, how long they expect to stay — in every letter she writes, because she has been told that the small things are what her friend wants, and because it is the only subject in her life on which she has ever been treated as an authority.</p>
+<p>The Censor's Hall, reading this file six years later in search of a crime, wrote in the margin here: <em>no matter here.</em></p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">BREATH FOUR</span>A Morning When the House Is Empty</h2>
+<hr class="scene-rule"/>
+<p>The Duke of Adria left Avimont on the nineteenth of Floralis with the spring muster and went north-east by the roads he had used the year before. His daughter went with him as far as Sennet, a requisitioned grange four miles back from the water, which served as his house for five weeks.</p>
+<p>Nine letters were written from Sennet. They are the warmest in the file and they are the last happy ones.</p>
+<hr class="scene-rule"/>
+<p><strong>XXIII. Vaelrie Longblood to Jaennis Fenwood. The twenty-fourth of Floralis, 841, from Sennet.</strong></p>
+<p>Jaennis,</p>
+<p>The bed is a board with opinions and the food is not terrible, it is repetitive, which is worse, because terrible food is at least a subject.</p>
+<p>We are at a grange called Sennet which belonged to a man who is no longer here and whose dogs are. There are five rooms and my father has one and the rest of us are arranged like cutlery. I have a corner of the upper floor with a shutter that does not shut, and I have moved the table under the window and turned the chair a hand's-breadth, and Kellen came up to see if I wanted anything and sat down in it for an hour, so.</p>
+<p>He is happy. I want to put that down plainly because it is not a thing I get to write often. My father is happy here in a way he is never happy at Avimont. He is up before anyone, he knows the name of every man who brings him a thing, he is a completely different creature from the one who reads the drainage.</p>
+<p>Last night after the meal somebody asked him for the Blackthorn and he would not, and then somebody asked him whether it was true about his father, which is the sort of thing that only gets asked at the third jug, and the table went absolutely silent.</p>
+<p>And he said — without even stopping — <em>which one?</em></p>
+<p>And the whole room came apart. Men were crying with it. The man who asked was laughing hardest of anybody, which is the thing he does, the warm at the end.</p>
+<p>I laughed too and then I lay awake, because I have heard him do that four or five times in my life and it is always the same answer and it has never once been a joke about <em>him</em>. It is a joke about them. He has been handed that question since he was nineteen and he has never in his life given a straight answer to it and nobody has ever noticed, because they are too busy laughing.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>XXIV. Jaennis Fenwood to Vaelrie Longblood. The third of Maiora, 841.</strong></p>
+<p>Vaelrie,</p>
+<p class="marginalia"><em>Which one.</em></p>
+<p>Yes. I would have laughed as well.</p>
+<p>The shutter that does not shut will make you ill. Ask Kellen for a wedge and do not ask anybody else, because a girl who asks for a thing twice is thought to be difficult and a girl who asks the right man once is thought to be no trouble at all, and you want to be no trouble at all for the next month.</p>
+<p>Now I am going to write the letter I have been not writing since Cinaria, and I want you to read it all the way to the end before you feel anything about it.</p>
+<p>The Woodgate contract goes to the notaries in Solaris. I have this from my own people and it is good; I would not write it to you if it were not. Once it is engrossed it is an instrument, and an instrument is not a conversation, and your father will not break one, not because he does not love you but because a man who breaks an instrument in a bad year has nothing left to sell.</p>
+<p>So. There are four months.</p>
+<p>Here is what I can do, set out plainly, so that you may weigh it as a thing and not as a feeling:</p>
+<p>There is money. Not a great deal; enough, and it is mine and not the house's, and nobody audits it.</p>
+<p>There is a woman at Marcott called Delia Harrow who keeps a mercer's shop and who owes me something she cannot repay any other way. She will take a girl in, clothe her differently, and put her on a river boat as a passenger of her own family.</p>
+<p>There are papers, such as they are: a widow's licence in the name of Anne Corr, which is a real woman who died at Fairport in 837 and whose licence was never surrendered. It will not survive a serious examination. It does not have to; it has to survive a boat.</p>
+<p>There is this house, at the end of it, and the room over the yard, and the chair.</p>
+<p>And there is one difficulty, and it is the only one, and I want you to understand that I am giving you the whole of it and not a piece:</p>
+<p>It must be a morning when the house is empty.</p>
+<p>Not the night. A night departure is missed at dawn and you would have eight hours, and eight hours is not enough to reach Marcott. It must be a morning when the household is occupied with something larger than you, when the yard is full of men doing something that matters, when nobody will look for you until the evening meal and half of them will assume you are with the other half. That gives you a day and a night and you will be on the water before anybody says your name out loud.</p>
+<p>So the whole of it comes down to a question I cannot answer and you can:</p>
+<p>When is there a morning when the house is empty?</p>
+<p>Tell me which day and I will have Delia Harrow's cart at the Sennet crossroads at first light with a mercer's woman on the box who will not ask you anything.</p>
+<p>If there is no such morning, tell me that, and I will think of something else, and I will not think less of you.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p>There is no question in that letter about the Duke of Adria.</p>
+<p>There is no question about the muster, the crossing, the order of march, the bridging train, the condition of the water, or where he will sleep. There is no request for a movement, a strength, a date of departure or an objective. Every military fact in the file arrives in the next letter, unprompted, and arrives because the girl is explaining her own reasoning, at length, the way she has explained her reasoning to this woman for nine months and been praised for it.</p>
+<p>The Hall, in 847, took Letter XXIV to be the point at which the crime was committed. It is not. The crime, if it is one, is Letter XXII and the eleven pages of first names, and a chair put in a room on the third of Cinaria, and a girl at sixteen being told <em>you are not wrong</em> by the only person who ever said it.</p>
+<p>Letter XXIV is the collection.</p>
+<hr class="scene-rule"/>
+<p><strong>XXV. Vaelrie Longblood to Jaennis Fenwood. The fifth of Maiora, 841, from Sennet.</strong></p>
+<p>Jaennis,</p>
+<p>Yes. There is a morning.</p>
+<p>I have gone up and down it all night and I am going to set it out properly for you the way you do, so you can see that I have thought and not just jumped.</p>
+<p>The fifth of Lavius.</p>
+<p>I will tell you why it is that morning and not another one, because there is only one and you should know how narrow it is.</p>
+<p>He crosses at Kettling on the fifth. It is the low ford below Tarlington, the one with the gravel bar, and it is the only place he can put the carts over before the Fenwoods finish the works at Marcott, and he has been waiting on the water since we came here — Doubt rides down to look at the ford every second day and comes back and says a number and my father says <em>not yet</em> and puts his hand flat on the table. Yesterday Doubt said the number and my father did not say not yet. So it is the fifth, or the seventh at the very outside if it rains in the hills, and it will not rain, and everyone here is behaving as though it will not.</p>
+<p>Which means: he goes down on the fourth at dark with Harlan and Kellen and Aumery and the Falcott boy and Doubt and the whole of the household, because he will not send the household over without him and he never has. Sennet will have a cook, a man with a broken foot, and me.</p>
+<p>They will not look for me until the evening of the fifth at the earliest and probably not until the sixth, because he will be across and moving and there will be nobody left here who is responsible for knowing where I am. That is the day and a night you said you needed. I counted it five times.</p>
+<p>So: the Sennet crossroads, first light, the fifth of Lavius.</p>
+<p>I am frightened and I am not going to pretend I am not. But I wanted to tell you that I did the arithmetic myself and I did it right, because I have never been asked to do anything real in my life and this is the first thing and I did it properly.</p>
+<p>Also — I am going to say this once and then never again, because you told me not to answer the letter about the chair and I have not, for six weeks, and I am tired of not.</p>
+<p>I am not coming because of Corbin Woodgate.</p>
+<p>Vaelrie</p>
+<hr class="scene-rule"/>
+<p><strong>XXVI. Jaennis Fenwood to Vaelrie Longblood. The thirteenth of Maiora, 841.</strong></p>
+<p>My dear,</p>
+<p>The fifth of Lavius. The Sennet crossroads. First light. Delia's cart, a grey mare, a woman on the box in a brown cloak who will say <em>is it Anne</em> and nothing else at all.</p>
+<p>Bring: nothing you cannot carry in one hand, nothing with your arms on it, and the small things. Leave the rest. It is all replaceable and you are not.</p>
+<p>You did the arithmetic properly. I want you to hear that from me before anything else happens, because you will be told a great many things about yourself in the years to come and very few of them will be that.</p>
+<p>And my dear — I know why you are coming.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p>There are nine days between Letter XXVI and Letter XXVII and the file is empty across them.</p>
+<p>What happened in them is not in this correspondence and is very well attested elsewhere. Notice of the ford at Kettling, of the date, and of the fact that the whole of the Duke's household would be down with the carts, reached the Fenwood marshal at Tarlington on the nineteenth of Maiora. The works at Marcott, which were four days from finishing, were abandoned and the labour was moved that night. On the morning of the fifth of Lavius the Duke of Adria brought his carts down to the gravel bar at Kettling in a light mist and found the far bank held.</p>
+<p>He got across. He was always going to get across; he was a very good soldier and he had the numbers. The crossing cost him thirty-one men and four days, and among the thirty-one were Harlan Tasford, who liked a chair by the fire, and who was the father of the girl Ouen Longblood had married the year before; Aumery of Garyn; the younger Falcott, who was seventeen and did the Duke's boots; a post-rider whose name in the muster roll is Robert Dowt and who was called Doubt by everybody who ever spoke to him; and Kellen, who had the grey, and who had asked a girl a fortnight earlier whether she had been thrown.</p>
+<p>Five of the thirty-one are named in these letters. All five are named in the eleven pages.</p>
+<p>Vaelrie Longblood was on the river by then and knew none of it.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">BREATH FIVE</span>Close to My Heart</h2>
+<hr class="scene-rule"/>
+<p><strong>XXVII. Vaelrie Longblood to Jaennis Fenwood. The sixth of Lavius, 841, from the water below Marcott.</strong></p>
+<p>Jaennis,</p>
+<p>The woman said <em>is it Anne</em> and I said yes and that was all, exactly as you wrote, and I have been on this boat since noon and nobody has looked at me twice.</p>
+<p>I have been trying to decide what I feel and the honest answer is: nothing very much, and enormously. I keep putting my hand on the rail to check that it is there.</p>
+<p>There is a woman across from me with three children and the smallest one has decided about me, and has been asleep against my arm for two hours, and I have not moved my arm.</p>
+<p>I did it. I did the thing.</p>
+<p>Anne</p>
+<hr class="scene-rule"/>
+<p><strong>XXVIII. Vaelrie Longblood to Jaennis Fenwood. The eleventh of Lavius, 841, from Marcott.</strong></p>
+<p>Jaennis,</p>
+<p>There has been a fight at Kettling.</p>
+<p>Delia's boy came back with it this morning and I made him say it twice. He does not know much. He says the ford was held and that there were four days of it and that the Duke of Adria is across and alive.</p>
+<p>I have been sitting here since with my hands in my lap.</p>
+<p>I want you to tell me something and I want you to tell me it straight the way you always have. When I wrote you the fifth of Maiora and told you about the ford, did that go anywhere?</p>
+<p>I am not accusing you. I am asking you. You have never lied to me. You told me on the twenty-sixth of Decis to always know who put the chair there, and I have thought about that letter more than any other letter you have sent me, and I am asking.</p>
+<p>V.</p>
+<hr class="scene-rule"/>
+<p><strong>XXIX. Jaennis Fenwood to Vaelrie Longblood. The nineteenth of Lavius, 841.</strong></p>
+<p>Vaelrie,</p>
+<p>Yes.</p>
+<p>I sent it on the day I had it. It went to my uncle at Tarlington by my own rider and I wrote the covering note myself and I did not have to be persuaded and I did not hesitate.</p>
+<p>I am not going to tell you I agonised. I did not. I have had nine months to decide what I would do when this letter came and the one thing I settled early was that I would not perform a struggle I had not had.</p>
+<p>Now the rest of it, all of it, and then you may do whatever you like with me.</p>
+<p>I did not seduce you into it. I want that word out of the way because you will use it on yourself for years. I never asked you a single question about your father's army. Go back through the file — you have my letters, I have made sure you have my letters — and find me one. There is not one. I asked you about his hands and his singing and his household and what he was like in the morning, and every one of those was a true question that I wanted the answer to, and I have kept all of it, and I would keep all of it if none of the rest had ever happened.</p>
+<p>And I knew what it was worth. Both of those are true at once and neither cancels the other and you are going to have to learn to hold two true things at the same time, which is the actual lesson of your whole education and not the chairs.</p>
+<p>I told you what I was on the twenty-sixth of Decis. I told you as clearly as it can be told and I told you in the fourth month, when you could still have stopped, and I have thought since about why I did that and I do not entirely know. It was not kindness. It may have been vanity. I think I wanted one person alive who had seen me do it and stayed.</p>
+<p>I am not sorry. I want to be exact: I am sorry that Kellen is dead, and I am sorry about the post-rider whose name I now know, and I am sorriest of all that the list of the dead and the list in your eleven pages are the same list, because I could have burned those pages after I had read them and I did not, and there was no need to keep them, and keeping them was the only thing I did in nine months that was not necessary.</p>
+<p>I am not sorry that I did it. My house was three months from being finished. Your father would have had the valley by Reaping. I am a widow under suspicion of murder with no title, no lands and no protector, and I had one thing, and it came in the post from a girl who loved me, and I spent it.</p>
+<p>And now the part you have not asked and I am going to answer anyway, because you will not ask it and it is the only one that matters:</p>
+<p>The room is still there. The chair is still by the window. Nothing about it was ever pretence, and it was not payment, and if you burn this letter and go to Ethor and never speak to me again it will stay empty, because I put it there before I knew there would be anything to buy.</p>
+<p>Come, or do not come. If you come there is a place for you here as long as I have a house: close to my bosom, close to my heart, and I mean that in the plain way and in no other, and you will have the morning light and nothing will ever be asked of you again.</p>
+<p>If you do not come, Delia will see you to Ethor or to the sea, and the money is yours either way, and I will not write to you after this unless you write to me.</p>
+<p>You are not wrong. You have never once been wrong. That is still the difficulty with you.</p>
+<p>Jaennis</p>
+<hr class="scene-rule"/>
+<p><strong>XXX. Vaelrie Longblood to Jaennis Fenwood. Undated. Marcott.</strong></p>
+<p>I am coming.</p>
+<hr class="scene-rule"/>
+<p>That is the whole of Letter XXX. It is the thirtieth item in the folder and the shortest and it is on a torn half-sheet, and it is the last letter Vaelrie Longblood wrote to Jaennis Fenwood, because after it they lived in the same house.</p>
+<p>The remaining eleven documents are of other kinds.</p>
+<hr class="scene-rule"/>
+<p>The thirty-first is not from either of them.</p>
+<p>It came to Valvano House on the second of Solaris, 841, addressed to <em>Vaelrie Longblood, in the household of the Lady Jaennis Fenwood</em>, which means that it was written by a man who knew precisely where she was and had known for some time. It is in the Duke of Adria's own hand. It is the only thing in the file he ever wrote.</p>
+<p>It is given here entire.</p>
+<hr class="scene-rule"/>
+<p><strong>XXXI. Valdais Longblood, Duke of Adria, to Vaelrie Longblood. The twenty-sixth of Maiora — corrected in the same hand to the twenty-sixth of Lavius — 841.</strong></p>
+<p>Paget,</p>
+<p>The grey has a splint. Kellen would have said it was the near fore and he would have been wrong, as he always was about that animal and as he always would have gone on being; it is the off. She will be sound by Reaping and I am not going to sell her.</p>
+<p>I have got the Blackthorn wrong all these years. There are not fourteen verses. There are eleven, and the last three that everybody sings are a Fairport addition from about the time of the old Censor, and I have been told this by a man in a barn who did not know who I was and who was very patient with me. So I have been making a joke for twenty years about a thing that is not there. I thought you would want that.</p>
+<p>Cullan has learned to say <em>no</em>, which he says to everything, including things he wants. He is nine and this is late.</p>
+<p>Your grandmother writes that the weather at Ravier is filthy and that she is in excellent health, in that order.</p>
+<p>I hope you are eating. Write if you like.</p>
+<p>Your father</p>
+<hr class="scene-rule"/>
+<p>There is no accusation in it. There is no forgiveness in it. There is no mention of Kettling, of the ford, of the thirty-one, of the marriage contract with Corbin Woodgate — which was, in the event, never engrossed and was allowed to lapse in Septhis without a word said — or of the fact that his second daughter had been gone from his house for seven weeks and was living in the house of the woman whose uncle held the far bank.</p>
+<p>He corrected the date. He wrote Maiora and then went back and made it Lavius, which is what a man does when the whole of one month has gone past him without being counted.</p>
+<p>He mentions the horse of a dead man and does not mention the man.</p>
+<p>And he tells her about the Blackthorn: that the joke he has been making all her life was made about something that was not there, and that he has been wrong for twenty years, and that a stranger in a barn was very patient with him.</p>
+<p>He signs it <em>your father</em> and not <em>Valdais</em>, which is how he signed every letter he ever wrote to any of his children, and he asks her to write if she likes.</p>
+<p>She did not write. There is nothing from her in the file after Letter XXX.</p>
+<p>The Duke of Adria wrote to his daughter four more times in the following two years, and all four are in the folder, and all four are like this one, and none of them mentions any of it, and the last of them is about a dog.</p>
+<p>That is the punishment, and it should be set down as exactly as it can be, because it is the thing the whole book has been walking toward and it is easy to miss on a first reading:</p>
+<p>He never accused her. Therefore she could never be forgiven. A man who says <em>I know what you did and I forgive you</em> has given the other person a door; a man who says nothing at all, warmly, four times, over two years, and asks whether they are eating, has shut a door so quietly that they will spend the rest of their life listening for the latch.</p>
+<p>Whether he knew is not recorded anywhere and was never spoken of by anybody who would know. He was a very intelligent man and the arithmetic was not hard and there were three people alive who could have done it.</p>
+<p>But the file does not say, and no one now can say, and it is not the business of this edition to supply it.</p>
+<hr class="scene-rule"/>
+<p>The remaining documents are household papers.</p>
+<p>There is a note of the twenty-ninth of Lavius, 841, in the hand of a maid of the house, recording that a young lady arrived in the afternoon with one bag, was taken up by the back stair, and was shown the east room over the yard by Ylena of Coldmorrow, who carried the bag herself and would not give it up. Ylena of Coldmorrow was, at that date, a very young woman in Jaennis Fenwood's household of whom nothing else was known to anybody, and who had already been in it for four years.</p>
+<p>There is a physician's account for the winter of 841, which lists Vaelrie Longblood among the household under the name <em>Anne Corr</em> and then, from Kindling, under her own.</p>
+<p>There are seven quarterly notes of a private allowance, paid from Jaennis Fenwood's own money and not the house's, continuing without interruption until 849, which is as far as the folder goes.</p>
+<p>And the last document in the file is a joiner's bill.</p>
+<p>It is for one chair, a small elbow-chair with an ash frame, taken from the long store, re-seated in canvas and rush, and carried up to the east room over the yard.</p>
+<p>It is receipted and paid.</p>
+<p>It is dated the third of Cinaria, 841.</p>
+<hr class="scene-rule"/>
+<p>Every single thing she said was true.</p>
+<p>That is the whole of the Avimont file. Forty-one items. She kept them all, including the ones that could have hanged her, and she copied out her own, and she numbered them on the reverse in a small clean hand as they came in and went out, and when it was finished she put a joiner's bill at the bottom of the folder where nobody was ever going to look for it.</p>
+<p>What she wanted the bill to prove, and to whom, and whether the girl in the east room ever knew it was there, are questions the file raises and does not answer.</p>
+<p>It is the last exhibit in a nine-month proof that she never once lied, filed by the only person who needed the proof, where nobody would find it.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">CODA</span>A Note on the Reckoning</h2>
+<hr class="scene-rule"/>
+<p>Vaelrie Longblood lived in Jaennis Fenwood's house for the rest of the period covered by any record here. She did not marry. She kept the household books from 844 and kept them very well; four of her ledgers survive and they are the work of a person who counted five times.</p>
+<p>She was called Paget by nobody after 841, and she signed herself <em>V. Longblood</em>, plainly, in every hand she ever wrote again, including in the ledgers, where a clerk is not required to sign at all.</p>
+<p>Of the two questions this book is usually read for — whether the Duke of Adria knew, and who his father was — it answers neither, and the editor has resisted considerable pressure to make it appear to.</p>
+<p>On the second: the reader will have noticed that a great many people over a great many years asked Valdais Longblood whether it was true about his father, and that he had one answer, which he had built when he was nineteen and never improved, and which is the funniest thing in this file and the only thing in it he never once said twice about in two different ways. He was asked it at a table at Sennet by a man at the third jug, five weeks before Kettling, and the room came apart, and his daughter laughed with the rest of them and then lay awake.</p>
+<p class="marginalia"><em>Which one.</em></p>
+<p>That is all there is. Nine months, forty-one letters, thirty-one men at a gravel bar, a room over a yard, and a joke a man made for twenty years about three verses that were not there.</p>
+</body>
+</html>
