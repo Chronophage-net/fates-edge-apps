@@ -62,6 +62,12 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.10.5] - 2026-09-16
+
+### Chore
+- sync The Daughter of Ahakar and regenerate manifests
+- sync lockfile versions
+
 ## [5.10.4] - 2026-09-16
 
 ### Chore
