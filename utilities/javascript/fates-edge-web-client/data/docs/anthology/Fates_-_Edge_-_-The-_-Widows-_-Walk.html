@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Widow's Walk — A Tale of the Grain Covenant</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>The Widow's Walk</h1>
+<h4>A Tale of the Grain Covenant, told in five nights</h4>
+<hr class="scene-rule"/>
+<p><strong>A note on the sources.</strong> This is the telling of Obi Diallo, who had it of his mother, who had it of Sekou Diallo her uncle, who was a boy carrying water at the weigh-house at Mbaro in the year the barges did not move. Four tellings of it are written down. They do not agree. This is the longest and it is not the kindest, and it is the one in which the old woman is permitted to interrupt.</p>
+<p>Where she interrupts, it is set down. Where the teller refuses, that is set down too.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">NIGHT ONE</span>The Gift That Came Down With the Monsoon</h2>
+<hr class="scene-rule"/>
+<p>Sit. Sit, the fire is not for looking at.</p>
+<p>You have paid, Chidi Toure, and you will be praised, and the praise will be true, which is more than most men get for their money. Your grandfather's grandfather weighed grain honestly at the Mudflat station for thirty years and was never once written up, and a man whose people were never written up may sit closest to the fire on the first night. That is the whole of the praise. If you want more you may buy it from a worse man than me.</p>
+<p>Now.</p>
+<p>I am Obi Diallo. My mother was Nia Diallo who carried this word. Her uncle was Sekou Diallo who was a boy with a water-jar in the weigh-house at Mbaro in the year the barges did not move, and who saw two of the things in this tale with his own eyes and heard the rest from a woman who washed for the Corps.</p>
+<p>I say that first because you should know what you are buying. Two things seen. The rest carried.</p>
+<p>Hear me.</p>
+<hr class="scene-rule"/>
+<p>She came down with the monsoon.</p>
+<p>That is how they say it and it is true the way a proverb is true, which is to say it is short. She came down in the month the coffee goes east, on the fourth caravan, with forty mules and eleven drivers and her father's factor and her father's word.</p>
+<p>She came down with a scale in her baggage.</p>
+<p><em>That</em> is the part they leave out, and I will not leave it out, because the whole of what follows is in that box. A woman of eighteen, going to a husband she had never seen, in a country she had never walked, packed a merchant's balance with her own hands. Not her mother's beads. Not her grandmother's cloth, though she brought those also and they are in the inventory and you may go and read it.</p>
+<p>A balance. Brass. Taharkan pattern, with the long tongue.</p>
+<p>You do not pack a scale to go to a wedding. You pack a scale to go to <em>work</em>.</p>
+<hr class="scene-rule"/>
+<p>Her name was Zawadi, of the house of Gebre, and her father was Dawit Gebre whom they called the Monsoon-Watcher, who had four hundred mules and a share in nine ships and a way of speaking that made men feel they had thought of it themselves.</p>
+<p><em>Zawadi.</em> You know what it means. It means gift.</p>
+<p>I will say this once and then I will let it alone, because a teller who keeps poking the same place is a man with one tool: her father named her Gift when she was born and gave her as one when she was eighteen, and there is no evidence anywhere that he ever once noticed. He was not a cruel man. He was a trader. To a trader a gift is a thing you give in order to receive, and he received: a grain lane, a tariff remission, and the Salt Syndicate off his back for a generation.</p>
+<p>He got a very good price. Everybody says so. Even she said so.</p>
+<p>She said it with the flat voice of a woman reading out a figure that is correct.</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA</strong>, from the dark, where she sits every night: <em>He wept when she went.</em></p>
+<p>Obi Diallo: Mother of the fire, he may have wept.</p>
+<p class="marginalia"><em>He wept. My grandmother was in that house.</em></p>
+<p>He may have wept and it may have been a good price. Those are not two stories, mother. Those are one story, and it is the commonest story on this earth, and if we had to stop the telling every time a man wept over a thing he did anyway, we would be here until the rains.</p>
+<p class="marginalia"><em>Set it down that he wept.</em></p>
+<p>— It is set down.</p>
+<hr class="scene-rule"/>
+<p>Now, Taharka.</p>
+<p>You people of the flat country think the highlands are a place where it is cold and there are horses. That is not what the highlands are. The highlands are a place where <strong>the weather is a government</strong>.</p>
+<p>The monsoon comes up out of the sea and hits the ridge and it rains on one side and it does not rain on the other, and which side you were born on decided what your grandmother ate. Every Taharkan of any standing spends their life reading a sky that has already decided. They are not fatalists. They are the opposite. They are the most prepared people on this earth, because they know exactly how much of their life is not theirs, and they have spent four hundred years arranging the rest of it around that hole.</p>
+<p>A Taharkan trader's daughter is taught three things before she is taught to write.</p>
+<p>She is taught to read a sky. She is taught to read a road — which pass is open, which is closed, what a closed pass does to a price four hundred miles away. And she is taught to read a face across a table, because in the highlands the goods are far away and the man is in front of you, and you are not buying grain, you are buying <em>what he says about the grain</em>.</p>
+<p>Zawadi Gebre was very good at all three.</p>
+<p>Now put that woman on a barge in the canal country, where it rains when it rains, where the road is water, and where the man across the table is not permitted to lie to you because there is a book.</p>
+<p>You see the trouble already.</p>
+<hr class="scene-rule"/>
+<p>Mbaro.</p>
+<p>I must do Mbaro or the rest makes no sense, and I will be quick, and Chidi Toure has paid for a long night so do not sigh at me.</p>
+<p>Mbaro is a city built on the principle that hunger is the only thing a thousand tribes will agree about.</p>
+<p>Not famine. <strong>Control.</strong> Any fool can promise you food after the harvest. The Covenant promises you food <em>after the bad harvest</em>, and it does it by the simplest arrangement ever written and the hardest one to keep: you put in when you have, you take out when you have not, and the taking-out is not a favour and cannot be refused and does not have to be asked for twice.</p>
+<p>That is it. That is the whole thing. Hundreds of peoples, a thousand tongues, four wars with the marble country fought to a standstill — and underneath all of it, one sentence about a granary.</p>
+<p>In the middle of the city stands the Tower. You know it. You have seen its shadow on your own table at the third hour, wherever you keep your table, because that is the joke about the Granary Tower and it is not entirely a joke.</p>
+<p>And around the top of the Tower, under the overhang, there is a gallery. A walkway. Wide enough for two, with a rail, going all the way round, and from it you can see the bay and the canals and the barge-lanes and the roofs of the four great weigh-houses.</p>
+<p>The Holder of the Covenant walks it every morning at first light. Every morning. Since the beginning.</p>
+<p>Not to be seen. Not for ceremony.</p>
+<p>To <em>count the barges</em>.</p>
+<p>Because a Holder who can be told how many barges came in is a Holder who can be lied to, and a Holder who has counted them himself cannot. That is the Covenant in one habit, and it is worth more than the Tower it is built on.</p>
+<p>They call it the Walk.</p>
+<hr class="scene-rule"/>
+<p>The Holder in that year was <strong>Idriss Keita</strong>, and I am going to make you angry now, because I am going to tell you he was a good man, and you have all heard how this ends.</p>
+<p>He was a good man.</p>
+<p>Hear me. I am not a fool and neither was my mother's uncle. I know what the fourth night holds. I am telling you that on the first night, in the year she came down, Idriss Keita was the best Holder in nine generations and everybody in the confederacy knew it, including the people who later spat when they said his name, including her.</p>
+<p>He was forty-one. He had been Holder for eleven years. He had come up through the weigh-houses, which is not usual — Holders are generally made out of the great clans and educated to it — and he had done six years as a canal factor before that, standing in the mud, arguing about moisture content, and he never lost it. He could still put his hand in a sack to the wrist and tell you what it had been stored on.</p>
+<p>Three things about him, and then we will get to the wedding, mother, I see you.</p>
+<p><strong>He had no praise-name that he liked.</strong> They had tried several on him. <em>Keita of the Full Granary.</em> <em>The Fourth Wall.</em> He would not answer to any of them, and after a while people stopped, and his name stayed his name, which in a country of praise-names is itself a kind of praise and he knew it and that is why he did it.</p>
+<p><strong>He was famous for one act.</strong> In the ninth year of his holding, the Sow country south of the bay lost its harvest to a rot and asked for the take-out, and there was a question, because the Sow had put in short for three years running and the rules are the rules. He came down himself, with the Tally, and he stood in their weigh-house and read out their own three short years to their faces, aloud, so that nobody could say afterward that it had been hidden.</p>
+<p>And then he gave them the full take-out. Full. Not reduced.</p>
+<p>And then he wrote in the Tally, in his own hand, <em>given full, the shortfall of three years standing</em>, so that it would be in the book forever that they had been carried.</p>
+<p>That is the act everybody praises. And you should notice — because she noticed, on the second night, and it is why she came to love him — that it is two acts. The mercy and the record. He gave them everything and he wrote down that he had.</p>
+<p>He did not do that to shame them. He did it because a mercy that is not in the book is a mercy that can be denied later, by a worse man, in a worse year.</p>
+<p><strong>And the third thing.</strong> He did not want to marry her. Not for one hour. He had buried a wife at thirty and had not wanted another, and the Salt Syndicate and the whole eastern council had spent two years explaining to him what a Taharkan lane was worth, and he had agreed the way a man agrees to a tooth being pulled.</p>
+<p>So understand what walked into that room.</p>
+<p>A woman who had been given as a gift by a father who wept, and a man who had agreed to receive her the way you agree to a necessary injury.</p>
+<p>Both of them entirely certain the other was delighted.</p>
+<hr class="scene-rule"/>
+<p>They were married in the fourth week, in the Tower, under the Tally, which is how it is done.</p>
+<p>And I will tell you the truth about the wedding, which is that nobody remembers it, and the reason nobody remembers it is that nothing happened at it. Forty days of feasting is what the song says. It was nine days and it rained for three of them.</p>
+<p>What everybody remembers is the morning after.</p>
+<hr class="scene-rule"/>
+<p>She came up to the gallery at first light.</p>
+<p>He was already there. He was always already there; he had walked it eleven years in every weather and the men at the weigh-houses set their own morning by the moment his shape went past the eastern rail.</p>
+<p>She came up the stair in a plain wrap with her hair tied like a woman going to work, and she stood at the rail beside him, and neither of them said good morning, because neither of them had decided to be pleasant yet.</p>
+<p>He counted. She let him count.</p>
+<p>Then she said: "Forty-one."</p>
+<p>He did not turn his head. He said, "Thirty-nine."</p>
+<p>"Forty-one," she said. "Two came in behind the reed spit while you were looking at the western lane. They are low in the water and they are not ours."</p>
+<p>Silence on that gallery for a while.</p>
+<p>Then Idriss Keita said — and my mother's uncle had this from a woman who had it from the man who carried the Holder's water, so weigh it as you like — he said:</p>
+<p>"Show me."</p>
+<p>And she showed him. She put her hand on the rail and walked him along the eastern arc and showed him the reed spit and the shadow under it and the two hulls, and explained, in the flat voice of a woman reading out a correct figure, that in her father's country you learn to count what is behind a ridge because everything of value in the highlands is behind a ridge.</p>
+<p>And he looked for a long time.</p>
+<p>And then he said the worst possible thing he could have said, and he said it with pleasure, because he was a weigh-house man and he had been handed a true thing:</p>
+<p>"Then I have been walking this gallery for eleven years standing in the wrong place."</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>This is where you make them fall in love. Everyone makes them fall in love here.</em></p>
+<p>Obi Diallo: I am not making them fall in love, mother.</p>
+<p class="marginalia"><em>You are. The scale and the two barges and the man saying show me. I have heard it forty times.</em></p>
+<p>Obi Diallo: They detested each other for two more years.</p>
+<p class="marginalia"><em>Good.</em></p>
+<p>Obi Diallo: She thought he was a peasant with a book who had been handed a country he was not equal to, and who hid behind the Tally the way a small man hides behind a big brother. She said so. It is written down; she said it to her father's factor in a letter and the factor was a gossip and the letter went east.</p>
+<p class="marginalia"><em>Good. Say the rest.</em></p>
+<p>Obi Diallo: And he thought she was a merchant's daughter who had been taught that everything on this earth is a price, and who would find out, the first bad year, that a confederacy is not a trade.</p>
+<p class="marginalia"><em>Say the rest, Obi Diallo.</em></p>
+<p>Obi Diallo: ...And they were both correct, mother. That is the rest. Each of them had the other exactly right, and two years later each of them was wrong about it, and <em>neither of them ever changed</em>.</p>
+<p>That is the thing about that marriage and I will say it once. They did not become different people. They stopped being wrong about the same two facts.</p>
+<hr class="scene-rule"/>
+<p>Now I will tell you what the Corps is, and then you may go to your beds, and on the second night we will do the year the rot came up the bay.</p>
+<p>The Vermilion Corps is not an army. Put that out of your head. Oshiira has armies, and they are somebody else's business, and they have never in four wars decided anything.</p>
+<p>The Corps is two thousand people in red, and what they guard is <strong>the book</strong>.</p>
+<p>Not the grain. Anyone can guard grain; you put a wall round it and men on the wall. The Corps guards the <em>tally</em> — the weighing, the entering, the copying, the carrying, the keeping. A warden stands in the weigh-house and watches a scale. A warden rides the barge with the sack. A warden sits in the room while the clerk copies the day's figures, and a second warden, who does not know the first, reads the copy in a different room that evening.</p>
+<p>They are not cruel. You must understand this or the fifth night will make no sense to you. In my whole life I have never heard of a Vermilion warden beating a man. They do not need to and it would spoil the instrument.</p>
+<p>They are <em>thorough</em>. They are the most thorough people in the world, and they have been thorough for four hundred years without a break, and the entire confederacy — a thousand tribes who agree about nothing — has agreed to be watched by them, forever, because the alternative is a grain book that can be edited and a promise that can be broken in a bad year by whoever is strongest that season.</p>
+<p>They keep vigil without cruelty. That is their own phrase and they are proud of it and it is true.</p>
+<p>And here is what I want in your heads when you lie down tonight, because it is the hinge of everything and I will not say it again on the fourth night when you would rather I did:</p>
+<p>The Corps does not serve the Holder.</p>
+<p>The Corps serves the Covenant.</p>
+<p>Those have been the same thing for four hundred years. Everybody says them in the same breath. In four hundred years nobody has had to find out what happens when they come apart.</p>
+<hr class="scene-rule"/>
+<p>Sleep. Come back tomorrow. Bring your own fire-wood; Chidi Toure has paid for the telling, not for the burning.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">NIGHT TWO</span>The Year the Rot Came Up the Bay</h2>
+<hr class="scene-rule"/>
+<p>You came back. Good. Sit where you sat; a fire remembers where people sat and it is bad luck to teach it otherwise.</p>
+<p>Last night I left them on a gallery being correct at each other. Two years passed. I am going to spend them in four breaths, because a teller who gives you every year gives you no years.</p>
+<p><strong>The first year</strong> she learned the canals and he let her, because he could not think of a reason to stop her and because a man who has agreed to a tooth being pulled does not then take an interest in the tooth.</p>
+<p><strong>The second year</strong> she began to be seen in the weigh-houses. Not sent. <em>Seen.</em> Standing at the back with her arms folded while a factor argued moisture content, saying nothing, and then one question at the end, and the question was always the one nobody had asked.</p>
+<p>The weigh-house men gave her a name in the second year and it is the first name she ever earned in that country. They called her <strong>Bibi of the Two Barges</strong>, and they meant it half as a joke and half as a warning to each other, which is the only honest kind of praise-name there is.</p>
+<p>One scene out of those two years, so that you do not think I am hurrying past them because there was nothing in them.</p>
+<p>In the second year there was a dispute at the Toure weigh-house about damp millet — a factor had taken in a barge at a moisture the scale-master would not sign, and the factor was a large man in the eastern lane and the scale-master was twenty-four.</p>
+<p>The Holder came down himself, because he always came down himself, and the whole eastern lane came to watch a big man be reduced.</p>
+<p>And Idriss Keita heard it out, and looked at the sacks, and put his hand in one to the wrist, and then he did not reduce anybody. He signed it at a lower grade, wrote the grade in the Tally, wrote the factor's name beside it, and said that the barge would be re-weighed at Mudflat at the factor's own cost, and went home.</p>
+<p>Merciful. Recorded. Exactly the man.</p>
+<p>And she went after him into the passage and said — in front of two clerks, which is the part everybody remembers — <em>"You have taught four hundred men in that room that a large man gets a lower grade and a small one gets a refusal."</em></p>
+<p>And he said: "I have taught them that the grade is written down."</p>
+<p>And she said: "You have taught them that <strong>you</strong> are written down. There is no rule in that room. There is only you, and your hand, and your excellent memory, and when you are dead there will be a man in your chair who is not excellent, and the room will have forty years of your judgements and no rule at all."</p>
+<p>And he said, very coldly, that the Covenant had held for four hundred years on the judgement of Holders.</p>
+<p>And she said that her father had held a house for forty years on his own judgement, and that when he died it would go to her brother, and that she had spent her whole childhood watching a great trading house arrange itself entirely around the contents of one man's head, and that she could tell him exactly what such a house is worth on the day the head stops.</p>
+<p>And then she said the thing that was unforgivable, which is that she said: <em>"You are not building a covenant. You are being one."</em></p>
+<hr class="scene-rule"/>
+<p>He did not speak to her for nine weeks.</p>
+<p>And in the ninth week he brought in the grading schedule — fixed bands, published, applied by the scale-master without reference upward, appealable only to the Corps — which is the schedule every one of you has weighed grain under your whole life, and which is called the Keita bands, and which was her argument given back to her with his name on it and not one word of acknowledgement anywhere.</p>
+<p>She was furious for a year.</p>
+<p><strong>FATOU KAMARA:</strong> <em>She was not. She was pleased.</em></p>
+<p>Obi Diallo: She was furious <em>and</em> pleased, mother, which is the condition of every clever woman who has ever been right in front of a proud man. You have been in it yourself and so have I.</p>
+<hr class="scene-rule"/>
+<p><strong>And in the third year the rot came up the bay.</strong></p>
+<hr class="scene-rule"/>
+<p>I want you to understand the rot, because you were all raised on the songs and the songs make it a monster.</p>
+<p>It was not a monster. It was a wet season and a fungus and a bad three weeks, and it went through the low country along the bay — the Sow lands again, and the Diallo flats, which is my own people, and I will not pretend to you that I tell this part from a great height.</p>
+<p>It took the standing crop in nine districts.</p>
+<p>Now. That is not a catastrophe. Hear me — that is <em>not a catastrophe</em>, and if you think it is then you have never understood what you live inside. Nine districts is what the Covenant is <em>for</em>. The granaries were full. The Tally was clean. The take-out was owed, the take-out was available, and Idriss Keita had the barges moving within four days, which is fast, and nobody praised him for it because that is the job.</p>
+<p>The catastrophe was the road.</p>
+<hr class="scene-rule"/>
+<p>Here is what happened, and it is arithmetic, and I am sorry, and it is also the whole of the tale so you will sit still for it.</p>
+<p>Grain moves out of the great granaries by canal. The canals go where the canals go. To reach the nine districts, the take-out had to come down the eastern lane and then transfer to mule at Mudflat, because the last forty miles are mud in a wet season and always have been.</p>
+<p>Forty miles of mule.</p>
+<p>And the mules were not there.</p>
+<p>Not stolen. Not withheld. Nobody's fault, and this is the part that makes people angry, because we all want it to have been somebody's fault. The eastern mule-trains had been contracted three months earlier — before anyone knew — for the coffee lift, because the coffee comes down out of Taharka in that month and it always has, and a mule that is under the coffee is not under the millet.</p>
+<p>Four hundred mules in the wrong valley, under a legal contract, for a good reason.</p>
+<p>And in the weigh-house at Mudflat they stood and looked at each other and did the sum, and the sum said: nine districts, eleven days, and grain in a tower a hundred and forty miles away that might as well have been in the moon.</p>
+<hr class="scene-rule"/>
+<p>They brought it to the Tower on the third evening.</p>
+<p>Every senior factor in the eastern lane in one room, and the Holder, and the Corps, and a map, and eleven days.</p>
+<p>And they did what men in a room always do, which is that they began to be excellent at the wrong question. How many mules can be bought. How many can be seized — and there was a lawyer for that, there is always a lawyer for that. Whether the contract could be broken and what it would cost and who would be owed.</p>
+<p>Three hours. Three hours on <em>how to get four hundred mules</em>.</p>
+<p>And Zawadi Gebre, who was not on the council and had not been asked and was standing at the back with her arms folded, said the thing she always said, which was the one question nobody had asked.</p>
+<p>She said: "Whose coffee is it?"</p>
+<hr class="scene-rule"/>
+<p>Silence in the room.</p>
+<p>Because the answer, which everybody knew and nobody had been holding in the same hand as the problem, was: it is Taharkan coffee, contracted by four Taharkan houses, of which one is the house of Gebre, and it is going east to Ashaan and to the Brass Coast, and it is going there because that is where it goes, and nobody in that room had thought about the coffee at all except as a thing occupying mules.</p>
+<p>And she said — and she said it in the flat voice, and my mother's uncle was in the passage with a water-jar and heard it through the door, and this is one of the two things he saw or heard with his own body, so mark it —</p>
+<p>She said: "You are trying to move the mules. Move the coffee."</p>
+<hr class="scene-rule"/>
+<p>Hear it.</p>
+<p>The coffee does not have to be in Ashaan in eleven days. The coffee does not have to be anywhere in eleven days; coffee keeps, coffee is <em>not hungry</em>. The coffee has to be east before the rains close the high pass, which is a different date and it is thirty-one days away.</p>
+<p>Unload the coffee at Mudflat. Put it under the reed awnings, under Covenant seal, with a Vermilion warden on it, which means it cannot be touched and every house in Taharka knows it cannot be touched. Free four hundred mules in one afternoon. Run the millet. Then re-load the coffee and run it east on the same mules with nine days to spare.</p>
+<p>The cost is a transfer, a storage, an insurance, and thirty days of four Taharkan houses being furious.</p>
+<p>And the reason nobody in that room could see it — and I want you to be gentle about this, because they were not stupid men — is that they were all Oshiiran, and an Oshiiran looks at a lane and sees <em>what is moving on it</em>, and a Taharkan looks at a lane and sees <em>what has to be somewhere by when</em>.</p>
+<p>She had been reading roads and skies since she was seven. She knew, to the day, when the high pass closes. Nobody in that room knew it to the month.</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>And they did it.</em></p>
+<p>Obi Diallo: They did it.</p>
+<p class="marginalia"><em>And her own father's coffee sat in the mud at Mudflat for thirty days.</em></p>
+<p>Obi Diallo: It did.</p>
+<p class="marginalia"><em>Say what it cost her.</em></p>
+<p>Obi Diallo: ...It cost her Taharka, mother. She was never welcome in her father's house again. Not cast out — nothing so clean. Just never <em>sent for</em>. Four houses lost a season's interest and the house of Gebre was the one that had put a daughter in Mbaro and the daughter had unloaded them into the mud, and after that her father's letters came twice a year and were about the weather.</p>
+<p class="marginalia"><em>Say the other thing.</em></p>
+<p>Obi Diallo: She never mentioned it. Not once, in the rest of her life, in any account we have. She did not say it in the room and she did not say it after. Her father's name does not appear in her own hand again anywhere.</p>
+<p class="marginalia"><em>Now you may have your love story.</em></p>
+<hr class="scene-rule"/>
+<p>He found her on the gallery that night.</p>
+<p>Not at first light. At the dead hour, the third watch, when there is nobody on the canals and the Tower is the only lit thing in Mbaro.</p>
+<p>She was at the eastern rail, in the place she had shown him two years before, looking at nothing, because there was nothing to look at.</p>
+<p>And he stood a little way off and he said: "Your father's houses will make you pay for that."</p>
+<p>And she said: "Yes."</p>
+<p>And he said: "Did you know that when you said it?"</p>
+<p>And she said: "I knew it before I said it. I did the sum in the passage. I stood in the passage for a while."</p>
+<hr class="scene-rule"/>
+<p>Now.</p>
+<p>Here is the moment, and I am going to do it slowly, because every teller before me has done it fast and made it a sweetness, and it is not a sweetness.</p>
+<p>Idriss Keita did not thank her.</p>
+<p>He did not praise her, he did not touch her, he did not say any of the eleven things a man says. He stood at the rail in the dark for a long time.</p>
+<p>And then he went and got the Tally.</p>
+<p>He went down the stair himself at the third watch and came back with the day's leaf and a lamp and a reed pen, and he set it on the rail in front of her, and he wrote — in his own hand, in the book, where it is forever and where every warden and factor and clerk in the confederacy would read it within a season:</p>
+<div class="panel panel-gold instrument"><p><em>The lane was opened on the counsel of Zawadi of Gebre, who saw it when the council did not, and who bore the cost of it in her own house. Written so that it is not forgotten.</em></p></div>
+<p>And then he gave her the pen and said, "Put your mark on it, so that it is not me saying it."</p>
+<hr class="scene-rule"/>
+<p>That is what she fell in love with.</p>
+<p>Not the man. The <strong>instrument</strong>. A country where a thing you did in a passage at the back of a room gets written into the book that outlives everybody, by a man who could as easily have taken the counsel and the credit and been praised in nine districts for it, and who instead went down a stair at the third watch to get a pen.</p>
+<p>She said, much later, to the only person she ever said anything to — and I will get to that woman on the fourth night, and no, mother, I know you know, let them hear it in its place —</p>
+<p>She said: <em>I had spent my whole life among people who kept their word. I had never before lived in a place where the word was kept for you when you were not in the room.</em></p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>And him? What did he fall in love with?</em></p>
+<p>Obi Diallo: Mother, I do not know.</p>
+<p class="marginalia"><em>You always say that here.</em></p>
+<p>Obi Diallo: I always say it here because it is always true here. We have her word for what she loved, in a letter, in her own hand. We have nothing from him. Nothing. The man wrote four thousand pages in his life and every one of them is about grain.</p>
+<p class="marginalia"><em>Then guess. You are a Diallo. Guess.</em></p>
+<p>Obi Diallo: ...I think he had been Holder for thirteen years and in thirteen years nobody had ever told him he was standing in the wrong place.</p>
+<p>I think that is all it was. I think he was a man who had been agreed with, respectfully, by excellent people, every day, for thirteen years, and that it had been slowly killing something in him that he did not have a name for. And then a foreign woman with a brass scale said <em>thirty-nine is wrong</em> on a cold gallery and did not apologise for it.</p>
+<p>I think he loved her the way a man loves the first true weight after a year of bad scales.</p>
+<p>I do not know. Write it down that I do not know.</p>
+<hr class="scene-rule"/>
+<p>Four years after that, and I will close the night on this.</p>
+<p>They were not a soft couple. I have heard tellings where they are soft and I do not believe those tellings. They argued in front of councils, which scandalised everybody. She kept her own factor and her own accounts and her own name, and signed as <em>Zawadi of Gebre</em> until the day she died, and never once as Keita.</p>
+<p>But this is in the household roll, and my mother's uncle saw it twice with his own eyes, and it is the second of the two things he saw:</p>
+<p><strong>She began walking the gallery with him.</strong></p>
+<p>Every morning. First light. Two shapes going past the eastern rail instead of one, and the weigh-house men set their morning by the pair of them for nine years.</p>
+<p>He counted the western lane. She counted the east, because of the reed spit, because he could not see behind it and she could.</p>
+<p>Nine years of two people counting barges in the dark.</p>
+<p>And on the fourth night I will tell you what she saw from the eastern rail in the tenth year, and you will wish I had stopped here.</p>
+<hr class="scene-rule"/>
+<p>Go. Come back.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">NIGHT THREE</span>The Iron Country</h2>
+<hr class="scene-rule"/>
+<p>The mountain people came in the tenth year.</p>
+<p>Now, you have all seen an Aeler. You have seen the factors at the Brass Gate and the ones who buy the low-grade millet for their under-farms, and you think you know what they are.</p>
+<p>You do not. Those are their <em>traders</em>. What came down to Mbaro in the tenth year was a <strong>True Mason</strong>, and a True Mason is a different animal, and I will tell you the one thing about them that matters for this tale.</p>
+<p>They do not lie. Ever. Not as a virtue — as a <em>method</em>.</p>
+<p>An Aeler hold runs on a rule that a child down there has before it has letters: <strong>every square pays, or it closes.</strong> Every chamber, every gallery, every arrangement, must show a return or be sealed and abandoned. They have been doing this for so long that they have become the most honest people on this earth, because in a world where every square must pay, a lie is a square that pays once and then closes, and they have the arithmetic to prove it.</p>
+<p>So they do not deceive you.</p>
+<p>They tell you the whole truth about a thing, at length, with the figures, and then they let you walk into it.</p>
+<p>And that is far worse, and you will see why.</p>
+<hr class="scene-rule"/>
+<p>He was called <strong>Orthen Aezenbron</strong>, and he came up out of the bay on an Ecktorian coaster with nine chests and a slate, and he was in Mbaro for four months and not one person ever caught him in an untruth, and when he left there were people weeping on the quay.</p>
+<p>What he offered was this. I will give it to you plainly because he gave it to them plainly.</p>
+<p><strong>The Aeler would cut the canals.</strong></p>
+<p>You are laughing. Do not laugh. The Aeler have been cutting rock for two thousand years and the thing that stops Oshiiran grain is not rock, it is <em>water and mud</em>, and the Aeler build locks. Locks, and a cut through the high bar at Mudflat, and an under-passage at the Sow neck, and stone banks on the eastern lane so that it does not silt every third year.</p>
+<p>Do you understand what that is? Forty miles of mule becomes eleven miles of barge. The eastern lane runs in the wet season. The transfer at Mudflat — the transfer that nearly killed nine districts in the year of the rot, the transfer that cost Zawadi Gebre her father — <em>does not happen any more</em>, because there is a cut.</p>
+<p>It would take thirty years. It would outlive everybody in the room.</p>
+<p>And the price was grain.</p>
+<p>Not money. Never money; the mountain does not want your money and has more iron than you will ever have. Grain, delivered to the Brass Gate, so much a year, for as long as the works stand.</p>
+<p>For as long as the works stand.</p>
+<hr class="scene-rule"/>
+<p>I met him once. No — I did not; I am old and I have started to say that. My mother met him, as a girl, carrying figures for her uncle, and she said two things about Orthen Aezenbron that I have never forgotten.</p>
+<p>The first is that he was the most courteous man who ever came to Mbaro.</p>
+<p>The second is that being in a room with him was like standing near a wall that is being built while you talk.</p>
+<p>She carried in the assay figures on a day in the second month and he was at the long table with his slate and he thanked her and asked her name and used it, and then he said — to her, a girl of fourteen with a tray — <em>"Do you know how much your country loses to the silt at the eastern bar each year, in bushels?"</em></p>
+<p>And she said no.</p>
+<p>And he told her. Exactly. To four figures, for each of the last nine years, from memory, and then he said the average, and then he said what it would be over thirty years if nothing were done, and then he said, with real feeling, that it was a terrible number and that it had been a terrible number for two hundred years and that nobody in this country had ever once written it down in a single place until he had done it in his fourth week.</p>
+<p>And my mother said the worst part, the part she remembered at eighty, was that <strong>he was not gloating</strong>. He was <em>distressed</em>. He thought it was a waste and it genuinely upset him, and he had come four thousand miles with nine chests to fix it, and he would fix it, and the price was the price.</p>
+<p>She said: he was the kindest man in Mbaro and he was quietly taking the roof off, and he would have told you so if you had asked, and nobody asked, because what do you ask a man who has already told you everything?</p>
+<hr class="scene-rule"/>
+<p>Idriss Keita argued for it, and he argued for it <em>well</em>, and I am going to give you his argument as he gave it, because if I give you a fool's version of it then the rest of this is a tale about a fool, and it is not.</p>
+<p>He said: we have built the greatest promise on this earth and we are running it on mud.</p>
+<p>He said: nine districts nearly starved in the year of the rot, and the reason was not the rot and was not the granary and was not the Covenant. It was forty miles of soft ground in a wet month. We were saved by a foreign woman noticing a coffee contract. We were saved by <em>luck wearing the shape of a clever person</em>, and a promise that requires a clever person to be standing in the right passage is not a promise, it is a habit.</p>
+<p>He said: I have read the Tally back two hundred years. Nine times in two hundred years the take-out arrived late, and four of those nine it arrived late for the same reason, in the same forty miles.</p>
+<p>He said: I can fix it once, forever, for grain we do not eat.</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>Now say her answer.</em></p>
+<p>Obi Diallo: I am coming to her answer.</p>
+<p class="marginalia"><em>Say it now. Every teller lets him have the room for an hour and gives her four words at the end of it.</em></p>
+<p>Obi Diallo: Then take the fire, mother.</p>
+<p class="marginalia"><em>No. You are the Diallo. Say it properly or I will say it badly and you will have to live with that.</em></p>
+<hr class="scene-rule"/>
+<p>Her answer was three questions and she asked them in the council, in front of forty people, and I have them from the minute, which the Corps kept, as the Corps keeps everything.</p>
+<p><strong>"From which harvest is the grain paid?"</strong></p>
+<p>And Orthen Aezenbron, who did not lie, said: from the surplus.</p>
+<p><strong>"And in a year when there is no surplus?"</strong></p>
+<p>And Orthen Aezenbron, who did not lie, said: the obligation stands. The works do not un-build themselves in a bad year. A debt that is forgiven in bad years is a debt nobody would lend against, and my hold would not have permitted me to offer it.</p>
+<p><strong>"Then in a bad year, the mountain is paid before the nine districts are fed."</strong></p>
+<p>And there was a silence in that council of some length.</p>
+<p>And Orthen Aezenbron said — and this is in the minute, in the warden's hand, and it is the most honest sentence anybody said in that whole year:</p>
+<p class="marginalia"><em>"Madame, that is what a debt is. I am not concealing it. It is the third line of the instrument and I have read it aloud twice."</em></p>
+<hr class="scene-rule"/>
+<p>You see it now.</p>
+<p>He was not cheating them. He never cheated anybody. He put the whole thing on the table, in daylight, with the figures, and said: <em>this is what you are buying and this is what it costs and the cost falls in exactly the year you will least be able to bear it.</em></p>
+<p>And a room full of the best men in the confederacy looked at thirty years of locks and a cut at Mudflat, and thought about the bad year the way people think about their own death, which is to say: seriously, respectfully, and as a thing that happens to a different man.</p>
+<hr class="scene-rule"/>
+<p>She lost.</p>
+<p>I want that plain. She did not win the argument and then get overruled. She <em>lost it</em>, in the room, on the merits, in front of forty people, and the reason she lost is worth your attention:</p>
+<p>Because her position could only be argued in the negative. He had a cut at Mudflat and a lock at the Sow neck and thirty years of drawings, and she had a year that had not happened yet.</p>
+<p>Everything she said was true and none of it could be drawn.</p>
+<p>And when a man with a drawing argues against a woman with a bad year, the drawing wins, in every country, every time, and it will win in this one until the sun goes out.</p>
+<hr class="scene-rule"/>
+<p>The instrument was sealed in the eleventh year. Both of them signed it. She signed it.</p>
+<p>Hear that, because the tellings leave it out and it is the truest thing in this tale: <strong>Zawadi of Gebre put her mark on the Aeler instrument.</strong> She lost the argument and then she signed, because she was the Holder's wife and the council had decided and the Covenant is not a thing you sulk at.</p>
+<p>She spent the next two years making it work. She ran the eastern lane. She negotiated the delivery schedule down from four to three deliveries a year and got the assay done at Mbaro instead of at the Gate, which saved a fortune and was her idea, and it is in the Tally under her mark.</p>
+<p>For two years, the woman who said it would kill people in a bad year was the best administrator that instrument ever had.</p>
+<p>That is not a contradiction. If you think it is a contradiction you have never held an office.</p>
+<hr class="scene-rule"/>
+<p>Now the fourth thing, and then I will stop, because I am old and this is the part I do not like.</p>
+<p>In the thirteenth year she was doing the assay figures — hers, her own work, nobody sent her — and she was reconciling the Brass Gate receipts against the eastern lane dispatches, and there was a difference.</p>
+<p>Not a large one. Not a theft; nothing so clean.</p>
+<p>There was a <strong>second lane</strong>.</p>
+<p>Grain going to the mountain that was not on the Covenant schedule. Small — a fortieth of the contracted tonnage, running out of the Sow country by the new under-passage, assayed separately, receipted separately, paid separately.</p>
+<p>Paid in iron.</p>
+<p>And the iron did not come back to the granary account.</p>
+<p>It went to a house account at Mbaro, in the Holder's own name, and it had been running for two years, and it was very large.</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>Say the amount.</em></p>
+<p>Obi Diallo: I will not, because the four tellings give four amounts and they are all wrong and the number does not matter.</p>
+<p class="marginalia"><em>Then say the other thing. Say what he was doing with it.</em></p>
+<p>Obi Diallo: ...Mother, nobody knows what he was doing with it.</p>
+<p class="marginalia"><em>Nobody knows because she never asked him.</em></p>
+<p>Obi Diallo: Yes.</p>
+<p class="marginalia"><em>She had eleven days. She walked past him on that gallery every morning for eleven days with this in her hand and she did not ask him one question.</em></p>
+<p>Obi Diallo: Yes, mother.</p>
+<p class="marginalia"><em>And you will not say why.</em></p>
+<p>Obi Diallo: I will say why. I have thought about it for forty years and I will say what I think, and then whoever is telling this after me may say something better.</p>
+<p>She did not ask because she already knew what he would say.</p>
+<p>He would have said: <em>the works are thirty years and my life is not, and the confederacy will need a second granary in the south when the cut opens, and no council will vote money for a granary that is not yet needed, and I am building it out of my own name so that it exists before they know they want it.</em></p>
+<p>Or he would have said: <em>the Sow lands put in short for three years and I carried them and it is in the book, and now they cannot borrow anywhere, and I have been lending against my own name because a Holder may not lend against the Covenant.</em></p>
+<p>Or he would have said: <em>I am forty-nine and I have given this country every hour since I was nineteen and I wanted one thing that was mine.</em></p>
+<p>Any of those. She could hear all three in his voice, standing at the rail, in his own cadence, the way you can hear a dead man say a thing he never said.</p>
+<p>And here is the trouble, and it is the whole trouble, and it is why I do not like this night:</p>
+<p><strong>Every one of those three is a sentence she would have believed.</strong></p>
+<p>He had never lied to her. In thirteen years, not once, not small. He had gone down a stair at the third watch to write her name in a book. If Idriss Keita had stood on that gallery and given her <em>any</em> of those three, she would have believed him, and she knew she would believe him, and she did not know whether believing him would be her judgement or her love.</p>
+<p>So she did not ask.</p>
+<p>She did not ask, because she did not trust <em>herself</em> in front of him.</p>
+<hr class="scene-rule"/>
+<p><em>And that is where you always stop,</em> says Fatou Kamara, <em>and you always stop there because it makes her noble.</em></p>
+<p>Obi Diallo: What would you have me say, mother.</p>
+<p class="marginalia"><em>Say that she was afraid he would say something she could not answer. Say that a woman who cannot risk hearing her husband's reason has already decided, and everything after is arrangement.</em></p>
+<p>Obi Diallo: ...</p>
+<p class="marginalia"><em>Say it.</em></p>
+<p>Obi Diallo: I have set down what you said, mother. I will not say it in my own mouth. My mother did not say it and her uncle did not say it.</p>
+<p>That is not because it is untrue.</p>
+<p>It is because there were two people on that gallery and forty years of tellings, and every one of them has been about him, and I am not going to be the Diallo who finally explains her.</p>
+<hr class="scene-rule"/>
+<p>Enough. The fire is low and tomorrow is the long night.</p>
+<p>Tomorrow she goes down the stair and does not come back up the same woman, and I am going to tell you the name of the woman she went to see.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">NIGHT FOUR</span>What You May Not Take Back</h2>
+<hr class="scene-rule"/>
+<p>First, a correction, and do not smile at me.</p>
+<p>Last night but one I said she saw it in the tenth year. That was wrong. It was the thirteenth. I am old and the tenth year is the year the mountain came and my mouth went to it.</p>
+<p>I say this aloud because a teller who never corrects himself in front of you is a teller who has decided you will not notice, and a man who has decided that about you will lie to you later about something that matters.</p>
+<p>Now. The thirteenth year.</p>
+<hr class="scene-rule"/>
+<p>She saw the barges before she ever saw a figure.</p>
+<p>That is the part I want in you tonight. Not the assay. Not the house account. Those came after, and those are what the songs have, because a song can carry a number.</p>
+<p>She was on the gallery at first light, at the eastern rail, in the place where she had stood every morning for nine years, and she counted the eastern lane as she had counted it every morning for nine years, and there were barges coming up under the reed spit that were not on any schedule she had ever been given.</p>
+<p>Not many. Three, four in a month. Low in the water.</p>
+<p>Coming up out of the Sow country, through the new under-passage, in the dark, before the lane opened.</p>
+<p>And here is the thing, and I want you to hold it gently because it will be sharp in your hand:</p>
+<p><strong>She was the only person in the world standing in a place where those barges could be seen.</strong></p>
+<p>Not the Corps. The Corps watch weigh-houses and books; they do not stand on a gallery at first light looking at a reed spit a mile off. Not the factors, who are in their beds. Not the Holder, who counted the western lane, because in nine years they had divided the gallery between them and the east was hers.</p>
+<p>He had put her there. In the first year, on a cold morning, when a foreign woman told him he had been standing in the wrong place for eleven years, and he said <em>show me</em>, and then he moved.</p>
+<p>He gave her the only window in the confederacy that looked at the thing he was doing.</p>
+<p>Thirteen years before he did it.</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>Say whether he knew.</em></p>
+<p>Obi Diallo: Mother, I cannot.</p>
+<p class="marginalia"><em>Guess. You guessed for him last night.</em></p>
+<p>Obi Diallo: Last night I guessed at a reason a man might have. Tonight you are asking me whether a man wanted to be caught by his wife, and that is a different country and I have no road into it.</p>
+<p class="marginalia"><em>Then leave it standing.</em></p>
+<p>Obi Diallo: It is standing. Look at it as long as you like. I have looked at it for forty years and it has not moved.</p>
+<hr class="scene-rule"/>
+<p>Now the woman she went to see, as I promised.</p>
+<p><strong>Amara Bangura.</strong> Warden-Commander of the Vermilion Corps, fifty-six years old in that year, out of the canal country, a Bangura of the middle water. Twenty-nine years in red.</p>
+<p>Two things about her and they are both in the Corps roll, which survives, and I have seen it.</p>
+<p><strong>The first.</strong> She was famous in the Corps for a thing she did at nineteen, as a junior warden at a mudflat station, which was that she wrote up her own uncle for a short weight of four bushels. Four bushels. A nothing. He was fined and he was shamed and he did not speak to her for the rest of his life, and she attended his funeral and stood at the back.</p>
+<p>She never told that story. Other people told it. When it was told in front of her she would wait until it was finished and then continue with what she had been saying.</p>
+<p><strong>The second.</strong> In twenty-nine years she never once raised her voice in an interrogation, and she is on record — in a training instruction that is still read to new wardens, I am told — as saying: <em>A frightened man will tell you what you want. We do not want what we want. We want the figure.</em></p>
+<p>That is the woman. Hold her.</p>
+<hr class="scene-rule"/>
+<p>Now the procedure, and the procedure is the whole of tonight, and if you learn one thing at this fire in five nights let it be this one, because you live under it.</p>
+<p>You do not go to the Corps.</p>
+<p>There is no door. There is no office of accusations at the Tower. If you go to a warden in the street and say <em>I wish to speak to the Commander about the Holder</em>, the warden will look at you with great patience and say that the Commander is not available, and it will be true, and you may do that every day until you die.</p>
+<p>What there is, is <strong>the laying of an information</strong>, and you do it at a weigh-house, at a counter, to whichever warden is standing there, in front of whoever else is in the room.</p>
+<p>That is not a loophole. That is the design, and it is four hundred years old, and every part of it is deliberate:</p>
+<p><strong>Any person may lay it.</strong> A factor, a barge-hand, a child. There is no rank on that counter.</p>
+<p><strong>It must be about the tally.</strong> Not about a man. You cannot lay an information that somebody is wicked. You may only lay that a figure is wrong, and say which figure.</p>
+<p><strong>It is written down as you say it and read back to you.</strong></p>
+<p><strong>And it cannot be withdrawn.</strong></p>
+<p>Not by you. Not by the Commander. Not by the Holder. Once a figure has been laid at a Covenant counter, the Corps must reconcile it and must publish the reconciliation, and the only thing on this earth that stops it is the figure turning out to be right.</p>
+<p>Why? Because an accusation about grain that <em>can</em> be withdrawn is an accusation that can be bought back, and a country where an accusation can be bought back has no tally at all, only a market in silence.</p>
+<p>So they made it a thing you cannot take back.</p>
+<p>Which means every person who has ever stood at one of those counters has stood there knowing that the sentence they are about to say will finish somewhere without them.</p>
+<hr class="scene-rule"/>
+<p>She went on foot. She went alone. She went to the Mudflat station, which is an hour and a half from the Tower and the least important of the four, and she went at the middle of the day when it was full.</p>
+<p>There were eleven people in that weigh-house. My mother's uncle was not one of them and I will not pretend otherwise.</p>
+<p>The warden on the counter was a boy of twenty-two named Kofi Sow.</p>
+<p>And she said — and this is in the record, because it is read back and written down, and it is the shortest information ever laid in the Corps' history, and they teach it:</p>
+<p><strong>"The Brass Gate assay receipts for the last two years do not reconcile with the eastern lane dispatches. The difference is a fortieth. I am the Holder's wife and I did the reconciliation myself."</strong></p>
+<p>And Kofi Sow, twenty-two years old, wrote it down, and read it back to her, and asked her if that was what she had said.</p>
+<p>And she said yes.</p>
+<hr class="scene-rule"/>
+<p>That is the moment.</p>
+<p>Not the Aeler. Not the barges. Not anything on the fifth night. <em>That</em> is the moment, and it took about forty heartbeats, and it happened at a mud counter in front of eleven strangers and a boy.</p>
+<p>Because after <em>yes</em>, there is nothing. There is no more decision to make, ever, by anybody. The instrument runs.</p>
+<p>She walked back an hour and a half in the heat.</p>
+<hr class="scene-rule"/>
+<p>They came for the books that evening. Not for him — for the <strong>books</strong>, which is how it is always done: four wardens at the assay office, four at the Sow station, two at the house of account, all at the same hour, no explanation to anybody.</p>
+<p>Amara Bangura did the reconciliation herself, with two clerks, in three days.</p>
+<p>The figure was right. Her figure. To within a half-bushel across two years, which any weigh-master in this country will tell you is a frightening piece of work.</p>
+<p>On the fourth day the Commander walked up the Tower stair and onto the gallery at first light, which no warden had ever done, and stood at the western rail beside the Holder of the Covenant, and told him what had been laid, and by whom, and what the reconciliation showed.</p>
+<p>We do not have that conversation. Nobody does. Two people were on that gallery and one of them died and the other never spoke of it in twenty-two further years of service.</p>
+<p>We have one line, and we have it because a Corps clerk was on the stair below and it went into the day-book, and the day-book survives:</p>
+<p>The Holder said: <strong>"Is she safe?"</strong></p>
+<p>That is all we have. Three words out of whatever was said up there.</p>
+<p class="marginalia"><em>Is she safe.</em></p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>He knew she had laid it.</em></p>
+<p>Obi Diallo: The Commander told him who had laid it, mother. It is in the procedure. The informant is named to the subject. It is the fourth line of the instruction.</p>
+<p class="marginalia"><em>Why?</em></p>
+<p>Obi Diallo: So that nobody can be accused in the dark. So that a man knows his accuser. It is the oldest protection there is and it is also, on that morning, the cruellest thing in this entire tale, and both of those are true at once and the Corps has never seen any difficulty in it.</p>
+<p class="marginalia"><em>And his first question was whether she was safe.</em></p>
+<p>Obi Diallo: His first recorded question, mother. There may have been forty before it.</p>
+<p class="marginalia"><em>Do you believe there were forty before it?</em></p>
+<p>Obi Diallo: ...No.</p>
+<hr class="scene-rule"/>
+<p>Now the eleven days, and this is the part that no teller before me has done, and I am going to do it because Fatou Kamara has made me ashamed of skipping it for thirty years.</p>
+<p>Eleven days between the laying of the information and the end of Idriss Keita.</p>
+<p>And on every one of those eleven mornings, at first light, two people went out onto that gallery and counted the barges.</p>
+<hr class="scene-rule"/>
+<p>Both of them. Every morning. He did not stop and she did not stop.</p>
+<p>I want you to sit in that, because it is the most difficult thing in this tale and the tellings all walk round it. They knew. She knew he knew — the procedure names the informant, it is the fourth line of the instruction, the Commander had told him on the fourth day. He knew she knew he knew.</p>
+<p>And at first light on the fifth day they both came up the stair, because it was first light, and somebody has to count the barges.</p>
+<p>He went to the western rail. She went to the eastern.</p>
+<p>And they counted.</p>
+<hr class="scene-rule"/>
+<p>There was no conversation on any of the eleven mornings. I want that plain: nothing was said, on any of them, that anybody ever heard or recorded.</p>
+<p>Except once.</p>
+<p>On the ninth morning — this is in the household roll, from the man who carried the Holder's water, who was on the stairhead and did not come out because he could not — on the ninth morning Idriss Keita finished the western lane and did not go down.</p>
+<p>He stood, and then he walked the northern arc to the eastern rail, and he stood beside his wife for a while, in the place he had given her thirteen years before.</p>
+<p>And he looked out over the eastern lane and he counted it. Her lane. Out loud, once, quietly, the way you read a figure back at a counter.</p>
+<p>And the number he said was right.</p>
+<p>It was right <em>including the ones behind the reed spit</em>.</p>
+<hr class="scene-rule"/>
+<p>You understand.</p>
+<p>There is no way to count what is behind the reed spit from the western rail. There is no way to count it standing next to her unless you have already, at some time, learned how, and practised it, and gone on doing it.</p>
+<p>He had been able to see them the whole time.</p>
+<p>He had been able to see them the whole time, and he had given her the only window in the confederacy that looked at what he was doing, and had gone on standing beside her every morning for nine years while she looked through it.</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>Now say whether he knew.</em></p>
+<p>Obi Diallo: No, mother.</p>
+<p class="marginalia"><em>You have just said it. You have just stood him at that rail and made him say the number.</em></p>
+<p>Obi Diallo: I have told you what he did on the ninth morning. That is what my mother's uncle had and it is what I have got. I will not put a reason under it.</p>
+<p class="marginalia"><em>A man who wanted to be caught. A man who was confessing. A man who was saying: I have always been able to see it and I let you look anyway. Any of those.</em></p>
+<p>Obi Diallo: Any of those. And a man who simply counted a lane because it was there and he was good at his work and he had nine days left and nothing else to do with his hands.</p>
+<p>Mother, I have four of them, and all four fit, and it is the same trouble as the house account and it is the same trouble as the whole of this tale: <strong>every explanation of Idriss Keita is one a decent person would believe.</strong></p>
+<p>That is not me failing to decide. That is the shape of the man, and it is why she is standing at the other rail not asking.</p>
+<p class="marginalia"><em>And she said nothing.</em></p>
+<p>Obi Diallo: She said nothing. He said the number, and it was right, and she did not turn her head, and after a while he went down the stair.</p>
+<p>They counted together again on the tenth morning and on the eleventh.</p>
+<p>On the twelfth there was only one of them, and she walked the whole circuit alone, and she has been walking it in one shape or another for four hundred years.</p>
+<hr class="scene-rule"/>
+<p>That is what it took, from the laying to the end, and I am going to tell you the end quickly and flatly, and some of you will feel cheated, and I want you to sit with feeling cheated, because it is the correct feeling and it is the one the whole thing is built to give you.</p>
+<p>There was no trial, because there is no trial; a reconciliation <em>is</em> the trial and it had been published.</p>
+<p>There was no arrest, because the Corps does not arrest a Holder; there is no provision for it and there never has been.</p>
+<p>There was no rising, no faction, no clan calling out, no eastern council in uproar. Four great houses sent word to the Tower within a day of the publication and every one of the four sent the same word, which was: <em>the Covenant stands</em>.</p>
+<p>On the eleventh day the Holder of the Covenant was found dead in the Tower, at his table, with the Tally open in front of him at the current leaf.</p>
+<p>The Corps said it was his heart.</p>
+<p>Nobody in the confederacy believed that, then or now, and the Corps has never once elaborated, and in four hundred years no warden has ever been found who would say a word about it to anybody.</p>
+<p>They did it the way you would put out a lamp in a room you were leaving.</p>
+<p>Without hatred. Without a speech. Without one hour of jockeying, or bargaining, or offering him a way out, because they are not politicians and it is not their office and the thought would not occur.</p>
+<p>It was simply, as far as they were concerned, the next thing that had to be done about a figure.</p>
+<hr class="scene-rule"/>
+<p>I told you on the first night. Write it on the inside of your arm.</p>
+<p><strong>The Corps does not serve the Holder. The Corps serves the Covenant.</strong></p>
+<p>For four hundred years those were the same sentence, and in the thirteenth year of Idriss Keita they came apart for eleven days, and the Corps did not hesitate for one of them, because they had known the answer the whole time and had simply never been asked.</p>
+<hr class="scene-rule"/>
+<p>She was not told.</p>
+<p>That is the last thing tonight and then I am done, and Chidi Toure, you may have your praise in the morning because I have nothing left tonight.</p>
+<p>Nobody came to her. Nobody sent. She was in her own rooms in the Tower on the eleventh day and the household went quiet around her in the way a household goes quiet, and she stood in the middle of it and understood from the quality of the silence, and she did not weep where anyone could see, and no account anywhere says she wept at all.</p>
+<p>At first light on the twelfth day, Zawadi of Gebre went up the stair and out onto the gallery and walked it.</p>
+<p>The whole circuit. Eastern rail, northern arc, western rail, round.</p>
+<p>Alone, for the first time in nine years.</p>
+<p>And she counted the barges, because somebody had to count the barges, and there was nobody left in that building who could see behind the reed spit.</p>
+<hr class="scene-rule"/>
+<p>Tomorrow is the last night.</p>
+<p>Tomorrow the woman in red comes up the stair a second time.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">NIGHT FIVE</span>An Even Exchange</h2>
+<hr class="scene-rule"/>
+<p>Before I begin.</p>
+<p>There is a woman in red sitting at the back, beyond Fatou Kamara, where the light does not reach. She came on the second night and she has come every night since and she has not eaten anything and she has not asked me for anything.</p>
+<p>Warden. You are welcome at this fire. You do not have to sit in the dark; there is no rule about it and the cold is the same for everybody.</p>
+<p>She is not going to move. That is all right.</p>
+<p>I tell you she is there because I am about to tell the part that the Corps does not like, and I am going to tell it anyway, and I would rather you watched me do it than heard afterwards that I had been brave in private.</p>
+<p>Sit. Hear me.</p>
+<hr class="scene-rule"/>
+<p>Amara Bangura came up the Tower stair at first light on the sixteenth day.</p>
+<p>Four days after the funeral, which was small, and which Zawadi of Gebre attended, and at which she was seated where a Holder's wife is seated, and at which nobody would look at her.</p>
+<p>She was on the gallery. Eastern rail. She had walked it alone every morning for four days.</p>
+<p>And the Warden-Commander came up out of the stairhead in red, alone, without a clerk, which is not how the Corps does anything, and stood at the western rail — <em>his</em> rail; she stood where he had stood — and let the woman finish counting.</p>
+<p>That is the first thing I want you to notice about Amara Bangura, and I have noticed it for forty years. She waited until the count was done.</p>
+<p>Then she said: "The confederacy requires a Holder of the Covenant."</p>
+<p>And Zawadi of Gebre said: "Yes. It does."</p>
+<p>And Amara Bangura said: "It is you."</p>
+<hr class="scene-rule"/>
+<p>Now she laughed.</p>
+<p>I have this from the roll and I have it from two of the four tellings and I believe it entirely, and it is the only time in this entire tale that anybody laughs.</p>
+<p>She laughed, on that gallery, four days after the funeral, and she said: "I am the reason there is a vacancy."</p>
+<p>And the Commander said: "Yes."</p>
+<p>And she said: "I am Taharkan."</p>
+<p>And the Commander said: "Yes."</p>
+<p>And she said, and here the roll has it in her own words because the Commander wrote the conversation up herself that evening, as the procedure requires: <strong>"I killed him."</strong></p>
+<p>And Amara Bangura said: "No. The Corps did. You laid a figure at a counter and the figure was correct. I want you to be very clear about the difference, because you are going to have to live inside it for a long time, and it is the only comfortable room in the building."</p>
+<hr class="scene-rule"/>
+<p>Then she refused.</p>
+<p>Properly. At length. For two days. I will give you her four refusals because they are all good and because the answers are better.</p>
+<p><strong>She said: the eastern council will never accept a foreign widow.</strong></p>
+<p>Amara Bangura said: the eastern council sent word within a day of the publication and the word was <em>the Covenant stands</em>. They will accept a barge-pole if it can count. You have mistaken them for a court. They are not a court. They are forty people who need the take-out to arrive.</p>
+<p><strong>She said: the four great clans will each put up a claim, and there will be four claims and one Covenant, and it will come apart in a season.</strong></p>
+<p>Amara Bangura said: yes. That is precisely why it is you. Four clans can fight each other for a chair. Not one of them can fight <em>you</em> for it, because to argue that you should not hold it, they would have to argue that the figure you laid was wrong. And it was not wrong. It is published. It reconciles to the half-bushel.</p>
+<p>Hear that, all of you. Hear what she is saying.</p>
+<p><strong>The thing that made her unbearable made her unopposable.</strong> Nobody could raise a hand against her without raising a hand against the tally, and in Oshiira that is the one thing nobody will do, because the day you do it you are no longer arguing about a chair, you are arguing about whether there is grain in a bad year.</p>
+<p><strong>She said: I do not want it.</strong></p>
+<p>Amara Bangura said: I know. That was the third of the four requirements and you have satisfied it.</p>
+<p><strong>And she said — and this is the fourth and it is the real one, and she said it at the eastern rail with her back to the Commander:</strong></p>
+<p class="marginalia"><em>"I loved him. You are asking the woman who loved him. What do you imagine is left?"</em></p>
+<p>And Amara Bangura, who had written up her own uncle for four bushels at nineteen and attended his funeral and stood at the back, said:</p>
+<p class="marginalia"><em>"Exactly what is required, madame. Nothing more and nothing less. I would not have come up this stair for a woman who had not loved him. Anybody can lay an information against a man they dislike. That is worth nothing to us and we get four a week."</em></p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>That is the cruellest sentence in this tale.</em></p>
+<p>Obi Diallo: It is, mother.</p>
+<p class="marginalia"><em>And it is the truest.</em></p>
+<p>Obi Diallo: It is that also. You have found the place where the two of them live in the same house, and you have been coming to this fire for thirty years to stand in it, and I have never once seen you satisfied.</p>
+<p class="marginalia"><em>I am not here to be satisfied, Diallo. I am here to make sure you do not go soft on the fifth night, and you always do.</em></p>
+<p>Obi Diallo: Not tonight, mother.</p>
+<hr class="scene-rule"/>
+<p>Now the exchange. This is what you came for. Some of you have been waiting four nights and I have watched you wait.</p>
+<p>It was on the second day, and it was at the end, when she had run out of refusals and they both knew it, and the roll has it and I will give it exactly.</p>
+<p>She turned round from the rail and she looked at the Warden-Commander of the Vermilion Corps and she said:</p>
+<p><strong>"Understand what you are asking. If I take this, you may end me quickly. I know this. I have seen it."</strong></p>
+<p>And Amara Bangura said:</p>
+<p><strong>"Yes. But for a slip of the grain tally, madame, you may end us slowly. So it is an even exchange."</strong></p>
+<hr class="scene-rule"/>
+<p>Sit with that. I am going to be quiet for a moment and you are going to sit with it.</p>
+<p>...</p>
+<p>Now let me take it apart, because it is the constitution of this country and most of you have lived your whole lives inside it without ever once being told what it says.</p>
+<p><em>You may end me quickly.</em> That is plain. They had done it in eleven days to a better-loved person than her and she had watched.</p>
+<p><em>For a slip of the grain tally, you may end us slowly.</em> Now think.</p>
+<p>She is the Holder. The Holder's hand goes in the Tally. A Holder who wanted to could put a wrong figure in the book — one figure, one leaf, small, in a quiet year — and let it sit. And a false figure in the Tally does not kill a warden. It rots the <em>book</em>. And when the book is found to have rotted, four hundred years of a thousand tribes believing that the take-out cannot be refused goes with it, and the Corps has no purpose and no protection and no reason to exist, because the only thing that has ever made two thousand people in red tolerable to a confederacy of hundreds of peoples is that the book they guard is true.</p>
+<p>She can destroy them in a way they can never recover from, slowly, at a desk, with a pen.</p>
+<p>They can destroy her in an evening.</p>
+<p>Neither can ever do it, because the moment either begins, the other's hand is already on the thing.</p>
+<p class="marginalia"><em>So it is an even exchange.</em></p>
+<p>That is not a threat. Nobody in that conversation was threatening anybody. Two people stood on a gallery and calmly described the arrangement that they were both about to be locked inside for the rest of their lives, so that neither would ever be able to say afterward that they had not understood.</p>
+<p>It is the most honest sentence ever spoken in Oshiira and I would put it on the Tower.</p>
+<hr class="scene-rule"/>
+<p>She took it.</p>
+<p>Not that day. She took it at the end of the second day, and the way she took it was to turn back to the rail and say: <em>"Then who counts the eastern lane?"</em></p>
+<p>And Amara Bangura said, <em>"You do, madame."</em></p>
+<p>And that was the whole of the accession. No oil, no drum, no clan sitting. There is no ceremony for it; there never has been. The Holder of the Covenant is whoever the Corps salutes at first light, and on the eighteenth day at first light two thousand people in red saluted a Taharkan trader's daughter on a gallery, and it was done.</p>
+<hr class="scene-rule"/>
+<p>Now the name, and then I have one thing left and it is short.</p>
+<p>She would not take a praise-name. They tried; the clans tried hardest, because a clan that lands a praise-name on a Holder has a hand on the Holder's sleeve forever. <em>Keita of the Full Granary</em> had been refused by the last one. They came to her with nine.</p>
+<p>She refused all nine. She would not be Keita — she had never once signed it — and she would not be <em>of Gebre</em> in that office either, because Gebre had not answered her letters in four years.</p>
+<p>And so for two seasons the most powerful person in the confederacy had no name to be called by in the third person, which is an intolerable state of affairs for a country with a thousand tongues in it, and the country did what a country does.</p>
+<p>The weigh-house men had called her <em>Bibi of the Two Barges</em> for eleven years, and they loved her, and they could not use it now, because it was a joke from before and it had his morning in it.</p>
+<p>So they used the only other true thing they had.</p>
+<p>They said: <em>the widow</em>.</p>
+<p>Not as a title. Not at first. The way you say a thing at a counter — <em>take it up to the widow, she is on the walk</em> — and it went from the Mudflat station to the four weigh-houses in a season and out along the canals in a year, and nobody decreed it and nobody could have stopped it.</p>
+<p>By the time she died it was carved.</p>
+<p><strong>And it is still there.</strong> You said it yourselves, tonight, walking here, without thinking: <em>the Widow wants</em>, <em>the Widow's writ</em>, <em>the Widow's Eye</em>. Four hundred years and a hundred women and not one of them a widow, most of them never married at all — and the confederacy calls every one of them by the name of one Taharkan woman's dead husband, because the weigh-house men at Mudflat needed something to call her in the autumn of a bad year.</p>
+<p>That is how a country names itself. Not in a chamber. At a counter, in the afternoon, by people who needed a word.</p>
+<hr class="scene-rule"/>
+<p><strong>FATOU KAMARA:</strong> <em>Now say the part you always say.</em></p>
+<p>Obi Diallo: She walked it for thirty-one years, mother.</p>
+<p class="marginalia"><em>Every morning.</em></p>
+<p>Obi Diallo: Every morning. First light. Eastern rail first, because of the reed spit, and then the whole circuit. Through two bad harvests and the fourth Ecktorian war and the year of the low canals. In the last four years they carried her up the stair in a chair and she counted from the chair and she was wrong twice and knew it both times.</p>
+<p class="marginalia"><em>And the mountain?</em></p>
+<p>Obi Diallo: Paid. Every year, on the schedule, to the half-bushel, for thirty-one years. She never once tried to break the Aeler instrument — she had signed it, and it was in the book, and a Widow who breaks a sealed instrument is a Widow who has taught the confederacy that instruments can be broken.</p>
+<p>She paid it in the two bad harvests too. Out of the reserve. Exactly as she had said in that council, at forty people, and lost.</p>
+<p class="marginalia"><em>Say what it cost in the second bad harvest.</em></p>
+<p>Obi Diallo: ...Eleven districts went on the short take-out for a season, mother.</p>
+<p class="marginalia"><em>Say the rest.</em></p>
+<p>Obi Diallo: Nobody died. It is in the Tally. Eleven districts, one season, short measure, no deaths recorded.</p>
+<p class="marginalia"><em>Because?</em></p>
+<p>Obi Diallo: Because she had spent nine years building the southern granary. Out of the Covenant's own account, voted properly, argued for in council four times before it passed.</p>
+<p>...Which is the thing she had imagined he might say, on the gallery, in the eleven days when she did not ask him.</p>
+<p class="marginalia"><em>Yes. And you will not say what that means.</em></p>
+<p>Obi Diallo: No, mother. I will not. It has been forty years and I have not got to the bottom of it, and I am not going to pretend at this fire that I have.</p>
+<hr class="scene-rule"/>
+<p>One thing left.</p>
+<p>Fatou Kamara has come to this fire for thirty years and every year on the fifth night she says the same thing to me, and every year I have no answer, and tonight I am going to let her say it and then something else is going to happen.</p>
+<p>Mother. Say your piece.</p>
+<p><strong>FATOU KAMARA:</strong> <em>The exchange is invented.</em></p>
+<p class="marginalia"><em>"You may end me quickly. For a slip of the tally you may end us slowly." No teller had that from anybody. It is too good. It is the shape a man makes when he wants a tale to close like a door. My grandmother heard this told by Sekou Diallo himself and it was not in it, and I have said so at this fire for thirty years and no Diallo has ever answered me.</em></p>
+<p>Obi Diallo: ...That is true. I have no answer, mother. I have never had one. My mother had none either and she said so.</p>
+<hr class="scene-rule"/>
+<p>And then the woman in red, at the back, beyond the light, who has sat here five nights and eaten nothing and asked for nothing, said — without standing, in an ordinary voice, the first and only thing she said:</p>
+<p><strong>"It is in the day-book."</strong></p>
+<hr class="scene-rule"/>
+<p>Nobody spoke for a while.</p>
+<p>And then Fatou Kamara said, "...Which day-book."</p>
+<p>And the warden said: "The Commander's. The sixteenth to the eighteenth day. She wrote up the conversation herself, as the procedure requires. It is not sealed. It has never been sealed. Any person may read it at the Tower on any day the Tower is open."</p>
+<p>And Fatou Kamara said: "Then why has nobody?"</p>
+<p>And the warden said: "People do. Four or five in a year." And then, after a moment, and this is the only thing she said that was not a fact: "It is a long way to go to find out that a tale you have loved for thirty years is accurate."</p>
+<hr class="scene-rule"/>
+<p>That is the end of it.</p>
+<p>I am Obi Diallo. My mother was Nia Diallo who carried this word, and her uncle was Sekou Diallo who was a boy with a water-jar at the weigh-house at Mbaro in the year the barges did not move, and who saw two things with his own eyes and carried the rest.</p>
+<p>I have told you five nights. Chidi Toure paid for four and got five, and that is between him and me.</p>
+<p>Go home. The lane opens at first light and somebody will be on the gallery counting you in.</p>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>Here ends The Widow's Walk.</em></p>
+<hr class="scene-rule"/>
+<h2>A NOTE ON THE TELLING</h2>
+<p><strong>Order.</strong> This stands alone. It is not of the Belworth and does not touch it.</p>
+<p><strong>What it is for.</strong> Oshiira's generator already says the Widow has held the confederacy together for centuries, that the Vermilion Corps guards the covenant and not the grain, and that a page of the Great Tally has gone missing and the Corps has hunted it for nine years. This tale is the origin of the first two and deliberately does not touch the third. The missing page is not in here and should not be put here.</p>
+<p><strong>The four tellings</strong> referred to in the text are not written. If a table wants them, the disagreements are the useful part: whether the father wept, whether she loved him, what the private account was for, and whether the exchange was ever said.</p>
+<p><strong>At a table.</strong> The laying of an information is the handout. Any person may lay it, it must be about a figure and not a man, it is read back, and it cannot be withdrawn by anybody including the person who laid it. Hand a player that rule and a figure that does not reconcile.</p>
+</body>
+</html>

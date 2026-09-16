@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-15T16:01:45.531Z",
+  "generated": "2026-09-16T00:30:37.256Z",
   "documents": [
     {
       "id": "srd",
@@ -1459,6 +1459,16 @@
       "active": true
     },
     {
+      "id": "the_widows_walk",
+      "title": "The Widows Walk",
+      "file": "Fates_-_Edge_-_-The-_-Widows-_-Walk.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "witnessed-prey",
       "title": "The Witnessed Prey, a Hunter's Guide",
       "subtitle": "A bestiary of debts, flesh, and thresholds",
@@ -1593,7 +1603,7 @@
       "active": true
     }
   ],
-  "total_count": 100,
-  "active_count": 100,
+  "total_count": 101,
+  "active_count": 101,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
