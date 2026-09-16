@@ -2,7 +2,7 @@
  * Dice feature - Roll dice and view history
  * UI for the Fate's Edge resolution system
  * Uses the core dice engine for all rolling logic
- * Supports deterministic RNG for static sites
+ * Supports explicitly selected deterministic replay for testing
  * Supports WebSocket sync for multiplayer
  */
 
@@ -12,7 +12,7 @@ import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
 import { escHtml, safeParseInt } from '@core/utils.js';
 import { addRoll, getState, saveState } from '@core/state.js';
 // Import the core dice engine
-import { performRoll, rollDie } from '@core/dice.js';
+import { performRoll, rollDie, Xorshift128, getSeed, setSeed, generateSeed as createSeed, getRandom, getRandomInt, getRandomIntInclusive } from '@core/dice.js';
 // Import WebSocket for sync
 import { isConnectedToServer, onEvent, offEvent, sendMessage as sendWSMessage } from '@core/websocket.js';
 // NEW: a11y -- remote rolls already get a showToast() (aria-live via
@@ -26,221 +26,11 @@ import { announce } from '@core/a11y-announce.js';
 let container = null;
 let wsListeners = new Map();
 
-// ============================================================
-// CRYPTO MODULE - LAZY LOAD WITH FALLBACK
-// ============================================================
-
-let cryptoModule = null;
-let cryptoLoadAttempted = false;
-
-async function getCryptoModule() {
-    if (cryptoModule) return cryptoModule;
-    if (cryptoLoadAttempted) return null;
-    
-    cryptoLoadAttempted = true;
-    try {
-        // Try to load the crypto module
-        const module = await import('@core/crypto.js');
-        cryptoModule = module;
-        console.log('[Dice] Crypto module loaded successfully');
-        return cryptoModule;
-    } catch (e) {
-        console.debug('[Dice] Crypto module not available, using fallback RNG');
-        return null;
-    }
-}
-
-// ============================================================
-// SEED MANAGEMENT
-// ============================================================
-
-let _seed = null;
-let _prng = null;
-
-// Xorshift128+ PRNG for deterministic random generation
-class Xorshift128 {
-    constructor(seed) {
-        this.seed = seed;
-        this.state = this._seedToState(seed);
-    }
-    
-    _seedToState(seed) {
-        let s0 = 0;
-        let s1 = 0;
-        
-        if (typeof seed === 'number') {
-            s0 = seed;
-            s1 = seed + 0x9e3779b97f4a7c15;
-        } else if (typeof seed === 'string') {
-            let hash = 0;
-            for (let i = 0; i < seed.length; i++) {
-                hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-                hash = hash & hash;
-            }
-            s0 = hash;
-            s1 = hash + 0x9e3779b97f4a7c15;
-        } else {
-            s0 = Date.now();
-            s1 = Date.now() + 0x9e3779b97f4a7c15;
-        }
-        
-        return { s0: BigInt(s0), s1: BigInt(s1) };
-    }
-    
-    random() {
-        let s0 = this.state.s0;
-        let s1 = this.state.s1;
-        
-        let x = s1;
-        let y = s0;
-        
-        x = x ^ (x << BigInt(23));
-        x = x ^ (x >> BigInt(17));
-        x = x ^ (y ^ (y >> BigInt(26)));
-        
-        this.state.s0 = y;
-        this.state.s1 = x;
-        
-        const result = Number((x + y) & BigInt(0xFFFFFFFFFFFFFFFF)) / 18446744073709551616;
-        return result;
-    }
-    
-    randomInt(min, max) {
-        return Math.floor(this.random() * (max - min)) + min;
-    }
-    
-    randomIntInclusive(min, max) {
-        return Math.floor(this.random() * (max - min + 1)) + min;
-    }
-}
-
-async function loadSeedFromCrypto() {
-    const crypto = await getCryptoModule();
-    if (crypto && crypto.getSeed) {
-        return crypto.getSeed();
-    }
-    return null;
-}
-
-async function saveSeedToCrypto(seed) {
-    const crypto = await getCryptoModule();
-    if (crypto && crypto.setSeed) {
-        return crypto.setSeed(seed);
-    }
-    return false;
-}
-
-async function generateSeedFromCrypto() {
-    const crypto = await getCryptoModule();
-    if (crypto && crypto.generateSeed) {
-        return crypto.generateSeed();
-    }
-    // Fallback: generate a random seed
-    try {
-        if (window && window.crypto && window.crypto.getRandomValues) {
-            const array = new Uint32Array(4);
-            window.crypto.getRandomValues(array);
-            return array.reduce((acc, val) => acc + val.toString(16).padStart(8, '0'), '');
-        }
-    } catch (e) { /* ignore */ }
-    return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-}
-
-function getSeed() {
-    return _seed;
-}
-
-function setSeed(seed) {
-    _seed = seed;
-    if (seed) {
-        _prng = new Xorshift128(seed);
-        // Save to localStorage for persistence
-        try {
-            localStorage.setItem('fates-edge-seed', seed);
-        } catch (e) { /* ignore */ }
-        // Also save via crypto if available (async - fire and forget)
-        saveSeedToCrypto(seed).catch(() => {});
-    } else {
-        _prng = null;
-        try {
-            localStorage.removeItem('fates-edge-seed');
-        } catch (e) { /* ignore */ }
-        saveSeedToCrypto(null).catch(() => {});
-    }
-    return true;
-}
-
+// Seed controls and rolls share the same engine. Replay mode is explicit and session-only.
 async function generateSeed() {
-    const newSeed = await generateSeedFromCrypto();
-    setSeed(newSeed);
-    return newSeed;
-}
-
-// Initialize seed from localStorage on module load
-try {
-    const stored = localStorage.getItem('fates-edge-seed');
-    if (stored) {
-        _seed = stored;
-        _prng = new Xorshift128(stored);
-        console.log('[Dice] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
-    }
-} catch (e) { /* ignore */ }
-
-// Also try to load from window seed (set by build script for static sites)
-if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
-    _seed = window.__RANDOM_SEED;
-    _prng = new Xorshift128(_seed);
-    try {
-        localStorage.setItem('fates-edge-seed', _seed);
-        console.log('[Dice] Seed loaded from window.__RANDOM_SEED:', _seed.substring(0, 8) + '...');
-    } catch (e) { /* ignore */ }
-}
-
-// Try to load from crypto module asynchronously (don't block)
-if (!_seed) {
-    loadSeedFromCrypto().then(seed => {
-        if (seed) {
-            _seed = seed;
-            _prng = new Xorshift128(seed);
-            console.log('[Dice] Seed loaded from crypto module:', seed.substring(0, 8) + '...');
-            try {
-                localStorage.setItem('fates-edge-seed', seed);
-            } catch (e) { /* ignore */ }
-        }
-    }).catch(() => {});
-}
-
-// ============================================================
-// DETERMINISTIC RNG FUNCTIONS
-// ============================================================
-
-function getRandom() {
-    if (_prng) {
-        return _prng.random();
-    }
-    // Fallback to crypto or Math.random
-    try {
-        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-            const array = new Uint32Array(1);
-            window.crypto.getRandomValues(array);
-            return array[0] / 4294967296;
-        }
-    } catch (e) { /* ignore */ }
-    return Math.random();
-}
-
-function getRandomInt(min, max) {
-    if (_prng) {
-        return _prng.randomInt(min, max);
-    }
-    return Math.floor(getRandom() * (max - min)) + min;
-}
-
-function getRandomIntInclusive(min, max) {
-    if (_prng) {
-        return _prng.randomIntInclusive(min, max);
-    }
-    return Math.floor(getRandom() * (max - min + 1)) + min;
+    const seed = createSeed();
+    setSeed(seed);
+    return seed;
 }
 
 // ============================================================
@@ -932,18 +722,6 @@ function exportHistory() {
 // ============================================================
 
 export async function init(el) {
-    // Try to load seed from crypto module if available
-    try {
-        const crypto = await getCryptoModule();
-        if (crypto && crypto.getSeed) {
-            const seed = crypto.getSeed();
-            if (seed) {
-                setSeed(seed);
-                console.log('[Dice] Seed loaded from crypto module on init');
-            }
-        }
-    } catch (e) { /* ignore */ }
-    
     return render(el);
 }
 

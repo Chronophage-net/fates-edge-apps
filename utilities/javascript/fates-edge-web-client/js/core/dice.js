@@ -2,7 +2,7 @@
  * Core Dice Engine - Fate's Edge Resolution System
  * 
  * Provides the core dice rolling logic with support for:
- * - Seeded deterministic RNG (for static/demo deployments)
+ * - Explicit, session-only deterministic replay (for testing)
  * - Cryptographic RNG fallback
  * - Xorshift128+ PRNG implementation
  * - Story Beat generation on 1s
@@ -33,46 +33,25 @@ class Xorshift128 {
     }
     
     _seedToState(seed) {
-        let s0 = 0;
-        let s1 = 0;
-        
-        if (typeof seed === 'number') {
-            s0 = seed;
-            s1 = seed + 0x9e3779b97f4a7c15;
-        } else if (typeof seed === 'string') {
-            let hash = 0;
-            for (let i = 0; i < seed.length; i++) {
-                hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-                hash = hash & hash;
-            }
-            s0 = hash;
-            s1 = hash + 0x9e3779b97f4a7c15;
-        } else {
-            s0 = Date.now();
-            s1 = Date.now() + 0x9e3779b97f4a7c15;
+        // Hash in bounded integer space; Number literals cannot represent a 64-bit seed exactly.
+        let hash = 14695981039346656037n;
+        for (const character of String(seed)) {
+            hash = BigInt.asUintN(64, (hash ^ BigInt(character.codePointAt(0))) * 1099511628211n);
         }
-        
-        return { s0: BigInt(s0), s1: BigInt(s1) };
+        return { s0: hash || 1n, s1: BigInt.asUintN(64, hash ^ 0x9e3779b97f4a7c15n) || 2n };
     }
-    
+
     random() {
-        let s0 = this.state.s0;
-        let s1 = this.state.s1;
-        
-        let x = s1;
-        let y = s0;
-        
-        x = x ^ (x << BigInt(23));
-        x = x ^ (x >> BigInt(17));
-        x = x ^ (y ^ (y >> BigInt(26)));
-        
+        let x = this.state.s0;
+        const y = this.state.s1;
         this.state.s0 = y;
-        this.state.s1 = x;
-        
-        const result = Number((x + y) & BigInt(0xFFFFFFFFFFFFFFFF)) / 18446744073709551616;
-        return result;
+        x = BigInt.asUintN(64, x ^ (x << 23n));
+        this.state.s1 = BigInt.asUintN(64, x ^ (x >> 17n) ^ y ^ (y >> 26n));
+        // Keep 53 bits before conversion, so rounding can never produce 1.0.
+        const sum = BigInt.asUintN(64, this.state.s1 + y);
+        return Number(sum >> 11n) / 9007199254740992;
     }
-    
+
     randomInt(min, max) {
         return Math.floor(this.random() * (max - min)) + min;
     }
@@ -100,18 +79,8 @@ function getSeed() {
  * @returns {boolean} Success
  */
 function setSeed(seed) {
-    _seed = seed;
-    if (seed) {
-        _prng = new Xorshift128(seed);
-        try {
-            localStorage.setItem('fates-edge-seed', seed);
-        } catch (e) { /* ignore */ }
-    } else {
-        _prng = null;
-        try {
-            localStorage.removeItem('fates-edge-seed');
-        } catch (e) { /* ignore */ }
-    }
+    _seed = seed === null || seed === undefined || seed === '' ? null : String(seed);
+    _prng = _seed === null ? null : new Xorshift128(_seed);
     return true;
 }
 
@@ -174,29 +143,9 @@ function getRandomIntInclusive(min, max) {
     return Math.floor(getRandom() * (max - min + 1)) + min;
 }
 
-// ============================================================
-// SEED INITIALIZATION
-// ============================================================
-
-// Initialize seed from localStorage on module load
-try {
-    const stored = localStorage.getItem('fates-edge-seed');
-    if (stored) {
-        _seed = stored;
-        _prng = new Xorshift128(stored);
-        console.log('[Dice Core] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
-    }
-} catch (e) { /* ignore */ }
-
-// Also try to load from window seed (set by build script for static sites)
-if (!_seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
-    _seed = window.__RANDOM_SEED;
-    _prng = new Xorshift128(_seed);
-    try {
-        localStorage.setItem('fates-edge-seed', _seed);
-        console.log('[Dice Core] Seed loaded from window.__RANDOM_SEED:', _seed.substring(0, 8) + '...');
-    } catch (e) { /* ignore */ }
-}
+// Normal play always starts with fresh browser randomness. Saved/build-time seeds belong
+// to other app features and must not silently replay dice after a reload. setSeed() is
+// an explicit, session-only testing control shared by the engine and its UI.
 
 // ============================================================
 // SKILLS DEFINITIONS
@@ -305,19 +254,18 @@ function getOutcomeLabelFromCode(code) {
  * @returns {number} Roll result (1 to sides)
  */
 function rollDie(sides = 10) {
-    if (sides < 1) {
-        throw new Error('Die must have at least 1 side');
+    if (!Number.isInteger(sides) || sides < 1 || sides > 4294967296) {
+        throw new Error('Die sides must be an integer between 1 and 4294967296');
     }
-    if (_prng) {
-        return _prng.randomInt(1, sides + 1);
+    if (_prng) return _prng.randomInt(1, sides + 1);
+    const crypto = globalThis.crypto || globalThis.window?.crypto;
+    if (crypto?.getRandomValues) {
+        // Rejection sampling keeps every face equally likely, even when sides does not divide 2^32.
+        const limit = 4294967296 - (4294967296 % sides);
+        const array = new Uint32Array(1);
+        do { crypto.getRandomValues(array); } while (array[0] >= limit);
+        return (array[0] % sides) + 1;
     }
-    try {
-        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-            const array = new Uint32Array(1);
-            window.crypto.getRandomValues(array);
-            return Math.floor((array[0] / 4294967296) * sides) + 1;
-        }
-    } catch (e) { /* ignore */ }
     return Math.floor(Math.random() * sides) + 1;
 }
 
