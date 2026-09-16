@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Last Blade — A Working Treatment</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>The Last Blade</h1>
+<h4>A working treatment of the Belworth campaign novel</h4>
+<hr class="scene-rule"/>
+<p><strong>What this is.</strong> A reconciliation pass over the six-part outline, against canon as it now stands, with the structural faults named and fixed. It is a plan, not prose. Where it overrules the outline it says so and says why.</p>
+<p><strong>The corrections it is built on.</strong> Rekedim's people fled <strong>south and east off the Violet Steppe</strong>. His father was displaced by <strong>Tulgoth</strong>, not Kargath; <em>the Last Blade</em> is a line's name and Kargath is Tulgoth's hidden heir, alive now. <strong>Riarhin's mother was a Rocke and her father a Lethai-al styled a prince</strong>, so she is Lethai-al on her father's side. <strong>Braedyn does not go north.</strong> He is struck, and the wound is called a sickness, and <strong>Seniro and Braedyn the Younger go in his stead</strong> while <strong>Elyas is sent away with Rekedim</strong>, and they come back by way of Tarlington.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART ZERO</span>What Was Wrong With It</h2>
+<hr class="scene-rule"/>
+<p>Six faults, named plainly, because the rest of this document is the repair.</p>
+<p><strong>One: the first two parts are the same part.</strong> Both are <em>meet a Vigil faction, be double-crossed by the informant, discover the Aeler behind it.</em> So are the third and the fourth — both are <em>track the Edgewalker through Acasia in company with a True Mason.</em> Twelve chapters of outline contain six chapters of story. The fix is not to trim; it is to make the second half of each pair <strong>do a different thing to the same material</strong>, which is what the gambit names were already promising and not delivering.</p>
+<p><strong>Two: the game is narrated instead of played.</strong> In the outline, characters say <em>it is like a game of Canray</em> eleven times. Every one of those is the book explaining its own metaphor, and every one of them is a place where the reader is told what to notice instead of being allowed to notice it.</p>
+<p>The rule for the whole novel, and it is absolute: <strong>no character ever compares anything to the game.</strong> Not once. What they do instead is <em>use</em> it — with the vocabulary the corpus already has, which is a working vocabulary and not a poetic one. <em>Count your exits. Fork the far mouth. Two exits, both priced. Seed is a depot, not a daring. Lane welding. She never checks behind.</em> When a character says <em>the far mouth is forked</em>, they are not being literary. They are giving an order.</p>
+<p>The reader who has read <em>Count Your Exits</em> will be able to <strong>notate the plot</strong>. The reader who has not will follow a competent thriller and never feel lectured. That is the whole design, and it only works if nobody in the book points at it.</p>
+<p><strong>Three: the board in the study is doing nothing.</strong> In the outline, Riarhin's subconscious keeps dragging her back to the unfinished game, and then at the end she realises it is symbolic. Symbols are not plot. The fix is in <em>Part Two</em> below and it is the single largest change in this document: <strong>the position is a message.</strong></p>
+<p><strong>Four: Gyllan is alive in two places and dead in a third.</strong> He survives Parts One and Two in one draft and dies in chapter two of another. Pick. He dies at the end of Part Two, and his death is the hinge the book turns on, and everything after it is a different book than everything before it.</p>
+<p><strong>Five: the Vigil's three factions are a diagram.</strong> <em>Populist, Aristocratic, Clandestine</em> is a taxonomy, not a conflict. Given below is what they actually disagree about, which is procedural and therefore arguable, and which makes all three of them correct.</p>
+<p><strong>Six: the cultural reveal has already happened.</strong> The outline's late twist is that Kon'reh is Ykrul and the world forgot. It has not forgotten. <em>Count Your Exits</em> opens by saying so, on the page, in the second paragraph: the steppe's game, the steppe set the first board, and the Aelers and the Vhasians and the Ecktorians all know perfectly well where it came from and play it anyway under their own names.</p>
+<p>Which is better. Kargath's grievance is not that the world forgot. It is that <strong>the world remembers, credits them, borrowed the only thing his people ever made that everyone wanted, and it bought them nothing</strong> — not a border, not a treaty, not one year of not being ridden down. Acknowledgement without consequence is a worse injury than theft and it is a far better motive, and it is the motive of a great many real people.</p>
+<hr class="scene-rule"/>
+<h3>THE SPINE</h3>
+<h2>Three Names for One Thing</h2>
+<hr class="scene-rule"/>
+<p>The novel has one idea and it is stated three times in three registers, and it is never explained.</p>
+<p><strong>The game has three names.</strong> <em>Kon'reh</em> on the grass, <em>Canray</em> at court, <em>K'thra</em> in the under-vaults. One board. Three peoples who each believe their version is the serious one.</p>
+<p><strong>The blade has three names.</strong> She calls it <strong>Toothpick</strong>. The army called it <strong>Fate's Edge</strong> and she hated that and stopped answering to it. It is <strong>Remorse</strong>, the first of the Three Forged, which chose her <em>not for victory, but for sorrow endured</em> — and that name is not said aloud in this novel by anybody, including her, including at the end. <em>A Roll of the Fallen</em> names her and does not name the blade; this book does the same, and the reader who has both may work it out and will not be congratulated for it.</p>
+<p><strong>The man has three names.</strong> <em>Tulgoth</em> was the Last Blade. <em>Kargath</em> is called it now and is entitled to nothing. And <strong>Rekedim Many-Scars</strong> is what the other answer to the same injury looks like: a Ykrul born in the Fens with the steppe face and the steppe hands and not one word of the steppe language, who wrote the manual, and put <em>Canray</em> on the cover, because it was for Vhasian soldiers and he was an honest man about audiences.</p>
+<p>Kargath and Rekedim are the same man given the same wound and a different quarter-hour. That is the book. Everything else is roads.</p>
+<hr class="scene-rule"/>
+<h3>THE CAST</h3>
+<h2>Who Is Load-Bearing</h2>
+<hr class="scene-rule"/>
+<p><strong>Riarhin.</strong> Lead. Sixty-six and looks six-and-twenty; Lethai-al on her father's side out of Silkstrand, a Rocke yarl's grandchild on the other. Scout in the Fenwood army at Lence; reported to the marshal and to nobody else; found Coldmorrow doing her own work and reported it correctly, and then said the name aloud at a fire where a fifteen-year-old girl could hear it, and has never offered that in her own defence.</p>
+<p>She is not hot-headed. The outline makes her the impatient one against Gyllan's caution, and that is a stock pairing and it is wrong for her. <strong>She is fast, and she is right, and she is used to being the only one in the room who is going to live long enough to regret it.</strong> Her impatience is not temper; it is arithmetic — she has watched slow careful men be slow and careful and then be dead, for forty years, and she is tired of the pattern and cannot say why she knows it.</p>
+<p>Her flaw is not recklessness. It is that <strong>she does not look at things she has decided not to look at</strong>, and she can hold that refusal for sixteen years, and it is the same refusal that keeps her from the board and the same one that keeps her from Coldmorrow.</p>
+<p><strong>Rekedim Many-Scars.</strong> Forty. Supply sergeant, logistician, author of <em>Canray by Convoy</em>, teacher of four children in a long room off a counting-house. Not a general and never will be; the book must resist making him one. His power is that he converts a country into a corridor and a culture into a lane. He is the only person in the novel who is never once surprised, and this is a quiet tragedy rather than a superpower: he is not surprised because he was raised by a man who lost.</p>
+<p><strong>Elyas Everblood.</strong> The Summer Knight; Oswyn's youngest; Braedyn's ward at Tarlington. Sent away with Rekedim, ostensibly for safety. He is the mirror of Veralyn and the book should let that be visible without saying it. He reads the world through story and myth and he is right about the pattern and wrong about what to do with it, every time, which makes him useful and dangerous in the same scene.</p>
+<p><strong>Gyllan.</strong> Old knight, oathbound never to draw again, the oath privately known and publicly assumed. He served the Vigil and the duke together in a younger world. He dies at the end of Part Two. <strong>Give him the rest of it before then</strong> — he must be funny, and specific, and irritating about something small, or his death is a plot point rather than a loss.</p>
+<p><strong>Lyra.</strong> Gyllan's student. The novel's moral engine and its best character, and the outline already knows it. She wants the count to come out even. It is not going to. Her arc is not corruption; it is the discovery that <em>a ledger is not justice</em>, and her refusal to accept that, and the fact that her refusal is honourable and gets people killed.</p>
+<p><strong>Alric.</strong> Junior scholar; Lyra's shadow; the reader's proxy and the only one who ever asks the plain question. Keep him small and keep him alive.</p>
+<p><strong>The Scout-Commander.</strong> The Ykrul escort of the second half. Two obligations owed, a third that must be paid. He is the book's proof that Kargath is not the Ykrul and the Ykrul are not Kargath.</p>
+<p><strong>Kargath.</strong> Tulgoth's hidden heir. Appears in Part One, in person, unrecognised, in a scene the reader will only understand on a second reading. Do not hold him off the page until Part Five; a villain first seen in the fifth part of six is a rumour with a sword.</p>
+<p><strong>Braedyn Fenwood.</strong> Dying through the whole book, off the page after Part One, and the gravity of every part.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART ONE</span>The Duke's Discretion</h2>
+<h4><em>Canray. A piece is given up, and the giving is not announced.</em></h4>
+<hr class="scene-rule"/>
+<p><strong>The gambit.</strong> At court one does not concede a piece; one <em>discovers</em> that it was never defended. A Canray player of the Vhasian school gives ground in a way that can afterward be described as an accident, so that the concession costs him no standing while it costs his opponent the tempo of having to decide whether it was one. The whole part is Braedyn Fenwood doing this with his own life.</p>
+<p><strong>The shape.</strong> An attempt on the duke, three days after the coronation, in his own house, by a man who got past everything.</p>
+<p>The wound is mortal and everybody in the room knows it inside the hour. What Braedyn does with the hour is the part the book is about. He gives out that he is <strong>sick</strong>. He signs nothing that would date the truth. He sends <strong>Seniro and Braedyn the Younger north</strong> in his stead, the marshal and the talker, because that is the pairing the house reaches for when the head of it must not be seen to be absent — and Seniro goes without being told why and does not ask, and Braedyn the Younger, who has no name of his own on any instrument, is for once extremely glad of it.</p>
+<p>And he sends <strong>Elyas away with Rekedim</strong>, which reads to the household as getting the ward out of danger, and which is also getting the two people most likely to work out who ordered it four hundred miles from anyone who could stop them.</p>
+<p>He gives up his own death as a piece, quietly, and does not announce it. <em>That</em> is the Duke's Discretion, and the book should never say the phrase.</p>
+<p><strong>Beats.</strong></p>
+<p>1. <strong>The attempt, and the hour after it.</strong> Not a fight scene. The fight is over in a paragraph. The scene is the hour: a physician told what to write, a clerk told what not to, and a dying man arranging six people's journeys while lying still so the bleeding does not start again. 2. <strong>Riarhin is not sent. She goes.</strong> Braedyn does not give her an errand. He asks her a question — the wrong question, deliberately, one she can answer — and she leaves the room with a piece of information she does not know she has been given. She is the only one he does not instruct, because she is the only one who has never once been in his pay. 3. <strong>The study.</strong> On her way out she passes the board. Sixteen years set up. She does not look at it. The prose must not describe the position. She does not look at it, and the reader is told exactly that, in five words, and nothing more. 4. <strong>The investigation, and how it fails.</strong> The assassin is dead and his effects are clean and the house's own records are excellent and say nothing. It fails <strong>because it is done well</strong> — because House Fenwood files everything, and a house that files everything has a place where a thing can be put that is more invisible than a hiding place, which is a correctly completed form. 5. <strong>The first thread.</strong> A hire. A licence. Something small, dull, and properly registered, leading toward <strong>the Vigil</strong> — the old society for the restoration of the Utaran order, which Gyllan served and which the duke once did. 6. <strong>Kargath, once, unrecognised.</strong> He is in this part, on the page, and nobody knows it and the reader should not know it either. When they go back they will find that he was the only person in the scene who asked nothing. 7. <strong>They leave.</strong> The last image of Braedyn is from outside a door.</p>
+<p><strong>Do not</strong> put a duel or a chase at the end of this part. It ends with paperwork and a departure, and the reader should be slightly uneasy that nothing has happened yet.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART TWO</span>The Unfinished Game</h2>
+<h4><em>Canray. The position on the board is the letter.</em></h4>
+<hr class="scene-rule"/>
+<p>This part replaces the outline's second act entirely, and this is the largest change in the document.</p>
+<p><strong>The problem it solves.</strong> The outline has Riarhin haunted by the unfinished board for two hundred pages and then realising it is <em>symbolic</em>. The board must instead be <strong>the intelligence</strong>, and the reason for it must be procedural and airtight:</p>
+<p><strong>Braedyn Fenwood could not write it down.</strong> He had known for two years that someone inside his own house was reading his correspondence, and he had never been able to find out who, because the house is very good at files and whoever it is is inside the filing. Anything he wrote could be read. Anything he said could be reported. So he put what he knew <strong>into a position</strong>, on a board that had stood untouched in his study for sixteen years, in a notation only one living person can read — because it is not notation at all, it is <em>their</em> game, sixteen years of it, and the meaning is in the departures from how she plays.</p>
+<p>He did not tell her. He could not. He arranged instead for her to be the only person who would ever be in a position to look, and then he gave her sixteen years of reasons not to, and then he was struck before he could correct for that, and this is the one thing in the book Braedyn Fenwood got badly wrong.</p>
+<p><strong>And she does not look at it until page four hundred</strong>, because she is Riarhin, and she does not look at things she has decided not to look at.</p>
+<p><strong>The shape.</strong> Everything the outline wanted from Part Two happens here — the Vigil's factions, the informant who plays both sides, the archive, the double-cross — but it is now a <strong>wasted journey</strong>, and the reader must be allowed to feel that it was wasted, because the answer was on a table in a house they left in chapter one.</p>
+<p><strong>The Vigil's three factions</strong>, rewritten so that they are arguing about a procedure instead of being labelled:</p>
+<p>The Vigil exists to restore the Utaran order. It has existed for three hundred years and has never restored anything, and the three factions disagree about <strong>what an empire actually is</strong>, which means they disagree about what would have to be rebuilt first.</p>
+<ul><li><strong>The Instrument.</strong> An empire is its law. Restore the Censor's Hall, the writs, the indiction, the standard weights, and the thing is back whether or not anyone is crowned. These are archivists and lawyers and they are the faction Braedyn was nearest to, and they are the reason he was a member, and they have never hurt anybody and they are not harmless.</li><li><strong>The Road.</strong> An empire is its logistics. Restore the roads, the posts, the bridges, the grain, and the law will follow the carts. These are engineers and merchants, and they are the faction that has been quietly doing business with the Aeler for ninety years for entirely honest reasons, and they are how the Aeler got in.</li><li><strong>The Crown.</strong> An empire is a person. Find the blood, put it on a chair, and everything else can be argued afterward. These are the ones with money and no patience, and they are the smallest faction and the loudest, and they are the ones who paid for the knife.</li></ul>
+<p>All three are correct about what an empire is. That is why the Vigil has never restored anything and never will.</p>
+<p><strong>Beats.</strong></p>
+<p>1. <strong>Gyllan's contact.</strong> A former knight, now an informant of the Instrument faction. The scene is not noir-atmospheric; it is <em>administrative</em>, which is far worse. The man has a desk. 2. <strong>The archive.</strong> Not a heist. The Vigil's archive is not guarded; it is <em>catalogued</em>, and the catalogue is the defence. What they need is not stealable because it is not filed under anything a person would look for. Rekedim gets them in by asking a question about <strong>where the building's coal is delivered</strong>, and this is the first time in the book he does the thing he does. 3. <strong>The document, and what it actually is.</strong> Not a conspiracy. A <strong>shipping schedule</strong> — Aeler-crafted goods moving through Vhas on the Road faction's own perfectly legal account, in quantities that make sense only if somebody is arming somebody. Fragmentary. True. Useless without the other half. 4. <strong>The double-cross.</strong> The informant was honest and was also selling to the Crown faction, and did not consider these to be in conflict, and says so, and is not lying. 5. <strong>Lyra and the ledger.</strong> She works out, on her own, four pages before anyone else, that the quantities do not reconcile — and she is right, and nobody acts on it fast enough, and this is the first crack. 6. <strong>Gyllan's death.</strong> He draws. That is the whole of it: a man who swore never to draw again draws, in a bad room, for someone else, and dies of it, and the oath is broken in the last second of the life it governed. <strong>Do not let anyone eulogise the oath.</strong> Lyra is holding his cord afterward and that is the eulogy. 7. <strong>The Aeler name.</strong> They come out of it with one: an <strong>Edgewalker</strong>, working the Acasian marches.</p>
+<p>The part ends with them turned west with a name and a dead teacher, four hundred miles from a board with the answer on it.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART THREE</span>The Merchant's Step</h2>
+<h4><em>K'thra. Invest, and make the other side show a hand it has not been asked for.</em></h4>
+<hr class="scene-rule"/>
+<p><strong>The gambit.</strong> In the under-vaults they do not play K'thra for pleasure; they <strong>arbitrate</strong> with it. Two factors with a disputed toll sit down over a board and are finished by evening and the settlement binds, and each walks out having agreed to something he would not have signed at a table. The Merchant's Step is the opening move of an arbitration: you put something on the board you are willing to lose in order to find out what your opponent is <em>not</em> willing to lose.</p>
+<p><strong>The Edgewalker.</strong> Keep her — elitist, cold, contemptuous of humans, arming warlords and seeding rumours through a loyal retinue so that her hands stay clean. But give her the one thing the outline does not: <strong>she is right about something.</strong> The Acasian marches are going to burn with or without her, and she says so, and the reader should be unable to prove her wrong.</p>
+<p>And make her a deliberate counter-image of the Edgewalker in the <em>Diwān of Roads</em> — Rurik Dornvael, rich past use, who bought a girl and freed her the same hour and never told her. Two Aelers who go out of the mountain and become enormous, and one of them is lonely and one of them is not, and the book never mentions the other one.</p>
+<p><strong>The True Mason.</strong> Keep entirely. He is the best invention in the outline and he is canon-native: a True Mason is an Aeler who does not lie, <em>not as a virtue — as a method</em>, and this one is an old retired mason walking the human roads repairing bridges his ancestors built, as a religious duty, and he is pleasant, and helpful, and <strong>not altruistic</strong>, and he will say so if asked.</p>
+<p>Give him one hard exchange with Elyas, who wants him to be a saint, in which he explains without heat that the roads are maintained because a road that fails takes the toll with it, and that he does not require Elyas to find this beautiful.</p>
+<p><strong>Beats.</strong></p>
+<p>1. <strong>The Step.</strong> Rekedim's plan: they cannot find the Edgewalker, so they <strong>put something on the board.</strong> They let it be known, through three channels, that a buyer is in the marches with Fenwood coin looking for exactly what she sells. Two of the channels are hers. They are not trying to trap her. They are trying to find out <strong>which warlord she moves to protect</strong>, because the piece she defends is the piece that tells you what she is actually building. 2. <strong>The road.</strong> The journey with the True Mason. Slow, good, funny in places. Alric asks the plain question and gets a plain answer and is more disturbed by it than by anything so far. 3. <strong>Lyra sharpening.</strong> She is not grieving in a soft way. She is <em>competent</em> in a new and unpleasant register, and the others notice and are glad of it, which is the horrible part. 4. <strong>The hand shows.</strong> The Edgewalker moves to protect a warlord she has no commercial reason to protect. Rekedim sees it. <strong>The warlord is a Ykrul.</strong> Not a chieftain — an exile, a man with no tribe, sitting on the Acasian side of the grass with money from somewhere. 5. <strong>Riarhin's refusal.</strong> Her first real chance at the Edgewalker, and she does not take it, and the book must be honest that this is not wisdom: she does not take it because she has been sixty-six years old for forty years and knows what happens to people who take the first chance.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART FOUR</span>The Bridge's Collapse</h2>
+<h4><em>K'thra. Do not take the piece. Take the thing it stands on.</em></h4>
+<hr class="scene-rule"/>
+<p><strong>The gambit.</strong> The under-vaults' cruellest move and the one they are proudest of. You do not capture. You remove the <strong>support</strong> — the toll, the lane, the credit, the bridge — and the piece is still on the board and is worth nothing, and no one can point to the move that killed it.</p>
+<p><strong>What makes this part different from Part Three</strong>, and this is the fix for the doubled Aeler act: Part Three is about <strong>finding</strong> the Edgewalker. Part Four is about <strong>discovering she is not the top of it</strong>, and the discovery is made <em>by doing to her exactly what she does to others</em>.</p>
+<p>They do not fight her. They take her credit. Rekedim and the True Mason between them work out which four bridges and one salt-lane her whole operation stands on, and the Mason — who has spent fifty years maintaining those bridges — <strong>declines to maintain one</strong>, for one season, on a technicality, in writing, with perfect courtesy. It is the only violent act of his life and it is a filing.</p>
+<p>And when her support goes, the money does not stop.</p>
+<p>Somebody else is paying. Somebody who has been paying all along, and who is not Aeler, and who does not need her.</p>
+<p><strong>Beats.</strong></p>
+<p>1. <strong>The confrontation.</strong> It happens early in the part, not late, and it is a <em>conversation</em>. She is not afraid of them. She explains her business model. She is contemptuous and she is precise and the precision is what frightens them. 2. <strong>The unmaintained bridge.</strong> The Mason's single act. Make the reader understand exactly what it costs him and let him do it anyway. Then let him say, at the end of it, that he will be repairing it himself in the spring and that this does not undo anything and that he is aware. 3. <strong>The collapse.</strong> Her warlords go quiet. Her retinue thins. And the Ykrul exile is still buying. 4. <strong>The reversal.</strong> She comes to <em>them</em>, once, at the end, not for mercy — for <strong>information</strong>, because she has worked out at the same time they have that she was never the top of it, and she is more insulted by that than by being ruined. She gives them the name and the shape of the money and she does not ask for anything and she leaves.</p>
+<p>She is not punished, and she is not redeemed, and she does not appear again. <strong>Resist giving her a death.</strong> The corpus does not kill people to tidy them. 5. <strong>The Mason's parting.</strong> Keep his warning from the outline, but cut the foreshadowing-flavoured phrasing. He says something small and practical and it lands harder. 6. <strong>The name.</strong> <em>Kargath.</em> Tulgoth's son. Alive. And Rekedim — who has known that name his entire life the way other men know a disease their family died of — says nothing at all for a day and a half.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART FIVE</span>The Stalking Wolf</h2>
+<h4><em>Kon'reh. Pursue while closing the exits, and never chase.</em></h4>
+<hr class="scene-rule"/>
+<p>Here the novel changes hands. Everything in Parts One to Four was played on boards belonging to other people — a court, an archive, a market. Part Five goes onto the grass, where the game is played in dirt with pebbles and sheep-bones and is given to children before they are permitted to hunt, and where none of the party's advantages are advantages.</p>
+<p>This part absorbs the <em>Road of Ash &amp; Grass</em> material, which is the strongest writing in the whole outline and should be kept nearly as drafted.</p>
+<p><strong>The camp, and the two obligations.</strong> Keep exactly: the scout commander who comes in with palms open and a spear held low, who has been given <em>leverage, not blood</em>; the two young scouts who break past him out of the insult of an old man saying no; the two arrows; and the commander who does not raise his spear but looks at the dead boys <em>as if at a ledger he must now balance</em>. Keep <strong>"Under my ring. Their zeal is my weight."</strong> Keep the kneeling to be counted.</p>
+<p><strong>One change.</strong> Gyllan cannot die twice. He died at the end of Part Two. The man who steps in front of Lyra at that fire and takes the spear is <strong>Alric</strong> — and it is worse, because Alric is not a knight and has no oath to break and simply gets in the way, badly, and it works. He survives it maimed. Lyra, who has already lost the teacher, now has the boy she was supposed to look after alive and ruined, and this is what turns her.</p>
+<p><strong>The three chiefs.</strong> Keep all three tests from the outline; they are good and they are properly Ykrul, which is to say they are about weights, water and wards rather than truth, courage and mercy. Keep Elyas's line about the romances and Riarhin's flat answer, because it is the one time the book is permitted to notice its own machinery, and once is the correct number.</p>
+<ul><li><strong>Lock-Count Velkan</strong>, the skeptic. The split-stick ledger with three inconsistencies. Outcome: the skimmed water-rent is Kargath's riders.</li><li><strong>Ash-Wind Iserin</strong>, the pragmatist. The plank bridge re-seated before dawn without cutting live timber. Outcome: <em>"I don't choose sides; I choose lanes."</em> — and two grazing corridors unguarded on new moons.</li><li><strong>Sluice-Elder Amru</strong>, the river-mystic. <em>Two obligations are spent. A third is not owed. If you want my ear, pay.</em> Riarhin lays the braid-rings of the two dead boys on his cairn and speaks the road-words naming their commander's order and their zeal, and converts a vengeance into a ledger entry. Then the Wind-Knot: blindfold, ford-stones, three words permitted, and <strong>Lyra spends her one word — "hold" — and saves the crossing with her hands shaking.</strong></li></ul>
+<p><strong>The moot that isn't.</strong> Keep entirely, and keep it as the intellectual centre of the second half. They will not betray Kargath. And in the morning a clerk miscopies a rota, a courier delivers a schedule without a seal, and a salt-yard tally stays lost. <strong>Doors remain technically shut and a path appears if you know how to walk it.</strong> Nobody says the word <em>exit</em>. Three of them are certified anyway.</p>
+<p><strong>Kargath, properly, at last.</strong> He gets one long scene in this part and it is not a threat scene. He explains himself to a subordinate who is not really listening, which is the only way a man like that ever tells the truth.</p>
+<p>His grievance, stated once and never repeated: <strong>the world took the board.</strong> It took it openly, credited it, plays it in three languages, teaches it to its children, writes manuals about it — and his people got nothing for it. Not a border. Not a treaty. Not one year of not being ridden down. He does not complain of theft. He complains of <strong>acknowledgement without consequence</strong>, which he regards, correctly, as the more contemptuous of the two.</p>
+<p>And then the thing that makes him a person rather than a thesis: he has read <em>Canray by Convoy</em>. He owns a copy. He thinks it is very good. He knows exactly who wrote it and what Rekedim is, and he refers to him — without heat, as a matter of fact — as <strong>the one who took the offer</strong>.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART SIX</span>The Last Blade</h2>
+<h4><em>Kon'reh. The strike that ends it, which is only available because everything before it was.</em></h4>
+<hr class="scene-rule"/>
+<p><strong>Keep the outline's architecture.</strong> The war-chest, the allied strike, the forced duel, the six steps, the burial of the brothers' blades, the keeping of Remnant.</p>
+<p><strong>Three corrections.</strong></p>
+<p><strong>One: the chest is not treasure, it is credit.</strong> Silver, salt, coin and <em>portable ledgers</em>. Taking it does not make Kargath poor; it makes him <strong>unable to pay on time</strong>, which on the grass is worse, because a man who cannot pay his riders this week is a man whose riders are listening to someone else by the new moon. Rekedim says this in one sentence and the sentence is the climax of his entire arc, and it is about bread.</p>
+<p><strong>Two: the duel must be a disappointment, on purpose.</strong> The outline promises a duel that is the culmination of every strategy in the book. It must not be. Kargath is out of pieces before he draws; the duel is not the last move, it is <strong>the receipt for a game that ended two chapters ago</strong>, and he knows it, and the reader should feel the deflation and then understand it.</p>
+<p><em>Six steps.</em> She names the number before it starts — what she owes and all he has left. It takes six. It is spare and quick and there is nothing beautiful in it.</p>
+<p>And <strong>do not give him a speech as he dies.</strong> The outline has him reflecting on the irony of Kon'reh with his last breath. He has already said all of that, once, in Part Five, to a man who was not listening, which is the right place for it. Here he should say something small and irrelevant and true. He is allowed one sentence. It should not be about the game.</p>
+<p><strong>Three: Lyra, not the duel, is the ending.</strong></p>
+<p>Riarhin wins and buries the brothers' blades with him and keeps Remnant, and pairs it with the one she calls Toothpick, and the book does not say the third name.</p>
+<p>And Lyra does not forgive her. That is the ending. Their break in Part Five is not repaired in Part Six, and the last exchange between them is short and civil and final, and the warmth does not come back.</p>
+<p>Because Lyra is right: mercy for strangers and a knife for her own. And Riarhin is also right: she kills the one who <em>chose</em> the killing, and the commander did not choose, and he will answer twice when she calls. <strong>Both are right and the count does not come out even</strong>, and a book that lets them reconcile is a book that has decided it does.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">CODA</span>The Silent Board</h2>
+<hr class="scene-rule"/>
+<p>Tarlington. Late. She comes back the way the corrections require — Elyas and Rekedim returning by way of Tarlington, and she with them, and the house in the last week of a duke who has been <em>sick</em> for eleven months and is about to be dead.</p>
+<p>She goes into the study.</p>
+<p>And this is where the novel pays for four hundred pages of not looking, and there are two ways to do it and only one of them is honest.</p>
+<p><strong>The dishonest ending</strong>, which is the one the outline is reaching for: she reads the position, it names the man, and she understands that the answer was here all along. Clean, satisfying, and it makes the entire book a wasted journey in the cheap sense, and it makes Braedyn a puzzle-setter.</p>
+<p><strong>The honest ending</strong>, which is the one to write: <strong>she reads it, and it is not an answer.</strong></p>
+<p>It is a <em>question</em>. Sixteen years ago she left in the middle of a game, and the position is the position she left him in, untouched — and what he has done, at some point in the years since, is move <strong>one piece</strong>. One. His own. Into a losing square, deliberately, with no purpose that improves his position in any way.</p>
+<p>She stands and looks at it for a long time and works out what it is, because she is the only person alive who can:</p>
+<p>He resigned.</p>
+<p>Not in the notation — there is no notation for it, on the grass or in the under-vaults, and there is not one in Canray either. He made the move a man makes when he wants the other player to be able to say, afterwards, that they did not lose. He conceded the game to her, sixteen years ago or six years ago or last winter, on a board she was never going to look at, and told nobody, and went on dying of a thing he was calling a cold.</p>
+<p>And the intelligence is in it after all — not a name, but the <em>shape</em> of what he knew, which she can now read off the board the way she could always have read it, and which would have saved a great deal and will still save some. It is both. It was always going to be both. He could not write it down, so he put it where only she could read it, and then, because he was also a man and not only a duke, he used the same board to say the other thing.</p>
+<p>She does not cry and she does not sit down. She takes the losing piece off the board and puts it in her pocket, which is not a move either.</p>
+<p>Then she goes up and sits with him. He is not able to talk by then. The book does not report what she says.</p>
+<hr class="scene-rule"/>
+<p><strong>The last image.</strong> The board, after, with a piece missing and the position unresolved and no one in the room who can read it.</p>
+<p>Sixteen years of a game nobody won. A blade with three names, of which nobody says the third. A game with three names, of which everyone knows the first and it changed nothing.</p>
+<p>And a woman who is going to live a very long time, walking out of a house at the end of a war she has now been in twice, with a dead man's piece in her pocket, and a debt on the grass she has not called in yet.</p>
+<p class="marginalia"><em>Call once for the road. Once for the reckoning.</em></p>
+<hr class="scene-rule"/>
+<h3>APPENDIX</h3>
+<h2>Working Rules</h2>
+<hr class="scene-rule"/>
+<p><strong>On the game.</strong> Nobody compares anything to it. Ever. They use it. The vocabulary is operational: <em>count your exits; fork the far mouth; two exits, both priced; seed is a depot, not a daring; lane welding; the ninth rim; she never checks behind.</em> If a line could be cut and replaced with <em>"it was like a game of Canray,"</em> the line is wrong and the scene has not done its work.</p>
+<p><strong>On the three names.</strong> Never gloss them. A Vhasian says Canray, an Aeler says K'thra, a Ykrul says Kon'reh, and the book never stops to tell you they are the same, and the reader gets it inside forty pages and feels clever, which is the correct transaction.</p>
+<p><strong>On Remorse.</strong> Not named. Not hinted at by a character. The blade is Toothpick when she speaks of it and Fate's Edge when the army did and she hated it. Anyone who has read <em>A Roll of the Fallen</em> has what they need.</p>
+<p><strong>On the Hollow and the Ninth.</strong> Neither belongs in this book. The Ykrul material will pull toward them — the ninth step, the ninth rim, the counting — and it must be allowed to pull and never arrive. Whatever is not explained here is not being withheld coyly; it is not the subject.</p>
+<p><strong>On numbers.</strong> The Belworth books count in <strong>nines and elevens</strong> and this is one of them. <em>Six steps</em> is the exception and is load-bearing precisely because it is the wrong number for this shelf: it is a Ykrul count in a Vhasian book, and it is the moment the novel stops being played on the party's board.</p>
+<p><strong>On length and shape.</strong> Six parts, roughly even, with Part Two the longest and Part Six the shortest. The novel is front-loaded with procedure and back-loaded with grass, and the hinge is a man drawing a sword he swore not to draw, at the end of the second part, in a bad room, for somebody else.</p>
+</body>
+</html>

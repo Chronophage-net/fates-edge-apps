@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-16T14:35:21.011Z",
+  "generated": "2026-09-16T16:15:14.455Z",
   "documents": [
     {
       "id": "srd",
@@ -1359,6 +1359,16 @@
       "active": true
     },
     {
+      "id": "the_last_blade_treatment",
+      "title": "The Last Blade Treatment",
+      "file": "Fates_-_Edge_-_-The-_-Last-_-Blade-_-Treatment.html",
+      "path": "/data/docs/design/",
+      "category": "design",
+      "categoryLabel": "Design",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_nameless",
       "title": "The Nameless",
       "file": "Fates_-_Edge_-_-The-_-Nameless.html",
@@ -1623,7 +1633,7 @@
       "active": true
     }
   ],
-  "total_count": 103,
-  "active_count": 103,
+  "total_count": 104,
+  "active_count": 104,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
