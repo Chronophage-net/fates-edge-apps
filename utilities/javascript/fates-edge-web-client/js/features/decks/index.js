@@ -1,9 +1,17 @@
 /**
  * Decks feature - Deck of Consequences and Crown Spread
- * Supports single draw, multiple draw, and Crown Spread (4+1 wildcard).
+ * Supports single draw, multiple draw, and Crown Spread (4+1 twist).
  * Loads region data dynamically from /data/regions/.
  * Region discovery is done without a manifest.json – we test known slugs.
- * Uses deterministic RNG for static/demo deployments.
+ *
+ * Deterministic RNG: session-only. Call setDeckSeed(seed) to enable, or
+ * setDeckSeed(null) to return to crypto. Persistence is intentionally NOT
+ * performed by this module:
+ *   - the deck's seed must not survive a page reload by accident, and
+ *   - the deck must never share a localStorage key with the dice engine
+ *     (fates-edge-seed). Doing so previously let the "New Seed" button
+ *     here silently pin the dice engine into deterministic mode forever,
+ *     and vice versa. See core/dice.js's header for the same rationale.
  *
  * Data structure:
  *   {
@@ -206,8 +214,17 @@ const ACE_EFFECTS = {
 };
 
 // ============================================================
-// DETERMINISTIC RNG
+// DETERMINISTIC RNG (session-only)
 // ============================================================
+//
+// Deliberately self-contained: the deck's generator is INDEPENDENT of the
+// dice engine's. They used to share a localStorage key, which meant that
+// reseeding one would silently reseed the other; they are now decoupled.
+//
+// There is intentionally NO module-load-time localStorage read and NO
+// module-load-time write. setDeckSeed() controls the mode for the current
+// session only. A demo/static deployment that wants a reproducible deck
+// should call setDeckSeed(<constant>) from its own bootstrap script.
 
 const _deckSeedState = { seed: null, prng: null };
 
@@ -246,53 +263,33 @@ class Xorshift128 {
 }
 
 export function getDeckSeed() { return _deckSeedState.seed; }
+
+/**
+ * Enable or disable the deck's deterministic RNG for this session.
+ * @param {string|null} seed  Pass a seed to enable, null to clear.
+ *
+ * Does NOT touch localStorage. Persisting the seed across reloads is a
+ * deployment-time decision (inject it from your bootstrap), not a runtime
+ * side effect of clicking a UI button. Also invalidates the twist offset
+ * so the flavour text is regenerated under the new RNG rather than reusing
+ * a value drawn under the previous one.
+ */
 export function setDeckSeed(seed) {
-    _deckSeedState.seed = seed;
-    if (seed) {
-        _deckSeedState.prng = new Xorshift128(seed);
-        try { localStorage.setItem('fates-edge-deck-seed', seed); } catch (e) { /* ignore */ }
-    } else {
-        _deckSeedState.prng = null;
-        try { localStorage.removeItem('fates-edge-deck-seed'); } catch (e) { /* ignore */ }
-    }
+    _deckSeedState.seed = (seed === null || seed === undefined || seed === '') ? null : String(seed);
+    _deckSeedState.prng = _deckSeedState.seed ? new Xorshift128(_deckSeedState.seed) : null;
+    _cardOffset = null;
     return true;
 }
+
 export function generateDeckSeed() {
     try {
-        if (window && window.crypto && window.crypto.getRandomValues) {
+        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
             const array = new Uint32Array(4);
             window.crypto.getRandomValues(array);
             return array.reduce((acc, val) => acc + val.toString(16).padStart(8, '0'), '');
         }
     } catch (e) { /* ignore */ }
     return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-}
-
-try {
-    const stored = localStorage.getItem('fates-edge-deck-seed');
-    if (stored) {
-        _deckSeedState.seed = stored;
-        _deckSeedState.prng = new Xorshift128(stored);
-        console.log('[Decks] Seed loaded from localStorage:', stored.substring(0, 8) + '...');
-    }
-} catch (e) { /* ignore */ }
-
-if (!_deckSeedState.seed && typeof window !== 'undefined' && window.__RANDOM_SEED) {
-    _deckSeedState.seed = window.__RANDOM_SEED;
-    _deckSeedState.prng = new Xorshift128(_deckSeedState.seed);
-    try { localStorage.setItem('fates-edge-deck-seed', _deckSeedState.seed); } catch (e) { /* ignore */ }
-}
-
-if (!_deckSeedState.seed && typeof window !== 'undefined') {
-    try {
-        const diceSeed = localStorage.getItem('fates-edge-seed');
-        if (diceSeed) {
-            _deckSeedState.seed = diceSeed;
-            _deckSeedState.prng = new Xorshift128(_deckSeedState.seed);
-            localStorage.setItem('fates-edge-deck-seed', _deckSeedState.seed);
-            console.log('[Decks] Seed shared from dice module:', _deckSeedState.seed.substring(0, 8) + '...');
-        }
-    } catch (e) { /* ignore */ }
 }
 
 function getDeckRandom() {
@@ -377,12 +374,22 @@ let deckHistory = [];
 let regionData = null;
 let regionNames = [];
 let selectedRegion = null;
-let cardOffset = 0;
 let isInitialized = false;
 let isSyncing = false;
 let regionChangeCallbacks = [];
 
-cardOffset = getDeckRandomInt(0, 1000);
+// Twist offset: a per-session salt that varies the fifth card's flavour
+// text. Computed LAZILY on first use so it always reflects whichever RNG
+// mode is active at the moment of the first draw -- previously it was
+// computed at module load, before a seed could possibly have been set, so
+// the twist stayed crypto-random even when the shuffle was reproducible.
+let _cardOffset = null;
+function getCardOffset() {
+    if (_cardOffset === null) {
+        _cardOffset = getDeckRandomInt(0, 1000);
+    }
+    return _cardOffset;
+}
 
 // ============================================================
 // REGION DATA CACHE
@@ -690,9 +697,16 @@ function renderGmNote(note, { compact = false, heading = null } = {}) {
         </details>`;
 }
 
+/**
+ * The flavour text for the fifth card of a Crown Spread. Its suit+rank
+ * are hashed together with a per-session offset; identical spreads within
+ * the same session produce identical twists, and a seeded session is
+ * replayable. Note that the fifth card is an ordinary draw -- it may or
+ * may not be a Joker, and the text labels it accordingly.
+ */
 function getWildcardMeaning(card, regionData) {
     const twists = DEFAULT_TWISTS;
-    const seed = (card?.suit || 'joker') + (card?.rank || '') + cardOffset + 999;
+    const seed = (card?.suit || 'joker') + (card?.rank || '') + getCardOffset() + 999;
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
         hash = ((hash << 5) - hash) + seed.charCodeAt(i);
@@ -837,14 +851,32 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
         </div>
     `).join('');
 
+    // The fifth card is an ordinary draw from the deck. It is NOT guaranteed
+    // to be a Joker, and the display should not pretend otherwise. Derive
+    // colour/symbol/rank/suit from the actual card so a Seven of Clubs
+    // renders as a Seven of Clubs, not a 🃏.
+    const _wfIsJoker = isJokerCard(wildcard);
+    const _wfColor = _wfIsJoker
+        ? 'var(--gold)'
+        : (wildcard.color || SUIT_COLORS[wildcard.suit] || 'var(--gold)');
+    const _wfSymbol = _wfIsJoker
+        ? '🃏'
+        : (wildcard.symbol || SUIT_SYMBOLS[wildcard.suit] || '?');
+    const _wfRank = _wfIsJoker
+        ? 'Joker'
+        : (wildcard.rankName || wildcard.rank || '?');
+    const _wfSuit = _wfIsJoker
+        ? ''
+        : (wildcard.suitName || SUIT_NAMES[wildcard.suit] || '');
+
     const wildcardDisplay = `
-        <div class="crown-card wildcard" style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;min-width:80px;">
-            <div style="background:var(--bg3);border:2px solid var(--gold);border-radius:var(--radius);padding:0.4rem;text-align:center;width:70px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow: 0 0 20px rgba(212,175,55,0.4);animation:pulse-gold 1.5s ease-in-out infinite;">
-                <div style="font-size:0.7rem;color:var(--gold);">🌟</div>
-                <div style="font-size:1.8rem;color:var(--gold);">🃏</div>
-                <div style="font-size:0.6rem;color:var(--gold);">Wildcard</div>
+        <div class="crown-card twist" style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;min-width:80px;">
+            <div style="background:var(--bg3);border:2px solid ${_wfColor};border-radius:var(--radius);padding:0.4rem;text-align:center;width:70px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;${_wfIsJoker ? 'box-shadow: 0 0 20px rgba(212,175,55,0.4);animation:pulse-gold 1.5s ease-in-out infinite;' : ''}">
+                <div style="font-size:0.7rem;color:var(--text3);">🌟</div>
+                <div style="font-size:1.8rem;color:${_wfColor};">${_wfSymbol}</div>
+                <div style="font-size:0.6rem;color:${_wfColor};">${_wfRank}</div>
             </div>
-            <div style="font-size:0.6rem;color:var(--gold);text-align:center;max-width:80px;">Wildcard<br>Twist</div>
+            <div style="font-size:0.6rem;color:var(--text3);text-align:center;max-width:80px;">${_wfSuit ? `${_wfSuit}<br>` : ''}Twist</div>
         </div>
     `;
 
@@ -873,13 +905,14 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 
     const wildcardMeaning = getWildcardMeaning(wildcard, regionData);
     const wildcardVertical = `
-        <div style="display:grid;grid-template-columns:100px 1fr;gap:0.5rem;padding:0.5rem;background:var(--bg4);border-radius:var(--radius);margin-top:0.3rem;border:2px solid var(--gold);">
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:0.5rem;padding:0.5rem;background:var(--bg2);border-radius:var(--radius);margin-top:0.3rem;border-inline-start:4px solid ${_wfColor};">
             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                <div style="font-size:1.5rem;color:var(--gold);">🌟</div>
-                <div style="font-size:0.8rem;font-weight:600;color:var(--gold);">Wildcard</div>
+                <div style="font-size:1.5rem;color:${_wfColor};">${_wfSymbol}</div>
+                <div style="font-size:0.8rem;font-weight:600;color:${_wfColor};">${_wfRank}</div>
+                <div style="font-size:0.65rem;color:var(--text3);">🌟 Twist</div>
             </div>
             <div style="display:flex;flex-direction:column;justify-content:center;">
-                <div style="font-size:0.8rem;color:var(--gold);font-weight:600;">Wildcard Twist</div>
+                <div style="font-size:0.8rem;color:var(--text2);font-weight:600;">Twist</div>
                 <div style="font-size:0.85rem;color:var(--text);line-height:1.4;">${renderCardText(wildcardMeaning)}</div>
             </div>
         </div>
@@ -890,7 +923,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     synthesis += `🏔️ Crest: ${positionCards[1].regionMeaning || positionCards[1].description}\n\n`;
     synthesis += `👑 Crown: ${positionCards[2].regionMeaning || positionCards[2].description}\n\n`;
     synthesis += `🤝 Left Hand: ${positionCards[3].regionMeaning || positionCards[3].description}\n\n`;
-    synthesis += `🌟 Wildcard: ${wildcardMeaning}`;
+    synthesis += `${wildcardMeaning}`;
 
     const nonWildcards = mainCards.filter(c => !isJokerCard(c));
     let highest = null;
@@ -920,7 +953,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
         timerCard = `${highest.rankName} of ${highest.suitName}`;
     } else if (highest) {
         timer = 4;
-        timerCard = 'Joker (Wildcard)';
+        timerCard = 'Joker (Twist)';
     }
 
     if (timer) {
@@ -1098,7 +1131,7 @@ export async function render(el) {
                             <option value="1" data-i18n="feature.decks.1SB1Card">1 SB (1 card)</option>
                             <option value="2" selected data-i18n="feature.decks.2SB2Cards">2 SB (2 cards)</option>
                             <option value="3" data-i18n="feature.decks.3SB3Cards">3 SB (3 cards)</option>
-                            <option value="crown" data-i18n="feature.decks.crownSpread41Wildcard">👑 Crown Spread (4+1 wildcard)</option>
+                            <option value="crown" data-i18n="feature.decks.crownSpread41Wildcard">👑 Crown Spread (4+1 twist)</option>
                         </select>
                     </div>
                     <button class="btn btn-gold" id="deck-draw-btn" data-i18n="feature.decks.draw">🃏 Draw</button>
@@ -1142,7 +1175,7 @@ export async function render(el) {
         <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-inline-start:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                 <span style="font-size:0.8rem;color:var(--text2);">
-                    ${isDeterministic ? '🎲 Deterministic RNG (seeded)' : '🔀 Cryptographic RNG (random)'}
+                    ${isDeterministic ? '🎲 Deterministic RNG (seeded, this session)' : '🔀 Cryptographic RNG (random)'}
                     ${isDeterministic ? `<span style="font-size:0.6rem;color:var(--text3);font-family:monospace;">seed: ${_deckSeedState.seed.substring(0, 8)}...</span>` : ''}
                 </span>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
@@ -1205,9 +1238,10 @@ export async function render(el) {
     if (seedRegenerate) {
         seedRegenerate.addEventListener('click', function() {
             const newSeed = generateDeckSeed();
+            // setDeckSeed() invalidates the twist offset internally and
+            // does not touch localStorage. The deck's seed is session-only,
+            // and must never touch the dice engine's persistence key.
             setDeckSeed(newSeed);
-            try { localStorage.setItem('fates-edge-seed', newSeed); } catch (e) { /* ignore */ }
-            cardOffset = getDeckRandomInt(0, 1000);
             render(container);
             showToast(i18nText("feature.decks.newDeckSeedGeneratedValue", { value0: newSeed.substring(0, 8) }, "🎲 New deck seed generated: {{value0}}..."), 'success');
         });
@@ -1218,7 +1252,6 @@ export async function render(el) {
         seedClear.addEventListener('click', function() {
             if (confirm(i18nText("feature.decks.clearTheDeterministicSeedThisWillUse", null, "Clear the deterministic seed? This will use cryptographic RNG instead."))) {
                 setDeckSeed(null);
-                cardOffset = getDeckRandomInt(0, 1000);
                 render(container);
                 showToast(i18nText("feature.decks.deckSeedClearedUsingCryptographicRNG", null, "🧹 Deck seed cleared. Using cryptographic RNG."), 'info');
             }
@@ -1297,7 +1330,7 @@ function updateSpreadDescription() {
     const descEl = document.getElementById('spread-description');
     if (!descEl) return;
     if (type === 'crown') {
-        descEl.textContent = i18nText("feature.decks.crownSpread4CardsRootCrestCrown", null, "👑 Crown Spread: 4 cards (Root, Crest, Crown, Left Hand) + 1 wildcard twist. Each card draws from the selected region's deck.");
+        descEl.textContent = i18nText("feature.decks.crownSpread4CardsRootCrestCrown", null, "👑 Crown Spread: 4 cards (Root, Crest, Crown, Left Hand) + 1 twist card. Each card draws from the selected region's deck.");
     } else if (type === '2') {
         descEl.textContent = i18nText("feature.decks.twoDrawsAComplicationWithAnAdditional", null, "Two draws: a complication with an additional twist.");
     } else if (type === '3') {
@@ -1385,7 +1418,7 @@ export async function drawConsequence() {
 
         if (typeof logRecordingEvent === 'function') {
             const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
-            logRecordingEvent('crown_spread', `Crown Spread: ${cardNames} | Wildcard: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${selectedRegion}`);
+            logRecordingEvent('crown_spread', `Crown Spread: ${cardNames} | Twist: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${selectedRegion}`);
         }
     } else {
         const cardsEl = document.getElementById('crown-spread-cards');
@@ -1593,7 +1626,8 @@ export function resetDeck() {
         showToast(i18nText("feature.decks.onlyTheGMCanResetTheDeck", null, "Only the GM can reset the deck."), 'error');
         return;
     }
-    cardOffset = getDeckRandomInt(0, 1000);
+    // Invalidate the twist salt so the next draw picks a fresh flavour text.
+    _cardOffset = null;
     buildDeck();
     const drawnCards = document.getElementById('drawn-cards');
     if (drawnCards) drawnCards.innerHTML = '';
@@ -1739,8 +1773,25 @@ export function openCrownSpread() {
 
         if (typeof logRecordingEvent === 'function') {
             const cardNames = mainCards.map(c => `${c.rankName} of ${c.suitName}`).join(', ');
-            logRecordingEvent('crown_spread_modal', `Crown Spread (modal): ${cardNames} | Wildcard: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${regionName}`);
+            logRecordingEvent('crown_spread_modal', `Crown Spread (modal): ${cardNames} | Twist: ${isJokerCard(wildcard) ? 'Joker' : `${wildcard.rankName} of ${wildcard.suitName}`} | Region: ${regionName}`);
         }
+
+        // The fifth card is an ordinary draw and may or may not be a Joker.
+        // Derive its real colour / symbol / rank / suit for the modal's
+        // display so a Seven of Clubs renders as a Seven of Clubs.
+        const _wfIsJoker = isJokerCard(wildcard);
+        const _wfColor = _wfIsJoker
+            ? 'var(--gold)'
+            : (wildcard.color || SUIT_COLORS[wildcard.suit] || 'var(--gold)');
+        const _wfSymbol = _wfIsJoker
+            ? '🃏'
+            : (wildcard.symbol || SUIT_SYMBOLS[wildcard.suit] || '?');
+        const _wfRank = _wfIsJoker
+            ? 'Joker'
+            : (wildcard.rankName || wildcard.rank || '?');
+        const _wfSuit = _wfIsJoker
+            ? ''
+            : (wildcard.suitName || SUIT_NAMES[wildcard.suit] || '');
 
         crownSpreadModal.innerHTML = `
             <div style="background:var(--bg2);padding:2rem;border-radius:16px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);">
@@ -1761,10 +1812,10 @@ export function openCrownSpread() {
                             <div style="font-size:0.5rem;color:var(--text3);">${p.position.label}</div>
                         </div>
                     `).join('')}
-                    <div style="background:var(--bg4);border:2px solid var(--gold);border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:70px;box-shadow:0 0 20px rgba(212,175,55,0.3);">
-                        <div style="font-size:0.6rem;color:var(--gold);">🌟</div>
-                        <div style="font-size:2rem;color:var(--gold);">🃏</div>
-                        <div style="font-size:0.6rem;color:var(--gold);">Wild</div>
+                    <div style="background:var(--bg3);border:2px solid ${_wfColor};border-radius:var(--radius);padding:0.5rem;text-align:center;min-width:70px;${_wfIsJoker ? 'box-shadow: 0 0 20px rgba(212,175,55,0.3);' : ''}">
+                        <div style="font-size:0.6rem;color:var(--text3);">🌟</div>
+                        <div style="font-size:2rem;color:${_wfColor};">${_wfSymbol}</div>
+                        <div style="font-size:0.6rem;color:${_wfColor};">${_wfRank}</div>
                         <div style="font-size:0.5rem;color:var(--text3);">Twist</div>
                     </div>
                 </div>
@@ -1783,8 +1834,9 @@ export function openCrownSpread() {
                     `).join('')}
                     <div>
                         <div style="display:flex;align-items:center;gap:0.5rem;">
-                            <span style="color:var(--gold);">🌟</span>
-                            <strong style="color:var(--gold);">Wildcard Twist</strong>
+                            <span style="color:${_wfColor};">🌟</span>
+                            <strong style="color:${_wfColor};">Twist</strong>
+                            <span style="color:var(--text3);font-size:0.8rem;">${_wfRank}${_wfSuit ? ` of ${_wfSuit}` : ''}</span>
                         </div>
                         <div style="color:var(--text);font-size:0.95rem;line-height:1.55;margin-inline-start:1.5rem;">${renderCardText(result.wildcard)}</div>
                     </div>
