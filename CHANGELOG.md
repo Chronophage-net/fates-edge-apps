@@ -62,6 +62,11 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.10.0] - 2026-09-16
+
+### Added
+- The Widow's Walk, from docs v0.23.0
+
 ## [5.9.6] - 2026-09-15
 
 ### Chore
