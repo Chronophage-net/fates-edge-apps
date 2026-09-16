@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Daughter of Ahakar — A Tale of Ashaan</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>The Daughter of Ahakar</h1>
+<h4>A Tale of Ashaan, told in three</h4>
+<hr class="scene-rule"/>
+<p><strong>A note on the telling.</strong> This is a performance piece and it should be read as one. It was taken down at Fairport in the winter of 819 AR from a woman who gave the house three different names in the course of one evening and would not be drawn on any of them.</p>
+<p>She tells it in the third person throughout. That is not an affectation of the transcriber. She was asked about it twice and answered once, at the end, and the answer is the last thing in the tale, and it should not be read before the rest.</p>
+<p>The tale counts in threes and nines, as everything out of Ashaan does.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART ONE</span>The Wisdom of the Snake</h2>
+<hr class="scene-rule"/>
+<p>Once upon a time there was a city between the desert and the sea, and it had a name, and I am not going to say it, because that is the joke and you will have it at the end whether you want it or not.</p>
+<p>The city grew old. Cities do. It grew rich and then it grew fat and then it grew cruel, which is the order they go in, and the young people of it looked at their fathers and did not want to become them, which is also the order.</p>
+<p>And there came a prophet out of the poor quarter called <strong>Ahakar</strong>, who preached love, and peace, and patience, and who took whoever would come with him out into the red country and lived in the caves there. And this was so long ago that nobody can tell you the year and anybody who gives you one is selling something.</p>
+<p>Ahakar taught three wisdoms and he taught them from three animals, because he was talking to people who had walked four days and were sitting on rock, and you do not give such people a syllogism.</p>
+<p><strong>The Wisdom of the Snake.</strong> The snake wants nothing. It carries nothing. It owns one coat and when the coat stops fitting it leaves the coat behind in the sand and does not go back to look at it. You may hold a snake's whole life in two hands and there is nothing in it that is not the snake. <em>Be able to leave it.</em> That is the snake, and the snake is wise.</p>
+<p><strong>The Wisdom of the Spider.</strong> The spider does not chase. The spider looks at the corner it has been given — not a better corner, the corner it has — and it makes the corner into the trap, and then it waits, and it does not eat more than it needs, because a fat spider is a dead spider. It does not want what is over the wall. It wants what is coming down the wall. <em>Use what is in the room.</em> That is the spider, and the spider is wise.</p>
+<p><strong>The Wisdom of the Raven.</strong> The raven knows the face of death. It is the only one of the three that has looked at the thing properly, and it is not frightened of it, and it is not reconciled to it either, which is the part everybody gets wrong. The raven does not say <em>death is beautiful</em>. The raven says <em>that one is dead, and I am not, and I will be.</em> It sits on the wall and it counts. All things live as they must. All things die. <em>Look at it.</em> That is the raven, and the raven is wise.</p>
+<p>And Ahakar said a fourth thing, which was not a wisdom but a warning, and it is the only sentence of his that every single one of his children can still say, in every tribe, in every dialect, nine hundred years later:</p>
+<p class="marginalia"><em>Each of these will be forgotten in its turn. And on the day the last of them is forgotten, my people are taken.</em></p>
+<p>Now hold that, because it is a story about a promise being kept.</p>
+<hr class="scene-rule"/>
+<p>The city between the desert and the sea fell. Not dramatically. It was eaten by a plague and then by its own creditors and then by the takers, and by the time anyone thought to write down that it had fallen there was nobody left in it to argue about the date.</p>
+<p>And the Sons and Daughters of Ahakar came out of the caves and made tribes and went into the red country, and they were hunted there for nine generations, and they were very good at not being caught.</p>
+<p>They kept the Snake, because a people who are hunted own nothing they cannot carry and bury nothing they cannot leave. They kept the Spider, because a people in a desert use the rock they are standing on. And they kept the Raven hardest of all, because they buried somebody every month and they looked at it every month and they got very calm about it, which frightened everyone who met them.</p>
+<p>Then the hunting stopped.</p>
+<p>They came out of the red country into the grass, and the grass was good, and they built villages with walls of mud and dung, and they had children who had never buried anybody, and those children had children.</p>
+<p>And here is what happened, and it is the saddest part of the story and it happens in about sixty years, which is nothing:</p>
+<p>They kept the Snake, because a herdsman still moves.</p>
+<p>They kept the Spider, because a village is a corner you make into a trap.</p>
+<p>And they let the Raven go. Not out of wickedness. Out of <em>comfort</em>. They stopped looking at the thing because they had stopped having to, and after two generations of not looking at it they had a whole vocabulary for not looking at it, and they told their children that death was a sleep and a garden and a reunion — all of which may be true, and none of which is <em>looking</em>.</p>
+<p>And on a morning in the sixth month of a good year, with the grass high, the takers came over the rise with brass chains on nine carts and found a people who had forgotten how to count.</p>
+<hr class="scene-rule"/>
+<p>The tribes call the takers <strong>kûls</strong>, and that is not what the takers call themselves, and you should notice that, because this is a story about what people are called.</p>
+<p>They came out of <strong>Ashaan</strong>, which is the country that is written where the old city was, and which has no name either, and that is a different story and a worse one.</p>
+<p>They walked the grassland people across the red country to the coast, which takes nine weeks and which is a distance the tribes' own great-grandfathers had crossed at their own speed with their own water. Many died. The tribes have a number for how many and the Ashaani rolls have a different one, and the difference between the two numbers is a subject on which the Brass Coast has been making a case for two hundred years.</p>
+<p>The children were put in the wagons. This is the part visitors never believe, so the tellers always slow down here. <strong>The children were fed.</strong> They were watered twice a day and shaded and counted every morning, and they rode, and their mothers walked, and at night the wagons were drawn up close enough that the children could hear everything.</p>
+<p>That is not carelessness and it is not sadism. A child in good condition is worth four times a child in poor condition, and a child who has spent nine weeks listening to its mother in the dark is a child who has learned something permanent about who can help it.</p>
+<p>Both of those facts were in the same ledger, in the same hand, on the same page.</p>
+<hr class="scene-rule"/>
+<p>At the end of the ninth week they came in sight of the city and were made to stand in lines outside the wall, in the sun, from the middle of the morning.</p>
+<p>At the head of the lines was a trestle table with an awning over it, and under the awning sat a woman.</p>
+<p>She wore a gown of gold and a circlet of gold, and over her face she wore a veil made of gold coins, hung close, so that they moved and clicked when she turned her head. The coins were not Ashaani. They were not anything. They were the coinage of nine dead empires, and every one of them had been legal tender somewhere, and every one of them was now a decoration on a veil, and she had chosen them for that.</p>
+<p>She is the <strong>Veiled Sister</strong>, and she is a Maeri, which means she is not a person and is not a spirit and is not to be petitioned, and I will say nothing else about what she is because I do not know and neither does anybody who tells you they do.</p>
+<p>Her method was very simple and she had been doing it for a long time.</p>
+<p>She asked each one their name. And they told her. They told her whether they wished to or not; the tongue went and did it. And then she leaned in, and she thanked them.</p>
+<hr class="scene-rule"/>
+<p>A small girl of the grassland tribes came to the table in the afternoon.</p>
+<p>"Give me your name, child."</p>
+<p>And the girl did not want to. She had decided, somewhere back in the fourth week, that she was not going to give this woman anything, and she had held that decision for five weeks the way children hold decisions, which is completely.</p>
+<p>And her mouth opened and her tongue moved and her own voice said her name out loud into the sun, clearly, all of it, the full form her grandmother used.</p>
+<p>She saw the smile happen under the coins. You could not see the mouth. You could see the coins move.</p>
+<p>And the woman leaned forward, and the girl felt the cold come off her — in that sun, in that country, a cold like a cellar door opening — and the woman said, into her ear, courteously:</p>
+<p>"Thank you. You are now <strong>Ahloh Zada</strong>."</p>
+<p>Which is the Ashaani term of art and means <em>slave of the powerful</em>, and which is not an insult and is not intended as one. It is a category. It is what you are called when the column where your name goes has been closed.</p>
+<p>And then the woman stopped.</p>
+<p>She sat back a little, and her head went to one side, and she was quiet for the space of three breaths, with the whole line waiting and the guards waiting and the sun coming down. And the girl, who had nothing left to be frightened with, looked up at the coins and watched them not move.</p>
+<p>It was the look of a person who has put something in her mouth and found it is not what she expected.</p>
+<p>Then the Veiled Sister shook her head once, very slightly, and lifted her hand, and the girl was sent on to the market.</p>
+<p>Nobody has ever been able to tell the daughter of Ahakar what that was. She has asked nine people who would know and they have given her nine answers, and the only one she has ever repeated is the one she got from a Breath-less woman in a cellar at Galanina, who said: <em>she does not spit them out, little sister. Ask instead what she was going to do with it and did not.</em></p>
+<hr class="scene-rule"/>
+<p>Now the tale usually says: <em>and she was sold, and she suffered.</em> And that is true and it is not enough, so I will do it properly, in three, because everything in this story comes in three.</p>
+<p><strong>She was bought first by a spice family</strong> and made chamber-slave to a merchant's daughter of her own age, and she attended her and played with her and grew with her, and was not beaten, and was fed, and was taught her letters by accident because it was easier to teach both girls than one. For six years the daughter of Ahakar had a friend who owned her, and did not find that strange, because she was nine.</p>
+<p>Then the merchant owed the wrong sum to the wrong man. He was killed in his own courtyard. His wife and his daughter were sold into a house on the Street of Lamps, and the daughter of Ahakar has never found out what became of either of them, and has looked, twice.</p>
+<p><strong>She was bought second by the men who killed him</strong>, who looked at a clever girl with letters and no name and saw an instrument.</p>
+<p>They were good teachers. That is the thing nobody wants to hear. They taught her to sing, and to dance, and to play the flute and the lute and the viol. They taught her poetry in three tongues. They taught her to take a voice off a person the way you take a coat off a hook. They taught her when to be charming and, much more important, when to be dull, because a dull woman is not remembered and a charming one is. And they taught her the whole grammar of a man's heart — where the stops are, what the fingering is, how long to hold a silence — and they taught it the way you teach an instrument, with a rod, for hours.</p>
+<p>And she was extremely good at it, and they told her so, and she was fifteen, and being told you are good at something is the third thing that happens to you in your whole life.</p>
+<p><strong>She was given third to a court mage</strong>, as a companion, which is a word.</p>
+<p>He was called Sarem Esoiti-broken and he was sixty and he was rude to her for nine days.</p>
+<p>On the tenth day she corrected his scansion. He had been reciting something old and getting a foot wrong in it, and she said so before she remembered not to, and he stopped, and went back, and found she was right, and looked at her for the first time.</p>
+<p>And after that they were happy, and I am going to say the word <em>happy</em> and not take it back.</p>
+<p>He laughed at her jokes. He taught her to see magic — and she found she could <em>hear</em> it, that it had a pulse and a rhythm under it, and that she had been hearing it in rooms all her life and calling it nerves. She made small magics. Nothing anyone would notice. A light. A knot. A false footstep in a corridor.</p>
+<p>She was in that house eleven months and they were the best eleven months she had had and the best she would have for nine years.</p>
+<p>And on a night in the ninth month of the year, the men who owned her used the fact of her — used the laughing, and the scansion, and the hour he did not set his wards because she was playing — and they came in and did the thing they had been paying for since the day they bought her.</p>
+<p>She went out of the house over the garden wall with his blood on the front of a dress he had given her.</p>
+<hr class="scene-rule"/>
+<p>That is the Snake, and she did not know it yet.</p>
+<p>The snake leaves the coat in the sand. The snake does not go back to look at the coat.</p>
+<p>She went back. She went back four times in six years, to the street, at night, to stand across from the house and look at the window, and the fourth time there was a different family in it with a lamp lit and children shouting, and she stood in the road and understood that the coat was gone and that nothing whatever had been left for her to mourn against, and that this was supposed to be the freedom.</p>
+<p>She did not feel free. She felt like a woman standing in a road.</p>
+<hr class="scene-rule"/>
+<p>For six years she was nothing in particular. She begged, performed, cut purses, told fortunes, sang in yards, and did three other things she will name if you buy the wine and will not name otherwise.</p>
+<p>And in those years she met others of her own people — always slaves, always in kitchens and yards and back rooms, always older than her — and they gave her what they had, which was the tale of Ahakar and the three wisdoms and the songs, in pieces, in the wrong order, in four dialects.</p>
+<p>None of them knew her tribe. None of them knew her name. She described her grandmother's hands and her village's well and a hill shaped like a sleeping dog, and nine people said <em>yes, I know that hill</em> and named nine different districts.</p>
+<p>What she got was the crib notes. The Snake is <em>let it go</em>. The Spider is <em>use what you have</em>. The Raven is <em>everything dies</em>. Three sentences, which is what survives a forced march, and which is about as much of a philosophy as a proverb is of a law.</p>
+<p>She has said, since, that she thinks this is funny. She does not laugh when she says it.</p>
+<p>And at nineteen she went aboard a ship called the <strong>Half Moon's Grace</strong> in the bottom of the fruit and came out of the hold nine days later on the far side of the Amaranthine, in a country where nobody had ever heard of any of it, and where being a Sidhi woman with no name got her exactly one question, asked once, at the quay, by a bored man with a book: <em>name?</em></p>
+<p>And she opened her mouth. And this time nothing came out at all.</p>
+<p>So she gave him one. The first one. It was <strong>Aevana</strong>, and she made it out of nothing on a dock in the rain, and it is the first thing she ever owned.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART TWO</span>The Wisdom of the Spider</h2>
+<hr class="scene-rule"/>
+<p>Fairport is the last great river port on the Belworth before the sea, which means it is a customs house with a city attached, which means it is the best place on that coast to be nobody.</p>
+<p>She was there four months before the thing happened that this tale is really about, and in those four months she ran nine small confidences and lost only one, and the one she lost she lost to a cadet.</p>
+<p>He was rich, he was twenty, he was vain, and she had taken eleven crowns off him with a story about a shipment and a widow. And instead of being quietly ashamed of it like a gentleman, he saw her in the fish market and came over the stalls after her.</p>
+<p>She was fast and she was clever and she did not yet know the lanes, which is the whole of it: she went left where there was no left, and came out of the alley into the chest of a large man in a plain coat who caught her by both arms without any effort at all.</p>
+<p>This was <strong>Jaymes Bloodgood the Younger</strong>, who was the cadet's commanding officer, and who had watched the entire pursuit from a doorway with his arms folded.</p>
+<p>He was not angry. That was the first strange thing. He listened to the cadet, and then he listened to her, which was the second strange thing and a larger one, and then he said that she would give the money back, all of it, tonight, and that the cadet would apologise to the fishmonger whose stall he had gone through.</p>
+<p>And then he said that she looked as though she had not eaten and that his father kept a table, and that she was welcome at it, provided — and he said this without smiling, which is how she knew he was joking — that she would not steal the silver, or the walls and the floors down to the studs.</p>
+<hr class="scene-rule"/>
+<p>Here is what the tale does not usually give you, and the tale is worse for it, so I am going to give it to you and you can be patient.</p>
+<p>She came at the hour she was told. She knocked properly. She had spent two of the returned crowns on a plain grey dress, which is the only genuinely stupid thing she did that year, and she stood on the step with her hands folded like a lady's companion, and when Jaymes opened the door he laughed out loud in her face and then apologised for it.</p>
+<p>The house had four rooms. The father — also <strong>Jaymes</strong>, which is the whole family's one joke — had been a soldier and was now a clerk of the river watch, and had hands like boot leather and a voice that filled a room he was not in. The wife was <strong>Fauline</strong>, and she was the kind of beautiful that makes people stupid, and she had entirely stopped noticing it, and she put a bowl in front of Aevana before anybody was introduced to anybody.</p>
+<p>And there was a boy of two on the floor by the fire, and his father called him <strong>Jaymes the Even Younger</strong>, and the boy answered to it.</p>
+<p>They ate boiled fowl and a pease pudding and there was not enough of it. The elder Jaymes told a story about a bridge at Charau that his son had clearly heard four hundred times, and at the point where the story was wrong the son said <em>no</em>, and the father said <em>yes</em>, and Fauline said the number, flatly, without looking up, and both men went quiet and accepted it.</p>
+<p>And Aevana sat in that kitchen with a bowl in her hands and had the following thought, which she has repeated to three people in her life and one of them was me:</p>
+<p class="marginalia"><em>So this is what they are all protecting.</em></p>
+<p>She had spent nineteen years in and around the houses of powerful men. She had never once been in a room where the people in it were not, at some level, transacting. She did not know it was possible. She had assumed that the warmth in songs was a convention of songs, like rhyme.</p>
+<p>She went back the next week. And the week after.</p>
+<hr class="scene-rule"/>
+<p>The friendship ran three years and it ran both ways, which is the only reason it was a friendship.</p>
+<p>She brought them stories. That was her coin and she paid it generously. She would turn up at the door with a tale she had got off a Ykrul drover at the quay or out of a book she had not returned to the library, and she would take the floor in front of the fire and <em>do</em> it — voices, both parts, the lot — and the elder Jaymes would shout corrections about the military details and she would incorporate them on the spot.</p>
+<p>She told them her own schemes too, afterwards, when they had worked. They knew exactly what she was. They never once pretended otherwise and they never once asked her to stop, and the elder Jaymes said one time that a city that had produced her deserved her, which is the nearest thing to absolution she has ever been given.</p>
+<p>She coveted tales. More than money — and she liked money. She would hear a new one in a wine shop and go without dinner to hear the end of it. Ask her why and she will tell you it is because a tale is portable. Press her and she will change the subject in a way you will not notice for an hour.</p>
+<p>And in return they taught her.</p>
+<p>The father taught her the history of war, which she loved, because it is entirely made of people being certain and being wrong. The son taught her the rapier — badly at first, then not badly — and taught her the politics of the Wardenry: who owed whom, which offices were real, and the single most valuable lesson anyone ever gave her, which was <em>find out who signs it</em>.</p>
+<p>Three years. A grey dress, a bowl of pease pudding, a small boy who learned to say <em>Vana</em> before he could say his own name.</p>
+<p>You should hold on to that, because we are coming to the part where it is taken away, and the tale will do it in nine lines, and I want you to feel every one of them.</p>
+<hr class="scene-rule"/>
+<p>The Bloodgoods were rising. Not far. From nothing to a little.</p>
+<p>And there was a lordling in Fairport called <strong>Camus Renard</strong>, of a cadet branch of a Vhas house that had been pushed east out of old Vhas two centuries before and had been sliding downhill ever since in a dignified manner. He had the name and none of the money and all of the opinion. He had two sons, twins, <strong>Mangus</strong> and <strong>Jordanus</strong>, who were popular but not as popular, and rising but not as fast.</p>
+<p>Some say there was an old feud between the houses. There is a version of this tale told at Marcott in which the whole thing goes back nine generations and a stolen horse. I have never found anything in it and I have looked in two archives, and I mention it only because you will hear it.</p>
+<p>What is certain is that in the spring the elder Bloodgood was given a commission of the river watch that Camus Renard had spent four years asking for, and that Camus Renard congratulated him publicly and warmly and at length.</p>
+<hr class="scene-rule"/>
+<p>On a morning in Shearing, with both Bloodgood men away up-river on the Wardenry's business, a servant in Renard livery came to Aevana with a commission.</p>
+<p>His lordship had come into some art at his country place and wished it appraised, discreetly, by someone with an eye and no connection to the trade. He had been told she had both. There would be six crowns in it.</p>
+<p>She went.</p>
+<p>There was a murder of crows on the gate when she came up the drive. Nine of them, sitting along the ironwork, doing nothing at all. She stopped and looked at them, and they looked at her, and she thought — and she is exact about this, because she has gone over it about a thousand times — she thought: <em>that is a sign, and I do not believe in signs, and I want the six crowns.</em></p>
+<p>Inside, the art dealer was a man she knew: <strong>Ray Grin</strong>, a thin grey Fairport fence with a broken-toothed smile, who had worked two jobs with her and cheated her on neither.</p>
+<p>And the two of them spent the entire day going through his lordship's precious collection, most of which was rubbish, and cheerfully working out how to divide the difference between what it was worth and what they would tell him it was worth.</p>
+<p>It was a good day. She has said that. It was a <em>good day</em>.</p>
+<hr class="scene-rule"/>
+<p>She came back to Fairport in the evening and let herself into the house because the door was open, and the door was never open.</p>
+<p>Fauline was on the kitchen floor in a great deal of blood, and Jaymes the Even Younger, who was three, was sitting on the floor next to her, not crying any more, having been crying for some hours.</p>
+<p>She got it out of him in pieces over the next hour, and it took her two more days to be sure she had it straight, because he was three and because the words he had were not the right size.</p>
+<p>Two men came. They had faces that were not faces — <strong>masks</strong>, the painted kind the players wear at the fair, one laughing and one not. One of them did it. The other one picked the boy up and carried him into the other room and crouched down and told him, kindly, to hide, and to be quiet, and to count.</p>
+<p>And then they went away.</p>
+<p>She sat down on the floor of that kitchen with the child in her lap and she understood the whole shape of the day in about four seconds: the commission, the six crowns, the country house, Ray Grin, the good day. She had been <em>placed</em>. Somebody had spent a day's wages and an afternoon of his own time to make certain that the one dangerous person in that household was nine miles away and pleasantly occupied.</p>
+<p>And then she leaned over and closed Fauline's eyes with two fingers, and said, in her own language, the thing her people say.</p>
+<p class="marginalia"><em>All things live as they must. All things die.</em></p>
+<p>That is the Wisdom of the Raven, in the crib-note version, and it is what she had.</p>
+<p>And she has said since — and this is the reason I tell this tale at all, and the reason it is not a revenge tale — that as she said it she heard how <em>thin</em> it was. That she had a dead woman under her hands and a live child in her lap and the only thing her whole people had given her to say over it was a sentence you could fit on a coin.</p>
+<p><em>All things die.</em> Yes. And?</p>
+<p>That is where the second part of this story really begins, and everything that comes after it is a woman trying to find out what the rest of that sentence is.</p>
+<hr class="scene-rule"/>
+<p>They buried Fauline on a hill of wildflowers above the water, because it was where she went.</p>
+<p>The three of them stood on it afterwards — the father, the son, and the woman with no name — and swore the thing people swear, and two of them meant it in the ordinary way.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART THREE</span>The Wisdom of the Raven</h2>
+<hr class="scene-rule"/>
+<p>It took eleven weeks, and she did the work in the first nine days, which is the part the tale always skips because it is not exciting.</p>
+<p>She found out who signs it.</p>
+<p>She went at the thing exactly the way the son had taught her: not <em>who did this</em>, which is a question for a ballad, but <em>who paid, in what currency, to whom, and what did the receipt look like</em>. She spent four days in the Wardenry's own record room on a pretext so thin it would not have survived a question, and nobody asked her one, because she was a woman with a broom and a bored expression.</p>
+<p>She found the masks. Players' masks are not a costume in Fairport; they are <em>property</em>, and property is hired, and a hire is written down.</p>
+<p>She found that Mangus Renard had paid, in three instalments, a sum that appears in no ledger as a sum but appears in three ledgers as a discrepancy.</p>
+<p>And she found out something else, which she did not go looking for and which changed the shape of everything, which is that the man who had crouched down and told a three-year-old to hide had not been paid extra for it and had not been told to.</p>
+<hr class="scene-rule"/>
+<p><strong>Mangus</strong> was the charming one. Everyone said so, and when everyone says a man is charming what they mean is that he is easily led.</p>
+<p>He met a girl in the street in Verrus. She stumbled going past him; he caught her elbow; she laughed at herself, which is the most disarming thing a beautiful woman can do, and he walked her where she was going, which was nowhere, and by the second hour they were at coffee and the errand was forgotten.</p>
+<p>She was <strong>Elysia</strong>, and she had green eyes and a beautiful smile and she had lost her mother young, and so had he, and there is nothing on this earth that opens a young man faster.</p>
+<p>And Elysia knew of a medium. A real one. <strong>Madam El'Apidæ</strong>, out past the town, who spoke to the dead.</p>
+<p>He scoffed. Of course he scoffed.</p>
+<p>"Promise me," she said. "Promise me — for yourself. For your own peace." And she looked away down the street, wistfully, at nothing at all. "Trust me. She'll bring you peace."</p>
+<p>He promised. They arranged to meet again. He never saw her again, and he did not notice that he had not, because he had a great deal on his mind by then.</p>
+<hr class="scene-rule"/>
+<p>The tent stood in a clearing in the wood outside the town and it was round, and painted round it was a great black hooded serpent, coiled, with its mouth open at the flap, so that a man going in went in at the mouth.</p>
+<p>Inside there were lamps with coloured glass and a mist that smelled faintly of a kitchen and a woman in a silk gown, sitting.</p>
+<p>She wore an ebony mask with no eyeholes, with a winding symbol cut across the brow, and she had a glass orb on a pedestal, and an empty chair on the other side of the table.</p>
+<p>"Come in. Sit, young Mangus Renard." Husky, ruined-sounding, with a slight accent from somewhere hot.</p>
+<p>"You know me?"</p>
+<p>"The spirits know you. They know not your business." She turned her blind face from him to the orb. "Come and sit, if you dare. Or go. I care not."</p>
+<p>He came and sat, arrogantly, the way a man sits when he has been dared by a woman.</p>
+<p>"Ah. Brave. Good. Put your coin on the table and say to whom you wish to speak."</p>
+<p>He fished out a copper and put it down and looked at her.</p>
+<p>The tent shook. Hard — the poles knocked, the lamps swung, and a long mourning note went through the air from somewhere above and behind him. He half rose.</p>
+<p>The masked woman did not move.</p>
+<p>"<strong>Lady Lynora Renard, née Sternos, will not come for a copper.</strong>"</p>
+<p>He put a silver piece on top of the copper.</p>
+<hr class="scene-rule"/>
+<p>I am going to tell you how it was done, because this tale has been told for years as though it were a haunting, and it was not, and the woman who did it would be insulted.</p>
+<p>The mourning note was a length of waxed thread run through a hole in a tent pole with a rosined leather tab on it, and the boy who pulled it was eleven and was paid a penny.</p>
+<p>The mist was a kettle.</p>
+<p>The tent shook because the guy-ropes on the far side were held, not pegged.</p>
+<p>The husky voice was an hour of practice.</p>
+<p>And Lady Lynora Renard, née Sternos, had a monument in the Fairport chapel with her full style cut into it, and a gardener who had worked her garden for nine years and who remembered the lilac, and the lilies, and the sun on the south wall, and who told all of it to a very interested young woman over two afternoons for the price of three drinks.</p>
+<p>There was no ghost in that tent. There was three weeks of work.</p>
+<hr class="scene-rule"/>
+<p>The chant started low and grew. Her arms moved, controlled at first and then not, faster, jerking; her breath came quicker and quicker; and then her hands shot up and her fingers spread and her head went back and she folded over the table like a dropped coat.</p>
+<p>"Mangus…"</p>
+<p>It was not her voice. It was softer, warmer, higher, with the vowels of a woman who had been taught to speak in a good room.</p>
+<p>"Mangus… you called to me."</p>
+<p>"Mother?" He had gone forward on to his forearms. "I met — a girl — she said I could. Is it you? Do you remember the lilies?"</p>
+<p>"Mangus… your brother. Your father. The garden, so bright, like the sun. The lilac bush, too…"</p>
+<p>"<em>Yes</em>," said Mangus Renard. "Yes!"</p>
+<p>And the voice darkened.</p>
+<p>"Mangus. Did you do something?"</p>
+<p>He did not answer.</p>
+<p>"My soul is tainted. I was pulled out of my rest. There is a shadow over my name." A pause, exactly long enough. "Your brother. <em>Murder?</em>"</p>
+<p>The blood went out of his face. "I— we. It wasn't us."</p>
+<p>Then the tent came apart. Both sides at once, the poles banging, the lamps swinging wild, and the woman <em>stood up</em> and screamed — a real scream, torn, the kind that empties a person — and her hand came up and floated and one finger curled towards him.</p>
+<p>"<em>Confess! The temple! Atone! Did you? Tell me!</em>"</p>
+<p>And Mangus Renard, who was twenty-four and frightened of his father and had been sick about this for eleven weeks, put his face in his hands and gave it up entire.</p>
+<p>"Yes — Father — it was Jordanus who did it. I was supposed to kill the child. I just took him in the other room and told him to hide." He was weeping. "Father commanded me. I <em>had</em> to."</p>
+<hr class="scene-rule"/>
+<p>He never saw the woman's face, and there was nothing to see; the mask did not come off.</p>
+<p>He never heard the elder Jaymes Bloodgood come through the back of the tent either.</p>
+<p>Afterwards she crouched by him and put her fingers on his eyes and closed them, and said a thing in a language he had not lived long enough to hear.</p>
+<p>She said the Wisdom of the Snake.</p>
+<p>And I want to be exact about why, because this is the hinge of the whole tale.</p>
+<p>She did not say it over him because he had shed anything. She said it over him because <em>she</em> had. She had spent eleven weeks being Elysia — being open, being wistful, being a girl who had lost her mother, which she had — and she had done it so well and so long that some part of her had gone into it and would not come back out. And she knelt in that tent with a dead man's eyelids under her fingers and she said <em>leave the coat in the sand</em>, to herself, in her grandmother's dialect, as an instruction.</p>
+<p>The snake wants nothing and carries nothing.</p>
+<p>She was twenty-two and she had just found out what that costs.</p>
+<hr class="scene-rule"/>
+<p><strong>Jordanus</strong> was the clever one, and the clever one is easier, because a clever man will not admit he is lost.</p>
+<p>His brother had gone missing, which his brother did roughly twice a year, and the usual method was to ask three people and be told which brothel or which temple. This time the three people sent him to other people, and those people sent him on again, and by the fourth day he had a map of the city with lines drawn on it in his own hand and it was beginning to look, he thought irritably, like a <em>web</em>.</p>
+<p>He paid good money to bad people for a service and the service was not being rendered.</p>
+<p>A small filthy boy tugged at him in the street with his hand out. Jordanus gave him a ha'penny to make him go away and got, in exchange: <em>Ray Grin says he needs to talk, he said people have been askin' questions, m'lord</em> — and then the boy was gone into an alley before he could take hold of him.</p>
+<p>Another line on the map.</p>
+<hr class="scene-rule"/>
+<p>Ray Grin kept a room above the Dusklight Den, which Jordanus hated, and he went through the lobby with his face set like a man walking through weather.</p>
+<p>"Grin." He opened the door as he knocked.</p>
+<p>Behind a rough oak desk drifted with paper sat Ray, deep-eyed, grinning. On the desk, in plain view, sat a purse Jordanus knew, and it was empty.</p>
+<p>"Sir Jordanus." The slightest bow. "Your brother's gone missing, I hear."</p>
+<p>Jordanus came forward with his hand on his pommel. "Enough. If you have something, say it." He looked at the purse. "And make it worth my while."</p>
+<p>"Aye, young sir." Ray tossed the purse so that Jordanus had to catch it. "Your brother got himself into a bit of trouble and decided to sort it himself. He went to the theatre to settle his business. And yours."</p>
+<p>"<em>Mine.</em>"</p>
+<p>"Bloody good business." Ray laughed at his own joke and put his hands behind his head. "Someone's been sniffin' round about that business. Mangus paid a pretty coin or two to have it go away."</p>
+<p>"And doubtless paid more to make a mess of it." Jordanus narrowed his eyes. "Why are you telling me, Grin? Nothing with you is free."</p>
+<p>The thin man spread his hands. "I'm wrapped up in it. They came to <em>me</em>. And as entertaining as it is to watch poor Mangus flounder, I'd like the thing actually dealt with." He leaned in. "Besides. Your brother's already paid a fair bit. Call it a retainer."</p>
+<p>Jordanus nodded once. "The theatre," he said, and turned, and went.</p>
+<hr class="scene-rule"/>
+<p>Somebody applauded from the dark corner of the room, slowly, three times.</p>
+<p>"Oh, very good, Ray. Very good."</p>
+<p>"I played my part." He looked tired. "I hope you learned something. I don't know how you got Mangus separated from his purse, but I'll be taking the rest of his gold."</p>
+<p>"You'll get it."</p>
+<p>"Best hurry, whatever you've got planned."</p>
+<p>"Jordanus will find a few delays between here and there." She came off the wall and crossed the room without any noise at all. "Ray. Ray. Clever Ray."</p>
+<p>"<em>Aevana. Elysia.</em>" He showed the broken teeth. "Alisaunde today, is it? I do love working with you, lass. You draw the eye."</p>
+<p>She sat on the edge of the desk. He looked up at her with a kind of fondness.</p>
+<p>"Now. We had a deal, Alisaunde." Almost sweetly. "Honour among thieves."</p>
+<p>"Oh, Ray. Too clever by half. Renard would have paid you too, wouldn't he? You're always the man with the plan."</p>
+<p>He shrugged, contrite, paternal. "We do what we've got to do, girl. But we keep our deals. Honour among thieves."</p>
+<p>She nodded slowly, and reached out, and began to play with the long grey hair at the back of his neck with one hand.</p>
+<p>"The Sidhi have a saying, across the water," she said. "<em>Honour before reason.</em>"</p>
+<p>He actually thought about it. That is the part she tells and does not embellish: he tilted his head and considered it, genuinely interested, a man who liked a good phrase.</p>
+<p>"Is that a motto, then? A proverb?"</p>
+<p>She took a fistful of the hair and lifted, and came off the desk in the same movement, and opened his throat with the knife that had been in her other hand since she left the wall. She put his head down on the desk, in the papers, and stood back out of it.</p>
+<p>"It's an insult, Ray."</p>
+<hr class="scene-rule"/>
+<p>The theatre was clear across town, and between Ray Grin's door and its door Jordanus Renard was delayed nine times.</p>
+<p>A beggar with a crutch. A boy with a hoop. A woman who had lost a dog and described it at length. A funeral. A cart that shed its load of turnips across the lane. A man who was absolutely certain they had met at Marcott. A widow. A fool. A small girl who took his hand and would not let go of it and would not say why.</p>
+<p>Nine. He never noticed. Nobody ever notices nine. It was full dusk when he got there and he was in the frame of mind of a man who has had a very long, very stupid day.</p>
+<p>He hated the theatre. He had said a hundred times that actors were the worst possible mixture of whores and fools, and he had never once had an exchange with one that had not left him confused and cross.</p>
+<p>And the place was empty. Looming and lit and <em>empty</em>.</p>
+<hr class="scene-rule"/>
+<p>"M'lord?"</p>
+<p>At the rear door: a woman, tanned, light brown hair, brilliant green eyes. "May I help you, m'lord?"</p>
+<p>"I seek my brother. He looks much like me. Same height, same eyes, browner hair."</p>
+<p>She burst out laughing. "Oh, <em>him</em>! He's an absolute terror." And then caught herself, and added, primly: "M'lord."</p>
+<p>Jordanus's eyebrows went up. "I beg your pardon. Miss—?"</p>
+<p>She drew a breath and assembled herself into something like a lady. An actress, he concluded, and he was right, and he looked properly at her for the first time. She was fresh from a bath and smelled of it, and she was wearing stage paint, and her dress was clean and newly on. Was that a flute in her hand? What on earth was going on here? Actors.</p>
+<p>"Alisaunde," she said. "Alisaunde Neith." A deep curtsy, and then — somehow — a sort of <em>bounce</em>.</p>
+<p>"Sir Jordanus Renard. I am looking for my brother Mangus."</p>
+<p>"<em>Magnus!</em>" She clapped her hands together once. Then remembered herself and beckoned him to follow. "Forgive me, m'lord — he wouldn't tell us his name." Playful exasperation, enormous. "I think he may have been flirting with us. Oh my."</p>
+<p>"<em>Mangus</em>," said Jordanus, and sighed from the bottom of his boots. His brother. Of course. Head in the clouds, or else stuffed with wool.</p>
+<p>He should attend to the business at hand. Which was—</p>
+<p>"Did he say why he came?"</p>
+<p>She thought about it. <em>Dramatically.</em> How does a person think dramatically? Jordanus was dying behind his eyes.</p>
+<p>"He was talking with a big man. Tall. Brown hair." She was being serious, and the effort was so evident that he found himself, against everything, appreciating it. "They had words, and then they parted." Her hands were getting away from her as she went on.</p>
+<p>Big man. Tall. Brown hair. Marvellous.</p>
+<hr class="scene-rule"/>
+<p>Here is the trap, and here is why I am taking my time over it.</p>
+<p>It took eleven minutes and she never once touched him.</p>
+<p>She walked him. That is all. She walked him through the property room and past the paint frame and up the side of the pit and along the gallery and down again, and she talked, and every single turn took him further from a door, and at no point did she ask him to go anywhere. He went. He kept going because she kept talking and because the next thing she was about to say was always slightly more interesting than the fact that he had not found his brother yet.</p>
+<p>Twice he nearly turned round.</p>
+<p>The first time was at the property room door, where he stopped and said, "Why would he come <em>here</em>?" — a real question, the right question, the only one that mattered — and she said, "Oh, they all do, m'lord, it's the only place in the city where nobody can hear you," and he thought, <em>yes, that is exactly the sort of thing Mangus would think</em>, and went on.</p>
+<p>The second time was on the stairs, when he became aware that he had not seen another living soul in the building, and said so.</p>
+<p>And she said, "It's the fast, m'lord," and did not explain, and he did not ask, because a man does not like to admit he does not know which fast.</p>
+<p>And then — and this is the part she does not perform, she just says it — he began to enjoy himself.</p>
+<p>She talked about the plays. Dragons and faeries, love and betrayal, a duke who is really a shepherd, a woman who fights her own brother for nine nights. And Jordanus Renard, who was twenty-four and had never in his life had an hour that was not an arrangement, who had a map at home with lines all over it, who was tired to the marrow of politics he had no patience for and a courtship he had no interest in, found that he was — of all things — <em>comfortable</em>.</p>
+<p>He has no idea how long they had been walking.</p>
+<p>"So," she said. "Magnus loved this view. Looking out from the stage." They had come out into the middle of it, in the last of the light from the high windows, with the empty stands going up in front of them into the dark. "There's something majestic about an open space, don't you think?"</p>
+<p>"Mangus," he said, absently, and looked out at all that empty air.</p>
+<p>And then he came out of it like a man coming out of water.</p>
+<p>"<em>Mangus.</em> Where is my brother?"</p>
+<p>"Oh!" She turned to him, beaming, delighted, both hands together. "Right, m'lord. It's time you met him."</p>
+<p>And she tapped her foot, once, very lightly.</p>
+<hr class="scene-rule"/>
+<p>The world went out from under him. Then the floor of the under-stage came up and took his leg, and he heard it go, and before the sound he was making could become a word a sword came up through the dark and blossomed in his throat.</p>
+<p>She stood at the edge of the open trap and looked down into it for a while.</p>
+<p>Then she said the Wisdom of the Spider.</p>
+<p class="marginalia"><em>The spider does not chase. It looks at the corner it has been given — not a better corner, the corner it has — and it makes the corner into the trap, and then it waits.</em></p>
+<p>She had not laid a hand on him. She had been given a building and a man who hated actors, and she had used the building, and she had used the hate, and she had not taken more than she needed.</p>
+<p>And she stood there with the trap open at her feet and thought, quite clearly: <em>I am good at this. I am better at this than at anything I have ever done. I was made to be good at this and the men who made me are dead and I am still doing it.</em></p>
+<p>She has told me that she did not enjoy killing either of them. I believe her about Jordanus. I have never been sure about Mangus.</p>
+<hr class="scene-rule"/>
+<p>Some weeks later, in a good room with a fire in it, a Sidhi woman played a black viol while Camus Renard read through a stack of papers.</p>
+<p>It had taken most of what was left of his fortune — bribes, two false witnesses, one genuine one who had been made afraid — but he had it: a warrant out of the Wardenry for the arrest of Jaymes Bloodgood the Younger for the murder of his own wife. The elder Bloodgood was beyond reach; he had forty years of service and the city would not touch him. But he was ruined, and his son was fled and had been tried in his absence, and the two of them would never stand in the same room again.</p>
+<p>The street rat of theirs had gone to the gutters or the wind. Clever enough, that one. Born lower than a snake's belly.</p>
+<p>His boys had been found at the bottom of a hill of weeds above the water, stripped. Mangus throttled, his face bloated and purple. Jordanus with a broken leg and his throat run through. Made to look like robbery. He knew better.</p>
+<p>His boys were gone.</p>
+<p>The music was doing nothing for him. Nor was the wine, though the wine was sweeter than usual and he had drunk rather a lot of it, and he was tired — unusually tired — and the pages were turning slowly.</p>
+<p>He came to the last page, which was the warrant, and looked down at the signature.</p>
+<p>It was wrong. It was not the Warden's great looping flourish.</p>
+<p>It was his own.</p>
+<p>His eyes went over the words above it, and they went slowly, and they had to go over some of them twice.</p>
+<hr class="scene-rule"/>
+<p>"Your sons were each a half of you," the Sidhi woman said, still playing. "Mangus your charm. Jordanus your wit."</p>
+<p>Camus Renard tried to stand. His legs were there and they were not listening.</p>
+<p>"I studied them both very carefully. Each half." She swayed into a crescendo and let it end, and set the viol down, and laid the bow across it, and picked up a cup and drank from it. "But they were <em>you</em>. There was nothing in either of them that was not you."</p>
+<p>He tried to make a sound. What came out was air.</p>
+<p>"You helped us, you know. Insisting they always carry a full purse. Revenge is expensive." She gestured at the window. "Hemlock, though — that grows right outside. I know nothing at all about poison. Even I know not to let hemlock grow up against a kitchen. Do you keep no animals?"</p>
+<p>She came and crouched by his chair.</p>
+<p>"Taunting you is unseemly and I am going to do a little of it anyway. You love your power more than you loved your sons. I have watched you for eleven weeks and I am sure of it. So I am taking that. Jaymes wanted you to live." She tilted her head. "<em>Honour before reason</em> should be that family's motto."</p>
+<p>She dipped a finger in the cup and let three drops fall on the note.</p>
+<p>"They'll say you shed a few tears for your sons at the end," she said, and set the note by his hand. "It's a beautiful note. I gave you that too."</p>
+<p>He gave one soft gasp and went over.</p>
+<p>And the world went red at the edges, and he heard her say something in a language he did not know, and he did not know what it was, and it was the Wisdom of the Raven.</p>
+<hr class="scene-rule"/>
+<p>And this time she had the whole of it.</p>
+<p>Not <em>all things die</em>. She had had that at nine years old and it had been no use to her on a kitchen floor.</p>
+<p>What she had, crouched in that room with a dead lordling and a viol and a forged warrant, was the rest of the sentence, which she had spent eleven weeks earning and which nobody had been alive to teach her:</p>
+<p class="marginalia"><em>That one is dead. And I am not. And I will be. And none of the three of those is a payment for either of the others.</em></p>
+<p>The raven does not settle accounts. The raven sits on the wall and <em>counts</em>, and does not pretend the count comes out even, because it does not, and a people who need it to come out even will invent a garden and a sleep and a reunion and then, in two generations, they will stop looking at the thing entirely, and then the carts will come over the rise in a good year with the grass high.</p>
+<p>Fauline Bloodgood was still dead. Three men were now also dead and one of them had told a frightened child to hide. The boy still had no mother, and now had no aunt either, because she left in the spring and did not go back, because she is a snake and she leaves the coat in the sand.</p>
+<p>Nothing was even. Nothing was <em>ever going to be</em> even.</p>
+<p>She looked at that, properly, for the first time in her life.</p>
+<p>That is the wisdom her people forgot. That is what it was for.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">CODA</span>The List</h2>
+<hr class="scene-rule"/>
+<p>There is a lighthouse at Galanina with a green flame in a cage of brass, and the Sidhi who got out keep others like it all down the Brass Coast, and at the foot of every one of them there is a list.</p>
+<p>It is the list of the unnumbered: the children who were taken and unnamed, set down by anyone who remembers a name, in any hand, in any tongue. It is not a mourning. It is <em>maintained</em>, with additions, by people who fully intend to present it to somebody one day.</p>
+<p>The daughter of Ahakar went to the great one nine years after Fairport, with money, in a good coat, having crossed the sea a second time.</p>
+<p>The High Keeper was a very old woman with a list longer than her arm, and she was glad to see her, and gave her the whole afternoon and did not hurry her once.</p>
+<p>They went through the grassland names. Then the names by district. Then by the year of the taking, and then by the hill shaped like a sleeping dog, of which there turned out to be four.</p>
+<p>And at the end of it the old woman put her hand flat on the page and said, gently, that she had nine hundred names, and that she did not know the last nine, and that they had come to her already worn, and that she had never been able to get them clean.</p>
+<p>"Say them," said the daughter of Ahakar.</p>
+<p>And the High Keeper said them, all nine, slowly, twice.</p>
+<p>And nothing happened. No bell, no turning, no cold, no lifting. Nine sounds in a stone room and a green flame that did not so much as lean.</p>
+<p>She thanked her, and paid for nine years of lamp oil, and walked down to the harbour, and has never been back.</p>
+<p>She does not say whether one of them was hers. I have asked her twice. The second time she said: <em>if I knew that, I would know it.</em> Which is not an answer and is the only one she has.</p>
+<hr class="scene-rule"/>
+<p>So she went on.</p>
+<p>She has been a great many people since, in a great many towns, and every one of them has been very good company and none of them has lasted more than three years. She is a chronicler of sorts, and a thief when the mood is on her, and the best teller of tales in any room she has ever walked into, and she will not take money for the telling, only for the rest of it.</p>
+<p>She keeps the three wisdoms. She has them properly now, all three, in the long form, and she can give you the whole of Ahakar in about two hours and it is worth the two hours.</p>
+<p>And she will tell you her own tale — she tells it often, she is telling it now — and she will tell it from a little way off, about a girl, about a woman, about <em>the daughter of Ahakar</em>, who did this and then did that and then went down to the harbour.</p>
+<hr class="scene-rule"/>
+<p>At Fairport, in the winter of 819, the man taking this down asked her why.</p>
+<p>She had been drinking and she was tired and she answered it, which she had refused to do earlier in the evening, and this is what she said, and it is the end of the tale:</p>
+<p>"Because a woman in a tale has a name.</p>
+<p>"You do not need to hear it. It does not have to be said. It is simply there, in the shape of the thing, the way a door is in a wall — <em>the daughter of Ahakar</em>, and you all nodded, and not one of you asked me for it, and you have sat here four hours perfectly content.</p>
+<p>"That is the only place left where I have one.</p>
+<p>"So no. I will not tell it the other way. Because if I said <em>I</em>, one of you would ask. One of you always asks. It is a kind question and it is asked kindly and I have no answer to it, and I am not going to stand in a warm room in front of nine people and have nothing.</p>
+<p>"The Snake says leave the coat in the sand. I have left everything I ever had in the sand and I would do it again tomorrow.</p>
+<p>"The Spider says use what is in the room. There is nothing in this room but you.</p>
+<p>"And the Raven says look at it.</p>
+<p>"So: I was a child in a line in the sun, and a woman in a veil of gold took my name out of my mouth and put it somewhere, and she has it still, and I am not going to get it back, and no amount of anything I do will make that even.</p>
+<p>"There. That is the Raven. That is the whole of it. My people forgot it for sixty years and it cost them everything, and I have had it for nine years now and I have not put it down once."</p>
+<p>She picked up her cup.</p>
+<p>"And in the meantime I have this. A tale, and a room, and a name that nobody has to say."</p>
+<p>She drank.</p>
+<p>"Which one, in the end, is a better arrangement than most of you have got."</p>
+</body>
+</html>

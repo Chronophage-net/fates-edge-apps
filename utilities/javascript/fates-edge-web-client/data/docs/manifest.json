@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-16T13:36:35.476Z",
+  "generated": "2026-09-16T14:35:21.011Z",
   "documents": [
     {
       "id": "srd",
@@ -1249,6 +1249,16 @@
       "active": true
     },
     {
+      "id": "the_daughter_of_ahakar",
+      "title": "The Daughter Of Ahakar",
+      "file": "Fates_-_Edge_-_-The-_-Daughter-_-of-_-Ahakar.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_diwan_of_roads",
       "title": "The Diwan Of Roads",
       "file": "Fates_-_Edge_-_-The-_-Diwan-_-of-_-Roads.html",
@@ -1613,7 +1623,7 @@
       "active": true
     }
   ],
-  "total_count": 102,
-  "active_count": 102,
+  "total_count": 103,
+  "active_count": 103,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
