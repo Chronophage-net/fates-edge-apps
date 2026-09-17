@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-16T16:15:14.455Z",
+  "generated": "2026-09-17T02:46:32.364Z",
   "documents": [
     {
       "id": "srd",
@@ -821,6 +821,16 @@
       "active": true
     },
     {
+      "id": "no_bruises",
+      "title": "No Bruises",
+      "file": "Fates_-_Edge_-_-No-_-Bruises.html",
+      "path": "/data/docs/anthology/",
+      "category": "anthology",
+      "categoryLabel": "Anthology",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "paget",
       "title": "Paget",
       "file": "Fates_-_Edge_-_-Paget.html",
@@ -1633,7 +1643,7 @@
       "active": true
     }
   ],
-  "total_count": 104,
-  "active_count": 104,
+  "total_count": 105,
+  "active_count": 105,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
