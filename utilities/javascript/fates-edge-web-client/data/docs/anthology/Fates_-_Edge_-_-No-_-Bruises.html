@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>No Bruises — The Autobiography of Madam Serafine</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>No Bruises</h1>
+<p class="subtitle">A Novella of Silkstrand</p>
+<p class="marginalia"><em>The autobiography of Madam Serafine, Mistress of the Velvet Court.</em></p>
+<hr class="scene-rule"/>
+<h3>A word before we undress</h3>
+<p>Put my name on it large enough to be read across a shop.</p>
+<p>The portrait may be the old one. The mouth is badly drawn, but the painter is dead and his widow has learned to charge accordingly. Leave the mouth. People who remember me before the veil will enjoy knowing better. People who do not will imagine something expensive.</p>
+<p>I have been advised to omit the unpleasant parts.</p>
+<p>By a man whose wife sent me a ham last winter, in gratitude for an unpleasant part I performed on her behalf. He ate most of it. There was a note about the rind.</p>
+<p>You see the difficulty.</p>
+<p>I would rather tell you myself. I know the names. I know where the second door was. When somebody says a woman did a terrible thing with a smile, I can usually tell you whether she was smiling, or holding a pin between her teeth.</p>
+<p>There will be deaths. I am sorry about several. There will be women who should have known better, men who did know better, and a respectable quantity of other people's money. You may dislike me. A great many people do, particularly before they have met me.</p>
+<p>Have something to eat while you decide. The little pastries are eel. Everyone asks whether they are eel after eating three.</p>
+<p>And let us have one understanding. If you came for the night I gave Livaea, you will leave disappointed. I cannot remember it. I have sold three accounts of it, all different, all excellent, and the most expensive was the least plausible. This one costs you the price printed on the cover. You may have what I know.</p>
+<p>Bring the lamp closer. I do not like talking to a man I cannot see.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART I</span>The girl under the stall</h2>
+<p>The first purse was yellow goatskin. There were two white stitches in the bottom where the leather had split. I put my finger through one and felt a coin.</p>
+<p>I was seven. He smelled of cloves. When he laughed he leaned backward and the purse came forward, swinging from the belt beneath his belly. He was laughing at a boy who had dropped a tray of cups. The boy was trying to gather the pieces before the stallkeeper hit him again.</p>
+<p>I got the purse off with a mussel shell.</p>
+<p>That is the part people improve. They give me a little knife. I had no knife. A knife was a possession to be taken from you by someone who had two. I had a shell with a good edge and a piece of sack tied around my waist. The shell cut through the cord, then through the side of my finger. I held the purse under my arm and walked away sucking blood.</p>
+<p>He never stopped laughing.</p>
+<p>I bought bread, smoked sprats and a pear. The pear was a mistake. I had never bought one before and did not know you were allowed to touch it. One side was brown. I ate that side first so the good half would remain.</p>
+<p>Behind the dyers' steps I was sick into the canal. The bread went first. I tried to hold the sprats down with my hand over my mouth.</p>
+<p>Go on, take another pastry. This is a childhood. They are disagreeable up close.</p>
+<p>There were two of us under the stall that autumn. Me and a girl called Tessa, who was a year older and had a whistle through a broken front tooth. She could do a gull with it. I could do the stallkeeper's wife. We performed for each other when the rain came through the boards and there was no prospect of sleep.</p>
+<p>The stall sold onions. In the morning we came out smelling of onions and the woman paid us in bruised ones to move the sacks. She knew we slept there. Her husband did not. She would leave a sack hanging over the front when the Watch came down, then shout at us for vermin as soon as they were gone.</p>
+<p>Tessa took half the purse money.</p>
+<p>Not because she had earned it. Because I showed it to her, and she put her arms around me, and I wanted her to do that again.</p>
+<p>We bought a blanket. She chose a red one that leaked fluff. At night we picked the lice out together and crushed them against a stone. She gave each one the name of somebody important. A harbour judge died under her thumbnail. We laughed so hard that the stallkeeper woke up and kicked the boards.</p>
+<p>I have slept in beds that took six men to carry upstairs. I remember that blanket.</p>
+<p>I remember wanting it to be mine, too.</p>
+<hr class="scene-rule"/>
+<p>There was a collector called Barto. He had the right to collect for the stalls, which he had obtained by breaking the previous collector's jaw. The stallkeepers considered this an irregularity for about a week. Afterward they complained that he came too early.</p>
+<p>Barto found the purse because Tessa bought shoes.</p>
+<p>You must forgive her. They were red. There were buttons down the side. She came back with her old feet poking out of them, all sores and dirt above this astonishing leather, and stood with one foot turned outward like a lady at a fountain.</p>
+<p>I wanted to hit her. I wanted the shoes. I wanted her to give me something because she had something. None of these feelings made me less pleased to see her pleased.</p>
+<p>Barto lifted her by the ankle and the shoe came off in his hand. She went down hard. I can still hear the little noise of her chin against the step.</p>
+<p>He looked inside it, as though the rest of the money might be there.</p>
+<p>Then he looked at me.</p>
+<p>I pointed at the onion woman's drawer.</p>
+<p>It was an excellent drawer. Her husband kept the stall money in a box under the scales. The drawer held what she did not tell him about. I knew because she sometimes gave us a copper from it when the onions had sold well. She had a cough that made her stop in the middle of laughing. She was putting money away to see a physician across the bridge.</p>
+<p>I told Barto all of that. Rapidly. Children are very thorough when they are frightened.</p>
+<p>He let Tessa go.</p>
+<p>He went through the stall. The woman stood with both hands full of onions. When her husband came she put them down. He listened to Barto, opened the drawer, and looked at her for a long time.</p>
+<p>We did not sleep beneath the stall again.</p>
+<p>Tessa said I should have kept quiet. I asked whether she would rather have lost her other shoe. We had our first proper quarrel, which is to say she hit me and I bit her and afterward we went looking for somewhere dry together.</p>
+<p>The woman died that winter. The stall was open the following morning. Her husband sold onions from the physician's drawer.</p>
+<p>I did not cause the cough. I have never claimed otherwise about the money.</p>
+<p>For years, whenever someone complained that I had ruined them, I remembered her standing with the onions and felt a sharp little irritation. Not grief. Irritation. She had been kind to me. It made a nuisance of remembering her.</p>
+<p>I can tell you that now. It has been a very long time. There is no one left to return the money to, and I have endowed two wards at Agatha's hospice. The second has better windows.</p>
+<hr class="scene-rule"/>
+<p>Old Kes found us behind a fish smokehouse, trying to dry the blanket over a stolen brazier.</p>
+<p>He took the brazier. It belonged to a customer of his. Then he gave us bread and a task, which was to carry a parcel across the Dye Yards without opening it.</p>
+<p>Tessa opened it while I watched the alley.</p>
+<p>Buttons. Mother-of-pearl. Hundreds. We put them back, all except one that had fallen into a crack. She wanted to leave it. I got it out with the shell.</p>
+<p>Kes counted them in front of us. Every button. His left hand was short three fingers, and the two that remained moved with the neatness of a pair of tongs.</p>
+<p>He gave us another parcel.</p>
+<p>That was my apprenticeship. There was no touching speech. He had parcels and we could run. On wet days he let us sit inside the warehouse where the cheap cloth was kept. Once a month he paid someone to cut our hair. Tessa cried the first time. I stole the hairdresser's comb.</p>
+<p>Kes made me give it back.</p>
+<p>"He'll come here again," he said.</p>
+<p>I thought that a poor reason until the next month, when the man cut around a sore on my scalp so gently that I scarcely felt it. I kept my hands on my knees throughout. It required effort.</p>
+<p>Kes taught us to look at the person who wasn't talking. To wrap a broken thing before trying to sell it. To count what went into a warehouse as well as what came out. He would buy stolen goods, but not a dead worker's tools. He called certain men thieves in a tone that suggested an entirely different profession from ours.</p>
+<p>He did not make a habit of telling us he loved us. He kept bread where we could reach it.</p>
+<p>When I was twelve, a customs man put a hook through a runner's cheek for swallowing a pass. Kes paid to have it taken out. He sat beside the bed and fed the boy broth through the gap on the other side. I watched him do it. I wanted somebody to do that for me if it became necessary.</p>
+<p>I also noticed how the other runners watched him.</p>
+<p>There. You want the beginning of the woman? It is both those things. You may put your finger on the second if it pleases you. The first was there.</p>
+<hr class="scene-rule"/>
+<p>Tessa went to work in a bindery. At fourteen she had wages, a place in the attic, and hands permanently red from the dye used on cheap covers. She called it honest work and laughed when she said honest. The binder took a portion for the bed, another for meals, and charged her for a sheet of paper if she spoiled it. She stole the paper instead.</p>
+<p>I sold it for her.</p>
+<p>That is where I met ink. Until then a written thing was something you carried without knowing whom it would hurt. Tessa showed me a debt notice and read it aloud while I followed her finger. Her nails were bitten almost to the quick. She made the words sound like something foul she had found in a shoe.</p>
+<p>I learned my name first.</p>
+<p>Yes, Serafine. It was mine before I could write it. No priest bestowed it on me. No dead lady left it conveniently unattended. My mother had taste, whoever she was. You need not recover her from a cellar to explain me.</p>
+<p>Tessa wrote the letters on an offcut. I copied them until the curves stopped collapsing. We drank small beer from the same cup. By morning I could make a name that looked as if it belonged to someone with a bedroom.</p>
+<p>The binder caught us before dawn.</p>
+<p>He hit Tessa for using the lamp. I had the shell in my pocket. By then I owned a knife, but I kept the shell. I went for him and he caught my wrist and bent it backward until my knees gave.</p>
+<p>He said he would call the Watch.</p>
+<p>I told him about the sheets Tessa had been selling. Who bought them. What I had been paid. Where the money was hidden.</p>
+<p>He loosened his hand.</p>
+<p>It was becoming a habit.</p>
+<p>Tessa lost the attic and two teeth. I got out with my wrist intact and a piece of paper on which I had written my name eleven times.</p>
+<p>She would not speak to me for a year.</p>
+<p>When we met again she had learned to make teeth out of bone. Not for herself; she could not afford her own work. She was doing quite well, she said, and asked if I knew a lady who wanted a comb.</p>
+<p>I found her six.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART II</span>A better class of dirt</h2>
+<p>At nineteen I could write three sorts of hand, pick an ordinary lock, and eat a meal without bending an elbow over the plate to defend it. That last accomplishment cost the most.</p>
+<p>I worked for a notary's copyist called Pel, who owned one good coat and treated it as a senior partner. He wore it to meet clients. When there were no clients he hung it where he could see it, then sat in his shirtsleeves complaining about the weather.</p>
+<p>Pel paid me to copy inventories. I paid Tessa to alter the order in which the copies were bound. A page put between the wrong covers could spend years out of reach of the person who wanted it. We charged extra for making it turn up promptly afterward.</p>
+<p>She had forgiven me. Or she wanted the work. We did not discuss the distinction.</p>
+<p>I had a room above a poulterer. In summer the heat brought feathers through the floorboards. They stuck to my wet stockings. I would peel one away while dressing for dinner and wonder whether people born above a certain height ever had to do such things.</p>
+<p>There was a woman at those dinners called Irena Voss. No relation to any Voss you know. She corrected people who assumed one, which I thought wasteful. Her father had left her a ribbon shop and enough resentment to run it profitably.</p>
+<p>She was twenty-six. I was twenty-two when she first put her hand on my knee beneath the table and asked whether I meant to spend the entire evening looking at her.</p>
+<p>"Is it bothering you?"</p>
+<p>"Your restraint is beginning to."</p>
+<p>She wore dark green. I remember because I could never find the exact shade afterward, though I asked several dyers to make it and made a nuisance of myself. The dress was plain at the throat. When she leaned to refill my glass I saw a small pale mark just below her ear, where an earring had caught.</p>
+<p>We left separately and met around the corner. She kissed me against the shutter of a closed bakery. I had prepared something clever to say and lost it when she laughed against my mouth.</p>
+<p>At her house she asked whether I wanted to stay. I said yes too quickly. She seemed to like that.</p>
+<p>There was hot water. I cannot give you a proper account of my first great love without the hot water. A servant brought it, covered, and went away; it remained ours to waste. I washed slowly. Irena sat on the bed pulling the pins from her hair. She had no hurry in her at all.</p>
+<p>In the morning I stole a little silver spoon.</p>
+<p>I did not need it. I had wages in my room. I had eaten until I was pleasantly uncomfortable. She was asleep with one hand open on the sheet, and there was the spoon beside the coffee, and I put it in my stocking.</p>
+<p>You have been waiting for me to confess something I cannot explain. There it is. I liked the spoon. I liked her. I took it.</p>
+<hr class="scene-rule"/>
+<p>Pel got into trouble over a ship that had arrived without the cargo entered on its manifest.</p>
+<p>It was my manifest. A handsome piece of work. I had allowed for differences in the inks and rubbed the folds with a little soot. The ship's owner would have sailed comfortably through the inspection if his nephew had not tried to sell a case of the missing cargo to the inspector's brother.</p>
+<p>The nephew fled. The owner declared himself deceived. Pel put on the good coat and went to explain.</p>
+<p>He came back without the coat. There was blood in his ear. He sat down on the floor of the office and leaned against a cupboard, and I could hear his breath snagging on something inside him.</p>
+<p>"They want the hand," he said.</p>
+<p>I packed my things while he watched.</p>
+<p>Irena let me in. I told her I needed somewhere for one night. She did not ask why until I had eaten. I appreciated that; I have found it worth remembering in my own houses.</p>
+<p>When I told her, she said, "You can stay."</p>
+<p>I began with the reasons it would be dangerous for her. I was very eloquent. Then I noticed she was not enjoying my account of her courage as much as I was, and stopped.</p>
+<p>"What do they have?" she asked.</p>
+<p>"Pel."</p>
+<p>"What does Pel have?"</p>
+<p>"My name. My hand. The little room."</p>
+<p>"Then tonight won't be enough."</p>
+<p>She knew a clerk at the counting-house of Dey and Sorn. He owed her for ribbons supplied to a lady whose husband believed her expenses were smaller. The clerk could get me out through the harbour in a grain boat. A berth, papers, enough money to start elsewhere.</p>
+<p>I asked what Dey and Sorn had to do with the missing cargo.</p>
+<p>She went very still.</p>
+<p>"You are leaving," she said.</p>
+<p>"They insure it."</p>
+<p>"Serafine."</p>
+<p>"The owner gets paid twice. Once for what he sold. Once for what he says he lost."</p>
+<p>"Yes. Now put on the brown coat."</p>
+<p>I had been copying their forms for two years. I knew the sort of books they kept. The owner's claim would be there. His real payments might be there too, if he was stupid enough to use the same house for both. He was a man who had employed his nephew. I thought the risk reasonable.</p>
+<p>Irena sat down on the edge of the bed.</p>
+<p>"You could be safe tomorrow," she said.</p>
+<p>I can hear her still. Not pleading. Trying to understand why she was having to say it twice.</p>
+<p>I put on the brown coat.</p>
+<p>I went to Dey and Sorn.</p>
+<hr class="scene-rule"/>
+<p>The door at the back had a new lock.</p>
+<p>That is how most disasters begin. Something cheap has been replaced by something better. The man who ordered it goes home satisfied and never learns what an inconvenience he has caused.</p>
+<p>I could open it. I needed time. The watchman crossed the yard every few minutes, and there was a cook asleep beyond the kitchen door who snored until she stopped, at which point I stopped as well and waited for her to begin again.</p>
+<p>Rain slid down the back of my collar. I could smell the drains and yesterday's onions. Somewhere above me a woman was singing one of the songs you hear in pleasure houses when the good clients have gone and the staff are washing up.</p>
+<p>I hummed the space after the refrain.</p>
+<p>Kes had taught me that much of Ikasha. You give the silence its place. You do not push a tune through it because you are nervous. I held the pick still. The watchman's lamp crossed the end of the passage, stopped, and moved on.</p>
+<p>Then the pick broke.</p>
+<p>I had half a piece of iron in the lock, half in my hand, and a boat waiting on the ebb that I had already missed.</p>
+<p>The singing stopped.</p>
+<p>"That was a very pretty little prayer," a woman said. "Did it get you in?"</p>
+<p>She stood in the kitchen doorway, barefoot, with an apple in her hand. There had been a sleeping cook behind that door. There might still have been. The woman bit the apple. Juice ran over her thumb.</p>
+<p>"I would like to leave," I said.</p>
+<p>"Would you?"</p>
+<p>She held out the apple. I did not take it.</p>
+<p>"Your friend has a room ready," she said. "There is a boat. There was a boat. You could still catch it, if somebody were kind."</p>
+<p>I looked at the broken pick.</p>
+<p>"But there are books in here," she said, "and you know how to read them."</p>
+<p>She had a bit of apple skin caught between two teeth. I remember wanting to remove it. I remember the wish with an unpleasant clarity. The door, the prison, Pel on the floor, all of them had become less urgent than the small red strip against the white tooth.</p>
+<p>She smiled and it was gone.</p>
+<p>"One night," she said.</p>
+<p>"For what?"</p>
+<p>"Everything you have come for."</p>
+<p>"Which night?"</p>
+<p>"You will know until you don't."</p>
+<p>The kitchen smelled of bread. I had eaten at Irena's less than an hour before. My stomach hurt with wanting it.</p>
+<p>"Will you get me out?"</p>
+<p>"Yes."</p>
+<p>"And the books?"</p>
+<p>"Yes."</p>
+<p>I asked for Pel. I want that included. I did ask.</p>
+<p>She looked amused.</p>
+<p>"You may have enough to fetch him. What you do with enough will be your affair."</p>
+<p>I took the apple.</p>
+<p>There is a taste in the world I have never found again. I have employed cooks from five coasts. They are all still employed. It would be unjust to punish a cook because an apple tasted of something he has never wanted.</p>
+<hr class="scene-rule"/>
+<p>The next thing I remember is washing my hands at a fountain.</p>
+<p>It was morning. My clothes were dry. There was wax under my nails and a small unmarked coin in my mouth. I spat it into my palm. Warm. I could not tell whether the warmth was mine.</p>
+<p>Beside me stood a porter with a handcart full of account books. He asked where I wanted them.</p>
+<p>He had asked before. There was impatience in his voice.</p>
+<p>"My house," I said.</p>
+<p>"Which?"</p>
+<p>That was new.</p>
+<p>He showed me a paper. There were two properties on it, both conveyed in a hand I knew. My hand. Beneath the name, a seal. I had wax beneath my nails the same colour.</p>
+<p>I chose the nearer address because my feet hurt.</p>
+<p>By noon I owned a counting-house. By dusk the shipowner was paying me to manage the accounts he had tried to have me imprisoned for altering. I had his second set of books. I had a letter to his nephew. I had several things whose value I did not yet understand, but understood well enough to keep.</p>
+<p>Pel was dead.</p>
+<p>The gaoler said it had happened early that morning. There was a fee to release the body. I paid it. There was a separate fee for his clothes. I paid that too, before remembering that they had taken his coat.</p>
+<p>Irena came to the counting-house three days later.</p>
+<p>She brought the spoon.</p>
+<p>"You left this in your other stocking," she said.</p>
+<p>I thought she would be impressed by the room. It had a window on the canal and a rug that was a little too large, so that one corner curled against the wall. I had bought flowers.</p>
+<p>She looked at the flowers, then at me.</p>
+<p>"Come home," she said.</p>
+<p>I said I was home.</p>
+<p>She put the spoon down.</p>
+<p>The porter was waiting outside. The shipowner had sent a clerk. Someone needed a signature. Irena stood between me and the door, and I kissed her until she stopped looking at the room.</p>
+<p>It worked. That afternoon it worked.</p>
+<p>I was young. I had nearly died. I had a great deal to do.</p>
+<p>You can understand it.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART III</span>The house with the yellow door</h2>
+<p>The woman who sold me my first pleasure house tried to include the staff in the sale.</p>
+<p>I made her strike them out.</p>
+<p>It is a pleasing incident. I have told it at dinners. The guests approve, the younger women look at me with a little more interest, and the man who has been trying to get me alone discovers a reason to admire my principles.</p>
+<p>What happened next is less often requested.</p>
+<p>I stood in the downstairs parlour and told the staff they were free to go. Four women went. A man who sang in the evenings asked whether his last month's wages would be paid. A laundress put on her coat, took it off again, and asked whether freedom included the rooms upstairs.</p>
+<p>I had not thought about the rooms.</p>
+<p>The woman who had sold me the house was sitting by the fireplace, counting my money. She made a small sound. I wanted to put the poker through her face. Instead I told the laundress she could stay until she found somewhere.</p>
+<p>"At what rent?" she asked.</p>
+<p>I gave a figure. The old owner made the sound again.</p>
+<p>There were eleven people in the house that evening. I had offended six, frightened three, and acquired a cook who wished to know whether we were still feeding the other two.</p>
+<p>It was a useful first day.</p>
+<hr class="scene-rule"/>
+<p>The place stood beside a canal where the dyers emptied their vats. On red days the water looked like something slaughtered upstream. On blue days it looked clean enough to tempt a stranger. The cellar walls sweated all year. There were mushrooms behind a cabinet in the dining room.</p>
+<p>I called it the Yellow Door because the door was yellow and I had spent my invention on the purchase.</p>
+<p>Irena came to see it. She walked through the rooms with her skirts gathered above the dirty boards. In the best bedroom she lifted a corner of the mattress, looked underneath, and lowered it carefully.</p>
+<p>"Burn that," she said.</p>
+<p>We burned six.</p>
+<p>She supplied ribbons for the bed curtains at cost. I paid her cost and added a little, secretly, to the next order. When she discovered it she came down to the counting-house and threw the account at me.</p>
+<p>"You cannot bear to owe me anything," she said.</p>
+<p>"I owe you a spoon."</p>
+<p>She laughed. I had expected her to. I stood and put my hands on her waist. She let me kiss her once, then stepped back.</p>
+<p>"You do that when you want to stop hearing me."</p>
+<p>"I do it when I want to kiss you."</p>
+<p>"Yes," she said. "That is why I keep letting you."</p>
+<p>It was becoming difficult to win an argument without losing the evening.</p>
+<hr class="scene-rule"/>
+<p>We opened in rain. A musician arrived drunk, a customer fell on the steps, and the cook discovered that the fishmonger had supplied something with the eyes of a much older fish.</p>
+<p>The evening was saved by a woman called Celise, who had stayed through the sale because she was owed money by three men who knew the address. She had worked in houses in Zakov and along the Brass Coast. She could speak to a drunken man without letting him believe they were having the same conversation.</p>
+<p>Celise sent the musician to bed. She put the fallen customer beside the fire, gave him dry socks, and told his friends he had saved her from doing exactly the same thing. Then she sang without accompaniment while I took the fishmonger into the kitchen and explained the knives.</p>
+<p>By midnight we had paid for the fish twice over. I asked Celise to run the parlour.</p>
+<p>She named a wage. I offered less. She went upstairs.</p>
+<p>I followed her.</p>
+<p>In her room she took off one earring and put it on the dresser. She had heard me come in but did not turn around. The back of her neck shone with perspiration. There was a strip of dark lace caught in the clasp of her necklace.</p>
+<p>"Your door," she said.</p>
+<p>I closed it.</p>
+<p>"Outside."</p>
+<p>I paid what she asked. We did very well together.</p>
+<hr class="scene-rule"/>
+<p>I liked the house.</p>
+<p>You will expect me to have endured it until I could afford a cleaner business. I liked it from the first evening the floor had been scrubbed and the lamps were trimmed and someone upstairs laughed with no effort to make it carry.</p>
+<p>I liked the preparation: stockings drying over a rail, powder on a dressing table, a man's careful shave before someone he wished to impress. I liked the tired kitchen talk when a woman came down in her shift and ate cold chicken from the bone. I liked how a room changed when the right person entered it.</p>
+<p>There was pleasure there. Ordinary pleasure, bought and given, sometimes disappointing, sometimes much better than either person had expected. Adults came to us because they wanted to touch and be touched. We asked what they liked. We listened to the answer. We put clean water beside the bed.</p>
+<p>Some nights that was all that happened.</p>
+<p>Celise had a client who wept whenever she sang a particular song. He paid her not to sing it, then asked for it before he left. Another wanted to sleep while someone sat in the room sewing. He woke at the slightest silence. The woman who sat with him learned to pull the thread through a little noisily.</p>
+<p>We kept a note so she would not have to explain it to a substitute.</p>
+<p>That was the first book of preferences. A practical book. Allergies, names not to use, a warning about a man who would be pleasant until the drink caught up with him. Celise kept it locked because it concerned her staff's safety.</p>
+<p>I had a key because it was my house.</p>
+<p>The man who wanted sewing was a clerk at the harbour court. When an inspection threatened the Yellow Door, I asked him to postpone it. He refused. His hands were shaking. I could hear Celise upstairs singing the song for the man who paid not to hear it.</p>
+<p>I said I would hate to explain to the inspector why a court clerk spent so many nights in a house he had never inspected.</p>
+<p>He looked at the locked drawer.</p>
+<p>The inspection was postponed.</p>
+<p>Celise came into my office the next morning and emptied the book into the fire. She tore out the pages in handfuls. I watched her because I had already copied the useful ones.</p>
+<p>"He was sleeping," she said.</p>
+<p>"I know."</p>
+<p>"He wasn't doing anything to anyone."</p>
+<p>"I know."</p>
+<p>"Then why him?"</p>
+<p>She was usually more intelligent than that.</p>
+<p>There were rooms upstairs. Wages due. The drains needed work. A postponement had allowed us to continue earning while I found someone to do it. I could have explained all this, but Celise had seen the accounts. She knew.</p>
+<p>I let her finish burning the book. Paper is cheap when you know where to get it.</p>
+<hr class="scene-rule"/>
+<p>The first shrine was behind the linen cupboard.</p>
+<p>I had not authorised it. There was a little mirror, a lamp, and a silk ribbon tied around the stem of a glass. Someone had left a peach cut open on a dish. The flesh was already darkening where the knife had gone through.</p>
+<p>I asked who had put it there.</p>
+<p>Celise said several people.</p>
+<p>"For what?"</p>
+<p>"What do you think?"</p>
+<p>I thought of the apple in the kitchen doorway. I had been thinking of it all week. Sometimes, after a very good supper, I caught myself licking the inside of my wrist as if the taste might have got there somehow.</p>
+<p>That night I brought a better lamp.</p>
+<p>Do not laugh. People have entered religions over less.</p>
+<p>When I knelt, a woman in the mirror was already kneeling. I saw the pale oval of her face and the line of her mouth before I realised it was mine. I had expected another face. I do not know why.</p>
+<p>I wanted the room to love me. There was no other word for it. The entire room: the woman stripping a bed next door, the man waiting below, Celise counting the linen, Irena in her own house deciding whether to come. I wanted them all to turn when I entered. I wanted them pleased. I wanted their wanting to continue after I left.</p>
+<p>My knees hurt against the boards. I could smell the peach.</p>
+<p>The lamp burned until there was no oil left.</p>
+<p>In the morning Celise asked whether I had slept. I asked how many bookings we had.</p>
+<hr class="scene-rule"/>
+<p>Tessa made the first sign for the house. She had learned gilding by then. She put a small bird above the yellow door, carrying a ribbon in its beak.</p>
+<p>"You should have had a bird," she said. "People remember pictures."</p>
+<p>I told her it was beautiful. It was. Her hands were red still, but she wore gloves when she went out, very cheap ones with pearl buttons I had sent her from Kes's warehouse.</p>
+<p>She would not come in.</p>
+<p>I thought she disapproved of the business. She said she disapproved of the stairs; her knees were bad. I offered to have supper brought down.</p>
+<p>"Another night."</p>
+<p>I watched her go along the canal, stopping once to bend her leg before taking the bridge steps. I wanted to call her back and put her in a better coat and have everyone see how well I treated old friends. She would have hated the coat. That was part of the difficulty with her.</p>
+<p>She sent a bill. I paid it at once.</p>
+<p>I did not notice until years later that she had stopped asking me to find her customers.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART IV</span>What the city wanted</h2>
+<p>By twenty-seven I owned three warehouses, two gambling rooms and the house. I have written that elsewhere. It sounds sufficient when put in a line.</p>
+<p>Every morning I woke with something missing.</p>
+<p>A week without Irena was obvious. A week with her was worse. She would be beside me, warm and drowsy, her hair caught beneath my shoulder, and I would look toward the door because someone might be waiting with news.</p>
+<p>I learned to take a moment before getting up. To kiss her forehead. To make the going look reluctant. Sometimes it was reluctant. I wanted to remain and to leave and to have her waiting when I came back.</p>
+<p>Livaea did not arrive at breakfast and demand a fresh atrocity. There was breakfast. There was coffee. There was a day full of things I might obtain. I did not feel cursed. I felt unusually well equipped.</p>
+<p>The Watch Captain was a man called Orren Dask. He had a round face that looked kindly until he smiled. The smile showed too much of the lower teeth.</p>
+<p>He came to the Yellow Door for money. He came again because Celise made him feel witty. The third time he wanted to stay until morning.</p>
+<p>I had instructed the staff that they could refuse anyone. Celise refused him. He sat very still, looking at the cup in his hand.</p>
+<p>"She is tired," I said.</p>
+<p>Celise looked at me.</p>
+<p>Dask asked for her the following night.</p>
+<p>You see what I had done. A small courtesy to a powerful customer. It took three words to make her refusal into a postponement.</p>
+<p>She came to the office and shut the door so hard that a glass fell off a shelf.</p>
+<p>"Tell him," she said.</p>
+<p>I told him.</p>
+<p>He inspected us the next morning. Six men came with him. They opened chests, pulled the beds apart, tipped a jar of powder onto the wet floor. One held the cook against a wall while another went through her pockets. The cook had a son at sea. She had a letter from him folded in her apron. When the man was finished, the letter lay in the spilled powder.</p>
+<p>They found no offence that would stand in a hearing. They closed us pending one.</p>
+<p>Dask came back that evening, alone.</p>
+<p>"A misunderstanding," he said.</p>
+<p>He touched my cheek with the back of a finger. I did not move away. He took that as encouragement and told me what would make the misunderstanding disappear.</p>
+<p>I did not supply Celise.</p>
+<p>Write that accurately. I have done enough that you need not give me this as well.</p>
+<p>I supplied the Captain with a promotion.</p>
+<hr class="scene-rule"/>
+<p>It took five weeks. He had a superior, a deputy, and a cousin who sold lamp oil to the Watch at a price the superior had begun to question. The cousin had been paying for bad oil and supplying worse. A watch-house had burned the previous winter. Two men had died in their beds.</p>
+<p>I bought the carter who had delivered the oil. I bought his debt, I mean. He had pledged his mule to a moneylender and could not work without it. I returned the mule. He cried against its neck. I was embarrassed for him and waited until he was finished.</p>
+<p>Then I asked him to remember that the superior had ordered the substitution.</p>
+<p>He had not.</p>
+<p>The carter understood the request. He did not give me a speech about honesty. He looked at the mule, then at me, then at the man waiting in my doorway.</p>
+<p>He said he remembered.</p>
+<p>I found two further witnesses and a clerk who could put their recollections in a convincing order. The clerk belonged to the Archivist, though at the time I did not know that. He had a dry little cough and charged extra for dates.</p>
+<p>The superior was dismissed, tried and hanged. Dask took his place. Celise watched the procession from behind the curtains. I was in the kitchen when she came down.</p>
+<p>"Does he know?" she asked.</p>
+<p>"He knows enough."</p>
+<p>"I meant the one they hanged."</p>
+<p>The cook was skinning onions. There were papery scraps all over the table. I picked one off my sleeve.</p>
+<p>"He signed the supply orders," I said.</p>
+<p>"For oil."</p>
+<p>"Yes."</p>
+<p>She left me with that distinction, which did the dead man no good at all.</p>
+<p>The house reopened. Dask sent flowers. I put them in the parlour where he would see them when he came to thank me.</p>
+<p>He did not ask for Celise again.</p>
+<hr class="scene-rule"/>
+<p>The Archivist invited me to tea.</p>
+<p>He had a room in the Archivolt where the windows were set too high to show the street. I had expected an old man and found a man who had decided not to give anyone the pleasure of estimating his age. His quill lay beside the cup. The nib was pale and jointed. He watched me notice it.</p>
+<p>"A relative," he said.</p>
+<p>"Yours or the pen's?"</p>
+<p>He smiled.</p>
+<p>There are people who begin enjoying you at the moment you become dangerous to them. They have been bored for years. I am fond of them, though I do not leave my glass with them.</p>
+<p>He showed me a copy of the carter's testimony. Underneath it lay a copy made before the dates were added.</p>
+<p>"You should keep your drafts," he said.</p>
+<p>"You appear to be doing it for me."</p>
+<p>"I charge."</p>
+<p>We agreed a price. He did not name his employer. A servant brought a folded note while we were talking. The paper had a faint warmth when it passed near my hand. He read it, folded it along a different crease, and said our conversation was over.</p>
+<p>I have met more powerful men since. None of them have made a servant carry away a second cup so promptly.</p>
+<p>Do I know who sends the warm paper? You have paid for a life, not my funeral.</p>
+<hr class="scene-rule"/>
+<p>Irena left in spring.</p>
+<p>She had a new shop in the upper city. I had arranged the lease through someone she did not know I knew. It was a generous lease, at a rent lower than the building could command. I expected her to discover it eventually and be cross for an evening.</p>
+<p>She discovered it before signing.</p>
+<p>I was having a dress fitted when she came. The seamstress was on her knees with pins in her mouth. Irena stood inside the door holding the folded lease.</p>
+<p>"Could you leave us?" she asked.</p>
+<p>The seamstress looked at me. I said she might. Irena watched the exchange.</p>
+<p>"How much of it?" she asked when we were alone.</p>
+<p>"How much of what?"</p>
+<p>"The last order. The customer from Vhasia. The man who wanted enough green silk to cover a chapel."</p>
+<p>"They wanted ribbon. You sell ribbon."</p>
+<p>"How much?"</p>
+<p>I told her. Most of it. Not everything; she had good customers of her own. But enough to keep her from worrying through a bad winter. Enough to let her spend more evenings with me.</p>
+<p>She put the lease on the dressing table.</p>
+<p>I began to tell her she need not be ashamed. I never got to the end of the sentence.</p>
+<p>She slapped me. Hard. I was furious. Then I saw her face and put the fury away, because it was useless and there was something much worse happening.</p>
+<p>"Don't arrange my life so I'll have time to love you," she said.</p>
+<p>I offered to cancel the orders. I offered to leave the shop alone. I offered a great deal, and as I spoke I heard how it sounded: a woman bidding against an empty doorway.</p>
+<p>She took her things over three days. I sent a cart each morning. On the third she sent it away.</p>
+<p>Our last night together had been good. I insist on that. She had laughed when I caught my hair in an earring. We had lain awake with the window open and listened to a drunk trying to persuade a boatman to take him across a canal he could have crossed by walking twenty paces to the bridge. We had both thought him ridiculous.</p>
+<p>I kept trying to get back to that night while she packed. She was already in the room where the lease lay on the table.</p>
+<p>I did not put anything in her way after she left.</p>
+<p>For almost a month.</p>
+<p>Then I heard she was seeing someone. A cooper's daughter, broad at the shoulders, with none of the accomplishments Irena usually admired. I had a customs inquiry opened into a shipment of ribbon. It delayed payment long enough for Irena to have to borrow. The loan came from a house I controlled.</p>
+<p>She paid it back early.</p>
+<p>I was pleased with her. I was insulted. I wanted to send another order. I wanted the woman with the broad shoulders to catch a fever, recover badly, and move somewhere inland.</p>
+<p>I did none of the last part. You may take what comfort you can from that.</p>
+<hr class="scene-rule"/>
+<p>Sister Agatha came to collect for the hospice. She had come before, but now I could give enough for the visits to be worth arranging.</p>
+<p>She counted the money at my desk. Her sleeve pulled back and I saw the broken chain tattooed around her wrist. There were old pale scars through the ink. I did not ask. In Silkstrand it is rude to question a woman's jewellery unless you are prepared to buy it.</p>
+<p>"You could come and see the ward," she said.</p>
+<p>I went. I wore a plain dress because I knew enough not to wear a fine one. Agatha put an apron over it and asked me to hold a basin.</p>
+<p>A man had fallen from scaffolding. He kept apologising for the mess. I held the basin while she washed him. His wife stood at the foot of the bed, staring at his boots. There was a hole through one sole big enough to put a thumb into.</p>
+<p>I bought him boots. It was what I could do. He could never wear them, as it turned out, but his wife sold them and bought several weeks of food.</p>
+<p>Agatha did not correct my misunderstanding. She asked me to come again.</p>
+<p>I sent money instead.</p>
+<p>You have heard there was a child. That Agatha raised her. That she has my eyes. Half the city has my eyes when there is something to inherit. Agatha keeps her own doors. Ask her, if you are an exceptionally brave fool.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART V</span>A little silver</h2>
+<p>The man who tried to take the Yellow Door was called Varo. He had a share in three ferries and a larger share in the men who unloaded them. He came into my parlour wearing a coat lined with otter and ordered a woman brought downstairs.</p>
+<p>Celise asked which woman he wished to meet.</p>
+<p>"The one who owns it."</p>
+<p>I was sitting behind him. He had mistaken me for a customer. I allowed the mistake to live a few moments while I finished my wine.</p>
+<p>He offered me less than half what I had put into the house. When I declined, he touched one of the new curtains and asked whether they burned easily.</p>
+<p>There are men to whom you can give a witty answer. Varo had brought two companions with broken knuckles and no wine in their glasses. I said I would consider his offer.</p>
+<p>He gave me until morning.</p>
+<p>I sent for Dask. Dask was unavailable. I sent again. His deputy came with a polite expression and explained that the Captain could not interfere in a private sale.</p>
+<p>Varo had paid more than I had, or frightened him more. I did not then possess the whole man. People forget that when they describe my rise. They begin with the finished Court and imagine I had only to point.</p>
+<p>That evening I had a house full of staff, a threatened fire, and a Captain who had decided to be scrupulous. Celise was moving the lamps away from the windows. The cook wrapped her son's letter in oilcloth and put it inside her dress.</p>
+<p>I went to see Varo.</p>
+<p>Not at his home. I could not have got through his door. He kept a woman in a rented room above a chandlery, and the candlemaker owed Kes a favour. I went through the shop after it closed and waited in the room while the woman took a walk along the quay.</p>
+<p>I had paid her to go. She asked what would happen when she returned. I said the man who threatened her would be gone.</p>
+<p>I did not specify how far.</p>
+<hr class="scene-rule"/>
+<p>Varo came in with rain on the otter collar. He saw me, stopped, and put his hand behind his back.</p>
+<p>I had brought a knife. It was beneath the cushion on which I sat. This struck me, at that instant, as an extraordinarily stupid place to keep a knife.</p>
+<p>"You have considered," he said.</p>
+<p>"I thought we might come to terms."</p>
+<p>"We have."</p>
+<p>He crossed the room quickly. I got the knife out badly, caught the cushion with it, and stood up in a flurry of stuffing. He hit my wrist with the heel of his hand. The knife went under the bed.</p>
+<p>There was no beautiful movement after that. I went for the door and he caught my hair. I hit the wall with my mouth open. Something cracked. My front teeth remained where they belonged, which was a mercy I had time to appreciate later.</p>
+<p>He held me against the wallpaper and told me I had been badly advised.</p>
+<p>Then a voice behind him said, "Move your hand."</p>
+<p>There was a woman in the doorway. She wore a silver half-mask and an ordinary wet coat. Her stiletto was so fine that I saw the handle before I saw the blade.</p>
+<p>Varo released my hair. He knew her. I heard it in the way he began to speak.</p>
+<p>She moved closer. He reached for her wrist and she cut his forearm. He seemed surprised by how little it hurt. He looked at the line, then at her, and she stepped out of his reach while his fingers began to open and close on their own.</p>
+<p>I went down on my knees to find my knife. Blood from my mouth dripped on the floor. Beneath the bed there was a slipper, a bent pin, and a quantity of dust. I found the knife by its handle and crawled backward into the room.</p>
+<p>Varo was sitting now. His legs had given way. He was trying to say something. I thought he was asking for water.</p>
+<p>The woman in the mask watched me. She did not tell me what to do.</p>
+<p>I could have left him there. The poison was already working. Instead I put the knife under his chin. He took hold of my sleeve. His grip was weak and horribly intimate. I pushed until the sleeve came free.</p>
+<p>Afterward I was sick beside him.</p>
+<p>The masked woman gave me a cloth. I wiped my mouth, saw what came off it, and was sick again.</p>
+<p>"Done?" she asked.</p>
+<p>"I think so."</p>
+<p>"We go down the back."</p>
+<p>The woman who lived there was waiting in the passage below. She saw the blood and made a small noise. I put the purse into her hand. All of it. More than we had agreed.</p>
+<p>She did not close her fingers around it.</p>
+<p>I folded them for her.</p>
+<hr class="scene-rule"/>
+<p>The masked woman took me through a drain that opened onto the canal under the chandlery. We crouched in water to our calves while a patrol crossed the bridge above us. I could hear the loose metal on their belts. She held one finger up without looking at me.</p>
+<p>I did not need telling. My mouth had begun to hurt enough to occupy my attention completely.</p>
+<p>When we came out she walked me to a shuttered workshop and knocked. Someone admitted us through a side door. There was a chair, a table, and a little brazier. A man heated wine and did not ask our names.</p>
+<p>She took off her wet gloves. There was a pale scar across one knuckle. Nothing about the hands suggested the last twenty minutes.</p>
+<p>"Who sent you?" I asked.</p>
+<p>"You have made yourself useful."</p>
+<p>"To whom?"</p>
+<p>She held the warm cup while I tried to drink. I could not close my lips properly.</p>
+<p>"That is a question for later."</p>
+<p>I dislike answers of that kind. They are most effective when you have nowhere to go and a stranger is keeping the cup from tipping into your lap.</p>
+<p>I asked her name.</p>
+<p>"You won't need it."</p>
+<p>She was right. The Court already called her the Silken Blade. The name was in use before she worked for me. I did not invent every unpleasant thing in Silkstrand. I improved the arrangements under which several were employed.</p>
+<p>At dawn I went home. Celise opened the door. She looked at my mouth, put a hand behind my head, and brought me into the kitchen.</p>
+<p>She made me broth. The cook warmed a cloth. I cried while they worked on me. I had not intended to. Celise said nothing and held the basin.</p>
+<p>For a little while I had everything I wanted.</p>
+<p>Then I asked whether Varo's men had come.</p>
+<hr class="scene-rule"/>
+<p>I inherited none of his ferries. That would have been too obvious. A cousin inherited them and asked me to help with the labour disputes. The cousin had seen Varo's body. Someone had made sure of it.</p>
+<p>I gave him an agreement he could live with. I gave Dask an opportunity to solve a different murder. I paid the candlemaker for the damage to his upstairs room. I found the woman who had lived there a room in another district and paid the rent for a year.</p>
+<p>She came to the Yellow Door near the end of that year. I did not recognise her until she mentioned the chandlery.</p>
+<p>"It runs out next month," she said.</p>
+<p>"The rent?"</p>
+<p>"They still ask about him."</p>
+<p>I arranged another year.</p>
+<p>It was inexpensive. She had a face that made me remember the passage and her open hand. Afterward I asked a clerk to deal with her, and the arrangement became easier on us both.</p>
+<p>You disapprove of the clerk. I can see it. Would it improve matters if I made the woman repeat the night to me every time she needed a roof?</p>
+<p>No, do not answer immediately. Drink something first. People give better answers when their mouths are occupied.</p>
+<hr class="scene-rule"/>
+<p>The Court began letting me settle quarrels.</p>
+<p>An innkeeper had stolen from a smuggler. A smuggler had delivered the wrong goods on purpose. A forger had forged a letter accusing another forger of forgery, which would have amused me more if three people had not already lost fingers over it.</p>
+<p>I held the meetings in a room at the back of the house. There was food, clean light, a privy people could use without crossing the whole building. I paid attention to that. A surprising quantity of violence occurs because someone has been made uncomfortable for too long and needs an excuse to stand up.</p>
+<p>I did not always decide fairly. I decided in ways people could bear to carry outside. If a man lost, he usually had something in his hand when he went. Sometimes it was his hat. Sometimes he was pleased to have it.</p>
+<p>The Silken Blade came to certain meetings. She took the chair beside the door. Nobody asked whether she was comfortable.</p>
+<p>I did.</p>
+<p>She looked at me through the mask. Then she moved the chair out of the draught.</p>
+<p>We understood each other a little better after that. Do not make a romance of it. I wanted someone capable of killing me to prefer the room with me in it. I also dislike sitting in a draught. There is room for both in a small kindness.</p>
+<hr class="scene-rule"/>
+<p>Celise left the Yellow Door for the Gilded Pillow.</p>
+<p>She told me at breakfast. There was jam on her sleeve. I noticed it because I was trying not to look surprised.</p>
+<p>The Pillow had older ties to Livaea, rooms in better repair, and women who knew rites Celise had been learning in pieces. She wanted to practise among them. She wanted, she said, to work in a house where the patron's shrine was not kept behind the linen.</p>
+<p>"I can move it," I said.</p>
+<p>"I know."</p>
+<p>I offered more money. She kissed my cheek. I offered a share. She shook her head.</p>
+<p>"You have a good house," she said. "Let it be a good house without me."</p>
+<p>I let her go. Then I bought a share in the Pillow.</p>
+<p>She was angry when she learned. By then she had a room there and responsibilities and was doing the work she wanted. The purchase changed none of that. I told her so.</p>
+<p>She said that was precisely how I did it.</p>
+<p>Her anger passed. Most anger does when the kitchen still needs to be run. We remained on speaking terms. Eventually she began coming to my meetings on behalf of the women at the Pillow.</p>
+<p>I was pleased. She was very good at the work.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART VI</span>People who kept their word</h2>
+<p>Kes called the little guild the Silk Coin. I thought the name sentimental. He said sentiment sold almost as well as fear and smelled better in the morning.</p>
+<p>He still kept the three fingers in a jar. He would take it down if a young thief grew careless around a lock. The young thief would listen, appalled, while Kes explained the customs trap in loving detail. He had been explaining it for so long that he enjoyed certain parts.</p>
+<p>We had supper at his warehouse twice a year. Fish, potatoes, something pickled in a jar that had better not be the wrong one. He liked that joke. I obliged him by being offended every time.</p>
+<p>By then there were young people everywhere. One on a windowsill. One trying to mend a tool that had already been mended too often. A quiet girl with ink on her fingers. A boy with a fox that watched the table more intelligently than he did.</p>
+<p>I had gifts brought. Practical gifts. Good paper. A file. A medicine case. It was pleasant to be the visitor whose arrival made the room brighten.</p>
+<p>Kes's daughter was there one evening. She had his direct look and all ten fingers. I will not give you her name. She has had enough printed about her father without finding herself in shop windows as well.</p>
+<p>She asked whether I meant to eat with my gloves on.</p>
+<p>I took them off. Kes laughed until he coughed.</p>
+<p>It was a good evening. I stayed too long. On the way home I found myself humming the song they had sung, and became cross when I could not remember the middle verse.</p>
+<p>I sent for someone who knew it.</p>
+<hr class="scene-rule"/>
+<p>The dispute began with a crate of stolen dyes.</p>
+<p>They usually do begin with something that can be carried. The grand reasons arrive after the men with knives have been paid.</p>
+<p>The Silk Coin had taken the crate from a factor I protected. It was valuable, but not ruinously so. They had a buyer ready and a principle that permitted stealing from the man in question. I do not contest the principle. I had read his correspondence and could have suggested several more reasons.</p>
+<p>I sent a message asking for the crate back.</p>
+<p>Kes sent the amount the factor had paid for it. Not what it would sell for. What he had paid. There was a note about fair restitution, written in Kes's hand with one blot where the pen had caught.</p>
+<p>I laughed. I showed it to the Archivist. He did not laugh.</p>
+<p>"Are they under your protection?" he asked.</p>
+<p>"In a manner of speaking."</p>
+<p>"You may want a more exact manner."</p>
+<p>I went to the guildhouse.</p>
+<p>It was a converted spice warehouse near the Dye Yards. The walls still smelled sweet in damp weather. They had built rooms above the main floor and a kitchen behind it. Someone was practising a tune upstairs, getting the same few notes wrong every time.</p>
+<p>Kes asked whether I had come for supper.</p>
+<p>I explained the problem.</p>
+<p>He listened. When I finished he pushed the money back toward me. It was the same sum. He had kept it ready.</p>
+<p>"You don't get to sell him safety from us," he said.</p>
+<p>"Someone has to settle these things."</p>
+<p>"We have settled it."</p>
+<p>A woman at the next table stopped sharpening a knife. A man by the stairs put down the cup he was washing. They were listening now. I had hoped to speak to Kes privately. He had kept the door open.</p>
+<p>"You taught me to pay what was owed," I said.</p>
+<p>"I did."</p>
+<p>"Then why make this difficult?"</p>
+<p>He looked tired. I mistook it for weakness and began again.</p>
+<p>At last he said, "Serafine. Some people are allowed to tell you no."</p>
+<p>The tune upstairs stopped. Whoever had been practising had finally got the passage right, or become bored with it.</p>
+<p>I took the money. I kissed Kes. I thanked him for the invitation and said I could not stay.</p>
+<p>I did not threaten the room. There were children in it.</p>
+<hr class="scene-rule"/>
+<p>I offered the Silk Coin a place in the Court.</p>
+<p>Good terms. Better than several existing partners enjoyed. They would keep their rooms, choose their work, and settle disputes through my people. In return they would agree not to touch protected cargo and supply information when asked.</p>
+<p>They refused.</p>
+<p>I improved the terms. They refused again.</p>
+<p>You may be wondering whether they refused because they were principled or because they disliked me. I wondered too. I spent a regrettable amount of effort trying to separate the two.</p>
+<p>Then people began going to them.</p>
+<p>A runner who had angered one of my creditors. A woman who had been offered work she did not wish to perform. Two brothers who knew a route through the Dye Yards that my people needed. The Silk Coin found them places. Sometimes work. Sometimes a road out of the city.</p>
+<p>They asked payment. Of course they did. They were thieves with a kitchen to maintain. But the payment ended. A thing was done, an amount was paid, and the person was allowed to cease being useful.</p>
+<p>That attracted attention.</p>
+<p>A creditor came to my room and asked what his protection was worth if a debtor could cross a canal and be made safe by Old Kes. He put a knife on the table. Not as a threat to me. He wished permission to use it elsewhere.</p>
+<p>I told him to put it away.</p>
+<p>He did. Slowly enough for me to notice.</p>
+<p>That night I went to the Pillow. Celise was dressing for a private supper. She stood at the mirror fastening a necklace, unable to make the clasp catch. I took it from her and closed it.</p>
+<p>"You are shaking," she said.</p>
+<p>"Only a little."</p>
+<p>She turned. She had known me long enough to be careful when I was careful.</p>
+<p>I told her about the Silk Coin. She listened without offering to solve it. That irritated me. People who have been paid well ought to contribute something to a conversation.</p>
+<p>"They cannot have a city inside my city," I said.</p>
+<p>"Perhaps it isn't all yours."</p>
+<p>I pulled the necklace straight at her throat. I did it gently. She put her hand over mine and took it away.</p>
+<p>There was music below. Food on the stairs. Someone laughed in a way that made another laugh before knowing the reason. I had provided money for the repairs, protection for the deliveries, a Captain who would look elsewhere. The whole house was full of people enjoying something, and for that moment none of it reached me.</p>
+<p>I wanted the guildhouse emptied.</p>
+<p>I did not say burned. I had not got there yet.</p>
+<hr class="scene-rule"/>
+<p>Tessa delivered a bound book to the house in the Heights.</p>
+<p>Yes, I had the house in the Heights by then. A lady had died. Her heirs wanted money more than a view of the canal. I had both and saw no reason to keep the uglier of the two.</p>
+<p>The book was for letters I wanted kept. Green leather. Good stitching. Tessa had hired two apprentices and was wearing gloves made for her hands. She had become broad through the waist and walked with a stick.</p>
+<p>I ordered tea. She asked whether I could pay the bill first, because a supplier was waiting.</p>
+<p>I paid it. Then I asked her to sit.</p>
+<p>She took the chair nearest the door.</p>
+<p>"You know the people at the Silk Coin," I said.</p>
+<p>"I bind their books."</p>
+<p>"Who goes there?"</p>
+<p>"Customers."</p>
+<p>"Tessa."</p>
+<p>She held the cup in both hands. There was a gold line around the rim. She looked at it for a moment, then put it down without drinking.</p>
+<p>"I used to wonder," she said, "when someone asked you something, whether I'd be the answer."</p>
+<p>"That was a long time ago."</p>
+<p>"Yes."</p>
+<p>I spoke about our childhood. The red blanket. The shoes. I made the gull sound as well as I could without the broken tooth. She smiled. She could not help it.</p>
+<p>I leaned forward.</p>
+<p>"Who goes there?"</p>
+<p>The smile went. She picked up her stick and stood with the small effort I had been watching her conceal.</p>
+<p>"Don't send for me again," she said.</p>
+<p>I did not have her followed. I already knew where she lived.</p>
+<p>There is a difference. At the time it seemed sufficient.</p>
+<hr class="scene-rule"/>
+<p>I went to the shrine after she left.</p>
+<p>By then Livaea had a proper room. The walls were silk, the lamp glass was red, and the fruit was changed before it spoiled. I knelt with a full stomach and a mouth that watered as if I had been kept without food all day.</p>
+<p>I asked what I should do.</p>
+<p>Nothing answered.</p>
+<p>I sat back on my heels. The room was close. My own perfume was beginning to annoy me. In the mirror I looked like a woman waiting for a maid to finish something.</p>
+<p>I asked again.</p>
+<p>Still nothing.</p>
+<p>You would prefer a command here. Something dreadful whispered from the glass. It would account for the next few chapters very comfortably.</p>
+<p>The lamp needed trimming. I trimmed it. I took a piece of fruit from the dish and went downstairs to work.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART VII</span>The offer</h2>
+<p>Kes's daughter came to the Pillow because Celise asked her to.</p>
+<p>There was work. Accounts for the kitchen, orders for linen, the sort of position a capable grown woman might accept without asking her father to inspect the premises. She had done similar work for the Silk Coin. Celise offered better wages and a room she need not share.</p>
+<p>The work was real. She performed it for six weeks. The cook liked her. She corrected an overcharge for flour and taught one of the house servants to sign her name instead of making a mark. She wrote to Kes about the room.</p>
+<p>Then we stopped her letters.</p>
+<p>That was all it took to bring him.</p>
+<p>He came in the afternoon, carrying a packet of sweets from a shop near the Dye Yards. He had bought the sort she liked when she was small. Celise received him in the blue parlour. I waited upstairs until he asked for me.</p>
+<p>I had put on a dark dress and a velvet veil. I had begun wearing it at meetings. People listened more attentively when they could not be certain where I was looking. I liked what they supplied in place of my face.</p>
+<p>Kes looked at it for a moment.</p>
+<p>"Take that off," he said.</p>
+<p>I did.</p>
+<p>He was the last person who could ask me in that tone and be obeyed. It was not a power he enjoyed using. He kept the packet in his good hand, the paper beginning to go translucent where his fingers pressed it.</p>
+<p>"Where is she?"</p>
+<p>"Upstairs."</p>
+<p>"Bring her down."</p>
+<p>"Sit first."</p>
+<p>He sat because his legs were troubling him. I knew that. I had chosen a chair that would not make him struggle to get out of it. You can arrange a kindness while arranging everything else.</p>
+<p>Celise brought his daughter. He stood at once. She put both hands on his shoulders and made him sit again, then knelt beside the chair.</p>
+<p>They spoke very quietly. I let them. There were things I needed him to see for himself: that she was alive, that she had not been beaten, that she knew she was not free to leave. She was angry enough to do most of the work for me.</p>
+<p>"Don't promise them anything," she said.</p>
+<p>He touched her hair. His two fingers were clumsy against it.</p>
+<p>She looked up at me.</p>
+<p>"He will," she said. "You know he will."</p>
+<p>I said nothing. There was no answer she needed.</p>
+<hr class="scene-rule"/>
+<p>The offer was made in the room behind the shrine.</p>
+<p>Celise made it. By then she had the rite. She had learned it slowly, under women who did not teach such things merely because someone could pay. I knew what it cost her to use it. I knew she would do it for the house, and what she called the house had grown broad enough to include me.</p>
+<p>Kes would assist in bringing the Silk Coin into the Court's hands. His daughter would leave the Pillow alive and free of the house's claim. He would not be asked to strike anyone. He would not be asked to name the children.</p>
+<p>He said no.</p>
+<p>Celise waited.</p>
+<p>It was quiet enough to hear a glass set down in the next room. Someone laughed, then lowered their voice. There was a supper in progress. A woman was being paid to sing to people who had had an agreeable day.</p>
+<p>Kes said no again. His face had begun to change colour. He put a hand against his breastbone and breathed through his mouth.</p>
+<p>Celise said his daughter's name.</p>
+<p>He looked at the door through which she had gone. I could see the beat at his throat. His hand opened. The packet of sweets fell onto the carpet.</p>
+<p>"She leaves," he said.</p>
+<p>"When you have done what you undertake."</p>
+<p>"Alive. No one follows her. No one asks her for anything afterward."</p>
+<p>Celise looked at me. I agreed.</p>
+<p>He turned back to her. I had expected a curse. He asked what he must say.</p>
+<p>She gave him the words. He repeated them, stumbling once. She made him repeat that part correctly. When it was finished his breathing eased. He sat as though something that had been holding him upright had let go.</p>
+<p>I picked up the sweets. One had come unwrapped. I put it back with the others and folded the paper over.</p>
+<p>That is the portion of the account people find hardest to forgive. I have noticed it when I tell it. They will hear about a throat cut in a room and look grave. The sweets offend them personally.</p>
+<p>I did not eat one, if that is what you are wondering.</p>
+<hr class="scene-rule"/>
+<p>We used the Bronze Ledger.</p>
+<p>There are several books. The Blue records who may be bought. The Bronze records why certain people no longer need to be asked. It is kept in a lead-lined safe in my private study. You may write that down. It has been common knowledge for years. The ward will still kill a fool who mistakes information for an invitation.</p>
+<p>We removed the book and left a letter.</p>
+<p>I remember choosing the paper. Something good enough to suggest I had taken the trouble. A thin sheet would have looked hurried. I wrote the message myself, then copied it because the first version leaned upward toward the right.</p>
+<p>The Court had watched them for a year. That part was true. There were lists of their contacts, the doors they used, the times they returned. I had supplied several of those doors with hinges and locks. The workmen remembered.</p>
+<p>Kes offered himself as the reason they should come. He could not do otherwise once the order was given. We sent the threat in a bloodied note: the ledger, one night, or he would hang.</p>
+<p>The child who carried it had been fed at the guildhouse. We chose him for that. He believed every word. His fear would have been difficult to imitate and unnecessary to rehearse.</p>
+<p>I sat in my new dressing room while the message went out. A maid was fitting the veil to a different comb. I had a headache. One pin kept pulling at the same place and I snapped at her.</p>
+<p>She apologised.</p>
+<p>I apologised back, quite sincerely. She had done nothing wrong.</p>
+<p>Then I sent for the patrol schedules.</p>
+<hr class="scene-rule"/>
+<p>They got into the study.</p>
+<p>Of course they did. We had allowed for ability. There is no sense setting a trap that insults the animal enough for it to turn around.</p>
+<p>What we had not allowed for was the man who went back through the smoke for his companion after the ward turned. He should have died in the doorway. He took the burns and came out carrying her. The report said he was laughing. I do not know whether that is true. People add laughter to courage because they cannot bear how frightened a brave person may be.</p>
+<p>They escaped with minor books. Enough to inconvenience me, though not enough to purchase safety. I was angry with the servants who had left those books accessible. I docked no wages. It was my study. I had approved the arrangement.</p>
+<p>I had the servants moved instead.</p>
+<p>The next morning a fence was arrested under a warrant from a Censor who had once been very indiscreet at dinner. A cache in the Dye Yards caught fire. An informant gave up a patrol route. There was a fight on a bridge and someone went over the side.</p>
+<p>The city continued working. Barges passed the burned building. People complained about the smell. The fence's wife tried to hire a lawyer and found the first three were unavailable.</p>
+<p>I had breakfast with a buyer from the Brass Coast. He wanted a route for goods that were lawful at one end of the voyage and awkward at the other. We ate figs. He told me I looked tired.</p>
+<p>"Business," I said.</p>
+<p>He understood. Business is a marvellous word. A man can agree with it before knowing whom it concerns.</p>
+<hr class="scene-rule"/>
+<p>Kes met them in the catacombs beneath the Pillow.</p>
+<p>I learned that afterward. This is where I am supposed to explain that I permitted it, having anticipated their response. I did not permit it. I had not anticipated his finding a useful act inside what remained to him.</p>
+<p>He gave them the combination to a backup safe in his warehouse. He warned them to get the children out. The command had required his betrayal. It had not made him stop looking for some way to help them.</p>
+<p>Celise brought me the news. She had taken off her necklace and held it wound around one hand. There were little red impressions in her palm.</p>
+<p>"You said he was bound," I told her.</p>
+<p>"He is."</p>
+<p>"Then how?"</p>
+<p>She told me what he had done. It satisfied the words. I wanted a failure in the rite, a defect that could be corrected by someone other than me. There was none.</p>
+<p>I asked whether he had named his daughter.</p>
+<p>"They know."</p>
+<p>I looked at the sweets. We had sent them to her room. She had sent them back unopened. They lay beside a bowl of fruit on my desk, looking shabby and particular.</p>
+<p>"We finish tonight," I said.</p>
+<p>Celise stopped winding the necklace.</p>
+<p>"They will stay," she said.</p>
+<p>"I know."</p>
+<p>"There are children."</p>
+<p>"I know."</p>
+<p>I had used the same answer with her before. She recognised it. So did I. Recognition did not oblige either of us to end the conversation differently.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">PART VIII</span>The Velvet War</h2>
+<p>We bought the mercenaries' evening.</p>
+<p>Black Banners. Good equipment, sober enough to understand the orders, and an officer who asked which doors were to remain usable. The Silken Blade answered that question. I signed for the payment.</p>
+<p>The guildhouse was surrounded before dark. Men watched the windows. Men watched the canal. We had people at the bridges to stop anyone making a public appeal. Dask's patrols found reasons to remain in the neighbouring streets, where the sound would be close enough to explain afterward and too far away to require immediate action.</p>
+<p>Someone from the Silk Coin tried to negotiate.</p>
+<p>We gave them terms. They were not terms I intended to keep. I have never understood the difficulty people have saying that. You may dislike a lie without making it take six sentences to admit.</p>
+<p>The negotiation cost them time. They spent some of it writing letters. I did not know that until copies began to circulate years later. One was addressed to a girl who had been learning to mend a particular sort of lock. Her teacher had drawn the part she kept putting in backward.</p>
+<p>I saw that letter in an intelligence report. The drawing was quite clear. He had used the last part of his evening to make sure she could do it without him.</p>
+<p>I had the report copied. It told me she might still be alive.</p>
+<hr class="scene-rule"/>
+<p>The house in the Heights was quiet while the attack began.</p>
+<p>I had guests expected later and had forgotten to cancel them. When the maid reminded me, I told her to receive them in the lower parlour and send up if there was anything she could not manage.</p>
+<p>I changed my dress.</p>
+<p>It was a black one with sleeves that made my hands look delicate. There was a pocket inside large enough for a folded book. I put the unmarked coin in it, because I had begun keeping the coin with me, and could feel its small warmth through the cloth.</p>
+<p>I remember the dress more clearly than the first report. There is no virtue in pretending otherwise.</p>
+<p>The report said the entrance was holding. They had barricaded it well. A woman at the upper window was making the approach expensive. One of the mercenaries had been dragged back with a bolt in his thigh. His officer wanted permission to fire the roof.</p>
+<p>The officer already had that permission.</p>
+<p>I sent it again, in writing.</p>
+<p>That is the act. I had many reasons. The page was short.</p>
+<hr class="scene-rule"/>
+<p>A fire in the Dye Yards does not begin red.</p>
+<p>It begins as a thicker darkness over the roofs. Then the smoke catches what light there is, and people look up from the canal because the air has changed. If there is oil inside, the first flame goes high and narrow. If there are dry beams, it spreads sideways. By the time the neighbouring roofs show clearly, someone is trying to get a child through a window.</p>
+<p>I knew all that. I had lived there.</p>
+<p>From my upper room I could see only the light. The city stood between us: chimneys, bridge towers, a bell-house. I opened the window and heard nothing I could separate from the ordinary night.</p>
+<p>The Silken Blade sent a runner. The upper floor had caught. The defenders were still at the stairwell. There were fewer of them. They were holding it anyway.</p>
+<p>"How many children?" I asked.</p>
+<p>He did not know.</p>
+<p>I told him to find out.</p>
+<p>He was very young. Old enough for the work, young enough to have thought I would be pleased that he had delivered the message quickly. He stood in my doorway with soot on one side of his face. I gave him water before sending him back.</p>
+<p>He drank with both hands around the glass.</p>
+<p>The maid came up to say one of the guests was asking for me. I said I would be down shortly.</p>
+<hr class="scene-rule"/>
+<p>Kes did not survive the night.</p>
+<p>There are accounts of how he died. Some are more useful than others. All agree that he had given the children what help he could and was dead before the business was finished. I did not require a more exact account. You may think that generous. You may think I preferred not to have one.</p>
+<p>His daughter was still at the Pillow.</p>
+<p>I sent an order that she was to leave at first light with the money and papers promised. Celise came herself to ask whether I meant it. She had been at the shrine. Her face looked scrubbed.</p>
+<p>"Yes," I said.</p>
+<p>"No one follows her."</p>
+<p>"Those were the terms."</p>
+<p>Celise put the order inside her sleeve. I asked whether she would stay for a drink.</p>
+<p>"No."</p>
+<p>I let her go.</p>
+<p>There are people who will take that as evidence in my favour. I did, at the time. I had kept my agreement with Kes. His daughter would be free. The fact that I had first arranged for her to need freeing seemed, in the exhausted hour after midnight, less important than the correctness of the release.</p>
+<p>You have done something similar on a smaller scale. I would wager the house on it.</p>
+<p>Not this house. One of the others.</p>
+<hr class="scene-rule"/>
+<p>The children got out.</p>
+<p>Eight, by the best count. The report was uncertain at first. There were bodies in the stairwell, bodies near the entrance, and a cellar the searchers could not reach until the beams had cooled. They found a passage to the canal. By then the people who had used it were beyond the net.</p>
+<p>Someone had guided them. The description was of a hooded figure, no name, seen briefly. I was given three names afterward and paid for none. A good witness says when he does not know. A witness who needs supper gives you a name.</p>
+<p>I did not let the eight escape. I did not look away. Nobody was carrying a secret instruction to spare them.</p>
+<p>The people on the stairwell held long enough.</p>
+<p>It annoyed me more than the loss of the minor books, more than Kes's last kindness, more than the expense of the men who had to be paid for being hurt. The guildhouse was gone. The Silk Coin could not operate in the city. I had obtained what I had set out to obtain, and there were eight people beyond my reach who would remember it in a way I could not arrange.</p>
+<p>I ordered the roads watched.</p>
+<p>When that failed, I ordered the names taken off the guild rolls. The Archivist dealt with the legal residue. Rooms were let to other tenants. Credit was withdrawn. Employers were advised that certain names would complicate their own affairs.</p>
+<p>Friends forgot faces. Some genuinely, I am told. Some had families and decided that forgetting was a thing they could learn.</p>
+<p>I do not know where courtesy ended and Livaea began in all of that. I knew which offices to send to. I sent.</p>
+<hr class="scene-rule"/>
+<p>Tessa came two mornings later.</p>
+<p>The porter told me she had no appointment. I told him she did not need one. He looked puzzled. People with authority often do when you exercise your own.</p>
+<p>She had walked across the city. Her gloves were wet. She stood in my office until I rose and brought a chair myself.</p>
+<p>On my desk she put a small piece of blackened leather. One corner of a cover. Green beneath the soot. I recognised her work.</p>
+<p>"There were books upstairs," she said.</p>
+<p>I asked if anyone of hers had been in the house.</p>
+<p>She stared at me.</p>
+<p>"What?" I said.</p>
+<p>"Would that help?"</p>
+<p>I wanted to say something kind. I could usually find it. The room was warm; her hands were cold. I offered tea.</p>
+<p>She shook her head. She had not sat in the chair.</p>
+<p>"I won't do another cover for you," she said.</p>
+<p>"You don't have to."</p>
+<p>"I know I don't."</p>
+<p>She left the leather on the desk. It smelled of wet ash and the old sweet spice that came out of the guildhouse walls in rain.</p>
+<p>I put it in a drawer. Later I had the drawer emptied because the smell persisted.</p>
+<p>I did not ruin her. She worked for years afterward. You can find the bindings if you know what to look for: a little ridge at the foot of the spine, where her thumb always pressed too hard.</p>
+<p>This book is not one of hers.</p>
+<hr class="scene-rule"/>
+<p>They brought me the jar from Kes's warehouse.</p>
+<p>The fingers had gone pale in the spirits. The stopper was stuck. I sat with it for a while and remembered the bread he kept within reach, the boy with the hook wound, the care with which he counted the buttons we had carried.</p>
+<p>Then I remembered the money pushed across the table, the open door, the people listening while he told me no.</p>
+<p>You will want one memory to defeat the other. They took turns. They still do, when I let them.</p>
+<p>I sent the jar to his daughter through Celise. I do not know whether she kept it. I enclosed no letter. Some offerings are easier without your handwriting on them.</p>
+<p>That afternoon the creditor who had put his knife on my table returned. He thanked me for settling the matter. The others sent messages. There was a gift of wine, an invitation from a house that had previously been careful about receiving me, and a warm folded note with no signature.</p>
+<p>It said the arrangements were satisfactory.</p>
+<p>I slept very well that night. I had slept badly for weeks.</p>
+<p>You see? I can give you the ugly parts.</p>
+<hr class="scene-rule"/>
+<h2><span class="movement-kicker">CODA</span>Which will please you?</h2>
+<p>It has been twenty years.</p>
+<p>The city has new bridges. The dyes are no cleaner. Dask is dead and his successor comes to the house on the same afternoon of the week, though I have never mentioned that to him. The Yellow Door has been painted twice and remains yellow. I own a larger share of the Pillow than I did then. Celise no longer runs its rooms. She has people who do that for her.</p>
+<p>I have not shown my face in public since the war. A porcelain half-mask for certain occasions. Velvet for others. You may choose a reason. Age, vanity, a rite, a scar, a woman seen in a doorway wearing the face I thought was safely upstairs. I have heard all of them. The last has cost people money to repeat convincingly.</p>
+<p>I do not spend more than three nights in the same bedroom.</p>
+<p>The servants find it inconvenient. I pay them well. A fresh room is a small indulgence for someone who has had to sleep beneath onions.</p>
+<p>There are nights when I wake wanting Irena with such force that for a moment I think she is in the next room. I know where she lives. I know the name of the woman who lives with her. I have not sent for either of them.</p>
+<p>I have sent customers to the shop. Fewer than I used to. She charges them full price and no one complains.</p>
+<p>The spoon is in my travelling case.</p>
+<p>I have replaced the hinge twice.</p>
+<hr class="scene-rule"/>
+<p>When the young man taking this down reached the account of Kes, he stopped writing.</p>
+<p>Until then he had been excellent company. He laughed at the right places and sometimes at places I had not meant to be funny, which is rarer and more useful. He had a way of pressing his lips together before asking a difficult question. I liked watching him decide to ask it anyway.</p>
+<p>"His daughter was free?" he said.</p>
+<p>"Yes."</p>
+<p>"And the children escaped."</p>
+<p>"Eight of them."</p>
+<p>He made a note. I could see the relief in the movement of his hand.</p>
+<p>I had just told him about the order to fire the roof. He was writing down that eight children had escaped it. I let him finish. It is unkind to interrupt a man while he is finding a way to remain comfortable in your house.</p>
+<p>Afterward he asked about publication.</p>
+<p>His wife was ill. He had mentioned it on the first afternoon, apologising because he might have to leave early. I had sent a physician before he came again. There was nothing secret about it. I asked which physician he preferred. He thanked me. She is better now.</p>
+<p>He wanted to know whether I would allow the names to stand.</p>
+<p>"All of them?"</p>
+<p>"The ones I have given you."</p>
+<p>"People will say—"</p>
+<p>"They already do."</p>
+<p>He looked down at the page. I asked whether he had been paid for the extra mornings. He had. I told him to charge for the evening as well.</p>
+<p>He resumed writing.</p>
+<hr class="scene-rule"/>
+<p>I have been a hungry girl. I have been a woman waiting for another woman to come upstairs. I have been hurt, frightened, cheated, helped, and loved by people who had quite enough to do without it.</p>
+<p>I have also ordered things from a warm room and slept after they were done.</p>
+<p>You have had the room and the order. You have had the seven-year-old with blood on her finger. I have kept nothing back that would improve your opinion of my methods.</p>
+<p>Still here?</p>
+<p>Good. I dislike a guest who leaves hungry.</p>
+<p>There is supper downstairs. A singer has come from the Brass Coast; she has a low voice and a laugh you can feel before you hear it. There is a young man who plays the viol, beautifully, when he can be persuaded to stop talking. Celise says the woman in blue is the best company in the house, and Celise is seldom wrong about company.</p>
+<p>They keep their own appointments. They will tell you if you bore them. Do try not to. It makes the evening longer for everyone.</p>
+<p>You may prefer to stay here with me. I have another bottle and no wish to go to bed yet.</p>
+<p>What? The girl under the onion stall?</p>
+<p>Darling. She has eaten.</p>
+<p>Now tell me which will please you.</p>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>Here ends No Bruises.</em></p>
+</body>
+</html>
