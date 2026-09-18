@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-18T02:36:27.819Z",
+  "generated": "2026-09-18T17:26:15.048Z",
   "documents": [
     {
       "id": "srd",
@@ -363,9 +363,9 @@
       "id": "a_roll_of_the_fallen",
       "title": "A Roll Of The Fallen",
       "file": "Fates_-_Edge_-_-A-_-Roll-_-of-_-the-_-Fallen.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -523,9 +523,9 @@
       "id": "count_your_exits",
       "title": "Count Your Exits",
       "file": "Fates_-_Edge_-_-Count-_-Your-_-Exits.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -824,9 +824,9 @@
       "id": "no_bruises",
       "title": "No Bruises",
       "file": "Fates_-_Edge_-_-No-_-Bruises.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -834,9 +834,9 @@
       "id": "paget",
       "title": "Paget",
       "file": "Fates_-_Edge_-_-Paget.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1262,9 +1262,9 @@
       "id": "the_daughter_of_ahakar",
       "title": "The Daughter Of Ahakar",
       "file": "Fates_-_Edge_-_-The-_-Daughter-_-of-_-Ahakar.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1272,9 +1272,9 @@
       "id": "the_diwan_of_roads",
       "title": "The Diwan Of Roads",
       "file": "Fates_-_Edge_-_-The-_-Diwan-_-of-_-Roads.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1369,6 +1369,16 @@
       "active": true
     },
     {
+      "id": "the_last_blade",
+      "title": "The Last Blade",
+      "file": "Fates_-_Edge_-_-The-_-Last-_-Blade.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_last_blade_treatment",
       "title": "The Last Blade Treatment",
       "file": "Fates_-_Edge_-_-The-_-Last-_-Blade-_-Treatment.html",
@@ -1432,9 +1442,9 @@
       "id": "the_road_kept_no_prints",
       "title": "The Road Kept No Prints",
       "file": "Fates_-_Edge_-_-The-_-Road-_-Kept-_-No-_-Prints.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1502,9 +1512,9 @@
       "id": "the_widows_hand",
       "title": "The Widows Hand",
       "file": "Fates_-_Edge_-_-The-_-Widows-_-Hand.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1512,9 +1522,9 @@
       "id": "the_widows_walk",
       "title": "The Widows Walk",
       "file": "Fates_-_Edge_-_-The-_-Widows-_-Walk.html",
-      "path": "/data/docs/anthology/",
-      "category": "anthology",
-      "categoryLabel": "Anthology",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1653,7 +1663,7 @@
       "active": true
     }
   ],
-  "total_count": 106,
-  "active_count": 106,
+  "total_count": 107,
+  "active_count": 107,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

@@ -62,6 +62,21 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.11.0] - 2026-09-18
+
+Add Novels and Novellas library category and reading editions
+
+### Chore
+- sync lockfile versions
+
+### Other
+- Sync anthology and design docs from fates-edge-docs
+- Manifest
+- Added No Bruises
+- Editorial pass and fixed the wildcard RNG/display in the decks feature.
+- package-lock.json updates
+- Die RNG issue
+
 ## [5.10.9] - 2026-09-16
 
 ### Chore

@@ -185,8 +185,28 @@
         .tablewrap { overflow-x:auto; }
         ul { font-family:var(--serif); }
 </style>
+<style id="fiction-frontmatter-style">
+.fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
+.fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
+.fiction-title-page h1 { font-size: 2.4rem; line-height: 1.15; }
+.fiction-copyright { padding: 3rem 1rem; font-size: .9rem; line-height: 1.65; border-top: 1px solid #999; border-bottom: 1px solid #999; margin-bottom: 4rem; }
+.fiction-copyright h2 { font-size: 1.25rem; }
+@media print { .fiction-title-page, .fiction-copyright { break-after: page; min-height: 70vh; border: 0; } }
+</style>
 </head>
 <body>
+<div class="fiction-frontmatter">
+<section class="fiction-title-page" aria-label="Title page">
+<p>Fate’s Edge · Novels &amp; Novellas</p><h1>The Daughter of Ahakar</h1>
+<p>by Nicholas A. Gasper</p><p><a href="#fiction-copyright">Copyright and edition</a></p>
+</section>
+<section class="fiction-copyright" id="fiction-copyright" aria-labelledby="fiction-copyright-heading">
+<h2 id="fiction-copyright-heading">Copyright</h2>
+<p><strong>The Daughter of Ahakar</strong><br>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+<p>This work of fiction, including its prose, original characters and setting, is proprietary content. It is not part of the Creative Commons-licensed Fate’s Edge System Reference Document.</p>
+<p>No part of this work may be reproduced or distributed without the copyright holder’s written permission, except as permitted by law.</p>
+<p>Digital reading edition · 2026</p>
+</section></div>
 <h1>The Daughter of Ahakar</h1>
 <h4>A Tale of Ashaan, told in three</h4>
 <hr class="scene-rule"/>

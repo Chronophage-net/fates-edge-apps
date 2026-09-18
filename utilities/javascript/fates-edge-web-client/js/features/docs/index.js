@@ -117,6 +117,12 @@ const DOC_TYPES = {
         icon: '⚡',
         description: 'One-page quickstart guides for new players'
     },
+    novels: {
+        label: '📚 Novels & Novellas',
+        folder: 'novels',
+        icon: '📚',
+        description: 'Standalone long-form fiction from the Fate’s Edge world'
+    },
     anthology: {
         label: '📖 Anthology',
         folder: 'anthology',
@@ -160,7 +166,7 @@ for (const [id, type] of Object.entries(DOC_TYPES)) {
 FOLDER_TO_TYPE['tollveil'] = 'other-games';
 
 // ─── Type order for sorting ──────────────────────────────────
-const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'travel', 'design', 'other-games', 'es', 'uploaded', 'other'];
+const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'novels', 'travel', 'design', 'other-games', 'es', 'uploaded', 'other'];
 
 // ============================================================
 // STATE

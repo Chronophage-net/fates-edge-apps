@@ -36,6 +36,7 @@ const CATEGORY_MAP = {
   'resources': { id: 'resources', label: 'Resources', path: '/data/docs/resources/' },
   'adventures': { id: 'adventures', label: 'Adventures', path: '/data/docs/adventures/' },
   'expansions': { id: 'expansions', label: 'Expansions', path: '/data/docs/expansions/' },
+  'novels': { id: 'novels', label: 'Novels & Novellas', path: '/data/docs/novels/' },
   'anthology': { id: 'anthology', label: 'Anthology', path: '/data/docs/anthology/' },
   'travel': { id: 'travel', label: 'World', path: '/data/docs/travel/' },
   'design': { id: 'design', label: 'Design', path: '/data/docs/design/' },
