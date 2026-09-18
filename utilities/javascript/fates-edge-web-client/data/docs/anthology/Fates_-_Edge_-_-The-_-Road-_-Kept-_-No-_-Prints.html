@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Road Kept No Prints — A Novella of the Raven Road</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>The Road Kept No Prints</h1>
+<p class="subtitle">A Novella of the Raven Road</p>
+<p class="marginalia"><em>Set down by Dusana.</em></p>
+<hr class="scene-rule"/>
+<h2>The blue thread</h2>
+<p>Mara used to put an onion in the heel of a stocking and hang it beside her bed. For her chest, she said. She had a chest like a miller's horse and had never coughed except to interrupt somebody. In the spring she planted the onion. By autumn there were more stockings.</p>
+<p>I mention this because her wagon smelled of onions long before we went into the fen.</p>
+<p>We were going to the winter yards. Six wagons, a saddle horse, two goats, and nineteen people with opinions about the goats. One belonged to Anet. The other belonged to whoever Anet was arguing with. Her daughter Tavi could make them follow by putting her closed hand behind her back. There was never anything in it. They followed with an expression I have seen on men going to their second wedding.</p>
+<p>Rain had followed us down from the ridges. Radan stopped twice to scrape the clay out of the wheel hubs, and the second time he found a split in the rear wheel of my wagon. He braced it with a piece cut from a blue-painted cupboard door. His son Ivo held the nails between his lips.</p>
+<p>"Out of your mouth," Radan said.</p>
+<p>Ivo took them out.</p>
+<p>"And wash your hands before you eat."</p>
+<p>Ivo was twenty-three. He had a son of his own, sleeping in the grain wagon with Senna's little ones. He looked at me over his father's shoulder. I looked elsewhere. There are occasions when the elderly must stand together.</p>
+<p>The paint had come from Mara's cupboard. She made Radan promise to replace the door before the yards. He said he would use walnut and put a noblewoman's bottom on it in gold. She said she had a serviceable bottom already and needed somewhere to put her cups.</p>
+<p>That was the morning. I remember the sound of the hammer. I remember Ivo moving his tongue over the places the nails had been.</p>
+<p>We took the lower road because the ridge crossing had gone. Petar rode ahead and came back with river mud up to his horse's belly. He had seen half a bridge turn slowly in the water, still holding a cart. Nobody in the cart. He had shouted. Nothing answered.</p>
+<p>The lower road lay through Ash-Fenn.</p>
+<p>I had crossed it in summer. There was a raised way, a stone shelter, and a ford with a hard bottom if you kept the willow on your left. Beyond it the land rose. We could reach dry ground before the following night. At the winter yards there would be roofs over the wagons and turnips in the ground, and Olek had a daughter who had written that she would forgive him if he brought his own blankets.</p>
+<p>"Forgive what?" I asked him.</p>
+<p>"She'll tell me when I get there."</p>
+<p>He was our farrier. He had worked the east road before I knew him, and he remembered more of the fen than I did. I asked about the ford. He said the willow had been struck but the stump remained. Then he spat into the rain and went to look at a horse's foot.</p>
+<p>He had been doing that since we turned downhill. Spitting. I thought his old tooth had started again.</p>
+<p>At the first milestone I put my hand on the wet stone. There were cuts along its face beneath the moss. Someone had rubbed salt into them. Most had washed out, leaving pale grit where the chisel had bitten deepest.</p>
+<p>A copper disc lay in the little hollow at its foot.</p>
+<p>I left it there. I have never found that taking the money off a threshold improves a journey.</p>
+<p>The road held us above the water. Reeds brushed the wheels. The rain thinned until it was no more than the sound of rain, and then there was only leather creaking and the goats complaining beneath Anet's wagon.</p>
+<p>Tavi walked beside me for a while. She was eleven and had decided that eleven was old enough to hear how certain songs ended. I told her the one about the man who married a heron. When I came to the wedding she asked whether he knew.</p>
+<p>"Of course he knew. He had built a nest."</p>
+<p>"Then why did he get angry about the frogs?"</p>
+<p>"People are often surprised by things they have arranged themselves."</p>
+<p>She thought about that. She had a blue thread caught around one of her front teeth. She was sewing a cloth shoe for a wooden horse and kept biting off lengths. I made her give me the spool.</p>
+<p>We saw the first wreck where the road widened.</p>
+<p>It had burned down to the iron. One wheel lay flat in black water, its spokes soft with rot. Rushes grew through the bed. There was a hook where a pan might have hung and a long strip of metal bowed upward from the axle. The horses turned their heads away as they passed.</p>
+<p>Radan got off his seat.</p>
+<p>I thought he wanted the iron. We could not afford delay, but neither could we afford good iron left beside a road. I told him to be quick.</p>
+<p>He squatted by the wheel. Then he stood and backed away from it, one hand held in front of him.</p>
+<p>"Dusana."</p>
+<p>The cupboard brace was there.</p>
+<p>Most of the wood had gone. A little remained under the heads of three nails. The blue paint lay in a cracked scale along the bottom edge.</p>
+<p>"Someone had the same notion," I said.</p>
+<p>He shook his head.</p>
+<p>"Come away."</p>
+<p>"I turned the middle nail."</p>
+<p>He spoke quietly, with the patience he used for people who thought a wheel was a circle and therefore simple.</p>
+<p>"Hit an old hole. Turned it out and put it through beside itself. Look."</p>
+<p>I could see the two holes. I could see the bent shaft under the nail head. There was a dark thumbprint in the paint.</p>
+<p>I went back to my wagon. The brace was sound. Blue paint, three nails, the middle one bent. I touched it and got a small splinter in my finger.</p>
+<p>Radan came after me. He put his hand over mine and held it against the wood.</p>
+<p>"You tell me," he said.</p>
+<p>I had no answer he could use.</p>
+<p>I took Petar aside. We would turn while there was room, go back to the milestone, and camp on the higher ground we had passed. In the morning we could send two riders north to find a farm. The horses were tired. There was nothing to be gained by frightening everyone.</p>
+<p>Petar nodded. He had stopped smiling.</p>
+<p>Turning six wagons on a causeway took most of the remaining light. We unloaded sacks. We took the goats across separately. Radan and Ivo lifted the grain wagon's rear wheels while the rest of us pulled the pole around. One sack split. Mara knelt in the mud to recover the peas until I made her stop.</p>
+<p>My wagon came last. I watched its wheel all the way around. The brace held.</p>
+<p>We went back between the reeds with the sunset behind the cloud on our right. I had checked it before we turned. It had been on our left.</p>
+<p>Petar rode ahead to find the milestone.</p>
+<p>He returned at a walk.</p>
+<p>"How far?" I asked.</p>
+<p>He brought his horse close enough that our knees touched.</p>
+<p>"You should come."</p>
+<p>Beyond the bend the road widened. The burned wheel lay in the water. The little blue scale showed beneath the nails.</p>
+<p>We had approached it from the other side.</p>
+<p>There were no tracks on the road. We had churned it with every wheel and hoof we owned. The clay lay smooth, stippled by rain.</p>
+<p>Petar got down and pressed his boot into it.</p>
+<p>We stood over the print. Water filled the heel. He turned to look at me, and when we looked back there was only the rain.</p>
+<p>Behind us Mara called that the children were cold.</p>
+<p>I asked her to light the stoves.</p>
+<hr class="scene-rule"/>
+<p>We put the wagons close together on the widened ground. I did not allow anyone to strip the wreck. Olek laid a little salt across each step, then went around the outside of the camp with a pouch in his hand. He did not make a ring. He stopped where the ground dropped toward the reeds and stood there for some time.</p>
+<p>I asked what he was doing.</p>
+<p>"Looking at the edge."</p>
+<p>He shut the pouch.</p>
+<p>"Your people know this place," I said.</p>
+<p>"People know all kinds of places."</p>
+<p>He would give me nothing else. I was angry with him. I had been angry since Radan put my hand on the wheel, and Olek was old enough to be convenient.</p>
+<p>Mara fed everyone. Senna warmed the children's feet between her palms and inspected the rash on Ivo's baby. Anet washed the spilled peas in a basin. Tavi held the lamp for her.</p>
+<p>I went out with Petar to examine the ground north of the road. If we could not trust the road, perhaps we could find a ridge beneath the reeds and walk a route the wagons could follow. I took a coil of line. Petar tied his end to a wheel.</p>
+<p>Twenty paces out, the mud rose above my boots. Another five and I could no longer feel a firm bottom with the pole. The water was warm beneath the surface. I thought of decay and pulled the pole back quickly.</p>
+<p>Somewhere farther out a horse snorted.</p>
+<p>Petar turned his head.</p>
+<p>Our horses were behind us. I could hear Olek talking to them. He always told them about the work before he began it.</p>
+<p>The snort came again. Then the small, quick sound of a bridle being shaken.</p>
+<p>"Loose animal," Petar said.</p>
+<p>"Leave it."</p>
+<p>He lifted the lamp.</p>
+<p>Something white moved low between the reeds. A horse's blaze, perhaps, seen through the stems. It turned toward us and held still.</p>
+<p>I pulled Petar's sleeve. We went back along the line. He looked over his shoulder once.</p>
+<p>We were forty paces from the wagons when the singing began.</p>
+<p>A familiar tune. I had sung it to put children to sleep and drunk men to shame. The verse was one I had made up about a priest whose trousers were stolen by an otter.</p>
+<p>Someone laughed at the end.</p>
+<p>My voice began the next verse.</p>
+<h2>The woman in my chair</h2>
+<p>She was sitting on my wagon step with Tavi leaning against her knee. She had taken off her boots. One stocking hung loose at the heel, showing the place I had darned it in red because I had run out of brown.</p>
+<p>Mara stood beside her with a bowl.</p>
+<p>The woman said, "There. They've found their way back."</p>
+<p>Petar stopped so abruptly that I walked into his arm.</p>
+<p>I knew my face in mirrors, in dark windows, in the bottom of a clean pan if someone had polished it to annoy me. This was different. The mouth moved before the words reached me. She rubbed her thumb against her second finger, working at the little hard patch the pen had made. I had never seen myself do it.</p>
+<p>Tavi stood up.</p>
+<p>"You said you weren't going."</p>
+<p>She was speaking to the woman on the step.</p>
+<p>"I didn't," the woman said.</p>
+<p>Mara lowered the bowl. She looked at my boots. They were caked with black mud to the knee. The other woman's were tucked beneath the step, dry on their sides.</p>
+<p>"Where have you been?" Mara asked.</p>
+<p>"North of the road. With Petar."</p>
+<p>"She's been here since we lit the stove."</p>
+<p>The woman put a hand on Tavi's shoulder.</p>
+<p>"Come away from her," I said.</p>
+<p>Tavi did not move.</p>
+<p>I said her name too loudly. She flinched, and the woman drew her a little closer.</p>
+<p>"Don't shout at the child."</p>
+<p>It was exactly what I would have said.</p>
+<p>Petar put down the lamp and drew his knife. The woman watched him. She looked frightened. I remember that clearly. Her left foot drew back beneath the step, and she put the child behind her.</p>
+<p>"Mara," I said. "Take Tavi."</p>
+<p>Mara took her. The woman let go at once.</p>
+<p>People were gathering. Radan came with his mallet. Ivo had a piece of wood. Senna stayed by the grain wagon with the younger children behind her skirt.</p>
+<p>"Put those down," I said.</p>
+<p>"Put them down," the woman said, almost with me.</p>
+<p>Radan's grip tightened.</p>
+<p>There was a pot boiling somewhere. Water hissed over the rim onto the stove. Nobody went to it.</p>
+<p>I asked the woman her name.</p>
+<p>She gave mine.</p>
+<p>"Where were you born?"</p>
+<p>"You know."</p>
+<p>"Say it."</p>
+<p>She looked at the faces around us. Her eyes were wet.</p>
+<p>"Not here."</p>
+<p>The answer sickened me. It was one of mine. A long time ago something had asked me about a child without a name, and since then I had learned to keep certain answers for the morning, with my own hands in sight.</p>
+<p>I felt the ground shift beneath my foot. It had not moved. I had forgotten to lock my knee.</p>
+<p>Mara caught my elbow.</p>
+<p>"Sit," she said.</p>
+<p>She said it to me. The other woman was already sitting.</p>
+<p>We spent an hour asking things. Who had broken the green cup. What Olek's daughter called him when she was angry. Where Radan had hidden Mara's good spoon after the midsummer feast. The woman knew. Sometimes I answered first. Sometimes she did.</p>
+<p>Then Anet asked about her husband.</p>
+<p>I told her not to.</p>
+<p>"What did he say? At the end."</p>
+<p>The woman shut her eyes.</p>
+<p>Anet's husband had died with his head on my thigh while Senna went for clean water. He had been ashamed of wetting himself. I had told him about a place I knew where the water was always warm. He had asked whether his wife could come.</p>
+<p>The woman said, "He asked whether you could come."</p>
+<p>Anet covered her mouth.</p>
+<p>Beneath the wagon someone coughed.</p>
+<p>It was a deep, wet cough, followed by a little effort to clear the throat. I had felt that effort against my leg.</p>
+<p>Senna took the lamp from Petar. She bent to look under the wagon.</p>
+<p>I caught her shoulder and pulled her upright so hard that she cried out.</p>
+<p>The cough came again.</p>
+<p>Radan backed away. His heel struck the step of the next wagon. Anet was staring at the space between the wheels.</p>
+<p>"Joren?"</p>
+<p>I put my hand over her mouth.</p>
+<p>For a moment we struggled like enemies. She bit me. Then something under the boards drew a long breath, and we both became still.</p>
+<p>The woman on my step lifted her feet.</p>
+<p>We waited. A drop fell from the axle into the mud. Another. The boiling pot went quiet.</p>
+<p>At last Mara went to take it off the stove. She walked sideways, watching the wagon until the corner hid it.</p>
+<p>Nobody asked another question.</p>
+<hr class="scene-rule"/>
+<p>I slept in Mara's wagon. The other woman stayed in mine. Radan sat outside between us, holding his mallet. Petar took the first watch at the road.</p>
+<p>Mara would not let me wash the bite in the basin we used for cups. She poured water over my hand outside and gave me a clean strip from her apron.</p>
+<p>"You believe me," I said.</p>
+<p>"I believe you were bitten. Hold still."</p>
+<p>Inside she pulled a blanket around my shoulders and put broth in my hands. There was a pea stuck to her cuff. I picked it off. It left a round wet place.</p>
+<p>"How did she come?"</p>
+<p>Mara sat opposite me. The stove door threw a bar of red across her ankles.</p>
+<p>"You came down the road. She did. Alone. Said Petar was looking at a crossing. You were cold. I told you about the stove pipe. You said you'd see to it in the morning."</p>
+<p>"Anything else?"</p>
+<p>"You asked whether I had fed Anet."</p>
+<p>Anet forgot to eat when Tavi was unwell. Tavi had been coughing on the ridge. I had meant to remind Mara.</p>
+<p>"She was shaking," Mara said. "I gave her the dry shawl. Yours was wet."</p>
+<p>I looked at the shawl around my shoulders. It was Mara's, brown with a little burn beside the fringe.</p>
+<p>"Did she say anything about the road?"</p>
+<p>"Said we had to keep on. Said going back was worse."</p>
+<p>Outside Radan shifted on his stool. The wood creaked beneath him. I listened until I heard his boots move as well.</p>
+<p>Mara took the bowl away. She reached past me to straighten the onion in its stocking. Then she lay down in her clothes.</p>
+<p>I watched the stove until the red went dark.</p>
+<p>Near dawn, Petar screamed.</p>
+<p>We found him at the wreck. He was on his knees with his face pressed against the burned wheel. His hands gripped the iron rim. The muscles stood out along his neck.</p>
+<p>Radan caught him under the arms. Petar screamed again, but he could not open his mouth enough to make the sound properly. Something held his lower jaw.</p>
+<p>There was no hand. I could see the pale skin beneath his chin stretched into separate dents. Blood ran over his lip and down his neck.</p>
+<p>"Don't pull," Senna said.</p>
+<p>Radan had already pulled.</p>
+<p>Petar's jaw opened sideways. I heard a small crack. He made a high, breathless sound and struck at Radan with both hands.</p>
+<p>The woman was beside us. She poured salt over the black wood. Nothing happened. She poured more, her hand shaking so hard that most fell into the water.</p>
+<p>Olek came with a pry bar. He put it between the iron and Petar's face. Senna was shouting at him. He ignored her and leaned his weight against it.</p>
+<p>The wheel broke.</p>
+<p>Petar fell backward onto Radan. A narrow piece of burned wood came with him, clenched between his teeth. Olek struck it once with the bar. It dropped into the mud and lay still.</p>
+<p>I saw tooth marks in it. Too many, some very small.</p>
+<p>We carried Petar to the grain wagon. Senna put her thumbs inside his mouth and made Radan hold his head. I held the lamp. There was blood on her wrists and on the baby's blanket beneath him. The baby began crying. Ivo took him outside.</p>
+<p>When Senna finished, Petar lay with his jaw tied shut. His eyes followed every movement of the lamp.</p>
+<p>The other woman stood in the doorway. She was holding my salt pouch. I reached into my coat and found it there too.</p>
+<p>She looked at my hand.</p>
+<p>Neither of us spoke.</p>
+<h2>What the water held</h2>
+<p>Petar could write a little. He had learned for a woman who left before he could send her anything she would have enjoyed reading. He used the skill to keep horse tallies afterward and said it was the better investment.</p>
+<p>Senna let him hold a piece of charcoal once she was sure he could swallow.</p>
+<p>He wrote on the back of a cupboard panel. Mara had surrendered the rest of the door.</p>
+<p class="marginalia"><em>Horse loose.</em></p>
+<p>"There wasn't a horse," I said.</p>
+<p>He made an impatient mark through the words. He had not said there was. He had said what he believed.</p>
+<p class="marginalia"><em>Heard mine.</em></p>
+<p>I waited.</p>
+<p class="marginalia"><em>Then Mother.</em></p>
+<p>He pressed the charcoal down until it broke. I gave him the other piece.</p>
+<p class="marginalia"><em>Under. Cold. Asked hand.</em></p>
+<p>He had heard his mother beneath the wreck, asking him to put his hand through the wheel. When he bent, she had asked him to come closer. He could not hear her. He had put his face against the spokes.</p>
+<p>I looked at the marks on his jaw and did not ask what she had said then.</p>
+<p>He caught my wrist.</p>
+<p class="marginalia"><em>Don't leave.</em></p>
+<p>"We won't leave you."</p>
+<p>He crossed it out. His fingers slipped on the panel. He tried again, making the letters larger.</p>
+<p class="marginalia"><em>Don't leave me with you.</em></p>
+<p>The other woman was standing beyond the door with hot water. She read it from where she stood. Her face changed, and for a moment I thought she would drop the pot.</p>
+<p>She set it down carefully.</p>
+<p>We put Senna with him. I told her neither of us was to enter without her permission. She nodded without looking at me. There was dried blood in the creases of her fingers.</p>
+<p>We buried the cupboard panel under a stone. Petar watched through the open door. He wanted to see where it went.</p>
+<hr class="scene-rule"/>
+<p>The woman wanted to go east.</p>
+<p>"The shelter is less than a day," she said.</p>
+<p>"You don't know where we are."</p>
+<p>"Neither do you."</p>
+<p>We stood between the lead horses, speaking quietly. Behind her, Olek was examining the traces. Behind me, Mara was dividing bread. Everyone could hear us.</p>
+<p>"Turn again and we spend the day turning," she said. "Petar needs a dry bed. The children need a fire that isn't under a wooden roof."</p>
+<p>She was right about all of it. That was the worst part of talking to her. I could find no foolishness to seize.</p>
+<p>"Will you walk ahead?" I asked.</p>
+<p>"Yes."</p>
+<p>"Far enough that we can stop if something happens."</p>
+<p>She looked at me for a long time.</p>
+<p>"You think I can bring it to you."</p>
+<p>"Can you?"</p>
+<p>"I don't know."</p>
+<p>We went east. She walked in front, carrying a lamp even after the light was strong enough to see the road. I rode beside the grain wagon. Petar could see me through the gap in the canvas. Whenever I fell behind, he struck the boards with his heel.</p>
+<p>The wreck disappeared into the mist. I watched it until I could no longer distinguish the iron from the reeds.</p>
+<p>For a while the road behaved like a road. A broken branch lay across it. We moved it. A wheel sank into a soft place. We put brush beneath it and pushed. The goats ate something that disagreed with them and expressed their dissatisfaction for the next mile. Mara complained about the cold, and I loved her for it.</p>
+<p>At noon the ground rose around a stand of willows. The woman waited there.</p>
+<p>Two tracks divided beyond the trees. One ran along a bank above open water. The other passed between hummocks thick with sedge. Both bore old wheel cuts.</p>
+<p>Olek said the bank was the way to the ford.</p>
+<p>The woman said it would not hold the loaded wagons.</p>
+<p>Radan pushed a pole into the bank. It went down to his hand. He looked at Olek.</p>
+<p>"Used to be stone under it," Olek said.</p>
+<p>We unloaded the heaviest things. Flour, iron, the small chest of books from my wagon. We could carry them across the narrow part and reload on the far side. Ivo went first with a sack over his shoulder. Anet followed with a bundle of bedding. I stood at the nearer end and passed things down.</p>
+<p>The other woman took the books.</p>
+<p>I almost stopped her. Then I thought how absurd it would be to lose a sack of flour because I was jealous of paper. I let her go.</p>
+<p>She walked beside Anet. Their heads bent together. I could not hear what they said.</p>
+<p>Halfway across, Ivo stopped.</p>
+<p>He shifted the sack and turned toward the water.</p>
+<p>"Keep walking," I called.</p>
+<p>He put one foot down off the bank.</p>
+<p>I dropped the bag in my hands and ran.</p>
+<p>Anet caught the back of his coat. The sack slid from his shoulder and split in the water. White spread across the surface. Beneath it there were faces.</p>
+<p>They lay upward, pressed close together. Some had their eyes shut. Some were looking at us. Their hair drifted in the flour. One mouth opened, and a little of the white went in.</p>
+<p>Ivo leaned farther. Anet could not hold him. Her boots slid toward the edge.</p>
+<p>The woman put down the chest. She caught Ivo's hair and pulled his head back hard enough that he cried out. I took his arm. Between us we dragged him onto the bank.</p>
+<p>He fought us. Then he saw the water again and began scrambling backward, pushing with his heels.</p>
+<p>The faces were gone. Flour floated in a thin sheet. The empty sack turned once and sank.</p>
+<p>We carried everything else by the sedge track.</p>
+<p>Ivo would not speak until he had seen his son. He held the baby so tightly that Senna made him loosen his arms. He kept touching the child's ear.</p>
+<p>"What happened?" I asked him.</p>
+<p>"He was in the water."</p>
+<p>"Your little one?"</p>
+<p>Ivo nodded.</p>
+<p>"He was looking up. I could have reached him."</p>
+<p>"You couldn't."</p>
+<p>"I know that now."</p>
+<p>He looked at me with such anger that I sat back.</p>
+<p>"His coat was blue," he said. "The one Mara's making. With the wooden buttons. He hasn't worn it yet. It isn't finished."</p>
+<p>He put his mouth against the baby's hair and stayed like that.</p>
+<p>I went to Mara. The coat lay in her basket, one sleeve attached. The buttons were in a little bowl. I tipped them into my hand. There were five, cut from a piece of plum wood, each with a pale oval where the grain turned.</p>
+<p>I had no reason to hide them. I wrapped them in a cloth and put them beneath her mattress anyway.</p>
+<hr class="scene-rule"/>
+<p>Radan would not take the grain wagon over the sedge track until he had walked it himself. I went with him. The ground held, but there was a culvert beneath the far end, and the old stone arch had split.</p>
+<p>We put planks over it. Radan drove the empty tool wagon across first. The planks flexed. The stone held.</p>
+<p>Then we brought the grain wagon, with Petar inside because moving him again would have hurt him more. Senna walked at its rear. Ivo led the horses. Radan crouched beside the near wheel to watch the planks.</p>
+<p>It crossed safely.</p>
+<p>The next wagon carried Anet's cloth and the children's beds. Its left wheel slipped off a plank.</p>
+<p>Radan stepped forward. The plank snapped up and struck his knee. He fell between the wheels.</p>
+<p>Ivo hauled on the horses' heads. They stopped. The wagon did not.</p>
+<p>I saw the rear wheel climb onto Radan's leg. He had both hands flat against the road, trying to push himself away. His mouth was open, but the first sound did not come until the wheel reached his hip.</p>
+<p>We pushed the wagon. I put my shoulder against the side and pushed until something tore in my back. The horses backed. The traces hung loose.</p>
+<p>The wheel went over him.</p>
+<p>Then the wagon stopped.</p>
+<p>For a moment everyone remained in the position they had taken to save him. My shoulder against the boards. Ivo hanging on the bridle. Anet with both hands pressed to her face.</p>
+<p>Radan was looking at me.</p>
+<p>Senna knelt beside him. She put a hand beneath his coat and withdrew it. Then she took his head into her lap.</p>
+<p>Ivo crawled to him. He was saying a word over and over. I could not make it out. Later I understood that he was saying <em>back</em>. He wanted us to move the wagon back.</p>
+<p>Radan tried to speak. Senna bent close. He tried again. She shook her head once, very slightly, and stroked his hair.</p>
+<p>He died with his eyes open. I had closed many eyes. I could not make myself touch his.</p>
+<p>The other woman did it.</p>
+<p>We wrapped him in a sailcloth and put him in his own wagon. Ivo drove. He held the reins correctly, the way his father had taught him. His hands did not shake until we stopped that evening.</p>
+<p>Anet came to me while I was washing mud from my skirt.</p>
+<p>"When we were carrying the books," she said. "She told me to keep Tavi away from the left wheel."</p>
+<p>I looked toward my wagon. The woman was sitting inside, with the door open.</p>
+<p>"Did she say why?"</p>
+<p>"Said the plank would break."</p>
+<p>"Before it happened?"</p>
+<p>Anet nodded.</p>
+<p>"Why didn't you tell us?"</p>
+<p>"I thought you knew."</p>
+<p>She began crying. I held her because there was nothing else I could do with my hands. After a while she pushed me away.</p>
+<p>"If she tells me anything else, I'll tell everyone."</p>
+<p>"Anet—"</p>
+<p>"You can decide what to do with it. You don't get to decide whether we hear."</p>
+<p>She wiped her face on her sleeve and went to help Ivo with the horses. She could be like that over a disputed length of cloth, refusing to let a customer fold it until both of them had seen the cut edge. I had found it tiresome in markets.</p>
+<p>Behind her the reeds moved against the wind.</p>
+<h2>A roof for the night</h2>
+<p>The shelter had a well, a roof, and a door that shut. I tested the door three times before I allowed anyone inside.</p>
+<p>It was built against a low rise, with a stable at one end and a common room at the other. A wall of fieldstone divided them. The roof over the stable had been repaired with turf. Someone had planted leeks beside the well. Green leaves stood in a straight row above the wet earth.</p>
+<p>There was nobody there.</p>
+<p>The room smelled of cold soot and old blankets. A bundle of rushes lay by the hearth. Two cups stood upside down on a shelf. In one corner a broom leaned against a stone marked with shallow cuts. Salt lay in the cuts, dry beneath the roof.</p>
+<p>Olek touched the stone and took off his cap.</p>
+<p>"Who keeps it?" I asked.</p>
+<p>"Travellers."</p>
+<p>"Who puts the salt there?"</p>
+<p>He did not answer.</p>
+<p>We put Petar beside the hearth and lit a fire. Senna gave him warm water through a reed. He swallowed twice, then caught her wrist and held it until she promised to stay.</p>
+<p>The relief was so great that it made me weak. There was a roof above us. The rain made an ordinary sound on it. Mara found a pot without a hole and began to cook. Anet hung the wet stockings on a line. Tavi took the goats into the stable and came back complaining that one had eaten the corner of a blanket.</p>
+<p>We washed. Ivo sat with his son beside Radan's wrapped body, then came to ask Mara about the little coat. She said she would finish it tonight. I fetched the buttons from beneath her mattress.</p>
+<p>Senna asked Mara to move the lamp so she could read. She had brought a cheap account of a sea captain who had married three women in different ports. She complained about him at every supper. I offered to take her place beside Petar, but she tucked the book against his pillow and settled where he could see her.</p>
+<p>"You'll lose your place," I said.</p>
+<p>"I know the page. I want to see him get caught."</p>
+<p>She read until her head nodded. Petar's hand lay loose around her wrist.</p>
+<p>The woman sat on the far side of the hearth. She had a cut on her palm from the bank. I had a bite on mine. We kept our hands where people could see them.</p>
+<p>After supper she went to Petar. He watched her kneel. She asked whether she could change the cloth beneath his head.</p>
+<p>He nodded.</p>
+<p>I hated him a little for allowing it. Then I hated myself.</p>
+<p>She changed the cloth gently. When she lifted his head he made a small sound, and she waited until it passed. I knew the weight of that head in my hands. I had never held it.</p>
+<p>I went outside.</p>
+<p>There were lights far out on the fen. Low, steady lights in a line. They might have been lanterns carried along another road. I could see no road.</p>
+<p>Olek stood by the well. He was scattering something into the water, pinches from his fingers.</p>
+<p>"What are you paying for?" I asked.</p>
+<p>He shut his hand.</p>
+<p>"Let it be, Dusana."</p>
+<p>"Radan is dead."</p>
+<p>"I know."</p>
+<p>"You know more than that."</p>
+<p>He looked suddenly old. His cap was in his other hand, crushed against his thigh.</p>
+<p>"There are people who keep these places. My mother knew some. They said you mustn't stand too long in a crossing. Said you could hold it for someone else if you knew how."</p>
+<p>"The Witness?"</p>
+<p>He looked toward the common-room door.</p>
+<p>"I've heard the name," I said.</p>
+<p>"Then keep it down."</p>
+<p>I had heard it in different mouths, meaning different things. A traveller who remained at a ford. A circle with no proper temple. Men who made a practice of silence and women who distrusted the practice. I had not found a story I trusted enough to put beside another.</p>
+<p>Olek opened his hand. A copper disc rested on his palm. Its edge had been worn thin.</p>
+<p>"My mother gave me that when I took the east road. I never spent it."</p>
+<p>"Is it helping?"</p>
+<p>"We're under a roof."</p>
+<p>He closed his fingers around it and went inside.</p>
+<p>I stayed by the well until the lights went out. One remained after the others, too low to be held in a person's hand.</p>
+<p>Then it moved upward.</p>
+<p>I went inside and barred the door.</p>
+<hr class="scene-rule"/>
+<p>Senna woke me by putting her hand over my mouth.</p>
+<p>I opened my eyes. Her face was close to mine. Beyond her shoulder the room lay in the faint red of the hearth. People slept on the floor, their blankets rising and falling. The woman across the room had her face turned toward the wall.</p>
+<p>Senna lifted her hand.</p>
+<p>"Come quietly."</p>
+<p>Petar's bed was empty.</p>
+<p>We found him in the stable. He was standing beside Anet's wagon with a pot in his hands. Water ran down its side. He had been pouring it over the bedding through the open door.</p>
+<p>His jaw bandage hung around his neck.</p>
+<p>"Petar," Senna said.</p>
+<p>He turned. His mouth had fallen open on one side. He tried to close it with his free hand.</p>
+<p>"Help," he said.</p>
+<p>It was barely a word.</p>
+<p>I took the pot. It smelled of lamp oil.</p>
+<p>He caught my wrist and pushed it toward the wagon. Then he caught the same wrist with his other hand and pulled it back. His whole body shook with the effort.</p>
+<p>"Help."</p>
+<p>Senna called for Ivo.</p>
+<p>Petar struck her. He looked appalled even as his fist hit her mouth. Then he struck her again. I caught his arm. He was much stronger than I remembered.</p>
+<p>Ivo came through the door. Together we forced Petar to the ground. He fought until we tied his wrists to the stable post. Then he sagged forward, sobbing through his broken mouth.</p>
+<p>The other woman brought a knife and cut the wet bedding from the wagon. Mara carried it into the rain. Anet stood in the doorway with Tavi behind her, one hand on the child's head.</p>
+<p>Petar watched us remove the oil. He nodded each time a piece went out. He could still move his feet. He pressed them against the post and kept them there.</p>
+<p>We took turns sitting beside him until morning.</p>
+<p>During my turn Senna came to change the bandage. Her lip had swollen. She moved as if every joint hurt.</p>
+<p>"He didn't mean to hit you," I said.</p>
+<p>"I was there."</p>
+<p>She worked in silence for a while. Petar shut his eyes when she touched the side of his face.</p>
+<p>"He woke before," she said. "At the other camp. While you were outside with her."</p>
+<p>I waited.</p>
+<p>"He thought there was a man sitting at his feet. He kept trying to make room. I told him it was only the blanket."</p>
+<p>"What man?"</p>
+<p>"He couldn't tell me. He pointed. Then he did this."</p>
+<p>She put her palms together, fingers straight, as if holding a narrow object between them.</p>
+<p>"I thought he wanted the writing board. I told him it was buried. He shook his head. Then he tried to get up, and I made him lie down."</p>
+<p>She wiped blood from the corner of his mouth.</p>
+<p>"When I went for water, there was a wet place at the foot of the bed. Someone had been sitting there. I put a cloth over it."</p>
+<p>"Why didn't you say?"</p>
+<p>She looked at me.</p>
+<p>"You had just told me neither of you could come in unless I allowed it. I hadn't allowed anyone."</p>
+<p>Petar opened his eyes. He looked at the empty place beside my stool.</p>
+<p>Senna and I moved together. She took his head. I turned the stool so my back was against the wall.</p>
+<p>Nothing sat down.</p>
+<p>He watched the place until the light came.</p>
+<hr class="scene-rule"/>
+<p>We tried leaving the wagons.</p>
+<p>I wanted to do it while the shelter still felt possible. We could make litters for Petar and the little ones, take blankets and flour, lead the horses. If the wagons were drawing us back, we would walk.</p>
+<p>The other woman agreed. She helped lash the poles.</p>
+<p>We put Radan in a dry corner of the stable. Ivo would not leave him without a covering of stones. Olek and I helped carry them. I cut a lock of Radan's hair for his son. Ivo put it in the pocket of the unfinished blue coat.</p>
+<p>Mara tried to carry her cooking pot. I made her choose between it and the flour. She looked at me as if I had asked her to choose between two children.</p>
+<p>"I'll come back for it," she said.</p>
+<p>I did not answer.</p>
+<p>Olek led us south along a strip of raised ground. The woman went at the rear. I walked beside Petar's litter. His hands were bound loosely in front of him. Whenever one began moving, he gripped it with the other.</p>
+<p>Beyond the last reeds we found two alders with a strip of grass between them. Olek pushed his pole through. It struck dry ground. He passed between the trunks and stood on the other side, looking up into the branches.</p>
+<p>"Birds," he said.</p>
+<p>I could hear them. Small birds, quarrelling over something.</p>
+<p>Ivo shifted the litter to his other hand. As he did, his father's voice came from behind us.</p>
+<p>"Not that way. You'll hurt your back."</p>
+<p>Ivo turned.</p>
+<p>The shelter stood where the reeds had been. Its stable door was open. Radan sat inside, leaning forward with his elbows on his knees. His coat was buttoned wrong. I could see a strip of the bloodied sailcloth beneath him.</p>
+<p>"Underneath," he said. "Like I showed you."</p>
+<p>Ivo began lowering the litter.</p>
+<p>"Don't answer him," Olek said.</p>
+<p>The alder trunks had grown flat on their inward sides. The bark darkened. A nail appeared at the height of my face, bright at the head. Beyond them I could still see grass, but the birds had stopped.</p>
+<p>Radan lifted his head.</p>
+<p>"Tell her. You remember. The day you broke—"</p>
+<p>"His wrist," Ivo said. "It was my wrist, not—"</p>
+<p>The space between the trees narrowed. Something heavy struck the ground on the other side. The smell of the stable came through it.</p>
+<p>Olek put a shoulder against one trunk and his hands against the other. He was trying to keep them apart. His boots slid over the roots.</p>
+<p>"Ivo. Put him down."</p>
+<p>Ivo looked at his father.</p>
+<p>"Put Petar down. Help me."</p>
+<p>The voice from the stable began again. Olek shouted over it, calling Ivo by name, telling him where to put his feet. I lowered my end of the litter. Ivo stumbled to Olek and took hold of his coat.</p>
+<p>For a moment Olek's fingers remained beyond the narrowing gap. He cried out. Ivo pulled harder. The far trunk rolled toward us with a sound of splitting wood, and Olek fell clear.</p>
+<p>Two alders stood over a ditch full of water. One had a fresh wound in its bark. Across the ditch there were reeds as far as I could see.</p>
+<p>Olek's fingers were scraped raw. He held them against his chest.</p>
+<p>"You heard him?" Ivo asked.</p>
+<p>Olek nodded.</p>
+<p>"It was wrong. He remembered it wrong."</p>
+<p>"Leave it wrong."</p>
+<p>Ivo looked toward the shelter. The stable doorway was empty. He began crying, angrily, wiping his face with his sleeve.</p>
+<p>I asked Olek how he had known what to do.</p>
+<p>"The wood was coming together. I put myself between it."</p>
+<p>He could not straighten two of his fingers. Ivo helped him bind them. Then we carried Petar back to the shelter. We needed the splints in Senna's bag, and there was no dry ground beyond the trees now.</p>
+<p>The leeks stood in their straight row. One had been pulled up. Its white root lay on the earth beside the well.</p>
+<p>Mara went inside and sat beside her pot. Ivo made us wait with him while he looked into the stable. His father lay beneath the stones. None had moved.</p>
+<p>The other woman stayed outside. She stood facing the road, with her arms folded tight across her chest. I joined her.</p>
+<p>"There was grass," I said.</p>
+<p>She nodded.</p>
+<p>"We could have reached it."</p>
+<p>She shook her head. Her teeth were chattering.</p>
+<p>I put my hand on her shoulder before I remembered. Beneath the shawl there was bone, warmth, the small involuntary movement of a person trying not to cry.</p>
+<p>She leaned against my hand.</p>
+<p>I took it away.</p>
+<h2>The place at the foot of the bed</h2>
+<p>We left the shelter in the wagons because Olek could no longer carry a litter and the rest of us could not carry everything. Ivo put his father back in the tool wagon. Nobody argued. Mara took the pot and the flour.</p>
+<p>I pulled the leek from beside the well and replanted it. I do not know why. The hole was there. It took a moment.</p>
+<p>The road beyond the shelter was paved in places. The stones had tilted, making little shelves of water. Beneath one I saw a copper disc green with age. Olek would not let me stop. He had torn a strip from his shirt to bind his fingers and held the reins between his palms.</p>
+<p>He had begun counting under his breath. He stopped each time he noticed me listening.</p>
+<p>By afternoon the smell of smoke had entered our clothes.</p>
+<p>There was no smoke to see. I checked the stoves. Mara checked them again after me. The smell grew stronger whenever we passed a stand of reeds, then faded in the open places.</p>
+<p>Tavi walked with me. She had not asked for a song since the wreck. The wooden horse protruded from her pocket, its one cloth shoe dark with mud.</p>
+<p>"Have you seen something?" I asked her.</p>
+<p>She shook her head too quickly.</p>
+<p>"You won't be in trouble."</p>
+<p>"I haven't done anything."</p>
+<p>"I know."</p>
+<p>She looked at my bandaged hand.</p>
+<p>"Does that hurt?"</p>
+<p>"A little."</p>
+<p>"Hers is on the other side."</p>
+<p>The other woman's cut was in her right palm. Mine was in my left. Tavi had been using the injuries to tell us apart. So had everyone else. I had seen Anet look at our hands before speaking.</p>
+<p>"If she hurts the other one, how will we know?"</p>
+<p>I could have said I would wear a ribbon. I could have said Mara would know me. Instead I told her to stay with her mother whenever she was uncertain.</p>
+<p>She nodded. The answer had made her more afraid.</p>
+<p>At a bend we found a broken cart lying across the road. Its bed was full of wet ash. A narrow channel ran through the ash as if something had crawled out recently.</p>
+<p>The horses would not approach it.</p>
+<p>Olek went forward. He held his copper disc between finger and thumb. He said a few words I could not hear.</p>
+<p>The lead horse took one step.</p>
+<p>Behind the cart a person rose.</p>
+<p>I saw a shoulder first, a dark curved surface shedding water. Then the top of a head. It kept rising until it was taller than the cart, though the ground behind it was lower than the road.</p>
+<p>Olek stopped speaking.</p>
+<p>The person turned its head. I could not see a face. Wet cloth covered it, pulled tight over the place where the mouth should have been. The cloth moved inward.</p>
+<p>All our horses breathed out together.</p>
+<p>Then it was down among the reeds again, moving fast toward the side of the caravan.</p>
+<p>"Inside," I said.</p>
+<p>Tavi did not move. I picked her up and pushed her through the nearest wagon door. Anet caught her from within.</p>
+<p>Something struck the underside of the wagon. The boards jumped. Anet screamed. I heard crockery break.</p>
+<p>Olek ran back toward us. His cap came off. He did not stop for it.</p>
+<p>The wagon shook again. A nail head rose beside my foot on the step. I jumped down. Beneath the axle, a strip of wet cloth slid around the wood and tightened.</p>
+<p>Ivo hit it with a hatchet. The edge went through cloth and into the axle. He wrenched it free. There was blood on the blade.</p>
+<p>A hand came up on the other side of the wheel.</p>
+<p>The fingers were burned together. It gripped the rim and pulled. The wagon leaned toward the ditch. Anet was trying to open the door, but the frame had twisted.</p>
+<p>Ivo struck the hand. Twice. The second blow severed two fingers. They fell into the mud and continued bending.</p>
+<p>I put my shoulder beneath the wagon's side. Others came beside me. We pushed upward while Anet kicked the door from within. It burst open. She thrust Tavi out first. Mara caught the child.</p>
+<p>The hand let go.</p>
+<p>The wagon dropped onto its wheels. I fell forward onto the step. Something beneath it took the loose end of my shawl.</p>
+<p>It pulled gently at first. I thought someone behind me had caught the cloth. Then the knot pressed into my throat.</p>
+<p>I tried to stand. My head struck the underside of the step. The cloth tightened. I could see boots moving in the mud. I could not get enough breath to call.</p>
+<p>My fingers would not go beneath the knot. My tongue felt too large. The wood above me had an old burn mark shaped like a thumb.</p>
+<p>Someone cut the shawl.</p>
+<p>I fell onto my side and breathed mud.</p>
+<p>The woman knelt beside me with the knife. She pulled me away from the wagon by the collar. I struck her because I thought she was pulling me underneath again. She did not let go.</p>
+<p>We got everyone onto the road. Olek poured salt across it behind us. His hand was bleeding. The copper disc was gone.</p>
+<p>The thing moved beneath the wagons for some time. We heard it scraping along the axles, stopping beneath each door. It made no sound with its mouth.</p>
+<p>At last the horses began breathing normally.</p>
+<p>We moved the broken cart with poles. Nobody touched the ash. Beyond it the road rose enough that we could look back along the underside of our wagons.</p>
+<p>There was nothing there.</p>
+<p>Anet found the two fingers in the hem of her skirt. She was so still while I took them out that I thought she had fainted standing up.</p>
+<p>We put them beneath a stone.</p>
+<hr class="scene-rule"/>
+<p>Olek's hand had been bound with cord beneath his sleeve. He discovered it when Senna went to wash the cut.</p>
+<p>Three tight turns around the wrist. Wet cord, almost black. He looked at it without surprise.</p>
+<p>Senna cut it. There was a pale groove underneath, healed at the edges.</p>
+<p>"How long?" she asked.</p>
+<p>"I don't know."</p>
+<p>She took his other wrist. It was clear.</p>
+<p>I sat beside him while she worked. The other woman was helping Anet mend the wagon door. I could hear the hammer strike, followed by a pause, then another strike. Each time I thought of Radan's hand on mine.</p>
+<p>Olek watched the cut cord.</p>
+<p>"My mother took me to a winter keeping," he said. "Once. I was little. There was a room with lamps. People came in and left a place for someone. I thought it was for my father. He was dead."</p>
+<p>He rubbed the healed groove.</p>
+<p>"It wasn't for him."</p>
+<p>Senna wrapped his hand. He waited until she had gone.</p>
+<p>"She said if the edge gave way, you mustn't pull it tight at once. You had to let something pass. Just once. Then close it. I thought she meant a torn seam. She used to mend sails."</p>
+<p>"Do you remember what she did?"</p>
+<p>He shook his head.</p>
+<p>"I remember the lamps. The last one stayed dark. Mother called it the Remaining. I asked what remained. She gave me her handkerchief to fold."</p>
+<p>He rubbed the groove around his wrist.</p>
+<p>"I remember being hungry. They wouldn't eat until someone had stopped speaking. I couldn't see who."</p>
+<p>He began to cry without changing his expression.</p>
+<p>"I should have told you at the milestone."</p>
+<p>"Would it have kept us out?"</p>
+<p>"I don't know."</p>
+<p>I took his good hand.</p>
+<p>"Then save your strength."</p>
+<p>He looked past me toward the reeds.</p>
+<p>"It's been there since the well," he said. "At the edge of my eye. I thought if I didn't turn—"</p>
+<p>He stopped.</p>
+<p>I turned.</p>
+<p>A strip of pale cloth hung from a reed. Nothing more. The reed was not bending beneath its weight.</p>
+<p>When I looked back, Olek was watching me with an expression I had never seen on his face.</p>
+<p>"Don't do that again," he said.</p>
+<hr class="scene-rule"/>
+<p>We did not light the stoves that evening. Everyone had smelled enough burning. We ate bread and cheese beside the halted wagons, standing close enough to touch.</p>
+<p>I counted the people by their faces. I had begun doing it whenever we stopped. Petar lay inside the grain wagon, with Senna at the door. Ivo held his child. Anet held Tavi's wrist as if crossing a busy street.</p>
+<p>The other woman sat apart on the road. She was looking at her hands.</p>
+<p>I went to her with bread.</p>
+<p>"Thank you," I said.</p>
+<p>She took it.</p>
+<p>"For the shawl."</p>
+<p>"You would have done it."</p>
+<p>"I don't know what I would have done."</p>
+<p>She looked up at me then. There was mud in the lines beside her mouth. I could see a broken vein beneath her left eye that I had never noticed on myself.</p>
+<p>"Neither do I," she said.</p>
+<p>We ate together.</p>
+<p>After a while she said, "I remember a door at the shelter."</p>
+<p>"There were two."</p>
+<p>"There were two when we were there."</p>
+<p>I waited, but she would not go on. She pressed the heel of the bread between her palms until it flattened.</p>
+<p>"I know you're frightened," I said.</p>
+<p>She gave a short laugh. It was ugly. I had heard it come out of my own mouth when I was too tired to be kind.</p>
+<p>"You keep telling people what they are."</p>
+<p>She stood and went to Petar.</p>
+<p>I remained on the road. In the dark beyond the last wagon, something took a step when she did. When she stopped, it stopped.</p>
+<p>I waited until she moved again.</p>
+<p>The step came behind me this time.</p>
+<h2>The account beside the fire</h2>
+<p>Near morning Tavi woke me. She put the wooden horse into my hand before she spoke.</p>
+<p>Its cloth shoe was gone.</p>
+<p>"I need to tell you," she said.</p>
+<p>I sat up. We had slept in turns beside the road. My back hurt where I had pushed the wagon. My throat was swollen. When I swallowed I could feel the place the shawl had tightened.</p>
+<p>Anet was asleep a few feet away, one arm stretched across the empty place where Tavi had been. I wanted to wake her. Tavi caught my sleeve.</p>
+<p>"She'll be angry."</p>
+<p>"We can wake her together."</p>
+<p>"Please."</p>
+<p>I looked at the child's bare feet and wrapped them in the edge of my blanket.</p>
+<p>"All right."</p>
+<p>She had gone into the stable at the shelter while we were carrying Petar outside. She wanted the horse's shoe. One of the goats had pulled it off, and she had seen it beneath the grain wagon.</p>
+<p>She crawled under to get it.</p>
+<p>"There was a man," she said. "At the back."</p>
+<p>I kept my hands still around the wooden horse.</p>
+<p>"What did he do?"</p>
+<p>"He was sitting. His feet weren't on the ground."</p>
+<p>"Did he speak to you?"</p>
+<p>She nodded.</p>
+<p>"What did he say?"</p>
+<p>"He asked if we'd all come."</p>
+<p>"What did you tell him?"</p>
+<p>"I said we were leaving."</p>
+<p>She began picking at a crack in the road with one fingernail.</p>
+<p>"Then what?"</p>
+<p>"He said he knew."</p>
+<p>I could hear Olek breathing in his sleep. A slow breath, then a long pause. A faint scrape followed it from beneath the nearest wagon.</p>
+<p>"He had something on his knees," Tavi said. "A board. Like yours. With the stones. Only they weren't stones."</p>
+<p>"What were they?"</p>
+<p>"I didn't look. I wanted the shoe."</p>
+<p>She started crying then, quietly, ashamed of having failed at the thing she had crawled under there to do.</p>
+<p>I held her. She put her face against my throat. It hurt, and I was grateful for the pain because it gave me something small enough to attend to.</p>
+<p>"Did he touch you?"</p>
+<p>She shook her head.</p>
+<p>"Did he ask you to do anything?"</p>
+<p>"He said there was room."</p>
+<p>"Where?"</p>
+<p>She pointed at the ground beside us.</p>
+<p>I moved before I could stop myself, pulling her into my lap.</p>
+<p>Nothing occupied the place she had indicated. It was just wide enough for a person to sit.</p>
+<p>We woke Anet. Tavi told her about the lost shoe. I told her the child had been frightened in the stable. Anet put her arms around her and did not ask why we had woken her.</p>
+<p>I kept the wooden horse until breakfast. When I returned it, Tavi turned it over to see whether I had found the shoe.</p>
+<hr class="scene-rule"/>
+<p>The ground rose after that. For the first time since the willows, the road had a shoulder wide enough to walk three abreast. We could see a low ridge through the mist. There were trees on it. Real trees, with branches moving separately in the wind.</p>
+<p>Ivo said he could smell grass.</p>
+<p>We stopped to rest the horses before the climb. Olek's mare was trembling. He rubbed her neck and leaned his forehead against her cheek. She put her head against him.</p>
+<p>Mara lit a small fire on the stones. Nobody objected. We needed hot water. Petar's breathing had become thick, and Senna wanted to loosen the cloth beneath his jaw.</p>
+<p>The fire caught easily. Blue at the base, yellow above. I watched until I was satisfied it burned like a fire.</p>
+<p>People gathered. They had begun to hope. It was a fragile, practical hope: a hill, firmer ground, a place to put the horses. They looked toward me while Mara poured water into the pot.</p>
+<p>I had failed to explain anything since the wheel. I had given orders and changed them. I had asked questions and then forbidden questions. Radan was wrapped in his wagon. Petar had to be tied to keep him from hurting us. There were two women with my face, and both were eating their bread.</p>
+<p>They deserved something they could hold.</p>
+<p>I asked Anet to take Tavi a little way up the road. She shook her head.</p>
+<p>"We're staying together."</p>
+<p>I nodded.</p>
+<p>The other woman stood at the far side of the fire. She looked exhausted. Her cut hand was wrapped in a strip of my old shawl.</p>
+<p>"We have come through a place where people were burned," I said. "Their wagons were burned with them. Something has been kept here. Olek knows a little of the keeping. I know a little of what happens when it fails."</p>
+<p>Olek lowered his head.</p>
+<p>"We won't try to recover everything. We need only get across. The road is carrying things it ought to have left behind. That is why Radan found the repair. Why Ivo saw the coat."</p>
+<p>Mara looked toward her sewing basket.</p>
+<p>I spoke gently. I have often found that gentleness gives a frightened person room to think. I wanted them to think. I wanted them to trust their hands again.</p>
+<p>"There was someone at the shelter before us. Petar saw him in the bed. Tavi saw him in the stable. He was waiting for the wagons. The place at his feet was kept clear."</p>
+<p>The other woman lifted her head.</p>
+<p>I could see it as I spoke. The shelter before we arrived. Rain against the turf roof. A man seated with a board across his knees. The pieces set out. The empty place.</p>
+<p>"When the first wagon came, he moved it from the outer edge. He didn't touch the next one. He waited until the woman in the doorway had counted—"</p>
+<p>"You weren't there," Mara said.</p>
+<p>I stopped.</p>
+<p>The fire snapped. A little wet wood had split in the heat.</p>
+<p>Mara was looking at me. She held the pot by its handle, forgetting the cloth.</p>
+<p>The other woman's mouth was shut.</p>
+<p>From my wagon, behind us, my voice said, "—the children."</p>
+<p>Nobody moved.</p>
+<p>Then the voice continued.</p>
+<p>"She counted them twice because one was asleep beneath the bench. When she had finished, he turned the board."</p>
+<p>I knew the next sentence. It rose in my mouth with the easy movement of something remembered.</p>
+<p>Mara dropped the pot.</p>
+<p>Boiling water struck my leg. I screamed. The sentence broke apart.</p>
+<p>Inside the wagon someone laughed once. It was my laugh when I had forgotten to be kind.</p>
+<p>The door opened inward.</p>
+<p>My door had never opened inward.</p>
+<p>Petar began hammering his heels against the grain wagon. Senna ran to him. The other woman caught my arm and pulled me away from the fire.</p>
+<p>Beyond the open door I could see the shelter's common room. The stone with its shallow cuts. The cups on the shelf. A person sitting at the far end with something across his knees.</p>
+<p>Behind him stood a row of people packed so closely that I could not see the wall. Their faces were turned toward the door.</p>
+<p>The nearest one stepped forward.</p>
+<p>It struck the lintel with its forehead. It did not bend. It pushed, and the wood began to split.</p>
+<p>The woman beside me shouted for oil. Olek ran to the horses and cut them free. One kicked through a shaft as he dragged it away.</p>
+<p>Mara was already moving.</p>
+<p>We poured it over the wagon step and through the window. Ivo brought the burning stick from the fire. His hands shook so badly that I had to guide them.</p>
+<p>The person in the doorway had got one arm outside. The skin was black and split, showing wet flesh underneath. It groped down the wagon's side, looking for a hold.</p>
+<p>I set the oil alight.</p>
+<p>The flame ran up the door and across the window. The arm drew back. From inside came the sound of people trying to move through a crowded room.</p>
+<p>My voice was still speaking. I pressed my hands over my ears. I could hear it through my palms.</p>
+<p>The other woman stood beside me, doing the same.</p>
+<p>We burned my wagon on the road. My blankets, my books, the little box of letters beneath the bed, the cups people had given me because I remembered how they liked their tea. The roof fell inward. Sparks rose and vanished in the mist.</p>
+<p>I watched the doorway until there was no doorway left.</p>
+<p>For a little while the voices stopped.</p>
+<h2>The wagons go on</h2>
+<p>Olek's mare fell while we were putting Petar into the tool wagon.</p>
+<p>She went down on her knees, then onto her side. Her eye rolled toward us. Olek cut the traces and shouted for Ivo to hold the other horse.</p>
+<p>The grain wagon continued forward.</p>
+<p>Its pole slid past the mare's shoulder. One loose trace dragged across her neck. Ivo leapt clear as the front wheel passed him.</p>
+<p>There was no slope.</p>
+<p>The wagon rolled until it reached the place my wagon had occupied. Then it stopped.</p>
+<p>Behind it, Anet's wagon began to move.</p>
+<p>"Out," I said.</p>
+<p>People stood looking at the wheels.</p>
+<p>"Take the children out. Now."</p>
+<p>Mara climbed through a moving door. Ivo ran beside her and took his son. Anet threw bundles into the road, then jumped with Tavi clinging to her neck. The tool wagon jolted forward while Senna was still inside with Petar.</p>
+<p>We ran with it. The horses stumbled because the traces were pulling them from behind.</p>
+<p>Olek cut one team free, then another. A shaft struck him in the chest. He fell, got up, and went back with the knife.</p>
+<p>I ran to the tool wagon. Senna was trying to lift Petar. He had become rigid. His tied hands pressed against the roof with a strength neither of them could master.</p>
+<p>"Cut him loose," I said.</p>
+<p>"He'll—"</p>
+<p>"We can't carry him like that."</p>
+<p>I climbed inside. The wagon smelled of blood and Radan's body. I cut Petar's wrists free. He lowered his arms at once and put them around my neck.</p>
+<p>For a moment I thought he was helping us.</p>
+<p>Then his hands tightened.</p>
+<p>Senna struck his arm. He stared at me, tears running down his face, and tightened his grip again. My injured throat would not bear it. The room narrowed to his eyes and the black gap of his mouth.</p>
+<p>Senna took the knife from me.</p>
+<p>She cut his forearm. Deep, below the wrist. His fingers opened on one side.</p>
+<p>I pulled away. She caught the other hand and held it against his chest.</p>
+<p>"I'm sorry," she said to him.</p>
+<p>He nodded. He was trying to nod. The movement made blood spill over his bandage.</p>
+<p>We got him to the door. Ivo and the other woman ran beside the wagon. They took his weight. I jumped down after him and fell to my knees. Senna landed beside me with the knife still in her hand.</p>
+<p>The tool wagon went on. Radan was inside it.</p>
+<p>Ivo ran after it.</p>
+<p>Mara caught his coat. He dragged her several steps before the woman caught him too. He fought them, looking at the departing wagon.</p>
+<p>"We can't," Mara said. "We can't."</p>
+<p>He stopped fighting. His face had gone empty.</p>
+<p>Olek's mare was trying to get up. Her hind legs would not support her. He knelt beside her and put his hand over her eye.</p>
+<p>I took Tavi's face against my coat before he used the knife.</p>
+<hr class="scene-rule"/>
+<p>We followed the wagons because the road behind us had gone under water.</p>
+<p>I had looked back while we were getting Petar down. There had been dry stone. Now black water covered it from reed to reed, without a ripple. My burned wagon stood in the middle, its iron glowing dull red. The water did not steam.</p>
+<p>Ahead, the other wagons rolled at a walking pace. Their wheels made no tracks. The surviving horses followed us, loose or led by the bridle. One goat came with Tavi. The other was gone.</p>
+<p>We made a litter from two shafts and a blanket. Petar lay on it with his eyes shut. Senna had bound his arm. Blood seeped through the cloth, slowly enough that she let it be.</p>
+<p>Ivo and I took the first turn carrying him. My burned leg hurt with each step. The pain kept me in my body. When it faded I looked down to make sure my foot was where I expected it.</p>
+<p>The other woman walked beside us. She had stopped trying to guide anyone. She watched the wagons.</p>
+<p>"You knew," I said.</p>
+<p>"About the plank."</p>
+<p>"Yes."</p>
+<p>"I remembered telling Anet."</p>
+<p>"Before you told her?"</p>
+<p>She nodded.</p>
+<p>"What else do you remember?"</p>
+<p>She looked at Petar. Then away.</p>
+<p>"Don't ask me."</p>
+<p>I did not.</p>
+<p>We changed bearers. Mara took my end. She was stronger than most people knew. I walked beside Tavi and listened to the goat breathe through its nose.</p>
+<p>The wagons began turning off the road.</p>
+<p>One after another they rolled between the reeds, down a slope too steep for wheels. They did not overturn. Their beds remained level as if the ground beneath them had risen to meet them.</p>
+<p>Beyond lay an open place.</p>
+<p>At first I thought there was a village. Dark shapes stood in rows around a square. Then I recognised the shapes as wagons, burned down to different heights. Some still had roofs. Others were only wheels and axles. Water lay beneath them all.</p>
+<p>Our wagons moved into the spaces between them.</p>
+<p>The tool wagon stopped beside an old post. Its door swung open. The sailcloth around Radan shifted, though there was no wind.</p>
+<p>Ivo made a sound and turned away.</p>
+<p>Across the open place the land rose toward the trees we had seen. A narrow bank ran from the last wreck to the higher ground. I could see grass along its top. Beyond it, a bird lifted from a branch and flew out of sight.</p>
+<p>We had to cross the open place to reach it.</p>
+<p>Olek stood beside me. He had lost his cap and one boot. His stocking was black with mud.</p>
+<p>"I'll go first," he said.</p>
+<p>"Can you find the bottom?"</p>
+<p>He took a pole from Anet.</p>
+<p>"I'll tell you."</p>
+<p>He went down the slope. The water reached his shins. He tested each step. We followed in a line, keeping the horses behind us so they would not trample anyone if they panicked.</p>
+<p>The old wagons smelled of wet ash. On one step lay a small shoe. It was made of leather, split across the toe. I looked away before I could see more.</p>
+<p>A bell sounded somewhere.</p>
+<p>One stroke. I waited for the next. None came.</p>
+<p>Then someone inside a burned wagon began speaking.</p>
+<p>The language was unfamiliar. I could hear the rise and fall of a person explaining something carefully. A second voice answered from farther away. Beneath them there was a low continuous sound, too steady for breath.</p>
+<p>Olek stopped.</p>
+<p>"Keep going," I said.</p>
+<p>He moved. The water rose to his knees.</p>
+<p>My wagon stood ahead of us.</p>
+<p>It had burned to the height of the bed. The blue brace remained on the rear wheel. A little smoke rose from the place where my books had been.</p>
+<p>I did not look inside.</p>
+<p>The other woman did. She caught the edge with her cut hand and leaned toward it. Her face changed.</p>
+<p>"Come away," I said.</p>
+<p>She did not move.</p>
+<p>I seized her sleeve. She turned on me with such hatred that I let go. Then the hatred was gone. She put her hand over her mouth and followed us.</p>
+<p>We reached the foot of the bank.</p>
+<p>Olek tested it. His pole struck stone. He climbed one step, then another, and turned to help Mara.</p>
+<p>The bank moved away.</p>
+<p>It was a small movement, the width of a hand. Water opened between Olek's boot and the next stone. He reached farther. The bank withdrew again.</p>
+<p>He stepped down.</p>
+<p>The water closed over the gap. The grass remained where it had been. Near enough to touch with the pole. Farther than his foot could go.</p>
+<p>Behind us the voices became clearer.</p>
+<p>I recognised a phrase. I had heard it in a roadside keeping years before, spoken by a woman who would not tell me where she had learned it.</p>
+<p>Olek recognised it too. His mouth moved with the cadence, though no sound came out.</p>
+<p>The woman beside me gripped his arm.</p>
+<p>"Don't finish."</p>
+<p>He stared at her.</p>
+<p>A child began crying behind us. Not Tavi. One of Senna's little ones, cold and exhausted and unable to understand why we had stopped.</p>
+<p>I turned to help.</p>
+<p>Between our people stood a man with wet cloth over his face.</p>
+<p>He was close enough that I could see the weave. One hand rested on the litter pole beside Mara's. The burned fingers had grown together. Where two should have been, there was a fresh, wet stump.</p>
+<p>Mara had not seen him. She was looking at me.</p>
+<p>"Put it down," I said.</p>
+<p>She began to lower the litter.</p>
+<p>The man's hand tightened. The pole cracked. Petar rolled toward him.</p>
+<p>I caught Petar's coat. Ivo caught the blanket. The man pulled, and the cloth tore along the seam.</p>
+<p>Petar opened his eyes.</p>
+<p>He looked at the thing beside him. Then at Senna.</p>
+<p>His uninjured hand moved to his own bandage. He pulled it down from his mouth.</p>
+<p>"Go," he said.</p>
+<p>Senna held him harder.</p>
+<p>The man bent toward her. The wet cloth drew inward over the place where its mouth should have been. Senna's hair lifted toward it. Blood began running from her nose.</p>
+<p>Olek struck it with the pole.</p>
+<p>The wood passed through its shoulder and stopped. Olek tried to pull it free. The cloth-covered head turned toward him.</p>
+<p>"Leave it," I shouted.</p>
+<p>He would not leave it. He put one foot against the thing's leg and pulled with both hands.</p>
+<p>For a moment it held the shape of a man. Then the wet cloth opened along the side, and Olek went into it to the shoulder.</p>
+<p>I heard his arm break.</p>
+<p>He screamed. He tried to step backward, but his leg had gone in as well. The cloth tightened around his chest. His face remained outside, pressed against the place the man's face had been.</p>
+<p>I reached for him.</p>
+<p>The woman seized me from behind and dragged me away. I fought her. Olek was still looking at me. His mouth moved. I could not hear him over the low sound that had filled the open place.</p>
+<p>Then his face turned inward.</p>
+<p>There was a man standing beside the broken litter. He wore Olek's coat. Water ran from its hem.</p>
+<p>Petar was gone.</p>
+<p>Senna knelt with an empty piece of blanket in her hands.</p>
+<h2>Across</h2>
+<p>I remember trying to lift Senna and finding that my hands would not close.</p>
+<p>The other woman lifted her. Mara took one arm. Between them they brought her to the foot of the bank. Ivo gathered the children. Anet held the horses. These things happened without my telling anyone to do them.</p>
+<p>I stood looking at the place where Olek had been.</p>
+<p>Something lay in the water near my foot. His copper disc. I could see the worn edge and the little hole his mother had put through it for a cord.</p>
+<p>I bent to take it.</p>
+<p>The other woman said my name.</p>
+<p>I stopped with my fingers in the water.</p>
+<p>"Leave it."</p>
+<p>Beyond her, the man in Olek's coat stood beside the tool wagon. His hands rested at his sides. He did not come closer.</p>
+<p>The voices continued. Some were speaking together now. I understood a little more each time they began again.</p>
+<p>I straightened.</p>
+<p>"We need to cross," I said.</p>
+<p>The woman nodded.</p>
+<p>"You know how."</p>
+<p>"I know a little."</p>
+<p>"So do I."</p>
+<p>We looked at each other. My throat hurt. Her right hand was bleeding through the shawl. Neither of us looked like a woman anyone should trust with their children.</p>
+<p>I remembered Olek braced between the trees, holding the narrowing gap while he called Ivo away from his father's voice. His fingers scraped raw. Later he had told me about a seam allowed to open, something passing before it was closed. I could not tell how much he had remembered at the trees and how much he had simply done.</p>
+<p>I could put my hands where his had been.</p>
+<p>I took out my salt pouch. There was a little left, damp at the bottom. The other woman took out hers.</p>
+<p>We poured them together into Mara's empty bowl.</p>
+<p>Mara held it. Her hands were steady. There were burns across the fingers that had held the pot.</p>
+<p>"What do I do?" she asked.</p>
+<p>"Keep it dry."</p>
+<p>Ivo found a plank floating beside a wreck. He laid it from the submerged road toward the first stone of the bank. It reached. When he put his weight on it, the far end slid away.</p>
+<p>He drew it back, jaw clenched.</p>
+<p>"Again," I said.</p>
+<p>He laid it down. I knelt at the near end and put salt along the edge. The grains disappeared into the wet grain of the wood. The woman knelt opposite me.</p>
+<p>We did not say anything.</p>
+<p>I put my palm flat on the plank. She put hers beside it. Something pushed upward beneath my hand. The wood bowed without lifting its far end from the stone. A splinter worked into the heel of my palm, slowly, with each pulse of pressure.</p>
+<p>I pressed harder. The woman caught the other edge. Between us the bow flattened, and the wet wood gave a low creak.</p>
+<p>The voices stopped.</p>
+<p>It was worse when they stopped. I could hear the water dripping from the wagons. I could hear Senna making a small sound through her teeth. I could hear something moving inside Olek's coat.</p>
+<p>The woman took a breath.</p>
+<p>The plank held.</p>
+<p>"Go," I said to Ivo.</p>
+<p>He stepped onto it. The far end stayed against the stone. He took another step and reached the bank.</p>
+<p>He turned. He was crying.</p>
+<p>"It holds."</p>
+<p>Anet passed him Tavi. Then the smaller children, one at a time. Mara held the bowl in one hand and helped with the other. The woman beside me kept her palm on the wood.</p>
+<p>I lifted mine.</p>
+<p>The near edge rose beneath her fingers. The far end began sliding sideways along the stone.</p>
+<p>I put my hand back and leaned on it. The edge came down. She breathed out through her teeth. Whatever was lifting the wood had not stopped.</p>
+<p>"Take the others," I told Mara.</p>
+<p>"Then you."</p>
+<p>"Yes."</p>
+<p>She looked at me, then at the woman. She did not ask which of us I meant.</p>
+<p>People crossed. The horses were harder. Anet led the first, speaking into its ear, and Ivo pulled from the bank. The animal jumped the final stretch. The plank struck my wrist. Something gave inside it, a sharp little movement followed by heat. I kept my hand down.</p>
+<p>The next horse refused. It backed, trembling, eyes white. Anet loosened the bridle and stepped away. We could not force it without losing the crossing. She stood for a moment with the empty rein in her hand, then climbed onto the plank.</p>
+<p>Behind us a wagon door shut.</p>
+<p>Mara looked around.</p>
+<p>"Don't," the woman said.</p>
+<p>Mara turned back. She put the bowl in the water beside us. Most of the salt was gone. Then she took Senna by the shoulders and pushed her toward Ivo.</p>
+<p>Senna had been holding the torn blanket. She dropped it when she stepped onto the plank. It spread on the water. A corner caught beneath my knee.</p>
+<p>Mara crossed after her.</p>
+<p>The goat followed, slipping once. Tavi caught its horns from the bank. Someone helped her pull it up.</p>
+<p>Then there were only the two of us.</p>
+<p>The woman was breathing through her mouth. Blood from her hand ran along the groove in the plank toward mine.</p>
+<p>"You go," she said.</p>
+<p>"We lift together."</p>
+<p>She shook her head.</p>
+<p>"One first."</p>
+<p>"Then you."</p>
+<p>Behind her, someone stepped down from a wagon.</p>
+<p>She heard it. Her eyes closed briefly.</p>
+<p>"I don't want to stay," she said.</p>
+<p>Until then I had been able to imagine that she belonged to the place, that some part of her wanted what was happening. Her voice took that away from me.</p>
+<p>I could not think of anything to say.</p>
+<p>She looked toward the bank. Mara stood there with Ivo. They had found a length of rope and were tying it around a tree root. Tavi was watching us from behind Anet's skirt.</p>
+<p>"She never got the shoe," the woman said.</p>
+<p>"No."</p>
+<p>"I meant to mend it."</p>
+<p>I remembered the wooden horse in my hand, the damp place where the little shoe had been. I remembered a child's head against my knee while I sang about the otter. I had been in the reeds with Petar at the time.</p>
+<p>The woman looked at me.</p>
+<p>I did not ask her whether she remembered the reeds.</p>
+<p>I slid my good hand beneath hers. Her fingers were cold. I pressed them against the plank with mine.</p>
+<p>"When I move," I said, "put your knee here."</p>
+<p>She nodded.</p>
+<p>I shifted my weight. She put her knee where my hand had been. The plank moved a little, then steadied. I kept my injured hand on it until her weight had taken the pressure.</p>
+<p>Mara threw the rope.</p>
+<p>It fell short. I reached with my foot and drew it toward me. My burned leg shook. I put the loop around my waist.</p>
+<p>The woman was holding the plank with both hands now. Her back had begun to bend. Something beneath the wood pressed upward in slow pulses.</p>
+<p>I stepped onto it.</p>
+<p>Halfway across, I heard her cry out. Her knee had slipped off the wet edge. The plank rose beneath my feet, and the far end slid from the stone.</p>
+<p>I dropped onto my stomach. My injured wrist struck the edge. The pain went up my arm into my jaw. I held with the other hand.</p>
+<p>Ivo pulled the rope. Mara braced against the root. The plank turned under me, and black water covered my face.</p>
+<p>There were voices beneath it.</p>
+<p>I opened my mouth before I could stop myself.</p>
+<p>Someone pulled me upward by the hair. My shoulder struck stone. Ivo was shouting. Mara had one hand twisted in my coat. Together they dragged me onto the bank.</p>
+<p>I coughed water onto the grass.</p>
+<p>The plank floated away from the near side. The woman still knelt where it had been. Her hands rested on the water as if there were wood beneath them.</p>
+<p>I tried to get up.</p>
+<p>Mara held me down.</p>
+<p>"Wait."</p>
+<p>The woman raised her head. She looked at us. At me.</p>
+<p>Behind her stood someone in a coat I recognised. The hem was wet. I could not see above its collar.</p>
+<p>"You can bring me across," she said.</p>
+<p>I reached for the rope.</p>
+<p>"When he turned the board, the place beside—"</p>
+<p>I knew how the sentence ended. My mouth began to shape the words.</p>
+<p>Between Mara's boots the grass split in a straight line. One edge lifted, showing the underside of a board. Beneath it was lamplight. I smelled the shelter's cold soot.</p>
+<p>Mara pulled me away. The woman saw the opening. She broke off, gasped, and tried to speak again. A hand pressed against the underside of the lifted grass.</p>
+<p>She put both hands over her mouth.</p>
+<p>For a moment the grass stayed raised. Her shoulders shook. Then the hand withdrew, and the edge fell shut. Ivo pulled Tavi farther up the bank.</p>
+<p>The woman looked at me over her fingers. I was still holding the rope. There was nowhere to throw it that would reach her.</p>
+<p>She kept her hands there.</p>
+<p>The water rose between us, smooth and black, without a wave. It covered her knees, her waist, the cut ends of the shawl. She did not lower her hands.</p>
+<p>I could still see her eyes when the mist came down.</p>
+<hr class="scene-rule"/>
+<p>We climbed until the ground was dry beneath the grass.</p>
+<p>Ivo carried me for part of it. I remember his shoulder against my stomach and being ashamed that he had to carry me when he had been unable to bring his father. I asked him to put me down. He said he would when we reached somewhere suitable.</p>
+<p>He used his father's voice. He did not know he had done it.</p>
+<p>At the top we found a fence. Beyond it, sheep. A dog came barking along the wire, stopped short of us, and began whining.</p>
+<p>The shepherd brought a lantern and a stick. He looked at our clothes, at Senna's bloodied face, at the children. He lowered the stick.</p>
+<p>"Road trouble?"</p>
+<p>Mara said yes.</p>
+<p>He took us to a shed and sent his boy for help. There was straw on the floor. The sheep pushed their noses through the slats and complained because we were near their feed.</p>
+<p>Ivo set me down. I put my good hand into the straw and closed it around a fistful. Dry. Sharp. It hurt in a simple way.</p>
+<p>The shepherd's wife brought blankets. She had a red mark on her cheek where she had been sleeping against a seam. She gave Senna water and began washing the blood away without asking whose it was.</p>
+<p>They counted us because they needed bowls.</p>
+<p>I watched each person receive one.</p>
+<p>The shepherd asked where we had come from. Mara said the fen. He looked toward the door and did not ask anything else that night.</p>
+<p>I slept between Anet and the wall. Tavi lay beyond her mother. Once, in the dark, she reached across and touched my bandaged hand.</p>
+<p>I let her feel the bite.</p>
+<h2>The winter yards</h2>
+<p>We reached the yards in other people's carts.</p>
+<p>There were turnips. There were roofs. Olek's daughter had made up a bed with a better blanket than the one she had told him to bring. She stood beside it while Mara spoke to her. Then she folded the blanket and put it in a chest.</p>
+<p>Ivo went back as far as the shepherd's fence with three men who knew the district. They found the raised road and the stone shelter. The shelter roof had fallen years before. There were no leeks by the well.</p>
+<p>They found iron in the fen. They brought none of it home.</p>
+<p>I did not ask them to draw where they had walked.</p>
+<p>My wrist healed crooked. Senna had done what she could with strips of wood and the shepherd's clean linen. For a long time I could not hold a cup in that hand. Mara gave me one with two handles and told me to stop admiring it and drink.</p>
+<p>Senna stopped attending births that winter. She helped again in spring. The first time, she asked another woman to stay in the room even when there was nothing for her to do. Afterward they ate together. I know because Mara took the food.</p>
+<p>Anet sold cloth from a stall. She disliked sleeping under a roof that did not move, then became used to it. Tavi made a second shoe for the wooden horse. It was yellow. She would not replace the blue one, so the horse had one bare foot and one bright foot, and went wherever she put it.</p>
+<p>Ivo finished the cupboard door in plain wood. He brought it to Mara though she no longer had the wagon. She ran her hand along its edge and told him it was good work. He put his face against her shoulder. She held him until his son began pulling at his coat.</p>
+<p>These things took time. They did not happen in one afternoon after we were safe.</p>
+<p>People came to ask about the journey. Some brought food. Some had relatives who had travelled the east road. One man had copied an account of an old burning and wanted to know whether I had heard a certain phrase. He began it before I could stop him.</p>
+<p>I knocked the cup from his hand.</p>
+<p>He left angry. I paid for his coat to be cleaned. I did not invite him back.</p>
+<p>The others spoke when they needed to. Sometimes I sat with them. If I could bear it, I listened. When I could not, I told them so. They found people who had not been there and could sit through the night without trying to put one person's memory beside another's.</p>
+<p>I have set down what I did and what I failed to do. There are places where another account would make this one easier to follow. I know where they are.</p>
+<p>I have not sent for them.</p>
+<hr class="scene-rule"/>
+<p>In spring Mara bought a wagon with a stove that smoked when the wind came from the west. Ivo fixed it. She said he had his father's hands. He said he knew, and for once neither of them apologised.</p>
+<p>She planted her onions beside the winter shed before we left. Someone would have them in autumn. That pleased her. She had a new stocking by the bed, and the first onion in it was large enough to make the heel bulge.</p>
+<p>I rode with her as far as the dry road.</p>
+<p>At the first stopping place I helped prepare supper. My hand was clumsy. Mara gave me the potatoes and kept the knife work for herself. The light was good. There was a small wind, enough to carry the stove smoke away from the horses.</p>
+<p>A man from the next fire came over with a bowl. He recognised me. He asked for a tale while the pot came to the boil.</p>
+<p>I told him about a woman who kept onions in her stockings.</p>
+<p>Mara called me a liar before I had finished the first sentence. The man laughed. I went on. There was a neighbour in it, and a stolen hen, and a perfectly respectable explanation for the hen being found in the neighbour's bed. Mara corrected me about the bed. I accepted the correction. She had been there.</p>
+<p>When supper was ready, we ate.</p>
+<p>Afterward the man asked what had happened to my hand.</p>
+<p>Mara reached for his bowl.</p>
+<p>"There's more," she said.</p>
+<p>He held it out. She gave him potatoes from the bottom, where they had caught a little and taken the taste of the pot. He said those were the ones he liked.</p>
+<p>I stayed beside the fire while they ate. Beyond the wagons a horse moved in its sleep. Someone went to settle it. The man began telling Mara about his sister, who grew onions large enough to frighten a dog.</p>
+<p>I listened.</p>
+<hr class="scene-rule"/>
+<p class="marginalia"><em>Here ends The Road Kept No Prints.</em></p>
+</body>
+</html>
