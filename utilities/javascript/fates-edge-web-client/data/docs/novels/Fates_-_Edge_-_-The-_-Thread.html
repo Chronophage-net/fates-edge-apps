@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.11" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The Thread</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+<style id="fiction-frontmatter-style">
+.fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
+.fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
+.fiction-title-page h1 { font-size: 2.4rem; line-height: 1.15; }
+.fiction-copyright { padding: 3rem 1rem; font-size: .9rem; line-height: 1.65; border-top: 1px solid #999; border-bottom: 1px solid #999; margin-bottom: 4rem; }
+.fiction-copyright h2 { font-size: 1.25rem; }
+@media print { .fiction-title-page, .fiction-copyright { break-after: page; min-height: 70vh; border: 0; } }
+</style>
+</head>
+<body>
+<div class="fiction-frontmatter">
+<section class="fiction-title-page" aria-label="Title page">
+<p>Fate’s Edge · Novels &amp; Novellas</p><h1>The Thread</h1>
+<p>by Nicholas A. Gasper</p><p><a href="#fiction-copyright">Copyright and edition</a></p>
+</section>
+<section class="fiction-copyright" id="fiction-copyright" aria-labelledby="fiction-copyright-heading">
+<h2 id="fiction-copyright-heading">Copyright</h2>
+<p><strong>The Thread</strong><br>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+<p>This work of fiction, including its prose, original characters and setting, is proprietary content. It is not part of the Creative Commons-licensed Fate’s Edge System Reference Document.</p>
+<p>No part of this work may be reproduced or distributed without the copyright holder’s written permission, except as permitted by law.</p>
+<p>Digital reading edition · 2026</p>
+</section></div>
+<header id="title-block-header">
+<h1 class="title">The Thread</h1>
+</header>
+<h1 id="the-thread">The Thread</h1>
+<h3 id="a-novella-of-the-belworth">A Novella of the Belworth</h3>
+<p><em>Being the second account of Riarhin, sometime scout of the
+Fenwood army, from the hills above Cair to the edge of the Red Wastes;
+with the usual difficulty about what she was actually looking
+for.</em></p>
+<p><em>Sequel to</em> The Last Blade<em>, and in one particular to</em>
+No Bruises<em>.</em></p>
+<hr />
+<blockquote>
+<p><em>The soup is always free. The price never is.</em> — An ancient
+proverb, said at the banking of the fires</p>
+</blockquote>
+<hr />
+<h2 id="prologue-the-huntress">Prologue: The Huntress</h2>
+<p>Farrick prayed for wind. He prayed every day for a stout breeze. It
+was late autumn, the cold was wet and went through you like knives, down
+to the bone. He had been cold, and miserable, and wet for a fortnight,
+and still he prayed for wind.</p>
+<p>They were held up in an abandoned mill. Its gray, weathered wood was
+covered in rose vines and thorns that looked black in the moonlight. Six
+boys left out of twenty. Young, frightened, cold, each of them praying
+for wind.</p>
+<p>It was a week after the hamlet. It hadn’t been burned when they found
+it. The Rothari wanted to send a message. The hamlet hadn’t paid its
+dues in two months. Normally Farrick would drown a bridge or burn the
+wheat and let them starve slowly. But it had gone on too long, and the
+country had gotten lax, and a message was to be sent.</p>
+<p>And Farrick was ever the faithful messenger.</p>
+<p>Twenty boys, green, given a purpose in the Rothari they never had in
+whatever mudflat they crawled out of. They pillaged. They took what they
+wanted, and whoever they wanted. Laughter, fire, whiskey, and piss-poor
+ale off the brewer’s widow. That was the last joy they had.</p>
+<p>The first one died in the river valley. They had been following the
+shore—the river was low, and the round rocks were easier walking than
+the game trails in the hills. That was a mistake. The valley was wooded,
+and steep.</p>
+<p>The arrow took him in the throat. There was no wind; the air was
+still and cool. There was no sound until the choke and the wet gurgle.
+His legs faltered and he dropped like a doll. Dead soon enough. It was a
+cruel shot.</p>
+<p>They formed a circle. Two more boys: an eye, a leg. Farrick sent six
+into the hills to find whoever it was. He found their bodies that night
+by torchlight. In the morning, three more were dead—throats cut in their
+sleep. Nobody saw anything but “perhaps a shadow.”</p>
+<p>Perhaps a shadow.</p>
+<p>They found a wheelhouse that night that had turned lumber, once. It
+was old; the valley had been emptied by plague two centuries ago. It
+should not have been standing. The slatted walls were failing, but it
+was shelter. Or so he thought.</p>
+<p>He woke to smoke. Someone had fired the thatch. They fled. They
+should have found buckets and made a try of it, but they fled. He tried
+to pull them into some kind of order; they scattered anyway, shadows in
+the dark. Two fewer shadows came back, and one was left screaming
+somewhere behind them.</p>
+<p>And then silence.</p>
+<p>The rules were simple. Low fires. No prattle. Move when the wind
+rises.</p>
+<p>They moved.</p>
+<p>Shack to shack, hamlet to hamlet, tracing the river. The shadow took
+a man a day. Just one. And maimed another. They began leaving the maimed
+ones behind—alone and scared, to the shadow’s mercy.</p>
+<p>Now they were out of shelter, backed into a lazy eddy at the foot of
+a bluff. In an old mill that had quit turning when the river changed
+course.</p>
+<p>No fires.</p>
+<p>No sound.</p>
+<p>Just the smell of piss and fear.</p>
+<p>“Farrick,” a voice called from the hills. A woman’s voice. Close. Too
+close. He did not answer.</p>
+<p>“I’d promise to spare your boys, but that’s a lie.”</p>
+<p>Anger rose in him, and rage took what sense he had.</p>
+<p>“Who are you? What do you want?” he called. Brigands? Why send a
+woman?</p>
+<p>“It’s obvious,” the voice said, not kindly. Then silence.</p>
+<p>Then he knew. Not a woman. The woman. She had been haunting these
+hills for months. A flash of dull auburn, a glimpse of green cloth.
+Elf-touched, and carrying fire from some distant hell.</p>
+<p>“If your quarrel is with me, I’ll face you. Leave my boys.”</p>
+<p>“How noble.” The voice mocked him, closer still. “I’ll come to
+you.”</p>
+<p>“Fire! Torches!” he cried, but it was too late. The sound of broken
+thatch. A shadow dropped into the room. A knife took a boy in the
+shoulder; a thin dull sword arched and took another. Three rushed her.
+Two shrank back.</p>
+<p>Green fools.</p>
+<p>The three went down like wheat before a scythe. He didn’t see it
+clearly. Then it was him, two boys who’d wet themselves, and her between
+them and the door. And she took her time.</p>
+<p>“I yield!” he cried, lifting his sword. She stopped, and took a
+stance. “Mercy!” He threw it aside.</p>
+<p>“Pick it up. You are beyond my mercy.” She waited.</p>
+<p>He reached. The world went black as he lunged for the blade. And
+then—cold.</p>
+<h1 id="act-i">Act I</h1>
+<h2 id="chapter-one-half-in-advance">Chapter One: Half in Advance</h2>
+<p>The tavern was loud enough to hide in.</p>
+<p>Riarhin sat at the bar, in the shadow of the stair, with a whiskey
+she hadn’t paid for yet and a wet sack on the floor beside her stool.
+She had been there an hour. She would be there another.</p>
+<p>She did not look at the door. She had learned a long time ago that
+looking at the door is a thing people notice.</p>
+<p>Kolmar was neutral ground. That was the whole of its economy — a town
+on the Acasi side of the old border, where the Rothari kept a house and
+the Viterran interests kept a factor and neither of them kept a
+garrison. Neutral ground in Acasia meant you could sit in a tavern with
+a Rothari’s head in a sack and nobody would touch you for it until you
+were outside the walls.</p>
+<p>In Acasia, that was as close to law as law got.</p>
+<p>She intended to be outside the walls by morning.</p>
+<p>The three came in the way Rothari men came in anywhere — loud, and
+slow, and certain the room would make way. It did.</p>
+<p>Riarhin watched them in the mirror behind the bar, which was cracked
+and flyspecked and did the work well enough. At the edge of the mirror,
+in the shadow of the doorframe, a very large man leaned against the jamb
+with his arms crossed and did not move.</p>
+<p>Na’ar had been mistaken for the tavern’s muscle three times since
+they sat down. He had not corrected anybody. He found it funny, and
+Riarhin found it useful, and neither of them had discussed it.</p>
+<p>The Rothari took a table. They took a bottle. They looked for someone
+to bully, because that was the order of the evening, and found her.</p>
+<p>One of them noticed her first. Elbow, nod, grin. The other two
+turned.</p>
+<p>They saw the hair first — dull auburn, red enough to catch the
+lamplight and wrong for the room. Then the cloth, green, country-cut,
+nothing a woman in Acasia would wear unless she wanted to be looked
+at.</p>
+<p>Then the eyes.</p>
+<p>Green, or gray, or something between, depending on the light and the
+angle. Hazel at the edge, if you were close enough to see the edge. And
+near the iris, where the color should have gone quiet, it went the other
+way — a thin flare of gold, like a coal breathed on, like something
+behind the eye had turned its head and looked back.</p>
+<p>They saw it. She watched them see it.</p>
+<p>The big one — rings, good boots, the kind of man who has never once
+been told no by somebody smaller — put his hand on the bar beside her
+cup and leaned in.</p>
+<p>“Evening.”</p>
+<p>She hated Acasi. Silkstrand had given it a music and the hills had
+taken the music back out, left it flat and blunt and Vilikari in the
+bones, and she had never once heard it spoken without hearing both
+places at once.</p>
+<p>She drank her whiskey and did not answer.</p>
+<p>“Wet sack.” He nodded at the floor. “What’s in it?”</p>
+<p>She set the cup down.</p>
+<p>“Farrick. Or at least his head.”</p>
+<p>The man went still. Then his face did the thing she had seen before
+and always enjoyed — the half-second where the body hasn’t caught up to
+the news yet, and the rage arrives just behind the words.</p>
+<p>“He was my kin,” he hissed through his teeth.</p>
+<p>One of the others leaned in and said something in his ear. The big
+man shrugged him off like a coat.</p>
+<p>At the doorframe, Na’ar shifted his weight. It was a small movement.
+It was not a nervous movement. It was the movement of a man deciding he
+was not needed and hoping that changed.</p>
+<p>Riarhin lifted two fingers at the barmaid.</p>
+<p>“Round. On me.”</p>
+<p>The maid went. The men did not sit — not yet — but they did not leave
+either, and that was the tell. They stood with their hands loose and
+their weight forward and no notion of what they were waiting for.</p>
+<p>Riarhin picked up her cup and drank. She looked at the big one over
+the rim. She did not blink.</p>
+<p>It took about a minute. She watched it happen. Rage, then doubt, then
+the slow cold arrival of the arithmetic: she was sitting, she was calm,
+she had a sack on the floor with a Rothari’s head in it, and she had
+just bought them a drink.</p>
+<p>By the time the barmaid came back with the bottle and three cups, his
+face had gone from rage to unease and had settled there.</p>
+<p>The maid set the bottle down and got out of the way. She had done
+this before, or she was smarter than she looked, or both.</p>
+<p>“Drink.”</p>
+<p>The big man looked at her. He looked at the sack. Something moved in
+his face — stunned, then confused, then angry all over again, and this
+time it was the kind of angry that does something.</p>
+<p>He shifted his weight.</p>
+<p>The man beside him put a hand on his shoulder.</p>
+<p>Riarhin smiled.</p>
+<p>“Drink.”</p>
+<p>The smile went away.</p>
+<p>She kicked the sack. It moved, heavy, and settled, and something
+inside it knocked against the floorboards.</p>
+<p>“Or join your kin.”</p>
+<p>They drank.</p>
+<p>They poured with shaking hands and they drank, all three, and she
+watched them do it, and she did not touch her own cup.</p>
+<p>The door opened.</p>
+<p>Aryka Everblood came in like a woman who had bought the building and
+was considering whether to keep it.</p>
+<p>She was tall, gray at the temple, nearer fifty than forty and
+carrying it the way a soldier carries a scar — without comment. She wore
+good plain clothes cut by someone who knew her measurements, and a sword
+she had used, and a signet on her right hand that she did not bother to
+hide.</p>
+<p>The purse was on her, of course. It was always on her. Riarhin had
+known Aryka Everblood for two years and had never once seen her hand a
+purse to a servant or a factor or a guard. The woman carried her own
+money the way other people carried a weapon: because the moment you let
+someone else hold it, you had given something away.</p>
+<p>She walked in, took three steps, and stood where she could see the
+whole room. The four men with her spread out behind her without being
+told. They were not her guards. Riarhin knew the look of guards. These
+were men who worked for her and knew what happened to men who did
+not.</p>
+<p>The room noticed. The room had been noticing Aryka Everblood for
+eleven years.</p>
+<p>Her eyes found Riarhin first. Then the three Rothari. Then the sack.
+Then Na’ar, at the doorframe, and something flickered across her face —
+recognition, and a dry, private amusement, and something else that
+Riarhin did not bother to name.</p>
+<p>She had followed the bodies. Riarhin could see it in the way she
+stood. Aryka Everblood had walked into Kolmar behind a trail of dead
+Rothari boys, and she had done it with a smile, because that was what
+she did. Cold, mechanical, unhurried. The hatred was not hot in her. It
+had not been hot in years. It had been filed down and oiled and put to
+work.</p>
+<p>“What’s the affair?”</p>
+<p>The Rothari men had gone rigid. The big one’s hand had drifted
+halfway to his hip and stopped there, like a man who has just remembered
+where he is.</p>
+<p>Riarhin did not look at her.</p>
+<p>She lifted her cup.</p>
+<p>“To family.”</p>
+<p>They hesitated. Then they drank, because their hands were already on
+the cups, and because the alternative was on the floor.</p>
+<p>Riarhin set her cup down and turned on the stool.</p>
+<p>Then she switched.</p>
+<p>“Aryka,” she said, in Vhasian — hill Vhasian, the vowels flat where
+the hills flatten them and the <em>r</em> rolled back in the throat.
+“You’ll need to buy your own.”</p>
+<p>The three Rothari men looked at each other. They had not understood a
+word of it and they knew they hadn’t, and that was its own kind of
+message.</p>
+<p>Aryka’s eyebrows went up a fraction of an inch.</p>
+<p>And she answered in court Vhasian.</p>
+<p>Not the same tongue at all, when you heard them side by side. Hers
+came out round and unhurried, every vowel finished, the <em>r</em> soft
+as a courtier’s bow — Vhasian the way it was spoken in a nursery in
+Aberiel, with a tutor in the room and a queen listening from the
+passage. “And if I don’t?”</p>
+<p>Riarhin heard it and had to work to keep her face still.</p>
+<p>Twenty years in the hills and she had forgotten that was a thing
+people could do. That a woman could stand in a tavern in Acasia with a
+sack of Rothari head on the floor and ask and if I don’t like she was
+declining a second cup of tea.</p>
+<p>It was ridiculous. It was also, and she hated this, faintly
+charming.</p>
+<p>Riarhin stood, slowly, the way a person stands when she has nowhere
+to be and wants everyone to know it. She reached down and took the sack
+by the neck, and lifted it, and held it at shoulder height so Aryka
+could see it properly — the wet dark of it, the weight, the shape.</p>
+<p>And switched back.</p>
+<p>“After the bounty.”</p>
+<p>Aryka Everblood looked at the sack.</p>
+<p>She looked at the three Rothari, still holding their cups, still not
+breathing right. They had become furniture. They knew they had become
+furniture. There was nothing they could do about it, and Aryka was
+enjoying that fact so much that she did not bother to hide it.</p>
+<p>She looked at Riarhin, and at the gold in her eyes, and at the
+whiskey she still hadn’t paid for.</p>
+<p>And she laughed.</p>
+<p>Not a court laugh. Not a polite one. A real one, short and surprised
+and genuinely pleased — the laugh of a woman who has been in a lot of
+bad rooms and has just found something in this one worth the trip.</p>
+<p>“You,” she said.</p>
+<p>Still court Vhasian. Still round. Still a princess in a tavern, and
+either she couldn’t turn it off or she didn’t want to, and Riarhin
+genuinely could not tell which.</p>
+<p>Then Acasi again, for the bar, as she pulled out the stool two down
+from Riarhin’s.</p>
+<p>“Barkeep. Whiskey. And put it on my tab.”</p>
+<p>Riarhin sat back down. She set the sack on the floor between their
+stools.</p>
+<p>“Generous.”</p>
+<p>“I’m paying for the round. I’m not paying for your whiskey.”</p>
+<p>“You’re paying for the head. The whiskey’s a courtesy.”</p>
+<p>“I don’t do courtesies.”</p>
+<p>“No,” Riarhin said. “You don’t.”</p>
+<p>Aryka took the whiskey the barmaid brought and drank it without
+ceremony. She did not look at the three Rothari, who were still standing
+at the bar with their cups, still not sure whether the evening was over,
+still furniture.</p>
+<p>“Rulf,” she said, without turning. “You may go.”</p>
+<p>The big one — Rulf — opened his mouth.</p>
+<p>“Go,” Aryka said.</p>
+<p>He looked at her. He looked at Riarhin. He looked at the sack on the
+floor.</p>
+<p>He set his cup down and went. The other two followed him like the
+tide going out, and the door closed behind them, and the room got its
+noise back.</p>
+<p>At the doorframe, Na’ar uncrossed his arms and settled against the
+jamb again. He had not moved during any of it. He had simply been there,
+and now he was still there, and Riarhin could feel him being amused from
+twelve feet away.</p>
+<p>Aryka drank.</p>
+<p>“You took Farrick,” she said. Not a question.</p>
+<p>“I took Farrick.”</p>
+<p>“Good.”</p>
+<p>Riarhin shrugged. “He was in my way.”</p>
+<p>Aryka raised an eyebrow this time.</p>
+<p>Riarhin let a brief smirk touch her face before it went still
+again.</p>
+<p>Aryka looked at her for a long moment. Then she laughed again —
+shorter this time, more private, the laugh of a woman conceding a point
+she had already decided not to fight over.</p>
+<p>“You’re a difficult woman, Riarhin.”</p>
+<p>“I’ve been told.”</p>
+<p>“By people who are still alive?”</p>
+<p>“By people who are still alive.”</p>
+<p>The fire cracked. Somewhere behind them a man was losing badly at
+dice and complaining about it in Acasi, and a woman was laughing at him,
+and the room went on being a room.</p>
+<p>Aryka refilled both cups. She did it herself, which told Riarhin
+something — either she trusted the barmaid not to water it or she wanted
+her hands busy — and then she sat back and looked at the sack on the
+floor.</p>
+<p>“How long did you carry that?”</p>
+<p>“Six days.”</p>
+<p>“And nobody stopped you.”</p>
+<p>“Nobody would.”</p>
+<p>Aryka nodded slowly. She was looking at Riarhin the way a woman looks
+at a tool she has just discovered is sharper than she thought.</p>
+<p>“You know what he was,” she said. “Farrick. What he did at the
+hamlet.”</p>
+<p>“I know.”</p>
+<p>“And you know whose order he was acting on.”</p>
+<p>“I know that too.”</p>
+<p>“Then you know why I’m here.”</p>
+<p>Riarhin drank. “You’re here to pay me.”</p>
+<p>“Yes. And I’m here to pay you for the rest of them.”</p>
+<p>Aryka leaned back. She had the look of a woman who had been waiting
+for this conversation for a while and was enjoying finally having
+it.</p>
+<p>“There are four more,” she said. “The man who gave the order, and
+three hands who were at the hamlet with Farrick. I have a writ on all
+four. I have had the writ for eight months and I have spent those eight
+months discovering that my men are too loud, my name is too well known,
+and the hills above Cair do not care about either.”</p>
+<p>“So you need someone quiet.”</p>
+<p>“I need someone who can walk into those hills and come out with four
+heads.”</p>
+<p>“Go on.”</p>
+<p>“And I’ll pay well for it.”</p>
+<p>Riarhin turned the cup in her fingers. She did not look at Aryka. She
+looked at the whiskey, and at the fire behind the bar, and at nothing at
+all.</p>
+<p>“What’s the figure?”</p>
+<p>“Two hundred crowns for the man. Fifty each for the hands. Paid on
+delivery, here, in Kolmar, where the money means something.”</p>
+<p>Riarhin said nothing.</p>
+<p>She did not need the money. That was the thing Aryka did not know, or
+had not yet decided to notice. Riarhin had little need for silver and
+Na’ar had silver enough from his last job. They had been living lean in
+the hills for two years because there was nothing in the hills worth
+buying. She did not need two hundred crowns. She did not need fifty.</p>
+<p>But Aryka Everblood had asked her for something. And Aryka Everblood
+had asked her for something in Acasia, in the Acasi way, with a figure,
+like a woman buying a horse.</p>
+<p>“Three hundred for the man,” she said. “Seventy-five for the hands.
+Half in advance.”</p>
+<p>Aryka’s eyebrows went up. “Half in advance is not how this
+works.”</p>
+<p>“Then just the four.” Riarhin made to stand, slowly. “And we’ll be on
+our way.”</p>
+<p>Aryka gracefully made an idle gesture. Riarhin sat. Ever the
+princess.</p>
+<p>“You don’t trust me.” she said.</p>
+<p>“I don’t trust anybody,” Riarhin said. “You’re not special.”</p>
+<p>Aryka looked at her for a long moment. Then she reached inside her
+coat and pulled out the purse, and counted coins onto the bar — not all
+of them, but enough, and the sound they made was a sound Riarhin had not
+heard in a while and had not missed.</p>
+<p>“Half,” Aryka said. “In advance. And you bring me the man’s head
+first, before the others, because he’s the one I want, and I want him
+while he’s still frightened that the hands are dying.”</p>
+<p>“Those weren’t the terms offered.”</p>
+<p>“I’m changing the terms.”</p>
+<p>Riarhin looked at the coins and sighed.</p>
+<p>She took them.</p>
+<p>“North road,” she said. “Three days. Bring your own horse and don’t
+bring your men.”</p>
+<p>“I don’t take orders.”</p>
+<p>“You’re not taking orders. You’re being given an itinerary.”</p>
+<p>Aryka smiled. It was a real smile and it reached her eyes, which
+Riarhin had not expected, and she did not know what to do with it.</p>
+<p>“I like you,” Aryka said. “That’s inconvenient.”</p>
+<p>“It is.”</p>
+<p>Riarhin stood, slowly, and picked up the sack, and slung it over her
+shoulder like a bag of meal. At the doorframe, Na’ar straightened and
+fell in behind her, and Aryka watched him do it — watched the way he
+moved, big and fast and unhurried, a man who had been doing this for a
+long time and would do it for a long time more.</p>
+<p>“Ykrul,” Aryka said.</p>
+<p>Na’ar looked at her.</p>
+<p>“I’ve been to the Violet Steppe,” Aryka said.</p>
+<p>“I’ve been to Aberiel,” Na’ar smirked. His voice was rough.</p>
+<p>“Did you like it?”</p>
+<p>“No.”</p>
+<p>“Neither did I,” Aryka said, and it was a real answer and it landed,
+and Na’ar let out a deep laugh from his belly.</p>
+<p>Riarhin looked back over her shoulder. The gold in her eyes caught
+the lamplight for just a moment.</p>
+<p>“Three days,” she said. “The ford above Cair. Don’t be late. I don’t
+wait.”</p>
+<p>“I know,” Aryka said. “That’s what I’m paying for.”</p>
+<p>Riarhin walked out with Na’ar. The door closed behind them.</p>
+<p>Aryka Everblood sat alone at the bar for a moment, with two cups and
+a bottle and the noise of the room coming back around her. She looked at
+the empty stool where Riarhin had been sitting. She looked at the coins
+still on the bar, and the ones that had gone into a coat pocket, and she
+did the arithmetic she had been doing all evening and arrived at the
+same answer she had started with.</p>
+<p>She was grinning. She knew she was grinning. She had been grinning
+for the last ten minutes and had not been able to stop, and she was
+fifty years old and a princess of the blood and she had spent thirty
+years learning to control her face, and she could not stop.</p>
+<p>“Barkeep,” she said. “Another.”</p>
+<p>She did not pay for it. She put it on her own tab, and the barkeep,
+who had been keeping tabs in Kolmar for thirty years and knew exactly
+what that meant, wrote it down without a word.</p>
+<p>Acasia, she thought. A head in a sack, a warlord buying drinks for
+the woman who delivered it. Oh, and a trail of dead. It was going to be
+a fun ride in the morning.</p>
+<p>The fire cracked. The dice game went on. Somebody opened the door and
+let in the cold, and somebody else shouted at them to close it, and the
+night kept going the way nights do in a town that belongs to no one.</p>
+<h2 id="chapter-two-the-ford-above-cair">Chapter Two: The Ford Above
+Cair</h2>
+<p>Aryka came alone and she came early.</p>
+<p>Riarhin had been on the rise above the ford since the middle of the
+afternoon, and she had chosen the rise because it gave her the road for
+two miles in the direction Aryka would come from and one mile in the
+direction she would not. She had watched a carter water four mules, a
+boy drive geese across and lose one, a man walk south with a door on his
+back. None of them had looked up.</p>
+<p>Aryka rode into the water at the shallow end, let the horse drink,
+and then sat in the saddle looking directly at the place where Riarhin
+was lying.</p>
+<p>“I can see your boot,” she said.</p>
+<p>Riarhin looked at her boot. It was where she had put it, behind a
+stone, in shade.</p>
+<p>“No you can’t.”</p>
+<p>“No,” Aryka agreed. “But you’ve moved now.”</p>
+<p>Riarhin came down the slope. She had been three days above Cair and
+had not spoken to anyone but Na’ar, who did not require it, and the
+sound of her own voice in Vhasian was briefly unfamiliar.</p>
+<p>Aryka had brought one horse, a spare, a bedroll, and a bag that did
+not look large enough to hold what a woman of her sort would consider
+necessary. No men. She had done exactly as she had been told and had
+contrived to look as though she had thought of it herself.</p>
+<p>“Where’s the Ykrul?”</p>
+<p>“Behind you.”</p>
+<p>Aryka did not turn around to check, which Riarhin marked.</p>
+<hr />
+<p>They rode north until the light went, and then Aryka kept riding.</p>
+<p>Riarhin had expected to stop. She had chosen a place to stop, a fold
+below a stand of thorn with water at the bottom of it, and she had been
+carrying the place in her head since noon the way she carried such
+places. At dusk she said so.</p>
+<p>“There’s water at the bottom of the next fold.”</p>
+<p>“Is there water at the top of the pass?”</p>
+<p>“Yes.”</p>
+<p>“Then we’ll use that.”</p>
+<p>They came over the pass at full dark with the horses walking and the
+stones moving under them, and Aryka got down and unsaddled and lay in
+her cloak on the ground like a woman who had been doing it for thirty
+years, because she had.</p>
+<p>Na’ar looked at Riarhin. Riarhin looked back at him. Neither of them
+said anything, and in the morning Aryka was up before either of them,
+sitting on a rock with her boots off, going over her feet with her
+thumbs for hot places before they became blisters.</p>
+<p>It was a small thing. Riarhin had seen perhaps six people in her life
+do it without being told to.</p>
+<p>“You’ve done this,” she said.</p>
+<p>“Thirty-one years.” Aryka pulled the boot on. “Not lately. The knees
+have an opinion.”</p>
+<p>“And the men you left in Kolmar?”</p>
+<p>“Will be drunk for two days and useful on the third.” She stood,
+tested the foot, and found it acceptable. “They’re not for the hills. I
+told you that and I meant it and I would rather you believed me the
+first time, because we’re going to be doing this for a month and I
+dislike repeating myself.”</p>
+<p>“So do I.”</p>
+<p>“Good.”</p>
+<hr />
+<p>The country above Cair was not empty; it was emptied.</p>
+<p>Riarhin knew the difference and did not explain it. Empty ground has
+no paths in it. This ground had paths, and stock walls with the stone
+robbed out of the gaps, and one hamlet with the thatch fallen in and a
+plum tree still bearing beside the door. Somebody had taken the fruit.
+There were stones under the tree where they had thrown at the high
+branches.</p>
+<p>She got down and looked at the stones.</p>
+<p>“Four days,” she said. “Perhaps five. Two of them, one small.”</p>
+<p>Aryka came up beside her and looked at the same stones and saw,
+Riarhin could tell, stones.</p>
+<p>“You can have that from thrown rock?”</p>
+<p>“I can have it from the grass where they stood and the grass where
+they didn’t.” She pointed, and Aryka followed the finger, and then did
+something Riarhin had not expected: she squatted down, put her hand flat
+where the grass had been pressed, and left it there until she had
+understood it.</p>
+<p>“Say the rest.”</p>
+<p>“They came from the south and left north and they weren’t afraid.
+They ate the plums here, in the open, in daylight.” Riarhin stood.
+“Which means nobody is living within a half-day of us who would have
+taken the tree first.”</p>
+<p>“Which means the hamlet below is gone as well.”</p>
+<p>“It means nobody has been hungry here since the spring.”</p>
+<p>Aryka thought about it. She did not say <em>good</em> and she did not
+say <em>how terrible</em>. She said, “Then the men we want are being fed
+from somewhere that isn’t here,” and got back on her horse.</p>
+<p>Riarhin found that she had been waiting to be complimented, and that
+not being complimented was better, and she was annoyed about both.</p>
+<hr />
+<p>On the fourth day she left them.</p>
+<p>She did not announce it. She had said, at the water, that the road
+bent east around a shoulder of rock and that she wanted to see the other
+side of the shoulder, and Aryka had said fine, and then Riarhin had not
+come back for a day and a half.</p>
+<p>Na’ar built a fire, which he was not supposed to do, and cooked,
+which he was very good at, and answered Aryka’s questions about the
+Violet Steppe in his own time, and did not once suggest going to
+look.</p>
+<p>When Riarhin came down off the rock at the second dusk, Aryka was
+sitting with her back against a stone and her sword across her knees,
+and she waited until Riarhin had eaten before she spoke.</p>
+<p>“Don’t do that again.”</p>
+<p>“I found the house.”</p>
+<p>“I know you found the house. You have the look.” Aryka turned the
+sword over. “Don’t do it again without telling me how long. Not because
+I need to give you permission. Because if you are three days gone I have
+to decide whether you are dead, and I will decide wrong, and then I will
+do something expensive.”</p>
+<p>Riarhin considered several answers. She had used all of them before
+on people with more right to hear them.</p>
+<p>“Two days,” she said. “If I’m longer than two days, I’m not
+coming.”</p>
+<p>“Thank you.”</p>
+<p>“That isn’t an agreement about permission.”</p>
+<p>“No,” Aryka said. “It’s an itinerary.”</p>
+<p>Na’ar laughed into the fire.</p>
+<hr />
+<p>The house was a stone tower with a hall built onto it, forty years
+newer than the tower and worse made, and it had eleven men in it and a
+woman who cooked and a boy who took the horses.</p>
+<p>Riarhin lay on the slope above it for six hours and did not move.</p>
+<p>This was the part nobody understood, and she had long ago stopped
+explaining it. Waiting was not the absence of the work. The work was the
+six hours. In the first hour she had the walls and the doors. In the
+third she had the rotation — two men, changed at what she judged to be
+the fourth hour of the watch, one of them always the same man, which
+meant he was either trusted or being punished. In the fifth hour the boy
+came out and emptied something and went back, and that told her where
+the kitchen drain ran, and where the ground would be soft, and that the
+boy was allowed out after dark.</p>
+<p>In the sixth hour a man came out onto the step, looked at the hills
+for a while, and spat.</p>
+<p>She had his face. She had his gait and the set of his shoulders and
+the particular way he put his weight on the outside of the left foot.
+She had the ring on his hand, and she would have it in a year, and in
+ten.</p>
+<p>Then she came down off the slope and told Aryka that the man who had
+given the order was in the tower, and that it would take four days.</p>
+<p>“Four days for one man?”</p>
+<p>“Four days for one man and no fighting.”</p>
+<p>Aryka looked at the hills, and at the dark where the tower was, and
+at Riarhin.</p>
+<p>“And if I said I wanted it tomorrow?”</p>
+<p>“Then you’d have eleven men and a boy,” Riarhin said, “and one of
+them would get out, and we’d spend the rest of the month on the
+hands.”</p>
+<p>Aryka smiled slowly. It was the smile of a woman putting something
+away in a place she would be able to find it again.</p>
+<p>“Four days,” she said.</p>
+<h2 id="chapter-three-under-the-plum-tree">Chapter Three: Under the Plum
+Tree</h2>
+<p>It took five.</p>
+<p>On the second day the boy came out after dark to empty the slops and
+Riarhin was standing at the end of the drain where the ground was
+soft.</p>
+<p>He was perhaps eleven. He had a bucket in both hands and he saw her
+and did not drop it, which was interesting, and did not shout, which was
+more interesting still.</p>
+<p>“Whose are you?” she asked in Acasi.</p>
+<p>He looked at the hills behind her. He was working out whether there
+were more of her.</p>
+<p>“Tacen’s.”</p>
+<p>“Tacen is the one with the ring.”</p>
+<p>“Tacen is the one with the ring.”</p>
+<p>“Are you his?”</p>
+<p>The boy took a moment over it. Then he said, “I’m the horses’,” and
+Riarhin decided she was not going to have to do anything about the
+boy.</p>
+<p>“Where do the horses’ hay come from?”</p>
+<p>“Sedris. Cart every ninth day.”</p>
+<p>“And when did the cart last come?”</p>
+<p>“Six days.”</p>
+<p>She gave him a copper, which he did not want and took anyway, because
+a boy who refuses money has to explain himself later.</p>
+<p>“You didn’t see me.”</p>
+<p>“I didn’t see you.”</p>
+<p>“You did,” she said. “Tell them on the ninth day. Not before.”</p>
+<p>He thought about that and then he understood it, and she watched him
+understand it, and it was the last easy thing that happened at the
+tower.</p>
+<hr />
+<p>The cart came on the ninth day, which was the fifth day of the four
+she had promised, and Riarhin was under it.</p>
+<p>She had walked six miles to Sedris, found the yard, found the carter,
+and established in one conversation about axle grease that he was paid
+by the load and not by the hour and that he stopped twice on the road up
+because the second hill was cruel to the mule.</p>
+<p>Between the first stop and the second she got under the bed and put
+her back against the boards and her boots against the axle tree and rode
+up to the tower that way, with the sword left in the thorn above Sedris,
+because a sword on the back does not fit under a cart, and Toothpick in
+her boot where it always was.</p>
+<p>The gate opened. The mule went through. The boy came for the
+mule.</p>
+<p>Nobody looks under a cart they have been expecting for nine days.</p>
+<p>She let the yard empty. Then she came out on the far side, into the
+space between the cart and the hall wall, and stood up, and walked in
+through the kitchen door like a woman who lived there.</p>
+<p>The woman who cooked was at the fire. She turned around with a spoon
+in her hand and looked at Riarhin, and Riarhin put a finger against her
+own lips, and the woman looked at her for a long moment and then turned
+back to the fire and went on stirring.</p>
+<p>Riarhin went up the stair.</p>
+<hr />
+<p>Tacen was writing.</p>
+<p>That was the thing she had not expected and would remember: a man at
+a table with a pen, in a cold room, doing sums in a ledger with his coat
+over his shoulders and his tongue between his teeth.</p>
+<p>He looked up.</p>
+<p>He had time to put his hand on the table. He did not have time to do
+anything else, because she had not come up the stair to talk to him, and
+Toothpick was already out of her boot and moving before he had finished
+turning his head.</p>
+<p>He went over backwards with the chair.</p>
+<p>She stood and listened. The house went on being a house. Downstairs a
+man laughed at something, and somewhere a door closed, and nobody
+came.</p>
+<p>Riarhin looked at the ledger for a while.</p>
+<p>It was a household book. Grain, hay, wages, a dispute about a horse.
+On the ninth page there was a list of eleven names with figures beside
+them and four of the figures had been struck through and written again
+higher, and the date beside the change was two weeks after the
+hamlet.</p>
+<p>He had paid them more afterwards.</p>
+<p>She tore out the page and put it inside her coat. Then she did the
+work she had come for, and wrapped it, and went out through the kitchen,
+and the woman at the fire did not turn round.</p>
+<p>Riarhin stopped in the doorway.</p>
+<p>“There’s a boy in the stable.”</p>
+<p>The spoon kept moving.</p>
+<p>“He’ll be blamed,” Riarhin said.</p>
+<p>The woman stopped stirring. She did not look up, and she spoke to the
+pot.</p>
+<p>“Then take him to the Sedris road and put him on the cart, and I’ll
+say the both of you went over the wall, and there’ll be nothing to blame
+him for.”</p>
+<p>Riarhin went to the stable.</p>
+<hr />
+<p>Aryka was standing when she came down out of the trees, which meant
+she had been standing for some time.</p>
+<p>Riarhin put the wrapped thing on the ground between them and did not
+make a performance of it.</p>
+<p>Aryka looked at it. Then she looked past Riarhin at the boy, who had
+stopped at the edge of the firelight and was holding the mule.</p>
+<p>“What’s that?”</p>
+<p>“That’s the horses’.”</p>
+<p>Aryka’s eyebrows went up. Riarhin waited for the argument, and had
+three answers ready, and discovered that she needed none of them,
+because Aryka simply said, “Na’ar. Feed him,” and squatted down and
+began to unwrap the head to be certain of the face.</p>
+<p>She was certain of it. She had been carrying the face for eight
+months.</p>
+<p>Then she sat back on her heels and stayed there a while longer than
+the work required.</p>
+<p>“Five days,” she said.</p>
+<p>“Five days.”</p>
+<p>“You said four.”</p>
+<p>“The cart came on the ninth day.”</p>
+<p>Aryka laughed once, without much in it, and wrapped the head
+again.</p>
+<p>“I have wanted this,” she said, “since the fourth of Maiora, and I
+find I have nowhere to put it.”</p>
+<p>Riarhin sat down across the fire from her. The boy was eating with
+both hands and Na’ar was watching him eat with the satisfaction of a man
+watching weather improve.</p>
+<p>“Put it in the sack,” she said. “It travels better.”</p>
+<h2 id="chapter-four-the-hands">Chapter Four: The Hands</h2>
+<p>Aryka wanted them frightened first, and Riarhin gave her that, and
+afterwards was not sure it had been a kindness to anybody.</p>
+<p>The three hands were at Vethric’s yard, eleven miles east, and they
+knew by the fourth day that Tacen was dead because a man came up from
+Sedris with the news and the news had a shape to it: no fight, no siege,
+nobody heard anything, the cook says two of them went over the wall. By
+the fifth day they had moved into the yard’s loft and set a watch. By
+the seventh they had begun to disagree about whether to go south.</p>
+<p>Riarhin did not touch them for nine days.</p>
+<p>What she did was smaller. She took a horse out of the paddock on the
+second night and left the gate open, and the horse came back on its own,
+and the men spent a morning deciding whether it had ever been gone. On
+the fourth night she cut one strap on each of four saddles, halfway
+through, from the inside. On the sixth she left a fire on the ridge
+where they could see it and sat a hundred yards from the fire watching
+the man who came to look at it.</p>
+<p>On the eighth night one of the three walked out of the yard in the
+dark with a bag and did not tell the others.</p>
+<p>Riarhin let him get four miles.</p>
+<hr />
+<p>He was called Parrin and he had a wife in Sedris and he was crying
+before she asked him anything, which made it slower rather than
+faster.</p>
+<p>She sat him down against a rock with his own knife on the ground
+between them where he could reach it, which is a thing that stops a man
+reaching for it.</p>
+<p>“You were at the hamlet.”</p>
+<p>“I was at the hamlet.”</p>
+<p>“What did you do there?”</p>
+<p>He told her. He took a long time about it and he did not make himself
+better than he had been, which she had not expected, and twice he
+stopped and said <em>I don’t know why</em> in a way that she
+believed.</p>
+<p>When he had finished she asked him where the other two slept and
+which of them held the watch after midnight, and he told her that
+too.</p>
+<p>Then he asked whether he was going to die.</p>
+<p>“Yes.”</p>
+<p>He put his face in his hands. After a while he asked if she would
+tell his wife it had been quick.</p>
+<p>“I’m not going to Sedris.”</p>
+<p>“Then—”</p>
+<p>“I’ll tell the boy at the yard to say it was quick,” Riarhin said.
+“He’ll say it. And she’ll know he was told to say it, because everybody
+is always told to say it, and she’ll believe it anyway, because people
+do.”</p>
+<p>Parrin thought about this. He seemed to find it better than
+nothing.</p>
+<p>She let him say what he wanted to say first. It took a while. Then
+she drew Toothpick and did it behind the ear, from the side, while he
+was still talking, because a man who has finished talking has to be
+waited on and she had decided years ago that this was a cruelty she
+would not perform.</p>
+<hr />
+<p>The other two she did in the loft on the tenth night, and it was not
+clean, and one of them got to the ladder.</p>
+<p>He got to the ladder because the second one was awake when he should
+not have been, sitting in the dark with a bow across his knees and no
+fire and no light, which was better practice than either of them had
+shown in nine days. He put an arrow into the roof beam eight inches from
+Riarhin’s head and then she was across the boards and inside the length
+of the bow with Toothpick, and close work in a loft with hay on the
+floor is not a thing anyone plans.</p>
+<p>She took a broken tooth out of it and a cut along the ribs that she
+did not notice until the morning.</p>
+<p>The one at the ladder she shot from the loft door as he crossed the
+yard, which was a poor shot and took him through the hip, and she had to
+go down and finish it in the mud with the knife, with the dogs barking
+and a light going on in the farmhouse fifty yards away.</p>
+<p>She was on the ridge before anyone came out.</p>
+<hr />
+<p>Aryka looked at the ribs and then at Riarhin’s mouth.</p>
+<p>“Open.”</p>
+<p>“It’s a tooth.”</p>
+<p>“Open.”</p>
+<p>Riarhin opened her mouth. Aryka put a thumb on her jaw and turned her
+head towards the fire and looked in there with the frank disinterest of
+a woman looking at a horse.</p>
+<p>“Back left. You’ll want that out before it goes bad.”</p>
+<p>“It’ll grow.”</p>
+<p>Aryka’s hand stopped.</p>
+<p>She did not say anything. She let go of Riarhin’s jaw, sat back, and
+reached for the cloth and the flask, and began cleaning the cut along
+the ribs as though nothing had been said, and Riarhin let her, and
+neither of them came back to it that night or ever.</p>
+<p>Na’ar put more wood on the fire.</p>
+<hr />
+<p>The heads went into the sack and the sack went onto the spare horse,
+and they came down out of the hills on the second of Verrus with the
+rain coming sideways.</p>
+<p>“Nine days,” Aryka said, at the ford.</p>
+<p>“Nine days of nothing. One night of it.”</p>
+<p>“Yes. I watched you do the nothing.” Aryka wiped her face with the
+back of her wrist. “That’s the part I paid for and I didn’t know it when
+I paid.”</p>
+<p>Riarhin did not answer. Across the water Na’ar had got down and was
+leading his horse, because the stones were bad and he was the heaviest
+of them, and he was singing something in Ykrul with two notes in it.</p>
+<p>“You could have taken the three in one night,” Aryka said. “The first
+night. Before they knew about Tacen.”</p>
+<p>“Yes.”</p>
+<p>“Why didn’t you?”</p>
+<p>“You asked for them frightened.”</p>
+<p>Aryka was quiet for a stride or two.</p>
+<p>“I did,” she said. “I’d forgotten I’d said it.”</p>
+<p>“I hadn’t.”</p>
+<h2 id="chapter-five-paid-in-full">Chapter Five: Paid in Full</h2>
+<p>Kolmar had not improved in a month.</p>
+<p>They came in on the north road with the sack on the spare horse and
+the whole town knew before they reached the square, because a boy had
+run ahead, because a boy always runs ahead.</p>
+<p>The Rothari house on the east side of the square had its shutters
+closed. Riarhin looked at the shutters on the way past and did not slow
+down.</p>
+<p>Aryka paid her in the same tavern, at the same bar, in front of the
+same barkeep, and she did it loudly enough that the room could hear it
+and slowly enough that the room could count it. Three hundred for Tacen.
+Seventy-five each for the hands. Less the half already paid.</p>
+<p>She laid the last of it out in stacks and pushed them across.</p>
+<p>“Count it.”</p>
+<p>“I don’t need to count it.”</p>
+<p>“Count it anyway. I want the barkeep to see you count it.”</p>
+<p>Riarhin counted it. It came to what it should have come to, which she
+had known from the sound.</p>
+<p>“Done,” Aryka said.</p>
+<p>“Done.”</p>
+<p>And that was the commission finished, and the writ discharged, and
+the eight months of Aryka Everblood’s business in the hills above Cair
+concluded, and there was nothing further between them.</p>
+<p>Aryka bought a bottle and did not leave.</p>
+<hr />
+<p>Riarhin had expected the leaving to happen the next morning.</p>
+<p>It did not happen the next morning. It did not happen on the day
+after, when Aryka spent four hours with a factor about something that
+was not explained, or on the day after that, when she paid off two of
+her four men and sent them south with a letter and kept the other
+two.</p>
+<p>On the fourth morning Riarhin found her in the stable yard having a
+shoe looked at.</p>
+<p>“You’ve somewhere to be,” Riarhin said.</p>
+<p>“I have somewhere I’m not going.”</p>
+<p>“That’s a different thing.”</p>
+<p>“It is.” Aryka watched the farrier work. “Where are you going?”</p>
+<p>“South. Eventually.”</p>
+<p>“Eventually.”</p>
+<p>“I have a thing to find first and I don’t know where it is.”</p>
+<p>Aryka nodded as though that were an ordinary answer, and Riarhin
+realised with some irritation that to a woman who had spent eight months
+in a country that did not care who she was, it probably was.</p>
+<p>“Well,” Aryka said. “I’m not doing anything.”</p>
+<p>“You don’t have to come.”</p>
+<p>“I know.”</p>
+<p>Riarhin heard loneliness in it, and filed it, and was wrong.</p>
+<hr />
+<p>Na’ar was pleased, which required no investigation.</p>
+<p>He had been pleased in the hills, and he was pleased in Kolmar, and
+he would be pleased on any road that had an end further away than this
+one. Riarhin had been travelling with him for a year and four months and
+had never once had to ask him whether he minded.</p>
+<p>She found him at the horse trough with Aryka’s two remaining men,
+teaching them a game with three stones and no rules that either of them
+could establish.</p>
+<p>“She’s coming,” Riarhin said.</p>
+<p>Na’ar moved a stone. One of the men made a sound of protest.</p>
+<p>“Good,” he said.</p>
+<p>“You don’t know why.”</p>
+<p>“No.” He moved another stone, and the second man laughed, and the
+first man swore. “Do you?”</p>
+<p>Riarhin thought about it on the way back across the yard and had not
+arrived anywhere by the time she got there.</p>
+<h2 id="chapter-six-what-he-was-looking-for">Chapter Six: What He Was
+Looking For</h2>
+<p>Riarhin had four pieces of paper and she had been carrying them for
+two years.</p>
+<p>She laid them out on the table in the room above the tavern because
+Aryka had asked what she was looking for, and because after a month in
+the hills the question had been asked in a way that made refusing it
+more trouble than answering.</p>
+<p>The first was a copy in her own hand of an entry in a clerk’s
+catalogue: an account of the Himadri temple, two leaves inserted in
+another hand, a drawing of green glass in a brass frame, and a dispute
+about whether the leaves were old enough to justify the price. The
+second was a dealer’s name and the name of a forwarding house on the
+southern coast. The third was a letter from that forwarding house,
+eighteen months old, regretting that the volume described had been
+consigned onward and that their instructions did not permit them to say
+to whom. The fourth was a list of six names in Oshiira, of which four
+were confirmed dead and one had never existed.</p>
+<p>Aryka read all four. She took her time.</p>
+<p>“This is nothing,” she said.</p>
+<p>“Yes.”</p>
+<p>“You’ve had two years.”</p>
+<p>“I’ve had two years and a dealer who died in Verrus of the year
+before last, and a forwarding house that keeps its instructions, and a
+correspondent in Oshiira who may be a man or may be a way of signing
+letters.” Riarhin put her hand flat on the four sheets. “And a
+word.”</p>
+<p>“Kalrantha.”</p>
+<p>“Kalrantha.”</p>
+<p>Aryka sat back. “What is it?”</p>
+<p>“I don’t know.”</p>
+<p>“What do you think it is?”</p>
+<p>“I don’t know that either. It’s in three northern books and in all
+three it’s the same paragraph, copied. Green glass in a brass frame, out
+of the Himadri, and a wish with a clause folded into it.” She could have
+said all three word for word and did not. “Which is a rumour wearing a
+description.”</p>
+<p>“That’s somebody else’s line.”</p>
+<p>Riarhin looked up.</p>
+<p>“You said it the way a person says a thing they were told,” Aryka
+said. “Whose?”</p>
+<p>“A man who spent money on it for years and never got it.”</p>
+<p>“And where is he?”</p>
+<p>“In the ground above a dry well, with his brothers’ knives.”</p>
+<p>Aryka was quiet for a while. She turned the forwarding house’s letter
+over and looked at the back of it, which was blank, as Riarhin had
+looked at the back of it perhaps forty times.</p>
+<p>“So he wanted it, and couldn’t have it, and that’s your reason.”</p>
+<p>“He was careful about what he wanted.”</p>
+<p>“That’s not a reason. That’s a recommendation.”</p>
+<p>“It’s enough,” Riarhin said. “He’s dead. What he was interested in
+didn’t die with him. Better I find it before the next careful man
+does.”</p>
+<p>It was an excellent reason. She had been using it for two years and
+it had never once let her down, and she noticed, saying it aloud to a
+woman who had been paying attention for a month, that it did not sound
+quite the way it sounded in her head.</p>
+<p>Aryka did not pick at it. That was worse.</p>
+<hr />
+<p>Later, when Aryka had gone down, Riarhin sat with the four sheets and
+did not put them away.</p>
+<p>She had been moving since the crossing. Work, road, town, another
+problem, another man who wanted killing, another fire, another morning.
+She had become very good at leaving, and she could remember the order of
+it: leaving had been freedom for a while, and then it had been staying
+alive, and then it had been a habit, and habits do not announce the day
+they change over.</p>
+<p>What she had noticed lately — not thought about; noticed, the way she
+noticed a ford she did not intend to use — was that the road had begun
+to feel like standing still.</p>
+<p>Kalrantha was not a road.</p>
+<p>It was a thing to find.</p>
+<p>She folded the four sheets and put them inside her coat and did not
+examine why that mattered.</p>
+<hr />
+<p>There was a fifth piece of paper and it was not on the table.</p>
+<p>It had come to her at Vethric two years before, forwarded four times,
+and it was three lines in a clerk’s hand telling her that the Duke of
+the Belworth’s condition was unchanged and that the young gentleman had
+arrived and been received.</p>
+<p>Unchanged, in the spring of that year, had meant alive.</p>
+<p>She had not written back. There had been nothing to write that was
+not a question, and the honest form of the question was <em>is he dead
+yet</em>, and she had not been able to find a way to put that on paper
+to a household that would have to read it aloud to somebody.</p>
+<p>Two years was long enough that the answer had stopped being news and
+become a fact she did not have.</p>
+<p>She knew exactly how many days it had been. She had never once
+counted them on purpose.</p>
+<h2 id="chapter-seven-have-some-soup">Chapter Seven: Have Some Soup</h2>
+<p>The witch was in a hamlet called Ossen Fold, and she was dying, and
+she had sent for Riarhin by name.</p>
+<p>That was the part that got Riarhin up the valley. Not the sending —
+people sent for her; it was how she was paid. The name. She had been in
+Acasia under four arrangements of her own name and none of them had
+reached this valley, and the woman at the bottom of the track had said
+<em>she’s expecting the elf-touched one with the green cloth</em> in the
+flat tone of somebody repeating an instruction she did not enjoy.</p>
+<p>Aryka wanted to come in. Riarhin told her to wait at the wall.</p>
+<p>“Why?”</p>
+<p>“Because there’s one door.”</p>
+<p>Aryka looked at the house. It was stone to the window-line and turf
+above, with a bush of something grown up over the south side and a
+thread of smoke coming out of the roof rather than a chimney.</p>
+<p>“And if I hear a noise?”</p>
+<p>“Then I’ll be making it.”</p>
+<hr />
+<p>Inside it was dark and warm and smelled of wet wool, mutton fat, and
+the flowering herb that Riarhin had last smelled in a room above a
+courtyard in Silkstrand where a woman had been made comfortable enough
+to die slowly.</p>
+<p>The witch was on a box bed against the far wall with her legs under a
+horse blanket. She was old in the way that has nothing to do with years:
+skin gone papery at the wrists, the whole architecture of her face
+resettled around the bones. Her eyes were entirely present.</p>
+<p>There was a pot over the fire, and a bowl beside it, and a stool.</p>
+<p>“Sit down,” the witch said in Acasi. “You’re standing where the
+draught is.”</p>
+<p>Riarhin did not sit down. She looked at the room first: the one door,
+the window shuttered and pegged from inside, a hook, a broom, a rack of
+drying stalks, a box under the bed with the lid not quite closed. Then
+she sat on the stool, which put her back to the door, and she moved the
+stool until it did not.</p>
+<p>The witch watched her do all of it without comment.</p>
+<p>“You know my name,” Riarhin said.</p>
+<p>“I know four of them.”</p>
+<p>“Who from?”</p>
+<p>“A woman in Sedris whose sister is married in Cair, who had it from a
+carter who had it from a boy who was taken out of a stable on a hay cart
+in Verrus.” The witch’s mouth moved. “You want it to have been
+sorcery.”</p>
+<p>“No,” Riarhin said. “That would have been less trouble to fix.”</p>
+<p>“Ha.”</p>
+<p>The old woman shifted herself higher against the wall. It cost her,
+and she did it without asking for help, and Riarhin did not offer
+any.</p>
+<p>“I’m dying.”</p>
+<p>“Yes.”</p>
+<p>“Say it back to me properly. People go soft at this part and then I
+have to do it twice.”</p>
+<p>“You’ll be dead in two days,” Riarhin said. “Three if the weather
+turns and you’re stubborn about it.”</p>
+<p>The witch smiled with real pleasure.</p>
+<p>“Good. Then we can trade.”</p>
+<hr />
+<p>“I want you to save my daughter,” the witch said.</p>
+<p>Riarhin did not answer at once. She had come up the valley for a name
+and a rumour and she had expected to be sold something.</p>
+<p>“Where is she?”</p>
+<p>“Ah.” The witch’s finger came up. “That’s a different question and it
+costs more.”</p>
+<p>“What do you have that I want?”</p>
+<p>“I know where Kalrantha is not.”</p>
+<p>Riarhin sat very still. It was, she thought afterwards, the most
+skilful thing anybody had said to her in two years, because a woman who
+says <em>I know where it is</em> is selling and a woman who says <em>I
+know where it is not</em> has already read your papers.</p>
+<p>“Go on.”</p>
+<p>“Not in the north. Not in the Himadri, whatever your three books say.
+And not in any hand that would answer a letter.” The witch let that sit.
+“And I know the name of the house that had the account, and the city it
+stands in, and I’ll give you the wording exactly, because the wording is
+the whole of it and it will do you no good at all if you get it
+wrong.”</p>
+<p>“Tell me how to find Kalrantha,” Riarhin said, “and I’ll find the
+girl.”</p>
+<p>The witch looked at her for a long moment.</p>
+<p>Then she said: “Have some soup.”</p>
+<hr />
+<p>Riarhin looked at the pot.</p>
+<p>She knew what a pot on a fire in a witch’s house was worth and she
+knew four ways to be certain of it and she had used all four, in other
+rooms, on other nights, and she was tired in a way that had nothing to
+do with the last nine days.</p>
+<p>She got up, and took the bowl, and filled it, and ate it
+standing.</p>
+<p>It was mutton and barley and something sour she could not place, and
+it was very good, and there were three pieces of meat in it, which for a
+woman two days from dying was not a small thing to put in a pot for a
+stranger.</p>
+<p>The witch watched her finish. She watched the way a woman watches a
+seam go in.</p>
+<p>When Riarhin set the bowl down, the old woman said:</p>
+<p>“Say you’ll find the girl.”</p>
+<p>“You haven’t given me the wording.”</p>
+<p>“Say it.”</p>
+<p>Riarhin looked at the bowl. Then at the fire. Then at the door, which
+was where the draught was.</p>
+<p>“I will find the girl,” she said.</p>
+<p>The witch smiled.</p>
+<p>Riarhin did not.</p>
+<hr />
+<p>She got the wording. She got it four times, and made the old woman
+say it four times, and the fourth time it came out the same as the
+first, which was how Riarhin knew it had been learned and not
+composed.</p>
+<p><em>The counting house, in Silkstrand. But you must go by the
+counting house.</em></p>
+<p>“By it.”</p>
+<p>“By it.”</p>
+<p>“Not into it.”</p>
+<p>“I have said the words,” the witch said, “and I will not improve
+them, and if you go into it you will find clerks and a ledger and a man
+who is sorry he cannot help, and that will be the end of your two
+years.”</p>
+<p>“And the girl?”</p>
+<p>“Is at the shieling above the burnt wood. Four hours north, and then
+up.”</p>
+<p>“How old?”</p>
+<p>The witch’s face did something then that Riarhin would think about
+for a long time afterwards, and could not have named, and did not try
+to.</p>
+<p>“Nine,” she said. “Twenty-two years ago.”</p>
+<hr />
+<p>She died in the night, before the two days, which Riarhin had allowed
+for.</p>
+<p>Riarhin was sitting on the stool with her back not to the door when
+it happened, and there was no last word and no instruction, only the
+breath going wrong and then going out, and the room being the same room
+afterwards with one less thing in it.</p>
+<p>She sat for a while.</p>
+<p>Then she felt it: a pressure, quite specific, closing around her
+throat, not tight enough to interfere with breathing and not loose
+enough to be imagined. She put two fingers against her neck. There was
+nothing there.</p>
+<p>She had felt a rope and she had felt a hand and she had felt a
+bowstring and this was none of those.</p>
+<p>It was finer than that.</p>
+<p>She went out to the wall and told Aryka the old woman was dead, and
+did not mention her throat, and did not touch it again where anyone
+could see.</p>
+<h2 id="chapter-eight-wyllmonts-shadow">Chapter Eight: Wyllmont’s
+Shadow</h2>
+<p>They went north because Riarhin had said a sentence in a dark room
+and could not now get out of it.</p>
+<p>Four hours north and then up meant two days in that country, and the
+two days were how she learned what Aryka Everblood actually was, which
+was not what the hills had told her and not what Kolmar had told her
+either.</p>
+<p>It came out in pieces, the way it does when nobody is asking.</p>
+<hr />
+<p>The first piece came at a wall, where they stopped because the horses
+had had enough of the stones.</p>
+<p>Aryka sat down on the wall and put her hands on her knees, and out of
+nothing she said, “I could have taken her when she was twenty.”</p>
+<p>“Who?”</p>
+<p>“Veralyn.”</p>
+<p>Riarhin waited.</p>
+<p>“She had the height on me. She has always had the height on me and
+there is nothing to be done about height.” Aryka turned her hand over
+and looked at the palm. “But at twenty I was the stronger. I know that.
+She knows it. It never mattered, because there was no room in Viterra
+for a woman to be the stronger in a way anybody had to write down.”</p>
+<p>“Vhasia would have written it down.”</p>
+<p>“Vhasia would have put me in a saddle at fifteen and given me a
+company and made a song about it.” She said it without much bitterness,
+which made it worse. “Viterra gave me a good master-at-arms, in a
+courtyard, with the door shut, and a great deal of praise for how well I
+managed it, and then went on arranging the succession as though I had
+been a tapestry.”</p>
+<hr />
+<p>The second piece came about her brothers.</p>
+<p>Wyllmont, who had stormed a fortress because he had grown tired of
+standing outside it being looked at, and had died doing it, and had been
+right that it could be taken and wrong about almost everything else.
+Wyllmont, who had denied her Aberiel and had later found in himself, for
+Veralyn, an amount of forgiveness and opportunity that he had never once
+located for his sister.</p>
+<p>“He wasn’t cruel to me,” Aryka said. “That’s the part people get
+wrong when they tell it. He simply never thought of it. There was a
+shape a thing was supposed to have and I was not that shape, and he was
+not a man who could hold two shapes in his head at once.”</p>
+<p>And Arryk, the other brother, the ally, who history had settled on as
+a drunk.</p>
+<p>“He was,” Aryka said. “He was that. I’m not going to argue about the
+cup.”</p>
+<p>“Then what’s the argument?”</p>
+<p>“That he was a man of thirty living in Wyllmont’s shadow after
+Charau, carrying things nobody around him would let him put a name to,
+and being told every year of his life that one day the whole of it would
+come to him from the man who had done it.” She looked at the hills. “You
+can drink at that. I’ve watched better people drink at less.”</p>
+<p>Arryk’s son was Arwen, whom history remembered as little better, and
+who had been struck out of the succession by Brightstride for an offence
+that Aryka described in one sentence and did not elaborate.</p>
+<p>“He touched the Fenwood interest.”</p>
+<p>Riarhin kept her face where it was.</p>
+<p>“You know what the Fenwoods are,” Aryka said. It was not a question,
+and she had not looked over, and Riarhin understood that she had been
+carrying whatever she knew about Riarhin’s history for a month and had
+chosen this wall to put it down on. “They hold enough of Viterra and
+enough of the river that the Crown goes on existing partly by agreeing
+not to notice. Everybody signs the same word — vassal — and everybody
+knows what the word is doing. That fiction is the settlement. It has
+held for a hundred and forty years because nobody has ever been stupid
+enough to say it out loud in a room where it would have to be
+answered.”</p>
+<p>“And Arwen said it out loud.”</p>
+<p>“Arwen made it impossible not to answer.” Aryka got off the wall. “So
+Brightstride removed him, which was expedient, and everyone agreed it
+was justice. And then Brightstride died the year after, and nobody
+wanted to reopen anything, and the expedient became the settlement, and
+it has been the settlement ever since.”</p>
+<p>She picked up her reins.</p>
+<p>“I carried that for years,” she said. “Then decades. I am finished
+with it.”</p>
+<p>Riarhin looked at the road ahead of them.</p>
+<p>“Vhasia,” Aryka said. “Viterra. My cousins. Veralyn. Arwen. The
+throne. All of it. Done.”</p>
+<hr />
+<p>Riarhin heard wounded pride.</p>
+<p>She heard it clearly and she was not being stupid about it. She had
+watched a great many people decide, in her hearing, that the thing they
+had not been given had never been worth having, and they all said it the
+same way, and they all said <em>done</em> about three times more often
+than a person says a word they mean.</p>
+<p>“You’re not done,” she said.</p>
+<p>Aryka did not argue.</p>
+<p>That was the part Riarhin got wrong, and she got it wrong for the
+most reasonable reason available: a woman who is telling the truth and a
+woman who has given up arguing look identical from the outside.</p>
+<hr />
+<p>Na’ar rode behind them all that afternoon and said nothing about any
+of it.</p>
+<p>At the top of the second climb he brought his horse up alongside
+Riarhin’s and looked at the burnt wood below them — forty acres of black
+stalk on a north slope, six or seven years dead, with green coming up
+through it in the wet places.</p>
+<p>“Fire from above,” he said.</p>
+<p>“Lightning?”</p>
+<p>“Lightning takes one tree and then the wind takes the rest.” He
+pointed with his chin at the shape of the burn, which was a wedge,
+narrow at the top. “That started at the top of a hill in still air.”</p>
+<p>Riarhin looked at it for a while.</p>
+<p>“Say the rest.”</p>
+<p>“I have said it,” Na’ar said, and went back to riding.</p>
+<h2 id="chapter-nine-the-girl-who-was-not">Chapter Nine: The Girl Who
+Was Not</h2>
+<p>The shieling above the burnt wood had one room and a stone bench and
+a child sitting on the bench with her hands in her lap.</p>
+<p>She was small and she was clean, and that was the first thing wrong.
+Her dress had been washed. Her hair had been combed and parted and the
+parting was exact. There was no water within a quarter-mile of the
+shieling, uphill, and there had been nobody on that hill in six
+years.</p>
+<p>“You came,” the child said.</p>
+<p>“Yes.”</p>
+<p>“She said you would. She was very certain and I told her that
+certainty is a thing people spend.” The child smiled. She had a child’s
+teeth. “Will you sit down? You’re standing where the draught is.”</p>
+<p>Riarhin did not sit down.</p>
+<p>Behind her in the doorway Aryka had stopped with her hand on the
+jamb, and Na’ar had not come in at all, and Riarhin could hear him
+outside, not moving.</p>
+<hr />
+<p>“What are you?” Riarhin asked.</p>
+<p>“I am what was asked for.”</p>
+<p>“By whom?”</p>
+<p>“By a woman who wanted her sister back.” The child folded her hands
+more comfortably. “Not that woman. An older one, a long time ago, in a
+room with the shutters pegged. She said she would give anything, which
+is a sentence people say without hearing it, and she said it out loud,
+which is different from thinking it, and she said it in a place where
+saying it is an opening.”</p>
+<p>“And something answered.”</p>
+<p>“Something is always answering,” the child said. “That is the whole
+of its work. It is not clever and it is not cruel. It is attentive.”</p>
+<p>“And the girl?”</p>
+<p>“Died of a fever in her ninth year and has been dead twenty-two years
+and is not in this room.” The child looked down at her own hands with an
+interest that was not a child’s interest. “This is a shape. It was given
+to me and I keep it well. You will notice that I have not once told you
+a lie.”</p>
+<p>“No,” Riarhin said. “You’ve been very careful.”</p>
+<p>“Thank you.”</p>
+<p>“It wasn’t praise.”</p>
+<p>“It was accurate,” the child said, “which I prefer.”</p>
+<hr />
+<p>“The old woman sent me,” Riarhin said.</p>
+<p>“She sent you to save me.”</p>
+<p>“She sent me to find you.”</p>
+<p>Something happened in the child’s face then — not a flinch, nothing
+so useful. A small adjustment, like a clerk turning a page and finding
+the column already added.</p>
+<p>“Yes,” it said. “She did say find. She was a careful woman too. We
+understood each other for a long time.”</p>
+<p>“Twenty-two years.”</p>
+<p>“She fed me,” the child said. “I do not require it. She required it.”
+It tilted its head. “She gave you soup.”</p>
+<p>“Yes.”</p>
+<p>“And you ate it, and then she asked you to say the words, and you
+said them.” The smile came back. “You will have felt something
+afterwards. At the throat. Not tight. Fine.”</p>
+<p>Riarhin did not touch her neck.</p>
+<p>“Yes,” she said.</p>
+<p>“That is not mine,” the child said. “I want you to know that, because
+you will blame me for it later and I would rather be blamed for my own
+work. She spun that herself. It is the last thing she made and she made
+it out of a bowl of soup and eleven words, and it will hold, and you are
+going to keep your promise.” It looked genuinely pleased. “She was very
+good.”</p>
+<hr />
+<p>“Tell me about the counting house,” Riarhin said.</p>
+<p>“You have the wording.”</p>
+<p>“Tell me why.”</p>
+<p>“Because what you want is not in the counting house, and the man in
+the counting house is not lying when he says so, and if you go in and
+ask him he will tell you the truth and the truth will close the road.”
+The child swung its feet, once, and Riarhin’s hand did not move but
+everything behind her hand did. “Go by it. Not in. Watch who comes out
+of it and decide which of them is interesting. One of them will be.”</p>
+<p>“And that’s the whole of it?”</p>
+<p>“That’s the whole of it that I have.” A pause. “I know less than you
+think and more than you would like. Kalrantha is a word that has had a
+great deal of trouble taken over it. I do not know what it is either. I
+have wondered. Wondering is most of what I do.”</p>
+<p>Riarhin believed it, which was the worst thing that had happened all
+day.</p>
+<p>“Then we’re finished,” she said.</p>
+<p>“Are we?”</p>
+<p>“I was asked to find you. I’ve found you.”</p>
+<p>“Yes,” the child said. “You have.”</p>
+<hr />
+<p>Then it looked past her, at the doorway, and its whole attention
+moved.</p>
+<p>“And you,” it said.</p>
+<p>Aryka took her hand off the jamb.</p>
+<p>“I did not see you properly,” the child said. “Forgive me. You were
+standing behind something I was interested in.” It leaned forward very
+slightly. “I smell the hunger in you.”</p>
+<p>Aryka went still. Riarhin had seen her still at the ford and still at
+the tower and this was a different stillness.</p>
+<p>“Riches?” the child asked.</p>
+<p>Nothing.</p>
+<p>“Glory,” it said, and there was something almost warm in it, almost
+coaxing, the voice of a thing that has done this a great many times and
+still enjoys it. “Glory? No. Not that either.”</p>
+<p>It sat back.</p>
+<p>“No. You seek pow—”</p>
+<p>Riarhin drew Toothpick and put it through the base of the skull,
+upward, from behind the ear, the way she had done it to a weeping man
+against a rock nine days before, and the child-shaped thing stopped in
+the middle of the word and did not finish it.</p>
+<p>There was very little blood. The body went sideways off the bench and
+lay on the stone with its hands still folded, because the hands had been
+part of the shape and the shape had been kept well.</p>
+<p>At Riarhin’s throat, something gave.</p>
+<p>Not a snap. A slackening, the way a line goes slack when whoever was
+holding the other end has let go of it, which is not the same as being
+free of the line.</p>
+<hr />
+<p>Aryka had not moved from the doorway.</p>
+<p>“What,” she said, “was that.”</p>
+<p>“A promise being kept.”</p>
+<p>“That was a child.”</p>
+<p>“It was not a child, and you know it wasn’t, and you were about to
+let it finish a sentence about you in front of two other people.”
+Riarhin wiped Toothpick on her thigh and put it away. “It doesn’t lie.
+That’s not a virtue. It means everything it says arrives true and lands
+where it was aimed.”</p>
+<p>Aryka looked at the thing on the floor. She was breathing the way
+people breathe when they have been holding it.</p>
+<p>“The old woman asked you to save her.”</p>
+<p>“The old woman asked me to save her,” Riarhin said. “I said I’d find
+the girl. I never said I’d save her.”</p>
+<p>Aryka’s head came round.</p>
+<p>And she was furious. Riarhin had expected that and had been ready for
+it, and had the answer prepared about promises and wording and what the
+old woman had actually bought, and none of it was necessary, because
+what came out of Aryka Everblood’s mouth was not about the child at
+all.</p>
+<p>“I wanted to hear the rest.”</p>
+<hr />
+<p>Outside, Na’ar had built a fire without asking anybody.</p>
+<p>He looked at Riarhin’s face, and at Aryka’s back going down the slope
+alone, and he put another stick on.</p>
+<p>“The child?” he said.</p>
+<p>“Wasn’t.”</p>
+<p>Na’ar nodded, as though that settled the whole of it, which for him
+it did.</p>
+<h2 id="chapter-ten-the-roads-south">Chapter Ten: The Roads South</h2>
+<p>They buried the witch on the third day, because it took them two days
+to come back down and one more to do it properly in ground that did not
+want to be dug.</p>
+<p>Aryka dug. She did not offer and she was not asked and she took the
+spade off Na’ar after an hour without a word about it, and she worked
+until her hands were in a state, and Riarhin understood that this was
+what Aryka Everblood did instead of saying things, and filed it
+correctly this time.</p>
+<p>They put her in with the horse blanket, because there was no one to
+leave it to.</p>
+<p>The hamlet came up the track afterwards, eleven of them, and stood at
+the wall and did not come in. Riarhin told them the old woman was dead
+and that she had been sent for and had gone up the valley and had done
+what she was asked. Nobody asked what that was. One woman asked whether
+the shieling above the burnt wood was empty now.</p>
+<p>“Yes,” Riarhin said.</p>
+<p>The woman put her hand over her mouth, and then took it away, and
+said thank you, and went down the track.</p>
+<hr />
+<p>Riarhin rubbed the house out afterwards, in the way she had: stool
+back where it had been, bowl washed, shutter pegged, the box under the
+bed left exactly as unclosed as she had found it. She did not know why
+she did it and she did not stop to find out.</p>
+<p>On the way out she stopped at the fire, which was cold.</p>
+<p>Eleven words. She could say them in the old woman’s voice and in the
+old woman’s Acasi, with the catch in the third one where the breath had
+gone wrong.</p>
+<p>She did not say them.</p>
+<hr />
+<p>They rode south for nine days and Aryka talked about it twice.</p>
+<p>The first time was at a ford, where she said, without preamble, “I
+meant it,” and Riarhin said, “I know,” and neither of them believed the
+other.</p>
+<p>The second time was at an inn in a town whose name Riarhin forgot on
+purpose, where Aryka drank two cups and said, “You think I am going to
+turn round.”</p>
+<p>“I think you’ve been turning round for thirty years.”</p>
+<p>“And now?”</p>
+<p>“And now you’ve got two men, a purse you carry yourself, and nothing
+to do.”</p>
+<p>Aryka looked into the cup and smiled, and it was not the smile from
+the tavern in Kolmar. It was the other one — the one she put things away
+with.</p>
+<p>“Yes,” she said. “Nothing to do.”</p>
+<hr />
+<p>The country changed four days out from the coast and Riarhin’s body
+knew before she did.</p>
+<p>The shutters went thin. She noticed it at an inn where the shutter
+did not meet the frame and the light came through in a line, and she was
+up and across the room and had her hand on the peg before she had
+decided to move, and the peg was where her hand expected it to be.</p>
+<p>Then there was jasmine in a courtyard, laid over a drain, and the
+smell of the two together did something to her that the smell of either
+alone did not.</p>
+<p>And on the eighth day a factor’s man bowed to Aryka in the street,
+and Riarhin caught herself counting the rings on his hand and
+estimating, quite precisely and without having asked herself to, how
+easily each of them would come off.</p>
+<p>She stopped. She had not done that in twenty years.</p>
+<p>Nobody had taught her that on the road.</p>
+<hr />
+<p>Na’ar found her on the sea wall the night before they went down into
+the city.</p>
+<p>He did not ask her what was wrong. He had never once asked her what
+was wrong, in a year and four months, which was most of why she was
+still travelling with him.</p>
+<p>He stood beside her and looked at the water, which was flat and black
+and going nowhere, and after a while he said:</p>
+<p>“Many-Scars said you would not come south.”</p>
+<p>Riarhin did not turn her head.</p>
+<p>“When did he say that?”</p>
+<p>“When he asked me to go with you.”</p>
+<p>The water went on doing nothing. Somewhere below them a boat knocked
+against a stone, and knocked again, and a man swore at it without any
+real feeling.</p>
+<p>“He was wrong,” Riarhin said.</p>
+<p>“No,” said Na’ar. “He said you would not come south. He did not say
+you would not go.”</p>
+<p>He went back to the fire.</p>
+<p>Riarhin stayed on the wall until the tide turned, and did not examine
+it, and in the morning they went down into Silkstrand.</p>
+</body>
+</html>

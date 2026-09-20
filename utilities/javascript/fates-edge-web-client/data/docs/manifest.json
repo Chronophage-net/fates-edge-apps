@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-18T17:26:15.048Z",
+  "generated": "2026-09-20T14:25:22.910Z",
   "documents": [
     {
       "id": "srd",
@@ -696,6 +696,16 @@
       "path": "/data/docs/es/",
       "category": "es",
       "categoryLabel": "Español",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fates_edge_long_form_readers_guide",
+      "title": "Fates Edge Long Form Readers Guide",
+      "file": "Fates-_-Edge-_-Long-_-Form-_-Readers-_-Guide.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1469,6 +1479,16 @@
       "active": true
     },
     {
+      "id": "the_thread",
+      "title": "The Thread",
+      "file": "Fates_-_Edge_-_-The-_-Thread.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_three_reckonings",
       "title": "The Three Reckonings",
       "file": "Fates_-_Edge_-_-The-_-Three-_-Reckonings.html",
@@ -1663,7 +1683,7 @@
       "active": true
     }
   ],
-  "total_count": 107,
-  "active_count": 107,
+  "total_count": 109,
+  "active_count": 109,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

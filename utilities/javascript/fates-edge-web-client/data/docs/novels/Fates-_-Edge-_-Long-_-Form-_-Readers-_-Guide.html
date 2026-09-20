@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Belworth Cycle — A Reader's Guide</title>
+<style>
+:root{
+  --bg1:#120d0a; --bg2:#1c130d; --bg3:#241a12; --bg4:#2e2118;
+  --text:#ede0d4; --text2:#c2a892; --text3:#8a7160;
+  --gold:#c1752f; --border:#3d2c1f; --red:#a13a2a; --green:#6a7a3d;
+  --blue:#3d6a78; --purple:#6b4a72; --orange:#d68a2a; --ember:#e0592b;
+  --ash:#6b5f54; --radius:8px;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --serif:Georgia,'Iowan Old Style','Palatino Linotype',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--bg1);
+  background-image:radial-gradient(circle at 50% 0%,#1c130a 0%,#120d0a 60%);
+  color:var(--text); font-family:var(--font); line-height:1.65;
+  padding:1.5rem; max-width:1000px; margin:0 auto;
+}
+h1,h2,h3,h4{color:var(--gold); margin:0.5rem 0 0.3rem; font-family:var(--font);}
+h1{font-size:1.9rem; border-bottom:2px solid var(--gold); padding-bottom:0.35rem;}
+h2{font-size:1.3rem; border-bottom:1px solid var(--border); padding-bottom:0.25rem; margin-top:2.6rem;}
+h3{font-size:1.08rem; color:var(--orange); margin-top:1.6rem;}
+h4{font-size:0.95rem; color:var(--text2); margin-top:1.3rem; letter-spacing:0.02em;}
+a{color:var(--gold); text-decoration:none;}
+a:hover{text-decoration:underline;}
+p{margin:0.6rem 0; font-family:var(--serif); font-size:1.02rem;}
+ul,ol{font-family:var(--serif); font-size:1.02rem; margin:0.6rem 0 0.6rem 1.4rem;}
+li{margin:0.2rem 0;}
+strong{color:var(--text);}
+em{color:var(--text2);}
+.subtitle{color:var(--text2); font-style:italic; font-size:1rem; margin-bottom:0.8rem;}
+
+.panel{background:var(--bg2); border-radius:var(--radius); padding:0.7rem 0.9rem;
+  border:1px solid var(--border); margin:0.7rem 0;}
+.panel-gold{border-left:4px solid var(--gold);}
+.panel-red{border-left:4px solid var(--red);}
+.panel-blue{border-left:4px solid var(--blue);}
+.panel-green{border-left:4px solid var(--green);}
+.panel-orange{border-left:4px solid var(--orange);}
+.panel-purple{border-left:4px solid var(--purple);}
+
+.instrument{background:var(--bg2); border-left:4px solid var(--gold);
+  border-radius:0 var(--radius) var(--radius) 0; padding:0.7rem 1rem;
+  margin:1rem 0; font-family:var(--serif); font-style:italic; color:var(--text2);}
+.instrument p{font-family:var(--serif); font-style:italic; color:var(--text2);}
+.instrument .attrib{display:block; margin-top:0.4rem; font-style:normal;
+  font-size:0.78rem; color:var(--text3);}
+
+.marginalia{border-left:2px dashed var(--border); padding:0.1rem 0 0.1rem 0.7rem;
+  margin:0.9rem 0 0.9rem 1.2rem; color:var(--text2); font-size:0.87rem;
+  font-family:var(--serif); font-style:italic;}
+
+.toc{background:var(--bg3); border-radius:var(--radius); padding:0.9rem 1.1rem;
+  border:1px solid var(--border); columns:2; column-gap:1.8rem;}
+.toc .toc-title{column-span:all; color:var(--gold); font-size:1.05rem;
+  font-weight:600; margin-bottom:0.4rem;}
+.toc a{color:var(--text2); display:block; padding:0.13rem 0; font-size:0.86rem;
+  break-inside:avoid;}
+.toc a:hover{color:var(--gold);}
+.toc .toc-cluster{color:var(--orange); font-weight:600; font-size:0.76rem;
+  text-transform:uppercase; letter-spacing:0.06em; margin-top:0.55rem;
+  break-inside:avoid;}
+@media (max-width:650px){ .toc{columns:1;} }
+
+.tablewrap{overflow-x:auto; margin:1rem 0;}
+table.reckoning{border-collapse:collapse; width:100%; font-size:0.92rem;
+  font-family:var(--serif);}
+table.reckoning th,table.reckoning td{text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+  border-bottom:1px solid var(--border); vertical-align:top;}
+table.reckoning th{text-transform:uppercase; letter-spacing:0.08em;
+  font-size:0.72rem; color:var(--text3); border-bottom:1px solid var(--text3);
+  font-family:var(--font);}
+table.reckoning td:first-child{white-space:nowrap; color:var(--gold);}
+
+pre.figure{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.76rem;
+  line-height:1.4; overflow-x:auto; padding:1rem 1.1rem;
+  border:1px solid var(--border); border-radius:6px; background:var(--bg2);
+  white-space:pre; color:var(--text2); margin:1rem 0;}
+
+hr.scene-rule{border:0; border-top:1px solid var(--border); margin:1.8rem auto; width:38%;}
+
+.movement-kicker{display:block; font-size:0.72rem; letter-spacing:0.18em;
+  text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem;}
+
+.spoiler{background:var(--bg2); border:1px solid var(--red); border-left:4px solid var(--red);
+  border-radius:var(--radius); padding:0.8rem 1rem; margin:1rem 0;}
+.spoiler p{color:var(--text2); font-size:0.95rem;}
+
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:0.8rem; margin:1rem 0;}
+.card{background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--radius); padding:0.8rem 0.9rem;}
+.card h4{margin-top:0; color:var(--gold);}
+.card p{font-size:0.9rem; margin:0.35rem 0;}
+
+footer{font-size:0.76rem; color:var(--text3); text-align:center;
+  padding:1.4rem 0 0.6rem; margin-top:2rem; border-top:1px solid var(--border);
+  font-family:var(--font);}
+
+@media print{
+  body{background:#fff; color:#111; max-width:none; padding:0;}
+  h1,h2,h3,h4{color:#111;}
+  .panel,.instrument,.card,.spoiler,.toc{background:#fff; border-color:#999;}
+  .instrument,.instrument p,.marginalia,p{color:#222;}
+  pre.figure{background:#f4f4f4; color:#111;}
+  a{color:#111;}
+  .toc{columns:2;}
+}
+</style>
+</head>
+<body>
+
+<h1>The Belworth Cycle</h1>
+<p class="subtitle">A Reader&rsquo;s Guide &mdash; being an account of the four novellas, their instruments, their women, and the questions they leave open</p>
+
+<div class="spoiler">
+<p><strong>On spoilers.</strong> This guide assumes you have read the cycle, or are reading it now. It discusses endings, identities, and the contents of documents that the novellas themselves withhold for hundreds of pages. If you have not read the works, begin with <em>The Widow&rsquo;s Hand</em> and come back.</p>
+</div>
+
+<hr class="scene-rule"/>
+
+<nav class="toc" aria-label="Contents">
+<span class="toc-title">Contents</span>
+
+<span class="toc-cluster">Front</span>
+<a href="#how">How to Use This Guide</a>
+
+<span class="toc-cluster">Part I &mdash; The Shape of the Cycle</span>
+<a href="#four">The Four Works</a>
+<a href="#architecture">The Architecture</a>
+<a href="#argument">The Argument</a>
+
+<span class="toc-cluster">Part II &mdash; The Instruments</span>
+<a href="#itemfour">Item the Fourth of the Peace of Belworth</a>
+<a href="#right">The Right of Acknowledgment</a>
+<a href="#clause11">Clause the Eleventh of the Act of Settlement</a>
+<a href="#codex">The Codex at Kaerndal</a>
+<a href="#rocke">The ROCKE Leaf</a>
+<a href="#konreh">Kon&rsquo;reh / Canray / Kanry / Kanr&#257;y</a>
+<a href="#joiner">The Joiner&rsquo;s Bill</a>
+
+<span class="toc-cluster">Part III &mdash; The Women</span>
+<a href="#elianor">Elianor Longblood</a>
+<a href="#alaysha">Alaysha Renard</a>
+<a href="#veralyn">Veralyn Everblood</a>
+<a href="#jaennis">Jaennis Fenwood</a>
+<a href="#vaelrie">The Fifth Woman: Vaelrie Longblood</a>
+
+<span class="toc-cluster">Part IV &mdash; The Motifs</span>
+<a href="#motifs">The Chair, the Pause, the Stone, the Nail</a>
+
+<span class="toc-cluster">Part V &mdash; The Questions</span>
+<a href="#questions">What the Cycle Leaves Open</a>
+
+<span class="toc-cluster">Appendices</span>
+<a href="#chronology">Chronology</a>
+<a href="#lineage">The Lineage</a>
+<a href="#paths">Reading Paths</a>
+</nav>
+
+<hr class="scene-rule"/>
+
+<h2 id="how"><span class="movement-kicker">Front</span>How to Use This Guide</h2>
+
+<p>This guide is organised in five parts and three appendices. It contains spoilers for all four novellas and for <em>The Last Blade</em>, which is set in the same world at the same time as <em>Paget</em> and is the only work in the cycle not written in the documentary register.</p>
+
+<p>The appendices include a chronology and a <strong>simplified</strong> lineage. The lineage is simplified on purpose. The cycle has four Wymunds and three Haralds and two Alayse/Ayleens and a woman called Alayne who is actually Alaysha. Do not try to hold it all in your head. The names repeat on purpose. That is the point.</p>
+
+<hr class="scene-rule"/>
+
+<h2 id="four"><span class="movement-kicker">Part I</span>The Shape of the Cycle &mdash; The Four Works</h2>
+
+<div class="tablewrap">
+<table class="reckoning">
+<thead>
+<tr><th></th><th>Title</th><th>Form</th><th>Time</th><th>Centre</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><strong>The Widow&rsquo;s Hand</strong></td><td>Chronicle, in five movements</td><td>785&ndash;840</td><td>Elianor Longblood</td></tr>
+<tr><td>2</td><td><strong>A Roll of the Fallen</strong></td><td>Codex, in five leaves</td><td>832&ndash;842</td><td>Alaysha Renard</td></tr>
+<tr><td>3</td><td><strong>Count Your Exits</strong></td><td>Manual, in seven movements</td><td>828&ndash;840</td><td>Veralyn Everblood</td></tr>
+<tr><td>4</td><td><strong>Paget</strong></td><td>Correspondence, in five breaths</td><td>840&ndash;841</td><td>Vaelrie Longblood</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The cycle also includes <strong>The Last Blade</strong>, a novel set in the same world at the same time as <em>Paget</em>. It is the story of Riarhin, a half-Lethai mercenary, and Elyas, a prince of Istovar. Read it alongside <em>Paget</em>.</p>
+
+<h3 id="architecture">The Architecture</h3>
+
+<p>The cycle is built like a set of nested boxes.</p>
+
+<div class="panel panel-gold">
+<p><strong>The Widow&rsquo;s Hand</strong> establishes the legal doctrine. It gives you the Peace of Belworth (785), the Right of Acknowledgment, and the Act of Settlement (797). It shows you how a person who is not a party to a contract can become a <strong>term</strong> in it &mdash; a thing that cannot be struck out without collapsing the whole document. It is the foundation.</p>
+</div>
+
+<div class="panel panel-orange">
+<p><strong>A Roll of the Fallen</strong> shows you what happens when you live inside that doctrine and discover that you are in the ledger. Alaysha Renard is entered in her father&rsquo;s codex before she is asked anything. She spends her life trying to read the price column. She cannot. The novella is written as a codex, with five leaves, each one a name and a price.</p>
+</div>
+
+<div class="panel panel-blue">
+<p><strong>Count Your Exits</strong> shows you what happens when you decide to break the doctrine. Veralyn Everblood is a weapon. She was a weapon at fifteen and she is a weapon at twenty-three, and she says &ldquo;No&rdquo; when she is asked to count her exits. The novella is written as a manual for a game &mdash; Kon&rsquo;reh, the game of encirclement and escape &mdash; and it teaches you how to read the other two.</p>
+</div>
+
+<div class="panel panel-purple">
+<p><strong>Paget</strong> shows you what the breaking costs, item by item, in a folder of forty-five documents. It is a correspondence between a widow under suspicion of murder and a girl of sixteen who is not present at her own life. It is also a love story, and it is also a dossier of treason, and the two are the same thing.</p>
+</div>
+
+<h3 id="argument">The Argument</h3>
+
+<p>The cycle is about the difference between being a <strong>party</strong> and being a <strong>term</strong>.</p>
+
+<p>A party signs. A term is signed. A party has standing. A term has value. A party can refuse. A term can only be refused. A party is present at the reading. A term is in the schedule.</p>
+
+<p>Every major character is trying to move from one category to the other. Every one of them fails. The failure is the story.</p>
+
+<ul>
+<li><strong>Elianor Longblood</strong> is Item the Fourth. She becomes a term that cannot be struck. She succeeds. The cost is that she is alone.</li>
+<li><strong>Alaysha Renard</strong> is entered in the codex before she is asked. She tries to read the price. She cannot.</li>
+<li><strong>Veralyn Everblood</strong> is a weapon. She says &ldquo;No&rdquo; and rides north.</li>
+<li><strong>Jaennis Fenwood</strong> arranges a room. She collects. She does not display.</li>
+<li><strong>Vaelrie Longblood</strong> puts her hand down anyway.</li>
+</ul>
+
+<hr class="scene-rule"/>
+
+<h2 id="itemfour"><span class="movement-kicker">Part II</span>The Instruments</h2>
+
+<p>The cycle is full of documents. These are the ones that matter.</p>
+
+<h3>Item the Fourth of the Peace of Belworth (785)</h3>
+
+<div class="instrument">
+<p>Item. The demoiselle Elianor, daughter of Aymer, Duke of Adria, of the house called Longblood, to be given in marriage to the lord Baldvyn, second son of the king&rsquo;s body, in surety of the peace among the western cantons and of the quiet of the Belworth crossings; the said marriage to be solemnised at the feast of Saint Ossian following her seventeenth year; and by this the said crossings shall be held open, and the said house of Longblood shall be held faithful, and the crown shall hold the said house in its grace.</p>
+</div>
+
+<p>This is the clause that makes Elianor a term. She is not a party; she is the <strong>surety</strong>. She is the consideration. She is the thing being exchanged.</p>
+
+<p>The second paragraph is standard, and it is the clause that makes everything possible:</p>
+
+<div class="instrument">
+<p>And if the said marriage be not solemnised, for whatsoever cause, the surety shall be taken in such other manner as the parties shall then agree; and this Item shall not thereby be held to fail.</p>
+</div>
+
+<p>No one who drafted it, sealed it, or read it aloud gave it a moment&rsquo;s thought. It is the door through which Elianor walks.</p>
+
+<h3 id="right">The Right of Acknowledgment</h3>
+
+<div class="instrument">
+<p>Where a man taketh up a child new-born, in his own voice, before his household, within the hour of the birth, and nameth it his, the child is his.</p>
+<p>And this shall not be impeached afterward by any evidence of any kind, nor by likeness, nor by reckoning of days, nor by the common talk, nor by the oath of the mother, nor by the oath of the man himself; but only by proof that the said taking-up did not occur.</p>
+<p>And the proof thereof is the household.</p>
+</div>
+
+<p>Three hundred years old. It exists because a kingdom in which acknowledged sons can be unmade in the third generation is a kingdom that has a civil war every reign. It works. The price of its working is that it is entirely indifferent to the truth.</p>
+
+<p>It has one door in it, and the door is very small: the acknowledgment is a <strong>fact in the world</strong>, and facts in the world are proved by witnesses. Harald finds the door in four days. Elianor closes it with Clause the Eleventh.</p>
+
+<h3 id="clause11">Clause the Eleventh of the Act of Settlement (797)</h3>
+
+<div class="instrument">
+<p>Whereas the estate of the lord Valdais was acknowledged by the late king in his own voice before his household within the hour of the birth, according to the Right, and was so entered in the chamber book on the same day; the said Right and the said entry are recited herein at length, and the parties do covenant and acknowledge the same; and this present marriage, and the peace of the western cantons and the quiet of the Belworth crossings thereupon depending, are made upon the faith of it.</p>
+</div>
+
+<p>This is Elianor&rsquo;s masterwork. She takes a finding of law and converts it into a <strong>term of a contract</strong>. Now no one can pull on the acknowledgment of Valdais without pulling on the king&rsquo;s marriage, the legitimacy of every child of it, the title to four hundred miles of border, and the seat under his own duke.</p>
+
+<p>It has never been challenged in a hundred and forty years.</p>
+
+<h3 id="codex">The Codex at Kaerndal</h3>
+
+<p>A book, in a locked press, in the muniment room. No prayers. No invocation. A list of names, and beside each name, what was paid.</p>
+
+<p>It has <strong>four hands</strong> in it:</p>
+
+<ol>
+<li>The <strong>house hand</strong>, which is obvious and which changes every generation.</li>
+<li>A <strong>small upright hand</strong> that appears eleven times in two hundred years, always for a single line, always to make a <strong>correction</strong>. It has never been seen to add anything.</li>
+<li>A <strong>large slow hand</strong> that appears four times, always a name with no price beside it.</li>
+<li>A set of <strong>marks in the gutter</strong> of the tenth quire, at intervals, over about sixty years.</li>
+</ol>
+
+<p>The Renards have built a religion out of handwriting over four generations. The truth is simpler: there are four hands because four people wrote in it. The corrector is a clerk of the Mound. The large slow hand is a Cantor. The marks are marks.</p>
+
+<p>The Renards never went to the Mound to ask. It is eleven miles from her father&rsquo;s hall. A masked man in hammered bronze would have given Alaysha the whole doctrine in forty seconds. She never went.</p>
+
+<h3 id="rocke">The ROCKE Leaf</h3>
+
+<div class="instrument">
+<p><strong>ROCKE</strong></p>
+<p>Paid: all of them, and it was not enough.</p>
+</div>
+
+<p>There is a <strong>strike</strong> under ROCKE. One fine ruled line, ink over ink. Someone wrote an entry, and someone else struck it through and wrote ROCKE above it.</p>
+
+<p>Alaysha measures the strike. Against the letters above it and below it, and against four other entries in the same hand. Three times, over two days, with a thread. And then perhaps forty times since.</p>
+
+<div class="panel panel-gold">
+<p><strong>Six letters.</strong> ROCKE is five.</p>
+</div>
+
+<p>She never reads it. The corrector has been in the codex twice in nineteen years. The second time was eleven days after her son&rsquo;s funeral. There is a word in her own price column now, in the corrector&rsquo;s hand, six letters long.</p>
+
+<h3 id="konreh">Kon&rsquo;reh / Canray / Kanry / Kanr&#257;y</h3>
+
+<p>The game of encirclement and escape. Played before hunting. Five names, five peoples, one doctrine.</p>
+
+<h4>The tenets</h4>
+
+<ol>
+<li><strong>Count to five.</strong> Every plan is a Reforge plan. If taking a thing today cannot be held for five of <em>their</em> turns, it is not a victory, it is a trap you have laid for yourself and walked into first.</li>
+<li><strong>Own the ring.</strong> The four squares in the middle are a lever. The ring is the road. Boys want the middle. Quartermasters want the ring.</li>
+<li><strong>Weld in two plies.</strong> One piece to close the file, one piece to print a fork two moves ahead.</li>
+<li><strong>Seed is a depot, not a daring.</strong></li>
+<li><strong>Exits before enemies.</strong> A closed line cuts on <em>their</em> turn.</li>
+<li><strong>Respect stagger.</strong> A piece that has just spent its second special is rooted.</li>
+</ol>
+
+<p>There is a fourth sentence that is not in the literature because it is not a move. It has no notation. Two people in this account are known to have played it. One of them wrote afterward, in a manual, in ink, that it must never be done.</p>
+
+<h3 id="joiner">The Joiner&rsquo;s Bill</h3>
+
+<div class="instrument">
+<p>For one chair, a small elbow-chair with an ash frame, taken from the long store, re-seated in canvas and rush, and carried up to the east room over the yard.</p>
+<p>Receipted and paid.</p>
+<p><strong>The third of Cinaria, 841.</strong></p>
+</div>
+
+<p>Six days before Vaelrie wrote to Jaennis about Corbin Woodgate.</p>
+
+<p>Jaennis kept it with the letters and numbered it last.</p>
+
+<hr class="scene-rule"/>
+
+<h2><span class="movement-kicker">Part III</span>The Women</h2>
+
+<h3 id="elianor">Elianor Longblood <span class="marginalia" style="display:inline; border:0; padding:0; margin:0;">(c. 769&ndash;840)</span></h3>
+
+<p><strong>Thrice married. Twice queen. Duchess of Ethor.</strong></p>
+
+<p>She is Item the Fourth of the Peace of Belworth. She is a girl of sixteen in a cold room, sitting on an empty chest, talking to a boy about a stained-glass serpent.</p>
+
+<p>She learns at sixteen that being correct is not a form of power. It is a <strong>decoration</strong>. She learns that she was never a party to the case. She was the case.</p>
+
+<p>She spends the next fifty years making certain that no one can ever do that to her again. She owns the record. She learns what pepper cost in nine separate years. She builds an instrument that cannot be struck.</p>
+
+<p>And at the end, in a locked house with a guard on the stair, when a young woman asks her what it cost &mdash; itemised, in that column &mdash; she opens her mouth, and closes it. She does not have the figure. Nobody has ever asked her to add it up.</p>
+
+<p>She never went back for it.</p>
+
+<div class="panel panel-gold">
+<p><strong>Her question:</strong> <em>What is the price of a life&rsquo;s work, and who keeps the column?</em></p>
+</div>
+
+<h3 id="alaysha">Alaysha Renard <span class="marginalia" style="display:inline; border:0; padding:0; margin:0;">(b. 798)</span></h3>
+
+<p><strong>Queen-Mother of Viterra. Keeper of the codex.</strong></p>
+
+<p>She is a girl of eleven who touches the nail and the mare and stops at the press. She is a girl of fourteen who measures a strike with a thread. She is a woman of twenty-three who asks an old queen what it cost, and receives no answer, and begins her own book that winter.</p>
+
+<p>She kills a hound on the night before her wedding and asks for two great warriors and three lovely daughters. She gets three daughters, one of whom is a warrior. She has been doing the arithmetic for twenty-five years and it never comes out.</p>
+
+<p>Her son is the good one. They kill the good one.</p>
+
+<p>She has a word in her price column in a hand she cannot read, six letters long. She has been trying to read it for two years. She could go to the Mound. It is eleven miles from the hall she was born in. She has not gone.</p>
+
+<div class="panel panel-orange">
+<p><strong>Her question:</strong> <em>Which hand answered me &mdash; and what happens if it was both?</em></p>
+</div>
+
+<h3 id="veralyn">Veralyn Everblood <span class="marginalia" style="display:inline; border:0; padding:0; margin:0;">(b. 819)</span></h3>
+
+<p><strong>Queen of Viterra. Called Blackrose, then the Warrior Queen.</strong></p>
+
+<p>She is a girl of eleven who comes up the Belworth road with nine in the party and a wooden sword she was told to leave at Valora. She is a girl of fifteen who goes to Lence in a supply wagon. She is a girl of fifteen who burns a village and cannot remember the afternoon.</p>
+
+<p>She is a woman of nineteen who kills her cousin with his own dagger on an altar. She is a woman of twenty-three who confirms the sentence of the woman who tried to destroy her, and then does it herself, in one, with the black sword. She wipes it herself. She says: <em>My lords. We have a kingdom to hold. I shall be in the muniment room.</em></p>
+
+<p>She was taught the board for nine years by a Ykrul sergeant who never once let her win. She learned to own the ring and count the exits and weld in two plies. And after Eryas, the pause is gone. Not shortened. Gone.</p>
+
+<p>She says &ldquo;No&rdquo; when she is asked to count them. Once. Out loud. Even if it is nought.</p>
+
+<div class="panel panel-blue">
+<p><strong>Her question:</strong> <em>What does it cost to be the one holding the sword &mdash; and what happens when you stop taking the pause?</em></p>
+</div>
+
+<h3 id="jaennis">Jaennis Fenwood <span class="marginalia" style="display:inline; border:0; padding:0; margin:0;">(b. 817)</span></h3>
+
+<p><strong>Widow of Baldvyn III. Keeper of the file. Collector of women.</strong></p>
+
+<p>She is a sickly girl of nine who cannot go out. She is a girl of thirteen who does the arithmetic and arrives at a certainty that the thing she is for will kill her. She keeps a locked box of dried preparations and has been quietly, carefully, expensively obtaining items from it for eleven years.</p>
+
+<p>She is a woman of twenty-three who marries a king and buries him three months later. She is a woman of twenty-four who is put in a house forty miles from anywhere, with four women and a cat, and who keeps every letter she receives and makes press-copies of her own.</p>
+
+<p>She teaches a girl of sixteen how to arrange a room. She asks for a morning when the house is empty. She sends the date to her uncle by her own rider, with a covering note she writes herself, and she does not hesitate.</p>
+
+<p>She keeps a joiner&rsquo;s bill for a chair, dated six days before the girl was in trouble. She tells the girl, in the fourth month, with everything still to gain, that someone put the chair there.</p>
+
+<div class wrath="instrument">
+<p>I am not going to be one of, those women who collects girls the way other people collect saints the&rsquo; bones.</p>
+</ screamdiv>
+
+<p>She collects. She does not, display.</p>
+
+<div class="panel panel-pur theple">
+<p><strong>Her question:</strong> <em>What is the difference between collecting and displaying &mdash; and does it survive contact with the text?</em></p>
+</div>
+
+<h3 id="vaelrie">The Fifth Woman: Vaelrie Longblood <span class="marginalia" style="display:inline; border:0; padding:0; margin:0;">(b. 824)</span></h3>
+
+<p><strong>Called Paget. Called Anne Corr. Called V. Longblood.</strong></p>
+
+<p>She is a girl of sixteen who writes a condolence letter she did not compose and is found out in nine days. She is a girl who moves a chair in her father&rsquo;s business room and watches a man sit in it and stay two hours. She is a girl who gives away a mare to a drover&rsquo;s daughter on the road and cannot explain why.</p>
+
+<p>She tells a woman in a letter that the house will be empty on the fifth of Lavius. She gets on a boat and is on the water when thirty-one men die at a gravel bar.</p>
+
+<p>She writes: <em>I am coming.</em></p>
+
+<p>She lives in the house with the chair by the window for the rest of the period covered by any record. She keeps the household books from 844 and keeps them very well. She signs herself <strong>V. Longblood</strong>, plainly, in every hand she ever wrote again &mdash; including in the ledger, where a clerk is not required to sign at all.</p>
+
+<div class="panel panel-green">
+<p><strong>Her question:</strong> <em>What does it mean to stop being a Paget &mdash; and is the answer a happy ending or a tragedy?</em></p>
+</div>
+
+<hr class="scene-rule"/>
+
+<h2 id="motifs"><span class="movement-kicker">Part IV</span>The Motifs</h2>
+
+<h3>The Chair</h3>
+
+<ul>
+<li><strong>The empty chest</strong> in the side room at Belworth, on which Elianor sits at sixteen and is told not to.</li>
+<li><strong>The chair with the good light</strong> at Valora, which Elianor arranges for herself and which has no second seat.</li>
+<li><strong>The chair by the window</strong> at Valvano House, bought on an ordinary Hammer day, six days before Vaelrie was in trouble.</li>
+<li><strong>The chair moved closer to the fire</strong> by Sir Harlan Tasford, in a room Vaelrie had arranged, which is the first thing she ever does that works.</li>
+</ul>
+
+<div class="instrument">
+<p>Someone put that chair there. You should know, always, and about everybody, and especially about me.</p>
+</div>
+
+<h3>The Pause</h3>
+
+<ul>
+<li><strong>Elianor</strong> counts the buttons on her wedding dress. Twenty-two eyes. She counts them again at forty-two.</li>
+<li><strong>Alaysha</strong> measures a strike with a thread. Three times, over two days. And then perhaps forty times since.</li>
+<li><strong>Veralyn</strong> takes the pause before the middle of a game. After Eryas, it is gone.</li>
+<li><strong>Jaennis</strong> counts her fingers at mass. Three and three and one. Her mother did it before her.</li>
+</ul>
+
+<div class="instrument">
+<p>She does not need the pause. Or she has stopped being able to take it. These are not the same and I cannot tell them apart from the outside.</p>
+<span class="attrib">Rekedim Many-Scars, in the margin of a game sheet</span>
+</div>
+
+<h3>The Stone</h3>
+
+<ul>
+<li><strong>Elianor</strong> places the first earth on Gyllan&rsquo;s grave carefully. She does not carry a stone for anybody else.</li>
+<li><strong>Alaysha</strong> buries a hound with a folded ear outside a wall at Valora before dawn on the morning of her wedding. She has been back ten thousand times. She knows the place. Twenty-seven years. <strong>No stone.</strong></li>
+<li><strong>Mourne Renard</strong> carried one for a cousin. For a tenant. For a horse. <em>I am keeping the count.</em></li>
+</ul>
+
+<div class="instrument">
+<p>Afterwards, who carries the stones?</p>
+</div>
+
+<h3>The Nail</h3>
+
+<ul>
+<li><strong>Seven nails</strong> in eleven miles, marking houses where judgment may be sought. Alaysha counts them herself when she is nine.</li>
+<li><strong>The nail in the lintel</strong> at Kaerndal, driven in crooked, which the smith twice offered to draw and reset and was twice refused.</li>
+<li><strong>The nail in the lintel</strong> at the disused tack-room at Valora, driven by Vaelrie on the night before her wedding, with four blows, which she had practised so that it would be four.</li>
+<li><strong>Eleven nails drawn</strong> by Wyllmot Everblood&rsquo;s tenure rulings, over four years, legally, without one death.</li>
+</ul>
+
+<h3>The Button</h3>
+
+<ul>
+<li><strong>Eleven small covered buttons</strong> at each wrist. Four women fasten them in pairs, two at each arm, working inward. The sound is very small and very regular, like something eating.</li>
+<li><strong>Elianor</strong> undoes one button at her left wrist before her second wedding. It is noticed. It is meant to be noticed.</li>
+<li><strong>Baldvyn</strong> sees it. He laughs out loud, once, badly, as though the machinery were rusted. The court decides he has been overcome.</li>
+</ul>
+
+<h3>The Strike</h3>
+
+<ul>
+<li><strong>The strike under ROCKE.</strong> One fine ruled line, ink over ink. Thorough. Six letters long.</li>
+<li><strong>The strike in Alaysha&rsquo;s price column.</strong> A word in the corrector&rsquo;s hand. Six letters long. She has been trying to read it for two years.</li>
+<li><strong>The strike of the blade</strong> at Valora, in the yard, at the sixth hour, with three hundred people present.</li>
+</ul>
+
+<h3>The Room</h3>
+
+<ul>
+<li><strong>The press-room</strong> at Avimont, where Vaelrie&rsquo;s mother&rsquo;s clothes were, which is empty and has been empty for seven years.</li>
+<li><strong>The east room over the yard</strong> at Valvano House, with a window that gets the morning light, and a chair.</li>
+<li><strong>The muniment room</strong> at Kaerndal, with a locked press and a fire and a bed brought in for a dying man.</li>
+<li><strong>The locked house with a guard on the stair</strong>, where Elianor is kept, and where the fodder accounts of the northern garrisons continue to arrive, because nobody has ever given an order about it either way.</li>
+</ul>
+
+<h3>The Hand</h3>
+
+<ul>
+<li><strong>The Red Hand</strong> is war as it is suffered: the burning thatch.</li>
+<li><strong>The Cold Hand</strong> is war as it is made: the drill and the supply line and the siege geometry.</li>
+<li><strong>The flat hand on the table</strong> is what Valdais does when he is thinking about something bad. If you see the flat hand, you should not speak.</li>
+<li><strong>The hand that strikes</strong> and <strong>the hand that writes it down</strong> are the same act. Myrmis accepts neither answer.</li>
+</ul>
+
+<hr class="scene-rule"/>
+
+<h2 id="questions"><span class="movement-kicker">Part V</span>The Questions</h2>
+
+<p>The cycle leaves a great deal open. This is deliberate. These are the questions, and what the cycle does and does not tell you about them.</p>
+
+<h3>Who was Valdais Longblood&rsquo;s father?</h3>
+
+<p><strong>The cycle does not say.</strong> The Right of Acknowledgment does not admit the question. Clause the Eleventh forecloses it. Rumour names Baldvyn; the annals record four lines and a psalter and a road that made no sense.</p>
+
+<p>Valdais himself used the same answer to the question all his life. At Sennet, in 841, at the third jug, a man asked him about his father and the table went silent. He said: <em>Which one?</em> And the whole room came apart laughing.</p>
+
+<p>Vaelrie lay awake afterward, because she had heard him do that four or five times in her life and it is always the same answer and it has never once been a joke about <em>him</em>.</p>
+
+<h3>What are the six letters?</h3>
+
+<p><strong>The cycle does not say.</strong> The strike under ROCKE measures six letters. The word in Alaysha&rsquo;s price column is six letters long.</p>
+
+<p>The obvious candidates are ROCKES, RENARD, ALAYSE, and any number of six-letter names. The cycle gives you none of them.</p>
+
+<p>The doctrine, which any monk of the Mound could have given Alaysha in forty seconds, is that there are <strong>two</strong> hands, and the question <em>which hand answered me</em> is not a hard question. It is a malformed one. It is, precisely and exactly, the disclaiming.</p>
+
+<p>She never went. Nobody in her family had gone in four generations.</p>
+
+<h3>What did Jaennis Fenwood mean by &ldquo;the betrayal of the court and the queen&rsquo;s body&rdquo;?</h3>
+
+<p><strong>The cycle gives you four readings and declines to choose.</strong> The editor says: <em>The editor has a preference and is keeping it.</em></p>
+
+<p>There is a <strong>fifth reading</strong>, available only to a reader who has noticed that Ylena of Coldmorrow was in Jaennis&rsquo;s household from 837, and that her name appears on nothing after the fifth of Lavius, 841. The editor says: <em>It is left where she left it.</em></p>
+
+<h3>Did Jaennis Fenwood know the ford at Kettling would be held?</h3>
+
+<p><strong>She sent the date.</strong> She wrote the covering note herself. She did not hesitate.</p>
+
+<p>She says: <em>I am not going to tell you I agonised. I did not.</em></p>
+
+<p>What she does not say is whether she knew what the date was worth, or whether she knew it when she asked for it, or whether she asked for it because she knew.</p>
+
+<p>She says: <em>I knew what it was worth. Both of those are true at once and neither cancels the other.</em></p>
+
+<h3>What became of Ylena of Coldmorrow?</h3>
+
+<p><strong>The cycle tells you what became of the woman of the household.</strong> She was taken, tried, convicted, and sentenced. The sentence was carried out on the fifth of Lavius, 841, in another place and at an hour set down in its own register.</p>
+
+<p>The cycle does not tell you whether she did it. The evidence was sufficient and never conclusive. She never confessed. She was condemned in a hall in which every single person had learned four days earlier whose daughter she was.</p>
+
+<p>Veralyn Everblood understood all of that perfectly. She had written it down in Floralis. She had it in her own hand in the muniment room ninety feet away.</p>
+
+<p>She confirmed the sentence.</p>
+
+<h3>What became of Vaelrie Longblood?</h3>
+
+<p><strong>She lived in Jaennis Fenwood&rsquo;s house for the rest of the period covered by any record here.</strong> She did not marry. She kept the household books from 844 and kept them very well. She signed herself <em>V. Longblood</em>, plainly, in every hand she ever wrote again.</p>
+
+<p>She was called Paget by nobody after 841.</p>
+
+<p>Whether that is a happy ending or a tragedy is not for the cycle to say, and it does not say.</p>
+
+<h3>What did Elianor Longblood&rsquo;s life cost?</h3>
+
+<p><strong>She could not produce the figure.</strong> She opened her mouth, and closed it. Nobody had ever asked her to add it up. She had never once opened a column for herself.</p>
+
+<p>She thought about it for nineteen years. There is a line in a letter of hers, written at seventy to a man in a priory at Ancourt, that is the nearest she ever came:</p>
+
+<div class="instrument">
+<p>I have been trying since the spring of the third year to draw up a particular account, at the instance of a lady who asked me for it very civilly and has never mentioned it since. I find I cannot arrive at a figure. I find I cannot arrive at the first entry. You will laugh at me; do, I should be glad of it.</p>
+</div>
+
+<h3>What is the cycle for?</h3>
+
+<div class="panel panel-gold">
+<p><strong>It is about the difference between collecting and displaying.</strong></p>
+<p>It is about the difference between a relic under a cloth and a relic on a table.</p>
+<p>It is about the difference between a term that cannot be struck and a party to the contract.</p>
+<p>And it is about the moment when someone lifts the cloth, and tells you what is on the table, and waits to see whether you put your hand down anyway.</p>
+</div>
+
+<p>Vaelrie put her hand down.</p>
+
+<p>She wrote: <em>I am coming.</em></p>
+
+<p>And the joiner&rsquo;s bill is dated six days before she was in trouble, and it is receipted and paid, and it is the last item in the folder, and it does not prove anything at all.</p>
+
+<p>It just says the chair was there.</p>
+
+<hr class="scene-rule"/>
+
+<h2 id="chronology"><span class="movement-kicker">Appendix</span>Chronology</h2>
+
+<div class="tablewrap">
+<table class="reckoning">
+<thead>
+<tr><th>Year</th><th>Event</th></tr>
+</thead>
+<tbody>
+<tr><td>785</td><td>The Peace of Belworth. Item the Fourth. Elianor and Baldvyn are betrothed.</td></tr>
+<tr><td>786</td><td>Elianor marries Wymund IV at Valora.</td></tr>
+<tr><td>793</td><td>Elianor keeps the autumn at Corbenoit.</td></tr>
+<tr><td>796</td><td>Valdais born and acknowledged within the hour. The Thornhills rise.</td></tr>
+<tr><td>797</td><td>Ubbin Falls. Wymund dies. Harald reigned ten days. Baldvyn crowned. Brigh burned. The Act of Settlement. Baldvyn marries Elianor.</td></tr>
+<tr><td>798</td><td>Wyllmot born.</td></tr>
+<tr><td>814</td><td>Valdais signs Clause the Tenth at his majority.</td></tr>
+<tr><td>819</td><td>Veralyn born.</td></tr>
+<tr><td>821</td><td>The Longblood Defiance ends at Charau. Elianor incarcerated.</td></tr>
+<tr><td>828</td><td>Veralyn sent to Tarlington.</td></tr>
+<tr><td>832</td><td>Lence sacked. Coldmorrow burned.</td></tr>
+<tr><td>834</td><td>Baldvyn&rsquo;s tourney. Baldvyn the Good dies. Wyllmot crowned.</td></tr>
+<tr><td>836</td><td>The Seven Week Uprising. Wyllmot dies at Eryas. Brightstride crowned.</td></tr>
+<tr><td>838</td><td>Brightstride dies. The succession crisis.</td></tr>
+<tr><td>840</td><td>Veralyn crowned. Ylena condemned. The northern earls rise. Valdais crosses the Belworth.</td></tr>
+<tr><td>841</td><td>The fifth of Lavius. The ford at Kettling. Thirty-one men. Vaelrie on the river.</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="scene-rule"/>
+
+<h2 id="lineage"><span class="movement-kicker">Appendix</span>The Lineage</h2>
+
+<p class="marginalia">Simplified. Deliberately. The names repeat on purpose.</p>
+
+<pre class="figure">WYMUND IV (the Smiling King)
+├── HARALD (the Bold) — reigned 10 days, died at Brigh, 797
+├── BALDVYN (the Good) — m. ELIANOR LONGBLOOD
+│   ├── WYLLMOT — m. ALAYSHA RENARD
+│   │   ├── BALDVYN III (Brightstride) — d. 838
+│   │   │   m. JAENNIS FENWOOD
+│   │   ├── VERALYN (Blackrose, the Warrior Queen)
+│   │   ├── ELYSABETH
+│   │   └── ROSLYN
+│   ├── ARYKA
+│   └── ARWYN
+├── AOBREY — m. BRAEDYN FENWOOD
+├── AYLEEN
+├── ALYKSANDER (Iverius the Pious)
+├── CAMYLLE
+└── ALAYSE
+
+OSWYN EVERBLOOD — brother of Wymund IV
+└── Duke of Istovar (by Clause the Ninth)
+
+VALDAIS LONGBLOOD — acknowledged son of Wymund IV
+├── OUEN
+├── VAELRIE (Paget)
+└── MAEGWEN</pre>
+
+<div class="marginalia">
+Rumour names Baldvyn as the father of some or all of Elianor&rsquo;s children by Wymund. The Right of Acknowledgment does not admit the question and Clause the Eleventh forecloses it. Nothing here settles it.
+</div>
+
+<hr class="scene-rule"/>
+
+<h2 id="paths"><span class="movement-kicker">Appendix</span>Reading Paths</h2>
+
+<div class="grid">
+
+<div class="card">
+<h4>The Author&rsquo;s Order</h4>
+<ol>
+<li><em>The Widow&rsquo;s Hand</em></li>
+<li><em>A Roll of the Fallen</em></li>
+<li><em>Count Your Exits</em></li>
+<li><em>Paget</em></li>
+</ol>
+</div>
+
+<div class="card">
+<h4>The Chronological Order</h4>
+<ol>
+<li><em>The Widow&rsquo;s Hand</em> (785&ndash;840)</li>
+<li><em>Count Your Exits</em> (828&ndash;840)</li>
+<li><em>A Roll of the Fallen</em> (832&ndash;842)</li>
+<li><em>Paget</em> (840&ndash;841)</li>
+</ol>
+</div>
+
+<div class="card">
+<h4>The Investigation Order</h4>
+<ol>
+<li><em>Paget</em> &mdash; read it first, as the key</li>
+<li><em>The Widow&rsquo;s Hand</em> &mdash; the doctrine</li>
+<li><em>A Roll of the Fallen</em> &mdash; the ledger</li>
+<li><em>Count Your Exits</em> &mdash; the game</li>
+</ol>
+</div>
+
+<div class="card">
+<h4>The Companion Reading</h4>
+<p>Read <em>Paget</em> and <em>The Last Blade</em> side by side. They take place at the same time. Riarhin and Elyas and Rekedim are in the background of <em>Paget</em>, and Vaelrie and Jaennis are in the background of <em>The Last Blade</em>. Neither work acknowledges the other. That is the point.</p>
+</div>
+
+</div>
+
+<hr class="scene-rule"/>
+
+<p class="marginalia" style="text-align:center; border:0; margin:2rem 0 0 0;">
+Here ends the Reader&rsquo;s Guide to the Belworth Cycle.<br/>
+The chair is still by the window.
+</p>
+
+<footer>
+The Belworth Cycle &mdash; A Reader&rsquo;s Guide<br/>
+Digital reading edition
+</footer>
+
+</body>
+</html>
