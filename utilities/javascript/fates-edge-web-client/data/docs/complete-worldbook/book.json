@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-08T14:34:45.396049+00:00",
+  "generated": "2026-09-21T01:30:08.559829+00:00",
   "id": "complete-worldbook",
   "title": "The Complete Worldbook",
   "subtitle": "A Gazetteer of the Known Realms",
@@ -81,6 +81,5 @@
       "label": "Chapter 15",
       "title": "Colophon"
     }
-  ],
-  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
+  ]
 }

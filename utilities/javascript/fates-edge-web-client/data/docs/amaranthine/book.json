@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-08T14:35:20.455894+00:00",
+  "generated": "2026-09-21T01:28:25.268523+00:00",
   "id": "amaranthine",
   "title": "The Amaranthine",
   "subtitle": "The Core Setting Book",
@@ -66,6 +66,5 @@
       "label": "Chapter 12",
       "title": "Coda: A Random Encounter (Not Really) at the Three-Mugs Inn"
     }
-  ],
-  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
+  ]
 }
