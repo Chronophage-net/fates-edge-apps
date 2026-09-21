@@ -206,9 +206,23 @@
          those call sites resolve correctly and stop reaching document.body
          at all. (module-loader.js's `this.container` lookup was hitting
          this exact same missing-id fallback too — see its constructor.) -->
+    <!-- NEW: the mobile off-canvas sidebar (see css/app.css's ~1024px
+         media query -- .sidebar, .sidebar.open, .sidebar-scrim,
+         .mobile-nav-toggle, .mobile-nav-close) was styled but never had a
+         button, close control, or backdrop actually wired up anywhere in
+         this file or in js/app.js. Below 1024px width the sidebar is
+         permanently transform:translateX(-100%)'d off-screen with no way
+         to bring it back -- reported as "the toolkit is missing its
+         sidebar." The three elements below plus the small toggle in
+         app.js's init (search "mobile sidebar toggle") complete what the
+         CSS was already built for. -->
+    <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false" data-i18n-attr="aria-label:nav.openMobile">☰</button>
+    <div class="sidebar-scrim" id="sidebarScrim" hidden></div>
+
     <div class="app-shell" id="app-content">
         <!-- ===== SIDEBAR ===== -->
         <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main Navigation" data-i18n-attr="aria-label:nav.main">
+            <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Close navigation" data-i18n-attr="aria-label:nav.closeMobile">✕</button>
             <div class="sidebar-brand">
                 <span class="brand-icon">⚔️</span>
                 <div class="brand-text">

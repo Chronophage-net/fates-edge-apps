@@ -119,7 +119,9 @@
     "systemStatus": {
       "label": "Estado",
       "title": "Estado del sistema"
-    }
+    },
+    "openMobile": "Abrir navegación",
+    "closeMobile": "Cerrar navegación"
   },
   "footer": {
     "saved": "Guardado",

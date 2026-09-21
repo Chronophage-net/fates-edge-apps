@@ -59,9 +59,52 @@ function onUnlockSuccess() {
     initializeRouter();
 }
 
+// NEW: css/app.css has always had a full off-canvas mobile sidebar
+// treatment (.sidebar, .sidebar.open, .sidebar-scrim, .mobile-nav-toggle,
+// .mobile-nav-close under the ~1024px media query -- see the ~Sep 9 commit
+// "Updated CSS to hide mobile navigation on desktop browsers"), but no
+// button, close control, or backdrop was ever added to index.html, and
+// nothing here ever toggled `.open`/aria-expanded. Below 1024px width the
+// sidebar sat permanently transform:translateX(-100%)'d off-screen with
+// no way to bring it back at all -- reported as "the toolkit is missing
+// its sidebar." index.html now has #mobileNavToggle / #mobileNavClose /
+// #sidebarScrim; this wires them up to what the CSS already expected.
+function initMobileSidebarToggle() {
+    const toggle = document.getElementById('mobileNavToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (!toggle || !sidebar) return;
+    const closeBtn = document.getElementById('mobileNavClose');
+    const scrim = document.getElementById('sidebarScrim');
+
+    const setOpen = (open) => {
+        sidebar.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        if (scrim) scrim.hidden = !open;
+    };
+
+    toggle.addEventListener('click', () => setOpen(true));
+    if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
+    if (scrim) scrim.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) setOpen(false);
+    });
+
+    // Picking a tab closes the off-canvas sidebar so the panel underneath
+    // is immediately visible, instead of leaving the drawer open over it.
+    const sidebarNav = document.getElementById('sidebarNav');
+    if (sidebarNav) {
+        sidebarNav.addEventListener('click', (e) => {
+            if (e.target.closest('.nav-item') && window.matchMedia('(max-width: 1024px)').matches) {
+                setOpen(false);
+            }
+        });
+    }
+}
+
 async function init() {
     console.log(`Fate's Edge Toolkit v${APP_VERSION} — Loading...`);
     applyDisplayedVersion();
+    initMobileSidebarToggle();
 
     try {
         // 0. Interface language.

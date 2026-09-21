@@ -119,7 +119,9 @@
     "systemStatus": {
       "label": "Status",
       "title": "System Status"
-    }
+    },
+    "openMobile": "Open navigation",
+    "closeMobile": "Close navigation"
   },
   "footer": {
     "saved": "Saved",
