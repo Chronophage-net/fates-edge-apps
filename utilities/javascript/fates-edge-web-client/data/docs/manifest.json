@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-20T14:25:22.910Z",
+  "generated": "2026-09-22T17:47:41.825Z",
   "documents": [
     {
       "id": "srd",
@@ -1489,6 +1489,16 @@
       "active": true
     },
     {
+      "id": "the_thread_treatment",
+      "title": "The Thread Treatment",
+      "file": "Fates_-_Edge_-_-The-_-Thread-_-Treatment.html",
+      "path": "/data/docs/design/",
+      "category": "design",
+      "categoryLabel": "Design",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_three_reckonings",
       "title": "The Three Reckonings",
       "file": "Fates_-_Edge_-_-The-_-Three-_-Reckonings.html",
@@ -1683,7 +1693,7 @@
       "active": true
     }
   ],
-  "total_count": 109,
-  "active_count": 109,
+  "total_count": 110,
+  "active_count": 110,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
