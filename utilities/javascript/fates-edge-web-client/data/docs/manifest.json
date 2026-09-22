@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-22T18:22:36.910Z",
+  "generated": "2026-09-22T23:39:09.845Z",
   "documents": [
     {
       "id": "srd",
@@ -1539,6 +1539,26 @@
       "active": true
     },
     {
+      "id": "the_weight_you_carry",
+      "title": "The Weight You Carry",
+      "file": "Fates_-_Edge_-_-The-_-Weight-_-You-_-Carry.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_weight_you_carry_treatment",
+      "title": "The Weight You Carry Treatment",
+      "file": "Fates_-_Edge_-_-The-_-Weight-_-You-_-Carry-_-Treatment.html",
+      "path": "/data/docs/design/",
+      "category": "design",
+      "categoryLabel": "Design",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_widows_hand",
       "title": "The Widows Hand",
       "file": "Fates_-_Edge_-_-The-_-Widows-_-Hand.html",
@@ -1693,7 +1713,7 @@
       "active": true
     }
   ],
-  "total_count": 110,
-  "active_count": 110,
+  "total_count": 112,
+  "active_count": 112,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
