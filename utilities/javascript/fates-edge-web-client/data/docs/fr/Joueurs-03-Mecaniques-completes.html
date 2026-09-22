@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge Guide du Joueur — Chapitre 3 : Mécaniques de base (Français)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a; --bg2: #1a1a2e; --bg3: #252540; --bg4: #2f2f4a;
+        --text: #e8e8f0; --text2: #b8b8c8; --text3: #8888a0;
+        --gold: #c9a84c; --gold-hover: #d4b85c; --border: #333355;
+        --red: #c0392b; --green: #27ae60; --blue: #2980b9; --purple: #8e44ad; --orange: #e67e22;
+        --radius: 8px; --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg1); color: var(--text); font-family: var(--font); padding: 1.5rem; max-width: 1100px; margin: 0 auto; line-height: 1.6; }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    p.subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 1rem; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel { background: var(--bg2); border-radius: var(--radius); padding: 0.6rem 0.8rem; border: 1px solid var(--border); margin: 0.6rem 0; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .text-muted { color: var(--text3); }
+    .text-sm { font-size: 0.85rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote { font-style: italic; border-left: 4px solid var(--gold); padding: 0.5rem 1rem; margin: 0.5rem 0; background: var(--bg2); border-radius: var(--radius); color: var(--text2); }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    dl { margin: 0.4rem 0 0.6rem 0.4rem; }
+    dt { color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1.2rem; color: var(--text2); }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body><aside class="translation-notice" lang="fr">Version française. Traduction assistée ; révision éditoriale complète en attente. <a href="../players-guide/Players-_-Guide-_-03-_-Core-_-Mechanics.html" hreflang="en">Consulter l'original en anglais</a></aside>
+<h1 id="reader-section-1">Mécaniques de base</h1>
+<p class="subtitle">Fate's Edge Guide du Joueur — Chapitre 3</p>
+<div class="panel">
+<span class="panel-title">Un mot de la Route du Corbeau</span>
+<em>« La route se souvient. Chaque roue brisée laisse une marque, et chaque lampe allumée avait quelqu'un derrière elle. La seule question est de savoir lequel des deux vous comptez être. »</em>
+<div class="text-sm text-muted mt-1">— Dusana de la Route du Corbeau, gardienne d'histoires Tulkani, <em>Le Cordon du Foyer</em></div>
+</div>
+<h2 id="play-loop">La boucle de jeu</h2>
+<p><span id="resolution-cycle"></span>Chaque action significative suit les huit mêmes étapes. Apprenez-les et vous saurez comment se joue Fate's Edge ; tout le reste de ce chapitre n'est que du détail accroché à ce cadre.</p>
+<div class="panel" style="border-left:4px solid var(--gold);">
+<p style="margin:0;"><strong>La boucle en une ligne :</strong> dites ce que vous voulez et comment → le MJ fixe la Position et le DV → lancez Attribut + Compétence → comptez les 6 et les 1 → lisez le résultat → le MJ dépense vos 1 → notez ce que cela vous a coûté.</p>
+</div>
+<ol>
+<li><strong>Le MJ plante le décor.</strong> Il décrit la situation et demande ce que vous faites.</li>
+<li><strong>Vous déclarez votre intention et votre approche.</strong> Ce que vous voulez accomplir, et comment vous vous y prenez — ce qui nomme l'<strong>Attribut + Compétence</strong> que vous lancerez.</li>
+<li><strong>Le MJ fixe la Position et le DV.</strong> La Position (Dominant, Maîtrisé, Désespéré) mesure votre exposition ; le DV (2–5) mesure la difficulté de la tâche. Les deux sont fixés <em>avant</em> les dés, donc vous pouvez encore changer d'avis.</li>
+<li><strong>Vous lancez.</strong> Attribut + Compétence en d10.</li>
+<li><strong>Comptez deux fois.</strong> Chaque <strong>6 et plus</strong> est une Réussite. Chaque <strong>1</strong> est un Point d'Histoire pour le MJ. Un dé ne peut être que l'un ou l'autre, et vous comptez toujours les deux.</li>
+<li><strong>Lisez le résultat.</strong> Comparez les Réussites au DV sur la Matrice des résultats : Réussite Nette, Réussite avec PH, Partielle, ou Échec.</li>
+<li><strong>Le MJ dépense les Points d'Histoire.</strong> Complications, minuteurs qui avancent, escalade — payés avec les 1 que vous avez lancés, que vous ayez réussi ou non.</li>
+<li><strong>Vous notez ce que cela vous a coûté.</strong> Faveurs (1 sur une Partielle, 2 sur un Échec), Fatigue, Dommage, Obligation. Puis le projecteur passe.</li>
+</ol>
+<p>Un passage complet devrait prendre environ <strong>quatre-vingt-dix secondes</strong>. Si ça traîne, revenez à l'essentiel : une intention claire, un jet, une conséquence.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Règle d'or</span>
+<strong>Dans le doute, faites le choix qui sert l'histoire.</strong> Si vous vous surprenez à demander « Quel est le coup optimal ? », essayez de le reformuler en « Qu'est-ce qui serait le plus intéressant pour l'histoire ? »
+</div>
+<h2 id="player-managed-modules">Modules gérés par le joueur</h2>
+<p>Dans Fate's Edge, vous êtes le gestionnaire principal de l'état mécanique de votre personnage. Ce n'est pas qu'une question de commodité — c'est un principe de conception central qui réduit la charge du MJ et vous garde impliqué.</p>
+<div class="panel">
+<span class="panel-title">Vous suivez votre propre histoire</span>
+<strong>Ce que vous gérez :</strong>
+<ul>
+<li>Les jauges d'Obligation (une par Patron ou Symbole)</li>
+<li>Les minuteurs de Corruption (Chantres, Chuchoteurs de Pacte)</li>
+<li>Les minuteurs de Laisse (esprits invoqués)</li>
+<li>Les états d'Atouts (Florissant, Stable, Tendu, Effondré)</li>
+<li>Les états de Suivants (Loyauté : Fidèle/Tendue/Rompue ; Forme : Prêt/Blessé/À terre)</li>
+<li>Les minuteurs de progression (Répertoire, Lien Spirituel)</li>
+<li>Faveurs, Faveur (Patron), Levier</li>
+</ul>
+<p class="mt-1"><strong>Vos responsabilités :</strong></p>
+<ol>
+<li><strong>Notez immédiatement</strong> quand une règle dit « notez +X ».</li>
+<li><strong>Déclarez les seuils</strong> (« Mon Obligation est pleine ! »).</li>
+<li><strong>Gardez-le visible</strong> (utilisez des jauges que tout le monde peut voir).</li>
+<li><strong>Gardez la propriété</strong> — vous connaissez votre état mieux que quiconque.</li>
+</ol>
+<p class="mt-1"><strong>Soutien du MJ :</strong> Le MJ fait des vérifications ponctuelles et fournit des conséquences, mais vous pilotez le récit mécanique de votre personnage.</p>
+</div>
+<div class="panel">
+<span class="panel-title">Exemple : suivre votre Obligation</span>
+    Une personnage avec Âme 2 et Prestance 2 a une Capacité d'Obligation de 4. Elle invoque un Rite du Patron A (+1), puis Pousse plus tard un Rite du Patron B (+1), puis Brise le Sceau sur un Symbole (+2). Elle a maintenant :
+    <ul>
+<li>Patron A : 1 segment</li>
+<li>Patron B : 1 segment</li>
+<li>Symbole (Invocateur) : 2 segments</li>
+</ul>
+<p class="mt-1">Obligation totale = 4 → exactement à la Capacité. Pas encore de Fatigue. Si elle invoque un Rite de plus de n'importe quel Patron, elle dépasse la Capacité et note <strong>1 Fatigue</strong> immédiatement.</p>
+</div>
+<h2 id="dice-mechanics">Mécaniques de base des dés</h2>
+<p>Quand vous tentez une action significative, lancez un pool de dés à dix faces (d10). La taille de votre pool est :</p>
+<p style="text-align:center;font-size:1.1rem;color:var(--gold);">Pool de dés = Attribut + Compétence</p>
+<dl>
+<dt>Attribut (1–5)</dt>
+<dd>Traits larges comme la Force, l'Esprit, ou le Charme.</dd>
+<dt>Compétence (0–5)</dt>
+<dd>Entraînement dans un domaine spécifique (par ex. Mêlée, Discrétion, Arcanes).</dd>
+</dl>
+<div class="panel panel-red">
+<span class="panel-title">Légende de la Chute : Le poids des chiffres</span>
+<em>« Les Aeler comptent leurs souffles ; les Aelaerem versent huit coupes et s'arrêtent. La neuvième n'est pas un chiffre — c'est une blessure qui ne s'est pas refermée. »</em>
+<p class="mt-1">Dans Fate's Edge, les dés ne sont pas de simples générateurs aléatoires. Ils sont l'écho de chaque serment prêté, chaque dette impayée. Quand vous lancez un 1, vous nourrissez le Vide — et le Vide nourrit l'histoire.</p>
+</div>
+<h3>Lire les dés</h3>
+<p>Chaque dé qui affiche <strong>6 ou plus</strong> compte comme une <strong>Réussite</strong>. Chaque dé qui affiche un <strong>1</strong> génère un <strong>Point d'Histoire (PH)</strong>.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Résultat du dé</th><th>Effet</th></tr></thead>
+<tbody>
+<tr><td>6–10</td><td>+1 Réussite</td></tr>
+<tr><td>1</td><td>+1 Point d'Histoire (PH)</td></tr>
+<tr><td>2–5</td><td>Rien</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Exemple :</strong> Lyra (Esprit 3 + Discrétion 2 = 5 dés) lance : 6, 4, 3, 1, 6 → 2 Réussites, 1 PH. Le DV est 2 — elle réussit, mais le MJ a 1 PH à dépenser (peut-être un garde qui s'agite).</p>
+<div class="panel panel-purple">
+<span class="panel-title">Quand lancer les dés</span>
+    Vous ne lancez les dés que quand :
+    <ul>
+<li>Le résultat est incertain, <strong>et</strong></li>
+<li>L'échec importerait à l'histoire, <strong>et</strong></li>
+<li>L'action est assez significative pour mériter un projecteur.</li>
+</ul>
+<p class="mt-1">Pour les actions routinières sans risque réel, le groupe peut simplement convenir que vous réussissez. <em>Exemple :</em> Grimper à une corde nouée par temps calme → pas de jet. Grimper à la même corde pendant que des gobelins tirent des flèches → jet.</p>
+</div>
+<h2 id="difficulty-value">Valeur de Difficulté (DV)</h2>
+<p>Le Maître du Jeu fixe une <strong>Valeur de Difficulté</strong> — le nombre cible de Réussites nécessaires.</p>
+<div class="panel">
+<span class="panel-title">Échelle de Valeur de Difficulté (DV)</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>DV</th><th>Situation</th></tr></thead>
+<tbody>
+<tr><td>2</td><td>Routine, aucune pression</td></tr>
+<tr><td><strong>3</strong></td><td><strong>Sous pression, opposition légère (par défaut)</strong></td></tr>
+<tr><td>4</td><td>Difficile, résistance active</td></tr>
+<tr><td>5</td><td>Extrême, enjeux élevés</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<p><strong>DV 3 est la valeur par défaut.</strong> Si le MJ demande un jet, quelque chose est en jeu. N'inflatez pas les DV — ils font déjà leur travail.</p>
+<p><strong>L'exception étroite : DV 6–8.</strong> Au Palier IV+ uniquement, une œuvre magique à marqueurs maximaux ou un obstacle exigeant un travail d'équipe à l'échelle épique peut appeler un DV de 6, 7, ou 8 — voir le chapitre Palier Épique du Guide du MJ. Ce n'est pas un outil d'escalade général ; en dessous du Palier IV, et pour les tâches ordinaires à tout palier, l'échelle s'arrête toujours à 5.</p>
+<h2 id="outcome-matrix">La Matrice des résultats</h2>
+<p>Comparez vos Réussites au DV pour déterminer le résultat.</p>
+<div class="panel">
+<span class="panel-title">Matrice des résultats</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Résultat</th><th>Ce que cela signifie</th></tr></thead>
+<tbody>
+<tr><td><strong>Réussite Nette</strong> (S ≥ DV)</td><td>Vous atteignez votre objectif sans complication.</td></tr>
+<tr><td><strong>Réussite avec PH</strong> (S ≥ DV, PH&gt;0)</td><td>Vous réussissez, mais le MJ dépense des PH pour ajouter un rebondissement.</td></tr>
+<tr><td><strong>Partielle</strong> (0 &lt; S &lt; DV)</td><td>Vous progressez, mais la situation reste non résolue. Vous gagnez 1 Faveur.</td></tr>
+<tr><td><strong>Échec</strong> (S = 0)</td><td>Vous échouez, et la situation s'aggrave. Vous gagnez 2 Faveurs.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<p><strong>Ce que signifie une Partielle.</strong> Une Partielle n'est pas un échec — elle fait avancer l'histoire. Exemples :</p>
+<ul>
+<li>Améliorer votre Position pour la tentative suivante (voir Position, ci-dessous).</li>
+<li>Réduire le DV effectif du prochain jet.</li>
+<li>Réussir à échelle ou durée réduite.</li>
+<li>Révéler une information ou ouvrir une nouvelle voie.</li>
+</ul>
+<div class="panel panel-red">
+<span class="panel-title">Échouer en avançant</span>
+    Un <strong>Échec</strong> n'est jamais « il ne se passe rien ». Le MJ doit introduire une complication, faire avancer un minuteur, ou révéler un danger caché. Vous gagnez 2 Faveurs — l'histoire avance, et vous obtenez des ressources pour réessayer.
+    <p class="mt-1"><em>Exemple :</em> Vous ratez le crochetage d'une serrure (Échec). Le MJ dit : « Votre crochet casse, mais vous entendez les pas du garde — il est sur le point de tourner au coin. Vous avez un temps pour vous cacher. » L'histoire avance.</p>
+</div>
+<h3>Réussites critiques</h3>
+<p>Un jet de <strong>10</strong> compte comme <strong>deux Réussites</strong>. Si le jet réussit, chaque 10 ajoute du poids narratif.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>10</th><th>Effet</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Réussite forte — améliorez votre Position d'un cran sur votre prochaine action cette scène, ou gagnez un avantage mineur (à la discrétion du MJ).</td></tr>
+<tr><td>2</td><td>Réussite exceptionnelle — choisissez deux bénéfices de la liste ci-dessus.</td></tr>
+<tr><td>3</td><td>Réussite légendaire — victoire décisive ; effacez 1 segment d'un minuteur pertinent.</td></tr>
+<tr><td>4+</td><td>Réussite mythique — remodelez la scène ; effacez 1 à 2 segments d'un minuteur pertinent.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Important :</strong> Un dé affichant un <strong>10</strong> n'est jamais relancé, même par des effets de Position ou d'autres mécaniques. Les effets critiques ne s'appliquent que si le jet global réussit.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Exemple : lancer un 10</span>
+    Lyra lance 3 dés : <strong>10</strong>, 8, 1. Elle obtient : 2 réussites (du 10) + 1 réussite (du 8) = 3 réussites. Le jet génère aussi 1 PH (du 1). Parce qu'elle a lancé un 10, le MJ accorde un bénéfice supplémentaire : « Votre flèche transperce l'épaule du bandit — il lâche son épée. » <em>(Bénéfice narratif choisi par le MJ.)</em>
+</div>
+<h2 id="boons">Faveurs</h2>
+<p>Les Faveurs représentent l'élan et le levier narratif. Vous pouvez en détenir jusqu'à <strong>5</strong>.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Légende du Toucher de Velours</span>
+<em>« La pièce qu'on ne dépense jamais est celle dont on ne se souvient pas avoir volée. »</em>
+<p class="mt-1">Les Faveurs sont la meilleure amie du voleur — une seconde chance quand la serrure claque mal, une ombre soudaine quand le garde se retourne. À Fil de Soie, on dit qu'une Faveur est une dette envers la chance, et la chance encaisse toujours.</p>
+</div>
+<div class="panel panel-green">
+<span class="panel-title">Pourquoi vous devriez dépenser vos Faveurs — La mathématique du plaisir</span>
+<strong>Thésauriser les Faveurs pour la conversion en XP mène à moins d'engagement et à des scores de plaisir plus faibles.</strong>
+<p class="mt-1">Chaque Faveur que vous détenez est un moment dramatique qui attend de se produire :</p>
+<ul>
+<li>Relancer un échec critique transforme le désespoir en triomphe.</li>
+<li>Améliorer la Position avant un jet risqué transforme un pari Désespéré en chance Maîtrisée.</li>
+<li>Activer un Atout amène le réseau de votre personnage dans l'histoire.</li>
+</ul>
+<p class="mt-1"><strong>L'XP tiré des Faveurs n'est qu'un filet (max 2 par séance).</strong> La vraie récompense est l'<em>agentivité</em>. Dépensez vos Faveurs librement — ce ne sont pas des jetons d'XP.</p>
+<p class="mt-1"><em>Exemple :</em> Vous avez 3 Faveurs. Plutôt que de les convertir plus tard, utilisez-en 1 pour relancer un crochetage raté, une autre pour améliorer votre Position avant un combat, et gardez la dernière pour une urgence. C'est ainsi que naissent les légendes.</p>
+</div>
+<h3>Gagner des Faveurs</h3>
+<ul>
+<li><strong>Réussite Partielle :</strong> Gagnez 1 Faveur (voir la Matrice des résultats, ci-dessus).</li>
+<li><strong>Échec :</strong> Gagnez 2 Faveurs.</li>
+<li><strong>Action liée à un Lien :</strong> Une fois par Lien par séance, gagnez 1 Faveur quand une action engage significativement ce Lien (les Liens sont établis à la création du personnage — Chapitre 2, Étape 8).</li>
+<li><strong>Récompense du MJ :</strong> Pour créativité, sacrifice, ou fort jeu narratif.</li>
+</ul>
+<p><strong>Quand ce n'est pas accordé :</strong> Une répétition sûre, des sondages à risque nul, ou des tentatives identiques répétées dans la même scène ne génèrent pas de Faveurs.</p>
+<h3>Dépenser des Faveurs</h3>
+<ul>
+<li>Relancer un seul dé (après avoir vu le résultat)</li>
+<li>Activer un Atout présent en scène (1 Faveur)</li>
+<li>Améliorer la Position d'1 cran avant un jet (voir Position, ci-dessous)</li>
+<li>Alimenter certains Rites ou capacités (voir le chapitre Magie)</li>
+<li>Convertir en XP (2 Faveurs = 1 XP, une fois par séance pendant le temps mort, max 2 XP par séance)</li>
+</ul>
+<p><strong>Substituer la Fatigue aux Faveurs.</strong> Si vous n'avez plus de Faveurs (ou souhaitez les conserver), vous pouvez payer <strong>1 Fatigue</strong> à la place d'1 Faveur pour activer tout effet qui coûte normalement une Faveur. Cela représente le fait de puiser dans l'épuisement, de s'appuyer sur l'effort brut, ou d'accepter un léger péage physique. Le MJ peut opposer un veto à cette substitution si la fiction la rend implausible (par ex. activer un Atout délicat en étant épuisé). Utiliser cette option ne change pas le résultat de l'effet ni ne génère de Points d'Histoire supplémentaires ; cela change simplement la ressource dépensée.</p>
+<h3>Limite de report</h3>
+<p>À la fin de chaque scène, réduisez les Faveurs détenues à un maximum de <strong>2</strong>. L'excédent est perdu — dépensez-le ou perdez-le.</p>
+<h2 id="position">Position</h2>
+<p>Chaque action se déroule depuis une <strong>Position</strong> qui reflète l'avantage du personnage.</p>
+<div class="panel">
+<span class="panel-title">Effets de la Position</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Position</th><th>Cadre narratif</th><th>Effet mécanique</th></tr></thead>
+<tbody>
+<tr><td>Dominant</td><td>Vous imposez votre avantage</td><td>Relancez un <em>échec</em>.</td></tr>
+<tr><td>Maîtrisé</td><td>Norme équilibrée</td><td>Aucune relance.</td></tr>
+<tr><td>Désespéré</td><td>Vous agissez sous la contrainte</td><td>Relancez une <em>réussite</em>.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="mt-1">Vous pouvez dépenser <strong>1 Faveur</strong> pour améliorer la Position d'un cran avant de lancer les dés. Le MJ peut dépenser <strong>2 PH</strong> pour aggraver votre Position d'un cran (après le jet).</p>
+<p>Votre <strong>héritage</strong> déplace aussi la Position : chaque peuple a une <strong>Affinité</strong> qui l'améliore et une <strong>Limite</strong> qui l'aggrave, sur les jets utilisant les Attributs et Compétences qu'ils nomment (voir <em>Monde, Régions et Cultures</em>). La Position ne monte jamais au-dessus de Dominant ni ne descend en dessous de Désespéré — à chaque extrémité, les modificateurs supplémentaires ne font rien plutôt que de se convertir en dés.</p>
+</div>
+<p><strong>Important :</strong> Un dé affichant un <strong>10</strong> n'est jamais relancé, même par la Position Désespéré.</p>
+<div class="panel panel-blue">
+<span class="panel-title">La leçon d'un duelliste Vhasian</span>
+<em>« Sur le Pont-du-Tithe, la Position est tout. Tenez-vous avec le soleil dans le dos — vous êtes Dominant. Les pieds sur une planche glissante — Désespéré. Le pont n'a que faire de votre fierté. »</em>
+<p class="mt-1">Votre Position est le jugement que l'histoire porte sur votre risque. Changez la fiction, et la Position suit.</p>
+</div>
+<p><strong>Interaction des Faveurs avec la Fatigue :</strong> Quand la Fatigue force une relance de réussite (voir Jauge de Fatigue, ci-dessous), dépenser 1 Faveur annule <em>une</em> telle relance. Vous pouvez dépenser des Faveurs après avoir vu le résultat d'une relance due à la Fatigue.</p>
+<div class="panel panel-green">
+<span class="panel-title">Économie des Faveurs en un coup d'œil</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Action</th><th>Changement de Faveurs</th></tr></thead>
+<tbody>
+<tr><td>Réussite Partielle</td><td>Gagnez 1 Faveur</td></tr>
+<tr><td>Échec</td><td>Gagnez 2 Faveurs</td></tr>
+<tr><td>Action liée à un Lien</td><td>Gagnez 1 Faveur (une fois/Lien/séance)</td></tr>
+<tr><td>Récompense du MJ</td><td>+1 Faveur (rare)</td></tr>
+<tr><td>Relancer un dé</td><td>Dépensez 1 Faveur</td></tr>
+<tr><td>Activer un Atout</td><td>Dépensez 1 Faveur</td></tr>
+<tr><td>Améliorer la Position (avant le jet)</td><td>Dépensez 1 Faveur</td></tr>
+<tr><td>Convertir en XP (temps mort)</td><td>Dépensez 2 Faveurs → 1 XP (max 2 XP/séance)</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="mt-1"><strong>Maximum détenu :</strong> 5 Faveurs. À la fin de la scène, réduisez à <strong>2</strong> (l'excédent est perdu).</p>
+</div>
+<div class="panel panel-blue">
+<strong>Position</strong> (Dominant/Maîtrisé/Désespéré) = À quel point cette action est-elle risquée ? — détermine la sévérité de l'échec et les relances.<br/>
+<strong>Effet</strong> (Limité/Standard/Grand) = Qu'accomplissez-vous en cas de réussite ? — détermine la portée, l'échelle, ou la qualité.
+    <p class="mt-1 text-sm"><em>Exemple :</em> Désamorcer un piège — un Effet Limité laisse une personne traverser, Standard en laisse passer deux, Grand les quatre.</p>
+</div>
+<h2 id="story-beats">Points d'Histoire (PH)</h2>
+<p>Les Points d'Histoire sont des outils narratifs que le MJ dépense pour introduire des rebondissements. Ils gardent l'histoire vivante avec des complications.</p>
+<h3>Exemples de dépense de PH</h3>
+<ul>
+<li><strong>1 PH :</strong> Complication mineure — bruit, trace, +1 segment d'Approvisionnement.</li>
+<li><strong>2 PH :</strong> Revers modéré — alarme déclenchée, perte de couverture, un adversaire mineur apparaît, ou avance d'1 segment sur un minuteur de faction ou de front.</li>
+<li><strong>3 PH :</strong> Problème sérieux — renforts, un équipement clé se brise.</li>
+<li><strong>4+ PH :</strong> Tournant majeur — un piège se déclenche, l'autorité arrive, la scène bascule.</li>
+</ul>
+<p><strong>Conseil au joueur :</strong> Ne craignez pas les Points d'Histoire — ils sont du carburant pour le drame, pas une punition. Chaque fois que vous lancez un 1, vous donnez une étincelle au MJ. Cette étincelle peut allumer un feu qui fait brûler l'histoire plus fort.</p>
+<h2 id="harm-fatigue">Dommage et Fatigue</h2>
+<h3>Jauge de Fatigue</h3>
+<p>Chaque personnage a une jauge de Fatigue égale à son <strong>Corps</strong>. Notez de la Fatigue pour l'effort, la tension magique, ou le stress.</p>
+<ul>
+<li>Chaque cran de Fatigue aggrave votre Position : Dominant → Maîtrisé → Désespéré (voir Position, ci-dessus).</li>
+<li>Si déjà Désespéré, appliquez plutôt -1 dé par Fatigue.</li>
+<li>Les pénalités de Fatigue et de Dommage se <strong>cumulent</strong>. Par exemple, un personnage avec Dommage 1 (-1 dé) qui est aussi Désespéré à cause de la Fatigue subit les deux pénalités.</li>
+<li><strong>Débordement :</strong> Quand la jauge se remplit, augmentez le Dommage d'1 cran (voir Niveaux de Dommage, ci-dessous) et effacez toute la Fatigue.</li>
+<li><strong>Récupération :</strong> Un repos court efface 1 à 2 Fatigue ; une nuit complète de repos efface tout.</li>
+</ul>
+<div class="panel panel-orange">
+<span class="panel-title">Le compte de souffle Aeler</span>
+<em>« Les Guetteurs Profonds disent : huit souffles est un corridor, seize est une chambre, trente-deux est un fou qui a oublié de faire demi-tour. La Fatigue est votre souffle qui s'épuise — notez-le, ou la montagne vous marquera. »</em>
+<p class="mt-1">La Fatigue n'est pas seulement de la lassitude ; c'est le poids de chaque choix difficile que vous avez déjà fait.</p>
+</div>
+<h3>L'effet montagnes russes (subir un Dommage efface la Fatigue)</h3>
+<p>Quand vous subissez un Dommage, le choc de la blessure efface temporairement votre Fatigue. Cela crée des revirements dramatiques naturels — un personnage proche de l'effondrement qui reçoit une blessure et trouve soudain un second souffle.</p>
+<p><strong>Exemple :</strong> Mateo est à Fatigue 3 (Désespéré, -2 dés). Un gobelin le poignarde pour 1 Dommage. En suivant la procédure ci-dessous, le Dommage efface sa Fatigue (étape 2), puis il ajoute la Fatigue convertie (étape 3). Il termine avec Dommage 1, Fatigue 0 — blessé mais l'esprit clair.</p>
+<h3>Niveaux de Dommage</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Niveau de Dommage</th><th>Effet</th></tr></thead>
+<tbody>
+<tr><td>Dommage 1</td><td>-1 dé sur les actions liées</td></tr>
+<tr><td>Dommage 2</td><td>-1 dé sur la plupart des actions jusqu'au traitement</td></tr>
+<tr><td>Dommage 3</td><td>Incapacité ou agonie</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Subir Dommage et Fatigue — La procédure (perspective du joueur)</h3>
+<p><strong>Quand vous êtes touché, le MJ énonce la valeur de Dommage. Vous calculez la conversion en utilisant votre type d'armure, puis appliquez le résultat dans cet ordre :</strong></p>
+<ol>
+<li><strong>Le MJ énonce le Dommage :</strong> Le MJ narre l'attaque et vous indique la valeur de Dommage entrant (par ex. « Vous subissez Dommage 3 »).
+    <ul>
+<li>Votre travail est de connaître votre type d'armure et d'appliquer vous-même la conversion.</li>
+<li>Le MJ ne calcule <em>pas</em> la conversion pour vous.</li>
+</ul>
+</li>
+<li><strong>Calculez la conversion :</strong> En utilisant la Table de conversion d'armure (voir ci-dessous), déterminez :
+    <ul>
+<li><strong>Fatigue gagnée :</strong> Le coût en Fatigue du coup (minimum 1).</li>
+<li><strong>Dommage restant :</strong> Tout Dommage qui traverse votre armure.</li>
+</ul>
+<p class="text-sm mt-1"><em>Exemple :</em> MJ : « Vous subissez Dommage 2. » Vous (Armure légère) : « Dommage 2 en Armure légère → Dommage 1 restant, Fatigue 1 gagnée. »</p>
+</li>
+<li><strong>Appliquez d'abord le Dommage restant :</strong>
+<ul>
+<li>Effacez <strong>toute</strong> la Fatigue existante (le choc de la blessure réinitialise l'épuisement).</li>
+<li>Augmentez votre niveau de Dommage de la valeur de Dommage restant que vous avez calculée.</li>
+</ul>
+<p class="text-sm mt-1"><em>Exemple :</em> Vous avez calculé Dommage restant = 1 → Effacez la Fatigue, Dommage +=1.</p>
+</li>
+<li><strong>Ajoutez la Fatigue :</strong>
+<ul>
+<li>Ajoutez la Fatigue gagnée de votre calcul à votre jauge de Fatigue.</li>
+<li>Si cela remplit ou dépasse votre jauge (valeur de Corps), résolvez le <strong>Débordement</strong> (voir Jauge de Fatigue, ci-dessus).</li>
+</ul>
+<p class="text-sm mt-1"><em>Exemple :</em> Vous avez calculé Fatigue gagnée = 2 → Ajoutez 2 Fatigue, puis vérifiez si Fatigue ≥ Corps.</p>
+</li>
+<li><strong>Narrez le résultat :</strong>
+<ul>
+<li>Décrivez à quoi cela ressemble quand votre personnage encaisse le coup.</li>
+<li>« La lame glisse sous mon bouclier — je sens la piqûre (1 Dommage) tandis que l'épuisement s'estompe (1 Fatigue ajoutée). »</li>
+<li>Ou : « Mon plastron absorbe l'impact — le coup me fait claquer des dents (2 Fatigue) mais ne fait pas couler de sang. »</li>
+</ul>
+</li>
+</ol>
+<div class="panel panel-gold">
+<span class="panel-title">Astuce joueur : possédez votre conversion</span>
+<strong>Vous êtes responsable du calcul de votre propre conversion d'armure.</strong> Votre travail est de :
+    <ul>
+<li>Connaître votre type d'armure (Légère/Moyenne/Lourde/Supérieure/Mythique).</li>
+<li>Consulter la table de conversion quand le MJ énonce le Dommage entrant.</li>
+<li>Appliquer le résultat dans le bon ordre : <strong>Dommage d'abord</strong> (effacer la Fatigue), puis <strong>Fatigue</strong> (vérifier le débordement).</li>
+<li>Narrer le résultat pour garder la fiction vivante.</li>
+</ul>
+<p class="mt-1"><em>Cela garde le moteur de pression en marche : le MJ narre l'attaque, vous gérez vos ressources, et l'histoire reste vivante.</em></p>
+</div>
+<h3>Table de conversion d'armure (référence joueur)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Type d'armure</th><th>Dommage 1</th><th>Dommage 2</th><th>Dommage 3</th><th>Dommage 4</th><th>Dommage 5</th></tr></thead>
+<tbody>
+<tr><td>Légère</td><td>F1</td><td>D1 + F1</td><td>D2 + F1</td><td>D3 + F1</td><td>D4 + F1</td></tr>
+<tr><td>Moyenne</td><td>F1</td><td>F1</td><td>D2 + F1</td><td>D3 + F1</td><td>D4 + F1</td></tr>
+<tr><td>Lourde</td><td>F1</td><td>F1</td><td>F2</td><td>D1 + F2</td><td>D2 + F2</td></tr>
+<tr><td>Supérieure</td><td>F1</td><td>F1</td><td>F1</td><td>F3</td><td>D1 + F3</td></tr>
+<tr><td>Mythique</td><td>F1</td><td>F1</td><td>F1</td><td>F1</td><td>F4</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted"><em>Minimum 1 Fatigue par coup, même si la conversion donnerait 0. « F » = Fatigue gagnée ; « D » = Dommage restant.</em></p>
+<h4>Comprendre le schéma</h4>
+<p>La table de conversion d'armure suit un schéma simple. Chaque type d'armure a un <strong>Palier</strong> (Légère = 1, Moyenne = 2, Lourde = 3, Supérieure = 4, Mythique = 5). Pour tout Dommage entrant :</p>
+<ul>
+<li><strong>Si Dommage ≤ Palier :</strong> Tout le Dommage est converti en Fatigue. La Fatigue gagnée est 1 de moins que la valeur de Dommage (minimum 1).</li>
+<li><strong>Si Dommage &gt; Palier :</strong> Les premiers points de Dommage égaux au Palier sont convertis en Fatigue (Palier − 1 Fatigue), et les points de Dommage restants s'appliquent directement.</li>
+</ul>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Palier d'armure</th><th>Convertit</th><th>Fatigue par Palier</th></tr></thead>
+<tbody>
+<tr><td>1 (Légère)</td><td>1 Dommage</td><td>1 Fatigue</td></tr>
+<tr><td>2 (Moyenne)</td><td>2 Dommage</td><td>1 Fatigue</td></tr>
+<tr><td>3 (Lourde)</td><td>3 Dommage</td><td>2 Fatigue</td></tr>
+<tr><td>4 (Supérieure)</td><td>4 Dommage</td><td>3 Fatigue</td></tr>
+<tr><td>5 (Mythique)</td><td>5 Dommage</td><td>4 Fatigue</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Exemples pour le joueur (processus de conversion complet)</h4>
+<ul>
+<li><strong>Exemple 1 — Armure légère :</strong>
+<ul>
+<li><em>MJ :</em> « Vous subissez Dommage 2. »</li>
+<li><em>Vous (Armure légère) :</em> « Dommage 2 en Armure légère → Dommage 1 restant, Fatigue 1 gagnée. »</li>
+<li><em>Appliquer :</em> Effacer la Fatigue, Dommage +=1, puis ajouter 1 Fatigue.</li>
+<li><em>Narration :</em> « La lame glisse sous mon bouclier — je sens la piqûre (Dommage 1) tandis que l'épuisement s'estompe (Fatigue 1 ajoutée). »</li>
+</ul>
+</li>
+<li><strong>Exemple 2 — Armure lourde (conversion complète) :</strong>
+<ul>
+<li><em>MJ :</em> « Vous subissez Dommage 3. »</li>
+<li><em>Vous (Armure lourde) :</em> « Dommage 3 en Armure lourde → Dommage 0 restant, Fatigue 2 gagnée. »</li>
+<li><em>Appliquer :</em> Aucun Dommage à appliquer (la Fatigue ne s'efface pas), puis ajouter 2 Fatigue.</li>
+<li><em>Narration :</em> « Mon plastron absorbe tout l'impact — le coup me fait claquer des dents (2 Fatigue) mais ne fait pas couler de sang. »</li>
+</ul>
+</li>
+<li><strong>Exemple 3 — Armure lourde (Dommage en excès) :</strong>
+<ul>
+<li><em>MJ :</em> « Vous subissez Dommage 4. »</li>
+<li><em>Vous (Armure lourde) :</em> « Dommage 4 en Armure lourde → Dommage 1 restant, Fatigue 2 gagnée. »</li>
+<li><em>Appliquer :</em> Effacer la Fatigue, Dommage +=1, puis ajouter 2 Fatigue.</li>
+<li><em>Narration :</em> « Le coup glisse au-delà de ma garde — je sens la morsure de la lame (Dommage 1) tandis que l'impact fait vibrer mes os (Fatigue 2 ajoutée). »</li>
+</ul>
+</li>
+<li><strong>Exemple 4 — Armure supérieure :</strong>
+<ul>
+<li><em>MJ :</em> « Vous subissez Dommage 4. »</li>
+<li><em>Vous (Armure supérieure) :</em> « Dommage 4 en Armure supérieure → Dommage 0 restant, Fatigue 3 gagnée. »</li>
+<li><em>Appliquer :</em> Aucun Dommage à appliquer (la Fatigue ne s'efface pas), puis ajouter 3 Fatigue.</li>
+<li><em>Narration :</em> « Le coup frappe en plein sur ma poitrine — l'armure tient, mais la force chasse l'air de mes poumons (3 Fatigue). »</li>
+</ul>
+</li>
+<li><strong>Exemple 5 — Armure mythique :</strong>
+<ul>
+<li><em>MJ :</em> « Vous subissez Dommage 5. »</li>
+<li><em>Vous (Armure mythique) :</em> « Dommage 5 en Armure mythique → Dommage 0 restant, Fatigue 4 gagnée. »</li>
+<li><em>Appliquer :</em> Aucun Dommage à appliquer (la Fatigue ne s'efface pas), puis ajouter 4 Fatigue.</li>
+<li><em>Narration :</em> « Le marteau frappe mon épaulière — l'alliage mythique chante, absorbant le coup, mais mes bras tremblent sous l'effort (4 Fatigue). »</li>
+</ul>
+</li>
+<li><strong>Exemple 6 — Armure mythique (Dommage en excès) :</strong>
+<ul>
+<li><em>MJ :</em> « Vous subissez Dommage 6. »</li>
+<li><em>Vous (Armure mythique) :</em> « Dommage 6 en Armure mythique → Dommage 1 restant, Fatigue 4 gagnée. »</li>
+<li><em>Appliquer :</em> Effacer la Fatigue, Dommage +=1, puis ajouter 4 Fatigue.</li>
+<li><em>Narration :</em> « La lame trouve une brèche dans le blindage mythique — je sens la morsure froide de l'acier (Dommage 1) tandis que l'impact me fait tomber à genoux (Fatigue 4 ajoutée). »</li>
+</ul>
+</li>
+<li><strong>Exemple 7 — Débordement (perspective du joueur) :</strong>
+<ul>
+<li><em>MJ :</em> « Vous subissez Dommage 3. »</li>
+<li><em>Vous (Armure lourde, Corps 2, Fatigue 1) :</em> « Dommage 3 en Armure lourde → Dommage 0 restant, Fatigue 2 gagnée. »</li>
+<li><em>Appliquer :</em> Aucun Dommage à appliquer (la Fatigue ne s'efface pas), puis ajouter 2 Fatigue.</li>
+<li><em>Vérifier le débordement :</em> La Fatigue était à 1, maintenant à 3 (≥ Corps 2) → Débordement ! Dommage +=1, effacer toute la Fatigue.</li>
+<li><em>Narration :</em> « Le coup écrasant brise ma garde — la douleur explose (Dommage 1) tandis que l'épuisement s'évanouit (Fatigue effacée). »</li>
+</ul>
+</li>
+</ul>
+<h4>Rappels clés</h4>
+<ul>
+<li><strong>Appliquez toujours le Dommage en premier</strong> (ce qui efface la Fatigue), puis ajoutez la Fatigue.</li>
+<li><strong>La Fatigue minimum par coup est 1</strong>, même si la table indique 0.</li>
+<li><strong>Le Débordement se produit quand la Fatigue ≥ Corps</strong>, pas quand elle le dépasse.</li>
+<li><strong>La table fait loi.</strong> Ne calculez pas au-delà de ce qu'elle montre.</li>
+<li><strong>Narrez le résultat</strong> — cela enrichit la fiction et garde tout le monde impliqué.</li>
+<li><strong>L'armure de palier supérieur</strong> (Supérieure, Mythique) est rare. Votre MJ vous dira si elle est disponible.</li>
+</ul>
+<h3>Récupération</h3>
+<ul>
+<li><strong>Fatigue :</strong> Un repos court (nourriture/eau) retire 2 Fatigue ; une nuit complète retire tout.</li>
+<li><strong>Dommage :</strong> Nécessite des soins médicaux et du temps — un traitement mineur rétrograde le Dommage, des soins adéquats le retirent.</li>
+</ul>
+<h2 id="initiative">Initiative et ordre des tours</h2>
+<p><strong>Par défaut : Initiative narrative.</strong> Fate's Edge n'utilise pas d'initiative fixe. L'ordre des tours suit la fiction :</p>
+<ul>
+<li><strong>Décret narratif :</strong> Le MJ cadre l'ordre du projecteur selon les circonstances.</li>
+<li><strong>Contribution des joueurs :</strong> Les joueurs peuvent suggérer d'agir quand cela a du sens.</li>
+<li><strong>Surprise :</strong> Les embusqueurs agissent en premier ; les cibles répondent ensuite.</li>
+<li><strong>Flexibilité :</strong> Le projecteur peut changer en cours de scène si c'est fictionnellement approprié.</li>
+</ul>
+<p class="text-sm text-muted">(Des systèmes d'initiative structurés optionnels — pop-corn, par camps, créneaux de vitesse — sont disponibles dans le Guide du MJ si votre table les préfère.)</p>
+<h3>Économie de tour (règles rapides)</h3>
+<p>Chaque personnage prend <strong>1 Action et 1 Mouvement</strong> à son tour. Actions et Mouvements peuvent être pris dans n'importe quel ordre ; répéter la même Action n'est pas autorisé sauf mention contraire.</p>
+<p><strong>Mouvement :</strong> Traversez jusqu'à <strong>une bande de portée</strong> (Proche → Alentours → Portée → Lointain, ou l'inverse).</p>
+<ul>
+<li><strong>Se relever :</strong> Utilisez votre Mouvement pour vous relever d'une position à terre.</li>
+</ul>
+<p><strong>Options d'action :</strong> Sur votre action, vous pouvez :</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Action</th><th>Effet</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Attaquer</td><td>Faire une attaque de mêlée ou à distance contre une cible.</td><td>Une attaque à distance en Proche est <strong>Désespéré</strong>.</td></tr>
+<tr><td>Se dégager</td><td>Permet un mouvement sûr.</td><td>Votre Mouvement ne provoque pas d'attaques d'opportunité ; vous ne pouvez pas Attaquer ce tour.</td></tr>
+<tr><td>Bousculer</td><td>Repousser une cible d'une bande de portée (Proche → Alentours).</td><td>Corps + Athlétisme opposé à Corps + Athlétisme. En cas de réussite, la cible recule et subit -1 Position à sa prochaine action.</td></tr>
+<tr><td>Empoigner</td><td>Saisir une cible pour la restreindre ou la contrôler.</td><td>Corps + Mêlée opposé à Corps + Athlétisme. En cas de réussite, les deux sont Engagés (ne peuvent pas s'éloigner). La cible empoignée subit -1 dé sur toutes ses actions. Se libérer nécessite un nouveau jet opposé comme action.</td></tr>
+<tr><td>Charger (tour complet)</td><td>Se déplacer de deux bandes vers un ennemi + faire une attaque de mêlée.</td><td>Coûte 1 Fatigue, prochaine défense Désespéré, nécessite un terrain dégagé. <strong>Quitter la portée Proche pendant une Charge provoque des attaques d'opportunité normalement.</strong></td></tr>
+<tr><td>Escarmoucher (tour complet)</td><td>Se déplacer de deux bandes loin d'un ennemi + faire une attaque à distance.</td><td>Coûte 1 Fatigue, prochaine défense Désespéré, nécessite un terrain dégagé. <strong>Quitter la portée Proche pendant une Escarmouche provoque des attaques d'opportunité normalement.</strong></td></tr>
+<tr><td>Observer / Changer de Position</td><td>Gagner +1 Position une fois.</td><td>Une fois par tour.</td></tr>
+<tr><td>Préparer (Travail d'équipe)</td><td>Un Setup incertain et risqué réussi accorde à un allié +1 Position sur sa prochaine action.</td><td>Ne demande un jet que quand le résultat est incertain et risqué ; ne puise pas dans le plafond de +3 dés d'Assistance.</td></tr>
+<tr><td>Assister (Travail d'équipe)</td><td>Dépensez 1 Faveur pour donner +1 dé au jet d'un allié.</td><td>Un seul assistant peut utiliser Assister sur une action donnée. Le maximum total de dés d'assistance de toutes sources (incluant Préparer et autres capacités) est <strong>+3</strong>.</td></tr>
+<tr><td>Protéger</td><td>Adopter une posture de garde ou faire écran pour un allié proche.</td><td>Jusqu'à votre prochain tour, vous pouvez intercepter un coup destiné à cet allié et lancer les dés pour y résister ; voir <em>Réactions</em>, ci-dessous, pour vous défendre vous-même.</td></tr>
+<tr><td>Canaliser / Tisser</td><td>Préparation de rite de Gardien des runes.</td><td>Une interruption peut aggraver la Position.</td></tr>
+<tr><td>Lancer un Rite / Chant</td><td>Effectuer une action magique.</td><td>Peut être Poussé (coûte de la Fatigue/Corruption).</td></tr>
+<tr><td>Interagir</td><td>Manipuler un objet ou l'environnement.</td><td>Le MJ fixe le DV.</td></tr>
+<tr><td>Objets gratuits</td><td>Courts cris, lâcher un objet.</td><td>Les actions plus longues nécessitent les bons types d'action.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Réactions (se défendre soi-même)</h4>
+<p>Se défendre n'est pas une action de tour — c'est une <strong>Réaction</strong>, dépensée hors tour contre la pression d'un adversaire. Vous avez <strong>1 Réaction par tour</strong>. Quand un coup arrive, le MJ énonce le Dommage entrant et vous décidez :</p>
+<ul>
+<li><strong>Dépenser votre Réaction :</strong> Lancez un test de défense. <strong>DV = le Dommage entrant.</strong> Une Réussite l'évite entièrement ; une Partielle le réduit à la protection moindre convenue avant le jet (divisez le Dommage par deux, arrondi au supérieur, sauf indication contraire de la fiction) ; un Échec subit le Dommage complet. Une Réaction dépensée revient à votre prochain tour — ou immédiatement, pour <strong>1 Faveur</strong>.</li>
+<li><strong>Garder votre Réaction :</strong> Le coup passe passivement. Appliquez le Dommage énoncé directement via votre Conversion d'armure, aucun jet des deux côtés.</li>
+</ul>
+<p>Les Talents défensifs qui se déclenchent face à la pression entrante (Contre-sort, Interception, et similaires) sont <em>passifs</em> — ils se déclenchent selon leur propre condition imprimée et ne puisent jamais dans votre réserve de Réaction, donc en utiliser un ne vous laisse jamais sans Réaction pour le jet ci-dessus.</p>
+<h4>Frappe en pas de côté (se rapprocher ou reculer)</h4>
+<p>Dans le cadre d'une action d'attaque de mêlée, vous pouvez vous déplacer d'<strong>une bande de portée</strong> (Proche ↔ Alentours, Alentours ↔ Portée, ou Portée ↔ Lointain) sans utiliser votre action de Mouvement pour le tour. Si vous le faites, votre Position pour cette attaque s'aggrave d'un cran (par ex. Maîtrisé devient Désespéré, Dominant devient Maîtrisé). Vous ne pouvez pas aussi utiliser votre action de Mouvement normale le même tour.</p>
+<p>Cela représente une fente audacieuse pour se rapprocher ou un pas rapide en arrière pour créer de l'espace, sacrifiant la sécurité pour le positionnement tactique.</p>
+<ul>
+<li><strong>Exemple (Vaurien) :</strong> Lyra est à portée Alentours avec un couteau (arme légère). Elle déclare une Frappe en pas de côté, se déplaçant en portée Proche en attaquant. Sa Position passe de Maîtrisé à Désespéré, mais elle bénéficie maintenant du bonus Proche du couteau (+2d). Elle lance avec la relance Désespéré (les réussites sont relancées une fois) mais obtient +2 dés de son arme.</li>
+<li><strong>Exemple (Lancier) :</strong> Mateo est en portée Proche avec une lance (arme moyenne, +1d en Proche, +2d en Alentours). Il recule vers Alentours dans le cadre de son attaque, aggravant sa Position de Maîtrisé à Désespéré, mais gagne +2d au lieu de +1d.</li>
+</ul>
+<h4>Attaques d'opportunité</h4>
+<p>Quitter la portée <strong>Proche</strong> d'un ennemi sans utiliser <em>Se dégager</em> provoque une attaque de mêlée gratuite (Position Maîtrisé, aucun coût d'action). De plus, les actions suivantes provoquent une attaque d'opportunité si elles sont effectuées en étant <strong>engagé en Proche</strong> avec un ennemi :</p>
+<ul>
+<li>Faire une attaque à distance (arc, arbalète, arme de jet).</li>
+<li>Lancer un sort qui n'a pas l'attribut <code>[TOUCHER]</code> ou <code>[PROTECTION]</code>.</li>
+</ul>
+<p>Une <strong>Charge</strong> ou une <strong>Escarmouche</strong> qui vous fait quitter la portée Proche d'un ennemi provoque une attaque d'opportunité comme d'habitude (sauf si vous avez utilisé Se dégager au préalable). Utiliser une <strong>Frappe en pas de côté</strong> pour quitter la portée Proche provoque aussi une attaque d'opportunité sauf si vous avez aussi utilisé Se dégager.</p>
+<h4>Position et modificateurs de dés</h4>
+<ul>
+<li><strong>L'échelle :</strong> Désespéré → Maîtrisé → Dominant. Trois échelons, et c'est tout.</li>
+<li><strong>L'échelle a une limite.</strong> La Position ne monte jamais au-dessus de Dominant ni ne descend en dessous de Désespéré. À chaque extrémité, les modificateurs supplémentaires ne font simplement rien — ils ne se convertissent pas en dés.</li>
+<li><strong>Pourquoi :</strong> votre pool n'est jamais que ce pour quoi vous avez payé. Un personnage dont l'Attribut est 1 et la Compétence 0 lance un dé à son pire jour, pas zéro, et aucune pile de pénalités ne peut lui retirer cela. La question que pose le jeu est toujours <em>à quel point cela peut-il mal tourner</em>, jamais <em>puis-je seulement tenter cela</em>.</li>
+<li><strong>Que faire à la place :</strong> une quatrième source d'avantage sur un jet déjà Dominant n'est pas gaspillée — c'est le signal pour le MJ d'abaisser le DV, d'élargir l'Effet, ou simplement de dire oui.</li>
+</ul>
+<p><strong>Mises en garde et Talents :</strong></p>
+<ul>
+<li><strong>Charger</strong> et <strong>Escarmoucher</strong> nécessitent un terrain dégagé (pas de terrain difficile) sauf indication contraire d'un talent (voir le chapitre Talents).</li>
+<li>Des talents comme <em>Charge sans effort</em> (4 XP) ou <em>Escarmouche sans effort</em> (4 XP) permettent d'ignorer le coût en Fatigue une fois par scène.</li>
+<li>Le talent <em>Acharné</em> (6 XP) permet Charger ou Escarmoucher en terrain difficile (le coût en Fatigue s'applique toujours).</li>
+</ul>
+<div class="panel">
+<span class="panel-title">Le combat en bref</span>
+<ul>
+<li><strong>Tour :</strong> 1 Action + 1 Mouvement.</li>
+<li><strong>Mouvement :</strong> Proche ↔ Alentours ↔ Portée ↔ Lointain.</li>
+<li><strong>Attaque :</strong> Lancez Attribut + Compétence contre DV (défense de l'ennemi). Une attaque à distance en Proche → Désespéré.</li>
+<li><strong>Réaction :</strong> 1 par tour (renouvelable pour 1 Faveur). Dépensez-la pour lancer un test de défense, DV = Dommage entrant ; gardez-la et le coup passe passivement.</li>
+<li><strong>Bousculer :</strong> Corps + Athlétisme opposé à Corps + Athlétisme. Repousse la cible d'une bande.</li>
+<li><strong>Empoigner :</strong> Corps + Mêlée opposé à Corps + Athlétisme. Les deux sont Engagés ; la cible subit -1 dé.</li>
+<li><strong>Frappe en pas de côté :</strong> Se déplacer d'une bande dans le cadre d'une attaque de mêlée ; aggrave la Position d'un cran.</li>
+<li><strong>Dommage :</strong> Quand vous touchez, la cible note du Dommage (voir la procédure ci-dessus). Les ennemis utilisent les mêmes niveaux de Dommage que les joueurs.</li>
+<li><strong>Fatigue :</strong> Chaque point aggrave votre Position (ou -1 dé si déjà Désespéré). Subir du Dommage efface la Fatigue — l'effet « montagnes russes ».</li>
+<li><strong>Minuteurs :</strong> Les MJ utilisent souvent des minuteurs pour les renforts, l'effondrement environnemental, ou le moral ennemi.</li>
+</ul>
+<p class="text-sm text-muted mt-1"><em>Les règles de combat complètes sont dans le Guide du MJ.</em></p>
+</div>
+<h2 id="weapons-armor">Armes et Armures</h2>
+<div class="panel panel-green">
+<span class="panel-title">Acier de Fil de Soie</span>
+<em>« Une lame Légère est la promesse d'un courtisan — rapide, élégante, facile à cacher. Une lame Lourde est l'ultimatum d'un capitaine de condotta — lente, brutale, et définitive. »</em>
+<p class="mt-1">Choisissez votre poids comme vous choisissez vos mots. Les deux peuvent trancher.</p>
+</div>
+<h3>Armes par classe de poids</h3>
+<ul>
+<li><strong>Légère (4 XP)</strong> — rapide, dissimulable.</li>
+<li><strong>Moyenne (8 XP)</strong> — équilibrée, standard du champ de bataille.</li>
+<li><strong>Lourde (12 XP)</strong> — punitive, lente.</li>
+</ul>
+<h3>Modificateurs de mêlée</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Poids</th><th>Proche</th><th>Alentours</th><th>Portée</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Légère</td><td>+2d</td><td>+1d</td><td>—</td><td>Rapide dans les espaces réduits</td></tr>
+<tr><td>Moyenne</td><td>+1d</td><td>+2d</td><td>—</td><td>Placement une fois/scène ou -1d à la première attaque</td></tr>
+<tr><td>Lourde</td><td>-1d</td><td>+3d</td><td>+0d</td><td>Placement une fois/scène ou -2d à la première attaque</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Portée</strong> est la bande qu'une hampe traverse et qu'une épée ne traverse pas — lance, arme d'hast, épée à deux mains. Les armes Lourdes la menacent nativement, sans bonus : c'est où elles peuvent atteindre, pas où elles frappent le plus fort. Une arme Légère ou Moyenne ne la menace qu'avec l'attribut <code>Hampe</code>, aussi à +0d. Un tiret signifie que l'arme ne menace pas du tout cette bande.</p>
+<p class="text-sm text-muted">Poids et distance ne partagent jamais un mot : aucune arme n'est Proche ou Portée, et aucune bande n'est Légère, Moyenne, ou Lourde. « Une arme Moyenne en portée Alentours » se lit d'une seule façon.</p>
+<h3>Distance et Tempo</h3>
+<p>Les armes à distance ont un <strong>Tempo</strong> qui détermine comment elles interagissent avec le mouvement, la visée, et le rechargement.</p>
+<p><strong>Types de Tempo</strong></p>
+<dl>
+<dt>Rapide</dt>
+<dd>Vous pouvez <strong>vous déplacer et tirer dans le même tour</strong>. <em>Exemples :</em> couteaux de lancer, arbalète légère (si préchargée), fronde.</dd>
+<dt>Standard</dt>
+<dd>Vous pouvez soit <strong>vous déplacer</strong> soit <strong>tirer</strong> à votre tour, pas les deux. Comme action spéciale, vous pouvez <strong>Viser</strong> (gagnez +1d ou +1 Effet à votre prochain tir), mais Viser remplace votre attaque ce tour. <em>Exemples :</em> arc long, arbalète lourde (si préchargée), mousquet.</dd>
+<dt>Lent</dt>
+<dd>L'arme nécessite un <strong>round complet pour se charger</strong> (ou se placer/s'appuyer). <em>Round 1 :</em> Utilisez votre action pour charger (aucune attaque). Vous pouvez encore vous déplacer, mais se déplacer en chargeant est en Position Désespéré sauf si vous avez un talent. <em>Round 2 :</em> Tirez (et pouvez vous déplacer ensuite). Puis vous devez recharger à nouveau pour un autre tir. <em>Exemples :</em> baliste, canon à main, arquebuse lourde.
+  <p class="text-sm text-muted mt-1">Votre Action et votre Mouvement peuvent être pris dans n'importe quel ordre, donc chargez <em>après</em> vous être déplacé au round 1 et tirez <em>avant</em> de vous déplacer au round 2 : le chargement et le tir s'enchaînent et vous vous déplacez quand même les deux rounds. Le coût d'une arme Lente n'est pas du temps perdu, c'est que tout le monde agit entre les deux — vous avez dit à la table où vous serez et ce que vous êtes sur le point de faire.</p></dd>
+</dl>
+<p><strong>Modificateurs à distance par poids.</strong> Notez que Proche est une <em>Position</em>, pas un modificateur de dé — un arc n'est pas plus difficile à viser à bout de bras, il est plus difficile de survivre en l'utilisant. <strong>Les armes à distance traitent Portée comme Alentours</strong> ; un archer ne se soucie pas de savoir si la lance est à distance d'épée ou de hampe.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Poids</th><th>Tempo</th><th>Proche</th><th>Alentours</th><th>Lointain</th></tr></thead>
+<tbody>
+<tr><td>Légère (4 XP)</td><td>Rapide</td><td>Maîtrisé</td><td>+1d</td><td>—</td></tr>
+<tr><td>Moyenne (8 XP)</td><td>Standard</td><td>Désespéré</td><td>+2d</td><td>+1d</td></tr>
+<tr><td>Lourde (12 XP)</td><td>Lent</td><td>Désespéré</td><td>+1d</td><td>+3d</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Référence rapide du Tempo</strong></p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Tempo</th><th>Bouger + Tirer ?</th><th>Option Viser ?</th><th>Rechargement requis</th></tr></thead>
+<tbody>
+<tr><td>Rapide</td><td>Oui (même tour)</td><td>Non</td><td>Aucun (ou gratuit)</td></tr>
+<tr><td>Standard</td><td>Non (bouger ou tirer)</td><td>Oui (+1d/+1 Effet)</td><td>Aucun (Viser coûte une action)</td></tr>
+<tr><td>Lent</td><td>Non (charger un tour, tirer le suivant)</td><td>Non</td><td>Round complet</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Attributs d'arme (optionnels, +4 XP chacun, max 2)</h3>
+<p><code>Hampe</code>, <code>Corps à corps</code>, Précis, Brutal, Crochet, Dissimulable, Dégainage rapide, Deux mains, Main secondaire.</p>
+<ul>
+<li><strong>Hampe</strong> — une lance, un bâton, ou une arme d'hast légère. Une arme Légère ou Moyenne avec cet attribut menace la bande <strong>Portée</strong> à +0d, ce que sa classe de poids ne peut normalement pas faire.</li>
+<li><strong>Corps à corps</strong> — conçue pour la mêlée serrée : une pointe de bouclier, une main-gauche, une lame raccourcie. +1d en <strong>Proche</strong>.</li>
+</ul>
+<h3>Boucliers (optionnels)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Bouclier</th><th>XP</th><th>Bénéfice</th><th>Compromis</th></tr></thead>
+<tbody>
+<tr><td>Rondache</td><td>4</td><td>+1d Défense contre la mêlée ou +1 DV une fois</td><td>Main secondaire occupée</td></tr>
+<tr><td>Écu</td><td>8</td><td>+1d Défense ; convertit 1 Dommage → 1 Fatigue</td><td>-1d à distance</td></tr>
+<tr><td>Pavois</td><td>12</td><td>Planté : cône de couverture lourde</td><td>Lent à déplacer ; encombrant</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Armure</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Armure</th><th>XP</th><th>Conversion (Dommage → Fatigue)</th><th>Pénalité</th></tr></thead>
+<tbody>
+<tr><td>Légère</td><td>4</td><td>1→1 (minimum 1 Fatigue par coup)</td><td>—</td></tr>
+<tr><td>Moyenne</td><td>8</td><td>2→1 (minimum 1 Fatigue par coup)</td><td>-1d compétences physiques</td></tr>
+<tr><td>Lourde</td><td>12</td><td>3→2 (minimum 1 Fatigue par coup)</td><td>-2d physique, pas de sprint en terrain accidenté</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted"><em>Notes :</em> La conversion est appliquée par instance de Dommage via consultation du MJ (voir la procédure ci-dessus). Cette table montre ce que le MJ vous répondra quand vous signalez la valeur de Dommage et le type d'armure.</p>
+<h3>État et entretien</h3>
+<dl>
+<dt>Négligée</dt>
+<dd>Armes : -1d ; Armures : conversion aggravée d'un cran (par ex. Légère se comporte comme pas d'armure, Lourde comme Moyenne).</dd>
+<dt>Compromise</dt>
+<dd>Armes : -1d à la première attaque de chaque round ; Armures : aucune conversion.</dd>
+</dl>
+<p class="text-sm text-muted"><em>Réparation :</em> Un repos court avec des outils retire Négligée (aucun jet requis). Une scène de travail ou un forgeron retire Compromise ; un jet d'Artisanat réussi (DV 3) peut réduire le temps à un repos court.</p>
+<h2 id="ranged-options">Options à distance</h2>
+<ul>
+<li><strong>Viser :</strong> +1 dé ou +1 Effet au prochain tir (perdu si vous vous déplacez ou êtes perturbé).</li>
+<li><strong>Volée :</strong> Dépensez des munitions supplémentaires pour +1 dé (max +2).</li>
+<li><strong>Suppression :</strong> Zone sous le feu ; les ennemis y agissent à -1 dé ou Effet Limité jusqu'à changer de couverture.</li>
+<li><strong>Guet :</strong> Préparez un tir Maîtrisé sur un déclencheur clair traversant votre ligne.</li>
+</ul>
+<h2 id="followers-assets">Suivants et Atouts</h2>
+<h3>Suivants</h3>
+<p>Les Suivants sont des PNJ nommés ayant une relation personnelle avec votre personnage. Ils :</p>
+<ul>
+<li>Assistent pendant les scènes via les Liens et l'Assistance (voir Chapitre 2, Étape 8).</li>
+<li>Agissent hors scène pour recueillir des informations ou gérer des tâches.</li>
+<li>Ont des motivations et des vulnérabilités — le MJ peut les mettre en danger.</li>
+</ul>
+<p>Les Suivants ne sont pas des outils jetables. Ils peuvent grandir, changer, ou être perdus.</p>
+<h4>États des Suivants</h4>
+<p>Au lieu de minuteurs numériques, suivez la <strong>Loyauté</strong> et la <strong>Forme</strong> d'un Suivant comme l'un de trois états chacun.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>État</th><th>Signification</th><th>Effet mécanique</th></tr></thead>
+<tbody>
+<tr><td colspan="3" style="text-align:center;"><em>Loyauté</em></td></tr>
+<tr><td>Fidèle</td><td>Engagé, digne de confiance</td><td>Assistance normale, actions indépendantes disponibles</td></tr>
+<tr><td>Tendue</td><td>Doutant, sous pression</td><td>Assiste à -1 dé ; peut refuser des ordres risqués</td></tr>
+<tr><td>Rompue</td><td>Trahie ou déserté</td><td>Le Suivant part ou devient hostile</td></tr>
+<tr><td colspan="3" style="text-align:center;"><em>Forme</em></td></tr>
+<tr><td>Prêt</td><td>Indemne, reposé</td><td>Fonction complète</td></tr>
+<tr><td>Blessé</td><td>Blessé, épuisé</td><td>Assiste à -1 dé ; aucune action indépendante</td></tr>
+<tr><td>À terre</td><td>Incapacité</td><td>Nécessite un sauvetage ou des soins médicaux</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Changez d'état quand la fiction l'exige (par ex. après une mission échouée, un compromis moral, ou avoir subi des dégâts). Aucun jet requis.</p>
+<h4>Suivants à haute capacité (Cap 4–5)</h4>
+<p>Les Suivants avec une Capacité de 4 ou 5 sont des lieutenants de confiance, intendants, ou commandants. La gestion de vos Atouts peut leur être déléguée, vous libérant de la surveillance directe.</p>
+<ul>
+<li>Un Suivant <strong>Cap 4</strong> peut se voir déléguer <strong>jusqu'à 2 Atouts</strong>.</li>
+<li>Un Suivant <strong>Cap 5</strong> peut se voir déléguer <strong>jusqu'à 4 Atouts</strong>.</li>
+</ul>
+<p>Quand un Atout est délégué à un Suivant, l'entretien propre du Suivant (payé en XP ou en action de temps mort) <strong>couvre automatiquement l'entretien de ces Atouts</strong> — vous ne payez pas d'entretien d'Atout séparé. Le Suivant gère la logistique, le personnel, ou l'entretien politique dans le cadre de son rôle.</p>
+<p>Si la Loyauté du Suivant devient <strong>Tendue</strong> ou <strong>Rompue</strong>, tous les Atouts délégués deviennent immédiatement <strong>Négligés</strong> aussi jusqu'à ce que le Suivant soit rétabli. Si un Suivant est <strong>Compromis</strong>, ces Atouts sont perdus.</p>
+<h3>Atouts</h3>
+<p>Les Atouts sont des ressources ou positions durables sous votre contrôle — planques, réseaux, charges politiques, reliques. Ils :</p>
+<ul>
+<li>Créent des avantages qui persistent au-delà d'une seule scène.</li>
+<li>Résolvent des problèmes que les dés seuls ne peuvent pas résoudre.</li>
+<li>Coûtent des Faveurs à activer (le MJ détermine l'impact).</li>
+</ul>
+<p>Les Atouts peuvent être menacés, dégradés, ou perdus. Une utilisation excessive attire l'attention.</p>
+<h4>Statut de l'Atout</h4>
+<p>Les Atouts ont un <strong>Statut</strong> unifié unique qui décrit leur santé et leur utilisabilité globales.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Statut</th><th>Signification</th><th>Effet</th></tr></thead>
+<tbody>
+<tr><td>Florissant</td><td>Bien entretenu, respecté</td><td>+1 dé sur les jets impliquant l'atout, +1 Rendement</td></tr>
+<tr><td>Stable</td><td>Fonctionnement normal</td><td>Aucun modificateur</td></tr>
+<tr><td>Tendu</td><td>Problèmes qui s'accumulent</td><td>-1 dé sur les jets liés à l'atout, aucun Rendement</td></tr>
+<tr><td>Effondré</td><td>Non fonctionnel</td><td>Nécessite une quête ou un temps mort majeur pour restaurer</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Le Statut s'aggrave quand l'Atout est négligé, attaqué, ou subit un échec public. Il s'améliore par des actions de temps mort dédiées ou des missions réussies qui bénéficient à l'Atout.</p>
+<h3>Suivants contre Atouts</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th></th><th>Suivants</th><th>Atouts</th></tr></thead>
+<tbody>
+<tr><td>Nature</td><td>Personnes</td><td>Ressources/Structures</td></tr>
+<tr><td>Rôle principal</td><td>Soutien personnel</td><td>Levier stratégique</td></tr>
+<tr><td>Activation</td><td>Assistance (dépenser une Faveur) ou interaction narrative</td><td>Dépense de Faveur</td></tr>
+<tr><td>Risque</td><td>Émotionnel, narratif</td><td>Structurel, politique</td></tr>
+<tr><td>Croissance</td><td>Peuvent devenir des PJ</td><td>Peuvent s'étendre ou s'effondrer</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Principe de conception :</strong> Les Suivants créent de la <em>profondeur</em>. Les Atouts créent de la <em>portée</em>. Le jeu de haut niveau dépend de la gestion des deux.</p>
+<h2 id="game-structure">Structure du jeu</h2>
+<h3>Échelles de temps</h3>
+<dl>
+<dt>Instant</dt>
+<dd>Un battement de cœur, une seule action.</dd>
+<dt>Un moment</dt>
+<dd>Quelques minutes, une activité courte.</dd>
+<dt>Temps significatif</dt>
+<dd>Des heures, un effort prolongé.</dd>
+<dt>Jours</dt>
+<dd>Entreprises à grande échelle.</dd>
+</dl>
+<h3>Unités de jeu</h3>
+<dl>
+<dt>Scène</dt>
+<dd>Unité narrative de base, couvre un conflit spécifique.</dd>
+<dt>Séance</dt>
+<dd>Une session de jeu (3 à 6 heures).</dd>
+<dt>Campagne</dt>
+<dd>Arc narratif entier.</dd>
+</dl>
+<h2 id="action-resolution">Étapes de résolution d'action</h2>
+<ol>
+<li>Décrivez votre intention et votre méthode.</li>
+<li>Construisez le pool de dés : Attribut + Compétence (+ équipement, assistance).</li>
+<li>Lancez les d10 ; comptez les Réussites (6+) et les Points d'Histoire (les 1).</li>
+<li>Comparez les Réussites au DV.</li>
+<li>Appliquez le résultat de la Matrice des résultats (voir ci-dessus).</li>
+<li>Le MJ dépense les PH le cas échéant (voir Points d'Histoire, ci-dessus).</li>
+<li>Gagnez des Faveurs pour une Partielle ou un Échec (voir Faveurs, ci-dessus).</li>
+</ol>
+<div class="panel panel-blue">
+<span class="panel-title">Référence rapide</span>
+<strong>Pool de dés :</strong> Attribut + Compétence d10<br/>
+<strong>Réussite :</strong> Dé ≥ 6<br/>
+<strong>Point d'Histoire (PH) :</strong> Dé = 1 donne un PH au MJ<br/>
+<strong>DV :</strong> 2 (facile) à 5+ (extrême) — par défaut 3<br/>
+<strong>Dommage :</strong> système à 3 niveaux ; voir la procédure ci-dessus<br/>
+<strong>Faveurs :</strong> 2 sur un échec, 1 sur une partielle<br/>
+<strong>Conversion d'armure :</strong> Signalez la valeur de Dommage + le type d'armure au MJ ; recevez la Fatigue gagnée + le Dommage restant<br/>
+<strong>Position :</strong> Dominant (relance un échec), Maîtrisé (normal), Désespéré (relance une réussite)<br/>
+<strong>Fatigue :</strong> Aggrave la Position (ou -1 dé si déjà Désespéré). Jauge pleine → Dommage+1, effacer la Fatigue.<br/>
+<strong>Dommage :</strong> 1 (-1 dé), 2 (-2 dés), 3 (incapacité). Subir du Dommage efface d'abord la Fatigue.
+</div>
+<h2 id="narrative-suggestions">Suggestions narratives</h2>
+<ul>
+<li><strong>Cadrage collaboratif de scène :</strong> Les joueurs peuvent suggérer des éléments de scène (météo, réactions de PNJ) avec l'accord du MJ.</li>
+<li><strong>Résolution pilotée par l'intention :</strong> Si le succès est raisonnablement assuré, le MJ peut demander aux joueurs de décrire <em>comment</em> plutôt que de lancer les dés.</li>
+<li><strong>Déclarations de flashback :</strong> Dépensez 1 Faveur pour déclarer un flashback établissant une préparation passée, et décrivez la scène.</li>
+<li><strong>Assistance descriptive :</strong> Les joueurs peuvent assister en fournissant des descriptions vivantes, accordant +1 dé à l'acteur principal.</li>
+<li><strong>Narration proactive :</strong> Les joueurs peuvent suggérer des détails favorables mineurs (un PNJ serviable, un objet utile à portée de main) sous réserve de l'accord du MJ.</li>
+</ul>
+<div class="panel">
+<span class="panel-title">Référence rapide des mécaniques de base</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Quoi</th><th>Comment</th></tr></thead>
+<tbody>
+<tr><td>Pool de dés</td><td>Attribut + Compétence d10</td></tr>
+<tr><td>Réussite</td><td>Dé ≥ 6</td></tr>
+<tr><td>Point d'Histoire (PH)</td><td>Dé = 1</td></tr>
+<tr><td>Difficulté (DV)</td><td>Par défaut 3 (2=facile, 4=difficile, 5+=extrême)</td></tr>
+<tr><td>Résultats</td><td>Réussite Nette (S≥DV, PH=0) ; Réussite avec PH (S≥DV, PH&gt;0) ; Partielle (0&lt;S&lt;DV → gagne 1 Faveur) ; Échec (S=0 → gagne 2 Faveurs)</td></tr>
+<tr><td>Faveurs</td><td>Max 5 ; réduire à 2 en fin de scène. Dépenser : relancer, améliorer la Position, activer un Atout, convertir 2→1 XP.</td></tr>
+<tr><td>Position</td><td>Dominant (relance un échec), Maîtrisé (normal), Désespéré (relance une réussite)</td></tr>
+<tr><td>Fatigue</td><td>Aggrave la Position (ou -1 dé si Désespéré). Jauge pleine → Dommage+1, effacer la Fatigue.</td></tr>
+<tr><td>Dommage</td><td>1 (-1 dé), 2 (-2 dés), 3 (incapacité). Subir du Dommage efface d'abord la Fatigue.</td></tr>
+<tr><td>Conversion d'armure</td><td>Signalez la valeur de Dommage + le type d'armure au MJ ; appliquez la Fatigue gagnée/le Dommage restant retournés</td></tr>
+<tr><td>Frappe en pas de côté</td><td>Se déplacer d'une bande dans le cadre d'une attaque de mêlée ; aggrave la Position d'un cran.</td></tr>
+<tr><td>Bousculer</td><td>Corps + Athlétisme opposé. Repousse la cible d'une bande.</td></tr>
+<tr><td>Empoigner</td><td>Corps + Mêlée opposé. Les deux sont Engagés ; la cible subit -1 dé.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<footer class="doc-footer">
+    Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Utilisé avec permission, Tous droits réservés.
+</footer>
+</body>
+</html>
