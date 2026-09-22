@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge Guide du Joueur — Chapitre 2 : Résumé de la création de personnage (Français)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    p.subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 1rem; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    dl { margin: 0.4rem 0 0.6rem 0.4rem; }
+    dt { color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1.2rem; color: var(--text2); }
+    .multicols { column-count: 2; column-gap: 2rem; }
+    @media (max-width: 600px) { .multicols { column-count: 1; } }
+    .tree { margin: 0.4rem 0 0.4rem 1rem; }
+    .tree ul { list-style: none; border-left: 1px dashed var(--border); margin-left: 0.6rem; padding-left: 0.9rem; }
+    .tree > ul { border-left: none; margin-left: 0; padding-left: 0; }
+    .tree li { margin: 0.25rem 0; }
+    .branch-label { color: var(--orange); font-weight: 600; font-size: 0.8rem; }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body><aside class="translation-notice" lang="fr">Version française. Traduction assistée ; révision éditoriale complète en attente. <a href="../players-guide/Players-_-Guide-_-02-_-Character-_-Creation.html" hreflang="en">Consulter l'original en anglais</a></aside>
+<h1 id="reader-section-1">Résumé de la création de personnage</h1>
+<p class="subtitle">Fate's Edge Guide du Joueur — Chapitre 2</p>
+<div class="panel panel-blue">
+<span class="panel-title">Démarrage rapide</span>
+    Ce chapitre vous guide dans la création d'un personnage en environ 10 à 15 minutes. Suivez les étapes dans l'ordre. La plupart des choix sont guidés par le concept de votre personnage ; les chiffres viennent ensuite.
+</div>
+<h2 id="mindset">Comment penser en tant que joueur de Fate's Edge</h2>
+<p>Avant d'attribuer le moindre point d'XP, prenez un moment pour comprendre l'état d'esprit qui fait chanter Fate's Edge. Ce n'est pas un jeu d'optimisation ou de build parfait — c'est un jeu de choix significatifs, de risques dramatiques, et de narration partagée.</p>
+<h3>Embrassez la fiction</h3>
+<p>Votre personnage n'est pas une collection de chiffres — c'est une histoire vivante. Quand vous déclarez une action, pensez d'abord à ce que ferait votre personnage à cet instant, et laissez ensuite la mécanique suivre. Les dés ne sont pas un obstacle à votre créativité ; ils sont un partenaire de conversation. Un 1 n'est pas un échec — c'est une invitation pour le monde à riposter, et cette riposte est ce qui rend l'histoire mémorable.</p>
+<h3>Dépensez vos Faveurs</h3>
+<p>Les Faveurs ne sont pas des jetons d'XP. Elles sont du carburant dramatique. Les thésauriser pour les convertir (2 Faveurs → 1 XP) prive la table de tension et vous prive de votre filet de sécurité. Une Faveur dépensée pour relancer un échec critique ou améliorer la Position avant un pari désespéré crée un moment que toute la table retiendra. L'XP viendra de vos aventures ; les Faveurs sont pour les histoires que vous racontez maintenant.</p>
+<h3>Embrassez l'échec</h3>
+<p>Un Échec n'est jamais « il ne se passe rien ». C'est une opportunité pour le MJ de faire escalader la situation, pour votre personnage d'apprendre, et pour le groupe de s'adapter. Quand vous échouez, vous gagnez 2 Faveurs — le système vous récompense de prendre des risques. Traitez chaque Échec comme un cadeau : il change la situation, vous donne des ressources, et rend la réussite finale plus douce.</p>
+<h3>Vous êtes un co-créateur</h3>
+<p>Le MJ cadre la pression ; vous pilotez la fiction. Vous n'essayez pas de « battre » le jeu ou de déjouer le MJ. Vous collaborez pour raconter une histoire captivante. Quand vous décrivez vos actions en détail — montrant la poussière dans vos yeux, le tremblement de votre bras, la prière désespérée que vous murmurez — vous donnez au MJ la permission de vous récompenser avec de la Position, de l'Effet, ou même une Faveur gratuite. La saveur est gratuite, et c'est votre meilleur outil.</p>
+<h3>Connaissez vos ressources</h3>
+<p>Vous suivez vous-même votre Obligation, votre Fatigue, votre Dommage, et vos Faveurs. Gardez votre feuille visible et vos jauges à jour. Quand votre Obligation approche de sa capacité maximale, ce n'est pas un avertissement — c'est une promesse d'aventure future. Quand votre Fatigue est élevée, ce n'est pas une pénalité — c'est une chance pour un retournement dramatique. Prenez possession de vos ressources, et utilisez-les comme leviers narratifs.</p>
+<h3>Faites confiance au système</h3>
+<p>La boucle de base (Attribut + Compétence, Position, DV, Matrice des résultats) est assez robuste pour porter n'importe quelle scène. Si vous oubliez une règle, reposez-vous sur la Règle d'or : faites le choix qui sert l'histoire. Le reste suivra.</p>
+<h3>Jouez pour découvrir</h3>
+<p>Vous ne savez pas comment la scène se terminera, pas plus que le MJ. Cette incertitude est le cœur battant du jeu. Embrassez-la. Posez des questions, prenez des risques, et laissez les dés chanter. Les séances les plus mémorables viennent de personnages qui agissent avec audace et acceptent les conséquences.</p>
+<blockquote>
+« La route ne promet pas un voyage sûr — seulement un voyage vrai. »
+<span class="attribution">— Le Vagabond Gris</span>
+</blockquote>
+<h2 id="engagement-flowchart">Organigramme d'engagement du joueur</h2>
+<p>Fate's Edge est modulaire par conception. Vous pouvez jouer avec seulement la boucle de résolution de base et rien d'autre — ou ajouter des couches de complexité à mesure que votre table se sent à l'aise. L'organigramme suivant vous aide à naviguer ce choix. Commencez en haut et suivez le chemin qui correspond à votre style de jeu préféré. Rappelez-vous : vous pouvez toujours activer (ou désactiver) des sous-systèmes à mesure que votre personnage évolue et que la campagne l'exige.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Organigramme d'adoption de la complexité pour les joueurs de Fate's Edge</span>
+<div class="tree">
+<ul>
+<li><strong>Commencez ici :</strong> Que voulez-vous ?
+            <ul>
+<li><span class="branch-label">Juste jouer avec la résolution de base ?</span>
+<ul>
+<li><span class="branch-label">Oui →</span> <strong>Boucle de base uniquement</strong> — Attributs + Compétences, aucun Talent, aucun atout.</li>
+<li><span class="branch-label">Non →</span> Voulez-vous un avantage signature ?
+                            <ul>
+<li><span class="branch-label">Non →</span> Prenez 1–2 <strong>Talents mineurs</strong>, puis continuez vers : Voulez-vous la magie ?</li>
+<li><span class="branch-label">Oui →</span> Voulez-vous la magie ?
+                                    <ul>
+<li><span class="branch-label">Non →</span> Choisissez un <strong>Patron + une voie magique</strong>, puis continuez vers : Voulez-vous une influence hors scène ?</li>
+<li><span class="branch-label">Oui →</span> Voulez-vous une influence hors scène ?
+                                            <ul>
+<li><span class="branch-label">Non →</span> Acquérez un <strong>Atout ou un Suivant</strong>, puis continuez vers : Voulez-vous bâtir un héritage commun ?</li>
+<li><span class="branch-label">Oui →</span> Voulez-vous bâtir un héritage commun ?
+                                                    <ul>
+<li><span class="branch-label">Non →</span> Formez une <strong>Confiance</strong> avec votre groupe.</li>
+<li><span class="branch-label">Oui →</span> <strong>Combinez toutes les couches !</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<h3>Comment utiliser cet organigramme</h3>
+<ul>
+<li><strong>Boucle de base uniquement :</strong> Parfait pour les one-shots ou les joueurs qui veulent une expérience narrative pure. Vous restez pleinement efficace dans n'importe quelle scène — Attributs et Compétences vous donnent largement de quoi lancer les dés.</li>
+<li><strong>Talents mineurs :</strong> Ajoutez un ou deux coups signature (par ex. Sens Aiguisés, Second Souffle) pour donner à votre personnage une identité mécanique sans grande complexité.</li>
+<li><strong>Patron + Magie :</strong> Choisissez un Patron et l'une des cinq voies magiques (Gardien des runes, Invocateur, Chantre, Invocateur de créatures, ou Lanceur libre). Cela ajoute un suivi de ressources (Obligation, Corruption, etc.) mais ouvre de nouvelles possibilités narratives et mécaniques.</li>
+<li><strong>Atouts/Suivants :</strong> Étendez votre influence au-delà de votre feuille de personnage. Les Atouts sont des ressources hors scène ; les Suivants sont des alliés en scène. Les deux nécessitent un entretien mais offrent un levier durable.</li>
+<li><strong>Confiances :</strong> Mettez en commun votre XP avec votre groupe pour bâtir une organisation partagée — une guilde, une compagnie marchande, un réseau d'espions. C'est pour les campagnes de longue durée et l'héritage collectif.</li>
+<li><strong>Combiner :</strong> Vous pouvez combiner tout ou partie de ces couches. Le système est modulaire ; vous n'êtes pas enfermé dans une seule voie. Vous pouvez commencer simple et ajouter de la complexité à mesure que votre campagne évolue.</li>
+</ul>
+<h3>Une note sur la progression</h3>
+<p>Vous n'êtes jamais pénalisé pour avoir choisi une voie plus simple. Un personnage avec des Attributs et des Compétences élevés est aussi capable qu'un personnage avec de nombreux Talents et Patrons — ils expriment simplement leur pouvoir différemment. Le jeu équilibre l'étendue face à la profondeur, et les deux sont valides. Choisissez ce qui vous enthousiasme, et changez d'avis plus tard. La route est longue, et le Vagabond Gris la parcourt avec vous.</p>
+<h2 id="overview">Vue d'ensemble</h2>
+<p>Avec la philosophie et le cadre d'adoption en tête, vous êtes prêt à créer votre personnage. Vous commencez au <strong>Palier I (Novice)</strong> avec <strong>32 Points d'Expérience (XP)</strong>. Les Liens et les Complications peuvent ajouter jusqu'à <strong>+4 XP</strong> à eux deux — +2 chacun, quatre au total, répartis comme vous voulez (voir l'Étape 8). XP de départ maximum : <strong>36</strong>.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Étape</th><th>Où trouver les règles</th><th>Temps</th></tr></thead>
+<tbody>
+<tr><td><a href="#step1">1. Concept et Ascendance</a></td><td>Ici ; table d'héritage au Chapitre 12</td><td>2 min</td></tr>
+<tr><td><a href="#step2">2. Attributs</a></td><td>Chapitre Mécaniques de base</td><td>2 min</td></tr>
+<tr><td><a href="#step3">3. Compétences</a></td><td>Chapitre Mécaniques de base</td><td>2 min</td></tr>
+<tr><td><a href="#step4">4. Talents (optionnel)</a></td><td>Chapitre Talents</td><td>3 min</td></tr>
+<tr><td><a href="#step5">5. Patron (optionnel)</a></td><td>Chapitre Puissances du Monde et Patrons</td><td>2 min</td></tr>
+<tr><td><a href="#step6">6. Affinité culturelle</a></td><td>Chapitre Monde, Régions et Cultures</td><td>1 min</td></tr>
+<tr><td><a href="#step7">7. Atouts et Suivants (optionnel)</a></td><td>Chapitre Atouts et Suivants</td><td>1 min</td></tr>
+<tr><td><a href="#step8">8. Liens et Complications</a></td><td>Ici</td><td>2 min</td></tr>
+<tr><td><a href="#step9">9. Équipement et touches finales</a></td><td>Ici</td><td>1 min</td></tr>
+</tbody>
+</table></div>
+</div>
+<h2 id="step1">Étape 1 — Concept et Héritage</h2>
+<p>Écrivez une phrase qui décrit l'<strong>origine, la profession, et un trait caractéristique</strong> de votre personnage. Exemples :</p>
+<ul>
+<li>« Une tailleuse de tunnels Aeler qui a perdu son compte de souffle et entend désormais la pierre chanter. »</li>
+<li>« Un duelliste Vhasian au visage balafré et au vœu de ne plus jamais perdre. »</li>
+<li>« Un parleur du ciel Ykrul qui doit un prix du sang à un clan rival. »</li>
+</ul>
+<p>Choisissez ensuite votre <strong>héritage</strong> — le peuple dont vous êtes issu. L'héritage ne coûte rien et n'accorde aucun dé. Il accorde une <strong>Position</strong> : un cran meilleur sur les jets qui jouent sur les forces de votre peuple, un cran pire sur ce pour quoi il n'a jamais été fait.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Héritage</th><th>Affinité (+1 Position)</th><th>Limite (−1 Position)</th></tr></thead>
+<tbody>
+<tr><td><strong>Aeler</strong> (sous-montagne)</td><td>Corps <em>ou</em> Artisanat</td><td>Prestance</td></tr>
+<tr><td><strong>Aelinnel</strong> (petit peuple, protocole)</td><td>Esprit <em>ou</em> Artisanat</td><td>Corps</td></tr>
+<tr><td><strong>Aelaerem</strong> (petit peuple, foyer)</td><td>Prestance <em>ou</em> Discrétion</td><td>Corps</td></tr>
+<tr><td><strong>Lethai-al</strong> (des forêts)</td><td>Esprit <em>ou</em> Discrétion</td><td>Prestance</td></tr>
+<tr><td><strong>Lethai-thora</strong> (des écoles)</td><td>Esprit <em>ou</em> Savoir</td><td>Corps</td></tr>
+<tr><td><strong>Lethai-ar</strong> (de la Vallée Cramoisie)</td><td>Prestance <em>ou</em> Tromperie</td><td>Âme</td></tr>
+<tr><td><strong>Ykrul</strong> (de la steppe)</td><td>Corps <em>ou</em> Endurance</td><td>Prestance</td></tr>
+<tr><td><strong>Narethi</strong></td><td>Âme <em>ou</em> Arcanes</td><td>Corps</td></tr>
+<tr><td><strong>Humain</strong> (toute culture)</td><td>N'importe quelle Compétence où vous n'avez <em>aucun</em> rang</td><td>Aucune</td></tr>
+<tr><td><strong>Mixte</strong></td><td>L'Affinité d'un parent</td><td>La Limite de l'autre parent</td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="panel panel-gold">
+<span class="panel-title">Comment fonctionnent l'Affinité et la Limite</span>
+<ul>
+<li>Chacune est un <strong>Attribut</strong> et (pour l'Affinité) une <strong>Compétence</strong>. Si le jet utilise l'un ou l'autre, le cran s'applique.</li>
+<li><strong>Elles s'annulent.</strong> Un jet qui touche à la fois votre Affinité et votre Limite est simplement non modifié.</li>
+<li><strong>Elles ne se cumulent pas avec elles-mêmes.</strong> Un jet utilisant votre Attribut d'Affinité <em>et</em> votre Compétence d'Affinité améliore quand même la Position d'un seul cran, pas deux.</li>
+<li><strong>L'échelle a une limite.</strong> La Position va Désespéré → Maîtrisé → Dominant. Mieux que Dominant reste Dominant ; cela ne se convertit jamais en dés.</li>
+</ul>
+<p class="mt-1 text-sm text-muted">Les descriptions complètes de chaque peuple se trouvent au Chapitre 12 (Monde, Régions, et Cultures).</p>
+</div>
+<h2 id="step2">Étape 2 — Attributs</h2>
+<p>Vous avez quatre <strong>Attributs</strong> (1–5). Dépensez de l'XP pour les augmenter depuis une base de 1 chacun.</p>
+<p><strong>Coût :</strong> Chaque cran coûte <strong>le nouveau niveau × 3 XP</strong>. C'est incrémental :</p>
+<ul>
+<li>1 → 2 coûte 6 XP (2 × 3)</li>
+<li>2 → 3 coûte 9 XP (3 × 3)</li>
+<li>3 → 4 coûte 12 XP (4 × 3)</li>
+<li>4 → 5 coûte 15 XP (5 × 3)</li>
+</ul>
+<p>Ainsi, faire passer un Attribut de 1 à 3 coûte 6 + 9 = <strong>15 XP au total</strong>.</p>
+<p><strong>Fourchettes de départ recommandées :</strong></p>
+<ul>
+<li>Attribut principal (celui que vous utilisez le plus) : <strong>3</strong> (coûte 15 XP au total : 1→2 = 6, 2→3 = 9)</li>
+<li>Attributs secondaires : <strong>2</strong> chacun (coûte 6 XP chacun : 1→2 = 6)</li>
+</ul>
+<p><strong>Exemple :</strong> Corps 3 (1→2 = 6, 2→3 = 9 → total 15 XP), Esprit 2 (1→2 = 6 XP) → 21 XP dépensés. Âme et Prestance restent à 1.</p>
+<h2 id="step3">Étape 3 — Compétences</h2>
+<p>Choisissez des <strong>Compétences</strong> (0–5) qui correspondent à votre concept. Les <strong>compétences clés</strong> (utilisées souvent) devraient être à 2–3 ; les autres à 0–1.</p>
+<p><strong>Coût :</strong> Chaque cran coûte <strong>le nouveau niveau × 2 XP</strong>. C'est incrémental :</p>
+<ul>
+<li>0 → 1 coûte 2 XP (1 × 2)</li>
+<li>1 → 2 coûte 4 XP (2 × 2)</li>
+<li>2 → 3 coûte 6 XP (3 × 2)</li>
+<li>3 → 4 coûte 8 XP (4 × 2)</li>
+<li>4 → 5 coûte 10 XP (5 × 2)</li>
+</ul>
+<p>Ainsi, faire passer une Compétence de 0 à 2 coûte 2 + 4 = <strong>6 XP au total</strong>.</p>
+<p><strong>Total de départ recommandé :</strong> Dépensez <strong>8 à 12 XP</strong> en compétences.</p>
+<p><strong>Exemple :</strong> Mêlée 2 (0→1 = 2, 1→2 = 4 → total 6 XP), Athlétisme 1 (0→1 = 2 XP), Endurance 1 (0→1 = 2 XP) → total 10 XP.</p>
+<h2 id="step4">Étape 4 — Talents</h2>
+<div class="panel panel-blue">
+<span class="panel-title">Vous n'avez pas besoin de Talents pour être efficace</span>
+    Un personnage avec <strong>seulement des Attributs et des Compétences</strong> est un personnage complet et viable — <em>surtout au Palier I</em>.
+    <p class="mt-1">Les Talents sont des <strong>extras optionnels</strong>. Ils vous donnent un avantage signature, mais ils ne sont pas requis pour contribuer significativement au groupe. Un guerrier Corps 3 + Mêlée 2 sans Talent lance quand même 5 dés au combat. Un érudit Âme 3 + Savoir 2 sans Talent lance quand même 5 dés pour se souvenir de secrets anciens.</p>
+<p class="mt-1"><strong>Commencez simple.</strong> Prenez 0 à 2 Talents. Ajoutez-en davantage à mesure que vous progressez. Le système est conçu pour que les Attributs et les Compétences fassent le gros du travail.</p>
+</div>
+<p>Les Talents sont des capacités spéciales. Commencez avec <strong>0 à 3 talents</strong>. Beaucoup de concepts fonctionnent bien avec deux talents mineurs (2–3 XP chacun) ou un talent majeur (4–6 XP). Certains concepts fonctionnent parfaitement avec <strong>zéro</strong> Talent — vos Attributs et Compétences suffisent.</p>
+<p><strong>Talents d'accès à la magie (si vous voulez la magie) :</strong></p>
+<ul>
+<li><strong>Art des sorts (6 XP)</strong> — lancer libre</li>
+<li><strong>Familier (2 XP) + Codex (4 XP)</strong> — Gardien des runes (rites)</li>
+<li><strong>Symbole du Patron (4 XP)</strong> — Invocateur (rituels)</li>
+<li><strong>Voie du Chantre (8 XP)</strong> — Chantre (chants)</li>
+<li><strong>Chuchoteur de Pacte (2 XP) + Pactiseur mineur (2 XP)</strong> — Invocateur de créatures</li>
+</ul>
+<p><strong>Talents non magiques (exemples) :</strong></p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Talent</th><th>Coût</th><th>Effet</th></tr></thead>
+<tbody>
+<tr><td><em>Aucun</em></td><td><em>0 XP</em></td><td><em>Un personnage valide et complet. Attributs + Compétences font le travail.</em></td></tr>
+<tr><td>Sens Aiguisés</td><td>2 XP</td><td>+1 dé aux jets de perception.</td></tr>
+<tr><td>Survie défensive</td><td>3 XP</td><td>+1 dé en défense de mêlée, convertit le Dommage en Fatigue.</td></tr>
+<tr><td>Maître d'armes</td><td>5 XP</td><td>+2 dés avec une arme choisie.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Voir le chapitre Talents pour la liste complète.</p>
+<h2 id="step5">Étape 5 — Patron (Optionnel)</h2>
+<p>Si votre personnage utilise la magie par le biais d'un <strong>Patron</strong>, choisissez-en un (voir le chapitre Puissances du Monde et Obligation). Les six recommandés pour les premiers personnages sont :</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Patron</th><th>Thème</th></tr></thead>
+<tbody>
+<tr><td>Serment de Flamme et de Lumière</td><td>vœux, rayonnement, châtiment</td></tr>
+<tr><td>Le Voyageur</td><td>routes, passage sûr</td></tr>
+<tr><td>Inaea (Ange de l'Araignée)</td><td>miséricorde, communauté</td></tr>
+<tr><td>Le Témoin</td><td>vérité, mémoire</td></tr>
+<tr><td>Roi de la Charogne</td><td>décomposition, renouveau</td></tr>
+<tr><td>Ikasha (Celle qui Dort)</td><td>ombres, secrets</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Vous n'avez <strong>pas</strong> besoin d'un Patron si vous êtes un lanceur libre (Art des sorts) ou un psionique (optionnel).</p>
+<h2 id="step6">Étape 6 — Affinité culturelle</h2>
+<p>Votre héritage définit qui est votre peuple. Votre <strong>affinité culturelle</strong> définit où vous avez été élevé — et ce n'est souvent pas le même lieu. Choisissez une région du Chapitre 12 (Monde, Régions, et Cultures). Elle accorde un bénéfice une fois par séance, tiré de la façon dont ce lieu fait réellement les choses.</p>
+<p><strong>Cumul.</strong> Votre Affinité d'héritage et votre affinité culturelle sont des choses séparées et peuvent toutes deux se manifester dans une scène — mais si les deux amélioreraient la Position sur le même jet, vous obtenez <strong>un cran, pas deux</strong>. La Position a trois échelons ; il n'y a nulle part où aller au-dessus de Dominant.</p>
+<h2 id="step7">Étape 7 — Atouts et Suivants (Optionnel)</h2>
+<p>Vous pouvez dépenser de l'XP en :</p>
+<ul>
+<li><strong>Atout mineur (4 XP)</strong> — par ex. une planque, un atelier</li>
+<li><strong>Suivant (Cap² XP)</strong> — par ex. éclaireur Cap 2 (4 XP), lieutenant Cap 3 (9 XP)</li>
+</ul>
+<p>La plupart des personnages de départ ignorent cela ou prennent un atout mineur. Voir le chapitre Atouts et Suivants.</p>
+<h2 id="step8">Étape 8 — Liens et Complications</h2>
+<p><strong>Liens :</strong> Établissez <strong>jusqu'à deux Liens</strong> avec d'autres personnages joueurs. Chaque Lien accorde une Faveur une fois par séance quand vous agissez dessus avec une description détaillée. Au Palier III (90+ XP), les Liens permettent aussi des transferts de Faveurs.</p>
+<p><strong>Complications :</strong> Vous pouvez prendre jusqu'à <strong>deux complications</strong> (par ex. une querelle, un objet maudit, une dette). Chacune donne <strong>+2 XP</strong> mais chaque personnage avec une complication ajoute <strong>+1 Point d'Histoire en réserve</strong> aux scènes précoces. Travaillez avec votre MJ.</p>
+<p class="text-sm text-muted">Voir le chapitre Contextes pour des exemples.</p>
+<h2 id="step9">Étape 9 — Équipement et touches finales</h2>
+<p><strong>Équipement de départ (présumé) :</strong></p>
+<ul>
+<li>Un ensemble de vêtements adapté à votre culture</li>
+<li>Une arme de mêlée Légère ou une arme à distance avec munitions</li>
+<li>Armure légère (si votre concept l'exige)</li>
+<li>Un sac à dos, une outre, 1d6 jours de rations, un couteau utilitaire, un briquet à silex, une petite lanterne ou une bougie</li>
+<li>Tout outil requis par vos compétences (par ex. des crochets, une trousse de soins, du matériel d'écriture)</li>
+</ul>
+<p>Pour de l'équipement spécial (armure lourde, armes lourdes, objets magiques), dépensez de l'XP ou acquérez-les en jouant.</p>
+<p><strong>Décompte final de l'XP :</strong></p>
+<ul>
+<li>Commencez avec <strong>32 XP</strong>.</li>
+<li>Ajoutez <strong>+2 XP</strong> par Lien ou Complication pris, pour un maximum combiné de <strong>+4</strong>.</li>
+<li>XP de départ maximum : <strong>36</strong>.</li>
+</ul>
+<p><strong>Dépensez-le tout.</strong> L'XP de départ ne peut pas être mis en réserve — tout ce que vous laissez non dépensé disparaît simplement.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Atterrir exactement sur 32</span>
+    Les Attributs coûtent des multiples de 3 et les Compétences des multiples de 2, donc les builds ont tendance à s'arrêter un point trop tôt. Deux moyens bon marché de combler l'écart : un <strong>Suivant Cap 1</strong> (1 XP — un apprenti, un chien, un coursier qui connaît les ruelles) ou un Talent à prix impair, comme <em>Survie défensive</em> (3 XP) ou <em>Maître d'armes</em> (5 XP). Les deux apparaissent dans les builds ci-dessous.
+</div>
+<h2 id="build-examples">Exemples de builds</h2>
+<p>Six personnages complets, dépensant chacun <strong>exactement 32 XP</strong>. Chacun d'eux lance un pool de cinq dés dans sa spécialité. Aucun d'eux n'a besoin de plus d'un Talent ; deux n'en ont besoin d'aucun. Chaque entrée se termine par ce qu'il faut faire des <strong>+4 XP</strong> si votre table utilise les Liens et Complications.</p>
+<h3>Build 1 : Le Duelliste</h3>
+<ul>
+<li><strong>Attributs :</strong> Corps 3 (15), Esprit 2 (6) → <strong>21</strong></li>
+<li><strong>Compétences :</strong> Mêlée 2 (6) → <strong>6</strong></li>
+<li><strong>Talents :</strong> Maître d'armes (5) → <strong>5</strong></li>
+<li><strong>Total : 32 XP</strong></li>
+</ul>
+<p><strong>Pool :</strong> Corps 3 + Mêlée 2 = 5 dés — 7 avec sa lame de choix. Étroit et mortel : elle a une seule réponse, et c'est une très bonne réponse.</p>
+<p><strong>Avec +4 :</strong> Athlétisme 1 (2) et Endurance 1 (2), pour pouvoir poursuivre et tenir.</p>
+<h3>Build 2 : L'Érudit <span class="text-sm text-muted">(aucun Talent)</span></h3>
+<ul>
+<li><strong>Attributs :</strong> Esprit 2 (6), Âme 2 (6), Prestance 2 (6) → <strong>18</strong></li>
+<li><strong>Compétences :</strong> Savoir 3 (12), Perspicacité 1 (2) → <strong>14</strong></li>
+<li><strong>Total : 32 XP</strong></li>
+</ul>
+<p><strong>Pool :</strong> Esprit 2 + Savoir 3 = 5 dés. Notez l'échange : il a acheté de la profondeur dans la <em>Compétence</em> plutôt que dans l'Attribut, ce qui est moins cher, et a dépensé la différence pour être compétent partout ailleurs. Les mêmes cinq dés dans sa spécialité ; un personnage bien plus complet en dehors.</p>
+<p><strong>Avec +4 :</strong> Perspicacité 1 (2) et Persuasion 1 (2) — les deux compétences qui transforment ce qu'il sait en ce que font les gens.</p>
+<h3>Build 3 : L'Éclaireuse</h3>
+<ul>
+<li><strong>Attributs :</strong> Esprit 3 (15), Corps 2 (6) → <strong>21</strong></li>
+<li><strong>Compétences :</strong> Discrétion 2 (6), Athlétisme 1 (2) → <strong>8</strong></li>
+<li><strong>Talents :</strong> Sens Aiguisés (2) → <strong>2</strong></li>
+<li><strong>Suivant :</strong> chien pisteur, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Total : 32 XP</strong></li>
+</ul>
+<p><strong>Pool :</strong> Esprit 3 + Discrétion 2 = 5 dés ; 6 quand elle cherche quelque chose. Le chien est le point impair, et il sera la raison pour laquelle elle survivra une nuit.</p>
+<p><strong>Avec +4 :</strong> Endurance 1 (2) et Perspicacité 1 (2) — les jambes pour continuer et le sens pour savoir quand ne pas le faire.</p>
+<h3>Build 4 : Le Guérisseur</h3>
+<ul>
+<li><strong>Attributs :</strong> Âme 3 (15), Esprit 2 (6) → <strong>21</strong></li>
+<li><strong>Compétences :</strong> Artisanat 2 (6), Perspicacité 1 (2) → <strong>8</strong></li>
+<li><strong>Talents :</strong> Survie défensive (3) → <strong>3</strong></li>
+<li><strong>Total : 32 XP</strong></li>
+</ul>
+<p><strong>Pool :</strong> Âme 3 + Artisanat 2 = 5 dés. Survie défensive lui permet de convertir le Dommage en Fatigue, ce qui est tout le travail : il est celui qui doit encore tenir debout après.</p>
+<p><strong>Avec +4 :</strong> Savoir 1 (2) et Athlétisme 1 (2) — ou Familier (2) plus un point de compétence, s'il se dirige vers la voie du Gardien des runes.</p>
+<h3>Build 5 : Le Commandant</h3>
+<ul>
+<li><strong>Attributs :</strong> Prestance 3 (15), Esprit 2 (6) → <strong>21</strong></li>
+<li><strong>Compétences :</strong> Persuasion 2 (6), Perspicacité 1 (2), Savoir 1 (2) → <strong>10</strong></li>
+<li><strong>Suivant :</strong> héraut, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Total : 32 XP</strong></li>
+</ul>
+<p><strong>Pool :</strong> Prestance 3 + Persuasion 2 = 5 dés. Aucun Talent du tout. Le héraut n'est pas un garde du corps — c'est une voix qui arrive avant lui, ce qui est souvent l'arme la plus utile.</p>
+<p><strong>Avec +4 :</strong> Prestance de Commandement (4), si la campagne de votre MJ comporte un champ de bataille. Sinon Tromperie 1 et Mêlée 1.</p>
+<h3>Build 6 : Le Vaurien</h3>
+<ul>
+<li><strong>Attributs :</strong> Esprit 3 (15), Corps 2 (6) → <strong>21</strong></li>
+<li><strong>Compétences :</strong> Discrétion 2 (6), Tromperie 1 (2), Perspicacité 1 (2) → <strong>10</strong></li>
+<li><strong>Suivant :</strong> informateur de rue, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Total : 32 XP</strong></li>
+</ul>
+<p><strong>Pool :</strong> Esprit 3 + Discrétion 2 = 5 dés. Perspicacité est là parce que savoir quand on vous ment est la même compétence que bien mentir, vue de l'autre côté.</p>
+<p><strong>Avec +4 :</strong> Tromperie à 2 (4). Un dé de plus là où cela compte le plus.</p>
+<div class="panel panel-blue">
+<span class="panel-title">Ce que ces six ont en commun</span>
+    Cinq dés dans ce pour quoi ils sont faits. C'est le chiffre à viser, et il y a plusieurs chemins pour y arriver : Attribut 3 + Compétence 2, ou Attribut 2 + Compétence 3 (moins cher, et cela laisse de la monnaie pour l'étendue). Tout le reste sur ces feuilles — le Talent, le chien, le héraut — est du personnage, pas de la compétence.
+</div>
+<h2 id="starting-gear">Options d'équipement de départ</h2>
+<h3>Armes et armures</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Objet</th><th>Coût en XP</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Arme légère (dague, épée courte)</td><td>Gratuit (ou 4 XP pour une spéciale)</td><td>Dommage 1, +2d Proche, +1d Alentours</td></tr>
+<tr><td>Arme moyenne (épée longue, lance)</td><td>Gratuit (ou 8 XP pour une spéciale)</td><td>Dommage 2, +1d Proche, +2d Alentours</td></tr>
+<tr><td>Arme lourde (épée à deux mains, hallebarde)</td><td>12 XP</td><td>Dommage 3, -1d Proche, +3d Alentours</td></tr>
+<tr><td>Armure légère</td><td>4 XP</td><td>Dommage 1 → Fatigue 1</td></tr>
+<tr><td>Armure moyenne</td><td>8 XP</td><td>Dommage 2 → Fatigue 1</td></tr>
+<tr><td>Armure lourde</td><td>12 XP</td><td>Dommage 3 → Fatigue 2</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>La plupart des personnages de départ prennent une arme Légère et une armure Légère gratuites. Les armes et armures lourdes sont des investissements significatifs.</p>
+<div class="panel panel-green">
+<span class="panel-title">Le conseil du Vagabond Gris</span>
+    « Prenez l'arme gratuite. Douze points d'expérience achètent une épée à deux mains, et une épée à deux mains vous achète un point de Dommage supplémentaire et un mauvais moment dans chaque porte, ruelle, et escalier du monde. Dépensez-les en armure si vous devez dépenser. Dépensez-les en un ami si vous avez le bon sens. »
+</div>
+<h2 id="next-steps">Prochaines étapes</h2>
+<ul>
+<li>Lisez le chapitre Mécaniques de base pour apprendre à lancer les dés, utiliser la Position, et dépenser des Faveurs.</li>
+<li>Lisez le chapitre Magie si votre personnage utilise la magie.</li>
+<li>Lisez le chapitre Interaction avec le Monde pour les règles de voyage, de temps, et sociales.</li>
+<li>Travaillez avec votre MJ pour décider de la situation de départ et des minuteurs de campagne.</li>
+</ul>
+<div class="panel panel-green">
+<span class="panel-title">Le conseil du Vagabond Gris</span>
+    « N'essayez pas de créer un personnage parfait. Créez-en un qui doit quelque chose, porte une cicatrice, et a un nom que quelqu'un d'autre dira à voix haute. Les chiffres suivent l'histoire. Ils ne l'ont jamais menée. »
+</div>
+<h2 id="party-composition">Guide de composition du groupe</h2>
+<div class="panel panel-blue">
+<span class="panel-title">Bâtir un groupe équilibré</span>
+    Fate's Edge n'exige pas un groupe « équilibré » au sens traditionnel. Un groupe de quatre duellistes est viable — ils résoudront simplement les problèmes avec l'acier plutôt qu'avec les mots. Cependant, les groupes qui couvrent plusieurs rôles ont plus d'outils et sont plus résilients quand les choses tournent mal.
+    <p class="mt-1">Ce guide vous aide à réfléchir aux rôles que votre groupe pourrait couvrir, comment différents builds de personnage peuvent remplir ces rôles, et — surtout — comment les <strong>Suivants</strong> peuvent combler les lacunes quand aucun personnage joueur ne couvre un rôle nécessaire. Utilisez-le comme point de départ de conversation pendant la séance zéro.</p>
+</div>
+<h3>Les cinq rôles</h3>
+<div class="panel panel-blue">
+<span class="panel-title">Lisez ces rôles comme Attribut + Compétence</span>
+    Chaque rôle ci-dessous est un <strong>Attribut</strong> et une ou deux <strong>Compétences clés</strong>. Cette paire est le rôle ; les Talents listés sont l'assaisonnement. Un Tank est Corps et Mêlée. Un Soutien est Âme et Artisanat. Si vous avez la paire, vous avez le travail.
+</div>
+<p>Les personnages de Fate's Edge sont définis par leur <em>approche</em>, pas par une classe. Les mêmes mécaniques peuvent soutenir différents styles de jeu. Pensez à ces rôles comme <strong>ce que vous faites à la table</strong>, pas comme <strong>ce qu'est votre personnage</strong>.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Rôle</th><th>Attribut principal</th><th>Ce que vous faites</th></tr></thead>
+<tbody>
+<tr><td><strong>Tank</strong></td><td>Corps</td><td>Se tenir devant, absorber les dégâts, protéger les alliés</td></tr>
+<tr><td><strong>Frappeur</strong></td><td>Corps ou Esprit</td><td>Infliger des dégâts, éliminer les menaces, briser les lignes</td></tr>
+<tr><td><strong>Contrôleur</strong></td><td>Âme ou Prestance</td><td>Façonner le champ de bataille, imposer des conditions, gérer la peur</td></tr>
+<tr><td><strong>Soutien</strong></td><td>Âme</td><td>Soigner, retirer des conditions, transférer des fardeaux</td></tr>
+<tr><td><strong>Utilitaire</strong></td><td>Esprit ou Âme</td><td>Recueillir des informations, résoudre des énigmes, négocier avec les esprits</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Tank — Le Mur</h4>
+<p>Vous vous tenez entre le danger et les gens que vous protégez. Vous n'avez pas besoin d'infliger le plus de dégâts — vous devez être le plus difficile à tuer.</p>
+<p><strong>Mécaniques clés :</strong></p>
+<ul>
+<li>Corps élevé (4+ pour la jauge de Fatigue et la défense)</li>
+<li>Armure lourde (convertit le Dommage en Fatigue)</li>
+<li>Talents défensifs (Survie défensive, Porteur de bouclier) — optionnel</li>
+</ul>
+<p><strong>Exemple de build (32 XP) :</strong> Corps 3 (15), Âme 2 (6), Mêlée 2 (6), Endurance 1 (2), Survie défensive (3) = <strong>32 XP</strong>. Avec +4 : Athlétisme 1 (2), et l'armure moyenne reste hors de portée ; réservez plutôt l'XP des Liens à Athlétisme et Perspicacité — ou économisez pour l'armure Lourde (12) en jeu.</p>
+<p><strong>Pool de dés :</strong> Corps 3 + Mêlée 2 = 5 dés. Survie défensive convertit le Dommage en Fatigue, ce qui est ce qui fait réellement d'un mur un mur.</p>
+<h4>Frappeur — La Lame</h4>
+<p>Vous éliminez les menaces. Que ce soit par la précision ou la force écrasante, votre travail est de terminer les combats.</p>
+<p><strong>Mécaniques clés :</strong></p>
+<ul>
+<li>Corps élevé (mêlée) ou Esprit (à distance)</li>
+<li>Maître d'armes (optionnel — ajoute +2 dés)</li>
+</ul>
+<p><strong>Exemple de build (32 XP) :</strong> Corps 3 (15), Esprit 2 (6), Mêlée 2 (6), Maître d'armes (5) = <strong>32 XP</strong> — c'est le Build 1 (Le Duelliste) ci-dessus. Avec +4 : Athlétisme 1 (2) et Discrétion 1 (2), pour qu'elle puisse atteindre le combat et le quitter.</p>
+<p><strong>Pool de dés :</strong> Corps 3 + Mêlée 2 + Maître d'armes 2 = 7 dés avec l'arme choisie.</p>
+<h4>Contrôleur — La Tisseuse</h4>
+<p>Vous façonnez le champ de bataille. La peur, les conditions, et le positionnement sont vos armes.</p>
+<p><strong>Mécaniques clés :</strong></p>
+<ul>
+<li>Âme élevée (volonté) ou Prestance (intimidation)</li>
+<li>Les compétences sociales (Persuasion, Tromperie) sont la base</li>
+</ul>
+<p><strong>Exemple de build (32 XP) :</strong> Prestance 3 (15), Âme 2 (6), Persuasion 2 (6), Tromperie 1 (2), Perspicacité 1 (2), plus un Suivant Cap 1 (1) = <strong>32 XP</strong>. Avec +4 : Prestance de Commandement (4).</p>
+<p><strong>Pool de dés :</strong> Prestance 3 + Persuasion 2 = 5 dés.</p>
+<h4>Soutien — Le Rebouteux</h4>
+<p>Vous gardez le groupe debout. La guérison, le retrait de conditions, et le transfert de fardeaux sont votre domaine.</p>
+<p><strong>Mécaniques clés :</strong></p>
+<ul>
+<li>Âme élevée (volonté) ou Esprit (médecine)</li>
+<li>La compétence Artisanat est la base</li>
+</ul>
+<p><strong>Exemple de build (32 XP) :</strong> Âme 3 (15), Esprit 2 (6), Artisanat 2 (6), Perspicacité 1 (2), Survie défensive (3) = <strong>32 XP</strong> — c'est le Build 4 (Le Guérisseur) ci-dessus. Avec +4 : Savoir 1 (2) et Athlétisme 1 (2).</p>
+<p><strong>Pool de dés :</strong> Âme 3 + Artisanat 2 = 5 dés.</p>
+<h4>Utilitaire — Les Yeux et les Oreilles</h4>
+<p>Vous résolvez des problèmes qui ne peuvent pas se résoudre avec de l'acier. L'information, la négociation, et la consultation des esprits sont vos outils.</p>
+<p><strong>Mécaniques clés :</strong></p>
+<ul>
+<li>Esprit élevé (perception) ou Âme (intuition)</li>
+<li>Les compétences de connaissance (Savoir, Perspicacité) sont la base</li>
+</ul>
+<p><strong>Exemple de build (32 XP) :</strong> Esprit 3 (15), Âme 2 (6), Savoir 2 (6), Perspicacité 1 (2), Perspicacité 1 (2), plus un Suivant Cap 1 — un informateur, un apprenti archiviste (1) = <strong>32 XP</strong>. Avec +4 : Persuasion 1 (2) et Discrétion 1 (2).</p>
+<p><strong>Pool de dés :</strong> Esprit 3 + Savoir 2 = 5 dés. Le Build 2 (L'Érudit) atteint le même pool pour moins cher, en achetant Savoir 3 plutôt qu'Esprit 2 — comparez-les.</p>
+<h3>Combler les lacunes avec des Suivants</h3>
+<p>Tous les groupes n'ont pas un joueur qui veut jouer chaque rôle. C'est là que les <strong>Suivants</strong> (voir le Chapitre 10, Atouts et Suivants) entrent en jeu. Un Suivant bien choisi peut couvrir un rôle manquant, fournir une assistance spécialisée, ou gérer des tâches qu'aucun personnage joueur ne veut faire.</p>
+<h4>Quand utiliser un Suivant</h4>
+<ul>
+<li><strong>Personne ne veut jouer le Soutien :</strong> Un Suivant avec de l'Artisanat (médecine) ou des Rites de guérison peut garder le groupe en vie.</li>
+<li><strong>Personne ne veut jouer le Tank :</strong> Un Suivant avec une Armure lourde et un bouclier peut tenir la ligne.</li>
+<li><strong>Personne n'a une Perspicacité élevée :</strong> Un Suivant éclaireur ou informateur peut recueillir des informations hors scène.</li>
+<li><strong>Personne ne parle une langue particulière ou ne connaît les coutumes d'une région :</strong> Un Suivant guide local peut naviguer les pièges culturels.</li>
+<li><strong>Le groupe a besoin d'un spécialiste pour une mission unique :</strong> Un Suivant peut être engagé pour la durée d'une tâche.</li>
+</ul>
+<h4>Rôles de Suivant (par Capacité)</h4>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Type de Suivant</th><th>Plage de Cap</th><th>Ce qu'il peut faire</th></tr></thead>
+<tbody>
+<tr><td><strong>Garde du corps (Tank)</strong></td><td>2–3</td><td>Tenir une ligne, absorber des dégâts, protéger un PJ</td></tr>
+<tr><td><strong>Éclaireur (Utilitaire)</strong></td><td>2–3</td><td>Recueillir des informations, naviguer, repérer les dangers</td></tr>
+<tr><td><strong>Guérisseur (Soutien)</strong></td><td>2–3</td><td>Stabiliser les blessures, effacer la Fatigue, retirer les Conditions</td></tr>
+<tr><td><strong>Érudit (Utilitaire)</strong></td><td>2–3</td><td>Rechercher, traduire, identifier des reliques</td></tr>
+<tr><td><strong>Mercenaire (Frappeur)</strong></td><td>2–3</td><td>Infliger des dégâts au combat, suivre des ordres</td></tr>
+<tr><td><strong>Guide (Utilitaire)</strong></td><td>2–3</td><td>Naviguer le terrain, interpréter les coutumes locales, traduire</td></tr>
+<tr><td><strong>Receleur (Contrôleur/Utilitaire)</strong></td><td>2</td><td>Accéder aux marchés noirs, répandre des rumeurs, créer un levier</td></tr>
+<tr><td><strong>Apprenti (Tout)</strong></td><td>1–2</td><td>Assister un PJ dans sa spécialité (ajoute des dés d'assistance)</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Coûts et entretien des Suivants</h4>
+<p>Les Suivants sont acquis en dépensant de l'XP : Cap² XP (Cap 1 = 1 XP, Cap 2 = 4 XP, Cap 3 = 9 XP). Ils nécessitent un entretien :</p>
+<ul>
+<li><strong>Efficace :</strong> Payez max(1, XP d'acquisition ÷ 3, arrondi au supérieur) par temps mort — 1 XP au Cap 1, 2 au Cap 2, 3 au Cap 3. Aucune scène requise.</li>
+<li><strong>Intensif :</strong> Payez 1 XP et consacrez une scène à entretenir la relation (entraînement, repas partagé, résolution d'un problème personnel).</li>
+</ul>
+<p><strong>Conséquences de la négligence :</strong></p>
+<ul>
+<li>La Loyauté s'aggrave : Fidèle → Tendue → Rompue.</li>
+<li>Un Suivant Tendu assiste avec -1 dé ; un Suivant Rompu part ou devient hostile.</li>
+<li>Si un Suivant est négligé pendant deux temps morts consécutifs, il part définitivement (ou pire — il rejoint un rival).</li>
+</ul>
+<div class="panel panel-gold">
+<span class="panel-title">Astuce joueur : Le Suivant comme Successeur</span>
+    Un Suivant Cap 3+ peut devenir votre successeur quand votre personnage se retire ou tombe. Il hérite de votre position dans les factions, d'un fardeau non résolu, et d'un Lien d'Héritage. Si vous jouez une longue campagne, envisagez d'investir dans un Suivant en qui vous auriez confiance pour porter votre bannière. Voir le Chapitre 17 (Le Moteur de l'Héritage) pour les règles complètes.
+</div>
+<h3>Composition du groupe en un coup d'œil</h3>
+<p>Utilisez cette table pour voir si votre groupe a des lacunes. Un personnage peut couvrir plusieurs rôles. Les Suivants peuvent combler les lacunes marquées (S).</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Taille du groupe</th><th>Couverture recommandée</th></tr></thead>
+<tbody>
+<tr><td><strong>2 joueurs</strong></td><td>1 Tank/Frappeur + 1 Soutien/Contrôleur (S pour les rôles manquants)</td></tr>
+<tr><td><strong>3 joueurs</strong></td><td>Tank + Frappeur + Soutien (ou Contrôleur) ; S pour le rôle manquant</td></tr>
+<tr><td><strong>4 joueurs</strong></td><td>Tank + Frappeur + Contrôleur + Soutien (l'Utilitaire se fond souvent dans le Soutien ou le Contrôleur)</td></tr>
+<tr><td><strong>5+ joueurs</strong></td><td>Tous les rôles couverts ; envisagez des rôles secondaires</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Exemples de compositions de groupe</h3>
+<h4>Le groupe équilibré (4 joueurs, 32 XP chacun)</h4>
+<ul>
+<li><strong>Tank :</strong> Corps 3, Mêlée 2 (5 dés). Armure lourde.</li>
+<li><strong>Frappeur :</strong> Corps 3, Mêlée 2 (5 dés). Arme moyenne.</li>
+<li><strong>Soutien :</strong> Âme 3, Artisanat 2 (5 dés). Sortilège SOIN.</li>
+<li><strong>Utilitaire :</strong> Esprit 3, Savoir 2 (5 dés). Trousse de recherche.</li>
+</ul>
+<p><strong>Note :</strong> Aucun de ces quatre n'a de Talent, et tous les quatre sont pleinement efficaces. Chacun dépense environ <strong>27 à 29 XP</strong> sur la paire ci-dessus, ce qui laisse trois à cinq points pour une seconde compétence, un Suivant Cap 1, ou un petit Talent — selon ce que le personnage veut, plutôt que ce dont le groupe a besoin.</p>
+<h4>Le groupe agressif (3 joueurs + Suivant)</h4>
+<ul>
+<li><strong>Frappeur/Tank :</strong> Corps 3, Mêlée 2 (5 dés). Armure moyenne.</li>
+<li><strong>Frappeur :</strong> Esprit 3, Discrétion 2 (5 dés). Armes légères.</li>
+<li><strong>Utilitaire/Soutien :</strong> Âme 3, Arcanes 2 (5 dés). Art des sorts.</li>
+<li><strong>Suivant : Guérisseur (Cap 2, 4 XP)</strong> — garde le groupe en vie.</li>
+</ul>
+<h4>Le groupe social (3 joueurs + Suivant)</h4>
+<ul>
+<li><strong>Contrôleur :</strong> Prestance 3, Persuasion 2 (5 dés).</li>
+<li><strong>Utilitaire :</strong> Esprit 3, Tromperie 2 (5 dés).</li>
+<li><strong>Soutien/Utilitaire :</strong> Âme 3, Savoir 2 (5 dés).</li>
+<li><strong>Suivant : Garde du corps (Cap 2, 4 XP)</strong> — protège les diplomates.</li>
+</ul>
+<h3>Dernier conseil du Vagabond Gris</h3>
+<blockquote>
+« Ne vous obsédez pas sur la composition du groupe. Le jeu est flexible. Un groupe de quatre duellistes est viable — ils résoudront simplement les problèmes avec l'acier plutôt qu'avec les mots. Un groupe de quatre érudits est viable — ils négocieront, mèneront des recherches, et trouveront le chemin qui évite complètement le combat. La question n'est pas de savoir si votre groupe est « équilibré ». La question est de savoir si votre groupe est préparé pour le genre de problèmes que votre MJ présentera. Parlez à votre MJ. Demandez quel genre de campagne il dirige. Puis construisez en conséquence. Et s'il vous manque un rôle, engagez un Suivant. Il n'est pas aussi fort qu'un PJ, mais il vaut mieux que rien — et il peut devenir davantage.
+<p class="mt-1">« Un Suivant n'est pas un serviteur. Un Suivant est une relation. Traitez-le bien, et il vous sauvera la vie. Traitez-le mal, et il s'en souviendra. La route est longue. Marchez-la avec des gens en qui vous avez confiance — ou au moins que vous payez à temps. »</p>
+</blockquote>
+<h3>Combler les lacunes avec des Suivants (référence rapide)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Rôle manquant</th><th>Suivant recommandé</th><th>Ce qu'il fait</th></tr></thead>
+<tbody>
+<tr><td>Pas de Tank</td><td>Garde du corps (Cap 2–3)</td><td>Tenir la ligne, absorber des dégâts, protéger un PJ</td></tr>
+<tr><td>Pas de Frappeur</td><td>Mercenaire (Cap 2–3)</td><td>Infliger des dégâts au combat, suivre des ordres</td></tr>
+<tr><td>Pas de Contrôleur</td><td>Interrogateur ou Sorcière (Cap 2–3)</td><td>Imposer la peur, gérer les conditions, manipuler</td></tr>
+<tr><td>Pas de Soutien</td><td>Guérisseur (Cap 2–3)</td><td>Stabiliser, effacer la Fatigue, retirer les Conditions</td></tr>
+<tr><td>Pas d'Utilitaire</td><td>Érudit ou Guide (Cap 2–3)</td><td>Rechercher, traduire, naviguer, identifier</td></tr>
+</tbody>
+</table></div>
+</div>
+<section id="character-adaptation"><h2>Adapter un concept de personnage</h2><p>Ce guide utilise les règles de personnage existantes. Il n'ajoute aucun système de classe ni de nouvelles capacités.</p><h2 id="start-with-the-character">Commencez par le personnage que vous voulez jouer</h2>
+<p>Écrivez trois courtes déclarations avant de chercher des correspondances mécaniques :</p>
+<ol><li><strong>Rôle :</strong> qu'apporte ce personnage ? Les exemples incluent tenir un passage, trouver une route cachée, soigner les blessés, ou négocier avec des puissances dangereuses.</li><li><strong>Méthode :</strong> comment le fait-il ? Un bouclier, une observation patiente, un rite pratiqué, et une promesse contraignante créent des personnages différents même s'ils servent le même rôle.</li><li><strong>Signature :</strong> quel(s) moment(s) rendrai(en)t le personnage reconnaissable ? « Je me tiens entre le danger et mes alliés » est plus utile ici qu'une liste de vingt capacités de classe.</li></ol>
+<p>Une sous-classe affine généralement la méthode ou la signature : deux guerriers peuvent partager un entraînement martial tandis que l'un protège une compagnie et l'autre combat au travers d'embuscades soigneusement préparées. Vous n'avez pas besoin de préserver la frontière de classe du jeu source pour préserver cette distinction.</p>
+<h2 id="conversion-process">Convertir le concept en six étapes</h2>
+<ol><li><strong>Convenez du point de départ.</strong> Choisissez le Palier Fate's Edge de la campagne, la procédure de création, et le matériel disponible. Un personnage de haut niveau dans un autre jeu n'établit pas un budget de départ Fate's Edge.</li><li><strong>Séparez la capacité ordinaire des exceptions.</strong> Le maniement des armes, la discrétion, l'endurance, la persuasion, et la recherche commencent généralement avec des attributs et des compétences existantes. Une capacité source qui rend un personnage entraîné ou compétent peut ne nécessiter aucun talent.</li><li><strong>Choisissez la signature essentielle.</strong> Trouvez un talent ou une voie publiés qui produit réellement l'effet désiré. Lisez son déclencheur, ses prérequis, son action ou son timing, son coût, ses limites, et ses conséquences. Des noms similaires seuls ne constituent pas une correspondance.</li><li><strong>Construisez avec les règles cibles.</strong> Payez les coûts Fate's Edge énoncés et satisfaites les prérequis. Notez la source exacte de chaque option spéciale. L'équipement, les suivants, et les atouts utilisent leurs propres règles d'acquisition et d'usage.</li><li><strong>Placez les capacités ultérieures sur une liste d'avancement.</strong> Gardez un concept de départ reconnaissable au lieu de forcer une liste complète de capacités de haut niveau dans un build novice. La liste est un plan, pas un droit à des capacités gratuites.</li><li><strong>Testez le build dans des scènes représentatives.</strong> Testez sa contribution ordinaire, son action signature, et sa réponse à un revers. Ajustez la sélection dans les règles de personnage convenues de la campagne si l'expérience ne correspond pas au concept.</li></ol>
+<h2 id="feature-map">Traduire les capacités par ce qu'elles font</h2>
+<table><thead><tr><th>Capacité source</th><th>Chercher dans Fate's Edge</th><th>Garder explicite</th></tr></thead><tbody>
+<tr><td>Entraînement aux armes, expertise en exploration, ou compétence sociale</td><td>Attributs et compétences existantes pertinentes ; équipement le cas échéant.</td><td>L'entraînement n'accorde pas automatiquement une action spéciale, un dé bonus, ou une immunité.</td></tr>
+<tr><td>Une posture défensive, un tir acrobatique, ou une manœuvre de combat signature</td><td>Une action ordinaire sous la procédure de base, ou un talent publié si une exception est essentielle.</td><td>Utilisez le timing, l'effet, et la fréquence de l'option sélectionnée. Ne copiez pas l'économie d'action d'un jeu source.</td></tr>
+<tr><td>Une liste de sorts ou une discipline surnaturelle</td><td>Une voie magique Fate's Edge et ses œuvres ou rites autorisés.</td><td>L'accès, la portée, les coûts, le contrecoup, et les conséquences viennent de cette voie, pas du sort source.</td></tr>
+<tr><td>Un familier, un allié invoqué, une créature liée, ou une suite</td><td>Les règles appropriées de familier, d'invocation, de suivant, ou d'atout.</td><td>Ce sont des relations différentes. Faites correspondre le rôle de la créature et utilisez les coûts et limites de la relation choisie.</td></tr>
+<tr><td>Un vœu, un patron, un ordre, ou une obligation héritée</td><td>Les relations du cadre et la voie ou les options de personnage publiées pertinentes.</td><td>Une relation narrative n'est pas automatiquement un bénéfice mécanique ou un atout acheté.</td></tr>
+<tr><td>Tours supplémentaires, réussite automatique, immunité, ou annulation de conséquence</td><td>Une exception publiée spécifiquement formulée, si elle existe et que le personnage y est admissible.</td><td>Ne déduisez pas l'exception de la classe source. Préservez son verrou Fate's Edge, son déclencheur, son coût, et sa limite.</td></tr>
+</tbody></table>
+<h2 id="numbers-and-resources">Laissez les chiffres du jeu source derrière vous</h2>
+<p>Ne convertissez pas directement les niveaux en XP, les points de vie en Dommage, les valeurs d'armure en DV, ou les emplacements de sorts en Fatigue. Ces valeurs appartiennent à des procédures différentes. Choisissez la capacité visée, puis appliquez la procédure Fate's Edge qui l'exprime.</p>
+<p>La même chose s'applique aux calendriers de ressources. Une capacité source qui se recharge après un repos n'acquiert pas ce calendrier de recharge dans Fate's Edge. Si le talent choisi est une fois par scène ou une fois par séance, c'est la règle que vous utilisez. Une ressource source portant un nom différent ne justifie pas l'ajout d'une autre jauge.</p>
+<p>Utilisez les compétences existantes. La méditation d'un moine peut utiliser Âme + Endurance selon sa procédure énoncée ; elle n'a pas besoin d'une compétence de Méditation. La Psionique est une compétence additionnelle explicite dans sa propre extension, pas un modèle pour inventer une compétence pour chaque classe.</p>
+<p>Les changements de Position, d'Effet, de dés, de DV, de Fatigue, de Dommage, et de Points d'Histoire ne sont pas des bonus interchangeables. Utilisez le bénéfice et le coût spécifiques de l'option que vous avez sélectionnée. Les Talents qui annulent les Points d'Histoire appartiennent aux paliers supérieurs ; une capacité source ne peut pas contourner ce verrou ou créer une annulation par analogie.</p>
+<h2 id="worked-outlines">Quatre esquisses de build travaillées</h2>
+<p>Ces exemples montrent comment faire des choix. Ce ne sont pas des feuilles de personnage complètes ni des packages gratuits : finalisez les valeurs, coûts, talents, et équipement en utilisant les règles de création choisies pour la campagne.</p>
+<h3>Le protecteur juré</h3>
+<p><strong>Concept :</strong> un gardien discipliné qui tient un passage et protège un compagnon. Commencez avec Corps et des compétences martiales pertinentes comme Mêlée et Endurance. Lisez <a href="../expansions/Fates_-_Edge_-_-Way-_-of-_-Warrior.html#martial-archetypes">les archétypes martiaux de Voie du Guerrier</a> pour des options défensives candidates. Sélectionnez une option pour son effet protecteur réel, puis vérifiez son coût et ses prérequis.</p>
+<p><strong>Distinction de sous-classe :</strong> faites du vœu et des personnes qu'il lie une partie des relations du personnage. Si une protection surnaturelle est essentielle, choisissez également une voie magique publiée appropriée ; une description sacrée seule n'accorde aucun sort ni immunité. Placez sur la liste d'avancement les capacités que le personnage de départ ne peut pas encore se permettre.</p>
+<h3>L'infiltrateur insaisissable</h3>
+<p><strong>Concept :</strong> quelqu'un qui entre inaperçu, apprend un secret, et ressort. Esprit et Discrétion sont un point de départ pour la méthode ; choisissez d'autres compétences pour refléter comment le personnage gère les gens et les obstacles. Établissez ce que le personnage veut avant de traiter chaque infiltration comme une attaque.</p>
+<p><strong>Distinction de sous-classe :</strong> un embusqueur et un infiltrateur social peuvent partager un entraînement à la discrétion mais investir différemment dans leurs choix suivants. Utilisez la procédure de combat ou un talent publié exact pour une attaque depuis la dissimulation. N'importez pas un multiplicateur de dégâts du jeu source simplement parce que la classe source en reçoit un.</p>
+<h3>Le lanceur lié par un pacte</h3>
+<p><strong>Concept :</strong> un pouvoir médié par une relation qui peut exiger quelque chose en retour. Choisissez la voie Fate's Edge dont l'accès, les effets, et les obligations correspondent à cette relation. L'étiquette « pacte » d'un jeu source ne détermine pas à elle seule quelle voie Fate's Edge utiliser.</p>
+<p><strong>Distinction de sous-classe :</strong> exprimez l'influence du patron à travers la voie sélectionnée, ses œuvres autorisées, et les relations de cadre du personnage. Si le concept inclut un compagnon, lisez séparément les règles pertinentes de familier ou de suivant. Ne regroupez pas un compagnon gratuit dans une capacité magique.</p>
+<h3>L'ascète discipliné</h3>
+<p><strong>Concept :</strong> contrôle du souffle, de l'équilibre, et du mouvement. Utilisez les attributs et compétences de base, puis lisez <a href="../expansions/Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Monks.html#talents">les Talents de Moine</a> pour l'effet signature que vous voulez. La méditation utilise sa procédure publiée et la compétence Endurance existante.</p>
+<p><strong>Distinction de sous-classe :</strong> choisissez une <a href="../expansions/Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Monks.html#traditions">Tradition monastique</a> pour ses options et engagements énoncés. Si des effets psychiques définissent le concept, utilisez l'<a href="../expansions/Fates_-_Edge_-_-Psionics.html">extension Psionique</a> avec son accès et ses règles de Tension mentale. N'introduisez pas une réserve séparée simplement pour imiter le nom de ressource d'une classe source.</p>
+<h2 id="edgewalker-build">Marcheur de Lisière — le Visage sans charisme</h2>
+<p><strong>Concept :</strong> un vaurien Aeler, banni de la vie respectable de la halle mais contribuant toujours en rapportant des opportunités : contrats de grain, accès, renseignement, droits de récupération, ou une alliance utile. La halle peut accepter le résultat tout en refusant au vaurien une place à sa table. C'est aussi une destination Fate's Edge pour un cerveau, un fixeur, ou un vaurien centré sur l'intrigue venu d'un autre jeu.</p>
+<p><strong>Signature :</strong> le fonctionnaire ne vous aime pas, comprend exactement ce que coûtera un refus, et signe. Votre influence repose sur la préparation et un levier crédible. Vous pouvez être abrasif et socialement mal accueilli tout en commandant l'attention ; sans charisme ne signifie pas incapable d'agir dans une scène sociale.</p>
+<h3 id="edgewalker-starting-package">Package de départ</h3>
+<p>Cet exemple utilise <a href="../srd/characters.html#step-2-attributes">le tableau d'attributs de départ du DRB</a> et ses six points de compétence. Utilisez la procédure de création choisie par votre campagne si elle diffère ; ce package ne fournit aucun XP, équipement, ou contact supplémentaire.</p>
+<ul>
+<li><strong>Attributs :</strong> Corps 1, Esprit 3, Âme 2, Prestance 2. L'Esprit soutient la préparation et le jugement rapide ; la Prestance représente la capacité de faire pression sans nécessiter chaleur ou charme. Corps 1 laisse une vraie vulnérabilité quand une négociation devient physique.</li>
+<li><strong>Compétences :</strong> Persuasion 2, Perspicacité 2, Tromperie 1, Savoir 1. Six points, aucun au-dessus de 2. Persuasion gère la négociation ouverte et l'intimidation ; Perspicacité lit les gens et les preuves ; Tromperie couvre les approches secrètes et le bluff ; Savoir fournit le contexte appris sur les coutumes et institutions. Ce vaurien commence comme négociateur, pas comme cambrioleur accompli.</li>
+<li><strong>Premier talent optionnel :</strong> <a href="../srd/talents.html#scout-talents">Paumes de Soie (2 XP)</a>, acheté sur le budget de talents disponible de la campagne. Un pot-de-vin ou cadeau à un fonctionnaire mineur accorde le Fil temporaire <em>Silence Acheté</em> ; l'activer réduit le DV de 1 sur une action de Pétition ou de Courtage impliquant ce fonctionnaire et le consomme. Cela ne couvre pas toutes les négociations ni ne confère d'autorité sur des fonctionnaires supérieurs.</li>
+<li><strong>Trousse pratique :</strong> matériel d'écriture, copies d'accords pertinents, vêtements de voyage, et un moyen ordinaire d'autodéfense, acquis par la procédure d'équipement normale. Un accord copié n'est une preuve utile que s'il est authentique et pertinent ; porter du papier ne crée pas de revendication en soi.</li>
+<li><strong>Liens de départ à établir avec le MJ :</strong> un contact de la halle qui accepte vos opportunités, un intermédiaire de surface qui connaît votre travail, et quelqu'un qui se souvient du coût de votre dernier succès. Ce sont des amorces de relation. Payez tout suivant mécanique, atout, ou autre bénéfice selon ses propres règles.</li>
+</ul>
+<h3 id="edgewalker-at-the-table">Comment le build fonctionne à la table</h3>
+<ol>
+<li><strong>Enquêtez sur la dépendance.</strong> Apprenez qui peut accorder la décision, ce qui le contraint, et quelle preuve soutient votre conclusion. Utilisez Perspicacité ou Savoir quand l'approche les appelle ; un secret deviné n'est pas un levier établi.</li>
+<li><strong>Acquérez une alternative crédible.</strong> Négociez avec le créancier, organisez un autre itinéraire, ou rassemblez les gens qui partagent votre intérêt. Résolvez ces actions normalement et acceptez leurs coûts. Vous ne pouvez pas annoncer que vous possédez déjà les dettes du fonctionnaire simplement parce que vous êtes un Marcheur de Lisière.</li>
+<li><strong>Formulez une demande précise.</strong> « Libérez notre cargaison inspectée au tarif affiché, et je contresigne l'extension. » Utilisez Persuasion pour la négociation ouverte. Sélectionnez l'attribut qui correspond à l'approche réelle selon les règles de base ; l'Esprit ne remplace pas systématiquement la Prestance simplement parce que c'est votre valeur la plus élevée.</li>
+<li><strong>Résolvez et honorez le résultat.</strong> Établissez la Position et le DV, lancez les dés en cas d'incertitude, comptez les réussites et les Points d'Histoire, puis résolvez le résultat et les conséquences. N'appliquez que les bénéfices que la fiction établie ou une option achetée fournit. En cas de réussite, prenez la vraie concession. Accomplissez ce que vous avez promis en échange.</li>
+</ol>
+<p><strong>Une scène à tester :</strong> un maître de port retient le pilote de votre compagnie. Découvrez quels capitaines ont besoin de ce pilote, obtenez leur accord d'attendre, et présentez les coûts de retard qui en résultent au maître de port. Chaque maillon doit être réel. Si les capitaines refusent, construisez une autre approche ; s'ils acceptent et que votre négociation réussit, le pilote sort même si le maître de port vous méprise toujours. Voir <a href="../complete-worldbook/Worldbook-_-12-_-World-_-Travel-_-&amp;-_-Gateways.html#sec:edgewalker-leverage">les notes du Livre du Monde sur le Marcheur de Lisière</a> pour l'exemple complet et les priorités des autres voyageurs.</p>
+<p><strong>Avancement :</strong> améliorez Persuasion pour la négociation directe, Perspicacité pour trouver le point de pression, et Savoir ou Tromperie selon votre méthode. Ajoutez Discrétion pour une entrée secrète, Endurance pour un voyage difficile, ou une compétence martiale pour une fuite qui tourne mal. Achetez chaque augmentation à son coût publié. Les contacts et atouts peuvent élargir votre portée quand ils sont acquis selon leurs règles ; le patron respecté qui ouvre des portes peut être quelqu'un d'autre dans le groupe.</p>
+<p><strong>Tension du personnage :</strong> décidez quelle opportunité mériterait votre retour, si vous voulez encore ce retour, et quel coût vous refuserez d'exporter vers les basses terres. Votre cynisme peut être cohérent sans être universel : les gens tiennent parfois un serment à un coût ruineux. Apprenez ce qu'ils valorisent plutôt que de supposer que chaque refus cache un prix plus élevé.</p>
+<p><strong>Limite des règles :</strong> ce build n'ajoute aucune classe, compétence, Fil automatique, minuteur d'Opportunité, ou succès social garanti. Toute procédure d'extension Aeler publiée séparément nécessite que cette extension soit utilisée et suit ses termes énoncés. Le build fonctionne à travers la boucle de base sans elle.</p>
+<h2 id="conversion-worksheet">Fiche de conversion</h2>
+<table><thead><tr><th>Élément</th><th>Votre réponse</th></tr></thead><tbody>
+<tr><td>Classe ou sous-classe source ; palier de départ et procédure de création de la campagne</td><td>________________________________</td></tr>
+<tr><td>Rôle, méthode, et un ou deux moments signature</td><td>________________________________</td></tr>
+<tr><td>Attributs et compétences de base qui soutiennent les actions ordinaires</td><td>________________________________</td></tr>
+<tr><td>Talent ou voie sélectionné ; source Fate's Edge exacte</td><td>________________________________</td></tr>
+<tr><td>Prérequis, coût, déclencheur, timing, fréquence, et conséquences</td><td>________________________________</td></tr>
+<tr><td>Équipement, relations, suivants, ou atouts et leurs règles d'acquisition</td><td>________________________________</td></tr>
+<tr><td>Choix d'avancement ultérieurs et capacités non résolues</td><td>________________________________</td></tr>
+<tr><td>Ajouts ou changements explicites que le groupe a convenu d'utiliser</td><td>________________________________</td></tr>
+</tbody></table>
+</section><footer class="doc-footer">
+    Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Utilisé avec permission, Tous droits réservés.
+</footer>
+</body>
+</html>
