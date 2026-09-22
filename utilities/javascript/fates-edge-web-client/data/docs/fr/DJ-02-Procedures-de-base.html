@@ -1,0 +1,616 @@
+<!-- ============ GM-_-Guide-_-02-_-Core-_-Procedures.html ============ -->
+<!DOCTYPE html>
+
+<html dir="ltr" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge Guide du MJ — Chapitre 2 : Procédures de base (Français)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+    h5 { font-size: 0.9rem; color: var(--text2); margin-top: 0.5rem; }
+    p { margin: 0.5rem 0; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    dl { margin: 0.4rem 0; }
+    dt { font-weight: 600; color: var(--gold); margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1rem; color: var(--text2); }
+    .subtitle { color: var(--text3); font-size: 0.95rem; margin-top: -0.2rem; margin-bottom: 1rem; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.9rem;
+        border: 1px solid var(--border);
+        margin: 0.7rem 0;
+    }
+    .panel-title { color: var(--gold); font-weight: 700; margin-bottom: 0.3rem; }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.6rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    footer { text-align: center; color: var(--text3); font-size: 0.8rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .flow-list { list-style: none; margin: 0.6rem 0; padding: 0; }
+    .flow-list li { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.7rem; margin: 0.3rem 0; }
+    .flow-list .flow-arrow { text-align: center; color: var(--text3); margin: 0.1rem 0; }
+</style>
+</head>
+<body><aside class="translation-notice" lang="fr">Version française. Traduction assistée ; révision éditoriale complète en attente. <a href="../gm-guide/GM-_-Guide-_-02-_-Core-_-Procedures.html" hreflang="en">Consulter l'original en anglais</a></aside>
+<h1 id="reader-section-1">Chapitre 2 : Diriger la partie — Procédures de base</h1>
+<p class="subtitle">Fate's Edge Guide du MJ — Chapitre 2</p>
+<div class="panel panel-blue">
+<div class="panel-title">Diriger Fate's Edge — Procédures de base en bref</div>
+<p><strong>Votre rôle :</strong> Cadrer la pression, suivre les conséquences, laisser la fiction avancer.</p>
+<p><strong>Réglages par défaut</strong> — DV = 3 · Position = Maîtrisé · Un minuteur court</p>
+<p><strong>La boucle de base (pour chaque action significative)</strong></p>
+<ol>
+<li>Le joueur déclare son intention et son approche (Attribut + Compétence)</li>
+<li>Vous indiquez la Position et fixez les minuteurs pertinents</li>
+<li>Le joueur lance ses d10 ; comptez les <strong>Réussites</strong> (6–9 = 1, un 10 = 2) et les <strong>Points d'Histoire (les 1)</strong></li>
+<li>Comparez au DV → utilisez la <strong>Matrice des résultats</strong></li>
+<li>Appliquez les conséquences et mettez à jour la fiction</li>
+</ol>
+<p><strong>Matrice des résultats (ce que vous faites)</strong></p>
+<ul>
+<li><strong>Réussite Nette</strong> (S ≥ DV, PH = 0) → intention atteinte, aucune complication</li>
+<li><strong>Réussite avec PH</strong> (S ≥ DV, PH &gt; 0) → intention atteinte, dépensez un PH pour un rebondissement</li>
+<li><strong>Partielle</strong> (0 &lt; S &lt; DV) → progrès accompli, le joueur gagne 1 Faveur</li>
+<li><strong>Échec</strong> (S = 0) → aucun progrès, le joueur gagne 2 Faveurs, dépensez un PH pour faire monter la tension</li>
+</ul>
+<p><strong>Points d'Histoire (PH) — dépensez-les pour créer du drame</strong></p>
+<ul>
+<li><strong>1 PH :</strong> Mineur — bruit, faire avancer un minuteur, petit revers</li>
+<li><strong>2 PH :</strong> Modéré — alarme déclenchée, perte d'avantage, aggravation de la Position</li>
+<li><strong>3+ PH :</strong> Majeur — renforts, changement de scène, un atout se brise</li>
+</ul>
+<p><strong>Règle d'or</strong><br/>
+<em>Dans le doute, prenez la décision qui fait avancer l'histoire.</em><br/>
+    Fixez DV=3, Position=Maîtrisé, demandez le jet, et résolvez avec la Matrice des résultats.</p>
+</div>
+<div class="panel">
+<p><strong>Position</strong> (Dominant/Maîtrisé/Désespéré) = À quel point cette action est-elle risquée ? — détermine la sévérité de l'échec et les relances.<br/>
+<strong>Effet</strong> (Limité/Standard/Grand) = Qu'accomplissez-vous en cas de réussite ? — détermine la portée, l'échelle ou la qualité.</p>
+<p class="text-sm"><em>Exemple :</em> Désamorcer un piège — un Effet Limité laisse une personne traverser, Standard en laisse passer deux, Grand les quatre.</p>
+</div>
+<div class="panel panel-green">
+<div class="panel-title">MJ débutant ? Commencez ici</div>
+<p>Vous n'avez pas besoin de mémoriser ce chapitre avant votre première séance. Voici ce dont vous avez réellement besoin :</p>
+<ol>
+<li><strong>La boucle de base</strong> (ci-dessus) — connaissez les cinq étapes.</li>
+<li><strong>DV 3, Position Maîtrisé</strong> — vos réglages par défaut.</li>
+<li><strong>La Matrice des résultats</strong> — Nette/PH/Partielle/Échec.</li>
+<li><strong>Dépensez les PH tôt</strong> — une complication forte vaut mieux que trois faibles.</li>
+</ol>
+<p>Tout le reste de ce chapitre est du matériel de référence. <strong>Vous pouvez diriger une séance complète avec seulement ces quatre éléments.</strong> Les exemples à la fin du chapitre vous montreront comment.</p>
+<p><em>Quand vous oubliez une règle — et cela arrivera — reposez-vous sur la Règle d'or. L'histoire passe avant tout.</em></p>
+</div>
+<div class="panel panel-red">
+<div class="panel-title">Vendre l'action — Quand les joueurs vous offrent de l'or</div>
+<blockquote>« Ne me dites pas juste que vous frappez avec votre épée. Montrez-moi la poussière dans vos yeux, le tremblement de votre bras, la prière désespérée que vous murmurez au Voyageur. »<br/>
+    « Et ne vous contentez pas de peindre un joli tableau — montrez-moi ce que votre personnage risque, craint, ou aime en cet instant. »</blockquote>
+<p>Quand un joueur <strong>vend l'action</strong> — non pas en empilant les adjectifs, mais en révélant ce à quoi son personnage tient, ce qu'il risque de perdre, ou pourquoi ce moment compte — vous avez la permission de lui donner un avantage mécanique. C'est une récompense pour l'<strong>investissement dans le jeu de rôle</strong>, pas pour le vocabulaire.</p>
+<p><strong>Comment arbitrer</strong></p>
+<ul>
+<li><strong>Description basique :</strong> « J'attaque le gobelin. » — Aucun bonus.</li>
+<li><strong>Description tactique :</strong> Le joueur utilise l'environnement, le positionnement, ou une tactique astucieuse. <em>Exemple :</em> « Je feinte haut, puis j'enfonce mon épaule dans le bouclier du gobelin, le repoussant pour ouvrir son flanc. » → <strong>Améliorez la Position d'un cran</strong> (par ex. Maîtrisé → Dominant) pour ce jet.</li>
+<li><strong>Description centrée sur le personnage :</strong> Le joueur énonce un enjeu, invoque un Lien, révèle une peur, ou rend visible un choix difficile. <em>Une phrase sincère compte plus qu'un paragraphe d'adjectifs.</em> <em>Exemple :</em> « Je pense à ma mère, morte parce que je n'ai pas eu le courage. Je ne laisserai pas cela se reproduire. Je plante mes pieds et je défie le gobelin de passer par-dessus moi. » → <strong>Améliorez la Position d'un cran <em>et</em> mettez 1 Point d'Histoire en réserve</strong> (ou améliorez l'Effet d'un cran, à votre choix).</li>
+</ul>
+<p><strong>Ce qui compte (et ce qui ne compte pas)</strong></p>
+<p><strong>Compte :</strong></p>
+<ul>
+<li>Énoncer un enjeu clair (« Si j'échoue, ma sœur ne mange pas. »)</li>
+<li>Invoquer un Lien en pleine action (« Je dois la vie à Michael. Je ne le laisserai pas affronter ça seul. »)</li>
+<li>Révéler une peur ou un espoir lié au jet (« J'ai une terreur du feu, mais j'attrape la poutre — les enfants sont derrière moi. »)</li>
+<li>Rendre visible un choix difficile (« Je pourrais fuir, mais je ne le fais pas. Fuir est ce qui m'a valu l'exil. »)</li>
+</ul>
+<p><strong>Ne compte pas :</strong></p>
+<ul>
+<li>Empiler les adjectifs (« étincelant », « puissant », « ancien ») sans enjeu.</li>
+<li>Les listes sensorielles passives (« le vent froid, les pierres mouillées, la lumière faible »).</li>
+<li>Répéter la même description fleurie à chaque jet.</li>
+</ul>
+<p><strong>Directives pour un jeu équitable</strong></p>
+<ul>
+<li><strong>Aucune pénalité pour un discours simple.</strong> Ne punissez jamais un joueur fatigué, timide, ou qui préfère simplement une résolution rapide. Le bonus est un cadeau, pas une taxe.</li>
+<li><strong>Soyez cohérent.</strong> Récompensez l'investissement sincère, pas le vocabulaire. Un joueur discret qui livre une phrase honnête mérite le bonus autant qu'un conteur éloquent.</li>
+<li><strong>Laissez la fiction guider le bonus.</strong> Une action désespérée et téméraire décrite avec de vrais enjeux pourrait améliorer l'Effet mais aggraver la Position — la mécanique doit refléter la fiction.</li>
+<li><strong>Invitez les joueurs discrets.</strong> Posez des questions ouvertes : « Qu'est-ce qui est en jeu pour votre personnage en ce moment ? » ou « Que craignez-vous qu'il se passe en cas d'échec ? » Des incitations douces aident les joueurs timides à trouver leur moment.</li>
+<li><strong>« Vente » de groupe.</strong> Si toute la table contribue à décrire une action de groupe (une embuscade coordonnée, un rituel commun), accordez le bonus au lanceur principal ou donnez à chaque participant un petit avantage (par ex. +1 dé, une fois).</li>
+</ul>
+<p><strong>Exemple</strong></p>
+<blockquote>
+<strong>Basique :</strong> « Je me faufile devant la sentinelle. » (Aucun bonus, jet normal.)<br/><br/>
+<strong>Tactique :</strong> « J'attends que le vent fasse claquer les volets, puis je traverse les pavés mouillés — talon-pointe, talon-pointe — en gardant la pile de tonneaux entre moi et le regard de la sentinelle. » Le MJ acquiesce : « Parfait. Comme vous utilisez le vent et les tonneaux, jetez en <strong>Position Dominante</strong>. »<br/><br/>
+<strong>Centré sur le personnage :</strong> « Mon petit frère est dans ce camp. Je me suis caché de chaque combat depuis notre départ — mais pas cette fois. Je m'avance, plus discret du tout, parce qu'il doit savoir que quelqu'un est venu pour lui. » Le MJ : « Voilà l'essentiel. Jetez en <strong>Position Dominante</strong>, et je mets un Point d'Histoire en réserve pour que sa réaction compte. »
+    </blockquote>
+<p class="text-sm"><em>Les dés décident toujours du succès ou de l'échec. Mais une action bien racontée enrichit l'histoire — et donne au joueur un avantage quand les dés tombent.</em></p>
+</div>
+<h2 id="mindset">Comment penser dans Fate's Edge</h2>
+<p>Diriger <strong>Fate's Edge</strong> tient moins à arbitrer la difficulté qu'à gérer l'élan. Votre rôle principal n'est pas de bloquer le succès, de protéger des issues, ou de simuler le réalisme — c'est de <strong>cadrer la pression</strong>, de <strong>suivre les conséquences</strong>, et de <strong>laisser la fiction avancer</strong>.</p>
+<p>Si vous vous surprenez à demander « À quel point cela devrait-il être difficile ? », vous avez déjà un temps de retard. Demandez plutôt :</p>
+<ul>
+<li>Qu'est-ce qui est en jeu en ce moment ?</li>
+<li>Que se passe-t-il si cela tourne mal ?</li>
+<li>Quelle pression est déjà en jeu ?</li>
+</ul>
+<p>Les règles existent pour répondre à ces questions — pas pour les remplacer.</p>
+<div class="panel panel-blue">
+<div class="panel-title">État d'esprit du MJ : Le moteur de pression</div>
+<p>Pensez à chaque scène comme à un <strong>moteur de pression</strong> :</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr><td><strong>Les dés</strong></td><td>créent des résultats</td></tr>
+<tr><td><strong>Les minuteurs</strong></td><td>suivent les répercussions</td></tr>
+<tr><td><strong>Les Points d'Histoire</strong></td><td>alimentent l'escalade</td></tr>
+<tr><td><strong>Les Faveurs</strong></td><td>récompensent le risque</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Votre rôle est de garder ce moteur en marche — pas de décider où il s'arrête. Laissez les procédures faire le travail. Votre attention appartient à la fiction.</p>
+</div>
+<h2 id="core-loop">La boucle de base</h2>
+<p>La procédure complète est <a href="#resolution-cycle">Le cycle de résolution de base</a>, ci-dessous, et le panneau en haut de ce chapitre est la version à garder sous les yeux. Ce qui mérite d'être dit ici, c'est à quoi sert cette boucle :</p>
+<p><strong>Ne cherchez pas le « bon » jet.</strong> Si l'action compte, la procédure s'applique — les huit mêmes étapes, qu'il s'agisse d'un duel à l'épée, d'une charte falsifiée, ou d'excuses. Si l'action ne compte pas, ne faites pas lancer les dés du tout ; dites oui et passez à la suite.</p>
+<h3>Vos réglages par défaut</h3>
+<p>Dans le doute, faites confiance à la fiction. Le système suivra. Reposez-vous sur ces valeurs par défaut :</p>
+<ul>
+<li><strong>DV</strong> : 3</li>
+<li><strong>Position</strong> : Maîtrisé</li>
+<li><strong>Conséquence</strong> : Fatigue, pression temporelle, ou exposition</li>
+<li><strong>Minuteurs</strong> : Un minuteur court lié à la scène</li>
+</ul>
+<p>N'escaladez que lorsque la fiction l'exige.</p>
+<h3>Ce que vous <em>ne</em> faites <em>pas</em></h3>
+<p>Vous <em>ne</em> :</p>
+<ul>
+<li>demandez pas de jets pour verrouiller la progression</li>
+<li>gonflez pas la difficulté pour « mettre au défi » les joueurs</li>
+<li>protégez pas les plans des PNJ contre les perturbations</li>
+<li>cachez pas d'informations derrière des vérifications inutiles</li>
+</ul>
+<p>Si les joueurs agissent avec détermination, le monde doit répondre avec détermination.</p>
+<h3>Ce que vous faites</h3>
+<p>Vous :</p>
+<ul>
+<li>énoncez la Position clairement et avec assurance</li>
+<li>laissez les résultats partiels faire avancer l'histoire</li>
+<li>dépensez des Points d'Histoire pour rendre l'échec intéressant</li>
+<li>permettez à la réussite de créer de nouveaux problèmes</li>
+</ul>
+<p>Le jeu fonctionne mieux quand rien ne s'arrête.</p>
+<h2 id="narrative-time">Temps narratif : Rounds, Tours, Scènes et Arcs</h2>
+<p>Fate's Edge mesure le temps par poids narratif, pas en secondes réelles. Utilisez ces définitions communes pour garder la table alignée.</p>
+<dl>
+<dt>Round</dt>
+<dd>Tours de tous les participants à un conflit (incluant Actions, Mouvements et Réactions). Un round se termine quand chaque personne présente a eu l'occasion d'agir.</dd>
+<dt>Tour</dt>
+<dd>Le moment d'un joueur individuel : une Action et un Mouvement (voir le Cycle de résolution de base dans le DRB). Les tours sont l'unité de base de l'agentivité du joueur.</dd>
+<dt>Temps significatif</dt>
+<dd>Trois rounds ou plus de conflit structuré, ou toute période hors combat où un effort prolongé est requis (par ex. un rituel, une poursuite, ou plusieurs heures de voyage). Utilisez le Temps significatif pour déclencher des minuteurs à long terme et des actions de temps mort.</dd>
+<dt>Scène</dt>
+<dd>Une unité de jeu narratif couvrant un conflit, un lieu, ou une situation précise. Équivalent d'une « rencontre » à la D&amp;D (mais évitez cette comparaison ; une scène peut être sociale, exploratoire, ou un montage). Une scène se termine quand sa question centrale est résolue.</dd>
+<dt>Séance</dt>
+<dd>Une session de jeu (typiquement 3 à 6 heures). Une séance peut contenir une scène majeure ou plusieurs scènes plus petites, et se termine par l'attribution de Points d'Expérience et la mise à jour des minuteurs.</dd>
+<dt>Arc</dt>
+<dd>Un arc narratif complet (3 à 6 séances) qui fait avancer les objectifs des personnages, résout un front majeur, et fait progresser un minuteur de campagne. À la fin d'un arc, le MJ peut appeler un Tirage de la Couronne ou déclencher un final.</dd>
+</dl>
+<h4>Le Temps significatif en jeu</h4>
+<p>Quand la fiction appelle un Temps significatif (par ex. accomplir un rituel, escalader une falaise, ou se reposer une heure), le MJ peut :</p>
+<ul>
+<li>Faire avancer un minuteur pertinent d'1 segment.</li>
+<li>Permettre au groupe de réduire sa Fatigue de 1 à 2 (si les conditions le permettent).</li>
+<li>Demander un seul jet pour représenter tout l'effort prolongé (le DV est fixé par l'ampleur de la tâche).</li>
+</ul>
+<h2 id="resolution-cycle">Le cycle de résolution de base</h2>
+<p>Quand un joueur lance les dés, il engage le monde à travers le risque, la conséquence, et la découverte.</p>
+<ol>
+<li><strong>Déclarer l'Action et l'Approche :</strong> Le joueur énonce son intention, Attribut + Compétence.</li>
+<li><strong>Fixer la Valeur de Difficulté (DV) :</strong> Selon les enjeux narratifs.</li>
+<li><strong>Établir la Position :</strong> Dominant, Maîtrisé, ou Désespéré.</li>
+<li><strong>Lancer le pool de d10.</strong></li>
+<li><strong>Compter les Réussites (6–9 = 1, un 10 = 2) et les Points d'Histoire (les 1).</strong></li>
+<li><strong>Comparer au DV</strong> avec la Matrice des résultats.</li>
+<li><strong>Appliquer le résultat :</strong> Réussite Nette, Réussite avec PH, Partielle, ou Échec.</li>
+<li><strong>Dépenser les PH</strong> pour des complications et des rebondissements.</li>
+</ol>
+<p><strong>Réussite Nette.</strong> L'action réussit comme prévu. Aucun Point d'Histoire généré sauf indication contraire. La fiction avance proprement.</p>
+<p><strong>Réussite avec PH.</strong> L'action réussit mais génère des <strong>Points d'Histoire</strong>. La réussite tient ; le coût est que le MJ dépense ces PH, idéalement appliqués à l'action déclenchante ou à ses conséquences immédiates.</p>
+<p><strong>Échec.</strong> L'action échoue et génère des <strong>Points d'Histoire</strong>. Le MJ utilise ces PH pour introduire des complications, faire avancer l'opposition, ou faire basculer la situation contre le personnage.</p>
+<p><strong>Réussite Partielle (arbitrage du MJ).</strong> Une Partielle indique un progrès mais pas une résolution complète. La manière dont cela se manifeste est déterminée par le MJ, selon le contexte, l'échelle, et les enjeux narratifs.</p>
+<p>Les résultats partiels peuvent :</p>
+<ul>
+<li>Améliorer la <strong>Position</strong> du personnage pour une tentative suivante</li>
+<li>Réduire le <strong>DV</strong> effectif du prochain jet</li>
+<li>Atteindre l'objectif à échelle réduite ou pour une durée limitée</li>
+<li>Réussir totalement mais générer un <strong>Point d'Histoire</strong> en tant que coût ou complication</li>
+<li>Révéler une information ou créer une nouvelle opportunité au lieu d'une résolution immédiate</li>
+</ul>
+<p><strong>Principe directeur.</strong> Les Partielles représentent un <em>progrès significatif</em>. Convertissez le progrès en avantage, en résolution, ou en complication, selon ce qui sert le mieux la fiction.</p>
+<div class="panel">
+<div class="panel-title">Effets de la Position</div>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Position</th><th>Effet mécanique</th></tr></thead>
+<tbody>
+<tr><td>Dominant</td><td>Peut relancer un échec (dé &lt; 6).</td></tr>
+<tr><td>Maîtrisé</td><td>État par défaut ; aucune relance.</td></tr>
+<tr><td>Désespéré</td><td>Doit relancer une réussite (un dé de 6 à 9), en gardant le second résultat. Un 10 n'est jamais relancé.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-title">Échelle de difficulté — Focus débutant</div>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>DV</th><th>Quand l'utiliser</th></tr></thead>
+<tbody>
+<tr><td>2</td><td>Routine : chemin clair, aucune pression, quasi garanti.</td></tr>
+<tr><td>3</td><td>Par défaut : défi léger, un peu de risque — le plus utilisé.</td></tr>
+<tr><td>4</td><td>Difficile : opposition sérieuse, mauvais angle, ou forte résistance.</td></tr>
+<tr><td>5+</td><td>Extrême : rencontre majeure ou pari dramatique.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<h2 id="position-dv">Position et Valeur de Difficulté</h2>
+<p>Position et DV sont vos deux principaux cadrans pour fixer les enjeux et la difficulté. Ils fonctionnent ensemble mais répondent à des questions différentes :</p>
+<ul>
+<li><strong>DV (Valeur de Difficulté)</strong> — À quel point la tâche est-elle <em>difficile</em> ? (2 = routine, 3 = sous pression, 4 = difficile, 5+ = extrême)</li>
+<li><strong>Position</strong> — À quel point la tentative est-elle <em>risquée</em> ? (Dominant = sûr, Maîtrisé = équilibré, Désespéré = dangereux)</li>
+</ul>
+<h3>DV 3 par défaut</h3>
+<p>Sauf si la fiction l'indique clairement autrement, commencez à <strong>DV 3</strong>. Cela donne un taux de réussite d'environ 50 à 60 % pour un pool moyen (4 à 6 dés) et laisse de la place pour les Partielles et les Échecs. <strong>N'inflatez pas le DV pour « mettre au défi » les joueurs</strong> — utilisez plutôt la Position, les minuteurs, et les dépenses de PH.</p>
+<h3>Quand aggraver la Position</h3>
+<p>Aggravez la Position quand la fiction place le personnage en désavantage :</p>
+<ul>
+<li>Exposé ou encerclé → Désespéré</li>
+<li>Pressé ou distrait → Maîtrisé ou Désespéré</li>
+<li>Surpris ou pris en embuscade → Désespéré</li>
+</ul>
+<p><em>N'aggravez jamais</em> la Position juste pour rendre un jet « plus difficile ». La Position concerne le <strong>danger narratif</strong>, pas l'arithmétique.</p>
+<h3>La Règle d'or</h3>
+<div class="panel panel-gold">
+<div class="panel-title">Règle d'or</div>
+<p><strong>Dans le doute, prenez la décision qui fait avancer l'histoire.</strong></p>
+<p>Si vous ne vous souvenez plus d'une règle, fixez DV = 3, Position = Maîtrisé, et demandez au joueur de lancer les dés. Résolvez le résultat avec la Matrice des résultats. Vous pourrez chercher la règle après la séance.</p>
+</div>
+<h3>Exemple : utiliser les PH pour faire escalader une scène</h3>
+<div class="panel">
+<div class="panel-title">Dépenser des PH pour le drame (Le pont)</div>
+<p>Le groupe négocie le passage d'un pont de montagne étroit. Un capitaine mercenaire rival exige un pot-de-vin.</p>
+<ul>
+<li><strong>Le joueur obtient une Partielle.</strong> Le MJ gagne 2 PH.</li>
+<li><strong>Le MJ dépense 1 PH :</strong> « Le capitaine s'appuie sur son épée — vous remarquez sa main qui se rapproche de la garde. <em>Les tensions montent</em>. » (Faites avancer un nouveau minuteur : <strong>Les esprits s'échauffent [4]</strong>.)</li>
+<li><strong>Le MJ dépense le second PH :</strong> « Une pierre descellée tombe du pont et éclabousse la rivière loin en contrebas. Les archers du capitaine encochent leurs flèches. <strong>La Position s'aggrave en Désespéré</strong>. »</li>
+</ul>
+<p>Le joueur a quand même réussi à négocier un péage réduit, mais le MJ a utilisé des PH pour introduire une pression croissante et un minuteur visible. La scène crépite maintenant de danger.</p>
+</div>
+<h3>Matrice des résultats</h3>
+<div class="panel">
+<div class="panel-title">Matrice des résultats</div>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Résultat du jet</th><th>Ce qui se passe</th></tr></thead>
+<tbody>
+<tr><td>Réussites ≥ DV, PH = 0</td><td><strong>Réussite Nette</strong> — intention atteinte, aucune complication.</td></tr>
+<tr><td>Réussites ≥ DV, PH &gt; 0</td><td><strong>Réussite avec PH</strong> — intention atteinte ; le MJ dépense les PH pour une complication.</td></tr>
+<tr><td>0 &lt; Réussites &lt; DV</td><td><strong>Partielle</strong> — progrès avec complication ; le joueur gagne 1 Faveur.</td></tr>
+<tr><td>Réussites = 0</td><td><strong>Échec</strong> — aucun progrès ; le MJ escalade avec des PH ; le joueur gagne 2 Faveurs.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<div class="panel panel-gold">
+<p>Rappelez aux joueurs qu'ils peuvent dépenser 1 <strong>Faveur</strong> avant un jet pour améliorer l'Effet d'un cran.</p>
+</div>
+<h3>Réactions, puis conversion d'armure et récupération de Fatigue</h3>
+<p><strong>Chaque PJ dispose d'1 Réaction par tour.</strong> Quand la pression d'un adversaire menace un PJ, annoncez le Dommage entrant et laissez le joueur décider s'il dépense sa Réaction :</p>
+<ul>
+<li><strong>Réaction dépensée :</strong> Le joueur lance un test de défense. Le DV est égal au Dommage entrant. Une Réussite évite entièrement le Dommage ; une Partielle le réduit à la protection moindre convenue avant le jet (divisez le Dommage par deux, arrondi au supérieur, sauf indication contraire de la fiction) ; un Échec subit le Dommage complet. Une Réaction dépensée est indisponible jusqu'au prochain tour du PJ, à une exception près : le joueur peut dépenser <strong>1 Faveur</strong> pour obtenir une Réaction supplémentaire ce même tour.</li>
+<li><strong>Aucune Réaction dépensée :</strong> Par défaut, c'est passif — passez directement à l'application du Dommage annoncé. Il n'y a rien à lancer.</li>
+</ul>
+<p>Les <strong>Talents défensifs</strong> qui se déclenchent face à une pression entrante (Contre-sort, Interception, et similaires) sont <em>passifs</em> — ils se déclenchent selon leur propre condition imprimée et ne puisent pas dans cette même réserve de Réaction. Garder les deux séparés évite le cas limite de la double dépense, où utiliser un Talent défensif coûterait l'unique Réaction de la table et laisserait le PJ incapable de faire également le jet de défense de base ce tour-là.</p>
+<p><strong>Votre rôle en tant que MJ, dans un cas comme dans l'autre, est simple :</strong> une fois le Dommage qui passe réellement fixé, annoncez cette valeur. <strong>Le joueur applique lui-même sa conversion d'armure</strong> en utilisant la Table de conversion d'armure sur sa feuille. Cela vous laisse les mains libres pour la narration et le rythme.</p>
+<ol>
+<li><strong>Vous dites :</strong> « Attaque entrante — Couteau, Dommage 1. Dépensez-vous votre Réaction ? »</li>
+<li><strong>Le joueur :</strong> Décide, lance les dés s'il la dépense, et vous dit le Dommage qui passe.</li>
+<li><strong>Le joueur :</strong> Consulte son type d'armure sur la table, applique la conversion, et décrit le résultat.</li>
+<li><strong>Vous :</strong> Narrez la fiction selon ce qu'il coche.</li>
+</ol>
+<p>La table elle-même est destinée aux joueurs (voir Annexe A.5). Votre seule responsabilité est d'annoncer la valeur de Dommage et de faire confiance au joueur pour gérer le calcul.</p>
+<div class="panel panel-gold">
+<div class="panel-title">Astuce MJ : L'effet montagnes russes</div>
+<p><strong>Cela crée des revirements narratifs dramatiques :</strong> quand le Dommage est appliqué et que la conversion d'armure le réduit, le choc de la blessure peut effacer la Fatigue existante. Cela représente un « second souffle » — un personnage proche de l'effondrement qui reçoit une blessure et retrouve soudain de la clarté grâce à l'adrénaline.</p>
+<p><em>Laissez le joueur décrire à quoi cela ressemble.</em> Un combattant qui haletait (Fatigue 3) reçoit un coup superficiel (Dommage 1, converti en Fatigue 1, déclenchant un débordement) et se redresse soudain, saignant mais concentré. La mécanique et la fiction se renforcent mutuellement.</p>
+<p><strong>Votre rôle :</strong> Demandez au joueur : « À quoi cela ressemble-t-il ? » Laissez-le s'approprier le moment.</p>
+</div>
+<h2 id="learning-examples">Apprendre par l'exemple</h2>
+<p>Cette section parcourt la même situation à travers plusieurs passages, en ajoutant une règle à la fois. Utilisez-la comme modèle mental quand vous improvisez.</p>
+<h4>Exemple 1 — Sans PH, sans Faveurs</h4>
+<div class="panel">
+<p>Lyra tente de se faufiler devant un gardien dans un couloir étroit. (Corps + Discrétion = 5d10).<br/>
+    MJ : risque normal, DV 3, Position Maîtrisé.<br/>
+    Jet : 3, 5, 6, 7, 9 → 3 réussites (6, 7, 9).<br/>
+    DV 3 avec 3 réussites = <strong>Réussite</strong>.<br/>
+    MJ : « Vous passez devant le gardien sans bruit. Vous êtes en position derrière lui si vous voulez agir. »</p>
+</div>
+<h4>Exemple 2 — Ajout des Points d'Histoire</h4>
+<div class="panel">
+<p>Même situation. Lyra lance 5d10 : 1, 4, 6, 6, 8.<br/>
+    Réussites : 3 (6, 6, 8). Un 1 → 1 PH pour le MJ.<br/>
+    DV 3 avec 3 réussites = <strong>Réussite</strong> avec 1 PH.<br/>
+    Dépense du MJ (1 PH = Mineur) : « Vous passez devant le gardien, mais votre cape s'accroche et se déchire. Le bruit résonne — la salle suivante a une pénalité de -1 sur la Position pour les tests de discrétion. »</p>
+</div>
+<h4>Exemple 3 — Ajout des Faveurs</h4>
+<div class="panel">
+<p>Plus tard, Lyra escalade un mur de pierres instables (Athlétisme + Corps = 4d10). DV 3.<br/>
+    Jet : 2, 3, 4, 5 → 0 réussite = <strong>Échec</strong>.<br/>
+    Le MJ accorde <strong>2 Faveurs</strong>. « Vous glissez et retombez durement, subissant 1 Dommage. Notez 2 Faveurs — vous pourrez les utiliser plus tard pour renverser la situation. »<br/>
+    À la tentative suivante, Lyra dépense 1 Faveur pour relancer un dé, transformant l'échec en réussite.</p>
+</div>
+<h4>Exemple 4 — PH + Faveurs + Position</h4>
+<div class="panel">
+<p>Le groupe fuit tandis que la tour s'effondre. Un escalier croulant bloque la sortie.<br/>
+    MJ : « Désespéré. DV 4 pour que tout le monde traverse en sécurité. »<br/>
+    Lyra mène, lançant 6d10 (Corps + Athlétisme + aide) : 1, 2, 6, 7, 7, 9.<br/>
+    4 réussites contre DV 4 = Réussite. Un 1 lancé = 1 PH pour le MJ. Position Désespéré.<br/>
+    MJ : « Vous passez tous de l'autre côté, mais la dernière marche s'effondre derrière vous. Je dépense 1 PH : votre chemin de sortie a disparu. Il vous faudra trouver une nouvelle issue. »<br/>
+<strong>Leçon :</strong> Même en cas de réussite, les PH vous permettent d'infléchir la fiction vers le drame sans effacer la victoire du joueur.</p>
+</div>
+<h3>Organigramme de la boucle de base</h3>
+<p class="text-sm text-muted">Ce qui suit résume l'organigramme de la boucle de base du chapitre sous forme de procédure linéaire.</p>
+<ul class="flow-list">
+<li><strong>Cadrer la scène</strong> (qu'est-ce qui est en jeu ?)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Le joueur déclare son intention</strong> (Attribut + Compétence)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Le MJ fixe la Position</strong> (Dominant/Maîtrisé/Désespéré)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Le MJ fixe le DV</strong> (3 par défaut)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Le joueur lance son pool de dés</strong> — comptez les réussites (6–9 = 1, un 10 = 2) et les 1 (PH)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Comparer les réussites au DV :</strong>
+<ul>
+<li>S ≥ DV, PH = 0 → <strong>Réussite Nette</strong> (aucun PH)</li>
+<li>S ≥ DV, PH &gt; 0 → <strong>Réussite avec PH</strong></li>
+<li>0 &lt; S &lt; DV → <strong>Partielle</strong> (gagne 1 Faveur)</li>
+<li>S = 0 → <strong>Échec</strong> (gagne 2 Faveurs)</li>
+</ul>
+</li>
+<li class="flow-arrow">↓</li>
+<li>La Réussite Nette passe directement au joueur suivant. Réussite avec PH, Partielle, et Échec passent par : <strong>le MJ dépense des PH</strong> (complications, minuteurs)</li>
+<li class="flow-arrow">↓</li>
+<li><strong>Passer la main au joueur suivant</strong></li>
+</ul>
+<div class="panel panel-blue">
+<div class="panel-title">Résumé du chapitre : les procédures de base en une page</div>
+<ul>
+<li><strong>Votre rôle :</strong> Cadrer la pression, suivre les conséquences, faire avancer la fiction.</li>
+<li><strong>Réglages par défaut :</strong> DV 3, Position Maîtrisé, un minuteur court.</li>
+<li><strong>Boucle de base :</strong> Déclarer → Fixer Position/DV → Lancer → Résultat → Conséquences.</li>
+<li><strong>Résultats :</strong> Réussite Nette, Réussite avec PH, Partielle (gagne 1 Faveur), Échec (gagne 2 Faveurs).</li>
+<li><strong>Points d'Histoire :</strong> Dépensez-en 1 (mineur), 2 (modéré), 3+ (majeur).</li>
+<li><strong>Règle d'or :</strong> Dans le doute, tranchez en faveur de l'histoire. Vérifiez la règle plus tard.</li>
+</ul>
+</div>
+<h2 id="risk">Le Risque</h2>
+<p>Pourquoi le risque est le moteur de ce jeu — et pourquoi la sécurité est ennuyeuse — c'est le Chapitre 1. Ce qui suit est la partie que vous utilisez à la table : ce qu'est réellement un Point d'Histoire, et quand en dépenser un.</p>
+<h3>Que sont vraiment les Points d'Histoire ?</h3>
+<p>Les nouveaux MJ demandent souvent : <em>« Que sont vraiment les Points d'Histoire ? De simples complications ? Une ressource que je devrais thésauriser pour le grand moment ? »</em></p>
+<p>La réponse est plus simple et plus profonde qu'on ne pourrait le croire. <strong>Les Points d'Histoire sont la permission qu'offre le jeu de rendre les choses intéressantes.</strong></p>
+<p>Chaque fois qu'un joueur lance un 1, il invite le monde à réagir. Les dés ont parlé : quelque chose a légèrement mal tourné, ou dévié, ou pris une tournure <em>inattendue</em>. Le PH est votre licence pour honorer cette invitation. Ce n'est pas une punition. Ce n'est pas une pénalité. C'est l'univers qui dit : <em>« Oui, et… »</em></p>
+<div class="panel panel-gold">
+<div class="panel-title">L'arme secrète du MJ</div>
+<p><strong>Les Points d'Histoire sont votre principal outil de rythme.</strong></p>
+<p>Une scène sans PH est une scène où les joueurs ont le contrôle. Une scène avec PH est une scène où le monde riposte. Les deux devraient alterner. Si vous dépensez des PH tôt et souvent, vous créez de la pression. Si vous les thésaurisez, la scène semble plate.</p>
+<blockquote><em>« Ne gardez pas vos Points d'Histoire pour le climax. Le climax est fait des Points d'Histoire que vous avez dépensés en chemin. »</em>
+<span class="attribution">— Le Vagabond Gris</span></blockquote>
+</div>
+<h4>Ce que les PH ne sont pas</h4>
+<p>Les PH ne sont pas :</p>
+<ul>
+<li><strong>Des punitions.</strong> Ce n'est pas la manière du MJ de dire « vous avez échoué ». C'est la manière du monde de dire « quelque chose d'intéressant s'est produit ».</li>
+<li><strong>Une ressource finie.</strong> Vous n'êtes pas limité par les PH. Si la fiction exige une complication, introduisez-la — même avec 0 PH. Les PH vous disent simplement : <em>les joueurs ont lancé des 1 ici ; ils veulent que le monde riposte.</em></li>
+<li><strong>Des effets ponctuels.</strong> Un seul PH peut créer une complication qui se répercute sur toute la séance. Un garde alerté maintenant sera un problème plus tard.</li>
+</ul>
+<h4>Ce que sont les PH</h4>
+<p>Les PH sont :</p>
+<ul>
+<li><strong>Du carburant narratif.</strong> Ils vous donnent la permission d'escalader, de retourner la situation, de surprendre.</li>
+<li><strong>Une pression générée par les joueurs.</strong> Les joueurs ont lancé des 1. Ils vous disent : <em>« Rendez cela intéressant. »</em></li>
+<li><strong>Des créateurs de tension.</strong> Chaque PH dépensé est un moment où les plans des joueurs tournent légèrement mal — ou se compliquent.</li>
+<li><strong>Des graines d'histoire.</strong> Une complication mineure maintenant peut devenir un fil narratif majeur plus tard.</li>
+</ul>
+<h4>Un exemple concret</h4>
+<p>Imaginez que le groupe se faufile devant un garde. Le voleur lance Discrétion et obtient 3 réussites contre DV 3 — une Réussite Nette. Mais l'un des dés montre un 1. Le MJ gagne 1 PH.</p>
+<p><em>Que signifie ce PH ?</em></p>
+<p>Cela ne signifie pas que le voleur échoue. Cela signifie que le monde remarque quelque chose. Le garde ne voit pas le voleur, mais une pierre descellée glisse sur le sol. Le garde lève les yeux, scrute l'obscurité, et marmonne : <em>« Sûrement juste un rat… »</em> avant de retourner à son poste. Le garde est désormais <em>légèrement suspicieux</em>. Plus tard, quand le groupe sera plus profondément dans le complexe, ce garde sera plus alerte. Un échec ultérieur pourrait déclencher une alarme complète.</p>
+<p><strong>C'est un Point d'Histoire.</strong> Une petite conséquence qui grandit avec le temps. Une graine plantée pour un drame futur.</p>
+<h3>Le menu des dépenses de PH</h3>
+<p>Utilisez ce menu pour guider vos dépenses. Les coûts indiqués sont des repères, pas des règles. Une complication à 1 PH dans une scène pourrait être une complication à 2 PH dans une autre.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Coût en PH</th><th>Effet</th></tr></thead>
+<tbody>
+<tr><td>1 PH</td><td><strong>Pression mineure :</strong> Bruit, distraction, faire avancer d'1 un minuteur de 4 à 6 segments, aggraver la Position d'un cran.</td></tr>
+<tr><td>2 PH</td><td><strong>Revers modéré :</strong> Alarme déclenchée, perte de couverture ou d'avantage, un adversaire mineur apparaît, le groupe se retrouve brièvement séparé.</td></tr>
+<tr><td>3+ PH</td><td><strong>Problème sérieux :</strong> Des renforts arrivent, un équipement clé se brise, un rebondissement majeur transforme la scène, l'autorité arrive, l'environnement change radicalement.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Astuce de pro :</strong> Un rebondissement fort (par ex. 3 PH pour des renforts) crée plus de drame que trois rebondissements faibles (1+1+1 PH pour du bruit). Soyez généreux — un PH inutilisé est de l'élan gaspillé. Un rebondissement fort crée un souvenir. Trois rebondissements faibles créent un flou. Les joueurs se souviendront des renforts. Ils ne se souviendront pas des trois fois où un garde a levé les yeux.</p>
+<p><em>Dépensez vos PH. Dépensez-les tôt. Dépensez-les souvent. Le grand moment est fait des petits moments que vous avez déjà dépensés. Cela dit, n'oubliez pas d'avoir de grands moments.</em></p>
+<h3>Le cycle des PH</h3>
+<p>L'économie des PH crée un cycle vertueux :</p>
+<ol>
+<li><strong>Les joueurs lancent les dés.</strong> Ils réussissent ou échouent, mais les dés montrent des 1.</li>
+<li><strong>Le MJ gagne des PH.</strong> Le monde reçoit la permission de riposter.</li>
+<li><strong>Le MJ dépense des PH.</strong> Une complication est introduite.</li>
+<li><strong>Les joueurs réagissent.</strong> Ils s'adaptent, surmontent, ou échouent à nouveau.</li>
+<li><strong>Le cycle se répète.</strong> Chaque jet génère de nouveaux PH, de nouvelles complications, un nouveau drame.</li>
+</ol>
+<p>Le cycle ne s'arrête jamais parce que les dés ne s'arrêtent jamais. Un Échec génère 2 Faveurs et le MJ dépense des PH. Une Partielle génère 1 Faveur. Même une Réussite Nette avec un 1 génère un PH. L'histoire avance toujours.</p>
+<blockquote><em>« L'économie des PH est le moteur du drame. Elle transforme chaque jet en une question : que se passe-t-il ensuite ? »</em>
+<span class="attribution">— Le Vagabond Gris</span></blockquote>
+<h3>Sur les Valeurs de Difficulté et le défi</h3>
+<p>Un joueur avec 8 dés peut gérer un DV 3 facilement. Ce n'est pas un problème. C'est le système qui fonctionne comme prévu.</p>
+<h4>N'inflatez pas les DV arbitrairement</h4>
+<p>La tentation est compréhensible : un joueur lance beaucoup de dés, alors vous voulez rendre les choses « plus difficiles ». Vous fixez donc DV 4 là où DV 3 suffirait. Puis DV 5 là où DV 4 suffirait.</p>
+<p><strong>Ne faites pas cela.</strong></p>
+<p>Voici pourquoi :</p>
+<ul>
+<li><strong>Des DV faibles ne sont pas un échec du défi.</strong> Un joueur qui a investi dans un grand pool de dés a <em>mérité</em> le droit de réussir régulièrement des tâches de base. DV 3 est la valeur par défaut. C'est intentionnel.</li>
+<li><strong>Une réussite sans Point d'Histoire reste une réussite.</strong> Une Réussite Nette (S ≥ DV, PH = 0) est un résultat valide. Le joueur a réussi proprement. Sa compétence a été récompensée.</li>
+<li><strong>Les Réussites Nettes affament l'économie de Faveurs.</strong> Si un joueur lance 8 dés contre DV 3 et réussit proprement, il n'a gagné aucune Faveur. Ce n'est pas un défaut — c'est le compromis d'être très compétent. Il a échangé des retournements dramatiques contre de la fiabilité.</li>
+<li><strong>L'inflation arbitraire du DV casse le calcul.</strong> Si vous fixez DV 4 pour chaque serrure ordinaire, vous punissez en réalité le joueur d'avoir investi dans ses compétences. Les probabilités du jeu supposent que DV 3 est la référence.</li>
+</ul>
+<h4>Quand augmenter le DV</h4>
+<p>Augmentez la Valeur de Difficulté quand la fiction l'exige :</p>
+<ul>
+<li>Une serrure ordinaire est DV 3.</li>
+<li>Une serrure de maître, forgée par un artisan de guilde, est DV 4.</li>
+<li>Un coffre protégé magiquement, scellé par un Gardien des runes, est DV 5.</li>
+<li>Les cinq protections de la porte du caveau ne constituent pas un seul test de DV — elles forment un <strong>Minuteur</strong>.</li>
+</ul>
+<p>Le DV indique au joueur <em>à quel point cette serrure précise est difficile</em>. La fiction lui indique <em>pourquoi</em>.</p>
+<h4>Le minuteur : un meilleur outil qu'un DV gonflé</h4>
+<p>Prenez la porte du caveau avec ses cinq protections. Un seul jet pour percer les cinq est un DV élevé (5+), mais c'est aussi un jet ennuyeux. À la place :</p>
+<ol>
+<li>Établissez l'objectif : <em>« Le caveau a cinq protections. Chacune doit être brisée en séquence. »</em></li>
+<li>Fixez un minuteur visible : <strong>Protections du caveau [6]</strong>.</li>
+<li>Chaque jet d'Artisanat ou d'Arcanes réussi (DV 3-4) efface un segment du minuteur.</li>
+<li>Chaque échec fait avancer un minuteur de menace : <strong>Patrouille de garde [4]</strong> ou <strong>Progression de l'alarme [4]</strong>.</li>
+</ol>
+<p>Les 8 dés du joueur roulent maintenant toujours contre un DV raisonnable (3-4), mais le défi réside dans l'<em>accumulation</em> des réussites, non dans la hauteur arbitraire d'une cible unique. Le joueur se sent compétent. La tension est réelle. L'histoire avance.</p>
+<h4>Les joueurs devraient rechercher des défis plus difficiles</h4>
+<p>À mesure que les personnages grandissent, les joueurs devraient <em>vouloir</em> rechercher de plus grands défis — non parce que le MJ a gonflé les DV, mais parce que le monde les leur présente :</p>
+<ul>
+<li>Une voleuse de Palier I crochette des serrures pour vivre. DV 3 est son pain quotidien.</li>
+<li>Une voleuse de Palier III crache des coffres pour vivre. Elle ne crochette pas les mêmes serrures — elle crochette de <em>meilleures</em> serrures. Ces serrures sont DV 4 parce qu'elles <em>sont</em> de meilleures serrures, pas parce que le MJ a décidé de rendre les choses plus difficiles.</li>
+<li>Une voleuse de Palier V ne crochette plus aucune serrure. Elle négocie avec l'esprit de la porte, ou traverse le mur grâce à un Rite, ou a déjà soudoyé le serrurier. Le défi s'est transformé.</li>
+</ul>
+<p>Le rôle du MJ n'est pas de rendre les anciens défis plus difficiles. C'est de présenter de <em>nouveaux</em> défis qui correspondent à la croissance des personnages.</p>
+<h4>La Règle d'or du DV</h4>
+<div class="panel">
+<div class="panel-title">La Règle d'or du DV</div>
+<p><strong>Fixez le DV selon la fiction, pas selon le pool de dés du joueur.</strong></p>
+<p>Une serrure est DV 3 parce que c'est une serrure. Une protection est DV 4 parce que c'est une protection. Un caveau est un Minuteur parce que c'est un caveau.</p>
+<p>Si le joueur a investi dans un grand pool de dés, laissez-le en profiter. Il l'a mérité. Sa récompense est la fiabilité — la capacité de réussir des tâches de base sans drame.</p>
+<p>Si vous voulez du drame, utilisez :</p>
+<ul>
+<li><strong>La Position :</strong> Rendez-la Désespérée.</li>
+<li><strong>Les minuteurs :</strong> Ajoutez une horloge.</li>
+<li><strong>Les Points d'Histoire :</strong> Dépensez des PH pour compliquer la réussite.</li>
+<li><strong>La fiction :</strong> Donnez-leur des serrures plus difficiles à crocheter, pas des jets plus difficiles à réussir.</li>
+</ul>
+</div>
+<h4>Un exemple concret</h4>
+<p>La voleuse du groupe a <strong>Esprit 4</strong> et <strong>Artisanat 3</strong>. Elle lance 7 dés pour crocheter une serrure.</p>
+<p><strong>Erreur :</strong> MJ : « La serrure est délicate. DV 4. »</p>
+<p><strong>Correct :</strong> MJ : « La serrure est une serrure de guilde standard. DV 3. Vous la crochetez facilement — Réussite Nette. Aucune Faveur. C'est l'avantage d'être une maîtresse. »</p>
+<p>Plus tard : <em>« La porte du caveau a cinq protections. Chacune est un test à DV 3, mais vous devez toutes les lever avant que la patrouille de garde ne termine sa ronde. Je démarre un minuteur Patrouille de garde [6]. »</em></p>
+<p>La joueuse lance 7 dés contre DV 3, réussit à répétition, et efface le minuteur. Elle se sent compétente. Le défi résidait dans la pression temporelle, pas dans la difficulté arbitraire d'un seul jet.</p>
+<h4>Pensée finale</h4>
+<p>Des DV faibles ne sont pas un mode facile. Ils sont la référence. Le grand pool de dés du joueur n'est pas un problème à résoudre — c'est une qualité à célébrer.</p>
+<p>Laissez le joueur profiter de sa compétence. Puis donnez-lui de <em>nouveaux</em> problèmes qui exigent un autre type de talent.</p>
+<blockquote><em>« Une voleuse maîtresse ne crochette pas des serrures plus difficiles. Elle crochette des serrures différentes — des serrures qui gardent des secrets, des serrures qui parlent, des serrures qui n'étaient jamais destinées à être ouvertes. Le jeu ne consiste pas à rendre le jet plus difficile. Il consiste à rendre le choix important. »</em>
+<span class="attribution">— Le Vagabond Gris</span></blockquote>
+<h3>Puis-je lancer moins de dés ? Non !</h3>
+<p>Une question qui revient souvent, surtout de la part de joueurs habitués à des systèmes où mal lancer les dés est puni, est :</p>
+<p><em>« Je lance 8 dés. C'est beaucoup de chances de lancer des 1. Puis-je choisir de lancer moins de dés pour éviter de générer des Points d'Histoire ? »</em></p>
+<p><strong>Non. Absolument pas. Voici pourquoi.</strong></p>
+<p>Dans certains jeux, lancer un 1 sur un dé est un <strong>état d'échec</strong> — cela signifie que quelque chose de mauvais se produit. Les joueurs apprennent à craindre ces faces. Ils essaient de minimiser leurs pools de dés pour éviter les mauvais résultats. <strong>Fate's Edge n'est pas ce jeu-là.</strong></p>
+<p>Dans Fate's Edge, un 1 n'est <strong>pas</strong> un échec. C'est un <strong>Point d'Histoire (PH)</strong> — une ressource qui alimente le récit. Quand vous lancez un 1, vous n'êtes pas puni. Vous remettez au MJ une étincelle pour allumer un feu qui fait brûler l'histoire plus fort.</p>
+<div class="panel">
+<div class="panel-title">La Règle d'or des pools de dés</div>
+<p><strong>Ne réduisez jamais le pool de dés d'un joueur.</strong></p>
+<p>Le pool de dés est l'expression principale de la compétence du personnage du joueur. Un personnage avec Corps 4 et Mêlée 4 a investi un XP considérable — il a mérité ces 8 dés.</p>
+<p>Si vous voulez rendre un défi plus difficile, utilisez :</p>
+<ul>
+<li><strong>La Position :</strong> Rendez-la Désespérée. Le joueur relance ses réussites.</li>
+<li><strong>Le DV :</strong> Augmentez la Valeur de Difficulté quand la fiction l'exige.</li>
+<li><strong>Les minuteurs :</strong> Ajoutez une horloge. Le joueur doit réussir avant qu'elle ne se remplisse.</li>
+<li><strong>Les Points d'Histoire :</strong> Dépensez des PH pour introduire des complications.</li>
+</ul>
+<p><strong>Ne leur retirez pas leurs dés. Ils les ont mérités.</strong></p>
+</div>
+<p>Un joueur qui demande à lancer moins de dés demande un résultat <em>sûr</em>. Il veut éviter les complications. Mais Fate's Edge n'est pas un jeu de sécurité — c'est un jeu de risque, de drame, et du plaisir de lancer une poignée de dés pour voir ce qui se passe.</p>
+<blockquote><em>« Les dés ne sont pas une ressource à rationner. Ils sont une déclaration de compétence. Laissez les joueurs lancer leur pool complet. Puis utilisez la Position, le DV, et les PH pour façonner le résultat. C'est ça, le jeu. »</em>
+<span class="attribution">— Le Vagabond Gris</span></blockquote>
+<footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Utilisé avec permission, Tous droits réservés.</footer>
+</body>
+</html>
