@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Annexe : Référence rapide — Fate's Edge Guide du Joueur (Français)</title>
+<style>
+        :root {
+            --bg1: #0d0d1a;
+            --bg2: #1a1a2e;
+            --bg3: #252540;
+            --bg4: #2f2f4a;
+            --text: #e8e8f0;
+            --text2: #b8b8c8;
+            --text3: #8888a0;
+            --gold: #c9a84c;
+            --gold-hover: #d4b85c;
+            --border: #333355;
+            --red: #c0392b;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+        h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+        h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+        h4 { font-size: 0.95rem; color: var(--text); margin-top: 0.6rem; }
+        h5 { font-size: 0.88rem; color: var(--text2); margin-top: 0.5rem; }
+        p.subtitle { color: var(--text2); margin-bottom: 1rem; font-size: 1rem; }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-hover); text-decoration: underline; }
+        p { margin: 0.5rem 0; }
+        ul, ol { margin: 0.4rem 0 0.6rem 1.5rem; }
+        li { margin: 0.2rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            margin: 0.7rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .panel h3, .panel h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--bg4);
+            color: var(--text3);
+            border: 1px solid var(--border);
+        }
+        .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; }
+        th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+        th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg2); }
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--gold);
+            padding: 0.5rem 1rem;
+            margin: 0.7rem 0;
+            background: var(--bg2);
+            border-radius: var(--radius);
+            color: var(--text2);
+            text-align: center;
+        }
+        blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+        code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+        .entry { margin: 0.8rem 0; }
+        .entry-title { font-weight: 700; color: var(--text); }
+        .card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.6rem 0.9rem;
+            margin: 0.6rem 0;
+        }
+        .card .fill { color: var(--text3); }
+        .spell {
+            background: var(--bg3);
+            border-left: 3px solid var(--purple);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.8rem;
+            margin: 0.5rem 0;
+        }
+        .spell .spell-name { font-weight: 700; color: var(--gold); }
+        .spell .spell-tags { color: var(--purple); font-family: monospace; font-size: 0.85rem; }
+        footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 2px solid var(--gold); text-align: center; color: var(--text3); font-size: 0.8rem; }
+    </style>
+</head>
+<body><aside class="translation-notice" lang="fr">Version française. Traduction assistée ; révision éditoriale complète en attente. <a href="../players-guide/Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html" hreflang="en">Consulter l'original en anglais</a></aside>
+<h1 id="reader-section-1">Annexe : Référence rapide</h1>
+<p class="subtitle">Fate's Edge Guide du Joueur — Annexe</p>
+<h2 id="player-tools-and-quick-reference">Outils du joueur et référence rapide</h2>
+<p>Cette annexe fournit des outils légers et adaptés à la table pour suivre la progression du personnage, l'état de la campagne, et les règles au fil du jeu. Imprimez, photocopiez, ou recopiez sur des fiches Bristol pour un usage à table.</p>
+<h3>Recommandations pour des suivis physiques</h3>
+<p>Beaucoup de groupes trouvent que des suivis physiques et tactiles accélèrent le jeu et réduisent la charge mentale. Envisagez :</p>
+<ul>
+<li><strong>Des jetons de poker ou des billes de verre</strong> pour les Faveurs et les Points d'Histoire (PH). <em>Gardez un petit bol de jetons au centre de la table — dépensez et gagnez visiblement.</em></li>
+<li><strong>Des tableaux effaçables ou des fiches plastifiées</strong> pour les minuteurs (cercles à 4/6/8 segments). <em>Utilisez un marqueur effaçable ; dessinez un nouveau minuteur à chaque scène.</em></li>
+<li><strong>Des fiches (7,5 × 12,5 cm)</strong> pour les Atouts et les Suivants. <em>Écrivez le nom de l'Atout, son usage libre, et sa poussée sur une face ; retournez-la une fois utilisée.</em></li>
+<li><strong>Des trombones ou pinces colorées</strong> sur les feuilles de personnage pour les jauges de Fatigue et de Dommage. <em>Faites glisser la pince vers le haut ou le bas — sans effacer.</em></li>
+<li><strong>Des « roues de minuteur » imprimées</strong> (un cercle divisé en 4/6/8 parts) placées dans une pochette plastique. <em>Marquez les parts avec un marqueur effaçable, effacez avec un mouchoir.</em></li>
+<li><strong>Des d10</strong> pour suivre les modificateurs temporaires (Position, Effet, ou Élan). <em>Placez le dé près du suivi concerné et ajustez-le vers le haut ou le bas.</em></li>
+</ul>
+<h3>Fiche de résolution</h3>
+<div class="card">
+<p><strong>Déclarer → le MJ fixe le DV et la Position → lancer Attribut + Compétence en d10 → compter.</strong></p>
+<p>Chaque <strong>6–9</strong> vaut 1 réussite. Chaque <strong>10</strong> en vaut 2. Chaque <strong>1</strong> donne 1 PH au MJ.</p>
+<p>Comparez les réussites (S) au <strong>DV</strong> :</p>
+<p>S ≥ DV, aucun 1 → <strong>Réussite Nette</strong><br/>
+S ≥ DV, un ou plusieurs 1 → <strong>Réussite avec PH</strong> — vous l'obtenez, le monde riposte<br/>
+0 &lt; S &lt; DV → <strong>Partielle</strong> — progrès, mais pas d'arrivée ; +1 Faveur<br/>
+S = 0 → <strong>Échec</strong> — cela échoue et empire ; +2 Faveurs</p>
+<p><strong>DV</strong> 2 routine • 3 par défaut • 4 difficile • 5+ extrême. <strong>Position</strong> Dominant (relancer un échec) / Maîtrisé / Désespéré (relancer une réussite).</p>
+<p><strong>Les PH</strong> forment la réserve du MJ : complications, escalade, minuteurs.</p>
+</div>
+<h3>Suivi de Fatigue et de Dommage</h3>
+<div class="card">
+<p><strong>Fatigue :</strong> <span class="fill">________</span> (Max = Corps)<br/>
+<strong>Tension mentale :</strong> <span class="fill">________</span><br/>
+<strong>Dommage :</strong> [ ] Dommage 1 (−1 dé, actions liées)   [ ] Dommage 2 (−1 dé, la plupart des actions)   [ ] Dommage 3 (incapacité ou agonie)</p>
+<p>Quand les jauges se remplissent :</p>
+<ul>
+<li>Débordement de Fatigue → augmentez le Dommage de 1, effacez la Fatigue.</li>
+<li>Tension mentale → entraîne instabilité ou désavantage.</li>
+<li>Dommage 3 → Baroud d'honneur ou Réclamation du Patron (voir « Mort optionnelle du personnage » dans les règles de base).</li>
+</ul>
+</div>
+<h3>Suivi des PH et de l'Élan</h3>
+<div class="card">
+<p><strong>PH actuels (réserve du MJ) :</strong> <span class="fill">______</span><br/>
+<strong>Élan (réserve du groupe, optionnel — Ch.18) :</strong> <span class="fill">______</span> (max 2 mis en réserve par séance)<br/>
+<strong>Utilisés cette séance :</strong> <span class="fill">______</span></p>
+</div>
+<h3>Progression des Talents</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Coût en XP</th><th>Type de Talent / Impact</th></tr>
+<tr><td>2–3 XP</td><td>Talent mineur — un bonus situationnel, une technique signature</td></tr>
+<tr><td>4–6 XP</td><td>Talent majeur — une spécialisation, un effet permanent fort</td></tr>
+<tr><td>7–10 XP</td><td>Talent de prestige — définit la campagne, généralement soumis à une condition</td></tr>
+<tr><td colspan="2"><em>Les Talents d'accès à la magie ont un coût individuel :</em> Familier 2 • Chuchoteur de Pacte 2 • Pactiseur mineur 2 • Codex 4 • Symbole du Patron 4 • Art des sorts 6 • Voie du Chantre 8</td></tr>
+</table></div>
+</div>
+<h3>Fiche des objectifs du personnage</h3>
+<div class="card">
+<p><strong>Nom :</strong> <span class="fill">____________</span><br/>
+<strong>Motivation centrale :</strong> <span class="fill">____________</span><br/>
+<strong>Objectif à court terme (1–2 séances) :</strong> <span class="fill">____________</span><br/>
+<strong>Objectif à long terme (arc) :</strong> <span class="fill">____________</span><br/>
+<strong>Complication de contexte :</strong> <span class="fill">____________</span><br/>
+<strong>Relation qui compte :</strong> <span class="fill">____________</span></p>
+</div>
+<p><em>Astuce physique :</em> Imprimez cette fiche sur du carton, pliez-la en deux, et posez-la devant vous comme rappel.</p>
+<h3>Fiche d'attitude de faction</h3>
+<div class="card">
+<p><strong>Nom de la faction :</strong> <span class="fill">_________</span><br/>
+Attitude : −3 −2 −1 0 +1 +2 +3<br/>
+Notes : <span class="fill">____________________</span></p>
+</div>
+<h3>Fiche d'orientation du joueur (principes rapides)</h3>
+<div class="card">
+<p><strong>1. Déclarez une action audacieuse</strong> — Faites avancer la fiction.<br/>
+<strong>2. Acceptez les conséquences</strong> — Les complications créent l'histoire.<br/>
+<strong>3. Dépensez des Points d'Histoire</strong> — Faites compter les moments.<br/>
+<strong>4. Utilisez les Faveurs</strong> — Relancez, améliorez la Position, activez des Atouts.<br/>
+<strong>5. Partagez le feu des projecteurs</strong> — Assistez, tissez des liens, mettez en valeur vos alliés.</p>
+</div>
+<h3>Référence rapide des ressources par classe / archétype</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Archétype</th><th>Ressource centrale</th></tr>
+<tr><td>Guerrier / Combattant</td><td>Manœuvres, Fatigue, Maître d'armes</td></tr>
+<tr><td>Voleur / Éclaireur</td><td>Positionnement, Discrétion, Coup dans le dos</td></tr>
+<tr><td>Lanceur de sorts (libre)</td><td>Art des sorts, Marqueurs élémentaires, Contrecoup</td></tr>
+<tr><td>Gardien des runes</td><td>Rites, Obligation, Codex</td></tr>
+<tr><td>Invocateur</td><td>Rituels, Symbole du Patron, Briser le Sceau</td></tr>
+<tr><td>Chantre</td><td>Chants, Minuteur de Corruption, Répertoire</td></tr>
+<tr><td>Invocateur de créatures</td><td>Minuteur de Laisse, Lien Spirituel, Pacte</td></tr>
+</table></div>
+</div>
+<h3>Comment interagir avec le MJ (invites pour le joueur)</h3>
+<ul>
+<li><strong>Demandez :</strong> « Que dois-je lancer ? » — obtenez le DV et la Position.</li>
+<li><strong>Proposez :</strong> « Puis-je dépenser un PH pour obtenir X ? » — négociez des orientations narratives.</li>
+<li><strong>Déclarez :</strong> « Voici mon intention et ma méthode. » — énoncez toujours ce que vous voulez qu'il se passe.</li>
+<li><strong>Offrez :</strong> « J'accepte une complication si Y se produit. » — invitez des Pactes du diable.</li>
+<li><strong>Clarifiez :</strong> « Qu'est-ce qui est en jeu si j'échoue ? » — connaissez les enjeux avant de lancer les dés.</li>
+</ul>
+<h3>Suivi de projet de temps mort</h3>
+<div class="card">
+<p><strong>Nom :</strong> <span class="fill">___________</span>    <strong>Segments :</strong> [ ] [ ] [ ] [ ] [ ] [ ]<br/>
+<strong>Objectif :</strong> <span class="fill">___________</span><br/>
+<strong>Obstacles / Ressources nécessaires :</strong> <span class="fill">________</span></p>
+</div>
+<p><em>Astuce physique :</em> Utilisez un minuteur effaçable à 6 segments. À chaque temps mort, effacez un segment et lancez les dés pour le progrès.</p>
+<h3>Quelle conséquence acceptez-vous ? (Menu pour le MJ)</h3>
+<p>Quand un joueur échoue ou réussit partiellement, le MJ peut proposer un choix parmi cette liste (ou en inventer un) :</p>
+<ul>
+<li>Dommage (niveau 1 ou 2)</li>
+<li>Fatigue (1 ou 2)</li>
+<li>Avantage perdu (la Position s'aggrave, un minuteur avance)</li>
+<li>Délais (un minuteur avance, une échéance se resserre)</li>
+<li>Exposition / Attention (attention des ennemis, prime)</li>
+<li>Épuisement des ressources (avancée du minuteur d'approvisionnement, équipement compromis)</li>
+<li>Tension relationnelle (un Lien ou une attitude de faction s'aggrave)</li>
+</ul>
+<h3>Façons de briller dans Fate's Edge</h3>
+<ul>
+<li>Liez vos actions à vos motivations et à votre passé — invoquez votre Faveur de contexte.</li>
+<li>Proposez des complications et acceptez-les — gagnez des Faveurs.</li>
+<li>Dépensez des PH pour faire escalader ou transformer la scène — rendez l'échec mémorable.</li>
+<li>Utilisez votre ressource de classe tôt et souvent — ne la thésaurisez pas.</li>
+<li>Reliez les scènes aux thèmes de la campagne — nommez la faction ou le lieu.</li>
+<li>Mettez en valeur les autres personnages — assistez, préparez le terrain, cédez le feu des projecteurs.</li>
+</ul>
+<h3>Fiches vierges pour notes rapides</h3>
+<div class="card" style="text-align:center;">Nom / Faveurs / Fatigue / Dommage</div>
+<div class="card" style="text-align:center;">Minuteurs / Obligation / Notes de scène</div>
+<h3>Dernier rappel</h3>
+<p><strong>Votre feuille de personnage n'est pas votre personnage.</strong> C'est un outil pour vous aider à exprimer qui il a été, qui il devient, et comment ses choix changent le monde.</p>
+<p>Utilisez ces outils pour rendre cette expression vivante, lourde de conséquences, et mémorable.</p>
+<h2 id="magic-systems-reference">Référence des systèmes de magie</h2>
+<p>La magie dans Fate's Edge est plurielle. Différentes traditions canalisent le pouvoir à travers des structures métaphysiques différentes, mais toutes obéissent à la même vérité :</p>
+<blockquote><em>Le pouvoir a un coût, et la magie façonne celui qui la manie.</em></blockquote>
+<p>Cette annexe fournit des outils de référence rapide pour les joueurs utilisant des systèmes liés à la magie, des talismans, des rites, et des pratiques occultes.</p>
+<h3>Principes magiques fondamentaux</h3>
+<div class="card">
+<ul>
+<li>La magie exprime l'<strong>identité et la croyance</strong>.</li>
+<li>Lancer un sort crée toujours des <strong>conséquences quelque part</strong>.</li>
+<li>La magie réécrit la réalité par l'<strong>intention, la structure, ou le sacrifice</strong>.</li>
+<li>Un pouvoir excessif érode le <strong>libre arbitre</strong> (voir l'encadré Ascension Iconique dans les règles complètes).</li>
+</ul>
+</div>
+<h3>Référence universelle du lancer de sorts</h3>
+<div class="card">
+<p><strong>Modèle de déclaration de sort :</strong></p>
+<ol>
+<li><strong>Intention</strong> — Quel changement recherchez-vous ?</li>
+<li><strong>Forme</strong> — Comment votre tradition l'exprime-t-elle ?</li>
+<li><strong>Coût</strong> — Que risquez-vous ou dépensez-vous ?</li>
+<li><strong>Résolution</strong> — Testez ; appliquez les règles de Position/Effet.</li>
+<li><strong>Contrecoup</strong> — Marquez de la Fatigue, une pression de PH, un tabou, une instabilité, ou un marché.</li>
+</ol>
+</div>
+<h3>Référence rapide des traditions magiques</h3>
+<div class="entry">
+<p class="entry-title">Arcane libre (Magie savante)</p>
+<p><em>Façonnage créatif, rationnel, délibéré.</em> Outils : Glyphes, structures, métaphores. Coûts : Fatigue, recul de la réalité, instabilité de PH. <strong>Repère de jeu :</strong> Schématisez votre sort ou énoncez son symbolisme. Les grands sorts distordent le destin — acceptez les pics de PH.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Arcane innée (Sorcellerie)</p>
+<p><em>Émotionnelle, instinctive, liée à la lignée.</em> Outils : Souffle, impulsion, résonance. Coûts : Fatigue, contrecoup imprévisible. <strong>Repère de jeu :</strong> Traitez la magie comme un réflexe. Repoussez vos limites — attendez-vous à des conséquences.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Invocation (Prêtre / Paladin / Médium)</p>
+<p><em>Pétition, prière, pacte, rite.</em> Outils : Symboles, vœux, lieux de pouvoir. Coûts : Pressions de tabou, minuteurs d'obligation. <strong>Repère de jeu :</strong> Votre magie ne vous appartient pas — présentez-la comme une requête. Violer votre éthos entraîne des conséquences.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Consécration runique (Art des runes)</p>
+<p><em>Méthodes, sceaux, contrats.</em> Outils : Étapes rituelles, codex, clauses de liaison. Coûts : Minuteurs de faim, boucles d'escalade. <strong>Repère de jeu :</strong> La magie est une <em>procédure</em>. Attendez-vous à ce que le système riposte.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Façonnage / Pouvoir druidique</p>
+<p><em>Résonance avec le lieu, l'élément, le cycle.</em> Outils : Marques, offrandes, rites saisonniers. Coûts : Écho environnemental, conséquence territoriale. <strong>Repère de jeu :</strong> Déclarez ce que la terre veut — puis négociez.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Liaison de Pacte (Sorcier lié / Avatar)</p>
+<p><em>Échange, faim, transformation.</em> Outils : Jetons, signatures, marques de reflet. Coûts : Perte d'autonomie, risque d'ascension. <strong>Repère de jeu :</strong> Demandez : « Que gagne mon Patron ? » La dette devient intrigue.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Invocation de créatures (Médium / Nécromancien / Chamane)</p>
+<p><em>Invocation d'entités, liaison, action de vassal.</em> Outils : Cercles, marchés, lanternes, appels ancestraux. Coûts : Minuteurs d'attention, risque de brèche. <strong>Repère de jeu :</strong> Donnez une personnalité à l'entité invoquée — son aide vient avec des exigences.</p>
+</div>
+<h3>Règles communes du coût magique</h3>
+<p style="text-align:center;"><strong>Aucune magie n'est gratuite.</strong></p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Type de coût</th><th>Exemples en jeu</th></tr>
+<tr><td>Fatigue</td><td>Poussée d'épuisement, concentration tremblante, tension corporelle</td></tr>
+<tr><td>Pression de PH</td><td>Le MJ fait grimper les complications ou les minuteurs (contrecoup élémentaire, présages du Patron)</td></tr>
+<tr><td>Tabou / Obligation</td><td>Commandements, rites, punition pour mésusage, exigences du Patron</td></tr>
+<tr><td>Attention / Contrecoup</td><td>Les esprits remarquent ; le registre cosmique avance ; conscience des factions</td></tr>
+<tr><td>Anomalie / Distorsion</td><td>Les lieux réagissent, la réalité se déforme, les rituels résonnent — les marqueurs de scène changent</td></tr>
+<tr><td>Érosion identitaire</td><td>Actes forcés, dérive d'alignement, risque d'Ascension Iconique</td></tr>
+</table></div>
+</div>
+<h3>Synergies entre systèmes</h3>
+<p>Tous les systèmes magiques peuvent se combiner. Un Gardien des runes peut imiter un Clerc ou un Druide ; un Invocateur peut agir comme un Paladin ou un Prophète ; un Sorcier peut ressembler à une Sorcière, un Élémentaliste, ou un Psionique.</p>
+<p>Pour combiner les systèmes :</p>
+<ol>
+<li>Choisissez votre <strong>expression principale</strong> (croyance, intellect, instinct, rituel).</li>
+<li>Décrivez les sorts à travers ce prisme.</li>
+<li>Laissez les coûts refléter votre système.</li>
+<li>Suivez les conséquences séparément — combiner les systèmes augmente le risque.</li>
+</ol>
+<h3>Rappels au MJ pour la magie</h3>
+<ul>
+<li>La magie crée de l'histoire — récompensez son usage par des conséquences et de l'élan.</li>
+<li>Les joueurs devraient narrer la méthode, pas seulement l'effet.</li>
+<li>Les grands moments devraient changer les scènes, pas seulement les chiffres.</li>
+<li>La magie devrait tenter le lanceur — faire écho à ses motivations et ses failles.</li>
+</ul>
+<h3>Rappels au joueur pour la magie</h3>
+<ul>
+<li>Assumez le coût — la magie paraît significative quand elle fait mal.</li>
+<li>Rendez la magie personnelle — décrivez à quoi elle ressemble et ce qu'elle procure.</li>
+<li>Liez les pouvoirs à l'identité, la croyance, le traumatisme, le devoir, ou l'héritage.</li>
+<li>Laissez la magie changer votre personnage avec le temps.</li>
+</ul>
+<h2 id="pre-made-spells-with-tags-and-dv-math">Sorts prêts à l'emploi avec MARQUEURS et calcul de DV</h2>
+<p>Les exemples suivants illustrent comment les MARQUEURS, la mise à l'échelle du DV, et l'intention du sort interagissent au sein du système de lancer de sorts. Utilisez-les comme inspiration ou comme modèles pour vos propres sorts.</p>
+<h3>Comment lire une fiche de sort</h3>
+<p>Chaque fiche comprend :</p>
+<ul>
+<li><strong>Nom</strong> et <strong>Tradition</strong> (optionnel).</li>
+<li><strong>MARQUEURS</strong> — les composants qui définissent l'effet.</li>
+<li><strong>Effet</strong> — résultat en langage simple.</li>
+<li><strong>DV</strong> — calcul de base (1 + nombre de MARQUEURS ; les marqueurs dangereux ajoutent +2).</li>
+<li><strong>Notes</strong> — portée, durée, ou considérations particulières typiques.</li>
+</ul>
+<h3>Palier I : Utilité mineure (DV 2–3)</h3>
+<div class="spell">
+<p class="spell-name">Lumière simple <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Lumière)</span></p>
+<p class="spell-tags">[ILLUMINER]</p>
+<p><strong>Effet :</strong> Créer une petite lumière soutenue (luminosité d'une torche) pour la scène.<br/>
+<strong>DV :</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notes :</strong> Aucun risque de contrecoup ; dure jusqu'à dissipation.</p>
+</div>
+<div class="spell">
+<p class="spell-name">SOIN des blessures mineures <span class="text-muted" style="color:var(--text3);font-weight:400;">(Vie + SOIN)</span></p>
+<p class="spell-tags">[SOIN]</p>
+<p><strong>Effet :</strong> Refermer une petite coupure ou un bleu ; réduire 1 Fatigue (mineure).<br/>
+<strong>DV :</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notes :</strong> Nécessite un contact.</p>
+</div>
+<div class="panel panel-orange">
+<h4>Soigner Dommage et Fatigue</h4>
+<p><strong>SOIN comme sortilège mineur.</strong> Le marqueur <code>SOIN</code> (Vie) peut être lancé comme sortilège mineur à action unique (DV 2). En cas de réussite, vous retirez <strong>1 Fatigue</strong> à vous-même ou à un allié touché. Cela ne peut pas soigner le Dommage.</p>
+<p><strong>Soigner le Dommage (1 niveau).</strong> Pour restaurer un niveau de Dommage, vous devez inclure le marqueur <code>SOIN</code> et soit :</p>
+<ul>
+<li>ajouter un <strong>modificateur de +2 DV</strong> au sort, soit</li>
+<li>combiner <code>SOIN</code> avec un second marqueur approprié (par ex. <code>Purifier</code>, <code>Renforcer</code>, <code>Purger</code>).</li>
+</ul>
+<p>Le MJ fixe le DV final selon les marqueurs et la gravité de la blessure.</p>
+<p><em>Pourquoi ?</em> La Fatigue est de l'épuisement — un charme rapide peut soulager des muscles fatigués. Le Dommage est une blessure — refermer des plaies exige plus de pouvoir et de risque. Cela garde le soin significatif sans éclipser l'endurance martiale.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Message sur le vent <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Voile)</span></p>
+<p class="spell-tags">[CHUCHOTEMENT]</p>
+<p><strong>Effet :</strong> Porter un court message chuchoté sur 30 mètres via les courants d'air.<br/>
+<strong>DV :</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notes :</strong> Communication à sens unique ; durée de 30 secondes.</p>
+</div>
+<h3>Palier II : Utilité de combat (DV 3–4)</h3>
+<div class="spell">
+<p class="spell-name">Lame de flamme <span class="text-muted" style="color:var(--text3);font-weight:400;">(Feu + Frappe)</span></p>
+<p class="spell-tags">[EMBRASEMENT][FRAPPE]</p>
+<p><strong>Effet :</strong> Enflammer une arme, ajoutant +1 Dommage et [BRÛLURE] à la prochaine attaque de mêlée.<br/>
+<strong>DV :</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notes :</strong> Dure un échange.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Bouclier d'air <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Mur)</span></p>
+<p class="spell-tags">[PROTECTION][DÉFENSE]</p>
+<p><strong>Effet :</strong> Créer une barrière d'air comprimé ; gagner +1 Position à la prochaine défense.<br/>
+<strong>DV :</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notes :</strong> Usage unique.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Pas véloce <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Bond)</span></p>
+<p class="spell-tags">[HÂTE][MOUVEMENT]</p>
+<p><strong>Effet :</strong> Doubler la vitesse de déplacement pour un échange.<br/>
+<strong>DV :</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notes :</strong> Nécessite un espace dégagé.</p>
+</div>
+<h3>Palier III : Contrôle de zone (DV 4–5)</h3>
+<div class="spell">
+<p class="spell-name">Mur de pierre <span class="text-muted" style="color:var(--text3);font-weight:400;">(Terre + Mur)</span></p>
+<p class="spell-tags">[BARRIÈRE][FORTIFICATION]</p>
+<p><strong>Effet :</strong> Invoquer un mur de pierre de 3 mètres (Alentours ; durée de la scène).<br/>
+<strong>DV :</strong> 1 + 1 + 1 = <strong>3</strong>. <em>DV dangereux :</em> <strong>4</strong> (blocage en combat).<br/>
+<strong>Notes :</strong> Fournit une couverture ; entrave le mouvement.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Douce touche du sommeil <span class="text-muted" style="color:var(--text3);font-weight:400;">(Eau + Esprit)</span></p>
+<p class="spell-tags">[RÊVE][COMMANDEMENT]</p>
+<p><strong>Effet :</strong> Une cible s'endort (durée de la scène ; Résistance : Esprit + Perspicacité DV 2).<br/>
+<strong>DV :</strong> 1 + 1 + 1 = <strong>3</strong>. <em>DV dangereux :</em> <strong>4</strong> (usage en combat).<br/>
+<strong>Notes :</strong> Le Dommage réveille la cible.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Manteau de flammes <span class="text-muted" style="color:var(--text3);font-weight:400;">(Feu + Zone)</span></p>
+<p class="spell-tags">[EMBRASEMENT][ZONE]</p>
+<p><strong>Effet :</strong> Rayon de 2 mètres de chaleur intense ; les ennemis subissent −1 dé pour approcher.<br/>
+<strong>DV :</strong> 1 + 1 + 1 = <strong>3</strong>. <em>DV dangereux :</em> <strong>4</strong> (si des alliés sont proches).<br/>
+<strong>Notes :</strong> Crée un terrain difficile.</p>
+</div>
+<h3>Palier IV : Façonnage du champ de bataille (DV 5)</h3>
+<div class="spell">
+<p class="spell-name">Tremblement de terre <span class="text-muted" style="color:var(--text3);font-weight:400;">(Terre + Force)</span></p>
+<p class="spell-tags">[SÉISME][ZONE]</p>
+<p><strong>Effet :</strong> Tremblement de 6 mètres ; les ennemis testent Corps + Athlétisme (DV 3) ou tombent au sol.<br/>
+<strong>DV :</strong> 1 + 1 + 1 = <strong>3</strong>. <em>DV dangereux :</em> <strong>5</strong>.<br/>
+<strong>Notes :</strong> Déstabilise les structures ; affecte tous ceux présents dans la zone.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Furie de la tempête <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Tempête)</span></p>
+<p class="spell-tags">[TEMPÊTE][ZONE][FORCE]</p>
+<p><strong>Effet :</strong> Nuage de tempête de 9 mètres ; la foudre frappe des cibles aléatoires (Dommage 2).<br/>
+<strong>DV :</strong> 1 + 1 + 1 + 1 = <strong>4</strong>. <em>DV dangereux :</em> <strong>6</strong>.<br/>
+<strong>Notes :</strong> Dure toute la scène ; réduit la visibilité.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Cercle de guérison <span class="text-muted" style="color:var(--text3);font-weight:400;">(Vie + Zone)</span></p>
+<p class="spell-tags">[SOIN][ZONE][PURGE]</p>
+<p><strong>Effet :</strong> Les alliés dans un rayon de 4,5 mètres soignent 1 Dommage et effacent 1 Fatigue.<br/>
+<strong>DV :</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notes :</strong> Un effet positif majeur justifie un DV élevé.</p>
+</div>
+<h3>Palier V : Effets de niveau domaine (DV 5)</h3>
+<div class="spell">
+<p class="spell-name">Portail de passage <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Pli)</span></p>
+<p class="spell-tags">[PORTAIL][TRANSPORT][ZONE]</p>
+<p><strong>Effet :</strong> Ouvrir un portail bidirectionnel de 6 mètres de large reliant deux lieux.<br/>
+<strong>DV :</strong> 1 + 2 + 1 + 1 = <strong>5</strong>. <em>DV dangereux :</em> <strong>7</strong>.<br/>
+<strong>Notes :</strong> Nécessite de la concentration ; peut se déstabiliser.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Armée de pierre <span class="text-muted" style="color:var(--text3);font-weight:400;">(Terre + Invocation)</span></p>
+<p class="spell-tags">[CONJURATION][ZONE][GARDE]</p>
+<p><strong>Effet :</strong> Invoquer 4 gardiens de pierre (Cap 2) qui suivent des ordres simples.<br/>
+<strong>DV :</strong> 1 + 2 + 1 + 1 = <strong>5</strong>. <em>DV dangereux :</em> <strong>6</strong>.<br/>
+<strong>Notes :</strong> Durée de la scène ; concentration.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Domination de l'esprit <span class="text-muted" style="color:var(--text3);font-weight:400;">(Destin + Esprit)</span></p>
+<p class="spell-tags">[COMMANDEMENT][ZONE][MALÉDICTION]</p>
+<p><strong>Effet :</strong> Tous les ennemis dans un rayon de 7,5 mètres testent Esprit + Perspicacité (DV 4) ou obéissent à un seul ordre.<br/>
+<strong>DV :</strong> 1 + 1 + 1 + 2 = <strong>5</strong>. <em>DV dangereux :</em> <strong>7</strong>.<br/>
+<strong>Notes :</strong> Risque éthique significatif ; contrecoup probable.</p>
+</div>
+<h3>Sorts signatures / personnels (personnalisés)</h3>
+<div class="spell">
+<p class="spell-name">Le Lien du Gardien <span class="text-muted" style="color:var(--text3);font-weight:400;">(Vie + Liaison) — Chantre guérisseur</span></p>
+<p class="spell-tags">[SOIN][LIAISON][GARDE]</p>
+<p><strong>Effet :</strong> Soigner 2 Dommage et lier le lanceur à la cible — le prochain Dommage qu'elle subirait, le lanceur en subit 1 à la place.<br/>
+<strong>DV :</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notes :</strong> Protection sacrificielle.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Pas de l'ombre <span class="text-muted" style="color:var(--text3);font-weight:400;">(Air + Voile) — Voie du Trickster</span></p>
+<p class="spell-tags">[VOILE][MOUVEMENT][BOND]</p>
+<p><strong>Effet :</strong> Devenir invisible et se téléporter de 9 mètres ; gagner +2 dés à la prochaine action de Discrétion.<br/>
+<strong>DV :</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notes :</strong> Nécessite de l'ombre ou une faible lumière.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Vérité de la forge <span class="text-muted" style="color:var(--text3);font-weight:400;">(Feu + Révélation) — Art de l'Artificier</span></p>
+<p class="spell-tags">[RÉVÉLATION][SOIN][FORTIFICATION]</p>
+<p><strong>Effet :</strong> Voir les défauts d'un objet et le réparer comme si vous aviez 2 niveaux de Compétence supplémentaires (scène).<br/>
+<strong>DV :</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notes :</strong> Fonctionne sur les objets magiques (avec risque).</p>
+</div>
+<h3>Directives de contrecoup et de poussée</h3>
+<h4>Exemples de contrecoup par palier</h4>
+<ul>
+<li><strong>Paliers I–II :</strong> Fatigue mineure, effet élémentaire bref (fumée, froid, statique).</li>
+<li><strong>Paliers III–IV :</strong> Dommage 1, Condition temporaire, danger environnemental.</li>
+<li><strong>Palier V :</strong> Dommage 2, Condition majeure, changement environnemental significatif.</li>
+</ul>
+<h4>Options de poussée (accélérer ou amplifier)</h4>
+<ul>
+<li><strong>+1 Effet :</strong> Augmenter le rayon, la durée, ou la puissance d'un cran.</li>
+<li><strong>+1 dé :</strong> Améliorer le jet de lancement (coût : +1 Fatigue).</li>
+<li><strong>Instantané :</strong> Résoudre immédiatement (coût : +1 Dommage).</li>
+<li><strong>Maintenir :</strong> Conserver l'effet par concentration (+1 Fatigue/round).</li>
+</ul>
+<p>Ce cadre fournit des exemples concrets de sorts et démontre comment les MARQUEURS, la mise à l'échelle du DV, et l'ambition interagissent au sein du système magique.</p>
+<h2 id="free-casting-tags-system">Lancer libre (Système de MARQUEURS)</h2>
+<p>Certains lanceurs façonnent des forces brutes à travers une grammaire arcanique partagée appelée <strong>MARQUEURS</strong>. Construisez un sort à la table à l'aide d'une courte phrase de marqueurs.</p>
+<h3>Structure du sort</h3>
+<p><strong>Intention</strong> + <strong>Cible</strong> + <strong>Marqueurs</strong> = effet. Exemple : <em>« Je déchaîne Embrasement • Zone • Force contre les maraudeurs. »</em></p>
+<h3>Valeur de Difficulté de base (DV)</h3>
+<p style="text-align:center;font-size:1.05rem;"><strong>DV = 1 + nombre de MARQUEURS</strong></p>
+<p>Les MARQUEURS dangereux (Téléportation, Transformation, Domination) ajoutent +2 DV au lieu de +1.</p>
+<h3>Jet de lancement</h3>
+<p>Lancez <strong>Esprit + Arcanes</strong> (ou similaire). Réussite = le sort fonctionne. Échec ou n'importe quel 1 = Contrecoup.</p>
+<h3>Contrecoup pour les lanceurs libres</h3>
+<p>Choisissez-en un :</p>
+<ul>
+<li>Dommage 2 (Arcanique)</li>
+<li>+2 Fatigue</li>
+<li>Corruption +1</li>
+<li>Effet secondaire catastrophique (le MJ décrit)</li>
+</ul>
+<p>Si le sort inclut un marqueur « dangereux », le Contrecoup se déclenche aussi sur les résultats <em>mixtes</em>.</p>
+<h3>Bibliothèque de MARQUEURS (abrégée)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Catégorie de MARQUEUR</th><th>Exemples</th></tr>
+<tr><td>Élémentaire</td><td>Embrasement, Gel, Tempête, Pierre, Vague, Vent, Terre, Feu, Eau, Air, Foudre, Cendre</td></tr>
+<tr><td>Force</td><td>Force, Zone, Frappe, Mur, Liaison, Dissipation, Poussée, Traction, Écrasement, Bouclier</td></tr>
+<tr><td>Esprit et Voile</td><td>Voile, Divination, Mémoire, Commandement, Peur, Illusion, Rêve, Chuchotement, Révélation, Dissimulation</td></tr>
+<tr><td>Vie et Corps</td><td>SOIN, Purification, Renforcement, Réveil, Bête, Soin, Poison, Pourriture, Engourdissement, Maladie</td></tr>
+<tr><td>Espace et Mouvement (dangereux, +2 DV)</td><td>Bond, Pli, Portail, Gravité, Phase, Téléportation, Clignement, Ancrage</td></tr>
+<tr><td>Création et Transformation (dangereux, +2 DV)</td><td>Création, Invocation, Transmutation, Animation, Conjuration, Forme, Greffe, Chair-façonnage</td></tr>
+<tr><td>Illusion et Tromperie</td><td>Mirage, Écho, Masque, Copie, Fantasme, Miroitement</td></tr>
+<tr><td>Protection et Garde</td><td>Protection, Défense, Sceau, Barrière, Sanctuaire, Négation</td></tr>
+<tr><td>Temps (rare, dangereux, +2 DV)</td><td>Hâte, Ralentissement, Arrêt, Rembobinage, Vieillissement</td></tr>
+<tr><td>Malédiction et Sort</td><td>Malédiction, Guigne, Liaison, Infortune, Souillure, Corruption</td></tr>
+<tr><td>Information</td><td>Savoir, Perception, Localisation, Souvenir, Traduction</td></tr>
+</table></div>
+</div>
+<h3>Exemples de sorts par DV</h3>
+<ul>
+<li><strong>Lumière</strong> [Illuminer] — DV 2 (1 marqueur)</li>
+<li><strong>Message sur le vent</strong> [Chuchotement] — DV 2</li>
+<li><strong>Bouclier d'air</strong> [Protection] [Défense] — DV 3</li>
+<li><strong>Manteau de flammes</strong> [Embrasement] [Zone] — DV 3</li>
+<li><strong>Mur de pierre</strong> [Barrière] [Fortification] — DV 3 (deux marqueurs), ou DV 4 si le MJ juge le blocage en combat dangereux</li>
+<li><strong>Téléportation</strong> [Bond] [Voile] — [Bond] seul est déjà un marqueur dangereux (+2), donc DV total 3 plutôt que le calcul naïf 1 + 2 + 1 = 4</li>
+</ul>
+<footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Utilisé avec permission, Tous droits réservés.</footer>
+</body>
+</html>
