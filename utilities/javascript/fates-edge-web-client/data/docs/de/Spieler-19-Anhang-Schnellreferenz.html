@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge Spielerhandbuch — Anhang: Schnellreferenz (Deutsch)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    p.subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 1rem; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    dl { margin: 0.4rem 0 0.6rem 0.4rem; }
+    dt { color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1.2rem; color: var(--text2); }
+    .multicols { column-count: 2; column-gap: 2rem; }
+    @media (max-width: 600px) { .multicols { column-count: 1; } }
+    .tree { margin: 0.4rem 0 0.4rem 1rem; }
+    .tree ul { list-style: none; border-left: 1px dashed var(--border); margin-left: 0.6rem; padding-left: 0.9rem; }
+    .tree > ul { border-left: none; margin-left: 0; padding-left: 0; }
+    .tree li { margin: 0.25rem 0; }
+    .branch-label { color: var(--orange); font-weight: 600; font-size: 0.8rem; }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+<aside class="translation-notice" lang="de">Deutsche Version. Maschinell unterstützte Übersetzung; vollständige redaktionelle Überarbeitung steht noch aus. <a href="../players-guide/Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html" hreflang="en">Original auf Englisch ansehen</a></aside>
+<h1 id="reader-section-1">Anhang: Schnellreferenz</h1>
+<p class="subtitle">Fate's Edge Spielerhandbuch — Anhang</p>
+<h2 id="player-tools-and-quick-reference">Spielerwerkzeuge und Schnellreferenz</h2>
+<p>Dieser Anhang bietet leichtgewichtige, tischtaugliche Werkzeuge zur Verfolgung von Charakterfortschritt, Kampagnenzustand und Regeln im Moment. Druckt, kopiert oder übertragt sie auf Karteikarten für den Gebrauch am Tisch.</p>
+<h3>Empfehlungen für physische Zähler</h3>
+<p>Viele Gruppen stellen fest, dass physische, greifbare Zähler das Spiel beschleunigen und die mentale Last reduzieren. Erwägt:</p>
+<ul>
+<li><strong>Pokerchips oder Glasperlen</strong> für Gunsten und Story-Beats (SB). <em>Haltet eine kleine Schale mit Chips in der Tischmitte — gebt sichtbar aus und verdient sichtbar.</em></li>
+<li><strong>Whiteboards oder laminierte Blätter</strong> für Zähler (4/6/8-Segment-Kreise). <em>Nutzt einen Nassabwisch-Marker; zeichnet jede Szene einen neuen Zähler.</em></li>
+<li><strong>Karteikarten (3×5)</strong> für Vorteile und Gefolgsleute. <em>Schreibt den Namen des Vorteils, die freie Nutzung und den Schub auf eine Seite; dreht die Karte bei Nutzung um.</em></li>
+<li><strong>Farbige Büroklammern oder Klemmen</strong> auf Charakterbögen für Erschöpfungs- und Schadensleisten. <em>Schiebt die Klammer hoch oder runter — kein Radieren nötig.</em></li>
+<li><strong>Gedruckte „Zähler-Räder"</strong> (ein in 4/6/8 Segmente geteilter Kreis) in einer Klarsichthülle. <em>Markiert Segmente mit einem Trockenabwisch-Marker, wischt mit einem Tuch ab.</em></li>
+<li><strong>W10-Würfel</strong> zur Verfolgung temporärer Modifikatoren (Position, Effekt oder Schwung). <em>Legt den Würfel neben den betreffenden Zähler und stellt ihn hoch oder runter.</em></li>
+</ul>
+<h3>Auflösungs-Karteikarte</h3>
+<div class="card">
+<p><strong>Verkünden → SL legt DV und Position fest → würfelt Attribut + Fertigkeit in W10 → zählen.</strong></p>
+<p>Jede <strong>6–9</strong> ist 1 Erfolg. Jede <strong>10</strong> ist 2. Jede <strong>1</strong> gibt der SL 1 SB.</p>
+<p>Vergleicht Erfolge (E) mit dem <strong>DV</strong>:</p>
+<p>E ≥ DV, keine 1en → <strong>Klarer Erfolg</strong><br/>
+E ≥ DV, eine oder mehr 1en → <strong>Erfolg mit SB</strong> — ihr bekommt es, die Welt drängt zurück<br/>
+0 &lt; E &lt; DV → <strong>Teilerfolg</strong> — Fortschritt, kein Ankommen; +1 Gunst<br/>
+E = 0 → <strong>Fehlschlag</strong> — es scheitert und verschlechtert sich; +2 Gunsten</p>
+<p><strong>DV</strong> 2 Routine • 3 Standard • 4 schwer • 5+ extrem. <strong>Position</strong> Dominant (einen Fehlschlag neu würfeln) / Kontrolliert / Verzweifelt (einen Erfolg neu würfeln).</p>
+<p><strong>SB</strong> ist der Pool der SL: Komplikationen, Eskalation, Zähler.</p>
+</div>
+<h3>Erschöpfungs- und Schadenszähler</h3>
+<div class="card">
+<p><strong>Erschöpfung:</strong> <span class="fill">________</span> (Max = Körper)<br/>
+<strong>Mentale Belastung:</strong> <span class="fill">________</span><br/>
+<strong>Schaden:</strong> [ ] Schaden 1 (−1 Würfel, zugehörige Handlungen)   [ ] Schaden 2 (−1 Würfel, die meisten Handlungen)   [ ] Schaden 3 (handlungsunfähig oder sterbend)</p>
+<p>Wenn Leisten sich füllen:</p>
+<ul>
+<li>Erschöpfungsüberlauf → Schaden um 1 erhöhen, Erschöpfung löschen.</li>
+<li>Mentale Belastung → verursacht Instabilität oder Nachteil.</li>
+<li>Schaden 3 → Letztes Gefecht oder Anspruch der Schutzmacht (siehe „Optionaler Tod von Spielfiguren" in den Kernregeln).</li>
+</ul>
+</div>
+<h3>SB- und Schwung-Verfolgung</h3>
+<div class="card">
+<p><strong>Aktuelle SB (Pool der SL):</strong> <span class="fill">______</span><br/>
+<strong>Schwung (Gruppenpool, optional — Kap. 18):</strong> <span class="fill">______</span> (max. 2 gebankt pro Sitzung)<br/>
+<strong>Genutzt in dieser Sitzung:</strong> <span class="fill">______</span></p>
+</div>
+<h3>Talentfortschritt</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>EP-Kosten</th><th>Talentart / Wirkung</th></tr>
+<tr><td>2–3 EP</td><td>Kleines Talent — ein situativer Bonus, ein Signatur-Kniff</td></tr>
+<tr><td>4–6 EP</td><td>Großes Talent — eine Spezialisierung, ein starker anhaltender Effekt</td></tr>
+<tr><td>7–10 EP</td><td>Prestige-Talent — kampagnenprägend, meist an eine Voraussetzung gebunden</td></tr>
+<tr><td colspan="2"><em>Talente für Magiezugang werden einzeln bepreist:</em> Vertrauter 2 • Pakt-Flüsterer 2 • Geringer Paktschreiber 2 • Kodex 4 • Symbol der Schutzmacht 4 • Zauberkunst 6 • Pfad des Kantors 8</td></tr>
+</table></div>
+</div>
+<h3>Charakterziele-Karte</h3>
+<div class="card">
+<p><strong>Name:</strong> <span class="fill">____________</span><br/>
+<strong>Kerntrieb:</strong> <span class="fill">____________</span><br/>
+<strong>Kurzfristiges Ziel (1–2 Sitzungen):</strong> <span class="fill">____________</span><br/>
+<strong>Langfristiges Ziel (Bogen):</strong> <span class="fill">____________</span><br/>
+<strong>Hintergrund-Komplikation:</strong> <span class="fill">____________</span><br/>
+<strong>Wichtige Beziehung:</strong> <span class="fill">____________</span></p>
+</div>
+<p><em>Praxistipp:</em> Druckt diese Karte auf Karton, faltet sie in der Mitte und stellt sie vor euch als Erinnerung auf.</p>
+<h3>Fraktions-Haltungskarte</h3>
+<div class="card">
+<p><strong>Fraktionsname:</strong> <span class="fill">_________</span><br/>
+Haltung: −3 −2 −1 0 +1 +2 +3<br/>
+Notizen: <span class="fill">____________________</span></p>
+</div>
+<h3>Spieler-Orientierungskarte (Kurze Prinzipien)</h3>
+<div class="card">
+<p><strong>1. Mutige Handlung verkünden</strong> — Die Fiktion vorantreiben.<br/>
+<strong>2. Konsequenzen akzeptieren</strong> — Komplikationen erzeugen Geschichte.<br/>
+<strong>3. Story-Beats ausgeben</strong> — Momente wichtig machen.<br/>
+<strong>4. Gunsten nutzen</strong> — Neu würfeln, Position verbessern, Vorteile aktivieren.<br/>
+<strong>5. Das Rampenlicht teilen</strong> — Unterstützen, binden, Verbündete vorbereiten.</p>
+</div>
+<h3>Klassen-/Archetyp-Ressourcen-Kurzreferenz</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Archetyp</th><th>Kernressource</th></tr>
+<tr><td>Kämpfer/-in / Krieger/-in</td><td>Manöver, Erschöpfung, Waffenmeister/-in</td></tr>
+<tr><td>Gauner/-in / Kundschafter/-in</td><td>Positionierung, Heimlichkeit, Rückenstoß</td></tr>
+<tr><td>Zauberer/-in (Freiform)</td><td>Zauberkunst, Elementar-Merkmale, Rückschlag</td></tr>
+<tr><td>Runenwahrer/-in</td><td>Riten, Verpflichtung, Kodex</td></tr>
+<tr><td>Anrufer/-in</td><td>Rituale, Symbol der Schutzmacht, Siegel brechen</td></tr>
+<tr><td>Kantor/-in</td><td>Lieder, Korruptionszähler, Repertoire</td></tr>
+<tr><td>Beschwörer/-in</td><td>Leinen-Zähler, Geistbindung, Pakt</td></tr>
+</table></div>
+</div>
+<h3>Wie ihr mit der SL interagiert (Spieler-Anregungen)</h3>
+<ul>
+<li><strong>Fragen:</strong> „Was muss ich würfeln?" — erhaltet DV und Position.</li>
+<li><strong>Vorschlagen:</strong> „Kann ich SB ausgeben, um X zu erreichen?" — verhandelt erzählerische Vorstöße.</li>
+<li><strong>Verkünden:</strong> „Das ist meine Absicht und Methode." — nennt immer, was geschehen soll.</li>
+<li><strong>Anbieten:</strong> „Ich nehme eine Komplikation, wenn Y geschieht." — ladet zu Teufelspakten ein.</li>
+<li><strong>Klären:</strong> „Was steht auf dem Spiel, wenn ich scheitere?" — kennt die Einsätze, bevor ihr würfelt.</li>
+</ul>
+<h3>Ruhephasen-Projektzähler</h3>
+<div class="card">
+<p><strong>Name:</strong> <span class="fill">___________</span>    <strong>Segmente:</strong> [ ] [ ] [ ] [ ] [ ] [ ]<br/>
+<strong>Ziel:</strong> <span class="fill">___________</span><br/>
+<strong>Hindernisse / Benötigte Ressourcen:</strong> <span class="fill">________</span></p>
+</div>
+<p><em>Praxistipp:</em> Nutzt einen 6-Segment-Whiteboard-Zähler. Wischt bei jeder Ruhephase ein Segment weg und würfelt auf Fortschritt.</p>
+<h3>Welche Konsequenz akzeptiert ihr? (Menü für die SL)</h3>
+<p>Wenn ein Spieler scheitert oder teilweise erfolgreich ist, kann die SL eine Wahl aus dieser Liste anbieten (oder eine eigene erfinden):</p>
+<ul>
+<li>Schaden (Stufe 1 oder 2)</li>
+<li>Erschöpfung (1 oder 2)</li>
+<li>Verlorener Vorteil (Position verschlechtert sich, ein Zähler rückt vor)</li>
+<li>Zeitverzögerungen (ein Zähler tickt, eine Frist verkürzt sich)</li>
+<li>Aufmerksamkeit / Hitze (Aufmerksamkeit von Feinden, Kopfgeld)</li>
+<li>Ressourcenverbrauch (Versorgungszähler tickt, Ausrüstung beschädigt)</li>
+<li>Beziehungsbelastung (eine Bindung oder Fraktionshaltung verschlechtert sich)</li>
+</ul>
+<h3>Wege, in Fate's Edge zu glänzen</h3>
+<ul>
+<li>Verbindet Handlungen mit euren Trieben und eurer Vorgeschichte — ruft eure Hintergrund-Gunst an.</li>
+<li>Bietet Komplikationen an und akzeptiert sie — verdient Gunsten.</li>
+<li>Gebt SB aus, um die Szene zu eskalieren oder zu verändern — macht Scheitern unvergesslich.</li>
+<li>Nutzt eure Klassenressource früh und oft — hortet sie nicht.</li>
+<li>Verbindet Szenen mit Kampagnenthemen — nennt die Fraktion oder den Ort.</li>
+<li>Lasst andere Charaktere gut aussehen — unterstützt, bereitet vor, gebt das Rampenlicht weiter.</li>
+</ul>
+<h3>Leere Spieler-Karteikarten (für schnelle Notizen)</h3>
+<div class="card" style="text-align:center;">Name / Gunsten / Erschöpfung / Schaden</div>
+<div class="card" style="text-align:center;">Zähler / Verpflichtung / Szenennotizen</div>
+<h3>Letzte Erinnerung</h3>
+<p><strong>Euer Charakterbogen ist nicht euer Charakter.</strong> Er ist ein Werkzeug, um auszudrücken, wer sie gewesen sind, wer sie werden, und wie ihre Entscheidungen die Welt verändern.</p>
+<p>Nutzt diese Werkzeuge, um diesen Ausdruck lebendig, konsequent und unvergesslich zu machen.</p>
+<h2 id="magic-systems-reference">Referenz der Magiesysteme</h2>
+<p>Magie in Fate's Edge ist vielfältig. Verschiedene Traditionen kanalisieren Macht durch unterschiedliche metaphysische Strukturen, aber alle gehorchen derselben Wahrheit:</p>
+<blockquote><em>Macht hat einen Preis, und Magie formt die, die sie führt.</em></blockquote>
+<p>Dieser Anhang bietet Schnellreferenz-Werkzeuge für Spieler, die magieaffine Systeme, Talismane, Riten und okkulte Praktiken nutzen.</p>
+<h3>Grundlegende magische Prinzipien</h3>
+<div class="card">
+<ul>
+<li>Magie drückt <strong>Identität und Glauben</strong> aus.</li>
+<li>Zaubern erzeugt immer <strong>Konsequenzen irgendwo</strong>.</li>
+<li>Magie schreibt die Realität um durch <strong>Absicht, Struktur oder Opfer</strong>.</li>
+<li>Übermäßige Macht zermürbt <strong>Wahlfreiheit</strong> (siehe Seitenleiste Ikonischer Aufstieg in den vollständigen Regeln).</li>
+</ul>
+</div>
+<h3>Universelle Zauber-Referenz</h3>
+<div class="card">
+<p><strong>Zauber-Verkündungsvorlage:</strong></p>
+<ol>
+<li><strong>Absicht</strong> — Welche Veränderung wollt ihr?</li>
+<li><strong>Form</strong> — Wie drückt eure Tradition sie aus?</li>
+<li><strong>Kosten</strong> — Was riskiert oder verbraucht ihr?</li>
+<li><strong>Auflösung</strong> — Probe; wendet Position-/Effekt-Regeln an.</li>
+<li><strong>Rückwirkung</strong> — Markiert Erschöpfung, SB-Druck, Tabu, Instabilität oder Handel.</li>
+</ol>
+</div>
+<h3>Magie-Traditionen-Kurzreferenz</h3>
+<div class="entry">
+<p class="entry-title">Freiform-Arkana (Zauberei)</p>
+<p><em>Kreatives, rationales, überlegtes Formen.</em> Werkzeuge: Glyphen, Strukturen, Metaphern. Kosten: Erschöpfung, Realitätsrückstoß, SB-Instabilität. <strong>Spielhinweis:</strong> Zeichnet euren Zauber oder nennt seine Symbolik. Große Zauber verzerren das Schicksal — akzeptiert SB-Spitzen.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Angeborene Arkana (Hexerei)</p>
+<p><em>Emotional, instinktiv, blutlinienverbunden.</em> Werkzeuge: Atem, Impuls, Resonanz. Kosten: Erschöpfung, unvorhersehbarer Rückschlag. <strong>Spielhinweis:</strong> Behandelt Magie wie einen Reflex. Geht an eure Grenzen — erwartet Konsequenzen.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Anrufung (Priester/-in / Paladin / Medium)</p>
+<p><em>Bittgebet, Gebet, Pakt, Ritus.</em> Werkzeuge: Symbole, Schwüre, Kraftorte. Kosten: Tabu-Druck, Verpflichtungszähler. <strong>Spielhinweis:</strong> Eure Magie ist nicht eure eigene — rahmt sie als Bitte. Verstöße gegen euren Ethos ziehen Konsequenzen nach sich.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Runische Weihe (Runenwahrertum)</p>
+<p><em>Methoden, Siegel, Verträge.</em> Werkzeuge: Ritualschritte, Kodizes, Bindungsklauseln. Kosten: Hungerzähler, Eskalationsschleifen. <strong>Spielhinweis:</strong> Magie ist <em>Verfahren</em>. Erwartet, dass das System zurückdrängt.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Formung / Druidische Macht</p>
+<p><em>Resonanz mit Ort, Element, Kreislauf.</em> Werkzeuge: Zeichen, Opfergaben, saisonale Riten. Kosten: Umgebungsecho, territoriale Konsequenz. <strong>Spielhinweis:</strong> Verkündet, was das Land will — dann handelt.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Paktbindung (Hexenmeister/-in / Avatar)</p>
+<p><em>Tausch, Hunger, Verwandlung.</em> Werkzeuge: Marken, Unterschriften, Spiegelzeichen. Kosten: Autonomieverlust, Aufstiegsrisiko. <strong>Spielhinweis:</strong> Fragt: „Was bekommt meine Schutzmacht?" Schuld wird zur Handlung.</p>
+</div>
+<div class="entry">
+<p class="entry-title">Beschwörung (Medium / Nekromant/-in / Schamane/-in)</p>
+<p><em>Anrufung von Wesen, Bindung, Vasallenhandlung.</em> Werkzeuge: Kreise, Handel, Laternen, Ahnenrufe. Kosten: Aufmerksamkeitszähler, Durchbruchsrisiko. <strong>Spielhinweis:</strong> Gebt dem Beschworenen eine Persönlichkeit — seine Hilfe kommt mit Forderungen.</p>
+</div>
+<h3>Gemeinsame Regeln magischer Kosten</h3>
+<p style="text-align:center;"><strong>Keine Magie ist kostenlos.</strong></p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Kostenart</th><th>Beispiele im Spiel</th></tr>
+<tr><td>Erschöpfung</td><td>Erschöpfungsschub, zitternde Konzentration, körperliche Belastung</td></tr>
+<tr><td>SB-Druck</td><td>Die SL verschärft Komplikationen oder Zähler (elementarer Rückschlag, Vorzeichen der Schutzmacht)</td></tr>
+<tr><td>Tabu / Verpflichtung</td><td>Gebote, Riten, Strafe für Missbrauch, Forderungen der Schutzmacht</td></tr>
+<tr><td>Aufmerksamkeit / Rückwirkung</td><td>Geister werden aufmerksam; das kosmische Kontobuch tickt; Fraktionen werden aufmerksam</td></tr>
+<tr><td>Anomalie / Verzerrung</td><td>Orte reagieren, Realität verzerrt sich, Rituale echoen — Szenenmerkmale ändern sich</td></tr>
+<tr><td>Identitätszermürbung</td><td>Erzwungene Handlungen, Gesinnungswandel, Risiko Ikonischen Aufstiegs</td></tr>
+</table></div>
+</div>
+<h3>Systemübergreifende Synergien</h3>
+<p>Alle Magiesysteme können sich vermischen. Ein/e Runenwahrer/-in mag einen Kleriker oder Druiden nachahmen; ein/e Anrufer/-in mag als Paladin oder Prophet/-in wirken; ein/e Hexer/-in mag wie eine Hexe, Elementarist/-in oder Psioniker/-in aussehen.</p>
+<p>Beim Kombinieren von Systemen:</p>
+<ol>
+<li>Wählt euren <strong>primären Ausdruck</strong> (Glaube, Verstand, Instinkt, Ritual).</li>
+<li>Beschreibt Zauber durch diese Linse.</li>
+<li>Lasst Kosten euer System widerspiegeln.</li>
+<li>Verfolgt Konsequenzen getrennt — das Mischen von Systemen erhöht das Risiko.</li>
+</ol>
+<h3>Erinnerungen für die SL zur Magie</h3>
+<ul>
+<li>Magie erzeugt Geschichte — belohnt ihre Nutzung mit Konsequenzen und Schwung.</li>
+<li>Spieler sollten die Methode erzählen, nicht nur den Effekt.</li>
+<li>Große Momente sollten Szenen verändern, nicht nur Zahlen.</li>
+<li>Magie sollte die Zauberperson verlocken — ihre Triebe und Schwächen widerspiegeln.</li>
+</ul>
+<h3>Erinnerungen für Spieler zur Magie</h3>
+<ul>
+<li>Lehnt euch in die Kosten hinein — Magie fühlt sich bedeutsam an, wenn sie wehtut.</li>
+<li>Macht Magie persönlich — beschreibt, wie sie aussieht und sich anfühlt.</li>
+<li>Verbindet Kräfte mit Identität, Glauben, Trauma, Pflicht oder Vermächtnis.</li>
+<li>Lasst Magie euren Charakter mit der Zeit verändern.</li>
+</ul>
+<h2 id="pre-made-spells-with-tags-and-dv-math">Vorgefertigte Zauber mit MERKMALEN und DV-Rechnung</h2>
+<p>Die folgenden Beispiele veranschaulichen, wie MERKMALE, DV-Skalierung und Zauberabsicht innerhalb des Zaubersystems zusammenwirken. Nutzt sie als Inspiration oder als Vorlagen für eure eigenen Zauber.</p>
+<h3>Wie man einen Zaubereintrag liest</h3>
+<p>Jeder Eintrag enthält:</p>
+<ul>
+<li><strong>Name</strong> und <strong>Tradition</strong> (optional).</li>
+<li><strong>MERKMALE</strong> — die Komponenten, die den Effekt definieren.</li>
+<li><strong>Effekt</strong> — Ergebnis in einfacher Sprache.</li>
+<li><strong>DV</strong> — Basisberechnung (1 + Anzahl der Merkmale; gefährliche Merkmale addieren +2).</li>
+<li><strong>Notizen</strong> — typische Reichweite, Dauer oder besondere Überlegungen.</li>
+</ul>
+<h3>Stufe I: Kleiner Nutzen (DV 2–3)</h3>
+<div class="spell">
+<p class="spell-name">Einfaches Licht <span class="text-muted" style="color:var(--text3);font-weight:400;">(Luft + Licht)</span></p>
+<p class="spell-tags">[ERLEUCHTEN]</p>
+<p><strong>Effekt:</strong> Erzeugt ein kleines anhaltendes Licht (Fackelhelligkeit) für die Szene.<br/>
+<strong>DV:</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notizen:</strong> Kein Rückschlagrisiko; hält an, bis es beendet wird.</p>
+</div>
+<div class="spell">
+<p class="spell-name">HEILEN Kleine Wunden <span class="text-muted" style="color:var(--text3);font-weight:400;">(Leben + HEILEN)</span></p>
+<p class="spell-tags">[HEILEN]</p>
+<p><strong>Effekt:</strong> Schließt einen kleinen Schnitt oder Bluterguss; reduziert 1 Erschöpfung (gering).<br/>
+<strong>DV:</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notizen:</strong> Erfordert Berührung.</p>
+</div>
+<div class="panel panel-orange">
+<h4>Schaden und Erschöpfung heilen</h4>
+<p><strong>HEILEN als Zauberspruch.</strong> Das Merkmal <code>HEILEN</code> (Leben) kann als einaktiger Zauberspruch gewirkt werden (DV 2). Bei Erfolg entfernt ihr <strong>1 Erschöpfung</strong> von euch selbst oder einem berührten Verbündeten. Das kann keinen Schaden heilen.</p>
+<p><strong>Schaden heilen (1 Stufe).</strong> Um eine Schadensstufe wiederherzustellen, müsst ihr das Merkmal <code>HEILEN</code> einbeziehen und entweder:</p>
+<ul>
+<li>einen <strong>+2-DV-Modifikator</strong> zum Zauber hinzufügen, oder</li>
+<li><code>HEILEN</code> mit einem zweiten passenden Merkmal kombinieren (z. B. <code>Reinigen</code>, <code>Stärken</code>, <code>Läutern</code>).</li>
+</ul>
+<p>Die SL legt den endgültigen DV basierend auf den Merkmalen und der Schwere der Wunde fest.</p>
+<p><em>Warum?</em> Erschöpfung ist Müdigkeit — ein schneller Zauber kann müde Muskeln lindern. Schaden ist Verletzung — Wunden zu schließen verlangt mehr Macht und Risiko. Das hält Heilung bedeutsam, ohne die körperliche Ausdauer zu überschatten.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Botschaft auf dem Wind <span class="text-muted" style="color:var(--text3);font-weight:400;">(Luft + Schleier)</span></p>
+<p class="spell-tags">[FLÜSTERN]</p>
+<p><strong>Effekt:</strong> Trägt eine kurze geflüsterte Botschaft 30 Meter weit auf Windströmungen.<br/>
+<strong>DV:</strong> 1 + 1 = <strong>2</strong>.<br/>
+<strong>Notizen:</strong> Einwegkommunikation; 30 Sekunden Dauer.</p>
+</div>
+<h3>Stufe II: Kampfnutzen (DV 3–4)</h3>
+<div class="spell">
+<p class="spell-name">Klingenflamme <span class="text-muted" style="color:var(--text3);font-weight:400;">(Feuer + Schlag)</span></p>
+<p class="spell-tags">[BRENNEND][SCHLAG]</p>
+<p><strong>Effekt:</strong> Umhüllt eine Waffe mit Feuer, fügt +1 Schaden und [BRENNEN] zum nächsten Nahkampfangriff hinzu.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notizen:</strong> Hält einen Schlagabtausch lang an.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Luftschild <span class="text-muted" style="color:var(--text3);font-weight:400;">(Luft + Wand)</span></p>
+<p class="spell-tags">[SCHUTZ][VERTEIDIGEN]</p>
+<p><strong>Effekt:</strong> Erzeugt eine komprimierte Luftbarriere; erhaltet Position +1 bei der nächsten Verteidigung.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notizen:</strong> Nur einmalige Nutzung.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Flinker Schritt <span class="text-muted" style="color:var(--text3);font-weight:400;">(Luft + Sprung)</span></p>
+<p class="spell-tags">[HAST][BEWEGEN]</p>
+<p><strong>Effekt:</strong> Verdoppelt die Bewegungsgeschwindigkeit für einen Schlagabtausch.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>.<br/>
+<strong>Notizen:</strong> Erfordert offenen Raum.</p>
+</div>
+<h3>Stufe III: Flächenkontrolle (DV 4–5)</h3>
+<div class="spell">
+<p class="spell-name">Steinwand <span class="text-muted" style="color:var(--text3);font-weight:400;">(Erde + Wand)</span></p>
+<p class="spell-tags">[BARRIERE][BEFESTIGEN]</p>
+<p><strong>Effekt:</strong> Beschwört eine 3 Meter hohe Steinwand (Mittel; Dauer der Szene).<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Gefährlicher DV:</em> <strong>4</strong> (Kampfblockade).<br/>
+<strong>Notizen:</strong> Bietet Deckung; behindert Bewegung.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Sanfte Berührung des Schlafs <span class="text-muted" style="color:var(--text3);font-weight:400;">(Wasser + Geist)</span></p>
+<p class="spell-tags">[TRAUM][BEFEHLEN]</p>
+<p><strong>Effekt:</strong> Ein Ziel schläft ein (Dauer der Szene; Widerstand: Geist + Einsicht DV 2).<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Gefährlicher DV:</em> <strong>4</strong> (Kampfeinsatz).<br/>
+<strong>Notizen:</strong> Schaden weckt das Ziel.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Flammenmantel <span class="text-muted" style="color:var(--text3);font-weight:400;">(Feuer + Fläche)</span></p>
+<p class="spell-tags">[BRENNEND][FLÄCHE]</p>
+<p><strong>Effekt:</strong> 2-Meter-Radius intensiver Hitze; Feinde erleiden −1 Würfel bei Annäherung.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Gefährlicher DV:</em> <strong>4</strong> (falls Verbündete in der Nähe sind).<br/>
+<strong>Notizen:</strong> Erzeugt schwieriges Gelände.</p>
+</div>
+<h3>Stufe IV: Schlachtfeldformung (DV 5)</h3>
+<div class="spell">
+<p class="spell-name">Erdbeben <span class="text-muted" style="color:var(--text3);font-weight:400;">(Erde + Kraft)</span></p>
+<p class="spell-tags">[BEBEN][FLÄCHE]</p>
+<p><strong>Effekt:</strong> 6-Meter-Erschütterung; Feinde würfeln Körper + Athletik (DV 3) oder fallen zu Boden.<br/>
+<strong>DV:</strong> 1 + 1 + 1 = <strong>3</strong>. <em>Gefährlicher DV:</em> <strong>5</strong>.<br/>
+<strong>Notizen:</strong> Destabilisiert Bauwerke; betrifft alle im Bereich.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Zorn des Sturms <span class="text-muted" style="color:var(--text3);font-weight:400;">(Luft + Sturm)</span></p>
+<p class="spell-tags">[STURM][FLÄCHE][KRAFT]</p>
+<p><strong>Effekt:</strong> 9-Meter-Sturmwolke; Blitze treffen zufällige Ziele (Schaden 2).<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>. <em>Gefährlicher DV:</em> <strong>6</strong>.<br/>
+<strong>Notizen:</strong> Hält die Szene an; reduziert Sichtweite.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Heilkreis <span class="text-muted" style="color:var(--text3);font-weight:400;">(Leben + Fläche)</span></p>
+<p class="spell-tags">[HEILEN][FLÄCHE][LÄUTERN]</p>
+<p><strong>Effekt:</strong> Verbündete in 4,5-Meter-Radius heilen 1 Schaden und löschen 1 Erschöpfung.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notizen:</strong> Größerer positiver Effekt rechtfertigt hohen DV.</p>
+</div>
+<h3>Stufe V: Effekte auf Domänenebene (DV 5)</h3>
+<div class="spell">
+<p class="spell-name">Tor des Durchgangs <span class="text-muted" style="color:var(--text3);font-weight:400;">(Luft + Falte)</span></p>
+<p class="spell-tags">[TOR][TRANSPORT][FLÄCHE]</p>
+<p><strong>Effekt:</strong> Öffnet ein 6 Meter breites Zweiwege-Portal, das zwei Orte verbindet.<br/>
+<strong>DV:</strong> 1 + 2 + 1 + 1 = <strong>5</strong>. <em>Gefährlicher DV:</em> <strong>7</strong>.<br/>
+<strong>Notizen:</strong> Erfordert Konzentration; kann destabilisieren.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Armee aus Stein <span class="text-muted" style="color:var(--text3);font-weight:400;">(Erde + Beschwörung)</span></p>
+<p class="spell-tags">[BESCHWÖREN][FLÄCHE][WACHE]</p>
+<p><strong>Effekt:</strong> Beschwört 4 Steinwächter (Cap 2), die einfachen Befehlen folgen.<br/>
+<strong>DV:</strong> 1 + 2 + 1 + 1 = <strong>5</strong>. <em>Gefährlicher DV:</em> <strong>6</strong>.<br/>
+<strong>Notizen:</strong> Dauer der Szene; Konzentration.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Herrschaft über den Geist <span class="text-muted" style="color:var(--text3);font-weight:400;">(Schicksal + Geist)</span></p>
+<p class="spell-tags">[BEFEHLEN][FLÄCHE][FLUCH]</p>
+<p><strong>Effekt:</strong> Alle Feinde in 7,5-Meter-Radius würfeln Geist + Einsicht (DV 4) oder gehorchen einem einzelnen Befehl.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 2 = <strong>5</strong>. <em>Gefährlicher DV:</em> <strong>7</strong>.<br/>
+<strong>Notizen:</strong> Bedeutendes ethisches Risiko; Rückschlag wahrscheinlich.</p>
+</div>
+<h3>Signatur-/Persönliche Zauber (Benutzerdefiniert)</h3>
+<div class="spell">
+<p class="spell-name">Die Bindung des Wächters <span class="text-muted" style="color:var(--text3);font-weight:400;">(Leben + Bindung) — Heilende/-r Kantor/-in</span></p>
+<p class="spell-tags">[HEILEN][BINDUNG][WACHE]</p>
+<p><strong>Effekt:</strong> Heilt 2 Schaden und verbindet die Zauberperson mit dem Ziel — den nächsten Schaden, den es nimmt, erleidet stattdessen die Zauberperson zu 1.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notizen:</strong> Opferschutz.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Schrittwechsel des Schattens <span class="text-muted" style="color:var(--text3);font-weight:400;">(Luft + Schleier) — Weg des Tricksters</span></p>
+<p class="spell-tags">[SCHLEIER][BEWEGEN][SPRUNG]</p>
+<p><strong>Effekt:</strong> Wird unsichtbar und teleportiert 9 Meter; erhält +2 Würfel bei der nächsten Heimlichkeitshandlung.<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notizen:</strong> Erfordert Schatten oder schwaches Licht.</p>
+</div>
+<div class="spell">
+<p class="spell-name">Wahrheit der Schmiede <span class="text-muted" style="color:var(--text3);font-weight:400;">(Feuer + Enthüllen) — Handwerk des Artifexes</span></p>
+<p class="spell-tags">[ENTHÜLLEN][HEILEN][BEFESTIGEN]</p>
+<p><strong>Effekt:</strong> Sieht Fehler in einem Gegenstand und repariert, als wäre die Fertigkeit 2 Stufen höher (Szene).<br/>
+<strong>DV:</strong> 1 + 1 + 1 + 1 = <strong>4</strong>.<br/>
+<strong>Notizen:</strong> Funktioniert bei magischen Gegenständen (mit Risiko).</p>
+</div>
+<h3>Richtlinien für Rückschlag und Pushen</h3>
+<h4>Rückschlag-Beispiele nach Stufe</h4>
+<ul>
+<li><strong>Stufe I–II:</strong> Geringe Erschöpfung, kurzer elementarer Effekt (Rauch, Kälte, Statik).</li>
+<li><strong>Stufe III–IV:</strong> Schaden 1, temporärer Zustand, Umgebungsgefahr.</li>
+<li><strong>Stufe V:</strong> Schaden 2, größerer Zustand, bedeutende Umgebungsveränderung.</li>
+</ul>
+<h4>Push-Optionen (Beschleunigen oder Verstärken)</h4>
+<ul>
+<li><strong>+1 Effekt:</strong> Radius, Dauer oder Stärke um eine Stufe erhöhen.</li>
+<li><strong>+1 Würfel:</strong> Zauberwurf verbessern (Kosten: +1 Erschöpfung).</li>
+<li><strong>Sofort:</strong> Sofort auflösen (Kosten: +1 Schaden).</li>
+<li><strong>Aufrechterhalten:</strong> Effekt mit Konzentration aufrechterhalten (+1 Erschöpfung/Runde).</li>
+</ul>
+<p>Dieses Rahmenwerk liefert konkrete Zauberbeispiele und zeigt, wie MERKMALE, DV-Skalierung und Ambition innerhalb des Magiesystems zusammenwirken.</p>
+<h2 id="free-casting-tags-system">Freies Zaubern (MERKMAL-System)</h2>
+<p>Manche Zauberpersonen formen rohe Kräfte durch eine gemeinsame arkane Grammatik namens <strong>MERKMALE</strong>. Baut am Tisch einen Zauber mit einer kurzen Phrase aus Merkmalen.</p>
+<h3>Zauberstruktur</h3>
+<p><strong>Absicht</strong> + <strong>Ziel</strong> + <strong>Merkmale</strong> = Effekt. Beispiel: <em>„Ich entfessle Brennend • Fläche • Kraft gegen die Plünderer."</em></p>
+<h3>Basis-Schwierigkeitswert (DV)</h3>
+<p style="text-align:center;font-size:1.05rem;"><strong>DV = 1 + Anzahl der MERKMALE</strong></p>
+<p>Gefährliche MERKMALE (Teleportation, Verwandlung, Beherrschung) addieren +2 DV statt +1.</p>
+<h3>Zauberwurf</h3>
+<p>Würfelt <strong>Verstand + Arkana</strong> (oder Ähnliches). Erfolg = der Zauber wirkt. Fehlschlag oder eine 1 = Rückschlag.</p>
+<h3>Rückschlag für freie Zauberer/-innen</h3>
+<p>Wählt eins:</p>
+<ul>
+<li>Schaden 2 (Arkan)</li>
+<li>+2 Erschöpfung</li>
+<li>Korruption +1</li>
+<li>Katastrophaler Nebeneffekt (SL beschreibt)</li>
+</ul>
+<p>Enthält der Zauber ein „gefährliches" MERKMAL, wird Rückschlag auch bei <em>gemischten</em> Ergebnissen ausgelöst.</p>
+<h3>Merkmalbibliothek (Gekürzt)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Merkmalkategorie</th><th>Beispiele</th></tr>
+<tr><td>Elementar</td><td>Brennend, Gefrierend, Sturm, Stein, Woge, Wind, Erde, Feuer, Wasser, Luft, Blitz, Asche</td></tr>
+<tr><td>Kraft</td><td>Kraft, Fläche, Schlag, Wand, Bindung, Bannen, Stoßen, Ziehen, Zermalmen, Schild</td></tr>
+<tr><td>Geist &amp; Schleier</td><td>Schleier, Weitsicht, Erinnerung, Befehlen, Furcht, Blendwerk, Traum, Flüstern, Enthüllen, Verbergen</td></tr>
+<tr><td>Leben &amp; Körper</td><td>HEILEN, Reinigen, Stärken, Erwecken, Bestie, Heilen, Gift, Fäulnis, Betäuben, Kranken</td></tr>
+<tr><td>Raum &amp; Bewegung (gefährlich, +2 DV)</td><td>Sprung, Falte, Tor, Schwerkraft, Phase, Teleport, Blinzeln, Anker</td></tr>
+<tr><td>Erschaffung &amp; Verwandlung (gefährlich, +2 DV)</td><td>Erschaffen, Beschwören, Transmutieren, Beleben, Herbeirufen, Formen, Pfropfen, Fleischwerk</td></tr>
+<tr><td>Illusion &amp; Täuschung</td><td>Trugbild, Echo, Maske, Kopie, Phantasma, Schimmer</td></tr>
+<tr><td>Schutz &amp; Bannung</td><td>Schutz, Verteidigen, Siegel, Barriere, Zufluchtsort, Aufheben</td></tr>
+<tr><td>Zeit (selten, gefährlich, +2 DV)</td><td>Hast, Verlangsamen, Anhalten, Zurückspulen, Altern</td></tr>
+<tr><td>Fluch &amp; Hexe</td><td>Fluch, Verwünschung, Bindung, Unglück, Befleckung, Verderben</td></tr>
+<tr><td>Information</td><td>Wissen, Spüren, Orten, Erinnern, Übersetzen</td></tr>
+</table></div>
+</div>
+<h3>Beispielzauber nach DV</h3>
+<ul>
+<li><strong>Licht</strong> [Erleuchten] — DV 2 (1 Merkmal)</li>
+<li><strong>Botschaft auf dem Wind</strong> [Flüstern] — DV 2</li>
+<li><strong>Luftschild</strong> [Schutz] [Verteidigen] — DV 3</li>
+<li><strong>Flammenmantel</strong> [Brennend] [Fläche] — DV 3</li>
+<li><strong>Steinwand</strong> [Barriere] [Befestigen] — DV 3 (zwei Merkmale), oder DV 4, falls die SL Kampfblockade als gefährlich einstuft</li>
+<li><strong>Teleport</strong> [Sprung] [Schleier] — [Sprung] allein ist bereits ein gefährliches Merkmal (+2), daher Gesamt-DV 3 statt der naiven 1 + 2 + 1 = 4</li>
+</ul>
+<footer class="doc-footer">Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Verwendet mit Genehmigung, Alle Rechte vorbehalten.</footer>
+</body>
+</html>
