@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge Spielerhandbuch — Kapitel 2: Charaktererstellung — Zusammenfassung (Deutsch)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    p.subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 1rem; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    dl { margin: 0.4rem 0 0.6rem 0.4rem; }
+    dt { color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1.2rem; color: var(--text2); }
+    .multicols { column-count: 2; column-gap: 2rem; }
+    @media (max-width: 600px) { .multicols { column-count: 1; } }
+    .tree { margin: 0.4rem 0 0.4rem 1rem; }
+    .tree ul { list-style: none; border-left: 1px dashed var(--border); margin-left: 0.6rem; padding-left: 0.9rem; }
+    .tree > ul { border-left: none; margin-left: 0; padding-left: 0; }
+    .tree li { margin: 0.25rem 0; }
+    .branch-label { color: var(--orange); font-weight: 600; font-size: 0.8rem; }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+<aside class="translation-notice" lang="de">Deutsche Version. Maschinell unterstützte Übersetzung; vollständige redaktionelle Überarbeitung steht noch aus. <a href="../players-guide/Players-_-Guide-_-02-_-Character-_-Creation.html" hreflang="en">Original auf Englisch ansehen</a></aside>
+<h1 id="reader-section-1">Charaktererstellung — Zusammenfassung</h1>
+<p class="subtitle">Fate's Edge Spielerhandbuch — Kapitel 2</p>
+<div class="panel panel-blue">
+<span class="panel-title">Schnellstart</span>
+    Dieses Kapitel führt dich in etwa 10–15 Minuten durch die Erstellung eines Charakters. Folge den Schritten der Reihe nach. Die meisten Entscheidungen ergeben sich aus deinem Charakterkonzept; die Zahlen kommen später.
+</div>
+<h2 id="mindset">Wie ein Fate's-Edge-Spieler denkt</h2>
+<p>Bevor du auch nur einen Punkt Erfahrung vergibst, nimm dir einen Moment, um die Denkweise zu verstehen, die Fate's Edge zum Klingen bringt. Dies ist kein Spiel der Optimierung oder perfekter Builds — es ist ein Spiel bedeutsamer Entscheidungen, dramatischer Risiken und gemeinsamen Erzählens.</p>
+<h3>Nimm die Fiktion ernst</h3>
+<p>Dein Charakter ist keine Ansammlung von Zahlen — er ist eine lebendige Geschichte. Wenn du eine Handlung ansagst, denke zuerst daran, was dein Charakter in diesem Moment tun würde, und lass erst danach die Mechanik folgen. Die Würfel sind keine Hürde für deine Kreativität — sie sind ein Gesprächspartner. Eine gewürfelte 1 ist kein Scheitern — sie ist eine Einladung an die Welt, zurückzudrängen, und genau dieses Zurückdrängen macht die Geschichte unvergesslich.</p>
+<h3>Gib deine Gunsten aus</h3>
+<p>Gunsten sind keine EP-Marken. Sie sind dramatischer Treibstoff. Wer sie für die Umwandlung horten (2 Gunsten → 1 EP), hungert den Tisch nach Spannung aus und beraubt sich selbst des eigenen Sicherheitsnetzes. Eine Gunst, ausgegeben, um einen kritischen Fehlschlag neu zu würfeln oder die Position vor einem verzweifelten Wagnis zu verbessern, schafft einen Moment, an den sich der ganze Tisch erinnern wird. Die EP kommen aus deinen Abenteuern; die Gunsten sind für die Geschichten, die du gerade jetzt erzählst.</p>
+<h3>Nimm das Scheitern an</h3>
+<p>Ein Fehlschlag bedeutet niemals „nichts passiert". Er ist eine Gelegenheit für die SL zu eskalieren, für deinen Charakter zu lernen, und für die Gruppe sich anzupassen. Wenn du scheiterst, erhältst du 2 Gunsten — das System belohnt dich dafür, dich ins Risiko zu lehnen. Behandle jeden Fehlschlag als Geschenk: Er verändert die Lage, gibt dir Ressourcen und macht den späteren Erfolg süßer.</p>
+<h3>Du bist Mitgestalter/-in</h3>
+<p>Die SL setzt den Druck; du treibst die Fiktion voran. Du versuchst nicht, das Spiel zu „schlagen" oder die SL auszutricksen. Ihr arbeitet zusammen, um eine mitreißende Geschichte zu erzählen. Wenn du deine Handlungen detailreich beschreibst — den Staub in den Augen zeigst, das Zittern im Arm, das verzweifelte Gebet, das du flüsterst — gibst du der SL die Erlaubnis, dich mit Position, Effekt oder sogar einer kostenlosen Gunst zu belohnen. Ausschmückung ist kostenlos, und sie ist dein größtes Werkzeug.</p>
+<h3>Kenne deine Ressourcen</h3>
+<p>Du führst selbst Buch über deine Verpflichtung, Erschöpfung, Schaden und Gunsten. Halte deinen Bogen sichtbar und deine Zähler aktuell. Wenn deine Verpflichtung fast ihre Kapazität erreicht, ist das keine Warnung — es ist ein Versprechen künftiger Abenteuer. Wenn deine Erschöpfung hoch ist, ist das keine Strafe — es ist eine Chance für ein dramatisches Comeback. Nimm deine Ressourcen in Besitz und nutze sie als erzählerische Hebel.</p>
+<h3>Vertrau dem System</h3>
+<p>Der Kernablauf (Attribut + Fertigkeit, Position, DV, Ergebnismatrix) trägt jede Szene zuverlässig. Wenn du eine Regel vergisst, greife auf die Goldene Regel zurück: Triff die Wahl, die der Geschichte dient. Der Rest folgt von selbst.</p>
+<h3>Spiel, um herauszufinden</h3>
+<p>Du weißt nicht, wie die Szene endet — genauso wenig wie die SL. Diese Ungewissheit ist der Herzschlag des Spiels. Lehn dich hinein. Stell Fragen, geh Risiken ein und lass die Würfel singen. Die unvergesslichsten Sitzungen entstehen aus Charakteren, die mutig handeln und die Konsequenzen akzeptieren.</p>
+<blockquote>
+„Die Straße verspricht keine sichere Reise — nur eine wahre."
+<span class="attribution">— Der Graue Wanderer</span>
+</blockquote>
+<h2 id="engagement-flowchart">Einstiegsdiagramm für Spielerbeteiligung</h2>
+<p>Fate's Edge ist von Natur aus modular. Ihr könnt nur mit dem Kernwürfelsystem spielen und sonst nichts — oder Schicht für Schicht Komplexität hinzufügen, sobald sich euer Tisch damit wohlfühlt. Das folgende Diagramm hilft euch bei dieser Wahl. Beginnt oben und folgt dem Pfad, der zu eurem bevorzugten Spielstil passt. Denkt daran: Ihr könnt euch jederzeit für oder gegen Teilsysteme entscheiden, wenn sich euer Charakter weiterentwickelt und die Kampagne es verlangt.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Komplexitäts-Einstiegsdiagramm für Fate's-Edge-Spieler</span>
+<div class="tree">
+<ul>
+<li><strong>Beginnt hier:</strong> Was wollt ihr?
+            <ul>
+<li><span class="branch-label">Nur mit dem Kernwürfelsystem spielen?</span>
+<ul>
+<li><span class="branch-label">Ja →</span> <strong>Nur Kernablauf</strong> — Attribute + Fertigkeiten, keine Talente, keine Vorteile.</li>
+<li><span class="branch-label">Nein →</span> Wollt ihr eine besondere Stärke?
+                            <ul>
+<li><span class="branch-label">Nein →</span> Nehmt 1–2 <strong>kleine Talente</strong>, dann weiter zu: Wollt ihr Magie?</li>
+<li><span class="branch-label">Ja →</span> Wollt ihr Magie?
+                                    <ul>
+<li><span class="branch-label">Nein →</span> Wählt eine <strong>Schutzmacht + einen Magiepfad</strong>, dann weiter zu: Wollt ihr Einfluss abseits der Bühne?</li>
+<li><span class="branch-label">Ja →</span> Wollt ihr Einfluss abseits der Bühne?
+                                            <ul>
+<li><span class="branch-label">Nein →</span> Erwerbt einen <strong>Vorteil oder Gefolgsmann</strong>, dann weiter zu: Wollt ihr ein gemeinsames Vermächtnis aufbauen?</li>
+<li><span class="branch-label">Ja →</span> Wollt ihr ein gemeinsames Vermächtnis aufbauen?
+                                                    <ul>
+<li><span class="branch-label">Nein →</span> Gründet einen <strong>Trust</strong> mit eurer Gruppe.</li>
+<li><span class="branch-label">Ja →</span> <strong>Mischt alle Ebenen!</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<h3>So benutzt ihr dieses Diagramm</h3>
+<ul>
+<li><strong>Nur Kernablauf:</strong> Perfekt für Einzelabenteuer oder Spieler, die eine reine Erzählerfahrung wollen. Ihr seid in jeder Szene voll handlungsfähig — Attribute und Fertigkeiten geben euch reichlich Würfel.</li>
+<li><strong>Kleine Talente:</strong> Fügt ein oder zwei markante Kniffe hinzu (z. B. Scharfe Sinne, Zweiter Atem), um eurem Charakter eine mechanische Identität ohne großen Aufwand zu geben.</li>
+<li><strong>Schutzmacht + Magie:</strong> Wählt eine Schutzmacht und einen der fünf Magiepfade (Runenwahrer/-in, Anrufer/-in, Kantor/-in, Beschwörer/-in oder Freie/-r Zauberer/Zauberin). Das bringt Ressourcenverwaltung (Verpflichtung, Korruption usw.) mit sich, eröffnet aber neue erzählerische und mechanische Möglichkeiten.</li>
+<li><strong>Vorteile/Gefolgsleute:</strong> Erweitert euren Einfluss über euren Charakterbogen hinaus. Vorteile sind Ressourcen abseits der Bühne; Gefolgsleute sind Verbündete auf der Bühne. Beide brauchen Pflege, bieten dafür aber dauerhaften Hebel.</li>
+<li><strong>Trusts:</strong> Legt EP mit eurer Gruppe zusammen, um eine gemeinsame Organisation aufzubauen — eine Gilde, ein Handelshaus, ein Spionagenetzwerk. Das ist für lange Kampagnen und kollektives Vermächtnis gedacht.</li>
+<li><strong>Mischen und kombinieren:</strong> Ihr könnt jede beliebige oder alle Ebenen kombinieren. Das System ist modular; ihr seid nicht auf einen einzigen Pfad festgelegt. Ihr könnt einfach beginnen und Komplexität hinzufügen, während eure Kampagne wächst.</li>
+</ul>
+<h3>Eine Anmerkung zum Fortschritt</h3>
+<p>Ihr werdet niemals dafür bestraft, den einfacheren Pfad zu wählen. Ein Charakter mit hohen Attributen und Fertigkeiten ist genauso fähig wie einer mit vielen Talenten und Schutzmächten — sie drücken ihre Stärke nur unterschiedlich aus. Das Spiel wiegt Breite gegen Tiefe auf, und beides ist gültig. Wählt, was euch begeistert, und ändert später eure Meinung. Die Straße ist lang, und der Graue Wanderer geht sie mit euch.</p>
+<h2 id="overview">Überblick</h2>
+<p>Mit der Philosophie und dem Einstiegsrahmen im Hinterkopf seid ihr bereit, euren Charakter zu bauen. Ihr beginnt auf <strong>Stufe I (Novize/Novizin)</strong> mit <strong>32 Erfahrungspunkten (EP)</strong>. Bindungen und Komplikationen können zusammen bis zu <strong>+4 EP</strong> hinzufügen — je +2, insgesamt vier, wie auch immer ihr sie aufteilt (siehe Schritt 8). Maximale Start-EP: <strong>36</strong>.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Schritt</th><th>Wo die Regeln stehen</th><th>Zeit</th></tr></thead>
+<tbody>
+<tr><td><a href="#step1">1. Konzept &amp; Abstammung</a></td><td>Hier; Herkunftstabelle in Kapitel 12</td><td>2 Min.</td></tr>
+<tr><td><a href="#step2">2. Attribute</a></td><td>Kapitel Kernmechaniken</td><td>2 Min.</td></tr>
+<tr><td><a href="#step3">3. Fertigkeiten</a></td><td>Kapitel Kernmechaniken</td><td>2 Min.</td></tr>
+<tr><td><a href="#step4">4. Talente (optional)</a></td><td>Kapitel Talente</td><td>3 Min.</td></tr>
+<tr><td><a href="#step5">5. Schutzmacht (optional)</a></td><td>Kapitel Weltmächte &amp; Schutzmächte</td><td>2 Min.</td></tr>
+<tr><td><a href="#step6">6. Kulturelle Affinität</a></td><td>Kapitel Welt, Regionen &amp; Kulturen</td><td>1 Min.</td></tr>
+<tr><td><a href="#step7">7. Vorteile &amp; Gefolgsleute (optional)</a></td><td>Kapitel Vorteile &amp; Gefolgsleute</td><td>1 Min.</td></tr>
+<tr><td><a href="#step8">8. Bindungen &amp; Komplikationen</a></td><td>Hier</td><td>2 Min.</td></tr>
+<tr><td><a href="#step9">9. Ausrüstung &amp; letzte Details</a></td><td>Hier</td><td>1 Min.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h2 id="step1">Schritt 1 — Konzept &amp; Herkunft</h2>
+<p>Schreibt einen Satz, der die <strong>Herkunft, den Beruf und ein prägendes Merkmal</strong> eures Charakters beschreibt. Beispiele:</p>
+<ul>
+<li>„Eine Aeler-Tunnelbauerin, die ihre Atemzählung verlor und nun den Stein singen hört."</li>
+<li>„Ein vhasianischer Duellant mit vernarbtem Gesicht und dem Schwur, nie wieder zu verlieren."</li>
+<li>„Ein Ykrul-Himmelssprecher, der einem rivalisierenden Klan einen Blutpreis schuldet."</li>
+</ul>
+<p>Wählt dann eure <strong>Herkunft</strong> — das Volk, dem ihr entstammt. Herkunft kostet nichts und gewährt keine Würfel. Sie gewährt <strong>Position</strong>: eine Stufe besser bei Würfen, die die Stärken eures Volkes ausspielen, eine Stufe schlechter bei dem, wofür es nie gemacht war.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Herkunft</th><th>Affinität (+1 Position)</th><th>Grenze (−1 Position)</th></tr></thead>
+<tbody>
+<tr><td><strong>Aeler</strong> (Unter dem Berg)</td><td>Körper <em>oder</em> Handwerk</td><td>Ausstrahlung</td></tr>
+<tr><td><strong>Aelinnel</strong> (Kleines Volk, Protokoll)</td><td>Verstand <em>oder</em> Handwerk</td><td>Körper</td></tr>
+<tr><td><strong>Aelaerem</strong> (Kleines Volk, Herdfeuer)</td><td>Ausstrahlung <em>oder</em> Heimlichkeit</td><td>Körper</td></tr>
+<tr><td><strong>Lethai-al</strong> (Von den Wäldern)</td><td>Verstand <em>oder</em> Heimlichkeit</td><td>Ausstrahlung</td></tr>
+<tr><td><strong>Lethai-thora</strong> (Von den Schulen)</td><td>Verstand <em>oder</em> Wissen</td><td>Körper</td></tr>
+<tr><td><strong>Lethai-ar</strong> (Vom Karmesintal)</td><td>Ausstrahlung <em>oder</em> Täuschung</td><td>Geist</td></tr>
+<tr><td><strong>Ykrul</strong> (Von der Steppe)</td><td>Körper <em>oder</em> Ausdauer</td><td>Ausstrahlung</td></tr>
+<tr><td><strong>Narethi</strong></td><td>Geist <em>oder</em> Arkana</td><td>Körper</td></tr>
+<tr><td><strong>Mensch</strong> (jede Kultur)</td><td>Jede Fertigkeit, in der ihr <em>keine</em> Ränge habt</td><td>Keine</td></tr>
+<tr><td><strong>Gemischt</strong></td><td>Affinität eines Elternteils</td><td>Grenze des anderen Elternteils</td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="panel panel-gold">
+<span class="panel-title">Wie Affinität und Grenze funktionieren</span>
+<ul>
+<li>Jede ist ein <strong>Attribut</strong> und (bei Affinität) eine <strong>Fertigkeit</strong>. Berührt der Wurf eines davon, gilt die Stufe.</li>
+<li><strong>Sie heben sich auf.</strong> Ein Wurf, der sowohl eure Affinität als auch eure Grenze berührt, bleibt schlicht unverändert.</li>
+<li><strong>Sie stapeln sich nicht mit sich selbst.</strong> Ein Wurf, der eurer Affinitäts-Attribut <em>und</em> eure Affinitäts-Fertigkeit nutzt, verbessert die Position trotzdem nur um eine Stufe, nicht um zwei.</li>
+<li><strong>Die Leiter endet.</strong> Position verläuft Verzweifelt → Kontrolliert → Dominant. Besser als Dominant bleibt Dominant; es wird nie in Würfel umgewandelt.</li>
+</ul>
+<p class="mt-1 text-sm text-muted">Vollständige Beschreibungen jedes Volkes stehen in Kapitel 12 (Welt, Regionen und Kulturen).</p>
+</div>
+<h2 id="step2">Schritt 2 — Attribute</h2>
+<p>Ihr habt vier <strong>Attribute</strong> (1–5). Gebt EP aus, um sie von einem Grundwert von je 1 zu erhöhen.</p>
+<p><strong>Kosten:</strong> Jede Stufe kostet <strong>neuer Wert × 3 EP</strong>. Das ist inkrementell:</p>
+<ul>
+<li>1 → 2 kostet 6 EP (2 × 3)</li>
+<li>2 → 3 kostet 9 EP (3 × 3)</li>
+<li>3 → 4 kostet 12 EP (4 × 3)</li>
+<li>4 → 5 kostet 15 EP (5 × 3)</li>
+</ul>
+<p>Ein Attribut von 1 auf 3 zu erhöhen kostet also 6 + 9 = <strong>15 EP insgesamt</strong>.</p>
+<p><strong>Empfohlene Startwerte:</strong></p>
+<ul>
+<li>Primärattribut (das, das ihr am häufigsten nutzt): <strong>3</strong> (kostet insgesamt 15 EP: 1→2 = 6, 2→3 = 9)</li>
+<li>Sekundärattribute: je <strong>2</strong> (kostet je 6 EP: 1→2 = 6)</li>
+</ul>
+<p><strong>Beispiel:</strong> Körper 3 (1→2 = 6, 2→3 = 9 → insgesamt 15 EP), Verstand 2 (1→2 = 6 EP) → 21 EP ausgegeben. Geist und Ausstrahlung bleiben bei 1.</p>
+<h2 id="step3">Schritt 3 — Fertigkeiten</h2>
+<p>Wählt <strong>Fertigkeiten</strong> (0–5), die zu eurem Konzept passen. <strong>Schlüsselfertigkeiten</strong> (häufig genutzt) sollten 2–3 betragen; andere 0–1.</p>
+<p><strong>Kosten:</strong> Jede Stufe kostet <strong>neue Stufe × 2 EP</strong>. Das ist inkrementell:</p>
+<ul>
+<li>0 → 1 kostet 2 EP (1 × 2)</li>
+<li>1 → 2 kostet 4 EP (2 × 2)</li>
+<li>2 → 3 kostet 6 EP (3 × 2)</li>
+<li>3 → 4 kostet 8 EP (4 × 2)</li>
+<li>4 → 5 kostet 10 EP (5 × 2)</li>
+</ul>
+<p>Eine Fertigkeit von 0 auf 2 zu erhöhen kostet also 2 + 4 = <strong>6 EP insgesamt</strong>.</p>
+<p><strong>Empfohlener Startbetrag:</strong> Gebt <strong>8–12 EP</strong> für Fertigkeiten aus.</p>
+<p><strong>Beispiel:</strong> Nahkampf 2 (0→1 = 2, 1→2 = 4 → insgesamt 6 EP), Athletik 1 (0→1 = 2 EP), Ausdauer 1 (0→1 = 2 EP) → insgesamt 10 EP.</p>
+<h2 id="step4">Schritt 4 — Talente</h2>
+<div class="panel panel-blue">
+<span class="panel-title">Ihr braucht keine Talente, um handlungsfähig zu sein</span>
+    Ein Charakter mit <strong>nur Attributen und Fertigkeiten</strong> ist ein vollständiger, tragfähiger Charakter — <em>besonders auf Stufe I</em>.
+    <p class="mt-1">Talente sind <strong>optionale Extras</strong>. Sie geben euch eine markante Stärke, sind aber nicht nötig, um sinnvoll zur Gruppe beizutragen. Ein Krieger mit Körper 3 + Nahkampf 2 ohne Talente würfelt im Kampf trotzdem 5 Würfel. Ein Gelehrter mit Geist 3 + Wissen 2 ohne Talente würfelt trotzdem 5 Würfel, um uralte Geheimnisse abzurufen.</p>
+<p class="mt-1"><strong>Beginnt einfach.</strong> Nehmt 0–2 Talente. Fügt später mehr hinzu. Das System ist so gestaltet, dass Attribute und Fertigkeiten die Hauptarbeit leisten.</p>
+</div>
+<p>Talente sind besondere Fähigkeiten. Beginnt mit <strong>0–3 Talenten</strong>. Viele Konzepte funktionieren gut mit zwei kleinen Talenten (je 2–3 EP) oder einem großen Talent (4–6 EP). Manche Konzepte funktionieren perfekt mit <strong>null</strong> Talenten — eure Attribute und Fertigkeiten reichen aus.</p>
+<p><strong>Talente für Magiezugang (wenn ihr Magie wollt):</strong></p>
+<ul>
+<li><strong>Zauberkunst (6 EP)</strong> — freies Zaubern</li>
+<li><strong>Vertrauter (2 EP) + Kodex (4 EP)</strong> — Runenwahrer/-in (Riten)</li>
+<li><strong>Symbol der Schutzmacht (4 EP)</strong> — Anrufer/-in (Rituale)</li>
+<li><strong>Pfad des Kantors (8 EP)</strong> — Kantor/-in (Lieder)</li>
+<li><strong>Pakt-Flüsterer (2 EP) + Geringer Paktschreiber (2 EP)</strong> — Beschwörer/-in</li>
+</ul>
+<p><strong>Talente ohne Magiebezug (Beispiele):</strong></p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Talent</th><th>Kosten</th><th>Effekt</th></tr></thead>
+<tbody>
+<tr><td><em>Keins</em></td><td><em>0 EP</em></td><td><em>Ein gültiger, vollständiger Charakter. Attribute + Fertigkeiten leisten die Arbeit.</em></td></tr>
+<tr><td>Scharfe Sinne</td><td>2 EP</td><td>+1 Würfel bei Wahrnehmungsproben.</td></tr>
+<tr><td>Defensives Überleben</td><td>3 EP</td><td>+1 Würfel bei Nahkampfverteidigung, wandelt Schaden in Erschöpfung um.</td></tr>
+<tr><td>Waffenmeister/-in</td><td>5 EP</td><td>+2 Würfel mit einer gewählten Waffe.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted">Die vollständige Liste findet ihr im Kapitel Talente.</p>
+<h2 id="step5">Schritt 5 — Schutzmacht (optional)</h2>
+<p>Wenn euer Charakter Magie über eine <strong>Schutzmacht</strong> nutzt, wählt eine (siehe Kapitel Weltmächte und Verpflichtung). Die sechs für Erstcharaktere empfohlenen sind:</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Schutzmacht</th><th>Thema</th></tr></thead>
+<tbody>
+<tr><td>Schwur der Flamme &amp; des Lichts</td><td>Schwüre, Strahlen, Züchtigung</td></tr>
+<tr><td>Der Wanderer</td><td>Straßen, sichere Reise</td></tr>
+<tr><td>Inaea (Engel der Spinne)</td><td>Gnade, Gemeinschaft</td></tr>
+<tr><td>Die Zeugin</td><td>Wahrheit, Erinnerung</td></tr>
+<tr><td>Aasgeierkönig</td><td>Verfall, Erneuerung</td></tr>
+<tr><td>Ikasha (Die Schlafende)</td><td>Schatten, Geheimnisse</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Ihr braucht <strong>keine</strong> Schutzmacht, wenn ihr Freie/-r Zauberer/-in (Zauberkunst) oder Psioniker/-in (optional) seid.</p>
+<h2 id="step6">Schritt 6 — Kulturelle Affinität</h2>
+<p>Eure Herkunft bestimmt, wer euer Volk ist. Eure <strong>kulturelle Affinität</strong> bestimmt, wo ihr aufgewachsen seid — und das ist oft nicht derselbe Ort. Wählt eine Region aus Kapitel 12 (Welt, Regionen und Kulturen). Sie gewährt einen Vorteil einmal pro Sitzung, der sich daraus ergibt, wie es an diesem Ort tatsächlich zugeht.</p>
+<p><strong>Stapeln.</strong> Eure Herkunftsaffinität und eure kulturelle Affinität sind getrennte Dinge und können beide in einer Szene auftauchen — verbessern aber beide dieselbe Wurfposition, erhaltet ihr <strong>eine Stufe, nicht zwei</strong>. Position hat drei Sprossen; über Dominant hinaus gibt es nichts.</p>
+<h2 id="step7">Schritt 7 — Vorteile &amp; Gefolgsleute (optional)</h2>
+<p>Ihr könnt EP ausgeben für:</p>
+<ul>
+<li><strong>Kleiner Vorteil (4 EP)</strong> — z. B. ein Unterschlupf, eine Werkstatt</li>
+<li><strong>Gefolgsmann (Cap² EP)</strong> — z. B. Cap-2-Kundschafter/-in (4 EP), Cap-3-Leutnant (9 EP)</li>
+</ul>
+<p>Die meisten Startcharaktere überspringen dies oder nehmen einen kleinen Vorteil. Siehe Kapitel Vorteile &amp; Gefolgsleute.</p>
+<h2 id="step8">Schritt 8 — Bindungen &amp; Komplikationen</h2>
+<p><strong>Bindungen:</strong> Legt <strong>bis zu zwei Bindungen</strong> zu anderen Spielercharakteren fest. Jede Bindung gewährt einmal pro Sitzung eine Gunst, wenn ihr mit einer ausführlichen Beschreibung nach ihr handelt. Auf Stufe III (ab 90 EP) erlauben Bindungen auch die Übertragung von Gunsten.</p>
+<p><strong>Komplikationen:</strong> Ihr könnt bis zu <strong>zwei Komplikationen</strong> nehmen (z. B. eine Fehde, ein verfluchtes Item, eine Schuld). Jede gibt <strong>+2 EP</strong>, aber jeder Charakter mit einer Komplikation fügt frühen Szenen <strong>+1 gebankten Story-Beat</strong> hinzu. Sprecht euch mit eurer SL ab.</p>
+<p class="text-sm text-muted">Beispiele findet ihr im Kapitel Hintergründe.</p>
+<h2 id="step9">Schritt 9 — Ausrüstung &amp; letzte Details</h2>
+<p><strong>Startausrüstung (vorausgesetzt):</strong></p>
+<ul>
+<li>Ein Satz Kleidung, passend zu eurer Kultur</li>
+<li>Eine leichte Nahkampfwaffe oder Fernkampfwaffe mit Munition</li>
+<li>Leichte Rüstung (falls euer Konzept es verlangt)</li>
+<li>Ein Rucksack, ein Wasserschlauch, 1W6 Tage Rationen, ein Mehrzweckmesser, Feuerstein und Stahl, eine kleine Laterne oder Kerze</li>
+<li>Werkzeuge, die eure Fertigkeiten erfordern (z. B. Dietriche, Heiler-Ausrüstung, Schreibmaterial)</li>
+</ul>
+<p>Für besondere Ausrüstung (schwere Rüstung, schwere Waffen, magische Gegenstände) gebt EP aus oder erwerbt sie im Spiel.</p>
+<p><strong>Endabrechnung der EP:</strong></p>
+<ul>
+<li>Beginnt mit <strong>32 EP</strong>.</li>
+<li>Fügt <strong>+2 EP</strong> für jede genommene Bindung oder Komplikation hinzu, bis zu einem kombinierten Höchstwert von <strong>+4</strong>.</li>
+<li>Maximale Start-EP: <strong>36</strong>.</li>
+</ul>
+<p><strong>Gebt alles aus.</strong> Start-EP können nicht gebankt werden — was ihr ungenutzt lasst, ist einfach verloren.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Exakt auf 32 landen</span>
+    Attribute kosten in Vielfachen von 3 und Fertigkeiten in Vielfachen von 2, daher bleiben Builds gerne einen Punkt zu kurz. Zwei günstige Wege, die Lücke zu schließen: ein <strong>Cap-1-Gefolgsmann</strong> (1 EP — ein Lehrling, ein Hund, ein Laufbursche, der die Gassen kennt) oder ein Talent mit ungeradem Preis, wie <em>Defensives Überleben</em> (3 EP) oder <em>Waffenmeister/-in</em> (5 EP). Beide sind in den Builds unten zu sehen.
+</div>
+<h2 id="build-examples">Build-Beispiele</h2>
+<p>Sechs vollständige Charaktere, jeder gibt <strong>genau 32 EP</strong> aus. Jeder von ihnen würfelt in seiner Spezialität einen Pool von fünf Würfeln. Keiner braucht mehr als ein Talent; zwei brauchen gar keins. Jeder Eintrag endet mit einem Vorschlag, was mit den <strong>+4 EP</strong> zu tun ist, falls euer Tisch Bindungen und Komplikationen nutzt.</p>
+<h3>Build 1: Der/die Duellant/-in</h3>
+<ul>
+<li><strong>Attribute:</strong> Körper 3 (15), Verstand 2 (6) → <strong>21</strong></li>
+<li><strong>Fertigkeiten:</strong> Nahkampf 2 (6) → <strong>6</strong></li>
+<li><strong>Talente:</strong> Waffenmeister/-in (5) → <strong>5</strong></li>
+<li><strong>Gesamt: 32 EP</strong></li>
+</ul>
+<p><strong>Pool:</strong> Körper 3 + Nahkampf 2 = 5 Würfel — 7 mit ihrer bevorzugten Klinge. Eng gefasst und tödlich: Sie hat eine Antwort, und es ist eine sehr gute Antwort.</p>
+<p><strong>Mit +4:</strong> Athletik 1 (2) und Ausdauer 1 (2), damit sie jagen und durchhalten kann.</p>
+<h3>Build 2: Der/die Gelehrte <span class="text-sm text-muted">(keine Talente)</span></h3>
+<ul>
+<li><strong>Attribute:</strong> Verstand 2 (6), Geist 2 (6), Ausstrahlung 2 (6) → <strong>18</strong></li>
+<li><strong>Fertigkeiten:</strong> Wissen 3 (12), Einsicht 1 (2) → <strong>14</strong></li>
+<li><strong>Gesamt: 32 EP</strong></li>
+</ul>
+<p><strong>Pool:</strong> Verstand 2 + Wissen 3 = 5 Würfel. Beachtet den Tausch: Er hat Tiefe in der <em>Fertigkeit</em> gekauft statt im Attribut, was günstiger ist, und die Differenz in Kompetenz überall sonst investiert. Dieselben fünf Würfel in seiner Spezialität; ein deutlich runderer Charakter außerhalb davon.</p>
+<p><strong>Mit +4:</strong> Einsicht 1 (2) und Überzeugung 1 (2) — die beiden Fertigkeiten, die sein Wissen in Handlungen anderer verwandeln.</p>
+<h3>Build 3: Der/die Kundschafter/-in</h3>
+<ul>
+<li><strong>Attribute:</strong> Verstand 3 (15), Körper 2 (6) → <strong>21</strong></li>
+<li><strong>Fertigkeiten:</strong> Heimlichkeit 2 (6), Athletik 1 (2) → <strong>8</strong></li>
+<li><strong>Talente:</strong> Scharfe Sinne (2) → <strong>2</strong></li>
+<li><strong>Gefolgsmann:</strong> Spürhund, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Gesamt: 32 EP</strong></li>
+</ul>
+<p><strong>Pool:</strong> Verstand 3 + Heimlichkeit 2 = 5 Würfel; 6, wenn sie nach etwas sucht. Der Hund ist der ungerade Punkt, und er wird der Grund sein, warum sie eine Nacht überlebt.</p>
+<p><strong>Mit +4:</strong> Ausdauer 1 (2) und Einsicht 1 (2) — die Beine, um weiterzumachen, und den Verstand, um zu wissen, wann nicht.</p>
+<h3>Build 4: Der/die Heiler/-in</h3>
+<ul>
+<li><strong>Attribute:</strong> Geist 3 (15), Verstand 2 (6) → <strong>21</strong></li>
+<li><strong>Fertigkeiten:</strong> Handwerk 2 (6), Einsicht 1 (2) → <strong>8</strong></li>
+<li><strong>Talente:</strong> Defensives Überleben (3) → <strong>3</strong></li>
+<li><strong>Gesamt: 32 EP</strong></li>
+</ul>
+<p><strong>Pool:</strong> Geist 3 + Handwerk 2 = 5 Würfel. Defensives Überleben lässt ihn Schaden in Erschöpfung umwandeln, was die ganze Aufgabe ist: Er ist derjenige, der hinterher noch stehen muss.</p>
+<p><strong>Mit +4:</strong> Wissen 1 (2) und Athletik 1 (2) — oder Vertrauter (2) plus ein Fertigkeitspunkt, wenn er sich in Richtung des Runenwahrer-Pfades bewegt.</p>
+<h3>Build 5: Der/die Befehlshaber/-in</h3>
+<ul>
+<li><strong>Attribute:</strong> Ausstrahlung 3 (15), Verstand 2 (6) → <strong>21</strong></li>
+<li><strong>Fertigkeiten:</strong> Überzeugung 2 (6), Einsicht 1 (2), Wissen 1 (2) → <strong>10</strong></li>
+<li><strong>Gefolgsmann:</strong> Herold, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Gesamt: 32 EP</strong></li>
+</ul>
+<p><strong>Pool:</strong> Ausstrahlung 3 + Überzeugung 2 = 5 Würfel. Gar keine Talente. Der Herold ist kein Leibwächter — sie ist eine Stimme, die vor ihm eintrifft, was oft die nützlichere Waffe ist.</p>
+<p><strong>Mit +4:</strong> Befehlsgewalt (4), falls die Kampagne eurer SL ein Schlachtfeld enthält. Sonst Täuschung 1 und Nahkampf 1.</p>
+<h3>Build 6: Der/die Gauner/-in</h3>
+<ul>
+<li><strong>Attribute:</strong> Verstand 3 (15), Körper 2 (6) → <strong>21</strong></li>
+<li><strong>Fertigkeiten:</strong> Heimlichkeit 2 (6), Täuschung 1 (2), Einsicht 1 (2) → <strong>10</strong></li>
+<li><strong>Gefolgsmann:</strong> Straßeninformant/-in, Cap 1 (1) → <strong>1</strong></li>
+<li><strong>Gesamt: 32 EP</strong></li>
+</ul>
+<p><strong>Pool:</strong> Verstand 3 + Heimlichkeit 2 = 5 Würfel. Einsicht ist dabei, weil zu wissen, wann man belogen wird, dieselbe Fertigkeit ist wie gut zu lügen — nur von der anderen Seite betrachtet.</p>
+<p><strong>Mit +4:</strong> Täuschung auf 2 (4). Ein Würfel mehr dort, wo es am meisten zählt.</p>
+<div class="panel panel-blue">
+<span class="panel-title">Was diese sechs gemeinsam haben</span>
+    Fünf Würfel in dem, wofür sie da sind. Das ist die Zahl, auf die man zielt, und es gibt mehrere Wege dorthin: Attribut 3 + Fertigkeit 2, oder Attribut 2 + Fertigkeit 3 (günstiger, und lässt Kleingeld für Breite übrig). Alles andere auf diesen Bögen — das Talent, der Hund, der Herold — ist Charakter, keine Kompetenz.
+</div>
+<h2 id="starting-gear">Startausrüstungs-Optionen</h2>
+<h3>Waffen und Rüstung</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Gegenstand</th><th>EP-Kosten</th><th>Notizen</th></tr></thead>
+<tbody>
+<tr><td>Leichte Waffe (Dolch, Kurzschwert)</td><td>Kostenlos (oder 4 EP für Besonderes)</td><td>Schaden 1, +2W Nah, +1W Mittel</td></tr>
+<tr><td>Mittlere Waffe (Langschwert, Speer)</td><td>Kostenlos (oder 8 EP für Besonderes)</td><td>Schaden 2, +1W Nah, +2W Mittel</td></tr>
+<tr><td>Schwere Waffe (Zweihänder, Hellebarde)</td><td>12 EP</td><td>Schaden 3, -1W Nah, +3W Mittel</td></tr>
+<tr><td>Leichte Rüstung</td><td>4 EP</td><td>Schaden 1 → Erschöpfung 1</td></tr>
+<tr><td>Mittlere Rüstung</td><td>8 EP</td><td>Schaden 2 → Erschöpfung 1</td></tr>
+<tr><td>Schwere Rüstung</td><td>12 EP</td><td>Schaden 3 → Erschöpfung 2</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Die meisten Startcharaktere nehmen eine kostenlose leichte Waffe und leichte Rüstung. Schwere Waffen und Rüstungen sind bedeutende Investitionen.</p>
+<div class="panel panel-green">
+<span class="panel-title">Der Rat des Grauen Wanderers</span>
+    „Nimm die kostenlose Waffe. Zwölf Erfahrung kauft einen Zweihänder, und ein Zweihänder kauft dir einen Punkt mehr Schaden und eine schlechtere Zeit in jeder Tür, Gasse und jedem Treppenhaus der Welt. Gib es für Rüstung aus, wenn du musst. Gib es für einen Freund aus, wenn du klug bist."
+</div>
+<h2 id="next-steps">Nächste Schritte</h2>
+<ul>
+<li>Lest das Kapitel Kernmechaniken, um zu lernen, wie man würfelt, Position nutzt und Gunsten ausgibt.</li>
+<li>Lest das Kapitel Magie, wenn euer Charakter Magie nutzt.</li>
+<li>Lest das Kapitel Weltinteraktion für Reise-, Zeit- und Sozialregeln.</li>
+<li>Sprecht mit eurer SL über die Startsituation und Kampagnen-Zähler.</li>
+</ul>
+<div class="panel panel-green">
+<span class="panel-title">Der Rat des Grauen Wanderers</span>
+    „Versucht nicht, einen perfekten Charakter zu bauen. Baut einen, der etwas schuldet, eine Narbe trägt und einen Namen hat, den jemand anderes laut aussprechen wird. Die Zahlen folgen der Geschichte. Sie haben sie noch nie angeführt."
+</div>
+<h2 id="party-composition">Leitfaden zur Gruppenzusammensetzung</h2>
+<div class="panel panel-blue">
+<span class="panel-title">Eine ausgewogene Gruppe aufbauen</span>
+    Fate's Edge verlangt keine „ausgewogene" Gruppe im herkömmlichen Sinn. Eine Gruppe aus vier Duellanten ist tragfähig — sie werden Probleme einfach mit Stahl statt mit Worten lösen. Gruppen, die mehrere Rollen abdecken, haben jedoch mehr Werkzeuge und sind widerstandsfähiger, wenn etwas schiefgeht.
+    <p class="mt-1">Dieser Leitfaden hilft euch zu überlegen, welche Rollen eure Gruppe abdecken könnte, wie verschiedene Charakter-Builds diese Rollen ausfüllen können, und — entscheidend — wie <strong>Gefolgsleute</strong> Lücken füllen können, wenn kein Spielercharakter eine benötigte Rolle abdeckt. Nutzt ihn als Gesprächsanlass während der Sitzung Null.</p>
+</div>
+<h3>Die fünf Rollen</h3>
+<div class="panel panel-blue">
+<span class="panel-title">Lest sie als Attribut + Fertigkeit</span>
+    Jede Rolle unten ist ein <strong>Attribut</strong> und eine oder zwei <strong>Schlüsselfertigkeiten</strong>. Diese Paarung ist die Rolle; die aufgeführten Talente sind Würze. Ein Tank ist Körper und Nahkampf. Eine Unterstützung ist Geist und Handwerk. Habt ihr das Paar, habt ihr die Aufgabe.
+</div>
+<p>Fate's-Edge-Charaktere definieren sich durch <em>Vorgehensweise</em>, nicht durch Klasse. Dieselbe Mechanik kann unterschiedliche Spielstile tragen. Denkt an diese Rollen als <strong>das, was ihr am Tisch tut</strong>, nicht als <strong>das, was euer Charakter ist</strong>.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Rolle</th><th>Primärattribut</th><th>Was ihr tut</th></tr></thead>
+<tbody>
+<tr><td><strong>Tank</strong></td><td>Körper</td><td>Vorne stehen, Schaden absorbieren, Verbündete schützen</td></tr>
+<tr><td><strong>Angreifer/-in</strong></td><td>Körper oder Verstand</td><td>Schaden austeilen, Bedrohungen ausschalten, Linien durchbrechen</td></tr>
+<tr><td><strong>Kontrolleur/-in</strong></td><td>Geist oder Ausstrahlung</td><td>Das Schlachtfeld formen, Zustände auferlegen, Furcht steuern</td></tr>
+<tr><td><strong>Unterstützung</strong></td><td>Geist</td><td>Heilen, Zustände entfernen, Lasten übertragen</td></tr>
+<tr><td><strong>Vielseitigkeit</strong></td><td>Verstand oder Geist</td><td>Informationen sammeln, Rätsel lösen, mit Geistern verhandeln</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Tank — Die Mauer</h4>
+<p>Ihr steht zwischen der Gefahr und den Menschen, die ihr beschützt. Ihr müsst nicht den meisten Schaden austeilen — ihr müsst am schwersten zu töten sein.</p>
+<p><strong>Schlüsselmechaniken:</strong></p>
+<ul>
+<li>Hoher Körper (4+ für Erschöpfungsleiste und Verteidigung)</li>
+<li>Schwere Rüstung (wandelt Schaden in Erschöpfung um)</li>
+<li>Defensive Talente (Defensives Überleben, Schildträger/-in) — optional</li>
+</ul>
+<p><strong>Build-Beispiel (32 EP):</strong> Körper 3 (15), Geist 2 (6), Nahkampf 2 (6), Ausdauer 1 (2), Defensives Überleben (3) = <strong>32 EP</strong>. Mit +4: Athletik 1 (2), mittlere Rüstung ist außer Reichweite — steckt die Bindungs-EP stattdessen in Athletik und Einsicht, oder spart im Spiel auf schwere Rüstung (12).</p>
+<p><strong>Würfelpool:</strong> Körper 3 + Nahkampf 2 = 5 Würfel. Defensives Überleben wandelt Schaden in Erschöpfung um, was eine Mauer tatsächlich zur Mauer macht.</p>
+<h4>Angreifer/-in — Die Klinge</h4>
+<p>Ihr schaltet Bedrohungen aus. Ob durch Präzision oder überwältigende Kraft, eure Aufgabe ist es, Kämpfe zu beenden.</p>
+<p><strong>Schlüsselmechaniken:</strong></p>
+<ul>
+<li>Hoher Körper (Nahkampf) oder Verstand (Fernkampf)</li>
+<li>Waffenmeister/-in (optional — fügt +2 Würfel hinzu)</li>
+</ul>
+<p><strong>Build-Beispiel (32 EP):</strong> Körper 3 (15), Verstand 2 (6), Nahkampf 2 (6), Waffenmeister/-in (5) = <strong>32 EP</strong> — das ist Build 1 (Der/die Duellant/-in) von oben. Mit +4: Athletik 1 (2) und Heimlichkeit 1 (2), damit sie den Kampf erreichen und wieder verlassen kann.</p>
+<p><strong>Würfelpool:</strong> Körper 3 + Nahkampf 2 + Waffenmeister/-in 2 = 7 Würfel mit der gewählten Waffe.</p>
+<h4>Kontrolleur/-in — Die Weberin</h4>
+<p>Ihr formt das Schlachtfeld. Furcht, Zustände und Positionierung sind eure Waffen.</p>
+<p><strong>Schlüsselmechaniken:</strong></p>
+<ul>
+<li>Hoher Geist (Willenskraft) oder Ausstrahlung (Einschüchterung)</li>
+<li>Soziale Fertigkeiten (Überzeugung, Täuschung) sind das Fundament</li>
+</ul>
+<p><strong>Build-Beispiel (32 EP):</strong> Ausstrahlung 3 (15), Geist 2 (6), Überzeugung 2 (6), Täuschung 1 (2), Einsicht 1 (2), plus ein Cap-1-Gefolgsmann (1) = <strong>32 EP</strong>. Mit +4: Befehlsgewalt (4).</p>
+<p><strong>Würfelpool:</strong> Ausstrahlung 3 + Überzeugung 2 = 5 Würfel.</p>
+<h4>Unterstützung — Der/die Heiler/-in</h4>
+<p>Ihr haltet die Gruppe auf den Beinen. Heilung, Zustandsentfernung und Lastenübertragung sind eure Domäne.</p>
+<p><strong>Schlüsselmechaniken:</strong></p>
+<ul>
+<li>Hoher Geist (Willenskraft) oder Verstand (Medizin)</li>
+<li>Handwerk ist das Fundament</li>
+</ul>
+<p><strong>Build-Beispiel (32 EP):</strong> Geist 3 (15), Verstand 2 (6), Handwerk 2 (6), Einsicht 1 (2), Defensives Überleben (3) = <strong>32 EP</strong> — das ist Build 4 (Der/die Heiler/-in) von oben. Mit +4: Wissen 1 (2) und Athletik 1 (2).</p>
+<p><strong>Würfelpool:</strong> Geist 3 + Handwerk 2 = 5 Würfel.</p>
+<h4>Vielseitigkeit — Augen und Ohren</h4>
+<p>Ihr löst Probleme, die nicht mit Stahl gelöst werden können. Information, Verhandlung und Geisterbefragung sind eure Werkzeuge.</p>
+<p><strong>Schlüsselmechaniken:</strong></p>
+<ul>
+<li>Hoher Verstand (Wahrnehmung) oder Geist (Intuition)</li>
+<li>Wissensfertigkeiten (Wissen, Einsicht) sind das Fundament</li>
+</ul>
+<p><strong>Build-Beispiel (32 EP):</strong> Verstand 3 (15), Geist 2 (6), Wissen 2 (6), Einsicht 1 (2), Einsicht 1 (2), plus ein Cap-1-Gefolgsmann — ein Informant, ein Archivlehrling (1) = <strong>32 EP</strong>. Mit +4: Überzeugung 1 (2) und Heimlichkeit 1 (2).</p>
+<p><strong>Würfelpool:</strong> Verstand 3 + Wissen 2 = 5 Würfel. Build 2 (Der/die Gelehrte) erreicht denselben Pool günstiger, indem er Wissen 3 statt Verstand 2 kauft — vergleicht sie.</p>
+<h3>Lücken mit Gefolgsleuten füllen</h3>
+<p>Nicht jede Gruppe hat einen Spieler, der jede Rolle spielen will. Hier kommen <strong>Gefolgsleute</strong> ins Spiel (siehe Kapitel 10, Vorteile &amp; Gefolgsleute). Ein gut gewählter Gefolgsmann kann eine fehlende Rolle abdecken, spezialisierte Unterstützung bieten oder Aufgaben übernehmen, die kein Spielercharakter erledigen will.</p>
+<h4>Wann ihr einen Gefolgsmann einsetzt</h4>
+<ul>
+<li><strong>Niemand will Unterstützung spielen:</strong> Ein Gefolgsmann mit Handwerk (Medizin) oder heilenden Riten kann die Gruppe am Leben halten.</li>
+<li><strong>Niemand will Tank spielen:</strong> Ein Gefolgsmann mit schwerer Rüstung und Schild kann die Linie halten.</li>
+<li><strong>Niemand hat hohe Einsicht:</strong> Ein Kundschafter- oder Informanten-Gefolgsmann kann abseits der Bühne Informationen sammeln.</li>
+<li><strong>Niemand spricht eine bestimmte Sprache oder kennt die Bräuche einer Region:</strong> Ein einheimischer Führer-Gefolgsmann kann kulturelle Fallstricke umschiffen.</li>
+<li><strong>Die Gruppe braucht einen Spezialisten für eine einzelne Mission:</strong> Ein Gefolgsmann kann für die Dauer einer Aufgabe angeheuert werden.</li>
+</ul>
+<h4>Gefolgsmann-Rollen (nach Fähigkeit)</h4>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Gefolgsmann-Typ</th><th>Cap-Bereich</th><th>Was sie können</th></tr></thead>
+<tbody>
+<tr><td><strong>Leibwächter/-in (Tank)</strong></td><td>2–3</td><td>Eine Linie halten, Schaden absorbieren, eine Spielfigur schützen</td></tr>
+<tr><td><strong>Kundschafter/-in (Vielseitigkeit)</strong></td><td>2–3</td><td>Informationen sammeln, navigieren, Gefahren erspähen</td></tr>
+<tr><td><strong>Heiler/-in (Unterstützung)</strong></td><td>2–3</td><td>Wunden stabilisieren, Erschöpfung abbauen, Zustände entfernen</td></tr>
+<tr><td><strong>Gelehrte/-r (Vielseitigkeit)</strong></td><td>2–3</td><td>Forschen, übersetzen, Relikte identifizieren</td></tr>
+<tr><td><strong>Söldner/-in (Angreifer/-in)</strong></td><td>2–3</td><td>Schaden im Kampf austeilen, Befehlen folgen</td></tr>
+<tr><td><strong>Führer/-in (Vielseitigkeit)</strong></td><td>2–3</td><td>Gelände navigieren, lokale Bräuche deuten, übersetzen</td></tr>
+<tr><td><strong>Hehler/-in (Kontrolleur/-in/Vielseitigkeit)</strong></td><td>2</td><td>Zugang zu Schwarzmärkten, Gerüchte streuen, Druckmittel schaffen</td></tr>
+<tr><td><strong>Lehrling (Beliebig)</strong></td><td>1–2</td><td>Unterstützt eine Spielfigur in ihrer Spezialität (fügt Unterstützungswürfel hinzu)</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Gefolgsmann-Kosten und Pflege</h4>
+<p>Gefolgsleute werden durch das Ausgeben von EP erworben: Cap² EP (Cap 1 = 1 EP, Cap 2 = 4 EP, Cap 3 = 9 EP). Sie brauchen Pflege:</p>
+<ul>
+<li><strong>Effizient:</strong> Zahlt max(1, Erwerbs-EP ÷ 3, aufgerundet) pro Ruhephase — 1 EP bei Cap 1, 2 bei Cap 2, 3 bei Cap 3. Keine Szene nötig.</li>
+<li><strong>Intensiv:</strong> Zahlt 1 EP und verbringt eine Szene damit, die Beziehung zu pflegen (Training, ein gemeinsames Mahl, das Lösen eines persönlichen Problems).</li>
+</ul>
+<p><strong>Folgen der Vernachlässigung:</strong></p>
+<ul>
+<li>Loyalität verschlechtert sich: Treu → Angespannt → Zerbrochen.</li>
+<li>Ein angespannter Gefolgsmann unterstützt mit -1 Würfel; ein zerbrochener Gefolgsmann geht oder wird feindselig.</li>
+<li>Wird ein Gefolgsmann zwei Ruhephasen hintereinander vernachlässigt, verlässt er euch dauerhaft (oder schlimmer — er schließt sich einem Rivalen an).</li>
+</ul>
+<div class="panel panel-gold">
+<span class="panel-title">Spielertipp: Der Gefolgsmann als Nachfolger</span>
+    Ein Cap-3+-Gefolgsmann kann euer Nachfolger werden, wenn euer Charakter in den Ruhestand geht oder fällt. Er erbt euer Ansehen bei der Fraktion, eine ungelöste Last und eine Vermächtnis-Bindung. Wenn ihr eine lange Kampagne spielt, erwägt, in einen Gefolgsmann zu investieren, dem ihr zutrauen würdet, euer Banner zu tragen. Siehe Kapitel 17 (Die Vermächtnis-Maschine) für die vollständigen Regeln.
+</div>
+<h3>Gruppenzusammensetzung auf einen Blick</h3>
+<p>Nutzt diese Tabelle, um zu sehen, ob eure Gruppe Lücken hat. Ein Charakter kann mehrere Rollen abdecken. Gefolgsleute können die mit (F) markierten Lücken füllen.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Gruppengröße</th><th>Empfohlene Abdeckung</th></tr></thead>
+<tbody>
+<tr><td><strong>2 Spieler</strong></td><td>1 Tank/Angreifer/-in + 1 Unterstützung/Kontrolleur/-in (F für fehlende Rollen)</td></tr>
+<tr><td><strong>3 Spieler</strong></td><td>Tank + Angreifer/-in + Unterstützung (oder Kontrolleur/-in); F für die fehlende Rolle</td></tr>
+<tr><td><strong>4 Spieler</strong></td><td>Tank + Angreifer/-in + Kontrolleur/-in + Unterstützung (Vielseitigkeit geht oft in Unterstützung oder Kontrolleur/-in auf)</td></tr>
+<tr><td><strong>5+ Spieler</strong></td><td>Alle Rollen abgedeckt; erwägt Zweitrollen</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Beispiel-Gruppenzusammensetzungen</h3>
+<h4>Die ausgewogene Gruppe (4 Spieler, je 32 EP)</h4>
+<ul>
+<li><strong>Tank:</strong> Körper 3, Nahkampf 2 (5 Würfel). Schwere Rüstung.</li>
+<li><strong>Angreifer/-in:</strong> Körper 3, Nahkampf 2 (5 Würfel). Mittlere Waffe.</li>
+<li><strong>Unterstützung:</strong> Geist 3, Handwerk 2 (5 Würfel). HEILUNG-Zauberspruch.</li>
+<li><strong>Vielseitigkeit:</strong> Verstand 3, Wissen 2 (5 Würfel). Forschungsausrüstung.</li>
+</ul>
+<p><strong>Anmerkung:</strong> Keiner dieser vier hat ein Talent, und alle vier sind voll handlungsfähig. Jeder gibt etwa <strong>27–29 EP</strong> für die obige Paarung aus, was drei bis fünf Punkte übrig lässt für eine zweite Fertigkeit, einen Cap-1-Gefolgsmann oder ein kleines Talent — je nachdem, was der Charakter will, statt was die Gruppe braucht.</p>
+<h4>Die aggressive Gruppe (3 Spieler + Gefolgsmann)</h4>
+<ul>
+<li><strong>Angreifer/-in/Tank:</strong> Körper 3, Nahkampf 2 (5 Würfel). Mittlere Rüstung.</li>
+<li><strong>Angreifer/-in:</strong> Verstand 3, Heimlichkeit 2 (5 Würfel). Leichte Waffen.</li>
+<li><strong>Vielseitigkeit/Unterstützung:</strong> Geist 3, Arkana 2 (5 Würfel). Zauberkunst.</li>
+<li><strong>Gefolgsmann: Heiler/-in (Cap 2, 4 EP)</strong> — hält die Gruppe am Leben.</li>
+</ul>
+<h4>Die soziale Gruppe (3 Spieler + Gefolgsmann)</h4>
+<ul>
+<li><strong>Kontrolleur/-in:</strong> Ausstrahlung 3, Überzeugung 2 (5 Würfel).</li>
+<li><strong>Vielseitigkeit:</strong> Verstand 3, Täuschung 2 (5 Würfel).</li>
+<li><strong>Unterstützung/Vielseitigkeit:</strong> Geist 3, Wissen 2 (5 Würfel).</li>
+<li><strong>Gefolgsmann: Leibwächter/-in (Cap 2, 4 EP)</strong> — schützt die Diplomaten.</li>
+</ul>
+<h3>Abschließender Rat des Grauen Wanderers</h3>
+<blockquote>
+„Versteift euch nicht auf die Gruppenzusammensetzung. Das Spiel ist flexibel. Eine Gruppe aus vier Duellanten ist tragfähig — sie werden Probleme einfach mit Stahl statt mit Worten lösen. Eine Gruppe aus vier Gelehrten ist tragfähig — sie werden verhandeln, forschen und den Weg finden, der Kampf ganz vermeidet. Die Frage ist nicht, ob eure Gruppe ‚ausgewogen' ist. Die Frage ist, ob eure Gruppe für die Art von Problemen bereit ist, die eure SL präsentieren wird. Sprecht mit eurer SL. Fragt, was für eine Kampagne sie leitet. Baut dann entsprechend. Und wenn euch eine Rolle fehlt, heuert einen Gefolgsmann an. Er ist nicht so stark wie eine Spielfigur, aber besser als nichts — und kann zu etwas Größerem werden.
+<p class="mt-1">„Ein Gefolgsmann ist kein Diener. Ein Gefolgsmann ist eine Beziehung. Behandelt ihn gut, und er wird euch das Leben retten. Behandelt ihn schlecht, und er wird sich erinnern. Die Straße ist lang. Geht sie mit Leuten, denen ihr vertraut — oder zahlt zumindest pünktlich."</p>
+</blockquote>
+<h3>Lücken mit Gefolgsleuten füllen (Schnellreferenz)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Fehlende Rolle</th><th>Empfohlener Gefolgsmann</th><th>Was er tut</th></tr></thead>
+<tbody>
+<tr><td>Kein Tank</td><td>Leibwächter/-in (Cap 2–3)</td><td>Die Linie halten, Schaden absorbieren, eine Spielfigur schützen</td></tr>
+<tr><td>Kein/e Angreifer/-in</td><td>Söldner/-in (Cap 2–3)</td><td>Schaden im Kampf austeilen, Befehlen folgen</td></tr>
+<tr><td>Kein/e Kontrolleur/-in</td><td>Verhörspezialist/-in oder Hexe/Hexer (Cap 2–3)</td><td>Furcht auferlegen, Zustände verwalten, manipulieren</td></tr>
+<tr><td>Keine Unterstützung</td><td>Heiler/-in (Cap 2–3)</td><td>Stabilisieren, Erschöpfung abbauen, Zustände entfernen</td></tr>
+<tr><td>Keine Vielseitigkeit</td><td>Gelehrte/-r oder Führer/-in (Cap 2–3)</td><td>Forschen, übersetzen, navigieren, identifizieren</td></tr>
+</tbody>
+</table></div>
+</div>
+<h2 id="character-adaptation">Ein Charakterkonzept anpassen</h2>
+<p>Diese Anleitung nutzt bestehende Charakterregeln. Sie fügt kein Klassensystem und keine neuen Fähigkeiten hinzu.</p>
+<h2 id="start-with-the-character">Beginnt mit dem Charakter, den ihr spielen wollt</h2>
+<p>Schreibt drei kurze Aussagen, bevor ihr nach mechanischen Entsprechungen sucht:</p>
+<ol><li><strong>Rolle:</strong> Was trägt dieser Charakter bei? Beispiele sind das Halten eines Durchgangs, das Finden eines verborgenen Wegs, das Behandeln der Verwundeten oder das Verhandeln mit gefährlichen Mächten.</li><li><strong>Methode:</strong> Wie machen sie es? Ein Schild, geduldige Beobachtung, ein eingeübter Ritus und ein bindendes Versprechen erzeugen unterschiedliche Charaktere, selbst wenn sie derselben Rolle dienen.</li><li><strong>Signatur:</strong> Welcher eine oder zwei Momente würden den Charakter wiedererkennbar machen? „Ich stehe zwischen der Gefahr und meinen Verbündeten" ist hier nützlicher als eine Liste von zwanzig Klassenmerkmalen.</li></ol>
+<p>Eine Unterklasse schärft normalerweise die Methode oder die Signatur: Zwei Krieger teilen sich vielleicht militärische Ausbildung, während der eine ein Unternehmen beschützt und der andere sich durch sorgfältig vorbereitete Hinterhalte kämpft. Ihr müsst die Klassengrenze des Ausgangsspiels nicht bewahren, um diese Unterscheidung zu bewahren.</p>
+<h2 id="conversion-process">Wandelt das Konzept in sechs Schritten um</h2>
+<ol><li><strong>Einigt euch auf den Ausgangspunkt.</strong> Wählt die Fate's-Edge-Stufe der Kampagne, das Erstellungsverfahren und das verfügbare Material. Ein hochstufiger Charakter in einem anderen Spiel legt kein Fate's-Edge-Startbudget fest.</li><li><strong>Trennt gewöhnliche Fähigkeit von Ausnahmen.</strong> Schwertkampf, Heimlichkeit, Ausdauer, Überzeugungskraft und Forschung beginnen meist mit Attributen und vorhandenen Fertigkeiten. Ein Ausgangsmerkmal, das einen Charakter trainiert oder kompetent macht, braucht vielleicht gar kein Talent.</li><li><strong>Wählt die wesentliche Signatur.</strong> Findet ein veröffentlichtes Talent oder einen Pfad, der tatsächlich den gewünschten Effekt erzeugt. Lest Auslöser, Voraussetzungen, Handlung oder Timing, Kosten, Grenzen und Konsequenzen. Ähnliche Namen allein sind keine Übereinstimmung.</li><li><strong>Baut mit den Zielregeln.</strong> Zahlt die angegebenen Fate's-Edge-Kosten und erfüllt die Voraussetzungen. Notiert die genaue Quelle jeder Sonderoption. Ausrüstung, Gefolgsleute und Vorteile nutzen ihre eigenen Erwerbs- und Nutzungsregeln.</li><li><strong>Setzt spätere Merkmale auf eine Fortschrittsliste.</strong> Bewahrt ein wiedererkennbares Startkonzept, anstatt eine vollständige hochstufige Merkmalsliste in einen Novizen-Build zu zwingen. Die Liste ist ein Plan, kein Anspruch auf kostenlose Fähigkeiten.</li><li><strong>Testet den Build in repräsentativen Szenen.</strong> Testet seinen gewöhnlichen Beitrag, seine Signaturhandlung und seine Reaktion auf einen Rückschlag. Passt die Auswahl innerhalb der vereinbarten Charakterregeln der Kampagne an, wenn die Erfahrung nicht zum Konzept passt.</li></ol>
+<h2 id="feature-map">Übersetzt Merkmale nach dem, was sie tun</h2>
+<table><thead><tr><th>Ausgangsmerkmal</th><th>Sucht in Fate's Edge nach</th><th>Haltet explizit fest</th></tr></thead><tbody>
+<tr><td>Waffentraining, Erkundungsexpertise oder soziale Kompetenz</td><td>Attribute und die relevanten vorhandenen Fertigkeiten; wo zutreffend Ausrüstung.</td><td>Training gewährt nicht automatisch eine besondere Handlung, einen Bonuswürfel oder Immunität.</td></tr>
+<tr><td>Eine Verteidigungshaltung, ein Trickschuss oder ein Signatur-Kampfmanöver</td><td>Eine gewöhnliche Handlung unter dem Kernverfahren, oder ein veröffentlichtes Talent, wenn eine Ausnahme wesentlich ist.</td><td>Nutzt Timing, Effekt und Häufigkeit der gewählten Option. Kopiert nicht die Aktionsökonomie des Ausgangsspiels.</td></tr>
+<tr><td>Eine Zauberliste oder übernatürliche Disziplin</td><td>Einen Fate's-Edge-Magiepfad und seine erlaubten Wirkungen oder Riten.</td><td>Zugang, Umfang, Kosten, Rückschlag und Konsequenzen stammen aus diesem Pfad, nicht aus dem Ausgangszauber.</td></tr>
+<tr><td>Ein Haustier, beschworener Verbündeter, gebundenes Wesen oder Gefolge</td><td>Die passenden Vertrauten-, Beschwörungs-, Gefolgsmann- oder Vorteilsregeln.</td><td>Das sind unterschiedliche Beziehungen. Passt die Rolle des Wesens an und nutzt die Kosten und Grenzen der gewählten Beziehung.</td></tr>
+<tr><td>Ein Schwur, eine Schutzmacht, ein Orden oder eine geerbte Verpflichtung</td><td>Beziehungen im Setting und den relevanten veröffentlichten Pfad oder Charakteroptionen.</td><td>Eine erzählerische Beziehung ist nicht automatisch ein mechanischer Vorteil oder ein gekaufter Vorteil.</td></tr>
+<tr><td>Extra Züge, automatischer Erfolg, Immunität oder Konsequenzaufhebung</td><td>Eine genau formulierte veröffentlichte Ausnahme, falls sie existiert und der Charakter sie erfüllt.</td><td>Leitet die Ausnahme nicht aus der Ausgangsklasse ab. Bewahrt ihr Fate's-Edge-Gate, Auslöser, Kosten und Grenze.</td></tr>
+</tbody></table>
+<h2 id="numbers-and-resources">Lasst die Zahlen des Ausgangsspiels hinter euch</h2>
+<p>Wandelt Stufen nicht direkt in EP um, Trefferpunkte nicht in Schaden, Rüstungswerte nicht in DV oder Zauberplätze nicht in Erschöpfung. Diese Werte gehören zu unterschiedlichen Verfahren. Wählt die beabsichtigte Fähigkeit, dann wendet das Fate's-Edge-Verfahren an, das sie ausdrückt.</p>
+<p>Dasselbe gilt für Ressourcenzeitpläne. Ein Ausgangsmerkmal, das sich nach einer Rast erneuert, übernimmt diesen Erneuerungszeitplan nicht in Fate's Edge. Ist das gewählte Talent einmal pro Szene oder einmal pro Sitzung, ist das die Regel, die ihr nutzt. Eine anders benannte Ausgangsressource rechtfertigt nicht das Hinzufügen einer weiteren Leiste.</p>
+<p>Nutzt vorhandene Fertigkeiten. Die Meditation eines Mönchs kann Geist + Ausdauer unter dem angegebenen Verfahren nutzen; sie braucht keine eigene Meditationsfertigkeit. Psionik ist eine explizite zusätzliche Fertigkeit in ihrer eigenen Erweiterung, keine Vorlage, um für jede Klasse eine Fertigkeit zu erfinden.</p>
+<p>Änderungen an Position, Effekt, Würfeln, DV, Erschöpfung, Schaden und Story-Beats sind keine austauschbaren Boni. Nutzt den spezifischen Vorteil und die Kosten der gewählten Option. Talente, die Story-Beats aufheben, gehören zu höheren Stufen; ein Ausgangsmerkmal kann dieses Gate nicht umgehen oder Aufhebung durch Analogie erzeugen.</p>
+<h2 id="worked-outlines">Vier ausgearbeitete Build-Gliederungen</h2>
+<p>Diese Beispiele zeigen, wie man Entscheidungen trifft. Sie sind keine vollständigen Charakterbögen oder kostenlosen Pakete: Legt Werte, Kosten, Talente und Ausrüstung mit den von der Kampagne gewählten Erstellungsregeln endgültig fest.</p>
+<h3>Der/die geschworene Beschützer/-in</h3>
+<p><strong>Konzept:</strong> ein disziplinierter Wächter, der einen Durchgang hält und einen Gefährten beschützt. Beginnt mit Körper und relevanten militärischen Fertigkeiten wie Nahkampf und Ausdauer. Lest <a href="../expansions/Fates_-_Edge_-_-Way-_-of-_-Warrior.html#martial-archetypes" hreflang="en">die militärischen Archetypen des Weg des Kriegers</a> für mögliche Verteidigungsoptionen. Wählt eine Option für ihren tatsächlichen Schutzeffekt, prüft dann Kosten und Voraussetzungen.</p>
+<p><strong>Unterklassenunterscheidung:</strong> Macht den Schwur und die Menschen, die er bindet, zu einem Teil der Beziehungen des Charakters. Ist übernatürlicher Schutz wesentlich, wählt zusätzlich einen passenden veröffentlichten Magiepfad; eine heilige Beschreibung allein gewährt keinen Zauber und keine Immunität. Setzt Fähigkeiten, die sich der Startcharakter noch nicht leisten kann, auf die Fortschrittsliste.</p>
+<h3>Der/die schwer fassbare Infiltrator/-in</h3>
+<p><strong>Konzept:</strong> jemand, der unbemerkt eindringt, ein Geheimnis erfährt und wieder herauskommt. Verstand und Heimlichkeit sind ein Ausgangspunkt für die Methode; wählt weitere Fertigkeiten, um darzustellen, wie der Charakter mit Menschen und Hindernissen umgeht. Legt fest, was der Charakter will, bevor ihr jede Infiltration als Angriff behandelt.</p>
+<p><strong>Unterklassenunterscheidung:</strong> Ein Hinterhalts-Spezialist und ein sozialer Infiltrator teilen sich vielleicht Heimlichkeitstraining, investieren aber unterschiedlich in ihre nächsten Wahlen. Nutzt das Kampfverfahren oder ein genau veröffentlichtes Talent für einen Angriff aus der Deckung. Importiert keinen Schadensmultiplikator des Ausgangsspiels nur weil die Ausgangsklasse einen erhält.</p>
+<h3>Der/die paktgebundene Zauberer/-in</h3>
+<p><strong>Konzept:</strong> Macht, vermittelt durch eine Beziehung, die eine Gegenleistung verlangen kann. Wählt den Fate's-Edge-Pfad, dessen Zugang, Effekte und Verpflichtungen zu dieser Beziehung passen. Die Bezeichnung „Pakt" eines Ausgangsspiels allein bestimmt nicht, welcher Fate's-Edge-Pfad zu nutzen ist.</p>
+<p><strong>Unterklassenunterscheidung:</strong> Drückt den Einfluss der Schutzmacht durch den gewählten Pfad, seine erlaubten Wirkungen und die Beziehungen des Charakters im Setting aus. Enthält das Konzept einen Gefährten, lest die relevanten Vertrauten- oder Gefolgsmann-Regeln separat. Bündelt keinen kostenlosen Gefährten in ein magisches Merkmal.</p>
+<h3>Der/die disziplinierte Asket/-in</h3>
+<p><strong>Konzept:</strong> Kontrolle über Atem, Balance und Bewegung. Nutzt die Kernattribute und -fertigkeiten, dann lest <a href="../expansions/Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Monks.html#talents" hreflang="en">Mönchs-Talente</a> für den gewünschten Signatureffekt. Meditation nutzt ihr veröffentlichtes Verfahren und die vorhandene Ausdauer-Fertigkeit.</p>
+<p><strong>Unterklassenunterscheidung:</strong> Wählt eine <a href="../expansions/Fates_-_Edge_-_-The-_-Complete-_-Guide-_-to-_-Monks.html#traditions" hreflang="en">Klostertradition</a> für ihre angegebenen Optionen und Verpflichtungen. Definieren psychische Effekte das Konzept, nutzt die <a href="../expansions/Fates_-_Edge_-_-Psionics.html" hreflang="en">Psionik-Erweiterung</a> mit ihren Zugangs- und Mentale-Belastung-Regeln. Führt keinen separaten Pool ein, nur um den Ressourcennamen einer Ausgangsklasse nachzuahmen.</p>
+<h2 id="edgewalker-build">Kantengänger/-in — der/die unscheinbare Unterhändler/-in</h2>
+<p><strong>Konzept:</strong> ein/e Aeler-Gauner/-in, aus dem angesehenen Leben der Halle verstoßen, aber immer noch beitragend, indem er/sie Chancen nach Hause bringt: Getreideverträge, Zugang, Aufklärung, Bergungsrechte oder ein nützliches Bündnis. Die Halle mag das Ergebnis akzeptieren und dem/der Gauner/-in dennoch keinen Platz an ihrem Tisch gewähren. Dies ist auch ein Fate's-Edge-Ziel für einen Strippenzieher, Fixer oder intrigenfokussierten Gauner aus einem anderen Spiel.</p>
+<p><strong>Signatur:</strong> Der Beamte mag euch nicht, versteht aber genau, was eine Ablehnung kosten würde, und unterschreibt. Euer Einfluss beruht auf Vorbereitung und glaubwürdigem Druckmittel. Ihr könnt schroff und sozial unbeliebt sein und trotzdem Aufmerksamkeit befehligen; unscheinbar bedeutet nicht handlungsunfähig in einer sozialen Szene.</p>
+<h3 id="edgewalker-starting-package">Startpaket</h3>
+<p>Dieses Beispiel nutzt das <a href="../srd/characters.html#step-2-attributes" hreflang="en">SRD-Start-Attributarray</a> und seine sechs Fertigkeitspunkte. Nutzt das von eurer Kampagne gewählte Erstellungsverfahren, falls es abweicht; dieses Paket liefert keine zusätzlichen EP, Ausrüstung oder Kontakte.</p>
+<ul>
+<li><strong>Attribute:</strong> Körper 1, Verstand 3, Geist 2, Ausstrahlung 2. Verstand unterstützt Vorbereitung und schnelles Urteilsvermögen; Ausstrahlung stellt die Fähigkeit dar, eine Forderung durchzusetzen, ohne Wärme oder Charme zu benötigen. Körper 1 hinterlässt eine echte Verwundbarkeit, wenn eine Verhandlung körperlich wird.</li>
+<li><strong>Fertigkeiten:</strong> Überzeugung 2, Einsicht 2, Täuschung 1, Wissen 1. Sechs Punkte, keiner über 2. Überzeugung übernimmt offene Verhandlung und Einschüchterung; Einsicht liest Menschen und Beweise; Täuschung deckt verdeckte Ansätze und Bluffen ab; Wissen liefert gelernten Kontext für Bräuche und Institutionen. Dieser/diese Gauner/-in beginnt als Verhandler/-in, nicht als vollendete/r Einbrecher/-in.</li>
+<li><strong>Optionales erstes Talent:</strong> <a href="../srd/talents.html#scout-talents" hreflang="en">Seidene Handflächen (2 EP)</a>, gekauft aus dem verfügbaren Talentbudget der Kampagne. Eine Bestechung oder ein Geschenk an einen niederen Beamten gewährt den vorübergehenden Faden <em>Erkaufte Verschwiegenheit</em>; seine Aktivierung senkt den DV um 1 bei einer Petitions- oder Vermittlungshandlung mit diesem Beamten und verbraucht ihn. Er deckt nicht jede Verhandlung ab und verleiht keine Autorität über hochrangige Beamte.</li>
+<li><strong>Praktische Ausrüstung:</strong> Schreibmaterial, Kopien relevanter Vereinbarungen, Reisekleidung und ein gewöhnliches Mittel zur Selbstverteidigung, erworben über das normale Ausrüstungsverfahren. Eine kopierte Vereinbarung ist nur dann nützlicher Beweis, wenn sie echt und relevant ist; Papier zu tragen erzeugt für sich genommen keinen Anspruch.</li>
+<li><strong>Startbeziehungen, mit der SL festzulegen:</strong> ein Hallenkontakt, der eure Chancen annimmt, ein oberflächlicher Vermittler, der eure Arbeit kennt, und jemand, der sich an die Kosten eures letzten Erfolgs erinnert. Das sind Beziehungsanstöße. Bezahlt für jeden mechanischen Gefolgsmann, Vorteil oder anderen Nutzen nach dessen eigenen Regeln.</li>
+</ul>
+<h3 id="edgewalker-at-the-table">Wie der Build am Tisch funktioniert</h3>
+<ol>
+<li><strong>Untersucht die Abhängigkeit.</strong> Findet heraus, wer die Entscheidung gewähren kann, was sie einschränkt und welche Beweise eure Schlussfolgerung stützen. Nutzt Einsicht oder Wissen, wenn der Ansatz es verlangt; ein erratenes Geheimnis ist kein etabliertes Druckmittel.</li>
+<li><strong>Erwerbt eine glaubwürdige Alternative.</strong> Verhandelt mit dem/der Gläubiger/-in, arrangiert eine andere Route oder organisiert die Menschen, die euer Interesse teilen. Löst diese Handlungen normal auf und akzeptiert ihre Kosten. Ihr könnt nicht verkünden, dass ihr die Schulden des Beamten bereits besitzt, nur weil ihr ein/e Kantengänger/-in seid.</li>
+<li><strong>Stellt eine präzise Forderung.</strong> „Gebt unsere inspizierte Fracht zum festgelegten Preis frei, und ich gegenzeichne die Verlängerung." Nutzt Überzeugung für die offene Verhandlung. Wählt das Attribut, das zum tatsächlichen Ansatz unter den Kernregeln passt; Verstand ist kein pauschaler Ersatz für Ausstrahlung, nur weil es euer höchster Wert ist.</li>
+<li><strong>Löst auf und haltet das Ergebnis ein.</strong> Legt Position und DV fest, würfelt bei Ungewissheit, zählt Erfolge und Story-Beats, löst dann Ergebnis und Konsequenzen auf. Wendet nur die Vorteile an, die die etablierte Fiktion oder eine gekaufte Option gewähren. Nehmt bei Erfolg das tatsächliche Zugeständnis. Erfüllt, was ihr im Gegenzug versprochen habt.</li>
+</ol>
+<p><strong>Eine Szene zum Testen:</strong> ein/e Hafenmeister/-in hält den Lotsen eures Unternehmens fest. Findet heraus, welche Kapitäne diesen Lotsen brauchen, sichert deren Zustimmung zu warten, und legt dem/der Hafenmeister/-in die daraus entstehenden Verzögerungskosten vor. Jedes Glied muss echt sein. Weigern sich die Kapitäne, baut einen anderen Ansatz; stimmen sie zu und gelingt eure Verhandlung, verlässt der Lotse das Gebäude, auch wenn der/die Hafenmeister/-in euch immer noch verachtet. Siehe <a href="../complete-worldbook/Worldbook-_-12-_-World-_-Travel-_-&amp;-_-Gateways.html#sec:edgewalker-leverage" hreflang="en">die Worldbook-Notizen zum Kantengänger</a> für das vollständige Beispiel und die Prioritäten der anderen Reisenden.</p>
+<p><strong>Fortschritt:</strong> Verbessert Überzeugung für direkte Verhandlung, Einsicht, um den Druckpunkt zu finden, und Wissen oder Täuschung je nach eurer Methode. Fügt Heimlichkeit für verdeckten Zugang hinzu, Ausdauer für harte Reisen, oder eine militärische Fertigkeit für eine schiefgehende Flucht. Kauft jede Steigerung zu ihren veröffentlichten Kosten. Kontakte und Vorteile können eure Reichweite erweitern, wenn sie nach ihren Regeln erworben werden; der angesehene Patron, der Türen öffnet, kann jemand anderes in der Gruppe sein.</p>
+<p><strong>Charakterspannung:</strong> Entscheidet, welche Gelegenheit eure Rückkehr rechtfertigen würde, ob ihr diese Rückkehr noch wollt, und welche Kosten ihr euch weigert, in die Niederlande zu exportieren. Euer Zynismus kann kohärent sein, ohne universell zu sein: Manche Menschen halten einen Eid auch um einen ruinösen Preis. Lernt, was sie wertschätzen, statt anzunehmen, dass jede Ablehnung einen höheren Preis verbirgt.</p>
+<p><strong>Regelgrenze:</strong> Dieser Build fügt keine Klasse, Fertigkeit, automatischen Faden, Gelegenheits-Zähler oder garantierten sozialen Erfolg hinzu. Jedes separat veröffentlichte Aeler-Erweiterungsverfahren erfordert, dass diese Erweiterung genutzt wird, und folgt ihren angegebenen Bedingungen. Der Build funktioniert über den Kernablauf auch ohne sie.</p>
+<h2 id="conversion-worksheet">Umwandlungs-Arbeitsblatt</h2>
+<table><thead><tr><th>Eintrag</th><th>Eure Antwort</th></tr></thead><tbody>
+<tr><td>Ausgangsklasse oder -unterklasse; Kampagnen-Startstufe und Erstellungsverfahren</td><td>________________________________</td></tr>
+<tr><td>Rolle, Methode und ein oder zwei Signaturmomente</td><td>________________________________</td></tr>
+<tr><td>Kernattribute und -fertigkeiten, die gewöhnliche Handlungen unterstützen</td><td>________________________________</td></tr>
+<tr><td>Gewähltes Talent oder gewählter Pfad; genaue Fate's-Edge-Quelle</td><td>________________________________</td></tr>
+<tr><td>Voraussetzungen, Kosten, Auslöser, Timing, Häufigkeit und Konsequenzen</td><td>________________________________</td></tr>
+<tr><td>Ausrüstung, Beziehungen, Gefolgsleute oder Vorteile und ihre Erwerbsregeln</td><td>________________________________</td></tr>
+<tr><td>Spätere Fortschrittswahlen und ungelöste Merkmale</td><td>________________________________</td></tr>
+<tr><td>Explizite Ergänzungen oder Änderungen, die die Gruppe vereinbart hat</td><td>________________________________</td></tr>
+</tbody></table>
+<footer class="doc-footer">
+    Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Verwendet mit Genehmigung, Alle Rechte vorbehalten.
+</footer>
+</body>
+</html>
