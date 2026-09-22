@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge — Wesentliche Regeln (Deutsch)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.5rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .badge-red { background: var(--red); color: #fff; border-color: var(--red); }
+    .badge-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .badge-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .badge-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .badge-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .toc {
+        background: var(--bg3);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.5rem 0;
+    }
+    .toc summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+    .toc summary:hover { color: var(--gold-hover); }
+    .toc a { color: var(--text2); display: block; padding: 0.1rem 0; font-size: 0.85rem; }
+    .toc a:hover { color: var(--gold); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    pre { background: var(--bg3); padding: 0.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid var(--border); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .titlepage { text-align: center; margin: 1rem 0 0.5rem; }
+    .titlepage h1 { font-size: 2.5rem; border-bottom: none; margin-bottom: 0.1rem; }
+    .titlepage h2 { font-size: 1.8rem; font-weight: normal; border-bottom: none; margin-top: 0; }
+    .copyright-page { text-align: center; margin: 1rem 0; padding: 1rem 0; border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+    .copyright-page h1 { border-bottom: none; }
+    .warningbox { background: var(--bg3); border-left: 4px solid var(--red); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .tipbox { background: var(--bg3); border-left: 4px solid var(--gold); padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: var(--radius); }
+    .srd-reference { background: var(--bg2); border: 1px solid var(--gold); padding: 0.5rem 1rem; margin: 1rem 0; border-radius: var(--radius); }
+    .back-to-top { position: fixed; bottom: 1rem; right: 1rem; background: var(--bg3); padding: 0.5rem 0.8rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 100; }
+    .back-to-top:hover { background: var(--gold); color: var(--bg1); }
+    .search-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem; color: var(--text); width: 100%; max-width: 300px; }
+    .search-box:focus { outline: none; border-color: var(--gold); }
+    .highlight { background: var(--bg4); border-left: 3px solid var(--gold); padding-left: 0.5rem; }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+<aside class="translation-notice" lang="de">Deutsche Version. Maschinell unterstützte Übersetzung; vollständige redaktionelle Überarbeitung steht noch aus. <a href="../resources/Fates_-_Edge_-_-Essentials.html" hreflang="en">Original auf Englisch ansehen</a></aside>
+<a class="back-to-top" href="#">⬆</a>
+<div id="main-content">
+<!-- ==================== TITLE PAGE ==================== -->
+<div class="titlepage">
+<h1 id="reader-section-1">Fate's Edge</h1>
+<h2 id="reader-section-2">Wesentliche Regeln</h2>
+<p>Eine vollständige kostenlose Version des Spiels</p>
+<p class="author" style="color:var(--text2);">Nicholas A. Gasper</p>
+<p class="date text-muted">10.07.2026</p>
+</div>
+<!-- ==================== COPYRIGHT PAGE ==================== -->
+<div class="copyright-page">
+<h1 id="reader-section-3">Fate's Edge: Wesentliche Regeln</h1>
+<p>Copyright © Nicholas A. Gasper</p>
+<p><em>Erste Auflage, Juni 2026</em></p>
+<hr style="width: 60%; margin: 1em auto; border-color: var(--gold);"/>
+<p><strong>Wichtiger Lizenzhinweis</strong></p>
+<div class="license-text" style="max-width:700px;margin:0 auto;font-size:0.9rem;line-height:1.5;">
+<p>Die Abschnitte dieses Werks, die zum <em>Fate's Edge System-Referenzdokument (SRD)</em> gehören<br/>
+        (durchgehend deutlich mit <code>[SRD]</code>-Kennzeichnung markiert), stehen unter der<br/>
+<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative-Commons-Lizenz Namensnennung – Nicht kommerziell – Weitergabe unter gleichen Bedingungen 4.0 International</a>.<br/>
+        Um eine Kopie dieser Lizenz einzusehen, besucht <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">http://creativecommons.org/licenses/by-nc-sa/4.0/</a>.</p>
+<p>Alle übrigen Inhalte — einschließlich, aber nicht beschränkt auf Setting-Hintergrund, ursprüngliche Charaktere,<br/>
+        Abenteuer, Kunstwerke, Karten und firmeneigene Mechaniken — sind <strong>© Nicholas A. Gasper, alle Rechte vorbehalten</strong>.<br/>
+        Diese urheberrechtlich geschützten Inhalte dürfen ohne vorherige schriftliche Genehmigung<br/>
+        nicht vervielfältigt, verbreitet oder übertragen werden, mit Ausnahme kurzer Zitate in Rezensionen<br/>
+        und bestimmter anderer nichtkommerzieller Nutzungen, die das Urheberrecht erlaubt.</p>
+<p><strong>Das SRD steht außerdem als eigenständiger kostenloser Download zur Verfügung</strong><br/>
+        unter <a href="https://chronophage.github.io/kon-reh/build/html/srd.html">https://chronophage.github.io/kon-reh/build/html/srd.html</a>.<br/>
+        Für Anfragen zur Nutzung urheberrechtlich geschützter Inhalte wendet euch an den Autor<br/>
+        über die Website des Verlags oder unter der in der kommerziellen Ausgabe angegebenen Adresse.</p>
+</div>
+<hr style="width: 50%; margin: 1em auto; border-color: var(--gold);"/>
+<p><em>„Die Münze, die man nie ausgibt, ist die, an deren Diebstahl man sich nicht erinnert."</em><br/>
+    — Serafine vom Samtenen Griff</p>
+</div>
+<!-- ==================== SRD REFERENCE ==================== -->
+<div class="srd-reference">
+<h2 id="reader-section-4" style="text-align:center;border-bottom:none;">System-Referenzdokument (SRD) — Referenz</h2>
+<ul>
+<li><strong>Was ist das SRD?</strong> Der offen lizenzierte Teil dieses Werks (CC BY-NC-SA 4.0), gedacht für Drittanbieter-Ersteller/-innen. <em>Alle SRD-Inhalte sind in diesem Buch mit <code>[SRD]</code>-Kennzeichnung markiert.</em></li>
+<li><strong>Verifizierte SRD-Inhalte umfassen:</strong>
+<ul>
+<li>Kern-Auflösungsmechanik (Würfelpools, Position, DV, Ergebnismatrix)</li>
+<li>Gunst- und Story-Beat-Ökonomien</li>
+<li>Erschöpfungs-, Schadens- und Rüstungsumrechnungssysteme</li>
+<li>Beschreibungen von Attributen und Fertigkeiten</li>
+<li>Grundlegende Kampf- und Handlungsökonomie-Regeln</li>
+<li>Universelle Magiemechanik (TAGS, DV-Berechnung, Rückschlag)</li>
+<li>NSC-Vorlagen und Begegnungsrichtlinien</li>
+<li>Ausrüstungs- und Gegenstandstabellen</li>
+<li>Rahmen zur Charaktererstellung</li>
+</ul>
+</li>
+<li><strong>Erweiterte Inhalte (nicht SRD — urheberrechtlich geschützt):</strong>
+<ul>
+<li>Setting-Hintergrund (Fraktionen Acasias, der Fluch, regionale Details)</li>
+<li>Ursprüngliche Charaktere, NSCs und benannte Figuren</li>
+<li>Abenteuermodule und Szenarioaufhänger</li>
+<li>Patronsbeschreibungen, Riten und exklusive mechanische Inhalte</li>
+<li>Firmeneigene Magiesysteme (Runenwahrer-, Anrufer-, Kantoren-, Beschwörer-spezifisch)</li>
+<li>Kunstwerke, Karten und grafische Elemente</li>
+<li>Fraktionsbeschreibungen und kampagnenspezifische Inhalte</li>
+<li>Originalprosa, Rahmenerzählungen und narrativer Text</li>
+<li><em>Hinweis: Optionale Systeme wie das Konsequenzen-Deck, das Kronen-Spread und der Reise-Rahmen sind urheberrechtlich geschützte Inhalte.</em></li>
+</ul>
+</li>
+<li><strong>Lizenzzusammenfassung:</strong> SRD-Inhalte sind lizenziert unter <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. Alle erweiterten Inhalte sind <strong>© Nicholas A. Gasper, alle Rechte vorbehalten</strong>. Siehe Copyright-Seite für den vollständigen Lizenztext.</li>
+</ul>
+<hr style="width: 50%; margin: 1em auto; border-color: var(--gold);"/>
+<p><em>„Die Münze, die man nie ausgibt, ist die, an deren Diebstahl man sich nicht erinnert."</em><br/>
+    — Serafine vom Samtenen Griff</p>
+</div>
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<details class="toc">
+<summary>📑 Inhaltsverzeichnis</summary>
+<a href="#ch:welcome">Willkommen bei Fate's Edge</a>
+<a href="#ch:core-mechanics">Kernmechaniken</a>
+<a href="#ch:character-creation">Charaktererstellung</a>
+<a href="#ch:pregens">Vorgefertigte Charaktere</a>
+<a href="#ch:lantern-at-dusk">Einstiegsabenteuer: Die Laterne in der Dämmerung</a>
+<a href="#ch:simplified-magic">Vereinfachte Magie</a>
+<a href="#ch:gm-tips">SL-Tipps: Eure erste Spielsitzung leiten</a>
+<a href="#ch:next-steps">Wie es weitergeht</a>
+<a href="#ch:quick-reference">Schnellreferenz</a>
+</details>
+<!-- ==================== MAIN CONTENT ==================== -->
+<blockquote>
+<p>„Die Münze, die man nie ausgibt, ist die, an deren Diebstahl man sich nicht erinnert."<br/>
+    — Serafine vom Samtenen Griff</p>
+</blockquote>
+<section class="level1" id="ch:welcome">
+<h1 id="reader-section-5">Willkommen bei Fate's Edge</h1>
+<section class="level2" id="what-is-this-game">
+<h2 id="reader-section-6">Worum geht es in diesem Spiel?</h2>
+<p><strong>Fate's Edge</strong> ist ein Tabletop-Rollenspiel, in dem
+<em>jede Entscheidung Gewicht hat</em>. Ihr spielt kein Brettspiel
+und keinen taktischen Simulator. Ihr erzählt gemeinsam eine
+Geschichte — eine Geschichte von Risiko, Konsequenz und Vermächtnis.</p>
+<p>In diesem Spiel verkörpert ihr Verbannte, Gauner, Überlebende und
+Held/-innen in einer Welt aus uralter Magie, gefallenen Reichen und
+lebendigen Kulturen. Die Welt erinnert sich an das, was ihr tut. Jeder
+Schwur, jeder Verrat, jedes verzweifelte Wagnis hallt weiter.</p>
+<section class="level3 unnumbered" id="core-philosophy-narrative-first">
+<h3 class="unnumbered">Kernphilosophie: Erzählung zuerst</h3>
+<p>Die Geschichte ist der Grund, warum es die Regeln gibt — nicht
+umgekehrt. Wenn ihr euch zum Spielen zusammensetzt, würfelt ihr nicht,
+um zu sehen, was passiert — ihr erzählt eine Geschichte, mit Würfeln
+als Ko-Autoren.</p>
+<p><strong>Mechanik dient der Geschichte.</strong> Ein Würfelwurf ist
+nie nur Erfolg/Misserfolg. Er verändert die fiktive Landschaft.</p>
+<ul>
+<li><p><strong>Klarer Erfolg</strong> — Der Plan funktioniert wie
+beabsichtigt.</p></li>
+<li><p><strong>Erfolg &amp; SB</strong> — Ihr bekommt, was ihr wollt,
+aber die Welt wehrt sich.</p></li>
+<li><p><strong>Teilerfolg</strong> — Ihr macht Fortschritt, aber die
+Situation bleibt ungelöst.</p></li>
+<li><p><strong>Fehlschlag</strong> — Ihr scheitert, und die Situation
+eskaliert.</p></li>
+</ul>
+<p>Jeder Wurf zählt. Die Geschichte stockt nie; sie entwickelt sich
+weiter.</p>
+</section>
+<section class="level3 unnumbered" id="risk-as-the-engine-of-drama">
+<h3 class="unnumbered">Risiko als Motor des Dramas</h3>
+<p>Fate's Edge baut auf bedeutsamem Risiko auf. Sicherheit ist
+langweilig. Wenn eure Figur etwas zu verlieren hat — Ruf, Verbündete,
+Ideale, das Leben —, werden ihre Taten heroisch oder tragisch
+denkwürdig.</p>
+<p>Euer wichtigstes Werkzeug zur Risikosteuerung ist die
+<strong>Story-Beat-(SB-)</strong>Ökonomie. Zeigen die Würfel eine 1,
+reagiert die Welt. Die SL erhält SB, um Komplikationen einzuführen,
+Bedrohungen zu eskalieren oder verborgene Gefahren aufzudecken.</p>
+<div class="warningbox">
+<p><strong>Wichtig:</strong> SB entstehen bei <em>jedem</em> Wurf, der
+eine 1 erzeugt, egal ob der Gesamtwurf gelingt oder scheitert. Sie
+sind keine Bestrafung; sie sind Treibstoff für eine unvorhersehbare,
+reaktive Erzählung.</p>
+</div>
+</section>
+<section class="level3 unnumbered" id="characters-who-change-the-world">
+<h3 class="unnumbered">Charaktere, die die Welt verändern</h3>
+<p>Charakterwachstum in Fate's Edge bedeutet nicht das Anhäufen
+abstrakter Macht. Es ist bedeutsames Wachstum, verwurzelt in der
+Geschichte. Ihr verdient <strong>Erfahrungspunkte (EP)</strong>, indem
+ihr euch auf Herausforderungen und Komplikationen einlasst. Ihr gebt EP
+aus, um Fähigkeiten zu verbessern, Vorteile (Assets) zu erwerben oder
+kulturelle Talente freizuschalten.</p>
+<p>Aufstieg ist direkt an die Erzählung gebunden. Eine Figur wird
+Legendäre/-r Feldherr/-in, indem sie Armeen führt, nicht indem sie
+Monster grindet. Eine Zauberin meistert verbotenes Wissen, indem sie
+Rückschlag überlebt.</p>
+</section>
+<section class="level3 unnumbered" id="key-concepts-at-a-glance">
+<h3 class="unnumbered">Kernbegriffe auf einen Blick</h3>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">Würfelpool</span> Attribut + Fertigkeit als W10. 6+ = Erfolg.
+1 = Story-Beat (SB) für die SL.</p></li>
+<li><p><span class="badge badge-blue">Position &amp; Effekt</span> Position
+(Dominant/Kontrolliert/Verzweifelt) legt den Einsatz bei Misserfolg fest.
+Effekt (Begrenzt/Standard/Groß) beschreibt, was ein klarer Erfolg
+erreicht.</p></li>
+<li><p><span class="badge badge-purple">Zähler</span> Visuelle Tracker für laufende
+Herausforderungen (z. B. ein Schloss mit 4 Segmenten, ein Aufstieg
+einer Fraktion mit 8 Segmenten).</p></li>
+<li><p><span class="badge badge-green">Gunsten</span> Narrative Marken, die ihr durch das
+Eingehen von Risiko verdient. Gebt sie aus, um Würfel neu zu würfeln,
+die Position zu verbessern oder Vorteile (Assets) zu aktivieren.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="safety-tools-lines-veils-x-card">
+<h2 id="reader-section-7">Sicherheitswerkzeuge: Linien, Schleier &amp; X-Karte</h2>
+<p>Fate's Edge behandelt reife Themen — Konflikt, Verlust, Horror,
+Verrat und schwierige Entscheidungen. Der Tisch muss sich stets sicher
+anfühlen. Nutzt diese drei einfachen Werkzeuge.</p>
+<section class="level3 unnumbered" id="x-card">
+<h3 class="unnumbered">X-Karte</h3>
+<p>Jede spielende Person (einschließlich der SL) kann[SRD] ein X auf
+eine Karte zeichnen oder einfach „X" sagen, wenn ein Moment
+unangenehm wird. [/SRD]Der beschriebene Inhalt wird sofort aus der
+Fiktion entfernt — ohne Fragen, ohne Erklärungen. Die Szene wird
+umgehend retconnt oder umgelenkt.</p>
+</section>
+<section class="level3 unnumbered" id="lines">
+<h3 class="unnumbered">Linien</h3>
+<p>Eine Linie ist eine harte Grenze: Inhalt, der im Spiel überhaupt
+nicht vorkommen wird. Beispiele: „Keine sexuelle Gewalt", „Kein Leid
+für Kinder", „Kein Körperhorror". Spieler/-innen benennen ihre Linien
+vor der Kampagne; die Gruppe respektiert sie.</p>
+</section>
+<section class="level3 unnumbered" id="veils">
+<h3 class="unnumbered">Schleier</h3>
+<p>Ein Schleier ist eine weiche Grenze: Inhalt, der „außerhalb der
+Szene" geschehen oder abgeblendet werden kann. Das Ereignis wird
+anerkannt, aber nicht beschrieben. Beispiel: „Eine romantische Szene
+darf stattfinden, aber blendet ab, bevor sie explizit wird."</p>
+</section>
+<section class="level3 unnumbered" id="how-to-use-these-tools">
+<h3 class="unnumbered">So nutzt ihr diese Werkzeuge</h3>
+<div class="panel panel-purple">
+<ul>
+<li><p>Legt Linien und Schleier in der Sitzung Null fest. Schreibt sie
+auf, wo alle sie sehen können.</p></li>
+<li><p>Haltet eine X-Karte sichtbar auf dem Tisch.</p></li>
+<li><p>Erinnert die Spieler/-innen, dass sie die X-Karte jederzeit
+nutzen können.</p></li>
+<li><p>Wird die X-Karte genutzt, haltet inne, spult bei Bedarf zurück
+und macht weiter. Fragt nicht nach.</p></li>
+<li><p>Die SL ist auch eine spielende Person; sie darf die X-Karte
+für ihr eigenes Wohlbefinden nutzen.</p></li>
+</ul>
+</div>
+<p class="text-sm text-muted">Diese Werkzeuge dienen nicht der Zensur — sie dienen dem
+Einverständnis. Sie erlauben es dem Tisch, dunklere, intensivere
+Geschichten zu erzählen, weil alle wissen, dass sie aussteigen
+können.</p>
+</section>
+</section>
+<section class="level2" id="session-zero-the-foundation-of-play">
+<h2 id="reader-section-8">Sitzung Null: Das Fundament des Spiels</h2>
+<p>Trefft euch vor eurem ersten Würfelwurf zu einer Sitzung Null. Hier
+baut ihr das gemeinsame Verständnis auf, das Fate's Edge zum Klingen
+bringt.</p>
+<section class="level3 unnumbered" id="session-zero-checklist">
+<h3 class="unnumbered">Checkliste zur Sitzung Null</h3>
+<div class="panel panel-blue">
+<ol>
+<li><p><strong>Linien &amp; Schleier:</strong> Welche Inhalte sind
+tabu (Linien) oder nur angedeutet (Schleier)?</p></li>
+<li><p><strong>Ton:</strong> Kinoreife Action? Grimmiges Überleben?
+Politische Intrige? Dunkler Horror?</p></li>
+<li><p><strong>Kampagnenlänge:</strong> Einzelabenteuer, kurzer Bogen
+(3–6 Sitzungen) oder lange Kampagne?</p></li>
+<li><p><strong>Charakteraufhänger:</strong> Jede spielende Person
+nennt ein Ziel und eine Angst für ihre Figur.</p></li>
+<li><p><strong>Ausgangssituation:</strong> Wo beginnt die
+Geschichte?</p></li>
+<li><p><strong>Terminplanung:</strong> Wie oft trefft ihr euch? Was
+passiert, wenn jemand fehlt?</p></li>
+</ol>
+<p class="text-sm text-muted mt-1">Dreißig Minuten für die Sitzung Null zu investieren, erspart euch
+Stunden an Reibung mitten in der Kampagne.</p>
+</div>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:core-mechanics">
+<h1 id="reader-section-9">Kernmechaniken</h1>
+<div class="panel panel-gold">
+<p><strong>Der Kernablauf in 90 Sekunden</strong></p>
+<ol>
+<li><p>Spieler/-in verkündet Absicht und Vorgehen (Attribut +
+Fertigkeit).</p></li>
+<li><p>Die SL legt Position (Dominant/Kontrolliert/Verzweifelt) und
+Schwierigkeit (DV 2–5+) fest.</p></li>
+<li><p>Spieler/-in würfelt den Würfelpool (Attribut + Fertigkeit als
+W10).</p></li>
+<li><p>Erfolge zählen (6+ = Erfolg, 10 = 2 Erfolge) und Story-Beats
+(1en).</p></li>
+<li><p>Erfolge mit der DV anhand der Ergebnismatrix vergleichen.</p></li>
+<li><p>Die SL gibt Story-Beats (SB) für Komplikationen aus.</p></li>
+<li><p>Spieler/-in markiert Ressourcen (Gunsten, Erschöpfung,
+Schaden).</p></li>
+</ol>
+</div>
+<section class="level2" id="the-resolution-loop">
+<h2 id="reader-section-10">Der Auflösungszyklus</h2>
+<p>Jede bedeutsame Handlung durchläuft diesen einfachen Zyklus:</p>
+<section class="level3 unnumbered" id="declare-intent-and-approach">
+<h3 class="unnumbered">1. Absicht und Vorgehen verkünden</h3>
+<p>Die spielende Person sagt, was sie erreichen will und wie
+(Attribut + Fertigkeit). Beispiel: <em>„Ich will mich am Wächter
+vorbeischleichen (Verstand + Heimlichkeit)."</em></p>
+</section>
+<section class="level3 unnumbered" id="set-difficulty-value-dv">
+<h3 class="unnumbered">2. Schwierigkeitswert (DV) festlegen</h3>
+<p>Die SL legt die Zielzahl der benötigten Erfolge fest.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>DV</strong></th><th style="text-align: left;"><strong>Situation</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">2</td><td style="text-align: left;">Routine, kein Druck, fast garantiert.</td></tr>
+<tr><td style="text-align: left;">3</td><td style="text-align: left;">Standard — leichter Widerstand, etwas Risiko.</td></tr>
+<tr><td style="text-align: left;">4</td><td style="text-align: left;">Schwer — ernster Widerstand oder schlechter Winkel.</td></tr>
+<tr><td style="text-align: left;">5+</td><td style="text-align: left;">Extrem — großer Endgegner oder dramatisches Wagnis.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="set-position">
+<h3 class="unnumbered">3. Position festlegen</h3>
+<p>Die Position zeigt, wie riskant die Handlung ist, und verändert,
+wie sich die Würfel verhalten.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Position</strong></th><th style="text-align: left;"><strong>Narrativer Rahmen</strong></th><th style="text-align: left;"><strong>Mechanischer Effekt</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Dominant</td><td style="text-align: left;">Ihr nutzt den Vorteil aus</td><td style="text-align: left;">Einen Fehlschlag neu würfeln.</td></tr>
+<tr><td style="text-align: left;">Kontrolliert</td><td style="text-align: left;">Ausgeglichen, normal</td><td style="text-align: left;">Kein Nachwurf.</td></tr>
+<tr><td style="text-align: left;">Verzweifelt</td><td style="text-align: left;">Ihr handelt unter Zwang</td><td style="text-align: left;">Einen Erfolg neu würfeln.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Ihr könnt 1 Gunst ausgeben, um die Position vor dem Würfeln um eine
+Stufe zu verbessern.</p>
+</section>
+<section class="level3 unnumbered" id="roll-the-dice">
+<h3 class="unnumbered">4. Würfeln</h3>
+<p>Würfelt Attribut + Fertigkeit als W10.</p>
+<ul>
+<li><p>Jeder Würfel mit 6–9 = 1 Erfolg.</p></li>
+<li><p>Jeder Würfel mit 10 = 2 Erfolge (kritisch).</p></li>
+<li><p>Jeder Würfel mit 1 = 1 Story-Beat (SB) für die SL.</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="apply-the-outcome">
+<h3 class="unnumbered">5. Das Ergebnis anwenden</h3>
+<p>Vergleicht Erfolge mit der DV:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Wurfergebnis</strong></th><th style="text-align: left;"><strong>Ausgang</strong></th><th style="text-align: left;"><strong>Was passiert</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">E ≥ DV, SB = 0</td><td style="text-align: left;">Klarer Erfolg</td><td style="text-align: left;">Absicht erreicht; keine Komplikation.</td></tr>
+<tr><td style="text-align: left;">E ≥ DV, SB &gt; 0</td><td style="text-align: left;">Erfolg mit SB</td><td style="text-align: left;">Absicht erreicht; die SL gibt SB für eine Komplikation aus.</td></tr>
+<tr><td style="text-align: left;">0 &lt; E &lt; DV</td><td style="text-align: left;">Teilerfolg</td><td style="text-align: left;">Fortschritt erzielt; Spieler/-in erhält 1 Gunst.</td></tr>
+<tr><td style="text-align: left;">E = 0</td><td style="text-align: left;">Fehlschlag</td><td style="text-align: left;">Kein Fortschritt; Spieler/-in erhält 2 Gunsten; die SL eskaliert.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section class="level2" id="boons-player-resource">
+<h2 id="reader-section-11">Gunsten (Spielerressource)</h2>
+<p>Gunsten stehen für Schwung und narrativen Einfluss. Ihr dürft bis zu
+5 Gunsten halten.</p>
+<section class="level3 unnumbered" id="earning-boons">
+<h3 class="unnumbered">Gunsten verdienen</h3>
+<div class="panel panel-green">
+<ul>
+<li><p><span class="badge badge-green">+1</span> <strong>Teilerfolg:</strong> 1 Gunst erhalten.</p></li>
+<li><p><span class="badge badge-green">+2</span> <strong>Fehlschlag:</strong> 2 Gunsten erhalten.</p></li>
+<li><p><span class="badge badge-green">+1</span> <strong>Bandengetriebene Handlung:</strong> Einmal pro Bande und
+Sitzung 1 Gunst erhalten.</p></li>
+<li><p><strong>Belohnung der SL:</strong> Für Kreativität, Opferbereitschaft oder
+starkes narratives Spiel.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="spending-boons">
+<h3 class="unnumbered">Gunsten ausgeben</h3>
+<ul>
+<li><p>Einen einzelnen Würfel neu würfeln (nachdem das Ergebnis
+bekannt ist).</p></li>
+<li><p>Einen sichtbaren Vorteil (Asset) aktivieren (1 Gunst).</p></li>
+<li><p>Die Position vor einem Wurf um eine Stufe verbessern.</p></li>
+<li><p>Bestimmte Riten oder Fähigkeiten speisen.</p></li>
+<li><p>2 Gunsten → 1 EP umwandeln (einmal pro Sitzung, max. 2 EP durch
+Umwandlung).</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="limits">
+<h3 class="unnumbered">Grenzen</h3>
+<div class="panel panel-red">
+<ul>
+<li><p>Höchstens 5 Gunsten gehalten.</p></li>
+<li><p>Am Ende jeder Szene die gehaltenen Gunsten auf höchstens 2
+reduzieren (Überschuss geht verloren).</p></li>
+<li><p>Höchstens 2 Gunsten aus Fehlschlägen pro Charakter und
+Szene.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="story-beats-gm-resource">
+<h2 id="reader-section-12">Story-Beats (SL-Ressource)</h2>
+<p>Jedes Mal, wenn eine spielende Person eine 1 würfelt, erhält die SL
+einen Story-Beat (SB). Gebt SB aus, um Komplikationen einzuführen oder
+den Druck zu erhöhen.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>SB-Kosten</strong></th><th style="text-align: left;"><strong>Effekt</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">1 SB</td><td style="text-align: left;">Klein: Lärm, Spur, einen Zähler +1 tick.</td></tr>
+<tr><td style="text-align: left;">2 SB</td><td style="text-align: left;">Mäßig: Alarm ausgelöst, Position verloren, ein geringerer Gegner erscheint.</td></tr>
+<tr><td style="text-align: left;">3+ SB</td><td style="text-align: left;">Groß: Verstärkung, Szenenwechsel, einen Vorteil zerbrechen.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="tipbox">
+<p><strong>Setzt Story-Beats offensiv ein.</strong> Ungenutzter Druck
+ist verschwendete Dynamik. Ein starker Beat ist besser als viele
+kleine Nachteile — aber ihr müsst auf sie hinarbeiten.</p>
+</div>
+</section>
+<section class="level2" id="fatigue-and-harm">
+<h2 id="reader-section-13">Erschöpfung und Schaden</h2>
+<section class="level3 unnumbered" id="fatigue">
+<h3 class="unnumbered">Erschöpfung</h3>
+<p>Jede Figur hat eine Erschöpfungsleiste in Höhe ihres
+Körper-Attributs.</p>
+<ul>
+<li><p>Jeder Punkt Erschöpfung verschlechtert eure Position um eine
+Stufe (Dominant → Kontrolliert → Verzweifelt).</p></li>
+<li><p>Seid ihr bereits Verzweifelt, erlegt jede weitere Erschöpfung
+–1 Würfel auf.</p></li>
+<li><p>Ist die Erschöpfungsleiste voll, erhöht den Schaden um 1 und
+löscht die gesamte Erschöpfung.</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="harm">
+<h3 class="unnumbered">Schaden</h3>
+<p>Schaden steht für ernsthafte Verletzung.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Schadensstufe</strong></th><th style="text-align: left;"><strong>Effekt</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Schaden 1</td><td style="text-align: left;">–1 Würfel auf verwandte Handlungen.</td></tr>
+<tr><td style="text-align: left;">Schaden 2</td><td style="text-align: left;">–1 Würfel auf die meisten Handlungen.</td></tr>
+<tr><td style="text-align: left;">Schaden 3</td><td style="text-align: left;">Kampfunfähig oder sterbend.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="armor-conversion">
+<h3 class="unnumbered">Rüstungsumrechnung</h3>
+<p>Rüstung reduziert Schaden nicht direkt. Stattdessen wandelt sie
+Schaden in Erschöpfung um.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Rüstungsart</strong></th><th style="text-align: left;"><strong>Schaden 1</strong></th><th style="text-align: left;"><strong>Schaden 2</strong></th><th style="text-align: left;"><strong>Schaden 3</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Leicht</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Schaden 1 + Erschöpfung 1</td><td style="text-align: left;">Schaden 2 + Erschöpfung 1</td></tr>
+<tr><td style="text-align: left;">Mittel</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Schaden 2 + Erschöpfung 1</td></tr>
+<tr><td style="text-align: left;">Schwer</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Erschöpfung 2</td></tr>
+</tbody>
+</table>
+</div>
+<p><em>Mindestens 1 Erschöpfung pro Treffer, selbst wenn die
+Umrechnung 0 ergäbe.</em></p>
+</section>
+<section class="level3 unnumbered" id="recovery">
+<h3 class="unnumbered">Erholung</h3>
+<div class="panel panel-green">
+<ul>
+<li><p><span class="badge badge-green">Erschöpfung</span> Eine kurze Rast (1 Stunde) entfernt 2
+Erschöpfung. Eine volle Nachtruhe entfernt alles.</p></li>
+<li><p><span class="badge badge-red">Schaden</span> Erfordert medizinische Versorgung
+(Handwerk-Wurf) oder magische Heilung. Natürliche Genesung dauert eine
+Woche pro Stufe.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="timers">
+<h3 class="unnumbered">Zähler</h3>
+<p>Zähler sind visuelle Tracker für laufende Herausforderungen und
+sich aufbauenden Druck.</p>
+<section class="level4 unnumbered" id="timer-sizes">
+<h4 class="unnumbered">Zählergrößen</h4>
+<ul>
+<li><p><span class="badge badge-green">4 Segmente</span> Kurzfristiger Druck (eine
+Wachpatrouille trifft ein, eine Tür bricht).</p></li>
+<li><p><span class="badge badge-gold">6 Segmente</span> Standard-Szenenzähler (ein Ritual
+vollendet sich, ein Rivale entkommt).</p></li>
+<li><p><span class="badge badge-red">8+ Segmente</span> Szenenübergreifender oder
+kampagnenweiter Zähler (eine Fraktion festigt ihre Macht).</p></li>
+</ul>
+</section>
+<section class="level4 unnumbered" id="when-to-tick-a-timer">
+<h4 class="unnumbered">Wann ein Zähler tickt</h4>
+<ul>
+<li><p>Bei einem Teilerfolg oder Fehlschlag.</p></li>
+<li><p>Wenn ihr Story-Beats ausgebt (1 SB = üblicherweise 1
+Tick).</p></li>
+<li><p>Wenn die Fiktion es verlangt: <em>„Während ihr streitet,
+breitet sich das Feuer aus."</em></p></li>
+</ul>
+</section>
+<section class="level4 unnumbered" id="when-a-timer-fills">
+<h4 class="unnumbered">Wenn ein Zähler sich füllt</h4>
+<p>Das festgelegte Ereignis tritt ein. Das Ereignis sollte sichtbar
+sein und die Situation verändern.</p>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li><p>Ein Zähler <strong>Wachpatrouille [4]</strong> füllt sich:
+Wachen treffen ein.</p></li>
+<li><p>Ein Zähler <strong>Ritualvollendung [6]</strong> füllt sich:
+das Ritual ist vollbracht.</p></li>
+<li><p>Ein Zähler <strong>Bündnisbildung [8]</strong> füllt sich: eine
+Fraktion entscheidet sich zu handeln.</p></li>
+</ul>
+<div class="tipbox">
+<p><strong>Zähler sind sichtbar.</strong> Zeigt sie den
+Spieler/-innen. Schreibt <em>Kulteinfluss [6]</em> auf eine
+Karteikarte und legt sie auf den Tisch. Tickt laut: <em>„Der Gesang
+des Kults wird lauter — das Ritual schreitet voran."</em></p>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:character-creation">
+<h1 id="reader-section-14">Charaktererstellung</h1>
+<section class="level2" id="overview">
+<h2 id="reader-section-15">Überblick</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Stufe I</span> <span class="badge badge-gold">32 EP</span> Charaktere beginnen auf Stufe I (Novize) mit <strong>32
+Erfahrungspunkten (EP)</strong>. Ihr könnt bis zu +4 EP erhalten, indem
+ihr bedeutsame Bande (mit anderen Spielfiguren) und Komplikationen
+wählt.</p>
+</div>
+</section>
+<section class="level2" id="step-1-concept">
+<h2 id="reader-section-16">Schritt 1: Konzept</h2>
+<p>Schreibt einen Satz, der Herkunft, Beruf und einen prägenden
+Charakterzug eurer Figur beschreibt.</p>
+<p>Beispiele:</p>
+<ul>
+<li><p><em>„Eine Aeler-Tunnelbauerin, die ihre Atemzahl verlor und nun
+Stein singen hört."</em></p></li>
+<li><p><em>„Ein vhasianischer Duellant mit vernarbtem Gesicht und dem
+Schwur, nie wieder zu verlieren."</em></p></li>
+</ul>
+</section>
+<section class="level2" id="step-2-attributes">
+<h2 id="reader-section-17">Schritt 2: Attribute</h2>
+<p>Ihr habt vier Attribute (1–5). Gebt EP aus, um sie von einem
+Grundwert von je 1 zu erhöhen.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Attribut</strong></th><th style="text-align: left;"><strong>Beschreibung</strong></th><th style="text-align: left;"><strong>Kosten</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Körper</td><td style="text-align: left;">Kraft, Ausdauer, körperliche Widerstandsfähigkeit.</td><td style="text-align: left;">neue Stufe × 3 EP</td></tr>
+<tr><td style="text-align: left;">Verstand</td><td style="text-align: left;">Wahrnehmung, Geschwindigkeit, schnelles Denken.</td><td style="text-align: left;">neue Stufe × 3 EP</td></tr>
+<tr><td style="text-align: left;">Geist</td><td style="text-align: left;">Willenskraft, Fokus, Verbindung zum Immateriellen.</td><td style="text-align: left;">neue Stufe × 3 EP</td></tr>
+<tr><td style="text-align: left;">Ausstrahlung</td><td style="text-align: left;">Charisma, Befehlsgewalt, Durchsetzungskraft der Persönlichkeit.</td><td style="text-align: left;">neue Stufe × 3 EP</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Die Kosten steigen schrittweise:</strong></p>
+<ul>
+<li><p>1 → 2 kostet 6 EP (2 × 3)</p></li>
+<li><p>2 → 3 kostet 9 EP (3 × 3)</p></li>
+<li><p>3 → 4 kostet 12 EP (4 × 3)</p></li>
+</ul>
+<p><strong>Empfohlene Startbereiche:</strong></p>
+<ul>
+<li><p>Primäres Attribut (am häufigsten genutzt): <strong>3</strong>
+(kostet insgesamt 15 EP: 1→2 = 6, 2→3 = 9)</p></li>
+<li><p>Sekundäre Attribute: je <strong>2</strong> (kostet je 6
+EP)</p></li>
+</ul>
+</section>
+<section class="level2" id="step-3-skills">
+<h2 id="reader-section-18">Schritt 3: Fertigkeiten</h2>
+<p>Wählt Fertigkeiten (0–5), die zu eurem Konzept passen.
+Schlüsselfertigkeiten sollten bei 2–3 liegen; andere bei 0–1.</p>
+<ul>
+<li><p>Kosten: <strong>neue Stufe × 2 EP</strong> (schrittweise)</p></li>
+<li><p>Empfohlene Startsumme: 8–12 EP auf Fertigkeiten
+ausgeben.</p></li>
+</ul>
+<p><strong>Die Kosten steigen schrittweise:</strong></p>
+<ul>
+<li><p>0 → 1 kostet 2 EP (1 × 2)</p></li>
+<li><p>1 → 2 kostet 4 EP (2 × 2)</p></li>
+<li><p>2 → 3 kostet 6 EP (3 × 2)</p></li>
+</ul>
+<section class="level3 unnumbered" id="core-skill-list">
+<h3 class="unnumbered">Kernliste der Fertigkeiten</h3>
+<p>Die sechzehn Kernfertigkeiten sind nach Thema gruppiert:</p>
+<div class="grid-2">
+<div>
+<p><span class="badge badge-red">Kampf</span></p>
+<ul>
+<li><p>Nahkampf</p></li>
+<li><p>Fernkampf</p></li>
+<li><p>Waffenlos</p></li>
+</ul>
+<p><span class="badge badge-orange">Körperlich</span></p>
+<ul>
+<li><p>Athletik</p></li>
+<li><p>Heimlichkeit</p></li>
+<li><p>Ausdauer</p></li>
+<li><p>Handwerk</p></li>
+</ul>
+</div>
+<div>
+<p><span class="badge badge-blue">Sozial</span></p>
+<ul>
+<li><p>Überzeugung</p></li>
+<li><p>Täuschung</p></li>
+<li><p>Hinterlist</p></li>
+<li><p>Auftreten</p></li>
+<li><p>Einsicht</p></li>
+</ul>
+<p><span class="badge badge-gold">Wissen</span></p>
+<ul>
+<li><p>Wissen</p></li>
+<li><p>Ermittlung</p></li>
+<li><p>Medizin</p></li>
+</ul>
+<p><span class="badge badge-purple">Magie</span></p>
+<ul>
+<li><p>Arkana</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section class="level2" id="step-4-talents">
+<h2 id="reader-section-19">Schritt 4: Talente</h2>
+<div class="tipbox">
+<p><strong>Ihr braucht keine Talente, um effektiv zu sein.</strong>
+Eine Figur mit nur Attributen und Fertigkeiten ist ein vollständiger,
+tragfähiger Charakter — besonders auf Stufe I.</p>
+</div>
+<p>Talente sind besondere Fähigkeiten. Beginnt mit <strong>0–3
+Talenten</strong>.</p>
+<section class="level3 unnumbered" id="sample-talents">
+<h3 class="unnumbered">Beispieltalente</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Talent</strong></th><th style="text-align: left;"><strong>Kosten</strong></th><th style="text-align: left;"><strong>Effekt</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;"><em>Keines</em></td><td style="text-align: left;"><em>0 EP</em></td><td style="text-align: left;"><em>Ein gültiger, vollständiger Charakter.</em></td></tr>
+<tr><td style="text-align: left;">Scharfe Sinne</td><td style="text-align: left;">2 EP</td><td style="text-align: left;">+1 Würfel auf Wahrnehmungsproben.</td></tr>
+<tr><td style="text-align: left;">Waffenmeister/-in</td><td style="text-align: left;">5 EP</td><td style="text-align: left;">+2 Würfel mit einer gewählten Waffe.</td></tr>
+<tr><td style="text-align: left;">Zweiter Atem</td><td style="text-align: left;">2 EP</td><td style="text-align: left;">Einmal pro Szene 1 Erschöpfung entfernen.</td></tr>
+<tr><td style="text-align: left;">Silberzunge</td><td style="text-align: left;">2 EP</td><td style="text-align: left;">+1 Würfel auf Überzeugungsversuche.</td></tr>
+<tr><td style="text-align: left;">Befehlspräsenz</td><td style="text-align: left;">4 EP</td><td style="text-align: left;">+1 Würfel auf Führung und Einschüchterung.</td></tr>
+<tr><td style="text-align: left;">Defensives Überleben</td><td style="text-align: left;">3 EP</td><td style="text-align: left;">+1 Würfel auf Verteidigungswürfe im Nahkampf.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section class="level2" id="step-5-bonds-and-complications">
+<h2 id="reader-section-20">Schritt 5: Bande und Komplikationen</h2>
+<section class="level3 unnumbered" id="bonds">
+<h3 class="unnumbered">Bande</h3>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">1–2 Bande</span> Legt 1–2 Bande mit anderen Spielfiguren fest. Jedes Band gewährt
+einmal pro Sitzung eine Gunst, wenn ihr mit ausführlicher Beschreibung
+danach handelt.</p>
+<p><strong>Beispiel eines Bandes:</strong> <em>„Sie half mir, dem
+Prozess zu entkommen, der meine Familie ruinierte."</em></p>
+</div>
+</section>
+<section class="level3 unnumbered" id="complications">
+<h3 class="unnumbered">Komplikationen</h3>
+<div class="panel panel-red">
+<p><span class="badge badge-red">+2 EP je</span> Ihr könnt bis zu zwei Komplikationen wählen (z. B. eine Fehde, ein
+verfluchtes Item, eine Schuld). Jede gibt +2 EP, aber jede Figur mit
+einer Komplikation fügt frühen Szenen +1 gebankten Story-Beat
+hinzu.</p>
+<p><strong>Beispiel einer Komplikation:</strong> <em>„Der Magistrat,
+der meine Familie verurteilte, jagt mich noch immer."</em></p>
+</div>
+</section>
+</section>
+<section class="level2" id="step-6-gear">
+<h2 id="reader-section-21">Schritt 6: Ausrüstung</h2>
+<p>Ihr beginnt mit:</p>
+<ul>
+<li><p>Einem Satz Kleidung, passend zu eurer Kultur.</p></li>
+<li><p>Einer Nahkampfwaffe (Leicht oder Mittel) oder einer
+Fernkampfwaffe mit Munition.</p></li>
+<li><p>Leichter Rüstung.</p></li>
+<li><p>Einem Rucksack, Wasserschlauch, 1W6 Tagesrationen, einem
+Messer, Feuerstein und Stahl, einer kleinen Laterne oder Kerze.</p></li>
+<li><p>Allen Werkzeugen, die eure Fertigkeiten erfordern (z. B.
+Dietriche, Heilerset).</p></li>
+</ul>
+</section>
+<section class="level2" id="build-examples">
+<h2 id="reader-section-22">Beispiel-Builds</h2>
+<section class="level3 unnumbered" id="the-duelist-32-xp">
+<h3 class="unnumbered">Der Duellant (32 EP)</h3>
+<div class="panel panel-red">
+<p><span class="badge badge-red">Gesamt: 31 EP</span></p>
+<ul>
+<li><p>Körper 3 (15 EP), Verstand 2 (6 EP) → 21 EP</p></li>
+<li><p>Nahkampf 2 (6 EP), Athletik 1 (2 EP), Ausdauer 1 (2 EP) → 10
+EP</p></li>
+<li><p><strong>Gesamt:</strong> 31 EP (1 EP gebankt)</p></li>
+</ul>
+<p class="text-sm text-muted"><em>Fügt ein Band für +2 EP hinzu, um auf 33 EP zu kommen.</em></p>
+</div>
+</section>
+<section class="level3 unnumbered" id="the-scholar-32-xp">
+<h3 class="unnumbered">Der/Die Gelehrte (32 EP)</h3>
+<div class="panel panel-blue">
+<p><span class="badge badge-blue">Gesamt: 31 EP</span></p>
+<ul>
+<li><p>Verstand 3 (15 EP), Geist 2 (6 EP) → 21 EP</p></li>
+<li><p>Wissen 2 (6 EP), Einsicht 1 (2 EP), Einsicht 1 (2 EP) → 10
+EP</p></li>
+<li><p><strong>Gesamt:</strong> 31 EP (1 EP gebankt)</p></li>
+</ul>
+<p class="text-sm text-muted"><em>Fügt ein Band für +2 EP hinzu, um auf 33 EP zu kommen.</em></p>
+</div>
+</section>
+<section class="level3 unnumbered" id="the-scout-32-xp">
+<h3 class="unnumbered">Der/Die Kundschafter/-in (32 EP)</h3>
+<div class="panel panel-green">
+<p><span class="badge badge-green">Gesamt: 29 EP</span></p>
+<ul>
+<li><p>Verstand 3 (15 EP), Körper 2 (6 EP) → 21 EP</p></li>
+<li><p>Heimlichkeit 2 (6 EP), Einsicht 1 (2 EP) → 8 EP</p></li>
+<li><p><strong>Gesamt:</strong> 29 EP (3 EP gebankt)</p></li>
+</ul>
+<p class="text-sm text-muted"><em>Fügt Scharfe Sinne (2 EP) und ein Band (+2 EP) hinzu, für
+33 EP.</em></p>
+</div>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:pregens">
+<h1 id="reader-section-23">Vorgefertigte Charaktere</h1>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">3 Gunsten</span> <span class="badge badge-blue">0 Erschöpfung/Schaden</span> Wählt eine/-n aus. Alle sind für das Einstiegsabenteuer
+ausbalanciert. Jede Spielfigur beginnt mit <strong>3 Gunsten</strong>
+und <strong>0 Erschöpfung/Schaden</strong>.</p>
+</div>
+<div class="grid-2">
+<div class="panel panel-red">
+<section class="level2 unnumbered" id="levi-soldier">
+<h2 class="unnumbered" id="reader-section-24">1. Levi — Soldat</h2>
+<p><span class="badge badge-red">Nahkampf</span> <em>Einst Legionär, jetzt Söldner.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Körper</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Verstand</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Geist</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Ausstrahlung</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Fertigkeiten:</strong> Nahkampf 2, Athletik 1, Ausdauer 1,
+Einsicht 1 (um Gegner zu lesen)</p>
+<p><strong>Talent — Kampfinstinkte:</strong> Einmal pro Szene einen
+misslungenen Verteidigungswurf neu würfeln.</p>
+<p><strong>Vorteil — Vertrautes Schwert:</strong> Euer Schwert bricht
+niemals bei einem Fehlschlag.</p>
+<p><strong>Bande:</strong> (wählt eines mit einer anderen Spielfigur)
+<em>„Ich rettete dir das Leben vor Millhaven."</em></p>
+<p><strong>EP:</strong> Körper 3 (15), Verstand 2 (6) = 21 EP. Nahkampf
+2 (6), Athletik 1 (2), Ausdauer 1 (2), Einsicht 1 (2) = 12 EP.
+Kampfinstinkte (2 EP). <strong>Gesamt: 35 EP</strong> (mit einem
+Band).</p>
+</section>
+</div>
+<div class="panel panel-blue">
+<section class="level2 unnumbered" id="lyra-scholar">
+<h2 class="unnumbered" id="reader-section-25">2. Lyra — Gelehrte</h2>
+<p><span class="badge badge-blue">Wissen</span> <em>Wegen verbotener Forschung von der Akademie
+ausgeschlossen.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Verstand</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Geist</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Körper</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Ausstrahlung</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Fertigkeiten:</strong> Wissen 2, Arkana 1, Einsicht 1,
+Einsicht 1</p>
+<p><strong>Talent — Wissenshüterin:</strong> Einmal pro Sitzung
+obskure Geschichte ohne Wurf abrufen.</p>
+<p><strong>Vorteil — Gelehrtentasche:</strong> Enthält Bücher,
+Reagenzien, ein kleines Teleskop.</p>
+<p><strong>Bande:</strong> <em>„Wir haben beide unseren Platz in
+Silkstrand verloren."</em></p>
+<p><strong>EP:</strong> Verstand 3 (15), Geist 2 (6) = 21 EP. Wissen 2
+(6), Arkana 1 (2), Einsicht 1 (2), Einsicht 1 (2) = 12 EP.
+Wissenshüterin (2 EP). <strong>Gesamt: 35 EP</strong> (mit einem
+Band).</p>
+</section>
+</div>
+</div>
+<div class="grid-2">
+<div class="panel panel-purple">
+<section class="level2 unnumbered" id="sera-shadow">
+<h2 class="unnumbered" id="reader-section-26">3. Sera — Schatten</h2>
+<p><span class="badge badge-purple">Heimlichkeit</span> <em>Ehemalige Gildendiebin, jetzt eine Wanderin.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Verstand</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Körper</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Geist</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Ausstrahlung</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Fertigkeiten:</strong> Heimlichkeit 2, Täuschung 2, Einsicht
+1 (um Zielpersonen zu lesen)</p>
+<p><strong>Talent — Silberzunge:</strong> +1 Würfel, um durch Reden zu
+überzeugen oder zu täuschen.</p>
+<p><strong>Vorteil — Schattenmantel:</strong> +1 Würfel auf
+Heimlichkeitswürfe bei schwachem Licht.</p>
+<p><strong>Bande:</strong> <em>„Du hast mein Geheimnis bewahrt, als
+die Wachen kamen."</em></p>
+<p><strong>EP:</strong> Verstand 3 (15), Körper 2 (6) = 21 EP.
+Heimlichkeit 2 (6), Täuschung 2 (6), Einsicht 1 (2) = 14 EP.
+Silberzunge (2 EP). <strong>Gesamt: 37 EP</strong> (mit einem Band —
+anpassen, indem Einsicht auf 0 gesenkt wird, für 35 EP).</p>
+</section>
+</div>
+<div class="panel panel-green">
+<section class="level2 unnumbered" id="mira-healer">
+<h2 class="unnumbered" id="reader-section-27">4. Mira — Heilerin</h2>
+<p><span class="badge badge-green">Medizin</span> <em>Der Hexerei bezichtigt, weil sie das Unheilbare heilte.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Geist</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Verstand</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Körper</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Ausstrahlung</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Fertigkeiten:</strong> Handwerk 2, Einsicht 1 (zur
+Diagnose), Einsicht 2</p>
+<p><strong>Talent — Eiserner Magen:</strong> Immun gegen gewöhnliche
+Gifte und verdorbene Nahrung.</p>
+<p><strong>Vorteil — Heilerset:</strong> Verbände, Kräuter,
+grundlegende medizinische Ausrüstung.</p>
+<p><strong>Bande:</strong> <em>„Du hast mir vertraut, als niemand
+sonst es tat."</em></p>
+<p><strong>EP:</strong> Geist 3 (15), Verstand 2 (6) = 21 EP.
+Handwerk 2 (6), Einsicht 1 (2), Einsicht 2 (6) = 14 EP. Eiserner
+Magen (3 EP). <strong>Gesamt: 38 EP</strong> (mit einem Band —
+anpassen: Einsicht auf 1 senken, für 35 EP).</p>
+</section>
+</div>
+</div>
+<div class="panel panel-gold">
+<section class="level2 unnumbered" id="kael-runekeeper-optional-magic-user">
+<h2 class="unnumbered" id="reader-section-28">5. Kael — Runenwahrer (optionale/-r Magieanwender/-in)</h2>
+<p><span class="badge badge-gold">Magie</span> <span class="badge badge-orange">Anpassung auf Stufe II nötig</span> <em>Ein Wanderer, dem Reisenden verschworen.</em></p>
+<div class="table-wrap">
+<table>
+<tbody>
+<tr><td style="text-align: left;"><strong>Geist</strong></td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;"><strong>Verstand</strong></td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;"><strong>Körper</strong></td><td style="text-align: left;">1</td></tr>
+<tr><td style="text-align: left;"><strong>Ausstrahlung</strong></td><td style="text-align: left;">1</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Fertigkeiten:</strong> Wissen 2, Arkana 1, Einsicht 1,
+Einsicht 1</p>
+<p><strong>Talente:</strong> Vertrauter (2 EP), Kodex (4 EP)</p>
+<p><strong>Riten:</strong> Wegsinn (4 EP), Segen des Reisenden (5 EP)
+– dies sind besondere Fähigkeiten, keine Fertigkeiten.</p>
+<p><strong>Bande:</strong> <em>„Die Straße hat uns
+zusammengeführt."</em></p>
+<p><strong>EP:</strong> Geist 3 (15), Verstand 2 (6) = 21 EP. Wissen 2
+(6), Arkana 1 (2), Einsicht 1 (2), Einsicht 1 (2) = 12 EP. Vertrauter
+(2), Kodex (4) = 6 EP. Wegsinn (4), Segen des Reisenden (5) = 9 EP.
+<strong>Gesamt: 48 EP</strong> (erfordert eine Anpassung durch die SL
+oder Start auf Stufe II).</p>
+</section>
+</div>
+</section>
+<section class="level1" id="ch:lantern-at-dusk">
+<h1 id="reader-section-29">Einstiegsabenteuer: Die Laterne in der Dämmerung</h1>
+<p class="flex"><span class="badge badge-gold">Stufe I</span> <span class="badge badge-blue">Einzelabenteuer</span> <span class="badge badge-purple">2–3-Stunden-Sitzung</span></p>
+<section class="level2" id="setup">
+<h2 id="reader-section-30">Vorbereitung</h2>
+<p>Die Gruppe wird von <strong>Ältester Sarai</strong> aus dem
+abgelegenen Dorf <strong>Duskwood</strong> angeheuert. Eine
+schreckliche Seuche breitet sich vom alten Grabhügel in den Hügeln aus
+— demselben Grabhügel, in dem vor Jahrhunderten eine verfluchte
+Laterne vergraben wurde. Die Laterne muss zu einem Steinkreis im Tal
+gebracht werden, um den Fluch zu brechen. Doch der Grabhügel ist nicht
+leer.</p>
+</section>
+<section class="level2" id="what-the-party-knows">
+<h2 id="reader-section-31">Was die Gruppe weiß</h2>
+<div class="panel panel-blue">
+<ul>
+<li><p>Die Laterne befindet sich in der zentralen Kammer des
+Grabhügels.</p></li>
+<li><p>Der Grabhügel wird von ruhelosen Geistern bewacht (den
+<strong>Dämmerwichten</strong>).</p></li>
+<li><p>Eine rivalisierende Schatzsucherin, <strong>Flinke Lena</strong>,
+ist ebenfalls in den Grabhügel eingedrungen.</p></li>
+<li><p>Der Fluch wird die Feldfrüchte des Dorfes innerhalb von drei
+Tagen töten.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="timers-1">
+<h2 id="reader-section-32">Zähler</h2>
+<div class="panel panel-red">
+<ul>
+<li><p><span class="badge badge-red">Grabhügeleinsturz [6]</span> tickt, wenn die Gruppe
+einen Wurf im Inneren nicht schafft (die SL rückt bei jedem Fehlschlag
+1 Segment vor). Bei 6 versiegelt sich der Eingang — Flucht wird zu
+einer verzweifelten Gruppenhandlung.</p></li>
+<li><p><span class="badge badge-orange">Lenas Vorhaben [4]</span> tickt am Ende jeder Szene
+im Grabhügel. Füllt er sich, hat Lena die Laterne bereits genommen;
+die Gruppe muss sie jagen.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-1-the-entry">
+<h2 id="reader-section-33">Szene 1 — Der Eingang</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-blue">Kontrolliert</span></p>
+<p>Der Grabhügeleingang ist ein schmaler Steingang. Ein schwaches
+grünes Leuchten pulsiert aus der Tiefe.</p>
+<p><strong>Hindernis:</strong> Ein Einsturz versperrt den Weg.</p>
+<ul>
+<li><p><strong>Wurf:</strong> Körper + Athletik (DV 3,
+Kontrolliert).</p></li>
+<li><p><span class="badge badge-green">Klarer Erfolg</span> Ihr räumt den Schutt und
+tretet ein.</p></li>
+<li><p><span class="badge badge-gold">Teilerfolg</span> Ihr kommt durch, wirbelt aber
+Schutt auf — Grabhügeleinsturz +1 tick.</p></li>
+<li><p><span class="badge badge-red">Fehlschlag</span> Ihr werdet von einem Felsbrocken
+eingeklemmt — markiert Schaden 1 und Einsturz +1.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-2-the-spirit-corridor">
+<h2 id="reader-section-34">Szene 2 — Der Geisterkorridor</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-blue">Kontrolliert</span></p>
+<p>Der Gang weitet sich zu einer Halle, in der drei
+<strong>Dämmerwichte</strong> treiben. Sie greifen nicht an, wenn man
+sie nicht provoziert, aber sie lassen niemanden ohne ein Opfer
+passieren.</p>
+<p><strong>Bietet eine Erinnerung oder ein Geheimnis an.</strong></p>
+<ul>
+<li><p><strong>Wurf:</strong> Ausstrahlung + Überzeugung (DV 3,
+Kontrolliert).</p></li>
+<li><p><span class="badge badge-green">Klarer Erfolg</span> Sie verneigen sich und lassen
+euch durch.</p></li>
+<li><p><span class="badge badge-gold">Teilerfolg</span> Sie nehmen euer Opfer, stehlen
+aber auch ein zufälliges Ausrüstungsstück (die SL wählt).</p></li>
+<li><p><span class="badge badge-red">Fehlschlag</span> Sie greifen als eine einzige
+Meute an (Kap 2, je 1 Schaden, je 2 Erschöpfung bei einem Treffer).
+Kampf folgt den normalen Regeln.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-3-the-lantern-chamber">
+<h2 id="reader-section-35">Szene 3 — Die Laternenkammer</h2>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-blue">Kontrolliert</span></p>
+<p>Die Laterne steht auf einem Steinaltar. <strong>Flinke Lena</strong>
+ist dort und versucht, sie herauszubrechen.</p>
+<p><strong>Konfrontiert Lena:</strong> Sie ist keine Kämpferin.</p>
+<ul>
+<li><p><strong>Wurf:</strong> Ausstrahlung + Überzeugung (DV 3,
+Kontrolliert), um einen Deal anzubieten oder sie einzuschüchtern.</p></li>
+<li><p><span class="badge badge-green">Klarer Erfolg</span> Sie geht friedlich, warnt aber,
+dass „andere danach kommen werden."</p></li>
+<li><p><span class="badge badge-gold">Teilerfolg</span> Sie stimmt zu, jede Belohnung zu
+teilen, verlangt aber später einen Gefallen (startet einen
+Schuld-Zähler [4]).</p></li>
+<li><p><span class="badge badge-red">Fehlschlag</span> Sie löst eine Falle aus — eine
+Steintür beginnt sich zu schließen (Einsturz +2 tick).</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="scene-4-escape">
+<h2 id="reader-section-36">Szene 4 — Flucht</h2>
+<div class="panel panel-red">
+<p><span class="badge badge-gold">DV 3</span> <span class="badge badge-red">Verzweifelt</span> <span class="badge badge-orange">3 Erfolge vor 2 Fehlschlägen</span></p>
+<p>Nachdem ihr die Laterne genommen habt, beginnt der Grabhügel
+ernsthaft einzustürzen.</p>
+<p><strong>Gruppen-Fertigkeitsprobe:</strong> Die Gruppe braucht 3
+Erfolge vor 2 Fehlschlägen, um zu entkommen. Jede Spielfigur
+beschreibt, wie sie hilft (z. B. Athletik, um eine Tür abzustützen,
+Ermittlung, um uralte Fluchtrunen zu lesen).</p>
+<ul>
+<li><p><strong>Wurf:</strong> Passendes Attribut + Fertigkeit (DV 3,
+Position Verzweifelt).</p></li>
+<li><p>Jeder Fehlschlag tickt Einsturz +1.</p></li>
+<li><p>Erreicht Einsturz 6, bevor ihr entkommt, versiegelt sich der
+Eingang — ihr müsst einen anderen Weg finden (startet einen zweiten
+Zähler [4] zum Freigraben, jeder Erfolg entfernt 1 Segment; bei
+Fehlschlag markiert Erschöpfung).</p></li>
+</ul>
+<p><span class="badge badge-green">Erfolg</span> Ihr brecht ins Mondlicht hervor, die Laterne
+in der Hand.</p>
+<p><span class="badge badge-red">Fehlschlag</span> Ihr entkommt, aber jemand bleibt
+zurück — gefangen oder verloren. Der Rest der Gruppe muss die Person
+später retten.</p>
+</div>
+</section>
+<section class="level2" id="resolution">
+<h2 id="reader-section-37">Auflösung</h2>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">DV 2</span></p>
+<p>Bringt die Laterne zurück zum Steinkreis. Den Fluch zu brechen
+erfordert ein einfaches Ritual.</p>
+<ul>
+<li><p><strong>Wurf:</strong> Geist + Wissen (DV 2) oder Geist +
+Arkana, falls magisches Wissen genutzt wird.</p></li>
+<li><p><span class="badge badge-green">Klarer Erfolg</span> Die Seuche weicht. Ältester
+Sarai belohnt jede Spielfigur mit einer <strong>Verpflichtung</strong>
+— „Das Dorf schuldet euch etwas."</p></li>
+<li><p><span class="badge badge-gold">Teilerfolg</span> Der Fluch weicht, aber die Laterne
+kann nicht zerstört werden — sie wird bald eine andere Gefahr
+anziehen.</p></li>
+<li><p><span class="badge badge-red">Fehlschlag</span> Der Fluch wird nur um ein Jahr
+zurückgedrängt. Ein dunkler Geist entkommt und wird zu einem
+wiederkehrenden Feind.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="advancement">
+<h2 id="reader-section-38">Aufstieg</h2>
+<p><span class="badge badge-gold">6–10 EP</span> Jede Spielfigur verdient am Ende <strong>6–10 EP</strong>. EP
+können ausgegeben werden für:</p>
+<ul>
+<li><p>Ein Attribut erhöhen: neue Stufe × 3 EP (Ausfallzeit = neue
+Stufe in Tagen).</p></li>
+<li><p>Eine Fertigkeit erhöhen: neue Stufe × 2 EP (Ausfallzeit = neue
+Stufe in Tagen).</p></li>
+<li><p>Ein geringes Talent lernen (2–4 EP) — Beispiele:
+<em>Scharfe Sinne</em>, <em>Zweiter Atem</em>,
+<em>Kampfreflexe</em>.</p></li>
+<li><p>Einen geringen Vorteil (Asset) erwerben (4 EP) — Unterschlupf,
+Kontakt oder besonderes Werkzeug.</p></li>
+</ul>
+<div class="tipbox">
+<p><strong>Eilregel:</strong> Überspringt die Ausfallzeit, indem ihr
+einen <em>Eile-Zähler [4]</em> akzeptiert. Füllt er sich, bevor ihr
+fertig seid, hat die neue Fähigkeit einen Makel (Wahl der SL).</p>
+</div>
+</section>
+</section>
+<section class="level1" id="ch:simplified-magic">
+<h1 id="reader-section-39">Vereinfachte Magie</h1>
+<p>Dieses Kapitel behandelt zwei Ansätze zur Magie: <strong>Freies
+Zaubern</strong> für Spieler/-innen, die Zauber improvisieren wollen,
+und <strong>Hexengaben</strong> für Spieler/-innen, die verlässliche,
+günstige magische Tricks wollen, ohne sich auf einen vollständigen
+Magiepfad festzulegen.</p>
+<section class="level2" id="free-casting-spellcraft">
+<h2 id="reader-section-40">Freies Zaubern (Zauberkunst)</h2>
+<p>Wenn eine spielende Person eine improvisierende magische Figur
+möchte, nutzt diese vereinfachten Regeln (basierend auf dem Pfad des
+<em>Freien Zauberers/der Freien Zauberin</em>). Für vollständige
+Magiesysteme (Runenwahrer, Anrufer, Kantoren) siehe das vollständige
+<em>Fate's Edge Spielerhandbuch</em>.</p>
+<section class="level3 unnumbered" id="spellcasting">
+<h3 class="unnumbered">Zaubern</h3>
+<p>Wählt ein magisches <strong>Element</strong> (Feuer, Wasser, Erde,
+Luft, Schicksal, Leben, Glück, Tod). Beschreibt euren Zauber mithilfe
+von <strong>TAGS</strong>. Jeder Tag erhöht die DV um 1. Gefährliche
+Tags (Teleportieren, Verwandeln, Beherrschen) erhöhen die DV
+stattdessen um +2.</p>
+<p><span class="math display">DV = 1 + Anzahl der Tags</span></p>
+<p>(maximal 6). Würfelt <strong>Geist + Arkana</strong>.</p>
+</section>
+<section class="level3 unnumbered" id="example">
+<h3 class="unnumbered">Beispiel</h3>
+<p><em>„Ich schleudere eine [brennende] [Flächen]-Explosion"</em> = DV
+3.</p>
+</section>
+<section class="level3 unnumbered" id="backlash">
+<h3 class="unnumbered">Rückschlag</h3>
+<div class="warningbox">
+<p>Würfelt ihr einen Fehlschlag oder gibt die SL SB aus, schlägt die
+Magie zurück:</p>
+<ul>
+<li><p><span class="badge badge-orange">1–2 SB</span> Kleines Aufflackern, Erschöpfung 1,
+unheimliches Geräusch.</p></li>
+<li><p><span class="badge badge-red">3+ SB</span> Schaden 1, der Zauber trifft eine
+verbündete Person, oder ein Omen eines Patrons erscheint.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="sample-spells-dv-24">
+<h3 class="unnumbered">Beispielzauber (DV 2–4)</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Zauber</strong></th><th style="text-align: left;"><strong>TAGS</strong></th><th style="text-align: left;"><strong>DV</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Licht</td><td style="text-align: left;">[Erleuchten]</td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;">HEILEN</td><td style="text-align: left;">[HEILEN]</td><td style="text-align: left;">2</td></tr>
+<tr><td style="text-align: left;">Schild der Luft</td><td style="text-align: left;">[Schützen] [Verteidigen]</td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;">Flammenmantel</td><td style="text-align: left;">[Brennend] [Fläche]</td><td style="text-align: left;">3</td></tr>
+<tr><td style="text-align: left;">Teleport</td><td style="text-align: left;">[Sprung] [Selbst]</td><td style="text-align: left;">4</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="light-illuminate-dv-2">
+<h3 class="unnumbered">Licht [Erleuchten] — DV 2</h3>
+<p>Erschafft ein kleines, anhaltendes Licht.</p>
+</section>
+<section class="level3 unnumbered" id="heal-heal-dv-2">
+<h3 class="unnumbered">HEILEN [HEILEN] — DV 2</h3>
+<p>Heilt 1 Erschöpfung bei euch selbst oder einer berührten
+verbündeten Person.</p>
+</section>
+<section class="level3 unnumbered" id="shield-of-air-ward-defend-dv-3">
+<h3 class="unnumbered">Schild der Luft [Schützen] [Verteidigen] — DV 3</h3>
+<p>Erhaltet Position +1 auf die nächste Verteidigung.</p>
+</section>
+<section class="level3 unnumbered" id="flame-cloak-burning-area-dv-3">
+<h3 class="unnumbered">Flammenmantel [Brennend] [Fläche] — DV 3</h3>
+<p>Feinde erleiden –1 Würfel, um sich zu nähern.</p>
+</section>
+</section>
+<section class="level2" id="hedge-gifts-simplified-witchcraft">
+<h2 id="reader-section-41">Hexengaben (vereinfachte Hexenkunst)</h2>
+<p>Hexengaben sind einfache magische Fähigkeiten ohne Wurf. Eine Figur
+mit dem Talent <strong>Kunst der Hecke</strong> lernt zwei Hexengaben
+ihrer Wahl. Dies sind kleine, verlässliche Effekte, die niemals einen
+Würfelwurf erfordern und niemals Verpflichtung verursachen.</p>
+<section class="level3 unnumbered" id="requirements">
+<h3 class="unnumbered">Voraussetzungen</h3>
+<div class="panel panel-purple">
+<ul>
+<li><p><span class="badge badge-purple">4 EP</span> <strong>Kunst der Hecke:</strong> Erfordert Wissen 1+ oder
+Einsicht 1+.</p></li>
+<li><p>Ihr lernt <strong>zwei Hexengaben</strong> eurer Wahl.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="hedge-gifts">
+<h3 class="unnumbered">Hexengaben</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Gabe</strong></th><th style="text-align: left;"><strong>Effekt</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;"><strong>Ruhige Hand</strong></td><td style="text-align: left;">Einmal pro Szene eine verwundete Person (auch euch selbst) berühren und 1 Erschöpfung entfernen. Kein Wurf. Darf in einer Szene nicht zweimal bei derselben Person genutzt werden.</td></tr>
+<tr><td style="text-align: left;"><strong>Knoten der Gunst</strong></td><td style="text-align: left;">Einmal pro Szene einen Knoten in eine Schnur, einen Faden oder ein Tuch binden. Verbündete in Nähe erhalten +1 Würfel auf eine einzelne Art von Wurf (beim Binden wählen: Heimlichkeit, Überzeugung, Verteidigung oder Navigation). Der Knoten muss gebunden bleiben.</td></tr>
+<tr><td style="text-align: left;"><strong>Warme Hand</strong></td><td style="text-align: left;">Einmal pro Szene jemanden berühren. Deren nächste körperliche Handlung erhält entweder +1 Würfel (Trost) oder erleidet –1 Würfel (Warnung). Kein Wurf.</td></tr>
+<tr><td style="text-align: left;"><strong>Herdsinn</strong></td><td style="text-align: left;">Einmal pro Szene der SL eine Ja/Nein-Frage über eine Schwelle, eine Grenze oder ein Versprechen in der aktuellen Szene stellen. Die SL muss wahrheitsgemäß antworten.</td></tr>
+<tr><td style="text-align: left;"><strong>Salzlinie</strong></td><td style="text-align: left;">Einmal pro Szene eine Handvoll Salz in einer durchgehenden Linie ausstreuen (Bewegungshandlung). Jeder Geist, jede Erscheinung oder jedes verfluchte Wesen, das versucht sie zu überqueren, muss Geist + Einsicht (DV 3) prüfen oder wird für diesen Austausch aufgehalten.</td></tr>
+<tr><td style="text-align: left;"><strong>Die ungezündete Kerze</strong></td><td style="text-align: left;">Einmal pro Sitzung erklären, dass eine sichtbare Lichtquelle (Laterne, Kerze, Fackel) flackert oder erlischt. Dies erschafft eine Zone aus schwachem Licht oder Dunkelheit in Reichweite Nähe für einen Austausch.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level3 unnumbered" id="example-build-the-hedge-witch-32-xp">
+<h3 class="unnumbered">Beispiel-Build: Die Heckenhexe (32 EP)</h3>
+<div class="panel panel-gold">
+<p><span class="badge badge-gold">Gesamt: 33 EP</span></p>
+<ul>
+<li><p><strong>Attribute:</strong> Geist 3 (15 EP), Verstand 2 (6 EP)
+→ 21 EP</p></li>
+<li><p><strong>Fertigkeiten:</strong> Wissen 2 (6 EP), Einsicht 1
+(2 EP) → 8 EP</p></li>
+<li><p><strong>Talent:</strong> Kunst der Hecke (4 EP) → 4 EP</p></li>
+<li><p><strong>Hexengaben:</strong> Ruhige Hand, Knoten der
+Gunst</p></li>
+<li><p><strong>Gesamt:</strong> 21 + 8 + 4 = <strong>33 EP</strong></p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="promise-timers">
+<h3 class="unnumbered">Versprechenszähler</h3>
+<div class="tipbox">
+<p><span class="badge badge-gold">Versprechenszähler [4]</span> Manche Hexengaben-Effekte oder Rituale erzeugen
+Verpflichtungen. Stellt diese mit einem <strong>Versprechenszähler</strong>
+dar (üblicherweise 4 Segmente):</p>
+<ul>
+<li><p>Tickt den Zähler, wenn das Versprechen ignoriert,
+aufgeschoben oder missachtet wird.</p></li>
+<li><p>Füllt er sich, wird der Preis fällig — sozial, spirituell
+oder narrativ.</p></li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+<section class="level1" id="ch:gm-tips">
+<h1 id="reader-section-42">SL-Tipps: Eure erste Spielsitzung leiten</h1>
+<section class="level2" id="before-you-start">
+<h2 id="reader-section-43">Bevor ihr beginnt</h2>
+<section class="level3 unnumbered" id="read-the-adventure-first">
+<h3 class="unnumbered">Lest zuerst das Abenteuer</h3>
+<p>Lest <em>Die Laterne in der Dämmerung</em> (Kapitel 5) mindestens
+zweimal durch. Ihr müsst es nicht auswendig können, aber ihr solltet
+die wichtigen Szenen und Zähler kennen.</p>
+</section>
+<section class="level3 unnumbered" id="know-the-core-rules">
+<h3 class="unnumbered">Kennt die Kernregeln</h3>
+<p>Die Kernmechaniken (Kapitel 2) sind euer Motor. Vergesst ihr eine
+Regel, greift standardmäßig auf Folgendes zurück:</p>
+<p class="flex"><span class="badge badge-gold">DV = 3</span> <span class="badge badge-blue">Position = Kontrolliert</span> <span class="badge badge-green">Effekt = Standard</span></p>
+<p class="text-sm text-muted">Ihr könnt die Regel nach der Sitzung nachschlagen.</p>
+</section>
+<section class="level3 unnumbered" id="print-the-reference-sheet">
+<h3 class="unnumbered">Druckt das Referenzblatt aus</h3>
+<p>Haltet die Schnellreferenz (Kapitel 9) am Tisch griffbereit.</p>
+</section>
+</section>
+<section class="level2" id="during-the-session">
+<h2 id="reader-section-44">Während der Sitzung</h2>
+<section class="level3 unnumbered" id="start-strong">
+<h3 class="unnumbered">Stark beginnen</h3>
+<p>Nutzt einen kalten Einstieg: <em>„Das grüne Licht des Grabhügels
+flackert. Ihr riecht Verwesung. Was tut ihr?"</em></p>
+</section>
+<section class="level3 unnumbered" id="set-dv-to-3-by-default">
+<h3 class="unnumbered">Setzt DV standardmäßig auf 3</h3>
+<p>Erhöht nur auf 4 oder 5, wenn die Aufgabe wirklich legendär ist.
+Eure Aufgabe ist es nicht, die Spieler/-innen mit hohen Zahlen
+herauszufordern — sondern mit interessanten Entscheidungen.</p>
+</section>
+<section class="level3 unnumbered" id="spend-story-beats-early-and-often">
+<h3 class="unnumbered">Gebt Story-Beats früh und oft aus</h3>
+<p>Ein einzelner SB kann eine ruhige Szene in eine angespannte
+verwandeln. Hortet sie nicht.</p>
+</section>
+<section class="level3 unnumbered" id="fail-forward">
+<h3 class="unnumbered">Vorwärts scheitern</h3>
+<div class="tipbox">
+<p>Sagt bei einem Fehlschlag niemals „nichts passiert". Führt immer
+eine neue Komplikation ein oder lasst einen Zähler voranschreiten.</p>
+</div>
+</section>
+<section class="level3 unnumbered" id="use-the-pre-gens">
+<h3 class="unnumbered">Nutzt die vorgefertigten Charaktere</h3>
+<p>Die vorgefertigten Charaktere (Kapitel 4) sind so gestaltet, dass
+sie verschiedene Spielstile zeigen. Lasst die Spieler/-innen einen
+auswählen.</p>
+</section>
+<section class="level3 unnumbered" id="keep-the-spotlight-moving">
+<h3 class="unnumbered">Haltet den Fokus in Bewegung</h3>
+<p>Fragt ruhige Spieler/-innen direkt: <em>„Sera, was tust du, während
+das passiert?"</em></p>
+</section>
+<section class="level3 unnumbered" id="end-on-a-cliffhanger">
+<h3 class="unnumbered">Endet mit einem Cliffhanger</h3>
+<p>Wenn die Laterne angehoben wird, beschreibt, wie die Decke Risse
+bekommt — und sagt dann „Fortsetzung folgt."</p>
+</section>
+<section class="level3 unnumbered" id="using-timers-at-the-table">
+<h3 class="unnumbered">Zähler am Tisch nutzen</h3>
+<p>Zähler sind euer wichtigstes Werkzeug, um Druck zu erzeugen. Nutzt
+sie sichtbar und konsequent.</p>
+<ul>
+<li><p><strong>Benennt sie anschaulich:</strong> <em>„Ritualvollendung"</em>
+statt <em>„Zähler 3"</em>.</p></li>
+<li><p><strong>Tickt sie laut:</strong> <em>„Der Gesang des Kults
+wird lauter — Ritualvollendung rückt auf 4 von 6 vor."</em></p></li>
+<li><p><strong>Verbindet Zählerfortschritt mit der Fiktion:</strong>
+Sagt nie einfach nur <em>„Zähler ticken."</em> Beschreibt, was sich
+verändert.</p></li>
+<li><p><strong>Platziert Tracker zentral:</strong> Nutzt
+Karteikarten, Pokerchips oder Whiteboards, die alle sehen können.</p></li>
+</ul>
+</section>
+<section class="level3 unnumbered" id="the-three-timer-rule">
+<h3 class="unnumbered">Die Drei-Zähler-Regel</h3>
+<div class="panel panel-purple">
+<p><span class="badge badge-purple">Max. 3 aktive Zähler</span> Haltet zu jedem Zeitpunkt höchstens drei aktive Zähler in einer
+Szene. Mehr erzeugt kognitive Überlastung.</p>
+<ul>
+<li><p><strong>Situationszähler:</strong> Verfolgt den Fortschritt
+zum unmittelbaren Ziel der Szene.</p></li>
+<li><p><strong>Gegenzähler:</strong> Verfolgt den Druck der
+Gegenseite.</p></li>
+<li><p><strong>Kampagnenzähler:</strong> Verfolgt langfristigen
+Front-Druck.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level2" id="common-pitfalls-and-fixes">
+<h2 id="reader-section-45">Häufige Fallstricke und Lösungen</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Fallstrick</strong></th><th style="text-align: left;"><strong>Lösung</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">SB für einen „großen Moment" zurückhalten</td><td style="text-align: left;">Gebt SB früh aus. Druck erzeugt Drama.</td></tr>
+<tr><td style="text-align: left;">DV zu hoch ansetzen (4–5 für Routine)</td><td style="text-align: left;">Standardmäßig DV 3. Nutzt Position für Spannung.</td></tr>
+<tr><td style="text-align: left;">Eine Regel nicht kennen</td><td style="text-align: left;">Trefft eine Entscheidung, die die Geschichte in Bewegung hält.</td></tr>
+<tr><td style="text-align: left;">Spieler/-innen bleiben stecken</td><td style="text-align: left;">Fragt: <em>„Was ist euer Ziel?"</em> Benennt dann das einfachste Hindernis.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="handling-player-creativity">
+<h2 id="reader-section-46">Mit Spielerkreativität umgehen</h2>
+<div class="panel panel-green">
+<ul>
+<li><p><strong>Sagt „Ja, aber" statt „Nein".</strong> Bietet einen
+Preis, einen Zähler oder eine Komplikation an.</p></li>
+<li><p><strong>Nutzt Vorbereitungs- und Unterstützungshandlungen.</strong>
+Lasst Nichtspezialisten sinnvoll beitragen.</p></li>
+<li><p><strong>Begrüßt unerwartete Lösungen.</strong> Umgeht eine
+spielende Person eine geplante Begegnung, lasst es funktionieren —
+und eskaliert dann anderswo.</p></li>
+<li><p><strong>Vorwärts scheitern.</strong> Ein misslungener Wurf
+sollte die Geschichte nie anhalten; er sollte die Richtung
+ändern.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="after-the-session">
+<h2 id="reader-section-47">Nach der Sitzung</h2>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">6–10 EP</span> Vergebt EP pro spielender Person.</p></li>
+<li><p>Führt aktive Zähler fort oder löscht sie.</p></li>
+<li><p>Fragt die Spieler/-innen: <em>„Eine Sache, die dir gefallen
+hat, eine Sache, von der du mehr willst."</em></p></li>
+<li><p>Notiert alle Entscheidungen, die ihr getroffen habt, um sie
+später mit dem Regeltext abzugleichen.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section class="level1" id="ch:next-steps">
+<h1 id="reader-section-48">Wie es weitergeht</h1>
+<section class="level2" id="ready-for-more">
+<h2 id="reader-section-49">Bereit für mehr?</h2>
+<p>Dieser Essential Guide gibt euch eine vollständige erste Sitzung.
+Für das volle Erlebnis:</p>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">Spielerhandbuch</span> Attribute, Fertigkeiten,
+Talente, Magiesysteme, Charakteraufstieg und die Welt.</p></li>
+<li><p><span class="badge badge-blue">SL-Handbuch</span> Zähler, Fronten, fortgeschrittenes
+Story-Beat-Management, Fraktionsregeln und Spiel auf hohen Stufen.</p></li>
+<li><p><span class="badge badge-purple">Abenteuer</span> <em>Blut und Seide</em> (Dorfverteidigung),
+<em>Jenseits von Millhaven</em> (Vermittlung), <em>Das Messingtor</em>
+(Raubzug).</p></li>
+</ul>
+</div>
+<p class="text-sm text-muted">Alle vom Autor unter CC-BY verfügbar.</p>
+</section>
+<section class="level2" id="where-to-go-next">
+<h2 id="reader-section-50">Wohin als Nächstes</h2>
+<section class="level3 unnumbered" id="build-your-own-character">
+<h3 class="unnumbered">Baut eure eigene Figur</h3>
+<p>Nutzt die Charaktererstellungsregeln in Kapitel 3, um eine eigene
+Figur zu bauen. Experimentiert mit verschiedenen Attributen,
+Fertigkeiten und Talenten.</p>
+</section>
+<section class="level3 unnumbered" id="run-your-own-adventure">
+<h3 class="unnumbered">Leitet euer eigenes Abenteuer</h3>
+<p>Nutzt den Rahmen aus Kapitel 5, um eigene Abenteuer zu
+entwerfen:</p>
+<div class="panel panel-blue">
+<ul>
+<li><p>Definiert ein Problem (die Seuche, die verfluchte
+Laterne).</p></li>
+<li><p>Definiert einen Ort (den Grabhügel).</p></li>
+<li><p>Definiert eine Rivalin oder einen Rivalen (Flinke
+Lena).</p></li>
+<li><p>Setzt Zähler (Grabhügeleinsturz, Lenas Vorhaben).</p></li>
+<li><p>Lasst die Spieler/-innen ihren eigenen Weg wählen.</p></li>
+</ul>
+</div>
+</section>
+<section class="level3 unnumbered" id="expand-the-world">
+<h3 class="unnumbered">Erweitert die Welt</h3>
+<p>Fate's Edge spielt in einer reichen Welt aus uralter Magie,
+gefallenen Reichen und lebendigen Kulturen. Erkundet die Regionen der
+Amaranthine: Ecktorias Marmorhallen, das nebelverhangene Nebelland,
+das zersplitterte Königreich Vhasia und mehr.</p>
+</section>
+</section>
+<section class="level2" id="final-thought">
+<h2 id="reader-section-51">Ein letzter Gedanke</h2>
+<p>Ihr habt alles, was ihr braucht, um Fate's Edge zu spielen. Nun
+greift zu euren Würfeln, atmet tief durch und betretet die Edge. Die
+Welt wartet.</p>
+</section>
+</section>
+<section class="level1" id="ch:quick-reference">
+<h1 id="reader-section-52">Schnellreferenz</h1>
+<section class="level2" id="core-resolution">
+<h2 id="reader-section-53">Kernauflösung</h2>
+<div class="panel panel-gold">
+<ol>
+<li><p>Absicht und Vorgehen verkünden (Attribut + Fertigkeit).</p></li>
+<li><p>Die SL legt Position und DV fest.</p></li>
+<li><p>Würfelpool würfeln.</p></li>
+<li><p>Erfolge zählen (6+; 10 = 2 Erfolge) und Story-Beats
+(1en).</p></li>
+<li><p>Ergebnismatrix anwenden.</p></li>
+<li><p>Die SL gibt SB aus.</p></li>
+<li><p>Spieler/-in markiert Ressourcen.</p></li>
+</ol>
+</div>
+</section>
+<section class="level2" id="difficulty-value-dv">
+<h2 id="reader-section-54">Schwierigkeitswert (DV)</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>DV</strong></th><th style="text-align: left;"><strong>Situation</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">2</td><td style="text-align: left;">Routine, kein Druck.</td></tr>
+<tr><td style="text-align: left;">3</td><td style="text-align: left;">Standard — leichter Widerstand.</td></tr>
+<tr><td style="text-align: left;">4</td><td style="text-align: left;">Schwer — ernster Widerstand.</td></tr>
+<tr><td style="text-align: left;">5+</td><td style="text-align: left;">Extrem — dramatisches Wagnis.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="position">
+<h2 id="reader-section-55">Position</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Position</strong></th><th style="text-align: left;"><strong>Narrativ</strong></th><th style="text-align: left;"><strong>Effekt</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Dominant</td><td style="text-align: left;">Vorteil</td><td style="text-align: left;">Einen Fehlschlag neu würfeln.</td></tr>
+<tr><td style="text-align: left;">Kontrolliert</td><td style="text-align: left;">Normal</td><td style="text-align: left;">Kein Nachwurf.</td></tr>
+<tr><td style="text-align: left;">Verzweifelt</td><td style="text-align: left;">Unter Zwang</td><td style="text-align: left;">Einen Erfolg neu würfeln.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="outcome-matrix">
+<h2 id="reader-section-56">Ergebnismatrix</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Wurfergebnis</strong></th><th style="text-align: left;"><strong>Ausgang</strong></th><th style="text-align: left;"><strong>Was passiert</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">E ≥ DV, SB = 0</td><td style="text-align: left;">Klarer Erfolg</td><td style="text-align: left;">Absicht erreicht.</td></tr>
+<tr><td style="text-align: left;">E ≥ DV, SB &gt; 0</td><td style="text-align: left;">Erfolg mit SB</td><td style="text-align: left;">Absicht erreicht; die SL gibt SB aus.</td></tr>
+<tr><td style="text-align: left;">0 &lt; E &lt; DV</td><td style="text-align: left;">Teilerfolg</td><td style="text-align: left;">Fortschritt; 1 Gunst erhalten.</td></tr>
+<tr><td style="text-align: left;">E = 0</td><td style="text-align: left;">Fehlschlag</td><td style="text-align: left;">Kein Fortschritt; 2 Gunsten erhalten; die SL eskaliert.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="boons">
+<h2 id="reader-section-57">Gunsten</h2>
+<div class="panel panel-green">
+<ul>
+<li><p><span class="badge badge-green">Max. gehalten: 5</span></p></li>
+<li><p><strong>Verdienen:</strong> Teilerfolg (1 Gunst), Fehlschlag (2
+Gunsten), bandengetriebene Handlung (1 Gunst).</p></li>
+<li><p><strong>Ausgeben:</strong> Würfel neu würfeln, Position
+verbessern, Vorteil (Asset) aktivieren.</p></li>
+<li><p><strong>Umwandeln:</strong> 2 Gunsten → 1 EP (einmal pro
+Sitzung, max. 2 EP durch Umwandlung).</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="fatigue-and-harm-1">
+<h2 id="reader-section-58">Erschöpfung und Schaden</h2>
+<div class="panel panel-red">
+<ul>
+<li><p>Erschöpfungsleiste = Körper.</p></li>
+<li><p>Jede Erschöpfung verschlechtert die Position (oder –1 Würfel,
+falls bereits Verzweifelt).</p></li>
+<li><p>Erschöpfungsüberlauf → Schaden +1, Erschöpfung löschen.</p></li>
+<li><p>Schaden: 1 (–1 Würfel), 2 (–1 Würfel), 3 (kampfunfähig).</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="armor-conversion-1">
+<h2 id="reader-section-59">Rüstungsumrechnung</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align: left;"><strong>Rüstung</strong></th><th style="text-align: left;"><strong>Schaden 1</strong></th><th style="text-align: left;"><strong>Schaden 2</strong></th><th style="text-align: left;"><strong>Schaden 3</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left;">Leicht</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Schaden 1 + Erschöpfung 1</td><td style="text-align: left;">Schaden 2 + Erschöpfung 1</td></tr>
+<tr><td style="text-align: left;">Mittel</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Schaden 2 + Erschöpfung 1</td></tr>
+<tr><td style="text-align: left;">Schwer</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Erschöpfung 1</td><td style="text-align: left;">Erschöpfung 2</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="level2" id="recovery-1">
+<h2 id="reader-section-60">Erholung</h2>
+<ul>
+<li><p><strong>Erschöpfung:</strong> Kurze Rast (1 Stunde) entfernt 2.
+Volle Nacht entfernt alles.</p></li>
+<li><p><strong>Schaden:</strong> Medizinische Versorgung oder
+magische Heilung. Natürliche Genesung: 1 Woche pro Stufe.</p></li>
+</ul>
+</section>
+<section class="level2" id="combat-quick-reference">
+<h2 id="reader-section-61">Kampf-Schnellreferenz</h2>
+<div class="panel panel-red">
+<ul>
+<li><p><strong>Zug:</strong> 1 Handlung + 1 Bewegung.</p></li>
+<li><p><strong>Bewegung:</strong> Um eine Reichweitenstufe verschieben
+(Nah ↔︎ Nähe ↔︎ Reichweite ↔︎ Fern).</p></li>
+<li><p><strong>Sprint (Handlung):</strong> Zwei Stufen bewegen;
+nächste Verteidigung Verzweifelt.</p></li>
+<li><p><strong>Rückzug (Handlung):</strong> Bewegung provoziert keine
+Gelegenheitsangriffe.</p></li>
+<li><p><strong>Gelegenheitsangriff:</strong> Nah zu verlassen ohne
+Rückzug provoziert einen kostenlosen Nahkampfangriff.</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="timers-quick-reference">
+<h2 id="reader-section-62">Zähler-Schnellreferenz</h2>
+<div class="panel panel-purple">
+<ul>
+<li><p><span class="badge badge-green">4 Segmente</span> Kurzfristig (Wachpatrouille,
+brechende Tür)</p></li>
+<li><p><span class="badge badge-gold">6 Segmente</span> Standardszene (Ritual, Flucht)</p></li>
+<li><p><span class="badge badge-red">8+ Segmente</span> Langfristig (Fraktion,
+Kampagne)</p></li>
+<li><p><strong>Tick bei:</strong> Teilerfolg/Fehlschlag, SB-Ausgabe,
+Erfordernis der Fiktion</p></li>
+<li><p><strong>Wenn voll:</strong> Festgelegtes Ereignis tritt
+ein</p></li>
+<li><p><strong>Grenze:</strong> Höchstens 3 aktive Zähler pro
+Szene</p></li>
+</ul>
+</div>
+</section>
+<section class="level2" id="hedge-gifts-quick-reference">
+<h2 id="reader-section-63">Hexengaben-Schnellreferenz</h2>
+<div class="panel panel-gold">
+<ul>
+<li><p><span class="badge badge-gold">4 EP</span> <strong>Kunst der Hecke:</strong> Lernt zwei
+Hexengaben.</p></li>
+<li><p><strong>Kein Wurf, keine Kosten.</strong> Gaben funktionieren
+innerhalb ihrer festgelegten Grenzen.</p></li>
+<li><p><strong>Ruhige Hand:</strong> 1 Erschöpfung entfernen
+(einmal/Szene).</p></li>
+<li><p><strong>Knoten der Gunst:</strong> +1 Würfel auf eine Art von
+Wurf (einmal/Szene).</p></li>
+<li><p><strong>Warme Hand:</strong> Nächste körperliche Handlung +1
+Würfel oder –1 Würfel.</p></li>
+<li><p><strong>Herdsinn:</strong> Eine Ja/Nein-Frage über eine
+Schwelle stellen.</p></li>
+<li><p><strong>Salzlinie:</strong> Geister am Überqueren
+hindern.</p></li>
+<li><p><strong>Die ungezündete Kerze:</strong> Eine Lichtquelle
+löschen (einmal/Sitzung).</p></li>
+</ul>
+</div>
+</section>
+</section>
+</div>
+<footer class="doc-footer">Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Verwendet mit Genehmigung, Alle Rechte vorbehalten.</footer>
+</body>
+</html>
