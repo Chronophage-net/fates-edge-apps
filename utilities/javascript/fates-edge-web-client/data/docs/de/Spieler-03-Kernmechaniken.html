@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fate's Edge Spielerhandbuch — Kapitel 3: Kernmechaniken (Deutsch)</title>
+<style>
+    :root {
+        --bg1: #0d0d1a;
+        --bg2: #1a1a2e;
+        --bg3: #252540;
+        --bg4: #2f2f4a;
+        --text: #e8e8f0;
+        --text2: #b8b8c8;
+        --text3: #8888a0;
+        --gold: #c9a84c;
+        --gold-hover: #d4b85c;
+        --border: #333355;
+        --red: #c0392b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --radius: 8px;
+        --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg1);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.2rem; margin-top: 1.2rem; }
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; }
+    h4 { font-size: 0.95rem; color: var(--text); }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-hover); text-decoration: underline; }
+    p { margin: 0.4rem 0; }
+    p.subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 1rem; }
+    ul, ol { margin: 0.4rem 0 0.6rem 1.4rem; }
+    li { margin: 0.15rem 0; }
+    .panel {
+        background: var(--bg2);
+        border-radius: var(--radius);
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border);
+        margin: 0.6rem 0;
+    }
+    .panel-gold { border-left: 4px solid var(--gold); }
+    .panel-red { border-left: 4px solid var(--red); }
+    .panel-blue { border-left: 4px solid var(--blue); }
+    .panel-green { border-left: 4px solid var(--green); }
+    .panel-purple { border-left: 4px solid var(--purple); }
+    .panel-orange { border-left: 4px solid var(--orange); }
+    .panel-title { color: var(--gold); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.05rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border);
+    }
+    .badge-gold { background: var(--gold); color: #1a1400; border-color: var(--gold); }
+    .text-muted { color: var(--text3); }
+    .text-gold { color: var(--gold); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.7rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    th, td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg4); color: var(--gold); font-weight: 600; }
+    tr:nth-child(even) { background: var(--bg2); }
+    blockquote {
+        font-style: italic;
+        border-left: 4px solid var(--gold);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        background: var(--bg2);
+        border-radius: var(--radius);
+        color: var(--text2);
+    }
+    blockquote .attribution { display: block; font-style: normal; color: var(--text3); font-size: 0.85rem; margin-top: 0.3rem; }
+    code { background: var(--bg4); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    dl { margin: 0.4rem 0 0.6rem 0.4rem; }
+    dt { color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+    dd { margin: 0.1rem 0 0.3rem 1.2rem; color: var(--text2); }
+    .multicols { column-count: 2; column-gap: 2rem; }
+    @media (max-width: 600px) { .multicols { column-count: 1; } }
+    .tree { margin: 0.4rem 0 0.4rem 1rem; }
+    .tree ul { list-style: none; border-left: 1px dashed var(--border); margin-left: 0.6rem; padding-left: 0.9rem; }
+    .tree > ul { border-left: none; margin-left: 0; padding-left: 0; }
+    .tree li { margin: 0.25rem 0; }
+    .branch-label { color: var(--orange); font-weight: 600; font-size: 0.8rem; }
+    footer.doc-footer { font-size: 0.75rem; color: var(--text3); text-align: center; padding: 1.5rem 0 0.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+<aside class="translation-notice" lang="de">Deutsche Version. Maschinell unterstützte Übersetzung; vollständige redaktionelle Überarbeitung steht noch aus. <a href="../players-guide/Players-_-Guide-_-03-_-Core-_-Mechanics.html" hreflang="en">Original auf Englisch ansehen</a></aside>
+<h1 id="reader-section-1">Kernmechaniken</h1>
+<p class="subtitle">Fate's Edge Spielerhandbuch — Kapitel 3</p>
+<div class="panel">
+<span class="panel-title">Ein Wort von der Rabenstraße</span>
+<em>„Die Straße erinnert sich. Jedes zerbrochene Rad hinterlässt eine Spur, und hinter jeder brennenden Lampe stand jemand. Die einzige Frage ist, wer von beiden du sein willst."</em>
+<div class="text-sm text-muted mt-1">— Dusana von der Rabenstraße, Tulkani-Geschichtenhüterin, <em>Die Herdschnur</em></div>
+</div>
+<h2 id="play-loop">Der Spielablauf</h2>
+<p><span id="resolution-cycle"></span>Jede bedeutsame Handlung durchläuft dieselben acht Schritte. Lernt diese, und ihr wisst, wie
+Fate's Edge gespielt wird; alles Weitere in diesem Kapitel ist Detail, das an diesem Rahmen hängt.</p>
+<div class="panel" style="border-left:4px solid var(--gold);">
+<p style="margin:0;"><strong>Der Ablauf in einem Satz:</strong> Sagt, was ihr wollt und wie → die SL legt Position und DV fest
+→ würfelt Attribut + Fertigkeit → zählt 6en und 1en → lest das Ergebnis → die SL gibt eure 1en aus → notiert,
+was es euch gekostet hat.</p>
+</div>
+<ol>
+<li><strong>Die SL setzt die Szene.</strong> Sie beschreibt die Situation und fragt, was ihr tut.</li>
+<li><strong>Ihr verkündet Absicht und Vorgehen.</strong> Was ihr erreichen wollt, und wie ihr dabei vorgeht — das benennt <strong>Attribut + Fertigkeit</strong>, die ihr würfeln werdet.</li>
+<li><strong>Die SL legt Position und DV fest.</strong> Position (Dominant, Kontrolliert, Verzweifelt) zeigt, wie exponiert ihr seid; DV (2–5) zeigt, wie schwer die Aufgabe ist. Beide werden <em>vor</em> den Würfeln festgelegt, sodass ihr eure Meinung noch ändern könnt.</li>
+<li><strong>Ihr würfelt.</strong> Attribut + Fertigkeit in W10.</li>
+<li><strong>Zählt zweimal.</strong> Jede <strong>6+</strong> ist ein Erfolg. Jede <strong>1</strong> ist ein Story-Beat für die SL. Ein Würfel kann nur eines von beidem sein, und ihr zählt immer beides.</li>
+<li><strong>Lest das Ergebnis.</strong> Vergleicht Erfolge mit dem DV in der Ergebnismatrix: Klarer Erfolg, Erfolg mit SB, Teilerfolg oder Fehlschlag.</li>
+<li><strong>Die SL gibt die Story-Beats aus.</strong> Komplikationen, fortschreitende Zähler, Eskalation — bezahlt aus den gewürfelten 1en, egal ob ihr erfolgreich wart oder nicht.</li>
+<li><strong>Ihr notiert, was es kostete.</strong> Gunsten (1 bei Teilerfolg, 2 bei Fehlschlag), Erschöpfung, Schaden, Verpflichtung. Dann wandert der Fokus weiter.</li>
+</ol>
+<p>Ein vollständiger Durchlauf sollte etwa <strong>neunzig Sekunden</strong> dauern. Wenn es sich zieht, kürzt auf das Nötigste: eine klare Absicht,
+ein Wurf, eine Konsequenz.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Goldene Regel</span>
+<strong>Im Zweifel trefft die Wahl, die der Geschichte dient.</strong> Wenn ihr euch fragt „Was ist der optimale Zug?", versucht stattdessen zu fragen: „Was wäre für die Geschichte am interessantesten?"
+</div>
+<h2 id="player-managed-modules">Vom Spieler verwaltete Module</h2>
+<p>In Fate's Edge seid ihr die primäre Verwalter/-in des mechanischen Zustands eures Charakters. Das ist nicht nur eine Frage der Bequemlichkeit — es ist ein Kernprinzip des Designs, das den Aufwand für die SL reduziert und euch eingebunden hält.</p>
+<div class="panel">
+<span class="panel-title">Ihr führt eure eigene Geschichte</span>
+<strong>Was ihr verwaltet:</strong>
+<ul>
+<li>Verpflichtungsleisten (eine pro Schutzmacht oder Symbol)</li>
+<li>Korruptionszähler (Kantoren, Pakt-Flüsterer)</li>
+<li>Leinen-Zähler (beschworene Geister)</li>
+<li>Vorteilszustände (Blühend, Stabil, Angespannt, Zusammengebrochen)</li>
+<li>Gefolgsmann-Zustände (Loyalität: Treu/Angespannt/Zerbrochen; Zustand: Bereit/Verletzt/Am Boden)</li>
+<li>Fortschrittszähler (Repertoire, Geistbindung)</li>
+<li>Gunsten, Gunst (Favor), Druckmittel</li>
+</ul>
+<p class="mt-1"><strong>Eure Verantwortlichkeiten:</strong></p>
+<ol>
+<li><strong>Notiert sofort</strong>, wenn eine Regel „markiert +X" sagt.</li>
+<li><strong>Meldet Schwellenwerte</strong> („Meine Verpflichtung ist voll!").</li>
+<li><strong>Haltet es sichtbar</strong> (nutzt Zähler, die alle sehen können).</li>
+<li><strong>Behaltet die Verantwortung</strong> — ihr kennt euren Zustand am besten.</li>
+</ol>
+<p class="mt-1"><strong>Unterstützung durch die SL:</strong> Die SL prüft stichprobenartig und liefert Konsequenzen, aber ihr treibt die mechanische Erzählung eures Charakters voran.</p>
+</div>
+<div class="panel">
+<span class="panel-title">Beispiel: Eure Verpflichtung verfolgen</span>
+    Ein Charakter mit Geist 2 und Ausstrahlung 2 hat eine Verpflichtungskapazität von 4. Sie ruft einen Ritus von Schutzmacht A an (+1), pusht dann später einen Ritus von Schutzmacht B (+1) und bricht dann das Siegel eines Symbols (+2). Sie hat jetzt:
+    <ul>
+<li>Schutzmacht A: 1 Segment</li>
+<li>Schutzmacht B: 1 Segment</li>
+<li>Symbol (Anrufer/-in): 2 Segmente</li>
+</ul>
+<p class="mt-1">Gesamtverpflichtung = 4 → genau an der Kapazität. Noch keine Erschöpfung. Ruft sie einen weiteren Ritus von irgendeiner Schutzmacht an, überschreitet sie die Kapazität und markiert sofort <strong>1 Erschöpfung</strong>.</p>
+</div>
+<h2 id="dice-mechanics">Grundlegende Würfelmechanik</h2>
+<p>Wenn ihr eine bedeutsame Handlung versucht, würfelt einen Pool zehnseitiger Würfel (W10). Die Größe eures Pools ist:</p>
+<p style="text-align:center;font-size:1.1rem;color:var(--gold);">Würfelpool = Attribut + Fertigkeit</p>
+<dl>
+<dt>Attribut (1–5)</dt>
+<dd>Breite Eigenschaften wie Kraft, Witz oder Ausstrahlung.</dd>
+<dt>Fertigkeit (0–5)</dt>
+<dd>Training in einem bestimmten Bereich (z. B. Nahkampf, Heimlichkeit, Arkana).</dd>
+</dl>
+<div class="panel panel-red">
+<span class="panel-title">Legende vom Fall: Das Gewicht der Zahlen</span>
+<em>„Die Aeler zählen ihre Atemzüge; die Aelaerem gießen acht Becher ein und halten inne. Der neunte ist keine Zahl — er ist eine Wunde, die nicht verheilt ist."</em>
+<p class="mt-1">In Fate's Edge sind Würfel keine bloßen Zufallsgeneratoren. Sie sind das Echo jedes geleisteten Schwurs, jeder unbezahlten Schuld. Wenn ihr eine 1 würfelt, nährt ihr die Leere — und die Leere nährt die Geschichte.</p>
+</div>
+<h3>Die Würfel lesen</h3>
+<p>Jeder Würfel, der <strong>6 oder höher</strong> zeigt, zählt als <strong>Erfolg</strong>. Jeder Würfel, der eine <strong>1</strong> zeigt, erzeugt einen <strong>Story-Beat (SB)</strong>.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Würfelergebnis</th><th>Effekt</th></tr></thead>
+<tbody>
+<tr><td>6–10</td><td>+1 Erfolg</td></tr>
+<tr><td>1</td><td>+1 Story-Beat (SB)</td></tr>
+<tr><td>2–5</td><td>Nichts</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Beispiel:</strong> Lyra (Verstand 3 + Heimlichkeit 2 = 5 Würfel) würfelt: 6, 4, 3, 1, 6 → 2 Erfolge, 1 SB. Der DV beträgt 2 — sie ist erfolgreich, aber die SL hat 1 SB zu vergeben (vielleicht rührt sich eine Wache).</p>
+<div class="panel panel-purple">
+<span class="panel-title">Wann ihr würfelt</span>
+    Ihr würfelt nur, wenn:
+    <ul>
+<li>Das Ergebnis ungewiss ist, <strong>und</strong></li>
+<li>Ein Scheitern für die Geschichte wichtig wäre, <strong>und</strong></li>
+<li>Die Handlung bedeutsam genug ist, um im Rampenlicht zu stehen.</li>
+</ul>
+<p class="mt-1">Bei routinemäßigen Handlungen ohne echtes Risiko kann die Gruppe einfach vereinbaren, dass ihr Erfolg habt. <em>Beispiel:</em> Ein geknotetes Seil bei ruhigem Wetter erklimmen → kein Wurf. Dasselbe Seil erklimmen, während Kobolde Pfeile schießen → Wurf.</p>
+</div>
+<h2 id="difficulty-value">Schwierigkeitswert (DV)</h2>
+<p>Die Spielleitung legt einen <strong>Schwierigkeitswert</strong> fest — die Zielzahl der benötigten Erfolge.</p>
+<div class="panel">
+<span class="panel-title">Schwierigkeitswert-Leiter (DV)</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>DV</th><th>Situation</th></tr></thead>
+<tbody>
+<tr><td>2</td><td>Routine, kein Druck</td></tr>
+<tr><td><strong>3</strong></td><td><strong>Unter Druck, milder Widerstand (Standard)</strong></td></tr>
+<tr><td>4</td><td>Schwierig, aktiver Widerstand</td></tr>
+<tr><td>5</td><td>Extrem, hohe Einsätze</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<p><strong>DV 3 ist der Standard.</strong> Wenn die SL zu einem Wurf auffordert, steht etwas auf dem Spiel. Blast DVs nicht auf — sie erfüllen ihre Aufgabe bereits.</p>
+<p><strong>Die enge Ausnahme: DV 6–8.</strong> Nur auf Stufe IV+ kann eine magische Wirkung mit maximalen Anhängseln oder ein Hindernis, das episches Teamwork verlangt, DV 6, 7 oder 8 erfordern — siehe das Kapitel Epische Stufe im SL-Handbuch. Das ist kein allgemeines Eskalationswerkzeug; unterhalb von Stufe IV, und für gewöhnliche Aufgaben auf jeder Stufe, endet die Leiter weiterhin bei 5.</p>
+<h2 id="outcome-matrix">Die Ergebnismatrix</h2>
+<p>Vergleicht eure Erfolge mit dem DV, um das Ergebnis zu bestimmen.</p>
+<div class="panel">
+<span class="panel-title">Ergebnismatrix</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Ergebnis</th><th>Was es bedeutet</th></tr></thead>
+<tbody>
+<tr><td><strong>Klarer Erfolg</strong> (E ≥ DV)</td><td>Ihr erreicht euer Ziel ohne Komplikation.</td></tr>
+<tr><td><strong>Erfolg mit SB</strong> (E ≥ DV, SB&gt;0)</td><td>Ihr seid erfolgreich, aber die SL gibt SB aus, um eine Wendung hinzuzufügen.</td></tr>
+<tr><td><strong>Teilerfolg</strong> (0 &lt; E &lt; DV)</td><td>Ihr macht Fortschritt, aber die Situation bleibt ungelöst. Ihr erhaltet 1 Gunst.</td></tr>
+<tr><td><strong>Fehlschlag</strong> (E = 0)</td><td>Ihr scheitert, und die Situation eskaliert. Ihr erhaltet 2 Gunsten.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<p><strong>Was ein Teilerfolg bedeutet.</strong> Ein Teilerfolg ist kein Scheitern — er treibt die Geschichte voran. Beispiele:</p>
+<ul>
+<li>Verbessert eure Position für den nächsten Versuch (siehe Position, unten).</li>
+<li>Senkt den effektiven DV des nächsten Wurfs.</li>
+<li>Erfolg in reduziertem Umfang oder reduzierter Dauer.</li>
+<li>Enthüllt Informationen oder öffnet einen neuen Weg.</li>
+</ul>
+<div class="panel panel-red">
+<span class="panel-title">Vorwärts scheitern</span>
+    Ein <strong>Fehlschlag</strong> bedeutet niemals „nichts passiert". Die SL muss eine Komplikation einführen, einen Zähler vorrücken oder eine verborgene Gefahr enthüllen. Ihr erhaltet 2 Gunsten — die Geschichte bewegt sich, und ihr erhaltet Ressourcen für einen neuen Versuch.
+    <p class="mt-1"><em>Beispiel:</em> Ihr scheitert beim Knacken eines Schlosses (Fehlschlag). Die SL sagt: „Euer Dietrich bricht, aber ihr hört die Schritte der Wache — sie ist dabei, um die Ecke zu biegen. Ihr habt einen Herzschlag, um euch zu verstecken." Die Geschichte schreitet voran.</p>
+</div>
+<h3>Kritische Erfolge</h3>
+<p>Ein Wurf von <strong>10</strong> zählt als <strong>zwei Erfolge</strong>. Ist der Wurf insgesamt erfolgreich, fügt jede 10 erzählerisches Gewicht hinzu.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>10en</th><th>Effekt</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Starker Erfolg — verbessert eure Position um eine Stufe bei eurer nächsten Handlung in dieser Szene, oder erhaltet einen kleinen Vorteil (nach Ermessen der SL).</td></tr>
+<tr><td>2</td><td>Außergewöhnlicher Erfolg — wählt zwei Vorteile aus der obigen Liste.</td></tr>
+<tr><td>3</td><td>Legendärer Erfolg — entscheidender Sieg; löscht 1 Segment eines relevanten Zählers.</td></tr>
+<tr><td>4+</td><td>Mythischer Erfolg — formt die Szene um; löscht 1–2 Segmente eines relevanten Zählers.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Wichtig:</strong> Ein Würfel, der eine <strong>10</strong> zeigt, wird nie neu gewürfelt, selbst nicht durch Positionseffekte oder andere Mechaniken. Kritische Effekte gelten nur, wenn der Gesamtwurf erfolgreich ist.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Beispiel: Eine 10 würfeln</span>
+    Lyra würfelt 3 Würfel: <strong>10</strong>, 8, 1. Sie erhält: 2 Erfolge (von der 10) + 1 Erfolg (von der 8) = 3 Erfolge. Der Wurf erzeugt außerdem 1 SB (von der 1). Weil sie eine 10 gewürfelt hat, gewährt die SL einen zusätzlichen Vorteil: „Euer Pfeil durchbohrt die Schulter des Banditen — er lässt sein Schwert fallen." <em>(Erzählerischer Vorteil, gewählt von der SL.)</em>
+</div>
+<h2 id="boons">Gunsten</h2>
+<p>Gunsten stehen für Schwung und erzählerischen Hebel. Ihr könnt bis zu <strong>5 Gunsten</strong> halten.</p>
+<div class="panel panel-gold">
+<span class="panel-title">Legende vom Samtenen Griff</span>
+<em>„Die Münze, die nie ausgegeben wird, ist die, an deren Nehmen du dich nicht erinnerst."</em>
+<p class="mt-1">Gunsten sind der beste Freund des Diebes — eine zweite Chance, wenn das Schloss falsch klickt, ein plötzlicher Schatten, wenn die Wache sich umdreht. In Silkstrand sagt man, eine Gunst sei eine Schuld gegenüber dem Glück, und das Glück treibt seine Schulden immer ein.</p>
+</div>
+<div class="panel panel-green">
+<span class="panel-title">Warum ihr Gunsten ausgeben solltet — Die Mathematik des Spaßes</span>
+<strong>Das Horten von Gunsten für die EP-Umwandlung führt zu weniger Einbindung und geringerem Spaß.</strong>
+<p class="mt-1">Jede Gunst, die ihr haltet, ist ein dramatischer Moment, der darauf wartet, zu geschehen:</p>
+<ul>
+<li>Ein kritisches Scheitern neu zu würfeln verwandelt Verzweiflung in Triumph.</li>
+<li>Die Position vor einem riskanten Wurf zu verbessern verwandelt ein verzweifeltes Wagnis in eine kontrollierte Chance.</li>
+<li>Einen Vorteil zu aktivieren bringt das Netzwerk eures Charakters in die Geschichte.</li>
+</ul>
+<p class="mt-1"><strong>EP aus Gunsten sind ein Tröpfeln (max. 2 pro Sitzung).</strong> Die eigentliche Belohnung ist <em>Handlungsmacht</em>. Gebt Gunsten frei aus — sie sind keine EP-Marken.</p>
+<p class="mt-1"><em>Beispiel:</em> Ihr habt 3 Gunsten. Statt sie später umzuwandeln, nutzt eine, um einen misslungenen Dietrichversuch neu zu würfeln, eine weitere, um eure Position vor einem Kampf zu verbessern, und spart die letzte für einen Notfall. So entstehen Legenden.</p>
+</div>
+<h3>Gunsten verdienen</h3>
+<ul>
+<li><strong>Teilerfolg:</strong> Erhaltet 1 Gunst (siehe Ergebnismatrix, oben).</li>
+<li><strong>Fehlschlag:</strong> Erhaltet 2 Gunsten.</li>
+<li><strong>Bindungsgetriebene Handlung:</strong> Einmal pro Bindung pro Sitzung erhaltet ihr 1 Gunst, wenn eine Handlung diese Bindung bedeutsam einbezieht (Bindungen werden bei der Charaktererstellung festgelegt — Kapitel 2, Schritt 8).</li>
+<li><strong>SL-Belohnung:</strong> Für Kreativität, Opferbereitschaft oder starkes erzählerisches Spiel.</li>
+</ul>
+<p><strong>Wann keine vergeben werden:</strong> Sichere Übung, risikofreie Sondierungen oder wiederholte identische Versuche in derselben Szene erzeugen keine Gunsten.</p>
+<h3>Gunsten ausgeben</h3>
+<ul>
+<li>Einen einzelnen Würfel neu würfeln (nachdem ihr das Ergebnis gesehen habt)</li>
+<li>Einen Vorteil auf der Bühne aktivieren (1 Gunst)</li>
+<li>Position um 1 Stufe verbessern, vor einem Wurf (siehe Position, unten)</li>
+<li>Bestimmte Riten oder Fähigkeiten befeuern (siehe Kapitel Magie)</li>
+<li>In EP umwandeln (2 Gunsten = 1 EP, einmal pro Sitzung während der Ruhephase, max. 2 EP pro Sitzung)</li>
+</ul>
+<p><strong>Erschöpfung statt Gunsten.</strong> Habt ihr keine Gunsten mehr übrig (oder wollt sie schonen), könnt ihr <strong>1 Erschöpfung</strong> anstelle von 1 Gunst zahlen, um jeden Effekt zu aktivieren, der normalerweise eine Gunst kostet. Das stellt dar, dass ihr euch durch Erschöpfung kämpft, auf rohe Anstrengung setzt oder einen kleinen körperlichen Tribut akzeptiert. Die SL kann diese Substitution untersagen, wenn die Fiktion sie unplausibel macht (z. B. einen empfindlichen Vorteil zu aktivieren, während ihr erschöpft seid). Diese Option ändert weder das Ergebnis des Effekts noch erzeugt sie zusätzliche Story-Beats; sie ändert nur, welche Ressource ausgegeben wird.</p>
+<h3>Übertragungsgrenze</h3>
+<p>Am Ende jeder Szene reduziert gehaltene Gunsten auf ein Maximum von <strong>2</strong>. Überschüsse gehen verloren — gebt sie aus oder verliert sie.</p>
+<h2 id="position">Position</h2>
+<p>Jede Handlung findet aus einer <strong>Position</strong> heraus statt, die den Vorteil des Charakters widerspiegelt.</p>
+<div class="panel">
+<span class="panel-title">Positionseffekte</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Position</th><th>Erzählerischer Rahmen</th><th>Mechanischer Effekt</th></tr></thead>
+<tbody>
+<tr><td>Dominant</td><td>Ihr nutzt euren Vorteil</td><td>Würfelt einen <em>Fehlschlag</em> neu.</td></tr>
+<tr><td>Kontrolliert</td><td>Ausgeglichene Norm</td><td>Keine Neuwürfe.</td></tr>
+<tr><td>Verzweifelt</td><td>Ihr handelt unter Zwang</td><td>Würfelt einen <em>Erfolg</em> neu.</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="mt-1">Ihr könnt <strong>1 Gunst</strong> ausgeben, um die Position vor dem Wurf um eine Stufe zu verbessern. Die SL kann <strong>2 SB</strong> ausgeben, um eure Position nach dem Wurf um eine Stufe zu verschlechtern.</p>
+<p>Eure <strong>Herkunft</strong> verschiebt die Position ebenfalls: Jedes Volk hat eine <strong>Affinität</strong>, die sie verbessert, und eine <strong>Grenze</strong>, die sie verschlechtert, bei Würfen, die die von ihr benannten Attribute und Fertigkeiten nutzen (siehe <em>Welt, Regionen und Kulturen</em>). Position steigt nie über Dominant und fällt nie unter Verzweifelt — an beiden Enden bewirken weitere Modifikatoren nichts, statt sich in Würfel zu verwandeln.</p>
+</div>
+<p><strong>Wichtig:</strong> Ein Würfel, der eine <strong>10</strong> zeigt, wird niemals neu gewürfelt, selbst nicht durch die Position Verzweifelt.</p>
+<div class="panel panel-blue">
+<span class="panel-title">Die Lektion eines vhasianischen Duellanten</span>
+<em>„Auf der Pont-du-Tithe ist Position alles. Steh mit der Sonne im Rücken — du bist Dominant. Füße auf einer rutschigen Planke — Verzweifelt. Die Brücke kümmert sich nicht um deinen Stolz."</em>
+<p class="mt-1">Eure Position ist das Urteil der Geschichte über euer Risiko. Ändert die Fiktion, und die Position folgt.</p>
+</div>
+<p><strong>Wechselwirkung von Gunst und Erschöpfung:</strong> Wenn Erschöpfung einen Erfolg zum Neuwurf zwingt (siehe Erschöpfungsleiste, unten), hebt das Ausgeben von 1 Gunst <em>einen</em> solchen Neuwurf auf. Ihr könnt Gunsten ausgeben, nachdem ihr das Ergebnis eines Erschöpfungs-Neuwurfs gesehen habt.</p>
+<div class="panel panel-green">
+<span class="panel-title">Die Gunst-Ökonomie auf einen Blick</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Handlung</th><th>Gunst-Änderung</th></tr></thead>
+<tbody>
+<tr><td>Teilerfolg</td><td>Erhaltet 1 Gunst</td></tr>
+<tr><td>Fehlschlag</td><td>Erhaltet 2 Gunsten</td></tr>
+<tr><td>Bindungsgetriebene Handlung</td><td>Erhaltet 1 Gunst (einmal/Bindung/Sitzung)</td></tr>
+<tr><td>SL-Belohnung</td><td>+1 Gunst (selten)</td></tr>
+<tr><td>Einen Würfel neu würfeln</td><td>Gebt 1 Gunst aus</td></tr>
+<tr><td>Vorteil aktivieren</td><td>Gebt 1 Gunst aus</td></tr>
+<tr><td>Position verbessern (vor dem Wurf)</td><td>Gebt 1 Gunst aus</td></tr>
+<tr><td>In EP umwandeln (Ruhephase)</td><td>Gebt 2 Gunsten aus → 1 EP (max. 2 EP/Sitzung)</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="mt-1"><strong>Maximum gehalten:</strong> 5 Gunsten. Am Ende der Szene auf <strong>2</strong> reduzieren (Überschuss verloren).</p>
+</div>
+<div class="panel panel-blue">
+<strong>Position</strong> (Dominant/Kontrolliert/Verzweifelt) = Wie riskant ist diese Handlung? — bestimmt die Schwere des Scheiterns und Neuwürfe.<br/>
+<strong>Effekt</strong> (Begrenzt/Standard/Groß) = Wie viel erreicht ihr bei Erfolg? — bestimmt Umfang, Ausmaß oder Qualität.
+    <p class="mt-1 text-sm"><em>Beispiel:</em> Eine Falle entschärfen — Begrenzter Effekt lässt eine Person durchqueren, Standard lässt zwei, Groß lässt alle vier.</p>
+</div>
+<h2 id="story-beats">Story-Beats (SB)</h2>
+<p>Story-Beats sind erzählerische Werkzeuge, die die SL ausgibt, um Wendungen einzuführen. Sie halten die Geschichte mit Komplikationen lebendig.</p>
+<h3>Beispiele für SB-Ausgaben</h3>
+<ul>
+<li><strong>1 SB:</strong> Kleine Komplikation — Lärm, Spur, +1 Versorgungssegment.</li>
+<li><strong>2 SB:</strong> Mäßiger Rückschlag — Alarm ausgelöst, Deckung verloren, geringerer Feind erscheint, oder ein Fraktions- oder Front-Zähler rückt um 1 Segment vor.</li>
+<li><strong>3 SB:</strong> Ernste Schwierigkeiten — Verstärkung, wichtige Ausrüstung geht kaputt.</li>
+<li><strong>4+ SB:</strong> Große Wende — Falle schnappt zu, Autorität trifft ein, Szene verschiebt sich.</li>
+</ul>
+<p><strong>Spielerrat:</strong> Fürchtet Story-Beats nicht — sie sind Treibstoff für Drama, keine Strafe. Jedes Mal, wenn ihr eine 1 würfelt, gebt ihr der SL einen Funken. Dieser Funke kann ein Feuer entzünden, das die Geschichte heller brennen lässt.</p>
+<h2 id="harm-fatigue">Schaden und Erschöpfung</h2>
+<h3>Erschöpfungsleiste</h3>
+<p>Jeder Charakter hat eine Erschöpfungsleiste, die dem <strong>Körper</strong>-Wert entspricht. Markiert Erschöpfung für Anstrengung, magische Belastung oder Stress.</p>
+<ul>
+<li>Jede Erschöpfungsstufe verschlechtert eure Position: Dominant → Kontrolliert → Verzweifelt (siehe Position, oben).</li>
+<li>Seid ihr bereits Verzweifelt, wendet stattdessen -1 Würfel pro Erschöpfung an.</li>
+<li>Abzüge durch Erschöpfung und Schaden <strong>stapeln sich</strong>. Zum Beispiel erleidet ein Charakter mit Schaden 1 (-1 Würfel), der durch Erschöpfung außerdem Verzweifelt ist, beide Abzüge.</li>
+<li><strong>Überlauf:</strong> Wenn die Leiste voll wird, erhöht sich Schaden um 1 Stufe (siehe Schadensstufen, unten), und alle Erschöpfung wird gelöscht.</li>
+<li><strong>Erholung:</strong> Eine kurze Rast löscht 1–2 Erschöpfung; eine volle Nachtruhe löscht alles.</li>
+</ul>
+<div class="panel panel-orange">
+<span class="panel-title">Aeler-Atemzählung</span>
+<em>„Die Tiefen-Wächter sagen: Acht Atemzüge sind ein Gang, sechzehn eine Kammer, zweiunddreißig ein Narr, der vergessen hat umzukehren. Erschöpfung ist euer versiegender Atem — markiert sie, oder der Berg wird euch markieren."</em>
+<p class="mt-1">Erschöpfung ist nicht nur Müdigkeit; sie ist das Gewicht jeder schweren Entscheidung, die ihr bereits getroffen habt.</p>
+</div>
+<h3>Der Achterbahn-Effekt (Schaden nehmen löscht Erschöpfung)</h3>
+<p>Wenn ihr Schaden nehmt, löscht der Schock der Wunde vorübergehend eure Erschöpfung. Das erzeugt natürliche dramatische Schwankungen — ein Charakter kurz vor dem Zusammenbruch, der eine Wunde nimmt und plötzlich neuen Atem findet.</p>
+<p><strong>Beispiel:</strong> Mateo ist bei Erschöpfung 3 (Verzweifelt, -2 Würfel). Ein Kobold ersticht ihn für Schaden 1. Nach dem untenstehenden Verfahren löscht der Schaden seine Erschöpfung (Schritt 2), dann addiert er die umgewandelte Erschöpfung (Schritt 3). Er endet mit Schaden 1, Erschöpfung 0 — verwundet, aber klar im Kopf.</p>
+<h3>Schadensstufen</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Schadensstufe</th><th>Effekt</th></tr></thead>
+<tbody>
+<tr><td>Schaden 1</td><td>-1 Würfel bei zugehörigen Handlungen</td></tr>
+<tr><td>Schaden 2</td><td>-1 Würfel bei den meisten Handlungen, bis behandelt</td></tr>
+<tr><td>Schaden 3</td><td>Handlungsunfähig oder sterbend</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Schaden und Erschöpfung nehmen — Das Verfahren (aus Spielersicht)</h3>
+<p><strong>Wenn ihr getroffen werdet, nennt die SL den Schadenswert. Ihr berechnet die Umwandlung anhand eures Rüstungstyps und wendet das Ergebnis in dieser Reihenfolge an:</strong></p>
+<ol>
+<li><strong>Die SL nennt den Schaden:</strong> Die SL erzählt den Angriff und nennt euch den eingehenden Schadenswert (z. B. „Ihr nehmt Schaden 3").
+    <ul>
+<li>Eure Aufgabe ist es, euren Rüstungstyp zu kennen und die Umwandlung selbst vorzunehmen.</li>
+<li>Die SL berechnet die Umwandlung <em>nicht</em> für euch.</li>
+</ul>
+</li>
+<li><strong>Die Umwandlung berechnen:</strong> Nutzt die Rüstungsumwandlungstabelle (siehe unten), um zu bestimmen:
+    <ul>
+<li><strong>Erhaltene Erschöpfung:</strong> Die Erschöpfungskosten des Treffers (mindestens 1).</li>
+<li><strong>Verbleibender Schaden:</strong> Jeder Schaden, der eure Rüstung umgeht.</li>
+</ul>
+<p class="text-sm mt-1"><em>Beispiel:</em> SL: „Ihr nehmt Schaden 2." Ihr (Leichte Rüstung): „Schaden 2 in leichter Rüstung → Schaden 1 verbleibend, Erschöpfung 1 erhalten."</p>
+</li>
+<li><strong>Zuerst verbleibenden Schaden anwenden:</strong>
+<ul>
+<li>Löscht <strong>alle</strong> bestehende Erschöpfung (der Schock der Verletzung setzt die Erschöpfung zurück).</li>
+<li>Erhöht eure Schadensstufe um den berechneten verbleibenden Schaden.</li>
+</ul>
+<p class="text-sm mt-1"><em>Beispiel:</em> Ihr habt verbleibenden Schaden = 1 berechnet → Erschöpfung löschen, Schaden +=1.</p>
+</li>
+<li><strong>Die Erschöpfung hinzufügen:</strong>
+<ul>
+<li>Addiert die aus eurer Berechnung erhaltene Erschöpfung zu eurer Erschöpfungsleiste.</li>
+<li>Füllt oder überschreitet dies eure Leiste (Körperwert), löst <strong>Überlauf</strong> aus (siehe Erschöpfungsleiste, oben).</li>
+</ul>
+<p class="text-sm mt-1"><em>Beispiel:</em> Ihr habt erhaltene Erschöpfung = 2 berechnet → 2 Erschöpfung addieren, dann prüfen, ob Erschöpfung ≥ Körper.</p>
+</li>
+<li><strong>Das Ergebnis erzählen:</strong>
+<ul>
+<li>Beschreibt, wie es aussieht, wenn euer Charakter den Treffer nimmt.</li>
+<li>„Die Klinge gleitet unter meinen Schild — ich spüre den Stich (1 Schaden), während die Erschöpfung schwindet (1 Erschöpfung hinzugefügt)."</li>
+<li>Oder: „Mein Brustpanzer absorbiert den Aufprall — der Schlag lässt meine Zähne klappern (2 Erschöpfung), zieht aber kein Blut."</li>
+</ul>
+</li>
+</ol>
+<div class="panel panel-gold">
+<span class="panel-title">Spielertipp: Übernehmt eure Umwandlung</span>
+<strong>Ihr seid dafür verantwortlich, eure eigene Rüstungsumwandlung zu berechnen.</strong> Eure Aufgabe ist es:
+    <ul>
+<li>Euren Rüstungstyp zu kennen (Leicht/Mittel/Schwer/Überlegen/Mythisch).</li>
+<li>Die Umwandlungstabelle zu konsultieren, wenn die SL eingehenden Schaden nennt.</li>
+<li>Das Ergebnis in der richtigen Reihenfolge anzuwenden: <strong>Schaden zuerst</strong> (Erschöpfung löschen), dann <strong>Erschöpfung</strong> (Überlauf prüfen).</li>
+<li>Das Ergebnis zu erzählen, um die Fiktion lebendig zu halten.</li>
+</ul>
+<p class="mt-1"><em>Das hält die Druckmaschine am Laufen: Die SL erzählt den Angriff, ihr verwaltet eure Ressourcen, und die Geschichte bleibt lebendig.</em></p>
+</div>
+<h3>Rüstungsumwandlungstabelle (Spielerreferenz)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Rüstungstyp</th><th>Schaden 1</th><th>Schaden 2</th><th>Schaden 3</th><th>Schaden 4</th><th>Schaden 5</th></tr></thead>
+<tbody>
+<tr><td>Leicht</td><td>E1</td><td>S1 + E1</td><td>S2 + E1</td><td>S3 + E1</td><td>S4 + E1</td></tr>
+<tr><td>Mittel</td><td>E1</td><td>E1</td><td>S2 + E1</td><td>S3 + E1</td><td>S4 + E1</td></tr>
+<tr><td>Schwer</td><td>E1</td><td>E1</td><td>E2</td><td>S1 + E2</td><td>S2 + E2</td></tr>
+<tr><td>Überlegen</td><td>E1</td><td>E1</td><td>E1</td><td>E3</td><td>S1 + E3</td></tr>
+<tr><td>Mythisch</td><td>E1</td><td>E1</td><td>E1</td><td>E1</td><td>E4</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted"><em>Mindestens 1 Erschöpfung pro Treffer, auch wenn die Umwandlung 0 ergäbe. „E" = erhaltene Erschöpfung; „S" = verbleibender Schaden.</em></p>
+<h4>Das Muster verstehen</h4>
+<p>Die Rüstungsumwandlungstabelle folgt einem einfachen Muster. Jeder Rüstungstyp hat eine <strong>Stufe</strong> (Leicht = 1, Mittel = 2, Schwer = 3, Überlegen = 4, Mythisch = 5). Für jeden eingehenden Schaden:</p>
+<ul>
+<li><strong>Ist Schaden ≤ Stufe:</strong> Der gesamte Schaden wird in Erschöpfung umgewandelt. Die erhaltene Erschöpfung ist 1 weniger als der Schadenswert (mindestens 1).</li>
+<li><strong>Ist Schaden &gt; Stufe:</strong> Die ersten Stufe-Punkte Schaden werden in Erschöpfung umgewandelt (Stufe − 1 Erschöpfung), und die verbleibenden Schadenspunkte werden direkt angewendet.</li>
+</ul>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Rüstungsstufe</th><th>Wandelt um</th><th>Erschöpfung pro Stufe</th></tr></thead>
+<tbody>
+<tr><td>1 (Leicht)</td><td>1 Schaden</td><td>1 Erschöpfung</td></tr>
+<tr><td>2 (Mittel)</td><td>2 Schaden</td><td>1 Erschöpfung</td></tr>
+<tr><td>3 (Schwer)</td><td>3 Schaden</td><td>2 Erschöpfung</td></tr>
+<tr><td>4 (Überlegen)</td><td>4 Schaden</td><td>3 Erschöpfung</td></tr>
+<tr><td>5 (Mythisch)</td><td>5 Schaden</td><td>4 Erschöpfung</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Spielerbeispiele (vollständiger Umwandlungsprozess)</h4>
+<ul>
+<li><strong>Beispiel 1 — Leichte Rüstung:</strong>
+<ul>
+<li><em>SL:</em> „Ihr nehmt Schaden 2."</li>
+<li><em>Ihr (Leichte Rüstung):</em> „Schaden 2 in leichter Rüstung → Schaden 1 verbleibend, Erschöpfung 1 erhalten."</li>
+<li><em>Anwenden:</em> Erschöpfung löschen, Schaden +=1, dann 1 Erschöpfung hinzufügen.</li>
+<li><em>Erzählung:</em> „Die Klinge gleitet unter meinen Schild — ich spüre den Stich (Schaden 1), während die Erschöpfung schwindet (Erschöpfung 1 hinzugefügt)."</li>
+</ul>
+</li>
+<li><strong>Beispiel 2 — Schwere Rüstung (vollständige Umwandlung):</strong>
+<ul>
+<li><em>SL:</em> „Ihr nehmt Schaden 3."</li>
+<li><em>Ihr (Schwere Rüstung):</em> „Schaden 3 in schwerer Rüstung → Schaden 0 verbleibend, Erschöpfung 2 erhalten."</li>
+<li><em>Anwenden:</em> Kein Schaden anzuwenden (Erschöpfung wird nicht gelöscht), dann 2 Erschöpfung hinzufügen.</li>
+<li><em>Erzählung:</em> „Mein Brustpanzer absorbiert den vollen Aufprall — der Schlag lässt meine Zähne klappern (2 Erschöpfung), zieht aber kein Blut."</li>
+</ul>
+</li>
+<li><strong>Beispiel 3 — Schwere Rüstung (übermäßiger Schaden):</strong>
+<ul>
+<li><em>SL:</em> „Ihr nehmt Schaden 4."</li>
+<li><em>Ihr (Schwere Rüstung):</em> „Schaden 4 in schwerer Rüstung → Schaden 1 verbleibend, Erschöpfung 2 erhalten."</li>
+<li><em>Anwenden:</em> Erschöpfung löschen, Schaden +=1, dann 2 Erschöpfung hinzufügen.</li>
+<li><em>Erzählung:</em> „Der Schlag gleitet an meiner Deckung vorbei — ich spüre den Biss der Klinge (Schaden 1), während der Aufprall meine Knochen erschüttert (Erschöpfung 2 hinzugefügt)."</li>
+</ul>
+</li>
+<li><strong>Beispiel 4 — Überlegene Rüstung:</strong>
+<ul>
+<li><em>SL:</em> „Ihr nehmt Schaden 4."</li>
+<li><em>Ihr (Überlegene Rüstung):</em> „Schaden 4 in überlegener Rüstung → Schaden 0 verbleibend, Erschöpfung 3 erhalten."</li>
+<li><em>Anwenden:</em> Kein Schaden anzuwenden (Erschöpfung wird nicht gelöscht), dann 3 Erschöpfung hinzufügen.</li>
+<li><em>Erzählung:</em> „Der Schlag trifft mitten auf meine Brust — die Rüstung hält stand, aber die Wucht presst mir die Luft aus der Lunge (3 Erschöpfung)."</li>
+</ul>
+</li>
+<li><strong>Beispiel 5 — Mythische Rüstung:</strong>
+<ul>
+<li><em>SL:</em> „Ihr nehmt Schaden 5."</li>
+<li><em>Ihr (Mythische Rüstung):</em> „Schaden 5 in mythischer Rüstung → Schaden 0 verbleibend, Erschöpfung 4 erhalten."</li>
+<li><em>Anwenden:</em> Kein Schaden anzuwenden (Erschöpfung wird nicht gelöscht), dann 4 Erschöpfung hinzufügen.</li>
+<li><em>Erzählung:</em> „Der Hammer trifft meinen Schulterpanzer — die mythische Legierung singt und absorbiert den Schlag, aber meine Arme zittern vor Anstrengung (4 Erschöpfung)."</li>
+</ul>
+</li>
+<li><strong>Beispiel 6 — Mythische Rüstung (übermäßiger Schaden):</strong>
+<ul>
+<li><em>SL:</em> „Ihr nehmt Schaden 6."</li>
+<li><em>Ihr (Mythische Rüstung):</em> „Schaden 6 in mythischer Rüstung → Schaden 1 verbleibend, Erschöpfung 4 erhalten."</li>
+<li><em>Anwenden:</em> Erschöpfung löschen, Schaden +=1, dann 4 Erschöpfung hinzufügen.</li>
+<li><em>Erzählung:</em> „Die Klinge findet eine Lücke in der mythischen Plattierung — ich spüre den kalten Biss des Stahls (Schaden 1), während der Aufprall mich in die Knie zwingt (Erschöpfung 4 hinzugefügt)."</li>
+</ul>
+</li>
+<li><strong>Beispiel 7 — Überlauf (aus Spielersicht):</strong>
+<ul>
+<li><em>SL:</em> „Ihr nehmt Schaden 3."</li>
+<li><em>Ihr (Schwere Rüstung, Körper 2, Erschöpfung 1):</em> „Schaden 3 in schwerer Rüstung → Schaden 0 verbleibend, Erschöpfung 2 erhalten."</li>
+<li><em>Anwenden:</em> Kein Schaden anzuwenden (Erschöpfung wird nicht gelöscht), dann 2 Erschöpfung hinzufügen.</li>
+<li><em>Überlauf prüfen:</em> Erschöpfung war 1, jetzt 3 (≥ Körper 2) → Überlauf! Schaden +=1, alle Erschöpfung löschen.</li>
+<li><em>Erzählung:</em> „Der zermalmende Schlag zerschmettert meine Deckung — Schmerz lodert auf (Schaden 1), während die Erschöpfung verschwindet (Erschöpfung gelöscht)."</li>
+</ul>
+</li>
+</ul>
+<h4>Wichtige Erinnerungen</h4>
+<ul>
+<li><strong>Wendet immer zuerst Schaden an</strong> (was Erschöpfung löscht), dann fügt Erschöpfung hinzu.</li>
+<li><strong>Mindestens 1 Erschöpfung pro Treffer</strong>, selbst wenn die Tabelle 0 angibt.</li>
+<li><strong>Überlauf tritt ein, wenn Erschöpfung ≥ Körper ist</strong>, nicht erst wenn er überschritten wird.</li>
+<li><strong>Die Tabelle ist die Regel.</strong> Berechnet nicht über das hinaus, was sie zeigt.</li>
+<li><strong>Erzählt das Ergebnis</strong> — es bereichert die Fiktion und hält alle eingebunden.</li>
+<li><strong>Rüstung höherer Stufe</strong> (Überlegen, Mythisch) ist selten. Eure SL sagt euch, ob sie verfügbar ist.</li>
+</ul>
+<h3>Erholung</h3>
+<ul>
+<li><strong>Erschöpfung:</strong> Kurze Rast (Nahrung/Wasser) entfernt 2 Erschöpfung; eine volle Nacht entfernt alles.</li>
+<li><strong>Schaden:</strong> Erfordert medizinische Versorgung und Zeit — geringe Behandlung senkt die Schadensstufe, ordentliche Pflege entfernt sie.</li>
+</ul>
+<h2 id="initiative">Initiative und Zugreihenfolge</h2>
+<p><strong>Standard: Erzählerische Initiative.</strong> Fate's Edge nutzt keine feste Initiative. Die Zugreihenfolge folgt der Fiktion:</p>
+<ul>
+<li><strong>Erzählerisches Ermessen:</strong> Die SL rahmt die Rampenlicht-Reihenfolge anhand der Umstände.</li>
+<li><strong>Spielereinbringen:</strong> Spieler können vorschlagen zu handeln, wenn es Sinn ergibt.</li>
+<li><strong>Überraschung:</strong> Angreifer aus dem Hinterhalt handeln zuerst; Ziele reagieren danach.</li>
+<li><strong>Flexibilität:</strong> Das Rampenlicht kann mitten in der Szene wechseln, wenn es fiktional passt.</li>
+</ul>
+<p class="text-sm text-muted">(Optionale strukturierte Initiativesysteme — Popcorn, seitenbasiert, Geschwindigkeitsslots — stehen im SL-Handbuch zur Verfügung, falls euer Tisch sie bevorzugt.)</p>
+<h3>Zugökonomie (Kurzregeln)</h3>
+<p>Jeder Charakter hat <strong>1 Handlung und 1 Bewegung</strong> in seinem Zug. Handlungen und Bewegungen können in beliebiger Reihenfolge genutzt werden; dieselbe Handlung zu wiederholen ist nicht erlaubt, sofern nicht anders vermerkt.</p>
+<p><strong>Bewegung:</strong> Durchquert bis zu <strong>ein Entfernungsband</strong> (Nah → Mittel → Weit → Fern, oder umgekehrt).</p>
+<ul>
+<li><strong>Aufstehen:</strong> Nutzt eure Bewegung, um aus der Bauchlage aufzustehen.</li>
+</ul>
+<p><strong>Handlungsoptionen:</strong> Bei eurer Handlung könnt ihr:</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Handlung</th><th>Effekt</th><th>Anmerkungen</th></tr></thead>
+<tbody>
+<tr><td>Angriff</td><td>Nah- oder Fernkampfangriff gegen ein Ziel.</td><td>Fernkampf im Nahbereich ist <strong>Verzweifelt</strong>.</td></tr>
+<tr><td>Rückzug</td><td>Ermöglicht sichere Bewegung.</td><td>Eure Bewegung provoziert keine Gelegenheitsangriffe; ihr könnt in diesem Zug nicht Angreifen.</td></tr>
+<tr><td>Stoßen</td><td>Schiebt ein Ziel ein Entfernungsband zurück (Nah → Mittel).</td><td>Gegenwurf Körper + Athletik vs. Körper + Athletik. Bei Erfolg bewegt sich das Ziel zurück und erleidet -1 Position bei seiner nächsten Handlung.</td></tr>
+<tr><td>Greifen</td><td>Packt ein Ziel, um es festzuhalten oder zu kontrollieren.</td><td>Gegenwurf Körper + Nahkampf vs. Körper + Athletik. Bei Erfolg sind beide Verwickelt (können sich nicht voneinander entfernen). Das gegriffene Ziel erleidet -1 Würfel bei allen Handlungen. Sich zu befreien erfordert einen neuen Gegenwurf als Handlung.</td></tr>
+<tr><td>Ansturm (Voller Zug)</td><td>Zwei Bänder auf einen Feind zu bewegen + einen Nahkampfangriff ausführen.</td><td>Kostet 1 Erschöpfung, nächste Verteidigung Verzweifelt, erfordert offenes Gelände. <strong>Das Verlassen des Nahbereichs während eines Ansturms provoziert wie üblich Gelegenheitsangriffe.</strong></td></tr>
+<tr><td>Gefecht (Voller Zug)</td><td>Zwei Bänder von einem Feind weg bewegen + einen Fernkampfangriff ausführen.</td><td>Kostet 1 Erschöpfung, nächste Verteidigung Verzweifelt, erfordert offenes Gelände. <strong>Das Verlassen des Nahbereichs während eines Gefechts provoziert wie üblich Gelegenheitsangriffe.</strong></td></tr>
+<tr><td>Beobachten / Position ändern</td><td>Erhaltet einmalig +1 Position.</td><td>Einmal pro Zug.</td></tr>
+<tr><td>Vorbereitung (Teamwork)</td><td>Eine erfolgreiche, ungewisse und riskante Vorbereitung gewährt einem Verbündeten +1 Position bei seiner nächsten Handlung.</td><td>Erfordert nur dann einen Wurf, wenn das Ergebnis ungewiss und riskant ist; zählt nicht zur Unterstützungs-Würfelpool-Obergrenze von +3.</td></tr>
+<tr><td>Unterstützung (Teamwork)</td><td>Gebt 1 Gunst aus, um einem Verbündeten +1 Würfel bei seinem Wurf zu geben.</td><td>Nur eine unterstützende Person darf Unterstützung bei einer bestimmten Handlung nutzen. Maximale Gesamt-Unterstützungswürfel aus allen Quellen (einschließlich Vorbereitung und anderer Fähigkeiten) sind <strong>+3</strong>.</td></tr>
+<tr><td>Beschützen</td><td>Nehmt eine schützende Haltung ein oder blockt für einen nahen Verbündeten.</td><td>Bis zu eurem nächsten Zug könnt ihr einen für ihn bestimmten Treffer abfangen und würfeln, um ihm zu widerstehen; siehe <em>Reaktionen</em>, unten, für die Verteidigung eurer selbst.</td></tr>
+<tr><td>Kanalisieren / Weben</td><td>Runenwahrer-/Ritual-Vorbereitung.</td><td>Unterbrechung kann die Position verschlechtern.</td></tr>
+<tr><td>Ritus/Lied wirken</td><td>Eine magische Handlung ausführen.</td><td>Kann gepusht werden (kostet Erschöpfung/Korruption).</td></tr>
+<tr><td>Interagieren</td><td>Ein Objekt oder die Umgebung manipulieren.</td><td>Die SL legt den DV fest.</td></tr>
+<tr><td>Freie Handlungen</td><td>Kurze Rufe, einen Gegenstand fallen lassen.</td><td>Längere Handlungen erfordern angemessene Handlungstypen.</td></tr>
+</tbody>
+</table></div>
+</div>
+<h4>Reaktionen (euch selbst verteidigen)</h4>
+<p>Euch zu verteidigen ist keine Zughandlung — es ist eine <strong>Reaktion</strong>, außerhalb eures Zugs gegen den Druck eines Gegners eingesetzt. Ihr habt <strong>1 Reaktion pro Zug</strong>. Wenn ein Treffer bevorsteht, nennt die SL den eingehenden Schaden, und ihr entscheidet:</p>
+<ul>
+<li><strong>Eure Reaktion ausgeben:</strong> Würfelt eine Verteidigungsprobe. <strong>DV = der eingehende Schaden.</strong> Ein Erfolg wehrt ihn vollständig ab; ein Teilerfolg reduziert ihn auf den vor dem Wurf vereinbarten geringeren Schutz (Schaden halbieren, aufgerundet, sofern die Fiktion nichts anderes sagt); ein Fehlschlag nimmt den vollen Schaden. Eine ausgegebene Reaktion kehrt in eurem nächsten Zug zurück — oder sofort, für <strong>1 Gunst</strong>.</li>
+<li><strong>Eure Reaktion zurückhalten:</strong> Der Treffer landet passiv. Wendet den genannten Schaden direkt durch eure Rüstungsumwandlung an, kein Wurf auf beiden Seiten.</li>
+</ul>
+<p>Defensive Talente, die durch eingehenden Druck auslösen (Gegenzauber, Abfangen und Ähnliches), sind <em>passiv</em> — sie feuern nach ihrem eigenen gedruckten Auslöser und greifen nie auf euren Reaktionspool zu, sodass die Nutzung eines solchen euch nie ohne Reaktion für den obigen Wurf zurücklässt.</p>
+<h4>Seitwärtsstoß (Annähern oder Zurückweichen)</h4>
+<p>Als Teil eines Nahkampfangriffs könnt ihr euch <strong>ein Entfernungsband</strong> bewegen (Nah ↔ Mittel, Mittel ↔ Weit, oder Weit ↔ Fern), ohne eure Bewegungshandlung für diesen Zug zu nutzen. Tut ihr dies, verschlechtert sich eure Position für diesen Angriff um eine Stufe (z. B. wird Kontrolliert zu Verzweifelt, Dominant zu Kontrolliert). Ihr könnt in demselben Zug nicht auch eure normale Bewegungshandlung nutzen.</p>
+<p>Das stellt einen kühnen Vorstoß dar, um Distanz zu schließen, oder einen schnellen Schritt zurück, um Raum zu schaffen, wobei Sicherheit gegen taktische Positionierung geopfert wird.</p>
+<ul>
+<li><strong>Beispiel (Gaunerin):</strong> Lyra ist im Mittelbereich mit einem Messer (leichte Waffe). Sie erklärt einen Seitwärtsstoß und bewegt sich beim Angriff in den Nahbereich. Ihre Position sinkt von Kontrolliert zu Verzweifelt, aber sie profitiert nun vom Nahbereich-Bonus ihres Messers (+2W). Sie würfelt mit dem Verzweifelt-Neuwurf (Erfolge werden einmal neu gewürfelt), erhält aber +2 Würfel durch ihre Waffe.</li>
+<li><strong>Beispiel (Speerkämpfer):</strong> Mateo ist im Nahbereich mit einem Speer (mittlere Waffe, +1W im Nahbereich, +2W im Mittelbereich). Er weicht als Teil seines Angriffs in den Mittelbereich zurück, was seine Position von Kontrolliert zu Verzweifelt verschlechtert, aber er erhält +2W statt +1W.</li>
+</ul>
+<h4>Gelegenheitsangriffe</h4>
+<p>Den <strong>Nahbereich</strong> eines Feindes zu verlassen, ohne <em>Rückzug</em> zu nutzen, provoziert einen freien Nahkampfangriff (Position Kontrolliert, keine Handlungskosten). Zusätzlich provozieren folgende Handlungen einen Gelegenheitsangriff, wenn sie ausgeführt werden, während ihr <strong>im Nahbereich verwickelt</strong> seid mit einem Feind:</p>
+<ul>
+<li>Einen Fernkampfangriff ausführen (Bogen, Armbrust, Wurfwaffe).</li>
+<li>Einen Zauber wirken, der nicht das Attribut <code>[BERÜHRUNG]</code> oder <code>[SCHUTZ]</code> hat.</li>
+</ul>
+<p>Ein <strong>Ansturm</strong> oder <strong>Gefecht</strong>, der euch aus dem Nahbereich eines Feindes bringt, provoziert wie üblich einen Gelegenheitsangriff (es sei denn, ihr habt vorher Rückzug genutzt). Die Nutzung von <strong>Seitwärtsstoß</strong>, um den Nahbereich zu verlassen, provoziert ebenfalls einen Gelegenheitsangriff, es sei denn, ihr habt auch Rückzug genutzt.</p>
+<h4>Position und Würfelmodifikatoren</h4>
+<ul>
+<li><strong>Die Leiter:</strong> Verzweifelt → Kontrolliert → Dominant. Drei Sprossen, und das sind alle.</li>
+<li><strong>Die Leiter endet.</strong> Position steigt nie über Dominant und fällt nie unter Verzweifelt. An beiden Enden bewirken weitere Modifikatoren schlicht nichts — sie werden nicht in Würfel umgewandelt.</li>
+<li><strong>Warum:</strong> Euer Pool ist immer nur das, wofür ihr bezahlt habt. Ein Charakter mit Attribut 1 und Fertigkeit 0 würfelt an seinem schlechtesten Tag einen Würfel, nicht keinen, und kein Stapel von Abzügen kann das wegnehmen. Die Frage, die das Spiel stellt, ist immer <em>wie schlimm kann das werden</em>, niemals <em>darf ich es überhaupt versuchen</em>.</li>
+<li><strong>Was ihr stattdessen tun solltet:</strong> Eine vierte Vorteilsquelle bei einem bereits Dominanten Wurf ist nicht verschwendet — sie ist das Stichwort für die SL, den DV zu senken, den Effekt zu erweitern oder einfach ja zu sagen.</li>
+</ul>
+<p><strong>Vorbehalte und Talente:</strong></p>
+<ul>
+<li><strong>Ansturm</strong> und <strong>Gefecht</strong> erfordern offenes Gelände (kein schwieriges Terrain), sofern nicht ein Talent etwas anderes sagt (siehe Kapitel Talente).</li>
+<li>Talente wie <em>Müheloser Ansturm</em> (4 EP) oder <em>Müheloses Gefecht</em> (4 EP) erlauben es, die Erschöpfungskosten einmal pro Szene zu ignorieren.</li>
+<li>Das Talent <em>Unermüdlich</em> (6 EP) erlaubt Ansturm oder Gefecht über schwieriges Terrain (Erschöpfungskosten gelten weiterhin).</li>
+</ul>
+<div class="panel">
+<span class="panel-title">Kampf in Kürze</span>
+<ul>
+<li><strong>Zug:</strong> 1 Handlung + 1 Bewegung.</li>
+<li><strong>Bewegung:</strong> Nah ↔ Mittel ↔ Weit ↔ Fern.</li>
+<li><strong>Angriff:</strong> Würfelt Attribut + Fertigkeit gegen DV (Verteidigung des Gegners). Fernkampfangriff im Nahbereich → Verzweifelt.</li>
+<li><strong>Reaktion:</strong> 1 pro Zug (erneuert für 1 Gunst). Gebt sie aus, um eine Verteidigungsprobe zu würfeln, DV = eingehender Schaden; haltet sie zurück, und der Treffer landet passiv.</li>
+<li><strong>Stoßen:</strong> Gegenwurf Körper + Athletik vs. Körper + Athletik. Schiebt das Ziel ein Band.</li>
+<li><strong>Greifen:</strong> Gegenwurf Körper + Nahkampf vs. Körper + Athletik. Beide Verwickelt; Ziel erleidet -1 Würfel.</li>
+<li><strong>Seitwärtsstoß:</strong> Bewegt euch ein Band als Teil eines Nahkampfangriffs; verschlechtert die Position um eine Stufe.</li>
+<li><strong>Schaden:</strong> Wenn ihr trefft, markiert das Ziel Schaden (siehe das obige Verfahren). Gegner nutzen dieselben Schadensstufen wie Spieler.</li>
+<li><strong>Erschöpfung:</strong> Jeder Punkt verschlechtert eure Position (oder -1 Würfel, wenn bereits Verzweifelt). Schaden zu nehmen löscht Erschöpfung — die „Achterbahn".</li>
+<li><strong>Zähler:</strong> SLs nutzen oft Zähler für Verstärkung, Umgebungszusammenbruch oder Feindmoral.</li>
+</ul>
+<p class="text-sm text-muted mt-1"><em>Die vollständigen Kampfregeln stehen im SL-Handbuch.</em></p>
+</div>
+<h2 id="weapons-armor">Waffen &amp; Rüstung</h2>
+<div class="panel panel-green">
+<span class="panel-title">Silkstrand-Stahl</span>
+<em>„Eine leichte Klinge ist das Versprechen eines Höflings — schnell, elegant, leicht zu verbergen. Eine schwere Klinge ist das Ultimatum eines Condotta-Hauptmanns — langsam, brutal und endgültig."</em>
+<p class="mt-1">Wählt euer Gewicht so, wie ihr eure Worte wählt. Beide können schneiden.</p>
+</div>
+<h3>Waffen nach Gewichtsklasse</h3>
+<ul>
+<li><strong>Leicht (4 EP)</strong> — schnell, verbergbar.</li>
+<li><strong>Mittel (8 EP)</strong> — ausgewogen, Schlachtfeldstandard.</li>
+<li><strong>Schwer (12 EP)</strong> — strafend, langsam.</li>
+</ul>
+<h3>Nahkampf-Modifikatoren</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Gewicht</th><th>Nah</th><th>Mittel</th><th>Weit</th><th>Anmerkungen</th></tr></thead>
+<tbody>
+<tr><td>Leicht</td><td>+2W</td><td>+1W</td><td>—</td><td>Schnell auf engem Raum</td></tr>
+<tr><td>Mittel</td><td>+1W</td><td>+2W</td><td>—</td><td>Einmal/Szene ansetzen oder -1W erster Angriff</td></tr>
+<tr><td>Schwer</td><td>-1W</td><td>+3W</td><td>+0W</td><td>Einmal/Szene ansetzen oder -2W erster Angriff</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Weit</strong> ist das Band, das ein Schaft überbrückt und ein Schwert nicht — Speer, Stangenwaffe, Zweihänder. Schwere Waffen bedrohen es von Natur aus, ohne Bonus: Dort können sie hinreichen, nicht dort, wo sie am härtesten treffen. Eine leichte oder mittlere Waffe bedroht es nur mit dem Merkmal <code>Geschäftet</code>, ebenfalls bei +0W. Ein Strich bedeutet, dass die Waffe dieses Band überhaupt nicht bedroht.</p>
+<p class="text-sm text-muted">Gewicht und Entfernung teilen sich nie ein Wort: Keine Waffe ist Nah oder Weit, und kein Band ist Leicht, Mittel oder Schwer. „Eine mittlere Waffe im Mittelbereich" liest sich auf genau eine Weise.</p>
+<h3>Fernkampf &amp; Tempo</h3>
+<p>Fernkampfwaffen haben ein <strong>Tempo</strong>, das bestimmt, wie sie mit Bewegung, Zielen und Nachladen interagieren.</p>
+<p><strong>Tempo-Arten</strong></p>
+<dl>
+<dt>Schnell</dt>
+<dd>Ihr könnt <strong>im selben Zug bewegen und schießen</strong>. <em>Beispiele:</em> Wurfmesser, leichte Armbrust (falls vorgeladen), Schleuder.</dd>
+<dt>Standard</dt>
+<dd>Ihr könnt entweder <strong>bewegen</strong> oder <strong>schießen</strong> in eurem Zug, nicht beides. Als Sonderhandlung könnt ihr <strong>Zielen</strong> (erhaltet +1W oder +1 Effekt bei eurem nächsten Schuss), aber Zielen ersetzt euren Angriff in diesem Zug. <em>Beispiele:</em> Langbogen, schwere Armbrust (falls vorgeladen), Muskete.</dd>
+<dt>Langsam</dt>
+<dd>Die Waffe erfordert eine <strong>volle Runde zum Laden</strong> (oder Ansetzen/Abstützen). <em>Runde 1:</em> Nutzt eure Handlung zum Laden (kein Angriff). Ihr könnt euch weiterhin bewegen, aber während des Ladens bewegen ist Position Verzweifelt, sofern ihr kein Talent habt. <em>Runde 2:</em> Schießen (und könnt euch danach bewegen). Dann müsst ihr für einen weiteren Schuss erneut nachladen. <em>Beispiele:</em> Ballista, Handkanone, schwere Arkebuse.
+  <p class="text-sm text-muted mt-1">Eure Handlung und eure Bewegung können in beliebiger Reihenfolge genutzt werden, also ladet <em>nach</em> dem Bewegen in Runde 1 und schießt <em>vor</em> dem Bewegen in Runde 2: Das Laden und der Schuss folgen unmittelbar aufeinander, und ihr bewegt euch trotzdem in beiden Runden. Die Kosten einer langsamen Waffe sind keine verlorene Zeit, sondern dass alle anderen zwischen den beiden Handlungen agieren — ihr habt dem Tisch gesagt, wo ihr sein werdet und was ihr gleich tut.</p></dd>
+</dl>
+<p><strong>Fernkampf-Modifikatoren nach Gewicht.</strong> Beachtet, dass Nah eine <em>Position</em> ist, kein Würfelmodifikator — ein Bogen ist nicht schwerer auf Armlänge zu zielen, er ist schwerer zu überleben, wenn man ihn dort nutzt. <strong>Fernkampfwaffen behandeln Weit als Mittel</strong>; ein Bogenschütze kümmert sich nicht darum, ob der Speer auf Schwertdistanz oder Schaftdistanz ist.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Gewicht</th><th>Tempo</th><th>Nah</th><th>Mittel</th><th>Fern</th></tr></thead>
+<tbody>
+<tr><td>Leicht (4 EP)</td><td>Schnell</td><td>Kontrolliert</td><td>+1W</td><td>—</td></tr>
+<tr><td>Mittel (8 EP)</td><td>Standard</td><td>Verzweifelt</td><td>+2W</td><td>+1W</td></tr>
+<tr><td>Schwer (12 EP)</td><td>Langsam</td><td>Verzweifelt</td><td>+1W</td><td>+3W</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Tempo-Kurzreferenz</strong></p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Tempo</th><th>Bewegen + Schießen?</th><th>Zielen-Option?</th><th>Nachladen erforderlich</th></tr></thead>
+<tbody>
+<tr><td>Schnell</td><td>Ja (gleicher Zug)</td><td>Nein</td><td>Keins (oder kostenlos)</td></tr>
+<tr><td>Standard</td><td>Nein (bewegen oder schießen)</td><td>Ja (+1W/+1 Effekt)</td><td>Keins (Zielen kostet eine Handlung)</td></tr>
+<tr><td>Langsam</td><td>Nein (eine Runde laden, nächste schießen)</td><td>Nein</td><td>Volle Runde</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Waffenmerkmale (optional, je +4 EP, max. 2)</h3>
+<p><code>Geschäftet</code>, <code>Nahkampfgriff</code>, Präzise, Brutal, Haken, Verbergbar, Schnellzug, Zweihändig, Nebenhand.</p>
+<ul>
+<li><strong>Geschäftet</strong> — ein Speer, Quarterstab oder leichte Stangenwaffe. Eine leichte oder mittlere Waffe mit diesem Merkmal bedroht das <strong>Weit</strong>-Band bei +0W, was ihre Gewichtsklasse sonst nicht kann.</li>
+<li><strong>Nahkampfgriff</strong> — gebaut für das Gedränge: ein Schilddorn, eine Hauptwaffe, eine gekürzte Klinge. +1W im <strong>Nahbereich</strong>.</li>
+</ul>
+<h3>Schilde (optional)</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Schild</th><th>EP</th><th>Vorteil</th><th>Kompromiss</th></tr></thead>
+<tbody>
+<tr><td>Buckler</td><td>4</td><td>+1W Verteidigung gg. Nahkampf oder einmalig +1 DV</td><td>Nebenhand belegt</td></tr>
+<tr><td>Reiterschild</td><td>8</td><td>+1W Verteidigung; wandelt 1 Schaden→1 Erschöpfung um</td><td>-1W Fernkampf</td></tr>
+<tr><td>Pavese</td><td>12</td><td>Aufstellen: schwerer Deckungskegel</td><td>Langsam zu bewegen; sperrig</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3>Rüstung</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Rüstung</th><th>EP</th><th>Umwandlung (Schaden → Erschöpfung)</th><th>Abzug</th></tr></thead>
+<tbody>
+<tr><td>Leicht</td><td>4</td><td>1→1 (mindestens 1 Erschöpfung pro Treffer)</td><td>—</td></tr>
+<tr><td>Mittel</td><td>8</td><td>2→1 (mindestens 1 Erschöpfung pro Treffer)</td><td>-1W körperliche Fertigkeiten</td></tr>
+<tr><td>Schwer</td><td>12</td><td>3→2 (mindestens 1 Erschöpfung pro Treffer)</td><td>-2W körperlich, kein Sprint in rauem Gelände</td></tr>
+</tbody>
+</table></div>
+</div>
+<p class="text-sm text-muted"><em>Anmerkungen:</em> Die Umwandlung wird pro Schadens-Instanz per SL-Konsultation angewendet (siehe das obige Verfahren). Diese Tabelle zeigt, was die SL zurückmeldet, wenn ihr Schadenswert und Rüstungstyp mitteilt.</p>
+<h3>Zustand &amp; Pflege</h3>
+<dl>
+<dt>Vernachlässigt</dt>
+<dd>Waffen: -1W; Rüstung: Umwandlung um eine Stufe verschlechtert (z. B. Leicht verhält sich wie keine Rüstung, Schwer wie Mittel).</dd>
+<dt>Beschädigt</dt>
+<dd>Waffen: -1W beim ersten Angriff jeder Runde; Rüstung: keine Umwandlung.</dd>
+</dl>
+<p class="text-sm text-muted"><em>Behebung:</em> Eine kurze Rast mit Werkzeug entfernt Vernachlässigt (kein Wurf erforderlich). Eine Szene Arbeit oder ein Schmied entfernt Beschädigt; ein erfolgreicher Handwerkswurf (DV 3) kann die Zeit auf eine kurze Rast verkürzen.</p>
+<h2 id="ranged-options">Fernkampf-Optionen</h2>
+<ul>
+<li><strong>Zielen:</strong> +1 Würfel oder +1 Effekt beim nächsten Schuss (verloren, wenn ihr euch bewegt oder unterbrochen werdet).</li>
+<li><strong>Salve:</strong> Gebt zusätzliche Munition aus für +1 Würfel (max. +2).</li>
+<li><strong>Unterdrücken:</strong> Zone unter Beschuss; Feinde dort handeln mit -1 Würfel oder Begrenztem Effekt, bis sie die Deckung wechseln.</li>
+<li><strong>Lauerstellung:</strong> Bereitet einen Kontrollierten Schuss auf einen klaren Auslöser vor, der eure Linie kreuzt.</li>
+</ul>
+<h2 id="followers-assets">Gefolgsleute und Vorteile</h2>
+<h3>Gefolgsleute</h3>
+<p>Gefolgsleute sind benannte NSCs mit einer persönlichen Beziehung zu eurem Charakter. Sie:</p>
+<ul>
+<li>Unterstützen während Szenen über Bindungen und Unterstützung (siehe Kapitel 2, Schritt 8).</li>
+<li>Handeln abseits der Bühne, um Informationen zu sammeln oder Aufgaben zu erledigen.</li>
+<li>Haben Motive und Verwundbarkeiten — die SL kann sie in Gefahr bringen.</li>
+</ul>
+<p>Gefolgsleute sind keine Wegwerf-Werkzeuge. Sie können wachsen, sich verändern oder verloren gehen.</p>
+<h4>Gefolgsmann-Zustände</h4>
+<p>Statt numerischer Zähler, verfolgt die <strong>Loyalität</strong> und <strong>Zustand</strong> eines Gefolgsmanns als jeweils einen von drei Zuständen.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Zustand</th><th>Bedeutung</th><th>Mechanischer Effekt</th></tr></thead>
+<tbody>
+<tr><td colspan="3" style="text-align:center;"><em>Loyalität</em></td></tr>
+<tr><td>Treu</td><td>Engagiert, vertrauenswürdig</td><td>Normale Unterstützung, eigenständige Handlungen verfügbar</td></tr>
+<tr><td>Angespannt</td><td>Zweifelnd, unter Druck</td><td>Unterstützung bei -1 Würfel; kann riskante Befehle verweigern</td></tr>
+<tr><td>Zerbrochen</td><td>Verraten oder desertiert</td><td>Gefolgsmann geht oder wird feindselig</td></tr>
+<tr><td colspan="3" style="text-align:center;"><em>Zustand</em></td></tr>
+<tr><td>Bereit</td><td>Unverletzt, ausgeruht</td><td>Volle Funktion</td></tr>
+<tr><td>Verletzt</td><td>Verwundet, erschöpft</td><td>Unterstützung bei -1 Würfel; keine eigenständigen Handlungen</td></tr>
+<tr><td>Am Boden</td><td>Handlungsunfähig</td><td>Erfordert Rettung oder medizinische Versorgung</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Ändert Zustände, wenn die Fiktion es verlangt (z. B. nach einer gescheiterten Mission, einem moralischen Kompromiss oder erlittenem Schaden). Keine Würfe erforderlich.</p>
+<h4>Hochfähige Gefolgsleute (Cap 4–5)</h4>
+<p>Gefolgsleute mit Fähigkeit 4 oder 5 sind vertrauenswürdige Leutnants, Verwalter oder Kommandeure. Ihnen kann die Verwaltung eurer Vorteile übertragen werden, was euch von direkter Aufsicht befreit.</p>
+<ul>
+<li>Einem <strong>Cap-4</strong>-Gefolgsmann können <strong>bis zu 2 Vorteile</strong> übertragen werden.</li>
+<li>Einem <strong>Cap-5</strong>-Gefolgsmann können <strong>bis zu 4 Vorteile</strong> übertragen werden.</li>
+</ul>
+<p>Wird ein Vorteil an einen Gefolgsmann übertragen, deckt dessen eigene Pflege (bezahlt in EP oder einer Ruhephasenhandlung) <strong>automatisch die Pflege dieser Vorteile ab</strong> — ihr zahlt keine separate Vorteilspflege. Der Gefolgsmann kümmert sich als Teil seiner Rolle um Logistik, Personal oder politische Instandhaltung.</p>
+<p>Wird die Loyalität des Gefolgsmanns <strong>Angespannt</strong> oder <strong>Zerbrochen</strong>, werden alle übertragenen Vorteile sofort ebenfalls <strong>Vernachlässigt</strong>, bis der Gefolgsmann wiederhergestellt ist. Wird ein Gefolgsmann <strong>Beschädigt</strong>, gehen diese Vorteile verloren.</p>
+<h3>Vorteile</h3>
+<p>Vorteile sind dauerhafte Ressourcen oder Positionen unter eurer Kontrolle — Unterschlüpfe, Netzwerke, politische Ämter, Relikte. Sie:</p>
+<ul>
+<li>Erzeugen Vorteile, die über eine einzelne Szene hinaus bestehen.</li>
+<li>Lösen Probleme, die Würfel allein nicht können.</li>
+<li>Kosten Gunsten zur Aktivierung (die SL bestimmt die Auswirkung).</li>
+</ul>
+<p>Vorteile können bedroht, geschwächt oder verloren werden. Übermäßige Nutzung zieht Aufmerksamkeit auf sich.</p>
+<h4>Vorteilsstatus</h4>
+<p>Vorteile haben einen einzigen, einheitlichen <strong>Status</strong>, der ihren allgemeinen Zustand und ihre Nutzbarkeit beschreibt.</p>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Status</th><th>Bedeutung</th><th>Effekt</th></tr></thead>
+<tbody>
+<tr><td>Blühend</td><td>Gut gepflegt, angesehen</td><td>+1 Würfel bei Würfen mit dem Vorteil, +1 Ertrag</td></tr>
+<tr><td>Stabil</td><td>Normaler Betrieb</td><td>Kein Modifikator</td></tr>
+<tr><td>Angespannt</td><td>Probleme häufen sich</td><td>-1 Würfel bei vorteilsbezogenen Würfen, kein Ertrag</td></tr>
+<tr><td>Zusammengebrochen</td><td>Funktionsunfähig</td><td>Erfordert eine Quest oder größere Ruhephase zur Wiederherstellung</td></tr>
+</tbody>
+</table></div>
+</div>
+<p>Der Status verschlechtert sich, wenn der Vorteil vernachlässigt, angegriffen wird oder ein öffentliches Scheitern erleidet. Er verbessert sich durch gezielte Ruhephasenhandlungen oder erfolgreiche Missionen, die dem Vorteil zugutekommen.</p>
+<h3>Gefolgsleute vs. Vorteile</h3>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th></th><th>Gefolgsleute</th><th>Vorteile</th></tr></thead>
+<tbody>
+<tr><td>Natur</td><td>Menschen</td><td>Ressourcen/Strukturen</td></tr>
+<tr><td>Primäre Rolle</td><td>Persönliche Unterstützung</td><td>Strategischer Hebel</td></tr>
+<tr><td>Aktivierung</td><td>Unterstützung (Gunst ausgeben) oder erzählerische Interaktion</td><td>Gunst-Ausgabe</td></tr>
+<tr><td>Risiko</td><td>Emotional, erzählerisch</td><td>Strukturell, politisch</td></tr>
+<tr><td>Wachstum</td><td>Können zu Spielfiguren werden</td><td>Können expandieren oder zusammenbrechen</td></tr>
+</tbody>
+</table></div>
+</div>
+<p><strong>Designprinzip:</strong> Gefolgsleute erzeugen <em>Tiefe</em>. Vorteile erzeugen <em>Reichweite</em>. Spiel auf hoher Stufe hängt davon ab, beides zu verwalten.</p>
+<h2 id="game-structure">Spielstruktur</h2>
+<h3>Zeitskalen</h3>
+<dl>
+<dt>Moment</dt>
+<dd>Ein Herzschlag, eine einzelne Handlung.</dd>
+<dt>Etwas Zeit</dt>
+<dd>Ein paar Minuten, eine kurze Tätigkeit.</dd>
+<dt>Bedeutsame Zeit</dt>
+<dd>Stunden, ausgedehnte Anstrengung.</dd>
+<dt>Tage</dt>
+<dd>Groß angelegte Unternehmungen.</dd>
+</dl>
+<h3>Spieleinheiten</h3>
+<dl>
+<dt>Szene</dt>
+<dd>Grundlegende Erzähleinheit, deckt einen bestimmten Konflikt ab.</dd>
+<dt>Sitzung</dt>
+<dd>Eine Spielsitzung (3–6 Stunden).</dd>
+<dt>Kampagne</dt>
+<dd>Der gesamte Handlungsbogen.</dd>
+</dl>
+<h2 id="action-resolution">Schritte der Handlungsauflösung</h2>
+<ol>
+<li>Beschreibt eure Absicht und Methode.</li>
+<li>Baut den Würfelpool auf: Attribut + Fertigkeit (+ Ausrüstung, Unterstützung).</li>
+<li>Würfelt W10; zählt Erfolge (6+) und Story-Beats (1en).</li>
+<li>Vergleicht Erfolge mit dem DV.</li>
+<li>Wendet das Ergebnis aus der Ergebnismatrix an (siehe oben).</li>
+<li>Die SL gibt SB aus, falls zutreffend (siehe Story-Beats, oben).</li>
+<li>Erhaltet Gunsten für Teilerfolg oder Fehlschlag (siehe Gunsten, oben).</li>
+</ol>
+<div class="panel panel-blue">
+<span class="panel-title">Kurzreferenz</span>
+<strong>Würfelpool:</strong> Attribut + Fertigkeit W10<br/>
+<strong>Erfolg:</strong> Würfel ≥ 6<br/>
+<strong>Story-Beat (SB):</strong> Würfel = 1 gibt SB an die SL<br/>
+<strong>DV:</strong> 2 (leicht) bis 5+ (extrem) — Standard 3<br/>
+<strong>Schaden:</strong> 3-stufiges System; siehe das obige Verfahren<br/>
+<strong>Gunsten:</strong> 2 bei Fehlschlag, 1 bei Teilerfolg<br/>
+<strong>Rüstungsumwandlung:</strong> Meldet Schadenswert + Rüstungstyp an die SL; erhaltet erhaltene Erschöpfung + verbleibenden Schaden<br/>
+<strong>Position:</strong> Dominant (Fehlschlag neu würfeln), Kontrolliert (normal), Verzweifelt (Erfolg neu würfeln)<br/>
+<strong>Erschöpfung:</strong> Verschlechtert die Position (oder -1 Würfel, wenn bereits Verzweifelt). Volle Leiste → Schaden+1, Erschöpfung löschen.<br/>
+<strong>Schaden:</strong> 1 (-1 Würfel), 2 (-2 Würfel), 3 (handlungsunfähig). Schaden zu nehmen löscht zuerst die Erschöpfung.
+</div>
+<h2 id="narrative-suggestions">Erzählerische Vorschläge</h2>
+<ul>
+<li><strong>Gemeinsame Szenengestaltung:</strong> Spieler können Szenenelemente vorschlagen (Wetter, NSC-Reaktionen) mit Zustimmung der SL.</li>
+<li><strong>Absichtsgetriebene Auflösung:</strong> Wenn Erfolg angemessen sicher ist, kann die SL die Spieler bitten, <em>wie</em> statt zu würfeln, zu beschreiben.</li>
+<li><strong>Rückblenden-Erklärungen:</strong> Gebt 1 Gunst aus, um eine Rückblende zu erklären, die vergangene Vorbereitung etabliert, und beschreibt die Szene.</li>
+<li><strong>Beschreibende Unterstützung:</strong> Spieler können durch lebhafte Beschreibungen unterstützen und der Hauptperson +1 Würfel gewähren.</li>
+<li><strong>Proaktives Erzählen:</strong> Spieler können kleine günstige Details vorschlagen (ein hilfreicher NSC, ein nützlicher Gegenstand zur Hand), vorbehaltlich der Zustimmung der SL.</li>
+</ul>
+<div class="panel">
+<span class="panel-title">Kernmechaniken-Kurzreferenz</span>
+<div class="table-wrap">
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead><tr><th>Was</th><th>Wie</th></tr></thead>
+<tbody>
+<tr><td>Würfelpool</td><td>Attribut + Fertigkeit W10</td></tr>
+<tr><td>Erfolg</td><td>Würfel ≥ 6</td></tr>
+<tr><td>Story-Beat (SB)</td><td>Würfel = 1</td></tr>
+<tr><td>Schwierigkeit (DV)</td><td>Standard 3 (2=leicht, 4=schwer, 5+=extrem)</td></tr>
+<tr><td>Ergebnisse</td><td>Klarer Erfolg (E≥DV, SB=0); Erfolg mit SB (E≥DV, SB&gt;0); Teilerfolg (0&lt;E&lt;DV → 1 Gunst erhalten); Fehlschlag (E=0 → 2 Gunsten erhalten)</td></tr>
+<tr><td>Gunsten</td><td>Max. 5; am Szenenende auf 2 kürzen. Ausgeben: neu würfeln, Position verbessern, Vorteil aktivieren, 2→1 EP umwandeln.</td></tr>
+<tr><td>Position</td><td>Dominant (Fehlschlag neu würfeln), Kontrolliert (normal), Verzweifelt (Erfolg neu würfeln)</td></tr>
+<tr><td>Erschöpfung</td><td>Verschlechtert die Position (oder -1 Würfel, wenn bereits Verzweifelt). Volle Leiste → Schaden+1, Erschöpfung löschen.</td></tr>
+<tr><td>Schaden</td><td>1 (-1 Würfel), 2 (-2 Würfel), 3 (handlungsunfähig). Schaden zu nehmen löscht zuerst die Erschöpfung.</td></tr>
+<tr><td>Rüstungsumwandlung</td><td>Meldet Schadenswert + Rüstungstyp an die SL; wendet zurückgemeldete erhaltene Erschöpfung/verbleibenden Schaden an</td></tr>
+<tr><td>Seitwärtsstoß</td><td>Bewegt euch ein Band als Teil eines Nahkampfangriffs; verschlechtert die Position um eine Stufe.</td></tr>
+<tr><td>Stoßen</td><td>Gegenwurf Körper + Athletik. Schiebt das Ziel ein Band.</td></tr>
+<tr><td>Greifen</td><td>Gegenwurf Körper + Nahkampf. Beide Verwickelt; Ziel erleidet -1 Würfel.</td></tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<footer class="doc-footer">
+    Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Verwendet mit Genehmigung, Alle Rechte vorbehalten.
+</footer>
+</body>
+</html>
