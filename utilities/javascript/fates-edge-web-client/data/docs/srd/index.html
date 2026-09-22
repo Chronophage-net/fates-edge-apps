@@ -31,7 +31,7 @@ how?</p></li>
 <li><p>Position: <strong>Dominant</strong> (advantage),
 <strong>Controlled</strong> (balanced), <strong>Desperate</strong> (high
 risk).</p></li>
-<li><p>DV: 2 (routine) to 5+ (extreme). Default DV = 3.</p></li>
+<li><p>DV: 2 (routine) to 5 (extreme); default DV = 3. DV 6–8 exists only at Tier IV+, for max-tag magic or epic-scale teamwork obstacles — see the GM Guide.</p></li>
 </ul></li>
 <li><p><strong>Roll dice.</strong> Pool = Attribute + Skill (d10s). Each
 6–9 = 1 success; each 10 = 2 successes.</p></li>
@@ -87,8 +87,7 @@ complications:</p>
 <ul>
 <li><p><strong>Position</strong> (risk): Dominant (safe), Controlled
 (normal), Desperate (high stakes).</p></li>
-<li><p><strong>Effect</strong> (reward): Limited, Standard,
-Great.</p></li>
+<li><p><strong>Effect</strong> (narrative tag): Limited, Standard, Great — signals the size of the fictional payoff to the GM; carries no mechanical ramifications on its own.</p></li>
 <li><p>Spending 1 Boon before a roll improves Position by one
 step.</p></li>
 <li><p>The GM may spend SB to worsen Position.</p></li>
@@ -108,17 +107,8 @@ resets exhaustion).</p></li>
 </ul>
 </section>
 <section class="level2 unnumbered" id="armor-conversion-table">
-<h3 class="unnumbered">Armor Conversion Table</h3>
-<div class="table-wrap"><div class="table-scroll"><table>
-<thead>
-<tr><th style="text-align: left;"><strong>Armor Type</strong></th><th style="text-align: center;"><strong>Harm 1</strong></th><th style="text-align: center;"><strong>Harm 2</strong></th><th style="text-align: center;"><strong>Harm 3</strong></th></tr>
-</thead>
-<tbody>
-<tr><td style="text-align: left;">Light</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Harm 1 + Fatigue 1</td><td style="text-align: center;">Harm 2 + Fatigue 1</td></tr>
-<tr><td style="text-align: left;">Medium</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Harm 2 + Fatigue 1</td></tr>
-<tr><td style="text-align: left;">Heavy</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 2</td></tr>
-</tbody>
-</table></div></div>
+<h3 class="unnumbered">Armor Conversion Formula</h3>
+<p>Armor is an integer Step, 0–5 (None/Light/Medium/Heavy/Superior/Mythic; see <em>Equipment: Armor</em>). Compare Harm (H) to Step (S): if H ≤ S, mark max(1, H−1) Fatigue and take no Harm; if H &gt; S, mark max(1, S−1) Fatigue and take H − S Harm.</p>
 </section>
 <section class="level2 unnumbered" id="quick-reference-defaults">
 <h3 class="unnumbered">Quick Reference: Defaults</h3>
@@ -226,7 +216,7 @@ hide.”</p></li>
 <p><strong>Earning Boons:</strong></p>
 <ul>
 <li>Partial (0 &lt; successes &lt; DV): Gain 1 Boon.</li>
-<li>Miss (successes = 0): Gain 2 Boons (provided the roll was meaningful and generated at least one SB).</li>
+<li>Miss (successes = 0): Gain 2 Boons if the roll was meaningful — no SB needs to have been generated; obvious Boon fishing is not meaningful.</li>
 <li>Bond-driven action: Once per bond per session, when you act meaningfully on a Mutual Bond and provide an Intricate Description, gain 1 Boon.</li>
 <li>GM award: For creative solutions, sacrifices, or outstanding roleplay.</li>
 </ul>
@@ -287,7 +277,7 @@ hide.”</p></li>
 <li><strong>GM sets Position and Difficulty (DV).</strong>
 <ul>
 <li>Position: Dominant (advantage), Controlled (normal), Desperate (high risk).</li>
-<li>DV: 2 (routine) to 5+ (extreme). Default DV = 3.</li>
+<li>DV: 2 (routine) to 5 (extreme); default DV = 3. DV 6–8 exists only at Tier IV+, for max-tag magic or epic-scale teamwork obstacles — see the GM Guide.</li>
 </ul>
 </li>
 <li><strong>Roll dice.</strong> Pool = Attribute + Skill (d10s). Count successes:
@@ -324,7 +314,7 @@ hide.”</p></li>
 <tr><td>5</td><td>Extreme – multiple constraints, dramatic gambles.</td></tr>
 </tbody>
 </table></div>
-<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+<p><strong>The standard ladder ends at 5.</strong> A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 for an ordinary task only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce. There is one narrow exception: DV 6–8, unlocked at Tier IV, reserved for a max-tag magical working, a test at the ceiling of Rite difficulty, or an obstacle that genuinely demands epic-scale teamwork. See the GM Guide's Epic Tier chapter — this is not a general escalation tool, and a GM reaching for DV 6+ on an ordinary task is inflating, not escalating.</p>
 </div>
 </section>
 <section class="level2" id="core-mechanic-position-and-effect">
@@ -339,18 +329,19 @@ hide.”</p></li>
 </ul>
 </div>
 <div class="panel">
-<p><strong>Effect (Reward)</strong></p>
+<p><strong>Effect (Narrative Tag)</strong></p>
 <ul>
-<li><strong>Limited:</strong> Minimal outcome.</li>
-<li><strong>Standard:</strong> Expected outcome.</li>
-<li><strong>Great:</strong> Strong outcome with additional benefit.</li>
+<li><strong>Limited:</strong> A minimal outcome, narratively.</li>
+<li><strong>Standard:</strong> The expected outcome, narratively.</li>
+<li><strong>Great:</strong> A strong outcome, narratively.</li>
 </ul>
+<p class="text-sm">Effect signals the size of the fictional payoff on a success — it carries <strong>no independent mechanical ramifications</strong> of its own (no bonus dice, no Harm change, no numeric bonus). Any actual bonus must come from a stated Talent, tag, or explicit rule — never from Effect alone.</p>
 </div>
 </div>
 <p><strong>Modifiers:</strong></p>
 <ul>
 <li>Player may spend 1 Boon before rolling to improve Position by one step.</li>
-<li>GM may spend SB to worsen Position or reduce Effect.</li>
+<li>GM may spend SB to worsen Position or narrow the scene’s stated Effect (still narrative only, not a numeric penalty).</li>
 <li><strong>The ladder ends.</strong> Position never rises above Dominant or falls below Desperate. At either end further modifiers do nothing; they do not convert into dice.</li>
 <li>This matters because your pool is only ever what you paid for. A character with Attribute 1 and Skill 0 rolls one die at their worst, never none — so the question is always <em>how badly can this go</em>, and never <em>may I attempt it at all</em>. It is also what lets heritage, cultural affinity, assists and gear all push on Position without any of them touching the dice.</li>
 <li>A fourth source of advantage on an already-Dominant roll is not wasted. It is the GM's cue to lower the DV, widen the Effect, or just say yes.</li>
@@ -397,7 +388,7 @@ number instead of describing the swing.</p>
 <h4>Earning Boons</h4>
 <ul>
 <li>Partial: gain 1 Boon.</li>
-<li>Miss: gain 2 Boons (if the roll was meaningful and generated at least one SB).</li>
+<li>Miss: gain 2 Boons if the roll was meaningful (no SB requirement; obvious Boon fishing is not meaningful).</li>
 <li>Bond-driven action (once per bond per session): gain 1 Boon.</li>
 <li>GM award (creative solutions, sacrifices, outstanding roleplay).</li>
 </ul>

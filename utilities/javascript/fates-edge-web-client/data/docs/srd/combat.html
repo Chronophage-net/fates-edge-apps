@@ -71,39 +71,40 @@
 </section>
 <section class="level2" id="equipment-armor">
 <h3 id="equipment-heading-4">Armor</h3>
-<p>Armor does not reduce Harm directly. Instead, it converts incoming Harm into Fatigue. See the Armor Conversion Table below.</p>
-<div class="table-wrap">
-<div class="table-scroll"><table>
-<thead>
-<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
-</thead>
-<tbody>
-<tr><td><span class="badge badge-green">Light</span></td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td><span class="badge badge-gold">Medium</span></td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td><span class="badge badge-red">Heavy</span></td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
-</tbody>
-</table></div>
-</div>
-<section class="level3" id="armor-notes">
-<h4 id="equipment-heading-5">Notes</h4>
+<p>Armor does not reduce Harm directly. Instead, it converts incoming Harm into Fatigue. Armor is an integer <strong>Step, 0–5</strong>:</p>
 <ul>
-<li>Minimum 1 Fatigue per hit, even if conversion would give 0.</li>
-<li>Light armor: –1d to physical actions (optional).</li>
-<li>Medium armor: –1d to physical actions, –1d to Stealth, and subterfuge.</li>
-<li>Heavy armor: –2d to physical actions, –2d to Stealth, and subterfuge; cannot sprint.</li>
+<li><strong>0 — None:</strong> bare skin, robes, no meaningful protection.</li>
+<li><strong>1 — Light:</strong> leather, padded cloth.</li>
+<li><strong>2 — Medium:</strong> chain, brigandine.</li>
+<li><strong>3 — Heavy:</strong> plate, thick natural hide.</li>
+<li><strong>4 — Superior:</strong> exceptional make; Tier III availability.</li>
+<li><strong>5 — Mythic:</strong> a named, storied piece; Guide+ or expansion content only.</li>
+</ul>
+<p>Steps 1–3 are ordinary equipment a PC can buy or find; Steps 4–5 are not handed out as a default kit.</p>
+<section class="level3" id="armor-conversion-formula">
+<h4 id="equipment-heading-5">Armor Conversion Formula</h4>
+<p>Compare incoming Harm (H) to the armor’s Step (S). If H ≤ S, the hit is absorbed: no Harm gets through, and you mark max(1, H−1) Fatigue. If H &gt; S, the hit gets through: you mark max(1, S−1) Fatigue <em>and</em> take H − S Harm. Minimum 1 Fatigue per hit either way.</p>
+</section>
+<section class="level3" id="armor-notes">
+<h4 id="equipment-heading-6">Notes</h4>
+<ul>
+<li>Light (Step 1) armor: –1d to physical actions (optional).</li>
+<li>Medium (Step 2) armor: –1d to physical actions, –1d to Stealth, and subterfuge.</li>
+<li>Heavy (Step 3) armor and above: –2d to physical actions, –2d to Stealth, and subterfuge; cannot sprint.</li>
 </ul>
 </section>
 <section class="level3" id="armor-conversion-examples">
-<h4 id="equipment-heading-6">Armor Conversion Examples</h4>
+<h4 id="equipment-heading-7">Armor Conversion Examples</h4>
 <ul>
-<li>Light armor vs Harm 1: take 1 Fatigue. No Harm.</li>
-<li>Medium armor vs Harm 2: take 1 Fatigue. No Harm.</li>
-<li>Heavy armor vs Harm 3: take 2 Fatigue. No Harm.</li>
+<li>Step 1 (Light) vs Harm 1 (H ≤ S): take 1 Fatigue. No Harm.</li>
+<li>Step 2 (Medium) vs Harm 2 (H ≤ S): take 1 Fatigue. No Harm.</li>
+<li>Step 3 (Heavy) vs Harm 3 (H ≤ S): take 2 Fatigue. No Harm.</li>
+<li>Step 1 (Light) vs Harm 3 (H &gt; S): take 1 Fatigue and 2 Harm.</li>
 </ul>
 </section>
 </section>
 <section class="level2" id="shields-optional">
-<h3 id="equipment-heading-7">Shields (Optional)</h3>
+<h3 id="equipment-heading-8">Shields (Optional)</h3>
 <p>Shields are worn in the off-hand. Using a shield restricts weapon size to Light or Medium.</p>
 <div class="table-wrap">
 <div class="table-scroll"><table>
@@ -119,7 +120,7 @@
 </div>
 </section>
 <section class="level2" id="mundane-gear">
-<h3 id="equipment-heading-8">Mundane Gear</h3>
+<h3 id="equipment-heading-9">Mundane Gear</h3>
 <p>Most gear is abstracted. When you need a specific item (rope, lockpicks, torch), assume you have it unless the fiction says otherwise or the GM spends SB to declare a shortage.</p>
 <p>The following items are tracked as part of Supply (see Section 6.6 below):</p>
 <ul>
@@ -138,7 +139,7 @@
 </ul>
 </section>
 <section class="level2" id="supply-timer">
-<h3 id="equipment-heading-9">Supply Timer</h3>
+<h3 id="equipment-heading-10">Supply Timer</h3>
 <div class="panel panel-gold">
 <p><strong>Supply Timer [4]</strong>: A shared party resource tracking access to food, water, ammunition, and basic gear. When the timer fills, the party runs out of a critical resource (GM chooses: food, water, ammunition, or a specific tool). Resupply at settlements, through successful foraging, or by spending a Cache token (see Asset rules).</p>
 <p>Each Supply segment represents approximately one day's worth of resources for the party.</p>
@@ -159,14 +160,14 @@
 <p>When the Supply Timer is at 2 segments (Dangerous), each character gains 1 Fatigue per day until resupplied. At 3 segments (Empty), characters begin taking Harm 1 per day (starvation, dehydration, exposure).</p>
 </section>
 <section class="level2" id="equipment-condition">
-<h3 id="equipment-heading-10">Equipment Condition</h3>
+<h3 id="equipment-heading-11">Equipment Condition</h3>
 <p>All gear can become Neglected or Compromised.</p>
 <ul>
 <li><strong>Neglected:</strong> Weapons suffer –1 die on attack rolls; armor conversion worsens by one step (e.g., Light behaves as Unarmored). Neglected gear is usable but unreliable.</li>
 <li><strong>Compromised:</strong> Weapons suffer –1 die on the first attack each round; armor provides no conversion (all Harm applies directly). Compromised gear is barely functional.</li>
 </ul>
 <section class="level3" id="repair">
-<h4 id="equipment-heading-11">Repair</h4>
+<h4 id="equipment-heading-12">Repair</h4>
 <ul>
 <li>Neglected → Functional: Requires a short rest (1 hour) and access to basic tools.</li>
 <li>Compromised → Neglected: Requires a scene of dedicated work (Craft test, DV 3) or a visit to a smith.</li>
@@ -176,10 +177,10 @@
 </section>
 </section>
 <section class="level2" id="magical-items-enchantments">
-<h3 id="equipment-heading-12">Magical Items (Enchantments)</h3>
+<h3 id="equipment-heading-13">Magical Items (Enchantments)</h3>
 <p>Enchantments are permanent magical modifications treated as Minor or Standard Assets (§14.2). Each enchantment costs XP and counts toward the item's enchantment limit.</p>
 <section class="level3" id="enchantment-limits">
-<h4 id="equipment-heading-13">Enchantment Limits</h4>
+<h4 id="equipment-heading-14">Enchantment Limits</h4>
 <ul>
 <li>Light item: maximum 1 enchantment.</li>
 <li>Medium item: maximum 2 enchantments.</li>
@@ -187,7 +188,7 @@
 </ul>
 </section>
 <section class="level3" id="sample-enchantments">
-<h4 id="equipment-heading-14">Sample Enchantments</h4>
+<h4 id="equipment-heading-15">Sample Enchantments</h4>
 <ul>
 <li><strong>Keen Edge (2 XP):</strong> +1 die when attacking armored targets.</li>
 <li><strong>Flaming Blade (4 XP):</strong> +1 Harm against creatures vulnerable to fire; +1 Effect against cold-based foes.</li>
@@ -198,12 +199,12 @@
 </ul>
 </section>
 <section class="level3" id="removing-an-enchantment">
-<h4 id="equipment-heading-15">Removing an Enchantment</h4>
+<h4 id="equipment-heading-16">Removing an Enchantment</h4>
 <p>An enchantment can be removed with a ritual (Wits + Arcana, DV 4) costing 1 XP per enchantment level. The item is not damaged.</p>
 </section>
 </section>
 <section class="level2" id="weapon-and-armor-acquisition">
-<h3 id="equipment-heading-16">Weapon and Armor Acquisition</h3>
+<h3 id="equipment-heading-17">Weapon and Armor Acquisition</h3>
 <ul>
 <li>Mundane weapons and armor are acquired through play (found, looted, purchased with Supply, or granted as part of character background). No XP cost.</li>
 <li>Masterwork or enchanted items require XP expenditure (as Assets) or narrative quests.</li>
@@ -258,11 +259,11 @@
 </section>
 <section class="level3" id="setup-teamwork">
 <h4 id="action-economy-heading-10">Setup (Teamwork)</h4>
-<p>Create advantage for an ally. On success, grant their next action +1 Position or step up Effect (GM's call).</p>
+<p>Create advantage for an ally. A Setup uses an action and only calls for a roll when its outcome is uncertain and risky; a successful uncertain or risky Setup grants their next action +1 Position (one step). This does not draw from the Assist dice-pool cap — it is a Position bump, not a die. Repeated Setups do not stack.</p>
 </section>
 <section class="level3" id="assist-teamwork">
 <h4 id="action-economy-heading-11">Assist (Teamwork)</h4>
-<p>Spend 1 Boon to give an ally +1 die on their current roll. You share appropriate risk or consequence.</p>
+<p>Spend 1 Boon to give an ally +1 die on their current roll, subject to the +3 teamwork dice-pool cap (Setup does not count against this cap; it grants Position, not dice). You share appropriate risk or consequence.</p>
 </section>
 <section class="level3" id="protect-action-economy">
 <h4 id="action-economy-heading-12">Protect</h4>
@@ -573,21 +574,9 @@
 <p class="text-muted text-sm">Overflow can occur multiple times from a single hit (e.g., with Body 1 or 2).</p>
 </section>
 <section class="level2" id="health-fatigue-harm-armor-conversion-table">
-<h3>Armor Conversion Table</h3>
-<p>Armor does not reduce incoming Harm directly. Instead, it converts Harm to Fatigue according to the table below.</p>
-<div class="table-wrap">
-<div class="table-scroll"><table>
-<thead>
-<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
-</thead>
-<tbody>
-<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
-</tbody>
-</table></div>
-</div>
-<p class="text-sm"><em>Example:</em> Light armor vs Harm 2 becomes Harm 1 + Fatigue 1. Heavy armor vs Harm 3 becomes Fatigue 2.</p>
+<h3>Armor Conversion Formula</h3>
+<p>Armor does not reduce incoming Harm directly. Instead, it converts Harm to Fatigue. Armor is an integer Step, 0–5 (see <em>Equipment: Armor</em>, this book, for the full Step list — None/Light/Medium/Heavy/Superior/Mythic). Compare incoming Harm (H) to the armor’s Step (S): if H ≤ S, mark max(1, H−1) Fatigue and take no Harm; if H &gt; S, mark max(1, S−1) Fatigue and take H − S Harm.</p>
+<p class="text-sm"><em>Example:</em> Step 1 (Light) vs Harm 2 (H &gt; S) becomes Harm 1 + Fatigue 1. Step 3 (Heavy) vs Harm 3 (H ≤ S) becomes Fatigue 2, no Harm.</p>
 </section>
 <section class="level2" id="health-fatigue-harm-recovery">
 <h3>Recovery</h3>

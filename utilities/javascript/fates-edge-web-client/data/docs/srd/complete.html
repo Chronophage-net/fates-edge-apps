@@ -31,7 +31,7 @@ how?</p></li>
 <li><p>Position: <strong>Dominant</strong> (advantage),
 <strong>Controlled</strong> (balanced), <strong>Desperate</strong> (high
 risk).</p></li>
-<li><p>DV: 2 (routine) to 5+ (extreme). Default DV = 3.</p></li>
+<li><p>DV: 2 (routine) to 5 (extreme); default DV = 3. DV 6–8 exists only at Tier IV+, for max-tag magic or epic-scale teamwork obstacles — see the GM Guide.</p></li>
 </ul></li>
 <li><p><strong>Roll dice.</strong> Pool = Attribute + Skill (d10s). Each
 6–9 = 1 success; each 10 = 2 successes.</p></li>
@@ -87,8 +87,7 @@ complications:</p>
 <ul>
 <li><p><strong>Position</strong> (risk): Dominant (safe), Controlled
 (normal), Desperate (high stakes).</p></li>
-<li><p><strong>Effect</strong> (reward): Limited, Standard,
-Great.</p></li>
+<li><p><strong>Effect</strong> (narrative tag): Limited, Standard, Great — signals the size of the fictional payoff to the GM; carries no mechanical ramifications on its own.</p></li>
 <li><p>Spending 1 Boon before a roll improves Position by one
 step.</p></li>
 <li><p>The GM may spend SB to worsen Position.</p></li>
@@ -108,17 +107,8 @@ resets exhaustion).</p></li>
 </ul>
 </section>
 <section class="level2 unnumbered" id="armor-conversion-table">
-<h3 class="unnumbered">Armor Conversion Table</h3>
-<div class="table-wrap"><div class="table-scroll"><table>
-<thead>
-<tr><th style="text-align: left;"><strong>Armor Type</strong></th><th style="text-align: center;"><strong>Harm 1</strong></th><th style="text-align: center;"><strong>Harm 2</strong></th><th style="text-align: center;"><strong>Harm 3</strong></th></tr>
-</thead>
-<tbody>
-<tr><td style="text-align: left;">Light</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Harm 1 + Fatigue 1</td><td style="text-align: center;">Harm 2 + Fatigue 1</td></tr>
-<tr><td style="text-align: left;">Medium</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Harm 2 + Fatigue 1</td></tr>
-<tr><td style="text-align: left;">Heavy</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 1</td><td style="text-align: center;">Fatigue 2</td></tr>
-</tbody>
-</table></div></div>
+<h3 class="unnumbered">Armor Conversion Formula</h3>
+<p>Armor is an integer Step, 0–5 (None/Light/Medium/Heavy/Superior/Mythic; see <em>Equipment: Armor</em>). Compare Harm (H) to Step (S): if H ≤ S, mark max(1, H−1) Fatigue and take no Harm; if H &gt; S, mark max(1, S−1) Fatigue and take H − S Harm.</p>
 </section>
 <section class="level2 unnumbered" id="quick-reference-defaults">
 <h3 class="unnumbered">Quick Reference: Defaults</h3>
@@ -226,7 +216,7 @@ hide.”</p></li>
 <p><strong>Earning Boons:</strong></p>
 <ul>
 <li>Partial (0 &lt; successes &lt; DV): Gain 1 Boon.</li>
-<li>Miss (successes = 0): Gain 2 Boons (provided the roll was meaningful and generated at least one SB).</li>
+<li>Miss (successes = 0): Gain 2 Boons if the roll was meaningful — no SB needs to have been generated; obvious Boon fishing is not meaningful.</li>
 <li>Bond-driven action: Once per bond per session, when you act meaningfully on a Mutual Bond and provide an Intricate Description, gain 1 Boon.</li>
 <li>GM award: For creative solutions, sacrifices, or outstanding roleplay.</li>
 </ul>
@@ -287,7 +277,7 @@ hide.”</p></li>
 <li><strong>GM sets Position and Difficulty (DV).</strong>
 <ul>
 <li>Position: Dominant (advantage), Controlled (normal), Desperate (high risk).</li>
-<li>DV: 2 (routine) to 5+ (extreme). Default DV = 3.</li>
+<li>DV: 2 (routine) to 5 (extreme); default DV = 3. DV 6–8 exists only at Tier IV+, for max-tag magic or epic-scale teamwork obstacles — see the GM Guide.</li>
 </ul>
 </li>
 <li><strong>Roll dice.</strong> Pool = Attribute + Skill (d10s). Count successes:
@@ -324,7 +314,7 @@ hide.”</p></li>
 <tr><td>5</td><td>Extreme – multiple constraints, dramatic gambles.</td></tr>
 </tbody>
 </table></div>
-<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+<p><strong>The standard ladder ends at 5.</strong> A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 for an ordinary task only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce. There is one narrow exception: DV 6–8, unlocked at Tier IV, reserved for a max-tag magical working, a test at the ceiling of Rite difficulty, or an obstacle that genuinely demands epic-scale teamwork. See the GM Guide's Epic Tier chapter — this is not a general escalation tool, and a GM reaching for DV 6+ on an ordinary task is inflating, not escalating.</p>
 </div>
 </section>
 <section class="level2" id="core-mechanic-position-and-effect">
@@ -339,18 +329,19 @@ hide.”</p></li>
 </ul>
 </div>
 <div class="panel">
-<p><strong>Effect (Reward)</strong></p>
+<p><strong>Effect (Narrative Tag)</strong></p>
 <ul>
-<li><strong>Limited:</strong> Minimal outcome.</li>
-<li><strong>Standard:</strong> Expected outcome.</li>
-<li><strong>Great:</strong> Strong outcome with additional benefit.</li>
+<li><strong>Limited:</strong> A minimal outcome, narratively.</li>
+<li><strong>Standard:</strong> The expected outcome, narratively.</li>
+<li><strong>Great:</strong> A strong outcome, narratively.</li>
 </ul>
+<p class="text-sm">Effect signals the size of the fictional payoff on a success — it carries <strong>no independent mechanical ramifications</strong> of its own (no bonus dice, no Harm change, no numeric bonus). Any actual bonus must come from a stated Talent, tag, or explicit rule — never from Effect alone.</p>
 </div>
 </div>
 <p><strong>Modifiers:</strong></p>
 <ul>
 <li>Player may spend 1 Boon before rolling to improve Position by one step.</li>
-<li>GM may spend SB to worsen Position or reduce Effect.</li>
+<li>GM may spend SB to worsen Position or narrow the scene’s stated Effect (still narrative only, not a numeric penalty).</li>
 <li><strong>The ladder ends.</strong> Position never rises above Dominant or falls below Desperate. At either end further modifiers do nothing; they do not convert into dice.</li>
 <li>This matters because your pool is only ever what you paid for. A character with Attribute 1 and Skill 0 rolls one die at their worst, never none — so the question is always <em>how badly can this go</em>, and never <em>may I attempt it at all</em>. It is also what lets heritage, cultural affinity, assists and gear all push on Position without any of them touching the dice.</li>
 <li>A fourth source of advantage on an already-Dominant roll is not wasted. It is the GM's cue to lower the DV, widen the Effect, or just say yes.</li>
@@ -397,7 +388,7 @@ number instead of describing the swing.</p>
 <h4>Earning Boons</h4>
 <ul>
 <li>Partial: gain 1 Boon.</li>
-<li>Miss: gain 2 Boons (if the roll was meaningful and generated at least one SB).</li>
+<li>Miss: gain 2 Boons if the roll was meaningful (no SB requirement; obvious Boon fishing is not meaningful).</li>
 <li>Bond-driven action (once per bond per session): gain 1 Boon.</li>
 <li>GM award (creative solutions, sacrifices, outstanding roleplay).</li>
 </ul>
@@ -1086,39 +1077,40 @@ number instead of describing the swing.</p>
 </section>
 <section class="level2" id="equipment-armor">
 <h3 id="equipment-heading-4">Armor</h3>
-<p>Armor does not reduce Harm directly. Instead, it converts incoming Harm into Fatigue. See the Armor Conversion Table below.</p>
-<div class="table-wrap">
-<div class="table-scroll"><table>
-<thead>
-<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
-</thead>
-<tbody>
-<tr><td><span class="badge badge-green">Light</span></td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td><span class="badge badge-gold">Medium</span></td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td><span class="badge badge-red">Heavy</span></td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
-</tbody>
-</table></div>
-</div>
-<section class="level3" id="armor-notes">
-<h4 id="equipment-heading-5">Notes</h4>
+<p>Armor does not reduce Harm directly. Instead, it converts incoming Harm into Fatigue. Armor is an integer <strong>Step, 0–5</strong>:</p>
 <ul>
-<li>Minimum 1 Fatigue per hit, even if conversion would give 0.</li>
-<li>Light armor: –1d to physical actions (optional).</li>
-<li>Medium armor: –1d to physical actions, –1d to Stealth, and subterfuge.</li>
-<li>Heavy armor: –2d to physical actions, –2d to Stealth, and subterfuge; cannot sprint.</li>
+<li><strong>0 — None:</strong> bare skin, robes, no meaningful protection.</li>
+<li><strong>1 — Light:</strong> leather, padded cloth.</li>
+<li><strong>2 — Medium:</strong> chain, brigandine.</li>
+<li><strong>3 — Heavy:</strong> plate, thick natural hide.</li>
+<li><strong>4 — Superior:</strong> exceptional make; Tier III availability.</li>
+<li><strong>5 — Mythic:</strong> a named, storied piece; Guide+ or expansion content only.</li>
+</ul>
+<p>Steps 1–3 are ordinary equipment a PC can buy or find; Steps 4–5 are not handed out as a default kit.</p>
+<section class="level3" id="armor-conversion-formula">
+<h4 id="equipment-heading-5">Armor Conversion Formula</h4>
+<p>Compare incoming Harm (H) to the armor’s Step (S). If H ≤ S, the hit is absorbed: no Harm gets through, and you mark max(1, H−1) Fatigue. If H &gt; S, the hit gets through: you mark max(1, S−1) Fatigue <em>and</em> take H − S Harm. Minimum 1 Fatigue per hit either way.</p>
+</section>
+<section class="level3" id="armor-notes">
+<h4 id="equipment-heading-6">Notes</h4>
+<ul>
+<li>Light (Step 1) armor: –1d to physical actions (optional).</li>
+<li>Medium (Step 2) armor: –1d to physical actions, –1d to Stealth, and subterfuge.</li>
+<li>Heavy (Step 3) armor and above: –2d to physical actions, –2d to Stealth, and subterfuge; cannot sprint.</li>
 </ul>
 </section>
 <section class="level3" id="armor-conversion-examples">
-<h4 id="equipment-heading-6">Armor Conversion Examples</h4>
+<h4 id="equipment-heading-7">Armor Conversion Examples</h4>
 <ul>
-<li>Light armor vs Harm 1: take 1 Fatigue. No Harm.</li>
-<li>Medium armor vs Harm 2: take 1 Fatigue. No Harm.</li>
-<li>Heavy armor vs Harm 3: take 2 Fatigue. No Harm.</li>
+<li>Step 1 (Light) vs Harm 1 (H ≤ S): take 1 Fatigue. No Harm.</li>
+<li>Step 2 (Medium) vs Harm 2 (H ≤ S): take 1 Fatigue. No Harm.</li>
+<li>Step 3 (Heavy) vs Harm 3 (H ≤ S): take 2 Fatigue. No Harm.</li>
+<li>Step 1 (Light) vs Harm 3 (H &gt; S): take 1 Fatigue and 2 Harm.</li>
 </ul>
 </section>
 </section>
 <section class="level2" id="shields-optional">
-<h3 id="equipment-heading-7">Shields (Optional)</h3>
+<h3 id="equipment-heading-8">Shields (Optional)</h3>
 <p>Shields are worn in the off-hand. Using a shield restricts weapon size to Light or Medium.</p>
 <div class="table-wrap">
 <div class="table-scroll"><table>
@@ -1134,7 +1126,7 @@ number instead of describing the swing.</p>
 </div>
 </section>
 <section class="level2" id="mundane-gear">
-<h3 id="equipment-heading-8">Mundane Gear</h3>
+<h3 id="equipment-heading-9">Mundane Gear</h3>
 <p>Most gear is abstracted. When you need a specific item (rope, lockpicks, torch), assume you have it unless the fiction says otherwise or the GM spends SB to declare a shortage.</p>
 <p>The following items are tracked as part of Supply (see Section 6.6 below):</p>
 <ul>
@@ -1153,7 +1145,7 @@ number instead of describing the swing.</p>
 </ul>
 </section>
 <section class="level2" id="supply-timer">
-<h3 id="equipment-heading-9">Supply Timer</h3>
+<h3 id="equipment-heading-10">Supply Timer</h3>
 <div class="panel panel-gold">
 <p><strong>Supply Timer [4]</strong>: A shared party resource tracking access to food, water, ammunition, and basic gear. When the timer fills, the party runs out of a critical resource (GM chooses: food, water, ammunition, or a specific tool). Resupply at settlements, through successful foraging, or by spending a Cache token (see Asset rules).</p>
 <p>Each Supply segment represents approximately one day's worth of resources for the party.</p>
@@ -1174,14 +1166,14 @@ number instead of describing the swing.</p>
 <p>When the Supply Timer is at 2 segments (Dangerous), each character gains 1 Fatigue per day until resupplied. At 3 segments (Empty), characters begin taking Harm 1 per day (starvation, dehydration, exposure).</p>
 </section>
 <section class="level2" id="equipment-condition">
-<h3 id="equipment-heading-10">Equipment Condition</h3>
+<h3 id="equipment-heading-11">Equipment Condition</h3>
 <p>All gear can become Neglected or Compromised.</p>
 <ul>
 <li><strong>Neglected:</strong> Weapons suffer –1 die on attack rolls; armor conversion worsens by one step (e.g., Light behaves as Unarmored). Neglected gear is usable but unreliable.</li>
 <li><strong>Compromised:</strong> Weapons suffer –1 die on the first attack each round; armor provides no conversion (all Harm applies directly). Compromised gear is barely functional.</li>
 </ul>
 <section class="level3" id="repair">
-<h4 id="equipment-heading-11">Repair</h4>
+<h4 id="equipment-heading-12">Repair</h4>
 <ul>
 <li>Neglected → Functional: Requires a short rest (1 hour) and access to basic tools.</li>
 <li>Compromised → Neglected: Requires a scene of dedicated work (Craft test, DV 3) or a visit to a smith.</li>
@@ -1191,10 +1183,10 @@ number instead of describing the swing.</p>
 </section>
 </section>
 <section class="level2" id="magical-items-enchantments">
-<h3 id="equipment-heading-12">Magical Items (Enchantments)</h3>
+<h3 id="equipment-heading-13">Magical Items (Enchantments)</h3>
 <p>Enchantments are permanent magical modifications treated as Minor or Standard Assets (§14.2). Each enchantment costs XP and counts toward the item's enchantment limit.</p>
 <section class="level3" id="enchantment-limits">
-<h4 id="equipment-heading-13">Enchantment Limits</h4>
+<h4 id="equipment-heading-14">Enchantment Limits</h4>
 <ul>
 <li>Light item: maximum 1 enchantment.</li>
 <li>Medium item: maximum 2 enchantments.</li>
@@ -1202,7 +1194,7 @@ number instead of describing the swing.</p>
 </ul>
 </section>
 <section class="level3" id="sample-enchantments">
-<h4 id="equipment-heading-14">Sample Enchantments</h4>
+<h4 id="equipment-heading-15">Sample Enchantments</h4>
 <ul>
 <li><strong>Keen Edge (2 XP):</strong> +1 die when attacking armored targets.</li>
 <li><strong>Flaming Blade (4 XP):</strong> +1 Harm against creatures vulnerable to fire; +1 Effect against cold-based foes.</li>
@@ -1213,12 +1205,12 @@ number instead of describing the swing.</p>
 </ul>
 </section>
 <section class="level3" id="removing-an-enchantment">
-<h4 id="equipment-heading-15">Removing an Enchantment</h4>
+<h4 id="equipment-heading-16">Removing an Enchantment</h4>
 <p>An enchantment can be removed with a ritual (Wits + Arcana, DV 4) costing 1 XP per enchantment level. The item is not damaged.</p>
 </section>
 </section>
 <section class="level2" id="weapon-and-armor-acquisition">
-<h3 id="equipment-heading-16">Weapon and Armor Acquisition</h3>
+<h3 id="equipment-heading-17">Weapon and Armor Acquisition</h3>
 <ul>
 <li>Mundane weapons and armor are acquired through play (found, looted, purchased with Supply, or granted as part of character background). No XP cost.</li>
 <li>Masterwork or enchanted items require XP expenditure (as Assets) or narrative quests.</li>
@@ -1273,11 +1265,11 @@ number instead of describing the swing.</p>
 </section>
 <section class="level3" id="setup-teamwork">
 <h4 id="action-economy-heading-10">Setup (Teamwork)</h4>
-<p>Create advantage for an ally. On success, grant their next action +1 Position or step up Effect (GM's call).</p>
+<p>Create advantage for an ally. A Setup uses an action and only calls for a roll when its outcome is uncertain and risky; a successful uncertain or risky Setup grants their next action +1 Position (one step). This does not draw from the Assist dice-pool cap — it is a Position bump, not a die. Repeated Setups do not stack.</p>
 </section>
 <section class="level3" id="assist-teamwork">
 <h4 id="action-economy-heading-11">Assist (Teamwork)</h4>
-<p>Spend 1 Boon to give an ally +1 die on their current roll. You share appropriate risk or consequence.</p>
+<p>Spend 1 Boon to give an ally +1 die on their current roll, subject to the +3 teamwork dice-pool cap (Setup does not count against this cap; it grants Position, not dice). You share appropriate risk or consequence.</p>
 </section>
 <section class="level3" id="protect-action-economy">
 <h4 id="action-economy-heading-12">Protect</h4>
@@ -1588,21 +1580,9 @@ number instead of describing the swing.</p>
 <p class="text-muted text-sm">Overflow can occur multiple times from a single hit (e.g., with Body 1 or 2).</p>
 </section>
 <section class="level2" id="health-fatigue-harm-armor-conversion-table">
-<h3>Armor Conversion Table</h3>
-<p>Armor does not reduce incoming Harm directly. Instead, it converts Harm to Fatigue according to the table below.</p>
-<div class="table-wrap">
-<div class="table-scroll"><table>
-<thead>
-<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
-</thead>
-<tbody>
-<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
-</tbody>
-</table></div>
-</div>
-<p class="text-sm"><em>Example:</em> Light armor vs Harm 2 becomes Harm 1 + Fatigue 1. Heavy armor vs Harm 3 becomes Fatigue 2.</p>
+<h3>Armor Conversion Formula</h3>
+<p>Armor does not reduce incoming Harm directly. Instead, it converts Harm to Fatigue. Armor is an integer Step, 0–5 (see <em>Equipment: Armor</em>, this book, for the full Step list — None/Light/Medium/Heavy/Superior/Mythic). Compare incoming Harm (H) to the armor’s Step (S): if H ≤ S, mark max(1, H−1) Fatigue and take no Harm; if H &gt; S, mark max(1, S−1) Fatigue and take H − S Harm.</p>
+<p class="text-sm"><em>Example:</em> Step 1 (Light) vs Harm 2 (H &gt; S) becomes Harm 1 + Fatigue 1. Step 3 (Heavy) vs Harm 3 (H ≤ S) becomes Fatigue 2, no Harm.</p>
 </section>
 <section class="level2" id="health-fatigue-harm-recovery">
 <h3>Recovery</h3>
@@ -2295,11 +2275,14 @@ number instead of describing the swing.</p>
 </section>
 <section class="level3" id="step-3-assign-armor">
 <h4>Step 3: Assign Armor</h4>
+<p>Armor is an integer <strong>Step, 0–5</strong>. Steps 1–3 are ordinary equipment; Steps 4–5 are Tier III material or a Guide+/expansion option, and a GM should not hand them out as a default NPC’s kit.</p>
 <ul>
-<li>None: No conversion.</li>
-<li>Light: Harm 1 → Fatigue 1.</li>
-<li>Medium: Harm 2 → Fatigue 1.</li>
-<li>Heavy: Harm 3 → Fatigue 2.</li>
+<li><strong>0 — None:</strong> bare skin, robes, no meaningful protection.</li>
+<li><strong>1 — Light:</strong> leather, padded cloth.</li>
+<li><strong>2 — Medium:</strong> chain, brigandine.</li>
+<li><strong>3 — Heavy:</strong> plate, thick natural hide.</li>
+<li><strong>4 — Superior:</strong> exceptional make, Tier III availability.</li>
+<li><strong>5 — Mythic:</strong> a named, storied piece — Guide+ or expansion content only.</li>
 </ul>
 </section>
 <section class="level3" id="step-4-add-special-abilities">
@@ -2319,15 +2302,15 @@ number instead of describing the swing.</p>
 <tr><th>NPC</th><th>TL</th><th>Harm</th><th>Armor</th><th>Special</th></tr>
 </thead>
 <tbody>
-<tr><td>Bandit</td><td>1</td><td>1</td><td>None</td><td>Cowardly</td></tr>
-<tr><td>Guard</td><td>2</td><td>2</td><td>Light</td><td>Patrol Training</td></tr>
-<tr><td>Knight</td><td>3</td><td>3</td><td>Heavy</td><td>Challenge, Mounted</td></tr>
-<tr><td>Cultist</td><td>1–2</td><td>1</td><td>None</td><td>Ritual Chant, Fanatic</td></tr>
-<tr><td>Lesser Spirit</td><td>1</td><td>1</td><td>None (incorporeal)</td><td>Sunlight Sensitivity</td></tr>
-<tr><td>Greater Spirit</td><td>3</td><td>3</td><td>Heavy (or Light + immunity)</td><td>Elemental Aura</td></tr>
-<tr><td>Wraith</td><td>2–3</td><td>2 + Fatigue</td><td>None (incorporeal)</td><td>Life Drain</td></tr>
-<tr><td>Wolf</td><td>1–2</td><td>2</td><td>None</td><td>Pack Tactics</td></tr>
-<tr><td>Dire Bear</td><td>4</td><td>4</td><td>Medium</td><td>Terrifying Roar, Maul</td></tr>
+<tr><td>Bandit</td><td>1</td><td>1</td><td>0</td><td>Cowardly</td></tr>
+<tr><td>Guard</td><td>2</td><td>2</td><td>1</td><td>Patrol Training</td></tr>
+<tr><td>Knight</td><td>3</td><td>3</td><td>3</td><td>Challenge, Mounted</td></tr>
+<tr><td>Cultist</td><td>1–2</td><td>1</td><td>0</td><td>Ritual Chant, Fanatic</td></tr>
+<tr><td>Lesser Spirit</td><td>1</td><td>1</td><td>0 (incorporeal)</td><td>Sunlight Sensitivity</td></tr>
+<tr><td>Greater Spirit</td><td>3</td><td>3</td><td>3 (or 1 + immunity)</td><td>Elemental Aura</td></tr>
+<tr><td>Wraith</td><td>2–3</td><td>2 + Fatigue</td><td>0 (incorporeal)</td><td>Life Drain</td></tr>
+<tr><td>Wolf</td><td>1–2</td><td>2</td><td>0</td><td>Pack Tactics</td></tr>
+<tr><td>Dire Bear</td><td>4</td><td>4</td><td>2</td><td>Terrifying Roar, Maul</td></tr>
 </tbody>
 </table></div>
 </div>
@@ -3069,7 +3052,7 @@ number instead of describing the swing.</p>
 <p><span class="badge badge-red">Dangerous (+2 DV)</span></p>
 <p>Coerce obedience or twist existing loyalties.</p>
 <ul>
-<li><strong>DV:</strong> by fiction (target's will, opposing magic). Typical DV 5–7.</li>
+<li><strong>DV:</strong> by fiction (target's will, opposing magic). Typical DV 5; DV 6–7 only against a will hard enough to qualify as the Tier IV+ exception (max-tag working or ceiling Rite difficulty — see the GM Guide's Epic Tier chapter).</li>
 <li><strong>Hit:</strong> The target follows one simple command or shifts loyalty one step in the caster's favor (e.g., Faithful → Strained toward their original master). The effect lasts one scene or until the command is fulfilled.</li>
 <li><strong>Partial:</strong> The target hesitates, reveals information, or acts with clear reluctance; the compulsion is visible to observers.</li>
 <li><strong>Miss:</strong> The target resists; the caster marks 1 Fatigue and the target's original loyalty increases by one step (they become more devoted to their original cause).</li>
@@ -4601,7 +4584,7 @@ number instead of describing the swing.</p>
 <tr><td>5</td><td>Extreme — multiple constraints, dramatic gambles.</td></tr>
 </tbody>
 </table></div>
-<p><strong>The ladder ends at 5.</strong> There is no DV 6. A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce.</p>
+<p><strong>The standard ladder ends at 5.</strong> A task harder than Extreme is not a bigger number — it is a clock, a worse Position, or a flat no. Raising the DV past 5 for an ordinary task only moves the roll toward automatic failure, which is the one outcome the Outcome Matrix already has a row for and does not need a difficulty to produce. There is one narrow exception: DV 6–8, unlocked at Tier IV, reserved for a max-tag magical working, a test at the ceiling of Rite difficulty, or an obstacle that genuinely demands epic-scale teamwork. See the GM Guide's Epic Tier chapter — this is not a general escalation tool, and a GM reaching for DV 6+ on an ordinary task is inflating, not escalating.</p>
 </div>
 </div>
 </section>
@@ -4643,21 +4626,10 @@ number instead of describing the swing.</p>
 </div>
 </section>
 <section class="level2" id="quick-reference-armor-conversion-table">
-<h3>Armor Conversion Table</h3>
+<h3>Armor Conversion Formula</h3>
 <div class="panel panel-gold">
-<div class="table-wrap">
-<div class="table-scroll"><table>
-<thead>
-<tr><th>Armor Type</th><th>Harm 1</th><th>Harm 2</th><th>Harm 3</th></tr>
-</thead>
-<tbody>
-<tr><td>Light</td><td>Fatigue 1</td><td>Harm 1 + Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td>Medium</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Harm 2 + Fatigue 1</td></tr>
-<tr><td>Heavy</td><td>Fatigue 1</td><td>Fatigue 1</td><td>Fatigue 2</td></tr>
-</tbody>
-</table></div>
-</div>
-<p class="text-sm text-muted">Minimum 1 Fatigue per hit, even if conversion would give 0.</p>
+<p>Armor is an integer Step, 0–5 (None/Light/Medium/Heavy/Superior/Mythic). Compare Harm (H) to Step (S): if H ≤ S, mark max(1, H−1) Fatigue and take no Harm; if H &gt; S, mark max(1, S−1) Fatigue and take H − S Harm.</p>
+<p class="text-sm text-muted">Minimum 1 Fatigue per hit, even if the formula would give 0.</p>
 </div>
 </section>
 <section class="level2" id="quick-reference-fatigue-and-harm">
