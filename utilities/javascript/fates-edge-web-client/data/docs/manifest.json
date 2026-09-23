@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-22T23:39:09.845Z",
+  "generated": "2026-09-23T15:16:57.585Z",
   "documents": [
     {
       "id": "srd",
@@ -1120,6 +1120,26 @@
       ]
     },
     {
+      "id": "the_belworth_war_outline",
+      "title": "The Belworth War Outline",
+      "file": "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Outline.html",
+      "path": "/data/docs/design/",
+      "category": "design",
+      "categoryLabel": "Design",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_belworth_war_treatment",
+      "title": "The Belworth War Treatment",
+      "file": "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Treatment.html",
+      "path": "/data/docs/design/",
+      "category": "design",
+      "categoryLabel": "Design",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_cartomancers_compass",
       "title": "The Cartomancers Compass",
       "file": "Fates_-_Edge_-_-The-_-Cartomancers-_-Compass.html",
@@ -1713,7 +1733,7 @@
       "active": true
     }
   ],
-  "total_count": 112,
-  "active_count": 112,
+  "total_count": 114,
+  "active_count": 114,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
