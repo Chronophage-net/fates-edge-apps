@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Belworth War — A Working Treatment</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>The Belworth War</h1>
+<h3>Working treatment — title provisional</h3>
+<p><strong>Status.</strong> Working treatment incorporating the author's current decisions. The decisive southern battle, Veralyn's bargain with Fayd, Valdais's retreat, the coordinated attacks on Marcott and Fairport, and the character of Jaennis's fair company are settled. Fayd's price is a permanent intelligence office. He remains committed to the Vigil and ultimately chooses to groom Veralyn as empress of a new Utaran Empire. Jaennis loves Veralyn and intends to draw her, with her inherited taste for women, into the fair company's arrangement. Proposed scene details remain proposals; the later graveyard coda's placement remains open. No dates are assigned to the deaths of Braedyn or Oswyn.</p>
+<p><strong>Scope.</strong> The next novel follows Veralyn and Valdais's war, the queen's court, and Elyas returning to the Belworth. Riarhin is still away throughout the main action. Braedyn and Oswyn are dead in the prologue. Veralyn ultimately turns south, makes a deal with Fayd to turn the rebellious Belworth lords, and defeats Valdais in a battle that forces him to fall back. The victory is real. So is the authority Fayd gains by making it possible.</p>
+<p><strong>Proposed form.</strong> An ensemble novel in close third person, with six principal viewpoints: Elyas, Seniro, Constano, Veralyn, Jaennis, and Lyra. Lyra takes three focused court chapters rather than an equal share of the military narrative. Fayd remains outside the viewpoint structure. The reader sees what he obtains, what he makes possible, and what other people decide to overlook. Valdais is known through his operations, terms, prisoners, envoys, and effects on those opposing him; a private explanation of his ultimate purpose is not supplied by default.</p>
+<p>The question joining these stories is practical: when the recognised authorities can no longer keep people fed, protected, or heard, who acquires the right to act for them? Elyas discovers that affection does not settle competing obligations. Seniro finds that preserving a house may require surrendering its possessions. Constano loses the means by which his competence reaches anybody. Veralyn can defeat men who refuse to give her a battle worth winning. Jaennis builds the government people actually encounter while the reigning queen is away. Lyra establishes a place at court by noticing what its more powerful inhabitants overlook. Fayd makes himself useful while some of the people teaching her remain wary of him.</p>
+<h3>What carries into this book</h3>
+<p>Elyas comes home from the western expedition with experience, witnesses, and evidence, including the papers against Merrow. Orvain is dead. Alric has taken pains to preserve the damaged pages; Lyra travels east with Elyas, having intended to return to Amru's hearing, but establishes herself at court. Show her decision to remain and what she does about that earlier intention—correspondence and a deferred journey, rather than forgetting the hearing or Gyllan. The evidence and Alric's work need an on-page disposition. Lyra has a continuing story of her own after its delivery. The plot must not behave as though the journey produced nothing because Braedyn can no longer receive its answer.</p>
+<p>Rekedim remained in the west. Elyas cannot reach for him whenever command becomes difficult. He can remember a lesson, apply it badly, or discover why he had misunderstood it. Riarhin has gone her own way. Neither mentor returns to solve his household, courtship, or command.</p>
+<p>Elyas already knows Berent Ailsean from Baron Lorran Aeryl's household. Berent received him formally, witnessed Cedric's duel, and read its terms. Taking him as squire continues that encounter. It should carry the weight of a boy who has already seen Elyas make courtesy do difficult work, and of Elyas becoming responsible for somebody who will copy him.</p>
+<p>Mara remained in Tarlington at Elyas's request. She promised to report what she could observe, not to become his sole source of truth. Their romance already exists; the new movement is his intention to marry her and what that intention requires from both of them. She is lowborn. The scandal belongs to the people and institutions that make this consequential, not to a narrator astonished that he loves her.</p>
+<p>Kaeden Fayd was the Vigil faction's second-in-command and intelligence intermediary. He used the party to obtain evidence against his superior and kept his bargain. His imperial restorationism is established. Elyas cannot meet him at court as an unknown, or forget that their useful transaction helped him rise. He remains committed to the Vigil. His changing tactics lead him to use Veralyn as the prospective sovereign of a new Utaran Empire rather than treat her merely as an obstacle. His access to the rebellious lords comes from real relationships in that movement; do not inflate this into personal control of every grievance or military operation.</p>
+<p>Constano and Seniro have distinct competences and familiar names. Constano is Conlin to people who knew him as a boy; he walks with a turned foot and does not become a mounted battlefield hero to prove his worth. Seniro is Wymund the Red to his soldiers. Use the names according to who speaks, not as interchangeable decoration. The younger Braedyn's existing military role must also be accounted for, even if he remains a subordinate presence.</p>
+<p>Jaennis is Brightstride's widow, a Fenwood, Constano's daughter, and the dowager queen. Veralyn is the reigning queen. Jaennis was left at Valora with the seals; this gives her genuine delegated authority without automatically granting an unlimited regency. Her standing, her household, and the crown's offices overlap but are not identical. Past suspicions about Brightstride's death remain suspicions unless this novel is expressly to resolve them.</p>
+<p>Harald is Elyas's living elder brother, inheriting Oswyn's responsibilities at Istovar. He is not one of the family's earlier kings of the same name. Earlier accounts make him careful, courteous, and unable to decide. His uselessness in this crisis should grow out of that established man: he checks a figure again while the opportunity to act expires, seeks assurances nobody can give, and leaves other people to bear the results.</p>
+<h3>Geography and the campaigns</h3>
+<p>Ecktoria lies west of Silkstrand. The Belworth lies east. The river runs broadly north to south toward the Amaranthine. Fairport and Marcott are opposing ports at its delta; Fairport is Viterran, Marcott Vhasian. Refuge across the river and flight north along the river are different movements.</p>
+<p>The shared campaign began in spring 841: Veralyn went north against the earls, while Valdais's already provisioned army moved through Ethor and Istovar, crossed into Aberiel, then crossed the Belworth. The earlier ferry killings and valley conflict occupied Fenwood officers who should have been watching his preparations. This novel develops the war and rebellion; it does not repeat the opening as a second invasion with identical preparations.</p>
+<p>There are three connected operations: the northern campaign in the flint hills; the defence and political disintegration of the Belworth; and the struggle for the delta, its shipping, money, and stores. Each has people with local purposes. The northern earls and the rebellious valley barons are not interchangeable. Valdais can use an uprising he does not wholly control. The Vigil can incite barons whose grievances and ambitions predate its involvement.</p>
+<p><strong>Chronology.</strong> This book's main action runs while Riarhin is away. It follows Elyas's return from the western expedition and does not wait for the events of <em>The Weight You Carry</em> to finish. The gift of Kalrantha at Braedyn's grave belongs either in a later coda to this novel or in the next novel's prologue. It does not occur in this book's opening. If used as a coda, mark the passage of time clearly. Kalrantha is not present to influence this book's campaign or its political bargains.</p>
+<p>The earlier family notes supplied by the author are an idea source, not a competing chronology. Do not restore their 838 crisis date, obsolete ages, death accounts, or superseded names. Keep Kaeden Fayd, not Caedric Fade; Alaysha, not Alayne; and the established living/dead status of the current books. The old court roster is not a list of people all still available for office. Ylena cannot be brought back as a maid after her established execution. The commercial family may appear as Tiren or Tireno in older documents; use the author's Tireno here without treating the spellings as two houses.</p>
+<h3>Prologue — The men who could answer</h3>
+<p>Both old dukes are dead. The proposed viewpoint is Constano at the close of Braedyn's funeral observances, with news of Oswyn's death already received. Do not stage two long deathbeds or claim the men died together. The business after one funeral is enough to establish both absences.</p>
+<p>Constano must send an answer to Istovar that Braedyn would once have addressed directly to Oswyn. The letter will now reach Harald. At the same time, somebody asks for a guarantee Braedyn made orally. Constano believes the promise; he has no means of making his father's personal credit survive unchanged. His first act as head of the house is a decision about people still alive, made while he has barely had time to grieve.</p>
+<p>The old study can retain its unfinished game, but it does not give him the answer. Keep this brief and human: a household meal nobody wants, a chair not yet moved, a servant bringing the wrong number of cups through habit. The man he loved and the man whose obligations he inherits are the same person.</p>
+<p>Veralyn is already committed to the northern campaign. Riarhin is absent. There is no implausible assembly of every principal at the grave. Elyas's chapter-one return follows the prologue; whether he has received both deaths before reaching the valley can be decided in drafting, but neither death is concealed from the reader as a mystery.</p>
+<p>Close with Constano committing himself to the work at Fairport. What leaves the room is an order bearing his own authority, with a promise someone will expect him to keep.</p>
+<h3>The character movements</h3>
+<h4>Elyas — Beloved is not obeyed</h4>
+<p>He returns expecting to bring the results of an errand into a household. Instead, every destination offers him a different duty. His father's inheritance is in Harald's hands. The Fenwoods raised him but cannot command all his loyalties by affection. The crown wants the use of his name. Barons who smile at him refuse the order he has brought.</p>
+<p>His first response is to make himself useful to everyone. That must fail in a concrete case: two promises whose deadlines cannot both be met, or a protection he offers without the men to enforce it. He improves by stating what he can actually undertake and accepting that the refusal will make him disliked. Berent watches the process. The squire is not an audience for immaculate lessons; he sees an admired man repair an error.</p>
+<p>His intention to marry Mara must become an act during the novel, not a warm thought repeated whenever battle leaves time. The precise act can be a public declaration, a formal request, or the marriage itself, depending on the chosen ending. He speaks to her before announcing anything to his household. She decides what she accepts. His rank cannot make her consent a foregone conclusion or protect her from consequences he does not experience.</p>
+<h4>Seniro — What can still be held</h4>
+<p>Seniro is trying to preserve House Fenwood and delay Valdais. He must have operational reasons for each stand: a convoy not yet past, a district not yet evacuated, a force that needs another day to regroup. A bridge is not valuable merely because it has a Fenwood banner over it.</p>
+<p>Draw on the older notes' useful distinction between Seniro's boisterous, forceful manner and his actual intelligence. He is a Fenwood who can let an opponent mistake loudness for simplicity. His weakness is the understandable desire to make a rebellious neighbour afraid enough to obey. The Vigil makes that temptation costly. Harsh reprisals can win the crossing and recruit the next barony against him. Leniency can leave his rear unsecured. The treatment should give him decisions in which kindness is not automatically the correct tactic and severity is not automatically evidence of strength.</p>
+<p>He and Constano disagree while their partnership still works. Seniro asks for movements that require purchases already committed elsewhere. Constano asks him to relinquish a position whose political meaning does not appear in the accounts. Each is sometimes right. After Fairport, Seniro loses more than a supply office: he loses the man who could tell him which apparent resource had already been spent.</p>
+<h4>Constano — The man who cannot get an answer</h4>
+<p>Fairport is where Constano can turn scattered assets into an army that eats. Show the actual work through consequential choices: which captain receives payment, which grain consignment gets an escort, which family accepts a guarantee because Conlin gave it. His strength includes relationships. He is not a human calculating machine.</p>
+<p>The sack destroys the place from which his orders become real. He saves something useful but cannot save the whole apparatus. The choices during his escape must include people as well as records, and the physical difficulty of his flight must take his disability seriously without turning it into humiliation or a miraculous cure.</p>
+<p>He flees north and becomes out of the loop. His chapters thereafter know less than those of the court and the army. A message reaches a destination already abandoned. A technically sound instruction arrives after a contradictory emergency order has been obeyed. He has not become stupid or passive; the connections that made his work effective have broken.</p>
+<h4>Veralyn — The campaign that will not finish</h4>
+<p>The earls in the flint hills deny her the satisfying battle that would settle the north. They scatter, negotiate separately, surrender places of small value, and make the queen choose between pursuit and the duties that require her farther south. She can win a day's fighting and still lose time she cannot buy back.</p>
+<p>Tylan Vayle's preparation repeatedly keeps possibilities open. His relationship with Veralyn needs more than warnings she ignores. He should bring her a workable alternative, undertake a hard order she gives knowingly, and once make her face a consequence through the arrangement of people or horses rather than an argument about her character.</p>
+<p>Veralyn understands that Valdais is spending the northern rebellion. She is not discovering the original trap for the first time. The question is what she can still do now that she is inside it. Do not save her by making the enemy irrational or by granting her a conveniently decisive message at precisely the moment she needs one.</p>
+<p>Shadowsteel remains as established: extraordinary workmanship, no visible performance that absolves its bearer of a decision. Kalrantha is elsewhere with Riarhin. Veralyn's eventual victory comes from command, preparation, a political bargain, and people who act on it. The amulet cannot be used to explain the victory retrospectively.</p>
+<p>Veralyn has inherited Baldvyn's womanizing. Give that appetite its own life during the northern campaign: a flirtation she initiates, an adult lover whose attraction is mutual, the ease with which she assumes another welcome will follow. She is not merely waiting to be tempted by Jaennis. Pleasure can offer warmth and respite, and the queen's habit of seeking it can also create expectations she has not considered. Keep the women particular rather than presenting a procession of interchangeable conquests. Her military competence and her appetite coexist.</p>
+<p>Her affection and desire for Jaennis need not imply exclusivity. The important new movement is Jaennis's intention to make the fair company's shared life the place where Veralyn can satisfy that appetite. Veralyn must still make choices about the invitation; she is not led into it through uncharacteristic innocence.</p>
+<h4>Jaennis — The court people can reach</h4>
+<p>Jaennis makes court while Veralyn makes war. Her fair company ranges from adult serving women and attendants to young adult wives of standing. The court heavily implies that the company shares her bed and one another's. Some of the implication is gossip, some is jealous exaggeration, and enough is true that the gossip cannot be dismissed as a misunderstanding of innocent friendship. Jaennis is careful about what becomes publicly demonstrable. Her desire is real, increasingly demanding, and not merely a device for obtaining information.</p>
+<p>Use her viewpoint to make attraction legible without turning the household into an explicit catalogue: whom she wants beside her at supper, whose departure she delays, the intimacy of a shared dressing room, a private joke that changes when a husband enters. She can conceal a relationship from the court while the reader has little doubt about it. These women have distinct reasons for staying—pleasure, affection, safety, ambition, companionship—and distinct limits. No member's employment or marriage automatically establishes that she welcomes Jaennis's attention.</p>
+<p>The company is also attractive in public: wit, dress, music, good food, and admission to a room from which people have been excluded. Those pleasures are worth writing, not merely listing as cover for espionage. Access to Jaennis inevitably has political effects, but not every lover is an agent and not every gift is a bribe. A woman can be fond of her and also sell an introduction; another can refuse a favour without ceasing to desire her.</p>
+<p>A useful proposed progression is from a carefully protected attachment to a second indulgence that complicates the first, then to the assumption that discretion can be arranged around whatever she wants. The war enlarges her freedom and the number of people dependent on her. That does not make her foolish. It makes her better at defending a choice she ought to examine. Give at least one woman a refusal Jaennis must respond to, so her care or selfishness is revealed through conduct rather than a narrator's label.</p>
+<p>Provisional company roles are a trusted adult attendant who knows the household's practical rhythms, a young married woman with independent standing, and a newcomer whose apparent boldness conceals less security. Final names are open. The old notes' court roster can supply candidates once their ages, marriages, and survival have been checked; it must not silently install dead characters, children, or every female relative as a lover.</p>
+<p>Jaennis's competence and appetites coexist. She can settle a petition brilliantly after a night she is trying to keep out of somebody's account. A rival may attack her sexual reputation while ignoring an actual administrative failure. Conversely, a useful appointment should not automatically acquit her of a personal betrayal. Her household gives Fayd access to people and problems, but he does not need a sexual blackmail plot to become indispensable.</p>
+<p>Jaennis loves Veralyn and wants her within this arrangement. She also wants to exploit the queen's womanizing, inherited from Baldvyn. These desires do not cancel one another: she wants the woman she loves near her, wants the company and freedom she has built, and sees an advantage in making the queen's other desires lead back to her household. She does not solve this by demanding fidelity she does not want to practise herself.</p>
+<p>The plan is an invitation attractive on its own terms. Letters from the north can tell her whom Veralyn has noticed, what she misses, and which pleasures survive a campaign. Jaennis prepares a welcome in which the queen can feel understood and indulged. She chooses introductions and proximity; she cannot guarantee who will desire whom or which woman will accept the place intended for her. One attachment should complicate her design because somebody acts for herself.</p>
+<p>The reader should see both love and exploitation. Give Jaennis a private act of care for Veralyn that gains no audience or political advantage. Then let her use real knowledge of the same woman to arrange a meeting she expects to benefit from. Neither scene invalidates the other. Her growing appetite is not just for power disguised as sex; she actually wants the people and the life she is arranging.</p>
+<h4>Lyra — A place earned by paying attention</h4>
+<p>Lyra establishes herself at court outside Jaennis's fair company. She can be friendly with its members, enjoy an evening, and understand its influence without joining its intimate arrangement. Her independence is a choice about her own life, not a judgment that the women who choose differently are foolish or compromised.</p>
+<p>She arrives with field experience, Gyllan's teaching, and the consequences of his death. She is very good at paying attention: who answers a question addressed to someone else, which frightened petitioner relaxes when a particular servant enters, the detail in an account that changes after a second listener arrives. This is attentive observation, not Riarhin's total recall, a magical truth sense, or immediate mastery of court politics. She must ask what a detail means, compare accounts, and sometimes revise a conclusion.</p>
+<p>People already wary of Fayd teach her. Proposed recurring mentors are an experienced chancery clerk who knows which promises an office can actually honour and a long-serving court woman who understands access and households. Their names and exact positions remain drafting choices. Each has reasons to distrust him, and each has interests of their own. They teach her to distinguish a grievance from evidence and a useful negotiator from a reliable source. They need not form a secret opposing faction.</p>
+<p>Her early usefulness is modest and tangible. She notices that two witnesses have been kept together when they were meant to be heard separately, or that a messenger has delivered the answer to a question nobody in this room has yet sent. Checking the discrepancy lets the court correct a real error. An officer asks for her on a second occasion. Her standing grows through repeated useful work, not through being proclaimed the cleverest person present.</p>
+<p>Her concern about Fayd matures as his successes accumulate. She sees that he is acquiring the power to decide what reaches the people who make decisions. His terms may be accurate, his releases genuine, and his loyalties still dangerous. She cannot defeat his argument by proving the bargained-for road really opened. That distinction is the adult difficulty of her story.</p>
+<p>By the end she has people who seek her observations, a defined role in court work, and the confidence to state both what she has seen and what it does not establish. A proposed continuing duty is assisting in the examination of petitions and witness accounts, with direct access to a responsible crown officer; she does not become Fayd's subordinate merely because he receives the intelligence office. The formal position can remain modest. Her value is that someone besides Fayd is learning how the court knows what it knows.</p>
+<h4>Fayd — An empire with a different sovereign</h4>
+<p>Fayd remains a Vigil man. His goal changes from the forms of restoration he previously pursued toward a new Utaran Empire with Veralyn as empress. This is authorial knowledge. His final choice grows from watching her turn military skill into a political settlement, accept an effective bargain, and draw obedience from people who resisted her. He recognises a sovereign around whom imperial institutions might be built.</p>
+<p>The permanent intelligence office is the price he demands for turning the Belworth lords. It gives his contacts a continuing place in the state, pays for their work, and makes him answerable to the crown rather than a negotiator dismissed when the fighting ends. Veralyn grants it because the result is worth that price to her. She does not agree to become his projected empress as an undisclosed term of this bargain.</p>
+<p>He is changing strategy, not secretly becoming a loyal servant who has abandoned the Vigil. He can protect the queen, defeat her enemies, and sincerely strengthen her government because those acts now advance his imperial project. This makes his service more consequential than a string of sabotages. It also means he has to contend with the woman herself: she may have ambitions, loyalties, and limits that do not fit his plan.</p>
+<p>Keep him outside the viewpoint structure. His decision becomes legible through what he asks the new office to do after victory: cultivating contacts beyond the present war, approaching houses across the former imperial territories, and directing restorationist support toward the reigning queen. A proposed final exchange has him seek authority for correspondence that Jaennis considers unexpectedly far-reaching. The reader can connect this with his established commitment without receiving a private explanatory monologue. Do not make Jaennis and Fayd partners in a single plan merely because each intends to shape Veralyn's future.</p>
+<h3>Part I — The return</h3>
+<h4>1. A road with three masters — Elyas</h4>
+<p>The homecoming begins with competing claims on an ordinary passage: a baron's new toll, the liege's older safe-conduct, and frightened carriers who have already paid once. Elyas's name initially opens the gate. It does not settle what will happen to the next wagon after he leaves. He learns that the disorder is sustained, organised, and larger than a few men taking advantage of war.</p>
+<p>Let him return something tangible to the people behind the cart: a seized animal or a passenger held as security. It buys immediate goodwill and creates an obligation he will later discover he cannot casually fulfil. The Vigil's arguments reach him through what people repeat, not through a captured manifesto explaining the whole plot.</p>
+<h4>2. A day bought at the crossing — Seniro</h4>
+<p>A local success shows the defence working. Seniro delays Valdais's advance long enough for a necessary movement behind him. Then he discovers that the movement is late because a baron who owes him service has kept his men at home. The failure joins the rebellion to the campaign before either can be treated as a separate storyline.</p>
+<h4>3. The empty encampment — Veralyn</h4>
+<p>Veralyn reaches ground prepared for a confrontation and finds the earls gone. Tylan's precautions recover prisoners, stores, or a usable road, so the day is not empty spectacle. What they fail to recover is the time spent reaching it. News from the Belworth gives her a reason to leave; the surviving northern threat gives her a reason she cannot simply do so. In the evening, away from the map, her interest in an adult woman of the local household shows the familiar ease of her appetite. The encounter need not conceal a spy or punish her for enjoying herself.</p>
+<h4>4. The first invitation — Jaennis</h4>
+<p>Introduce the fair company through an occasion that is pleasurable on the page. An adult serving woman is included with an ease that unsettles a visitor who knows her station; a married guest answers Jaennis with a familiarity her husband would recognise if he were there. Neither exchange needs an explanation. The practical grievance reaching Jaennis after the entertainment is one of the valley disputes already affecting Elyas and Seniro. Her attention moves competently between the petition and the woman she has asked to remain.</p>
+<h4>5. What Fairport can send — Constano</h4>
+<p>Constano obtains one difficult consignment by spending standing that cannot be replenished with a signature. His arrangement depends on Marcott and its allied Tireno family. Establish the relationship before its destruction. A map and a merchant's assurance should not substitute for showing the people who have agreed to take a risk together.</p>
+<h4>6. The people who stayed — Elyas</h4>
+<p>Elyas reunites with Mara and delivers the western evidence into identifiable custody. Lyra, Alric, Pell, and the surviving witnesses receive a clear next step rather than vanishing between books. The evidence may be inconvenient to the new government; it must not merely be lost to make Fayd's subsequent rise easier.</p>
+<p>Lyra elects to remain long enough to see the witnesses properly heard and begins assisting the people receiving their accounts. A court officer finds her observations useful and asks her to return. Her decision to establish herself here grows out of that work; she is not simply left behind by Elyas.</p>
+<p>Mara and Elyas have private time before war or household business interrupts them. She has lived through the duke's decline and death while he was away. He cannot turn the reunion into a report of his own travels. His wish to marry her first becomes a conversation between them, including the practical future each imagines.</p>
+<p><strong>Movement completed:</strong> he has returned and found the people he sought. Returning has not restored his former place among them.</p>
+<h3>Part II — Useful people</h3>
+<h4>7. The offer from an earl — Veralyn</h4>
+<p>An earl offers submission on terms that protect his own position and isolate someone else. Accepting may shorten the campaign; it may also teach every remaining earl which concessions can be extracted by waiting. Tylan helps test the military value of the offer. Veralyn must own the answer.</p>
+<h4>8. The levy that will not come — Seniro</h4>
+<p>The barons' refusal becomes organised enough to threaten a specific operation. Their case contains recognisable grievances. The Vigil has supplied coordination, confidence, or political language; it has not invented every wrong. Seniro's response costs him a local relationship he had expected his father's name to preserve.</p>
+<h4>9. A man with an agreement — Lyra</h4>
+<p>Fayd arrives with a limited success that can be independently verified. Hostages are released, a road reopens, or a baron agrees to a meeting previously refused. He asks for the authority to complete that piece of work. His manner is modest, his terms precise, and his advantage lies in knowing which disagreement each side can afford to settle.</p>
+<p>Lyra attends through her new work with the western testimony. She recognises Fayd and remembers the terms of the earlier bargain. An experienced clerk makes her separate what she witnessed from what she assumes. A court woman quietly points out which petitioners no longer approach the ordinary officers once Fayd has entered the room. Neither tells her what to think; both give her something to check.</p>
+<p>The reader already knows his history. The suspense is not whether this apparently ordinary man has a secret, but which compromise the court will accept because he gets results. Lyra's first useful observation concerns one such practical change in access, not a discovery of his entire imperial design.</p>
+<h4>10. A squire and a brother — Elyas</h4>
+<p>Berent joins Elyas through an explicit release or transfer from his existing household; he does not simply reappear in new livery. Elyas must undertake his keep, training, and responsibility. Give the boy a task that has a real result and an error he can admit safely.</p>
+<p>At Istovar, Harald needs a decision Elyas cannot make in his name without changing their relationship. Harald wants his brother's prestige and reassurance but resists giving him authority. The family conversation begins courteously and ends without the order their officers need.</p>
+<h4>11. Across the river — Constano</h4>
+<p>Pressure on Marcott puts the Tireno alliance at risk. Constano sees what displacement would do to credit, boats, warehouses, and the people who operate them. Preparations for refuge across the river begin before anyone admits that they may be permanent.</p>
+<p>Valdais has been acquiring support from the middle cantons. Their alignment allows the attack on Marcott from the north; the Tireno family is driven across the river. The assault on Fairport from the sea is coordinated with that attack. Constano can recognise the threat from the north without knowing the second blow is already in motion. The corsairs' particular leader and recruiting intermediary need not be invented to establish the coordination. Do not assign the operation to Fayd without further authorial direction.</p>
+<h4>12. The inconvenient acquaintance — Lyra, with Elyas present</h4>
+<p>Elyas recognises Fayd. He tells Jaennis what their previous bargain involved and what it cannot prove. Fayd does not panic or rely on Elyas forgetting. He acknowledges what is already known and argues that access to people hostile to the crown is precisely what makes him useful in negotiating with them.</p>
+<p>Jaennis authorises a bounded task with terms someone can later enforce. She is making a political choice with a known risk. Fayd does not promise that the Vigil's contacts or ambitions have ceased to exist. He offers to make those contacts serve a particular settlement. This establishes the smaller version of the bargain Veralyn will later make with him. Lyra watches how a known risk becomes an accepted appointment through a sequence of reasonable answers. Afterwards she compares her account with one of the people teaching her; a point they disagree about is checked rather than smoothed away. Her record does not vanish merely because Jaennis has authorised the work.</p>
+<p><strong>Movement completed:</strong> Fayd has earned a foothold, Berent has entered Elyas's household, and the institutions have made deliberate commitments. The disasters ahead will damage arrangements the reader has seen working.</p>
+<h3>Part III — The port burns</h3>
+<h4>13. The wrong horizon — Constano</h4>
+<p>The northern assault drives the Tirenos and their dependants out of Marcott and across the river. Fairport commits boats, crews, and attention to receiving them. The coordinated corsair assault then comes from the sea. Constano need not know its coordination immediately; the reader can infer it from the timing and earlier evidence of middle-canton preparations. Make the approach, available warning, and defence intelligible. A proposed mechanism is the pressure of the river evacuation pulling harbour craft and manpower toward the inland quays while the raiders approach the seaward works. Fairport is caught performing a necessary task, not forgetting that it is a port.</p>
+<p>The sack breaks Constano's system in stages. A landing separates a gate from its defenders. A fire cuts off a store he had been trying to save. A trusted captain cannot reach the quay where the refugees have been sent. He gives orders whose consequences he can see, and has to abandon an order that was right ten minutes earlier.</p>
+<h4>14. The supplies that do not arrive — Seniro</h4>
+<p>The sack reaches the army first as an absence. A barge fails to arrive. Then come contradictory reports and a demand to protect a withdrawal already underway. Seniro chooses a defensive position that buys escape at the cost of something the house cannot easily replace. Valdais exploits the failure with the readiness established in the earlier books.</p>
+<h4>15. Whose people — Elyas</h4>
+<p>Refugees or displaced allies meet a barrier backed by a baron whose submission was recently promised. Elyas cannot settle the matter by repeating the promise. Berent sees both the obligation to admit people and the shortage that makes admitting them difficult. Mara's knowledge of households or local arrangements can matter here if she is present by her own choice; she must not be transported between scenes solely to improve Elyas's decisions.</p>
+<h4>16. The price of turning south — Veralyn</h4>
+<p>Reliable news of the sack finally reaches Veralyn. She has horses, wounded, prisoners, and a northern settlement that is not complete. This chapter makes the cost of leaving as real as the cost of remaining. Tylan has anticipated part of the problem and cannot anticipate all of it. Their decision changes what Seniro can reasonably expect, but his knowledge of that decision must wait for a messenger.</p>
+<h4>17. A court after the news — Jaennis</h4>
+<p>The fair company receives people who need beds, money, introductions, and news of missing relatives. Its existing hospitality has practical value because people already know where to go. Members disagree about who should be helped first. Jaennis makes room for someone she particularly wants nearby, with a sound public explanation and a private reason the reader understands. The court's pleasures do not disappear; their continuation beside catastrophe can be generous, necessary, self-serving, or all three at once. Since Constano is her father, his uncertain whereabouts must interrupt her composure personally, not merely inconvenience an office. A letter from Veralyn gives her a different relief; her private reply offers something chosen for the woman she loves. She then begins planning the queen's place within the company. This is where her love, anxiety, appetite, and intention to influence Veralyn can coexist in close viewpoint.</p>
+<p>Fayd brings a second useful result, addressing a real obstruction between relief and the people who need it. He begins receiving requests that would formerly have gone to separate officers. Jaennis must notice the accumulation even if she accepts it.</p>
+<h4>18. North without the office — Constano</h4>
+<p>Constano escapes and moves north with a reduced company. Decide exactly whom and what he saved, then honour that load in the journey. His letters go out through improvised routes. Some reach people who can no longer obey them. He receives no convenient comprehensive account of the war.</p>
+<p>A local success proves that he remains himself: he arranges shelter or food for the people actually with him. It cannot restore Fairport's machinery. The contrast is the injury. End the part with his absence producing a decision elsewhere that he would have disputed, had anyone been able to ask him.</p>
+<p><strong>Movement completed:</strong> Fairport has been sacked, Constano has fled north, and the command and supply relationships have changed. This is a permanent alteration of the novel, not a spectacular interruption followed by business as usual.</p>
+<h3>Part IV — Who can give an answer</h3>
+<h4>19. The promised marriage — Elyas</h4>
+<p>Elyas and Mara reach a decision about what they intend. Its disclosure turns a private relationship into a household and political matter. Objections should differ: a relative wants an alliance, an officer fears division over succession, a servant knows that Mara will be punished socially for privileges Elyas treats as easy to grant. Harald's response can show the difference between wanting his brother happy and being able to support him when support costs something.</p>
+<p>Mara sets a condition concerning her own life. Do not make her sole contribution a willingness to suffer for his honour. The outcome must preserve her right to choose even where both lovers underestimate what follows.</p>
+<h4>20. The ground Seniro leaves — Seniro</h4>
+<p>With Constano absent from effective coordination, Seniro makes a withdrawal he would once have defended as dishonourable. Give it a clear military purpose and a painful household consequence. The troops must do the work: dismantling a crossing, bringing out the wounded, holding a road while civilians pass. His changed understanding is legible in an order rather than a speech about learning humility.</p>
+<h4>21. The people Fayd can bring — Lyra</h4>
+<p>Fayd demonstrates that his smaller settlements can become a larger change of allegiance. He cannot promise every baron. He names the lords whose men, roads, crossings, or grain would alter the campaign and explains what each must be able to tell his own household. A meeting or limited undertaking proves he has access. Jaennis arranges for the offer to reach Veralyn in a form the queen can examine herself.</p>
+<p>Lyra helps check the limited undertaking. She notices that a proposed witness depends on the very man whose performance he is being asked to certify. An independent comparison is arranged. The promised release or passage proves genuine. She has made the bargain more credible without making Fayd more trustworthy, and her mentors do not pretend that these are the same result.</p>
+<p>She can now put a precise concern before an officer who will listen: the court must retain its own access to the people whose reports Fayd brings. She does not ask that he be refused merely because she dislikes the arrangement. The queen's offer goes forward with both the useful evidence and the limits of that evidence intact.</p>
+<p>News of Veralyn's coming return changes the household around her. Lyra sees Jaennis rearranging places and introductions within the fair company, and a woman declining one of those arrangements. She can recognise that the queen's welcome is being prepared without knowing every private intention behind it. Her chapter stays with what she can attend to and learn.</p>
+<h4>22. Enough of the north — Veralyn</h4>
+<p>Veralyn ends the pursuit in the flint hills sufficiently to turn south. The proposed local resolution is a limited submission or containment that removes the earls' immediate ability to destroy her rear without granting her every concession she wanted. She leaves named responsibilities with people who have men to enforce them. This is an operational conclusion to the northern campaign, not an unexplained disappearance of its opponents.</p>
+<p>Tylan has prepared a southern movement without stripping the northern settlement of its means of survival. He has counted mounts, provisions, and the condition of the men. Veralyn orders the turn before it can be comfortable. Her army will arrive capable of fighting because of choices made earlier, not because a transition paragraph restores everybody's strength.</p>
+<h4>23. A command Harald cannot give — Elyas</h4>
+<p>The brothers' incompatibility becomes operational. Elyas needs authority to fulfil a specific undertaking; Harald fears what conceding it will mean. Their confrontation leaves the situation changed. The working choice is that Elyas takes a bounded royal commission rather than continuing to promise action in Harald's name. His brother experiences it as abandonment or usurpation even if it does not formally take his title.</p>
+<p>Berent sees Elyas choose a duty that makes someone dislike him. The boy's later conduct shows what he understood, possibly imperfectly. The marriage question and the command question meet in the household's view of whether Elyas has become reliable or impossible. Mara's answer to his proposed future is not replaced by Harald's permission.</p>
+<h4>24. The queen's bargain — Veralyn</h4>
+<p>Veralyn meets Fayd and makes the deal herself. Jaennis has established his access and usefulness; neither she nor a messenger makes the final bargain in the queen's place. Fayd undertakes to turn the rebellious Belworth lords whose support would change the battle. Veralyn must authorise concessions, protection, or recognition she would not offer them after an uncomplicated victory. His personal price is a permanent intelligence office. He will turn the lords; she will place the resulting network within her government under his continuing direction. The lords also need terms they can accept. A proposed package is conditional pardon and confirmation of specified rights in return for immediate military acts, with individual disputes reserved for adjudication. Those details are negotiable; Fayd's demand for the permanent office is settled.</p>
+<p>The offer has to be executable. Which lords will act? What must happen first? How will their captains recognise the queen's orders? What if one lord delays? What evidence can she have before committing her army? Tylan asks the questions that determine whether a political undertaking can survive contact with a battlefield. Fayd answers enough to earn a risk, not enough to remove it.</p>
+<p>She knows she is employing a man connected to the movement that helped make the crisis. She puts the agreed office in writing, to take effect on the named undertakings being performed; she does not leave his reward to vague gratitude after the battle. Elyas's earlier account is available to her. The bargain does not require her to believe him virtuous. It requires her to believe that the promised actions can be obtained at the price agreed. Make the first test small and observable: a convoy passes, a captive comes back, or an agreed road opens before the main army enters it.</p>
+<p><strong>Movement completed:</strong> Veralyn has turned south and has made the bargain. The final act must now test it in action.</p>
+<h3>Part V — The lords who turn</h3>
+<h4>25. The answer sent too late — Constano</h4>
+<p>Constano, still moving north outside effective coordination, sends the best advice his information permits. It may concern a baron who has since agreed terms with Fayd or a port resource already unavailable. The reader understands the discrepancy without being asked to laugh at him. He succeeds at one immediate responsibility to his companions and cannot restore his former place in the war.</p>
+<p>Do not bring him to the council in time to price every concession or correct every military assumption. His absence has allowed another man to acquire work that used to belong to several reliable people. The cost of the bargain is not necessarily a price Constano would have refused; nobody can know, because he was not asked while an answer still mattered.</p>
+<h4>26. The men Seniro must admit — Seniro</h4>
+<p>Fayd's agreement becomes orders on the ground. Lords who withheld levies or obstructed the defence must now be allowed to move armed men through Fenwood positions. Seniro has reasons to distrust each of them. Some of his soldiers have buried people killed in the disorder. He obeys the queen's agreement while putting the practical safeguards in place that make obedience possible.</p>
+<p>The proposed field lies on the Viterran side of the Belworth, where a tributary crossing and raised roads constrain the movement of supplies and reserves. The precise site remains unnamed until its fit with the regional map is checked. Fenwood's history of draining and engineering the valley gives Seniro useful knowledge of where a column can leave the road and where it cannot. It does not give him a secret device that wins the battle unaided.</p>
+<p>One converted lord performs the promised action. Another is late or brings fewer men than promised. Seniro must hold the necessary ground through the discrepancy. This is the military value of all the delays he has bought: the queen can reach a position from which the changed allegiances matter.</p>
+<h4>27. The southern battle — Veralyn</h4>
+<p>Valdais is fighting an army whose local support has changed. The turned barons deny him a lateral road and a supply point, admit royal troops across a passage he expected held against them, or threaten the connection to his Belworth crossing. Choose a small number of these concrete actions. They must happen at places introduced before the battle; no new host appears over a hill solely because Fayd said it would.</p>
+<p>Veralyn and Tylan force the decision. Her attack fixes the main enemy force while the restored routes let her move a reserve that Valdais cannot safely ignore. Seniro keeps the necessary passage open under pressure. The queen's combat can be fierce and personal, but her decisive action is an order made with imperfect reports, not a duel that causes thousands of men to change allegiance at once.</p>
+<p>Valdais reacts intelligently. He attempts to reopen the threatened route and preserve his crossing. He loses the contest for the ground that would let him sustain the offensive. Retreat becomes necessary before his army is trapped on the wrong bank. This is a decisive royal victory in the battle and a forced fallback by Valdais; it is not the destruction of every army he can ever raise or an automatic end to all his claims.</p>
+<h4>28. What turning costs — Elyas</h4>
+<p>Elyas holds a concrete part in the same battle: securing the passage for the turning lords, preventing an agreed surrender from becoming a massacre, and then facing Valdais's counterstroke against that route. His acquaintance with the lords helps get the agreement enacted. It does not make frightened captains obey orders they have not received.</p>
+<p>Berent performs a squire's task under danger—finding a remount, carrying a bounded message along a known route, or recovering someone Elyas cannot leave his command to reach. Do not make him win the battle through a child's miraculous insight. He sees Elyas refuse a pursuit that would abandon the people placed in his care. The restraint costs him a visible chance at glory and preserves the duty he accepted.</p>
+<p>Valdais falls back with part of his force still coherent. The victors hold the disputed ground. The reader should be able to say why he had to retreat and which human decisions made it happen. Reports of the victory will soon give those decisions a simpler author.</p>
+<h4>29. The useful office — Jaennis</h4>
+<p>The permanent intelligence office promised to Fayd is confirmed as part of the settlement. The lords have performed enough of their undertakings to change the battle; the queen keeps her side of the deal. Walsingham is the author's comparison for his function: intelligence, correspondence, informants, negotiation, and the ability to connect knowledge to action. It is not an in-world title or permission to import another state's exact institutions. The formal title is a drafting choice; the permanence of the office, its intelligence function, and its place under the crown are already agreed.</p>
+<p>The office has a sponsor, duties, access, funding, and a reporting relationship to the reigning queen. Jaennis has helped create his position and has to live with the degree to which people now bring matters directly to him. His appointment is defensible: the lords turned, the battle was won, and somebody has to maintain the undertakings that made both possible.</p>
+<p>Fayd now makes the further choice the novel has prepared: he will groom Veralyn to become empress of a new Utaran Empire. His first outward act can be a request to open correspondence with people whose usefulness extends well beyond the defeated lords. He proposes cultivating their allegiance to Veralyn herself. Jaennis notices the reach of the proposal; the reader knows enough of his earlier politics to understand why this is a change of method rather than an abandonment of the Vigil. Lyra is present in her now-established court role. When asked to confirm a point about the old testimony, she answers exactly, including an inconvenient limit. The office is confirmed anyway. Her continuing place gives the court another attentive witness; it does not magically prevent a bargain the queen has chosen to keep.</p>
+<p>Jaennis's court celebrates. She has prepared Veralyn's return as carefully as the audience that secured Fayd's offer. A woman of the company catches the queen's interest; Jaennis facilitates their conversation and receives Veralyn's familiar affection in the same evening. The reader sees that she wants both. Keep the actual degree of the queen's participation a matter of behaviour and implication, not an announcement of the arrangement's rules. Jaennis has begun drawing her in, not acquired ownership of her desires.</p>
+<p>End the court movement with two distinct projects taking their first successful steps: Fayd's imperial design and Jaennis's intimate arrangement. They need not know each other's intentions. Both depend on a queen who has just demonstrated that she can make formidable choices of her own.</p>
+<h4>30. The household he chooses — Elyas</h4>
+<p>Give the military ending a human consequence. Elyas returns to Mara without treating survival or victory as an answer to the question he asked her. The working endpoint is a publicly stated intention to marry, accepted by Mara on terms they have discussed. This settles his willingness to stand behind the choice while leaving the wedding's timing open. If the author prefers the marriage itself, it can occupy this place without changing the battle's outcome.</p>
+<p>Berent is now visibly part of their household. Harald's inadequate response is still a fact of their lives. Constano is not suddenly restored to every confidence. The rebellious lords have returned to obedience on new terms. Fayd has a position that cannot be dismissed as a temporary necessity any longer.</p>
+<p>The final scene should allow pleasure. Elyas and Mara have wanted a future together; deciding to attempt it need not be staged only as a catalogue of punishment. The scandal persists outside the room. Inside it they can laugh, disagree over something ordinary, and begin making arrangements. He has stopped waiting for universal approval before naming the life he wants.</p>
+<h3>Optional coda — A small gift, later</h3>
+<p>The main novel ends with the military victory and its personal and political settlement. Riarhin's return with Kalrantha belongs after an explicit time interval, either here as a short coda or in the next novel's prologue. Preserve the graveyard meeting with Veralyn as the existing forward seed; its placement is still open.</p>
+<p>If it closes this book, the reader has just seen Veralyn win through hard decisions and an effective bargain. Riarhin then gives her a small, apparently inert thing for reasons grounded in their relationships and the completed southern journey. No one explains it and nothing performs. The coda begins the next danger without claiming that the amulet caused the war just concluded. It must not displace the novel's earned ending with an unresolved climax.</p>
+<h3>Information, evidence, and restraint</h3>
+<p>Dispatches require carriers, routes, and time. A report can be accurate when sent and useless when received. Track what each viewpoint knows at the start of a decision, especially after Fairport. Constano's isolation and Fayd's effectiveness depend on the reader understanding this difference.</p>
+<p>Keep the different operations distinct. The Vigil incited the valley barons, and Fayd's enduring connections let him negotiate their turn. Valdais's middle-canton support enables the coordinated attacks on Marcott and Fairport. Fayd ultimately intends to turn Veralyn's success toward imperial restoration under her. None of this requires every rebel, corsair, earl, and claimant to obey one hidden commander. His network contains people who must be persuaded and paid, and whose interests may change again.</p>
+<p>Preserve the western evidence. If its reception is obstructed, identify the person and reason. If Fayd anticipates it, show what he could have known. If Elyas cannot turn a suspicion into an accusation, make the evidentiary limit clear. The plot should never require him to forget a conversation the reader remembers.</p>
+<p>Keep Lyra outside the fair company while allowing friendships across that boundary. Her wary teachers have their own interests; she learns from them rather than inheriting their conclusions. Her observations cannot reveal private plans she has no evidence for.</p>
+<p>Give the fair company relationships outside Fayd's work. Give Mara scenes with desires beyond marriage, even when seen through Elyas. Give Berent something to learn other than swordplay. Give the barons consequences in the lives of people beneath them. Give Valdais victories that cost his opponents something particular, rather than measuring danger by the number of times he is called formidable.</p>
+<h3>Use of the older succession-war notes</h3>
+<p>Retain as useful texture the Fenwoods' commercial and engineering inheritance, their code-switching between formal and familiar names, Seniro's intelligence beneath a forceful public manner, Tylan's dry humour and preparation, Veralyn's dancing and appetite for songs as well as fighting, and Jaennis's carefully managed appearance of innocence. These details can make scenes livelier without restoring an obsolete timeline.</p>
+<p>Do not import the old roster wholesale. The older spymaster assignment does not automatically block Fayd's new office; establish the present organisation rather than silently treating an old list as a surviving appointment. Do not conflate Alric, Elyas's travelling companion, with an older court officer because their names resemble one another. Do not bring Rekedim back from the west to fill an old bodyguard line.</p>
+<p>The author has now confirmed the useful heart of the old relationship premise: Jaennis loves Veralyn, Veralyn has inherited Baldvyn's womanizing, and Jaennis intends to exploit that appetite by drawing her into the fair company. Do not import every older anecdote about their childhood or lovers along with that confirmation. Old allegations about poison, childhood, religious motives, and genealogy remain subject to the revised novels. The separate Vendan travel scene is a source of possible character texture, not a subplot this book must adopt.</p>
+<h3>Remaining placement and drafting choices</h3>
+<p>Riarhin's later gift of Kalrantha can be this novel's coda or the following novel's prologue. Either placement keeps her absent during the main action and avoids attributing Veralyn's victory to the amulet. The working treatment recommends leaving the gift for the next prologue so that the battle, Fayd's appointment, and Elyas's commitment have room to settle here; this recommendation is not a settled change.</p>
+<p>The title remains a working label. The battlefield's exact site, Fayd's formal office title, the individual pardons and privileges offered to the barons, and the fair company's final names can be selected in drafting without changing the agreed arcs. The treatment ends Elyas's romance on an accepted public intention to marry, leaving the ceremony for later unless the author chooses to include it here.</p>
+</body>
+</html>
