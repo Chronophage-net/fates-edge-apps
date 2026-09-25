@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-23T15:16:57.585Z",
+  "generated": "2026-09-25T01:26:37.449Z",
   "documents": [
     {
       "id": "srd",
@@ -386,6 +386,16 @@
       "path": "/data/docs/resources/",
       "category": "resources",
       "categoryLabel": "Resources",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "after_the_belworth_war_preview",
+      "title": "After The Belworth War Preview",
+      "file": "Fates_-_Edge_-_-After-_-The-_-Belworth-_-War-_-Preview.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1120,6 +1130,16 @@
       ]
     },
     {
+      "id": "the_belworth_war",
+      "title": "The Belworth War",
+      "file": "Fates_-_Edge_-_-The-_-Belworth-_-War.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_belworth_war_outline",
       "title": "The Belworth War Outline",
       "file": "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Outline.html",
@@ -1733,7 +1753,7 @@
       "active": true
     }
   ],
-  "total_count": 114,
-  "active_count": 114,
+  "total_count": 116,
+  "active_count": 116,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
