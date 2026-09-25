@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>After The Belworth War — A Working Treatment</title>
+<style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .movement-kicker { display:block; font-size:0.72rem; letter-spacing:0.18em;
+            text-transform:uppercase; color:var(--text3); margin-bottom:0.25rem; }
+        h2 { margin-top:2.6rem; }
+        .tale-meta.place { text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.1rem; }
+        .instrument p { font-family:var(--serif); font-style:italic; }
+        hr.scene-rule { border:0; border-top:1px solid var(--border); margin:1.6rem auto; width:38%; }
+        .marginalia { font-family:var(--serif); color:var(--text2); }
+        body > p, .story p { font-family:var(--serif); font-size:1.02rem; }
+        pre.figure { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:0.78rem;
+            line-height:1.35; overflow-x:auto; padding:1rem 1.1rem; border:1px solid var(--border);
+            border-radius:6px; background:var(--bg2,rgba(127,127,127,0.06)); white-space:pre; }
+        table.reckoning { border-collapse:collapse; margin:1.4rem 0; font-size:0.92rem; width:100%; }
+        table.reckoning th, table.reckoning td { text-align:left; padding:0.35rem 0.8rem 0.35rem 0;
+            border-bottom:1px solid var(--border); vertical-align:top; }
+        table.reckoning th { text-transform:uppercase; letter-spacing:0.08em; font-size:0.74rem;
+            color:var(--text3); border-bottom:1px solid var(--text3); }
+        .tablewrap { overflow-x:auto; }
+        ul { font-family:var(--serif); }
+</style>
+</head>
+<body>
+<h1>After The Belworth War</h1>
+<h3>Working treatment — second volume of the Belworth duology</h3>
+<p><strong>Status.</strong> A proposed treatment built from the author's decision ledger, the completed first novel, <em>The Last Blade</em>, and <em>Paget</em>. The title is a working label. The author has now selected permanent confinement for Valdais and confirmed that Fayd conceals the assassination method from Veralyn. The author has also specified the assassination’s political purpose: Fayd removes the River Lords’ greatest obstacle to joining him and makes her death an implicit threat to those who still refuse. An approach from the Mound, recognising Veralyn as Gelfrey’s heir, is a proposed further thread; her response remains open. Vaelrie genuinely loves Ouen and Jaennis, grows increasingly distracted by the fair company, and is no longer someone Jaennis will use as a political instrument. Jaennis’s love should appear real while remaining known through conduct. Supporting scenes and the final arrangement of chapters below remain proposals for this book.</p>
+<p><strong>The boundary.</strong> Riarhin does not enter the main narrative. She supplies no message, intelligence, intervention, or unseen solution on which this war depends. Her return and the gift of Kalrantha may appear in a separately marked coda after this novel has ended, or as the prologue of her next book. This treatment prefers the latter while keeping both placements available. Neither Kalrantha nor a revelation about it causes the settlement of the Belworth war.</p>
+<p><strong>The novel.</strong> Valdais has lost at Hollin and still has an army. Through the winter, Ouen struggles to keep the household supplying that army from Adria. Cedric Aeryl accepts a way out of his own disgrace: Fayd will make his disaffection useful, placing him with Dame Ysabeau de Corvaunt among the middle cantons. She becomes the first commander to give him sustained responsibility and teach him how to carry it. When Fayd requires him to kill her, he understands what he is destroying and does it. Her death removes the commander the River Lords most fear if they abandon Valdais, while demonstrating what Fayd can do to someone he wants removed. Valdais loses the coalition that lets him remain in the field. Veralyn confines him for life, and his children begin receiving letters from the house where their grandmother was once confined.</p>
+<p>Ouen finishes with less freedom to blame his father for the choices in front of him. Cedric finishes with greater authority and a murder that his new colleagues consider successful work. Neither education needs to be described to the reader as a lesson.</p>
+<h3>Inheritance and necessary corrections</h3>
+<p>This is a sequel to the actual ending of <em>The Belworth War</em>. Hollin remains a real victory. Valdais's orderly withdrawal, the surviving horse under Ysabeau, the unresolved delta, Fayd's new office, and the queen's restrictions on that office all remain consequential. The new book does not repeat the northern campaign or expose Hollin as a meaningless feint.</p>
+<p>Begin after Hollin, with its first notices reaching Adria. Carry the story through winter into the following spring. The first war began in spring 841; the first novel's late-season battle is followed by this winter and spring, rather than by another spring campaign in the same year. A numbered calendar would place the new spring in 842. Keep the treatment's scene dating seasonal until the travel and correspondence intervals are laid out. Ouen's opening is his present adult life, not a flashback to before <em>Paget</em>. His father has long since crossed the Vhasian Scar.</p>
+<p>Use <strong>Cedric Aeryl</strong>, <strong>Edran Aeryl</strong>, and <strong>Baron Lorran Aeryl</strong>, as in <em>The Last Blade</em> and Berent's release in the first novel. The ledger's “Aeyl” is treated as a spelling discrepancy, not a new family. Use <strong>Dame Ysabeau de Corvaunt</strong>, not “Ysebeau.” Her home canton need not be assigned a new name merely to make her political role legible.</p>
+<p>Cedric is the younger son who collected unlawful tolls at Whiterun, was scarred by Riarhin, and fought Elyas under terms that reopened the road. Elyas allowed the first blood that settled the affair; Cedric's private account of that encounter need not recognise the generosity. His allowance was assigned to restitution. Edran is the heir who helped stop the hunt and carry out the settlement. Lorran is now too old to sit a horse, as the new ledger establishes; neither son can count on their father riding out to repair what they have done. Cedric's knowledge of the Viterran approaches to Tarlington Ford is a genuine qualification. Do not merge that ford with the Whiterun toll site or with Kettling merely because all three concern river movement.</p>
+<p>Halden is a competent household administrator whom Elianor left with Ouen. He is not a covert minder sending a private account of every failure to her. The preview's discovery that his correspondence contains ordinary business remains true. His connection to the grandmother explains why Ouen cannot dismiss him as an interchangeable servant; it does not make Ouen's suspicions correct.</p>
+<p><strong>The unnamed house needs one correction to the ledger.</strong> Baldvyn II imprisoned Elianor after the Longblood Defiance. Veralyn did not imprison her grandmother. In this book Veralyn consigns Valdais to that same house. Keep its location and proper name unrevealed. Reusing it does not establish Valdais's biological parentage, which remains a deliberate and irrecoverable uncertainty.</p>
+<p>Valdais's children are Ouen, Maegwen, and Vaelrie; their mother Madilyn died, and Taliya is the wife who raised Vaelrie. Valdais's love for his family and his repeated infidelities coexist. Ouen has seen enough to know this and is capable of addressing the embarrassment instead of the hurt. Baldvyn's similar conduct belongs in the family's remembered experience. Wymund IV's fidelity must not be erased to make a neat hereditary pattern.</p>
+<h3>Viewpoint and scale</h3>
+<p>Use <strong>Ouen and Cedric as the two principal close-third viewpoints</strong>, with Vaelrie's letters embedded in Ouen's chapters. No Fayd, Valdais, or Ysabeau interior viewpoint. Their actions must remain intelligible, but Cedric does not acquire access to every secret because he serves one of them.</p>
+<p>The two cameras narrow an ensemble established in the first book. That is useful: the court and the Fenwoods are now encountered by people who have reasons to resent, misunderstand, or distrust them. Ouen is Veralyn's enemy's son and Jaennis's correspondent's brother. Cedric is Berent's former household companion, Elyas's former opponent, and Fayd's recruit. These connections give the returning characters scenes with work to do.</p>
+<p>Plan for roughly <strong>28–32 substantial chapters</strong>, grouped into five parts. This is a full second novel, provisionally comparable in extent to the first, rather than thirty brief connective scenes. A chapter should contain a developing encounter with an outcome its viewpoint must live with. The treatment below groups sequences; these are not instructions to give every sequence exactly one chapter. Letters should complicate or precipitate an encounter, not substitute for it.</p>
+<p>Ouen's attention is exact when he has chosen to give it: a hawk's feet on the glove, a child's disappointment, a slight in his father's wording. His failures arise when he must hold several people's needs in mind and make an unwelcome choice. Preserve his humour, vanity, skill, and affection. He must never be revealed as a thwarted military genius.</p>
+<p>Cedric begins by attending to rank, recognition, and who has laughed at him. Under Ysabeau he learns to ask who must perform an order and whether that person has what it requires. Under Fayd he learns to make another person's circumstances useful. These capacities grow together. His assassination cannot be the sudden discovery that he was a different sort of man all along.</p>
+<h3>What the River Lords want</h3>
+<p>The middle-canton lords who backed Valdais have paid for horse, stores, and the northern approach to Marcott. Some expect toll income; some want protection from larger neighbours; some want an enforceable limit on the crown's interference. Hollin has made them doubt the return on their expenditure. It has not made them eager to place themselves individually at the mercy of the victorious queen.</p>
+<p>Keep them distinct from Maresse, Lisle, and Corbel, whose specific undertakings made Hollin possible. The first book's turned lords now have to honour their pardons and obligations. They are evidence used in the new negotiation, not a fresh set of rebels waiting to perform the same turn again.</p>
+<p><strong>Fayd's proposed objective:</strong> obtain separate, registered agreements from the southern river houses that deny Valdais further military transit, credit, and fresh levies. In exchange, Veralyn will recognise specified local rights, hear disputes, and protect agreed commercial passage. What Fayd wants beyond the immediate war is the right to bring those houses' disputes and correspondence directly to Veralyn. A recurring relationship with her personally can grow into imperial allegiance later.</p>
+<p>Veralyn cannot annex every Vhasian canton by signing a Viterran pardon. Her authority as queen and Duchess of Aberiel must be distinguished. For houses beyond her jurisdiction, the instruments concern passage, protection, arbitration, and undertakings they can lawfully make; they do not magically erase their existing lieges. Some houses will refuse. Fayd can win enough without winning all.</p>
+<p>The future empire appears in the arrangement of audiences, envoys, and accepted petitions. Nobody ends this book by proclaiming a new Utaran Empire. Fayd remains committed to the Vigil while redirecting its ambition towards a sovereign who can actually command loyalty.</p>
+<h3>Why Fayd has Ysabeau killed</h3>
+<p><strong>Authorial decision.</strong> Fayd is wooing the River Lords. Ysabeau is their greatest threat if they join him. Removing her says, in effect: <em>I have removed your greatest threat to joining us. Do so, or you are next.</em> This is the political purpose of the assassination. It does not depend on her having invented a rival peace compact or become a neutral broker.</p>
+<p><strong>Proposed practical basis.</strong> Ysabeau commands the mobile force capable of reaching a wavering house before the queen can protect it. She knows the cantons, their captains, and which approaches remain usable when the main roads fail. Hollin demonstrated that she could bring a disciplined force away from defeat. A lord can doubt Valdais’s prospects and still believe she will reach his household if he withdraws the support he promised.</p>
+<p>Make that fear visible before Fayd exploits it. At a meeting, a lord who welcomes the offered terms refuses to send the letter that would commit him. Cedric recognises the ford or estate the man is trying to protect. Elsewhere he sees Ysabeau enforce an undertaking against a house that has held back its men or supplies. She gives clear terms and performs the threatened seizure when they are refused. Her personal kindness and honour do not prevent her from being a formidable instrument of Valdais’s campaign.</p>
+<p>Fayd first offers benefits the lords actually want: recognised rights, reliable access, hearings, protection. Their repeated answer concerns who can protect them from Ysabeau in the interval between declaring and receiving help. He learns this from several negotiations, including Cedric’s reports. Killing her answers the objection and supplies a second reason to accept him.</p>
+<p>The message is understood without a public confession. Fayd need not send her head or write a threat under the queen’s seal. A confidential assurance before the death, an informed messenger afterward, and the prompt return of terms already discussed can be enough for a particular lord to understand whose protection is being offered. Let one negotiator ask who now guarantees his own safety. Fayd’s answer gives him a way to consent while keeping the threat outside the instrument.</p>
+<p>Her companies do not dissolve when she dies. A deputy can fight; another officer can punish an exposed household. What is lost is her particular combination of command, local reach, and authority over contingents that do not readily obey one another. Fayd has only a limited opportunity before Valdais repairs that command. The queen’s advance and the actual protections promised must arrive in that interval.</p>
+<p>Different houses respond differently. One joins for the benefits; one joins because he is frightened of Fayd; one delays and sends his family away; one remains with Valdais. Do not kill every holdout as a repeated demonstration. The credibility of <em>you are next</em> changes the negotiations without making Fayd all-powerful or his promises unnecessary.</p>
+<p>Veralyn has authorised the negotiations and the offer of protection. She has not authorised the murder. The instrument she receives records what the lords undertake and what she owes them. Fayd conceals how he made acceptance possible. His breach of her limits remains his deliberate act, not a secret meaning the narrator assigns to her lawful orders.</p>
+<h3>The Mound’s approach</h3>
+<p><strong>New possibility from the author.</strong> The Mound recognises Veralyn as Gelfrey’s heir and may approach her during this volume. What she does with the recognition remains unresolved. This thread carries forward the altar at Eryas, Shadowsteel, and her conduct on the Hollin field without requiring Kalrantha or Riarhin.</p>
+<p>Keep the Mound distinct from the Bloody Table and from the fanatics of the Aelerian Uprising. The older Mound conducts hidden hearings and does not seek a throne. Its doctrine joins the making of war to the suffering of it; a person cannot claim one and disclaim the other. Gelfrey’s association with the uprising does not retroactively make that uprising a Mound operation. The Mound can recognise an inheritance passing through him without endorsing everything he did.</p>
+<p>The recognition is theirs to state. Do not turn it into an omniscient confirmation that Myrmis has appointed Veralyn, or into a recoverable genealogy. They are approaching her as Gelfrey’s successor in a religious or judicial responsibility, not establishing a new dynastic claim. Precisely what duties they expect should be developed through the encounter rather than settled in this treatment.</p>
+<p><strong>Proposed placement:</strong> during Ouen’s winter visit to the royal household in Part II. A person seeking a private audience reaches Veralyn through the ordinary hearing arrangements. As Ouen’s business concludes, he is present long enough to hear Gelfrey named and the recognition made. Veralyn has the visitor admitted privately; Ouen leaves. He can later tell Vaelrie what he heard without knowing what passed in the interview. This keeps Cedric in his undercover position and does not require a third viewpoint. The Mound need not reveal itself publicly to the whole court.</p>
+<p>A later request or returned object can keep the approach alive, but do not supply an acceptance or refusal by implication. No Mound order commissions Ysabeau’s murder, licenses Fayd’s work, or dictates Valdais’s sentence. Those choices must retain their existing human causes. The approach raises a further claim on the queen that Fayd did not arrange and Jaennis cannot automatically interpret.</p>
+<h3>Part I — The household left behind</h3>
+<h4>The Duke's Morning</h4>
+<p>Open with the existing Ouen preview. The hawk damages the letter; Halden explains the horses, fodder, and competing demands on the granaries; Ouen escapes into a task at which he is good. Retain the child with the oversized glove, the father he wishes could admire the hawk without asking about the ditch, and the belated instruction to move the grain.</p>
+<p>Clarify Halden's connection to Elianor with one natural recollection. No introductory family diagram. The next scene discovers what Ouen's delay cost: the hired teams have waited all day and cannot complete the movement before dark. A carter needs to return to a sick household member; someone must decide whether he can leave with his wage and who takes his load. Halden can arrange the work once Ouen chooses. Ouen cannot make the loss disappear by becoming annoyed at the explanation.</p>
+<p>A letter from Valdais describes Hollin as a withdrawal to better ground. A returning horse arrives with a wound badly described in the same packet. Ouen cares about the animal and has to hear its rider's account before the horse can be treated. Let the defeat enter his household through something he will look at.</p>
+<h4>A second son with a useful grievance</h4>
+<p>Cedric comes to Fayd through the business left over from Whiterun. His restitution still limits his allowance and his standing at home. He expects a man of Fayd's new importance either to patronise him or to erase the inconvenience. Fayd does neither. He asks Cedric to describe the approach to Tarlington Ford and challenges a point that someone who only knew the map would get wrong.</p>
+<p>The interview establishes that Fayd has checked Cedric's history. The scar, Edran's position, and the household grievance will support an apparent defection. Cedric resents being valued for an embarrassment, but Fayd is the first man to offer him a consequential use for what he knows.</p>
+<p>He accepts an intelligence placement, not an assassination commission. His initial instructions concern the River Lords, their intentions, and Ysabeau's access. He is told that he can be brought out if the position fails. Fayd does not promise that this is the whole of what he may eventually ask.</p>
+<h4>Brother and sister</h4>
+<p>Vaelrie writes to Ouen because she loves him and wants to hear from him. She thinks he is a twit, has ample evidence, and would be hurt if he stopped writing. Keep the particulars of <em>Paget</em>: she has learned to date letters, distinguish an affectionate answer from a commitment, and ask a question her father cannot satisfy by praising her. Give their early correspondence a remembered pleasure, a question about his child, and a piece of nonsense that only he will understand. Her perceptiveness must not make every letter a correction.</p>
+<p>Ouen complains about Halden and asks her to explain his father's wishes. She answers the question he actually asked, including an inconvenient detail about the household. Their shared childhood gives them room to be funny and occasionally unkind. When she goes too far she can mend it without withdrawing the point. She can recognise his evasion without delivering a diagnosis of it, and be pleased by a small success he has not thought worth reporting.</p>
+<p>The chapter ends with a choice about which portion of her letter he repeats to Halden. That choice affects an impending provision for Taliya's household. The woman his father betrayed is not just the occasion for a witty family comparison.</p>
+<h4>Taking Cedric in</h4>
+<p>Cedric's break with his family is staged around a real quarrel. Edran does not need to know the operation; the resulting hurt and practical consequences are genuine. Cedric cannot later demand that his brother treat the quarrel as theatre.</p>
+<p>Ysabeau receives a disgruntled second son who knows a useful crossing. She checks what can be checked and gives him a limited duty under supervision. His grievance earns him a hearing, not a seat beside the command papers. His first task is to escort men who have already had their horses taken for someone more important. He tries to order compliance and fails. Ysabeau makes him stay until the actual problem is settled.</p>
+<p>End the part with Cedric's first useful report reaching Fayd and Ouen's first letter to Vaelrie describing a decision he has made more impressively than he made it.</p>
+<h3>Part II — People who keep their word</h3>
+<h4>An apprenticeship with consequences</h4>
+<p>Give Ysabeau and Cedric several shared scenes before trust deepens. He carries an instruction whose route becomes unusable and returns having obeyed the words but failed the task. She makes him account for the men left waiting. On another occasion his knowledge of a crossing saves a contingent a needless detour; she credits him in front of the captain who mocked his scar. Both encounters matter to him.</p>
+<p>She admits an error of her own and changes an order. He has not previously seen that improve a commander's authority. She also makes decisions he dislikes: enforcing a lawful requisition, returning a deserter to a household that wants him punished, keeping a canton in a dangerous position because it undertook to hold it. Her competence and warmth do not require modern moral innocence.</p>
+<p>Retain Bastian and the woman she called her companion at the exchange with Seniro. Let Cedric meet that woman in an ordinary setting, with work and a relationship that existed before his arrival. She need not become his confidante. Ysabeau's private life must not exist only to make her death sadder.</p>
+<h4>The bill for Fairport</h4>
+<p>A conference over stores or damaged cargo puts Ouen in the same room as Constano and Tireno representatives. Their access is under a limited safe-conduct, not an implausible social reunion. Valdais's army still benefits from the delta, and the households displaced by the sack still have claims.</p>
+<p>Ouen has heard “corsairs” used to put distance between his father and the burning. Constano brings a survivor who needs a named warehouse's ownership established so she can reopen her trade. Ouen recognises the mark on a consignment in his own stores. He cannot resolve the sack, but he has to decide whether this particular property will be returned or used for the army.</p>
+<p>Constano neither recovers Fairport with a signature nor loses his judgement because he uses a cane. He can restart a small line of exchange if Ouen honours one guarantee. This creates a working connection that matters at the end, when Ouen needs a promise believed on the other bank.</p>
+<h4>The court encountered from outside</h4>
+<p>An independently arranged negotiation brings Ouen to a court encounter under truce, or to a temporary royal household receiving negotiators close enough for the journey to be credible. Establish the travel time before placing the scene. Vaelrie is delighted that he is coming. Her letters arrange the sibling visit, not the negotiation; Jaennis has not used her to draw him there. He goes to defend an Adrian interest and to see his sister, and the two purposes remain distinguishable.</p>
+<p>The fair company is visible as a social life he only partly understands. Its members enjoy themselves, disagree, and pass information through relationships that Fayd's office does not own. Vaelrie keeps turning towards a voice elsewhere in the room. She loses the thread of something Ouen is saying, apologises, and asks him to begin again; he can tell she really wants to hear and is not entirely succeeding. In later letters a particular woman appears more often than Vaelrie notices. Keep the developing attraction and distraction gradual, in attention, anticipation, music, conversation, and whom she hopes to see. Membership of the household is not an automatic declaration about her intimate life.</p>
+<p>Jaennis’s refusal to use her has a practical test. Fayd or an envoy asks that Vaelrie put a question to her brother which he would answer more freely for her. Jaennis refuses. If the crown wants the answer, it must ask Ouen through its own representative. The opportunity passes or becomes harder to obtain. Jaennis does not secretly ask the same question through one of the company afterward, and she does not tell Vaelrie what a sacrifice she has made. Her other political dealings remain sharp. This particular boundary is real.</p>
+<p>Veralyn receives him with Tylan present as Lord Marshal. Their practical ease disturbs the picture of a queen ruled by a pleasure-loving court that Ouen has brought with him. Jaennis notices where Veralyn turns for an answer. Keep the future marriage an available development, not an announced settlement needed to finish this war.</p>
+<h4>The protection the lords ask for</h4>
+<p>Cedric attends a meeting at which Ysabeau requires a river house to fulfil its commitment to Valdais. The household has been considering Fayd’s offer. Ysabeau knows which promise has been broken, names the remedy, and can enforce it. She avoids needless humiliation and leaves the lord very little choice. Cedric admires how she does it and reports the encounter accurately.</p>
+<p>Fayd’s reply asks which houses would change sides if that force could no longer reach them promptly, and which captains could take Ysabeau’s place. Cedric understands the questions as preparation for a military operation. They are also preparing Fayd’s answer to the objection he keeps hearing in his negotiations.</p>
+<p>One of Cedric's reports helps prevent an unnecessary seizure or releases wages otherwise withheld. He experiences usefulness inside Fayd's service before he is asked to kill for it. His continued service cannot rest entirely on threats.</p>
+<h3>Part III — An agreement that might hold</h3>
+<h4>Ouen promises too much</h4>
+<p>Two Adrian claimants need the same remounts or stores: the army's officer carries his father's request, while a tenant representative has an existing household undertaking. Ouen gives each a sufficiently pleasant answer to let the visitor leave satisfied. Halden discovers the collision when both arrive to collect.</p>
+<p>The correction happens in front of the people affected. Ouen cannot punish Halden into producing a second lot of horses. He names which promise will be broken and pays something of his own to reduce the harm. The expense does not make his original conduct clever. His wife sees what he did, and the scene at home need not end in an argument; her refusal to praise the repair can be harder for him.</p>
+<p>Later he keeps a small promise to his child at an inconvenient time. It remains a small promise. The novel need not award him a governing philosophy for it.</p>
+<h4>Cedric becomes someone Ysabeau needs</h4>
+<p>A disputed withdrawal gives Cedric a bounded command. His local knowledge helps, but he succeeds chiefly because he asks a subordinate the question he once would have considered beneath him. Ysabeau backs his decision when a noble protests. That public trust gives him access she would not have granted to a man merely good at flattery.</p>
+<p>She includes him in preparations to secure the cantons’ spring commitments and keep their contingents available to Valdais. A place is proposed for him after the campaign: enough pay, a real duty, a future in which his name means something besides Whiterun. He wants it. Do not make the alternative obviously temporary or secretly a trap.</p>
+<p>In reporting the offer to Fayd, he discovers that arrangements for his extraction have been made farther in advance than he expected. A return route is already paid for; a person he thought served only an ordinary commercial purpose knows which authority will receive him. Keep the exact practical arrangements for the draft, but establish them before they are needed. The later escape must depend on people being where they undertook to be, with room for delay and failure.</p>
+<h4>The first book's household grows</h4>
+<p>Ouen and Vaelrie's connection to the Fenwoods makes attendance at Elyas and Mara's wedding possible under the same limited truce arrangements. The wedding is proposed for this part, after the first book's public commitment and with Mara's work continuing. Keep its social awkwardness particular: a seating decision, the use of her title, someone assuming she will now stop nursing. Elyas and Mara have already chosen one another; do not rerun the courtship as a fresh test of whether he is ashamed of her.</p>
+<p>Berent belongs to their household now. Cedric hears of the wedding through a letter from home and resents how easily the former page appears to have acquired a future. He remembers that Berent read the duel terms. The two men can meet only later, when their journeys actually bring them together; coincidence is not needed to force the parallel.</p>
+<p>This domestic sequence belongs to the war through safe-conducts, leave, and the people who must return to duties the next morning. It also deserves space for pleasure. The pear tree was a promise of ordinary life; the sequel should let some of that life happen.</p>
+<h4>A letter begun twice</h4>
+<p>As spring approaches, Vaelrie’s letters become less punctual and more crowded with the company’s life. Ouen suspects she has been persuaded to forget him. She answers that accusation with hurt and affection, then lets another appointment intrude on the reply. She is discovering pleasures and attachments that do not revolve around her father or brother. That does not reduce her love for them.</p>
+<p>Her love for Jaennis also needs room apart from politics or the company’s attractions. During Ouen’s visit he sees her bring Jaennis a small comfort, wait through an inconvenient piece of business, or know when she wants company without being asked. Jaennis makes time for her when there is no audience to impress. Keep Vaelrie’s age continuous with <em>Paget</em>, where she was sixteen in Octis 840; the winter and spring here do not license an unexplained leap in age or experience. This movement is carried through affection and changing attention.</p>
+<h4>The instruction changes</h4>
+<p>Veralyn instructs Fayd to separate the river houses from Valdais and obtain reliable passage before the spring advance. Her instructions remain bounded, written, and consistent with the office she established. There is no coy royal phrase that quietly amounts to permission to kill.</p>
+<p>Cedric receives the further order in private: Ysabeau must die before Valdais’s spring dispositions are complete, and the preparations he understood as insurance are to bring him out afterward. Fayd says that the River Lords have been asking who will protect them from her. He intends to give them an answer they can believe. He need not visit in person if the draft's geography will not support it; the instruction must nevertheless be authenticated beyond Cedric's reasonable doubt.</p>
+<p>Cedric proposes alternatives using knowledge Ysabeau has given him. Fayd can answer some objections and refuse others. He offers continued employment and real responsibility; he also expects obedience. Cedric has room to refuse and understands that refusal would cost the future he has begun to want. No magical compulsion, endangered child, or secret revelation that Ysabeau is monstrous should perform his choice for him.</p>
+<p>A further request from the Mound can recall the winter audience here without supplying Veralyn’s answer. If Fayd learns of it, he must learn through an actual source; the narrative does not give him automatic knowledge of every private encounter at court.</p>
+<p>End the part with Cedric returning to Ysabeau’s service while knowing what he has accepted. Stay within his knowledge thereafter. Do not hide the order from the reader during his remaining intimate scenes with her.</p>
+<h3>Part IV — Before the houses answer</h3>
+<h4>The last work they do together</h4>
+<p>Ysabeau and Cedric finish a difficult piece of ordinary command: getting a damaged contingent home, settling the provisions for the spring muster, or arranging a safe exchange with Seniro. Choose a task whose particulars have already been established. Her trust permits him to help successfully. Let the scene have its own immediate outcome rather than making every gesture a farewell sign.</p>
+<p>She gives him a correction or a future instruction that he will later use in Fayd's office. It should be technical and unremarkable in the moment. Avoid a deathbed aphorism conveniently delivered before she knows she is dying.</p>
+<p>Meanwhile Ouen sees his father's requests grow more urgent as the royal advance approaches. Valdais comes home briefly or summons him to a reachable headquarters. Their interview gives the father presence in his own family: charm, attention, temper, a real wish to protect them, and an expectation that their resources remain available to his purpose. He has a practicable spring operation pending, dependent on houses whose loyalty Ysabeau is helping keep enforceable. He is neither defeated already nor omniscient about Fayd.</p>
+<h4>Cedric kills Ysabeau</h4>
+<p>The killing is a close scene through Cedric. Access comes from the trust he has earned. It is not a duel, an honourable challenge, a battlefield accident, or a failed intervention that happens to fulfil the order. He knowingly murders her.</p>
+<p>Prefer a brief, ugly act to an elaborate mechanism. Do not give her a speech forgiving him or a final gesture that he can keep as absolution. She need not understand the whole betrayal before she dies. What he can see of her response is enough.</p>
+<p>His escape uses the prepared arrangements and suffers a practical failure already made possible in the earlier scenes. He has to make a decision for another person travelling with him. Saving that person can show what he learned from Ysabeau without compensating for killing her. He survives because the operation was prepared and because he has become capable of performing it, not because Fayd appears at the last moment with unlimited reach.</p>
+<h4>The interval opens</h4>
+<p>Fayd’s negotiators return to houses that have already seen his terms. The objection concerning Ysabeau can no longer be made in the same way. A lord receives the news of her death from a messenger who is too well informed, too soon, and who asks when his answer may be collected. The messenger does not need to threaten him aloud.</p>
+<p>In a negotiation Cedric witnesses after his return, a lord who has previously bargained at length asks instead whether his household will be protected once he signs. Fayd assures him of protection. The man asks what happens if he waits. The answer concerns the expiration of the offer, in language both men understand. Cedric sees the use to which her death is being put; nobody explains it to him as a lesson.</p>
+<p>Ouen receives two incompatible accounts of the killing and a request from a house whose horses were supposed to protect an Adrian consignment. Its lord now refuses to send them. Ouen has to decide whether to send the stores onward unescorted, hold them, or redirect them to feed the men coming home. He can see that someone is frightened and that a commitment has changed. He does not receive an explanatory report of Fayd’s whole operation.</p>
+<p>Cedric, extracted, hears what the office is saying happened. Its public account differs from what he knows. Fayd does not congratulate him on becoming a good man. He gives him work for which he is now trusted.</p>
+<h4>The checks still exist</h4>
+<p>Lyra and Pellam encounter expenditure or correspondence prepared before the news of the death. Their first concern is what the crown has authorised and what obligations are being incurred, not an immediate deduction of the murder. Let them obtain a correction or restriction that Fayd has to obey. The first book's independent chancery cannot become decorative just because his operation succeeds.</p>
+<p>The proposed end-state is that Veralyn receives a real account of the political results but is not told who killed Ysabeau or on whose order. Lyra retains a discrepancy; she does not yet possess proof of assassination. Whether the queen eventually learns belongs to a later decision. Nothing here treats her failure to know as secret consent.</p>
+<h3>Part V — The house that remains</h3>
+<h4>The army loses its campaign</h4>
+<p>The separate river agreements deny Valdais what he needs for another season: fresh contingents, credit, and reliable passage for stores. Tylan uses the roads actually made available. Seniro keeps pressure on the remaining force without throwing men into a final display of courage. One of the new promises fails and they must adapt. Their victory requires command after diplomacy has altered the ground.</p>
+<p>Give the final military sequence a different shape from Hollin. Valdais tries to bring his remaining columns together for a withdrawal that would preserve an independent field army. The royal forces prevent the junction and hold the route by which its stores must pass. Ouen encounters the men and baggage driven back into the household's reach; Cedric, now attached to the Correspondence at the royal headquarters, sees the terms tested against reports from the field. Neither camera narrates a battle it cannot see.</p>
+<p>Valdais retains enough force to make indiscriminate pursuit expensive. Veralyn can secure his person and disarm the coalition through surrender terms, provided his family and officers believe them. Her decision to offer confinement comes from this military and political situation. The amulet is absent. Shadowsteel supplies no answer. Allow one troubling moment in her attention or certainty to continue the Myrmis thread without demonstrating a new power.</p>
+<h4>Ouen's consequential answer</h4>
+<p>Valdais asks for something Ouen could still supply which would prolong resistance by consuming what the Adrian household needs to survive the settlement. Ouen has already promised those resources elsewhere. This time he understands both claims before answering.</p>
+<p>He refuses the additional commitment, while undertaking to secure the terms offered to his father and the returning men. Halden can advise, but Ouen has to give the refusal himself. It is late, painful, and sufficiently obvious that nobody needs to applaud. He remains capable of self-pity and of wanting his father to admire him for a choice his father resents.</p>
+<p>The refusal contributes to the surrender; it does not single-handedly defeat an army. Veralyn, Tylan, Seniro, the river houses, and Constano have created the circumstances in which it matters. Ouen's earlier return of a particular consignment gives Constano a reason to believe this undertaking, though not to trust every claim the family makes.</p>
+<p>Before the settlement, somebody proposes using Vaelrie’s access to make her father or brother accept the terms. Jaennis refuses again, this time with a larger advantage available. Vaelrie can choose to speak to her family or petition for them. Jaennis will help her make her own request and will not supply a political script disguised as a private letter. Give this refusal an identifiable witness and consequence so it remains more than an assertion that Jaennis has changed.</p>
+<h4>Permanent confinement</h4>
+<p>Valdais accepts terms that preserve lives and the Longblood household while ending his political freedom. Veralyn orders confinement for life in the unnamed house once used for Elianor. His military authority ends; the household's continuing tenure and Ouen's governing role are confirmed through the settlement rather than through a convenient declaration that Valdais is dead. The exact titles can be settled with the legal drafting. Until then, “the Duke” in Ouen's opening remains the household's anticipatory or teasing usage.</p>
+<p>His parentage is neither tried nor established. No confession, private letter, bodily resemblance, or narrator's aside supplies the lost answer. The choice of prison recalls a family's injuries without explaining all the motives of either generation.</p>
+<p>He may correspond with his children. <strong>Proposed practice, not a newly settled authorial rule:</strong> letters pass through a named custodian; personal correspondence is delivered, political instructions are withheld, and each withholding is recorded. This preserves the possibility of genuine family communication while giving the restriction a person responsible for applying it. Ouen and Vaelrie can receive the same letter differently. A guard does not have to be sadistic to make the boundary final.</p>
+<p>Vaelrie chooses to be with her brother for the family’s part in the transfer or its immediate aftermath. Jaennis lets her go without instructions to extract news or influence the terms. A practical kindness at the departure can bear more than a declaration of selfless love. Ouen accompanies the transfer far enough to see a good room and a guarded stair. The house remains unnamed. Valdais asks about his grandson, notices a small failure in the arrangements, and tries to have it corrected as though he were still conducting his household. Let affection and the habit of command persist in the same exchange.</p>
+<h4>What victory has made</h4>
+<p>Cedric receives responsibility within Fayd's office: agents, reports, and decisions that will send people into positions like his own. He applies a practice learned from Ysabeau and declines to explain where he learned it. Fayd knows he can be trusted with this kind of instruction. That is the promotion's meaning; the narrator need not call it corruption or redemption.</p>
+<p>A final encounter with Edran or Berent establishes that public usefulness has not repaired every relationship. Cedric's restitution is not erased from the record to clear room for a royal career. Ysabeau's surviving companion or a member of her company asks for effects or unpaid wages. Cedric is in a position to see the request honoured. He cannot make that kindness an answer to the killing.</p>
+<p>Fayd obtains the next set of audiences with the river houses. Veralyn reads the requests, asks an unwelcome question, and chooses which she will hear. Her powers of decision remain active; his success is in making those decisions serve a wider project. Jaennis retains her own access and company. Neither has become the sole author of the queen's future.</p>
+<p>End in Ouen's household after the first permitted letter arrives. He reads the lines about his son aloud and keeps a more difficult line to himself. He starts a reply while Halden brings him a piece of business he cannot postpone without inconveniencing someone already waiting. Ouen asks for an explanation, listens imperfectly, and gives the necessary answer before going out. His son's wooden hawk or properly fitted glove can close the family scene, provided it remains a child's object rather than a declared emblem of succession.</p>
+<p>The war ends. The family continues. Do not append Riarhin to this chapter.</p>
+<h3>Continuing the first book's threads</h3>
+<p><strong>Elyas, Mara, and Berent.</strong> Give their chosen household a lived existence and, provisionally, the wedding. Mara continues nursing or training at the stations on terms she makes herself. Berent has further ordinary duties and witnesses the cost of Cedric's return to favour. Elyas is entitled to distrust Cedric without being granted knowledge of his secret. Harald's earlier provision of a company remains an actual improvement; he need not become decisive or lapse into a caricature to make the younger men useful.</p>
+<p><strong>Constano and Fairport.</strong> The Tirenos' displacement and the damage to the ports require a material outcome. End with a quay or warehouse service reopening, a contested claim heard, and displaced households making choices about return. Do not restore both delta ports to their pre-war condition because Valdais is confined. Constano recovers a working reach through cooperation with local people; his foot and grief remain his own.</p>
+<p><strong>Seniro and Tylan.</strong> Both have work that cannot be replaced by Fayd's success. Seniro recognises the loss of an opponent who kept exchanges credible. He need not immediately suspect assassination. Tylan acts as the appointed Lord Marshal throughout. The ease between him and Veralyn continues, with Jaennis able to see that military confidence can become personal intimacy. A marriage decision is not required in this volume.</p>
+<p><strong>Jaennis, Veralyn, and the company.</strong> Let the household continue to be pleasurable and politically capable. It can transmit a request Fayd would otherwise control and contradict one of his accounts. Jaennis's love and wish to arrange Veralyn's appetites remain active. Veralyn's appetite remains hers. An old northern attachment such as Anneth need not return in person to prove it existed; if mentioned, preserve her right to have continued her own life. No new lover is required merely to illustrate the trait again.</p>
+<p><strong>Lyra and the western evidence.</strong> Her employment belongs to Pellam's chancery, not to Jaennis's company or Fayd's personal staff. Give the promised Amru hearing an explicit status: preferably a confirmed hearing and named witness arrangements, conveyed during Cedric's dealings with the chancery. Do not invent an acquittal or condemnation without consulting the western case. The Merrow proceedings remain separate from Fayd's appointment and from Cedric's new duties. A progress report is enough if this novel cannot responsibly conclude them; silence is not.</p>
+<p><strong>Vaelrie and Jaennis.</strong> Vaelrie genuinely loves her brother, thinks him a twit, and increasingly finds her attention claimed by the fair company. Her love for Jaennis is genuine too. Jaennis no longer uses her as a political tool. Show the change in refused opportunities and in privacy respected when information would be useful. Her love should be the convincing reading of what she does, without a narrator certifying her motives or a final reveal that every kindness was another operation. The company’s increasing place in Vaelrie’s life is her own developing attachment, not a recruitment programme. Ouen and Vaelrie may quarrel over her distraction and still seek each other when their father is confined.</p>
+<p><strong>The Mound.</strong> Carry the proposed approach through one encounter and a later sign that the question remains before Veralyn. Keep her response open, the Mound separate from the Bloody Table, and its recognition distinct from Fayd’s imperial design. An audience does not amount to allegiance.</p>
+<p><strong>The first turned lords.</strong> Corbel's drainage adjudication and the distinction between Lisle's pardon and his deficient service must survive into implementation. A result affecting real tenants is better than a council's assurance that agreements have been honoured. Successful performance here gives some southern houses a reason to consider the new terms. A failure or delay makes their fear of being left exposed to Ysabeau more reasonable.</p>
+<h3>Riarhin's separate threshold</h3>
+<p>The preferred placement is <strong>the prologue of Riarhin's next book</strong>. After this novel's settlement, she returns to Braedyn's grave and gives Kalrantha to Veralyn. Seniro already knows her; their acquaintance needs no introduction designed to join the two series. Her uncertainty about keeping such a small, hard-won prize can belong to her own account of the return.</p>
+<p>If used as a coda here, mark it as a separate movement after the completed Ouen ending. It must not reveal that the campaign, confinement, or assassination was secretly governed by the amulet. It should open the next problem without withdrawing this book's human causes or emotional conclusion. Do not dramatise both versions or fix a journey date merely to force the scene into this volume.</p>
+<h3>Drafting constraints and decisions still open</h3>
+<p>Follow the prose guide and its fiction guidance on transitions and consequential detail. Put the consequence inside an encounter wherever that encounter changes someone's choices. Keep summary for uneventful travel, elapsed time, and facts the reader already knows. Do not end each chapter by explaining which of the two men has learned more. Their letters, instructions, omissions, and work can show it.</p>
+<p>The military and administrative details need somebody present who wants an answer. A remount belongs to a rider; a frozen wage prevents someone leaving; a toll dispute decides who may take a harvest home. Avoid attaching a generic suffering peasant to every calculation. Minor characters can be impatient, mercenary, mistaken, or pleased with the terms.</p>
+<p>Preserve the established range of sexuality and relationships. Ysabeau's murder removes the River Lords’ greatest threat in joining Fayd and makes his willingness to kill part of the inducement. Her relationship with a woman is part of the life he destroys, not an explanation for her death. Cedric's regard for her remains real before and after it. Neither his mentorship nor his later service requires a romance.</p>
+<p>The five-part movement is settled only as a drafting proposal. Still open: the final title; the specific southern meeting place and battlefield routes; the names and precise jurisdictions of the new river negotiators; the extraction's practical details; the prison correspondence regulations; the degree of later suspicion among Lyra, Jaennis, and Seniro; the precise expectations expressed by the Mound and Veralyn’s response; the particular relationships through which the fair company draws Vaelrie’s attention; the final legal form of Ouen's succession or delegated government; and coda versus next-book prologue. None of these requires postponing the central treatment.</p>
+<p>The author-approved commitments are firm: Ouen opens; Cedric genuinely learns from Ysabeau, kills her, survives, and becomes Fayd's lieutenant; Fayd uses the killing to secure the River Lords through protection and implied threat, while concealing the method from Veralyn; Valdais lives in permanent confinement and can correspond with his children; his parentage remains unresolved; Vaelrie loves Ouen and Jaennis, is increasingly distracted by the company, and is no longer used politically by Jaennis; Riarhin is absent from the main story.</p>
+</body>
+</html>
