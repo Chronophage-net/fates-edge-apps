@@ -188,12 +188,18 @@ function generateDocsManifest(docsPath) {
       if (EXCLUDED_FILES.has(file)) continue;
       if (file.toLowerCase() === 'index.html') continue;
 
-      // Spanish editions carry their accented, reader-facing title in the HTML.
-      const localizedTitle = subdir === 'es' && file.endsWith('.html')
+      // Fiction titles may change while their filenames and saved document IDs stay stable.
+      // Spanish editions also carry their accented reader-facing title in the HTML.
+      const localizedTitle = ['es', 'novels', 'design'].includes(subdir) && file.endsWith('.html')
         ? fs.readFileSync(path.join(subPath, file), 'utf8').match(/<title>([^<]+)<\/title>/i)?.[1]
         : null;
-      const title = localizedTitle || getDocTitle(file);
-      const id = generateId(title);
+      const title = localizedTitle
+        ? localizedTitle.replace(/&#(x[0-9a-f]+|[0-9]+);|&(amp|quot|apos|lt|gt|nbsp);/gi, (entity, numeric, named) => {
+            if (numeric) return String.fromCodePoint(numeric[0].toLowerCase() === 'x' ? parseInt(numeric.slice(1), 16) : parseInt(numeric, 10));
+            return { amp: '&', quot: '"', apos: "'", lt: '<', gt: '>', nbsp: ' ' }[named.toLowerCase()];
+          })
+        : getDocTitle(file);
+      const id = generateId(['novels', 'design'].includes(subdir) ? getDocTitle(file) : title);
       const isCore = subdir === 'core';
 
       documents.push({
