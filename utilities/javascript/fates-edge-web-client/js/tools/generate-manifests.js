@@ -199,7 +199,13 @@ function generateDocsManifest(docsPath) {
             return { amp: '&', quot: '"', apos: "'", lt: '<', gt: '>', nbsp: ' ' }[named.toLowerCase()];
           })
         : getDocTitle(file);
-      const id = generateId(['novels', 'design'].includes(subdir) ? getDocTitle(file) : title);
+      // Keep saved reading references when a volume receives its final filename.
+      const legacyFictionIds = {
+        'Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-I-_-Tributary.html': 'the_belworth_war',
+        'Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-II-_-Estuary.html': 'after_the_belworth_war',
+      };
+      const id = (subdir === 'novels' && legacyFictionIds[file])
+        || generateId(['novels', 'design'].includes(subdir) ? getDocTitle(file) : title);
       const isCore = subdir === 'core';
 
       documents.push({

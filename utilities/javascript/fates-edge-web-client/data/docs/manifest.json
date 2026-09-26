@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-26T18:57:18.751Z",
+  "generated": "2026-09-26T22:24:39.523Z",
   "documents": [
     {
       "id": "srd",
@@ -570,16 +570,6 @@
       "active": true
     },
     {
-      "id": "after_the_belworth_war",
-      "title": "Estuary — Working Draft",
-      "file": "Fates_-_Edge_-_-After-_-The-_-Belworth-_-War.html",
-      "path": "/data/docs/novels/",
-      "category": "novels",
-      "categoryLabel": "Novels & Novellas",
-      "core": false,
-      "active": true
-    },
-    {
       "id": "factions_of_the_fractured_sun",
       "title": "Factions Of The Fractured Sun",
       "file": "Fates_-_Edge_-_-Factions-of-the-Fractured-Sun.html",
@@ -1110,6 +1100,26 @@
       ]
     },
     {
+      "id": "the_belworth_war",
+      "title": "The Belworth War, Part I: Tributary",
+      "file": "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-I-_-Tributary.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "after_the_belworth_war",
+      "title": "The Belworth War, Part II: Estuary",
+      "file": "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-II-_-Estuary.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_cartomancers_compass",
       "title": "The Cartomancers Compass",
       "file": "Fates_-_Edge_-_-The-_-Cartomancers-_-Compass.html",
@@ -1629,16 +1639,6 @@
       "path": "/data/docs/tollveil/",
       "category": "other-games",
       "categoryLabel": "Other Games",
-      "core": false,
-      "active": true
-    },
-    {
-      "id": "the_belworth_war",
-      "title": "Tributary",
-      "file": "Fates_-_Edge_-_-The-_-Belworth-_-War.html",
-      "path": "/data/docs/novels/",
-      "category": "novels",
-      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
