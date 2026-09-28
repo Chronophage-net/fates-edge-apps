@@ -53,3 +53,9 @@ export async function verifyRoomToken(token, { jwks, issuer, serverId, roomId, r
     typeof payload.sub === 'string' && typeof payload.membership_id === 'string', 403, 'Room token rejected');
   return payload;
 }
+
+// Passwords are opaque credentials: whitespace is part of the value.
+export function password(value) {
+  requireThat(typeof value === 'string' && value.length > 0 && value.length <= 256, 400, 'Password must contain 1–256 characters');
+  return value;
+}

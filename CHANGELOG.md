@@ -62,6 +62,104 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.11.1] - 2026-09-28
+
+### Fixed
+- sync novel HTML markup fix + remove stray factions-manifest.json
+- wire up the off-canvas mobile sidebar toggle that was never connected
+
+### Chore
+- sync docs data from fates-edge-docs (recall rule, the mesh)
+- sync docs data from fates-edge-docs (Riarhin reference)
+- sync docs data from fates-edge-docs (Keld, endings)
+- sync docs data from fates-edge-docs (Kalrantha, elements, Oshiira)
+- sync docs data from fates-edge-docs (patrons sweep)
+- sync docs data from fates-edge-docs (regions repair, The Thread ending)
+- sync docs data from fates-edge-docs (Dye Yards chase)
+- sync docs data from fates-edge-docs (Silence, carry rule)
+- sync docs data from fates-edge-docs (Riarhin continuity)
+- sync docs data from fates-edge-docs (The Thread craft pass)
+- sync docs data from fates-edge-docs v0.30.0
+
+### Other
+- Sync revised Riarhin and Belworth reading editions
+- Sync Theona political setting revision
+- Sync reviewed Mab and Worldbook editorial revisions
+- Sync revised return chronology and Ubral setting
+- Sync reconciled character histories and novel editions
+- Sync Riarhin fighting-style clarification
+- Sync corrected histories of Riarhin's blades
+- Sync corrected chronology and advisory court reference
+- Sync editorial revisions to the fourteen reader editions
+- Introduce Varitin through Estuary’s postwar thanksgiving
+- Sync Estuary spiritual culture revisions
+- Sync expanded Bethencourt embassy in Estuary
+- Publish polished Belworth volumes under final part titles
+- Editorial pass
+- Sync Estuary campaign and casualty-return revisions
+- Sync current fiction editions and remove author working materials
+- Editorial sweep of bridges and over-explaination.
+- Updates to the Belworth War
+- Updates to the Belworth War
+- Sync Belworth War outline: 35 chapters, Tylan's northern campaign
+- Sync Belworth War outline: descriptive register and viewpoint lenses
+- Sync docs: Belworth War outline, 33 chapters
+- Sync data: Brightstride spelling and Everblood family note
+- Sync data: women in arms on the two banks (regions, Chronicles, Kon'reh guide)
+- Sync docs: Belworth War outline, rival networks
+- Sync docs: Belworth War outline revisions
+- Sync docs: Belworth War outline, Jaennis and Fayd
+- Sync docs: The Belworth War chapter outline
+- Futher Sweeps
+- Sync docs: Riarhin subtext revisions to the three novels
+- Sync docs: The Weight You Carry treatment note
+- Sync docs: The Weight You Carry forward hook
+- Sync docs: add The Weight You Carry to the web client
+- Document update
+- Sync German translation: Essentials (Wesentliche-Regeln)
+- Sync German translation: SRD (System-Referenzdokument)
+- Sync German translation: GM Guide Chapter 2 - Core Procedures
+- Sync German translation: Player's Guide Appendix - Quick Reference
+- Editorial sweep
+- Sync German translation: Player's Guide Chapter 3 - Core Mechanics
+- Sync German translation: Player's Guide Chapter 2 - Character Creation
+- Sync German translation: Player's Guide Ch.1 (Quickstart)
+- Sync German translation: Quickstart
+- Sync German translation: GM Guide Appendix A (Core Reference Tables)
+- Sync German translation: GM Guide Appendix E (Safety and Inclusivity)
+- Sync German translation: GM Guide Appendix I (Session Zero)
+- Sync French translation: SRD (Systems Reference Document)
+- Sync French translation: Essentials (Guide-essentiel)
+- Sync French translation of Player's Guide Ch.3 backport from fates-edge-docs
+- Sync French translation of Player's Guide Ch.2 backport from fates-edge-docs
+- Sync French translation of Player's Guide Ch.19 backport from fates-edge-docs
+- Sync French translation of GM Guide Ch.2 backport from fates-edge-docs
+- Sync French translation batch backport from fates-edge-docs
+- Editorial sweep
+- Sync Spanish Reaction-mechanic translation backport from fates-edge-docs
+- Sync Guide Reaction-mechanic publish backport from fates-edge-docs
+- Sync SRD canon reconciliation backport from fates-edge-docs
+- Sync docs canon reconciliation backport from fates-edge-docs
+- npm install
+- Fixed the ending to The Thread
+- Build sweep
+- Region revision
+- Sync The Thread: Ashaan and Galanina corrections
+- Sync The Thread: Aryka's exile
+- Sync The Thread: worldbook implied rather than quoted
+- Sync The Thread: geography revision
+- Sync The Thread: Old Count revision
+- Sync The Thread reading edition: complete rough draft
+- Sync The Thread reading edition from fates-edge-docs: Act II
+- Sync The Thread reading edition from fates-edge-docs
+- Sync novels from fates-edge-docs: add The Thread
+- Updated; rules audit
+- Updated; rules audit
+- Create Fates-_-Edge-_-Long-_-Form-_-Readers-_-Guide.
+- Updated TLB to add more description of the characters.
+- Updated the ending to Paget
+- Editorial tweaks
+
 ## [5.11.0] - 2026-09-18
 
 Add Novels and Novellas library category and reading editions

@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Foundry-VTT-orange" alt="Foundry VTT"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
-  <img src="https://img.shields.io/badge/status-stable-brightgreen" alt="Status"/>
+  <img src="https://img.shields.io/badge/status-host%20verification%20needed-yellow" alt="Status"/>
 </p>
 
 Connects a Foundry VTT world to the Fate's Edge [socket server](../../javascript/fates-edge-socket-server/), so chat, dice rolls, characters, scene notifications, ad-hoc timers, the Deck of Consequences, Crown Spread readings, module listing, and GM election/promotion all sync in real time between Foundry and every other connected VTT client.
@@ -21,13 +21,23 @@ Connects a Foundry VTT world to the Fate's Edge [socket server](../../javascript
 - **Deck operations** — draw, shuffle, and Crown Spread, shown as both Foundry chat messages and journal entries.
 - **Module listing** — see modules available on the server.
 - **GM election & promotion** — request, approve/reject, and view client roles from the Foundry UI.
-- **Secure** — API key authentication and configurable per-feature permissions.
+- **Room access** — room passwords and socket-server account tokens; server-side role checks still apply.
 
 ---
 
+## Connection and privacy
+
+Use a `ws://` or `wss://` server URL. An HTTPS Foundry page requires `wss://`. The module waits for room admission before showing Connected. Socket-server room passwords and account tokens are supported; managed rooms requiring a manager-token adapter currently fail explicitly.
+
+Keep the active Foundry GM connected: that client publishes incoming public chat and journals once for the whole world. Other clients still maintain their own room identities. Only a message’s author forwards it outward; imported messages, whispers, and blind rolls are not re-broadcast. Remote whispers are imported only for the receiving Foundry user. Character sync creates reference journals, not system-specific Actor sheets.
+
+Password, account token, API key, and display name are now client settings. When upgrading, clear any previously stored world-level credentials and enter each user’s credentials locally. The API key is a deployment administrator credential, not a room password; leave it empty unless using administrative HTTP tools. Browser settings are not a secret vault.
+
+Journals use modern text pages with private default ownership. Remote journal content retains structural formatting while active HTML and attributes are removed. Existing legacy journal content is left intact; new updates use a text page.
+
 ## Requirements
 
-- Foundry VTT v11 or higher (tested with v13)
+- Foundry VTT v11–v13 API target; these versions have not been exercised in a running Foundry installation during this review
 - A Fate's Edge socket server, running and reachable
 - A stable connection for WebSocket communication
 
@@ -56,7 +66,7 @@ After enabling the module, configure it via **Settings → Configure Settings �
 |---|---|
 | **Server URL** | The WebSocket URL of your Fate's Edge server (`ws://localhost:10000` or `wss://your-server.com`). |
 | **Room Code** | The room code to join (e.g. `AC12`). |
-| **API Key** | Optional, if your server requires one. |
+| **API Key** | Optional deployment administrator key for HTTP tools; not a room login. |
 | **Player Name** | Your display name in the VTT (defaults to your Foundry username). |
 | **Default Region** | Default region for deck draws. |
 | **Auto Connect** | Connect automatically when Foundry loads. |
@@ -67,7 +77,7 @@ After enabling the module, configure it via **Settings → Configure Settings �
 |---|---|
 | **Sync Chat** | Mirror ordinary (non-whisper) Foundry chat to the VTT. |
 | **Sync Dice Rolls** | Send Foundry rolls to the VTT. |
-| **Sync Characters** | Sync characters to the VTT as journal entries. |
+| **Sync Characters** | Import VTT character reference journals into Foundry. |
 | **Sync Timers** | Reserved for a future scene/campaign timer integration — registered but not yet wired to any behavior. Unrelated to ad-hoc timers below, which always sync regardless of this setting. |
 | **Sync Scenes** | Broadcast the active scene's name on change (notification only — doesn't touch the room whiteboard). |
 | **Sync Deck** | Sync Deck of Consequences draws with the VTT. |
@@ -203,3 +213,7 @@ Fork, branch, commit, push, open a pull request.
 <p align="center">
   <sub>Made with ❤️ by Nick Gasper</sub>
 </p>
+
+## Verification
+
+Run `node --test utilities/vtt_mods_bots/tests/*.test.js` from the repository root after installing the Discord and socket-server dependencies. The bridge is tested with mocked Foundry host APIs and the actual socket server: URL construction, admission, chat, dice events, escaping, duplicate suppression, and private-message handling. UI rendering, Foundry document permissions, and full game-system compatibility still require testing in an installed Foundry world. No hosted manifest or release ZIP is published by this change; use the manual installation steps above.

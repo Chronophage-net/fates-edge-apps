@@ -1,3 +1,5 @@
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 /**
  * Print-ready character sheets.
  *
@@ -36,9 +38,6 @@ const PATH_META = {
     'familiar-only': { title: 'Runekeeper', subtitle: 'The Thiasos keeps company.', canonical: 'runekeeper' }
 };
 
-function getJsPDFCtor() {
-    return (window.jspdf && window.jspdf.jsPDF) || null;
-}
 
 function text(value, fallback = '') {
     if (value === null || value === undefined || value === '') return fallback;
@@ -147,7 +146,7 @@ function table(doc, x, y, width, columns, body, options = {}) {
     columns.forEach((column, index) => {
         columnStyles[index] = { cellWidth: column.width || 'auto', halign: column.align || 'left' };
     });
-    doc.autoTable({
+    autoTable(doc, {
         startY: y,
         margin: { left: x, right: PAGE.width - x - width }, // rtl-physical: PDF page coordinates
         tableWidth: width,
@@ -486,9 +485,7 @@ export function getPrintablePractice(magicPath) {
 
 export function buildCharacterPDF(c) {
     if (!c) return null;
-    const JsPDFCtor = getJsPDFCtor();
-    if (!JsPDFCtor) return null;
-    const doc = new JsPDFCtor({ unit: 'pt', format: 'letter', orientation: 'landscape', compress: true });
+    const doc = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'landscape', compress: true });
     addCorePage(doc, c);
     if (hasCompanyPage(c)) addCompanyPage(doc, c);
     addPracticePage(doc, c);

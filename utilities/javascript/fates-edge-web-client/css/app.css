@@ -99,18 +99,10 @@ html.light {
        in :root above and ACCESSIBILITY.md for the full contrast audit. */
     --text3: #736e79;
     --text-inverse: #f8f6fa;
-    /* NOTE (not changed here — see ACCESSIBILITY.md): --gold (#b8860b) is
-       only 3.03:1 against this theme's --bg, below AA's 4.5:1 for text use.
-       Left as-is because --gold also drives the .btn-gold background
-       gradient (--gold → --gold-light) with --text-inverse text on top,
-       where --gold-light's OWN contrast is already worse (2.21:1) — fixing
-       just --gold in isolation wouldn't fix that gradient, and widening the
-       fix to the gradient risks a visible design change beyond what this
-       pass verified. See ACCESSIBILITY.md for the calculated replacement
-       value and what still needs visual QA before landing it. */
-    --gold: #b8860b;
-    --gold-light: #d4a017;
-    --gold-dark: #9a7208;
+    /* Warm gold remains legible both as text and behind inverse button text. */
+    --gold: #765407;
+    --gold-light: #805b08;
+    --gold-dark: #654700;
     --gold-glow: rgba(184, 134, 11, 0.12);
     --gold-glow-strong: rgba(184, 134, 11, 0.2);
     --red: #c62828;
@@ -1979,3 +1971,23 @@ dialog.creature-detail-dialog::backdrop {
 }
 .deck-gm-note p:first-child { margin-top: 0; }
 .deck-gm-note p:last-child { margin-bottom: 0; }
+
+/* Shared loading, missing-page and recovery states. */
+.route-state {
+    max-width: 38rem;
+    margin: clamp(2rem, 10vh, 6rem) auto;
+    padding: clamp(1.5rem, 5vw, 3rem);
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: radial-gradient(ellipse at top, var(--gold-glow), transparent 70%), var(--bg2);
+    box-shadow: var(--shadow-elevated);
+    overflow-wrap: anywhere;
+}
+.route-state-symbol { display: block; font-size: 2.5rem; color: var(--gold); margin-block-end: 1rem; }
+.route-state h2 { margin-block-end: 0.75rem; }
+.route-state p { line-height: 1.65; }
+.route-state-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem; margin-block: 1.5rem; }
+.route-state details { text-align: start; margin-block-start: 1.5rem; font-size: 0.85rem; color: var(--text2); }
+.route-state summary { cursor: pointer; }
+.route-state-error { border-block-start: 3px solid var(--gold); }

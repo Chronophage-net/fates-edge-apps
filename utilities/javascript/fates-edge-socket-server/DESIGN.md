@@ -17,7 +17,7 @@ The socket server is a Node.js/Express HTTP API plus **two** parallel WebSocket 
 | Persistence | SQLite by default (`server/storage.js`, `campaigns.db`); optional PostgreSQL (`pg`) or MySQL (`mysql2`) via `DATABASE_TYPE`/`DATABASE_URL` |
 | Ephemeral room state | An in-memory `Map` (`server/room.js`), scoped to one process, gone on restart |
 | Horizontal scaling | Optional Redis pub/sub relay, off by default — see [`SCALING.md`](SCALING.md) |
-| Config | `dotenv` + environment variables, with an optional `server/config.json` overlay |
+| Config | `dotenv` + environment variables, over an optional `server/config.json` file, then validated defaults |
 
 There's no caching layer, no PDF conversion, no outbound email, no job scheduler, and no Helmet.js/CSP/HSTS configuration — the server's job is narrow (relay room state, persist campaigns) and the dependency list stays narrow to match. `server/api.js` is the authoritative route list at any given moment; grep it for `router.get/post/put/delete` rather than trusting a hand-copied table anywhere, this document included.
 

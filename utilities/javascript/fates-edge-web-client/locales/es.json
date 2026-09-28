@@ -1556,7 +1556,7 @@
     "kon-reh.vtt-bridge.accept": "Aceptar",
     "kon-reh.vtt-bridge.decline": "Rechazar",
     "module-loader.error": "⚠️ Error inminente",
-    "module-loader.errorLoadingModule": "❌ Módulo de carga de errores",
+    "module-loader.errorLoadingModule": "No se pudo abrir esta herramienta",
     "module-loader.moduleLoadedButNoRenderFunctionFound": "Módulo cargado pero sin función de renderizado encontrado.",
     "module-loader.pleaseCheckExports": "Por favor, revise las exportaciones.",
     "patrons.addCosmic": "➕ Añadir Cosmic genes",
@@ -1666,7 +1666,7 @@
     "router.goHome": "🏠 Ir a casa",
     "router.navigatedToValue": "Se abrió {{value0}}",
     "router.redirectedToValue": "↪️ Redirigido a {{value0}}",
-    "router.unknownRoute": "📄 Ruta desconocida",
+    "router.unknownRoute": "Página no encontrada",
     "search.findRulesDocumentsWikiEntriesAndMore": "Encontrar reglas, documentos, entradas de wiki, y más.",
     "search.rebuildIndex": "🔄 Rebuild Index genes",
     "search.search": "Buscar",
@@ -2695,7 +2695,12 @@
     "wiki.talents": "🧠 Talentos",
     "wiki.valueAlreadyCloned": "\"{{value0}}\" ya clonado.",
     "wiki.wiki": "📖 Wiki ganancias",
-    "docs.readingGuide": "🧭 Guía de lectura — por dónde empezar"
+    "docs.readingGuide": "🧭 Guía de lectura — por dónde empezar",
+    "module-loader.loading": "Abriendo tus herramientas…",
+    "module-loader.loadingHint": "Preparando esta herramienta para tu mesa.",
+    "module-loader.retryHint": "Comprueba tu conexión y vuelve a intentarlo. Tu trabajo guardado sigue aquí.",
+    "module-loader.retry": "Volver a intentarlo",
+    "module-loader.details": "Detalles técnicos"
   },
   "paperImport": {
     "title": "Importar desde papel",

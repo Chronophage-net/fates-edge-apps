@@ -4,6 +4,17 @@ All notable changes to the Fate's Edge Web Client are logged here. This file sta
 
 ## [Unreleased]
 
+### Web client review — 2026-09-27
+- Tighten homepage spacing and action hierarchy, scope its button styles to Home, respect reduced motion, and improve light-theme gold contrast.
+- Add accessible loading and recovery states; retain the original panel on retry, ignore stale imports, and give missing pages a dedicated recovery panel.
+- Escape route/error text, enforce feature visibility after legacy redirects, reject prototype keys in deep merges, and fail closed when HTML sanitization is unavailable.
+- Bundle DOMPurify 3.4.16, jsPDF 4.2.1 and AutoTable 5.0.8 locally instead of loading the old sanitizer/PDF scripts from a CDN.
+- Replace the ignored top-level Vite server hook with a plugin: return real document 404s, preserve binary files, support HEAD, and reject traversal and symlink escapes.
+- Repeat security headers in nginx locations that override header inheritance; use a stricter referrer policy.
+- Format structured bestiary resilience and puzzle resolutions correctly; update obsolete data assertions and add behavioral regressions for loading, routing, sanitization, file serving, and real PDF generation.
+- Validation and scope: see [REVIEW.md](REVIEW.md).
+
+
 Background document indexing, a wiki that reflects its data, and a quieter control hierarchy
 
 ### Added

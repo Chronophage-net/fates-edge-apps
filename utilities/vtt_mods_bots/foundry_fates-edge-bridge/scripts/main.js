@@ -51,7 +51,7 @@ Hooks.once('init', () => {
     FatesEdgeBridge.initialize();
     
     // Add status bar UI
-    addStatusBarUI();
+    // Foundry may not have mounted its interface during init.
     
     // Listen for GM state changes
     Hooks.on('fates-edge-gm-state-changed', (state) => {
@@ -62,6 +62,7 @@ Hooks.once('init', () => {
 });
 
 Hooks.once('ready', () => {
+    addStatusBarUI();
     // Auto-connect if enabled
     if (game.settings.get('fates-edge-bridge', 'autoConnect')) {
         setTimeout(() => {
@@ -103,7 +104,7 @@ function addStatusBarUI() {
         <span id="fates-edge-status" style="color: #747f8d;">⚪ Disconnected</span>
         <span id="fates-edge-deck" style="color: #d4af37;">🃏 54</span>
         <span id="fates-edge-voice" style="color: #747f8d;">🎤 Off</span>
-        <span id="fates-edge-region" style="color: #8ac49a;">📍 ${game.settings.get('fates-edge-bridge', 'defaultRegion') || 'Acasia'}</span>
+        <span id="fates-edge-region" style="color: #8ac49a;">📍 ${escapeHtml(game.settings.get('fates-edge-bridge', 'defaultRegion') || 'Acasia')}</span>
         <button id="fates-edge-gm-btn" aria-label="${escapeHtml(ariaLabel('fatesEdgeGmPanel', 'Open Game Master management panel'))}" style="
             background: rgba(212, 175, 55, 0.2);
             border: 1px solid #d4af37;

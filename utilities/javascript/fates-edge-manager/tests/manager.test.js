@@ -208,3 +208,30 @@ test('operators can inspect node placements; cancelled invites and archived room
   assert.equal((await request(`/v1/rooms/${room.id}/connect`,'GET',null,alice)).status,409);
   assert.equal((await request(`/v1/rooms/${room.id}/keys`,'POST',{label:'No',scopes:['room:connect']},alice)).status,409);
 });
+
+test('passwords preserve leading and trailing spaces through creation, login and change', async () => {
+  const name='space_password', password='  correct-horse-spaces  ';
+  assert.equal((await request('/v1/operator/accounts','POST',{username:name,password},alice)).status,200);
+  assert.equal((await request('/v1/auth/login','POST',{username:name,password:password.trim()})).status,401);
+  const login=await request('/v1/auth/login','POST',{username:name,password});
+  assert.equal(login.status,200);
+  const user={cookie:login.cookie,csrf:login.data.csrf};
+  assert.equal((await request('/v1/me/password','POST',{current_password:password,password:'  replacement password  '},user)).status,200);
+  assert.equal((await request('/v1/auth/login','POST',{username:name,password:'  replacement password  '})).status,200);
+});
+
+test('malformed and oversized JSON return bounded errors without echoing credentials', async () => {
+  for(const [body,expected] of [['{"password":"private-canary",',400],[JSON.stringify({password:'private-canary'.repeat(2000)}),413]]) {
+    const response=await fetch(base+'/v1/auth/login',{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body});
+    assert.equal(response.status,expected);
+    const result=await response.json();
+    assert(!JSON.stringify(result).includes('private-canary'));
+    assert(result.request_id);
+  }
+});
+
+test('configuration rejects origins with paths and node registration rejects malformed URLs', async () => {
+  assert.throws(()=>createApp({db,tokens,origin:base+'/path',pepper:'p'.repeat(48)}),/exact HTTP/);
+  const result=await request('/v1/internal/nodes/register','POST',{server_id:nodeId,public_url:'not a URL'},null,{Authorization:`Bearer ${nodeKey}`});
+  assert.equal(result.status,400);
+});

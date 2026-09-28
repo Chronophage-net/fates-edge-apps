@@ -5,10 +5,7 @@
   "version": "4.17.0",
   "authors": [
     {
-      "name": "Fate's Edge Team",
-      "email": "support@fates-edge.com",
-      "url": "https://fates-edge.com",
-      "discord": "https://discord.gg/fates-edge"
+      "name": "Nicholas A. Gasper"
     }
   ],
   "esmodules": [
@@ -26,45 +23,14 @@
   ],
   "compatibility": {
     "minimum": "11",
-    "verified": "13",
     "maximum": "13"
   },
   "socket": true,
-  "url": "https://github.com/fates-edge/fates-edge",
-  "manifest": "https://github.com/fates-edge/fates-edge/releases/latest/download/module.json",
-  "download": "https://github.com/fates-edge/fates-edge/releases/latest/download/fates-edge-bridge.zip",
-  "readme": "https://github.com/fates-edge/fates-edge/blob/main/README.md",
-  "changelog": "https://github.com/fates-edge/fates-edge/blob/main/CHANGELOG.md",
-  "bugs": "https://github.com/fates-edge/fates-edge/issues",
+  "url": "https://github.com/Chronophage-net/fates-edge-apps",
+  "readme": "https://github.com/Chronophage-net/fates-edge-apps/tree/main/utilities/vtt_mods_bots/foundry_fates-edge-bridge",
+  "changelog": "https://github.com/Chronophage-net/fates-edge-apps/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/Chronophage-net/fates-edge-apps/issues",
   "allowBugReporter": true,
-  "media": [
-    {
-      "type": "icon",
-      "url": "https://fates-edge.com/images/fates-edge-icon.png"
-    },
-    {
-      "type": "screenshot",
-      "url": "https://fates-edge.com/images/foundry-bridge-screenshot-1.png"
-    },
-    {
-      "type": "screenshot",
-      "url": "https://fates-edge.com/images/foundry-bridge-screenshot-2.png"
-    },
-    {
-      "type": "screenshot",
-      "url": "https://fates-edge.com/images/foundry-bridge-screenshot-3.png"
-    },
-    {
-      "type": "cover",
-      "url": "https://fates-edge.com/images/foundry-bridge-cover.png"
-    }
-  ],
-  "minimumCoreVersion": "11",
-  "compatibleCoreVersion": "13",
-  "system": [],
-  "dependencies": [],
-  "conflicts": [],
-  "pack": [],
   "packs": [],
   "relationships": {
     "requires": [],
@@ -100,5 +66,5 @@
       "protocolVersion": 2
     }
   },
-  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
+  "_license": "Fate's Edge Copyright \u2013 \u00a9 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

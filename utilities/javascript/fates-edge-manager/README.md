@@ -187,3 +187,11 @@ smoke check. Webhooks, shared-load-balancer affinity cookies and live
 room migration are not implemented in this initial release. Direct node endpoints are supported.
 
 Code and software documentation: MIT. This package does not bundle Fate’s Edge setting content.
+
+## September 2026 review
+
+Passwords preserve leading and trailing spaces during account creation, sign-in and password changes. `MANAGER_ORIGIN` must be an exact origin with no path or trailing slash. Invalid JSON and oversized requests return bounded messages without echoing submitted credentials.
+
+The dashboard keeps the most recent navigation authoritative when requests finish out of order, offers retry after page failures, clears stale sign-in loading state, labels and focuses dialogs, and supports narrow screens and keyboard navigation. Changing pages closes credential dialogs and clears their contents.
+
+The current review passed 20 tests, including password round trips, error privacy, navigation races, signed OIDC and real socket-node authorization. See `REVIEW.md` for scope and limitations.

@@ -20,11 +20,12 @@ const config = require('./utils/config');  // <-- load config
 // ============================================================
 
 const client = new Client({
+    allowedMentions: { parse: [], repliedUser: false },
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.DirectMessages
     ]
 });
@@ -39,7 +40,7 @@ client.vtt = new VTTClient(config.vtt);
 // Command Loading
 // ============================================================
 
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync(require('node:path').join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
     try {
@@ -59,16 +60,16 @@ for (const file of commandFiles) {
 // Event Loading
 // ============================================================
 
-const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+const eventFiles = fs.readdirSync(require('node:path').join(__dirname, 'events')).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
     try {
         const event = require(`./events/${file}`);
         const eventName = file.split('.')[0];
         if (event.once) {
-            client.once(eventName, (...args) => event.execute(...args, client));
+            client.once(eventName, (...args) => Promise.resolve().then(() => event.execute(...args, client)).catch(error => logger.error('Event handler failed', error)));
         } else {
-            client.on(eventName, (...args) => event.execute(...args, client));
+            client.on(eventName, (...args) => Promise.resolve().then(() => event.execute(...args, client)).catch(error => logger.error('Event handler failed', error)));
         }
         logger.info(`✅ Loaded event: ${eventName}`);
     } catch (err) {
@@ -208,12 +209,14 @@ client.login(process.env.DISCORD_TOKEN)
 
 process.on('SIGINT', () => {
     logger.info('🛑 Shutting down...');
+    client.vtt.disconnect();
     client.destroy();
     process.exit(0);
 });
 
 process.on('SIGTERM', () => {
     logger.info('🛑 Shutting down...');
+    client.vtt.disconnect();
     client.destroy();
     process.exit(0);
 });

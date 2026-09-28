@@ -45,7 +45,7 @@ function setupWSS(wss, appConfig) {
         : null;
 
     wss.on('connection', async (ws, req) => {
-        const url = new URL(req.url, `http://${req.headers.host}`);
+        const url = new URL(req.url, 'http://localhost');
         let roomCode = url.searchParams.get('room');
         if (!roomCode) {
             const pathParts = url.pathname.split('/').filter(Boolean);
@@ -62,7 +62,7 @@ function setupWSS(wss, appConfig) {
                 if (url.searchParams.has('token') || url.searchParams.has('apiKey')) throw new Error('Credentials must not be sent in URLs');
                 ws.send(JSON.stringify({ type: 'auth-required', mode: 'managed' }));
                 managedHandshake = await new Promise((resolve, reject) => {
-                    const timer = setTimeout(() => finish(new Error('Handshake timeout')), 10000);
+                    const timer = setTimeout(() => finish(new Error('Handshake timeout')), wssConfig.handshakeTimeoutMs || 10000);
                     const closed = () => finish(new Error('Connection closed'));
                     const message = raw => {
                         try {
@@ -112,8 +112,7 @@ function setupWSS(wss, appConfig) {
         // NEW: per-room client cap (MAX_CLIENTS_PER_ROOM, 0/unset =
         // unlimited, unchanged default behavior) -- see config.js and
         // socketio-handlers.js's identical check on the Socket.IO side.
-        // This transport joins the room at connection time (no separate
-        // join-room message), so this is the only place to check it.
+        // Reject already-full rooms early; admission rechecks after async authentication.
         if (wssConfig.maxClientsPerRoom > 0 && currentRoom.clients.size >= wssConfig.maxClientsPerRoom) {
             logger.warn('🚫 Rejected connection: room full', { room: roomKey, cap: wssConfig.maxClientsPerRoom });
             ws.send(JSON.stringify({ type: 'error', message: 'This room is full.', code: 'ROOM_FULL' }));
@@ -138,7 +137,15 @@ function setupWSS(wss, appConfig) {
         // not be allowed to act as the temporary default Player.
         ws.handshakeStarted = false;
         ws.handshakeComplete = false;
-        currentRoom.clients.set(clientId, ws.clientData);
+        // Pending connections are not room members and receive no room broadcasts.
+        const handshakeTimer = setTimeout(() => {
+            if (!ws.handshakeComplete && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'error', code: 'HANDSHAKE_TIMEOUT', message: 'The room handshake timed out. Reconnect and try again.' }));
+                ws.close(4008, 'Handshake timeout');
+            }
+        }, wssConfig.handshakeTimeoutMs || 10000);
+        handshakeTimer.unref?.();
+        ws.finishHandshake = () => clearTimeout(handshakeTimer);
         socketStats.wsConnections++;
         socketStats.totalConnections++;
 
@@ -177,7 +184,7 @@ function setupWSS(wss, appConfig) {
             timestamp: Date.now(),
             message: 'Connected to Fate\'s Edge WebSocket server',
             protocols: ['socket.io', 'plain-websocket'],
-            serverVersion: '1.0.0'
+            serverVersion: require('../package.json').version
         }));
 
         // ─── Send room state (includes whiteboard, region, characters) ──
@@ -200,10 +207,10 @@ function setupWSS(wss, appConfig) {
         }
         ws.send(JSON.stringify(roomStatePayload));
         };
-        if (!currentRoom.sideTask) ws.sendInitialState();
+        // State is sent only after the password, membership and role checks succeed.
 
         // ─── Message handler ──────────────────────────────────────────
-        ws.on('message', (message) => {
+        ws.on('message', async (message) => {
             try {
                 // NEW: rate-limit gate, checked before dispatching to any
                 // case below -- covers all ~50 message types through this
@@ -221,7 +228,11 @@ function setupWSS(wss, appConfig) {
                 }
 
                 const data = JSON.parse(message);
-                const messageType = data.type || 'unknown';
+                if (!data || typeof data !== 'object' || Array.isArray(data) || typeof data.type !== 'string') {
+                    ws.send(JSON.stringify({ type: 'error', code: 'INVALID_MESSAGE', message: 'Send a JSON object with a message type.' }));
+                    return;
+                }
+                const messageType = data.type;
                 if (wssConfig.manager) {
                     try { wssConfig.manager.permit(ws.managerClaims, messageType, room.rooms.get(roomKey)?.code); }
                     catch { ws.send(JSON.stringify({ type: 'permission-denied', message: 'Managed room access rejected' })); return; }
@@ -300,7 +311,7 @@ function setupWSS(wss, appConfig) {
                         break;
                     }
                     case 'handshake':
-                        handleHandshake(ws, currentRoom, data);
+                        await handleHandshake(ws, currentRoom, data);
                         break;
 
                     case 'request_gm':
@@ -400,7 +411,7 @@ function setupWSS(wss, appConfig) {
 
                     case 'set_room_password':
                         if (isGmLike(ws.clientData.role)) {
-                            handleSetRoomPassword(ws, currentRoom, data);
+                            await handleSetRoomPassword(ws, currentRoom, data);
                         }
                         break;
 
@@ -432,17 +443,13 @@ function setupWSS(wss, appConfig) {
                             chatMsg.senderUserId = ws.clientData?.userId == null ? null : String(ws.clientData.userId);
                         }
                         room.recordChatMessage(currentRoom, chatMsg, wssConfig.maxChatHistory);
-                        // Whisper with a resolvable live recipient (e.g. the AI GM
-                        // bot's join greeting) -- deliver privately instead of to
-                        // the whole room. See room.js's deliverWhisper() for what
-                        // "resolvable" means and why this doesn't (yet) cover the
-                        // human-typed whisper feature's character-id/'gm' recipients.
-                        const whisperedPrivately = chatMsg && chatMsg.whisper && chatMsg.recipient
-                            ? room.deliverWhisper(roomKey, messageType, data, ws.clientId, chatMsg.recipient)
-                            : false;
-                        if (!whisperedPrivately && !(chatMsg?.whisper && chatMsg?.privateOnly)) {
-                            room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
+                        if (room.isPrivateChatMessage(chatMsg)) {
+                            if (!room.deliverWhisper(roomKey, messageType, data, ws.clientId, chatMsg.recipient)) {
+                                ws.send(JSON.stringify({ type: 'error', code: 'WHISPER_UNDELIVERABLE', message: 'Whisper not sent: the recipient is unavailable or ambiguous.' }));
+                            }
+                            break;
                         }
+                        room.broadcastToRoom(roomKey, messageType, data, ws.clientId);
                         break;
                     }
 
@@ -911,16 +918,17 @@ function setupWSS(wss, appConfig) {
                 }
             } catch (error) {
                 logger.error('Error parsing plain WS message', { clientId, error: error.message });
-                ws.send(JSON.stringify({ type: 'error', message: 'Invalid message format: ' + error.message }));
+                if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'error', code: 'INVALID_MESSAGE', message: 'The message could not be processed. Check its format and try again.' }));
             }
         });
 
         // ─── Close handler ──────────────────────────────────────────
         ws.on('close', () => {
+            ws.finishHandshake();
             if (pingInterval) clearInterval(pingInterval);
             logger.info('🔌 Plain WebSocket client disconnected', { clientId, room: roomKey });
             const r = room.rooms.get(roomKey);
-            if (r) {
+            if (r && r.clients.has(clientId)) {
                 const wasGm = r.clients.get(clientId)?.role === 'gm';
                 r.clients.delete(clientId);
                 room.broadcastToRoom(roomKey, 'presence', { clients: room.getClientsList(r) }, clientId);
@@ -940,6 +948,8 @@ function setupWSS(wss, appConfig) {
                     logger.info('🗑️ Room deleted (empty)', { room: roomKey });
                 }
             }
+            // An idle/failed handshake may have created an otherwise empty room.
+            if (r && r.clients.size === 0 && !r.sideTask) room.rooms.delete(roomKey);
             socketStats.wsConnections--;
         });
 
@@ -973,6 +983,9 @@ async function handleHandshake(ws, roomState, data) {
             if (persistedHash) roomState.password = persistedHash;
         } catch (e) {
             logger.warn('Failed to hydrate persisted room password', { error: e.message });
+            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'error', code: 'ROOM_AUTH_UNAVAILABLE', message: 'Room access could not be verified. Please try again shortly.' }));
+            ws.close(1011, 'Room access unavailable');
+            return;
         }
     }
 
@@ -989,6 +1002,9 @@ async function handleHandshake(ws, roomState, data) {
             membership = await storage.getMembership(roomState.code, authUser.userId);
         } catch (e) {
             logger.warn('Account membership lookup failed', { error: e.message });
+            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'error', code: 'ROOM_AUTH_UNAVAILABLE', message: 'Room access could not be verified. Please try again shortly.' }));
+            ws.close(1011, 'Room access unavailable');
+            return;
         }
     }
 
@@ -996,7 +1012,7 @@ async function handleHandshake(ws, roomState, data) {
     if (roomState.password && !membership) {
         const ok = await auth.verifyPassword(data.password, roomState.password);
         if (!ok) {
-            ws.send(JSON.stringify({ type: 'error', message: 'Incorrect room password.' }));
+            ws.send(JSON.stringify({ type: 'error', code: 'ROOM_PASSWORD_INVALID', message: 'Incorrect room password. Check it with your host and reconnect.' }));
             ws.close(4003, 'Incorrect password');
             return;
         }
@@ -1020,8 +1036,7 @@ async function handleHandshake(ws, roomState, data) {
     ws.clientData.email = data.clientEmail || '';
     ws.clientData.userId = authUser ? authUser.userId : null;
     // selectedCharacter remains empty initially
-    roomState.clients.set(ws.clientId, ws.clientData);
-    ws.handshakeComplete = true;
+
 
     if (!managerClaims && authUser && hasAccountSupport()) {
         storage.upsertMembership(roomState.code, authUser.userId, {}).catch(e =>
@@ -1048,16 +1063,34 @@ async function handleHandshake(ws, roomState, data) {
         }
     }
 
-    if (roomState.sideTask) ws.sendInitialState?.();
+
     Object.assign(ws.clientData, require('./seat-presence').metadata(data, wssConfig.apiKey));
     if (ws.clientData.botSeatRejected) {
         logger.warn('Rejected bot seat handshake', { reason: ws.clientData.botSeatRejected });
         ws.send(JSON.stringify({ type: 'error', message: `Bot seat rejected: ${ws.clientData.botSeatRejected}` }));
         return ws.close(4004, 'Invalid bot seat');
     }
+    // Async admission checks can outlive the socket or the room, or race another join.
+    if (ws.readyState !== WebSocket.OPEN) return;
+    if (room.rooms.get(roomState.room_id) !== roomState) {
+        ws.close(1013, 'Room changed; reconnect');
+        return;
+    }
+    if (wssConfig.maxClientsPerRoom > 0 && roomState.clients.size >= wssConfig.maxClientsPerRoom) {
+        ws.send(JSON.stringify({ type: 'error', code: 'ROOM_FULL', message: 'This room is full. Ask the host to free a seat.' }));
+        ws.close(4003, 'Room full');
+        return;
+    }
+    // Claim lookup above can yield after the first GM check.
+    if (assignedRole === 'gm' && room.getExistingGm(roomState)) assignedRole = 'player';
+    ws.clientData.role = assignedRole;
+    roomState.clients.set(ws.clientId, ws.clientData);
+    ws.handshakeComplete = true;
+    ws.finishHandshake();
     const clientsList = room.getClientsList(roomState);
     ws.send(JSON.stringify({ type: 'handshake_ack', success: true, room_id: roomState.room_id, sideTasks: true, sideTaskId: roomState.sideTask?.id || null, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList,
         ...(managerClaims ? { serverId: managerClaims.server_id, placementVersion: managerClaims.placement_version } : {}) }));
+    ws.sendInitialState?.();
     room.broadcastToRoom(roomState.code, 'presence', { clients: clientsList }, ws.clientId);
     room.broadcastToRoom(roomState.code, 'player-joined', {
         clientId: ws.clientId,

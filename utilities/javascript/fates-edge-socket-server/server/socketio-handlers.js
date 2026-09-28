@@ -229,6 +229,8 @@ function setupSocketIO(io, appConfig) {
                     if (persistedHash) currentRoom.password = persistedHash;
                 } catch (e) {
                     logger.warn('Failed to hydrate persisted room password', { error: e.message });
+                    socket.emit('error', { code: 'ROOM_AUTH_UNAVAILABLE', message: 'Room access could not be verified. Please try again shortly.' });
+                    return;
                 }
             }
 
@@ -258,6 +260,8 @@ function setupSocketIO(io, appConfig) {
                     membership = await storage.getMembership(roomKey, authUser.userId);
                 } catch (e) {
                     logger.warn('Account membership lookup failed', { error: e.message });
+                    socket.emit('error', { code: 'ROOM_AUTH_UNAVAILABLE', message: 'Room access could not be verified. Please try again shortly.' });
+                    return;
                 }
             }
 
@@ -1031,17 +1035,13 @@ function setupSocketIO(io, appConfig) {
                 ...data,
                 clientName: socket.clientData?.name || 'Player',
             };
-            // Whisper with a resolvable live recipient (e.g. the AI GM bot's
-            // join greeting) -- deliver privately instead of to the whole
-            // room. See room.js's deliverWhisper() for what "resolvable"
-            // means and why this doesn't (yet) cover the human-typed
-            // whisper feature's character-id/'gm' recipients.
-            const whisperedPrivately = chatMsg && chatMsg.whisper && chatMsg.recipient
-                ? room.deliverWhisper(socket.room, 'chat-message', payload, socket.id, chatMsg.recipient)
-                : false;
-            if (!whisperedPrivately && !(chatMsg?.whisper && chatMsg?.privateOnly)) {
-                room.broadcastToRoom(socket.room, 'chat-message', payload, socket.id);
+            if (room.isPrivateChatMessage(chatMsg)) {
+                if (!room.deliverWhisper(socket.room, 'chat-message', payload, socket.id, chatMsg.recipient)) {
+                    socket.emit('error', { code: 'WHISPER_UNDELIVERABLE', message: 'Whisper not sent: the recipient is unavailable or ambiguous.' });
+                }
+                return;
             }
+            room.broadcastToRoom(socket.room, 'chat-message', payload, socket.id);
         });
 
         // ─── Relay events ───────────────────────────────────────────

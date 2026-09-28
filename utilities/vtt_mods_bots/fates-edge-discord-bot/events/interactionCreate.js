@@ -7,6 +7,8 @@ const logger = require('../utils/logger');
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
+        const denied = require('../utils/interaction-access').accessError(interaction, client.config || {});
+        if (denied) return interaction.reply({ content: denied, ephemeral: true });
         if ((interaction.isModalSubmit() && interaction.customId === 'paper-import:input') ||
             (interaction.isButton() && interaction.customId?.startsWith('paper-import:'))) {
             return require('../commands/paper-import').handleInteraction(interaction, client);
@@ -29,15 +31,15 @@ module.exports = {
                 return interaction.reply({ content: '❌ Not connected to VTT server.', ephemeral: true });
             }
             try {
-                client.vtt.send('chat-message', {
+                client.vtt.send('chat-message', { message: {
                     type: 'chat-message',
                     text: `!gm ${action} ${id}`,
                     sender: interaction.user.username,
                     recipient: 'all',
                     whisper: false,
                     timestamp: Date.now(),
-                });
-                await interaction.reply({ content: `${action === 'approve' ? '✅ Approved' : '🗑️ Rejected'} — sent to the GM bot.`, ephemeral: true });
+                } });
+                await interaction.reply({ content: `${action === 'approve' ? 'Approval' : 'Rejection'} request sent to the GM bot; awaiting its response.`, ephemeral: true });
             } catch (error) {
                 logger.error('❌ Failed to relay Assistant GM suggestion action:', error);
                 await interaction.reply({ content: `❌ Failed to send: ${error.message}`, ephemeral: true });
@@ -59,7 +61,7 @@ module.exports = {
             await command.execute(interaction, client);
         } catch (error) {
             logger.error(`❌ Command error (${interaction.commandName}):`, error);
-            await interaction.reply({
+            await interaction[interaction.deferred || interaction.replied ? 'editReply' : 'reply']({
                 content: `❌ There was an error executing this command: ${error.message}`,
                 ephemeral: true
             });

@@ -5,7 +5,7 @@
 # the socket server, plus an optional local Express webhook listener
 # (WEBHOOK_PORT). No required inbound port.
 # ---------------------------------------------------------------
-FROM node:20-alpine
+FROM node:22-bookworm-slim
 
 WORKDIR /app
 

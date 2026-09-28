@@ -114,60 +114,9 @@
     </div>
 
     <div class="sheet-section">
-        <h2>⚔️ VTT Sync Status</h2>
-        <div class="sync-status">
-            <span id="vtt-status">🔴 Disconnected</span>
-            <button class="vtt-sync-btn" onclick="syncCharacterToVTT()">Sync to VTT</button>
-        </div>
+        <h2>Dice rolls</h2>
+        <button type="roll" name="roll_melee" value="&{template:default} {{name=@{name}: Body + Melee}} {{Dice=[[(@{body}+@{melee})d10]]}}">Body + Melee</button>
+        <button type="roll" name="roll_stealth" value="&{template:default} {{name=@{name}: Wits + Stealth}} {{Dice=[[(@{wits}+@{stealth})d10]]}}">Wits + Stealth</button>
+        <p>These roll dice locally. Apply Fate’s Edge outcome rules at the table. Live network sync is not supported by Roll20 sheets or Mods.</p>
     </div>
 </div>
-
-<style>
-    /* Styles are in fates-edge.css */
-</style>
-
-<script>
-    // Character sheet JavaScript
-    // This runs in the character sheet sandbox
-
-    // Function to sync character to VTT
-    function syncCharacterToVTT() {
-        // Get character data
-        const charData = {
-            name: getAttr('name'),
-            harm: getAttr('harm'),
-            fatigue: getAttr('fatigue'),
-            boons: getAttr('boons'),
-            tier: getAttr('tier'),
-            body: getAttr('body'),
-            wits: getAttr('wits'),
-            spirit: getAttr('spirit'),
-            presence: getAttr('presence')
-        };
-
-        // Send to VTT via API command
-        // This will be handled by the API script
-        sendChat('!fates-edge sync char ' + JSON.stringify(charData));
-
-        // Update status
-        document.getElementById('vtt-status').textContent = '🟡 Syncing...';
-        setTimeout(() => {
-            document.getElementById('vtt-status').textContent = '🟢 Synced';
-        }, 2000);
-    }
-
-    // Helper to get attribute value
-    function getAttr(name) {
-        const el = document.querySelector(`[name="attr_${name}"]`);
-        return el ? parseInt(el.value) || 0 : 0;
-    }
-
-    // Update status from API
-    on('change:attr_name', () => {
-        // Update VTT status when name changes
-        document.getElementById('vtt-status').textContent = '🟡 Unsaved';
-        setTimeout(() => {
-            document.getElementById('vtt-status').textContent = '🟢 Synced';
-        }, 1000);
-    });
-</script>

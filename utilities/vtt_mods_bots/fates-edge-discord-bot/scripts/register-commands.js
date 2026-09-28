@@ -32,8 +32,7 @@ function loadCommands() {
         try {
             command = require(filePath);
         } catch (err) {
-            console.error(`❌ Failed to load ${file}:`, err.message);
-            continue;
+            throw new Error(`Failed to load ${file}: ${err.message}`);
         }
 
         if (command && command.data && typeof command.execute === 'function') {
@@ -91,4 +90,5 @@ async function main() {
     }
 }
 
-main();
+if (require.main === module) main();
+module.exports = { loadCommands };

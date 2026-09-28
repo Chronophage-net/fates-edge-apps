@@ -1,3 +1,4 @@
+import './core/html-sanitizer.js';
 /**
  * Fate's Edge Toolkit – Main Application Entry Point
  * See CHANGELOG.md at the repo root for the full version history —

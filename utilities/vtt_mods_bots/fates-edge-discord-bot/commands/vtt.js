@@ -543,7 +543,7 @@ async function handleConnect(interaction, vtt) {
         }
 
         if (serverUrl) {
-            vtt.config.serverUrl = serverUrl;
+            if (new URL(serverUrl).origin !== new URL(vtt.config.serverUrl).origin) return interaction.editReply('Change VTT_SERVER_URL in the bot configuration and restart to use a different server.');
         }
 
         vtt.deck = { cards: [], history: [], offset: 0 };
@@ -552,10 +552,12 @@ async function handleConnect(interaction, vtt) {
         vtt.pendingMessages = [];
         vtt.characters = {};
 
-        vtt.connect(room || undefined);
 
         const timeout = setTimeout(() => {
-            interaction.editReply('⏰ Connection timed out. Check server URL and room code.');
+            vtt.removeListener('connected', connectedHandler);
+            vtt.removeListener('error', errorHandler);
+            vtt.disconnect();
+            interaction.editReply('⏰ Connection timed out. Check server URL, room code and password.').catch(() => {});
         }, 15000);
 
         const connectedHandler = () => {
@@ -572,17 +574,19 @@ async function handleConnect(interaction, vtt) {
                 )
                 .setTimestamp();
 
-            interaction.editReply({ embeds: [embed] });
+            interaction.editReply({ embeds: [embed] }).catch(error => console.warn('Unable to update connection reply:', error.message));
         };
 
         const errorHandler = (err) => {
             clearTimeout(timeout);
             vtt.removeListener('connected', connectedHandler);
-            interaction.editReply(`❌ Connection failed: ${err.message}`);
+            vtt.disconnect();
+            interaction.editReply(`❌ Connection failed: ${err.message}`).catch(() => {});
         };
 
         vtt.once('connected', connectedHandler);
         vtt.once('error', errorHandler);
+        vtt.connect(room || undefined);
 
     } catch (err) {
         interaction.editReply(`❌ Error: ${err.message}`);

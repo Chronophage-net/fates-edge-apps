@@ -1556,7 +1556,7 @@
     "kon-reh.vtt-bridge.accept": "Accept",
     "kon-reh.vtt-bridge.decline": "Decline",
     "module-loader.error": "⚠️ Error",
-    "module-loader.errorLoadingModule": "❌ Error loading module",
+    "module-loader.errorLoadingModule": "This tool couldn’t open",
     "module-loader.moduleLoadedButNoRenderFunctionFound": "Module loaded but no render function found.",
     "module-loader.pleaseCheckExports": "Please check exports.",
     "patrons.addCosmic": "➕ Add Cosmic",
@@ -1666,7 +1666,7 @@
     "router.goHome": "🏠 Go Home",
     "router.navigatedToValue": "Navigated to {{value0}}",
     "router.redirectedToValue": "↪️ Redirected to {{value0}}",
-    "router.unknownRoute": "📄 Unknown Route",
+    "router.unknownRoute": "Page not found",
     "search.findRulesDocumentsWikiEntriesAndMore": "Find rules, documents, wiki entries, and more.",
     "search.rebuildIndex": "🔄 Rebuild Index",
     "search.search": "Search",
@@ -2695,7 +2695,12 @@
     "wiki.talents": "🧠 Talents",
     "wiki.valueAlreadyCloned": "\"{{value0}}\" already cloned.",
     "wiki.wiki": "📖 Wiki",
-    "docs.readingGuide": "🧭 Reading guide — where to start"
+    "docs.readingGuide": "🧭 Reading guide — where to start",
+    "module-loader.loading": "Opening your toolkit…",
+    "module-loader.loadingHint": "Getting this tool ready for your table.",
+    "module-loader.retryHint": "Check your connection, then try again. Your saved work is still here.",
+    "module-loader.retry": "Try again",
+    "module-loader.details": "Technical details"
   },
   "paperImport": {
     "title": "Import from Paper",

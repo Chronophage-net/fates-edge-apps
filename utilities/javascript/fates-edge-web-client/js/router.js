@@ -27,6 +27,7 @@ import { t as i18nText } from '@core/i18n.js';
 import { showToast } from './components/Toast.js';
 import { moduleLoader } from './module-loader.js';
 import { isFeatureVisible, getFeatureLockMessage } from './core/feature-toggles.js';
+import { escHtml } from './core/utils.js';
 import { announce } from './core/a11y-announce.js';
 
 // ============================================================
@@ -75,6 +76,7 @@ const ROUTE_IMPORTS = {
 // STATE
 // ============================================================
 
+let navigationId = 0;
 let currentTab = 'home';
 let activeCallbacks = [];
 let isInitialized = false;
@@ -84,7 +86,7 @@ let isInitialized = false;
 // ============================================================
 
 function resolveTab(tab) {
-    const redirect = ROUTE_REDIRECTS[tab];
+    const redirect = Object.hasOwn(ROUTE_REDIRECTS, tab) ? ROUTE_REDIRECTS[tab] : null;
     if (redirect) {
         console.log(`↪️ Router: Redirecting "${tab}" → "${redirect}"`);
         return redirect;
@@ -101,18 +103,12 @@ function getOrCreateContentElement(resolvedTab) {
     let el = document.getElementById(`tab-${resolvedTab}`);
     if (el) return el;
 
-    // Fallback: find any .tab-content
-    el = document.querySelector('.tab-content');
-    if (el) {
-        el.id = `tab-${resolvedTab}`;
-        return el;
-    }
-
     // Create new inside <main> or <body>
     const container = document.querySelector('main') || document.body;
     el = document.createElement('div');
     el.id = `tab-${resolvedTab}`;
     el.className = 'tab-content';
+    el.setAttribute('role', 'tabpanel');
     container.appendChild(el);
     console.log(`🆕 Created content container for tab: ${resolvedTab}`);
     return el;
@@ -123,6 +119,7 @@ function getOrCreateContentElement(resolvedTab) {
 // ============================================================
 
 export async function navigate(tab, options = {}) {
+    const requestId = ++navigationId;
     const resolved = resolveTab(tab);
     const isRedirect = resolved !== tab;
 
@@ -135,7 +132,7 @@ export async function navigate(tab, options = {}) {
     }
 
     // NEW: feature-access backstop — see file header note.
-    if (!isFeatureVisible(resolved) && !options._fromRedirect) {
+    if (!isFeatureVisible(resolved)) {
         console.log(`🚫 Router: "${resolved}" is not currently accessible.`);
         showToast(getFeatureLockMessage(resolved) || `"${resolved}" is not currently available.`, 'info');
         if (resolved !== 'home') {
@@ -152,14 +149,26 @@ export async function navigate(tab, options = {}) {
     // Check if route exists in loader
     if (!moduleLoader.importFns.has(resolved)) {
         console.warn(`⚠️ Route not found: ${resolved} (original: ${tab})`);
-        const contentEl = getOrCreateContentElement(resolved);
+        moduleLoader.cancelRender();
+        currentTab = resolved;
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-selected', 'false');
+        });
+        const contentEl = getOrCreateContentElement('not-found');
+        contentEl.classList.add('active');
+        document.title = "Fate's Edge — Page not found";
         contentEl.innerHTML = `
-            <div class="panel">
-                <h3 data-i18n="feature.router.unknownRoute">📄 Unknown Route</h3>
-                <p class="text-muted">The route "${resolved}" is not registered.</p>
-                <button class="btn btn-sm mt-1" onclick="window.location.hash='home'" data-i18n="feature.router.goHome">🏠 Go Home</button>
+            <div class="route-state">
+                <span class="route-state-symbol" aria-hidden="true">◇</span>
+                <h2 data-i18n="feature.router.unknownRoute">Page not found</h2>
+                <p class="text-muted">The page “${escHtml(resolved)}” is not available. Choose a tool from the sidebar or return home.</p>
+                <a class="btn btn-primary" href="#home" data-i18n="feature.router.goHome">Go Home</a>
             </div>
         `;
+        contentEl.setAttribute('tabindex', '-1');
+        contentEl.focus();
         return;
     }
 
@@ -196,11 +205,13 @@ export async function navigate(tab, options = {}) {
 
     // Delegate rendering to moduleLoader
     try {
-        await moduleLoader.renderModule(resolved, contentEl);
+        const loaded = await moduleLoader.renderModule(resolved, contentEl);
+        if (requestId !== navigationId || !loaded) return;
         if (options.connectionSetup) {
             const settings = await import('./features/settings/index.js');
             settings.showConnectionSetup(contentEl);
         }
+        if (requestId !== navigationId) return;
         activeCallbacks.forEach(cb => cb(resolved, moduleLoader.getModule(resolved)));
         if (isRedirect) {
             showToast(i18nText("feature.router.redirectedToValue", { value0: resolved }, "↪️ Redirected to {{value0}}"), 'info');

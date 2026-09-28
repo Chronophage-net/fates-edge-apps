@@ -1,16 +1,17 @@
 // js/module-loader.js - Robust module loader (integrated with router)
 
-import { setHtml } from './core/utils.js';
+import { setHtml, escHtml } from './core/utils.js';
 import { syncManager } from './core/sync/index.js';
 import { applyTranslations } from './core/i18n.js';
 
-class ModuleLoader {
+export class ModuleLoader {
     constructor() {
         this.modules = new Map();           // loaded modules
         this.loading = new Map();           // in-progress loads
         this.importFns = new Map();         // route name -> import function
         this.container = document.getElementById('app-content');
         this.currentModule = null;
+        this.renderId = 0;
     }
 
     /**
@@ -101,7 +102,7 @@ class ModuleLoader {
 
         // Ensure module has a render function
         if (typeof module.render !== 'function') {
-            console.warn(`⚠️ Module "${moduleName}" has no render function. Available exports:`, Object.keys(module));
+            console.warn(`⚠️ Module "${escHtml(moduleName)}" has no render function. Available exports:`, Object.keys(module));
 
             // Try alternative entry points
             if (typeof module.init === 'function') {
@@ -118,7 +119,7 @@ class ModuleLoader {
                 module.render = (el) => {
                     setHtml(el, `
                         <div class="panel">
-                            <h3>📄 ${moduleName}</h3>
+                            <h3>📄 ${escHtml(moduleName)}</h3>
                             <p class="text-muted" data-i18n="feature.module-loader.moduleLoadedButNoRenderFunctionFound">Module loaded but no render function found.</p>
                             <p class="text-muted small" style="font-size:0.8rem;color:var(--text3);" data-i18n="feature.module-loader.pleaseCheckExports">Please check exports.</p>
                         </div>
@@ -186,17 +187,23 @@ class ModuleLoader {
             return;
         }
 
+        this.cancelRender();
+        const requestId = this.renderId;
+        this.busyContainer = container;
+        container.setAttribute('aria-busy', 'true');
+        setHtml(container, `<div class="route-state" role="status">
+            <span class="route-state-symbol" aria-hidden="true">◇</span>
+            <h2 data-i18n="feature.module-loader.loading">Opening your toolkit…</h2>
+            <p class="text-muted" data-i18n="feature.module-loader.loadingHint">Getting this tool ready for your table.</p>
+        </div>`);
+        applyTranslations(container);
         try {
-            // Deactivate current module if different
-            if (this.currentModule && this.currentModule !== moduleName) {
-                const currentMod = this.modules.get(this.currentModule);
-                if (currentMod && typeof currentMod.onDeactivate === 'function') {
-                    await currentMod.onDeactivate();
-                }
-            }
-
-            // Load (or retrieve) the module
             const module = await this.loadModule(moduleName);
+            if (requestId !== this.renderId) return null;
+            if (this.currentModule && this.currentModule !== moduleName) {
+                await this.modules.get(this.currentModule)?.onDeactivate?.();
+                if (requestId !== this.renderId) return null;
+            }
 
             // Store container reference
             module._container = container;
@@ -205,12 +212,13 @@ class ModuleLoader {
             setHtml(container, '');
             if (typeof module.render === 'function') {
                 await module.render(container);
+                if (requestId !== this.renderId) return null;
                 module._lastRender = Date.now();
             } else {
                 setHtml(container, `
                     <div class="panel">
                         <h3 data-i18n="feature.module-loader.error">⚠️ Error</h3>
-                        <p class="text-muted">Module "${moduleName}" has no render function.</p>
+                        <p class="text-muted">Module "${escHtml(moduleName)}" has no render function.</p>
                     </div>
                 `);
             }
@@ -219,6 +227,8 @@ class ModuleLoader {
             if (typeof module.onActivate === 'function') {
                 await module.onActivate();
             }
+
+            if (requestId !== this.renderId) return null;
 
             // Feature modules build most of their interface at runtime. Apply
             // their data-i18n annotations after both render and activation so
@@ -237,25 +247,45 @@ class ModuleLoader {
             return module;
         } catch (error) {
             console.error(`Failed to render module "${moduleName}":`, error);
+            if (requestId !== this.renderId) return null;
             setHtml(container, `
-                <div class="panel" style="border-inline-start:4px solid var(--red);">
-                    <h3 style="color:var(--red);" data-i18n="feature.module-loader.errorLoadingModule">❌ Error loading module</h3>
-                    <p class="text-muted">${error.message || 'Unknown error'}</p>
-                    <pre style="font-size:0.7rem;background:var(--bg3);padding:0.5rem;overflow:auto;max-height:150px;">${error.stack || ''}</pre>
-                    <button class="btn btn-primary mt-1" onclick="window.moduleLoader?.retryModule('${moduleName}')">
-                        🔄 Retry
-                    </button>
+                <div class="route-state route-state-error" role="alert">
+                    <span class="route-state-symbol" aria-hidden="true">◇</span>
+                    <h2 data-i18n="feature.module-loader.errorLoadingModule">This tool couldn’t open</h2>
+                    <p class="text-muted" data-i18n="feature.module-loader.retryHint">Check your connection, then try again. Your saved work is still here.</p>
+                    <div class="route-state-actions">
+                        <button type="button" class="btn btn-primary" data-retry-module data-i18n="feature.module-loader.retry">Try again</button>
+                        <a class="btn btn-quiet" href="#home" data-i18n="feature.router.goHome">Go Home</a>
+                    </div>
+                    <details><summary data-i18n="feature.module-loader.details">Technical details</summary><p>${escHtml(error.message || 'Unknown error')}</p></details>
                 </div>
             `);
+            container.querySelector('[data-retry-module]')?.addEventListener('click', () => {
+                return this.retryModule(moduleName, container);
+            });
+            applyTranslations(container);
+            return null;
+        } finally {
+            if (requestId === this.renderId) {
+                container.removeAttribute('aria-busy');
+                this.busyContainer = null;
+            }
         }
+    }
+
+    cancelRender() {
+        this.busyContainer?.removeAttribute('aria-busy');
+        this.busyContainer = null;
+        this.renderId++;
     }
 
     /**
      * Retry loading a failed module
      */
-    async retryModule(moduleName) {
+    async retryModule(moduleName, targetElement = null) {
+        const container = targetElement || this.modules.get(moduleName)?._container || this.container;
         this.unloadModule(moduleName);
-        return this.renderModule(moduleName);
+        return this.renderModule(moduleName, container);
     }
 
     /**

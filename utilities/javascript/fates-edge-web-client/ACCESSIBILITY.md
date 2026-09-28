@@ -1,5 +1,12 @@
 # Accessibility
 
+September 2026 update: the light-theme gold tokens are now `#765407`,
+`#805b08`, and `#654700`, with inverse text on filled buttons. This supersedes
+the historical gold-contrast follow-up below. Desktop dark/light and 390px
+mobile layouts were visually checked. Home button overrides are scoped to
+`#tab-home`, and its entrance animation respects reduced motion.
+
+
 What's built into the Fate's Edge web client for screen reader, low-vision, and hearing/speech-related accessibility, where to find each feature, and how to turn it on. For what's planned but not yet built, see [Known gaps](#known-gaps) at the end.
 
 ## Navigation & screen readers

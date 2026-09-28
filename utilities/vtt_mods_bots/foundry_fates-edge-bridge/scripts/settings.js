@@ -41,7 +41,7 @@ export const registerSettings = function() {
     game.settings.register('fates-edge-bridge', 'password', {
         name: 'Room Password',
         hint: "The room's join password, if the GM has set one (only needed for this account's first join -- see Account Token below to skip re-entering it after that)",
-        scope: 'world',
+        scope: 'client',
         config: true,
         type: String,
         default: '',
@@ -53,7 +53,7 @@ export const registerSettings = function() {
     game.settings.register('fates-edge-bridge', 'apiKey', {
         name: 'API Key',
         hint: 'API key for authentication (optional)',
-        scope: 'world',
+        scope: 'client',
         config: true,
         type: String,
         default: '',
@@ -71,7 +71,7 @@ export const registerSettings = function() {
     game.settings.register('fates-edge-bridge', 'authToken', {
         name: 'Account Token',
         hint: 'Optional per-account login token. Lets a GM skip re-entering a room password on later joins, and makes bans against this account persist across reconnects.',
-        scope: 'world',
+        scope: 'client',
         config: true,
         type: String,
         default: '',
@@ -83,7 +83,7 @@ export const registerSettings = function() {
     game.settings.register('fates-edge-bridge', 'playerName', {
         name: 'Player Name',
         hint: 'Name to display in the VTT (leave empty to use Foundry user name)',
-        scope: 'world',
+        scope: 'client',
         config: true,
         type: String,
         default: '',

@@ -82,11 +82,8 @@ function trustedSanitize(html) {
             FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
         });
     }
-    // --- Fallback: basic strip if DOMPurify isn't loaded ---
-    return String(html)
-        .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-        .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
-        .replace(/href\s*=\s*["']\s*javascript:/gi, 'href="#"');
+    return escHtml(html);
+
 }
 // ============================================================
 // Container & query helpers

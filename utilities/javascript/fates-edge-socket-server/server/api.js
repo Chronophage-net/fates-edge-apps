@@ -130,14 +130,14 @@ function createApiRouter(appConfig) {
     router.get('/healthz', (req, res) => res.status(200).send('OK'));
     router.get('/api/healthz', (req, res) => res.status(200).send('OK'));
     router.get(config.healthEndpoint, (req, res) => {
-        const roomStats = Array.from(room.rooms.keys()).map(code => room.getRoomStats(code)).filter(Boolean);
+        const totalClients = Array.from(room.rooms.values()).reduce((sum, entry) => sum + entry.clients.size, 0);
         res.json({
             status: 'ok',
             timestamp: Date.now(),
             uptime: process.uptime(),
             stats: {
                 totalRooms: room.rooms.size,
-                rooms: roomStats
+                totalClients
             }
         });
     });
@@ -182,7 +182,7 @@ function createApiRouter(appConfig) {
 
     // ─── Room list ──────────────────────────────────────────────────
     router.get('/api/rooms', authenticate, (req, res) => {
-        const roomStats = Array.from(room.rooms.keys()).map(code => room.getRoomStats(code)).filter(Boolean);
+        const totalClients = Array.from(room.rooms.values()).reduce((sum, entry) => sum + entry.clients.size, 0);
         res.json({ rooms: roomStats, count: roomStats.length, timestamp: Date.now() });
     });
 

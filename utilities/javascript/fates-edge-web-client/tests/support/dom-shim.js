@@ -176,6 +176,9 @@ export function installDomShim() {
             sessionStorage: globalThis.sessionStorage,
             addEventListener() {},
             removeEventListener() {},
+            // jsPDF uses these standard browser helpers; Node provides the same APIs.
+            atob: globalThis.atob,
+            btoa: globalThis.btoa,
             DOMPurify: undefined
         };
     }

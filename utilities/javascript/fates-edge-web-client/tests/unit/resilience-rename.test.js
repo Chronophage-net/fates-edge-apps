@@ -21,7 +21,18 @@ import {
 } from '../../js/features/encounters/bestiary.js';
 
 describe('Resilience rename: back-compatibility', () => {
-    it('reads the new key', () => {
+    it('formats structured wound pools without changing the stored data', () => {
+        const entry = { resilience: { value: 8, perPhase: true } };
+        assertEqual(resilienceOf(entry), '8 per phase');
+        assertEqual(entry.resilience.value, 8);
+        assertEqual(resilienceOf({ resilience: { value: 3 } }), '3 (standard)');
+        assertEqual(resilienceOf({ resilience: { value: 8 } }), '8 (advanced)');
+        assertEqual(resilienceOf({ resilience: { value: 5 } }), '5');
+        assertEqual(resilienceOf({ resilience: { value: 'bad' } }), undefined);
+        assertEqual(resilienceOf({ resolution: 'Speak its name.' }), 'None (puzzle)');
+    });
+
+    it('reads the new key' , () => {
         assertEqual(resilienceOf({ resilience: '8 (advanced)' }), '8 (advanced)');
     });
 
@@ -66,11 +77,11 @@ describe('Resilience rename: shipped data', () => {
         return JSON.parse(readFileSync(path.resolve(here, '..', '..', 'data', 'bestiary.json'), 'utf8'));
     };
 
-    it('every bestiary entry carries resilience and none is left on the old key', async () => {
+    it('every adversary has a wound pool or a puzzle resolution, without the old key', async () => {
         const raw = await loadBestiary();
         const entries = parseBestiary(raw);
         assertTrue(entries.length > 200, `expected the full bestiary, got ${entries.length}`);
-        const missing = entries.filter(e => !e.resilience);
+        const missing = entries.filter(e => !resilienceOf(e));
         const stale = entries.filter(e => e.harm_levels !== undefined);
         assertEqual(missing.length, 0, `${missing.length} entries have no resilience`);
         assertEqual(stale.length, 0, `${stale.length} entries still carry harm_levels`);
@@ -79,8 +90,8 @@ describe('Resilience rename: shipped data', () => {
     it('resilience values stay on the vocabulary the books use', async () => {
         const raw = await loadBestiary();
         const entries = parseBestiary(raw);
-        const odd = entries.filter(e => !/^(3 \(standard\)|8 \(advanced\)|8 per phase|None \(puzzle\))/.test(String(e.resilience)));
-        assertTrue(odd.length < entries.length * 0.2,
-            `unexpected resilience vocabulary in ${odd.length} entries, e.g. ${odd.slice(0, 3).map(e => e.resilience).join(' | ')}`);
+        const odd = entries.filter(e => !/^(3 \(standard\)|8 \(advanced\)|8 per phase|None \(puzzle\))/.test(String(resilienceOf(e))));
+        assertEqual(odd.length, 0,
+            `unexpected resilience vocabulary in ${odd.length} entries, e.g. ${odd.slice(0, 3).map(e => resilienceOf(e)).join(' | ')}`);
     });
 });

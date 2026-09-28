@@ -15,6 +15,9 @@ function loadConfig() {
         vtt: {
             serverUrl: process.env.VTT_SERVER_URL || 'ws://localhost:10000',
             apiKey: process.env.VTT_API_KEY,
+            password: process.env.VTT_ROOM_PASSWORD || '',
+            authToken: process.env.VTT_AUTH_TOKEN || '',
+            botName: process.env.VTT_BOT_NAME || 'Discord Bot',
             roomCode: process.env.VTT_ROOM_CODE || '',
             logChannel: process.env.VTT_LOG_CHANNEL || ''  // <-- ADDED
         },
@@ -53,6 +56,8 @@ function loadConfig() {
     if (!config.discord.clientId) {
         errors.push('DISCORD_CLIENT_ID is required');
     }
+
+    if (!config.discord.guildId) errors.push('DISCORD_GUILD_ID is required for this shared bridge');
 
     if (!config.vtt.serverUrl) {
         errors.push('VTT_SERVER_URL is required');

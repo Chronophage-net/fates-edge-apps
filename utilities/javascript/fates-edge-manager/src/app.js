@@ -2,7 +2,7 @@ import express from 'express';
 import { randomUUID, randomBytes } from 'node:crypto';
 import argon2 from 'argon2';
 import { fileURLToPath } from 'node:url';
-import { digest, equal, secret, text, uuid, requireThat, roles, scopesFor } from './security.js';
+import { digest, equal, secret, text, uuid, requireThat, roles, scopesFor, password as passwordValue } from './security.js';
 import { installSSO } from './sso.js';
 import { verifyPassword } from './passwords.js';
 
@@ -15,7 +15,9 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   requireThat(pepper?.length >= 32, 500, 'Manager pepper must contain at least 32 characters');
   const app = express();
   app.disable('x-powered-by');
-  const secure = new URL(origin).protocol === 'https:';
+  const configuredOrigin = new URL(origin);
+  requireThat(configuredOrigin.origin === origin && !configuredOrigin.username && !configuredOrigin.password, 500, 'MANAGER_ORIGIN must be an exact HTTP(S) origin');
+  const secure = configuredOrigin.protocol === 'https:';
   requireThat(secure || ['localhost','127.0.0.1'].includes(new URL(origin).hostname), 500, 'HTTPS is required');
   const cookieOptions = { httpOnly: true, secure, sameSite: 'lax', path: '/' };
   const hash = value => digest(value, pepper);
@@ -138,7 +140,7 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   route('get', '/health', 'none', async tx => { await tx.query('SELECT 1'); return { status: 'ok' }; });
   app.get('/.well-known/jwks.json', (req,res) => res.json(tokens.jwks));
   route('post', '/v1/auth/login', 'public', async (tx,req,res) => {
-    const name = text(req.body.username, 32), password = text(req.body.password, 256);
+    const name = text(req.body.username, 32), password = passwordValue(req.body.password);
     const account = await one(tx, "SELECT * FROM accounts WHERE lower(username)=lower($1) AND status='active'", [name]);
     const valid = await verifyPassword(account?.password_hash || await dummyPasswordHash, password);
     requireThat(account?.password_hash && valid, 401, 'Invalid username or password');
@@ -161,14 +163,14 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   });
   route('post', '/v1/me/password', 'human', async (tx,req) => {
     const account=await one(tx,'SELECT password_hash FROM accounts WHERE id=$1',[req.account.id]);
-    requireThat(account.password_hash && await verifyPassword(account.password_hash,text(req.body.current_password,256)),403,'Current password is incorrect');
-    const password=text(req.body.password,256);requireThat(password.length>=12,400,'Use at least 12 characters');
+    requireThat(account.password_hash && await verifyPassword(account.password_hash,passwordValue(req.body.current_password)),403,'Current password is incorrect');
+    const password=passwordValue(req.body.password);requireThat(password.length>=12,400,'Use at least 12 characters');
     await tx.query('UPDATE accounts SET password_hash=$2 WHERE id=$1',[req.account.id,await argon2.hash(password)]);
     await tx.query('DELETE FROM sessions WHERE account_id=$1 AND digest<>$2',[req.account.id,req.account.digest]);
     await audit(tx,req,'password.changed');
   });
   route('post', '/v1/operator/accounts', 'operator', async (tx,req) => {
-    const username = text(req.body.username,32), password=text(req.body.password,256);
+    const username = text(req.body.username,32), password=passwordValue(req.body.password);
     requireThat(/^[a-zA-Z0-9_-]{3,32}$/.test(username) && password.length >= 12,400,'Use a 3–32 character username and a password of at least 12 characters');
     const account = await one(tx,'INSERT INTO accounts(id,username,password_hash) VALUES($1,$2,$3) RETURNING id,username', [randomUUID(),username,await argon2.hash(password)]);
     await audit(tx,req,'account.created',null,account.id); return account;
@@ -313,7 +315,8 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
     requireThat(row,404,'Node not found'); await audit(tx,req,`node.${req.body.status}`,null,row.server_id);
   });
   route('post','/v1/internal/nodes/register','service',async(tx,req)=>{
-    const url=new URL(text(req.body.public_url,500));
+    let url;
+    try { url = new URL(text(req.body.public_url,500)); } catch { requireThat(false,400,'Use a valid socket URL'); }
     requireThat(!url.username && !url.password && !url.search && !url.hash && (url.protocol==='wss:' || (!secure && url.protocol==='ws:' && ['localhost','127.0.0.1'].includes(url.hostname))),400,'Use a secure socket URL');
     requireThat(Number.isInteger(req.body.capacity_rooms) && req.body.capacity_rooms>0 && req.body.capacity_rooms<=10000,400,'Invalid node capacity');
     await tx.query(`INSERT INTO socket_nodes(server_id,name,public_url,capacity_rooms,region) VALUES($1,$2,$3,$4,$5)
@@ -330,8 +333,12 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   app.use(express.static(fileURLToPath(new URL('../public',import.meta.url)),{etag:false}));
   app.use((req,res)=>res.status(404).json({error:'Not found',request_id:req.requestId}));
   app.use((error,req,res,next)=>{
+    if (res.headersSent) return next(error);
     const status=error.status || (error.code==='23505'?409:500);
-    res.status(status).json({error:status===500?'Request failed':error.code==='23505'?'That record already exists':error.message,request_id:req.requestId});
+    const message = error.type === 'entity.parse.failed' ? 'Invalid JSON request body'
+      : error.type === 'entity.too.large' ? 'Request body is too large'
+      : status >= 500 ? 'Request failed' : error.code === '23505' ? 'That record already exists' : error.message;
+    res.status(status).json({error:message,request_id:req.requestId});
   });
   return app;
 }

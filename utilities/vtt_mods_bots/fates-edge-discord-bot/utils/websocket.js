@@ -13,6 +13,7 @@ class VTTClient extends EventEmitter {
     constructor(config) {
         super();
         this.config = config;
+        this.on('error', error => logger.warn(error.message));
         this.ws = null;
         this.connected = false;
         this.clientId = null;
@@ -22,6 +23,7 @@ class VTTClient extends EventEmitter {
         this.heartbeatInterval = null;
         this.roomCode = config.roomCode;
         this.pendingMessages = [];
+        this.manualDisconnect = false;
 
         // GM state
         this.clients = new Map();
@@ -41,11 +43,13 @@ class VTTClient extends EventEmitter {
     // ─── Connection ──────────────────────────────────────────────
 
     connect(roomCode = this.roomCode) {
-        if (this.connected) {
+        if (this.ws && [WebSocket.CONNECTING, WebSocket.OPEN].includes(this.ws.readyState)) {
             logger.warn('Already connected to VTT server');
             return;
         }
 
+        this.manualDisconnect = false;
+        this._cleanup();
         if (roomCode) {
             this.roomCode = roomCode;
         }
@@ -60,13 +64,16 @@ class VTTClient extends EventEmitter {
         logger.info(`🏠 Room: ${this.roomCode}`);
 
         try {
-            const wsUrl = `${this.config.serverUrl}?room=${encodeURIComponent(this.roomCode)}`;
-            this.ws = new WebSocket(wsUrl);
+            const wsUrl = new URL(this.config.serverUrl);
+            if (!['ws:', 'wss:'].includes(wsUrl.protocol) || wsUrl.username || wsUrl.password) throw new Error('Use a ws:// or wss:// URL without credentials');
+            wsUrl.searchParams.set('room', this.roomCode);
+            this.ws = new WebSocket(wsUrl, { handshakeTimeout: 10000, maxPayload: 8 * 1024 * 1024 });
+            const socket = this.ws;
 
-            this.ws.on('open', () => this._onOpen());
-            this.ws.on('message', (data) => this._onMessage(data));
-            this.ws.on('error', (error) => this._onError(error));
-            this.ws.on('close', (code, reason) => this._onClose(code, reason));
+            socket.on('open', () => { if (this.ws === socket) this._onOpen(); });
+            socket.on('message', (data) => { if (this.ws === socket) this._onMessage(data); });
+            socket.on('error', (error) => { if (this.ws === socket) this._onError(error); });
+            socket.on('close', (code, reason) => { if (this.ws === socket) this._onClose(code, reason); });
 
         } catch (err) {
             logger.error(`❌ Connection error: ${err.message}`);
@@ -76,6 +83,8 @@ class VTTClient extends EventEmitter {
     }
 
     disconnect() {
+        this.manualDisconnect = true;
+        this.pendingMessages = [];
         logger.info('🔌 Disconnecting from VTT server');
         this._cleanup();
         if (this.ws) {
@@ -97,7 +106,7 @@ class VTTClient extends EventEmitter {
 
     send(type, data = {}) {
         const message = { type, ...data };
-        this._sendMessage(message);
+        return this._sendMessage(message);
     }
 
     // Confirm a single paper entry with a receiving web client. Deliberately
@@ -141,11 +150,11 @@ class VTTClient extends EventEmitter {
                 return true;
             } catch (err) {
                 logger.error(`❌ Failed to send message: ${err.message}`);
-                this.pendingMessages.push(message);
+                // Uncertain mutations must not replay on reconnect.
                 return false;
             }
         } else {
-            this.pendingMessages.push(message);
+            // Offline commands are rejected rather than replayed into a later room.
             return false;
         }
     }
@@ -154,24 +163,11 @@ class VTTClient extends EventEmitter {
 
     _onOpen() {
         logger.info('✅ WebSocket connected');
-        this.connected = true;
-        this.reconnectAttempts = 0;
-        this.emit('connected');
-
-        // Send handshake (plain WebSocket protocol)
-        const playerName = this.config.botName || 'Discord Bot';
-        this._sendMessage({
-            type: 'handshake',
-            clientName: playerName,
-            role: 'player',
-            password: this.config.password || ''
-        });
-
-        // Send any pending messages
-        while (this.pendingMessages.length > 0) {
-            const msg = this.pendingMessages.shift();
-            this._sendMessage(msg);
-        }
+        this.connected = false;
+        this.ws.send(JSON.stringify({
+            type: 'handshake', clientName: this.config.botName || 'Discord Bot',
+            role: 'player', password: this.config.password || '', authToken: this.config.authToken || ''
+        }));
 
         // Start heartbeat
         this.heartbeatInterval = setInterval(() => {
@@ -184,6 +180,7 @@ class VTTClient extends EventEmitter {
     _onMessage(data) {
         try {
             const message = JSON.parse(data.toString());
+            if (!message || typeof message !== 'object' || Array.isArray(message) || typeof message.type !== 'string') return;
             this.emit('message', message);
             this._handleMessage(message);
         } catch (err) {
@@ -203,7 +200,7 @@ class VTTClient extends EventEmitter {
         this.clientId = null;
         this.emit('disconnected');
 
-        if (code !== 1000) {
+        if (!this.manualDisconnect && ![1000, 4000, 4002, 4003, 4004].includes(code)) {
             this._scheduleReconnect();
         }
     }
@@ -217,11 +214,23 @@ class VTTClient extends EventEmitter {
                 // We'll capture clientId from handshake_ack.
                 break;
 
+            case 'error':
+            case 'permission-denied':
+                this.emit('error', new Error(message.message || 'The server rejected this request'));
+                break;
+            case 'auth-required':
+                this.emit('error', new Error('Managed rooms need a manager-token adapter; use an unmanaged server for this integration.'));
+                this.disconnect();
+                break;
             case 'handshake_ack':
+                if (!message.success) break;
+                this.connected = true;
+                this.reconnectAttempts = 0;
                 this.clientId = message.clientId;
                 this.myRole = message.clientRole || 'player';
                 logger.info(`✅ Handshake successful. Client ID: ${this.clientId}, Role: ${this.myRole}`);
                 this.emit('handshake_ack', message);
+                this.emit('connected');
                 if (message.activeClients) {
                     this._updateClients(message.activeClients);
                 }
@@ -553,9 +562,9 @@ class VTTClient extends EventEmitter {
     // ─── Public API ──────────────────────────────────────────────
 
     getApiBaseUrl() {
-        const wsUrl = this.config.serverUrl;
-        const httpUrl = wsUrl.replace(/^ws/, 'http');
-        return httpUrl.replace(/\/$/, '') + '/api';
+        const url = new URL(this.config.serverUrl);
+        url.protocol = url.protocol === 'wss:' ? 'https:' : 'http:';
+        return `${url.origin}/api`;
     }
 
     getCurrentGM() {

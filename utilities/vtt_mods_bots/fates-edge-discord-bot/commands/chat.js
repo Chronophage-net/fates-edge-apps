@@ -10,7 +10,7 @@ module.exports = {
         .setDescription('Send a message to the VTT chat')
         .addStringOption(option =>
             option.setName('message')
-                .setDescription('Message to send')
+                .setDescription('Message to send').setMaxLength(1000)
                 .setRequired(true)
         )
         .addStringOption(option =>
@@ -50,18 +50,24 @@ module.exports = {
                 }
             }
 
+            let recipient = whisperTarget;
+            if (whisperTarget) {
+                const matches = [...client.vtt.clients.values()].filter(c => c.id === whisperTarget || c.name.toLowerCase() === whisperTarget.toLowerCase());
+                if (matches.length !== 1) return interaction.editReply('Choose one connected player by exact name or client ID.');
+                recipient = matches[0].id;
+            }
             // Build the chat payload
             const payload = {
                 type: 'chat-message',
                 text: message,
                 sender: system ? 'System' : sender,
-                recipient: whisperTarget || 'all',
+                recipient: recipient || 'all',
                 whisper: !!whisperTarget,
                 timestamp: Date.now()
             };
 
             // Send via VTT client (uses WebSocket)
-            client.vtt.send('chat-message', payload);
+            if (!client.vtt.send('chat-message', { message: payload })) throw new Error('Connection is not ready');
 
             // Build confirmation embed
             const embed = new EmbedBuilder()

@@ -44,12 +44,18 @@ module.exports = {
                 return null;
             }
             const channel = client.channels.cache.get(channelId);
-            if (!channel) {
+            if (!channel || channel.guildId !== client.config?.discord?.guildId || !channel.isTextBased()) {
                 console.warn(`⚠️ VTT log channel ${channelId} not found`);
                 return null;
             }
             return channel;
         };
+
+        vtt.on('chat-message', data => {
+            const payload = require('../utils/chat-relay').publicChat(data, vtt.clientId);
+            const channel = payload && getLogChannel();
+            if (channel) channel.send(payload).catch(error => console.warn('VTT chat relay failed:', error.message));
+        });
 
         // 1. GM vote request
         vtt.on('gmVoteRequest', (data) => {

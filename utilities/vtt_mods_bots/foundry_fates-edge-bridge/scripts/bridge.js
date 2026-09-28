@@ -124,7 +124,7 @@ export const FatesEdgeBridge = {
             if (!btn) return;
             const id = btn.dataset.feSuggestionId;
             const action = btn.dataset.feSuggestionAction;
-            if (!id || (action !== 'approve' && action !== 'reject')) return;
+            if (!game.user.isGM || !id || (action !== 'approve' && action !== 'reject')) return;
             const card = btn.closest('.fe-suggestion-card');
             if (card) card.querySelectorAll('button').forEach(b => { b.disabled = true; });
             this.sendChatMessage(`!gm ${action} ${id}`);
@@ -138,7 +138,7 @@ export const FatesEdgeBridge = {
     // ============================================================
     
     connect() {
-        if (this.connected) {
+        if (this.ws && [WebSocket.CONNECTING, WebSocket.OPEN].includes(this.ws.readyState)) {
             console.log('🔌 Already connected to Fate\'s Edge server');
             return;
         }
@@ -166,16 +166,21 @@ export const FatesEdgeBridge = {
         this._updateStatusUI('connecting');
         
         try {
-            const protocol = serverUrl.startsWith('https') ? 'wss' : 'ws';
-            const wsUrl = serverUrl.replace(/^https?:\/\//, '');
-            const fullUrl = `${protocol}://${wsUrl}?room=${encodeURIComponent(roomCode)}`;
-            
-            this.ws = new WebSocket(fullUrl);
-            
-            this.ws.onopen = () => this._onOpen(playerName, password, authToken);
-            this.ws.onmessage = (event) => this._onMessage(event);
-            this.ws.onerror = (error) => this._onError(error);
-            this.ws.onclose = (event) => this._onClose(event);
+            const fullUrl = new URL(serverUrl);
+            if (fullUrl.protocol === 'http:') fullUrl.protocol = 'ws:';
+            if (fullUrl.protocol === 'https:') fullUrl.protocol = 'wss:';
+            if (!['ws:', 'wss:'].includes(fullUrl.protocol) || fullUrl.username || fullUrl.password) throw new Error('Use a ws:// or wss:// URL without credentials');
+            if (globalThis.location?.protocol === 'https:' && fullUrl.protocol !== 'wss:') throw new Error('An HTTPS Foundry game requires a wss:// server');
+            fullUrl.searchParams.set('room', roomCode);
+            this.roomCode = roomCode;
+            clearTimeout(this.reconnectTimer);
+            this.ws = new WebSocket(fullUrl.toString());
+            const socket = this.ws;
+
+            socket.onopen = () => { if (this.ws === socket) this._onOpen(playerName, password, authToken); };
+            socket.onmessage = event => { if (this.ws === socket) this._onMessage(event); };
+            socket.onerror = error => { if (this.ws === socket) this._onError(error); };
+            socket.onclose = event => { if (this.ws === socket) this._onClose(event); };
             
         } catch (err) {
             console.error('❌ Failed to connect:', err);
@@ -240,9 +245,8 @@ export const FatesEdgeBridge = {
     
     _onOpen(playerName, password, authToken) {
         console.log('✅ WebSocket connected');
-        this.connected = true;
-        this.reconnectAttempts = 0;
-        this._updateStatusUI('connected');
+        this.connected = false;
+        this._updateStatusUI('connecting');
 
         const message = {
             type: 'handshake',
@@ -269,6 +273,7 @@ export const FatesEdgeBridge = {
     _onMessage(event) {
         try {
             const data = JSON.parse(event.data);
+            if (!data || typeof data !== 'object' || Array.isArray(data) || typeof data.type !== 'string') return;
             this._handleMessage(data);
         } catch (err) {
             console.warn('⚠️ Failed to parse WebSocket message:', err);
@@ -277,6 +282,14 @@ export const FatesEdgeBridge = {
     
     _handleMessage(data) {
         switch (data.type) {
+            case 'error':
+            case 'permission-denied':
+                ui.notifications.error(escapeHtml(data.message || 'The server rejected this request'));
+                break;
+            case 'auth-required':
+                ui.notifications.error('Managed rooms require a manager-token adapter. Use an unmanaged server with this bridge.');
+                this.disconnect();
+                break;
             case 'handshake_ack':
                 this._handleHandshakeAck(data);
                 break;
@@ -471,7 +484,7 @@ export const FatesEdgeBridge = {
             this.heartbeatInterval = null;
         }
         
-        if (event.code !== 1000) {
+        if (![1000, 4000, 4002, 4003, 4004].includes(event.code)) {
             this._attemptReconnect();
         }
     },
@@ -503,6 +516,10 @@ export const FatesEdgeBridge = {
     // ============================================================
     
     _handleHandshakeAck(data) {
+        if (!data.success) return;
+        this.connected = true;
+        this.reconnectAttempts = 0;
+        this._updateStatusUI('connected');
         this.clientId = data.clientId;
         this.myRole = data.clientRole || 'player';
         console.log(`✅ Handshake successful. Client ID: ${this.clientId}, Role: ${this.myRole}`);
@@ -511,10 +528,10 @@ export const FatesEdgeBridge = {
         if (data.activeClients) {
             this._updateClients(data.activeClients);
             const names = data.activeClients.map(c => c.name).join(', ');
-            console.log(`👥 Clients in room: ${names}`);
+            console.log(`👥 Clients in room: ${escapeHtml(names)}`);
         }
         
-        this._sendRegionUpdate(this.defaultRegion);
+        // Joining does not overwrite the table's existing region.
         this._updateGmUI();
         this._updateDeckUI();
     },
@@ -578,17 +595,27 @@ export const FatesEdgeBridge = {
     },
     
     _handleChatMessage(data) {
-        console.log(`💬 ${data.sender}: ${data.text}`);
-        const isSystem = data.sender === 'System';
-        const chatData = {
-            user: game.user,
-            content: `<b>${isSystem ? '📢' : '[Fate\'s Edge]'} ${escapeHtml(data.sender)}:</b> ${escapeHtml(data.text)}`,
-            whisper: []
-        };
-        ChatMessage.create(chatData);
-        Hooks.call('fates-edge-chat-message', data);
+        const message = data.message || data;
+        if (message.senderClientId === this.clientId) return;
+        const privateMessage = message.whisper || message.privateOnly || (message.recipient && message.recipient !== 'all');
+        // Each Foundry user has a socket, but public ChatMessage documents are
+        // shared across the world. Only the active GM publishes imported events.
+        if (!privateMessage && !this.isRelayOwner()) return;
+        ChatMessage.create({
+            user: game.user.id,
+            content: `<b>[Fate's Edge] ${escapeHtml(message.sender || 'Player')}:</b> ${escapeHtml(message.text || '')}`,
+            whisper: privateMessage ? [game.user.id] : [],
+            flags: { 'fates-edge-bridge': { imported: true } }
+        });
+        Hooks.call('fates-edge-chat-message', message);
     },
 
+    isRelayOwner() {
+        const activeGM = game.users?.activeGM;
+        if (activeGM) return activeGM.id === game.user.id;
+        const gm = game.users?.find?.(user => user.active && user.isGM);
+        return gm ? gm.id === game.user.id : !!game.user.isGM;
+    },
     // NEW: optional AI GM voice narration playback. Local to THIS
     // client only -- deliberately does not go through Foundry's own
     // socket layer (AudioHelper.play(data, true) would broadcast it a
@@ -638,6 +665,7 @@ export const FatesEdgeBridge = {
     },
 
     _handleRollResult(data) {
+        data = data.roll || data;
         console.log('🎲 Roll:', data);
         let resultText = data.result;
         if (data.rolls && data.rolls.length > 0) {
@@ -648,7 +676,7 @@ export const FatesEdgeBridge = {
             content: `<b>[Fate's Edge] ${escapeHtml(data.sender)} rolled:</b><br>🎲 ${escapeHtml(data.expr || 'Dice Roll')}<br><b>Result:</b> ${escapeHtml(resultText)}${data.reason ? `<br><i>${escapeHtml(data.reason)}</i>` : ''}`,
             whisper: []
         };
-        ChatMessage.create(chatData);
+        if (this.isRelayOwner()) ChatMessage.create({ ...chatData, user: game.user.id, flags: { 'fates-edge-bridge': { imported: true } } });
         Hooks.call('fates-edge-roll-result', data);
     },
     
@@ -700,15 +728,15 @@ export const FatesEdgeBridge = {
         
         const content = `
             <div style="border: 2px solid #d4af37; border-radius: 8px; padding: 10px; margin: 5px 0; background: rgba(212, 175, 55, 0.1);">
-                <h3 style="color: #d4af37; margin-top: 0;">🃏 Deck Draw - ${region}</h3>
+                <h3 style="color: #d4af37; margin-top: 0;">🃏 Deck Draw - ${escapeHtml(region)}</h3>
                 <p><strong>${cards.length} card(s) drawn:</strong></p>
-                <p style="font-size: 0.9em;">${cardNames}</p>
+                <p style="font-size: 0.9em;">${escapeHtml(cardNames)}</p>
                 <hr style="border-color: #d4af37; margin: 5px 0;">
-                <p style="font-style: italic;">${synthesis}</p>
-                <p style="font-size: 0.8em; color: #888; margin-top: 5px;">Cards remaining: ${this.deckState.remaining}</p>
+                <p style="font-style: italic;">${escapeHtml(synthesis)}</p>
+                <p style="font-size: 0.8em; color: #888; margin-top: 5px;">Cards remaining: ${escapeHtml(this.deckState.remaining)}</p>
             </div>
         `;
-        ChatMessage.create({ user: game.user, content, whisper: [] });
+        if (this.isRelayOwner()) ChatMessage.create({ user: game.user.id, content, whisper: [], flags: { 'fates-edge-bridge': { imported: true } } });
         this._createJournalEntry(`Deck Draw - ${region}`, `Cards: ${cardNames}\n\n${synthesis}`);
         this._updateDeckUI();
         Hooks.call('fates-edge-deck-drawn', data);
@@ -720,10 +748,10 @@ export const FatesEdgeBridge = {
         const content = `
             <div style="border: 2px solid #d4af37; border-radius: 8px; padding: 10px; margin: 5px 0; background: rgba(212, 175, 55, 0.1);">
                 <h3 style="color: #d4af37; margin-top: 0;">🔀 Deck Shuffled</h3>
-                <p>${this.deckState.remaining} cards remaining.</p>
+                <p>${escapeHtml(this.deckState.remaining)} cards remaining.</p>
             </div>
         `;
-        ChatMessage.create({ user: game.user, content, whisper: [] });
+        if (this.isRelayOwner()) ChatMessage.create({ user: game.user.id, content, whisper: [], flags: { 'fates-edge-bridge': { imported: true } } });
         this._updateDeckUI();
         Hooks.call('fates-edge-deck-shuffled', data);
     },
@@ -746,18 +774,18 @@ export const FatesEdgeBridge = {
         console.log(`👑 Crown Spread from ${region}`);
         
         let content = `<div style="border: 2px solid #d4af37; border-radius: 8px; padding: 10px; margin: 5px 0; background: rgba(212, 175, 55, 0.1);">`;
-        content += `<h3 style="color: #d4af37; margin-top: 0;">👑 Crown Spread - ${region}</h3>`;
+        content += `<h3 style="color: #d4af37; margin-top: 0;">👑 Crown Spread - ${escapeHtml(region)}</h3>`;
         const positions = ['🌱 Root', '🏔️ Crest', '👑 Crown', '🤝 Left Hand'];
         if (result.positions) {
             result.positions.forEach((p, i) => {
                 if (i < positions.length) {
-                    content += `<p><strong>${positions[i]}:</strong> ${p.meaning || '...'}</p>`;
+                    content += `<p><strong>${positions[i]}:</strong> ${escapeHtml(p.meaning || '...')}</p>`;
                 }
             });
         }
-        content += `<p><strong>🌟 Wildcard:</strong> ${result.wildcard || '...'}</p>`;
+        content += `<p><strong>🌟 Wildcard:</strong> ${escapeHtml(result.wildcard || '...')}</p>`;
         content += `</div>`;
-        ChatMessage.create({ user: game.user, content, whisper: [] });
+        if (this.isRelayOwner()) ChatMessage.create({ user: game.user.id, content, whisper: [], flags: { 'fates-edge-bridge': { imported: true } } });
         
         let journalContent = `Crown Spread - ${region}\n\n`;
         if (result.positions) {
@@ -792,7 +820,8 @@ export const FatesEdgeBridge = {
             </div>
         `;
         try {
-            const message = await ChatMessage.create({ user: game.user, content, whisper: [] });
+            if (!this.isRelayOwner()) return;
+            const message = await ChatMessage.create({ user: game.user.id, content, whisper: [], flags: { 'fates-edge-bridge': { imported: true } } });
             if (message?.id) this.assistantSuggestionMessages.set(id, message.id);
         } catch (e) {
             console.warn("⚠️ Fate's Edge: failed to post Assistant GM suggestion card:", e);
@@ -836,9 +865,10 @@ export const FatesEdgeBridge = {
         console.log(`📦 ${this.loadedModules.length} modules loaded`);
         const names = this.loadedModules.map(m => m.name || m.id).join(', ');
         ui.notifications.info(`📦 Fate's Edge: ${this.loadedModules.length} modules loaded`);
-        ChatMessage.create({
-            user: game.user,
-            content: `<b>📦 Loaded Modules:</b><br>${names}`,
+        if (this.isRelayOwner()) ChatMessage.create({
+            user: game.user.id,
+            flags: { 'fates-edge-bridge': { imported: true } },
+            content: `<b>📦 Loaded Modules:</b><br>${escapeHtml(names)}`,
             whisper: []
         });
         Hooks.call('fates-edge-module-list', data);
@@ -1034,7 +1064,7 @@ export const FatesEdgeBridge = {
                 this.pendingRequests.push({ requesterId, requesterName });
             }
             this._updateGmUI();
-            ui.notifications.info(`👑 ${requesterName} requests to become GM. Use the GM panel to approve.`);
+            ui.notifications.info(`👑 ${escapeHtml(requesterName)} requests to become GM. Use the GM panel to approve.`);
         }
         Hooks.call('fates-edge-gm-vote-request', data);
     },
@@ -1078,8 +1108,9 @@ export const FatesEdgeBridge = {
 
     _handleServerAnnouncement(data) {
         ui.notifications.info(`📢 Fate's Edge: ${escapeHtml(data.message)}`);
-        ChatMessage.create({
-            user: game.user,
+        if (this.isRelayOwner()) ChatMessage.create({
+            user: game.user.id,
+            flags: { 'fates-edge-bridge': { imported: true } },
             content: `<b>📢 ${escapeHtml(data.message)}</b>`,
             whisper: []
         });
@@ -1128,11 +1159,18 @@ export const FatesEdgeBridge = {
     },
     
     sendChatMessage(text, sender = null) {
-        return this._send('chat-message', { text, sender: sender || game.user.name, timestamp: Date.now() });
+        return this._send('chat-message', { message: { text, sender: sender || game.user.name, timestamp: Date.now() } });
     },
     
-    sendRoll(expr, reason = null) {
-        return this._send('roll-dice', { expr, reason: reason || 'Dice roll', sender: game.user.name, timestamp: Date.now() });
+    async sendRoll(expr, reason = null) {
+        if (!this.connected) return false;
+        try {
+            const roll = await new Roll(expr).evaluate({ async: true });
+            return this._send('roll-result', { expr: roll.formula, result: roll.total, reason, sender: game.user.name });
+        } catch (error) {
+            ui.notifications.error(`Unable to roll: ${escapeHtml(error.message)}`);
+            return false;
+        }
     },
     
     sendDeckDraw(count = 1, region = null) {
@@ -1550,58 +1588,30 @@ export const FatesEdgeBridge = {
     // Utility Functions
     // ============================================================
     
-    _createJournalEntry(title, content) {
-        let journal = game.journal.find(j => j.name === title);
-        const formattedContent = `<div style="font-family: 'Times New Roman', serif; padding: 10px;">${content.replace(/\n/g, '<br>')}</div>`;
-        if (!journal) {
-            JournalEntry.create({
-                name: title,
-                content: formattedContent,
-                folder: null,
-                permissions: { default: 0, [game.user.id]: 3 }
-            });
-        } else {
-            journal.update({ content: formattedContent });
+    async _createJournalEntry(title, content) {
+        if (!this.isRelayOwner()) return;
+        // Keep structural formatting only; remote text must never create active HTML.
+        const parsed = new DOMParser().parseFromString(String(content), 'text/html');
+        const allowed = new Set(['H1','H2','H3','H4','P','B','STRONG','I','EM','UL','OL','LI','TABLE','THEAD','TBODY','TR','TD','TH','BR','HR','PRE','CODE','SMALL','DIV','SPAN']);
+        for (const element of [...parsed.body.querySelectorAll('*')]) {
+            if (!allowed.has(element.tagName)) element.remove();
+            else for (const attribute of [...element.attributes]) element.removeAttribute(attribute.name);
         }
-    },
-    
-    _parseDiceExpression(expr) {
-        if (expr.toLowerCase().includes('df')) {
-            const parts = expr.match(/^(\d*)dF([+-]\d+)?$/i);
-            if (parts) {
-                const count = parseInt(parts[1]) || 4;
-                const modifier = parseInt(parts[2]) || 0;
-                const rolls = [];
-                let total = 0;
-                for (let i = 0; i < count; i++) {
-                    const roll = Math.floor(Math.random() * 3) - 1;
-                    rolls.push(roll);
-                    total += roll;
-                }
-                total += modifier;
-                return { total, rolls };
+        const page = { name: title, type: 'text', text: { content: parsed.body.innerHTML, format: 1 } };
+        try {
+            const journal = game.journal.find(j => j.name === title);
+            if (!journal) await JournalEntry.create({ name: title, pages: [page], ownership: { default: 0, [game.user.id]: 3 } });
+            else {
+                const existing = journal.pages.find(p => p.type === 'text');
+                if (existing) await journal.updateEmbeddedDocuments('JournalEntryPage', [{ ...page, _id: existing.id }]);
+                else await journal.createEmbeddedDocuments('JournalEntryPage', [page]);
             }
+        } catch (error) {
+            console.error('Fate’s Edge journal sync failed:', error);
+            ui.notifications.warn('Fate’s Edge could not update the journal. Check your Foundry permissions.');
         }
-        
-        const parts = expr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
-        if (!parts) {
-            const num = parseInt(expr) || 0;
-            return { total: num, rolls: [num] };
-        }
-        const count = parseInt(parts[1]);
-        const sides = parseInt(parts[2]);
-        const modifier = parseInt(parts[3]) || 0;
-        const rolls = [];
-        let total = 0;
-        for (let i = 0; i < count; i++) {
-            const roll = Math.floor(Math.random() * sides) + 1;
-            rolls.push(roll);
-            total += roll;
-        }
-        total += modifier;
-        return { total, rolls };
     },
-    
+
     // ============================================================
     // UI Updates
     // ============================================================
@@ -1631,7 +1641,7 @@ export const FatesEdgeBridge = {
     _updateDeckUI() {
         const deckEl = document.getElementById('fates-edge-deck');
         if (deckEl) {
-            deckEl.innerHTML = `🃏 ${this.deckState.remaining}`;
+            deckEl.textContent = `🃏 ${this.deckState.remaining}`;
         }
         Hooks.call('fates-edge-deck-ui-updated', this.deckState);
     },
@@ -1675,8 +1685,10 @@ export const FatesEdgeBridge = {
     // its deprecated alias, kept here only as a fallback for older
     // Foundry versions still within this module's compatibility range.
     hookChatMessage(chatMessage) {
+        if (chatMessage.flags?.['fates-edge-bridge']?.imported) return;
+        if ((chatMessage.author || chatMessage.user)?.id !== game.user.id) return;
         const content = chatMessage.content;
-        const whisper = chatMessage.whisper && chatMessage.whisper.length > 0;
+        const whisper = chatMessage.blind || (chatMessage.whisper && chatMessage.whisper.length > 0);
         const senderName = (chatMessage.author || chatMessage.user)?.name || 'Unknown';
 
         // Dice rolls: a ChatMessage created from a Roll has a non-empty
@@ -1698,7 +1710,7 @@ export const FatesEdgeBridge = {
     },
 
     hookDiceRoll(roll) {
-        this.sendRoll(roll.formula, roll.total);
+        this._send('roll-result', { expr: roll.formula, result: roll.total, sender: game.user.name });
     },
 
     hookSceneChange() {

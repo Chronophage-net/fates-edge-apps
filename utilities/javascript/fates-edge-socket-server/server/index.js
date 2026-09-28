@@ -9,8 +9,8 @@ try { require('dotenv').config(); } catch (e) {}
 
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
-const WebSocket = require('ws');
+const { createTransports, closeTransports } = require('./transports');
+const { version } = require('../package.json');
 const cors = require('cors');
 
 const config = require('./config.js').loadConfig();
@@ -47,6 +47,14 @@ if (clusterMod.shouldUseCluster(config) && require('cluster').isPrimary) {
 
 // ---------- Express ----------
 const app = express();
+app.disable('x-powered-by');
+app.set('trust proxy', config.trustProxy);
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+});
 app.use(cors({ origin: config.corsOrigin }));
 
 // Increase payload limit for campaign state and character updates (can be large)
@@ -64,25 +72,25 @@ app.use(api.createApiRouter(config));
 app.get('/', (req, res) => {
     res.json({
         name: "Fate's Edge WebSocket Server",
-        version: "1.0.0",
+        version,
         status: "running",
         rooms: room.rooms.size,
         timestamp: Date.now()
     });
 });
 
+app.use((error, req, res, next) => {
+    if (res.headersSent) return next(error);
+    const status = error.type === 'entity.too.large' ? 413 : error.type === 'entity.parse.failed' ? 400 : 500;
+    logger.warn('HTTP request failed', { status, type: error.type || 'internal' });
+    res.status(status).json({ error: status === 413 ? 'Request body is too large.' : status === 400 ? 'Invalid JSON request body.' : 'The request could not be completed.' });
+});
+
 // ---------- HTTP server ----------
 const server = http.createServer(app);
 
-// ---------- Socket.io ----------
-const io = socketIo(server, {
-    cors: { origin: config.corsOrigin, methods: ["GET", "POST"], credentials: true },
-    transports: ['websocket', 'polling'],
-    // NEW: raised above Socket.IO's 1MB default -- see config.js's
-    // wsMaxPayloadBytes note (added for the optional AI GM Bot voice
-    // narration feature's base64-encoded 'tts-audio' events).
-    maxHttpBufferSize: config.wsMaxPayloadBytes
-});
+// Both protocols share a port without competing upgrade listeners.
+const { io, wss } = createTransports(server, config);
 room.setIo(io);                // enable room.broadcastToRoom for Socket.io
 ioHandlers.setupSocketIO(io, config);
 
@@ -108,21 +116,6 @@ const effectiveScalingApi = scalingApi.enabled
     : clusterMod.initClusterWsRelay(config, logger, room.deliverToLocalWsClients);
 room.setScaling(effectiveScalingApi);
 
-// ---------- Plain WebSocket ----------
-// NEW: maxPayload -- see config.js's wsMaxPayloadBytes note. The plain-ws
-// transport has no default cap at all otherwise.
-const wss = new WebSocket.Server(config.manager
-    ? { noServer: true, maxPayload: config.wsMaxPayloadBytes }
-    : { server, path: '/', maxPayload: config.wsMaxPayloadBytes });
-if (config.manager) {
-    // A second server-bound upgrade listener would reject Socket.IO's upgrade
-    // path. Dispatch only the plain-WebSocket path to this transport.
-    server.on('upgrade', (req, socket, head) => {
-        if (new URL(req.url, 'http://localhost').pathname === '/') {
-            wss.handleUpgrade(req, socket, head, ws => wss.emit('connection', ws, req));
-        }
-    });
-}
 wsHandlers.setupWSS(wss, config);
 
 // Prevent the WebSocket server from crashing on underlying HTTP errors
@@ -141,20 +134,14 @@ function gracefulShutdown(signal) {
     if (effectiveScalingApi && effectiveScalingApi.close) effectiveScalingApi.close();
     if (config.manager) config.manager.close();
 
-    server.close((err) => {
-        if (err) {
-            logger.error('Error closing HTTP server', { error: err.message });
-            process.exit(1);
-        }
-        logger.info('HTTP server closed.');
-        io.close(() => {
-            logger.info('Socket.io server closed.');
-            wss.close(() => {
-                logger.info('WebSocket server closed.');
-                logger.info('✅ Graceful shutdown complete.');
-                process.exit(0);
-            });
-        });
+    Promise.resolve().then(async () => {
+        await closeTransports(server, io, wss);
+        await require('./storage').closeDatabase();
+        logger.info('Graceful shutdown complete.');
+        process.exit(0);
+    }).catch(error => {
+        logger.error('Shutdown failed', { error: error.message });
+        process.exit(1);
     });
 
     // Force shutdown after 10 seconds
@@ -181,10 +168,8 @@ const MAX_PORT_RETRIES = 5;
 let currentPort = config.port;
 
 function startServer(port, retriesLeft) {
-    server.removeAllListeners('error');
-    server.removeAllListeners('listening');
-
-    server.on('error', (err) => {
+    server.once('error', (err) => {
+        server.off('listening', onListening);
         if (err.code === 'EADDRINUSE') {
             if (retriesLeft > 0) {
                 logger.warn(`Port ${port} is in use. Trying next port (${port + 1})...`);
@@ -202,9 +187,10 @@ function startServer(port, retriesLeft) {
         }
     });
 
-    server.listen(port, config.host, () => {
+    function onListening() {
+        port = server.address().port;
         console.log('='.repeat(70));
-        console.log(`🎯 Fate's Edge WebSocket Server v1.0.0`);
+        console.log(`🎯 Fate's Edge WebSocket Server v${version}`);
         console.log('='.repeat(70));
         console.log(`🚀 Server running on ${config.host}:${port}`);
         console.log(`📊 Health: http://localhost:${port}${config.healthEndpoint}`);
@@ -216,7 +202,8 @@ function startServer(port, retriesLeft) {
         console.log(`📊 Log Level: ${config.logLevel}`);
         console.log('='.repeat(70));
         console.log('✅ Server ready for connections\n');
-    });
+    }
+    server.listen(port, config.host, onListening);
 }
 
 if (isClusterWorker) {

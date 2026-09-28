@@ -52,7 +52,17 @@ export const harmLevelsForTl = resilienceForTl;
  */
 export function resilienceOf(entry) {
     if (!entry) return undefined;
-    return entry.resilience != null ? entry.resilience : entry.harm_levels;
+    const raw = entry.resilience ?? entry.harm_levels;
+    if (raw && typeof raw === 'object') {
+        const value = raw.value;
+        if (!Number.isFinite(value) || value < 0) return undefined;
+        if (raw.perPhase) return `${value} per phase`;
+        if (value === 3) return '3 (standard)';
+        if (value === 8) return '8 (advanced)';
+        return String(value);
+    }
+    // Puzzle adversaries intentionally have a resolution instead of a wound pool.
+    return raw ?? (entry.resolution ? 'None (puzzle)' : undefined);
 }
 
 /**

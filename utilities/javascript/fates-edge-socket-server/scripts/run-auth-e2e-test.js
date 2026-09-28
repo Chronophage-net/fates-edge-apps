@@ -1,73 +1,20 @@
 #!/usr/bin/env node
-/**
- * Boots the server against a scratch SQLite DB, runs test-auth-e2e.js
- * against it, then tears the server down -- so `npm run test:auth` is a
- * single command instead of a manual "start server in one terminal, run
- * the script in another" dance.
- */
-const { spawn } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
-
-const PORT = process.env.TEST_PORT || 10123;
-const dbPath = path.join(os.tmpdir(), `fates-edge-auth-test-${Date.now()}.db`);
-
-const env = {
-    ...process.env,
-    PORT: String(PORT),
-    DATABASE_TYPE: 'sqlite',
-    DATABASE_URL: dbPath,
-    AUTH_JWT_SECRET: process.env.AUTH_JWT_SECRET || 'test-secret-for-local-run',
-    API_KEY: process.env.API_KEY || 'test-admin-key',
-};
-
-async function waitForHealth(url, timeoutMs = 15000) {
-    const start = Date.now();
-    while (Date.now() - start < timeoutMs) {
-        try {
-            const res = await fetch(url);
-            if (res.ok) return true;
-        } catch (e) { /* not up yet */ }
-        await new Promise(r => setTimeout(r, 300));
-    }
-    return false;
-}
+// Run authentication checks against an isolated database on an available port.
+const { spawn } = require('node:child_process');
+const path = require('node:path');
+const { startTestServer } = require('../tests/support/live-server');
 
 async function main() {
-    try { require('sqlite3').verbose(); }
-    catch (error) {
-        console.error('Authentication tests require a working SQLite native driver. Rebuild sqlite3 for this host before retrying.');
-        console.error(error.message);
-        process.exitCode = 1;
-        return;
-    }
-    const server = spawn(process.execPath, [path.join(__dirname, '..', 'server-start.js')], {
-        env,
-        stdio: ['ignore', 'pipe', 'pipe'],
-    });
-
-    let serverOutput = '';
-    server.stdout.on('data', d => { serverOutput += d; });
-    server.stderr.on('data', d => { serverOutput += d; });
-
-    const up = await waitForHealth(`http://localhost:${PORT}/healthz`);
-    if (!up) {
-        console.error('Server did not become healthy in time. Output so far:\n' + serverOutput);
-        server.kill('SIGTERM');
-        process.exit(1);
-    }
-
-    const test = spawn(process.execPath, [path.join(__dirname, '..', 'test-auth-e2e.js')], {
-        env: { ...env, TEST_BASE_URL: `http://localhost:${PORT}` },
-        stdio: 'inherit',
-    });
-
-    test.on('close', (code) => {
-        server.kill('SIGTERM');
-        try { fs.unlinkSync(dbPath); } catch (e) { /* scratch file, fine either way */ }
-        process.exit(code);
-    });
+    const server = await startTestServer();
+    try {
+        process.exitCode = await new Promise((resolve, reject) => {
+            const child = spawn(process.execPath, [path.join(__dirname, '../test-auth-e2e.js')], {
+                env: { ...process.env, TEST_BASE_URL: server.base, API_KEY: 'isolated-test-admin-key' },
+                stdio: 'inherit',
+            });
+            child.once('error', reject);
+            child.once('exit', code => resolve(code ?? 1));
+        });
+    } finally { await server.close(); }
 }
-
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch(error => { console.error(error); process.exitCode = 1; });

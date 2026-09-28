@@ -144,7 +144,7 @@ Every route below is served from `server/api.js`. `authenticate` means the reque
 | Method | Endpoint | Auth | Description |
 |---|---|:---:|---|
 | GET | `/healthz`, `/api/healthz` | – | Plain `OK` liveness check, always available regardless of config. |
-| GET | `<HEALTH_ENDPOINT>` (default `/api/health`) | – | Fuller health check + room stats as JSON. |
+| GET | `<HEALTH_ENDPOINT>` (default `/api/health`) | – | Aggregate health counts as JSON; room codes and names are private. |
 | GET | `/api/turn-credentials?clientId=X` | – | Mint short-lived TURN credentials (404 if `TURN_SECRET` isn't configured). |
 | GET | `/api/rooms` | ✅ | List all rooms with stats. |
 | POST | `/api/auth/register`, `/api/auth/login` | –* | Account auth (bcrypt + JWT). *Requires the optional DB storage module to be present. |
@@ -170,7 +170,7 @@ Real-time events (chat, dice, GM election, deck draws, scene/timer sync, voice s
 
 ## Configuration
 
-Environment variables (see `env-example.md` for the full list, `.env.example` for the Docker Compose subset):
+Configuration precedence is environment variables, then `server/config.json`, then defaults. `CONFIG_FILE` selects another JSON file. Invalid values stop startup with a configuration error. See `env-example.md` for environment settings and `.env.example` for the Docker Compose subset.
 
 | Env var | Default | Description |
 |---|---|---|
@@ -181,6 +181,10 @@ Environment variables (see `env-example.md` for the full list, `.env.example` fo
 | `TURN_SECRET`, `TURN_REALM`, `TURN_URLS`, `TURN_CREDENTIAL_TTL` | unset | TURN credential minting — see `/api/turn-credentials` above and this server's `docker-compose.yml` `coturn` service. |
 | `API_RATE_LIMIT_WINDOW_MS` / `API_RATE_LIMIT_MAX` | `60000` / `300` | General per-IP REST rate limit (`_MAX=0` disables). |
 | `WS_MESSAGE_RATE_WINDOW_MS` / `WS_MESSAGE_RATE_MAX` | `10000` / `120` | Per-connection WebSocket message rate limit, both transports (`_MAX=0` disables). |
+| `CORS_ORIGIN` | `*` | Comma-separated HTTP(S) origins allowed for browser HTTP and WebSocket connections. Native clients without an Origin still require room admission. |
+| `TRUST_PROXY` | `false` | Trusted proxy hop count or IP/CIDR list; configure to match your deployment before using per-IP limits behind a proxy. |
+| `WS_MAX_PAYLOAD_BYTES` | `8388608` | Maximum inbound message size on both transports (1 KiB–100 MiB). |
+| `HANDSHAKE_TIMEOUT_MS` | `10000` | Plain WebSocket admission deadline (100–120000 ms). |
 | `MAX_CLIENTS_PER_ROOM` | `0` (unlimited) | Reject new joins once a room already holds this many clients. |
 | `CLUSTER_WORKERS` | `0` (single process) | Fork this many worker processes (or `auto` = one per CPU core) — see [`SCALING.md`](SCALING.md). |
 | `REDIS_URL` | unset | Optional multi-instance scaling — see [`SCALING.md`](SCALING.md). |
@@ -206,3 +210,9 @@ Environment variables (see `env-example.md` for the full list, `.env.example` fo
 The web client offers a focused Join a session flow, explicit starter-roster setup, and actionable connection errors. Socket.IO validates a destination before leaving the current room and rejects overlapping joins with `JOIN_IN_PROGRESS`; retry after the active request finishes. Bad destination passwords retain existing membership. Password whitespace is preserved.
 
 Validated with two real local Socket.IO clients, 289 client tests, and a production build. All 220 server tests pass, including Redis initialization. The copyright tool now excludes dependencies; its accidental metadata injection into the installed Redis command table has been repaired. Hosted managed-room acceptance remains separate from local transport verification.
+
+### Connection privacy and verification
+
+Plain WebSocket clients receive room state only after admission. Both transports reject admission when persisted access rules cannot be read. An unresolved private-message recipient receives `WHISPER_UNDELIVERABLE`; the message is never broadcast or added to public history. Private delivery currently requires a recipient connected to the same server process.
+
+Run `npm test` for unit and live transport regressions, and `npm run test:auth` for account/password/ban checks. Both use isolated temporary databases and available local ports; they require permission to open local listeners.

@@ -588,6 +588,7 @@ export function deepMerge(...sources) {
     for (const source of sources) {
         if (!source || typeof source !== 'object') continue;
         for (const key of Object.keys(source)) {
+            if (['__proto__', 'prototype', 'constructor'].includes(key)) continue;
             const val = source[key];
             if (val && typeof val === 'object' && !Array.isArray(val)) {
                 target[key] = deepMerge(target[key] || {}, val);
@@ -754,28 +755,21 @@ export function sanitizeHtml(html) {
     if (!html) return '';
     if (typeof html !== 'string') return '';
 
-    // If DOMPurify is available (loaded as a global), use it
-    if (typeof window !== 'undefined' && window.DOMPurify) {
-        return window.DOMPurify.sanitize(html, {
-            USE_PROFILES: { html: true },
-            FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
-            FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
-        });
+    const purifier = globalThis.window?.DOMPurify;
+    if (typeof purifier?.sanitize === 'function') {
+        try {
+            return purifier.sanitize(html, {
+                USE_PROFILES: { html: true },
+                FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select'],
+                FORBID_ATTR: ['style', 'id', 'name'],
+                ALLOW_DATA_ATTR: false,
+                ALLOW_ARIA_ATTR: false,
+            });
+        } catch {
+            // A failed sanitizer must never turn into an HTML passthrough.
+        }
     }
-
-    // Fallback: manual sanitization
-    let safe = html;
-
-    // Remove <script> tags and their content
-    safe = safe.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-
-    // Remove all on* attributes (case‑insensitive)
-    safe = safe.replace(/\s+on\w+\s*=\s*("[^"]*"|'[^']*'|[^>\s]+)/gi, '');
-
-    // Remove <iframe>, <object>, <embed> tags
-    safe = safe.replace(/<\/?(iframe|object|embed)\b[^>]*>/gi, '');
-
-    return safe;
+    return escHtml(html);
 }
 
 /**

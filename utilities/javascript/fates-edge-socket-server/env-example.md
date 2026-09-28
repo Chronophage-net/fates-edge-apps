@@ -72,3 +72,12 @@ CLUSTER_WORKERS=0
 # SCALING.md for what's required to actually run more than one instance
 # (sticky sessions at the load balancer, a shared database).
 REDIS_URL=
+
+# ─── Browser Origins and Connection Limits ───────────────────────
+# Use a comma-separated list of exact origins in production. No paths.
+CORS_ORIGIN=*
+# Set only to your deployment's trusted proxy hop count or IP/CIDRs.
+TRUST_PROXY=false
+WS_MAX_PAYLOAD_BYTES=8388608
+HANDSHAKE_TIMEOUT_MS=10000
+LOG_LEVEL=INFO

@@ -1037,24 +1037,22 @@ async function initMysql() {
 }
 
 // ─── Initialisation ──────────────────────────────────────────────────
+let initialization = null;
 async function init() {
     if (driver) return driver;
-
-    switch (dbType) {
-        case 'postgres':
-            driver = await initPostgres();
-            break;
-        case 'mysql':
-            driver = await initMysql();
-            break;
-        case 'sqlite':
-        default:
-            driver = await initSqlite();
-            break;
+    if (!initialization) {
+        initialization = (async () => {
+            const factories = { sqlite: initSqlite, postgres: initPostgres, mysql: initMysql };
+            const factory = factories[dbType];
+            if (!factory) throw new Error('Unsupported DATABASE_TYPE');
+            driver = await factory();
+            isReady = true;
+            console.log(`🗄️ Database storage initialized (${dbType})`);
+            return driver;
+        })();
     }
-    isReady = true;
-    console.log(`🗄️ Database storage initialized (${dbType})`);
-    return driver;
+    try { return await initialization; }
+    finally { initialization = null; }
 }
 
 // ─── Exported storage interface ────────────────────────────────────
@@ -1081,6 +1079,7 @@ async function loadAutoSave(roomCode) {
 }
 
 async function closeDatabase() {
+    if (initialization) await initialization;
     if (driver) {
         await driver.close();
         driver = null;

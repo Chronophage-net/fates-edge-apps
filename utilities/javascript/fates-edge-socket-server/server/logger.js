@@ -10,10 +10,10 @@ const LOG_LEVELS = {
 };
 
 function createLogger(levelName = 'INFO') {
-    const currentLevel = LOG_LEVELS[levelName] || LOG_LEVELS.INFO;
+    const currentLevel = LOG_LEVELS[String(levelName).toUpperCase()] ?? LOG_LEVELS.INFO;
 
     function log(level, message, data = null) {
-        const levelNum = LOG_LEVELS[level] || LOG_LEVELS.INFO;
+        const levelNum = LOG_LEVELS[level] ?? LOG_LEVELS.INFO;
         if (levelNum < currentLevel) return;
 
         const timestamp = new Date().toISOString();

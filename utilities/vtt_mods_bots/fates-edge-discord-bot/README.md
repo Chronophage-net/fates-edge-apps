@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Discord-Bot-blue" alt="Discord Bot"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
-  <img src="https://img.shields.io/badge/node-18+-brightgreen" alt="Node.js"/>
+  <img src="https://img.shields.io/badge/node-22.12+-brightgreen" alt="Node.js"/>
 </p>
 
 Bridges your Discord server with the Fate's Edge [socket server](../../javascript/fates-edge-socket-server/), so a table can play through Discord slash commands instead of (or alongside) the web client. Covers GM election and promotion, chat relay, dice, characters, timers, the Deck of Consequences, module management, and the Adventure Engine.
@@ -27,9 +27,19 @@ Bridges your Discord server with the Fate's Edge [socket server](../../javascrip
 
 ---
 
+## Deployment and access
+
+This bot uses one shared VTT identity. All interactions require **Manage Server** permission in `DISCORD_GUILD_ID`; do not use it as a public multi-user credentials proxy. The socket server still enforces its own room roles. `VTT_API_KEY` is a deployment administrator secret for HTTP commands, not a room login token. Omit it unless those commands are needed.
+
+Set `VTT_ROOM_PASSWORD` for a password-protected room, or `VTT_AUTH_TOKEN` for a socket-server account token. Managed rooms requiring a bot-manager token adapter are not supported and fail with an explicit error. Use `ws://` for local development and `wss://` for remote deployment. A command cannot redirect the configured credentials to another server origin.
+
+Set `VTT_LOG_CHANNEL` to a channel in the configured guild for incoming **public** VTT chat. Private messages are never copied to that channel. Outgoing chat uses `/vttchat`; ordinary Discord messages are not automatically forwarded. No mutations are queued while disconnected.
+
+Run `/vtt connect` after startup; a connected status means the server admitted the bot to the room. Run `npm run register` after adding commands. Prefix commands only display help.
+
 ## Requirements
 
-- Node.js 18 or higher
+- Node.js 22.12 or higher
 - A Discord Bot Token ([Discord Developer Portal](https://discord.com/developers/applications))
 - A Fate's Edge socket server, running and reachable
 - A Discord server where you can install bots
@@ -53,7 +63,7 @@ Edit `.env`:
 # Discord Bot Configuration
 DISCORD_TOKEN=YOUR_BOT_TOKEN
 DISCORD_CLIENT_ID=YOUR_CLIENT_ID
-DISCORD_GUILD_ID=YOUR_GUILD_ID  # Optional, for dev
+DISCORD_GUILD_ID=YOUR_GUILD_ID  # Required: the one server this bridge serves
 
 # Fate's Edge VTT Server
 VTT_SERVER_URL=ws://localhost:10000
@@ -91,7 +101,7 @@ A standalone `Dockerfile` is also included if you'd rather build just this bot i
 
 ## Discord bot setup
 
-**Creating a bot token:** [Discord Developer Portal](https://discord.com/developers/applications) → New Application → Bot tab → Add Bot → copy the token for `.env`. Enable **Message Content Intent** and **Server Members Intent**.
+**Creating a bot token:** [Discord Developer Portal](https://discord.com/developers/applications) → New Application → Bot tab → Add Bot → copy the token for `.env`. Enable **Message Content Intent** for legacy prefix help; **Server Members Intent** is not required.
 
 **Inviting the bot:** OAuth2 → URL Generator → scopes `bot` and `applications.commands` → permissions Send Messages, Embed Links, Attach Files, Read Message History, Use Slash Commands → open the generated URL and authorize it for your server.
 
@@ -123,7 +133,7 @@ A standalone `Dockerfile` is also included if you'd rather build just this bot i
 
 | Command | Description | Example |
 |---|---|---|
-| `/roll <dice> [reason] [vtt:true]` | Roll dice and optionally send to VTT | `/roll 3d6+2 "Attack" vtt:true` |
+| `/roll dice:4d10` | Roll locally; broadcast results when connected | `/roll dice:3d6+2` |
 | `/vttchat <message> [sender]` | Send a message to VTT chat | `/vttchat "Hello VTT!" "GM"` |
 
 ### Character management

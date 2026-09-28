@@ -48,10 +48,10 @@ function buildHTML() {
           <p>“Eight is the world. Nobody sensible counts past it.”</p>
         </div>
         <div class="hero-actions">
-          <a href="#slide-rules" class="btn btn-gold" data-action="rules-link" data-i18n="feature.home.readTheRules">Read the rules</a>
-          <a href="#" class="btn btn-primary" data-action="create-char" data-i18n="feature.home.makeSomeone">Make someone</a>
+          <a href="#slide-rules" class="btn btn-secondary" data-action="rules-link" data-i18n="feature.home.readTheRules">Read the rules</a>
+          <a href="#" class="btn btn-secondary" data-action="create-char" data-i18n="feature.home.makeSomeone">Make someone</a>
           <a href="#slide-toolkit" class="btn btn-secondary" data-action="toolkit-link" data-i18n="feature.home.openTheToolkit">Open the toolkit</a>
-          <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;" data-i18n="feature.home.beginTheLanternAtDusk">Begin — The Lantern at Dusk</button>
+          <button class="btn btn-primary btn-large" data-action="quick-start" data-i18n="feature.home.beginTheLanternAtDusk">Begin — The Lantern at Dusk</button>
           <button class="btn btn-secondary" data-action="product-tour" data-i18n="feature.home.takeTheTour">Take the tour</button>
         </div>
       </div>
@@ -288,24 +288,19 @@ function injectStyles() {
   styles.textContent = `
     /* ===== SLIDE CONTAINER ===== */
     .home-slide {
-      min-height: 100vh;
+      min-height: auto;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 4rem 1.5rem;
       scroll-margin-top: 60px;
       position: relative;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: slideFadeIn 0.8s ease forwards;
+      border-bottom: 1px solid var(--border);
+      animation: slideFadeIn 0.45s ease;
     }
-    .home-slide:nth-child(2) { animation-delay: 0.2s; }
-    .home-slide:nth-child(3) { animation-delay: 0.4s; }
-    .home-slide:nth-child(4) { animation-delay: 0.6s; }
-    .home-slide:nth-child(5) { animation-delay: 0.8s; }
-    .home-slide:nth-child(6) { animation-delay: 1.0s; }
 
     @keyframes slideFadeIn {
+      from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -339,7 +334,7 @@ function injectStyles() {
     .scroll-arrow { font-size: 1.4rem; line-height: 1; }
 
     /* ===== BUTTONS ===== */
-    .btn {
+    #tab-home .btn {
       display: inline-block;
       padding: 0.6rem 1.4rem;
       border-radius: var(--radius);
@@ -350,35 +345,35 @@ function injectStyles() {
       cursor: pointer;
       font-size: 0.9rem;
     }
-    .btn-primary {
+    #tab-home .btn-primary {
       background: var(--gold);
-      color: #0b0b0b;
+      color: var(--text-inverse);
     }
-    .btn-primary:hover {
+    #tab-home .btn-primary:hover {
       background: var(--gold-light);
       transform: translateY(-2px);
       box-shadow: 0 4px 20px rgba(201,168,76,0.3);
     }
-    .btn-gold {
+    #tab-home .btn-gold {
       background: transparent;
       border-color: var(--gold);
       color: var(--gold);
     }
-    .btn-gold:hover {
+    #tab-home .btn-gold:hover {
       background: rgba(201,168,76,0.1);
       transform: translateY(-2px);
     }
-    .btn-secondary {
+    #tab-home .btn-secondary {
       background: var(--bg2);
       border-color: var(--border);
       color: var(--text);
     }
-    .btn-secondary:hover {
+    #tab-home .btn-secondary:hover {
       background: var(--bg3);
       border-color: var(--gold);
       transform: translateY(-2px);
     }
-    .btn-large {
+    #tab-home .btn-large {
       padding: 0.8rem 2.5rem;
       font-size: 1.05rem;
     }
@@ -387,8 +382,8 @@ function injectStyles() {
     .home-hero {
       background: radial-gradient(ellipse at 30% 20%, rgba(201,168,76,0.06) 0%, transparent 70%);
       text-align: center;
-      min-height: 100vh;
-      padding-top: 5rem;
+      min-height: min(720px, 85svh);
+      padding-block: clamp(3rem, 7vw, 6rem);
     }
     .hero-badge {
       display: inline-block;
@@ -407,7 +402,7 @@ function injectStyles() {
       font-size: clamp(3rem, 10vw, 5.5rem);
       line-height: 1.1;
       font-weight: 700;
-      color: var(--gold);
+      color: var(--text);
       margin-bottom: 0.5rem;
     }
     .hero-title .gold { color: var(--gold); }
@@ -810,6 +805,10 @@ function injectStyles() {
     }
 
     /* ===== RESPONSIVE ===== */
+    @media (prefers-reduced-motion: reduce) {
+      .home-slide, .scroll-indicator { animation: none; }
+      #tab-home .btn { transition: none; }
+    }
     @media (max-width: 768px) {
       .home-slide { padding: 3rem 1rem; min-height: auto; }
       .home-hero { min-height: auto; padding-top: 2rem; }
@@ -869,7 +868,7 @@ function showWelcomeOverlay() {
       </div>
 
       <div class="welcome-actions">
-        <button class="btn btn-gold btn-large" data-action="quick-start" style="font-weight:700;border-width:2px;">
+        <button class="btn btn-gold btn-lg" data-action="quick-start">
           Start The Lantern at Dusk
         </button>
         <p class="welcome-subtext">Adds the starter adventure and the full ready-made character roster to this browser. Existing starter characters are kept. No account is needed to try it.</p>
