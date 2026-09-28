@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-26T22:24:39.523Z",
+  "generated": "2026-09-28T01:35:16.469Z",
   "documents": [
     {
       "id": "srd",
@@ -1299,6 +1299,16 @@
       "active": true
     },
     {
+      "id": "the_face_you_bear",
+      "title": "The Face You Bear",
+      "file": "Fates_-_Edge_-_-The-_-Face-_-You-_-Bear.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_five_daughters_of_inaea",
       "title": "The Five Daughters Of Inaea",
       "file": "Fates_-_Edge_-_-The-_-Five-_-Daughters-_-of-_-Inaea.html",
@@ -1683,7 +1693,7 @@
       "active": true
     }
   ],
-  "total_count": 109,
-  "active_count": 109,
+  "total_count": 110,
+  "active_count": 110,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
