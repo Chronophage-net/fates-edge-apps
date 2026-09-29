@@ -1,4 +1,5 @@
 import { t as i18nText } from '@core/i18n.js';
+import { showOutcomeOverlay, hideOutcomeOverlay } from './outcome-overlay.js';
 // ============================================================
 //  KON'REH ENGINE — implementation of the official LaTeX rulebook
 //  ("Corpus Canré Scholiatum" / Kon'reh Core Rules §1–9)
@@ -1586,6 +1587,7 @@ export function openKonrehModal(netConfig = null) {
 
   let konrehHiddenSiblings = null;
   const closeKonrehModal = () => {
+    hideOutcomeOverlay();
     modal.remove();
     if (konrehHiddenSiblings) {
       konrehHiddenSiblings.forEach(ch => { ch.style.display = ''; });
@@ -2322,12 +2324,43 @@ export function openKonrehModal(netConfig = null) {
     }
   }
 
+  // ---- End-of-game outcome (Victory / Defeat / Draw overlay) ----
+  // Fires once per finished game. Perspective: networked → the local
+  // seat; vs-AI → the human (the side the AI isn't playing); local
+  // two-player → neutral "Player N wins" (both people share the screen).
+  let outcomeShown = false;
+  function maybeShowOutcome() {
+    if (!game.winner) {
+      if (outcomeShown) { outcomeShown = false; hideOutcomeOverlay(); }
+      return;
+    }
+    if (outcomeShown) return;
+    outcomeShown = true;
+
+    const me = isNetworked ? localPlayer : (aiConfig ? (aiConfig.player === 1 ? 2 : 1) : null);
+    let result, title, subtitle;
+    if (game.winner === 'draw') {
+      result = 'draw'; title = 'Draw'; subtitle = game.winReason || 'No legal moves remain.';
+    } else if (me == null) {
+      result = 'neutral'; title = `Player ${game.winner} Wins`; subtitle = game.winReason || '';
+    } else if (game.winner === me) {
+      result = 'win'; title = 'Victory';
+      subtitle = game.winReason || (aiConfig ? `You outplayed ${SCHOOLS[aiConfig.schoolId].name}.` : 'You won the game.');
+    } else {
+      result = 'lose'; title = 'Defeat';
+      subtitle = game.winReason || (aiConfig ? `${SCHOOLS[aiConfig.schoolId].name} takes the board.` : 'Your opponent won the game.');
+    }
+    const buttons = [{ label: 'Rematch', primary: true, onClick: () => resetBtn.click() }];
+    showOutcomeOverlay({ result, title, subtitle, buttons });
+  }
+
   // ---- Main render function ----
   function render() {
     updateCoachHint();
     drawBoardOnly();
     renderStatus();
     syncCoachAnimation();
+    maybeShowOutcome();
 
     // Update status with selected piece coords (if any)
     if (selectedPiece) {

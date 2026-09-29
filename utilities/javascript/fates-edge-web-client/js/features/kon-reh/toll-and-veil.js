@@ -29,6 +29,7 @@
 //   controller.destroy()            -> optional cleanup
 
 import { t as i18nText } from '@core/i18n.js';
+import { showOutcomeOverlay, hideOutcomeOverlay } from './outcome-overlay.js';
 import {
     TollVeilEngine, aiChooseBid, aiChoosePlay, legalPlaysForSeat,
     MIN_SEATS, MAX_SEATS, cardDisplay, TRICKS_PER_HAND, MAX_BID,
@@ -168,6 +169,40 @@ function renderSetupScreen(root, onStart) {
     root.querySelector('#tv-mode-vsai').onclick = () => onStart({ seats, aiSeats: Array.from({ length: seats - 1 }, (_, i) => i + 1) });
 }
 
+let outcomeShownFor = null; // controller whose game-over we've already announced
+
+// Victory / Defeat overlay, once per finished game. Seated players get a
+// personal result; spectators / GM-run tables (localSeat == null) get a
+// neutral "<name> wins".
+function maybeShowOutcome(controller, view) {
+    if (view.phase !== 'game_over' || view.gameWinner == null) {
+        if (outcomeShownFor === controller) { outcomeShownFor = null; hideOutcomeOverlay(); }
+        return;
+    }
+    if (outcomeShownFor === controller) return;
+    outcomeShownFor = controller;
+
+    const me = controller.localSeat;
+    const seatLabel = s => controller.seatNames[s] || `Seat ${s + 1}`;
+    const winnerLabel = seatLabel(view.gameWinner);
+    const scores = view.scores || [];
+    const ranking = scores.map((sc, s) => ({ s, sc })).sort((a, b) => b.sc - a.sc)
+        .map(r => `${r.s === me ? 'You' : seatLabel(r.s)}: ${r.sc}`).join(' · ');
+    const details = ranking ? `Final scores — ${ranking}` : '';
+
+    let result, title, subtitle;
+    if (me == null) {
+        result = 'neutral'; title = `${winnerLabel} Wins`; subtitle = `First to ${view.winningScore} points.`;
+    } else if (view.gameWinner === me) {
+        result = 'win'; title = 'Victory'; subtitle = `You reached ${view.winningScore} points first.`;
+    } else {
+        result = 'lose'; title = 'Defeat'; subtitle = `${winnerLabel} reached ${view.winningScore} points first.`;
+    }
+    const buttons = controller.requestNewGame
+        ? [{ label: 'Play Again', primary: true, onClick: () => controller.requestNewGame() }] : [];
+    showOutcomeOverlay({ result, title, subtitle, details, buttons });
+}
+
 function renderGame(root, controller, closeFn) {
     const view = controller.getView();
     const mySeat = controller.localSeat;
@@ -272,6 +307,7 @@ function renderGame(root, controller, closeFn) {
     `;
 
     root.querySelector('#tv-close').onclick = closeFn;
+    maybeShowOutcome(controller, view);
     if (controller.canBid()) {
         root.querySelectorAll('[data-bid]').forEach(btn => {
             btn.onclick = () => controller.bid(parseInt(btn.dataset.bid, 10));
@@ -356,6 +392,8 @@ export function openTollVeilModal(config = {}) {
 }
 
 export function closeTollVeilModal() {
+    hideOutcomeOverlay();
+    outcomeShownFor = null;
     if (unsubscribe) { unsubscribe(); unsubscribe = null; }
     if (activeController && activeController.destroy) activeController.destroy();
     activeController = null;
