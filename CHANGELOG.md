@@ -62,6 +62,26 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.12.0] - 2026-09-29
+
+### Added
+- add Victory/Defeat/Draw overlay to Kon'reh and Toll & Veil
+
+### Other
+- Sync Cord cameos in published novels
+- Sync tidied Justicar anthology story
+- Sync Naars injury continuity in Face reading edition
+- Sync reviewed longform reading editions
+- Sync subtle Fate clues in Riarhin novels
+- Sync Face You Bear narrative-distance revision
+- Sync reviewed Riarhin and Belworth sentence revisions
+- Sync completed Patron and fiction craft reviews
+- Sync Patron histories and adventure editorial refinements
+- Add published The Face You Bear to the web reading library
+- Sync longform editorial refinements to reading editions
+- Sync corrected companion novella chronologies
+- Maintenance update
+
 ## [5.11.1] - 2026-09-28
 
 ### Fixed
