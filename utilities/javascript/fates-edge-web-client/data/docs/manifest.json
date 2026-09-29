@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-28T01:35:16.469Z",
+  "generated": "2026-09-29T16:29:00.236Z",
   "documents": [
     {
       "id": "srd",
@@ -1409,6 +1409,16 @@
       "active": true
     },
     {
+      "id": "the_names_you_take",
+      "title": "The Names You Take",
+      "file": "Fates_-_Edge_-_-The-_-Names-_-You-_-Take.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_ninth_proof",
       "title": "The Ninth Proof",
       "file": "Fates_-_Edge_-_-The-_-Ninth-_-Proof.html",
@@ -1693,7 +1703,7 @@
       "active": true
     }
   ],
-  "total_count": 110,
-  "active_count": 110,
+  "total_count": 111,
+  "active_count": 111,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
