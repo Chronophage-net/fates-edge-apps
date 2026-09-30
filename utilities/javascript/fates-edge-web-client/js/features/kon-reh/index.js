@@ -1,5 +1,4 @@
 import { t as i18nText } from '@core/i18n.js';
-import { showOutcomeOverlay, hideOutcomeOverlay } from './outcome-overlay.js';
 // ============================================================
 //  KON'REH ENGINE — implementation of the official LaTeX rulebook
 //  ("Corpus Canré Scholiatum" / Kon'reh Core Rules §1–9)
@@ -465,6 +464,24 @@ export class KonrehEngine {
     const runnerWasGreenBeforeCapture = piece.type === 'green';
 
     // 1. Slide (Blue specials pivot through an intermediate slide-end square)
+    //
+    // getBlueSpecials() only ever builds specials on a slide basis that did
+    // NOT enter ZoC (a Blue whose slide ends in ZoC has spent its move and
+    // cannot chain). makeMove trusts whatever move it is handed, though, so
+    // a bug upstream — or a move replayed from a stale/remote source — could
+    // smuggle an illegal special through. Cheap insurance:
+    // Re-derive the basis rather than recomputing ZoC by hand here: the
+    // ZoC bookkeeping for a slide end is subtle (walkHomeward deliberately
+    // excludes the piece being approached), and getBlueSlides is the single
+    // authority on it. Hand-rolling the check a second time is how the two
+    // copies drift.
+    if (move.slideEnd && move.special) {
+      const basis = this.getBlueSlides(piece).find(
+        b => b.x === move.slideEnd.x && b.y === move.slideEnd.y
+      );
+      if (!basis || basis.slideEnteredZoc) return false;
+    }
+
     if (move.slideEnd) {
       this.board[piece.y][piece.x] = null;
       piece.x = move.slideEnd.x;
@@ -917,9 +934,331 @@ function isNearCross(engine, x, y) {
 // exactly like pieceProgress()/isNearCross() already do for their terms.
 // Per the rulebook's own "XS (Exit Certainty)" heuristic: "count legal
 // exits before entering the Cross. One is playable; two is safe."
+// CONTRACT: this counts the moves Blue *could* make if it were Blue's
+// turn, which is only the same thing as "exits" when Blue is currently
+// standing in the Cross. evaluate() only calls it inside its
+// isCross(myBlue.x, myBlue.y) branch, so that holds — but the assertion
+// is cheap and the next caller will not know, so it is checked here
+// rather than left as a comment nobody reads.
 function blueExitCertainty(engine, blue) {
   if (!blue || blue.rooted) return 0;
+  if (!engine.isCross(blue.x, blue.y)) return 0; // outside the Cross, "exits" is meaningless
   return pseudoMoves(engine, blue).filter(m => !engine.isCross(m.x, m.y)).length;
+}
+
+// ============================================================
+//  REFORGE REACHABILITY
+// ============================================================
+// The old Reforge term was a Manhattan-distance gradient: "be nearer the
+// enemy Home Apex." That is a slope, not a plan, and in practice the AI
+// shuffled sideways for five turns and lost the race without ever
+// contesting the banner. Manhattan distance is the wrong metric here for
+// four separate reasons:
+//
+//   1. It ignores ZoC, which is the whole point of Kon'reh's endgame — a
+//      piece six squares out can be completely sealed in.
+//   2. It ignores lane geometry. A Red at (0,6) and a Red at (6,0) are
+//      equidistant from (0,0) but only one of them has a clean onward
+//      lane; the other is pinned against the edge.
+//   3. It only ever looked at the single closest piece, so opening a
+//      second approach with a second piece scored exactly zero.
+//   4. Its feasibility cliff (`bestDist > turnsLeft * 5`) used 5 — Blue's
+//      Onward distance — as the per-turn ceiling for every piece. A Red
+//      covers 2. The cliff was so lenient it only ever fired once the
+//      race was already lost.
+//
+// What follows replaces the slope with a plan: a breadth-first search in
+// TURNS (not squares) from each candidate runner to the enemy Home Apex,
+// using that piece's own Onward/Homeward rules and the real ZoC on the
+// board. "Can this piece get there in the breaths I have left?" is the
+// question the rulebook's five-breath framing actually asks.
+//
+// Two deliberate approximations, both documented so nobody mistakes them
+// for bugs:
+//   * The board is treated as static — enemy pieces do not move out of
+//     the way, and do not move into it. Over a 5-turn horizon inside an
+//     alpha-beta search that the search itself will refine, this is the
+//     right trade; a full joint search here would be exponential.
+//   * The runner is lifted off its own origin square for the duration of
+//     the walk, so it cannot block itself on a lane it starts on.
+
+// Only ever called with a non-Blue runner: by construction a side racing
+// to Reforge has no Blue on the board.
+function reforgeStepsFrom(engine, type, player, x, y) {
+    const { onward, homeward } = engine.lanesFor(player);
+    const out = [];
+    for (const [dx, dy] of onward) {
+        const landing = engine.walkOnwardExact(x, y, dx, dy, ONWARD_DIST[type], player);
+        if (landing) out.push(landing);
+    }
+    for (const [dx, dy] of homeward) {
+        for (const step of engine.walkHomeward(x, y, dx, dy, HOMEWARD_DIST[type], player)) out.push(step);
+    }
+    return out;
+}
+
+// Turns for this piece to stand on `goal`, or null if it cannot within
+// `maxTurns`. maxTurns is the live Reforge countdown, so it is never
+// more than 5 and the search is bounded at 5 * 64 states.
+// `optimistic` lifts every ENEMY piece off the board for the duration of
+// the walk, which also removes their ZoC. That answers a different and
+// equally necessary question: "could this runner make it if the wall in
+// front of it were cleared?" When the strict answer is "no path", the
+// optimistic answer is what distinguishes a move that opens the lane —
+// capturing the blocker on the approach square — from aimless drift. It
+// is what turns a lost race into a played one.
+function reforgeTurnsToApex(engine, piece, goal, maxTurns, optimistic = false) {
+    if (piece.x === goal.x && piece.y === goal.y) return 0;
+    if (maxTurns <= 0) return null;
+
+    // Lift the runner off the board so it does not block its own lane.
+    const originId = engine.board[piece.y][piece.x];
+    engine.board[piece.y][piece.x] = null;
+    const lifted = [];
+    if (optimistic) {
+        for (const q of engine.pieces) {
+            if (q.isAlive && q.player !== piece.player) {
+                lifted.push([q.y, q.x, engine.board[q.y][q.x]]);
+                engine.board[q.y][q.x] = null;
+            }
+        }
+    }
+    try {
+        const seen = new Set([piece.y * 8 + piece.x]);
+        let frontier = [{ x: piece.x, y: piece.y }];
+        for (let turn = 1; turn <= maxTurns; turn++) {
+            const next = [];
+            for (const sq of frontier) {
+                for (const step of reforgeStepsFrom(engine, piece.type, piece.player, sq.x, sq.y)) {
+                    if (step.x === goal.x && step.y === goal.y) return turn;
+                    const key = step.y * 8 + step.x;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    next.push({ x: step.x, y: step.y });
+                }
+            }
+            if (next.length === 0) break;
+            frontier = next;
+        }
+        return null;
+    } finally {
+        for (const [ly, lx, id] of lifted) engine.board[ly][lx] = id;
+        engine.board[piece.y][piece.x] = originId;
+    }
+}
+
+// Running the BFS for every piece at every leaf of the search is more
+// than the eval can afford, and it is also unnecessary: a runner twelve
+// squares out is not the one that decides the race. Sort by Manhattan
+// distance — a cheap, admissible-enough proxy for "worth examining" —
+// and only walk the nearest few properly.
+const REFORGE_BFS_MAX_RUNNERS = 4;
+
+// { turns, runners, bestManhattan } — `turns` is the fastest feasible
+// plan in turns (null if there is none), `runners` how many distinct
+// pieces have a feasible plan, so the eval can value redundancy.
+export function reforgeOutlook(engine, player) {
+    const goal = engine.enemyHomeApexOf(player);
+    const turnsLeft = engine.reforgeCountdown[player];
+
+    const candidates = [];
+    let bestManhattan = Infinity;
+    for (const p of engine.pieces) {
+        if (!p.isAlive || p.player !== player || p.type === 'blue') continue;
+        const md = Math.abs(p.x - goal.x) + Math.abs(p.y - goal.y);
+        if (md < bestManhattan) bestManhattan = md;
+        candidates.push({ piece: p, md });
+    }
+    if (candidates.length === 0) return { turns: null, runners: 0, bestManhattan: Infinity };
+
+    candidates.sort((a, b) => a.md - b.md);
+    let turns = null, runners = 0;
+    for (const c of candidates.slice(0, REFORGE_BFS_MAX_RUNNERS)) {
+        const t = reforgeTurnsToApex(engine, c.piece, goal, turnsLeft);
+        if (t === null) continue;
+        runners++;
+        if (turns === null || t < turns) turns = t;
+    }
+
+    // Only pay for the optimistic pass when the strict one found nothing —
+    // that is the only case where the answer changes a decision.
+    let optimisticTurns = turns;
+    if (turns === null) {
+        for (const c of candidates.slice(0, REFORGE_BFS_MAX_RUNNERS)) {
+            const t = reforgeTurnsToApex(engine, c.piece, goal, turnsLeft, true);
+            if (t === null) continue;
+            if (optimisticTurns === null || t < optimisticTurns) optimisticTurns = t;
+        }
+    }
+
+    return { turns, optimisticTurns, runners, bestManhattan };
+}
+
+// ---- Apex threats, counted by LANE ----
+//
+// Measured, against a defender playing at the same depth: one runner is
+// never enough. A Green one move from the banner gets its lane re-plugged
+// for free —
+//
+//     P2 green(4,4)->(0,4)     one move from planting
+//     P1 green(1,1)->(0,1)     re-plugs the lane
+//
+// — and the defender can go on doing that every turn, forever, because
+// plugging costs one move and so does threatening.
+//
+// But the apex is reachable along exactly TWO straight lanes, and those
+// lanes are disjoint except at the apex square itself. No single defensive
+// move can answer two runners that are each one Onward move from the apex
+// on DIFFERENT lanes: a piece occupies one square, and there is no square
+// that sits on both lanes. Two lane-distinct threats is therefore a forced
+// Reforge, and that — not proximity — is the structure the search needs to
+// be hunting for.
+//
+// The second thing this fixes is subtler. A blocked threat still has
+// value: the defender is spending a piece to hold that lane and cannot
+// spend it anywhere else. reforgeOutlook() reports `turns: null` for a
+// plugged lane, which used to make the whole position read as flat — so
+// the AI would walk a runner AWAY from a square the opponent was paying to
+// contest (observed: a Green retreating (0,4) -> (2,4) -> (5,4) -> (7,4)
+// after the plug). Scoring the standing threat itself is what anchors it.
+//
+// A piece is a standing threat when it sits at exactly its own Onward
+// distance from the apex along a lane, whether or not the path is
+// currently clear. It is LIVE when the path is also clear, i.e. it plants
+// next turn if left alone.
+export function apexThreats(engine, player) {
+    const goal = engine.enemyHomeApexOf(player);
+    const { onward } = engine.lanesFor(player);
+    const liveLanes = new Set();
+    const threatLanes = new Set();
+    const pinners = new Set();
+
+    for (const p of engine.pieces) {
+        if (!p.isAlive || p.player !== player || p.type === 'blue') continue;
+        const dist = ONWARD_DIST[p.type];
+        for (const [dx, dy] of onward) {
+            // Standing on the lane at exactly Onward distance means one
+            // Onward move lands on the apex — the direction is implied,
+            // since Onward always points at the enemy apex.
+            if (p.x + dx * dist !== goal.x || p.y + dy * dist !== goal.y) continue;
+            const lane = dx !== 0 ? 'x' : 'y';
+            threatLanes.add(lane);
+            const landing = engine.walkOnwardExact(p.x, p.y, dx, dy, dist, player);
+            if (landing && landing.x === goal.x && landing.y === goal.y) {
+                liveLanes.add(lane);
+            } else {
+                // Not live, so something is sitting in the way. Those
+                // pieces are PINNED: they are spending their existence
+                // holding this lane shut and cannot be used elsewhere
+                // while the threat stands. Counting them is what stops a
+                // blocked runner from reading as a dead runner — the
+                // failure that had a Green retreating (0,4) -> (2,4) ->
+                // (5,4) -> (7,4) away from a square the defender was
+                // paying every turn to contest.
+                for (let k = 1; k < dist; k++) {
+                    const occ = engine.getPieceAt(p.x + dx * k, p.y + dy * k);
+                    if (occ && occ.isAlive && occ.player !== player) pinners.add(occ.id);
+                }
+            }
+        }
+    }
+    return { live: liveLanes.size, standing: threatLanes.size, pinned: pinners.size };
+}
+
+// The whole Reforge picture for one side, as a positive score: high is
+// good FOR that side. evaluate() adds it for `me` and subtracts it for
+// `opp`, so the shape only has to be written once.
+function reforgeScore(engine, player, pm) {
+    // THE BANNER IS ALREADY PLANTED.
+    //
+    // A pending Reforge means this player's runner reached the enemy Home
+    // Apex and the only thing left is choosing where Blue comes back. That
+    // is the win condition for the race — but planting CONSUMES the runner
+    // (makeMove sets isAlive = false on it), and blueAlive stays false
+    // until the placement resolves. So a naive reading of the position is
+    // "Blue dead, no runner left, clock still running" — catastrophe — and
+    // the search learns to avoid the exact move it is supposed to be
+    // hunting for. Measured: the winning plant scored -2640 and a sideways
+    // shuffle scored -360, so the AI shuffled.
+    //
+    // This is the same shape as the last-piece/draw bug already documented
+    // in startTurn(): an evaluation that misreads a terminal state teaches
+    // the search to throw the game away. Check it before anything else.
+    if (engine.pendingReforge && engine.pendingReforge.player === player) {
+        return 1400 * pm.reforge;
+    }
+
+    const turnsLeft = engine.reforgeCountdown[player];
+    const { turns, optimisticTurns, runners, bestManhattan } = reforgeOutlook(engine, player);
+    let s = 0;
+
+    if (bestManhattan === Infinity) {
+        // No piece left to run at all — the Reforge cannot be made.
+        return -1200 * pm.reforge;
+    }
+
+    // Lane structure, scored BEFORE and independently of path feasibility —
+    // see apexThreats(). Two live lane-distinct threats cannot both be
+    // plugged by one move, so that is very nearly a won race; a single one
+    // is real but answerable. Standing (currently blocked) threats are
+    // scored too, because holding the square is what forces the defender to
+    // keep paying, and because dropping them to zero is what taught the
+    // runner to wander off.
+    const { live, standing, pinned } = apexThreats(engine, player);
+    if (live >= 2) s += 1200;
+    else if (live === 1) s += 350;
+    if (standing >= 2) s += 400;
+    else if (standing === 1) s += 120;
+    // Each enemy piece nailed to blocking duty is board the defender does
+    // not get to use. If you are forcing more commitment than you are
+    // spending, you are winning the Reforge even while every lane is shut.
+    s += pinned * 90;
+
+    if (turns === null) {
+        // No feasible plan inside the clock. Say so loudly — this is the
+        // cliff the old term was trying and failing to express.
+        s -= 800;
+
+        // But "losing" is not "indifferent". A race can be sealed purely by
+        // enemy pieces sitting on the approach squares, and the move that
+        // captures one of them turns `turns` from null into a number on the
+        // very next node — a swing of well over a thousand. Rewarding a
+        // short OPTIMISTIC path is what makes the search look for that move
+        // instead of drifting, which is exactly what the logged game showed
+        // it doing: Stall to (0,6), then (0,7), then (1,7), away from the
+        // banner, because every option scored the same flat nothing.
+        //
+        // Note that "no plan" is often the honest verdict rather than a
+        // bug. Exact-distance Onward fixes a piece's parity along its lane:
+        // a Red moves exactly 2 per Onward move, so from an odd rank it can
+        // only reach odd ranks, and the apex at 0 is unreachable until it
+        // spends a whole turn on a Homeward step to change parity — a turn
+        // it also spends moving the wrong way. Worse, measured on an empty
+        // board, NO piece starting in its own home cluster can reach the
+        // enemy apex inside five turns at all (Red reaches it from 38 of 64
+        // squares, Orange 49, Green 55 — and the home ranks are outside all
+        // three). Losing your Blue before you have developed is simply
+        // fatal in this ruleset. The AI should then play the best try, not
+        // pretend it has a race.
+        if (optimisticTurns !== null) {
+            s += 300;
+            s += Math.max(0, turnsLeft - optimisticTurns) * 40;
+        }
+        s += (14 - bestManhattan) * 6;
+    } else {
+        // There IS a path. The flat bonus is what makes "a plan" beat "a
+        // slightly shorter shuffle"; the slack term prefers arriving with
+        // breaths to spare, which is what survives an opponent's blocking
+        // move; redundancy prefers two runners over one, because a single
+        // runner can be sealed by a single enemy piece.
+        s += 600;
+        s += Math.max(0, turnsLeft - turns) * 120;
+        s += (14 - bestManhattan) * 8;
+        if (runners > 1) s += Math.min(runners - 1, 3) * 80;
+        if (turns === 0) s += 1000; // already standing on the Apex, ready to plant
+    }
+
+    return s * pm.reforge;
 }
 
 // ---- Game phase detection ----
@@ -979,7 +1318,7 @@ const PHASE_MULTIPLIER = {
 // and a steep Reforge-urgency term (including a large bonus for already
 // standing on the enemy Apex, ready to plant immediately) — all of it
 // re-weighted per `gamePhase()` above.
-function evaluate(engine, weights, me) {
+export function evaluate(engine, weights, me) {
   if (engine.winner === me) return 1_000_000;
   if (engine.winner === 'draw') return 0;
   if (engine.winner) return -1_000_000;
@@ -1007,7 +1346,12 @@ function evaluate(engine, weights, me) {
   // same threshold) but kept as its own factor since it should ramp with
   // material count rather than snap on/off at the phase boundary.
   const totalNonBluePieces = engine.pieces.filter(p => p.isAlive && p.type !== 'blue').length;
-  const endgameFactor = totalNonBluePieces <= 8 ? 1.6 : 1.0;
+  // A smooth ramp rather than the old `<= 8 ? 1.6 : 1.0` snap, which put a
+  // 60% discontinuity across a single capture: trading the ninth piece was
+  // worth far more than trading the eighth or the tenth, for no reason in
+  // the rules. Same endpoints (1.0 with a full board, 1.6 when the board
+  // is bare), reached gradually.
+  const endgameFactor = 1 + 0.075 * Math.max(0, 8 - totalNonBluePieces);
 
   for (const p of engine.pieces) {
     if (!p.isAlive) continue;
@@ -1192,60 +1536,13 @@ function evaluate(engine, weights, me) {
     score += weights.reforge * pm.reforge * (urgency + 1) * (urgency + 1) * 20;
   }
 
-  // --- Proximity bonus for the player in Reforge: encourage moving toward the enemy Home Apex ---
-  // FIX: "the coach doesn't seem to understand the need to re-forge" — the
-  // per-square gradient below is now scaled by pm.reforge too (so it's the
-  // dominant concern in the endgame phase, not just a tie-breaker), and a
-  // feasibility cliff has been added: once the fastest possible runner can
-  // no longer reach the enemy Home Apex within the turns actually left on
-  // the clock, that's a losing Reforge, and the evaluation should say so
-  // loudly rather than let some unrelated tactical nicety look better by
-  // comparison. (See also chooseAiMove/updateCoachHint, which now search
-  // deeper specifically in the endgame phase so this gradient is visible
-  // far enough ahead to actually steer toward the winning path.)
-  if (!engine.blueAlive[me]) {
-    const enemyHome = engine.enemyHomeApexOf(me);
-    let bestDist = Infinity;
-    for (const p of engine.pieces) {
-      if (p.isAlive && p.player === me) {
-        const d = Math.abs(p.x - enemyHome.x) + Math.abs(p.y - enemyHome.y);
-        if (d < bestDist) bestDist = d;
-      }
-    }
-    if (bestDist !== Infinity) {
-      // Bonus: (max possible distance = 14) - current distance, scaled by
-      // 20 and by pm.reforge (dominant in the endgame phase).
-      score += (14 - bestDist) * 20 * pm.reforge;
-      // Extra large bonus if already on the Apex (ready to plant)
-      if (bestDist === 0) score += 1000 * pm.reforge;
-      // Feasibility cliff: 5 is the fastest any piece can ever cover in a
-      // single turn (Blue's own Onward distance — the ceiling for every
-      // piece type). If the remaining distance can no longer be covered
-      // in the turns actually left, the Reforge is failing.
-      const turnsLeft = engine.reforgeCountdown[me];
-      if (turnsLeft > 0 && bestDist > turnsLeft * 5) {
-        score -= 400 * pm.reforge;
-      }
-    }
-  }
-  if (!engine.blueAlive[opp]) {
-    const enemyHome = engine.enemyHomeApexOf(opp);
-    let bestDist = Infinity;
-    for (const p of engine.pieces) {
-      if (p.isAlive && p.player === opp) {
-        const d = Math.abs(p.x - enemyHome.x) + Math.abs(p.y - enemyHome.y);
-        if (d < bestDist) bestDist = d;
-      }
-    }
-    if (bestDist !== Infinity) {
-      score -= (14 - bestDist) * 20 * pm.reforge;
-      if (bestDist === 0) score -= 1000 * pm.reforge;
-      const turnsLeft = engine.reforgeCountdown[opp];
-      if (turnsLeft > 0 && bestDist > turnsLeft * 5) {
-        score += 400 * pm.reforge;
-      }
-    }
-  }
+  // --- Reforge planning: is there an actual path to the banner? ---
+  // Replaces the old Manhattan-distance gradient, which rewarded stepping
+  // vaguely nearer the enemy Home Apex and produced a five-turn shuffle
+  // rather than a race. See reforgeOutlook()/reforgeScore() above for why
+  // distance was the wrong metric and what replaced it.
+  if (!engine.blueAlive[me]) score += reforgeScore(engine, me, pm);
+  if (!engine.blueAlive[opp]) score -= reforgeScore(engine, opp, pm);
 
   return score;
 }
@@ -1400,22 +1697,38 @@ export function chooseAiMove(engine, player, schoolId, depth = 3) {
       }
     }
 
-    let alpha = -Infinity;
-    const beta = Infinity;
     let bestScore = -Infinity;
     let iterBestMoves = [];
 
     for (const cand of moves) {
       const clone = engine.clone();
       clone.makeMove(cand.pieceId, cand.move);
-      const score = search(clone, d - 1, alpha, beta, weights, player);
+      // FULL WINDOW at the root, deliberately.
+      //
+      // This loop used to raise alpha across siblings the way an interior
+      // node does, and then collect every score within 1e-6 of the best as
+      // a "tie" to pick from at random. Those two things cannot both be
+      // true: under alpha-beta a sibling that is worse than alpha returns a
+      // BOUND, not its real value, and that bound is frequently exactly
+      // alpha -- so a cut-off move landed in the tie set and got played a
+      // third of the time.
+      //
+      // That is what made the Reforge fix look like it had not worked: the
+      // evaluation correctly scored the runner's move to (0,4) some 880
+      // points above a sideways shuffle, the search pruned the shuffle,
+      // the shuffle came back reading exactly alpha, and the root picked
+      // between them by coin flip. The AI's five-turn drift was a search
+      // bug wearing an evaluation bug's clothes.
+      //
+      // Interior nodes still prune normally; only the root pays for an
+      // exact score per move, and the root is the one place we need one.
+      const score = search(clone, d - 1, -Infinity, Infinity, weights, player);
       if (score > bestScore + 1e-6) {
         bestScore = score;
         iterBestMoves = [cand];
       } else if (Math.abs(score - bestScore) <= 1e-6) {
         iterBestMoves.push(cand);
       }
-      alpha = Math.max(alpha, bestScore);
     }
 
     if (iterBestMoves.length > 0) {
@@ -1464,6 +1777,44 @@ function describeMove(game, piece, move, titleFn) {
   }
   if (move.capture) return `Slide & capture at (${move.x},${move.y})`;
   return `Slide to (${move.x},${move.y})`;
+}
+
+// The rulebook's own §State Tracking notation, emitted after every logged
+// move. Without these the log is readable but not *auditable*: you can see
+// that a move happened, but not whether the engine's Cross clock, special
+// budget, Reforge countdown and Green dial agree with what the rules say
+// they should be. Every field here is already tracked on the engine — this
+// only surfaces it.
+//
+//   [CF:in 2/3]  Blue's Cross stay count      [Excl:1]  re-entry exclusion
+//   [S:D S:H]    specials spent this life     [Rooted]  Crown Stagger
+//   [RC 4/5]     Reforge countdown            [G:3-2]   Green dial, P1-P2
+export function stateTags(game, player) {
+  const parts = [];
+  const blue = game.getBlue(player);
+
+  if (blue) {
+    if (blue.crossStays > 0) parts.push(`CF:in ${blue.crossStays}/3`);
+    if (blue.crossExclusion > 0) parts.push(`Excl:${blue.crossExclusion}`);
+    if (blue.specialsUsed.length) parts.push(blue.specialsUsed.join(' '));
+    if (blue.rooted) parts.push('Rooted');
+  }
+
+  // The countdown is only meaningful for a side whose Blue is off the
+  // board, and both sides can be racing at once, so label them.
+  for (const pl of [1, 2]) {
+    if (!game.blueAlive[pl] && game.reforgeCountdown[pl] > 0) {
+      parts.push(`RC P${pl} ${game.reforgeCountdown[pl]}/5`);
+    }
+  }
+
+  // The Green dial is global (capped at 6 across both players), so it is
+  // always worth showing as a split.
+  const g1 = game.pieces.filter(p => p.isAlive && p.type === 'green' && p.player === 1).length;
+  const g2 = game.pieces.filter(p => p.isAlive && p.type === 'green' && p.player === 2).length;
+  parts.push(`G:${g1}-${g2}`);
+
+  return parts.map(t => `<span class="kr-tag">[${t}]</span>`).join('');
 }
 
 function moveKind(move) {
@@ -1587,7 +1938,6 @@ export function openKonrehModal(netConfig = null) {
 
   let konrehHiddenSiblings = null;
   const closeKonrehModal = () => {
-    hideOutcomeOverlay();
     modal.remove();
     if (konrehHiddenSiblings) {
       konrehHiddenSiblings.forEach(ch => { ch.style.display = ''; });
@@ -1915,7 +2265,7 @@ export function openKonrehModal(netConfig = null) {
   }
 
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, c => ({ '&': '&', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
   function talkLine(html) {
@@ -2324,43 +2674,12 @@ export function openKonrehModal(netConfig = null) {
     }
   }
 
-  // ---- End-of-game outcome (Victory / Defeat / Draw overlay) ----
-  // Fires once per finished game. Perspective: networked → the local
-  // seat; vs-AI → the human (the side the AI isn't playing); local
-  // two-player → neutral "Player N wins" (both people share the screen).
-  let outcomeShown = false;
-  function maybeShowOutcome() {
-    if (!game.winner) {
-      if (outcomeShown) { outcomeShown = false; hideOutcomeOverlay(); }
-      return;
-    }
-    if (outcomeShown) return;
-    outcomeShown = true;
-
-    const me = isNetworked ? localPlayer : (aiConfig ? (aiConfig.player === 1 ? 2 : 1) : null);
-    let result, title, subtitle;
-    if (game.winner === 'draw') {
-      result = 'draw'; title = 'Draw'; subtitle = game.winReason || 'No legal moves remain.';
-    } else if (me == null) {
-      result = 'neutral'; title = `Player ${game.winner} Wins`; subtitle = game.winReason || '';
-    } else if (game.winner === me) {
-      result = 'win'; title = 'Victory';
-      subtitle = game.winReason || (aiConfig ? `You outplayed ${SCHOOLS[aiConfig.schoolId].name}.` : 'You won the game.');
-    } else {
-      result = 'lose'; title = 'Defeat';
-      subtitle = game.winReason || (aiConfig ? `${SCHOOLS[aiConfig.schoolId].name} takes the board.` : 'Your opponent won the game.');
-    }
-    const buttons = [{ label: 'Rematch', primary: true, onClick: () => resetBtn.click() }];
-    showOutcomeOverlay({ result, title, subtitle, buttons });
-  }
-
   // ---- Main render function ----
   function render() {
     updateCoachHint();
     drawBoardOnly();
     renderStatus();
     syncCoachAnimation();
-    maybeShowOutcome();
 
     // Update status with selected piece coords (if any)
     if (selectedPiece) {
@@ -2490,6 +2809,7 @@ export function openKonrehModal(netConfig = null) {
       entry += ' <span class="kr-badge">Blue captured!</span>';
     }
     if (game.pendingReforge) entry += ' <span class="kr-badge">Banner planted</span>';
+    entry += ` ${stateTags(game, player)}`;
     log(entry);
 
     if (isAiMove) {
@@ -2758,17 +3078,17 @@ export default {
         <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Local hot‑seat, vs‑computer Schools, or challenge a connected player from the Whiteboard's 🌀 Kon'reh toggle.</p>
       </div>
       <div class="panel" style="max-width:720px;margin:1rem auto 0;text-align:center;padding:2rem 1.5rem;">
-        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;" data-i18n="feature.kon-reh.tollVeil">🃏 Toll & Veil</h2>
+        <h2 style="color:var(--gold);letter-spacing:0.02em;margin-bottom:0.1rem;" data-i18n="feature.kon-reh.tollVeil">🃏 Toll &amp; Veil</h2>
         <p style="color:var(--text2);margin-top:0;">A 3-5 player trick-taking card game of bids, trump, and nerve</p>
-        <button id="tollveil-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;" data-i18n="feature.kon-reh.playTollVeil">▶ Play Toll & Veil</button>
-        <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Pass & play, solo vs AI, or host a table for the group from the Whiteboard's 🃏 Toll & Veil toggle — points-only by default, with optional capped-XP or narrative "String" stakes.</p>
+        <button id="tollveil-play-btn" class="btn btn-gold" style="margin-top:0.75rem;padding:0.6rem 1.6rem;font-weight:600;" data-i18n="feature.kon-reh.playTollVeil">▶ Play Toll &amp; Veil</button>
+        <p style="color:var(--text3);font-size:0.75rem;margin-top:0.6rem;">Pass &amp; play, solo vs AI, or host a table for the group from the Whiteboard's 🃏 Toll &amp; Veil toggle — points-only by default, with optional capped-XP or narrative "String" stakes.</p>
       </div>
       <div class="panel" id="konreh-rules-panel" style="max-width:720px;margin:1rem auto 0;padding:1.25rem 1.5rem;text-align: start;font-size:0.85rem;line-height:1.5;">
         <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.konRehHowToPlay">Kon'reh — How to Play</h3>
         ${getRulesText()}
       </div>
       <div class="panel" id="tollveil-rules-panel" style="max-width:720px;margin:1rem auto 2rem;padding:1.25rem 1.5rem;text-align: start;font-size:0.85rem;line-height:1.5;">
-        <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.tollVeilHowToPlay">Toll & Veil — How to Play</h3>
+        <h3 style="color:var(--gold);margin-top:0;" data-i18n="feature.kon-reh.tollVeilHowToPlay">Toll &amp; Veil — How to Play</h3>
         ${getTollVeilRulesText()}
       </div>
     `;

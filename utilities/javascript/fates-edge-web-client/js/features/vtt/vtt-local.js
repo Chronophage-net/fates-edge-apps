@@ -87,7 +87,7 @@ async function renderMiniTracker() {
       <div class="text-muted text-sm" style="margin-bottom:0.3rem;">Round ${trackerState.round || 0}</div>
       <div style="display:flex;flex-direction:column;gap:0.15rem;">
         ${trackerState.combatants.map(c => {
-          const isActive = trackerState.activeCombatantIds ? trackerState.activeCombatantIds.includes(c.id) : c.id === trackerState.activeCombatantId;
+          const isActive = c.id === trackerState.activeCombatantId;
           const weaponGlyph = { light: '🗡️', medium: '⚔️', heavy: '🔨', ranged: '🏹' }[c.weaponClass] || '';
           let rangeHtml = '';
           if (selfCombatant && selfCombatant.id !== c.id) {
@@ -119,6 +119,19 @@ async function renderMiniTracker() {
     console.debug('[VTT Local] Mini tracker unavailable:', err?.message);
     el.innerHTML = '<div class="text-muted text-sm">Combat tracker unavailable.</div>';
   }
+}
+
+// ─── Which characters are actually at the table ──────────────────────────────
+// "Push to VTT" sets char.vtt = true (Characters tab). Local mode used to hand
+// the store every character in the roster, so the flag changed nothing and the
+// button looked broken. Honour it as opt-in -- but a roster saved before the
+// flag existed carries no vtt key at all, and filtering those to nothing would
+// empty the table for anyone upgrading, so fall back to the whole roster when
+// no character has ever been pushed.
+function vttRoster() {
+  const all = getCharacters();
+  const pushed = all.filter(c => c.vtt === true);
+  return pushed.length ? pushed : (all.some(c => c.vtt === false) ? pushed : all);
 }
 
 function getSenderName() {
@@ -327,7 +340,7 @@ function handleSlash(text) {
       break;
     }
     case 'status': {
-      const chars = getCharacters().filter(c => c.vtt);
+      const chars = vttRoster();
       if (chars.length === 0) {
         sendMessage('📡 Local mode | No VTT characters.', 'System', 'all');
       } else {
@@ -453,7 +466,7 @@ function attachEvents() {
       case 'chat-send-btn': e.preventDefault(); handleSendMessage(); break;
       case 'vtt-clear-chat': clearChatHistory?.(); vttStore.clearChat(); showToast(i18nText("feature.vtt.vtt-local.chatCleared", null, "Chat cleared."), 'success'); break;
       case 'vtt-refresh-btn': {
-        const chars = getCharacters();
+        const chars = vttRoster();
         vttStore.updateCharacters(chars);
         vttStore.updateTimers(getState().timers || []);
         showToast(i18nText("feature.vtt.vtt-local.vttRefreshed", null, "VTT refreshed."), 'info');
@@ -490,7 +503,7 @@ function attachEvents() {
           if (typeof module.sceneEndTrimBoons === 'function') {
             module.sceneEndTrimBoons();
           }
-          const chars = getCharacters();
+          const chars = vttRoster();
           vttStore.updateCharacters(chars);
           resetCombatScene();
         }).catch(err => {
@@ -498,7 +511,7 @@ function attachEvents() {
           const state = getState();
           (state.characters || []).forEach(c => { c.boons = Math.min(c.boons || 0, 2); });
           saveState();
-          vttStore.updateCharacters(getCharacters());
+          vttStore.updateCharacters(vttRoster());
           resetCombatScene();
           showToast(i18nText("feature.vtt.vtt-local.sceneEndedBoonsTrimmed", null, "Scene ended: Boons trimmed."), 'info');
         });
@@ -602,7 +615,7 @@ export function render(el) {
       <div class="vtt-card-header">
         <span class="vtt-card-title" data-i18n="feature.vtt.vtt-local.tableStatus">🛰️ Table Status</span>
         <span class="vtt-stat-pill">
-          <span class="vtt-dot" style="background:var(--gold);"></span>
+          <span class="vtt-dot" style="background:var(--vtt-gold);"></span>
           📡 Local mode (no server)
         </span>
       </div>
@@ -614,8 +627,8 @@ export function render(el) {
            Settings > WebSocket panel has the same toggle for anyone who'd
            rather set it there). -->
       <details class="vtt-status-more" data-vtt-remember="vtt.status.open">
-      <summary><span data-i18n="feature.vtt.vtt-local.tableSettings">Voice, party & connection</span></summary>
-      <div class="vtt-stat-row" id="vtt-local-only-row" style="justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;margin-bottom:0.5rem;background:var(--bg3);border-radius:calc(var(--radius) - 2px);">
+      <summary><span data-i18n="feature.vtt.vtt-local.tableSettings">Voice, party &amp; connection</span></summary>
+      <div class="vtt-stat-row" id="vtt-local-only-row" style="justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;margin-bottom:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);">
         ${isLocalOnlyMode() ? `
           <span class="text-muted" style="font-size:0.85rem;" data-i18n="feature.vtt.vtt-local.fullyOfflineNoConnectionAttemptsNoReconnect">✅ Fully offline &mdash; no connection attempts, no reconnect loop.</span>
           <button class="btn btn-sm btn-ghost" id="vtt-local-only-toggle" title="Allow connecting to a server again" data-i18n-attr="title:feature.vtt.vtt-local.allowConnectingToAServerAgain" data-i18n="feature.vtt.vtt-local.allowConnecting">🌐 Allow connecting</button>
@@ -657,7 +670,7 @@ export function render(el) {
              capped so huge desktop monitors don't get an absurdly tall pane.
              NEW: role="log"/aria-live="polite"/aria-relevant="additions" —
              see the matching change in vtt-connected.js's header comment. -->
-        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--bg3);border-radius:calc(var(--radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);" data-i18n-attr="aria-label:feature.vtt.vtt-local.chatMessages"></div>
+        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Chat messages" style="flex:1;overflow-y:auto;padding:0.5rem;background:var(--vtt-surface2);border-radius:calc(var(--vtt-radius) - 2px);margin-bottom:0.5rem;font-size:1rem;display:flex;flex-direction:column;max-height:min(70vh, 600px);min-height:min(35vh, 300px);" data-i18n-attr="aria-label:feature.vtt.vtt-local.chatMessages"></div>
         <div id="selected-character-display" class="vtt-speaking-as"></div>
         <div class="chat-input-row" style="display:flex;gap:0.4rem;">
           <input type="text" id="chatInput" placeholder="Type… (/roll, /timer, /help)" style="flex:1;font-size:1rem;padding:0.5rem 0.6rem;" / data-i18n-attr="placeholder:feature.vtt.vtt-local.typeRollTimerHelp">
@@ -761,7 +774,7 @@ export function render(el) {
             </div>
             <div id="vtt-common-rolls" style="margin-top:0.5rem;min-height:2.5rem;"></div>
             <div class="vtt-btn-row" style="margin-top:0.5rem;">
-              <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-local.rollPost">Roll & Post</button>
+              <button class="btn btn-gold btn-sm" id="vtt-roll-post-btn" data-i18n="feature.vtt.vtt-local.rollPost">Roll &amp; Post</button>
               <button class="btn btn-sm" id="vtt-roll-only-btn" data-i18n="feature.vtt.vtt-local.rollOnly">Roll Only</button>
             </div>
             <div id="vtt-roll-output" class="mt-1" style="min-height:3rem;padding:0.2rem 0;"></div>
@@ -797,7 +810,7 @@ export function render(el) {
   renderMiniTracker();
 
   // Normalize and set initial characters
-  const chars = getCharacters();
+  const chars = vttRoster();
   vttStore.updateCharacters(chars);
   vttStore.updateTimers(getState().timers || []);
   vttStore.setConnectionStatus('local');
@@ -816,7 +829,7 @@ export function render(el) {
       presenceInterval = null;
       return;
     }
-    const chars = getCharacters();
+    const chars = vttRoster();
     vttStore.updateCharacters(chars);
     vttStore.updateTimers(getState().timers || []);
     renderMiniTracker();

@@ -552,8 +552,14 @@ export function renderCharList() {
         }
     });
     
-    // Setup event delegation
-    list.addEventListener('click', handleCharacterAction);
+    // Setup event delegation. renderCharList() only rewrites innerHTML, so the
+    // element survives every re-render -- binding unconditionally stacked one
+    // more listener per render, and an even number of them toggled Push to VTT
+    // on and straight back off again.
+    if (!list.dataset.actionsBound) {
+        list.addEventListener('click', handleCharacterAction);
+        list.dataset.actionsBound = '1';
+    }
     
     renderPartyOverview();
 }
@@ -657,7 +663,7 @@ function createCharacterSummary(char) {
     // Build the HTML
     const div = document.createElement('div');
     div.className = 'char-summary';
-    div.style.cssText = 'padding:0.4rem 0.6rem;font-size:0.75rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;background:var(--bg);';
+    div.style.cssText = 'padding:0.4rem 0.6rem;font-size:0.75rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;background:var(--bg1);';
 
     const harmColor = harm === 0 ? 'var(--green)' : harm === 1 ? 'var(--gold)' : harm === 2 ? 'var(--orange)' : 'var(--red)';
     const obligColor = obligInfo.doubleCapacity ? 'var(--red)' : obligInfo.overCapacity ? 'var(--orange)' : 'var(--text2)';
@@ -696,7 +702,10 @@ function handleCharacterAction(e) {
         case 'delete':
             deleteCharacterHandler(id);
             break;
-        case 'vtt':
+        // The card's button carries data-action="toggle-vtt" (see
+        // components/CharacterCard.js); this case read 'vtt', so Push to VTT
+        // had been a dead button.
+        case 'toggle-vtt':
             togglePushToVTT(id);
             break;
         case 'roll':
@@ -912,8 +921,12 @@ function togglePushToVTT(id) {
                 : `"${char.name || 'Character'}" removed from VTT.`,
             'success'
         );
-        const vttBtn = document.querySelector('.sidebar-nav button[data-tab="vtt"]');
-        if (vttBtn) vttBtn.click();
+        // Follow the character over to the table when pushing; stay put when
+        // taking one off it.
+        if (newVtt) {
+            const vttBtn = document.querySelector('.sidebar-nav button[data-tab="vtt"]');
+            if (vttBtn) vttBtn.click();
+        }
     }
 }
 

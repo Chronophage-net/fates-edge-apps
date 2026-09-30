@@ -82,8 +82,11 @@ function trustedSanitize(html) {
             FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
         });
     }
-    return escHtml(html);
-
+    // --- Fallback: basic strip if DOMPurify isn't loaded ---
+    return String(html)
+        .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+        .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
+        .replace(/href\s*=\s*["']\s*javascript:/gi, 'href="#"');
 }
 // ============================================================
 // Container & query helpers
@@ -423,9 +426,9 @@ export function renderChat() {
                     <div style="font-size:1.1rem;">No messages yet</div>
                     <div style="font-size:0.9rem;margin-top:0.3rem;">
                         ${isConnected ? `🌐 Connected to server${roomCode ? ` (${roomCode})` : ''}` : '📡 Messages stay local'}
-                        <span style="color:var(--text3);margin-inline-start:0.3rem;">via ${mode}</span>
+                        <span style="color:var(--text4);margin-inline-start:0.3rem;">via ${mode}</span>
                     </div>
-                    <div style="font-size:0.8rem;margin-top:0.5rem;color:var(--text3);">
+                    <div style="font-size:0.8rem;margin-top:0.5rem;color:var(--text4);">
                         Type /help for commands
                     </div>
                 </div>
@@ -594,7 +597,7 @@ function renderSuggestionDetails(suggestionData) {
         return `
             <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
                 <span class="outcome-tag" style="font-weight:600;">${outcomeLabel}</span>
-                <span style="margin-inline-start:0.4rem;color:var(--text3);">[${kindLabel}]</span>
+                <span style="margin-inline-start:0.4rem;color:var(--text4);">[${kindLabel}]</span>
                 ${previewHtml}
             </div>
         `;
@@ -602,7 +605,7 @@ function renderSuggestionDetails(suggestionData) {
 
     return `
         <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;border:1px solid var(--gold);font-size:0.85rem;">
-            <div><span style="color:var(--text3);">[${kindLabel}]</span> pending GM approval</div>
+            <div><span style="color:var(--text4);">[${kindLabel}]</span> pending GM approval</div>
             ${previewHtml}
             <div style="margin-top:0.4rem;display:flex;gap:0.4rem;">
                 <button class="btn btn-xs" data-suggestion-id="${escHtml(id)}" data-suggestion-action="approve" style="color:var(--green);border-color:var(--green);">✅ Approve</button>
@@ -637,7 +640,10 @@ export function renderVTTChars() {
         const selectedId = vttStore.getSelectedCharacterId();
 
         if (vttChars.length === 0) {
-            setHtml(grid, `<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:1.1rem;">👤 No VTT characters</div>`);
+            setHtml(grid, `<div style="text-align:center;padding:1.5rem;color:var(--text3);">
+                <div style="font-size:1.1rem;">👤 No characters at the table</div>
+                <div style="font-size:0.85rem;margin-top:0.35rem;">Open the Characters tab and press 💬 Push to seat one here.</div>
+            </div>`);
             setHtml(detailContainer, '');
             return;
         }
@@ -990,7 +996,7 @@ export function renderCommonRolls() {
                 }
                 const output = q('#vtt-roll-output');
                 if (output) {
-                    output.innerHTML = `<span style="color:var(--text2);">⚡ ${escHtml(label)} prepared (Attr ${attr} + Skill ${skill})</span>`;
+                    output.innerHTML = `<span style="color:var(--text2);">⚡ ${label} prepared (Attr ${attr} + Skill ${skill})</span>`;
                 }
                 const rollerPanel = q('.vtt-panel:has(#vtt-roll-output)');
                 if (rollerPanel) rollerPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
