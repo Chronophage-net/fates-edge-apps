@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-29T16:29:00.236Z",
+  "generated": "2026-09-30T13:25:12.141Z",
   "documents": [
     {
       "id": "srd",
@@ -1120,6 +1120,16 @@
       "active": true
     },
     {
+      "id": "the_blood_in_the_fold",
+      "title": "The Blood in the Fold",
+      "file": "Fates_-_Edge_-_-The-_-Blood-_-in-_-the-_-Fold.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_cartomancers_compass",
       "title": "The Cartomancers Compass",
       "file": "Fates_-_Edge_-_-The-_-Cartomancers-_-Compass.html",
@@ -1703,7 +1713,7 @@
       "active": true
     }
   ],
-  "total_count": 111,
-  "active_count": 111,
+  "total_count": 112,
+  "active_count": 112,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
