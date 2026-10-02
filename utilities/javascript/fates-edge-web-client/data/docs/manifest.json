@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-09-30T13:25:12.141Z",
+  "generated": "2026-10-02T14:14:42.121Z",
   "documents": [
     {
       "id": "srd",
@@ -690,6 +690,16 @@
       "active": true
     },
     {
+      "id": "fates_edge_long_form_readers_guide",
+      "title": "Fate’s Edge — Longform Reader’s Guide",
+      "file": "Fates-_-Edge-_-Long-_-Form-_-Readers-_-Guide.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "fenwood_everblood_chronicles",
       "title": "Fenwood Everblood Chronicles",
       "file": "Fates_-_Edge_-_-Fenwood-Everblood-Chronicles.html",
@@ -1130,6 +1140,26 @@
       "active": true
     },
     {
+      "id": "the_bones_of_empire",
+      "title": "The Bones of Empire",
+      "file": "Fates_-_Edge_-_-The-_-Bones-_-of-_-Empire.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_bridge_born",
+      "title": "The Bridge Born",
+      "file": "Fates_-_Edge_-_-The-_-Bridge-_-Born.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_cartomancers_compass",
       "title": "The Cartomancers Compass",
       "file": "Fates_-_Edge_-_-The-_-Cartomancers-_-Compass.html",
@@ -1355,6 +1385,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_harvest_of_leaves",
+      "title": "The Harvest of Leaves",
+      "file": "Fates_-_Edge_-_-The-_-Harvest-_-of-_-Leaves.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1713,7 +1753,7 @@
       "active": true
     }
   ],
-  "total_count": 112,
-  "active_count": 112,
+  "total_count": 116,
+  "active_count": 116,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
