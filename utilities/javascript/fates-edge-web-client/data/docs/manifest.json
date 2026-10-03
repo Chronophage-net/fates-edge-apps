@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-02T14:14:42.121Z",
+  "generated": "2026-10-03T14:22:54.028Z",
   "documents": [
     {
       "id": "srd",
@@ -1439,6 +1439,16 @@
       "active": true
     },
     {
+      "id": "the_kept_place",
+      "title": "The Kept Place",
+      "file": "Fates_-_Edge_-_-The-_-Kept-_-Place.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_last_blade",
       "title": "The Last Blade",
       "file": "Fates_-_Edge_-_-The-_-Last-_-Blade.html",
@@ -1753,7 +1763,7 @@
       "active": true
     }
   ],
-  "total_count": 116,
-  "active_count": 116,
+  "total_count": 117,
+  "active_count": 117,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
