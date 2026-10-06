@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-03T14:22:54.028Z",
+  "generated": "2026-10-06T15:01:19.813Z",
   "documents": [
     {
       "id": "srd",
@@ -1459,6 +1459,16 @@
       "active": true
     },
     {
+      "id": "the_mist_walker",
+      "title": "The Mist Walker",
+      "file": "Fates_-_Edge_-_-The-_-Mist-_-Walker.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_nameless",
       "title": "The Nameless",
       "file": "Fates_-_Edge_-_-The-_-Nameless.html",
@@ -1539,6 +1549,16 @@
       "active": true
     },
     {
+      "id": "the_seed_of_ruin",
+      "title": "The Seed of Ruin",
+      "file": "Fates_-_Edge_-_-The-_-Seed-_-of-_-Ruin.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_serpent_s_coil",
       "title": "The Serpent'S Coil",
       "file": "Fates_-_Edge_-_-The-_-Serpent's-_-Coil.html",
@@ -1565,6 +1585,16 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_toll_of_the_dead",
+      "title": "The Toll of the Dead",
+      "file": "Fates_-_Edge_-_-The-_-Toll-_-of-_-the-_-Dead.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1763,7 +1793,7 @@
       "active": true
     }
   ],
-  "total_count": 117,
-  "active_count": 117,
+  "total_count": 120,
+  "active_count": 120,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
