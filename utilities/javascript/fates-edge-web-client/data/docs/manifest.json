@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-06T15:01:19.813Z",
+  "generated": "2026-10-07T02:00:00.787Z",
   "documents": [
     {
       "id": "srd",
@@ -1429,6 +1429,16 @@
       "active": true
     },
     {
+      "id": "the_howling_ice",
+      "title": "The Howling Ice",
+      "file": "Fates_-_Edge_-_-The-_-Howling-_-Ice.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_invokers_guide",
       "title": "The Invokers Guide",
       "file": "Fates_-_Edge_-_-The-_-Invokers-_-Guide.html",
@@ -1793,7 +1803,7 @@
       "active": true
     }
   ],
-  "total_count": 120,
-  "active_count": 120,
+  "total_count": 121,
+  "active_count": 121,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
