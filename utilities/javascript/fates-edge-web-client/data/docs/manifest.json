@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-07T02:00:00.787Z",
+  "generated": "2026-10-07T23:50:03.830Z",
   "documents": [
     {
       "id": "srd",
@@ -1110,6 +1110,16 @@
       ]
     },
     {
+      "id": "the_bell_that_counts_to_nine",
+      "title": "The Bell That Counts to Nine",
+      "file": "Fates_-_Edge_-_-The-_-Bell-_-That-_-Counts-_-to-_-Nine.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_belworth_war",
       "title": "The Belworth War, Part I: Tributary",
       "file": "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-I-_-Tributary.html",
@@ -1579,6 +1589,16 @@
       "active": true
     },
     {
+      "id": "the_things_that_carry_us",
+      "title": "The Things That Carry Us",
+      "file": "Fates_-_Edge_-_-The-_-Things-_-That-_-Carry-_-Us.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_thread",
       "title": "The Thread",
       "file": "Fates_-_Edge_-_-The-_-Thread.html",
@@ -1803,7 +1823,7 @@
       "active": true
     }
   ],
-  "total_count": 121,
-  "active_count": 121,
+  "total_count": 123,
+  "active_count": 123,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
