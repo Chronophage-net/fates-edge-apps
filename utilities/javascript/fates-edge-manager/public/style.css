@@ -4,3 +4,61 @@
 .skip-link{position:fixed;top:8px;left:8px;transform:translateY(-160%);z-index:10;background:var(--gold);color:var(--bg);padding:12px;border-radius:4px}.skip-link:focus{transform:none}
 main,.split>*{min-width:0}.card{overflow-wrap:anywhere}.grid{grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr))}.card-bottom{gap:12px;flex-wrap:wrap}.loading{padding:40px 0;color:var(--gold)}dialog{max-height:calc(100dvh - 32px);overflow:auto}dialog h2{padding-right:28px}input,select,button,.button{min-height:44px}[role=alert]{color:var(--red)}.log{overflow-wrap:anywhere}.log time{flex-shrink:0}.badge.expired{background:#402d29;color:var(--red)}
 @media(max-width:420px){.stats{grid-template-columns:1fr}.stat{display:flex;justify-content:space-between;align-items:center}.stat strong{margin:0}.log{flex-wrap:wrap}dialog{padding:22px}.actions{gap:8px}nav a{min-height:44px}}
+
+/* Let content shrink inside flex/grid layouts without hiding overflow. */
+.heading>*,.actions>*,.grid>*,.stack>*,header>*{min-width:0}
+h1,h2,h3,#notice,#account-label{overflow-wrap:anywhere}
+button,.button{max-width:100%;white-space:normal;text-align:center}
+input,select,textarea{min-width:0;max-width:100%}
+label.check{min-height:44px;overflow-wrap:anywhere}
+input[type=checkbox]{min-height:0;width:20px;height:20px;flex:0 0 20px}
+dialog{overscroll-behavior:contain}
+body:has(dialog[open]){overflow:hidden}
+
+/* Tablets and phones share a compact top navigation, with every tab visible. */
+@media(max-width:900px){
+  body{display:block}
+  aside{position:static;width:auto;padding:18px max(18px,env(safe-area-inset-right)) 14px max(18px,env(safe-area-inset-left));border-right:0;border-bottom:1px solid var(--line)}
+  .brand{font-size:15px}.sigil{font-size:30px}
+  nav{margin-top:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;overflow:visible}
+  nav:empty{display:none}
+  nav a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 6px;white-space:normal;text-align:center;letter-spacing:0}
+  .aside-footer{display:none}
+  main{margin:0;width:100%;padding:0 max(18px,env(safe-area-inset-right)) 0 max(18px,env(safe-area-inset-left))}
+  header{height:auto;min-height:60px;gap:12px;flex-wrap:wrap;padding:14px 0}
+  #account-label{max-width:100%;letter-spacing:.5px}
+  section{min-height:0;padding:25px 0 32px}
+  .login{margin:20px auto 32px}
+  .heading{align-items:flex-start;flex-wrap:wrap;gap:12px}
+  .heading>.actions{width:100%}
+  .split{grid-template-columns:minmax(0,1fr)}
+  .log{flex-wrap:wrap;gap:8px 16px}
+  .log time{flex-shrink:1}
+  input,select,textarea,td select{font-size:16px}
+  footer{gap:16px;padding-bottom:max(22px,env(safe-area-inset-bottom))}
+  dialog{max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:22px}
+  dialog .close{min-width:44px}
+}
+
+/* Retain table semantics, but present each record as a labelled mobile card. */
+@media(max-width:700px){
+  .responsive-table,.responsive-table tbody,.responsive-table tr,.responsive-table td{display:block;width:100%}
+  .responsive-table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%)}
+  .responsive-table tr{padding:16px 0;border-bottom:1px solid var(--line)}
+  .responsive-table tr:last-child{border-bottom:0;padding-bottom:0}
+  .responsive-table td{padding:8px 0;border:0;overflow-wrap:anywhere}
+  .responsive-table td::before{content:attr(data-label);display:block;margin-bottom:8px;font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .responsive-table td:empty{display:none}
+  .responsive-table td p{margin:8px 0}
+  .responsive-table td select{width:100%}
+  .responsive-table td>button{margin:0 8px 8px 0}
+  .table-wrap{overflow:visible}
+  .heading>.button,.heading>button{width:100%}
+  .actions{width:100%}
+  .actions>button,.actions>.button{flex:1 1 120px}
+  .empty{padding:32px 18px}
+  .card{padding:18px}
+}
+@media(max-width:360px){
+  nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

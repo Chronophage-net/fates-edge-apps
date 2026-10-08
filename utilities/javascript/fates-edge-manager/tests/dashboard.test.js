@@ -36,3 +36,27 @@ test('failed pages offer retry and sign-in clears stale busy state',async()=>{
   assert.equal(ui.element('#content').attrs['aria-busy'],'false');
   assert.match(ui.element('#content').innerHTML,/Sign in/);
 });
+
+test('mobile key records keep labels, table semantics, escaping and action hooks',async()=>{
+  const ui=await dashboard();
+  const html=vm.runInContext(`keyTable([{id:'key-1',label:'<Integration>',username:'Reviewer',role:'gm',display_prefix:'fe_test',scopes:['room:read','room:connect'],status:'active',expires_at:'2099-01-01'}])`,ui.context);
+  assert.match(html,/class="responsive-table" role="table"/);
+  for(const label of ['Integration','Access','Status / expiry','Actions'])assert.match(html,new RegExp(`role="cell" data-label="${label}"`));
+  assert.match(html,/&lt;Integration&gt;/);
+  assert.match(html,/data-action="rotate-key" data-id="key-1"/);
+  assert.match(html,/data-action="revoke-key" data-id="key-1"/);
+});
+
+test('mobile roster retains labelled cells and editable membership controls',async()=>{
+  const ui=await dashboard();
+  const render=vm.runInContext("location.hash='#rooms/room-1';render()",ui.context);
+  ui.respond('/v1/rooms/room-1',{room_id:'room-1',name:'Campaign',control_role:'owner',role:'gm',room_status:'active',room_code:'ABCDEF',roster:[{account_id:'member-1',username:'Player',control_role:'member',role:'player',status:'active'}]});
+  // Let the dependent audit request enqueue.
+  await new Promise(resolve=>setImmediate(resolve));
+  ui.respond('/v1/rooms/room-1/audit',[]);await render;
+  const html=ui.element('#content').innerHTML;
+  for(const label of ['Person','Game role','Status','Actions'])assert.match(html,new RegExp(`role="cell" data-label="${label}"`));
+  assert.match(html,/data-member="member-1"/);
+  assert.match(html,/data-control-member="member-1"/);
+  assert.match(html,/data-action="remove-member"/);
+});
