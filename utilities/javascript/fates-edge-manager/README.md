@@ -20,6 +20,12 @@ accounts and rooms disappear when stopped. It has no registered game servers.
 
 ## Persistent local installation
 
+**NAS/Docker users:** this package's `compose.yml` runs PostgreSQL **only**.
+The Manager application and managed socket node still run as separate Node processes
+in the instructions below. Deploying that Compose file alone does not start a dashboard.
+For a regular home table without centralized account management, use the simpler
+[two-container home Docker setup](../../../DOCKER_HOME.md) instead.
+
 ```sh
 npm ci
 npm run setup

@@ -1,5 +1,9 @@
 # Installing the Fate's Edge Socket Server
 
+**Home/NAS users:** start with the [Home Docker guide](../../../DOCKER_HOME.md)
+for the website and game server together. Commands on this page use the server-only
+Compose file in this directory; its database storage path differs from the root stack.
+
 Think of this the same way you'd think about a Valheim, ARK, or Minecraft
 dedicated server: it's the always-on process that holds the "world" (your
 campaign — chat, dice rolls, character sheets, the Deck of Consequences,
@@ -161,22 +165,12 @@ in the Web Client's connection settings — find your LAN IP with
 you'd find it to host any LAN game.
 
 **Players connect over the internet:**
-Same idea as forwarding a port for any dedicated game server:
-1. Forward TCP port `10000` (or whatever you set `PORT` to) on your
-   router to the machine running the server.
-2. Give players your public IP (check "what's my IP" in a browser) or a
-   DNS name pointing at it.
-3. If your public IP changes periodically (most home internet), consider
-   a free dynamic-DNS service (No-IP, DuckDNS) so you don't have to
-   re-share your IP every session — same trick used for any home-hosted
-   game server.
-
-**Don't want to touch your router at all?** A tunnel service — [Cloudflare
-Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
-or [Tailscale](https://tailscale.com/) — gets you a stable, public address
-without opening any ports, the same category of tool as `ngrok`/`playit.gg`
-for game servers. Out of scope for this guide, but worth knowing it exists
-if your router/ISP makes port forwarding painful (CGNAT, etc.).
+Do not expose plain HTTP/WebSocket traffic or your NAS administration interface.
+Use a private VPN for trusted players or an HTTPS reverse proxy with a valid certificate,
+WebSocket support, and deliberate firewall/access rules. Give browsers an HTTPS website
+and a secure `wss://` server address. A VPN does not remove the browser's HTTPS requirement
+for microphone or screen capture. See the [Home Docker guide](../../../DOCKER_HOME.md)
+for the public URL settings and a two-hostname example.
 
 **Hosting on a VPS instead of your own machine?** Same steps, just run
 them on the VPS — most cloud providers' firewalls need the port opened
@@ -186,25 +180,23 @@ there too, in addition to (or instead of) a router.
 
 ## Voice Chat (optional)
 
-Voice chat works out of the box via STUN, which is enough for most home
-routers. It only breaks down for players behind stricter NATs/firewalls
-(common on some corporate/campus/mobile networks) — for those, you need a
-TURN relay. This repo bundles [coturn](https://github.com/coturn/coturn)
-for that, wired up via `docker-compose.yml`:
+Voice chat first requires HTTPS when the website is opened on a NAS by IP or hostname.
+HTTP localhost is a special case only when the browser runs on the server itself.
+Once browser permissions work, STUN can establish direct connections on some networks;
+others need a TURN relay. Do not promise that every home router works without one.
 
-```bash
-cp .env.example .env   # if you haven't already
-# edit .env: set TURN_SECRET to any long random string,
-# and TURN_URLS=turn:<your-public-ip-or-domain>:3478
-docker compose up -d
+For this **server-only Compose file**, copy `.env.example` to `.env` only if you do
+not already have one. Set a long random `TURN_SECRET`, your actual `TURN_URLS`, and
+appropriate `TURN_PUBLIC_IP`, then explicitly enable the optional service:
+
+```sh
+docker compose --profile turn up -d
 ```
 
-This also starts the `coturn` service alongside the main server. It needs
-UDP/TCP port `3478` forwarded too (same as above), and additionally uses
-ports `49160-49200` UDP for the actual relayed audio — forward that range
-as well if you're hosting for players outside your LAN. See
-`coturn/README.md` for adding a real TLS cert (`turns://`) if some
-players are behind a firewall that only allows HTTPS-looking traffic.
+Review [coturn/README.md](coturn/README.md) before exposing a relay. Its host-networking
+requirements depend on the Docker platform. For an internet-accessible relay, firewall
+and router rules must permit UDP/TCP 3478 and UDP 49160–49200; TLS on 5349 additionally
+needs certificates and matching configuration. Do not open these ports unnecessarily.
 
 Skip this whole section if STUN-only voice chat already works for your
 group — most home setups don't need it.
@@ -256,7 +248,13 @@ lives in one place: the SQLite database at `data/campaigns.db` (Docker)
 or `./campaigns.db` in this folder (manual/Node). Back up the whole
 `data/` folder (Docker) or just `campaigns.db` (manual) the same way
 you'd back up a game server's save folder — copy it somewhere else
-periodically, or before every update if you want to be extra safe.
+periodically, and before every update. Stop the server while copying SQLite files;
+copy the entire folder, including any `-wal`/`-shm` sidecars and `room-directory.json`,
+not just the database file while it is live. Back up `.env` privately too.
+
+This is the **standalone server** path. The root stack instead stores its database
+and room directory in the `server-persistence` named volume; backing up only `data/`
+there would miss them. See the Home Docker guide for backup and restore commands.
 
 If you've installed any adventure modules (`modules/<id>/`), back those
 up too — they're not stored in the database.
@@ -275,8 +273,8 @@ up too — they're not stored in the database.
 **`docker compose up` finishes but I can't connect.**
 Check `docker compose logs server` — most often either the port is
 already used by something else on your machine (change `PORT` in `.env`),
-or you're trying to connect from another device without forwarding the
-port (see [Opening Your Server to Players](#opening-your-server-to-players)).
+or the NAS firewall blocks access. On the same LAN, use the NAS IP, not localhost;
+router port forwarding is not needed.
 
 **I don't know my API key.**
 `docker compose logs server | grep -A2 "No API_KEY"` — it's printed once
@@ -291,8 +289,8 @@ will survive restarts (data lost before the fix, unfortunately, can't be
 recovered unless you had a manual backup).
 
 **Voice chat doesn't work for one specific player.**
-That's almost always the NAT issue TURN exists to fix — see [Voice
-Chat](#voice-chat-optional) above.
+First check HTTPS and microphone permission, then investigate NAT/TURN — see
+[Voice Chat](#voice-chat-optional) above.
 
 **A player can't reach the server but everyone else can.**
 Usually a firewall on their end, not yours — have them try a different

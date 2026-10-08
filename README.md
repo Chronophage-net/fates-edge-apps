@@ -107,14 +107,22 @@ node server-start.js     # listens on :3000 by default (:10000 via Docker — se
 
 See [the socket server's own README](utilities/javascript/fates-edge-socket-server/README.md) for what it does and its full setup guide.
 
-### Docker (the whole ecosystem, one command)
+### Docker on a home server or NAS
+
+**Start with the [Home Docker guide](DOCKER_HOME.md).** It walks through NAS project
+setup, the two required containers, first connection, storage, backups, updates, and
+HTTPS. Node.js is not needed on the Docker host. The SaaS Manager is a separate setup;
+its Compose file runs only its database.
 
 ```bash
 cp .env.example .env
-docker-compose up                        # web client (:8080) + server (:10000)
-docker-compose --profile turn up         # + coturn TURN relay, for voice chat behind strict NATs
-docker-compose --profile bots up         # + AI GM bot + Discord bot
-docker-compose --profile discord-bot up  # + just the Discord bot
+# Edit .env: set a private API_KEY and your website's CORS_ORIGIN first.
+docker compose config --quiet
+docker compose up -d --build client server  # website :8080 + game server :10000
+# Optional, only after configuring their credentials:
+docker compose --profile turn up -d
+docker compose --profile bots up -d
+docker compose --profile discord-bot up -d
 ```
 
 The `bots` and `ai-gm-bot` profiles need `fates-edge-ai-gm-bot` cloned as a sibling directory to `fates-edge-apps`; every other profile works without it. Each component also has its own standalone `Dockerfile`/`docker-compose.yml` if you'd rather run just one piece — see `docker-compose.yml`'s header comments and `.env.example` for the full option list.

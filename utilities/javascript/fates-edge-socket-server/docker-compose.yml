@@ -1,30 +1,13 @@
-version: '3.8'
-
 # ---------------------------------------------------------------
 # Fate's Edge — Realtime server + TURN (voice chat NAT traversal)
 #
-# Scope note: this compose file covers the socket-server and its
-# coturn TURN relay only. It's deliberately NOT the "one
-# docker-compose up for the whole ecosystem" file from the roadmap
-# (client + server + optional bots) — that's a separate, larger
-# unification effort. This one exists because the server and coturn
-# share a secret (TURN_SECRET / static-auth-secret) and are the two
-# pieces the voice-chat NAT-traversal fix actually depends on. It will
-# get folded into the unified compose file once that lands.
+# For a home NAS running the website too, use the repository-root
+# docker-compose.yml and DOCKER_HOME.md. This file is server-only.
 #
-# Quick start:
-#   1. cp .env.example .env
-#   2. Fill in TURN_SECRET (any long random string) and TURN_URLS
-#      (turn:<a DNS name or public IP your players can reach>:3478) --
-#      plus TURN_PUBLIC_IP below if this host's public IP differs from
-#      the one Docker sees locally (common on cloud VMs).
-#   3. docker-compose up
-#
-# Voice chat works with ZERO TURN configuration too (STUN-only, via
-# public Google STUN servers) — it just won't traverse symmetric
-# NAT / restrictive firewalls. Leaving TURN_SECRET blank disables the
-# turn-credentials endpoint gracefully (404) and the coturn container
-# still starts, it's simply unused.
+# Quick start: copy .env.example to .env, set a private API_KEY, then
+# run docker compose up -d --build server.
+# TURN is optional: configure TURN_SECRET and TURN_URLS, then run
+# docker compose --profile turn up -d. The default needs no TURN secret.
 # ---------------------------------------------------------------
 
 services:
@@ -60,6 +43,7 @@ services:
       # already-host-mounted ./data volume below instead, so it survives
       # container recreation like everything else here does.
       - DATABASE_URL=/app/data/campaigns.db
+      - ROOM_DIRECTORY_FILE=/app/data/room-directory.json
       # TURN credential minting -- must match the coturn service below.
       - TURN_SECRET=${TURN_SECRET:-}
       - TURN_REALM=${TURN_REALM:-fates-edge}
@@ -85,22 +69,22 @@ services:
       - fates-edge-network
 
   coturn:
+    profiles: ["turn"]
     image: coturn/coturn:4.6
     container_name: fates-edge-turn
     restart: unless-stopped
     # coturn allocates its UDP relay ports dynamically per session, which
     # doesn't play nicely with Docker's bridge/NAT networking -- host
     # networking is the standard way to run coturn in a container. This
-    # only works on Linux Docker hosts; Docker Desktop (Mac/Windows)
-    # doesn't support host networking, so on those platforms you'll need
-    # to run coturn directly on the host (or a Linux VM) instead of via
-    # this compose service. 40 relay ports is plenty for a small
+    # requires Linux Docker Engine or supported Docker Desktop with host
+    # networking enabled. Check your NAS/platform before using it.
+    # The configured relay-port range is intended for a small
     # self-hosted table of players -- raise --min-port/--max-port above
     # if you're running many simultaneous rooms.
     network_mode: "host"
     environment:
       - TURN_REALM=${TURN_REALM:-fates-edge}
-      - TURN_SECRET=${TURN_SECRET:?Set TURN_SECRET in .env}
+      - TURN_SECRET=${TURN_SECRET:-}
       - TURN_PUBLIC_IP=${TURN_PUBLIC_IP:-}
       # Set to "true" once you've mounted a real cert/key below (see
       # volumes) to also listen for turns:// (TLS on 5349) -- that's
@@ -115,6 +99,10 @@ services:
     command:
       - |
         set -e
+        if [ -z "$$TURN_SECRET" ]; then
+          echo "ERROR: Set TURN_SECRET in .env before enabling the turn profile." >&2
+          exit 1
+        fi
         ARGS="--listening-port=3478 --min-port=49160 --max-port=49200 \
           --realm=$$TURN_REALM --use-auth-secret --static-auth-secret=$$TURN_SECRET \
           --no-cli --log-file=stdout --fingerprint"

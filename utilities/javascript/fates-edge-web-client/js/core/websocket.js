@@ -1,4 +1,5 @@
 import { connectionFeedback } from './connection-feedback.js';
+import { getConnectionDefaults } from './connection-defaults.js';
 /**
  * WebSocket Client Module
  * Handles real-time communication with the server
@@ -27,18 +28,12 @@ import { parseManagedConnection } from './managed-connection.js';
 
 const CONFIG = {
     get DEFAULT_WS_URL() {
-        const isSecure = window.location.protocol === 'https:';
-        return isSecure 
-            ? 'ws://fates-edge-ws.onrender.com'
-            : 'ws://localhost:10000';
+        return getConnectionDefaults(undefined, window.location).wsUrl;
     },
     get DEFAULT_SOCKET_URL() {
-        const isSecure = window.location.protocol === 'https:';
-        return isSecure
-            ? 'https://fates-edge-ws.onrender.com'
-            : 'http://localhost:10000';
+        return getConnectionDefaults(undefined, window.location).serverUrl;
     },
-    DEFAULT_ROOM: 'AC12', // matches fates-edge-ai-gm-bot's own ROOM default (ai-gm-bot.js) so a fresh client and a freshly-started bot land in the same room with zero config
+    DEFAULT_ROOM: getConnectionDefaults().room,
     MAX_RECONNECT: 5,
     RECONNECT_INTERVAL: 3000,
     CONNECTION_TIMEOUT: 10000
@@ -183,10 +178,7 @@ function getWSConfig() {
     const state = getState();
     const settings = state.settings || {};
     
-    const isSecure = window.location.protocol === 'https:';
-    const defaultUrl = isSecure 
-        ? 'wss://fates-edge-ws.onrender.com'
-        : 'ws://localhost:10000';
+    const defaultUrl = CONFIG.DEFAULT_WS_URL;
     
     return {
         url: settings.wsUrl || localStorage.getItem('fates-edge-ws-url') || defaultUrl,

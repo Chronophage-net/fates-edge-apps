@@ -10,7 +10,10 @@ COPY package*.json ./
 # --only=production is deprecated/removed in newer npm; --omit=dev is the
 # supported equivalent (was causing npm to print its help text and exit
 # non-zero on node:24-alpine's bundled npm).
-RUN npm ci --omit=dev
+# sqlite3 may need compilation when no prebuilt binary matches a NAS CPU.
+RUN apk add --no-cache --virtual .node-build-deps python3 make g++ \
+    && npm ci --omit=dev \
+    && apk del .node-build-deps
 
 # ---------------------------------------------------------------
 # Copy server files

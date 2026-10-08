@@ -13,21 +13,22 @@
 # ---------------------------------------------------------------
 # Stage 1: Build the SPA
 # ---------------------------------------------------------------
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
 # Optional build-time overrides for the WebSocket/server defaults baked
 # into the compiled SPA (see js/features/settings/index.js) -- unset by
-# default, which preserves the normal production build pointed at the
-# hosted server. docker-compose.full.yml's demo build sets these to point
-# a locally-built image at its own local server instead.
+# default. The root stack supplies the self-hosted port; the full demo
+# supplies explicit localhost addresses. Do not pass credentials as build args.
 ARG VITE_WS_URL=""
 ARG VITE_WS_ROOM=""
 ARG VITE_SERVER_URL=""
+ARG VITE_SELF_HOSTED_SERVER_PORT=""
 ENV VITE_WS_URL=${VITE_WS_URL}
 ENV VITE_WS_ROOM=${VITE_WS_ROOM}
 ENV VITE_SERVER_URL=${VITE_SERVER_URL}
+ENV VITE_SELF_HOSTED_SERVER_PORT=${VITE_SELF_HOSTED_SERVER_PORT}
 
 COPY package*.json ./
 RUN npm ci

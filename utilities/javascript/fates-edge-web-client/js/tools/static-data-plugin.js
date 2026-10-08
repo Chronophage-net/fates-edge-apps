@@ -1,4 +1,5 @@
-import { readFile, realpath, stat } from 'node:fs/promises';
+import { readFile, realpath, stat, cp, mkdir, writeFile } from 'node:fs/promises';
+import { randomBytes } from 'node:crypto';
 import { resolve, relative, isAbsolute, extname } from 'node:path';
 
 const MIME_TYPES = {
@@ -49,8 +50,27 @@ export function createStaticDataMiddleware(root) {
 }
 
 export function staticDataPlugin(projectRoot) {
+    let outputDir;
     return {
         name: 'fates-edge-static-data',
+        configResolved(config) {
+            if (config.command === 'build') outputDir = resolve(config.root, config.build.outDir);
+        },
+        async closeBundle() {
+            if (!outputDir) return;
+            // Only copy public runtime content, never configuration or source secrets.
+            await cp(resolve(projectRoot, 'data'), resolve(outputDir, 'data'), { recursive: true });
+            await cp(resolve(projectRoot, 'docs'), resolve(outputDir, 'docs'), { recursive: true });
+            let seed;
+            try { seed = JSON.parse(await readFile(resolve(outputDir, 'data/seed.json'), 'utf8')).seed; }
+            catch (error) { if (error.code !== 'ENOENT') throw error; }
+            if (typeof seed !== 'string' || !seed) seed = randomBytes(32).toString('hex');
+            const seedJSON = JSON.stringify({seed});
+            await mkdir(resolve(outputDir, '.seed'), {recursive: true});
+            await writeFile(resolve(outputDir, '.seed/random-seed.json'), seedJSON);
+            await writeFile(resolve(outputDir, 'data/seed.json'), seedJSON);
+            await writeFile(resolve(outputDir, 'seed.js'), `window.__RANDOM_SEED ||= ${JSON.stringify(seed)};\n`);
+        },
         configureServer(server) {
             for (const folder of ['docs', 'adventures']) {
                 server.middlewares.use(`/data/${folder}`, createStaticDataMiddleware(resolve(projectRoot, 'data', folder)));

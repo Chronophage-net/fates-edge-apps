@@ -60,34 +60,79 @@ function onUnlockSuccess() {
     initializeRouter();
 }
 
-// NEW: css/app.css has always had a full off-canvas mobile sidebar
-// treatment (.sidebar, .sidebar.open, .sidebar-scrim, .mobile-nav-toggle,
-// .mobile-nav-close under the ~1024px media query -- see the ~Sep 9 commit
-// "Updated CSS to hide mobile navigation on desktop browsers"), but no
-// button, close control, or backdrop was ever added to index.html, and
-// nothing here ever toggled `.open`/aria-expanded. Below 1024px width the
-// sidebar sat permanently transform:translateX(-100%)'d off-screen with
-// no way to bring it back at all -- reported as "the toolkit is missing
-// its sidebar." index.html now has #mobileNavToggle / #mobileNavClose /
-// #sidebarScrim; this wires them up to what the CSS already expected.
+// Responsive navigation: labelled top bar, grouped tools, and keyboard-safe drawer.
 function initMobileSidebarToggle() {
     const toggle = document.getElementById('mobileNavToggle');
     const sidebar = document.getElementById('sidebar');
     if (!toggle || !sidebar) return;
     const closeBtn = document.getElementById('mobileNavClose');
     const scrim = document.getElementById('sidebarScrim');
+    const mobile = window.matchMedia('(max-width: 1024px)');
+    const screenTitle = document.getElementById('mobileScreenTitle');
+    const groups = [...sidebar.querySelectorAll('.nav-group')].map((group, index) => {
+        const label = group.querySelector('.nav-group-title');
+        const control = document.createElement('button');
+        control.type = 'button';
+        control.className = 'nav-group-toggle';
+        control.textContent = label.textContent;
+        if (label.dataset.i18n) control.dataset.i18n = label.dataset.i18n;
+        const items = document.createElement('div');
+        items.className = 'nav-group-items';
+        items.id = `mobile-nav-group-${index}`;
+        control.setAttribute('aria-controls', items.id);
+        group.querySelectorAll('.nav-item').forEach(item => items.append(item));
+        group.append(control, items);
+        const entry = { group, control, items, expanded: index === 0 || !!group.querySelector('.nav-item.active') };
+        control.addEventListener('click', () => {
+            entry.expanded = !entry.expanded;
+            syncGroups();
+        });
+        return entry;
+    });
+    function syncGroups() {
+        for (const entry of groups) {
+            const expanded = !mobile.matches || entry.expanded;
+            entry.control.setAttribute('aria-expanded', String(expanded));
+            entry.items.hidden = !expanded;
+        }
+    }
+    const syncScreen = () => {
+        if (screenTitle) {
+            screenTitle.removeAttribute('data-i18n');
+            screenTitle.textContent = document.title.replace(/^Fate['’]s Edge\s*[—–-]\s*/, '');
+        }
+        const active = sidebar.querySelector('.nav-item.active');
+        const entry = groups.find(entry => entry.group.contains(active));
+        if (entry) entry.expanded = true;
+        syncGroups();
+    };
+    new MutationObserver(syncScreen).observe(document.querySelector('title'), {childList: true, characterData: true, subtree: true});
+    syncGroups();
 
     const setOpen = (open) => {
+        open = open && mobile.matches;
+        const focusWasInside = sidebar.contains(document.activeElement);
         sidebar.classList.toggle('open', open);
         toggle.setAttribute('aria-expanded', String(open));
         if (scrim) scrim.hidden = !open;
+        sidebar.inert = mobile.matches && !open;
+        if (open) requestAnimationFrame(() => { if (sidebar.classList.contains('open')) closeBtn?.focus(); });
+        else if (mobile.matches && focusWasInside) toggle.focus();
     };
+    mobile.addEventListener('change', () => { setOpen(false); syncGroups(); });
+    setOpen(false);
 
     toggle.addEventListener('click', () => setOpen(true));
     if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
     if (scrim) scrim.addEventListener('click', () => setOpen(false));
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && sidebar.classList.contains('open')) setOpen(false);
+        if (e.key === 'Tab' && mobile.matches && sidebar.classList.contains('open')) {
+            const controls = [...sidebar.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), [tabindex="0"]')].filter(el => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+            const first = controls[0], last = controls.at(-1);
+            if (e.shiftKey && (document.activeElement === first || !sidebar.contains(document.activeElement))) { e.preventDefault(); last?.focus(); }
+            else if (!e.shiftKey && (document.activeElement === last || !sidebar.contains(document.activeElement))) { e.preventDefault(); first?.focus(); }
+        }
     });
 
     // Picking a tab closes the off-canvas sidebar so the panel underneath
