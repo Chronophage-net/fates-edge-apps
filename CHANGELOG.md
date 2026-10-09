@@ -71,6 +71,7 @@ Redesigned play and reference workspaces; reliable AI-GM and Socket.IO connectio
 - Redesign Whiteboard with contextual tools, mobile controls, multiline notes, keyboard sheet selection, and per-sheet undo/redo.
 - Refresh Dice and Kon’reh with pool previews, session continuity, guided rules, and keyboard-accessible board controls.
 - Rebuild the Docs library and reader with filters, saved/recent reading, chapter navigation, and clear print/download controls.
+- Include the pending editorial updates to six bundled Fate's Edge novels.
 
 ### Connection reliability
 - Deliver AI-GM proposals and scene/combat updates consistently across native WebSocket and Socket.IO.
@@ -80,7 +81,7 @@ Redesigned play and reference workspaces; reliable AI-GM and Socket.IO connectio
 
 ### Validation
 - 455 client tests, three live browser lifecycle tests, and 231 socket-server tests passed; production build passed.
-- Production dependency audit is clean. Five development-tool vulnerability findings remain outside this release's connection changes.
+- The web-client production dependency audit is clean. Its five development-tool findings and the socket-server install audit's eight findings (one moderate, six high, one critical) remain outstanding; no automatic dependency upgrades were applied.
 
 ## [5.13.0] - 2026-10-09
 
