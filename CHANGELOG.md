@@ -62,6 +62,46 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.13.0] - 2026-10-09
+
+Redesigned Spellcraft, VTT, characters and talents, adventures, crafting, encounters, and Wiki; aligned crafting guides and fixed library editing and persistence.
+
+### Added
+- Redesigned Spellcraft, VTT, character creation/display and talent browsing, adventure management, crafting projects, and encounter preparation/run/aftermath workflows.
+- Search-first Wiki library with multi-term search, category/region/collection filters, sorting, bookmarks, pagination, responsive cards, and restoration of hidden references.
+
+### Fixed
+- Wiki editor save/delete controls now target the current editor screen; custom categories and structured bundled metadata survive editing/imports.
+- Added missing font and outcome-animation CSS defaults and a logical positioning property for RTL layouts.
+
+### Docs
+- Aligned the included crafting guides and SRD with the project workshop, and documented Wiki library controls.
+
+### Tests
+- All 418 web-client tests pass; production build and desktop/mobile Wiki workflow checks pass.
+
+### Other
+- Updated interface and improved Docker for home users.
+- Mobile interface fix
+- Sync Bell and Things active reading editions
+- Sync selective longform editorial revisions
+- Sync Riarhin memory and ageing continuity edits
+- Publish Howling Ice reading edition and refresh fiction catalogue
+- Sync novel reader companions and Belworth family lineages
+- Sync Belworth age and chronology corrections
+- Sync reading editions after novel source relocation
+- Sync active longform novels and updated readers guide
+- Sync The Kept Place reading edition and updated fiction catalogue
+- Sync Bridge Born's revised Farieth discovery
+- Sync revised fiction library and publish The Bridge Born
+- Sync edited Names and published Blood in the Fold reading editions
+- Updated Kon'reh AI.
+- Sync Names continuity corrections
+- Sync refined Names You Take reading edition
+- Sync line-edited Names You Take
+- Add The Names You Take to the novels library
+- NPM install
+
 ## [5.12.0] - 2026-09-29
 
 ### Added
