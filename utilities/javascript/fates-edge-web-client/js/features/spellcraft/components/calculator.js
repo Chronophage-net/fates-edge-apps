@@ -138,7 +138,8 @@ function buildTagDefinitions() {
     };
     
     for (const [name, data] of Object.entries(raw)) {
-        map.set(name, { ...data, name });
+        const key = name.toUpperCase();
+        map.set(key, { ...data, name: key });
     }
     return map;
 }
@@ -354,19 +355,56 @@ function calculatorSaveSpell() {
 
     const spellName = activeTags.join(' ');
     const defaultName = spellName.length > 40 ? spellName.substring(0, 37) + '...' : spellName;
-    const name = prompt(i18nText("feature.spellcraft.components.calculator.spellName", null, "Spell name:"), defaultName);
-    if (!name) return;
-    const description = prompt(i18nText("feature.spellcraft.components.calculator.effectDescription", null, "Effect description:"), generateSpellDescription(activeTags)) || '';
+    const existingForm = calculatorContainer?.querySelector('#calculator-save-form');
+    if (existingForm) {
+        existingForm.querySelector('input').focus();
+        return;
+    }
+    const tags = activeTags.slice();
+    const form = document.createElement('form');
+    form.id = 'calculator-save-form';
+    form.setAttribute('aria-label', 'Save spell to spellbook');
+    form.style.cssText = 'display:grid;gap:0.75rem;padding:1rem;border:1px solid var(--gold);border-radius:8px;margin-block:1rem;';
+    form.innerHTML = `
+        <strong>Save to ${escHtml(char.name || 'character')}'s spellbook</strong>
+        <label>Spell name<input name="spellName" required maxlength="120" value="${escHtml(defaultName)}" style="display:block;width:100%;box-sizing:border-box;"></label>
+        <label>Effect description<textarea name="description" rows="3" style="display:block;width:100%;box-sizing:border-box;">${escHtml(generateSpellDescription(tags))}</textarea></label>
+        <label><input name="overwrite" type="checkbox"> Replace an existing spell with the same name and tags</label>
+        <p role="alert" class="save-error" hidden></p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;"><button type="submit" class="btn btn-gold">Save spell</button><button type="button" class="btn btn-ghost">Cancel</button></div>`;
+    form.querySelector('[type="button"]').addEventListener('click', () => {
+        form.remove();
+        calculatorContainer?.querySelector('#save-spell-btn')?.focus();
+    });
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        const current = getCharacterData();
+        if (!current || current.id !== char.id) return;
+        const name = form.elements.spellName.value.trim();
+        const error = form.querySelector('.save-error');
+        const duplicate = current.spellbook?.some(s => s.name === name && s.tags?.join(',') === tags.join(','));
+        if (!name || (duplicate && !form.elements.overwrite.checked)) {
+            error.hidden = false;
+            error.textContent = !name ? 'Enter a spell name.' : 'Choose another name or enable replacement above.';
+            return;
+        }
+        persistCalculatorSpell(current, name, form.elements.description.value, tags);
+    });
+    calculatorContainer?.querySelector('#save-spell-btn')?.parentElement.after(form);
+    form.querySelector('input').focus();
+}
+
+function persistCalculatorSpell(char, name, description, tags) {
 
     // Compute DV
-    const result = calculateDV(activeTags);
+    const result = calculateDV(tags);
     const dv = result.dv;
 
     const newSpell = {
         id: generateId('spell_'),
         name: name.trim(),
         description: description.trim(),
-        tags: activeTags.slice(),
+        tags: tags.slice(),
         dv: dv,
         breakdown: result.breakdown,
         totalMod: result.totalMod,
@@ -382,7 +420,6 @@ function calculatorSaveSpell() {
     // Avoid duplicates
     const existing = char.spellbook.findIndex(s => s.name === newSpell.name && s.tags?.join(',') === newSpell.tags.join(','));
     if (existing >= 0) {
-        if (!confirm(i18nText("feature.spellcraft.components.calculator.valueAlreadyExistsInYourSpellbookOverwrite", { value0: newSpell.name }, "\"{{value0}}\" already exists in your spellbook. Overwrite?"))) return;
         char.spellbook[existing] = newSpell;
     } else {
         char.spellbook.push(newSpell);

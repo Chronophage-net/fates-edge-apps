@@ -73,6 +73,8 @@ import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '@core
 // ─── Role check ──────────────────────────────────────────────
 import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
 import { openInlineScreen, closeInlineScreen, inlineScreenShell } from '@components/InlineScreen.js';
+import { renderShelf, renderSession, sceneSummary } from './workspace.js';
+import './workspace.css';
 
 // ============================================================
 // CONSTANTS
@@ -92,6 +94,9 @@ let adventureViewMode = 'list'; // 'list' | 'detail' | 'create'
 let isDestroyed = false;
 let advSearchTerm = '';
 let advSortMode = 'status'; // 'status' | 'title' | 'tier' | 'progress'
+let advStatusFilter = 'all';
+let sessionTab = 'run';
+const noteDrafts = new Map();
 
 // ─── Helper to check if current user is GM ──────────────────────────
 
@@ -1020,10 +1025,11 @@ function completeScene(adventureId, actIndex, sceneIndex) {
     if (adventures.length === 0) loadAdventuresFromState();
     const adventure = getAdventure(adventureId);
     if (!adventure) return null;
+    if (adventure.status !== 'active' || adventure.currentAct !== actIndex || adventure.currentScene !== sceneIndex) return null;
     const act = adventure.acts[actIndex];
     if (!act) return null;
     const scene = act.scenes[sceneIndex];
-    if (!scene) return null;
+    if (!scene || scene.completed) return null;
     scene.completed = true;
 
     logAdventureEvent(`📜 Scene completed: "${scene.title}" (${adventure.title})`, 'info', 'scene_completed', {
@@ -1701,6 +1707,8 @@ function render(el) {
 
 function renderView() {
     if (!container || isDestroyed) return;
+    const oldNotes = container.querySelector('#adv-notes');
+    if (oldNotes?.dataset.adventureId) noteDrafts.set(oldNotes.dataset.adventureId, oldNotes.value);
 
     if (adventureViewMode === 'detail' && activeAdventureId) {
         container.innerHTML = renderAdventureDetail(activeAdventureId);
@@ -1717,6 +1725,50 @@ function renderView() {
         container.innerHTML = renderAdventureList();
         attachEvents();
     }
+    attachWorkspaceEvents();
+}
+
+function attachWorkspaceEvents() {
+    container.querySelectorAll('[data-open-adventure]').forEach(button => button.addEventListener('click', () => {
+        sessionTab = 'run';
+        window.adventureOpenDetail(button.dataset.openAdventure);
+    }));
+    container.querySelector('[data-adventure-back]')?.addEventListener('click', () => window.adventureBackToList());
+    const adventure = getAdventure(activeAdventureId);
+    const current = adventure && sceneSummary(adventure).current;
+    container.querySelector('[data-adventure-start]')?.addEventListener('click', () => window.adventureStart(adventure.id));
+    container.querySelector('[data-adventure-complete]')?.addEventListener('click', () => window.adventureCompleteScene(adventure.id, current.actIndex, current.sceneIndex));
+    container.querySelector('[data-adventure-encounter]')?.addEventListener('click', () => window.adventureStartEncounter(adventure.id, current.actIndex, current.sceneIndex));
+    container.querySelector('[data-adventure-creature]')?.addEventListener('click', () => window.adventureAddBestiaryCreature(adventure.id));
+    container.querySelector('#adv-status')?.addEventListener('change', e => { advStatusFilter=e.target.value; renderView(); });
+    const tabs = [...container.querySelectorAll('[data-adventure-tab]')];
+    const selectTab = id => {
+        sessionTab=id;
+        tabs.forEach(tab => {
+            const selected=tab.dataset.adventureTab===id;
+            tab.setAttribute('aria-selected',String(selected));
+            tab.tabIndex=selected?0:-1;
+            container.querySelector(`#adv-pane-${tab.dataset.adventureTab}`).hidden=!selected;
+        });
+    };
+    tabs.forEach((tab,index) => {
+        tab.addEventListener('click', () => selectTab(tab.dataset.adventureTab));
+        tab.addEventListener('keydown', e => {
+            if (!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+            e.preventDefault();
+            const direction = getComputedStyle(tab).direction === 'rtl' ? -1 : 1;
+            const next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(index+(e.key==='ArrowRight'?direction:-direction)+tabs.length)%tabs.length;
+            selectTab(tabs[next].dataset.adventureTab); tabs[next].focus();
+        });
+    });
+    if(tabs.length) selectTab(sessionTab);
+    container.querySelectorAll('.adventure-create div[style]').forEach(el => {
+        if(el.style.gridTemplateColumns) el.classList.add('adv-form-grid');
+    });
+    container.querySelectorAll('.adventure-create label').forEach(label => {
+        const input=label.parentElement.querySelector('input[id],select[id],textarea[id]');
+        if(input) label.htmlFor=input.id;
+    });
 }
 
 const ADV_SORT_LABELS = {
@@ -1737,6 +1789,7 @@ function adventureProgress(a) {
 function getFilteredSortedAdventures() {
     const term = advSearchTerm.trim().toLowerCase();
     let list = adventures;
+    if (advStatusFilter !== 'all') list=list.filter(a=>a.status===advStatusFilter);
     if (term) {
         list = list.filter(a =>
             (a.title || '').toLowerCase().includes(term) ||
@@ -1766,157 +1819,7 @@ function getFilteredSortedAdventures() {
 }
 
 function renderAdventureList() {
-    const hasAdventures = adventures.length > 0;
-    const canEdit = isGM();
-    const visibleAdventures = getFilteredSortedAdventures();
-
-    return `
-        <div class="adventures-modern-layout flex flex-col gap-2">
-            <header class="adventures-header">
-                <h1 class="page-title" data-i18n="feature.adventure-manager.adventures">🎭 Adventures</h1>
-                <p class="page-sub" data-i18n="feature.adventure-manager.loadTrackAndManageYourFateS">Load, track, and manage your Fate's Edge adventures.</p>
-            </header>
-
-            <div class="flex gap-1 flex-center flex-wrap" style="border-bottom:1px solid var(--border);padding-bottom:0.5rem;">
-                ${canEdit ? `
-                    <button class="btn btn-sm btn-gold" id="adv-browse-library-btn" data-i18n="feature.adventure-manager.browseLibrary">📚 Browse Library</button>
-                    <button class="btn btn-sm btn-secondary" id="adv-load-file-btn" data-i18n="feature.adventure-manager.loadFromFile">📂 Load from File</button>
-                    <button class="btn btn-sm btn-primary" id="adv-create-btn" data-i18n="feature.adventure-manager.newAdventure">✨ New Adventure</button>
-                    <button class="btn btn-sm btn-secondary" id="adv-crown-gen-btn" data-i18n="feature.adventure-manager.importCrownSpread">👑 Import Crown Spread</button>
-                ` : `
-                    <span style="font-size:0.75rem;color:var(--text3);">🔒 Read‑only – only the GM can manage adventures.</span>
-                `}
-                <button class="btn btn-sm btn-utility" id="adv-refresh-btn" data-i18n="feature.adventure-manager.refresh">🔄 Refresh</button>
-            </div>
-
-            ${renderAdhocTimersPanel()}
-
-            ${hasAdventures ? `
-                <div class="flex gap-1 flex-center flex-wrap">
-                    <input id="adv-search" type="text" placeholder="🔍 Search by title, tier, theme, author…" value="${escHtml(advSearchTerm)}"
-                        style="flex:1;min-width:200px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem 0.5rem;font-size:0.85rem;" />
-                    <select id="adv-sort" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem 0.5rem;font-size:0.8rem;">
-                        ${Object.entries(ADV_SORT_LABELS).map(([val, label]) => `<option value="${val}" ${advSortMode === val ? 'selected' : ''}>${label}</option>`).join('')}
-                    </select>
-                    ${advSearchTerm ? `<span style="font-size:0.7rem;color:var(--text3);">${visibleAdventures.length} of ${adventures.length}</span>` : ''}
-                </div>
-            ` : ''}
-
-            <div class="panel" style="min-height:300px;">
-                ${hasAdventures ? `
-                    <div class="flex flex-col gap-1">
-                        ${visibleAdventures.length > 0
-                            ? visibleAdventures.map(a => renderAdventureCardSafe(a, canEdit)).join('')
-                            : `<div class="text-center" style="padding:1.5rem 0;"><p class="text-muted">No adventures match "${escHtml(advSearchTerm)}".</p></div>`
-                        }
-                    </div>
-                ` : `
-                    <div class="text-center" style="padding:2rem 0;">
-                        <div style="font-size:3rem;">🎭</div>
-                        <p class="text-muted" data-i18n="feature.adventure-manager.noAdventuresLoadedYet">No adventures loaded yet.</p>
-                        ${canEdit ? `
-                            <p class="text-sm text-muted" data-i18n="feature.adventure-manager.clickBrowseLibraryToPickOneFrom">Click "Browse Library" to pick one from /data/adventures/, "Load from File" to import your own, or create a new one.</p>
-                            <div class="flex gap-1 flex-center mt-1">
-                                <button class="btn btn-sm btn-gold" id="adv-load-file-btn" data-i18n="feature.adventure-manager.loadFromFile">📂 Load from File</button>
-                                <button class="btn btn-sm btn-secondary" id="adv-crown-gen-btn" data-i18n="feature.adventure-manager.importCrownSpread">👑 Import Crown Spread</button>
-                            </div>
-                        ` : `
-                            <p class="text-sm text-muted" data-i18n="feature.adventure-manager.noAdventuresAvailableOnlyTheGMCan">No adventures available. Only the GM can add them.</p>
-                        `}
-                    </div>
-                `}
-            </div>
-
-            <div class="panel" style="background:var(--bg2);border-inline-start:4px solid var(--gold);font-size:0.75rem;color:var(--text3);">
-                <strong>💡 Adventure Format:</strong> Adventures are stored in <code>/data/adventures/</code> as JSON files.
-                Each adventure contains acts, scenes, timers, NPCs, locations, and a bestiary (creatures for encounters).
-                Crown Spread generation creates a structured adventure from a card draw.
-            </div>
-        </div>
-    `;
-}
-
-function renderAdventureCardSafe(adventure, canEdit) {
-    try {
-        return renderAdventureCard(adventure, canEdit);
-    } catch (e) {
-        console.error('[Adventures] Failed to render adventure card:', adventure?.id, e);
-        const deleteBtn = canEdit ? `<button class="btn btn-xs btn-danger" onclick="window.adventureDelete('${adventure?.id}')">🗑️ Remove</button>` : '';
-        return `
-            <div class="panel" style="padding:0.6rem 0.8rem;border-inline-start:4px solid var(--red);">
-                <div style="font-weight:600;color:var(--red);">⚠️ "${escHtml(adventure?.title || adventure?.id || 'Unknown adventure')}" failed to render</div>
-                <div style="font-size:0.75rem;color:var(--text3);margin:0.2rem 0;">${escHtml(e.message)} — see browser console for details.</div>
-                <div style="display:flex;gap:0.3rem;">
-                    ${canEdit ? `<button class="btn btn-xs btn-secondary" onclick="window.adventureExport('${adventure?.id}')">📤 Export raw data</button>` : ''}
-                    ${deleteBtn}
-                </div>
-            </div>
-        `;
-    }
-}
-
-function renderAdventureCard(adventure, canEdit) {
-    const statusColors = {
-        'planned': 'var(--text3)',
-        'active': 'var(--gold)',
-        'completed': 'var(--green)',
-        'archived': 'var(--text2)'
-    };
-    const statusLabels = {
-        'planned': '📋 Planned',
-        'active': '🔄 Active',
-        'completed': '✅ Completed',
-        'archived': '📦 Archived'
-    };
-    const tierColors = {
-        'I': '#8bc34a',
-        'II': '#4caf50',
-        'III': '#ff9800',
-        'IV': '#e91e63',
-        'V': '#9c27b0'
-    };
-
-    const actCount = adventure.acts?.length || 0;
-    const sceneCount = adventure.acts?.reduce((acc, act) => acc + (act.scenes?.length || 0), 0) || 0;
-    const completedScenes = adventure.acts?.reduce((acc, act) => acc + (act.scenes?.filter(s => s.completed).length || 0), 0) || 0;
-    const progress = sceneCount > 0 ? Math.round((completedScenes / sceneCount) * 100) : 0;
-
-    const deleteBtn = canEdit ? `<button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();window.adventureDelete('${adventure.id}')" style="color:var(--red);">✕</button>` : '';
-
-    return `
-        <div class="panel" style="padding:0.6rem 0.8rem;border-inline-start:4px solid ${statusColors[adventure.status] || 'var(--border)'};cursor:pointer;" data-adv-id="${adventure.id}" onclick="window.adventureOpenDetail('${adventure.id}')">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
-                <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-                    <span style="font-weight:600;font-size:0.95rem;">${escHtml(adventure.title)}</span>
-                    <span style="font-size:0.65rem;padding:0.05rem 0.4rem;border-radius:8px;background:${tierColors[adventure.tier] || 'var(--text3)'}33;border:1px solid ${tierColors[adventure.tier] || 'var(--text3)'};color:${tierColors[adventure.tier] || 'var(--text3)'};">Tier ${adventure.tier}</span>
-                    <span style="font-size:0.6rem;padding:0.05rem 0.4rem;border-radius:8px;background:${statusColors[adventure.status]}33;border:1px solid ${statusColors[adventure.status]};color:${statusColors[adventure.status]};">${statusLabels[adventure.status]}</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap;">
-                    <span style="font-size:0.65rem;color:var(--text3);">${actCount} acts · ${sceneCount} scenes</span>
-                    <span style="font-size:0.65rem;color:var(--text3);">${progress}% done</span>
-                    ${deleteBtn}
-                </div>
-            </div>
-            ${adventure.description ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:0.1rem;">${escHtml(plainTextPreview(adventure.description))}</div>` : ''}
-            ${adventure.themes?.length ? `
-                <div style="display:flex;gap:0.2rem;flex-wrap:wrap;margin-top:0.2rem;">
-                    ${adventure.themes.slice(0, 4).map(t => `<span style="font-size:0.55rem;padding:0.05rem 0.35rem;border-radius:8px;background:var(--bg4);color:var(--purple);border:1px solid var(--purple);">${escHtml(t)}</span>`).join('')}
-                </div>
-            ` : ''}
-            <div style="display:flex;gap:0.2rem;flex-wrap:wrap;margin-top:0.2rem;">
-                ${adventure.acts?.slice(0, 3).map(act => `
-                    <span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--bg3);color:var(--text3);">${escHtml(act.title)}</span>
-                `).join('')}
-                ${(adventure.acts?.length || 0) > 3 ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--bg3);color:var(--text3);">+${adventure.acts.length - 3} more</span>` : ''}
-            </div>
-            <div style="margin-top:0.2rem;display:flex;gap:0.2rem;flex-wrap:wrap;font-size:0.6rem;color:var(--text3);">
-                ${adventure.sessions ? `<span>🗓️ ${escHtml(String(adventure.sessions))} sessions</span>` : ''}
-                ${adventure.startedAt ? `<span>📅 Started: ${new Date(adventure.startedAt).toLocaleDateString()}</span>` : ''}
-                ${adventure.completedAt ? `<span>✅ Completed: ${new Date(adventure.completedAt).toLocaleDateString()}</span>` : ''}
-                <span>👤 ${escHtml(adventure.author || 'Unknown')}</span>
-            </div>
-        </div>
-    `;
+    return renderShelf({adventures, visible:getFilteredSortedAdventures(), canEdit:isGM(), search:advSearchTerm, sort:advSortMode, sorts:ADV_SORT_LABELS, status:advStatusFilter, timers:renderAdhocTimersPanel()});
 }
 
 function buildAdventureDetailHtml(adventure) {
@@ -1951,7 +1854,7 @@ function buildAdventureDetailHtml(adventure) {
     const timersHtml = adventure.campaignTimers?.map((t, idx) => `
         <div class="flex gap-1 flex-center" style="margin:0.1rem 0;">
             <span class="flex-1 text-sm">${escHtml(t.name)}</span>
-            <span style="font-size:0.65rem;color:var(--text2);">${t.description || ''}</span>
+            <span style="font-size:0.65rem;color:var(--text2);">${escHtml(t.description || '')}</span>
             <div style="flex:1;background:var(--bg3);border-radius:var(--radius);height:6px;overflow:hidden;max-width:120px;">
                 <div style="width:${(t.current / t.segments) * 100}%;height:100%;background:${(t.current / t.segments) > 0.8 ? 'var(--red)' : 'var(--gold)'};"></div>
             </div>
@@ -1963,7 +1866,7 @@ function buildAdventureDetailHtml(adventure) {
     // ─── Acts & Scenes ────────────────────────────────────────────
     const actsHtml = adventure.acts?.map((act, actIdx) => {
         const scenesHtml = act.scenes?.map((scene, sceneIdx) => {
-            const isCurrent = actIdx === adventure.currentAct && sceneIdx === adventure.currentScene;
+            const isCurrent = adventure.status === 'active' && actIdx === adventure.currentAct && sceneIdx === adventure.currentScene;
             const isCompleted = scene.completed;
             const descId = `scene-desc-${adventure.id}-${actIdx}-${sceneIdx}`;
 
@@ -1989,7 +1892,7 @@ function buildAdventureDetailHtml(adventure) {
                 : '';
 
             return `
-                <div style="display:flex;flex-direction:column;padding:0.1rem 0.2rem;border-radius:4px;${isCurrent ? 'background:var(--bg4);border-inline-start:3px solid var(--gold);' : ''}${isCompleted ? 'opacity:0.6;' : ''}">
+                <div class="adv-scene" style="display:flex;flex-direction:column;padding:0.1rem 0.2rem;border-radius:4px;${isCurrent ? 'background:var(--bg4);border-inline-start:3px solid var(--gold);' : ''}${isCompleted ? 'opacity:0.6;' : ''}">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <div style="display:flex;align-items:center;gap:0.3rem;">
                             <span style="font-size:0.8rem;">${isCompleted ? '✅' : isCurrent ? '▶️' : '⏹️'}</span>
@@ -2083,7 +1986,7 @@ function buildAdventureDetailHtml(adventure) {
 
     // ─── Notes ────────────────────────────────────────────────────
     const notesEditor = canEdit
-        ? `<textarea id="adv-notes" rows="3" style="width:100%;font-size:0.75rem;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;">${escHtml(adventure.notes || '')}</textarea>
+        ? `<textarea id="adv-notes" data-adventure-id="${escHtml(adventure.id)}" aria-label="Session notes" rows="12" style="width:100%;font-size:0.75rem;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;">${escHtml(noteDrafts.get(adventure.id) ?? adventure.notes ?? '')}</textarea>
            <button class="btn btn-xs btn-primary mt-1" onclick="window.adventureSaveNotes('${adventure.id}')">💾 Save Notes</button>`
         : `<div style="font-size:0.75rem;color:var(--text2);white-space:pre-wrap;">${escHtml(adventure.notes || '')}</div>`;
 
@@ -2098,84 +2001,8 @@ function buildAdventureDetailHtml(adventure) {
         <span style="font-size:0.75rem;color:var(--text3);">🔒 Read‑only – only the GM can manage this adventure.</span>
     `;
 
-    return `
-        <div class="adventure-detail flex flex-col gap-2">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;">
-                <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-                    <button class="btn btn-sm btn-secondary" onclick="window.adventureBackToList()" data-i18n="feature.adventure-manager.back">← Back</button>
-                    <span style="font-weight:600;font-size:1.1rem;color:var(--gold);">${escHtml(adventure.title)}</span>
-                    <span style="font-size:0.65rem;padding:0.05rem 0.4rem;border-radius:8px;background:${tierColors[adventure.tier] || 'var(--text3)'}33;border:1px solid ${tierColors[adventure.tier] || 'var(--text3)'};color:${tierColors[adventure.tier] || 'var(--text3)'};">Tier ${escHtml(String(adventure.tierRange || adventure.tier))}</span>
-                    <span style="font-size:0.6rem;padding:0.05rem 0.4rem;border-radius:8px;background:${statusColors[adventure.status]}33;border:1px solid ${statusColors[adventure.status]};color:${statusColors[adventure.status]};">${statusLabels[adventure.status]}</span>
-                    ${adventure.sessions ? `<span style="font-size:0.6rem;padding:0.05rem 0.4rem;border-radius:8px;background:var(--bg3);color:var(--text3);border:1px solid var(--border);">🗓️ ${escHtml(String(adventure.sessions))} Sessions</span>` : ''}
-                </div>
-                <div style="display:flex;gap:0.2rem;flex-wrap:wrap;">
-                    ${actionButtons}
-                </div>
-            </div>
-
-            ${adventure.themes?.length ? `
-                <div style="display:flex;gap:0.25rem;flex-wrap:wrap;">
-                    ${adventure.themes.map(t => `<span style="font-size:0.65rem;padding:0.1rem 0.5rem;border-radius:10px;background:var(--bg4);color:var(--purple);border:1px solid var(--purple);">${escHtml(t)}</span>`).join('')}
-                </div>
-            ` : ''}
-
-            ${adventure.description ? `<div style="font-size:0.85rem;padding:0.2rem 0;">${renderDescriptionHtml(adventure.description)}</div>` : ''}
-
-            <div style="display:grid;grid-template-columns:2fr 1fr;gap:0.5rem;">
-                <div class="flex flex-col gap-1">
-                    <div class="panel">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                            <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.progress">📜 Progress</h4>
-                            <span style="font-size:0.75rem;color:var(--text3);">${completedScenes}/${sceneCount} scenes · ${progress}%</span>
-                        </div>
-                        <div style="width:100%;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-top:0.2rem;">
-                            <div style="width:${progress}%;height:100%;background:${progress > 80 ? 'var(--green)' : progress > 50 ? 'var(--gold)' : 'var(--blue)'};border-radius:4px;"></div>
-                        </div>
-                    </div>
-
-                    <div class="panel">
-                        <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.campaignTimers">⏱️ Campaign Timers</h4>
-                        ${timersHtml}
-                    </div>
-
-                    <div class="panel">
-                        <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.actsScenes">📖 Acts & Scenes</h4>
-                        ${actsHtml}
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                    <div class="panel">
-                        <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.npcs">👤 NPCs</h4>
-                        <div style="max-height:200px;overflow-y:auto;">${npcsHtml}</div>
-                    </div>
-
-                    <div class="panel">
-                        <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.locations">📍 Locations</h4>
-                        <div style="max-height:150px;overflow-y:auto;">${locationsHtml}</div>
-                    </div>
-
-                    <div class="panel">
-                        <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.factions">🏛️ Factions</h4>
-                        <div style="max-height:150px;overflow-y:auto;">${factionsHtml}</div>
-                    </div>
-
-                    <div class="panel">
-                        <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.bestiaryAdventureCreatures">🐉 Bestiary (Adventure Creatures)</h4>
-                        <div style="max-height:200px;overflow-y:auto;margin-bottom:0.3rem;">${bestiaryHtml}</div>
-                        ${canEdit ? `<button class="btn btn-xs btn-secondary" onclick="window.adventureAddBestiaryCreature('${adventure.id}')">+ Add Creature</button>` : ''}
-                    </div>
-
-                    ${gmHintsHtml}
-
-                    <div class="panel">
-                        <h4 style="margin:0;font-size:0.9rem;" data-i18n="feature.adventure-manager.notes">📝 Notes</h4>
-                        ${notesEditor}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    const current = sceneSummary(adventure).current;
+    return renderSession({adventure, canEdit, description:renderDescriptionHtml(adventure.description || ""), acts:actsHtml, timers:timersHtml, npcs:npcsHtml, locations:locationsHtml, factions:factionsHtml, bestiary:bestiaryHtml, hints:gmHintsHtml, notes:notesEditor, actions:actionButtons, currentDescription:current ? renderDescriptionHtml(current.scene.description || "No reading notes for this scene.") : ""});
 }
 
 function renderAdventureDetail(adventureId) {
@@ -2208,6 +2035,7 @@ function renderCreateAdventure() {
     // This is only called when isGM() returns true (see renderView guard)
     return `
         <div class="adventure-create flex flex-col gap-2">
+            <div class="adv-hero"><div><p class="adv-eyebrow">ADVENTURE BUILDER</p><h1>Give the story a shape.</h1><p>Start with the premise, add an act and its scenes, then bring in people, places, and clocks. Optional sections can stay empty.</p></div></div>
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;border-bottom:2px solid var(--border);padding-bottom:0.3rem;">
                 <h2 style="margin:0;font-size:1.1rem;color:var(--gold);" data-i18n="feature.adventure-manager.createNewAdventure">✨ Create New Adventure</h2>
                 <button class="btn btn-sm btn-secondary" onclick="window.adventureBackToList()" data-i18n="feature.adventure-manager.back">← Back</button>
@@ -2510,6 +2338,13 @@ function attachCreateEvents() {
             }
             const tier = document.getElementById('adv-create-tier')?.value || 'III';
             const description = document.getElementById('adv-create-description')?.value.trim() || '';
+            const timerInputs = [...container.querySelectorAll('.adv-timer-segments, .adv-scene-timer-segments')];
+            const invalidTimer = timerInputs.find(input => !Number.isInteger(Number(input.value)) || Number(input.value) < 1 || Number(input.value) > 60);
+            if (invalidTimer) {
+                showToast('Timer segments must be a whole number from 1 to 60.', 'error');
+                invalidTimer.focus();
+                return;
+            }
 
             const acts = [];
             document.querySelectorAll('.adv-act-row').forEach(actRow => {
@@ -2618,8 +2453,11 @@ function attachCreateEvents() {
                 status: 'planned'
             });
 
+            if (!adventure) return;
             showToast(i18nText("feature.adventure-manager.createdValue", { value0: adventure.title }, "✨ Created \"{{value0}}\""), 'success');
-            adventureViewMode = 'list';
+            activeAdventureId = adventure.id;
+            sessionTab = 'run';
+            adventureViewMode = 'detail';
             renderView();
         });
     }
@@ -2834,6 +2672,8 @@ function refresh() {
 }
 
 function destroy() {
+    const notes = container?.querySelector('#adv-notes');
+    if (notes?.dataset.adventureId) noteDrafts.set(notes.dataset.adventureId, notes.value);
     isDestroyed = true;
     container = null;
     saveAdventuresToState();

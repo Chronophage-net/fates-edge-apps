@@ -19,6 +19,7 @@
  */
 
 import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
+import { setupTableUI, showTimerForm } from './table-ui.js';
 import { vttStore, MAX_CONTROLLED_CHARACTERS } from '@core/vtt-store.js';
 import { getState, clearChatHistory, getCharacter, addVTTEvent, addSessionLogEntry, getCharacters, ensureCharacterDefaults, getStableClientId, onCharacterChange } from '@core/state.js';
 import { performRoll } from '@core/dice.js';
@@ -1827,15 +1828,12 @@ function attachEvents() {
             case 'vtt-roll-post-btn': rollConnected(true); break;
             case 'vtt-roll-only-btn': rollConnected(false); break;
             case 'vtt-add-timer': import('@core/state.js').then(m => {
-                const state = m.getState();
-                const name = prompt(i18nText("feature.vtt.vtt-connected.timerName", null, "Timer name:"), 'Scene Timer');
-                if (name) {
-                    const segments = parseInt(prompt(i18nText("feature.vtt.vtt-connected.segments", null, "Segments:"), '6') || '6');
-                    const timer = { id: 'timer-' + Date.now(), name, segments, current: 0 };
+                showTimerForm(container, timer => {
+                    const {name} = timer;
                     m.addTimer(timer);
-                    vttStore.updateTimers(state.timers || []);
+                    vttStore.updateTimers(m.getState().timers || []);
                     showToast(i18nText("feature.vtt.vtt-connected.timerValueCreated", { value0: name }, "Timer \"{{value0}}\" created."), 'success');
-                }
+                });
             }).catch(() => showToast(i18nText("feature.vtt.vtt-connected.timerFeatureNotAvailable", null, "Timer feature not available"), 'error')); break;
             case 'vtt-scene-end': {
                 const state = getState();
@@ -2246,6 +2244,7 @@ export function render(el) {
     `;
     
     // Initialize reactive renderers
+    setupTableUI(el);
     renderChat();
     renderVTTChars();
     renderCommonRolls();

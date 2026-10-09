@@ -54,7 +54,7 @@ export function createCharacterCard(char, { onEdit, onDelete, onToggleVTT, onRol
             ${avatarHtml}
             <div style="min-width:0;">
                 <div class="name">${escHtml(char.name || unnamed)} ${vttBadge}</div>
-                <div class="meta">${escHtml(char.heritage || '')} · ${tier} ${char.tier || 'I'} · XP ${char.xp || 32} · ❤️${char.harm || 0} ⚡${char.fatigue || 0} 🎲${char.boons || 0} · ${(char.bonds || []).length}B · ${(char.complications || []).length}C</div>
+                <div class="meta">${escHtml(char.heritage || '')} · ${tier} ${char.tier || 'I'} · XP ${char.totalXp ?? char.xp ?? 32} · ❤️${char.harm || 0} ⚡${char.fatigue || 0} 🎲${char.boons || 0} · ${(char.bonds || []).length}B · ${(char.complications || []).length}C</div>
             </div>
         </div>
         <div class="actions">

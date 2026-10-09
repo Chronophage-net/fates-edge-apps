@@ -1,0 +1,40 @@
+.bench-workspace { --bench-line: var(--border); }
+.bench-intro { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; padding:1.5rem; margin-block-end:1.5rem; border:1px solid var(--bench-line); border-radius:12px; background:linear-gradient(120deg,var(--bg2),var(--bg3)); }
+.bench-intro h2 { margin:.3rem 0 .6rem; font-size:clamp(1.45rem,2.4vw,2rem); color:var(--gold); }
+.bench-intro p { margin:.35rem 0; }
+.bench-eyebrow { color:var(--gold); font-size:.7rem; letter-spacing:.12em; font-weight:700; text-transform:uppercase; }
+.bench-stats { display:flex; gap:1.5rem; flex-wrap:wrap; }
+.bench-stats span { display:flex; flex-direction:column; font-size:.75rem; color:var(--text2); }
+.bench-stats strong { font-size:1.7rem; color:var(--text); }
+.bench-layout { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr); gap:1.5rem; align-items:start; }
+.bench-layout > *, .bench-fields > *, .bench-section-heading > * { min-width:0; }
+.bench-section-heading { display:flex; justify-content:space-between; align-items:center; gap:.75rem; flex-wrap:wrap; }
+.bench-section-heading > span { font-size:.75rem; color:var(--text2); }
+.bench-section h3, .bench-project h3, .bench-new h3 { margin:.25rem 0 .8rem; }
+.bench-project, .bench-new, .bench-reference, .bench-empty { border:1px solid var(--bench-line); border-radius:10px; padding:1.2rem; background:var(--bg2); margin-block-end:1rem; overflow-wrap:anywhere; }
+.bench-project { border-inline-start:3px solid var(--gold); }
+.bench-project p, .bench-reference p { line-height:1.6; }
+.bench-new { border-block-start:3px solid var(--gold); }
+.bench-empty { text-align:center; padding:2rem 1rem; border-style:dashed; }
+.bench-empty > span { font-size:2rem; color:var(--gold); }
+.bench-muted, .bench-empty p, .bench-reference, .bench-materials { color:var(--text2); font-size:.85rem; }
+.bench-reference summary, .bench-workspace details > summary { cursor:pointer; padding-block:.6rem; color:var(--text); font-weight:600; }
+.bench-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.8rem; }
+.bench-field { display:flex; flex-direction:column; gap:.4rem; margin-block:.8rem; min-width:0; font-size:.8rem; }
+.bench-field input, .bench-field textarea, .bench-field select { width:100%; min-width:0; max-width:100%; box-sizing:border-box; color:var(--text); background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:.7rem; font:inherit; }
+.bench-field textarea { resize:vertical; }
+.bench-workspace .btn { min-height:44px; height:auto; white-space:normal; max-width:100%; }
+.bench-workspace :focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+.bench-badge { border:1px solid var(--gold); border-radius:20px; padding:.3rem .6rem; }
+.bench-progress { display:flex; align-items:center; gap:.75rem; margin-block:1rem; }
+.bench-progress progress { flex:1; min-width:0; height:.65rem; accent-color:var(--gold); }
+.bench-progress strong { font-size:.8rem; white-space:nowrap; }
+.bench-cost, .bench-good { color:var(--gold); font-size:.8rem; }
+.bench-result, .bench-choice, .bench-flaw { background:var(--bg); border-radius:6px; padding:.85rem; margin-block:.8rem; font-size:.85rem; }
+.bench-flaw { border-inline-start:2px solid var(--gold); }
+.bench-flaw .btn { display:block; margin-block-start:.7rem; }
+.bench-result small, .bench-reference small { color:var(--text2); }
+.bench-collection { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:1rem; margin-block-start:1rem; }
+.crafting-tabs { flex-wrap:wrap; }
+@media (max-width:900px) { .bench-layout { grid-template-columns:minmax(0,1fr); } .bench-layout:not(.bench-has-projects) > aside { grid-row:1; } }
+@media (max-width:480px) { .bench-intro, .bench-project, .bench-new, .bench-reference { padding:1rem; } .bench-stats { gap:1rem; } .bench-workspace .btn { width:100%; margin-block:.25rem; } .bench-fields { grid-template-columns:minmax(0,1fr); } }

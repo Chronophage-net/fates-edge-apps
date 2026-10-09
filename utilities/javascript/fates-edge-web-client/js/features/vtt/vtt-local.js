@@ -19,7 +19,8 @@
 
 import { t as i18nText } from '@core/i18n.js';
 import { vttStore } from '@core/vtt-store.js';
-import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory, saveState } from '@core/state.js';
+import { getState, getCharacters, ensureCharacterDefaults, clearChatHistory, saveState, addTimer } from '@core/state.js';
+import { setupTableUI, showTimerForm } from './table-ui.js';
 import { performRoll } from '@core/dice.js';
 import { showToast } from '@components/Toast.js';
 import { escHtml } from '@core/utils.js';
@@ -157,7 +158,8 @@ function createLocalMessage(text, sender, recipient = 'all', metadata = {}) {
     timestamp: Date.now(),
     local: true,
     id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-    sent: false,
+    // No network send was attempted. false is reserved for a failed send.
+    sent: null,
     // Solo/local mode has no other connected players to spoof a GM label
     // for -- see vtt-core.js's renderChatMessageText -- so it's always
     // "verified" here, the same way isGM()-style checks elsewhere treat
@@ -475,22 +477,13 @@ function attachEvents() {
       case 'vtt-roll-post-btn': rollLocal(true); break;
       case 'vtt-roll-only-btn': rollLocal(false); break;
       case 'vtt-add-timer': {
-        const name = prompt(i18nText("feature.vtt.vtt-local.timerName", null, "Timer name:"), 'Scene Timer');
-        if (name) {
-          const segments = parseInt(prompt(i18nText("feature.vtt.vtt-local.segments", null, "Segments:"), '6') || '6');
-          const state = getState();
-          const newTimer = { 
-            id: 'timer-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4), 
-            name, 
-            segments, 
-            current: 0 
-          };
-          state.timers = state.timers || [];
-          state.timers.push(newTimer);
-          vttStore.updateTimers(state.timers);
+        showTimerForm(container, timer => {
+          const {name, segments} = timer;
+          addTimer(timer);
+          vttStore.updateTimers(getState().timers || []);
           sendMessage(`Timer created: ${name} (${segments} segments)`, 'System', 'all');
           showToast(i18nText("feature.vtt.vtt-local.timerValueCreated", { value0: name }, "Timer \"{{value0}}\" created."), 'success');
-        }
+        });
         break;
       }
       case 'vtt-scene-end': {
@@ -798,6 +791,7 @@ export function render(el) {
 `;
 
   // Initialize reactive renderers
+  setupTableUI(el);
   renderChat();
   renderVTTChars();
   renderCommonRolls();

@@ -25,6 +25,7 @@ import { isConnectedToServer, sendEvent } from '@core/websocket.js';
 import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
 import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
 import { getObjectiveType, resolveObjectiveType, isCombatType, DEFAULT_OBJECTIVE_TYPE } from '@core/objective-types.js';
+import { snapshotSession, canResume, parseTrackAmount } from './workspace.js';
 
 // NOTE: combatant.type ('player'|'adversary') is the *role* field, pre-existing
 // and unrelated to the objective type below — kept separate to avoid a naming
@@ -67,6 +68,7 @@ function canSetRange() {
 }
 
 let modal = null;
+let trackerGeneration = 0;
 let trackerHiddenSiblings = null;
 let currentEncounterId = null;
 let combatants = [];
@@ -519,15 +521,21 @@ function getLinkedRival(name) {
 // ============================================================
 
 export async function openTracker(encounterId) {
+    if (!canSetRange()) return showToast('Only the GM can run encounters.', 'error');
+    if (modal) closeTracker();
+    const opening = ++trackerGeneration;
     const state = getState();
     const encounter = state.encounters?.find(e => String(e.id) === String(encounterId));
     if (!encounter) {
         showToast(i18nText("feature.encounters.combat.encounterNotFound", null, "Encounter not found."), 'error');
         return;
     }
+    if (encounter.archived || encounter.status === 'resolved') return showToast('Restore or reopen this encounter from its workspace first.', 'info');
+    if (encounter.trackerSession && !canResume(encounter.trackerSession)) return showToast('This saved session cannot be read. It has been preserved; duplicate the encounter for a fresh run.', 'warning');
 
-    currentEncounterId = encounterId;
     const bestiaryCreatures = await loadBestiaryData();
+    if (opening !== trackerGeneration || !canSetRange()) return;
+    currentEncounterId = encounterId;
     // encounter.type — the objective type picked in the Encounters panel when
     // this encounter was created/edited. Missing on any pre-existing saved
     // encounter, in which case it's treated as 'combat' (see objective-types.js).
@@ -594,7 +602,25 @@ export async function openTracker(encounterId) {
     rangeGridOpen = false;
     initRangeForAllCombatants();
 
+    const saved = encounter.trackerSession;
+    if (canResume(saved)) {
+        const session = snapshotSession(saved);
+        combatants = session.combatants; obstacles = session.obstacles;
+        round = session.round; turnPhase = session.turnPhase;
+        timerSegments = session.timerSegments; timerMax = session.timerMax; timerName = session.timerName || 'Scene timer';
+        combatLog = session.combatLog || []; rangeMap = session.rangeMap || {};
+    }
+    encounter.status = 'active';
+
     renderTracker();
+}
+
+function persistTracker() {
+    if (!canSetRange() || currentEncounterId == null) return;
+    const encounter = getState().encounters?.find(e => String(e.id) === String(currentEncounterId));
+    if (!encounter) return;
+    encounter.trackerSession = snapshotSession({ combatants, obstacles, round, turnPhase, timerSegments, timerMax, timerName, combatLog, rangeMap });
+    saveState();
 }
 
 // ============================================================
@@ -635,6 +661,8 @@ function broadcastCombatStatus() {
 // ============================================================
 
 function renderTracker() {
+    if (!canSetRange()) return;
+    persistTracker();
     if (modal && modal.parentNode) {
         modal.parentNode.removeChild(modal);
     }
@@ -643,7 +671,7 @@ function renderTracker() {
     // Inline editor screen — combat tracker takes over the view in place
     // instead of floating above it as a pop-up.
     modal = document.createElement('div');
-    modal.className = 'editor-screen-host';
+    modal.className = 'editor-screen-host enc-tracker';
     modal.style.cssText = `width:100%;padding:1rem 0;animation:fadeIn 0.3s ease;`;
 
     // Side-based turns: the whole player side is "active" together during the
@@ -762,9 +790,10 @@ function renderTracker() {
                 </div>
 
                 <div style="display: flex; gap: 0.25rem; flex-shrink: 0; flex-wrap: wrap; align-items:center;">
+                    <input class="combat-amount" type="number" min="1" max="999" value="1" aria-label="Amount for ${attr(c.name)}" title="Amount to apply">
                     ${isCombat ? `
-                    <button class="btn btn-xs btn-ghost combat-damage-btn" data-list="${list}" data-index="${i}" title="Deal damage" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">💥</button>
-                    <button class="btn btn-xs btn-ghost combat-heal-btn" data-list="${list}" data-index="${i}" title="Heal" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">💚</button>
+                    <button class="btn btn-xs btn-ghost combat-damage-btn" data-list="${list}" data-index="${i}" title="Deal damage" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--red);">Damage</button>
+                    <button class="btn btn-xs btn-ghost combat-heal-btn" data-list="${list}" data-index="${i}" title="Heal" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">Heal</button>
                     ` : `
                     <button class="btn btn-xs btn-ghost combat-damage-btn" data-list="${list}" data-index="${i}" title="${escHtml(objType.progressLabel)} (${objType.progressVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--orange);">${objType.icon} ${escHtml(objType.progressLabel)}</button>
                     <button class="btn btn-xs btn-ghost combat-heal-btn" data-list="${list}" data-index="${i}" title="${escHtml(objType.reliefLabel)} (${objType.reliefVerb})" style="padding: 0.25rem 0.4rem; font-size: 0.8rem; color: var(--green);">↩️ ${escHtml(objType.reliefLabel)}</button>
@@ -823,7 +852,7 @@ function renderTracker() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;">
                 <div>
                     <h2 style="margin:0;color:var(--gold);font-size:1.7rem;display:flex;align-items:center;gap:0.5rem;">
-                        ⚔️ Combat Tracker
+                        ${escHtml(getState().encounters?.find(e => String(e.id) === String(currentEncounterId))?.title || 'Encounter tracker')}
                     </h2>
                     <div style="color:var(--text2);font-size:0.85rem;margin-top:0.25rem;">
                         ${combatants.length} combatants${obstacles.length ? ` · ${obstacles.length} obstacles` : ''} · Round ${round} · ${combatants.filter(c => c.status === 'active').length} active
@@ -835,7 +864,7 @@ function renderTracker() {
                     color: var(--text2); font-size: 1.25rem; cursor: pointer;
                     width: 36px; height: 36px; border-radius: 50%;
                     display: flex; align-items: center; justify-content: center;
-                ">✕</button>
+                " aria-label="Save and return to encounter">Save & return</button>
             </div>
 
             <!-- Stats Grid -->
@@ -873,7 +902,7 @@ function renderTracker() {
                 border-radius: 12px; padding: 0.85rem 1.1rem; margin-bottom: 1.25rem;
             ">
                 <div style="font-size:1.1rem;font-weight:700;color:${turnPhase === 'players' ? 'var(--blue)' : 'var(--red)'};">
-                    ${phaseLabel(turnPhase)}'s Turn
+                    ${phaseLabel(turnPhase)}’ turn
                 </div>
                 <div style="font-size:0.75rem;color:var(--text2);">
                     ${turnPhase === 'players'
@@ -1024,7 +1053,18 @@ function renderTracker() {
         trackerHiddenSiblings.forEach(ch => { ch.style.display = 'none'; });
     }
     hostContainer.appendChild(modal);
-    window.scrollTo({ top: 0 });
+    const turnControls = modal.querySelector('#combat-next')?.parentElement;
+    if (turnControls) {
+        turnControls.classList.add('enc-turn-controls');
+        modal.querySelector('.combat-modal > div')?.after(turnControls);
+    }
+    for (const eventName of ['click', 'change', 'keydown']) modal.addEventListener(eventName, event => {
+        if (!canSetRange() && !event.target.closest('#combat-close, #combat-close-tracker')) {
+            event.preventDefault(); event.stopImmediatePropagation();
+            showToast('Only the GM can change the tracker.', 'warning');
+        }
+    }, true);
+    // Retain scroll position during actions; long rosters must not jump to the top.
 
     // EVENT LISTENERS
     modal.querySelector('#combat-close')?.addEventListener('click', closeTracker);
@@ -1139,11 +1179,11 @@ function renderTracker() {
             keyHandler = null;
             return;
         }
-        if (e.key === ' ' && !e.target.matches('input, textarea, select')) {
+        if (e.key === ' ' && !e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
             e.preventDefault();
             modal.querySelector('#combat-next')?.click();
         }
-        if ((e.key === 'r' || e.key === 'R') && !e.target.matches('input, textarea, select')) {
+        if ((e.key === 'r' || e.key === 'R') && !e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
             e.preventDefault();
             modal.querySelector('#combat-timer-reset')?.click();
         }
@@ -1157,7 +1197,9 @@ function renderTracker() {
 // CLOSE TRACKER
 // ============================================================
 
-function closeTracker() {
+export function closeTracker() {
+    trackerGeneration++;
+    persistTracker();
     if (keyHandler) {
         document.removeEventListener('keydown', keyHandler);
         keyHandler = null;
@@ -1177,6 +1219,7 @@ function closeTracker() {
     }
 
     currentEncounterId = null;
+    import('./index.js').then(module => module.renderEncounters());
 }
 
 // ============================================================
@@ -1196,6 +1239,7 @@ function addLog(type, message) {
 export function logExternalAction(sender, message, type = 'info') {
     if (!currentEncounterId) return;
     addLog(type, `${sender}: ${message}`);
+    persistTracker();
     if (modal && modal.parentNode) renderTracker();
 }
 
@@ -1510,17 +1554,22 @@ function endRound() {
 // ─── damageEntry/healEntry etc. work on either `combatants` or `obstacles` —
 // pass the list explicitly so one set of functions covers both. ──────────
 
+function trackAmount(list, idx) {
+    const name = list === obstacles ? 'obstacles' : 'combatants';
+    const row = [...modal.querySelectorAll('.combatant-entry')].find(el => el.dataset.list === name && Number(el.dataset.index) === idx);
+    const amount = parseTrackAmount(row?.querySelector('.combat-amount')?.value);
+    if (amount === null) showToast('Enter a whole-number amount from 1 to 999.', 'warning');
+    return amount;
+}
+
 function damageEntry(list, idx) {
     if (idx < 0 || idx >= list.length) return;
     const c = list[idx];
     const isCombat = isCombatType(c.objectiveType);
     const objType = resolveObjectiveType(c.objectiveType, c);
 
-    const amount = parseInt(prompt(isCombat ? 'Damage amount:' : `${objType.progressLabel} amount:`, '1') || '1');
-    if (isNaN(amount) || amount < 1) {
-        showToast(i18nText("feature.encounters.combat.invalidAmount", null, "Invalid amount."), 'error');
-        return;
-    }
+    const amount = trackAmount(list, idx);
+    if (amount === null) return;
 
     if (!isCombat) {
         // Non-combat clocks are a plain current/max track — no armor
@@ -1574,7 +1623,8 @@ function healEntry(list, idx) {
     const isCombat = isCombatType(c.objectiveType);
     const objType = resolveObjectiveType(c.objectiveType, c);
 
-    const amount = parseInt(prompt(isCombat ? 'Heal amount:' : `${objType.reliefLabel} amount:`, '1') || '1');
+    const amount = trackAmount(list, idx);
+    if (amount === null) return;
 
     if (!isCombat) {
         c.harm = Math.max(c.harm - amount, 0);

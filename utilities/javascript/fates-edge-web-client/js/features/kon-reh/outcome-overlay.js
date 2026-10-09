@@ -32,6 +32,7 @@ function injectStyle() {
     style.id = STYLE_ID;
     style.textContent = `
         #${OVERLAY_ID} { position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center;
+            --fe-oc-accent:#d4af37; --fe-oc-glow:rgba(212,175,55,.25); --dx:0px; --dy:0px;
             background:rgba(8,8,14,0.72); backdrop-filter:blur(3px); animation: fe-oc-fade .35s ease-out both;
             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
         #${OVERLAY_ID} .fe-oc-card { position:relative; text-align:center; min-width:min(360px,90vw); max-width:90vw; padding:28px 34px 24px;
@@ -49,7 +50,7 @@ function injectStyle() {
         #${OVERLAY_ID} .fe-oc-btn { background:#2a2b38; color:#e8e6df; border:1px solid #3a3b4a; padding:8px 18px; border-radius:6px; cursor:pointer; font-size:13px; }
         #${OVERLAY_ID} .fe-oc-btn:hover { background:#34364a; }
         #${OVERLAY_ID} .fe-oc-btn.primary { background:var(--fe-oc-accent); color:#1a1400; border-color:var(--fe-oc-accent); font-weight:600; }
-        #${OVERLAY_ID} .fe-oc-spark { position:absolute; top:50%; left:50%; width:6px; height:6px; border-radius:50%; background:var(--fe-oc-accent);
+        #${OVERLAY_ID} .fe-oc-spark { position:absolute; top:50%; inset-inline-start:50%; width:6px; height:6px; border-radius:50%; background:var(--fe-oc-accent);
             opacity:0; animation: fe-oc-spark 1.4s ease-out forwards; pointer-events:none; }
         @keyframes fe-oc-fade { from { opacity:0 } to { opacity:1 } }
         @keyframes fe-oc-pop { from { transform:scale(.7); opacity:0 } to { transform:scale(1); opacity:1 } }

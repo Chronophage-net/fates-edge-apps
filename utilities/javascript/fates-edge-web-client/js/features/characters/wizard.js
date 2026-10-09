@@ -139,6 +139,8 @@ const MAGIC_PATHS = [
     { id: 'monk', label: 'Monk (Monastic Training, 4 XP)', cost: 4, note: 'Breath States, Meditation, and monastic Techniques. Patron-optional.' }
 ];
 
+import { matchesCatalogQuery, collectTalentRecord } from './catalog-utils.js';
+
 function defaultSkills() {
     const skills = {};
     ALL_SKILLS.forEach(s => skills[s.toLowerCase()] = 0);
@@ -325,7 +327,11 @@ function injectModalStyles() {
         }
         .wizard-progress-step {
             flex: 1;
-            height: 4px;
+            min-width:0;
+            padding:0.4rem;
+            font-size:0.75rem;
+            color:var(--text-inverse);
+            text-align:center;
             background: var(--border, #444);
             border-radius: 2px;
             transition: background 0.3s;
@@ -425,14 +431,26 @@ function injectModalStyles() {
 
 function ensureModal() {
     let modal = document.getElementById('wizardModal');
-    if (modal) return modal;
-
     injectModalStyles();
+    if (modal) {
+        modal.setAttribute('aria-labelledby', 'wizard-title');
+        modal.querySelector('.modal')?.classList.add('wizard-content');
+        modal.querySelector('#wizard-nav')?.classList.add('wizard-navigation');
+        if (!modal.querySelector('#wizard-progress')) {
+            const progress = document.createElement('div');
+            progress.id = 'wizard-progress';
+            progress.style.cssText = 'display:flex;gap:0.5rem;margin-block-end:1rem;';
+            progress.innerHTML = Array.from({length:5}, () => '<div class="wizard-progress-step"></div>').join('');
+            modal.querySelector('#wizard-steps')?.before(progress);
+        }
+        return modal;
+    }
 
     modal = document.createElement('div');
     modal.id = 'wizardModal';
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'false');
+    modal.setAttribute('aria-labelledby', 'wizard-title');
     modal.style.display = 'none';
 
     modal.innerHTML = `
@@ -445,7 +463,7 @@ function ensureModal() {
                 ${[1,2,3,4,5].map(() => `<div class="wizard-progress-step"></div>`).join('')}
             </div>
             <div id="wizard-steps"></div>
-            <div style="display:flex;justify-content:space-between;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border, #444);">
+            <div class="wizard-navigation" style="display:flex;justify-content:space-between;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border, #444);">
                 <button id="wizard-back" class="btn btn-secondary" data-i18n="feature.characters.wizard.back">← Back</button>
                 <button id="wizard-next" class="btn btn-gold" data-i18n="feature.characters.wizard.next">Next →</button>
             </div>
@@ -803,7 +821,7 @@ function readTalentListFromDOM() {
         const costEl = row.querySelector('.wz-talent-cost');
         const name = nameEl ? (nameEl.tagName === 'INPUT' ? nameEl.value.trim() : nameEl.textContent.trim()) : '';
         const cost = costEl ? safeParseInt(costEl.value || costEl.textContent, 0) : 0;
-        if (name) items.push({ name, cost });
+        if (name) items.push(collectTalentRecord(state.data?.talents || [], name, cost));
     });
     return items;
 }
@@ -939,11 +957,16 @@ function renderStep() {
 
     const stepNames = ['Identity', 'Attributes', 'Skills', 'Talents & Loadout', 'Bonds & Summary'];
     titleEl.textContent = i18nText("feature.characters.wizard.characterWizardStepValueValue", { value0: state.step + 1, value1: stepNames[state.step] }, "Character Wizard — Step {{value0}}: {{value1}}");
+    titleEl.removeAttribute('data-i18n');
+    nextBtn.removeAttribute('data-i18n');
     backBtn.style.display = state.step === 0 ? 'none' : 'inline-block';
     nextBtn.textContent = state.step === 4 ? '✨ Finish' : 'Next →';
 
     document.querySelectorAll('.wizard-progress-step').forEach((el, idx) => {
         el.style.background = idx <= state.step ? 'var(--gold)' : 'var(--border)';
+        el.style.color = idx <= state.step ? 'var(--text-inverse)' : 'var(--text)';
+        el.textContent = `${idx + 1}. ${stepNames[idx]}`;
+        el.setAttribute('aria-current', idx === state.step ? 'step' : 'false');
     });
 
     let html = '';
@@ -961,6 +984,13 @@ function renderStep() {
         html = '<p class="error">Error rendering step. Please refresh.</p>';
     }
     stepsEl.innerHTML = html;
+    stepsEl.querySelectorAll('div[style]').forEach(el => {
+        if (el.style.gridTemplateColumns) el.classList.add('wizard-field-grid');
+    });
+    stepsEl.querySelectorAll('label:not([for])').forEach(label => {
+        const control = label.parentElement.querySelector('input[id], select[id], textarea[id]');
+        if (control) label.htmlFor = control.id;
+    });
 
     if (state.step === 1) attachAttributeListeners();
     if (state.step === 2) attachSkillListeners();
@@ -1243,7 +1273,12 @@ function renderTalentCatalog() {
     const spent = calculateTotalXpSpent(d);
     const remainingXp = (safeParseInt(d.totalXp, 32)) - spent;
     const showStarterPicks = !(d.talents && d.talents.length);
-    const available = rankTalentsForDisplay(tierAvailable, { remainingXp, showStarterPicks });
+    const query = document.getElementById('wz-talent-search')?.value || '';
+    const available = rankTalentsForDisplay(tierAvailable, { remainingXp, showStarterPicks }).filter(t => matchesCatalogQuery(t, query));
+    if (!available.length) {
+        catalogContainer.innerHTML = '<p class="text-muted">No matching talents. Try another name, effect, or prerequisite.</p>';
+        return;
+    }
 
     let printedRecommendedHeader = false;
     catalogContainer.innerHTML = available.map(t => {
@@ -1275,19 +1310,16 @@ function renderTalentCatalog() {
         `;
     }).join('');
 
-    // Directly attach click listeners to each button
-    catalogContainer.querySelectorAll('.catalog-add-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const name = this.dataset.name;
-            const cost = parseInt(this.dataset.cost, 10);
-            addTalentFromCatalog(name, cost);
-        });
-    });
+    // The wizard's delegated handler owns Add clicks, including after search.
 }
 export function addTalentFromCatalog(name, cost) {
     const listEl = document.getElementById('wz-talent-list');
     if (!listEl || !state.data) return;
+    if ((state.data.talents || []).some(t => t.name === name)) {
+        showToast('This talent is already selected.', 'info');
+        return;
+    }
+    const talent = getAvailableTalentsForTier(state.data).find(t => t.name === name && Number(t.cost) === cost);
 
     const row = document.createElement('div');
     row.className = 'dynamic-row wz-talent-row';
@@ -1299,7 +1331,7 @@ export function addTalentFromCatalog(name, cost) {
     listEl.appendChild(row);
 
     if (state.data.talents) {
-        state.data.talents.push({ name, cost });
+        state.data.talents.push({ ...talent, name, cost });
     }
     updateXpBudgetFromDOM();
     if (state.step === 4) setTimeout(updateSummaryDisplay, 50);
@@ -1545,6 +1577,7 @@ function renderStep3TalentsAndLoadout(d) {
                 Start with 0–3 talents. Many concepts work perfectly with zero talents.
             </div>
             
+            <label class="catalog-search">Find a talent<input type="search" id="wz-talent-search" placeholder="Name, effect, or prerequisite"></label>
             <div id="wz-talent-catalog" class="talent-catalog"></div>
             
             <div id="wz-talent-list">${talentRows}</div>
@@ -1733,7 +1766,7 @@ function updateSkillCost(skillKey) {
 function updateXpBudgetFromDOM() {
     if (!state.data) return;
     const d = state.data;
-    d.talents = readTalentListFromDOM();
+    if (document.getElementById('wz-talent-list')) d.talents = readTalentListFromDOM();
     const budgetEl = document.querySelector('.xp-budget-bar');
     if (budgetEl) {
         const spent = calculateTotalXpSpent(d);
@@ -1768,7 +1801,6 @@ function updateDerivedStats() {
 function updateSummaryDisplay() {
     if (!state.data || state.step !== 4) return;
     const d = state.data;
-    d.talents = readTalentListFromDOM();
     d.bonds = readBondList();
     d.complications = readCompList();
     
@@ -1871,7 +1903,7 @@ function attachEvents() {
     const keyHandler = (e) => {
         if (!state.isOpen || !modal.contains(e.target)) return;
         if (e.key === 'Escape') closeWizard();
-        else if (e.key === 'Enter' && e.target.matches('input:not([type=button]):not([type=checkbox]):not([type=radio])')) {
+        else if (e.key === 'Enter' && e.target.matches('input:not([type=button]):not([type=checkbox]):not([type=radio]):not([type=search])')) {
             const next = document.getElementById('wizard-next');
             if (next) { e.preventDefault(); next.click(); }
         }
@@ -2030,6 +2062,7 @@ function attachEvents() {
     // ─── Input handlers ──────────────────────────────────────────
     const inputHandler = (e) => {
         if (!state.isOpen) return;
+        if (e.target.id === 'wz-talent-search') { renderTalentCatalog(); return; }
         // Update talent list when talent name/cost changes
         if (e.target.matches('.wz-talent-name, .wz-talent-cost')) {
             state.data.talents = readTalentListFromDOM();

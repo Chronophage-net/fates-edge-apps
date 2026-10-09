@@ -658,7 +658,7 @@ export async function renderMonks(el) {
             </div>
 
             <!-- ─── Breath State + Flow ────────────────────────── -->
-            <div style="display:grid;grid-template-columns:2fr 1fr;gap:0.3rem;">
+            <div class="monks-workspace" style="display:grid;grid-template-columns:2fr 1fr;gap:0.3rem;">
                 <div class="monks-breath" style="background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border-inline-start:4px solid var(--gold);">
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.2rem;">
                         <div>

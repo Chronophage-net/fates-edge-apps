@@ -81,6 +81,7 @@ function createEditorModal(entry, isNew) {
             <div class="form-group">
                 <label for="wiki-editor-category" data-i18n="feature.wiki.editor.category">Category</label>
                 <select id="wiki-editor-category">
+                    ${entry.category && !['rules','patrons','regions','magic','combat','lore','talents','assets','equipment','characters','monsters','other'].includes(entry.category) ? `<option value="${escHtml(entry.category)}" selected>${escHtml(entry.category)}</option>` : ''}
                     <option value="rules" ${entry.category === 'rules' ? 'selected' : ''}>📜 Rules</option>
                     <option value="patrons" ${entry.category === 'patrons' ? 'selected' : ''}>👁️ Patrons</option>
                     <option value="regions" ${entry.category === 'regions' ? 'selected' : ''}>🌍 Regions</option>
@@ -200,7 +201,7 @@ function setupEditorEvents(entry, isNew) {
 
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
-            const id = modalOverlay.querySelector('.modal')?.dataset?.entryId;
+            const id = modalOverlay.querySelector('.editor-screen')?.dataset?.entryId;
             if (id && confirm(i18nText("feature.wiki.editor.deleteThisEntry", null, "Delete this entry?"))) {
                 const state = getState();
                 state.wikiEntries = (state.wikiEntries || []).filter(e => String(e.id) !== String(id));
@@ -271,6 +272,7 @@ function saveEntry(isNew) {
         cost: costInput.value !== '' ? parseInt(costInput.value) : null,
         slot: slotInput.value.trim(),
         body: bodyTextarea.value,
+        stub: !bodyTextarea.value.trim(),
         source: 'local'
     };
 
@@ -282,7 +284,7 @@ function saveEntry(isNew) {
         addWikiEntry(entryData);
         showToast(i18nText("feature.wiki.editor.createdValue", { value0: title }, "✅ Created \"{{value0}}\""), 'success');
     } else {
-        const id = modalOverlay.querySelector('.modal')?.dataset?.entryId;
+        const id = modalOverlay.querySelector('.editor-screen')?.dataset?.entryId;
         if (!id) {
             showToast(i18nText("feature.wiki.editor.errorEntryIDNotFound", null, "Error: Entry ID not found."), 'error');
             return;

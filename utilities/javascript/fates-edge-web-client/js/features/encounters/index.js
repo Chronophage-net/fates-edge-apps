@@ -1,919 +1,138 @@
-/**
- * Encounters feature - Manage combat and social encounters
- * ✅ Integrated with Bestiary (panel below encounter list, left column)
- * Reads Threat Level 1–10 and creature-specific Story Beat moves
- * ✅ Shared GM Story Beat bank with Bestiary
- * ✅ One-click "Open Tracker" from bestiary entries
- * ✅ Creature detail modal with SB spends
- * v2 – Role‑based gating: non‑GM cannot create, edit, delete, or open combat tracker.
- */
-
-import { t as i18nText } from '@core/i18n.js';
+/** Encounter library, scene preparation, explicit Bestiary targets, and aftermath. */
 import { getState, saveState } from '@core/state.js';
-import { escHtml } from '@core/utils.js';
+import { generateId } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
-import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
-import { 
-    loadBestiaryData, 
-    loadWikiData, 
-    addCreatureAsAdversary,
-    getCreatureDescription,
-    getCategoryBadgeColor,
-    showCreatureDetail
-} from './bestiary.js';
-import { openTracker } from './combat.js';
-import { getObjectiveType, DEFAULT_OBJECTIVE_TYPE } from '@core/objective-types.js';
-// ─── Role check ──────────────────────────────────────────────
 import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
-import { isConnectedToServer } from '@core/websocket.js'
+import { isConnectedToServer } from '@core/websocket.js';
+import { loadBestiaryData, loadWikiData, getCreatureDescription, showCreatureDetail } from './bestiary.js';
+import { openTracker, closeTracker } from './combat.js';
+import { closeEditor } from './editor.js';
+import { renderShell, renderLibrary, renderScene, renderCreatures, cloneEncounter } from './workspace.js';
+
 let container = null;
 let bestiaryData = [];
-let filteredBestiary = [];
-
-// ============================================================
-// SHARED STORY BEAT BANK (same key as bestiary.js)
-// ============================================================
-
-const SB_BANK_KEY = 'fates-edge-gm-sb-bank';
-let gmStoryBeats = 0;
-
-function loadStoryBeatsBank() {
-    try {
-        const stored = localStorage.getItem(SB_BANK_KEY);
-        gmStoryBeats = stored ? Math.max(0, parseInt(stored, 10)) : 0;
-    } catch (_) {
-        gmStoryBeats = 0;
-    }
-}
-
-function saveStoryBeatsBank() {
-    try {
-        localStorage.setItem(SB_BANK_KEY, String(gmStoryBeats));
-    } catch (_) {}
-}
-
-function adjustStoryBeats(delta) {
-    gmStoryBeats = Math.max(0, gmStoryBeats + delta);
-    saveStoryBeatsBank();
-    renderSBBank();
-}
-
-function spendStoryBeats(cost, label) {
-    if (gmStoryBeats < cost) {
-        showToast(i18nText("feature.encounters.needValueSBOnlyValueAvailable", { value0: cost, value1: gmStoryBeats }, "Need {{value0}} SB; only {{value1}} available."), 'warning');
-        return false;
-    }
-    gmStoryBeats -= cost;
-    saveStoryBeatsBank();
-    renderSBBank();
-    try {
-        logToSession(`💥 SB spent (${cost}): ${label}`, 'danger');
-        addVTTEvent('sb_spent', { cost, label });
-    } catch (e) { /* ignore */ }
-    showToast(i18nText("feature.encounters.spentValueSBValue", { value0: cost, value1: label }, "Spent {{value0}} SB — {{value1}}"), 'success');
-    return true;
-}
-
-// ============================================================
-// QUICK REFERENCE DATA
-// ============================================================
-
-const QUICK_ADVERSARIES = [
-    { name: 'Goblin Scavenger', body: 'Small, green, greedy. TL1. Harm 3.' },
-    { name: 'Skeleton Knight', body: 'Animated armour, rusty blade. TL2. Harm 4.' },
-    { name: 'Thorn Dryad', body: 'Fey with bark skin and thorny vines. TL3. Harm 5.' },
-    { name: 'Cultist Emissary', body: 'Robed zealot, whispers of doom. TL2. Harm 3.' },
-    { name: 'Rust Wyrm', body: 'Mechanical beast, dripping corrosion. TL4. Harm 6.' }
-];
-
-const ADVERSARY_MOVES = [
-    { cost: 1, name: 'Flurry', effect: '+2 damage, +1 harm to self' },
-    { cost: 2, name: 'Grapple', effect: 'Target is held; must break free' },
-    { cost: 3, name: 'Sunder', effect: 'Destroy one piece of armour or shield' },
-    { cost: 4, name: 'Enrage', effect: '+1 to all actions, but vulnerable' }
-];
-
-const QUICK_TIMERS = [
-    { name: 'Ticking Clock', effect: '6 segments – after each round, advance one' },
-    { name: 'Ritual Progress', effect: '5 segments – at completion, summon boss' },
-    { name: 'Environmental Hazard', effect: '8 segments – area becomes unstable' }
-];
-
-// ============================================================
-// HELPER – check if current user is GM
-// ============================================================
-
-function isGM() {
-    if (!isConnectedToServer()) return true; // solo/local – allow all
-    return isGmLikeRole(getMyStoredRole());
-}
-
-// ============================================================
-// RENDER
-// ============================================================
+let loadVersion = 0;
+const ui = { view: 'library', selectedId: null, search: '', status: 'all', bestiarySearch: '', tl: 'all', targetId: '', drafts: {} };
+const isGM = () => !isConnectedToServer() || isGmLikeRole(getMyStoredRole());
+const encounters = () => getState().encounters || [];
+const findEncounter = id => encounters().find(e => String(e.id) === String(id));
 
 export async function render(el) {
     container = el;
-    
-    // Load bestiary data
+    const version = ++loadVersion;
+    draw();
     try {
         bestiaryData = await loadBestiaryData();
-        console.log(`[Encounters] Loaded ${bestiaryData.length} bestiary entries`);
         await loadWikiData();
-    } catch (e) {
-        console.warn('Bestiary data not available:', e);
-        bestiaryData = [];
-    }
-    filteredBestiary = bestiaryData;
-    loadStoryBeatsBank();
+        if (version === loadVersion && container && ui.view === 'bestiary') renderBestiary();
+    } catch (error) { console.warn('[Encounters] Bestiary unavailable', error); }
+}
 
-    const canEdit = isGM();
-
-    container.innerHTML = `
-        <style>
-            .encounters-layout { padding: 1rem; }
-            .encounters-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-            
-            /* Main grid: left column 2fr, right column 1fr */
-            .encounters-grid {
-                display: grid;
-                grid-template-columns: 2fr 1fr;
-                gap: 1.25rem;
-                align-items: start;
-                min-height: 70vh;
-            }
-            @media (max-width: 768px) {
-                .encounters-grid {
-                    grid-template-columns: 1fr;
-                    gap: 1rem;
-                }
-            }
-
-            /* Left column – stacked vertically */
-            .left-column {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                height: 100%;
-            }
-            /* Saved Encounters takes auto height */
-            .saved-encounters {
-                flex-shrink: 0;
-            }
-            /* Bestiary panel takes remaining height */
-            .bestiary-panel-wrapper {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                min-height: 300px; /* fallback */
-            }
-            .bestiary-panel-wrapper .panel {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-            }
-            .bestiary-panel-wrapper .bestiary-list-container {
-                flex: 1;
-                overflow-y: auto;
-                padding-inline-end: 0.25rem;
-            }
-
-            /* Right column – stacked panels */
-            .right-column {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .panel {
-                background: var(--bg-panel);
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                padding: 0.8rem;
-            }
-            .panel h4 {
-                margin: 0 0 0.3rem 0;
-                font-size: 1rem;
-            }
-
-            .encounter-item {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0.6rem 0.9rem;
-                background: var(--bg3);
-                border-radius: var(--radius);
-                border: 1px solid var(--border);
-                margin-bottom: 0.45rem;
-                transition: border-color 0.2s, background 0.2s;
-            }
-            .encounter-item:hover {
-                border-color: var(--gold);
-                background: var(--bg2);
-            }
-            .encounter-item.active {
-                border-inline-start: 4px solid var(--green);
-            }
-
-            .bestiary-filters {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.2rem;
-                margin-bottom: 0.4rem;
-                align-items: center;
-            }
-            .bestiary-list {
-                display: flex;
-                flex-direction: column;
-                gap: 0.35rem;
-                font-size: 0.8rem;
-            }
-            .bestiary-entry {
-                display: grid;
-                grid-template-columns: 1fr auto;
-                gap: 0.4rem;
-                align-items: center;
-                background: var(--bg3);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-sm);
-                padding: 0.45rem 0.6rem;
-                transition: border-color 0.2s, background 0.2s;
-            }
-            .bestiary-entry:hover {
-                border-color: var(--gold);
-                background: var(--bg2);
-            }
-            .bestiary-entry .entry-main {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                gap: 0.35rem;
-                min-width: 0;
-            }
-            .bestiary-entry .entry-actions {
-                display: flex;
-                gap: 0.25rem;
-            }
-
-            .sb-bank-display {
-                display: flex;
-                align-items: center;
-                gap: 0.4rem;
-                margin-bottom: 0.3rem;
-            }
-            .sb-bank-display input {
-                width: 50px;
-                text-align: center;
-                font-size: 0.8rem;
-                background: var(--bg2);
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                padding: 0.15rem;
-            }
-            .sb-move-card {
-                background: var(--bg2);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-sm);
-                padding: 0.3rem 0.5rem;
-                margin-bottom: 0.3rem;
-                font-size: 0.75rem;
-            }
-            .sb-move-card .cost {
-                color: var(--red);
-                font-weight: 700;
-            }
-            .creature-tag {
-                font-size: 0.65rem;
-                padding: 0.05rem 0.35rem;
-                border-radius: 12px;
-                background: var(--bg2);
-                color: var(--text2);
-                white-space: nowrap;
-            }
-            .tl-badge {
-                background: var(--red-glow, var(--bg2));
-                color: var(--red);
-            }
-            .class-badge {
-                background: var(--gold-glow, var(--bg2));
-                color: var(--gold);
-            }
-            .scale-table {
-                font-size: 0.7rem;
-                display: grid;
-                grid-template-columns: 0.6fr 1.4fr 0.8fr;
-                gap: 0.1rem 0.3rem;
-            }
-            .scale-table > div {
-                padding: 0.1rem 0.2rem;
-                border-bottom: 1px solid var(--border);
-            }
-
-            /* Quick adversary clickable */
-            .quick-adversary {
-                background: var(--bg3);
-                padding: 0.35rem 0.55rem;
-                border-radius: 4px;
-                margin-bottom: 0.3rem;
-                border-inline-start: 3px solid var(--gold);
-                cursor: pointer;
-                transition: background 0.15s;
-            }
-            .quick-adversary:hover {
-                background: var(--bg2);
-            }
-
-            .btn { transition: all 0.2s ease; }
-            .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-            .btn:active { transform: scale(0.96); }
-
-            /* Scrollbars */
-            .bestiary-list-container::-webkit-scrollbar,
-            #encounter-list::-webkit-scrollbar,
-            .right-column .panel > div:last-child::-webkit-scrollbar {
-                width: 6px;
-            }
-            .bestiary-list-container::-webkit-scrollbar-track,
-            #encounter-list::-webkit-scrollbar-track,
-            .right-column .panel > div:last-child::-webkit-scrollbar-track {
-                background: var(--bg3);
-                border-radius: 3px;
-            }
-            .bestiary-list-container::-webkit-scrollbar-thumb,
-            #encounter-list::-webkit-scrollbar-thumb,
-            .right-column .panel > div:last-child::-webkit-scrollbar-thumb {
-                background: var(--border);
-                border-radius: 3px;
-            }
-        </style>
-
-        <div class="encounters-layout">
-            <header class="encounters-header">
-                <div>
-                    <h1 class="page-title" style="margin:0;" data-i18n="feature.encounters.encounters">⚔️ Encounters</h1>
-                    <p class="page-sub" style="margin:0.2rem 0 0;" data-i18n="feature.encounters.buildEncountersTrackCombatAndReferenceAdversaries">Build encounters, track combat, and reference adversaries.</p>
-                </div>
-                ${canEdit ? `<button class="btn btn-gold" id="add-encounter-btn" data-i18n="feature.encounters.newEncounter">+ New Encounter</button>` : ''}
-            </header>
-
-            <div class="encounters-grid">
-                <!-- LEFT COLUMN -->
-                <div class="left-column">
-                    <!-- Saved Encounters -->
-                    <div class="saved-encounters panel">
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
-                            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-                                <h4 style="margin:0;" data-i18n="feature.encounters.savedEncounters">📋 Saved Encounters</h4>
-                                <input type="text" id="encounter-search" placeholder="🔍 Search…" style="font-size:0.8rem; padding:0.25rem 0.5rem; width:160px;" / data-i18n-attr="placeholder:feature.encounters.search">
-                            </div>
-                        </div>
-                        <div id="encounter-list" style="max-height:40vh; overflow-y:auto; padding-inline-end:0.25rem;"></div>
-                    </div>
-
-                    <!-- Bestiary Panel (large, takes remaining height) -->
-                    <div class="bestiary-panel-wrapper">
-                        <div class="panel">
-                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem;">
-                                <h4 style="margin:0;" data-i18n="feature.encounters.bestiary">📖 Bestiary</h4>
-                                <div style="display:flex; gap:0.3rem; align-items:center;">
-                                    <input type="text" id="bestiary-search" placeholder="Search…" style="font-size:0.75rem; padding:0.15rem 0.4rem; width:100px;" / data-i18n-attr="placeholder:feature.encounters.search_8tlzy">
-                                    <select id="bestiary-filter-tl" aria-label="Threat Level" style="font-size:0.7rem; padding:0.1rem 0.2rem;">
-                                        <option value="all" >All Threat Levels</option>
-                                        ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">TL ${n}</option>`).join('')}
-                                    </select>
-                                    <button class="btn btn-sm btn-ghost" id="bestiary-refresh" style="font-size:0.7rem; padding:0.1rem 0.4rem;">↻</button>
-                                </div>
-                            </div>
-                            <div class="bestiary-list-container">
-                                <div id="bestiary-list" class="bestiary-list"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RIGHT COLUMN -->
-                <div class="right-column">
-                    <!-- Quick Adversaries -->
-                    <div class="panel">
-                        <h4 data-i18n="feature.encounters.quickAdversaries">🃏 Quick Adversaries</h4>
-                        <div id="quick-adversaries" style="font-size:0.75rem; max-height:200px; overflow-y:auto; margin-top:0.3rem;"></div>
-                    </div>
-
-                    <!-- GM SB Bank -->
-                    <div class="panel">
-                        <h4 data-i18n="feature.encounters.gmSBBank">⚡ GM SB Bank</h4>
-                        <div class="sb-bank-display">
-                            <span style="font-size:0.8rem; color:var(--text2);">Bank:</span>
-                            <button class="btn btn-xs btn-ghost" id="sb-minus" style="font-weight:bold;">−</button>
-                            <input type="number" id="sb-bank-input" value="${gmStoryBeats}" min="0" />
-                            <button class="btn btn-xs btn-ghost" id="sb-plus" style="font-weight:bold;">+</button>
-                        </div>
-                        <div id="sb-default-moves" style="max-height:120px; overflow-y:auto; font-size:0.75rem; margin-top:0.3rem;"></div>
-                    </div>
-
-                    <!-- Threat Scale -->
-                    <div class="panel">
-                        <h4 data-i18n="feature.encounters.threatScale">📊 Threat Scale</h4>
-                        <div class="scale-table" style="margin-top:0.3rem;">
-                            <div><strong>TL</strong></div><div><strong>Role</strong></div><div><strong>Resilience</strong></div>
-                            <div>1</div><div>Fodder / pest</div><div>3 Std.</div>
-                            <div>2</div><div>Common threat</div><div>3 Std.</div>
-                            <div>3</div><div>Drop unarmored PC</div><div>3 Std.</div>
-                            <div>4</div><div>Elite / captain</div><div>8 Adv.</div>
-                            <div>5–6</div><div>Miniboss / Boss</div><div>8 Adv.</div>
-                            <div>7–8</div><div>Arch / named horror</div><div>8 /phase</div>
-                            <div>9</div><div>Cosmic / god-adjacent</div><div>8 /phase</div>
-                            <div>10</div><div>Cosmic / god-adjacent</div><div>🧩 Puzzle</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    renderQuickReference();
-    renderEncounters();
-    renderBestiary();
-    renderSBBank();
-    renderDefaultSBMoves();
+function draw() {
+    if (!container) return;
+    const selected = ui.selectedId == null ? null : findEncounter(ui.selectedId);
+    container.innerHTML = selected
+        ? renderScene({ ...selected, aftermath: ui.drafts[selected.id] ?? selected.aftermath }, isGM())
+        : renderShell(encounters(), ui, isGM());
+    if (!selected) { renderList(); renderBestiary(); }
     attachEvents();
 }
 
-// ============================================================
-// STORY BEAT BANK RENDER
-// ============================================================
-
-function renderSBBank() {
-    const input = document.getElementById('sb-bank-input');
-    if (input) input.value = gmStoryBeats;
+// Called by the editor and tracker when returning to this workspace.
+export function renderEncounters() { draw(); }
+function renderList() {
+    const list = container?.querySelector('#encounter-list');
+    if (list) list.innerHTML = renderLibrary(encounters(), ui, isGM());
 }
-
-function renderDefaultSBMoves() {
-    const el = document.getElementById('sb-default-moves');
-    if (!el) return;
-    
-    const moves = [
-        { cost: 1, name: 'Minor complication', effect: 'Tick a timer, leave a trace, or make a noise.' },
-        { cost: 2, name: 'Moderate complication', effect: 'Alarm raised, lose Position, lesser foe appears.' },
-        { cost: 3, name: 'Major complication', effect: 'Reinforcements, scene shift, or break an asset.' }
-    ];
-    
-    el.innerHTML = moves.map(m => `
-        <div class="sb-move-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:0.4rem;">
-                <strong>${escHtml(m.name)}</strong>
-                <button class="btn btn-xs btn-danger sb-spend-btn" data-cost="${m.cost}" data-label="${escHtml(m.name)}" style="font-size:0.65rem;">
-                    ${m.cost} SB
-                </button>
-            </div>
-            <div style="color:var(--text2);margin-top:0.15rem;">${escHtml(m.effect)}</div>
-        </div>
-    `).join('');
-    
-    el.querySelectorAll('.sb-spend-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const cost = parseInt(btn.dataset.cost, 10);
-            const label = btn.dataset.label;
-            spendStoryBeats(cost, label);
-        });
-    });
-}
-
-// ============================================================
-// RENDER QUICK REFERENCE
-// ============================================================
-
-function renderQuickReference() {
-    const advEl = document.getElementById('quick-adversaries');
-    if (advEl) {
-        advEl.innerHTML = QUICK_ADVERSARIES.map(a => `
-            <div class="quick-adversary" data-name="${escHtml(a.name)}" data-body="${escHtml(a.body)}">
-                <div style="font-weight:600;font-size:0.85rem;">${escHtml(a.name)}</div>
-                <div style="font-size:0.75rem;color:var(--text2);">${escHtml(a.body)}</div>
-            </div>
-        `).join('');
-        
-        advEl.querySelectorAll('.quick-adversary').forEach(el => {
-            el.addEventListener('click', () => {
-                createEncounterFromAdversary(el.dataset.name, el.dataset.body);
-            });
-        });
-    }
-}
-
-// ============================================================
-// RENDER ENCOUNTERS (with role‑based gating)
-// ============================================================
-
-export function renderEncounters() {
-    const el = document.getElementById('encounter-list');
-    if (!el) return;
-    const state = getState();
-    const encounters = state.encounters || [];
-    const canEdit = isGM();
-    
-    const search = document.getElementById('encounter-search')?.value?.toLowerCase() || '';
-    let filtered = encounters;
-    if (search) {
-        filtered = encounters.filter(e => 
-            (e.title || '').toLowerCase().includes(search) || 
-            (e.body || '').toLowerCase().includes(search)
-        );
-    }
-    
-    if (filtered.length === 0) {
-        el.innerHTML = `
-            <div style="text-align:center;padding:1.5rem;color:var(--text3);">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">⚔️</div>
-                <div>${encounters.length === 0 ? 'No encounters yet. Click "New Encounter" to start.' : 'No matches found.'}</div>
-            </div>
-        `;
-        return;
-    }
-    
-    el.innerHTML = filtered.map(e => {
-        const isActive = e.status === 'active';
-        const statusColor = isActive ? 'var(--green)' : 'var(--text2)';
-        const activeClass = isActive ? 'active' : '';
-        const tl = e.difficulty || 3;
-        const tlBadge = `<span class="creature-tag tl-badge" title="Difficulty / TL" data-i18n-attr="title:feature.encounters.difficultyTL">TL ${tl}</span>`;
-        const objType = getObjectiveType(e.type);
-        const objTypeBadge = `<span class="creature-tag" title="${escHtml(objType.description)}">${objType.icon} ${escHtml(objType.label)}</span>`;
-
-        let actionsHtml = '';
-        if (canEdit) {
-            actionsHtml = `
-                <button class="btn btn-xs btn-primary encounter-edit-btn" data-id="${e.id}" title="Edit">✏️</button>
-                <button class="btn btn-xs btn-green encounter-combat-btn" data-id="${e.id}" title="Combat Tracker">⚔️</button>
-                <button class="btn btn-xs btn-danger encounter-delete-btn" data-id="${e.id}" title="Delete">🗑️</button>
-            `;
-        } else {
-            actionsHtml = `<button class="btn btn-xs btn-primary bestiary-view-btn" data-name="${escHtml(safeName)}" title="Details">📄 Details</button>`;
-        }
-        
-        return `
-            <div class="encounter-item ${activeClass}" data-id="${e.id}">
-                <div class="info" style="flex:1;min-width:150px;cursor:pointer;" onclick="window.toggleEncounterBody('${e.id}')">
-                    <div class="name" style="font-weight:600;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-                        ${escHtml(e.title)}
-                        ${tlBadge}
-                        ${objTypeBadge}
-                        <span style="color:${statusColor};font-size:0.75rem;">${e.status || 'draft'}</span>
-                    </div>
-                    <div class="meta" style="font-size:0.8rem;color:var(--text2);">
-                        ${e.location || 'No location'} · ${e.adversaries?.length || 0} adversaries
-                    </div>
-                    <div id="enc-body-${e.id}" style="display:none;margin-top:0.4rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:4px;font-size:0.8rem;color:var(--text);border-inline-start:3px solid var(--gold);">
-                        ${escHtml(e.body || 'No description.')}
-                        ${e.adversaries && e.adversaries.length > 0 ? `
-                            <div style="margin-top:0.35rem;">
-                                <strong style="color:var(--gold);">Adversaries:</strong>
-                                ${e.adversaries.map(a => `<span class="creature-tag">${escHtml(a.name)}</span>`).join(' ')}
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-                <div class="actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    ${actionsHtml}
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    // Only attach events if GM
-    if (canEdit) {
-        el.querySelectorAll('.encounter-edit-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openEncounterEditor(btn.dataset.id);
-            });
-        });
-        el.querySelectorAll('.encounter-combat-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openCombatTracker(btn.dataset.id);
-            });
-        });
-        el.querySelectorAll('.encounter-delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteEncounterHandler(btn.dataset.id);
-            });
-        });
-    }
-}
-
-window.toggleEncounterBody = function(id) {
-    const el = document.getElementById('enc-body-' + id);
-    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-};
-
-// ============================================================
-// RENDER BESTIARY PANEL (unchanged – also GM‑only for add/open)
-// ============================================================
-
 function renderBestiary() {
-    const listEl = document.getElementById('bestiary-list');
-    if (!listEl) return;
-
-    const searchInput = document.getElementById('bestiary-search');
-    const tlSelect = document.getElementById('bestiary-filter-tl');
-    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    const tlFilter = tlSelect ? tlSelect.value : 'all';
-    filteredBestiary = bestiaryData.filter(entry => {
-        const name = (entry.name || '').toLowerCase();
-        const desc = (getCreatureDescription(entry) || '').toLowerCase();
-        const category = (entry.category || '').toLowerCase();
-        const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm) || category.includes(searchTerm);
-        const matchesTL = tlFilter === 'all' || parseInt(entry.tl, 10) === parseInt(tlFilter, 10);
-        return matchesSearch && matchesTL;
-    });
-
-    if (!bestiaryData || bestiaryData.length === 0) {
-        listEl.innerHTML = `
-            <div style="text-align:center;padding:1.5rem;color:var(--text3);">
-                <div style="font-size:1.5rem;margin-bottom:0.5rem;">📭</div>
-                <div>No bestiary data loaded.<br><small>Check that /data/bestiary.json exists.</small></div>
-            </div>
-        `;
-        return;
-    }
-
-    if (filteredBestiary.length === 0) {
-        listEl.innerHTML = `
-            <div style="text-align:center;padding:1.5rem;color:var(--text3);">
-                <div style="font-size:1.5rem;margin-bottom:0.5rem;">🔍</div>
-                <div>No creatures match your search or filters.</div>
-            </div>
-        `;
-        return;
-    }
-
-    const canEdit = isGM();
-
-    listEl.innerHTML = filteredBestiary.map(entry => {
-        const name = entry.name || 'Unnamed';
-        const safeName = name;
-        const tl = entry.tl != null ? `TL ${entry.tl}` : '';
-        const cls = entry.class || '';
-        const category = entry.category || '';
-        const description = getCreatureDescription(entry);
-
-        let actionsHtml = '';
-        if (canEdit) {
-            actionsHtml = `
-                <button class="btn btn-xs btn-primary bestiary-view-btn" data-name="${escHtml(safeName)}" title="Details">📄</button>
-                <button class="btn btn-xs btn-gold bestiary-add-adversary" data-name="${escHtml(safeName)}" title="Add to current encounter">+ Add</button>
-                <button class="btn btn-xs btn-green bestiary-open-tracker" data-name="${escHtml(safeName)}" title="Open Combat Tracker">🎯</button>
-            `;
-        } else {
-            actionsHtml = `<button class="btn btn-xs btn-primary bestiary-view-btn" data-name="${escHtml(safeName)}" title="Details">📄 Details</button>`;
-        }
-
-        return `
-            <div class="bestiary-entry" data-name="${escHtml(safeName)}">
-                <div class="entry-main">
-                    <span style="font-weight:600;font-size:0.9rem;min-width:0;overflow:hidden;text-overflow:ellipsis;">${escHtml(name)}</span>
-                    ${category ? `<span class="badge badge-${getCategoryBadgeColor(category)}" style="font-size:0.6rem;">${escHtml(category)}</span>` : ''}
-                    ${tl ? `<span class="creature-tag tl-badge">${escHtml(tl)}</span>` : ''}
-                    ${cls ? `<span class="creature-tag class-badge">Class ${escHtml(cls)}</span>` : ''}
-                    <span style="font-size:0.75rem;color:var(--text2);flex:1 1 100%;min-width:0;overflow:hidden;text-overflow:ellipsis;">${description ? escHtml(description.slice(0, 90)) + (description.length > 90 ? '…' : '') : ''}</span>
-                </div>
-                <div class="entry-actions">
-                    ${actionsHtml}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Reference material is readable in every role.
-    listEl.querySelectorAll('.bestiary-view-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const name = btn.dataset.name;
-                const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
-                if (entry) showCreatureDetail(entry, { readOnly: !canEdit });
-            });
-        });
-
-    if (canEdit) {
-        listEl.querySelectorAll('.bestiary-add-adversary').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const name = btn.dataset.name;
-                const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
-                if (entry) {
-                    addCreatureAsAdversary(entry);
-                    renderEncounters();
-                } else {
-                    showToast(i18nText("feature.encounters.creatureValueNotFound", { value0: name }, "❌ Creature \"{{value0}}\" not found."), 'error');
-                }
-            });
-        });
-
-        listEl.querySelectorAll('.bestiary-open-tracker').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const name = btn.dataset.name;
-                const entry = bestiaryData.find(e => (e.name || '').toLowerCase() === name.toLowerCase());
-                if (entry) {
-                    addCreatureAsAdversary(entry);
-                    const state = getState();
-                    const encounter = state.encounters.find(e => e.status === 'active') || state.encounters[state.encounters.length - 1];
-                    if (encounter) {
-                        openTracker(encounter.id);
-                    } else {
-                        showToast(i18nText("feature.encounters.couldNotFindEncounterToOpenTracker", null, "Could not find encounter to open tracker."), 'error');
-                    }
-                } else {
-                    showToast(i18nText("feature.encounters.creatureValueNotFound", { value0: name }, "❌ Creature \"{{value0}}\" not found."), 'error');
-                }
-            });
-        });
-    }
+    const list = container?.querySelector('#bestiary-list');
+    if (!list) return;
+    const query = ui.bestiarySearch.trim().toLowerCase();
+    const visible = bestiaryData.filter(e => [e.name, e.category, getCreatureDescription(e)].join(' ').toLowerCase().includes(query))
+        .filter(e => ui.tl === 'all' || String(e.tl) === ui.tl)
+        .map(e => ({ ...e, description: getCreatureDescription(e) }));
+    const target = findEncounter(ui.targetId);
+    list.innerHTML = renderCreatures(visible, isGM(), !!target && !target.archived && !target.trackerSession && target.status !== 'resolved');
 }
 
-// ============================================================
-// CREATURE DETAIL MODAL (with SB spends) – unchanged
-// ============================================================
-
-
-// ============================================================
-// ENCOUNTER OPERATIONS – all guarded by isGM()
-// ============================================================
-
-function createEncounterFromAdversary(name, body) {
-    if (!isGM()) {
-        showToast(i18nText("feature.encounters.onlyTheGMCanCreateEncounters", null, "Only the GM can create encounters."), 'error');
-        return;
-    }
-    const state = getState();
-    if (!state.encounters) state.encounters = [];
-    
-    const newEntry = {
-        id: 'enc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-        title: name,
-        body: body,
-        difficulty: 2,
-        location: '',
-        status: 'draft',
-        type: DEFAULT_OBJECTIVE_TYPE, // quick-add from bestiary is always a fight
-        adversaries: [{ name: name, body: body }],
-        created: Date.now()
-    };
-    state.encounters.push(newEntry);
-    saveState();
-    
-    try {
-        logToSession(`⚔️ Encounter created: ${newEntry.title}`, 'warning');
-        addVTTEvent('encounter_created', { 
-            name: newEntry.title, 
-            id: newEntry.id,
-            status: newEntry.status 
-        });
-    } catch (e) { /* ignore */ }
-    
-    renderEncounters();
-    showToast(i18nText("feature.encounters.createdEncounterFromValue", { value0: name }, "🃏 Created encounter from \"{{value0}}\""), 'success');
-}
-
-function deleteEncounterHandler(id) {
-    if (!isGM()) {
-        showToast(i18nText("feature.encounters.onlyTheGMCanDeleteEncounters", null, "Only the GM can delete encounters."), 'error');
-        return;
-    }
-    if (!confirm(i18nText("feature.encounters.deleteEncounter", null, "Delete encounter?"))) return;
-    const state = getState();
-    const encounter = state.encounters.find(e => e.id === id);
-    if (encounter) {
-        try {
-            logToSession(`🗑️ Encounter deleted: ${encounter.title}`, 'info');
-            addVTTEvent('encounter_deleted', { name: encounter.title, id: encounter.id });
-        } catch (e) { /* ignore */ }
-    }
-    state.encounters = (state.encounters || []).filter(e => e.id !== id);
-    saveState();
-    renderEncounters();
-    showToast(i18nText("feature.encounters.encounterDeleted", null, "Encounter deleted."), 'success');
-}
-
-export function openEncounterEditor(id) {
-    if (!isGM()) {
-        showToast(i18nText("feature.encounters.onlyTheGMCanEditEncounters", null, "Only the GM can edit encounters."), 'error');
-        return;
-    }
-    import('./editor.js').then(module => {
-        module.openEditor(id);
-    }).catch(err => {
-        console.error('Failed to load encounter editor:', err);
-        showToast(i18nText("feature.encounters.encounterEditorNotAvailable", null, "Encounter editor not available."), 'error');
-    });
+export async function openEncounterEditor(id) {
+    if (!isGM()) return showToast('Only the GM can edit encounters.', 'error');
+    ui.selectedId = id;
+    const editor = await import('./editor.js');
+    if (!isGM()) return;
+    editor.openEditor(id);
 }
 
 function openCombatTracker(id) {
-    if (!isGM()) {
-        showToast(i18nText("feature.encounters.onlyTheGMCanOpenTheCombat", null, "Only the GM can open the combat tracker."), 'error');
-        return;
-    }
-    import('./combat.js').then(module => {
-        module.openTracker(id);
-    }).catch(err => {
-        console.error('Failed to load combat tracker:', err);
-        showToast(i18nText("feature.encounters.combatTrackerNotAvailable", null, "Combat tracker not available."), 'error');
+    if (!isGM()) return showToast('Only the GM can run encounters.', 'error');
+    ui.selectedId = id;
+    openTracker(id).catch(error => showToast('Could not open tracker: ' + error.message, 'error'));
+}
+
+export function attachEvents() {
+    const root = container?.querySelector('.enc-workspace');
+    if (!root || root.dataset.bound) return;
+    root.dataset.bound = 'true';
+    root.addEventListener('input', event => {
+        if (event.target.id === 'encounter-search') { ui.search = event.target.value; renderList(); }
+        if (event.target.id === 'bestiary-search') { ui.bestiarySearch = event.target.value; renderBestiary(); }
+        if (event.target.name === 'aftermath') ui.drafts[event.target.closest('form').dataset.id] = event.target.value;
+    });
+    root.addEventListener('change', event => {
+        if (event.target.id === 'encounter-status') { ui.status = event.target.value; renderList(); }
+        if (event.target.id === 'bestiary-filter-tl') { ui.tl = event.target.value; renderBestiary(); }
+        if (event.target.id === 'encounter-target') { ui.targetId = event.target.value; renderBestiary(); }
+    });
+    root.addEventListener('submit', event => {
+        if (event.target.id !== 'enc-aftermath') return;
+        event.preventDefault();
+        if (!isGM()) return;
+        const encounter = findEncounter(event.target.dataset.id);
+        if (!encounter) return;
+        encounter.aftermath = String(new FormData(event.target).get('aftermath') || '').trim().slice(0,12000);
+        if (event.submitter?.name === 'resolve') encounter.status = 'resolved';
+        delete ui.drafts[encounter.id];
+        saveState(); draw(); showToast(event.submitter?.name === 'resolve' ? 'Encounter resolved. Session and notes preserved.' : 'Aftermath saved.', 'success');
+    });
+    root.addEventListener('click', event => {
+        const button = event.target.closest('[data-enc-action]');
+        if (!button || button.disabled) return;
+        const { encAction: action, id } = button.dataset;
+        if (action === 'view') { ui.view = id; ui.selectedId = null; draw(); return; }
+        if (action === 'back') { ui.selectedId = null; ui.view = 'library'; draw(); return; }
+        if (action === 'open') { ui.selectedId = id; draw(); return; }
+        if (action === 'creature') {
+            const creature = bestiaryData.find(e => e.name === id);
+            if (creature) showCreatureDetail(creature, { readOnly: true });
+            return;
+        }
+        // Recheck permissions at action time, not just while rendering controls.
+        if (!isGM()) return showToast('Only the GM can change encounters.', 'error');
+        if (action === 'new') return openEncounterEditor(null);
+        if (action === 'edit') return openEncounterEditor(id);
+        if (action === 'track') return openCombatTracker(id);
+        if (action === 'add-creature') {
+            const target = findEncounter(ui.targetId), creature = bestiaryData.find(e => e.name === id);
+            if (!target || !creature || target.archived || target.trackerSession || target.status === 'resolved') return showToast('Choose a draft target. Running encounters accept imports in their tracker.', 'warning');
+            (target.adversaries ||= []).push({ ...JSON.parse(JSON.stringify(creature)), body: getCreatureDescription(creature) });
+            saveState(); showToast(`${creature.name} added to ${target.title}.`, 'success'); return;
+        }
+        const encounter = findEncounter(id); if (!encounter) return;
+        if (action === 'clone') {
+            const copy = cloneEncounter(encounter, `enc_${generateId(20)}`);
+            getState().encounters.push(copy); ui.selectedId = copy.id;
+        }
+        if (action === 'archive') encounter.archived = !encounter.archived;
+        if (action === 'reopen') encounter.status = encounter.trackerSession ? 'active' : 'draft';
+        saveState(); draw();
     });
 }
 
-// ============================================================
-// EVENT LISTENERS
-// ============================================================
-
-export function attachEvents() {
-    const addBtn = document.getElementById('add-encounter-btn');
-    if (addBtn) {
-        const newBtn = addBtn.cloneNode(true);
-        addBtn.parentNode.replaceChild(newBtn, addBtn);
-        newBtn.addEventListener('click', () => {
-            openEncounterEditor(null);
-        });
-    }
-    
-    const search = document.getElementById('encounter-search');
-    if (search) {
-        search.addEventListener('input', renderEncounters);
-    }
-
-    const bestiarySearch = document.getElementById('bestiary-search');
-    if (bestiarySearch) {
-        bestiarySearch.addEventListener('input', renderBestiary);
-    }
-
-    const tlSelect = document.getElementById('bestiary-filter-tl');
-    if (tlSelect) {
-        tlSelect.addEventListener('change', renderBestiary);
-    }
-
-
-
-    const refreshBtn = document.getElementById('bestiary-refresh');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', async () => {
-            try {
-                bestiaryData = await loadBestiaryData({ refresh: true });
-                await loadWikiData();
-                renderBestiary();
-                showToast(i18nText("feature.encounters.bestiaryRefreshed", null, "Bestiary refreshed."), 'info');
-            } catch (e) {
-                showToast(i18nText("feature.encounters.failedToRefreshBestiary", null, "Failed to refresh bestiary."), 'error');
-            }
-        });
-    }
-
-    // SB bank controls (always available)
-    const sbMinus = document.getElementById('sb-minus');
-    const sbPlus = document.getElementById('sb-plus');
-    const sbInput = document.getElementById('sb-bank-input');
-
-    if (sbMinus) sbMinus.addEventListener('click', () => adjustStoryBeats(-1));
-    if (sbPlus) sbPlus.addEventListener('click', () => adjustStoryBeats(1));
-    if (sbInput) {
-        sbInput.addEventListener('change', () => {
-            const val = parseInt(sbInput.value, 10);
-            gmStoryBeats = isNaN(val) ? 0 : Math.max(0, val);
-            saveStoryBeatsBank();
-            renderSBBank();
-        });
-    }
-}
-
-// ============================================================
-// LIFECYCLE
-// ============================================================
-
-export function destroy() {
-    container = null;
-}
-
+export function destroy() { container = null; loadVersion++; closeEditor(); closeTracker(); }
 export function onActivate() {
-    // Dashboard's "Track" button and encounter-card click stash the target
-    // id here before navigating over — see js/features/dashboard/index.js.
-    const pendingTrackerId = sessionStorage.getItem('fe-pending-combat-tracker');
-    if (pendingTrackerId) {
-        sessionStorage.removeItem('fe-pending-combat-tracker');
-        openCombatTracker(pendingTrackerId);
-    }
-
-    const pendingEditorId = sessionStorage.getItem('fe-pending-encounter-editor');
-    if (pendingEditorId) {
-        sessionStorage.removeItem('fe-pending-encounter-editor');
-        openEncounterEditor(pendingEditorId);
+    for (const [key, open] of [['fe-pending-combat-tracker',openCombatTracker],['fe-pending-encounter-editor',openEncounterEditor]]) {
+        const id = sessionStorage.getItem(key);
+        if (id) { sessionStorage.removeItem(key); open(id); }
     }
 }
-
-export default {
-    render,
-    destroy,
-    attachEvents,
-    onActivate
-};
+export default { render, destroy, attachEvents, onActivate };

@@ -1,7 +1,13 @@
+@import '../js/features/crafting/workshop.css';
+@import '../js/features/encounters/workspace.css';
+@import '../js/features/wiki/library.css';
+
 /* ============================================================
    THEME SYSTEM – Color Tokens & Theme Switching
    ============================================================ */
 :root {
+    --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-code: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
     /* Base palette (dark) */
     --bg: #0f1117;
     --bg2: #161823;
@@ -3214,6 +3220,23 @@ body::before {
 .vtt-panel { margin-bottom: 0.7rem; }
 .vtt-panel:last-child { margin-bottom: 0; }
 
+.vtt-quick-nav { display:flex; flex-wrap:wrap; gap:0.35rem; padding:0.4rem; margin-block-end:0.75rem; background:var(--vtt-surface); border:1px solid var(--vtt-border); border-radius:8px; position:sticky; inset-block-start:0; z-index:5; }
+.vtt-quick-nav button { flex:1 1 auto; min-height:44px; }
+.vtt-live-table [id^="vtt-section-"] { scroll-margin-block-start:7rem; }
+.vtt-timer-form { display:grid; gap:0.75rem; margin-block-start:0.75rem; padding:0.75rem; border:1px solid var(--vtt-gold); border-radius:8px; }
+.vtt-timer-form label { display:grid; gap:0.3rem; }
+.vtt-timer-form input { width:100%; min-width:0; box-sizing:border-box; }
+@media (max-width:600px) {
+    .vtt-live-table .chat-input-row { display:grid !important; grid-template-columns:minmax(0,1fr) auto; }
+    .vtt-live-table #chatInput { grid-column:1 / -1; width:100%; min-width:0; box-sizing:border-box; }
+    .vtt-live-table input:not([type=checkbox]), .vtt-live-table select { min-width:0; max-width:100%; font-size:16px !important; min-height:44px; }
+    .vtt-live-table button { min-height:44px; }
+    .vtt-live-table .vtt-dice-row { flex-wrap:wrap; }
+    .vtt-live-table .vtt-field { min-width:0; }
+    .vtt-live-table .vtt-card-header { flex-wrap:wrap; }
+    .vtt-live-table .inline-check { flex:0 0 auto; white-space:nowrap; min-height:36px; }
+}
+
 /* --- chat --------------------------------------------------------------- */
 .chat-box { min-width: 0; }
 .chat-messages { gap: 0.35rem; }
@@ -4017,6 +4040,25 @@ body::before {
 
 .form-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
 .inline-check { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+.catalog-search { display:grid; gap:0.35rem; margin-block:0.75rem; font-size:0.85rem; }
+.catalog-search input { width:100%; min-width:0; box-sizing:border-box; min-height:44px; }
+#char-list .char-item { display:flex; flex-wrap:wrap; gap:0.75rem; padding:0.75rem; border:1px solid var(--border); border-radius:8px; }
+#char-list .char-item .name { font-weight:700; overflow-wrap:anywhere; }
+#char-list .char-item .meta { color:var(--text2); line-height:1.6; }
+#char-list .char-item .actions { display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; }
+#wizardModal .wizard-content { box-sizing:border-box; }
+#wizardModal .wizard-navigation { position:sticky; inset-block-end:0; background:var(--bg); padding-block-end:0.75rem; z-index:3; }
+@media (max-width:600px) {
+    #wizardModal .wizard-content { padding:0.75rem; }
+    #wizardModal .wizard-field-grid { grid-template-columns:minmax(0,1fr) !important; }
+    #wizardModal #wizard-progress { gap:0.25rem !important; flex-wrap:wrap; }
+    #wizardModal .wizard-progress-step { flex:1 1 28%; }
+    #wizardModal input:not([type=checkbox]):not([type=radio]), #wizardModal select, #wizardModal textarea, .catalog-search input { font-size:16px; max-width:100%; min-width:0; }
+    #wizardModal button, #char-list button, #talent-panel button { min-height:44px; }
+    #char-list .char-item>div:first-child { flex-basis:100% !important; }
+    #talent-panel>div:first-child>div { flex-wrap:wrap; min-width:0; }
+    #wizardModal .talent-catalog-item .talent-info { min-width:0; overflow-wrap:anywhere; }
+}
 .empty-chat-state, .empty-state { color: var(--text3); text-align: center; padding: 1.5rem 1rem; font-style: italic; }
 .preset-rolls { display: flex; gap: 0.3rem; flex-wrap: wrap; }
 .crafting-empty-note { color: var(--text3); font-style: italic; font-size: 0.85rem; }

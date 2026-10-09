@@ -196,6 +196,40 @@ function ensureStyles() {
     const style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = `
+        .spellcraft-context { display:flex; align-items:end; justify-content:space-between; gap:1rem; flex-wrap:wrap; padding:1rem; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); }
+        .spellcraft-context p { margin:0.25rem 0 0; color:var(--text2); font-size:0.85rem; }
+        .spellcraft-context-title { color:var(--gold); font-size:1.1rem; font-weight:700; }
+        .spellcraft-character-field { display:grid; gap:0.35rem; min-width:0; font-size:0.8rem; color:var(--text2); }
+        .spellcraft-character-field select { width:100%; max-width:340px; min-height:44px; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.5rem; }
+        .spellcraft-container, .spellcraft-header>*, .spellcraft-content-inner { min-width:0; }
+        .spellcraft-container .spellcraft-path-desc { white-space:normal; max-width:42rem; font-size:0.85rem; color:var(--text2); }
+        .spellcraft-container .spellcraft-path-select { min-height:44px; }
+        .spellcraft-container .spellcraft-tab { min-height:44px; padding:0.6rem 1rem; color:var(--text2); }
+        .spellcraft-container .spellcraft-tab.active { color:var(--text-inverse); }
+        .spellcraft-tab:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+        .spellcraft-tool-help { margin:0; padding:0.65rem 0; color:var(--text2); font-size:0.85rem; line-height:1.5; }
+        .spellcraft-error { padding:1.25rem; border:1px solid var(--red); border-radius:var(--radius); }
+        .spellcraft-error p { color:var(--text2); }
+        .spellcraft-path-settings { width:100%; }
+        .spellcraft-path-settings summary { padding:0.65rem 0; cursor:pointer; color:var(--text2); font-size:0.85rem; }
+        .spellcraft-path-settings>div { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; padding:0.5rem 0; }
+        .spellcraft-container .path-info-grid, .spellcraft-container .path-finder-grid, .spellcraft-empty .path-info-grid { grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr)); }
+        @media (max-width:700px) {
+            .spellcraft-context { align-items:stretch; }
+            .spellcraft-context p { display:none; }
+            .spellcraft-container .calculator-workspace, .spellcraft-container .monks-workspace { grid-template-columns:minmax(0,1fr) !important; }
+            .spellcraft-character-field { width:100%; }
+            .spellcraft-character-field select { max-width:none; }
+            .spellcraft-container input:not([type=checkbox]):not([type=radio]), .spellcraft-container select, .spellcraft-container textarea, .spellcraft-empty select { font-size:16px !important; max-width:100%; min-width:0 !important; }
+            .spellcraft-container button, .spellcraft-empty button { min-height:44px; }
+            .spellcraft-header>div { width:100%; }
+            .spellcraft-container .spellcraft-footer { grid-template-columns:1fr !important; font-size:0.8rem !important; }
+            .spellcraft-tabs { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.5rem !important; }
+            .spellcraft-tab { white-space:normal; text-align:center; }
+            .spellcraft-content { overflow-wrap:anywhere; }
+            .magic-tour-overlay { bottom:calc(80px + env(safe-area-inset-bottom)); }
+            .magic-tour-card { padding:1rem; max-height:60dvh; }
+        }
         .spellcraft-tab {
             position: relative;
             transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
@@ -535,6 +569,7 @@ let container = null;
 let eventListeners = [];
 let activeTab = 'spellbook';
 let renderToken = 0;
+let tourTimer = null;
 let isPathFinder = false;
 
 // ─── Tour state ──────────────────────────────────────────────
@@ -594,6 +629,26 @@ function buildPathSelectOptions(currentPath) {
         })
         .join('');
 }
+
+function renderCharacterContext(char) {
+    return `<section class="spellcraft-context" aria-label="Spellcraft character">
+        <div><div class="spellcraft-context-title">Spellcraft & Magic</div><p>Your character, their tradition, and the tools to work it.</p></div>
+        <label class="spellcraft-character-field" for="spellcraft-char-select">Active character
+            <select id="spellcraft-char-select">${(getState().characters || []).map(c => `<option value="${escHtml(c.id)}" ${c.id === char.id ? 'selected' : ''}>${escHtml(c.name || 'Unnamed')}</option>`).join('')}</select>
+        </label>
+    </section>`;
+}
+
+const TAB_HELP = {
+    spellbook: 'Keep and find this character’s spells. Path-specific tools are in the tabs alongside it.',
+    calculator: 'Build a spell from TAGS, review its difficulty and cost, then test or save it.',
+    rites: 'Explore the Rites available through this character’s Patron or Symbols.',
+    witchcraft: 'Work with Hedge Gifts, quick workings, and full rituals.',
+    cantor: 'Choose your songs and review the costs of giving them voice.',
+    psionics: 'Work with disciplines and keep an eye on Mental Strain.',
+    summoning: 'Manage summoned spirits, terms, and the Leash.',
+    monks: 'Choose a tradition and practice its techniques and meditation.'
+};
 
 // ============================================================
 // MAGIC PATHS TOUR
@@ -748,7 +803,8 @@ function checkMagicTour() {
     // Only show if not seen and character has no path or is on 'none'
     if (!getMagicTourSeen() && (char.magicPath === 'none' || !char.magicPath)) {
         // Small delay to let the UI render first
-        setTimeout(() => { if (container?.isConnected && !document.getElementById('fates-edge-product-tour')) showMagicTour(); }, 400);
+        clearTimeout(tourTimer);
+        tourTimer = setTimeout(() => { if (container?.isConnected && !document.getElementById('fates-edge-product-tour')) showMagicTour(); }, 400);
     }
 }
 
@@ -768,7 +824,7 @@ function renderNoCharacterView() {
 
             <div style="display:flex;gap:0.4rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
                 ${characters.length > 0 ? `
-                    <select id="spellcraft-char-select" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.6rem;font-size:0.85rem;min-width:220px;">
+                    <select id="spellcraft-char-select" aria-label="Active character" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.6rem;font-size:0.85rem;min-width:220px;">
                         <option value="" data-i18n="feature.spellcraft.chooseACharacter">— Choose a character —</option>
                         ${characters.map(c => {
                             const pathLabel = c.magicPath && c.magicPath !== 'none'
@@ -811,23 +867,13 @@ function renderNoCharacterView() {
     `;
 }
 
-function attachNoCharacterEvents() {
-    const select = document.getElementById('spellcraft-char-select');
-    if (select) {
-        select.addEventListener('change', () => {
-            const id = select.value;
-            if (!id) return;
-            vttStore.updateCharacters(getState().characters || []);
-            vttStore.selectCharacter(id);
-        });
-    }
-}
-
 // ============================================================
 // RENDER – Main
 // ============================================================
 
 export function render(el) {
+    ++renderToken;
+    clearTimeout(tourTimer);
     container = el;
     if (!container) return;
 
@@ -837,7 +883,6 @@ export function render(el) {
     if (!char) {
         container.innerHTML = renderNoCharacterView();
         attachEvents();
-        attachNoCharacterEvents();
         return;
     }
 
@@ -868,6 +913,8 @@ export function render(el) {
     container.innerHTML = `
         <div class="spellcraft-container" style="display:flex;flex-direction:column;gap:0.8rem;">
 
+            ${renderCharacterContext(char)}
+
             <!-- ─── Header ─────────────────────────────────────── -->
             <header class="spellcraft-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;border-bottom:2px solid var(--border);padding-bottom:0.5rem;">
                 <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
@@ -881,21 +928,21 @@ export function render(el) {
                         </div>
                     </div>
                 </div>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
-                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path" data-i18n-attr="title:feature.spellcraft.changeMagicPath">
+                <details class="spellcraft-path-settings" ${char.magicPath && char.magicPath !== 'none' ? '' : 'open'}><summary>Path settings & guide</summary><div>
+                    <select id="spellcraft-path-select" aria-label="Magic path" class="spellcraft-path-select" title="Change magic path" data-i18n-attr="title:feature.spellcraft.changeMagicPath">
                         ${pathOptionsHtml}
                     </select>
                     <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path" data-i18n-attr="title:feature.spellcraft.setMagicPath" data-i18n="feature.spellcraft.setPath">Set Path</button>
                     <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh" data-i18n-attr="title:feature.spellcraft.refresh">↻</button>
                     <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour" data-i18n-attr="title:feature.spellcraft.magicPathsTour" data-i18n="feature.spellcraft.tour">🎭 Tour</button>
-                </div>
+                </div></details>
             </header>
 
             <!-- ─── Tracks ─────────────────────────────────────── -->
             <div id="trackers-container" class="panel" style="padding:0.3rem 0.5rem;background:var(--bg2);border-radius:var(--radius);"></div>
 
             <!-- ─── Tabs ────────────────────────────────────────── -->
-            <div class="spellcraft-tabs" style="display:flex;gap:0.2rem;border-bottom:1px solid var(--border);padding-bottom:0.1rem;flex-wrap:wrap;">
+            <div class="spellcraft-tabs" role="tablist" aria-label="Magic tools" style="display:flex;gap:0.2rem;border-bottom:1px solid var(--border);padding-bottom:0.1rem;flex-wrap:wrap;">
                 ${renderTabButtons(tabs)}
             </div>
 
@@ -933,6 +980,8 @@ function renderPathFinder(char, name, pathMeta, patron) {
     container.innerHTML = `
         <div class="spellcraft-container" style="display:flex;flex-direction:column;gap:0.8rem;">
 
+            ${renderCharacterContext(char)}
+
             <!-- ─── Header ─────────────────────────────────────── -->
             <header class="spellcraft-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;border-bottom:2px solid var(--border);padding-bottom:0.5rem;">
                 <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
@@ -946,14 +995,14 @@ function renderPathFinder(char, name, pathMeta, patron) {
                         </div>
                     </div>
                 </div>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;">
-                    <select id="spellcraft-path-select" class="spellcraft-path-select" title="Change magic path" data-i18n-attr="title:feature.spellcraft.changeMagicPath">
+                <details class="spellcraft-path-settings" ${char.magicPath && char.magicPath !== 'none' ? '' : 'open'}><summary>Path settings & guide</summary><div>
+                    <select id="spellcraft-path-select" aria-label="Magic path" class="spellcraft-path-select" title="Change magic path" data-i18n-attr="title:feature.spellcraft.changeMagicPath">
                         ${pathOptionsHtml}
                     </select>
                     <button class="btn btn-sm btn-secondary" id="spellcraft-set-path" title="Set magic path" data-i18n-attr="title:feature.spellcraft.setMagicPath" data-i18n="feature.spellcraft.setPath">Set Path</button>
                     <button class="btn btn-sm btn-ghost" id="spellcraft-refresh" title="Refresh" data-i18n-attr="title:feature.spellcraft.refresh">↻</button>
                     <button class="btn btn-sm btn-secondary" id="show-magic-tour-btn" title="Magic Paths Tour" data-i18n-attr="title:feature.spellcraft.magicPathsTour" data-i18n="feature.spellcraft.tour">🎭 Tour</button>
-                </div>
+                </div></details>
             </header>
 
             <!-- ─── Path Finder Body ───────────────────────────── -->
@@ -1013,7 +1062,7 @@ function renderPathFinder(char, name, pathMeta, patron) {
                 </div>
 
                 <!-- ─── Tabs (Spellbook, + Witchcraft if hedge-gifted) ─────────── -->
-                <div class="spellcraft-tabs" style="display:flex;gap:0.2rem;border-bottom:1px solid var(--border);padding-bottom:0.1rem;flex-wrap:wrap;">
+                <div class="spellcraft-tabs" role="tablist" aria-label="Magic tools" style="display:flex;gap:0.2rem;border-bottom:1px solid var(--border);padding-bottom:0.1rem;flex-wrap:wrap;">
                     ${renderTabButtons(getAvailableTabs(char))}
                 </div>
 
@@ -1093,7 +1142,7 @@ function selectPathForCharacter(pathId) {
 
 function renderTabButtons(tabs) {
     return tabs.map(tab => `
-        <button class="spellcraft-tab btn btn-sm${activeTab === tab.id ? ' active' : ''}" data-tab="${tab.id}">
+        <button id="spellcraft-tab-${tab.id}" role="tab" aria-selected="${activeTab === tab.id}" aria-controls="spellcraft-content" tabindex="${activeTab === tab.id ? '0' : '-1'}" class="spellcraft-tab btn btn-sm${activeTab === tab.id ? ' active' : ''}" data-tab="${tab.id}">
             ${tab.icon} ${tab.label}
         </button>
     `).join('');
@@ -1108,7 +1157,7 @@ function hasHedgeAccess(char) {
         || (char.witch?.hedgeGifts || []).length > 0;
 }
 
-function getAvailableTabs(char) {
+export function getAvailableTabs(char) {
     const path = char.magicPath || 'none';
     const tabs = [];
 
@@ -1159,6 +1208,10 @@ export async function renderActiveTabContent() {
     if (!char) return;
 
     const myToken = ++renderToken;
+    contentEl.setAttribute('role', 'tabpanel');
+    contentEl.setAttribute('aria-labelledby', `spellcraft-tab-${activeTab}`);
+    contentEl.setAttribute('aria-busy', 'true');
+    contentEl.tabIndex = 0;
     contentEl.innerHTML = `<div class="spellcraft-loading">Loading…</div>`;
 
     const wrapper = document.createElement('div');
@@ -1167,7 +1220,7 @@ export async function renderActiveTabContent() {
     try {
         switch (activeTab) {
             case 'spellbook':
-                renderSpellbook(wrapper);
+                await renderSpellbook(wrapper);
                 break;
             case 'calculator':
                 await renderCalculator(wrapper);
@@ -1190,23 +1243,28 @@ export async function renderActiveTabContent() {
                 await renderSummoning(wrapper);
                 break;
             case 'monks':
-                renderMonks(wrapper);
+                await renderMonks(wrapper);
                 break;
             case 'witchcraft':
-                renderWitchcraft(wrapper, { fullMode: true });
+                await renderWitchcraft(wrapper, { fullMode: true });
                 break;
             default:
                 wrapper.innerHTML = `<p style="color:var(--text3);">Select a tab to view its content.</p>`;
         }
     } catch (err) {
         console.error(`Spellcraft: error rendering tab "${activeTab}":`, err);
-        wrapper.innerHTML = `<p style="color:var(--red);">Failed to load this tab. Check the console for details.</p>`;
+        wrapper.innerHTML = `<div class="spellcraft-error" role="alert"><h3>This tool could not load</h3><p>Try again or choose another tool.</p><button class="btn btn-secondary" id="spellcraft-retry">Try again</button></div>`;
     }
 
     if (myToken !== renderToken) return;
 
     contentEl.innerHTML = '';
+    const help = document.createElement('p');
+    help.className = 'spellcraft-tool-help';
+    help.textContent = TAB_HELP[activeTab] || '';
+    contentEl.appendChild(help);
     contentEl.appendChild(wrapper);
+    contentEl.setAttribute('aria-busy', 'false');
 }
 
 function renderAll() {
@@ -1243,6 +1301,8 @@ function renderAll() {
 }
 
 function switchTab(tabId) {
+    const char = getCharacterData({ silent: true });
+    if (!char || !getAvailableTabs(char).some(tab => tab.id === tabId)) return;
     if (tabId === activeTab) return;
     activeTab = tabId;
 
@@ -1250,6 +1310,8 @@ function switchTab(tabId) {
     if (tabsContainer) {
         tabsContainer.querySelectorAll('.spellcraft-tab').forEach(b => {
             b.classList.toggle('active', b.dataset.tab === activeTab);
+            b.setAttribute('aria-selected', String(b.dataset.tab === activeTab));
+            b.tabIndex = b.dataset.tab === activeTab ? 0 : -1;
         });
     }
 
@@ -1340,6 +1402,9 @@ function attachEvents() {
                 renderAll();
                 showToast(i18nText("feature.spellcraft.refreshed", null, "🔄 Refreshed"), 'info');
                 break;
+            case 'spellcraft-retry':
+                renderActiveTabContent();
+                break;
             case 'spellcraft-set-path':
                 setPathFromSelect();
                 break;
@@ -1352,6 +1417,26 @@ function attachEvents() {
     if (container) {
         container.addEventListener('click', clickHandler);
         eventListeners.push({ target: container, event: 'click', handler: clickHandler });
+        const keyHandler = e => {
+            const button = e.target.closest('.spellcraft-tab');
+            if (!button || !['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+            e.preventDefault();
+            const buttons = [...container.querySelectorAll('.spellcraft-tab')];
+            const rtl = getComputedStyle(button).direction === 'rtl';
+            const delta = (e.key === 'ArrowRight' ? 1 : -1) * (rtl ? -1 : 1);
+            const index = e.key === 'Home' ? 0 : e.key === 'End' ? buttons.length - 1 : (buttons.indexOf(button) + delta + buttons.length) % buttons.length;
+            switchTab(buttons[index].dataset.tab);
+            buttons[index].focus();
+        };
+        container.addEventListener('keydown', keyHandler);
+        eventListeners.push({target: container, event:'keydown', handler:keyHandler});
+        const characterHandler = e => {
+            if (e.target.id !== 'spellcraft-char-select' || !e.target.value) return;
+            vttStore.updateCharacters(getState().characters || []);
+            vttStore.selectCharacter(e.target.value);
+        };
+        container.addEventListener('change', characterHandler);
+        eventListeners.push({target: container, event:'change', handler:characterHandler});
     }
 
     // Handle path selection from dropdown (via the Set Path button)
@@ -1420,11 +1505,13 @@ function changeMagicPath() {
 // ============================================================
 
 export function destroy() {
+    ++renderToken;
+    clearTimeout(tourTimer);
+    eventListeners.forEach(({ target, event, handler }) => {
+        (target || container)?.removeEventListener(event, handler);
+    });
+    eventListeners = [];
     if (container) {
-        eventListeners.forEach(({ event, handler }) => {
-            container.removeEventListener(event, handler);
-        });
-        eventListeners = [];
         container.innerHTML = '';
         container = null;
     }

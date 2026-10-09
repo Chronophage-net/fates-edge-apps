@@ -32,9 +32,9 @@ To play with others, connect to a running [socket server](../fates-edge-socket-s
 - **Dice** — Fate's Edge resolution with position and boons, and Story Beat tracking.
 - **Encounters** — a combat/objective tracker with an integrated bestiary. Clocks aren't limited to Harm/Heal combat math — Obstruction, Skill Challenge, Trap/Ward, Lockpick, Heist, Social/Negotiation, and a freeform Custom type each get their own progress vocabulary and icon, with real combat's Harm/Fatigue/armor math strictly gated to actual fights.
 - **Timers** — visual timers for scene and campaign pressure.
-- **Docs & Wiki** — a searchable document viewer for the SRD, Essentials guide, and GM Screen, plus a Markdown wiki with an in-app editor.
+- **Docs & Wiki** — a searchable document viewer for the SRD, Essentials guide, and GM Screen, plus a responsive Markdown reference library. Combine search terms with category/region filters, browse personal or bundled entries, bookmark frequent references, and page through results. Use **Write an entry** for table lore or **Clone to my wiki** to customize a bundled reference. **Library tools & storage** reloads bundled material, restores hidden references, or clones the entire bundle; reload never replaces personal entries. Bookmarks and edits are saved in this browser; use Export Data for a backup.
 - **Search** — full-text search across the Wiki, documents, patrons, factions, and regions. Zero-config with a built-in local Fuse.js index; optionally backed by a self-hosted Solr or Elasticsearch instance for larger deployments (`window.__SOLR_URL` / `window.__ES_URL`/`__ES_API_KEY`, `window.__SEARCH_BACKEND` to force one when both are configured — see System Status for which one is actually active).
-- **Crafting** — the Codex (Talent-tier-priced magic items/artifacts, attunement and upkeep/decay tracking) and the crafting bench for ingredients and recipes, split out into its own tab so it isn't gated behind any one magic path.
+- **Crafting** — a project workshop for Provisions, Works, and Wonders, with ingredients, work rolls, partial-success choices, flaws and repairs, collection, and upkeep. The included Player's Guide, GM's Guide, and SRD describe the same system. The Codex retains Talent-tier-priced magic items/artifacts and attunement tracking.
 
 ### Spellcraft — the magic system
 

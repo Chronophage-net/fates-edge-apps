@@ -1,85 +1,19 @@
-/**
- * Crafting – The Bench and the Codex
- *
- * "A magic sword is not a toy. It is a creditor. It demands maintenance,
- * attention, and sometimes a blood-price. If you cannot afford the
- * upkeep, do not pick it up. The edge is not worth the interest."
- * – The Gray Wanderer
- *
- * ────────────────────────────────────────────────────────────────────────
- * WHY THIS IS ITS OWN TOP-LEVEL FEATURE (not a Spellcraft tab):
- * Crafting — foraging/buying ingredients, combining them, working recipes,
- * and browsing/attuning magic items — has nothing to do with any one
- * magic path. It used to live inside spellcraft/components/witchcraft.js
- * as a "Crafting Bench" section bolted onto the Witch's hedge-magic panel,
- * open to everyone but hidden behind a path-specific module. It is pulled
- * out here so it (a) shows up in its own sidebar slot, reachable without
- * detouring through Spellcraft, and (b) can grow independently of
- * witchcraft-specific concerns like Shadow/Shame/Identity Strain, Hedge
- * Gifts, or the Weaver. witchcraft.js now contains ONLY hedge-magic-
- * specific material.
- *
- * Character state lives under char.crafting (NOT char.witch) — a fresh,
- * dedicated namespace: { ingredients, crafted, attuned, log, forageCount }.
- * ────────────────────────────────────────────────────────────────────────
- *
- * MODULE LAYOUT (split out for size — this used to be one ~1000+ line
- * file mixing game data, state helpers, HTML templates, and event wiring):
- *   - data.js   — static game data (fallback ingredients/recipes/Codex)
- *                 and /data/wiki.json loading/parsing.
- *   - state.js  — character-side persisted-state accessors, plus the
- *                 pure attunement/upkeep/decay/forage-limit helpers
- *                 (exported here too, re-exported for backward
- *                 compatibility with existing test imports).
- *   - render.js — HTML templating only, no DOM/persistence/inline CSS.
- *   - index.js (this file) — orchestration: render(), event wiring,
- *                 action handlers (the only place that calls
- *                 saveCharacter/updateCharacter), and the module-level
- *                 'downtime-tick' listener.
- *
- * STYLING: all presentational CSS lives in css/app.css under
- * "CRAFTING FEATURE" (plus the app-wide .btn/.panel/.flex-between
- * component classes) — no inline `style="..."` attributes or `<style>`
- * blocks in the templates this module builds.
- *
- * ────────────────────────────────────────────────────────────────────────
- * THE CODEX (Item & Artifact reference + attunement tracking).
- * Fate's Edge's gear rules (Player's Guide ch. "Gear, Magic Items, and
- * Crafting", sections/items.tex) price magic items by Talent-equivalent
- * tier — Minor (2 XP), Major (4 XP), Prestige (6 XP), Epic (8 XP) — and
- * require paid upkeep each downtime for up to 3 attuned items, with a
- * Maintained → Neglected → Compromised decay track if upkeep is skipped.
- * Artifacts use Obligation instead of XP/upkeep and never decay. The
- * Codex tab is a browsable reference for sample items/consumables/
- * artifacts (loaded from /data/wiki.json, categories "magic_item" /
- * "consumable" / "artifact"), plus lightweight bookkeeping so a table
- * can actually track attunement and upkeep instead of doing it on paper.
- * ────────────────────────────────────────────────────────────────────────
- *
- * ────────────────────────────────────────────────────────────────────────
- * DECAY STATE & FORAGE LIMIT are both driven by a 'downtime-tick'
- * CustomEvent dispatched from js/features/factions/index.js's
- * "GM Downtime (Faction Turn)" button — see handleDowntimeTick() near
- * the bottom of this file. Each downtime: unpaid attuned items decay one
- * step (state.js applyDowntimeTick()), and every character's forage
- * attempt count resets to 0 (state.js resetForageCount()).
- * ────────────────────────────────────────────────────────────────────────
- */
-
+/** Crafting: project-based bench, collection, and Codex. Rules live in both Downtime guides. */
+import { renderWorkshop, renderCollection } from './workshop.js';
+import { projectsFor, createProject, resolveProjectRoll, choosePartial, completeProject, resolveGathering, toggleOwnedAttunement, payItemUpkeep } from './projects.js';
 import { t as i18nText } from '@core/i18n.js';
 import { vttStore } from '@core/vtt-store.js';
 import { getState, getCharacter, updateCharacter } from '@core/state.js';
-import { escHtml, generateId, safeParseInt } from '@core/utils.js';
+import { generateId } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
 import { performRoll } from '@core/dice.js';
 
 import {
-    ensureWikiLoaded, parseIngredientsFromWiki, parseRecipesFromWiki, parseCodexFromWiki
+    ensureWikiLoaded, parseRecipesFromWiki, parseCodexFromWiki
 } from './data.js';
 
 import {
-    getIngredients, getCraftedItems, getAttunedItems,
-    addToCraftingLog, availableXp,
+    getCraftedItems, getAttunedItems, availableXp,
     ATTUNEMENT_LIMIT, upkeepCostFor, intensiveUpkeepCostFor, canAttune,
     DECAY_ORDER, advanceDecay, itemRequiresUpkeep, applyDowntimeTick,
     FLAWS, flawById, wonderObligationFor,
@@ -87,7 +21,7 @@ import {
 } from './state.js';
 
 import {
-    renderRoot, renderCraftingTab, renderCodexTab, renderNoCharacterView, renderCraftResultToast
+    renderRoot, renderCodexTab, renderNoCharacterView
 } from './render.js';
 
 // Re-exported for tests (tests/unit/crafting.test.js,
@@ -109,34 +43,22 @@ let container = null;
 let lastCharId = null;
 
 const uiState = {
-    craftCombineSelection: [],
-    craftExpandedRecipe: null,
     codexTierFilter: 'all',
     codexCategoryFilter: 'magic_item',
     activeTab: 'crafting',
-    recipeSearchQuery: '',
-    recipeSkillFilter: 'all',
-    recipeTierFilter: 'all',
-    batchQuantity: 1
+    projectDraft: {}
 };
 
 // Parsed wiki data, rebuilt each render() and read by the delegated event
 // handlers. These used to be re-parsed from scratch inside the click handler
 // on EVERY click, which is both wasteful and unnecessary: render() has
 // already done exactly this work, and a click cannot change wiki.json.
-let refinementMap = {};
-let ingredientMap = {};
 let recipeMap = {};
 let codexMap = {};
 
 function resetUiStateIfCharChanged(char) {
     if (lastCharId !== char.id) {
-        uiState.craftCombineSelection = [];
-        uiState.craftExpandedRecipe = null;
-        uiState.batchQuantity = 1;
-        uiState.recipeSearchQuery = '';
-        uiState.recipeSkillFilter = 'all';
-        uiState.recipeTierFilter = 'all';
+        uiState.projectDraft = {};
         lastCharId = char.id;
     }
 }
@@ -190,17 +112,12 @@ export async function render(el) {
 
     const state = getState();
     const wikiEntries = state.wikiEntries || [];
-    ingredientMap = parseIngredientsFromWiki(wikiEntries);
     recipeMap = parseRecipesFromWiki(wikiEntries);
     codexMap = parseCodexFromWiki(wikiEntries);
 
-    refinementMap = {};
-    for (const [id, recipe] of Object.entries(recipeMap)) {
-        if (recipe.outputIngredient) refinementMap[id] = recipe;
-    }
-
     const tabContent = uiState.activeTab === 'crafting'
-        ? renderCraftingTab(char, ingredientMap, recipeMap, refinementMap, uiState)
+        ? renderWorkshop(char, recipeMap, uiState)
+        : uiState.activeTab === 'collection' ? renderCollection(char)
         : renderCodexTab(char, codexMap, uiState);
 
     container.innerHTML = renderRoot(char, tabContent, uiState);
@@ -227,278 +144,30 @@ function attachNoCharacterEvents() {
 // ACTIONS
 // ============================================================
 
-function forageIngredient(char, ingredientMap) {
-    if (!canForage(char)) {
-        return showToast(i18nText("feature.crafting.noForageAttemptsLeftThisDowntimeValue", { value0: FORAGE_LIMIT_PER_DOWNTIME, value1: FORAGE_LIMIT_PER_DOWNTIME }, "No forage attempts left this downtime ({{value0}}/{{value1}} used). Wait for the next GM Downtime."), 'warning');
-    }
-    const common = Object.values(ingredientMap).filter(i => i.common);
-    if (common.length === 0) return showToast(i18nText("feature.crafting.noCommonIngredientsDefined", null, "No common ingredients defined."), 'error');
-    const picked = common[Math.floor(Math.random() * common.length)];
-    const ingredients = getIngredients(char);
-    ingredients.push(picked.name);
-    const count = recordForageAttempt(char);
-    saveCharacter({ crafting: char.crafting });
-    showToast(i18nText("feature.crafting.foragedValueValueValueValueThisDowntime", { value0: picked.icon, value1: picked.name, value2: count, value3: FORAGE_LIMIT_PER_DOWNTIME }, "🌿 Foraged {{value0}} {{value1}} ({{value2}}/{{value3}} this downtime)"), 'success');
-    refreshPanel();
-}
-
-function purchaseIngredient(char, ingredientMap) {
-    const select = document.getElementById('craft-buy-select');
-    if (!select || !select.value) return showToast(i18nText("feature.crafting.chooseARareIngredientToBuyFirst", null, "Choose a rare ingredient to buy first."), 'error');
-    const picked = ingredientMap[select.value];
-    if (!picked) return showToast(i18nText("feature.crafting.ingredientNotFound", null, "Ingredient not found."), 'error');
-    if (availableXp(char) < picked.cost) return showToast(i18nText("feature.crafting.notEnoughXPNeedValueHaveValue", { value0: picked.cost, value1: availableXp(char) }, "Not enough XP. Need {{value0}}, have {{value1}}."), 'error');
-    char.xpSpent = (char.xpSpent || 0) + picked.cost;
-    const ingredients = getIngredients(char);
-    ingredients.push(picked.name);
-    saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-    showToast(i18nText("feature.crafting.purchasedValueValueForValueXP", { value0: picked.icon, value1: picked.name, value2: picked.cost }, "💰 Purchased {{value0}} {{value1}} for {{value2}} XP"), 'success');
-    refreshPanel();
-}
-
-function removeIngredientAt(char, index) {
-    const ingredients = getIngredients(char);
-    if (index < 0 || index >= ingredients.length) return;
-    const [removed] = ingredients.splice(index, 1);
-    char.crafting.ingredients = ingredients;
-    uiState.craftCombineSelection = uiState.craftCombineSelection.filter(i => i !== index).map(i => (i > index ? i - 1 : i));
-    saveCharacter({ crafting: char.crafting });
-    showToast(i18nText("feature.crafting.removedValue", { value0: removed }, "Removed {{value0}}."), 'info');
-    refreshPanel();
-}
-
-function toggleCombineSelect(index) {
-    const pos = uiState.craftCombineSelection.indexOf(index);
-    if (pos === -1) {
-        if (uiState.craftCombineSelection.length >= 3) return showToast(i18nText("feature.crafting.youCanCombineUpTo3Ingredients", null, "You can combine up to 3 ingredients at once."), 'warning');
-        uiState.craftCombineSelection.push(index);
-    } else {
-        uiState.craftCombineSelection.splice(pos, 1);
-    }
-    refreshPanel();
-}
-
-function combineIngredients(char, recipeMap) {
-    if (uiState.craftCombineSelection.length === 0) return showToast(i18nText("feature.crafting.checkAtLeastOneIngredientBelowTo", null, "Check at least one ingredient below to combine."), 'warning');
-    const ingredients = getIngredients(char);
-    const indices = [...new Set(uiState.craftCombineSelection)].filter(i => i >= 0 && i < ingredients.length).sort((a, b) => b - a);
-    const selectedNames = indices.map(i => ingredients[i]).reverse();
-    for (const i of indices) ingredients.splice(i, 1);
-    char.crafting.ingredients = ingredients;
-    uiState.craftCombineSelection = [];
-
-    let matchedRecipe = null;
-    for (const recipe of Object.values(recipeMap)) {
-        const recipeIngs = recipe.ingredients || [];
-        if (selectedNames.length > 0 && selectedNames.every(name => recipeIngs.some(r => r.toLowerCase() === name.toLowerCase()))) {
-            matchedRecipe = recipe;
-            break;
-        }
-    }
-
-    if (matchedRecipe) {
-        const crafted = getCraftedItems(char);
-        crafted.push({ id: generateId('crafted_'), name: matchedRecipe.name, effect: matchedRecipe.effect, quality: 'standard', uses: matchedRecipe.tier === 'standard' ? 2 : 1, recipe: matchedRecipe.id, icon: matchedRecipe.icon || '🔧', createdAt: Date.now() });
-        addToCraftingLog(char, { name: matchedRecipe.name, quality: 'standard', icon: matchedRecipe.icon });
-        saveCharacter({ crafting: char.crafting });
-        showToast(i18nText("feature.crafting.successfullyCraftedValueValue", { value0: matchedRecipe.icon, value1: matchedRecipe.name }, "⚗️ Successfully crafted {{value0}} {{value1}}!"), 'success');
-    } else {
-        const randomEffects = [
-            'A bubbly green liquid that smells of mint; drink it to restore 1 Fatigue.',
-            'A gray powder that sparkles; it can be thrown to create a flash of light (distract enemies).',
-            'A sticky tar that hardens on contact; can be used to patch a leak or jam a lock.',
-            'A sweet syrup that induces vivid dreams; take it to gain +1 die on a future Wits roll.',
-            'A bitter tonic that purges the system; removes one Poisoned condition (if any).'
-        ];
-        const effect = randomEffects[Math.floor(Math.random() * randomEffects.length)];
-        const crafted = getCraftedItems(char);
-        crafted.push({ id: generateId('crafted_'), name: '🧪 Unknown Concoction', effect, quality: 'flawed', uses: 1, recipe: null, icon: '🧪', createdAt: Date.now() });
-        addToCraftingLog(char, { name: 'Unknown Concoction', quality: 'flawed', icon: '🧪' });
-        saveCharacter({ crafting: char.crafting });
-        showToast(i18nText("feature.crafting.youCreatedAnUnknownConcoctionValue", { value0: effect }, "⚗️ You created an unknown concoction: {{value0}}"), 'info');
-    }
-    refreshPanel();
-}
-
-function craftFromRecipe(char, recipeMap, recipeId, quantity = 1) {
-    const recipe = recipeMap[recipeId];
-    if (!recipe) return showToast(i18nText("feature.crafting.recipeNotFound", null, "Recipe not found."), 'error');
-
-    const required = recipe.ingredients || [];
-    const ingredients = getIngredients(char);
-    const missing = required.filter(req => !ingredients.some(i => i.toLowerCase() === req.toLowerCase()));
-    const totalXpCost = recipe.xpCost * quantity;
-
-    if (availableXp(char) < totalXpCost) return showToast(i18nText("feature.crafting.notEnoughXPNeedValueHaveValue", { value0: totalXpCost, value1: availableXp(char) }, "Not enough XP. Need {{value0}}, have {{value1}}."), 'error');
-
-    // One roll for the whole batch (rolling per-item would be more
-    // granular but adds a lot of UI noise for little mechanical payoff).
-    const skillLevel = char.skills?.[recipe.skill] || 0;
-    const attr = recipe.skill === 'craft' ? 'wits' : 'spirit';
-    const attrValue = char[attr] || 1;
-    const pool = attrValue + skillLevel;
-    const dv = recipe.dv;
-
-    // MATERIALS SET POSITION, NOT DICE (SRD 6.9.2). Having what the recipe
-    // asks for is Dominant; missing some of it is Desperate; the rest is
-    // Controlled. There is deliberately no reagent arithmetic — the SRD is
-    // explicit that once the table starts subtracting petals from a list,
-    // the game has stopped being about the thing being made.
-    const position = missing.length === 0
-        ? (required.length > 0 ? 'dominant' : 'controlled')
-        : 'desperate';
-
-    // performRoll's signature is (attr, skill, dv, position, boons). This
-    // used to be called as performRoll(pool, dv) — which passed the pool as
-    // the attribute, the DV as the skill, and left the DV undefined, so
-    // every craft rolled pool+dv dice.
-    const result = performRoll(attrValue, skillLevel, dv, position);
-
-    let success = false, outcome = '', outcomeClass = 'failure', boons = 0, sbCount = 0;
-    if (result.successes >= dv) {
-        success = true;
-        sbCount = result.storyBeats || 0;
-        outcome = sbCount > 0 ? '✅ Success, with a Story Beat' : '✅ Clean Success';
-        outcomeClass = 'success';
-    } else if (result.successes > 0) {
-        outcome = '⚠️ Partial — the piece takes a Flaw';
-        outcomeClass = 'partial';
-        boons = 1;
-        sbCount = result.storyBeats || 0;
-    } else {
-        outcome = '❌ Miss';
-        sbCount = result.storyBeats || 1;
-        boons = 2;
-    }
-
-    const updates = {};
-    let appliedXpCost = 0;
-    let obligationMarked = 0;
-    if (success || outcome === '⚠️ Partial') {
-        char.xpSpent = (char.xpSpent || 0) + totalXpCost;
-        appliedXpCost = totalXpCost;
-        updates.xpSpent = char.xpSpent;
-    }
-    if (boons > 0) {
-        char.boons = Math.min(5, (char.boons || 0) + boons);
-        updates.boons = char.boons;
-    }
-
-    // Materials are NOT consumed by a subtraction. Under SRD 6.9.2 they set
-    // Position and nothing else, so the list a character keeps here is a
-    // record of what they have to hand, not a stock ledger to decrement.
-    // A Miss is where materials are lost, and that is the GM's call in the
-    // fiction, not an automatic splice.
-    const consumed = [];
-    updates.crafting = char.crafting;
-
-    const crafted = getCraftedItems(char);
-    const itemsCreated = [];
-    if (success || outcome === '⚠️ Partial') {
-        for (let i = 0; i < quantity; i++) {
-            const flaw = success ? null : FLAWS[Math.floor(Math.random() * FLAWS.length)];
-            const newItem = {
-                id: generateId('crafted_'),
-                name: recipe.name,
-                effect: recipe.effect,
-                quality: success ? 'standard' : 'flawed',
-                flaw: flaw ? { id: flaw.id, name: flaw.name, effect: flaw.effect } : null,
-                uses: recipe.tier === 'standard' ? 2 : 1,
-                recipe: recipe.id,
-                cost: recipe.xpCost || 0,
-                icon: recipe.icon || '🔧',
-                createdAt: Date.now()
-            };
-            crafted.push(newItem);
-            itemsCreated.push(newItem);
-        }
-        updates.crafting = char.crafting;
-        // A Wonder marks Obligation the moment it is finished (SRD 6.9.5) —
-        // you cannot make magic, only borrow it. A caster with no Patron
-        // marks it anyway; it goes to whatever answered.
-        obligationMarked = wonderObligationFor(recipe.xpCost) * quantity;
-        if (obligationMarked > 0) {
-            char.obligation = (char.obligation || 0) + obligationMarked;
-            updates.obligation = char.obligation;
-        }
-        if (itemsCreated.length > 0) {
-            addToCraftingLog(char, {
-                name: recipe.name,
-                quality: itemsCreated[0].quality,
-                flaw: itemsCreated[0].flaw ? itemsCreated[0].flaw.name : null,
-                icon: recipe.icon
-            });
-        }
-    } else {
-        addToCraftingLog(char, { name: `Failed: ${recipe.name}`, quality: 'failure', icon: '💥' });
-    }
-
-    saveCharacter(updates);
-    uiState.craftExpandedRecipe = null;
-
-    showToastWithHTML(renderCraftResultToast({
-        recipe, quantity, pool, dv, position, result, outcome, outcomeClass,
-        totalXpCost: appliedXpCost, boons, sbCount, consumed, missing, itemsCreated, obligationMarked
-    }));
-    refreshPanel();
-}
-
 function useCraftedItem(char, itemId) {
-    const crafted = getCraftedItems(char);
-    const item = crafted.find(c => c.id === itemId);
-    if (!item) return showToast(i18nText("feature.crafting.itemNotFound", null, "Item not found."), 'error');
-    showToast(i18nText("feature.crafting.usedValueValue", { value0: item.name, value1: item.effect || i18nText('feature.crafting.itemUsed', null, 'The item is used.') }, "🧪 Used \"{{value0}}\": {{value1}}"), 'success');
+    const item = getCraftedItems(char).find(i => String(i.id) === String(itemId));
+    if (!item || ['work', 'wonder'].includes(item.kind)) return;
     item.uses = (item.uses || 1) - 1;
-    if (item.uses <= 0) {
-        char.crafting.crafted = crafted.filter(c => c.id !== itemId);
-    }
+    if (item.uses <= 0) char.crafting.crafted = getCraftedItems(char).filter(i => String(i.id) !== String(itemId));
     saveCharacter({ crafting: char.crafting });
-    refreshPanel();
-}
-
-function removeCraftedItem(char, itemId) {
-    char.crafting.crafted = getCraftedItems(char).filter(c => c.id !== itemId);
-    saveCharacter({ crafting: char.crafting });
-    showToast(i18nText("feature.crafting.itemRemoved", null, "Item removed."), 'info');
-    refreshPanel();
-}
-
-// ─── Refinement actions ──────────────────────────────────────
-
-function refineIngredient(char, recipeMap, recipeId) {
-    const recipe = recipeMap[recipeId];
-    if (!recipe || !recipe.outputIngredient) return showToast(i18nText("feature.crafting.notARefinementRecipe", null, "Not a refinement recipe."), 'error');
-    const required = recipe.ingredients || [];
-    const ingredients = getIngredients(char);
-    const missing = required.filter(req => !ingredients.some(i => i.toLowerCase() === req.toLowerCase()));
-    if (missing.length > 0) return showToast(i18nText("feature.crafting.missingIngredientsValue", { value0: missing.join(', ') }, "Missing ingredients: {{value0}}"), 'error');
-    if (availableXp(char) < recipe.xpCost) return showToast(i18nText("feature.crafting.notEnoughXPNeedValue", { value0: recipe.xpCost }, "Not enough XP. Need {{value0}}."), 'error');
-
-    for (const req of required) {
-        const idx = ingredients.findIndex(i => i.toLowerCase() === req.toLowerCase());
-        if (idx !== -1) ingredients.splice(idx, 1);
-    }
-    ingredients.push(recipe.outputIngredient);
-    char.xpSpent = (char.xpSpent || 0) + recipe.xpCost;
-    addToCraftingLog(char, { name: recipe.outputIngredient, quality: 'refined', icon: recipe.icon });
-    saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-    showToast(i18nText("feature.crafting.refinedValueFromValue", { value0: recipe.outputIngredient, value1: required.join(', ') }, "⚗️ Refined {{value0}} from {{value1}}."), 'success');
+    showToast('Used ' + item.name + '. Apply its effect and any Flaws at the table.', 'success');
     refreshPanel();
 }
 
 // ─── Codex actions ─────────────────────────────────────────────
 
 function toggleAttune(char, codex, entryId) {
-    const entry = codex.find(e => e.id === entryId);
+    const entry = codex.find(e => String(e.id) === String(entryId));
     if (!entry) return showToast(i18nText("feature.crafting.itemNotFoundInTheCodex", null, "Item not found in the Codex."), 'error');
     const attuned = getAttunedItems(char);
-    const idx = attuned.findIndex(a => a.id === entryId);
+    const idx = attuned.findIndex(a => String(a.id) === String(entryId));
     if (idx !== -1) {
+        (char.crafting.releasedItems ||= {})[entryId] = { ...attuned[idx] };
         attuned.splice(idx, 1);
         showToast(i18nText("feature.crafting.brokeAttunementWithValue", { value0: entry.title }, "Broke attunement with {{value0}}."), 'info');
     } else {
-        if (!canAttune(attuned, entryId)) return showToast(i18nText("feature.crafting.alreadyAttunedToValueItemsBreakOne", { value0: ATTUNEMENT_LIMIT }, "Already attuned to {{value0}} items — break one first."), 'warning');
-        attuned.push({ id: entry.id, name: entry.title, cost: entry.cost, tier: entry.tier, icon: entry.icon, category: entry.category, condition: 'maintained', paidUpkeepThisDowntime: false, attunedAt: Date.now() });
+        if (!canAttune(attuned, entry.id)) return showToast(i18nText("feature.crafting.alreadyAttunedToValueItemsBreakOne", { value0: ATTUNEMENT_LIMIT }, "Already attuned to {{value0}} items — break one first."), 'warning');
+        attuned.push({ id: entry.id, name: entry.title, cost: entry.cost, tier: entry.tier, icon: entry.icon, category: entry.category, condition: 'maintained', paidUpkeepThisDowntime: false, attunedAt: Date.now(), ...char.crafting.releasedItems?.[entryId] });
         showToast(i18nText("feature.crafting.attunedToValue", { value0: entry.title }, "🔗 Attuned to {{value0}}."), 'success');
     }
     saveCharacter({ crafting: char.crafting });
@@ -506,32 +175,12 @@ function toggleAttune(char, codex, entryId) {
 }
 
 function payUpkeep(char, itemId, mode) {
-    const attuned = getAttunedItems(char);
-    const item = attuned.find(a => a.id === itemId);
-    if (!item) return showToast(i18nText("feature.crafting.itemNotFound", null, "Item not found."), 'error');
-
-    // Compromised items don't come back from paying upkeep — items.tex:
-    // "requires a quest to restore". Send the player to restoreCompromisedItem().
-    if (item.condition === 'compromised') {
-        return showToast(i18nText("feature.crafting.valueIsCompromisedUpkeepWonTFix", { value0: item.name }, "{{value0}} is Compromised — upkeep won't fix it. It requires a quest to restore."), 'warning');
-    }
-
-    if (mode === 'efficient') {
-        const cost = upkeepCostFor(item);
-        if (availableXp(char) < cost) return showToast(i18nText("feature.crafting.notEnoughXPForUpkeepNeedValue", { value0: cost }, "Not enough XP for upkeep. Need {{value0}}."), 'error');
-        char.xpSpent = (char.xpSpent || 0) + cost;
-        item.condition = 'maintained';
-        item.paidUpkeepThisDowntime = true;
+    try {
+        const cost = payItemUpkeep(char, itemId, mode);
         saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-        showToast(i18nText("feature.crafting.paidValueXPUpkeepForValue", { value0: cost, value1: item.name }, "💰 Paid {{value0}} XP upkeep for {{value1}}."), 'success');
-    } else {
-        char.xpSpent = (char.xpSpent || 0) + intensiveUpkeepCostFor(item);
-        item.condition = 'maintained';
-        item.paidUpkeepThisDowntime = true;
-        saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-        showToast(i18nText("feature.crafting.spentADowntimeSceneMaintainingValue", { value0: item.name }, "🕯️ Spent a downtime scene maintaining {{value0}}."), 'success');
-    }
-    refreshPanel();
+        showToast('Upkeep paid: ' + cost + ' XP' + (mode === 'intensive' ? ' and a downtime scene.' : '.'), 'success');
+        refreshPanel();
+    } catch (error) { showToast(error.message, 'error'); }
 }
 
 // Compromised items require a quest, not upkeep, to fix (items.tex).
@@ -540,7 +189,7 @@ function payUpkeep(char, itemId, mode) {
 // distinct from payUpkeep(), which is blocked for compromised items.
 function restoreCompromisedItem(char, itemId) {
     const attuned = getAttunedItems(char);
-    const item = attuned.find(a => a.id === itemId);
+    const item = attuned.find(a => String(a.id) === String(itemId));
     if (!item) return showToast(i18nText("feature.crafting.itemNotFound", null, "Item not found."), 'error');
     if (item.condition !== 'compromised') return showToast(i18nText("feature.crafting.valueIsnTCompromised", { value0: item.name }, "{{value0}} isn't Compromised."), 'info');
     item.condition = 'maintained';
@@ -551,18 +200,14 @@ function restoreCompromisedItem(char, itemId) {
 }
 
 function retireItem(char, itemId) {
-    const attuned = getAttunedItems(char);
-    const idx = attuned.findIndex(a => a.id === itemId);
-    if (idx === -1) return;
-    const [item] = attuned.splice(idx, 1);
-    const refund = Math.floor((item.cost || 0) / 2);
-    if (refund > 0) {
-        char.xpSpent = Math.max(0, (char.xpSpent || 0) - refund);
-    }
-    saveCharacter({ xpSpent: char.xpSpent, crafting: char.crafting });
-    showToast(refund > 0
-        ? i18nText('feature.crafting.retiredWithRefund', { item: item.name, refund }, 'Retired {{item}} — regained {{refund}} XP.')
-        : i18nText('feature.crafting.retired', { item: item.name }, 'Retired {{item}}.'), 'info');
+    const item = getAttunedItems(char).find(i => String(i.id) === String(itemId));
+    if (!item) return;
+    const owned = getCraftedItems(char).find(i => String(i.id) === String(itemId));
+    if (owned) owned.attunementState = { ...item };
+    else (char.crafting.releasedItems ||= {})[itemId] = { ...item };
+    char.crafting.attuned = getAttunedItems(char).filter(i => String(i.id) !== String(itemId));
+    saveCharacter({ crafting: char.crafting });
+    showToast('Attunement released after a quiet scene. No XP refunded.', 'info');
     refreshPanel();
 }
 
@@ -587,6 +232,10 @@ function handleDowntimeTick() {
         // Always reset — every character gets a fresh forage allowance
         // each downtime regardless of whether they have attuned items.
         resetForageCount(char);
+        for (const item of getCraftedItems(char)) {
+            if (item.attunementState) item.attunementState.paidUpkeepThisDowntime = false;
+        }
+        for (const item of Object.values(char.crafting.releasedItems || {})) item.paidUpkeepThisDowntime = false;
         updateCharacter(char.id, { crafting: char.crafting });
     }
     if (anyDecay) {
@@ -626,120 +275,109 @@ function currentChar() {
     return getCharacterData({ silent: true });
 }
 
+function persistBench(char) {
+    saveCharacter({ crafting: char.crafting, xpSpent: char.xpSpent || 0, obligation: char.obligation || 0, boons: char.boons || 0 });
+    refreshPanel();
+}
+
 function attachEvents() {
     if (!container) return;
-
-    // Re-bound every render: this button lives inside the replaced innerHTML,
-    // so its old listener goes away with the old element.
     const refreshBtn = document.getElementById('craft-refresh-btn');
-    if (refreshBtn) refreshBtn.addEventListener('click', async () => {
-        showToast(i18nText("feature.crafting.reloadingCraftingData", null, "🔄 Reloading crafting data…"), 'info');
-        await ensureWikiLoaded(true);
-        await refreshPanel();
-        showToast(i18nText("feature.crafting.craftingRefreshed", null, "✅ Crafting refreshed."), 'success');
-    });
-
+    refreshBtn?.addEventListener('click', async () => { await ensureWikiLoaded(true); await refreshPanel(); });
     if (container[BOUND_FLAG]) return;
     container[BOUND_FLAG] = true;
 
-    // Tab switching
-    container.addEventListener('click', (e) => {
-        const tabBtn = e.target.closest('.crafting-tab');
-        if (tabBtn) {
-            uiState.activeTab = tabBtn.dataset.tab;
+    container.addEventListener('input', e => {
+        if (e.target.closest('#bench-create')) uiState.projectDraft = Object.fromEntries(new FormData(e.target.closest('form')));
+    });
+    container.addEventListener('change', e => {
+        if (e.target.matches('#bench-create [name="kind"]')) {
+            uiState.projectDraft = Object.fromEntries(new FormData(e.target.closest('form')));
             refreshPanel();
         }
+        if (e.target.id === 'codex-tier-filter') { uiState.codexTierFilter = e.target.value; refreshPanel(); }
     });
-
-    // Search/filter/batch-quantity inputs
-    container.addEventListener('input', (e) => {
-        const search = e.target.closest('#recipe-search');
-        if (search) {
-            uiState.recipeSearchQuery = search.value;
-            return refreshPanel();
-        }
-        const batch = e.target.closest('#craft-batch-qty');
-        if (batch) {
-            let val = parseInt(batch.value, 10);
-            if (isNaN(val) || val < 1) val = 1;
-            if (val > 10) val = 10;
-            uiState.batchQuantity = val;
-            return refreshPanel();
-        }
+    container.addEventListener('submit', e => {
+        const form = e.target;
+        if (!form.matches('#bench-create, .bench-roll, .bench-gather-form, .bench-notes')) return;
+        e.preventDefault();
+        const char = currentChar(); if (!char) return;
+        const data = Object.fromEntries(new FormData(form));
+        try {
+            if (form.id === 'bench-create') {
+                createProject(char, data, `project_${generateId(20)}`);
+                uiState.projectDraft = {};
+                showToast('Project started. Agree each bench action with your GM.', 'success');
+            } else {
+                const project = projectsFor(char).find(p => p.id === form.closest('[data-project]').dataset.project);
+                if (!project) return;
+                if (form.matches('.bench-notes')) {
+                    project.materials = String(data.materials || '').trim().slice(0, 1000);
+                    showToast('Project notes saved.', 'success');
+                } else if (form.matches('.bench-gather-form')) {
+                    if (!canForage(char)) throw new Error('Already gathered this downtime.');
+                    const result = performRoll(Number(char.wits) || 1, Number(char.skills?.[data.skill]) || 0, Number(data.dv), data.position);
+                    const success = resolveGathering(char, project, result, Number(data.dv));
+                    showToast((success ? 'Right materials secured.' : 'No gathering advantage; agree the consequence with your GM.') + ' ' + result.storyBeats + ' SB to bank.', success ? 'success' : 'info');
+                } else {
+                    const bonus = Number(data.bonus);
+                    const attr = Number(char[data.attribute]) || 1;
+                    const skill = Number(char.skills?.[project.skill]) || 0;
+                    if (attr + skill + bonus < 1) throw new Error('The adjusted pool must contain at least one die.');
+                    const result = e.submitter?.name === 'manual'
+                        ? { successes: Number(data.successes), storyBeats: Number(data.storyBeats), dice: [] }
+                        : performRoll(attr + bonus, skill, project.dv, data.position);
+                    resolveProjectRoll(char, project, result, { attribute: data.attribute, position: data.position });
+                }
+            }
+            persistBench(char);
+        } catch (error) { showToast(error.message, 'error'); }
     });
-
-    container.addEventListener('change', (e) => {
-        const tierFilter = e.target.closest('#codex-tier-filter');
-        if (tierFilter) { uiState.codexTierFilter = tierFilter.value; return refreshPanel(); }
-
-        const skillFilter = e.target.closest('#recipe-skill-filter');
-        if (skillFilter) { uiState.recipeSkillFilter = skillFilter.value; return refreshPanel(); }
-
-        const tierFilterRecipes = e.target.closest('#recipe-tier-filter');
-        if (tierFilterRecipes) { uiState.recipeTierFilter = tierFilterRecipes.value; return refreshPanel(); }
-
-        const combineCheckbox = e.target.closest('[data-combine-idx]');
-        if (combineCheckbox) return toggleCombineSelect(parseInt(combineCheckbox.dataset.combineIdx, 10));
-    });
-
-    // Click actions (delegated)
-    container.addEventListener('click', async (e) => {
-        // Purely-visual toggles first: they need no character and no data, so
-        // they stay cheap and keep working even with no character selected.
-        const toggleRecipeBtn = e.target.closest('[data-toggle-recipe]');
-        if (toggleRecipeBtn) {
-            const id = toggleRecipeBtn.dataset.toggleRecipe;
-            uiState.craftExpandedRecipe = uiState.craftExpandedRecipe === id ? null : id;
-            return refreshPanel();
+    container.addEventListener('click', e => {
+        const tab = e.target.closest('.crafting-tab');
+        if (tab) { uiState.activeTab = tab.dataset.tab; return refreshPanel(); }
+        const category = e.target.closest('[data-codex-category]');
+        if (category) { uiState.codexCategoryFilter = category.dataset.codexCategory; return refreshPanel(); }
+        const char = currentChar(); if (!char) return;
+        const button = e.target.closest('[data-bench-action]');
+        if (button) {
+            try {
+                const action = button.dataset.benchAction;
+                const card = button.closest('[data-project]');
+                const project = projectsFor(char).find(p => p.id === card?.dataset.project);
+                const item = getCraftedItems(char).find(i => i.id === button.closest('[data-item]')?.dataset.item);
+                if (action === 'recipe') {
+                    const recipe = recipeMap[container.querySelector('#bench-recipe')?.value];
+                    if (!recipe) throw new Error('Choose a recipe first.');
+                    uiState.projectDraft = { kind: 'provision', name: recipe.outputIngredient || recipe.name, effect: recipe.effect || recipe.description, materials: (recipe.ingredients || []).join(', '), dv: recipe.dv };
+                    return refreshPanel();
+                }
+                if (action === 'partial-clean') choosePartial(char, project, 'clean');
+                if (action === 'partial-flaw') choosePartial(char, project, 'flaw', card.querySelector('[name="flaw"]').value);
+                if (action === 'finish') completeProject(char, project);
+                if (action === 'shelve') project.shelved = true;
+                if (action === 'resume') project.shelved = false;
+                if (action === 'attune') toggleOwnedAttunement(char, item.id);
+                if (action === 'repair') {
+                    createProject(char, { kind: 'repair', name: 'Repair: ' + item.name, targetId: item.id, flawId: button.dataset.flaw, effect: 'Remove the ' + button.dataset.flaw + ' Flaw.' }, `project_${generateId(20)}`);
+                    uiState.activeTab = 'crafting';
+                }
+                persistBench(char);
+            } catch (error) { showToast(error.message, 'error'); }
+            return;
         }
-
-        const clearCombineBtn = e.target.closest('#craft-clear-combine-btn');
-        if (clearCombineBtn) { uiState.craftCombineSelection = []; return refreshPanel(); }
-
-        const codexCategoryBtn = e.target.closest('[data-codex-category]');
-        if (codexCategoryBtn) { uiState.codexCategoryFilter = codexCategoryBtn.dataset.codexCategory; return refreshPanel(); }
-
-        const char = currentChar();
-        if (!char) return;
-
-        const forageBtn = e.target.closest('#craft-forage-btn');
-        if (forageBtn) return forageIngredient(char, ingredientMap);
-
-        const buyBtn = e.target.closest('#craft-buy-btn');
-        if (buyBtn) return buyIngredient(char, ingredientMap);
-
-        const combineBtn = e.target.closest('#craft-combine-btn');
-        if (combineBtn) return combineIngredients(char, recipeMap);
-
-        const removeIngBtn = e.target.closest('[data-remove-ingredient-idx]');
-        if (removeIngBtn) return removeIngredientAt(char, parseInt(removeIngBtn.dataset.removeIngredientIdx, 10));
-
-        const craftRecipeBtn = e.target.closest('[data-craft-recipe]');
-        if (craftRecipeBtn) return craftFromRecipe(char, recipeMap, craftRecipeBtn.dataset.craftRecipe, uiState.batchQuantity || 1);
-
-        const refineBtn = e.target.closest('[data-refine-recipe]');
-        if (refineBtn) return refineIngredient(char, recipeMap, refineBtn.dataset.refineRecipe);
-
-        const useCraftedBtn = e.target.closest('[data-use-crafted]');
-        if (useCraftedBtn) return useCraftedItem(char, useCraftedBtn.dataset.useCrafted);
-
-        const removeCraftedBtn = e.target.closest('[data-remove-crafted]');
-        if (removeCraftedBtn) return removeCraftedItem(char, removeCraftedBtn.dataset.removeCrafted);
-
-        const attuneBtn = e.target.closest('[data-toggle-attune]');
-        if (attuneBtn) return toggleAttune(char, codexMap, safeParseInt(attuneBtn.dataset.toggleAttune, 0));
-
-        const payUpkeepBtn = e.target.closest('[data-pay-upkeep]');
-        if (payUpkeepBtn) return payUpkeep(char, payUpkeepBtn.dataset.payUpkeep, 'efficient');
-
-        const sceneUpkeepBtn = e.target.closest('[data-scene-upkeep]');
-        if (sceneUpkeepBtn) return payUpkeep(char, sceneUpkeepBtn.dataset.sceneUpkeep, 'intensive');
-
-        const retireBtn = e.target.closest('[data-retire-item]');
-        if (retireBtn) return retireItem(char, retireBtn.dataset.retireItem);
-
-        const restoreBtn = e.target.closest('[data-restore-item]');
-        if (restoreBtn) return restoreCompromisedItem(char, restoreBtn.dataset.restoreItem);
+        const use = e.target.closest('[data-use-crafted]');
+        if (use) return useCraftedItem(char, use.dataset.useCrafted);
+        const attune = e.target.closest('[data-toggle-attune]');
+        if (attune) return toggleAttune(char, codexMap, attune.dataset.toggleAttune);
+        const pay = e.target.closest('[data-pay-upkeep]');
+        if (pay) return payUpkeep(char, pay.dataset.payUpkeep, 'efficient');
+        const scene = e.target.closest('[data-scene-upkeep]');
+        if (scene) return payUpkeep(char, scene.dataset.sceneUpkeep, 'intensive');
+        const release = e.target.closest('[data-retire-item]');
+        if (release) return retireItem(char, release.dataset.retireItem);
+        const restore = e.target.closest('[data-restore-item]');
+        if (restore) return restoreCompromisedItem(char, restore.dataset.restoreItem);
     });
 }
 
@@ -747,23 +385,6 @@ function attachEvents() {
 // TOAST WITH HTML (roll-outcome readout, non-blocking)
 // ============================================================
 
-function showToastWithHTML(html) {
-    const existing = document.querySelector('.custom-toast-modal');
-    if (existing) existing.remove();
-
-    const modal = document.createElement('div');
-    modal.className = 'custom-toast-modal';
-    const inner = document.createElement('div');
-    inner.className = 'custom-toast-modal-inner';
-    inner.innerHTML = html;
-    modal.appendChild(inner);
-    document.body.appendChild(modal);
-
-    const closeBtn = inner.querySelector('.craft-result-close');
-    if (closeBtn) closeBtn.addEventListener('click', () => modal.remove());
-
-    setTimeout(() => { if (modal.parentNode) modal.remove(); }, 10000);
-}
 
 // ============================================================
 // EXPORT

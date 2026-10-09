@@ -12,6 +12,9 @@ import { showToast } from '@components/Toast.js';
 import { openTracker } from './combat.js';
 import { loadBestiaryData, getCreatureDescription } from './bestiary.js';
 import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '@core/objective-types.js';
+import { getMyStoredRole, isGmLikeRole } from '@core/feature-toggles.js';
+import { isConnectedToServer } from '@core/websocket.js';
+const canEdit = () => !isConnectedToServer() || isGmLikeRole(getMyStoredRole());
 
 let modal = null;
 let editingId = null;
@@ -49,6 +52,7 @@ function tlToMaxHarm(tl) {
 // ============================================================
 
 export function openEditor(id) {
+    if (!canEdit()) return showToast('Only the GM can edit encounters.', 'error');
     closeEditor();
 
     const state = getState();
@@ -63,7 +67,7 @@ export function openEditor(id) {
         isNew = false;
     } else {
         encounter = {
-            id: generateId('enc_'),
+            id: `enc_${generateId(20)}`,
             title: '',
             body: '',
             difficulty: 3,
@@ -101,7 +105,7 @@ export function closeEditor() {
 
 function renderEditor(encounter) {
     modal = document.createElement('div');
-    modal.className = 'editor-screen-host';
+    modal.className = 'editor-screen-host enc-editor';
     modal.style.cssText = `width:100%;padding:1rem 0;`;
 
     const advRows = (encounter.adversaries || []).map((a, i) => `
@@ -128,22 +132,22 @@ function renderEditor(encounter) {
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
-                <label data-i18n="feature.encounters.editor.title">Title *</label>
+                <label for="enc-title" data-i18n="feature.encounters.editor.title">Title *</label>
                 <input id="enc-title" value="${attr(encounter.title)}" placeholder="Encounter name" style="width:100%;" />
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
-                <label data-i18n="feature.encounters.editor.description">Description</label>
+                <label for="enc-body" data-i18n="feature.encounters.editor.description">Description</label>
                 <textarea id="enc-body" rows="3" placeholder="Describe the encounter..." style="width:100%;" data-i18n-attr="placeholder:feature.encounters.editor.describeTheEncounter">${attr(encounter.body || '')}</textarea>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
                 <div class="form-group">
-                    <label data-i18n="feature.encounters.editor.threatLevel110">Threat Level (1-10)</label>
+                    <label for="enc-difficulty" data-i18n="feature.encounters.editor.threatLevel110">Threat Level (1-10)</label>
                     <input type="number" id="enc-difficulty" value="${encounter.difficulty || 3}" min="1" max="10" />
                 </div>
                 <div class="form-group">
-                    <label data-i18n="feature.encounters.editor.location">Location</label>
+                    <label for="enc-location" data-i18n="feature.encounters.editor.location">Location</label>
                     <input id="enc-location" value="${attr(encounter.location || '')}" placeholder="Where?" />
                 </div>
             </div>
@@ -152,7 +156,7 @@ function renderEditor(encounter) {
                 <label title="What kind of clock is this? Combat keeps its real Harm/Fatigue/armor math; every other type is a labeled progress/setback track for the appropriate scene — a heist, a lock, a negotiation, etc." data-i18n-attr="title:feature.encounters.editor.whatKindOfClockIsThisCombat">
                     Objective Type
                 </label>
-                <select id="enc-objective-type">
+                <select id="enc-objective-type" aria-label="Objective type">
                     ${Object.entries(OBJECTIVE_TYPES).map(([id, t]) => `
                         <option value="${attr(id)}" ${(encounter.type || DEFAULT_OBJECTIVE_TYPE) === id ? 'selected' : ''}>
                             ${t.icon} ${escHtml(t.label)} — ${escHtml(t.description)}
@@ -164,23 +168,26 @@ function renderEditor(encounter) {
             <div id="enc-custom-fields" style="display:${(encounter.type || DEFAULT_OBJECTIVE_TYPE) === 'custom' ? 'grid' : 'none'};grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
                 <div class="form-group">
                     <label data-i18n="feature.encounters.editor.timerLabel">Timer Label</label>
-                    <input id="enc-custom-label" value="${attr(encounter.customLabel || '')}" placeholder="e.g. Ritual Completion" style="width:100%;" />
+                    <input id="enc-custom-label" aria-label="Timer label" value="${attr(encounter.customLabel || '')}" placeholder="e.g. Ritual Completion" style="width:100%;" />
                 </div>
                 <div class="form-group">
                     <label data-i18n="feature.encounters.editor.tickLabel">Tick Label</label>
-                    <input id="enc-custom-tick-label" value="${attr(encounter.customTickLabel || '')}" placeholder="e.g. chant" style="width:100%;" />
+                    <input id="enc-custom-tick-label" aria-label="Tick label" value="${attr(encounter.customTickLabel || '')}" placeholder="e.g. chant" style="width:100%;" />
                 </div>
             </div>
 
             <div class="form-group" style="margin-bottom:0.8rem;">
                 <label data-i18n="feature.encounters.editor.status">Status</label>
-                <select id="enc-status">
+                <select id="enc-status" aria-label="Encounter status">
                     <option value="draft" ${encounter.status === 'draft' ? 'selected' : ''}>Draft</option>
                     <option value="active" ${encounter.status === 'active' ? 'selected' : ''}>Active</option>
                     <option value="resolved" ${encounter.status === 'resolved' ? 'selected' : ''}>Resolved</option>
                 </select>
             </div>
 
+            <label class="enc-field"><span>Stakes · objective and cost of failure</span><textarea id="enc-stakes" rows="3" maxlength="4000" placeholder="Stop the ritual before the harbor floods. If they fail…">${escHtml(encounter.stakes || '')}</textarea></label>
+            <label class="enc-field"><span>GM notes · private preparation</span><textarea id="enc-gm-notes" rows="3" maxlength="8000" placeholder="Motives, secrets, clues, and escalation…">${escHtml(encounter.gmNotes || '')}</textarea></label>
+            ${encounter.trackerSession ? '<p class="enc-muted">This encounter has a saved session. Preparation edits do not reset the live roster; add live creatures inside the tracker.</p>' : ''}
             <div style="margin-bottom:0.8rem;">
                 <label style="display:block;margin-bottom:0.3rem;" data-i18n="feature.encounters.editor.adversaries">Adversaries</label>
                 <div id="adv-list">${advRows}</div>
@@ -216,8 +223,8 @@ function renderEditor(encounter) {
             const state = getState();
             const enc = state.encounters.find(e => String(e.id) === String(editingId));
             if (enc) {
-                openTracker(enc.id);
                 closeEditor();
+                openTracker(enc.id);
             }
         }
     });
@@ -338,6 +345,7 @@ async function importFromBestiary() {
                 div.className = 'adv-row';
                 div.style.cssText = 'display:flex;gap:0.35rem;margin:0.3rem 0;align-items:center;flex-wrap:wrap;';
                 div.innerHTML = `
+                    <input type="hidden" class="adv-original" value="${attr(JSON.stringify(entry))}" />
                     <input type="text" class="adv-name" placeholder="Name" value="${attr(entry.name)}" style="flex:2;min-width:120px;" />
                     <input type="text" class="adv-body" placeholder="Description / stats" value="${attr(getCreatureDescription(entry))}" style="flex:3;min-width:150px;" />
                     <input type="hidden" class="adv-tl" value="${entry.tl !== undefined ? attr(String(entry.tl)) : ''}" />
@@ -369,6 +377,7 @@ async function importFromBestiary() {
 // ============================================================
 
 function saveEditor(baseEncounter, silent = false) {
+    if (!canEdit()) { showToast('Only the GM can save encounter changes.', 'error'); return false; }
     const title = document.getElementById('enc-title')?.value.trim();
     if (!title) {
         if (!silent) {
@@ -390,11 +399,13 @@ function saveEditor(baseEncounter, silent = false) {
     const customTickLabel = document.getElementById('enc-custom-tick-label')?.value.trim() || '';
 
     const adversaries = [];
-    document.querySelectorAll('.adv-row').forEach(row => {
+    modal.querySelectorAll('.adv-row').forEach(row => {
         const name = row.querySelector('.adv-name')?.value.trim();
         if (name) {
             const tlVal = row.querySelector('.adv-tl')?.value.trim();
             adversaries.push({
+                ...(baseEncounter.adversaries?.[row.dataset.index] || {}),
+                ...safeJsonParse(row.querySelector('.adv-original')?.value || '{}', {}),
                 name,
                 body: row.querySelector('.adv-body')?.value.trim() || '',
                 tl: tlVal ? safeParseInt(tlVal, undefined) : undefined,
@@ -412,7 +423,7 @@ function saveEditor(baseEncounter, silent = false) {
     let saved = false;
     if (isNew) {
         const newEnc = {
-            id: baseEncounter.id || generateId('enc_'),
+            id: baseEncounter.id || `enc_${generateId(20)}`,
             title,
             body,
             difficulty,
@@ -452,6 +463,8 @@ function saveEditor(baseEncounter, silent = false) {
     }
 
     if (saved) {
+        currentEncounter.stakes = modal.querySelector('#enc-stakes')?.value.trim() || '';
+        currentEncounter.gmNotes = modal.querySelector('#enc-gm-notes')?.value.trim() || '';
         saveState();
         if (!silent) {
             closeEditor();

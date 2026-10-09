@@ -1,0 +1,45 @@
+.enc-workspace { max-width:1240px; margin-inline:auto; }
+.enc-hero { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; padding:1.6rem; margin-block:1rem 1.5rem; background:linear-gradient(125deg,var(--bg2),var(--bg3)); border:1px solid var(--border); border-radius:14px; }
+.enc-hero h1 { color:var(--gold); margin:.4rem 0; font-size:clamp(1.8rem,3vw,2.8rem); overflow-wrap:anywhere; }
+.enc-hero p { color:var(--text2); line-height:1.6; }
+.enc-hero-actions { display:flex; flex-direction:column; gap:.7rem; align-items:flex-start; }
+.enc-kicker { font-size:.72rem; font-weight:700; letter-spacing:.09em; color:var(--gold); text-transform:uppercase; }
+.enc-tabs,.enc-row { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap; }
+.enc-tabs { justify-content:flex-start; margin-block:1rem; }
+.enc-tools { display:grid; grid-template-columns:minmax(0,2fr) minmax(160px,1fr); gap:1rem; }
+.enc-field { display:flex; flex-direction:column; gap:.45rem; margin-block:.7rem; font-size:.85rem; min-width:0; }
+.enc-field input,.enc-field select,.enc-field textarea { padding:.75rem; border:1px solid var(--border); background:var(--bg); color:var(--text); border-radius:7px; font:inherit; width:100%; box-sizing:border-box; min-width:0; }
+.enc-field textarea { resize:vertical; }
+.enc-card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr)); gap:1rem; }
+.enc-card,.enc-section,.enc-empty { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.25rem; overflow-wrap:anywhere; }
+.enc-card { display:flex; flex-direction:column; gap:.35rem; border-block-start:2px solid var(--gold); }
+.enc-card h2,.enc-section h2 { font-size:1.2rem; margin:.45rem 0 .8rem; }
+.enc-card-foot { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-block-start:auto; padding-block-start:.75rem; border-block-start:1px solid var(--border); font-size:.8rem; }
+.enc-muted { color:var(--text2); font-size:.85rem; line-height:1.6; }
+.enc-chip { color:var(--text2); border:1px solid var(--border); border-radius:18px; padding:.3rem .65rem; font-size:.75rem; }
+.enc-clamp { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; line-height:1.6; color:var(--text2); }
+.enc-empty { padding:3rem 1rem; text-align:center; border-style:dashed; }
+.enc-empty > span { font-size:2rem; color:var(--gold); }
+.enc-scene-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(260px,1fr); gap:1.25rem; }
+.enc-scene-grid > * { min-width:0; }
+.enc-section { margin-block-end:1rem; }
+.enc-prose { white-space:pre-wrap; line-height:1.7; }
+.enc-stakes { border-inline-start:3px solid var(--gold); padding-inline-start:1rem; margin-block-start:1.25rem; }
+.enc-stakes h3 { color:var(--gold); font-size:.9rem; }
+.enc-cast { border-block-start:1px solid var(--border); padding-block:.75rem; }
+.enc-workspace summary { cursor:pointer; line-height:1.5; }
+.enc-manage { display:grid; gap:.75rem; margin-block-start:1rem; }
+.enc-workspace .btn,.enc-editor .btn,.enc-tracker .btn { min-height:44px; height:auto; white-space:normal; }
+.enc-workspace :focus-visible,.enc-editor :focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+.enc-editor .editor-screen { max-width:920px !important; background:var(--bg2); padding:1.5rem; border:1px solid var(--border); border-radius:12px; }
+.enc-editor input,.enc-editor textarea,.enc-editor select { max-width:100%; min-width:0; box-sizing:border-box; padding:.65rem; }
+.enc-editor .adv-row { padding:1rem; background:var(--bg3); border:1px solid var(--border); border-radius:8px; }
+.enc-tracker .combat-modal { max-width:1200px !important; max-height:none !important; overflow:visible !important; box-sizing:border-box; margin-inline:auto; box-shadow:none !important; }
+.enc-tracker .combatant-entry { flex-wrap:wrap; transform:none !important; }
+.enc-tracker .combatant-entry > div:last-child { flex-wrap:wrap; }
+.enc-tracker .combat-amount { width:4.5rem; min-height:44px; padding:.5rem; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); }
+.enc-tracker .enc-turn-controls { position:sticky; inset-block-start:0; z-index:2; background:var(--bg2); padding-block:.7rem !important; margin-block-end:1rem; border-block-end:1px solid var(--border); }
+.enc-tracker #combatant-list { max-height:none !important; overflow:visible !important; }
+.enc-tracker #combat-close { width:auto !important; height:auto !important; padding:.65rem !important; border-radius:7px !important; font-size:.85rem !important; }
+@media(max-width:800px) { .enc-scene-grid,.enc-tools { grid-template-columns:minmax(0,1fr); } .enc-hero { padding:1.1rem; } .enc-tracker .combat-modal,.enc-editor .editor-screen { padding:.8rem !important; } .enc-tracker .combatant-entry { padding:.7rem !important; gap:.5rem !important; } .enc-tracker .combatant-entry > div:last-child { width:100%; } .enc-editor .editor-screen > div { flex-wrap:wrap; } }
+@media(max-width:420px) { .enc-card-foot .btn,.enc-hero-actions,.enc-hero-actions .btn { width:100%; } .enc-editor .editor-screen > div[style*="grid"] { grid-template-columns:minmax(0,1fr) !important; } }

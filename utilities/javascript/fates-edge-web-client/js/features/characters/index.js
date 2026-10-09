@@ -66,6 +66,7 @@ import { getCharacter,
 	saveState } from '@core/state.js';
 import { createCharacterCard } from '@components/CharacterCard.js';
 import { showToast } from '@components/Toast.js';
+import { matchesCatalogQuery } from './catalog-utils.js';
 
 // ============================================================
 // GAME DATA CONSTANTS (from Player's Guide)
@@ -384,6 +385,7 @@ export function render(el) {
                     <span id="xp-summary" class="text-muted"></span>
                 </div>
             </div>
+            <label class="catalog-search">Find a character<input type="search" id="character-search" placeholder="Name, heritage, or magic path"></label>
             <div class="char-list" id="char-list"></div>
         </div>
         
@@ -401,6 +403,8 @@ export function render(el) {
                 </div>
             </div>
             
+            <label class="catalog-search">Find a talent<input type="search" id="talent-search" placeholder="Name, effect, or prerequisite"></label>
+            <p class="text-muted">Cloning adds an editable copy to your catalog, not to a character. Choose talents in the wizard or character editor.</p>
             <!-- Talent Tier Filter -->
             <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.5rem;" id="talent-filters">
                 <button class="btn btn-xs btn-gold talent-filter-btn active" data-filter="all" data-i18n="feature.characters.all">All</button>
@@ -422,6 +426,8 @@ export function render(el) {
     renderPartyOverview();
     renderTalentList();
     attachEvents();
+    container.querySelector('#talent-search').addEventListener('input', renderTalentList);
+    container.querySelector('#character-search').addEventListener('input', renderCharList);
 }
 
 // ============================================================
@@ -528,7 +534,9 @@ export function renderCharList() {
         return;
     }
     
-    list.innerHTML = characters.map(char => {
+    const query = document.getElementById('character-search')?.value || '';
+    const visibleCharacters = characters.filter(char => matchesCatalogQuery({name:char.name, description:[char.heritage, char.magicPath].join(' ')}, query));
+    list.innerHTML = visibleCharacters.map(char => {
         const card = createCharacterCard(char, {
             onEdit: () => {},
             onDelete: () => {},
@@ -540,6 +548,7 @@ export function renderCharList() {
         wrapper.appendChild(card);
         return wrapper.outerHTML;
     }).join('');
+    if (!visibleCharacters.length) list.innerHTML = '<p class="text-muted">No matching characters. Try another search.</p>';
     
     // Add character summary stats below each card
     characters.forEach(char => {
@@ -780,10 +789,13 @@ export function renderTalentList() {
         }
     }
     
+    const query = document.getElementById('talent-search')?.value || '';
+    filteredLocal = filteredLocal.filter(t => matchesCatalogQuery(t, query));
+    filteredRemote = filteredRemote.filter(t => matchesCatalogQuery(t, query));
     let html = '';
     
     if (filteredLocal.length === 0 && filteredRemote.length === 0) {
-        html = `<div style="text-align:center;padding:0.5rem;color:var(--text3);font-size:0.85rem;">No talents in this tier.</div>`;
+        html = `<div style="text-align:center;padding:0.5rem;color:var(--text3);font-size:0.85rem;">No talents match this search and tier. Try another search or select All.</div>`;
         container.innerHTML = html;
         return;
     }

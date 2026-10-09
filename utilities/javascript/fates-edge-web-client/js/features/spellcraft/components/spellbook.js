@@ -346,11 +346,16 @@ function formatText(text) {
 }
 
 function getTagColor(tag) {
-    return TAG_COLORS[tag] || 'var(--text3)';
+    return TAG_COLORS[canonicalTag(tag)] || 'var(--text3)';
 }
 
 function getTagDefinition(tag) {
-    return TAG_DEFINITIONS[tag] || 'Unknown tag';
+    return TAG_DEFINITIONS[canonicalTag(tag)] || 'Unknown tag';
+}
+
+function canonicalTag(tag) {
+    const value = String(tag || '').toUpperCase();
+    return Object.keys(TAG_DEFINITIONS).find(key => key.toUpperCase() === value) || tag;
 }
 
 function getCategoryIcon(category) {
@@ -943,6 +948,8 @@ export async function renderSpellbook(el) {
     // Show quick tutorial if spellbook is empty
     if (spells.length === 0 && !localStorage.getItem('fates-edge-spellbook-tutorial-shown')) {
         setTimeout(() => {
+            // A delayed guide must not cover another tool or a different character.
+            if (!el.isConnected || getCharacterData({silent:true})?.id !== char.id) return;
             showToastWithHTML(`
                 <div style="display:flex;flex-direction:column;gap:0.3rem;">
                     <div style="font-weight:600;font-size:1.1rem;color:var(--gold);">Your grimoire is empty</div>
@@ -1166,8 +1173,8 @@ window.spellbookFromTags = async function() {
     if (!tagsInput) return;
     const tags = tagsInput.trim().split(/\s+/).map(t => t.toUpperCase());
 
-    const validTags = tags.filter(t => TAG_COLORS[t]);
-    const invalidTags = tags.filter(t => !TAG_COLORS[t]);
+    const validTags = tags.filter(t => TAG_COLORS[canonicalTag(t)]);
+    const invalidTags = tags.filter(t => !TAG_COLORS[canonicalTag(t)]);
     if (invalidTags.length > 0) {
         showToast(i18nText("feature.spellcraft.components.spellbook.unknownTagsValueTheyWillBeIncluded", { value0: invalidTags.join(', ') }, "Unknown tags: {{value0}}. They will be included but have no color."), 'warning');
     }

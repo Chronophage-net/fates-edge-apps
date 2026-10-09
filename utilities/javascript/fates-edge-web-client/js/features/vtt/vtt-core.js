@@ -1383,6 +1383,9 @@ export function updateMessageCount() {
     if (!currentContainer) return;
     const countEl = currentContainer.querySelector('#message-count');
     if (!countEl) return;
+    // This label is translated dynamically below; a static "0 messages"
+    // data-i18n marker lets the translation observer overwrite live counts.
+    countEl.removeAttribute('data-i18n');
 
     if (countUnsubscribe) countUnsubscribe();
     countUnsubscribe = vttStore.subscribe('chatMessages', (messages) => {

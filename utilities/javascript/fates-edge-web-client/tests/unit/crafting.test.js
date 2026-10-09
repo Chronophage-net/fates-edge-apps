@@ -140,15 +140,11 @@ describe('crafting: decay state transitions', () => {
 });
 
 describe('crafting: forage attempts per downtime', () => {
-    // Not specified in the rulebook (world_interactions.tex's
-    // "Foraging and Subsistence by Region" table is an unrelated travel
-    // mechanic) — this cap is a web-client-only economy/pacing decision.
-    // See state.js's FORAGE_LIMIT_PER_DOWNTIME comment. Resets on the
-    // same 'downtime-tick' event as upkeep decay.
+    // The shared Downtime procedure allows one gathering attempt per downtime.
 
     it('FORAGE_LIMIT_PER_DOWNTIME is a small positive number', () => {
         assertTrue(FORAGE_LIMIT_PER_DOWNTIME > 0);
-        assertEqual(FORAGE_LIMIT_PER_DOWNTIME, 3);
+        assertEqual(FORAGE_LIMIT_PER_DOWNTIME, 1);
     });
 
     it('canForage() allows attempts until the limit, then blocks', () => {

@@ -9,6 +9,10 @@ import { getState, addWikiEntry, updateWikiEntry, deleteWikiEntry, saveState } f
 import { escHtml, debounce } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
 import { renderWikiMarkdown as renderMarkdown } from './markdown.js';
+import { filterLibrary, libraryPage, mergeBundledEntries } from './library.js';
+let currentPage = 1;
+let filterSignature = '';
+let loadGeneration = 0;
 
 // ─── Configuration ──────────────────────────────────────────────────────
 
@@ -21,81 +25,33 @@ let _eventListeners = [];   // for cleanup
 
 export function render(el) {
     container = el;
+    currentPage = 1;
+    filterSignature = '';
     container.innerHTML = `
-        <div class="wiki-modern-layout">
+        <div class="wiki-modern-layout wiki-library">
             <header class="wiki-header">
-                <h1 class="wiki-title" data-i18n="feature.wiki.wiki">📖 Wiki</h1>
-                <p class="wiki-subtitle" data-i18n="feature.wiki.referenceRulesPatronsRegionsEquipmentTalentsAssets">Reference rules, patrons, regions, equipment, talents, assets, and more. Markdown supported.</p>
+                <div><p class="wiki-source">FATE’S EDGE / REFERENCE LIBRARY</p><h1 class="wiki-title">Wiki</h1>
+                <p class="wiki-subtitle">Find a rule, explore the world, or keep your table’s own lore. Bookmark the references you reach for most.</p></div>
+                <button class="btn btn-gold" id="wiki-add-btn">+ Write an entry</button>
             </header>
-
-            <div class="wiki-grid">
-                <!-- Sidebar -->
-                <aside class="wiki-sidebar">
-                    <div class="wiki-sidebar-section">
-                        <h3 data-i18n="feature.wiki.categories">📂 Categories</h3>
-                        <ul class="wiki-category-list" id="wiki-category-list"></ul>
-                    </div>
-                    <div class="wiki-sidebar-section">
-                        <h3 data-i18n="feature.wiki.tags">🏷️ Tags</h3>
-                        <div class="wiki-tag-cloud" id="wiki-tag-cloud"></div>
-                    </div>
-                    <div class="wiki-sidebar-section">
-                        <h3 data-i18n="feature.wiki.stats">ℹ️ Stats</h3>
-                        <div id="wiki-stats-sidebar">
-                            <div>Total: <span id="wiki-total-count">0</span></div>
-                            <div>Local: <span id="wiki-local-count">0</span></div>
-                            <div>Bundled: <span id="wiki-remote-count">0</span></div>
-                            <div>Hidden: <span id="wiki-hidden-count">0</span></div>
-                        </div>
-                    </div>
-                    <div class="wiki-sidebar-section">
-                        <button class="btn btn-gold btn-sm wiki-sidebar-action" id="wiki-add-btn" data-i18n="feature.wiki.addEntry">+ Add entry</button>
-                        <!-- Reload and Import All are maintenance actions, not
-                             everyday ones: Import All copies every bundled
-                             entry into local storage and Reload re-fetches the
-                             bundle. Both are quiet utility controls so the one
-                             action people actually want stays the loud one. -->
-                        <div class="wiki-sidebar-utils">
-                            <button class="btn btn-xs btn-utility" id="wiki-reload-btn" title="Re-fetch the bundled wiki" data-i18n="feature.wiki.reloadBundled">Reload bundled</button>
-                            <button class="btn btn-xs btn-utility" id="wiki-import-btn" title="Copy every bundled entry into your own wiki" data-i18n="feature.wiki.importAll">Import all</button>
-                        </div>
-                    </div>
-                </aside>
-
-                <!-- Main Content -->
-                <main class="wiki-content">
-                    <div class="wiki-toolbar">
-                        <div class="wiki-search-wrap">
-                            <input type="text" id="wiki-search" placeholder="🔍 Search wiki…" class="wiki-search-input" / data-i18n-attr="placeholder:feature.wiki.searchWiki">
-                        </div>
-                        <div class="wiki-filter-wrap">
-                            <!-- Options are filled from the entries that
-                                 actually exist (see refreshCategoryFilter).
-                                 This used to be a hardcoded list of eleven
-                                 categories, nine of which matched nothing in
-                                 the shipped data while four real categories
-                                 were missing from it entirely. -->
-                            <select id="wiki-cat-filter" class="wiki-filter-select">
-                                <option value="" data-i18n="feature.wiki.allCategories">All Categories</option>
-                            </select>
-                        </div>
-                        <div class="wiki-filter-wrap">
-                            <select id="wiki-region-filter" class="wiki-filter-select">
-                                <option value="">All regions</option>
-                            </select>
-                        </div>
-                        <div id="wiki-status" class="wiki-status"></div>
-                    </div>
-                    <div class="wiki-resultbar">
-                        <span id="wiki-result-count" class="wiki-result-count"></span>
-                        <span id="wiki-active-filters" class="wiki-active-filters"></span>
-                    </div>
-
-                    <div id="wiki-list-container">
-                        <div id="wiki-list"></div>
-                    </div>
-                </main>
-            </div>
+            <div class="wiki-grid"><section class="wiki-content" aria-label="Wiki library">
+                <div class="wiki-toolbar">
+                    <label class="wiki-search-label">Search the library<input type="search" id="wiki-search" placeholder="Title, rules text, region, or tags…" class="wiki-search-input"></label>
+                    <label>Category<select id="wiki-cat-filter" class="wiki-filter-select"><option value="">All categories</option></select></label>
+                    <label>Region<select id="wiki-region-filter" class="wiki-filter-select"><option value="">All regions</option></select></label>
+                    <label>Collection<select id="wiki-source-filter" class="wiki-filter-select"><option value="">All entries</option><option value="local">My entries</option><option value="remote">Bundled reference</option><option value="bookmarks">Bookmarks</option></select></label>
+                    <label>Sort by<select id="wiki-sort" class="wiki-filter-select"><option value="">My entries first</option><option value="title">Title A–Z</option><option value="category">Category</option></select></label>
+                </div>
+                <div id="wiki-status" role="status"></div>
+                <div class="wiki-resultbar"><span id="wiki-result-count" aria-live="polite"></span><span id="wiki-active-filters" class="wiki-active-filters"></span><button class="btn btn-xs btn-quiet" id="wiki-clear-btn">Clear filters</button></div>
+                <div id="wiki-list-container"><div id="wiki-list"></div></div>
+                <nav class="wiki-pagination" aria-label="Wiki pages"><button class="btn btn-sm" id="wiki-prev">Previous</button><span id="wiki-page-count" aria-live="polite"></span><button class="btn btn-sm" id="wiki-next">Next</button></nav>
+                <details class="wiki-maintenance"><summary>Library tools &amp; storage</summary>
+                    <p><span id="wiki-local-count">0</span> personal entries · <span id="wiki-remote-count">0</span> bundled · <span id="wiki-hidden-count">0</span> hidden. Clone a bundled entry to customize it without editing the source.</p>
+                    <div class="wiki-maintenance-actions"><button class="btn btn-sm" id="wiki-reload-btn">Reload bundled</button><button class="btn btn-sm" id="wiki-restore-btn">Restore hidden entries</button><button class="btn btn-sm" id="wiki-import-btn">Clone all bundled entries</button></div>
+                    <p>Reload preserves your personal entries and bookmarks. Cloning all entries makes editable copies; it is not a backup.</p>
+                </details>
+            </section></div>
         </div>
     `;
 
@@ -107,6 +63,7 @@ export function render(el) {
 // ─── Load Remote Wiki ──────────────────────────────────────────────────
 
 export function loadRemoteWiki() {
+    const generation = ++loadGeneration;
     const status = document.getElementById('wiki-status');
     if (status) status.textContent = i18nText("feature.wiki.loadingBundledWiki", null, "📥 Loading bundled wiki…");
 
@@ -116,6 +73,7 @@ export function loadRemoteWiki() {
             return res.json();
         })
         .then(data => {
+            if (generation !== loadGeneration) return { added: 0, total: 0 };
             // --- FIX: handle various structures ---
             let entries = [];
             if (Array.isArray(data)) {
@@ -143,51 +101,20 @@ export function loadRemoteWiki() {
             if (!state.wikiEntries) state.wikiEntries = [];
             if (!state.hiddenRemoteIds) state.hiddenRemoteIds = [];
 
-            // Remove existing remote entries
-            state.wikiEntries = state.wikiEntries.filter(e => e.source !== 'remote');
-
-            let added = 0;
-            entries.forEach((entry, idx) => {
-                if (!entry || !entry.title) return;
-                const remoteId = 'remote-' + (entry.id || idx);
-                if (state.hiddenRemoteIds.includes(remoteId)) return;
-
-                const localDup = state.wikiEntries.find(e =>
-                    e.title.toLowerCase().trim() === entry.title.toLowerCase().trim()
-                );
-                if (localDup) return;
-
-                state.wikiEntries.push({
-                    id: remoteId,
-                    title: entry.title,
-                    // Facets the bundled data carries and the card now shows:
-                    // a one-line subtitle, the region the entry belongs to,
-                    // and the suit/number of the draw card it came from.
-                    subtitle: entry.subtitle || '',
-                    category: entry.category || 'lore',
-                    body: entry.body || '',
-                    tags: Array.isArray(entry.tags) ? entry.tags :
-                          (entry.tags ? String(entry.tags).split(',').map(t => t.trim()).filter(Boolean) : []),
-                    cost: entry.cost != null ? Number(entry.cost) : null,
-                    slot: entry.slot || '',
-                    region: entry.region || '',
-                    suit: entry.suit || '',
-                    card: entry.card != null ? entry.card : null,
-                    stub: !!entry.stub,
-                    source: 'remote'
-                });
-                added++;
-            });
+            const merged = mergeBundledEntries(state.wikiEntries, entries, state.hiddenRemoteIds);
+            state.wikiEntries = merged.entries;
+            const added = merged.added;
             saveState();
-            if (status) status.textContent = i18nText("feature.wiki.loadedValueBundledEntries", { value0: added }, "✅ Loaded {{value0}} bundled entries.");
+            if (status) status.textContent = `Bundled reference refreshed · ${added} entries available alongside your personal library.`;
             renderWiki();
-            if (added > 0) showToast(i18nText("feature.wiki.loadedValueBundledWikiEntries", { value0: added }, "📥 Loaded {{value0}} bundled wiki entries."), 'success');
+
             return { added, total: entries.length };
         })
         .catch(err => {
+            if (generation !== loadGeneration) return { added: 0, total: 0, error: err };
             console.warn('Remote wiki load failed:', err);
             const status = document.getElementById('wiki-status');
-            if (status) status.textContent = i18nText("feature.wiki.couldNotLoadBundledWikiValueUsing", { value0: err.message }, "⚠️ Could not load bundled wiki ({{value0}}). Using local entries only.");
+            if (status) status.textContent = i18nText("feature.wiki.couldNotLoadBundledWikiValueUsing", { value0: err.message }, "⚠️ Could not load bundled wiki ({{value0}}). Keeping your saved library.");
             renderWiki();
             return { added: 0, total: 0, error: err };
         });
@@ -216,7 +143,7 @@ export function renderEntryCard(e) {
 
     const suit = (e.suit || '').toLowerCase();
     const pip = SUIT_GLYPH[suit]
-        ? `<span class="wiki-card-pip suit-${escHtml(suit)}" title="${escHtml(suit)}${e.card ? ' ' + e.card : ''}">${SUIT_GLYPH[suit]}${e.card ? `<span class="pip-num">${escHtml(String(e.card))}</span>` : ''}</span>`
+        ? `<span class="wiki-card-pip suit-${escHtml(suit)}" title="${escHtml(suit)}${e.card ? ' ' + escHtml(String(e.card)) : ''}">${SUIT_GLYPH[suit]}${e.card ? `<span class="pip-num">${escHtml(String(e.card))}</span>` : ''}</span>`
         : '';
 
     const facets = [
@@ -254,14 +181,15 @@ export function renderEntryCard(e) {
                     <h3 class="wiki-entry-title">${escHtml(e.title)}</h3>
                     ${e.subtitle ? `<p class="wiki-entry-subtitle">${escHtml(e.subtitle)}</p>` : ''}
                 </div>
-                <span class="wiki-entry-category" data-action="category" data-cat="${escHtml(e.category || 'uncategorized')}">${escHtml(e.category || 'uncategorized')}</span>
+                <button type="button" class="wiki-entry-category" data-action="category" data-cat="${escHtml(e.category || 'uncategorized')}">${escHtml(e.category || 'uncategorized')}</button>
             </header>
+            <p class="wiki-source">${isRemote ? 'Bundled reference' : 'My entry'}</p>
             ${facets ? `<div class="wiki-entry-facets">${facets}</div>` : ''}
             <div class="wiki-entry-summary">${summary}</div>
             ${tags.length ? `<div class="wiki-entry-tags">${tagBadges}${moreTags}</div>` : ''}
             <footer class="wiki-entry-tools">
                 ${isLong ? `<button class="btn btn-xs btn-quiet wiki-expand-btn" data-action="expand" data-id="${id}">Read more</button>` : '<span></span>'}
-                <span class="wiki-entry-actions">${tools}</span>
+                <span class="wiki-entry-actions"><button class="btn btn-xs btn-quiet" data-action="bookmark" data-id="${id}" aria-pressed="${(getState().wikiBookmarks || []).includes(String(e.id))}">${(getState().wikiBookmarks || []).includes(String(e.id)) ? 'Bookmarked' : 'Bookmark'}</button>${tools}</span>
             </footer>
         </article>
     `;
@@ -270,7 +198,12 @@ export function renderEntryCard(e) {
 // ─── Render Wiki (exported) ───────────────────────────────────────────
 
 export function renderWiki() {
+    refreshFacetFilters();
+    const signature = ['wiki-search','wiki-cat-filter','wiki-region-filter','wiki-source-filter','wiki-sort'].map(id => document.getElementById(id)?.value || '').join('\u001f');
+    if (signature !== filterSignature) { currentPage = 1; filterSignature = signature; }
     const entries = getFilteredEntries();
+    const pagination = libraryPage(entries, currentPage);
+    currentPage = pagination.page;
     const el = document.getElementById('wiki-list');
     if (!el) return;
 
@@ -278,6 +211,12 @@ export function renderWiki() {
     refreshFacetFilters();
     renderSidebar(entries);
     updateResultBar(entries.length);
+    const pageLabel = document.getElementById('wiki-page-count');
+    if (pageLabel) pageLabel.textContent = `Page ${currentPage} of ${pagination.pages}`;
+    const prev = document.getElementById('wiki-prev');
+    const next = document.getElementById('wiki-next');
+    if (prev) prev.disabled = currentPage <= 1;
+    if (next) next.disabled = currentPage >= pagination.pages;
 
     if (entries.length === 0) {
         el.innerHTML = `
@@ -290,7 +229,7 @@ export function renderWiki() {
         return;
     }
 
-    el.innerHTML = entries.map(e => renderEntryCard(e)).filter(Boolean).join('');
+    el.innerHTML = pagination.items.map(e => renderEntryCard(e)).filter(Boolean).join('');
 
     // Attach event listeners using delegation on the list container
     // Use click delegation to avoid re-binding each time
@@ -321,6 +260,15 @@ function attachWikiItemEvents() {
         const id = target.dataset.id;
 
         switch (action) {
+            case 'bookmark': {
+                const state = getState();
+                const bookmarks = new Set(state.wikiBookmarks || []);
+                if (bookmarks.has(id)) bookmarks.delete(id); else bookmarks.add(id);
+                state.wikiBookmarks = [...bookmarks];
+                saveState(); renderWiki();
+                Array.from(list.querySelectorAll('[data-action="bookmark"]')).find(button => button.dataset.id === id)?.focus();
+                break;
+            }
             case 'edit':
                 openWikiEditor(id);
                 break;
@@ -445,6 +393,8 @@ function updateResultBar(shown) {
     if (search) chips.push(['search', `“${search}”`]);
     if (cat) chips.push(['cat', cat]);
     if (region) chips.push(['region', region]);
+    const source = document.getElementById('wiki-source-filter');
+    if (source?.value) chips.push(['source', source.selectedOptions[0].textContent]);
     const el = document.getElementById('wiki-active-filters');
     if (el) {
         el.innerHTML = chips.map(([kind, label]) =>
@@ -476,41 +426,12 @@ function updateStats() {
 }
 
 function getFilteredEntries() {
+    const value = id => document.getElementById(id)?.value || '';
     const state = getState();
-    const search = document.getElementById('wiki-search')?.value?.toLowerCase() || '';
-    const cat = document.getElementById('wiki-cat-filter')?.value || '';
-    let entries = state.wikiEntries || [];
-
-    if (search) {
-        entries = entries.filter(e =>
-            (e.title || '').toLowerCase().includes(search) ||
-            (e.subtitle || '').toLowerCase().includes(search) ||
-            (e.body || '').toLowerCase().includes(search) ||
-            (e.region || '').toLowerCase().includes(search) ||
-            (e.tags || []).some(t => t.toLowerCase().includes(search))
-        );
-    }
-    if (cat) {
-        entries = entries.filter(e => e.category === cat);
-    }
-    const region = document.getElementById('wiki-region-filter')?.value || '';
-    if (region) {
-        entries = entries.filter(e => e.region === region);
-    }
-
-    // Sort: local first, then remote, then by title
-    entries.sort((a, b) => {
-        if (a.source === 'remote' && b.source !== 'remote') return 1;
-        if (a.source !== 'remote' && b.source === 'remote') return -1;
-        // Entries whose text has not been written yet sink below the ones
-        // that have something to read.
-        const aStub = !!a.stub || !(a.body || '').trim();
-        const bStub = !!b.stub || !(b.body || '').trim();
-        if (aStub !== bStub) return aStub ? 1 : -1;
-        return (a.title || '').localeCompare(b.title || '');
-    });
-
-    return entries;
+    return filterLibrary(state.wikiEntries || [], {
+        search: value('wiki-search'), category: value('wiki-cat-filter'), region: value('wiki-region-filter'),
+        source: value('wiki-source-filter'), sort: value('wiki-sort')
+    }, state.wikiBookmarks || []);
 }
 
 // ─── Entry Management ──────────────────────────────────────────────────
@@ -687,7 +608,7 @@ export function attachEvents() {
         addEventListenerSafe(filterBar, 'click', (ev) => {
             const chip = ev.target.closest('[data-action="clear-filter"]');
             if (!chip) return;
-            const byKind = { search: 'wiki-search', cat: 'wiki-cat-filter', region: 'wiki-region-filter' };
+            const byKind = { search: 'wiki-search', cat: 'wiki-cat-filter', region: 'wiki-region-filter', source: 'wiki-source-filter' };
             const el = document.getElementById(byKind[chip.dataset.kind]);
             if (el) { el.value = ''; renderWiki(); }
         });
@@ -700,6 +621,22 @@ export function attachEvents() {
             loadRemoteWiki().then(() => renderWiki());
         });
     }
+    for (const id of ['wiki-source-filter', 'wiki-sort']) addEventListenerSafe(document.getElementById(id), 'change', renderWiki);
+    addEventListenerSafe(document.getElementById('wiki-clear-btn'), 'click', () => {
+        for (const id of ['wiki-search','wiki-cat-filter','wiki-region-filter','wiki-source-filter','wiki-sort']) document.getElementById(id).value = '';
+        renderWiki(); document.getElementById('wiki-search').focus();
+    });
+    for (const [id, step] of [['wiki-prev', -1], ['wiki-next', 1]]) addEventListenerSafe(document.getElementById(id), 'click', () => {
+        currentPage += step; renderWiki(); document.getElementById('wiki-list-container')?.scrollIntoView({ block: 'start' });
+    });
+    addEventListenerSafe(document.getElementById('wiki-restore-btn'), 'click', async () => {
+        const state = getState();
+        const hidden = state.hiddenRemoteIds || [];
+        if (!hidden.length) { showToast('There are no hidden entries.', 'info'); return; }
+        state.hiddenRemoteIds = []; saveState();
+        const result = await loadRemoteWiki();
+        if (result?.error) { state.hiddenRemoteIds = hidden; saveState(); }
+    });
     if (importBtn) {
         addEventListenerSafe(importBtn, 'click', importAllFromWiki);
     }
@@ -721,6 +658,7 @@ export function refresh() {
 export function destroy() {
     detachEvents();
     container = null;
+    loadGeneration++;
 }
 
 // ─── Exports ──────────────────────────────────────────────────────────

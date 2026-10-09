@@ -1,0 +1,68 @@
+.adv-workspace, .adventure-create { max-width:1440px; margin-inline:auto; padding:0.25rem; color:var(--text); }
+.adv-workspace *,.adventure-create * { box-sizing:border-box; }
+.adv-hero { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; padding:2rem; border:1px solid var(--border); border-radius:16px; background:linear-gradient(120deg,var(--bg2),var(--bg3)); border-block-start:3px solid var(--gold); }
+.adv-hero h1 { font-size:clamp(1.7rem,3vw,2.7rem); margin:0.35rem 0; line-height:1.15; overflow-wrap:anywhere; }
+.adv-hero p { color:var(--text2); margin:0.4rem 0; max-width:65ch; }
+.adv-workspace .adv-eyebrow { font-size:0.7rem; font-weight:700; letter-spacing:0.14em; color:var(--gold); margin:0 0 0.6rem; }
+.adv-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1rem; margin-block:1.25rem; }
+.adv-stats>div { display:grid; gap:0.4rem; border-inline-start:2px solid var(--border); padding:0.5rem 1rem; }
+.adv-stats strong { font-size:1.8rem; color:var(--gold); font-variant-numeric:tabular-nums; }
+.adv-stats span,.adv-muted { color:var(--text2); font-size:0.85rem; }
+.adv-resume { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; background:var(--bg2); padding:1.5rem; border:1px solid var(--gold); border-radius:12px; }
+.adv-workspace h2 { font-size:1.25rem; margin:0 0 0.75rem; }
+.adv-workspace h3 { font-size:1.25rem; line-height:1.35; margin:0.8rem 0; }
+.adv-toolbar { display:flex; gap:0.5rem; flex-wrap:wrap; margin-block:1rem; }
+.adv-library-heading,.adv-card-meta,.adv-card-progress,.adv-card-footer { display:flex; justify-content:space-between; gap:0.6rem; align-items:center; flex-wrap:wrap; }
+.adv-library-heading { margin-block:1.5rem 0.75rem; }
+.adv-library-heading span,.adv-card-meta,.adv-card-footer>span { color:var(--text2); font-size:0.8rem; }
+.adv-filters { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr); gap:0.75rem; margin-block-end:1rem; }
+.adv-filters label { display:grid; gap:0.4rem; font-size:0.8rem; color:var(--text2); }
+.adv-workspace input,.adv-workspace select,.adv-workspace textarea { min-width:0; width:100%; padding:0.65rem; background:var(--bg2); color:var(--text); border:1px solid var(--border); border-radius:8px; }
+.adv-card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr)); gap:1rem; }
+.adv-library-card { display:flex; flex-direction:column; padding:1.3rem; border:1px solid var(--border); border-radius:12px; background:var(--bg2); transition:border-color 150ms; min-width:0; }
+.adv-library-card:hover { border-color:var(--gold); }
+.adv-card-description { color:var(--text2); line-height:1.6; font-size:0.9rem; margin:0 0 1rem; overflow-wrap:anywhere; }
+.adv-badge,.adv-tags span { border:1px solid var(--border); border-radius:30px; padding:0.25rem 0.6rem; font-size:0.75rem; text-transform:capitalize; background:var(--bg3); }
+.adv-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-block-end:1rem; }
+.adv-card-progress { margin-block-start:auto; font-size:0.8rem; color:var(--text2); }
+.adv-workspace progress { appearance:none; width:100%; height:6px; border:0; border-radius:4px; margin-block:0.65rem 1rem; background:var(--bg4); accent-color:var(--gold); }
+.adv-workspace progress::-webkit-progress-bar { background:var(--bg4); border-radius:4px; }
+.adv-workspace progress::-webkit-progress-value { background:var(--gold); border-radius:4px; }
+.adv-empty { grid-column:1 / -1; text-align:center; padding:3rem 1rem; border:1px dashed var(--border); border-radius:12px; }
+.adv-table-timers { margin-block:1.5rem; }
+.adv-workspace summary { cursor:pointer; padding:0.75rem 0; }
+.adv-tabs { display:flex; gap:0.5rem; margin-block:0.5rem 1.5rem; border-block-end:1px solid var(--border); padding-block-end:0.75rem; }
+.adv-tabs [aria-selected=true] { background:var(--gold); color:var(--text-inverse); }
+.adv-workspace [hidden] { display:none !important; }
+.adv-run-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(260px,1fr); gap:1.5rem; }
+.adv-run-grid>* { min-width:0; }
+.adv-current { border:1px solid var(--gold); border-radius:12px; padding:1.5rem; margin-block-end:1.5rem; background:var(--bg2); line-height:1.65; }
+.adv-panel { border:1px solid var(--border); border-radius:12px; padding:1.25rem; background:var(--bg2); margin-block-end:1rem; line-height:1.6; }
+.adv-reference-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+.adv-management { max-width:100%; }
+.adv-management>div { display:flex; gap:0.5rem; flex-wrap:wrap; padding-block:0.5rem; }
+.adv-scene { margin-block:0.6rem; padding:0.7rem !important; border:1px solid var(--border); }
+.adv-scene>div:first-child,.adv-scene>div:first-child>div { flex-wrap:wrap; gap:0.5rem !important; }
+.adv-workspace .panel { border-radius:10px; padding:1rem !important; margin-block:0.75rem !important; }
+.adv-workspace .panel [style*="font-size:0."] { font-size:0.85rem !important; line-height:1.6; }
+.adv-workspace .flex.flex-center { flex-wrap:wrap; }
+.adv-workspace button,.adventure-create button { min-height:44px; }
+.adv-workspace button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+.adv-back { margin-block-end:0.75rem; }
+.adventure-create { display:grid; gap:1rem; }
+.adventure-create .panel { padding:1.25rem; border-radius:12px; }
+.adventure-create input,.adventure-create select,.adventure-create textarea { min-height:44px; font-size:1rem !important; max-width:100%; }
+.adventure-create h4 { font-size:1.1rem !important; margin-block-end:0.75rem !important; }
+.adventure-create .adv-act-row { padding:1rem !important; margin-block:1rem !important; }
+@media(max-width:800px) {
+    .adv-run-grid,.adv-reference-grid { grid-template-columns:minmax(0,1fr); }
+    .adv-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .adv-hero { padding:1.25rem; }
+    .adv-filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .adv-filters label:first-child { grid-column:1 / -1; }
+    .adv-tabs { gap:0.25rem; }
+    .adv-tabs button { flex:1; white-space:normal; padding-inline:0.5rem; }
+    .adv-workspace input,.adv-workspace select,.adv-workspace textarea { font-size:16px; }
+    .adventure-create .adv-form-grid { grid-template-columns:minmax(0,1fr) !important; }
+    .adventure-create .adv-act-row>div { flex-wrap:wrap; }
+}

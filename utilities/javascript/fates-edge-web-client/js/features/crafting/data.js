@@ -15,7 +15,7 @@ import { getState, saveState } from '@core/state.js';
 
 export async function ensureWikiLoaded(force = false) {
     const state = getState();
-    if (state.wikiEntries && !force) return;
+    if (Array.isArray(state.wikiEntries) && state.wikiEntries.length && !force) return;
     try {
         const response = await fetch('/data/wiki.json');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -194,7 +194,7 @@ export function parseRecipesFromWiki(entries) {
     const recipes = {};
     for (const entry of entries) {
         if (entry.category === 'recipe' && entry.title) {
-            const id = String(entry.id) || entry.title.toLowerCase().replace(/ /g, '-');
+            const id = entry.id == null ? entry.title.toLowerCase().replace(/ /g, '-') : String(entry.id);
             recipes[id] = {
                 id, name: entry.title, description: entry.body || '', effect: entry.effect || entry.body || '',
                 ingredients: entry.ingredients || [], skill: entry.skill || 'craft',

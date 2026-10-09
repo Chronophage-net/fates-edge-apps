@@ -60,17 +60,11 @@ export function availableXp(char) {
 // ============================================================
 // FORAGING LIMIT (per downtime)
 //
-// Not specified anywhere in the rulebook (the Player's Guide's
-// "Foraging and Subsistence by Region" table, world_interactions.tex,
-// is a travel-survival mechanic with its own DV/roll, unrelated to this
-// panel's one-click "grab a free common ingredient" button). This cap
-// is a web-client-only economy/pacing decision, not a documented rule —
-// pick a different number here if your table wants a different pace.
-// Chosen to match the game's existing fondness for "3" (attunement
-// limit, combine-up-to-3-ingredients).
+// Player / GM Downtime: gather once for one declared project.
+// The legacy forageCount field is retained for saved-character compatibility.
 // ============================================================
 
-export const FORAGE_LIMIT_PER_DOWNTIME = 3;
+export const FORAGE_LIMIT_PER_DOWNTIME = 1;
 
 export function getForageCount(char) {
     return getCraftState(char).forageCount || 0;
