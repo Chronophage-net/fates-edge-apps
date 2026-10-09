@@ -182,7 +182,7 @@ Configuration precedence is environment variables, then `server/config.json`, th
 | `API_RATE_LIMIT_WINDOW_MS` / `API_RATE_LIMIT_MAX` | `60000` / `300` | General per-IP REST rate limit (`_MAX=0` disables). |
 | `WS_MESSAGE_RATE_WINDOW_MS` / `WS_MESSAGE_RATE_MAX` | `10000` / `120` | Per-connection WebSocket message rate limit, both transports (`_MAX=0` disables). |
 | `CORS_ORIGIN` | `*` | Comma-separated HTTP(S) origins allowed for browser HTTP and WebSocket connections. Native clients without an Origin still require room admission. |
-| `TRUST_PROXY` | `false` | Trusted proxy hop count or IP/CIDR list; configure to match your deployment before using per-IP limits behind a proxy. |
+| `TRUST_PROXY` | `false` | Trusted proxy hop count or IP/CIDR list; configure to match your deployment before using per-IP limits behind a proxy. Prefer ordinary IPv4 CIDRs such as `10.0.0.0/8`; mapped IPv6 notation requires the full prefix, e.g. `::ffff:10.0.0.0/104`, not `/8`. |
 | `WS_MAX_PAYLOAD_BYTES` | `8388608` | Maximum inbound message size on both transports (1 KiB–100 MiB). |
 | `HANDSHAKE_TIMEOUT_MS` | `10000` | Plain WebSocket admission deadline (100–120000 ms). |
 | `MAX_CLIENTS_PER_ROOM` | `0` (unlimited) | Reject new joins once a room already holds this many clients. |

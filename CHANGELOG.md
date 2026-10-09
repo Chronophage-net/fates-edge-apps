@@ -1,3 +1,9 @@
+## Unreleased — socket-server security fix (2026-10-09)
+
+- Upgrade and enforce `proxy-addr >=2.0.8` within the 2.x line to fix CVE-2026-90711 (GHSA-jqcg-44mw-7w3h): IPv4 clients could be incorrectly trusted by certain IPv6 proxy subnets, allowing forged forwarded IP addresses.
+- Add regression tests for short mapped-IPv6 prefixes and zero-leading-bit IPv6 trust subnets, plus valid IPv4/mapped-IPv6 proxy behavior. The two attack cases fail on 2.0.7 and pass on 2.0.8.
+- Socket-server audit now reports zero critical findings; six high and one moderate finding remain. Reinstall from the updated lockfile or rebuild the Docker image and restart the server to deploy this fix.
+
 ## Developer portal link — 2026-09-11
 
 - Add Developer Portal link to README and Developer Portal note to CONTRIBUTING.md pointing to the developer portal and the fates-edge-ai-gm-bot companion repo. This helps contributors find canonical docs and coordinate cross-repo changes.
