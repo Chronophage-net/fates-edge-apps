@@ -1,4 +1,42 @@
 import { describe, it, assert, assertEqual, sleep, createMockWebSocket } from '../runner.js';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+
+// Execute the production dispatchers with transport/DOM dependencies stubbed.
+// This catches missing named delivery, not merely missing event-name strings.
+const source = readFileSync(new URL('../../js/core/websocket.js', import.meta.url), 'utf8');
+const plainDispatcher = source.slice(source.indexOf('function handleWebSocketMessage(data)'), source.indexOf('export function sendWSMessage'));
+const ioDispatcher = source.slice(source.indexOf('function setupSocketIOListeners()'), source.indexOf('export function', source.indexOf('function setupSocketIOListeners()')));
+
+describe('AI-GM browser event delivery', () => {
+    for (const transport of ['websocket', 'socketio']) {
+        it(`${transport} delivers narration, proposals and scene state exactly once to named subscribers`, () => {
+            const received = [], listeners = new Map();
+            const context = {
+                pendingCallbacks: new Map(),
+                triggerEvent: (event, data) => received.push({ event, data }),
+                socket: { on: (event, fn) => listeners.set(event, fn) },
+                document: { dispatchEvent() {} },
+                CustomEvent: class {},
+            };
+            const dispatch = transport === 'websocket'
+                ? vm.runInNewContext(plainDispatcher + ';handleWebSocketMessage;', context)
+                : (vm.runInNewContext(ioDispatcher + ';setupSocketIOListeners();', context), data => {
+                    assert(listeners.has(data.type), `Missing Socket.IO listener: ${data.type}`);
+                    listeners.get(data.type)(data);
+                });
+            for (const event of ['tts-audio', 'soundboard-ambience', 'assistant-suggestion-created',
+                'assistant-suggestion-resolved', 'scene-status-update', 'combat-status-update', 'sync-state']) {
+                const data = { type: event, id: 'proposal-1', outcome: 'approved', status: 'active' };
+                dispatch(data);
+                assertEqual(received.length, 1, `${event} delivered exactly once`);
+                assertEqual(received[0].event, event);
+                assert(received[0].data === data, 'payload preserved');
+                received.length = 0;
+            }
+        });
+    }
+});
 
 describe('WebSocket Integration', () => {
     

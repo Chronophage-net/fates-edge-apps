@@ -4,6 +4,7 @@
  * Holds the DOM references, event bindings, and high‑level UI state.
  * Delegates all core logic to the other modules.
  */
+import { arrangeWorkspace, updateToolHelp, openNoteEditor } from './workspace.js';
 import { t as i18nText } from '@core/i18n.js';
 import { state, setContainer, setCanvas, setCtx, playerViewActive, setPlayerViewActive, getActiveSheet, setCurrentTool as setSharedTool, setTableModeActive as setSharedTableMode } from './state.js';
 import { loadWhiteboardData, saveWhiteboardData, setupWebSocketSync, forceSync, onActivate, onDeactivate } from './persistence.js';
@@ -101,6 +102,7 @@ let draggedObjectType = null;
 
 // Voice & GM role
 let voiceUnsub = null;
+let eventController = null;
 
 // Export UI state for other modules
 export { currentTool, currentColor, currentSize, currentOpacity, tableModeActive };
@@ -142,6 +144,7 @@ export function toggleTableMode() {
 }
 
 function applyTableMode() {
+    document.getElementById('whiteboard-modern-layout')?.classList.toggle('wb-table-mode', tableModeActive);
     const header = document.getElementById('whiteboard-header');
     const toolbar = document.getElementById('whiteboard-toolbar');
     const sheetTabs = document.getElementById('whiteboard-sheet-tabs');
@@ -495,6 +498,8 @@ export function render(el) {
         </div>
     `;
 
+    arrangeWorkspace(el, currentTool);
+
     // ── Initialise canvas ──
     initCanvas();
     renderOverlay();
@@ -539,6 +544,9 @@ export function render(el) {
 // ============================================================
 
 export function attachEvents() {
+    eventController?.abort();
+    eventController = new AbortController();
+    const signal = eventController.signal;
     // ── Connect button ──
     document.getElementById('whiteboard-connect-btn')?.addEventListener('click', () => {
         import('@core/websocket.js').then(ws => ws.default.initWebSocket()).catch(() => {});
@@ -568,6 +576,7 @@ export function attachEvents() {
             document.querySelectorAll('.btn[data-tool]').forEach(b => b.className = 'btn btn-sm btn-secondary');
             btn.className = 'btn btn-sm btn-gold';
             currentTool = tool;
+            updateToolHelp(tool);
             setCurrentTool(currentTool);
             setSharedTool(currentTool);
             const canvasEl = document.getElementById('whiteboard-canvas');
@@ -785,13 +794,20 @@ export function attachEvents() {
         });
 
         // ── Canvas mouse/touch events for drawing ──
-        canvasEl.addEventListener('mousedown', startDrawing);
-        canvasEl.addEventListener('mousemove', draw);
-        canvasEl.addEventListener('mouseup', endDrawing);
-        canvasEl.addEventListener('mouseleave', endDrawing);
-        canvasEl.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); });
-        canvasEl.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
-        canvasEl.addEventListener('touchend', (e) => { e.preventDefault(); endDrawing(e.changedTouches[0]); });
+        canvasEl.addEventListener('pointerdown', e => {
+            if (e.button !== 0 || !e.isPrimary) return;
+            e.preventDefault();
+            canvasEl.setPointerCapture(e.pointerId);
+            startDrawing(e);
+        });
+        canvasEl.addEventListener('pointermove', e => { if(e.isPrimary) draw(e); });
+        const finish = e => {
+            if (!e.isPrimary) return;
+            endDrawing(e);
+            if(canvasEl.hasPointerCapture(e.pointerId)) canvasEl.releasePointerCapture(e.pointerId);
+        };
+        canvasEl.addEventListener('pointerup', finish);
+        canvasEl.addEventListener('pointercancel', finish);
 
         // ── Hover cursor for lights ──
         canvasEl.addEventListener('mousemove', (e) => {
@@ -822,10 +838,11 @@ export function attachEvents() {
         initCanvas();
         restoreDrawings();
         renderOverlay();
-    });
+    }, { signal });
 
     // ── Keyboard shortcuts ──
     window.addEventListener('keydown', (e) => {
+        if (e.target.closest?.('input, textarea, select, [contenteditable="true"]') || document.querySelector('dialog[open]')) return;
         const key = e.key.toLowerCase();
         if ((e.ctrlKey || e.metaKey) && key === 'z' && !e.shiftKey) {
             e.preventDefault();
@@ -834,23 +851,24 @@ export function attachEvents() {
             e.preventDefault();
             redo();
         }
-    });
+    }, { signal });
 
     // ── Globals for overlay drag handlers ──
     window.editWhiteboardNote = (id) => {
+        const sheetId = state.activeSheetId;
         const note = state.notes.find(n => n.id === id);
         if (note) {
             if (state.layers.find(l => l.id === note.layerId)?.locked) {
                 showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
                 return;
             }
-            const newContent = prompt(i18nText("feature.whiteboard.modules.ui.editNote", null, "Edit note:"), note.content);
-            if (newContent !== null) {
+            openNoteEditor(note, content => {
+                if (state.activeSheetId !== sheetId || state.layers.find(l => l.id === note.layerId)?.locked) return;
                 pushUndoSnapshot();
-                note.content = newContent;
+                note.content = content;
                 saveWhiteboardData();
                 renderOverlay();
-            }
+            });
         }
     };
     window.deleteWhiteboardNote = (id) => {
@@ -896,6 +914,8 @@ export function attachEvents() {
         if (!note) return;
         const layer = state.layers.find(l => l.id === note.layerId);
         if (layer?.locked) { showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning'); return; }
+        if (event.target.closest('button') || (event.button !== undefined && event.button !== 0)) return;
+        event.preventDefault();
         event.stopPropagation();
         pushUndoSnapshot();
         isDraggingObject = true;
@@ -909,21 +929,25 @@ export function attachEvents() {
             renderOverlay();
         };
         const onUp = () => {
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+            document.removeEventListener('pointercancel', onUp);
             isDraggingObject = false;
             draggedObject = null;
             draggedObjectType = null;
             saveWhiteboardData();
         };
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
+        document.addEventListener('pointermove', onMove, { signal });
+        document.addEventListener('pointerup', onUp, { signal });
+        document.addEventListener('pointercancel', onUp, { signal });
     };
     window.__wbStartDragImage = (id, event) => {
         const img = state.images.find(i => i.id === id);
         if (!img) return;
         const layer = state.layers.find(l => l.id === img.layerId);
         if (layer?.locked) { showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning'); return; }
+        if (event.target.closest('button') || (event.button !== undefined && event.button !== 0)) return;
+        event.preventDefault();
         event.stopPropagation();
         pushUndoSnapshot();
         isDraggingObject = true;
@@ -937,21 +961,25 @@ export function attachEvents() {
             renderOverlay();
         };
         const onUp = () => {
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+            document.removeEventListener('pointercancel', onUp);
             isDraggingObject = false;
             draggedObject = null;
             draggedObjectType = null;
             saveWhiteboardData();
         };
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
+        document.addEventListener('pointermove', onMove, { signal });
+        document.addEventListener('pointerup', onUp, { signal });
+        document.addEventListener('pointercancel', onUp, { signal });
     };
     window.__wbStartDragToken = (id, event) => {
         const token = state.characterTokens.find(t => t.id === id);
         if (!token) return;
         const layer = state.layers.find(l => l.id === token.layerId);
         if (layer?.locked) { showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning'); return; }
+        if (event.target.closest('button') || (event.button !== undefined && event.button !== 0)) return;
+        event.preventDefault();
         event.stopPropagation();
         pushUndoSnapshot();
         isDraggingObject = true;
@@ -965,15 +993,17 @@ export function attachEvents() {
             renderOverlay();
         };
         const onUp = () => {
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+            document.removeEventListener('pointercancel', onUp);
             isDraggingObject = false;
             draggedObject = null;
             draggedObjectType = null;
             saveWhiteboardData();
         };
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
+        document.addEventListener('pointermove', onMove, { signal });
+        document.addEventListener('pointerup', onUp, { signal });
+        document.addEventListener('pointercancel', onUp, { signal });
     };
 
     // ── Connection change ──
@@ -989,7 +1019,7 @@ export function attachEvents() {
         }
         renderVttCombatToolbar();
         populateRoster();
-    });
+    }, { signal });
 }
 
 // ============================================================
@@ -1222,8 +1252,7 @@ function draw(e) {
         const drawing = state.drawings[state.drawings.length - 1];
         if (drawing) {
             drawing.points.push({ x: pos.x, y: pos.y });
-            drawStroke(drawing);
-            saveWhiteboardData();
+            restoreDrawings();
         }
         return;
     }
@@ -1397,6 +1426,12 @@ function endDrawing(e) {
 
     if (!isDrawing) return;
     isDrawing = false;
+    if (currentTool === 'pen' || currentTool === 'eraser') {
+        saveWhiteboardData();
+        restoreDrawings();
+        updateStats();
+        return;
+    }
 
     // Shape end
     if (['line','rectangle','circle','arrow','polygon'].includes(currentTool) && shapeStart) {
@@ -1476,24 +1511,21 @@ export function addWhiteboardNote() {
         showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
         return;
     }
-    const content = prompt(i18nText("feature.whiteboard.modules.ui.noteContent", null, "Note content:"), 'New note');
-    if (!content) return;
-    const containerEl = document.getElementById('whiteboard-canvas-container');
-    const rect = containerEl.getBoundingClientRect();
-    pushUndoSnapshot();
-    state.notes.push({
-        id: 'note-' + Date.now(),
-        x: rect.width / 2 - 50,
-        y: rect.height / 2 - 50,
-        content: content,
-        layerId: activeLayerId
+    const sheetId = state.activeSheetId;
+    const layerId = activeLayerId;
+    openNoteEditor(null, content => {
+        if(state.activeSheetId !== sheetId || state.layers.find(l=>l.id===layerId)?.locked) return;
+        const rect = document.getElementById('whiteboard-canvas-container')?.getBoundingClientRect();
+        if(!rect) return;
+        pushUndoSnapshot();
+        state.notes.push({id:'note-'+crypto.randomUUID(),x:Math.max(8,rect.width/2-90),y:80,content,layerId});
+        saveWhiteboardData(); renderOverlay(); updateStats();
     });
-    saveWhiteboardData();
-    renderOverlay();
-    updateStats();
 }
 
 export function uploadWhiteboardImage() {
+    const sheetId = state.activeSheetId;
+    const layerId = activeLayerId;
     const activeLayer = state.layers.find(l => l.id === activeLayerId);
     if (activeLayer?.locked) {
         showToast(i18nText("feature.whiteboard.modules.ui.thisLayerIsLocked", null, "This layer is locked"), 'warning');
@@ -1506,13 +1538,19 @@ export function uploadWhiteboardImage() {
         const file = e.target.files[0];
         if (!file) return;
         // SECURITY: block SVG uploads
-        if (file.type === 'image/svg+xml') {
-            showToast(i18nText("feature.whiteboard.modules.ui.svgUploadsAreNotAllowedForSecurity", null, "SVG uploads are not allowed for security reasons."), 'error');
+        if (!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)) {
+            showToast('Choose a PNG, JPEG, WebP, or GIF image. SVG uploads are not supported.', 'error');
+            return;
+        }
+        if (file.size > 5_000_000) {
+            showToast('Choose an image under 5 MB to keep board saves manageable.', 'error');
             return;
         }
         const reader = new FileReader();
         reader.onload = (ev) => {
+            if (state.activeSheetId !== sheetId || state.layers.find(l => l.id === layerId)?.locked) return;
             const containerEl = document.getElementById('whiteboard-canvas-container');
+            if (!containerEl) return;
             const rect = containerEl.getBoundingClientRect();
             pushUndoSnapshot();
             state.images.push({
@@ -1520,7 +1558,7 @@ export function uploadWhiteboardImage() {
                 x: rect.width / 2 - 100,
                 y: rect.height / 2 - 100,
                 data: ev.target.result,
-                layerId: activeLayerId
+                layerId
             });
             saveWhiteboardData();
             renderOverlay();
@@ -1627,11 +1665,18 @@ export function refresh() {
 }
 
 export function destroy() {
+    eventController?.abort();
+    eventController = null;
+    document.getElementById('wb-note-editor')?.close();
+    isDrawing = false; isDraggingToken = false; isDraggingLight = false; isDraggingObject = false;
+    shapeStart = null; rulerStart = null; rulerEnd = null; fogWallStart = null;
     hideOnboardingModal(false);
     const container = document.getElementById('whiteboard-modern-layout');
     if (container) container.innerHTML = '';
     saveWhiteboardData();
     if (voiceUnsub) voiceUnsub();
+    voiceUnsub = null;
+    setCanvas(null); setCtx(null); setContainer(null);
     // Clean up WS listeners (including gm_role_update) done in persistence.js's onDeactivate
 }
 

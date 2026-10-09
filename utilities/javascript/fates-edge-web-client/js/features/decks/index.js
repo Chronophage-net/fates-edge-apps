@@ -46,9 +46,10 @@
 import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { shuffleArray } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
-import { getState, addTimer } from '@core/state.js';
+import { getState, addTimer, saveState } from '@core/state.js';
 import { logRecordingEvent } from '@core/media.js';
 import { parseRegionDescription } from './region-parser.js';
+import { renderDeckWorkspace, renderJournal } from './workspace.js';
 // ─── Use shared discovery ────────────────────────────────────
 import { initializeRegions, discoverRegions } from '@core/discovery.js';
 // ─── Role-based access ──────────────────────────────────────
@@ -371,6 +372,11 @@ function extractTags(text) {
 let container = null;
 let deck = [];
 let deckHistory = [];
+let journalLoaded = false;
+let deckBuilt = false;
+let drawBusy = false;
+let regionGeneration = 0;
+let selectedDrawType = '2';
 let regionData = null;
 let regionNames = [];
 let selectedRegion = null;
@@ -1001,6 +1007,11 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
 let regionInitPromise = null;
 
 export function ensureRegionsReady() {
+    if (!journalLoaded) {
+        const journal = getState().deckJournal;
+        deckHistory = Array.isArray(journal) ? journal.filter(e => e && typeof e === 'object') : [];
+        journalLoaded = true;
+    }
     if (!regionInitPromise) {
         regionInitPromise = (async () => {
             regionNames = await initializeRegions(REGION_DIR);
@@ -1029,8 +1040,10 @@ export function ensureRegionsReady() {
  */
 async function applyRegion(regionName, { silent = false } = {}) {
     if (!regionName) return null;
+    const generation = ++regionGeneration;
     selectedRegion = regionName;
     const data = await fetchRegionData(regionName);
+    if (generation !== regionGeneration) return null;
     regionData = data;
     if (!silent) {
         regionChangeCallbacks.forEach(cb => {
@@ -1048,12 +1061,14 @@ async function handleRegionChange() {
     const headerEl = document.getElementById('region-header');
 
     if (!regionName) {
+        regionGeneration++; selectedRegion = null; regionData = null;
         if (descEl) descEl.textContent = i18nText("feature.decks.selectARegionToDisplayItsDescription", null, "Select a region to display its description.");
         if (headerEl) headerEl.innerHTML = '';
         return;
     }
 
     const data = await applyRegion(regionName);
+    if (!data || selectedRegion !== regionName) return;
 
     // The dropdown itself can only show a slug-derived name (e.g. "Acasia"),
     // cheaply, without fetching every region file just to populate a list.
@@ -1107,116 +1122,23 @@ export async function render(el) {
     // ─── Use shared initialization ────────────────────────────
     regionNames = await ensureRegionsReady();
 
-    let regionOptions = regionNames.map(n => `<option value="${n}">${n}</option>`).join('');
-    if (regionNames.length === 0) {
-        regionOptions = '<option value="">No regions available</option>';
-    }
-
-    const isDeterministic = !!_deckSeedState.seed;
-    const regionCount = regionNames.length;
-
-    // ─── Check role permission ─────────────────────────────────
+    if (container !== el) return;
     const { accessible } = getFeatureAccess('decks');
-
-    // Build the interactive controls only if accessible
-    let controlsHtml = '';
-    if (accessible) {
-        controlsHtml = `
-            <div class="panel">
-                <h3 data-i18n="feature.decks.drawType">Draw Type</h3>
-                <div class="deck-controls" style="display:flex;flex-wrap:wrap;gap:0.8rem;align-items:end;">
-                    <div class="field" style="flex:0 0 200px;">
-                        <label data-i18n="feature.decks.costDraw">Cost / Draw</label>
-                        <select id="deck-draw-type">
-                            <option value="1" data-i18n="feature.decks.1SB1Card">1 SB (1 card)</option>
-                            <option value="2" selected data-i18n="feature.decks.2SB2Cards">2 SB (2 cards)</option>
-                            <option value="3" data-i18n="feature.decks.3SB3Cards">3 SB (3 cards)</option>
-                            <option value="crown" data-i18n="feature.decks.crownSpread41Wildcard">👑 Crown Spread (4+1 twist)</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-gold" id="deck-draw-btn" data-i18n="feature.decks.draw">🃏 Draw</button>
-                    <button class="btn" id="deck-reshuffle-btn" data-i18n="feature.decks.reshuffle">↺ Reshuffle</button>
-                    <span class="text-muted" id="deck-cards-remaining" data-i18n="feature.decks.54Cards">54 cards</span>
-                </div>
-                <div id="spread-type-indicator" style="margin-top:0.4rem;font-size:0.85rem;color:var(--text2);">
-                    <span id="spread-description">Single draw: one consequence</span>
-                </div>
-            </div>
-
-            <div class="panel" id="consequence-display">
-                <h3 id="consequence-title" data-i18n="feature.decks.cardsDrawn">Cards Drawn</h3>
-                <div id="crown-spread-cards" style="margin:0.8rem 0;display:none;"></div>
-                <div class="card-grid" id="drawn-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.8rem;margin:0.8rem 0;"></div>
-                <div id="consequence-synthesis" class="consequence-synthesis" style="background:var(--bg3);border-inline-start:4px solid var(--gold);padding:0.8rem 1rem;border-radius:var(--radius);margin-top:0.8rem;font-style:italic;white-space:pre-wrap;">
-                    Draw cards to see a complication.
-                </div>
-                <div id="crown-spread-details" style="margin-top:0.8rem;display:none;"></div>
-                <div id="timer-result" style="margin-top:0.8rem;display:none;background:var(--bg3);padding:0.5rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);"></div>
-            </div>
-        `;
-    } else {
-        controlsHtml = `
-            <div class="panel" style="background:var(--bg2);border:2px dashed var(--border);text-align:center;padding:1.5rem;">
-                <div style="font-size:2rem;">🔒</div>
-                <h3 style="color:var(--text2);" data-i18n="feature.decks.deckIsGMOnly">Deck is GM‑only</h3>
-                <p style="color:var(--text3);">Only the Game Master can draw cards in a connected session.</p>
-                <p style="font-size:0.8rem;color:var(--text3);">You can still browse regions and view the history.</p>
-            </div>
-        `;
+    container.innerHTML = renderDeckWorkspace(regionNames, accessible, _deckSeedState.seed);
+    if (!journalLoaded) {
+        const journal = getState().deckJournal;
+        deckHistory = Array.isArray(journal) ? journal.filter(e => e && typeof e === 'object') : [];
+        journalLoaded = true;
     }
-
-    // Assemble the full UI
-    container.innerHTML = `
-        <div class="decks-header">
-            <h1 class="page-title" data-i18n="feature.decks.deckOfConsequences">🃏 Deck of Consequences</h1>
-            <p class="page-sub" data-i18n="feature.decks.transformStoryBeatsSBIntoThematicComplications">Transform Story Beats (SB) into thematic complications. Choose a region and draw type.</p>
-        </div>
-
-        <div class="panel" style="padding:0.3rem 0.8rem;margin-bottom:0.5rem;background:var(--bg3);border-inline-start:3px solid ${isDeterministic ? 'var(--gold)' : 'var(--text3)'};">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
-                <span style="font-size:0.8rem;color:var(--text2);">
-                    ${isDeterministic ? '🎲 Deterministic RNG (seeded, this session)' : '🔀 Cryptographic RNG (random)'}
-                    ${isDeterministic ? `<span style="font-size:0.6rem;color:var(--text3);font-family:monospace;">seed: ${_deckSeedState.seed.substring(0, 8)}...</span>` : ''}
-                </span>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                    <button class="btn btn-xs btn-ghost" id="deck-seed-regenerate" title="Regenerate seed" data-i18n-attr="title:feature.decks.regenerateSeed" data-i18n="feature.decks.newSeed">🔄 New Seed</button>
-                    <button class="btn btn-xs btn-ghost" id="deck-seed-clear" title="Clear seed (use crypto)" data-i18n-attr="title:feature.decks.clearSeedUseCrypto" data-i18n="feature.decks.clearSeed">🧹 Clear Seed</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="field" style="max-width:300px;display:flex;align-items:center;gap:0.5rem;">
-                <label style="margin:0;" data-i18n="feature.decks.region">Region</label>
-                <select id="deck-region-select">
-                    <option value="" data-i18n="feature.decks.selectRegion">— Select Region —</option>
-                    ${regionOptions}
-                </select>
-                <button class="btn btn-xs btn-ghost" id="deck-refresh-regions" title="Re-scan for region files" data-i18n-attr="title:feature.decks.reScanForRegionFiles">🔄</button>
-                <span style="font-size:0.7rem;color:var(--text3);white-space:nowrap;">(${regionCount} regions)</span>
-            </div>
-            ${regionNames.length === 0 ? `<div style="color:var(--orange);font-size:0.8rem;margin-top:0.3rem;">⚠️ No region files found. Using fallback defaults.</div>` : ''}
-            <div id="region-header" style="margin-top:0.6rem;"></div>
-            <div id="region-description" style="margin-top:0.5rem;background:var(--bg2);padding:0.8rem 1rem;border-radius:var(--radius);border-inline-start:4px solid var(--gold);color:var(--text);font-size:1rem;line-height:1.6;max-height:60vh;overflow-y:auto;">
-                <span style="color:var(--text2);">Select a region to display its description.</span>
-            </div>
-        </div>
-
-        ${controlsHtml}
-
-        <div class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-                <h3 style="margin:0;" data-i18n="feature.decks.history">📜 History</h3>
-                ${accessible ? `<button class="btn btn-sm" id="deck-history-clear-btn" data-i18n="feature.decks.clearHistory">Clear History</button>` : ''}
-            </div>
-            <div class="deck-history" id="deck-history" style="max-height:200px;overflow-y:auto;margin-top:0.5rem;"></div>
-        </div>
-    `;
-
-    buildDeck();
+    if (!deckBuilt) buildDeck();
+    updateDeckCount();
     renderDeckHistory();
     attachEvents();
+    const drawType = document.getElementById('deck-draw-type');
+    if (drawType) drawType.value = selectedDrawType;
     updateSpreadDescription();
+    if (accessible) restoreLastReading();
+    document.getElementById('deck-history-search')?.addEventListener('input', renderDeckHistory);
 
     const select = document.getElementById('deck-region-select');
     if (select) {
@@ -1241,7 +1163,9 @@ export async function render(el) {
             // setDeckSeed() invalidates the twist offset internally and
             // does not touch localStorage. The deck's seed is session-only,
             // and must never touch the dice engine's persistence key.
+            if (!getFeatureAccess('decks').accessible || drawBusy) return;
             setDeckSeed(newSeed);
+            lastDrawResults = null; buildDeck();
             render(container);
             showToast(i18nText("feature.decks.newDeckSeedGeneratedValue", { value0: newSeed.substring(0, 8) }, "🎲 New deck seed generated: {{value0}}..."), 'success');
         });
@@ -1251,7 +1175,9 @@ export async function render(el) {
     if (seedClear) {
         seedClear.addEventListener('click', function() {
             if (confirm(i18nText("feature.decks.clearTheDeterministicSeedThisWillUse", null, "Clear the deterministic seed? This will use cryptographic RNG instead."))) {
+                if (!getFeatureAccess('decks').accessible || drawBusy) return;
                 setDeckSeed(null);
+                lastDrawResults = null; buildDeck();
                 render(container);
                 showToast(i18nText("feature.decks.deckSeedClearedUsingCryptographicRNG", null, "🧹 Deck seed cleared. Using cryptographic RNG."), 'info');
             }
@@ -1280,7 +1206,7 @@ export async function render(el) {
                     select.value = regionNames[0];
                 }
                 await handleRegionChange();
-                const countSpan = document.querySelector('#deck-region-select + span');
+                const countSpan = document.getElementById('deck-region-count');
                 if (countSpan) countSpan.textContent = i18nText("feature.decks.valueRegions", { value0: regionNames.length }, "({{value0}} regions)");
                 showToast(i18nText("feature.decks.regionListRefreshed", null, "🗺️ Region list refreshed."), 'success');
             }
@@ -1295,6 +1221,7 @@ export async function render(el) {
 // ============================================================
 
 function buildDeck() {
+    deckBuilt = true;
     deck = [];
     for (const suit of SUITS) {
         for (const rank of RANKS) {
@@ -1343,6 +1270,14 @@ function updateSpreadDescription() {
 let lastDrawResults = null;
 
 export async function drawConsequence() {
+    if (drawBusy) return;
+    drawBusy = true;
+    const button = document.getElementById('deck-draw-btn');
+    if (button) button.disabled = true;
+    try { await performConsequenceDraw(); }
+    finally { drawBusy = false; if (button?.isConnected) button.disabled = false; }
+}
+async function performConsequenceDraw() {
     await ensureRegionsReady();
     // Extra safety – this should not be called if UI is disabled, but keep it.
     const { accessible } = getFeatureAccess('decks');
@@ -1355,10 +1290,13 @@ export async function drawConsequence() {
         showToast(i18nText("feature.decks.pleaseSelectARegionFirst", null, "Please select a region first."), 'error');
         return;
     }
-    const data = await fetchRegionData(selectedRegion);
-    if (!data) return;
+    const drawRegion = selectedRegion;
+    const data = await fetchRegionData(drawRegion);
+    if (!data || selectedRegion !== drawRegion || !getFeatureAccess('decks').accessible) return;
 
     const type = document.getElementById('deck-draw-type')?.value || '1';
+    if (!['1','2','3','crown'].includes(type)) return;
+    selectedDrawType = type;
     let cards = [];
     let isCrown = false;
 
@@ -1459,8 +1397,7 @@ export async function drawConsequence() {
 
     const detailsEl = document.getElementById('crown-spread-details');
     if (details) {
-        detailsEl.style.display = 'block';
-        detailsEl.innerHTML = details;
+        if (detailsEl) { detailsEl.style.display = 'block'; detailsEl.innerHTML = details; }
         const titleEl = document.getElementById('consequence-title');
         if (titleEl) titleEl.textContent = i18nText("feature.decks.crownSpread", null, "👑 Crown Spread");
     } else {
@@ -1470,7 +1407,7 @@ export async function drawConsequence() {
     }
 
     const timerEl = document.getElementById('timer-result');
-    if (timer) {
+    if (timer && timerEl) {
         timerEl.style.display = 'block';
         timerEl.innerHTML = `
             <strong>⏱️ Suggested Timer:</strong> ${timer.segments} segments (from highest card: ${timer.card})
@@ -1483,19 +1420,23 @@ export async function drawConsequence() {
             });
         }
     } else {
-        timerEl.style.display = 'none';
+        if (timerEl) timerEl.style.display = 'none';
     }
 
-    lastDrawResults = { cards, synthesis, isCrown, details, timer, type, aceEffect };
+    lastDrawResults = { cards, synthesis, isCrown, details, timer, type, aceEffect, region: drawRegion, cardDisplay, drawnGmNotes };
+    const readingContext = document.getElementById('deck-reading-context');
+    if (readingContext) readingContext.textContent = `Reading drawn in ${drawRegion}. Changing region affects the next draw.`;
 
     const cardStr = cards.map(c => isJokerCard(c) ? `🃏${c.rank}` : `${c.rankName} of ${c.suitName}`).join(' | ');
     deckHistory.push({
-        time: new Date().toLocaleTimeString(),
+        region: selectedRegion,
+        time: new Date().toLocaleString(),
         cards: cardStr,
         synthesis: synthesis.replace(/\n/g, ' '),
         type: type === 'crown' ? 'Crown Spread' : `${type} Draw${type > 1 ? 's' : ''}`,
         aceEffect: aceEffect ? `${aceEffect.emoji} ${aceEffect.text}` : null
     });
+    saveJournal();
     renderDeckHistory();
 
     broadcastDraw(cards, type, selectedRegion, synthesis);
@@ -1547,7 +1488,9 @@ function renderCards(cards, isCrown) {
 }
 
 function createTimerFromCard(cardName, segments) {
+    if (!getFeatureAccess('decks').accessible) return;
     import('@features/timers/index.js').then(module => {
+        if (!getFeatureAccess('decks').accessible) return;
         if (module.openTimerEditor) {
             module.openTimerEditor({ name: `Crown Spread: ${cardName}`, segments, current: 0 });
             showToast(i18nText("feature.decks.creatingTimerFromValueValueSegments", { value0: cardName, value1: segments }, "⏱️ Creating timer from {{value0}} ({{value1}} segments)"), 'success');
@@ -1589,24 +1532,41 @@ function createTimerFromCard(cardName, segments) {
 function renderDeckHistory() {
     const el = document.getElementById('deck-history');
     if (!el) return;
-    if (deckHistory.length === 0) {
-        el.innerHTML = '<span class="text-muted">No draws yet.</span>';
-        return;
+    el.innerHTML = renderJournal(deckHistory, document.getElementById('deck-history-search')?.value || '');
+}
+
+function saveJournal() {
+    getState().deckJournal = deckHistory;
+    saveState();
+}
+
+function restoreLastReading() {
+    if (!lastDrawResults) return;
+    const { cards, synthesis, isCrown, details, type, region, cardDisplay, drawnGmNotes = [], timer } = lastDrawResults;
+    renderCards(cards, isCrown);
+    const title = document.getElementById('consequence-title');
+    if (title) title.textContent = isCrown ? 'Crown Spread' : `${type} card reading`;
+    const context = document.getElementById('deck-reading-context');
+    if (context) context.textContent = `Reading drawn in ${region}. Changing region affects the next draw.`;
+    const text = document.getElementById('consequence-synthesis');
+    if (text) text.innerHTML = renderSynthesisHtml(synthesis) + drawnGmNotes.map(({label,note}) => renderGmNote(note,{heading:label})).join('');
+    for (const [id, html] of [['crown-spread-cards',cardDisplay],['crown-spread-details',details]]) {
+        const element = document.getElementById(id);
+        if (element) { element.style.display = html ? 'block' : 'none'; element.innerHTML = html || ''; }
     }
-    el.innerHTML = deckHistory.slice().reverse().map(e =>
-        `<div style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
-            <span style="color:var(--text3);font-size:0.7rem;">[${e.time}]</span>
-            <span style="background:var(--bg3);padding:0.05rem 0.4rem;border-radius:8px;font-size:0.7rem;">${e.type}</span>
-            <span style="font-weight:500;">${e.cards}</span>
-            <span style="color:var(--text2);font-size:0.75rem;">→</span>
-            <span style="font-size:0.8rem;">${e.synthesis}</span>
-            ${e.aceEffect ? `<span style="color:var(--gold);font-size:0.7rem;">${e.aceEffect}</span>` : ''}
-        </div>`
-    ).join('');
+    const timerEl = document.getElementById('timer-result');
+    if (timerEl && timer) {
+        timerEl.style.display = 'block';
+        timerEl.innerHTML = `Suggested timer: ${Number(timer.segments)} segments <button class="btn btn-sm" id="create-timer-btn">Add Timer</button>`;
+        timerEl.querySelector('button').onclick = () => createTimerFromCard(timer.card, timer.segments);
+    }
 }
 
 function clearDeckHistory() {
+    if (!getFeatureAccess('decks').accessible) return;
+    if (!confirm('Clear the saved reading journal? This cannot be undone. The current deck is unchanged.')) return;
     deckHistory = [];
+    saveJournal();
     renderDeckHistory();
     showToast(i18nText("feature.decks.deckHistoryCleared", null, "Deck history cleared."), 'success');
     if (typeof logRecordingEvent === 'function') {
@@ -1620,13 +1580,17 @@ export function getDeckHistory() {
 }
 
 export function resetDeck() {
+    if (drawBusy) return;
     // Prevent non-GM from resetting
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
         showToast(i18nText("feature.decks.onlyTheGMCanResetTheDeck", null, "Only the GM can reset the deck."), 'error');
         return;
     }
+    lastDrawResults = null;
     // Invalidate the twist salt so the next draw picks a fresh flavour text.
+    const context = document.getElementById('deck-reading-context');
+    if (context) context.textContent = '';
     _cardOffset = null;
     buildDeck();
     const drawnCards = document.getElementById('drawn-cards');
@@ -1652,7 +1616,7 @@ export function resetDeck() {
     }
 
     showToast(_deckSeedState.seed
-        ? i18nText('feature.decks.deckReshuffledDeterministic', null, 'Deck reshuffled with a new deterministic seed.')
+        ? i18nText('feature.decks.deckReshuffledDeterministic', null, 'Deck reshuffled using the current deterministic sequence.')
         : i18nText('feature.decks.deckReshuffled', null, 'Deck reshuffled with new random seeds.'), 'success');
 }
 
@@ -1688,20 +1652,14 @@ export async function refresh() {
             select.value = regionNames[0];
         }
         await handleRegionChange();
-        const countSpan = document.querySelector('#deck-region-select + span');
+        const countSpan = document.getElementById('deck-region-count');
         if (countSpan) countSpan.textContent = i18nText("feature.decks.valueRegions", { value0: regionNames.length }, "({{value0}} regions)");
     }
 }
 
 export function destroy() {
     container = null;
-    deck = [];
-    deckHistory = [];
-    regionData = null;
-    selectedRegion = null;
-    isInitialized = false;
-    regionChangeCallbacks = [];
-    regionDataCache.clear();
+    // Navigating away must not reset the deck, selected region, or reading.
 }
 
 export function attachEvents() {
@@ -1716,7 +1674,7 @@ export function attachEvents() {
     if (reshuffleBtn) {
         const newBtn = reshuffleBtn.cloneNode(true);
         reshuffleBtn.parentNode.replaceChild(newBtn, reshuffleBtn);
-        newBtn.addEventListener('click', resetDeck);
+        newBtn.addEventListener('click', () => { if (confirm('Reshuffle all 54 cards? Your reading journal will be kept.')) resetDeck(); });
     }
     const clearBtn = document.getElementById('deck-history-clear-btn');
     if (clearBtn) {
@@ -1728,7 +1686,7 @@ export function attachEvents() {
     if (typeSelect) {
         const newSelect = typeSelect.cloneNode(true);
         typeSelect.parentNode.replaceChild(newSelect, typeSelect);
-        newSelect.addEventListener('change', updateSpreadDescription);
+        newSelect.addEventListener('change', () => { selectedDrawType = newSelect.value; updateSpreadDescription(); });
     }
 }
 
@@ -1959,6 +1917,7 @@ export async function onRegionChange(regionNameOrCallback, callback) {
 }
 
 export async function quickDraw(count = 1, regionName = null) {
+    if (!Number.isInteger(count) || count < 1 || count > 3) return null;
     // Quick draw is also GM‑only
     const { accessible } = getFeatureAccess('decks');
     if (!accessible) {
@@ -2004,12 +1963,14 @@ export async function quickDraw(count = 1, regionName = null) {
 
     broadcastDraw(cards, String(count), selectedRegion, synthesisWithAce);
     deckHistory.push({
-        time: new Date().toLocaleTimeString(),
+        region: selectedRegion,
+        time: new Date().toLocaleString(),
         cards: cardNames,
         synthesis: synthesisWithAce.replace(/\n/g, ' '),
         type: `${count} Draw${count > 1 ? 's' : ''}`,
         aceEffect: aceEffect ? `${aceEffect.emoji} ${aceEffect.text}` : null
     });
+    saveJournal();
     renderDeckHistory();
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('quick_draw', `${count} card(s) drawn: ${cardNames} | Region: ${selectedRegion}`);
@@ -2063,12 +2024,14 @@ export async function quickCrownSpread(regionName = null) {
     broadcastDraw(cards, 'crown', selectedRegion, synthesisWithAce);
     const cardNames = cards.map(c => isJokerCard(c) ? '🃏 Joker' : `${c.rankName} of ${c.suitName}`).join(', ');
     deckHistory.push({
-        time: new Date().toLocaleTimeString(),
+        region: selectedRegion,
+        time: new Date().toLocaleString(),
         cards: cardNames,
         synthesis: synthesisWithAce.replace(/\n/g, ' '),
         type: 'Crown Spread',
         aceEffect: aceEffect ? `${aceEffect.emoji} ${aceEffect.text}` : null
     });
+    saveJournal();
     renderDeckHistory();
     if (typeof logRecordingEvent === 'function') {
         logRecordingEvent('crown_spread_quick', `Crown Spread: ${cardNames} | Region: ${selectedRegion}`);

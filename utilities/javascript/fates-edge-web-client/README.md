@@ -33,6 +33,7 @@ To play with others, connect to a running [socket server](../fates-edge-socket-s
 - **Encounters** — a combat/objective tracker with an integrated bestiary. Clocks aren't limited to Harm/Heal combat math — Obstruction, Skill Challenge, Trap/Ward, Lockpick, Heist, Social/Negotiation, and a freeform Custom type each get their own progress vocabulary and icon, with real combat's Harm/Fatigue/armor math strictly gated to actual fights.
 - **Timers** — visual timers for scene and campaign pressure.
 - **Docs & Wiki** — a searchable document viewer for the SRD, Essentials guide, and GM Screen, plus a responsive Markdown reference library. Combine search terms with category/region filters, browse personal or bundled entries, bookmark frequent references, and page through results. Use **Write an entry** for table lore or **Clone to my wiki** to customize a bundled reference. **Library tools & storage** reloads bundled material, restores hidden references, or clones the entire bundle; reload never replaces personal entries. Bookmarks and edits are saved in this browser; use Export Data for a backup.
+- **Docs reading room** — search all categories by title, author, description, or chapter title (not full document body text). Browse 24 documents per page, save frequently used guides, or use Recently read. Opening a document switches to a dedicated reader with section navigation and text-size controls; Back to library preserves the current filters. Books reopen at the last chapter read, not an exact scroll position. Saved/recent reading preferences are local to this browser and stored separately from campaign exports. Uploads, chapter links, and the existing document-specific print allowlist remain supported.
 - **Search** — full-text search across the Wiki, documents, patrons, factions, and regions. Zero-config with a built-in local Fuse.js index; optionally backed by a self-hosted Solr or Elasticsearch instance for larger deployments (`window.__SOLR_URL` / `window.__ES_URL`/`__ES_API_KEY`, `window.__SEARCH_BACKEND` to force one when both are configured — see System Status for which one is actually active).
 - **Crafting** — a project workshop for Provisions, Works, and Wonders, with ingredients, work rolls, partial-success choices, flaws and repairs, collection, and upkeep. The included Player's Guide, GM's Guide, and SRD describe the same system. The Codex retains Talent-tier-priced magic items/artifacts and attunement tracking.
 
@@ -53,6 +54,11 @@ One unified UI covering every path in the game:
 ### Running a campaign
 
 - **Factions & Patrons** — standings, agendas, relationships, and rites/witchcraft/traditions tied to cosmic and terrestrial patrons.
+- **Patron library** — search across lore and mechanics, filter traditions, save favorites, and open full references with section shortcuts. Choose a character before tracking Patron Obligation; the legacy table tracker remains available. This per-Patron ledger is separate from Spellcraft's character-wide totals. Library tools create local references; reloading bundled references preserves local edits.
+- **Whiteboard workspace** — named drawing tools and contextual guidance beside the board, collapsible tools on phones, multiline notes, pointer-based drawing/dragging, keyboard-operable sheet selection, and per-sheet undo/redo. Ctrl/Cmd+Z affects the board only while Whiteboard is open and you are not typing in a field. Clear-content controls are separated from everyday actions. “Export drawing PNG” exports the canvas/grid/fog, not the separately pinned notes, images, or portraits; use the app's Export Data for a complete backup. Player View is a visual preview, not a security boundary for shared data.
+- **Dice workspace** — build a pool with a live 12-die-cap preview, review an example setup, then explicitly Roll. Presets do not roll automatically. The current setup and latest result survive tab navigation within this session; history is saved. Randomness/replay controls are separate from normal play and affect the shared dice engine.
+- **Kon’reh game library** — launch local hot-seat or computer play, enable Coach Mode, and expand rules when needed. Play using the board or the keyboard-accessible Column/Row selectors (coordinates 0–7) and Select / move button; legal destinations are listed after selection. Closing a local game ends that match. Connected challenges still launch through Whiteboard. Toll & Veil remains available alongside Kon’reh.
+- **Deck workspace** — select a region and reading, then draw without leaving the table controls. SB labels are guidance, not automatic spending. Navigation retains the current deck and reading; a page reload starts a new deck. The searchable reading journal survives reloads, includes GM Tools draws, and is retained when reshuffling. Connected players can browse references, while draw/reset controls remain GM-only.
 - **Adventure Manager** — load pre-authored adventure modules and track scene/act progress, NPCs, locations, and a per-adventure bestiary. Also hosts the **ad-hoc timer panel** — quick GM/AI-improvised countdown timers (e.g. "Guard Patrol," "Village Unrest") that are independent of any loaded adventure and live on the server (`server/timers.js`) rather than in this client's local state, separate from an adventure module's own authored scene/campaign timers.
 - **Whiteboard** — collaborative notes and grid-combat tools.
 - **GM Tools** — GM-only utilities kept separate from the shared player view: Session Recap (below), the **Kanban** task board for threats and opportunities, the **Travel Planner** for overland route/travel-time planning across regions, and a **Soundboard** (ambience loops + one-shot SFX, with a crossfade transition) whose "Search Sounds" modal looks up CC-licensed tracks on [Freesound](https://freesound.org) via the socket server's proxy (needs `FREESOUND_API_KEY` set there — see that server's README) and tracks attribution for anything that requires it.
@@ -203,8 +209,17 @@ for the translator's guide and the developer notes on `t()`, `data-i18n` and
 
 ## Development
 
+### Real-time connections
+
+Socket.IO is bundled with the app; NAS/LAN installations do not need access to its public CDN. A transport connection is not yet a room connection: game controls send only after the server accepts the room join. Reconnects reuse the name, requested role, password, and authentication supplied for that session, in memory only. Leaving or disconnecting clears that retry information.
+
+`initSocketIO()` resolves transport setup; call and await `joinRoom(code, { name, role, password, authToken })` for admission. `initWebSocket({ mode: 'socketio', room, clientData })` performs both steps. Incorrect credentials reject the join; a GM-seat conflict may instead admit the client as a Player. A timed-out join closes its connection to prevent a late response from accepting the wrong request.
+
+The live test command below starts temporary local servers and SQLite databases. Install dependencies in both this client and the sibling socket-server directory first. It does not use your running campaign or paid AI services. Reverse-proxy deployment and external AI/audio services need a separate deployment smoke test.
+
 ```bash
 npm test          # runs tests/runner.js — a small hand-rolled test framework, no Jest
+npm run test:socketio # isolated live admission/reconnect tests (requires socket-server dependencies)
 npm run i18n:report   # interface translation + string-extraction coverage
 ```
 

@@ -1,3 +1,6 @@
+import { arrangeDocs, enterReader, finishReading, filterDocuments, isSaved, toggleSaved, readReadingState } from './workspace.js';
+let documentRequest = 0;
+let libraryPage = 0;
 /**
  * Docs Module – Document Library with localStorage cache
  * 
@@ -527,6 +530,7 @@ export function render(el) {
         </div>
     `;
 
+    arrangeDocs(container, () => {libraryPage=0;applyDocsFilter();});
     loadDocs();
     attachDocEvents();
     setupThemeObserver();
@@ -981,8 +985,8 @@ function attachDocEvents() {
         });
     }
 
-    if (typeFilter) typeFilter.addEventListener('change', applyDocsFilter);
-    if (searchInput) searchInput.addEventListener('input', applyDocsFilter);
+    if (typeFilter) typeFilter.addEventListener('change', () => {libraryPage=0;applyDocsFilter();});
+    if (searchInput) searchInput.addEventListener('input', () => {libraryPage=0;applyDocsFilter();});
 
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
@@ -990,6 +994,9 @@ function attachDocEvents() {
             // dropdown always has one category selected (there's no "All"
             // option to clear back to), so leave it as the user set it.
             if (searchInput) searchInput.value = '';
+            if (typeFilter) typeFilter.value = 'all';
+            const shelf=document.getElementById('docsShelf');if(shelf)shelf.value='all';
+            libraryPage=0;
             applyDocsFilter();
             if (searchInput) searchInput.focus();
         });
@@ -1240,8 +1247,8 @@ function renderDocCard(doc) {
     const typeInfo = DOC_TYPES[doc.type] || DOC_TYPES.other;
     const typeIcon = typeInfo.icon || '📄';
     const typeLabel = typeInfo.label || 'Other';
-    const tierBadge = doc.tier ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--gold)33;color:var(--gold);border:1px solid var(--gold);">Tier ${doc.tier}</span>` : '';
-    const sessionsBadge = doc.sessions ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--blue)33;color:var(--blue);border:1px solid var(--blue);">${doc.sessions} sessions</span>` : '';
+    const tierBadge = doc.tier ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--gold)33;color:var(--gold);border:1px solid var(--gold);">Tier ${escHtml(String(doc.tier))}</span>` : '';
+    const sessionsBadge = doc.sessions ? `<span style="font-size:0.55rem;padding:0.05rem 0.3rem;border-radius:6px;background:var(--blue)33;color:var(--blue);border:1px solid var(--blue);">${escHtml(String(doc.sessions))} sessions</span>` : '';
     const pagesBadge = doc.book && Array.isArray(doc.pages) ? `<span style="font-size:0.6rem;color:var(--text2);">${doc.pages.length} chapters</span>` : '';
 
     return `
@@ -1249,11 +1256,11 @@ function renderDocCard(doc) {
              style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.8rem;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;justify-content:space-between;min-height:100%;">
             <div>
                 <div style="font-size:1.5rem;margin-bottom:0.2rem;">${icon}</div>
-                <h4 style="color:var(--gold);margin-bottom:0.3rem;font-size:0.95rem;font-weight:600;word-break:break-word;">${escHtml(doc.title)}</h4>
+                <h4 style="color:var(--gold);margin-bottom:0.3rem;font-size:0.95rem;font-weight:600;word-break:break-word;"><button class="doc-open" aria-label="Read ${escHtml(doc.title)}">${escHtml(doc.title)}</button></h4>
             </div>
             <div>
                 <div class="doc-meta" style="font-size:0.75rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;margin-top:0.3rem;">
-                    <span class="doc-category-badge ${doc.type || 'other'}"
+                    <span class="doc-category-badge ${escHtml(doc.type || 'other')}"
                           style="display:inline-block;padding:0.05rem 0.5rem;border-radius:12px;font-size:0.6rem;font-weight:600;background:var(--bg4);color:var(--text2);letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">
                         ${typeIcon} ${escHtml(typeLabel)}
                     </span>
@@ -1263,14 +1270,20 @@ function renderDocCard(doc) {
                     ${sessionsBadge}
                     ${pagesBadge}
                 </div>
-                ${doc.description ? `<div style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(doc.description)}</div>` : ''}
+                ${doc.description ? `<div class="doc-description" style="font-size:0.65rem;color:var(--text3);margin-top:0.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(doc.description)}</div>` : ''}
             </div>
+            <button class="btn doc-save" data-save-path="${escHtml(doc.fullPath || '')}" aria-label="${isSaved(doc.fullPath)?'Unsave':'Save'} ${escHtml(doc.title)}" aria-pressed="${isSaved(doc.fullPath)}">${isSaved(doc.fullPath)?'★ Saved':'☆ Save'}</button>
         </div>
     `;
 }
 
 function attachDocCardEvents(container) {
     container.querySelectorAll('.doc-card').forEach(card => {
+        card.querySelector('[data-save-path]')?.addEventListener('click', event => {
+            event.stopPropagation();
+            if(!toggleSaved(card.dataset.fullpath)) showToast('Could not save your reading preference. Browser storage may be full.','warning');
+            applyDocsFilter();
+        });
         card.addEventListener('click', function() {
             const fullPath = this.dataset.fullpath;
             if (!fullPath || fullPath === '#') {
@@ -1315,26 +1328,9 @@ function applyDocsFilter() {
     const type = typeFilter ? typeFilter.value : '';
     const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    if (!type) {
-        container.innerHTML = `
-            <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;font-style:italic;">
-                <div style="font-size:1.4rem;">📂</div>
-                <p>Choose a category above to browse its documents.</p>
-            </div>
-        `;
-        updateDocStats(0);
-        return;
-    }
-
-    let filtered = allDocs.filter(d => d.type === type);
-    if (search) {
-        filtered = filtered.filter(d =>
-            d.title.toLowerCase().includes(search) ||
-            d.file.toLowerCase().includes(search) ||
-            (d.author && d.author.toLowerCase().includes(search))
-        );
-    }
-
+    const filtered=filterDocuments(allDocs,{type,query:search,shelf:document.getElementById('docsShelf')?.value || 'all'});
+    const pageSize=24;
+    libraryPage=Math.min(libraryPage,Math.max(0,Math.ceil(filtered.length/pageSize)-1));
     updateDocStats(filtered.length);
 
     if (filtered.length === 0) {
@@ -1350,10 +1346,16 @@ function applyDocsFilter() {
 
     container.innerHTML = `
         <div class="doc-grid">
-            ${filtered.map(renderDocCard).join('')}
+            ${filtered.slice(libraryPage*pageSize,(libraryPage+1)*pageSize).map(renderDocCard).join('')}
         </div>
     `;
 
+    if(filtered.length>pageSize) {
+        const pager=document.createElement('div');pager.className='docs-pagination';
+        pager.innerHTML='<button class="btn" data-page="-1" '+(libraryPage===0?'disabled':'')+'>Previous</button><span>Page '+(libraryPage+1)+' of '+Math.ceil(filtered.length/pageSize)+'</span><button class="btn" data-page="1" '+((libraryPage+1)*pageSize>=filtered.length?'disabled':'')+'>Next</button>';
+        pager.querySelectorAll('button').forEach(button=>button.onclick=()=>{libraryPage+=Number(button.dataset.page);applyDocsFilter();document.getElementById('doc-list')?.scrollIntoView({block:'start'});});
+        container.append(pager);
+    }
     attachDocCardEvents(container);
 }
 
@@ -1369,7 +1371,7 @@ function populateTypeFilter(docs) {
     docs.forEach(d => { if (d.type) types.add(d.type); });
 
     const currentValue = sel.value;
-    sel.innerHTML = '';
+    sel.innerHTML = '<option value="all">All categories</option>';
 
     const sortedTypes = Array.from(types).sort((a, b) => {
         const ia = TYPE_ORDER.indexOf(a);
@@ -1403,10 +1405,10 @@ function populateTypeFilter(docs) {
     // whole point of the dropdown is to pick the one category whose tiles
     // populate the pane below. Keep whatever was already chosen if it's
     // still valid, otherwise default to the first category.
-    if (currentValue && sortedTypes.includes(currentValue)) {
+    if (currentValue && (currentValue==='all'||sortedTypes.includes(currentValue))) {
         sel.value = currentValue;
     } else if (sortedTypes.length > 0) {
-        sel.value = sortedTypes[0];
+        sel.value = 'all';
     }
 }
 
@@ -1436,7 +1438,10 @@ function updateTotalCount() {
 
 function openBookDocument(doc) {
     currentBookDoc = doc;
-    loadBookChapter(doc, 0);
+    const recent=readReadingState().recent.find(item=>item.path===doc.fullPath);
+    const base=doc.path.endsWith('/')?doc.path:doc.path+'/';
+    const chapter=doc.pages.findIndex(page=>base+page.file===recent?.chapter);
+    loadBookChapter(doc, Math.max(0,chapter));
 }
 
 function updateChapterNav(doc, chapterIndex) {
@@ -1504,6 +1509,7 @@ function scrollDocumentAnchor(viewer, anchor) {
 }
 
 function loadBookChapter(doc, chapterIndex, preserveTheme = false, anchor = '') {
+    const request=++documentRequest;
     if (!doc || !Array.isArray(doc.pages) || !doc.pages[chapterIndex]) return;
 
     currentBookDoc = doc;
@@ -1520,6 +1526,7 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false, anchor = '') 
     currentDocPath = chapterPath;
 
     viewerContainer.style.display = 'block';
+    enterReader(container);
     updateChapterNav(doc, chapterIndex);
     const printBtn = document.getElementById('doc-print-btn');
     if (printBtn) printBtn.style.display = PRINTABLE_DOC_IDS.has(doc.id) ? '' : 'none';
@@ -1534,6 +1541,7 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false, anchor = '') 
             return res.text();
         })
         .then(html => {
+            if(request!==documentRequest || !viewer.isConnected)return;
             if (isSpaContent(html)) {
                 viewer.innerHTML = `
                     <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;">
@@ -1548,6 +1556,7 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false, anchor = '') 
             const sanitized = sanitizeHtml(html);
             viewer.innerHTML = injectThemeAndStyles(sanitized, chapterPath);
             wireDocumentLinks(viewer, chapterPath);
+            finishReading(viewer,chapterPath,doc.fullPath);
             if (anchor || !preserveTheme) scrollDocumentAnchor(viewer, anchor);
             titleEl.textContent = i18nText("feature.docs.valueValueValue", { value0: doc.title, value1: chapter.label ? `${chapter.label}: ` : '', value2: chapter.title }, "{{value0}} — {{value1}}{{value2}}");
             if (!preserveTheme) {
@@ -1555,6 +1564,7 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false, anchor = '') 
             }
         })
         .catch(err => {
+            if(request!==documentRequest || !viewer.isConnected)return;
             console.error('Chapter load error:', err);
             viewer.innerHTML = `
                 <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;">
@@ -1573,6 +1583,7 @@ function loadBookChapter(doc, chapterIndex, preserveTheme = false, anchor = '') 
 // ============================================================
 
 export function loadDocument(docPath, preserveTheme = false, anchor = '') {
+    const request=++documentRequest;
     currentDocPath = docPath;
     currentBookDoc = null;
     currentChapterIndex = -1;
@@ -1583,6 +1594,7 @@ export function loadDocument(docPath, preserveTheme = false, anchor = '') {
     if (!viewerContainer || !viewer || !titleEl) return;
 
     viewerContainer.style.display = 'block';
+    enterReader(container);
     titleEl.textContent = i18nText("feature.docs.loading", null, "Loading…");
     viewer.innerHTML = '<div class="loading" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text2);font-style:italic;padding:2rem;">Loading document…</div>';
 
@@ -1645,6 +1657,7 @@ export function loadDocument(docPath, preserveTheme = false, anchor = '') {
                 </div>
             </div>
         `;
+        finishReading(viewer,docPath,doc.fullPath);
         titleEl.textContent = i18nText("feature.docs.valuePDF", { value0: doc.title }, "{{value0}} (PDF)");
         return;
     }
@@ -1667,6 +1680,8 @@ export function loadDocument(docPath, preserveTheme = false, anchor = '') {
         }
         const themedHtml = injectThemeAndStyles(sanitized, docPath);
         viewer.innerHTML = themedHtml;
+        wireDocumentLinks(viewer,docPath);
+        finishReading(viewer,docPath,doc.fullPath);
         titleEl.textContent = doc.title;
         showToast(i18nText("feature.docs.loadedValue_10jeg", { value0: titleEl.textContent }, "📄 Loaded: {{value0}}"), 'success');
         return;
@@ -1700,6 +1715,7 @@ export function loadDocument(docPath, preserveTheme = false, anchor = '') {
             return res.text();
         })
         .then(html => {
+            if(request!==documentRequest || !viewer.isConnected)return;
             if (isSpaContent(html)) {
                 viewer.innerHTML = `
                     <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;min-width:100%;">
@@ -1720,6 +1736,7 @@ export function loadDocument(docPath, preserveTheme = false, anchor = '') {
             const themedHtml = injectThemeAndStyles(sanitized, fetchPath);
             viewer.innerHTML = themedHtml;
             wireDocumentLinks(viewer, fetchPath);
+            finishReading(viewer,fetchPath,doc?.fullPath || fetchPath);
             if (anchor || !preserveTheme) scrollDocumentAnchor(viewer, anchor);
 
             if (doc) {
@@ -1732,12 +1749,13 @@ export function loadDocument(docPath, preserveTheme = false, anchor = '') {
             showToast(i18nText("feature.docs.loadedValue_10jeg", { value0: titleEl.textContent }, "📄 Loaded: {{value0}}"), 'success');
         })
         .catch(err => {
+            if(request!==documentRequest || !viewer.isConnected)return;
             console.error('Document load error:', err);
             viewer.innerHTML = `
                 <div class="empty-state" style="color:var(--text2);text-align:center;padding:2rem;min-width:100%;">
                     <div style="font-size:2rem;">❌</div>
                     <p>Could not load document.</p>
-                    <p class="text-muted" style="font-size:0.85rem;">${err.message}</p>
+                    <p class="text-muted" style="font-size:0.85rem;">${escHtml(err.message)}</p>
                     <p class="text-muted" style="font-size:0.75rem;">Path: ${escHtml(fetchPath)}</p>
                     <button class="btn btn-sm btn-primary" onclick="location.reload()" style="margin-top:0.5rem;" data-i18n="feature.docs.reload">🔄 Reload</button>
                 </div>
@@ -1808,6 +1826,10 @@ function injectThemeAndStyles(content, docPath) {
 // ============================================================
 
 export function closeDocViewer() {
+    documentRequest++;
+    document.getElementById('tab-docs')?.classList.remove('docs-reading');
+    document.querySelector('.docs-workspace')?.classList.remove('docs-reading');
+    document.getElementById('docsSearchInput')?.focus();
     const container = document.getElementById('doc-viewer-container');
     const viewer = document.getElementById('doc-viewer');
     if (container) container.style.display = 'none';
@@ -1852,7 +1874,6 @@ function refreshView() {
     if (list) {
         populateTypeFilter(allDocs);
         applyDocsFilter();
-        updateDocStats(allDocs.length);
         updateTotalCount();
     }
 }
@@ -1881,6 +1902,7 @@ export function refresh() {
 }
 
 export function destroy() {
+    documentRequest++;
     if (window._themeObserver) {
         window._themeObserver.disconnect();
         window._themeObserver = null;

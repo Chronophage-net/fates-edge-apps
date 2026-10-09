@@ -128,22 +128,23 @@ export function renderSheetTabs() {
     const bar = document.getElementById('whiteboard-sheet-tabs');
     if (!bar) return;
     bar.innerHTML = state.sheets.map(s => `
-        <span class="wb-sheet-tab ${s.id === state.activeSheetId ? 'active' : ''}" data-sheet-id="${s.id}"
+        <span class="wb-sheet-tab ${s.id === state.activeSheetId ? 'active' : ''}" data-sheet-id="${escHtml(String(s.id))}"
               style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px 6px 0 0;
                      cursor:pointer;font-size:0.78rem;margin-inline-end:2px;
                      background:${s.id === state.activeSheetId ? 'var(--bg3, #24242e)' : 'transparent'};
                      border:1px solid var(--border); border-bottom:${s.id === state.activeSheetId ? 'none' : '1px solid var(--border)'};
                      color:${s.id === state.activeSheetId ? 'var(--gold)' : 'var(--text3)'};">
-            <span class="wb-sheet-tab-name">${escHtml(s.name)}</span>
-            <button class="wb-sheet-rename" data-sheet-id="${s.id}" title="Rename" style="background:none;border:none;color:inherit;cursor:pointer;font-size:0.7rem;">✏️</button>
-            <button class="wb-sheet-dup" data-sheet-id="${s.id}" title="Duplicate" style="background:none;border:none;color:inherit;cursor:pointer;font-size:0.7rem;">⧉</button>
-            <button class="wb-sheet-del" data-sheet-id="${s.id}" title="Delete" style="background:none;border:none;color:inherit;cursor:pointer;font-size:0.7rem;">✕</button>
+            <button class="wb-sheet-tab-name" type="button" aria-pressed="${s.id === state.activeSheetId}" data-select-sheet="${escHtml(String(s.id))}">${escHtml(s.name)}</button>
+            <button class="wb-sheet-rename" data-sheet-id="${escHtml(String(s.id))}" aria-label="Rename ${escHtml(s.name)}" title="Rename" style="background:none;border:none;color:inherit;cursor:pointer;font-size:0.7rem;">✏️</button>
+            <button class="wb-sheet-dup" data-sheet-id="${escHtml(String(s.id))}" aria-label="Duplicate ${escHtml(s.name)}" title="Duplicate" style="background:none;border:none;color:inherit;cursor:pointer;font-size:0.7rem;">⧉</button>
+            <button class="wb-sheet-del" data-sheet-id="${escHtml(String(s.id))}" aria-label="Delete ${escHtml(s.name)}" title="Delete" style="background:none;border:none;color:inherit;cursor:pointer;font-size:0.7rem;">✕</button>
         </span>
     `).join('') + `
-        <button id="whiteboard-add-sheet" title="Add sheet"
+        <button id="whiteboard-add-sheet" aria-label="Add sheet" title="Add sheet"
                 style="display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px 6px 0 0;
                        cursor:pointer;font-size:0.85rem;background:transparent;border:1px dashed var(--border);color:var(--text3);" data-i18n-attr="title:feature.whiteboard.modules.sheets.addSheet">➕</button>
     `;
+    bar.querySelectorAll('[data-select-sheet]').forEach(button => button.addEventListener('click',()=>switchToSheet(button.dataset.selectSheet)));
     bar.querySelectorAll('.wb-sheet-tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
             if (e.target.closest('button')) return;

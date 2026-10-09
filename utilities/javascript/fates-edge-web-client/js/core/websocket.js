@@ -1,4 +1,5 @@
 import { connectionFeedback } from './connection-feedback.js';
+import { createSocketIOSession } from './socketio-session.js';
 import { getConnectionDefaults } from './connection-defaults.js';
 /**
  * WebSocket Client Module
@@ -44,6 +45,8 @@ const CONFIG = {
 // ============================================================
 
 let socket = null;          // Socket.io instance
+let socketSession = null;
+let socketInitGeneration = 0;
 let ws = null;              // Plain WebSocket instance
 let roomCode = null;
 let isConnected = false;
@@ -305,6 +308,8 @@ export function connectManagedRoom(input, name = 'Player') {
 }
 
 export function connectWebSocket(room = null, url = null, managed = null) {
+    if (socket || socketSession) disconnectWebSocket();
+    socketInitGeneration++;
     const config = getWSConfig();
     
     // Close existing connection
@@ -620,6 +625,11 @@ function handleWebSocketMessage(data) {
             triggerEvent('soundboard-ambience', data);
             break;
 
+        case 'assistant-suggestion-created':
+        case 'assistant-suggestion-resolved':
+            triggerEvent(type, data);
+            break;
+
         case 'roll-result':
             triggerEvent('roll-result', data);
             break;
@@ -818,6 +828,9 @@ export function sendWSMessage(data, callback = null) {
  *    would just reconnect anyway, silently undoing the user's action.
  */
 export function disconnectWebSocket() {
+    socketInitGeneration++;
+    socketSession?.dispose();
+    socketSession = null;
     cancelManagedConnect?.();
     cancelManagedConnect = null;
     awaitingHandshakeAck = false;
@@ -917,6 +930,8 @@ export async function testWSConnection(url, room = null) {
  * Initialize Socket.io connection
  */
 export function initSocketIO(serverUrl = null, options = {}) {
+    disconnectWebSocket();
+    const generation = socketInitGeneration;
     return new Promise((resolve, reject) => {
         if (socket) {
             socket.disconnect();
@@ -929,26 +944,10 @@ export function initSocketIO(serverUrl = null, options = {}) {
         const normalizedUrl = normalizeSocketURL(url);
         
         try {
-            const importSocketIO = async () => {
-                try {
-                    const ioModule = await import('https://cdn.socket.io/4.7.2/socket.io.esm.min.js');
-                    return ioModule.io || ioModule.default || ioModule;
-                } catch (e) {
-                    return new Promise((resolveScript) => {
-                        const script = document.createElement('script');
-                        script.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
-                        script.onload = () => {
-                            resolveScript(window.io || window.socketIO || window.io);
-                        };
-                        script.onerror = () => {
-                            reject(new Error('Failed to load Socket.io client library'));
-                        };
-                        document.head.appendChild(script);
-                    });
-                }
-            };
+            const importSocketIO = async () => (await import('socket.io-client')).io;
             
             importSocketIO().then((io) => {
+                if (generation !== socketInitGeneration) throw new Error('Connection cancelled');
                 const socketOptions = {
                     transports: ['websocket', 'polling'],
                     reconnection: true,
@@ -960,34 +959,34 @@ export function initSocketIO(serverUrl = null, options = {}) {
                 };
                 
                 socket = io(normalizedUrl, socketOptions);
+                const client = socket;
                 connectionMode = 'socketio';
+                socketSession = createSocketIOSession(client, {
+                    onNotReady(status = 'joining') {
+                        isConnected = false;
+                        socketId = null;
+                        wsStatus = client.connected ? status : 'disconnected';
+                        updateState({ ...getState(), wsStatus, wsSocketId: null });
+                    },
+                    onReady(data) {
+                        isConnected = true;
+                        socketId = client.id;
+                        roomCode = data.room;
+                        wsStatus = 'connected';
+                        updateState({ ...getState(), wsStatus, wsRoom: roomCode, wsSocketId: socketId });
+                        triggerEvent('connected', { socketId, room: roomCode, mode: 'socketio', url: normalizedUrl });
+                        showToast(i18nText('feature.core.websocket.connectedToServer', null, 'Connected to server'), 'success');
+                    },
+                    onError(error) { triggerEvent('error', { message: error.message, error }); },
+                });
                 
                 socket.on('connect', () => {
                     console.log('🔗 Socket.io connected to:', normalizedUrl);
-                    isConnected = true;
-                    socketId = socket.id;
                     reconnectAttempts = 0;
-                    wsStatus = 'connected';
                     currentServerUrl = socket.io.uri;   // e.g., "https://foobar:12345" (Socket.io uses http(s))
                     cachedApiBase = null;
 
-                    const state = getState();
-                    state.wsStatus = 'connected';
-                    state.wsSocketId = socketId;
-                    updateState(state);
-                    
-                    triggerEvent('connected', { 
-                        socketId, 
-                        mode: 'socketio',
-                        url: normalizedUrl
-                    });
-                    
-                    showToast(i18nText("feature.core.websocket.connectedToServer", null, "Connected to server"), 'success');
-                    
-                    if (roomCode) {
-                        joinRoom(roomCode);
-                    }
-                    
+                    // Resolves transport setup only. Game readiness follows room-joined.
                     resolve(socket);
                 });
                 
@@ -1147,6 +1146,13 @@ function setupSocketIOListeners() {
         triggerEvent('soundboard-ambience', data);
     });
 
+    // AI-GM proposals and live scene state must reach the same subscribers
+    // on both transports; a generic 'event' does not notify named handlers.
+    for (const event of ['assistant-suggestion-created', 'assistant-suggestion-resolved',
+        'scene-status-update', 'combat-status-update', 'sync-state']) {
+        socket.on(event, data => triggerEvent(event, data));
+    }
+
     socket.on('roll-result', (data) => {
         triggerEvent('roll-result', data);
     });
@@ -1262,44 +1268,17 @@ function setupSocketIOListeners() {
  * Join a room (Socket.io)
  */
 export function joinRoom(code, clientData = {}) {
-    return new Promise((resolve, reject) => {
-        if (!socket || !socket.connected) {
-            reject(new Error('Not connected'));
-            return;
-        }
-        
-        roomCode = code.toUpperCase();
-        
-        const timeout = setTimeout(() => {
-            reject(new Error('Join room timeout'));
-        }, CONFIG.CONNECTION_TIMEOUT);
-        
-        socket.emit('join-room', {
-            roomCode,
-            playerName: clientData.name || 'Player',
-            // NEW: optional account auth, see js/core/sync/index.js's
-            // identical note -- omitted/invalid tokens just mean an
-            // anonymous join, same as always.
-            authToken: clientData.authToken || localStorage.getItem('fates-edge-auth-token') || undefined
-        }, (response) => {
-            clearTimeout(timeout);
-            if (response && response.error) {
-                reject(new Error(response.error));
-            } else {
-                resolve(response);
-            }
-        });
-    });
+    if (!socketSession) return Promise.reject(new Error('Not connected'));
+    return socketSession.join(code, { ...clientData,
+        authToken: clientData.authToken ?? localStorage.getItem('fates-edge-auth-token') ?? undefined });
 }
 
 /**
  * Leave current room (Socket.io)
  */
 export function leaveRoom() {
-    if (socket && socket.connected && roomCode) {
-        socket.emit('leave-room', roomCode);
-        roomCode = null;
-    }
+    socketSession?.leave();
+    roomCode = null;
 }
 
 // ============================================================
@@ -1395,7 +1374,7 @@ export function getConnectionMode() {
 export function getConnectedClients() {
     return new Promise((resolve) => {
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected || !roomCode) {
+            if (!isConnected || !socket || !socket.connected || !roomCode) {
                 resolve([]);
                 return;
             }
@@ -1418,7 +1397,7 @@ export function getConnectedClients() {
  */
 export function sendMessage(data) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected) {
+        if (!isConnected || !socket || !socket.connected) {
             console.warn('Cannot send message: not connected to server');
             return false;
         }
@@ -1434,7 +1413,7 @@ export function sendMessage(data) {
  */
 export function syncState(state) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected || !roomCode) {
+        if (!isConnected || !socket || !socket.connected || !roomCode) {
             console.warn('Cannot sync: not connected to server');
             return false;
         }
@@ -1455,7 +1434,7 @@ export function syncState(state) {
  */
 export function sendChatMessage(message) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected || !roomCode) {
+        if (!isConnected || !socket || !socket.connected || !roomCode) {
             console.warn('Cannot send chat: not connected to server');
             return false;
         }
@@ -1476,7 +1455,7 @@ export function sendChatMessage(message) {
  */
 export function sendRoll(rollData) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected || !roomCode) {
+        if (!isConnected || !socket || !socket.connected || !roomCode) {
             console.warn('Cannot send roll: not connected to server');
             return false;
         }
@@ -1497,7 +1476,7 @@ export function sendRoll(rollData) {
  */
 export function sendEvent(eventData) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected || !roomCode) {
+        if (!isConnected || !socket || !socket.connected || !roomCode) {
             console.warn('Cannot send event: not connected to server');
             return false;
         }
@@ -1518,7 +1497,7 @@ export function sendEvent(eventData) {
  */
 export function sendMediaBroadcast(data) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected || !roomCode) {
+        if (!isConnected || !socket || !socket.connected || !roomCode) {
             return false;
         }
         socket.emit('media_recording', { ...data, room: roomCode });
@@ -1583,7 +1562,7 @@ export function drawCards(count = 1, region = 'Acasia') {
         const data = { count, region };
         
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected || !roomCode) {
+            if (!isConnected || !socket || !socket.connected || !roomCode) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1610,7 +1589,7 @@ export function drawCards(count = 1, region = 'Acasia') {
 export function shuffleDeck() {
     return new Promise((resolve) => {
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected || !roomCode) {
+            if (!isConnected || !socket || !socket.connected || !roomCode) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1638,7 +1617,7 @@ export function drawCrownSpread(region = 'Acasia') {
         const data = { region };
         
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected || !roomCode) {
+            if (!isConnected || !socket || !socket.connected || !roomCode) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1665,7 +1644,7 @@ export function drawCrownSpread(region = 'Acasia') {
 export function getDeckHistory() {
     return new Promise((resolve) => {
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected || !roomCode) {
+            if (!isConnected || !socket || !socket.connected || !roomCode) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1691,7 +1670,7 @@ export function getDeckHistory() {
 export function clearDeckHistory() {
     return new Promise((resolve) => {
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected || !roomCode) {
+            if (!isConnected || !socket || !socket.connected || !roomCode) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1723,7 +1702,7 @@ export function requestModulePush(moduleId) {
         const data = { moduleId };
         
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected) {
+            if (!isConnected || !socket || !socket.connected) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1752,7 +1731,7 @@ export function requestModuleCleanup(moduleId) {
         const data = { moduleId };
         
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected) {
+            if (!isConnected || !socket || !socket.connected) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1779,7 +1758,7 @@ export function requestModuleCleanup(moduleId) {
 export function listModules() {
     return new Promise((resolve) => {
         if (connectionMode === 'socketio') {
-            if (!socket || !socket.connected) {
+            if (!isConnected || !socket || !socket.connected) {
                 resolve({ error: 'Not connected' });
                 return;
             }
@@ -1808,7 +1787,7 @@ export function listModules() {
  */
 export function sendVoiceOffer(data) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected) return false;
+        if (!isConnected || !socket || !socket.connected) return false;
         socket.emit('voice-offer', data);
         return true;
     } else {
@@ -1821,7 +1800,7 @@ export function sendVoiceOffer(data) {
  */
 export function sendVoiceAnswer(data) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected) return false;
+        if (!isConnected || !socket || !socket.connected) return false;
         socket.emit('voice-answer', data);
         return true;
     } else {
@@ -1834,7 +1813,7 @@ export function sendVoiceAnswer(data) {
  */
 export function sendVoiceICECandidate(data) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected) return false;
+        if (!isConnected || !socket || !socket.connected) return false;
         socket.emit('voice-ice-candidate', data);
         return true;
     } else {
@@ -1847,7 +1826,7 @@ export function sendVoiceICECandidate(data) {
  */
 export function sendVoiceStatus(data) {
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected) return false;
+        if (!isConnected || !socket || !socket.connected) return false;
         socket.emit('voice-status', data);
         return true;
     } else {
@@ -1877,7 +1856,7 @@ export function sendVoiceStatus(data) {
 export function changeRole(targetId, role, persist = false) {
     if (!targetId || !role) return false;
     if (connectionMode === 'socketio') {
-        if (!socket || !socket.connected) return false;
+        if (!isConnected || !socket || !socket.connected) return false;
         socket.emit('role_change_request', { targetId, role, persist });
         return true;
     } else {
@@ -1904,7 +1883,8 @@ export function initWebSocket(options = {}) {
     const mode = options.mode || config.mode || 'websocket';
     
     if (mode === 'socketio') {
-        return initSocketIO(config.url, options).catch(err => {
+        return initSocketIO(config.url, options).then(() =>
+            joinRoom(options.room || config.room, options.clientData || {}), err => {
             console.error('Socket.io init failed, falling back to WebSocket:', err);
             return connectWebSocket(config.room, config.url);
         });

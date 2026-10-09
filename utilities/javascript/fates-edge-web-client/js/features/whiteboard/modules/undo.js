@@ -19,6 +19,7 @@ function snapshotForUndo() {
         notes: JSON.parse(JSON.stringify(state.notes)),
         images: JSON.parse(JSON.stringify(state.images)),
         characterTokens: JSON.parse(JSON.stringify(state.characterTokens)),
+        gridCombat: JSON.parse(JSON.stringify(state.gridCombat)),
     };
 }
 
@@ -38,6 +39,7 @@ export function undo() {
     state.notes = prev.notes;
     state.images = prev.images;
     state.characterTokens = prev.characterTokens;
+    state.gridCombat = prev.gridCombat;
     saveWhiteboardData();
     restoreDrawings();
     renderOverlay();
@@ -53,6 +55,7 @@ export function redo() {
     state.notes = next.notes;
     state.images = next.images;
     state.characterTokens = next.characterTokens;
+    state.gridCombat = next.gridCombat;
     saveWhiteboardData();
     restoreDrawings();
     renderOverlay();

@@ -1,6 +1,12 @@
 @import '../js/features/crafting/workshop.css';
 @import '../js/features/encounters/workspace.css';
 @import '../js/features/wiki/library.css';
+@import '../js/features/patrons/workspace.css';
+@import '../js/features/decks/workspace.css';
+@import '../js/features/whiteboard/workspace.css';
+@import '../js/features/dice/workspace.css';
+@import '../js/features/kon-reh/workspace.css';
+@import '../js/features/docs/workspace.css';
 
 /* ============================================================
    THEME SYSTEM – Color Tokens & Theme Switching

@@ -2,6 +2,14 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## [5.14.0] - 2026-10-09
+
+- Redesign Patrons, Decks, Whiteboard, Dice, Kon’reh, and Docs workspaces. See the README feature descriptions for persistence, accessibility, and export limitations.
+- Fix AI-GM suggestion delivery and Socket.IO scene/combat event parity.
+- Separate transport connection from room admission; forward join credentials and roles, preserve them in memory for reconnects, and block game traffic until accepted.
+- Bundle Socket.IO locally and add real WebSocket/polling lifecycle tests (`npm run test:socketio`).
+- Verification: 455 client tests, three live lifecycle tests, and production build passed. Deployed reverse proxies and external AI/audio providers were not exercised.
+
 ## [Unreleased]
 
 ### Web client review — 2026-09-27

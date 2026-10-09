@@ -1,3 +1,4 @@
+import { arrangeDiceWorkspace } from './workspace.js';
 /**
  * Dice feature - Roll dice and view history
  * UI for the Fate's Edge resolution system
@@ -25,6 +26,8 @@ import { announce } from '@core/a11y-announce.js';
 
 let container = null;
 let wsListeners = new Map();
+const rollSetup = {attr:'2',skill:'1',dv:'3',position:'controlled',boons:'0'};
+let lastResult = null;
 
 // Seed controls and rolls share the same engine. Replay mode is explicit and session-only.
 async function generateSeed() {
@@ -100,7 +103,7 @@ export function render(el) {
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
                 <span style="font-size:0.8rem;color:var(--text2);">
                     ${isConnected ? '🟢 Connected to server' : '📡 Local mode'}
-                    ${isDeterministic ? ` 🎲 Deterministic (seed: ${seed.substring(0, 8)}...)` : ' 🔀 Cryptographic RNG'}
+                    ${isDeterministic ? ` 🎲 Deterministic (seed: ${escHtml(String(seed).substring(0, 8))}...)` : ' 🔀 Cryptographic RNG'}
                 </span>
                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                     <button class="btn btn-xs btn-ghost" id="seed-regenerate" title="Regenerate seed" data-i18n-attr="title:feature.dice.regenerateSeed" data-i18n="feature.dice.newSeed">🔄 New Seed</button>
@@ -193,7 +196,9 @@ export function render(el) {
         </div>
     `;
     
+    arrangeDiceWorkspace(container, rollSetup);
     attachEvents();
+    if (lastResult) displayResult(lastResult);
     renderHistory();
     updateStats();
     setupWebSocketSync();
@@ -317,13 +322,9 @@ function attachEvents() {
         });
     }
     
-    // Enter key support
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && container && container.contains(e.target)) {
-            const rollBtn = document.getElementById('roll-btn');
-            if (rollBtn) rollBtn.click();
-        }
-    });
+    // Native buttons already support Enter/Space. A document-level Enter
+    // listener caused duplicate rolls and also rolled when activating Export.
+
 }
 
 // ============================================================
@@ -349,10 +350,8 @@ function applyPreset(preset) {
     document.getElementById('roll-position').value = p.position;
     document.getElementById('roll-boons').value = p.boons;
     
-    setTimeout(() => {
-        const rollBtn = document.getElementById('roll-btn');
-        if (rollBtn) rollBtn.click();
-    }, 100);
+    container?.dispatchEvent(new Event('dice-preset-change'));
+
 }
 
 // ============================================================
@@ -437,6 +436,7 @@ function handleRoll() {
         };
         
         addRoll(rollData);
+        lastResult = result;
         displayResult(result);
         // NEW: a11y -- announce the local roll's outcome to screen readers
         // (see the import above). Kept concise on purpose: successes,
@@ -600,7 +600,7 @@ function renderHistory() {
                 return `
                     <div class="history-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;gap:0.5rem;">
                         <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;">
-                            <span style="font-size:0.7rem;color:var(--text3);">${sender}</span>
+                            <span style="font-size:0.7rem;color:var(--text3);">${escHtml(sender)}</span>
                             <span style="font-weight:500;">${roll.attr || 0}+${roll.skill || 0}</span>
                             <span class="text-muted" style="font-size:0.75rem;">vs DV${roll.dv || 0}</span>
                             <span style="font-size:0.75rem;">${posIcon}</span>
@@ -609,7 +609,7 @@ function renderHistory() {
                         </div>
                         <div style="font-size:0.7rem;color:var(--text3);text-align: end;flex-shrink:0;">
                             <span style="background:var(--bg3);padding:0.05rem 0.4rem;border-radius:8px;">[${escHtml(diceDisplay)}]</span>
-                            ${rerollDisplay}
+                            ${escHtml(rerollDisplay)}
                             <span class="text-muted" style="margin-inline-start:0.3rem;">${time}</span>
                         </div>
                     </div>
@@ -726,6 +726,7 @@ export async function init(el) {
 }
 
 export function destroy() {
+    container?._diceEvents?.abort();
     cleanupWebSocketListeners();
     container = null;
 }

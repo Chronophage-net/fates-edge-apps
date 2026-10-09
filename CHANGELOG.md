@@ -62,6 +62,26 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/), versions
 - Preserve accessible navigation labels in the mobile icon rail. Recognize standalone HTML game styles without treating them as global app styles.
 - Validation: 274 web-client tests pass, including a standalone-style isolation regression; desktop and 390px VTT/wiki checks pass.
 
+## [5.14.0] - 2026-10-09
+
+Redesigned play and reference workspaces; reliable AI-GM and Socket.IO connections.
+
+### Added and improved
+- Redesign Patrons and Decks with searchable libraries, character-specific obligation tracking, deliberate draw controls, and a persistent reading journal.
+- Redesign Whiteboard with contextual tools, mobile controls, multiline notes, keyboard sheet selection, and per-sheet undo/redo.
+- Refresh Dice and Kon’reh with pool previews, session continuity, guided rules, and keyboard-accessible board controls.
+- Rebuild the Docs library and reader with filters, saved/recent reading, chapter navigation, and clear print/download controls.
+
+### Connection reliability
+- Deliver AI-GM proposals and scene/combat updates consistently across native WebSocket and Socket.IO.
+- Wait for room admission before enabling game traffic; resolve joins from the server's room-joined event and preserve name, role, password, and authentication on reconnect.
+- Bundle Socket.IO locally for NAS/LAN use without a public CDN. Reject overlapping joins, cancel abandoned joins, and close timed-out sessions to exclude late acknowledgements.
+- Add live bot interoperability, authorization, isolation, reconnect, and browser lifecycle tests over WebSocket and polling.
+
+### Validation
+- 455 client tests, three live browser lifecycle tests, and 231 socket-server tests passed; production build passed.
+- Production dependency audit is clean. Five development-tool vulnerability findings remain outside this release's connection changes.
+
 ## [5.13.0] - 2026-10-09
 
 Redesigned Spellcraft, VTT, characters and talents, adventures, crafting, encounters, and Wiki; aligned crafting guides and fixed library editing and persistence.

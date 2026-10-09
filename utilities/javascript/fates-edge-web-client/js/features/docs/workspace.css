@@ -1,0 +1,23 @@
+.docs-workspace{min-width:0}.docs-eyebrow{letter-spacing:.15em;font-size:.7rem;color:var(--gold);margin:1rem 0 .5rem}
+.docs-workspace .doc-grid{max-height:none!important;overflow:visible!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr))!important;grid-auto-rows:auto!important;gap:1rem!important}
+.docs-workspace .doc-card{min-height:190px!important;padding:1rem!important;text-align:start;position:relative}
+.docs-workspace .doc-card h4{font-size:1.05rem!important;line-height:1.4}.docs-workspace .doc-card:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.docs-workspace .doc-description{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.5;font-size:.8rem!important}
+.docs-workspace .doc-save{margin-top:.8rem;align-self:flex-start;min-height:36px}
+.docs-workspace .doc-open{font:inherit;color:inherit;background:transparent;border:0;padding:0;text-align:start;cursor:pointer;line-height:1.4}.docs-workspace .doc-open:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.docs-workspace .docs-tools{border:1px solid var(--border);border-radius:10px;padding:.75rem;margin-bottom:1rem}.docs-workspace summary{cursor:pointer;font-weight:600}.docs-workspace .docs-tools p{font-size:.8rem;color:var(--text3)}
+.docs-workspace .docs-filter-bar{padding:1rem!important;gap:1rem!important}.docs-workspace input,.docs-workspace select{min-height:42px;max-width:100%}
+.docs-workspace .docs-shelf{display:flex;align-items:center;gap:.5rem;font-size:.8rem}
+.docs-workspace.docs-reading> :not(#doc-viewer-container){display:none!important}
+.docs-workspace #doc-viewer-container{border:0!important;padding:0!important;margin:0!important;scroll-margin-top:70px}
+.docs-workspace #doc-viewer{height:auto!important;max-height:none!important;min-height:65vh!important;overflow-x:auto;overflow-y:visible!important;padding:clamp(.8rem,3vw,2.5rem)!important;line-height:1.75}
+.docs-workspace #doc-viewer .integrated-document{font-size:calc(1rem * var(--reader-scale,1))!important;max-width:90ch!important;margin-inline:auto!important}
+.docs-workspace #doc-viewer .integrated-document p,.docs-workspace #doc-viewer .integrated-document li{font-size:calc(1rem * var(--reader-scale,1))!important}
+.docs-workspace #doc-viewer .integrated-document.light{--bg:#fafafa!important;--bg2:#eaeaea!important;--bg3:#dfdfdf!important;--bg4:#d3d3d3!important;--text:#212121!important;--text2:#555!important;--text3:#666!important;--muted:#666!important;--gold:#805a00!important;--border:#bbb!important;color:#212121!important}
+.docs-workspace #doc-viewer .integrated-document.dark{--bg:#0d0b0f!important;--bg2:#18141c!important;--bg3:#231e29!important;--text:#e6dce8!important;--text2:#b8aabf!important;--text3:#b8aabf!important;--gold:#d4af37!important;--border:#3a3242!important;color:#e6dce8!important}
+.docs-workspace #doc-viewer img{max-width:100%;height:auto}.docs-workspace #doc-viewer h1,.docs-workspace #doc-viewer h2,.docs-workspace #doc-viewer h3{scroll-margin-top:80px}
+.docs-reader-tools{display:flex;flex-wrap:wrap;gap:1rem;padding:.8rem;border:1px solid var(--border);background:var(--bg3);border-radius:10px;margin-bottom:1rem;align-items:start}
+.docs-reader-tools label{display:flex;gap:.5rem;align-items:center;font-size:.8rem}.docs-reader-tools details{flex:1;min-width:180px}.docs-reader-tools nav{max-height:260px;overflow:auto;display:grid;margin-top:.5rem}
+.docs-toc-link{border:0;background:transparent;color:var(--text);padding:.5rem;text-align:start;cursor:pointer;font:inherit;font-size:.85rem}.docs-toc-link:hover{background:var(--bg2);color:var(--gold)}
+.docs-pagination{display:flex;justify-content:center;gap:1rem;align-items:center;margin:1rem 0}
+@media(max-width:600px){.docs-workspace .doc-grid{grid-template-columns:1fr!important}.docs-workspace .btn{min-height:44px}.docs-workspace #doc-viewer-container>div:first-child>div{flex-wrap:wrap}.docs-workspace .docs-filter-bar>.filter-group{flex-basis:100%!important}.docs-workspace #doc-viewer-title{font-size:1rem!important}.docs-workspace #doc-viewer{border-radius:8px!important}}

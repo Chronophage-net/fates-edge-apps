@@ -1,0 +1,11 @@
+.kr-lobby{max-width:1100px;margin:auto}.kr-lobby>header{padding:1rem 0}.kr-lobby-cards{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem}
+.kr-lobby .panel{padding:1.5rem}.kr-lobby h2{color:var(--gold)}.kr-lobby p{color:var(--text2);line-height:1.6}
+.kr-lobby details{margin:1rem 0;border:1px solid var(--border);border-radius:12px;padding:1rem}.kr-lobby summary{cursor:pointer;font-weight:600;color:var(--gold)}
+#konreh-modal .kr-game-column{min-width:0!important}#konreh-modal .kr-game-content{max-height:none!important;overflow:visible!important}
+#konreh-modal .kr-game-sidebar{min-width:0!important;max-height:none!important}
+#konreh-modal .kr-btn{min-height:42px}#konreh-modal select{max-width:100%}
+#konreh-modal .kr-square-controls{width:100%;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;padding:.8rem 0}
+#konreh-modal .kr-square-controls label{display:flex;gap:.35rem;align-items:center;font-size:.8rem}
+#konreh-modal .kr-square-controls select{background:#101119;color:var(--ink);padding:.5rem;border:1px solid var(--line);border-radius:6px}
+#konreh-modal .kr-square-description{width:100%;font-size:.8rem;color:var(--muted)}
+@media(max-width:760px){.kr-lobby-cards{grid-template-columns:1fr}#konreh-modal{padding:0!important}#konreh-modal .kr-game-content{padding:12px!important;gap:12px!important}#konreh-modal .kr-game-column,#konreh-modal .kr-game-sidebar{flex-basis:100%!important}#konreh-modal .kr-depth-row{flex-wrap:wrap!important;gap:10px!important}#konreh-modal .kr-btn{min-height:44px}.kr-lobby .btn{min-height:44px}}

@@ -7,7 +7,7 @@ import { state, syncActiveSheetRefs, getActiveSheet, setContainer } from './stat
 import { normalizeSheet, createDefaultSheet } from './sheets.js';
 import { refresh, renderVttCombatToolbar } from './ui.js';
 import { isVttGm, setVttRole, isGridCombatActive, renderGridCombat } from './combat.js';
-import { restoreDrawings } from './renderer.js';
+import { restoreDrawings, renderPingMarker } from './renderer.js';
 
 let wsListeners = new Map();
 let isSyncing = false;
@@ -30,8 +30,9 @@ function isValidCharacterToken(t) {
 function sanitizeIncomingWhiteboard(incoming) {
     if (!incoming || typeof incoming !== 'object') return null;
     const sanitized = {};
+    if (typeof incoming.activeSheetId === 'string') sanitized.activeSheetId = incoming.activeSheetId;
     if (Array.isArray(incoming.sheets)) {
-        sanitized.sheets = incoming.sheets.map(s => {
+        sanitized.sheets = incoming.sheets.filter(s => s && typeof s === 'object').map(s => {
             // Only take what we need, discard extra props
             return {
                 id: typeof s.id === 'string' ? s.id : 'sheet-' + Date.now(),
@@ -144,9 +145,9 @@ export function setupWebSocketSync() {
 
     const updateHandler = (data) => {
         if (isSyncing || !data || !data.whiteboard) return;
-        applyIncomingWhiteboard(data.whiteboard);
-        saveWhiteboardData();
-        refresh();
+        isSyncing = true;
+        try { applyIncomingWhiteboard(data.whiteboard); saveWhiteboardData(); refresh(); }
+        finally { isSyncing = false; }
     };
     onWSEvent('whiteboard-update', updateHandler);
     wsListeners.set('whiteboard-update', updateHandler);
@@ -154,10 +155,8 @@ export function setupWebSocketSync() {
     const roomStateHandler = (data) => {
         if (data && data.whiteboard) {
             isSyncing = true;
-            applyIncomingWhiteboard(data.whiteboard);
-            saveWhiteboardData();
-            refresh();
-            isSyncing = false;
+            try { applyIncomingWhiteboard(data.whiteboard); saveWhiteboardData(); refresh(); }
+            finally { isSyncing = false; }
         }
     };
     onWSEvent('room-state', roomStateHandler);
@@ -165,16 +164,16 @@ export function setupWebSocketSync() {
 
     const syncStateHandler = (data) => {
         if (isSyncing || !data || !data.state) return;
-        applyIncomingWhiteboard(data.state);
-        saveWhiteboardData();
-        refresh();
+        isSyncing = true;
+        try { applyIncomingWhiteboard(data.state); saveWhiteboardData(); refresh(); }
+        finally { isSyncing = false; }
     };
     onWSEvent('sync-state', syncStateHandler);
     wsListeners.set('sync-state', syncStateHandler);
 
     // Ping handler
     const pingHandler = (data) => {
-        if (!data || data.sheetId !== state.activeSheetId) return;
+        if (!data || data.sheetId !== state.activeSheetId || !Number.isFinite(data.x) || !Number.isFinite(data.y)) return;
         renderPingMarker(data.x, data.y);
     };
     onWSEvent('whiteboard-ping', pingHandler);
@@ -236,11 +235,6 @@ export function forceSync() {
 // Placeholder for updateConnectionStatusUI - will be imported from ui later
 function updateConnectionStatusUI(connected) {
     // Implemented in ui.js
-}
-
-// Ping marker (needs ref to overlay, we'll move to renderer)
-function renderPingMarker(x, y) {
-    // Implementation moved to renderer.js
 }
 
 export function onActivate() { loadWhiteboardData(); setupWebSocketSync(); }

@@ -234,11 +234,11 @@ export function renderOverlay() {
         const opacity = layer ? layer.opacity : 1;
         return `
         <div class="glass" style="position:absolute;left:${note.x}px;top:${note.y}px;/* rtl-physical: board coordinates */padding:0.4rem 0.6rem;border-radius:var(--radius-sm);min-width:80px;max-width:180px;cursor:${canDrag && !locked ? 'grab' : 'pointer'};z-index:10;color:var(--text);font-size:0.8rem;pointer-events:auto;border:1px solid var(--gold);opacity:${opacity};"
-             ${canDrag && !locked ? `onmousedown="window.__wbStartDragNote('${note.id}', event)"` : ''}>
-            <div>${escHtml(note.content)}</div>
+             ${canDrag && !locked ? `onpointerdown="window.__wbStartDragNote(${escHtml(JSON.stringify(String(note.id)))}, event)"` : ''}>
+            <div style="white-space:pre-wrap;overflow-wrap:anywhere;">${escHtml(note.content)}</div>
             <div class="flex gap-1 mt-1">
-                <button class="btn btn-xs btn-ghost" onclick="window.editWhiteboardNote('${note.id}')">✏️</button>
-                <button class="btn btn-xs btn-danger" onclick="window.deleteWhiteboardNote('${note.id}')">✕</button>
+                <button class="btn btn-xs btn-ghost" aria-label="Edit note" onclick="window.editWhiteboardNote(${escHtml(JSON.stringify(String(note.id)))})">✏️</button>
+                <button class="btn btn-xs btn-danger" aria-label="Delete note" onclick="window.deleteWhiteboardNote(${escHtml(JSON.stringify(String(note.id)))})">✕</button>
             </div>
         </div>
     `;
@@ -252,9 +252,9 @@ export function renderOverlay() {
         const opacity = layer ? layer.opacity : 1;
         return `
         <div style="position:absolute;left:${img.x}px;top:${img.y}px;/* rtl-physical: board coordinates */cursor:${canDrag && !locked ? 'grab' : 'pointer'};z-index:5;pointer-events:auto;opacity:${opacity};"
-             ${canDrag && !locked ? `onmousedown="window.__wbStartDragImage('${img.id}', event)"` : ''}>
-            <img src="${img.data}" alt="Image pinned to the whiteboard" style="max-width:250px;max-height:250px;border-radius:4px;display:block;border:1px solid var(--border);" draggable="false" />
-            <button class="btn btn-xs btn-danger absolute" style="top:-8px;inset-inline-end:-8px;" onclick="window.deleteWhiteboardImage('${img.id}')">✕</button>
+             ${canDrag && !locked ? `onpointerdown="window.__wbStartDragImage(${escHtml(JSON.stringify(String(img.id)))}, event)"` : ''}>
+            <img src="${escHtml(img.data)}" alt="Image pinned to the whiteboard" style="max-width:250px;max-height:250px;border-radius:4px;display:block;border:1px solid var(--border);" draggable="false" />
+            <button class="btn btn-xs btn-danger absolute" style="top:-8px;inset-inline-end:-8px;" onclick="window.deleteWhiteboardImage(${escHtml(JSON.stringify(String(img.id)))})">✕</button>
         </div>
     `;
     }).join('');
@@ -267,10 +267,10 @@ export function renderOverlay() {
         const opacity = layer ? layer.opacity : 1;
         return `
         <div style="position:absolute;left:${token.x}px;top:${token.y}px;/* rtl-physical: board coordinates */cursor:${canDrag && !locked ? 'grab' : 'default'};z-index:15;pointer-events:auto;opacity:${opacity};display:flex;flex-direction:column;align-items:center;"
-             ${canDrag && !locked ? `onmousedown="window.__wbStartDragToken('${token.id}', event)"` : ''}>
+             ${canDrag && !locked ? `onpointerdown="window.__wbStartDragToken(${escHtml(JSON.stringify(String(token.id)))}, event)"` : ''}>
             <img src="${escHtml(token.imageData)}" alt="" style="width:48px;height:48px;border-radius:4px;border:2px solid var(--gold);object-fit:cover;" draggable="false" />
             <span style="font-size:0.7rem;color:var(--text);background:rgba(0,0,0,0.6);padding:0 4px;border-radius:2px;margin-top:2px;max-width:80px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${escHtml(token.name)}</span>
-            <button class="btn btn-xs btn-danger" style="position:absolute;top:-8px;inset-inline-end:-8px;padding:0 4px;font-size:0.6rem;border-radius:50%;" onclick="window.deleteCharacterToken('${token.id}')">✕</button>
+            <button class="btn btn-xs btn-danger" style="position:absolute;top:-8px;inset-inline-end:-8px;padding:0 4px;font-size:0.6rem;border-radius:50%;" onclick="window.deleteCharacterToken(${escHtml(JSON.stringify(String(token.id)))})">✕</button>
         </div>
     `;
     }).join('');

@@ -1,0 +1,13 @@
+.play-eyebrow{font-size:.68rem;letter-spacing:.15em;color:var(--gold);margin:1rem 0 .5rem}
+.dice-play-layout{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.3fr);gap:1rem;align-items:start}
+.dice-workspace .form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.dice-workspace .field.small{width:auto;min-width:0;max-width:none}
+.dice-workspace select{width:100%;min-height:44px}.dice-workspace .dice-setup{padding:1.25rem}
+.dice-workspace #roll-btn{width:100%;min-height:52px;font-size:1.05rem}
+.dice-workspace #dice-pool-preview{padding:.8rem;background:var(--bg3);border-inline-start:3px solid var(--gold);border-radius:6px;font-weight:600}
+.dice-workspace details{border:1px solid var(--border);padding:.8rem;border-radius:10px;margin:.8rem 0}
+.dice-workspace summary{cursor:pointer;font-weight:600}.dice-workspace details p{font-size:.8rem;color:var(--text3)}
+.dice-workspace .dice-history-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.dice-workspace .history-item{flex-wrap:wrap}.dice-workspace .history-item>div{min-width:0;overflow-wrap:anywhere}
+.dice-workspace .btn{min-height:38px}.dice-workspace #roll-history{max-height:440px!important}
+@media(max-width:760px){.dice-play-layout{grid-template-columns:1fr}.dice-workspace .btn{min-height:44px}}

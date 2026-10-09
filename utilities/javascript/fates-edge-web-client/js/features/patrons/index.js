@@ -42,6 +42,8 @@ import { escHtml } from '@core/utils.js';
 // ─── Import shared discovery ────────────────────────────
 import { discoverPatrons } from '@core/discovery.js';
 import { recommendPatrons } from './recommender.js';
+import { filterPatrons, patronCards, mergePatronLibrary } from './library.js';
+const library = { query: '', path: '', saved: false, character: 'default-character' };
  
 // ============================================================
 // CONSTANTS
@@ -428,6 +430,7 @@ export async function loadPatronData(force = false) {
 
     const saved = getState();
     const cacheMatchesCurrentSchema = saved.patrons?._schemaVersion === PATRON_SCHEMA_VERSION;
+    state.obligation = saved.patrons?.obligation || state.obligation;
 
     if (!force && saved.patrons && cacheMatchesCurrentSchema) {
         if (saved.patrons.cosmic?.length || saved.patrons.terrestrial?.length) {
@@ -500,7 +503,7 @@ async function loadRemotePatrons(force = false) {
                 state.usingFallback = true;
                 showToast(i18nText("feature.patrons.noCosmicPatronFilesFoundUsingDefaults", null, "⚠️ No cosmic patron files found. Using defaults."), 'warning');
             }
-            state.cosmicPatrons = cosmicPatrons.sort(sortByName);
+            state.cosmicPatrons = mergePatronLibrary(cosmicPatrons, getState().patrons?.cosmic).sort(sortByName);
  
             // Fetch terrestrial
             let terrestrialPatrons = [];
@@ -525,7 +528,7 @@ async function loadRemotePatrons(force = false) {
                 state.usingFallback = true;
                 showToast(i18nText("feature.patrons.noTerrestrialPatronFilesFoundUsingDefaults", null, "⚠️ No terrestrial patron files found. Using defaults."), 'warning');
             }
-            state.terrestrialPatrons = terrestrialPatrons.sort(sortByName);
+            state.terrestrialPatrons = mergePatronLibrary(terrestrialPatrons, getState().patrons?.terrestrial).sort(sortByName);
  
             // Fetch religions
             let religions = [];
@@ -547,7 +550,7 @@ async function loadRemotePatrons(force = false) {
                 state.usingFallback = true;
                 showToast(i18nText("feature.patrons.noReligionFilesFoundUsingDefaults", null, "⚠️ No religion files found. Using defaults."), 'warning');
             }
-            state.religions = religions.sort(sortByName);
+            state.religions = mergePatronLibrary(religions, getState().patrons?.religions).sort(sortByName);
 
             state.dataLoaded = true;
             savePatronData();
@@ -569,9 +572,10 @@ async function loadRemotePatrons(force = false) {
 }
  
 function loadDefaultPatrons() {
-    state.cosmicPatrons = DEFAULT_COSMIC_PATRONS.map(normalizePatron).sort(sortByName);
-    state.terrestrialPatrons = DEFAULT_TERRESTRIAL_PATRONS.map(normalizePatron).sort(sortByName);
-    state.religions = DEFAULT_RELIGIONS.sort(sortByName);
+    const saved = getState().patrons || {};
+    state.cosmicPatrons = mergePatronLibrary(DEFAULT_COSMIC_PATRONS.map(normalizePatron), saved.cosmic).sort(sortByName);
+    state.terrestrialPatrons = mergePatronLibrary(DEFAULT_TERRESTRIAL_PATRONS.map(normalizePatron), saved.terrestrial).sort(sortByName);
+    state.religions = mergePatronLibrary(DEFAULT_RELIGIONS, saved.religions).sort(sortByName);
     state.dataLoaded = true;
     state.usingFallback = true;
     console.log(`📦 Using defaults: ${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial, ${state.religions.length} religions`);
@@ -599,7 +603,9 @@ export function getPatronObligation(characterId, patronId) {
  
 export function setPatronObligation(characterId, patronId, value) {
     if (!state.obligation[characterId]) state.obligation[characterId] = {};
-    state.obligation[characterId][patronId] = Math.max(0, value);
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return;
+    state.obligation[characterId][patronId] = Math.max(0, Math.floor(amount));
     savePatronData();
 }
  
@@ -619,285 +625,48 @@ export function clearPatronObligation(characterId, patronId, amount = 1) {
  
 export function render(el) {
     container = el;
-    const loadPromise = loadPatronData();
- 
-    const usingFallback = state.usingFallback;
- 
+    const loading = loadPatronData();
+    const characters = getState().characters || [];
+    if (library.character !== 'default-character' && !characters.some(c => String(c.id) === library.character)) library.character = 'default-character';
     container.innerHTML = `
-        <div class="patrons-modern-layout">
-            <header class="patrons-header" style="margin-bottom:0.5rem;">
-                <h1 class="patrons-title" data-i18n="feature.patrons.patrons">👁️ Patrons</h1>
-                <p class="patrons-subtitle" data-i18n="feature.patrons.thePowersHousesAndFaithsThatMay">The powers, houses, and faiths that may put a claim on a character.</p>
-                ${!state.dataLoaded ? '<p class="text-muted" style="font-size:0.85rem;">⏳ Loading data...</p>' : `<p class="text-muted" style="font-size:0.85rem;">📚 ${state.cosmicPatrons.length} cosmic, ${state.terrestrialPatrons.length} terrestrial, ${state.religions.length} religions</p>`}
-                ${usingFallback ? `<div style="color:var(--orange);font-size:0.85rem;margin-top:0.3rem;">⚠️ Using fallback defaults for some data.</div>` : ''}
-            </header>
- 
-            <div class="patrons-tabs" style="display:flex;gap:0.3rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-                <button class="patrons-tab active" data-view="cosmic" data-i18n="feature.patrons.cosmic">🌟 Cosmic</button>
-                <button class="patrons-tab" data-view="terrestrial" data-i18n="feature.patrons.terrestrial">🏛️ Terrestrial</button>
-                <button class="patrons-tab" data-view="religions" data-i18n="feature.patrons.religions">⛪ Religions</button>
+        <div class="patrons-modern-layout patron-workspace">
+            <header class="patrons-header"><p class="patron-kicker">FATE’S EDGE / POWERS & ALLEGIANCES</p><h1>Patrons</h1><p class="patrons-subtitle">Discover what a power offers, what it asks, and where its rivals stand.</p></header>
+            <div class="patrons-tabs" aria-label="Patron collections">${[['cosmic','Cosmic powers'],['terrestrial','Worldly patrons'],['religions','Faiths & orders']].map(([key,label]) => `<button class="patrons-tab ${state.viewMode === key ? 'active' : ''}" data-view="${key}" aria-pressed="${state.viewMode === key}">${label}</button>`).join('')}</div>
+            <div class="patron-library-controls">
+                <label>Search the library<input type="search" id="patron-library-search" value="${escHtml(library.query)}" placeholder="Name, domain, rites, lore…"></label>
+                <label>Tradition<select id="patron-library-path"><option value="">All traditions</option><option value="rites">Rites</option><option value="witchcraft">Witchcraft</option><option value="monastic">Monastic</option></select></label>
+                <label>Collection<select id="patron-library-saved"><option value="">All entries</option><option value="saved">Saved powers</option></select></label>
+                <label>Track Obligation for<select id="patron-library-character"><option value="default-character">Table tracker (legacy)</option>${characters.map(c => `<option value="${escHtml(String(c.id))}">${escHtml(c.name || 'Unnamed character')}</option>`).join('')}</select></label>
             </div>
- 
-            <div id="patrons-view-container" class="patrons-view-container">
-                ${renderView('cosmic')}
-            </div>
- 
-            <div id="patron-modal" class="patron-modal" style="display:none;"></div>
-            <div id="asset-modal" class="patron-modal" style="display:none;"></div>
-        </div>
-    `;
- 
+            <div class="patron-library-status"><span id="patron-library-count" role="status"></span><button class="btn btn-sm" data-patron-action="clear">Clear filters</button></div>
+            <div id="patrons-view-container"></div>
+            <details class="patron-library-tools"><summary>Find a patron for a character concept</summary><p>Describe an ideal, a profession, or a promise. Suggestions use the cosmic patron catalogue.</p><label for="patron-recommender-input">Character concept</label><br><input id="patron-recommender-input" value="${escHtml(state.recommender.query)}" placeholder="A courier who never refuses shelter"><button class="btn btn-sm" data-patron-action="recommend">Suggest patrons</button><button class="btn btn-sm" data-patron-action="reset-recommend">Clear suggestions</button><p id="patron-recommender-status"></p></details>
+            <details class="patron-library-tools"><summary>Library tools</summary><p>Custom entries and Obligation records stay in this browser. Reload refreshes bundled references while keeping your custom entries.</p><button class="btn btn-sm" data-patron-action="create">Add custom entry</button><button class="btn btn-sm" data-patron-action="reload">Reload references</button></details>
+            <div id="patron-modal" class="patron-modal" style="display:none;"></div><div id="asset-modal" class="patron-modal" style="display:none;"></div>
+        </div>`;
+    container.querySelector('#patron-library-path').value = library.path;
+    container.querySelector('#patron-library-saved').value = library.saved ? 'saved' : '';
+    container.querySelector('#patron-library-character').value = library.character;
     attachEvents();
-
-    // The first render deliberately shows a loading state while the patron
-    // files are discovered. Re-render when that work finishes; otherwise a
-    // first-time visitor is left looking at "Loading..." until they leave the
-    // tab and come back.
-    if (!state.dataLoaded) {
-        loadPromise.then(() => {
-            if (container === el && el.isConnected) render(el);
-        });
-    }
+    refreshView();
+    loading.then(() => { if (container === el && el.isConnected) refreshView(); });
 }
- 
+
 function renderView(view) {
     state.viewMode = view;
-    if (!state.dataLoaded) {
-        return `<div class="patrons-empty"><div style="font-size:3rem;">⏳</div><div>Loading...</div></div>`;
+    if (!state.dataLoaded) return '<p role="status">Loading the patron library…</p>';
+    const favorites = getState().patronFavorites || [];
+    let patrons = view === 'cosmic' ? state.cosmicPatrons.filter(p => ninthRevealed || !isTheNinth(p)) : view === 'terrestrial' ? state.terrestrialPatrons : state.religions;
+    if (view === 'cosmic' && state.recommender.active && state.recommender.results?.length) {
+        const visible = new Set(patrons.map(p => p.id));
+        patrons = state.recommender.results.map(r => r.patron).filter(p => visible.has(p.id));
     }
- 
-    switch(view) {
-        case 'cosmic': return renderCosmicPatrons();
-        case 'terrestrial': return renderTerrestrialPatrons();
-        case 'religions': return renderReligions();
-        default: return renderCosmicPatrons();
-    }
+    const filtered = filterPatrons(patrons, library.query, view === 'cosmic' ? library.path : '', library.saved, favorites);
+    const count = document.getElementById('patron-library-count');
+    if (count) count.textContent = `${filtered.length} of ${patrons.length} entries${state.usingFallback ? ' · Some fallback references are in use' : ''}`;
+    return `<div class="patron-library-grid">${patronCards(filtered, favorites, state.obligation[library.character] || {}, view)}</div>`;
 }
- 
-// ============================================================
-// RENDER: COSMIC PATRONS
-// ============================================================
- 
-function renderCosmicPatrons() {
-    if (state.cosmicPatrons.length === 0) {
-        return `
-            <div class="patrons-empty">
-                <div style="font-size:3rem;">🌟</div>
-                <div>No cosmic patrons loaded.</div>
-                <button class="btn btn-utility" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
-            </div>
-        `;
-    }
- 
-    const characterId = 'default-character';
-    const obligationMap = state.obligation[characterId] || {};
 
-    // ─── Patron Recommender ────────────────────────────────────────
-    const rec = state.recommender;
-    const recommenderBox = `
-        <div class="patron-recommender" style="display:flex;gap:0.3rem;align-items:center;background:var(--bg2);border-radius:var(--radius);padding:0.3rem 0.5rem;border:1px solid var(--border);flex-wrap:wrap;">
-            <span style="font-size:0.75rem;color:var(--text3);white-space:nowrap;">Find a patron:</span>
-            <input type="text" id="patron-recommender-input" value="${escHtml(rec.query)}"
-                placeholder="e.g. 'a courier who never refuses shelter'"
-                onkeydown="if(event.key==='Enter') window.runPatronRecommender()"
-                style="flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.4rem;font-size:0.75rem;" />
-            <button class="btn btn-xs btn-primary" onclick="window.runPatronRecommender()" data-i18n="feature.patrons.search">Search</button>
-            ${rec.active ? `<button class="btn btn-xs btn-ghost" onclick="window.clearPatronRecommender()" style="color:var(--text3);" data-i18n="feature.patrons.clear">✕ Clear</button>` : ''}
-        </div>
-    `;
-
-    // ─── EASTER EGG: The Ninth ──────────────────────────────────
-    // Check if the search query triggers the revelation
-    const query = rec.query || '';
-    const shouldRevealNinth = isNinthTrigger(query);
-
-    // If triggered, reveal The Ninth
-    if (shouldRevealNinth && !ninthRevealed) {
-        ninthRevealed = true;
-        // Optional: show a cryptic toast
-        setTimeout(() => {
-            showToast(i18nText("feature.patrons.theCountIsWrong", null, "The count is wrong."), 'info');
-        }, 300);
-    }
-
-    // Filter patrons for display
-    let displayPatrons = [...state.cosmicPatrons];
-
-    // Hide The Ninth unless it has been revealed
-    if (!ninthRevealed) {
-        displayPatrons = displayPatrons.filter(p => !isTheNinth(p));
-    }
-
-    // ─── Apply recommender filter ─────────────────────────────────
-    let gridPatrons = displayPatrons;
-    let matchInfoById = {};
-    let resultsNote = '';
-
-    if (rec.active && rec.results) {
-        // Filter recommender results to only include visible patrons
-        const visibleResults = rec.results.filter(r => !isTheNinth(r.patron) || ninthRevealed);
-        
-        if (visibleResults.length === 0 && rec.results.length > 0) {
-            // This handles the case where the only match was The Ninth
-            resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.3rem;background:var(--bg3);border-radius:var(--radius);border-inline-start:3px solid var(--purple);">
-                No patron answers. The index insists that nothing is missing.
-            </div>`;
-            gridPatrons = displayPatrons;
-        } else if (visibleResults.length === 0) {
-            resultsNote = `<div style="font-size:0.75rem;color:var(--text3);padding:0.3rem;">No visible patrons matched "${escHtml(rec.query)}" — showing the full list instead.</div>`;
-            gridPatrons = displayPatrons;
-        } else {
-            gridPatrons = visibleResults.map(r => r.patron);
-            visibleResults.forEach(r => {
-                matchInfoById[r.patron.id] = r.matchedTags.slice(0, 3).map(m => m.match);
-            });
-            // Check if The Ninth was hidden but would have matched
-            const hiddenNinthMatch = rec.results.some(r => isTheNinth(r.patron) && !ninthRevealed);
-            if (hiddenNinthMatch) {
-                resultsNote = `<div style="font-size:0.75rem;color:var(--purple);padding:0.2rem 0.3rem;font-style:italic;">
-                    ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}".
-                    <span style="color:var(--text3);">The index has left a space between entries.</span>
-                </div>`;
-            } else {
-                resultsNote = `<div style="font-size:0.7rem;color:var(--gold);padding:0.2rem 0.3rem;">
-                    ${visibleResults.length} match${visibleResults.length === 1 ? '' : 'es'} for "${escHtml(rec.query)}", best first.
-                </div>`;
-            }
-        }
-    } else if (ninthRevealed) {
-        // Show a subtle indicator that The Ninth is present
-        resultsNote = `<div style="font-size:0.7rem;color:var(--purple);padding:0.2rem 0.3rem;font-style:italic;">
-            One entry has no proper place in the list.
-        </div>`;
-    }
-
-    // ─── Render the grid ──────────────────────────────────────────
-    return `
-        <div style="display:flex;flex-direction:column;gap:0.5rem;">
-            ${recommenderBox}
-            ${resultsNote}
-
-            <div class="patrons-scroll-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;max-height:220px;overflow-y:auto;padding:0.2rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);">
-                ${gridPatrons.map(p => {
-                    const obl = obligationMap[p.id] || 0;
-                    const name = safeString(p.name || p.title || 'Unnamed');
-                    const summary = getPatronSummary(p);
-                    const icon = getPatronIcon(p);
-                    const color = getPatronColor(p);
-                    const matched = matchInfoById[p.id];
-                    const isNinth = isTheNinth(p);
-                    
-                    return `
-                        <div class="patron-tile" onclick="window.viewPatron('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-inline-start:3px solid ${color};transition:all 0.2s;${matched ? 'border:1px solid var(--gold);' : ''}${isNinth ? 'border:1px solid var(--purple);position:relative;' : ''}">
-                            ${isNinth ? `<div style="position:absolute;top:-6px;inset-inline-end:-4px;font-size:0.7rem;color:var(--purple);">🔮</div>` : ''}
-                            ${icon ? `<div style="font-size:1.5rem;">${safeString(icon)}</div>` : ''}
-                            <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
-                            <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
-                            ${matched ? `<div style="font-size:0.55rem;color:var(--gold);margin-top:0.1rem;">${matched.map(escHtml).join(', ')}</div>` : ''}
-                            ${isNinth ? `<div style="font-size:0.55rem;color:var(--purple);margin-top:0.05rem;">Unindexed</div>` : ''}
-                            <div style="font-size:0.55rem;color:var(--text2);margin-top:0.1rem;">Obligation ${obl}</div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
- 
-            <div id="cosmic-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--gold);min-height:80px;">
-                <p style="color:var(--text2);font-style:italic;margin:0;">Select a patron above to see their description and details.</p>
-            </div>
- 
-            <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                <button class="btn btn-primary btn-sm" onclick="window.addCosmicPatron()" data-i18n="feature.patrons.addCosmic">➕ Add Cosmic</button>
-                <button class="btn btn-utility btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
-                <button class="btn btn-utility btn-sm" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
-            </div>
-        </div>
-    `;
-}
- 
-// ============================================================
-// RENDER: TERRESTRIAL PATRONS
-// ============================================================
- 
-function renderTerrestrialPatrons() {
-    if (state.terrestrialPatrons.length === 0) {
-        return `
-            <div class="patrons-empty">
-                <div style="font-size:3rem;">🏛️</div>
-                <div>No terrestrial patrons loaded.</div>
-                <button class="btn btn-primary" onclick="window.addTerrestrialPatron()" data-i18n="feature.patrons.addTerrestrial">➕ Add Terrestrial</button>
-                <button class="btn btn-utility" onclick="window.loadDefaultPatrons()" data-i18n="feature.patrons.loadDefaults">📥 Load Defaults</button>
-            </div>
-        `;
-    }
- 
-    return `
-        <div style="display:flex;flex-direction:column;gap:0.8rem;">
-            <div class="patrons-scroll-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;max-height:220px;overflow-y:auto;padding:0.2rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);">
-                ${state.terrestrialPatrons.map(p => {
-                    const name = safeString(p.name || p.title || 'Unnamed');
-                    const summary = getPatronSummary(p);
-                    const icon = getPatronIcon(p) || '🏛️';
-                    const color = p.color || '#2980b9';
-                    return `
-                        <div class="patron-tile" onclick="window.viewTerrestrial('${p.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.3rem 0.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;border-inline-start:3px solid ${color};transition:all 0.2s;">
-                            <div style="font-size:1.5rem;">${safeString(icon)}</div>
-                            <div style="font-size:0.75rem;font-weight:600;color:var(--text);">${escHtml(name)}</div>
-                            <div style="font-size:0.6rem;color:var(--text3);">${escHtml(summary)}</div>
-                            <div style="font-size:0.55rem;color:var(--text2);">Tier ${safeString(p.tier || 'I')}</div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
- 
-            <div id="terrestrial-description-area" style="background:var(--bg2);border-radius:var(--radius);padding:0.8rem;border-inline-start:4px solid var(--blue);min-height:80px;">
-                <p style="color:var(--text2);font-style:italic;margin:0;">Select a terrestrial patron to see details.</p>
-            </div>
- 
-            <div class="patrons-actions" style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                <button class="btn btn-primary btn-sm" onclick="window.addTerrestrialPatron()" data-i18n="feature.patrons.addTerrestrial">➕ Add Terrestrial</button>
-                <button class="btn btn-utility btn-sm" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
-            </div>
-        </div>
-    `;
-}
- 
-// ============================================================
-// RENDER: RELIGIONS
-// ============================================================
- 
-function renderReligions() {
-    if (state.religions.length === 0) {
-        return `
-            <div class="patrons-empty">
-                <div style="font-size:3rem;">⛪</div>
-                <div>No religions loaded.</div>
-                <button class="btn btn-primary" onclick="window.addReligion()" data-i18n="feature.patrons.addReligion">➕ Add Religion</button>
-            </div>
-        `;
-    }
- 
-    return `
-        <div class="religions-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.5rem;">
-            ${state.religions.map(r => {
-                const name = safeString(r.name || r.title || 'Unnamed');
-                const orders = r.orders ? r.orders.length : 0;
-                const icon = r.icon || '⛪';
-                return `
-                    <div class="religion-card" onclick="window.viewReligion('${r.id}')" style="background:var(--bg3);border-radius:var(--radius);padding:0.5rem;cursor:pointer;border-inline-start:3px solid var(--gold);">
-                        <div style="font-size:1.5rem;">${safeString(icon)}</div>
-                        <div style="font-weight:600;">${escHtml(name)}</div>
-                        <div style="font-size:0.7rem;color:var(--text3);">${orders} ${orders === 1 ? 'Order' : 'Orders'}</div>
-                    </div>
-                `;
-            }).join('')}
-        </div>
-        <div class="patrons-actions" style="margin-top:0.5rem;">
-            <button class="btn btn-primary" onclick="window.addReligion()" data-i18n="feature.patrons.addReligion">➕ Add Religion</button>
-            <button class="btn btn-utility" onclick="window.refreshPatrons()" data-i18n="feature.patrons.refresh">🔄 Refresh</button>
-        </div>
-    `;
-}
- 
 // ============================================================
 // PATRON DETAIL (Cosmic)
 // ============================================================
@@ -920,13 +689,13 @@ function renderPatronDetail(patronId) {
  
     descArea.innerHTML = `
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-            <span style="font-size:1.5rem;">${safeString(icon)}</span>
+            <span style="font-size:1.5rem;">${escHtml(safeString(icon))}</span>
             <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
             <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
-            <span style="color:var(--text3);font-size:0.75rem;margin-inline-start:auto;">Obligation: ${getPatronObligation('default-character', patron.id)}</span>
-            <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation('default-character', '${patron.id}', 1)">➕</button>
-            <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation('default-character', '${patron.id}', 1)">➖</button>
-            <button class="btn btn-xs btn-ghost" onclick="window.openPatronDetailModal('${patron.id}')">📖 Full Details</button>
+            <span style="color:var(--text3);font-size:0.75rem;margin-inline-start:auto;">Obligation: ${getPatronObligation(library.character, patron.id)}</span>
+            <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation(${escHtml(JSON.stringify(library.character))}, ${escHtml(JSON.stringify(patron.id))}, 1)">➕</button>
+            <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation(${escHtml(JSON.stringify(library.character))}, ${escHtml(JSON.stringify(patron.id))}, 1)">➖</button>
+            <button class="btn btn-xs btn-ghost" onclick="window.openPatronDetailModal(${escHtml(JSON.stringify(String(patron.id)))})">📖 Full Details</button>
         </div>
         <div style="margin:0.3rem 0 0 0;color:var(--text2);font-size:0.9rem;line-height:1.5;overflow-y:auto;">
             ${formatText(desc)}
@@ -1015,7 +784,7 @@ window.openPatronDetailModal = function(patronId) {
     const color = getPatronColor(patron);
     const domain = safeString(patron.domain || patron.subtitle || 'Unknown Domain');
     const religion = safeString(patron.religion || '');
-    const currentObligation = getPatronObligation('default-character', patron.id);
+    const currentObligation = getPatronObligation(library.character, patron.id);
     const lore = getPatronLore(patron);
  
     // Build sections HTML
@@ -1037,9 +806,9 @@ window.openPatronDetailModal = function(patronId) {
                         ${patron.source === 'default' ? '<span class="badge badge-remote" style="background:var(--bg3);color:var(--text3);padding:0.1rem 0.5rem;border-radius:12px;font-size:0.7rem;">📦 Default Data</span>' : ''}
                     </div>
                     <div style="margin-top:0.5rem;font-size:0.9rem;display:flex;gap:0.5rem;align-items:center;">
-                        <span>Obligation: <strong>${currentObligation}</strong></span>
-                        <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation('default-character', '${patron.id}', 1)">➕</button>
-                        <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation('default-character', '${patron.id}', 1)">➖</button>
+                        <span>${escHtml((getState().characters || []).find(c => String(c.id) === library.character)?.name || 'Table tracker (legacy)')} · Obligation: <strong id="patron-obligation-value">${currentObligation}</strong></span>
+                        <button class="btn btn-xs btn-primary" onclick="window.addPatronObligation(${escHtml(JSON.stringify(library.character))}, ${escHtml(JSON.stringify(patron.id))}, 1)">➕</button>
+                        <button class="btn btn-xs btn-secondary" onclick="window.clearPatronObligation(${escHtml(JSON.stringify(library.character))}, ${escHtml(JSON.stringify(patron.id))}, 1)">➖</button>
                     </div>
                 </div>
             </div>
@@ -1051,16 +820,15 @@ window.openPatronDetailModal = function(patronId) {
  
             <!-- Actions -->
             <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
-                <button class="btn btn-sm" onclick="window.editPatron('${patron.id}')">✏️ Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="window.deletePatron('${patron.id}')">🗑️ Delete</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" data-i18n="feature.patrons.close">Close</button>
+                <button class="btn btn-sm" onclick="window.editPatron(${escHtml(JSON.stringify(String(patron.id)))})">✏️ Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="window.deletePatron(${escHtml(JSON.stringify(String(patron.id)))})">🗑️ Delete</button>
+              <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" data-i18n="feature.patrons.close">Close</button>
             </div>
         </div>
     `;
  
-    modal.onclick = (e) => {
-        if (e.target === modal) window.closePatronModal();
-    };
+    enhancePatronDetail(modal);
+    modal.onclick = (event) => { if (event.target === modal) window.closePatronModal(); };
 
     // Fill Cross-Resonance once the table has loaded. Deliberately after
     // the modal paints: the rivalry file is one fetch and the detail panel
@@ -1548,10 +1316,10 @@ window.viewTerrestrial = function(id) {
         const icon = getPatronIcon(patron) || '🏛️';
         descArea.innerHTML = `
             <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-                <span style="font-size:1.5rem;">${safeString(icon)}</span>
+                <span style="font-size:1.5rem;">${escHtml(safeString(icon))}</span>
                 <span style="font-weight:600;font-size:1.1rem;">${escHtml(name)}</span>
                 <span style="color:var(--text3);font-size:0.85rem;">${escHtml(summary)}</span>
-                <button class="btn btn-xs btn-ghost" onclick="window.openTerrestrialDetailModal('${patron.id}')" style="margin-inline-start:auto;">📖 Full Details</button>
+                <button class="btn btn-xs btn-ghost" onclick="window.openTerrestrialDetailModal(${escHtml(JSON.stringify(String(patron.id)))})" style="margin-inline-start:auto;">📖 Full Details</button>
             </div>
             <div style="margin:0.3rem 0 0 0;color:var(--text2);font-size:0.9rem;line-height:1.5;overflow-y:auto;">
                 ${formatText(desc)}
@@ -1655,16 +1423,15 @@ window.openTerrestrialDetailModal = function(id) {
             </div>
  
             <div class="patron-detail-actions" style="display:flex;gap:0.5rem;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
-                <button class="btn btn-sm" onclick="window.editTerrestrial('${patron.id}')">✏️ Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="window.deleteTerrestrial('${patron.id}')">🗑️ Delete</button>
+                <button class="btn btn-sm" onclick="window.editTerrestrial(${escHtml(JSON.stringify(String(patron.id)))})">✏️ Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="window.deleteTerrestrial(${escHtml(JSON.stringify(String(patron.id)))})">🗑️ Delete</button>
                 <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" data-i18n="feature.patrons.close">Close</button>
             </div>
         </div>
     `;
  
-    modal.onclick = (e) => {
-        if (e.target === modal) window.closePatronModal();
-    };
+    enhancePatronDetail(modal);
+    modal.onclick = (event) => { if (event.target === modal) window.closePatronModal(); };
 };
  
 // ============================================================
@@ -1740,7 +1507,7 @@ window.viewReligion = function(id) {
         <div class="modal-content" style="width:90%;max-width:640px;max-height:90vh;overflow-y:auto;padding:1.5rem;border-radius:var(--radius);">
             <button class="modal-close" onclick="window.closePatronModal()" style="float: inline-end;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text3);">✕</button>
             <div class="patron-detail-header">
-                <span class="patron-detail-icon">${safeString(religion.icon || '⛪')}</span>
+                <span class="patron-detail-icon">${escHtml(safeString(religion.icon || '⛪'))}</span>
                 <h2 style="color:var(--gold);margin:0;">${escHtml(name)}</h2>
             </div>
             ${religion.subtitle ? `<p class="patron-detail-domain">${escHtml(religion.subtitle)}</p>` : ''}
@@ -1757,13 +1524,13 @@ window.viewReligion = function(id) {
             ${schism}
             ${regional}
             <div class="patron-detail-actions">
+              <button class="btn btn-sm" onclick="window.editReligion(${escHtml(JSON.stringify(String(religion.id)))})">Edit local reference</button>
               <button class="btn btn-sm btn-secondary" onclick="window.closePatronModal()" data-i18n="feature.patrons.close">Close</button>
             </div>
         </div>
     `;
-    modal.onclick = (e) => {
-        if (e.target === modal) window.closePatronModal();
-    };
+    enhancePatronDetail(modal);
+    modal.onclick = (event) => { if (event.target === modal) window.closePatronModal(); };
 };
  
 // ============================================================
@@ -1771,8 +1538,52 @@ window.viewReligion = function(id) {
 // ============================================================
  
 window.closePatronModal = function() {
-    document.getElementById('patron-modal').style.display = 'none';
+    const modal = document.getElementById('patron-modal');
+    if (modal) { modal.style.display = 'none'; modal.onkeydown = null; }
+    patronReturnFocus?.focus();
 };
+let patronReturnFocus = null;
+function enhancePatronDetail(modal) {
+    patronReturnFocus = document.activeElement;
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', modal.querySelector('h2')?.textContent || 'Patron details');
+    modal.querySelector('.modal-close')?.setAttribute('aria-label', 'Close details');
+    const navigation = document.createElement('nav');
+    navigation.className = 'patron-section-nav';
+    navigation.setAttribute('aria-label', 'Jump to patron section');
+    modal.querySelectorAll('.patron-detail-section h4, .patron-detail-section h3').forEach(heading => {
+        const button = document.createElement('button');
+        button.className = 'btn btn-sm'; button.textContent = heading.textContent;
+        button.onclick = () => { heading.tabIndex = -1; heading.focus(); heading.scrollIntoView({block:'start'}); };
+        navigation.appendChild(button);
+    });
+    modal.querySelector('.patron-detail-header')?.after(navigation);
+    modal.querySelectorAll('.rite-header').forEach(header => {
+        header.setAttribute('role', 'button');
+        header.tabIndex = 0;
+        header.onkeydown = event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                header.click();
+            }
+        };
+    });
+    modal.onkeydown = event => {
+        if (event.key === 'Escape') { event.preventDefault(); window.closePatronModal(); }
+        if (event.key !== 'Tab') return;
+        const focusable = [...modal.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]')].filter(el => !el.disabled && el.getClientRects().length);
+        const first = focusable[0], last = focusable.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    modal.querySelector('.modal-close')?.focus();
+}
+function refreshObligationValue(characterId, patronId) {
+    const value = document.getElementById('patron-obligation-value');
+    if (value) value.textContent = getPatronObligation(characterId, patronId);
+    refreshView();
+}
  
 window.closeAssetModal = function() {
     document.getElementById('asset-modal').style.display = 'none';
@@ -1786,6 +1597,40 @@ window.viewPatron = function(id) {
     }
 };
  
+function openLibraryEditor(kind, id = null) {
+    const key = kind === 'cosmic' ? 'cosmicPatrons' : kind === 'terrestrial' ? 'terrestrialPatrons' : 'religions';
+    const existing = id ? state[key].find(p => p.id === id) : null;
+    if (id && !existing) return;
+    const entry = existing || {};
+    const modal = document.getElementById('patron-modal');
+    if (!modal) return;
+    modal.style.display = 'block';
+    modal.innerHTML = `<div class="modal-content patron-editor"><button class="modal-close btn" type="button" aria-label="Close details">← Back</button><div class="patron-detail-header"><h2>${existing ? 'Edit entry' : 'Create a custom entry'}</h2></div><p>Change your local reference. Existing rites, gifts, rivalries, and other structured details are preserved.</p><form id="patron-library-form"><label>Name<input name="name" required value="${escHtml(entry.name || entry.title || '')}"></label><label>Subtitle / domain<input name="subtitle" value="${escHtml(entry.subtitle || entry.domain || '')}"></label><label>Description<textarea name="description" rows="8">${escHtml(getPatronDescription(entry) === 'No description available.' ? '' : getPatronDescription(entry))}</textarea></label>${kind === 'terrestrial' ? `<label>Location<input name="location" value="${escHtml(safeString(entry.location))}"></label><label>Leverage<textarea name="leverage">${escHtml(safeString(entry.leverage))}</textarea></label>` : ''}<div class="patron-editor-actions"><button class="btn btn-gold" type="submit">Save entry</button><button class="btn" type="button" data-cancel>Cancel</button></div></form></div>`;
+    enhancePatronDetail(modal);
+    modal.querySelector('.modal-close').onclick = window.closePatronModal;
+    modal.querySelector('[data-cancel]').onclick = window.closePatronModal;
+    modal.querySelector('form').onsubmit = event => {
+        event.preventDefault();
+        const fields = new FormData(event.target);
+        const name = String(fields.get('name') || '').trim();
+        if (!name) return;
+        const description = String(fields.get('description') || '');
+        const updated = {
+            ...entry, id: entry.id || 'local-' + crypto.randomUUID(), name, title:name,
+            subtitle: String(fields.get('subtitle') || ''), domain: String(fields.get('subtitle') || ''),
+            description, source:'local'
+        };
+        if (entry.lore && typeof entry.lore === 'object') updated.lore = {...entry.lore, description};
+        else if (typeof entry.lore === 'string') updated.lore = description;
+        if (kind === 'terrestrial') { updated.location = String(fields.get('location') || ''); updated.leverage = String(fields.get('leverage') || ''); }
+        if (existing) state[key] = state[key].map(p => p.id === id ? updated : p);
+        else state[key].push(updated);
+        state[key].sort(sortByName); savePatronData(); window.closePatronModal(); refreshView();
+        showToast('Local reference saved.', 'success');
+    };
+    modal.querySelector('input')?.focus();
+}
+
 // ============================================================
 // OBLIGATION WINDOW FUNCTIONS
 // ============================================================
@@ -1794,6 +1639,7 @@ window.addPatronObligation = function(characterId, patronId, amount = 1) {
     addPatronObligation(characterId, patronId, amount);
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (patron) renderPatronDetail(patronId);
+    refreshObligationValue(characterId, patronId);
     showToast(i18nText("feature.patrons.addedValueObligationToValue", { value0: amount, value1: patronId }, "Added {{value0}} Obligation to {{value1}}"), 'success');
 };
  
@@ -1801,6 +1647,7 @@ window.clearPatronObligation = function(characterId, patronId, amount = 1) {
     clearPatronObligation(characterId, patronId, amount);
     const patron = state.cosmicPatrons.find(p => p.id === patronId);
     if (patron) renderPatronDetail(patronId);
+    refreshObligationValue(characterId, patronId);
     showToast(i18nText("feature.patrons.clearedValueObligationFromValue", { value0: amount, value1: patronId }, "Cleared {{value0}} Obligation from {{value1}}"), 'info');
 };
  
@@ -1808,49 +1655,9 @@ window.clearPatronObligation = function(characterId, patronId, amount = 1) {
 // CRUD OPERATIONS
 // ============================================================
  
-window.addCosmicPatron = function() {
-    const name = prompt(i18nText("feature.patrons.enterPatronName", null, "Enter patron name:"));
-    if (!name) return;
-    const domain = prompt(i18nText("feature.patrons.enterPatronDomain", null, "Enter patron domain:")) || 'Unknown';
-    const icon = prompt(i18nText("feature.patrons.enterPatronIconEmoji", null, "Enter patron icon (emoji):")) || '🌟';
+window.addCosmicPatron = function() { openLibraryEditor('cosmic'); };
  
-    state.cosmicPatrons.push(normalizePatron({
-        id: 'patron-' + Date.now(),
-        name,
-        domain,
-        icon,
-        description: prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:")) || 'A cosmic patron of the Amaranthine.',
-        rites: prompt(i18nText("feature.patrons.enterRitesCommaSeparated", null, "Enter rites (comma-separated):"))?.split(',').map(s => s.trim()) || [],
-        rivals: prompt(i18nText("feature.patrons.enterRivalsCommaSeparated", null, "Enter rivals (comma-separated):"))?.split(',').map(s => s.trim()) || [],
-        sigil: prompt(i18nText("feature.patrons.enterSigilDescription", null, "Enter sigil description:")) || 'Unknown',
-        corruption: prompt(i18nText("feature.patrons.enterCorruptionEffect", null, "Enter corruption effect:")) || 'None',
-        source: 'local'
-    }));
-    state.cosmicPatrons.sort(sortByName);
-    savePatronData();
-    refreshView();
-    showToast(i18nText("feature.patrons.addedPatronValue", { value0: name }, "Added patron: {{value0}}"), 'success');
-};
- 
-window.editPatron = function(id) {
-    const patron = state.cosmicPatrons.find(p => p.id === id);
-    if (!patron) return;
-    const name = prompt(i18nText("feature.patrons.enterPatronName", null, "Enter patron name:"), patron.name || patron.title);
-    if (!name) return;
-    patron.name = name;
-    patron.title = name;
-    patron.domain = prompt(i18nText("feature.patrons.enterPatronDomain", null, "Enter patron domain:"), patron.domain || patron.subtitle) || patron.domain;
-    patron.icon = prompt(i18nText("feature.patrons.enterPatronIcon", null, "Enter patron icon:"), patron.icon) || patron.icon;
-    patron.description = prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:"), patron.description) || patron.description;
-    patron.sigil = prompt(i18nText("feature.patrons.enterSigil", null, "Enter sigil:"), patron.sigil) || patron.sigil;
-    patron.corruption = prompt(i18nText("feature.patrons.enterCorruption", null, "Enter corruption:"), patron.corruption) || patron.corruption;
-    patron.source = 'local';
-    state.cosmicPatrons.sort(sortByName);
-    savePatronData();
-    refreshView();
-    window.closePatronModal();
-    showToast(i18nText("feature.patrons.updatedPatronValue", { value0: name }, "Updated patron: {{value0}}"), 'success');
-};
+window.editPatron = function(id) { openLibraryEditor('cosmic', id); };
  
 window.deletePatron = function(id) {
     const patron = state.cosmicPatrons.find(p => p.id === id);
@@ -1864,55 +1671,9 @@ window.deletePatron = function(id) {
     showToast(i18nText("feature.patrons.deletedPatronValue", { value0: patron.name || patron.title }, "Deleted patron: {{value0}}"), 'info');
 };
  
-window.addTerrestrialPatron = function() {
-    const name = prompt(i18nText("feature.patrons.enterTerrestrialPatronName", null, "Enter terrestrial patron name:"));
-    if (!name) return;
+window.addTerrestrialPatron = function() { openLibraryEditor('terrestrial'); };
  
-    state.terrestrialPatrons.push(normalizePatron({
-        id: 'terr-' + Date.now(),
-        name,
-        type: prompt(i18nText("feature.patrons.enterTypeCreditorFenceSanctuaryMilitaryTribal", null, "Enter type (creditor/fence/sanctuary/military/tribal):")) || 'patron',
-        tier: prompt(i18nText("feature.patrons.enterTierIV", null, "Enter tier (I-V):")) || 'I',
-        description: prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:")) || 'A terrestrial patron of the Amaranthine.',
-        location: prompt(i18nText("feature.patrons.enterLocation", null, "Enter location:")) || 'Unknown',
-        leverage: prompt(i18nText("feature.patrons.enterLeverage", null, "Enter leverage:")) || 'None listed',
-        debtTrigger: prompt(i18nText("feature.patrons.enterDebtTrigger", null, "Enter debt trigger:")) || 'When Obligation fills, they call in a debt.',
-        quirk: prompt(i18nText("feature.patrons.enterQuirk", null, "Enter quirk:")) || '',
-        assetSlots: parseInt(prompt(i18nText("feature.patrons.enterAssetSlots", null, "Enter asset slots:")) || '2'),
-        maxAssetTier: prompt(i18nText("feature.patrons.enterMaxAssetTierMinorStandardMajor", null, "Enter max asset tier (Minor/Standard/Major):")) || 'Minor',
-        obligationCapacity: prompt(i18nText("feature.patrons.enterObligationCapacitySpiritPresenceOrFixed", null, "Enter obligation capacity (Spirit+Presence or fixed):")) || 'Spirit+Presence',
-        source: 'local'
-    }));
-    state.terrestrialPatrons.sort(sortByName);
-    savePatronData();
-    refreshView();
-    showToast(i18nText("feature.patrons.addedTerrestrialPatronValue", { value0: name }, "Added terrestrial patron: {{value0}}"), 'success');
-};
- 
-window.editTerrestrial = function(id) {
-    const patron = state.terrestrialPatrons.find(p => p.id === id);
-    if (!patron) return;
-    const name = prompt(i18nText("feature.patrons.enterName", null, "Enter name:"), patron.name || patron.title);
-    if (!name) return;
-    patron.name = name;
-    patron.title = name;
-    patron.type = prompt(i18nText("feature.patrons.enterType", null, "Enter type:"), patron.type) || patron.type;
-    patron.tier = prompt(i18nText("feature.patrons.enterTier", null, "Enter tier:"), patron.tier) || patron.tier;
-    patron.description = prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:"), patron.description) || patron.description;
-    patron.location = prompt(i18nText("feature.patrons.enterLocation", null, "Enter location:"), patron.location) || patron.location;
-    patron.leverage = prompt(i18nText("feature.patrons.enterLeverage", null, "Enter leverage:"), patron.leverage) || patron.leverage;
-    patron.debtTrigger = prompt(i18nText("feature.patrons.enterDebtTrigger", null, "Enter debt trigger:"), patron.debtTrigger) || patron.debtTrigger;
-    patron.quirk = prompt(i18nText("feature.patrons.enterQuirk", null, "Enter quirk:")) || patron.quirk;
-    patron.assetSlots = parseInt(prompt(i18nText("feature.patrons.enterAssetSlots", null, "Enter asset slots:"), patron.assetSlots) || '2');
-    patron.maxAssetTier = prompt(i18nText("feature.patrons.enterMaxAssetTier", null, "Enter max asset tier:"), patron.maxAssetTier) || patron.maxAssetTier;
-    patron.obligationCapacity = prompt(i18nText("feature.patrons.enterObligationCapacity", null, "Enter obligation capacity:"), patron.obligationCapacity) || patron.obligationCapacity;
-    patron.source = 'local';
-    state.terrestrialPatrons.sort(sortByName);
-    savePatronData();
-    refreshView();
-    window.closePatronModal();
-    showToast(i18nText("feature.patrons.updatedTerrestrialPatronValue", { value0: name }, "Updated terrestrial patron: {{value0}}"), 'success');
-};
+window.editTerrestrial = function(id) { openLibraryEditor('terrestrial', id); };
  
 window.deleteTerrestrial = function(id) {
     const patron = state.terrestrialPatrons.find(p => p.id === id);
@@ -1926,46 +1687,9 @@ window.deleteTerrestrial = function(id) {
     showToast(i18nText("feature.patrons.deletedTerrestrialPatronValue", { value0: patron.name || patron.title }, "Deleted terrestrial patron: {{value0}}"), 'info');
 };
  
-window.addReligion = function() {
-    const name = prompt(i18nText("feature.patrons.enterReligionName", null, "Enter religion name:"));
-    if (!name) return;
-    const icon = prompt(i18nText("feature.patrons.enterIconEmoji", null, "Enter icon (emoji):")) || '⛪';
+window.addReligion = function() { openLibraryEditor('religions'); };
  
-    state.religions.push({
-        id: 'religion-' + Date.now(),
-        name,
-        icon,
-        description: prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:")) || 'A religion of the Amaranthine.',
-        lore: prompt(i18nText("feature.patrons.enterLore", null, "Enter lore:")) || '',
-        doctrines: prompt(i18nText("feature.patrons.enterDoctrinesCommaSeparated", null, "Enter doctrines (comma-separated):"))?.split(',').map(s => s.trim()) || [],
-        practices: prompt(i18nText("feature.patrons.enterPracticesCommaSeparated", null, "Enter practices (comma-separated):"))?.split(',').map(s => s.trim()) || [],
-        orders: [],
-        source: 'local'
-    });
-    state.religions.sort(sortByName);
-    savePatronData();
-    refreshView();
-    showToast(i18nText("feature.patrons.addedReligionValue", { value0: name }, "Added religion: {{value0}}"), 'success');
-};
- 
-window.editReligion = function(id) {
-    const religion = state.religions.find(r => r.id === id);
-    if (!religion) return;
-    const name = prompt(i18nText("feature.patrons.enterReligionName", null, "Enter religion name:"), religion.name);
-    if (!name) return;
-    religion.name = name;
-    religion.icon = prompt(i18nText("feature.patrons.enterIcon", null, "Enter icon:"), religion.icon) || religion.icon;
-    religion.description = prompt(i18nText("feature.patrons.enterDescription", null, "Enter description:"), religion.description) || religion.description;
-    religion.lore = prompt(i18nText("feature.patrons.enterLore", null, "Enter lore:"), religion.lore) || religion.lore;
-    religion.doctrines = prompt(i18nText("feature.patrons.enterDoctrinesCommaSeparated", null, "Enter doctrines (comma-separated):"), religion.doctrines.join(','))?.split(',').map(s => s.trim()) || [];
-    religion.practices = prompt(i18nText("feature.patrons.enterPracticesCommaSeparated", null, "Enter practices (comma-separated):"), religion.practices.join(','))?.split(',').map(s => s.trim()) || [];
-    religion.source = 'local';
-    state.religions.sort(sortByName);
-    savePatronData();
-    refreshView();
-    window.closePatronModal();
-    showToast(i18nText("feature.patrons.updatedReligionValue", { value0: name }, "Updated religion: {{value0}}"), 'success');
-};
+window.editReligion = function(id) { openLibraryEditor('religions', id); };
  
 window.deleteReligion = function(id) {
     const religion = state.religions.find(r => r.id === id);
@@ -1996,7 +1720,8 @@ window.runPatronRecommender = function() {
         return;
     }
 
-    const results = recommendPatrons(query, state.cosmicPatrons);
+    if (isNinthTrigger(query)) ninthRevealed = true;
+    const results = recommendPatrons(query, state.cosmicPatrons.filter(p => ninthRevealed || !isTheNinth(p)));
     state.recommender.query = query;
     state.recommender.results = results;
     state.recommender.active = true;
@@ -2017,33 +1742,12 @@ window.clearPatronRecommender = function() {
     refreshView();
 };
 
-window.refreshPatrons = function() {
-    localStorage.removeItem('fates-edge-patrons-cache-cosmic');
-    localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
-    localStorage.removeItem('fates-edge-patrons-cache-religion');
- 
-    const saved = getState();
-    if (saved.patrons) {
-        delete saved.patrons.cosmic;
-        delete saved.patrons.terrestrial;
-        delete saved.patrons.religions;
-        saveState();
-    }
-
-    state.cosmicPatrons = [];
-    state.terrestrialPatrons = [];
-    state.religions = [];
-    state.dataLoaded = false;
-    state.usingFallback = false;
-    // Clear any recommender results too — they hold references to the
-    // patron objects we're about to throw away, and would otherwise show
-    // stale/duplicate tiles once fresh data loads.
+window.refreshPatrons = async function() {
     state.recommender.results = null;
     state.recommender.active = false;
- 
-    loadPatronData(true);
+    await loadPatronData(true);
     refreshView();
-    showToast(i18nText("feature.patrons.patronsRefreshedFromDisk", null, "🔄 Patrons refreshed from disk"), 'success');
+    showToast('Patron references reloaded; custom entries and tracking preserved.', 'success');
 };
  
 window.loadDefaultPatrons = function() {
@@ -2061,6 +1765,14 @@ function refreshView() {
     if (container) {
         container.innerHTML = renderView(state.viewMode);
     }
+    document.querySelectorAll('.patrons-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.view === state.viewMode);
+        tab.setAttribute('aria-pressed', String(tab.dataset.view === state.viewMode));
+    });
+    const path = document.getElementById('patron-library-path');
+    if (path) path.disabled = state.viewMode !== 'cosmic';
+    const note = document.getElementById('patron-recommender-status');
+    if (note) note.textContent = state.recommender.active ? `${state.recommender.results?.length || 0} suggestions for “${state.recommender.query}”.` : '';
     attachEvents();
 }
  
@@ -2069,20 +1781,60 @@ function refreshView() {
 // ============================================================
  
 export function attachEvents() {
-    document.querySelectorAll('.patrons-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.patrons-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            const view = tab.dataset.view;
-            const container = document.getElementById('patrons-view-container');
-            if (container) {
-                container.innerHTML = renderView(view);
-                attachEvents();
-            }
-        });
+    if (!container || container._patronLibraryBound) return;
+    container._patronLibraryBound = true;
+    container.addEventListener('input', event => {
+        if (event.target.id !== 'patron-library-search') return;
+        library.query = event.target.value;
+        if (isNinthTrigger(library.query)) ninthRevealed = true;
+        refreshView();
+    });
+    container.addEventListener('change', event => {
+        if (event.target.id === 'patron-library-path') library.path = event.target.value;
+        if (event.target.id === 'patron-library-saved') library.saved = !!event.target.value;
+        if (event.target.id === 'patron-library-character') library.character = event.target.value;
+        refreshView();
+    });
+    container.addEventListener('keydown', event => {
+        if (event.target.id === 'patron-recommender-input' && event.key === 'Enter') window.runPatronRecommender();
+    });
+    container.addEventListener('click', async event => {
+        const tab = event.target.closest('[data-view]');
+        if (tab?.classList.contains('patrons-tab')) { state.viewMode = tab.dataset.view; refreshView(); return; }
+        const button = event.target.closest('[data-patron-action]');
+        if (!button) return;
+        const { patronAction: action, id } = button.dataset;
+        if (action === 'open') {
+            state.selectedPatron = id;
+            if (state.viewMode === 'cosmic') window.openPatronDetailModal(id);
+            else if (state.viewMode === 'terrestrial') window.openTerrestrialDetailModal(id);
+            else window.viewReligion(id);
+        }
+        if (action === 'favorite') {
+            const saved = getState(); const favorites = new Set(saved.patronFavorites || []);
+            if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+            saved.patronFavorites = [...favorites]; saveState(); refreshView();
+            [...container.querySelectorAll('[data-patron-action="favorite"]')].find(b => b.dataset.id === id)?.focus();
+        }
+        if (action === 'clear') {
+            library.query = ''; library.path = ''; library.saved = false;
+            state.recommender.active = false;
+            container.querySelector('#patron-library-search').value = '';
+            container.querySelector('#patron-library-path').value = '';
+            container.querySelector('#patron-library-saved').value = '';
+            refreshView(); container.querySelector('#patron-library-search').focus();
+        }
+        if (action === 'recommend') { state.viewMode = 'cosmic'; window.runPatronRecommender(); }
+        if (action === 'reset-recommend') window.clearPatronRecommender();
+        if (action === 'create') {
+            if (state.viewMode === 'cosmic') window.addCosmicPatron();
+            else if (state.viewMode === 'terrestrial') window.addTerrestrialPatron();
+            else window.addReligion();
+        }
+        if (action === 'reload') { button.disabled = true; await window.refreshPatrons(); button.disabled = false; }
     });
 }
- 
+
 // ============================================================
 // LIFECYCLE METHODS
 // ============================================================
@@ -2111,11 +1863,11 @@ export function onDeactivate() {
     console.log('[Patrons] Deactivated');
 }
  
-export function refresh() {
+export async function refresh() {
     localStorage.removeItem('fates-edge-patrons-cache-cosmic');
     localStorage.removeItem('fates-edge-patrons-cache-terrestrial');
     localStorage.removeItem('fates-edge-patrons-cache-religion');
-    loadPatronData(true);
+    await loadPatronData(true);
     refreshView();
 }
  
