@@ -664,7 +664,14 @@ export function attachEvents() {
             const capInput = window.prompt(i18nText("feature.whiteboard.modules.ui.xpWagerCapPerPlayer", null, "XP wager cap per player:"), '2');
             stakeConfig = { mode: 'xp', xpCap: Math.max(1, parseInt(capInput, 10) || 1) };
         } else if (stakeChoice === 'string') {
-            stakeConfig = { mode: 'string' };
+            const risk = window.prompt('Choose the story promise: favor (one small, safe favor), rumor (a useful rumor chosen by its teller), or passage (an introduction or contact lead). Everyone can review it before joining.', 'favor');
+            if (risk === null) return;
+            const storyRisk = risk.trim().toLowerCase();
+            if (!['favor', 'rumor', 'passage'].includes(storyRisk)) {
+                showToast('Choose favor, rumor, or passage to host a story-stakes table.', 'error');
+                return;
+            }
+            stakeConfig = { mode: 'string', storyRisk };
         }
         const started = openTollVeilTable({ hostName: name, numSeats, stakeConfig });
         if (started) {

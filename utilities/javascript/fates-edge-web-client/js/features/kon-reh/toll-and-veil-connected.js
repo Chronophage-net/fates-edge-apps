@@ -41,18 +41,10 @@
 // client's character record. See applyStakeEvent() below.
 
 import { TollVeilEngine, aiChooseBid, aiChoosePlay } from './toll-and-veil-engine.js';
+import { storyPromise } from './story-stakes.js';
 import { getCharacter, updateCharacter, getCharacters } from '@core/state.js';
 
 export const TOLL_VEIL_CONNECTED_PROTOCOL_VERSION = 1;
-
-const STRING_DEBT_PROMPTS = [
-    'I owe you a story about why I needed that XP.',
-    "I'll do one favor for you, no questions asked.",
-    'You now know my character’s deepest fear.',
-    'I owe you the truth about where I really was that night.',
-    'Next time you need backup, I’m there — no matter the cost.',
-    'You hold one secret of mine now. Use it wisely.',
-];
 
 /** Best-effort "my bound character" — mirrors the Whiteboard's own
  *  convention (js/features/whiteboard/modules/ui.js's getWhiteboardSenderName). */
@@ -135,7 +127,7 @@ export function createTollVeilHost(transport, options = {}) {
 
     function broadcastState() {
         seq++;
-        safeSend({ t: 'public', seq, state: engine.getPublicState() });
+        safeSend({ t: 'public', seq, state: { ...engine.getPublicState(), humanSeats: Array.from({length:numSeats},(_,i)=>i).filter(i=>!isAiSeat(i)) } });
         for (let s = 0; s < engine.numSeats; s++) {
             const id = seatIds[s];
             if (!id) continue;
@@ -160,7 +152,7 @@ export function createTollVeilHost(transport, options = {}) {
 
     function resolveStakes() {
         const winner = engine.gameWinner;
-        if (winner == null || stakeConfig.mode === 'points') return;
+        if (winner == null || stakeConfig.mode === 'points' || isAiSeat(winner)) return;
         const loserSeats = [];
         for (let s = 0; s < engine.numSeats; s++) {
             if (s === winner) continue;
@@ -181,7 +173,7 @@ export function createTollVeilHost(transport, options = {}) {
             summaryLines.push(`💰 Toll & Veil: seat ${winner + 1} collects ${amount} wagered XP from ${loserSeats.map(s => `seat ${s + 1}`).join(', ')}.`);
         } else if (stakeConfig.mode === 'string') {
             for (const loser of loserSeats) {
-                const text = STRING_DEBT_PROMPTS[Math.floor(Math.random() * STRING_DEBT_PROMPTS.length)];
+                const text = storyPromise(stakeConfig);
                 const ev = { t: 'stake-string', fromSeat: loser, toSeat: winner, text };
                 safeSend(ev);
                 applyStakeEvent(ev, localSeat);
@@ -247,6 +239,7 @@ export function createTollVeilHost(transport, options = {}) {
         seatNames: Array.from({ length: numSeats }, (_, i) => isHumanSeat(i) ? `Seat ${i + 1}` : (i === localSeat ? 'You' : (i === localSeat ? 'You' : `AI ${i + 1}`))),
         localSeat,
         stakeConfig,
+        humanSeats: Array.from({length:numSeats},(_,i)=>i).filter(i=>!isAiSeat(i)),
         getView() {
             const pub = engine.getPublicState();
             const myHand = localSeat != null ? engine.getSeatView(localSeat).hand : [];
@@ -337,6 +330,7 @@ export function createTollVeilGuest(transport, options = {}) {
         seatNames: [],
         localSeat: mySeat,
         stakeConfig,
+        get humanSeats() { return publicState?.humanSeats; },
         getView() {
             return { ...(publicState || {}), myHand };
         },

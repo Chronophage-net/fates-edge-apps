@@ -14,6 +14,23 @@
 - Working-tree web tests passed 457/458; an unrelated, uncommitted GM-guide edit fails the crafting-rules check and is excluded from this release.
 - Python dependency auditing and upgraded Electron runtime/installer smoke tests remain unverified because their downloads failed. See SECURITY.md for scope and release caveats.
 
+## [5.15.0] - 2026-10-12
+
+Games room redesign, reliable result overlays, and agreed Toll & Veil story stakes
+
+### Games
+- Redesign the games landing page with a real Kon'reh board screenshot, move guidance, and clearer local play controls.
+- Improve Toll & Veil handoff privacy, bidding and card confirmation; correct Leap availability.
+- Connect Kon'reh terminal states to accessible, responsive result dialogs; add final statistics, review/replay controls, and escaped result text.
+- Agree story promises before Toll & Veil play, tie prompts to bids and markers, retain final-hand recaps, and exclude AI seats from story debt settlement.
+
+### Validation
+- Production web build passed; browser checks covered results, keyboard focus, dismissal, replay and narrow-screen layout.
+- Working-tree web tests: 468/469 passed. The existing GM-guide crafting mismatch belongs to an unrelated local edit excluded from this release, along with the pending Five Daughters document edit.
+
+### Other
+- Sync active novels and revised reader appendices
+
 ## [5.14.1] - 2026-10-12
 
 AI-GM request correlation, accurate suggestion outcomes, proxy trust security fix, and updated reading library.

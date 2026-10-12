@@ -1,4 +1,7 @@
 import { t as i18nText } from '@core/i18n.js';
+import { showOutcomeOverlay, hideOutcomeOverlay } from './outcome-overlay.js';
+import { konrehResult } from './results.js';
+const boardPreviewUrl = new URL('./board-preview.jpg', import.meta.url).href;
 // ============================================================
 //  KON'REH ENGINE — implementation of the official LaTeX rulebook
 //  ("Corpus Canré Scholiatum" / Kon'reh Core Rules §1–9)
@@ -1941,6 +1944,7 @@ export function openKonrehModal(netConfig = null) {
   let aiTimer = null;
   let disposed = false;
   const closeKonrehModal = () => {
+    hideOutcomeOverlay();
     disposed = true;
     clearTimeout(aiTimer);
     stopCoachAnimation();
@@ -1983,7 +1987,7 @@ export function openKonrehModal(netConfig = null) {
 
   const closeBtnTop = document.createElement('button');
   closeBtnTop.className = 'kr-btn';
-  closeBtnTop.textContent = '✕';
+  closeBtnTop.textContent = 'Back to games';
   closeBtnTop.title = 'Close';
   closeBtnTop.setAttribute('aria-label','Back to game library');
   closeBtnTop.onclick = () => { stopCoachAnimation(); closeKonrehModal(); };
@@ -1992,6 +1996,7 @@ export function openKonrehModal(netConfig = null) {
 
   // ---- Setup screen (choose mode) ----
   const setupScreen = document.createElement('div');
+  setupScreen.className = 'kr-setup';
   setupScreen.style.cssText = 'width:100%; display:flex; flex-direction:column; align-items:center; gap:14px; padding: 18px 0 8px;';
 
   const setupIntro = document.createElement('div');
@@ -2000,6 +2005,7 @@ export function openKonrehModal(netConfig = null) {
   setupScreen.appendChild(setupIntro);
 
   const modeRow = document.createElement('div');
+  modeRow.className = 'kr-mode-row';
   modeRow.style.cssText = 'display:flex; gap:10px;';
   const twoPlayerBtn = document.createElement('button');
   twoPlayerBtn.className = 'kr-btn primary';
@@ -2063,6 +2069,7 @@ export function openKonrehModal(netConfig = null) {
   schoolPanel.appendChild(schoolLabel);
 
   const schoolGrid = document.createElement('div');
+  schoolGrid.className = 'kr-school-grid';
   schoolGrid.style.cssText = 'display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%;';
   schoolPanel.appendChild(schoolGrid);
 
@@ -2075,11 +2082,13 @@ export function openKonrehModal(netConfig = null) {
   Object.entries(SCHOOLS).forEach(([id, school]) => {
     const card = document.createElement('button');
     card.className = 'kr-btn';
+    card.setAttribute('aria-pressed', String(id === chosenSchool));
     card.style.cssText = 'text-align: start; padding:10px 12px; display:flex; flex-direction:column; gap:3px; border:1px solid #3a3b4a;';
     card.innerHTML = `<div style="font-weight:700; color:var(--gold);">${school.name}</div><div style="font-size:11px; color:var(--muted); font-weight:400;">${school.tagline}</div>`;
     card.onclick = () => {
       chosenSchool = id;
       Object.values(schoolCards).forEach(c => c.style.borderColor = '#3a3b4a');
+      Object.values(schoolCards).forEach(c => c.setAttribute('aria-pressed', String(c === card)));
       card.style.borderColor = 'var(--gold)';
     };
     schoolGrid.appendChild(card);
@@ -2139,6 +2148,10 @@ export function openKonrehModal(netConfig = null) {
   statusDiv.style.cssText = 'margin-top: 12px; font-size: 13.5px; color: var(--ink); text-align: center; min-height: 22px; font-weight:600;';
   statusDiv.setAttribute('role','status');
   boardContainer.insertBefore(statusDiv,canvas);
+  const moveGuide = document.createElement('div');
+  moveGuide.className = 'kr-move-guide';
+  moveGuide.setAttribute('aria-live', 'polite');
+  boardContainer.insertBefore(moveGuide,canvas);
 
   // Coach tip div – shows the suggestion and also the selected piece coordinates
   const coachTipDiv = document.createElement('div');
@@ -2257,6 +2270,7 @@ export function openKonrehModal(netConfig = null) {
   let pendingChoice = null;
   let aiConfig = null;      // { schoolId, player, depth }
   let aiThinking = false;
+  let outcomeGame = null;
 
   // Coach: a cached { piece, move } suggestion, keyed off the current
   // game state so we only re-run the search when something actually
@@ -2709,6 +2723,23 @@ export function openKonrehModal(netConfig = null) {
       statusDiv.textContent += i18nText("feature.kon-reh.selectedValueValue", { value0: selectedPiece.x, value1: selectedPiece.y }, "  |  Selected: ({{value0}}, {{value1}})");
     }
     describeSquare();
+    if (!game.winner) outcomeGame = null;
+    if (game.winner && outcomeGame !== game) {
+      outcomeGame = game;
+      showOutcomeOverlay({
+        ...konrehResult(game, isNetworked ? localPlayer : aiConfig ? (aiConfig.player === 1 ? 2 : 1) : null),
+        buttons: [
+          ...(!isNetworked ? [{ label: 'New contest', primary: true, onClick: () => resetBtn.click() }] : []),
+          { label: 'Back to games', onClick: closeKonrehModal },
+        ],
+      });
+    }
+    const waiting = (aiConfig && game.turn === aiConfig.player) || (isNetworked && game.turn !== localPlayer);
+    moveGuide.textContent = game.winner ? 'Match complete. Review the log or start a new game.'
+      : game.pendingReforge ? 'Reforge: choose a return square from the options below.'
+      : waiting ? 'Your opponent is considering their move.'
+      : selectedPiece ? `${TYPE_LABEL[selectedPiece.type]} · onward exactly ${ONWARD_DIST[selectedPiece.type]}, homeward up to ${HOMEWARD_DIST[selectedPiece.type]}. ${validMoves.length ? 'Choose a highlighted destination.' : 'No legal moves here — choose another piece.'}`
+      : 'Select one of your pieces to reveal legal moves. In the opening, try an outer Red.';
   }
 
   // ---- Status rendering (DOM only — drawing happens in drawBoardOnly) ----
@@ -2941,6 +2972,8 @@ export function openKonrehModal(netConfig = null) {
   });
 
   resetBtn.addEventListener('click', () => {
+    hideOutcomeOverlay();
+    clearTimeout(aiTimer);
     stopCoachAnimation();
     if (isNetworked) {
       game = new KonrehEngine();
@@ -3115,9 +3148,10 @@ export default {
     if (!container) return;
 
     container.innerHTML = `
-      <section class="kr-lobby"><header><p class="play-eyebrow">FATE’S EDGE / GAMES AT THE TABLE</p><h1>Kon’reh &amp; company</h1><p>A quiet contest, a worthy rival, or a little trouble between adventures.</p></header>
-      <div class="kr-lobby-cards"><article class="panel"><p class="play-eyebrow">STRATEGY · TWO SIDES</p><h2>Kon’reh</h2><p>Apex, Sanctum, and Reforge. Play across the same screen or test your plans against the computer’s Schools.</p><button id="konreh-play-btn" class="btn btn-gold">Play Kon’reh</button><p>New to the board? Enable Coach Mode during setup for move suggestions and explanations.</p></article>
-      <article class="panel"><p class="play-eyebrow">CARDS · THREE TO FIVE SEATS</p><h2>Toll &amp; Veil</h2><p>A trick-taking game of bids, trump, and nerve. Pass and play or take on computer opponents.</p><button id="tollveil-play-btn" class="btn">Play Toll &amp; Veil</button><p>For connected play, challenge a player or host a table from Whiteboard.</p></article></div>
+      <section class="kr-lobby"><header><p class="play-eyebrow">FATE’S EDGE / THE GAMES ROOM</p><h1>A seat at the table.</h1><p>Outthink a rival. Risk a bid. Two ways to spend the hours between adventures.</p></header>
+      <div class="kr-lobby-cards"><article class="panel kr-game-card"><div class="kr-board-preview"><img src="${boardPreviewUrl}" alt="Kon’reh starting board: gold and red pieces at opposite Apexes, with the Cross in the center." width="522" height="522"></div><div class="kr-card-copy"><p class="play-eyebrow">01 / THE STRATEGY BOARD</p><h2>Kon’reh</h2><p>Guard your Blue. Control the Cross. Turn a desperate position into a Reforge.</p><ul class="kr-game-tags"><li>2 sides</li><li>Shared screen or AI</li><li>6 rival Schools</li></ul><button id="konreh-play-btn" class="btn btn-gold">Play Kon’reh <span aria-hidden="true">↗</span></button><p class="kr-start-tip">First game? Turn on Coach Mode for live suggestions and explanations.</p></div></article>
+      <article class="panel kr-game-card"><div class="tv-deck-preview" aria-hidden="true"><span>9<br>♣</span><span>A<br>♡</span><span>K<br>♠</span></div><div class="kr-card-copy"><p class="play-eyebrow">02 / THE ROADSIDE CARD GAME</p><h2>Toll &amp; Veil</h2><p>Read the trump. Name your bid. Make every trick and one-use marker count.</p><ul class="kr-game-tags"><li>3–5 seats</li><li>Pass &amp; play or AI</li><li>10 tricks per hand</li></ul><button id="tollveil-play-btn" class="btn btn-gold">Play Toll &amp; Veil <span aria-hidden="true">↗</span></button><p class="kr-start-tip">Pass-and-play keeps each hand covered until its player is ready.</p></div></article></div>
+      <aside class="kr-room-note"><div><h3>Friends at another screen?</h3><p>Connect to the same room, then challenge a player or host a Toll &amp; Veil table from Whiteboard.</p></div><a class="btn" href="#whiteboard">Open Whiteboard →</a></aside>
       <details id="konreh-rules-panel"><summary>Kon’reh · rules &amp; reference</summary>${getRulesText()}</details>
       <details id="tollveil-rules-panel"><summary>Toll &amp; Veil · rules &amp; reference</summary>${getTollVeilRulesText()}</details>
       <p>Local matches last while the game is open. Leaving the game ends the local match.</p></section>

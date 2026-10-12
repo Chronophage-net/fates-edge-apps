@@ -10,6 +10,47 @@ The main *Fate's Edge* application: character management, dice, encounters, the 
 
 ## Quick start
 
+### Games room
+
+Open **Kon'reh** in the sidebar (`#kon-reh`) for both games. Each game has a
+short introduction, play options, and expandable rules. The Whiteboard shortcut
+leads to connected challenges and hosted tables; local games need no server.
+
+- **Kon'reh:** choose two players on one screen or a computer School. Coach Mode
+  offers suggestions. Select a piece and a highlighted destination, or use the
+  Column/Row controls and **Select / move**. The guide above the board explains
+  the selected piece's distances, waiting turns, and Reforge choices.
+- **Toll & Veil:** choose 3–5 seats and pass-and-play or solo versus AI. In
+  pass-and-play, hand the device to the named player before **Reveal my hand**.
+  Cards remain visible while bidding. During play, select a legal card, review
+  Cut/Leap, then confirm. A required Leap is selected explicitly with an
+  explanation; unavailable markers and cards are disabled. The table log keeps
+  recent plays and scoring available without crowding the hand.
+
+Local matches are held in memory: leaving the game or reloading ends them.
+Both games show a match-result dialog with final scores or remaining pieces.
+**Review table** (or Escape) returns to the final position; local Toll & Veil
+offers **Play Again**. Connected Kon'reh rematches start through a new challenge.
+The dialog traps keyboard focus and respects reduced-motion preferences.
+
+Toll & Veil's optional story stakes are agreed before play: a small favor,
+a useful in-character rumor, or an introduction. Points-only remains the default.
+The table shows that promise alongside prompts based on bids and marker use;
+the last-hand recap records bids, tricks, points, and notable risks. These are
+fiction prompts, not new scoring rules or automatic character-sheet changes.
+AI seats neither owe nor collect story debts. Connected hosts choose the
+promise in the Whiteboard hosting flow; the lobby shows it before joining.
+
+For UI regression checks, run the development server and open
+`/tests/fixtures/game-outcomes.html`. This test-only page exercises the actual
+game dialogs with terminal Kon'reh positions and completed Toll & Veil games;
+check win/loss/draw, shared-table results, keyboard focus, review, and replay.
+
+The handoff screen prevents casual shoulder-surfing, not access by someone
+inspecting the browser's developer tools.
+
+### Run locally
+
 ```bash
 cd utilities/javascript/fates-edge-web-client
 npm install

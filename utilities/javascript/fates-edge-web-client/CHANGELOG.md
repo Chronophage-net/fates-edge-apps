@@ -2,6 +2,13 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## [5.15.0] - 2026-10-12
+
+- Redesign the games room with a real board preview, move guidance, and clearer Toll & Veil handoff, bidding, and card controls.
+- Wire Kon'reh results into the shared accessible win/loss/draw overlay; add statistics, table review, and replay controls.
+- Add agreed Toll & Veil story promises, bid/marker-driven scene prompts, final-hand recaps, and AI debt exclusions.
+- Add game-result and games-room regression tests plus a browser outcome fixture. Build and browser checks passed; working-tree tests passed 468/469, with the unrelated local GM-guide crafting edit excluded from release.
+
 ## [5.14.0] - 2026-10-09
 
 - Redesign Patrons, Decks, Whiteboard, Dice, Kon’reh, and Docs workspaces. See the README feature descriptions for persistence, accessibility, and export limitations.

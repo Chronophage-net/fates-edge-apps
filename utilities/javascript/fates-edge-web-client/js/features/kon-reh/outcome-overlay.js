@@ -14,6 +14,7 @@
 
 const OVERLAY_ID = 'fe-outcome-overlay';
 const STYLE_ID = 'fe-outcome-style';
+let restoreModal = null;
 
 const THEMES = {
     win:     { icon: '🏆', accent: '#d4af37', glow: 'rgba(212,175,55,0.35)', label: 'Victory' },
@@ -35,7 +36,7 @@ function injectStyle() {
             --fe-oc-accent:#d4af37; --fe-oc-glow:rgba(212,175,55,.25); --dx:0px; --dy:0px;
             background:rgba(8,8,14,0.72); backdrop-filter:blur(3px); animation: fe-oc-fade .35s ease-out both;
             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
-        #${OVERLAY_ID} .fe-oc-card { position:relative; text-align:center; min-width:min(360px,90vw); max-width:90vw; padding:28px 34px 24px;
+        #${OVERLAY_ID} .fe-oc-card { position:relative; text-align:center; width:560px; max-width:calc(100vw - 24px); max-height:calc(100dvh - 32px); overflow:auto; box-sizing:border-box; padding:28px 26px 24px;
             background:#1b1c26; color:#e8e6df; border:1px solid var(--fe-oc-accent); border-radius:14px;
             box-shadow:0 0 60px var(--fe-oc-glow), 0 20px 60px rgba(0,0,0,.6); }
         #${OVERLAY_ID}.win .fe-oc-card { animation: fe-oc-pop .55s cubic-bezier(.2,1.4,.4,1) both; }
@@ -43,11 +44,18 @@ function injectStyle() {
         #${OVERLAY_ID}.draw .fe-oc-card, #${OVERLAY_ID}.neutral .fe-oc-card { animation: fe-oc-pop .45s ease-out both; }
         #${OVERLAY_ID} .fe-oc-icon { font-size:54px; line-height:1; }
         #${OVERLAY_ID}.win .fe-oc-icon { animation: fe-oc-bounce 1.2s ease-in-out .5s 2; }
-        #${OVERLAY_ID} .fe-oc-title { margin:10px 0 4px; font-size:30px; letter-spacing:.06em; text-transform:uppercase; color:var(--fe-oc-accent); font-weight:800; }
+        #${OVERLAY_ID} .fe-oc-title { margin:10px 0 12px; font:500 clamp(26px,6vw,40px) Georgia,serif; color:var(--fe-oc-accent); overflow-wrap:anywhere; }
+        #${OVERLAY_ID} .fe-oc-eyebrow { color:#c3bcae; font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:18px; }
+        #${OVERLAY_ID} .fe-oc-stats { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:20px 0; }
+        #${OVERLAY_ID} .fe-oc-stat { flex:1 1 100px; border:1px solid #454451; border-radius:10px; padding:12px; background:#12151e; }
+        #${OVERLAY_ID} .fe-oc-stat strong { display:block; font-size:22px; color:#eee3c8; }
+        #${OVERLAY_ID} .fe-oc-stat span { font-size:12px; color:#bdb9c9; }
+        #${OVERLAY_ID} .fe-oc-story { text-align:start; white-space:pre-line; background:#272832; border-inline-start:3px solid var(--fe-oc-accent); padding:14px; margin:16px 0; font-size:14px; line-height:1.6; overflow-wrap:anywhere; }
         #${OVERLAY_ID} .fe-oc-sub { font-size:14px; color:#c9c8d4; }
-        #${OVERLAY_ID} .fe-oc-details { margin-top:12px; font-size:12px; color:#9a9aa8; line-height:1.6; }
+        #${OVERLAY_ID} .fe-oc-details { margin-top:12px; font-size:14px; color:#bab6c8; line-height:1.6; white-space:pre-line; overflow-wrap:anywhere; }
         #${OVERLAY_ID} .fe-oc-btns { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
-        #${OVERLAY_ID} .fe-oc-btn { background:#2a2b38; color:#e8e6df; border:1px solid #3a3b4a; padding:8px 18px; border-radius:6px; cursor:pointer; font-size:13px; }
+        #${OVERLAY_ID} .fe-oc-btn { background:#2a2b38; color:#e8e6df; border:1px solid #3a3b4a; padding:10px 18px; min-height:44px; border-radius:8px; cursor:pointer; font-size:14px; }
+        #${OVERLAY_ID} :focus-visible { outline:3px solid #f2dfab; outline-offset:3px; }
         #${OVERLAY_ID} .fe-oc-btn:hover { background:#34364a; }
         #${OVERLAY_ID} .fe-oc-btn.primary { background:var(--fe-oc-accent); color:#1a1400; border-color:var(--fe-oc-accent); font-weight:600; }
         #${OVERLAY_ID} .fe-oc-spark { position:absolute; top:50%; inset-inline-start:50%; width:6px; height:6px; border-radius:50%; background:var(--fe-oc-accent);
@@ -100,9 +108,11 @@ function playCue(result) {
 export function hideOutcomeOverlay() {
     const el = document.getElementById(OVERLAY_ID);
     if (el) el.remove();
+    restoreModal?.();
+    restoreModal = null;
 }
 
-export function showOutcomeOverlay({ result = 'neutral', title, subtitle = '', details = '', buttons = [], sound = true } = {}) {
+export function showOutcomeOverlay({ result = 'neutral', title, subtitle = '', details = '', buttons = [], sound = true, game = 'Table games', stats = [], story = '' } = {}) {
     injectStyle();
     hideOutcomeOverlay();
     const theme = THEMES[result] || THEMES.neutral;
@@ -111,17 +121,21 @@ export function showOutcomeOverlay({ result = 'neutral', title, subtitle = '', d
     overlay.id = OVERLAY_ID;
     overlay.className = result;
     overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-live', 'polite');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'fe-oc-title');
     overlay.setAttribute('aria-label', title || theme.label);
     overlay.style.setProperty('--fe-oc-accent', theme.accent);
     overlay.style.setProperty('--fe-oc-glow', theme.glow);
 
     overlay.innerHTML = `
         <div class="fe-oc-card">
+            <div class="fe-oc-eyebrow">${esc(game)} · Match complete</div>
             <div class="fe-oc-icon" aria-hidden="true">${theme.icon}</div>
-            <div class="fe-oc-title">${esc(title || theme.label)}</div>
+            <h2 id="fe-oc-title" class="fe-oc-title">${esc(title || theme.label)}</h2>
             ${subtitle ? `<div class="fe-oc-sub">${esc(subtitle)}</div>` : ''}
-            ${details ? `<div class="fe-oc-details">${details}</div>` : ''}
+            ${stats.length ? `<div class="fe-oc-stats">${stats.map(s => `<div class="fe-oc-stat"><strong>${esc(s.value)}</strong><span>${esc(s.label)}</span></div>`).join('')}</div>` : ''}
+            ${details ? `<div class="fe-oc-details">${esc(details)}</div>` : ''}
+            ${story ? `<div class="fe-oc-story"><b>After the table</b>\n${esc(story)}</div>` : ''}
             <div class="fe-oc-btns"></div>
         </div>
     `;
@@ -141,7 +155,7 @@ export function showOutcomeOverlay({ result = 'neutral', title, subtitle = '', d
     }
 
     const btnRow = overlay.querySelector('.fe-oc-btns');
-    const allButtons = [...buttons, { label: 'Dismiss', onClick: null }];
+    const allButtons = [...buttons, { label: 'Review table', onClick: null }];
     allButtons.forEach((b, i) => {
         const btn = document.createElement('button');
         btn.className = 'fe-oc-btn' + (b.primary ? ' primary' : '');
@@ -151,11 +165,26 @@ export function showOutcomeOverlay({ result = 'neutral', title, subtitle = '', d
             if (b.onClick) b.onClick();
         };
         btnRow.appendChild(btn);
-        if (i === 0) setTimeout(() => btn.focus(), 50);
     });
-    overlay.addEventListener('keydown', e => { if (e.key === 'Escape') hideOutcomeOverlay(); });
+    const previousFocus = document.activeElement;
+    const siblings = Array.from(document.body.children).map(el => ({ el, inert: el.inert }));
+    siblings.forEach(({el}) => { el.inert = true; });
+    restoreModal = () => {
+        siblings.forEach(({el,inert}) => { el.inert = inert; });
+        if (previousFocus?.isConnected) previousFocus.focus();
+    };
+    overlay.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); hideOutcomeOverlay(); }
+        if (e.key === 'Tab') {
+            const controls = [...btnRow.querySelectorAll('button')];
+            const first = controls[0], last = controls[controls.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+    });
 
     document.body.appendChild(overlay);
+    btnRow.querySelector('button').focus();
     if (sound) playCue(result);
     return overlay;
 }

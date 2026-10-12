@@ -26,6 +26,7 @@ import { sendEvent, onEvent, getSocketId, isConnectedToServer } from '@core/webs
 import { createTollVeilHost, createTollVeilGuest } from './toll-and-veil-connected.js';
 import { openTollVeilModal, closeTollVeilModal } from './toll-and-veil.js';
 import { escHtml } from '@core/utils.js';
+import { storyRiskKey, storyPromise } from './story-stakes.js';
 
 const NS = 'tollveil';
 
@@ -73,7 +74,7 @@ function sanitizeStakeConfig(raw) {
     const mode = ['points', 'xp', 'string'].includes(raw?.mode) ? raw.mode : 'points';
     const xpCapNum = Number(raw?.xpCap);
     const xpCap = mode === 'xp' ? Math.min(50, Math.max(1, Number.isFinite(xpCapNum) ? Math.floor(xpCapNum) : 1)) : undefined;
-    return xpCap !== undefined ? { mode, xpCap } : { mode };
+    return xpCap !== undefined ? { mode, xpCap } : mode === 'string' ? { mode, storyRisk: storyRiskKey(raw?.storyRisk) } : { mode };
 }
 
 // SECURITY FIX: clamps a network-supplied seat count into the engine's
@@ -134,6 +135,7 @@ function renderLobbyBanner() {
     el.innerHTML = `
         <div><b>${escHtml(lobbyState.hostName || 'A player')}</b> is hosting Toll &amp; Veil (${lobbyState.numSeats} seats · ${stakeLabel})</div>
         <div style="color:#9a9aa8; font-size:12px;">${seatsLabel}</div>
+        ${lobbyState.stakeConfig.mode === 'string' ? `<div>${escHtml(storyPromise(lobbyState.stakeConfig))} Joining agrees to this promise; decide its details together. AI seats do not owe or collect debts.</div>` : ''}
         <div style="display:flex; gap:8px;">
             ${iAmHost ? '<button id="tv-lobby-start" style="background:#d4af37;color:#1a1400;border:none;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer;">Start Game</button>' : ''}
             ${!iAmHost && !iAmSeated ? '<button id="tv-lobby-join" style="background:#d4af37;color:#1a1400;border:none;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer;">Join Table</button>' : ''}

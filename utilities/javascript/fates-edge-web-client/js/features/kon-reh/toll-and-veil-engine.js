@@ -387,6 +387,13 @@ export class TollVeilEngine {
             this.scores[seat] += score;
         }
 
+        this.lastHandSummary = this.scores.map((total, seat) => ({
+            seat, bid: this.bids.find(b => b.seat === seat)?.bid ?? 0,
+            tricks: this.tricksWon[seat], score: handScores[seat], total,
+            perfectVeil: this.bids.find(b => b.seat === seat)?.bid === 0 && this.tricksWon[seat] === 0,
+            cross: this.trick5Winner === seat && this.trick6Winner !== seat,
+            cut: this.markerUsed[seat].cut, leap: this.markerUsed[seat].leap,
+        }));
         this._log('Hand scores: ' + this.scores.map((s, i) => `Seat ${i + 1}: ${handScores[i]} (total ${s})`).join('  '));
 
         for (let seat = 0; seat < this.numSeats; seat++) {
@@ -427,6 +434,7 @@ export class TollVeilEngine {
             gameWinner: this.gameWinner,
             handCounts: this.hands.map(h => h.length),
             log: this.log.slice(-40),
+            lastHandSummary: this.lastHandSummary?.map(row => ({ ...row })) || [],
         };
     }
 
@@ -493,13 +501,13 @@ export function legalPlaysForSeat(engine, seat) {
         if (isLeading) {
             if (isTrump && !engine.trumpBroken && !handIsAllTrump) {
                 needsLeap = true;
-                legal = !!markers.leap; // only legal with Leap available (and unspent)
+                legal = !markers.leap; // markerUsed is true once spent
             }
         } else if (hasLeadSuit) {
             legal = card.suit === engine.leadSuit;
         } else if (isTrump && !engine.trumpBroken && !handIsAllTrump) {
             needsLeap = true;
-            legal = !!markers.leap;
+            legal = !markers.leap;
         }
         return { card, isTrump, legal, needsLeap };
     }).filter(o => o.legal);
