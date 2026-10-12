@@ -1,3 +1,19 @@
+## [5.14.2] - 2026-10-12
+
+### Security
+
+- Update vulnerable runtime/build dependencies; all seven npm package audits reported zero findings after remediation.
+- Sandbox desktop windows, validate privileged IPC callers, restrict navigation and secondary-window content, and stop exposing Electron events through preload callbacks.
+- Reject backup path traversal, symlink escapes, and unsafe filenames in Python region manifests; add regression tests.
+- Replace nodemon with native Node watch mode and unused root Vitest tooling with the native Node test runner. Desktop/root tooling requires Node 22.12+.
+
+### Documentation and validation
+
+- Include the previously committed Five Daughters line edit and expansion-discovery improvements.
+- Manager (22), socket server (235), Discord (19), desktop security (5), root (9), and Python (66) tests passed; web production build passed.
+- Working-tree web tests passed 457/458; an unrelated, uncommitted GM-guide edit fails the crafting-rules check and is excluded from this release.
+- Python dependency auditing and upgraded Electron runtime/installer smoke tests remain unverified because their downloads failed. See SECURITY.md for scope and release caveats.
+
 ## [5.14.1] - 2026-10-12
 
 AI-GM request correlation, accurate suggestion outcomes, proxy trust security fix, and updated reading library.

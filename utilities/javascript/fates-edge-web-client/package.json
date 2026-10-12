@@ -1,6 +1,6 @@
 {
   "name": "fates-edge-web-client",
-  "version": "5.14.1",
+  "version": "5.14.2",
   "type": "module",
   "description": "Fate's Edge Toolkit Web Client",
   "scripts": {
@@ -32,6 +32,9 @@
     "magic-string": "^0.30.21",
     "serve": "^14.2.6",
     "vite": "^8.2.0"
+  },
+  "overrides": {
+    "compression": "^1.8.2"
   },
   "license": "MIT",
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",

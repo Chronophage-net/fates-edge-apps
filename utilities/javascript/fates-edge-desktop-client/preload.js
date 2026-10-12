@@ -1,5 +1,28 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+const subscriptions = new Map();
+function onSafe(channel, callback) {
+  if (typeof callback !== 'function') throw new TypeError('A callback is required');
+  const listeners = subscriptions.get(channel) || new Map();
+  subscriptions.set(channel, listeners);
+  if (listeners.has(callback)) return;
+  // Preserve the historical (event, payload) signature without exposing
+  // Electron's event object or its privileged sender to the renderer.
+  const listener = (_event, ...args) => callback(null, ...args);
+  listeners.set(callback, listener);
+  ipcRenderer.on(channel, listener);
+}
+function removeSafe(channel, callback) {
+  const listeners = subscriptions.get(channel);
+  if (!listeners) return;
+  for (const [original, listener] of listeners) {
+    if (callback && callback !== original) continue;
+    ipcRenderer.removeListener(channel, listener);
+    listeners.delete(original);
+  }
+  if (!listeners.size) subscriptions.delete(channel);
+}
+
 /**
  * Fate's Edge Desktop Client - Preload Script
  * Exposes a safe, whitelisted API to the renderer via contextBridge.
@@ -48,7 +71,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   reportConnectionStatus: (status) => ipcRenderer.invoke('report-connection-status', status),
   reconnect: () => ipcRenderer.invoke('reconnect'),
   disconnect: () => ipcRenderer.invoke('disconnect'),
-  onConnectionCommand: (callback) => ipcRenderer.on('connection-command', callback),
+  onConnectionCommand: (callback) => onSafe('connection-command', callback),
 
   // ============================================================
   // APP CONTROL
@@ -121,16 +144,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   installUpdate: () => ipcRenderer.invoke('install-update'),
   getUpdateStatus: () => ipcRenderer.invoke('get-update-status'),
-  onUpdateAvailable: (callback) => ipcRenderer.on('update-available', callback),
-  onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', callback),
-  onUpdateProgress: (callback) => ipcRenderer.on('update-progress', callback),
-  onUpdateError: (callback) => ipcRenderer.on('update-error', callback),
+  onUpdateAvailable: (callback) => onSafe('update-available', callback),
+  onUpdateDownloaded: (callback) => onSafe('update-downloaded', callback),
+  onUpdateProgress: (callback) => onSafe('update-progress', callback),
+  onUpdateError: (callback) => onSafe('update-error', callback),
 
   // ============================================================
   // DEEP LINKS
   // ============================================================
 
-  onDeepLink: (callback) => ipcRenderer.on('deep-link', callback),
+  onDeepLink: (callback) => onSafe('deep-link', callback),
   handleDeepLink: (url) => ipcRenderer.invoke('handle-deep-link', url),
   registerProtocol: () => ipcRenderer.invoke('register-protocol'),
 
@@ -152,7 +175,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   unregisterGlobalShortcut: (shortcut) =>
     ipcRenderer.invoke('unregister-global-shortcut', shortcut),
   unregisterAllShortcuts: () => ipcRenderer.invoke('unregister-all-shortcuts'),
-  onGlobalShortcut: (callback) => ipcRenderer.on('global-shortcut-triggered', callback),
+  onGlobalShortcut: (callback) => onSafe('global-shortcut-triggered', callback),
 
   // ============================================================
   // WINDOW MANAGEMENT
@@ -188,20 +211,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // EVENTS (main -> renderer)
   // ============================================================
 
-  onSettingsChanged: (callback) => ipcRenderer.on('settings-changed', callback),
-  onOpenSettings: (callback) => ipcRenderer.on('open-settings', callback),
+  onSettingsChanged: (callback) => onSafe('settings-changed', callback),
+  onOpenSettings: (callback) => onSafe('open-settings', callback),
   onConnectionStatusChange: (callback) =>
-    ipcRenderer.on('connection-status-change', callback),
-  onWindowFocus: (callback) => ipcRenderer.on('window-focus', callback),
-  onWindowBlur: (callback) => ipcRenderer.on('window-blur', callback),
-  onWindowResize: (callback) => ipcRenderer.on('window-resize', callback),
-  onBeforeQuit: (callback) => ipcRenderer.on('before-quit', callback),
+    onSafe('connection-status-change', callback),
+  onWindowFocus: (callback) => onSafe('window-focus', callback),
+  onWindowBlur: (callback) => onSafe('window-blur', callback),
+  onWindowResize: (callback) => onSafe('window-resize', callback),
+  onBeforeQuit: (callback) => onSafe('before-quit', callback),
 
   // ============================================================
   // MENU ACTIONS (app menu bar integration)
   // ============================================================
 
-  onMenuAction: (callback) => ipcRenderer.on('menu-action', callback),
+  onMenuAction: (callback) => onSafe('menu-action', callback),
   triggerMenuAction: (action) => ipcRenderer.invoke('trigger-menu-action', action),
 
   // ============================================================
@@ -279,8 +302,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // REMOVE EVENT LISTENERS (cleanup)
   // ============================================================
 
-  removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel),
-  removeListener: (channel, callback) => ipcRenderer.removeListener(channel, callback)
+  removeAllListeners: (channel) => removeSafe(channel),
+  removeListener: (channel, callback) => removeSafe(channel, callback)
 });
 
 // ============================================================

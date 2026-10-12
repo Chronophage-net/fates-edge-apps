@@ -108,7 +108,13 @@ cd build
 
 ## Requirements
 
-Node.js 18+, npm or yarn, and (for building installers) `electron-builder`'s per-platform dependencies above.
+Node.js 22.12+ (a supported LTS release is recommended), npm or yarn, and (for building installers) `electron-builder`'s per-platform dependencies above.
+
+The desktop client uses Electron 44 with sandboxed, context-isolated windows.
+Secondary windows may load only the bundled application, and privileged IPC is
+accepted only from an owned window's top-level bundled renderer. File access is
+limited to application storage or files explicitly selected through a dialog;
+backup identifiers and symlink escapes are checked separately.
 
 ## Contributing
 

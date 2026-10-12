@@ -25,6 +25,7 @@ const path = require('path');
 const fs = require('fs');
 const fsp = fs.promises;
 const os = require('os');
+const security = require('./security');
 
 const Store = require('electron-store');
 const log = require('electron-log');
@@ -78,18 +79,12 @@ const BACKUPS_DIR = () => path.join(USER_DATA_DIR(), 'backups');
 const SESSIONS_DIR = () => path.join(USER_DATA_DIR(), 'sessions');
 
 function isAllowedPath(targetPath) {
-  if (!targetPath || typeof targetPath !== 'string') return false;
-  const resolved = path.resolve(targetPath);
-  if (grantedPaths.has(resolved)) return true;
-  const allowedRoots = [USER_DATA_DIR(), BACKUPS_DIR(), SESSIONS_DIR()];
-  return allowedRoots.some((root) => {
-    const resolvedRoot = path.resolve(root);
-    return resolved === resolvedRoot || resolved.startsWith(resolvedRoot + path.sep);
-  });
+  return security.isAllowedPath(targetPath, [USER_DATA_DIR(), BACKUPS_DIR(), SESSIONS_DIR()], grantedPaths);
 }
 
 function grantPath(p) {
-  if (p) grantedPaths.add(path.resolve(p));
+  const canonical = security.canonicalPath(p);
+  if (canonical) grantedPaths.add(canonical);
   return p;
 }
 
@@ -109,10 +104,11 @@ function createMainWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
 
+  security.secureContents(mainWindow.webContents, RENDERER_DIR);
   const indexPath = path.join(RENDERER_DIR, 'index.html');
   if (fs.existsSync(indexPath)) {
     mainWindow.loadFile(indexPath);
@@ -145,6 +141,15 @@ function createMainWindow() {
 function getTargetWindow(windowId) {
   if (windowId && secondaryWindows.has(windowId)) return secondaryWindows.get(windowId);
   return BrowserWindow.getFocusedWindow() || mainWindow;
+}
+
+// Every privileged handler uses the same top-level, owned-window check.
+function handleIPC(channel, handler) {
+  ipcMain.handle(channel, (event, ...args) => {
+    const contents = [mainWindow, ...secondaryWindows.values()].filter(Boolean).map(win => win.webContents);
+    if (!security.isTrustedSender(event, RENDERER_DIR, contents)) throw new Error('Untrusted IPC sender');
+    return handler(event, ...args);
+  });
 }
 
 // ============================================================
@@ -297,26 +302,26 @@ function buildApplicationMenu() {
 // IPC HANDLERS -- SETTINGS
 // ============================================================
 
-ipcMain.handle('get-server-url', () => settingsStore.get('serverUrl'));
-ipcMain.handle('set-server-url', (event, url) => {
+handleIPC('get-server-url', () => settingsStore.get('serverUrl'));
+handleIPC('set-server-url', (event, url) => {
   settingsStore.set('serverUrl', url);
   notifySettingsChanged();
   return true;
 });
-ipcMain.handle('get-settings', () => settingsStore.store);
-ipcMain.handle('set-settings', (event, settings) => {
+handleIPC('get-settings', () => settingsStore.store);
+handleIPC('set-settings', (event, settings) => {
   settingsStore.set({ ...settingsStore.store, ...(settings || {}) });
   notifySettingsChanged();
   return settingsStore.store;
 });
-ipcMain.handle('reset-settings', () => {
+handleIPC('reset-settings', () => {
   settingsStore.clear();
   settingsStore.set(DEFAULT_SETTINGS);
   notifySettingsChanged();
   return settingsStore.store;
 });
-ipcMain.handle('get-setting', (event, key) => settingsStore.get(key));
-ipcMain.handle('set-setting', (event, key, value) => {
+handleIPC('get-setting', (event, key) => settingsStore.get(key));
+handleIPC('set-setting', (event, key, value) => {
   settingsStore.set(key, value);
   notifySettingsChanged();
   return true;
@@ -330,21 +335,21 @@ function notifySettingsChanged() {
 // IPC HANDLERS -- CONNECTION MANAGEMENT
 // ============================================================
 
-ipcMain.handle('get-connection-status', () => connectionState);
-ipcMain.handle('get-connection-history', () => connectionHistory);
-ipcMain.handle('report-connection-status', (event, status) => {
+handleIPC('get-connection-status', () => connectionState);
+handleIPC('get-connection-history', () => connectionHistory);
+handleIPC('report-connection-status', (event, status) => {
   connectionState = { status: status?.status || 'unknown', lastChange: Date.now(), detail: status };
   connectionHistory.push(connectionState);
   if (connectionHistory.length > MAX_CONNECTION_HISTORY) connectionHistory.shift();
   if (mainWindow) mainWindow.webContents.send('connection-status-change', connectionState);
   return true;
 });
-ipcMain.handle('reconnect', (event) => {
+handleIPC('reconnect', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) win.webContents.send('connection-command', { command: 'reconnect' });
   return { relayed: !!win };
 });
-ipcMain.handle('disconnect', (event) => {
+handleIPC('disconnect', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) win.webContents.send('connection-command', { command: 'disconnect' });
   return { relayed: !!win };
@@ -354,23 +359,23 @@ ipcMain.handle('disconnect', (event) => {
 // IPC HANDLERS -- APP CONTROL
 // ============================================================
 
-ipcMain.handle('restart-app', () => {
+handleIPC('restart-app', () => {
   app.relaunch();
   app.exit(0);
 });
-ipcMain.handle('quit-app', () => app.quit());
-ipcMain.handle('reload-app', (event) => {
+handleIPC('quit-app', () => app.quit());
+handleIPC('reload-app', (event) => {
   BrowserWindow.fromWebContents(event.sender)?.webContents.reload();
 });
-ipcMain.handle('minimize-app', (event) => BrowserWindow.fromWebContents(event.sender)?.minimize());
-ipcMain.handle('maximize-app', (event) => {
+handleIPC('minimize-app', (event) => BrowserWindow.fromWebContents(event.sender)?.minimize());
+handleIPC('maximize-app', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (!win) return;
   win.isMaximized() ? win.unmaximize() : win.maximize();
 });
-ipcMain.handle('close-app', (event) => BrowserWindow.fromWebContents(event.sender)?.close());
-ipcMain.handle('get-app-version', () => app.getVersion());
-ipcMain.handle('get-app-path', (event, name) => {
+handleIPC('close-app', (event) => BrowserWindow.fromWebContents(event.sender)?.close());
+handleIPC('get-app-version', () => app.getVersion());
+handleIPC('get-app-path', (event, name) => {
   try {
     return app.getPath(name || 'userData');
   } catch (err) {
@@ -382,12 +387,12 @@ ipcMain.handle('get-app-path', (event, name) => {
 // IPC HANDLERS -- SYSTEM
 // ============================================================
 
-ipcMain.handle('show-item-in-folder', (event, targetPath) => {
+handleIPC('show-item-in-folder', (event, targetPath) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   shell.showItemInFolder(targetPath);
   return { ok: true };
 });
-ipcMain.handle('open-external', (event, url) => {
+handleIPC('open-external', (event, url) => {
   try {
     const parsed = new URL(url);
     if (!['http:', 'https:', 'mailto:'].includes(parsed.protocol)) {
@@ -399,8 +404,8 @@ ipcMain.handle('open-external', (event, url) => {
     return { ok: false, error: 'Invalid URL' };
   }
 });
-ipcMain.handle('open-dev-tools', (event) => BrowserWindow.fromWebContents(event.sender)?.webContents.openDevTools());
-ipcMain.handle('get-system-info', () => ({
+handleIPC('open-dev-tools', (event) => BrowserWindow.fromWebContents(event.sender)?.webContents.openDevTools());
+handleIPC('get-system-info', () => ({
   platform: process.platform,
   arch: process.arch,
   release: os.release(),
@@ -409,14 +414,14 @@ ipcMain.handle('get-system-info', () => ({
   cpuCount: os.cpus().length,
   hostname: os.hostname()
 }));
-ipcMain.handle('get-platform', () => process.platform);
-ipcMain.handle('is-packaged', () => app.isPackaged);
+handleIPC('get-platform', () => process.platform);
+handleIPC('is-packaged', () => app.isPackaged);
 
 // ============================================================
 // IPC HANDLERS -- FILE OPERATIONS
 // ============================================================
 
-ipcMain.handle('save-file', async (event, content, defaultPath, options = {}) => {
+handleIPC('save-file', async (event, content, defaultPath, options = {}) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showSaveDialog(win, {
     defaultPath,
@@ -429,7 +434,7 @@ ipcMain.handle('save-file', async (event, content, defaultPath, options = {}) =>
   return { ok: true, path: result.filePath };
 });
 
-ipcMain.handle('open-file', async (event, options = {}) => {
+handleIPC('open-file', async (event, options = {}) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showOpenDialog(win, {
     properties: ['openFile'],
@@ -443,7 +448,7 @@ ipcMain.handle('open-file', async (event, options = {}) => {
   return { ok: true, path: filePath, content };
 });
 
-ipcMain.handle('read-file', async (event, targetPath) => {
+handleIPC('read-file', async (event, targetPath) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   try {
     const content = await fsp.readFile(targetPath, 'utf8');
@@ -453,7 +458,7 @@ ipcMain.handle('read-file', async (event, targetPath) => {
   }
 });
 
-ipcMain.handle('write-file', async (event, targetPath, content) => {
+handleIPC('write-file', async (event, targetPath, content) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   try {
     await fsp.writeFile(targetPath, content, 'utf8');
@@ -463,7 +468,7 @@ ipcMain.handle('write-file', async (event, targetPath, content) => {
   }
 });
 
-ipcMain.handle('choose-directory', async (event, options = {}) => {
+handleIPC('choose-directory', async (event, options = {}) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showOpenDialog(win, { properties: ['openDirectory'] });
   if (result.canceled || !result.filePaths.length) return { ok: false, canceled: true };
@@ -471,7 +476,7 @@ ipcMain.handle('choose-directory', async (event, options = {}) => {
   return { ok: true, path: result.filePaths[0] };
 });
 
-ipcMain.handle('get-file-stats', async (event, targetPath) => {
+handleIPC('get-file-stats', async (event, targetPath) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   try {
     const stats = await fsp.stat(targetPath);
@@ -488,7 +493,7 @@ ipcMain.handle('get-file-stats', async (event, targetPath) => {
   }
 });
 
-ipcMain.handle('get-files-in-directory', async (event, targetPath, options = {}) => {
+handleIPC('get-files-in-directory', async (event, targetPath, options = {}) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   try {
     const entries = await fsp.readdir(targetPath, { withFileTypes: true });
@@ -507,20 +512,20 @@ ipcMain.handle('get-files-in-directory', async (event, targetPath, options = {})
 // IPC HANDLERS -- LOCAL DATA
 // ============================================================
 
-ipcMain.handle('get-local-data', (event, key) => (key ? localDataStore.get(key) : localDataStore.store));
-ipcMain.handle('set-local-data', (event, key, value) => {
+handleIPC('get-local-data', (event, key) => (key ? localDataStore.get(key) : localDataStore.store));
+handleIPC('set-local-data', (event, key, value) => {
   localDataStore.set(key, value);
   return true;
 });
-ipcMain.handle('delete-local-data', (event, key) => {
+handleIPC('delete-local-data', (event, key) => {
   localDataStore.delete(key);
   return true;
 });
-ipcMain.handle('clear-all-local-data', () => {
+handleIPC('clear-all-local-data', () => {
   localDataStore.clear();
   return true;
 });
-ipcMain.handle('export-local-data', async (event, options = {}) => {
+handleIPC('export-local-data', async (event, options = {}) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showSaveDialog(win, {
     defaultPath: options.defaultPath || 'fates-edge-data-export.json',
@@ -531,7 +536,7 @@ ipcMain.handle('export-local-data', async (event, options = {}) => {
   await fsp.writeFile(result.filePath, JSON.stringify(localDataStore.store, null, 2), 'utf8');
   return { ok: true, path: result.filePath };
 });
-ipcMain.handle('import-local-data', async (event, targetPath) => {
+handleIPC('import-local-data', async (event, targetPath) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   try {
     const raw = await fsp.readFile(targetPath, 'utf8');
@@ -551,7 +556,7 @@ function ensureDir(dir) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-ipcMain.handle('create-backup', async (event, options = {}) => {
+handleIPC('create-backup', async (event, options = {}) => {
   ensureDir(BACKUPS_DIR());
   const id = `backup-${Date.now()}`;
   const filePath = path.join(BACKUPS_DIR(), `${id}.json`);
@@ -566,7 +571,7 @@ ipcMain.handle('create-backup', async (event, options = {}) => {
   return { ok: true, id, path: filePath };
 });
 
-ipcMain.handle('list-backups', async () => {
+handleIPC('list-backups', async () => {
   ensureDir(BACKUPS_DIR());
   const entries = await fsp.readdir(BACKUPS_DIR());
   const backups = [];
@@ -580,9 +585,9 @@ ipcMain.handle('list-backups', async () => {
   return backups.sort((a, b) => b.createdAt - a.createdAt);
 });
 
-ipcMain.handle('restore-backup', async (event, backupId) => {
-  const filePath = path.join(BACKUPS_DIR(), `${backupId}.json`);
-  if (!isAllowedPath(filePath) && !filePath.startsWith(BACKUPS_DIR())) {
+handleIPC('restore-backup', async (event, backupId) => {
+  const filePath = security.backupPath(BACKUPS_DIR(), backupId);
+  if (!filePath) {
     return { ok: false, error: 'Invalid backup id' };
   }
   try {
@@ -597,8 +602,9 @@ ipcMain.handle('restore-backup', async (event, backupId) => {
   }
 });
 
-ipcMain.handle('delete-backup', async (event, backupId) => {
-  const filePath = path.join(BACKUPS_DIR(), `${backupId}.json`);
+handleIPC('delete-backup', async (event, backupId) => {
+  const filePath = security.backupPath(BACKUPS_DIR(), backupId);
+  if (!filePath) return { ok: false, error: 'Invalid backup id' };
   try {
     await fsp.unlink(filePath);
     return { ok: true };
@@ -632,7 +638,7 @@ autoUpdater.on('error', (err) => {
   if (mainWindow) mainWindow.webContents.send('update-error', err.message);
 });
 
-ipcMain.handle('check-for-updates', async () => {
+handleIPC('check-for-updates', async () => {
   if (!app.isPackaged) return { ok: false, reason: 'Auto-update is disabled outside of a packaged build.' };
   try {
     await autoUpdater.checkForUpdates();
@@ -641,21 +647,21 @@ ipcMain.handle('check-for-updates', async () => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('install-update', () => {
+handleIPC('install-update', () => {
   if (!app.isPackaged) return { ok: false, reason: 'Auto-update is disabled outside of a packaged build.' };
   autoUpdater.quitAndInstall();
 });
-ipcMain.handle('get-update-status', () => updateStatus);
+handleIPC('get-update-status', () => updateStatus);
 
 // ============================================================
 // IPC HANDLERS -- DEEP LINKS
 // ============================================================
 
-ipcMain.handle('handle-deep-link', (event, url) => {
+handleIPC('handle-deep-link', (event, url) => {
   handleIncomingDeepLink(url);
   return true;
 });
-ipcMain.handle('register-protocol', () => {
+handleIPC('register-protocol', () => {
   if (process.defaultApp && process.argv.length >= 2) {
     app.setAsDefaultProtocolClient('fatesedge', process.execPath, [path.resolve(process.argv[1])]);
   } else {
@@ -668,7 +674,7 @@ ipcMain.handle('register-protocol', () => {
 // IPC HANDLERS -- SHORTCUTS
 // ============================================================
 
-ipcMain.handle('register-global-shortcut', (event, shortcut) => {
+handleIPC('register-global-shortcut', (event, shortcut) => {
   if (!shortcut || typeof shortcut !== 'string') return { ok: false, error: 'Invalid shortcut' };
   const success = globalShortcut.register(shortcut, () => {
     if (mainWindow) mainWindow.webContents.send('global-shortcut-triggered', shortcut);
@@ -676,12 +682,12 @@ ipcMain.handle('register-global-shortcut', (event, shortcut) => {
   if (success) registeredShortcuts.add(shortcut);
   return { ok: success };
 });
-ipcMain.handle('unregister-global-shortcut', (event, shortcut) => {
+handleIPC('unregister-global-shortcut', (event, shortcut) => {
   globalShortcut.unregister(shortcut);
   registeredShortcuts.delete(shortcut);
   return true;
 });
-ipcMain.handle('unregister-all-shortcuts', () => {
+handleIPC('unregister-all-shortcuts', () => {
   globalShortcut.unregisterAll();
   registeredShortcuts.clear();
   return true;
@@ -693,7 +699,8 @@ ipcMain.handle('unregister-all-shortcuts', () => {
 
 let nextWindowId = 1;
 
-ipcMain.handle('create-window', (event, options = {}) => {
+handleIPC('create-window', (event, options = {}) => {
+  if (options.path && options.path !== 'index.html') return { ok: false, error: 'Only the bundled application may open a privileged window' };
   const id = nextWindowId++;
   const win = new BrowserWindow({
     width: options.width || 900,
@@ -701,35 +708,35 @@ ipcMain.handle('create-window', (event, options = {}) => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      sandbox: true
     }
   });
-  const target = options.path
-    ? path.join(RENDERER_DIR, options.path)
-    : path.join(RENDERER_DIR, 'index.html');
+  security.secureContents(win.webContents, RENDERER_DIR);
+  const target = path.join(RENDERER_DIR, 'index.html');
   if (fs.existsSync(target)) win.loadFile(target);
   secondaryWindows.set(id, win);
   win.on('closed', () => secondaryWindows.delete(id));
   return { ok: true, windowId: id };
 });
-ipcMain.handle('close-window', (event, windowId) => {
+handleIPC('close-window', (event, windowId) => {
   getTargetWindow(windowId)?.close();
   return true;
 });
-ipcMain.handle('focus-window', (event, windowId) => {
+handleIPC('focus-window', (event, windowId) => {
   getTargetWindow(windowId)?.focus();
   return true;
 });
-ipcMain.handle('set-window-bounds', (event, bounds) => {
+handleIPC('set-window-bounds', (event, bounds) => {
   getTargetWindow()?.setBounds(bounds);
   return true;
 });
-ipcMain.handle('get-window-bounds', (event) => getTargetWindow()?.getBounds() || null);
-ipcMain.handle('set-always-on-top', (event, enabled) => {
+handleIPC('get-window-bounds', (event) => getTargetWindow()?.getBounds() || null);
+handleIPC('set-always-on-top', (event, enabled) => {
   getTargetWindow()?.setAlwaysOnTop(!!enabled);
   return true;
 });
-ipcMain.handle('set-full-screen', (event, enabled) => {
+handleIPC('set-full-screen', (event, enabled) => {
   getTargetWindow()?.setFullScreen(!!enabled);
   return true;
 });
@@ -738,16 +745,16 @@ ipcMain.handle('set-full-screen', (event, enabled) => {
 // IPC HANDLERS -- NOTIFICATIONS
 // ============================================================
 
-ipcMain.handle('send-notification', (event, title, body, options = {}) => {
+handleIPC('send-notification', (event, title, body, options = {}) => {
   if (!Notification.isSupported()) return { ok: false, error: 'Notifications not supported on this system' };
   const notification = new Notification({ title, body, silent: !!options.silent });
   notification.show();
   return { ok: true };
 });
-ipcMain.handle('get-notification-permission', () => ({
+handleIPC('get-notification-permission', () => ({
   permission: Notification.isSupported() ? 'granted' : 'unsupported'
 }));
-ipcMain.handle('request-notification-permission', () => ({
+handleIPC('request-notification-permission', () => ({
   permission: Notification.isSupported() ? 'granted' : 'unsupported'
 }));
 
@@ -755,7 +762,7 @@ ipcMain.handle('request-notification-permission', () => ({
 // IPC HANDLERS -- TRAY
 // ============================================================
 
-ipcMain.handle('set-tray-icon', (event, iconPath) => {
+handleIPC('set-tray-icon', (event, iconPath) => {
   try {
     const resolved = iconPath && fs.existsSync(iconPath) ? iconPath : path.join(__dirname, 'fe_icon.png');
     const image = nativeImage.createFromPath(resolved);
@@ -772,11 +779,11 @@ ipcMain.handle('set-tray-icon', (event, iconPath) => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('set-tray-tooltip', (event, tooltip) => {
+handleIPC('set-tray-tooltip', (event, tooltip) => {
   if (tray) tray.setToolTip(tooltip || '');
   return { ok: !!tray };
 });
-ipcMain.handle('show-tray-context-menu', () => {
+handleIPC('show-tray-context-menu', () => {
   if (!tray) return { ok: false, error: 'Tray not initialized' };
   const menu = Menu.buildFromTemplate([
     { label: 'Show Fate\'s Edge', click: () => mainWindow && mainWindow.show() },
@@ -791,7 +798,7 @@ ipcMain.handle('show-tray-context-menu', () => {
 // IPC HANDLERS -- MENU ACTIONS
 // ============================================================
 
-ipcMain.handle('trigger-menu-action', (event, action) => {
+handleIPC('trigger-menu-action', (event, action) => {
   const handler = MENU_ACTIONS[action];
   if (!handler) return { ok: false, error: `Unknown action: ${action}` };
   handler();
@@ -804,12 +811,12 @@ ipcMain.handle('trigger-menu-action', (event, action) => {
 
 const LOG_LEVELS = new Set(['error', 'warn', 'info', 'debug']);
 
-ipcMain.handle('log', (event, level, message) => {
+handleIPC('log', (event, level, message) => {
   const lvl = LOG_LEVELS.has(level) ? level : 'info';
   log[lvl](`[renderer] ${message}`);
   return true;
 });
-ipcMain.handle('get-logs', async (event, options = {}) => {
+handleIPC('get-logs', async (event, options = {}) => {
   try {
     const filePath = log.transports.file.getFile().path;
     const raw = await fsp.readFile(filePath, 'utf8');
@@ -820,7 +827,7 @@ ipcMain.handle('get-logs', async (event, options = {}) => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('clear-logs', async () => {
+handleIPC('clear-logs', async () => {
   try {
     const filePath = log.transports.file.getFile().path;
     await fsp.writeFile(filePath, '', 'utf8');
@@ -829,7 +836,7 @@ ipcMain.handle('clear-logs', async () => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('export-logs', async (event, targetPath) => {
+handleIPC('export-logs', async (event, targetPath) => {
   try {
     const srcPath = log.transports.file.getFile().path;
     let destPath = targetPath;
@@ -857,22 +864,22 @@ ipcMain.handle('export-logs', async (event, targetPath) => {
 // that's navigator.mediaDevices in the renderer. These handlers are
 // intentionally honest about that rather than returning made-up data.
 
-ipcMain.handle('get-audio-devices', () => ({
+handleIPC('get-audio-devices', () => ({
   ok: false,
   supported: false,
   reason: 'Audio device enumeration must happen in the renderer via navigator.mediaDevices.enumerateDevices().'
 }));
-ipcMain.handle('set-audio-device', (event, deviceId, type) => {
+handleIPC('set-audio-device', (event, deviceId, type) => {
   settingsStore.set(`audioDevice.${type || 'default'}`, deviceId);
   return { ok: true };
 });
-ipcMain.handle('get-audio-device', (event, type) => settingsStore.get(`audioDevice.${type || 'default'}`) || null);
-ipcMain.handle('test-audio-device', () => ({
+handleIPC('get-audio-device', (event, type) => settingsStore.get(`audioDevice.${type || 'default'}`) || null);
+handleIPC('test-audio-device', () => ({
   ok: false,
   supported: false,
   reason: 'Audio device testing must happen in the renderer.'
 }));
-ipcMain.handle('get-audio-level', () => ({ ok: false, supported: false }));
+handleIPC('get-audio-level', () => ({ ok: false, supported: false }));
 
 // ============================================================
 // IPC HANDLERS -- GRID COMBAT / WHITEBOARD
@@ -898,11 +905,11 @@ async function writeExportPayload(win, payload, format, defaultName) {
   return { ok: true, path: result.filePath };
 }
 
-ipcMain.handle('export-grid-map', async (event, code, format) => {
+handleIPC('export-grid-map', async (event, code, format) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   return writeExportPayload(win, code, format, `grid-map.${format || 'json'}`);
 });
-ipcMain.handle('import-grid-map', async (event, targetPath) => {
+handleIPC('import-grid-map', async (event, targetPath) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   try {
     const content = await fsp.readFile(targetPath, 'utf8');
@@ -911,11 +918,11 @@ ipcMain.handle('import-grid-map', async (event, targetPath) => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('export-whiteboard', async (event, code, format) => {
+handleIPC('export-whiteboard', async (event, code, format) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   return writeExportPayload(win, code, format, `whiteboard.${format || 'json'}`);
 });
-ipcMain.handle('import-whiteboard', async (event, targetPath) => {
+handleIPC('import-whiteboard', async (event, targetPath) => {
   if (!isAllowedPath(targetPath)) return { ok: false, error: 'Path not permitted' };
   try {
     const content = await fsp.readFile(targetPath, 'utf8');
@@ -924,11 +931,12 @@ ipcMain.handle('import-whiteboard', async (event, targetPath) => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('print-whiteboard', async (event, code) => {
+handleIPC('print-whiteboard', async (event, code) => {
   // 'code' is expected to be an HTML fragment/document string produced by
   // the renderer's whiteboard view. We render it in a hidden, throwaway
   // window so the OS print dialog reflects exactly what the user saw.
-  const printWin = new BrowserWindow({ show: false, webPreferences: { sandbox: true } });
+  const printWin = new BrowserWindow({ show: false, webPreferences: { sandbox: true, javascript: false } });
+  security.secureContents(printWin.webContents, RENDERER_DIR);
   try {
     await printWin.loadURL('data:text/html,' + encodeURIComponent(typeof code === 'string' ? code : String(code)));
     await new Promise((resolve, reject) => {
@@ -948,13 +956,13 @@ ipcMain.handle('print-whiteboard', async (event, code) => {
 // IPC HANDLERS -- DOCK (macOS)
 // ============================================================
 
-ipcMain.handle('set-dock-badge', (event, count) => {
+handleIPC('set-dock-badge', (event, count) => {
   if (process.platform === 'darwin' && app.dock) {
     app.dock.setBadge(count ? String(count) : '');
   }
   return { ok: process.platform === 'darwin' };
 });
-ipcMain.handle('set-dock-menu', (event, menuItems) => {
+handleIPC('set-dock-menu', (event, menuItems) => {
   if (process.platform !== 'darwin' || !app.dock) return { ok: false, reason: 'macOS only' };
   // menuItems is a plain-data array of {label, action}. We can't accept
   // renderer-supplied click functions over IPC (same reason as
@@ -977,14 +985,14 @@ ipcMain.handle('set-dock-menu', (event, menuItems) => {
 // the preload API only passes a name, matching how settings/local-data
 // are already tracked centrally in this process.
 
-ipcMain.handle('save-session', async (event, name) => {
+handleIPC('save-session', async (event, name) => {
   if (!name || typeof name !== 'string') return { ok: false, error: 'Session name required' };
   ensureDir(SESSIONS_DIR());
   const filePath = path.join(SESSIONS_DIR(), `${sanitizeFileName(name)}.json`);
   await fsp.writeFile(filePath, JSON.stringify({ name, savedAt: Date.now(), data: localDataStore.store }, null, 2), 'utf8');
   return { ok: true, path: filePath };
 });
-ipcMain.handle('load-session', async (event, name) => {
+handleIPC('load-session', async (event, name) => {
   const filePath = path.join(SESSIONS_DIR(), `${sanitizeFileName(name)}.json`);
   try {
     const raw = await fsp.readFile(filePath, 'utf8');
@@ -995,7 +1003,7 @@ ipcMain.handle('load-session', async (event, name) => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('list-sessions', async () => {
+handleIPC('list-sessions', async () => {
   ensureDir(SESSIONS_DIR());
   const entries = await fsp.readdir(SESSIONS_DIR());
   const sessions = [];
@@ -1008,7 +1016,7 @@ ipcMain.handle('list-sessions', async () => {
   }
   return sessions.sort((a, b) => b.savedAt - a.savedAt);
 });
-ipcMain.handle('delete-session', async (event, name) => {
+handleIPC('delete-session', async (event, name) => {
   const filePath = path.join(SESSIONS_DIR(), `${sanitizeFileName(name)}.json`);
   try {
     await fsp.unlink(filePath);
@@ -1017,7 +1025,7 @@ ipcMain.handle('delete-session', async (event, name) => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('auto-save-session', async () => {
+handleIPC('auto-save-session', async () => {
   ensureDir(SESSIONS_DIR());
   const filePath = path.join(SESSIONS_DIR(), '__autosave__.json');
   await fsp.writeFile(filePath, JSON.stringify({ name: '__autosave__', savedAt: Date.now(), data: localDataStore.store }, null, 2), 'utf8');
@@ -1042,7 +1050,7 @@ async function captureScreenSource(sourceId) {
   return source.thumbnail;
 }
 
-ipcMain.handle('capture-screen', async (event, options = {}) => {
+handleIPC('capture-screen', async (event, options = {}) => {
   try {
     const image = await captureScreenSource(options.sourceId);
     if (options.save) {
@@ -1058,7 +1066,7 @@ ipcMain.handle('capture-screen', async (event, options = {}) => {
     return { ok: false, error: err.message };
   }
 });
-ipcMain.handle('capture-area', async (event, bounds) => {
+handleIPC('capture-area', async (event, bounds) => {
   try {
     const image = await captureScreenSource();
     const cropped = image.crop(bounds || { x: 0, y: 0, width: image.getSize().width, height: image.getSize().height });

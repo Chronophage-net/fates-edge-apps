@@ -1,12 +1,12 @@
 {
   "name": "fates-edge-socket-server",
-  "version": "5.14.1",
+  "version": "5.14.2",
   "description": "Fate's Edge WebSocket + HTTP server with campaign storage, deck, and character management",
   "main": "server-start.js",
   "type": "commonjs",
   "scripts": {
     "start": "node server-start.js",
-    "dev": "nodemon server-start.js",
+    "dev": "node --watch server-start.js",
     "test": "node --test tests/*.test.js",
     "test:auth": "node scripts/run-auth-e2e-test.js"
   },
@@ -27,9 +27,6 @@
     "ioredis": "^5.4.1",
     "mysql2": "^3.11.0",
     "pg": "^8.13.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
   },
   "engines": {
     "node": ">=18.0.0"

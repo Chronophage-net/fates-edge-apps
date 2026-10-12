@@ -1,11 +1,11 @@
 {
   "name": "fates-edge-discord-bot",
-  "version": "5.14.1",
+  "version": "5.14.2",
   "description": "Discord bot for Fate's Edge VTT integration",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "node --watch index.js",
     "register": "node scripts/register-commands.js",
     "sync:paper-parser": "node scripts/sync-paper-parser.js",
     "test": "node scripts/sync-paper-parser.js --check && node --test tests/*.test.js"
@@ -20,8 +20,8 @@
     "ws": "^8.14.2"
   },
   "_note_voice": "AI GM voice narration (utils/tts-voice.js, optional -- see DISCORD_TTS_ENABLED) additionally needs an Opus encoder and FFmpeg, neither bundled here: `npm install @discordjs/opus ffmpeg-static` (or a system `ffmpeg` on PATH). @discordjs/voice alone is enough for the bot to load; playback is lazily attempted only when the feature is actually enabled, and fails soft with a log message if those are missing.",
-  "devDependencies": {
-    "nodemon": "^3.0.1"
+  "overrides": {
+    "proxy-addr": "^2.0.8"
   },
   "license": "MIT",
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",

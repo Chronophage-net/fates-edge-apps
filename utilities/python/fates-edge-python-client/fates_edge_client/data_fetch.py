@@ -17,6 +17,7 @@ card meanings (see deck.py's load_region_data()).
 """
 
 import json
+import re
 from pathlib import Path
 from typing import List, Optional
 
@@ -52,6 +53,19 @@ def fetch_region_data(dest_dir: Optional[Path] = None, quiet: bool = False) -> L
     manifest_resp = requests.get(f"{_RAW_BASE}/manifest.json", timeout=10)
     manifest_resp.raise_for_status()
     slugs = json.loads(manifest_resp.text)
+
+    # Remote manifest names are data, never paths. Validate the entire list
+    # before writing anything, including pre-existing symlink destinations.
+    if not isinstance(slugs, list) or len(slugs) > 1000 or any(
+        not isinstance(slug, str)
+        or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}", slug)
+        or slug.lower() == "manifest"
+        for slug in slugs
+    ):
+        raise ValueError("Invalid region manifest")
+    for name in ["manifest", *slugs]:
+        if (dest_dir / f"{name}.json").is_symlink():
+            raise ValueError("Region destination must not be a symlink")
 
     (dest_dir / "manifest.json").write_text(manifest_resp.text, encoding="utf-8")
 

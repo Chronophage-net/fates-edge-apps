@@ -1,10 +1,10 @@
 {
   "name": "kon-reh",
-  "version": "5.14.1",
+  "version": "5.14.2",
   "description": "Fate's Edge Toolkit",
   "scripts": {
-    "test": "vitest run --passWithNoTests",
-    "test:ci": "vitest run --passWithNoTests --reporter=verbose",
+    "test": "node --test tests/*.test.mjs",
+    "test:ci": "node --test --test-reporter=spec tests/*.test.mjs",
     "lint": "eslint . --ext .js",
     "lint:ci": "eslint . --ext .js",
     "build": "echo 'Build complete'",
@@ -17,8 +17,10 @@
     "demo:down": "bash tools/demo.sh --down"
   },
   "devDependencies": {
-    "vitest": "^1.0.0",
     "eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   },
   "license": "MIT",
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
