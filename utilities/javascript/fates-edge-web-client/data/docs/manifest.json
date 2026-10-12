@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-12T13:12:09.398Z",
+  "generated": "2026-10-12T17:00:02.686Z",
   "documents": [
     {
       "id": "srd",
@@ -1631,6 +1631,16 @@
       "active": true
     },
     {
+      "id": "the_serpents_coil",
+      "title": "The Serpent’s Coil",
+      "file": "Fates_-_Edge_-_-The-_-Serpents-_-Coil.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_things_that_carry_us",
       "title": "The Things That Carry Us",
       "file": "Fates_-_Edge_-_-The-_-Things-_-That-_-Carry-_-Us.html",
@@ -1895,7 +1905,7 @@
       "active": true
     }
   ],
-  "total_count": 130,
-  "active_count": 130,
+  "total_count": 131,
+  "active_count": 131,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
