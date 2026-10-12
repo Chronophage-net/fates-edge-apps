@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-12T11:57:16.540Z",
+  "generated": "2026-10-12T13:12:09.398Z",
   "documents": [
     {
       "id": "srd",
@@ -1370,13 +1370,15 @@
     },
     {
       "id": "the_five_daughters_of_inaea",
-      "title": "The Five Daughters Of Inaea",
+      "title": "The Five Daughters of Inaea",
       "file": "Fates_-_Edge_-_-The-_-Five-_-Daughters-_-of-_-Inaea.html",
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
       "core": false,
-      "active": true
+      "active": true,
+      "description": "Romance, devotion, and dangerous promises: the Iron Rose, five practices, rival faiths, and a sanctuary adventure.",
+      "author": "Nicholas A. Gasper"
     },
     {
       "id": "the_forge_of_souls",

@@ -61,6 +61,15 @@ const CATEGORY_MAP = {
 
 const SUBDIRS = Object.keys(CATEGORY_MAP);
 
+// Curated shelf copy; keep filename-derived IDs stable for saved reading links.
+const DOC_METADATA = {
+  'expansions/Fates_-_Edge_-_-The-_-Five-_-Daughters-_-of-_-Inaea.html': {
+    title: 'The Five Daughters of Inaea',
+    description: 'Romance, devotion, and dangerous promises: the Iron Rose, five practices, rival faiths, and a sanctuary adventure.',
+    author: 'Nicholas A. Gasper',
+  },
+};
+
 // ─── Helpers ──────────────────────────────────────────────────────
 /**
  * Reads an existing manifest.json, returning null if absent or unparseable.
@@ -217,6 +226,7 @@ function generateDocsManifest(docsPath) {
         categoryLabel: category.label,
         core: isCore,
         active: true,
+        ...DOC_METADATA[`${subdir}/${file}`],
         ...(file.toLowerCase().endsWith('.pdf') ? { isPDF: true } : {})
       });
     }
