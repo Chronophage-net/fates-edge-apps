@@ -14,6 +14,22 @@ async function botJoin(server) {
     return { bot, ack };
 }
 
+test('deck requests preserve IDs across both transports without requiring IDs from legacy clients', { timeout: 20000 }, async t => {
+    const server = await startTestServer();
+    t.after(() => server.close());
+    for (const socketIO of [false, true]) {
+        const client = await connect(server, { socketIO });
+        await client.join(socketIO ? 'IODRAW' : 'WSDRAW', { role: 'gm', playerRole: 'gm' });
+        for (const [request, response] of [['deck-draw', 'deck-drawn'], ['crown-spread', 'crown-spread']]) {
+            const id = `${socketIO}-${request}`;
+            client.send(request, { count: 1, region: 'Acasia', requestId: id });
+            assert.equal((await client.wait(response)).requestId, id);
+            client.send(request, { count: 1, region: 'Acasia' });
+            assert.equal((await client.wait(response)).requestId, undefined);
+        }
+    }
+});
+
 test('AI-GM wire contract bridges browser transports, preserves authority, and isolates rooms', { timeout: 20000 }, async t => {
     const server = await startTestServer();
     t.after(() => server.close());

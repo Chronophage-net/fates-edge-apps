@@ -144,13 +144,19 @@ describe('Crafting workshop and documentation', () => {
         assert(html.includes('<label')); assert(html.includes('<progress')); assert(html.includes('Record table roll'));
         assert(!html.includes('craft-buy-btn')); assert(!html.includes('craft-batch-qty'));
     });
-    it('the Player, GM and both SRD references carry the same procedure', () => {
+    it('the Player, GM and both SRD references retain the shared bench rules', () => {
         const paths = ['players-guide/Players-_-Guide-_-11-_-Downtime.html','gm-guide/GM-_-Guide-_-09-_-Downtime.html','srd/crafting.html','srd/complete.html'];
-        const blocks = paths.map(path => {
+        const documents = paths.map(path => {
             const html = readFileSync(new URL('../../data/docs/' + path, import.meta.url),'utf8');
-            const start = html.indexOf('<div class="panel panel-gold" data-crafting-rules="project-bench-v1">');
-            assert(start >= 0); return html.slice(start, html.indexOf('</div>', start));
+            const text = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+            for (const rule of [/Attribute \+ Craft/, /Attribute \+ Arcana/, /2 segments/, /1 segment/, /Flaw/, /DV 4, Timer \[4\]/, /Minor 2.*Major 4.*Prestige 6.*Epic 8/, /Obligation/, /three.*Wonders/, /Maintained → Neglected → Compromised/, /Wits \+ Lore/, /Wits \+ Endurance/]) {
+                assert(rule.test(text), `${path}: missing ${rule}`);
+            }
+            return html;
         });
-        for (const block of blocks) assertEqual(block, blocks[0]);
+        // SRD editions share literal rule content; guide prose may differ.
+        const section = html => html.match(/<section id="crafting-reference">[\s\S]*?<\/section>/)?.[0];
+        assert(section(documents[2]), 'missing SRD crafting section');
+        assertEqual(section(documents[2]), section(documents[3]));
     });
 });

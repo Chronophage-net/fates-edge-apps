@@ -1159,6 +1159,7 @@ async function handleDeckDraw(ws, roomState, data) {
 
         const result = {
             type: 'deck-drawn',
+            ...(typeof data.requestId === 'string' && data.requestId.length <= 128 ? { requestId: data.requestId } : {}),
             cards: drawn,
             synthesis,
             cardCount: count,
@@ -1219,6 +1220,7 @@ async function handleCrownSpread(ws, roomState, data) {
 
         const response = {
             type: 'crown-spread',
+            ...(typeof data.requestId === 'string' && data.requestId.length <= 128 ? { requestId: data.requestId } : {}),
             cards,
             mainCards,
             wildcard,

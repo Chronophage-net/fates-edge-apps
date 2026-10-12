@@ -1,8 +1,25 @@
-## Unreleased — socket-server security fix (2026-10-09)
+## [5.14.1] - 2026-10-12
+
+AI-GM request correlation, accurate suggestion outcomes, proxy trust security fix, and updated reading library.
+
+### Reliability and documentation
+
+- Echo bounded deck-draw and crown-spread request IDs on both transports, preserving ID-less client compatibility.
+- Display failed AI-GM suggestion applications as failures, not approvals; escape unknown outcome labels.
+- Document server-first upgrades for AI-GM bot 4.18.3, backward compatibility, backups and partial-action recovery.
+- Correct the GM-guide crafting summary to match the Player's Guide/SRD and replace an obsolete markup-equality test with shared-rule checks. Record the required canonical docs backport.
+- Include the published fiction and revised reader editions committed since 5.14.0.
+
+### Socket-server security fix
 
 - Upgrade and enforce `proxy-addr >=2.0.8` within the 2.x line to fix CVE-2026-90711 (GHSA-jqcg-44mw-7w3h): IPv4 clients could be incorrectly trusted by certain IPv6 proxy subnets, allowing forged forwarded IP addresses.
 - Add regression tests for short mapped-IPv6 prefixes and zero-leading-bit IPv6 trust subnets, plus valid IPv4/mapped-IPv6 proxy behavior. The two attack cases fail on 2.0.7 and pass on 2.0.8.
-- Socket-server audit now reports zero critical findings; six high and one moderate finding remain. Reinstall from the updated lockfile or rebuild the Docker image and restart the server to deploy this fix.
+- At the 2026-10-09 fix, the socket-server audit reported zero critical findings; six high and one moderate finding remained. Reinstall from the updated lockfile or rebuild the Docker image and restart the server to deploy this fix. This release does not claim to resolve those remaining findings.
+
+### Validation
+
+- 455 client tests, 235 socket-server tests and three live browser transport tests passed; production web build passed.
+- Companion bot 4.18.3 passed 292 tests and the isolated restart/recovery smoke test. No live AI provider calls were made.
 
 ## Developer portal link — 2026-09-11
 

@@ -593,7 +593,7 @@ function renderSuggestionDetails(suggestionData) {
     const previewHtml = preview ? `<div style="margin-top:0.2rem;white-space:pre-wrap;">${escHtml(preview)}</div>` : '';
 
     if (status !== 'pending') {
-        const outcomeLabel = { approved: '✅ Approved', rejected: '🗑️ Rejected', 'auto-rejected': '🗑️ Auto-rejected (another option was approved)' }[status] || status;
+        const outcomeLabel = { approved: '✅ Approved', failed: '⚠️ Action failed — check table state before retrying', rejected: '🗑️ Rejected', 'auto-rejected': '🗑️ Auto-rejected (another option was approved)' }[status] || escHtml(status);
         return `
             <div class="suggestion-card" style="margin-top:0.3rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;font-size:0.85rem;color:var(--text3);">
                 <span class="outcome-tag" style="font-weight:600;">${outcomeLabel}</span>

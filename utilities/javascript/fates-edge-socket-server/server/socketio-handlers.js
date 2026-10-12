@@ -553,6 +553,7 @@ function setupSocketIO(io, appConfig) {
                     cards: drawn,
                     synthesis,
                     type: isCrown ? 'crown' : String(count),
+                    ...(typeof data?.requestId === 'string' && data.requestId.length <= 128 ? { requestId: data.requestId } : {}),
                     region,
                     remaining: r.deck.length,
                     clientName: socket.clientData?.name || 'Player',
@@ -639,6 +640,7 @@ function setupSocketIO(io, appConfig) {
                 r.lastActivity = Date.now();
                 const response = {
                     success: true,
+                    ...(typeof data?.requestId === 'string' && data.requestId.length <= 128 ? { requestId: data.requestId } : {}),
                     cards, mainCards, wildcard,
                     result, remaining: r.deck.length,
                     clientName: socket.clientData?.name || 'Player',
