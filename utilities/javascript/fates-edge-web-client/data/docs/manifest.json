@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-07T23:50:03.830Z",
+  "generated": "2026-10-12T11:57:16.540Z",
   "documents": [
     {
       "id": "srd",
@@ -1339,6 +1339,16 @@
       "active": true
     },
     {
+      "id": "the_doors_he_holds",
+      "title": "The Doors He Holds",
+      "file": "Fates_-_Edge_-_-The-_-Doors-_-He-_-Holds.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_dwarven_debt",
       "title": "The Dwarven Debt",
       "file": "Fates_-_Edge_-_-The-_-Dwarven-_-Debt.html",
@@ -1395,6 +1405,26 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_guest_who_brought_death",
+      "title": "The Guest Who Brought Death",
+      "file": "Fates_-_Edge_-_-The-_-Guest-_-Who-_-Brought-_-Death.html",
+      "path": "/data/docs/adventures/",
+      "category": "adventures",
+      "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_guest_who_brought_death",
+      "title": "The Guest Who Brought Death",
+      "file": "Fates_-_Edge_-_-The-_-Guest-_-Who-_-Brought-_-Death.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1515,6 +1545,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_ninth_proof",
+      "title": "The Ninth Proof",
+      "file": "Fates_-_Edge_-_-The-_-Ninth-_-Proof.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1793,6 +1833,36 @@
       "active": true
     },
     {
+      "id": "what_the_mountain_keeps",
+      "title": "What the Mountain Keeps",
+      "file": "Fates_-_Edge_-_-What-_-the-_-Mountain-_-Keeps.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "whispers_in_the_stacks",
+      "title": "Whispers in the Stacks",
+      "file": "Fates_-_Edge_-_-Whispers-_-in-_-the-_-Stacks.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "whispers_in_the_tunnels",
+      "title": "Whispers in the Tunnels",
+      "file": "Fates_-_Edge_-_-Whispers-_-in-_-the-_-Tunnels.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "whispers_in_the_tunnels",
       "title": "Whispers In The Tunnels",
       "file": "Fates_-_Edge_-_-Whispers-_-in-_-the-_-Tunnels.html",
@@ -1823,7 +1893,7 @@
       "active": true
     }
   ],
-  "total_count": 123,
-  "active_count": 123,
+  "total_count": 130,
+  "active_count": 130,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

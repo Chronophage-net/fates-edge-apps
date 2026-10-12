@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Nicholas A. Gasper" />
+  <title>The Guest Who Brought Death</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+<style>body{max-width:56rem;margin:3rem auto;padding:0 1.4rem 4rem;background:#f6f2e9;color:#292722;font:18px/1.65 Georgia,serif}h1,h2,h3{line-height:1.25}a{color:#654628}nav,aside{font:15px/1.6 system-ui,sans-serif}aside{border-left:3px solid #a38a5b;padding:.6rem 1rem}table{border-collapse:collapse;font-size:.9em}th,td{padding:.5rem;text-align:left;vertical-align:top;border-bottom:1px solid #ccc}blockquote{border-left:2px solid #aaa;margin-left:0;padding-left:1.2rem}</style></head>
+<body><aside>Adventure · GM information and spoilers · revised wedding and refuge scenario</aside>
+<header id="title-block-header">
+<h1 class="title">The Guest Who Brought Death</h1>
+<p class="author">Nicholas A. Gasper</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#a-wedding-in-ubral" id="toc-a-wedding-in-ubral">A wedding
+in Ubral</a></li>
+<li><a href="#the-truth-for-the-gm" id="toc-the-truth-for-the-gm">The
+truth for the GM</a></li>
+<li><a href="#the-local-settlement" id="toc-the-local-settlement">The
+local settlement</a>
+<ul>
+<li><a href="#guest-right-at-this-hall"
+id="toc-guest-right-at-this-hall">Guest-right at this hall</a></li>
+</ul></li>
+<li><a href="#people-with-something-to-lose"
+id="toc-people-with-something-to-lose">People with something to
+lose</a></li>
+<li><a href="#ground-plan-and-opening"
+id="toc-ground-plan-and-opening">Ground plan and opening</a></li>
+<li><a href="#investigation-without-a-single-locked-clue"
+id="toc-investigation-without-a-single-locked-clue">Investigation
+without a single locked clue</a></li>
+<li><a href="#escalation-through-choices"
+id="toc-escalation-through-choices">Escalation through choices</a>
+<ul>
+<li><a href="#the-muster-and-the-ford"
+id="toc-the-muster-and-the-ford">The muster and the ford</a></li>
+</ul></li>
+<li><a href="#what-the-haunting-can-and-cannot-do"
+id="toc-what-the-haunting-can-and-cannot-do">What the haunting can and
+cannot do</a></li>
+<li><a href="#opening-the-refuge" id="toc-opening-the-refuge">Opening
+the refuge</a></li>
+<li><a href="#resolution-guidance"
+id="toc-resolution-guidance">Resolution guidance</a></li>
+<li><a href="#after-the-crossing" id="toc-after-the-crossing">After the
+crossing</a></li>
+<li><a href="#revision-and-source-note"
+id="toc-revision-and-source-note">Revision and source note</a></li>
+</ul>
+</nav>
+<h1 class="unnumbered" id="a-wedding-in-ubral">A wedding in Ubral</h1>
+<p>A guest dies during a wedding feast in Hearth-Hall. The host protects
+everyone from immediate reprisal, including the unknown killer. Before
+the household can discover what happened, a sealed passage beneath its
+hearth begins admitting the voices of people it once refused to
+shelter.</p>
+<p>This is a social mystery and household gothic adventure for an
+early-career party, suitable for Tiers I–II with opposition adjusted to
+the group. Allow two or three sessions: the feast and investigation; the
+threatened household and discovery of the refuge; the evacuation and
+opening. A single long session can begin at the death and omit the
+outside muster. The associated novel chooses one outcome; the adventure
+does not require it.</p>
+<p><strong>Tone:</strong> wet wool steaming near a good fire; wedding
+flowers beside a washed corpse; laughter audible through a wall after
+the room beyond has emptied. Let the hall be comfortable and desirable
+before it becomes dangerous. Its inhabitants have different interests,
+tempers and senses of humour. Avoid an endless sequence of solemn
+speeches about oaths.</p>
+<p><strong>Content to establish with the table:</strong> poisoning,
+coercion within families, threatened sacrifice, remembered massacre,
+haunting by familiar voices. No character must surrender a loved one’s
+memory or accept a permanent curse to complete this scenario.</p>
+<h1 class="unnumbered" id="the-truth-for-the-gm">The truth for the
+GM</h1>
+<ol>
+<li><p>Odran Vale is a travelling ward-reader employed by descendants of
+families once denied refuge here. He is neither an Oath-Breaker assassin
+nor an agent of a hidden final villain. He brings evidence of Bran
+Dorn’s recent passage extortion and an outer threshold stone from the
+old refuge.</p></li>
+<li><p>Bran, the laird’s brother, poisons Odran’s individual warmed cup
+during a disputed wedding song. Use a fictional substance, widowglass.
+No real preparation, dose or recipe is needed. Its pale residue catches
+in the cup’s repaired seam. Bran intends to conceal the documents and
+blame the incoming Lorns.</p></li>
+<li><p>Lira previously helped Bran examine the sealed refuge. At his
+request she restored its inner threshold stone beneath the bridal
+chamber, believing it protective. Odran’s matching stone, carried across
+the present welcome, reopens the old relation. His murder supplies a
+fresh death under protection. Bran did not foresee the full
+consequence.</p></li>
+<li><p>The ancestors of House Dorn accepted displaced travellers, barred
+the refuge’s lower door and surrendered them to attackers. Later
+construction enclosed the threshold. A local binding kept the rejected
+dead outside by treating their admission as unfinished. It is a practice
+of this site, not universal Ubral law.</p></li>
+<li><p>Bran offers Lira as the person to put outside now. She was
+fostered among the Lorns, which makes her politically convenient to
+disown. Expelling her repeats the original harm; it does not safely
+discharge the binding.</p></li>
+<li><p>The remnant called the Keeper of the Empty Place is the refuge’s
+last custodian, bound to repeat the refusal. Opening and holding the
+original passage while returning both threshold pieces allows the
+rejected guests to leave. Current guests must have real shelter during
+the work. Exposure, a falling chimney and armed relatives are physical
+problems even after the haunting is understood.</p></li>
+</ol>
+<h1 class="unnumbered" id="the-local-settlement">The local
+settlement</h1>
+<p>House Dorn is a minor Mac Tern client; House Lorn is tied to Mac
+Gowan. The wedding addresses their own grazing and winter-passage
+dispute, not the enduring Mac Tern–O’Creagh feud. Varrak is the local
+laird, not High Chieftain of Ubral. Six neighbouring households have
+brought dependants, musicians, drovers and gifts. The Tor envoy
+witnesses arrangements but cannot absolve murder or command the
+dead.</p>
+<p>Ubral is predominantly human. Druven’s Aeler family has lived here
+for generations and belongs to the place. Do not treat her as a visiting
+dispenser of magical stone answers. Her structural knowledge requires
+access and examination.</p>
+<h2 class="unnumbered" id="guest-right-at-this-hall">Guest-right at this
+hall</h2>
+<p>Varrak promises protection from reprisal and a hearing before
+punishment. That permits guarded custody, separating fighters, securing
+weapons and examining evidence. It does not make an assailant
+untouchable, forbid accusations or prevent self-defence. He offers
+shelter through the storm and escorted departure when possible. A guest
+may refuse further hospitality. A person who arrived after the death
+cannot truthfully be claimed as its witness.</p>
+<p>Explain these local terms in ordinary speech. Do not spring an
+undisclosed hospitality rule to punish a player. The metaphysical danger
+belongs to the old refuge’s specific history and can be investigated
+separately from the laird’s current authority.</p>
+<h1 class="unnumbered" id="people-with-something-to-lose">People with
+something to lose</h1>
+<div class="description">
+<p>A widow who wants both Massen and a life outside her father’s house.
+She knows household routes and routines. She initially protects its
+reputation and may have offended a useful witness. In play she can
+obtain access and admit mistakes; she does not solve the case for the
+party.</p>
+<p>A capable escort captain, affectionate, proud and anxious about his
+people. He secretly called armed cousins to the ford as insurance. He
+can recall them, but a messenger must reach them and their commander may
+demand reassurance.</p>
+<p>Generous in public and often in private. He will stop immediate
+revenge. He knows the refuge was closed after a massacre but has avoided
+the particulars. Later he considers Bran’s proposed sacrifice; an
+argument, new evidence or a workable evacuation can move him.</p>
+<p>Familiar, useful and capable of affection. His extortion depends on
+control of the passage. He will hide the cup and silence its witness if
+allowed. Killing him does not end the haunting; saving his life does not
+pardon him.</p>
+<p>Fostered among Lorns, competent with old songs and local routes. Bran
+used her help restoring the inner stone. She does not initially know
+about the poison. She later moves the corpse because he tells her it
+will end the dangerous welcome. Fear and exhaustion do not make all her
+perceptions false.</p>
+<p>Knows who handled the cups and guards the servants’ privacy. She will
+give practical information. She will not surrender everyone in her care
+to an unannounced interrogation.</p>
+<p>Ubral-born Aeler, with an apprentice son. Her flue repairs do not
+imply knowledge of the hidden foundation. Once she examines it, she can
+identify the danger to the chimney and propose supports. She needs
+labour and time, not a speech about trusting experts.</p>
+<p>A witness with limited escort authority. Can arrange custody and
+carry evidence to a later hearing. Has no supernatural means of
+detecting lies.</p>
+<p>Name them with the group or regional generator. Saw Bran at the
+warmer. Has reason to distrust Brin or the laird. Let them specify a
+safe place and a second listener before giving testimony.</p>
+</div>
+<h1 class="unnumbered" id="ground-plan-and-opening">Ground plan and
+opening</h1>
+<p>The old tower backs onto a timber-roofed feast hall. A service hatch
+connects the cup warmer to the kitchen. Brin’s place is visible from the
+warmer, but a standing singer blocks it during the disputed song. The
+women’s stair reaches the bridal chamber above a sealed lower passage.
+Kitchen, yard, washhouse and byre form a route that avoids the feast
+hall. The blocked refuge door opens towards a burn and cairn; the ford
+is farther downhill. Nearby cottages remain reachable before the pass
+does.</p>
+<p>Describe these routes before they matter. The storm closes the
+distant pass first, not every door in the compound. Supernatural
+distortions affect the old passage and doors connected to it; they are
+not permission to relocate any clue the players approach.</p>
+<p>The party may be wedding guests, paid escorts, repair workers, the
+envoy’s companions or travellers explicitly admitted that afternoon.
+Begin before the death when possible. Give them a real task and a social
+connection: settle a horse at the ford, help air bedding, rehearse a
+song, carry a relative upstairs. Odran arrives on the third afternoon of
+the gathering and dies that evening. There is no second unexplained
+“third night.”</p>
+<p>He refuses Bran’s request to postpone his petition. During the song
+Bran uses the warmer. Later Odran lifts his cup, tries to speak and
+collapses. The red spill is wine, not a poison diagnosis. A healer tries
+to save him; in the default opening it is too late. If a group with
+appropriate powers prevents the death, honour that success: Odran can
+testify to Bran’s threat but did not see the dosing. The reunited stones
+can still disturb the refuge, with more time to evacuate and no fresh
+murder feeding it.</p>
+<h1 class="unnumbered"
+id="investigation-without-a-single-locked-clue">Investigation without a
+single locked clue</h1>
+<p>Give information when characters take an appropriate action. A roll
+can determine speed, notice, access under opposition or the safety of
+handling something. It should not decide whether the essential facts
+exist.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Question</th>
+<th style="text-align: left;">Direct evidence</th>
+<th style="text-align: left;">Other route or limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Was the drink targeted?</td>
+<td style="text-align: left;">Residue in one cup’s repaired seam; shared
+jug and other cups clean.</td>
+<td style="text-align: left;">The healer and cup-washer can compare
+them. Wine colour proves nothing.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Who had access?</td>
+<td style="text-align: left;">Serving witness saw Bran at the warmer
+during the song.</td>
+<td style="text-align: left;">Brin saw him approach it; a musician
+recalls the interrupted exchange. No witness saw every movement.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Why kill Odran?</td>
+<td style="text-align: left;">Recent extortion demand in his chest bears
+Bran’s damaged seal-mark.</td>
+<td style="text-align: left;">A claimant at the ford retains a matching
+demand. Motive alone is not proof of poisoning.</td>
+</tr>
+<tr>
+<td style="text-align: left;">What links Bran to poison?</td>
+<td style="text-align: left;">Lira knows a stoppered packet is missing
+from his work chest; wrapping carries similar grit.</td>
+<td style="text-align: left;">Bran attempts to retrieve the cup if
+unwatched. Similar residue supports testimony; it is not an infallible
+assay.</td>
+</tr>
+<tr>
+<td style="text-align: left;">What did Odran bring?</td>
+<td style="text-align: left;">Petition, refuge plan, outer stone and
+damaged professional ring in his chest.</td>
+<td style="text-align: left;">Lira recognizes the ring’s two repairs
+from copied work. His employer can later verify his commission.</td>
+</tr>
+<tr>
+<td style="text-align: left;">What is under the hearth?</td>
+<td style="text-align: left;">Druven finds the blocked passage and inner
+threshold on examination.</td>
+<td style="text-align: left;">Painted plaster, draughts, old household
+routes and the petition independently identify a former refuge.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Where is the body?</td>
+<td style="text-align: left;">Washhouse tracks, lamp soot, shroud caught
+on a peg; a helper saw Lira carrying it.</td>
+<td style="text-align: left;">Question her without threat. She followed
+Bran’s advice, not a spontaneous madness.</td>
+</tr>
+</tbody>
+</table>
+<p>The silver key opens the chest; the party can also force it in view
+of witnesses. Its lock does not require guessing a verse. Keep copies of
+essential information elsewhere if destructive handling ruins a page.
+The broken ring is identification, not five pieces scattered through
+symbolic puzzle rooms. Lies belong to speakers with motives; a failed
+check does not make the GM supply a false fact as objective truth.</p>
+<h1 class="unnumbered" id="escalation-through-choices">Escalation
+through choices</h1>
+<p>Use three visible pressures. These are scenario clocks, not new
+character resources. Tell players what actions advance them. Do not tick
+them every time someone speaks.</p>
+<div class="description">
+<p>Starts at one after the death. Advance for an assault, an accusation
+treated as permission to raid, or an armed message allowed through
+unanswered. At two, doors and escorts are contested; at four, a named
+faction attempts a specific attack or seizure. Guarded custody, a
+witnessed account and reaching Massen’s cousins can reduce it. The whole
+of Ubral does not automatically go to war.</p>
+<p>Starts at zero. Advance for substantial delay without heating or
+shelter, damage to a shelter, or sending people across the ford
+unprepared. At two, infirm guests need relocation; at four, a specific
+stranded group needs immediate rescue. Fuel, blankets, paired guides and
+opening nearby buildings address it.</p>
+<p>Starts at one when the matching stones meet. The default death
+advances it to two. Advance for moving a named guest towards expulsion,
+repeating the old refusal as a remedy, or opening the lower way without
+watchers and refuge prepared. At three, connected doors mislead and
+voices lure; at four, the keeper enacts the refusal physically. This is
+an intervention the party can interrupt, not instant irreversible
+defeat. Isolation of the stones can slow it but does not undo what has
+begun.</p>
+</div>
+<p>The dawn deadline is Bran’s demand that the household surrender Lira,
+not a universal expiration of guest-right. If the party exposes him
+early, change his tactics. He may seek protection, offer partial
+knowledge or escape; do not make him immune until his scheduled
+confession.</p>
+<h2 class="unnumbered" id="the-muster-and-the-ford">The muster and the
+ford</h2>
+<p>Massen’s men wait below the ford. They believe their people may be
+hostages. A witness from one of the excluded families is also waiting
+there with a surviving shelter token and a recent passage demand. The
+players can bring them in, meet outside, send an escort or arrange a
+second place of safety. The water cannot name the murderer. Its danger
+is current, weather and the pressure of armed men on narrow footing.</p>
+<p>A lowland officer may offer blankets and escort in return for a
+garrison at the pass. This adds a useful but politically costly option,
+not a punishment for the party’s preference. Omit this complication in a
+short session.</p>
+<h1 class="unnumbered" id="what-the-haunting-can-and-cannot-do">What the
+haunting can and cannot do</h1>
+<p>Familiar voices draw people towards the sealed passage. Footsteps
+answer from empty rooms. The keeper withdraws a stool or empty bowl,
+then goes back to the bolt when someone calls outside. Watching her
+repeatedly reveals that she is both enforcing and caught in the refusal.
+She cannot give the killer’s name, pronounce guilt or narrate every
+century of history.</p>
+<p>Keep a human route through the yard visible. Paired watches, shared
+sleeping rooms and answering voices only with a companion reduce danger.
+Characters can retreat to another sheltered building. A successful ward
+can protect an established boundary according to its own rules; it does
+not automatically dissolve this site’s history. Never invent a new
+patron fee after a player has accepted stated terms.</p>
+<p>If a character attacks the keeper, let a suitable weapon or working
+drive her back or break her grasp. Ordinary weapons cannot kill a
+remnant, but can break a door, free caught clothing or sever a binding
+object. State this before asking for a pointless damage roll. She
+returns to the bolt while the passage remains denied. This is a hazard
+with an objective, not a creature with arbitrary immunity until five
+runes are stepped on.</p>
+<h1 class="unnumbered" id="opening-the-refuge">Opening the refuge</h1>
+<p>The players need to establish three practical conditions:</p>
+<ol>
+<li><p>Current guests have somewhere safe to go and a route there. A
+promise of shelter is not enough if its door remains barred or the ford
+is impassable.</p></li>
+<li><p>Both threshold pieces are returned to their original positions
+and the old lower passage is opened. The outer piece is in Odran’s
+chest; the inner piece is beneath the bridal room. Examination, the plan
+and Lira’s account establish this without a single mandatory skill
+check.</p></li>
+<li><p>Living witnesses hold the route through the crossing. Nobody is
+expelled to stand in for the rejected dead. The keeper can lift the bolt
+when the refusal is no longer being performed by the household around
+her.</p></li>
+</ol>
+<p>Opening the passage threatens the old chimney. Druven identifies this
+before the party commits. Earlier shoring, extra labour, controlled
+dismantling or established magic may preserve more of the house. Without
+those preparations, the bridal floor and hall roof become unsafe.
+Resolve the evacuation in distinct tasks: release the fitting, hold the
+lower door, carry wounded people, move a burning obstruction, reach a
+missing child. Do not repeat the same Arcana test until someone rolls
+well.</p>
+<p>Bran may try to force Lira into the place after a relative frees him.
+This is preventable through secure custody or convincing his helper. His
+death does not appease the keeper. Let players arrest, disarm, injure or
+kill him as the confrontation actually unfolds, with the corresponding
+consequences. An NPC bride need not land the decisive blow.</p>
+<h1 class="unnumbered" id="resolution-guidance">Resolution guidance</h1>
+<p>Use the current Attribute plus Skill procedure. Useful approaches
+include Wits plus Insight for competing accounts, Wits plus Craft for
+the cup or supports, Wits plus Lore for local practice, Spirit plus
+Arcana for an established working, Presence plus Sway for reassurance,
+and Body plus Athletics for carrying or crossing. Choose the pair from
+the actual approach. Default to DV 3 under pressure; an ordinary
+unopposed observation needs no roll. Use DV 2 for a straightforward
+task, DV 4 for active resistance or a difficult physical constraint.
+State Dominant, Controlled or Desperate Position before the roll.</p>
+<p>A miss can cost time, expose a witness, strain a support or worsen
+the declared danger. It need not destroy the clue. Story Beats are
+generated and spent under the core rules; failed DV 3 rolls do not
+automatically grant an NPC one SB, and nobody spends SB as a ten-minute
+rest fee. Apply Fatigue, harm and magical costs using the relevant
+existing procedure. Do not turn “one Fatigue” into an undefined
+week-long social penalty.</p>
+<p>For physical opposition, use the current guard or raider adversary
+appropriate to the party rather than increasing every DV. Give opponents
+concrete aims: seize a witness, recover the cup, hold the gate. Retreat,
+surrender and changing allegiance are available. Before play, select the
+combat profiles from the campaign’s current adversary source; this
+scenario does not introduce a new monster stat block.</p>
+<h1 class="unnumbered" id="after-the-crossing">After the crossing</h1>
+<p>Separate four outcomes: the fate of the murdered guest’s case; the
+release or continued confinement of the dead; the safety of current
+guests; and the future of the marriage and pass. Success in one does not
+imply the others.</p>
+<p>If the party opens the refuge, give the dead a departure and the
+living time to count people, dress injuries and find beds. No extra
+curse is required to make success costly. If they cannot open it
+tonight, evacuation and guarded containment can preserve lives while
+leaving a later return necessary. If they abandon people, record which
+people and who saw it; do not award automatic universal exile.</p>
+<p>Bran can be held for a later witnessed judgment. Varrak’s authority
+is diminished by what is exposed. Displaced families retain claims the
+wedding never settled. Brin and Massen may marry later, separate, or
+revise their agreement. The party does not choose their marriage for
+them.</p>
+<p>Rewards can be paid escort work, repairs, a named household’s
+hospitality or a safe-conduct actually recognized by its issuer. No
+blanket level of Social Capital with all Ubral is created. Odran’s
+daughter should receive his body or an honest account of its
+disposition, his personal effects and the evidence he carried.</p>
+<h1 class="unnumbered" id="revision-and-source-note">Revision and source
+note</h1>
+<p>This revision replaces the contradictory assassin/protector
+identities, the scattered ring puzzle, the late Ward-Reader villain and
+the forced sacrifice. It retains the dead guest, wedding, chest, Bran
+and Lira. It draws on the Ubral setting and regional deck while treating
+the refuge’s binding as a local invention. The novel treatment fixes one
+first-person path through these events; player decisions remain
+authoritative in the adventure.</p>
+<p>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+</body>
+</html>
