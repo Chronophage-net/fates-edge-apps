@@ -191,7 +191,7 @@ Skip downtime by accepting a Risk Timer [4]. If it fills, the new ability has a 
 - **Upkeep** (each downtime): Efficient (XP ≈ acquisition/3) or Intensive (1 XP + downtime scene).
 
 ## Terrestrial Patrons & Trusts
-- **Terrestrial Patrons** (noble houses, guilds, syndicates): offer Assets/Favours in exchange for Obligation (Influence). Capacity = Spirit + Presence.
+- **Terrestrial Patrons** (noble houses, guilds, syndicates): offer Assets/Favors in exchange for Obligation (Influence). Capacity = Spirit + Presence.
 - **Trusts** (player‑owned factions): pool XP (10 XP to found). Members can call on the Trust, borrow Assets, request Followers, all costing Obligation to the Trust.
 
 ## Travel Framework

@@ -8,7 +8,7 @@ contributions, review status, and how to submit corrections without writing code
 - [Instrucciones en español](TRANSLATIONS.es.md)
 - [Spanish glossary](locales/GLOSARIO.es.md)
 - [Technical interface translation guide](TRANSLATION.md)
-- [Spanish interface catalogue](locales/es.json)
+- [Spanish interface catalog](locales/es.json)
 - [Spanish documents](data/docs/es/)
 
 The Spanish interface and documents are initial machine-assisted translations

@@ -162,13 +162,13 @@ Redesigned Spellcraft, VTT, characters and talents, adventures, crafting, encoun
 - Mobile interface fix
 - Sync Bell and Things active reading editions
 - Sync selective longform editorial revisions
-- Sync Riarhin memory and ageing continuity edits
-- Publish Howling Ice reading edition and refresh fiction catalogue
+- Sync Riarhin memory and aging continuity edits
+- Publish Howling Ice reading edition and refresh fiction catalog
 - Sync novel reader companions and Belworth family lineages
 - Sync Belworth age and chronology corrections
 - Sync reading editions after novel source relocation
 - Sync active longform novels and updated readers guide
-- Sync The Kept Place reading edition and updated fiction catalogue
+- Sync The Kept Place reading edition and updated fiction catalog
 - Sync Bridge Born's revised Farieth discovery
 - Sync revised fiction library and publish The Bridge Born
 - Sync edited Names and published Blood in the Fold reading editions
@@ -687,7 +687,7 @@ Story Beats handed to the GM bank once per roll
 - Copy quality pass
 - Updated HTML and JSON files.
 - Add workflow to delete GitHub Actions caches
-- Completed first-party interface localization extraction, with a 2,593-key English catalogue, LTR and RTL pseudolocales, logical-direction layout, strict coverage/audit reports, and translator tooling.
+- Completed first-party interface localization extraction, with a 2,593-key English catalog, LTR and RTL pseudolocales, logical-direction layout, strict coverage/audit reports, and translator tooling.
 
 ## [5.0.9] - 2026-09-02
 
@@ -792,7 +792,7 @@ Twelve skills, Threat Level, Position corrections, GM authority enforced on the 
 - sync SRD-conformant bestiary from fates-edge-docs
 - sync crafting rules and manifests from fates-edge-docs
 - regenerate manifests
-- sync TL standardisation from fates-edge-docs
+- sync TL standardization from fates-edge-docs
 - regenerate manifests
 - regenerate manifests
 - sync upkeep/assist unification from fates-edge-docs
@@ -847,7 +847,7 @@ Clear all npm audit findings; fix the test runner and a flaky test
 - note the unclean-manifest loop and the npm audit backlog
 
 ### Chore
-- build artefacts from the release hook (lockfile versions, manifest timestamp)
+- build artifacts from the release hook (lockfile versions, manifest timestamp)
 
 ## [4.26.0] - 2026-08-31
 

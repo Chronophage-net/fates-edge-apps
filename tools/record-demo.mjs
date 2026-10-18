@@ -145,7 +145,7 @@ async function run() {
       })()
     `);
     // A fresh, headless profile can finish the app shell before its initial
-    // hash navigation. Visit a neighbouring route and come home so the first
+    // hash navigation. Visit a neighboring route and come home so the first
     // frame always contains the actual landing page, not an empty shell.
     await evaluate(cdp, `document.querySelector('.sidebar-nav [data-tab="characters"]')?.click()`);
     await sleep(900);

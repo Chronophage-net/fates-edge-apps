@@ -1,5 +1,5 @@
 {
-  "_comment": "Invoker archetypes: named Symbol combinations for the professional practitioner — the ward-setter with a shingle, the exorcist with a bag, the stage conjuror with a licence. Each is built on ONE canonical rivalry from patron-rivalries.json, so the character's central tension is already in the Cross-Resonance table, plus a third Symbol that complicates it. Three Symbols is 12 XP and deliberately one short of the four that would tax every scene.",
+  "_comment": "Invoker archetypes: named Symbol combinations for the professional practitioner — the ward-setter with a shingle, the exorcist with a bag, the stage conjuror with a license. Each is built on ONE canonical rivalry from patron-rivalries.json, so the character's central tension is already in the Cross-Resonance table, plus a third Symbol that complicates it. Three Symbols is 12 XP and deliberately one short of the four that would tax every scene.",
   "design_note": {
     "title": "Reading an Archetype",
     "text": "An archetype is not a class. It is a purchase order: which Symbols to buy, in what order, and what the friction between them will cost you. Everything here resolves with the rules already in this guide — Symbols are 4 XP Minor Assets, invocation marks Obligation, displaying the Symbol buys DV −1 and Obligation −1, Crack the Seal buys instant resolution for +2 Obligation and a Compromised Symbol, and Obligation Capacity is Spirit + Presence. Nothing below adds a subsystem.",
@@ -64,7 +64,7 @@
       "name": "The Quiet Coroner",
       "trade": "Exorcist, deposition-taker, and last physician to the already dead",
       "tagline": "I am not here to release you. I am here to write down what you say, and then release you.",
-      "concept": "Someone has to sit with the ones who did not finish. Quiet Coroners are engaged by families, magistrates, harbour boards and occasionally by the dead themselves; they arrive with a bag, a chalk line, a cheap chair and no hurry. The work is half exorcism and half deposition, and the order matters: a soul that has been laid to rest cannot be questioned, and a soul that is still answering questions has not been laid to rest. The good ones are patient. The great ones are the sort of patient that frightens people.",
+      "concept": "Someone has to sit with the ones who did not finish. Quiet Coroners are engaged by families, magistrates, harbor boards and occasionally by the dead themselves; they arrive with a bag, a chalk line, a cheap chair and no hurry. The work is half exorcism and half deposition, and the order matters: a soul that has been laid to rest cannot be questioned, and a soul that is still answering questions has not been laid to rest. The good ones are patient. The great ones are the sort of patient that frightens people.",
       "symbols": [
         {
           "patron": "Varnek Karn, the Death's Negotiator",
@@ -135,8 +135,8 @@
       ],
       "spine": {
         "rivalry": "Mab vs Palinode",
-        "canon_friction": "glamour demands encore; truth offends mask; favour must be sung aloud; court erupts at song's climax",
-        "note": "The mask and the encore want opposite things. Mab's favour is granted quietly and must be repaid in kind; Palinode's is granted to a room and must be repaid in front of it. An Encore who works a masque carries both, and the moment the crowd demands the trick again is the moment the bargain becomes public. Position one step worse, an extra Obligation, and a standing ovation."
+        "canon_friction": "glamour demands encore; truth offends mask; favor must be sung aloud; court erupts at song's climax",
+        "note": "The mask and the encore want opposite things. Mab's favor is granted quietly and must be repaid in kind; Palinode's is granted to a room and must be repaid in front of it. An Encore who works a masque carries both, and the moment the crowd demands the trick again is the moment the bargain becomes public. Position one step worse, an extra Obligation, and a standing ovation."
       },
       "build": {
         "attributes": "Presence first and by a distance; Wits second. Presence also doubles the Obligation Capacity this build needs.",
@@ -147,11 +147,11 @@
         "name": "The Unglamoured Turn",
         "text": "Once in a performance, drop the act. Display Solara's Symbol — no glamour, no patter, no misdirection — and address one person in the room directly. Treat as a Presence + Insight action at DV set by how badly that person does not want to be seen. A Clean Success means they are seen, by themselves as much as by you, and whatever they were about to do they do not do. It works exactly once per audience, and it works because the hall has spent two hours being lied to beautifully."
       },
-      "when_it_goes_wrong": "Mab does not mind being used as a stage effect. Palinode does not mind being used as a stage effect. Both mind being used as an alibi. When the act is exposed as cover for real work, the Encore does not lose their power — they lose the hall, the licence and the manager, and a practitioner without a room is a practitioner carrying two Symbols that only function in front of a crowd.",
+      "when_it_goes_wrong": "Mab does not mind being used as a stage effect. Palinode does not mind being used as a stage effect. Both mind being used as an alibi. When the act is exposed as cover for real work, the Encore does not lose their power — they lose the hall, the license and the manager, and a practitioner without a room is a practitioner carrying two Symbols that only function in front of a crowd.",
       "hooks": [
-        "The company has a three-night licence in a city where the Censorate reads every playbill. Someone has bought the box directly above the stage for all three nights and has not attended.",
+        "The company has a three-night license in a city where the Censorate reads every playbill. Someone has bought the box directly above the stage for all three nights and has not attended.",
         "A Chain-Lantern in the fourth row is not watching the trick. They are watching the wings, where a nine-year-old with a real talent is holding the props.",
-        "Mab's court has requested the act. Command performance, no fee, no refusal, and the favour will be granted before the encore rather than after — which every Encore knows is how the Queen makes a debt land in front of witnesses."
+        "Mab's court has requested the act. Command performance, no fee, no refusal, and the favor will be granted before the encore rather than after — which every Encore knows is how the Queen makes a debt land in front of witnesses."
       ],
       "homage": "The evening-dress conjuror whose hypnosis is not a trick; the sorcerer who breaks his staff at the end of the show; the professional illusionist who is a magician twice, and only one of them is billed."
     }

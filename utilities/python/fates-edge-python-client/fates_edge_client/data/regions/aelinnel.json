@@ -46,7 +46,7 @@
       "name": "Caelum Viridant",
       "role": "Green Knight, Warden of the Stag-Roads",
       "motivation": "Test the worthy and trap the careless",
-      "quirk": "His armour is woven from living boughs that bleed when he lies. He has never bled."
+      "quirk": "His armor is woven from living boughs that bleed when he lies. He has never bled."
     },
     {
       "name": "Eilidh Stone-Prince",
@@ -211,7 +211,7 @@
       "rank": 13,
       "suit": "spade",
       "title": "Hall of Aelinnel",
-      "subtitle": "[CIVILISATION]",
+      "subtitle": "[CIVILIZATION]",
       "description": "A timber keep threaded between standing stones; floors level themselves for guests.",
       "flavor": "The ninth stone in the floor is always warm — it remembers the last person who lied.",
       "mechanical_hook": ""

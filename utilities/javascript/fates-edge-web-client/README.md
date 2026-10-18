@@ -234,7 +234,7 @@ it is stored per browser, so a shared campaign never forces one language on
 the whole table. Game content — adventures, wiki entries, patrons, the SRD —
 stays in the language it was written in.
 
-English is the source catalogue (`locales/en.json`) and the fallback for
+English is the source catalog (`locales/en.json`) and the fallback for
 everything: any string without a translation is shown in English rather than
 left blank, so a partial translation is always safe to ship. Generated LTR
 and RTL pseudolocales are available for spotting untranslated text, layouts

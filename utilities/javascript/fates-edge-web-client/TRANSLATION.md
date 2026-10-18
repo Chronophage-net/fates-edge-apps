@@ -14,19 +14,19 @@ state in which a missing translation blanks out the interface.
 
 Settings → Language offers English, English (United States) (`en-US`), and
 English (United Kingdom) (`en-GB`). Browser detection selects the regional
-locale when it matches. The regional catalogues cover every interface key,
-including American/British spellings such as armor/armour and color/colour.
+locale when it matches. The regional catalogs cover every interface key,
+including American/British spellings such as armor/armor and color/color.
 Date and number helpers use the selected regional locale. Authored game data
 remains in its original language.
 
-Keep both regional JSON catalogues aligned when changing `en.json`. Most
+Keep both regional JSON catalogs aligned when changing `en.json`. Most
 values intentionally match the source; identical-English counts in the
 coverage report do not indicate unfinished regional translations.
 
 ## Spanish and contribution guide
 
 Spanish (`es`, **Español**) is available in Settings → Language. The initial
-catalogue is machine-assisted with targeted terminology corrections; complete
+catalog is machine-assisted with targeted terminology corrections; complete
 key coverage does not mean every screen has received editorial review. Spanish
 document editions are listed separately under **Docs → Español**.
 
@@ -114,10 +114,10 @@ review tasks, and ways to contribute without using Git.
 | File | Role |
 | --- | --- |
 | `js/core/i18n.js` | The runtime: `t()`, `setLocale()`, `applyTranslations()`. No dependencies. |
-| `locales/en.json` | The source catalogue. Every other locale is a translation of this file. |
+| `locales/en.json` | The source catalog. Every other locale is a translation of this file. |
 | `locales/index.js` | The list of shipped languages and how to load each one. |
 | `locales/en-x-pseudo.js` | A generated pseudolocale used to find untranslated UI and cramped layouts. |
-| `locales/en-x-pseudo-rtl.js` | The same complete test catalogue with RTL layout enabled. |
+| `locales/en-x-pseudo-rtl.js` | The same complete test catalog with RTL layout enabled. |
 | `js/tools/i18n-extract-features.js` | Conservative extractor for first-party UI (`npm run i18n:extract`). |
 | `js/tools/i18n-report.js` | Coverage report (`npm run i18n:report`). |
 | `js/tools/i18n-new-locale.js` | Scaffolds a new language (`npm run i18n:new`). |
@@ -152,7 +152,7 @@ observer never guesses at unannotated content, so character names and loaded
 game prose are not mistaken for interface copy.
 
 A unit test (`tests/unit/i18n.test.js`) fails the build if a `data-i18n` key
-is missing from `en.json`, or if the inline English and the catalogue text
+is missing from `en.json`, or if the inline English and the catalog text
 have drifted apart.
 
 ### Translating strings in feature modules
@@ -196,7 +196,7 @@ Preview what the extractor would change:
 npm run i18n:extract
 ```
 
-Review that list, then apply it and review the resulting English catalogue:
+Review that list, then apply it and review the resulting English catalog:
 
 ```bash
 npm run i18n:extract -- --write
@@ -205,7 +205,7 @@ npm run i18n:extract -- --write
 Do not broaden the extractor over `data/`, rule tables, adventures, patron or
 region prose, or printable source material. Those are authored works, not UI.
 Their surrounding buttons, errors, and status messages still belong in the
-interface catalogue.
+interface catalog.
 
 ```bash
 npm run i18n:report

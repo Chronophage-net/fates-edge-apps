@@ -3920,7 +3920,7 @@
     "Mind-Reaver": {
       "page": "Mind-Reaver",
       "summary": "A creature of nightmare that feeds on the thoughts of the living. Hails from the deepest places of the world.",
-      "lore": "The mind-reavers are the remnants of a civilisation that predates the Astroegro. They do not speak aloud—they project their will. They do not attack with claws—they consume the self.",
+      "lore": "The mind-reavers are the remnants of a civilization that predates the Astroegro. They do not speak aloud—they project their will. They do not attack with claws—they consume the self.",
       "locations": [
         "Dungeon depths",
         "Ways Between",
@@ -6965,7 +6965,7 @@
         {
           "cost": 4,
           "name": "The Rider's Challenge",
-          "effect": "The Rider challenges a character to a duel. Refusing causes the character to be Marked by the Alder King (all Fey in the region will recognise them as a coward)."
+          "effect": "The Rider challenges a character to a duel. Refusing causes the character to be Marked by the Alder King (all Fey in the region will recognize them as a coward)."
         }
       ]
     }

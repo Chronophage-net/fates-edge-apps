@@ -4,7 +4,7 @@
     "name": "English (United States)",
     "nativeName": "English (United States)",
     "dir": "ltr",
-    "note": "Regional English interface catalogue. Keep keys, placeholders and markup aligned with en.json."
+    "note": "Regional English interface catalog. Keep keys, placeholders and markup aligned with en.json."
   },
   "app": {
     "name": "Fate's Edge",

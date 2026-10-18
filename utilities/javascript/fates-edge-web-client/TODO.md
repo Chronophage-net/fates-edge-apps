@@ -92,7 +92,7 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
 - [x] **`data/lock-reset.json` is no longer tracked.** Added to
       `utilities/javascript/.gitignore`, with `data/lock-reset.example.json`
       tracked in its place and INSTALL.md updated with the copy step. Runtime
-      behaviour is unchanged: `local-lock.js` already returns false on a
+      behavior is unchanged: `local-lock.js` already returns false on a
       missing file, exactly as it did on the empty hash it shipped with.
 - [x] **Test runner fixed.** `node tests/runner.js` died on `Cannot find package
       '@core/state.js'`: the `@core` alias exists only in `vite.config.js`, and
@@ -106,7 +106,7 @@ Looking for what's actually left to build? The root [README's Roadmap](../../../
       "must follow suit when able" led `hand[0]` blindly; when that card was
       trump the engine correctly refused the lead (trump not broken), the play
       was rejected and `leadSuit` stayed null. It now leads a non-trump card
-      and asserts the lead succeeded. Engine behaviour was correct throughout.
+      and asserts the lead succeeded. Engine behavior was correct throughout.
       10/10 clean runs after the fix.
 
 ## Repo hygiene

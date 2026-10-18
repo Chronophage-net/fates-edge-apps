@@ -501,7 +501,7 @@ The Fate's Edge server (Node.js) acts as a central hub, synchronising state acro
 #### Terminal Client (Node.js)
 - **Features**:
   - Full WebSocket support
-  - ANSI colour themes (default, dracula, forest, amber)
+  - ANSI color themes (default, dracula, forest, amber)
   - Rich command set including all VTT and adventure commands
   - Dice rolling with advantage/disadvantage, critical/fumble detection, roll history
   - Persistent banner cache (remote ANSI art fetch)

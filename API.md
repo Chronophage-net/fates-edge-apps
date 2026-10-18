@@ -191,7 +191,7 @@ List all clients in a room.
 Kick a client from the room.
 **Request body (optional):**
 ```json
-{ "reason": "Disruptive behaviour" }
+{ "reason": "Disruptive behavior" }
 ```
 
 **`POST /api/rooms/:code/clients/:clientId/ban`**

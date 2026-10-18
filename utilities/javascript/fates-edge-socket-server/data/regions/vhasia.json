@@ -11,7 +11,7 @@
     "tagline": "The sun shattered at Lence. The pieces are still falling. Which shadow will catch you?",
     "genre": "Courtly intrigue, chevauchée warfare, fractured legitimacy, the tragedy of chivalry—a kingdom that cannot mourn because mourning would mean admitting the old world is dead. Beneath the gilt and the heraldry, chivalry is a thin veneer; the iron of siege and sack shows through at every edge.",
     "mood": "Crowns, Courts, and the Weight of Lence",
-    "starting_location": "The Pont-du-Tithe, its golden arches catching fire in the sunset as pilgrims chant from both banks. A Duchy Constable in splendid armour guards the toll gate. 'The chevauchée burns to the east,' he says, gesturing toward the Belworth. 'Two Crowns march to meet it. Whose seal do you carry? Speak quickly—the levy waits for no one. And keep your hand away from your sword. The bridge remembers the last blood spilled here. It remembers the Fenwood horses crossing from the east. It remembers the screams.'",
+    "starting_location": "The Pont-du-Tithe, its golden arches catching fire in the sunset as pilgrims chant from both banks. A Duchy Constable in splendid armor guards the toll gate. 'The chevauchée burns to the east,' he says, gesturing toward the Belworth. 'Two Crowns march to meet it. Whose seal do you carry? Speak quickly—the levy waits for no one. And keep your hand away from your sword. The bridge remembers the last blood spilled here. It remembers the Fenwood horses crossing from the east. It remembers the screams.'",
     "lore": {
       "history": "Vhasia is a realm of broken coronations and split loyalties, still bleeding from a wound a decade old. Once a proud province of the Utaran empire, the unified Sun Court shattered like its heraldic sunburst when the Fenwoods of Viterra and their allies crossed the Belworth, sacked the capital of Lence, and cast down the old Blood line. Duke Braedyn Fenwood—uncle of Veralyn, now the Warrior Queen of Viterra—led the assault, his ironshod cavalry grinding the Sun King's army into the mud of the Ford of Ashes. They burned Lence until the mirrors melted and the very stones wept. They left the throne empty—not destroyed, but open. And they left a wound that has not healed. But the wound runs deeper than smoke and stone. Forty years ago, during the Province Wars, King Wymund of Viterra sought alliance with Vhasia through marriage—taking Elianor Everblood (née Longblood) as his queen. She bore him two daughters, his heir Valdais Longblood, and a second son, Wyllmot, who was made heir to the Viterran throne. When Wymund died, Elianor married his son Baldvyn II, becoming queen of Viterra again and binding the two realms in blood—but also in rumor. The jealousies between these unions ignited the provincial wars that weakened both realms, culminating in Wyllmot's clash with Valdais at Adria—a victory stained by the suspicion that brother had fought brother for a throne built on doubtful bloodlines. When the Fenwoods came, Elianor was in her western duchy of Ethor, having married into the Vhasian royal Bloods line—a final attempt to stitch the realm back together. Her nephew had been made heir to the Sun Court on condition of that marriage, a settlement that the sack of Lence tore apart utterly. Now, Elianor rules from Ethor, her alliances woven from the threads of three marriages and the quiet terror that none of her sons may be truly 'hers' by the blood that matters. She is not mourning. She is waiting—for proof, for a sign, for the moment when the fractured sun might finally cast a single shadow.",
       "first_notice": "The smell of old smoke and fresh ink. The way every noble's seal has a hairline crack—like the fault lines in old marriage alliances. The constant, nervous laughter of courtiers who remember whose head rolled last season—and whose mother married which king. The way the knights touch their gorgets when someone speaks of mercy, remembering Sir Corin's unbuckling at Lence—and the queen who watched it all from Ethor, wondering if the mercy she'd been shown was ever real.",
@@ -73,7 +73,7 @@
     {
       "name": "The Cantor Alain",
       "role": "Iron Bard, bearer of the Cracked Ring",
-      "motivation": "Sing the truth of Corin's mercy before the armour closes again—and sing the truth of the queens who bore sons to two kings, and the sons who never knew which father's blood they carried.",
+      "motivation": "Sing the truth of Corin's mercy before the armor closes again—and sing the truth of the queens who bore sons to two kings, and the sons who never knew which father's blood they carried.",
       "quirk": "Feathers grow from his temples; his shadow moves a half-step behind him. His songs are the only honest history left in Vhasia. He sings the names of the dead every dusk. The dead listen—and sometimes, they answer."
     },
     {
@@ -282,9 +282,9 @@
       "suit": "heart",
       "title": "Duchy Constable",
       "subtitle": "",
-      "description": "Splendid armour, empty coffers, pride swollen as a banner; glory over gold.",
-      "flavor": "His armour was his grandfather's. It still has the dent from a Fenwood axe. He serves Valdais because Valdais pays—but he served the old king first. He cannot forgive himself for surviving Lence. The dent weeps rust.",
-      "mechanical_hook": "He will enforce the law with zeal, but can be swayed by a promise of honour or a reminder of Lence."
+      "description": "Splendid armor, empty coffers, pride swollen as a banner; glory over gold.",
+      "flavor": "His armor was his grandfather's. It still has the dent from a Fenwood axe. He serves Valdais because Valdais pays—but he served the old king first. He cannot forgive himself for surviving Lence. The dent weeps rust.",
+      "mechanical_hook": "He will enforce the law with zeal, but can be swayed by a promise of honor or a reminder of Lence."
     },
     {
       "rank": 7,
@@ -338,7 +338,7 @@
       "subtitle": "",
       "description": "Riverside keep in the west; weaves alliances as if they were dowries.",
       "flavor": "She has outlived three husbands and two sons. She is not mourning. She is waiting. Her grand-nephew—real or false—will sit on the Sun Court. She will not live to see it. She has made her peace with that. The peace tastes of Lence.",
-      "mechanical_hook": "An audience with her can grant a Queen's Audience (Diamond) but she always expects a favour in return."
+      "mechanical_hook": "An audience with her can grant a Queen's Audience (Diamond) but she always expects a favor in return."
     },
     {
       "rank": 13,
@@ -626,15 +626,15 @@
     },
     {
       "name": "Vhasian Chivalry & the Round of Five Virtues",
-      "description": "The knights of the western cantons (Ethor, Adria) follow the Round of Five Virtues: Courage, Courtesy, Mercy, Prowess, Truth. In a formal joust or a legal duel, the GM may award Victory by Virtue rather than by blood: the combatant with the higher Virtue score wins the dispute, even if they lost the physical exchange. This is the law of the tilt and the law of the court. But at Lence, the Fenwoods showed no mercy. The knights still argue about whether chivalry died there—or whether it was already a corpse, dressed in armour, a thin veneer over savagery. And sometimes, they whisper that the first crack in the sun came not from the Fenwoods' swords, but from the marriage beds where queens bore sons to two kings—and the sons who never knew which father's blood they carried."
+      "description": "The knights of the western cantons (Ethor, Adria) follow the Round of Five Virtues: Courage, Courtesy, Mercy, Prowess, Truth. In a formal joust or a legal duel, the GM may award Victory by Virtue rather than by blood: the combatant with the higher Virtue score wins the dispute, even if they lost the physical exchange. This is the law of the tilt and the law of the court. But at Lence, the Fenwoods showed no mercy. The knights still argue about whether chivalry died there—or whether it was already a corpse, dressed in armor, a thin veneer over savagery. And sometimes, they whisper that the first crack in the sun came not from the Fenwoods' swords, but from the marriage beds where queens bore sons to two kings—and the sons who never knew which father's blood they carried."
     },
     {
       "name": "The Armor Closes / The Song Escapes (Chivalric Timers)",
-      "description": "The Cantor Alain, bearer of the Cracked Ring, sings a warning at every tourney: Armor Closes [6] advances when knights choose protection over mercy, when gorgets are buckled tight, when chivalry becomes siege mentality. When full, the cantons close their borders and the raids become wars. The Fenwoods taught Vhasia that mercy is a weakness. The knights have not forgotten. They wear their gorgets to bed. Song Escapes [8] advances when a Cantor sings the truth, when mercy is shown, when armour is unbuckled. When full, a moment of genuine connection occurs—though it may be fatal. The Cantor Alain has been trying to fill this timer for ten years. He is still trying. He sings every dusk. The dead listen—and sometimes they answer."
+      "description": "The Cantor Alain, bearer of the Cracked Ring, sings a warning at every tourney: Armor Closes [6] advances when knights choose protection over mercy, when gorgets are buckled tight, when chivalry becomes siege mentality. When full, the cantons close their borders and the raids become wars. The Fenwoods taught Vhasia that mercy is a weakness. The knights have not forgotten. They wear their gorgets to bed. Song Escapes [8] advances when a Cantor sings the truth, when mercy is shown, when armor is unbuckled. When full, a moment of genuine connection occurs—though it may be fatal. The Cantor Alain has been trying to fill this timer for ten years. He is still trying. He sings every dusk. The dead listen—and sometimes they answer."
     },
     {
       "name": "Local Patrons (Syncretic Names)",
-      "description": "Seint Michel, the Judge of the Scar (Mykkiel): The law that does not bend; the judge who cannot be bought. His shrines are at tourney fields and courtrooms. Knights swear oaths on his scale before the joust. Seint Isabeau, Who Slumbers Amongst the Lilies (Ikasha): The dream of setting aside the crown; the mercy of forgetting duty. Her groves demand that armour be unbuckled at the threshold. Seint Evroul of the Cairn (Mor'iraath): The oath that outlasts the oath-taker; the blood-price paid in stone. The barrow-kings demand tribute in stories, not gold. The Cantor's Road (The Traveler): The road that belongs to no lord; the path that finds its own way. Cantors are immune to chivalric protection—but subject to its violence."
+      "description": "Seint Michel, the Judge of the Scar (Mykkiel): The law that does not bend; the judge who cannot be bought. His shrines are at tourney fields and courtrooms. Knights swear oaths on his scale before the joust. Seint Isabeau, Who Slumbers Among the Lilies (Ikasha): The dream of setting aside the crown; the mercy of forgetting duty. Her groves demand that armor be unbuckled at the threshold. Seint Evroul of the Cairn (Mor'iraath): The oath that outlasts the oath-taker; the blood-price paid in stone. The barrow-kings demand tribute in stories, not gold. The Cantor's Road (The Traveler): The road that belongs to no lord; the path that finds its own way. Cantors are immune to chivalric protection—but subject to its violence."
     }
   ],
   "lore_echoes": [
@@ -643,8 +643,8 @@
       "description": "The Order of the Gilded Scale maintains the Chivalric Roll—a record of every oath sworn and broken in the cantons. A page torn from this roll can serve as a single-use Claim String (gain +1 Position in any court). The Order's justiciars are feared and respected; they never unbuckle their gorgets, and they have never lost a case. The Queen-Mother keeps a copy in her riverside keep, wrapped in a gray shroud. The page that records the Fenwood oath of safe passage—broken at Lence—is still blank. The Order will not write it. They are afraid of what will happen if they do. The blank page smells of smoke."
     },
     {
-      "title": "Seint Isabeau, Who Slumbers Amongst the Lilies (Ikasha)",
-      "description": "In the Ethorian marches, knights whisper prayers to Seint Isabeau when they long to set aside their steel. Her shrine is a hawthorn grove where armour must be left at the gate. Pilgrims who enter bare-skinned and speak a true regret find that their next wound heals in a single night—but they dream of a woman in white who asks, 'Will you remember how to be touched?' Those who return to the grove a second time are never seen again. The knights who survived Lence do not go near the grove. They are afraid of what they might forget—or what they might remember."
+      "title": "Seint Isabeau, Who Slumbers Among the Lilies (Ikasha)",
+      "description": "In the Ethorian marches, knights whisper prayers to Seint Isabeau when they long to set aside their steel. Her shrine is a hawthorn grove where armor must be left at the gate. Pilgrims who enter bare-skinned and speak a true regret find that their next wound heals in a single night—but they dream of a woman in white who asks, 'Will you remember how to be touched?' Those who return to the grove a second time are never seen again. The knights who survived Lence do not go near the grove. They are afraid of what they might forget—or what they might remember."
     },
     {
       "title": "Seint Evroul of the Cairn (Mor'iraath)",
@@ -690,7 +690,7 @@
       "**Exposure:** Rival officials or court guards take notice.",
       "**Noise:** Parlement clerks or routier patrols are alerted.",
       "**Trace:** Trackers or tax collectors mark your route.",
-      "**Delay:** A setback costs time or a favourable legal window.",
+      "**Delay:** A setback costs time or a favorable legal window.",
       "**Supply Strain:** Mark +1 segment on a relevant resource timer.",
       "**Lence Echo:** A flash of smoke, a distant scream, a child's face in a window. The memory of the sack surfaces. The GM gains 1 SB to spend on a fear effect. The fear is always the same: that it will happen again."
     ],
@@ -845,7 +845,7 @@
     "song_escapes_timer": {
       "name": "Song Escapes",
       "max_segments": 8,
-      "description": "Advances when a Cantor sings the truth, when mercy is shown, when armour is unbuckled. When full, a moment of genuine connection occurs—though it may be fatal. The Cantor Alain has been trying to fill this timer for ten years. He is still trying. He sings every dusk. The dead listen—and sometimes they answer."
+      "description": "Advances when a Cantor sings the truth, when mercy is shown, when armor is unbuckled. When full, a moment of genuine connection occurs—though it may be fatal. The Cantor Alain has been trying to fill this timer for ten years. He is still trying. He sings every dusk. The dead listen—and sometimes they answer."
     },
     "claimants_coup": {
       "name": "Claimant's Coup (per claimant)",
@@ -976,7 +976,7 @@
       "Tie rewards to visible symbols (seals, badges, writs) that can be challenged, stolen, or voided—especially if they bear the old king's seal or the Fenwood mark.",
       "Let rival claimants issue conflicting authorities, forcing players to choose whose favor matters more—and whose memory of Lence they are willing to invoke.",
       "Use the parlements, cathedrals, and châteaux as arenas for social contests, where knowledge of law and custom determines success—and where the mere mention of the Fenwood name can shift the tide.",
-      "Introduce the Lence's Shadow mechanic: whenever a scene involves a legal dispute, a military manoeuvre, or a negotiation with a noble who lost family in the sack, the GM may spend 1 SB to invoke the memory of the burning. The Position worsens by one step, and the losing party may gain the Haunted condition.",
+      "Introduce the Lence's Shadow mechanic: whenever a scene involves a legal dispute, a military maneuver, or a negotiation with a noble who lost family in the sack, the GM may spend 1 SB to invoke the memory of the burning. The Position worsens by one step, and the losing party may gain the Haunted condition.",
       "Use the Armor Closes and Song Escapes timers as a visible campaign front. The party's actions—acts of mercy or cruelty—tick one or the other. When the Armor Closes, the cantons become fortresses; when the Song Escapes, a moment of genuine connection may change everything—or kill everyone."
     ]
   },

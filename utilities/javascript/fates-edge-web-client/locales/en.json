@@ -4,7 +4,7 @@
     "name": "English",
     "nativeName": "English",
     "dir": "ltr",
-    "note": "Source catalogue. Every other locale is a translation of THIS file; run `npm run i18n:report` after editing to see which locales fell behind."
+    "note": "Source catalog. Every other locale is a translation of THIS file; run `npm run i18n:report` after editing to see which locales fell behind."
   },
   "app": {
     "name": "Fate's Edge",
@@ -712,8 +712,8 @@
     "core.local-lock.confirmPassword": "Confirm password:",
     "core.local-lock.incorrectPassword": "❌ Incorrect password.",
     "core.local-lock.invalidResetCode": "❌ Invalid reset code.",
-    "core.local-lock.lockCancelledNoPasswordSet": "Lock cancelled — no password set.",
-    "core.local-lock.passwordsDidNotMatchLockCancelled": "Passwords did not match. Lock cancelled.",
+    "core.local-lock.lockCancelledNoPasswordSet": "Lock canceled — no password set.",
+    "core.local-lock.passwordsDidNotMatchLockCancelled": "Passwords did not match. Lock canceled.",
     "core.local-lock.setALocalLockPasswordStoredOnly": "Set a local lock password (stored only on this device):",
     "core.media.alreadyRecording": "Already recording.",
     "core.media.couldNotStartLiveTranscriptionRecordingContinues": "Could not start live transcription. Recording continues without it.",

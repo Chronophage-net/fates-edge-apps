@@ -50,7 +50,7 @@ Background document indexing, a wiki that reflects its data, and a quieter contr
 - `tests/unit/bestiary-schema.test.js` asserted against `payload.data.length`, hardcoding the `{_license, data}` envelope that a copyright-stamping script had briefly imposed on every top-level array in the repo. It now reads whichever shape the file is in, matching `parseBestiary()`'s own tolerance.
 
 ### Changed
-- **`data/wiki.json` cleaned** (307 entries, was 308 with one duplicate pair). 52 entries had an entire scraped card mashed into the `title` field with backslash separators — split into `title`, `subtitle`, `card` and a labelled body. TeX escaping (`\&`, ` ``quoted'' `, `---`) removed from every user-visible string. 34 patron entries backfilled with real lore from `data/patrons/*.json`. The 62 entries that genuinely have no text are marked `stub` and render as "No description recorded for this entry yet", sorted last, rather than as blank cards.
+- **`data/wiki.json` cleaned** (307 entries, was 308 with one duplicate pair). 52 entries had an entire scraped card mashed into the `title` field with backslash separators — split into `title`, `subtitle`, `card` and a labeled body. TeX escaping (`\&`, ` ``quoted'' `, `---`) removed from every user-visible string. 34 patron entries backfilled with real lore from `data/patrons/*.json`. The 62 entries that genuinely have no text are marked `stub` and render as "No description recorded for this entry yet", sorted last, rather than as blank cards.
 - **Control weight is now a hierarchy** (`DESIGN.md` § "Control weight"). `.btn-danger` is restyled rather than rewritten at its 71 call sites: transparent and faint by default, red only on hover or keyboard focus, with `.btn-danger.is-loud` to opt back in for a confirmation dialog's confirming button. New `.btn-utility` (37 refresh/reload/rebuild/load-defaults buttons migrated to it), `.btn-quiet`, and `.btn-icon`. On wiki cards the per-entry tools fade to 45% until hover or focus-within, and stay solid on touch devices; they never leave the tab order.
 - Wiki search now matches subtitles and regions, not just title/body/tags, and entries whose text is missing sort below entries that have something to read.
 - The Search tab's "🔄 Rebuild Index" is now a quiet "Rebuild index" utility control, and its status line reports live indexing progress (`Indexing documents… 42/198`).
@@ -75,19 +75,19 @@ Internationalisation groundwork — the interface can now be translated
 
 ### Added
 - `js/core/i18n.js`: a dependency-free i18n runtime — `t()`/`tn()` with `{{placeholder}}` interpolation and `Intl.PluralRules`-based plurals, `Intl`-backed number/date/list/relative-time helpers, a locale registry that packs can extend via `registerLocale()` (mirroring `theme-manager.js`'s `registerTheme()`), and `applyTranslations()` for `data-i18n` / `data-i18n-html` / `data-i18n-attr` markup.
-- `locales/en.json`, the source catalogue for the app shell (navigation, footer, modals, keyboard-shortcut list, X-Card, password/lock gates, the new Language panel), plus `locales/index.js` listing the shipped languages.
+- `locales/en.json`, the source catalog for the app shell (navigation, footer, modals, keyboard-shortcut list, X-Card, password/lock gates, the new Language panel), plus `locales/index.js` listing the shipped languages.
 - `locales/en-x-pseudo.js`: a pseudolocale generated from `en.json` at import time (`[Ŝèttîngš ··]`) for finding strings that never went through `t()` and layouts that break when words run ~30% longer. Hidden from the normal picker behind a "Show the translation-test locale" toggle.
 - **Settings → Language**: a picker with a "Match my browser" option, a live status line reporting how much of the active language is actually translated, and a note that game content is not translated.
 - `npm run i18n:report` (translation + extraction coverage, `--strict` for CI) and `npm run i18n:new -- <code> "<Name>" "<Native name>"` (scaffolds a locale file).
 - [`TRANSLATION.md`](TRANSLATION.md) — a translator's guide and the developer conventions for adding translatable strings.
-- 26 unit tests covering fallback behaviour, interpolation, plurals, locale switching, DOM application, and a guard that fails if `index.html`'s `data-i18n` keys drift away from `en.json`.
+- 26 unit tests covering fallback behavior, interpolation, plurals, locale switching, DOM application, and a guard that fails if `index.html`'s `data-i18n` keys drift away from `en.json`.
 
 ### Changed
 - `index.html`'s shell is annotated with `data-i18n` attributes. The English text stays inline and remains the fallback; no visible text changed.
 - `js/app.js` awaits `initI18n()` before rendering, and re-translates the shell plus `refreshCurrentTab()` when the language changes.
 
 ### Notes
-- Nothing here can blank out the UI: a missing key, an unknown locale, or a catalogue that fails to load all fall back to the English that was already there, and `initI18n()` never rejects.
+- Nothing here can blank out the UI: a missing key, an unknown locale, or a catalog that fails to load all fall back to the English that was already there, and `initI18n()` never rejects.
 - Feature modules still render English inline; extraction is meant to proceed feature by feature, and `npm run i18n:report` names the largest remaining pockets.
 - Right-to-left languages get `dir="rtl"` on the document, but `css/app.css` still uses physical `left`/`right` properties in places — an RTL translation needs a CSS pass alongside it.
 
