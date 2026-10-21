@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-12T17:00:02.686Z",
+  "generated": "2026-10-21T23:17:29.169Z",
   "documents": [
     {
       "id": "srd",
@@ -466,6 +466,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "blood_and_silk",
+      "title": "Blood and Silk",
+      "file": "Fates_-_Edge_-_-Blood-_-and-_-Silk.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -1501,6 +1511,16 @@
       "active": true
     },
     {
+      "id": "the_lady_under_the_waves",
+      "title": "The Lady Under the Waves",
+      "file": "Fates_-_Edge_-_-The-_-Lady-_-Under-_-the-_-Waves.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_last_blade",
       "title": "The Last Blade",
       "file": "Fates_-_Edge_-_-The-_-Last-_-Blade.html",
@@ -1905,7 +1925,7 @@
       "active": true
     }
   ],
-  "total_count": 131,
-  "active_count": 131,
+  "total_count": 133,
+  "active_count": 133,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
