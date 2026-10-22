@@ -2,6 +2,12 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## 2026-10-22 — Crafting documentation and regional English fixes
+
+- Sync the canonical GM downtime chapter's shared crafting procedure, replacing the obsolete one-roll summary. The canonical HTML and LaTeX sources now agree, so future syncs retain the fix.
+- Restore British spellings in en-GB after the earlier American-English conversion; keep default English and en-US unchanged. Extend regional-locale coverage to wizard labels, the licence notice and interpolated spellbook text.
+- Validation: all 470 tests pass, the production build succeeds, and npm audit reports zero vulnerabilities.
+
 ## 2026-10-22 — Dependency security patches
 
 - Update DOMPurify to 3.4.17, clearing its sanitizer advisories and the inherited findings in jsPDF and jsPDF-AutoTable. The PDF libraries share the patched dependency.

@@ -244,11 +244,18 @@ describe('i18n: regional English', () => {
         const options = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' };
         await setLocale('en-US', { persist: false });
         assertEqual(t('feature.characters.editor.armor'), 'Armor');
+        assertEqual(t('feature.characters.wizard.armor_148gn'), 'Armor:');
+        assertEqual(t('modal.license'), '📜 License Notice');
+        assertEqual(t('feature.spellcraft.components.spellbook.unknownTagsValueTheyWillBeIncluded', { value0: 'test' }), 'Unknown tags: test. They will be included but have no color.');
         assertEqual(formatDate(date, options), '09/05/2026');
         await setLocale('en-GB', { persist: false });
         assertEqual(t('feature.characters.editor.armor'), 'Armour');
+        assertEqual(t('feature.characters.wizard.armor_148gn'), 'Armour:');
+        assertEqual(t('modal.license'), '📜 Licence Notice');
+        assertEqual(t('feature.spellcraft.components.spellbook.unknownTagsValueTheyWillBeIncluded', { value0: 'test' }), 'Unknown tags: test. They will be included but have no colour.');
         assertEqual(formatDate(date, options), '05/09/2026');
         await setLocale('en', { persist: false });
+        assertEqual(t('feature.characters.editor.armor'), 'Armor');
     });
 });
 

@@ -120,7 +120,7 @@
 @media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
 @media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
 </style></head>
-<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 9 · Downtime</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-08-_-Travel-_-Framework.html">Previous chapter</a><a href="GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Chapter 9: Downtime Management</a></li><li><a href="#gm-procedures">GM Procedures for Running Downtime</a></li><li><a href="#downtime-ref">Common Downtime Rolls Reference (GM)</a></li><li><a href="#rush-rules">Rush Rules: GM Procedures for Risk Timers</a></li><li><a href="#downtime-timers">Using Downtime to Advance Campaign Timers</a></li><li><a href="#echo-system">Handling Off-Screen Characters: The Echo System</a></li><li><a href="#downtime-advice">Additional Downtime Tools and Advice (GM)</a></li><li><a href="#cheat-sheet">Downtime Quick Reference (GM Cheat Sheet)</a></li></ul></details>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 9 · Downtime</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-08-_-Travel-_-Framework.html">Previous chapter</a><a href="GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Chapter 9: Downtime Management</a></li><li><a href="#gm-procedures">GM Procedures for Running Downtime</a></li><li><a href="#downtime-ref">Common Downtime Rolls Reference (GM)</a></li><li><a href="#crafting-bench">Running Crafting at the Bench</a></li><li><a href="#rush-rules">Rush Rules: GM Procedures for Risk Timers</a></li><li><a href="#downtime-timers">Using Downtime to Advance Campaign Timers</a></li><li><a href="#echo-system">Handling Off-Screen Characters: The Echo System</a></li><li><a href="#downtime-advice">Additional Downtime Tools and Advice (GM)</a></li><li><a href="#cheat-sheet">Downtime Quick Reference (GM Cheat Sheet)</a></li></ul></details>
 <h1 id="reader-section-1">Chapter 9: Downtime Management</h1>
 <p class="subtitle">Fate's Edge GM Guide — Chapter 9</p>
 <p>Downtime is the narrative space between adventures — days, weeks, or even months when characters rest, train, build assets, settle debts, and pursue personal projects. <strong>As GM, your role is to:</strong></p>
@@ -174,13 +174,39 @@
 <tr><td>Learn a New Talent</td><td>appropriate Attribute + Lore</td><td>5</td><td>Advance 1 segment on a Talent Acquisition Timer [6].</td></tr>
 <tr><td>Clear Obligation</td><td>Spirit + Lore (act of service)</td><td>3</td><td>Reduce Obligation by 1 segment (you describe the act).</td></tr>
 <tr><td>Carouse for Information</td><td>Presence + Deception</td><td>3</td><td>Gain a rumor or a minor String.</td></tr>
-<tr><td>Craft an Item</td><td>Wits + Craft</td><td>DV by item (3–5)</td><td>Create a mundane or minor magical item.</td></tr>
+<tr><td>Craft a Provision or Work</td><td>Attribute + Craft</td><td>2–5+ by ambition</td><td>Finish a Provision or advance a Work's Project Timer; use the bench procedure below.</td></tr>
+<tr><td>Craft a Wonder</td><td>Attribute + Arcana</td><td>2–5+ by ambition</td><td>Advance the Project Timer; charge XP and mark Obligation when the Wonder is finished.</td></tr>
 <tr><td>Research a Topic</td><td>Wits + Insight</td><td>4</td><td>Gain one piece of true information (you may be cryptic).</td></tr>
 <tr><td>Manage an Asset</td><td>Presence + Sway</td><td>3</td><td>Reduce or prevent condition degradation.</td></tr>
 <tr><td>Establish a Contact</td><td>Presence + Sway</td><td>4</td><td>Gain a new Minor String.</td></tr>
 <tr><td>Reduce a Debt Timer</td><td>Presence + Sway or service roll</td><td>4</td><td>Clear 1–2 segments (your discretion).</td></tr>
 <tr><td>Train a Follower</td><td>Spirit + Sway</td><td>4</td><td>Improve Follower Cap by 1 (requires Training Timer).</td></tr>
 </table></div></div>
+<section id="crafting-gm">
+<h2 id="crafting-bench">Running Crafting at the Bench</h2>
+<p>Use the <a href="../srd/crafting.html#crafting-reference">SRD's bench procedure</a> when a player makes something. Agree on the intended result, the work it requires, and the conditions at the bench before calling for a roll. A successful project roll advances that work; it does not finish every kind of item at once.</p>
+<h3>Set the Project and the Roll</h3>
+<ul>
+<li><strong>Provision:</strong> a single-use item, resolved with one roll and no Project Timer. It costs the scene and materials, with no XP cost.</li>
+<li><strong>Work:</strong> a lasting mundane item of real quality. Set a Project Timer [4] or [6]; it costs skill and time, with no XP cost.</li>
+<li><strong>Wonder:</strong> an enchanted item. Set a Project Timer [6], [8], or [10]; its XP and Obligation costs come due at completion.</li>
+</ul>
+<p>Roll <strong>Attribute + Craft</strong> for a Provision or Work, or <strong>Attribute + Arcana</strong> for a Wonder. Choose the Attribute from the approach: Wits to plan and measure, Body to forge, Spirit to coax, or Presence to direct a workshop. Set DV by ambition: 2 for mending or familiar repetition, 3 for competent new work, 4 at the edge of the craft, and 5+ for something nobody has made.</p>
+<p><strong>Materials set Position.</strong> Suitable materials, tools, workspace, and unhurried time give Dominant; adequate conditions give Controlled; improvisation or pressure gives Desperate. Establish those conditions through the fiction rather than counting reagents.</p>
+<h3>Resolve One Action at a Time</h3>
+<p>Allow one roll per downtime action or scene spent at the bench. For a Work or Wonder, use these results:</p>
+<ul>
+<li><strong>Clean Success:</strong> fill 2 segments.</li>
+<li><strong>Success with Story Beats:</strong> fill 2 segments and bank the rolled Story Beats. The workshop's noise, smoke, or visitors offer immediate ways to spend them.</li>
+<li><strong>Partial:</strong> the player chooses 1 segment clean, or 2 segments with a named <strong>Flaw</strong> in the item. Award 1 Boon either way.</li>
+<li><strong>Miss:</strong> fill no segments, award 2 Boons, and introduce the consequence in the fiction.</li>
+</ul>
+<p>A Provision is finished on success. On a Partial, the player can finish it with a Flaw or leave it unfinished for another action; on a Miss it remains unfinished. Apply the same Boon awards. A Work or Wonder exists when its Timer fills. Keep any Flaws accumulated along the way: a later success does not erase them. Removing a named Flaw is a separate project at <strong>DV 4, Timer [4]</strong>.</p>
+<h3>Wonders, Upkeep, and Gathering</h3>
+<p>At completion, charge the Wonder's tier cost: <strong>Minor 2, Major 4, Prestige 6, Epic 8 XP</strong>. Mark <strong>Obligation</strong> of 1, 2, 3, or 4 respectively, even if the maker has no named Patron. Record who or what answered rather than treating the debt as waived.</p>
+<p>A character may be attuned to <strong>three Wonders</strong> at once; attuning or releasing one takes a quiet scene. Each attuned Wonder requires upkeep every downtime: max(1, its XP cost ÷ 3, rounded up) in XP, or 1 XP and a downtime scene. Unpaid upkeep moves it through <strong>Maintained → Neglected → Compromised</strong>; a Compromised Wonder's enchantment is inert until repaired. Found Artifacts instead take Obligation on their own terms, with no XP cost, upkeep, or decay.</p>
+<p>Once per downtime, a character may gather with <strong>Wits + Lore</strong> in a settlement or archive, or <strong>Wits + Endurance</strong> in the wild. Set DV by rarity: 2 for common, 3 for uncommon, 4 for rare, and 5 for an ingredient with a name of its own. Success establishes the right materials and gives Dominant at the bench for <strong>one project</strong>.</p>
+</section>
 <h2 id="rush-rules">Rush Rules: GM Procedures for Risk Timers</h2>
 <p>Players can attempt to rush downtime activities. <strong>As GM, follow this procedure:</strong></p>
 <ol>
