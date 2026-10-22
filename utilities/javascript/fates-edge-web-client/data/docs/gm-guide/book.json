@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-23T13:10:57.595827+00:00",
+  "generated": "2026-10-22T23:08:35.049901+00:00",
   "id": "gm_guide",
   "title": "GM Guide",
   "subtitle": "A Comprehensive Guide for the Fate's Edge Game Master",
@@ -15,6 +15,11 @@
       "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
       "label": "Chapter 2",
       "title": "Core Procedures"
+    },
+    {
+      "file": "GM-_-Guide-_-02a-_-The-_-GMs-_-Job.html",
+      "label": "Chapter 2a",
+      "title": "The GMs Job"
     },
     {
       "file": "GM-_-Guide-_-03-_-Managing-_-Resources.html",

@@ -28,6 +28,8 @@ const EXCLUDED_FILE_PATTERN = /manifest.*\.json(\.tmp)?$/i;
 // ─── Category mapping: subdir → category info ────────────────────
 const CATEGORY_MAP = {
   'es': { id: 'es', label: 'Español', path: '/data/docs/es/' },
+  'de': { id: 'de', label: 'Deutsch', path: '/data/docs/de/' },
+  'fr': { id: 'fr', label: 'Français', path: '/data/docs/fr/' },
   'core': { id: 'core', label: 'Core', path: '/data/docs/core/' },
   'quickstart': { id: 'quickstart', label: 'Quickstart', path: '/data/docs/quickstart/' },
   'srd': { id: 'core', label: 'Core', path: '/data/docs/srd/', book: true },
@@ -63,6 +65,12 @@ const SUBDIRS = Object.keys(CATEGORY_MAP);
 
 // Curated shelf copy; keep filename-derived IDs stable for saved reading links.
 const DOC_METADATA = {
+  'novels/index.html': {
+    id: 'novels_catalog',
+    title: 'Novels & Novellas — Catalog',
+    description: 'Browse the complete long-form fiction collection.',
+    author: 'Nicholas A. Gasper',
+  },
   'expansions/Fates_-_Edge_-_-The-_-Five-_-Daughters-_-of-_-Inaea.html': {
     title: 'The Five Daughters of Inaea',
     description: 'Romance, devotion, and dangerous promises: the Iron Rose, five practices, rival faiths, and a sanctuary adventure.',
@@ -195,11 +203,11 @@ function generateDocsManifest(docsPath) {
     for (const file of files) {
       if (!/\.(html|pdf)$/i.test(file)) continue;
       if (EXCLUDED_FILES.has(file)) continue;
-      if (file.toLowerCase() === 'index.html') continue;
+      if (file.toLowerCase() === 'index.html' && !DOC_METADATA[`${subdir}/${file}`]) continue;
 
       // Fiction titles may change while their filenames and saved document IDs stay stable.
-      // Spanish editions also carry their accented reader-facing title in the HTML.
-      const localizedTitle = ['es', 'novels', 'design'].includes(subdir) && file.endsWith('.html')
+      // Translated editions also carry their accented reader-facing title in the HTML.
+      const localizedTitle = ['es', 'de', 'fr', 'novels', 'design'].includes(subdir) && file.endsWith('.html')
         ? fs.readFileSync(path.join(subPath, file), 'utf8').match(/<title>([^<]+)<\/title>/i)?.[1]
         : null;
       const title = localizedTitle
@@ -214,6 +222,7 @@ function generateDocsManifest(docsPath) {
         'Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-II-_-Estuary.html': 'after_the_belworth_war',
       };
       const id = (subdir === 'novels' && legacyFictionIds[file])
+        || (['de', 'fr'].includes(subdir) && `${subdir}_${generateId(title)}`)
         || generateId(['novels', 'design'].includes(subdir) ? getDocTitle(file) : title);
       const isCore = subdir === 'core';
 

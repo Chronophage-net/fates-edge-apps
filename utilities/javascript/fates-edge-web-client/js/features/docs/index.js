@@ -65,6 +65,20 @@ const UPLOADED_DOCS_KEY = 'fates-edge-uploaded-docs';
 
 // ─── Document Types (from build_config.toml) ────────────────
 const DOC_TYPES = {
+    de: {
+        label: 'Deutsch',
+        group: 'Localized',
+        folder: 'de',
+        icon: '🌐',
+        description: 'Dokumente auf Deutsch'
+    },
+    fr: {
+        label: 'Français',
+        group: 'Localized',
+        folder: 'fr',
+        icon: '🌐',
+        description: 'Documents en français'
+    },
     es: {
         label: 'Español',
         group: 'Localized',
@@ -169,7 +183,7 @@ for (const [id, type] of Object.entries(DOC_TYPES)) {
 FOLDER_TO_TYPE['tollveil'] = 'other-games';
 
 // ─── Type order for sorting ──────────────────────────────────
-const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'novels', 'travel', 'design', 'other-games', 'es', 'uploaded', 'other'];
+const TYPE_ORDER = ['core', 'quickstart', 'players-guide', 'gm-guide', 'resources', 'adventures', 'expansions', 'anthology', 'novels', 'travel', 'design', 'other-games', 'de', 'es', 'fr', 'uploaded', 'other'];
 
 // ============================================================
 // STATE

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-21T23:17:29.169Z",
+  "generated": "2026-10-22T23:10:39.918Z",
   "documents": [
     {
       "id": "srd",
@@ -122,6 +122,11 @@
           "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
           "label": "Chapter 2",
           "title": "Core Procedures"
+        },
+        {
+          "file": "GM-_-Guide-_-02a-_-The-_-GMs-_-Job.html",
+          "label": "Chapter 2a",
+          "title": "The GMs Job"
         },
         {
           "file": "GM-_-Guide-_-03-_-Managing-_-Resources.html",
@@ -400,6 +405,16 @@
       "active": true
     },
     {
+      "id": "fr_annexe_r_f_rence_rapide_fate_s_edge_guide_du_joueur_fran_ais",
+      "title": "Annexe : Référence rapide — Fate's Edge Guide du Joueur (Français)",
+      "file": "Joueurs-19-Annexe-reference-rapide.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "annotated_play_session",
       "title": "Annotated Play Session",
       "file": "Fates_-_Edge_-_-Annotated_-_Play_-_Session.html",
@@ -590,6 +605,16 @@
       "active": true
     },
     {
+      "id": "fr_fate_s_edge_d_marrage_rapide_fran_ais",
+      "title": "Fate's Edge — Démarrage rapide (Français)",
+      "file": "Demarrage-rapide.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "fate_s_edge_documento_de_referencia_del_sistema_espa_ol",
       "title": "Fate's Edge — Documento de referencia del sistema (Español)",
       "file": "Documento-de-referencia-del-sistema.html",
@@ -690,6 +715,66 @@
       "active": true
     },
     {
+      "id": "fr_fate_s_edge_guide_du_joueur_chapitre_1_d_marrage_rapide_fran_ais",
+      "title": "Fate's Edge — Guide du joueur — Chapitre 1 : Démarrage rapide (Français)",
+      "file": "Joueurs-01-Demarrage-rapide.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_fate_s_edge_guide_du_mj_liste_de_v_rification_de_la_s_ance_z_ro_fran_ais",
+      "title": "Fate's Edge — Guide du MJ — Liste de vérification de la séance zéro (Français)",
+      "file": "DJ-I-Session-zero.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_fate_s_edge_guide_du_mj_s_curit_et_inclusion_fran_ais",
+      "title": "Fate's Edge — Guide du MJ — Sécurité et inclusion (Français)",
+      "file": "DJ-E-Securite-et-inclusion.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_guide_du_mj_sitzung_null_deutsch",
+      "title": "Fate's Edge — Guide du MJ — Sitzung Null (Deutsch)",
+      "file": "SL-I-Sitzung-Null.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_fate_s_edge_guide_du_mj_tables_de_r_f_rence_essentielles_fran_ais",
+      "title": "Fate's Edge — Guide du MJ — Tables de référence essentielles (Français)",
+      "file": "DJ-A-Tables-de-reference.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_fate_s_edge_guide_essentiel_fran_ais",
+      "title": "Fate's Edge — Guide essentiel (Français)",
+      "file": "Guide-essentiel.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "fate_s_edge_inicio_r_pido_espa_ol",
       "title": "Fate's Edge — Inicio rápido (Español)",
       "file": "Inicio-rapido.html",
@@ -706,6 +791,136 @@
       "path": "/data/docs/novels/",
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_schnellstart_deutsch",
+      "title": "Fate's Edge — Schnellstart (Deutsch)",
+      "file": "Schnellstart.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_sl_leitfaden_referenztabellen_deutsch",
+      "title": "Fate's Edge — SL-Leitfaden — Referenztabellen (Deutsch)",
+      "file": "SL-A-Referenztabellen.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_sl_leitfaden_sicherheit_und_inklusion_deutsch",
+      "title": "Fate's Edge — SL-Leitfaden — Sicherheit und Inklusion (Deutsch)",
+      "file": "SL-E-Sicherheit-und-Inklusion.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_spielerhandbuch_kapitel_1_schnellstart_deutsch",
+      "title": "Fate's Edge — Spielerhandbuch — Kapitel 1: Schnellstart (Deutsch)",
+      "file": "Spieler-01-Schnellstart.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_wesentliche_regeln_deutsch",
+      "title": "Fate's Edge — Wesentliche Regeln (Deutsch)",
+      "file": "Wesentliche-Regeln.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_fate_s_edge_guide_du_joueur_chapitre_2_r_sum_de_la_cr_ation_de_personnage_fran_ais",
+      "title": "Fate's Edge Guide du Joueur — Chapitre 2 : Résumé de la création de personnage (Français)",
+      "file": "Joueurs-02-Creation-de-personnage.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_fate_s_edge_guide_du_joueur_chapitre_3_m_caniques_de_base_fran_ais",
+      "title": "Fate's Edge Guide du Joueur — Chapitre 3 : Mécaniques de base (Français)",
+      "file": "Joueurs-03-Mecaniques-completes.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_fate_s_edge_guide_du_mj_chapitre_2_proc_dures_de_base_fran_ais",
+      "title": "Fate's Edge Guide du MJ — Chapitre 2 : Procédures de base (Français)",
+      "file": "DJ-02-Procedures-de-base.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_sl_handbuch_kapitel_2_grundlegende_abl_ufe_deutsch",
+      "title": "Fate's Edge SL-Handbuch — Kapitel 2: Grundlegende Abläufe (Deutsch)",
+      "file": "SL-02-Grundlegende-Ablaeufe.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_spielerhandbuch_anhang_schnellreferenz_deutsch",
+      "title": "Fate's Edge Spielerhandbuch — Anhang: Schnellreferenz (Deutsch)",
+      "file": "Spieler-19-Anhang-Schnellreferenz.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_spielerhandbuch_kapitel_2_charaktererstellung_zusammenfassung_deutsch",
+      "title": "Fate's Edge Spielerhandbuch — Kapitel 2: Charaktererstellung — Zusammenfassung (Deutsch)",
+      "file": "Spieler-02-Charaktererstellung.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_spielerhandbuch_kapitel_3_kernmechaniken_deutsch",
+      "title": "Fate's Edge Spielerhandbuch — Kapitel 3: Kernmechaniken (Deutsch)",
+      "file": "Spieler-03-Kernmechaniken.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "de_fate_s_edge_systemreferenzdokument_srd_einstieg_der_kernmechanismus_deutsch",
+      "title": "Fate's Edge Systemreferenzdokument (SRD) — Einstieg: der Kernmechanismus (Deutsch)",
+      "file": "System-Referenzdokument.html",
+      "path": "/data/docs/de/",
+      "category": "de",
+      "categoryLabel": "Deutsch",
       "core": false,
       "active": true
     },
@@ -839,6 +1054,18 @@
       "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
+    },
+    {
+      "id": "novels_catalog",
+      "title": "Novels & Novellas — Catalog",
+      "file": "index.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true,
+      "description": "Browse the complete long-form fiction collection.",
+      "author": "Nicholas A. Gasper"
     },
     {
       "id": "paget",
@@ -1022,6 +1249,16 @@
       "path": "/data/docs/resources/",
       "category": "resources",
       "categoryLabel": "Resources",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "fr_srd_de_fate_s_edge_commencer_ici_la_m_canique_centrale_fran_ais",
+      "title": "SRD de Fate's Edge — Commencer ici : la mécanique centrale (Français)",
+      "file": "Document-de-reference-du-systeme.html",
+      "path": "/data/docs/fr/",
+      "category": "fr",
+      "categoryLabel": "Français",
       "core": false,
       "active": true
     },
@@ -1925,7 +2162,7 @@
       "active": true
     }
   ],
-  "total_count": 133,
-  "active_count": 133,
+  "total_count": 156,
+  "active_count": 156,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

@@ -2,6 +2,12 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## 2026-10-22 — Document navigation and catalog repairs
+
+- Sync repaired translated links and section anchors; include GM Guide Chapter 2a in the reading sequence.
+- Register the shipped German and French editions under their own language categories, and make the fiction catalog discoverable.
+- Add a catalog coverage check for every shipped HTML page and collision checks for the new document IDs.
+
 ## [5.15.0] - 2026-10-12
 
 - Redesign the games room with a real board preview, move guidance, and clearer Toll & Veil handoff, bidding, and card controls.
