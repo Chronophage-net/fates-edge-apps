@@ -2,6 +2,12 @@
 
 All notable changes to the Fate's Edge Web Client are logged here. This file starts at 4.2 — earlier versions (up through 4.1.2a) predate this convention and aren't reconstructed retroactively.
 
+## 2026-10-22 — Dependency security patches
+
+- Update DOMPurify to 3.4.17, clearing its sanitizer advisories and the inherited findings in jsPDF and jsPDF-AutoTable. The PDF libraries share the patched dependency.
+- Raise the Vite minimum to 8.2.4 and lock that patched release with its updated build dependencies.
+- Validation: npm audit reports zero vulnerabilities; the production build and four direct sanitizer security checks pass. The full suite passes 468/470 tests; the crafting-guide content and regional English spelling failures also reproduce in an isolated checkout with the previous dependency lockfile.
+
 ## 2026-10-22 — Document navigation and catalog repairs
 
 - Sync repaired translated links and section anchors; include GM Guide Chapter 2a in the reading sequence.
