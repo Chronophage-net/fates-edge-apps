@@ -21,6 +21,8 @@
   },
   "_note_voice": "AI GM voice narration (utils/tts-voice.js, optional -- see DISCORD_TTS_ENABLED) additionally needs an Opus encoder and FFmpeg, neither bundled here: `npm install @discordjs/opus ffmpeg-static` (or a system `ffmpeg` on PATH). @discordjs/voice alone is enough for the bot to load; playback is lazily attempted only when the feature is actually enabled, and fails soft with a log message if those are missing.",
   "overrides": {
+    "body-parser@1": "^1.20.9",
+    "undici@6": "^6.29.1",
     "proxy-addr": "^2.0.8"
   },
   "license": "MIT",

@@ -1,3 +1,9 @@
+## Dependency security update — 2026-10-24
+
+- Patch body-parser, fast-uri, and undici within their existing major versions across the web client, socket server, manager, Discord bot, and desktop client. Update Electron to 44.9.3, with a minimum of 44.9.1.
+- Add live-server regression coverage for unauthenticated crashes caused by compressed request bodies with trailing bytes; verify the tests fail on the vulnerable parser and pass after the update.
+- All seven npm audits report zero known vulnerabilities. All 753 tests in the affected projects and the production web build pass; the checksum-verified Electron runtime passes a basic macOS arm64 renderer smoke test. See SECURITY.md for scope and deployment requirements.
+
 ## [5.14.2] - 2026-10-12
 
 ### Security

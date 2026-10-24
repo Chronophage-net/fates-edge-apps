@@ -41,6 +41,61 @@ every app in the repo. Only the latest released version is actively
 supported; please update before reporting an issue if you're running an
 older tag.
 
+## Dependency security update — 2026-10-24
+
+Reviewed all seven npm lockfiles after new advisories appeared. Compatible
+dependency updates resolve the findings in the web client, socket server,
+manager, Discord bot, and desktop client; root and terminal audits were clean.
+Major-scoped overrides keep transitive dependencies on their existing major
+versions while enforcing the patched minimums.
+
+### Remediations
+
+- `body-parser` 1.20.9 in the socket server and Discord bot, and 2.4.0 in the
+  manager: malformed compressed request bodies could crash the process before
+  authentication or route matching
+  ([GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828)).
+- `fast-uri` 3.1.9 in the web and desktop toolchains: fixes URI scheme and
+  authority parsing/normalization issues
+  ([scheme handling](https://github.com/advisories/GHSA-w74x-v6f9-j3xg),
+  [host ambiguity](https://github.com/advisories/GHSA-wjr9-j795-jxcr)).
+- `undici` 6.29.1 in Discord and desktop tooling, and 7.30.1 in desktop tooling:
+  fixes compressed-response crashes, EventSource memory exhaustion, and the
+  affected 7.x integrity-check bypass
+  ([crash](https://github.com/advisories/GHSA-xjj6-f33q-929c),
+  [EventSource](https://github.com/advisories/GHSA-4qv8-2p9j-2685),
+  [integrity check](https://github.com/advisories/GHSA-f72v-6w45-q472)).
+- Electron's minimum is now 44.9.1, with 44.9.3 resolved in the lockfile, to
+  address compromised certificate authorities that could allow TLS server
+  impersonation
+  ([GHSA-jr5w-w6x2-84p9](https://github.com/advisories/GHSA-jr5w-w6x2-84p9)).
+
+### Verification and scope
+
+- All seven npm audits report **zero known vulnerabilities**, including
+  development dependencies. The 11 initial package findings included duplicate
+  dependencies across projects; they were not 11 distinct vulnerabilities.
+- All affected-project tests pass: web client 470, socket server 237, manager
+  22, Discord bot 19, desktop security 5 (**753 total**).
+- New live-server regression tests cover JSON and form bodies with gzip and
+  deflate compression, including malicious trailing bytes. Both tests fail
+  against body-parser 1.20.8 with a terminated server and pass on 1.20.9;
+  ordinary compressed requests still parse successfully.
+- URI parsing checks cover encoded schemes, multiple `@` characters in an
+  authority, and ordinary HTTPS normalization. The production web build passes.
+- Electron 44.9.3 was downloaded from its official release and verified against
+  the npm package's SHA-256 checksum. A macOS arm64 smoke test loaded a hidden
+  local page with sandboxing and context isolation enabled and confirmed that
+  the renderer could not access Node's `require`. This verifies basic runtime
+  startup, not installer packaging or the complete desktop application's OS
+  integrations on every supported platform.
+- This update audits npm dependencies only; it does not resolve the earlier
+  Python dependency-audit limitation below.
+
+Reinstall from the updated lockfiles and rebuild/restart deployed services and
+desktop installers to deploy these fixes. Updating source alone does not replace
+an already running service or an installed desktop application's runtime.
+
 ## Security sweep — 2026-10-12 (v5.14.2)
 
 This review covered the seven npm package lockfiles and security-sensitive app
