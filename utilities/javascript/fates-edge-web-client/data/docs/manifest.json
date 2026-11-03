@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-27T02:21:36.604Z",
+  "generated": "2026-11-03T03:09:55.437Z",
   "documents": [
     {
       "id": "srd",
@@ -531,6 +531,16 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "city_of_forgetting",
+      "title": "City of Forgetting",
+      "file": "Fates_-_Edge_-_-City-_-of-_-Forgetting.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -2162,7 +2172,7 @@
       "active": true
     }
   ],
-  "total_count": 156,
-  "active_count": 156,
+  "total_count": 157,
+  "active_count": 157,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
