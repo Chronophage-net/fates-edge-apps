@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-03T03:09:55.437Z",
+  "generated": "2026-11-03T03:19:48.436Z",
   "documents": [
     {
       "id": "srd",
@@ -531,16 +531,6 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
-      "core": false,
-      "active": true
-    },
-    {
-      "id": "city_of_forgetting",
-      "title": "City of Forgetting",
-      "file": "Fates_-_Edge_-_-City-_-of-_-Forgetting.html",
-      "path": "/data/docs/novels/",
-      "category": "novels",
-      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -2115,6 +2105,16 @@
       "id": "what_the_mountain_keeps",
       "title": "What the Mountain Keeps",
       "file": "Fates_-_Edge_-_-What-_-the-_-Mountain-_-Keeps.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "what_the_water_kept",
+      "title": "What the Water Kept",
+      "file": "Fates_-_Edge_-_-What-_-the-_-Water-_-Kept.html",
       "path": "/data/docs/novels/",
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
