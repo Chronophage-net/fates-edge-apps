@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-09T01:40:25.582Z",
+  "generated": "2026-11-09T02:48:07.665Z",
   "documents": [
     {
       "id": "srd",
@@ -1678,6 +1678,16 @@
       "active": true
     },
     {
+      "id": "the_harbor_of_knives",
+      "title": "The Harbor of Knives",
+      "file": "Fates_-_Edge_-_-The-_-Harbor-_-of-_-Knives.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_harvest_of_leaves",
       "title": "The Harvest of Leaves",
       "file": "Fates_-_Edge_-_-The-_-Harvest-_-of-_-Leaves.html",
@@ -2182,7 +2192,7 @@
       "active": true
     }
   ],
-  "total_count": 158,
-  "active_count": 158,
+  "total_count": 159,
+  "active_count": 159,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
