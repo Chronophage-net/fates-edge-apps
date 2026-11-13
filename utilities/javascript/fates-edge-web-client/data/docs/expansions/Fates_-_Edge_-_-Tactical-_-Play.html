@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Tactical Play</title><style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        body { max-width: 1100px; }
+        h2 { margin-top: 2.6rem; }
+        h3 { margin-top: 1.8rem; }
+        table { display: block; max-width: 100%; overflow-x: auto; }
+        .table-wrap { max-width: 100%; overflow-x: auto; }
+    </style><style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head><body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Expansions · specialist reference</strong></p><p>Read the core rules first, then this document’s scope, prerequisites, and procedures. Apply only changes it explicitly states; a missing restatement is not a general exception. The SRD and extensions in the Player’s and GM Guides remain the core reference, and the core loop still applies.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#document-title">Tactical Play</a></li><li><a href="#reading-route">How to use this book</a></li><li><a href="#what-this-module-does">What this module does</a></li><li><a href="#core-principles">Core Principles</a></li><li><a href="#the-grid">The Grid</a></li><li><a href="#movement">Movement</a></li><li><a href="#zones-of-control-zoc">Zones of Control (ZoC)</a></li><li><a href="#cover-position">Cover &amp; Position</a></li><li><a href="#flanking-rear-attacks">Flanking &amp; Rear Attacks</a></li><li><a href="#weapon-tags-grid-interactions">Weapon Tags (Grid interactions)</a></li><li><a href="#action-economy-tactical">Action Economy (Tactical)</a></li><li><a href="#position-sources-quick-lookup">Position Sources – Quick Lookup</a></li><li><a href="#line-of-sight-concealment">Line of Sight &amp; Concealment</a></li><li><a href="#example-turn">Example Turn</a></li><li><a href="#gm-guidance">GM Guidance</a></li><li><a href="#tactical-combat-cheat-sheet">Tactical Combat Cheat-Sheet</a></li><li><a href="#license">License</a></li><li><a href="#miniatures-options">Miniatures Options</a></li></ul></details><article class="fe-reading-document"><h1 id="document-title">Tactical Play</h1><section aria-labelledby="reading-route" data-fe-reader-added="reading-route"><h2 id="reading-route">How to use this book</h2><p>This is an optional grid overlay for the core combat procedure. Read <a href="#the-grid">The Grid</a>, <a href="#movement">Movement</a>, and <a href="#zones-of-control-zoc">Zones of Control</a> first. The Miniatures Options section adds footprints and facing; it follows the Position and Effect rules above where the older Miniatures Guide used different bonuses or movement values. The grid does not add hit points or replace core resolution.</p></section><p><span><strong>Fate’s Edge</strong></span><br/>
+<span><strong>Tactical Combat Module</strong> </span><br/>
+<span>Optional grid-based skirmish rules</span><br/>
+<span>Version 2.0 2026-11-13</span></p>
+<hr/>
+<h3 class="unnumbered" id="rules-compatibility">Rules compatibility</h3>
+<p>The core rules comprise the SRD plus the extensions in the Player’s Guide and GM Guide. This expansion applies only its stated additions and exceptions. Keep the core loop: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, resolve the outcome, and apply consequences.</p>
+<p>This module adds optional grid-based procedures for movement, reach, cover, Zones of Control, flanking, and facing. It uses the core resolution loop unchanged: the grid helps establish fictional position and effect but does not replace a roll, create hit points, or add a separate damage track.</p>
+<h2 class="unnumbered" id="what-this-module-does">What this module does</h2>
+<ul>
+<li><p>Adds a <em>grid</em> (square or hex, 5 ft cells) to measure distance, line of sight, and reach.</p></li>
+<li><p>Introduces <em>movement rates</em>, <em>terrain costs</em>, <em>zones of control (ZoC)</em>, and <em>flanking</em> – all converted directly into the existing <em>Position</em> ladder.</p></li>
+<li><p>All actions resolved with standard <code>Attribute + Skill</code> pools, Story Beats (SB), Boons, and Position/Effect outcomes.</p></li>
+<li><p><strong>No HP, no new damage tracks.</strong> Harm and Fatigue work exactly as in the core rules.</p></li>
+<li><p>Completely optional – use for one encounter, a whole campaign, or never.</p></li>
+</ul>
+<hr/>
+<h2 id="core-principles">Core Principles</h2>
+<ol>
+<li><p><strong>Narrative first.</strong> The grid is a storytelling tool. Every move must be described in fiction.</p></li>
+<li><p><strong>No mechanics changes.</strong> Dice pools, Story Beats (SB), Boons, Position and Effect work as written.</p></li>
+<li><p><strong>Predictable tactics.</strong> Cover, flanking, reach and facing give players concrete ways to gain Position before rolling.</p></li>
+</ol>
+<hr/>
+<h2 id="the-grid">The Grid</h2>
+<h3 id="scale">Scale</h3>
+<ul>
+<li><p><strong>1 square (or hex) = 5 ft.</strong> Square or hex – pick before session.</p></li>
+<li><p>Most characters occupy one cell. <em>Large</em> creatures (e.g. horse) occupy 2×2.</p></li>
+</ul>
+<h3 id="range-bands-grid-version">Range Bands (grid version)</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Close</strong></td>
+<td style="text-align: left;">Adjacent cells (melee)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Near</strong></td>
+<td style="text-align: left;">Up to 6 cells (≈30 ft)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Far</strong></td>
+<td style="text-align: left;">7–12 cells (≈35–60 ft)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Absent</strong></td>
+<td style="text-align: left;">Beyond 12 cells or off-screen</td>
+</tr>
+</tbody>
+</table></div>
+<p>Core range bands still apply; the grid just gives precise counts.</p>
+<h2 id="movement">Movement</h2>
+<h3 id="movement-rate">Movement Rate</h3>
+<ul>
+<li><p><strong>Move action:</strong> <em>Body + 3</em> cells. (Example: Body 3 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> 6 cells)</p></li>
+<li><p><strong>Dash:</strong> Use your action to double movement. After dashing, your <em>next defense</em> is at <strong>Desperate</strong>.</p></li>
+<li><p><strong>Difficult terrain:</strong> 2 movement points per cell (mud, rubble, shallow water).</p></li>
+<li><p><strong>Elevation:</strong> Moving <em>up</em> costs +1 movement point per level; moving down is free.</p></li>
+</ul>
+<h2 id="zones-of-control-zoc">Zones of Control (ZoC)</h2>
+<ul>
+<li><p>ZoC = all orthogonal (or all six) adjacent cells.</p></li>
+<li><p><strong>Entering</strong> enemy ZoC ends your movement and places you in melee (<strong>Controlled</strong> with that enemy).</p></li>
+<li><p><strong>Leaving</strong> ZoC requires a <em>Disengage</em> test: DV 4 (plus any modifiers). Failure leaves you <strong>Desperate</strong> for your next action.</p></li>
+<li><p><strong>Stacked ZoC:</strong> +1 to Disengage DV per extra enemy.</p></li>
+<li><p><strong>Pushing Through ZoC:</strong> To move through an enemy’s Zone of Control without ending movement, make a Skill test (Athletics or Acrobatics) vs DV <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mo>+</mo><mo form="prefix" stretchy="false">(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo form="postfix" stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">4 + (N-1)</annotation></semantics></math>, where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math> is the number of enemies exerting ZoC in the target path. On success, you may continue your movement through the ZoC. On failure, movement ends as normal (entering ZoC places you in melee). <em>Regardless of outcome, pushing through incurs one cost:</em></p>
+<ul>
+<li><p><strong>Gain 1 Fatigue</strong>,</p></li>
+<li><p><strong>or GM gains 1 Story Beats (SB)</strong>,</p></li>
+<li><p><strong>or your next action suffers <strong>Risky</strong> (if currently <strong>Controlled</strong>) or <strong>Desperate</strong> (if currently <strong>Risky</strong>)</strong>.</p></li>
+</ul>
+<p><em>(Higher skill ranks improve success chance—veterans thread through chaos where novices falter.)</em></p></li>
+</ul>
+<h2 id="cover-position">Cover &amp; Position</h2>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Partial cover (low wall)</strong></td>
+<td style="text-align: left;">Defender gains <strong>Controlled</strong> against ranged attacks only.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Full cover (solid wall)</strong></td>
+<td style="text-align: left;">Defender gains <strong>Controlled</strong> against all attacks; attacker gains <strong>Dominant</strong> when defending against that target.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Cover can be destroyed (GM spends Story Beats (SB)).</p>
+<h2 id="flanking-rear-attacks">Flanking &amp; Rear Attacks</h2>
+<ul>
+<li><p><strong>Flanking:</strong> Two allies on opposite sides of a target (orthogonal or hex). Next attacker gains <strong>Dominant</strong> for that attack.</p></li>
+<li><p><strong>Rear attack:</strong> Attacker directly behind target. Gain <strong>Dominant</strong> <em>and</em> upgrade <em>Standard</em> to <em>Great</em> for that strike.</p></li>
+</ul>
+<h2 id="weapon-tags-grid-interactions">Weapon Tags (Grid interactions)</h2>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong><strong>Tag</strong></strong></th>
+<th style="text-align: left;"><strong>Grid Effect</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><em>[Reach]</em></strong></td>
+<td style="text-align: left;">Can attack up to 2 cells away (Near). Enemies without Reach suffer –1 Position when trying to close.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><em>[Fast]</em></strong></td>
+<td style="text-align: left;">After a successful melee hit, shift 1 cell (no ZoC trigger).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><em>[Set]</em></strong></td>
+<td style="text-align: left;">Plant weapon as an action. Any enemy that charges into that cell (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">\ge4</annotation></semantics></math> cells straight) triggers an automatic attack at +1 Effect.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><em>[Brutal]</em></strong></td>
+<td style="text-align: left;">On a hit, push target 1 cell orthogonally. Target’s next defensive Position drops one step.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="action-economy-tactical">Action Economy (Tactical)</h2>
+<p>Each turn:</p>
+<ol>
+<li><p><strong>One Action</strong> – attack, cast, use skill, activate talent, etc.</p></li>
+<li><p><strong>One Move</strong> – up to movement rate (can be taken before, after, or split around the action).</p></li>
+</ol>
+<p>Exceptions: Dashing uses the Action, no separate attack that turn (unless a talent gives a free attack).</p>
+<h2 id="position-sources-quick-lookup">Position Sources – Quick Lookup</h2>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong><strong>Situation</strong></strong></th>
+<th style="text-align: left;"><strong>Position Change</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Partial cover (defender)</strong></td>
+<td style="text-align: left;"><strong>Controlled</strong> (ranged only)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Full cover (defender)</strong></td>
+<td style="text-align: left;"><strong>Controlled</strong> (all attacks)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Flanking (attacker)</strong></td>
+<td style="text-align: left;"><strong>Dominant</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Rear attack (attacker)</strong></td>
+<td style="text-align: left;"><strong>Dominant</strong> + <em>Great</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dashing (defender next)</strong></td>
+<td style="text-align: left;"><strong>Desperate</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Disengage failure (defender)</strong></td>
+<td style="text-align: left;"><strong>Desperate</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Spend a Boon before roll</strong></td>
+<td style="text-align: left;">Shift Position up one step</td>
+</tr>
+</tbody>
+</table></div>
+<p>All other Position assignments follow the core rules (terrain, surprise, etc.).</p>
+<h2 id="line-of-sight-concealment">Line of Sight &amp; Concealment</h2>
+<ul>
+<li><p>Line of sight blocked by solid obstacles (walls, large creatures, dense forest). GM may call for Notice/Stealth if partially concealed.</p></li>
+<li><p>Concealment (fog, smoke, darkness) gives the defender <strong>Controlled</strong> against ranged attacks. Melee unaffected unless attacker must enter the concealed area.</p></li>
+</ul>
+<h2 id="example-turn">Example Turn</h2>
+<ol>
+<li><p>Harper (Body 4, Melee 5) stands 5 cells from a guard behind a low wall (partial cover).</p></li>
+<li><p>Harper dashes 12 cells, ending adjacent (enters guard’s ZoC). Guard now <strong>Controlled</strong>, Harper <strong>Dominant</strong> for his attack.</p></li>
+<li><p>Valeros is already on the opposite side – flanking active.</p></li>
+<li><p>Harper attacks at <strong>Dominant</strong> (flanking bonus). Rolls <code>Body + Melee</code> = 9 dice.</p></li>
+<li><p>6 successes vs DV 3 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> clean hit. Harper uses <em>[Brutal]</em> to push the guard 1 cell away, out of cover.</p></li>
+<li><p>Guard’s next defense is at <strong>Desperate</strong> (push effect).</p></li>
+<li><p>Valeros attacks the now coverless, <strong>Desperate</strong> guard with <em>[Fast]</em> dagger, shifts 1 cell after the hit.</p></li>
+</ol>
+<p>Dice, Boons, and Outcome matrix untouched; only Position derived from the grid.</p>
+<h2 id="gm-guidance">GM Guidance</h2>
+<ol>
+<li><p>Draw the grid early – dry-erase board or VTT.</p></li>
+<li><p>Read Position first: “What is the attacker’s Position? What can the defender do to change it?”</p></li>
+<li><p>Spend Story Beats (SB) on dramatic consequences (cover collapse, reinforcements, etc.).</p></li>
+<li><p>Use Boons to upgrade Position – a powerful tactical choice.</p></li>
+</ol>
+<h2 id="tactical-combat-cheat-sheet">Tactical Combat Cheat-Sheet</h2>
+<h3 id="position-effect-modifiers">Position / Effect Modifiers</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong><strong>Situation</strong></strong></th>
+<th style="text-align: left;"><strong>Result</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Full cover (defender)</strong></td>
+<td style="text-align: left;"><strong>Controlled</strong>; attacker gains <strong>Dominant</strong> when defending.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Partial cover (defender)</strong></td>
+<td style="text-align: left;"><strong>Controlled</strong> vs ranged only.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Flanking (attacker)</strong></td>
+<td style="text-align: left;"><strong>Dominant</strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Rear attack (attacker)</strong></td>
+<td style="text-align: left;"><strong>Dominant</strong> + <em>Great</em>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dashing (defender next)</strong></td>
+<td style="text-align: left;"><strong>Desperate</strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Disengage failure (defender)</strong></td>
+<td style="text-align: left;"><strong>Desperate</strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Spend a Boon (before roll)</strong></td>
+<td style="text-align: left;">Shift Position up one step.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="movement-1">Movement</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Rule</strong></th>
+<th style="text-align: left;"><strong>Formula / Cost</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Base move</td>
+<td style="text-align: left;">Body + 3 cells</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dash (action)</td>
+<td style="text-align: left;">2× move, next defense <strong>Desperate</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Difficult terrain</td>
+<td style="text-align: left;">2 movement per cell</td>
+</tr>
+<tr>
+<td style="text-align: left;">Elevation up</td>
+<td style="text-align: left;">+1 movement per level (down free)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Run (spend Boon)</td>
+<td style="text-align: left;">2× move, next action <strong>Desperate</strong> (optional)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="zones-of-control">Zones of Control</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Action</strong></th>
+<th style="text-align: left;"><strong>Effect</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Enter enemy ZoC</td>
+<td style="text-align: left;">End movement; in melee (<strong>Controlled</strong>)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Leave ZoC</td>
+<td style="text-align: left;">Disengage test (DV 4 + modifiers)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Stacked ZoC</td>
+<td style="text-align: left;">+1 DV per extra enemy</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="weapon-tags-grid">Weapon Tags (Grid)</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><em>[Reach]</em></strong></td>
+<td style="text-align: left;">Attack up to 2 cells; enemies without Reach suffer –1 Position closing.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><em>[Fast]</em></strong></td>
+<td style="text-align: left;">After hit, shift 1 cell (no ZoC).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><em>[Set]</em></strong></td>
+<td style="text-align: left;">Plant; charge into cell <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> automatic attack at +1 Effect.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><em>[Brutal]</em></strong></td>
+<td style="text-align: left;">Push 1 cell; target’s next defense Position drops one step.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="action-economy">Action Economy</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Action</strong></th>
+<th style="text-align: left;"><strong>Cost</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Attack, cast, skill</td>
+<td style="text-align: left;">1 Action</td>
+</tr>
+<tr>
+<td style="text-align: left;">Move (≤ move rate)</td>
+<td style="text-align: left;">1 Move (can be split)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dash</td>
+<td style="text-align: left;">1 Action (no other action)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Disengage</td>
+<td style="text-align: left;">1 Action (or free if talent)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Use Boon for Position</td>
+<td style="text-align: left;">1 Boon (before roll)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Tip:</strong> Declare your tactical advantage (cover, flanking, high ground) before rolling; the GM sets Position based on the board.</p>
+<h2 class="unnumbered" id="license">License</h2>
+<p>This Tactical Combat Module is released under the <strong>Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)</strong> license. You may copy, modify and distribute it provided you give appropriate credit and share any modifications under the same terms.</p>
+<h2 id="miniatures-options">Miniatures Options</h2>
+<p>These options add miniature footprints, facing, and a few table aids to the Tactical Combat rules. Use the movement, Zone of Control, flanking, and Position/Effect rules in the preceding sections. Where the earlier Miniatures Guide differs, this combined reference uses the Tactical Combat rules as the shared baseline.</p>
+<h3 id="base-sizes">Base Sizes</h3>
+<ul>
+<li><p>Small: one cell.</p></li>
+<li><p>Medium: two cells by one cell.</p></li>
+<li><p>Large: two cells by two cells.</p></li>
+<li><p>Huge: three cells by three cells.</p></li>
+</ul>
+<p>Large and Huge creatures project their Zone of Control from each edge cell of their base. A miniature’s footprint changes the cells it occupies; it does not change its movement rate.</p>
+<h3 id="facing">Facing</h3>
+<p>Choose a facing after a Move. On a square grid, the front arc extends three cells ahead, the side arcs cover the two flanks, and the rear arc extends three cells behind. On a hex grid, the front arc extends three hexes, the side arcs cover the two lateral directions, and the rear arc extends one hex behind. Use these arcs to determine whether the existing flank or rear Position/Effect benefit applies; facing does not add a separate die bonus.</p>
+<h3 id="optional-actions">Optional Actions</h3>
+<dl>
+<dt>Shove.</dt>
+<dd>
+<p>On a successful action, move the target one cell if the fiction and its size permit. A target entering an enemy Zone of Control stops there; a shove does not bypass a Zone of Control.</p>
+</dd>
+<dt>Brace.</dt>
+<dd>
+<p>Until your next turn, gain Controlled Position when resisting a shove. This does not extend your Zone of Control.</p>
+</dd>
+<dt>Take Cover.</dt>
+<dd>
+<p>Use a Move to reach suitable terrain. The GM sets Position against ranged attacks using the cover rules above.</p>
+</dd>
+</dl>
+<h3 id="optional-boon-maneuvers">Optional Boon Maneuvers</h3>
+<ul>
+<li><p>Spend one Boon to disengage automatically.</p></li>
+<li><p>Spend two Boons for a Heroic Rush: move up to your normal movement rate through enemy Zones of Control, then end Engaged with one enemy in reach.</p></li>
+</ul>
+<p>These are optional tactical spends. They do not alter the core Boon economy or grant extra actions.</p>
+<h3 id="magic-on-the-grid">Magic on the Grid</h3>
+<p>Apply a spell’s existing range, cost, and outcome first; these notes describe how its effect occupies the grid.</p>
+<ul>
+<li><p><code>[WARD]</code> effects can block passage when the spell says they do; resolve a crossing with the stated test and cost.</p></li>
+<li><p><code>[CONJURE]</code> effects occupy their stated cells and may block line of sight or movement if the spell says so.</p></li>
+<li><p><code>[TRANSPORT]</code> effects require a legal destination under the spell’s range and Zone of Control rules.</p></li>
+<li><p><code>[PASSAGE]</code> effects identify a route or opening; apply only the Position or Effect the spell explicitly grants.</p></li>
+<li><p><code>[AREA]</code> effects use the spell’s stated radius and target rules; check friendly and enemy cells before resolving.</p></li>
+</ul>
+</article></article></body></html>

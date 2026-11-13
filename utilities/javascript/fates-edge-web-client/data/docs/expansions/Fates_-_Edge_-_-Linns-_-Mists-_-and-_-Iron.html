@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Linn: Mists and Iron</title><style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        body { max-width: 1100px; }
+        h2 { margin-top: 2.6rem; }
+        h3 { margin-top: 1.8rem; }
+        table { display: block; max-width: 100%; overflow-x: auto; }
+        .table-wrap { max-width: 100%; overflow-x: auto; }
+    </style><style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head><body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Expansions · specialist reference</strong></p><p>Read the core rules first, then this document’s scope, prerequisites, and procedures. Apply only changes it explicitly states; a missing restatement is not a general exception. The SRD and extensions in the Player’s and GM Guides remain the core reference, and the core loop still applies.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#document-title">Linn: Mists and Iron</a></li><li><a href="#reading-route">How to use this book</a></li><li><a href="#design-goals">Design Goals</a></li><li><a href="#linn-crewclan-sheet-template">Linn Crew/Clan Sheet (Template)</a></li><li><a href="#ship-sheet-longhulls-rivercraft">Ship Sheet (Longhulls &amp; Rivercraft)</a></li><li><a href="#season-wheel-theaters">Season Wheel &amp; Theaters</a></li><li><a href="#score-types-procedures">Score Types &amp; Procedures</a></li><li><a href="#oaths-blood-silver-repute">Oaths, Blood-Silver, &amp; Repute</a></li><li><a href="#sea-river-procedures">Sea &amp; River Procedures</a></li><li><a href="#linn-culture-tools-portrayal-guidance">Linn Culture Tools (portrayal guidance)</a></li><li><a href="#factions-fronts">Factions &amp; Fronts</a></li><li><a href="#generators">Generators</a></li><li><a href="#integration-notes">Integration Notes</a></li><li><a href="#example-of-play-short">Example of Play (short)</a></li><li><a href="#gm-reference-one-page">GM Reference (one page)</a></li><li><a href="#changelog">Changelog</a></li><li><a href="#pitch">Pitch</a></li><li><a href="#safety-tone">Safety &amp; Tone</a></li><li><a href="#what-you-need">What You Need</a></li><li><a href="#cast-hooks">Cast &amp; Hooks</a></li><li><a href="#fronts-timers">Fronts &amp; Timers</a></li><li><a href="#adventure-structure">Adventure Structure</a></li><li><a href="#running-the-fog-harriers">Running the Fog-Harriers</a></li><li><a href="#oaths-law-thing">Oaths, Law, &amp; Thing</a></li><li><a href="#wilderness-travel-procedures">Wilderness &amp; Travel Procedures</a></li><li><a href="#sea-river-hooks">Sea &amp; River Hooks</a></li><li><a href="#psionics-hooks-optional">Psionics Hooks (optional)</a></li><li><a href="#rewards-fallout">Rewards &amp; Fallout</a></li><li><a href="#prep-aids">Prep Aids</a></li><li><a href="#one-page-reference">One-Page Reference</a></li><li><a href="#changelog-1">Changelog</a></li><li><a href="#the-faith-of-the-linn-shrine-temple-and-the-weight-of-the-word">The Faith of the Linn: Shrine, Temple, and the Weight of the Word</a></li><li><a href="#the-way-out-to-meet-it-linn-nerve-as-a-playable-thing">The Way Out to Meet It: Linn Nerve as a Playable Thing</a></li><li><a href="#how-the-peoples-answer">How the Peoples Answer</a></li><li><a href="#saga-system-epic-reputation-and-legendary-deeds">Saga System: Epic Reputation and Legendary Deeds</a></li><li><a href="#faith-tags-for-linn-venues">Faith Tags for Linn Venues</a></li><li><a href="#glossary-of-nordic-terms">Glossary of Nordic Terms</a></li></ul></details><article class="fe-reading-document"><h1 id="document-title">Linn: Mists and Iron</h1><section aria-labelledby="reading-route" data-fe-reader-added="reading-route"><h2 id="reading-route">How to use this book</h2><p>This is a campaign companion for the Linn and the northern coast. Begin with the <a href="#linn-crewclan-sheet-template">crew/clan sheet</a>, <a href="#season-wheel-theaters">season wheel</a>, and <a href="#score-types-procedures">score procedures</a>. The later saga and faith sections provide deeper campaign material; the adventure is an example of those systems in play. Scenario clock lists are options: keep no more than three active in the shared play space by recommendation.</p></section><p><strong>A culture-focused module for coastal raids, river thrusts, oath-law, and seasonal expeditions by the Linns—seafarers of the north who strike the Violet Steppe littoral, run the Yloka up into the Abderrian Sea and Mistlands, and range as far south as Theona in the Dolmis. Built to slot into Amaranthine Sea, Political Intrigue, Wilderness, and Caravans using core Fate’s Edge procedures (Position/DV, SB, timers, Strings, Favor/Leverage/Exposure).</strong></p>
+<h3 class="unnumbered" id="rules-compatibility">Rules compatibility</h3>
+<p>The core rules comprise the SRD plus the extensions in the Player’s Guide and GM Guide. This expansion applies only its stated additions and exceptions. Keep the core loop: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, resolve the outcome, and apply consequences.</p>
+<p>Adds Linn’s mists-and-iron gazetteer, its customs and its regional timers. Anything it introduces is an addition to the core loop, not a replacement for it: a named track or timer here is its own measure and never stands in for Fatigue, Harm or the Outcome Matrix, and no option waives the roll, the Story Beats it generates, or the stated cost unless it says so explicitly.</p>
+<h2 class="unnumbered" id="design-goals">Design Goals</h2>
+<ul>
+<li><p><strong>Oath before oar.</strong> Social bonds, boasts, and blood-silver shape play as much as blades.</p></li>
+<li><p><strong>Raider–trader parity.</strong> Raids, mercenary service, and escort trade are equally supported.</p></li>
+<li><p><strong>Seamless integration.</strong> Uses existing chase/ship rules, faction timers, and currencies—no new dice math.</p></li>
+<li><p><strong>Low bookkeeping.</strong> Crew, ship, season wheel, and 2–3 visible timers per scenario.</p></li>
+</ul>
+<p><strong>Timer load:</strong> Treat scenario timer lists as options, not a set to track all at once. As a table-speed recommendation, keep no more than three timers active in the shared play space. Keep off-focus clocks in notes and swap them in between scenes or encounters; advance an inactive clock only when an established event calls for it. Groups that want more simultaneous operational detail may track more.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<caption>Linn: Mist &amp; Iron - The First Year (Quickstart)</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><p><strong>Season</strong></p></th>
+<th style="text-align: left;"><p><strong>Key Activities</strong></p></th>
+<th style="text-align: left;"><p><strong>Mechanical Focus</strong></p></th>
+<th style="text-align: left;"><p><strong>Sample Score</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><p><strong>Winter Hearth/Thing</strong></p></td>
+<td style="text-align: left;"><p>Rest, repair, socialize, attend Thing moots</p></td>
+<td style="text-align: left;"><ul>
+<li><p>Resolve Feuds with Blood-Silver</p></li>
+<li><p>Swear/fulfill Oaths</p></li>
+<li><p>Advance Repute through deeds</p></li>
+</ul></td>
+<td style="text-align: left;"><p>Thing Moot: Settle disputes, gain winter land, swear new oaths</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p><strong>Spring Muster</strong></p></td>
+<td style="text-align: left;"><p>Prepare ships, gather crews, plan summer activities</p></td>
+<td style="text-align: left;"><ul>
+<li><p>Ship repairs/upgrades</p></li>
+<li><p>Crew coordination rolls</p></li>
+<li><p>Plan expedition objectives</p></li>
+</ul></td>
+<td style="text-align: left;"><p>Scout Mission: Gather intelligence on threats/locations for summer</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p><strong>Summer Raids</strong></p></td>
+<td style="text-align: left;"><p>Active expeditions, trading, warfare</p></td>
+<td style="text-align: left;"><ul>
+<li><p>Coastal Raid (Plunder/Blood-Price timers)</p></li>
+<li><p>River Strike (Pursuit/Current timers)</p></li>
+<li><p>Combat encounters</p></li>
+<li><p>Weather/Ice hazards</p></li>
+</ul></td>
+<td style="text-align: left;"><p>Coastal Raid: Plunder a settlement while evading pursuit</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p><strong>Autumn Trade/Settling</strong></p></td>
+<td style="text-align: left;"><p>Profit from summer deeds, settle accounts</p></td>
+<td style="text-align: left;"><ul>
+<li><p>Escort/Trade (Market procedures)</p></li>
+<li><p>Saga Reputation gains</p></li>
+<li><p>Social maneuvering at Thing</p></li>
+<li><p>Plan for winter</p></li>
+</ul></td>
+<td style="text-align: left;"><p>Escort Mission: Protect trade goods while navigating hazards</p></td>
+</tr>
+</tbody>
+</table></div>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<caption>Core Quickstart Rules Summary</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>System</strong></th>
+<th style="text-align: left;"><strong>Quick Rule</strong></th>
+<th style="text-align: left;"><strong>Key Dice</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Crew Tracks</strong></td>
+<td style="text-align: left;">Repute [6]: Fame/standing</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Feud [4]: Active quarrels</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Exposure [6]: Foreign attention</td>
+<td style="text-align: left;">DV 2-5</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Position: Dominant/Controlled/Desperate</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Re-roll 1 success/failure</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ship Actions</strong></td>
+<td style="text-align: left;">Navigate (DV 2-5)</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Board &amp; Brace (DV 3-5)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Chase (Sea/River) (DV 2-5)</td>
+<td style="text-align: left;">Ship Tags modify DVs</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Weather/Ice Matrix [4-6]</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Oaths &amp; Saga</strong></td>
+<td style="text-align: left;">Oath Ledger: Favors owed/held</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Break Oath: Repute -1, Feud +1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Saga Reputation [6]: Local <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Regional <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Legendary</td>
+<td style="text-align: left;">Saga Points for epic deeds</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Position/Social benefits by tier</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Complications</strong></td>
+<td style="text-align: left;">Mist &amp; Iron SB Menu (1-4 SB)</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Weather/Ice hazards</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Fen Corruption timer</td>
+<td style="text-align: left;">Story Beats drive narrative</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Environmental timers</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="linn-crewclan-sheet-template">Linn Crew/Clan Sheet (Template)</h2>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>[CLAN / CREW NAME]</strong></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Aett (home seat): ____________</td>
+<td style="text-align: left;">Thing Affiliation: ____________</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Strings (2–3):</strong> winter harbor <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> river-right <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> trade oath <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> feud settlement <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> warding chant <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> pilot’s stone</p>
+<p><strong>Tags (2–4):</strong> Oathbound <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Riverwise <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Ice-Trained <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Reaver-Known <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Hospitable <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Law-Strict <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Skald-Loud <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Wolf-Banner</p>
+<p><strong>Tracks:</strong></p>
+<ul>
+<li><p>Repute [6] (standing among Linn and neighbors)</p></li>
+<li><p>Feud [4] (active quarrel; on fill <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> blood-price owed or war)</p></li>
+<li><p>Exposure [6] (to foreign powers; for non-Linn venues)</p></li>
+</ul>
+<p><strong>Oath Ledger:</strong> favors owed/held (name + what; acts like Favor/Leverage within Linn spheres)</p>
+<p><strong>Notables:</strong> steersman <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> war-leader <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> speaker <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> skald <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> shipwright</p>
+<p><strong>Repute [6]:</strong> Tick up for kept oaths, fair trade, valor; tick down for oath-breaking, cowardice, or sacrilege. High Repute grants Audience: Respectful at thing; low invites Audience: Skeptical.</p>
+<p><strong>Feud [4]:</strong> Name the counterparty. Ticks on insult, theft, or harm; clear by blood-silver, ordeal, or deed.</p>
+<h2 id="ship-sheet-longhulls-rivercraft">Ship Sheet (Longhulls &amp; Rivercraft)</h2>
+<p><strong>Pick a hull and 3–4 tags.</strong></p>
+<p><strong>Longhull (raider):</strong> shallow draft, fast oars, beachable.</p>
+<p><strong>Broadshore (cargo):</strong> higher freeboard, stout frames, slower oars.</p>
+<p><strong>River-spear (cutter):</strong> light, narrow, collapsible mast for weirs.</p>
+<p><strong>Ship Tags (choose 3–4)</strong></p>
+<ul>
+<li><p>Shallow Draft — River rapids Drive/Handle DV –1; cross bars, weirs.</p></li>
+<li><p>Beaching Hull — Land/sail from beaches; Disengage gains Position +1 at surf.</p></li>
+<li><p>Ice-Ready — In thaw/freeze scenes, first Condition +1 is ignored.</p></li>
+<li><p>Mistwise — In fog/gares, Navigate DV –1; Ambush at Sea starts one Position higher.</p></li>
+<li><p>River-Runner — Row Upstream DV –1; portage checks Position +1.</p></li>
+<li><p>Wolf-Boarding Gear — Board &amp; Brace DV –1; entangling hooks/ropes.</p></li>
+<li><p>High Shields — +1 die defending vs arrows/sling; on 1: Side-Slip penalty (windage) applies.</p></li>
+<li><p>Skald-Drum — Once/score gain Audience: Fierce aboard; can rally morale.</p></li>
+<li><p>Pilots’ Stones — Hidden cairn-marks; once/score Navigate Position +1 in shoals.</p></li>
+</ul>
+<p><strong>Roles (choose at table)</strong><br/>
+Steersman (helm), War-Leader (boarding/assault), Speaker (parley), Skald (morale/saga), Shorehand (portage/repairs), Lookout (weather/ice).</p>
+<h2 id="season-wheel-theaters">Season Wheel &amp; Theaters</h2>
+<p>Spring Muster <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Summer Raids <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Autumn Trade/Settling <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Winter Hearth/Thing.</p>
+<p>At each transition:</p>
+<ul>
+<li><p>Advance Politics (Mandate/Crisis) for coastal powers.</p></li>
+<li><p>Roll Weather/Ice [4–6] for the theater in play (coast, river, mistland).</p></li>
+<li><p>Offer Oath Opportunities (escort, feud settlement, shrine warding).</p></li>
+</ul>
+<p><strong>Theaters</strong></p>
+<ul>
+<li><p>Coast (Abderrian/Mistlands): cliffs, skerries, tide races, fog.</p></li>
+<li><p>River (Yloka): bars, rapids, weirs, toll-fords, riverside towns.</p></li>
+<li><p>Dolmis Reach (south): broader seas, warmer storms, foreign courts.</p></li>
+</ul>
+<h2 id="score-types-procedures">Score Types &amp; Procedures</h2>
+<p>Pick approach (Deceit <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Speed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Shock <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Parley) <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> set Position/DV from venue/tags <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> roll.</p>
+<h3 id="coastal-raid-objective-plunder-message-prisoner">Coastal Raid (Objective: Plunder / Message / Prisoner)</h3>
+<p><strong>Timers:</strong> Alarm [4–6], Plunder [6–8], Ship Damage [4], Blood-Price [4].</p>
+<p><strong>Entry:</strong> surf landing, hidden cove, tide gate, harbor ruse.</p>
+<p><strong>On 1s:</strong> GM spends SB <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> alarm bells, hidden shoal, torch-chain across channel, watch-tower signal.</p>
+<p><strong>Resolution:</strong> When Plunder fills, choose coin or Strings (hostage pledge, toll writ, seasonal tithe). If Blood-Price fills, mark Feud +1 or pay blood-silver (Favor loss or obligation timer).</p>
+<h3 id="river-strike-objective-tollhouse-weir-rival-barge">River Strike (Objective: Tollhouse / Weir / Rival Barge)</h3>
+<p><strong>Timers:</strong> Current [4], Pursuit [6], Sentries [4], Plunder/Terms [6].</p>
+<p><strong>Position tweaks:</strong> River-Runner/Shallow Draft help; crosswinds/hail hurt.</p>
+<p><strong>On 1s:</strong> weir gets raised, arrows from reed-blind, boom-chain snaps at wrong time.</p>
+<h3 id="escorttrade-objective-profit-standing">Escort/Trade (Objective: Profit / Standing)</h3>
+<p>Use Market from Amaranthine/Caravans; add Linn perks:</p>
+<ul>
+<li><p>Thing Tokens (oath-markers) count as String once/session in Linn venues.</p></li>
+<li><p>Skald-Drum can convert Audience: Warm <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Favor (narrow) once/score with a saga.</p></li>
+</ul>
+<h3 id="thing-moot-objective-law-settlement">Thing Moot (Objective: Law / Settlement)</h3>
+<p><strong>Venue:</strong> ring of stones, winter hall.</p>
+<p><strong>Moves:</strong> Oath-Swear (commit under penalty), Wager Wyrd (ordeal by feat), Blood-Silver (compensation roll), Witness the Saga (Skald stakes a truth).</p>
+<p><strong>Outcomes:</strong> resolve Feud, write Oath to ledger (acts as durable String), assign winter land or river-right.</p>
+<h2 id="oaths-blood-silver-repute">Oaths, Blood-Silver, &amp; Repute</h2>
+<ul>
+<li><p><strong>Oath (currency):</strong> Inside Linn spheres, treat Oath Ledger entries as Favor/Leverage equivalents; breaking one ticks Repute –1 and creates Feud +1.</p></li>
+<li><p><strong>Blood-Silver (settlement):</strong> Pay with coin, hostage-string, or deed. Roll Petition/Broker vs DV 2–4 (standing, witnesses, hurt). On hit, reduce Feud –2; on partial, –1; on miss, counter-oath demanded.</p></li>
+<li><p><strong>Boasts &amp; Sagas:</strong> A public boast creates Audience: Expectant; fulfill it to gain Repute +1, fail and mark Exposure or Feud.</p></li>
+</ul>
+<h2 id="sea-river-procedures">Sea &amp; River Procedures</h2>
+<h3 id="dv-ladders">DV Ladders</h3>
+<ul>
+<li><p><strong>Chase (Sea):</strong> DV 2 reach <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 3 skerries <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 4 reef line <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 5 storm eddies.</p></li>
+<li><p><strong>Chase (River):</strong> DV 2 open <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 3 bars <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 4 rapids <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 5 weirs/locks.</p></li>
+<li><p><strong>Board &amp; Brace:</strong> DV 3–5 (tags: Wolf-Boarding Gear lowers DV).</p></li>
+</ul>
+<h3 id="weatherice-matrix-46">Weather/Ice Matrix [4–6]</h3>
+<p>Advance on 1s or fiction:</p>
+<ul>
+<li><p><strong>Fog/Mist:</strong> sight Position –1; Mistwise cancels. On 1, Pursuit +1 (lost bearings).</p></li>
+<li><p><strong>Squall/Hail:</strong> ranged actions –1 die; on 1, Condition +1 (sails/rig).</p></li>
+<li><p><strong>Ice/Floe:</strong> Navigate DV +1; on 1, choose Delay (Distance stalls) or Keel-Scuff (Condition +1).</p></li>
+</ul>
+<h3 id="portage-weirs">Portage &amp; Weirs</h3>
+<p>Treat as Cross Hazard (Body+Insight/Craft) DV 3–5; River-Runner/Shallow Draft grant Position +1. On 1, Oarline snaps or Axle-sled breaks.</p>
+<h3 id="mist-iron-sb-gm-menu">Mist &amp; Iron SB (GM menu)</h3>
+<ul>
+<li><p>Hidden Shoal: sudden ground; Ship Damage +1 unless Position was high.</p></li>
+<li><p>Tower Fire: beacon lit; Pursuit +1 and Alarm +1.</p></li>
+<li><p>Oarline Breaks: lose Position; repair or fight short-handed.</p></li>
+<li><p>Witness at Cliff: an enemy skiff sees; Exposure +1 (foreign) or Feud +1 (Linn).</p></li>
+<li><p>Saga Twisted: rumor flips an Audience tag against you.</p></li>
+</ul>
+<h2 id="linn-culture-tools-portrayal-guidance">Linn Culture Tools (portrayal guidance)</h2>
+<ul>
+<li><p>Emphasize law and reciprocity (oaths, blood-silver, witness) over caricature.</p></li>
+<li><p>Show plural livelihoods: fishers, traders, wardens, mercenaries, skalds—not only raiders.</p></li>
+<li><p>Let women/elders hold seats and steer deals; avoid monolith tropes.</p></li>
+<li><p>Lean into seasonality and thing assemblies as civic life.</p></li>
+</ul>
+<p><strong>Etiquette Hooks (once/scene in Linn venues):</strong> gift the host’s hearth with salt/fish oil; name your mother’s line; offer a verse—each can grant Position +1 in parley.</p>
+<h2 id="factions-fronts">Factions &amp; Fronts</h2>
+<ul>
+<li><p><strong>Linns Union (docks &amp; dues):</strong> Strings—dock priority, barge pilots.</p></li>
+<li><p><strong>Mistland Wardens:</strong> Strings—fog bell chains, cliff beacons.</p></li>
+<li><p><strong>Yloka Tollmen:</strong> Strings—boom-chains, river seals.</p></li>
+<li><p><strong>Dolmis Factors:</strong> Strings—winter contracts, bonded warehouses.</p></li>
+<li><p><strong>Shrine of Storm-Whale:</strong> Strings—safe-run chants, tithe.</p></li>
+</ul>
+<p><strong>Front Timers (examples):</strong></p>
+<ul>
+<li><p>Reprisals Fleet [6–8] (coastal power organizes counterstrike).</p></li>
+<li><p>Thing Schism [6] (oath controversies split halls).</p></li>
+<li><p>Mistland Famine [6] (trade mission needed; gain Standing if solved).</p></li>
+</ul>
+<h2 id="generators">Generators</h2>
+<h3 id="coastal-targets-d66">Coastal Targets (d66)</h3>
+<p>11 tide mill <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 12 beacon tower <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 13 cliff monastery <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 14 saltworks <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 15 fishing fleet <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 16 lord’s boathouse <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 21 skerry storehouse <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 22 ropewalk <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 23 ferry-chain <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 24 dyeshed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 25 customs shed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 26 river gate <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 31 amber beach <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 32 quarry pier <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 33 seal rookery <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 36barge yard <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 35 sheep isle <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 36 fortress quay <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 41 smokehouse row <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 42 eel-weirs <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 43 pilot stone <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 44 winter harbor <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 45 tax sloop <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 46 river lighthouse <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 51 shrine cove <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 52 smugglers’ cut <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 53 patrol launch <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 54 tollhouse <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 55 grain pier <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 56 seawall breach <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 61 ice slip <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 62 wreckers’ fires <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 63 tide cave <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 64 chain boom <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 65 slate wharf <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 66 mint barge.</p>
+<h3 id="river-hazards-d12">River Hazards (d12)</h3>
+<p>1 bar on a bend <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 2 sudden freshet <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 3 weir rat-lines <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 4 deadwood snag <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 5 eel-pots <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 6 ice pans <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 7 hidden side-cut <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 8 bluff echo <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 9 toll chain half-raised <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 10 reeds conceal archers <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 11 rain-swollen ford <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 12 sand-suck bank.</p>
+<h3 id="thing-cases-d12">Thing Cases (d12)</h3>
+<p>1 insult in song <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 2 stolen pilot stone <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 3 broken oath on winter grain <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 4 blood-price disputed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 5 marriage claim <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 6 warding chant stolen <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 7 hostage pledge lapsed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 8 salvage rights <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 9 border cairn moved <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 10 feud cooling terms <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 11 saga witness contest <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 12 mercenary pay withheld.</p>
+<h3 id="sagas-boons-d12">Sagas &amp; Boons (d12)</h3>
+<p>1 oar-song that steadies arms <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 2 whale omen at dawn <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 3 amber find <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 4 pilot’s ghost shows a cut <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 5 storm-whale spares you <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 6 omen of red sails <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 7 skald’s verse spreads <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 8 winter hall adopts you <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 9 river seal renewed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 10 cliff bell silent <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 11 mist opens path <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> 12 oath-ring warms (truth told).</p>
+<h2 id="integration-notes">Integration Notes</h2>
+<ul>
+<li><p><strong>Amaranthine Sea:</strong> Use ship chase and blockade tools; Linn Skald-Drum converts Audience to Favor once/score in port riots or dock disputes.</p></li>
+<li><p><strong>Caravans:</strong> Swap staging at waystations with winter harbors; River-Runner aids barge convoys upriver.</p></li>
+<li><p><strong>Wilderness:</strong> Portage/overland jumps tie into outpost assets; fjord hunts use Hunt/Chase ladders.</p></li>
+<li><p><strong>Political Intrigue:</strong> Treat the Thing as a political venue; Repute sets default Position; Blood-Silver interacts with Favor/Exposure economies.</p></li>
+<li><p><strong>Psionics:</strong> Seers translate as omen-readers; allow Psychic Weather Sense to soften fog/ice penalties once/leg.</p></li>
+<li><p><strong>Dragon’s Lair:</strong> Skerries and glacier valleys hide wyrm shrines; oaths may bind to ancient powers for perilous boons.</p></li>
+</ul>
+<h2 id="example-of-play-short">Example of Play (short)</h2>
+<p><strong>Setup:</strong> Longhull with Shallow Draft, Mistwise, Wolf-Boarding Gear. Crew Repute 3/6, Feud 1/4 (with Yloka Tollmen). Score: River Strike against a boom-chain tollhouse (Plunder/Terms).</p>
+<p><strong>Approach:</strong> Parley-then-Shock. Speaker petitions for winter discount (DV 3). Partial <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Position stays Controlled, GM spends 1 SB.</p>
+<p><strong>Action:</strong> War-Leader triggers Board &amp; Brace at the boom. Wolf-Boarding Gear drops DV to 3. Hit <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Plunder +2; a 1 shows <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> GM spends Tower Fire (Alarm +1, Pursuit +1).</p>
+<p><strong>Twist:</strong> Fog rolls in. Mistwise cancels Position penalty. Steersman runs a Pilots’ Stone line: Navigate gains Position +1; Pursuit –1.</p>
+<p><strong>Close:</strong> Plunder fills. Crew chooses a seasonal tithe String instead of coin. Blood-Price at 2/4; they pledge blood-silver at winter thing to avoid Feud tick.</p>
+<h2 id="gm-reference-one-page">GM Reference (one page)</h2>
+<ul>
+<li><p><strong>Crew:</strong> Repute [6] <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Feud [4] <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Exposure [6] <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Oath Ledger.</p></li>
+<li><p><strong>Ships:</strong> choose hull + 3–4 tags. Roles: Steersman <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> War-Leader <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Speaker <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Skald <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Shorehand <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Lookout.</p></li>
+<li><p><strong>Season Wheel:</strong> Spring muster <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Summer raids <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Autumn trade/settle <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Winter thing.</p></li>
+<li><p><strong>Score Types:</strong> Coastal Raid <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> River Strike <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Escort/Trade <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Thing Moot.</p></li>
+<li><p><strong>Key Timers:</strong> Alarm <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Plunder <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Ship Damage <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Blood-Price <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Pursuit.</p></li>
+<li><p><strong>Weather/Ice:</strong> Fog/Mist <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Squall/Hail <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Ice/Floe.</p></li>
+<li><p><strong>SB Menu:</strong> Hidden Shoal <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Tower Fire <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Oarline Breaks <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Witness at Cliff <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Saga Twisted.</p></li>
+<li><p><strong>Integration:</strong> Portage <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>↔</mo><annotation encoding="application/x-tex">\leftrightarrow</annotation></semantics></math> Wilderness <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Dock riots <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>↔</mo><annotation encoding="application/x-tex">\leftrightarrow</annotation></semantics></math> Amaranthine <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Thing <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>↔</mo><annotation encoding="application/x-tex">\leftrightarrow</annotation></semantics></math> Political <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>•</mi><annotation encoding="application/x-tex">\bullet</annotation></semantics></math> Omens <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>↔</mo><annotation encoding="application/x-tex">\leftrightarrow</annotation></semantics></math> Psionics.</p></li>
+</ul>
+<h2 id="changelog">Changelog</h2>
+<p><strong>v0.1</strong> — First draft: crew/ship sheets, tags &amp; roles, season wheel, sea/river procedures, raid/river/thing scores, oath &amp; blood-silver economy, generators, integration, and an example.</p>
+<p><strong>v0.2</strong> — Linn nerve made playable: revised <em>The Ninth Bell and the Unfinished Count</em> (hearth-count and keel-count); new <em>The Way Out to Meet It</em> (Doom-Naming, the Ninth Witness, Meetings, Ringing the Ninth, the Unsung condition); new <em>How the Peoples Answer</em> comparative table; new <em>The Bell That Counts to Nine</em> on the Crusade as assimilation rather than conquest; glossary expanded.</p>
+<p><strong>End of v0.2</strong></p>
+<p><strong>Hunger in the Mist<br/>
+A Linn Adventure for Fate’s Edge (v0.1)</strong></p>
+<p><strong>Hunger in the Mist<br/>
+A Linn Adventure for Fate’s Edge (v0.1)</strong><br/>
+A coastal-river saga for Tier II–III parties, inspired by northern raiding epics and survival horror—reimagined for Fate’s Edge without referencing any specific IP. Built to slot into Linn: Mist &amp; Iron, Wilderness, Caravans, Amaranthine Sea, Political Intrigue, and Psionics.</p>
+<h2 class="unnumbered" id="pitch">Pitch</h2>
+<p>Winter’s edge bites the Mistlands. Beacon towers fail. Villages whisper of Fog-Harriers—antler-helmed raiders who strike from fen and chalk caves, leaving carrion totems and vanished kin. The Linn hall of Stenskar seals its doors…then sends for help. The omens demand a mixed company: oarsmen and outsiders together, for the mist does not remember one tongue alone.</p>
+<p>Play in 3–5 sessions: defend a hall; scout the black fen; unmask the Harriers; strike the warrens; end a brood-line at dawn.</p>
+<h2 class="unnumbered" id="safety-tone">Safety &amp; Tone</h2>
+<ul>
+<li><p>Horror and funerary imagery; keep consent tools handy.</p></li>
+<li><p>Keep Linn culture plural: traders, fishers, skalds, wardens—not caricature raiders.</p></li>
+<li><p>The Fog-Harriers are a syncretic cult of coastal and fen folk (not a “lost people” stereotype). Their practices are ritual, not racial.</p></li>
+</ul>
+<h2 class="unnumbered" id="what-you-need">What You Need</h2>
+<ul>
+<li><p>Fate’s Edge core SRD (Position/DV, SB, timers, Strings).</p></li>
+<li><p>Linn: Mist &amp; Iron (crew/ship tags, thing, oaths, sea/river ladders).</p></li>
+<li><p>Wilderness (camp, biomes: marsh/coast). Optional: Psionics (omens), Political (thing moot), Caravans/Sea if you bring escort/convoy play.</p></li>
+</ul>
+<h2 id="cast-hooks">Cast &amp; Hooks</h2>
+<p><strong>PC hooks (choose or invent):</strong></p>
+<ul>
+<li><p>Outsider Envoy from a southern city bearing a winter contract.</p></li>
+<li><p>Skald-Loud: your saga named a fen spirit; it answered.</p></li>
+<li><p>Mistland Warden: your bell-chain went silent; your oath binds you to find why.</p></li>
+<li><p>River Pilot: your pilot stones were moved; trade boats vanish.</p></li>
+<li><p>Noetic Adept (Psionics): your dreams taste of chalk and marrow; omens point north.</p></li>
+</ul>
+<p><strong>Notables</strong></p>
+<ul>
+<li><p>Jarl Arnhild Stenskar (Speaker at winter thing). Strings: winter harbor, feud settlement.</p></li>
+<li><p>Hevr Skarn (War-Leader). String: oar-oath.</p></li>
+<li><p>Friga of the Bell Chain (Warden). String: beacon rites.</p></li>
+<li><p>The Fog-Harriers (cult). Strings: bog totems, whisper warrens, marrow resin.</p></li>
+<li><p>The Brood-Matron (Harrier oracle). String: bone throne in the chalk deeps.</p></li>
+</ul>
+<h2 id="fronts-timers">Fronts &amp; Timers</h2>
+<p><strong>Primary front — Hunger in the Mist</strong></p>
+<ul>
+<li><p>Beacon Silence [6] — as it fills, coastal beacons fail; +1 Position to Harrier night strikes.</p></li>
+<li><p>Missing Boats [6] — trade collapses; famine pressure rises.</p></li>
+<li><p>Brood-Matron’s Rite [8] — completes a mass anointing; Harriers fight at +1 Effect at night.</p></li>
+</ul>
+<p><strong>Local timers</strong></p>
+<ul>
+<li><p>Hall Panic [6] — rumor and grief; insert disadvantage tags until calmed.</p></li>
+<li><p>Feud with Tollmen [4] — complicates river help; clear at thing or pay blood-silver.</p></li>
+<li><p>Oath Debts [4] — favors owed by Stenskar; cash for aid or betrayal.</p></li>
+</ul>
+<h2 id="adventure-structure">Adventure Structure</h2>
+<h3 id="act-i-the-hall-at-dusk-defense-oaths">Act I — The Hall at Dusk (Defense &amp; Oaths)</h3>
+<p><strong>Scene A1: River Arrival</strong></p>
+<ul>
+<li><p>Enter by longhull or barge under fog. Mistwise helps; otherwise Position –1 to Navigate.</p></li>
+<li><p>Encounter: wreckers’ fires lure boats to a shoal (Hidden Shoal SB). Rescue or lose supplies.</p></li>
+</ul>
+<p><strong>Scene A2: Stenskar Winter Hall</strong></p>
+<ul>
+<li><p>A funeral table, skalds quiet, children hidden. Hall Panic [6] starts at 2/6.</p></li>
+<li><p>Thinglet: a small moot in the hall: testimonies about antler masks and bog-incense.</p></li>
+<li><p>Oath: Arnhild swears guest-right and asks for a mixed company. Add Oar-Oath String: one boon per session on a roll taken in public defense of Stenskar.</p></li>
+</ul>
+<p><strong>Scene A3: Night Probe</strong></p>
+<ul>
+<li><p>Harriers test the palisade with bone rattles and peat-smoke. Use Board &amp; Brace if defending the river gate; ranged volleys are hampered by fog.</p></li>
+<li><p>On any 1, spend SB Witness at Cliff (enemy skiff sees you); tick Missing Boats +1.</p></li>
+</ul>
+<p><strong>Outcomes:</strong> stabilize Hall Panic, earn Beacon Rite String (Warden’s trust), discover marrow resin (sweet narcotic used by Harriers).</p>
+<h3 id="act-ii-black-fen-recon-scouting-skirmish">Act II — Black Fen Recon (Scouting &amp; Skirmish)</h3>
+<p><strong>Travel:</strong> Wilderness Marsh biome; set Distance [6], Danger [4], Weather [4: fog/rain].</p>
+<p><strong>Intent:</strong> Scout or Hide to reduce Sign.</p>
+<p><strong>Key Sites</strong></p>
+<ul>
+<li><p>Bell Chain #7: rope cut, bell stolen; recover clapper for Clue.</p></li>
+<li><p>Totem Isle: antler totems, peat-fires burning cold; a captive left as bait.</p></li>
+<li><p>Pilot Stone Cairn: moved downstream; reset to ease escape later (Position +1 on retreat).</p></li>
+<li><p>Fen Bear’s Den: optional hunt; pelt as leverage at thing.</p></li>
+</ul>
+<p><strong>Encounters</strong></p>
+<ul>
+<li><p>Harrier Skirmishers (Near): reed-masks, bone darts (Harm 1, poison tag Drowse <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Weariness +1).</p></li>
+<li><p>Bog-Haze: Weather tick; on 1, Condition +1 unless Shelter tag.</p></li>
+<li><p>Whisper Caves Mouth: chalk dust, singing vents; enter now or return prepared.</p></li>
+</ul>
+<p><strong>Objectives</strong></p>
+<ul>
+<li><p>Track the Harriers to the warrens (accumulate 3 Clues: totem analysis, captive interrogation, resin tracing).</p></li>
+<li><p>Seize totems/resin to learn their rite.</p></li>
+<li><p>Optionally bargain at riverside Thing to clear Feud with Tollmen.</p></li>
+</ul>
+<h3 id="act-iii-the-whisper-warrens-assault-choice">Act III — The Whisper Warrens (Assault &amp; Choice)</h3>
+<p><strong>Dungeon Frame:</strong> single timer Warrens Depth [8]; three spokes: Bone Gallery, Steam Vents, Brood Halls. Advance on noise, heat, or delay. Harriers get Position +1 in darkness unless PCs carry warding light.</p>
+<p><strong>Rooms &amp; Beats</strong></p>
+<ol>
+<li><p>Bone Gallery: trophy totems; a riddle-song carved in chalk (Insight DV 3 decodes entry order; on 1, Alarm [4] +1).</p></li>
+<li><p>Steam Vents: scalding fog bursts; Cross Hazard DV 3–4.</p></li>
+<li><p>Brood Halls: sleeping pits; marrow resin harvest; captives. Mercy vs Zeal choice: rescue captives (slows assault, gain 1 Boon) or leave them (assault faster, Harriers fight with +1 Effect until Brood-Matron’s Rite is reduced).</p></li>
+</ol>
+<p><strong>The Brood-Matron</strong></p>
+<ul>
+<li><p>Oracle-chieftain enthroned on jointed bone. Uses Drowse fumes, reed-pipes to coordinate, and antler staff to parry.</p></li>
+<li><p>Moves: Frenzy the Pack (allies gain +1 Effect for one exchange), Fog Veil (Position –1 for intruders), Marrow Breath (Weariness +1 area; SB spend).</p></li>
+<li><p>Strings: prophecy tokens (chalk sticks carved with tide glyphs) and a Bone Oath Ring that can settle Feud at a Thing if claimed.</p></li>
+</ul>
+<p><strong>Finale Options</strong></p>
+<ul>
+<li><p>Strike the Matron: break the cult’s coordination; Harriers fragment.</p></li>
+<li><p>Collapse the Vents: explosives or psionic overpressure to seal the warrens (Weather +1; retreat timer).</p></li>
+<li><p>Parley of Oaths: prove the Matron bent an ancient river oath; some Harriers stand down under witness.</p></li>
+</ul>
+<p><strong>Aftermath:</strong> if Brood-Matron’s Rite was near full, pockets of Harriers fight on at night until Beacon Silence is restored.</p>
+<h2 id="running-the-fog-harriers">Running the Fog-Harriers</h2>
+<p>They are human cultists. Their horror comes from ritual masks, peat-smoke tactics, and night discipline, not species. Frame them as a fen syncretic sect that fed on famine and fear. Some defect when confronted with oaths and proofs.</p>
+<p><strong>Harrier Types (framework)</strong></p>
+<ul>
+<li><p>Skirmisher: reed mask, bone darts (Near), marsh knife (Close). Tags: Drowse, Reedslip (Hide/Disengage Position +1 in marsh). DV: 3 for ranged, 2 for melee.</p></li>
+<li><p>Reaver: antler helm, hooked spear (Close), net (entangle). Tag: Hook &amp; Haul (on hit, reposition foe). DV: 2 for melee.</p></li>
+<li><p>Whisperer: smoke-runner, pipe-signals, resin flasks. Move: Fog Veil (once/scene Position –1 to ranged against allies). DV: 2.</p></li>
+<li><p>Brood-Matron: see above. DV: 4, Harm 2.</p></li>
+</ul>
+<p>Use core opposition building: set DV by venue/cover (marsh, fog, night), hand out SB on 1s, and lean on Reedslip/Hook &amp; Haul to shape the fight.</p>
+<h2 id="oaths-law-thing">Oaths, Law, &amp; Thing</h2>
+<ul>
+<li><p>A Hall Thinglet can grant Witness for an oath; use it to settle Feud with Tollmen or bind local aid.</p></li>
+<li><p>Blood-Silver converts one Feud tick into truce; Boast publicly and fulfill it to gain Repute +1 at winter thing.</p></li>
+<li><p>The Bone Oath Ring from the warrens is admissible proof at a Thing; returning it can grant Standing with Mistland Wardens.</p></li>
+</ul>
+<h2 id="wilderness-travel-procedures">Wilderness &amp; Travel Procedures</h2>
+<ul>
+<li><p>Marsh Biome: Infiltrate Position +1; Drive Position –1. Hazards: sucking mud (Cross DV 3–5), miasma (Weariness +1 + Sickness [4]), hidden channel (Swim/Boat).</p></li>
+<li><p>Weather Matrix (Fog/Rain/Ice): see Wilderness; fog adds Pursuit +1 on 1s unless Mistwise.</p></li>
+</ul>
+<p><strong>Sample Leg:</strong> Stenskar <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Black Fen Mouth (Distance [4], Danger [4], Weather [4: fog]). Intent Hide. On strong Hide Sign, reduce Sign –2; on 1, Witness at Cliff SB.</p>
+<h2 id="sea-river-hooks">Sea &amp; River Hooks</h2>
+<ul>
+<li><p>River Strike: sabotage boom-chains raising for Harrier skiffs (Pursuit/Current timers).</p></li>
+<li><p>Escort: run refugees or grain; Skald-Drum can convert Audience: Warm <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Favor at a desperate dock.</p></li>
+<li><p>Ambush at Sea: Harrier cutters use kelp curtains; Mistwise counters.</p></li>
+</ul>
+<h2 id="psionics-hooks-optional">Psionics Hooks (optional)</h2>
+<ul>
+<li><p>Dream Weather: Noetic PC senses chalk singing <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Clue to vent map; reduce Warrens Depth advance once.</p></li>
+<li><p>Aegis of Will: disperse dart volleys (convert Harm 1 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Fatigue).</p></li>
+<li><p>Foresight: warn of a night probe; set Hall Defense Position +1.</p></li>
+</ul>
+<h2 id="rewards-fallout">Rewards &amp; Fallout</h2>
+<p><strong>Strings:</strong> Beacon Rites • Bone Oath Ring • Winter Harbor • Pilot’s Stones Reset • Tollmen Truce.</p>
+<p><strong>Boons:</strong> Mist opens path (Position +1 on a fog scene once) • Skald’s Verse spreads (Audience: Warm on arrival).</p>
+<p><strong>Standing:</strong> with Mistland Wardens, Dock unions, or Linn thing.</p>
+<p><strong>Treasure:</strong> marrow resin (contraband), antler crafts, river seals, captives ransomed.</p>
+<p><strong>Campaign Ripples:</strong></p>
+<ul>
+<li><p>The marrow resin points to a southern buyer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> city or sea arc.</p></li>
+<li><p>The Bone Oath Ring ties to an ancient river oath <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> political arc.</p></li>
+<li><p>The chalk vents hint at wyrm channels <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> dragon arc.</p></li>
+</ul>
+<h2 id="prep-aids">Prep Aids</h2>
+<p>Visible timers to start: Beacon Silence 2/6 • Missing Boats 1/6 • Hall Panic 2/6.</p>
+<p>Handouts: Oath tokens, totem sketches, bell-chain map, pilot stones diagram.</p>
+<p>Music: low frame drum; distant bells; water drip.</p>
+<h2 id="one-page-reference">One-Page Reference</h2>
+<ul>
+<li><p>Acts: Hall Defense <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Fen Recon <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Warrens Assault/Parley.</p></li>
+<li><p>Key Tags: Mistwise • Shallow Draft • River-Runner • Reedslip • Drowse.</p></li>
+<li><p>SB Menu (Mist &amp; Iron): Hidden Shoal • Tower Fire • Oarline Breaks • Witness at Cliff • Saga Twisted.</p></li>
+<li><p>Wilderness SB: Unwelcome Smoke • Bad Footing • Foul Water.</p></li>
+<li><p>Timers: Beacon Silence • Missing Boats • Brood-Matron’s Rite • Hall Panic • Feud (Tollmen) • Oath Debts.</p></li>
+<li><p>Outcomes: Matron struck • Vents collapsed • Oaths proven.</p></li>
+<li><p>Advancement: Repute shift • Standing gained • Strings banked.</p></li>
+</ul>
+<h2 id="changelog-1">Changelog</h2>
+<p><strong>v0.1</strong> — First pass: three-act structure, fronts/timers, scenes/venues, enemies, oaths &amp; thing, wilderness/river/psionic hooks, rewards, and a one-page reference.</p>
+<p><strong>End of v0.1</strong></p>
+<h2 id="the-faith-of-the-linn-shrine-temple-and-the-weight-of-the-word">The Faith of the Linn: Shrine, Temple, and the Weight of the Word</h2>
+<div class="epigraph">
+<p>The old gods ask for oaths. The new god asks for silence. I am not sure which is harder to give.</p>
+<p>Skald Aud of the Broken Keel, at the Thing of Stenskar, 847 AR</p>
+</div>
+<h3 id="the-old-shrines-oath-tide-and-hearth">The Old Shrines: Oath, Tide, and Hearth</h3>
+<p>Before the Temple of Light sent its first missionaries across the Dolmis, before the Thepyrgosi Synod codified its doctrines, the Linn kept faith with powers who asked for no prayers—only <em>witness</em>. The old shrines are not buildings. They are <strong>places of memory</strong>: a sea-stack where a chieftain swore to return, a hearthstone where a foster-child was named, a cairn where a drowned crew was given to Vélki’s tide.</p>
+<h4 id="the-patrons-of-the-shrines">The Patrons of the Shrines</h4>
+<p>The Linn do not have a pantheon. They have <strong>oath-kin</strong>—powers who are addressed only when a debt is owed or a word must be sealed.</p>
+<dl>
+<dt>Hrævkn (the Frost-Raven)</dt>
+<dd>
+<p>Witness of the Thing, whose ravens perch on the gables of every moot-hall. He does not speak; he <em>counts</em>. Every oath sworn on the oath-ring adds a feather to his tally. Every broken vow feathers his nest for winter.</p>
+</dd>
+<dt>Vélki (the Wave-Sworn)</dt>
+<dd>
+<p>She who was the first to bleed into the tide and drown. She sits on a throne of whalebone in the Abderrin Trench. When a Linn dies at sea, her hand rises through the waves to pull the body down—not in malice, but in <em>collection</em>. The sea gives passage; the sea takes its price.</p>
+</dd>
+<dt>Skáldyr (the Boast-Eater)</dt>
+<dd>
+<p>A shape that lives in the pause before the punchline, the tension of a harp string held too long. He feeds on <em>public promises</em>. A boast made before witnesses is a prayer. A boast broken leaves the boaster with a mouth full of ash.</p>
+</dd>
+<dt>Iarnvöllr (the Iron-Field)</dt>
+<dd>
+<p>Not a being but a <em>place</em>: a phantom battlefield that appears at dawn where the unburied dead of old raids walk in silent formation. They seek oaths, not blood. A living Linn who swears to retrieve a fallen comrade’s weapon may pass through the Iron-Field unharmed. One who breaks that oath joins the march.</p>
+</dd>
+<dt>Hvítabjörn (the White Bear)</dt>
+<dd>
+<p>A great winter-walker who tests hospitality. He appears during the first blizzard, shaking snow from his fur at the door of a longhouse. If the household offers the first cup of mead, he stays until spring, keeping wolves from the fold. If they refuse, he leaves, and no guest will arrive until the thaw.</p>
+</dd>
+</dl>
+<p>These are not gods to be worshipped. They are <strong>creditors</strong>. A Linn does not pray to Vélki for safe passage; she makes a <em>vow</em> to return a third of her plunder to the deep. A Linn does not ask Hrævkn for wisdom; he swears a <em>boast</em> before the Thing and trusts that the raven is counting.</p>
+<p><strong>At the table:</strong> Shrine-devout Linn (Devotion –2 or –3) gain <strong>+1d</strong> on rites or diplomacy conducted at a recognized shrine (a sea-stack, a moot-ring, a hearthstone). However, they begin social scenes in Temple-controlled venues at <strong>Position –1</strong>, as southern clerics eye them with suspicion.</p>
+<h3 id="the-temple-of-light-the-southern-doctrine">The Temple of Light: The Southern Doctrine</h3>
+<p>The Temple of Light arrived not with armies but with <strong>scribes, bells, and ledgers</strong>. Thepyrgosi missionaries first came to the Linn coast during the reign of the Sea-Queen Hella Ironside, offering grain in exchange for permission to build a single chapel at Fairport. Within a generation, the Temple had established scriptoria, synod courts, and a network of <strong>bell-towers</strong> that marked time in the southern fashion—eight bells for Lauds, nine for the Angelus, a counting that still troubles Linn elders.</p>
+<h4 id="what-the-temple-teaches">What the Temple Teaches</h4>
+<p>The Temple of Light preaches a unified cosmology: one source of illumination, one hierarchy of saints and confessors, one law written in scripture rather than sworn on iron. Its priests carry <strong>candles of witness</strong>, not oath-rings. Confession is private, not public. Salvation is a matter of <em>grace</em>, not <em>interest</em>.</p>
+<p>To a Linn ear, this sounds like a debt that can never be paid—because no price is named.</p>
+<p>Yet the Temple has spread for three reasons:</p>
+<ol>
+<li><p><strong>Grain.</strong> Linn winters are long. Temple granaries, stocked with southern grain, have saved villages from famine—and those villages now ring the Angelus.</p></li>
+<li><p><strong>Law.</strong> The Temple’s canon law offers a way to <em>end</em> feuds, not merely suspend them. A blood-price can be paid to the Temple’s poor fund, not to a rival clan. For Linn exhausted by generations of killing, this is seductive.</p></li>
+<li><p><strong>Writing.</strong> The old faith is oral. Oaths are remembered, not recorded. The Temple offers <em>indulgences</em>—parchment receipts for confessed sins, admissible in any synod court. To a culture that tracks strings and favors with knotted cords, a written receipt feels like <em>technology</em>.</p></li>
+</ol>
+<p><strong>At the table:</strong> Temple-devout Linn (Devotion +2 or +3) gain <strong>+1d</strong> on rites conducted in a consecrated church or on social rolls within a Temple-friendly venue. However, they begin scenes in shrine-controlled strongholds (cliff shrines, moot-rings, ancestral cairns) at <strong>Position –1</strong>, and any boast made before witnesses suffers <strong>–1d</strong> unless they ritually “convert” it into a written petition.</p>
+<h3 id="the-devotion-spectrum-five-faces-of-linn-faith">The Devotion Spectrum: Five Faces of Linn Faith</h3>
+<p>Most Linn do not sit at either extreme. They shift with the season, the harvest, and the proximity of a Temple granary. The <strong>Devotion Spectrum</strong> tracks this tension mechanically (see §25.1), but the <em>fiction</em> of each band is what brings the world to life.</p>
+<h4 id="shrine-devout-pure-shrine">–3: Shrine-Devout (Pure Shrine)</h4>
+<p><em>“The raven knows my name. Does your god know yours?”</em></p>
+<p>These Linn keep to the old ways. They swear oaths on iron rings, not parchment. They leave offerings of blood-silver at sea-stacks for Vélki. They refuse Temple grain even in famine. In shrines, they speak with the authority of generations. In Temple courts, they are sullen, evasive, and dangerous.</p>
+<p><strong>Typical communities:</strong> remote fjord villages, skerry-dwelling fishers, clans with a long feud history (they trust no outside law).</p>
+<h4 id="shrine-leaning">–2: Shrine-Leaning</h4>
+<p><em>“The old ways are hard. But they are <em>our</em> ways.”</em></p>
+<p>These Linn honor the shrine patrons but will trade with Temple merchants. They attend Thing, not synod. They may send a child to a Temple school for writing lessons—but the child must still swear a first oath on the family’s oath-ring. They are the <strong>backbone of resistance</strong> to full conversion.</p>
+<p><strong>Typical communities:</strong> mixed coastal towns with a Thing-hall but also a Temple chapel; clans that have intermarried with southern families but kept their own hearth-traditions.</p>
+<h4 id="to-1-mixed-unsure-the-bridge-walkers">–1 to +1: Mixed / Unsure (The Bridge-Walkers)</h4>
+<p><em>“I pour for the raven and kneel for the candle. Both have fed my children.”</em></p>
+<p>Most Linn live here. They will swear an oath at the Thing and also confess to a Temple priest—different debts, different creditors. They name their children with old shrine-names (Wave-Sworn, Raven-Counted) but also give them Temple baptismal names. They are <strong>pragmatic, not devout</strong>. The spectrum moves for them only when a crisis forces a choice: a failed harvest blamed on neglected shrines, or a plague that Temple healers cannot cure.</p>
+<p>Bridge-Walkers (Devotion 0) have no innate mechanical edge but may qualify for <strong>Ambassador Status</strong> (see §25.1) and are the most likely to earn <strong>Synthesis Tokens</strong> for blending practices.</p>
+<h4 id="temple-leaning">+2: Temple-Leaning</h4>
+<p><em>“The ledger is clearer than the memory. I know what I owe.”</em></p>
+<p>These Linn have largely converted to the Temple of Light. They attend synod courts, not Things. They keep written accounts of debts and favors—strings replaced by parchment. They may still visit a shrine on feast days, but they do so <em>quietly</em>, lest their Temple neighbors see. They are often wealthier than their shrine-devout kin, because Temple trade networks reach farther.</p>
+<p><strong>Typical communities:</strong> port towns with regular southern shipping, mercenary companies that fought for Thepyrgos or Ecktoria, families that lost a feud and used Temple arbitration to end it.</p>
+<h4 id="pure-temple">+3: Pure Temple</h4>
+<p><em>“The old gods take. The Light gives.”</em></p>
+<p>These Linn have fully abandoned the shrines. They see the old patrons as demons or delusions. They are zealous, often converts of the second generation. They serve as Temple missionaries, judges, and scribes. In shrine-controlled villages, they may be met with cold silence or violence. They are the shock troops of the <strong>Northern Crusade</strong>—and they are hated by many of their own kin.</p>
+<p><strong>Typical communities:</strong> Temple school graduates, families that were dispossessed by feud and found refuge in Temple lands, urban Linn in southern cities like Fairport or Thepyrgos itself.</p>
+<h3 id="the-northern-crusade-how-the-temple-of-light-presses-north">The Northern Crusade: How the Temple of Light Presses North</h3>
+<p>The Temple of Light does not send armies. It sends <strong>famine, law, and literacy</strong>—and when those fail, it sends <strong>justiciars with bells</strong>.</p>
+<h4 id="stage-one-the-grain-mission">Stage One: The Grain Mission</h4>
+<p>Temple missionaries arrive in a lean winter with shiploads of southern grain. They offer it freely, no strings—except a small chapel built by spring, a bell tower that marks the hours, a scribe who will write letters for those who cannot write. The first converts are the hungry and the curious.</p>
+<h4 id="stage-two-the-synod-court">Stage Two: The Synod Court</h4>
+<p>Once a Temple chapel is established, the bishop appoints a <strong>synod judge</strong>. This judge hears disputes that would normally go to the Thing. The judge uses canon law, which is written, consistent, and <em>slow</em>. For clans exhausted by blood-feud, this slow justice feels like mercy. For the shrine-devout, it feels like theft of their lawful authority.</p>
+<p>The synod judge also hears <em>confessions</em>. A Linn who confesses a broken oath to the Temple is not required to pay blood-silver—only to perform penance: a pilgrimage, a donation, a prayer. This undermines the entire shrine economy, which runs on compensation, not absolution.</p>
+<h4 id="stage-three-the-school">Stage Three: The School</h4>
+<p>Where there is a synod court, there is a school. Children learn to read the Temple’s script, to count in the southern fashion (eight bells to Lauds, nine to the Angelus), to write their names in ledgers. The schoolmaster is also a missionary. He does not destroy the old stories; he <em>rewrites</em> them. Hrævkn becomes a demon. Vélki becomes a cautionary tale about the perils of sea-worship. The White Bear becomes a metaphor for Christ’s hospitality.</p>
+<h4 id="stage-four-the-bell-and-the-banner">Stage Four: The Bell and the Banner</h4>
+<p>When a village has a chapel, a synod court, and a school, the Temple raises a <strong>bell-tower</strong> with a bronze bell cast in Thepyrgos. It rings eight times each morning. The old shrine bells—iron, cracked, tuned to the older counting—fall silent. The Temple also sends a <strong>banner</strong>: a white field with a golden candle, to be flown on feast days. In some villages, the shrine banner (a raven, a white bear, a wave) is relegated to a back wall. In others, it is burned.</p>
+<p>The Northern Crusade is not a single war but a <em>process</em>. GMs can track it with a <strong>Temple Pressure [6]</strong> timer in a region. Each tick represents a new chapel, a synod court, a school, a bell-tower. When the timer fills, the region becomes Temple-controlled (venue tags shift to Temple District or Contested Ground). Player actions can tick the timer backward by restoring a shrine, exposing a corrupt synod judge, or leading a successful raid against a Temple granary.</p>
+<h3 id="the-bell-that-counts-to-nine-the-crusade-as-digestion">The Bell That Counts to Nine: the Crusade as Digestion</h3>
+<div class="epigraph">
+<p>They did not take the hall. They asked, very politely, whether we would like the children to be able to read, and we said yes, because we are not monsters.</p>
+<p>Jarl Ingrith Ottarsdottir, three winters after the chapel went up</p>
+</div>
+<p>The Northern Crusade is the hardest thing in this book to run well, because the temptation is to play it as villainy and it is not villainy. What arrives on the Linn coast is not an army. It is grain in a lean winter. It is an alphabet. It is a clock. It is a court that will settle your grandmother’s boundary dispute without requiring you to fight your neighbor’s son over it. It is a school, a road, a foundling-house, and a woman from Thepyrgos who knows how to set a leg so that it works afterwards.</p>
+<p>Every one of those things is good. That is the entire problem, and if the table ever stops feeling it, the arc has gone wrong.</p>
+<h4 class="unnumbered" id="what-the-thepyrgosi-are-actually-doing">What the Thepyrgosi Are Actually Doing</h4>
+<p>They are bringing <em>culture</em>—in the sense they mean it, which is the sense most of the world now means it. Letters. Hours. Records. Weights that are the same in two towns. A calendar that does not depend on which elder is still alive to remember the year. The southern missionary does not think of himself as destroying anything, and he is not lying: from where he stands he is handing a cold, illiterate, feuding coast the tools he was raised to think of as the difference between people and weather.</p>
+<p>He is also, without noticing, doing the one thing the north has organized its entire inner life around not doing.</p>
+<p><strong>The thing to keep in front of the table.</strong> The Temple counts to nine every morning, from a tower, in public, for everybody, on a timetable—and nothing happens to them. A Linn who watches this for a season has to reach one of two conclusions, and both of them are ruinous:</p>
+<ul>
+<li><p>Something very large is standing behind the southerners, and it has not yet said what it wants; or</p></li>
+<li><p>the ninth was never what the grandmothers said, and nine generations of Linn have been paying a price nobody had to pay—which makes every saga ever sung an expensive and beautiful mistake.</p></li>
+</ul>
+<p>Do not resolve this. Let both explanations stay available for the whole campaign. The most interesting Linn NPCs in the north are the ones who have privately settled on the second one and have not told anybody.</p>
+<h4 class="unnumbered" id="cheap-remembering">Cheap Remembering</h4>
+<p>Linn memory is expensive on purpose. To be remembered you must do something a skald judges worth carrying, and then the skald must actually carry it, and other skalds must take it up, and it must survive the winter. Repute, Saga, blood-silver, the standing of a hall: all of it runs on the fact that remembrance is scarce and has to be earned in public.</p>
+<p>The Temple gives it away.</p>
+<p>A scribe writes a fisherman’s name in a baptismal roll for nothing. Not for a deed—for existing, on a Furrow day. Two years later his daughter can be found in a book, and her mother’s name is in it, and her grandmother’s, and none of them did anything a skald would cross a room for. To the Temple this is charity, and it is. To a jarl it is the quiet destruction of the only currency her authority is denominated in, and she cannot say so out loud without sounding exactly as petty as the missionary will report her to be.</p>
+<p>Worse: the schoolmaster does not burn the sagas. He <em>writes them down</em>. And a written saga does not need a skald. And a skald who is not needed is a man with an opinion.</p>
+<h4 class="unnumbered" id="digestion-not-conquest">Digestion, Not Conquest</h4>
+<p>The process takes two generations and requires no massacre at any point.</p>
+<ol>
+<li><p>The village keeps its shrine and adds a chapel. Nobody objects; there is room.</p></li>
+<li><p>The chapel acquires a synod court, which is slow, written, consistent, and—this is the part that hurts—often <em>fairer</em> than the Thing, because it cannot be swayed by whose cousin is standing at the back.</p></li>
+<li><p>The court acquires a school, because the court needs clerks.</p></li>
+<li><p>The school acquires the children.</p></li>
+<li><p>The children acquire the hours: eight bells to Lauds, nine to the Angelus, a day cut into pieces that are the same length in every town from here to the Brass Gate.</p></li>
+<li><p>Their children think a fjord is a place you leave.</p></li>
+</ol>
+<p>At no stage does anyone do anything a reasonable person would refuse.</p>
+<p><strong>Temple Pressure [6], revisited.</strong> The front timer (see the Northern Crusade material above) is not a measure of oppression. It is a measure of <em>usefulness</em>. Tick it forward whenever the Temple solves a problem the old order could not: a famine relieved, a feud ended without blood-silver, a child taught to read, a leg set properly, a road that stays open in March.</p>
+<p><strong>What ticks it back:</strong> a Thing that settles a hard case faster and better than the synod court, in public. A saga made that the school cannot contain and the scribes cannot flatten. A shrine restored and <em>useful</em>—a beacon rekindled, a bell-chain repaired, a pilot-stone reset—so that the old practice is visibly doing work.</p>
+<p><strong>What does not tick it back:</strong> burning the chapel. That advances it by <strong>1</strong>. Martyrs are excellent for literacy.</p>
+<h4 class="unnumbered" id="playing-the-crusade-honestly">Playing the Crusade Honestly</h4>
+<ul>
+<li><p><strong>Let the Temple be right at least once per arc</strong>, about something the party cares about. The clinic works. The grain is real. The synod judge, on at least one occasion, delivers a better verdict than the Thing would have.</p></li>
+<li><p><strong>Give the missionary a face and no hypocrisy.</strong> The dangerous one is not the justiciar with the torch; it is the tired, kind, competent man handing out bread who will still be handing out bread in ten years when the shrine has no attendants left.</p></li>
+<li><p><strong>Play the converts as people, not traitors.</strong> The Linn girl who learned to read and is glad of it is not a plot device. She is what the argument is actually about.</p></li>
+<li><p><strong>Never let the party “win” by proving the Temple wrong.</strong> They cannot; the Temple is largely right about the things it claims. What they can do is make the old way <em>work in front of witnesses</em>, which is the only argument that has ever moved a hall.</p></li>
+<li><p><strong>The horror, when you want it, is not the bell.</strong> It is the moment a Linn PC realizes they have started keeping the hours because it is convenient.</p></li>
+</ul>
+<p><strong>GM seed:</strong> The Thepyrgosi engineer surveying for the new road is courteous, curious, and asks the crew, in good faith, how many people live in the valley. Nobody has ever counted. The elders will not let him count. He cannot understand the objection and asks again, more slowly, assuming a language problem. He has been sleeping badly for a week and has begun to dream of a corridor with nine doors in it, and has told no one, because he is a rational man.</p>
+<h3 id="the-faith-tensions-in-play-example-scenes">The Faith Tensions in Play: Example Scenes</h3>
+<h4 id="scene-the-thing-at-winter-hearth">Scene: The Thing at Winter Hearth</h4>
+<p>The Thing convenes to settle a feud. The shrine-devout demand blood-silver paid in iron and cattle. The Temple-leaning faction proposes synod arbitration: the feud is confessed, penance assigned, the matter closed. The jarl, a Bridge-Walker (Devotion 0), must choose. The GM sets a <strong>Faith Tension</strong> of Medium (rumors, side-eyes, low-level feuds). Faith-marked actions suffer −1 Position.</p>
+<p><strong>Player options:</strong></p>
+<ul>
+<li><p>Side with the shrine-devout and gain a <strong>String</strong> (<em>Feud Token</em>) with that clan.</p></li>
+<li><p>Side with the Temple and gain a <strong>String</strong> (<em>Synod Indulgence</em>) with the bishop.</p></li>
+<li><p>Attempt a <strong>syncretic resolution</strong>: blood-silver paid to the Temple’s poor fund, followed by a shrine blessing. This requires a <strong>Synthesis Token</strong> (see §25.1) or a hard roll.</p></li>
+</ul>
+<h4 id="scene-the-bishops-progress">Scene: The Bishop’s Progress</h4>
+<p>A Temple bishop tours the coastal villages, consecrating new chapels. At each stop, he offers grain and scripture. Shrine-devout elders see their influence wane. The GM assigns a <strong>Contested Ground</strong> venue tag: both sides suffer −1 Position on faith actions unless they can frame their approach as bridge-building.</p>
+<p><strong>Player hook:</strong> A shrine-devout skald asks the party to steal the bishop’s <em>bell-clapper</em>—a relic said to contain a fragment of the True Candle. Without it, the consecration cannot proceed. The party must infiltrate the bishop’s camp, avoid his Thepyrgosi guards, and escape across the frozen fjord.</p>
+<h4 id="scene-the-converts-shame">Scene: The Convert’s Shame</h4>
+<p>A Temple-leaning Linn has agreed to testify against her own clan in a synod court, accusing them of “idolatry” (shrine worship). Her shrine-devout kin have declared a feud. She is now trapped in the Temple compound, afraid to leave.</p>
+<p><strong>Player options:</strong></p>
+<ul>
+<li><p>Smuggle her to a neutral port (escort mission, uses River-Runner or Mistwise tags).</p></li>
+<li><p>Convince the synod judge to drop the case (social scene, requires <strong>Belief Flexibility</strong> or <strong>Ambassador Status</strong>).</p></li>
+<li><p>Help her perform a <strong>dual-oath</strong> (shrine and Temple together) that satisfies both sides, earning a <strong>Synthesis Token</strong> and potentially creating a new syncretic tradition—but marking her as a heretic to both extremists.</p></li>
+</ul>
+<h3 id="cross-cultural-resonance-the-deep-threads">Cross-Cultural Resonance: The Deep Threads</h3>
+<p>The Linn faith does not exist in isolation. Its shapes echo in other cultures across Fate’s Edge—not because of borrowing, but because certain <em>structures of obligation</em> recur wherever people face the sea, the winter, and the problem of keeping promises.</p>
+<h4 id="the-thepyrgosi-thread-syllogistic-theology">The Thepyrgosi Thread (Syllogistic Theology)</h4>
+<p>The Temple of Light’s canon law shares a deep structure with the <strong>Thepyrgosi syllogism</strong>: if A owes B, and B owes C, then A owes C. This is simple debt transfer. The Linn old faith holds a different logic: if A swears an oath to B, and B witnesses A’s boast, then <em>B becomes part of the debt</em>—a tripartite structure (debtor, creditor, witness) that Thepyrgosi scholastics find inefficient.</p>
+<p><strong>In play:</strong> Thepyrgosi clerics attempting to convert Linn often stumble over the witness requirement. “Why does the raven need to know?” they ask. “Because the raven <em>is</em> the memory,” the Linn reply.</p>
+<h4 id="the-dhaharan-thread-mandala-of-exchange">The Dhaharan Thread (Mandala of Exchange)</h4>
+<p>The Dhaharan principalities, far to the south, have no shrines to ravens or white bears. But their <strong>mandala of exchange</strong>—the idea that all transactions, spiritual and material, are mirrored across a cosmic ledger—maps cleanly onto the Linn understanding of Vélki’s tide-debt. A Dhaharan merchant would recognize Vélki immediately: she is a <em>karmic creditor</em>, no different from a temple accountant.</p>
+<p><strong>In play:</strong> A Dhaharan trader who understands the Linn faith can negotiate blood-silver using Dhaharan ledger principles. This creates a <strong>Bridge-Walker</strong> moment (Devotion 0) where two very different cultures find a shared language of debt.</p>
+<h4 id="the-aeler-thread-keystone-and-oath">The Aeler Thread (Keystone and Oath)</h4>
+<p>The Aeler, those mountain engineers, keep their own faith in <strong>keystone clauses</strong>—promises carved in stone, witnessed by bells, enforced by gravity. An Aeler tunnel-wright would find the Linn oath-ring perfectly legible: it is a <em>load-bearing promise</em>, a contract signed in breath rather than chisel.</p>
+<p><strong>In play:</strong> An Aeler Runekeeper serving a Linn crew may interpret their boasts as Rites, marking Obligation to Hrævkn rather than to a Patron. This is not conversion; it is <em>translation</em>. The GM may allow such a character to use <strong>Synthesis Tokens</strong> to blend Linn shrine rites with Aeler ledgers.</p>
+<h3 id="faith-saga-and-the-shape-of-a-life">Faith, Saga, and the Shape of a Life</h3>
+<p>The Saga System (§26) is the perfect engine for tracking a Linn’s faith journey. A character’s Devotion should move rarely—only at major story beats:</p>
+<ul>
+<li><p><strong>Shrine-Devout (–3) to Mixed (–1):</strong> After surviving a winter on Temple grain, a Linn may lose faith in the old ways. Mechanically, this is a <strong>Story-Shaping Decision</strong> worth 1–2 Saga Points.</p></li>
+<li><p><strong>Mixed (0) to Temple-Leaning (+2):</strong> After a synod court ends a blood-feud that had lasted three generations, a clan may convert en masse. This is a <strong>Legendary Deed</strong> (Oath-Keeper Supreme) and may grant a permanent <strong>Syncretic Tradition</strong> boon.</p></li>
+<li><p><strong>Temple-Leaning (+2) to Pure Temple (+3):</strong> A character becomes a missionary, a justiciar, a bell-caster. They gain the <strong>Belief Flexibility</strong> talent (4 XP) for free—but they also gain a <strong>Heretic</strong> tag in shrine-devout venues.</p></li>
+</ul>
+<h4 id="saga-scenes-of-faith">Saga Scenes of Faith</h4>
+<p>When a player declares a <strong>Saga Scene</strong> (§26.5) in a faith context, the spotlight should illuminate the <em>cost</em> of belief:</p>
+<ul>
+<li><p>A shrine-devout skald sings the old names in a Temple chapel (Position +1 for the first roll, but the GM may spend 1 SB to have a synod judge arrive mid-verse).</p></li>
+<li><p>A Temple-leaning justiciar pronounces a shrine a demon-house and orders it burned. She gains +1d on her Command roll, but her shadow now has a raven’s silhouette (a Saga Scar, usable by the GM for future complications).</p></li>
+<li><p>A Bridge-Walker mediates between a shrine-devout clan and a Temple bishop. She earns a <strong>Synthesis Token</strong> immediately, but both sides demand a <em>reciprocal oath</em>—and she is now the witness.</p></li>
+</ul>
+<h3 id="the-ninth-bell-and-the-unfinished-count">The Ninth Bell and the Unfinished Count</h3>
+<p>The Temple of Light rings nine bells to mark the Angelus. The old shrines ring eight—and stop.</p>
+<p>Every people in the Amaranthine keeps the eight. The Aeler count their breaths in eights, the Aelinnel measure their steps in eights, the Ykrul tie their hostage strings in eights. The Linn keep it too. Eight strokes on the harbor bell, eight cups at a naming-feast, eight witnesses to an oath, eight nails in a coffin-plank. Ashore, a Linn counts like anyone sensible and stops where sensible people stop.</p>
+<p>What makes the Linn strange is what they do when they leave.</p>
+<h4 class="unnumbered" id="the-hearth-count-and-the-keel-count">The Hearth-Count and the Keel-Count</h4>
+<p>In the hall—among children, cattle, and the settled dead—a Linn keeps the <strong>hearth-count</strong>: eight, and no further. This is not piety. It is housekeeping. You do not open a door in a room where the babies sleep.</p>
+<p>A ship is not a hall. Before a keel takes water on a voyage that is meant to <em>matter</em>—a long raid, a blood-errand, a crossing nobody has come back from—the crew keeps the <strong>keel-count</strong>. They ring eight on the harbor bell, and then, deliberately, in daylight, in front of the whole strand, they ring the ninth.</p>
+<p>Then they go.</p>
+<p>The shrine-devout of other lands find this obscene, and say so. The Linn find the objection childish. Their reasoning, when a skald can be persuaded to lay it out plainly, runs like this: the ninth will be rung over you sooner or later, whatever you do; the only question is whether it is rung at a time you chose, in a place you chose, with witnesses standing on the strand who can carry the account home. A death in bed is a death nobody can describe. A death in the third hour of a boarding action, in front of forty men, is a death with a shape.</p>
+<p><strong>The short version.</strong> The Aelaerem pour eight cups and give the ninth to the earth so that nothing notices them. The Linn pour the ninth, drink it, and say their own names into it. Both peoples are afraid of exactly the same thing. Only one of them has decided that the way through is forward.</p>
+<h4 class="unnumbered" id="why-the-temples-bell-is-worse">Why the Temple’s Bell Is Worse</h4>
+<p>The shrine-devout do not fear the Temple’s ninth bell because it is forbidden. They fear it because it is <em>casual</em>.</p>
+<p>A Linn rings the ninth the way a careful man draws a blade: rarely, deliberately, never indoors, and never without knowing who is going to be standing there afterward. Thepyrgos rings it every morning at Lauds, from a stone tower, over a sleeping village, for everybody, on a schedule—and calls the practice <strong>the hours</strong>.</p>
+<p>There are only two explanations, and a Linn will lie awake over both. Either the southerners are shielded by something very large that has not yet said what it wants; or the ninth was never the thing the grandmothers said it was, and nine generations of Linn have been paying a price nobody had to pay. The first possibility is frightening. The second is unbearable, because it makes the sagas into a very long mistake.</p>
+<p><strong>GM seed:</strong> A Temple bell-tower in a recently converted village begins ringing a ninth bell at midnight—which is not the hour, and not the schedule. Livestock sicken. Children walk in their sleep toward the sea. The shrine-devout say the old patrons are angry. The Temple says the devil is testing the faithful. The bishop’s own bell-warden says, quietly, that nobody is pulling the rope. The truth is simpler than any of these: the bell was cast from iron salvaged out of a ship that sank without burial, and the drowned have started counting for themselves.</p>
+<div class="epigraph">
+<p>The old gods count your breaths. The new god counts your sins. Neither will let you forget. The question is which ledger you would rather read at midnight.</p>
+<p>Dusana of the Raven Road, at the Thing of Stenskar, after the ninth bell fell silent</p>
+</div>
+<h3 id="temple-of-light-shrines-and-the-devotion-spectrum">Temple of Light, Shrines, and the Devotion Spectrum</h3>
+<p>The Temple of Light and the old shrine cults do not exist as a simple on/off switch. Most Linn live somewhere along a sliding scale of tradition and new faith. Rather than tracking separate factions in detail, use the following light-weight overlays on existing mechanics (Position, SB, Tags, and Conditions).</p>
+<h4 class="unnumbered" id="the-devotion-spectrum">The Devotion Spectrum</h4>
+<p>Each character (or crew, if you prefer) may mark a single <strong>Devotion value</strong> from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">-3</annotation></semantics></math> to <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">+3</annotation></semantics></math>:</p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">-3</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">-2</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> <strong>0</strong> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">+1</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">+2</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">+3</annotation></semantics></math></p>
+<ul>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">-3</annotation></semantics></math>: <strong>Pure Shrine</strong> — openly devoted to patrons, deeply suspicious of Temple.</p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> to <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">+1</annotation></semantics></math>: <strong>Mixed / Unsure</strong> — lives in both worlds, or keeps faith private.</p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">+3</annotation></semantics></math>: <strong>Pure Temple</strong> — openly devout; treats shrines as questionable or obsolete.</p></li>
+</ul>
+<h5 class="unnumbered" id="when-it-moves">When It Moves</h5>
+<ul>
+<li><p>Only move Devotion on <strong>major story beats</strong>: public conversions, dramatic repudiations of a faith, founding or closing a shrine/Temple, or major miracles.</p></li>
+<li><p>A quiet personal doubt is color; a public oath-breaking before a hall can shift the track.</p></li>
+</ul>
+<h5 class="unnumbered" id="mechanical-edge-extremes-only">Mechanical Edge (Extremes Only)</h5>
+<p>Devotion only has direct mechanical teeth at:</p>
+<ul>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">-2</annotation></semantics></math> or <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">-3</annotation></semantics></math>: <strong>Shrine-Favored</strong> — gain <strong>+1d</strong> on patron rites or shrine diplomacy; suffer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> Position in clearly Temple-dominated venues.</p></li>
+<li><p><strong>0</strong>: <strong>Bridge-Walker</strong> — no innate bonus, but can qualify for <em>Ambassador Status</em> (below).</p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">+2</annotation></semantics></math> or <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">+3</annotation></semantics></math>: <strong>Temple-Favored</strong> — gain <strong>+1d</strong> on Temple rites or Temple court scenes; suffer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> Position in shrine strongholds.</p></li>
+</ul>
+<h4 class="unnumbered" id="venue-tags-faith-based-position">Venue Tags &amp; Faith-Based Position</h4>
+<p>Instead of detailed faction sheets, give each important location a single <strong>faith tag</strong>:</p>
+<ul>
+<li><p><strong>Shrine Stronghold</strong> — hills, halls, or villages bound tightly to patrons.</p></li>
+<li><p><strong>Temple District</strong> — towns with active Temple of Light presence and law.</p></li>
+<li><p><strong>Mixed Quarter</strong> — places where both altars stand; everyday compromise.</p></li>
+<li><p><strong>Contested Ground</strong> — frontiers, halls, or thing-sites where both sides push.</p></li>
+</ul>
+<p>Apply simple Position modifiers:</p>
+<ul>
+<li><p><strong>Shrine-Friendly Venue</strong>: Temple-leaning characters (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>2</mn><mi>/</mi><mo>+</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">+2/+3</annotation></semantics></math>) suffer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> Position on overtly faith-based actions unless they show respect or humility.</p></li>
+<li><p><strong>Temple-Friendly Venue</strong>: Shrine-leaning characters (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2</mn><mi>/</mi><mo>−</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">-2/-3</annotation></semantics></math>) suffer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> Position on faith actions unless they submit to Temple forms.</p></li>
+<li><p><strong>Mixed Quarter</strong>: No automatic penalty; GM may assess <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> Position for open grandstanding by either extreme.</p></li>
+<li><p><strong>Contested Ground</strong>: Both sides suffer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> Position on faith actions <em>unless</em> they can frame their approach as <strong>bridge-building</strong>. The GM may spend <strong>1 SB</strong> to create a brief opening where a sincere mediator can act at neutral Position.</p></li>
+</ul>
+<h4 class="unnumbered" id="faith-tension-as-a-scene-tag">Faith Tension as a Scene Tag</h4>
+<p>Treat religious tension like weather or terrain: a <strong>scene-level tag</strong> that sits on top of everything else.</p>
+<dl>
+<dt>Low Tension</dt>
+<dd>
+<p>Everyday life. No special modifiers.</p>
+</dd>
+<dt>Medium Tension</dt>
+<dd>
+<p>Rumors, side-eyes, low-level feuds. <em>Faith-marked</em> actions (invoking shrines, Temple doctrine, public prayers) suffer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> Position.</p>
+</dd>
+<dt>High Tension</dt>
+<dd>
+<p>Open feuding, recent blasphemy, or fresh Temple decrees. Opposing-faith interactions take <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">D</mi><mi mathvariant="normal">V</mi></mrow><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\mathrm{DV}+1</annotation></semantics></math> and generate automatic <strong>Exposure +1</strong> on failure.</p>
+</dd>
+</dl>
+<p>The GM can adjust Faith Tension up or down when:</p>
+<ul>
+<li><p>A public slight, miracle, or atrocity occurs.</p></li>
+<li><p>A Saga Scene (Section ‘Saga System: Epic Reputation and Legendary Deeds’) plays out around faith.</p></li>
+</ul>
+<h4 class="unnumbered" id="synthesis-tokens-blending-practices">Synthesis Tokens: Blending Practices</h4>
+<p>When characters successfully blend shrine and Temple practices in a scene <em>and</em> the table agrees it feels earned (shared prayers, joint rites, dual-oath funerals):</p>
+<ul>
+<li><p>The crew gains a <strong>Synthesis Token</strong> (treat like a <em>Boon</em> that can only be spent in faith contexts).</p></li>
+</ul>
+<p>A Synthesis Token may be spent to:</p>
+<ul>
+<li><p>Improve Position by one step for a faith-based action (e.g. Controlled<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>Controlled).</p></li>
+<li><p>Gain <strong>+1d</strong> on diplomacy between Temple and shrine factions.</p></li>
+<li><p>Declare <strong>temporary safe passage</strong> through otherwise hostile religious territory for a single scene (guards stand aside, elders agree to host, etc.).</p></li>
+</ul>
+<p>Unused Tokens do not stack endlessly; the crew may hold at most <strong>two</strong> Synthesis Tokens at a time.</p>
+<h4 class="unnumbered" id="dual-oaths-spiritual-conflict">Dual Oaths &amp; Spiritual Conflict</h4>
+<p>Some characters swear both to a patron shrine and the Temple of Light.</p>
+<p>You do not need a separate timer; instead, when you roll for a clearly faith-marked action while holding <strong>both</strong> shrine-oath and Temple vow:</p>
+<ul>
+<li><p>If the roll shows one or more <strong>1s</strong>, you must <strong>choose</strong> which faith is offended by how you acted.</p></li>
+<li><p>The offended side gains a narrative opening: colder reactions, whispers, or calls to prove yourself later.</p></li>
+</ul>
+<p>If you refuse to choose:</p>
+<ul>
+<li><p>Mark the <strong>Spiritual Conflict</strong> Condition: <em>“Pulled Between Altars”</em> (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> die to faith actions until resolved).</p></li>
+<li><p>Resolve it by taking a clear, public stand in a dramatic scene: favor one faith, attempt a risky synthesis, or refuse both and accept the fallout.</p></li>
+</ul>
+<h4 class="unnumbered" id="ritual-adaptation-contamination">Ritual Adaptation &amp; Contamination</h4>
+<p>When you perform shrine rites in explicitly Temple spaces (or Temple rites in fiercely shrine-held space), you are stepping into dangerous territory.</p>
+<h5 class="unnumbered" id="gm-sb-use-ritual-adaptation">GM SB Use (Ritual Adaptation)</h5>
+<p>When characters attempt mixed rites:</p>
+<ul>
+<li><p><strong>1 SB</strong>: Minor offense (wrong tool, clumsy phrasing) — social awkwardness, hushed whispers.</p></li>
+<li><p><strong>2 SB</strong>: Moderate tension — rumors, open criticism, minor feud Timers tick.</p></li>
+<li><p><strong>3+ SB</strong>: Major conflict — accusations of blasphemy, forced choices, or legal challenges.</p></li>
+</ul>
+<h5 class="unnumbered" id="contamination-tokens">Contamination Tokens</h5>
+<p>Additionally, if the rite is clearly “in the wrong place,” the GM may mark a <strong>Contamination Token</strong> on the character or venue:</p>
+<ul>
+<li><p>While holding a Contamination Token, you suffer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math> die to <em>all</em> faith-based rolls linked to that space or rite.</p></li>
+<li><p>Clear a Token by:</p>
+<ul>
+<li><p>Spending part of downtime on cleansing rites, reparations, or pilgrimages; or</p></li>
+<li><p>Converting it into growth: treat 1 Token as <strong>1 XP</strong> toward a faith-aligned talent or Devotion shift (you learned from your mistake, in public).</p></li>
+</ul></li>
+</ul>
+<h4 class="unnumbered" id="faith-ambassadors-flexible-belief">Faith Ambassadors &amp; Flexible Belief</h4>
+<p>Some characters become known as bridge-builders, mediators, or “those who can speak to both altars”.</p>
+<h5 class="unnumbered" id="ambassador-status">Ambassador Status</h5>
+<p>A character who has <em>successfully</em> mediated at least two serious faith conflicts (GM judgment) may be granted <strong>Ambassador Status</strong>:</p>
+<ul>
+<li><p>Mark a single checkbox or tag: <em>Temple–Shrine Ambassador</em>.</p></li>
+<li><p>Once per session, convert a <em>faith-based Position penalty</em> (e.g. from venue or Devotion) into an equivalent <strong>bonus</strong> for a single roll (e.g. Controlled<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>Controlled), by explicitly leaning on their reputation as a neutral voice.</p></li>
+<li><p>Refresh Ambassador Status when you play out another mediation scene that matters.</p></li>
+</ul>
+<h5 class="unnumbered" id="optional-talent-belief-flexibility">Optional Talent: Belief Flexibility</h5>
+<p>For characters who intentionally walk the line, you can allow a minor talent:</p>
+<dl>
+<dt><strong>Belief Flexibility</strong> (4 XP)</dt>
+<dd>
+<p>Once per session, ignore faith-alignment Position penalties (from venue tags or Devotion) for a single scene, representing a knack for “reading the room” and speaking both languages.</p>
+</dd>
+</dl>
+<p>Limit: You cannot benefit from both shrine <em>and</em> Temple-specific mechanical advantages in the same scene (pick which side of your faith is active).</p>
+<h4 class="unnumbered" id="using-faith-in-play">Using Faith in Play</h4>
+<ul>
+<li><p><strong>Keep It Light</strong> — These tools hang off mechanics you already use (Position, SB, Tags, Conditions). If you are ever tracking more than Devotion, one venue tag, and maybe a Token or two, simplify.</p></li>
+<li><p><strong>Play For Drama</strong> — Use Devotion shifts and Synthesis Tokens to spotlight big, meaningful choices, not background noise.</p></li>
+<li><p><strong>Tie Into Saga</strong> — Faith choices make excellent fuel for the Saga system (Section ‘Saga System: Epic Reputation and Legendary Deeds’): conversions, heresy trials, shrine restorations, and Temple victories are all things skalds love to sing about.</p></li>
+</ul>
+<h2 id="the-way-out-to-meet-it-linn-nerve-as-a-playable-thing">The Way Out to Meet It: Linn Nerve as a Playable Thing</h2>
+<div class="epigraph">
+<p>Everything that is coming for you is already on its way. You may sit in the hall and wait for it in the dark, or you may put on your good coat and walk down to the water and be standing there when it arrives. One of those is a story.</p>
+<p>Ranveig Hallsdottir, skald, to a boy who did not want to go</p>
+</div>
+<p>This chapter is the part of Linn culture that other peoples find hardest to portray without turning it into swagger. It is not swagger. It is a method, it is taught to children, and it has rules.</p>
+<h3 id="what-a-linn-is-actually-afraid-of">What a Linn Is Actually Afraid Of</h3>
+<p>Not drowning. Every Linn expects to drown; the sea is a colleague. Not poverty, not maiming, not even the feud—all three are survivable and all three make good verses.</p>
+<p>What a Linn fears is <strong>going under without a shape</strong>. Dying in a way nobody can describe. Being the man who was also there. Being a name in somebody else’s account of a night, mentioned once, in a subordinate clause. A Linn hall can forgive cowardice more easily than it can forgive being boring, because a coward at least gives the skald something to work with.</p>
+<p>This produces a culture that runs <em>toward</em> the things its neighbors ward against, and it is worth being precise about why: the Linn are not braver than the Aelaerem. They are afraid of a different half of the same problem. The Aelaerem are afraid of being noticed. The Linn are afraid of not being.</p>
+<h3 id="doom-naming-the-boast-properly-understood">Doom-Naming (the Boast, Properly Understood)</h3>
+<p>Outsiders hear a Linn boast and file it as bragging. It is closer to a declaration of intent made in front of witnesses so that the thing being declared cannot arrive quietly. You say the worst outcome out loud, in daylight, before you act. Then it belongs to you.</p>
+<p><strong>Doom-Naming.</strong> Before rolling, a Linn character may name aloud—in front of at least one witness who is not crew—the specific complication they most fear from this action. (“The line parts.” “Her brother is aboard.” “We are seen from the headland.”)</p>
+<ul>
+<li><p>For the rest of the scene, that named complication costs the GM <strong>1 less SB</strong> to bring about (minimum 1).</p></li>
+<li><p>If it <em>does</em> happen, the crew marks <strong>1 Saga Point</strong>, and the character who named it takes <strong>+1d</strong> on their next roll or clears <strong>1 Fatigue</strong>. They said it would happen. They were standing ready when it did.</p></li>
+<li><p>If the scene ends and it never happens, nothing occurs. No penalty, no reward. A doom named and dodged is simply a story with a weak ending, and the hall will say so.</p></li>
+<li><p>You may only name a doom that falls on <em>you</em>. Naming one that falls on someone else is not a boast; it is a curse, and the Thing has a great deal to say about curses.</p></li>
+</ul>
+<p><strong>Why it is not just a penalty.</strong> Players learn quickly that Doom-Naming makes bad things likelier. That is the trade and it should be visible: you are buying the <em>timing</em> and the <em>authorship</em> of your own disaster, and paying for it in probability. GMs should make the purchased version genuinely better—the line parts while the character has a hand on it and a knife in reach, rather than in the dark, later, behind them.</p>
+<h3 id="the-ninth-witness">The Ninth Witness</h3>
+<p>An oath sworn before eight living witnesses is binding at law, and the Thing will enforce it. An oath sworn before <em>nine</em>—where the ninth place is left deliberately empty, a seat unfilled, a cup poured and set down untouched—is binding on something that does not attend Things.</p>
+<p>Every people in the north knows that the ninth witness is always a ghost. The Linn are the only ones who send an invitation.</p>
+<p><strong>Swearing on the Ninth Witness.</strong> The oath is spoken with eight witnesses present and a ninth place set.</p>
+<ul>
+<li><p>While the oath stands, any character bound by it gains <strong>+1d</strong> on rolls that directly and visibly uphold it.</p></li>
+<li><p>The oath cannot be quietly abandoned. Breaking it, or letting it lapse through neglect, costs <strong>2 Boons or 2 SB</strong> and is <em>always</em> publicly known within the season—the ninth witness tells someone.</p></li>
+<li><p>Start a <strong>Noticed [8]</strong> clock for the swearer. It advances whenever the oath is invoked for advantage. When it fills, someone attends a scene who should not be there, remembers events accurately that they did not see, and does not explain themselves.</p></li>
+<li><p>No character may hold two ninth-witness oaths at once. A person with two ghosts is not a person with two friends.</p></li>
+</ul>
+<h3 id="going-out-to-meet-it">Going Out to Meet It</h3>
+<p>The central move of the whole culture, and the one that should come up at the table most often. When something is coming—a front timer nearly full, a feud about to break, a debt whose holder has begun asking after you—a Linn crew may refuse to be found. They go to it instead.</p>
+<p><strong>Declaring a Meeting.</strong> The crew names a threat that would resolve later at the GM’s convenience, and goes to it now.</p>
+<ul>
+<li><p>The associated timer <strong>fills immediately</strong>. The thing happens.</p></li>
+<li><p>In exchange, the crew chooses the <strong>ground, the hour, and who is present</strong>, and acts first.</p></li>
+<li><p>Position improves <strong>one step</strong> for the first exchange.</p></li>
+<li><p>If the Meeting costs the crew something real—a ship, a hand, an ally, a hall—mark <strong>1 Saga Point</strong>.</p></li>
+</ul>
+<p><strong>GM guidance: never refuse a Meeting.</strong> The entire culture is built on the assumption that this is allowed. Charge for it in blood, never in permission. A GM who says “you can’t get there in time” twice has quietly made the Linn into a different people.</p>
+<h3 id="ringing-the-ninth">Ringing the Ninth</h3>
+<p>The crew ritual before a score that is meant to matter. Eight strokes, a pause long enough to be a decision, and the ninth. It is done in harbor, in daylight, where the strand can see. Doing it privately is considered both cowardly and useless.</p>
+<p><strong>Ringing the Ninth.</strong> Declared before the score begins.</p>
+<ul>
+<li><p>Every crew member gains <strong>1 Boon</strong> at the start of the score.</p></li>
+<li><p>Position on the crew’s first roll of the score improves <strong>one step</strong>.</p></li>
+<li><p>The <strong>Hollow’s Attention [6]</strong> front timer advances <strong>1</strong> immediately, and <strong>1</strong> again for every scene the crew ends with no surviving witness outside the crew.</p></li>
+<li><p>A crew that rings the ninth and then withdraws—abandons the score, refuses the fight, sails home—advances that timer by a further <strong>2</strong> and every member takes the <strong>Unsung</strong> condition.</p></li>
+</ul>
+<h3 id="unsung-condition">Unsung (Condition)</h3>
+<p>Taken by a Linn who was present at something worth telling and is not in the telling: who rang the ninth and ran, who let another crew carry the account, who survived a night that nobody will describe with them in it.</p>
+<ul>
+<li><p><strong>–1d</strong> on all social rolls in Linn venues, halls, and Things.</p></li>
+<li><p>Cannot benefit from Crew Saga Reputation Position improvements (see ‘Saga System: Epic Reputation and Legendary Deeds’) while it is held.</p></li>
+<li><p><strong>Clearing it:</strong> earn a Saga Point in a scene where at least one person who is not crew survives to describe what happened. Not a payment, not a penance—a correction to the account.</p></li>
+</ul>
+<h3 id="the-price-which-the-linn-know-about">The Price, Which the Linn Know About</h3>
+<p>None of this is free, and the Linn are not naive about it. Their own proverbs say so: <em>the soup is always free, the coin is always warm, the price never is.</em> A people who deliberately make themselves worth noticing get noticed. Linn coasts have more thin places than anywhere except the Mistlands, more drowned who do not stay drowned, more oaths that outlive the swearer, and a far higher chance that a stranger at your fire already knows your mother’s name.</p>
+<p>The hall’s answer to this, delivered with a shrug that visitors find infuriating: <em>yes. And?</em></p>
+<p><strong>GM seed:</strong> A crew that has rung the ninth three seasons running finds that their harbor bell has begun sounding eight of its own accord, at odd hours, as though something were trying to talk them down.</p>
+<h2 id="how-the-peoples-answer">How the Peoples Answer</h2>
+<div class="epigraph">
+<p>Every hall from here to the Brass Gate is doing the same sum. It is only that nobody likes the answer, so we have all worked out a different way to be wrong about it.</p>
+<p>Aud of the Broken Keel, at the Thing of Stenskar</p>
+</div>
+<p>Nobody in the Amaranthine disputes the eight. Argue the patrons, argue the law, argue whose grandmother owns which skerry—but every people from the steppe to the Dolmis stops the count at eight, and every people has a story about what happens if you do not.</p>
+<p>Where they differ is what they do about it, and a Linn crew will meet all of these answers in a season’s sailing. Handled well, the differences are the best social material in the setting: two crews who both know exactly what the ninth is, and who have opposite instincts about what to do when they feel it in the room.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>People</strong></th>
+<th style="text-align: left;"><strong>What they do about the ninth</strong></th>
+<th style="text-align: left;"><strong>What they say about the Linn</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>People</strong></td>
+<td style="text-align: left;"><strong>What they do about the ninth</strong></td>
+<td style="text-align: left;"><strong>What they say about the Linn</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Linn</td>
+<td style="text-align: left;">Keep the eight ashore. Ring the ninth at sea, on purpose, in daylight, with the strand watching. Go out to meet what is coming.</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Aelaerem</td>
+<td style="text-align: left;">Keep the eight everywhere, always. Pour the ninth into the earth. Never name what you fear, because a named thing knows the way.</td>
+<td style="text-align: left;">“They believe being remembered is the same as being safe. They will find out.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mistlands</td>
+<td style="text-align: left;">Bells and salt at every threshold. Neither invite nor flee: hold the line, ring on time, keep the fog on the far side of it.</td>
+<td style="text-align: left;">“They open doors we spend our whole lives closing.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Theona</td>
+<td style="text-align: left;">Name the forbidden precisely, so it can be precisely avoided. The taboo is a map with a hole drawn accurately in it.</td>
+<td style="text-align: left;">“They know the rule perfectly well. They break it for a song.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ykrul</td>
+<td style="text-align: left;">Geometry. Make every obligation a shape that can be seen and counted, so that nothing is ever owed in the dark.</td>
+<td style="text-align: left;">“They count badly and sail well.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Aeler</td>
+<td style="text-align: left;">License it. A ward is craft, craft is guild work, and guild work carries a stamp and a warranty.</td>
+<td style="text-align: left;">“Unlicensed.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Aelinnel</td>
+<td style="text-align: left;">Courtesy as armor. Answer correctly, offer correctly, never accept the ninth cup, and be scrupulously polite to whatever drinks it.</td>
+<td style="text-align: left;">“Charming. Doomed. Do sit down.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Thepyrgos and the Temple</td>
+<td style="text-align: left;">Write it down. Count nine every morning from a tower, for everyone, on a schedule, and call the practice <em>the hours</em>.</td>
+<td style="text-align: left;">“Children with a bell.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ecktoria</td>
+<td style="text-align: left;">Legislate it. A thing that is unlawful may not occur; if it occurs anyway, that is a matter for the appeal.</td>
+<td style="text-align: left;">“Picturesque.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Vhasia</td>
+<td style="text-align: left;">Deny it publicly. Retain someone quietly.</td>
+<td style="text-align: left;">“Northern weather.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Viterra</td>
+<td style="text-align: left;">Register it, post a bond, and get a receipt for the bond.</td>
+<td style="text-align: left;">“Uninsured.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Zakov</td>
+<td style="text-align: left;">Sell it. Sell the ward, sell the warning, sell the location of the door, and sell the door.</td>
+<td style="text-align: left;">“Excellent customers.”</td>
+</tr>
+<tr>
+<td style="text-align: left;">Grímhúð</td>
+<td style="text-align: left;">Swore to it, once, in an old script, on terms they can no longer read.</td>
+<td style="text-align: left;">“The ones who found the third answer.”</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="the-two-honest-answers">The Two Honest Answers</h3>
+<p>A Linn will tell you—at length, after the fourth cup—that there are only two honest positions and everyone else is haggling.</p>
+<p>The Aelaerem say: <em>do not be interesting</em>. Keep the count, keep the hearth, keep your obligations small enough to carry, and let the great and terrible things pass over the roof without ever learning that you are under it. It is a coward’s doctrine and it has kept more villages alive than every war-band in the north put together, and the Linn know it.</p>
+<p>The Linn say: <em>be interesting on purpose</em>. On a day you chose, on ground you chose, in front of people who can carry the account. If the great and terrible thing is coming anyway—and it is—then meet it standing up, with your good coat on, in the middle of the afternoon.</p>
+<p>Everything between those two poles is negotiation: a bond, a stamp, a statute, a bell rung on a timetable. Useful, all of it. But a Linn skald and an Aelaerem matron, put in a room together, will understand each other perfectly and agree on nothing, and they will both be quietly certain that the other one is going to get somebody killed.</p>
+<p><strong>Using this at the table.</strong> When a Linn crew works alongside another people, ask which row of the table that people is standing on, and play the friction there rather than in ethnic caricature. An Aeler ward-wright will not refuse to help; she will refuse to help <em>unlicensed</em>, and the argument is about paperwork until somebody dies of it. An Aelaerem household will feed the crew generously and then ask them, kindly, to sleep in the barn—not from rudeness, but because the crew rang the ninth in the harbor three days ago and everyone in the valley heard it.</p>
+<h2 id="saga-system-epic-reputation-and-legendary-deeds">Saga System: Epic Reputation and Legendary Deeds</h2>
+<p>Not every story told in smoke-filled halls is true, but the ones that <em>stick</em> shape how the world meets you. The Saga System tracks not only what your crew has done, but how those deeds are remembered, twisted, and invoked by others.</p>
+<p>Saga Reputation sits alongside personal <strong>Repute</strong>, <strong>Audience</strong> tags, and <strong>Oaths</strong>. Where those mark who knows you locally, Saga Reputation marks when your story starts to move on its own.</p>
+<h3 id="crew-saga-reputation-track">Crew Saga Reputation Track</h3>
+<p>Each crew maintains a shared <strong>Saga Reputation</strong> track <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo form="prefix" stretchy="false">[</mo><mn>6</mn><mo form="postfix" stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[6]</annotation></semantics></math> that grows as they perform legendary deeds. This track represents how their exploits are told in halls across the northern lands.</p>
+<ul>
+<li><p><strong>Saga 1–2: Local Tales</strong> — Known by name in nearby settlements; a few skalds are watching your story.</p></li>
+<li><p><strong>Saga 3–4: Regional Fame</strong> — Songs and verses carry your deeds along trade routes and fjords; strangers recognize you by deeds, if not by face.</p></li>
+<li><p><strong>Saga 5–6: Living Legend</strong> — Your name is invoked in boasts, oaths, and threats. Children play at being you. Enemies plan around you.</p></li>
+</ul>
+<h5 class="unnumbered" id="who-tracks-it">Who Tracks It?</h5>
+<p>Saga Reputation is <em>crew-level</em>, not individual. Different characters may be more or less central to specific stories, but the world tends to remember “the crew” or “the Linn from the Mistship” as a whole.</p>
+<h3 id="earning-saga-points">Earning Saga Points</h3>
+<p>You raise Saga Reputation by earning <strong>Saga Points</strong>. Mark 1–2 Saga Points when the crew does something that people will <em>actually talk about</em> later.</p>
+<h5 class="unnumbered" id="core-triggers">Core Triggers</h5>
+<ul>
+<li><p><strong>Epic Victories</strong> — Defeating foes significantly above your Tier or overturning a seemingly unwinnable situation (e.g. defending a hall against impossible odds).</p></li>
+<li><p><strong>Impossible Feats</strong> — Succeeding at DV 5+ Position tests where the table agrees “this is the kind of thing skalds brag about”.</p></li>
+<li><p><strong>Honor-Keeping</strong> — Fulfilling major oaths under extreme circumstances, especially when keeping the oath costs you dearly.</p></li>
+<li><p><strong>Legendary Sacrifices</strong> — Choosing the harder path for the greater good: voluntary maiming, loss of wealth, exile, or similar stakes.</p></li>
+<li><p><strong>Story-Shaping Decisions</strong> — A choice that permanently alters a hall, village, route, or region (toppling a jarl, ending a feud, founding a Temple or shrine).</p></li>
+</ul>
+<h5 class="unnumbered" id="gm-guidance">GM Guidance</h5>
+<ul>
+<li><p><em>Ask:</em> “Would someone in three winters still be telling this story at a thing?” If yes, award Saga Points. 0</p></li>
+<li><p><em>Scale:</em> 1 Saga Point for strong deeds; 2 for true legends that also change fronts or timers on the campaign map.</p></li>
+</ul>
+<p>Each time the Saga track fills <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo form="prefix" stretchy="false">[</mo><mn>6</mn><mi>/</mi><mn>6</mn><mo form="postfix" stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[6/6]</annotation></semantics></math>, clear it and advance the crew’s <strong>Saga Tier</strong> by 1 (step their Saga Reputation band up to the next level). Optionally record a short <em>Saga Line</em> in the crew sheet: a one-sentence summary skalds repeat.</p>
+<h3 id="saga-benefits-position-social-edge">Saga Benefits: Position &amp; Social Edge</h3>
+<p>As Saga Reputation increases, the crew gains powerful Position and advantage benefits that reflect how the world receives them.</p>
+<h5 class="unnumbered" id="saga-12-local-heroes">Saga 1–2: Local Heroes</h5>
+<dl>
+<dt><strong>Local Hero</strong></dt>
+<dd>
+<p>Once per scene, when <em>defending your home, kin, or named allies</em>, one PC may improve Position by one step (Desperate<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>Controlled or Controlled<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>Controlled) on a single roll.</p>
+</dd>
+</dl>
+<h5 class="unnumbered" id="saga-34-regional-champions">Saga 3–4: Regional Champions</h5>
+<dl>
+<dt><strong>Regional Champion</strong></dt>
+<dd>
+<p>Once per session, a PC may declare a specific past deed (<em>“We held the bridge at Stormfjord for three days”</em>) that is now widely known. With GM approval, they gain <strong>+1d</strong> to a single roll where that story logically applies (rallying defenders, intimidating raiders, convincing a jarl to trust them, etc.).</p>
+</dd>
+</dl>
+<h5 class="unnumbered" id="saga-56-living-legends">Saga 5–6: Living Legends</h5>
+<dl>
+<dt><strong>Legendary Warrior</strong></dt>
+<dd>
+<p>Once per session, when the crew acts in a hall or region where their legend is well-known, one PC may treat any <em>Controlled</em> Position as <em>Dominant</em> for a single action, reflecting that the world <em>expects</em> them to triumph.</p>
+</dd>
+</dl>
+<h5 class="unnumbered" id="optional-individual-saga-marks">Optional: Individual Saga Marks</h5>
+<p>Individual PCs can also record <strong>Saga Marks</strong> for personally famous deeds (see ‘Legendary Deeds &amp; Personal Boons’), but these are color until the GM calls on them for Position shifts, Audience tags, or Strings.</p>
+<h3 id="saga-complications-fame-as-a-knife">Saga Complications: Fame as a Knife</h3>
+<p>Saga Reputation is a double-edged axe. Fame brings attention, expectations, and enemies.</p>
+<ul>
+<li><p><strong>Rival Challenges</strong> — At higher Saga levels, the GM is encouraged to introduce rival crews, warriors, or Temple champions who seek glory by besting you. For each Saga Tier above 2, once per arc start a <strong>Rival Challenge [4]</strong> timer.</p></li>
+<li><p><strong>Expectation Burden</strong> — Audience tags tilt toward <em>“expects-impossible-feats”</em>. Failures in public scenes may tick additional fallout timers as people feel <em>betrayed</em>, not merely disappointed.</p></li>
+<li><p><strong>Target Status</strong> — Enemies who come specifically hunting the famous crew gain <strong>+1d</strong> to <em>Assess, Track, or Ambush</em> rolls against them; their scouts already know your tactics and tales.</p></li>
+<li><p><strong>Saga Debt</strong> — The GM may introduce <strong>Saga Debt</strong> complications: a hall that sheltered you now calls in a favor, a child you inspired has gone missing hunting glory, or someone lied using your name.</p></li>
+</ul>
+<p>As a rule of thumb, for each Saga Tier above 1, allow the GM to add one additional twist or String per session based on fame alone.</p>
+<h3 id="saga-scenes-fame-arrives-before-you-do">Saga Scenes: Fame Arrives Before You Do</h3>
+<p>When the crew’s Saga Reputation is <strong>3+</strong>, once per session a player may declare a <strong>Saga Scene</strong>.</p>
+<ul>
+<li><p>Set the scene in a location where your fame plausibly precedes you: a coastal hall, a trade-town, a Temple court that follows skald verse.</p></li>
+<li><p>The active PC begins with <strong>Position +1</strong> on their first significant social interaction (e.g. Controlled instead of Controlled).</p></li>
+<li><p>All allies in the scene gain <strong>+1d once</strong> when they explicitly invoke the crew’s legend (quoting a verse, showing a trophy, calling on a past deed).</p></li>
+<li><p>The scene must showcase the crew’s legendary nature in some way: public boast, challenge, judgment, or sacrifice. If it resolves quietly, the GM may rule that no new Saga Points are earned from it.</p></li>
+</ul>
+<p>Saga Scenes are a spotlight tool: use them to turn ordinary negotiations or meetings into memorable chapters in the crew’s story.</p>
+<h3 id="legendary-deeds-personal-boons">Legendary Deeds &amp; Personal Boons</h3>
+<p>Certain deeds are so monumental that they grant permanent, personal benefits in addition to Saga Points. These should be <em>rare</em>, negotiated moments, not routine rewards.</p>
+<dl>
+<dt><strong>Slayer of Beasts</strong></dt>
+<dd>
+<p>Defeat a creature of myth or a unique monster that has haunted a hall, route, or region for generations. Gain <strong>+1d</strong> on all future rolls directly confronting similar creatures or their kin.</p>
+</dd>
+<dt><strong>Oath-Keeper Supreme</strong></dt>
+<dd>
+<p>Fulfill an “impossible” oath that multiple NPCs declared unachievable (e.g. “end this blood-feud in a single winter”, “bring both shrine and Temple to the same altar”). Once per session, convert one <em>single failed</em> roll related to oath, duty, or honor into a success at <em>limited</em> Effect (mark 1 SB as cost).</p>
+</dd>
+<dt><strong>Shield of the Innocent</strong></dt>
+<dd>
+<p>Defend the defenseless against overwhelming odds in a public, widely-witnessed stand. Gain <strong>+1 Armor</strong> (non-stacking) when you explicitly protect others, even without a physical shield.</p>
+</dd>
+<dt><strong>Master of Elements</strong></dt>
+<dd>
+<p>Survive an impossible natural force (shipwreck, avalanche, volcanic ash, storm-ice) in a way that becomes a hall-story. Gain permanent <strong>resistance</strong> to one chosen environmental hazard (e.g. cold, storm, fire, sea).</p>
+</dd>
+</dl>
+<h5 class="unnumbered" id="saga-scars">Saga Scars</h5>
+<p>Optionally, pair each Legendary Deed with a <strong>Saga Scar</strong>: a visible mark, habit, or quirk that signals the deed and may impose small costs (difficulty sleeping in calm weather, reflexive shielding behavior, faint frostbite, etc.). These are narrative prompts the GM can tag for SB spends.</p>
+<h3 id="saga-decline-fallen-heroes">Saga Decline &amp; Fallen Heroes</h3>
+<p>Saga Reputation is not guaranteed. It can decline when your story curdles.</p>
+<h5 class="unnumbered" id="loss-triggers">Loss Triggers</h5>
+<ul>
+<li><p><strong>Oath-Breaking</strong> — Publicly failing to keep a major oath, especially one bound before many witnesses or under shrine/Temple.</p></li>
+<li><p><strong>Cowardice</strong> — Refusing to act when honor or duty clearly demands it, and others see this choice.</p></li>
+<li><p><strong>Betrayal</strong> — Turning against guests, sworn allies, or those under your protection.</p></li>
+<li><p><strong>Hubris</strong> — Actions that show dangerous overconfidence leading to tragic fallout (e.g. provoking needless war, squandering hard-won peace).</p></li>
+</ul>
+<p>When one of these occurs in a public way, the GM may:</p>
+<ul>
+<li><p>Reduce Saga Reputation by 1 step (e.g. from 4 to 3).</p></li>
+<li><p>Strip one Saga Benefit (e.g. you no longer count as <em>Regional Champion</em>).</p></li>
+<li><p>Introduce a <strong>Fallen Hero</strong> Complication: former allies become rivals, children who idolized you turn bitter, or a skald begins composing a mocking counter-saga.</p></li>
+</ul>
+<h5 class="unnumbered" id="redemption-arcs">Redemption Arcs</h5>
+<p>Falling does not have to be the end:</p>
+<ul>
+<li><p>Create a <strong>Redemption Saga [6]</strong> timer. When it fills through self-sacrifice, amends, or impossible tasks, you may regain lost Saga steps or transform your legend into a new shape: <em>the Penitent</em>, <em>the Oath-Restorer</em>, etc.</p></li>
+</ul>
+<h3 id="integration-with-temple-of-light-shrines">Integration with Temple of Light &amp; Shrines</h3>
+<p>Religious choice is part of your legend. Whether you stand with shrines, the Temple of Light, or both, the songs will say something about it.</p>
+<h5 class="unnumbered" id="temple-forward-sagas">Temple-Forward Sagas</h5>
+<ul>
+<li><p><strong>Temple Conversion</strong> — When the crew openly converts to the Temple of Light and champions its causes, they may earn Saga Points for:</p>
+<ul>
+<li><p>Founding a new Temple or saving an existing one from ruin.</p></li>
+<li><p>Ending a Faith Feud through Temple law and mercy.</p></li>
+<li><p>Converting a powerful hall, jarl, or famed shrine-keeper.</p></li>
+</ul></li>
+<li><p>Mechanically, treat these as <em>Story-Shaping Decisions</em>. However, shrine-devout Audiences may assign negative tags (<em>Oath-Turners</em>, <em>Temple-Pawns</em>) and reduce certain Saga Benefits when dealing with traditionalists.</p></li>
+</ul>
+<h5 class="unnumbered" id="shrine-devout-sagas">Shrine-Devout Sagas</h5>
+<ul>
+<li><p>Crews who visibly champion shrines against Temple expansion may gain extra Saga Points for:</p>
+<ul>
+<li><p>Restoring a desecrated shrine to power.</p></li>
+<li><p>Driving out abusive Temple agents without collapsing law.</p></li>
+<li><p>Crafting syncretic rites that keep old powers honored.</p></li>
+</ul></li>
+<li><p>Temple Audiences may see them as <em>heretics</em> or <em>obstinate pagans</em>, increasing DV or lowering starting Position in Temple courts.</p></li>
+</ul>
+<h5 class="unnumbered" id="syncretic-sagas">Syncretic Sagas</h5>
+<ul>
+<li><p><strong>Syncretic Path</strong> — Some crews walk between: swearing shrine-oaths while bearing Temple blessings. Their Saga tends to be <em>contested</em>.</p></li>
+<li><p>Mechanically, they may earn Saga Points for brokering peace between faiths or inventing new shared rites, but:</p>
+<ul>
+<li><p>Start certain faith scenes with <strong>mixed Audience tags</strong> (<em>Curious</em>, <em>Suspicious</em>, <em>Conflicted</em>).</p></li>
+<li><p>The GM may tick <strong>Dual Oath Conflict</strong> or <strong>Faith Feud</strong> timers whenever a syncretic act goes badly.</p></li>
+</ul></li>
+</ul>
+<h5 class="unnumbered" id="heretic-legends">Heretic Legends</h5>
+<dl>
+<dt><strong>Heretic Status</strong></dt>
+<dd>
+<p>If the crew openly defies Temple doctrine <em>and</em> shrine agreements (e.g. consorting with banned powers, profaning both altars), their Saga might shift into a darker mode:</p>
+<ul>
+<li><p>Temple and shrine both gain license to hunt them; enemies gain <strong>+1d</strong> to find religious allies.</p></li>
+<li><p>At the same time, desperate halls, outcasts, and hidden cults might invoke them as <em>necessary monsters</em> or <em>storm-bringers</em>, granting unusual aid.</p></li>
+<li><p>Treat them as <em>Legendary Adversaries</em> in some stories, <em>secret saints</em> in others; Position swings can be dramatic.</p></li>
+</ul>
+</dd>
+</dl>
+<h3 id="using-saga-at-the-table">Using Saga at the Table</h3>
+<ul>
+<li><p><strong>For Players:</strong> Think of Saga as the camera pulling back. When you chase Saga Points, you are choosing which scenes become the ones future characters will hear about.</p></li>
+<li><p><strong>For GMs:</strong> Use Saga Reputation to choose who has heard of the crew, who cares, and how strongly. Let it steer front creation, rival crews, and which NPCs show up asking for help or vengeance.</p></li>
+<li><p><strong>For the Campaign:</strong> Over time, the Saga System can track the arc from unknown raiders to hall-builders, faith-champions, outcast heretics, or founders of a new order. Decide together which saga you are writing.</p></li>
+</ul>
+<h2 id="faith-tags-for-linn-venues">Faith Tags for Linn Venues</h2>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Venue</strong></th>
+<th style="text-align: left;"><strong>Faith Tag</strong></th>
+<th style="text-align: left;"><strong>Mechanical Effect</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">A sea-stack shrine (Vélki)</td>
+<td style="text-align: left;">Shrine Stronghold</td>
+<td style="text-align: left;">Temple-devout characters suffer −1 Position on faith actions</td>
+</tr>
+<tr>
+<td style="text-align: left;">A Thing-ring (Hrævkn)</td>
+<td style="text-align: left;">Shrine Stronghold</td>
+<td style="text-align: left;">As above; also, any boast made here is witnessed (cannot be retracted)</td>
+</tr>
+<tr>
+<td style="text-align: left;">A Temple chapel</td>
+<td style="text-align: left;">Temple District</td>
+<td style="text-align: left;">Shrine-devout characters suffer −1 Position on faith actions</td>
+</tr>
+<tr>
+<td style="text-align: left;">A synod court</td>
+<td style="text-align: left;">Temple District</td>
+<td style="text-align: left;">As above; also, any written testimony gains +1 die</td>
+</tr>
+<tr>
+<td style="text-align: left;">A port town with both chapel and moot-ring</td>
+<td style="text-align: left;">Mixed Quarter</td>
+<td style="text-align: left;">No penalty; grandstanding by either extreme may trigger GM SB spend</td>
+</tr>
+<tr>
+<td style="text-align: left;">A frontier village where a shrine and chapel face each other across a ford</td>
+<td style="text-align: left;">Contested Ground</td>
+<td style="text-align: left;">Both sides suffer −1 Position on faith actions unless bridge-building is declared</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="glossary-of-nordic-terms">Glossary of Nordic Terms</h2>
+<h3 id="social-and-political-terms">Social and Political Terms</h3>
+<dl>
+<dt>Aett</dt>
+<dd>
+<p>A clan or family grouping, often tracing descent from a common ancestor. The basic social unit in Linn society.</p>
+</dd>
+<dt>Blood-silver</dt>
+<dd>
+<p>Compensation paid to settle disputes and avoid feuds. A monetary or material payment that satisfies honor without violence.</p>
+</dd>
+<dt>Boast</dt>
+<dd>
+<p>A public declaration of intended action, creating social obligation. Failure to fulfill a boast damages reputation and may start feuds.</p>
+</dd>
+<dt>Doom-Naming</dt>
+<dd>
+<p>Saying aloud, before witnesses, the specific misfortune you most expect from an action you are about to take. Not bragging and not prophecy: a way of owning the disaster in advance so that it arrives on your terms rather than behind you in the dark.</p>
+</dd>
+<dt>Feud</dt>
+<dd>
+<p>An ongoing conflict between families or crews, tracked mechanically. Allows for escalation and resolution through various means.</p>
+</dd>
+<dt>Lawspeaker</dt>
+<dd>
+<p>Traditional role at Things who memorizes and recites the law. Could be incorporated as a specialized crew role.</p>
+</dd>
+<dt>Meeting</dt>
+<dd>
+<p>Going out to a doom rather than waiting for it. A crew that declares a Meeting accepts that the thing happens now, in exchange for choosing the ground, the hour, and the witnesses.</p>
+</dd>
+<dt>Ninth Witness</dt>
+<dd>
+<p>An oath sworn before eight living witnesses and a ninth place deliberately left empty. Binding on something that does not attend Things, and not quietly forgettable.</p>
+</dd>
+<dt>Repute</dt>
+<dd>
+<p>Social standing and honor within Linn society. Affects social interactions and access to opportunities.</p>
+</dd>
+<dt>Saga</dt>
+<dd>
+<p>Epic tales of heroic deeds that enhance reputation. Also represents the mechanical system for tracking legendary status.</p>
+</dd>
+<dt>Skald</dt>
+<dd>
+<p>A poet-singer who composes and performs verses about heroic deeds. Important for maintaining and spreading reputation.</p>
+</dd>
+<dt>String</dt>
+<dd>
+<p>A favor, connection, or obligation that can be called upon. Represents social capital and relationships.</p>
+</dd>
+<dt>Unsung</dt>
+<dd>
+<p>The condition of having been present at something worth telling and being absent from the telling. The Linn regard this as worse than cowardice, on the grounds that cowardice at least gives the skald material.</p>
+</dd>
+<dt>Thing</dt>
+<dd>
+<p>Political assembly where laws are made, disputes settled, and oaths sworn. Winter gatherings for community decision-making.</p>
+</dd>
+<dt>Thinglet</dt>
+<dd>
+<p>Smaller, informal assembly for local matters, often held within a hall.</p>
+</dd>
+<dt>Wyrd</dt>
+<dd>
+<p>Fate or doom, often settled through ordeal or trial by combat when legal resolution fails.</p>
+</dd>
+</dl>
+<h3 id="maritime-and-travel-terms">Maritime and Travel Terms</h3>
+<dl>
+<dt>Beaching Hull</dt>
+<dd>
+<p>Ship design feature allowing vessels to land directly on shore for easy access and escape.</p>
+</dd>
+<dt>Broadshore</dt>
+<dd>
+<p>Cargo vessel type with higher freeboard and stouter construction, slower but more seaworthy than raiding ships.</p>
+</dd>
+<dt>Gare</dt>
+<dd>
+<p>Local term for fog or mist conditions, particularly those affecting navigation and visibility.</p>
+</dd>
+<dt>Longhull</dt>
+<dd>
+<p>Sleek raiding vessel with shallow draft and fast oars, designed for speed and beach landings.</p>
+</dd>
+<dt>Mistwise</dt>
+<dd>
+<p>Specialized knowledge of navigating in foggy conditions, a valuable crew skill.</p>
+</dd>
+<dt>Pilot Stone</dt>
+<dd>
+<p>Cairn or marker used for navigation in familiar waters, often moved to confuse rivals.</p>
+</dd>
+<dt>River-spear</dt>
+<dd>
+<p>Light, narrow vessel designed for inland waterways, often with collapsible mast.</p>
+</dd>
+<dt>Shallow Draft</dt>
+<dd>
+<p>Ship design allowing navigation in waters too shallow for deeper vessels.</p>
+</dd>
+<dt>Skerry</dt>
+<dd>
+<p>Small rocky island or reef, often hazardous to navigation but useful for ambushes.</p>
+</dd>
+</dl>
+<h3 id="cultural-and-religious-terms">Cultural and Religious Terms</h3>
+<dl>
+<dt>Hospitable</dt>
+<dd>
+<p>Cultural value emphasizing the sacred duty to provide guest-right and proper hospitality.</p>
+</dd>
+<dt>Hearth-Count</dt>
+<dd>
+<p>The count of eight, kept ashore, in halls, and around children and cattle. Ordinary northern practice; the Linn keep it as scrupulously as anyone.</p>
+</dd>
+<dt>Hours, the</dt>
+<dd>
+<p>The southern division of the day, marked by Temple bells—eight to Lauds, nine to the Angelus. Named here because the Linn find the habit of counting nine every morning, publicly and on a schedule, more alarming than any doctrine the Temple actually preaches.</p>
+</dd>
+<dt>Muster</dt>
+<dd>
+<p>Spring gathering of crews and preparation for summer activities.</p>
+</dd>
+<dt>Keel-Count</dt>
+<dd>
+<p>The count carried past eight to the ninth, rung in harbor in daylight before a voyage that is meant to matter. The Linn practice that other peoples find obscene and the Linn find merely honest.</p>
+</dd>
+<dt>Oathbound</dt>
+<dd>
+<p>Character committed to keeping vows and promises, regardless of cost.</p>
+</dd>
+<dt>Riverwise</dt>
+<dd>
+<p>Specialized knowledge of river navigation, hazards, and local customs.</p>
+</dd>
+<dt>Ringing the Ninth</dt>
+<dd>
+<p>The crew ritual of the keel-count: eight strokes, a pause long enough to be a decision, then the ninth. Done publicly or not at all.</p>
+</dd>
+<dt>Shrine Warding</dt>
+<dd>
+<p>Ritual protection of settlements or territories through sacred sites and ceremonies.</p>
+</dd>
+<dt>Wolf-Banner</dt>
+<dd>
+<p>Warrior tradition or crew identity associated with fierce combat and boarding actions.</p>
+</dd>
+</dl>
+<h3 id="seasonal-terms">Seasonal Terms</h3>
+<dl>
+<dt>Hearth Time</dt>
+<dd>
+<p>Winter period of indoor activities, maintenance, and community bonding.</p>
+</dd>
+<dt>Muster</dt>
+<dd>
+<p>Spring assembly for preparation and crew organization.</p>
+</dd>
+<dt>Raids</dt>
+<dd>
+<p>Summer period of seaborne expeditions and military activities.</p>
+</dd>
+<dt>Settling</dt>
+<dd>
+<p>Autumn period for resolving disputes, trade negotiations, and harvest activities.</p>
+</dd>
+<dt>Thing Season</dt>
+<dd>
+<p>Winter period when assemblies are held due to weather and availability.</p>
+</dd>
+</dl>
+<h3 id="combat-and-conflict-terms">Combat and Conflict Terms</h3>
+<dl>
+<dt>Board &amp; Brace</dt>
+<dd>
+<p>Naval combat action involving boarding enemy vessels and fighting hand-to-hand.</p>
+</dd>
+<dt>Wolf-Boarding Gear</dt>
+<dd>
+<p>Specialized equipment for ship-to-ship combat, including hooks, ropes, and boarding planks.</p>
+</dd>
+</dl>
+</article></article></body></html>

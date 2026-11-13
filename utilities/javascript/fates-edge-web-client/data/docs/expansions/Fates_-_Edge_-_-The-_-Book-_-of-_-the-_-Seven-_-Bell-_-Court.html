@@ -1,0 +1,3042 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>The Book of the Seven Bell Court</title><style>
+        :root {
+            --bg1: #120d0a;
+            --bg2: #1c130d;
+            --bg3: #241a12;
+            --bg4: #2e2118;
+            --text: #ede0d4;
+            --text2: #c2a892;
+            --text3: #8a7160;
+            --gold: #c1752f;
+            --gold-hover: #d68a42;
+            --border: #3d2c1f;
+            --red: #a13a2a;
+            --green: #6a7a3d;
+            --blue: #3d6a78;
+            --purple: #6b4a72;
+            --orange: #d68a2a;
+            --ember: #e0592b;
+            --ash: #6b5f54;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg1);
+            background-image: radial-gradient(circle at 50% 0%, #1c130a 0%, #120d0a 60%);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        h1, h2, h3, h4, h5 { color: var(--gold); margin: 0.5rem 0 0.3rem; font-family: var(--font); }
+        h1 { font-size: 1.9rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.35rem; }
+        .subtitle { color: var(--text2); font-style: italic; margin-bottom: 0.8rem; font-size: 1rem; }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.08rem; color: var(--orange); margin-top: 1.3rem; }
+        a { color: var(--gold); text-decoration: none; }
+        p { margin: 0.55rem 0; }
+        .panel {
+            background: var(--bg2);
+            border-radius: var(--radius);
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            margin: 0.6rem 0;
+        }
+        .panel-gold { border-left: 4px solid var(--gold); }
+        .panel-red { border-left: 4px solid var(--red); }
+        .panel-blue { border-left: 4px solid var(--blue); }
+        .panel-green { border-left: 4px solid var(--green); }
+        .panel-purple { border-left: 4px solid var(--purple); }
+        .panel-orange { border-left: 4px solid var(--orange); }
+        .badge {
+            display: inline-block;
+            padding: 0.05rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem 0.15rem 0.1rem 0;
+        }
+        .badge-gold { background: var(--gold); color: #170f00; }
+        .badge-red { background: var(--red); color: #fff; }
+        .badge-green { background: var(--green); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-orange { background: var(--orange); color: #170f00; }
+        .badge-gray { background: var(--bg4); color: var(--text3); }
+        .text-muted { color: var(--text3); }
+        .text-sm { font-size: 0.85rem; }
+        .toc {
+            background: var(--bg3);
+            border-radius: var(--radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--border);
+            columns: 2;
+            column-gap: 1.5rem;
+        }
+        .toc-title { column-span: all; }
+        .toc a {
+            color: var(--text2);
+            display: block;
+            padding: 0.12rem 0;
+            font-size: 0.85rem;
+            break-inside: avoid;
+        }
+        .toc a:hover { color: var(--gold); }
+        .toc .toc-cluster { color: var(--orange); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.5rem; break-inside: avoid; }
+        @media (max-width: 650px) { .toc { columns: 1; } }
+        hr { border: none; border-top: 1px solid var(--border); margin: 0.8rem 0; }
+        .byline {
+            color: var(--text2);
+            font-style: italic;
+            font-size: 0.88rem;
+            margin: 0.2rem 0 0.7rem 0;
+            padding-left: 0.7rem;
+            border-left: 2px solid var(--border);
+        }
+        .story {
+            font-family: var(--serif);
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .story p { margin: 0.7rem 0; }
+        .story em, .story i { color: var(--text2); }
+        .closing {
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-left: 3px solid var(--ember);
+            background: var(--bg2);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.88rem;
+        }
+        .closing .attrib { display: block; margin-top: 0.3rem; color: var(--text3); font-style: normal; font-size: 0.75rem; }
+        .region-tag { font-size: 0.7rem; color: var(--ash); text-transform: uppercase; letter-spacing: 0.05em; }
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 0.6rem 0;
+            color: var(--text2);
+            font-style: italic;
+        }
+        .flex { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .tale-meta {
+            color: var(--text3);
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin: 0.1rem 0 0.55rem 0;
+        }
+        .tale-meta .obj { color: var(--text2); text-transform: none; letter-spacing: 0; font-style: italic; }
+        .marginalia {
+            border-left: 2px dashed var(--border);
+            padding: 0.1rem 0 0.1rem 0.7rem;
+            margin: 0.7rem 0 0.7rem 1.2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .closing.fragment { border-left-color: var(--ash); background: none; padding-left: 0.9rem; }
+        .reading-order { counter-reset: ro; list-style: none; margin: 0.4rem 0 0 0; padding: 0; }
+        .reading-order li { padding: 0.18rem 0 0.18rem 1.6rem; position: relative; font-size: 0.88rem; }
+        .reading-order li::before {
+            counter-increment: ro; content: counter(ro);
+            position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; top: 0.3rem;
+        }
+        .reading-order .temp { color: var(--text3); font-style: italic; }
+        .colophon-list { margin-left: 1.2rem; font-size: 0.85rem; color: var(--text2); }
+        .colophon-list li { margin: 0.15rem 0; }
+        footer {
+            font-size: 0.75rem;
+            color: var(--text3);
+            text-align: center;
+            padding: 1.2rem 0 0.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        body { max-width: 1100px; }
+        h2 { margin-top: 2.6rem; }
+        h3 { margin-top: 1.8rem; }
+        table { display: block; max-width: 100%; overflow-x: auto; }
+        .table-wrap { max-width: 100%; overflow-x: auto; }
+    </style><style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head><body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Expansions · specialist reference</strong></p><p>Read the core rules first, then this document’s scope, prerequisites, and procedures. Apply only changes it explicitly states; a missing restatement is not a general exception. The SRD and extensions in the Player’s and GM Guides remain the core reference, and the core loop still applies.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#document-title">The Book of the Seven Bell Court</a></li><li><a href="#reading-route">How to use this book</a></li><li><a href="#twelve-tales">Twelve Tales</a></li><li><a href="#silk-salt-and-shadows-sihai-noir-heist">Silk, Salt, and Shadows (Sihai Noir Heist)</a></li><li><a href="#the-emperors-quiet-sihai-political-thriller">The Emperor’s Quiet (Sihai Political Thriller)</a></li><li><a href="#the-ronins-winter-nihori-duel-drama">The Ronin’s Winter (Nihori Duel Drama)</a></li><li><a href="#monsoon-of-knives-ayokha-naval-caper">Monsoon of Knives (Ayokha Naval Caper)</a></li><li><a href="#the-city-that-forgets-sihaiayokha-mystic-mystery">The City That Forgets (Sihai–Ayokha Mystic Mystery)</a></li><li><a href="#festival-of-ten-thousand-lanterns-ayokha-social-sandbox">Festival of Ten Thousand Lanterns (Ayokha Social Sandbox)</a></li><li><a href="#the-jade-locust-sihai-plague-investigation">The Jade Locust (Sihai Plague Investigation)</a></li><li><a href="#ash-at-sunrise-nihori-battlefield-scenario">Ash at Sunrise (Nihori Battlefield Scenario)</a></li><li><a href="#the-thousand-step-court-paradox-dungeon">The Thousand-Step Court (Paradox Dungeon)</a></li><li><a href="#black-powder-white-paper-sihai-tech-vs.-tradition">Black Powder, White Paper (Sihai Tech vs. Tradition)</a></li><li><a href="#court-of-perfumed-knives-ayokha-palace-intrigue">Court of Perfumed Knives (Ayokha Palace Intrigue)</a></li><li><a href="#the-house-that-eats-oaths-haunted-legal-horror">The House that Eats Oaths (Haunted Legal Horror)</a></li><li><a href="#two-showpiece-adventures">Two Showpiece Adventures</a></li><li><a href="#duel-to-the-death-wu--xing-vs.-ninja">Duel to the Death: Wu -Xing vs. Ninja</a></li><li><a href="#the-bridge-of-three-echoes-pilgrimage-of-memory-and-mercy">The Bridge of Three Echoes (Pilgrimage of Memory and Mercy)</a></li><li><a href="#supporting-systems-cultural-material">Supporting Systems &amp; Cultural Material</a></li></ul></details><article class="fe-reading-document"><h1 id="document-title">The Book of the Seven Bell Court</h1><section aria-labelledby="reading-route" data-fe-reader-added="reading-route"><h2 id="reading-route">How to use this book</h2><p>This is a GM-facing adventure anthology. Begin with <a href="#at-a-glance-gm-guidance">At-a-Glance GM Guidance</a> and the <a href="#quick-prep-matrix-the-twelve-tales">Quick-Prep Matrix</a>, then choose one of the twelve tales for a session. The two showpiece adventures support longer arcs; the cultural and equipment sections are reference material.</p><p>Each tale is a menu of situations and clocks. Keep no more than three timers active in shared play by default; do not combine every listed clock or an additional scenario track at once.</p></section><h3 class="unnumbered" id="rules-compatibility">Rules compatibility</h3>
+<p><span>chapter</span><span>Rules compatibility</span> The core rules comprise the SRD plus the extensions in the Player’s Guide and GM Guide. This expansion applies only its stated additions and exceptions. Keep the core loop: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, resolve the outcome, and apply consequences.</p>
+<p>Adds the Seven Bell Court’s judging procedure, its Bells, and the regional material and equipment the Tales draw on. Bells are the Court’s own standing track and never stand in for Fatigue, Harm, Boons or the Outcome Matrix; a Scorecard judges how a bout is remembered, not whether a roll succeeded. Nothing here waives a roll, the Story Beats it generates, or a stated cost unless it says so explicitly.</p>
+<p><strong>Timer load:</strong> As a table-speed recommendation, keep no more than three timers active in the shared play space at once. A tale’s listed clocks are choices for its current situation, not a requirement to track every clock at once. Between scenes, swap clocks as the focus changes; keep inactive clocks in notes and advance them only when an established event calls for it. A tale whose central twist uses three simultaneous clocks may use all three; additional clocks are an advanced option.</p>
+<h3 class="unnumbered" id="introduction-how-to-use-this-book">Introduction: How to Use This Book</h3>
+<p><span>chapter</span><span>Introduction: How to Use This Book</span></p>
+<h6 class="unnumbered" id="what-this-anthology-contains">What This Anthology Contains</h6>
+<p>This anthology is organized into three clearly labeled parts:</p>
+<ul>
+<li><p><strong>Part I – Twelve Tales:</strong> 12 modular minor adventures for one session each (3–5 hours). Each Tale includes a clear premise, 1–3 signature timers, a mechanical twist, scaling notes, and a cinematic set-piece.</p></li>
+<li><p><strong>Part II – Two Showpiece Adventures:</strong> <em>Duel to the Death</em> (conspiracy tournament) and <em>The Bridge of Three Echoes</em> (contemplative pilgrimage). These are multi-session arcs with deeper NPC development, investigation layers, and culture-forward mechanics.</p></li>
+<li><p><strong>Part III – Extras:</strong> the <em>Seven Bell Court</em> judging system, regional cultural guidance (Sihai, Nihori, Ayokha), and a curated <em>Equipment for Contemplative Adventures</em> section showcasing the TAGS system.</p></li>
+</ul>
+<h3 class="unnumbered" id="at-a-glance-gm-guidance">At-a-Glance GM Guidance</h3>
+<ul>
+<li><p><strong>Read the Premise box</strong> and set the <em>stakes</em> in one sentence.</p></li>
+<li><p><strong>Pick timers</strong> appropriate to your table’s pace (resolve 1–3 per session).</p></li>
+<li><p><strong>Spot the mechanical twist</strong> (e.g., Truth Duel, Split-Screen Timer, Lantern Placement) and telegraph it early.</p></li>
+<li><p><strong>Use Seven Bell Court</strong> when victory should reflect <em>Form, Spirit, and Intent</em>, not just harm dealt.</p></li>
+<li><p><strong>Signal culture respectfully:</strong> use flavor cues as <em>gifts</em>, not gates. Reward understanding with <em>Cultural Edge</em> tokens.</p></li>
+</ul>
+<h3 class="unnumbered" id="quick-prep-matrix-the-twelve-tales">Quick-Prep Matrix: The Twelve Tales</h3>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Title</strong></th>
+<th style="text-align: left;"><strong>Theme</strong></th>
+<th style="text-align: left;"><strong>Mechanical Twist</strong></th>
+<th style="text-align: left;"><strong>Sessions</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Silk, Salt, and Shadows</td>
+<td style="text-align: left;">Noir Heist</td>
+<td style="text-align: left;"><em>Split-Screen Timer</em> (three parallel advancing timers)</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">The Emperor’s Quiet</td>
+<td style="text-align: left;">Political Thriller</td>
+<td style="text-align: left;"><em>Mandate Ledger</em> (legitimacy vs expediency)</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">The Ronin’s Winter</td>
+<td style="text-align: left;">Duel Arc (Nihori)</td>
+<td style="text-align: left;"><em>Seven Bell Court</em> judging (Form/Spirit/Intent)</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Monsoon of Knives</td>
+<td style="text-align: left;">Navy Caper</td>
+<td style="text-align: left;"><em>Weather Dice</em> affect Position/Effect</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">The City That Forgets</td>
+<td style="text-align: left;">Mystic Mystery</td>
+<td style="text-align: left;"><em>Memory Tokens</em> + dual Truth Tracks (Boon/Bane)</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Festival of Ten Thousand Lanterns</td>
+<td style="text-align: left;">Social Sandbox</td>
+<td style="text-align: left;"><em>Lantern Placement</em> drives faction influence</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">The Jade Locust</td>
+<td style="text-align: left;">Plague Investigation</td>
+<td style="text-align: left;"><em>Dual Timers: Civic &amp; Personal</em></td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ash at Sunrise</td>
+<td style="text-align: left;">Tactical Warfare</td>
+<td style="text-align: left;"><em>Battlefront Timers</em> + morale pressure</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">The Thousand-Step Court</td>
+<td style="text-align: left;">Paradox Dungeon</td>
+<td style="text-align: left;"><em>Trial Steps</em> re-write Position on ascent</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Black Powder, White Paper</td>
+<td style="text-align: left;">Tech vs Tradition</td>
+<td style="text-align: left;"><em>Innovation Pressure</em> vs <em>Customary Rights</em></td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Court of Perfumed Knives</td>
+<td style="text-align: left;">Palace Intrigue</td>
+<td style="text-align: left;"><em>Mask Exchanges</em> (identity play)</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">The House that Eats Oaths</td>
+<td style="text-align: left;">Haunted Law</td>
+<td style="text-align: left;"><em>Binding Clauses</em> as geasa</td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table></div>
+<h3 class="unnumbered" id="visual-organization">Visual Organization</h3>
+<ul>
+<li><p><strong>Part headers</strong> (<em>Twelve Tales</em>, <em>Two Showpieces</em>, <em>Extras</em>) make prep scope obvious.</p></li>
+<li><p><strong>Minor adventures</strong> use concise boxes (Premise/Timers/Twist/Scaling).</p></li>
+<li><p><strong>Showpieces</strong> include investigation layers, NPC webs, and end-state matrices.</p></li>
+</ul>
+<h3 class="unnumbered" id="session-planning">Session Planning</h3>
+<p>Minor adventures are built for a single night. Showpieces are intended for 2–4 sessions—each contains natural intermissions (rituals, court sessions, travel chapters) to pause cleanly.</p>
+<h6 class="unnumbered" id="the-judgment-of-the-seven-bell-court">The Judgment of the Seven Bell Court</h6>
+<p>In Ayokha, a duel is not merely the meeting of steel and skill. To the Celestial Order, combat without meaning is savagery. To Sihai philosophers, technique without restraint is chaos. To Nihori poets, victory without honor is an empty shadow.</p>
+<p>Thus, every formal bout is overseen by the <strong>Seven Bell Court</strong>: a neutral panel of masters, scholars, and priest-judges who weigh each clash by three sacred pillars of excellence:</p>
+<ul>
+<li><p><strong>Form</strong> – discipline, precision, and mastery of technique.</p></li>
+<li><p><strong>Spirit</strong> – composure, respect, and dignity in conflict.</p></li>
+<li><p><strong>Intent</strong> – purpose beyond ego: protection, duty, justice, or peace.</p></li>
+</ul>
+<p>A fighter may fall, yet be honored as victorious. A fighter may stand triumphant, yet be judged disgraced.</p>
+<p>The Scorecard system turns every match into a story:</p>
+<ul>
+<li><p>A reckless strike might land—yet shame the audience.</p></li>
+<li><p>A humble bow might calm a volatile crowd.</p></li>
+<li><p>A moment of mercy might prevent a war.</p></li>
+</ul>
+<p>Use the Judges’ Scorecards in tournaments, duels of honor, trial-by-combat, diplomatic exhibitions, or ritual tests of skill. When the world watches, a single point of Spirit may be worth more than blood.</p>
+<h2 id="twelve-tales">Twelve Tales</h2>
+<h2 id="silk-salt-and-shadows-sihai-noir-heist">Silk, Salt, and Shadows (Sihai Noir Heist)</h2>
+<h6 class="unnumbered" id="silk-salt-and-shadows">Silk, Salt, and Shadows</h6>
+<p><strong>Premise.</strong> Three rival crews target the same customs auction under lanternlight. PCs may steal, expose, or exploit the operation.</p>
+<p><strong>Setup.</strong> Start in a bustling paper-lantern market. Rumors spread that someone smuggled cursed cargo through Sihai waters.</p>
+<p><strong>Mechanical Twist.</strong> <em>Split-Screen Timer</em>: <strong>Security</strong>, <strong>Rival Crews</strong>, and <strong>Crowd Panic</strong> advance separately; PCs can shift pressure between them.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Security Alert [6]</p></li>
+<li><p>Rival Progress [8]</p></li>
+<li><p>Crowd Panic [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Smuggler – your old rival is bidding.</p></li>
+<li><p>Runekeeper – a sealed ledger pulses with occult wards.</p></li>
+<li><p>Noble – your family’s impounded cargo is on the block.</p></li>
+</ul>
+<p><strong>Scaling.</strong> Add a third inspector for high-tier play; remove one rival crew for low-tier.</p>
+<p><strong>Likely Patrons.</strong> Maelstraeus, The Witness, Ikasha.</p>
+<p><strong>Set-Pieces.</strong> Silk-bale barricades, coded bidding war, bamboo catwalk chase.</p>
+<h2 id="the-emperors-quiet-sihai-political-thriller">The Emperor’s Quiet (Sihai Political Thriller)</h2>
+<h6 class="unnumbered" id="the-emperors-quiet">The Emperor’s Quiet</h6>
+<p><strong>Premise.</strong> Seven ritual days of imperial silence. Bureaucrats slip edicts through sleeping offices; PCs decide what becomes law.</p>
+<p><strong>Setup.</strong> A red-wax proclamation forbids public speech in the capital. Within hours, forged seals appear.</p>
+<p><strong>Mechanical Twist.</strong> <em>Mandate Ledger</em>: track <strong>Legitimacy</strong> vs. <strong>Expediency</strong>. Whichever fills first becomes legal precedent.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Legitimacy [6]</p></li>
+<li><p>Conspiracy [8]</p></li>
+<li><p>Public Unrest [6]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Lawkeeper – protect lawful edicts.</p></li>
+<li><p>Diplomat – prevent riots.</p></li>
+<li><p>Monk – preserve the purity of ritual.</p></li>
+</ul>
+<p><strong>Scaling.</strong> Collapse factions for smaller parties; add secret police informant for high-tier.</p>
+<h2 id="the-ronins-winter-nihori-duel-drama">The Ronin’s Winter (Nihori Duel Drama)</h2>
+<h6 class="unnumbered" id="the-ronins-winter">The Ronin’s Winter</h6>
+<p><strong>Premise.</strong> A legendary duelist refuses battle until someone proves what victory is <em>for</em>. Steel alone cannot win this duel.</p>
+<p><strong>Setup.</strong> Snow-shrouded bridge town. Locals whisper the ronin’s name with awe and grief.</p>
+<p><strong>Mechanical Twist.</strong> <em>Seven Bell Court</em>: score <strong>Form</strong>, <strong>Spirit</strong>, <strong>Intent</strong> in all major exchanges—social and martial.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Blood Debt [6]</p></li>
+<li><p>Clan Honor [6]</p></li>
+<li><p>Snowmelt [8]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Samurai – clear ancestral shame.</p></li>
+<li><p>Cantor – sing the truth buried beneath the feud.</p></li>
+<li><p>Scholar – prove testimony was falsified.</p></li>
+</ul>
+<p><strong>Scaling.</strong> For lethal tone, ronin brings students. For introspective tone, he seeks a successor.</p>
+<h2 id="monsoon-of-knives-ayokha-naval-caper">Monsoon of Knives (Ayokha Naval Caper)</h2>
+<h6 class="unnumbered" id="monsoon-of-knives">Monsoon of Knives</h6>
+<p><strong>Premise.</strong> A coastal convoy must outrun both pirates and the incoming monsoon. PCs serve as escorts, saboteurs, or double agents.</p>
+<p><strong>Setup.</strong> The tide is turning. Markets shutter. A crimson-sailed flotilla waits offshore, knives flashing in stormlight.</p>
+<p><strong>Mechanical Twist.</strong> <em>Weather Dice</em>: roll at the start of each scene to shift <strong>Position</strong> and threaten new hazards.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Pirate Pursuit [6]</p></li>
+<li><p>Storm Surge [8]</p></li>
+<li><p>Crew Morale [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Sailor – protect friends aboard.</p></li>
+<li><p>Merchant – your cargo is life or death.</p></li>
+<li><p>Runekeeper – sabotage or defend magical rigging.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Rope-bridge boarding fights, burning sails, leviathan shadow beneath the hull.</p>
+<p><strong>Scaling.</strong> Smaller parties: reduce pirate elite. Larger parties: add ghost ship or monsoon spirits.</p>
+<h2 id="the-city-that-forgets-sihaiayokha-mystic-mystery">The City That Forgets (Sihai–Ayokha Mystic Mystery)</h2>
+<h6 class="unnumbered" id="the-city-that-forgets">The City That Forgets</h6>
+<p><strong>Premise.</strong> Memories vanish at dawn. Names, faces, debts, and crimes—gone. PCs must solve the mystery before they forget themselves.</p>
+<p><strong>Setup.</strong> A market square where no one remembers yesterday. Missing posters line the walls—blank where faces should be.</p>
+<p><strong>Mechanical Twist.</strong> <em>Memory Tokens</em>: spent like narrative currency, but losing them erases learned truths.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Memory Drain [8]</p></li>
+<li><p>Hidden Perpetrator [6]</p></li>
+<li><p>Identity Collapse (per PC) [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Detective – you solved this once before.</p></li>
+<li><p>Cantor – your songs still remember.</p></li>
+<li><p>Warrior – you are certain someone died… but you don’t know who.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Graffiti that only appears at night, ghost markets, children who remember everything.</p>
+<p><strong>Scaling.</strong> Lower tier: memory loss is mild and reversible. Higher tier: PCs may forget each other’s names and bonds.</p>
+<h2 id="festival-of-ten-thousand-lanterns-ayokha-social-sandbox">Festival of Ten Thousand Lanterns (Ayokha Social Sandbox)</h2>
+<h6 class="unnumbered" id="festival-of-ten-thousand-lanterns">Festival of Ten Thousand Lanterns</h6>
+<p><strong>Premise.</strong> Lanterns rise into a sacred sky—each blessing a god, spirit, or ancestor. But someone plans to poison the winds.</p>
+<p><strong>Setup.</strong> A week of dance, food, and ritual. Foreign guests arrive. Old grudges glow beneath paper and flame.</p>
+<p><strong>Mechanical Twist.</strong> <em>Lantern Placement</em>: PCs position lanterns to influence factions and shift social momentum.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Sabotage Plot [6]</p></li>
+<li><p>Faction Tension [8]</p></li>
+<li><p>Sacred Winds [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Diplomat – prevent an international insult.</p></li>
+<li><p>Priest – restore the sacred winds.</p></li>
+<li><p>Thief – steal a lantern containing a sealed prayer.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Lantern parade ambush, blessing boats on moonlit canals, sky-dance duel.</p>
+<p><strong>Scaling.</strong> Add rival foreign delegates for high politics. Reduce factions for smaller parties.</p>
+<h2 id="the-jade-locust-sihai-plague-investigation">The Jade Locust (Sihai Plague Investigation)</h2>
+<h6 class="unnumbered" id="the-jade-locust">The Jade Locust</h6>
+<p><strong>Premise.</strong> A plague devours harvests overnight. Glowing jade locusts burrow into grain stores—and into dreams.</p>
+<p><strong>Setup.</strong> Rice paddies gleam under moonlight. Sick fields whisper. Tunnels pulse with fungal light.</p>
+<p><strong>Mechanical Twist.</strong> <em>Plague Dice</em>: each scene risks contamination ; PCs must weigh speed vs. safety.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Crop Collapse [6]</p></li>
+<li><p>Locust Swarm [4]</p></li>
+<li><p>Fungal Corruption [8]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Farmer – your family’s land is dying.</p></li>
+<li><p>Alchemist – someone engineered this.</p></li>
+<li><p>Monk – dreams show more than fields.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Burning fields, dream-ritual exorcism, fungal shrine beneath a grain silo.</p>
+<p><strong>Scaling.</strong> Smaller parties: localized outbreak. Larger parties: outbreak spreads to trade routes.</p>
+<h2 id="ash-at-sunrise-nihori-battlefield-scenario">Ash at Sunrise (Nihori Battlefield Scenario)</h2>
+<h6 class="unnumbered" id="ash-at-sunrise">Ash at Sunrise</h6>
+<p><strong>Premise.</strong> A fallen village stands between two armies. PCs choose which banners to protect—or exploit both.</p>
+<p><strong>Setup.</strong> Dawn fog. Scorched earth. A shrine bell tolls; the villagers refuse to flee.</p>
+<p><strong>Mechanical Twist.</strong> <em>Warfare Influence Track</em>: PCs sway commanders, alter morale, sabotage logistics.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Army Advance [8]</p></li>
+<li><p>Villager Defiance [6]</p></li>
+<li><p>Shrine Fires [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Archer – protect innocents.</p></li>
+<li><p>Strategist – tip the balance.</p></li>
+<li><p>Cantor – negotiate a ceasefire.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Arrow-storm duel, shrine bombardment, civilian shield lines.</p>
+<p><strong>Scaling.</strong> High-tier: add war machines or oni mercenaries. Low-tier: only foot soldiers and archers.</p>
+<h2 id="the-thousand-step-court-paradox-dungeon">The Thousand-Step Court (Paradox Dungeon)</h2>
+<h6 class="unnumbered" id="the-thousand-step-court">The Thousand-Step Court</h6>
+<p><strong>Premise.</strong> A riddle-court where time loops, mirrors speak, and each misstep rewrites history.</p>
+<p><strong>Setup.</strong> An impossible staircase rises into the clouds. Every hundred steps, a different reality.</p>
+<p><strong>Mechanical Twist.</strong> <em>Paradox Tokens</em>: earned by breaking logic; spent to bend reality.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Paradox Collapse [6]</p></li>
+<li><p>Court Judgment [8]</p></li>
+<li><p>Memory Fracture (per PC) [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Scholar – unlock ancient truth.</p></li>
+<li><p>Duelist – defeat your mirrored self.</p></li>
+<li><p>Outcast – rewrite your past.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Mirror duels, time-loop diplomacy, staircase that bites like a serpent.</p>
+<p><strong>Scaling.</strong> Add guardian spirits for martial groups; increase riddles for social/investigative play.</p>
+<h2 id="black-powder-white-paper-sihai-tech-vs.-tradition">Black Powder, White Paper (Sihai Tech vs. Tradition)</h2>
+<h6 class="unnumbered" id="black-powder-white-paper">Black Powder, White Paper</h6>
+<p><strong>Premise.</strong> A printing guild and gunpowder foundry strike an illegal pact. Revolution whispers on the page and the barrel.</p>
+<p><strong>Setup.</strong> Pamphlets scatter across market streets. Fireworks burst—not celebratory.</p>
+<p><strong>Mechanical Twist.</strong> <em>Tech Track</em>: PCs choose to accelerate or suppress invention; society reacts.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Public Uprising [6]</p></li>
+<li><p>Gunpowder Accidents [4]</p></li>
+<li><p>Guild Conspiracy [8]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Engineer – protect innovation.</p></li>
+<li><p>Magistrate – quell sedition.</p></li>
+<li><p>Journalist – publish the truth.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Printing press siege, fireworks duel, gunpowder river barge chase.</p>
+<p><strong>Scaling.</strong> Low-tier: pamphlets only. High-tier: cannons and experimental explosives.</p>
+<h2 id="court-of-perfumed-knives-ayokha-palace-intrigue">Court of Perfumed Knives (Ayokha Palace Intrigue)</h2>
+<h6 class="unnumbered" id="court-of-perfumed-knives">Court of Perfumed Knives</h6>
+<p><strong>Premise.</strong> A masked ball where every dance is a duel, every toast a negotiation, every mask a lie.</p>
+<p><strong>Setup.</strong> At midnight, the palace doors close. No one leaves without losing face—or blood.</p>
+<p><strong>Mechanical Twist.</strong> <em>Mask Exchanges</em>: trade masks to steal identities, obligations, or secrets.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>Mask Misrule [6]</p></li>
+<li><p>Noble Scandal [8]</p></li>
+<li><p>Silent Assassins [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Noble – reclaim stolen legacy.</p></li>
+<li><p>Spy – steal a royal seal.</p></li>
+<li><p>Healer – cure poisoned wines.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Dance-fight duels, silent toast assassinations, balcony chase.</p>
+<p><strong>Scaling.</strong> Expand noble families for large parties; narrow to a single feud for small groups.</p>
+<h2 id="the-house-that-eats-oaths-haunted-legal-horror">The House that Eats Oaths (Haunted Legal Horror)</h2>
+<h6 class="unnumbered" id="the-house-that-eats-oaths">The House that Eats Oaths</h6>
+<p><strong>Premise.</strong> Breaking promises empowers a hungry house. Walls whisper names. Signed contracts appear in dreams.</p>
+<p><strong>Setup.</strong> An abandoned magistrate manor, windows boarded from the inside, legal scrolls nailed to the gates.</p>
+<p><strong>Mechanical Twist.</strong> <em>Broken Oath Timer</em> : each lie or failure empowers the house and manifests spirits of judgment.</p>
+<p><strong>Timers.</strong></p>
+<ul>
+<li><p>House Hunger [6]</p></li>
+<li><p>Oathbinding Spirits [8]</p></li>
+<li><p>Structural Collapse [4]</p></li>
+</ul>
+<p><strong>PC Hooks.</strong></p>
+<ul>
+<li><p>Lawyer – prove the house wrong.</p></li>
+<li><p>Thief – you were paid to seal it.</p></li>
+<li><p>Monk – set the bound spirits free.</p></li>
+</ul>
+<p><strong>Set-Pieces.</strong> Contract-binding spirits, courtroom nightmares, collapsing archive hall.</p>
+<p><strong>Scaling.</strong> High-tier: house begins rewriting reality. Low-tier: simple haunt with legal curses.</p>
+<h2 id="two-showpiece-adventures">Two Showpiece Adventures</h2>
+<h2 id="duel-to-the-death-wu--xing-vs.-ninja">Duel to the Death: Wu -Xing vs. Ninja</h2>
+<h5 class="unnumbered" id="conspiracy-of-shadows-and-elements">Conspiracy of Shadows and Elements</h5>
+<h5 id="adventure-overview">Adventure Overview</h5>
+<p><strong>Premise.</strong> An “honorable” martial arts tournament between Sihai and Nihori masks a joint conspiracy by corrupt merchants from both nations. The real prize is control of the Ayokhan spice routes, not the public trading post. Two legendary champions are being used as pawns, and their duel could trigger war.</p>
+<p><strong>Stakes.</strong> PCs must uncover the scheme before the finale, prevent an international incident, and decide whether to expose the truth (risking war) or defuse it without igniting hostilities.</p>
+<h5 id="the-conspiracy-unveiled">The Conspiracy Unveiled</h5>
+<h6 id="the-true-players">The True Players</h6>
+<p><strong>The Crimson Merchants’ Guild</strong></p>
+<ul>
+<li><p><strong>Membership:</strong> Corrupt traders from Sihai and Nihori.</p></li>
+<li><p><strong>Leadership:</strong> <strong>Merchant Lord Zhao</strong> (Sihai) and <strong>Daimyo Kuroda</strong> (Nihori; secretly a merchant in disguise).</p></li>
+<li><p><strong>Goal:</strong> Monopolize Ayokha’s spice trade by eliminating legitimate competition.</p></li>
+</ul>
+<h6 id="the-plan">The Plan</h6>
+<ol>
+<li><p><strong>Manufacture Conflict:</strong> Staged incidents inflame Sihai–Nihori tensions.</p></li>
+<li><p><strong>Heroic Distraction:</strong> Famous champions become unwitting figureheads.</p></li>
+<li><p><strong>Economic Warfare:</strong> Corner markets while eyes are on the tournament.</p></li>
+<li><p><strong>Political Manipulation:</strong> Orchestrate “outrage” and sell themselves as the cure.</p></li>
+</ol>
+<h5 id="the-champions-pawns-in-a-larger-game">The Champions: Pawns in a Larger Game</h5>
+<h6 id="master-li-wei-sihai-the-honorable-warrior-blind-to-the-truth">Master Li Wei (Sihai) — <em>The Honorable Warrior, Blind to the Truth</em></h6>
+<p><strong>Background.</strong> A disciplined warrior-monk convinced he defends Sihai’s honor and safeguards trade for common folk.<br/>
+<strong>Blind Spot.</strong> Unaware his patrons are manipulating him; holds a personal vendetta against Kage after a humiliating past encounter.<br/>
+<strong>Personality.</strong> Noble, doctrinaire, believes in Sihai philosophical rigor; wavers when Kage’s unconventional methods blunt his forms.</p>
+<h6 id="shinobi-kage-nihori-the-pragmatic-killer-with-hidden-honor">Shinobi Kage (Nihori) — <em>The Pragmatic Killer with Hidden Honor</em></h6>
+<p><strong>Background.</strong> A veteran shinobi who believes he serves national interest, though cynically aware of political rot.<br/>
+<strong>Blind Spot.</strong> Respects Li Wei despite animosity; underestimates the conspiracy’s scope.<br/>
+<strong>Personality.</strong> Dry, professionally proud, grudging respect for Li Wei’s skill.</p>
+<h5 id="the-tournament-structure-facade">The Tournament Structure (Facade)</h5>
+<h6 id="phase-1-the-gathering-storm">Phase 1: The Gathering Storm</h6>
+<p>Delegations arrive; tensions and odd incidents mount.<br/>
+<strong>PC Roles.</strong> Participants; staff (healers/smiths/cooks); journalists; diplomatic observers; mercenary security.</p>
+<h6 id="phase-2-trials-of-elements">Phase 2: Trials of Elements</h6>
+<p>Showcases of styles and traditions; sabotage attempts increase.</p>
+<h6 id="phase-3-the-final-duel">Phase 3: The Final Duel</h6>
+<p>Li Wei vs. Kage — engineered as a flashpoint for staged “outrage.”</p>
+<h5 id="the-web-of-deception">The Web of Deception</h5>
+<h6 id="the-poisoned-chalice">The Poisoned Chalice</h6>
+<ul>
+<li><p>Banquet fare laced with truth-serum and loyalty binders.</p></li>
+<li><p>Used to extract intel and nudge behavior.</p></li>
+</ul>
+<h6 id="the-shadow-network">The Shadow Network</h6>
+<ul>
+<li><p>Bribed Ayokhan officials look away.</p></li>
+<li><p>Merchant ships rerouted to dodge legitimate tariffs.</p></li>
+</ul>
+<h6 id="the-false-evidence">The False Evidence</h6>
+<ul>
+<li><p>Forged documents “prove” the losing nation’s aggression.</p></li>
+<li><p>Timed discovery just after the finals to justify sanctions.</p></li>
+</ul>
+<h5 id="mechanical-framework">Mechanical Framework</h5>
+<h6 id="investigation-timers">Investigation Timers</h6>
+<ul>
+<li><p><strong>Uncovering the Conspiracy [8]</strong></p></li>
+<li><p><strong>Political Tensions [6]</strong></p></li>
+<li><p><strong>Tournament Integrity [4]</strong></p></li>
+<li><p><strong>Champions’ Relationship [6]</strong></p></li>
+<li><p><strong>Conspiracy Timer [6]</strong> (advances when PCs fail with cost or the champions’ relationship worsens)</p></li>
+</ul>
+<h6 id="key-npcs-secrets">Key NPCs &amp; Secrets</h6>
+<p><strong>Merchant Lord Zhao (Sihai)</strong> — Embezzling from the Imperial Treasury; needs spice profits to plug theft; arrogant.<br/>
+<strong>Daimyo Kuroda (Nihori; actually a merchant)</strong> — Illegitimate lineage; assumes false identity; paranoid about exposure.<br/>
+<strong>Governor Priya of Ayokha</strong> — Aware of the scheme, blackmailed; values citizens’ safety; family held hostage.</p>
+<h5 id="champion-character-sheets">Champion Character Sheets</h5>
+<h6 class="unnumbered" id="master-li-wei-sihai-wu--xing-master"><strong>Master Li Wei (Sihai Wu -Xing Master)</strong></h6>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Attributes</strong></td>
+<td style="text-align: left;">Body 3, Wits 2, Spirit 4, Presence 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Skills</strong></td>
+<td style="text-align: left;">Melee 3, Arcana 3, Athletics 2, Insight 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Talents</strong></td>
+<td style="text-align: left;">Spellcraft; Elemental Harmony; Perfect Timing Way; Transcendent Harmony</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Approach</strong></td>
+<td style="text-align: left;">Dominant/Standard for elemental arts; Desperate/Great when emotionally compromised</td>
+</tr>
+</tbody>
+</table></div>
+<h6 class="unnumbered" id="shinobi-kage-nihori-shadow-warrior"><strong>Shinobi Kage (Nihori Shadow Warrior)</strong></h6>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Attributes</strong></td>
+<td style="text-align: left;">Body 2, Wits 4, Spirit 3, Presence 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Skills</strong></td>
+<td style="text-align: left;">Stealth 4, Melee 3, Deception 3, Lore 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Talents</strong></td>
+<td style="text-align: left;">Shadow Dance; Backstab; Deathblow; Conditioning</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Approach</strong></td>
+<td style="text-align: left;">Dominant/Standard in shadows; Dominant/Limited when exposed</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="adventure-hooks-by-pc-type">Adventure Hooks by PC Type</h5>
+<h6 id="participants">Participants</h6>
+<p>Opponents seem pre-briefed; prize money trails to shell accounts; bracket manipulation.<br/>
+<em>Hook Roll (Insight + Notice vs. DV 3):</em> Success reveals patterns; Partial sees “something off”; Miss leads into a trap.</p>
+<h6 id="support-staff">Support Staff</h6>
+<p>Overhear collusion; restricted shipments; preferential treatment.<br/>
+<em>Hook Roll (Wits + Stealth vs. DV 4):</em> Success gains intel; Partial raises suspicion; Miss compromises position.</p>
+<h6 id="journalists">Journalists</h6>
+<p>Assigned puff piece; conflicting tips; cross-border sources disagree.<br/>
+<em>Hook Roll (Wits + Sway vs. DV 3):</em> Success uncovers contradictions; Partial reveals spin; Miss gets discredited.</p>
+<h6 id="diplomats">Diplomats</h6>
+<p>Protocol manipulation; coded dispatches; access to intel networks.<br/>
+<em>Hook Roll (Command + Insight vs. DV 4):</em> Success IDs conspirators; Partial shows pressure; Miss triggers an incident.</p>
+<h6 id="mercenaries">Mercenaries</h6>
+<p>Conflicting orders; ignored breaches; pressure to silence witnesses.<br/>
+<em>Hook Roll (Wits + Lore vs. DV 3):</em> Success exposes sabotage; Partial notes payments; Miss makes you accessories.</p>
+<h5 id="key-investigation-scenes">Key Investigation Scenes</h5>
+<h6 id="scene-1-the-poisoned-banquet">Scene 1: The Poisoned Banquet</h6>
+<p><em>Reconciliation dinner; detect serums, observe odd champion behavior, avoid being dosed.</em><br/>
+<strong>Investigation (Wits + Insight vs. DV 4):</strong></p>
+<ul>
+<li><p><em>Success:</em> Identify serum ingredients; note odd behavior.</p></li>
+<li><p><em>Partial:</em> Detect tampering; not specifics; champions act strangely.</p></li>
+<li><p><em>Miss:</em> Dosed; reveal sensitive info; GM spends 2 SB (compromised leverage).</p></li>
+</ul>
+<p><strong>Alternative (Wits + Stealth vs. DV 3):</strong></p>
+<ul>
+<li><p><em>Success:</em> Avoid food; observe reactions.</p></li>
+<li><p><em>Partial:</em> Small dose; notice taste, muted effects.</p></li>
+<li><p><em>Miss:</em> Fully dosed; act against interests next scene.</p></li>
+</ul>
+<h6 id="scene-2-the-sabotaged-dojo">Scene 2: The Sabotaged Dojo</h6>
+<p><em>“Accidental” facility damage; trace conspirators; prevent repeats.</em><br/>
+<strong>Investigation (Wits + Craft vs. DV 4):</strong></p>
+<ul>
+<li><p><em>Success:</em> Trace tools/materials; identify fingerprints.</p></li>
+<li><p><em>Partial:</em> Know it’s sabotage; source unclear; prevent immediate repeats.</p></li>
+<li><p><em>Miss:</em> Blamed; Tournament Integrity +1; GM spends 1 SB (suspicion).</p></li>
+</ul>
+<p><strong>Repair (Body + Craft vs. DV 3):</strong></p>
+<ul>
+<li><p><em>Success:</em> Restore facilities; +1 Position for training.</p></li>
+<li><p><em>Partial:</em> Temporary fix; risk later collapse.</p></li>
+<li><p><em>Miss:</em> Worsen damage; training blocked; GM spends 1 SB (schedule hit).</p></li>
+</ul>
+<h6 id="scene-3-the-midnight-meeting">Scene 3: The Midnight Meeting</h6>
+<p><em>Eavesdrop leaders’ huddle; or survive a honeytrap.</em><br/>
+<strong>Infiltration (Wits + Stealth vs. DV 5):</strong></p>
+<ul>
+<li><p><em>Success:</em> Full conversation; key players and plans.</p></li>
+<li><p><em>Partial:</em> Fragmentary info; suspicion rises.</p></li>
+<li><p><em>Miss:</em> Discovered; combat/rout; GM spends 2 SB (capture risk).</p></li>
+</ul>
+<p><strong>Social (Presence + Sway vs. DV 4):</strong></p>
+<ul>
+<li><p><em>Success:</em> Invitation secured; inner circle access.</p></li>
+<li><p><em>Partial:</em> Limited access; curated info.</p></li>
+<li><p><em>Miss:</em> Outed as impostor; become target; GM spends 2 SB.</p></li>
+</ul>
+<h6 id="scene-4-the-false-evidence-plant">Scene 4: The False Evidence Plant</h6>
+<p><em>Catch the forgery room; weigh truth vs. protecting innocents.</em><br/>
+<strong>Detection (Insight + Notice vs. DV 4):</strong></p>
+<ul>
+<li><p><em>Success:</em> Identify operation; gather evidence; find originals.</p></li>
+<li><p><em>Partial:</em> See forgeries; originals missing; risk being framed.</p></li>
+<li><p><em>Miss:</em> Framed; Political Tensions +2; GM spends 3 SB (arrest now).</p></li>
+</ul>
+<p><strong>Analysis (Wits + Lore vs. DV 3):</strong></p>
+<ul>
+<li><p><em>Success:</em> Prove forgery; ID methods/forger.</p></li>
+<li><p><em>Partial:</em> Inconsistencies noted; proof lacking.</p></li>
+<li><p><em>Miss:</em> Accept as genuine; investigation misled; GM spends 2 SB.</p></li>
+</ul>
+<h5 id="climax-multiple-paths">Climax: Multiple Paths</h5>
+<h6 id="path-1-prevent-the-final-duel">Path 1: Prevent the Final Duel</h6>
+<p><em>Sway both champions; handle fallout of a canceled bout.</em><br/>
+<strong>(Presence + Sway vs. DV 5):</strong></p>
+<ul>
+<li><p><em>Success:</em> Both unite against conspirators.</p></li>
+<li><p><em>Partial:</em> One convinced; internal rift.</p></li>
+<li><p><em>Miss:</em> Both distrust PCs; GM spends 3 SB (hostility).</p></li>
+</ul>
+<h6 id="path-2-let-the-duel-proceed-expose-the-truth">Path 2: Let the Duel Proceed, Expose the Truth</h6>
+<p><em>Keep honor of the ring; unmask plot at peak.</em><br/>
+<strong>(Wits + Athletics vs. DV 4):</strong></p>
+<ul>
+<li><p><em>Success:</em> Perfect timing; max impact; minimal collateral.</p></li>
+<li><p><em>Partial:</em> Good timing; some bystander risk.</p></li>
+<li><p><em>Miss:</em> Poor timing; confusion/casualties; GM spends 2 SB.</p></li>
+</ul>
+<h6 id="path-3-turn-the-tables">Path 3: Turn the Tables</h6>
+<p><em>Run a sting during the finals; high risk to bystanders if timing slips.</em><br/>
+<strong>(Command + Craft vs. DV 5):</strong></p>
+<ul>
+<li><p><em>Success:</em> Flawless execution; conspirators caught.</p></li>
+<li><p><em>Partial:</em> Some escape; evidence compromised.</p></li>
+<li><p><em>Miss:</em> Plan fails; innocents endangered; GM spends 4 SB.</p></li>
+</ul>
+<h5 id="consequences-endings">Consequences &amp; Endings</h5>
+<h6 id="exposed-early">Exposed Early</h6>
+<p>War averted; trade normalizes; reputational damage and personal reckonings.<br/>
+<em>Reward:</em> +4 XP each; +1 Tier if applicable; Patron favor (Truth/Justice domains).</p>
+<h6 id="partial-success">Partial Success</h6>
+<p>Some arrests; tensions linger; roots remain.<br/>
+<em>Reward:</em> +2 XP each; mixed consequences; ongoing subplot hooks.</p>
+<h6 id="conspiracy-succeeds">Conspiracy Succeeds</h6>
+<p>War, economic collapse, and civilian suffering.<br/>
+<em>Consequence:</em> –2 XP each; Patron debt (Failure); new enemies.</p>
+<h6 id="pcs-fail-to-act">PCs Fail to Act</h6>
+<p>Default catastrophe: inter-nation war; Ayokhan trade implosion.<br/>
+<em>Consequence:</em> –4 XP each; major Patron debt; campaign-altering fallout.</p>
+<h5 id="character-development">Character Development</h5>
+<h6 id="li-wei">Li Wei</h6>
+<p>Choose between rigid honor and adaptive pragmatism.<br/>
+<em>Growth (Spirit + Insight vs. DV 4):</em></p>
+<ul>
+<li><p><em>Success:</em> Integrates pragmatism with honor; becomes mentor.</p></li>
+<li><p><em>Partial:</em> Temporary compromise; internal conflict lingers.</p></li>
+<li><p><em>Miss:</em> Loses faith; redemption arc seed.</p></li>
+</ul>
+<h6 id="kage">Kage</h6>
+<p>Decide whether cynicism equals complicity.<br/>
+<em>Growth (Presence + Lore vs. DV 3):</em></p>
+<ul>
+<li><p><em>Success:</em> Rediscovers purpose; gains honor.</p></li>
+<li><p><em>Partial:</em> Selective morality; measured choices.</p></li>
+<li><p><em>Miss:</em> Drifts toward antagonist; future redemption hook.</p></li>
+</ul>
+<h6 id="for-pcs">For PCs</h6>
+<p>Moral calculus; cultural literacy; growth in investigation, diplomacy, or combat.<br/>
+<em>Cultural Check (Presence + Lore vs. DV 3):</em></p>
+<ul>
+<li><p><em>Success:</em> +1d to Sihai/Nihori/Ayokhan interactions.</p></li>
+<li><p><em>Partial:</em> Basic understanding; modest social edge.</p></li>
+<li><p><em>Miss:</em> Faux pas; –1 Position on related interactions.</p></li>
+</ul>
+<h5 id="cultural-notes">Cultural Notes</h5>
+<h6 id="historical-parallels-fictionalized">Historical Parallels (Fictionalized)</h6>
+<p>Sihai: ideal vs. governance friction; bureaucracy exploited.<br/>
+Nihori: clan politics; duty weaponized pragmatically.<br/>
+Ayokha: trade hub mediating cultures under pressure.</p>
+<h6 id="champion-conflict">Champion Conflict</h6>
+<p>Embodies philosophical differences; shows manipulation of noble intent; personal grudges as levers.</p>
+<h6 id="ayokhan-cultural-elements">Ayokhan Cultural Elements</h6>
+<p><strong>Monsoon Timing:</strong> Investigation effectiveness varies with seasonal winds.<br/>
+<strong>Spirit World:</strong> Local <em>nat</em> may aid (Arcana + Spirit vs. DV 4).<br/>
+<strong>Mandala Politics:</strong> Multi-faction negotiation with vassal kings and sea-lords.</p>
+<h5 id="adventure-pacing">Adventure Pacing</h5>
+<h6 id="sessions-12">Sessions 1–2</h6>
+<p>Introductions, tensions, first clues.<br/>
+<em>Focus:</em> Establish tournament, champions, first conspiracy hints.</p>
+<h6 id="sessions-34">Sessions 3–4</h6>
+<p>Escalation, sabotage, revelations.<br/>
+<em>Focus:</em> Deepen investigation; confront conspirators; champions’ relationship deteriorates.</p>
+<h6 id="session-5">Session 5</h6>
+<p>Finale: sting, exposure, or duel; fallout.<br/>
+<em>Focus:</em> Climactic confrontation; resolve threads; apply consequences.</p>
+<h5 id="gm-notes">GM Notes</h5>
+<h6 id="balance">Balance</h6>
+<p>Conspiracy is discoverable but not obvious; champions have legitimate motives; multiple PC victory routes.<br/>
+<em>Guideline:</em> Each major clue requires a meaningful test, not passive observation.</p>
+<h6 id="sensitivity">Sensitivity</h6>
+<p>Individuals are culpable, not cultures; showcase virtues across traditions; Ayokha as bridge culture.<br/>
+<em>Reminder:</em> Champions embody ideals, not stereotypes.</p>
+<h6 id="agency">Agency</h6>
+<p>Multiple investigative vectors; flexible alliances; consequences drive story.<br/>
+<em>Mechanic:</em> Allow temporary, goal-focused faction alliances.</p>
+<h6 id="fates-edge-integration">Fate’s Edge Integration</h6>
+<p>Use Position/Effect for major challenges; spend SB for conspiracy complications (1–4 severity); award Boons for clever cultural leverage and moral choices; during downtime, 2 Boons <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> 1 XP for significant discoveries.</p>
+<h6 id="monsoon-timer-8">Monsoon Timer [8]</h6>
+<p>Tracks seasonal changes affecting the investigation:</p>
+<ul>
+<li><p>Seg. 1–2: Pre-monsoon — dry conditions; easier surveillance.</p></li>
+<li><p>Seg. 3–4: Early monsoon — activity spikes; shipping disruptions.</p></li>
+<li><p>Seg. 5–6: Peak monsoon — investigation hindered; indoor focus.</p></li>
+<li><p>Seg. 7–8: Late monsoon — clearing weather; finale windows open.</p></li>
+</ul>
+<h5 id="sample-investigation-encounters">Sample Investigation Encounters</h5>
+<h6 id="document-forgery-detection">Document Forgery Detection</h6>
+<p><em>Wits + Insight vs. DV 4</em><br/>
+<em>Success:</em> Identify false documents; trace to forger.<br/>
+<em>Partial:</em> Inconsistencies found; more evidence needed.<br/>
+<em>Miss:</em> Forgeries accepted; investigation misdirected.</p>
+<h6 id="bribe-detection">Bribe Detection</h6>
+<p><em>Wits + Insight vs. DV 3</em><br/>
+<em>Success:</em> Recognize corrupt behavior; gather proof.<br/>
+<em>Partial:</em> Sense corruption; proof lacking; suspicion rises.<br/>
+<em>Miss:</em> Become a target; compromised posture.</p>
+<h6 id="shadow-network-tracking">Shadow Network Tracking</h6>
+<p><em>Wits + Lore vs. DV 4</em><br/>
+<em>Success:</em> Trace routes; identify actors.<br/>
+<em>Partial:</em> Evidence found; conspirators alerted; time pressure.<br/>
+<em>Miss:</em> False trail; wasted resources; GM spends 2 SB.</p>
+<h5 id="tournament-combat-guidelines">Tournament Combat Guidelines</h5>
+<h6 id="phase-1-2-matches">Phase 1 &amp; 2 Matches</h6>
+<p>Position: Dominant/Standard (honorable competition). Effect: Limited/Great (style demonstration). Cultural considerations may tilt judging.</p>
+<h6 id="final-duel">Final Duel</h6>
+<p>Position: Dominant/Desperate (stakes and manipulation). Effect: Standard/Great (champions at full capability). Audience reactions create environmental factors.</p>
+<h6 id="conspiracy-intervention">Conspiracy Intervention</h6>
+<p>Position shifts with timing/approach; Effect modified by evidence presented; cultural honor stakes influence resolution options.</p>
+<h2 id="the-bridge-of-three-echoes-pilgrimage-of-memory-and-mercy">The Bridge of Three Echoes (Pilgrimage of Memory and Mercy)</h2>
+<h6 class="unnumbered" id="the-bridge-of-three-echoes">The Bridge of Three Echoes</h6>
+<p><strong>Premise.</strong> Once every century, a spectral bridge appears across the Valley of Silent Ash. Upon it walk the forgotten dead of three nations, seeking closure. Only those who carry truth may cross.</p>
+<p><strong>Purpose.</strong> Resolve ancient wrongs between Sihai, Nihori, and Ayokha without blades, armies, or scripts of state. A single night on the bridge can calm wars or spark them anew.</p>
+<p><strong>Tone.</strong> Quiet, solemn, beautiful. The adventure favors reflection, diplomacy, vows, compassion, and the verdict of ancestors.</p>
+<h5 id="structure-of-play">Structure of Play</h5>
+<p>The bridge manifests for a single night. Each <strong>Act</strong> is one crossing:</p>
+<ul>
+<li><p><strong>Act I: Lanterns of Regret</strong> (Ayokha)</p></li>
+<li><p><strong>Act II: Blades of Memory</strong> (Nihori)</p></li>
+<li><p><strong>Act III: Scrolls of Truth</strong> (Sihai)</p></li>
+</ul>
+<p>Each act offers:</p>
+<ul>
+<li><p>A symbolic ritual</p></li>
+<li><p>A moral choice with no easy answer</p></li>
+<li><p>A chance to earn or lose <strong>Echo Tokens</strong></p></li>
+</ul>
+<p>At dawn, the bridge judges the living.</p>
+<h5 id="echo-tokens-core-mechanic">Echo Tokens (Core Mechanic)</h5>
+<h6 class="unnumbered" id="echo-tokens">Echo Tokens</h6>
+<p>PCs earn or lose <strong>Echo Tokens</strong> by honoring the dead:</p>
+<ul>
+<li><p>Show mercy to a bitter spirit [+1]</p></li>
+<li><p>Tell a painful truth [+1]</p></li>
+<li><p>Break a vow [-1]</p></li>
+<li><p>Spill blood on the bridge [-2]</p></li>
+</ul>
+<p>At dawn:</p>
+<dl>
+<dt>3+ Tokens:</dt>
+<dd>
+<p>Spirits grant a Blessing of Peace</p>
+</dd>
+<dt>1–2 Tokens:</dt>
+<dd>
+<p>The bridge leaves the world unchanged</p>
+</dd>
+<dt>0 or less:</dt>
+<dd>
+<p>The bridge cracks, releasing ancestral wrath</p>
+</dd>
+</dl>
+<h5 id="timers">Timers</h5>
+<ul>
+<li><p><strong>Bridge Stability [6]</strong> – grows with violence or lies</p></li>
+<li><p><strong>Spirit Unrest [8]</strong> – shrinks with compassion or ritual</p></li>
+<li><p><strong>Dawn Approaches [10]</strong> – the night is short</p></li>
+</ul>
+<h5 id="act-i-lanterns-of-regret-ayokha">Act I: Lanterns of Regret (Ayokha)</h5>
+<p>Floating lanterns hover in ash-filled fog. Each lantern holds a recorded sorrow—love unspoken, apology unmade, duty abandoned.</p>
+<p><strong>Ritual:</strong> PCs place a lantern into the river of ash. Its flame brightens or dims depending on their sincerity.</p>
+<ul>
+<li><p>Heal a grieving spirit [+1 Echo Token]</p></li>
+<li><p>Sailor begs forgiveness from drowned crew</p></li>
+<li><p>Parent apologizes to a forgotten child</p></li>
+<li><p>Romantic rival confesses they saved a life instead of taking it</p></li>
+</ul>
+<p><strong>Set-Piece.</strong> A thousand lanterns rise, illuminating spectral tatami pavilions and Ayokhan funeral masks.</p>
+<p><strong>Test.</strong> PCs must speak a sorrow of their own. Silence counts as fear, not respect.</p>
+<h5 id="act-ii-blades-of-memory-nihori">Act II: Blades of Memory (Nihori)</h5>
+<p>A silent battlefield of polished stone. The dead are not hostile—they demand <em>acknowledgment</em>.</p>
+<p><strong>Ritual: Truth Duel.</strong> No blades strike flesh. To “win” is to yield the proud truth you never wished to speak.</p>
+<p>Examples:</p>
+<ul>
+<li><p>A warrior admits they killed for glory, not justice</p></li>
+<li><p>A magistrate admits they saved face instead of saving lives</p></li>
+<li><p>A monk admits they fled duty and called it enlightenment</p></li>
+</ul>
+<p><strong>Outcome.</strong></p>
+<ul>
+<li><p>Mutual truth: both sides bow, [+1 Token]</p></li>
+<li><p>Refusal to speak: spirits grow restless, [-1 Token]</p></li>
+</ul>
+<p><strong>Set-Piece.</strong> Rows of ash-blade swords hum in the wind, each engraved with an unspoken name.</p>
+<h5 id="act-iii-scrolls-of-truth-sihai">Act III: Scrolls of Truth (Sihai)</h5>
+<p>A grand pavilion of drifting parchment and calligraphy that writes itself. The spirits seek <em>record</em>, not vengeance.</p>
+<p><strong>Ritual:</strong> PCs must inscribe a truth on the Eternal Scroll:</p>
+<ul>
+<li><p>Confess a lineage secret</p></li>
+<li><p>Acknowledge a war crime</p></li>
+<li><p>Reveal a corruption</p></li>
+<li><p>Forgive a historic enemy</p></li>
+</ul>
+<p><strong>Set-Piece.</strong> Ink-spirits coil through the air. When a lie is spoken, parchment tears like thunder.</p>
+<p><strong>Test.</strong> If no one writes truth, the scroll writes <em>judgment</em> instead.</p>
+<h5 id="final-choice-break-or-bless-the-bridge">Final Choice: Break or Bless the Bridge</h5>
+<p>At the last step, three ancestral judges manifest: <strong>Ayokhan Mercy, Nihori Honor, Sihai Memory.</strong></p>
+<p>PCs must choose:</p>
+<ul>
+<li><p><strong>Bless the Bridge:</strong> swears a binding vow of peace</p></li>
+<li><p><strong>Break the Bridge:</strong> spirits rise to punish the living</p></li>
+<li><p><strong>Rewrite History:</strong> one truth is erased or rewritten</p></li>
+</ul>
+<p><strong>Echo Token Result Table:</strong></p>
+<ul>
+<li><p>3–5 Tokens <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Dawn Blessing (renewed treaties, ancestral gifts)</p></li>
+<li><p>1–2 Tokens <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Neutral departure, bittersweet memory</p></li>
+<li><p>0 or fewer <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Vengeful spirits pursue PCs beyond the bridge</p></li>
+</ul>
+<h5 id="patron-hooks">Patron Hooks</h5>
+<ul>
+<li><p><strong>Mab:</strong> promises peace, demands a price in memory</p></li>
+<li><p><strong>Inkblade:</strong> offers a rewritten scroll—dangerous temptation</p></li>
+<li><p><strong>Thrysos:</strong> grants mercy to warriors who admit their failures</p></li>
+<li><p><strong>Black Fox:</strong> the bridge hides a secret worth stealing</p></li>
+</ul>
+<h6 class="unnumbered" id="gm-guidance-tone">GM Guidance: Tone</h6>
+<p>This is not a combat showcase. Use silence as a mechanic. Let players sit in discomfort. Reward vulnerability—characters who speak truth should be mechanically advantaged.</p>
+<h6 class="unnumbered" id="endings">Endings</h6>
+<p><strong>Peace Ending.</strong> The bridge becomes part of living memory; ancestors rest.</p>
+<p><strong>Bitter Ending.</strong> Some truths are too sharp; one culture departs with permanent scars.</p>
+<p><strong>Forbidden Ending.</strong> PCs erase a historical truth. History now remembers something that never happened.</p>
+<h5 id="npcs-of-the-bridge-of-three-echoes">NPCs of the Bridge of Three Echoes</h5>
+<h6 class="unnumbered" id="sihai-npcs">Sihai NPCs</h6>
+<h6 id="magistrate-shen-liang">Magistrate Shen Liang</h6>
+<p>Historian-in-exile, gentle and formal. Carries scrolls spilling endless ink.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> Falsified census records to save a starving village.</p></li>
+<li><p><strong>If Helped:</strong> <em>Seal of Lenient Judgment</em> — +1 Position when pleading mercy.</p></li>
+<li><p><strong>If Silenced:</strong> Spirits mark him with invisible ink; PCs can see “coward” across his back.</p></li>
+</ul>
+<h6 id="jade-archivist-lian-xu">Jade Archivist Lian Xu</h6>
+<p>Keeper of forbidden histories, brilliant and furious.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> A massacre blamed on raiders was ordered internally.</p></li>
+<li><p><strong>If Helped:</strong> PCs gain a <em>True Ledger Fragment</em> to expose corruption later.</p></li>
+<li><p><strong>If Silenced:</strong> Spirits whisper the forbidden truth to an unwilling PC.</p></li>
+</ul>
+<h6 id="commander-wei-sun">Commander Wei Sun</h6>
+<p>War hero, loved by the empire, hollow with guilt.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> Civilian deaths reported as bandit casualties.</p></li>
+<li><p><strong>If Forgiven:</strong> <em>Blessing of Gentle Hands</em> — treat one lethal wound as nonlethal.</p></li>
+<li><p><strong>If Condemned:</strong> Silent spirits gather; Unrest +1.</p></li>
+</ul>
+<h6 class="unnumbered" id="nihori-npcs">Nihori NPCs</h6>
+<h6 id="poet-swordsman-akiro">Poet-Swordsman Akiro</h6>
+<p>Duelist-philosopher polishing a perfect blade.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> Provoked a duel to steal poetry, not for honor.</p></li>
+<li><p><strong>If Encouraged:</strong> Offers a memory-haiku restoring one spent Echo Token.</p></li>
+<li><p><strong>If Mocked:</strong> Challenges a PC to a Truth Duel.</p></li>
+</ul>
+<h6 id="sister-hana">Sister Hana</h6>
+<p>Temple attendant who stole sacred coins to feed orphans.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> Her mercy violated temple law.</p></li>
+<li><p><strong>If Defended:</strong> <em>Hands of Clean Intent</em> — ignore one Corruption tick.</p></li>
+<li><p><strong>If Condemned:</strong> She vanishes; Stability +1.</p></li>
+</ul>
+<h6 id="lord-shigure">Lord Shigure</h6>
+<p>Samurai-turned-traitor, polite and calm as ice.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> Betrayed his lord for ambition, not justice.</p></li>
+<li><p><strong>If Convinced:</strong> <em>Mask of Honest Silence</em> — reroll one failed Sway per adventure.</p></li>
+<li><p><strong>If Proud:</strong> Becomes a vengeful spirit later.</p></li>
+</ul>
+<h6 class="unnumbered" id="ayokha-npcs">Ayokha NPCs</h6>
+<h6 id="widow-ishani">Widow Ishani</h6>
+<p>Merchant-queen carrying three lanterns for lost husbands.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> Bribed a captain to sail early; ship sank.</p></li>
+<li><p><strong>If Admitted:</strong> <em>Coin of Clean Trade</em> — advantage when negotiating peace.</p></li>
+<li><p><strong>If Denied:</strong> Lanterns sink; Stability +2.</p></li>
+</ul>
+<h6 id="child-keeper-tavin">Child-Keeper Tavin</h6>
+<p>Medium holding hands of forgotten children.</p>
+<ul>
+<li><p><strong>Truth Feared:</strong> One child lives; Tavin hid him to protect him.</p></li>
+<li><p><strong>If Revealed:</strong> <em>Promise of Gentle Passage</em> — advantage on death saves.</p></li>
+<li><p><strong>If Forced:</strong> Children scatter; Unrest +1.</p></li>
+</ul>
+<h6 id="the-silent-judge">The Silent Judge</h6>
+<p>Ancient Ayokhan spirit of law without mercy.</p>
+<ul>
+<li><p><strong>Demand:</strong> Truth <em>and</em> consequence.</p></li>
+<li><p><strong>If Satisfied:</strong> Stability resets; Echo Token +1.</p></li>
+<li><p><strong>If Defied:</strong> Condemns PC, NPC, or culture — canon impact.</p></li>
+</ul>
+<h2 id="supporting-systems-cultural-material">Supporting Systems &amp; Cultural Material</h2>
+<h3 id="the-seven-bell-court">The Seven Bell Court</h3>
+<p>The book is named for this court, the Introduction promises it, and half the Tales call on it. Here it is in one place.</p>
+<p>The Seven Bell Court is an Ayokhan institution of seven judges — masters, scholars and priest-judges drawn from outside the parties to any matter before them. It does two things that look different and are not. It <em>judges formal bouts</em>: tournaments, duels of honor, trial-by-combat, diplomatic exhibitions, ritual tests of skill. And it <em>hears disputes</em>: evidence, custody, testimony, the overturning of a corrupt ruling. In both, the Court is asking the same question. Not <em>who won</em>, but <em>what was demonstrated</em>.</p>
+<h6 class="unnumbered" id="what-the-court-is-for-at-the-table">What the Court is for, at the table</h6>
+<p>Use the Court whenever the fiction cares how a thing was done and not only whether it succeeded. It gives a losing character a way to matter, a winning character something to lose, and the GM a public, legible pressure that is not Harm. A fighter may fall and be honored as victorious; a fighter may stand triumphant and be judged disgraced.</p>
+<h4 id="what-the-court-does-not-do">What the Court does not do</h4>
+<p>The Court sits alongside the core loop and never replaces it. Every action in front of it is resolved normally: declare intent and approach, set Position and DV, roll Attribute + Skill, count successes and Story Beats, read the Outcome Matrix. The Court then judges what everybody just watched.</p>
+<ul>
+<li><p>A Scorecard <strong>never changes a roll’s outcome</strong>. A Miss is a Miss even if it was the most beautiful Miss the judges have seen this year.</p></li>
+<li><p>Bells are <strong>not Boons</strong> and convert to nothing. They are standing with one institution.</p></li>
+<li><p>The Court sets <strong>no DV of its own</strong>. Actions taken to influence it use the ordinary ladder: DV 2 routine, 3 default, 4 hard, 5 extreme.</p></li>
+<li><p>Story Beats generated in front of the Court are spent as Story Beats always are. A bribed judge, a hostile crowd and a withdrawn writ are all good things to buy with them.</p></li>
+</ul>
+<h4 id="judging-a-bout-the-scorecard">Judging a bout: the Scorecard</h4>
+<p>After each major exchange, each judge scores the fighter on three pillars. Score the whole panel as one — seven separate opinions is bookkeeping, not drama.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Pillar</strong></th>
+<th style="text-align: left;"><strong>0 points</strong></th>
+<th style="text-align: left;"><strong>1 point</strong></th>
+<th style="text-align: left;"><strong>2 points</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Form</strong></td>
+<td style="text-align: left;">Sloppy, reckless</td>
+<td style="text-align: left;">Competent</td>
+<td style="text-align: left;">Exemplary technique, discipline</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Spirit</strong></td>
+<td style="text-align: left;">Cruelty, dishonour</td>
+<td style="text-align: left;">Restraint</td>
+<td style="text-align: left;">Mercy, respect, cultural resonance</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Intent</strong></td>
+<td style="text-align: left;">Selfish motive</td>
+<td style="text-align: left;">Neutral duty</td>
+<td style="text-align: left;">Protection of others, justice</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Form</strong> is discipline, precision and mastery of technique. <strong>Spirit</strong> is composure, respect and dignity in conflict. <strong>Intent</strong> is purpose beyond ego: protection, duty, justice, or peace.</p>
+<ul>
+<li><p>Score <strong>one exchange at a time</strong>, out loud, immediately. The point of the Court is that the table hears the judgment while the choice is still warm.</p></li>
+<li><p>A <strong>Clean Success</strong> earns at least 1 in the pillar it displayed. A <strong>Partial</strong> still scores — a costly, honest attempt is exactly what Spirit and Intent are for. A <strong>Miss</strong> scores 0 in the pillar it attempted and may score in another: the fighter who is disarmed and bows anyway has shown Spirit.</p></li>
+<li><p>A player may influence <strong>one pillar per scene</strong> through ritual, oath, testimony or an act the crowd can see. That is an ordinary roll against an ordinary DV.</p></li>
+<li><p>At the bout’s end the highest total earns the judges’ ruling, which is the <em>social</em> verdict. Who is still standing is a separate question and the two need not agree.</p></li>
+</ul>
+<h6 class="unnumbered" id="spending-a-boon-in-front-of-the-court">Spending a Boon in front of the Court</h6>
+<p>The usual three uses apply — re-roll a die, activate an Asset, improve Position one step. A Boon cannot buy a Scorecard point. What a player can do is spend one to make the attempt that earns it work.</p>
+<h4 id="standing-with-the-court-bells">Standing with the Court: Bells</h4>
+<p>Bells are the Court’s regard, tracked openly for the party as a whole. They run 0–7; the Court has seven bells and cannot ring more than it has.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Gain a Bell</strong></th>
+<th style="text-align: left;"><strong>Lose a Bell</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Respectful testimony, or a rite performed properly</td>
+<td style="text-align: left;">Disrespect to the Court or its officers</td>
+</tr>
+<tr>
+<td style="text-align: left;">Clear evidence with unbroken custody</td>
+<td style="text-align: left;">A falsified claim, or a broken seal</td>
+</tr>
+<tr>
+<td style="text-align: left;">A public act of mercy or restraint</td>
+<td style="text-align: left;">Violence against a party under the Court’s protection</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exposing tampering with a bout or a docket</td>
+<td style="text-align: left;">Being caught tampering</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Three Bells</strong> lets the party demand one thing of the Court and receive it: overturn a single corrupt decision, expose a falsified verdict, compel a witness who has refused, or halt a bout before a killing blow. Spending three Bells this way clears them; the Court has answered, and standing is earned again from whatever it was worth afterwards.</p>
+<p><strong>Seven Bells</strong> — the full peal — is a campaign event, not a purchase. The party may name a matter and the Court will hear it, whoever it inconveniences. Ring it once and the GM should make the consequences permanent.</p>
+<p><strong>Zero Bells</strong> is not neutral. A party at zero is a party the Court declines to see: petitions wait, writs go unsigned, and any roll to be heard begins one Position step worse.</p>
+<h6 class="unnumbered" id="running-bells-as-a-timer">Running Bells as a timer</h6>
+<p>If your table would rather see it fill, run Bells as a <strong>[8]</strong> timer with the party’s current standing marked on it. It behaves like any other timer — an SB can tick it down, a scene can tick it up — and like any other timer it is its own measure and touches nothing else.</p>
+<h4 id="cultural-edge">Cultural Edge</h4>
+<p>Several Tales reward a player who engages with a custom rather than routing around it. That reward is a <strong>Cultural Edge</strong>: a token, held by one character, spent before a roll for <strong>+1 die</strong> on any action where the custom in question actually bears on the outcome.</p>
+<ul>
+<li><p>Award one when a player uses a courtesy, a form of address, a rite or an obligation <em>correctly and by choice</em> — not for reciting lore, and not for asking the GM what the custom is.</p></li>
+<li><p>A character holds at most <strong>two</strong>. They do not carry between arcs.</p></li>
+<li><p>Cultural Edge is a gift, never a gate. A table that never earns one should still be able to finish any Tale in this book. If a custom has become a lock the players must pick, take the lock off.</p></li>
+</ul>
+<h4 id="using-the-court-outside-ayokha">Using the Court outside Ayokha</h4>
+<p>The Tales set the Court in Ayokha, but the procedure travels. Any institution that judges a public act by how it was performed can use the Scorecard and Bells unchanged: a Sihai academy weighing a scholar’s conduct, a Nihori house measuring a duel against its own code, a guild court, a temple assize. Rename the pillars if the local philosophy names them differently — what matters is that there are three, that they are scored in public, and that one of them is never about winning.</p>
+<h3 id="the-isles-of-the-dawn-spirit-nihori">The Isles of the Dawn Spirit (Nihori)</h3>
+<h6 class="unnumbered" id="nihori-the-isles-of-the-dawn-spirit"><strong>Nihori — The Isles of the Dawn Spirit</strong></h6>
+<p><strong>Tagline.</strong> A storm-wracked archipelago of fierce clans, living spirits, and master artisans. Nihori refines many eastern ideas into forms uniquely its own, standing in creative tension with the continental power of Sihai.</p>
+<h5 class="unnumbered" id="overview-balanced-framing">Overview (Balanced Framing)</h5>
+<p>Nihori is contrast made culture: serene moss temples beneath volcanic rims; disciplined warriors amid fractious lordships. The islands absorb, test, and reforge influences (including Sihai’s), claiming neither imitation nor isolation but <em>reinterpretation</em>.</p>
+<h5 id="geography-generator-d12">Geography Generator (d12)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d12</strong></th>
+<th style="text-align: left;"><strong>Feature</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Four great islands ring an <em>Inland Sea</em>; trade junks tack between shrine-harbors.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Fire-mountains smolder; ash fertilizes terraced paddies.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Knife-edged coasts with storm-carved arches; hidden coves host clandestine docks.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Cedar-clad ridges with mist stairways and bell-lines for avalanches.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Typhoon corridors marked by stone beacons and wind shrines.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Pearl banks guarded by reef kami; divers trade with temple fleets.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Bamboo valleys echoing with practice blades at dawn.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Black-sand beaches speckled with meteoric iron.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">Sky-bridges of rope and lacquer spanning ravines to fortress towns.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Volcanic hot springs claimed by monasteries and swordsmiths alike.</td>
+</tr>
+<tr>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">Cliff-temples where drums speak weather omens.</td>
+</tr>
+<tr>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">Lantern-lit fishing villages; storm bells double as invasion alarms.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="polity-power-d10">Polity &amp; Power (d10)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d10</strong></th>
+<th style="text-align: left;"><strong>Detail</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>Heavenly Sovereign</strong> holds ritual primacy; temples legitimize rule.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><strong>Shōgunate claim</strong> contested; generals court temple backing.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><strong>Daimyō league</strong> forms non-aggression pact against pirates.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><strong>Sword Monasteries</strong> arbitrate disputes with trial bouts.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;"><strong>Harbor Councils</strong> tax trade; share typhoon shelters.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;"><strong>Clanship Oaths</strong> bind ashigaru to rice pledges.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;"><strong>Smith Guild Compact</strong>: one masterpiece per year per forge.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;"><strong>Spirit-Mediator Shrine</strong> licenses exorcists for pay.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;"><strong>Pirate Amnesty</strong> offered for service against foreign raiders.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;"><strong>Isle Diet</strong> convenes; decisions are advisory but symbolically powerful.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="society-arts-d8">Society &amp; Arts (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Custom / Art</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Swordsmithing houses pass secrets by <em>failure journals</em>, not manuals.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Rustic tea pavilions host ceasefires and spies in equal measure.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Noh-style masked dramas teach clan history in allegory.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Pottery kilns revere asymmetry and kiln accident.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Poetry duels settle slights before blades do.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Tide calendars are household shrines.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Tattoo guilds encode loyalty oaths in wave motifs.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Storm-offering floats carry names of the missing.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="forces-methods-d10">Forces &amp; Methods (d10)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d10</strong></th>
+<th style="text-align: left;"><strong>Military Element</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>Samurai</strong> combined-arms: bow, spear, blade.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><strong>Ashigaru</strong> spear walls with whistle signals.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><strong>Shinobi</strong> smoke, peppers, false banners.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><strong>Matchlocks</strong> adopted in volley lines along levees.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;"><strong>Coastal Wokou</strong> raid tariffs; sometimes deputized.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;"><strong>Temple Guards</strong> duel to arbitrate feuds.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;"><strong>Scout Boats</strong> outrun storms by reading bird-lines.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;"><strong>Blade Saints</strong> sworn to refuse coin, accept rice.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;"><strong>Armorers</strong> field-test lamellar in rain and ash.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;"><strong>Storm Drummers</strong> time charges between gusts.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="trade-exchange-d8">Trade &amp; Exchange (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Exports / Imports</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>Exports:</strong> blades, lacquer, ink; <strong>Imports:</strong> grain, silk, porcelain.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Sulphur and silver fund harbor walls.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Pirate-chased auctions depress prices (great bargains).</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Sihai brokers trade jade for sword commissions.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Ayokhan spices traded for shipwright plans.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Storm insurance scrip issued by shrine treasuries.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Gun barrels proofed in temple pits.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Pilgrim tourism to volcano shrines.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="spirits-paths-d8">Spirits &amp; Paths (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Practice</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>Kannagara</strong>: offerings to rock, tree, and tide kami.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><strong>Empty Self</strong>: no-mind training in sword halls.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Ancestral boats set adrift at equinox.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Purity rites before duels; salt circles the ring.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Volcano appeasement dances for ash-safe winds.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Sea-kami ordain fishing limits by lot.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Shrine arbiters stamp contracts with wind-ink.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Zen gardens double as map puzzles for students.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="relations-parity-lens-d8">Relations (Parity Lens, d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Current State</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">With <strong>Sihai</strong>: competitive emulation; naval patrol standoffs.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">With <strong>Sihai</strong>: scholar exchanges; tariff disputes.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">With <strong>Ayokha</strong>: monsoon ship swaps; dockside duels.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">With <strong>Ayokha</strong>: joint anti-piracy cruises.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Western gun traders under shrine licensing.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Neutral islands serve as truce markets.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Mixed Sihai–Nihori craft guild in a border port.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Disputed lighthouse fees spark legal bout.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="adventure-hooks-d8">Adventure Hooks (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Hook</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">The Broken Sword: a murdered smith; rival clans claim the masterpiece.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Ronin’s Code: master betrayed; walk the ash-road for honor.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Ghost of the Fire-Mountain: appease the waking kami or evacuate the valley.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">The Black Ship: salvage or secrecy? gunpowder bids escalate.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Audience with the Sovereign: covert message through enemy provinces.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Shrine Storm-Bell stolen; typhoon omens unheeded.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Pirate Amnesty debate turns riotous at harbor court.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Trial by Poetry averts war—unless someone cheats.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ayokha-the-monsoon-throne">Ayokha — The Monsoon Throne</h3>
+<h6 class="unnumbered" id="ayokha-the-monsoon-throne-river-of-heaven"><strong>Ayokha — The Monsoon Throne, River of Heaven</strong></h6>
+<p><strong>Tagline.</strong> A temple-mandala of river, jungle, and sea—Ayokha blends what comes on the monsoon into something unmistakably its own, anchoring trade between Sihai, Nihori, and the West.</p>
+<h5 class="unnumbered" id="overview">Overview</h5>
+<p>Ayokha measures borders in loyalty, harbors, and wind. A god-king sits at the center; influence radiates through vassal ports, priest-chieftains, and Sea-Lords who ride the seasonal breath of the world.</p>
+<h5 id="geography-waterworks-d12">Geography &amp; Waterworks (d12)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d12</strong></th>
+<th style="text-align: left;"><strong>Feature</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Sona River flood-ladders feeding terrace mosaics.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Jade Coast mangroves hiding stilt markets.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Tide gates carved with celestial calendars.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Delta labyrinths navigated by drum code.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Step-pyramid temples aligned to monsoon stars.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Inland karst spires riddled with spirit caverns.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Bronze gong towers relay harbor warnings.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Batik guild towns with dye canals.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">River palaces on barge foundations.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Jungle bridges woven of living roots.</td>
+</tr>
+<tr>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">Pearl-silt basins taxed by shell weight.</td>
+</tr>
+<tr>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">Cyclone refuges marked by mirrored tiles.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="mandala-of-power-d10">Mandala of Power (d10)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d10</strong></th>
+<th style="text-align: left;"><strong>Node</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>Devaraja</strong> health omens steer policy.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><strong>Vassal Kings</strong> bid for canal grants.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><strong>Priest-Chieftains</strong> license jungle rites.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><strong>Sea-Lords</strong> tithe for storm-writs and letters of marque.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;"><strong>Celestial Bureaucrats</strong> set auspicious sailing days.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;"><strong>Astrologer Courts</strong> arbitrate trade disputes by star.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;"><strong>Festival Charters</strong> open tax-free weeks for pilgrims.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;"><strong>Harbor Syndics</strong> standardize weights, seals, and scripts.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;"><strong>River Wardens</strong> control floodgates and ferry rights.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;"><strong>Temple Auditors</strong> inspect sacred treasuries and relic loans.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="forces-fleet-d10">Forces &amp; Fleet (d10)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d10</strong></th>
+<th style="text-align: left;"><strong>Military Element</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Royal Guard in jeweled lamellar (ceremony and steel).</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">War Elephants break lines; skirmishers screen flanks.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Monsoon Junks with outrigger scouts.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Sea-Lords’ boarding crews with javelins and hooks.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Jungle archers versed in toxin governance.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">River mines disguised as lotus floats.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Temple Engineers staff floodworks and siege ramps.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Harbor Fire Corps drill for ship blazes.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">Astrolabe spotters for long-range semaphore.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Neutral convoy flags sold to foreigners (limited protection).</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="culture-craft-d8">Culture &amp; Craft (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Art / Practice</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Temple bas-reliefs retold with living actors at dusk.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Dance-dramas certify guild oaths before gods and crowds.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Textiles with gold thread denote tide-rights.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Cuisine codified by wind-season: sour for <em>south</em>, spice for <em>west</em>.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">River weddings consecrate ferry monopolies.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Pilgrim tattoos serve as toll passes.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Merchant astrology almanacs predict price tides.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Spirit ladders of bells appease nat in storm years.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="adventure-hooks-d8-1">Adventure Hooks (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Hook</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">The Silent Monsoon: find the rain’s offended spirit.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">The Sunken Temple: dive a shifting river maze.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">The Spice Captain’s Gambit: outrun rivals before the wind turns.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Elephant Arsenal: hold a pass with pachyderm tactics.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">The Usurper’s Whisper: unmask a court poisoner.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Floodgate Saboteurs threaten harvest tithes.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Star-Taxed Market sparks riot over unlucky day.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Ghost Barge bears unpaid dead to the capital.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sihai-the-central-kingdom">Sihai — The Central Kingdom</h3>
+<h6 class="unnumbered" id="sihai-the-central-kingdom-the-ordered-land"><strong>Sihai — The Central Kingdom, The Ordered Land</strong></h6>
+<p><strong>Tagline.</strong> An ancient, populous empire of law, letters, and logistics. Sihai projects influence by system and scale—yet continuously adapts through frontier contact and maritime exchange.</p>
+<h5 class="unnumbered" id="overview-balanced-framing-1">Overview (Balanced Framing)</h5>
+<p>Sihai is continuity given institution: examinations, canals, and corps that turn harvest into fleets and scrolls into strategy. Its power often persuades before it conquers—and learns as it persuades.</p>
+<h5 id="geography-works-d12">Geography &amp; Works (d12)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d12</strong></th>
+<th style="text-align: left;"><strong>Feature</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Sihon River basin: levees, fish-ladders, terrace miles.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Himadri passes with beacon towers and tea hostels.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Grand canals moving rice, troops, and poets.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Deep seaports with foreign quarters and coin-mints.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Altan Plains forts facing steppe cavalry.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Jade quarries sworn to ancestral cults.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Paper towns where mills sing like rain.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Salt pans governed by imperial stewards.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">“Sky-Spine” snowmelt reservoirs feeding clockwork gates.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Silk districts with mulberry oaths.</td>
+</tr>
+<tr>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">Porcelain kilns planned on geomantic lines.</td>
+</tr>
+<tr>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">Maritime colonies ruled by mixed councils.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="mandate-bureaucracy-d10">Mandate &amp; Bureaucracy (d10)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d10</strong></th>
+<th style="text-align: left;"><strong>Mechanism</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>Mandate of Heaven</strong>: disasters prompt audits and reforms.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><strong>Exam Halls</strong>: anonymous scripts, public rankings.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><strong>Censorate</strong>: roaming inspectors with seal-breaking powers.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><strong>Salt-Iron Monopolies</strong>: fund fleets and roads.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;"><strong>Canal Corps</strong>: corvée mitigated by meal guarantees.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;"><strong>Frontier Commands</strong>: civilian-military joint rule.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;"><strong>Ancestral Temples</strong>: civic rites as tax calendars.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;"><strong>Merchant Boards</strong>: issue credit scrip and dispute letters.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;"><strong>Scholar-Generals</strong>: strategy treatises guide deployments.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;"><strong>Maritime Code</strong>: convoy law for the Hintara and Nasan.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="forces-methods-d10-1">Forces &amp; Methods (d10)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d10</strong></th>
+<th style="text-align: left;"><strong>Military Element</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Mass infantry with crossbows and shield carts.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Riverine marines trained for lock combat.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Warrior Monks: shock teams and bodyguards.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Siege math schools attached to armies.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Cavalry auxiliaries recruited from steppe allies.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Fire-lance arsenals in coastal forts.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Navy junks as floating bastions with tower rigs.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Intelligence couriers on poetry circuits.</td>
+</tr>
+<tr>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">Logistics priests bless storehouses and ration ledgers.</td>
+</tr>
+<tr>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Border scouts mapping by star and water-chant.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="society-letters-table-d8">Society, Letters &amp; Table (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Culture</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>Way of Harmony</strong>: physicians/astrologers balance humors and seasons.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><strong>Path of Duty</strong>: etiquette courts arbitrate insults into reparations.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><strong>Inner Reflection</strong>: quiet halls open to commoners at dusk.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Family registers entwine tax and ancestor rites.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Tea guilds sponsor river poetry contests.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Jade carvers hold “silent auctions” by gesture.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Porcelain painters encode border news in patterns.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Canal operas celebrate engineers as folk heroes.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="trade-currency-d8">Trade &amp; Currency (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Flow</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Exports: silk, porcelain, tea, paper; Imports: horses, gems, grain.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Silk Route convoys insured by temple bonds.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Coastal colonies mint bilingual coin.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Price edicts issued by flood forecast.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Joint ventures with Nihori smiths in neutral ports.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Ayokhan spice quotas swap for canal timber rights.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Examination stipends tied to harvest shares.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Merchant <em>huizi</em> (notes) accepted across three realms.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="relations-parity-lens-d8-1">Relations (Parity Lens, d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Current State</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">With <strong>Nihori</strong>: naval exercises and joint anti-piracy patrols.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">With <strong>Nihori</strong>: exam scholars tour sword monasteries.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">With <strong>Ayokha</strong>: convoy calendars aligned to monsoon charts.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">With <strong>Ayokha</strong>: harbor law harmonization talks.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">With steppe states: hostage exchange for peace seasons.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">With westerners: limited concessions, strict tariff boards.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Tri-realm craft symposium on steel and ceramics.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Lighthouse standardization summit averts wrecks.</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="adventure-hooks-d8-2">Adventure Hooks (d8)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>d8</strong></th>
+<th style="text-align: left;"><strong>Hook</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Failed Exam conspiracy reaches into the Censorate.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Lost Legion standard haunts a Himadri pass.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Tea and Poison at a coastal etiquette court.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Monkey King’s Tomb maps hidden in opera costumes.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Colony’s Cry: hold a mixed-port against a warlord’s fleet.</td>
+</tr>
+<tr>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Canal breach sabotage during flood season.</td>
+</tr>
+<tr>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Jade tax revolt mediated by ancestor-oracle.</td>
+</tr>
+<tr>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Maritime code forged—or broken—at a tri-realm summit.</td>
+</tr>
+</tbody>
+</table></div>
+<h6 class="unnumbered" id="crowd-mood-track-6"><strong>Crowd Mood Track [6]</strong></h6>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>0–2</strong></td>
+<td style="text-align: left;">Curious admiration; cheers, ritual silence, respectful onlookers.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3–4</strong></td>
+<td style="text-align: left;">Partisan chants; thrown petals; accusations of bias; reporters swarm.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5</strong></td>
+<td style="text-align: left;">Projectiles, panic, scuffles; Position –1 on all social checks in the ring.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6</strong></td>
+<td style="text-align: left;">Riot or stampede: duel halted, collateral harm; Political Tensions +2.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Influencing the Crowd:</strong></p>
+<ul>
+<li><p>Respectful bow, ritual, poetic challenge: Crowd –1</p></li>
+<li><p>Public mercy or restraint: Crowd –1</p></li>
+<li><p>Brutality, insults, cheating, sacred bloodshed: Crowd +1</p></li>
+</ul>
+<h6 class="unnumbered" id="honor-pragmatism-tokens"><strong>Honor &amp; Pragmatism Tokens</strong></h6>
+<p>Characters may earn:</p>
+<ul>
+<li><p><strong>Honor Tokens</strong> for restraint, mercy, proper etiquette, protecting civilians.</p></li>
+<li><p><strong>Pragmatism Tokens</strong> for decisive action, clever shortcuts, bold risk-taking.</p></li>
+</ul>
+<p><strong>Spend 1 Token to:</strong></p>
+<ul>
+<li><p>Improve Position by +1 <em>or</em></p></li>
+<li><p>Cancel a single SB spend</p></li>
+</ul>
+<p>If spent in public before the wrong audience, increase <strong>Crowd Mood +1</strong>.</p>
+<h6 class="unnumbered" id="chain-of-custody-evidence"><strong>Chain-of-Custody Evidence</strong></h6>
+<p>Each item of physical evidence has a <strong>Custody Timer [4]</strong>. Write each handler’s name per segment.</p>
+<p><strong>If all segments filled:</strong> evidence is clean and admissible.<br/>
+<strong>If gaps exist:</strong> conspirators challenge legitimacy; <strong>DV +2</strong> to present in court.</p>
+<p>PCs may seal evidence with shrine-wax. Breaking a seal without a judge present:</p>
+<ul>
+<li><p>Evidence becomes inadmissible</p></li>
+<li><p>Lose 1 Bell from the Seven Bell Court</p></li>
+</ul>
+<h6 class="unnumbered" id="chain-of-custody-evidence-1"><strong>Chain-of-Custody Evidence</strong></h6>
+<p>Each item of physical evidence has a <strong>Custody Timer [4]</strong>. Write each handler’s name per segment.</p>
+<p><strong>If all segments filled:</strong> evidence is clean and admissible.<br/>
+<strong>If gaps exist:</strong> conspirators challenge legitimacy; <strong>DV +2</strong> to present in court.</p>
+<p>PCs may seal evidence with shrine-wax. Breaking a seal without a judge present:</p>
+<ul>
+<li><p>Evidence becomes inadmissible</p></li>
+<li><p>Lose 1 Bell from the Seven Bell Court</p></li>
+</ul>
+<h6 class="unnumbered" id="the-seven-bell-court-1"><strong>The Seven Bell Court</strong></h6>
+<p>A neutral Ayokhan judiciary that evaluates evidence, disputes, and rulings. PCs may earn <strong>Bells</strong> for:</p>
+<ul>
+<li><p>Respectful testimony or proper ritual</p></li>
+<li><p>Clear evidence with unbroken custody</p></li>
+<li><p>Public acts of mercy or restraint</p></li>
+</ul>
+<p><strong>3 Bells</strong> allows PCs to <em>overturn</em> any one corrupt decision or expose a falsified verdict. Disrespect, falsified claims, or broken seals <em>remove</em> Bells.</p>
+<h6 class="unnumbered" id="monsoon-timer-8-1"><strong>Monsoon Timer [8]</strong></h6>
+<p>Tracks seasonal weather affecting investigation and duels.</p>
+<p><strong>1–2:</strong> Dry — stealth easier; outdoor surveillance +1d<br/>
+<strong>3–4:</strong> Squalls — ranged attacks –1d; rooftops provide cover<br/>
+<strong>5–6:</strong> Peak Monsoon — travel DV +1; evidence may wash away<br/>
+<strong>7–8:</strong> Clearing — crowds return; ideal time for public confrontation</p>
+<h6 class="unnumbered" id="truth-duel-non-lethal-resolution"><strong>Truth Duel (Non-Lethal Resolution)</strong></h6>
+<p>If both champions accept mediation, replace lethal combat with a <strong>Three-Round Skills Duel</strong>:</p>
+<ul>
+<li><p><strong>Form:</strong> Display mastery (Melee, Acrobatics, Discipline)</p></li>
+<li><p><strong>Spirit:</strong> Withstand insult or provocation (Endurance, Sway, Meditation)</p></li>
+<li><p><strong>Intent:</strong> Defend one’s cause (Speechcraft, Honor, Logic)</p></li>
+</ul>
+<p>Win <strong>any 2 of 3</strong> to avert war while preserving face and the legitimacy of the tournament.</p>
+<h6 class="unnumbered" id="riot-stop-setpiece"><strong>Riot-Stop Setpiece</strong></h6>
+<p>When <strong>Crowd Mood = 5 or 6</strong>, PCs may attempt a culturally resonant display:</p>
+<ul>
+<li><p>Sihai: Tea ceremony of de-escalation</p></li>
+<li><p>Nihori: Poetry exchange before blades</p></li>
+<li><p>Ayokha: Bell procession invoking peace</p></li>
+</ul>
+<p><strong>Presence + Insight vs. DV 4</strong>:</p>
+<ul>
+<li><p><em>Success:</em> Crowd Mood –2, PCs gain 1 Bell</p></li>
+<li><p><em>Partial:</em> Crowd Mood –1, conspirators exploit distraction</p></li>
+<li><p><em>Miss:</em> Riot worsens; Tournament Integrity +1</p></li>
+</ul>
+<h6 class="unnumbered" id="judges-scorecards"><strong>Judges’ Scorecards</strong></h6>
+<p>Each formal duel is evaluated by an Ayokhan panel. After each major exchange or round:</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Category</strong></th>
+<th style="text-align: center;"><strong>0 Points</strong></th>
+<th style="text-align: center;"><strong>1 Point</strong></th>
+<th style="text-align: center;"><strong>2 Points</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Form</strong></td>
+<td style="text-align: center;">Sloppy, reckless</td>
+<td style="text-align: center;">Competent</td>
+<td style="text-align: center;">Exemplary technique, discipline</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Spirit</strong></td>
+<td style="text-align: center;">Cruelty, dishonor</td>
+<td style="text-align: center;">Restraint</td>
+<td style="text-align: center;">Mercy, respect, cultural resonance</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Intent</strong></td>
+<td style="text-align: center;">Selfish motive</td>
+<td style="text-align: center;">Neutral duty</td>
+<td style="text-align: center;">Protection of others, justice</td>
+</tr>
+</tbody>
+</table></div>
+<p>At duel’s end:</p>
+<ul>
+<li><p>Highest total earns the judges’ ruling.</p></li>
+<li><p>A fighter may lose physically yet win socially and avert humiliation.</p></li>
+<li><p>PCs may influence <strong>one category per scene</strong> via ritual, oath, or testimony.</p></li>
+</ul>
+<p>If judges are bribed or pressured, increase <strong>Tournament Integrity +1</strong>. Exposing tampering grants PCs <strong>+1 Bell</strong> from the Seven Bell Court.</p>
+<h6 class="unnumbered" id="official-tournament-scorecard"><strong>Official Tournament Scorecard</strong></h6>
+<p><strong>Match:</strong> <strong>Date:</strong><br/>
+<strong>Competitor A:</strong> <strong>Competitor B:</strong><br/>
+</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: center;"><strong>Round</strong></th>
+<th style="text-align: center;"><strong>Form</strong></th>
+<th style="text-align: center;"><strong>Spirit</strong></th>
+<th style="text-align: center;"><strong>Intent</strong></th>
+<th style="text-align: center;"><strong>Total</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>A</strong></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>B</strong></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>A</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>B</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>A</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>B</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+<td style="text-align: center;">__</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Final Totals:</strong><br/>
+Competitor A: ____ Competitor B: ____</p>
+<h3 class="unnumbered" id="appendix-cultural-sensitivity-best-practices">Appendix: Cultural Sensitivity &amp; Best Practices</h3>
+<p>This adventure is inspired by the philosophies, aesthetics, and martial traditions of East and Southeast Asia. While the cultures presented here are <em>fictional</em>, they draw from real-world analogues. This appendix provides guidance for respectful, conscientious presentation at the table.</p>
+<h5 class="unnumbered" id="core-design-principles">Core Design Principles</h5>
+<ul>
+<li><p><strong>Celebration, not exploitation.</strong> Cultural elements are sources of wisdom, beauty, and complex philosophy—not exotic spectacle.</p></li>
+<li><p><strong>Individuals act, cultures do not.</strong> Corruption, conspiracy, or villainy are the choices of specific people, not entire nations.</p></li>
+<li><p><strong>Multiple truths can coexist.</strong> Sihai, Nihori, and Ayokha each possess internally coherent philosophies worthy of respect; none is presented as inferior or “primitive.”</p></li>
+<li><p><strong>Differences produce story, not stereotypes.</strong> Philosophical tension drives narrative without reducing cultures to caricature.</p></li>
+</ul>
+<h5 class="unnumbered" id="guidance-for-gms">Guidance for GMs</h5>
+<p>When presenting culturally inspired characters, customs, or beliefs, prioritize:</p>
+<ul>
+<li><p><strong>Respectful tone</strong> – No mocking accents, no comedic stereotypes.</p></li>
+<li><p><strong>Cultural nuance</strong> – Show internal disagreement: traditionalists, pragmatists, reformers, skeptics.</p></li>
+<li><p><strong>Agency</strong> – Every NPC (even commoners) has opinions, priorities, and personal stakes.</p></li>
+<li><p><strong>Avoid monoliths</strong> – No culture speaks with one voice; factions interpret tradition differently.</p></li>
+</ul>
+<p>A simple GM mantra:</p>
+<p><em>“Portray dignity, curiosity, and complexity.“</em></p>
+<h5 class="unnumbered" id="language-ritual-and-names">Language, Ritual, and Names</h5>
+<p>Names, honorifics, and ceremonial acts should be:</p>
+<ul>
+<li><p><strong>Evocative but not appropriated</strong> directly from real-language templates</p></li>
+<li><p><strong>Consistent within each culture’s logic</strong> (Sihai -&gt; bureaucratic/formal; Nihori -&gt; ritual precision; Ayokha -&gt; syncretic sacred cyclicality)</p></li>
+<li><p><strong>Used respectfully</strong> without parody or exaggerated stereotypes</p></li>
+</ul>
+<p><strong>Optional Tool:</strong> If players are unfamiliar with honorifics or rituals, treat them as invitations—<em>explain their meaning rather than turning them into obstacles or “gotchas.”</em></p>
+<h5 class="unnumbered" id="historical-inspiration">Historical Inspiration</h5>
+<p>While this adventure draws inspiration from:</p>
+<ul>
+<li><p>Imperial examination systems and ancestor veneration</p></li>
+<li><p>Samurai ethics and ritualized martial arts</p></li>
+<li><p>Monsoon-driven maritime trade networks</p></li>
+<li><p>Temple cosmology and spirit veneration</p></li>
+</ul>
+<p>… all cultural elements are intentionally fictionalized to avoid misrepresenting any real-world tradition. The goal is homage, not imitation.</p>
+<h5 class="unnumbered" id="cultural-evolution-in-play">Cultural Evolution in Play</h5>
+<p>Cultures change. To reinforce authenticity:</p>
+<ul>
+<li><p>Allow characters to challenge tradition from within</p></li>
+<li><p>Show generational differences in belief</p></li>
+<li><p>Let cultural exchange influence customs and technology</p></li>
+</ul>
+<p>For example:</p>
+<ul>
+<li><p>A Sihai scholar fascinated by Ayokhan dance</p></li>
+<li><p>A Nihori ronin studying Sihai philosophy</p></li>
+<li><p>Ayokhan monks debating merchant influence on ritual purity</p></li>
+</ul>
+<p>Small details like these highlight cultural dynamism without disrespect.</p>
+<h5 class="unnumbered" id="player-engagement-consent">Player Engagement &amp; Consent</h5>
+<p>If the table is unfamiliar with these cultural spaces:</p>
+<ul>
+<li><p>Offer a <strong>Session Zero</strong> to align tone and expectations</p></li>
+<li><p>Use a <strong>Lines/Veils/X-Card</strong> framework for comfort</p></li>
+<li><p>Allow players to ask cultural questions without embarrassment</p></li>
+</ul>
+<p>A respectful table should always feel safe saying:</p>
+<p><em>“I’m not sure—can you explain that part?”</em></p>
+<h5 class="unnumbered" id="recommended-reading-optional">Recommended Reading (Optional)</h5>
+<p>Not required for play, but helpful for tone and cultural appreciation:</p>
+<ul>
+<li><p><strong>The Book of Five Rings</strong> (strategy, discipline)</p></li>
+<li><p><strong>Tao Te Ching</strong> (balance, paradox, non-coercive ethics)</p></li>
+<li><p><strong>The Ramayana</strong> and <strong>Mahabharata</strong> (epic duty, sacred duty)</p></li>
+<li><p><strong>The Romance of the Three Kingdoms</strong> (statecraft, loyalty, consequence)</p></li>
+</ul>
+<p>These are not canonical to the setting—just inspiration for respectful tone.</p>
+<h5 class="unnumbered" id="final-note">Final Note</h5>
+<p>This module approaches cultural worldbuilding with humility and admiration. If at any point a player feels uncomfortable, confused, or concerned, the correct response is simple:</p>
+<p><strong>Pause, listen, adjust, continue with respect.</strong></p>
+<p>The goal is storytelling that honors the philosophical beauty, ritual depth, and human drama that inspired these cultures.</p>
+<h3 id="equipment-for-contemplative-adventures">Equipment for Contemplative Adventures</h3>
+<p>The following items demonstrate how the TAGS system handles equipment that is both practical and symbolic. These tools are ideal for adventures focused on memory, mercy, negotiation, or moral choice. Each item is presented with clear TAG interactions and narrative intent.</p>
+<h5 id="signature-items">Signature Items</h5>
+<div class="itemblock">
+<p><strong>The Bridge-Walker’s Staff</strong><br/>
+<em>A walking staff carved from wood that grew on sacred ground.</em></p>
+<p><strong>TAGS:</strong> [WARD] [MEMORY] [STABILITY]</p>
+<p>Carved with spiraling prayers in three scripts, this staff comforts wandering spirits and grants confidence to those who cross uncertain paths.</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>+1d to <strong>Lore</strong> and <strong>Insight</strong> when navigating spiritual realms.</p></li>
+<li><p>vs. Cap 2 against malevolent spirits.</p></li>
+<li><p>: Ask one question per scene about a location’s history (GM answers honestly).</p></li>
+<li><p>: +1 Position when crossing precarious or shifting terrain.</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>The Truth-Teller’s Mirror</strong><br/>
+<em>A polished bronze mirror that reflects intention rather than appearance.</em></p>
+<p><strong>TAGS:</strong> [REVEAL] [PURIFY] [BIND]</p>
+<p>Ancient Ayokhan craftsmanship; in its surface, hearts show more clearly than faces.</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Truth vs. DV 3 to expose deception or hidden motives.</p></li>
+<li><p>: Remove [CURSE] or [CORRUPTION] from minor objects or afflictions.</p></li>
+<li><p>: Two willing parties may swear a truth-oath; resisting breaks the binding.</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>The Mercy-Bearer’s Bowl</strong><br/>
+<em>A wooden bowl that never empties when compassion is sincere.</em></p>
+<p><strong>TAGS:</strong> [HEAL] [CLEANSE] [SHARE]</p>
+<p>Food or drink shared from this bowl eases hunger and burdens of the heart.</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Recover minor Harm or a light Condition once per scene.</p></li>
+<li><p>: Remove one level of [FEAR] or [SHAME].</p></li>
+<li><p>: Any beneficial effect may be distributed among multiple recipients.</p></li>
+</ul>
+</div>
+<h5 id="weapons-of-philosophical-weight">Weapons of Philosophical Weight</h5>
+<div class="itemblock">
+<p><strong>Meteor Hammer of Remembrance</strong><br/>
+<em>A chain and weight forged from fallen stars; each link bears a name.</em></p>
+<p><strong>TAGS:</strong> [BIND] [FORCE] [MEMORY] [AREA]</p>
+<p>Each life the wielder protects is engraved into the chain, strengthening its purpose.</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>+ [AREA]: Sweep attack vs. multiple foes (Harm 1 each).</p></li>
+<li><p>: May restrain a target. Breaking the restraint requires resisting the emotional bond (DV 3, or DV 4 if the wielder invokes a named life).</p></li>
+<li><p>: After 10 lives are consciously protected, the weapon gains +1 Effect.</p></li>
+<li><p><strong>Backlash:</strong> Breaking an unjust bond causes Harm 1 to the wielder; the chain grows heavier.</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>The Scholar’s Quill of Truth</strong><br/>
+<em>Ink flows only for honest words.</em></p>
+<p><strong>TAGS:</strong> [SCRIBE] [REVEAL] [BIND] [WARD]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Records written with this quill gain [WARD] vs. alteration.</p></li>
+<li><p>: Hidden clauses or lost text become visible when traced.</p></li>
+<li><p>: Contracts written are magically enforceable if witnessed.</p></li>
+<li><p><strong>Limitation:</strong> Cannot write deliberate falsehoods; the nib locks.</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>The Diplomat’s Fan of Seasons</strong><br/>
+<em>What was, what is, and what might be.</em></p>
+<p><strong>TAGS:</strong> [VEIL] [REVEAL] [SANCTIFY] [COMMAND]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Obscures the wielder’s intentions during negotiation.</p></li>
+<li><p>: Shows one plausible outcome of the current debate.</p></li>
+<li><p>: Creates neutral ground acceptable to all parties present.</p></li>
+<li><p>: Once per scene, issue an order consistent with the revealed truth.</p></li>
+</ul>
+</div>
+<h5 id="ritual-tools">Ritual Tools</h5>
+<div class="itemblock">
+<p><strong>The Bridge Lantern</strong><br/>
+<em>A floating light that guides lost souls home.</em></p>
+<p><strong>TAGS:</strong> [GUIDE] [PURIFY] [MARK] [WARD]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Always points toward a designated destination.</p></li>
+<li><p>: Cleanses minor spiritual corruption in the area.</p></li>
+<li><p>: Place a beacon visible only to spirits and mediums.</p></li>
+<li><p>: Protects a small area from malevolent spirits (DV = user’s Spirit).</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>Scroll of Unwritten Truths</strong><br/>
+<em>Records what was never spoken.</em></p>
+<p><strong>TAGS:</strong> [SCRIBE] [REVEAL] [BIND] [DISPEL]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Records any witnessed event with perfect accuracy.</p></li>
+<li><p>: Shows hidden truth or perspective within the record.</p></li>
+<li><p>: Truths become immutable within the scope of the scroll.</p></li>
+<li><p>: Counters illusion or false memory tied to the record.</p></li>
+</ul>
+</div>
+<h5 id="cultural-adornments">Cultural Adornments</h5>
+<div class="itemblock">
+<p><strong>Three-Culture Prayer Beads</strong><br/>
+<em>One strand in harmony: Sihai, Nihori, Ayokha.</em></p>
+<p><strong>TAGS:</strong> [WARD] [HEAL] [GUIDE] [SANCTIFY]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Advantage vs. spiritual threats of the three cultures.</p></li>
+<li><p>: Recover 1 Fatigue or minor Harm via meditation.</p></li>
+<li><p>: +1d to cross-cultural understanding or etiquette.</p></li>
+<li><p>: Creates neutral ground acceptable to all three traditions.</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>Memory Keeper’s Robe</strong><br/>
+<em>Threads woven with emotional weight.</em></p>
+<p><strong>TAGS:</strong> [WARD] [MEMORY] [VEIL] [PURIFY]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Protects the wearer from [FEAR] or [DESPAIR].</p></li>
+<li><p>: Recall exact words or emotions from preserved moments.</p></li>
+<li><p>: Conceals the wearer’s present emotional state.</p></li>
+<li><p>: Remove one level of [CORRUPTION] or [CURSE] by sacrificing a memory woven into the garment.</p></li>
+</ul>
+</div>
+<h5 id="utility-items">Utility Items</h5>
+<div class="itemblock">
+<p><strong>Compass of Consequences</strong><br/>
+<em>Points toward choices of greatest moral weight.</em></p>
+<p><strong>TAGS:</strong> [GUIDE] [REVEAL] [COMMAND] [BIND]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Always indicates the path with greatest consequence.</p></li>
+<li><p>: Shows likely outcomes of following or ignoring guidance.</p></li>
+<li><p>: Compels acknowledgement of moral implications.</p></li>
+<li><p>: Ignoring the compass knowingly causes [CORRUPTION].</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>Cup of Shared Burden</strong><br/>
+<em>Suffering shared becomes suffering lessened.</em></p>
+<p><strong>TAGS:</strong> [HEAL] [SHARE] [BIND] [PURIFY]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Distribute Harm or Fatigue among willing participants.</p></li>
+<li><p>: Beneficial effects spread across those drinking together.</p></li>
+<li><p>: Creates temporary empathic link (shared emotion or pain).</p></li>
+<li><p>: Remove [CURSE] or [POISON] by sharing it among willing participants.</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>Talisman of Open Bargains</strong><br/>
+<em>Negotiation without deception.</em></p>
+<p><strong>TAGS:</strong> [REVEAL] [WARD] [BIND]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Hidden motives and unfair terms become apparent.</p></li>
+<li><p>: Protects both parties from manipulation or coercion.</p></li>
+<li><p>: Agreements made in good faith are honored by spirits of commerce.</p></li>
+</ul>
+</div>
+<div class="itemblock">
+<p><strong>Knife of Quiet Release</strong><br/>
+<em>Cuts bonds of suffering, not flesh.</em></p>
+<p><strong>TAGS:</strong> [DISPEL] [PURIFY] [RELEASE]</p>
+<p><strong>Mechanical Effects:</strong></p>
+<ul>
+<li><p>: Ends unwanted spiritual ties or parasitic spirits.</p></li>
+<li><p>: Removes lingering emotional poison (shame, guilt, obsession).</p></li>
+<li><p>: A person may willingly sever a vow or burden; if unjust, backlash causes Fatigue 1.</p></li>
+</ul>
+</div>
+<h5 id="tags-system-notes">TAGS System Notes</h5>
+<p>These items demonstrate the core strengths of TAG-based gear:</p>
+<ul>
+<li><p><strong>Purpose over power:</strong> Items matter because of narrative weight.</p></li>
+<li><p><strong>Mechanical clarity:</strong> Each TAG defines what the item can do.</p></li>
+<li><p><strong>Cultural authenticity:</strong> Effects reflect philosophical values.</p></li>
+<li><p><strong>Elegant limits:</strong> Backlash, corruption, and sacrifice prevent abuse.</p></li>
+</ul>
+<h5 class="unnumbered" id="item-quick-reference">Item Quick Reference</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Item</strong></th>
+<th style="text-align: left;"><strong>TAGS</strong></th>
+<th style="text-align: left;"><strong>At-a-Glance Use</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Bridge-Walker’s Staff</td>
+<td style="text-align: left;">[WARD][MEMORY][STABILITY]</td>
+<td style="text-align: left;">+1d Lore/Insight in spirit realms; Cap 2 ward vs. spirits; ask 1 true history Q/scene; +1 Position on precarious crossings.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Truth-Teller’s Mirror</td>
+<td style="text-align: left;">[REVEAL][PURIFY][BIND]</td>
+<td style="text-align: left;">DV 3 reveal deception/intent; remove minor <span class="smallcaps">[Curse]/[Corruption]</span>; forge truth-oath between willing parties.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mercy-Bearer’s Bowl</td>
+<td style="text-align: left;">[HEAL][CLEANSE][SHARE]</td>
+<td style="text-align: left;">Heal minor Harm/Condition 1/scene; remove one level of <span class="smallcaps">[Fear]</span> or <span class="smallcaps">[Shame]</span>; share any beneficial effect.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Meteor Hammer of Remembrance</td>
+<td style="text-align: left;">[BIND][FORCE][MEMORY][AREA]</td>
+<td style="text-align: left;">Sweep (Harm 1) vs. many; restrain via bonds (DV 3/4); +1 Effect after 10 lives saved; backlash Harm 1 when breaking unjust bonds.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Scholar’s Quill of Truth</td>
+<td style="text-align: left;">[SCRIBE][REVEAL][BIND][WARD]</td>
+<td style="text-align: left;">Records gain [WARD]; reveal hidden/erased text; witnessed contracts become enforceable; refuses falsehoods.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Diplomat’s Fan of Seasons</td>
+<td style="text-align: left;">[VEIL][REVEAL][SANCTIFY][COMMAND]</td>
+<td style="text-align: left;">Veil intent; show one plausible outcome; create neutral ground; once/scene issue order consistent with revealed truth.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bridge Lantern</td>
+<td style="text-align: left;">[GUIDE][PURIFY][MARK][WARD]</td>
+<td style="text-align: left;">Always guides to set destination; cleanse minor spiritual taint; set spirit-visible beacon; ward area (DV = user’s Spirit).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Scroll of Unwritten Truths</td>
+<td style="text-align: left;">[SCRIBE][REVEAL][BIND][DISPEL]</td>
+<td style="text-align: left;">Perfectly record events; reveal hidden truth in the record; fix truths within scope; dispel illusions tied to it.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Three-Culture Prayer Beads</td>
+<td style="text-align: left;">[WARD][HEAL][GUIDE][SANCTIFY]</td>
+<td style="text-align: left;">Edge vs. tri-cultural spirit threats; recover 1 Fatigue/Harm via meditation; +1d cross-cultural rolls; neutral ground for all three.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Memory Keeper’s Robe</td>
+<td style="text-align: left;">[WARD][MEMORY][VEIL][PURIFY]</td>
+<td style="text-align: left;">Ward vs. <span class="smallcaps">[Fear]/[Despair]</span>; recall words/emotions; veil current affect; purge <span class="smallcaps">[Corruption]/[Curse]</span> by sacrificing a stored memory.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Compass of Consequences</td>
+<td style="text-align: left;">[GUIDE][REVEAL][COMMAND][BIND]</td>
+<td style="text-align: left;">Points to highest-consequence path; reveal likely outcomes; force moral acknowledgement; ignoring knowingly inflicts <span class="smallcaps">[Corruption]</span>.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cup of Shared Burden</td>
+<td style="text-align: left;">[HEAL][SHARE][BIND][PURIFY]</td>
+<td style="text-align: left;">Split Harm/Fatigue among the willing; share boons; temporary empathic link; dilute <span class="smallcaps">[Curse]/[Poison]</span> among participants.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Talisman of Open Bargains</td>
+<td style="text-align: left;">[REVEAL][WARD][BIND]</td>
+<td style="text-align: left;">Reveal hidden motives/terms; ward against coercion; bind fair agreements by commerce spirits.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Knife of Quiet Release</td>
+<td style="text-align: left;">[DISPEL][PURIFY][RELEASE]</td>
+<td style="text-align: left;">Sever parasitic/spiritual ties; purge emotional toxins; willingly end vows/burdens (unjust release causes Fatigue 1).</td>
+</tr>
+</tbody>
+</table></div>
+<h6 class="unnumbered" id="tag-legend">TAG Legend</h6>
+<ul>
+<li><p><code>[WARD]</code> — Protects, deflects, or resists hostile spiritual/mental forces. Often sets DV or Cap.</p></li>
+<li><p><code>[MEMORY]</code> — Recalls, records, or reveals past intent/context; may ask setting-true questions.</p></li>
+<li><p><code>[STABILITY]</code> — Improves footing, balance, and composure; commonly grants Position.</p></li>
+<li><p><code>[REVEAL]</code> — Exposes truth, intent, or hidden states; often rolled vs. DV.</p></li>
+<li><p><code>[PURIFY]</code> — Removes taint, minor corruption, curses, or emotional toxins.</p></li>
+<li><p><code>[BIND]</code> — Creates oaths, restraints, empathic links, or enforcible contracts.</p></li>
+<li><p><code>[HEAL]</code> — Recovers minor Harm, Conditions, or Fatigue within scene limits.</p></li>
+<li><p><code>[CLEANSE]</code> — Eases specific afflictions: <span class="smallcaps">[Fear]</span>, <span class="smallcaps">[Shame]</span>, similar.</p></li>
+<li><p><code>[SHARE]</code> — Distributes effects across willing targets; merges burdens/benefits.</p></li>
+<li><p><code>[FORCE]</code> — Direct physical impact; adds Harm or leverage in contested actions.</p></li>
+<li><p><code>[AREA]</code> — Affects multiple targets or a zone; pair with other tags for scope.</p></li>
+<li><p><code>[VEIL]</code> — Obscures intent, aura, or presence; counters basic detection.</p></li>
+<li><p><code>[SANCTIFY]</code> — Establishes neutral/sacred ground; suspends hostile influence.</p></li>
+<li><p><code>[COMMAND]</code> — Issues binding directives aligned with ritual, truth, or mandate.</p></li>
+<li><p><code>[GUIDE]</code> — Points toward destinations, truths, or consequential choices.</p></li>
+<li><p><code>[MARK]</code> — Creates beacons, traces, or claim-signs seen by specified senses.</p></li>
+<li><p><code>[SCRIBE]</code> — Writes immutable records or reveals/anchors textual truth.</p></li>
+<li><p><code>[DISPEL]</code> — Ends illusions, false memories, or parasitic bonds.</p></li>
+<li><p><code>[RELEASE]</code> — Cleanly severs vows, bindings, or suffering ties (often with cost).</p></li>
+</ul>
+<h3 id="monastic-orders-of-the-three-realms">Monastic Orders of the Three Realms</h3>
+<p><em>Homebrew content for Fate’s Edge. These orders combine practical discipline with symbolic practice. Use TAGS to adjudicate order rites, tools, and sanctuary protections.</em></p>
+<h4 id="sihai-monastic-orders">Sihai Monastic Orders</h4>
+<div class="orderbox">
+<p><strong>Order of the Jade Mirror (Jade Mirror Monastery)</strong><br/>
+<em>Philosophy.</em> Balance contemplation and action; truth through reflection and faithful record.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Meditation before ancient scrolls; perfect annals; ritual purification of corrupted texts.<br/>
+<em>Monk Talents.</em> Disciplined Body; Flowing Spirit Way; Perfect Timing Way.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Iron Ink (Iron Ink Temples)</strong><br/>
+<em>Philosophy.</em> Knowledge must be protected; strength arises from preservation.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Warrior–scholars guarding libraries; burning wards; blood&amp;bronze oath-binding.<br/>
+<em>Monk Talents.</em> Iron Fist Way; Untouchable Way; Battlefield Mastery.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Empty Scroll (Empty Scroll Hermitages)</strong><br/>
+<em>Philosophy.</em> Wisdom in restraint—know what not to write; embrace emptiness.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Silent blank-chamber meditations; cleansing for troubled minds; teaching by omission.<br/>
+<em>Monk Talents.</em> Flowing Spirit Way; Perfect Timing Way; Transcendent Harmony.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Brass Abacus (Abacus Halls)</strong> <em>(New)</em><br/>
+<em>Philosophy.</em> Just measure begets just rule; count what matters and let the rest pass.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Civic audits; oath-counting rites; impartial mediation by ledgers and lines.<br/>
+<em>Monk Talents.</em> Disciplined Body; Perfect Timing Way; Battlefield Terror.</p>
+</div>
+<h4 id="nihori-monastic-orders">Nihori Monastic Orders</h4>
+<div class="orderbox">
+<p><strong>Order of the Falling Blossom (Falling Blossom Dojos)</strong><br/>
+<em>Philosophy.</em> Beauty is transience; perfect technique honors impermanence.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Blossom meditation; sword-forms like petals; acceptance of death as completion.<br/>
+<em>Monk Talents.</em> Iron Fist Way; Perfect Timing Way; Inevitable Way.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Mountain’s Breath (Mountain Breath Temples)</strong><br/>
+<em>Philosophy.</em> Stillness contains motion; endurance births power.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Wind-synced breathing; stone-sitting vigils; chant-healing and grounding.<br/>
+<em>Monk Talents.</em> Disciplined Body; Conditioning; Untouchable Way.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Silent Drum (Silent Drum Monasteries)</strong><br/>
+<em>Philosophy.</em> Loud truths are unspoken; hear the interval, not the note.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Gesture-cant; intention reading; vow-binding by mutual understanding.<br/>
+<em>Monk Talents.</em> Flowing Spirit Way; Perfect Timing Way; Duelist’s Edge.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Ink-Black Moon (Moon Reflection Hermitages)</strong> <em>(New)</em><br/>
+<em>Philosophy.</em> Reflection refines resolve; shadows distill the self.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Night-kata by water; moon-rites of confession; shadow-reading duels.<br/>
+<em>Monk Talents.</em> Untouchable Way; Perfect Timing Way; Inevitable Way.</p>
+</div>
+<h4 id="ayokha-monastic-orders">Ayokha Monastic Orders</h4>
+<div class="orderbox">
+<p><strong>Order of the River’s Voice (River Voice Sanctuaries)</strong><br/>
+<em>Philosophy.</em> All things flow; wisdom moves with currents, not against them.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Waterside meditations; water-healing; remembrance through stream-voices.<br/>
+<em>Monk Talents.</em> Flowing Spirit Way; Conditioning; Transcendent Harmony.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Burning Ash (Burning Ash Cloisters)</strong><br/>
+<em>Philosophy.</em> Renewal follows cinder; purification by chosen loss.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Ash-rites of relinquishment; flame-cleansings; fasting and rebirth.<br/>
+<em>Monk Talents.</em> Iron Fist Way; Flowing Spirit Way; Untouchable Way.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Three Bridges (Three Bridges Monasteries)</strong><br/>
+<em>Philosophy.</em> Bind across the divide; reconcile the opposed.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Bridge-building (literal/figurative); mediations; spirit-backed peace oaths.<br/>
+<em>Monk Talents.</em> Disciplined Body; Perfect Timing Way; Battlefield Terror.</p>
+</div>
+<div class="orderbox">
+<p><strong>Order of the Monsoon Bell (Storm Bell Conclaves)</strong> <em>(New)</em><br/>
+<em>Philosophy.</em> The season turns the soul; ring change, then endure it.<br/>
+<em>TAGS.</em> <span> </span> <span> </span> <span> </span> <span> </span><br/>
+<em>Practices.</em> Bell-chants before rains; flood-watch service; stormfasts of clarity.<br/>
+<em>Monk Talents.</em> Conditioning; Perfect Timing Way; Transcendent Harmony.</p>
+</div>
+<h4 id="universal-monk-talents">Universal Monk Talents</h4>
+<h5 class="unnumbered" id="core-talents-3-xp-each">Core Talents (3 XP each)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Disciplined Body</strong></td>
+<td style="text-align: left;">+1 die to unarmed; once/scene convert 1 Harm to Fatigue. <em>Steady breath, steady hand.</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Flowing Spirit Way</strong></td>
+<td style="text-align: left;">Per attack, convert up to 1 Harm to Fatigue; +1 die vs fear/charm. <em>Yield to redirect.</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Perfect Timing Way</strong></td>
+<td style="text-align: left;">Twice/scene, improve Position +1; +1 die to reactions. <em>Act in the beat between beats.</em></td>
+</tr>
+</tbody>
+</table></div>
+<h5 class="unnumbered" id="advanced-talents-68-xp">Advanced Talents (6–8 XP)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Iron Fist Way</strong></td>
+<td style="text-align: left;">+1 die unarmed; strikes count as enchanted. <em>Fist like forged iron.</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Untouchable Way</strong></td>
+<td style="text-align: left;">+1 die unarmed; convert 2 Harm to Fatigue; cannot be grappled. <em>Absence where the blow lands.</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Inevitable Way</strong></td>
+<td style="text-align: left;">+2 dice unarmed; ignore 1 Armor; counter on enemy miss. <em>Arrival is certain.</em></td>
+</tr>
+</tbody>
+</table></div>
+<h5 class="unnumbered" id="master-talents-1218-xp">Master Talents (12–18 XP)</h5>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Battlefield Mastery</strong></td>
+<td style="text-align: left;">When engaged with 3+ foes: +1 Effect; enemies –1 die. <em>Center of the storm.</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Battlefield Terror</strong></td>
+<td style="text-align: left;">Enemies in Close range act at –1 die. <em>Aura of decisive violence.</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Transcendent Harmony</strong></td>
+<td style="text-align: left;">Convert 2 Harm to Fatigue; once/session become immune to Harm (1 scene). <em>Perfect accord of body and breath.</em></td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="order-specific-equipment">Order-Specific Equipment</h4>
+<h5 class="unnumbered" id="sihai-orders">Sihai Orders</h5>
+<div class="gearbox">
+<p><strong>Jade Mirror Pendant</strong> <span> </span> <span> </span> <span> </span><br/>
+<em>Effect.</em> +1 <strong>Lore</strong>; store one vivid memory/day; <span> </span> vs tampering (DV 3).<br/>
+<strong>Iron Ink Brush</strong> <span> </span> <span> </span> <span> </span><br/>
+<em>Effect.</em> Write unalterable contracts; forging DV 4; oaths gain <span> </span>.</p>
+</div>
+<h5 class="unnumbered" id="nihori-orders">Nihori Orders</h5>
+<div class="gearbox">
+<p><strong>Falling Blossom Katana</strong> <span> </span> <span> </span> <span> </span><br/>
+<em>Effect.</em> Attacks are <em>artful</em>: on a miss, +1 <strong>Spirit</strong> next action; <span> </span> to end one grapple/scene.<br/>
+<strong>Mountain Stone Amulet</strong> <span> </span> <span> </span> <span> </span><br/>
+<em>Effect.</em> +1 Position when you end your turn stationary; minor <span> </span> (Harm 1) after a rest.</p>
+</div>
+<h5 class="unnumbered" id="ayokha-orders">Ayokha Orders</h5>
+<div class="gearbox">
+<p><strong>River Voice Conch</strong> <span> </span> <span> </span> <span> </span><br/>
+<em>Effect.</em> Call to lost souls; purify corrupted water; soothe [FEAR] by 1 level (once/scene).<br/>
+<strong>Three Bridges Cord</strong> <span> </span> <span> </span> <span> </span><br/>
+<em>Effect.</em> Tie witnessed agreements; create neutral ground (<span> </span>) for parley; +1d mediation.</p>
+</div>
+<h4 id="joining-an-order">Joining an Order</h4>
+<div class="orderbox">
+<p><strong>Trials.</strong></p>
+<ol>
+<li><p><strong>Trial of Understanding</strong> — demonstrate the order’s philosophy in deed or discourse.</p></li>
+<li><p><strong>Test of Worthiness</strong> — complete a task that serves the order’s purpose.</p></li>
+<li><p><strong>Oath of Devotion</strong> — swear to uphold tenets; gain <span> </span> to the order’s sanctuary.</p></li>
+</ol>
+<p><strong>Benefits.</strong> Access to order sanctuaries; order gear; one listed <em>Core Talent</em> at 1 XP discount (GM approval).<br/>
+<strong>Obligations.</strong> Render service when called; uphold doctrine; risk <span> </span> on oath-breaking.</p>
+</div>
+<h6 class="unnumbered" id="monastic-integration-optional-mechanics">Monastic Integration (Optional Mechanics)</h6>
+<p><strong>Sanctuary TAGS.</strong> An order’s home gains its TAG suite as area effects at DV = senior abbot’s <strong>Spirit</strong>.<br/>
+<strong>Vows as Timers.</strong> Take a 4–6 segment <em>Vow Timer</em> ; mark when you violate doctrine. On fill: lose benefits until atonement.<br/>
+<strong>Lineage Feats.</strong> After 3 major services, unlock one <em>Advanced Talent</em> at –1 XP (once).<br/>
+<strong>Rites of Aid.</strong> Once/session at a friendly monastery, ask a Rite aligned with order TAGS (GM sets DV/cost).</p>
+<h3 id="monastic-orderpatron-alignment">Monastic Order–Patron Alignment</h3>
+<p>Orders and Patrons lie on a spectrum of philosophical compatibility. Some pairings are natural, others merely workable, and a few create productive (or perilous) tension. Use this chapter to align a character’s order with a patron for narrative hooks and mechanical weight.</p>
+<h4 id="philosophical-vibes">Philosophical Vibes</h4>
+<p>Each order carries a <em>philosophical vibe</em> that broadly aligns with certain patron domains and resists others.</p>
+<div class="vibebox">
+<p><strong>Contemplative (Inner Focus)</strong><br/>
+<em>Emphasis.</em> Meditation, self-reflection, inner peace.<br/>
+<em>Compatible.</em> The Witness; Mab; Sacred Geometry.<br/>
+<em>Conflicts.</em> Oath of Flame &amp; Light; Khemesh.</p>
+</div>
+<div class="vibebox">
+<p><strong>Active (Outer Service)</strong><br/>
+<em>Emphasis.</em> Action, service, worldly engagement.<br/>
+<em>Compatible.</em> Raéyn; The Traveler; Inaea.<br/>
+<em>Conflicts.</em> Old Man of the Forest; Varnek Karn.</p>
+</div>
+<div class="vibebox">
+<p><strong>Balanced (Harmony)</strong><br/>
+<em>Emphasis.</em> Integration of inner and outer; moderation.<br/>
+<em>Compatible.</em> Ikasha; Clockwork Monad; Isoka.<br/>
+<em>Conflicts.</em> Gallows Bell; Carrion King.</p>
+</div>
+<div class="vibebox">
+<p><strong>Transformative (Change)</strong><br/>
+<em>Emphasis.</em> Renewal, shedding, evolution.<br/>
+<em>Compatible.</em> Isoka; Carrion King; The Traveler.<br/>
+<em>Conflicts.</em> Sacred Geometry; Mykkiel.</p>
+</div>
+<h4 id="alignment-table">Alignment Table</h4>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Order</strong></th>
+<th style="text-align: left;"><strong>Core Philosophy</strong></th>
+<th style="text-align: left;"><strong>Natural Patron</strong></th>
+<th style="text-align: left;"><strong>Compatible</strong></th>
+<th style="text-align: left;"><strong>Tension Patrons</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Jade Mirror</td>
+<td style="text-align: left;">Truth through reflection</td>
+<td style="text-align: left;">The Witness</td>
+<td style="text-align: left;">Mab; Sacred Geometry</td>
+<td style="text-align: left;">Khemesh; Malachai</td>
+</tr>
+<tr>
+<td style="text-align: left;">Iron Ink</td>
+<td style="text-align: left;">Protection of knowledge</td>
+<td style="text-align: left;">Mykkiel</td>
+<td style="text-align: left;">Sealed Gate; The Witness</td>
+<td style="text-align: left;">Maelstraeus; Livaea</td>
+</tr>
+<tr>
+<td style="text-align: left;">Empty Scroll</td>
+<td style="text-align: left;">Wisdom in restraint</td>
+<td style="text-align: left;">Ikasha</td>
+<td style="text-align: left;">Old Man; Isoka</td>
+<td style="text-align: left;">Raéyn; Oath of Flame</td>
+</tr>
+<tr>
+<td style="text-align: left;">Brass Abacus</td>
+<td style="text-align: left;">Justice through measure</td>
+<td style="text-align: left;">Mykkiel</td>
+<td style="text-align: left;">Sacred Geometry; Sealed Gate</td>
+<td style="text-align: left;">Maelstraeus; Gallows Bell</td>
+</tr>
+<tr>
+<td style="text-align: left;">Falling Blossom</td>
+<td style="text-align: left;">Beauty in transience</td>
+<td style="text-align: left;">Mab</td>
+<td style="text-align: left;">Carrion King; Isoka</td>
+<td style="text-align: left;">Sacred Geometry; Mykkiel</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mountain’s Breath</td>
+<td style="text-align: left;">Power through patience</td>
+<td style="text-align: left;">Old Man</td>
+<td style="text-align: left;">Khemesh; Nidhoggr</td>
+<td style="text-align: left;">Raéyn; Carrion King</td>
+</tr>
+<tr>
+<td style="text-align: left;">Silent Drum</td>
+<td style="text-align: left;">Truth in silence</td>
+<td style="text-align: left;">The Witness</td>
+<td style="text-align: left;">Ikasha; Gallows Bell</td>
+<td style="text-align: left;">Livaea; Maelstraeus</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ink-Black Moon</td>
+<td style="text-align: left;">Clarity through shadow</td>
+<td style="text-align: left;">Ikasha</td>
+<td style="text-align: left;">The Witness; Gallows Bell</td>
+<td style="text-align: left;">Inaea; Oath of Flame</td>
+</tr>
+<tr>
+<td style="text-align: left;">River’s Voice</td>
+<td style="text-align: left;">Flow with change</td>
+<td style="text-align: left;">Raéyn</td>
+<td style="text-align: left;">The Traveler; Isoka</td>
+<td style="text-align: left;">Sealed Gate; Mykkiel</td>
+</tr>
+<tr>
+<td style="text-align: left;">Burning Ash</td>
+<td style="text-align: left;">Renewal through loss</td>
+<td style="text-align: left;">Carrion King</td>
+<td style="text-align: left;">Isoka; The Traveler</td>
+<td style="text-align: left;">Inaea; Sacred Geometry</td>
+</tr>
+<tr>
+<td style="text-align: left;">Three Bridges</td>
+<td style="text-align: left;">Harmony through connection</td>
+<td style="text-align: left;">The Traveler</td>
+<td style="text-align: left;">Inaea; Sealed Gate</td>
+<td style="text-align: left;">Varnek Karn; Khemesh</td>
+</tr>
+<tr>
+<td style="text-align: left;">Monsoon Bell</td>
+<td style="text-align: left;">Endurance through change</td>
+<td style="text-align: left;">Raéyn</td>
+<td style="text-align: left;">Carrion King; The Traveler</td>
+<td style="text-align: left;">Sacred Geometry; Mykkiel</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="mechanical-effects-of-alignment">Mechanical Effects of Alignment</h4>
+<h5 class="unnumbered" id="natural-alignment-order-patron-match">Natural Alignment (Order + Patron match)</h5>
+<ul>
+<li><p><strong>Obligation Ease.</strong> Relevant Rites cost <em>–1 Obligation</em>.</p></li>
+<li><p><strong>Sanctuary Edge.</strong> +1 die to patron-aligned activities in the order’s sanctuary.</p></li>
+<li><p><strong>Special Access.</strong> Gain 1 specialized Rite (GM approval).</p></li>
+<li><p><strong>Tithe.</strong> Must tithe 10% of earned XP to Patron service (rounded up).</p></li>
+</ul>
+<h5 class="unnumbered" id="compatible-alignment">Compatible Alignment</h5>
+<ul>
+<li><p><strong>Smoother Rites.</strong> Patron Rite DV reduced by 1 (min DV 2).</p></li>
+<li><p><strong>Recovery.</strong> +1 Boon recovery when resting in the order’s sanctuary.</p></li>
+<li><p><strong>Caution.</strong> Actions opposing either doctrine mark +1 segment on Obligation Timer .</p></li>
+</ul>
+<h5 class="unnumbered" id="tension-alignment">Tension Alignment</h5>
+<ul>
+<li><p><strong>Edge for Cost.</strong> Take 1 Major Talent at <em>–2 XP</em> (once).</p></li>
+<li><p><strong>Force the Gift.</strong> You may <em>Push</em> the Patron’s Gift without extra Obligation (initial Obligation still applies).</p></li>
+<li><p><strong>Friction.</strong> –1 die to all Patron interactions (min 1 die).</p></li>
+<li><p><strong>Risk Shift.</strong> Failed Rites threaten <em>Corruption</em> instead of Obligation.</p></li>
+<li><p><strong>No Shelter.</strong> Order sanctuaries provide no Patron protection for you.</p></li>
+</ul>
+<h4 id="worked-examples">Worked Examples</h4>
+<div class="examplebox">
+<p><strong>Jade Mirror + The Witness (Natural)</strong><br/>
+<em>Obligation Reduction.</em> <em>Revelation’s Gaze</em> (cost 2) costs 1 for Jade Mirror monks.<br/>
+<em>Specialized Rite.</em> <strong>Mirror’s Truth</strong> — Reveal lies embedded in written records. DV = <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo form="prefix" stretchy="false">(</mo><mtext mathvariant="normal">Obligation</mtext><mo>−</mo><mtext mathvariant="normal">Spirit</mtext><mo>,</mo><mspace width="0.167em"></mspace><mn>2</mn><mo form="postfix" stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\max(\text{Obligation} - \text{Spirit},\,2)</annotation></semantics></math>.<br/>
+<em>Sanctuary Bonus.</em> +1 die to <strong>Lore</strong>/<strong>Insight</strong> when seeking truth; <em>WARD vs. deception</em> (DV = monk’s <strong>Spirit</strong>).<br/>
+<em>Service Tithe.</em></p>
+<ul>
+<li><p>Monthly: investigate one case of obscured truth.</p></li>
+<li><p>Quarterly: expose a significant deception or abuse of record.</p></li>
+<li><p>Annually: undertake a major truth-revelation quest.</p></li>
+</ul>
+<p><em>Failure.</em> If XP tithe is missed, Patron access is suspended until service is rendered.</p>
+</div>
+<div class="examplebox">
+<p><strong>Falling Blossom + Mab (Tension)</strong><br/>
+<em>Edge.</em> <strong>Inevitable Way</strong> (normally 18 XP) costs 16 XP.<br/>
+<em>Pushed Gift.</em> Patron’s Gift may be extended without additional Obligation (initial Obligation still applies).<br/>
+<em>Costs.</em> –1 die to Patron interactions; failed Rites mark <em>Corruption</em> instead of Obligation, with fae-glamor backlash; order sanctuaries do not shield from Patron consequences.</p>
+</div>
+<h4 id="optional-subsystems">Optional Subsystems</h4>
+<h5 class="unnumbered" id="alignment-shift-timers">Alignment Shift Timers</h5>
+<p>Track philosophical drift with a 4–6 segment <em>Alignment Shift Timer</em> . Mark when the character acts against either doctrine. On fill, reclassify the pairing (e.g., Compatible <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Natural, or Natural <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Tension). Clear 1–2 segments after a meaningful atonement scene.</p>
+<h5 class="unnumbered" id="sanctuary-modifiers-by-alignment">Sanctuary Modifiers by Alignment</h5>
+<ul>
+<li><p><strong>Natural.</strong> Sanctuary gains the Patron’s primary TAG as an area effect (DV = Abbot’s <strong>Spirit</strong>).</p></li>
+<li><p><strong>Compatible.</strong> Sanctuary confers +1 Position on scenes begun in reflection or rite.</p></li>
+<li><p><strong>Tension.</strong> Sanctuary benefits do not apply to the conflicted character; in addition, once/session the GM may <em>twist</em> a boon into a complication aligned with the Patron’s demands.</p></li>
+</ul>
+<h5 class="unnumbered" id="mixed-allegiance-advanced">Mixed Allegiance (Advanced)</h5>
+<p>If following two Patrons or serving an order crosswise:</p>
+<ul>
+<li><p>Maintain two 4–segment <em>Obligation Timers</em>. A scene that advances one also advances the other on a 1–2 (d6).</p></li>
+<li><p>When both fill simultaneously, choose: <em>renounce one</em> (immediate –1 die with that faction for the arc) or <em>become Claimed</em> (gain a potent once/arc Gift, but your GM may compel the claim 1/session).</p></li>
+</ul>
+<h4 id="using-alignment-in-play">Using Alignment in Play</h4>
+<h5 class="unnumbered" id="character-creation">Character Creation</h5>
+<ol>
+<li><p>Choose an <strong>Order</strong> that matches your concept.</p></li>
+<li><p>Check <strong>Natural Patron</strong> for immediate benefits.</p></li>
+<li><p>Consider <strong>Compatible</strong> pairings for flexibility and travel.</p></li>
+<li><p>Pick a <strong>Tension</strong> pairing only if you want story heat and swingy risk/reward.</p></li>
+</ol>
+<h5 class="unnumbered" id="adventure-hooks">Adventure Hooks</h5>
+<ul>
+<li><p><strong>Natural.</strong> The Patron assigns order-appropriate quests (audit, rite, mediation).</p></li>
+<li><p><strong>Compatible.</strong> The order petitions the Patron for aid against a doctrinal challenge.</p></li>
+<li><p><strong>Tension.</strong> Philosophical disputes split the monastery; you’re the fulcrum.</p></li>
+</ul>
+<h5 class="unnumbered" id="gm-guidance">GM Guidance</h5>
+<p>Use alignments to seed NPC relationships, sanctuary politics, and rite costs. Allow alignment to drift through play: conviction should matter on the sheet <em>and</em> at the table.</p>
+</article></article></body></html>

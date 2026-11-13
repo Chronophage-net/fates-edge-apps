@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-13T18:36:26.131Z",
+  "generated": "2026-11-13T19:34:46.486Z",
   "documents": [
     {
       "id": "srd",
@@ -1026,6 +1026,16 @@
       "active": true
     },
     {
+      "id": "linns_mists_and_iron",
+      "title": "Linns Mists And Iron",
+      "file": "Fates_-_Edge_-_-Linns-_-Mists-_-and-_-Iron.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "malachai_the_chained_angel",
       "title": "Malachai The Chained Angel",
       "file": "Fates_-_Edge_-_-Malachai-_-the-_-Chained-_-Angel.html",
@@ -1042,6 +1052,16 @@
       "path": "/data/docs/adventures/",
       "category": "adventures",
       "categoryLabel": "Adventures",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "modern_noir",
+      "title": "Modern Noir",
+      "file": "Fates_-_Edge_-_-Modern-_-Noir.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
       "core": false,
       "active": true
     },
@@ -1179,6 +1199,16 @@
       "active": true
     },
     {
+      "id": "rites_by_patron",
+      "title": "Rites By Patron",
+      "file": "Fates_-_Edge_-_-Rites-_-by-_-Patron.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "saikou-compendium",
       "title": "Saikou Ira's Compendium of the Veil",
       "subtitle": "An investigation into the unquiet dead, the cursed, and the hungry",
@@ -1259,6 +1289,16 @@
       "path": "/data/docs/fr/",
       "category": "fr",
       "categoryLabel": "Français",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "tactical_play",
+      "title": "Tactical Play",
+      "file": "Fates_-_Edge_-_-Tactical-_-Play.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
       "core": false,
       "active": true
     },
@@ -1403,6 +1443,16 @@
       "path": "/data/docs/novels/",
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "the_book_of_the_seven_bell_court",
+      "title": "The Book Of The Seven Bell Court",
+      "file": "Fates_-_Edge_-_-The-_-Book-_-of-_-the-_-Seven-_-Bell-_-Court.html",
+      "path": "/data/docs/expansions/",
+      "category": "expansions",
+      "categoryLabel": "Expansions",
       "core": false,
       "active": true
     },
@@ -2192,7 +2242,7 @@
       "active": true
     }
   ],
-  "total_count": 159,
-  "active_count": 159,
+  "total_count": 164,
+  "active_count": 164,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
