@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-08-23T13:10:57.632360+00:00",
+  "generated": "2026-11-13T18:35:56.296260+00:00",
   "id": "players_guide",
   "title": "Player's Guide",
   "subtitle": "Your Path to Adventure in the Amaranthine Sea and Beyond",
@@ -9,12 +9,12 @@
     {
       "file": "Players-_-Guide-_-01-_-Quickstart.html",
       "label": "Chapter 1",
-      "title": "Quickstart"
+      "title": "Quick Start"
     },
     {
       "file": "Players-_-Guide-_-02-_-Character-_-Creation.html",
       "label": "Chapter 2",
-      "title": "Character Creation"
+      "title": "Character Creation Summary"
     },
     {
       "file": "Players-_-Guide-_-03-_-Core-_-Mechanics.html",
@@ -24,27 +24,27 @@
     {
       "file": "Players-_-Guide-_-04-_-Magic.html",
       "label": "Chapter 4",
-      "title": "Magic"
+      "title": "Magic and Special Abilities"
     },
     {
       "file": "Players-_-Guide-_-05-_-Healing.html",
       "label": "Chapter 5",
-      "title": "Healing"
+      "title": "Healing: Mending Flesh and Spirit"
     },
     {
       "file": "Players-_-Guide-_-06-_-Talents.html",
       "label": "Chapter 6",
-      "title": "Talents"
+      "title": "Talents and Special Abilities"
     },
     {
       "file": "Players-_-Guide-_-07-_-Advancement.html",
       "label": "Chapter 7",
-      "title": "Advancement"
+      "title": "Character Advancement and Capabilities"
     },
     {
       "file": "Players-_-Guide-_-08-_-XP-_-Paths.html",
       "label": "Chapter 8",
-      "title": "XP Paths"
+      "title": "Experience Paths and Character Building"
     },
     {
       "file": "Players-_-Guide-_-09-_-Your-_-First-_-Magical-_-Character.html",
@@ -69,7 +69,7 @@
     {
       "file": "Players-_-Guide-_-13-_-World-_-Powers-_-and-_-Patrons.html",
       "label": "Chapter 13",
-      "title": "World Powers and Patrons"
+      "title": "World Powers and Influence"
     },
     {
       "file": "Players-_-Guide-_-14-_-World-_-Interaction.html",
@@ -79,7 +79,7 @@
     {
       "file": "Players-_-Guide-_-15-_-Currency-_-Free-_-Economy.html",
       "label": "Chapter 15",
-      "title": "Currency Free Economy"
+      "title": "Currency-Free Economy: XP, Barter, and Trusts"
     },
     {
       "file": "Players-_-Guide-_-16-_-Character-_-Backgrounds.html",
@@ -98,8 +98,8 @@
     },
     {
       "file": "Players-_-Guide-_-19-_-Appendix-_-Quick-_-Reference.html",
-      "label": "Chapter 19",
-      "title": "Appendix Quick Reference"
+      "label": "Appendix",
+      "title": "Appendices"
     }
   ],
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."

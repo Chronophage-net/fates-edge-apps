@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-10-22T23:08:35.049901+00:00",
+  "generated": "2026-11-13T18:36:01.228054+00:00",
   "id": "gm_guide",
   "title": "GM Guide",
   "subtitle": "A Comprehensive Guide for the Fate's Edge Game Master",
@@ -9,77 +9,77 @@
     {
       "file": "GM-_-Guide-_-01-_-Introduction.html",
       "label": "Chapter 1",
-      "title": "Introduction"
-    },
-    {
-      "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
-      "label": "Chapter 2",
-      "title": "Core Procedures"
+      "title": "Introduction: The Weight of Choice"
     },
     {
       "file": "GM-_-Guide-_-02a-_-The-_-GMs-_-Job.html",
-      "label": "Chapter 2a",
-      "title": "The GMs Job"
+      "label": "Chapter 2",
+      "title": "The GM’s Job"
+    },
+    {
+      "file": "GM-_-Guide-_-02-_-Core-_-Procedures.html",
+      "label": "Chapter 3",
+      "title": "Running the Game: Core Procedures"
     },
     {
       "file": "GM-_-Guide-_-03-_-Managing-_-Resources.html",
-      "label": "Chapter 3",
+      "label": "Chapter 4",
       "title": "Managing Resources"
     },
     {
       "file": "GM-_-Guide-_-04-_-Running-_-a-_-Currency-_-Free-_-Game.html",
-      "label": "Chapter 4",
-      "title": "Running a Currency Free Game"
+      "label": "Chapter 5",
+      "title": "Running a Currency-Free Game"
     },
     {
       "file": "GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html",
-      "label": "Chapter 5",
+      "label": "Chapter 6",
       "title": "Magic and Backlash"
     },
     {
       "file": "GM-_-Guide-_-06-_-Running-_-Scenarios.html",
-      "label": "Chapter 6",
+      "label": "Chapter 7",
       "title": "Running Scenarios"
     },
     {
       "file": "GM-_-Guide-_-07-_-Assets-_-and-_-Followers.html",
-      "label": "Chapter 7",
-      "title": "Assets and Followers"
+      "label": "Chapter 8",
+      "title": "Running Assets and Followers"
     },
     {
       "file": "GM-_-Guide-_-08-_-Travel-_-Framework.html",
-      "label": "Chapter 8",
-      "title": "Travel Framework"
+      "label": "Chapter 9",
+      "title": "World Interaction"
     },
     {
       "file": "GM-_-Guide-_-09-_-Downtime.html",
-      "label": "Chapter 9",
-      "title": "Downtime"
+      "label": "Chapter 10",
+      "title": "Downtime Management"
     },
     {
       "file": "GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html",
-      "label": "Chapter 10",
-      "title": "Campaigns Timers Consequences"
+      "label": "Chapter 11",
+      "title": "Campaigns, Timers, and Consequences"
     },
     {
       "file": "GM-_-Guide-_-11-_-Epic-_-Tier-_-Adventures.html",
-      "label": "Chapter 11",
-      "title": "Epic Tier Adventures"
+      "label": "Chapter 12",
+      "title": "Tier IV and V: Running Epic Adventures"
     },
     {
       "file": "GM-_-Guide-_-12-_-Advanced-_-GM-_-Techniques.html",
-      "label": "Chapter 12",
+      "label": "Chapter 13",
       "title": "Advanced GM Techniques"
     },
     {
       "file": "GM-_-Guide-_-13-_-Player-_-Archetypes-_-at-_-the-_-Table.html",
-      "label": "Chapter 13",
-      "title": "Player Archetypes at the Table"
+      "label": "Chapter 14",
+      "title": "Example Character Concepts"
     },
     {
       "file": "GM-_-Guide-_-14-_-Lore-_-Compendium.html",
-      "label": "Chapter 14",
-      "title": "Lore Compendium"
+      "label": "Chapter 15",
+      "title": "The Known World: A Lore Compendium"
     },
     {
       "file": "GM-_-Guide-_-App-_-A-_-Core-_-Reference-_-Tables.html",
@@ -114,22 +114,22 @@
     {
       "file": "GM-_-Guide-_-App-_-G-_-One-_-Page-_-GM-_-Screen-_-Summary.html",
       "label": "Appendix G",
-      "title": "One Page GM Screen Summary"
+      "title": "One-Page GM Screen Summary"
     },
     {
       "file": "GM-_-Guide-_-App-_-H-_-Sample-_-Deck-_-Reading.html",
       "label": "Appendix H",
-      "title": "Sample Deck Reading"
+      "title": "Sample Deck Reading (Example)"
     },
     {
       "file": "GM-_-Guide-_-App-_-I-_-Session-_-Zero-_-Checklist.html",
       "label": "Appendix I",
-      "title": "Session Zero Checklist"
+      "title": "Session Zero Checklist Handout"
     },
     {
       "file": "GM-_-Guide-_-App-_-J-_-Using-_-Expansions-_-and-_-Adversary-_-Templates.html",
       "label": "Appendix J",
-      "title": "Using Expansions and Adversary Templates"
+      "title": "Using Expansions: A Guide for the Overwhelmed GM"
     },
     {
       "file": "GM-_-Guide-_-App-_-K-_-Patron-_-Quick-_-Reference.html",

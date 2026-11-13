@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Fate's Edge GM Guide — Chapter 9: Downtime Management</title>
+<title>Fate's Edge — Chapter 10: Downtime Management</title>
 <style>
     :root {
         --bg1: #0d0d1a;
@@ -120,240 +120,373 @@
 @media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
 @media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
 </style></head>
-<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 9 · Downtime</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-08-_-Travel-_-Framework.html">Previous chapter</a><a href="GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Chapter 9: Downtime Management</a></li><li><a href="#gm-procedures">GM Procedures for Running Downtime</a></li><li><a href="#downtime-ref">Common Downtime Rolls Reference (GM)</a></li><li><a href="#crafting-bench">Running Crafting at the Bench</a></li><li><a href="#rush-rules">Rush Rules: GM Procedures for Risk Timers</a></li><li><a href="#downtime-timers">Using Downtime to Advance Campaign Timers</a></li><li><a href="#echo-system">Handling Off-Screen Characters: The Echo System</a></li><li><a href="#downtime-advice">Additional Downtime Tools and Advice (GM)</a></li><li><a href="#cheat-sheet">Downtime Quick Reference (GM Cheat Sheet)</a></li></ul></details>
-<h1 id="reader-section-1">Chapter 9: Downtime Management</h1>
-<p class="subtitle">Fate's Edge GM Guide — Chapter 9</p>
-<p>Downtime is the narrative space between adventures — days, weeks, or even months when characters rest, train, build assets, settle debts, and pursue personal projects. <strong>As GM, your role is to:</strong></p>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 10 · Downtime Management</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-08-_-Travel-_-Framework.html">Previous chapter</a><a href="GM-_-Guide-_-10-_-Campaigns-_-Timers-_-Consequences.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Downtime Management</a></li><li><a href="#gm-procedures-for-running-downtime">GM Procedures for Running Downtime</a></li><li><a href="#common-downtime-rolls-reference-gm">Common Downtime Rolls Reference (GM)</a></li><li><a href="#running-crafting-at-the-bench">Running Crafting at the Bench</a></li><li><a href="#rush-rules-gm-procedures-for-risk-timers">Rush Rules: GM Procedures for Risk Timers</a></li><li><a href="#using-downtime-to-advance-campaign-timers">Using Downtime to Advance Campaign Timers</a></li><li><a href="#handling-off-screen-characters-the-echo-system">Handling Off-Screen Characters: The Echo System</a></li><li><a href="#additional-downtime-tools-and-advice-gm">Additional Downtime Tools and Advice (GM)</a></li><li><a href="#downtime-quick-reference-gm-cheat-sheet">Downtime Quick Reference (GM Cheat Sheet)</a></li></ul></details><article class="fe-reading-document"><span class="legacy-anchor" id="gm-procedures"></span><span class="legacy-anchor" id="downtime-ref"></span><span class="legacy-anchor" id="crafting-gm"></span><span class="legacy-anchor" id="rush-rules"></span><span class="legacy-anchor" id="downtime-timers"></span><span class="legacy-anchor" id="echo-system"></span><span class="legacy-anchor" id="downtime-advice"></span><span class="legacy-anchor" id="cheat-sheet"></span><h1 id="reader-section-1">Downtime Management</h1><p class="subtitle">Chapter 10 · Downtime Management</p><section class="level2" id="ch:downtime">
+<p>Downtime is the narrative space between adventures – days, weeks, or even months when characters rest, train, build assets, settle debts, and pursue personal projects. <strong>As GM, your role is to:</strong></p>
 <ul>
-<li>Set duration and DVs based on fiction, not XP budgets.</li>
-<li>Hear player declarations and call for appropriate rolls.</li>
-<li>Apply the Outcome Matrix to determine progress/complications.</li>
-<li>Spend Story Beats from player rolls to introduce rumors, rival actions, or unexpected events.</li>
-<li>Manage campaign timers (Mandate, Crisis, faction) based on player choices.</li>
-<li>Track Asset/Follower upkeep and enforce neglect consequences.</li>
-<li>Run the Echo Character system for off-screen PCs.</li>
-<li>Adjudicate Rush Rules for accelerated development.</li>
+<li><p>Set duration and DVs based on fiction, not XP budgets.</p></li>
+<li><p>Hear player declarations and call for appropriate rolls.</p></li>
+<li><p>Apply the Outcome Matrix to determine progress/complications.</p></li>
+<li><p>Spend Story Beats from player rolls to introduce rumors, rival actions, or unexpected events.</p></li>
+<li><p>Manage campaign timers (Mandate, Crisis, faction) based on player choices.</p></li>
+<li><p>Track Asset/Follower upkeep and enforce neglect consequences.</p></li>
+<li><p>Run the Echo Character system for off-screen PCs.</p></li>
+<li><p>Adjudicate Rush Rules for accelerated development.</p></li>
 </ul>
-<p>Unlike many games, Fate's Edge treats downtime as an active phase where <strong>your adjudication shapes the fiction</strong> — not a mere pause. This chapter gives you the tools to run downtime efficiently and dramatically.</p>
-<h2 id="gm-procedures">GM Procedures for Running Downtime</h2>
-<p>Each downtime phase follows this loop. <strong>Follow these steps as GM:</strong></p>
+<p>Unlike many games, Fate’s Edge treats downtime as an active phase where <strong>your adjudication shapes the fiction</strong>–not a mere pause. This chapter gives you the tools to run downtime efficiently and dramatically.</p>
+<section class="level3" id="sec:gm-downtime-procedures">
+<h2 id="gm-procedures-for-running-downtime">GM Procedures for Running Downtime</h2>
+<p> Each downtime phase follows this loop. <strong>Follow these steps as GM:</strong></p>
 <ol>
-<li><strong>Set the Duration.</strong> Determine how much time passes based on fiction (usually 1–4 weeks for standard play; longer for epic campaigns). <em>Example:</em> "After the siege, two weeks pass while the army regroups — what do you do with this time?"</li>
-<li><strong>Hear Player Declarations.</strong> Each player states one or two major goals (training, research, carousing, etc.). <em>Note:</em> Players declare intent — you set DVs and call for rolls.</li>
-<li><strong>Call for Rolls &amp; Resolve.</strong> For each declaration:
+<li><p><strong>Set the Duration.</strong> Determine how much time passes based on fiction (usually 1–4 weeks for standard play; longer for epic campaigns). <em>Example:</em> “After the siege, two weeks pass while the army regroups–what do you do with this time?”</p></li>
+<li><p><strong>Hear Player Declarations.</strong> Each player states one or two major goals (training, research, carousing, etc.). <em>Note:</em> Players declare intent–you set DVs and call for rolls.</p></li>
+<li><p><strong>Call for Rolls &amp; Resolve.</strong> For each declaration:</p>
 <ul>
-<li>Set a Difficulty Value (DV) using the Common Downtime Rolls table (below) as a guide; increase by +1/+2 for rushed/dangerous projects.</li>
-<li>Have the player roll Attribute + Skill d10s; count Successes (6–9 = 1, a 10 = 2) and Story Beats (1s).</li>
-<li>Apply the Outcome Matrix (Clean Success / Success with SB / Partial / Miss).</li>
-<li><strong>Note all Story Beats generated</strong> for later spending.</li>
-</ul>
-</li>
-<li><strong>Spend Story Beats.</strong> Use any Story Beats generated during downtime to:
+<li><p>Set a Difficulty Value (DV) using the Common Downtime Rolls table (see <span class="math inline">\(\ref{sec:downtime-ref}\)</span>) as a guide; increase by +1/+2 for rushed/dangerous projects.</p></li>
+<li><p>Have the player roll Attribute + Skill d10s; count Successes (6+) and Story Beats (1s).</p></li>
+<li><p>Apply the Outcome Matrix (Clean Success / Success with SB / Partial / Miss).</p></li>
+<li><p><strong>Note all Story Beats generated</strong> for later spending.</p></li>
+</ul></li>
+<li><p><strong>Spend Story Beats.</strong> Use any Story Beats generated during downtime to:</p>
 <ul>
-<li>Introduce a minor rumor (1 SB): "A street urchin whispers you're being watched by the Black Ledger."</li>
-<li>Signal faction awareness (2 SB): "The City Guard captain mentions your name at roll call."</li>
-<li>Advance a complication timer (3+ SB): "The <em>Harbormaster's Grudge [4]</em> timer ticks +1–2."</li>
+<li><p>Introduce a minor rumor (1 SB): “A street urchin whispers you’re being watched by the Black Ledger.”</p></li>
+<li><p>Signal faction awareness (2 SB): “The City Guard captain mentions your name at roll call.”</p></li>
+<li><p>Advance a complication timer (3+ SB): “The <em>Harbormaster’s Grudge [4]</em> timer ticks +1–2.”</p></li>
 </ul>
-<em>GM Tip:</em> Spend SB to create <em>immediate hooks</em> for the next session — never waste them.</li>
-<li><strong>Manage Upkeep &amp; Timers.</strong>
+<p><em>GM Tip:</em> Spend SB to create <em>immediate hooks</em> for the next session–never waste them.</p></li>
+<li><p><strong>Manage Upkeep &amp; Timers.</strong></p>
 <ul>
-<li><strong>Asset/Follower Upkeep</strong>: Remind players to pay upkeep — Efficient, max(1, cost ÷ 3) in XP; or Intensive, 1 XP and a scene. If neglected, degrade condition (Maintained → Neglected → Compromised) and apply consequences.</li>
-<li><strong>Campaign Timers</strong>: Advance Mandate/Crisis/faction timers based on player choices.</li>
-<li><strong>Obligation Clearing</strong>: When players clear Obligation via acts of service, describe the narrative cost (e.g., "You spend the day repairing the temple roof — your hands blister, but the priests nod in approval").</li>
-</ul>
-</li>
-<li><strong>Handle Off-Screen Characters.</strong> Process Downtime Logs using the Echo Character system. <em>GM Tip:</em> Treat off-screen characters as active NPCs — their logs are your source for complications and opportunities.</li>
-<li><strong>Log the Results.</strong> Use the downtime log template to record key outcomes for session-to-session continuity.</li>
+<li><p><strong>Asset/Follower Upkeep</strong>: Remind players to pay XP or devote downtime scenes. If neglected, degrade condition (Maintained <span class="math inline">\(\rightarrow\)</span> Neglected <span class="math inline">\(\rightarrow\)</span> Compromised) and apply consequences (see <span class="math inline">\(\ref{sec:followers-assets-gm}\)</span>).</p></li>
+<li><p><strong>Campaign Timers</strong>: Advance Mandate/Crisis/faction timers based on player choices (see <span class="math inline">\(\ref{sec:downtime-timers}\)</span>).</p></li>
+<li><p><strong>Obligation Clearing</strong>: When players clear Obligation via acts of service, describe the narrative cost (e.g., “You spend the day repairing the temple roof–your hands blister, but the priests nod in approval”).</p></li>
+</ul></li>
+<li><p><strong>Handle Off-Screen Characters.</strong> Process Downtime Logs using the Echo Character system (see <span class="math inline">\(\ref{sec:echo-system}\)</span>). <em>GM Tip:</em> Treat off-screen characters as active NPCs–their logs are your source for complications and opportunities.</p></li>
+<li><p><strong>Log the Results.</strong> Use the downtime log template to record key outcomes for session-to-session continuity.</p></li>
 </ol>
-<h2 id="downtime-ref">Common Downtime Rolls Reference (GM)</h2>
-<p>Use this table to set DVs for player declarations. Increase DV by +1 (risky) or +2 (dangerous) as fiction demands.</p>
-<div class="table-wrap"><div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<tr><th>Player Goal</th><th>Skill Roll</th><th>Base DV</th><th>Effect on Success</th></tr>
-<tr><td>Recover from Harm</td><td>Wits + Craft</td><td>3</td><td>Remove 1 Harm (stacks with rest)</td></tr>
-<tr><td>Train a Skill</td><td>relevant Attribute + Skill</td><td>4</td><td>Advance 1 segment on a Training Timer [4].</td></tr>
-<tr><td>Learn a New Talent</td><td>appropriate Attribute + Lore</td><td>5</td><td>Advance 1 segment on a Talent Acquisition Timer [6].</td></tr>
-<tr><td>Clear Obligation</td><td>Spirit + Lore (act of service)</td><td>3</td><td>Reduce Obligation by 1 segment (you describe the act).</td></tr>
-<tr><td>Carouse for Information</td><td>Presence + Deception</td><td>3</td><td>Gain a rumor or a minor String.</td></tr>
-<tr><td>Craft a Provision or Work</td><td>Attribute + Craft</td><td>2–5+ by ambition</td><td>Finish a Provision or advance a Work's Project Timer; use the bench procedure below.</td></tr>
-<tr><td>Craft a Wonder</td><td>Attribute + Arcana</td><td>2–5+ by ambition</td><td>Advance the Project Timer; charge XP and mark Obligation when the Wonder is finished.</td></tr>
-<tr><td>Research a Topic</td><td>Wits + Insight</td><td>4</td><td>Gain one piece of true information (you may be cryptic).</td></tr>
-<tr><td>Manage an Asset</td><td>Presence + Sway</td><td>3</td><td>Reduce or prevent condition degradation.</td></tr>
-<tr><td>Establish a Contact</td><td>Presence + Sway</td><td>4</td><td>Gain a new Minor String.</td></tr>
-<tr><td>Reduce a Debt Timer</td><td>Presence + Sway or service roll</td><td>4</td><td>Clear 1–2 segments (your discretion).</td></tr>
-<tr><td>Train a Follower</td><td>Spirit + Sway</td><td>4</td><td>Improve Follower Cap by 1 (requires Training Timer).</td></tr>
-</table></div></div>
-<section id="crafting-gm">
-<h2 id="crafting-bench">Running Crafting at the Bench</h2>
-<p>Use the <a href="../srd/crafting.html#crafting-reference">SRD's bench procedure</a> when a player makes something. Agree on the intended result, the work it requires, and the conditions at the bench before calling for a roll. A successful project roll advances that work; it does not finish every kind of item at once.</p>
+</section>
+<section class="level3" id="sec:downtime-ref">
+<h2 id="common-downtime-rolls-reference-gm">Common Downtime Rolls Reference (GM)</h2>
+<p> Use this table to set DVs for player declarations. Increase DV by +1 (risky) or +2 (dangerous) as fiction demands.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><p><strong>Player Goal</strong></p></th>
+<th style="text-align: left;"><p><strong>Skill Roll</strong></p></th>
+<th style="text-align: left;"><p><strong>Base DV</strong></p></th>
+<th style="text-align: left;"><p><strong>Effect on Success</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="4" style="text-align: center;"><p><span><strong>Continued from previous page</strong></span></p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p><strong>Player Goal</strong></p></td>
+<td style="text-align: left;"><p><strong>Skill Roll</strong></p></td>
+<td style="text-align: left;"><p><strong>Base DV</strong></p></td>
+<td style="text-align: left;"><p><strong>Effect on Success</strong></p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Recover from Harm</p></td>
+<td style="text-align: left;"><p>Craft + Wits</p></td>
+<td style="text-align: left;"><p>3</p></td>
+<td style="text-align: left;"><p>Remove 1 Harm (stacks with rest)</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Train a Skill</p></td>
+<td style="text-align: left;"><p>relevant Attribute + Skill</p></td>
+<td style="text-align: left;"><p>4</p></td>
+<td style="text-align: left;"><p>Advance 1 segment on a Training Timer [4].</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Learn a New Talent</p></td>
+<td style="text-align: left;"><p>appropriate Attribute + Lore</p></td>
+<td style="text-align: left;"><p>5</p></td>
+<td style="text-align: left;"><p>Advance 1 segment on a Talent Acquisition Timer [6].</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Clear Obligation</p></td>
+<td style="text-align: left;"><p>Spirit + Lore (act of service)</p></td>
+<td style="text-align: left;"><p>3</p></td>
+<td style="text-align: left;"><p>Reduce Obligation by 1 segment (you describe the act).</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Carouse for Information</p></td>
+<td style="text-align: left;"><p>Presence + Deception</p></td>
+<td style="text-align: left;"><p>3</p></td>
+<td style="text-align: left;"><p>Gain a rumor or a minor String.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Craft a Provision or Work</p></td>
+<td style="text-align: left;"><p>Attribute + Craft</p></td>
+<td style="text-align: left;"><p>2–5+ by ambition</p></td>
+<td style="text-align: left;"><p>Finish a Provision or advance a Work’s Project Timer; see the bench procedure below.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Craft a Wonder</p></td>
+<td style="text-align: left;"><p>Attribute + Arcana</p></td>
+<td style="text-align: left;"><p>2–5+ by ambition</p></td>
+<td style="text-align: left;"><p>Advance the Project Timer; charge XP and mark Obligation at completion.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Research a Topic</p></td>
+<td style="text-align: left;"><p>Wits + Insight</p></td>
+<td style="text-align: left;"><p>4</p></td>
+<td style="text-align: left;"><p>Gain one piece of true information (you may be cryptic).</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Manage an Asset</p></td>
+<td style="text-align: left;"><p>Presence + Sway</p></td>
+<td style="text-align: left;"><p>3</p></td>
+<td style="text-align: left;"><p>Reduce or prevent condition degradation.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Establish a Contact</p></td>
+<td style="text-align: left;"><p>Presence + Sway</p></td>
+<td style="text-align: left;"><p>4</p></td>
+<td style="text-align: left;"><p>Gain a new Minor String.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Reduce a Debt Timer</p></td>
+<td style="text-align: left;"><p>Presence + Sway or service roll</p></td>
+<td style="text-align: left;"><p>4</p></td>
+<td style="text-align: left;"><p>Clear 1–2 segments (your discretion).</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Train a Follower</p></td>
+<td style="text-align: left;"><p>Spirit + Sway</p></td>
+<td style="text-align: left;"><p>4</p></td>
+<td style="text-align: left;"><p>Improve Follower Cap by 1 (requires Training Timer).</p></td>
+</tr>
+</tbody>
+</table></div>
+</section>
+<section class="level3" id="crafting-bench">
+<h2 id="running-crafting-at-the-bench">Running Crafting at the Bench</h2>
+<p>Use the SRD's bench procedure when a player makes something. Agree on the intended result, the work it requires, and the conditions at the bench before calling for a roll. A successful project roll advances that work; it does not finish every kind of item at once.</p>
+<section class="level4" id="set-the-project-and-the-roll">
 <h3>Set the Project and the Roll</h3>
 <ul>
-<li><strong>Provision:</strong> a single-use item, resolved with one roll and no Project Timer. It costs the scene and materials, with no XP cost.</li>
-<li><strong>Work:</strong> a lasting mundane item of real quality. Set a Project Timer [4] or [6]; it costs skill and time, with no XP cost.</li>
-<li><strong>Wonder:</strong> an enchanted item. Set a Project Timer [6], [8], or [10]; its XP and Obligation costs come due at completion.</li>
+<li><p><strong>Provision:</strong> a single-use item, resolved with one roll and no Project Timer. It costs the scene and materials, with no XP cost.</p></li>
+<li><p><strong>Work:</strong> a lasting mundane item of real quality. Set a Project Timer <span>[</span>4<span>]</span> or <span>[</span>6<span>]</span>; it costs skill and time, with no XP cost.</p></li>
+<li><p><strong>Wonder:</strong> an enchanted item. Set a Project Timer <span>[</span>6<span>]</span>, <span>[</span>8<span>]</span>, or <span>[</span>10<span>]</span>; its XP and Obligation costs come due at completion.</p></li>
 </ul>
 <p>Roll <strong>Attribute + Craft</strong> for a Provision or Work, or <strong>Attribute + Arcana</strong> for a Wonder. Choose the Attribute from the approach: Wits to plan and measure, Body to forge, Spirit to coax, or Presence to direct a workshop. Set DV by ambition: 2 for mending or familiar repetition, 3 for competent new work, 4 at the edge of the craft, and 5+ for something nobody has made.</p>
 <p><strong>Materials set Position.</strong> Suitable materials, tools, workspace, and unhurried time give Dominant; adequate conditions give Controlled; improvisation or pressure gives Desperate. Establish those conditions through the fiction rather than counting reagents.</p>
+</section>
+<section class="level4" id="resolve-one-action-at-a-time">
 <h3>Resolve One Action at a Time</h3>
 <p>Allow one roll per downtime action or scene spent at the bench. For a Work or Wonder, use these results:</p>
 <ul>
-<li><strong>Clean Success:</strong> fill 2 segments.</li>
-<li><strong>Success with Story Beats:</strong> fill 2 segments and bank the rolled Story Beats. The workshop's noise, smoke, or visitors offer immediate ways to spend them.</li>
-<li><strong>Partial:</strong> the player chooses 1 segment clean, or 2 segments with a named <strong>Flaw</strong> in the item. Award 1 Boon either way.</li>
-<li><strong>Miss:</strong> fill no segments, award 2 Boons, and introduce the consequence in the fiction.</li>
+<li><p><strong>Clean Success:</strong> fill 2 segments.</p></li>
+<li><p><strong>Success with Story Beats:</strong> fill 2 segments and bank the rolled Story Beats. The workshop's noise, smoke, or visitors offer immediate ways to spend them.</p></li>
+<li><p><strong>Partial:</strong> the player chooses 1 segment clean, or 2 segments with a named <strong>Flaw</strong> in the item. Award 1 Boon either way.</p></li>
+<li><p><strong>Miss:</strong> fill no segments, award 2 Boons, and introduce the consequence in the fiction.</p></li>
 </ul>
-<p>A Provision is finished on success. On a Partial, the player can finish it with a Flaw or leave it unfinished for another action; on a Miss it remains unfinished. Apply the same Boon awards. A Work or Wonder exists when its Timer fills. Keep any Flaws accumulated along the way: a later success does not erase them. Removing a named Flaw is a separate project at <strong>DV 4, Timer [4]</strong>.</p>
+<p>A Provision is finished on success. On a Partial, the player can finish it with a Flaw or leave it unfinished for another action; on a Miss it remains unfinished. Apply the same Boon awards. A Work or Wonder exists when its Timer fills. Keep any Flaws accumulated along the way: a later success does not erase them. Removing a named Flaw is a separate project at <strong>DV 4, Timer <span>[</span>4<span>]</span></strong>.</p>
+</section>
+<section class="level4" id="wonders-upkeep-and-gathering">
 <h3>Wonders, Upkeep, and Gathering</h3>
 <p>At completion, charge the Wonder's tier cost: <strong>Minor 2, Major 4, Prestige 6, Epic 8 XP</strong>. Mark <strong>Obligation</strong> of 1, 2, 3, or 4 respectively, even if the maker has no named Patron. Record who or what answered rather than treating the debt as waived.</p>
-<p>A character may be attuned to <strong>three Wonders</strong> at once; attuning or releasing one takes a quiet scene. Each attuned Wonder requires upkeep every downtime: max(1, its XP cost ÷ 3, rounded up) in XP, or 1 XP and a downtime scene. Unpaid upkeep moves it through <strong>Maintained → Neglected → Compromised</strong>; a Compromised Wonder's enchantment is inert until repaired. Found Artifacts instead take Obligation on their own terms, with no XP cost, upkeep, or decay.</p>
+<p>A character may be attuned to <strong>three Wonders</strong> at once; attuning or releasing one takes a quiet scene. Each attuned Wonder requires upkeep every downtime: max(1, its XP cost <span class="math inline">\(\div\)</span> 3, rounded up) in XP, or 1 XP and a downtime scene. Unpaid upkeep moves it through <strong>Maintained <span class="math inline">\(\rightarrow\)</span> Neglected <span class="math inline">\(\rightarrow\)</span> Compromised</strong>; a Compromised Wonder's enchantment is inert until repaired. Found Artifacts instead take Obligation on their own terms, with no XP cost, upkeep, or decay.</p>
 <p>Once per downtime, a character may gather with <strong>Wits + Lore</strong> in a settlement or archive, or <strong>Wits + Endurance</strong> in the wild. Set DV by rarity: 2 for common, 3 for uncommon, 4 for rare, and 5 for an ingredient with a name of its own. Success establishes the right materials and gives Dominant at the bench for <strong>one project</strong>.</p>
 </section>
-<h2 id="rush-rules">Rush Rules: GM Procedures for Risk Timers</h2>
-<p>Players can attempt to rush downtime activities. <strong>As GM, follow this procedure:</strong></p>
+</section>
+<section class="level3" id="sec:rush-rules">
+<h2 id="rush-rules-gm-procedures-for-risk-timers">Rush Rules: GM Procedures for Risk Timers</h2>
+<p> Players can attempt to rush downtime activities. <strong>As GM, follow this procedure:</strong></p>
 <ol>
-<li><strong>Player declares rushing</strong> (e.g., "I want to learn Acrobatics in 3 days instead of a week").</li>
-<li><strong>You create a Risk Timer</strong> of 4–6 segments, named after the potential consequence (e.g., <em>Pulled Muscle [6]</em>, <em>Backlash [4]</em>, <em>Patron Ire [4]</em>). <em>Narrate the risk:</em> "Pushing this hard could tear a tendon — I'm starting a <em>Pulled Muscle [6]</em> timer."</li>
-<li><strong>For each downtime action related to the rush, the player rolls as normal.</strong>
+<li><p><strong>Player declares rushing</strong> (e.g., “I want to learn Acrobatics in 3 days instead of a week”).</p></li>
+<li><p><strong>You create a Risk Timer</strong> of 4–6 segments, named after the potential consequence (e.g., <em>Pulled Muscle [6]</em>, <em>Backlash [4]</em>, <em>Patron Ire [4]</em>). <em>Narrate the risk:</em> “Pushing this hard could tear a tendon–I’m starting a <em>Pulled Muscle [6]</em> timer.”</p></li>
+<li><p><strong>For each downtime action related to the rush, the player rolls as normal.</strong></p>
 <ul>
-<li>On a <strong>Clean Success</strong>: The timer does not advance.</li>
-<li>On a <strong>Partial</strong> or <strong>Miss</strong>: The timer advances by 1 segment (or more, at your discretion for extreme failure).</li>
-</ul>
-</li>
-<li><strong>When the Risk Timer fills</strong>, choose one outcome based on fiction:
+<li><p>On a <strong>Clean Success</strong>: The timer does not advance.</p></li>
+<li><p>On a <strong>Partial</strong> or <strong>Miss</strong>: The timer advances by 1 segment (or more, at your discretion for extreme failure).</p></li>
+</ul></li>
+<li><p><strong>When the Risk Timer fills</strong>, choose one outcome based on fiction:</p>
 <ul>
-<li><strong>Project fails entirely</strong>, but the player gains 2 Boons to use on a later attempt.</li>
-<li><strong>Project succeeds, but the character suffers a permanent Condition</strong> (e.g., <em>Twisted Ankle</em>, <em>Migraines</em>) that lasts until treated.</li>
-<li><strong>Character gains the new ability, but immediately marks 1 Harm (overexertion) and gains a Debt Timer [4]</strong> to a terrestrial patron who "helped" them cheat time.</li>
-</ul>
-</li>
-<li><strong>If the timer never fills</strong>, the rush succeeds as normal with no extra cost.</li>
+<li><p><strong>Project fails entirely</strong>, but the player gains 2 Boons to use on a later attempt.</p></li>
+<li><p><strong>Project succeeds, but the character suffers a permanent Condition</strong> (e.g., <em>Twisted Ankle</em>, <em>Migraines</em>) that lasts until treated.</p></li>
+<li><p><strong>Character gains the new ability, but immediately marks 1 Harm (overexertion) and gains a Debt Timer [4]</strong> to a terrestrial patron who “helped” them cheat time.</p></li>
+</ul></li>
+<li><p><strong>If the timer never fills</strong>, the rush succeeds as normal with no extra cost.</p></li>
 </ol>
-<div class="panel panel-red">
-<span class="panel-title">Example: Rushing a Skill (GM Narration)</span>
-<p>Michael wants to raise his Melee from 3 to 4. Normal training takes 4 days. He rushes to do it in 2 days. You create a <em>Pulled Muscle [6]</em> timer: "Push too hard, and you'll tear something." Michael rolls three downtime actions (one per day). He gets a Partial and a Miss — the timer fills. You rule: "You gain the skill, but during the final drill you tear a tendon. Mark Harm 1 (Level 1) and you have the <em>Limp</em> Condition until you receive magical healing or rest for a full week."</p>
-</div>
-<h2 id="downtime-timers">Using Downtime to Advance Campaign Timers</h2>
-<p>Downtime lets players actively shape campaign threats and favor. <strong>As GM, adjudicate these declarations:</strong></p>
+<blockquote>
+<p><strong>Example: Rushing a Skill (GM Narration)</strong></p>
+<p>Michael wants to raise his Melee from 3 to 4. Normal training takes 4 days. He rushes to do it in 2 days. You create a <em>Pulled Muscle [6]</em> timer: “Push too hard, and you’ll tear something.” Michael rolls three downtime actions (one per day). He gets a Partial and a Miss – the timer fills. You rule: “You gain the skill, but during the final drill you tear a tendon. Mark Harm 1 (Level 1) and you have the <em>Limp</em> Condition until you receive magical healing or rest for a full week.”</p>
+</blockquote>
+</section>
+<section class="level3" id="sec:downtime-timers">
+<h2 id="using-downtime-to-advance-campaign-timers">Using Downtime to Advance Campaign Timers</h2>
+<p> Downtime lets players actively shape campaign threats and favor. <strong>As GM, adjudicate these declarations:</strong></p>
+<section class="level4" id="subsec:mandate-crisis">
 <h3>Mandate and Crisis</h3>
 <p>Players can declare they are working to increase Mandate (public favor) or decrease Crisis (threat level).</p>
 <ul>
-<li><strong>Increase Mandate (public favor):</strong> Player declares charity, problem-solving, or alliance-building. <strong>You set DV 4</strong> for Presence + Sway.
+<li><p><strong>Increase Mandate (public favor):</strong> Player declares charity, problem-solving, or alliance-building. <strong>You set DV 4</strong> for Presence + Sway.</p>
 <ul>
-<li>On success: Increase Mandate by 1 (to a max of 6).</li>
-<li>On a Miss: Increase Crisis by 1 (enemies notice their growing influence).</li>
-</ul>
-</li>
-<li><strong>Decrease Crisis (reduce threat):</strong> Player declares sabotage, truce-brokering, or conspiracy exposure. <strong>You set DV 5</strong> for an appropriate skill (e.g., Stealth, Deception, Lore).
+<li><p>On success: Increase Mandate by 1 (to a max of 6).</p></li>
+<li><p>On a Miss: Increase Crisis by 1 (enemies notice their growing influence).</p></li>
+</ul></li>
+<li><p><strong>Decrease Crisis (reduce threat):</strong> Player declares sabotage, truce-brokering, or conspiracy exposure. <strong>You set DV 5</strong> for an appropriate skill (e.g., Stealth, Deception, Lore).</p>
 <ul>
-<li>On success: Reduce Crisis by 1.</li>
-<li>On a Miss: Mandate also decreases by 1 (collateral damage — you describe how).</li>
+<li><p>On success: Reduce Crisis by 1.</p></li>
+<li><p>On a Miss: Mandate also decreases by 1 (collateral damage–you describe how).</p></li>
+</ul></li>
 </ul>
-</li>
-</ul>
+</section>
+<section class="level4" id="subsec:faction-debt-timers">
 <h3>Faction and Debt Timers</h3>
 <p>Players can influence visible timers through downtime actions.</p>
 <ul>
-<li><strong>Faction Timers</strong>: Player declares action to help or harm a faction (e.g., "I bribe officials in the Dyers' Guild"). <strong>You set DV 4</strong> for Presence + Sway.
+<li><p><strong>Faction Timers</strong>: Player declares action to help or harm a faction (e.g., “I bribe officials in the Dyers’ Guild”). <strong>You set DV 4</strong> for Presence + Sway.</p>
 <ul>
-<li>On success: Tick the faction timer <strong>back</strong> by 1 (less threat).</li>
-<li>On a Miss: Tick the timer <strong>forward</strong> by 1 (more threat).</li>
-<li><em>Example:</em> Success on bribing officials: "Your coins find the right palms — the Guild Influence timer retreats one segment."</li>
-</ul>
-</li>
-<li><strong>Debt Timers from Terrestrial Patrons</strong>: Player accepts a Debt Timer during downtime. <strong>You resolve it via</strong>:
+<li><p>On success: Tick the faction timer <strong>back</strong> by 1 (less threat).</p></li>
+<li><p>On a Miss: Tick the timer <strong>forward</strong> by 1 (more threat).</p></li>
+<li><p><em>Example:</em> Success on bribing officials: “Your coins find the right palms–the Guild Influence timer retreats one segment.”</p></li>
+</ul></li>
+<li><p><strong>Debt Timers from Terrestrial Patrons</strong>: Player accepts a Debt Timer during downtime (see <span class="math inline">\(\ref{sec:obligation-corruption-gm}\)</span>). <strong>You resolve it via</strong>:</p>
 <ul>
-<li>A service scene (roll to clear 1–2 segments),</li>
-<li>Or spending XP (1 XP = 1 segment cleared).</li>
+<li><p>A service scene (roll to clear 1–2 segments),</p></li>
+<li><p>Or spending XP (1 XP = 1 segment cleared).</p></li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h2 id="echo-system">Handling Off-Screen Characters: The Echo System</h2>
-<p>When a player has multiple characters or steps a character off-screen, <strong>you use this system to keep them active in the fiction</strong>:</p>
+</section>
+</section>
+<section class="level3" id="sec:echo-system">
+<h2 id="handling-off-screen-characters-the-echo-system">Handling Off-Screen Characters: The Echo System</h2>
+<p> When a player has multiple characters or steps a character off-screen, <strong>you use this system to keep them active in the fiction</strong>:</p>
+<section class="level4" id="core-principles-1">
 <h3>Core Principles</h3>
 <ul>
-<li>Off-screen characters are <strong>not frozen</strong>. They continue to act, gather information, and face consequences.</li>
-<li>The player provides a brief <strong>Downtime Log</strong> for each off-screen character (you provide the template).</li>
-<li>You spend 2–3 minutes per log, describing outcomes and possibly ticking a personal <strong>Crisis Timer [6]</strong> for that character.</li>
+<li><p>Off-screen characters are <strong>not frozen</strong>. They continue to act, gather information, and face consequences.</p></li>
+<li><p>The player provides a brief <strong>Downtime Log</strong> for each off-screen character (you provide the template).</p></li>
+<li><p>You spend 2–3 minutes per log, describing outcomes and possibly ticking a personal <strong>Crisis Timer [6]</strong> for that character.</p></li>
 </ul>
+</section>
+<section class="level4" id="subsec:switch-mechanics">
 <h3>Switch Mechanics</h3>
 <p>When a player wants to bring an off-screen character back into play (or send one off-screen):</p>
 <ol>
-<li><strong>Declare</strong> — Player states: "I'm switching to my other character, the scholar, for the next session."</li>
-<li><strong>Status</strong> — <strong>You assign</strong> the current character one of three statuses based on fiction:
+<li><p><strong>Declare</strong> – Player states: “I’m switching to my other character, the scholar, for the next session.”</p></li>
+<li><p><strong>Status</strong> – <strong>You assign</strong> the current character one of three statuses based on fiction:</p>
 <ul>
-<li><strong>Supporting</strong> — Works toward active PC goals (gathers intel, manages assets). Minimal risk.</li>
-<li><strong>Advancing</strong> — Pursues their own agenda (research, training). May uncover opportunities or trigger a complication.</li>
-<li><strong>In Peril</strong> — Their absence has made them a target. <strong>You tick a personal Crisis Timer [6]</strong> each session until they return.</li>
-</ul>
-</li>
-<li><strong>Re-entry</strong> — When returning, the character gains 2 Boons for a dramatic entrance. The player rolls Wits + Spirit (DV 3) to re-establish presence. <strong>You adjudicate the roll</strong>:
+<li><p><strong>Supporting</strong> – Works toward active PC goals (gathers intel, manages assets). Minimal risk.</p></li>
+<li><p><strong>Advancing</strong> – Pursues their own agenda (research, training). May uncover opportunities or trigger a complication.</p></li>
+<li><p><strong>In Peril</strong> – Their absence has made them a target. <strong>You tick a personal Crisis Timer [6]</strong> each session until they return.</p></li>
+</ul></li>
+<li><p><strong>Re-entry</strong> – When returning, the character gains 2 Boons for a dramatic entrance. The player rolls Wits + Spirit (DV 3) to re-establish presence. <strong>You adjudicate the roll</strong>:</p>
 <ul>
-<li>On a Miss: A complication follows them back (you describe it using 1–2 SB).</li>
-</ul>
-</li>
+<li><p>On a Miss: A complication follows them back (you describe it using 1–2 SB).</p></li>
+</ul></li>
 </ol>
+</section>
+<section class="level4" id="sec:downtime-log">
 <h3>Downtime Log Template (Provide to Players)</h3>
-<p>Give players this simple log to fill out for each off-screen (or on-screen) character between sessions:</p>
-<div class="panel">
-<span class="panel-title">Downtime Log — _____ (Character Name)</span>
-<p><strong>Resource Action:</strong> (How they maintain connections, pay upkeep, or keep assets running)</p>
-<p><strong>Project Action:</strong> (One goal they worked toward — training, research, crafting)</p>
-<p><strong>Event Response:</strong> (How they react to a rumor, threat, or off-screen event you describe)</p>
-<p><strong>GM Response:</strong> (You fill this in after the session)</p>
-</div>
-<h3>Off-Screen Crisis Timer</h3>
+<p> Give players this simple log to fill out for each off-screen (or on-screen) character between sessions:</p>
+<blockquote>
+<p><strong>Downtime Log – (Character Name)</strong></p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Resource Action:</strong> (How they maintain connections, pay upkeep, or keep assets running)</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Project Action:</strong> (One goal they worked toward – training, research, crafting)</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Event Response:</strong> (How they react to a rumor, threat, or off-screen event you describe)</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>GM Response:</strong> (You fill this in after the session)</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table></div>
+</blockquote>
+</section>
+<section class="level4" id="off-screen-crisis-timer">
+<h3>Off-Screen Crisis Timer </h3>
 <p>Each off-screen character tracks a personal <strong>Crisis Timer [6]</strong>. <strong>You tick this timer when</strong>:</p>
 <ul>
-<li>The player rolls a Miss on a downtime action.</li>
-<li>The character's status is <em>In Peril</em>.</li>
-<li>You spend a Story Beat to introduce trouble for that character.</li>
+<li><p>The player rolls a Miss on a downtime action.</p></li>
+<li><p>The character’s status is <em>In Peril</em>.</p></li>
+<li><p>You spend a Story Beat to introduce trouble for that character.</p></li>
 </ul>
 <p>When the timer fills, <strong>you introduce a major off-screen consequence</strong>: a rival strikes, an asset is destroyed, or they are captured. This creates immediate hooks for the active party.</p>
-<h2 id="downtime-advice">Additional Downtime Tools and Advice (GM)</h2>
-<p>Use these tools to make downtime a tension-filled narrative phase:</p>
+</section>
+</section>
+<section class="level3" id="sec:downtime-advice">
+<h2 id="additional-downtime-tools-and-advice-gm">Additional Downtime Tools and Advice (GM)</h2>
+<p> Use these tools to make downtime a tension-filled narrative phase:</p>
+<section class="level4" id="asset-follower-upkeep">
 <h3>Asset &amp; Follower Upkeep</h3>
-<p>Remind players to pay upkeep (Efficient or Intensive) for each asset and follower. Use the templates from the Assets and Followers chapter. If they forget, <strong>degrade the asset to Neglected or a Follower one step along Faithful → Strained → Broken</strong>. You can also use the Rush rules to restore a degraded asset in half the normal downtime.</p>
+<p>Remind players to pay upkeep (Efficient or Intensive) for each asset and follower. Use the Asset and Follower templates in Chapter 8. If they forget, <strong>degrade the asset to Neglected or a follower to Wary</strong>. You can also use the Rush rules to restore a degraded asset in half the normal downtime.</p>
+</section>
+<section class="level4" id="resolving-complications">
 <h3>Resolving Complications</h3>
-<p>Downtime is an excellent moment to clear lingering Complications. Players can spend a downtime action to resolve a complication — roll appropriate skill (DV 3–5). <strong>As GM, adjudicate:</strong></p>
+<p>Downtime is an excellent moment to clear lingering Complications. Players can spend a downtime action to resolve a complication–roll appropriate skill (DV 3–5). <strong>As GM, adjudicate:</strong></p>
 <ul>
-<li>On success: The complication is cleared (describe the narrative resolution).</li>
-<li>On a Miss: It worsens — <strong>you advance a related timer by 1 segment</strong>.</li>
+<li><p>On success: The complication is cleared (describe the narrative resolution).</p></li>
+<li><p>On a Miss: It worsens–<strong>you advance a related timer by 1 segment</strong>.</p></li>
 </ul>
+</section>
+<section class="level4" id="using-story-beats-from-downtime-rolls">
 <h3>Using Story Beats from Downtime Rolls</h3>
 <p>Any 1s rolled during downtime generate Story Beats. <strong>Do not waste them. Spend them as follows</strong>:</p>
 <ul>
-<li><strong>1 SB:</strong> A minor rumor begins about the character ("A beggar claims they saw you arguing with the watch captain").</li>
-<li><strong>2 SB:</strong> A rival or faction becomes aware of their activities ("The City Guard captain mentions your name at roll call").</li>
-<li><strong>3 SB:</strong> A complication arises — a theft, a broken item, a social faux pas ("Your safehouse door is jammed — spend 1 Boon to force it open").</li>
-<li><strong>4+ SB:</strong> A major twist — a Patron demands an audience, an enemy strikes an asset ("The Harbormaster confronts you at dawn: 'Your games end today.'").</li>
+<li><p><strong>1 SB:</strong> A minor rumor begins about the character (“A beggar claims they saw you arguing with the watch captain”).</p></li>
+<li><p><strong>2 SB:</strong> A rival or faction becomes aware of their activities (“The City Guard captain mentions your name at roll call”).</p></li>
+<li><p><strong>3 SB:</strong> A complication arises–a theft, a broken item, a social faux pas (“Your safehouse door is jammed–spend 1 Boon to force it open”).</p></li>
+<li><p><strong>4+ SB:</strong> A major twist–a Patron demands an audience, an enemy strikes an asset (“The Harbormaster confronts you at dawn: ’Your games end today.”’).</p></li>
 </ul>
-<p>These complications will ignite the next session's opening scene.</p>
+<p>These complications will ignite the next session’s opening scene.</p>
+</section>
+<section class="level4" id="downtime-as-collaborative-worldbuilding">
 <h3>Downtime as Collaborative Worldbuilding</h3>
-<p>Encourage players to ask questions during downtime ("I try to find a fence who deals in cursed coins. Is there one in this city?"). <strong>Use their rolls to establish new NPCs and locations</strong>:</p>
+<p>Encourage players to ask questions during downtime (“I try to find a fence who deals in cursed coins. Is there one in this city?”). <strong>Use their rolls to establish new NPCs and locations</strong>:</p>
 <ul>
-<li><strong>Clean Success</strong>: The fence exists and is reliable ("Old Jem's stall in the market — he'll take any cursed silver for fair price").</li>
-<li><strong>Partial</strong>: The fence exists but has a price (Debt Timer) — you describe the cost ("Old Jem nods, but his eyes flick to your purse: 'Five silver upfront, or no deal.'").</li>
-<li><strong>Miss</strong>: They exist but are working for an enemy ("Old Jem's stall is abandoned — in its place, a Black Ledger enforcer eyes you coldly").</li>
+<li><p><strong>Clean Success</strong>: The fence exists and is reliable (“Old Jem’s stall in the market–he’ll take any cursed silver for fair price”).</p></li>
+<li><p><strong>Partial</strong>: The fence exists but has a price (Debt Timer)–you describe the cost (“Old Jem nods, but his eyes flick to your purse: ’Five silver upfront, or no deal.”’).</p></li>
+<li><p><strong>Miss</strong>: They exist but are working for an enemy (“Old Jem’s stall is abandoned–in its place, a Black Ledger enforcer eyes you coldly”).</p></li>
 </ul>
+</section>
+<section class="level4" id="sample-downtime-sequence-gm-script">
 <h3>Sample Downtime Sequence (GM Script)</h3>
 <p>Use this template to frame downtime at your table:</p>
-<blockquote>"[Time period] passes. You each have [number] downtime actions. I need: a roll for skill training, a roll for asset upkeep, and a roll for whatever personal project you declared. You can also use a downtime action to interact with the campaign timers — tell me how you want to affect the Mandate or the Cult's Progress timer. Describe your goal, I'll set a DV, and we'll roll. Any 1s will give me Story Beats to complicate your return to action. Ready?"</blockquote>
-<h2 id="cheat-sheet">Downtime Quick Reference (GM Cheat Sheet)</h2>
-<div class="panel panel-blue">
-<span class="panel-title">Downtime GM Cheat Sheet</span>
+<blockquote>
+<p>"[Time period] passes. You each have [number] downtime actions. I need: a roll for skill training, a roll for asset upkeep, and a roll for whatever personal project you declared. You can also use a downtime action to interact with the campaign timers–tell me how you want to affect the Mandate or the Cult’s Progress timer. Describe your goal, I’ll set a DV, and we’ll roll. Any 1s will give me Story Beats to complicate your return to action. Ready?"</p>
+</blockquote>
+</section>
+</section>
+<section class="level3" id="sec:downtime-cheat-sheet">
+<h2 id="downtime-quick-reference-gm-cheat-sheet">Downtime Quick Reference (GM Cheat Sheet)</h2>
+<blockquote>
+<p><strong>Downtime GM Cheat Sheet</strong></p>
 <ul>
-<li><strong>Set duration</strong> based on fiction (1–4 weeks typical; adjust for scene weight).</li>
-<li><strong>Hear player declarations</strong> (1–2 goals per player).</li>
-<li><strong>Set DVs</strong> using reference table; increase for risk/rush.</li>
-<li><strong>Call for rolls</strong>; players count Successes/SBs.</li>
-<li><strong>Apply Outcome Matrix</strong>; note SBs generated.</li>
-<li><strong>Spend SB</strong> to introduce rumors/rival actions/complications (1 SB = minor rumor; 2 SB = faction awareness; 3 SB = complication; 4+ SB = major twist).</li>
-<li><strong>Advance/retreat campaign timers</strong> (Mandate, Crisis, faction) based on player choices + fiction.</li>
-<li><strong>Process off-screen characters</strong>: Collect Downtime Logs, apply Echo system mechanics.</li>
-<li><strong>Enforce Rush Rule</strong>: Create Risk Timer [4–6] for rushed actions; process Partial/Miss as timer ticks.</li>
-<li><strong>Track Asset/Follower upkeep</strong>: Players report; you enforce degradation if neglected.</li>
-<li><strong>Resolve complications</strong>: Player rolls vs DV; success = cleared, miss = worsens (you advance timer).</li>
+<li><p><strong>Set duration</strong> based on fiction (1–4 weeks typical; adjust for scene weight).</p></li>
+<li><p><strong>Hear player declarations</strong> (1–2 goals per player).</p></li>
+<li><p><strong>Set DVs</strong> using reference table; increase for risk/rush.</p></li>
+<li><p><strong>Call for rolls</strong>; players count Successes/SBs.</p></li>
+<li><p><strong>Apply Outcome Matrix</strong>; note SBs generated.</p></li>
+<li><p><strong>Spend SB</strong> to introduce rumors/rival actions/complications (1 SB = minor rumor; 2 SB = faction awareness; 3 SB = complication; 4+ SB = major twist).</p></li>
+<li><p><strong>Advance/retreat campaign timers</strong> (Mandate, Crisis, faction) based on player choices + fiction.</p></li>
+<li><p><strong>Process off-screen characters</strong>: Collect Downtime Logs, apply Echo system mechanics.</p></li>
+<li><p><strong>Enforce Rush Rule</strong>: Create Risk Timer [4–6] for rushed actions; process Partial/Miss as timer ticks.</p></li>
+<li><p><strong>Track Asset/Follower upkeep</strong>: Players report; you enforce degradation if neglected.</p></li>
+<li><p><strong>Resolve complications</strong>: Player rolls vs DV; success = cleared, miss = worsens (you advance timer).</p></li>
 </ul>
-</div>
-<footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-</article></body>
+</blockquote>
+</section>
+</section></article></article></body>
 </html>

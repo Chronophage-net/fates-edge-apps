@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Fate's Edge GM Guide — Chapter 3: Managing Resources</title>
+<title>Fate's Edge — Chapter 4: Managing Resources</title>
 <style>
     :root {
         --bg1: #0d0d1a;
@@ -123,721 +123,1235 @@
 @media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
 @media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
 </style></head>
-<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 3 · Managing Resources</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-02a-_-The-_-GMs-_-Job.html">Previous chapter</a><a href="GM-_-Guide-_-04-_-Running-_-a-_-Currency-_-Free-_-Game.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Chapter 3: Managing Resources</a></li><li><a href="#supply-timer">Supply Timer: The Pulse of Survival</a></li><li><a href="#fatigue-gm">Fatigue: The Weight of the World</a></li><li><a href="#obligation">Obligation: The Weight of Oaths</a></li><li><a href="#tracking-obligation">Tracking Obligation</a></li><li><a href="#clearing-obligation">Clearing Obligation</a></li><li><a href="#patron-intrusions">Patron Intrusions</a></li><li><a href="#terrestrial-mortal">Terrestrial Patrons: Mortal Obligation</a></li><li><a href="#blood-silk">Obligation in the Blood and Silk Trilogy</a></li><li><a href="#player-facing-obligation">Player-Facing Obligation</a></li><li><a href="#gm-facing-obligation">GM-Facing Obligation</a></li><li><a href="#ninth-taboo">The Ninth Taboo and Obligation</a></li><li><a href="#obligation-summary">Summary: Obligation at a Glance</a></li><li><a href="#obligation-final">Final Thought</a></li><li><a href="#boons-gm">Boons: The Currency of Resilience</a></li><li><a href="#followers-assets-gm">Followers and Assets: Power Beyond the Self</a></li><li><a href="#terrestrial-patrons-gm">Terrestrial Patrons: Favors and Obligation</a></li><li><a href="#trusts-gm">Player Trusts: Shared Legacy</a></li><li><a href="#combat-resources">Combat Resource Management</a></li><li><a href="#narrative-first-resources">Narrative First: The Fiction Is the Ledger</a></li><li><a href="#echo-characters-gm">Echo Characters: Managing Multi-Character Switching</a></li></ul></details>
-<h1 id="reader-section-1">Chapter 3: Managing Resources</h1>
-<p class="subtitle">Fate's Edge GM Guide — Chapter 3</p>
-<div class="panel panel-blue">
-<div class="panel-title">Philosophy of Resources</div>
-<p><strong>Resources are not there to hoard — they are tools to create drama.</strong></p>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>GM Guide</strong></p><p>Read this as preparation and adjudication guidance. Start with the core procedures, then use the relevant section for the situation at your table. Keep the resolution loop in view when applying a specialist procedure.</p><p><strong>GM Guide</strong> · Chapter 4 · Managing Resources</p><nav aria-label="Book navigation"><a href="index.html">Book contents</a><a href="GM-_-Guide-_-02-_-Core-_-Procedures.html">Previous chapter</a><a href="GM-_-Guide-_-04-_-Running-_-a-_-Currency-_-Free-_-Game.html">Next chapter</a></nav><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Managing Resources</a></li><li><a href="#supply-timer-the-pulse-of-survival">Supply Timer : The Pulse of Survival</a></li><li><a href="#fatigue-the-weight-of-the-world">Fatigue: The Weight of the World</a></li><li><a href="#reader-section-4-section-section-section">Obligation: The Weight of Oaths</a></li><li><a href="#reader-section-5-section-section-section">What Is Obligation?</a></li><li><a href="#reader-section-6-section-section-section">Tracking Obligation</a></li><li><a href="#reader-section-7-section-section-section">Clearing Obligation</a></li><li><a href="#reader-section-8-section-section-section">Patron Intrusions</a></li><li><a href="#reader-section-9-section-section-section">Terrestrial Patrons: Mortal Obligation</a></li><li><a href="#reader-section-10-section-section-section">Obligation in the Blood and Silk Trilogy</a></li><li><a href="#reader-section-11-section-section-section">Player-Facing Obligation</a></li><li><a href="#reader-section-12-section-section-section">GM-Facing Obligation</a></li><li><a href="#reader-section-13-section-section-section">The Ninth Taboo and Obligation</a></li><li><a href="#reader-section-14-section-section-section">Summary: Obligation at a Glance</a></li><li><a href="#final-thought">Final Thought</a></li><li><a href="#boons-the-currency-of-resilience">Boons: The Currency of Resilience</a></li><li><a href="#followers-and-assets-power-beyond-the-self">Followers and Assets: Power Beyond the Self</a></li><li><a href="#terrestrial-patrons-favors-and-obligation">Terrestrial Patrons: Favors and Obligation</a></li><li><a href="#player-trusts-shared-legacy">Player Trusts: Shared Legacy</a></li><li><a href="#combat-resource-management">Combat Resource Management</a></li><li><a href="#narrative-first-the-fiction-is-the-ledger">Narrative First: The Fiction Is the Ledger</a></li><li><a href="#echo-characters-managing-multi-character-switching">Echo Characters: Managing Multi-Character Switching</a></li></ul></details><article class="fe-reading-document"><span class="legacy-anchor" id="reader-section-14-section-section"></span><span class="legacy-anchor" id="reader-section-13-section-section"></span><span class="legacy-anchor" id="reader-section-12-section-section"></span><span class="legacy-anchor" id="reader-section-11-section-section"></span><span class="legacy-anchor" id="reader-section-10-section-section"></span><span class="legacy-anchor" id="reader-section-9-section-section"></span><span class="legacy-anchor" id="reader-section-8-section-section"></span><span class="legacy-anchor" id="reader-section-7-section-section"></span><span class="legacy-anchor" id="reader-section-6-section-section"></span><span class="legacy-anchor" id="reader-section-5-section-section"></span><span class="legacy-anchor" id="reader-section-4-section-section"></span><span class="legacy-anchor" id="reader-section-14"></span><span class="legacy-anchor" id="reader-section-13"></span><span class="legacy-anchor" id="reader-section-12"></span><span class="legacy-anchor" id="reader-section-11"></span><span class="legacy-anchor" id="reader-section-10"></span><span class="legacy-anchor" id="reader-section-9"></span><span class="legacy-anchor" id="reader-section-8"></span><span class="legacy-anchor" id="reader-section-7"></span><span class="legacy-anchor" id="reader-section-6"></span><span class="legacy-anchor" id="reader-section-5"></span><span class="legacy-anchor" id="reader-section-4"></span><span class="legacy-anchor" id="supply-timer"></span><span class="legacy-anchor" id="fatigue-gm"></span><span class="legacy-anchor" id="obligation"></span><span class="legacy-anchor" id="terrestrial-mortal"></span><span class="legacy-anchor" id="blood-silk"></span><span class="legacy-anchor" id="ninth-taboo"></span><span class="legacy-anchor" id="obligation-summary"></span><span class="legacy-anchor" id="obligation-final"></span><span class="legacy-anchor" id="boons-gm"></span><span class="legacy-anchor" id="followers-assets-gm"></span><span class="legacy-anchor" id="terrestrial-patrons-gm"></span><span class="legacy-anchor" id="patron-rank"></span><span class="legacy-anchor" id="trusts-gm"></span><span class="legacy-anchor" id="combat-resources"></span><span class="legacy-anchor" id="narrative-first-resources"></span><span class="legacy-anchor" id="echo-characters-gm"></span><span class="legacy-anchor" id="reader-section-4-section"></span><span class="legacy-anchor" id="reader-section-5-section"></span><span class="legacy-anchor" id="reader-section-6-section"></span><span class="legacy-anchor" id="reader-section-7-section"></span><span class="legacy-anchor" id="reader-section-8-section"></span><span class="legacy-anchor" id="reader-section-9-section"></span><span class="legacy-anchor" id="reader-section-10-section"></span><span class="legacy-anchor" id="reader-section-11-section"></span><span class="legacy-anchor" id="reader-section-12-section"></span><span class="legacy-anchor" id="reader-section-13-section"></span><span class="legacy-anchor" id="reader-section-14-section"></span><h1 id="reader-section-1">Managing Resources</h1><p class="subtitle">Chapter 4 · Managing Resources</p><section class="level2" id="ch:gm-resources">
+<blockquote>
+<p><strong>Philosophy of Resources</strong></p>
+<p> <strong>Resources are not there to hoard – they are tools to create drama.</strong></p>
 <ul>
-<li><strong>Spend Boons freely.</strong> Hoarding them for XP conversion starves the table of tension and robs players of their safety net.</li>
-<li><strong>Let Fatigue build.</strong> Fatigue is not punishment; it is the rising tide that forces hard choices and heroic comebacks.</li>
-<li><strong>Obligation is plot, not punishment.</strong> When a Patron calls in a debt, a story hook arrives. Embrace it.</li>
+<li><p><strong>Spend Boons freely.</strong> Hoarding them for XP conversion starves the table of tension and robs players of their safety net.</p></li>
+<li><p><strong>Let Fatigue build.</strong> Fatigue is not punishment; it is the rising tide that forces hard choices and heroic comebacks.</p></li>
+<li><p><strong>Obligation is plot, not punishment.</strong> When a Patron calls in a debt, a story hook arrives. Embrace it.</p></li>
 </ul>
-<p>The most memorable sessions come from characters spending their last Boon on a desperate re-roll, staggering forward under three Fatigue, or accepting a Patron's demand that changes everything.</p>
-</div>
-<p>In <strong>Fate's Edge</strong>, resources are narrative levers, not inventory lists. From the last sip of water in sun-scorched wastes to the fragile loyalty of a Ykrul war-band, every resource tells a story, and every story demands its price. As GM, you are the keeper of these threads—the weaver of scarcity and abundance. This chapter shows how to manage the systems that fuel mortal ambitions and epic campaigns.</p>
-<h2 id="supply-timer">Supply Timer: The Pulse of Survival</h2>
-<p>The <strong>Supply Timer</strong> tracks the party's access to essentials: food, water, gear, and logistical support. It is a shared party resource—a narrative lever that tightens tension when characters are isolated, pursued, or cut off from civilization.</p>
+<p>The most memorable sessions come from characters spending their last Boon on a desperate re-roll, staggering forward under three Fatigue, or accepting a Patron’s demand that changes everything.</p>
+</blockquote>
+<p>In <strong>Fate’s Edge</strong>, resources are narrative levers, not inventory lists. From the last sip of water in sun-scorched wastes to the fragile loyalty of a Ykrul war-band, every resource tells a story, and every story demands its price. As GM, you are the keeper of these threads—the weaver of scarcity and abundance. This chapter shows how to manage the systems that fuel mortal ambitions and epic campaigns.</p>
+<section class="level3" id="sec:supply-timer">
+<h2 id="supply-timer-the-pulse-of-survival">Supply Timer : The Pulse of Survival</h2>
+<p>The <strong>Supply Timer</strong> tracks the party’s access to essentials: food, water, gear, and logistical support. It is a shared party resource—a narrative lever that tightens tension when characters are isolated, pursued, or cut off from civilization.</p>
+<section class="level4" id="subsec:supply-stats">
 <h3>Supply Timer States</h3>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<thead><tr><th>Segments Filled</th><th>Narrative Effects</th></tr></thead>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:supply-timer-states">
+<caption>Supply Timer conditions and their narrative effects</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Segments Filled</strong></th>
+<th style="text-align: left;"><strong>Narrative Effects</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>0 (Full)</td><td>Well-equipped and prepared; no penalty.</td></tr>
-<tr><td>1 (Low)</td><td>Minor complications: bland rations, damaged arrows, thinning waterskins.</td></tr>
-<tr><td>2 (Dangerous)</td><td>Each character gains <strong>Fatigue 1</strong> as scarcity takes its toll.</td></tr>
-<tr><td>3 (Empty)</td><td>Severe penalties: starvation, dehydration, equipment failure imminent.</td></tr>
+<tr>
+<td style="text-align: left;">0 (Full)</td>
+<td style="text-align: left;">Well-equipped and prepared; no penalty.</td>
+</tr>
+<tr>
+<td style="text-align: left;">1 (Low)</td>
+<td style="text-align: left;">Minor complications: bland rations, damaged arrows, thinning waterskins.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2 (Dangerous)</td>
+<td style="text-align: left;">Each character gains <strong>Fatigue 1</strong> as scarcity takes its toll.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3 (Empty)</td>
+<td style="text-align: left;">Severe penalties: starvation, dehydration, equipment failure imminent.</td>
+</tr>
 </tbody>
 </table></div>
-</div>
-<h3>When to Advance the Supply Timer</h3>
-<p>The Supply Timer advances when the world turns against the party's preparations:</p>
+</section>
+<section class="level4" id="subsec:supply-advance">
+<h3>When to Advance the Supply Timer </h3>
+<p>The Supply Timer advances when the world turns against the party’s preparations:</p>
 <ul>
-<li>Extended travel through hostile lands without proper provisioning (see the Travel Framework — Chapter 14 of the Player's Guide, or §16 of the SRD).</li>
-<li>The GM spends <strong>2+ Story Beats</strong> on logistics failures or environmental hardships.</li>
-<li>The party chooses to travel light for speed or stealth.</li>
-<li>Failed <strong>Lore</strong> or <strong>Craft</strong> rolls related to hunting, foraging, or repair.</li>
+<li><p>Extended travel through hostile lands without proper provisioning (see the Travel Framework in Chapter 9 of the GM’s Guide or World Interaction in Chapter 14 of the Player’s Guide).</p></li>
+<li><p>The GM spends <strong>2+ Story Beats</strong> on logistics failures or environmental hardships.</p></li>
+<li><p>The party chooses to travel light for speed or stealth.</p></li>
+<li><p>Failed <strong>Lore</strong> or <strong>Craft</strong> rolls related to hunting, foraging, or repair.</p></li>
 </ul>
+</section>
+<section class="level4" id="subsec:supply-clear">
 <h3>Clearing Supply Segments</h3>
 <p>The timer recedes when the party finds respite:</p>
 <ul>
-<li>Reaching civilization resets the timer to <em>Full</em>.</li>
-<li>A group foraging test (Wits + Lore, DV 2) in favorable conditions clears 1 segment.</li>
-<li>Downtime spent in relative safety removes 1 segment.</li>
-<li>Successful provisioning (a good hunt, a discovered cache) can reduce segments.</li>
+<li><p>Reaching civilization resets the timer to <em>Full</em>.</p></li>
+<li><p>A group foraging test (Wits + Lore, DV 2) in favorable conditions clears 1 segment.</p></li>
+<li><p>Downtime spent in relative safety removes 1 segment.</p></li>
+<li><p>Successful provisioning (a good hunt, a discovered cache) can reduce segments.</p></li>
 </ul>
-<p><strong>Example.</strong> A week-long sea passage with uncertain winds. A failed <strong>Navigation</strong> roll causes the GM to spend 2 SB — filling two segments as supplies spoil. The party is now at <em>Low Supply</em>. A second failed roll fills another segment — <em>Dangerously Low</em>. Fatigue sets in. The sea gnaws at their endurance.</p>
-<h2 id="fatigue-gm">Fatigue: The Weight of the World</h2>
+<section class="level6" id="example.">
+<h5>Example.</h5>
+<p>A week-long sea passage with uncertain winds. A failed <strong>Navigation</strong> roll causes the GM to spend 2 SB – filling two segments as supplies spoil. The party is now at <em>Low Supply</em>. A second failed roll fills another segment – <em>Dangerously Low</em>. Fatigue sets in. The sea gnaws at their endurance.</p>
+</section>
+</section>
+</section>
+<section class="level3" id="sec:fatigue-gm">
+<h2 id="fatigue-the-weight-of-the-world">Fatigue: The Weight of the World</h2>
 <p>Fatigue represents the cumulative toll of journeying through a world that rarely offers comfort: exhaustion that seeps into bones, hunger that hollows cheeks, strain that clouds judgment.</p>
-<div class="panel">
-<div class="panel-title">The Roller-Coaster Effect</div>
-<p><strong>Taking Harm clears Fatigue temporarily</strong> — the shock of a wound can jolt a character back into action. This creates a natural "roller coaster" of tension:</p>
-<p><em>Example:</em> Henry is at Fatigue 3 (Desperate, −2 dice). A goblin stabs him for Harm 1. The Harm conversion procedure: first convert Harm → Fatigue (none, light armor), then apply remaining Harm — which clears all Fatigue. Henry's Fatigue drops to 0, but his Harm increases to 1. He is wounded but suddenly clear-headed, ready to fight back.</p>
+<blockquote>
+<p><strong>The Roller-Coaster Effect</strong></p>
+<p><strong>Taking Harm clears Fatigue temporarily</strong> – the shock of a wound can jolt a character back into action. This creates a natural "roller coaster" of tension:</p>
+<p><em>Example:</em> Henry is at Fatigue 3 (Desperate, –2 dice). A goblin stabs him for Harm 1. The Harm conversion procedure: first convert Harm <span class="math inline">\(\rightarrow\)</span> Fatigue (none, light armor), then apply remaining Harm – which clears all Fatigue. Henry’s Fatigue drops to 0, but his Harm increases to 1. He is wounded but suddenly clear-headed, ready to fight back.</p>
 <p>Use this effect to create dramatic swings: a character near collapse who takes a wound and finds a second wind. It keeps combat unpredictable and rewards players who embrace risk.</p>
-</div>
+</blockquote>
+<section class="level4" id="subsec:fatigue-effects">
 <h3>Fatigue Effects</h3>
-<p>Each point of Fatigue worsens the character's <strong>Position</strong> by one step (Dominant → Controlled → Desperate). If already Desperate, each additional Fatigue instead imposes a <strong>−1 die penalty</strong> on all rolls. Penalties from Fatigue and Harm <strong>stack</strong>.</p>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<thead><tr><th>Fatigue Level</th><th>Effect</th></tr></thead>
+<p>Each point of Fatigue worsens the character’s <strong>Position</strong> by one step (Dominant <span class="math inline">\(\rightarrow\)</span> Controlled <span class="math inline">\(\rightarrow\)</span> Desperate). If already Desperate, each additional Fatigue instead imposes a <strong>–1 die penalty</strong> on all rolls. Penalties from Fatigue and Harm <strong>stack</strong>.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:fatigue-effects">
+<caption>Fatigue progression and associated mechanical effects</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Fatigue Level</strong></th>
+<th style="text-align: left;"><strong>Effect</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>1</td><td>Position worsens one step (Dominant → Controlled → Desperate)</td></tr>
-<tr><td>2</td><td>If already Desperate, −1 die; otherwise Position worsens</td></tr>
-<tr><td>3</td><td>−2 dice (if already Desperate from Fatigue)</td></tr>
-<tr><td>4+</td><td>Collapse, KO, or spiritual break (incapacitated)</td></tr>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Position worsens one step (Dominant <span class="math inline">\(\rightarrow\)</span> Controlled <span class="math inline">\(\rightarrow\)</span> Desperate)</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">If already Desperate, –1 die; otherwise Position worsens</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">–2 dice (if already Desperate from Fatigue)</td>
+</tr>
+<tr>
+<td style="text-align: left;">4+</td>
+<td style="text-align: left;">Collapse, KO, or spiritual break (incapacitated)</td>
+</tr>
 </tbody>
 </table></div>
-</div>
+</section>
+<section class="level4" id="subsec:fatigue-clear">
 <h3>Clearing Fatigue</h3>
 <p>Recovery requires genuine respite:</p>
 <ul>
-<li>A <strong>short rest</strong> (quiet watch, food/water) removes <strong>2 Fatigue</strong>.</li>
-<li>A <strong>full night's rest</strong> in safety removes <strong>all Fatigue</strong>.</li>
-<li>Fatigue cannot be removed while the party is at <em>Dangerous</em> or <em>Empty</em> Supply.</li>
-<li>Medical attention (<strong>Presence + Craft</strong>, DV 2) during downtime can remove an additional 1 Fatigue.</li>
+<li><p>A <strong>short rest</strong> (quiet watch, food/water) removes <strong>2 Fatigue</strong>.</p></li>
+<li><p>A <strong>full night’s rest</strong> in safety removes <strong>all Fatigue</strong>.</p></li>
+<li><p>Fatigue cannot be removed while the party is at <em>Dangerous</em> or <em>Empty</em> Supply.</p></li>
+<li><p>Medical attention (<strong>Presence + Craft</strong>, DV 2) during downtime can remove an additional 1 Fatigue.</p></li>
 </ul>
-<p><strong>Narrative note:</strong> Fatigue is not only physical — it can reflect mental strain, grief, or spiritual exhaustion. A failed ritual might leave a caster at Fatigue 2 from metaphysical backlash alone.</p>
-<h3>Fatigue → Harm Conversion</h3>
+<section class="level6" id="narrative-note">
+<h5>Narrative note:</h5>
+<p>Fatigue is not only physical – it can reflect mental strain, grief, or spiritual exhaustion. A failed ritual might leave a caster at Fatigue 2 from metaphysical backlash alone.</p>
+</section>
+</section>
+<section class="level4" id="subsec:fatigue-harm">
+<h3>Fatigue <span class="math inline">\(\rightarrow\)</span> Harm Conversion</h3>
 <p>Each character has a Fatigue track equal to their <strong>Body</strong> attribute. When the track fills:</p>
 <ol>
-<li>Increase <strong>Harm</strong> by one level (0→Harm 1, Harm 1→Harm 2, Harm 2→Harm 3).</li>
-<li>Clear all Fatigue.</li>
+<li><p>Increase <strong>Harm</strong> by one level (0<span class="math inline">\(\rightarrow\)</span>Harm 1, Harm 1<span class="math inline">\(\rightarrow\)</span>Harm 2, Harm 2<span class="math inline">\(\rightarrow\)</span>Harm 3).</p></li>
+<li><p>Clear all Fatigue.</p></li>
 </ol>
-<p>This conversion can occur multiple times in a scene. (See the <em>Player's Guide</em> for full Harm rules.)</p>
-<h2 id="obligation">Obligation: The Weight of Oaths</h2>
-<blockquote>"The debt that is never called is the one that compounds in silence. The road remembers. The Hollow collects."
-<span class="attribution">— The Gray Wanderer</span></blockquote>
-<h3>What Is Obligation?</h3>
-<p><strong>Obligation</strong> is the mechanical representation of a character's debts—the weight of promises made, favors accepted, and powers borrowed. It is not a punishment. It is a promise of future story.</p>
-<p>In Fate's Edge, power is never free. When you invoke a Patron's Rite, accept a terrestrial patron's favor, or swear an oath that binds your fate, you mark Obligation. This debt is not a penalty—it is narrative fuel. It ensures that every gain has a cost, every alliance has a price, and every choice has consequences.</p>
-<div class="panel panel-purple">
-<div class="panel-title">The Philosophy of Debt</div>
-<p><strong>Why Obligation Matters:</strong></p>
-<ul>
-<li><strong>Power Has Cost:</strong> Every Rite, every favor, every Asset gained through patronage is a thread in a web of obligation.</li>
-<li><strong>Story Fuel:</strong> A full Obligation timer is not a punishment—it's an adventure hook. <em>Your Patron has a task for you.</em></li>
-<li><strong>Mechanical Weight:</strong> Obligation creates meaningful choices. <em>Can you afford to invoke another Rite, or are you already over capacity?</em></li>
-<li><strong>Narrative Density:</strong> Debt creates relationships. <em>Who do you owe? What do they want?</em></li>
-</ul>
+<p>This conversion can occur multiple times in a scene. (See the <em>Player’s Guide</em> for full Harm rules.)</p>
+</section>
+</section>
+<section class="level3" id="obligation-the-weight-of-oaths">
+<h2 id="reader-section-4-section-section-section">Obligation: The Weight of Oaths</h2>
+<div class="center">
+<p><em>"The debt that is never called is the one that compounds in silence. The road remembers. The Hollow collects."</em> — The Gray Wanderer</p>
 </div>
+</section>
+<section class="level3" id="what-is-obligation">
+<h2 id="reader-section-5-section-section-section">What Is Obligation?</h2>
+<p><strong>Obligation</strong> is the mechanical representation of a character’s debts—the weight of promises made, favors accepted, and powers borrowed. It is not a punishment. It is a promise of future story.</p>
+<p>In Fate’s Edge, power is never free. When you invoke a Patron’s Rite, accept a terrestrial patron’s favor, or swear an oath that binds your fate, you mark <span class="smallcaps">Obligation</span>. This debt is not a penalty—it is narrative fuel. It ensures that every gain has a cost, every alliance has a price, and every choice has consequences.</p>
+<blockquote>
+<p> <strong>Why Obligation Matters:</strong></p>
+<ul>
+<li><p><strong>Power Has Cost:</strong> Every Rite, every favor, every Asset gained through patronage is a thread in a web of obligation.</p></li>
+<li><p><strong>Story Fuel:</strong> A full Obligation timer is not a punishment—it’s an adventure hook. <em>Your Patron has a task for you.</em></p></li>
+<li><p><strong>Mechanical Weight:</strong> Obligation creates meaningful choices. <em>Can you afford to invoke another Rite, or are you already over capacity?</em></p></li>
+<li><p><strong>Narrative Density:</strong> Debt creates relationships. <em>Who do you owe? What do they want?</em></p></li>
+</ul>
+</blockquote>
+<section class="level4" id="what-obligation-represents">
 <h3>What Obligation Represents</h3>
-<p>Obligation is the currency of <em>being owed</em>. It represents:</p>
+<p><span class="smallcaps">Obligation</span> is the currency of <em>being owed</em>. It represents:</p>
 <ul>
-<li><strong>Patron Attention:</strong> The gods, spirits, and ancient powers of the world have noticed you. They have invested in you. They expect a return.</li>
-<li><strong>Faction Loyalty:</strong> A terrestrial patron (a noble house, a guild, a crime syndicate) has provided resources. They expect service in return.</li>
-<li><strong>Personal Debt:</strong> A character owes a favor, a promise, or a debt of honor.</li>
+<li><p><strong>Patron Attention:</strong> The gods, spirits, and ancient powers of the world have noticed you. They have invested in you. They expect a return.</p></li>
+<li><p><strong>Faction Loyalty:</strong> A terrestrial patron (a noble house, a guild, a crime syndicate) has provided resources. They expect service in return.</p></li>
+<li><p><strong>Personal Debt:</strong> A character owes a favor, a promise, or a debt of honor.</p></li>
 </ul>
-<p><strong>Important:</strong> Obligation is <em>not</em> a resource to hoard. It is a narrative lever. When your Obligation is high, your GM has hooks to pull. Embrace it—those hooks lead to adventure.</p>
-<h2 id="tracking-obligation">Tracking Obligation</h2>
+<p> <strong>Important:</strong> <span class="smallcaps">Obligation</span> is <em>not</em> a resource to hoard. It is a narrative lever. When your <span class="smallcaps">Obligation</span> is high, your GM has hooks to pull. Embrace it—those hooks lead to adventure.</p>
+</section>
+</section>
+<section class="level3" id="tracking-obligation">
+<h2 id="reader-section-6-section-section-section">Tracking Obligation</h2>
+<section class="level4" id="capacity">
 <h3>Capacity</h3>
-<p>A character's <strong>Obligation Capacity</strong> is:</p>
-<blockquote>Capacity = Spirit + Presence</blockquote>
-<p>This represents the total Obligation a character can carry across all Patrons, terrestrial patrons, and other debts before the ledger begins to creak.</p>
-<div class="panel">
-<div class="panel-title">Obligation Capacity Examples</div>
-<div class="table-wrap">
+<p>A character’s <strong>Obligation Capacity</strong> is:</p>
+<p><span class="math display">\[\text{Capacity} = \text{Spirit} + \text{Presence}\]</span></p>
+<p>This represents the total <span class="smallcaps">Obligation</span> a character can carry across all Patrons, terrestrial patrons, and other debts before the ledger begins to creak.</p>
+<blockquote>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<thead><tr><th>Spirit</th><th>Presence</th><th>Capacity</th><th>Notes</th></tr></thead>
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Spirit</strong></th>
+<th style="text-align: center;"><strong>Presence</strong></th>
+<th style="text-align: center;"><strong>Capacity</strong></th>
+<th style="text-align: center;"><strong>Notes</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>1</td><td>1</td><td>2</td><td>Minimal—one Rite and you're at capacity</td></tr>
-<tr><td>2</td><td>1</td><td>3</td><td>Can invoke three Low Rites before strain</td></tr>
-<tr><td>3</td><td>2</td><td>5</td><td>A dedicated Runekeeper's typical capacity</td></tr>
-<tr><td>4</td><td>3</td><td>7</td><td>A seasoned invoker with social connections</td></tr>
-<tr><td>5</td><td>5</td><td>10</td><td>A legendary figure with immense will and influence</td></tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">Minimal—one Rite and you’re at capacity</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Can invoke three Low Rites before strain</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">A dedicated Runekeeper’s typical capacity</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">A seasoned invoker with social connections</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">A legendary figure with immense will and influence</td>
+</tr>
 </tbody>
 </table></div>
-</div>
-</div>
+</blockquote>
+</section>
+<section class="level4" id="marking-obligation">
 <h3>Marking Obligation</h3>
-<p>When a character takes on a debt, they mark Obligation in one of several ways:</p>
+<p>When a character takes on a debt, they mark <span class="smallcaps">Obligation</span> in one of several ways:</p>
 <ul>
-<li><strong>Invoking a Rite (Runekeeper):</strong> Mark the Rite's listed Obligation cost.</li>
-<li><strong>Pushing a Rite:</strong> Mark an additional +1 Obligation for amplified effect.</li>
-<li><strong>Cracking the Seal (Invoker):</strong> Mark double the Rite's base cost.</li>
-<li><strong>Accepting a Terrestrial Favor:</strong> Mark +1 Obligation per favor accepted.</li>
-<li><strong>Acquiring an Asset through Patronage:</strong> mark Obligation equal to the Asset's tier — Minor 1, Standard 2, Major 3, unique 4 — plus 1 if it sits at the very top of what that patron's Rank can reach.</li>
+<li><p><strong>Invoking a Rite (Runekeeper):</strong> Mark the Rite’s listed <span class="smallcaps">Obligation</span> cost.</p></li>
+<li><p><strong>Pushing a Rite:</strong> Mark an additional +1 <span class="smallcaps">Obligation</span> for amplified effect.</p></li>
+<li><p><strong>Cracking the Seal (Invoker):</strong> Mark double the Rite’s base cost.</p></li>
+<li><p><strong>Accepting a Terrestrial Favor:</strong> Mark +1 <span class="smallcaps">Obligation</span> per favor accepted.</p></li>
+<li><p><strong>Acquiring an Asset through Patronage:</strong> Mark <span class="smallcaps">Obligation</span> equal to the Asset’s value tier (Minor: 1, Standard: 2, Major: 3).</p></li>
 </ul>
-<div class="panel">
-<div class="panel-title">Example: Kestra's Obligation</div>
-<p>Kestra (Spirit 3, Presence 1, Capacity 4) invokes a Low Rite of the Traveler (Obligation: 1). She now has 1 Obligation. She later pushes a Rite (additional +1), bringing her to 2. She still has capacity for two more Rites. Later, she invokes a Standard Rite (Obligation: 2), bringing her to 4—exactly at capacity. If she invokes one more Rite, she will exceed capacity and mark Fatigue.</p>
-</div>
+<blockquote>
+<p> Kestra (Spirit 3, Presence 1, Capacity 4) invokes a Low Rite of the Traveler (<span class="smallcaps">Obligation</span>: 1). She now has 1 <span class="smallcaps">Obligation</span>. She later pushes a Rite (additional +1), bringing her to 2. She still has capacity for two more Rites. Later, she invokes a Standard Rite (<span class="smallcaps">Obligation</span>: 2), bringing her to 4—exactly at capacity. If she invokes one more Rite, she will exceed capacity and mark Fatigue.</p>
+</blockquote>
+</section>
+<section class="level4" id="exceeding-capacity">
 <h3>Exceeding Capacity</h3>
-<p>When a character's total Obligation exceeds their Capacity:</p>
+<p>When a character’s total <span class="smallcaps">Obligation</span> exceeds their Capacity:</p>
 <ol>
-<li><strong>Mark Fatigue:</strong> For each segment over Capacity, the character marks 1 Fatigue.</li>
-<li><strong>No Further Rites:</strong> The character cannot invoke additional Rites or accept additional favors until Obligation is reduced.</li>
-<li><strong>Patron Intrusion (Double Capacity):</strong> If the character exceeds double their Capacity, clear all Fatigue, mark Harm 1, and trigger a <strong>Patron Intrusion</strong>—a narrative demand from the Patron.</li>
+<li><p><strong>Mark Fatigue:</strong> For each segment over Capacity, the character marks 1 Fatigue.</p></li>
+<li><p><strong>No Further Rites:</strong> The character cannot invoke additional Rites or accept additional favors until <span class="smallcaps">Obligation</span> is reduced.</p></li>
+<li><p><strong>Patron Intrusion (Double Capacity):</strong> If the character exceeds double their Capacity, clear all Fatigue, mark Harm 1, and trigger a <strong>Patron Intrusion</strong>—a narrative demand from the Patron.</p></li>
 </ol>
-<div class="panel">
-<div class="panel-title">Obligation Overflow Example</div>
-<p><strong>Example:</strong> Kestra has Capacity 4 and currently has 4 Obligation. She invokes another Rite, bringing her to 5. She marks 1 Fatigue (the strain of exceeding her capacity). If she later invokes a third Rite beyond capacity, bringing her to 6 (double her Capacity of 4 is 8, so she's not at double yet), she marks another Fatigue. If she reaches 8, she triggers a Patron Intrusion—the Traveler demands a task.</p>
-</div>
-<h2 id="clearing-obligation">Clearing Obligation</h2>
-<p>Obligation is cleared through meaningful engagement with the Patron or faction to whom the debt is owed. This is not accounting—it is story.</p>
+<blockquote>
+<p> <strong>Example:</strong> Kestra has Capacity 4 and currently has 4 <span class="smallcaps">Obligation</span>. She invokes another Rite, bringing her to 5. She marks 1 Fatigue (the strain of exceeding her capacity). If she later invokes a third Rite beyond capacity, bringing her to 6 (double her Capacity of 4 is 8, so she’s not at double yet), she marks another Fatigue. If she reaches 8, she triggers a Patron Intrusion—the Traveler demands a task.</p>
+</blockquote>
+</section>
+</section>
+<section class="level3" id="clearing-obligation">
+<h2 id="reader-section-7-section-section-section">Clearing Obligation</h2>
+<p><span class="smallcaps">Obligation</span> is cleared through meaningful engagement with the Patron or faction to whom the debt is owed. This is not accounting—it is story.</p>
+<section class="level4" id="acts-of-service">
 <h3>Acts of Service</h3>
-<p>A character may clear Obligation by performing an <strong>Act of Service</strong> for their Patron or terrestrial patron. The Act must align with the Patron's themes.</p>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Acts of Service by Patron</caption>
-<thead><tr><th>Patron</th><th>Theme</th><th>Example Act of Service</th></tr></thead>
-<tbody>
-<tr><td>The Traveler</td><td>Ways, Journeys</td><td>Guide a lost traveler to safety; repair a broken milestone; leave an offering at a crossroads.</td></tr>
-<tr><td>Oath of Flame &amp; Light</td><td>Dawn, Vows, Protection</td><td>Swear a public vow; consecrate a threshold; defend the innocent.</td></tr>
-<tr><td>Inaea</td><td>Webs, Mercy, Connection</td><td>Mend a broken relationship; tie a red thread at a threshold; offer comfort to the grieving.</td></tr>
-<tr><td>The Witness</td><td>Truth, Memory, Revelation</td><td>Expose a lie; record a forgotten truth; correct an error in a record.</td></tr>
-<tr><td>Ikasha</td><td>Shadow, Secrets, Thresholds</td><td>Hide a secret; protect a fugitive; leave no trace of your passing.</td></tr>
-<tr><td>The Carrion King</td><td>Decay, Renewal</td><td>Tend to the dying; bury the dead; compost something that others discard.</td></tr>
-<tr><td>Grimmir</td><td>Seasons, Nature, Sacrifice</td><td>Plant a tree; make an offering of blood; honor the turning of the seasons.</td></tr>
-<tr><td>Mykkiel</td><td>Law, Covenant, Zeal</td><td>Enforce a just law; witness an oath; correct an injustice.</td></tr>
-<tr><td>Malachai</td><td>Curses, Corruption</td><td>Lay a curse on a deserving target; accept a cursed gift; break a chain.</td></tr>
-</tbody>
-</table></div>
-</div>
+<p>A character may clear <span class="smallcaps">Obligation</span> by performing an <strong>Act of Service</strong> for their Patron or terrestrial patron. The Act must align with the Patron’s themes.</p>
+</section>
+<section class="level4" id="downtime-clearing">
 <h3>Downtime Clearing</h3>
-<p>During downtime (see Chapter 9), a character may clear Obligation through one of the following methods:</p>
+<p>During downtime (see Chapter 11 of the Player’s Guide), a character may clear <span class="smallcaps">Obligation</span> through one of the following methods:</p>
 <ul>
-<li><strong>Off-Screen Service (Clears 1 segment):</strong> The character describes an Act of Service performed between sessions. No roll required.</li>
-<li><strong>On-Screen Scene (Clears 1-2 segments):</strong> The character plays out an Act of Service during a session. The GM may call for a roll if the task is challenging.</li>
-<li><strong>XP Payment (Clears 2 segments):</strong> The character spends 2 XP to clear 2 segments of Obligation. This represents dedicating time and resources to fulfilling the debt.</li>
+<li><p><strong>Off-Screen Service (Clears 1 segment):</strong> The character describes an Act of Service performed between sessions. No roll required.</p></li>
+<li><p><strong>On-Screen Scene (Clears 1-2 segments):</strong> The character plays out an Act of Service during a session. The GM may call for a roll if the task is challenging.</p></li>
+<li><p><strong>XP Payment (Clears 2 segments):</strong> The character spends 2 <span class="smallcaps">XP</span> to clear 2 segments of <span class="smallcaps">Obligation</span>. This represents dedicating time and resources to fulfilling the debt.</p></li>
 </ul>
+</section>
+<section class="level4" id="focused-devotion-talent">
 <h3>Focused Devotion (Talent)</h3>
-<p>The <strong>Focused Devotion</strong> talent (3-5 XP) allows a character to clear 1 segment of Obligation by spending 1 Boon during a scene. This represents a moment of focused prayer, meditation, or devotion to the Patron.</p>
-<h2 id="patron-intrusions">Patron Intrusions</h2>
-<p>When a character's Obligation reaches critical mass (exceeding double Capacity), or when the GM spends SB on a narrative twist, a <strong>Patron Intrusion</strong> occurs. This is not a punishment—it is a story hook.</p>
+<p>The <strong>Focused Devotion</strong> talent (3-5 XP) allows a character to clear 1 segment of <span class="smallcaps">Obligation</span> by spending 1 <span class="smallcaps">Boon</span> during a scene. This represents a moment of focused prayer, meditation, or devotion to the Patron.</p>
+</section>
+</section>
+<section class="level3" id="patron-intrusions">
+<h2 id="reader-section-8-section-section-section">Patron Intrusions</h2>
+<p>When a character’s <span class="smallcaps">Obligation</span> reaches critical mass (exceeding double Capacity), or when the GM spends <span class="smallcaps">SB</span> on a narrative twist, a <strong>Patron Intrusion</strong> occurs. This is not a punishment—it is a story hook.</p>
+<section class="level4" id="what-a-patron-intrusion-looks-like">
 <h3>What a Patron Intrusion Looks Like</h3>
 <ul>
-<li><strong>The Patron Appears:</strong> The Patron appears in a dream, a vision, or through an intermediary. <em>"I have a task for you."</em></li>
-<li><strong>A Rival Servant Arrives:</strong> Another servant of the same Patron arrives to collect a debt or challenge your claim.</li>
-<li><strong>The Patron's Mark Becomes Visible:</strong> The Patron's symbol appears on your skin, your belongings, or your shadow. This may cause social trouble.</li>
-<li><strong>A Faction Makes a Demand:</strong> A terrestrial patron calls in a favor at the worst possible moment.</li>
-<li><strong>A Task Is Demanded:</strong> The Patron requires a specific service—a quest, a ritual, a sacrifice—before you may invoke further Rites.</li>
+<li><p><strong>The Patron Appears:</strong> The Patron appears in a dream, a vision, or through an intermediary. <em>"I have a task for you."</em></p></li>
+<li><p><strong>A Rival Servant Arrives:</strong> Another servant of the same Patron arrives to collect a debt or challenge your claim.</p></li>
+<li><p><strong>The Patron’s Mark Becomes Visible:</strong> The Patron’s symbol appears on your skin, your belongings, or your shadow. This may cause social trouble.</p></li>
+<li><p><strong>A Faction Makes a Demand:</strong> A terrestrial patron calls in a favor at the worst possible moment.</p></li>
+<li><p><strong>A Task Is Demanded:</strong> The Patron requires a specific service—a quest, a ritual, a sacrifice—before you may invoke further Rites.</p></li>
 </ul>
-<div class="panel">
-<div class="panel-title">Example: Patron Intrusion in Play</div>
-<p><strong>The Scenario:</strong> Kestra (Traveler's Runekeeper) has been invoking Rites recklessly. Her Obligation is at 8, which is double her Capacity of 4. The GM triggers a Patron Intrusion.</p>
-<p><strong>The GM says:</strong> "The Traveler appears in a dream. The road to Highpass is washed out, and a pilgrim family is trapped. Guide them safely, and clear 2 Obligation. Refuse, and mark Fatigue 2—the road will not open for you again until you do."</p>
-<p><strong>Kestra's Player:</strong> "I accept. The road has never failed me. I'll guide them."</p>
-<p><strong>The Result:</strong> Kestra gains a new adventure hook, a chance to clear Obligation, and a deeper relationship with her Patron.</p>
-</div>
+<blockquote>
+<p> <strong>The Scenario:</strong> Kestra (Traveler’s Runekeeper) has been invoking Rites recklessly. Her <span class="smallcaps">Obligation</span> is at 6, exceeding double her Capacity of 4. The GM triggers a Patron Intrusion.</p>
+<p><strong>The GM says:</strong> "The Traveler appears in a dream. The road to Highpass is washed out, and a pilgrim family is trapped. Guide them safely, and clear 2 <span class="smallcaps">Obligation</span>. Refuse, and mark Fatigue 2—the road will not open for you again until you do."</p>
+<p><strong>Kestra’s Player:</strong> "I accept. The road has never failed me. I’ll guide them."</p>
+<p><strong>The Result:</strong> Kestra gains a new adventure hook, a chance to clear <span class="smallcaps">Obligation</span>, and a deeper relationship with her Patron.</p>
+</blockquote>
+</section>
+<section class="level4" id="refusing-an-intrusion">
 <h3>Refusing an Intrusion</h3>
 <p>A character may refuse a Patron Intrusion. The consequences vary:</p>
 <ul>
-<li><strong>Minor Refusal (Patron Attention Wanes):</strong> The character loses the Patron's favor. They cannot invoke Rites or gain benefits from that Patron until they perform an Act of Service.</li>
-<li><strong>Major Refusal (Patron Wrath):</strong> The character gains a <strong>Patron's Curse</strong> (a Condition that imposes penalties until resolved) or gains 2 Fatigue. The Patron will not accept further invocations until the curse is lifted.</li>
+<li><p><strong>Minor Refusal (Patron Attention Wanes):</strong> The character loses the Patron’s favor. They cannot invoke Rites or gain benefits from that Patron until they perform an Act of Service.</p></li>
+<li><p><strong>Major Refusal (Patron Wrath):</strong> The character gains a <strong>Patron’s Curse</strong> (a Condition that imposes penalties until resolved) or gains 2 Fatigue. The Patron will not accept further invocations until the curse is lifted.</p></li>
 </ul>
-<h2 id="terrestrial-mortal">Terrestrial Patrons: Mortal Obligation</h2>
-<p>Not all Obligation flows to cosmic entities. Terrestrial patrons—noble houses, crime syndicates, merchant leagues—also collect debts.</p>
+</section>
+</section>
+<section class="level3" id="terrestrial-patrons-mortal-obligation">
+<h2 id="reader-section-9-section-section-section">Terrestrial Patrons: Mortal Obligation</h2>
+<p>Not all <span class="smallcaps">Obligation</span> flows to cosmic entities. Terrestrial patrons—noble houses, crime syndicates, merchant leagues—also collect debts.</p>
+<section class="level4" id="how-terrestrial-obligation-works">
 <h3>How Terrestrial Obligation Works</h3>
 <ul>
-<li><strong>Capacity:</strong> The same as supernatural Obligation (Spirit + Presence).</li>
-<li><strong>Marking:</strong> Accepting a favor, Asset, or protection from a terrestrial patron marks +1 Obligation to that patron.</li>
-<li><strong>Clearing:</strong> Perform tasks for the patron: Minor task (clears 1), Significant task (clears 2), Major task (clears 3+).</li>
-<li><strong>Overflow:</strong> Exceeding capacity causes Fatigue, just as with supernatural Patrons.</li>
+<li><p><strong>Capacity:</strong> The same as supernatural <span class="smallcaps">Obligation</span> (Spirit + Presence).</p></li>
+<li><p><strong>Marking:</strong> Accepting a favor, Asset, or protection from a terrestrial patron marks +1 <span class="smallcaps">Obligation</span> to that patron.</p></li>
+<li><p><strong>Clearing:</strong> Perform tasks for the patron: Minor task (clears 1), Significant task (clears 2), Major task (clears 3+).</p></li>
+<li><p><strong>Overflow:</strong> Exceeding capacity causes Fatigue, just as with supernatural Patrons.</p></li>
 </ul>
-<div class="panel">
-<div class="panel-title">Example: Terrestrial Patron Obligation</div>
-<p><strong>The Scenario:</strong> The party owes Obligation to House Contarini (Vilikari nobility). They have accepted a safehouse (Minor Asset, 1 Obligation) and a forged charter (Standard Asset, 2 Obligation). Total: 3 Obligation to House Contarini.</p>
-<p><strong>The Demand:</strong> That is 3 Obligation against a Capacity of 3 — full, but not yet over. One more favor tips it, and House Contarini would rather collect first. The GM triggers a terrestrial patron intrusion: "A Contarini factor arrives with a demand. The house needs a message delivered to the Valvano Ford—by dawn. Refuse, and the safehouse is reclaimed."</p>
-<p><strong>The Choice:</strong> The party can accept the task (clearing 2 Obligation if successful) or refuse (losing the safehouse and gaining a Black Mark with the house).</p>
-</div>
-<h2 id="blood-silk">Obligation in the Blood and Silk Trilogy</h2>
-<p>Obligation is a central theme in the Blood and Silk campaign arc.</p>
-<h3>The Velvet War</h3>
-<p>In the prequel, Old Kes's betrayal is driven by Obligation—Livaea's <strong>Unrefusable Offer</strong> compelled him to betray the Silk Coin. The player characters inherit this debt: the exiles carry the weight of Kes's broken oath into the main campaign.</p>
-<h3>Blood and Silk</h3>
-<p>In Millhaven, the party gains Obligation to the villagers through their actions—and the village gains Obligation to the party. This mutual debt is the foundation of community.</p>
-<h3>Beyond Millhaven</h3>
-<p>At the Valvano Ford, Obligation becomes a currency of peace. The three factions cannot move forward until their debts are acknowledged and paid. The party's success comes not from force, but from balancing ledgers.</p>
-<h3>The Bronze Gate</h3>
-<p>The Iron Seal of Varus is a broken Obligation made solid. The Ninth Legion's commander swore an oath and broke it—and the curse is the interest. Breaking the curse requires either fulfilling the oath or forgiving the debt.</p>
-<h2 id="player-facing-obligation">Player-Facing Obligation</h2>
-<p>As a player, Obligation is your guide to story. When you mark Obligation, you are not being penalized—you are inviting adventure.</p>
-<h3>What to Do With Obligation</h3>
-<ul>
-<li><strong>Embrace It:</strong> A full Obligation timer means your Patron is about to give you a quest. That quest is a session hook.</li>
-<li><strong>Clear It Through Story:</strong> Acts of Service are not chores—they are scenes. Describe how you honor your Patron.</li>
-<li><strong>Don't Hoard:</strong> Obligation is not a resource to be minimized. It is a source of narrative weight.</li>
-<li><strong>Use It for Leverage:</strong> A terrestrial patron's Obligation can be called in at strategic moments. <em>"I remind the factor that I once carried a message for him."</em></li>
-</ul>
-<h3>Intent: How to Approach Obligation</h3>
-<blockquote>"Obligation is not a tax. It is a door. Walk through it."</blockquote>
-<p>When you invoke a Rite or accept a favor, consider:</p>
-<ul>
-<li><strong>What story am I inviting?</strong> Your Obligation is a promise of future adventure. What kind of adventure do you want?</li>
-<li><strong>Who do I want to owe?</strong> Your Obligation is a relationship. Which Patron or faction do you want to deepen your connection with?</li>
-<li><strong>What am I willing to pay?</strong> Obligation is a cost, but it is also an investment. What are you willing to sacrifice for power?</li>
-</ul>
-<h2 id="gm-facing-obligation">GM-Facing Obligation</h2>
-<p>As a GM, Obligation is your primary tool for ensuring that power has weight and choices have consequences.</p>
-<h3>How to Use Obligation</h3>
-<ul>
-<li><strong>Track It Visibly:</strong> Let players see their Obligation totals. The tension of a nearing capacity is a pressure in itself.</li>
-<li><strong>Call It In:</strong> When Obligation is high, trigger intrusions. These are not punishments—they are story hooks.</li>
-<li><strong>Make Acts of Service Meaningful:</strong> When a player clears Obligation, describe the Act of Service. Make it a scene. Let it matter.</li>
-<li><strong>Use It to Create Conflict:</strong> Multiple Obligation tracks can create hard choices. <em>"Your Patron demands a task, but your terrestrial patron demands the opposite. Which debt do you honor?"</em></li>
-</ul>
-<h3>Obligation as Story Engine</h3>
-<blockquote>"The debt that is never called is the one that compounds in silence."</blockquote>
-<p>When your players have Obligation, you have hooks. Use them:</p>
-<ul>
-<li><strong>Patron Intrusions:</strong> These are free adventure seeds. <em>"Your Patron appears in a dream. The temple of the Forgotten Road has been desecrated. Purify it."</em></li>
-<li><strong>Faction Tension:</strong> Obligation to multiple factions creates natural drama. <em>"The House Contarini demands you deliver a message to the Valvano Ford—but the Ykrul have closed the pass."</em></li>
-<li><strong>Legacy Consequences:</strong> Obligation carries forward. A debt incurred in Millhaven may come due in the Bronze Gate.</li>
-</ul>
-<h2 id="ninth-taboo">The Ninth Taboo and Obligation</h2>
-<p>In Acasia and beyond, the Ninth Taboo is a form of Obligation—a debt to the land itself.</p>
-<h3>The Hollow's Attention</h3>
-<p>The Hollow's Attention timer (Chapter 10) is a form of Obligation to the Curse of Acasia. When the timer fills, the Hollow manifests as an Oath-Keeper and demands payment.</p>
-<h3>Breaking Customs</h3>
-<p>When a character knowingly breaks an Acasian custom (pours a ninth cup, takes a ninth step, speaks a ninth name), they mark Obligation to the Hollow. This is not a separate track—it is a narrative debt. The Hollow will collect.</p>
-<h2 id="obligation-summary">Summary: Obligation at a Glance</h2>
-<div class="table-wrap">
+<blockquote>
+<p> <strong>The Scenario:</strong> The party owes <span class="smallcaps">Obligation</span> to House Contarini (Vilikari nobility). They have accepted a safehouse (Minor Asset, 1 <span class="smallcaps">Obligation</span>) and a forged charter (Standard Asset, 2 <span class="smallcaps">Obligation</span>). Total: 3 <span class="smallcaps">Obligation</span> to House Contarini.</p>
+<p><strong>The Demand:</strong> The party’s <span class="smallcaps">Obligation</span> to House Contarini is at 3 of 4 (exceeding Capacity 3). The GM triggers a terrestrial patron intrusion: "A Contarini factor arrives with a demand. The house needs a message delivered to the Valvano Ford—by dawn. Refuse, and the safehouse is reclaimed."</p>
+<p><strong>The Choice:</strong> The party can accept the task (clearing 2 <span class="smallcaps">Obligation</span> if successful) or refuse (losing the safehouse and gaining a Black Mark with the house).</p>
+</blockquote>
+</section>
+<section class="level4" id="rank-what-a-patron-can-reach">
+<h3>Rank: What a Patron Can Reach</h3>
+<p>A terrestrial patron’s <strong>Rank</strong> says how far their arm goes: how many Assets they can carry for you, how large those Assets may be, and how much debt they will let you run up before they come collecting.</p>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Obligation Quick Reference</caption>
-<thead><tr><th>Concept</th><th>Mechanics</th></tr></thead>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Rank</strong></th>
+<th style="text-align: left;"><strong>Reach</strong></th>
+<th style="text-align: left;"><strong>Debt Ceiling</strong></th>
+<th style="text-align: left;"><strong>Asset Slots</strong></th>
+<th style="text-align: left;"><strong>Largest Asset</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>Capacity</td><td>Spirit + Presence</td></tr>
-<tr><td>Marking</td><td>Invoke Rite (+1), Push (+1), Crack the Seal (+2), Accept Favor (+1)</td></tr>
-<tr><td>Exceeding Capacity</td><td>1 Fatigue per segment over</td></tr>
-<tr><td>Double Capacity</td><td>Clear Fatigue, mark Harm 1, trigger Patron Intrusion</td></tr>
-<tr><td>Clearing (Service)</td><td>Act of Service (1-3 segments)</td></tr>
-<tr><td>Clearing (Downtime)</td><td>Off-screen (1), On-screen (1-2), XP (2 segments for 2 XP)</td></tr>
-<tr><td>Clearing (Talent)</td><td>Focused Devotion: 1 Boon for 1 segment</td></tr>
-<tr><td>Patron Intrusion</td><td>Quest, demand, rival, or omen</td></tr>
-<tr><td>Terrestrial Patrons</td><td>Same mechanics, narrative consequences</td></tr>
-<tr><td>The Ninth Taboo</td><td>Breaking customs marks Obligation to the Hollow</td></tr>
+<tr>
+<td style="text-align: left;"><strong>Street</strong> (a guild steward, a local crime boss, a hedge-court judge)</td>
+<td style="text-align: left;">A neighborhood, a hall, one canton</td>
+<td style="text-align: left;">3–4 segments</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Minor (4 XP)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>City</strong> (a noble house factor, a syndicate capo, a temple prefect)</td>
+<td style="text-align: left;">One city and what feeds it</td>
+<td style="text-align: left;">5–6 segments</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Standard (8 XP)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Regional</strong> (a duchy spymaster, a merchant prince, a coven leader)</td>
+<td style="text-align: left;">Several provinces</td>
+<td style="text-align: left;">7–8 segments</td>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Major (12 XP)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Imperial</strong> (an archduke, a syndicate master, a high priest)</td>
+<td style="text-align: left;">Across the Amaranthine</td>
+<td style="text-align: left;">8+ segments</td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Major, or something unique</td>
+</tr>
 </tbody>
 </table></div>
+<p><em>Debt Ceiling</em> is how much this patron will let accumulate before they collect — a measure of their reach, not of you. Your own <strong>Obligation Capacity is Spirit + Presence</strong>, always, exactly as for a supernatural Patron; exceeding it costs 1 Fatigue per segment over.</p>
+</section>
+<section class="level4" id="what-an-asset-costs-in-obligation">
+<h3>What an Asset Costs in Obligation</h3>
+<p>When a patron grants an Asset or a Follower for Obligation rather than XP, the cost is <strong>the thing’s tier</strong>: Minor 1, Standard 2, Major 3, unique 4. Followers ride the same ladder — a Cap 2 counts as Minor, a Cap 3 as Standard.</p>
+<p><strong>One modifier, and it is the interesting one.</strong> If what you are asking for sits at the very top of what that patron’s Rank can provide, <strong>add 1</strong>. It costs <em>them</em>, so it costs you. A Street patron scraping together a safehouse is spending real credit; a Regional one hands over the same safehouse without breaking eye contact.</p>
+<p>No patron can grant an Asset larger than their Rank allows, at any price. That is not a cost question — their arm does not reach.</p>
+</section>
+</section>
+<section class="level3" id="obligation-in-the-blood-and-silk-trilogy">
+<h2 id="reader-section-10-section-section-section">Obligation in the Blood and Silk Trilogy</h2>
+<p><span class="smallcaps">Obligation</span> is a central theme in the Blood and Silk campaign arc.</p>
+<section class="level4" id="the-velvet-war">
+<h3>The Velvet War</h3>
+<p>In the prequel, Old Kes’s betrayal is driven by <span class="smallcaps">Obligation</span>—Livaea’s <strong>Unrefusable Offer</strong> compelled him to betray the Silk Coin. The player characters inherit this debt: the exiles carry the weight of Kes’s broken oath into the main campaign.</p>
+</section>
+<section class="level4" id="blood-and-silk">
+<h3>Blood and Silk</h3>
+<p>In Millhaven, the party gains <span class="smallcaps">Obligation</span> to the villagers through their actions—and the village gains <span class="smallcaps">Obligation</span> to the party. This mutual debt is the foundation of community.</p>
+</section>
+<section class="level4" id="beyond-millhaven">
+<h3>Beyond Millhaven</h3>
+<p>At the Valvano Ford, <span class="smallcaps">Obligation</span> becomes a currency of peace. The three factions cannot move forward until their debts are acknowledged and paid. The party’s success comes not from force, but from balancing ledgers.</p>
+</section>
+<section class="level4" id="the-bronze-gate">
+<h3>The Bronze Gate</h3>
+<p>The Iron Seal of Varus is a broken <span class="smallcaps">Obligation</span> made solid. The Ninth Legion’s commander swore an oath and broke it—and the curse is the interest. Breaking the curse requires either fulfilling the oath or forgiving the debt.</p>
+</section>
+</section>
+<section class="level3" id="player-facing-obligation">
+<h2 id="reader-section-11-section-section-section">Player-Facing Obligation</h2>
+<p>As a player, <span class="smallcaps">Obligation</span> is your guide to story. When you mark <span class="smallcaps">Obligation</span>, you are not being penalized—you are inviting adventure.</p>
+<section class="level4" id="what-to-do-with-obligation">
+<h3>What to Do With Obligation</h3>
+<ul>
+<li><p><strong>Embrace It:</strong> A full <span class="smallcaps">Obligation</span> timer means your Patron is about to give you a quest. That quest is a session hook.</p></li>
+<li><p><strong>Clear It Through Story:</strong> Acts of Service are not chores—they are scenes. Describe how you honor your Patron.</p></li>
+<li><p><strong>Don’t Hoard:</strong> <span class="smallcaps">Obligation</span> is not a resource to be minimized. It is a source of narrative weight.</p></li>
+<li><p><strong>Use It for Leverage:</strong> A terrestrial patron’s <span class="smallcaps">Obligation</span> can be called in at strategic moments. <em>"I remind the factor that I once carried a message for him."</em></p></li>
+</ul>
+</section>
+<section class="level4" id="intent-how-to-approach-obligation">
+<h3>Intent: How to Approach Obligation</h3>
+<div class="center">
+<p><em>"Obligation is not a tax. It is a door. Walk through it."</em></p>
 </div>
-<h2 id="obligation-final">Final Thought</h2>
-<p>Obligation is the heartbeat of Fate's Edge. It is the weight that makes choices matter, the thread that connects characters to the world, and the promise of story yet to come.</p>
-<p>Do not fear it. Embrace it. When your Obligation is high, your story is rich.</p>
-<blockquote>"The road is long. The debt is patient. Walk true."</blockquote>
-<h2 id="boons-gm">Boons: The Currency of Resilience</h2>
-<p>Boons are narrative tokens earned by embracing risk. They reward <em>failure with opportunity</em> — the silver lining in clouds of defeat.</p>
-<div class="panel panel-gold">
-<div class="panel-title">Why You Should Spend Boons — The Math of Fun</div>
-<p><strong>Hoarding Boons for XP conversion leads to less engagement and lower fun scores.</strong></p>
+<p> When you invoke a Rite or accept a favor, consider:</p>
+<ul>
+<li><p><strong>What story am I inviting?</strong> Your <span class="smallcaps">Obligation</span> is a promise of future adventure. What kind of adventure do you want?</p></li>
+<li><p><strong>Who do I want to owe?</strong> Your <span class="smallcaps">Obligation</span> is a relationship. Which Patron or faction do you want to deepen your connection with?</p></li>
+<li><p><strong>What am I willing to pay?</strong> <span class="smallcaps">Obligation</span> is a cost, but it is also an investment. What are you willing to sacrifice for power?</p></li>
+</ul>
+</section>
+</section>
+<section class="level3" id="gm-facing-obligation">
+<h2 id="reader-section-12-section-section-section">GM-Facing Obligation</h2>
+<p>As a GM, <span class="smallcaps">Obligation</span> is your primary tool for ensuring that power has weight and choices have consequences.</p>
+<section class="level4" id="how-to-use-obligation">
+<h3>How to Use Obligation</h3>
+<ul>
+<li><p><strong>Track It Visibly:</strong> Let players see their <span class="smallcaps">Obligation</span> totals. The tension of a nearing capacity is a pressure in itself.</p></li>
+<li><p><strong>Call It In:</strong> When <span class="smallcaps">Obligation</span> is high, trigger intrusions. These are not punishments—they are story hooks.</p></li>
+<li><p><strong>Make Acts of Service Meaningful:</strong> When a player clears <span class="smallcaps">Obligation</span>, describe the Act of Service. Make it a scene. Let it matter.</p></li>
+<li><p><strong>Use It to Create Conflict:</strong> Multiple <span class="smallcaps">Obligation</span> tracks can create hard choices. <em>"Your Patron demands a task, but your terrestrial patron demands the opposite. Which debt do you honor?"</em></p></li>
+</ul>
+</section>
+<section class="level4" id="obligation-as-story-engine">
+<h3>Obligation as Story Engine</h3>
+<div class="center">
+<p><em>"The debt that is never called is the one that compounds in silence."</em></p>
+</div>
+<p> When your players have <span class="smallcaps">Obligation</span>, you have hooks. Use them:</p>
+<ul>
+<li><p><strong>Patron Intrusions:</strong> These are free adventure seeds. <em>"Your Patron appears in a dream. The temple of the Forgotten Road has been desecrated. Purify it."</em></p></li>
+<li><p><strong>Faction Tension:</strong> <span class="smallcaps">Obligation</span> to multiple factions creates natural drama. <em>"The House Contarini demands you deliver a message to the Valvano Ford—but the Ykrul have closed the pass."</em></p></li>
+<li><p><strong>Legacy Consequences:</strong> <span class="smallcaps">Obligation</span> carries forward. A debt incurred in Millhaven may come due in the Bronze Gate.</p></li>
+</ul>
+</section>
+</section>
+<section class="level3" id="the-ninth-taboo-and-obligation">
+<h2 id="reader-section-13-section-section-section">The Ninth Taboo and Obligation</h2>
+<p>In Acasia and beyond, the Ninth Taboo is a form of <span class="smallcaps">Obligation</span>—a debt to the land itself.</p>
+<section class="level4" id="the-hollows-attention">
+<h3>The Hollow’s Attention</h3>
+<p>The Hollow’s Attention timer (see World Interaction, Chapter 14 of the Player’s Guide) is a form of <span class="smallcaps">Obligation</span> to the Curse of Acasia. When the timer fills, the Hollow manifests as an Oath-Keeper and demands payment.</p>
+</section>
+<section class="level4" id="breaking-customs">
+<h3>Breaking Customs</h3>
+<p>When a character knowingly breaks an Acasian custom (pours a ninth cup, takes a ninth step, speaks a ninth name), they mark <span class="smallcaps">Obligation</span> to the Hollow. This is not a separate track—it is a narrative debt. The Hollow will collect.</p>
+</section>
+</section>
+<section class="level3" id="summary-obligation-at-a-glance">
+<h2 id="reader-section-14-section-section-section">Summary: Obligation at a Glance</h2>
+</section>
+<section class="level3" id="final-thought-1">
+<h2 id="final-thought">Final Thought</h2>
+<p><span class="smallcaps">Obligation</span> is the heartbeat of Fate’s Edge. It is the weight that makes choices matter, the thread that connects characters to the world, and the promise of story yet to come.</p>
+<p>Do not fear it. Embrace it. When your <span class="smallcaps">Obligation</span> is high, your story is rich.</p>
+<div class="center">
+<p><em>“The road is long. The debt is patient. Walk true.”</em></p>
+</div>
+</section>
+<section class="level3" id="sec:boons-gm">
+<h2 id="boons-the-currency-of-resilience">Boons: The Currency of Resilience</h2>
+<p>Boons are narrative tokens earned by embracing risk. They reward <em>failure with opportunity</em> – the silver lining in clouds of defeat.</p>
+<blockquote>
+<p><strong>Why You Should Spend Boons – The Math of Fun</strong></p>
+<p> <strong>Hoarding Boons for XP conversion leads to less engagement and lower fun scores.</strong></p>
 <p>Every Boon you hold is a dramatic moment waiting to happen:</p>
 <ul>
-<li>Re-rolling a critical failure turns despair into triumph.</li>
-<li>Improving Position before a risky roll turns a Desperate gamble into a Controlled chance.</li>
-<li>Activating an Asset brings your character's network into the story.</li>
+<li><p>Re-rolling a critical failure turns despair into triumph.</p></li>
+<li><p>Improving Position before a risky roll turns a Desperate gamble into a Controlled chance.</p></li>
+<li><p>Activating an Asset brings your character’s network into the story.</p></li>
 </ul>
 <p><strong>XP from Boons is a trickle (max 2 per session).</strong> The real reward is <em>agency</em>. The player who spends Boons shapes the story; the player who hoards them watches from the sidelines.</p>
-<p>As GM, remind players: "You have 3 Boons. What will you spend them on?" When a player sits on 5 Boons, gently suggest they use one before the scene ends. A spent Boon is a moment of player power. An unspent Boon is wasted potential.</p>
-</div>
+<p>As GM, remind players: "You have 3 Boons. What will you spend them on?" When a player sits on 5 Boons, gently suggest they use one before the scene ends. A spent Boon is a moment of player power. An unspent Boon is wasted potential.</p>
+</blockquote>
+<section class="level4" id="subsec:boons-earn">
 <h3>Earning Boons (GM Reminders)</h3>
 <ul>
-<li>On a <strong>Partial</strong> (1 Boon) or <strong>Miss</strong> (2 Boons) with meaningful consequences.</li>
-<li>Through clever or risky roleplay that drives the story.</li>
-<li>Via bond-driven actions with intricate descriptions.</li>
-<li>At GM discretion for exceptional collaborative play.</li>
+<li><p>On a <strong>Partial</strong> (1 Boon) or <strong>Miss</strong> (2 Boons) with meaningful consequences.</p></li>
+<li><p>Through clever or risky roleplay that drives the story.</p></li>
+<li><p>Via bond-driven actions with intricate descriptions.</p></li>
+<li><p>At GM discretion for exceptional collaborative play.</p></li>
 </ul>
 <p><strong>Limit:</strong> At most <strong>2 Boons</strong> from failures per character per scene. Repetition of the same approach with the same stakes does not award additional Boons.</p>
+</section>
+<section class="level4" id="subsec:boons-economy">
 <h3>Boon Economy (Quick Reference)</h3>
 <ul>
-<li><strong>Holding cap:</strong> Maximum 5 Boons.</li>
-<li><strong>Carryover:</strong> At the end of each scene, reduce held Boons to a maximum of 2 (excess lost).</li>
-<li><strong>Conversion:</strong> Once per session during downtime, convert 2 Boons → 1 XP (max 2 XP per session via conversion).</li>
+<li><p><strong>Holding cap:</strong> Maximum 5 Boons.</p></li>
+<li><p><strong>Carryover:</strong> At the end of each scene, reduce held Boons to a maximum of 2 (excess lost).</p></li>
+<li><p><strong>Conversion:</strong> Once per session during downtime, convert 2 Boons <span class="math inline">\(\rightarrow\)</span> 1 XP (max 2 XP per session via conversion).</p></li>
 </ul>
+</section>
+<section class="level4" id="subsec:boons-spend">
 <h3>Spending Boons (Player Options)</h3>
 <p>Players may spend 1 Boon to:</p>
 <ul>
-<li>Re-roll a single die (after seeing the pool).</li>
-<li>Activate an on-screen Asset.</li>
-<li>Improve Position by one step before a roll.</li>
-<li>Power certain Rites or abilities as described in their text.</li>
+<li><p>Re-roll a single die (after seeing the pool).</p></li>
+<li><p>Activate an on-screen Asset.</p></li>
+<li><p>Improve Position by one step before a roll.</p></li>
+<li><p>Power certain Rites or abilities as described in their text.</p></li>
 </ul>
-<h4>Substituting Fatigue for Boons (Optional)</h4>
+<section class="level6" id="substituting-fatigue-for-boons-optional">
+<h5>Substituting Fatigue for Boons (Optional)</h5>
 <p>If a player has no Boons remaining, they may substitute <strong>1 Fatigue</strong> for 1 Boon <em>once per scene</em>. This represents pushing through exhaustion for a last chance. The GM may veto if the fiction does not support it.</p>
+</section>
+</section>
+<section class="level4" id="subsec:boons-anti-fishing">
 <h3>Anti-Fishing Measures (GM Guidance)</h3>
 <ul>
-<li><strong>Once/Scene Cap:</strong> At most 2 Boons from failures per character per scene.</li>
-<li><strong>Repetition Rule:</strong> Same approach + same stakes in the same scene cannot award another Boon.</li>
-<li><strong>Position Gate:</strong> <em>Dominant</em> tests with trivial fallout do not award Boons.</li>
+<li><p><strong>Once/Scene Cap:</strong> At most 2 Boons from failures per character per scene.</p></li>
+<li><p><strong>Repetition Rule:</strong> Same approach + same stakes in the same scene cannot award another Boon.</p></li>
+<li><p><strong>Position Gate:</strong> <em>Dominant</em> tests with trivial fallout do not award Boons.</p></li>
 </ul>
-<p class="text-sm text-muted"><em>Design note:</em> Boons reward narrative risk, not repeated failure.</p>
-<h2 id="followers-assets-gm">Followers and Assets: Power Beyond the Self</h2>
+<p><em>Design note:</em> Boons reward narrative risk, not repeated failure.</p>
+</section>
+</section>
+<section class="level3" id="sec:followers-assets-gm">
+<h2 id="followers-and-assets-power-beyond-the-self">Followers and Assets: Power Beyond the Self</h2>
 <p>Players can invest XP in <strong>Followers</strong> (on-screen allies) and <strong>Assets</strong> (off-screen resources). These are story agents with their own motivations and risks. The following sections present simplified, low-bookkeeping systems that avoid numeric timers while preserving meaningful consequences.</p>
+<section class="level4" id="subsec:followers-gm">
 <h3>Followers: On-Screen Allies</h3>
-<p>Followers are bought with XP and tracked by a <strong>Cap</strong> (maximum assist bonus). Cost = Cap² XP; downtime 1–3 days to recruit.</p>
-<h4>Follower States</h4>
-<p>Instead of numeric timers, track a follower's <strong>Loyalty</strong> and <strong>Fitness</strong> as one of three states each.</p>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Follower Loyalty and Fitness states</caption>
-<thead><tr><th>State</th><th>Mechanical Effect</th></tr></thead>
+<p>Followers are bought with XP and tracked by a <strong>Cap</strong> (maximum assist bonus). Cost = Cap<span class="math inline">\(^2\)</span> XP; downtime 1–3 days to recruit.</p>
+<section class="level6" id="follower-states">
+<h5>Follower States</h5>
+<p>Instead of numeric timers, track a follower’s <strong>Loyalty</strong> and <strong>Fitness</strong> as one of three states each.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:follower-states">
+<caption>Follower Loyalty and Fitness states</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>State</strong></th>
+<th style="text-align: left;"><strong>Mechanical Effect</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td colspan="2" style="text-align:center;font-weight:600;"><em>Loyalty</em></td></tr>
-<tr><td>Faithful</td><td>Normal assist, independent actions available</td></tr>
-<tr><td>Strained</td><td>Assist at −1 die; may refuse risky orders</td></tr>
-<tr><td>Broken</td><td>Follower leaves or becomes hostile</td></tr>
-<tr><td colspan="2" style="text-align:center;font-weight:600;"><em>Fitness</em></td></tr>
-<tr><td>Ready</td><td>Full function</td></tr>
-<tr><td>Hurt</td><td>Assist at −1 die; no independent actions</td></tr>
-<tr><td>Down</td><td>Incapacitated; requires rescue or medical care</td></tr>
+<tr>
+<td colspan="2" style="text-align: center;"><em>Loyalty</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Faithful</td>
+<td style="text-align: left;">Normal assist, independent actions available</td>
+</tr>
+<tr>
+<td style="text-align: left;">Strained</td>
+<td style="text-align: left;">Assist at –1 die; may refuse risky orders</td>
+</tr>
+<tr>
+<td style="text-align: left;">Broken</td>
+<td style="text-align: left;">Follower leaves or becomes hostile</td>
+</tr>
+<tr>
+<td colspan="2" style="text-align: center;"><em>Fitness</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Ready</td>
+<td style="text-align: left;">Full function</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hurt</td>
+<td style="text-align: left;">Assist at –1 die; no independent actions</td>
+</tr>
+<tr>
+<td style="text-align: left;">Down</td>
+<td style="text-align: left;">Incapacitated; requires rescue or medical care</td>
+</tr>
 </tbody>
 </table></div>
-</div>
 <p>Change states when the fiction demands it (e.g., after a failed mission, a moral compromise, or taking damage). No rolls required.</p>
-<h4>Assisting in Scenes</h4>
+</section>
+<section class="level6" id="assisting-in-scenes">
+<h5>Assisting in Scenes</h5>
 <ul>
-<li>Assist dice equal min(Cap, helper's relevant Skill).</li>
-<li>Total assist from all sources capped at <strong>+3 dice</strong> (the <em>Exceptional Coordination</em> talent allows +4 from one follower).</li>
-<li>Only one follower may assist a given action.</li>
+<li><p>One Follower may assist a given action, providing up to <span class="math inline">\(\min(\text{Cap}, \text{helper's relevant Skill})\)</span> dice.</p></li>
+<li><p>Spend 1 Boon or 1 Fatigue for each die the Follower adds. Total assist dice are capped at <strong>+3</strong>. With the <em>Exceptional Coordination</em> talent, the cap rises to +4 and the Follower contributes dice equal to their Cap even if their relevant Skill is lower.</p></li>
 </ul>
-<h4>Follower Independent Actions</h4>
+</section>
+<section class="level6" id="follower-independent-actions">
+<h5>Follower Independent Actions</h5>
 <p>Once per scene, <strong>one</strong> follower may take a small independent action (party-wide limit). Examples:</p>
 <ul>
-<li><strong>Scout &amp; Signal</strong> — Change an ally's next action to <em>Dominant</em>.</li>
-<li><strong>Distract &amp; Draw</strong> — Reduce a threat/hunt/escape timer by 1 tick.</li>
-<li><strong>Fetch &amp; Carry</strong> — Move a small object through danger.</li>
+<li><p><strong>Scout &amp; Signal</strong> – Change an ally’s next action to <em>Dominant</em>.</p></li>
+<li><p><strong>Distract &amp; Draw</strong> – Reduce a threat/hunt/escape timer by 1 tick.</p></li>
+<li><p><strong>Fetch &amp; Carry</strong> – Move a small object through danger.</p></li>
 </ul>
-<p><strong>Cost:</strong> Mark <strong>Exposure +1</strong> or worsen <strong>Fitness</strong> one step (Ready → Hurt → Down) on that follower.</p>
-<h4>Followers as Successors</h4>
-<p>A Follower (Cap 3+) can become a <strong>successor</strong> if the player's main character retires, dies, or ascends. This is the core of the Legacy Engine (see the Epic Play chapter of the full GM Guide).</p>
-<h4>Follower Upkeep and Risk</h4>
+<p><strong>Cost:</strong> Mark <strong>Exposure +1</strong> or worsen <strong>Fitness</strong> one step (Ready <span class="math inline">\(\rightarrow\)</span> Hurt <span class="math inline">\(\rightarrow\)</span> Down) on that follower.</p>
+</section>
+<section class="level6" id="followers-as-successors">
+<h5>Followers as Successors</h5>
+<p>A Follower (Cap 3+) can become a <strong>successor</strong> if the player’s main character retires, dies, or ascends. This is the core of the Legacy Engine (see <span class="math inline">\(\ref{ch:gm-epic}\)</span> in the full GM Guide).</p>
+</section>
+<section class="level6" id="follower-upkeep-and-risk">
+<h5>Follower Upkeep and Risk</h5>
 <ul>
-<li>Each downtime, pay Efficient upkeep: max(1, acquisition cost ÷ 3, rounded up) <strong>or</strong> spend a scene tending the relationship.</li>
-<li>Neglect → Loyalty worsens one step (Faithful → Strained → Broken).</li>
-<li>If the GM spends <strong>2+ SB</strong> on an action you take with assistance, they may worsen Loyalty or Fitness on the follower instead of other consequences.</li>
-<li><strong>Off-Screen Capability:</strong> Once per downtime, a Cap 3+ follower can solve a significant problem but generates <strong>1 SB</strong> for the party (the GM describes the resulting complication).</li>
+<li><p>Each downtime, pay XP equal to Cap <strong>or</strong> spend a scene tending the relationship.</p></li>
+<li><p>Neglect <span class="math inline">\(\rightarrow\)</span> Loyalty worsens one step (Faithful <span class="math inline">\(\rightarrow\)</span> Strained <span class="math inline">\(\rightarrow\)</span> Broken).</p></li>
+<li><p>If the GM spends <strong>2+ SB</strong> on an action you take with assistance, they may worsen Loyalty or Fitness on the follower instead of other consequences.</p></li>
+<li><p><strong>Off-Screen Capability:</strong> Once per downtime, a Cap 3+ follower can solve a significant problem but generates <strong>1 SB</strong> for the party (the GM describes the resulting complication).</p></li>
 </ul>
+</section>
+</section>
+<section class="level4" id="subsec:assets-gm">
 <h3>Assets: Off-Screen Influence</h3>
 <p>Assets are titles, safehouses, spy rings, charters. They do not act in scenes directly but change the fiction between sessions.</p>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Asset tiers, acquisition cost, and representative examples</caption>
-<thead><tr><th>Tier</th><th>Cost and Examples</th></tr></thead>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:asset-tiers">
+<caption>Asset tiers, acquisition cost, and representative examples</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Tier</strong></th>
+<th style="text-align: left;"><strong>Cost and Examples</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>Minor</td><td>4 XP (1 day) — safehouse, small shop, local contact</td></tr>
-<tr><td>Standard</td><td>8 XP (1 week) — noble title, spy ring, workshop</td></tr>
-<tr><td>Major</td><td>12 XP (1 month) — city license, fortress lease, regional network</td></tr>
+<tr>
+<td style="text-align: left;">Minor</td>
+<td style="text-align: left;">4 XP (1 day) – safehouse, small shop, local contact</td>
+</tr>
+<tr>
+<td style="text-align: left;">Standard</td>
+<td style="text-align: left;">8 XP (1 week) – noble title, spy ring, workshop</td>
+</tr>
+<tr>
+<td style="text-align: left;">Major</td>
+<td style="text-align: left;">12 XP (1 month) – city license, fortress lease, regional network</td>
+</tr>
 </tbody>
 </table></div>
-</div>
-<h4>Asset Status</h4>
+<section class="level6" id="asset-status">
+<h5>Asset Status</h5>
 <p>Assets have a single unified <strong>Status</strong> that describes their overall health and usability.</p>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Asset Status levels and their effects</caption>
-<thead><tr><th>Status</th><th>Effect</th></tr></thead>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:asset-status">
+<caption>Asset Status levels and their effects</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Status</strong></th>
+<th style="text-align: left;"><strong>Effect</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>Flourishing</td><td>+1 die on rolls involving the asset, +1 Yield</td></tr>
-<tr><td>Stable</td><td>No modifier</td></tr>
-<tr><td>Strained</td><td>−1 die on asset-related rolls, no Yield</td></tr>
-<tr><td>Collapsed</td><td>Non-functional; requires quest or major downtime to restore</td></tr>
+<tr>
+<td style="text-align: left;">Flourishing</td>
+<td style="text-align: left;">+1 die on rolls involving the asset, +1 Yield</td>
+</tr>
+<tr>
+<td style="text-align: left;">Stable</td>
+<td style="text-align: left;">No modifier</td>
+</tr>
+<tr>
+<td style="text-align: left;">Strained</td>
+<td style="text-align: left;">–1 die on asset-related rolls, no Yield</td>
+</tr>
+<tr>
+<td style="text-align: left;">Collapsed</td>
+<td style="text-align: left;">Non-functional; requires quest or major downtime to restore</td>
+</tr>
 </tbody>
 </table></div>
-</div>
 <p>The Status worsens when the asset is neglected, attacked, or suffers a public failure. It improves through dedicated downtime actions or successful missions that benefit the asset.</p>
-<h4>Using Assets</h4>
+</section>
+<section class="level6" id="using-assets">
+<h5>Using Assets</h5>
 <ul>
-<li><strong>Off-Screen Effect:</strong> Use once per session for free (the quiet work between adventures).</li>
-<li><strong>On-Screen Activation:</strong> Spend 1 Boon to use the asset dramatically in a scene.</li>
-<li><strong>Downtime Activation:</strong> Pay 2 XP or 1 Boon to activate an asset at campaign start or during downtime.</li>
-<li>The asset must have plausible scope for the intended effect.</li>
+<li><p><strong>Off-Screen Effect:</strong> Use once per session for free (the quiet work between adventures).</p></li>
+<li><p><strong>On-Screen Activation:</strong> Spend 1 Boon to use the asset dramatically in a scene.</p></li>
+<li><p><strong>Downtime Activation:</strong> Pay 2 XP or 1 Boon to activate an asset at campaign start or during downtime.</p></li>
+<li><p>The asset must have plausible scope for the intended effect.</p></li>
 </ul>
-<h4>Asset Upkeep</h4>
+</section>
+<section class="level6" id="asset-upkeep">
+<h5>Asset Upkeep</h5>
 <p>Each downtime:</p>
 <ul>
-<li><strong>Efficient (higher XP, less time):</strong> Cost = max(1, Acquisition XP ÷ 3). Minimal effort.</li>
-<li><strong>Intensive (lower XP, more time):</strong> Cost = 1 XP. Requires a dedicated downtime action with significant personal involvement.</li>
-<li>Failure to pay → Status worsens one step (Flourishing → Stable → Strained → Collapsed).</li>
+<li><p><strong>Efficient (higher XP, less time):</strong> Cost = <span class="math inline">\(\max(1, \frac{\text{Acquisition XP}}{3})\)</span>. Minimal effort.</p></li>
+<li><p><strong>Intensive (lower XP, more time):</strong> Cost = 1 XP. Requires a dedicated downtime action with significant personal involvement.</p></li>
+<li><p>Failure to pay <span class="math inline">\(\rightarrow\)</span> Status worsens one step (Flourishing <span class="math inline">\(\rightarrow\)</span> Stable <span class="math inline">\(\rightarrow\)</span> Strained <span class="math inline">\(\rightarrow\)</span> Collapsed).</p></li>
 </ul>
-<h2 id="terrestrial-patrons-gm">Terrestrial Patrons: Favors and Obligation</h2>
+</section>
+</section>
+</section>
+<section class="level3" id="sec:terrestrial-patrons-gm">
+<h2 id="terrestrial-patrons-favors-and-obligation">Terrestrial Patrons: Favors and Obligation</h2>
 <p>Not every patron is a cosmic entity. Powerful mortals—nobles, crime lords, generals, merchant princes, and the old families of the Vilikari—can act as <strong>terrestrial patrons</strong>. They offer tangible aid (escorts, legal protection, supplies, even ongoing Assets) in exchange for favors and loyalty.</p>
+<section class="level4" id="how-terrestrial-patrons-work">
 <h3>How Terrestrial Patrons Work</h3>
-<p>When a character accepts a favor from a terrestrial patron, start an <strong>Obligation Timer</strong> with the patron's name (e.g., "Prefect Marcellus's Obligation [4]"). Mark one segment each time the character accepts a significant favor. When the timer fills, the patron calls in the debt — a mission, a political favor, or a direct demand.</p>
-<p>The party also tracks a separate <strong>Obligation</strong> tally for each terrestrial patron, exactly as they would for a supernatural Patron (see the Managing Obligation and Corruption section). Each accepted favor adds +1 Obligation. Exceeding Obligation Capacity (Spirit + Presence) causes Fatigue exactly as with cosmic Patrons.</p>
+<p>When a character accepts a favor from a terrestrial patron, start an <strong>Obligation Timer</strong> with the patron’s name (e.g., "Prefect Marcellus’s Obligation [4]"). Mark one segment each time the character accepts a significant favor. When the timer fills, the patron calls in the debt – a mission, a political favor, or a direct demand.</p>
+<p>The party also tracks a separate <strong>Obligation</strong> tally for each terrestrial patron, exactly as they would for a supernatural Patron (see <span class="math inline">\(\ref{sec:obligation-corruption-gm}\)</span>). Each accepted favor adds +1 Obligation. Exceeding Obligation Capacity (Spirit + Presence) causes Fatigue exactly as with cosmic Patrons.</p>
 <p>Refusing to honor the debt turns the patron into an enemy. The GM may advance associated <em>Crisis</em> timers or introduce complications.</p>
-<div class="panel">
-<div class="panel-title">Use Obligation Timers Aggressively</div>
-<p><strong>Obligation timers are story fuel.</strong> Call them in at the worst possible moment:</p>
+<blockquote>
+<p><strong>Use Obligation Timers Aggressively</strong></p>
+<p> <strong>Obligation timers are story fuel.</strong> Call them in at the worst possible moment:</p>
 <ul>
-<li><strong>Early (1–2 segments):</strong> A messenger arrives with a "reminder." Small favor.</li>
-<li><strong>Mid (3–4 segments):</strong> A significant service is demanded.</li>
-<li><strong>Full (5–6 segments):</strong> The patron calls in the debt at a critical moment — refusal means enmity.</li>
+<li><p><strong>Early (1–2 segments):</strong> A messenger arrives with a "reminder." Small favor.</p></li>
+<li><p><strong>Mid (3–4 segments):</strong> A significant service is demanded.</p></li>
+<li><p><strong>Full (5–6 segments):</strong> The patron calls in the debt at a critical moment – refusal means enmity.</p></li>
 </ul>
 <p>Obligation that is never called is wasted potential.</p>
-</div>
+</blockquote>
+</section>
+<section class="level4" id="clearing-terrestrial-obligation">
 <h3>Clearing Terrestrial Obligation</h3>
 <p>Obligation to a terrestrial patron is cleared by performing <strong>tasks</strong> for the patron. The GM sets the scope:</p>
 <ul>
-<li><strong>Minor task</strong> (deliver a message, pay a bribe): clears 1 Obligation.</li>
-<li><strong>Significant task</strong> (escort a caravan, break a siege): clears 2 Obligation.</li>
-<li><strong>Major task</strong> (assassinate a rival, broker a treaty): clears 3+ Obligation.</li>
+<li><p><strong>Minor task</strong> (deliver a message, pay a bribe): clears 1 Obligation.</p></li>
+<li><p><strong>Significant task</strong> (escort a caravan, break a siege): clears 2 Obligation.</p></li>
+<li><p><strong>Major task</strong> (assassinate a rival, broker a treaty): clears 3+ Obligation.</p></li>
 </ul>
 <p>Each task becomes a story hook.</p>
-<h3 id="patron-rank">Rank: What a Patron Can Reach</h3>
-<p>A terrestrial patron's <strong>Rank</strong> says how far their arm goes: how many Assets they can carry for you, how large those Assets may be, and how much debt they will let you run up before they come collecting.</p>
-<div class="panel">
-<div class="panel-title">Terrestrial Patron Rank</div>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<thead><tr><th>Rank</th><th>Reach</th><th>Debt Ceiling</th><th>Asset Slots</th><th>Largest Asset</th></tr></thead>
+</section>
+<section class="level4" id="asset-slots-and-patron-tier">
+<h3>Asset Slots and Patron Tier</h3>
+<p>A terrestrial patron’s power determines how many Assets they can support and at what cost. Each patron has a <strong>Tier</strong> (Minor, Major, or Paramount) that sets their Asset capacity.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:patron-tiers">
+<caption>Terrestrial Patron Tiers and Capacity</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Patron Tier</strong></th>
+<th style="text-align: left;"><strong>Reach</strong></th>
+<th style="text-align: left;"><strong>Asset Slots</strong></th>
+<th style="text-align: left;"><strong>Max Asset Size</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td><strong>Street</strong> <span class="text-sm text-muted">(a guild steward, a local crime boss, a hedge-court judge)</span></td><td>A neighborhood, a hall, one canton</td><td>3–4 segments</td><td>2</td><td>Minor (4 XP)</td></tr>
-<tr><td><strong>City</strong> <span class="text-sm text-muted">(a noble house factor, a syndicate capo, a temple prefect)</span></td><td>One city and what feeds it</td><td>5–6 segments</td><td>4</td><td>Standard (8 XP)</td></tr>
-<tr><td><strong>Regional</strong> <span class="text-sm text-muted">(a duchy spymaster, a merchant prince, a coven leader)</span></td><td>Several provinces</td><td>7–8 segments</td><td>6</td><td>Major (12 XP)</td></tr>
-<tr><td><strong>Imperial</strong> <span class="text-sm text-muted">(an archduke, a syndicate master, a high priest)</span></td><td>Across the Amaranthine</td><td>8+ segments</td><td>8</td><td>Major, or something unique</td></tr>
+<tr>
+<td style="text-align: left;">Minor</td>
+<td style="text-align: left;">Local (one city or canton)</td>
+<td style="text-align: left;">2 slots</td>
+<td style="text-align: left;">Standard Asset (8 XP)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Major</td>
+<td style="text-align: left;">Regional (multiple provinces)</td>
+<td style="text-align: left;">4 slots</td>
+<td style="text-align: left;">Major Asset (12 XP)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Paramount</td>
+<td style="text-align: left;">International (across the Amaranthine)</td>
+<td style="text-align: left;">6 slots</td>
+<td style="text-align: left;">Major Asset (12 XP)</td>
+</tr>
 </tbody>
 </table></div>
-</div>
-<p class="text-sm"><em>Debt Ceiling</em> is how much this patron will let accumulate before they collect — a measure of their reach, not of you. Your own <strong>Obligation Capacity is Spirit + Presence</strong>, always, exactly as for a supernatural Patron; exceeding it costs 1 Fatigue per segment over.</p>
-</div>
-<h3>What an Asset Costs in Obligation</h3>
-<p>When a patron grants an Asset or a Follower for Obligation rather than XP, the cost is <strong>the thing's tier</strong>: Minor 1, Standard 2, Major 3, unique 4. Followers ride the same ladder — a Cap 2 counts as Minor, a Cap 3 as Standard.</p>
-<p><strong>One modifier, and it is the interesting one.</strong> If what you are asking for sits at the very top of what that patron's Rank can provide, <strong>add 1</strong>. It costs <em>them</em>, so it costs you. A Street patron scraping together a safehouse is spending real credit; a Regional one hands over the same safehouse without breaking eye contact.</p>
-<p>No patron can grant an Asset larger than their Rank allows, at any price. That is not a cost question — their arm does not reach.</p>
+<section class="level6" id="asset-slot-costs">
+<h5>Asset Slot Costs</h5>
+<p>When a terrestrial patron grants an Asset in exchange for Obligation (rather than XP), the cost in Obligation segments is:</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:asset-costs">
+<caption>Asset Costs by Patron Tier</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Asset Type</strong></th>
+<th style="text-align: left;"><strong>Minor Patron</strong></th>
+<th style="text-align: left;"><strong>Major/Paramount Patron</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Minor Asset (4 XP value)</td>
+<td style="text-align: left;">2 Obligation</td>
+<td style="text-align: left;">2 Obligation</td>
+</tr>
+<tr>
+<td style="text-align: left;">Standard Asset (8 XP value)</td>
+<td style="text-align: left;">4 Obligation</td>
+<td style="text-align: left;">3 Obligation</td>
+</tr>
+<tr>
+<td style="text-align: left;">Major Asset (12 XP value)</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">4 Obligation</td>
+</tr>
+<tr>
+<td style="text-align: left;">Follower (Cap 2)</td>
+<td style="text-align: left;">2 Obligation</td>
+<td style="text-align: left;">2 Obligation</td>
+</tr>
+<tr>
+<td style="text-align: left;">Follower (Cap 3)</td>
+<td style="text-align: left;">4 Obligation</td>
+<td style="text-align: left;">3 Obligation</td>
+</tr>
+</tbody>
+</table></div>
+<p>A Minor Patron cannot grant Major Assets — their reach is too short. A Paramount Patron is rare; examples include the Matron of Silkstrand, the Federate King of the Vilikari, or the High King Beneath the Peaks.</p>
+</section>
+</section>
+<section class="level4" id="example-terrestrial-patrons">
 <h3>Example Terrestrial Patrons</h3>
-<div class="panel">
-<div class="panel-title">Sample Terrestrial Patrons</div>
-<div class="table-wrap">
+<blockquote>
+<p><strong>Sample Terrestrial Patrons</strong></p>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<thead><tr><th>Patron</th><th>Rank / Assets / Debt Trigger</th></tr></thead>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Patron</strong></th>
+<th style="text-align: left;"><strong>Tier / Assets / Debt Trigger</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>Prefect Marcellus (Ecktorian commander)</td><td>City (4 slots). Safe passage, food, guards. Debt: dangerous mission behind enemy lines.</td></tr>
-<tr><td>Censor Cassia (judicial authority)</td><td>Street (2 slots). Legal immunity, archive access. Debt: expose a political rival.</td></tr>
-<tr><td>Khatun Sarnai (Ykrul chieftain)</td><td>City (4 slots). Remounts, safe camp, guides. Debt: blood-price or raid on a rival clan.</td></tr>
-<tr><td>Mistress Ilvar (Silkstrand crime lord)</td><td>Street (2 slots). Black Bazaar access, cutpurses. Debt: public assassination.</td></tr>
-<tr><td>House Contarini (Vilikari Archivolt)</td><td>City (4 slots). Forged charters, legal immunity. Debt: retrieve a lost seal from a rival.</td></tr>
-<tr><td>The Ragman (Silkstrand underworld)</td><td>Regional (6 slots). Smuggling routes, night-boats, stolen goods. Debt: a favor that cannot be named.</td></tr>
+<tr>
+<td style="text-align: left;">Prefect Marcellus (Ecktorian commander)</td>
+<td style="text-align: left;">Major (4 slots). Safe passage, food, guards. Debt: dangerous mission behind enemy lines.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Censor Cassia (judicial authority)</td>
+<td style="text-align: left;">Minor (2 slots). Legal immunity, archive access. Debt: expose a political rival.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Khatun Sarnai (Ykrul chieftain)</td>
+<td style="text-align: left;">Major (4 slots). Remounts, safe camp, guides. Debt: blood-price or raid on a rival clan.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mistress Ilvar (Silkstrand crime lord)</td>
+<td style="text-align: left;">Minor (2 slots). Black Bazaar access, cutpurses. Debt: public assassination.</td>
+</tr>
+<tr>
+<td style="text-align: left;">House Contarini (Vilikari Archivolt)</td>
+<td style="text-align: left;">Major (4 slots). Forged charters, legal immunity. Debt: retrieve a lost seal from a rival.</td>
+</tr>
+<tr>
+<td style="text-align: left;">The Ragman (Silkstrand underworld)</td>
+<td style="text-align: left;">Paramount (6 slots). Smuggling routes, night-boats, stolen goods. Debt: a favor that cannot be named.</td>
+</tr>
 </tbody>
 </table></div>
-</div>
-</div>
+</blockquote>
+</section>
+<section class="level4" id="running-terrestrial-patrons">
 <h3>Running Terrestrial Patrons</h3>
 <ul>
-<li>Track each patron's Obligation Timer and the party's Obligation visibly.</li>
-<li>When a player asks for a favor, state the cost: "That's worth one segment and +1 Obligation. Are you willing?"</li>
-<li>When an Obligation Timer fills, give a hook that fits the patron's personality.</li>
-<li>If the party refuses, tick a <em>Crisis</em> timer or introduce a complication.</li>
-<li>Patrons compete. If the party owes Obligation to two rival patrons, those patrons will eventually demand conflicting loyalties.</li>
+<li><p>Track each patron’s Obligation Timer and the party’s Obligation visibly.</p></li>
+<li><p>When a player asks for a favor, state the cost: "That’s worth one segment and +1 Obligation. Are you willing?"</p></li>
+<li><p>When an Obligation Timer fills, give a hook that fits the patron’s personality.</p></li>
+<li><p>If the party refuses, tick a <em>Crisis</em> timer or introduce a complication.</p></li>
+<li><p>Patrons compete. If the party owes Obligation to two rival patrons, those patrons will eventually demand conflicting loyalties.</p></li>
 </ul>
-<div class="panel">
-<div class="panel-title">More Examples, by Rank</div>
-<div class="table-wrap">
+</section>
+<section class="level4 unnumbered" id="terrestrial-patrons-mortal-powers-that-collect">
+<h3 class="unnumbered">Terrestrial Patrons – Mortal Powers That Collect</h3>
+<p>Not all power flows from ancient patrons. Some sits in counting-houses, guild halls, and the back rooms of taverns. These are <strong>Terrestrial Patrons</strong>—noble houses, crime syndicates, merchant leagues, or cults that offer tangible aid in exchange for Obligation.</p>
+<blockquote>
+<p><strong>Terrestrial Patron Tiers</strong></p>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<thead><tr><th>Rank</th><th>Example Patron</th><th>Debt Ceiling</th><th>Typical Assets</th></tr></thead>
+<thead>
+<tr>
+<th style="text-align: left;"><p><strong>Rank</strong></p></th>
+<th style="text-align: left;"><p> <strong>Obligation Capacity</strong></p></th>
+<th style="text-align: center;"><p><strong>Asset Slots</strong></p></th>
+<th style="text-align: left;"><p> <strong>Max Asset Tier</strong></p></th>
+<th style="text-align: left;"><p> <strong>Debt Trigger (when Obligation fills)</strong></p></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>Street</td><td>The Coin That Never Spends (brothel madam)</td><td>3–4</td><td>Safe house, blackmail file (minor), one fence contact</td></tr>
-<tr><td>City</td><td>Madam Serafine (Velvet Court capo)</td><td>5–6</td><td>Spy network, forgery workshop, two safe houses</td></tr>
-<tr><td>Regional</td><td>The Ragman (Silkstrand underworld)</td><td>7–8</td><td>Smuggling routes, night-boats, stolen goods network</td></tr>
-<tr><td>Imperial</td><td>The Matron of Silkstrand</td><td>9+</td><td>Blue Ledger (all bribed officials), Maze of Whispers (city-wide passages), Ghost Crew (urchin army)</td></tr>
+<tr>
+<td style="text-align: left;"><p>Street</p>
+<p><span>local crime boss, guild steward, hedge-court judge</span></p></td>
+<td style="text-align: left;"><p> Spirit + Presence (3–4)</p></td>
+<td style="text-align: center;"><p>2</p></td>
+<td style="text-align: left;"><p> Minor (safehouse, contact network)</p></td>
+<td style="text-align: left;"><p> Demands a <em>minor service</em>: deliver a message, pay a bribe, rough up a rival.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>City</p>
+<p><span>noble house factor, syndicate capo, temple prefect</span></p></td>
+<td style="text-align: left;"><p> Spirit + Presence + 2 (5–6)</p></td>
+<td style="text-align: center;"><p>4</p></td>
+<td style="text-align: left;"><p> Standard (spy ring, guild charter, fortified warehouse)</p></td>
+<td style="text-align: left;"><p> Demands a <em>significant task</em>: escort a caravan, break a siege, forge a document.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Regional</p>
+<p><span>duchy spymaster, merchant prince, coven leader</span></p></td>
+<td style="text-align: left;"><p> Spirit + Presence + 4 (7–8)</p></td>
+<td style="text-align: center;"><p>6</p></td>
+<td style="text-align: left;"><p> Major (fortress lease, city license, regional network)</p></td>
+<td style="text-align: left;"><p> Demands a <em>major service</em>: broker a treaty, assassinate a rival, steal a relic.</p></td>
+</tr>
+<tr>
+<td style="text-align: left;"><p>Imperial</p>
+<p><span>archduke, syndicate master, high priest</span></p></td>
+<td style="text-align: left;"><p>+</p></td>
+<td style="text-align: center;"><p>8+</p></td>
+<td style="text-align: left;"><p> Major or unique (legendary asset)</p></td>
+<td style="text-align: left;"><p> Demands a <em>campaign–defining favor</em>: start a war, erase a bloodline, wake or seal a patron.</p></td>
+</tr>
 </tbody>
 </table></div>
-</div>
-<p class="text-sm">Each Obligation segment is cleared by performing tasks for the patron (minor task = 1 segment, significant = 2, major = 3+).</p>
-</div>
-<h2 id="trusts-gm">Player Trusts: Shared Legacy</h2>
+<p><em>Obligation Capacity</em> = Spirit + Presence + Rank Bonus. Exceeding capacity causes 1 Fatigue per segment. Refusing a triggered demand turns the patron into an enemy.</p>
+</blockquote>
+<blockquote>
+<p><strong>Example Terrestrial Patrons by Rank</strong></p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Rank</strong></th>
+<th style="text-align: left;"> <strong>Example Patron</strong></th>
+<th style="text-align: center;"><strong>Obligation Capacity</strong></th>
+<th style="text-align: left;"> <strong>Typical Assets</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Street</td>
+<td style="text-align: left;"> The Coin That Never Spends (brothel madam)</td>
+<td style="text-align: center;">3–4</td>
+<td style="text-align: left;"> Safe house, blackmail file (minor), one fence contact</td>
+</tr>
+<tr>
+<td style="text-align: left;">City</td>
+<td style="text-align: left;"> Madam Serafine (Velvet Court capo)</td>
+<td style="text-align: center;">5–6</td>
+<td style="text-align: left;"> Spy network, forgery workshop, two safe houses</td>
+</tr>
+<tr>
+<td style="text-align: left;">Regional</td>
+<td style="text-align: left;"> The Ragman (Silkstrand underworld)</td>
+<td style="text-align: center;">7–8</td>
+<td style="text-align: left;"> Smuggling routes, night-boats, stolen goods network</td>
+</tr>
+<tr>
+<td style="text-align: left;">Imperial</td>
+<td style="text-align: left;"> The Matron of Silkstrand</td>
+<td style="text-align: center;">9+</td>
+<td style="text-align: left;"> Blue Ledger (all bribed officials), Maze of Whispers (city-wide passages), Ghost Crew (urchin army)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each Obligation segment is cleared by performing tasks for the patron (minor task = 1 segment, significant = 2, major = 3+).</p>
+</blockquote>
+</section>
+</section>
+<section class="level3" id="sec:trusts-gm">
+<h2 id="player-trusts-shared-legacy">Player Trusts: Shared Legacy</h2>
 <p>A <strong>Trust</strong> is a shared pool of XP that players contribute to, used to acquire and maintain <strong>party-owned Assets and Followers</strong>. Trusts represent a collective enterprise—a mercenary company, a trading guild, a spy network, a religious order.</p>
+<section class="level4" id="forming-a-trust">
 <h3>Forming a Trust</h3>
 <p>Any player may contribute XP to the Trust pool. Contributions are voluntary and cannot be withdrawn. The Trust has no individual owner; spending from the pool requires majority agreement.</p>
+</section>
+<section class="level4" id="tiered-buy-in-for-trust-slots">
 <h3>Tiered Buy-In for Trust Slots</h3>
-<p>A Trust is not a single Asset — it is a <strong>container</strong> that can hold multiple Assets and Followers. The Trust's capacity is determined by its <strong>Tier</strong>, which players purchase collectively.</p>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Trust Tiers and Capacity</caption>
-<thead><tr><th>Trust Tier</th><th>Cost (Total XP)</th><th>Asset Slots</th><th>Max Asset Size</th></tr></thead>
+<p>A Trust is not a single Asset — it is a <strong>container</strong> that can hold multiple Assets and Followers. The Trust’s capacity is determined by its <strong>Tier</strong>, which players purchase collectively.</p>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:trust-tiers">
+<caption>Trust Tiers and Capacity</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Trust Tier</strong></th>
+<th style="text-align: left;"><strong>Cost (Total XP)</strong></th>
+<th style="text-align: left;"><strong>Asset Slots</strong></th>
+<th style="text-align: left;"><strong>Max Asset Size</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>Tier I (Local)</td><td>8 XP</td><td>2 slots</td><td>Standard Asset (8 XP)</td></tr>
-<tr><td>Tier II (Regional)</td><td>16 XP</td><td>4 slots</td><td>Major Asset (12 XP)</td></tr>
-<tr><td>Tier III (International)</td><td>32 XP</td><td>6 slots</td><td>Major Asset (12 XP)</td></tr>
+<tr>
+<td style="text-align: left;">Tier I (Local)</td>
+<td style="text-align: left;">8 XP</td>
+<td style="text-align: left;">2 slots</td>
+<td style="text-align: left;">Standard Asset (8 XP)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Tier II (Regional)</td>
+<td style="text-align: left;">16 XP</td>
+<td style="text-align: left;">4 slots</td>
+<td style="text-align: left;">Major Asset (12 XP)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Tier III (International)</td>
+<td style="text-align: left;">32 XP</td>
+<td style="text-align: left;">6 slots</td>
+<td style="text-align: left;">Major Asset (12 XP)</td>
+</tr>
 </tbody>
 </table></div>
-</div>
-<h4>Upgrading a Trust</h4>
+<section class="level6" id="upgrading-a-trust">
+<h5>Upgrading a Trust</h5>
 <p>Players may upgrade a Trust to the next Tier by paying the <strong>difference</strong> in XP (e.g., from Tier I to Tier II costs an additional 8 XP, contributed collectively). Upgrading requires a downtime scene where the Trust formalizes its new charter, expands its operations, or absorbs a rival organization.</p>
-<h4>What a Trust Can Buy</h4>
+</section>
+<section class="level6" id="what-a-trust-can-buy">
+<h5>What a Trust Can Buy</h5>
 <p>Once the Trust has capacity, players may spend XP from the Trust pool to acquire Assets and Followers that belong to the Trust as a whole.</p>
-<div class="table-wrap">
-<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
-<caption class="text-sm text-muted" style="caption-side:top;text-align:left;margin-bottom:0.3rem;">Trust Expenditures</caption>
-<thead><tr><th>Cost</th><th>Benefit</th></tr></thead>
+<div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table id="tab:trust-costs">
+<caption>Trust Expenditures</caption>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Cost</strong></th>
+<th style="text-align: left;"><strong>Benefit</strong></th>
+</tr>
+</thead>
 <tbody>
-<tr><td>4 XP</td><td>Minor Asset (shared safehouse, workshop, contact network)</td></tr>
-<tr><td>8 XP</td><td>Standard Asset (guild charter, spy ring, fortress lease)</td></tr>
-<tr><td>9 XP</td><td>Follower (Cap 3, loyal to the Trust, not any single PC)</td></tr>
+<tr>
+<td style="text-align: left;">4 XP</td>
+<td style="text-align: left;">Minor Asset (shared safehouse, workshop, contact network)</td>
+</tr>
+<tr>
+<td style="text-align: left;">8 XP</td>
+<td style="text-align: left;">Standard Asset (guild charter, spy ring, fortress lease)</td>
+</tr>
+<tr>
+<td style="text-align: left;">9 XP</td>
+<td style="text-align: left;">Follower (Cap 3, loyal to the Trust, not any single PC)</td>
+</tr>
 </tbody>
 </table></div>
-</div>
 <p>Each Asset or Follower consumes one Asset Slot. A Trust cannot exceed its slot capacity.</p>
+</section>
+</section>
+<section class="level4" id="upkeep-and-delegation">
 <h3>Upkeep and Delegation</h3>
-<p>Each downtime, the Trust must pay upkeep for its Assets and Followers using the standard rules (Efficient upkeep in XP, or 1 XP and a scene, per asset or follower).</p>
+<p>Each downtime, the Trust must pay upkeep for its Assets and Followers using the standard rules (1 XP or a scene per asset/follower).</p>
 <p>Alternatively, the Trust may <strong>delegate upkeep</strong> to a <strong>Cap 5 Follower</strong>:</p>
 <ul>
-<li>The Cap 5 follower can manage up to <strong>4 Asset Slots</strong> (any combination of Assets and Followers).</li>
-<li>The follower's own upkeep covers the delegated Assets — no separate XP cost.</li>
-<li><strong>Risk:</strong> If the follower becomes <em>Strained</em> or <em>Broken</em> (Loyalty), all delegated Assets worsen one step or are lost until the follower is restored.</li>
+<li><p>The Cap 5 follower can manage up to <strong>4 Asset Slots</strong> (any combination of Assets and Followers).</p></li>
+<li><p>The follower’s own upkeep covers the delegated Assets — no separate XP cost.</p></li>
+<li><p><strong>Risk:</strong> If the follower becomes <em>Strained</em> or <em>Broken</em> (Loyalty), all delegated Assets worsen one step or are lost until the follower is restored.</p></li>
 </ul>
+</section>
+<section class="level4" id="trust-assets-in-play">
 <h3>Trust Assets in Play</h3>
-<p>Assets and Followers acquired through a Trust belong to the <strong>party as a whole</strong>. Any member may activate them by spending their own Boons, following the normal Asset rules.</p>
-<div class="panel panel-blue">
-<div class="panel-title">Trusts and Terrestrial Patrons</div>
+<p>Assets and Followers acquired through a Trust belong to the <strong>party as a whole</strong>. Any member may activate them by spending their own Boons, following the normal Asset rules (see <span class="math inline">\(\ref{ch:running-assets-followers}\)</span>).</p>
+<blockquote>
+<p><strong>Trusts and Terrestrial Patrons</strong></p>
 <p>A Trust is a natural <strong>counterpart</strong> to a terrestrial patron relationship. A party that owes Obligation to House Contarini might form a Trust to manage the safehouses and informants the House provides. Conversely, a party that builds a Trust independently may eventually become a terrestrial patron themselves — a Minor patron with 2 Asset slots, offering favors to lesser allies.</p>
-<p>The GM may allow a Trust to <strong>absorb</strong> a terrestrial patron relationship: if the party retires their individual Obligation to a patron by paying XP from the Trust pool, the patron becomes a Trust Asset rather than a personal debt. The patron's Obligation Timer continues, but the obligation is now collective.</p>
-</div>
+<p>The GM may allow a Trust to <strong>absorb</strong> a terrestrial patron relationship: if the party retires their individual Obligation to a patron by paying XP from the Trust pool, the patron becomes a Trust Asset rather than a personal debt. The patron’s Obligation Timer continues, but the obligation is now collective.</p>
+</blockquote>
+</section>
+<section class="level4" id="dissolving-a-trust">
 <h3>Dissolving a Trust</h3>
 <p>If the party disbands, remaining XP in the pool is lost. Assets may be transferred to individual characters who pay the XP cost (or accept Obligation to a Terrestrial Patron to cover the difference). Followers loyal to the Trust may scatter, become independent NPCs, or be absorbed by a patron.</p>
+</section>
+<section class="level4" id="trust-quick-reference">
 <h3>Trust Quick Reference</h3>
-<div class="panel">
-<div class="panel-title">Trusts Summary</div>
+<blockquote>
+<p><strong>Trusts Summary</strong></p>
 <p><strong>Forming:</strong></p>
 <ul>
-<li>Players contribute XP collectively.</li>
-<li>Purchase Trust Tier (8/16/32 XP) for slot capacity.</li>
+<li><p>Players contribute XP collectively.</p></li>
+<li><p>Purchase Trust Tier (8/16/32 XP) for slot capacity.</p></li>
 </ul>
 <p><strong>Capacity by Tier:</strong></p>
 <ul>
-<li>Tier I (8 XP): 2 slots, max Standard Asset</li>
-<li>Tier II (16 XP): 4 slots, max Major Asset</li>
-<li>Tier III (32 XP): 6 slots, max Major Asset</li>
+<li><p>Tier I (8 XP): 2 slots, max Standard Asset</p></li>
+<li><p>Tier II (16 XP): 4 slots, max Major Asset</p></li>
+<li><p>Tier III (32 XP): 6 slots, max Major Asset</p></li>
 </ul>
 <p><strong>Upgrading:</strong></p>
 <ul>
-<li>Pay difference to next Tier (requires downtime scene).</li>
+<li><p>Pay difference to next Tier (requires downtime scene).</p></li>
 </ul>
 <p><strong>Spending:</strong></p>
 <ul>
-<li>Use Trust XP to buy Assets and Followers (4/8/9 XP).</li>
-<li>Each consumes one slot.</li>
+<li><p>Use Trust XP to buy Assets and Followers (4/8/9 XP).</p></li>
+<li><p>Each consumes one slot.</p></li>
 </ul>
 <p><strong>Upkeep:</strong></p>
 <ul>
-<li>Pay 1 XP or 1 scene per asset/follower per downtime.</li>
-<li>Or delegate to a Cap 5 follower (manages 4 slots).</li>
+<li><p>Pay 1 XP or 1 scene per asset/follower per downtime.</p></li>
+<li><p>Or delegate to a Cap 5 follower (manages 4 slots).</p></li>
 </ul>
 <p><strong>Activation:</strong></p>
 <ul>
-<li>Any Trust member spends their own Boons to activate.</li>
+<li><p>Any Trust member spends their own Boons to activate.</p></li>
 </ul>
-</div>
+</blockquote>
+</section>
+<section class="level4" id="subsec:mandate">
 <h3>Mandate Timer (0–6)</h3>
-<p>Tracks the party's public legitimacy.</p>
+<p>Tracks the party’s public legitimacy.</p>
 <ul>
-<li><strong>High Mandate:</strong> Allies seek them out, resources flow, doors open.</li>
-<li><strong>Low Mandate:</strong> Suspicion, bureaucratic obstacles, support withers.</li>
+<li><p><strong>High Mandate:</strong> Allies seek them out, resources flow, doors open.</p></li>
+<li><p><strong>Low Mandate:</strong> Suspicion, bureaucratic obstacles, support withers.</p></li>
 </ul>
 <p>Advance the timer when the party gains renown (clean victories, public accolades) or loses face (scandals, broken oaths).</p>
+</section>
+<section class="level4" id="subsec:crisis">
 <h3>Crisis Timer (0–6)</h3>
-<p>Tracks the opposition's growing strength.</p>
+<p>Tracks the opposition’s growing strength.</p>
 <ul>
-<li><strong>Rising Crisis:</strong> Complications escalate, enemies grow bolder.</li>
-<li><strong>Managed Crisis:</strong> Breathing room, opportunities to strike back.</li>
+<li><p><strong>Rising Crisis:</strong> Complications escalate, enemies grow bolder.</p></li>
+<li><p><strong>Managed Crisis:</strong> Breathing room, opportunities to strike back.</p></li>
 </ul>
 <p>Advance the timer when the party fails key objectives, ignores looming threats, or the GM spends SB on faction escalation.</p>
-<p><strong>Example.</strong> If the party brokers a peace treaty, advance <em>Mandate</em> by 1. If they assassinate a rival leader but leave evidence, advance <em>Crisis</em> by 1. When either timer reaches 6, trigger a major faction response (a summons, an assassination attempt, a public trial).</p>
-<h2 id="combat-resources">Combat Resource Management</h2>
+<section class="level6" id="example.-1">
+<h5>Example.</h5>
+<p>If the party brokers a peace treaty, advance <em>Mandate</em> by 1. If they assassinate a rival leader but leave evidence, advance <em>Crisis</em> by 1. When either timer reaches 6, trigger a major faction response (a summons, an assassination attempt, a public trial).</p>
+</section>
+</section>
+</section>
+<section class="level3" id="sec:combat-resources">
+<h2 id="combat-resource-management">Combat Resource Management</h2>
 <p>In combat, resource management takes on desperate urgency.</p>
+<section class="level4" id="subsec:combat-supply">
 <h3>Supply in Combat</h3>
 <ul>
-<li><strong>Intense Combat:</strong> GM may spend 1 SB to worsen Supply by one step (Full → Low → Dangerous → Empty).</li>
-<li><strong>Prolonged Engagement:</strong> Each hour of sustained combat worsens Supply one step.</li>
-<li><strong>Ammunition Depletion:</strong> Ranged weapons may run low, requiring scavenging actions (e.g., <strong>Craft</strong> roll to recover arrows).</li>
+<li><p><strong>Intense Combat:</strong> GM may spend 1 SB to worsen Supply by one step (e.g., Stable <span class="math inline">\(\rightarrow\)</span> Strained).</p></li>
+<li><p><strong>Prolonged Engagement:</strong> Each hour of sustained combat worsens Supply one step.</p></li>
+<li><p><strong>Ammunition Depletion:</strong> Ranged weapons may run low, requiring scavenging actions (e.g., <strong>Craft</strong> roll to recover arrows).</p></li>
 </ul>
+</section>
+<section class="level4" id="subsec:combat-fatigue">
 <h3>Fatigue in Combat</h3>
 <ul>
-<li>Characters apply Fatigue penalties as described above.</li>
-<li>Reaching Fatigue level 4+ during combat causes immediate collapse (incapacitated).</li>
-<li>Fatigue cannot be cleared during active combat.</li>
+<li><p>Characters apply Fatigue penalties as described in <span class="math inline">\(\ref{sec:fatigue-gm}\)</span>.</p></li>
+<li><p>Reaching Fatigue level 4+ during combat causes immediate collapse (incapacitated).</p></li>
+<li><p>Fatigue cannot be cleared during active combat.</p></li>
 </ul>
+</section>
+<section class="level4" id="subsec:combat-followers">
 <h3>Follower Combat Integration</h3>
 <ul>
-<li>Followers assist using their Cap (see Followers: On-Screen Allies, above).</li>
-<li>Spending <strong>2+ SB</strong> in combat can worsen a follower's Loyalty or Fitness.</li>
-<li>Followers can take combat-relevant independent actions (cost: worsen Fitness one step).</li>
-<li>After a follower acts twice in a high-risk combat scene, worsen their Exposure or Fitness.</li>
+<li><p>Followers assist using their Cap (see <span class="math inline">\(\ref{subsec:followers-gm}\)</span>).</p></li>
+<li><p>Spending <strong>2+ SB</strong> in combat can worsen a follower’s Loyalty or Fitness.</p></li>
+<li><p>Followers can take combat-relevant independent actions (cost: worsen Fitness one step).</p></li>
+<li><p>After a follower acts twice in a high-risk combat scene, worsen their Exposure or Fitness.</p></li>
 </ul>
-<h2 id="narrative-first-resources">Narrative First: The Fiction Is the Ledger</h2>
-<p>In Fate's Edge, arrows, rations, and waterskins are tracked only in the fiction that surrounds them. Mechanics engage only when those resources become scarce enough to matter. The focus remains always on <strong>narrative tension</strong> — the gnawing hunger, the fading light, the last arrow — not sterile bookkeeping.</p>
-<p><strong>Abstracting Coin and Time.</strong> Routine expenses and petty bribes are handled narratively ("You have enough coin from past jobs to cover a week's stay"). For major expenses (bribing a corrupt official, outfitting an expedition, buying a rare magical component), players may spend <strong>XP</strong> in place of coin (1 XP = a substantial sum). Use the "XP as currency" rule sparingly; it should feel like a meaningful sacrifice, not a tax.</p>
-<p><strong>GM Reminder.</strong> When a player asks "Do I have enough arrows?" the answer is almost always "yes" until it becomes dramatically interesting to say "no." Similarly, track Supply only when the party is isolated, pursued, or in a hostile environment. Let the world breathe with its own needs and abundances. And when the dice say the world pushes back against mortal plans — <strong>listen to what they tell you about the price of ambition.</strong></p>
-<h2 id="echo-characters-gm">Echo Characters: Managing Multi-Character Switching</h2>
-<p>Players may choose to temporarily step away from their current character and play another, while their first character continues to act offscreen. This is called an <strong>Echo Character</strong>. The optional rules in the Player's Guide give the player-facing procedure; this section provides the GM's mechanical framework for tracking offscreen characters, applying consequences, and maintaining narrative continuity.</p>
+</section>
+</section>
+<section class="level3" id="sec:resources-narrative-first">
+<h2 id="narrative-first-the-fiction-is-the-ledger">Narrative First: The Fiction Is the Ledger</h2>
+<p>In Fate’s Edge, arrows, rations, and waterskins are tracked only in the fiction that surrounds them. Mechanics engage only when those resources become scarce enough to matter. The focus remains always on <strong>narrative tension</strong> – the gnawing hunger, the fading light, the last arrow – not sterile bookkeeping.</p>
+<section class="level6" id="abstracting-coin-and-time.">
+<h5>Abstracting Coin and Time.</h5>
+<p>Routine expenses and petty bribes are handled narratively ("You have enough coin from past jobs to cover a week’s stay"). For major expenses (bribing a corrupt official, outfitting an expedition, buying a rare magical component), players may spend <strong>XP</strong> in place of coin (1 XP = a substantial sum). Use the "XP as currency" rule sparingly; it should feel like a meaningful sacrifice, not a tax.</p>
+</section>
+<section class="level6" id="gm-reminder.">
+<h5>GM Reminder.</h5>
+<p>When a player asks "Do I have enough arrows?" the answer is almost always "yes" until it becomes dramatically interesting to say "no." Similarly, track Supply only when the party is isolated, pursued, or in a hostile environment. Let the world breathe with its own needs and abundances. And when the dice say the world pushes back against mortal plans – <strong>listen to what they tell you about the price of ambition.</strong></p>
+</section>
+</section>
+<section class="level3" id="sec:echo-characters-gm">
+<h2 id="echo-characters-managing-multi-character-switching">Echo Characters: Managing Multi-Character Switching</h2>
+<p>Players may choose to temporarily step away from their current character and play another, while their first character continues to act offscreen. This is called an <strong>Echo Character</strong>. The optional rules in the Player’s Guide give the player-facing procedure; this section provides the GM’s mechanical framework for tracking offscreen characters, applying consequences, and maintaining narrative continuity.</p>
+<section class="level4" id="core-principles">
 <h3>Core Principles</h3>
 <ul>
-<li>Players <strong>choose</strong> when their character steps offscreen.</li>
-<li>Offscreen characters remain active in the fiction and can still affect the world.</li>
-<li>Absence creates <strong>opportunity and risk</strong>, not punishment.</li>
-<li>The world reacts to characters even when unseen.</li>
+<li><p>Players <strong>choose</strong> when their character steps offscreen.</p></li>
+<li><p>Offscreen characters remain active in the fiction and can still affect the world.</p></li>
+<li><p>Absence creates <strong>opportunity and risk</strong>, not punishment.</p></li>
+<li><p>The world reacts to characters even when unseen.</p></li>
 </ul>
+</section>
+<section class="level4" id="the-downtime-log">
 <h3>The Downtime Log</h3>
 <p>Each session a character is offscreen, the player completes a simple <strong>Downtime Log</strong>. The GM records the outcomes and may introduce one consequence per log.</p>
+<section class="level5" id="log-structure">
 <h4>Log Structure</h4>
 <p>The player declares:</p>
 <ol>
-<li><strong>Resource Action</strong>: How the character maintains connections or standing (e.g., sends a letter, pays a retainer, visits a contact offscreen).</li>
-<li><strong>Project Action</strong>: One goal or project advanced (e.g., researches a ritual, trains a follower, builds a contacts list).</li>
-<li><strong>Event Response</strong>: How the character reacts to unseen events or threats (e.g., avoids a patrol, hides from a rival, investigates a rumor).</li>
+<li><p><strong>Resource Action</strong>: How the character maintains connections or standing (e.g., sends a letter, pays a retainer, visits a contact offscreen).</p></li>
+<li><p><strong>Project Action</strong>: One goal or project advanced (e.g., researches a ritual, trains a follower, builds a contacts list).</p></li>
+<li><p><strong>Event Response</strong>: How the character reacts to unseen events or threats (e.g., avoids a patrol, hides from a rival, investigates a rumor).</p></li>
 </ol>
+</section>
+<section class="level5" id="tier-based-project-limits">
 <h4>Tier-Based Project Limits</h4>
-<p>Players may advance up to a certain number of projects per downtime based on their character's Tier:</p>
+<p>Players may advance up to a certain number of projects per downtime based on their character’s Tier:</p>
 <ul>
-<li>Tier I–II: 1 Project</li>
-<li>Tier III–IV: 2 Projects</li>
-<li>Tier V: 3 Projects</li>
+<li><p>Tier I–II: 1 Project</p></li>
+<li><p>Tier III–IV: 2 Projects</p></li>
+<li><p>Tier V: 3 Projects</p></li>
 </ul>
+</section>
+<section class="level5" id="gm-response">
 <h4>GM Response</h4>
 <p>For each Downtime Log, the GM:</p>
 <ul>
-<li>Notes the fictional outcome of each declaration.</li>
-<li>May assign <strong>one meaningful Consequence</strong> (complication, shift, or new opportunity) that will affect the character when they return.</li>
+<li><p>Notes the fictional outcome of each declaration.</p></li>
+<li><p>May assign <strong>one meaningful Consequence</strong> (complication, shift, or new opportunity) that will affect the character when they return.</p></li>
 </ul>
 <p>Consequences should be specific and story-driven, not punitive. Examples:</p>
 <ul>
-<li><em>"Your contact has moved; you'll need to find them again."</em></li>
-<li><em>"The rival you avoided now knows your general location."</em></li>
-<li><em>"Your project succeeds, but you lost a valuable resource in the process."</em></li>
+<li><p><em>“Your contact has moved; you’ll need to find them again.”</em></p></li>
+<li><p><em>“The rival you avoided now knows your general location.”</em></p></li>
+<li><p><em>“Your project succeeds, but you lost a valuable resource in the process.”</em></p></li>
 </ul>
+</section>
+</section>
+<section class="level4" id="crisis-timer-for-offscreen-characters">
 <h3>Crisis Timer for Offscreen Characters</h3>
 <p>Each offscreen character tracks a private <strong>Crisis Timer [6]</strong>. This timer represents mounting pressure, danger, or narrative trouble that accumulates while the character is away.</p>
-<h4>When to Tick the Crisis Timer</h4>
+<section class="level5" id="when-to-tick-the-crisis-timer">
+<h4>When to Tick the Crisis Timer </h4>
 <p>Tick the Crisis Timer +1 when:</p>
 <ul>
-<li>The player's Downtime Log includes a <strong>failed</strong> or <strong>partial</strong> outcome (GM discretion).</li>
-<li>The GM spends <strong>2+ Story Beats</strong> on offscreen events related to that character.</li>
-<li>The character ignores an obvious threat or obligation (e.g., refuses a Patron's demand while offscreen).</li>
-<li>The character is <em>In Peril</em> (status declared by player at start of absence).</li>
+<li><p>The player’s Downtime Log includes a <strong>failed</strong> or <strong>partial</strong> outcome (GM discretion).</p></li>
+<li><p>The GM spends <strong>2+ Story Beats</strong> on offscreen events related to that character.</p></li>
+<li><p>The character ignores an obvious threat or obligation (e.g., refuses a Patron’s demand while offscreen).</p></li>
+<li><p>The character is <em>In Peril</em> (status declared by player at start of absence).</p></li>
 </ul>
+</section>
+<section class="level5" id="when-the-crisis-timer-fills">
 <h4>When the Crisis Timer Fills</h4>
 <p>At 6 segments, the character faces a <strong>major offscreen crisis</strong>. The GM describes what happens, and the player must address it upon return. Examples:</p>
 <ul>
-<li>A rival captures the character's ally or asset.</li>
-<li>The character is wounded or cursed (apply Harm 1 or a Condition).</li>
-<li>The character loses a valuable resource (String, Asset tag, or follower Loyalty).</li>
-<li>A Patron calls in a debt in an especially inconvenient way.</li>
+<li><p>A rival captures the character’s ally or asset.</p></li>
+<li><p>The character is wounded or cursed (apply Harm 1 or a Condition).</p></li>
+<li><p>The character loses a valuable resource (String, Asset tag, or follower Loyalty).</p></li>
+<li><p>A Patron calls in a debt in an especially inconvenient way.</p></li>
 </ul>
 <p>After the crisis, reset the Crisis Timer to 0. The crisis should create a story hook, not remove the character from play.</p>
-<h4>Reducing the Crisis Timer</h4>
+</section>
+<section class="level5" id="reducing-the-crisis-timer">
+<h4>Reducing the Crisis Timer </h4>
 <p>Players may reduce the Crisis Timer by:</p>
 <ul>
-<li>Spending <strong>1 Boon</strong> (on their active character) to send aid or a message.</li>
-<li>Accepting a <strong>Devil's Bargain</strong> that introduces a complication on their active character.</li>
-<li>Having another player's active character interact with the offscreen character's situation (e.g., "I send a scout to check on them").</li>
+<li><p>Spending <strong>1 Boon</strong> (on their active character) to send aid or a message.</p></li>
+<li><p>Accepting a <strong>Devil’s Bargain</strong> that introduces a complication on their active character.</p></li>
+<li><p>Having another player’s active character interact with the offscreen character’s situation (e.g., “I send a scout to check on them”).</p></li>
 </ul>
-<p>The GM may also reduce the timer by 1 if the player's Downtime Log shows proactive risk management.</p>
+<p>The GM may also reduce the timer by 1 if the player’s Downtime Log shows proactive risk management.</p>
+</section>
+</section>
+<section class="level4" id="return-mechanics">
 <h3>Return Mechanics</h3>
 <p>When a player brings an Echo Character back to active play:</p>
 <ol>
-<li>The returning character gains <strong>2 Boons</strong> for narrative re-entry (a burst of momentum).</li>
-<li>The player rolls <strong>Wits + Spirit</strong> (DV 3) to reestablish presence. On a success, they reintegrate smoothly. On a failure, the GM applies one additional consequence (e.g., they arrive off-balance, or a complication follows them).</li>
-<li>The GM reveals any Consequences accumulated during absence, and the player must address unresolved plot threads.</li>
+<li><p>The returning character gains <strong>2 Boons</strong> for narrative re-entry (a burst of momentum).</p></li>
+<li><p>The player rolls <strong>Wits + Spirit</strong> (DV 3) to reestablish presence. On a success, they reintegrate smoothly. On a failure, the GM applies one additional consequence (e.g., they arrive off-balance, or a complication follows them).</p></li>
+<li><p>The GM reveals any Consequences accumulated during absence, and the player must address unresolved plot threads.</p></li>
 </ol>
+</section>
+<section class="level4" id="optional-buddy-system">
 <h3>Optional: Buddy System</h3>
 <p>If multiple players have offscreen characters, they may nominate a <strong>Buddy</strong> (another player with an active character) to help track Downtime Logs and Crisis Timers. The Buddy gains <strong>+1 additional Boon</strong> for the session for this support role (this Boon does not count toward the session cap).</p>
+</section>
+<section class="level4" id="player-guidelines-for-gm-to-communicate">
 <h3>Player Guidelines (for GM to communicate)</h3>
 <p>Share these with players who wish to use the system:</p>
 <ul>
-<li>Declare offscreen goals with clear fictional intent.</li>
-<li>Treat absence as character growth, not disappearance.</li>
-<li>Expect absence to create tension, opportunity, and drama.</li>
-<li>Keep your Downtime Log brief (one sentence per action).</li>
+<li><p>Declare offscreen goals with clear fictional intent.</p></li>
+<li><p>Treat absence as character growth, not disappearance.</p></li>
+<li><p>Expect absence to create tension, opportunity, and drama.</p></li>
+<li><p>Keep your Downtime Log brief (one sentence per action).</p></li>
 </ul>
+</section>
+<section class="level4" id="full-cross-reference">
 <h3>Full Cross-Reference</h3>
-<p>For player-facing rules on Echo Characters (how to declare absence, what a Downtime Log is, and the benefits of returning), see the Player's Guide chapter on Followers and Assets. The player version omits Crisis Timers and GM consequence mechanics; those are your tools as GM.</p>
-<footer>Fate's Edge Copyright — (c) 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.</footer>
-</article></body>
+<p>For player-facing rules on Echo Characters (how to declare absence, what a Downtime Log is, and the benefits of returning), see the Player’s Guide, Chapter <span class="math inline">\(\ref{ch:running-assets-followers}\)</span>. The player version omits Crisis Timers and GM consequence mechanics; those are your tools as GM. </p>
+</section>
+</section>
+</section></article></article></body>
 </html>
