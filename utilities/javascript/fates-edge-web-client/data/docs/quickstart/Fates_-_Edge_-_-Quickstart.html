@@ -62,7 +62,7 @@
 @media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
 @media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
 </style></head>
-<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Quickstart · entry point</strong></p><p>Read this document’s stated scope before using it. A quickstart is a starting point; follow its references when you need detail, and keep the full rules available for questions that a short introduction does not cover.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Fate's Edge — Quickstart</a></li><li><a href="#reader-section-2">1. What This Game Is</a></li><li><a href="#reader-section-3">2. The Core Loop</a></li><li><a href="#magic-rolls">Magic Rolls</a></li><li><a href="#reader-section-4">3. Boons &amp; Story Beats</a></li><li><a href="#reader-section-5">4. Build a Character in 5 Minutes</a></li><li><a href="#pregens">5. Grab-and-Go Pregens</a></li><li><a href="#reader-section-7">6. Table Safety, Fast Version</a></li></ul></details>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Quickstart · entry point</strong></p><p>Read this document’s stated scope before using it. A quickstart is a starting point; follow its references when you need detail, and keep the full rules available for questions that a short introduction does not cover.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Fate's Edge — Quickstart</a></li><li><a href="#reader-section-2">1. What This Game Is</a></li><li><a href="#reader-section-3">2. The Core Loop</a></li><li><a href="#core-skills">Core Skills</a></li><li><a href="#magic-rolls">Magic Rolls</a></li><li><a href="#reader-section-4">3. Boons &amp; Story Beats</a></li><li><a href="#reader-section-5">4. Build a Character in 5 Minutes</a></li><li><a href="#pregens">5. Grab-and-Go Pregens</a></li><li><a href="#reader-section-7">6. Table Safety, Fast Version</a></li></ul></details>
 <h1 id="reader-section-1">Fate's Edge — Quickstart</h1>
 <p class="text-muted" style="margin-bottom:0.8rem;">
 <span class="badge badge-gold">15-minute read</span>
@@ -95,14 +95,15 @@
 <tr><td>2</td><td>Routine, almost guaranteed</td></tr>
 <tr><td>3</td><td>Default — mild opposition, some risk</td></tr>
 <tr><td>4</td><td>Hard — serious opposition or bad angle</td></tr>
-<tr><td>5+</td><td>Extreme — major boss or dramatic gamble</td></tr>
+<tr><td>5</td><td>Extreme — high stakes or severe resistance</td></tr>
 </table></div>
+<p class="text-muted">The standard ladder ends at DV 5. DV 6–8 is reserved for Tier IV+ epic-scale challenges; otherwise use Position, Effect, or a timer to raise the stakes.</p>
 <h3>Position</h3>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Position</th><th>Frame</th><th>Effect</th></tr>
 <tr><td>Dominant</td><td>You press the advantage</td><td>Re-roll one failure</td></tr>
 <tr><td>Controlled</td><td>Balanced, normal</td><td>No re-rolls</td></tr>
-<tr><td>Desperate</td><td>You act under duress</td><td>Re-roll one success</td></tr>
+<tr><td>Desperate</td><td>You act under duress</td><td>Re-roll one success (never a 10)</td></tr>
 </table></div>
 <p class="text-muted">Spend 1 Boon to improve Position by one step before you roll.</p>
 <h3>Outcome</h3>
@@ -111,15 +112,28 @@
 <tr><td>Successes ≥ DV, no 1s</td><td>Clean Success</td><td>You get what you wanted, no complication</td></tr>
 <tr><td>Successes ≥ DV, some 1s</td><td>Success + Story Beat</td><td>You get it, but the GM spends SB on a complication</td></tr>
 <tr><td>0 &lt; Successes &lt; DV</td><td>Partial</td><td>Progress made; you gain 1 Boon</td></tr>
-<tr><td>0 Successes</td><td>Miss</td><td>No progress; you gain 2 Boons; GM escalates</td></tr>
+<tr><td>0 Successes</td><td>Miss</td><td>No progress; on a meaningful roll you gain 2 Boons; GM escalates</td></tr>
 </table></div>
+<section id="core-skills">
+<h3>Core Skills</h3>
+<p>Fate’s Edge uses these twelve core skills. Any skill not listed on a pre-gen is 0.</p>
+<div aria-label="Scrollable core skills table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
+<tr><th>Combat</th><td>Melee (armed or unarmed), Ranged</td></tr>
+<tr><th>Physical</th><td>Athletics, Stealth, Endurance</td></tr>
+<tr><th>Practical</th><td>Craft</td></tr>
+<tr><th>Social</th><td>Sway, Deception, Performance</td></tr>
+<tr><th>Mental</th><td>Insight, Lore</td></tr>
+<tr><th>Magic</th><td>Arcana</td></tr>
+</table></div>
+<p>Older references may call Craft “Medicine,” Insight “Investigation,” Deception “Subterfuge,” or Melee “Unarmed.” Those are covered by the twelve core skills above, not additional skills.</p>
+</section>
 <section id="magic-rolls">
 <h3>Magic Rolls</h3>
 <p>Use the pool or procedure named by the spell, Rite, or Gift. These are the common rules:</p>
 <div aria-label="Scrollable magic roll reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Magic approach</th><th>Roll or procedure</th></tr>
 <tr><td>Free Casting</td><td>Wits or Spirit + Arcana, whichever fits the approach</td></tr>
-<tr><td>Runekeeper Rite</td><td>Attribute + Ritual, only when the Rite calls for a roll</td></tr>
+<tr><td>Runekeeper Rite</td><td>Attribute + Lore, only when the Rite calls for a roll</td></tr>
 <tr><td>Invoker Rite</td><td>Follow the Rite's procedure; invocation usually costs time and Obligation, with no separate roll unless specified</td></tr>
 <tr><td>Cantor Song</td><td>Lore + Performance</td></tr>
 <tr><td>Witchcraft Hedge Gift</td><td>No roll</td></tr>
@@ -145,19 +159,25 @@
 <li>Attributes (Body/Wits/Spirit/Presence, base 1): put one at 3, one at 2. (~21 XP)</li>
 <li>Skills (0–5): 2–3 key skills at 1–2 each. (~8–12 XP)</li>
 <li>0–3 Talents if any XP is left — optional, not required to be effective.</li>
-<li>1 Bond with another PC (+2 XP), optionally 1 Complication (+2 XP).</li>
+<li>Up to 2 mutual Bonds (+1 XP each), and optionally 0–2 Complications (+2 XP each; each unresolved Complication gives the GM 1 banked SB at the start of each scene).</li>
 <li>Starting gear: clothes, a weapon, light armor, adventuring kit.</li>
 </ol>
 <h2 id="pregens">5. Grab-and-Go Pregens</h2>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
 <tr><th>Name</th><th>Concept</th><th>Best At</th></tr>
 <tr><td>Levi</td><td>Soldier — once a legionary, now a sellsword</td><td>Melee combat</td></tr>
-<tr><td>Lyra</td><td>Scholar — expelled for forbidden research</td><td>Lore &amp; investigation</td></tr>
-<tr><td>Sera</td><td>Shadow — former guild thief</td><td>Stealth &amp; subterfuge</td></tr>
-<tr><td>Mira</td><td>Healer — accused of witchcraft</td><td>Medicine &amp; insight</td></tr>
-<tr><td>Kael</td><td>Runekeeper — wanderer sworn to a patron</td><td>Magic (optional, Tier II)</td></tr>
+<tr><td>Lyra</td><td>Scholar — expelled for forbidden research</td><td>Lore &amp; Insight</td></tr>
+<tr><td>Sera</td><td>Shadow — former guild thief</td><td>Stealth &amp; Deception</td></tr>
+<tr><td>Mira</td><td>Healer — accused of witchcraft</td><td>Craft &amp; Insight</td></tr>
+<tr><td>Kael</td><td>Runekeeper — wanderer sworn to the Traveler</td><td>Magic (Tier I)</td></tr>
 </table></div>
-<p class="text-muted">Full stat blocks are in the <a href="../resources/Fates_-_Edge_-_-Essentials.html">Essential Guide</a>, Chapter 4.</p>
+<div class="panel panel-gold"><strong>Starting state:</strong> Tier I; 32 XP baseline plus one mutual Bond (+1 XP); 0 Boons, 0 Fatigue, 0 Harm. Each character’s unlisted core skills are 0.</div>
+<div class="panel"><h3>Levi — Soldier</h3><p><strong>Attributes:</strong> Body 3, Wits 2, Spirit 1, Presence 1. <strong>Skills:</strong> Melee 2, Athletics 1, Endurance 1.</p><p><strong>Talent:</strong> Combat Reflexes. <strong>Gear:</strong> Medium sword, light armor, travel kit.</p><p><strong>Bond:</strong> “I saved your life outside Millhaven.” Agree with another PC on what you each owe.</p></div>
+<div class="panel"><h3>Lyra — Scholar</h3><p><strong>Attributes:</strong> Body 2, Wits 3, Spirit 1, Presence 1. <strong>Skills:</strong> Lore 2, Arcana 1, Insight 1.</p><p><strong>Talent:</strong> Keen Senses. <strong>Gear:</strong> Staff, light armor, scholar’s tools and notes.</p><p><strong>Bond:</strong> “We both lost our place in Silkstrand.” Agree with another PC on what happened and what you share.</p></div>
+<div class="panel"><h3>Sera — Shadow</h3><p><strong>Attributes:</strong> Body 2, Wits 3, Spirit 1, Presence 1. <strong>Skills:</strong> Stealth 2, Deception 1, Insight 1.</p><p><strong>Talent:</strong> Trackless Step. <strong>Gear:</strong> Two light blades, light armor, lock tools.</p><p><strong>Bond:</strong> “You kept my secret when the guards came.” Agree with another PC on the secret and why they protected you.</p></div>
+<div class="panel"><h3>Mira — Healer</h3><p><strong>Attributes:</strong> Body 1, Wits 2, Spirit 3, Presence 1. <strong>Skills:</strong> Craft 2, Insight 1, Endurance 1.</p><p><strong>Talent:</strong> Field Dressing. <strong>Gear:</strong> Light weapon, light armor, healer’s tools.</p><p><strong>Bond:</strong> “You trusted me when no one else would.” Agree with another PC on what you risked for them.</p></div>
+<div class="panel"><h3>Kael — Runekeeper</h3><p><strong>Attributes:</strong> Body 1, Wits 2, Spirit 3, Presence 1. <strong>Skills:</strong> Lore 1, Arcana 1, Insight 1.</p><p><strong>Talents:</strong> Familiar, Codex. <strong>Known Rites:</strong> Road-Sense (Obligation 4) and Traveler’s Boon (Obligation 5); pay Obligation when invoked.</p><p><strong>Gear:</strong> Walking staff, light armor, travel kit, Traveler’s Codex. <strong>Bond:</strong> “The road brought us together.” Agree with another PC on the journey or debt that binds you.</p></div>
+<p class="text-muted">All five characters below are ready for play. Full rules and build notes are in the <a href="../resources/Fates_-_Edge_-_-Essentials.html#ch:pregens">Essential Guide</a>, Chapter 4.</p>
 <h2 id="reader-section-7">6. Table Safety, Fast Version</h2>
 <p>
         Keep an <strong>X-Card</strong> visible — anyone can say "X" to skip past uncomfortable content, no
