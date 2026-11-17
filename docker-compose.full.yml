@@ -154,7 +154,7 @@ services:
     pull_policy: never  # locally built -- never try to pull this from a registry
     container_name: fates-edge-demo-client
     ports:
-      - "${CLIENT_PORT:-8080}:80"
+      - "${CLIENT_PORT:-8080}:8080"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/health"]

@@ -30,29 +30,10 @@
  * - REVISED: Added Bound Patron, bloomCount, resonantRites display for Cantors.
  *
  * ────────────────────────────────────────────────────────────────────────
- * BUGFIX PASS (this revision) — "Talents doesn't work":
- *
- * 1. renderTalentList() filtered wiki entries with
- *    `e.category === 'talents' || e.category === 'talent'`. Real wiki
- *    entries (see cantor.js/psion.js's own fallback loaders) identify
- *    themselves as talents via a `tags` array containing 'talent' — the
- *    `category` field is used for the magic path name instead (e.g.
- *    category: 'magic'). This filter matched ZERO wiki entries, ever, so
- *    the standalone Talent Catalog panel could only ever show manually
- *    added local talents. The same wrong filter was duplicated in
- *    editor.js and wizard.js — fixed in all three.
- *
- * 2. cloneTalentFromWiki() hardcoded `activation: 'passive'` and never
- *    copied `prerequisites` from the source wiki entry — cloning an
- *    Active, prerequisite-gated talent (e.g. Ghost Heist, a new thief
- *    talent — Active, once per arc, requires Tier II + Stealth 3+) would
- *    silently turn it into a passive talent with no prerequisites shown.
- *    Now carries over `activation`/`prerequisites`/`tier` from the wiki
- *    entry when present, falling back to the previous defaults only when
- *    the entry doesn't specify them.
- * ────────────────────────────────────────────────────────────────────────
- * NEW: "Clone All" button clones every remote talent from the wiki that
- * hasn't already been cloned locally. Works with the fixed cloning logic.
+ * Talent source of truth: data/talents/*.json, loaded by core/talent-loader.js.
+ * Wiki entries are optional import material only. They are excluded from the
+ * character editor and filtered against the local catalog before display or
+ * import, so canonical talents are never presented as Wiki clones.
  * ────────────────────────────────────────────────────────────────────────
  */
 
@@ -67,6 +48,7 @@ import { getCharacter,
 import { createCharacterCard } from '@components/CharacterCard.js';
 import { showToast } from '@components/Toast.js';
 import { matchesCatalogQuery } from './catalog-utils.js';
+import { loadTalentCatalog } from '@core/talent-loader.js';
 
 // ============================================================
 // GAME DATA CONSTANTS (from Player's Guide)
@@ -399,12 +381,12 @@ export function render(el) {
                 <div style="display:flex;gap:0.3rem;">
                     <button class="btn btn-sm btn-ghost" id="talent-toggle-btn" title="Toggle talent list visibility" data-i18n-attr="title:feature.characters.toggleTalentListVisibility">−</button>
                     <button class="btn btn-sm btn-ghost" id="talent-add-btn" title="Add custom talent" data-i18n-attr="title:feature.characters.addCustomTalent" data-i18n="feature.characters.talent">+ Talent</button>
-                    <button class="btn btn-sm btn-ghost" id="talent-clone-all-btn" title="Clone all talents from the wiki that are not yet cloned" style="color:var(--gold);" data-i18n-attr="title:feature.characters.cloneAllTalentsFromTheWikiThat" data-i18n="feature.characters.cloneAll">📋 Clone All</button>
+                    <button class="btn btn-sm btn-ghost" id="talent-clone-all-btn" title="Import wiki-only talents not present in the local JSON catalog" style="color:var(--gold);" data-i18n-attr="title:feature.characters.cloneAllTalentsFromTheWikiThat" data-i18n="feature.characters.cloneAll">📥 Import Wiki-Only</button>
                 </div>
             </div>
             
             <label class="catalog-search">Find a talent<input type="search" id="talent-search" placeholder="Name, effect, or prerequisite"></label>
-            <p class="text-muted">Cloning adds an editable copy to your catalog, not to a character. Choose talents in the wizard or character editor.</p>
+            <p class="text-muted">Built-in talents load from the local JSON catalog. Importing adds a separate editable copy of a Wiki-only talent; it does not add it to a character.</p>
             <!-- Talent Tier Filter -->
             <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.5rem;" id="talent-filters">
                 <button class="btn btn-xs btn-gold talent-filter-btn active" data-filter="all" data-i18n="feature.characters.all">All</button>
@@ -425,6 +407,11 @@ export function render(el) {
     renderCharList();
     renderPartyOverview();
     renderTalentList();
+    loadTalentCatalog().then(() => {
+        if (container === el && el.isConnected) renderTalentList();
+    }).catch(err => {
+        console.warn('[Characters] Failed to load built-in talent catalog:', err);
+    });
     attachEvents();
     container.querySelector('#talent-search').addEventListener('input', renderTalentList);
     container.querySelector('#character-search').addEventListener('input', renderCharList);
@@ -734,9 +721,13 @@ export function renderTalentList() {
     const state = getState();
     const localTalents = state.talents || [];
     const wikiEntries = state.wikiEntries || [];
-    // FIX (see header note #1): identify talents via tags, not category.
+    const localNames = new Set(localTalents.map(t => normalizeTalentName(t.name)).filter(Boolean));
+    // Wiki entries remain available as an explicit import source, but built-in
+    // talents come from the dedicated JSON catalog and must never be duplicated
+    // as Wiki rows beside their canonical local entries.
     const remoteTalents = wikiEntries.filter(e =>
-        e.tags && Array.isArray(e.tags) && e.tags.includes('talent')
+        e.tags && Array.isArray(e.tags) && e.tags.includes('talent') &&
+        !localNames.has(normalizeTalentName(e.title || e.name))
     );
     
     // Count by tier
@@ -764,7 +755,7 @@ export function renderTalentList() {
     if (total === 0) {
         container.innerHTML = `
             <div style="text-align:center;padding:0.5rem;color:var(--text3);font-size:0.85rem;">
-                No talents defined. Clone from wiki or add custom.<br>
+                No talents loaded yet. Built-in talents load from the JSON catalog; you can also add a custom talent.<br>
                 <span style="font-size:0.75rem;">Talent tiers: Minor (2–3 XP), Major (4–6 XP), Prestige (7–10 XP), Epic (11+ XP)</span>
             </div>
         `;
@@ -1130,9 +1121,10 @@ function cloneTalentFromWiki(remoteIdOrObject) {
     if (!state.talents) state.talents = [];
     
     // Check if already cloned (by clonedFrom or by exact name match)
+    const remoteName = normalizeTalentName(remote.title || remote.name);
     const existing = state.talents.find(t => 
         t.clonedFrom === remote.id || 
-        (t.source === 'wiki-clone' && t.name === remote.title)
+        normalizeTalentName(t.name) === remoteName
     );
     if (existing) {
         // Not an error; just skip silently for bulk operations.
@@ -1144,7 +1136,7 @@ function cloneTalentFromWiki(remoteIdOrObject) {
     
     const newTalent = {
         id: generateId('talent_'),
-        name: remote.title,
+        name: remote.title || remote.name,
         cost: cost,
         description: remote.body || remote.description || '',
         prerequisites: remote.prerequisites || '',
@@ -1176,11 +1168,13 @@ function cloneAllTalentsFromWiki() {
     }
     
     // Get already cloned IDs
-    const existingClones = (state.talents || [])
-        .filter(t => t.source === 'wiki-clone' && t.clonedFrom)
-        .map(t => t.clonedFrom);
+    const existingClones = new Set((state.talents || []).map(t => String(t.clonedFrom || '')));
+    const existingNames = new Set((state.talents || []).map(t => normalizeTalentName(t.name)).filter(Boolean));
     
-    const toClone = remoteTalents.filter(t => !existingClones.includes(t.id));
+    const toClone = remoteTalents.filter(t =>
+        !existingClones.has(String(t.id)) &&
+        !existingNames.has(normalizeTalentName(t.title || t.name))
+    );
     
     if (toClone.length === 0) {
         showToast(i18nText("feature.characters.allWikiTalentsAreAlreadyCloned", null, "All wiki talents are already cloned."), 'info');
@@ -1353,6 +1347,10 @@ function getTalentTier(cost) {
         if (xp >= t.min && xp <= t.max) return t;
     }
     return TALENT_TIERS[0];
+}
+
+function normalizeTalentName(name) {
+    return String(name || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
 function determineRole(char) {

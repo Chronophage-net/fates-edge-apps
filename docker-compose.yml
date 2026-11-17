@@ -50,7 +50,7 @@ services:
     image: fates-edge-client:latest
     container_name: fates-edge-client
     ports:
-      - "${CLIENT_PORT:-8080}:80"
+      - "${CLIENT_PORT:-8080}:8080"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/health"]

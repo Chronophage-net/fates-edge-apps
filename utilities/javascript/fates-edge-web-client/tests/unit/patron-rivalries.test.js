@@ -24,7 +24,7 @@ const patrons = readdirSync(join(DATA, 'patrons'))
 describe('patrons: Cross-Resonance lookup', () => {
 
     it('the table survived extraction intact', () => {
-        assert(table.pairs.length === 81, `expected 81 pairings, got ${table.pairs.length}`);
+        assert(table.pairs.length === 84, `expected 84 pairings, got ${table.pairs.length}`);
         assert(table.rulings.length === 4, 'expected the four quick rulings');
         for (const p of table.pairs) {
             assert(p.patron && p.rival, 'every pairing needs both sides');

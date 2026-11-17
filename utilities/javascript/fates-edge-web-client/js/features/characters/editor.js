@@ -381,13 +381,10 @@ export function getTierFromXp(xp) {
 function getAvailableTalentsForTier(totalXp) {
     const appState = getState();
     const localTalents = appState.talents || [];
-    const wikiEntries = appState.wikiEntries || [];
-    const wikiTalents = wikiEntries.filter(e => e.tags && Array.isArray(e.tags) && e.tags.includes('talent'));
-
-    const allTalents = [
-        ...localTalents.map(t => ({ ...t, source: 'local' })),
-        ...wikiTalents.map(t => ({ ...t, name: t.title, description: t.body || t.description, source: 'wiki' }))
-    ];
+    // Built-in options are loaded from data/talents/*.json by talent-loader.
+    // Wiki entries are reference material, not a second source for character
+    // creation; mixing them here caused duplicate and clone-only choices.
+    const allTalents = localTalents.map(t => ({ ...t, source: 'local' }));
 
     const { tier } = getTierFromXp(totalXp);
     let allowedTiers = [];

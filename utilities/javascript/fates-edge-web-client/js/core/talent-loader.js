@@ -42,20 +42,40 @@ export async function loadTalentCatalog(force = false) {
 
     loadingPromise = (async () => {
         const manifest = await fetchJSON(MANIFEST_PATH);
-        const slugs = Array.isArray(manifest) ? manifest : (manifest?.data || []);
-        if (!slugs.length) {
+        const slugs = Array.isArray(manifest)
+            ? manifest
+            : (Array.isArray(manifest?.data) ? manifest.data : null);
+        // A missing or malformed manifest is a failed load, not an empty
+        // catalog. Leave `loaded` false so opening the editor again can retry.
+        if (!slugs) {
+            console.warn('[TalentLoader] Talent manifest is unavailable or invalid; will retry on next open.');
+            return;
+        }
+        if (slugs.length === 0) {
             loaded = true;
             return;
         }
 
         const state = getState();
-        if (!state.talents) state.talents = [];
+        if (!Array.isArray(state.talents)) state.talents = [];
         const existingIds = new Set(state.talents.map(t => t.id).filter(Boolean));
 
+        // Fetch the per-talent files together. Fetching 50+ files serially
+        // kept the character editor waiting on the entire network waterfall
+        // before it could render its catalog.
+        const entries = await Promise.all(slugs.map(async slug => ({
+            slug,
+            data: await fetchJSON(`${TALENTS_BASE_PATH}${slug}.json`),
+        })));
+
         let added = 0;
-        for (const slug of slugs) {
-            const data = await fetchJSON(`${TALENTS_BASE_PATH}${slug}.json`);
-            if (!data || !data.id) continue;
+        let failed = 0;
+        for (const { slug, data } of entries) {
+            if (!data || !data.id) {
+                failed++;
+                console.warn(`[TalentLoader] Talent file unavailable or invalid: ${slug}.json`);
+                continue;
+            }
             if (existingIds.has(data.id)) continue; // don't clobber local customizations
             ensureTalentEffects(data);
             state.talents.push(data);
@@ -67,7 +87,9 @@ export async function loadTalentCatalog(force = false) {
             saveState();
             console.log(`[TalentLoader] Loaded ${added} built-in talent(s) into the catalog.`);
         }
-        loaded = true;
+        // If one or more files failed, keep the loader retryable. Existing
+        // entries are deduplicated by id, so a retry only adds recovered data.
+        loaded = failed === 0;
     })();
 
     try {

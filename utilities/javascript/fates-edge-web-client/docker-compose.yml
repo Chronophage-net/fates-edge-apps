@@ -29,7 +29,7 @@ services:
     image: fates-edge-client:latest
     container_name: fates-edge-client
     ports:
-      - "${PORT:-8080}:80"
+      - "${PORT:-8080}:8080"
     restart: unless-stopped
     # FIX: was `curl -f ...` — the nginx:alpine base image doesn't ship
     # curl, so this healthcheck failed 100% of the time with "curl: not
