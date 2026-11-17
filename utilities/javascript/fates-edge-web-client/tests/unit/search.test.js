@@ -98,6 +98,19 @@ describe('Search module: Elasticsearch backend', () => {
 });
 
 describe('Search module: backend selection', () => {
+    it('Solr helpers do not make requests when no Solr URL is configured', async () => {
+        resetConfig();
+        let requestCount = 0;
+        await withMockFetch(async () => {
+            requestCount++;
+            return { ok: true, json: async () => ({ response: { docs: [] } }) };
+        }, async () => {
+            assertEqual(await checkSolr(), false);
+            assertEqual(await solrSearch('bell'), null);
+        });
+        assertEqual(requestCount, 0);
+    });
+
     it('loadSearchIndex() picks Elasticsearch when only __ES_URL is configured', async () => {
         resetConfig();
         window.__ES_URL = 'https://es.example.com/fatesedge';
@@ -147,12 +160,8 @@ describe('Search module: backend selection', () => {
 
         resetConfig(); // simulate the operator un-configuring Elasticsearch
         window.__SOLR_URL = 'https://solr.example.com/solr/fatesedge/select';
-        reloadIndex(); // fire-and-forget, matches production usage (rebuild button)
         await withMockFetch(async () => ({ ok: true }), async () => {
-            // give the not-awaited internal loadSearchIndex() a tick to settle
-            for (let i = 0; i < 5 && getSearchStatus().isLoading; i++) {
-                await new Promise(r => setTimeout(r, 0));
-            }
+            await reloadIndex();
         });
     });
 

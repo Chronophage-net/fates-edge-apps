@@ -1,5 +1,5 @@
 import { parsePregens } from '../../js/features/home/pregens.js';
-import { describe, it, assert } from '../runner.js';
+import { describe, it, assert, assertEqual } from '../runner.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -97,10 +97,15 @@ describe('Jump to the Action: welcome overlay wiring (source guard)', () => {
 });
 
 describe('Starter pack compatibility', () => {
-    it('accepts the licensed envelope and legacy arrays without changing characters', () => {
+    it('accepts licensed envelopes and legacy arrays while returning normalized copies', () => {
         const character = { name: 'Traveler', skills: { lore: 1 }, talents: [] };
-        assert(parsePregens({ _license: 'notice', data: [character] })[0] === character);
-        assert(parsePregens([character])[0] === character);
+        const fromEnvelope = parsePregens({ _license: 'notice', data: [character] })[0];
+        const fromArray = parsePregens([character])[0];
+        assert(fromEnvelope !== character && fromArray !== character);
+        assertEqual(fromEnvelope.body, 1);
+        assertEqual(fromEnvelope.skills.lore, 1);
+        assertEqual(Object.keys(fromEnvelope.skills).length, 12);
+        assertEqual(character.body, undefined, 'normalization must not mutate the downloaded object');
     });
     it('rejects malformed packs so setup can show an actionable warning', () => {
         for (const payload of [null, {}, { data: [] }, { data: [null, { name: 'Incomplete' }] }]) {

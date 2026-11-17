@@ -56,7 +56,10 @@ const FALLBACK_ENTRIES = [
 // every call also makes them reconfigurable at runtime, e.g. from a
 // Settings panel, without a page reload.)
 // ------------------------------------------------------------------
-function getSolrUrl() { return window.__SOLR_URL || null; }
+function getSolrUrl() {
+    const url = window.__SOLR_URL;
+    return typeof url === 'string' && url.trim() ? url.trim() : null;
+}
 // Base URL for one Elasticsearch index, e.g. "https://es.example.com/fatesedge"
 // (no trailing slash, no /_search suffix -- that's appended per-request below).
 function getEsUrl() { return window.__ES_URL || null; }
@@ -219,8 +222,10 @@ function updateStatus(msg, type = 'info') {
 // 4. SOLR SUPPORT
 // ------------------------------------------------------------------
 export async function checkSolr() {
+    const solrUrl = getSolrUrl();
+    if (!solrUrl) return false;
     try {
-        const res = await fetch(`${getSolrUrl()}?q=*:*&rows=0&wt=json`, { cache: 'no-cache' });
+        const res = await fetch(`${solrUrl}?q=*:*&rows=0&wt=json`, { cache: 'no-cache' });
         return res.ok;
     } catch {
         return false;
@@ -228,6 +233,8 @@ export async function checkSolr() {
 }
 
 export async function solrSearch(query) {
+    const solrUrl = getSolrUrl();
+    if (!solrUrl) return null;
     const params = new URLSearchParams({
         q: query,
         rows: 50,
@@ -235,7 +242,7 @@ export async function solrSearch(query) {
         fl: 'title,content,url,type,category,score',
     });
     try {
-        const res = await fetch(`${getSolrUrl()}?${params}`, { cache: 'no-cache' });
+        const res = await fetch(`${solrUrl}?${params}`, { cache: 'no-cache' });
         if (!res.ok) throw new Error('Solr query failed');
         const data = await res.json();
         // Normalized against the top hit in this response, so `score` is
@@ -504,7 +511,7 @@ export function search(query) {
 
 export function reloadIndex() {
     fuse = null; searchIndex = []; isInitialized = false; isLoading = false; activeBackend = null;
-    loadSearchIndex();
+    return loadSearchIndex();
 }
 
 export function getSearchStatus() {
