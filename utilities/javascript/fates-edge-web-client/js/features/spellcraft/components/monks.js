@@ -163,7 +163,7 @@ const BREATH_LABELS = {
 
 const BREATH_BONUSES = {
     [BREATH_STATES.ENTERING]: '+1 die to Perception and Insight',
-    [BREATH_STATES.HOLDING]: '+1 die to Defense and Resolve',
+    [BREATH_STATES.HOLDING]: '+1 die to Defense and Spirit + Endurance tests',
     [BREATH_STATES.RELEASING]: '+1 die to Attack and Athletics',
     [BREATH_STATES.EMPTY]: '+1 die to all rolls, but cannot use Flow'
 };

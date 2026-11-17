@@ -347,7 +347,7 @@ function getFallbackCantorTalents() {
             id: 'embraced-corruption',
             title: 'Embraced Corruption',
             category: 'magic',
-            body: 'Prerequisite: Cantor\'s Path, Tier II+. You have learned to treat the bloom not as disease but as evolution. When you voluntarily fill your Corruption Timer through Resonant Rites, choose your corruption trait. You may Push Songs without marking Fatigue once per session. After filling your Corruption Timer seven times, develop the Fugal Self: +1 die to all Performance rolls. However, each morning you must test Spirit + Resolve (DV 3) or your Corruption controls your body for the first scene of the day.',
+            body: 'Prerequisite: Cantor\'s Path, Tier II+. You have learned to treat the bloom not as disease but as evolution. When you voluntarily fill your Corruption Timer through Resonant Rites, choose your corruption trait. You may Push Songs without marking Fatigue once per session. After filling your Corruption Timer seven times, develop the Fugal Self: +1 die to all Performance rolls. However, each morning test Spirit + Endurance (DV 3) or your Corruption controls your body for the first scene of the day.',
             tags: ['talent', 'magic', 'cantor', 'epic'],
             cost: 12
         },
@@ -371,7 +371,7 @@ function getFallbackCantorTalents() {
             id: 'desperate-cadence',
             title: "Desperate Cadence (Malachai's False Note)",
             category: 'magic',
-            body: 'Learn The Lucky Pick (Low: reroll a failed Stealth or Subterfuge roll, costs 1 Fatigue and 1 Corruption) and Blood Price (Standard: curse a rival, they suffer -1 die on next heist, costs 2 Fatigue and marks a Reckoning Timer). Requires: Performance 2+, Patron: Malachai.',
+            body: 'Learn The Lucky Pick (Low: reroll a failed Stealth or Deception roll, costs 1 Fatigue and 1 Corruption) and Blood Price (Standard: curse a rival, they suffer -1 die on next heist, costs 2 Fatigue and marks a Reckoning Timer). Requires: Performance 2+, Patron: Malachai.',
             tags: ['talent', 'magic', 'cantor', 'prestige'],
             cost: 7
         },
@@ -565,10 +565,10 @@ export async function renderCantor(el) {
                 </div>
                 ${hasFugalSelf ? `
                     <div style="margin-top:0.3rem;padding-top:0.3rem;border-top:1px dashed var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
-                        <span style="font-size:0.65rem;color:${fugalSelfControlLost ? 'var(--red)' : 'var(--text3)'};" title="Grimoire §7.6.4: each morning, test Spirit + Resolve (DV 3) or Corruption controls your body for the first scene of the day.">
+                        <span style="font-size:0.65rem;color:${fugalSelfControlLost ? 'var(--red)' : 'var(--text3)'};" title="Grimoire §7.6.4: each morning, test Spirit + Endurance (DV 3) or Corruption controls your body for the first scene of the day.">
                             🌅 Morning Control: ${fugalSelfControlLost ? '⚠️ Corruption is in control this scene' : '✅ You are in control'}
                         </span>
-                        <button class="btn btn-xs btn-secondary" onclick="window.cantorToggleFugalControl()" title="Log the result of today's Spirit + Resolve (DV 3) test">
+                        <button class="btn btn-xs btn-secondary" onclick="window.cantorToggleFugalControl()" title="Log the result of today's Spirit + Endurance (DV 3) test">
                             Log Morning Test
                         </button>
                     </div>
@@ -689,7 +689,7 @@ export async function renderCantor(el) {
                         ${isBound ? `<span>🌸 <strong>Bloom:</strong> When Corruption is full, perform a Resonant Rite to transform</span>` : `<span>🌿 <strong>Unbound:</strong> No bloom – corruption is unfocused</span>`}
                         <span>🎵 <strong>Voice:</strong> Your larynx is older than any tree</span>
                         ${isHighCantor ? `<span>✨ <strong>High Cantor:</strong> Can sing Standard Rites</span>` : ''}
-                        ${hasFugalSelf ? `<span>🌅 <strong>Fugal Self:</strong> +1 die to Performance, but test Spirit+Resolve (DV 3) each morning</span>` : ''}
+                        ${hasFugalSelf ? `<span>🌅 <strong>Fugal Self:</strong> +1 die to Performance, but test Spirit + Endurance (DV 3) each morning</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -1079,7 +1079,7 @@ window.cantorToggleResonantRite = function(riteName) {
                         </div>
                         <div style="border-top:1px solid var(--border);padding-top:0.2rem;font-size:0.8rem;color:var(--text3);">
                             Corruption: ${char.corruption}/${corruptionMax} · Tier ${unlockedTier}/${corruptionTableLength || '?'}
-                            ${bloomCount >= 7 ? '<br>✨ <strong>Fugal Self achieved!</strong> +1 die to all Performance rolls — but each morning, test Spirit + Resolve (DV 3) or Corruption controls your body for the first scene.' : ''}
+                            ${bloomCount >= 7 ? '<br>✨ <strong>Fugal Self achieved!</strong> +1 die to all Performance rolls — but each morning, test Spirit + Endurance (DV 3) or Corruption controls your body for the first scene.' : ''}
                         </div>
                         <div style="font-size:0.65rem;color:var(--text3);font-style:italic;text-align:center;">
                             "The bloom is not an ending. It is a beginning."
@@ -1156,11 +1156,10 @@ window.cantorResetCorruption = function() {
 // ─── Fugal Self: Morning Control Test ──────────────────────────
 //
 // Grimoire §7.6.4: once you've bloomed 7 times, you develop the Fugal Self
-// (+1 die to Performance), but each morning you must test Spirit + Resolve
+// (+1 die to Performance), but each morning you must test Spirit + Endurance
 // (DV 3) or Corruption controls your body for the first scene of the day.
-// "Resolve" isn't currently tracked as its own stat/skill on the character
-// sheet here, so rather than guess at an undocumented formula, this is a
-// manual log: roll it however your table already resolves Resolve tests,
+// Endurance is the core skill for holding yourself together, so the test
+// uses the canonical Spirit + Endurance pool. This remains a manual log,
 // then record the outcome here so it's visible on the sheet.
 
 window.cantorToggleFugalControl = function() {

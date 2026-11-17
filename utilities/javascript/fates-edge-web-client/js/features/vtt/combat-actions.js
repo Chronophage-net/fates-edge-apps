@@ -24,10 +24,9 @@
  * "Roll & Post" keeps working exactly as before.
  *
  * ── Assumptions worth knowing about (easy to retune below) ──────────────
- * 1. Attribute pairing per skill (SKILL_ATTR_MAP): Melee/
- *    Athletics pair with Body; Ranged pairs with Wits (aim/precision);
- *    Tactics pairs with Wits; Command pairs with Presence. If your table
- *    plays it differently, just edit SKILL_ATTR_MAP.
+ * 1. Attribute pairings are defaults for this panel, not fixed rules.
+ *    The core twelve skills apply under different attributes when the
+ *    approach supports it; change SKILL_ATTR_MAP to suit the action.
  * 2. Weapon range modifiers (WEAPON_CLASS_MODS) mirror the Close/Near
  *    dice table on the character sheet (characters/editor.js
  *    WEAPON_CLASSES): Light +2d/+1d, Medium +1d/+2d, Heavy -1d/+3d.
@@ -60,7 +59,7 @@ const SKILL_ATTR_MAP = {
 const ATTACK_SKILLS = [
     { key: 'melee', label: 'Melee', icon: '⚔️' },
     { key: 'ranged', label: 'Ranged', icon: '🏹' },
-    { key: 'melee', label: 'Unarmed', icon: '🥊' },
+    { key: 'melee', label: 'Melee (unarmed)', icon: '🥊' },
 ];
 
 // Mirrors characters/editor.js WEAPON_CLASSES close/near dice notes.

@@ -43,7 +43,7 @@ const TALENT_TIERS = [
         max: 6,
         color: '#ffc107',
         desc: 'Strong upgrade, permanent effect in a niche. Often defines your character\'s signature move.',
-        examples: 'Weapon Mastery (+2d with chosen weapon), Spellcraft (free casting access), Command Presence (+1d leadership)'
+        examples: 'Weapon Master (+2 dice with a chosen weapon), Spellcraft (freeform casting access), Command Presence (+1 die on leadership rolls)'
     },
     { 
         id: 'prestige', 

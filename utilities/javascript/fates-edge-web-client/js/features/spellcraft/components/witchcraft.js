@@ -95,7 +95,7 @@ const { loadPatronData: ensurePatronDataLoaded } = patrons;
 
 const UNIVERSAL_HEDGE_GIFTS = [
     { id: 'steady-hand', name: 'Steady Hand', effect: 'Remove 1 Fatigue from yourself or a touched ally.', limit: 'Once per scene' },
-    { id: 'salt-line', name: 'Salt Line', effect: 'Pour a line of salt; spirits must test Spirit+Resolve (DV 3) to cross.', limit: 'Once per scene' },
+    { id: 'salt-line', name: 'Salt Line', effect: 'Pour a line of salt; spirits must test Spirit + Endurance (DV 3) to cross.', limit: 'Once per scene' },
     { id: 'hearth-sense', name: 'Hearth-Sense', effect: 'Ask the GM one yes/no question about a threshold, boundary, or debt.', limit: 'Once per scene' },
     { id: 'unlit-candle', name: 'The Unlit Candle', effect: 'Extinguish a light source; create dim light or darkness in Near range.', limit: 'Once per session' },
     { id: 'knot-of-favor', name: 'Knot of Favor', effect: 'Tie a knot; you and allies gain +1 die to one type of roll for the scene.', limit: 'Once per scene' },

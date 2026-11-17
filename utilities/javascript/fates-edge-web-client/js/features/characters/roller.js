@@ -30,22 +30,18 @@ import { playDiceAnimation } from '@components/Dice3D.js';
 // ============================================================
 
 const ALL_SKILLS = [
-    { name: 'Melee', attr: 'body', desc: 'Swords, axes, close-quarters weapons' },
-    { name: 'Ranged', attr: 'wits', desc: 'Bows, crossbows, thrown weapons, firearms' },
-    { name: 'Unarmed', attr: 'body', desc: 'Fistfighting, grappling, improvised brawling' },
-    { name: 'Athletics', attr: 'body', desc: 'Running, climbing, jumping, swimming' },
-    { name: 'Stealth', attr: 'wits', desc: 'Moving unseen, hiding, blending into shadows' },
-    { name: 'Endurance', attr: 'body', desc: 'Resisting fatigue, harsh weather, poison, disease' },
-    { name: 'Craft', attr: 'wits', desc: 'Building, repairing, creating tools, art, structures' },
-    { name: 'Sway', attr: 'presence', desc: 'Persuasion, negotiation, charm' },
-    { name: 'Deception', attr: 'presence', desc: 'Lying, bluffing, misdirection' },
-    { name: 'Subterfuge', attr: 'wits', desc: 'Social infiltration, disguise, manipulation of information' },
-    { name: 'Performance', attr: 'presence', desc: 'Entertainment, oration, acting, musical display' },
-    { name: 'Insight', attr: 'spirit', desc: 'Reading emotions, detecting lies, understanding motives' },
-    { name: 'Lore', attr: 'wits', desc: 'History, culture, religion, customs, general knowledge' },
-    { name: 'Investigation', attr: 'wits', desc: 'Research, deduction, analysis of clues' },
-    { name: 'Medicine', attr: 'wits', desc: 'Healing, anatomy, first aid, treatment' },
-    { name: 'Arcana', attr: 'spirit', desc: 'Magic theory, rituals, mystical phenomena, free casting' }
+    { name: 'Melee', attr: 'body', desc: 'Armed or unarmed close combat, grappling, improvised weapons' },
+    { name: 'Ranged', attr: 'wits', desc: 'Bows, crossbows, slings, thrown weapons, firearms' },
+    { name: 'Athletics', attr: 'body', desc: 'Running, climbing, leaping, swimming, sudden exertion' },
+    { name: 'Stealth', attr: 'wits', desc: 'Moving unseen, hiding, camouflage, going unremarked' },
+    { name: 'Endurance', attr: 'body', desc: 'Sustaining effort; resisting fatigue, poison, cold, hunger, fear, pressure' },
+    { name: 'Craft', attr: 'wits', desc: 'Making, mending, mechanisms, cooking, practical care and medicine' },
+    { name: 'Sway', attr: 'presence', desc: 'Persuasion, negotiation, charm, leadership, orders, intimidation' },
+    { name: 'Deception', attr: 'presence', desc: 'Lying, bluffing, disguise, forgery, covert social maneuvering' },
+    { name: 'Performance', attr: 'presence', desc: 'Singing, acting, oration, public speaking, musical display' },
+    { name: 'Insight', attr: 'spirit', desc: 'Reading people, ground, evidence, tracks, weather; deduction' },
+    { name: 'Lore', attr: 'wits', desc: 'History, custom, religion, law, legend, local knowledge, rites' },
+    { name: 'Arcana', attr: 'spirit', desc: 'Magic theory, identifying spells and wards, counterspelling, free casting' }
 ];
 
 const ATTRIBUTES = [
@@ -659,7 +655,7 @@ export function rollForCharacter(id, options = {}) {
         assistDice = 0,
         // Narrative range band the player was told by the GM before rolling
         // (close|near|reach|far|absent — see encounters/combat.js RANGE_BANDS).
-        // Optional; only affects physical rolls (Melee/Unarmed/Ranged).
+        // Optional; only affects physical rolls (Melee/Ranged).
         range = null
     } = options;
 
@@ -686,8 +682,7 @@ export function rollForCharacter(id, options = {}) {
         const skills = c.skills || {};
         const combatSkills = {
             melee: { attr: 'body', name: 'Melee' },
-            ranged: { attr: 'wits', name: 'Ranged' },
-            unarmed: { attr: 'body', name: 'Unarmed' }
+            ranged: { attr: 'wits', name: 'Ranged' }
         };
         
         let bestSkill = null;

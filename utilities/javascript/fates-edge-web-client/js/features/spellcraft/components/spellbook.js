@@ -247,7 +247,7 @@ const SPELL_TEMPLATES = [
         name: '💀 Leashed Curse',
         tags: ['Curse', 'Bind', 'Fear'],
         dv: 3,
-        description: 'A curse that tightens as the target struggles. They suffer -1 die to all actions until they succeed on a Resolve test (DV 4).',
+        description: 'A curse that tightens as the target struggles. They suffer -1 die to all actions until they succeed on a Spirit + Endurance test (DV 4).',
         category: 'Control'
     },
     {
@@ -275,7 +275,7 @@ const SPELL_TEMPLATES = [
         name: '🔮 Counterspell',
         tags: ['Counter', 'Dispel'],
         dv: 3,
-        description: 'Interrupt a spell being cast within Near range. The caster must test Spirit+Resolve (DV 4) or their spell fails.',
+        description: 'Interrupt a spell being cast within Near range. The caster must test Spirit + Endurance (DV 4) or their spell fails.',
         category: 'Defensive'
     },
     {
@@ -296,7 +296,7 @@ const SPELL_TEMPLATES = [
         name: '🧠 Mind Probe',
         tags: ['Scry', 'Memory', 'Command'],
         dv: 4,
-        description: 'Delve into a target\'s mind. Learn one surface thought or memory. The target may resist with Resolve (DV 4).',
+        description: 'Delve into a target\'s mind. Learn one surface thought or memory. The target may resist with Spirit + Endurance (DV 4).',
         category: 'Utility'
     }
 ];

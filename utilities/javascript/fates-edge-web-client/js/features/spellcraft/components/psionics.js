@@ -244,7 +244,7 @@ const SILENT_ORDERS = [
         mechanics: [
             'Circle Bond: Form a mental link with up to 3 willing allies (they need not be psions). The link lasts for one scene.',
             'Shared Burden: When you generate Mental Strain, you may transfer any amount to another Circle member within Near range. The GM gains 1 Story Beat each time you use this technique.',
-            "Circle's Breath: While linked, all linked members gain +1 die to all psionic rolls; if one member fails a Resolve test against fear or mental intrusion, all members test at +1 DV."
+            "Circle's Breath: While linked, all linked members gain +1 die to all psionic rolls; if one member fails a Spirit + Endurance test against fear or mental intrusion, all members test at +1 DV."
         ],
         cost: 6
     }

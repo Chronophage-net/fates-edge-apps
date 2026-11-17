@@ -20,11 +20,7 @@ import { t as i18nText } from './i18n.js';
 
 export const DEFAULT_ATTRIBUTES = { body: 1, wits: 1, spirit: 1, presence: 1 };
 
-// Canonical 16-skill list (matches js/features/characters/editor.js and roller.js,
-// which are the modules that actually read/write character.skills in the live UI).
-// Previously this list used different keys (stealth/investigate/perception/...) than
-// editor.js and roller.js, which meant characters could silently accumulate skill keys
-// nothing in the UI ever displayed or scored. Keeping one canonical list here avoids that.
+// Canonical twelve-skill schema shared by character creation and rolling.
 export const DEFAULT_SKILLS = {
   melee: 0,
   ranged: 0,
@@ -43,7 +39,7 @@ export const DEFAULT_SKILLS = {
 // Skills retired when the list was consolidated from sixteen to twelve, mapped
 // to the skill that absorbed them. A character saved under the old list keeps
 // their investment: the surviving skill takes the HIGHER of the two ratings, so
-// somebody with Melee 2 and Unarmed 3 ends up with Melee 3 rather than Melee 2.
+// somebody with Melee 2 and an old Unarmed 3 rating ends up with Melee 3.
 // Retired keys are then deleted so they can't linger and be re-displayed.
 export const RETIRED_SKILLS = {
   unarmed: 'melee',

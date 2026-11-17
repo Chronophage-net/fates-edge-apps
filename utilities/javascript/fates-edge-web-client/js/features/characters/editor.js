@@ -67,7 +67,7 @@ export const HERITAGES = [
     { id: 'aeler', label: 'Aeler (Dwarf) — Crowns & Under-Vaults', note: 'Affinity: Body or Craft; Limit: Presence. Stone-sense' },
     { id: 'lethai-al', label: 'Lethai-al (Wood Elf) — Root, River, Roof-Tree', note: 'Affinity: Wits or Stealth; Limit: Presence' },
     { id: 'lethai-thora', label: 'Lethai-thora (High Elf) — Mind\'s Eye & Civic Measure', note: 'Affinity: Wits or Lore; Limit: Body' },
-    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', note: 'Affinity: Presence or Subterfuge; Limit: Spirit' },
+    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', note: 'Affinity: Presence or Deception; Limit: Spirit' },
     { id: 'ykrul', label: 'Ykrul (Orc) — Wolf Standards, Winter Camps', note: 'Affinity: Body or Endurance; Limit: Presence' },
     { id: 'narethi', label: 'Narethi — The Unburied of the Deep Desert', note: 'Affinity: Spirit or Arcana; Limit: Body. Resonance Leash' },
     { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', note: 'Choose one +1 and one -1 from parent cultures' }

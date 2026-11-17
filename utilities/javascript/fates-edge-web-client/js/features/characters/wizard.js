@@ -63,7 +63,7 @@ const HERITAGES = [
     { id: 'aeler', label: 'Aeler (Dwarf) — Crowns & Under-Vaults', adj: 'Affinity: Body or Craft • Limit: Presence', note: 'Stone-sense, breath-counting, oath-cords. Heavy armor proficiency.' },
     { id: 'lethai-al', label: 'Lethai-al (Wood Elf) — Root, River, Roof-Tree', adj: 'Affinity: Wits or Stealth • Limit: Presence', note: 'Root-law, tree-speak, green ward in forests.' },
     { id: 'lethai-thora', label: 'Lethai-thora (High Elf) — Mind\'s Eye & Civic Measure', adj: 'Affinity: Wits or Craft • Limit: Body', note: 'Lorekeeper, weave anchor, academic immunity.' },
-    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', adj: 'Affinity: Presence or Subterfuge • Limit: Spirit', note: 'Mask-right, vow-touch, serpent\'s shed.' },
+    { id: 'lethai-ar', label: 'Lethai-ar (Dark Elf) — The Oathbound', adj: 'Affinity: Presence or Deception • Limit: Spirit', note: 'Mask-right, vow-touch, serpent\'s shed.' },
     { id: 'ykrul', label: 'Ykrul (Orc) — Wolf Standards, Winter Camps', adj: 'Affinity: Body or Craft • Limit: Presence', note: 'Blood memory, hostage strings, kon\'reh intuition. Mounted archery discount.' },
     { id: 'narethi', label: 'Narethi — The Unburied of the Deep Desert', adj: 'Affinity: Wits or Craft • Limit: Body', note: 'Natural telepathy, sunken eyes (darkvision), resonance sense. Resonance Leash [4].' },
     { id: 'mixed', label: 'Mixed Heritage — Half-Elves, Half-Ykrul, Half-Others', adj: "Affinity: one parent's • Limit: the other's", note: 'Take one parent Affinity and the other parent Limit. Access both talent lists.' }
@@ -1099,9 +1099,9 @@ function renderStep0Identity(d) {
 
 function renderStep1Attributes(d) {
     const attrs = [
-        { id: 'body', name: 'Body', desc: 'Physical strength, endurance, coordination', skills: 'Melee, Unarmed, Athletics, Endurance' },
-        { id: 'wits', name: 'Wits', desc: 'Mental acuity, perception, quick thinking', skills: 'Ranged, Stealth, Craft, Subterfuge, Lore, Investigation, Medicine' },
-        { id: 'spirit', name: 'Spirit', desc: 'Willpower, intuition, magical aptitude', skills: 'Insight, Arcana' },
+        { id: 'body', name: 'Body', desc: 'Strength, endurance, physical resilience', skills: 'Melee, Athletics, Endurance' },
+        { id: 'wits', name: 'Wits', desc: 'Perception, speed, quick thinking', skills: 'Ranged, Stealth, Craft, Lore' },
+        { id: 'spirit', name: 'Spirit', desc: 'Willpower, focus, magical aptitude', skills: 'Insight, Arcana' },
         { id: 'presence', name: 'Presence', desc: 'Charisma, social influence, force of personality', skills: 'Sway, Deception, Performance' }
     ];
     

@@ -1362,9 +1362,9 @@ function determineRole(char) {
     
     const maxAttr = Math.max(body, wits, spirit, presence);
     
-    if ((spirit >= 3 || wits >= 3) && (skills.medicine || 0) >= 2) return 'support';
+    if ((spirit >= 3 || wits >= 3) && (skills.craft || 0) >= 2) return 'support';
     if ((spirit >= 3 || presence >= 3) && ((skills.sway || 0) >= 2 || (skills.deception || 0) >= 1)) return 'controller';
-    if ((wits >= 3 || spirit >= 3) && ((skills.lore || 0) >= 2 || (skills.investigation || 0) >= 1)) return 'utility';
+    if ((wits >= 3 || spirit >= 3) && ((skills.lore || 0) >= 2 || (skills.insight || 0) >= 1)) return 'utility';
     if (body >= 3 && (skills.melee || 0) >= 2 && (skills.endurance || 0) >= 1) return 'tank';
     if ((body >= 3 || wits >= 3) && ((skills.melee || 0) >= 2 || (skills.ranged || 0) >= 2)) return 'striker';
     
