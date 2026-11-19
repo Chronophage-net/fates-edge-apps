@@ -37,27 +37,6 @@
         font-size: 1.8em;
       }
     }
-    @media print {
-      html {
-        color-scheme: light only;
-      }
-      html, body, pre, code {
-        background-color: transparent;
-      }
-      body, a, a:visited, blockquote {
-        color: black;
-      }
-      pre, code {
-        padding: 0;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
     p {
       margin: 1em 0;
     }
@@ -163,6 +142,12 @@
       text-decoration: none;
     }
     span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
     div.columns{display: flex; gap: 1.5em;}
     div.column{flex: auto;}
     @media screen {
@@ -179,7 +164,27 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-  </style>
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
 <style id="fiction-frontmatter-style">
 .fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
 .fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
@@ -5039,7 +5044,7 @@ come near Riarhin.</p>
 <p>“Alone,” he said.</p>
 <p>“Alone. It won’t work with two. You know it won’t. Nobody looks past
 two mourners.”</p>
-<p>“I know.” Amari’s voice was even. “I asked you to remember.”</p>
+<p>“I know, Riarhin. I know. I asked you to remember.”</p>
 <p>“I remember. That’s why I’m telling you now and not after.” Riarhin
 looked at him. “I can’t put him with anybody. I tried. For a week.
 There’s no way to do it where he’s with somebody and it still works. So

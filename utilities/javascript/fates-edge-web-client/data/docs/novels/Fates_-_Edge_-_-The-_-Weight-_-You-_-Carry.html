@@ -37,27 +37,6 @@
         font-size: 1.8em;
       }
     }
-    @media print {
-      html {
-        color-scheme: light only;
-      }
-      html, body, pre, code {
-        background-color: transparent;
-      }
-      body, a, a:visited, blockquote {
-        color: black;
-      }
-      pre, code {
-        padding: 0;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
     p {
       margin: 1em 0;
     }
@@ -163,6 +142,12 @@
       text-decoration: none;
     }
     span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
     div.columns{display: flex; gap: 1.5em;}
     div.column{flex: auto;}
     @media screen {
@@ -179,7 +164,27 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-  </style>
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
 <style id="fiction-frontmatter-style">
 .fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
 .fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
@@ -2445,9 +2450,9 @@ animals out of a gate. Riarhin looked at the paper under the woman’s
 hand, waiting for a countersignature.</p>
 <p>“I’m sorry,” Riarhin said, and found that she meant it, which was
 inconvenient.</p>
-<p>“Don’t be sorry. Sorry doesn’t countersign anything.” Sada Alemu
-turned another page. “I’m asking you a question.”</p>
-<p>“Which is?”</p>
+<p>“You can be sorry after. I’ve stood here nine days.” Sada Alemu
+turned another page. “Please answer me.”</p>
+<p>“About the camels?”</p>
 <p>Sada put her pen down, and turned, and looked at her properly.</p>
 <p>“Are you taking a string past the last Covenant well,” she said, “or
 are you making people think you are?”</p>
