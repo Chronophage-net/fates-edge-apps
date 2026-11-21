@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-21T21:49:21.507Z",
+  "generated": "2026-11-21T23:26:25.238Z",
   "documents": [
     {
       "id": "srd",
@@ -1868,6 +1868,16 @@
       "active": true
     },
     {
+      "id": "the_memory_merchants_labyrinth",
+      "title": "The Memory Merchant’s Labyrinth",
+      "file": "Fates_-_Edge_-_-The-_-Memory-_-Merchants-_-Labyrinth.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_mist_walker",
       "title": "The Mist Walker",
       "file": "Fates_-_Edge_-_-The-_-Mist-_-Walker.html",
@@ -2272,7 +2282,7 @@
       "active": true
     }
   ],
-  "total_count": 167,
-  "active_count": 167,
+  "total_count": 168,
+  "active_count": 168,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

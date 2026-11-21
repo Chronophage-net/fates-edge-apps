@@ -1,0 +1,2652 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.14" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The Memory Merchant’s Labyrinth</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
+<style id="fiction-frontmatter-style">
+.fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
+.fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
+.fiction-title-page h1 { font-size: 2.4rem; line-height: 1.15; }
+.fiction-copyright { padding: 3rem 1rem; font-size: .9rem; line-height: 1.65; border-top: 1px solid #999; border-bottom: 1px solid #999; margin-bottom: 4rem; }
+.fiction-copyright h2 { font-size: 1.25rem; }
+@media print { .fiction-title-page, .fiction-copyright { break-after: page; min-height: 70vh; border: 0; } }
+</style>
+</head>
+<body>
+<div class="fiction-frontmatter">
+<section class="fiction-title-page" aria-label="Title page">
+<p>Fate’s Edge · Novels &amp; Novellas</p><h1>The Memory Merchant’s Labyrinth</h1>
+<p>by Nicholas A. Gasper</p><p><a href="#fiction-copyright">Copyright and edition</a></p>
+</section>
+<section class="fiction-copyright" id="fiction-copyright" aria-labelledby="fiction-copyright-heading">
+<h2 id="fiction-copyright-heading">Copyright</h2>
+<p><strong>The Memory Merchant’s Labyrinth</strong><br>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+<p>This work of fiction, including its prose, original characters and setting, is proprietary content. It is not part of the Creative Commons-licensed Fate’s Edge System Reference Document.</p>
+<p>No part of this work may be reproduced or distributed without the copyright holder’s written permission, except as permitted by law.</p>
+<p>Digital reading edition · 2026</p>
+</section></div>
+<header id="title-block-header">
+<h1 class="title">The Memory Merchant’s Labyrinth</h1>
+</header>
+<h1 id="the-memory-merchants-labyrinth">The Memory Merchant’s
+Labyrinth</h1>
+<p><em>The Countess’s Irregulars — Book Four</em></p>
+<h1 id="part-i-something-you-would-remember">Part I — Something you
+would remember</h1>
+<h2 id="chapter-1-the-wrong-side-of-the-glass">Chapter 1 — The wrong
+side of the glass</h2>
+<p>Edrine Salvat had remembered the murder more clearly every day, until
+she broke her spectacles.</p>
+<p>He moved the lamp behind her shoulder. Its reflection had been
+swimming across the little silver case in her lap, making it difficult
+to look at her mouth while she spoke. Outside, somebody was unloading
+empty bottles. Every fourth crate hit the paving harder than the other
+three.</p>
+<p>“Tell me his name again.”</p>
+<p>“Helvo. He stokes the furnaces at the Saffron Rooms.”</p>
+<p>Ilaro found the name on the page. He had written it correctly.</p>
+<p>“And the man who is dead?”</p>
+<p>“Jossart.”</p>
+<p>“You remember Helvo killing him.”</p>
+<p>“Very clearly. That is the trouble.”</p>
+<p>He put down the pen.</p>
+<p>The woman watched him. She was perhaps sixty, with a narrow, capable
+face and a band of pale skin where a ring had recently been removed. Her
+clothes were good and had been cleaned badly. Soap had dried white along
+the inside of one cuff.</p>
+<p>She opened the silver case. It held spectacles, one lens cracked. She
+did not put them on. Instead she laid them beside his notebook and
+turned them until the broken lens caught the lamp.</p>
+<p>“I remember looking through these. I remember the crack in front of
+his face. But these were upstairs. I’d left them on my desk. I was
+washing a stain out of my skirt when they say I saw it.”</p>
+<p>The fourth crate fell outside. Ilaro waited for the ringing to
+subside.</p>
+<p>“Who says?”</p>
+<p>“Mistress Albel. Two of the buyers. The examining officer. The man
+who brought me supper afterward. Everyone has been very helpful.”</p>
+<p>She said the last word with such care that he looked up.</p>
+<p>“I have never forgotten a murder before, Master Selci. I assumed
+there was a proper way of going about it.”</p>
+<p>The Countess’s note had described her as a former correspondent,
+which could mean anything from a friend to a person whom the Countess
+had found useful to threaten. Ilaro had received the note with Edrine
+standing beside its bearer. He had been halfway through copying a
+shipwright’s bill for Pello and had offered her the only chair without a
+box on it.</p>
+<p>Now he asked her to begin with the stain.</p>
+<p>“Pomegranate cordial. A customer’s elbow. Jossart laughed and went
+down to find a cloth. I followed him because the cordial was working
+into the seam.”</p>
+<p>“Where were you?”</p>
+<p>“The old bath below the Rooms. We use the upper part for storage.
+There’s still a washing basin.”</p>
+<p>“How long ago?”</p>
+<p>“Eleven days.”</p>
+<p>She knew the morning because a carpenter had come to repair a
+shutter. She had paid him before the customers arrived. The shutter had
+been making a loose tapping sound for weeks, and she remembered enjoying
+its absence while she counted out his money.</p>
+<p>Then Jossart had laughed at the stain.</p>
+<p>Then she was in a bedroom with the curtains drawn, being told that
+she had been unwell.</p>
+<p>“That was what I remembered at first. The rest came back after the
+treatment.”</p>
+<p>“What treatment?”</p>
+<p>Edrine looked toward the door. The bottle carriers had begun arguing
+about the pavement.</p>
+<p>Ilaro stood, shut the window and returned to his stool. He sat too
+quickly; the wall took a little longer to settle than the room. Edrine
+waited without offering to help him. He was grateful for that.</p>
+<p>“We sell recollections,” she said. “Privately. To people who are
+introduced. Sometimes we keep something a person cannot bear to
+remember. Sometimes a person wishes to experience a thing they will
+never do.”</p>
+<p>She rubbed a place on the silver case with her thumb.</p>
+<p>“I arranged appointments. Packed the vessels. Remembered which people
+ought not to meet on the stair. I thought I understood the work.”</p>
+<p>“Does Mistress Albel perform it?”</p>
+<p>“She and Jossart. He prepared the impressions. He had a better hand
+for keeping the edges.”</p>
+<p>“The edges?”</p>
+<p>“Where a recollection stops. You ask to lose the sight of a body and
+discover you cannot remember the walk home. Or the person who walked
+with you.”</p>
+<p>Ilaro left a space after that. He did not know whether she was
+speaking of herself.</p>
+<p>“You were treated after Jossart died.”</p>
+<p>“I was told it would let me give evidence without distress. I had
+already agreed to have the bad part put away. That was what they said. I
+have my name on the paper.”</p>
+<p>“Do you remember agreeing?”</p>
+<p>“No.”</p>
+<p>Her hands were very still. The troublesome spectacle arm lay open
+between them.</p>
+<p>The restored account was vivid. Helvo stood over Jossart beside the
+washing basin. He had a knife. Blood ran down his sleeve. Edrine could
+remember the grinding of her teeth, the taste of something bitter
+beneath her tongue, even the little blue line in the basin where the
+glaze had cracked. Helvo said Jossart had cheated him. Then he thrust
+downward.</p>
+<p>“How was Jossart lying?”</p>
+<p>“On his side. His face toward me.”</p>
+<p>“And you were standing?”</p>
+<p>“Yes.”</p>
+<p>“Where?”</p>
+<p>She pointed past his elbow, then looked annoyed with herself.</p>
+<p>“Beside the door. The door from the packing room.”</p>
+<p>“Could you draw it?”</p>
+<p>“I could draw the whole building. I worked there nine years.”</p>
+<p>He gave her paper. She made a careful plan, pressing too hard when
+she reached the basin. The packing room stood above the old bath,
+reached by three steps. A second passage went behind the basin to the
+furnace court. A broad ramp carried goods down from the perfume shop at
+street level. Edrine labeled each before he asked.</p>
+<p>“Helvo’s knife,” Ilaro said. “Where is it now?”</p>
+<p>“With the watch. He says he cut Jossart’s collar because he thought
+he was choking.”</p>
+<p>“Have you spoken to him?”</p>
+<p>“No. They said it would confuse me.”</p>
+<p>Ilaro looked at the broken spectacles. “What changed?”</p>
+<p>Edrine lifted them. Through the cracked lens one of her eyes became
+several smaller, angry eyes.</p>
+<p>“My sleeve caught the case yesterday. They fell. That is when the
+glass broke.”</p>
+<p>The room grew quiet enough for him to hear the bottle men rolling
+their cart away.</p>
+<p>He asked her to describe the remembered crack. She did. It ran down
+from the upper rim, forked beside the nose-piece, and ended in a tiny
+crescent. The crack in the lens matched.</p>
+<p>“I may have added it,” she said. “I know people do that. I have heard
+Mistress Albel explain it to customers.”</p>
+<p>“You may have.”</p>
+<p>She lowered the spectacles. His refusal to reassure her seemed to
+give her room to breathe.</p>
+<p>“But you’ll look?”</p>
+<p>“Yes.”</p>
+<p>She began to cry, with no change in her face. He found a clean corner
+of the cloth beside the ink and offered it. She laughed once at its
+stiff, ink-black middle, then used the corner.</p>
+<p>“I helped put him there,” she said.</p>
+<p>Ilaro did not tell her she had done nothing wrong. He wanted to know
+who had brought her supper, what she had drunk, and where she had been
+sleeping. Those questions could wait until she had finished with the
+cloth.</p>
+<p>When she was ready, she told him that she had left the Rooms through
+the furnace court. Her small trunk remained upstairs. A carter who
+delivered charcoal had taken her as far as the fish market, where she
+bought the cheapest shawl she could find and walked to the Countess’s
+house.</p>
+<p>“Mistress Albel keeps the original impressions before she improves
+them. She says you need something to go back to.”</p>
+<p>“Do you know where yours is?”</p>
+<p>“A white glass cylinder. Blue binding around the stopper. E
+forty-one. I packed it myself.”</p>
+<p>He looked at her.</p>
+<p>“She called it a morning on the water. I didn’t know whose
+morning.”</p>
+<p>Edrine turned the little case over. Her thumb had polished a small
+bright patch through the tarnish.</p>
+<p>“They’re moving the collection. A buyer is taking the principal
+pieces out of Silkstrand. Mistress Albel has always said one must know
+when a house has become too familiar.”</p>
+<p>“When?”</p>
+<p>“The boat leaves in three mornings. Helvo goes to the quarry court
+the morning after.”</p>
+<p>Ilaro folded her drawing once, keeping the ink outward. He put it
+inside his notebook, beneath the page containing the sentence he had got
+wrong.</p>
+<h2 id="chapter-2-the-fourth-recovery">Chapter 2 — The fourth
+recovery</h2>
+<p>Rosceline disliked the perfume before she had finished climbing the
+stair.</p>
+<p>It smelled of expensive women being asked to believe something about
+summer. Beneath that lay a sour medicinal trace, partly hidden by the
+flowers. She stopped on the landing and put her nose to the small vial
+Celise had given her.</p>
+<p>“If she sells this,” she said, “I begin to understand the need to
+interfere with people’s recollections.”</p>
+<p>Celise opened the door. “It is the inexpensive line.”</p>
+<p>“Then there is another crime to investigate.”</p>
+<p>The others were already in the Countess’s little map room. Daska had
+a cushion behind her back, although her ribs no longer required one. She
+had discovered that it improved these meetings. Briska sat beside the
+open window, dismantling the fastening of a bracelet that did not belong
+to her. Pello had chosen the chair nearest the door. Ilaro stood over
+Edrine’s drawing with the Countess.</p>
+<p>Six weeks had passed since the carnival. Rosceline’s palm had healed
+shiny and pink beneath the new skin. The mark hurt when she gripped
+something too long, which had become a useful measure of how much she
+wished to continue a conversation.</p>
+<p>“Is she staying here?” Rosceline asked.</p>
+<p>“Elsewhere,” the Countess said. “Celise knows where.”</p>
+<p>Rosceline handed back the perfume. “And what does she want
+recovered?”</p>
+<p>“The unaltered recollection taken from her on the morning Jossart
+died. The vessel intact, its binding undisturbed. She will decide
+afterward whether to have it returned to her.”</p>
+<p>“She has accused the stoker.”</p>
+<p>“She has asked me to help establish whether that accusation is
+hers.”</p>
+<p>Ilaro laid the spectacles on the table. The Countess listened while
+he explained the crack. She did not interrupt him when he stopped to
+find the word for the crescent at its end.</p>
+<p>Rosceline took a seat beside Daska. “Could the man simply be
+guilty?”</p>
+<p>“Yes,” Ilaro said.</p>
+<p>“I thought you might dislike my asking.”</p>
+<p>“I’d dislike your deciding.”</p>
+<p>Daska reached past Rosceline for the fruit dish. She had ceased
+turning every disagreement between them into an opportunity to look
+away. Rosceline had not decided whether she preferred this.</p>
+<p>The Countess knew Sevrine Albel by reputation. She had bought no
+memories from her. She knew people who had, and several who would rather
+deny it under oath than explain the purchase to their families. Sevrine
+rented the Saffron Rooms above a perfume shop and used the old baths
+beneath it for storage and private demonstrations. Her buyers arrived
+separately. Nobody advertised the business. A man could commission a
+stolen recollection in the morning and dine with people who hanged
+mind-readers that evening.</p>
+<p>“What protection does she have?” Pello asked.</p>
+<p>“Enough to discourage a search on Edrine’s account alone. Not enough
+to make her remain here once an important customer begins asking
+questions.”</p>
+<p>“Have you?”</p>
+<p>“No. The move was arranged before Edrine left.”</p>
+<p>Briska held up the bracelet. Its clasp lay in pieces on the
+table.</p>
+<p>“This is supposed to be a recollection vessel?”</p>
+<p>“It holds a prepared impression. A demonstration piece.”</p>
+<p>“It also holds a spring assembled by somebody with a personal quarrel
+against springs.”</p>
+<p>“Can you put it back?”</p>
+<p>“Better than it was. Whether you will remember being six inches
+taller afterward is outside my competence.”</p>
+<p>The Countess smiled. Briska returned to the clasp.</p>
+<p>The proposed fee was eighteen hundred silver marks, divided equally.
+Three hundred in advance; reasonable preparation costs separate. The
+Countess wanted the cylinder, any written account that identified its
+treatment, and no sale of either to a stranger who offered more.
+Successful recovery did not depend on a court believing what the vessel
+contained. Rosceline listened closely to that qualification.</p>
+<p>“And it is the fourth,” she said.</p>
+<p>“If you accept.”</p>
+<p>Rosceline took the folded agreement from the inner breast of her
+coat. It had traveled to the mountains and back, been kept dry under a
+carnival awning, and acquired a soft gray line where her thumb always
+found the first fold. She put it beside Edrine’s drawing.</p>
+<p>“The original vessel. In the original condition. You will have your
+reader present at delivery.”</p>
+<p>“Yes.”</p>
+<p>“Edrine may refuse to use it.”</p>
+<p>“Yes.”</p>
+<p>“A magistrate may be a fool.”</p>
+<p>The Countess glanced at Celise. “I have made no promises concerning
+magistrates.”</p>
+<p>Rosceline smoothed the paper. She could feel the others noticing it
+now. They knew there was an agreement. They had seen its count reduced.
+She had not invited them to inspect the thing for which she kept
+returning.</p>
+<p>“I will want an introduction,” she said. “Someone with a grievance
+expensive enough to be convincing.”</p>
+<p>“I can arrange a buyer’s introduction. The grievance is usually
+supplied by the buyer.”</p>
+<p>“Mine will be excellent.”</p>
+<p>They went through the drawing. The street entrance led through the
+perfume shop to an upper gallery. Beneath it, a broad delivery ramp
+descended to a dry packing room. Three steps led from that room to the
+old bath. The furnace court had its own narrow door onto an alley, but
+Sevrine had kept it locked since Edrine’s departure. A disused servants’
+passage ran along the outside wall. Edrine thought it connected the
+gallery to the bath; she had not used it in years.</p>
+<p>Pello asked about the vessel’s packing case. Briska asked who
+maintained the lower rooms. Ilaro asked to see the men who had given
+matching testimony. Celise wrote down the requests without improving
+them.</p>
+<p>Rosceline watched the Countess’s hand rest near her agreement. Four
+recoveries had once seemed a tolerable way of measuring the future. Now
+there was an actual morning on which the paper might cease to matter,
+and she found herself checking for things concealed in its shortest
+sentences.</p>
+<p>The Countess noticed. She withdrew her hand.</p>
+<p>“It will be here when you return.”</p>
+<p>Rosceline looked toward the others. “Then we should establish whether
+we can return.”</p>
+<p>They agreed to inspect the Rooms that afternoon. No one accepted for
+another person. Daska wanted to hear Edrine before committing herself,
+and Pello wanted a look at the alley. The Countess allowed both
+conditions without treating them as a performance of independence.</p>
+<p>As the others left, Rosceline remained beside the table.</p>
+<p>Celise set a small book before her.</p>
+<p>The brown cover had a cup-mark on it. The blue cloth around the spine
+had been strengthened since the mountain expedition, with careful
+stitches that stopped short of the old writing. Rosceline touched the
+edge of the repair. She did not open it.</p>
+<p>“You could have put it away,” she said.</p>
+<p>“I could.”</p>
+<p>“You find this attractive in people?”</p>
+<p>The Countess sat. “Wanting something enough to work for it?”</p>
+<p>“Having one place where they can reliably be pressed.”</p>
+<p>For a moment the room contained only the noise of Briska explaining
+the bracelet’s defect to somebody in the passage.</p>
+<p>“I have employed you,” the Countess said. “I have kept what I agreed
+to give you. I do not require you to call that kind.”</p>
+<p>Rosceline opened the cover.</p>
+<p>Her own cramped hand lay beneath Sarem’s larger writing. The line was
+an exercise in meter. She had crowded its final word against the edge
+rather than admit that she had begun too far across the page.</p>
+<p>She almost placed her finger beside the little mark that would wake
+his voice. Instead she read the line. She could still hear where he
+would object.</p>
+<p>“Your reader will be here,” she repeated.</p>
+<p>“Yes.”</p>
+<p>Rosceline shut the book. Celise reached to put it away, and Rosceline
+held the cover a moment longer than was necessary before letting go.</p>
+<p>Downstairs, Daska was waiting in the courtyard with a pear.</p>
+<p>“Did you leave me one?” Rosceline asked.</p>
+<p>Daska gave her the pear. It had a bite out of it.</p>
+<p>Rosceline inspected the bitten place.</p>
+<p>“That is a distressingly literal answer.”</p>
+<p>“I was hungry.”</p>
+<p>They walked to the gate together. Rosceline ate from the other
+side.</p>
+<h2 id="chapter-3-the-bath-attendant">Chapter 3 — The bath
+attendant</h2>
+<p>Miette Avelot kept a doll’s leg in the drawer with her teeth.</p>
+<p>Briska discovered this because she had been told to look for a brass
+pin and had assumed that the drawer nearest the work was the sensible
+place to keep it. Miette took the leg out of her hand, put it back
+beside the little porcelain plate, and shut the drawer.</p>
+<p>“The other one.”</p>
+<p>“You might label them.”</p>
+<p>“I know where my teeth are.”</p>
+<p>The shop stood above a maker of funeral ribbons. Purple scraps hung
+from the stair rail to dry, and the room smelled of starch and the warm
+glue in Miette’s pot. She mended boxes, spectacle cases and the fittings
+of small instruments. There were three different locks on the door. The
+innermost had been fastened while Briska and Pello were still taking off
+their coats.</p>
+<p>Miette had worked for Sevrine Albel until the previous winter. The
+Countess’s introduction had described her as a former binder. Briska had
+expected books. The objects on the table suggested that binding was
+being used rather broadly.</p>
+<p>A cup with a silver wire around its foot. A hairbrush whose back had
+been opened and packed with wool. A little brass frame holding a piece
+of glass the color of weak tea.</p>
+<p>“Which of those is dangerous?” Briska asked.</p>
+<p>“The glue, if you put your hand in it.”</p>
+<p>“And the others?”</p>
+<p>“Depends what you do.”</p>
+<p>Pello remained by the window. He had loosened its fastening while
+apparently examining the funeral ribbons below. Miette watched him, then
+turned back to Briska.</p>
+<p>“You can open it. I’m particular about visitors leaving by the door,
+but I don’t insist.”</p>
+<p>Briska found the pin and laid it on the table. Miette had a split
+thumbnail, blackened where old glue had collected beneath it. She used
+the nail to hold a collar while driving the pin home.</p>
+<p>“What does Edrine’s binding do?”</p>
+<p>“Keeps the taking separate from the treatment. If Sevrine’s improving
+an impression, she wants a clean source. Something she hasn’t already
+persuaded to behave.”</p>
+<p>“Does she remove it from the person?”</p>
+<p>“If she means to. It’s different work from making a likeness. A
+likeness leaves you remembering. A taking leaves somewhere you keep
+trying to go.”</p>
+<p>“Can you make a taking?”</p>
+<p>“No. I make the things that stop it getting into the lining of your
+coat.”</p>
+<p>Briska leaned closer to the brass frame. “And this?”</p>
+<p>“A way through a house. Useful to somebody. At least it used to
+be.”</p>
+<p>Miette turned it over. The glass held a faint reflection of a door
+that was not in the room. Briska looked behind her before she could stop
+herself.</p>
+<p>Pello saw. He said nothing, which made it worse.</p>
+<p>“Borrowed,” Miette said. “A little carrying. You hold it properly and
+you remember where the man who gave it to me walked. Not the reasons.
+Not his whole life. He was very firm about that.”</p>
+<p>“Which house?”</p>
+<p>“The baths below the Saffron Rooms. Before Sevrine took the upper
+floor.”</p>
+<p>Briska moved her hand away from the frame.</p>
+<p>Miette smiled without showing whether she still had teeth of her own.
+“I thought that might interest you.”</p>
+<p>They had come for advice about the cylinder and received a possible
+route. Briska disliked how neatly the second thing followed the first.
+She asked whether Miette had offered it to anyone else.</p>
+<p>“Edrine asked about the old passage last winter. She thought the
+lower rooms would make good storage. I said she ought to ask the man who
+used them.”</p>
+<p>“Where is he?” Pello asked.</p>
+<p>“Downstairs. Complaining about the color of his ribbon.”</p>
+<p>The bath attendant was called Bourin. He came up with a narrow purple
+strip draped over his wrist and an expression of personal injury. He had
+bought the ribbon for his sister’s memorial, and the woman below had
+given him something that became red in strong sunlight.</p>
+<p>“She says it’s the same dye.”</p>
+<p>“It probably is,” Briska said. “Depending on the mordant—”</p>
+<p>Miette coughed.</p>
+<p>Briska stopped.</p>
+<p>Bourin sat and put the ribbon on his knee. His left foot turned
+outward beneath the chair. He had kept the baths before their water was
+diverted to the upper cisterns, and later had watched the empty building
+for its owner. The morning he had given Miette was a last inspection
+before he handed over the keys.</p>
+<p>“I still remember it,” he said. “People think you sell something and
+walk about with a hole. I had her keep it because she wanted to know
+where a pipe came through. Easier than taking her all that way with my
+knee.”</p>
+<p>“Does it include the pipe?”</p>
+<p>“Most of it. I looked away at the bend. There was a rat.”</p>
+<p>Briska took out Edrine’s copied plan. Bourin put a finger on the
+servants’ passage and followed it down to the old bath. At the bend he
+stopped.</p>
+<p>“Stair there. Narrow.”</p>
+<p>“It isn’t on this.”</p>
+<p>“Then whoever drew it didn’t use it.”</p>
+<p>Pello unfolded his own smaller sheet. He had spent the morning
+walking around the block. The furnace court backed onto a lane used by
+charcoal carts, with an ordinary iron door and a low window above it.
+The delivery ramp opened through the perfume shop’s side passage. A
+driver could bring a handcart to the top without entering the shop.</p>
+<p>“No water at either exit,” he said.</p>
+<p>Briska looked at him.</p>
+<p>“I checked.”</p>
+<p>She had been about to suggest a boat.</p>
+<p>They settled the loan. Bourin wanted the frame returned, and enough
+money to have his sister’s name embroidered on a ribbon of a color he
+approved. Miette wanted to know what Sevrine was packing. Briska said
+she could report what she saw, not everything that might be in a
+cellar.</p>
+<p>“Edrine’s piece first,” Miette said.</p>
+<p>“That is the work.”</p>
+<p>“Of course it is.”</p>
+<p>There was something in the answer that Briska could not put a useful
+name to. Pello shifted away from the window.</p>
+<p>“Do you want something brought out?” he asked.</p>
+<p>Miette’s hand rested on the hairbrush with its opened back.</p>
+<p>“I wanted things brought out last winter. There were reasons it
+couldn’t be done.”</p>
+<p>“Tell us what.”</p>
+<p>She turned the brush face down. “Ask me when you’ve seen the
+place.”</p>
+<p>Bourin wanted to demonstrate the frame before they left. Miette drew
+a curtain across the window and brought the chair away from the table.
+The precautions irritated Briska until she touched the glass.</p>
+<p>She was carrying a pail.</p>
+<p>Its handle bit a groove into the first joints of her fingers. Her
+left knee hurt. The room had a tiled floor, a high window, and a narrow
+step that she knew she must take sideways. There was a pleasant
+certainty about the position of everything. A door she had never seen
+stood exactly where it ought to stand.</p>
+<p>Briska lifted her foot.</p>
+<p>The chair struck the backs of her legs. Pello caught the pail that
+was not there by catching her actual wrist.</p>
+<p>She took her thumb off the glass.</p>
+<p>The shop returned in pieces. Glue. Purple ribbon. Her own knees,
+which had no particular reason to hurt.</p>
+<p>Bourin nodded. “You do tend to go with it.”</p>
+<p>“An observation you might have made before.”</p>
+<p>“I thought that was why you wanted directions.”</p>
+<p>Miette was laughing. Briska sat on the chair she had nearly stepped
+through and looked at the frame without touching it.</p>
+<p>“I’ll need a cord on this. A proper release. Thumb away, glass
+covered. No decorative latch.”</p>
+<p>“Now you’re speaking my trade.”</p>
+<p>They worked at the table for half an hour. Miette held the brass
+while Briska fitted a sliding leather cover. Bourin disputed the
+proposed ribbon color with Pello, who listened and eventually suggested
+that he take the sample outside before buying it.</p>
+<p>The old man considered this with the satisfaction of someone to whom
+a difficult problem had finally been properly presented.</p>
+<p>When they left, Briska carried the covered frame in a separate
+pocket. She had labeled the pocket herself.</p>
+<h2 id="chapter-4-a-satisfactory-revenge">Chapter 4 — A satisfactory
+revenge</h2>
+<p>The Saffron Rooms had made regret comfortable.</p>
+<p>There were low chairs, shaded lamps and small dishes of candied peel.
+The curtains had been chosen to flatter skin. A woman in a dark green
+dress sat with her hands folded around an empty cup, smiling at
+something that had occurred several years earlier to somebody else.</p>
+<p>Rosceline passed her without staring. Behind her, Daska inspected the
+peel and decided against it. Ilaro carried a plain leather portfolio. He
+had asked for the right-hand side of the gallery, away from the mirrors.
+Pello and Briska entered separately through the shop with a case of
+replacement fittings.</p>
+<p>The introduction had named Rosceline as a widow with an interest in
+unusual consolation. She had improved the widow by making her rich,
+impatient and rather recently bereaved. The resulting woman was
+recognizable enough that the attendant did not ask many questions.</p>
+<p>“My husband’s friends insist I should remember the good things,” she
+told him. “I do. They are the difficulty.”</p>
+<p>The attendant’s name was Teren. He had a soft voice, a heavy key ring
+and the fingers of a man who had once worked with horses. He asked what
+sort of experience she wished to purchase.</p>
+<p>“I thought you might have something in which a husband receives an
+adequate answer.”</p>
+<p>“Verbal?”</p>
+<p>“Let us not close possibilities before we have seen the stock.”</p>
+<p>Teren led them to a small table. A buyer behind a pierced wooden
+screen was protesting that a remembered victory had included an
+unexpected stomach complaint. The seller replied that it had been a
+cavalry action and the circumstances were inseparable from its
+authenticity.</p>
+<p>Daska took a piece of peel after all.</p>
+<p>Sevrine Albel arrived carrying a tray herself.</p>
+<p>She was a broad woman with graying hair cut close beneath a fine net.
+There was nothing vague about her. She placed the tray where the light
+would reach it, adjusted a chair that had been left badly, and asked
+Ilaro whether the lamp troubled him.</p>
+<p>“A little.”</p>
+<p>She moved it. No comment followed. Rosceline felt Ilaro’s attention
+sharpen at the courtesy.</p>
+<p>“You have been introduced by a careful person,” Sevrine said. “I hope
+we can be useful to you.”</p>
+<p>On the tray stood four shallow boxes. Each held a small object
+cushioned in dark wool. A button, a piece of green glass, a
+mother-of-pearl counter and a plain iron ring.</p>
+<p>“Are those the memories?” Daska asked.</p>
+<p>“They hold enough to allow a taste. The source remains
+elsewhere.”</p>
+<p>“Why?”</p>
+<p>“Because a room full of strangers handling the strongest impressions
+would be an unpleasant room. Also, people steal.”</p>
+<p>Rosceline smiled. “That must be tiresome in your profession.”</p>
+<p>Sevrine opened the box with the iron ring. The lining smelled faintly
+of warm metal.</p>
+<p>“A man who returned to the officer who had disgraced him. A public
+correction. No killing. You may be pleased to hear that it includes
+applause.”</p>
+<p>“I may not.”</p>
+<p>“Then we should establish what would please you.”</p>
+<p>Rosceline let the widow’s polite resentment drain out of her face. It
+was a small change, chiefly in the mouth. Sevrine noticed at once.</p>
+<p>“I have a thing to offer,” Rosceline said.</p>
+<p>Ilaro looked toward her. She had told him she might claim to be a
+seller as well as a buyer. She had not yet told him what.</p>
+<p>Sevrine shut the ring’s box. “A recollection?”</p>
+<p>“A private satisfaction.”</p>
+<p>“Many people believe those more valuable than they prove to be.”</p>
+<p>“Then you have been poorly served.”</p>
+<p>Behind the screen, the cavalry buyer demanded a different horse.</p>
+<p>Sevrine waited. Rosceline enjoyed that she did not help fill the
+silence. Her face showed professional interest, not reverence. Rosceline
+would have to earn the latter if she wanted it.</p>
+<p>“A man attempted to take something from me,” she said. “He was
+accustomed to being allowed to do that. There was a moment when he
+understood that he had chosen badly.”</p>
+<p>“Was the understanding prolonged?”</p>
+<p>“No.”</p>
+<p>Sevrine’s gaze moved to Daska, whose hand had stopped halfway to the
+dish.</p>
+<p>“You were present?”</p>
+<p>Daska put the peel down. “I was.”</p>
+<p>“That is useful.”</p>
+<p>“It wasn’t.”</p>
+<p>Rosceline turned her head slightly. Daska looked back at her, neither
+endorsing the offer nor making a scene in front of the merchant.</p>
+<p>Sevrine offered a private appointment the following afternoon. She
+would hear the circumstances, establish a boundary, and take a trial
+likeness if they agreed. Rosceline would retain her own recollection. A
+deposit would give access to the inner viewing rooms during the private
+sale the next evening. The buyer leaving Silkstrand preferred to inspect
+principal sources himself.</p>
+<p>“Master Carovel,” Sevrine said. “He has an interest in decisive
+experiences.”</p>
+<p>“I expect he has had very few.”</p>
+<p>“He has had the money to improve that.”</p>
+<p>Rosceline asked to see an inner room. Sevrine did not pretend that
+the request was unreasonable. She rose and led them down the broad ramp,
+past Briska arguing with Teren about a damaged brass collar.</p>
+<p>“It isn’t a matter of taste,” Briska was saying. “It is cracked.”</p>
+<p>“It has always been that shape.”</p>
+<p>“That is not the reassurance you imagine.”</p>
+<p>Pello stood behind the case with its handles resting against his
+shins. His eyes met Rosceline’s for an instant, then went back to the
+ramp.</p>
+<p>At its foot lay the packing room. Shallow cupboards lined the walls.
+A thick door on the left opened onto a square chamber fitted with tall,
+silver-backed panels. Each panel stood in a stone groove. The floor
+between them was bare enough to show how often the chairs had been
+moved.</p>
+<p>Sevrine put her palm against a small disk beside the door.</p>
+<p>The far wall became a garden.</p>
+<p>Rosceline smelled crushed fennel. A boy was climbing over a wall,
+carrying somebody else’s pears inside his shirt. The garden had the
+light of a late afternoon in which she suddenly believed she had once
+been very happy.</p>
+<p>Daska caught the sleeve of her dress.</p>
+<p>Rosceline looked down. Her foot was beyond the stone threshold.</p>
+<p>“Please remain outside,” Sevrine said. “This room is not prepared for
+company.”</p>
+<p>She took her hand from the disk. The garden thinned. For a moment the
+boy and the chair behind him occupied the same place. Then the chair
+stood alone.</p>
+<p>Rosceline withdrew her foot.</p>
+<p>“Whose was that?”</p>
+<p>“A gardener’s daughter. She kept the rest.”</p>
+<p>“Did she want to?”</p>
+<p>Sevrine closed the door. “You would have to ask her.”</p>
+<p>They crossed the packing room. Through an open cupboard Rosceline saw
+white glass cylinders in padded racks. Their bindings differed: red,
+green, a dark blue almost black beneath the lamp. Sevrine moved between
+her and the cupboard with no appearance of haste.</p>
+<p>Three steps descended beyond the room into the old bath. The basin
+stood against its far wall. A metal cover had been put over it. The
+furnace passage opened to the right. On the left, a narrow stair rose
+into darkness.</p>
+<p>“The building supplies more rooms than it appears to,” Sevrine said.
+“We are careful about who enters them.”</p>
+<p>Ilaro looked at the covered basin.</p>
+<p>“Does the old water still run?”</p>
+<p>“Only when we need it.”</p>
+<p>Sevrine led them upstairs again. Rosceline had smelled fennel all the
+way back to the gallery, although she knew it was not growing there.</p>
+<p>Outside, Daska waited until the shop door had shut.</p>
+<p>“Rell,” she said.</p>
+<p>Rosceline watched a cart pass. “You would prefer I had invented
+somebody?”</p>
+<p>“I’d prefer you told us before you offered him.”</p>
+<p>“I offered a meeting. Nothing has been taken.”</p>
+<p>Ilaro stood beside them with his portfolio pressed to his ribs. His
+face was pale.</p>
+<p>“We’ll discuss it before tomorrow,” he said. “All of it that affects
+the job.”</p>
+<p>Rosceline wanted to complain about the arrangement, chiefly because
+she had agreed to it. Instead she took the perfume sample from her
+sleeve and dropped it into the cart’s passing load of refuse.</p>
+<p>Daska watched it go.</p>
+<p>“That was probably useful evidence.”</p>
+<p>“It was atrocious.”</p>
+<p>They walked on. Half a street later Rosceline found herself looking
+for the boy with the pears.</p>
+<h1 id="part-ii-the-things-kept-underneath">Part II — The things kept
+underneath</h1>
+<h2 id="chapter-5-three-witnesses">Chapter 5 — Three witnesses</h2>
+<p>Helvo wanted his boots.</p>
+<p>The watch had taken them because one heel contained a narrow steel
+blade. He agreed that this was an awkward thing for a man accused of
+murder to have in his footwear. It remained a poor reason to send him to
+a quarry barefoot.</p>
+<p>“The blade folds,” he told Ilaro. “For cutting twine. You can’t get
+it open with the boot on.”</p>
+<p>The examining clerk sat at the far end of the room eating a plum. He
+had offered Ilaro the chair with its back to the barred window. Daska
+stood by the wall, leaving enough room between herself and the door that
+the clerk did not have to mention it.</p>
+<p>“Why keep it in a heel?” Ilaro asked.</p>
+<p>“Because people borrow knives. Nobody borrows your boot.”</p>
+<p>The clerk removed the stone from his mouth and laid it on a folded
+paper.</p>
+<p>“I have asked for the boots to be returned without the blade,” he
+said. “The officer who took them is on the western quay today.”</p>
+<p>“Then he’ll have comfortable feet.”</p>
+<p>Helvo’s own feet were bare beneath the bench. He had wrapped a rag
+around the right one, where the stone floor had opened a split in the
+skin. Daska looked at the rag, then away.</p>
+<p>Ilaro asked him about Jossart.</p>
+<p>The furnace man had found him by the basin after hearing something
+fall. There was blood from a cut above the ear. Jossart’s face was wet.
+Helvo had tried to lift him and found him heavy in a way that made no
+sense until he realized the fine coat was full of water. He cut the
+collar because the man’s throat seemed swollen and he could think of
+nothing else to do.</p>
+<p>“Did he speak?”</p>
+<p>“No.”</p>
+<p>“Did anyone come?”</p>
+<p>“Teren. He stood on the steps. Then Mistress Albel.”</p>
+<p>“Edrine?”</p>
+<p>“On the floor behind the door. I didn’t see her at first.”</p>
+<p>Ilaro stopped writing. “Which door?”</p>
+<p>“The packing room. It opens against the wall. She was behind it,
+sitting down. I thought she’d fainted.”</p>
+<p>“Did you go to her?”</p>
+<p>“Teren said to leave her. Then he caught my arm. I still had the
+knife.”</p>
+<p>Helvo looked at the clerk. “That’s when I dropped it. I’ve told
+you.”</p>
+<p>The clerk nodded. “It is in your statement.”</p>
+<p>He was called Veyrat, and he had accepted the Countess’s request for
+an interview without pretending that she commanded the watch. There were
+three statements against Helvo, a weapon with blood on it and a dead man
+whom Helvo admitted touching. Veyrat could delay the transfer if
+supplied with something beyond the accused man’s insistence that his
+employers were liars.</p>
+<p>“Someone who saw differently,” he said. “Something that puts one of
+these people elsewhere. I cannot tell the court that the Countess
+dislikes the perfume.”</p>
+<p>Daska turned toward Ilaro. He had not realized Rosceline’s opinion
+had been included in the introduction.</p>
+<p>The three witnesses were Edrine, a fur buyer called Lande, and a
+woman named Perette who kept rooms near the west gate. Each claimed to
+have stood in the packing-room doorway. Each remembered Helvo saying
+Jossart had cheated him. Lande supplied the words exactly. Perette
+insisted the final word had been swallowed by a noise from the
+furnace.</p>
+<p>“People differ,” Veyrat said.</p>
+<p>“They do.”</p>
+<p>Ilaro asked for copies. Veyrat let him make them at the table. Daska
+went out and returned with two soft, inexpensive shoes. The guard made
+her shake them upside down before giving them to Helvo.</p>
+<p>He put them on, pressed the toes with his thumb, and said that they
+would do until his boots came back.</p>
+<p>She accepted this as thanks.</p>
+<p>They found Lande at a warehouse where fox skins hung from the
+rafters. The smell was heavy enough to catch in the back of Ilaro’s
+throat. Lande had no wish to discuss murder before his apprentices, and
+considerably less wish to discuss why he had visited the Saffron Rooms.
+He came into the yard with them and stood beneath a dripping gutter.</p>
+<p>“I was inspecting a private collection.”</p>
+<p>“Of what?” Daska asked.</p>
+<p>“Private things.”</p>
+<p>Ilaro asked him to describe the scene without referring to his
+statement. Lande became more confident as he spoke. The bath emerged in
+painstaking detail: blue crack in the basin, blood on the sleeve,
+Jossart’s cheek against the wet floor. Then the viewpoint descended.
+Ilaro could not have said why he noticed it except that Lande bent while
+describing the man’s face, as if unconsciously returning to a
+posture.</p>
+<p>“Were you standing?”</p>
+<p>“Of course.”</p>
+<p>“Where was Edrine?”</p>
+<p>“Beside me.”</p>
+<p>“And Perette?”</p>
+<p>“She came after.”</p>
+<p>Lande lifted a hand to his mouth. “I had bitten myself. I remember
+that particularly. I couldn’t get the taste out for hours.”</p>
+<p>“Which side?”</p>
+<p>He touched the left corner of his mouth.</p>
+<p>Ilaro wrote it down.</p>
+<p>They left him under the gutter. Daska waited until they had passed
+the last hanging skins.</p>
+<p>“You keep rubbing your mouth.”</p>
+<p>“Do I?”</p>
+<p>“The same side.”</p>
+<p>He lowered his hand. He had been trying to imagine what Lande
+described and had begun supplying the sensation himself. That irritated
+him more than the man’s evasions.</p>
+<p>Perette would speak only through a half-open door. She had a customer
+upstairs and a delivery expected. She did not deny visiting Sevrine.
+There had been something she wanted help remembering, and she did not
+intend to discuss it with either of them.</p>
+<p>“Tell me about the basin,” Ilaro said.</p>
+<p>Her description put her at the same low angle as Lande’s. A little
+blue crescent in the glaze appeared above Jossart’s face. Helvo’s left
+boot stood in a spill of cordial. When she came to the threat, she
+swallowed and rubbed her lower lip.</p>
+<p>“Had you hurt your mouth?”</p>
+<p>“Yes. I must have. I remember the blood.”</p>
+<p>“Before the man was struck?”</p>
+<p>She looked at him with annoyance. Then her gaze moved past his
+shoulder to the opposite wall.</p>
+<p>“I think so.”</p>
+<p>Daska said nothing. A man called from upstairs. Perette did not
+answer him.</p>
+<p>“Which side?” Ilaro asked.</p>
+<p>She touched the left corner of her mouth.</p>
+<p>The client upstairs called again, less pleasantly. Perette shut the
+door as far as its chain would allow, leaving only her fingers visible
+around the edge.</p>
+<p>“I told the officer what I remember.”</p>
+<p>“I believe you,” Ilaro said.</p>
+<p>Her fingers tightened.</p>
+<p>He gave her the address where a message could reach him and left
+before she had to decide whether to shut him out.</p>
+<p>By late afternoon his headache had settled behind the right eye.
+Daska found a covered stall whose owner served thick broth and did not
+ask people to talk. Ilaro sat with his back to the street. He put the
+three statements beside his bowl, then moved them out of reach of his
+spoon.</p>
+<p>Daska ate. She had bought bread for him and two additional rolls for
+herself, which she did not explain.</p>
+<p>“Three people may remember the same words,” he said eventually. “They
+may have seen the same knife. They should not all remember biting the
+inside of one mouth.”</p>
+<p>“Edrine said bitter. Not blood.”</p>
+<p>He looked up. “You listened to her this morning?”</p>
+<p>“At the house. Before I came for you.”</p>
+<p>He turned to her account. The phrase was there: something bitter
+beneath the tongue. Edrine’s cracked spectacles were another difference.
+A correction added later, perhaps, as she tried to make the scene belong
+to herself. He would have to ask what her mouth had felt like when she
+first woke.</p>
+<p>Daska reached across him for the pepper.</p>
+<p>“Is this enough for Veyrat?”</p>
+<p>“It’s enough for another question.”</p>
+<p>“That won’t keep Helvo here.”</p>
+<p>“No.”</p>
+<p>He wanted to say more. The shape of his next thought had gone while
+the cart beside the stall was being unloaded. Daska waited, tore a roll
+in half and put one half on his plate.</p>
+<p>When it came back, it was simple enough.</p>
+<p>“Someone is still supplying them,” he said. “They haven’t only been
+told a lie. They’ve been given something they can remember better than
+the truth.”</p>
+<p>He ate before the broth cooled. Daska kept the statements dry with
+her forearm when the stallholder sloshed water across the next
+table.</p>
+<h2 id="chapter-6-the-beginning-she-preferred">Chapter 6 — The beginning
+she preferred</h2>
+<p>Rosceline laid her rapier on Briska’s workbench.</p>
+<p>It was an unnecessarily dramatic way of beginning the conversation.
+She knew this, but the alternative was to arrive carrying it and pretend
+that nobody would notice what they were discussing. Briska put a rag
+beneath the guard to keep it from marking the wood.</p>
+<p>“We are not testing anything on my bench,” she said.</p>
+<p>“No one has suggested it.”</p>
+<p>“You brought a sword.”</p>
+<p>“People bring swords into rooms quite often.”</p>
+<p>“Not into my varnish.”</p>
+<p>Pello moved the jar out of reach. Daska sat on the window ledge.
+Ilaro had brought the copied statements, but he kept them shut while
+Rosceline explained the proposed deposit.</p>
+<p>Sevrine would make a likeness of a short recollection. Rosceline
+would retain the original in herself. The likeness would remain in the
+Rooms until the sale, giving Rosceline access as a consignor rather than
+an ordinary visitor. She could withdraw it before a buyer took
+possession. They would use the appointment to identify Edrine’s vessel
+and the cabinet in which it was kept.</p>
+<p>“And she sees what happened to Rell,” Daska said.</p>
+<p>“Yes.”</p>
+<p>“Which part?”</p>
+<p>“The end.”</p>
+<p>Daska’s heel tapped the wall once. “Where does the end begin?”</p>
+<p>Rosceline could have given several answers. She had practiced one on
+the way to the workshop, something about a mountain already falling
+around them. In Briska’s room, with the sword lying beside a jar of
+glue, it sounded worse than it had in the street.</p>
+<p>“When he offered terms,” she said.</p>
+<p>Ilaro opened his notebook. “What is the risk to anyone else in the
+recollection?”</p>
+<p>“The people beside the ladder may be visible. They were
+occupied.”</p>
+<p>“Names?”</p>
+<p>“None in that interval.”</p>
+<p>“Your face?”</p>
+<p>“It is my view. I am unlikely to turn around and admire it.”</p>
+<p>Pello looked at the sword. “She can sell it afterward.”</p>
+<p>“Not if I take it back.”</p>
+<p>“If.”</p>
+<p>Rosceline drew the scabbard a little closer. “I know.”</p>
+<p>The admission left an unpleasant gap. She had expected to defend the
+plan against objections to its taste. Pello’s objection was much more
+useful and considerably harder to answer.</p>
+<p>Briska said she could examine the carrier and close it safely. She
+could not promise to prevent Sevrine taking more than agreed. Ilaro
+wanted Daska in the room, with a written account of the agreed beginning
+and end. Rosceline disliked the written account; she accepted it anyway.
+Pello would remain by the street entrance. Briska would use the
+equipment inspection to examine the packing room.</p>
+<p>“If she asks for a different recollection?” Daska said.</p>
+<p>“I refuse.”</p>
+<p>“If you think of a better one?”</p>
+<p>“I tell you before I give it.”</p>
+<p>Daska looked down at her hands. The fingers injured in the vault had
+stiffened during the colder week. She worked them open against her
+knee.</p>
+<p>“I won’t tell you it happened differently.”</p>
+<p>“I haven’t asked you to.”</p>
+<p>“No.”</p>
+<p>That was the whole answer. Rosceline sheathed the sword and began
+putting its rig back beneath her coat. The guard caught in a fold.
+Briska got up, released the snag without comment, and went back to her
+varnish.</p>
+<p>At the Saffron Rooms the following afternoon, Sevrine gave them a
+private chamber with a high window and a couch covered in gray linen.
+There were no mirrors. On the table stood a silver comb, a glass bulb
+and a small red vessel with a stopper like a closed eye.</p>
+<p>Daska inspected the room before sitting. She found an inner door and
+asked where it led.</p>
+<p>“To the viewing chamber.”</p>
+<p>“Keep it open.”</p>
+<p>Sevrine considered, then opened it. Beyond lay the silver-backed
+panels Rosceline had seen the previous day. They reflected only the
+furniture.</p>
+<p>The merchant read the agreed interval. She asked whether Rosceline
+wished to begin when the man approached with his sword.</p>
+<p>“He was already there.”</p>
+<p>“Then when he threatened your company.”</p>
+<p>“When he offered terms.”</p>
+<p>Sevrine lifted her eyes. “I am trying to give the buyer a useful
+beginning.”</p>
+<p>“It is mine.”</p>
+<p>A little silence followed. Daska sat with the paper open on her
+knee.</p>
+<p>Sevrine asked Rosceline to loosen her collar, take off her gloves and
+sit with both feet on the floor. She did not offer wine. The comb rested
+against the inside of Rosceline’s wrist, cold enough to make her fingers
+curl. Sevrine touched its back with two fingers and told her to remember
+the light beneath the shutter.</p>
+<p>The room smelled of clean linen. Then it smelled of hot metal.</p>
+<p>Rosceline felt the ladder rung under her boot. There was blood on
+Rell’s coat. His sword was low, his free hand open. She had liked the
+speed with which he named a share. That was there too, an appalling
+small pleasure preserved beside everything else.</p>
+<p>She tried to move past it.</p>
+<p>“Stay where you are,” Sevrine said.</p>
+<p>The voice came from the wrong room. Rosceline felt irritation rise,
+then the old anger under it. The sword-point rested on stone. Rell moved
+left because she asked him to.</p>
+<p>She had expected to remember the thrust. What returned most sharply
+was the small correction of her wrist. The body had offered resistance,
+and she had adjusted her hand with no more uncertainty than she might
+use to lift a cup whose handle was cracked.</p>
+<p>Her fingers closed on Sevrine’s sleeve.</p>
+<p>“Enough.”</p>
+<p>The comb lifted.</p>
+<p>She was on the couch. Daska stood in front of her, one hand beneath
+the wrist that had seized the merchant. Rosceline let go. The linen
+under her palm was wet with sweat.</p>
+<p>Sevrine sat back. Blood ran from one nostril. She caught it with a
+square of cloth and held the red vessel toward the lamp. Something dark
+moved near its base.</p>
+<p>“Very clear,” she said.</p>
+<p>Rosceline hated the satisfaction in her voice. She also wanted to
+know whether it was valuable.</p>
+<p>Daska passed her the gloves.</p>
+<p>“Can you stand?”</p>
+<p>“In a moment.”</p>
+<p>Sevrine waited. The blood had made her less composed, but not less
+interested. When she spoke again she addressed Rosceline as a fellow
+professional.</p>
+<p>“People will pay for certainty. This has a useful absence of doubt at
+the decisive point.”</p>
+<p>Daska folded the paper.</p>
+<p>“You have the likeness,” she said. “We’re finished here.”</p>
+<p>“I will prepare a sample for Master Carovel. You may inspect it
+tomorrow before the sale.”</p>
+<p>“The source stays as it is,” Rosceline said.</p>
+<p>“Of course.”</p>
+<p>Rosceline looked at the red vessel. She could still remember the
+mountain. Nothing had gone from her. That was a relief she resented
+needing.</p>
+<p>She signed the deposit with her Silkstrand name and watched Sevrine
+put the vessel in a small padded box. Daska copied its number: R twelve.
+The clerk at the door took the box to the packing room.</p>
+<p>On the way out, Rosceline stopped by a cabinet of perfume bottles.
+She chose one at random, opened it, and smelled sharp green leaves
+instead of hot blood.</p>
+<p>Daska waited beside her.</p>
+<p>“Do you want that?”</p>
+<p>“No.”</p>
+<p>Rosceline put it down. Her hand trembled against the glass. The shop
+girl courteously looked elsewhere.</p>
+<p>Outside, Pello had bought two cups of sour lemonade. He gave one to
+each of them. Rosceline drank too quickly and coughed. Daska held the
+cup while she recovered, then returned it without improving the
+moment.</p>
+<p>Across the street Briska emerged from the side passage with her case.
+She looked pleased, which was usually worth attending to.</p>
+<p>“The cabinet is below,” she said. “White glass. Blue binding. I saw
+the number.”</p>
+<p>Rosceline finished the lemonade. She had paid for entry with
+something she could still feel moving inside her, and at least they had
+found what they had come to steal.</p>
+<h2 id="chapter-7-a-staircase-no-longer-there">Chapter 7 — A staircase
+no longer there</h2>
+<p>The old man’s knee hurt before Briska reached the stair.</p>
+<p>That ought to have reassured her. Bourin had remembered the route in
+order, with the same dragging ache he had described in Miette’s shop.
+She could feel the pail pulling at her fingers. Somewhere ahead, a rat
+was about to cross a strip of daylight.</p>
+<p>Pello caught the back of her belt.</p>
+<p>“Stop.”</p>
+<p>She stopped with one foot in the air.</p>
+<p>The stair ended beneath it.</p>
+<p>For a moment she saw both things: a worn tread continuing downward
+and the black space where four steps had been removed. The tread was
+more convincing. She had placed her foot on it thousands of times,
+except that she had done no such thing.</p>
+<p>Pello pulled her backward. She took her thumb off the glass and let
+its leather cover fall.</p>
+<p>The remaining stair was a stub of stone projecting from the wall.
+Below it lay broken brick and a dry channel deep enough to break both
+legs. Someone had taken the missing treads for use elsewhere and left
+the gap behind a door that no longer locked.</p>
+<p>Briska sat on the upper step. Her own knee did not hurt. The absence
+was so abrupt that she pressed it with her hand.</p>
+<p>“Thank you,” she said.</p>
+<p>Pello knelt and lowered the hood from his lamp.</p>
+<p>She had expected him to say something about testing the ground. He
+merely held the light where she could see.</p>
+<p>They had entered through a narrow upper door from an unused cupboard
+behind the gallery. During the afternoon inspection Briska had found its
+frame beneath layers of paint and asked Teren whether his employer
+expected repairs to work through plaster. He had given her ten minutes
+and left to settle a disagreement over a sample. She had removed the
+lower hinge pin, replaced it with a shorter one and closed the cupboard
+again. Tonight Pello lifted the door out of its seating. There was no
+lock left to pick.</p>
+<p>The Saffron Rooms had shut to ordinary customers. Below them Teren
+and two packers were preparing the cases for the following night’s sale.
+Briska could hear crockery moving across wood. She had thought the old
+passage would let them see the cabinet from behind without crossing the
+packing room.</p>
+<p>It still might, if she stopped allowing a dead arrangement of stairs
+to carry her feet.</p>
+<p>Pello paid out the narrow rope he had fastened around a sound newel
+at the top. Briska tested the edge of each remaining stone with her tool
+handle. They descended into the broken channel, crossed it, and climbed
+onto the lower landing.</p>
+<p>The rat never came.</p>
+<p>She found herself waiting for it anyway.</p>
+<p>At the bottom, a narrow slit opened behind one of the silver-backed
+panels. Warm air came through smelling of lamp oil and somebody’s hair
+tonic. Briska looked into the viewing chamber.</p>
+<p>Sevrine sat beside a man in a cream coat. He had taken off his rings.
+His hands lay open on his knees, with a square of glass balanced across
+them. There were tears on his face. He looked pleased about them.</p>
+<p>“A little longer,” he said.</p>
+<p>“You’ve had the full interval.”</p>
+<p>“I wasn’t looking at her when it began.”</p>
+<p>Sevrine took the glass. The man’s fingers tried to follow it before
+he drew them back.</p>
+<p>On the opposite wall a woman stood in a doorway, carrying a bowl. She
+was ordinary enough to be startling in the rich room. Her hair had
+slipped from its binding. She was laughing at something the man whose
+memory they shared had said, and the man in the cream coat watched her
+as though he would give Sevrine anything to hear it again.</p>
+<p>The doorway faded. An empty chair stood where the woman had been.</p>
+<p>“You may arrange another viewing,” Sevrine said. “With time between
+them.”</p>
+<p>“Tomorrow?”</p>
+<p>“Tomorrow is the sale.”</p>
+<p>“Yes. Of course.”</p>
+<p>He rubbed his hands against his thighs. Pello shifted beside Briska,
+and she knew he was ready to go. She stayed long enough to see Sevrine
+put the glass into a shallow drawer beneath the reading table. The
+stronger vessels were elsewhere. A brass fitting connected the table to
+the nearest panel. Nothing visible drove the image, but the metal was
+hot enough that Sevrine used a cloth to touch it.</p>
+<p>The man in the cream coat rose. One of his rings rolled beneath the
+chair. He went down on his knees to find it, with an apology that seemed
+addressed to the woman who had vanished.</p>
+<p>Briska withdrew from the slit.</p>
+<p>At the next opening she could see the lower cabinet. White cylinders
+stood in individual hollows, their stoppers upward. E forty-one was in
+the second row. A blue cord crossed its stopper and disappeared beneath
+a seal of pale wax. Beside it, in a smaller recess, sat Rosceline’s red
+vessel.</p>
+<p>Teren lifted the white cylinder and read its number against a sheet.
+He wrapped it in gray felt, put it into a black traveling case and
+fastened a buckle around the lid. The case had six separate spaces. He
+filled the others from the same cabinet.</p>
+<p>Briska counted by position rather than trusting the labels she could
+barely see. Edrine’s was nearest the handle, on the left. Rosceline’s
+red source remained on the shelf.</p>
+<p>Teren carried the case toward the bath. He set it in a wall cupboard
+beside the covered basin, locked the door and put the key back on the
+ring at his belt.</p>
+<p>Pello touched Briska’s shoulder once. He had seen.</p>
+<p>They returned up the passage. At the missing steps Briska used the
+rope without consulting Bourin’s recollection. Its cover stayed down.
+The remembered pail seemed to drag at her empty hand all the same.</p>
+<p>Outside, the night smelled of frying fish and the canal at low water.
+Briska rested her case against her knee while Pello replaced the hinge
+pin in the cupboard door. Their ordinary clothes felt strangely light
+after the weight of the pail.</p>
+<p>Miette was waiting at the bottom of the shop stair when they came to
+return the frame.</p>
+<p>She had two men with her. One carried a roll of blankets. The other
+had a leather satchel that hung stiffly against his side. Briska smelled
+oil before she saw the stoppered bottles inside it.</p>
+<p>“Not tonight,” Miette said to them.</p>
+<p>The men waited in the street while she let Briska and Pello
+upstairs.</p>
+<p>“You were going in,” Briska said.</p>
+<p>“I was considering it.”</p>
+<p>“With lamp oil.”</p>
+<p>“You found the source?”</p>
+<p>Briska kept her case shut. “We found where they’re moving it.”</p>
+<p>Miette took off her coat. Her hands shook a little as she hung it on
+the peg. She was not calm about what she had been preparing to do, which
+made Briska less comfortable than if she had been.</p>
+<p>“My brother sold a summer,” Miette said. “He thought it was one
+afternoon. He wanted the money and he signed something Sevrine explained
+very patiently. There are things I can tell him now that make him look
+at me as if I’m lying.”</p>
+<p>“Is his piece there?”</p>
+<p>“No. It went abroad. I paid to have it found. Then I paid to have
+another piece read. That one belonged to a stranger. Sevrine was sorry.
+She always has something further to suggest.”</p>
+<p>Pello set the covered frame on the table. He kept his hand on it
+until Miette looked at him.</p>
+<p>“What burns with the house?” he asked.</p>
+<p>“The holdings. The prepared passages. Her stock.”</p>
+<p>“People?”</p>
+<p>“We were waiting until they’d gone.”</p>
+<p>“Bourin’s inspection says there’s a sleeping room below the furnace
+stair. Is it empty now?”</p>
+<p>Miette did not answer at once.</p>
+<p>Briska sat down. The chair was exactly where she expected it to be,
+and for that she was absurdly grateful.</p>
+<p>“We go tomorrow,” she said. “We bring out what we’re paid to bring
+out. If there is something else you can name, tell us. But nobody pours
+oil into that passage while we’re beneath it.”</p>
+<p>“Then you take one piece and leave her the rest.”</p>
+<p>“I haven’t promised to fix every wrong thing in the building.”</p>
+<p>Miette looked at her hands. “Neither did I when I went to work
+there.”</p>
+<p>They agreed to meet before the sale. Miette would give them the
+description of two unsold takings whose owners she could find. She would
+remain outside until they came out. Pello asked her to say the latter
+again with her men present. She was offended, but she called them
+up.</p>
+<p>On the way home Briska stopped at a stall and bought a pear. She bit
+into it while standing beside the brazier. The fruit was cold and
+gritty, the skin tougher than it ought to have been. She ate it all,
+including the bruised place, while Pello waited with her tools.</p>
+<h2 id="chapter-8-where-the-witness-stood">Chapter 8 — Where the witness
+stood</h2>
+<p>By the next morning, Edrine had arranged the borrowed room as if she
+expected its owner to come back and inspect it.</p>
+<p>The chair stood square to the table. The washcloth hung with its
+corners together. A little heap of pomegranate peel lay on a plate
+beside the bed. Ilaro looked at it before sitting down.</p>
+<p>“Celise brought the fruit,” Edrine said. “I thought I might try.”</p>
+<p>“Has it helped?”</p>
+<p>“It has stained another skirt.”</p>
+<p>She showed him the red mark on her thumb. Daska laughed, and Edrine’s
+mouth moved toward an answering smile before abandoning it.</p>
+<p>Ilaro laid the three accounts on the table. He did not begin with the
+matching sensations. First he asked about the room where she had woken
+and who had attended her.</p>
+<p>Teren brought food. Sevrine brought the treatment. A narrow strip of
+cloudy glass lay across Edrine’s wrists while Sevrine asked her to
+follow the scene it supplied. The first time it was difficult. The
+second time she could see Helvo clearly. After several days she could
+recall him without the glass.</p>
+<p>“Did it change between visits?”</p>
+<p>“There was more of it.”</p>
+<p>“Was any part different?”</p>
+<p>“The knife. At first I thought he held it in his right hand. Later it
+was the left.”</p>
+<p>“Which hand does he use?”</p>
+<p>“The right. He hurt the left at the furnace years ago. Two fingers
+don’t close properly.”</p>
+<p>Ilaro remembered Helvo pressing the soft shoe with his right thumb.
+He had not noticed the left fingers. Daska had.</p>
+<p>“He kept them against his coat,” she said.</p>
+<p>Edrine looked from one to the other. “Does that mean—”</p>
+<p>“It means the hand is wrong,” Ilaro said. “For the account we
+have.”</p>
+<p>He hated how small that sounded after everything she had brought him.
+He also disliked the relief with which he might have supplied a larger
+conclusion simply to make her stop looking at him that way.</p>
+<p>He unfolded her drawing. The doorway from the packing room stood
+three steps above the bath. If Lande had been there, he would have
+looked down across the basin’s near rim. His account put the blue crack
+above Jossart’s head. Perette described the same angle. Helvo put Edrine
+on the floor behind the open door.</p>
+<p>“Here,” Ilaro said, touching the space beside it. “Do you remember
+sitting here?”</p>
+<p>“No.”</p>
+<p>“Was your mouth sore when you woke?”</p>
+<p>She touched the left side of her jaw. “I had a cut inside the cheek.
+They said I’d bitten myself when I fainted.”</p>
+<p>The little spoon beside the pomegranate plate lay across the three
+statements. Ilaro moved it away and drew a line from the floor behind
+the door to the basin.</p>
+<p>“You could see under the cover’s raised edge from there. Someone
+standing in the doorway would see its top.”</p>
+<p>“The cover was open,” Edrine said.</p>
+<p>“In what you remember now?”</p>
+<p>“Yes.”</p>
+<p>He asked her to describe its underside. She knew the iron ribs, the
+cracked wooden handle, the little hook for holding it upright. She had
+cleaned those things for nine years. Knowing them did not establish that
+she had seen them that morning.</p>
+<p>Daska took her hands off her knees and leaned forward.</p>
+<p>“What was Jossart doing before he went for the cloth?”</p>
+<p>“He had asked Mistress Albel for an account of his share.”</p>
+<p>“Was that unusual?”</p>
+<p>“He’d asked twice already.”</p>
+<p>Edrine watched a seed roll across the plate. She stopped it with her
+finger.</p>
+<p>“He intended to leave. He had made a separate arrangement with
+Carovel. A room at the man’s house, his own equipment. Sevrine said they
+should discuss it after the customers had gone.”</p>
+<p>“Did you hear that discussion?” Ilaro asked.</p>
+<p>“No.”</p>
+<p>Then, after a moment: “I don’t know.”</p>
+<p>They stayed while she tried. There was no sudden scene waiting behind
+the effort. She remembered the carpenter’s loose shutter, and cordial
+running along the seam, and the annoyance of having laughed at Jossart’s
+joke while she was supposed to be cross with him. Trying harder made her
+head ache.</p>
+<p>Daska went to fetch water. Ilaro closed his notebook.</p>
+<p>“You can stop.”</p>
+<p>“I have stopped for eleven days.”</p>
+<p>“This is different.”</p>
+<p>She looked at him. He did not explain the difference to her. He was
+not certain she would find it useful.</p>
+<p>When Daska returned, Edrine asked what would happen if the recovered
+recollection showed Helvo killing him after all. Ilaro said they would
+have to account for it. If it showed something else, they would have to
+account for that too. She set the cup down so sharply that water ran
+into its saucer.</p>
+<p>“You make it sound like work.”</p>
+<p>“It will be.”</p>
+<p>That made her laugh, unexpectedly and without much pleasure. “I used
+to be good at that.”</p>
+<p>Daska pushed the plate toward her. “You’ve still got half a
+pomegranate to manage.”</p>
+<p>They left her eating it with the spoon.</p>
+<p>Veyrat received Ilaro’s comparison at the watch house before noon. He
+listened more carefully when Ilaro explained the line of sight than when
+he mentioned the traded impressions. He sent an officer to check the
+bath. An hour later the officer returned without entering it. The owner
+had required a proper warrant, and the perfume shop’s landlord had
+required the owner’s consent to anything involving the lower
+structure.</p>
+<p>Veyrat swore with an economy Ilaro admired.</p>
+<p>“I can put the transfer back a day,” he said. “I cannot make a murder
+disappear because the building is inconvenient.”</p>
+<p>“Nor can I.”</p>
+<p>“You intend to try something.”</p>
+<p>Ilaro put the borrowed pen back beside the clerk’s hand. “I intend to
+find out what is being moved.”</p>
+<p>Veyrat watched him. “Do not bring me a vessel full of something
+nobody else can inspect, and call it a witness.”</p>
+<p>“I’ll need the actual witnesses questioned again.”</p>
+<p>“I’m doing that.”</p>
+<p>“And Helvo’s coat. The knife. The healer’s account of the body.”</p>
+<p>The clerk took another sheet. “Those I have.”</p>
+<p>Jossart had water in his mouth and lungs. There was a head wound that
+might have stunned him. The cut at the collar had not killed him. Helvo
+had said all of this before anyone asked, and the officer taking the
+statement had treated it as suspicious knowledge.</p>
+<p>Ilaro copied the healer’s wording. When he reached the street, he had
+to sit on the low wall beside the watch house until the ache behind his
+eye loosened.</p>
+<p>Pello found him there shortly after noon. He had brought a small
+parcel of bread and cold chicken. He sat without asking whether Ilaro
+needed help.</p>
+<p>“Briska found the box,” he said.</p>
+<p>“So I hear.”</p>
+<p>“Miette has men.”</p>
+<p>Ilaro waited.</p>
+<p>“And oil.”</p>
+<p>He closed his eyes. Pello unwrapped the food on the wall between
+them.</p>
+<p>“We’ll speak to her before we go,” Ilaro said.</p>
+<p>“We did.”</p>
+<p>“How did it go?”</p>
+<p>“She agreed.”</p>
+<p>Neither of them found that entirely reassuring. They ate the chicken
+while the morning watch was relieved and a pair of men on the opposite
+corner argued over whose dog had bitten the other first.</p>
+<h2 id="chapter-9-an-improved-version">Chapter 9 — An improved
+version</h2>
+<p>The boat was shorter than Pello had described it.</p>
+<p>Rosceline stood on the quay and looked down into it. There was room
+for a useful cargo, two people working comfortably, or five people
+disagreeing about which of them ought to be considered cargo. Its paint
+had once been blue. Water lay between the floorboards, reflecting a sky
+that made the whole affair look more cheerful than it deserved.</p>
+<p>“This is the one?”</p>
+<p>Pello nodded.</p>
+<p>“I had formed an impression of something grander.”</p>
+<p>“I was asking about mooring space.”</p>
+<p>“That may have been when I stopped listening.”</p>
+<p>The seller sat on a bollard eating a boiled egg. He had heard enough
+of the exchange to revise his assessment of who held the money. He
+addressed the next sentence to Rosceline.</p>
+<p>“She’s sound where it matters.”</p>
+<p>“I have heard that said of people shortly before they become
+expensive.”</p>
+<p>Pello went down into the boat. He tested a rib with the handle of his
+knife and looked beneath the aft bench. The seller resumed eating.
+Rosceline watched Pello’s hands move over wood he wanted to own and felt
+briefly indecent, as if she had opened a letter not addressed to
+her.</p>
+<p>He had asked her to come because the seller knew her widow’s name and
+might be less inclined to disappear with a deposit. It was a reasonable
+use of her acquaintance. She found it more disturbing than being asked
+to lie.</p>
+<p>“Do you have enough?” she asked when he came back up.</p>
+<p>“For the hull.”</p>
+<p>“And the inconvenient remainder?”</p>
+<p>“After this job.”</p>
+<p>The seller quoted a price. Rosceline let him finish, asked him to
+repeat what he had said about the stem, and watched him correct the
+figure without quite admitting that he had. Pello named a lower one. The
+man complained about the price of timber. Rosceline looked at the pale
+patch where a fitting had been removed and allowed him to continue.</p>
+<p>They agreed on a small deposit, with the balance due after another
+inspection. Pello counted out the money himself. Rosceline witnessed the
+seller’s mark.</p>
+<p>Walking back, he asked what the Countess had promised her.</p>
+<p>She could have said it was private. It was private. He had not asked
+to inspect it or make a decision about it on her behalf.</p>
+<p>“A book.”</p>
+<p>He waited.</p>
+<p>“Someone I knew used it for lessons. There are pieces of his voice in
+it.”</p>
+<p>“Does he speak to you?”</p>
+<p>“No. It is always the same.”</p>
+<p>She watched the water moving beneath a bridge. A little raft of peel
+turned in the eddy, went under, and came up again farther out.</p>
+<p>“He was kind to me,” she said. “At a time when I had no particular
+reason to expect it.”</p>
+<p>Pello stopped to let a woman pass with a basket on each hip.</p>
+<p>“Will you keep working?”</p>
+<p>Rosceline looked at him.</p>
+<p>“After,” he said.</p>
+<p>“I have acquired a number of tastes for which I will continue to
+require money.”</p>
+<p>“That wasn’t what I meant.”</p>
+<p>She knew. She also knew that a quick agreeable answer would cost her
+nothing and might be less than he had asked for.</p>
+<p>“If you have work,” she said, “you can ask me.”</p>
+<p>He nodded. They went on without improving the arrangement.</p>
+<p>Sevrine had asked her to inspect the prepared sample before the sale.
+Rosceline arrived at the Rooms with Daska, who had spent the morning
+checking whether Miette’s promised two owners knew anyone was coming for
+their takings. One did. The other had died. Miette intended to return
+that vessel to her husband, who wanted it kept and had said so without
+being asked whether this was healthy.</p>
+<p>The private chamber smelled of the same clean linen. Sevrine had
+changed her cuffs. The silver comb lay in a covered box, and a flat red
+glass sat on the table beside it.</p>
+<p>“A tasting piece,” she said. “The source is secure.”</p>
+<p>Rosceline sat. Daska remained standing behind the chair.</p>
+<p>Sevrine set the glass against Rosceline’s palms.</p>
+<p>Rell came toward her with his sword raised.</p>
+<p>She knew the room. The ladder. The heat. She knew the shape of his
+mouth when he said they were both practical people. But his sword was
+up, and his free hand reached for her throat, and when she killed him
+the relief came cleanly, with none of the small, ugly pleasure in making
+him move where she wanted him.</p>
+<p>She took her hands away.</p>
+<p>Sevrine waited.</p>
+<p>Rosceline looked at the red glass. For several breaths she could
+remember both versions with the same bodily certainty. The false one had
+a particularly agreeable completeness. There was no loose place at which
+Daska’s face could enter.</p>
+<p>“He put the sword down,” she said.</p>
+<p>“The source had some discontinuity. These short pieces require a
+little support at the edges.”</p>
+<p>“He put it down.”</p>
+<p>Sevrine folded the cloth over the glass. “A buyer wishes to
+understand the action. We do not ask him to live through your whole
+acquaintance.”</p>
+<p>Daska came around the chair. Her voice was quieter than Rosceline had
+expected.</p>
+<p>“Show me.”</p>
+<p>Rosceline caught her wrist before it reached the table.</p>
+<p>“No.”</p>
+<p>Daska looked at the hand holding her.</p>
+<p>Rosceline released it. “It is wrong. You don’t need another version
+of that room.”</p>
+<p>Sevrine watched them with interest. Rosceline could almost feel the
+woman learning where to put the next pressure.</p>
+<p>“I can prepare the source more gently,” the merchant said. “For your
+own use. The essential facts remain. People often find that certain
+unnecessary sensations interfere with their ability to proceed.”</p>
+<p>“Which sensations?”</p>
+<p>“The resistance. The anticipation. The feeling afterward.”</p>
+<p>Rosceline looked at the line of blood that had dried beside Sevrine’s
+nostril during the earlier appointment. Today the skin was clean. The
+woman had done this before, hurting herself a little in the work and
+returning to it because the work was profitable and she was good at
+it.</p>
+<p>“My company will inspect the source before any sale,” Rosceline said.
+“The source I gave you.”</p>
+<p>“Of course.”</p>
+<p>“And I will withdraw it if I dislike the inspection.”</p>
+<p>“That is your right under the deposit.”</p>
+<p>Sevrine did not sound frightened. She had the source downstairs,
+guards at the entrance, and a buyer for whom a small difference in the
+movement of a sword might be a selling point.</p>
+<p>Rosceline rose. The memory in which she had acted reasonably tried to
+accompany her. She was surprised by how much effort it took to leave the
+glass on the table.</p>
+<p>In the passage Daska stopped her.</p>
+<p>“You could have let me see.”</p>
+<p>“I have no desire to watch you being persuaded.”</p>
+<p>“That would not have been the end of it.”</p>
+<p>“It might have been the beginning of something I couldn’t stop.”</p>
+<p>Daska considered this. The door to the private chamber remained shut
+behind them.</p>
+<p>“Tell Ilaro what she changed.”</p>
+<p>“I will.”</p>
+<p>“And me.”</p>
+<p>Rosceline drew a breath. She described the raised sword, the reaching
+hand, the clean relief. Daska listened to the end.</p>
+<p>When Rosceline had finished, the monk touched the seam of her sleeve
+where the sword rig sometimes caught.</p>
+<p>“He put it down,” Daska said.</p>
+<p>Rosceline nodded once.</p>
+<p>They went downstairs. In the shop, a young couple were choosing a
+perfume neither could afford. The girl liked the green one. The man
+asked for another smell of the cheaper bottle. Rosceline waited behind
+them instead of making them move.</p>
+<h2 id="chapter-10-what-will-fit-in-the-case">Chapter 10 — What will fit
+in the case</h2>
+<p>Briska had made a carrier with room for four vessels, and everyone
+wanted it to hold five.</p>
+<p>It lay open on her bench, a wooden box fitted with wool-lined
+dividers and a broad strap. The dividers could be moved. The size of the
+box could not. She explained this twice, once with an illustration
+involving Ilaro’s ink bottle, before Rosceline stopped suggesting that
+something might be slipped into the corners.</p>
+<p>“Edrine’s. Yours. The two Miette can name. Four,” Briska said. “The
+altered sample goes in a separate padded pocket. Flat things and round
+things require different arrangements.”</p>
+<p>“I had hoped geometry might make an exception for urgency.”</p>
+<p>“It hasn’t in my experience.”</p>
+<p>Miette sat beside the window with the descriptions of the other
+takings. One belonged to a cooper who had sold the recollection of a
+winter spent caring for his wife and then discovered how much of her
+laughter had lived inside it. The other belonged to a dead woman whose
+husband wanted the afternoon before her last voyage. Neither would help
+them with a lock.</p>
+<p>The cooper had authorized the recovery. The husband had paid Miette
+what he could toward the same work. Briska had checked both descriptions
+against the cabinet she had seen. They were in the outer shelf, away
+from Edrine’s packed case. They would take them if the way remained
+open. There was no promise to empty the room.</p>
+<p>Miette disliked the qualification. She accepted it.</p>
+<p>Her men would wait in the lane with a covered cart. The oil would
+remain in her shop. Pello had gone there himself and put the bottles in
+the stove cupboard. He had not taken away her key.</p>
+<p>They would enter during the private sale. Rosceline would insist on
+seeing her original beside the improved sample. Sevrine wanted Carovel
+to buy it and would bring the red source to the viewing table. Daska
+would stay with Rosceline. Ilaro would attend as her adviser, carrying
+the copied account of the agreed interval. Briska and Pello, already
+employed to replace the cracked fitting before the stock traveled, would
+go down the delivery ramp with their tools.</p>
+<p>The key to the bath cupboard hung at Teren’s belt. Pello had studied
+its shape and the way the man kept his coat unbuttoned indoors. Briska
+had prepared a plain substitute of the same weight. They needed the
+genuine key once. They would put it back if they could.</p>
+<p>The planned exit was the furnace court. Pello had seen its inner bolt
+while the charcoal was brought in. He could open it from inside.
+Miette’s cart would wait beyond the alley turn, out of sight of the
+shop. The old stair was a connection between levels, not an exit; its
+missing treads remained missing.</p>
+<p>Ilaro asked everyone to show him their route on the drawing. He
+marked two places where he had mistaken an upper landing for a lower
+one. Briska started to explain the whole building again.</p>
+<p>“Those two,” he said. “I have the rest.”</p>
+<p>She stopped. “The first is above the packing room. The second comes
+out beside the bath.”</p>
+<p>“Thank you.”</p>
+<p>Outside, somebody was calling for a knife sharpener. Daska took the
+carrier off the bench and tested its weight with the practice bottles
+inside. She gave it to Pello, who shortened the strap.</p>
+<p>When the others had gone to eat, Briska checked the latch for the
+third time. She had the unpleasant feeling that it was too ordinary for
+the place it would enter. Then she remembered the absent stair and left
+it ordinary.</p>
+<p>At the Saffron Rooms, Teren met her on the ramp.</p>
+<p>He had slept badly. His collar had been turned to hide a dirty edge,
+and the heavy keys made a small, persistent noise against his thigh. He
+looked behind Pello before letting them pass.</p>
+<p>“Carovel’s brought men.”</p>
+<p>“Buyers often bring people to carry things,” Briska said.</p>
+<p>“These don’t intend to carry.”</p>
+<p>At the bottom of the ramp, two men in neat brown coats stood beside
+the black traveling case. One wore a short sword high on his hip. The
+other held a cudgel as if it were a walking stick he expected someone to
+believe in. Both watched Pello’s hands.</p>
+<p>Briska set down the tool case and knelt beside the cracked collar. It
+joined the viewing table’s brass fitting to a flat strip running behind
+the nearest panel. The strip was warm. She had brought a replacement
+made to the same dimensions, with a split that could be tightened by two
+small screws.</p>
+<p>“Disconnect it,” she told Teren.</p>
+<p>He went to the wall and turned a little handle. The warmth began to
+leave the metal. From the chamber came a faint sound like someone
+sighing in sleep.</p>
+<p>“What does that do?”</p>
+<p>“Stops the prepared passages from taking the room.”</p>
+<p>“All of them?”</p>
+<p>“For this table.”</p>
+<p>Briska tested the fitting with a wetted finger. It had cooled enough
+to handle. She pointed out the cut-off to Pello without giving it a name
+that would interest the men in brown.</p>
+<p>Teren crouched beside her. “Could somebody get through the furnace
+door with a bag?”</p>
+<p>“It depends on the bag.”</p>
+<p>“My clothes.”</p>
+<p>She looked at him then.</p>
+<p>“Why?”</p>
+<p>“Because I would like to leave.”</p>
+<p>Above them a door closed hard. Carovel’s voice came through the
+floor, low and irritated. Briska could not make out the words.</p>
+<p>Teren took a small folded sheet from beneath his cuff.</p>
+<p>“She has an account of treatments. This is from the morning after
+Jossart. I was told to fetch Edrine, bring the glass, give her something
+to sleep afterward. I wrote the hours down because she said I kept
+getting them wrong.”</p>
+<p>“What did you see the morning before?”</p>
+<p>He looked toward the two guards.</p>
+<p>Briska held out her hand. He did not give her the paper yet.</p>
+<p>“Can the Countess keep them from taking me?”</p>
+<p>“Carovel’s men?”</p>
+<p>“All of them.”</p>
+<p>She could have said yes. It would probably have got her the
+paper.</p>
+<p>“I can get you to someone who’ll hear you,” she said. “I can’t
+promise what he’ll decide.”</p>
+<p>Teren’s mouth worked. He had the look of a man discovering, late,
+that the word <em>afterward</em> contained more people than he had
+accounted for.</p>
+<p>Pello crouched on his other side.</p>
+<p>“Bring your bag to the furnace passage. Stay by the door. If you come
+with us, you leave the knife here.”</p>
+<p>“I haven’t got a knife.”</p>
+<p>Pello looked at Teren’s right boot.</p>
+<p>The attendant flushed. He put the folded sheet into Briska’s
+hand.</p>
+<p>She slipped it inside the lining of her case, beneath the spare
+leather covers. Then she fitted the new collar. It sat well, tightened
+evenly, and did exactly what she had intended. The pleasure this gave
+her was brief and quite real.</p>
+<p>Teren went to fetch his clothes.</p>
+<p>Pello watched the keys move away with him. They had planned to steal
+those. Now they might have to ask.</p>
+<h1 id="part-iii-the-house-remembers">Part III — The house
+remembers</h1>
+<h2 id="chapter-11-the-man-who-bought-the-ending">Chapter 11 — The man
+who bought the ending</h2>
+<p>Master Carovel had bought courage and was finding it difficult to sit
+still.</p>
+<p>He paced between the viewing table and the door, taking short,
+energetic turns that brought his coat close to the lamp. Twice Sevrine
+moved the lamp. The third time she asked him to sit down.</p>
+<p>“I prefer to stand.”</p>
+<p>“You will see better from the chair.”</p>
+<p>“I can see perfectly.”</p>
+<p>Ilaro did not think he could. The man kept looking toward the nearest
+panel as though expecting someone to applaud from behind it. His pupils
+were large. A silver ring had left a green mark on one finger, and he
+rubbed at it whenever his restless hand came within reach of the
+other.</p>
+<p>Rosceline occupied the chair facing Sevrine. Daska stood behind her,
+far enough away to allow the short blade beneath Rosceline’s coat to
+come free. Ilaro had chosen a place beside the packing-room door. From
+there he could see the reading table, the ramp, and the three steps down
+to the bath.</p>
+<p>Briska’s repaired collar shone against the older metal. The cut-off
+handle lay beyond it, beside a panel whose back faced the wall. Pello
+had pointed it out before the buyers came down. Ilaro had written its
+position in his notebook and then put the notebook away.</p>
+<p>The private sale had fewer people than he expected. Lande was there,
+accompanied by a thin woman who corrected the way he held his gloves. A
+man with a cane waited near the entrance. Teren brought chairs for them
+and set a water jug on the little side table. He carried no bag. His key
+ring still hung at his belt.</p>
+<p>Sevrine began with a morning by a river.</p>
+<p>The man with the cane wanted to know whether the person remembering
+it had understood that this would be his last sunrise. Sevrine said the
+source’s knowledge at the time was faithfully preserved. Carovel asked
+whether anything happened after the sun came up.</p>
+<p>“A departure,” she said.</p>
+<p>“An escape?”</p>
+<p>“A departure.”</p>
+<p>Carovel waved it aside.</p>
+<p>Lande bought a limited viewing of something Sevrine called a
+reconciliation. His companion insisted on reading the conditions
+herself. Ilaro watched them leave with their little box and wondered
+whether the remembered apology would be more convincing than any Lande
+had managed on his own. The thought was unfair. He was tired enough to
+enjoy it anyway.</p>
+<p>Then Teren brought Rosceline’s red vessel.</p>
+<p>Sevrine put the prepared red glass beside it. The source was still
+sealed. Daska leaned forward far enough to see its number.</p>
+<p>“R twelve,” she said.</p>
+<p>Rosceline looked at Ilaro. He took out the copied deposit.</p>
+<p>“The interval begins with an offer of terms,” he said. “It ends after
+the weapon is withdrawn.”</p>
+<p>Carovel smiled. “A short negotiation.”</p>
+<p>“It was,” Daska said.</p>
+<p>The merchant touched the sample to the reading table. The nearest
+panel darkened. For an instant the room smelled of old bronze, and Ilaro
+felt heat on his shins. He remembered the vault well enough that his
+body supplied the height of the broken ladder without being asked.</p>
+<p>Rell’s sword was up.</p>
+<p>Ilaro had not seen the killing from where he stood in the mountain.
+He knew what Daska had told them afterward. The image now offered him a
+different account with terrible ease. He could feel Rosceline’s wrist
+moving. There was an assurance to it he had never possessed in any
+fight.</p>
+<p>Rosceline lifted the sample off the table.</p>
+<p>The heat disappeared.</p>
+<p>“That is the altered piece,” she said. “I asked to see the
+source.”</p>
+<p>Sevrine held out her hand. “You inspected this afternoon.”</p>
+<p>“And found it wrong.”</p>
+<p>Carovel’s attention sharpened. “Wrong in what respect?”</p>
+<p>“The man lowered his sword,” Daska said.</p>
+<p>The buyer looked at her, then at Rosceline. His expression did not
+become less pleased.</p>
+<p>“Ah. That might be more interesting.”</p>
+<p>Ilaro saw Rosceline’s mouth tighten. Sevrine had seen it too. She put
+the red glass in its cloth and moved the source toward the center of the
+table.</p>
+<p>At the packing-room door Teren shifted. Pello had come down the ramp
+with the empty carrier and a folded piece of felt. He stopped beside the
+attendant, asked a quiet question, and received the key ring under the
+felt. Teren’s hand remained closed a moment after it was empty.</p>
+<p>Ilaro looked back at the table before anyone followed his gaze.</p>
+<p>Carovel had ceased pacing.</p>
+<p>“Jossart used to be better at this distinction,” he said.</p>
+<p>Sevrine held the red vessel very still.</p>
+<p>“He was a capable man.”</p>
+<p>“He was to have come with me.”</p>
+<p>“So you told me.”</p>
+<p>“He told me.”</p>
+<p>The man with the cane moved toward the ramp. One of Carovel’s guards
+stepped aside to let him pass, then shut the packing-room door behind
+him. The other remained beside the steps to the bath.</p>
+<p>Ilaro put the deposit on his knee. There was no useful reason to
+stand yet.</p>
+<p>Carovel took a folded letter from his coat.</p>
+<p>“Three days before his death. He had concerns about the sources. The
+way you kept something once a client believed it had been returned. He
+wished to make an inventory when he arrived.”</p>
+<p>Sevrine set down the vessel. “You should have brought this to the
+watch.”</p>
+<p>“I prefer to settle difficulties with the person who can remedy
+them.”</p>
+<p>“You have brought swords.”</p>
+<p>“People steal.”</p>
+<p>He seemed pleased to return her own explanation. Ilaro watched the
+guard by the steps. The man’s attention had moved to Sevrine’s
+hands.</p>
+<p>Carovel offered her a room at his country house, protection from
+inquiries, and continued employment. He did not use the word
+confinement. He did explain that the principal sources would travel in
+his custody and that she would have no need to receive other
+customers.</p>
+<p>Rosceline began to speak. Carovel raised a hand without looking at
+her.</p>
+<p>“Your sale can proceed. This is a larger matter.”</p>
+<p>“I rather thought you might say that.”</p>
+<p>Teren backed toward the packing-room door. The guard caught him by
+the shoulder. Pello was no longer visible. Briska stood at the ramp with
+the tool case open at her feet.</p>
+<p>Sevrine touched the edge of the reading table.</p>
+<p>“Let him go.”</p>
+<p>Carovel’s man tightened his grip. Teren made a small sound. His wrist
+was being bent behind him, well beyond the point at which the movement
+could be mistaken for guidance.</p>
+<p>Ilaro stood.</p>
+<p>The bath water came up through the floor.</p>
+<p>It was cold against his ankles. He smelled the sharp cordial Edrine
+had described, then damp cloth pressed over his mouth. The room beyond
+the table lengthened into a tiled passage. Its far door stood open on a
+pale courtyard. A woman was calling for someone to bring a towel.</p>
+<p>He knew there had been no water. His foot moved to avoid it anyway
+and struck the chair beside him.</p>
+<p>Carovel’s guard shouted. The cudgel hit stone. Rosceline had come out
+of her chair with the narrow blade bare, but for a moment Ilaro could
+not tell which direction she faced. Every panel held a doorway. Every
+doorway looked as if it led out.</p>
+<p>“Stay where you are,” Briska called from the packing room.</p>
+<p>Ilaro tried to locate her voice. Water struck his face. He was not
+wet. His hand, held against his cheek, remained dry.</p>
+<p>“The floor is dry,” he said.</p>
+<p>Carovel staggered into him. The man’s courage had survived its
+usefulness. He shoved Ilaro aside and drew a short sword, slashing at a
+figure that moved across the nearest panel. The blade struck the frame
+and rang.</p>
+<p>Teren screamed. This time the sound belonged to the present room. His
+arm had broken in the guard’s grip.</p>
+<p>Sevrine moved toward the bath steps. Ilaro saw her through a gap
+where the remembered courtyard did not quite reach the doorframe. One
+hand trailed along the brass strip beneath the panels.</p>
+<p>Pello came out of the bath carrying the black case.</p>
+<p>For an instant Sevrine and Pello faced each other above the three
+steps. Then she lifted her free hand, and the wall behind him became an
+open quay.</p>
+<p>He turned toward it.</p>
+<p>“Pello,” Ilaro said. His voice barely carried. He took a breath that
+seemed full of bath water and shouted again. “Your right hand. Find the
+wall.”</p>
+<p>Pello’s hand struck the actual wall. He stopped with his shoulder
+against the plaster.</p>
+<p>The guard let Teren fall and came toward him.</p>
+<p>Ilaro could see the cudgel. He could see Pello holding a case too
+large to fight with. The water kept rising across the floor that was
+still dry.</p>
+<h2 id="chapter-12-a-place-to-put-the-sword">Chapter 12 — A place to put
+the sword</h2>
+<p>Rosceline cut the guard across the back of his thigh.</p>
+<p>He went down on one knee before he understood that she had moved
+behind him. His cudgel struck the edge of the bath step. Pello shoved
+the black case into her arms, caught the man’s coat and drove him
+sideways into the doorpost. The blow sounded heavy enough to be
+useful.</p>
+<p>“Take it,” Pello said.</p>
+<p>She already had. It was far more awkward than the elegant theft she
+had imagined. One buckle caught in the hidden sword rig under her coat.
+She tore it free, losing a button, and pushed the case across the floor
+toward Briska.</p>
+<p>The case slid through water that did not move around it.</p>
+<p>Briska caught the handle. For a moment Rosceline saw her kneeling on
+a riverbank. Then the riverbank became the packing-room floor, littered
+with felt and a dropped screwdriver.</p>
+<p>Carovel’s second man came through the viewing chamber with his sword
+low. This one had recognized that the figures in the panels were not
+solid. He kept his free hand against the frame and advanced by touching
+each real thing before trusting the next step.</p>
+<p>Rosceline could respect that while wishing he were less good at
+it.</p>
+<p>She retreated toward the table. The panels supplied a mountain stair
+beneath her feet, broken in the middle. Her ankle tried to turn at a
+remembered gap. She forced it straight and found the actual flat
+floor.</p>
+<p>Daska met the swordsman from his other side.</p>
+<p>He moved well. His first cut kept the monk outside his reach; the
+second forced Rosceline back against a chair. She could not get around
+him without leaving Ilaro and Teren behind. He had made himself an
+ordinary, competent obstacle in a room full of unreasonable ones.</p>
+<p>Carovel stood beside the reading table. Sevrine had disappeared into
+the bath passage. The red vessel remained in its little padded box, a
+few feet beyond the buyer’s hand.</p>
+<p>Rosceline wanted it badly enough that she almost looked twice.</p>
+<p>The swordsman saw the first look. He shifted to keep the table behind
+him.</p>
+<p>“You can leave without your toys,” he said.</p>
+<p>Daska threw the water jug at his head.</p>
+<p>It struck his raised arm and burst. He flinched. Rosceline stepped
+in, felt the rapier point drag across a buckle and slid it above the
+belt into the soft place beneath his ribs. Not deep. He shoved her back
+before she could correct the angle. Blood darkened his coat.</p>
+<p>Daska took his sword wrist in both hands. He drove his forehead into
+her face. Her nose broke with a small, appalling sound. She held him
+anyway.</p>
+<p>Rosceline struck his elbow with the rapier guard. Daska turned. The
+sword fell, and the two of them went against the panel hard enough to
+split its silvered backing.</p>
+<p>The garden behind it vanished.</p>
+<p>For a few feet the floor was plainly stone again. Rosceline saw the
+table leg, the broken jug, the man’s boot. Then another recollection
+pressed into the exposed space: blood on bronze, the edge of a ladder,
+Rell holding his hand open.</p>
+<p>Daska let go of the guard to put her forearm across his throat. He
+stopped struggling when he could no longer breathe. She lowered him to
+the floor, coughing blood from her own mouth.</p>
+<p>Rosceline took the red source.</p>
+<p>Carovel caught her wrist.</p>
+<p>“I have paid for that.”</p>
+<p>“You have offered.”</p>
+<p>His grip hurt the tender skin of her palm. She put the rapier point
+beneath his chin. He kept hold of her for another breath, staring at the
+blade with an expression that belonged to someone who had bought the
+feeling of facing one and found the object unexpectedly cold.</p>
+<p>“You don’t understand who—”</p>
+<p>“I have enough for the present.”</p>
+<p>He let go.</p>
+<p>She slipped the padded red box into the wide pocket beneath her left
+breast. The cloth-wrapped altered sample lay beside the reading stand.
+She took that too and passed it to Ilaro, who had got Teren sitting
+against the wall.</p>
+<p>“The false one,” she said. “Keep it separate.”</p>
+<p>He put it inside his portfolio. Teren’s broken wrist hung at an angle
+that made Rosceline look away before she could decide not to.</p>
+<p>From the packing room Briska shouted for everyone to use the furnace
+passage. Pello had the carrier open. The black case lay beside it, its
+six compartments exposed. He moved the white cylinder nearest the handle
+into the carrier, blue binding upward. Briska checked the number. Two
+smaller vessels followed from the outer shelf. Miette’s descriptions lay
+beneath her hand.</p>
+<p>They had Edrine’s recollection. They had hers. They could leave.</p>
+<p>Sevrine stood at the furnace doorway holding its bolt.</p>
+<p>She had blood running freely from her nose now. It spotted her collar
+and the hand she pressed against the brass strip beside the frame. The
+doorway behind her appeared to open on a long, quiet corridor, with a
+lamp burning at its far end.</p>
+<p>“Give me the case,” she said.</p>
+<p>Pello looked at the carrier, then at the black case still open on the
+floor.</p>
+<p>“The sources,” Sevrine said. “All of them.”</p>
+<p>Rosceline moved toward her. The corridor acquired a voice she
+knew.</p>
+<p>Rell said they could have done this differently.</p>
+<p>She stopped. He stood beside the lamp with his open hand extended.
+For a moment she could see the throat unpierced, the collar without
+blood. She knew the terms he had offered. She could almost calculate the
+share she would have lost by accepting them.</p>
+<p>Then the image corrected itself. His sword lifted. The version in
+which she had been justified came toward her with all the persuasive
+force of an event she had now experienced twice.</p>
+<p>Daska put a hand against her shoulder.</p>
+<p>“Here,” the monk said.</p>
+<p>Blood from Daska’s nose had reached her collar. She was holding a
+strip torn from the guard’s sleeve beneath it. Her eyes watered. She
+looked nothing like the composed witness Rosceline had spent weeks
+resenting.</p>
+<p>Rosceline put her free hand on the actual wall.</p>
+<p>The plaster was gritty. A piece came away beneath her thumbnail.</p>
+<p>Sevrine’s voice reached them from beside the door. “You know what I
+can remove.”</p>
+<p>Rosceline looked toward her through Rell’s raised arm.</p>
+<p>“Step away from the bolt.”</p>
+<p>“You could keep the useful parts.”</p>
+<p>Daska’s hand left her shoulder. She was going back for Teren. There
+was nobody to whom Rosceline needed to perform a refusal.</p>
+<p>She wanted the better version. She could admit that privately, in the
+little space the merchant had made around her. She wanted to have been
+attacked. She wanted the hand on her sleeve to have reached there first.
+The want was humiliating, and it did not make the false memory less
+attractive.</p>
+<p>Sevrine saw her hesitate.</p>
+<p>“We needn’t discuss it in front of them.”</p>
+<p>Rosceline drove the rapier through the sleeve of Sevrine’s working
+arm and into the wooden doorframe.</p>
+<p>The merchant screamed. Her palm came off the brass. Rell broke into
+strips of light, each one briefly attached to a different panel.
+Rosceline stepped forward, took the bolt with her free hand and
+pulled.</p>
+<p>It did not move.</p>
+<p>A locking bar had been dropped into brackets beyond it. Sevrine had
+secured that before returning to the doorway. The ordinary obstruction
+remained exactly where she had put it.</p>
+<p>Rosceline wrenched the blade free and pushed the merchant away from
+the frame. Blood ran down Sevrine’s wrist. The woman tried to reach the
+brass again.</p>
+<p>Pello caught her good arm and turned her against the wall.</p>
+<p>Briska came beside Rosceline, looked at the locking bar and
+swore.</p>
+<p>Behind them Carovel picked up the fallen sword.</p>
+<p>“Ilaro,” Rosceline said.</p>
+<p>The investigator looked up.</p>
+<p>“Leave the portfolio. Move.”</p>
+<p>He dragged Teren sideways. Carovel’s blow struck the place where the
+attendant’s head had been. The man had paid for courage. It had not
+supplied him with much judgment about the use of a sword.</p>
+<p>Rosceline went back toward him, leaving Briska to the door.</p>
+<h2 id="chapter-13-the-room-underneath">Chapter 13 — The room
+underneath</h2>
+<p>Briska could feel the floor sloping toward the sea.</p>
+<p>There was no sea beneath the Saffron Rooms. She repeated this once,
+aloud, and knelt anyway because her balance had begun listening to the
+wrong place. The furnace door stood in its iron frame. Across it lay a
+thick bar, dropped into brackets and held down by a wooden retaining
+piece that had swollen tight.</p>
+<p>Rosceline had pulled the bolt free. The bar still bore against the
+door. Briska put her short pry beneath its nearer end and tested the
+load. It moved a finger’s width, enough to show that the far bracket had
+bent.</p>
+<p>“Hold her off that strip,” she told Pello.</p>
+<p>He had Sevrine facing the wall, her good wrist turned behind her. The
+wounded arm hung loose. Blood pattered on the stone beside his shoe.</p>
+<p>“She’s trying.”</p>
+<p>“I can see.”</p>
+<p>“No,” he said. “The other way.”</p>
+<p>Sevrine had been working her injured hand toward the fitting below
+the frame. She caught it with two bloody fingers.</p>
+<p>The furnace passage filled with summer leaves.</p>
+<p>A child laughed somewhere above Briska’s head. She knew that laugh.
+For an instant she was certain of it, certain that if she looked up she
+would see someone who had been waiting for her to finish a tiresome
+piece of work. Her tool slipped. The bar came down on the knuckle of her
+left thumb.</p>
+<p>Pain cleared a small, useful portion of the room.</p>
+<p>She hit Sevrine’s fingers with the handle of the pry.</p>
+<p>The merchant gasped and pulled them back. Briska did not apologize.
+Pello shifted his grip and used the woman’s own belt to fasten her
+wrists in front of her, with room for the injured arm to hang without
+twisting. Then he set her against the wall well away from the brass.</p>
+<p>“Ilaro,” Briska called. “The cut-off. Beside the viewing table.”</p>
+<p>“I’m trying to reach it.”</p>
+<p>Rosceline and Carovel stood between him and the handle. The buyer had
+acquired a longer reach by swinging his sword in both hands. It made him
+dangerous in the way a badly hung beam was dangerous. He struck a chair,
+broke its back and stumbled through the pieces without stopping.</p>
+<p>Rosceline moved around him. She no longer had room for her usual long
+retreat. Each step tested the floor before taking weight. Carovel lunged
+toward a doorway that existed only in a panel, caught himself against
+the frame and turned fast enough to bring the blade across her coat.</p>
+<p>The fabric opened at the hip.</p>
+<p>Briska saw red beneath it. Rosceline looked briefly surprised, then
+drove the rapier guard into the buyer’s mouth.</p>
+<p>He reeled. She hooked a foot behind his ankle. His heel slid in the
+water from the broken jug, and he went down hard on the actual stone.
+The sword struck the table leg and fell beside him.</p>
+<p>Rosceline put her point against his throat.</p>
+<p>“Stay.”</p>
+<p>He stayed.</p>
+<p>Ilaro reached the handle. He turned it the wrong way, stopped, and
+looked toward Pello.</p>
+<p>“Down,” Pello said. “Then toward you.”</p>
+<p>The handle moved. The brass gave a little settling click.</p>
+<p>The summer leaves lost their shadows. Across the room, Rell’s hand
+remained suspended for a moment without an arm. Then the chamber
+returned to its ordinary proportions, ugly with overturned chairs and
+blood on the tiles.</p>
+<p>Briska was still certain that the floor sloped. She kept one knee
+down and worked by pressure through the tool rather than by the picture
+her eyes supplied.</p>
+<p>“Pello. Lift when I tell you.”</p>
+<p>He came beside her. She drove a thin wedge under the retaining piece,
+tapped it with the pry’s heel and split the swollen wood along its
+grain. Pello lifted. The bar dragged against the bent bracket. She
+struck the bracket’s outer lip, opening it far enough for the bar to
+clear.</p>
+<p>It fell on the floor with a weight that made her thumb throb.</p>
+<p>Cold air came through the furnace door. Beyond it stood Miette, one
+of her men, and a very ordinary brick wall across a very ordinary alley.
+Briska could have kissed the brickwork.</p>
+<p>“What happened?” Miette asked.</p>
+<p>“Move the cart closer.”</p>
+<p>Miette saw Sevrine against the wall. Her face changed.</p>
+<p>Pello stepped into her line of sight. “We have the two.”</p>
+<p>“You got them?”</p>
+<p>He pointed to the carrier. “That one stays with me.”</p>
+<p>Miette nodded. She turned back to the alley and called to the other
+man. Neither carried oil.</p>
+<p>Daska brought Teren to the doorway. She had one hand under his good
+elbow and a cloth pressed beneath her own nose. He walked with the
+careful, astonished steps of someone discovering that an arm could hurt
+everywhere at once.</p>
+<p>“First,” she said.</p>
+<p>They helped him onto the cart’s padded bed. Miette folded a blanket
+under his wrist. He asked whether his bag was still in the passage.
+Pello fetched it, put it beside him and removed the narrow blade from
+its outside pocket before returning to the room.</p>
+<p>Briska closed the carrier over Edrine’s cylinder and the two smaller
+holdings. Rosceline drew the red padded box from the wide pocket inside
+her coat. She gave it over without a remark. Briska checked R twelve,
+set it in the fourth space, and fastened the lid.</p>
+<p>“The false piece?”</p>
+<p>“In Ilaro’s portfolio.”</p>
+<p>“And the treatment sheet is still in my case.”</p>
+<p>Pello took the carrier. Briska put her tools away with her right
+hand. The left thumb had begun to swell inside its glove. She loosened
+the cuff and left the glove on until somebody less busy could advise
+her.</p>
+<p>Sevrine watched the closed box.</p>
+<p>“You’ll find it difficult to keep those properly.”</p>
+<p>Miette looked back from the cart. “I know how to bind glass.”</p>
+<p>“You know how to mend what other people have made.”</p>
+<p>Miette came one step into the passage. Pello stopped loading the cart
+and watched her.</p>
+<p>Briska expected a blow. She understood the wish for one so clearly
+that she almost made room.</p>
+<p>Instead Miette held out her hand to Pello. He took Teren’s key ring
+from his pocket and gave it to her.</p>
+<p>“Then I’d better keep the packing cupboard shut.”</p>
+<p>She went past the merchant into the bath. The black case held five
+sources they had not come for. Miette closed its lid, fastened the
+buckle and put it back inside the wall cupboard. She locked it. Then she
+shut the outer cabinet over the remaining vessels. She could not know
+every owner or every working. She could keep a curious person from
+opening a hot piece with bare hands.</p>
+<p>They had two wounded guards to account for. One lay on his side
+beneath the broken panel, breathing noisily. The other was awake and
+holding his cut thigh. Daska bound the thigh with strips from a clean
+packing cloth, tightening until the blood stopped coming through. The
+man tried to speak around his anger.</p>
+<p>“You stabbed me from behind.”</p>
+<p>Rosceline, who was tying Carovel’s hands with a curtain cord, did not
+look up.</p>
+<p>“You were facing Pello.”</p>
+<p>Daska told the guard to keep pressure on the cloth. He did. The
+second man stirred when Pello and Miette’s companion lifted him. His
+side wound needed a surgeon. So did several other things in the
+room.</p>
+<p>They could not put everyone on one cart. Ilaro retrieved his
+portfolio from beside the reading table. He checked the wrapped red
+sample for damage before taking out a clean sheet. Miette sent the
+younger man to the watch house with his written request for Veyrat and a
+surgeon. He carried no magical vessel, only the ordinary address and the
+account of a fight. Rosceline disliked leaving time for someone else to
+intervene. Ilaro pointed to the guard whose breath had begun to catch
+and asked whether she preferred carrying him.</p>
+<p>She went to sit on the lower step. Blood had soaked through her torn
+coat. When Daska knelt to inspect it, Rosceline began a sentence about
+an unnecessarily enthusiastic buyer and lost interest halfway
+through.</p>
+<p>“Deep?”</p>
+<p>“Long,” Daska said. “You’ll want stitches.”</p>
+<p>“I seldom do.”</p>
+<p>Daska pressed the cloth harder. Rosceline held still.</p>
+<p>By the time Veyrat arrived, the first gray of morning had reached the
+high window. Briska had covered the broken panel with a blanket because
+people kept seeing movements in it that none of the others could
+confirm. The cut-off remained down. The floor remained stone. Her body
+occasionally remembered the sea.</p>
+<p>The clerk stopped at the top of the ramp and took in the bound buyer,
+the wounded merchant and the damaged room.</p>
+<p>“I asked for something I could inspect.”</p>
+<p>Ilaro handed him the treatment sheet, recovered from Briska’s case.
+“Start with this.”</p>
+<p>Veyrat read. He asked Teren whether the writing was his. Teren said
+yes. The clerk asked what had happened to his arm. Teren looked at
+Carovel’s guard, then at Sevrine, then down at the sheet.</p>
+<p>“I’ll tell you,” he said. “But not with her beside me.”</p>
+<p>The surgeon came down the ramp carrying a case with no supernatural
+contents at all. Briska moved out of his way.</p>
+<p>Pello kept the carrier against his chest while Veyrat arranged the
+witnesses and prisoners. Miette gave the clerk the cupboard keys and
+named the people whose holdings they contained as far as she knew them.
+She did not ask him to burn the building.</p>
+<p>When Briska finally stepped into the alley, a baker was carrying
+trays past the cart. He looked at the blood, adjusted his route, and
+asked whether anyone could move the wheel off his doorstep.</p>
+<p>Pello moved it.</p>
+<h2 id="chapter-14-what-comes-back">Chapter 14 — What comes back</h2>
+<p>The Countess’s reader would not open the white cylinder until she had
+been told who wanted it opened.</p>
+<p>Ilaro liked her immediately. Her name was Anette, and she wore an old
+gray gown with a new patch at one elbow. She had already made Briska
+uncover her thumb, sent Daska upstairs to have her nose examined, and
+required the little room’s curtains to be drawn against the morning
+glare. None of this appeared to be part of her magic.</p>
+<p>Edrine sat opposite the carrier. She had not touched it.</p>
+<p>The Countess stood at the table while Anette inspected the blue
+binding. Celise had brought the original commission, Rosceline’s
+separate agreement and five purses. Beside them lay a copy of Teren’s
+treatment sheet, certified by Veyrat, who had kept the original.
+Rosceline stood because the wound at her hip made the chair
+uncomfortable. A dark spot spread slowly through the new dressing
+beneath her borrowed skirt.</p>
+<p>“The binding is intact,” Anette said. “The number agrees with the
+register sheet. I find no sign of replacement inside this closure.”</p>
+<p>“Is it hers?” the Countess asked.</p>
+<p>“I can test the correspondence without returning it. With her
+permission.”</p>
+<p>Edrine held out her hand.</p>
+<p>Anette touched two fingers to her wrist and one to the glass. Nothing
+visible happened. After a while Edrine drew a sharp breath and looked
+toward the corner of the room.</p>
+<p>“The shutter,” she said.</p>
+<p>Anette withdrew her hand. “Enough for that question.”</p>
+<p>The Countess accepted the recovery. Celise set the five purses on the
+table: three hundred marks each, the remainder after the advance.
+Approved costs had been separately written down. Miette’s extra work and
+the treatment of the company’s injuries would be settled from those
+accounts where agreed, and from their own money where not. Nobody
+attempted the calculation while blood was reaching Rosceline’s hem.</p>
+<p>The Countess marked the fourth completion on the paper.</p>
+<p>Celise brought Sarem’s book from the adjoining room. Rosceline took
+it with both hands. She looked first at the spine, then at the cover’s
+old cup-mark. Ilaro had expected her to say something extravagant. She
+put the book inside her coat and asked for the amended agreement.</p>
+<p>The Countess gave it to her.</p>
+<p>“Anette can keep your likeness sealed until you decide what to do
+with it,” she said.</p>
+<p>“Destroy the likeness. Keep the altered sample for Veyrat.”</p>
+<p>Anette looked at Daska’s empty chair, then back to Rosceline. “That
+will destroy this copy. It will not change what anyone remembers.”</p>
+<p>“I understand.”</p>
+<p>They left the red vessel closed until Ilaro could identify the
+altered sample for Veyrat’s account. Rosceline agreed to that too. She
+went upstairs with the surgeon’s assistant, carrying the book beneath
+the torn coat.</p>
+<p>Edrine remained.</p>
+<p>Ilaro told her what Veyrat had found. The healer’s account supported
+drowning before the knife was used. Teren had confirmed taking Sevrine’s
+prepared glass to Edrine and later to the other witnesses. He admitted
+that Lande and Perette had not been in the bath doorway when Helvo was
+seized. They had been upstairs waiting for their appointments. He had
+brought them down separately afterward.</p>
+<p>“Did he see Jossart die?” Edrine asked.</p>
+<p>“He says no.”</p>
+<p>“Do you believe him?”</p>
+<p>“I don’t know.”</p>
+<p>Teren had heard the struggle, delayed answering because he feared
+Sevrine’s anger, and found Helvo beside the body. That was his account
+now. It was better supported than his earlier one. Veyrat intended to
+ask it again after the surgeon had finished with his wrist.</p>
+<p>The clerk had halted Helvo’s transfer. He had not released him while
+every person in the bath accused another of something. Sevrine and
+Carovel were being held separately. The two guards had received
+treatment before questioning. No list of memory buyers had been posted
+outside the Rooms. Veyrat had enough ordinary violence to investigate
+without inviting a crowd to destroy the evidence.</p>
+<p>Edrine listened. Her hand lay on the table near the cylinder, close
+enough for her smallest finger to touch the felt around it.</p>
+<p>“What happens if I keep it closed?”</p>
+<p>Anette answered. “You may continue to reach for the missing part.
+Knowing where it is can help some people. Others find that worse.”</p>
+<p>“And if I open it?”</p>
+<p>“I can help it return to the person it was taken from. I cannot
+promise that you will like it, or that every detail will become certain.
+You will have this and the account you have been practicing. We may need
+time.”</p>
+<p>Edrine looked at Ilaro. “Will you be here?”</p>
+<p>“Yes.”</p>
+<p>“Then I want to.”</p>
+<p>Anette had her sit with her feet resting on a low stool. She asked
+Celise for warm water and a clean cloth, then moved the carrier out of
+reach. The two other holdings remained sealed for their owners. The
+white cylinder stood alone between them.</p>
+<p>When the binding was loosened, Ilaro smelled cordial.</p>
+<p>He was certain of it. He did not know whether the smell came from the
+room or from having been told to expect it. He wrote that down
+separately.</p>
+<p>Anette held the glass near Edrine’s wrist and told her to keep
+looking at the cloth in her lap. The woman’s breathing changed. She
+tried to stand, and Anette moved back rather than restraining her.</p>
+<p>“Wait,” Edrine said.</p>
+<p>They waited.</p>
+<p>“I was going downstairs. I thought they were arguing about money
+again.”</p>
+<p>Her thumb found the edge of the cloth. She rubbed it with a little
+repetitive motion that gathered the fabric into a knot.</p>
+<p>“Jossart had a case. He’d put things aside. She wanted to see inside
+it.”</p>
+<p>Ilaro did not ask which things.</p>
+<p>“He laughed. He said she could buy her own work back if she wished. I
+remember being angry with him. She had paid him badly, but he had put
+some of the takings in his case. He wasn’t only leaving.”</p>
+<p>The knot tightened.</p>
+<p>“Then he pushed her. She struck him with the basin’s handle. He sat
+down very suddenly. I thought he’d slipped.”</p>
+<p>Anette put the glass on its cloth. Edrine kept talking.</p>
+<p>“She called me to help. I went to him. He was still trying to get up.
+I took his shoulder. She said to hold him. I thought—”</p>
+<p>She stopped. Her eyes moved to the doorway. Celise stood there with
+the water, waiting to be told whether to enter.</p>
+<p>“I held him,” Edrine said. “Then she put his head in the basin.”</p>
+<p>The room remained quiet. Ilaro could hear the small scrape of
+Celise’s sleeve against the jug.</p>
+<p>“I let go. I did let go.”</p>
+<p>He believed that she remembered doing so. He did not tell her he had
+seen it. He had seen nothing except a woman holding a cloth so hard that
+her hands shook.</p>
+<p>“She hit me when I tried to pull her away. I went back against the
+door. My mouth was full of blood. I could see his shoe moving.”</p>
+<p>Edrine put the cloth down. She looked at it with surprise, as though
+somebody else had placed it in her hands.</p>
+<p>“Helvo came through the furnace passage. After. He shouted for help.
+That was when I lost it.”</p>
+<p>Anette asked whether she wanted the glass moved farther away. Edrine
+said yes. The reader covered it and carried it to the side table. Celise
+set the warm water down, and Edrine washed her hands although there was
+nothing on them.</p>
+<p>Afterward she wanted to know whether Jossart’s attempted theft would
+matter. Ilaro said it would matter to the owners of the takings, and
+perhaps to the account of the quarrel. It would not turn holding his
+head beneath water into an accident.</p>
+<p>“I thought he was our friend,” she said.</p>
+<p>She could have meant either of them. He did not choose for her.</p>
+<p>Veyrat came in the afternoon. He heard her account without the
+cylinder in the room. Then he asked for the source to be retained, the
+altered pieces kept separate and the physical statements copied before
+anyone tried another treatment. Anette agreed to the first two. Ilaro
+had already begun the third.</p>
+<p>Perette sent a message before evening. She had tried standing at the
+bath doorway with the watch officer. From there she could not see the
+blue crescent in the basin. She wanted that added to her statement.</p>
+<p>Lande sent an advocate.</p>
+<p>Ilaro folded both messages into different pockets of his portfolio.
+He had learned enough about where an account began to keep the
+beginnings apart.</p>
+<p>When he went to tell Edrine, she was eating bread in the little room
+with the shutters half-open. She had asked for the pomegranate to be
+taken away. Beside her plate lay the broken spectacles.</p>
+<p>“Can those be mended?” he asked.</p>
+<p>“The lens can be replaced.”</p>
+<p>“Would you like me to ask someone?”</p>
+<p>She considered it. “Yes. Keep the frame.”</p>
+<p>He put the spectacles in their silver case. It was the first thing
+she had asked him to recover that did not require entering somebody
+else’s head.</p>
+<h1 id="part-iv-in-her-own-keeping">Part IV — In her own keeping</h1>
+<h2 id="chapter-15-the-voice-in-the-room">Chapter 15 — The voice in the
+room</h2>
+<p>Rosceline had not realized how much she would dislike choosing a
+place to put the book.</p>
+<p>The drawer beside her bed was too shallow. The lower one held things
+that might stain it. The locked chest had a smell of old leather, and
+the shelf by the window was exposed to rain whenever the frame swelled
+badly enough to remain open.</p>
+<p>She stood in the middle of the room with the book in her hands and
+felt ridiculous.</p>
+<p>The surgeon had told her to lie down. He had sewn the cut at her hip
+in eight small stitches and expressed the opinion that she had been
+fortunate. She had asked whether he charged extra for this assessment.
+He had said he would if she continued moving.</p>
+<p>Now the stitches pulled whenever she turned. She set the book on the
+table, moved the ink, moved the table away from the window and sat
+beside it.</p>
+<p>Her room was above a shop that sold mourning clothes. Black cloth
+hung in the courtyard below, taking the sun out of the afternoon. She
+had once chosen the lodging because the owner asked few questions and
+kept unusually good keys. Those remained useful qualities. She had never
+asked whether the place suited something she meant to keep.</p>
+<p>Celise had wrapped the book in plain linen. Rosceline folded the
+linen back. Beneath it lay the receipt for the fourth recovery and the
+original agreement, marked complete. The Countess had signed a separate
+transfer of ownership because Rosceline asked for one. There was no
+ceremonial destruction of the old paper. She might need it if somebody
+became inconvenient later.</p>
+<p>She put the papers in the locked chest.</p>
+<p>The book remained on the table.</p>
+<p>When she opened it, a little of the old dust rose from the gutter.
+The repaired spine resisted before settling. She had been so occupied by
+the prospect of possessing it that she had given very little thought to
+how fragile it was.</p>
+<p>Her finger found the mark beside the familiar line.</p>
+<p>“Across the bronze—”</p>
+<p>“Burnished,” she said.</p>
+<p>“—burnished hills.”</p>
+<p>The voice stopped at the same place.</p>
+<p>Below the window a woman was refusing to pay for a widow’s veil that
+had been shortened before she had approved its length. Rosceline could
+hear every word. She waited until the argument moved into the shop, then
+touched the mark again.</p>
+<p>The same hesitation. The same annoyance. She corrected it again,
+quietly.</p>
+<p>There was no change in the recording to acknowledge that it had come
+home with her. Sarem did not know what she had done for it. He did not
+know she was older, or that she could now afford to waste a sheet of
+paper without first measuring the margin.</p>
+<p>She turned to the exercise beneath his hand. Her younger letters
+crowded toward the edge. She remembered him pushing another sheet across
+the table and telling her that the paper would survive the extravagance.
+She had kept using the first one. Waste had seemed like a test to which
+she did not yet know the answer.</p>
+<p>Rosceline laughed. Then she rested her forehead against the heel of
+her hand and stayed there until someone knocked.</p>
+<p>She shut the book too quickly. The movement hurt her hip.</p>
+<p>“It’s me,” Daska said.</p>
+<p>“That is an unexpectedly modest introduction.”</p>
+<p>“Can you open the door?”</p>
+<p>Rosceline went to it slowly. Daska stood outside carrying a parcel,
+with a strip across her nose and one eye beginning to turn yellow at the
+edge. She had brought the coat Rosceline had borrowed from the
+Countess’s house. It had been cleaned and folded. The torn one remained
+with a seamstress who had asked whether the owner had any particular
+attachment to its existing shape.</p>
+<p>“Very little now,” Rosceline said.</p>
+<p>Daska came in. She looked at the table, then at Rosceline’s face, and
+did not ask the question Rosceline had prepared to evade.</p>
+<p>“Ilaro says Helvo’s staying in Silkstrand while they question the
+other two. Veyrat won’t send him upriver.”</p>
+<p>“Good.”</p>
+<p>“Carovel’s advocate came for the letter. The one from Jossart. Veyrat
+kept it.”</p>
+<p>“Better.”</p>
+<p>Daska sat on the edge of the bed. The movement put her nearer the
+book, but she did not touch it.</p>
+<p>“Miette gave the cooper his piece this afternoon. He’s taking it home
+sealed. He wanted to speak to his wife before opening it.”</p>
+<p>Rosceline nodded. The other holding would go to the widower the next
+day. Miette had spent half the morning naming clients for Anette, and
+the other half objecting to the reader’s opinion of her packing. They
+seemed likely to continue working together.</p>
+<p>“Did you burn yours?” Daska asked.</p>
+<p>“Anette opened the red binding after Ilaro identified the sample.
+Then she broke the carrier and washed what was left from it. There was
+very little to see.”</p>
+<p>“The source?”</p>
+<p>“The likeness I lent. The source is still here.”</p>
+<p>Rosceline touched her temple, irritated by the obviousness of the
+gesture. Daska watched it without replying.</p>
+<p>For a moment Rosceline wanted to ask whether the monk thought better
+of her for refusing Sevrine’s improvement. She knew exactly how to
+phrase it so that it sounded like a joke. She also knew how much she
+would resent an answer delivered in the same form.</p>
+<p>She said nothing.</p>
+<p>Daska’s attention moved to the book.</p>
+<p>“Can you hear it whenever you like now?”</p>
+<p>“Yes.”</p>
+<p>“That must be strange.”</p>
+<p>Rosceline looked at the repaired blue spine. “It is becoming clear
+that I haven’t much practice at having something after I get it.”</p>
+<p>Daska considered this, then reached for the parcel she had brought.
+Beneath the coat lay a flat wooden box lined with clean cloth.</p>
+<p>“Briska made it too narrow for her gauge blocks. She says it’s square
+anyway.”</p>
+<p>Rosceline opened it. There was room for the book and its wrapping,
+without enough space for either to shift much. The clasp was plain and
+worked smoothly.</p>
+<p>“She measured it.”</p>
+<p>“I expect so.”</p>
+<p>“When?”</p>
+<p>“At the Countess’s. While you were arguing about the surgeon.”</p>
+<p>Rosceline put the book inside. It fitted.</p>
+<p>She was suddenly furious with Briska for having noticed a difficulty
+she had not yet known she would have. The anger passed almost at once,
+leaving something less convenient.</p>
+<p>“Tell her the corners are acceptable.”</p>
+<p>“You can tell her. Pello’s meeting the seller in the morning. He
+wants us there.”</p>
+<p>“I am forbidden unnecessary movement.”</p>
+<p>“You could sit on the quay and criticize.”</p>
+<p>“That seems to have been my appointed role from the outset.”</p>
+<p>Daska smiled carefully around her sore nose. When she rose to go,
+Rosceline asked her to wait.</p>
+<p>She took the book out of its new box and opened it to the marked
+page. Daska stood beside the table while Rosceline touched the little
+working. Sarem began the line. Rosceline supplied the correction, and
+the recording completed its familiar fragment.</p>
+<p>Neither woman spoke for a while.</p>
+<p>“Was that you, correcting him then?” Daska asked.</p>
+<p>“Yes. It didn’t keep my voice.”</p>
+<p>“You still know where it goes.”</p>
+<p>Rosceline looked at her. Daska was looking at the page, not offering
+a judgment on anything else.</p>
+<p>When she had left, Rosceline played the fragment once more. She did
+not correct it aloud this time. She listened to the little pause in
+which her younger self had spoken, then wrapped the book and put it in
+the box.</p>
+<p>There was room for the box on the table. She moved the ink to the
+shelf.</p>
+<h2 id="chapter-16-mallow">Chapter 16 — Mallow</h2>
+<p>Briska objected to the boat’s new name on technical grounds.</p>
+<p>“It will be beneath the rubbing strake.”</p>
+<p>Pello looked at the space where she had chalked the letters.</p>
+<p>“It fits.”</p>
+<p>“The letters fit. The fender will rub the first two off.”</p>
+<p>He considered the matter. “Put it higher.”</p>
+<p>That was an excellent answer, and she found it disappointing that she
+could not improve it.</p>
+<p>Nine days had passed since the fight at the Rooms. Her thumb remained
+bound to keep it from bending. She could hold a brush but not the small
+chisel with which she had intended to cut the name. Pello had offered to
+do the cutting. She had described the required angle until he handed her
+the brush and asked whether paint would float differently.</p>
+<p>The boat was called Mallow. She did not ask why. There was an older
+name beneath the gray paint, in letters so worn they might have been
+almost anything. Pello had paid for the hull, replaced one doubtful rib
+and bought a pair of oars that did not match. Briska had examined the
+repairs, found enough to criticize to satisfy them both, and brought a
+proper plug for the little drainage hole beneath the aft board.</p>
+<p>Her iron devotional casting hung at her throat. She held it briefly
+while the fresh paint dried, warming the small ridges between her good
+fingers. The wood smelled of oil, river mud and a boatyard’s insistence
+that all three were proof of sound work.</p>
+<p>Bourin came to inspect the name. He wore a purple ribbon at his cuff.
+Outside, in daylight, it remained purple.</p>
+<p>“That’s better,” he said.</p>
+<p>“The name?”</p>
+<p>“The ribbon.”</p>
+<p>She gave him back his covered route-frame. The leather slider was
+scuffed at the edge where she had dropped it against the broken stair.
+She had repaired the scuff and checked the pin.</p>
+<p>“The steps after the turn are gone,” she said. “Four of them. There’s
+a channel underneath.”</p>
+<p>Bourin frowned. “They were good stone.”</p>
+<p>“Someone else thought so.”</p>
+<p>He put the frame in his pocket. “Did you see the rat?”</p>
+<p>“No.”</p>
+<p>“Probably gone too.”</p>
+<p>He went to find a place on the quay where he could watch without
+being asked to carry anything.</p>
+<p>The others arrived separately. Ilaro came from the watch house with a
+parcel under his arm. He had new writing in his notebook and the look of
+someone who would prefer to remain quiet until it had settled. Daska
+wore a loose jacket that did not catch her bruised face when she pulled
+it over her head. Rosceline came last, carrying a cushion and walking
+with a care that made strangers move aside before she had to ask.</p>
+<p>“No one mentioned stairs,” she said.</p>
+<p>“There are three,” Briska told her.</p>
+<p>“I had counted. My objection concerns their existence.”</p>
+<p>Pello brought the boat close to the landing. Daska held its side
+while Rosceline descended. She sat on the aft bench, tested the cushion,
+and arranged her coat over the dressing at her hip. The plain wooden
+book-box was not with her. Briska found herself glad she had left it
+somewhere she trusted.</p>
+<p>Ilaro handed Pello the parcel. Inside were Edrine’s repaired
+spectacles and their silver case.</p>
+<p>“She’s at Miette’s this afternoon. She asked whether you could bring
+them if you’re going that way.”</p>
+<p>Pello put the case beneath the bench in a dry pouch. “Helvo?”</p>
+<p>“Released to attend the hearing. The accusation against him is
+withdrawn pending the new account. He has his boots.”</p>
+<p>Daska sat on the landing step. “Did he say thank you?”</p>
+<p>“He said the shoes were less trouble.”</p>
+<p>She laughed and rubbed her nose, regretting the movement a moment
+later.</p>
+<p>Sevrine remained held on the murder charge. Carovel had secured
+lodging instead of a cell while the assault charges were examined. His
+guards had been less fortunate. Veyrat had kept the letter, the
+treatment instructions and the altered sample in separate custody. Lande
+now remembered very little with confidence. Perette remembered enough to
+be angry and had retained someone who asked more questions than Lande’s
+advocate seemed to enjoy.</p>
+<p>Ilaro gave the account without pretending it was finished. Briska
+asked whether the holdings in the Rooms were safe.</p>
+<p>“For now. Anette and Miette are identifying the ones whose owners can
+be found. Some were sold willingly. Some were sold twice. They disagree
+about what can be returned.”</p>
+<p>“Of course they do.”</p>
+<p>“She says you’re welcome to help carry.”</p>
+<p>Briska looked at her thumb. “In a week.”</p>
+<p>Pello passed the forward line to Daska and went to the other end of
+the boat. The seller had come to watch the departure, chiefly to
+establish that any damage after this point belonged to somebody else. He
+offered an unsolicited opinion about the wind.</p>
+<p>Rosceline asked whether he had included that in the price. He went
+back to his bollard.</p>
+<p>There was still work before they could move. Briska checked the plug,
+the seats and the two new bindings around the oar pins. Pello loaded a
+short pole, a bailer and the old cover he intended to replace after he
+had earned enough to stop buying other things for the boat. Ilaro chose
+a place where he could see the bank without facing the glitter on the
+water. Daska took the forward bench.</p>
+<p>Rosceline watched Pello stow the bailer.</p>
+<p>“You do intend to row?”</p>
+<p>“Yes.”</p>
+<p>“An excellent qualification. I mention it because none of us appears
+to have been engaged for that purpose.”</p>
+<p>“I can,” Daska said.</p>
+<p>“I was speaking collectively. It made the complaint more
+impressive.”</p>
+<p>Briska stepped down last. The hull shifted under her and she reached
+with the wrong hand. Her sore thumb struck the gunwale. Pello caught her
+elbow before she could compensate by stepping somewhere worse.</p>
+<p>She sat, breathed through her teeth and waited for the pain to lose
+its bright edge.</p>
+<p>“Thank you,” she said.</p>
+<p>He passed her the loose end of the line. She untied it with her good
+hand and dropped the coil beside her feet.</p>
+<p>For several strokes they went nowhere. The line at the bow still held
+them to the landing. Daska looked down at it, then at the gathered
+spectators, and reached to free the knot.</p>
+<p>Rosceline opened her mouth.</p>
+<p>“Don’t,” the monk said.</p>
+<p>Rosceline shut it. Her shoulders shook once against the cushion.</p>
+<p>The boat drifted away from the stone. Pello set the oars. The
+unmatched blades entered the water at slightly different angles, and he
+corrected without comment. Briska watched the new rib take the strain.
+It held. So did the plug, the seats and the ordinary bindings she had
+made.</p>
+<p>A delivery barge rounded the bend ahead of them, its driver already
+preparing to object. Pello brought Mallow neatly against the quieter
+side of the canal and let it pass. The driver looked disappointed to
+have lost the opportunity.</p>
+<p>Rosceline settled back. Daska trailed two fingers through the water.
+Ilaro kept his notebook closed.</p>
+<p>Above the next bridge, laundry hung between windows. A sleeve dripped
+onto Rosceline’s shoulder as they passed beneath it. She looked up,
+astonished, and Pello laughed before he could help himself.</p>
+<p>It was loud enough to turn the head of the woman at the window.</p>
+<p>She drew in the shirt. Pello missed half a stroke, recovered it, and
+took them out among the morning boats.</p>
+</body>
+</html>
