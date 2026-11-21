@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-21T21:00:44.346Z",
+  "generated": "2026-11-21T21:49:21.507Z",
   "documents": [
     {
       "id": "srd",
@@ -1467,6 +1467,16 @@
       "active": true
     },
     {
+      "id": "the_carnival_of_broken_dreams",
+      "title": "The Carnival of Broken Dreams",
+      "file": "Fates_-_Edge_-_-The-_-Carnival-_-of-_-Broken-_-Dreams.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_cartomancers_compass",
       "title": "The Cartomancers Compass",
       "file": "Fates_-_Edge_-_-The-_-Cartomancers-_-Compass.html",
@@ -2262,7 +2272,7 @@
       "active": true
     }
   ],
-  "total_count": 166,
-  "active_count": 166,
+  "total_count": 167,
+  "active_count": 167,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }

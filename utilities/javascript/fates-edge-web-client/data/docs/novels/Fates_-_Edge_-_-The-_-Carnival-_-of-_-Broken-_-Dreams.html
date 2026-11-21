@@ -1,0 +1,3055 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.14" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The Carnival of Broken Dreams</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
+<style id="fiction-frontmatter-style">
+.fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
+.fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
+.fiction-title-page h1 { font-size: 2.4rem; line-height: 1.15; }
+.fiction-copyright { padding: 3rem 1rem; font-size: .9rem; line-height: 1.65; border-top: 1px solid #999; border-bottom: 1px solid #999; margin-bottom: 4rem; }
+.fiction-copyright h2 { font-size: 1.25rem; }
+@media print { .fiction-title-page, .fiction-copyright { break-after: page; min-height: 70vh; border: 0; } }
+</style>
+</head>
+<body>
+<div class="fiction-frontmatter">
+<section class="fiction-title-page" aria-label="Title page">
+<p>Fate’s Edge · Novels &amp; Novellas</p><h1>The Carnival of Broken Dreams</h1>
+<p>by Nicholas A. Gasper</p><p><a href="#fiction-copyright">Copyright and edition</a></p>
+</section>
+<section class="fiction-copyright" id="fiction-copyright" aria-labelledby="fiction-copyright-heading">
+<h2 id="fiction-copyright-heading">Copyright</h2>
+<p><strong>The Carnival of Broken Dreams</strong><br>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+<p>This work of fiction, including its prose, original characters and setting, is proprietary content. It is not part of the Creative Commons-licensed Fate’s Edge System Reference Document.</p>
+<p>No part of this work may be reproduced or distributed without the copyright holder’s written permission, except as permitted by law.</p>
+<p>Digital reading edition · 2026</p>
+</section></div>
+<header id="title-block-header">
+<h1 class="title">The Carnival of Broken Dreams</h1>
+</header>
+<h1 id="the-carnival-of-broken-dreams">The Carnival of Broken
+Dreams</h1>
+<p><em>The Countess’s Irregulars — Book Three</em></p>
+<h1 id="part-i-everybody-wins-something">Part I — Everybody wins
+something</h1>
+<h2 id="chapter-1-the-smaller-dragon">Chapter 1 — The smaller
+dragon</h2>
+<p>The dragon bit a warehouse and lost three teeth.</p>
+<p>One struck Rosceline’s shoe. It was made of painted wood, cheaply,
+with an iron tack still showing through the root. She picked it up while
+the creature’s rear half continued around the corner and its front half
+remained embedded in the plaster.</p>
+<p>Inside it, a man swore.</p>
+<p>The trumpeter took a larger breath and began again.</p>
+<p>“Stop playing,” the driver shouted.</p>
+<p>The trumpeter could not hear him. He had chosen his profession
+well.</p>
+<p>Daska laughed and went to help. She had bought a paper of hot nuts
+from a woman whose brazier stood beneath the warehouse awning. She gave
+the nuts to Pello without asking whether he wanted them and put her
+shoulder beneath the dragon’s jaw. The canvas throat opened above her,
+exposing ribs of willow, two frightened boys and a man clinging to a pot
+of lamp oil.</p>
+<p>“Put that down,” she told him.</p>
+<p>“The flame’s the best part.”</p>
+<p>“We haven’t seen all the parts yet.”</p>
+<p>Rosceline stepped back under the awning. Rain ran down the creature’s
+gilded scales and dripped from a row of little brass bells. Beyond its
+trapped body, the rest of the parade had folded into a swearing knot. A
+woman on stilts was waiting with one hand against a balcony. Her painted
+smile had begun to run. Two children beneath her were trying to make her
+blink.</p>
+<p>“You might lift the tail,” Rosceline suggested.</p>
+<p>Briska had already crawled under it. Her boots protruded from a
+fringe of crimson cloth. “You might stop telling people to lift things
+until you know what’s fastened to them.”</p>
+<p>“I have found that the fastenings usually make themselves known.”</p>
+<p>“Yes. Through injury.”</p>
+<p>Pello put the nuts on a barrel, moved a handcart out from behind the
+rear wheel and took hold of the long iron brake. He looked toward Daska.
+She nodded.</p>
+<p>The driver shook his whip at the warehouse door as if the building
+might be persuaded to move. A man in a leather apron appeared and
+demanded to know who had authorized the dragon.</p>
+<p>“I have a permit.”</p>
+<p>Ilaro, who had been sheltering beside Rosceline, held out his hand.
+The driver gave him the folded paper with the eagerness of a man finding
+someone willing to believe in it.</p>
+<p>Ilaro read beneath the edge of the awning. Rain tapped the paper. He
+moved it farther under cover and started the last line again.</p>
+<p>“This is for a smaller dragon.”</p>
+<p>“We improved it.”</p>
+<p>“The street hasn’t improved with it.”</p>
+<p>There was a sharp crack beneath the tail. Briska came out backward,
+carrying a short steel pin whose head was thick with green paint.</p>
+<p>“Your release was painted shut.”</p>
+<p>“That paint costs money.”</p>
+<p>She looked at the driver until he glanced away.</p>
+<p>Daska lifted the jaw. Pello released the brake, and the dragon
+shifted against her shoulder. Its throat scraped the wall with a noise
+that made Rosceline think of expensive furniture. The man with the oil
+put his pot down at last and pushed from inside. The front wheels
+turned. Something tore, and the creature came free with half a painted
+saint attached to its nose.</p>
+<p>The warehouse owner made a wounded sound.</p>
+<p>Rosceline offered him the tooth. “For the repair.”</p>
+<p>He did not take it. She put it on the barrel beside the nuts.</p>
+<p>The parade moved. The trumpeter, encouraged by the apparent success
+of his playing, grew louder. Daska wiped plaster from her sleeve and
+recovered her food. She offered some to Briska, who took one with two
+fingers and bit it before discovering how hot it was.</p>
+<p>“It’s been over a fire,” Daska said.</p>
+<p>Briska stared at her, chewing carefully.</p>
+<p>They followed the dragon through the widening street toward the
+inland fairground. Silkstrand’s wet paving reflected ropes of yellow
+lamps. Water from the dyers’ quarter slid beneath a narrow bridge,
+violet near one bank and the color of old wine near the other. Above it
+the parade’s paper fish turned in the rain. Their little metal tongues
+rang when the wind caught them.</p>
+<p>Rosceline had not meant to spend the evening with all four. She had
+asked Daska whether she was going, and Daska had asked Pello, and by the
+time Rosceline arrived at Briska’s workshop Ilaro was already waiting in
+the chair with the least light. Nobody had proposed a plan. She had
+liked that until Briska began questioning the dragon’s steering.</p>
+<p>Eight weeks had passed since the mountain. Briska’s sleeve no longer
+hid the whole scar on her forearm. Pello still came down from a high
+step with care. Daska’s left hand had closed around the dragon’s jaw
+without difficulty. Rosceline watched it now as the monk shook nuts into
+her mouth.</p>
+<p>“You’ll be sick before we reach the food.”</p>
+<p>“Then I’ll have room.”</p>
+<p>The fairground had been a field that morning. Now canvas peaks rose
+above the warehouses and the calliope played from somewhere behind them,
+a high, reedy sweetness that came through the brass like a child singing
+in a locked room.</p>
+<p>A woman stood on the entry platform in a coat of blue velvet. Its
+skirts were stiff with little mirrors. She greeted a cooper by name,
+asked after his wife, and told the next person he had chosen an
+excellent night to be unhappy.</p>
+<p>“Maestra Pann,” said the board above her. “Three Nights Only.”</p>
+<p>Pann’s eyes found Rosceline in the crowd. The smile she gave her was
+neither larger nor smaller than the one she had given the cooper.
+Rosceline disliked how much she noticed.</p>
+<p>They passed beneath the lamps.</p>
+<p>Warm sugar, wet rope and horse piss crowded the air. A girl on a
+narrow wire walked above the midway with a bowl balanced on her head. A
+man below invited bets on whether she would spill it. The girl looked
+down at him and said that if he shook the post again she would pour it
+into his trousers.</p>
+<p>Daska stopped to watch.</p>
+<p>Rosceline stopped beside a little booth where a man was trying to
+return a bird.</p>
+<p>The bird was in his mouth.</p>
+<p>Every time he opened it, a pure, beautiful whistle rose above the
+midway. He looked increasingly miserable. The woman behind the counter
+had sugared fingertips and a white turban so large it resembled
+something being offered at a wedding. She held out her hand.</p>
+<p>“Your original, darling. The little one. With the cut edge.”</p>
+<p>The man fumbled in his coat. He produced a cream ticket, creased and
+damp. When he put it down, his fingers stayed on it.</p>
+<p>“I was told it would bring pleasure.”</p>
+<p>“Hasn’t it?”</p>
+<p>“To everybody outside my house.”</p>
+<p>She smiled. He did not.</p>
+<p>“I would like my ordinary whistle.”</p>
+<p>“Then make the return.”</p>
+<p>She pointed to a fold near the ticket’s lower edge. He pressed the
+corner across his written name. The paper resisted a moment, springing
+up against his thumb. He pushed harder.</p>
+<p>“I give it back,” he said.</p>
+<p>The whistle stopped halfway through a note.</p>
+<p>He stood with his mouth open. The woman took the folded ticket,
+placed it beneath a small brass weight and invited him to try.</p>
+<p>His ordinary whistle was a damp hiss followed by a squeak.</p>
+<p>“Can he return that one too?” Daska asked.</p>
+<p>The man laughed before the woman could answer. He looked surprised by
+the sound, tried it again, and went off through the crowd with his hands
+empty.</p>
+<p>Ilaro watched the ticket beneath the weight.</p>
+<p>“He could have done it himself?”</p>
+<p>“It’s his wish.” The woman licked sugar from her thumb. “Until his
+settlement bell. Afterward we would have had a longer conversation.”</p>
+<p>Pello had taken a step away from the counter. Rosceline could see
+what he had seen: no prices on the sweets, only little blank cards
+beside them.</p>
+<p>She left the sweets alone.</p>
+<p>Farther along, a knife-thrower split an apple above his partner’s
+head. The blade struck the board so hard that the apple’s wet halves
+slapped her cheeks. She spat a seed at him and received more applause
+than he did.</p>
+<p>Beyond that was a blue placard with a finch painted at the top.</p>
+<p>Rosceline stopped.</p>
+<p>“Nerisse Dalca,” she read. “Her farewell.”</p>
+<p>“Again?” Briska asked.</p>
+<p>“She has been threatening it for years. I should like to see whether
+she means it.”</p>
+<p>The first two evenings were at the Blue Finch. The third, in larger
+lettering, was advertised beneath the carnival’s own name. Rosceline
+smoothed a wet curl from the edge of the placard. Nerisse’s drawn face
+had lost twenty years and acquired a chin she had never possessed.</p>
+<p>“Is she good?” Daska asked.</p>
+<p>“She used to be.”</p>
+<p>At the Blue Finch, twenty minutes later, Rosceline discovered how
+little she liked having said that.</p>
+<p>The room was full. Wet coats steamed from hooks along the wall. A
+woman carried a tray above her head through a gap that kept closing.
+Near the stage, a man with one empty sleeve had placed his drink on the
+chair beside him and was refusing to surrender it. Lusette, Nerisse’s
+niece, took the glass, moved it to a shelf and sold the chair before he
+could find the beginning of his objection.</p>
+<p>Nerisse stood beneath three lamps. Her dress was dark red, with a
+little repair near the waist that the light almost concealed. She had
+put no powder over the lines at her mouth.</p>
+<p>The accompanist began. She waited a beat longer than Rosceline
+expected, then sang into the space he had left.</p>
+<p>Rosceline sat down without arranging her coat.</p>
+<p>The song concerned a woman waiting at a harbor for a man everybody
+else knew was dead. It should have been intolerable. Nerisse made the
+woman impatient with the gulls, then with the neighbors, then so briefly
+hopeful that Rosceline felt something move behind her ribs before she
+could decide whether to allow it.</p>
+<p>Beside her, Daska’s nuts cooled unopened on her knee.</p>
+<p>The accompanist turned a page. He leaned toward Nerisse and opened
+his mouth to call the change.</p>
+<p>Nothing came.</p>
+<p>His lips moved again. Nerisse glanced at him, found the next phrase
+herself and went on singing.</p>
+<p>The man put a hand to his throat. Rosceline watched it stay there
+until he needed both hands for the instrument.</p>
+<p>When the song ended, the room applauded. She applauded with it.</p>
+<h2 id="chapter-2-all-the-chairs">Chapter 2 — All the chairs</h2>
+<p>Celise had put the letter in the middle of the table.</p>
+<p>Ilaro noticed that before he noticed the five chairs. Usually a
+letter in the Countess’s house lay beside its intended reader, leaving
+everyone else to wait for the account. This one had been opened flat,
+with a plain stone at each corner. A second sheet carried the terms of
+the proposed work.</p>
+<p>He chose the chair with its back to the window.</p>
+<p>Rosceline sat opposite him. She had arrived wearing a gray coat that
+seemed new until he saw the old cuffs. Pello stayed standing while
+Celise moved a vase away from the space beside his chair. Daska took a
+piece of bread from the plate. Briska looked at the stones holding down
+the letter and turned one over to examine the cut underside.</p>
+<p>“They’re garden weights,” Celise said.</p>
+<p>“The face is badly dressed.”</p>
+<p>“The letter hasn’t escaped.”</p>
+<p>Briska put it back.</p>
+<p>The Countess entered through the garden door. Her veil moved in the
+draft, briefly revealing the line of her mouth. She asked Daska whether
+the bread was fresh, accepted the answer without testing it, and sat at
+the end of the table.</p>
+<p>“You heard Nerisse last night.”</p>
+<p>“Half the city heard Nerisse,” Rosceline said. “If she had filled the
+room like that last winter, we would have been spared the
+farewells.”</p>
+<p>“She knows.”</p>
+<p>Ilaro began reading.</p>
+<p>The first lines were formal. Nerisse apologized for troubling someone
+whose kindness she had already used too often. The handwriting changed
+halfway down, becoming smaller and more forceful.</p>
+<p><em>Basile tried to speak and could not. It happened inside the
+house. Outside he said he was well. When he came back it happened again.
+I think something has been taken too soon. They will not let me see what
+I signed.</em></p>
+<p>Below that, in a different ink:</p>
+<p><em>Please have it brought back before the last bell. I will make the
+return myself.</em></p>
+<p>The letter had been delivered during the night.</p>
+<p>“She bought the audience,” Rosceline said.</p>
+<p>Ilaro kept reading to the bottom. There was a line on the reverse,
+visible through the paper, and he wanted to see whether it altered
+anything before the room decided what had happened.</p>
+<p>Celise lifted the weights for him.</p>
+<p><em>I was not buying a new voice. I do not want you to think
+that.</em></p>
+<p>He read the sentence twice. Then he turned the sheet back.</p>
+<p>“What did she promise?” he asked.</p>
+<p>“Her account says her singing voice after the farewell,” the Countess
+replied. “Three full performances in exchange. The carnival keeps the
+original ticket. She has a copy.”</p>
+<p>“And you’ve seen neither?”</p>
+<p>“Correct.”</p>
+<p>“Then we begin there,” Rosceline said. “Pello can look at the office,
+I can speak to the—”</p>
+<p>“Wait.”</p>
+<p>She looked at him. He could feel her preparing a pleasant answer that
+would leave the discussion exactly where she wanted it.</p>
+<p>“I haven’t finished with the work you’re asking us to accept,” he
+told the Countess.</p>
+<p>“Please do.”</p>
+<p>He placed one finger on Nerisse’s last sentence. “Suppose we bring
+the ticket and she has changed her mind.”</p>
+<p>“Then you bring me that answer.”</p>
+<p>“Are we paid for bringing the answer?”</p>
+<p>“Your expenses and the advance. The remainder is for the recovered
+ticket and the return completed before settlement.”</p>
+<p>Rosceline moved her cup. It made a small sound against the
+saucer.</p>
+<p>“I am not hiring you to carry her out of the city,” the Countess
+said.</p>
+<p>Daska swallowed her bread. “Good.”</p>
+<p>“Nor to close the carnival. I have an interest in the Finch’s
+premises, and Nerisse has received people for me when receiving them
+here would have been inconvenient. I would prefer that she survive
+retirement with the ability to complain about it.”</p>
+<p>“She’ll find a way,” Rosceline said.</p>
+<p>The Countess’s mouth moved beneath the veil. “Yes. But I would rather
+hear her.”</p>
+<p>Ilaro looked at the second sheet. Twelve hundred silver marks,
+divided among the five. Two hundred in advance. Agreed expenses
+separately. Celise had left room for particulars beneath the sum.</p>
+<p>“The return,” he said. “We saw one made last night. Is there more to
+it than the original and the person who asked?”</p>
+<p>“The person must withdraw deliberately before the stated settlement.
+A copy will not serve. Burning the original gives up the means of
+returning the wish. It does not give back what was promised.”</p>
+<p>“Who taught you that?” Briska asked.</p>
+<p>“Someone who tried burning one.”</p>
+<p>There was a brief silence. From the garden came a gardener’s
+irritated request that somebody stop moving his bucket.</p>
+<p>“Does the carnival answer to you?” Daska asked.</p>
+<p>“No.”</p>
+<p>“They have your kind of manners.”</p>
+<p>“A regrettably portable accomplishment.”</p>
+<p>Ilaro had been about to ask about the bell. The gardener spoke again,
+louder, and the question went out of his reach. He looked down at the
+word <em>settlement</em> until it came back.</p>
+<p>“There were two bells on the grounds. Which is the last one?”</p>
+<p>“We should ask before we rely on it,” Pello said.</p>
+<p>Ilaro nodded and wrote that down.</p>
+<p>Rosceline watched his pencil. “We can presumably speak to her without
+taking the whole table.”</p>
+<p>“Once we know what everybody has agreed to.”</p>
+<p>“I was agreeing.”</p>
+<p>“You were assigning.”</p>
+<p>She leaned back. Daska looked into her cup. Briska examined the
+weight again, this time without turning it over.</p>
+<p>Ilaro disliked having said it sharply. He disliked more that the
+sharpness seemed necessary. The room had been pleasant before the
+commission began, and he wanted that back without pretending the paper
+between them was unimportant.</p>
+<p>“I want the same question answered before five people act on five
+versions,” he said.</p>
+<p>Rosceline considered him. Then she reached for the sheet and read it
+herself.</p>
+<p>Celise brought the advance in five small purses. Nobody touched one
+until Nerisse’s letter had gone around the table. Briska asked for money
+to hire equipment rather than build anything before they knew the
+ground. Pello asked whether the Countess had an ordinary carrier who
+could be paid openly. Celise gave him a name and said that the woman
+would refuse anything she considered foolish, regardless of whose name
+he used.</p>
+<p>“That sounds expensive,” Daska said.</p>
+<p>“She usually saves me money.”</p>
+<p>When they stood, Rosceline took a folded paper from inside her coat.
+She placed it beside the Countess’s hand, not quite under it. Ilaro saw
+two lines crossed through and two left untouched. He looked away before
+she had to ask.</p>
+<p>“This would be the third,” Rosceline said.</p>
+<p>“If you accept it.”</p>
+<p>“I have.”</p>
+<p>The Countess wrote a short note beside the next line and returned the
+paper. Rosceline folded it into the same narrow shape and put it back
+inside her coat.</p>
+<p>Outside, the morning smelled of water warming against stone. The
+carnival’s posters had appeared on walls that had been bare the night
+before. On one, Nerisse’s painted mouth was open above a promise that
+there would be no empty seats.</p>
+<p>Ilaro stopped in the strip of shade beneath an arch. Daska waited
+without asking why. He put the two bells into separate lines in his
+notebook, leaving space beside each.</p>
+<p>Then he closed it and went with them to hear what Nerisse wanted
+now.</p>
+<h2 id="chapter-3-one-more-evening">Chapter 3 — One more evening</h2>
+<p>Nerisse was singing to six empty chairs and a man repairing the
+seventh.</p>
+<p>In daylight the Blue Finch looked smaller. The dark corners had
+become plain corners with damp at the bottom. A crack ran through the
+painted bird above the stage, giving it a second beak. Someone had
+chalked prices on the undersides of the chairs. Rosceline saw one when
+the repairer turned his chair over and shook a loose tenon out of
+it.</p>
+<p>Nerisse stopped halfway through the phrase.</p>
+<p>“That was meant to wait until I finished.”</p>
+<p>“So was paying me,” he said.</p>
+<p>She looked at him, then laughed reluctantly. “There is money now. Ask
+Lusette.”</p>
+<p>He set the chair down with less noise.</p>
+<p>Nerisse came to the edge of the stage. Her hair was pinned carelessly
+and she wore a man’s old coat over a dress Rosceline remembered from a
+better season. She recognized Rosceline at once, then looked past her
+toward the others.</p>
+<p>“You brought a committee.”</p>
+<p>“They have developed the habit of coming with me.”</p>
+<p>“Are they musical?”</p>
+<p>“Some of their objections have a recognizable refrain.”</p>
+<p>Daska crossed to the stage and held out a hand. “I liked the harbor
+song.”</p>
+<p>Nerisse took it. “You were here.”</p>
+<p>“All the way at the back. I could still hear every word.”</p>
+<p>The compliment reached Nerisse before she had prepared herself
+against it. Her fingers tightened briefly around Daska’s. She asked
+which verse, and the monk described the one in which the neighbors
+started bringing the woman soup. Nerisse smiled.</p>
+<p>“They had already buried him. She hadn’t.”</p>
+<p>“I know. I wanted her to throw the soup at them.”</p>
+<p>“Some nights she does.”</p>
+<p>Rosceline waited for them to finish. She had come to discuss a stolen
+voice, and already Daska looked as though she might purchase another
+evening of it.</p>
+<p>Basile sat behind the instrument with a cloth over his knees. Up
+close he was broad and untidily shaven, with two nails missing from one
+hand and a shirt collar that had been turned rather than replaced. He
+rubbed the strings with the cloth, working slowly around a little dark
+patch on the wood.</p>
+<p>“Your letter reached the Countess,” Rosceline said.</p>
+<p>Nerisse’s smile altered. “I was frightened.”</p>
+<p>“A sensible response to what you described.”</p>
+<p>“Pann has explained. These things can overlap. An advance against the
+payment. It should have come from me. She will have the clerk put it
+right.”</p>
+<p>Basile stopped polishing.</p>
+<p>“Has he?” Daska asked him.</p>
+<p>“Basile is much better this morning,” Nerisse said.</p>
+<p>The monk waited, looking at the accompanist.</p>
+<p>Nerisse glanced between them. “Tell her.”</p>
+<p>He put the cloth down.</p>
+<p>“Outside, I can tell her anything she wants.”</p>
+<p>His voice was rough but audible. He stood, came around the instrument
+and went toward the front door. Near the middle of the room it thinned.
+Rosceline heard the end of his next sentence as a dry whisper, the sort
+a sick man makes when he is trying not to alarm the person beside his
+bed.</p>
+<p>He opened the door. Street sound came in: an argument over a cart
+wheel, a hawker selling onions.</p>
+<p>“Here,” Basile said, perfectly clearly. “I could call a song from
+here. The instrument would be difficult.”</p>
+<p>Lusette appeared from the kitchen carrying a basin. “I suggested
+putting you in the doorway. He said the passing carts would be in the
+wrong key.”</p>
+<p>“Most of them are.”</p>
+<p>Lusette smiled at him. Then she saw the number of people in the room
+and set the basin down.</p>
+<p>She was a square-faced woman in her late twenties, with sleeves
+rolled to the elbow and a burn on the inside of one wrist. Unlike the
+figure on the posters, she had Nerisse’s chin.</p>
+<p>“If you’re here to look at the bar, I’ve paid for it.”</p>
+<p>“They aren’t,” Nerisse said.</p>
+<p>“The man yesterday said he wasn’t either.”</p>
+<p>Pello put a hand beneath the portable bar’s lower rail and tested its
+weight without moving it.</p>
+<p>“Wheels?”</p>
+<p>“Two at the back. Lift the front.”</p>
+<p>He looked at the worn floor underneath. “The axle wants moving
+forward.”</p>
+<p>“I know.”</p>
+<p>He took his hand away. She looked at him with slightly less
+hostility.</p>
+<p>Nerisse went to a cupboard behind the stage. Rosceline watched her
+choose the key from a ring, find that it was the wrong one and start
+again. Whatever Pann had said had not entirely settled her.</p>
+<p>“I have the copy. It says what I told you.”</p>
+<p>She brought out a long envelope. Inside was ordinary cream paper
+bearing her name, the three dates and the titles of the advertised
+performances. Rosceline laid it on the nearest table. Ilaro bent over it
+without touching it until Nerisse nodded.</p>
+<p><em>Three houses filled to the last place, to hear Nerisse Dalca sing
+farewell.</em></p>
+<p>Below, in smaller letters:</p>
+<p><em>In consideration, the voice of the house, to be received at the
+closing bell after The South Window, on the last night of the present
+engagement.</em></p>
+<p>There were three little crescent cuts along the bottom of the copy,
+drawn in ink. Beside them was a note identifying the original by its
+actual cuts and Nerisse’s thumb pressed into blue wax.</p>
+<p>“My voice,” Nerisse said. “That is what we discussed.”</p>
+<p>“Then why write <em>house</em>?” Ilaro asked.</p>
+<p>“Because that is how they write.”</p>
+<p>Rosceline knew the answer. She had obtained signatures from people
+who wanted the large sentence badly enough not to argue with the small
+one. Nerisse was looking at her as though she might be the person in the
+room capable of understanding that the signature had not been an
+accident.</p>
+<p>“You were going to stop singing anyway,” Rosceline said.</p>
+<p>“Yes.”</p>
+<p>“Then you thought you were paying with something you had finished
+using.”</p>
+<p>Nerisse sat. “I have sung to four people, Rosceline. Four. Two of
+them had come to ask whether the room was available for a funeral. I
+sang the whole evening because the other two had paid.”</p>
+<p>She touched the copy with a finger, very lightly.</p>
+<p>“Last night they stood outside. Lusette could have sold the same
+chair three times.”</p>
+<p>“I nearly did,” her niece said.</p>
+<p>Nobody laughed. Lusette picked up the basin again and carried it back
+toward the kitchen with her shoulders set.</p>
+<p>Rosceline sat opposite Nerisse. “Did they tell you how to make the
+return?”</p>
+<p>“With the original. I fold the corner over my name and give back what
+I asked for. Before the bell. Vellum keeps it in the office until the
+last performance. He showed me its place.”</p>
+<p>“And when you asked for it?”</p>
+<p>“He said they were preparing the account. Pann said there was no need
+to spoil an evening over a clerical mistake.”</p>
+<p>“There may be every need.”</p>
+<p>Nerisse looked toward the instrument. Basile had returned to it. He
+sat without trying to speak.</p>
+<p>“One more evening here. Then the great tent. They have lamps that
+make the whole room disappear except the person you mean to see. There
+is an orchestra, Rosceline. Not a man trying to make six strings do the
+work of twenty.”</p>
+<p>“Basile can hear you.”</p>
+<p>“Basile knows.”</p>
+<p>From the stage he raised one hand, without turning it into either
+agreement or refusal.</p>
+<p>Rosceline wanted to shake her. She could also imagine the lamps. That
+made the desire to shake her worse.</p>
+<p>“If we find the original, will you make the return?”</p>
+<p>Nerisse drew the copy closer. “Find out whether Pann has put it right
+first.”</p>
+<p>“That wasn’t the question.”</p>
+<p>“It is my answer.”</p>
+<p>Daska sat on the edge of the stage. The boards gave a little beneath
+her weight.</p>
+<p>“We can look,” she said. “We can come back and tell you what we find.
+But if somebody else is paying for your evening, you’ll have to hear
+that too.”</p>
+<p>Nerisse stared at her. “You think I would ask for that?”</p>
+<p>“I don’t know you.”</p>
+<p>The reply was quiet enough to leave room for an answer. Nerisse did
+not give one.</p>
+<p>They left the copy at the Finch after Ilaro had recorded its wording
+and the identifying cuts. Nerisse put it back in the envelope and kept
+it on her lap. Rosceline watched her hold the paper while Basile began
+the next song without waiting to be asked.</p>
+<p>Outside, Daska walked beside Rosceline through the smell of frying
+onions.</p>
+<p>“You were going to bring her with us.”</p>
+<p>“I was going to make certain she did nothing foolish while we
+worked.”</p>
+<p>“You’ll need a large room for that.”</p>
+<p>Rosceline looked at her. Daska was not smiling.</p>
+<p>“If she asks to leave, I’ll take her out,” the monk said. “If she
+asks to stay, you don’t get to make that my errand.”</p>
+<p>“And if her wish is taking Basile’s voice?”</p>
+<p>“Then we find out. You heard me tell her.”</p>
+<p>Rosceline looked ahead to where Pello had stopped beside a carrier’s
+cart. He was examining the wheels while Briska spoke to the woman on the
+driving board. Ilaro waited in the shade of the cart’s tilt.</p>
+<p>“You have become very particular.”</p>
+<p>“About some things.”</p>
+<p>Daska moved ahead to help the carrier shift a crate. Rosceline
+followed at her own pace, with Nerisse’s full room still uncomfortably
+bright in her memory.</p>
+<h2 id="chapter-4-a-proper-apology">Chapter 4 — A proper apology</h2>
+<p>The stair should have broken.</p>
+<p>Briska saw the defective pin before the performer put his foot on it.
+She caught the side rail, lifted the tread and slid the pin through its
+proper hole. The performer, a broad man in a false stomach, climbed two
+steps, braced for a fall that did not happen and went over backward with
+a look of deep personal betrayal.</p>
+<p>He landed on a padded mat. The false stomach stayed on the stair.</p>
+<p>From the empty benches, Daska began laughing.</p>
+<p>The carpenter beside Briska closed his eyes.</p>
+<p>“That,” he said, “was the part I had finished.”</p>
+<p>“The pin was only half seated.”</p>
+<p>“Yes.”</p>
+<p>“The tread would have dropped.”</p>
+<p>“Yes.”</p>
+<p>“Under a person.”</p>
+<p>He waited.</p>
+<p>Briska looked at the performer, the mat and the little leather tether
+that had brought the false stomach safely down against the step.</p>
+<p>“You could mark it.”</p>
+<p>“I did.” He pointed to a yellow cross on the side rail. “Then you put
+your hand over the mark.”</p>
+<p>The performer sat up. “Can we keep that? I like the stomach being
+left behind.”</p>
+<p>“We can keep it if you like paying for another spine,” the carpenter
+said.</p>
+<p>His name was Cazet. He wore a leather apron with six pockets and a
+narrow leather thong where the seventh had torn away. The nails in his
+mouth were clean. Briska approved of that more than she wanted to.</p>
+<p>She had offered her labor after noticing a footlight shutter hanging
+loose beside the main stage. Cazet had asked her to show him what was
+wrong, listened to half the answer and handed her a screwdriver. They
+had been getting on adequately until the stair.</p>
+<p>He crouched beside it and showed her the intended failure. The pin
+released two linked treads; the side rail stopped the collapse at the
+same height each time; the leather caught the belly; the man fell
+backward onto the mat if he did what he had rehearsed.</p>
+<p>“And if he doesn’t?”</p>
+<p>“Then I learn about it for the rest of the journey.”</p>
+<p>The performer came over and offered Briska his hand. “Salo.”</p>
+<p>She took it. His palm was callused in the same places as Daska’s,
+though larger. There was an old break in one finger.</p>
+<p>“You’re careful,” he said. “That’s new.”</p>
+<p>Cazet threw a shaving at him.</p>
+<p>They rebuilt the release with Briska holding the frame while Cazet
+placed the pin deliberately badly. She added a small stop to keep it
+from slipping farther than he intended. He tested it three times, then
+nodded once and left it there.</p>
+<p>Salo climbed. The stair folded. His stomach went up as he went down.
+Daska laughed harder this time, because he looked at the escaping belly
+before he hit the mat.</p>
+<p>Briska found herself smiling. She hid it by checking the stop.</p>
+<p>The main tent was still empty. Benches faced a broad platform with a
+false parlor painted across its back. A real door stood in the painted
+wall. Beyond it ran a staff passage to the loading side. A pair of
+narrow scenery panels could be drawn across the passage, closing it from
+view. Cazet showed her how one panel traveled badly because its lower
+guide had filled with grit.</p>
+<p>“People kick it,” he said.</p>
+<p>“That packs the grit in.”</p>
+<p>“People who kick things don’t stop to ask.”</p>
+<p>She removed the guide, cleaned it and made him bring the panel
+through its whole travel. It opened onto a gap wide enough for a person
+carrying a box. A handcart would need the second panel moved as
+well.</p>
+<p>Outside that gap, Pello was speaking to a porter in a rust-colored
+coat. Ilaro stood beside the bell frame near the tent’s far corner. He
+had asked Briska to look at the ropes when she had time.</p>
+<p>The small brass bell hung above a painted wheel. It called the
+carters and loading gangs. The iron one beside it had no decoration. Its
+clapper was wrapped in cloth while the grounds were being prepared.</p>
+<p>“That one settles the evening,” Cazet told her. “Nobody touches it
+until the maestra gives the cue.”</p>
+<p>“After the last song?”</p>
+<p>“After whatever she says is last. Nerisse’s farewell tomorrow.
+Usually they ask for two more. Usually the crowd gets them.”</p>
+<p>Ilaro wrote in his notebook. “And the little bell can ring first
+without settling anything.”</p>
+<p>“It can ring all day. We still won’t load any faster.”</p>
+<p>At the front of the tent, a little commotion had gathered around
+Rosceline.</p>
+<p>She stood on a square of polished boards facing someone in a white
+half-mask. The mask covered the upper face, leaving a narrow mouth and a
+faint scar beside it. Their coat was divided into pale and dark
+lozenges. A rapier rested along one arm as lightly as a riding crop.</p>
+<p>“She wants permission to interrupt tomorrow’s farewell,” Cazet
+said.</p>
+<p>“Why is she standing in a box?”</p>
+<p>“Because she asked while somebody else was speaking.”</p>
+<p>Briska put down her screwdriver.</p>
+<p>The Harlequin tilted their head as she approached. “Your associate
+has offered an apology.”</p>
+<p>“I have offered three,” Rosceline said.</p>
+<p>“Three explanations. An apology would have been shorter.”</p>
+<p>Daska came to stand beside Briska with her arms folded. Pello watched
+from the loading gap. Ilaro closed his notebook but stayed where the
+tent’s open side gave him air.</p>
+<p>Rosceline drew a breath.</p>
+<p>“I regret that my enthusiasm for your performance prevented me from
+hearing the end of it.”</p>
+<p>“There was no performance.”</p>
+<p>“How modest of you.”</p>
+<p>The rapier moved.</p>
+<p>Briska heard its point cut a thread before she saw the loose edge of
+Rosceline’s cuff lift. Rosceline kept her hand still. Daska stopped
+looking amused.</p>
+<p>“An apology,” the Harlequin said.</p>
+<p>Rosceline looked at the blade. Her own narrow sword hung beneath her
+coat, familiar enough to Briska now that she knew where its hilt would
+be. She watched Rosceline decide not to reach for it.</p>
+<p>“I spoke over you because I expected what I had to say would interest
+you more.”</p>
+<p>“Better.”</p>
+<p>“I was mistaken.”</p>
+<p>The Harlequin lowered the point. “Were you?”</p>
+<p>“For the purposes of obtaining permission to do it again,
+entirely.”</p>
+<p>The mouth beneath the mask curved.</p>
+<p>They stepped off the square and invited Rosceline to follow. She did,
+slowly enough that Briska understood she had disliked the last exchange
+much more than she intended to show.</p>
+<p>The permission was written on a narrow white card with a black edge.
+One declared interruption, before the final farewell song. It would last
+no longer than a small glass kept in the Harlequin’s booth. The subject
+must be announced beforehand. The right to speak did not include the
+right to compel an answer, strike someone or remove property.</p>
+<p>“What does it cost?” Rosceline asked.</p>
+<p>“Three silver marks.”</p>
+<p>“For the apology as well?”</p>
+<p>“That was free.”</p>
+<p>She paid with the expression of a woman who would have preferred the
+reverse.</p>
+<p>Pann arrived as the Harlequin finished the card. Her mirrored coat
+was gone; she wore a plain blue waistcoat, boots muddy to the ankle and
+a little bell tied at her wrist. She read the proposed interruption and
+looked at Rosceline.</p>
+<p>“A disappointed purchase.”</p>
+<p>“I have considerable experience.”</p>
+<p>“So have most of our customers. You will have to distinguish
+yourself.”</p>
+<p>Pann signed. She handed the card back and asked Briska whether Cazet
+had made her repair something he intended to break.</p>
+<p>“The reverse,” Briska said.</p>
+<p>“Then you’re learning quickly.”</p>
+<p>The ringmaster turned toward the grounds. Cazet called after her
+about a new delivery of rope. It was waiting beyond the last row of
+lamps, near the carrier’s gate. Pann stopped beneath the final lamp and
+sent an usher to bring a sample.</p>
+<p>Briska watched the man go. It was not far. Pann could have reached
+the load before he did.</p>
+<p>Then Cazet asked for his screwdriver, and Briska looked down to
+discover she had put it into her own bag.</p>
+<p>She gave it back. He counted his other tools in silence.</p>
+<h1 id="part-ii-behind-the-painted-faces">Part II — Behind the painted
+faces</h1>
+<h2 id="chapter-5-the-voice-of-the-house">Chapter 5 — The voice of the
+house</h2>
+<p>The washroom had one window, a cold stove and a chair that did not
+match anything else in the Blue Finch. Ilaro took the chair. Lusette set
+a basin on the stove and told the others to keep out until she called
+them.</p>
+<p>“They keep answering for each other.”</p>
+<p>“I noticed.”</p>
+<p>“My aunt thinks a pause is something she has to fill.”</p>
+<p>Ilaro smiled. Lusette did not, and he let the smile go without trying
+to explain it.</p>
+<p>She had given him a cup of water. He drank half. The room was cool
+enough to ease the pain behind his right eye, and the narrow window
+looked onto a wall rather than a bright street. For the first time since
+the parade, he could hear a single conversation without another one
+pressing against it.</p>
+<p>Basile came in carrying the cloth from his instrument.</p>
+<p>“I don’t sing much,” he said before sitting. “If this is about a
+rival. There isn’t one.”</p>
+<p>“It’s about when your voice failed.”</p>
+<p>“Last night.”</p>
+<p>“Before you started playing, or during?”</p>
+<p>Basile rubbed the cloth between his hands. “During the harbor song. I
+needed to tell her we’d gone too high for the next verse. She used to
+take it there. She can’t now.”</p>
+<p>“She made the change without you.”</p>
+<p>“She should. She’s sung it with me for fourteen years.”</p>
+<p>Ilaro had thought the missing call might have been an alteration in
+the arrangement, a cue Nerisse no longer needed. Watching a man open his
+mouth from across a crowded room was not the same as knowing what he
+intended to say.</p>
+<p>“You tried again?”</p>
+<p>“Three times. Then I played the change so hard she had to hear
+it.”</p>
+<p>“Did it hurt?”</p>
+<p>“No. That was the queer part. There was nothing to blame. My throat
+moved. I could feel the air.”</p>
+<p>He lifted a hand to the base of his neck, then put it down without
+touching himself.</p>
+<p>“It worked when I went out for beer. Failed when I came back. This
+morning I spoke in the kitchen, but by the time I sat at the instrument
+it had gone thin again.”</p>
+<p>“Where do you sleep?”</p>
+<p>“Upstairs. Back room. Why?”</p>
+<p>“I don’t know yet.”</p>
+<p>Basile looked at him with tired relief. “That’s a better answer than
+I’ve had from anybody today.”</p>
+<p>They called Tovin next. He was the man repairing the chairs. Sawdust
+clung to the turned cuffs of his trousers, and he had brought a broken
+rail with him because he did not want anyone to mistake it for
+firewood.</p>
+<p>“Mine’s mostly when I shout,” he said. “I couldn’t get her attention
+from the top landing. Thought she was ignoring me.”</p>
+<p>“Nerisse?”</p>
+<p>“Madal. She had the stair full of costumes. I had a chair under each
+arm. I could see the top of her head. Nothing was coming out.”</p>
+<p>“Were you at the performance?”</p>
+<p>“I was fixing chairs behind the kitchen.”</p>
+<p>“Did you sing along?”</p>
+<p>Tovin looked at Lusette.</p>
+<p>“Nobody asks him to,” she said.</p>
+<p>He made a face at her, gently, and turned back to Ilaro. “No.”</p>
+<p>Ilaro put a line through the word <em>singers</em>. He could still
+see it beneath the pencil. He wanted it there until he understood what
+had taken its place.</p>
+<p>Madal came without being called. She was carrying a red sleeve turned
+inside out over one arm, the beads cupped in her palm so they would not
+snag on the doorway.</p>
+<p>“If everybody’s to sit in here, somebody can fetch my needle
+case.”</p>
+<p>Lusette went for it.</p>
+<p>Madal sat on the cold stove instead of taking the chair Tovin
+offered. She had dressed Nerisse for so many years that she described
+evenings by the garments worn on them. Her voice had failed that morning
+while she was arguing over whether the red dress could be taken in
+again. She had no difficulty speaking now, though she cleared her throat
+often.</p>
+<p>“She thinks I’m doing it to frighten her,” she said.</p>
+<p>“Are you?” Tovin asked.</p>
+<p>“I would use a sound she could hear.”</p>
+<p>Lusette returned with the little case. Madal threaded the needle
+without interrupting her account, and the soft rasp of thread through
+cloth steadied the room.</p>
+<p>Ilaro asked where she slept. She pointed at the ceiling with the
+needle.</p>
+<p>“Above the front. Only room where you can hear whether they’ve put
+the shutters back correctly.”</p>
+<p>He began asking about the musicians who had played the first
+farewell. Basile was the only one who slept at the Finch. The fiddler
+lived with his wife two streets away. He had sung the chorus loudly
+enough for Lusette to hear him from the kitchen, and had spent that
+morning shouting at a man who had borrowed his bow.</p>
+<p>“I saw him,” Lusette said. “He’s well.”</p>
+<p>Ilaro turned the page.</p>
+<p>Tovin watched him. “I live here too. Little room beside the roof
+hatch. If that’s what you’re after.”</p>
+<p>“And you?” Ilaro asked Lusette.</p>
+<p>“Here.”</p>
+<p>“Any difficulty speaking?”</p>
+<p>“Not yet.”</p>
+<p>The words made Madal stop sewing. Lusette looked at the sleeve
+instead of at her.</p>
+<p>Ilaro set down the pencil. “These people share a house. The ones
+outside it haven’t reported the same trouble. That is what we have. It
+does not tell us whether every person upstairs will be affected, or
+whether the walls matter, or whether somebody has written particular
+names.”</p>
+<p>“She gave them our names,” Lusette said.</p>
+<p>The room became very quiet.</p>
+<p>“For the farewell places. Pann said the household should be named, to
+make sure nobody who belonged here was left without a seat. My aunt
+thought it was considerate.”</p>
+<p>“Were you asked?”</p>
+<p>“To spell Madal’s properly. They’d put an extra letter in.”</p>
+<p>Madal pulled the thread through the sleeve. It made a small, tight
+sound.</p>
+<p>Ilaro wrote the four names on a fresh sheet. He asked each person to
+check their own. Tovin had to borrow his pencil. Basile corrected
+nothing but read the whole sheet before handing it back.</p>
+<p>Rosceline appeared in the doorway as Lusette took the last turn.</p>
+<p>“We have a way into the office.”</p>
+<p>“Then we have something to look for.”</p>
+<p>He showed her the names. Her expression changed when she reached
+Lusette’s. She glanced at the young woman and then back at the page.</p>
+<p>“Does Nerisse know?”</p>
+<p>“She knows we’ve been talking,” Lusette said. “That’s different.”</p>
+<p>Rosceline folded the sheet once, considered it and gave it back.
+“Keep that with you. I don’t want to discover later that she thinks I
+invented the people.”</p>
+<p>It was an ugly remark, and he understood why she made it.</p>
+<p>When the others had gone, Ilaro stayed in the chair for another
+minute. Madal remained on the stove, sewing. She did not ask him to
+leave or offer him a remedy for his head. The sleeve turned slowly in
+her hands, bright red against the gray basin.</p>
+<p>“Will you be able to sell that?” he asked.</p>
+<p>“The beads. Perhaps the cloth. Depends who remembers wearing it.”</p>
+<p>“She does.”</p>
+<p>Madal nodded. “She remembers every night it went well.”</p>
+<p>Ilaro finished his water. He waited until she had drawn the needle
+through before getting up, so he would not knock her elbow on the way
+past.</p>
+<h2 id="chapter-6-first-to-leave">Chapter 6 — First to leave</h2>
+<p>Mistress Trissot’s handcart was ugly, narrow and exactly what Pello
+had asked for.</p>
+<p>Briska examined the axle while its owner watched from a stool. The
+yard smelled of hemp, old cabbage and warm horse. A wheelwright was
+hammering somewhere beyond the wall. Each blow made the cart’s loose
+side board rattle.</p>
+<p>“That’s meant to come off,” Trissot said.</p>
+<p>“I haven’t touched it.”</p>
+<p>“You’re looking at it as if you intend to.”</p>
+<p>Pello lifted the board from its sockets and laid it against the wall.
+He measured the cart with the span of his arms, looked at Briska and
+waited.</p>
+<p>“It will pass,” she said. “If both panels open. One won’t do.”</p>
+<p>Trissot held out her hand for the deposit. Rosceline had supplied it
+without asking whether a narrower person might be cheaper. Briska had
+been grateful and suspicious in almost equal amounts.</p>
+<p>“No fire,” the carrier said. “No dead people. If a live person
+becomes dead while aboard, you tell me before you return it.”</p>
+<p>“Furniture,” Pello said.</p>
+<p>“Furniture has caused worse trouble.”</p>
+<p>He gave her the coins.</p>
+<p>They would collect the cart before the following evening’s final
+show. It would carry a pair of repaired scenery panels to the loading
+gate, then wait beside the carrier’s wagon while the carnival finished.
+Trissot would have a man there to take the panels onward after they were
+returned. Pello paid for the delay as well as the wheels. Briska watched
+him insist on that second payment when Trissot tried to dismiss it.</p>
+<p>Outside the yard she asked why.</p>
+<p>“If he’s paid to wait, he waits.”</p>
+<p>“If things go badly, he may prefer to leave.”</p>
+<p>Pello shrugged. “He’ll be deciding. I won’t be surprised.”</p>
+<p>He had a rust-colored coat folded over one arm. It smelled of someone
+else’s tobacco. At the grounds, he put it on before they passed the
+goods gate, and a porter who had been looking for help gave him half a
+crate without asking his name.</p>
+<p>Briska followed them between the wagons.</p>
+<p>The records wagon stood near the entrance to the goods lane, its
+shafts pointing out. Other vehicles had been parked nose to tail while
+the tents went up; their wheels would have to be dug out of the mud and
+their loads rearranged before departure. This one had dry boards beneath
+its wheels and a clear turn toward the gate.</p>
+<p>Pello put down his end of the crate.</p>
+<p>“First,” he said quietly when the porter had gone.</p>
+<p>Briska looked along the lane. He was right. Whoever held the papers
+would be gone while the performers were still taking down their
+canvas.</p>
+<p>The wagon had a front door reached by three steps and a rear shutter
+above a loading shelf. The shutter’s latch could be reached from inside,
+but the shelf beneath it was too high for an easy descent. A fall would
+put someone between a wheel and the nearest tent stake.</p>
+<p>“How heavy is your investigator?” Pello asked.</p>
+<p>“Ask him.”</p>
+<p>Pello looked at her.</p>
+<p>“Lighter than the crate,” she said. “But less conveniently
+shaped.”</p>
+<p>She could fit a short loop beneath the shelf as a foothold. It would
+not open the shutter. Somebody would have to go in by the door to
+release that. The nearest canvas screen would conceal a person waiting
+behind the wagon if the lamps stayed where they were.</p>
+<p>Pello pointed to a narrow interval between the mirror attraction and
+a row of tethered ponies. “Out there. If the lane fills.”</p>
+<p>“Through the mirrors?”</p>
+<p>“Beside them.”</p>
+<p>She looked at the ropes, the screen and the distance to the public
+midway. It was an ordinary route made difficult by people, which she
+preferred to the other sort.</p>
+<p>At the main tent, Cazet was shaving a wooden runner beside the
+scenery panels. He had sorted his tools into two trays, one close to his
+knee and the other where Briska could reach it.</p>
+<p>“You think I steal.”</p>
+<p>“I know you borrow permanently if nobody interrupts.”</p>
+<p>She took a plane from the farther tray. It was better sharpened than
+the one he was using. She considered whether to tell him, then went to
+work on the runner.</p>
+<p>They tested the panels first with Pello carrying a broad box, then
+with Salo wearing his false belly. Salo had to turn sideways through the
+single opening. With both panels drawn, he could walk through and strike
+a pose. The second runner dragged under load.</p>
+<p>Briska proposed a spring that would pull the panel clear once the
+catch was lifted. Cazet offered her one from a broken drum mechanism.
+She fitted it, checked the travel and released the catch.</p>
+<p>The panel shot across, struck the end stop and returned hard enough
+to catch Salo’s stomach between itself and the frame.</p>
+<p>He looked down. “This belly’s having a difficult day.”</p>
+<p>Briska caught the panel before he tried to move.</p>
+<p>“Don’t pull. The cloth will tear.”</p>
+<p>“That’s what you’re worried about?”</p>
+<p>“At present.”</p>
+<p>She removed the spring. Cazet leaned against the stage with his lips
+pressed together. She gave him a look.</p>
+<p>“Say it.”</p>
+<p>“I was admiring the speed.”</p>
+<p>“We’ll use a line.”</p>
+<p>“A very advanced line?”</p>
+<p>“Two people, one at each panel, if you prefer.”</p>
+<p>He stopped smiling. “A line will do.”</p>
+<p>They ran it through two smooth eyes and back to a cleat inside the
+staff passage. Pello pulled. Both panels moved, slowly enough to stop if
+someone caught a sleeve. Briska pulled them shut and tried again
+herself.</p>
+<p>The work took longer than it should have because people kept using
+the passage. An acrobat brought a basket of shoes through it. A cook
+carried a pot of onions. Salo’s small daughter came looking for him with
+one stocking around her ankle. He sat on the stage and fastened it while
+she explained, with considerable indignation, that one of the ponies had
+eaten the ribbon.</p>
+<p>“The red pony?” he asked.</p>
+<p>“The other red pony.”</p>
+<p>“I’ll speak to him.”</p>
+<p>Briska let the girl pass before testing the line again.</p>
+<p>Her parent would have sold Cazet the spring, the improved runner and
+an agreement for replacing both. She could almost hear the patient
+explanation: a solution nobody pays to maintain is merely the beginning
+of another problem. She had hated hearing it while standing behind a
+stall. She caught herself checking whether the wooden runner could be
+removed without dismantling the whole frame.</p>
+<p>It could now.</p>
+<p>Before leaving she smoothed a rough place on the cleat and drew one
+slow breath over the wood. The little flawed casting she carried for the
+First Breath pressed against her ribs beneath her coat. Cazet noticed
+the breath and said nothing. He was oiling the folding stair’s release,
+doing it with the same attention he had given a real door.</p>
+<p>At dusk the five met behind the Blue Finch.</p>
+<p>Ilaro sat on an upturned basket, the sheet of household names across
+his knee. Rosceline listened while Pello described the wagon and Briska
+described what would and would not open. Daska had a piece of bread in
+one hand and kept the other free to trace the route on the yard’s packed
+dirt.</p>
+<p>“I take Vellum away from the door,” Rosceline said. “You two go
+in.”</p>
+<p>She meant Ilaro and Pello. Ilaro lifted his eyes.</p>
+<p>“I need to read the paper before anyone takes it. We know the
+wording, not what the original does.”</p>
+<p>“Yes.”</p>
+<p>“You won’t call him back until you have the signal.”</p>
+<p>“I heard you.”</p>
+<p>“I’m making certain.”</p>
+<p>Rosceline looked at the bread in Daska’s hand. “Is everybody going to
+say it?”</p>
+<p>Daska finished chewing. “I’m at the back. If you need the other way
+out, I’ll keep it open.”</p>
+<p>Briska saw Rosceline’s mouth soften before she turned away. It was a
+small thing, and perhaps she had imagined it.</p>
+<p>They waited until the Blue Finch’s lamps were lit. From inside came
+Basile’s opening chord. Briska put the ordinary cord loop, a small pry
+and two clean cloths into the side pocket of her bag. She left the
+spring on the kitchen sill.</p>
+<p>Lusette picked it up as they went through.</p>
+<p>“Is this useful?”</p>
+<p>“Not yet,” Briska said.</p>
+<p>“I know a man like that.”</p>
+<p>She set it aside for her portable bar and went to open the doors.</p>
+<h2 id="chapter-7-the-empty-hook">Chapter 7 — The empty hook</h2>
+<p>Vellum had a beautiful hand and an ugly way of using it.</p>
+<p>He wrote <em>insufficiently particular</em> across Rosceline’s
+proposed description, dried the words and returned the sheet without
+looking at her. The quill had made each letter narrow enough to suggest
+that more generous writing would have encouraged waste.</p>
+<p>“A disappointed purchase,” she said, “is perfectly particular to the
+person disappointed.”</p>
+<p>“The maestra must know what will be carried onto her stage.”</p>
+<p>“A box.”</p>
+<p>“Containing?”</p>
+<p>“The remains of an expectation.”</p>
+<p>He looked up.</p>
+<p>Rosceline smiled. “A neckcloth. Some letters. A small object whose
+value has declined since it was given to me. I do not intend to bring
+the gentleman.”</p>
+<p>“Is he alive?”</p>
+<p>“I am choosing to believe so. Otherwise my disappointment becomes a
+rather different act.”</p>
+<p>Vellum checked the point of his quill. His cuffs were so clean that
+she began wondering who washed them. A small key hung from a chain
+inside his waistcoat, and he had a habit of touching it when someone
+came too near the office steps.</p>
+<p>Pello came too near carrying a tray of cups.</p>
+<p>“Not here,” Vellum said.</p>
+<p>Pello stopped at the exact place where stopping would oblige the
+clerk to move. One cup tipped. Vellum caught the edge of the tray with
+both hands, furious before anything had spilled. Pello steadied it,
+apologized and went away.</p>
+<p>The chain lay against Vellum’s waistcoat. The key no longer did.</p>
+<p>Rosceline waited until the porter’s coat had disappeared behind the
+canvas screen.</p>
+<p>“Perhaps this is a question for your colleague.” She indicated the
+sweet booth a little way across the lane. “I should like the room to
+attend to me. Not merely remain in the same building.”</p>
+<p>“The permit secures your turn.”</p>
+<p>“It does not secure their interest. I have been married; I understand
+the distinction.”</p>
+<p>“Have you?”</p>
+<p>“More than once, if one counts promises.”</p>
+<p>He did not smile. She liked him less for making the work so
+one-sided.</p>
+<p>The office wagon stood behind him, its green paint blackened by the
+rain. At the rear, beyond his sight, Briska had fitted the little cord
+step. Ilaro waited beside a stacked crate with his hat pulled low
+against the lights. All Rosceline needed was enough time for them to go
+in, identify the original and come out by the shutter.</p>
+<p>Vellum put the quill down. “The Cotton Witch handles attention. I
+shall explain the permitted limits. We have had difficulties with people
+purchasing effects their performance could not contain.”</p>
+<p>“I promise not to exceed my audience’s capacity for delight.”</p>
+<p>“That is not the limit I meant.”</p>
+<p>He shut the front door and tried it with his hand. The latch held.
+When he reached for the missing key, Rosceline put her card in front of
+him.</p>
+<p>“The signature is already there.”</p>
+<p>He looked at Pann’s name, frowned and led her across the lane. He
+seemed to decide that locking the door could wait until she stopped
+talking. She intended to justify that decision for as long as
+possible.</p>
+<p>The woman in the white turban received them with a look of pleasure
+that Rosceline would have trusted more if it had required an effort. Her
+copper pan gave off a warm smell of burnt sugar. Fine threads of it
+trembled between her fingers as she lifted a little white cloud onto a
+stick.</p>
+<p>“A performance,” the Witch said. “How much of the room?”</p>
+<p>“All that can see me.”</p>
+<p>“And for how long?”</p>
+<p>Rosceline showed her the card.</p>
+<p>The Witch touched its edge. “A short glass. You could have
+longer.”</p>
+<p>“The permission is for one,” Vellum said.</p>
+<p>“I was speaking of desire.”</p>
+<p>“I was speaking of what we have sold.”</p>
+<p>The Witch looked at him, and for a moment Rosceline saw the
+impatience of someone interrupted during a lecture. Then the sweet smile
+returned.</p>
+<p>“What would you give for it?” she asked.</p>
+<p>“An equal interval in which I do not have to listen to anyone
+else.”</p>
+<p>“That is another purchase.”</p>
+<p>“So it is. I see why people like you.”</p>
+<p>Rosceline let herself look past the booth. Pello’s rust coat was no
+longer beside the crates. A sliver of light showed at the office’s rear
+shutter, then disappeared. The work had begun.</p>
+<p>The Witch rolled the spun sugar between her palms. It did not
+stick.</p>
+<p>“There are gracious prices. A little grace of your own. The ease with
+which you recognize an old friend’s footsteps. Your pleasure in a
+particular color.”</p>
+<p>“I am attached to my colors.”</p>
+<p>“Then something you do too much.”</p>
+<p>Vellum made a small sound.</p>
+<p>Rosceline turned toward him. “You have a recommendation?”</p>
+<p>“I have other work.”</p>
+<p>“And yet here we all are.”</p>
+<p>She asked about a period of silence because it seemed the answer most
+likely to annoy him and keep the conversation going. The Witch’s eyes
+warmed.</p>
+<p>“Your voice. An equal interval following the first. That would be
+neat.”</p>
+<p>“I was thinking about a possibility, not accepting an offer.”</p>
+<p>“Of course.”</p>
+<p>Vellum reached for a fresh slip. Rosceline put two fingers on the
+counter before he could begin.</p>
+<p>“No writing yet. I will hear the exact terms with the people who have
+to work beside me.”</p>
+<p>His glance sharpened. “The Countess’s people.”</p>
+<p>She kept her fingers where they were.</p>
+<p>“She knows a great many people.”</p>
+<p>“Nerisse said she would send some.”</p>
+<p>“Nerisse has always been optimistic about what her friends will do
+for her.”</p>
+<p>He looked toward the office wagon.</p>
+<p>Rosceline moved slightly, enough to put the bright counter lamp
+between his eyes and the dark lane. “Is she satisfied with the
+adjustment?”</p>
+<p>“Which adjustment?”</p>
+<p>“The one Pann promised her.”</p>
+<p>The clerk’s mouth closed. He checked the quill, though he had not
+used it since they left the steps.</p>
+<p>Behind him, a child began crying because the sugar animal she had
+purchased was melting. The Witch leaned down and reshaped it with two
+light touches. It stood on the paper again, smaller but recognizably a
+horse. The child’s tears stopped. Rosceline watched the mother reach for
+her purse and the Witch wave it away.</p>
+<p>“Some work is its own advertisement,” the woman said when she
+straightened.</p>
+<p>Vellum turned fully toward the wagon.</p>
+<p>Rosceline caught his attention with his own name. “Mr. Vellum. If I
+make the small purchase tomorrow, who ensures that what is taken is
+mine?”</p>
+<p>He looked back. “Whose would you prefer?”</p>
+<p>“I prefer to know who answers the question.”</p>
+<p>“The terms will be witnessed.”</p>
+<p>“By you?”</p>
+<p>“By the Harlequin, if you insist.”</p>
+<p>She wondered whether he had always sounded so tired of people asking
+where their money went, or whether that had developed after he stopped
+dealing only in money.</p>
+<p>At the rear of the wagon, Briska appeared beside the screen. She held
+one hand flat against her coat, then opened it.</p>
+<p>Empty.</p>
+<p>Rosceline felt a clean, cold irritation. Not fear yet. The original
+was not there, and the others were still inside. Briska’s second signal
+was to wait.</p>
+<p>She turned her attention back to the Witch.</p>
+<p>“Tell me about the silence. Does it prevent me writing something
+rude?”</p>
+<p>“No.”</p>
+<p>“That improves the offer.”</p>
+<p>Vellum had begun feeling along the chain inside his waistcoat.</p>
+<p>Rosceline saw his fingers reach the empty end. His face changed very
+little. That made it worse.</p>
+<p>“I must return to the office,” he said.</p>
+<p>“We haven’t finished.”</p>
+<p>“You have been very successful in making that clear.”</p>
+<p>He stepped around her.</p>
+<p>Rosceline could stop him with a hand, a spill, a small working that
+made him hear someone call. Each would buy seconds and make the next
+thing more difficult. She looked toward Briska. The artisan had raised
+two fingers: papers being read, more time needed.</p>
+<p>Rosceline lifted the copper pan from the sweet counter.</p>
+<p>“How is this supported?” she asked.</p>
+<p>The Witch caught the other handle before the pan tipped. Hot sugar
+shifted toward the rim. Vellum, already turning away, came back
+instinctively to save the writing slips beneath it.</p>
+<p>“Put that down.”</p>
+<p>“Gladly, if someone would tell me where.”</p>
+<p>The Witch’s fingers tightened on the handle. Rosceline felt the heat
+through the cloth she had taken from the counter. She had misjudged how
+heavy the pan would be. Sugar touched the edge and smoked.</p>
+<p>For one unpleasant moment there was nothing clever about the weight
+in her hands.</p>
+<p>Then Vellum dragged the stand beneath it and they set it down
+together.</p>
+<p>Across the lane, Briska dropped her hand and vanished behind the
+screen.</p>
+<p>The Witch looked at Rosceline without smiling.</p>
+<p>“You will pay for the cloth.”</p>
+<p>“Of course.”</p>
+<p>Rosceline put silver beside the pan and stepped away before either of
+them could decide what else she had bought.</p>
+<h2 id="chapter-8-the-actual-door">Chapter 8 — The actual door</h2>
+<p>The hook was empty.</p>
+<p>Pello held the office door while Ilaro read the little brass label
+beneath it. Nerisse’s name had been scratched into a removable strip.
+Two pinholes marked where a folded ticket had hung behind it. The
+adjacent hooks carried other wishes in neat packets, each with its lower
+corner left free.</p>
+<p>The thing they had come for had been there. He disliked how much more
+definite that was than finding no sign of it at all.</p>
+<p>“Moved,” he said.</p>
+<p>Pello eased the door shut. He put Vellum’s key on the desk where its
+owner would see it if he came in. Then he opened the rear shutter from
+inside and signaled Briska.</p>
+<p>Ilaro looked at the day’s working book. There were entries for
+supplies, staff advances, lost property and the cancellation of a wish
+to be taller. A note beside that last transaction directed somebody to
+shorten the customer’s new trousers at no charge.</p>
+<p>He found Nerisse’s name beneath a heading for the closing
+performance.</p>
+<p><em>Original transferred. Stage compartment. Presentation rack to be
+opened during final attraction. Personal attendance required.</em></p>
+<p>The entry bore Vellum’s initials and the time of that afternoon’s
+rehearsal.</p>
+<p>“He moved it after she told them we were coming.”</p>
+<p>Pello looked toward the shutter. Ilaro shook his head before the
+young man could signal departure.</p>
+<p>“There may be the price.”</p>
+<p>He turned one page. The writing stopped halfway down. Below it was a
+space that looked darker than the paper above, though no ink lay there.
+When he moved the lamp, the blankness moved against the light as if
+something thin and living had pressed itself beneath the sheet.</p>
+<p>He did not touch it again until Pello had come beside him.</p>
+<p>“Hold this toward the lamp. Not directly. There.”</p>
+<p>The paper was heavy vellum, warm at the edges. Pello held it while
+Ilaro moved the shade. Light came through the blank spaces. Letters
+formed between the ordinary lines, pale cuts through a darker
+surface.</p>
+<p><em>Voice of the house.</em></p>
+<p>There were names beneath it.</p>
+<p>Basile’s came first, then Tovin’s. Madal’s had been corrected, one
+letter scraped away and written again. Lusette’s remained clear at the
+bottom. Beside each was a mark of the same shape, filled to different
+depths.</p>
+<p>Ilaro took out the sheet the household had checked. He compared the
+names one by one. His hand had begun to ache from keeping the pencil too
+tightly between his fingers.</p>
+<p>Pello moved the lamp a fraction.</p>
+<p>“Don’t.”</p>
+<p>The young man stopped.</p>
+<p>“Sorry. The shade, not the flame. I need the light where it was.”</p>
+<p>Pello set it back. Then he put a folded rag beneath the shade so it
+would stay in place without either of them holding it.</p>
+<p>Ilaro copied the marks as well as the names. Under them, in ordinary
+ink, stood a shorter instruction.</p>
+<p><em>Principal retained for further engagement. Draw from attached
+household pending settlement.</em></p>
+<p>He read that twice.</p>
+<p>Nerisse’s name was not among those being charged.</p>
+<p>At the shutter Briska made a small, urgent sound. Pello looked over.
+She held up two fingers, then pointed toward the front.</p>
+<p>Ilaro wanted one more line, the one below the instruction. It might
+tell them how to undo what they had found. He could also hear someone’s
+boots in the lane, coming toward the steps.</p>
+<p>He folded his copy and put it into the inside pocket of his
+waistcoat. The source sheet went back under its covering page. He closed
+the book at the angle in which he had found it. There was nothing he
+could do about the lamp being warmer than it had been.</p>
+<p>Pello went through the shutter first. Briska took his elbow as he
+lowered himself onto the little cord step. Ilaro followed, sitting on
+the sill and turning with care. His coat caught on a splinter. For a
+moment he was half outside, unable to move without tearing it.</p>
+<p>The front latch clicked.</p>
+<p>He pulled. Cloth ripped behind his shoulder. Briska’s hand closed on
+his wrist, and the wagon wall slid past his face as his feet found the
+loop.</p>
+<p>Inside, Vellum said, “Who moved the lamp?”</p>
+<p>Pello took Ilaro’s weight for the last short drop. Briska shut the
+shutter. They crossed behind the screen just as someone went around the
+front wheel.</p>
+<p>Daska waited beside the ponies. She looked from Ilaro to the lane and
+moved without asking for an account.</p>
+<p>They nearly reached the public walkway.</p>
+<p>One of the ushers stepped out in front of Pello and caught his
+sleeve.</p>
+<p>“That’s Maret’s coat.”</p>
+<p>Pello turned the sleeve inside out around the usher’s hand, slipped
+free of the coat and left the man holding it. The movement was so quick
+that Ilaro understood it only after the empty garment dropped.</p>
+<p>“Here,” the usher shouted. “These people.”</p>
+<p>Daska took Ilaro by the back of his collar and put him through a
+canvas flap.</p>
+<p>Light struck from six directions.</p>
+<p>He was in the mirror attraction. Tall frames stood on wooden tracks,
+dividing the tent into little rooms that were not rooms. Lamps hung
+above them in red glass bowls. A woman in a feathered hat appeared to
+stand beside him, behind him and at the far end of a corridor that could
+not fit inside the tent.</p>
+<p>“Where’s the door?” she demanded.</p>
+<p>“Not that one,” Daska said.</p>
+<p>The woman had been reaching toward a dark rectangle. Daska caught her
+wrist before her knuckles struck glass.</p>
+<p>Pello passed them along the wall, watching the floor. Briska held a
+lamp low. Ilaro followed the strip of real mud beneath their feet. In
+the nearest mirror his reflection had not turned yet. It remained facing
+the place where they had entered, listening to something behind the
+canvas.</p>
+<p>He looked away.</p>
+<p>A hand struck the outside of the tent. The usher’s voice came through
+it, ordering somebody to close the far exit.</p>
+<p>Pello stopped beside a frame. A red rope went through an iron eye at
+its base and disappeared beneath the next panel. He stepped over it.
+Briska lifted the lamp higher for Ilaro to see.</p>
+<p>“Don’t put weight there.”</p>
+<p>Behind them came a wooden scrape. One of the moving mirrors slid
+toward the path they had just used. The woman in the hat screamed. Daska
+pushed her forward and turned back.</p>
+<p>A worker had been caught on the wrong side of the moving frame. His
+shoulder was wedged between its back and a tent pole, his face flat
+against the canvas. Someone outside kept pulling the operating rope.</p>
+<p>“Stop!” he shouted. “That’s me.”</p>
+<p>Daska seized the frame with both hands. It moved another inch before
+she braced her foot against the track. Glass shivered from top to
+bottom.</p>
+<p>Briska thrust the lamp at Pello and dropped beside the lower wheel.
+She drove her short pry under it, lifted and kicked the rope off its
+guide. The frame slewed sideways. Its upper corner struck the pole.</p>
+<p>The mirror broke with a noise like a roomful of teeth being
+crushed.</p>
+<p>Ilaro raised his arm. Something hot scored the back of his hand.
+Daska dragged the worker clear, half carrying him until his feet found
+the ground. The woman in the hat had begun laughing in sharp, frightened
+bursts. She could not seem to stop.</p>
+<p>“Bring her,” Briska said.</p>
+<p>Ilaro took the woman’s elbow. She came without resistance, looking
+over her shoulder at the pieces of herself still standing in the broken
+frame.</p>
+<p>Pello found the outer canvas seam by its ties. He drew his knife, cut
+two cords and lifted the flap. Night air came through, smelling of
+manure and onions.</p>
+<p>The actual ground was lower than the tent floor. Ilaro stumbled. The
+woman caught his sleeve, and for a moment they supported each other
+badly. Then Daska was beside them and the moment passed.</p>
+<p>They emerged between the ponies and a cook’s cart. Rosceline waited
+on the other side, holding a folded cloth against her palm.</p>
+<p>“Which way?” she asked Pello.</p>
+<p>He pointed toward the public midway. They went into it together,
+abandoning speed for the appearance of people who had purchased an
+unpleasant entertainment and were looking for something better.</p>
+<p>The woman in the hat stopped at a bench. She removed the hat, stared
+at the broken feather and began swearing with admirable steadiness. The
+worker sat beside her and held his shoulder.</p>
+<p>Daska waited until he could lift the arm. Then she told him who had
+kept pulling the rope. He already knew.</p>
+<p>They left the pair there with a cup of the cook’s water.</p>
+<p>Beyond the last lamps, Ilaro stopped walking. The pain in his head
+had become large enough to obscure the rest of the street. He wanted to
+sit down before it noticed he was still standing.</p>
+<p>Rosceline pointed at a low wall. He sat. Pello stood between him and
+the carnival lights while Briska wrapped the cut on his hand.</p>
+<p>“Did you get it?” Rosceline asked.</p>
+<p>“No. It’s beneath the main stage. Guarded until the last show.”</p>
+<p>Her mouth tightened. “And?”</p>
+<p>He took the folded sheet out of his waistcoat and put it in her
+unburned hand.</p>
+<p>She read without speaking. Daska leaned over her shoulder.</p>
+<p>“He’s keeping Nerisse,” Rosceline said at last.</p>
+<p>Ilaro closed his eyes. “Read the line before that.”</p>
+<p>She did. When he opened his eyes again, her face had lost its
+practiced interest.</p>
+<p>“We go back to the Finch,” she said.</p>
+<p>Nobody objected. He stayed on the wall until Briska finished the
+knot. Then he stood, slowly, and let the others set the pace.</p>
+<h2 id="chapter-9-the-last-potato">Chapter 9 — The last potato</h2>
+<p>Lusette stood beside the open doors with a slate in her hands.</p>
+<p>Rosceline saw it before she saw the young woman’s face. On the slate,
+in thick white letters, was the price of the remaining standing places.
+Beneath that someone had written <em>No credit</em>. The second line had
+been underlined hard enough to break the chalk.</p>
+<p>A man tried to argue. Lusette opened her mouth, stopped, and turned
+the slate toward him again.</p>
+<p>Rosceline put a hand on his sleeve.</p>
+<p>“Pay or move. She has a room to fill.”</p>
+<p>He looked at her face and chose to pay.</p>
+<p>Lusette took the coins. She was trying not to look relieved by the
+help. Rosceline recognized the effort and let her continue with it. She
+went into the house without asking for an explanation she could already
+see.</p>
+<p>Nerisse was midway through the second set. There was a high color in
+her cheeks, and the red dress caught the lamps each time she turned.
+Basile had put a little board beside his instrument with the next three
+keys written on it. When she glanced down, he touched the one she
+needed.</p>
+<p>The room listened.</p>
+<p>Rosceline stood at the back with the stolen names inside her coat.
+The little burn on her right palm stung beneath its cloth. At the stage
+edge Nerisse lifted a hand toward her, recognizing a friend or a
+problem. Then her eyes went past Rosceline to Lusette’s slate.</p>
+<p>For a moment the hand stayed raised.</p>
+<p>Basile waited at the end of a bar. Nerisse took the next breath and
+continued. The held note was beautiful. Rosceline wished it had not
+been.</p>
+<p>She remained standing through the rest of the set. Daska found a
+place beside the side wall. Ilaro went to the washroom with Briska;
+Pello stayed near the doors and quietly took over the disputes that
+required a voice.</p>
+<p>There were three of those before the evening ended. One man insisted
+he had bought a seat that did not exist. Pello found the seat in the
+kitchen, put it at the end of a row and made two people move their
+knees. Another complained that he could not see around the woman in
+front of him. Pello looked at the woman, then at the man, and went back
+to the door.</p>
+<p>Nerisse sang her last song standing quite still.</p>
+<p>When the applause began, she closed her eyes. Rosceline had seen her
+acknowledge rooms far more important than this one with less pleasure.
+The people rose; chairs scraped; someone called for the harbor song
+again. Nerisse opened her eyes and shook her head, smiling, as though
+refusal had become a delightful luxury.</p>
+<p>Lusette waited until the room had emptied before she put the slate
+down.</p>
+<p>In the kitchen, the potatoes had gone cold in their pan. Tovin warmed
+them again while Madal found enough plates. Basile sat by the back door
+with his coat on, keeping close to the strip of air in which speech
+sometimes returned to him. He looked at the food before looking at
+Nerisse.</p>
+<p>“There’s bread,” she said.</p>
+<p>He nodded. Madal put the loaf beside him.</p>
+<p>Rosceline laid Ilaro’s copy on the cleared corner of the table. She
+kept her burned hand away from the grease. Nerisse read the ordinary
+lines first, then the names underneath.</p>
+<p>“That isn’t the ticket.”</p>
+<p>“It is what he has written against it,” Ilaro said.</p>
+<p>“You copied this?”</p>
+<p>“Pello held the light.”</p>
+<p>The young man nodded when she looked at him. He had put his bread on
+the edge of his plate, leaving the center for the potatoes Tovin was
+serving.</p>
+<p>“Pann said it was temporary,” Nerisse said.</p>
+<p>“Pending settlement,” Rosceline replied. “That part was
+accurate.”</p>
+<p>Lusette drew the slate toward herself. She wrote, wiped away two
+words with the heel of her hand and wrote again.</p>
+<p><em>Did you ask whose?</em></p>
+<p>Nerisse looked at her niece. “She said she would speak to the
+clerk.”</p>
+<p>Lusette left the question where it was.</p>
+<p>Tovin put the potato pan down harder than he intended. The handle
+struck a cup and knocked it over. Pello caught the cup; Daska moved the
+paper before the water reached it. For a short while everybody had
+something to do.</p>
+<p>Rosceline could have used the interval. She knew exactly how to turn
+the wet table and the household’s anger into a decision Nerisse would
+later describe as her own. She began with the practical part.</p>
+<p>“You will remain here tomorrow. We will bring the original and you
+will make the return before anyone asks for another song.”</p>
+<p>“No,” Nerisse said.</p>
+<p>Rosceline had not expected the answer to come so readily.</p>
+<p>“They are taking Lusette’s voice.”</p>
+<p>“I can see that.”</p>
+<p>“Then look at her.”</p>
+<p>Nerisse did. Lusette’s face was flushed above the slate. She had been
+speaking for the whole house since she was old enough to reach the
+latch, and now she had to wait while other people took turns with her
+silence.</p>
+<p>“I have promised the performance,” Nerisse said.</p>
+<p>“You promised your voice,” Daska answered. “You can change your mind
+about that. You don’t get to promise hers.”</p>
+<p>“I didn’t know.”</p>
+<p>“You do now.”</p>
+<p>Nerisse stood. Her chair scraped back against the stove. Madal caught
+its upper rail before it struck the hot iron.</p>
+<p>“You think I wanted this? You think I looked at them and decided they
+had nothing better to do than pay for me?”</p>
+<p>Nobody answered quickly enough to help her.</p>
+<p>She sat again, more carefully. The kitchen was hot now, with the
+stove drawing properly and too many people breathing in it. Rosceline
+could smell the sweetness of the stage powder beneath Nerisse’s
+sweat.</p>
+<p>“I want to stand in that tent,” Nerisse said. “Once. I have wanted to
+stand somewhere like it since I was a girl. I am ashamed of wanting it
+tonight, and I want it anyway.”</p>
+<p>Daska looked down at her plate. She moved a potato through the grease
+without taking it.</p>
+<p>Basile pulled his coat tighter. When he spoke, his voice was thin but
+there.</p>
+<p>“Then stand there. But don’t make me sit here forever.”</p>
+<p>Nerisse covered her mouth with her hand.</p>
+<p>Rosceline looked away. She did not like watching people discover that
+the sentence they had prepared would not serve. She had made a
+profession of causing it and disliked it most when it happened without
+her assistance.</p>
+<p>Pello waited until Nerisse lowered her hand.</p>
+<p>“If I put the original in your hand, will you return it?”</p>
+<p>“At the tent?”</p>
+<p>“Before the bell.”</p>
+<p>She looked at the copy of the names. “Yes.”</p>
+<p>“Even if they’re still asking you to sing?”</p>
+<p>It took her longer that time.</p>
+<p>“Yes.”</p>
+<p>Lusette wiped the slate. She wrote one word, large enough for her
+aunt to read from across the table.</p>
+<p><em>Yourself.</em></p>
+<p>Nerisse nodded.</p>
+<p>Ilaro drew his notebook toward him. Rosceline raised a hand before he
+opened it.</p>
+<p>“We are trusting her to give up something she has just told us she
+cannot bear giving up.”</p>
+<p>“We’re asking her to,” Daska said. “That was the work.”</p>
+<p>“And if she doesn’t?”</p>
+<p>“Then she doesn’t.”</p>
+<p>Rosceline looked at the monk’s hand on the table. The left fingers
+lay comfortably now, except for the smallest, which would not quite rest
+flat. She remembered them dragging a chain around black stone while Rell
+stood below the ladder offering terms.</p>
+<p>She took her eyes from the hand.</p>
+<p>“We need time after the song,” she said.</p>
+<p>Ilaro opened the notebook. “We need time before it ends. Whatever
+they usually do afterward, we don’t rely on it.”</p>
+<p>Nerisse described the final program. Her last advertised song was
+<em>The South Window</em>. The carnival usually allowed requests after
+its principal attraction; Pann had promised two encores if the crowd
+wanted them. The iron bell would settle the engagement when Pann gave
+the cue. It could not take Nerisse’s payment before the advertised
+farewell, but an encore was a favor, not part of what she had
+purchased.</p>
+<p>“Then the last verse,” Ilaro said. “We plan to have it done before
+the last verse.”</p>
+<p>Ilaro folded his copy of Vellum’s instructions and put it back inside
+his waistcoat. Then he asked Nerisse to show them the return fold using
+her ordinary copy. She brought it from the cupboard. The drawn cuts
+marked the corner that would cross her name on the real ticket. She
+folded the copy and unfolded it. Nothing happened.</p>
+<p>Pello watched closely. Then he gave it back.</p>
+<p>By the time the questions were finished, the potatoes had cooled
+again. Daska asked whether anybody wanted the last one. Tovin said yes
+at the same moment she put her fork into it.</p>
+<p>She cut it in half.</p>
+<p>“That’s not half,” he said.</p>
+<p>“It is from here.”</p>
+<p>Lusette laughed without sound. The movement brought a brief fear to
+Nerisse’s face, then something softer and more painful. She reached
+across the table and laid her hand near her niece’s. Lusette left it
+there, close but untouched.</p>
+<p>Rosceline helped Madal carry the plates to the basin. Her palm hurt
+when the warm water reached the new blister. She bit back a complaint
+and found Madal looking at her.</p>
+<p>“Give me those. You’ll only drop one.”</p>
+<p>Rosceline surrendered the plates. It was easier than making a
+generous gesture of it.</p>
+<h1 id="part-iii-one-interruption">Part III — One interruption</h1>
+<h2 id="chapter-10-a-turn-of-the-glass">Chapter 10 — A turn of the
+glass</h2>
+<p>Cazet wanted to know who had broken the mirror.</p>
+<p>Briska pointed to herself, then explained the wheel, the rope and the
+worker’s trapped shoulder. He listened without speaking. When she
+finished, he asked which frame.</p>
+<p>“The tall one with the red lower rail.”</p>
+<p>“It should have had a stop.”</p>
+<p>“It did. The stop had split.”</p>
+<p>He put his breakfast down and went to look. She followed him across
+the morning grounds, past a woman washing paint from her face into a
+bucket. Without the lamps, the midway looked like a collection of
+objects that had survived a bad move. A paper moon lay face down in the
+mud. The dragon’s missing teeth had been replaced with pieces of
+white-painted shingle.</p>
+<p>At the mirror tent the worker Daska had freed stood arguing with an
+usher. He had one arm in a sling. Cazet asked him a question Briska
+could not hear. The man answered, and Cazet turned to the usher.</p>
+<p>“If you can’t hear someone inside, you stop pulling.”</p>
+<p>“The rope was—”</p>
+<p>“You stop pulling.”</p>
+<p>Briska waited while he inspected the frame. He removed the broken
+stop and put it in his apron. He would make another, he said, before
+anyone used the track again.</p>
+<p>Back at the main stage he handed Briska the other tray of tools.</p>
+<p>“You’re working, then?”</p>
+<p>“If you’ll have me.”</p>
+<p>“I’ll have the panels opening when I ask. What you do after that is
+becoming expensive.”</p>
+<p>She accepted the tools without promising anything she could not
+keep.</p>
+<p>Pello arrived carrying two repaired pieces of scenery on Trissot’s
+handcart. The carrier’s man stayed at the goods gate to wait for the
+evening load. He had a stool, a basket of food and the expression of
+someone who had been paid to remain unimpressed.</p>
+<p>Pello took Briska to the far end of the staff passage. Beneath the
+platform, behind a low locked hatch, a rectangular compartment had been
+fitted between the joists. Through the gap above it she could see a row
+of hooks and a little presentation rack. Two ushers sat nearby with a
+tray of breakfast between them. One had the rust coat folded at his
+feet.</p>
+<p>“They remember,” Pello said.</p>
+<p>“Yes.”</p>
+<p>He showed her the route Vellum would have to take when he opened the
+compartment: out through the low hatch, up the ordinary staff steps,
+along the passage behind the parlor wall, then onto the stage beside the
+settlement table. Cazet’s folding stair stood against that wall, waiting
+for Salo’s earlier routine. Its release was within reach of the scenery
+cleat.</p>
+<p>“You won’t get near the rack while those two sit there.”</p>
+<p>Pello nodded. “During the song they go to the aisle. One stays. I
+need him looking up.”</p>
+<p>They returned to the Finch for the rest of the company. Nerisse had
+gone through her program with Basile, marking where the carnival
+orchestra would take the part he usually played. He had written two
+corrections in the margin. She had accepted one and argued about the
+other. He looked pleased by the argument.</p>
+<p>Ilaro spread a rough drawing on the kitchen table. He had given up
+trying to make the tent round and drawn the paths that mattered. The
+stage lay at the top of the page, the goods gap to its left, the bell
+frame to its right. The public entrance was at the bottom. The hatch and
+the staff passage had their own marks behind the stage.</p>
+<p>“If the rack stays where Pello saw it, we use the first route. If
+Vellum moves the paper early, Pello follows him. Nobody starts the
+return without the original.”</p>
+<p>“We have established that,” Rosceline said.</p>
+<p>“I’m establishing where each person is when it stops being easy.”</p>
+<p>She let him continue.</p>
+<p>Daska would stay near Nerisse at the stage’s goods side. Briska would
+keep the panels ready, with a red cloth tied at the cleat to show the
+route could open. Ilaro would watch the bell cues from the shaded prompt
+position. A narrow white card raised once would mean the normal interval
+remained. Turned to its dark reverse, it would mean the iron bell was
+being prepared early. One of Cazet’s runners would take the card across
+if the passage stayed clear.</p>
+<p>Pello would keep the recovered ticket until Nerisse was beside him.
+Rosceline would take the declared interruption before <em>The South
+Window</em>. She would hold the room while the compartment was opened
+and the ushers went to their posts.</p>
+<p>“Holding a room is uncertain,” she said.</p>
+<p>“That’s why we have two routes.”</p>
+<p>“I can make that part less uncertain.”</p>
+<p>Briska looked up from the drawing.</p>
+<p>Rosceline described the Witch’s offer. An interval of attention
+followed by an equal interval without her own voice. She made it sound
+almost ordinary until she reached the second interval. Then Daska put
+down the cup she had been turning between her palms.</p>
+<p>“Yours.”</p>
+<p>“Who else’s would I offer?”</p>
+<p>Nobody answered.</p>
+<p>Rosceline’s face closed. Briska regretted the silence and did not
+know what she could honestly put in its place.</p>
+<p>“We hear the terms,” Pello said.</p>
+<p>“That is why I am telling you now.”</p>
+<p>They went together to the Harlequin’s booth.</p>
+<p>The small glass stood on a table with its sand in the lower bulb. The
+Harlequin measured five minutes with it; Briska had asked. Beside it lay
+Rosceline’s white card. The Cotton Witch came carrying no sweets this
+time, only a narrow strip of pale ribbon and a folded paper. Vellum was
+absent. Briska was glad of that until she wondered what he might be
+doing instead.</p>
+<p>The Witch laid out the exchange. The attention would begin when the
+Harlequin turned the glass for Rosceline’s declared act. At the end of
+the first turn, her voice would be unavailable for an equal duration.
+She could move, write, make signs and leave. No other person would pay
+the price. The audience would attend, not obey. The workers could
+continue their work and the maestra could still recognize something she
+disliked.</p>
+<p>“If she withdraws before it begins?” Ilaro asked.</p>
+<p>“Nothing is taken.”</p>
+<p>“After it begins?”</p>
+<p>“Both intervals run. Attention cannot be put back into the moments in
+which it was given.”</p>
+<p>Briska pointed at the glass. “If that breaks?”</p>
+<p>The Harlequin touched the upper bulb. “The glass measures. It does
+not make the time.”</p>
+<p>Rosceline read the paper herself. Then she passed it to Ilaro, who
+read the exact wording aloud. Pello listened from beside the booth’s
+open side. Daska watched the Witch’s hands.</p>
+<p>“At the end of her turn, I turn the glass again,” the Harlequin said.
+“At the end of that turn, the voice returns. The closing bell does not
+alter this exchange.”</p>
+<p>Rosceline signed with the name they knew her by. The Witch tied the
+pale ribbon around the foot of the glass. It tightened without a visible
+knot.</p>
+<p>Briska felt the hair along her forearm rise.</p>
+<p>Nothing happened to Rosceline. She thanked the Witch with an
+extravagance that made Daska shut her eyes briefly.</p>
+<p>Outside, Rosceline stopped them before they separated.</p>
+<p>“While I cannot speak, you will have to refrain from interpreting
+every expression as agreement.”</p>
+<p>“We manage now,” Briska said.</p>
+<p>Pello put a hand on the stage drawing beneath Ilaro’s arm. “If I’m
+late, stay where you said.”</p>
+<p>Rosceline looked at him. “The side stair may be closed.”</p>
+<p>“Then we use the panels.”</p>
+<p>“Pello—”</p>
+<p>“If I’m late.”</p>
+<p>The fairground was filling around them. A man carried a stack of
+benches so high that only his boots were visible. Rosceline stepped
+aside to let him pass. When he had gone, she looked back at Pello.</p>
+<p>“I’ll stay.”</p>
+<p>He took his hand from the drawing.</p>
+<p>Briska returned to the stage with him. They tested the panels once
+more, slowly, with Ilaro standing in the gap and then Nerisse. Daska
+watched the singer’s long skirt clear the lower rail and asked her to
+wear shoes she could walk in.</p>
+<p>“I can walk in my own shoes,” Nerisse said.</p>
+<p>“Then show me.”</p>
+<p>The singer walked the route. At the little step down she caught the
+hem with her heel. Daska waited while she freed it, then asked her to do
+it again.</p>
+<p>Briska knelt to smooth the rail’s upper edge. Above her, Nerisse
+lifted the skirt a little higher and made the step without catching
+anything.</p>
+<p>“There,” she said.</p>
+<p>Daska nodded. “Again.”</p>
+<h2 id="chapter-11-beyond-the-lamps">Chapter 11 — Beyond the lamps</h2>
+<p>Pann found Rosceline watching a boy mend a paper moon.</p>
+<p>He was older than she had first thought, perhaps twenty, with a
+careful little beard and glue drying in the hair on his wrists. The moon
+had split across its smiling face. He held the edges together while the
+paper dried, unable to scratch his own nose.</p>
+<p>Rosceline scratched it for him with the clean end of a
+paintbrush.</p>
+<p>“Higher,” he said.</p>
+<p>“You are becoming demanding.”</p>
+<p>“I’ve been holding this since lunch.”</p>
+<p>She scratched higher. He sighed with such uncomplicated pleasure that
+she almost envied him.</p>
+<p>“You could do useful work here,” Pann said behind her.</p>
+<p>Rosceline set down the brush. “I usually prefer work with a more
+flattering audience.”</p>
+<p>“He looks grateful.”</p>
+<p>“He has glue in both hands. His standards are temporarily low.”</p>
+<p>The ringmaster stood beneath a rope of unlit lamps. In daylight her
+blue waistcoat showed small, careful repairs. A button at her throat had
+been replaced with one from a different set. Rosceline had expected
+something more immaculate and was annoyed to find the imperfection
+attractive.</p>
+<p>They walked beside the great tent. Through a lifted side flap
+Rosceline could see Daska making Nerisse repeat the little descent. The
+singer’s patience had worn thin; the monk’s had not yet become pleasant.
+Briska stood at the scenery cleat with a red cloth in her hand.</p>
+<p>Pann watched for a moment.</p>
+<p>“Nerisse used to rehearse like that.”</p>
+<p>“She is rehearsing like that.”</p>
+<p>“Because someone is making her.”</p>
+<p>“We all require encouragement.”</p>
+<p>“And what encourages you?”</p>
+<p>Rosceline let the question sit between them. Pann did not hurry to
+improve it. They reached a small platform beside the lane, empty except
+for a stool and a lamp whose glass was smoked at the top.</p>
+<p>“Stand there,” Pann said.</p>
+<p>“I have paid for one square of boards already.”</p>
+<p>“This one is free to look at.”</p>
+<p>Rosceline put one foot on the platform, then the other. It was lower
+than it appeared. From the ground it had seemed an insignificant little
+place for a singer or a juggling child. From its center she could see
+three lanes meeting, the line at the sweet booth and the people moving
+between them.</p>
+<p>Pann changed the angle of the smoked lamp. Nothing lit. It was broad
+afternoon. Yet the people nearest the platform began looking toward
+Rosceline.</p>
+<p>A woman carrying a bucket slowed. A pair of workers stopped their
+argument long enough to hear what she might say. The boy with the moon
+turned his head without releasing his grip.</p>
+<p>Rosceline could have spoken to any one of them and made the others
+want to be next.</p>
+<p>She felt the opportunity as clearly as a hilt settling into her
+palm.</p>
+<p>“They haven’t bought anything,” she said.</p>
+<p>“Neither have you.”</p>
+<p>“And if I step down?”</p>
+<p>“Then they continue their afternoon.”</p>
+<p>She stayed another moment. The silence was rich with other people’s
+expectation. Nobody was asking whether she had told them everything.
+Nobody had a notebook open.</p>
+<p>“A dreadful little lamp,” she said, and stepped down.</p>
+<p>The woman went on with her bucket. One worker resumed the argument at
+exactly the word he had abandoned. Rosceline disliked the small
+emptiness that followed.</p>
+<p>Pann had seen it. Of course she had.</p>
+<p>“You know how to use a room. Most people only want to be in the
+middle of it.”</p>
+<p>“Most rooms are badly arranged.”</p>
+<p>“You would have a say in that.”</p>
+<p>They walked farther along the lane. Beyond the last lamps a mule
+stood with one hind hoof lifted, patiently allowing a man to remove a
+stone from it. The road beyond the mule led back toward Silkstrand’s
+houses and ordinary afternoon business.</p>
+<p>“You know why we’re here,” Rosceline said.</p>
+<p>“I know why the clerk has demanded another lock.”</p>
+<p>“He has been using it badly.”</p>
+<p>“He uses everything badly when he thinks somebody is watching his
+hands.”</p>
+<p>“And Nerisse?”</p>
+<p>Pann stopped beside the final lamp post. “Nerisse wanted a farewell
+that felt like the beginning of something. I can give her that.”</p>
+<p>“At other people’s expense.”</p>
+<p>“Do you propose to teach me how to keep an audience fed, Madame
+Rosceline?”</p>
+<p>There was no accusation in the question. That made it difficult to
+enjoy an answer.</p>
+<p>Rosceline looked beyond the post. Pello had left his own plain coat
+on a carrier’s bench near the mule. A little boy was considering one of
+its pockets with the open concentration of a beginner. Rosceline called
+to him. He withdrew his hand and ran.</p>
+<p>She went out to the bench and took up the coat.</p>
+<p>Pann followed one pace.</p>
+<p>Her boot reached the edge of the lightless circle beneath the final
+lamp. The movement stopped so abruptly that her upper body carried
+forward without it. She caught the post with one hand. The little bell
+at her wrist rang once.</p>
+<p>Rosceline turned with the coat over her arm.</p>
+<p>Pann’s foot had not crossed the worn line in the mud. She set it
+back, adjusted the cuff of her waistcoat and smiled.</p>
+<p>“Your friend should choose his attendants more carefully.”</p>
+<p>“He generally does.”</p>
+<p>Rosceline returned to her side of the post. She did not look down
+again. Pann did not thank her.</p>
+<p>For a while they watched the man work the stone from the mule’s hoof.
+When it came free, he showed it to the animal before putting it into his
+pocket. The mule lowered its foot and shifted its weight.</p>
+<p>“After your interruption,” Pann said, “there will be a quieter stair
+on the far side. If you wish to talk about an engagement, I can make
+time.”</p>
+<p>“I have work to finish.”</p>
+<p>“A person may have more than one employment.”</p>
+<p>“And less than one evening in which to consider it.”</p>
+<p>“Then consider it while you work.”</p>
+<p>Pann went back toward the tent. The lamps along the lane stirred
+though the wind had dropped. Rosceline remained by the post with Pello’s
+coat in her hands. She was still thinking about the platform when he
+came to find it.</p>
+<p>“Did you leave anything valuable in the pocket?”</p>
+<p>He took the coat, checked one seam and shook his head.</p>
+<p>“How discouraging for the child.”</p>
+<p>Pello put it on. “What did she want?”</p>
+<p>Rosceline looked at him. He had not asked where she had been or
+whether she intended to explain. He asked what they needed to know.</p>
+<p>“To employ me. She knows about the office. She has watched the goods
+route, and she expects to keep me talking after the act.”</p>
+<p>“Will you?”</p>
+<p>“I said I had work to finish.”</p>
+<p>He waited. She could have told him about the lamp. Instead she said,
+“She offered the far stair. We should assume someone will be waiting
+beside the near one.”</p>
+<p>Pello nodded and went to tell Briska.</p>
+<p>At the main tent, the artisan heard the account and swore softly. She
+moved the pull from its visible cleat to a second eye behind the painted
+parlor wall. A length of disconnected cord remained at the old position.
+She told Cazet which one now worked and made him pull it himself before
+leaving it.</p>
+<p>Ilaro listened while standing out of the draft. He asked whether Pann
+had mentioned changing the song or the settlement. Rosceline said she
+had not.</p>
+<p>“She can still drop the encores,” he said. “We keep the second
+cue.”</p>
+<p>Daska was watching Nerisse drink a little honey water. The monk
+looked at Rosceline, then at the far stair, and said nothing.</p>
+<p>Rosceline went to rehearse her act on an empty strip of boards. She
+opened the box, took out the neckcloth and began speaking to a gentleman
+who was not there. The first version sounded too much like a woman
+explaining a disappointment.</p>
+<p>She tried it again as a woman trying to sell one.</p>
+<p>That was better.</p>
+<h2 id="chapter-12-a-full-room">Chapter 12 — A full room</h2>
+<p>Ilaro’s place was behind the painted parlor, where the light reached
+him only after passing through a piece of canvas.</p>
+<p>Cazet had found a stool that did not rock. Beside it stood a little
+shelf for the program, the cue card and a cup. The arrangement would
+have looked considerate if Ilaro had not watched the carpenter charge
+Briska for the canvas. He found that reassuring. It could be asked for
+again without anybody needing to feel generous.</p>
+<p>The passage to the bell frame lay to his right. Through a narrow gap
+in the scenery he could see the iron bell’s rope and the foot of the
+person assigned to it. The brass departure bell was farther out, beyond
+the tent’s edge. Their ropes ran through separate guides.</p>
+<p>He checked those twice, then left them alone.</p>
+<p>Jorise, the runner Cazet had lent them, arrived carrying a bowl of
+soup. She was a narrow, dark-haired woman with a quick, practical walk.
+She set the bowl on the floor, where a passing sleeve could not catch
+it, and asked which card she was taking where.</p>
+<p>Ilaro showed her both sides.</p>
+<p>“White, the normal interval. Dark, they’re preparing settlement
+early. Daska at the goods-side wing. She passes it to Rosceline.”</p>
+<p>“Why?”</p>
+<p>He looked at her. He had been about to say it was not her concern.
+Her face made him hear how that would sound.</p>
+<p>“We’re taking Nerisse’s original ticket so she can return the wish.
+The clerk doesn’t intend to give it back.”</p>
+<p>Jorise picked up the card and examined its plain dark reverse.</p>
+<p>“If the ushers stop me, I come back. I’m not hitting anyone for
+Cazet’s wages.”</p>
+<p>“Yes.”</p>
+<p>“You’ll pay me yourself.”</p>
+<p>He did, from his advance. She checked the coin with a fingernail, put
+it away and sat beside her soup.</p>
+<p>Out front, the benches filled. Ilaro could hear the change in the
+tent’s sound as bodies absorbed the little echoes and replaced them with
+coughs, gossip and the shuffle of coats. A woman asked whether the seat
+beside her was taken. The answer was long enough to suggest the man she
+had asked hoped it might be.</p>
+<p>Near the stage, somebody began clapping too soon. The sound stopped
+in embarrassment. Salo came out to rescue it with his false stomach.</p>
+<p>Ilaro watched through the gap. The performer climbed the folding
+stair, patted his belly and tried to sit on a chair that Cazet had built
+to move away from him. The stair dropped. The belly rose. Salo followed
+it with such outraged dignity that the room laughed before he reached
+the mat.</p>
+<p>He had done it three times that afternoon. The knowledge did not make
+it less funny.</p>
+<p>Jorise ate her soup without looking up. “He’ll try the new turn if
+they laugh enough.”</p>
+<p>“Is it ready?”</p>
+<p>“No.”</p>
+<p>Salo considered the extra turn, felt the audience waiting and made a
+smaller bow instead. Behind the curtain Cazet let out a breath. Ilaro
+wrote nothing about it.</p>
+<p>The ringmaster crossed the stage. Her mirrored coat caught the lamps
+and broke them into little wandering pieces of light. She spoke to the
+people near the front, then lifted her voice so those at the back felt
+they had merely arrived closer.</p>
+<p>Nerisse entered on her arm.</p>
+<p>The singer wore the red dress. Madal had taken it in one last time. A
+line of darker beads hid the repair at the waist. Daska stood in the
+wing with Nerisse’s plain walking shoes under one arm; the singer had
+agreed to change for the exit, and the monk was making certain the shoes
+did not disappear among the costumes.</p>
+<p>Ilaro looked toward the compartment. One usher remained beside it.
+The other had gone to settle an argument over seats. Vellum was nowhere
+he could see.</p>
+<p>Nerisse began without speaking first.</p>
+<p>The song was lighter than the harbor ballad. A girl had promised
+three suitors the same dance and arrived at the feast with a fourth. The
+verses gave each man a reason to think he had misunderstood, and every
+reason made his position worse. Nerisse took pleasure in the
+misunderstandings. The orchestra followed her with a polish Basile’s six
+strings could never have supplied, but she left the musicians no time to
+congratulate themselves on it.</p>
+<p>Ilaro remembered hearing the song years ago in a tavern where he had
+been waiting for somebody who never arrived. He had spent the evening
+angry at the delay and remembered the tune anyway. Now, when Nerisse
+changed one old phrase, he almost sang the earlier words aloud.</p>
+<p>He stopped himself because he wanted to hear hers.</p>
+<p>At the side opening he saw Lusette with a slate tucked under her arm.
+She had come for the last performance. Tovin stood beside her; Madal had
+taken a place a little farther forward where she could see whether the
+beads were holding. Basile remained at the Finch with the instrument. He
+had told Ilaro he had packing to do.</p>
+<p>The song ended. Nerisse acknowledged the orchestra before the
+audience. It was a gracious thing, and the first violinist’s face showed
+how rarely he received it from a hired star.</p>
+<p>During the next piece, Pello passed behind the parlor wall carrying a
+bundle of ordinary rope. He put it beside the scenery rack and continued
+toward the low hatch. His movements were so unhurried that Ilaro had to
+resist looking after him.</p>
+<p>Briska came the other way. She touched the hidden pull once and gave
+Ilaro a small nod.</p>
+<p>The goods route could open.</p>
+<p>Rosceline waited with the little box on her lap. She had changed into
+a pale coat that made the repaired cuff look intentional. Her right palm
+was covered by a thin glove. The left hand rested on the lid, still
+enough to suggest she had become more nervous than she wished to
+admit.</p>
+<p>She caught Ilaro looking and raised an eyebrow.</p>
+<p>He showed her the white side of the card.</p>
+<p>She nodded and returned her attention to the song.</p>
+<p>There was time in which nothing went wrong. Ilaro drank his water.
+Jorise finished the soup. Through the gap he watched Nerisse stand close
+enough to the front row that an old woman could reach out and touch the
+hem of her dress. The woman did not touch it. She sat with both hands
+folded instead.</p>
+<p>Pann stood at the opposite wing. Her gaze moved from the singer to
+the household at the side opening, then toward the staff passage. She
+did not need to know every part of the plan to know where its people had
+placed themselves.</p>
+<p>Ilaro felt the old urge to get ahead of the evidence. He could decide
+now what she intended, set everybody moving and perhaps be right.</p>
+<p>He put one finger against the edge of the card and waited.</p>
+<p>The next song finished. The Harlequin appeared at the front of the
+stage with the small glass in one hand. Rosceline stood and gave her box
+a little shake. Something inside it made a deliberately disappointing
+rattle.</p>
+<p>The Harlequin named her interruption. A few people groaned, expecting
+an advertisement. Rosceline stepped into the light as though she had
+been waiting all evening to apologize for exactly that.</p>
+<p>Ilaro watched the glass turn.</p>
+<h2 id="chapter-13-the-declared-interruption">Chapter 13 — The declared
+interruption</h2>
+<p>Rosceline had the room before she had decided what to do with the man
+in the third row.</p>
+<p>He was enormous, comfortably seated and already looking forward to
+being disappointed. His wife had put a paper of sweets on his knee.
+Every time he moved, she steadied it without looking down.</p>
+<p>“I have come,” Rosceline told them, “to return a gentleman.”</p>
+<p>The room laughed in the places she expected. The man in the third row
+did not. He looked at the little box beneath her arm with genuine
+curiosity.</p>
+<p>“He was considerably larger when I acquired him. I mention this
+because the seller has suggested ordinary wear.”</p>
+<p>The laughter grew. She set the box on the table the Harlequin had
+provided and lifted its lid.</p>
+<p>The room followed her hands.</p>
+<p>She had held audiences before. There were always people at the edges
+to be drawn back, a whisper to be interrupted, a glance that meant
+somebody had begun thinking about the money in their pocket. Now she
+could feel those small departures begin and fail. Eyes returned to her
+without deciding to. A woman near the entrance kept turning her head
+toward the door and back again, puzzled by her own interest.</p>
+<p>Rosceline took out the neckcloth.</p>
+<p>“This was offered as proof of constancy. I have since learned it was
+sold by the yard.”</p>
+<p>The man in the third row smiled. His wife took a sweet from the paper
+on his knee.</p>
+<p>Rosceline shook out the silk. It was a cheap length she had bought
+that morning. Under the lamps it looked costly. She had chosen the color
+to make the room want it before she told them why they should not.</p>
+<p>“I require a witness. Preferably someone who has made a promise and
+subsequently regretted the clarity with which it was expressed.”</p>
+<p>Several hands rose. The large man’s wife lifted his.</p>
+<p>He looked at her, amused, and stood. The paper slid from his knee.
+She caught it before the sweets fell and sent him toward the stage with
+a little push at the back.</p>
+<p>Rosceline offered her hand. He took it gently, feeling the bandage
+beneath the glove.</p>
+<p>“Hurt yourself?” he asked.</p>
+<p>“An excess of interest in confectionery.”</p>
+<p>“It happens.”</p>
+<p>His voice was unexpectedly soft. Up close, his hands showed the
+thickened skin of a man who carried heavy things. She put the neckcloth
+into them and invited him to examine it.</p>
+<p>“Would you say that it is sound?”</p>
+<p>“It’s thin at the fold.”</p>
+<p>“The gentleman assured me it had never been used.”</p>
+<p>“You can see the fold.”</p>
+<p>The room laughed harder than her line had deserved. He had made it
+his line, and she liked him a little for the theft.</p>
+<p>At the far wing Pann raised two fingers to an usher. Rosceline saw
+the gesture while holding the neckcloth toward the lamps. It was the
+sort of small movement an audience never watched because a woman in pale
+silk was giving them something else to look at.</p>
+<p>The usher spoke to the first violinist. He took the two encore sheets
+from his rest and laid them aside, glancing once at Pann.</p>
+<p>Through the gap behind the parlor, Rosceline caught sight of Vellum.
+He had a leather wallet tucked beneath his arm.</p>
+<p>Too soon.</p>
+<p>Rosceline kept the cloth raised.</p>
+<p>“And if I told you I had been promised it would last for life?”</p>
+<p>The man rubbed the worn fold between a finger and thumb. “Whose?”</p>
+<p>She laughed with the room. She had to. There was no improving it.</p>
+<p>The glass stood at the Harlequin’s elbow, its lower bulb filling
+steadily. Briska’s red readiness cloth had gone from its original cleat.
+Rosceline knew why. Knowing did not prevent the brief, unreasonable
+certainty that somebody had changed the plan without telling her.</p>
+<p>She put the neckcloth around the volunteer’s shoulders. He lifted his
+chin to help, as naturally as if his wife had been doing it. His trust
+made her fingers clumsy for half a second.</p>
+<p>“You look reassuring,” she said. “That was also part of the original
+trouble.”</p>
+<p>“I’ve brought my own troubles.” He looked toward the third row.</p>
+<p>His wife called, “Only the ones that would fit through the door.”</p>
+<p>Rosceline waited for the laughter. Behind it she heard a sharp wooden
+knock from the staff passage. It could have been scenery. Everything
+there was supposed to make noises nobody took seriously.</p>
+<p>She removed the cloth and laid it beside the box.</p>
+<p>The next object was a little brass ring. She held it between two
+fingers so the nearest rows could see how modest it was.</p>
+<p>“The value of this was said to be entirely sentimental.”</p>
+<p>“Usually means they’ve lost the receipt,” the man said.</p>
+<p>“You are becoming expensive assistance.”</p>
+<p>“I haven’t asked for anything.”</p>
+<p>“Give it time.”</p>
+<p>He smiled, but his eyes had gone toward the rear of the platform.
+There was an usher there with one hand held out across a passage. Jorise
+stood on the other side, holding the cue card low against her skirt. The
+dark side faced outward.</p>
+<p>The usher shook his head.</p>
+<p>Jorise did not try to push through. She turned and disappeared behind
+the painted wall.</p>
+<p>Rosceline could not signal Daska without giving Pann something worth
+following. She put the ring on the volunteer’s open palm and closed his
+fingers around it.</p>
+<p>“Imagine that you were offered a future.”</p>
+<p>He looked down at his closed hand. “I’ve got one.”</p>
+<p>The answer was so plain that several people laughed late, mistaking
+the pause for preparation. Rosceline saw the wife in the third row stop
+chewing. Her face had changed a little.</p>
+<p>“Yes,” Rosceline said. “I see that you have.”</p>
+<p>She let him keep the moment. It cost her part of the interval, and
+she was glad of the cost until another knock came from behind the
+scenery.</p>
+<p>The iron bell’s rope shifted at the far edge of her sight.</p>
+<p>She put the lid on the box.</p>
+<p>“Then perhaps you can advise me. I have a gentleman reduced to a
+neckcloth, a ring and three letters which grow less informative as their
+punctuation improves. I would like to return him before the shop
+closes.”</p>
+<p>“What do you want back?”</p>
+<p>She had written an answer for that. Something about the time spent
+listening to him, followed by a joke the Harlequin would have disliked.
+Instead she found herself looking at the man’s hands and thinking of the
+small scratched-out word in Sarem’s book.</p>
+<p>The room waited.</p>
+<p>“I was hoping you wouldn’t ask,” she said.</p>
+<p>They laughed. She was grateful enough to dislike them briefly.</p>
+<p>At the goods wing, Daska appeared beside Nerisse. The singer was
+holding her skirt clear of her shoes. The monk had the dark cue card in
+her free hand now. She lifted it just enough for Rosceline to see.</p>
+<p>Rosceline inclined her head as if answering the volunteer.</p>
+<p>She had less sand than she wanted. The goods panels had opened,
+exposing a cart and the loading yard. Pello had not appeared.</p>
+<p>“There is one difficulty with returning a gentleman,” she told the
+room. “The seller generally insists that he be brought back in the
+condition in which he was purchased.”</p>
+<p>The large man looked into the box. “You’d need a bigger box.”</p>
+<p>This time Rosceline’s laugh was real. She gave him the brass ring for
+his wife and took back the neckcloth. He went down the steps to
+applause, moving carefully so he would not stumble with everybody
+looking.</p>
+<p>She watched him sit. His wife examined the ring, put it on a finger
+too small for it and held it there with her thumb.</p>
+<p>Rosceline turned back toward the room.</p>
+<p>“Which leaves us,” she began, “with the question of—”</p>
+<p>The sentence continued in her mind. Her mouth made the next word.</p>
+<p>Nothing reached the air.</p>
+<h2 id="chapter-14-no-rehearsal-for-this">Chapter 14 — No rehearsal for
+this</h2>
+<p>Vellum came through the low hatch while Rosceline was discussing the
+neckcloth.</p>
+<p>Briska saw the leather wallet first, then the clerk’s pale hand on
+the edge of the platform. He had opened the compartment early. The usher
+who should have stayed beside the rack went with him instead, leaving
+the low door swinging behind them.</p>
+<p>Pello stood at the far end of the staff passage with a coil of rope
+over his shoulder. He looked like a porter waiting for someone to notice
+that other people also needed the space. His eyes moved once toward
+Briska.</p>
+<p>She set her hand on the hidden pull.</p>
+<p>The old disconnected length hung in plain sight near Vellum’s route.
+The clerk touched it as he passed, checking something Pann had evidently
+told him to check. He seemed satisfied when the panels did not move.</p>
+<p>Then Pello let the coil slip.</p>
+<p>It fell across the passage in front of the usher. The man stopped to
+kick it aside. Pello bent with him, lifted the upper loop and brought it
+around his ankles. When the usher tried to step forward, his legs went
+in different directions.</p>
+<p>He hit the floor shoulder first. The noise was covered by a laugh
+from the audience.</p>
+<p>Vellum turned. Pello caught his sleeve with one hand and reached for
+the wallet with the other. The clerk drove an elbow backward, striking
+Pello below the eye. Pello lost his grip. Vellum’s coat tore at the
+shoulder as he twisted away.</p>
+<p>Briska came off the cleat.</p>
+<p>“Toward the stair,” she said.</p>
+<p>Pello went after the clerk. He kept one hand against the wall,
+closing the space instead of leaping. Vellum struck at him with the
+wallet. Something hard inside its cover cut Pello’s lip. Blood reached
+his chin before he seemed to notice it.</p>
+<p>The clerk backed onto the first tread of the folding stair.</p>
+<p>Briska reached the release.</p>
+<p>She could see his boot on the marked section, his weight coming onto
+it. Salo would have bent his knees at that moment and let the stair
+carry him backward onto the mat. Vellum tried to climb higher.</p>
+<p>She pulled the pin.</p>
+<p>The treads dropped beneath his feet. His shin struck the exposed side
+rail and his face hit the upper post. He cried out, sharply, in a voice
+no audience would have mistaken for rehearsed pain.</p>
+<p>Pello took the wallet as the clerk reached for the rail.</p>
+<p>The usher on the floor had freed one leg. He drew a short knife and
+slashed at the rope around the other. Briska kicked the coil away from
+his hand and caught a shallow cut across the side of her boot. The
+leather held. She did not wait for him to try again.</p>
+<p>Pello opened the wallet.</p>
+<p>Three packets lay inside. He ignored the first two and unfolded the
+third just enough to expose a name and blue wax. Three crescent cuts
+marked the bottom edge. Nerisse’s thumbprint had disturbed the wax into
+a little ridge on one side.</p>
+<p>“Here.”</p>
+<p>Briska looked. It was the name and the shape Ilaro had described,
+written above the line about the voice of the house.</p>
+<p>“Keep it flat.”</p>
+<p>He slid the original into a clean cloth and put it inside his coat.
+The wallet went beneath the stair, out of Vellum’s reaching hand. Pello
+did not waste time trying to kick it farther away.</p>
+<p>Vellum spat blood onto a tread.</p>
+<p>“That belongs to the carnival.”</p>
+<p>“So does the stair,” Briska said.</p>
+<p>She took the hidden line and pulled. The left scenery panel moved.
+The right moved a hand’s breadth and stopped.</p>
+<p>Someone outside had laid a bench across its lower guide.</p>
+<p>Briska swore. Pello looked toward the goods-side wing, where Daska
+should be waiting with Nerisse. He could reach it only by passing the
+usher, who was now on one knee with the knife free.</p>
+<p>“Go around the parlor,” she told him. “I’ll move the bench.”</p>
+<p>He touched his coat once to check the paper and went through the real
+door in the painted wall.</p>
+<p>Briska squeezed through the partial opening. Outside, the carrier’s
+man stood beside the cart with his arms folded. Two carnival workers
+were moving benches into the lane. They had been told to clear the tent
+after the last song. One looked at Briska’s face and put down his end
+without asking why she was in such a hurry.</p>
+<p>“That guide stays clear,” she said.</p>
+<p>“The maestra said—”</p>
+<p>“Your bench will break my panel.”</p>
+<p>It was the wrong argument for the moment and the right one for the
+man. He lifted the bench. Briska kicked a block beneath its leg to keep
+it out of the track, then went back inside and hauled the line
+again.</p>
+<p>Both panels traveled clear.</p>
+<p>Cold air reached the hot back of her neck. Beyond the gap, the goods
+lane led to Trissot’s cart and the gate. People in the side benches
+could now see the open passage, a bleeding clerk and a stage that had
+acquired an unintended view of the loading yard.</p>
+<p>Ilaro appeared behind the scenery, moving too quickly for the narrow
+space. Jorise was with him. She pointed toward the usher who had refused
+her passage, then stopped where she had promised to stop.</p>
+<p>“He wouldn’t take it.”</p>
+<p>Ilaro nodded, the dark card in his hand. “You did what I asked.”</p>
+<p>He went past her toward Daska. Briska reached for his sleeve before
+he stepped over the fallen rope.</p>
+<p>“There.”</p>
+<p>He looked down, placed his foot carefully and continued. The bandage
+on his hand had opened at the edge, showing a small fresh line of
+blood.</p>
+<p>On the far side, Pann was speaking to Salo.</p>
+<p>The performer had removed his false belly. Without it his body looked
+less absurd and more capable of doing damage. He glanced toward Nerisse,
+then toward the place where his daughter had watched rehearsals that
+morning. He shook his head once.</p>
+<p>Pann said something else.</p>
+<p>He moved to the goods-side wing.</p>
+<p>Briska saw Daska notice him. The monk put Nerisse’s walking shoes
+down behind a painted chair and moved half a pace closer to the
+singer.</p>
+<p>Ilaro reached her and showed the dark card. Daska took it, looked
+toward Rosceline and raised it briefly. Then she put it into Nerisse’s
+hand so the singer could see what had changed.</p>
+<p>The iron bell’s cloth was being removed.</p>
+<p>Pello had reached the goods-side edge of the parlor wall. He stopped
+when the knife-bearing usher came around that end from the passage.
+There was no room to pass without giving the man his back. Briska had
+her short pry in her hand, though she did not remember taking it
+out.</p>
+<p>She crossed the passage and struck the usher’s knife wrist against
+the doorpost.</p>
+<p>His knife fell. He hit her with his other hand, an open blow across
+the ear that sent light through her vision. She sat down hard on the
+edge of the stage. The pry struck the floor beside her.</p>
+<p>Pello drove the usher back through the doorway and pulled the real
+door shut. The man hit it shoulder first from the other side. Pello
+braced it while Briska retrieved the pry and pushed it through the
+door’s latch loop.</p>
+<p>The usher hammered once on the other side.</p>
+<p>Briska got up, holding the wall until it agreed to remain where it
+was.</p>
+<p>“Go.”</p>
+<p>Pello went.</p>
+<p>From the platform came a sudden pause in Rosceline’s voice, then
+laughter. The first glass had ended. A moment later the orchestra began
+<em>The South Window</em>. Its first notes were quieter than the noise
+backstage. Briska pressed a palm against her ear and found blood on one
+fingertip.</p>
+<p>The panels were open. The cart was there. She stayed beside the
+gap.</p>
+<h2 id="chapter-15-the-missing-sentence">Chapter 15 — The missing
+sentence</h2>
+<p>Rosceline made the word again.</p>
+<p>The man in the third row laughed. He thought she had found an
+excellent way to finish. She looked at him, took the praise with a small
+bow and felt the air pass uselessly over her tongue.</p>
+<p>At the table’s end the Harlequin turned the glass.</p>
+<p>She wanted to tell them that she had understood. She wanted to tell
+the whole room, loudly, that nothing had surprised her. Instead she
+closed her box, put the neckcloth inside it and lifted it against her
+hip.</p>
+<p>Pann came forward to take the applause. Her coat brushed Rosceline’s
+sleeve. In the chips of mirror she could see a dozen little pieces of
+her own mouth.</p>
+<p>“The far stair is clear,” the ringmaster said softly. “You needn’t
+wait for your friends.”</p>
+<p>Rosceline looked across the platform. Beyond Pann lay a short,
+unoccupied passage with a clean lamp at its end. Nobody was bleeding
+there. The offer had become more attractive since the afternoon.</p>
+<p>Nerisse came out of the goods-side wing to the first notes of <em>The
+South Window</em>. She carried the dark cue card in one hand. At the
+front of the stage she tucked it into the ribbon at her waist, lifted
+her head and sang.</p>
+<p>The first line was a woman’s complaint about the light. Her lover had
+built her a house with one window, and put it on the wrong side. Nerisse
+made the grievance sound domestic enough to earn a smile from the front
+benches. By the end of the verse she had made the same window something
+the woman had waited beside for years.</p>
+<p>Rosceline crossed behind her toward the goods wing.</p>
+<p>Pann did not put out a hand. That would have been ungracious before
+so many people. She simply moved with Rosceline, bringing the mirrored
+shoulder between her and the opening.</p>
+<p>“There is another place for you,” she said.</p>
+<p>Rosceline wished she had asked what it paid. She wished, more
+urgently, that she could tell Pann to get out of the way.</p>
+<p>She pointed at her own throat, widened her eyes in elaborate distress
+and indicated the goods lane. She needed air. A little sympathy. Surely
+one woman in the profession understood another.</p>
+<p>Pann smiled without moving.</p>
+<p>Rosceline set the box down on the ringmaster’s boot and stepped
+around her while she was looking at it.</p>
+<p>At the wing, Salo had placed himself between Daska and the gap. The
+man was still smiling. It was the smile he used when a trick required an
+audience member to remain very still.</p>
+<p>“We finish the evening,” he told the monk. “Then we discuss
+departures.”</p>
+<p>“Move your foot.”</p>
+<p>“You saw the fall. You know I can put you down without—”</p>
+<p>Daska took his wrist. Salo turned with her, expecting the pivot they
+had tried during rehearsal. She went the other way and stamped the
+inside of his ankle.</p>
+<p>His smile vanished.</p>
+<p>Rosceline saw how much bigger he was when he caught Daska by the
+upper arm and drove her into the painted chair. Its back snapped against
+the wall. The monk’s breath came out in a hard grunt. Nerisse did not
+turn. She had reached the part of the song where the woman moved the
+table each morning to keep a little sun upon it.</p>
+<p>Pello appeared beyond Salo’s shoulder with blood dried below his
+nose. He touched his coat. Rosceline nodded toward Nerisse.</p>
+<p>He could not get past the two people fighting.</p>
+<p>Daska let her knees bend. Salo shifted to lift her clear of the
+chair, and she caught the back of his neck, put both feet against the
+chair’s remaining crossbar and shoved. The bar broke. They went sideways
+into the mat from his earlier act.</p>
+<p>He knew how to land on it. He did not know she meant to roll across
+him with his wrist still turned.</p>
+<p>“Go,” she said into his shoulder.</p>
+<p>Pello went past.</p>
+<p>Salo struck Daska below the ribs with his free hand. Her face
+changed. She kept the wrist until Pello had cleared them, then released
+it and dragged herself behind the broken chair. Salo rose onto one knee,
+breathing through his teeth.</p>
+<p>Rosceline had drawn her rapier without remembering the decision. Its
+point rested a finger’s breadth below his eye.</p>
+<p>He looked up along it.</p>
+<p>She could not tell him how little patience she had left. Perhaps it
+showed. His hands settled open upon his thighs. She kept the point there
+while Daska stood, one arm held tightly against her side.</p>
+<p>Across the platform Pann raised her wrist. The little bell rang. At
+the far corner a man took the iron bell’s rope in both hands.</p>
+<p>Nerisse was beginning the last verse.</p>
+<p>Pello came to her beside the music stand. He drew the cloth from
+inside his coat, opened it on his palm and showed her the ticket. From
+where Rosceline stood, the blue wax was a dark spot beneath the
+lamps.</p>
+<p>Nerisse looked down while finishing a line. She had that much breath
+left; she used it. Then she took the paper.</p>
+<p>The orchestra continued. The first violinist glanced at her, waiting
+for the entry he had marked that afternoon.</p>
+<p>She missed it.</p>
+<p>Someone in the audience supplied the next word, affectionately, as if
+reminding an old friend. Nerisse’s mouth moved toward it. Her fingers
+tightened on the paper without making the fold.</p>
+<p>Rosceline wanted to shout. A voice was not required to run across the
+platform and turn the corner down herself. She had a free hand. She
+could make Nerisse understand what all of them had spent upon this
+ridiculous wish.</p>
+<p>Pello stayed where he was, the empty cloth spread between his
+hands.</p>
+<p>At the side entrance Lusette stood with Tovin. She had put her slate
+on the floor. Nerisse found her there, beyond the bright edge of the
+lamps.</p>
+<p>The singer bent the ticket’s lower corner over her name.</p>
+<p>“I give it back.”</p>
+<p>The words were spoken in her ordinary voice. They barely reached
+Rosceline above the orchestra.</p>
+<p>Under Nerisse’s thumb, the paper lifted. She pressed it down again.
+The blue wax split with a sound like a fingernail breaking.</p>
+<p>The first violinist stopped. A lower string sounded alone and fell
+quiet.</p>
+<p>For a moment nobody knew whether to applaud.</p>
+<p>Then the man with the brass ring began. His wife caught his elbow,
+uncertain, and let it go. Several rows joined him. At the back a woman
+stood to put on her coat. Two men who had sat utterly still through the
+song resumed an argument about whose turn it was to buy supper.</p>
+<p>The iron bell sounded.</p>
+<p>Nerisse flinched. Pello was already wrapping the folded ticket in its
+cloth. He put it back inside his coat and closed the fastening.</p>
+<p>Pann moved toward them.</p>
+<p>“I witnessed the return,” the Harlequin said.</p>
+<p>They had not raised their voice. They stood beside the small glass,
+one hand resting on the black-edged card that had given Rosceline her
+five minutes.</p>
+<p>“The performance has not been completed,” Pann said.</p>
+<p>“She has given it back.”</p>
+<p>The ringmaster looked at Nerisse. The singer held one hand against
+her waist, where the dark cue card had bent beneath her fingers.</p>
+<p>“You could still have had the room,” Pann told her.</p>
+<p>Nerisse looked at the rows of faces. Someone near the back asked
+loudly whether there was another act. She went with Pello toward the
+wing.</p>
+<p>Salo made a small movement beneath Rosceline’s blade.</p>
+<p>She pressed the point just far enough to mark the skin. A red bead
+gathered beneath his eye. He went still again. She did not like him for
+making her do it, which was absurd enough that she almost laughed
+without sound.</p>
+<p>Daska had recovered the walking shoes from behind the chair. She set
+them at Nerisse’s feet. The singer put a hand on Pello’s shoulder,
+stepped out of one high shoe and into its replacement. She fumbled the
+second. Daska bent, winced and left her to manage it.</p>
+<p>“Lift your skirt,” she said. “You know the step.”</p>
+<p>The knife-bearing usher burst around the parlor’s outer end. He had
+abandoned the blocked door. Rosceline saw him coming over Daska’s
+shoulder and pulled her blade back from Salo.</p>
+<p>The usher reached for Nerisse. Rosceline struck his forearm with the
+rapier’s guard and kicked the side of his knee. He fell against the
+floor with one hand splayed beneath him.</p>
+<p>She put her heel on it.</p>
+<p>His cry brought Salo to his feet. Rosceline turned the blade between
+them, still grinding down. She could feel a small movement through the
+sole of her shoe. When Pello and Nerisse were past the gap, she lifted
+her foot and backed after them.</p>
+<p>Salo stayed with the man on the floor.</p>
+<p>In the staff passage Vellum was sitting on the lowest tread, holding
+a rag against his mouth. He watched the place beneath Pello’s coat where
+the ticket had gone. Rosceline had to pass within reach of him. She kept
+the sword low, inviting him to try.</p>
+<p>He turned his face away.</p>
+<p>Briska held the opening with her shoulder. Blood had run beneath her
+ear and dried along her jaw. Ilaro stood on the little step outside,
+looking back into the tent as though he had forgotten something
+important.</p>
+<p>“Jorise?” he asked.</p>
+<p>Briska pointed. The runner stood beside Cazet at the prompt position.
+The carpenter had a hand on her shoulder and was keeping her out of the
+passage. She saw Ilaro looking and made an impatient motion toward the
+exit.</p>
+<p>He went down the step.</p>
+<p>The carrier’s man had brought the handcart alongside. Its side board
+lay in the bed. Pello took one handle, the man the other, and they
+shoved the cart across the narrowest part of the lane. An usher coming
+from the public side ran straight into it.</p>
+<p>“Round,” the carrier told them. “All of you. Don’t climb on it.”</p>
+<p>Nerisse lifted her skirt and went around the far wheel. Daska
+followed, breathing shallowly. Briska half turned at the sound of wood
+striking wood, but Ilaro caught her sleeve and kept her moving.</p>
+<p>Pello hauled his handle backward. The cart pivoted across the lane,
+caught the goods-gate post and lurched. An iron staple tore out of the
+bed. The loose side board hit the road.</p>
+<p>The carrier swore at Pello with a concentrated fluency Rosceline
+would have admired at any other time.</p>
+<p>Pello picked up the board. He did not leave it for the pursuers.</p>
+<p>Beyond the last lamps the street opened between closed workshops.
+Rosceline looked back once. Pann stood beside the gate, her mirrored
+coat gathering every scrap of light left behind them. One hand rested
+upon the post. She could have been seeing off honored guests.</p>
+<p>The ushers stopped to ask her something. The company turned the
+corner before she answered.</p>
+<p>Two streets farther on, the carrier put down the handles. The cart
+stood crookedly. He pointed at the ripped fastening and began telling
+them what it would cost to make his employer willing to speak to
+him.</p>
+<p>Rosceline opened her mouth. Air came out.</p>
+<p>She shut it. The silence had outlasted the bell, the ticket and her
+usefulness on the platform. Daska sat on a doorstep without waiting for
+the discussion to finish. Nerisse crouched beside her and began unlacing
+the monk’s coat where it pressed against her ribs.</p>
+<p>Pello paid a deposit against the damage. The carrier counted it,
+found it insufficient and held out his hand again. Briska tried to
+explain which piece had actually failed. He looked at the blood beneath
+her ear and told her to discuss it with Trissot in daylight.</p>
+<p>Rosceline leaned against the wall. The street smelled of wet wool
+from the fuller’s yard. Her sword was still in her hand. She wiped the
+point on the inside of her coat before putting it away.</p>
+<p>Nerisse had one of Daska’s laces between her fingers when she began
+to shake. She stopped working, pressed both hands flat upon her knees
+and waited. Daska let her.</p>
+<p>“I left my shoes,” the singer said at last.</p>
+<p>“Yes,” Rosceline answered. “I don’t recommend going back.”</p>
+<p>Her voice startled her more than its loss had. She swallowed.
+Everybody was looking at her, and for once she had no wish to improve
+what she had said.</p>
+<p>Pello pulled out the wrapped ticket, checked the fold by the light
+from a shutter and put it away again.</p>
+<p>Then he helped Daska stand.</p>
+<h1 id="part-iv-the-unfilled-seats">Part IV — The unfilled seats</h1>
+<h2 id="chapter-16-loading-out">Chapter 16 — Loading out</h2>
+<p>The noise that woke Ilaro was an argument over the bar.</p>
+<p>He had slept sitting down in the Finch’s washroom, with his coat
+folded between his head and the wall. Someone had put a blanket over his
+knees. He could not remember who, and the question was pleasant enough
+to leave unanswered.</p>
+<p>In the passage Nerisse was saying that the wheel would not pass
+through the kitchen door.</p>
+<p>“Then take the wheel off,” Lusette said.</p>
+<p>It came out as a scrape. Ilaro heard her stop, swallow and try
+again.</p>
+<p>“The wheel.”</p>
+<p>He remained still. Nobody hurried to speak for her.</p>
+<p>“You needn’t do it this morning,” Nerisse said.</p>
+<p>Lusette answered too quickly and lost the first word. She put a hand
+against her throat. Her aunt reached toward it, then lowered her arm
+before touching her.</p>
+<p>“It’s my bar.”</p>
+<p>“I know whose it is.”</p>
+<p>“Then I’ll decide where it goes.”</p>
+<p>From the kitchen came the sound of Tovin setting down a tool. After a
+little while he asked which side of the door had the wider turn. Lusette
+went to show him.</p>
+<p>Ilaro pushed the blanket off his knees. The window above the
+washstand had begun to brighten. He turned his chair away from it and
+waited for the small turning sensation in his head to stop.</p>
+<p>His cut hand had stuck to its bandage. He poured water over the cloth
+before trying to lift it. Halfway through, Madal came in for the basin
+and found him holding the loose end between his teeth.</p>
+<p>“Give it here.”</p>
+<p>He let her finish. She had a rough little voice this morning, too,
+but it was hers. She tested a sentence about the price of needles while
+winding the fresh strip. The first version failed on the last word. The
+second carried.</p>
+<p>“Better,” she said, inspecting the bandage.</p>
+<p>He was not sure which improvement she meant.</p>
+<p>Basile had put his instrument into its case beside the back door. He
+came to look at Ilaro’s hand, decided he had nothing useful to say about
+it and asked whether Nerisse could be required to pay him before the
+other people who were owed money.</p>
+<p>“What did she agree with you?”</p>
+<p>“A wage, every week. There’s no paper.”</p>
+<p>“Who heard her agree?”</p>
+<p>“Madal. Lusette. Usually anyone in the kitchen.”</p>
+<p>Ilaro wrote down the dates Basile gave him. The voice stopped once,
+on a number, and Basile waited with his eyes shut until it came back. He
+did not want a case against Nerisse. He wanted enough to pay for the
+room he had found near the harbor. The landlord would hold it until
+noon.</p>
+<p>“I can ask her with you,” Ilaro said. “I can’t put you ahead of
+people I haven’t heard from.”</p>
+<p>Basile looked at the note, disappointed but listening.</p>
+<p>“Don’t make it a quarrel. We’ve had the quarrel.”</p>
+<p>They found Nerisse in the little room where Madal kept the costumes.
+She had her jewelry box open. The good silver comb lay on the table
+beside two bracelets Ilaro had seen her wear during the first
+performance.</p>
+<p>She heard about the harbor room and asked Basile why he had not told
+her sooner.</p>
+<p>“I thought I might not be able to live in it.”</p>
+<p>Nerisse closed the jewelry box. For a moment Ilaro thought the
+interview was over. Then she opened it again and took out the matching
+comb.</p>
+<p>“There’s more for the pair.”</p>
+<p>“I can wait until tomorrow for some of it,” Basile said.</p>
+<p>“Your landlord can’t.”</p>
+<p>She wrapped the combs in a handkerchief and asked Madal to take them
+to the woman on Partridge Street, who knew the silver was good and would
+waste less time pretending otherwise. The bracelets went with them.
+Nerisse kept a little glass brooch shaped like a bird. She pinned it to
+her plain dress without looking in the mirror.</p>
+<p>When Basile had gone, Ilaro asked for the confirmation they would
+take to the Countess.</p>
+<p>Nerisse sat at the dressing table. The pen scratched. She described
+the ticket, wrote that she had made the return herself and paused over
+what to call the people whose voices had begun coming back.</p>
+<p>“Write their names,” Ilaro said.</p>
+<p>She did. Madal had already left with the jewelry, so Nerisse asked
+how the dresser spelled hers. Ilaro told her. She scraped away the extra
+letter, blew the dust clear and started the line again.</p>
+<p>He let the ink dry before folding it. The confirmation went into a
+separate pocket from the sheet he had copied in Vellum’s office. Pello
+still had the original. Ilaro would ask him to show it at the Countess’s
+table, in its cloth, with everybody there.</p>
+<p>Outside the dressing room, Daska lay across three chairs while Briska
+sat on the floor beside her. A woman from the next street was feeling
+beneath the monk’s ribs. She pressed once, listened to the answer and
+told Daska to stop trying to prove how deeply she could breathe.</p>
+<p>Briska had a clean pad behind her ear. The woman had made her sit for
+that, too. Pello stood near the window holding a cup of water that
+nobody had yet accepted. His swelling eye had closed halfway.</p>
+<p>“He’ll have the same trouble with his wrist,” Daska said when the
+woman had finished.</p>
+<p>Briska looked up. “Salo?”</p>
+<p>“Yes.”</p>
+<p>“Does that improve this?”</p>
+<p>“No. I’d like it to.”</p>
+<p>Ilaro sat beside the table and opened his notebook. He wrote
+<em>Returned before the iron bell</em>. Below it he put the four
+household names, leaving space beside each. Tovin came through carrying
+a wheel and answered his question without understanding why he had
+asked. Ilaro marked that down. Basile spoke again from the passage.
+Madal would have to wait until she returned from the silversmith.</p>
+<p>He reached the part about the wagon and found that he could not hold
+the order of events. The words on the page looked individually sound.
+Together they refused to become the night he remembered.</p>
+<p>He shut the notebook.</p>
+<p>“Later?” Pello asked.</p>
+<p>“Later.”</p>
+<p>Pello put the cup beside him.</p>
+<p>They left after Madal returned. Rosceline had gone ahead to arrange
+the Countess’s meeting and find a coat without blood inside it. Ilaro
+took the street above the loading canal with Pello; it was quieter than
+the market route, and Mistress Trissot’s yard lay along it. Briska and
+Daska would follow more slowly.</p>
+<p>Across the water the carnival was being taken down.</p>
+<p>The main tent had lost its high point. Men loosened ropes in a
+practiced order while a woman below shouted at anyone who thought he
+could improve it. At the edge of the midway, the Cotton Witch’s booth
+remained open. A child was buying an ordinary twist of sugar. The Witch
+bent to make the top resemble a bird.</p>
+<p>Vellum sat in the office wagon’s doorway with a dirty cloth beside
+his knee. A customer stood below him, ticket held in both hands. Ilaro
+could not hear their conversation across the canal.</p>
+<p>Pello had stopped, too.</p>
+<p>Ilaro felt for the notebook in his coat. He could write the place and
+time. He had no name for the customer, no knowledge of what had been
+promised. The man below the wagon laughed at something Vellum said, a
+short, unwilling laugh, and went up the steps.</p>
+<p>“We should tell her,” Pello said.</p>
+<p>“The Countess?”</p>
+<p>He nodded.</p>
+<p>“I will.”</p>
+<p>Farther along the grounds, Cazet helped lash the folding stair onto a
+wagon. The replaced pin shone bright against the old timber. Salo stood
+beside him with a wrap around his wrist. His daughter was showing him
+something she had found in the mud. He bent to look, keeping the injured
+hand out of her reach.</p>
+<p>The dragon came past with its tail folded up over its back. It made
+the corner easily. One of the wooden teeth was already loose.</p>
+<p>Pann’s wagon followed. She sat just inside its open door, the
+mirrored coat hanging from a peg behind her. The last rope of lamps had
+been looped beneath the roof for the journey. One knocked softly against
+the frame as the wagon crossed a rut.</p>
+<p>At Trissot’s gate, Ilaro found he had been gripping the notebook
+through his coat. He let go before Pello knocked.</p>
+<h2 id="chapter-17-one-remains">Chapter 17 — One remains</h2>
+<p>Rosceline found a pin in the borrowed coat while waiting for the
+others.</p>
+<p>It had been put through the lining to hold a seam and left there. She
+removed it carefully. The woman who had lent the coat would have been
+offended by a suggestion that she had done it on purpose, which did not
+make Rosceline less certain that she had.</p>
+<p>Celise brought a little dish for the pin.</p>
+<p>“Was there something wrong with your own?”</p>
+<p>“Several people had strong opinions about it.”</p>
+<p>“I can have it cleaned.”</p>
+<p>“You are very kind.”</p>
+<p>Celise waited. Rosceline set the pin in the dish.</p>
+<p>“There is blood inside the left skirt. The lining is silk. Tell her I
+will pay for whatever she needs to use.”</p>
+<p>“I’ll tell her.”</p>
+<p>The others arrived before Rosceline could decide whether <em>her</em>
+meant the laundress or the Countess. Daska lowered herself into the
+chair nearest the door. Briska chose the place beside her and turned her
+uninjured ear toward the table. Pello put a narrow roll of paper beside
+his hand. Trissot’s demand, presumably. The carrier had used more paper
+than the damage required.</p>
+<p>Ilaro stayed standing until Celise moved a lamp away from his
+chair.</p>
+<p>The Countess came in without the veil she wore before unfamiliar
+visitors. Rosceline had seen Serafine’s face often enough to distrust
+the intimacy of that. She was beautiful in a way that let people imagine
+they had discovered something private by looking carefully.</p>
+<p>“Nerisse?” she asked.</p>
+<p>“At the Finch,” Ilaro said. “Her household is speaking again. It
+isn’t steady yet.”</p>
+<p>He took the confirmation from his coat and laid it before her. Pello
+unfastened his own coat, brought out the clean cloth and opened it
+beside the letter.</p>
+<p>The ticket’s folded corner stayed down.</p>
+<p>Serafine turned it toward the window without unfolding it. The split
+wax caught the light. She read Nerisse’s account, stopped at the
+corrected name and continued to the signature.</p>
+<p>“Who saw the return?”</p>
+<p>“All of us,” Rosceline said. “And the Harlequin, who said so in
+Pann’s hearing. She disputed it briefly. Nobody appeared convinced.”</p>
+<p>“She wanted Nerisse to continue?”</p>
+<p>Ilaro took out the second paper. He explained where he had copied it
+and which part he had been able to read. He did not repeat the whole
+pursuit. When he lost the name of the room beneath the stage, Briska
+supplied <em>compartment</em>, and he continued.</p>
+<p>Rosceline listened with her hands in her lap. She knew where she
+could improve the account. The pause before the copied instruction was
+too long; Vellum’s face when the wallet went would have been worth
+describing. But Ilaro had the paper and the Countess was reading it.
+Rosceline looked at the pin in its dish until he finished.</p>
+<p>“The carnival is leaving,” he said. “They were still taking people
+into the office this morning.”</p>
+<p>“I can send the names of Pann and Vellum to the houses that receive
+my letters,” Serafine said. “And what you can substantiate about
+Nerisse’s bargain.”</p>
+<p>“People will go anyway,” Daska said.</p>
+<p>“Some will.”</p>
+<p>“She sang very well,” the monk added.</p>
+<p>Serafine looked at her for a moment. “I know.”</p>
+<p>She put Nerisse’s confirmation and the returned ticket together.
+Celise brought the payment. The remaining thousand silver marks had been
+divided into five bags, each heavier than Rosceline wished to carry
+through the streets in somebody else’s coat.</p>
+<p>Briska waited until Serafine had counted her share before offering
+the expenses. There was the cart, the damaged mirror, the hired canvas,
+the runner’s payment and the coat Pello had not returned to its owner.
+The first allowance covered several of them. Celise asked questions
+about the rest.</p>
+<p>“The cart wasn’t rolled over,” Briska told her. “A staple pulled
+free. The bed is sound. Her estimate includes replacing half of it.”</p>
+<p>Pello unrolled Trissot’s paper and pointed at the bottom.</p>
+<p><em>Loss of use.</em></p>
+<p>Briska read it. “The repair takes an hour.”</p>
+<p>“She has a morning’s work booked,” Pello said.</p>
+<p>“With that cart?”</p>
+<p>“Yes.”</p>
+<p>Briska sat back. After a moment she drew a line through the objection
+she had written on her own sheet. Rosceline found herself fond of her
+just then, without any desire to say so in a room where it might be used
+to improve the artisan’s temper.</p>
+<p>Celise accepted the remaining sums and set the bills aside. The money
+for Maret’s coat would go through the porter who had introduced Pello;
+nobody proposed making him enter the carnival to demand it.</p>
+<p>Rosceline took her separate agreement from the pocket where she had
+moved it before borrowing the coat. She unfolded it herself. The first
+two recoveries had been completed in different inks. Beside the third
+stood Serafine’s note accepting this commission.</p>
+<p>The Countess read it, drew a line through the open space and wrote
+the completion beneath.</p>
+<p>One remained.</p>
+<p>Rosceline knew where Sarem’s book was kept. The room lay two doors
+beyond the garden passage. She could have asked Celise to bring it while
+the others settled the final expenses. They would not have refused her
+the time. That had become another of the unpleasant things about
+them.</p>
+<p>She wanted to hear the catch in his voice before the laugh. She could
+remember it with exactness until she tried, and then the sound turned
+into her own expectation of it. Last night, waiting for her voice to
+return, she had been frightened that she would do that to everything he
+had said.</p>
+<p>Serafine blotted the new line and offered the paper back.</p>
+<p>Rosceline folded it along its old creases. “That is all, then.”</p>
+<p>“For this recovery.”</p>
+<p>“For this recovery,” she agreed.</p>
+<p>She put the agreement inside her coat while the others were still at
+the table.</p>
+<p>In the garden passage Daska waited for her to catch up. The monk held
+her bag of silver against her uninjured side, annoyed by its weight.</p>
+<p>“I thought you might take the stair,” she said.</p>
+<p>Rosceline stopped beside a pot of winter herbs. A gardener had cut
+the dead leaves away and left the sound ones awkwardly exposed.</p>
+<p>“Pann was very persuasive.”</p>
+<p>“I saw.”</p>
+<p>“I said I would stay.”</p>
+<p>Daska looked at her. The mountain was there between them, as present
+to Rosceline as the smell of the cut herbs. Rell’s lowered sword; the
+space in which she could have taken another answer. She felt the old,
+immediate resentment at being made to remember it by someone who had
+done nothing except remember it herself.</p>
+<p>She began, “If you intend—”</p>
+<p>“I heard you say it. You stayed.”</p>
+<p>Daska went down the passage. Rosceline remained by the pot until
+Celise came out carrying the dish with the pin.</p>
+<p>“Do you want this?”</p>
+<p>“Very much.”</p>
+<p>She took it and secured the borrowed seam properly before
+following.</p>
+<h2 id="chapter-18-the-chairs-are-for-sale">Chapter 18 — The chairs are
+for sale</h2>
+<p>Lusette had painted the name of her bar on the removable front
+board.</p>
+<p>The letters were white on a blue ground, uneven where she had tried
+to make the first one more elegant than the rest. <em>The Traveling
+Finch.</em> Briska read it while lying on the floor with one shoulder
+beneath the axle.</p>
+<p>“The brace is on the wrong side,” she said.</p>
+<p>Lusette bent to look. “That’s where Tovin could reach.”</p>
+<p>“I know why it’s there. It holds the end that isn’t trying to
+move.”</p>
+<p>“Can you put it on the other side?”</p>
+<p>“If you take the bottle rack out.”</p>
+<p>Lusette began lifting the rack. Briska stopped herself from
+describing how to do that, since the younger woman had built it and was
+already setting it down undamaged. She waited with the screwdriver in
+her hand.</p>
+<p>The floor smelled of spilled beer despite the scrubbing. Beneath the
+bar, where no customer had looked, someone had carved a small and
+anatomically ambitious horse into the underside of a shelf. Briska found
+it while feeling for the second screw. She chose not to improve that
+either.</p>
+<p>Above her, the Finch was being sold a piece at a time.</p>
+<p>The first buyer had taken the best lamp. A pale rectangle remained on
+the wall where its backplate had kept the smoke off. Two women were
+discussing a stack of cushions. Tovin demonstrated the repaired chair by
+sitting on it with his feet clear of the floor, then made the
+prospective buyer try it himself.</p>
+<p>Nerisse stood beside the little stage with the glass bird at her
+throat. A woman had offered for the red dress. Nerisse named a sum the
+woman considered an insult. They had been smiling at each other ever
+since.</p>
+<p>“The repair is visible,” the woman said.</p>
+<p>“I stood before several hundred people in it last night.”</p>
+<p>“I heard how that ended.”</p>
+<p>“Then you know nobody was discussing the repair.”</p>
+<p>Briska tightened the brace and slid out from beneath the bar. The
+movement pulled at her bruised head. She sat for a moment with her back
+against the cabinet while Lusette gathered the loose screws.</p>
+<p>“Should it take more weight now?” the younger woman asked.</p>
+<p>“It should take the same weight without spilling it at the first
+turn. Put the heavy bottles low. Don’t hang a bucket from the
+handle.”</p>
+<p>“Where should I hang it?”</p>
+<p>Briska looked at the bar. She had nearly answered <em>nowhere</em>,
+which would have been correct for an object that never needed washing.
+She pointed to the crosspiece beneath the shelf.</p>
+<p>“There. A short hook. You don’t want it catching the wheel.”</p>
+<p>Lusette found the chalk and marked the place. Her voice was still
+rough. She used it sparingly, though not apologetically.</p>
+<p>Pello came through the door carrying the replacement staple for
+Trissot’s cart. He had found one made of proper iron, he said, and left
+it with the carrier’s man. Briska asked why he still had it.</p>
+<p>He looked down at his hand. “The old one.”</p>
+<p>She held out her palm. The torn staple showed a dark flaw inside the
+bent end. She rubbed it with her thumb, then stopped. Trissot had been
+paid. The cart was working. Briska could spend an afternoon proving that
+she had been partly right, and nobody would be the richer except her own
+temper.</p>
+<p>“Put it in my bag,” she said. “I’ll use the sound half.”</p>
+<p>He did. Then he helped her stand without pulling on the arm she had
+braced against the floor.</p>
+<p>Across the room, Daska leaned against a pillar. She had tried moving
+chairs until Madal took one out of her hands and gave her a bundle of
+curtain rings to sort. She was doing that with considerable
+concentration. Ilaro sat near the door, where he could hear the room
+without having it on both sides of his head. He had finished the account
+for the Countess. The notebook was shut beneath his hat.</p>
+<p>Rosceline stood with Nerisse and the dress buyer. Briska could hear
+only pieces of her contribution: the cost of beadwork, the distinction
+between a repair and an alteration, and a woman’s foolishness in judging
+red cloth by the light from a northern window.</p>
+<p>The buyer asked her to step aside so that she could see it
+properly.</p>
+<p>Rosceline stepped aside.</p>
+<p>Briska turned back to Lusette before either woman noticed her
+smile.</p>
+<p>“Try it loaded.”</p>
+<p>They put the empty bottles in first, then filled two jugs and set
+them on the lower shelf. Lusette pushed the bar toward the door. Pello
+stood beside the wheel at the turn but did not touch it. The whole thing
+passed through with a finger’s breadth to spare.</p>
+<p>Outside, Lusette stopped and looked along the street.</p>
+<p>It was an ordinary afternoon. A cart of onions had halted opposite
+the Finch, forcing people to pass single file between its wheel and the
+wall. A man was washing a balcony with no concern for who walked beneath
+it. Two children waited to see whether the bar would produce something
+worth their money.</p>
+<p>Lusette lifted the front board into its clips.</p>
+<p>The nearer child read the name aloud. The other asked whether she had
+anything sweet.</p>
+<p>“Tomorrow,” she told him.</p>
+<p>He looked disappointed by her preparations.</p>
+<p>Nerisse appeared in the doorway without the red dress. The buyer had
+taken it. She watched Lusette testing the handle, her expression
+difficult to read until she came forward and straightened the blue board
+where it sat crookedly in its clips.</p>
+<p>“You can’t stand there. The onions will hide you.”</p>
+<p>“I’m not opening here.”</p>
+<p>“I can see that.”</p>
+<p>Lusette moved the bar half a pace anyway. Nerisse smoothed her own
+skirt, noticed she was doing it and went back inside.</p>
+<p>Briska followed. The afternoon had warmed her ear until it throbbed
+beneath the dressing. There was one curtain left to take down. Its pole
+would go with the house, but the cloth belonged to Nerisse. Pello
+fetched the short ladder and tested the bottom rung before climbing.</p>
+<p>Briska gathered the hanging end so it would not drag through the
+dirt.</p>
+<p>Near the stage Basile opened his instrument case. A loose fastening
+had caught one of the strings; he freed it, touched the note and winced.
+Nerisse turned at the sound.</p>
+<p>“That was wrong last night as well.”</p>
+<p>“Last night you had an orchestra.”</p>
+<p>“I noticed.”</p>
+<p>He adjusted the peg, tried the note again and played the few bars
+that followed it. Nerisse sat on the stage’s edge. She had the money
+from the dress in her hand. She laid it beside her and joined him
+halfway through the phrase.</p>
+<p>It was the passage she had not finished beneath the carnival
+lamps.</p>
+<p>Without the orchestra, the woman in the song seemed closer to the
+window. Briska could hear the little impatience in her complaint about
+its position. Nerisse reached the rise in the melody and stopped, breath
+gone before the note.</p>
+<p>Basile rested his hand across the strings.</p>
+<p>“Lower?” he asked.</p>
+<p>She shook her head, waited and began the line again.</p>
+<p>Pello had one curtain hook left. Briska held the cloth against her
+chest while he reached for it. Around the room people continued what
+they had been doing, but more slowly. The cushion buyers stood with the
+same cushion between them. Tovin stopped demonstrating the chair.
+Lusette came in from the street and remained beside the door.</p>
+<p>Rosceline sat on a stack of folded cloth. Her mouth was closed. She
+had taken off the borrowed coat and laid it carefully beneath her,
+lining inward.</p>
+<p>Nerisse finished the woman’s complaint. In the last line the lover
+returned with a mason, who looked at the window and told them the house
+would have to come down. The melody did not treat this as a tragedy.
+Basile let the last chord linger just long enough for the disagreement
+to begin again in the listener’s head.</p>
+<p>Somebody laughed. Daska looked up from the curtain rings, smiling
+with the unguarded pleasure Briska had seen during the first song at the
+Finch.</p>
+<p>The man buying the chair began to clap with it still hooked over one
+arm.</p>
+<p>Pello let go of the last curtain hook, came down the two remaining
+rungs and caught the chair before its legs struck the woman beside
+him.</p>
+<p>The cloth came free into Briska’s arms.</p>
+</body>
+</html>
