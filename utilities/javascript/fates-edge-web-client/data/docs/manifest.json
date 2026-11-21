@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-21T19:47:21.207Z",
+  "generated": "2026-11-21T21:00:44.346Z",
   "documents": [
     {
       "id": "srd",
@@ -1718,6 +1718,16 @@
       "active": true
     },
     {
+      "id": "the_grumbling_vault",
+      "title": "The Grumbling Vault",
+      "file": "Fates_-_Edge_-_-The-_-Grumbling-_-Vault.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "the_guest_who_brought_death",
       "title": "The Guest Who Brought Death",
       "file": "Fates_-_Edge_-_-The-_-Guest-_-Who-_-Brought-_-Death.html",
@@ -2252,7 +2262,7 @@
       "active": true
     }
   ],
-  "total_count": 165,
-  "active_count": 165,
+  "total_count": 166,
+  "active_count": 166,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
