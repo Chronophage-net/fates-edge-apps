@@ -1,0 +1,3125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.14" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The Gilded Heist</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
+<style id="fiction-frontmatter-style">
+.fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
+.fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
+.fiction-title-page h1 { font-size: 2.4rem; line-height: 1.15; }
+.fiction-copyright { padding: 3rem 1rem; font-size: .9rem; line-height: 1.65; border-top: 1px solid #999; border-bottom: 1px solid #999; margin-bottom: 4rem; }
+.fiction-copyright h2 { font-size: 1.25rem; }
+@media print { .fiction-title-page, .fiction-copyright { break-after: page; min-height: 70vh; border: 0; } }
+</style>
+</head>
+<body>
+<div class="fiction-frontmatter">
+<section class="fiction-title-page" aria-label="Title page">
+<p>Fate’s Edge · Novels &amp; Novellas</p><h1>The Gilded Heist</h1>
+<p>by Nicholas A. Gasper</p><p><a href="#fiction-copyright">Copyright and edition</a></p>
+</section>
+<section class="fiction-copyright" id="fiction-copyright" aria-labelledby="fiction-copyright-heading">
+<h2 id="fiction-copyright-heading">Copyright</h2>
+<p><strong>The Gilded Heist</strong><br>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+<p>This work of fiction, including its prose, original characters and setting, is proprietary content. It is not part of the Creative Commons-licensed Fate’s Edge System Reference Document.</p>
+<p>No part of this work may be reproduced or distributed without the copyright holder’s written permission, except as permitted by law.</p>
+<p>Digital reading edition · 2026</p>
+</section></div>
+<header id="title-block-header">
+<h1 class="title">The Gilded Heist</h1>
+</header>
+<h1 id="the-gilded-heist">The Gilded Heist</h1>
+<p><em>The Countess’s Irregulars — Book One</em></p>
+<h1 id="part-i-the-people-one-knows">Part I — The people one knows</h1>
+<h2 id="chapter-1-a-small-alteration">Chapter 1 — A small
+alteration</h2>
+<p>The blade came halfway out and stopped.</p>
+<p>Rosceline stood on the stool with one elbow above her head, a foot of
+bright steel projecting from the silk beneath her arm. She had paid
+forty-two marks for the dress. The sword had cost a man considerably
+more, although most of that expense had been incurred before she
+acquired it.</p>
+<p>“Don’t pull,” Briska said.</p>
+<p>Rosceline pulled.</p>
+<p>Silk parted from elbow to hip. The stool tipped. Daska caught her by
+the waist and set her back on it without interrupting the cut she was
+making with the shears.</p>
+<p>“There,” Daska said. “You can breathe now.”</p>
+<p>“I could breathe before.”</p>
+<p>“You were doing it very expensively.”</p>
+<p>At the workbench, Pello moved the dressmaker’s bill out from under
+the dripping oilcan. He examined the total, turned the paper over in the
+hope of finding an explanation, and put it down.</p>
+<p>Briska knelt beside the stool. Her black hair was braided close to
+her scalp, where it could not enter a gear. A pale burn curled around
+her wrist. She opened the clasp beneath Rosceline’s arm with a thumbnail
+and eased the blade clear of the torn lining.</p>
+<p>“The release worked.”</p>
+<p>“Beautifully,” Rosceline said.</p>
+<p>“Your sleeve entered the housing.”</p>
+<p>“We should have warned it.”</p>
+<p>“We did. I said fitted sleeves.”</p>
+<p>“These were fitted.”</p>
+<p>Daska turned the dangling silk outward. “To somebody with a second
+arm inside each one.”</p>
+<p>The workshop was above a cooper’s yard on a narrow canal where the
+water seldom moved faster than a walking man. Through its open window
+came the smell of wet staves, smoke and the scum that collected beneath
+the bridge. A boy downstairs was striking a barrel hoop with an iron
+hammer. He struck four times, paused, then struck five. In the corner
+Ilaro Selci sat with his face turned from the window and waited for him
+to finish.</p>
+<p>“Will the merchant be wearing armor?” he asked.</p>
+<p>“I hope not.” Rosceline looked toward the mirror. “We are going to a
+party.”</p>
+<p>“Then perhaps you could stab him with something smaller.”</p>
+<p>The mirror had belonged to a woman who sold assurances of fidelity. A
+dark stain occupied the place where her customers’ left eyes would have
+been. Rosceline shifted until she could see all of herself. The split
+showed a promising length of leg.</p>
+<p>She liked the color. In shade the silk was green enough to seem
+sober. Sunlight brought gold out of it, a slow, rich bloom that made the
+skin at her throat look warmer. She had chosen it for a woman who bought
+paintings on behalf of people who could afford to have somebody else
+choose them. It had no resemblance to the clothes she wore when visiting
+those people’s creditors.</p>
+<p>“I could keep the slit.”</p>
+<p>“You will have to,” Briska said. “Unless you can grow another
+piece.”</p>
+<p>Pello looked up. “Can you?”</p>
+<p>“Only on someone else’s dress.”</p>
+<p>He considered this answer longer than it deserved. Pello was
+perfectly capable of carrying a false bottom through a search conducted
+by his own uncle. He had trouble with Rosceline’s accounts of magic. She
+had never done him the courtesy of making all of them false.</p>
+<p>Daska folded the torn cloth back and pinned it. She had large, blunt
+fingers and a seamstress’s indifference to the body inside the garment.
+Rosceline had seen those same fingers turn a man’s wrist until he gave
+back a purse he had not stolen. It had been the wrong man. Daska had
+apologized, bought him a drink, and gone looking for the right one with
+a description that was now much better.</p>
+<p>“You can carry mine,” she said.</p>
+<p>“Your knife looks like a kitchen utensil.”</p>
+<p>“It is a kitchen utensil.”</p>
+<p>“I have a position to maintain.”</p>
+<p>“Then stand still.”</p>
+<p>Briska removed the little spring housing and brought it to the bench.
+Her tools lay on a gray cloth in a remarkably exact disorder. Pello knew
+which things he could touch because she had put them on his side. He
+touched one that she had not, and she took it from him without
+looking.</p>
+<p>“This wants a guard over the throat,” she said. “The catch is sound.
+A lip here will keep the lining out.”</p>
+<p>“You can do that by tomorrow?” Rosceline asked.</p>
+<p>Briska’s eyes rose.</p>
+<p>“That was a question about time.”</p>
+<p>“I heard it.”</p>
+<p>The hammer below struck again. Ilaro shut his notebook.</p>
+<p>“Would somebody ask the boy to hit it once?”</p>
+<p>Pello went to the window. “They all have to go in.”</p>
+<p>“I know how barrels work. I mean once per attempt.”</p>
+<p>Pello leaned out. There was a brief negotiation involving the boy’s
+skill, his employer’s hearing, and two copper pieces. The hammer
+stopped. A saw began.</p>
+<p>Ilaro rested his forehead on two fingers.</p>
+<p>“I specified hammering,” Pello said.</p>
+<p>Daska laughed. It was an unguarded, belly-deep noise. The monk’s
+former superiors, whoever they were, had failed to remove that from her.
+She finished the last pin and helped Rosceline step down.</p>
+<p>“You owe the dressmaker another fitting.”</p>
+<p>“She owes me a sleeve.”</p>
+<p>“Try that on her. I want to hear it.”</p>
+<p>There was a knock below, followed by the cooper telling someone that
+they were upstairs and that he took no responsibility for it. A woman in
+a dark blue coat came through the door. Her hair was dressed without a
+single escaped strand. She looked at the sword, the pins, the bill and
+Ilaro’s closed eyes in that order.</p>
+<p>“Madame Rosceline.”</p>
+<p>“Celise. Come in.”</p>
+<p>“I appear to have.”</p>
+<p>Pello cleared a chair. Celise remained standing.</p>
+<p>“The Countess will receive you at four. All five of you.”</p>
+<p>“She has decided?” Rosceline asked.</p>
+<p>“She has a proposal.”</p>
+<p>“Those are often the same thing in her house.”</p>
+<p>Celise gave that no answer. She took a square card from the inside
+breast pocket of her coat and put it on the workbench, beyond the oil.
+There was no name on it. A narrow border, black ink, an address on the
+quiet side of a bridge whose other side never slept.</p>
+<p>Rosceline had been to the house twice. The first time she had talked
+her way in. The second time she had been expected, which had felt
+worse.</p>
+<p>“Will there be food?” Daska asked.</p>
+<p>“At four?”</p>
+<p>“I like to know.”</p>
+<p>“There can be.”</p>
+<p>“Thank you.”</p>
+<p>Celise’s mouth changed slightly. “You are welcome.”</p>
+<p>After she had gone, Ilaro opened his notebook again.</p>
+<p>“You told her about us.”</p>
+<p>“I recommended you.”</p>
+<p>“What did you recommend me for?”</p>
+<p>“The truth, when it is inconvenient.”</p>
+<p>“You could have employed me yourself.”</p>
+<p>“I could not afford the volume.”</p>
+<p>He looked at her for a moment. His left eye watered in strong light;
+she had learned to wait until he finished blinking before deciding
+whether he was angry. This time he was amused. A little.</p>
+<p>“Four,” he said. “I need an hour before that without the rest of
+you.”</p>
+<p>Pello reached for his cap. Daska took an apple from the bowl on the
+bench and tossed another to him. Briska was already shaping the guard
+for the release, one foot braced on the stool. She worked with the
+pleasure of someone being allowed to correct a person in metal.</p>
+<p>Rosceline stayed for the second test.</p>
+<p>The harness lay diagonally beneath the dress, holding the slender
+blade from her left ribs toward her right thigh. A small sheath covered
+the point. Briska fitted the guard over the release and made Rosceline
+draw slowly, once, then in a single movement. Steel hissed through the
+slit. The point passed within an inch of the mirror.</p>
+<p>“Again,” Briska said.</p>
+<p>Rosceline sheathed it. Drew. This time she turned as she did it,
+letting the skirt follow the movement. The green silk opened around her
+knee. In the mirror, a woman of excellent breeding appeared ready to run
+somebody through.</p>
+<p>“That’s better.”</p>
+<p>“It was the sleeve,” Briska said.</p>
+<p>Rosceline kissed her on the crown of her head.</p>
+<p>Briska wiped her cheek against her shoulder, although the kiss had
+not touched it. “You’ll put paint on the work.”</p>
+<p>“Then it will be worth more.”</p>
+<p>She went downstairs before Briska could answer. At the bottom, the
+cooper was trying to explain to his apprentice why silence was not part
+of the price of a barrel. Rosceline left two more coppers beside the
+boy’s saw and carried her torn, lovely dress out into the afternoon.</p>
+<h2 id="chapter-2-the-price-of-a-voice">Chapter 2 — The price of a
+voice</h2>
+<p>The Countess’s door had no knocker. A woman opened it before
+Rosceline could decide whether that was a courtesy or a measurement.</p>
+<p>Inside, the air smelled of jasmine and the dry, sweet dust of paper
+kept from damp. There was water somewhere behind a screen. A shallow
+fountain, perhaps, though Rosceline had never seen it. The sound was
+irregular enough to make her listen.</p>
+<p>Daska had brushed her coat and left it open. Her clothes fitted
+closely at the wrists and ankles, and she had put on earrings the color
+of ripe plums. Pello had washed. Ilaro wore the same dark coat he wore
+everywhere, with the collar repaired in thread almost, but not quite,
+its color. Briska carried her questions in a leather case, together with
+a short rule.</p>
+<p>Celise took them through a waiting room. A woman sat beside the
+window with a paper crushed between her hands. She was in stage paint,
+one eye finished, the other bare. Without the second eye her face looked
+painfully unbalanced.</p>
+<p>“He says the rooms belong to the company,” she was telling a younger
+attendant. “They do. I know that. I pay for them every month.”</p>
+<p>The attendant glanced toward Celise.</p>
+<p>“Letha,” Celise said. “Come upstairs with me.”</p>
+<p>“I don’t mind the rent. He wants me to tell him who comes after the
+performance. As if I don’t have anything to do afterward except remember
+men for him.”</p>
+<p>Her voice was low and scraped at the edges. A singer who had been
+arguing instead of resting it.</p>
+<p>Celise held out her hand for the paper. Letha let her take it and
+stood. At the foot of the stair she caught sight of Daska’s
+earrings.</p>
+<p>“Those will pull if you turn fast.”</p>
+<p>“I take them off.”</p>
+<p>Letha nodded, as though that at least had been settled, and went
+upstairs.</p>
+<p>The Countess waited in the next room. Here, Madam Serafine received
+as the Velvet Countess. Her veil was dark, fine enough for the outline
+of her mouth to show when she turned toward the light. A bowl of white
+flowers stood near her chair. She wore no excessive jewelry. Men who
+expected a quantity of gold to tell them where the power sat generally
+found this room confusing.</p>
+<p>“Madame Rosceline. Your friends.”</p>
+<p>Rosceline introduced them. The Countess gave Ilaro the chair with its
+back to the window. To Daska she offered a plate of small savory cakes
+before the introductions were finished.</p>
+<p>“I have been told you prefer matters put plainly,” she said to
+Briska.</p>
+<p>“Someone has complained about me.”</p>
+<p>“Several people. A useful degree of consistency.”</p>
+<p>She laid a drawing on the low table. Briska moved the flowers to make
+room. The Countess watched her do it.</p>
+<p>“Lord Caspian Verre holds his Lantern Gala tomorrow evening. I
+require a book from his cellar.”</p>
+<p>“Borrowed?” Pello asked.</p>
+<p>“Permanently.”</p>
+<p>“Good. Returning things is awkward.”</p>
+<p>The Countess’s mouth showed through the veil in what might have been
+a smile.</p>
+<p>The drawing depicted a house with a wide entrance hall, a side wing
+and a canal along its eastern wall. A small separate plan showed the
+cellar. Briska put her rule across it.</p>
+<p>“Measured?”</p>
+<p>“Walked.”</p>
+<p>“By someone with long legs?”</p>
+<p>“I can arrange an introduction.”</p>
+<p>“I’ll want one.”</p>
+<p>The Countess touched a rectangle at the end of the cellar passage.
+“The Sunset Ledger. Brown leather, brass corners, a red band across the
+spine. The name was a private joke. Caspian liked to conduct this
+business at the end of a successful day.”</p>
+<p>“Whose business?” Ilaro asked.</p>
+<p>“His. And a number of people who would now prefer to have conducted
+less of it.”</p>
+<p>She described a customs officer who stopped examining particular
+cargoes, a watch captain who sent patrols to the wrong quay, a landlord
+who discovered an old right to increase rents after his tenants refused
+to vote as instructed. She did not give the names. She gave the
+amounts.</p>
+<p>Rosceline looked toward the stair door.</p>
+<p>“And singers.”</p>
+<p>“Caspian has recently begun taking an interest in my
+acquaintances.”</p>
+<p>“You object to competition.”</p>
+<p>“I object to that woman’s frightened face in my waiting room. I also
+object to competition. You need not choose which is true.”</p>
+<p>Daska put down the cake she had been holding. She had eaten three.
+The Countess moved the plate closer to her anyway.</p>
+<p>The fee was a thousand silver marks, divided equally, with a separate
+purse for preparation. Rosceline watched Pello avoid looking at anyone.
+He had been talking about a boat for months. She could almost hear its
+dimensions expanding.</p>
+<p>“The original book,” the Countess said. “Complete. No pages sold to
+someone you meet on the way out. No copying it for an independent
+enterprise.”</p>
+<p>“Who else has copies?” Ilaro asked.</p>
+<p>“Of individual arrangements? Several people. Of the whole? I believe
+nobody. Caspian has found it prudent to make himself necessary.”</p>
+<p>“Prudent until tomorrow.”</p>
+<p>“If you do well.”</p>
+<p>Briska leaned over the cellar plan. “What’s on the door?”</p>
+<p>“Ironwork. A lock whose key is kept in his upper office. A portrait
+of his late wife.”</p>
+<p>“Paint is usually manageable.”</p>
+<p>“This one is less so. It requires something said to it. A private
+form of address, perhaps. I have not obtained it.”</p>
+<p>“And behind the paint?”</p>
+<p>“I do not have a complete account.”</p>
+<p>Briska sat back.</p>
+<p>The Countess took a cream envelope from a shallow drawer. Its flap
+was closed with red wax bearing the impression of a small flower. She
+laid it beside the plan.</p>
+<p>“If a claim is made upon removal of the book, this may settle
+it.”</p>
+<p>“May,” Ilaro repeated.</p>
+<p>“I cannot promise what someone else will accept.”</p>
+<p>“What are you offering them?”</p>
+<p>“One place, for one named guest, at one of my private evenings before
+the season ends. I choose the evening. They enter my house and receive
+my hospitality. Nothing more.”</p>
+<p>Rosceline looked at the envelope. She had once spent seventeen days
+trying to get a man invited to a supper in this house. The man had died
+of ordinary causes before she succeeded. She had retained the
+advance.</p>
+<p>“That’s expensive,” she said.</p>
+<p>“So is the book.”</p>
+<p>Briska lifted the envelope by its edges. “Does opening this bind the
+opener?”</p>
+<p>“No.”</p>
+<p>“Does carrying it?”</p>
+<p>“No.”</p>
+<p>“Can someone use it to enter a bedroom?”</p>
+<p>The Countess’s voice changed. “No.”</p>
+<p>Briska put it in her case.</p>
+<p>The rest was access. Lady Wren, who had a grievance and liked
+company. A restoration contractor prepared to add two workers to a list.
+A guard who wished to leave the city. The Countess knew where he drank
+and had not approached him herself.</p>
+<p>“He will trust someone who can be found afterward,” she said.</p>
+<p>“Then why ask me?” Rosceline said.</p>
+<p>“I asked all five of you.”</p>
+<p>They agreed to inspect the arrangements before giving a final answer.
+Celise returned and led them out, carrying the copied plans. Rosceline
+remained seated.</p>
+<p>The Countess waited until the stair door closed. Then she brought out
+the book.</p>
+<p>It was smaller than Rosceline remembered notebooks being in that
+house. Brown covers, rubbed pale at the bottom corners. A scrap of blue
+cloth had been sewn around the spine by a person who could work magic
+and could not sew. There was a dark crescent on the front where a cup
+had stood.</p>
+<p>Rosceline did not touch it.</p>
+<p>“Where?”</p>
+<p>“An Ashaani collection sold through three owners. I had the seller’s
+account checked as far as it could be.”</p>
+<p>“Where is he?”</p>
+<p>“The latest seller? At home, enjoying his money.”</p>
+<p>The Countess turned to a page marked with a thin ribbon. The writing
+ran uphill and then lost confidence halfway across. Rosceline knew the
+hand. She had copied beneath it, once, her own letters cramped for fear
+of wasting the paper.</p>
+<p>There was a mark in the margin shaped like the beginning of an ear.
+She placed her fingertip beside it.</p>
+<p>For a moment she heard only the water behind the screen.</p>
+<p>Then Sarem said, “Across the bronze—”</p>
+<p>“Burnished,” she said.</p>
+<p>“—burnished hills,” the voice continued, annoyed, and stopped.</p>
+<p>She laughed once. It hurt her throat.</p>
+<p>“He always did that.”</p>
+<p>The Countess said nothing.</p>
+<p>Rosceline touched the mark again. The same hesitation, the same
+correction. She knew what should follow. Her own voice, young and
+intolerably pleased to have caught him. The working had kept none of
+it.</p>
+<p>She withdrew her hand.</p>
+<p>“How many?”</p>
+<p>“Surviving passages? Four that my reader could wake. There may be
+others.”</p>
+<p>“Jobs.”</p>
+<p>The Countess sat opposite her.</p>
+<p>“Four successful recoveries. Offered separately. Accepted separately.
+Paid at the agreed rate. The first can be Caspian’s book.”</p>
+<p>“And if I refuse the next?”</p>
+<p>“You wait for another proposal.”</p>
+<p>“If you dislike the manner in which I bring something home?”</p>
+<p>“I will probably tell you.”</p>
+<p>“But it counts.”</p>
+<p>“If it is the thing we agreed upon, in the agreed condition,
+yes.”</p>
+<p>“Put that down.”</p>
+<p>The Countess opened the writing box beside her chair. Rosceline
+watched the nib move. At the end she took the paper, read it twice, and
+made one small addition above the line. The Countess initialed it.</p>
+<p>“You may hear it again before you go.”</p>
+<p>“I have heard it.”</p>
+<p>She stood too quickly. The Countess closed Sarem’s book with both
+hands, carefully, and Rosceline hated her for knowing how to handle
+it.</p>
+<p>Celise was waiting in the passage. Rosceline gave her the smile she
+used for agreeable meetings.</p>
+<p>Celise looked at it, then down at the torn seam beneath her coat.</p>
+<p>“There is a woman in our sewing room who could mend that.”</p>
+<p>“It’s intended.”</p>
+<p>“Of course.”</p>
+<p>Outside, Silkstrand struck her with heat and the smell of fish frying
+in old oil. The others waited beneath an awning. Daska had bought a
+paper cone of cherries. She offered it without asking why Rosceline had
+stayed behind.</p>
+<p>Rosceline took one, bit through the skin and let the sour juice fill
+her mouth.</p>
+<p>“We should do it,” she said.</p>
+<h2 id="chapter-3-people-who-will-help">Chapter 3 — People who will
+help</h2>
+<p>Ilaro put a white bean on the cellar vault and a red one on the canal
+wicket.</p>
+<p>“The white is the book.”</p>
+<p>“It will be brown,” Pello said.</p>
+<p>“I have white beans.”</p>
+<p>“And red ones.”</p>
+<p>Ilaro moved the red bean off the plan. “The wicket will remain a
+drawing.”</p>
+<p>He had slept badly. A pain sat behind his left eye, dull enough to
+tolerate until something struck it from the outside. The workshop’s
+upper shutters were closed, leaving a thin stripe of morning on the
+floor. Briska had moved her hammering downstairs. Pello, who seemed
+constitutionally unable to sit without shifting his weight, had been
+given the chair that did not creak.</p>
+<p>Daska arrived smelling of river mist and breakfast.</p>
+<p>“He’s there,” she said. “Eating very slowly.”</p>
+<p>Ilaro closed the notebook he had been reading. On its first page was
+his old business address. He had crossed it out years ago and continued
+using the book from the other end. Sometimes he opened it backward and
+spent a moment expecting somebody to knock.</p>
+<p>“Did you speak to him?”</p>
+<p>“I bought food. He looked at my hands.”</p>
+<p>“Did he look frightened?”</p>
+<p>“He looked as though he’d paid for eggs and wanted eggs.”</p>
+<p>Pello laughed. Ilaro put his pencil down.</p>
+<p>“Come on, then.”</p>
+<p>The eating stall stood above a landing where eel baskets were
+unloaded. Its proprietor cooked over charcoal in an iron pan so worn the
+middle glowed red through the ash. Hessel sat with his back to the wall
+and his breakfast divided into small pieces. He had a square head, a
+close beard and a little hooked scar beside his mouth. His coat was
+turned inside out to hide its livery. The stitching gave it away.</p>
+<p>Daska sat opposite him. Pello took the place nearest the steps. Ilaro
+stayed on the end, out of the direct sun.</p>
+<p>“I was told two,” Hessel said.</p>
+<p>“He asks questions,” Daska said, indicating Ilaro. “It saves time
+afterward.”</p>
+<p>Hessel pushed his plate away. “Ask.”</p>
+<p>The guard knew the house well. He gave the service-stair turns, the
+height of the kitchen sill and the position of the key board in
+Caspian’s office. He knew which maids would object to seeing a tradesman
+upstairs and which would object to not being helped with a basket. He
+described the head of security without affection and without
+contempt.</p>
+<p>“Mistress Thorn reads the whole instruction,” he said. “You can’t
+give her the last bit and hope she likes it.”</p>
+<p>“Is she at the gate?” Ilaro asked.</p>
+<p>“Everywhere. She starts at the gate.”</p>
+<p>Pello drew a narrow rectangle beside the canal.</p>
+<p>“Loading door?”</p>
+<p>“Upstairs. Linen room.”</p>
+<p>“Working hoist?”</p>
+<p>“It lifted a crate of lamps yesterday.”</p>
+<p>“How many men’s weight?”</p>
+<p>Hessel looked at him.</p>
+<p>“One at a time,” Pello said.</p>
+<p>“You asked about the wicket.”</p>
+<p>“Now I’m asking about the hoist.”</p>
+<p>Ilaro watched the guard’s plate. The yolk had begun to harden. Hessel
+wanted to reach for the bread and would not do it while they were
+watching him.</p>
+<p>“Eat,” Ilaro said. “We are not paying you to leave hungry.”</p>
+<p>Hessel tore the bread.</p>
+<p>His shift covered the last part of the gala. At the last dance he
+could turn from the canal wicket to help the kitchen men wheel out an
+empty wine rack. He would leave its bolt drawn and the landing lamp
+covered. The scow could take the crew aboard under the noise of a
+departing guest barge. Hessel would join them, leave his coat in the
+boat, and be out of the city on a coastal vessel the next morning.</p>
+<p>“Before that,” Ilaro said. “The cellar.”</p>
+<p>“I go down for the special wine.”</p>
+<p>“You leave the stair unwatched.”</p>
+<p>“For a little while.”</p>
+<p>“How little?”</p>
+<p>“Depends how long it takes to find the wine.”</p>
+<p>Daska smiled. Hessel did not.</p>
+<p>“They tell you to be useful,” he said. “You do a thing and then
+you’ve done it, and next time they know who to ask.”</p>
+<p>The proprietor put more charcoal under the pan. Sparks flew into the
+bright morning.</p>
+<p>“What did you do?” Daska asked.</p>
+<p>Hessel looked toward Pello, who was drawing the mooring posts.</p>
+<p>“There was a woman in a shop. Caspian said the lease had ended. She
+had shelves full of little birds. Clay ones. Whistles. I took the
+shelves down.”</p>
+<p>“With the birds on them?”</p>
+<p>Hessel rubbed the scar at his mouth.</p>
+<p>“Yes.”</p>
+<p>Ilaro could have asked which shop, how long ago, who else was there.
+He knew the usefulness and the danger of an account that ended before
+anyone bled. Daska let the silence go on until Hessel lifted his
+eyes.</p>
+<p>“I want the boat,” he said.</p>
+<p>Pello turned his paper. On the reverse he wrote a vessel’s name and a
+master’s name.</p>
+<p>“The <em>Little Sister</em>. East along the coast. Master Vennick.
+Your place is booked under Hessel. No clever name to forget when someone
+calls it.”</p>
+<p>Hessel looked more closely at him. “Your people are the
+Tregards.”</p>
+<p>Pello’s pencil stopped.</p>
+<p>“I’ve seen your cousin at the confiscation quay,” Hessel said. “The
+Vilikari family. Everybody in the watch knows the boats.”</p>
+<p>“Then the watch should stop buying them back from us.”</p>
+<p>“I’m not leaving Verre to work for smugglers.”</p>
+<p>Pello pushed the paper nearer. “Vennick isn’t family. I’ve bought you
+an ordinary berth. Nobody’s asking you to carry a parcel, now or when
+you get off.”</p>
+<p>Hessel read the names again. “Good.”</p>
+<p>“When?”</p>
+<p>“First light after the gala. I’ll give you the passage paper when we
+get you out.”</p>
+<p>“And if you leave early?”</p>
+<p>Daska put her hand flat on the table.</p>
+<p>“You go with us.”</p>
+<p>He looked at her hand, then at her face.</p>
+<p>“Say it properly.”</p>
+<p>“I’ll get you to your boat, Hessel.”</p>
+<p>He nodded. It was the first time his shoulders moved without
+following a noise.</p>
+<p>On the way back, Pello said, “The wicket opens inward.”</p>
+<p>“You asked him?” Ilaro said.</p>
+<p>“I looked from the landing yesterday. There’s a crescent scraped in
+the stone inside the sill. People drag it. It will make a noise.”</p>
+<p>“Put that on the plan.”</p>
+<p>“I did. You put a bean on it.”</p>
+<p>Ilaro stopped. Daska went another two paces before she noticed.</p>
+<p>“What?” she asked.</p>
+<p>“His shift. He said he relieves the canal guard at the second bell
+after supper. The Countess’s list says the first.”</p>
+<p>“He may have remembered wrong.”</p>
+<p>“Then we should not build an escape on his remembering right.”</p>
+<p>They went back. Hessel was still at the stall, finishing the
+bread.</p>
+<p>This time it took only a question. The kitchen bell was rung after
+the servants had eaten. The hall bell marked the guests’ supper, an hour
+earlier. Both lists were correct and useless without the distinction.
+Ilaro wrote <em>HALL</em> in large letters at the top of his page.</p>
+<p>Hessel watched him.</p>
+<p>“You used to be in the watch?”</p>
+<p>“No.”</p>
+<p>“You ask like one.”</p>
+<p>“I used to be paid to notice when they hadn’t.”</p>
+<p>At the workshop, Rosceline was waiting with two invitations on thick
+paper and a smear of lilac paint on her glove.</p>
+<p>“Wren?” Ilaro asked.</p>
+<p>“Admires my judgment.”</p>
+<p>“What did you promise?”</p>
+<p>“To admire a painter.”</p>
+<p>“Can he paint?”</p>
+<p>“I have not yet been asked to decide.”</p>
+<p>She took the chair opposite and listened while they described the
+guard. She asked sensible questions about the scow, the moment of
+departure and Thorn’s habit of reading every instruction. Ilaro watched
+her fingertip move along the plan from the wicket to the upper loading
+door. He had known her for two smaller jobs. On the first she had lied
+to everyone except him. On the second she had lied to him as well, and
+saved him from arrest by doing it.</p>
+<p>He had not decided how to enter that in his notes.</p>
+<p>“What does the guard want?” she asked.</p>
+<p>“To leave,” Daska said.</p>
+<p>“Everyone wants to leave somewhere.”</p>
+<p>“He wants to leave this place on this boat tomorrow morning. We’ve
+promised.”</p>
+<p>Rosceline lifted her finger from the plan.</p>
+<p>“Then we should be punctual.”</p>
+<p>She went out again with the invitations tucked into the inner pocket
+of her coat. Pello left to confirm the berth. Daska took the cold tea
+downstairs to empty it without asking Ilaro whether he wanted it
+reheated. Briska returned with a metal blank she intended to turn into a
+key.</p>
+<p>Ilaro put the white bean beside the canal and began the sequence
+again, this time from the end.</p>
+<h2 id="chapter-4-spare-parts">Chapter 4 — Spare parts</h2>
+<p>Briska’s parent had sent the lock as a birthday present.</p>
+<p>It was a beautiful piece of work. Seven tumblers, a concealed gate, a
+spring that would hold its temper for longer than most lowland houses
+stood. The key had arrived a week later with a proposal for distributing
+the locks along the western coast.</p>
+<p>Briska kept the lock. She had opened it before the key came.</p>
+<p>Her parent had spent most of her childhood walking between the Aeler
+holds and the lowland markets. Every homecoming brought samples,
+contracts and some new reason the workshop could be made more
+profitable. Briska had declined the last reason in writing. The
+Edgewalker had sent back a correction to her estimate.</p>
+<p>People hearing Aezenbron sometimes expected somebody older, broader
+and born under a mountain. She was half-Aeler and had grown up beside
+this canal. Neither fact had ever prevented a customer from asking her
+to mend an ancient thing whose maker had been dead longer than her
+family could remember.</p>
+<p>It stood now at the back of her bench, holding down a stack of
+drawings she did not want anyone to read. Beside it lay three brass
+blanks, a shallow tray of dark wax and a thin fold of silver that would
+keep the wax from adhering to the original key. She had spent the
+morning learning how much pressure would give her a clean impression
+through a work glove.</p>
+<p>Pello watched her make the fifth attempt.</p>
+<p>“You could ask for the key.”</p>
+<p>“That’s the next version of the device.”</p>
+<p>“Cheaper.”</p>
+<p>“Only if they give it to you.”</p>
+<p>She lifted the test key. Clean shoulders, no drag at the teeth. The
+wax smelled faintly of pine resin. It pleased her more than she intended
+to show.</p>
+<p>Pello was looking at the birthday lock.</p>
+<p>“Did you make that?”</p>
+<p>“No.”</p>
+<p>“It’s good.”</p>
+<p>“Yes.”</p>
+<p>“I could sell them.”</p>
+<p>Briska gave him the look that had made two masters decline to retain
+her as an apprentice. “So I have been told.”</p>
+<p>He left it alone. Pello had an excellent sense of danger when the
+danger was within arm’s reach.</p>
+<p>Down in the yard, his cousin was attempting to move Briska’s tool
+frame without touching the dirty side of it. This was difficult because
+all four sides had been in the workshop. The cousin had a broad face,
+silver rings in both ears and the patient, proprietary manner of someone
+who had known Pello when he was small enough to lift by the collar.</p>
+<p>“You said a box,” he called.</p>
+<p>“It folds,” Briska said.</p>
+<p>“So do dead men. People still charge by the length.”</p>
+<p>She went down and showed him how the corner braces released. The
+wooden frame came together around the tools, its canvas cover closing
+over the top. A pair of leather handles took the load. The cousin lifted
+it and grunted.</p>
+<p>“And five people?”</p>
+<p>“Six,” Pello said. “The guard.”</p>
+<p>“Plus me.”</p>
+<p>“You were always coming.”</p>
+<p>“Good of you to remember.”</p>
+<p>The scow waited at the landing beneath the yard. Its paint had been
+blue in several different years. A broad, shallow hull gave room for
+crates and passengers; a long sweep hung off the stern, and two shorter
+oars lay inside. Briska stepped aboard and inspected the gunwale
+fastenings. The cousin watched her with increasing offense.</p>
+<p>“She floats.”</p>
+<p>“That’s one of the things I need.”</p>
+<p>“What are the others?”</p>
+<p>She pointed at the gap beneath a thwart. “Somewhere to put the tools
+where they won’t shift into a passenger’s legs.”</p>
+<p>He showed her a sound lashing point, then another. He knew his boat.
+She liked him better after he stopped telling her so.</p>
+<p>Pello counted the oars, touched the spare painter and looked up
+toward the workshop window. “We need to practice lowering.”</p>
+<p>The cousin’s expression brightened. “Him first.”</p>
+<p>They used the yard’s lifting beam. Pello rigged a line through a
+pulley and made a broad sling from a spare sail strap. Briska put the
+tool frame in it first, then the cousin added two sacks of sand. The
+beam creaked. The knots held.</p>
+<p>Daska arrived while they were lowering Pello.</p>
+<p>“You’ve found work for him.”</p>
+<p>“He’s freight,” the cousin said. “Costs less if it doesn’t
+speak.”</p>
+<p>Pello reached the scow, unhooked himself and threw the empty sling
+up. His cousin made him do it again. On the third descent he caught a
+heel under the window sill and swung hard enough to strike the wall.</p>
+<p>“Feet together until you’re clear,” Daska said.</p>
+<p>“I know.”</p>
+<p>“Then do that instead.”</p>
+<p>Briska watched the rope run. Nothing in the arrangement required
+novelty. Sound rope, a sound anchor, a person who paid attention at each
+end. She felt a small resentment toward how well it worked.</p>
+<p>Ilaro came down when the sun had moved off the yard. He examined the
+sling without touching it.</p>
+<p>“I would prefer stairs.”</p>
+<p>“So would I,” Briska said. “We’re making sure.”</p>
+<p>He took his coat off and folded it over a barrel. Daska helped him
+into the strap. Halfway down he shut his eyes and asked them to stop
+swinging him. They had not known they were.</p>
+<p>Pello steadied the rope from the boat. Ilaro descended the last few
+feet with his jaw clenched and remained seated after they freed him.</p>
+<p>“Again?” Briska asked.</p>
+<p>“No. I understand the principle.”</p>
+<p>She sat on the landing beside him while the others coiled the line.
+It was evening now. A woman was washing a child on the next stair,
+threatening to throw his dirty ears into the canal and let him grow new
+ones. The child offered her his brother’s ears instead.</p>
+<p>“Will you manage?” Briska asked.</p>
+<p>Ilaro rubbed his palms together. “If you don’t ask me while I’m doing
+it.”</p>
+<p>“I can manage that.”</p>
+<p>“And tell me before the drop. People say ‘ready’ when they mean
+they’re about to release something. I prefer to hear what the something
+is.”</p>
+<p>She wrote that on the corner of the plan after they went
+upstairs.</p>
+<p>Later she took apart the latch-spreader she intended to carry. A tiny
+screw drove two opposed jaws outward. In an ordinary door it would ease
+the wood away from a sprung latch long enough to put a shim through. In
+a well-repaired door it would probably bend itself into an expensive
+ornament. She packed a thin strip of steel beside it.</p>
+<p>Pello had gone with his cousin to arrange the coastal berth. Daska
+sat on the floor oiling the soles of her dancing shoes. The shoes were
+soft leather with a repair under the right heel. They had been used, and
+used hard.</p>
+<p>“You like this part,” Briska said.</p>
+<p>“The shoes?”</p>
+<p>“Tonight.”</p>
+<p>Daska pressed the repaired heel with her thumb. “I’ve danced for
+worse reasons.”</p>
+<p>“At the monastery?”</p>
+<p>“They frowned on it.”</p>
+<p>“Did that stop you?”</p>
+<p>“For years.”</p>
+<p>The answer came so readily that Briska had to look up.</p>
+<p>Daska set the shoe aside. “I was very good at doing what I was
+told.”</p>
+<p>“I find that difficult to picture.”</p>
+<p>“So do I, now.” She picked up the other shoe. “They used to give us
+sealed chests to carry to the winter kitchens. Said curiosity was the
+self asking to be fed. I got strong carrying them. Didn’t get curious
+until they stopped sending the kitchens any food.”</p>
+<p>Briska tightened a screw that was already tight.</p>
+<p>“Did you open one?”</p>
+<p>“Eventually.”</p>
+<p>Daska rubbed the oil into the leather. Briska let her. After a while
+the monk asked whether she had a needle heavy enough for a sole, and
+they talked about that.</p>
+<p>When the workshop was quiet, Briska opened a little tin from the top
+shelf. Inside lay a casting with one bubble near the neck. A narrow,
+useless thing, her first attempt to make a valve that would close under
+its own weight. She set it beside the finished tools and rested a
+fingertip against the flaw.</p>
+<p>“First Breath,” she said softly. “One thing I haven’t thought of. Let
+me see it before it breaks.”</p>
+<p>There was no answer. She had never expected one. She inspected the
+sling buckle again and found a burr that might fret the strap. She filed
+it away.</p>
+<p>By the time Rosceline returned for her dress, the tools were packed,
+the rope was dry and the candle had burned a little hollow in its own
+wax. Rosceline came upstairs with a narrow red ribbon folded between two
+fingers.</p>
+<p>“A gift?” Briska asked.</p>
+<p>“For someone who is helping us.”</p>
+<p>“What does the help cost?”</p>
+<p>“Less than the ribbon.”</p>
+<p>Briska looked at her. Rosceline smiled, took the mended dress from
+its hook and held it against herself.</p>
+<p>“Have you improved my sword?”</p>
+<p>“I have improved your access to it.”</p>
+<p>“A useful distinction.”</p>
+<p>She turned toward the mirror. Briska put the faulty little casting
+back in its tin and closed the lid.</p>
+<h1 id="part-ii-an-excellent-invitation">Part II — An excellent
+invitation</h1>
+<h2 id="chapter-5-almost-certainly-invited">Chapter 5 — Almost certainly
+invited</h2>
+<p>Rosceline wrote with her left hand.</p>
+<p>She could write well with it. Tonight she made the letters thick and
+uncertain, an educated person’s idea of a laborer’s effort. She
+misspelled <em>duplicate</em>, corrected it, and left the first attempt
+visible beneath a single stroke.</p>
+<p><em>Mistress Thorn. Your canal man Hessel is selling keys. Ask him
+where he means to be tomorrow. You will not find him at his station when
+the guest barge leaves.</em></p>
+<p>She read it over. Too good. She removed the final sentence and began
+again on a fresh sheet, replacing it with <em>He has money that is not
+his pay.</em></p>
+<p>That was true. Daska had given him half his fee against the route.
+Enough for Thorn to find something when she looked, and finding
+something would keep her looking there.</p>
+<p>The first sheet went into the little fire beneath the kettle.
+Rosceline held it by a corner until the heat reached her nail.</p>
+<p>Below her rented room, a messenger waited beside a flower stall. He
+had a pitted cheek and the long, careful nails of a man who did no
+carrying. He had delivered three unpleasant discoveries for her in the
+past and never asked whether the discoveries were genuine.</p>
+<p>She gave him the folded note, tied with the red ribbon.</p>
+<p>“Amber Villa. Security entrance. Mistress Thorn herself.”</p>
+<p>“Before the party?”</p>
+<p>“At the second boarding call from the guest barge. Not the
+first.”</p>
+<p>“I know numbers.”</p>
+<p>“I have paid people who didn’t.”</p>
+<p>He tucked the note inside his waistcoat. “What if the barge doesn’t
+leave?”</p>
+<p>“Then you bring it back.”</p>
+<p>She paid him half and showed him the rest. He looked at the dress
+beneath her open coat, with the new slit edged in narrow gold braid.</p>
+<p>“You going in?”</p>
+<p>“I have an invitation.”</p>
+<p>“People with invitations usually want things delivered before.”</p>
+<p>“Those are gifts.”</p>
+<p>She left him with that distinction and walked toward the hired chair
+waiting at the corner.</p>
+<p>Hessel would be in Pello’s scow by the second call. She had left
+margin for ordinary delay. Thorn would find his absence, his abandoned
+duties and the money, if he had been fool enough to keep any in his
+room. The inquiry would follow the departing guard toward the sea.
+Madame Rosceline would remain a woman who had admired two paintings and
+refused to buy either.</p>
+<p>It was a useful identity. She had spent a year making it useful. She
+did not intend to lose it because the others were content to leave the
+direction of the search to chance.</p>
+<p>Ilaro waited beside the chair, wearing a small black mask above his
+ordinary coat.</p>
+<p>“Is that all?” she asked.</p>
+<p>“It covers the part people object to.”</p>
+<p>She took his arm. “Smile when I introduce you.”</p>
+<p>“I have a headache already.”</p>
+<p>“Then we must give you a different expression for it.”</p>
+<p>The Amber Villa rose above a low wall crusted with flowering vines.
+Its pale stone had drunk the day’s heat and returned it to the evening
+in slow breaths. Lanterns swung between carved posts. Within the gates,
+women moved like brilliant fish through the dark backs of men’s coats.
+Gold flashed at throats and wrists. A man had brought a small white
+animal on a chain and was attempting to explain its value to someone who
+had stepped in its leavings.</p>
+<p>The hired chair stopped behind a carriage whose wheels were lacquered
+crimson. Rosceline gave the bearers a gratuity large enough to be seen,
+then walked past the carriage before its passengers could emerge.</p>
+<p>At the gate a woman in a plain coat examined their invitations. Her
+hair was graying at the temples. A sword hung high at her left hip,
+clear of the people crowding past. The fingers holding the paper had old
+burns across the knuckles.</p>
+<p>“Lady Wren’s guests,” Rosceline said.</p>
+<p>“I can read.”</p>
+<p>Rosceline smiled. “That makes the evening easier.”</p>
+<p>The woman looked up. Thorn’s eyes were a pale brown, almost yellow in
+the lantern light. They passed over Ilaro, returned to Rosceline’s split
+skirt, and stopped at the line of her left shoulder.</p>
+<p>“The coat stays in the cloakroom.”</p>
+<p>“I should hope so. It has been trying to slide off me since the
+bridge.”</p>
+<p>“Weapons stay there too.”</p>
+<p>“Do you consider opinions weapons?”</p>
+<p>“Only when somebody won’t stop using them.”</p>
+<p>She returned the invitations. Rosceline went through without another
+attempt to be amusing.</p>
+<p>In the cloakroom she surrendered her outer coat and the little knife
+she carried openly in its pocket. The attendant gave her a wooden token.
+The rapier’s hilt lay flat beneath her left arm. She kept that arm
+relaxed. Briska’s harness held without pulling.</p>
+<p>The hall opened in a blaze of cut glass. Chandeliers threw light onto
+gilded pilasters and the wet-looking green of enormous leaves standing
+in pots. Someone had banked white flowers along the stair. Beneath their
+scent lay hot wax, perfume and the dense animal warmth of people
+determined to enjoy themselves in too many clothes.</p>
+<p>Rosceline breathed it in.</p>
+<p>She had been hungry in cities full of rooms like this. She had
+entered them through kitchens, windows and a hole beneath a wall once
+occupied by a much smaller thief. Tonight a servant pronounced her name,
+correctly, and six people turned to find out whether they should know
+her.</p>
+<p>She let them wonder for a moment.</p>
+<p>“Madame Rosceline,” said a man in silver-gray silk. “At last.”</p>
+<p>Caspian Verre was handsome in the well-maintained manner of a man
+whose mirrors were paid to tell him the truth. A little softness beneath
+the jaw, a strong nose, hair dressed back from his temples. His mask
+hung from two fingers. He had taken it off so that other people could
+recognize him.</p>
+<p>“My lord.”</p>
+<p>“Wren tells me you have an eye.”</p>
+<p>“Two, on most evenings.”</p>
+<p>He laughed exactly enough. “And Mr. Selci.”</p>
+<p>Ilaro inclined his head.</p>
+<p>“You know the family?” Rosceline asked, lightly.</p>
+<p>“I know a number of people,” Caspian said. “I hope you will like the
+collection.”</p>
+<p>He touched her fingers as he bowed. His skin was warm and very
+dry.</p>
+<p>A servant brought him a glass. Caspian glanced at it and said, “No
+clove for Lady Vessa. She asked last year. And give the musicians their
+first purse before the dancing begins. I won’t have them counting my
+generosity by the tune.”</p>
+<p>The servant smiled with relief and went away.</p>
+<p>“You see?” Caspian said. “I attend to small things.”</p>
+<p>“It must be exhausting.”</p>
+<p>“I have people.”</p>
+<p>Across the hall, Daska stood with the dancers near the musicians’
+platform. She had removed the plum earrings and wore a narrow amber
+mask. Her hair was bound behind her neck. A wiry woman beside her was
+demonstrating a step with considerable impatience. Daska watched,
+repeated it, and added a turn. The woman’s impatience became
+interest.</p>
+<p>Rosceline let Caspian introduce her to a man who owned salt
+warehouses. While the man described the difficulties of salt, she
+watched Daska take the floor.</p>
+<p>The first movement was restrained. Hands meeting, weight passing,
+skirts brushing polished stone. Then the drum entered. Daska’s partner
+stepped across her line to test her; she shifted around him so closely
+that his sleeve lifted in her wake. He grinned. She gave him the turn
+back and laughed when he nearly missed it.</p>
+<p>Rosceline had meant only to use the distraction. She found herself
+watching for another measure.</p>
+<p>“Difficult business,” the warehouse owner said.</p>
+<p>“A terrible business.”</p>
+<p>“People imagine the sea does it for us.”</p>
+<p>“People imagine all sorts of things.”</p>
+<p>She saw Pello on the far side of the hall carrying a rolled canvas.
+Briska walked ahead of him with the confidence of a woman who had been
+asked to repair something and intended to make everyone regret the
+asking. They vanished through the eastern service door.</p>
+<p>Ilaro had obtained his introduction to the art steward. He was being
+shown upstairs. Before he turned, he touched the right side of his mask:
+the agreed sign that he had the gallery.</p>
+<p>Rosceline moved her glass to her left hand. Under the musicians’
+platform, a man in a porcelain mask sat beside an empty chair.</p>
+<p>There was nothing on the mask. No painted mouth, no eye decoration,
+only the cut openings and the faint glaze of cream-colored clay. The
+wearer held a wineglass by its stem. A dark glove covered the hand.</p>
+<p>The warehouse owner followed her glance.</p>
+<p>“Do you know that person?” she asked.</p>
+<p>“One of Caspian’s private guests.”</p>
+<p>“Which one?”</p>
+<p>He seemed to forget that she had asked. His eyes returned to her face
+and settled there with renewed appreciation.</p>
+<p>“I was saying, the cost of storage—”</p>
+<p>Rosceline put her glass into his hand.</p>
+<p>“Forgive me. I have seen a painting.”</p>
+<p>She left before he could decide which glass belonged to him.</p>
+<h2 id="chapter-6-the-door-that-stopped-scraping">Chapter 6 — The door
+that stopped scraping</h2>
+<p>The steward’s name was Orset. He had written it on the repair order
+in a hand that disliked expenditure.</p>
+<p>Briska stood beneath the portrait in Caspian’s office and held up the
+damaged brass fitting.</p>
+<p>“Who used this screw?”</p>
+<p>“The previous contractor.”</p>
+<p>“Did you pay him?”</p>
+<p>“Of course.”</p>
+<p>“Before he left?”</p>
+<p>Orset tightened his mouth. Pello, carrying the tool frame, looked
+innocently at the ceiling.</p>
+<p>The office was long and shallow, with two windows toward the street
+and a door onto the upper gallery. A desk occupied the center. Its
+surface was empty except for a tray, a letter opener and a little glass
+bird with a chipped beak. On the wall beside the portrait hung a board
+with four keys.</p>
+<p>Hessel had described them well. The vault key was the shortest: a
+broad, flat bow, a stem darkened where fingers held it, five teeth with
+one cut deep into the shoulder. Briska looked once and returned to the
+fitting.</p>
+<p>“I’ll need a new fixing in the wall. Can someone fetch water? Enough
+to settle the dust.”</p>
+<p>“You will not make dust in here.”</p>
+<p>“Then I shall need more water.”</p>
+<p>Orset looked toward Pello.</p>
+<p>“I need him to hold the frame,” Briska said.</p>
+<p>The steward went to the door and called for a servant. Pello brought
+the tool frame against the wall, opening its canvas cover between Orset
+and the key board. Briska reached beneath it, lifted the short key and
+pressed it into the wax lined with thin silver. Her thumb knew when the
+teeth had settled. She lifted it straight out, replaced it on its hook
+and closed her palm over the tray.</p>
+<p>Orset turned back before she had put the tray away.</p>
+<p>“What is that?”</p>
+<p>“Wax.”</p>
+<p>“For the wall?”</p>
+<p>“For the fitting. The wall gets water.”</p>
+<p>She showed him the piece of brass with wax darkening one edge. She
+had put it there before coming into the house. He inspected it, disliked
+the evidence of activity, and told them to be quick.</p>
+<p>Briska made the repair properly. She would have found it difficult to
+do otherwise with the screw in her hand. The old fixing had been driven
+into a crumbly joint. She moved it a finger’s breadth and seated it in
+sound stone. Pello held the frame while she worked. Sweat gathered under
+his cap.</p>
+<p>The woman in the portrait wore black, with a white flower caught in
+the opening of her bodice. Her face was less beautiful than the painter
+might have been paid to make it. The mouth, broad and slightly uneven,
+interested Briska. So did the wedding ring, worn high above the knuckle
+where the finger narrowed.</p>
+<p>When they lifted the frame clear, Pello saw writing on its back.</p>
+<p>“Don’t rub that,” Briska said sharply.</p>
+<p>He froze with his thumb beside the letters. “I wasn’t.”</p>
+<p>“Hold it away from your coat.”</p>
+<p>She took the thin mirror from her kit, ostensibly to inspect the
+upper fastening, and read the line backward.</p>
+<p><em>They came for you. C.</em></p>
+<p>Below it was a date, old enough for the varnish to have darkened
+around the incisions. She copied both on the back of the repair order
+while pretending to note the screw size. Pello watched without asking.
+He was good when given something clear to do.</p>
+<p>Afterward Orset took them to the linen room. Its loading door stood
+above the canal, and the hoist projected beyond the outer wall under a
+small tiled hood. A wooden cleat was bolted into a beam inside. The
+floor was scarred by the feet of heavy trunks.</p>
+<p>“Your things out this way,” the steward said. “You will not carry
+that box through supper.”</p>
+<p>“Someone will have to receive it.”</p>
+<p>“Arrange it.”</p>
+<p>Pello leaned out and whistled twice. Below, his cousin brought the
+scow out from under the shadow of a mooring stage. A servant stacking
+linen glanced through the opening and lost interest.</p>
+<p>Briska knelt beside the tool frame. Under its cover she put the
+impression into a wooden clamp and began filing a prepared blank. The
+coarse work was already done. She needed the deep shoulder cut and the
+final height of two teeth. She worked by feel as much as sight, hiding
+the motion beneath the canvas while Pello examined the hoist.</p>
+<p>“Old line is rotten near the eye,” he said.</p>
+<p>The servant looked up.</p>
+<p>“Then don’t use it.”</p>
+<p>“We brought one.”</p>
+<p>“Use that.”</p>
+<p>He did. The rope went through the pulley; the sling took the tool
+frame; the cousin cursed softly as it came down onto his boat. Pello
+left their line reeved and coiled the tail behind a stack of spare
+canvas. Briska kept the small kit in her leather bag and put the
+finished duplicate into its narrow side pocket.</p>
+<p>When she stood, the linen-room door caught on the floor.</p>
+<p>She looked at the lower hinge. Two turns would lift it clear.</p>
+<p>“Leave that,” Pello murmured.</p>
+<p>“It makes noise.”</p>
+<p>“It’s made noise for years.”</p>
+<p>“We’re leaving through here if things go badly. Do you want
+noise?”</p>
+<p>She lifted the door against her knee and tightened the loose screw.
+It moved beautifully.</p>
+<p>Mistress Thorn came through it less than a minute later.</p>
+<p>She stopped with one hand on the latch, pulled the door back and
+opened it again.</p>
+<p>“Who did that?”</p>
+<p>Briska kept her bag open. Hiding a thing too quickly was a good way
+to advertise it.</p>
+<p>“I did.”</p>
+<p>“Why?”</p>
+<p>“It scraped.”</p>
+<p>Thorn looked at her clothes, the bag, the clean semicircle on the
+floor where old scraping had polished the boards. “It did.”</p>
+<p>Pello stood by the hoist with the awkward blankness of a man trying
+not to look toward a rope.</p>
+<p>“Name?” Thorn asked him.</p>
+<p>“Canaletti.”</p>
+<p>“That all?”</p>
+<p>“Pello Canaletti.”</p>
+<p>“You took something down to a boat.”</p>
+<p>“Tools.”</p>
+<p>“A large number of tools.”</p>
+<p>“For large repairs.”</p>
+<p>Briska closed her eyes briefly.</p>
+<p>Thorn went to the loading door and looked down. The cousin looked up,
+waved a bill and demanded to know who was paying for his waiting
+time.</p>
+<p>“Not me,” Thorn said.</p>
+<p>“That’s what they all say.”</p>
+<p>She examined the new rope. Then the folded canvas. Then Briska’s
+bag.</p>
+<p>“Open it.”</p>
+<p>Briska set it on the linen table and laid out the contents. Pliers.
+Rule. Screwdriver. Files. The little latch-spreader, folded tight. The
+steel shim. A shallow tin of wax closed over the impression. The
+duplicate key lay in the side pocket under her finger.</p>
+<p>Thorn picked up the spreader.</p>
+<p>“What’s this?”</p>
+<p>“For easing a stuck latch.”</p>
+<p>“Do you get many stuck latches on picture frames?”</p>
+<p>“People ask you to fix other things once you’re in the house.”</p>
+<p>“Such as my door.”</p>
+<p>“That was free.”</p>
+<p>Thorn turned the screw. The jaws opened. She inspected them with
+genuine interest.</p>
+<p>“Would it work on oak?”</p>
+<p>“Depends how the oak was fitted.”</p>
+<p>“A careful answer.”</p>
+<p>“It prevents complaints.”</p>
+<p>Thorn returned the tool. Briska resisted the urge to check it
+immediately.</p>
+<p>“Orset can sign you out. After that, downstairs. No wandering.”</p>
+<p>“We have two frames left in the gallery.”</p>
+<p>“Then repair them.”</p>
+<p>Thorn stood aside and watched them leave. Briska felt the duplicate
+key pressing through leather against her finger. On the gallery Pello
+let out a breath.</p>
+<p>“Free,” he muttered.</p>
+<p>“Don’t.”</p>
+<p>“You fixed her door for free.”</p>
+<p>“I said don’t.”</p>
+<p>Below, the orchestra changed its tune. They had spent more time in
+the linen room than she had allowed for every repair upstairs. Briska
+gave the copied inscription to Ilaro as she passed his quiet chair, then
+went to the next frame and made herself work at a believable pace.</p>
+<h2 id="chapter-7-the-woman-in-the-other-frame">Chapter 7 — The woman in
+the other frame</h2>
+<p>Ilaro had found a chair behind an ugly marble shepherd.</p>
+<p>The shepherd held a flute to a mouth too small to accommodate it.
+From the hall below came the real music, dulled here by a heavy curtain
+and a fortunate turn in the gallery. Ilaro could see the western stair
+without being seen from most of it. He had put his notebook on his knee
+and a glass of water on the shepherd’s plinth.</p>
+<p>Orset had left him three sale catalogs and a list of pictures Caspian
+might consider parting with. The list omitted the good ones. Ilaro knew
+very little about painting, but the good ones had their prices written
+lightly in pencil where somebody could alter them before a buyer
+saw.</p>
+<p>He compared the paper Briska had given him with the oldest
+catalog.</p>
+<p><em>They came for you.</em> A gift to a performer, he thought. The
+date might identify a season, perhaps a first appearance. Caspian liked
+women who could bring a room to life. He also liked to own a significant
+part of the room afterward.</p>
+<p>Pello came along the gallery carrying a folded dust sheet.</p>
+<p>“You look busy,” Ilaro said.</p>
+<p>“I am busy.”</p>
+<p>“Excellent. Be busy here.”</p>
+<p>Pello laid the sheet over the marble shepherd, hiding its tiny face.
+The improvement was considerable.</p>
+<p>“Tell me about the picture in the office.”</p>
+<p>“Woman. Black dress. It weighs more than it looks.”</p>
+<p>“What else?”</p>
+<p>“White flower. Hands crossed.”</p>
+<p>“A musician’s hands?”</p>
+<p>“What do those look like?”</p>
+<p>“Never mind. A ring?”</p>
+<p>“Wedding ring. High on the finger. Same as the woman downstairs.”</p>
+<p>Ilaro looked up. “Which woman downstairs?”</p>
+<p>“In red, above the stair. The picture with all the flowers under it.
+People keep saying how much she’s missed.”</p>
+<p>The public portrait had occupied his left side when they entered. The
+chandeliers had been on his right. He remembered watching the light
+break across the spectacles of the man showing him in. He could not
+remember the painting at all.</p>
+<p>“The same woman?”</p>
+<p>“Same knuckles. Painter made her prettier downstairs. Didn’t fix the
+hands.”</p>
+<p>Ilaro crossed out the word <em>performer</em>.</p>
+<p>“His wife,” he said.</p>
+<p>“That’s what I thought. Unless he married the other one too.”</p>
+<p>“The portrait on the cellar door is his wife. The private words might
+be these.” He showed Pello the line.</p>
+<p>Pello read it. “Looks like he lost an argument.”</p>
+<p>“Possibly he enjoyed losing that one.”</p>
+<p>From below came applause, followed by a burst of laughter that had
+Daska somewhere in it. Ilaro listened until the next tune began. He
+turned the copied date toward the light and checked it against the
+catalog. The first portrait preceded the second by eleven years. The
+earlier commission had been paid by Caspian personally, before there was
+an Amber Villa to decorate.</p>
+<p>No cryptic poem. No elaborately concealed declaration. A husband had
+scratched something on the back of his wife’s picture where only people
+carrying it would see.</p>
+<p>“We should check the writing,” he said. “Against a letter in the
+office.”</p>
+<p>“Briska’s copied it.”</p>
+<p>“She copied the words. I need to know whose hand put them there.”</p>
+<p>Pello took the paper back. “I’ll tell her.”</p>
+<p>“And don’t conclude it’s the answer until we’ve tried it.”</p>
+<p>“You want me to tell her it might not work?”</p>
+<p>“She knows that already. Tell Rosceline.”</p>
+<p>When Pello had gone, Ilaro reached for his water and put his fingers
+into the glass. He stared at them, irritated beyond proportion. He had
+known where it was. He had just watched himself reach a little too far
+and failed to stop.</p>
+<p>He dried his hand on the inside of his coat.</p>
+<p>A man in a gilded half-mask passed the shepherd and glanced at the
+covered face. “Restoration?”</p>
+<p>“Mercy,” Ilaro said.</p>
+<p>The man laughed as though understanding something expensive and
+continued toward the private rooms.</p>
+<p>Ilaro shut his eyes. The dark behind them throbbed. Somewhere below,
+a glass broke and people cheered the person who had broken it. He
+thought of his old office on a wet afternoon, the little brass bell
+above the door, his partner telling him there was someone he ought to
+meet. The memory stopped before the steps. It always approached the
+steps as though there might be another route.</p>
+<p>“Here.”</p>
+<p>He opened his eyes. Daska stood beside him holding two pastries in a
+napkin.</p>
+<p>“I thought you’d gone home,” she said.</p>
+<p>“I thought about it.”</p>
+<p>“Pello would send for you.”</p>
+<p>“Pello would send the wrong cousin.”</p>
+<p>“They would still find you.”</p>
+<p>She put a pastry on the notebook. It left a transparent spot of fat
+beside his reconstructed times. Her own was gone before he had decided
+whether to object.</p>
+<p>“You were good down there,” he said.</p>
+<p>“I am good.”</p>
+<p>“I meant—”</p>
+<p>“I know. Thank you.”</p>
+<p>She sat on the floor beside the shepherd, stretching one leg out of
+sight behind the curtain. There was a red mark above her ankle where the
+shoe rubbed.</p>
+<p>“The little man with the green sash thought he could lift me.”</p>
+<p>“Could he?”</p>
+<p>“I let him get far enough to find out.”</p>
+<p>Ilaro bit the pastry. Pepper, crab and something sweet he could not
+identify. He had not been hungry until the first mouthful. Daska watched
+the stair while he ate.</p>
+<p>“Hessel?” he asked.</p>
+<p>“At his station. He saw me.”</p>
+<p>“Did he signal?”</p>
+<p>“He scratched his ear.”</p>
+<p>“That was the signal?”</p>
+<p>“It wasn’t a very convincing itch.”</p>
+<p>He nodded and turned to the next page. The small facts were easier
+with someone sitting beside him who did not require a conclusion every
+time he wrote one down.</p>
+<p>“Which hand does Orset use for the keys?”</p>
+<p>“Right.”</p>
+<p>“And then?”</p>
+<p>“Puts them in his left pocket. He has a ring on that hand. Big green
+stone. It catches if he tries to reach in with it.”</p>
+<p>Ilaro looked at her.</p>
+<p>“I was waiting for a door,” she said. “There wasn’t much else to
+watch.”</p>
+<p>He wrote it down. Briska had the cellar key. They still needed the
+office open again after the repairs were finished, and the steward’s
+pocket would matter.</p>
+<p>The music stopped. For a moment they could hear individual voices
+below, the shift of serving dishes, a woman’s tired cough. Ilaro let the
+quiet enter his head.</p>
+<p>“Say the pocket again.”</p>
+<p>Daska did. Then she sat without speaking until the musicians found
+the next tune.</p>
+<p>When she rose, she took the napkin with the crumbs in it.</p>
+<p>“Your white bean’s on the floor.”</p>
+<p>He looked down. It lay beside his shoe. He had brought it in his coat
+and must have dropped it with the notebook.</p>
+<p>“Leave it.”</p>
+<p>She picked it up anyway and put it in his palm.</p>
+<p>“You might need to explain something to Pello.”</p>
+<p>She went down the stair with the swing of a woman whose feet hurt and
+who would dance again as soon as they were asked. At the foot she spoke
+briefly to Pello, then caught Orset carrying an empty wine tray. The
+steward shook his head at her first invitation. She took the tray from
+him. At the second, he looked toward his employer and let himself be led
+onto the floor.</p>
+<p>Pello collected the discarded tray, offered it to a passing servant
+and stepped behind Orset as Daska turned him. His hand disappeared under
+the steward’s coat for less than a beat. Orset was concentrating on his
+feet.</p>
+<p>When Pello came upstairs, he put three small keys in Ilaro’s
+palm.</p>
+<p>“Left pocket,” he murmured. “You can put them back.”</p>
+<p>“I can’t.”</p>
+<p>“Neither can I once he’s stopped dancing. We’ll leave them where he
+thinks he dropped them.”</p>
+<p>Ilaro put the bean in his pocket and rose. The first key did not fit
+the office door. The second opened it without a sound.</p>
+<h2 id="chapter-8-a-useful-acquaintance">Chapter 8 — A useful
+acquaintance</h2>
+<p>Rosceline found the salt merchant beside a painting of a storm.</p>
+<p>He was explaining to a younger woman that water did not behave as the
+painter had represented it. The younger woman had adopted the inward,
+peaceful expression of a person planning to leave through a locked
+door.</p>
+<p>“You must tell Lord Caspian,” Rosceline said. “He believes it an
+exceptional example.”</p>
+<p>The merchant swelled. “It is an exceptional example. Of an artist’s
+ignorance.”</p>
+<p>“How fortunate you are here.”</p>
+<p>She touched the younger woman’s elbow as she passed. The woman needed
+no second offer. She slid away behind Rosceline and disappeared into a
+knot of guests.</p>
+<p>Caspian stood near the flowers beneath his wife’s portrait. Rosceline
+brought the merchant to him as though presenting a rare animal that had
+performed an amusing trick.</p>
+<p>“My lord, you must settle something. Master Deren has an objection to
+your sea.”</p>
+<p>“Only its movement,” the merchant said. “The color is admirable.”</p>
+<p>Caspian looked from him to Rosceline. Something in his face
+sharpened, then relaxed.</p>
+<p>“Deren has spent more time looking at water than most admirals,” he
+said. “We should listen.”</p>
+<p>They went to the painting. It was on the wall farthest from the
+eastern service passage. Deren began with the direction of the wind.
+Rosceline stood where Caspian would have to turn his back on the service
+door to answer her. Across the hall, Pello took a tray from a passing
+servant and walked upstairs under its authority.</p>
+<p>The sea in the picture rose black and green beneath a torn sky. A
+boat clung to the flank of a wave. Rosceline liked it. She had been on
+water like that, with a man beside her praying to a patron he had not
+mentioned before the weather changed. The painter had understood the
+terrible height of the water when the boat fell away beneath one’s feet.
+She could not have said whether the foam was correct.</p>
+<p>“You have something to add,” Caspian said to her.</p>
+<p>“I like the little boat.”</p>
+<p>“It is badly placed,” Deren said.</p>
+<p>“The people in it appear to agree.”</p>
+<p>Caspian laughed. Deren reconsidered whether he had been invited into
+an argument he could win.</p>
+<p>The host gave him a gracious retreat by asking about a shipment.
+Deren followed it. A minute later Caspian had passed him into the care
+of a man who needed salt, leaving Rosceline beside the sea.</p>
+<p>“That was unkind,” he said.</p>
+<p>“He was enjoying himself.”</p>
+<p>“I meant to me.”</p>
+<p>She turned. “I wanted to see whether you would defend it.”</p>
+<p>“Did I?”</p>
+<p>“You defended the evening. The painting can fend for itself.”</p>
+<p>He moved a little closer. Enough that the warmth from his body
+entered the cool air near the stone wall.</p>
+<p>“Wren has been keeping you for her own amusement.”</p>
+<p>“Wren would be very disappointed to learn that she has failed.”</p>
+<p>“What do you buy?”</p>
+<p>“What people want to own.”</p>
+<p>“And when they want something they ought not?”</p>
+<p>“I charge more for the conversation.”</p>
+<p>He looked at the slit in her dress without pretending not to. She let
+him. His attention was exact and practiced; it might have been enjoyable
+in a man who had not spent the afternoon threatening a singer’s
+rooms.</p>
+<p>“There are people I could introduce you to,” he said. “People who
+would stop wasting your time with small commissions.”</p>
+<p>“I have some affection for small commissions.”</p>
+<p>“Surely not for the pay.”</p>
+<p>“Sometimes for the person paying.”</p>
+<p>He reached for a glass from a servant’s tray and held it out to her.
+The stem was warm where his fingers had rested.</p>
+<p>“Then allow me to become one of them.”</p>
+<p>On the last word, something moved beneath his voice.</p>
+<p>Rosceline felt it as a note heard through a wall: too low to name,
+close enough to unsettle her teeth. Warmth rose at the back of her neck.
+For a moment the room seemed to have arranged itself sensibly around
+this man, and she wanted to stay where he could see her.</p>
+<p>She set the untouched glass on the window ledge.</p>
+<p>Sarem had made her listen to a kettle once. Nine kettles, eventually,
+until she could distinguish the boiling from the little working that
+kept one hot after the fire was dead. She had been furious with him by
+the sixth. Now she listened beneath Caspian’s easy breath and heard the
+tail of the same kind of intrusion, finer and directed at her.</p>
+<p>“You make introductions sound intimate,” she said.</p>
+<p>“They are.”</p>
+<p>He did not push. That was well done. A foolish man would have reached
+for her again and given her a reason to withdraw. Caspian let the
+invitation lie between them, warm and apparently voluntary.</p>
+<p>She wanted to cut his hand. Not badly. Just enough to spoil his
+confidence in the room. The desire was so sudden that she had to rest
+her own hand on the window ledge until it passed.</p>
+<p>“And what do your friends do for you?”</p>
+<p>“Remember who made the introduction.”</p>
+<p>“For how long?”</p>
+<p>“As long as it remains useful.”</p>
+<p>“To which of you?”</p>
+<p>He smiled. “Now we are discussing the same thing.”</p>
+<p>A servant approached with a question about the supper wine. Caspian
+excused himself for a moment. Rosceline used it to look toward the
+musicians’ platform.</p>
+<p>The porcelain mask was gone. The empty chair beside it was now
+occupied by an older woman eating a peach over her plate. Juice shone on
+her thumb. Nothing marked where the masked guest had sat.</p>
+<p>“Someone you know?” Caspian asked on returning.</p>
+<p>“I thought so.”</p>
+<p>“There are always unexpected acquaintances at my parties.”</p>
+<p>“Do you invite them?”</p>
+<p>“Eventually.”</p>
+<p>He offered his arm. She took it because the passage she needed was on
+the other side of the room and because refusing now would have told him
+something he had not earned. He led her beneath the portrait of the
+woman in red.</p>
+<p>Up close, the painted face was too smooth. Grief had paid the artist
+to take something out of it.</p>
+<p>“Your wife?”</p>
+<p>“Yes.”</p>
+<p>“The flowers suit her.”</p>
+<p>“She hated those flowers.”</p>
+<p>Rosceline looked at him.</p>
+<p>“She said they smelled of funerals. The household keeps replacing
+them. I have stopped explaining.”</p>
+<p>There was no working under this. His voice had gone flat in a place
+charm could not cover.</p>
+<p>“What did she like?”</p>
+<p>“Things that were growing somewhere else. Preferably where they
+inconvenienced the gardener.”</p>
+<p>He looked at the portrait long enough for the silence to become
+private. Then a man hailed him from beside the supper tables, and he
+turned with his public face already in place.</p>
+<p>“You will save me a dance,” he said.</p>
+<p>“If I have one left.”</p>
+<p>“Have one.”</p>
+<p>She watched him go. The lingering warmth at her neck had become an
+unpleasant dampness. She rubbed it away with the inside of her
+wrist.</p>
+<p>At the western stair, Ilaro stood beside the covered shepherd. He was
+looking at her rather than signaling. She went up to him.</p>
+<p>“He works on people,” she said quietly.</p>
+<p>“I would have thought that obvious.”</p>
+<p>“With magic.”</p>
+<p>Ilaro’s expression changed. He opened the office door behind him with
+a key she had not seen him acquire and stepped aside.</p>
+<p>“Then you should read this.”</p>
+<h1 id="part-iii-the-book-comes-out">Part III — The book comes out</h1>
+<h2 id="chapter-9-the-part-she-did-not-mention">Chapter 9 — The part she
+did not mention</h2>
+<p>The letter lay beneath an unfinished invitation on Caspian’s
+desk.</p>
+<p>Ilaro had found it while looking for a sample of the host’s writing.
+He had expected a signature, perhaps an insulting correction on a bill.
+Instead he found the same hand that had written <em>They came for
+you</em> telling the Countess to stop interfering with his tenants.</p>
+<p>Rosceline read without touching the paper.</p>
+<p>“That line,” Ilaro said.</p>
+<p>“I can see it.”</p>
+<p><em>Livaea has expressed no objection to my arrangements. You write
+as though She had appointed you to supervise Her admirers.</em></p>
+<p>Below that, Caspian had begun a sentence about the singer Letha,
+crossed out a phrase and tried again. Whatever courtesy he meant to put
+over the demand had not yet satisfied him.</p>
+<p>“He hasn’t sent it,” Rosceline said.</p>
+<p>“No. But she has sent him something. He’s answering it.”</p>
+<p>“The Countess has a wide correspondence.”</p>
+<p>“Don’t do that.”</p>
+<p>She looked at him.</p>
+<p>“I know how a letter works,” he said. “We asked about the protection.
+She described a portrait.”</p>
+<p>Rosceline turned toward the door. The music sounded muffled here, a
+beat under the boards. A servant’s footsteps passed in the gallery and
+went away.</p>
+<p>“She gave us the invitation.”</p>
+<p>“For a claim she couldn’t identify. This looks more familiar than
+that.”</p>
+<p>He watched her read the page again. Her face had a way of staying
+pleasantly available while her attention moved somewhere else. He had
+once watched a banker talk into that expression for twenty minutes and
+emerge with an investment in a quarry that had no stone.</p>
+<p>“Did he try it on you?” Ilaro asked.</p>
+<p>“A little warmth. A pleasant interest in staying.”</p>
+<p>“Are you still interested?”</p>
+<p>“In taking his book.”</p>
+<p>“That wasn’t what—” He stopped. The objection was becoming a habit.
+She waited, and he made himself finish differently. “I need to know
+whether you’re angry enough to make this harder.”</p>
+<p>“Probably.”</p>
+<p>It was a better answer than he had expected.</p>
+<p>Pello appeared at the door carrying the empty wine tray.</p>
+<p>“Orset’s looking for his keys.”</p>
+<p>Ilaro took the ring from the desk and put it in Pello’s palm. “By the
+wine cooler. Where you took the tray.”</p>
+<p>“He’s looking upstairs.”</p>
+<p>“Then he can enjoy finding them downstairs.”</p>
+<p>Pello glanced at the letter. “Are we in trouble?”</p>
+<p>“We have a choice. Get Briska and Daska.”</p>
+<p>“All of us in here?”</p>
+<p>“One brief repair conference. She’ll know what to say.”</p>
+<p>Briska arrived with her small bag and a strip of gilt molding. Daska
+followed carrying a basin of water. Pello kept the tray. They looked,
+Ilaro thought, like a group of people urgently failing to mend an
+expensive object. He moved the damaged glass bird to the desk’s edge to
+complete the appearance.</p>
+<p>Briska read the letter and pressed her tongue against a back
+tooth.</p>
+<p>“The invitation,” she said. “She had it ready.”</p>
+<p>“Yes.”</p>
+<p>“So she knew enough to bring a spare part.”</p>
+<p>Daska looked toward Rosceline. “What does he do?”</p>
+<p>“Makes his company seem like a better idea than it is.”</p>
+<p>“Can he stop us leaving?”</p>
+<p>“I don’t know.”</p>
+<p>No one spoke for a moment. The orchestra struck a chord that vibrated
+through the basin Daska held.</p>
+<p>“We can go,” Ilaro said. “We haven’t taken anything that matters yet.
+Hessel can meet us at the wicket. We give back the advance we haven’t
+spent.”</p>
+<p>Pello’s fingers tightened on the tray.</p>
+<p>“I’d have to pay my cousin.”</p>
+<p>“Yes.”</p>
+<p>“He’ll enjoy that.”</p>
+<p>Briska opened the side of her bag and checked the cream envelope. She
+did not take it out. “Or we find the book, see what actually holds it
+and decide there. Nobody offers anyone else a promise.”</p>
+<p>“Nobody offers me one either,” Daska said.</p>
+<p>Rosceline leaned against the desk. “We have the key. We have a likely
+phrase for the portrait. The man is downstairs making people grateful.
+I’d like him to have a disappointing evening.”</p>
+<p>“I’d like the money,” Pello said. “I’m saying it in case we all start
+having better reasons.”</p>
+<p>Daska set the basin down. Water trembled against its rim.</p>
+<p>“We get Hessel out whether we take the book or not.”</p>
+<p>“Yes,” Ilaro said.</p>
+<p>Briska nodded. Pello looked offended that it needed repeating.</p>
+<p>Rosceline said, “Of course.”</p>
+<p>Ilaro studied her. Nothing in the answer invited an objection he
+could name.</p>
+<p>He wanted the money too. There was an unpaid quarter on his rooms,
+and the woman who rented them to him had begun leaving his letters on
+the landing instead of sliding them under the door. Two hundred marks
+would let him stop apologizing for taking up space in a room he had once
+paid for without thought.</p>
+<p>“We continue,” he said. “We stop if the thing on the book asks for
+more than the Countess has offered.”</p>
+<p>“We ask what it means by more,” Rosceline said.</p>
+<p>“We ask briefly.”</p>
+<p>That brought a smile, real enough to be irritating.</p>
+<p>They separated by the routes that gave each an excuse to be seen.
+Pello took the key ring down toward the wine cooler. Daska returned the
+basin to the linen room. Briska asked Orset, loudly, whether the other
+contractor had been paid by the screw. The steward began explaining that
+he had inherited several unsatisfactory arrangements.</p>
+<p>Rosceline stayed a moment. Ilaro returned the letter beneath the
+unfinished invitation and set the little glass bird exactly where its
+dusty outline showed it had stood.</p>
+<p>“You could wait on the boat,” she said.</p>
+<p>“And have you tell me afterward what happened?”</p>
+<p>“I would make it bearable.”</p>
+<p>“That’s what worries me.”</p>
+<p>She left him with the smallest inclination of her head.</p>
+<p>He stood alone in the office until the corridor cleared. His headache
+had become a narrow pressure behind the eye. He took a little bottle
+from his inside pocket, drank water that tasted of the leather stopper
+and put it away. He checked his notebook for the supper bell, the wine,
+the first boarding call. Three entries. He could keep three entries in
+order.</p>
+<p>Downstairs the servants were removing the largest dishes. The smell
+of cooked fish had thickened in the heat. Pello stood near the service
+door, pretending to be denied another cup. As Ilaro passed, the younger
+man showed him an empty palm: keys returned.</p>
+<p>Hessel waited inside the passage. He had turned his livery the proper
+way out and looked older in it.</p>
+<p>“Five minutes,” he whispered. “The special wine’s behind the ordinary
+wine. I’ll have trouble.”</p>
+<p>“Make it six,” Ilaro said.</p>
+<p>Hessel looked at his face and, without asking anything else,
+nodded.</p>
+<h2 id="chapter-10-they-came-for-you">Chapter 10 — They came for
+you</h2>
+<p>The service stair held the day’s cold beneath the house.</p>
+<p>Rosceline went down with her gloved hand on the rail. The noise of
+the gala diminished one turn at a time. Behind her, Briska’s tools gave
+a small metal click. Ilaro descended more slowly, testing the last edge
+of each tread with his shoe. Daska remained at the top to watch the
+passage. Pello had gone to check the boat.</p>
+<p>At the foot, a corridor ran past shelves of empty wine baskets toward
+a single door. A lantern hung in a niche halfway along it. The flame
+shivered as though someone had breathed across the glass.</p>
+<p>Rosceline stopped.</p>
+<p>“Draft?” Briska whispered.</p>
+<p>“Possibly.”</p>
+<p>She listened. Somewhere behind the wall water moved through a pipe.
+Somewhere above, people laughed. Under those ordinary sounds she could
+hear the faint, repeated catch of a working sustaining itself. It had
+the irritating intimacy of a stranger humming on the other side of a
+thin partition.</p>
+<p>The portrait occupied most of the door. A narrow iron band framed the
+painted woman, dressed here in blue, with one hand resting on the back
+of a chair. The wedding ring was high on her finger. Her other hand held
+nothing, palm half-open as though somebody had just left it.</p>
+<p>“There she is,” Ilaro said.</p>
+<p>Briska examined the lock below the frame. “Wait.”</p>
+<p>She took the duplicate from her bag’s side pocket and wiped it on the
+cloth she carried. The teeth entered cleanly. At the turn there was
+resistance. Briska eased it back, changed the pressure and turned
+again.</p>
+<p>A bolt withdrew inside the door with a satisfying, entirely human
+noise.</p>
+<p>“Don’t touch it yet.”</p>
+<p>Rosceline had not moved. She was watching the painted hand.</p>
+<p>There was a small dark mark where a ring might once have been on the
+other finger. The painter had put it in. Caspian’s wife had possessed
+two rings, perhaps, or changed which one she wore. A pointless,
+particular detail. Rosceline felt the urge to ask what the woman had
+sounded like before remembering that nobody in the corridor could tell
+her.</p>
+<p>“They came for you,” she said.</p>
+<p>The lantern flame bent toward the door.</p>
+<p>Nothing else happened.</p>
+<p>Briska glanced at Ilaro. He kept his eyes on the portrait.</p>
+<p>Rosceline stepped nearer. She had spoken as though giving a servant
+the correct instruction. It had sounded like that even to her.</p>
+<p>She thought of the young portrait in the office, the line hidden
+behind it, and Caspian saying his wife had preferred flowers growing
+where they inconvenienced the gardener. She looked at the painted
+face.</p>
+<p>“They came for you,” she said again, softly, with the smallest
+resentment at being reminded.</p>
+<p>The woman’s gaze passed over her shoulder.</p>
+<p>It could have been a change in the light. Rosceline did not turn to
+check. Under the paint came a click like a nail lifted from a table, and
+the door shifted against the seal of the frame.</p>
+<p>Briska pulled it outward.</p>
+<p>Cold air touched Rosceline’s mouth. It smelled of cedar, old perfume
+and metal that had been handled in a close room.</p>
+<p>“Well,” Ilaro murmured.</p>
+<p>Rosceline could not have said whether the working had needed her tone
+or had merely taken its time. She disliked that she wanted to know.
+There were more useful questions inside.</p>
+<p>The vault was not large. Three cabinets stood against the walls,
+their narrow fronts inlaid with ivory flowers. Shelves held boxes, rolls
+of paper and bundles of letters tied in ribbons whose colors had faded
+unevenly. A blue silk slipper lay by itself beneath a glass dome. There
+was a child’s silver cup blackened inside, and a pair of jeweled combs
+joined by a chain fine enough to break between two fingers.</p>
+<p>She had seen rooms like this before. Men called them strongrooms and
+filled them with things that made other people weak.</p>
+<p>The book rested in an iron cradle on a waist-high table at the far
+wall. Brown leather, brass corners, red across the spine. Somebody had
+repaired the lower corner with a piece of darker hide. The clasp was
+shut.</p>
+<p>Briska caught Rosceline’s wrist before she reached for it.</p>
+<p>“A look first.”</p>
+<p>“I was going to look with my hand.”</p>
+<p>“That’s why I stopped it.”</p>
+<p>She knelt to examine the cradle. Ilaro stayed by the door, leaving it
+clear. Rosceline looked at the boxes. One had a false bottom so badly
+fitted that it annoyed her. Another had a surface of hammered gold
+showing tiny boats with too many oars. She could have put it beneath her
+coat. She resisted, with a feeling of being asked to exhibit moderation
+in a sweetshop.</p>
+<p>“No wire,” Briska said. “No plate under it. The clasp may be
+something.”</p>
+<p>Rosceline listened again. The humming had gone very thin. It seemed
+to come from the back of her teeth now, where no room should have been
+able to put it.</p>
+<p>“We can leave it,” Ilaro said.</p>
+<p>“We haven’t picked it up.”</p>
+<p>“I am aware.”</p>
+<p>Briska stood. “I’ll watch the cradle. Lift straight.”</p>
+<p>Rosceline put one hand under each end of the book. The leather was
+cool. It had the weight of a thing written in every day, pages swollen
+slightly near the spine. She lifted.</p>
+<p>The clasp burned the heel of her left hand.</p>
+<p>She nearly dropped it. Briska’s hands came under hers; Rosceline
+twisted her wrist and kept the hot brass away from her palm. Pain ran
+through the glove into the flesh below her thumb.</p>
+<p>“Hold it,” Briska said.</p>
+<p>“I am holding it.”</p>
+<p>A red line drew itself through the air from the clasp to the door.
+Thin as a hair, it stretched without sagging. Where it crossed the
+threshold, a bead of light gathered and swelled.</p>
+<p>Ilaro moved aside.</p>
+<p>From the corridor came a footstep.</p>
+<p>The person in the porcelain mask stood beyond the open door. Cream
+glaze, black eye openings, a coat the color of dried wine. One gloved
+hand rested on the iron doorframe. The flame in the niche behind it grew
+steady.</p>
+<p>“Whose hands are those?” the Collector asked.</p>
+<p>The voice was close enough that Rosceline felt herself prepare to
+turn toward it, although the speaker stood several paces away.</p>
+<p>She kept her grip on the book.</p>
+<p>“Mine.”</p>
+<p>“And who will miss them?”</p>
+<p>The brass grew hotter.</p>
+<h2 id="chapter-11-one-place-at-supper">Chapter 11 — One place at
+supper</h2>
+<p>Briska could smell the glove scorching.</p>
+<p>She took the folded cloth from her bag, opened it between the hot
+clasp and Rosceline’s hand, and helped her change her grip. The red line
+moved with the book. It did not pass through the cloth. It passed
+through the space the cloth had occupied a moment before, as though it
+were always arriving slightly late.</p>
+<p>“Can you put it down?” she asked.</p>
+<p>Rosceline lowered it toward the cradle. The line tightened. Heat
+prickled Briska’s bare wrist.</p>
+<p>“Apparently not.”</p>
+<p>The Collector tilted its head.</p>
+<p>“Would returning it undo your arrival?”</p>
+<p>“We don’t need it to undo anything,” Briska said. “We need to know
+what holds it.”</p>
+<p>“Did you think Lord Caspian paid for everything with silver?”</p>
+<p>Ilaro drew a slow breath. Briska knew the sound by now. He was
+setting aside an answer that would satisfy him and make the situation
+worse.</p>
+<p>“The book is pledged,” he said. “To whom?”</p>
+<p>The Collector turned the mask toward him.</p>
+<p>“Did you read his letter?”</p>
+<p>“Yes.”</p>
+<p>“Then do you require another name?”</p>
+<p>There was a faint scratch inside the wall. Briska looked at the
+doorframe. The glove resting on it left a warm, dark print on cold
+iron.</p>
+<p>“If we cross?” she asked.</p>
+<p>“Would you like every door in this house to know you?”</p>
+<p>Rosceline shifted the weight of the ledger. “I’d prefer a smaller
+acquaintance.”</p>
+<p>Her voice had become too light. Briska looked at her glove, where a
+dark oval was spreading over the palm. This was not a good place for
+Rosceline to enjoy herself.</p>
+<p>“Something taken can be replaced,” Ilaro said. “Is that what you’re
+offering?”</p>
+<p>“What would you offer?”</p>
+<p>Briska opened her bag with her free hand. The cream envelope lay
+inside its leather folder, exactly where she had left it after checking
+the seal upstairs. She took it out and held it by the corner.</p>
+<p>The Collector’s mask turned before the envelope had cleared the
+bag.</p>
+<p>“Whose hospitality?” it asked.</p>
+<p>Rosceline answered with the Countess’s title. For an instant Briska
+smelled something strange and familiar: hot stone after a forge had been
+closed, with a particular bitter oil used on mountain tools. Her parent
+had smelled of it on visits. It made her want to stand straighter, an
+old bodily obedience she hated.</p>
+<p>She lowered the envelope to the threshold instead of handing it
+over.</p>
+<p>“Read it.”</p>
+<p>“Would you read it to me?”</p>
+<p>“The seal is intact. You can open it.”</p>
+<p>“And you will stand by what it says?”</p>
+<p>“She stands by what it says. We’re delivering it.”</p>
+<p>The Collector’s hand left the doorframe. Briska could not see the
+warm print now, though she had watched it appear. The gloved fingers
+picked up the invitation.</p>
+<p>The red wax broke without a sound.</p>
+<p>Somewhere above, a drum gave three quick beats. A familiar tune
+began. Briska recognized it from Daska’s rehearsal and felt the loss of
+time in her stomach. The first boarding call would come during this
+dance.</p>
+<p>The Collector unfolded the paper.</p>
+<p>“One evening?”</p>
+<p>“One,” Ilaro said. “A named guest. The Countess chooses the evening.
+Before the season ends.”</p>
+<p>“And will the guest be welcome?”</p>
+<p>“Received,” Briska said. “That’s what she offered.”</p>
+<p>“Is there a difference?”</p>
+<p>“There is in my house.”</p>
+<p>The mask held still. The bitter oil scent faded. In its place came
+roses too long in water, sweet over rot.</p>
+<p>Rosceline’s breathing changed. Briska saw her looking past the mask
+toward the dark corridor, her attention briefly caught by something
+nobody else had heard.</p>
+<p>“Rosceline.”</p>
+<p>The woman looked back.</p>
+<p>“Keep it level.”</p>
+<p>“I’m doing that.”</p>
+<p>“Keep doing it.”</p>
+<p>Ilaro took his notebook out. His hands were steady enough until he
+tried to find the pencil.</p>
+<p>“The name,” he said. “We will need to report it.”</p>
+<p>The Collector gave one. “Would Mistress Ossene find a place at that
+table?”</p>
+<p>Ilaro wrote it down and repeated it. Briska did not know the name.
+Rosceline’s expression told her nothing useful.</p>
+<p>“That is within the offer,” Ilaro said.</p>
+<p>“Then what remains between us?”</p>
+<p>Briska pointed at the red line.</p>
+<p>“That.”</p>
+<p>The Collector looked down at it, almost curiously. Then the gloved
+hand reached past the doorframe and touched the line with one
+finger.</p>
+<p>The bead at the threshold opened like a wet mouth.</p>
+<p>Briska’s stomach lurched. She had time to think of the invitation
+being consumed, of something much larger pulling at a very small
+opening. The line snapped back into the clasp. The heat vanished so
+completely that Rosceline made a sharp, involuntary sound.</p>
+<p>The Collector stepped aside.</p>
+<p>Briska did not move immediately. She took the little strip of steel
+from her bag and passed it through the place where the red line had met
+the threshold. Nothing happened. She moved the ledger a hand’s breadth
+toward the door, supporting Rosceline’s burned hand.</p>
+<p>No heat. No light.</p>
+<p>“Is it ordinary now?” Rosceline asked.</p>
+<p>“It weighs something,” Briska said. “That’s encouraging.”</p>
+<p>Ilaro opened the book before they wrapped it. The clasp, cold now,
+lifted under his nail. He found the date of a payment from the office
+papers and read the corresponding entry. Then another. His mouth
+tightened.</p>
+<p>“That’s Deren,” he said.</p>
+<p>Rosceline leaned over. “The sea expert?”</p>
+<p>“Warehouse inspections. He pays to keep them predictable.”</p>
+<p>“How sensible.”</p>
+<p>“And the man with the gold sash paid to have a competitor’s boats
+held through a week of good weather.”</p>
+<p>She read the lines. Briska watched her read them twice. Then
+Rosceline closed the book and opened the oilcloth Briska handed her. The
+wrapping came around the brass corners. She tied it with a flat knot and
+put it inside her outer wrap, against her left side, clear of the sword
+harness.</p>
+<p>The Collector had gone.</p>
+<p>Briska looked into the corridor. There was no place to have stepped
+aside except back toward the service stair. She had been watching the
+book. The ordinary explanation was available, and she took it for the
+length of the corridor.</p>
+<p>At the door, she turned the duplicate key to withdraw it. The
+original bolt remained open. There was no useful reason to lock
+themselves out of a room they might have to return through. She put the
+key back in her bag and pulled the portrait door nearly closed.</p>
+<p>Rosceline peeled off the damaged glove. A red patch shone below her
+thumb, with a pale center. She pressed it to the cool stone wall.</p>
+<p>“You’ll want water,” Briska said.</p>
+<p>“I’ll want a great many things.”</p>
+<p>From above came the low, unmistakable sound of a horn.</p>
+<p>One long note, a pause, then another.</p>
+<p>Rosceline took her hand off the wall.</p>
+<p>“Which call was that?”</p>
+<p>Briska listened to the small sounds that followed: feet overhead, a
+door, a servant shouting for a basket to be moved.</p>
+<p>“Second, I think.”</p>
+<p>Rosceline moved past her toward the stair with the book held hard
+against her ribs.</p>
+<h2 id="chapter-12-the-wrong-man-at-the-right-time">Chapter 12 — The
+wrong man, at the right time</h2>
+<p>Pello met them at the turn of the stair.</p>
+<p>He caught Ilaro’s sleeve and pulled him against the wall. The
+movement struck the sore place behind Ilaro’s eye with a burst of light.
+He swallowed his first answer.</p>
+<p>“Tell me.”</p>
+<p>“They’ve got Hessel.”</p>
+<p>Rosceline stopped two steps above them.</p>
+<p>“Who?” Briska asked.</p>
+<p>“Thorn. Two of hers. He’s in the guardroom.”</p>
+<p>Daska appeared in the upper doorway, looked down the stair and closed
+the door behind her. She came as far as the landing. Ilaro could see
+only her shoes at first, the repaired heel placed carefully against the
+edge of the stone.</p>
+<p>“What happened?” she asked.</p>
+<p>Pello spoke quickly. There had been a messenger at the security
+entrance. A folded note. Thorn had read it, asked for Hessel, then asked
+again when he was not where he ought to have been. Pello had come back
+from the wicket to find a guard taking Hessel’s belt off him.</p>
+<p>“You saw the note?” Ilaro said.</p>
+<p>“I saw her open it. Red ribbon.”</p>
+<p>Rosceline looked toward the door above.</p>
+<p>Ilaro waited for the next fact. Instead, he found himself looking at
+her.</p>
+<p>“What was in it?” he asked.</p>
+<p>Pello shook his head. “I couldn’t—”</p>
+<p>“Rosceline.”</p>
+<p>She met his eyes. She had taken the mask off. A little color had run
+where it touched her cheek.</p>
+<p>“His name. The keys. Money they could find.”</p>
+<p>The silence that followed was short. Ilaro could hear breathing
+inside it, too many people in the narrow stair.</p>
+<p>“You sent it?” Daska said.</p>
+<p>“After we should have left.”</p>
+<p>“We haven’t left.”</p>
+<p>“Yes, Daska. I can see that.”</p>
+<p>The monk moved one step down. Briska put her bag on the stair between
+them, as though the space had suddenly acquired work to do.</p>
+<p>“Where is Caspian?” Ilaro asked.</p>
+<p>Pello swallowed. “He came through. Told Thorn to find out what Hessel
+sold. Said to break his fingers if he wouldn’t answer.”</p>
+<p>Daska’s hand closed on the rail.</p>
+<p>“Thorn told him fingers would be useful for writing it down. He
+didn’t like that. He’s back in the hall now.”</p>
+<p>Ilaro put his palm against the wall. It was wet with the cellar’s
+damp. His thoughts were moving too quickly to hold their order. The
+obvious interpretation kept getting in front of the useful one.</p>
+<p>“You meant to leave a suspect,” he said to Rosceline.</p>
+<p>“I meant to leave one who would be beyond their reach.”</p>
+<p>“You didn’t ask us.”</p>
+<p>“You would have made it a discussion.”</p>
+<p>“It has become one.”</p>
+<p>She looked away first. That gave him no satisfaction at all.</p>
+<p>There had been a room behind a wine shop, years ago, where another
+person had told him everything was arranged. He could remember the wet
+rim of a glass on the table. He could not remember the man’s expression
+before the first blow. Sometimes he tried to supply it from other faces
+and could not be sure whether the resemblance had been there.</p>
+<p>He took his hand off the wall.</p>
+<p>“Has Hessel said anything?”</p>
+<p>“Not while I could hear,” Pello said. “They shut the door.”</p>
+<p>“How many inside?”</p>
+<p>“Two with him. Thorn went to look at the lower door. One guard in the
+passage, moving.”</p>
+<p>“Which lower door?” Briska asked.</p>
+<p>“The wicket. She’s checking it.”</p>
+<p>Above them came the shuffle of several people moving across the
+landing, followed by a laugh and the sharp complaint of a woman whose
+shoe had come off. The five held still until the sounds passed.</p>
+<p>Pello looked at Rosceline’s wrap.</p>
+<p>“You’ve got the book?”</p>
+<p>She nodded.</p>
+<p>“Then we can use the hoist. My cousin hasn’t moved. He saw me signal
+him to wait.”</p>
+<p>“We aren’t leaving Hessel,” Daska said.</p>
+<p>“I wasn’t saying that.” Pello’s voice rose. He brought it down with
+visible effort. “I’m saying there’s a way out after.”</p>
+<p>“There is,” Briska said. “We get him upstairs. I can open an ordinary
+latch.”</p>
+<p>“They won’t have put him behind an ordinary latch,” Rosceline
+said.</p>
+<p>“Then I’ll look at the one they’ve got.”</p>
+<p>Ilaro could feel the group moving toward a decision without his
+having said the word. He was relieved. He was also frightened, and did
+not have enough attention left to disguise it well.</p>
+<p>“There are six of us after the door opens,” he said. “That changes
+the lowering.”</p>
+<p>“I’ve counted him all along,” Pello said.</p>
+<p>Rosceline’s mouth tightened.</p>
+<p>Daska bent and unlaced her dancing shoes. She put them together on
+the stair, toes pointing downward, and straightened in bare feet.</p>
+<p>“Which room?”</p>
+<p>Pello described the door off the eastern passage, the bench beneath
+its barred window and the hook where the guards hung their cloaks. He
+described it with such precision that Ilaro knew he had been making
+himself remember while somebody threatened the man inside. His voice
+shook only when he reached the end.</p>
+<p>“He’s not a good man,” Rosceline said.</p>
+<p>Daska looked at her.</p>
+<p>“I didn’t promise a good man a boat.”</p>
+<p>She went up the stair. Briska took her bag and followed. Pello waited
+for Ilaro.</p>
+<p>From outside came the deeper horn of a vessel under way. The guest
+barge was leaving. Its departure would draw people to the waterside and
+fill the canal with following boats. The covered moment at the lower
+wicket was gone.</p>
+<p>Ilaro turned to Rosceline.</p>
+<p>“A description of what you intended won’t get the door open.”</p>
+<p>“I heard you the first time.”</p>
+<p>“I hadn’t said it the first time.”</p>
+<p>She looked very tired for a moment, and then the tiredness
+disappeared beneath the face she intended to use next.</p>
+<p>“Can you keep them from going before they’re ready?”</p>
+<p>“Daska?”</p>
+<p>“All of them.”</p>
+<p>“What are you going to do?”</p>
+<p>She adjusted the book against her side with her burned left hand. The
+pain showed in the corner of her mouth.</p>
+<p>“Try to make us a little more time.”</p>
+<p>He wanted to ask whose time she proposed to spend. He let it go. From
+the landing Pello whispered his name.</p>
+<p>They slipped through the upper door into the service passage. The air
+here was hot and smelled of dishwater. A kitchen boy hurried past
+carrying a bucket too heavy for him, both hands locked around the
+handle. Daska took it from him for three steps, put it beside the hearth
+where he pointed, and went on. The boy never looked at her face.</p>
+<p>Rosceline turned the other way, toward the music. Ilaro saw her stop
+beside a polished copper tray and inspect her reflection. She wiped the
+run color from her cheek, raised her chin and stepped into the hall.</p>
+<p>Pello touched his sleeve again, more gently this time.</p>
+<p>“Ready?”</p>
+<p>“Tell me for what.”</p>
+<p>“Following them.”</p>
+<p>Ilaro nodded and went after the monk.</p>
+<h1 id="part-iv-a-departure-worth-noticing">Part IV — A departure worth
+noticing</h1>
+<h2 id="chapter-13-the-promised-dance">Chapter 13 — The promised
+dance</h2>
+<p>The musicians had begun putting down their instruments.</p>
+<p>Rosceline went to the platform before they could finish. The leader
+was loosening the horsehair on his bow. Sweat had flattened the curls
+beside his ears. He looked at her with the hostility of a working man
+offered an opportunity to work longer.</p>
+<p>“One more,” she said.</p>
+<p>“We have played the last.”</p>
+<p>“Lord Caspian promised me a dance.”</p>
+<p>“Then Lord Caspian should have begun earlier.”</p>
+<p>She liked him. She put a gold piece on the edge of his music
+stand.</p>
+<p>“Something slow enough for him.”</p>
+<p>The leader looked at the coin, then at Caspian across the hall. He
+tightened his bow again.</p>
+<p>“The summer air?”</p>
+<p>“Perfect.”</p>
+<p>She did not know it. That was a problem for the next minute.</p>
+<p>The first violin rose above the conversations. A woman near the
+platform clapped her hands in delight. Her companions joined her.
+Rosceline turned toward Caspian with her arm extended, inviting the
+whole room to notice that she was waiting.</p>
+<p>He crossed to her smiling.</p>
+<p>“I feared you had escaped me.”</p>
+<p>“Not yet.”</p>
+<p>He took her right hand. She moved close enough that only he could see
+the corner of the oilcloth beneath her wrap, and drew it aside just far
+enough to show the red band on brown leather.</p>
+<p>His hand stopped moving.</p>
+<p>“Deren,” she said softly. “Predictable inspections. An admirable
+investment.”</p>
+<p>The salt merchant was three paces away, settling himself beside a
+woman who had begun to admire his knowledge of the sea.</p>
+<p>Caspian looked once toward him.</p>
+<p>“You misunderstand what you are holding.”</p>
+<p>“Then explain it while we dance.”</p>
+<p>The room had made a space for them. Refusal would have required more
+words than he wished to provide. He set his hand at her waist. She put
+her burned left hand on his shoulder and let the first movement tell her
+how the air went.</p>
+<p>He was a good dancer. She had expected him to be a confident one; the
+distinction troubled her. His lead was exact, and he adjusted to the
+weight she was carrying without breaking the rhythm. Around them the
+chandeliers divided into bright streaks as they turned.</p>
+<p>“Who sent you?”</p>
+<p>“Who would you like it to have been?”</p>
+<p>“The Countess.”</p>
+<p>She smiled.</p>
+<p>“She has been making poor choices lately,” he said.</p>
+<p>“Has she?”</p>
+<p>“Her people take risks she has ceased taking herself.”</p>
+<p>“Most employers develop the habit.”</p>
+<p>He guided her between two slower couples. For a moment they were
+close to the eastern passage. She saw Thorn standing just inside it,
+speaking to a guard. Caspian did not look directly at her. He touched
+two fingers to his own cuff, then lowered his hand toward the canal
+wall.</p>
+<p>Thorn’s eyes moved to Rosceline.</p>
+<p>There was no surprise in them. Only a quick reassessment, followed by
+a glance at the doors.</p>
+<p>“Close something?” Rosceline asked.</p>
+<p>“The night air is unkind to the flowers.”</p>
+<p>She felt her pulse in the burned hand. The brass had left a shape
+below her thumb, small enough to cover with a coin and hot enough that
+every pressure from his shoulder seemed to drive it deeper.</p>
+<p>“If your friends touch me, I’ll read until they stop my mouth.”</p>
+<p>“You have two entries. Perhaps three. You have not had time for
+more.”</p>
+<p>“How many would you prefer?”</p>
+<p>He considered that while they turned. Over his shoulder she could see
+Deren laughing. Farther away, the gold-sashed man lifted a glass and
+spilled a little on the woman beside him. He apologized with an
+extravagance that made her laugh too.</p>
+<p>“It is easy to embarrass people,” Caspian said. “It is more difficult
+to survive doing it.”</p>
+<p>“You manage.”</p>
+<p>“I provide a service.”</p>
+<p>“So does a rat-catcher. People still dislike finding him in the
+kitchen.”</p>
+<p>His grip tightened briefly. He released the pressure before it became
+visible.</p>
+<p>“What does she pay you?”</p>
+<p>“Not enough for this dance.”</p>
+<p>“Three thousand.”</p>
+<p>She looked at him properly.</p>
+<p>“Marks,” he said. “Tonight. A room near the galleries, with your name
+above the door. Introductions to people who can afford your taste. Keep
+the Countess’s advance. Tell her you failed.”</p>
+<p>The offer had size. She saw the room before she chose not to: good
+north light, a locked cabinet, enough money to refuse tiresome men
+before hearing the rest of what they wanted. She could have kept the
+purchasing identity for another year, perhaps two. She was fond of
+it.</p>
+<p>Across the hall, Thorn sent two guards toward the kitchen and
+disappeared into the service passage herself.</p>
+<p>“I have associates,” Rosceline said.</p>
+<p>“You can pay them.”</p>
+<p>“You haven’t seen their expenses.”</p>
+<p>“Then leave them to the Countess. She will find a use.”</p>
+<p>He said it kindly. As a practical reassurance. Rosceline thought of
+Daska’s earrings on the workshop bench, Ilaro lowering himself toward
+the boat with his eyes shut, Briska wiping at a kiss that had not
+touched her cheek.</p>
+<p>She stepped harder than she needed to on Caspian’s foot.</p>
+<p>He breathed through his nose. “A miscalculation?”</p>
+<p>“A narrow passage.”</p>
+<p>“This floor is twenty paces across.”</p>
+<p>“You keep steering me toward the same place.”</p>
+<p>The music lifted. She let him turn her beneath his arm. Pain caught
+in her left hand as the fingers opened; she completed the movement with
+the right and returned close enough for him to smell the smoke on her
+glove.</p>
+<p>His eyes dropped to it.</p>
+<p>“You met the keeper.”</p>
+<p>“A person of few statements.”</p>
+<p>“What did you offer?”</p>
+<p>“Something that was accepted.”</p>
+<p>For the first time his composure broke without permission. Anger drew
+the skin tight around his mouth. He had known the book was taken. He had
+not known it could be taken cleanly enough to carry beyond the
+protections of the house.</p>
+<p>“She gave you an invitation.”</p>
+<p>Rosceline said nothing.</p>
+<p>“Who?”</p>
+<p>“You would have to ask her.”</p>
+<p>He laughed once, without pleasure. “You don’t even know whose company
+you have sold her.”</p>
+<p>“She named the price.”</p>
+<p>“Yes. She does that very well.”</p>
+<p>They passed beneath his wife’s portrait. The flowers smelled suddenly
+unbearable, hot and thick as breath under a cover. Rosceline shifted the
+book against her side. She had thought it would be easier to carry once
+the magic let go of it.</p>
+<p>“Give it to me,” Caspian said. “We walk to the study. You receive
+your money. The people at the doors continue believing you are a welcome
+guest.”</p>
+<p>“And Hessel?”</p>
+<p>The name changed the conversation again. She regretted it as soon as
+she heard herself say it.</p>
+<p>“Ah.”</p>
+<p>“He leaves.”</p>
+<p>“So that was your arrangement.”</p>
+<p>“It is now.”</p>
+<p>“Thorn thinks he has been selling access. She will establish the
+truth.”</p>
+<p>“She may already have enough of it.”</p>
+<p>“Then he should have been more careful with his employers.”</p>
+<p>Rosceline held his gaze. The violin repeated the first phrase. It was
+a long air, or the leader had understood what the gold piece was paying
+for.</p>
+<p>She did not know how long the guardroom would take. She knew how many
+people Thorn had sent to the canal, and that there would be no returning
+to the old plan now. She had the book. She could still offer it, take
+the money, name the loading door and step away from the rest.</p>
+<p>Caspian felt the change in her attention and smiled.</p>
+<p>“There,” he murmured. “You see the practical course.”</p>
+<p>She smiled back so convincingly that his shoulders eased.</p>
+<p>“My lord, I’ve been looking at it all evening.”</p>
+<p>The next turn carried them past the musicians. Rosceline caught the
+leader’s eye and moved one finger. Once more.</p>
+<p>He looked at the dance floor, then at the gold still lying on his
+stand. His bow bit harder into the strings.</p>
+<h2 id="chapter-14-the-man-they-promised">Chapter 14 — The man they
+promised</h2>
+<p>The guardroom door had been repaired by somebody who understood
+doors.</p>
+<p>Briska could have hated him for it. A new strip of oak ran down the
+latch side, closely fitted and pegged from within. She slipped the jaws
+of the spreader into the gap, turned the screw a quarter revolution and
+felt the little housing begin to bow before the wood gave anything at
+all.</p>
+<p>She stopped.</p>
+<p>Daska stood over her, barefoot on the warm stone of the passage. She
+had taken her amber mask off. Her face without it looked larger and less
+cheerful.</p>
+<p>“How long?”</p>
+<p>“This won’t do it.”</p>
+<p>“You said—”</p>
+<p>“I said I could open a latch. There is a good door around this
+one.”</p>
+<p>Briska backed the screw out and took the damaged tool away. The steel
+jaws had left two shallow marks near the catch. She covered them with
+her hand while she considered the gap.</p>
+<p>From inside came the scrape of a bench.</p>
+<p>“Hands where I can see them,” a man said.</p>
+<p>Daska leaned toward the barred opening above the door’s center. It
+was shuttered on the inside. She could hear better than Briska. Her jaw
+moved once.</p>
+<p>Pello waited at the passage bend. Farther back, Ilaro was speaking to
+the patrolling guard in the low, abrasive voice he used with people who
+had omitted the important part of an account.</p>
+<p>“Orset has found them. Now he’s saying someone in a guard’s coat took
+them upstairs. Mistress Thorn will want to know which coat.”</p>
+<p>The guard swore. “They were under the tray.”</p>
+<p>“Tell him that. He isn’t telling it that way.”</p>
+<p>Boots moved away toward the hall.</p>
+<p>Ilaro joined them. He had acquired a small tray with two mugs and a
+jug of something dark enough to be coffee. Steam rose from the
+spout.</p>
+<p>“The kitchen,” he said. “They were meant for the men by the
+gate.”</p>
+<p>Daska took the tray. “They’ll live.”</p>
+<p>Briska removed the thin shim from her kit. She slid it between the
+latch and the jamb. The repaired wood allowed almost no space, but the
+metal passed. It would not lift the catch against a hand holding the
+door; it could keep the catch from falling fully home once the door had
+opened.</p>
+<p>“Get him to look out,” she said.</p>
+<p>Daska knocked with the tray’s edge.</p>
+<p>“Coffee. Mistress Thorn says keep him awake.”</p>
+<p>The shutter moved. An eye appeared in the opening, followed by a
+portion of a nose that had once been broken badly.</p>
+<p>“We didn’t ask.”</p>
+<p>“Neither did I. Hold the tray or I put it on the floor.”</p>
+<p>The eye considered her. Briska crouched close to the wall, out of its
+angle, one hand on the shim.</p>
+<p>The shutter closed. A bolt drew back.</p>
+<p>The door opened the width of a man’s shoulder. He had a short blade
+in his right hand, held low. His left reached for the tray.</p>
+<p>Daska let him take the weight. Then she pushed.</p>
+<p>Coffee burst across his coat. The tray struck his chest and turned
+sideways. His blade came up; Daska stepped inside the arm, shoulder
+driving beneath his chin, and the edge opened a red line along the
+outside of her right upper arm.</p>
+<p>Briska shoved the door. The second guard threw himself against it
+from within. The good oak hit her shoulder and nearly put her on her
+back.</p>
+<p>She drove the shim down into the latch gap. The door caught on it
+with a harsh metallic note. Not enough space. Enough to stop it
+closing.</p>
+<p>“Pello!”</p>
+<p>He struck the door beside her, both of them pushing. Inside,
+something heavy scraped the floor. A man’s knee appeared in the opening
+and folded at the wrong angle beneath a sliding bench.</p>
+<p>Hessel had kicked it.</p>
+<p>The second guard went down. Pello and Briska fell through the door
+together.</p>
+<p>The room smelled of sweat, leather and the coffee spreading across
+the stone. A narrow window faced a wall too close to admit useful light.
+Hessel sat at the far end with his wrists tied in front of him by his
+own belt. One eye was swollen. He drew his legs back from the bench and
+kicked again as the fallen guard tried to rise.</p>
+<p>Daska had the first man’s wrist against the jamb. His shoulder stood
+high, his body twisted below it. He was very strong and very frightened.
+He tried to pull away. She moved with him and drove the side of her hand
+into his jaw.</p>
+<p>The noise was soft. His knees loosened.</p>
+<p>She took his blade as it fell, struck him once more with the heel of
+her palm and caught enough of his weight to keep his skull from hitting
+the threshold. Blood ran from her arm onto his coat.</p>
+<p>Pello had a knee on the second guard’s back. The man reached backward
+for his ankle. Briska hit the reaching hand with the end of her rule. He
+shouted and stopped reaching.</p>
+<p>“Don’t make me do that again,” she said.</p>
+<p>He tried to turn his head. Pello put more weight down.</p>
+<p>Ilaro closed the door as far as the bent shim allowed and stood
+listening beside it.</p>
+<p>Daska looked at the first guard. His lips were parted around blood
+and broken tooth. Her hand remained above him for a moment after there
+was any need to strike.</p>
+<p>“Daska,” Briska said.</p>
+<p>The monk blinked, put the stolen blade on the table and tore a strip
+from the man’s scarf.</p>
+<p>“Turn him over. He’ll choke.”</p>
+<p>They tied him on his side. The other guard cursed them until Hessel
+asked whether he wanted his mouth tied too. The guard looked at him and
+became quiet.</p>
+<p>Pello cut Hessel’s belt away with his rigging knife. Hessel flexed
+his fingers. Both hands worked. He stared at them for a moment, then
+tried to stand too quickly and sat down again.</p>
+<p>“Can you walk?” Briska asked.</p>
+<p>“Yes.”</p>
+<p>“Then don’t run yet.”</p>
+<p>He looked at Daska’s bleeding arm.</p>
+<p>“They did that?”</p>
+<p>“No. I’m decorating.”</p>
+<p>The answer had no laugh in it. She took a folded cloth from the
+coffee tray and pressed it to the cut. Briska pulled another strip from
+the guard’s scarf and tied the pad above the muscle, tight enough to
+stay, loose enough not to stop her hand. Daska lifted and lowered the
+arm. Her expression changed, then settled.</p>
+<p>“The boat?” Hessel asked.</p>
+<p>“Still real,” Pello said. “Different door.”</p>
+<p>Ilaro lifted a finger. Voices passed outside, too close. The
+patrolling guard had returned with Orset. They were arguing about keys
+and whether an accusation had actually been made. Briska held her
+breath. On the floor, the conscious captive drew a little air into his
+nose as though preparing to call.</p>
+<p>Hessel knelt beside him and put the short blade flat against his
+cheek.</p>
+<p>Nobody spoke until the voices had gone.</p>
+<p>Then Hessel lifted the blade, laid it on the table and stood. He
+looked at Daska, perhaps waiting to be told what that had made him. She
+opened the door a finger’s breadth and checked the passage.</p>
+<p>“Stairs.”</p>
+<p>Pello took Hessel first. Ilaro followed with one hand near the wall.
+Briska stayed beside Daska, gathering the tools she could recover. The
+spreader went into the bag bent. The shim would not come free of the
+jamb.</p>
+<p>She left it.</p>
+<p>At the first turn of the service stair they heard the ballroom
+applaud. The violin began its phrase again, louder. Pello looked back
+from the landing above.</p>
+<p>“She’s still dancing?”</p>
+<p>Daska’s mouth opened in an unwilling, astonished grin. “She’d better
+be doing it well.”</p>
+<p>He took Hessel toward the linen room. Briska watched him go, then
+heard Thorn’s voice from the passage below.</p>
+<p>“Who opened that door?”</p>
+<p>Daska moved to the narrowest part of the stair. She rolled her good
+shoulder once and put her hand out behind her.</p>
+<p>“Briska. Something I can hit with.”</p>
+<p>Briska gave her the short iron bar from her bag.</p>
+<h2 id="chapter-15-the-hosts-sleeve">Chapter 15 — The host’s sleeve</h2>
+<p>Caspian’s eyes went past Rosceline toward the eastern passage.</p>
+<p>She did not turn. She had learned enough from his face. Whatever was
+happening there had stopped being a private inconvenience.</p>
+<p>“You can still leave with me,” he said.</p>
+<p>The offer had lost its room above the galleries. There was something
+smaller and harder beneath it now.</p>
+<p>“Where would you take me?”</p>
+<p>“Somewhere we can finish this.”</p>
+<p>“I think we’re nearly finished.”</p>
+<p>She stepped away at the end of the measure. His hand stayed at her
+waist. She put her burned left hand over it, smiling for the people who
+had begun to applaud, and lifted his fingers one at a time.</p>
+<p>“A lovely air,” she said, loudly. “Though I understand good weather
+can be held for a week if one pays the right men.”</p>
+<p>The gold-sashed guest stopped applauding.</p>
+<p>Rosceline looked directly at him.</p>
+<p>“Your competitor’s boats. Seven mornings at the inspection quay. You
+must have been pleased with the result.”</p>
+<p>The man beside him lowered his glass. He was, by luck or Caspian’s
+sense of entertainment, connected to the injured competitor. Rosceline
+saw the recognition and leaned into it.</p>
+<p>“My lord keeps excellent records,” she said.</p>
+<p>“You are mistaken,” Caspian told her.</p>
+<p>“About the number of mornings?”</p>
+<p>“About where you are.”</p>
+<p>He reached beneath her wrap for the book.</p>
+<p>She turned against the hand, keeping the ledger pressed to her ribs.
+Her right hand went under her left arm. Thumb to the release. The
+corrected catch gave at once. Steel ran clear of silk.</p>
+<p>She put the point through Caspian’s embroidered cuff and into the
+edge of the serving table behind him.</p>
+<p>The nearest woman screamed. Caspian jerked his arm. Rosceline twisted
+the blade free with a tearing rasp and stepped past him while he was
+still trying to pull his sleeve away from the table.</p>
+<p>Wine went over. A servant dropped a tray of little glass bowls. They
+shattered so brightly beneath the chandeliers that for one second people
+seemed unsure whether the noise was part of the entertainment.</p>
+<p>“Keep back,” Rosceline said.</p>
+<p>She meant it. The rapier shook a little in her grip, and her left
+side had become clumsy with the book and the pain in her hand. She would
+cut anyone who made her choose in a hurry.</p>
+<p>Caspian’s guard came between two guests with a short cudgel in his
+right hand. He saw the blade and stopped just outside its reach.
+Sensible man. He did not want her dead in the middle of the room; he
+wanted her arm damaged enough to stop holding it.</p>
+<p>Rosceline backed toward the western stair.</p>
+<p>“That book is stolen,” Caspian called.</p>
+<p>“So was the week at the quay.”</p>
+<p>The gold-sashed man told her to shut her mouth. Another voice
+demanded that Caspian explain. Deren, the sea expert, had begun making
+his way toward the entrance with the discreet urgency of a man whose
+warehouse was on fire somewhere else.</p>
+<p>The guard lunged when Rosceline’s heel touched the first stair.</p>
+<p>She took the cudgel on the strong part of her blade and felt the
+shock run to her shoulder. His left hand caught the wrap. He pulled. She
+drove her point at his face, forcing him to let go, and gained two
+steps.</p>
+<p>He came after her before she could turn.</p>
+<p>The cudgel struck her ribs just below the right breast. Pain emptied
+her. She could not breathe. The room narrowed to the iron taste at the
+back of her mouth and the man’s boots on the stair below.</p>
+<p>He reached for the sword arm.</p>
+<p>She cut downward across his forearm. The blade opened cloth and
+flesh. Blood spattered the white flowers tied to the rail. He shouted
+and stumbled into a guest trying to come down.</p>
+<p>Rosceline tried to breathe again. Air entered in a thin, savage
+thread.</p>
+<p>She climbed.</p>
+<p>At the turn of the stair a great green swag hung from a cord looped
+around the balustrade. She had admired the fabric on entering. She cut
+the cord now, twice because the first stroke caught only half the
+fibers. The silk fell between her and the pursuing guard, folding over
+his head and the shoulders of the man behind him.</p>
+<p>There were more shouts. Something heavy struck the rail.</p>
+<p>She reached the upper gallery on her knees, got one foot under her
+and stood. The covered shepherd stood beside Ilaro’s empty chair. She
+caught its flute in passing, steadied herself and broke the tip off.</p>
+<p>“Sorry,” she told it.</p>
+<p>The little piece of marble remained in her left palm. She dropped it.
+Her hand would not close properly around anything except the book.</p>
+<p>Across the gallery, light spilled from the eastern service stair.
+Metal rang against metal. She went toward it with the sword low and the
+wrap gripped against her side.</p>
+<p>Daska stood at the top of the narrow flight. Blood had soaked through
+the pad on her right arm. She held Briska’s iron bar in her left hand,
+turning it to meet Thorn’s sword. Thorn was one step below, knees bent,
+point steady between them. A guard behind her tried to find room to pass
+and could not.</p>
+<p>Rosceline had seen Daska fight in alleys where people supplied their
+own mistakes. Thorn supplied none. She advanced by the width of a foot,
+made Daska move, then took the ground that opened. Her blade touched the
+monk’s sleeve and came away redder.</p>
+<p>Briska was at a washstand near the linen-room door, pulling a wide
+ceramic basin out of its wooden cradle.</p>
+<p>“Move back!” she shouted.</p>
+<p>Daska gave a step. Thorn followed.</p>
+<p>Briska hurled the basin at the stone between them.</p>
+<p>It burst with a hollow crack. Water slapped the walls. White
+fragments skidded across the landing and down the stair. Thorn’s leading
+foot slid; she caught the rail before the movement became a fall. The
+guard behind her swore as a shard struck his shin.</p>
+<p>Daska retreated across the wet landing. Her bare heel came down on a
+broken edge. She made a short, furious sound and did not look at it.</p>
+<p>Rosceline reached her side. Thorn looked up from the stair and saw
+the book, the sword and the blood on the green dress.</p>
+<p>“Madame.”</p>
+<p>“Mistress.”</p>
+<p>“The boat is watched.”</p>
+<p>“You’ve been very thorough.”</p>
+<p>“You haven’t seen thorough.”</p>
+<p>Briska caught Rosceline by the back of her dress and hauled her into
+the linen room. Daska came after them, kicking the door shut. The
+repaired hinge carried it smoothly into place. A blade struck the wood
+from the other side before the latch had finished falling.</p>
+<p>“Something to hold the door,” Daska said, laying the short iron bar
+on a shelf.</p>
+<p>There was none. Pello and Hessel dragged the freestanding linen rack
+across the floor. It was heavy with folded cloth, but one foot had
+rotted short at the bottom. The rack rocked as they jammed it against
+the door.</p>
+<p>Daska braced her good shoulder beneath its crosspiece and drove her
+bare left foot against the unsteady leg. The door shuddered. The rack
+held.</p>
+<p>“Go.”</p>
+<p>Pello looked at her bleeding heel.</p>
+<p>“Go, Pello.”</p>
+<p>He ran to the loading door. Below, his cousin’s scow lay against the
+wall. The man looked up, saw the first person at the opening and spread
+both hands in a gesture so expressive Rosceline almost laughed. The
+attempt hurt enough to stop her.</p>
+<p>Ilaro stood beside the hoist with the sling in his hands. He looked
+pale and very present.</p>
+<p>“The book,” he said.</p>
+<p>Rosceline clutched it tighter.</p>
+<p>“Pello can carry it down without using his hands.”</p>
+<p>Pello opened the cargo satchel slung across his back. Wide strap,
+close-fitting cover, no loose ornaments to catch a rope. She had watched
+him bring a stolen marble head down a drainpipe in it.</p>
+<p>She took the wrapped ledger from beneath her wrap. For an instant she
+could feel the count of recoveries on a page in another house, the book
+she wanted still waiting there. Then she pushed the ledger into the
+satchel and saw Pello buckle it shut.</p>
+<p>“It’s the real one,” she said.</p>
+<p>“I know.”</p>
+<p>“Don’t drop it.”</p>
+<p>“I hadn’t planned to.”</p>
+<p>The door struck the rack again. Daska’s injured arm hung beside her,
+blood running toward her fingertips. She changed her stance without
+taking the foot from the broken leg.</p>
+<p>Pello put Hessel into the sling. The guard’s hands worked clumsily
+around the rope.</p>
+<p>“Let it carry you,” Pello said. “Don’t try to climb the wall.”</p>
+<p>Hessel sat on the sill, looked down and went rigid.</p>
+<p>Below, the cousin called, “You wanted a boat. Here it is.”</p>
+<p>Hessel pushed away from the sill. The line took his weight and began
+to run through Pello’s hands.</p>
+<h2 id="chapter-16-a-boat-of-sufficient-size">Chapter 16 — A boat of
+sufficient size</h2>
+<p>Ilaro watched Hessel descend until the guard’s boots touched the
+scow.</p>
+<p>Then he made himself look at the knot instead of the water.</p>
+<p>Pello brought the sling back up. The door behind them thudded.
+Something in the linen rack cracked, followed by Daska telling it, with
+intense feeling, to stay where it was.</p>
+<p>“You next,” Pello said.</p>
+<p>Ilaro sat in the strap. He had practiced this. The difference was the
+dark water below and the woman behind him bleeding against the door.</p>
+<p>“Lowering,” Pello said.</p>
+<p>“All right.”</p>
+<p>The sill went away beneath him.</p>
+<p>For a moment he could see everything: the pale wall moving past his
+face, the canal black between reflected lanterns, a guard at the wicket
+turning his head. Then the rope swung and the lights smeared together.
+Nausea rose so sharply that he could not separate it from terror.</p>
+<p>He closed his eyes.</p>
+<p>“Keep coming,” the cousin called. “I’ve got you.”</p>
+<p>Hands took his shoulders. His feet struck wood. He was in the boat,
+bent forward, trying to remember that the ground now moving beneath him
+was meant to move.</p>
+<p>Hessel pulled the sling free. Ilaro crawled beneath the raised edge
+of the gunwale and held on to a thwart until his sight settled.</p>
+<p>“Don’t be sick on the tools,” the cousin said.</p>
+<p>Ilaro lifted his face.</p>
+<p>“If I can choose, I’ll be sick on you.”</p>
+<p>The man grinned and looked up again.</p>
+<p>Pello threw the long free end of the lowering line down to his
+cousin, who passed it around a mooring ring to take the strain. With the
+hoist controlled from the boat, Pello came down third, the satchel tight
+across his back. Halfway, his cap fell off. It landed in the canal and
+floated away with stately indifference. He watched it go until his
+cousin shouted at him.</p>
+<p>“Bought you that cap.”</p>
+<p>“I know.”</p>
+<p>“Your mother’ll ask.”</p>
+<p>“Tell her it was respectable to the end.”</p>
+<p>Pello landed lightly. He checked the satchel’s buckle before
+unhooking the sling, and Ilaro felt a small relief. The book had reached
+the boat. They had something to show for being hunted.</p>
+<p>Briska followed, using both hands on the rope and complaining under
+her breath about the angle of the loading beam. When she reached the
+deck she took the lowering line from the cousin, freeing him to handle
+the boat. She glanced at the tool frame but did not try to replace the
+pieces she had lost.</p>
+<p>Above, Rosceline appeared on the sill.</p>
+<p>She had tied the sword’s small sheath back over the point and thrust
+the weapon into its diagonal harness. Her green dress was dark on one
+side. Ilaro could see the effort it took her to sit, the way she kept
+her right elbow close to her ribs.</p>
+<p>The sling rose to her. She fitted it around herself and looked back
+into the room.</p>
+<p>Something struck the door hard enough to sound like the end of the
+rack.</p>
+<p>“Rosceline!” Pello shouted.</p>
+<p>She came off the sill. The line jerked, settled, and lowered her.
+Hessel caught her before she hit the gunwale. She swore into his
+shoulder with a richness that made him blink, then folded onto the deck
+beside Ilaro.</p>
+<p>“How bad?” he asked.</p>
+<p>“I don’t want to discuss it.”</p>
+<p>“Breathing?”</p>
+<p>“I’m doing it.”</p>
+<p>“Keep doing it.”</p>
+<p>She looked at him with genuine hatred for a moment. That reassured
+him more than a brave answer would have.</p>
+<p>The sling rose for the last time.</p>
+<p>Daska appeared at the loading door, one hand on the side of the
+frame. Behind her the linen rack went over with a roar of falling
+shelves and scattered cloth. She did not put the sling on. She caught
+the rope below it and slid, her feet braced against the wall.</p>
+<p>At the wicket, a man shouted. A second leaned out with a bow.</p>
+<p>“Push!” Pello said.</p>
+<p>His cousin drove the scow off the wall with the long sweep. Hessel
+and Pello reached for Daska as the boat began to move. Her feet hit the
+outer gunwale; she lost her grip on the rope and went backward toward
+the water.</p>
+<p>Pello caught her wrist. Hessel caught the back of her coat. Briska
+let the now-unweighted lowering line run free of the mooring ring.</p>
+<p>For one appalling instant she hung with her weight pulling both men
+over the side. Briska threw herself across Pello’s legs. The cousin put
+his shoulder against the sweep and held the boat from turning.</p>
+<p>Daska caught the gunwale with her good hand.</p>
+<p>They hauled her in over it, hard. She landed on the tool frame,
+rolled off and lay with her mouth open, making no sound.</p>
+<p>Above them Thorn reached the loading door. She took in the rope and
+the boat, then shouted to the men below.</p>
+<p>Briska unfolded the tool frame and heaved its canvas-covered side
+against the gunwale. It rose between them and the wicket just as the
+bowman loosed.</p>
+<p>The arrow tore through the canvas. It struck the thwart beside
+Ilaro’s knee with a noise like a hammer driven into green wood.</p>
+<p>He stared at the shaft.</p>
+<p>“That’s why we keep down,” the cousin said, and pulled.</p>
+<p>Pello took a second oar. The scow swung into the traffic left in the
+guest barge’s path. A small boat full of laughing people shouted at them
+for crossing its bow. A woman threw a half-eaten peach. It struck the
+canvas beside the arrow hole and slid down in a wet yellow smear.</p>
+<p>Daska made a sound.</p>
+<p>Rosceline bent toward her. “What?”</p>
+<p>“I hate that song.”</p>
+<p>The orchestra was still playing inside the villa.</p>
+<p>Ilaro looked back. The loading door had become a bright square above
+the canal. Thorn stood in it, one hand on the frame, watching. She had
+stopped shouting. That was worse. She was remembering.</p>
+<p>The scow went beneath a low bridge. Stone passed a hand’s breadth
+above the raised canvas. Briska pulled it down before it caught. For a
+few strokes they were in complete dark, water slapping the arch with a
+noise too large for the narrow space.</p>
+<p>Ilaro put his fingers against the arrow shaft to keep himself still.
+The wood trembled with the boat.</p>
+<p>“Not the straight cut,” he said when they emerged. “The watch can get
+there from the road before us. North, then under the dyers’ walk.”</p>
+<p>Pello shook his head. “Closed.”</p>
+<p>“When?”</p>
+<p>“This morning. Dredger across it. I saw the chain.”</p>
+<p>Ilaro had walked past that canal. He remembered a woman washing a red
+skirt on the steps. He did not remember the dredger.</p>
+<p>He closed his eyes for one breath and placed the routes against each
+other.</p>
+<p>“South, then. Behind the charcoal sheds. If they think we’re
+following the barge they’ll send the first boat to the outer
+landing.”</p>
+<p>“We’ll go to my cousin’s,” Pello said.</p>
+<p>The man at the sweep gave him a look.</p>
+<p>“Your other place,” Pello added.</p>
+<p>“You do like spending things that are mine.”</p>
+<p>“Do you want us at your house?”</p>
+<p>The cousin turned the scow south.</p>
+<p>They passed under hanging lines of wet canvas, through a drift of
+fish scales glittering on the surface, and into a reach where the lamps
+were mostly out. The stink of charcoal dust and stale bilge replaced the
+villa’s perfume. Ilaro found himself grateful for it. He could name what
+was making him feel ill now.</p>
+<p>Rosceline knelt beside Daska with the basin cloth pressed to the
+upper-arm wound. Briska was inspecting the cut in the monk’s heel.
+Hessel held the shaded lamp for her. Its light showed a thin white
+splinter embedded in the flesh.</p>
+<p>“Don’t pull it until we stop moving,” Ilaro said.</p>
+<p>Briska looked up. “I wasn’t going to.”</p>
+<p>He nodded and stopped offering advice he had not been asked for.</p>
+<p>They reached a shuttered boat shed on a side canal. The cousin let
+the scow drift the last few yards, caught a ring in the stone with the
+boathook and drew them under the overhang. Pello climbed out first and
+lifted the shed’s loose lower shutter from inside. There was a bench, a
+pile of nets and the dry smell of tarred rope.</p>
+<p>Hessel went in to hold the lamp. Briska followed with her bag.
+Together they helped Daska across the landing. Rosceline tried to stand
+without assistance and had to wait, gripping the gunwale, until the pain
+allowed it.</p>
+<p>Pello came back for the satchel. He opened it in the lamplight, took
+out the oilcloth bundle and handed it directly to Rosceline.</p>
+<p>“Still real,” he said.</p>
+<p>She looked at the knot, then at him.</p>
+<p>“Thank you.”</p>
+<p>He did not answer. He went to help his cousin pull the boat deeper
+into the shadow.</p>
+<p>Ilaro sat on the landing with his feet inside the scow. He had meant
+to be last out and now could not quite remember the movements needed to
+accomplish it. Hessel came back, offered an arm and waited without
+urging him.</p>
+<p>He took it.</p>
+<p>Inside the shed Daska was telling Briska to stop saying it would hurt
+and remove the bloody piece. Briska did. The monk’s fist struck the
+bench hard enough to shake the lamp in Hessel’s hand.</p>
+<p>The light steadied. Outside, an oar sounded on another canal and
+passed them by.</p>
+<h1 id="part-v-what-they-keep">Part V — What they keep</h1>
+<h2 id="chapter-17-paid-in-full">Chapter 17 — Paid in full</h2>
+<p>Hessel’s hands shook while he counted the money.</p>
+<p>He had said they were sound. They were sound enough to count, though
+he had to begin twice. Pello sat beside him on an overturned basket with
+the passage paper open across his knees. The ship’s name looked very
+ordinary in the yellow lamplight.</p>
+<p>Rosceline waited until the guard had finished.</p>
+<p>“The note to Thorn was mine.”</p>
+<p>He looked up. One eye had narrowed almost shut. The other moved to
+Daska and then to Pello.</p>
+<p>“They didn’t know,” Rosceline said.</p>
+<p>Hessel put the counted coins back in their little bag.</p>
+<p>“Why?”</p>
+<p>“To make the search follow you after we left.”</p>
+<p>He sat still long enough that she wanted to tell him again when it
+had been meant to arrive. She could give the delays, the inspection, the
+thing on the book. She knew how to make the sequence sound
+inevitable.</p>
+<p>He held his hand out to Pello for the passage paper.</p>
+<p>“Is this part real?”</p>
+<p>“Yes,” Pello said. “So is the money.”</p>
+<p>The guard folded the paper carefully. “And that one over there? The
+boatman?”</p>
+<p>“My cousin. He wants paying. He doesn’t want you.”</p>
+<p>Hessel nodded. He looked at Rosceline once more.</p>
+<p>“Don’t write my name again.”</p>
+<p>She opened her mouth, then closed it and nodded.</p>
+<p>He stood to help Daska with her coat.</p>
+<p>They stayed in the shed until the sky over the canal had lost its
+blackness. The cousin brought plain clothes in a sail bag, complaining
+that none of them was the right size for respectable people. Briska
+helped Rosceline out of the ruined dress. Every movement pulled at her
+ribs. The silk smelled of perfume, iron and another man’s sweat.</p>
+<p>“I’ll keep it,” Rosceline said.</p>
+<p>Briska held up the torn side. “For what?”</p>
+<p>“To remind me to charge more.”</p>
+<p>She wrapped the dress around the sheathed rapier and tied the bundle.
+She wore a borrowed brown coat over a shirt that closed too high on her
+throat. The book went inside the coat, wrapped as before. Her burned
+hand had been dressed with a clean fold of linen from the cousin’s
+stores, which he added aloud to the bill.</p>
+<p>Ilaro had fallen asleep sitting against the wall. Without the tension
+around his mouth he looked younger and more damaged. A pale seam showed
+above his ear where the hair had never grown back properly. Rosceline
+shaded the lamp with an empty tin and left him until Pello said they had
+to move.</p>
+<p>At the coastal landing the <em>Little Sister</em> lay below a tangle
+of spars and drying clothes. Its master had a bald head and a voice that
+could have loaded the cargo without assistance. He read Hessel’s paper,
+checked a mark in his own book and pointed toward the gangway.</p>
+<p>“One chest.”</p>
+<p>“I don’t have one,” Hessel said.</p>
+<p>“Then you’ve no complaint about the allowance.”</p>
+<p>Pello handed over the balance of the fare. Daska stood with one foot
+off the stone and her injured arm tucked inside the coat. Hessel turned
+to her.</p>
+<p>“You came back.”</p>
+<p>“You were in the wrong room.”</p>
+<p>He smiled with the uninjured side of his mouth. It was brief, and it
+went away when he saw Rosceline behind her.</p>
+<p>“Will you—” He stopped and tried another question. “The men in the
+guardroom?”</p>
+<p>“Alive when we left,” Daska said.</p>
+<p>He nodded. He had carried the stolen blade as far as the shed, then
+left it there. Rosceline could see the empty place at his belt when he
+turned.</p>
+<p>The master called for passengers. Hessel crossed the gangway without
+looking back again. He found a place beneath an awning among three
+women, a sleeping boy and a man holding a covered cage. A crewman pulled
+the gangway in. Pello caught the tossed shore line and freed it from the
+bollard.</p>
+<p>The <em>Little Sister</em> moved out slowly, sail beginning to fill
+above its crowded deck. Hessel put one hand over his swollen eye against
+the dawn. With the other he held the passage paper until a woman beside
+him said something and persuaded him to put it away.</p>
+<p>Daska waited until the boat had passed the outer post.</p>
+<p>Then she sat down on the bollard and said, “Someone find me a chair.
+I have been very athletic.”</p>
+<p>They hired two. Pello walked beside the bearers, carrying the dress
+and the sword. Briska supported Ilaro by pretending she needed his
+opinion on the damaged spreader. Rosceline heard him tell her that he
+would like to examine its failure in a room where nothing was
+moving.</p>
+<p>The Countess’s door opened at their approach.</p>
+<p>Celise took one look and sent for hot water, a surgeon and additional
+linen, in that order. She relieved Pello of the bundle and placed it on
+a side table without opening it. She did not ask why it was wet.</p>
+<p>“The book?”</p>
+<p>Rosceline took it out of her coat.</p>
+<p>“In person,” she said.</p>
+<p>Celise looked at her face. “Very well. This way.”</p>
+<p>The Countess received them in the same room. The flowers had been
+changed. Rosceline noticed it with an unreasonable feeling of injury. In
+this house the night had passed cleanly into morning.</p>
+<p>She put the oilcloth bundle on the table and untied it with her right
+hand. The ledger lay between the teacups, brown and dull and slightly
+damp at one corner.</p>
+<p>Serafine did not touch it immediately.</p>
+<p>“All of you?”</p>
+<p>“Yes,” Ilaro said. “And the guard has sailed.”</p>
+<p>The Countess inclined her head to Daska, who was watching the servant
+put food on a tray.</p>
+<p>Then she opened the book. Celise stood beside her while she checked
+the first page, the last, several places between. Rosceline saw
+recognition travel over the small visible portion of her face. At one
+entry the mouth behind the veil became still.</p>
+<p>“This is it.”</p>
+<p>Five purses were brought. The preparation expenses were settled
+separately. Briska put down the folded contractor’s bill and the
+cousin’s increasingly detailed account. The Countess read both without
+comment and paid them.</p>
+<p>Ilaro took his notebook out.</p>
+<p>“Mistress Ossene.”</p>
+<p>The Countess looked up.</p>
+<p>“One evening. Your choice before the season ends. The Collector kept
+the invitation.”</p>
+<p>For a moment she looked past them toward an empty chair. Then she
+said to Celise, “Not the musicians’ evening.”</p>
+<p>“Certainly not.”</p>
+<p>“The small supper after the west-coast buyers leave.”</p>
+<p>“I’ll see to it.”</p>
+<p>Ilaro kept the notebook open.</p>
+<p>“You knew Caspian served Livaea.”</p>
+<p>“Yes.”</p>
+<p>“We asked about the protections.”</p>
+<p>“I gave you what I believed would release the claim.”</p>
+<p>“That isn’t the same answer.”</p>
+<p>The Countess looked at the bandage around Rosceline’s hand, then at
+Daska’s arm.</p>
+<p>“No,” she said. “It isn’t.”</p>
+<p>Ilaro waited.</p>
+<p>“I wanted the book. I thought knowing the extent of the association
+might persuade you to leave it where it was.”</p>
+<p>“It nearly did,” Briska said.</p>
+<p>“You made your decision.”</p>
+<p>“After we were in his house.”</p>
+<p>The room went quiet. Rosceline was tired enough to enjoy the Countess
+having to occupy it.</p>
+<p>At last Serafine said, “You are right about that.”</p>
+<p>She did not improve the admission. Ilaro shut the notebook.</p>
+<p>“And now?” Pello asked. “He knows our faces.”</p>
+<p>“He would have to explain which book was taken if he made a formal
+complaint. Several of the people who would hear it are in these
+pages.”</p>
+<p>“He has men who don’t need a complaint,” Daska said.</p>
+<p>“Yes. Avoid his part of the canal. Let Celise know where messages can
+reach you. If Thorn approaches you, hear her out before doing anything
+theatrical.”</p>
+<p>Rosceline looked down at her purse. She would have liked protection
+that sounded less like another set of useful instructions. She would
+also have liked her ribs back as they had been yesterday. Neither seemed
+available.</p>
+<p>The Countess turned to the entry that had stopped her. A narrow knife
+came from the writing box. She slid it down the inside edge of a leaf,
+close to the stitching, and freed the page.</p>
+<p>Letha’s name stood near the top.</p>
+<p>Rosceline could read two dates and the words <em>information
+received</em>. The amounts below were small. Small enough to be
+believable, large enough to make the singer look paid.</p>
+<p>“She refused,” the Countess said. “He kept the entry.”</p>
+<p>“Useful if she ever complained,” Ilaro murmured.</p>
+<p>Serafine folded the leaf and held it to the candle. Flame took the
+edge. She let it burn almost to her fingers before placing it in the
+empty hearth.</p>
+<p>The rest of the book she gave to Celise.</p>
+<p>“Lock it away. We will need it.”</p>
+<p>Rosceline watched the two portions of Caspian’s work go to their
+different destinations. Then she took her private agreement from the
+inner pocket of her borrowed coat and laid it beside the purses.</p>
+<p>The Countess read the addition Rosceline had made the day before. She
+wrote beneath it, signed, and turned the paper so Rosceline could
+see.</p>
+<p><em>First recovery satisfied. Three remain.</em></p>
+<p>The ink was still wet when Rosceline folded the paper along its old
+crease.</p>
+<h2 id="chapter-18-a-very-promising-painter">Chapter 18 — A very
+promising painter</h2>
+<p>The surgeon said Rosceline’s ribs might hurt for several weeks.</p>
+<p>“Which ones?” she asked.</p>
+<p>“All the ones you’ve been using.”</p>
+<p>She had expected more sympathy from a man charging that much. He
+bound her burned hand, told her which changes in the pain would require
+him back, and moved on to Daska, who asked whether she could dance.</p>
+<p>“Not on that heel.”</p>
+<p>“I have another.”</p>
+<p>“I noticed.”</p>
+<p>Celise stood by until they had both listened to the instructions a
+second time. She made Ilaro lie down in a room with shutters and told
+the servant carrying his breakfast not to ask him any questions. He
+thanked her so directly that Rosceline looked away.</p>
+<p>By noon the company had been washed, fed and made sufficiently
+presentable to argue about money.</p>
+<p>They did it in Briska’s workshop the following day. Pello brought the
+scow’s final account and a new cap. Briska brought the broken
+latch-spreader and seemed to think the appearance of the object ought to
+settle the cost of replacing it. Daska occupied the chair that did not
+creak, with her left foot on a stool and a bowl of cherries within
+reach.</p>
+<p>Rosceline had slept for eleven hours and woken angry at every joint.
+She wore a loose shirt and had given up pretending that sitting down was
+easy.</p>
+<p>“A cap isn’t equipment,” Briska said.</p>
+<p>“It kept rain out of my eyes.”</p>
+<p>“It didn’t rain.”</p>
+<p>“Because I had the cap.”</p>
+<p>Ilaro, who had arrived last, sat with his back to the window. “Pay
+for the cap before he develops a religion.”</p>
+<p>They paid for the cap. The cousin’s charge for shelter remained a
+subject of dispute. He had added an amount for the arrow in the thwart
+and then, on the line below, an amount for keeping the arrow as a
+souvenir.</p>
+<p>“He’s charging both?” Rosceline said.</p>
+<p>“He says they’re different services.”</p>
+<p>“I like your cousin.”</p>
+<p>“Everyone does until they owe him.”</p>
+<p>Pello took his share and counted it twice, once for accuracy and once
+for pleasure. The boat he wanted was still beyond it, but less far
+beyond it than it had been. He wrapped most of the money in a cloth and
+left a few coins loose for lunch.</p>
+<p>Briska picked up the spreader. One jaw stood visibly higher than the
+other.</p>
+<p>“I can remake the housing.”</p>
+<p>“Will it open that door?” Daska asked.</p>
+<p>“No. But it will stop before bending.”</p>
+<p>“An improvement.”</p>
+<p>“I think so.”</p>
+<p>She put it aside instead of beginning work immediately. Rosceline
+noticed. It meant they had arrived at the part nobody wanted to purchase
+by the hour.</p>
+<p>Daska took a cherry, split it with her thumb and put the stone into
+the empty bowl.</p>
+<p>“If I tell someone I’ll get them out,” she said, “you don’t arrange
+to make that harder behind my back.”</p>
+<p>Rosceline leaned back. Her ribs objected. She leaned forward
+again.</p>
+<p>“I believed he would be clear.”</p>
+<p>“I know what you believed. I heard you.”</p>
+<p>Pello laid the tied money cloth on the bench. “My cousin would have
+been under that wicket when the search began if we’d been slower still.
+He wasn’t in your note. He was in your plan.”</p>
+<p>Rosceline looked at him, then at the others. None offered her a
+helpful interruption.</p>
+<p>“What do you want agreed?”</p>
+<p>“Names,” Daska said. “If you use someone’s name to send trouble after
+them, we hear it before the note leaves. They hear it if they’re one of
+the people helping us.”</p>
+<p>“Sometimes that will make it impossible.”</p>
+<p>“Then you find something else,” Pello said.</p>
+<p>Rosceline could have laughed at them. There were plenty of people in
+Silkstrand who would sell a man to his employer for less than the price
+of last night’s dress. Most of those people could not lower six others
+out of a watched house or hold a door with one damaged arm. She looked
+at the empty sleeve of Daska’s coat, folded over the chair.</p>
+<p>“Agreed.”</p>
+<p>“Say what you agreed,” Ilaro said.</p>
+<p>She turned toward him, irritated.</p>
+<p>He waited. It was one of his better talents.</p>
+<p>She said it. Not pleasantly, and without embroidery. Daska nodded
+once and reached for another cherry. Pello untied his money cloth to
+take out a coin he had put away by mistake. Briska began examining the
+spreader again.</p>
+<p>Nobody embraced her.</p>
+<p>After a while she found that she was less angry than she had intended
+to remain.</p>
+<p>The Countess let her visit Sarem’s book three days later.</p>
+<p>Rosceline went alone. Her hand had a clean dressing; her ribs still
+caught when she climbed stairs too fast. Celise showed her into a small
+room overlooking a courtyard, where laundry stirred above pots of herbs.
+The book lay on the table. There was a cup of water beside it and no tea
+to spill on the pages.</p>
+<p>“The Countess has given you half an hour,” Celise said.</p>
+<p>“How generous.”</p>
+<p>Celise looked at her, then at the chair.</p>
+<p>“You may shut the door.”</p>
+<p>She left.</p>
+<p>Rosceline sat. The bad stitching on the spine was worse in daylight.
+She remembered Sarem attempting to mend a sleeve while reciting, the
+needle stopped in the air as he lost his place. She had corrected the
+line and been told that if the daughters of Ahakar were going to be so
+particular about meter they might at least learn to sew.</p>
+<p>She had not learned then. Someone else always did it, in those
+houses. She had learned later, with a coat between herself and a cold
+wall, and discovered that he had been bad at it because he could afford
+to be.</p>
+<p>Her finger found the little mark.</p>
+<p>“Across the bronze—burnished hills.”</p>
+<p>The same pause. The same annoyance. She let it end without supplying
+the word.</p>
+<p>Eleven months had been a long time once. Long enough to stop
+listening for a particular step outside a door. Long enough to make a
+joke and expect him to hear it. The people who had sent her to him had
+waited for that. She had spent years wondering which laugh they had
+heard and understood as permission.</p>
+<p>She moved her finger away from the mark.</p>
+<p>Beyond the window, a woman shook a sheet out over the courtyard.
+Water fell onto the leaves below, making them nod. Someone called up a
+complaint. The woman called down something that made both of them
+laugh.</p>
+<p>Rosceline opened the book to another page. A line of small, awkward
+writing lay beneath Sarem’s. Her own. She had forgotten how cramped her
+letters had been.</p>
+<p>She read the correction she had made there and smiled despite
+herself. She had been right. He had drawn an irritated little stroke
+beside it that conceded nothing and changed the line above.</p>
+<p>When the half hour ended, she had heard the voice only once more.</p>
+<p>She closed the book. At the door she stopped with her hand on the
+latch, listening to the courtyard. Then she went to find Celise and ask
+for the name of the woman who had offered to repair her dress.</p>
+<p>Lady Wren’s salon fell on the following afternoon.</p>
+<p>Rosceline had considered sending an apology. She had a serviceable
+one, signed by the surgeon if she wanted to pay him for the additional
+use of his hand. Instead she wore the green dress, repaired along the
+old tear with a narrow panel of darker silk, and arrived with the others
+at a house that smelled of coffee and fresh plaster.</p>
+<p>“My dear,” Wren said. “Caspian tells the most extraordinary
+account.”</p>
+<p>“Does he include the sea?”</p>
+<p>“Not so far.”</p>
+<p>“Then it could use more work.”</p>
+<p>Wren looked at the dress, the bandage and the four people behind her.
+There was a limit to how much visible injury could be passed off as
+fashion, even in Silkstrand.</p>
+<p>“I hope you’re all well.”</p>
+<p>“Improving,” Daska said.</p>
+<p>She had her plum earrings on. Her arm remained in its dressing, and
+the cheap replacement shoe on her left foot had been cut away around the
+heel. She had argued for it at considerable length and could walk
+without wincing if nobody hurried her.</p>
+<p>Wren gave Ilaro a chair away from the small group of musicians and
+took Rosceline toward the paintings.</p>
+<p>The young artist waiting beside them wore a coat that had been
+pressed so recently it still smelled faintly damp. There was paint under
+one thumbnail. He had tried to clean the other with a knife and cut
+it.</p>
+<p>“Tavio,” Wren said. “Madame Rosceline.”</p>
+<p>He bowed too far. “I’ve heard about your judgment.”</p>
+<p>“That’s unfortunate. Show me something.”</p>
+<p>He showed her a view of the harbor first. It was skillful and dull,
+with water that Deren might have approved of. She said something about
+the light. He moved quickly to the next, a prosperous family arranged
+around a table whose perspective threatened to slide the youngest child
+onto the floor.</p>
+<p>Then she saw the fishmonger.</p>
+<p>The woman in the picture had turned halfway from her stall, one hand
+still holding a fish by its tail. The other rested on her hip. There was
+a red indentation where a basket strap had pressed into her wrist. Her
+fingers were broad, capable and slightly curled against the habit of
+cold. The smile had not been painted onto her mouth; it seemed to be
+arriving from something said beyond the edge of the canvas.</p>
+<p>Rosceline stepped nearer.</p>
+<p>“Who is she?”</p>
+<p>“My aunt.”</p>
+<p>“Did she buy it?”</p>
+<p>“She says she can see herself for nothing in the good pan.”</p>
+<p>Rosceline laughed. It hurt. She laughed again more carefully.</p>
+<p>She called over a woman she knew who had spent two seasons asking
+painters to make her father look less tired. Rosceline introduced them
+without adding a false history of commissions or a claim that someone
+more important was about to buy the picture. She pointed out the
+fishmonger’s hand and let the woman look.</p>
+<p>When they began discussing a sitting, Rosceline withdrew.</p>
+<p>At the far side of the room Daska had found the wiry dancer from the
+gala. They were exchanging an account of the evening that made generous
+use of their good hands. The dancer said something and Daska laughed,
+caught herself at the pull in her arm, then laughed once more
+anyway.</p>
+<p>Ilaro sat with coffee and the catalog. A woman beside him was asking
+about a missing necklace. He asked her when she had last worn the dress
+she thought it had been taken from. She stopped talking to consider
+it.</p>
+<p>Pello and Briska had cornered Tavio when he escaped the prospective
+client. Pello was describing the side of a boat with both hands.</p>
+<p>“There would be room for a name here. And a little work around
+it.”</p>
+<p>“A serpent?” the painter suggested.</p>
+<p>“Something people like to see approaching.”</p>
+<p>“What boat?” Briska asked.</p>
+<p>“When I buy it.”</p>
+<p>“Then buy one with a sound stem before you pay to decorate it.”</p>
+<p>Rosceline took a glass from a passing tray. Nobody was attempting to
+put a working into it. As far as she could hear.</p>
+<p>For once she had no reason to cross the room before someone stopped
+looking, and no appointment elsewhere that became urgent if she stayed.
+She could see an unoccupied chair beside Ilaro. She went toward it
+slowly, giving her ribs the time they required.</p>
+<p>Behind her, Pello said, “I was thinking of calling her the <em>Fair
+Return</em>.”</p>
+<p>Briska looked up from the little sketch Tavio had begun.</p>
+<p>“Leave room to repaint that.”</p>
+</body>
+</html>
