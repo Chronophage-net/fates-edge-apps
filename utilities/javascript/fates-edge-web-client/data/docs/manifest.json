@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-22T00:28:17.834Z",
+  "generated": "2026-11-22T01:35:56.630Z",
   "documents": [
     {
       "id": "srd",
@@ -1062,6 +1062,16 @@
       "path": "/data/docs/expansions/",
       "category": "expansions",
       "categoryLabel": "Expansions",
+      "core": false,
+      "active": true
+    },
+    {
+      "id": "no_berth_for_thieves",
+      "title": "No Berth for Thieves",
+      "file": "Fates_-_Edge_-_-No-_-Berth-_-for-_-Thieves.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
       "core": false,
       "active": true
     },
@@ -2292,7 +2302,7 @@
       "active": true
     }
   ],
-  "total_count": 169,
-  "active_count": 169,
+  "total_count": 170,
+  "active_count": 170,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
