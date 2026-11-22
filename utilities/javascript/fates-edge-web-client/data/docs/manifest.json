@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-21T23:26:25.238Z",
+  "generated": "2026-11-22T00:28:17.834Z",
   "documents": [
     {
       "id": "srd",
@@ -1283,6 +1283,16 @@
       "active": true
     },
     {
+      "id": "silk_and_velvet_the_crimson_masque",
+      "title": "Silk & Velvet: The Crimson Masque",
+      "file": "Fates_-_Edge_-_-Silk-_-and-_-Velvet-_-The-_-Crimson-_-Masque.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true
+    },
+    {
       "id": "fr_srd_de_fate_s_edge_commencer_ici_la_m_canique_centrale_fran_ais",
       "title": "SRD de Fate's Edge — Commencer ici : la mécanique centrale (Français)",
       "file": "Document-de-reference-du-systeme.html",
@@ -2282,7 +2292,7 @@
       "active": true
     }
   ],
-  "total_count": 168,
-  "active_count": 168,
+  "total_count": 169,
+  "active_count": 169,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
