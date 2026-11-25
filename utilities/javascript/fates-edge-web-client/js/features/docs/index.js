@@ -1,4 +1,4 @@
-import { arrangeDocs, enterReader, finishReading, filterDocuments, isSaved, toggleSaved, readReadingState } from './workspace.js';
+import { arrangeDocs, enterReader, finishReading, filterDocuments, groupDocuments, listSubcategories, isSaved, toggleSaved, readReadingState } from './workspace.js';
 let documentRequest = 0;
 let libraryPage = 0;
 /**
@@ -502,6 +502,12 @@ export function render(el) {
                 <label style="margin:0;font-size:0.8rem;font-weight:600;color:var(--text2);white-space:nowrap;" data-i18n="feature.docs.category">Category</label>
                 <select id="docsTypeFilter" style="padding:0.35rem 0.6rem;font-size:0.9rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);flex:0 1 220px;"></select>
             </div>
+            <!-- Subcategory: shown only when the chosen category has them
+                 (e.g. Novels & Novellas by series). -->
+            <div class="filter-group" id="docsSubFilterGroup" style="display:none;flex-wrap:wrap;gap:0.4rem;align-items:center;flex:1 1 200px;">
+                <label for="docsSubFilter" id="docsSubFilterLabel" style="margin:0;font-size:0.8rem;font-weight:600;color:var(--text2);white-space:nowrap;">Series</label>
+                <select id="docsSubFilter" style="padding:0.35rem 0.6rem;font-size:0.9rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);flex:0 1 260px;"></select>
+            </div>
             <div class="filter-group" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;flex:1 1 200px;">
                 <label style="margin:0;font-size:0.8rem;font-weight:600;color:var(--text2);white-space:nowrap;" data-i18n="feature.docs.search">Search</label>
                 <input type="text" id="docsSearchInput" placeholder="Filter by title…" style="padding:0.35rem 0.6rem;font-size:0.9rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);flex:1 1 180px;min-width:120px;" / data-i18n-attr="placeholder:feature.docs.filterByTitle">
@@ -588,6 +594,7 @@ function applyLoadedDocs(docs, source) {
     saveCache();
     console.log(`📚 Loaded ${allDocs.length} documents from ${source}`);
     populateTypeFilter(allDocs);
+    populateSubcategoryFilter();
     applyDocsFilter();
     updateDocStats(allDocs.length);
     updateTotalCount();
@@ -999,7 +1006,8 @@ function attachDocEvents() {
         });
     }
 
-    if (typeFilter) typeFilter.addEventListener('change', () => {libraryPage=0;applyDocsFilter();});
+    if (typeFilter) typeFilter.addEventListener('change', () => {libraryPage=0;populateSubcategoryFilter();applyDocsFilter();});
+    document.getElementById('docsSubFilter')?.addEventListener('change', () => {libraryPage=0;applyDocsFilter();});
     if (searchInput) searchInput.addEventListener('input', () => {libraryPage=0;applyDocsFilter();});
 
     if (clearBtn) {
@@ -1009,6 +1017,7 @@ function attachDocEvents() {
             // option to clear back to), so leave it as the user set it.
             if (searchInput) searchInput.value = '';
             if (typeFilter) typeFilter.value = 'all';
+            populateSubcategoryFilter();
             const shelf=document.getElementById('docsShelf');if(shelf)shelf.value='all';
             libraryPage=0;
             applyDocsFilter();
@@ -1342,7 +1351,8 @@ function applyDocsFilter() {
     const type = typeFilter ? typeFilter.value : '';
     const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    const filtered=filterDocuments(allDocs,{type,query:search,shelf:document.getElementById('docsShelf')?.value || 'all'});
+    const subcategory = document.getElementById('docsSubFilter')?.value || 'all';
+    const filtered=filterDocuments(allDocs,{type,query:search,shelf:document.getElementById('docsShelf')?.value || 'all',subcategory});
     const pageSize=24;
     libraryPage=Math.min(libraryPage,Math.max(0,Math.ceil(filtered.length/pageSize)-1));
     updateDocStats(filtered.length);
@@ -1355,6 +1365,23 @@ function applyDocsFilter() {
                 <p class="text-muted" style="font-size:0.85rem;" data-i18n="feature.docs.tryAdjustingTheCategoryOrSearchTerm">Try adjusting the category or search term.</p>
             </div>
         `;
+        return;
+    }
+
+    // A category with subcategories (e.g. novels by series) renders as
+    // headed sections in order, unpaged: the sections are the structure.
+    const groups = type && type !== 'all' ? groupDocuments(filtered) : [];
+    if (groups.length) {
+        container.innerHTML = groups.map(group => `
+            <section class="doc-subcategory" aria-labelledby="doc-sub-${escHtml(group.id || 'other')}">
+                <h3 id="doc-sub-${escHtml(group.id || 'other')}" class="doc-subcategory-title" style="color:var(--gold);font-size:1rem;margin:1.2rem 0 0.5rem;display:flex;gap:0.5rem;align-items:baseline;">
+                    ${escHtml(group.label)}
+                    <span style="font-size:0.75rem;color:var(--text3);font-weight:400;">${group.docs.length}</span>
+                </h3>
+                <div class="doc-grid">${group.docs.map(renderDocCard).join('')}</div>
+            </section>
+        `).join('');
+        attachDocCardEvents(container);
         return;
     }
 
@@ -1424,6 +1451,31 @@ function populateTypeFilter(docs) {
     } else if (sortedTypes.length > 0) {
         sel.value = 'all';
     }
+}
+
+// The second dropdown: the chosen category's subcategories, if it has any.
+// Hidden otherwise. Keeps the current choice when it is still offered.
+const SUBCATEGORY_NAMES = { novels: 'Series' };
+function populateSubcategoryFilter() {
+    const group = document.getElementById('docsSubFilterGroup');
+    const sel = document.getElementById('docsSubFilter');
+    const type = document.getElementById('docsTypeFilter')?.value || 'all';
+    if (!group || !sel) return;
+    const subs = type === 'all' ? [] : listSubcategories(allDocs, type);
+    if (!subs.length) {
+        group.style.display = 'none';
+        sel.innerHTML = '<option value="all"></option>';
+        sel.value = 'all';
+        return;
+    }
+    const name = SUBCATEGORY_NAMES[type] || 'Section';
+    const label = document.getElementById('docsSubFilterLabel');
+    if (label) label.textContent = name;
+    const current = sel.value;
+    sel.innerHTML = `<option value="all">All ${escHtml(name.toLowerCase())}</option>` +
+        subs.map(s => `<option value="${escHtml(s.id)}">${escHtml(s.label)} (${s.count})</option>`).join('');
+    sel.value = subs.some(s => s.id === current) ? current : 'all';
+    group.style.display = 'flex';
 }
 
 function updateDocStats(count) {
@@ -1887,6 +1939,7 @@ function refreshView() {
     const list = document.getElementById('doc-list');
     if (list) {
         populateTypeFilter(allDocs);
+        populateSubcategoryFilter();
         applyDocsFilter();
         updateTotalCount();
     }

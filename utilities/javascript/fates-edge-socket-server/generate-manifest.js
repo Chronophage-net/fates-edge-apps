@@ -60,7 +60,7 @@ function generateOne(moduleId, { force = false } = {}) {
     const manifest = deriveManifestFromContent(content);
 
     try {
-        fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+        fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
     } catch (e) {
         console.error(`❌ ${moduleId}: failed to write manifest.json (${e.message})`);
         return false;

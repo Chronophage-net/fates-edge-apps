@@ -123,6 +123,7 @@ def generate_manifest(output_dir):
     manifest_path = output_dir / "manifest.json"
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)
+        f.write('\n')
     
     print(f"✅ manifest.json created with {len(manifest)} entries")
 

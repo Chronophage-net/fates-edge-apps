@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-22T01:35:56.630Z",
+  "generated": "2026-11-25T23:21:18.150Z",
   "documents": [
     {
       "id": "srd",
@@ -372,7 +372,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "belworth-war",
+      "subcategoryLabel": "The Belworth War",
+      "subcategoryOrder": 2,
+      "order": 2
     },
     {
       "id": "advanced_campaigns",
@@ -492,7 +496,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "silkstrand",
+      "subcategoryLabel": "Silkstrand & the Velvet Court",
+      "subcategoryOrder": 3,
+      "order": 1
     },
     {
       "id": "blood_and_silk_saga",
@@ -542,7 +550,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "belworth-war",
+      "subcategoryLabel": "The Belworth War",
+      "subcategoryOrder": 2,
+      "order": 3
     },
     {
       "id": "cultural_builds",
@@ -792,7 +804,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "reading-guides",
+      "subcategoryLabel": "Reading Guides",
+      "subcategoryOrder": 0,
+      "order": 2
     },
     {
       "id": "de_fate_s_edge_schnellstart_deutsch",
@@ -1073,7 +1089,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "countess-irregulars",
+      "subcategoryLabel": "The Countess’s Irregulars",
+      "subcategoryOrder": 4,
+      "order": 6
     },
     {
       "id": "no_bruises",
@@ -1083,7 +1103,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "companion-novellas",
+      "subcategoryLabel": "Companion Novellas",
+      "subcategoryOrder": 6,
+      "order": 1
     },
     {
       "id": "novels_catalog",
@@ -1095,7 +1119,11 @@
       "core": false,
       "active": true,
       "description": "Browse the complete long-form fiction collection.",
-      "author": "Nicholas A. Gasper"
+      "author": "Nicholas A. Gasper",
+      "subcategory": "reading-guides",
+      "subcategoryLabel": "Reading Guides",
+      "subcategoryOrder": 0,
+      "order": 1
     },
     {
       "id": "paget",
@@ -1105,7 +1133,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "belworth-war",
+      "subcategoryLabel": "The Belworth War",
+      "subcategoryOrder": 2,
+      "order": 4
     },
     {
       "id": "paper_import_reference",
@@ -1300,7 +1332,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "countess-irregulars",
+      "subcategoryLabel": "The Countess’s Irregulars",
+      "subcategoryOrder": 4,
+      "order": 5
     },
     {
       "id": "fr_srd_de_fate_s_edge_commencer_ici_la_m_canique_centrale_fran_ais",
@@ -1424,7 +1460,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "standalone-novels",
+      "subcategoryLabel": "Standalone Novels",
+      "subcategoryOrder": 8,
+      "order": 1
     },
     {
       "id": "the_belworth_war",
@@ -1434,7 +1474,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "belworth-war",
+      "subcategoryLabel": "The Belworth War",
+      "subcategoryOrder": 2,
+      "order": 5
     },
     {
       "id": "after_the_belworth_war",
@@ -1444,7 +1488,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "belworth-war",
+      "subcategoryLabel": "The Belworth War",
+      "subcategoryOrder": 2,
+      "order": 6
     },
     {
       "id": "the_blood_in_the_fold",
@@ -1454,7 +1502,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "belworth-war",
+      "subcategoryLabel": "The Belworth War",
+      "subcategoryOrder": 2,
+      "order": 7
     },
     {
       "id": "the_bones_of_empire",
@@ -1464,7 +1516,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 7
     },
     {
       "id": "the_book_of_the_seven_bell_court",
@@ -1484,7 +1540,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 8
     },
     {
       "id": "the_carnival_of_broken_dreams",
@@ -1494,7 +1554,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "countess-irregulars",
+      "subcategoryLabel": "The Countess’s Irregulars",
+      "subcategoryOrder": 4,
+      "order": 3
     },
     {
       "id": "the_cartomancers_compass",
@@ -1653,7 +1717,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "companion-novellas",
+      "subcategoryLabel": "Companion Novellas",
+      "subcategoryOrder": 6,
+      "order": 4
     },
     {
       "id": "the_diwan_of_roads",
@@ -1663,7 +1731,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "companion-novellas",
+      "subcategoryLabel": "Companion Novellas",
+      "subcategoryOrder": 6,
+      "order": 3
     },
     {
       "id": "the_doors_he_holds",
@@ -1673,7 +1745,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "story-collections",
+      "subcategoryLabel": "Story Collections",
+      "subcategoryOrder": 7,
+      "order": 2
     },
     {
       "id": "the_dwarven_debt",
@@ -1693,7 +1769,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 4
     },
     {
       "id": "the_five_daughters_of_inaea",
@@ -1735,7 +1815,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "countess-irregulars",
+      "subcategoryLabel": "The Countess’s Irregulars",
+      "subcategoryOrder": 4,
+      "order": 1
     },
     {
       "id": "the_grumbling_vault",
@@ -1755,7 +1839,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "countess-irregulars",
+      "subcategoryLabel": "The Countess’s Irregulars",
+      "subcategoryOrder": 4,
+      "order": 2
     },
     {
       "id": "the_guest_who_brought_death",
@@ -1775,7 +1863,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "standalone-novels",
+      "subcategoryLabel": "Standalone Novels",
+      "subcategoryOrder": 8,
+      "order": 2
     },
     {
       "id": "the_harbor_of_knives",
@@ -1785,7 +1877,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "silkstrand",
+      "subcategoryLabel": "Silkstrand & the Velvet Court",
+      "subcategoryOrder": 3,
+      "order": 4
     },
     {
       "id": "the_harvest_of_leaves",
@@ -1795,7 +1891,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 6
     },
     {
       "id": "the_hazel_root",
@@ -1835,7 +1935,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "silkstrand",
+      "subcategoryLabel": "Silkstrand & the Velvet Court",
+      "subcategoryOrder": 3,
+      "order": 3
     },
     {
       "id": "the_howling_ice",
@@ -1845,7 +1949,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 11
     },
     {
       "id": "the_invokers_guide",
@@ -1865,7 +1973,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 9
     },
     {
       "id": "the_lady_under_the_waves",
@@ -1875,7 +1987,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "silkstrand",
+      "subcategoryLabel": "Silkstrand & the Velvet Court",
+      "subcategoryOrder": 3,
+      "order": 2
     },
     {
       "id": "the_last_blade",
@@ -1885,7 +2001,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 1
     },
     {
       "id": "the_memory_merchants_labyrinth",
@@ -1895,7 +2015,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "countess-irregulars",
+      "subcategoryLabel": "The Countess’s Irregulars",
+      "subcategoryOrder": 4,
+      "order": 4
     },
     {
       "id": "the_mist_walker",
@@ -1905,7 +2029,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 13
     },
     {
       "id": "the_nameless",
@@ -1925,7 +2053,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 5
     },
     {
       "id": "the_ninth_proof",
@@ -1945,7 +2077,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "lerris-trilogy",
+      "subcategoryLabel": "The Witnessed Prey: the Lerris Trilogy",
+      "subcategoryOrder": 5,
+      "order": 2
     },
     {
       "id": "the_paper_table",
@@ -1985,7 +2121,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "companion-novellas",
+      "subcategoryLabel": "Companion Novellas",
+      "subcategoryOrder": 6,
+      "order": 5
     },
     {
       "id": "the_salt_and_the_silk",
@@ -2005,7 +2145,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 10
     },
     {
       "id": "the_serpent_s_coil",
@@ -2025,7 +2169,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "standalone-novels",
+      "subcategoryLabel": "Standalone Novels",
+      "subcategoryOrder": 8,
+      "order": 4
     },
     {
       "id": "the_things_that_carry_us",
@@ -2035,7 +2183,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "story-collections",
+      "subcategoryLabel": "Story Collections",
+      "subcategoryOrder": 7,
+      "order": 1
     },
     {
       "id": "the_thread",
@@ -2045,7 +2197,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 2
     },
     {
       "id": "the_three_reckonings",
@@ -2065,7 +2221,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 12
     },
     {
       "id": "the_usurper_s_gambit",
@@ -2105,7 +2265,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "riarhin-cycle",
+      "subcategoryLabel": "The Riarhin Cycle",
+      "subcategoryOrder": 1,
+      "order": 3
     },
     {
       "id": "the_widows_hand",
@@ -2115,7 +2279,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "belworth-war",
+      "subcategoryLabel": "The Belworth War",
+      "subcategoryOrder": 2,
+      "order": 1
     },
     {
       "id": "the_widows_walk",
@@ -2125,7 +2293,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "companion-novellas",
+      "subcategoryLabel": "Companion Novellas",
+      "subcategoryOrder": 6,
+      "order": 2
     },
     {
       "id": "witnessed-prey",
@@ -2239,7 +2411,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "standalone-novels",
+      "subcategoryLabel": "Standalone Novels",
+      "subcategoryOrder": 8,
+      "order": 3
     },
     {
       "id": "what_the_water_kept",
@@ -2249,7 +2425,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "standalone-novels",
+      "subcategoryLabel": "Standalone Novels",
+      "subcategoryOrder": 8,
+      "order": 5
     },
     {
       "id": "whispers_in_the_stacks",
@@ -2259,7 +2439,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "lerris-trilogy",
+      "subcategoryLabel": "The Witnessed Prey: the Lerris Trilogy",
+      "subcategoryOrder": 5,
+      "order": 1
     },
     {
       "id": "whispers_in_the_tunnels",
@@ -2269,7 +2453,11 @@
       "category": "novels",
       "categoryLabel": "Novels & Novellas",
       "core": false,
-      "active": true
+      "active": true,
+      "subcategory": "lerris-trilogy",
+      "subcategoryLabel": "The Witnessed Prey: the Lerris Trilogy",
+      "subcategoryOrder": 5,
+      "order": 3
     },
     {
       "id": "whispers_in_the_tunnels",

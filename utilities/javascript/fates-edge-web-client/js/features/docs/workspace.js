@@ -8,13 +8,48 @@ export function toggleSaved(path) {
     const data=readReadingState(); data.saved=data.saved.includes(path)?data.saved.filter(p=>p!==path):[...data.saved,path];
     try {localStorage.setItem(KEY,JSON.stringify(data));} catch {return false;} return true;
 }
-export function filterDocuments(docs,{type='all',query='',shelf='all'}={},reading=readReadingState()) {
+// Subcategories (e.g. a novel's series) come from the docs manifest as
+// subcategory / subcategoryLabel / subcategoryOrder / order. Missing values
+// sort last; Infinity - Infinity is NaN, which `||` treats as a tie.
+const byTitle=(a,b)=>String(a.title).localeCompare(String(b.title));
+const bySubcategory=(a,b)=>((a.subcategoryOrder??Infinity)-(b.subcategoryOrder??Infinity))
+    ||String(a.subcategoryLabel||'').localeCompare(String(b.subcategoryLabel||''))
+    ||((a.order??Infinity)-(b.order??Infinity))
+    ||byTitle(a,b);
+export function filterDocuments(docs,{type='all',query='',shelf='all',subcategory='all'}={},reading=readReadingState()) {
     const words=query.toLowerCase().trim().split(/\s+/).filter(Boolean);
-    const result=docs.filter(doc=>(type==='all'||!type||doc.type===type)
+    const oneCategory=type&&type!=='all';
+    const result=docs.filter(doc=>(!oneCategory||doc.type===type)
+        &&(!oneCategory||!subcategory||subcategory==='all'||doc.subcategory===subcategory)
         &&(shelf!=='saved'||reading.saved.includes(doc.fullPath))
         &&(shelf!=='recent'||reading.recent.some(r=>r.path===doc.fullPath))
-        &&words.every(word=>[doc.title,doc.file,doc.author,doc.description,...(doc.pages||[]).map(p=>p.title)].join(' ').toLowerCase().includes(word)));
-    return result.sort((a,b)=>shelf==='recent'?reading.recent.findIndex(r=>r.path===a.fullPath)-reading.recent.findIndex(r=>r.path===b.fullPath):String(a.title).localeCompare(String(b.title)));
+        &&words.every(word=>[doc.title,doc.file,doc.author,doc.description,doc.subcategoryLabel,...(doc.pages||[]).map(p=>p.title)].join(' ').toLowerCase().includes(word)));
+    if(shelf==='recent')return result.sort((a,b)=>reading.recent.findIndex(r=>r.path===a.fullPath)-reading.recent.findIndex(r=>r.path===b.fullPath));
+    // Inside one category, keep its subcategories together and in order (a
+    // series in reading order); across all categories, alphabetical as before.
+    return result.sort(oneCategory&&result.some(d=>d.subcategory)?bySubcategory:byTitle);
+}
+// The subcategories present in one category, in shelf order.
+export function listSubcategories(docs,type) {
+    const seen=new Map();
+    docs.filter(d=>d.type===type&&d.subcategory).sort(bySubcategory).forEach(d=>{
+        if(!seen.has(d.subcategory))seen.set(d.subcategory,{id:d.subcategory,label:d.subcategoryLabel||d.subcategory,count:0});
+        seen.get(d.subcategory).count++;
+    });
+    return [...seen.values()];
+}
+// Split an already-sorted list into headed sections. Returns [] when no
+// document has a subcategory, so callers fall back to the flat grid.
+export function groupDocuments(docs) {
+    if(!docs.some(d=>d.subcategory))return [];
+    const groups=[];const byId=new Map();
+    for(const doc of docs){
+        const id=doc.subcategory||'';
+        if(!byId.has(id)){const group={id,label:id?(doc.subcategoryLabel||id):'Other',docs:[]};byId.set(id,group);groups.push(group);}
+        byId.get(id).docs.push(doc);
+    }
+    // Anything without a subcategory goes after the named sections.
+    return [...groups.filter(g=>g.id),...groups.filter(g=>!g.id)];
 }
 export function arrangeDocs(root,onFilter) {
     root.classList.remove('docs-reading');

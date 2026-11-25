@@ -172,6 +172,52 @@ function readBookManifestEntry(subPath, category) {
 }
 
 // ─── Generate Docs Manifest ──────────────────────────────────────
+// ─── Subcategories ───────────────────────────────────────────────
+// Any category directory may carry a series.json describing its shelves:
+//
+//   { "series": [ { "id", "label", "order", "files": ["a.html", ...] }, ... ] }
+//
+// fates-edge-docs writes data/docs/novels/series.json from its fiction
+// catalog (tools/build_long_fiction.py), so novels arrive grouped by series in
+// reading order. Each listed document gains subcategory, subcategoryLabel,
+// subcategoryOrder and order; the library shows a category with
+// subcategories as headed sections and offers a second filter for them.
+// Documents a series.json does not list simply have no subcategory.
+function applySubcategories(documents, docsRoot) {
+  for (const [subdir, category] of Object.entries(CATEGORY_MAP)) {
+    const seriesPath = path.join(docsRoot, subdir, 'series.json');
+    if (!fs.existsSync(seriesPath)) continue;
+    let shelves;
+    try {
+      shelves = JSON.parse(fs.readFileSync(seriesPath, 'utf8')).series;
+    } catch (err) {
+      console.warn(`⚠️  ${subdir}/series.json is not valid JSON (${err.message}) -- no subcategories`);
+      continue;
+    }
+    if (!Array.isArray(shelves)) continue;
+    let listed = 0;
+    shelves.forEach((shelf, shelfIndex) => {
+      (shelf.files || []).forEach((file, i) => {
+        const doc = documents.find(d => d.path === category.path && d.file === file);
+        if (!doc) {
+          console.warn(`⚠️  ${subdir}/series.json lists ${file}, which is not in the manifest`);
+          return;
+        }
+        doc.subcategory = shelf.id;
+        doc.subcategoryLabel = shelf.label;
+        doc.subcategoryOrder = Number.isFinite(shelf.order) ? shelf.order : shelfIndex;
+        doc.order = i + 1;
+        listed++;
+      });
+    });
+    const unlisted = documents.filter(d => d.path === category.path && !d.subcategory);
+    if (unlisted.length) {
+      console.warn(`⚠️  ${subdir}/series.json does not list: ${unlisted.map(d => d.file).join(', ')}`);
+    }
+    console.log(`📚 ${subdir}: ${listed} documents in ${shelves.length} subcategories`);
+  }
+}
+
 function generateDocsManifest(docsPath) {
   const fullPath = ensureDirectory(docsPath);
   const documents = [];
@@ -290,7 +336,11 @@ function generateDocsManifest(docsPath) {
     });
   }
 
+  applySubcategories(documents, fullPath);
+
   // ─── Sort: core first, then by title ─────────────────────────────
+  // (The library groups and orders subcategories itself; see
+  // filterDocuments/groupDocuments in js/features/docs/workspace.js.)
   documents.sort((a, b) => {
     if (a.core && !b.core) return -1;
     if (!a.core && b.core) return 1;
@@ -373,7 +423,7 @@ for (const entry of DATA_DIRS) {
           manifestData.generated = existing.generated;
         }
       }
-      fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2));
+      fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2) + '\n');
       console.log(`✅ Generated manifest for ${dir} (${count} entries)`);
     } catch (err) {
       console.error(`❌ Failed to write manifest to ${dir}:`, err.message);
@@ -381,7 +431,7 @@ for (const entry of DATA_DIRS) {
   } else {
     const manifestPath = path.join(fullPath, 'manifest.json');
     try {
-      fs.writeFileSync(manifestPath, JSON.stringify([], null, 2));
+      fs.writeFileSync(manifestPath, JSON.stringify([], null, 2) + '\n');
       console.log(`📭 Created empty manifest for ${dir} (no entries)`);
     } catch (err) {
       console.error(`❌ Failed to write empty manifest to ${dir}:`, err.message);

@@ -896,7 +896,7 @@ function createApiRouter(appConfig) {
             const manifest = deriveManifestFromContent(content, manifestOverrides || {});
 
             await fsPromises.mkdir(moduleDir, { recursive: true });
-            await fsPromises.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+            await fsPromises.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
             await fsPromises.writeFile(adventurePath, JSON.stringify(content, null, 2));
 
             res.json({ success: true, id, manifest, message: `Module "${id}" installed permanently.` });

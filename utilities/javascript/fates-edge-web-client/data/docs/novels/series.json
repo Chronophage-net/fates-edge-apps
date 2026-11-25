@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "series": [
+    {
+      "id": "reading-guides",
+      "label": "Reading Guides",
+      "order": 0,
+      "files": [
+        "index.html",
+        "Fates-_-Edge-_-Long-_-Form-_-Readers-_-Guide.html"
+      ]
+    },
+    {
+      "id": "riarhin-cycle",
+      "label": "The Riarhin Cycle",
+      "order": 1,
+      "files": [
+        "Fates_-_Edge_-_-The-_-Last-_-Blade.html",
+        "Fates_-_Edge_-_-The-_-Thread.html",
+        "Fates_-_Edge_-_-The-_-Weight-_-You-_-Carry.html",
+        "Fates_-_Edge_-_-The-_-Face-_-You-_-Bear.html",
+        "Fates_-_Edge_-_-The-_-Names-_-You-_-Take.html",
+        "Fates_-_Edge_-_-The-_-Harvest-_-of-_-Leaves.html",
+        "Fates_-_Edge_-_-The-_-Bones-_-of-_-Empire.html",
+        "Fates_-_Edge_-_-The-_-Bridge-_-Born.html",
+        "Fates_-_Edge_-_-The-_-Kept-_-Place.html",
+        "Fates_-_Edge_-_-The-_-Seed-_-of-_-Ruin.html",
+        "Fates_-_Edge_-_-The-_-Howling-_-Ice.html",
+        "Fates_-_Edge_-_-The-_-Toll-_-of-_-the-_-Dead.html",
+        "Fates_-_Edge_-_-The-_-Mist-_-Walker.html"
+      ]
+    },
+    {
+      "id": "belworth-war",
+      "label": "The Belworth War",
+      "order": 2,
+      "files": [
+        "Fates_-_Edge_-_-The-_-Widows-_-Hand.html",
+        "Fates_-_Edge_-_-A-_-Roll-_-of-_-the-_-Fallen.html",
+        "Fates_-_Edge_-_-Count-_-Your-_-Exits.html",
+        "Fates_-_Edge_-_-Paget.html",
+        "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-I-_-Tributary.html",
+        "Fates_-_Edge_-_-The-_-Belworth-_-War-_-Part-_-II-_-Estuary.html",
+        "Fates_-_Edge_-_-The-_-Blood-_-in-_-the-_-Fold.html"
+      ]
+    },
+    {
+      "id": "silkstrand",
+      "label": "Silkstrand & the Velvet Court",
+      "order": 3,
+      "files": [
+        "Fates_-_Edge_-_-Blood-_-and-_-Silk.html",
+        "Fates_-_Edge_-_-The-_-Lady-_-Under-_-the-_-Waves.html",
+        "Fates_-_Edge_-_-The-_-House-_-of-_-Borrowed-_-Voices.html",
+        "Fates_-_Edge_-_-The-_-Harbor-_-of-_-Knives.html"
+      ]
+    },
+    {
+      "id": "countess-irregulars",
+      "label": "The Countess’s Irregulars",
+      "order": 4,
+      "files": [
+        "Fates_-_Edge_-_-The-_-Gilded-_-Heist.html",
+        "Fates_-_Edge_-_-The-_-Grumbling-_-Vault.html",
+        "Fates_-_Edge_-_-The-_-Carnival-_-of-_-Broken-_-Dreams.html",
+        "Fates_-_Edge_-_-The-_-Memory-_-Merchants-_-Labyrinth.html",
+        "Fates_-_Edge_-_-Silk-_-and-_-Velvet-_-The-_-Crimson-_-Masque.html",
+        "Fates_-_Edge_-_-No-_-Berth-_-for-_-Thieves.html"
+      ]
+    },
+    {
+      "id": "lerris-trilogy",
+      "label": "The Witnessed Prey: the Lerris Trilogy",
+      "order": 5,
+      "files": [
+        "Fates_-_Edge_-_-Whispers-_-in-_-the-_-Stacks.html",
+        "Fates_-_Edge_-_-The-_-Ninth-_-Proof.html",
+        "Fates_-_Edge_-_-Whispers-_-in-_-the-_-Tunnels.html"
+      ]
+    },
+    {
+      "id": "companion-novellas",
+      "label": "Companion Novellas",
+      "order": 6,
+      "files": [
+        "Fates_-_Edge_-_-No-_-Bruises.html",
+        "Fates_-_Edge_-_-The-_-Widows-_-Walk.html",
+        "Fates_-_Edge_-_-The-_-Diwan-_-of-_-Roads.html",
+        "Fates_-_Edge_-_-The-_-Daughter-_-of-_-Ahakar.html",
+        "Fates_-_Edge_-_-The-_-Road-_-Kept-_-No-_-Prints.html"
+      ]
+    },
+    {
+      "id": "story-collections",
+      "label": "Story Collections",
+      "order": 7,
+      "files": [
+        "Fates_-_Edge_-_-The-_-Things-_-That-_-Carry-_-Us.html",
+        "Fates_-_Edge_-_-The-_-Doors-_-He-_-Holds.html"
+      ]
+    },
+    {
+      "id": "standalone-novels",
+      "label": "Standalone Novels",
+      "order": 8,
+      "files": [
+        "Fates_-_Edge_-_-The-_-Bell-_-That-_-Counts-_-to-_-Nine.html",
+        "Fates_-_Edge_-_-The-_-Guest-_-Who-_-Brought-_-Death.html",
+        "Fates_-_Edge_-_-What-_-the-_-Mountain-_-Keeps.html",
+        "Fates_-_Edge_-_-The-_-Serpents-_-Coil.html",
+        "Fates_-_Edge_-_-What-_-the-_-Water-_-Kept.html"
+      ]
+    }
+  ]
+}
