@@ -37,27 +37,6 @@
         font-size: 1.8em;
       }
     }
-    @media print {
-      html {
-        color-scheme: light only;
-      }
-      html, body, pre, code {
-        background-color: transparent;
-      }
-      body, a, a:visited, blockquote {
-        color: black;
-      }
-      pre, code {
-        padding: 0;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
     p {
       margin: 1em 0;
     }
@@ -163,6 +142,12 @@
       text-decoration: none;
     }
     span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
     div.columns{display: flex; gap: 1.5em;}
     div.column{flex: auto;}
     @media screen {
@@ -179,7 +164,27 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-  </style>
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
 <style id="fiction-frontmatter-style">
 .fiction-frontmatter { max-width: 38rem; margin: 0 auto; }
 .fiction-title-page { padding: 5rem 1rem 4rem; text-align: center; }
@@ -248,9 +253,11 @@ that account. Three pages, closely written. He could already hear her
 asking why he had begun so far back.</p>
 <p>The casebooks had reached him from his shrine while he waited for
 passage. Their bindings needed attention; he meant to have clean copies
-made of the sheets that were wearing through. He drew the oldest from
-beneath the berth and opened it across his knees. There was flour in the
-gutter of the first gathering. He had brushed at it years ago and
+made of the sheets that were wearing through. Amari’s little book of
+reckonings had come in the same bundle, tied between the two oldest. He
+moved it to the top of his bag without opening it. He drew the oldest
+from beneath the berth and opened it across his knees. There was flour
+in the gutter of the first gathering. He had brushed at it years ago and
 stopped when the paper began to lift.</p>
 <p>Vent-Deep. He remembered the baker before he remembered the snow.</p>
 <p>At the foot of a drawing, his first description of a signal remained
@@ -410,11 +417,11 @@ eaten them.</p>
 <p>She nodded. Her hands had gone under the edge of the towel, gripping
 the basket though Harken now held its weight.</p>
 <p>“Would you tell me his name?”</p>
-<p>“Edran.”</p>
+<p>“Hallan.”</p>
 <p>She said it quickly, before he had finished asking, and then looked
 frightened by the speed of her own answer.</p>
-<p>“Edran what?”</p>
-<p>“Just Edran. That is enough for him.”</p>
+<p>“Hallan what?”</p>
+<p>“Just Hallan. That is enough for him.”</p>
 <p>Saikou repeated it. He saw her listen to hear whether he would put
 the stress in the right place. When he did, her fingers opened.</p>
 <p>“You won’t blow him up again,” she said.</p>
@@ -435,7 +442,7 @@ that would not rise</h3>
 <p>Sanna had forgotten to put salt in the morning’s first dough.</p>
 <p>She discovered it by tasting a crumb from the loaf she had cut for
 Harken. The bread was pale inside and heavy, although the yeast had been
-alive when she set it beside the stove. Edran would have eaten it and
+alive when she set it beside the stove. Hallan would have eaten it and
 complained afterwards. He had considered that a fair arrangement: first
 the thing, then the opinion, so nobody might mistake what he intended to
 do.</p>
@@ -459,14 +466,14 @@ her to show it to them.</p>
 <p>She had not told the stranger about the bell inside her chest. She
 had told two men before him. One had said it was grief. The other had
 said he knew, which was worse because he plainly didn’t. He had then
-asked whether she sometimes heard Edran’s voice at night. She did,
+asked whether she sometimes heard Hallan’s voice at night. She did,
 sometimes, in the words he would have said about a door left open or the
 flour merchant’s prices. She did not mistake that for a man being in the
 room.</p>
 <p>The bell had not been like either thing.</p>
 <p>She had been at this board, with both hands in dough. A delivery had
 come early; there were forty loaves wanted instead of the twenty she had
-prepared for. She remembered being angry with Edran for not being home
+prepared for. She remembered being angry with Hallan for not being home
 to carry water before she remembered he was below. Then something struck
 beneath her breastbone. She had held still, feeling the dough rise
 between her fingers. It struck again. Her ears heard the clock on the
@@ -479,7 +486,7 @@ wheel had broken. She asked what had happened. He said nothing, and then
 asked her to keep back, and then said the old return had gone.</p>
 <p>She had not believed him. Returns went slowly. They were walked and
 measured and marked. The old return had always been there. It had more
-time than Edran had, more time than the men who named it.</p>
+time than Hallan had, more time than the men who named it.</p>
 <p>A piece of dough had dried across her wrist by the time they brought
 the first bodies up.</p>
 <p>She cut the loaf into smaller pieces. The worst part of being alone
@@ -497,7 +504,7 @@ and a paper packet in his hand.</p>
 <p>“I have been misinformed. It’s happened before.”</p>
 <p>She let him come in. He did not examine her room while she fastened
 the door. People often did, finding the empty place beside the stove,
-finding Edran in the coat peg and the shelf his hands had made, as
+finding Hallan in the coat peg and the shelf his hands had made, as
 though they were better at knowing where he wasn’t than she was.</p>
 <p>Saikou put the packet on the table. She filled the kettle. He asked
 where it should go, took it to the stove, and came back without
@@ -540,7 +547,7 @@ old enough to have had many, although she could not put an age on him.
 He did not carry oldness as the men here did, with caution about which
 knee they put down first. He carried it in the pauses before
 answers.</p>
-<p>“Edran wasn’t a brave man,” she said.</p>
+<p>“Hallan wasn’t a brave man,” she said.</p>
 <p>Saikou set his cup down.</p>
 <p>“He disliked walking the narrow staging above the pumps. He’d send a
 boy if he could, then quarrel with himself and go anyway. Once he stayed
@@ -562,7 +569,7 @@ bread.</p>
 liking him so quickly. None of it told her whether he could stop the
 mine being filled with stone.</p>
 <p>When he opened his notebook, she asked what he intended to write.</p>
-<p>“Your account of the warning. That your name for him is Edran. Where
+<p>“Your account of the warning. That your name for him is Hallan. Where
 you were. What remains uncertain.”</p>
 <p>“Will they see it?”</p>
 <p>“Who?”</p>
@@ -570,7 +577,7 @@ you were. What remains uncertain.”</p>
 <p>Saikou’s pen stopped above the page.</p>
 <p>“Who says that?”</p>
 <p>“The clerk in the upper archive. Years ago. He said there was no
-Edran in that crew. He showed me a column full of figures. I could not
+Hallan in that crew. He showed me a column full of figures. I could not
 argue with figures. I went home.”</p>
 <p>“And you didn’t ask again?”</p>
 <p>“My daughter was sick. There were loaves to make. He said it very
@@ -587,7 +594,7 @@ him give it to a magistrate. It was his name.”</p>
 <p>“I did.”</p>
 <p>“You began with asking me what else went after it.”</p>
 <p>He looked up. She thought he would explain why that had been needed.
-Instead he drew a small line through the space he had left after Edran,
+Instead he drew a small line through the space he had left after Hallan,
 and closed the book.</p>
 <p>“Tomorrow I’m going below,” he said. “I’d like to return
 afterwards.”</p>
@@ -638,14 +645,14 @@ nobody he wanted to impress. She made Harken say it too. The silver caps
 warmed briefly against Saikou’s fingers.</p>
 <p>Their guide was waiting past the gate, a thin old man with a stone
 hammer tucked beneath one arm. Saikou had first mistaken him for a stack
-of coats. His name was Neth. He spoke so quietly that Saikou leaned
-closer, and Neth shook his head.</p>
+of coats. His name was Gorm. He spoke so quietly that Saikou leaned
+closer, and Gorm shook his head.</p>
 <p>“Don’t chase it. You’ll hear.”</p>
 <p>They descended a stair worn into shallow bowls. Water moved somewhere
 beyond the wall. The air smelled of wet leather, lime, and a bitter
 mineral scent Saikou could not place. At the first landing Harken put a
 sampling tube into a wall recess and waited. At the second he tested
-again. Neth stood with two fingers touching the stone.</p>
+again. Gorm stood with two fingers touching the stone.</p>
 <p>Saikou kept his censer packed. He had met invokers who called every
 difficulty an invitation to burn something. He had recovered two of them
 from a room that had ceased to contain enough air for that opinion.</p>
@@ -673,7 +680,7 @@ it for her. Harken started to refuse. Saikou asked whether she was
 qualified for the inspection route. Harken said she was.</p>
 <p>“Then I’d like her account from where it happened.”</p>
 <p>Isset left her food tin with a man whose beard was caught in his
-collar and joined them. Harken took another rod from Derren’s rack. Neth
+collar and joined them. Harken took another rod from Derren’s rack. Gorm
 watched the silver warm and said nothing.</p>
 <p>The third stack was an old stone partition: fitted slabs rising to
 the roof. A gap had been made at its foot. Timber braces framed the
@@ -683,14 +690,14 @@ wasn’t.”</p>
 <p>Saikou looked through the gap. There was darkness, his own lamp’s
 reflection on a wet nail, and a small drift of white dust beneath the
 roof.</p>
-<p>Neth put his hand out. They stopped.</p>
+<p>Gorm put his hand out. They stopped.</p>
 <p>A grain struck Saikou’s helmet. Then another. Somewhere overhead the
 stone made a sound like a man clearing his throat in a house where
 everybody was asleep.</p>
 <p>Nobody moved.</p>
-<p>Neth looked sharply at Harken. Harken lifted one foot and set it
+<p>Gorm looked sharply at Harken. Harken lifted one foot and set it
 sideways on an old sleeper. Isset followed him. Saikou started to place
-his boot where hers had been. Neth caught his sleeve and pointed to the
+his boot where hers had been. Gorm caught his sleeve and pointed to the
 sleeper itself.</p>
 <p>They crossed the mouth one at a time. Behind them the pale drift
 spread across the gap. A strip of stone peeled from the roof and hit the
@@ -698,10 +705,10 @@ floor with a flat, enormous slap.</p>
 <p>Saikou’s shoulders had locked. He made himself look at the place
 where his boot had almost gone. The slab lay across it.</p>
 <p>“Was that him?” Isset whispered.</p>
-<p>“No,” Neth said.</p>
+<p>“No,” Gorm said.</p>
 <p>His voice carried perfectly.</p>
 <p>They retreated to the last sound brace. Harken examined the timber
-without touching it. Neth knelt, laid his hammer against a seam, and
+without touching it. Gorm knelt, laid his hammer against a seam, and
 listened. His hammer had a head of dark stone with a pale stripe through
 it. He slid a wooden wedge from his pocket and tapped it into a narrow
 crack. Each blow was so small Saikou could feel it better through his
@@ -746,7 +753,7 @@ slapped the slate out of his hand.</p>
 <p>The sound freed Harken’s mouth. He swore at Saikou with a
 thoroughness Saikou found encouraging.</p>
 <p>“Good,” Saikou said. “Keep doing that.”</p>
-<p>Neth had already moved back toward the new brace. He raised a hand to
+<p>Gorm had already moved back toward the new brace. He raised a hand to
 the seam. His fingers trembled. The dust resumed falling.</p>
 <p>They left without taking another image. Derren met them at the gate
 and counted the returned rods, the returned names, and the chalk marks
@@ -782,18 +789,18 @@ the last time. She declined it. Sitting down would make getting up into
 part of the argument.</p>
 <p>Harken had sent them with a letter. Saikou carried it folded, having
 broken its seal at Harken’s request to make sure it said what Harken
-thought it said. The clerk read it twice. Her name was Pella, and she
+thought it said. The clerk read it twice. Her name was Marit, and she
 had one hand tucked inside a wool sleeve because the room was cold.</p>
 <p>“Working diagrams are downstairs,” she said. “Historical pay records
 are behind the grille.”</p>
 <p>“We need both,” Saikou said.</p>
 <p>“Your authority is for working diagrams.”</p>
-<p>Pella laid the letter on the counter between them. Sanna saw the
+<p>Marit laid the letter on the counter between them. Sanna saw the
 words for the third stack, inspection, necessary expense. She had
-watched Harken write them. He had not written Edran.</p>
+watched Harken write them. He had not written Hallan.</p>
 <p>“Then bring us the diagram,” Sanna said. “We’ll begin with what you
 can do.”</p>
-<p>Pella’s shoulders relaxed a little. She went down a stair so narrow
+<p>Marit’s shoulders relaxed a little. She went down a stair so narrow
 that her sleeve brushed both walls.</p>
 <p>Saikou looked at Sanna. “You’ve been here before.”</p>
 <p>“Yes.”</p>
@@ -802,7 +809,7 @@ that her sleeve brushed both walls.</p>
 <p>She had imagined a confrontation on the way uphill, and now the clerk
 was a woman with a cold hand and a rule that somebody else had given
 her.</p>
-<p>Pella returned with a plan rolled round a wooden core. They spread it
+<p>Marit returned with a plan rolled round a wooden core. They spread it
 on the counter. The third stack was marked. So was the old return, shown
 as a short line ending at a crosshatched patch. Nothing led to a
 bell.</p>
@@ -812,34 +819,34 @@ bell.</p>
 <p>“The earlier one.”</p>
 <p>Sanna heard herself laugh. Both of them looked at her.</p>
 <p>“Bring that, too,” she said.</p>
-<p>Pella rubbed her cold fingers. “There’s a release procedure.”</p>
+<p>Marit rubbed her cold fingers. “There’s a release procedure.”</p>
 <p>“For a drawing of a tunnel that isn’t there?”</p>
 <p>“For a drawing of what is under the hold.”</p>
-<p>Saikou put a coin on the counter. Pella did not touch it.</p>
+<p>Saikou put a coin on the counter. Marit did not touch it.</p>
 <p>“The copying fee,” he said. “Not a suggestion.”</p>
 <p>“It’s three.”</p>
 <p>He added two. Sanna disliked him for being able to do that, then
 disliked herself for treating a man’s available money as an accusation.
 Her daughter’s money was still in the cup at home. She could have
 brought it.</p>
-<p>Pella gave them a receipt and opened the grille.</p>
+<p>Marit gave them a receipt and opened the grille.</p>
 <p>The stacks beyond were darker than the public room. They smelled of
 ink, wool, and the dry dust that rose from things nobody had wanted to
 throw away. Names had been written along the shelves in hands that
 changed every few feet. Sanna saw floods, wages, quarrels, water
 allotments, three marriages under dispute, and a winter grain account.
 There was no shelf marked men who did not return.</p>
-<p>Pella brought out a flat box tied with gray tape. Inside were plans,
+<p>Marit brought out a flat box tied with gray tape. Inside were plans,
 several with burned corners. Saikou lifted each with both hands. Sanna
 stood beside him, unable to keep herself from searching for a drawing of
-Edran among the lines.</p>
+Hallan among the lines.</p>
 <p>The old return had once continued beyond the present crosshatching.
 It entered a narrow chamber labeled Second Reserve, then climbed into a
 passage leading toward the square. Beside the reserve chamber a tiny
 outline held two parallel strokes.</p>
 <p>Saikou touched the air over it.</p>
 <p>“Bell pull?”</p>
-<p>Pella fetched a list of conventions. She turned its leaves against
+<p>Marit fetched a list of conventions. She turned its leaves against
 her knee.</p>
 <p>“Warning station.”</p>
 <p>A report had been folded beneath the plan. Water entering the lower
@@ -853,9 +860,9 @@ that water came before it.</p>
 <p>“The line goes up.”</p>
 <p>It went up through three sheets. On the last it emerged into a
 building Sanna knew. The chapel had once been a washhouse. She had
-scrubbed Edran’s collars there when their pump froze.</p>
+scrubbed Hallan’s collars there when their pump froze.</p>
 <p>“They put it over the door,” she said.</p>
-<p>Pella looked up.</p>
+<p>Marit looked up.</p>
 <p>“The old bell. After the washhouse closed. In the chapel. It was a
 gift.”</p>
 <p>Saikou was still following the line backwards.</p>
@@ -869,9 +876,9 @@ Numbers painted beside hooks. Children had played at hanging rags on the
 hooks after the workers went home.</p>
 <p>“Somebody had to pass it on,” she said.</p>
 <p>“It looks that way.”</p>
-<p>Pella opened another box. This one held narrow books and loose
+<p>Marit opened another box. This one held narrow books and loose
 returns. On its cover a clerk had written final settlement. Sanna knew
-before it was opened that her husband would not be inside as Edran.</p>
+before it was opened that her husband would not be inside as Hallan.</p>
 <p>There were twenty-four entries. Some were names. Some were initials.
 Four were duties. Third lamp. Upper haul. Reserve watch. Assistant at
 haul.</p>
@@ -881,7 +888,7 @@ mark, and the word issued. No woman’s name. No child’s. The sum was
 smaller than she remembered, though she had no reason to expect
 remembering it correctly after all this time.</p>
 <p>“That was mine,” she said.</p>
-<p>Pella slid a finger down a second column. “The receipt is
+<p>Marit slid a finger down a second column. “The receipt is
 elsewhere.”</p>
 <p>“Of course it is.”</p>
 <p>“I can find it.”</p>
@@ -890,17 +897,17 @@ book.</p>
 <p>“I know. I wasn’t speaking to you.”</p>
 <p>Saikou said nothing, and that made her eyes sting more than the page
 had.</p>
-<p>The receipt, when Pella found it, bore Sanna’s mark. There was a
-crooked stroke where Edran had taught her to make the beginning of her
+<p>The receipt, when Marit found it, bore Sanna’s mark. There was a
+crooked stroke where Hallan had taught her to make the beginning of her
 name. She had made it for money already spent, bread already eaten, a
 burial she had attended without a body. Beside it the office had written
 widow of third lamp.</p>
 <p>“You didn’t even need his name,” she said.</p>
-<p>Pella’s cold hand lay on the edge of the paper. “For this account,
+<p>Marit’s cold hand lay on the edge of the paper. “For this account,
 no.”</p>
-<p>They wrote the entries onto a clean sheet. Sanna supplied Edran. She
+<p>They wrote the entries onto a clean sheet. Sanna supplied Hallan. She
 knew the man on the upper haul had been called Meret because his wife
-made candles. She did not know the assistant. Pella found a lodging
+made candles. She did not know the assistant. Marit found a lodging
 register, but it contained two men who could have held the duty, and
 neither could be made certain. Saikou left a space beside it.</p>
 <p>“Do you have to know them all?” Sanna asked.</p>
@@ -912,9 +919,9 @@ uneven teeth. There had been such a boy. She could remember the teeth
 but not whether he had died in that winter or gone away before it. She
 kept the memory to herself until she could say it without placing him
 underground by mistake.</p>
-<p>By the time they left, Pella had ink on her sleeve and Sanna had the
+<p>By the time they left, Marit had ink on her sleeve and Sanna had the
 clean sheet folded in a borrowed envelope. The archive retained a copy.
-Pella wrote on that copy that Edran was attested by his wife, and Sanna
+Marit wrote on that copy that Hallan was attested by his wife, and Sanna
 made her mark beneath it. Saikou made his beneath hers. His signature
 was unexpectedly difficult to read.</p>
 <p>“They have your name now,” she said on the steps.</p>
@@ -995,12 +1002,12 @@ now.”</p>
 please him as much as it did.</p>
 <p>They rang at the beginning of the shift that was not going down.
 Harken read slowly. Meret of the upper haul. Third lamp, attested as
-Edran. Two men whose names Pella had recovered from the lodging register
-and whose duties could be joined to the account without doubt. Reserve
-watch, personal name unconfirmed. Assistant at haul, personal name
-unconfirmed.</p>
+Hallan. Two men whose names Marit had recovered from the lodging
+register and whose duties could be joined to the account without doubt.
+Reserve watch, personal name unconfirmed. Assistant at haul, personal
+name unconfirmed.</p>
 <p>Sanna spoke without lifting her voice.</p>
-<p>“Edran. You warned them.”</p>
+<p>“Hallan. You warned them.”</p>
 <p>The crew answered.</p>
 <p>“We have heard.”</p>
 <p>The dog barked again. A child laughed and was hushed. Saikou had not
@@ -1243,7 +1250,7 @@ around its sides.</p>
 <p>“Have you eaten?”</p>
 <p>She thought of the bread in her basket. “Not yet.”</p>
 <p>Maela followed her into the kitchen and cut one of the loaves without
-waiting to be offered a knife. Sanna sat in Edran’s chair. It was the
+waiting to be offered a knife. Sanna sat in Hallan’s chair. It was the
 nearest chair, which had always been the reason she sat there, despite
 the other meanings people liked to give it.</p>
 <p>Maela buttered two slices.</p>
@@ -1256,7 +1263,7 @@ annoyance could become hers.</p>
 continued, far enough away that neither of them could hear it from the
 kitchen.</p>
 <h3 id="chapter-7-the-shorter-way">Chapter 7 — The shorter way</h3>
-<p>By the time Saikou reached the gate again, Neth had made a chair out
+<p>By the time Saikou reached the gate again, Gorm had made a chair out
 of two boxes and was sitting on it as if it had been built for him. His
 stone hammer rested across his knees. A cup steamed beside his boot.</p>
 <p>“Did you sleep?” Saikou asked.</p>
@@ -1264,9 +1271,9 @@ stone hammer rested across his knees. A cup steamed beside his boot.</p>
 <p>“Enough?”</p>
 <p>“No.”</p>
 <p>“I’ve noticed people here prefer short answers.”</p>
-<p>Neth lifted the cup. “Spend a day without yours. You’ll hear
+<p>Gorm lifted the cup. “Spend a day without yours. You’ll hear
 more.”</p>
-<p>Saikou accepted the rebuke provisionally. He was not sure Neth had
+<p>Saikou accepted the rebuke provisionally. He was not sure Gorm had
 intended one. He sat on the lower box and unfolded the old diagram.</p>
 <p>The under-mason studied it without touching the paper. Then he
 pointed to the reserve chamber.</p>
@@ -1274,7 +1281,7 @@ pointed to the reserve chamber.</p>
 <p>“Gone?”</p>
 <p>“Moved.”</p>
 <p>“By how much?”</p>
-<p>Neth held his fingers apart. The distance was small enough to be less
+<p>Gorm held his fingers apart. The distance was small enough to be less
 reassuring than a larger one.</p>
 <p>They had three possible routes. The original return was blocked
 beneath the settling seam. The warning shaft could be opened from above,
@@ -1287,7 +1294,7 @@ because it did not require taking down the gallery above.</p>
 <p>“Can we bring it through in pieces?”</p>
 <p>“Not a bell.”</p>
 <p>Saikou folded the diagram to show only the shaft. “Then this.”</p>
-<p>Neth nodded.</p>
+<p>Gorm nodded.</p>
 <p>Harken came through the gate with Derren and a rolled permit. His
 expression was too carefully controlled.</p>
 <p>“How many men does that gallery employ?” Saikou asked.</p>
@@ -1324,7 +1331,7 @@ event the collapse would preserve.”</p>
 <p>Harken rubbed his forehead. “Can you find out without asking Sanna to
 lose anything?”</p>
 <p>“That is what we’re doing.”</p>
-<p>They went down with four helpers and no bell. Neth took the first
+<p>They went down with four helpers and no bell. Gorm took the first
 position. One helper carried supports cut to the sizes he had requested.
 Another carried a sampling bag. Isset came last, marking each turn with
 chalk and measuring the distance back to the open route. Saikou asked
@@ -1334,7 +1341,7 @@ He made each person look at it. Nobody was to treat the permit as proof
 that a chamber could be breathed in. The gauge mattered. So did the
 lamps. So did the strip of paper that moved in the draught over the
 route they had entered.</p>
-<p>Neth listened to the shifted wall. After a long interval he began
+<p>Gorm listened to the shifted wall. After a long interval he began
 taking stones out near its base. He did not strike the wall. His hammer
 moved against wedges, and each wedge received a blow small enough to
 disappoint a person who thought a hammer’s merit lay in noise.</p>
@@ -1358,7 +1365,7 @@ gap.</p>
 Beneath each shadow was a painted sign. One for water. One for smoke.
 One for a failed lamp circuit. Beside the board a lever hung sideways
 from its spindle.</p>
-<p>Neth moved back. Isset said the allowance was half spent. Derren was
+<p>Gorm moved back. Isset said the allowance was half spent. Derren was
 counting the party’s marks at the junction, not their breaths.</p>
 <p>Saikou lifted the mirror.</p>
 <p>The man with the lamp appeared as soon as the silver faced the board.
@@ -1389,12 +1396,12 @@ accepted the improvement.</p>
 A hook slid sideways into the crack between two stones. The lever stood
 upright. For one instant the wall had the depth of a room Saikou was
 standing inside rather than looking into.</p>
-<p>“Back,” Neth said.</p>
+<p>“Back,” Gorm said.</p>
 <p>Saikou took his foot off the sill. The wall returned. His lamp
 guttered and recovered. Harken pulled him by the back of his coat until
 he was clear.</p>
 <p>Water was rising under the iron shelves.</p>
-<p>The pressure gauge had changed. Harken ordered the helpers out. Neth
+<p>The pressure gauge had changed. Harken ordered the helpers out. Gorm
 set a wedge against the new seam and held it with both hands. Isset
 gathered the supports they had not used. Saikou reached for the mirror’s
 case and found it already in her hand.</p>
@@ -1404,7 +1411,7 @@ case and found it already in her hand.</p>
 again. Saikou leaned against the wall and let her. The number in his
 ribs had lost its certainty, but the hooks remained in his vision
 whenever he blinked.</p>
-<p>Neth came last, without the longest brace.</p>
+<p>Gorm came last, without the longest brace.</p>
 <p>“The room will not stay open,” he said. “That gallery has to be
 unweighted. Or the whole corner goes.”</p>
 <p>Harken took the diagram. His thumb rubbed the blue route until the
@@ -1486,7 +1493,7 @@ happened.</p>
 <p>“There’s your mistake.”</p>
 <p>He smiled and reached for the pudding with his other hand.</p>
 <p>After they ate, Saikou explained what they would ask of her. Her
-remembrance of Edran’s face would be what held the chamber open until
+remembrance of Hallan’s face would be what held the chamber open until
 the warning was completed. Lumenor believed it would answer because
 Sanna had known the man whose name she would speak.</p>
 <p>“You don’t know?” she asked.</p>
@@ -1509,12 +1516,12 @@ end.</p>
 <p>“I meant a drawing.”</p>
 <p>He paused. “If you have one.”</p>
 <p>She did not. They had once paid a young artist for a charcoal
-likeness at the summer stalls. It had looked like Edran if he had spent
+likeness at the summer stalls. It had looked like Hallan if he had spent
 his life being disappointed in horses. He laughed at it until she had
 laughed too. Their daughter had taken it to school for some lesson and
-lost it. There had been a quarrel. After supper Edran had gone round the
-neighbors asking whether they had seen a picture of a man who owed money
-to a horse.</p>
+lost it. There had been a quarrel. After supper Hallan had gone round
+the neighbors asking whether they had seen a picture of a man who owed
+money to a horse.</p>
 <p>She told the story. Harken laughed first. Saikou laughed after him,
 carefully, as though he had not yet earned the right.</p>
 <p>“I thought of drawing it myself,” she said. “Last night.”</p>
@@ -1585,7 +1592,7 @@ approaching street, outside the planned boundary, with instructions to
 turn people away without explaining enough to draw a crowd. The watchers
 had been paid from Saikou’s advance. One had asked whether danger
 entitled him to more. Harken had said yes and amended the amount.</p>
-<p>Inside the chapel Lumenor stood beneath the old bell. Neth had
+<p>Inside the chapel Lumenor stood beneath the old bell. Gorm had
 examined its fastenings. They were sound for hanging, doubtful for
 ringing, and inconvenient for lowering. He had replaced one peg and
 fitted a sling. The sling led through the inner doorway to the place
@@ -1715,7 +1722,7 @@ stayed where he had undertaken to stay.</p>
 returned to the place of its charge. This door receives no further duty
 from it.”</p>
 <p>The shadow did not withdraw at once. The old bell moved again,
-harder. Its fastening creaked. Neth put a hand against the sling from
+harder. Its fastening creaked. Gorm put a hand against the sling from
 behind the inner line. Lumenor’s tone descended until Saikou could no
 longer hear it, though the skin around his injured hand prickled.</p>
 <p>The shadow passed across the bell rather than into the chapel. For a
@@ -1731,7 +1738,7 @@ without touching its rim.</p>
 <p>Saikou looked at the young man. “Yes.”</p>
 <p>“He wasn’t ignoring him.”</p>
 <p>“We saw a pause. We didn’t see its meaning.”</p>
-<p>Neth began lowering the old bell. Harken came in with two helpers and
+<p>Gorm began lowering the old bell. Harken came in with two helpers and
 took the weight when the sling reached his shoulder. Sanna stood aside
 for them. As the bell passed her, she touched the polished place on its
 rim, then took her hand away.</p>
@@ -1745,7 +1752,7 @@ larger on the ground. Sanna had passed under it for years without
 thinking about its weight, as she had passed under roofs and beneath
 hills.</p>
 <p>Harken and Isset tested the cradle by lifting one end, setting it
-down, then lifting the other. Neth checked each binding. Saikou watched
+down, then lifting the other. Gorm checked each binding. Saikou watched
 the test with his bandaged hand inside his coat. His left shoulder
 looked stiff. She wondered what he was carrying that did not require a
 pack.</p>
@@ -1753,7 +1760,7 @@ pack.</p>
 still engaged with the pump had come aboveground. Nobody would be asked
 to share the old warning chamber’s allowance by happening to be below
 it. The upper gallery had been emptied. Its tools and timber were being
-carried to another level, except for the pieces Neth wanted for
+carried to another level, except for the pieces Gorm wanted for
 support.</p>
 <p>Sanna heard the men moving them, one beam at a time. A decision
 written on Harken’s plan had become men carrying things they had
@@ -1806,7 +1813,7 @@ worry, not enough to let her worry accurately. She would have to answer
 for that.</p>
 <p>Derren opened the gate. The bell went first.</p>
 <p>The descent took longer than Sanna expected. She had been down
-shallow stairs to fetch men’s lost mittens, deliver bread, tell Edran
+shallow stairs to fetch men’s lost mittens, deliver bread, tell Hallan
 their daughter was feverish. Those stairs belonged to rooms where
 daylight had an ordinary claim. This one continued after she felt it
 should have stopped.</p>
@@ -1816,7 +1823,7 @@ adjusted her step to Sanna’s and looked ahead.</p>
 <p>They passed a wall marked with fresh chalk. At its foot stood three
 empty food tins. One had a child’s scratched flower on its lid. Sanna
 thought of the sleeping girl against her coat, the little red wool. She
-had let herself think of the crew as an answer to Edran’s warning. Each
+had let herself think of the crew as an answer to Hallan’s warning. Each
 one had come with another answer attached, someone waiting
 elsewhere.</p>
 <p>Harken stopped them at the upper junction. He tested the air. Saikou
@@ -1831,7 +1838,7 @@ line at which they would leave.</p>
 without his help.</p>
 <p>Beyond the junction the way narrowed. The empty gallery had left a
 long space above the new supports. She could see places where tools had
-hung because the stone behind them was clean. Neth had driven his wedges
+hung because the stone behind them was clean. Gorm had driven his wedges
 beneath a great diagonal seam. He stood on a low plank, resting his
 forehead against the wall.</p>
 <p>“Does it hurt?” she asked.</p>
@@ -1844,13 +1851,13 @@ forehead against the wall.</p>
 where his forehead had rested. The stone was cold. Through it she felt
 something move, not against her skin but beneath it, a tiny traveling
 strain. She pulled away.</p>
-<p>“That isn’t Edran,” Neth said.</p>
+<p>“That isn’t Hallan,” Gorm said.</p>
 <p>“No.”</p>
 <p>He nodded as though she had learned something difficult. It was not
 difficult to distinguish her husband from a hill trying to settle. It
 was difficult to accept that both might need attention at once.</p>
 <p>The bell reached the reserve chamber with a scrape and a muffled
-curse. Harken apologized. Sanna told him Edran would have said
+curse. Harken apologized. Sanna told him Hallan would have said
 worse.</p>
 <p>Saikou let her sit while the others fitted the clapper. He crouched
 far enough away that she did not have to look down to see his face.</p>
@@ -1863,7 +1870,7 @@ far enough away that she did not have to look down to see his face.</p>
 the bad mouth, the notes on the reverse, and her daughter’s last letter.
 She had not brought them to cheat the price. She had brought them
 because they were hers and she was going somewhere unfamiliar.</p>
-<p>Edran’s face came when she called it. He was looking at the loaf he
+<p>Hallan’s face came when she called it. He was looking at the loaf he
 thought she had cut unevenly. He opened his mouth to say something
 useful and infuriating. She could almost hear him.</p>
 <p>She let the face stay until the work was ready.</p>
@@ -1888,11 +1895,11 @@ needed to remember where he actually stood.</p>
 <p>They had fixed a new board beside the old one. There were only two
 signs on it. One was the old water sign, copied from the diagram. The
 other showed the evacuation mark, with clear the workings written
-beneath it. Isset had written the words. Pella had checked the old mark
+beneath it. Isset had written the words. Marit had checked the old mark
 before the board was brought down. Neither correction depended on a
 miner being able to read while running.</p>
 <p>The chamber held Sanna, Saikou, Harken, and Aven. Derren stood at the
-sill. Neth waited outside with the rope. The remainder of the living
+sill. Gorm waited outside with the rope. The remainder of the living
 crew was aboveground. They would receive the warning through the
 temporary mechanical line, which led from the chamber to a small signal
 bell at the main gate. The line had been tested four times. On the last
@@ -1910,7 +1917,7 @@ That was a fine way to put a thought at the head of a table and serve it
 dinner. He watched the knot in the crosspiece and named the things
 around it: wood, iron, rope, hand.</p>
 <p>Sanna touched the old bell’s polished rim.</p>
-<p>“Edran,” she said.</p>
+<p>“Hallan,” she said.</p>
 <p>In the reflection the man struck the lever. The bell’s new clapper
 shifted, though nobody had touched it.</p>
 <p>Sanna closed her eyes.</p>
@@ -1929,7 +1936,7 @@ shout.</p>
 though something ought to have fallen between them.</p>
 <p>“Not even the mouth,” she said.</p>
 <p>Aven lifted her lamp toward Derren. Derren nodded.</p>
-<p>A sound came from above the chamber roof. Neth put one hand against
+<p>A sound came from above the chamber roof. Gorm put one hand against
 the seam outside. His other hand closed on the rope. Harken checked the
 gauge, then pointed to the board. The air remained in the safe band.</p>
 <p>Saikou turned the new water sign into place.</p>
@@ -1957,7 +1964,7 @@ man’s mouth opened. He put the cup on the stool. Nothing had
 changed.</p>
 <p>Saikou felt cold along his spine.</p>
 <p>The roof spoke above them.</p>
-<p>Neth said, “Out of the middle.”</p>
+<p>Gorm said, “Out of the middle.”</p>
 <p>Harken pushed Aven toward the wall. Saikou reached for Sanna. She was
 still holding the cord, looking at the bell with a bewilderment that did
 not belong only to grief.</p>
@@ -1967,7 +1974,7 @@ the shoulders and pulled her beneath the supported edge.</p>
 <p>His left forearm struck the stand. Something in it gave with a hot,
 clean pain.</p>
 <p>He did not let go. Harken caught the bell’s sling. Aven lifted her
-lamp clear of the floor. Neth forced a wedge against the seam with three
+lamp clear of the floor. Gorm forced a wedge against the seam with three
 hard blows of the stone hammer.</p>
 <p>Saikou heard himself curse. He recognized the marching complaint and
 was furious to have returned to it.</p>
@@ -1984,7 +1991,7 @@ own wrist. She kept the lamp in her other hand.</p>
 <p>Saikou tried to lift his mirror. His injured arm refused. He changed
 hands and saw the black water rise in the silver until the relay keeper
 stood waist-deep.</p>
-<p>The white cloth emerged on the rope. Neth caught it, passed it to
+<p>The white cloth emerged on the rope. Gorm caught it, passed it to
 Derren, and Derren held it through the opening.</p>
 <p>Harken took it. He hung it from the new board.</p>
 <p>“The living crew is clear,” he said. “The warning has been
@@ -2013,18 +2020,18 @@ arrived.</p>
 <p>The silver emptied.</p>
 <p>There was a room, a board, a crooked lever. Saikou’s face showed in
 the far edge, distorted by the crack. No other face stood beside it.</p>
-<p>Neth said, “Now.”</p>
+<p>Gorm said, “Now.”</p>
 <p>They left.</p>
 <p>Saikou could not help carry the bell. Harken did not try to bring it.
 He released the sling from its temporary hook and left the instrument
 resting on the broken stand. If the roof took it now, the roof would
 take bronze and iron.</p>
 <p>Aven led Sanna through the opening. Derren followed them once Harken
-came out. Neth removed the gate rod and handed it to Saikou, who could
+came out. Gorm removed the gate rod and handed it to Saikou, who could
 carry that much with his right hand.</p>
 <p>At the first turn the chamber roof settled. The sound traveled up the
 wall beside them. Saikou looked back and saw dust spread across the
-opening like flour dropped through a sieve. Neth’s last wedge
+opening like flour dropped through a sieve. Gorm’s last wedge
 disappeared into it.</p>
 <p>The rope remained taut.</p>
 <p>At the upper junction Harken tested the air again. Derren checked
@@ -2080,19 +2087,19 @@ left it. Maela reached to put it away.</p>
 <p>Sanna sat and turned the paper over. Broken tooth. Scar by chin. Left
 eyelid low when tired. She read the words. A man could be assembled from
 those words, as a man could be assembled from a short coat and an
-unlaced boot. She could imagine such a man. He was not Edran.</p>
+unlaced boot. She could imagine such a man. He was not Hallan.</p>
 <p>She turned the page back to the mouth.</p>
 <p>“Was it like that?” she asked.</p>
 <p>“I didn’t know him then.”</p>
 <p>Sanna knew. Maela had come to the street years later, with two
 children and a husband who had subsequently left. Sanna had told her
-stories of Edran until Maela could speak of him as though he had once
+stories of Hallan until Maela could speak of him as though he had once
 sat at their table. There was no reason that gift should now make Maela
 an eyewitness.</p>
 <p>“No,” Sanna said. “Of course.”</p>
 <p>“I can ask someone older.”</p>
 <p>“Not today.”</p>
-<p>Maela filled the kettle. Sanna looked at Edran’s chair. She knew the
+<p>Maela filled the kettle. Sanna looked at Hallan’s chair. She knew the
 wear on its left arm came from his thumb rubbing the wood. She knew he
 had shaved outside when the weather allowed, and indoors when the
 weather did not, leaving soap where she would find it with a sleeve. She
@@ -2134,7 +2141,7 @@ temptation to weigh it against her own payment. She left that alone.</p>
 <p>“Keep it among the instruments that have been used.”</p>
 <p>“Will it have my name?”</p>
 <p>“If you permit it.”</p>
-<p>“Edran’s,” Sanna said. “And the station keeper whose name we don’t
+<p>“Hallan’s,” Sanna said. “And the station keeper whose name we don’t
 know. Say that we don’t know it.”</p>
 <p>Aven wrote the request on a separate slip.</p>
 <p>The room darkened. Outside, men carried a length of pipe along the
@@ -2181,7 +2188,7 @@ leave.</p>
 loaf and put the first slice on the plate where he would sit.</p>
 <h3 id="chapter-13-above-the-count">Chapter 13 — Above the count</h3>
 <p>Saikou spent his first day of silence listening to other people
-explain why he had stopped speaking. Neth had asked for a day, as
+explain why he had stopped speaking. Gorm had asked for a day, as
 payment for what the under-mason had taught him. The request had sounded
 easy while Saikou still had a usable arm and work belowground to
 distract him.</p>
@@ -2196,14 +2203,14 @@ listening to stone.</p>
 <p>“Here?”</p>
 <p>Saikou closed his eyes. The young man took the hint eventually,
 though not the intended one, and brought him a pillow.</p>
-<p>Neth came after breakfast. He sat in the chair beside the window and
+<p>Gorm came after breakfast. He sat in the chair beside the window and
 put his hammer on the sill. A piece was missing from its head. The pale
 stripe ended in a fresh fracture.</p>
 <p>Saikou pointed to it.</p>
-<p>“The last wedge,” Neth said. “Stone in stone. It took the wrong
+<p>“The last wedge,” Gorm said. “Stone in stone. It took the wrong
 edge.”</p>
 <p>Saikou wrote how much.</p>
-<p>Neth shook his head. “Not money. I’ll need a good piece of that seam.
+<p>Gorm shook his head. “Not money. I’ll need a good piece of that seam.
 Takes choosing.”</p>
 <p>Saikou added I can help.</p>
 <p>The under-mason looked at the board on his arm. “Later.”</p>
@@ -2213,11 +2220,11 @@ cart arrived with the new pump chain. Harken counted its links in the
 yard. Two workers made a temporary gutter along the chapel wall. Maela’s
 younger son carried a loaf to the gate, walking carefully until he
 thought no one could see him, then running.</p>
-<p>Neth did not ask Saikou what he heard. Once, when a wagon crossed a
+<p>Gorm did not ask Saikou what he heard. Once, when a wagon crossed a
 loose paving stone, he tapped the sill. Saikou felt the answering
 vibration through the heel of his hand.</p>
 <p>That evening Saikou went to the archive.</p>
-<p>Pella had prepared a new cover for the disaster account. It included
+<p>Marit had prepared a new cover for the disaster account. It included
 a note of Sanna’s testimony, the chapel record, and Saikou’s corrected
 description of the relay keeper. He asked to read the copy before she
 stitched it in. She had retained the crossed-out word received in the
@@ -2290,7 +2297,7 @@ much of the night deciding which mattered.</p>
 <p>“For another crossing. Tell Lumenor what you observe.”</p>
 <p>Corren looked disappointed.</p>
 <p>Lumenor was at the under-altars. Aven brought Saikou a copy of the
-used instrument’s account. It named Edran of the third lamp and an
+used instrument’s account. It named Hallan of the third lamp and an
 unnamed keeper of the reserve relay. It named Sanna as the living
 witness. The price was set down in the same hand as the service, on the
 same page. Saikou read it and found nothing he wanted to correct.</p>
@@ -2323,8 +2330,8 @@ toward her house, where Maela stood with the key.</p>
 <p>“I know.”</p>
 <p>“Don’t write that I’ve learned to do without.”</p>
 <p>“I won’t.”</p>
-<p>She took the copy of the mine account from her basket. Edran’s name
-showed on the outer fold, where Pella had written it for her. She put it
+<p>She took the copy of the mine account from her basket. Hallan’s name
+showed on the outer fold, where Marit had written it for her. She put it
 back beside the loaf.</p>
 <p>The cart began to move. Her daughter told the driver to take the
 lower road because the higher one had a loose bridge. Sanna said she
@@ -2515,7 +2522,7 @@ That made no difference at all.</p>
 <p>She looked up sharply. Rowan could not see her face, but he heard her
 breath catch, and mistook it for agreement.</p>
 <p>“We’ll come again at dark. Think about what I’ve said. It needn’t go
-through Kes. This can be yours.”</p>
+through Gidon. This can be yours.”</p>
 <p>He took the cage away. His companion waited until Rowan had gone some
 distance before following him. Zel could still hear the piglet after
 their feet disappeared.</p>
@@ -2557,17 +2564,23 @@ coming.</p>
 taken it.</p>
 <h3 id="chapter-2-a-quiet-commission">Chapter 2 — A quiet
 commission</h3>
-<p>Old Kes offered Saikou breakfast before he offered him money. Saikou
-distrusted commissions which began with breakfast, but the bread was
-fresh, and he had come straight from a boat whose cook believed anything
-pickled was a vegetable.</p>
-<p>Kes watched him eat. He was a Sidhi with a broad face and a beard
+<p>Old Gidon offered Saikou breakfast before he offered him money.
+Saikou distrusted commissions which began with breakfast, but the bread
+was fresh, and he had come straight from a boat whose cook believed
+anything pickled was a vegetable.</p>
+<p>Gidon watched him eat. He was a Sidhi with a broad face and a beard
 divided by a scar beneath the lip. Saikou remembered him younger,
 shouting measurements across a wet deck while a customs officer asked
-whether the vessel would be ready to sail. Kes had answered that it
+whether the vessel would be ready to sail. Gidon had answered that it
 would be ready when he could walk on it without falling into the cargo.
 The customs officer had not enjoyed the answer.</p>
-<p>“You’ve heard about the woman,” Kes said.</p>
+<p>Along the beam over the door hung a row of brass lamps, eight of them
+lit against the gray morning and a ninth at the end, polished as bright
+as the rest, with no wick in it. When Saikou reached for more bread,
+Gidon pushed the dish toward him and said, as a man says <em>mind the
+step</em>, “Eat. A guest who stays too long becomes a target. A guest
+who stays for breakfast is only a guest.”</p>
+<p>“You’ve heard about the woman,” Gidon said.</p>
 <p>“I’ve heard about three women. One of them married the
 magistrate.”</p>
 <p>“Under the warehouses.”</p>
@@ -2578,8 +2591,8 @@ magistrate.”</p>
 <p>“How many missing ones?”</p>
 <p>“Three.”</p>
 <p>“How many found?”</p>
-<p>Kes looked toward the door. A young clerk stood there with a tablet,
-waiting to be noticed or dismissed. Kes dismissed him.</p>
+<p>Gidon looked toward the door. A young clerk stood there with a
+tablet, waiting to be noticed or dismissed. Gidon dismissed him.</p>
 <p>“Three,” he said. “One with a wound. Two frightened. The watch wants
 to send men below. I said the spring dredging was underway and they
 ought to wait for the channels to clear.”</p>
@@ -2595,19 +2608,20 @@ ignored him, and continued at the same pace.</p>
 <p>“What are you asking?” he said.</p>
 <p>“Find out why she’s still hungry.”</p>
 <p>That was an interesting question. Saikou put down the bread.</p>
-<p>Kes reached beneath the table and brought out a small cloth purse. He
-did not push it across. “Her mother has been providing food. Three
+<p>Gidon reached beneath the table and brought out a small cloth purse.
+He did not push it across. “Her mother has been providing food. Three
 months. I’ve paid for it. A month ago we thought she was better. Then a
 lighterman came out of the north drain with his arm torn open.”</p>
 <p>“Why did you think she was better?”</p>
 <p>“She stopped coming up.”</p>
-<p>Saikou looked at him. Kes gave a slight, impatient movement of the
+<p>Saikou looked at him. Gidon gave a slight, impatient movement of the
 shoulder.</p>
 <p>“What would you have called it?”</p>
 <p>“I’d have called it being out of sight.”</p>
-<p>Kes took that badly, which was not Saikou’s purpose, although it was
-not wholly unwelcome. There were mornings when he resented being asked
-to turn another man’s useful ignorance into a professional judgment.</p>
+<p>Gidon took that badly, which was not Saikou’s purpose, although it
+was not wholly unwelcome. There were mornings when he resented being
+asked to turn another man’s useful ignorance into a professional
+judgment.</p>
 <p>“Her name?”</p>
 <p>“Zel.”</p>
 <p>“Her mother’s?”</p>
@@ -2615,7 +2629,7 @@ to turn another man’s useful ignorance into a professional judgment.</p>
 <p>“May I speak to her?”</p>
 <p>“I won’t stop you.”</p>
 <p>“Would she expect you to?”</p>
-<p>Kes tightened the purse cord. “I don’t want this going before the
+<p>Gidon tightened the purse cord. “I don’t want this going before the
 Admiralty. They hear ghoul, they send fire. Then everybody has questions
 about which store wall came down with the drain, and nobody remembers
 why they started burning.”</p>
@@ -2624,7 +2638,7 @@ keeping time. He knew a version from his childhood and found himself
 quietly supplying the last words. On the next phrase he came in at the
 missing beat.</p>
 <p>The mallets continued. A boy beneath the window looked up.</p>
-<p>Kes smiled for the first time. “You haven’t worked here.”</p>
+<p>Gidon smiled for the first time. “You haven’t worked here.”</p>
 <p>“Apparently not.”</p>
 <p>“Don’t do that down there.”</p>
 <p>“Why?”</p>
@@ -2634,14 +2648,14 @@ investigated things which ate the names of towns and once persuaded a
 dead admiral to acknowledge a mistake. He could nevertheless be defeated
 socially by a sixteen-year-old holding a mallet.</p>
 <p>“How much?” he asked.</p>
-<p>Kes loosened the purse and laid out coins. A sufficient sum for
+<p>Gidon loosened the purse and laid out coins. A sufficient sum for
 investigation, with the promise of more when the matter was concluded.
 Saikou asked for the first sum now and accepted no definition of
 conclusion beyond a written report and the return of living persons
-where possible. Kes hesitated over the word <em>persons</em>. Saikou
+where possible. Gidon hesitated over the word <em>persons</em>. Saikou
 waited until he wrote it.</p>
-<p>It was a nuisance Kes would have to undo if he wished to say she had
-never been included.</p>
+<p>It was a nuisance Gidon would have to undo if he wished to say she
+had never been included.</p>
 <p>The wounded man was named Tevi. Saikou found him at his sister’s
 house, sitting beside a window with his left arm bound to a board. The
 sister, Sen, had put all her sewing within reach of his good hand so he
@@ -2708,13 +2722,13 @@ beside a chain drum. Their foreman had one trouser leg rolled above the
 knee and stood on a plank as if he meant to address a congregation.</p>
 <p>“We can take the north mouth,” he said. “We cannot take it on the old
 rate.”</p>
-<p>Old Kes stood below him. “You haven’t taken it on any rate.”</p>
+<p>Old Gidon stood below him. “You haven’t taken it on any rate.”</p>
 <p>“Because there’s a woman with teeth in it.”</p>
 <p>Saikou came closer. The foreman looked down at him.</p>
 <p>“Are you here to remove the teeth?”</p>
 <p>“Not yours, I hope.”</p>
-<p>The crew laughed. Kes did not. The foreman stepped off the plank and
-introduced himself as Hadrik, then asked whether Saikou had worked a
+<p>The crew laughed. Gidon did not. The foreman stepped off the plank
+and introduced himself as Hadrik, then asked whether Saikou had worked a
 dredge.</p>
 <p>“A marine’s answer would be yes. A dredger’s would be no.”</p>
 <p>“Good. Stay off the drum.”</p>
@@ -2724,11 +2738,11 @@ Cleaning it would open a quicker route for the shallow cutters. It would
 also empty the chamber where Zel had been seen. Hadrik marked the
 proposed cut with a dirty thumb.</p>
 <p>“By the next high tide she has nowhere to sit.”</p>
-<p>Kes said, “We cannot hold the whole harbor for her.”</p>
+<p>Gidon said, “We cannot hold the whole harbor for her.”</p>
 <p>“No,” Saikou replied. “But we can refrain from flushing her into it
 before I’ve spoken to her.”</p>
 <p>Hadrik nodded at his men. “That’s another day’s wages.”</p>
-<p>Kes looked at Saikou. It was going to be an expensive investigation
+<p>Gidon looked at Saikou. It was going to be an expensive investigation
 before anybody opened a sewer gate.</p>
 <h3 id="chapter-3-her-mothers-bowl">Chapter 3 — Her mother’s bowl</h3>
 <p>Anja had put too much salt in the blood again.</p>
@@ -2759,7 +2773,7 @@ said she had a rash. The child had asked to see it. His mother pulled
 him away by the shoulder, and the movement had made Zel’s mouth fill
 with saliva.</p>
 <p>She sat below Anja. The bowl remained between them.</p>
-<p>“Kes sent a man,” her mother said.</p>
+<p>“Gidon sent a man,” her mother said.</p>
 <p>“I know.”</p>
 <p>“Not to kill you.”</p>
 <p>“You don’t know.”</p>
@@ -2937,7 +2951,7 @@ She lay on them with her eyes open.</p>
 <h3 id="chapter-4-a-light-upon-the-water">Chapter 4 — A light upon the
 water</h3>
 <p>Anja opened the door with her left hand. Saikou saw the bandage
-before he saw her face, and disliked Kes a little more for having sent
+before he saw her face, and disliked Gidon a little more for having sent
 him to a house where somebody had already begun bleeding.</p>
 <p>“She did that?” he asked.</p>
 <p>Anja tried to put her wrist behind the door. “I caught it.”</p>
@@ -2982,7 +2996,7 @@ There had been a young woman careless with heat. She had not always
 lived beneath a quay.</p>
 <p>He put the apron in his satchel. At the door Anja caught his sleeve
 with her good hand.</p>
-<p>“Kes said you would keep this quiet.”</p>
+<p>“Gidon said you would keep this quiet.”</p>
 <p>“I agreed to investigate.”</p>
 <p>“He pays.”</p>
 <p>“He does.”</p>
@@ -3101,7 +3115,7 @@ offered his coat. She refused it because he was already wet, then took
 it when he admitted that he did not intend to become drier by
 arguing.</p>
 <p>There was no safe room ready.</p>
-<p>Old Kes had assumed Saikou would conclude his investigation
+<p>Old Gidon had assumed Saikou would conclude his investigation
 underground. The yard had a disused tally office above the outer sluice,
 but its door faced a passage used by thirty workers and its window
 opened directly over water. Hadrik agreed to block the window, then
@@ -3109,21 +3123,21 @@ refused to ask his men to work beside a hungry woman without being paid
 for the danger.</p>
 <p>Saikou spent the last of the first purse before Zel had anywhere to
 sit.</p>
-<p>The dock-syndic arrived while two men were lifting a shutter. Neral
+<p>The dock-syndic arrived while two men were lifting a shutter. Ostin
 wore a plain brown coat and a whistle on a cord beneath it. Saikou had
 seen him make five boats give way to a sixth by asking its owner whether
 his mother was well. He asked no such question now.</p>
-<p>“Kes hasn’t authorized a detention,” he said.</p>
+<p>“Gidon hasn’t authorized a detention,” he said.</p>
 <p>“She isn’t detained.”</p>
 <p>“What is she?”</p>
 <p>“Hungry.”</p>
-<p>Neral looked past him at the closed office door. “That won’t answer
+<p>Ostin looked past him at the closed office door. “That won’t answer
 the watch.”</p>
 <p>“It answers me.”</p>
 <p>“And who answers if somebody is hurt?”</p>
 <p>Saikou had been expecting obstruction. The sensible question
 irritated him more. Before he could reply, a woman carrying a blue
-lantern came up the steps and told Neral to move because he was standing
+lantern came up the steps and told Ostin to move because he was standing
 where the railing had given way.</p>
 <p>Dalia was a lantern advocate. Saikou knew the title and had once
 mistaken it for a ceremonial office until a member of the profession
@@ -3133,7 +3147,7 @@ above her wrists and a little glass water-timer tucked into the
 fastening of her coat.</p>
 <p>“She can stay here until the morning hearing,” Dalia said. “If she
 agrees. I’ve brought the keeper’s warrant.”</p>
-<p>Neral took the folded sheet.</p>
+<p>Ostin took the folded sheet.</p>
 <p>“It authorizes a beacon.”</p>
 <p>“And makes the sluice passage a service channel under the harbor
 court. The office becomes a refuge while the petition is heard. You may
@@ -3324,7 +3338,7 @@ Omi had gone to fetch water, and Saikou was speaking with somebody in
 the yard. Zel could hear the distant conversation: numbers, a slaughter
 time, somebody objecting to the length of a journey with a warm
 bowl.</p>
-<p>“Kes paid you,” Zel said.</p>
+<p>“Gidon paid you,” Zel said.</p>
 <p>“Yes.”</p>
 <p>“To keep me down there.”</p>
 <p>“He said you’d be killed if anybody knew.”</p>
@@ -3432,10 +3446,13 @@ the water. Pilots watched those reflections at night, when a lamp on a
 distant stake might be hidden by the nearest hull. The mirrors required
 cleaning so frequently that Isha had an apprentice doing nothing
 else.</p>
-<p>She was Lethai-ar, spare and dark-eyed, with a thin silver chain
-wound twice round her wrist. She listened while Saikou explained that a
-boat had passed beneath the new beacon carrying a man Zel recognized
-from the well.</p>
+<p>Dalia introduced Isha as a Lethai-ar keeper. She was spare and
+dark-eyed, with a thin silver chain wound twice round her wrist.</p>
+<p>“Sworn to the Weaver,” Isha said. “Ar is the thora’s word for
+us.”</p>
+<p>Dalia accepted the correction with a nod. Isha listened while Saikou
+explained that a boat had passed beneath the new beacon carrying a man
+Zel recognized from the well.</p>
 <p>“Recognition is not an offense,” Isha said.</p>
 <p>“No.”</p>
 <p>“Do you want that channel closed?”</p>
@@ -3458,14 +3475,14 @@ again. Saikou watched it. Isha watched him watching.</p>
 <p>“Then don’t practice looking as if you do.”</p>
 <p>He had deserved that. He asked for the earlier well inspection
 instead. Isha sent her apprentice to fetch it from a room where all the
-documents were wrapped against damp. The entry bore Kes’s authorization
-to clear an obstruction from the old curb. A separate line acknowledged
-the recovery of <em>ceramic waste</em>. There was no examination of the
-Veiled Sisters’ marking.</p>
+documents were wrapped against damp. The entry bore Gidon’s
+authorization to clear an obstruction from the old curb. A separate line
+acknowledged the recovery of <em>ceramic waste</em>. There was no
+examination of the Veiled Sisters’ marking.</p>
 <p>Saikou copied the names. He had no difficulty finding the worker with
 the red wrist strip. The man was mending a winch in Rowan’s rented shed.
-His name was Burl. Kes had paid him for clearing the well, he said, and
-Rowan for carrying away the fragments.</p>
+His name was Burl. Gidon had paid him for clearing the well, he said,
+and Rowan for carrying away the fragments.</p>
 <p>“Did you know what it was?”</p>
 <p>Burl spat into a crack between the boards. “I knew it came out in
 pieces.”</p>
@@ -3494,24 +3511,24 @@ mark with others he knew. That was the beginning of an answer. A well
 opened to something hungry had not made every drinker a ghoul. Zel’s
 particular contact, the last water after the seal came loose, the nature
 of the broken join: he could name uncertainties until nightfall.</p>
-<p>Kes was waiting at the office when he returned.</p>
+<p>Gidon was waiting at the office when he returned.</p>
 <p>“I paid to have a well cleared,” the dockmaster said. “I didn’t pay
 to have a girl ruined.”</p>
 <p>“Did you know the fragments were sealed?”</p>
 <p>“I knew the Sisters had left something there.”</p>
 <p>“And after she became ill?”</p>
-<p>Kes looked toward the ward. Zel was inside with Leto. Saikou could
+<p>Gidon looked toward the ward. Zel was inside with Leto. Saikou could
 hear pieces being moved on a board.</p>
 <p>“Then I paid her mother.”</p>
 <p>“You could have sent for help.”</p>
 <p>“I have sent for help.”</p>
-<p>Saikou was tired enough to want to strike him. Kes must have seen it.
-He stepped back, and the small movement shamed Saikou more effectively
-than an accusation would have.</p>
+<p>Saikou was tired enough to want to strike him. Gidon must have seen
+it. He stepped back, and the small movement shamed Saikou more
+effectively than an accusation would have.</p>
 <p>“Yes,” Saikou said. “You have. Now you will pay for the help you
 actually need.”</p>
-<p>Kes said they would discuss it tomorrow. Saikou knew the sentence too
-well to mistake it for an undertaking.</p>
+<p>Gidon said they would discuss it tomorrow. Saikou knew the sentence
+too well to mistake it for an undertaking.</p>
 <p>Inside, Zel had eaten again. She was calmer. Saikou found it harder
 to begin the conversation about the Well of Ichor.</p>
 <p>He told her what he knew. Far away, in Zahk’Kozahn, there was a place
@@ -3742,7 +3759,7 @@ channel.</p>
 customs post. Saikou knew it. Two moorings above a half-submerged
 foundation, close enough to the yard that cargo moved unnoticed beneath
 an evening’s ordinary noise.</p>
-<p>Neral appeared out of the whiteness, Dalia beside him with her blue
+<p>Ostin appeared out of the whiteness, Dalia beside him with her blue
 lantern. The syndic listened to Hadrik, then blew his whistle once,
 softly. He waited. Somewhere a man answered with another whistle.</p>
 <p>“They won’t be here quickly,” he said.</p>
@@ -3831,7 +3848,7 @@ the skin beneath it. Saikou struck Rowan’s jaw with the hilt of his
 weapon. The smuggler fell against the burning canvas, scrambling to get
 away from the heat.</p>
 <p>Fire made a good light in fog. It also made an audience. Voices began
-reaching them from the posts. Neral’s men had found the boat, but the
+reaching them from the posts. Ostin’s men had found the boat, but the
 boats around it kept them from coming closer.</p>
 <p>Saikou put his mirror flat on a grain bin and turned its face toward
 the buyer’s raised hand. He called on the Witness. The silver darkened,
@@ -3974,7 +3991,7 @@ was at least honest about itself.</p>
 <p>“In the account?”</p>
 <p>“Everyone talks as if I went looking for this.”</p>
 <p>Dalia wrote a note. Anja leaned closer.</p>
-<p>“Kes will have to answer for it.”</p>
+<p>“Gidon will have to answer for it.”</p>
 <p>“Yes,” Zel said. “And I will have to answer for Dren.”</p>
 <p>Her mother began saying that one did not excuse the other. Zel told
 her she knew. For a moment she wanted both women gone. Then Dalia put
@@ -4014,7 +4031,7 @@ admission.</p>
 with more held separately if work or fear brought hunger back early.
 Someone would remain to observe, not merely to see whether she finished.
 Varo could supply most days. They needed a second slaughterhouse,
-someone to carry from it, and a way to pay all of them without Kes
+someone to carry from it, and a way to pay all of them without Gidon
 deciding she cost too much.</p>
 <p>“And when there isn’t any?”</p>
 <p>“We are trying an overnight reserve. Unmixed, covered, kept cool.
@@ -4079,11 +4096,11 @@ to do with the wound. Saikou had been surprised by the irrelevance, as
 if surviving one encounter entitled a person to stop there.</p>
 <p>When he left, he bought a parcel of hot fish and ate it on the quay.
 It was the first meal he had chosen in several days rather than accepted
-while looking at a ledger or a wound. Halfway through, Neral sat beside
+while looking at a ledger or a wound. Halfway through, Ostin sat beside
 him.</p>
 <p>“You owe me,” the syndic said.</p>
 <p>Saikou swallowed. “For sitting on my coat?”</p>
-<p>Neral moved it. “For the watch. For that house being available. For
+<p>Ostin moved it. “For the watch. For that house being available. For
 the two people who haven’t gone home because you need a third set of
 eyes when someone changes shift.”</p>
 <p>“They are being paid.”</p>
@@ -4092,7 +4109,7 @@ eyes when someone changes shift.”</p>
 debt while hungry; every reasonable answer felt like somebody reaching
 into his supper.</p>
 <p>“What do you want?”</p>
-<p>“Come to the harbor council. Speak about the broken seal. Kes will
+<p>“Come to the harbor council. Speak about the broken seal. Gidon will
 say this began as a private illness. I don’t want the port paying a
 private man’s repair because he had the courage to give it a public name
 afterwards.”</p>
@@ -4101,23 +4118,23 @@ afterwards.”</p>
 <p>“You could ask him for money directly.”</p>
 <p>“He could give it directly and remain the man who decides whether
 next month’s payment comes.”</p>
-<p>Saikou looked at him. Neral rarely raised his voice, and Saikou could
+<p>Saikou looked at him. Ostin rarely raised his voice, and Saikou could
 see how people mistook that for a wish to keep everything as it was. The
-syndic wanted Kes weakened. He also wanted the watches and warehouses
-which had depended on Kes to keep working. “If I speak, I won’t speak
+syndic wanted Gidon weakened. He also wanted the watches and warehouses
+which had depended on Gidon to keep working. “If I speak, I won’t speak
 only about him.”</p>
-<p>Neral nodded once. “I expect to dislike some of it.”</p>
+<p>Ostin nodded once. “I expect to dislike some of it.”</p>
 <p>The council met that afternoon in a room which smelled of drying wool
 and good wax. Isha came with her route records. Dalia came with Zel’s
 statement. Hadrik came with a figure for the damaged stage, the lost
 dredging day, and a dead man’s unpaid wages.</p>
-<p>Kes stood through the first questions. He seemed to believe sitting
+<p>Gidon stood through the first questions. He seemed to believe sitting
 would make him look smaller. When Saikou described the curb and the
 sealing halves shown in his mirror, the dockmaster interrupted to ask
 whether a reflection could be entered as evidence.</p>
 <p>“Mine couldn’t tell you what he knew,” Saikou said. “His signed
 clearance can tell you what he ordered.”</p>
-<p>Kes looked at the sheet. Saikou described Burl’s double payment,
+<p>Gidon looked at the sheet. Saikou described Burl’s double payment,
 Rowan’s purchase of the fragments, the bowls Anja had carried below, and
 the false quiet which followed. He did not give Tevi’s name. Dalia had
 asked the wounded people which parts they wanted heard. Tevi wanted the
@@ -4144,29 +4161,29 @@ blood regardless of its value to a man at a table.</p>
 <p>They argued over the collection charge for half an hour. Saikou sat
 down. His arm hurt; the fish had grown cold. He found he could listen
 more patiently once he stopped pretending to be comfortable.</p>
-<p>The council had authority over Kes’s yard lease. It did not have
+<p>The council had authority over Gidon’s yard lease. It did not have
 authority to give his private warehouses away, nor the money to fund
 permanent care merely by saying it was deserved. They could fine him for
 opening the sealed well without examination. They could require him to
 meet the damage caused by his clearance and concealment, once assessed.
 Those proceedings would take longer than the supply of blood Saikou had
 paid for.</p>
-<p>Kes understood that before anybody else said it aloud.</p>
+<p>Gidon understood that before anybody else said it aloud.</p>
 <p>“I can advance the cost,” he said. “A year. Food, the house,
 attendants. Against the eventual assessment.”</p>
 <p>“And if the assessment is less?” Dalia asked.</p>
 <p>“The difference is mine.”</p>
 <p>“Do you retain any claim against Zel for it?”</p>
-<p>Kes looked at Saikou, then at the council. “No.”</p>
+<p>Gidon looked at Saikou, then at the council. “No.”</p>
 <p>It was a large concession, made by a man who understood he could lose
 more if he refused. Dalia put the undertaking in terms he could not call
 a gift later and ask to have thanked.</p>
-<p>To find the money, Kes sold his interest in the western bonded shed.
-Saikou knew because he went with Neral to collect the advance before the
-council dispersed. The purchaser had already offered less than the share
-was worth. He offered less again when he saw how badly Kes needed the
-money that afternoon.</p>
-<p>Kes signed anyway.</p>
+<p>To find the money, Gidon sold his interest in the western bonded
+shed. Saikou knew because he went with Ostin to collect the advance
+before the council dispersed. The purchaser had already offered less
+than the share was worth. He offered less again when he saw how badly
+Gidon needed the money that afternoon.</p>
+<p>Gidon signed anyway.</p>
 <p>Outside, he stopped Saikou.</p>
 <p>“I did bring you here.”</p>
 <p>“Yes.”</p>
@@ -4176,8 +4193,8 @@ money that afternoon.</p>
 <p>Saikou looked at the dockmaster. The answer he wanted to give would
 have been satisfying and incomplete.</p>
 <p>“Yes,” he said. “Beside the rest.”</p>
-<p>Kes let him pass. He was no longer standing as if he meant to address
-anybody.</p>
+<p>Gidon let him pass. He was no longer standing as if he meant to
+address anybody.</p>
 <p>Hadrik waited on the landing with a small wooden slat. He held it
 awkwardly, turning it over until Saikou asked what he wanted.</p>
 <p>“My brother’s name,” the foreman said.</p>
@@ -4213,7 +4230,7 @@ into a boat.</p>
 <p>The watchers would have to be replaced.</p>
 <p>Saikou went to the quarantine house with the first money. Zel was
 mending the new shirt where she had torn it in the cage. She asked
-whether Kes still owned the bowls.</p>
+whether Gidon still owned the bowls.</p>
 <p>“No,” Saikou said. “Varo owns his until we return them. You have your
 own.”</p>
 <p>She turned it in her hands. It was a plain earthenware basin, large
@@ -4374,7 +4391,7 @@ that she had no cord. She did not offer to weave another. Ressa brought
 back word that Iven had taken the ring and asked nothing else. The
 silence made Zel angry, then ashamed of the anger. She had hoped being
 able to return something would make him want to speak to her.</p>
-<p>The third person from Kes’s list was Fela, who carried produce from
+<p>The third person from Gidon’s list was Fela, who carried produce from
 the outer market. Dalia brought her statement with the account of the
 others. Fela still woke hearing water beneath her bed. She had begun
 using a longer road home so she would not pass any open drains, and the
@@ -4498,7 +4515,7 @@ discovering Zel had learned from Perrin how to stop losing.</p>
 <p>Perrin had a family of his own, whose claims made him cross when
 somebody assumed he would cover an extra shift. Dessa wanted her wages
 on the day agreed, and had once refused to remain until a replacement
-came after that replacement stayed drinking. Neral sent a watchman to
+came after that replacement stayed drinking. Ostin sent a watchman to
 sit outside the covered mirrors that night while Omi was fetched and
 paid for coming early. Zel remembered the watchman’s smell of wine more
 clearly than anybody’s assurances that he was competent.</p>
@@ -4519,7 +4536,7 @@ smell and thickness. Zel had reported less relief after the smallest
 collection. They had increased it instead of waiting for her to hurt
 somebody and make the complaint believable.</p>
 <p>The cold chest held only what had been collected since the preceding
-night. Once it had emptied completely. Neral had arranged an extra
+night. Once it had emptied completely. Ostin had arranged an extra
 slaughter from animals already sold for the next day’s market, paying
 the owner for advancing the work and the butcher for reopening his shed.
 The market price rose briefly. People complained. Zel heard the
@@ -4598,7 +4615,7 @@ thread through two holes.</p>
 suggests.”</p>
 <p>Tevi nodded. He asked Saikou to hold the leather flat. They finished
 a difficult inch of seam together.</p>
-<p>At the harbor, Kes’s office had another name over its door. The
+<p>At the harbor, Gidon’s office had another name over its door. The
 clearance inquiry had removed him from responsibility for wells and
 sealed works; the yard still employed him to buy timber. He was good at
 it. Several men who wanted him punished also wanted their next delivery
@@ -4667,10 +4684,8 @@ two carriers pass, each balancing a load which would not have been easy
 to divide. One recognized him and asked whether the woman was
 better.</p>
 <p>“She is fed,” he said.</p>
-<p>The carrier considered that, then shifted the load against his
-shoulder and went on. Saikou followed the water toward his lodging,
-where his supper would probably be cold and his coat remained in need of
-a new sleeve.</p>
+<p>The carrier considered that for a long moment, as though it answered
+some other question he had not known he was carrying, and went on.</p>
 <h3 id="homeward-off-kassamira">Homeward — Off Kassamira</h3>
 <p>They reached the outer anchorage after the lamps were lit.</p>
 <p>Saikou knew the lower pair on the mole. The third light, above and to
@@ -5240,8 +5255,8 @@ bone longer than any finger ought to be.</p>
 <p>“Yes. Quite handsome, before the repairs.”</p>
 <p>“Where’s the annex door?”</p>
 <p>“Under the third arch. There’s a porter.”</p>
-<p>There was. Saikou found the door, and the porter, and a queue of
-eleven people with folded petitions. He stood at the end of the queue.
+<p>There was. Saikou found the door, and the porter, and a queue of a
+dozen people with folded petitions. He stood at the end of the queue.
 After a while Cornelius came past him and stopped again.</p>
 <p>“You’re Ira, aren’t you? The foreign practitioner.”</p>
 <p>“I’ve been called worse things in my own language.”</p>
@@ -5260,8 +5275,8 @@ beneath a clean surface, the place where a presence had entered. It
 could not give him a city untouched by all the things that had happened
 to its remembering.</p>
 <p>He moved forward in the queue.</p>
-<p>At the desk he met Pell, a copy-clerk with three ink-stained fingers
-and a spectacles frame repaired with wire. Pell took his request, read
+<p>At the desk he met Tullo, a copy-clerk with three ink-stained fingers
+and a spectacles frame repaired with wire. Tullo took his request, read
 it, and turned it over.</p>
 <p>“Authority?”</p>
 <p>“Sister Nera, Quiet Seal.”</p>
@@ -5270,15 +5285,15 @@ it, and turned it over.</p>
 <p>“That’s religious custody.”</p>
 <p>“Her father’s a Censor.”</p>
 <p>“That’s civil office.”</p>
-<p>Pell took off his spectacles. Without them he looked younger and much
-more tired. “I’m not making this difficult for pleasure. An account in a
-Censor’s own keeping is privileged until either the Censor releases it
-or an examiner opens a cause. Your sister’s cause is against the
+<p>Tullo took off his spectacles. Without them he looked younger and
+much more tired. “I’m not making this difficult for pleasure. An account
+in a Censor’s own keeping is privileged until either the Censor releases
+it or an examiner opens a cause. Your sister’s cause is against the
 daughter.”</p>
 <p>“She isn’t my sister.”</p>
 <p>“Your religious sister.”</p>
 <p>“Ah. Yes.”</p>
-<p>Pell put the spectacles on again. “If you can give me an instrument
+<p>Tullo put the spectacles on again. “If you can give me an instrument
 number, I can furnish an attested copy of a public assignment. It’ll
 cost six copper and the search.”</p>
 <p>“What can you search without his permission?”</p>
@@ -5288,12 +5303,12 @@ private memoranda.”</p>
 <p>“If somebody assigned payment for them.”</p>
 <p>Saikou laid six copper on the desk. “His wife was Marcia. She died
 three years ago. Start there.”</p>
-<p>Pell did not touch the coins. “The search costs more if I have to go
+<p>Tullo did not touch the coins. “The search costs more if I have to go
 by relationship. People die every day.”</p>
-<p>Saikou paid the search fee. Pell gave him a receipt and told him to
+<p>Saikou paid the search fee. Tullo gave him a receipt and told him to
 wait on the bench. It was the first clear instruction he had received
 since entering the Hall, and he took pleasure in following it.</p>
-<p>By late afternoon Pell had found three entries.</p>
+<p>By late afternoon Tullo had found three entries.</p>
 <p>The first was for a syrup of mountain bark, purchased from an
 apothecary who was now dead. The second assigned the debt to a factor
 who had left Ecktoria. The third consolidated it with a hospital
@@ -5303,7 +5318,7 @@ woman’s weaving shop.</p>
 <p>“Fabius acquired the claim. It became security.”</p>
 <p>“Did he own the shop?”</p>
 <p>“He came to.”</p>
-<p>Pell tapped the dates. “There’s something you should notice. That
+<p>Tullo tapped the dates. “There’s something you should notice. That
 last consolidation isn’t three years ago. It’s last winter.”</p>
 <p>Saikou looked at the chain of sums. Each transfer named a price. Each
 price was plausible. Several were cheaper than the amount owing. The
@@ -5314,14 +5329,14 @@ sentence should have been.</p>
 <p>“Can you copy these?”</p>
 <p>“Yes.”</p>
 <p>“All three. Attested.”</p>
-<p>Pell began sharpening his pen. “That’s another charge.”</p>
+<p>Tullo began sharpening his pen. “That’s another charge.”</p>
 <p>“I’d guessed.”</p>
 <p>As the clerk worked, Saikou took a little smooth road-stone out of
 his coat and held it in his palm. He asked the Traveler for a path from
 this knowledge to the next place he needed to be. Not a path through
 somebody else’s locked conscience. Not an answer. A way to make the
 distance before the light went.</p>
-<p>When Pell looked up from the first sheet, a porter was standing in
+<p>When Tullo looked up from the first sheet, a porter was standing in
 the door with a message for the foreign practitioner. Sister Nera had
 sent it by a boy who knew the alleys. The boy waited outside, bouncing
 on his heels.</p>
@@ -5554,8 +5569,8 @@ things, and I’ll send the request. That’s all I’m offering.”</p>
 <p>They went to the east gate. The king walked with two sticks and
 refused the chamberlain’s arm until he reached the uneven last step.
 There he accepted it without ceremony. Saikou stood on the pavement
-below him with the papers Pell had copied and stated what he had come to
-ask.</p>
+below him with the papers Tullo had copied and stated what he had come
+to ask.</p>
 <p>The petitioners followed. A kitchen boy came out wiping his hands.
 Two passers-by stopped. By the time Saikou finished, twelve people had
 heard that the account for Marcia Valerius’s medicine continued to
@@ -5567,16 +5582,16 @@ clerk read it back. Saikou heard the phrase “without examination” become
 it.</p>
 <p>Then he put his seal to the sheet.</p>
 <p>It was a narrow thing. It did not spring locks. It did not dismiss
-guards. By sunset it had made Pell’s superintendent afraid to refuse a
+guards. By sunset it had made Tullo’s superintendent afraid to refuse a
 public copy search outright, and that was enough to get Saikou back
 through the annex door.</p>
-<p>Pell had four more assignments waiting.</p>
+<p>Tullo had four more assignments waiting.</p>
 <p>He had made notes on separate scraps, because he did not trust the
 order in which the registry now remembered its bundles. The amounts were
 troubling. The witnesses were more troubling. One seller appeared twice
 as a buyer, and the second time he bought the obligation for less than
 he had already received in interest.</p>
-<p>“There’s a Black Banner receipt here,” Pell said. “Ykrul settlement
+<p>“There’s a Black Banner receipt here,” Tullo said. “Ykrul settlement
 levy. It got consolidated with the same security.”</p>
 <p>“I thought they were being paid to guard the stores.”</p>
 <p>“They are. The levy’s older.”</p>
@@ -5609,7 +5624,7 @@ punched along it, each hole fitted to a date marker. The receipt was
 genuine. Fabius had paid the mercenary company in full. The company had
 canceled its interest in the consolidated obligation. A copy of that
 cancellation had gone back to the Censor’s Hall.</p>
-<p>Pell’s copy had no cancellation attached.</p>
+<p>Tullo’s copy had no cancellation attached.</p>
 <p>“Could the interest have been resold?” Saikou asked.</p>
 <p>“Not by us.”</p>
 <p>“Would your copy say if it had?”</p>
@@ -5999,7 +6014,7 @@ voices.</p>
 whose mother had argued in the prison yard for half an hour before Nera
 took her aside and said something that made the argument quieter but not
 shorter. Rhea had brought her bag because she was sleeping at her
-niece’s. Pell had arrived with a slate and a fresh bottle of ink. Livia
+niece’s. Tullo had arrived with a slate and a fresh bottle of ink. Livia
 had never seen a clerk come into a prison without wanting her to sign
 something.</p>
 <p>The seventh was a woman called Sabina.</p>
@@ -6065,7 +6080,7 @@ Inquisitor’s answers, which were always very beautiful and made her feel
 as if she had done something dirty by asking.</p>
 <p>Saikou mixed the powder with the salt and iron. Nera wrote the names
 of the people in the room on a sheet and read them aloud.</p>
-<p>Rhea. Edda. Brio. Dama. Sister Nera. Pell. Sabina.</p>
+<p>Rhea. Edda. Brio. Dama. Sister Nera. Tullo. Sabina.</p>
 <p>“Seven witnesses,” she said.</p>
 <p>“Am I one?” Livia asked.</p>
 <p>“You’re the person we’re here for,” Saikou said. “You can tell us
@@ -6074,7 +6089,7 @@ what you feel. You don’t have to keep the others in their places.”</p>
 would stand where she could see Livia’s mouth without looking into the
 mirrors. Brio would be by the door, watching both the room and the
 corridor. Nera would face Livia, her lamp beside the mirror that was to
-show the girl her own face. Pell would record what was said from the
+show the girl her own face. Tullo would record what was said from the
 table beyond the line. Sabina would stand at the far point between the
 other two mirrors.</p>
 <p>“Why her?” Livia asked.</p>
@@ -6082,10 +6097,10 @@ other two mirrors.</p>
 mistake what she hopes to see for what her hands are holding.”</p>
 <p>Sabina made a dry noise. “I can still be frightened.”</p>
 <p>“I’m expecting it.”</p>
-<p>“I don’t know the girl at all,” Pell said.</p>
+<p>“I don’t know the girl at all,” Tullo said.</p>
 <p>“You can write without deciding that every word out of her mouth
 belongs to her.”</p>
-<p>Pell looked at Livia. “Yes. I can do that.”</p>
+<p>Tullo looked at Livia. “Yes. I can do that.”</p>
 <p>Nobody asked her father’s name. It was not one of the seven. She was
 glad until she was not, and the change happened so quickly she could not
 keep up with herself.</p>
@@ -6121,7 +6136,7 @@ piece for apprentices. Both were suitable. Neither had been bought free
 of consequence.</p>
 <p>The prison’s washing room could not be made safe by declaring it
 safe. He tested the door hinges, covered the wet patches on the tubs
-with coarse cloth, and made Pell empty his ink into a narrow-necked
+with coarse cloth, and made Tullo empty his ink into a narrow-necked
 bottle rather than leave an open reflecting dish on the table. Brio took
 his shield outside. Nera put a blackened pin through the latch so it
 would not rattle loose when someone struck the door.</p>
@@ -6166,7 +6181,7 @@ been removed. Its mouth looked like a seal cut away from a document. Its
 eyes looked like the holes where somebody had taken binding cord out of
 an old account.</p>
 <p>Saikou kept his eyes on it.</p>
-<p>Livia’s mouth began to speak in old Utaran. Pell’s pen moved, then
+<p>Livia’s mouth began to speak in old Utaran. Tullo’s pen moved, then
 stopped. He knew enough to recognize a formula but not enough to record
 the whole passage. Saikou told him to mark the language and the number
 of phrases he heard, not to invent a translation.</p>
@@ -6223,7 +6238,7 @@ throwing the shadow across Livia’s face.</p>
 <p>It fought hardest there. Saikou lost the ordinary order of time. His
 hands burned from the cupboard’s ward. His back ached. Sweat cooled
 under his shirt though the room’s air had turned winter-cold. Twice he
-had to ask Pell how long the candle on the table had burned. Pell
+had to ask Tullo how long the candle on the table had burned. Tullo
 answered in lengths, not comforting estimates.</p>
 <p>A blow came at the door.</p>
 <p>Brio went to it without crossing the powder. Severian’s clerk wanted
@@ -6232,9 +6247,10 @@ interruption except in case of fire. The clerk said the Inquisitor’s
 authority preceded the permit. Brio asked if there was a fire.</p>
 <p>Another blow struck the latch. The blackened pin bent.</p>
 <p>Saikou raised his hand toward the door and brought the Sentinel’s
-line across it, witnessed by Brio on one side and Pell beyond the table.
-For an instant the whole room’s geometry had to hold two barriers at
-once. The demon saw the opening in that effort and took Livia’s arm.</p>
+line across it, witnessed by Brio on one side and Tullo beyond the
+table. For an instant the whole room’s geometry had to hold two barriers
+at once. The demon saw the opening in that effort and took Livia’s
+arm.</p>
 <p>Her hand reached for the host mirror.</p>
 <p>Edda cried out. Rhea cried out too. Saikou stepped between the
 reaching hand and the glass, too late to stop her fingers striking its
@@ -6287,7 +6303,7 @@ prepared.</p>
 word.</p>
 <p>Nera was on her knees beside Livia. The girl lay on the bench with
 her eyes open, breathing. Edda held her hand. Rhea was pulling a blanket
-over her feet. Pell wrote the time by the candle and had to sharpen his
+over her feet. Tullo wrote the time by the candle and had to sharpen his
 pen again because its nib had split.</p>
 <p>Saikou looked at the seven witnesses, counting them one by one.</p>
 <p>Beyond the door the trumpets had begun their dawn preparation. The
@@ -6318,9 +6334,9 @@ Marcia. This was more than that, and it frightened her until she
 remembered it did not have to mean anything about her own body.</p>
 <p>Dama sat on the floor against the wall. Brio had brought her a stool,
 but she had set it aside. She was holding the spool with the loose end
-wound around one finger. Pell was still writing. Edda’s green ribbon had
-come off Livia’s hair and was tied around the bench leg, where it would
-not get lost.</p>
+wound around one finger. Tullo was still writing. Edda’s green ribbon
+had come off Livia’s hair and was tied around the bench leg, where it
+would not get lost.</p>
 <p>The door opened.</p>
 <p>Fabius stood there.</p>
 <p>He looked wrong in a prison corridor. His robe was the one he wore to
@@ -6385,10 +6401,10 @@ already looked at Livia for years without seeing what was happening.</p>
 <p>“I knew she believed so,” he said.</p>
 <p>“Did you investigate?”</p>
 <p>“No.”</p>
-<p>Pell’s pen scraped. Fabius heard it. He looked toward the clerk and
+<p>Tullo’s pen scraped. Fabius heard it. He looked toward the clerk and
 then back at Dama.</p>
 <p>“There were others,” he said.</p>
-<p>Pell reached for a clean sheet.</p>
+<p>Tullo reached for a clean sheet.</p>
 <p>Fabius told them names. Some were names the thing had spoken through
 Livia’s mouth. Some were new. He had bought poor securities cheaply,
 enforced their harshest surviving terms, and credited the recoveries
@@ -6416,7 +6432,7 @@ Livia. She was an older woman with warm hands who asked where it hurt,
 waited for the answer, and then asked a different question when Livia
 said everywhere. Saikou showed her how the censer smoke now followed the
 girl’s shadow rather than running ahead of it. Nera read the witnessed
-record. Pell supplied the times, the separate statements, and Fabius’s
+record. Tullo supplied the times, the separate statements, and Fabius’s
 confession, which had not been part of the rite’s authorization but was
 part of the room’s evidence now.</p>
 <p>Severian said the residue might remain.</p>
@@ -6447,10 +6463,10 @@ demon mirror’s broken pieces remained inside the circle, silver dead and
 dull after their inward flight. Those were not the pieces he needed to
 distribute. They could be collected later, watched and counted. What
 pressed beneath the lid was in his own glass.</p>
-<p>He asked Pell to read back the deposition record. Fabius’s confession
-was clear enough to submit. Dama’s claim was identified. The canceled
-Banner receipt was attached. Marcia’s sealed letter remained in a
-separate pocket of his bag; no one had opened it to enlarge the
+<p>He asked Tullo to read back the deposition record. Fabius’s
+confession was clear enough to submit. Dama’s claim was identified. The
+canceled Banner receipt was attached. Marcia’s sealed letter remained in
+a separate pocket of his bag; no one had opened it to enlarge the
 confession.</p>
 <p>Then he asked Sabina for her leather gloves.</p>
 <p>She knew what he meant to do. They had arranged it before the rite
@@ -6461,7 +6477,7 @@ mirror was a soft bed of black cloth. Sabina had scored its back along
 three lines, shallow enough not to weaken it during the rite, deep
 enough to guide its breaking afterward. The lines did not guarantee four
 pieces. They gave him somewhere to put the force.</p>
-<p>Nera stood by the table. Pell watched from the door. Sabina put the
+<p>Nera stood by the table. Tullo watched from the door. Sabina put the
 gloves on Saikou’s hands, one at a time, because his burned fingers were
 slow.</p>
 <p>He held the gate-Symbol against the box’s hinge and named the
@@ -6482,7 +6498,7 @@ had to prevent that will from learning to become an agreement between
 its fragments.</p>
 <p>Sabina folded the loose dust into the wrapping of the first piece. No
 fragment was left on the lining. She counted the compartments, then the
-bundles, then the compartments again. Pell recorded the count. Nera
+bundles, then the compartments again. Tullo recorded the count. Nera
 repeated it aloud.</p>
 <p>Four.</p>
 <p>They had chosen the waters before beginning. The Dolmis at the lower
@@ -6534,9 +6550,10 @@ one.”</p>
 surface close without a splash. He gave his name for the record and went
 back to carrying sacks.</p>
 <p>At the chapel, the keeper unlocked the cistern hatch. Sabina had come
-by another lane with Pell. She set a wooden block beside the opening and
-had him help her lift the hatch. It weighed more than Pell expected. He
-let it tilt, and a corner struck the box in Saikou’s arms.</p>
+by another lane with Tullo. She set a wooden block beside the opening
+and had him help her lift the hatch. It weighed more than Tullo
+expected. He let it tilt, and a corner struck the box in Saikou’s
+arms.</p>
 <p>From inside came a small sound of greeting.</p>
 <p>All three remaining bundles shifted toward one another.</p>
 <p>Saikou set the box down flat at once and pressed his gate-Symbol
@@ -6545,7 +6562,7 @@ stood on the other. He had to make them both name what was happening
 before the barrier held: three separate pieces seeking the same space, a
 box divided, a seal struck but not opened.</p>
 <p>The sound stopped.</p>
-<p>Pell sat down against the wall. His face was white.</p>
+<p>Tullo sat down against the wall. His face was white.</p>
 <p>“Take the hatch’s weight on the block,” Sabina told him. “Wood. Not
 your hands. You don’t have to be brave at a hinge.”</p>
 <p>They lowered the second piece by a cord into the cistern. The cistern
@@ -6554,7 +6571,7 @@ shut, its overflow sealed. Nera inspected both seals with the keeper
 before Saikou released the cord. He spoke the distributing words again.
 The water went dark where the bundle entered and returned to its own old
 green.</p>
-<p>Pell recorded the deposit while Sabina helped the keeper lower the
+<p>Tullo recorded the deposit while Sabina helped the keeper lower the
 hatch.</p>
 <p>They reached the disused well after sunrise.</p>
 <p>The procession drums had begun within the walls. Nera could still go
@@ -6654,7 +6671,7 @@ basket somebody had fetched from the house. Edda had gone home to her
 mother and would return in the afternoon. Dama had gone to sell thread.
 Brio was on the gate instead of the cell corridor because his captain
 said he had had enough of mirrors for one shift.</p>
-<p>Pell brought the clean copies at midday.</p>
+<p>Tullo brought the clean copies at midday.</p>
 <p>He had made three sets. One for the examiner, one for Nera’s order,
 one for the office that had registered the original assignments. The
 last office might dislike its set, which was why he had entered delivery
@@ -6662,19 +6679,19 @@ in the other two copies. Fabius’s seal did not authorize any of them.
 The king’s witnessed request appeared at the front, identifying how the
 cause had begun, not pretending to have determined its outcome.</p>
 <p>“Where’s the fourth set?” Saikou asked.</p>
-<p>Pell looked at him.</p>
+<p>Tullo looked at him.</p>
 <p>“For the people whose claims are named,” he said. “Dama and the
 others. They’ll want to know where to apply.”</p>
 <p>“That’s many copies.”</p>
 <p>“Yes.”</p>
-<p>Pell took off his spectacles and wiped them on his sleeve. “The
+<p>Tullo took off his spectacles and wiped them on his sleeve. “The
 office will charge.”</p>
 <p>Saikou looked at his nearly empty purse. Nera said the Quiet Seal
 would pay for notices naming the cause and its examining desk, not for
 reconstructing every individual account. It would pay a clerk to sit
 twice a week in the hospice vestibule and help people read the notice.
-Pell nodded. He could arrange that. He did not volunteer to do all of it
-himself.</p>
+Tullo nodded. He could arrange that. He did not volunteer to do all of
+it himself.</p>
 <p>That afternoon he returned with Nera to the store-room where they had
 left the carrier’s rejected mirror. The cloth was dry. The witnessed
 line had held. He did not uncover the glass to celebrate either fact.
@@ -6892,8 +6909,8 @@ table.</p>
 <p>His mother was downstairs again, speaking to someone at the door.
 Saikou washed, changed his shirt, and went down before she sent for
 him.</p>
-<h3 id="chapter-14-the-thumb-upon-the-page">Chapter 14 — The thumb upon
-the page</h3>
+<h3 id="coda-the-thumb-upon-the-page">Coda — The thumb upon the
+page</h3>
 <p>The first time Livia’s fingerprints changed, she thought she had got
 glue on them.</p>
 <p>She was at her aunt’s kitchen table repairing a little tear in Edda’s
@@ -6955,18 +6972,18 @@ assignments, and she became angry enough to put the letter away before
 finishing it.</p>
 <p>Later she read the rest. It did not make her less angry. It let her
 know what he thought an answer was.</p>
-<p>She began visiting the copy office because Pell needed someone to
+<p>She began visiting the copy office because Tullo needed someone to
 carry completed sheets to the drying racks, and because her aunt wanted
 her out of the house for part of the day. At first she hated both
 reasons. She thought she ought to be permitted to sit by a window until
 she was ready to do something larger than carry papers. Then she
-discovered that the office had a box of spoiled copies and that Pell
+discovered that the office had a box of spoiled copies and that Tullo
 would let her take clean-backed sheets from it for drawing.</p>
 <p>She drew horses. Bad ones, then better ones. She drew Brio’s shield
 with the boss covered. She drew the orange, and found that making an
 orange look round was much harder than making a face look
 frightened.</p>
-<p>Pell taught her how to sort duplicate instruments by registration
+<p>Tullo taught her how to sort duplicate instruments by registration
 rather than subject. Things filed under medicine might be found later
 under grain. Things filed under a dead person’s name might have living
 people depending on them. He did not make these observations into
@@ -6974,9 +6991,9 @@ warnings about her father. He made her put the bundles on the right
 shelf.</p>
 <p>One day she found two copies with different endings.</p>
 <p>The earlier one had a grace extending repayment to the next quarter.
-The later one did not. She called Pell. He called the registrar. The
+The later one did not. She called Tullo. He called the registrar. The
 registrar took both copies upstairs, and Livia never learned whether
-that particular disagreement ended well. But Pell entered the transfer
+that particular disagreement ended well. But Tullo entered the transfer
 of the copies in the daybook and made her check the entry the following
 morning.</p>
 <p>“Otherwise,” he said, “we’ve only discovered a thing and handed it
@@ -7040,15 +7057,14 @@ put her gloved thumb on the page to hold it flat, and wrote the number
 where the next clerk would find it.</p>
 <h2 id="appendix-names-and-terms">Appendix — Names and terms</h2>
 <p>Optional reference arranged by case. The recurring patrons are listed
-first, then each local household. These are introductions, not Saikou’s
-diagnoses or a record of the cases’ outcomes.</p>
+first, then each local household.</p>
 <h3 id="across-the-cases">Across the cases</h3>
 <p><strong>Saikou Ira</strong> — An experienced invoker and exorcist
 whose work takes him between shrines, households and public authorities.
 His four patrons impose different limits on what he can ask and
 establish.</p>
 <p><strong>The Witness</strong> — A patron Saikou approaches through
-reflected observation. Seeing an act does not establish its motive.</p>
+reflected observation.</p>
 <p><strong>The Traveler</strong> — A patron of passage and paths;
 assistance does not remove the hazards of a journey.</p>
 <p><strong>The Sentinel</strong> — A patron invoked for witnessed
@@ -7061,14 +7077,13 @@ knife serve different purposes.</p>
 <h3 id="the-lamplighters-echo-1">The Lamplighter’s Echo</h3>
 <p><strong>Vent-Deep</strong> — A mining settlement where older workings
 lie beneath the routes still in use.</p>
-<p><strong>Sanna; Edran</strong> — A baker and her late husband, a
+<p><strong>Sanna; Hallan</strong> — A baker and her late husband, a
 lamplighter. Their daughter lives elsewhere.</p>
 <p><strong>Maela</strong> — Sanna’s neighbor, with a household and work
 of her own.</p>
-<p><strong>Harken Veth; Derren; Neth</strong> — The mine official, gate
-warden and under-mason respectively. Their responsibilities overlap
-without being interchangeable.</p>
-<p><strong>Pella; Corren</strong> — The archive clerk and the young man
+<p><strong>Harken Veth; Derren; Gorm</strong> — The mine official, gate
+warden and under-mason respectively.</p>
+<p><strong>Marit; Corren</strong> — The archive clerk and the young man
 serving at the chapel.</p>
 <p><strong>Lumenor; Aven</strong> — The Keeper of the Under-Altars, who
 speaks in bell tones, and the woman who interprets them.</p>
@@ -7079,11 +7094,11 @@ not be a person capable of answering questions.</p>
 coast.</p>
 <p><strong>Zel; Anja</strong> — A woman living with a dangerous hunger
 and her mother, who brings food into the drains.</p>
-<p><strong>Old Kes; Hadrik</strong> — A dockmaster and a foreman
+<p><strong>Old Gidon; Hadrik</strong> — A dockmaster and a foreman
 concerned with the yard, its workforce and the channel.</p>
 <p><strong>Omi; Leto</strong> — A carer and a young worker drawn into
 Zel’s care.</p>
-<p><strong>Dalia; Neral; Isha</strong> — An advocate, a harbor syndic
+<p><strong>Dalia; Ostin; Isha</strong> — An advocate, a harbor syndic
 and the Lethai-ar keeper of the mirror house.</p>
 <p><strong>Varo</strong> — A slaughterman whose supplies require
 payment, transport and planning.</p>
@@ -7099,11 +7114,10 @@ prisoner, her father the Censor, and her late mother.</p>
 <p><strong>Edda; Rhea</strong> — Livia’s cousin and a longtime household
 servant.</p>
 <p><strong>Sister Nera; Severian</strong> — A sister of the Quiet Seal
-and the Inquisitor. Their offices give them different responsibilities
-toward Livia.</p>
+and the Inquisitor.</p>
 <p><strong>Brio; Dama</strong> — A prison guard and his aunt, whose
 weaving shop figures in the inquiry.</p>
-<p><strong>Pell; Sabina</strong> — A clerk and a mirror-maker whose
+<p><strong>Tullo; Sabina</strong> — A clerk and a mirror-maker whose
 practical skills the investigation requires.</p>
 <p><strong>The Lame King</strong> — A ruler whose surviving authority
 depends on what others can be made to acknowledge publicly.</p>
