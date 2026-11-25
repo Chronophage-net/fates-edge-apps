@@ -193,21 +193,41 @@
 .fiction-copyright h2 { font-size: 1.25rem; }
 @media print { .fiction-title-page, .fiction-copyright { break-after: page; min-height: 70vh; border: 0; } }
 </style>
-</head>
-<body>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Novels &amp; Novellas · long-form fiction</strong></p><p>Standalone fiction. Copyright Nicholas A. Gasper. All rights reserved.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">Paget</a></li><li><a href="#fiction-copyright-heading">Copyright</a></li><li><a href="#reader-section-3">Paget</a></li><li><a href="#reader-section-4">BREATH ONE The Condolence</a></li><li><a href="#reader-section-5">BREATH TWO How a Room Is Arranged</a></li><li><a href="#reader-section-6">BREATH THREE The Marriage of Vaelrie Longblood</a></li><li><a href="#reader-section-7">BREATH FOUR A Morning When the House Is Empty</a></li><li><a href="#reader-section-8">BREATH FIVE Close to My Heart</a></li><li><a href="#reader-section-9">CODA A Note on the Reckoning</a></li><li><a href="#reader-section-10">Appendix — Finding names in the Avimont file</a></li></ul></details>
 <div class="fiction-frontmatter">
-<section class="fiction-title-page" aria-label="Title page">
-<p>Fate’s Edge · Novels &amp; Novellas</p><h1>Paget</h1>
+<section aria-label="Title page" class="fiction-title-page">
+<p>Fate’s Edge · Novels &amp; Novellas</p><h1 id="reader-section-1">Paget</h1>
 <p>by Nicholas A. Gasper</p><p><a href="#fiction-copyright">Copyright and edition</a></p>
 </section>
-<section class="fiction-copyright" id="fiction-copyright" aria-labelledby="fiction-copyright-heading">
+<section aria-labelledby="fiction-copyright-heading" class="fiction-copyright" id="fiction-copyright">
 <h2 id="fiction-copyright-heading">Copyright</h2>
-<p><strong>Paget</strong><br>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+<p><strong>Paget</strong><br/>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
 <p>This work of fiction, including its prose, original characters and setting, is proprietary content. It is not part of the Creative Commons-licensed Fate’s Edge System Reference Document.</p>
 <p>No part of this work may be reproduced or distributed without the copyright holder’s written permission, except as permitted by law.</p>
 <p>Digital reading edition · 2026</p>
 </section></div>
-<h1>Paget</h1>
+<h1 id="reader-section-3">Paget</h1>
 <h4>A Correspondence of the Belworth, in five breaths</h4>
 <hr class="scene-rule"/>
 <p><strong>A note on the sources.</strong> What follows is the Avimont file: forty-five items in one folder, kept together, kept in order, and kept by the woman who had the most to lose by keeping them.</p>
@@ -218,7 +238,7 @@
 <p><strong>A note on the names.</strong> The girl was christened Vaelrie Longblood, third child and second daughter of Valdais Longblood, Duke of Adria, by his first wife Madilyn of Ethor, who died before the child was two. She had a brother, Ouen, who would have Adria, and a sister, Maegwen, married into the Ravynes; and the woman who raised her was not her mother. She signed herself <em>Vaelrie</em> to strangers and <em>Paget</em> to her father's household, which called her nothing else, because she was never anywhere but at his elbow. A paget is a boy who carries a man's things and stands where he can be seen from. Her father gave her the name when she was six and meant it kindly.</p>
 <p>For ten years she accompanied her father. His whereabouts were part of her daily life.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">BREATH ONE</span>The Condolence</h2>
+<h2 id="reader-section-4"><span class="movement-kicker">BREATH ONE</span>The Condolence</h2>
 <hr class="scene-rule"/>
 <p>The first letter in the folder is an instrument of state and reads like one. It is in the girl's hand and it is not in the girl's voice. The substance was certainly given to her; the phrase <em>the anxiety the realm must share</em> appears in four other Adrian letters of concern that autumn, three of them signed by men, and one of them by her brother.</p>
 <hr class="scene-rule"/>
@@ -322,7 +342,7 @@
 <p>The third hand in the folder is the girl's own, and it appears at the bottom of this letter, and what it has written is: <em>begun dating my letters.</em></p>
 <p>No request for dates survives in the correspondence. From this letter onward, Vaelrie supplies them herself. Her letters can now be placed against the household movements in the muster rolls.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">BREATH TWO</span>How a Room Is Arranged</h2>
+<h2 id="reader-section-5"><span class="movement-kicker">BREATH TWO</span>How a Room Is Arranged</h2>
 <hr class="scene-rule"/>
 <p>Winter quarters. The Duke of Adria came back to Avimont in the second week of Decis and the household closed around him, and for four months the correspondence has almost nothing in it but a house.</p>
 <p>This is the part of the file that the Censor's Hall, when it finally read the thing in 847, skipped. There is a marginal note in the Hall's hand at the head of Letter XII which says <em>domestic — no matter here</em>. The Hall was looking for the crossing. It found the crossing. It did not understand that the crossing is in these letters and not in the later ones, and that by the time anybody writes down a date the work has been done for five months.</p>
@@ -408,7 +428,7 @@
 <p>The request is made in the fifth month. It is made warmly, it is made after an intimacy rather than before one, and it is made for a stated reason which is true: Jaennis Fenwood was at Valvano House through that winter on her uncle's arrangement, and her society was in fact written down.</p>
 <p>What she received, over the following three letters, was a list of the Duke of Adria's personal household: riders, body-servants, the men who slept across his door, his physician, his post-rider, the boy who did his boots. Vaelrie supplied marriages, habits, nicknames. The list runs to eleven pages.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">BREATH THREE</span>The Marriage of Vaelrie Longblood</h2>
+<h2 id="reader-section-6"><span class="movement-kicker">BREATH THREE</span>The Marriage of Vaelrie Longblood</h2>
 <hr class="scene-rule"/>
 <p>In Cinaria of 841 the Duchess of Adria opened negotiations for her stepdaughter's marriage.</p>
 <p>The man was Corbin Woodgate, forty-one, of the Ethorian Longbloods, a widower with land on the right side of the river and a temper that appears in two separate depositions and in none of the marriage papers. The match was sound. It cost Adria nothing and bought it a bridge.</p>
@@ -495,7 +515,7 @@
 <p>From Letter XXII onward, Vaelrie volunteers her position, describes the house, and says how long they expect to stay. Jaennis does not repeat the question.</p>
 <p>The Censor's Hall, reading this file six years later in search of a crime, wrote in the margin here: <em>no matter here.</em></p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">BREATH FOUR</span>A Morning When the House Is Empty</h2>
+<h2 id="reader-section-7"><span class="movement-kicker">BREATH FOUR</span>A Morning When the House Is Empty</h2>
 <hr class="scene-rule"/>
 <p>The Duke of Adria left Avimont on the nineteenth of Floralis with the spring muster and went east through Ethor and Istovar. His daughter went with him as far as Sennet, a requisitioned grange four miles back from the water, which served as his house for five weeks.</p>
 <p>Nine letters were written from Sennet. They are the warmest in the file and they are the last happy ones.</p>
@@ -572,7 +592,7 @@
 <p>The woman of the Lady Jaennis Fenwood's household who had been condemned for poisoning was already dead. Her sentence had been carried out in Lavius of the previous year, in another place and at an hour set down in its own register.</p>
 <p>No document in this folder connects the three. No document anywhere connects the three. The cart and the crossing share a morning; the execution belongs to the previous summer. The dates are all this edition intends to supply.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">BREATH FIVE</span>Close to My Heart</h2>
+<h2 id="reader-section-8"><span class="movement-kicker">BREATH FIVE</span>Close to My Heart</h2>
 <hr class="scene-rule"/>
 <p><strong>XXVII. Vaelrie Longblood to Jaennis Fenwood. The sixth of Lavius, 841, from the water below Marcott.</strong></p>
 <p>Jaennis,</p>
@@ -671,7 +691,7 @@
 <p>It is dated the third of Cinaria, 841.</p>
 <p>Six days before the girl wrote to her about Corbin Woodgate.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">CODA</span>A Note on the Reckoning</h2>
+<h2 id="reader-section-9"><span class="movement-kicker">CODA</span>A Note on the Reckoning</h2>
 <hr class="scene-rule"/>
 <p>Vaelrie Longblood lived in Jaennis Fenwood's house for the rest of the period covered by any record here. She did not marry. She kept the household books from 844 and kept them very well; four of her ledgers survive and they are the work of a person who counted five times.</p>
 <p>She was called Paget by nobody after 841, and she signed herself <em>V. Longblood</em>, plainly, in every hand she ever wrote again, including in the ledgers, where a clerk is not required to sign at all.</p>
@@ -680,7 +700,7 @@
 <p class="marginalia"><em>Which one.</em></p>
 <p>That is all there is. Nine months, thirty letters, thirty-one men at a gravel bar and a woman somewhere else the same morning, a chair bought on an ordinary Hammer day for no reason, a collar left off at noon because the kitchen was hot, and a joke a man made for twenty years about three verses that were not there.</p>
 <hr class="scene-rule"/>
-<h2>Appendix — Finding names in the Avimont file</h2>
+<h2 id="reader-section-10">Appendix — Finding names in the Avimont file</h2>
 <p class="marginalia"><em>A finding sheet for the numbered correspondence. The numbering of the surviving items is unchanged.</em></p>
 <p><strong>Vaelrie Longblood; Paget.</strong> One correspondent. “Paget” is the household name given by her father. Search both forms; neither has been substituted for the other in a signature.</p>
 <p><strong>Jaennis Fenwood.</strong> Recipient of Vaelrie’s letters and keeper of the file. Her outgoing press-copies are also present. A press-copy is a retained copy of a sent letter, not a second letter sent to its recipient.</p>
@@ -689,5 +709,5 @@
 <p><strong>Ouen; Maegwen.</strong> Vaelrie’s elder brother and sister. Maegwen married into the Ravynes.</p>
 <p><strong>Baldvyn Brightstride.</strong> Jaennis’s husband. Not Baldvyn the Good.</p>
 <p>There are forty-five numbered items, not forty-five letters. Thirty-five are letters; this edition prints thirty from the two women and the first of the Duke’s five. The remaining ten items are household papers. A continuous number establishes where a sheet was kept. It does not supply a date where none was written.</p>
-</body>
+</article></body>
 </html>

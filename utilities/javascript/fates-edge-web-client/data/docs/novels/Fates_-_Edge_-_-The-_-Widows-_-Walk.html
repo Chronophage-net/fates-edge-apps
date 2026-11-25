@@ -193,27 +193,47 @@
 .fiction-copyright h2 { font-size: 1.25rem; }
 @media print { .fiction-title-page, .fiction-copyright { break-after: page; min-height: 70vh; border: 0; } }
 </style>
-</head>
-<body>
+<style data-fe-reader-added="styles">
+.fe-reading-document { line-height: 1.75; min-width: 0; overflow-wrap: break-word; }
+.fe-reading-document h1 { margin-top: 3.5rem; margin-bottom: 1.2rem; line-height: 1.25; }
+.fe-reading-document h2 { margin-top: 3rem; margin-bottom: 1rem; padding-top: .6rem; line-height: 1.3; }
+.fe-reading-document h3 { margin-top: 2.2rem; margin-bottom: .8rem; line-height: 1.35; }
+.fe-reading-document h4, .fe-reading-document h5, .fe-reading-document h6 { margin-top: 1.7rem; margin-bottom: .6rem; }
+.fe-reading-document p { margin-block: .8rem; }
+.fe-reading-document li { margin-block: .35rem; }
+.fe-reading-document :target { scroll-margin-top: 2rem; }
+.fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { padding: 1rem 1.2rem; margin-block: 1.2rem 2rem; border: 1px solid var(--border, #888); border-radius: .5rem; font-family: system-ui, sans-serif; text-align: start; font-size: .95rem; line-height: 1.6; }
+.fe-reading-document .fe-reader-note p { margin: .5rem 0; }
+.fe-reading-document .fe-reader-note nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.fe-reading-document .fe-reader-contents summary { cursor: pointer; font-weight: 600; }
+.fe-reading-document .fe-reader-contents ul { padding-inline-start: 1.3rem; }
+.fe-reading-document .fe-table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2rem; }
+.fe-reading-document .fe-table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fe-reading-document img { max-width: 100%; height: auto; }
+.fe-reading-document pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) { .fe-reading-document h1 { font-size: 1.8rem; } .fe-reading-document h2 { font-size: 1.5rem; } .fe-reading-document .fe-reader-note { padding: .8rem; } }
+@media print { .fe-reading-document .fe-reader-note, .fe-reading-document .fe-reader-contents { display: none; } .fe-reading-document h1, .fe-reading-document h2, .fe-reading-document h3 { break-after: avoid; } .fe-reading-document .fe-table-scroll { overflow: visible; } }
+</style></head>
+<body><article class="fe-reading-document" data-fe-reader-wrapper="content"><aside aria-label="Reading context" class="fe-reader-note" data-fe-reader-added="orientation"><p><strong>Novels &amp; Novellas · long-form fiction</strong></p><p>Standalone fiction. Copyright Nicholas A. Gasper. All rights reserved.</p><nav aria-label="Library reading links"><a href="../resources/Reading-Guide.html">Where to start: library reading guide</a><a href="../srd/index.html">Core mechanic</a><a href="../complete-worldbook/index.html">Setting: Travel / Worldbook</a></nav></aside><details class="fe-reader-contents" data-fe-reader-added="contents"><summary>On this page</summary><ul><li><a href="#reader-section-1">The Widow's Walk</a></li><li><a href="#fiction-copyright-heading">Copyright</a></li><li><a href="#reader-section-3">The Widow's Walk</a></li><li><a href="#reader-section-4">NIGHT ONE The Gift That Came Down With the Monsoon</a></li><li><a href="#reader-section-5">NIGHT TWO The Year the Rot Came Up the Bay</a></li><li><a href="#reader-section-6">NIGHT THREE The Iron Country</a></li><li><a href="#reader-section-7">NIGHT FOUR What You May Not Take Back</a></li><li><a href="#reader-section-8">NIGHT FIVE An Even Exchange</a></li><li><a href="#reader-section-9">A NOTE ON THE TELLING</a></li><li><a href="#reader-section-10">Appendix — Names and terms</a></li></ul></details>
 <div class="fiction-frontmatter">
-<section class="fiction-title-page" aria-label="Title page">
-<p>Fate’s Edge · Novels &amp; Novellas</p><h1>The Widow&#x27;s Walk</h1>
+<section aria-label="Title page" class="fiction-title-page">
+<p>Fate’s Edge · Novels &amp; Novellas</p><h1 id="reader-section-1">The Widow's Walk</h1>
 <p>by Nicholas A. Gasper</p><p><a href="#fiction-copyright">Copyright and edition</a></p>
 </section>
-<section class="fiction-copyright" id="fiction-copyright" aria-labelledby="fiction-copyright-heading">
+<section aria-labelledby="fiction-copyright-heading" class="fiction-copyright" id="fiction-copyright">
 <h2 id="fiction-copyright-heading">Copyright</h2>
-<p><strong>The Widow&#x27;s Walk</strong><br>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
+<p><strong>The Widow's Walk</strong><br/>Copyright © 2026 Nicholas A. Gasper. All rights reserved.</p>
 <p>This work of fiction, including its prose, original characters and setting, is proprietary content. It is not part of the Creative Commons-licensed Fate’s Edge System Reference Document.</p>
 <p>No part of this work may be reproduced or distributed without the copyright holder’s written permission, except as permitted by law.</p>
 <p>Digital reading edition · 2026</p>
 </section></div>
-<h1>The Widow's Walk</h1>
+<h1 id="reader-section-3">The Widow's Walk</h1>
 <h4>A Tale of the Grain Covenant, told in five nights</h4>
 <hr class="scene-rule"/>
 <p><strong>A note on the sources.</strong> This is the telling of Obi Diallo, who had it of his mother, who had it of Sekou Diallo her uncle, who was a boy carrying water at the weigh-house at Mbaro in the year the barges did not move. Four tellings of it are written down. They do not agree. This is the longest and it is not the kindest, and it is the one in which the old woman is permitted to interrupt.</p>
 <p>Where she interrupts, it is set down. Where the teller refuses, that is set down too.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">NIGHT ONE</span>The Gift That Came Down With the Monsoon</h2>
+<h2 id="reader-section-4"><span class="movement-kicker">NIGHT ONE</span>The Gift That Came Down With the Monsoon</h2>
 <hr class="scene-rule"/>
 <p>Sit. Sit, the fire is not for looking at.</p>
 <p>You have paid, Chidi Toure, and you will be praised, and the praise will be true, which is more than most men get for their money. Your grandfather's grandfather weighed grain honestly at the Mudflat station for thirty years and was never once written up, and a man whose people were never written up may sit closest to the fire on the first night. That is the whole of the praise. If you want more you may buy it from a worse man than me.</p>
@@ -324,7 +344,7 @@
 <hr class="scene-rule"/>
 <p>Sleep. Come back tomorrow. Bring your own fire-wood; Chidi Toure has paid for the telling, not for the burning.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">NIGHT TWO</span>The Year the Rot Came Up the Bay</h2>
+<h2 id="reader-section-5"><span class="movement-kicker">NIGHT TWO</span>The Year the Rot Came Up the Bay</h2>
 <hr class="scene-rule"/>
 <p>You came back. Good. Sit where you sat; a fire remembers where people sat and it is bad luck to teach it otherwise.</p>
 <p>Last night I left them on a gallery being correct at each other. Two years passed. I am going to spend them in four breaths, because a teller who gives you every year gives you no years.</p>
@@ -440,7 +460,7 @@
 <hr class="scene-rule"/>
 <p>Go. Come back.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">NIGHT THREE</span>The Iron Country</h2>
+<h2 id="reader-section-6"><span class="movement-kicker">NIGHT THREE</span>The Iron Country</h2>
 <hr class="scene-rule"/>
 <p>The mountain people came in the tenth year.</p>
 <p>Now, you have all seen an Aeler. You have seen the factors at the Brass Gate and the ones who buy the low-grade millet for their under-farms, and you think you know what they are.</p>
@@ -550,7 +570,7 @@
 <p>Enough. The fire is low and tomorrow is the long night.</p>
 <p>Tomorrow she goes down the stair and does not come back up the same woman, and I am going to tell you the name of the woman she went to see.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">NIGHT FOUR</span>What You May Not Take Back</h2>
+<h2 id="reader-section-7"><span class="movement-kicker">NIGHT FOUR</span>What You May Not Take Back</h2>
 <hr class="scene-rule"/>
 <p>First, a correction, and do not smile at me.</p>
 <p>Last night but one I said she saw it in the tenth year. That was wrong. It was the thirteenth. I am old and the tenth year is the year the mountain came and my mouth went to it.</p>
@@ -691,7 +711,7 @@
 <p>Tomorrow is the last night.</p>
 <p>Tomorrow the woman in red comes up the stair a second time.</p>
 <hr class="scene-rule"/>
-<h2><span class="movement-kicker">NIGHT FIVE</span>An Even Exchange</h2>
+<h2 id="reader-section-8"><span class="movement-kicker">NIGHT FIVE</span>An Even Exchange</h2>
 <hr class="scene-rule"/>
 <p>Before I begin.</p>
 <p>There is a woman in red sitting at the back, beyond Fatou Kamara, where the light does not reach. She came on the second night and she has come every night since and she has not eaten anything and she has not asked me for anything.</p>
@@ -829,13 +849,13 @@
 <hr class="scene-rule"/>
 <p class="marginalia"><em>Here ends The Widow's Walk.</em></p>
 <hr class="scene-rule"/>
-<h2>A NOTE ON THE TELLING</h2>
+<h2 id="reader-section-9">A NOTE ON THE TELLING</h2>
 <p><strong>Order.</strong> This stands alone. It is not of the Belworth.</p>
 <p><strong>What it is for.</strong> Oshiira's generator already says the Widow has held the confederacy together for centuries, that the Vermilion Corps guards the covenant and not the grain, and that a page of the Great Tally has gone missing and the Corps has hunted it for nine years. This tale is the origin of the first two and deliberately does not touch the third. The missing page is not in here and should not be put here.</p>
 <p><strong>The four tellings</strong> are not supplied in full. A passage from the lower-landing version appears on the second night. The principal disagreements concern whether the father wept, whether she loved him, what the private account was for, and whether the exchange was ever said.</p>
 <p><strong>At a table.</strong> The laying of an information is the handout. Any person may lay it, it must be about a figure and not a man, it is read back, and it cannot be withdrawn by anybody including the person who laid it. Hand a player that rule and a figure that does not reconcile.</p>
 <hr class="scene-rule"/>
-<h2>Appendix — Names and terms</h2>
+<h2 id="reader-section-10">Appendix — Names and terms</h2>
 <p>Optional reference to the people speaking at the fire and the people they speak about. The chain of tellers is kept separate from the events they recount. These notes do not arbitrate between Obi’s account and the objections to it.</p>
 <h3>Dramatis Personae</h3>
 <p><strong>Amara Bangura</strong> — A commander of the Corps.</p>
@@ -848,5 +868,5 @@
 <p><strong>Corps</strong> — The body to which the disputed accounting is brought.</p>
 <p><strong>Grain Covenant</strong> — The arrangements governing the grain and the obligations contested in the tale.</p>
 <p><strong>Holder</strong> — Idriss’s office within those arrangements.</p>
-</body>
+</article></body>
 </html>
