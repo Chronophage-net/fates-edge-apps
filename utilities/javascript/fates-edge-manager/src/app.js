@@ -5,13 +5,43 @@ import { fileURLToPath } from 'node:url';
 import { digest, equal, secret, text, uuid, requireThat, roles, scopesFor, password as passwordValue } from './security.js';
 import { installSSO } from './sso.js';
 import { verifyPassword } from './passwords.js';
+import { silentLogger } from './log.js';
 
 const one = async (db, sql, values = []) => (await db.query(sql, values)).rows[0];
 const many = async (db, sql, values = []) => (await db.query(sql, values)).rows;
 const expires = seconds => new Date(Date.now() + seconds * 1000);
 const safeKeyFields = 'id, membership_id, display_prefix, label, scopes, status, expires_at, last_used_at, created_at';
 
-export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, providers = [], oidcFetch }) {
+// Placement and live columns joined onto a room row (alias r) so the
+// dashboard can say where the room is and whether anyone is playing.
+const LIVE_JOIN = `LEFT JOIN room_placements lp ON lp.room_id=r.id LEFT JOIN socket_nodes ln ON ln.server_id=lp.server_id`;
+const LIVE_FIELDS = `lp.room_id IS NOT NULL AS placed, lp.status AS placement_status, ln.name AS node_name,
+  (ln.status IN ('ready','draining') AND ln.last_heartbeat_at>now()-interval '60 seconds') AS node_online,
+  lp.live_clients, lp.live_bots, lp.live_adventure, lp.live_reported_at,
+  (lp.live_reported_at>now()-interval '90 seconds') AS live_fresh`;
+
+/**
+ * One state per room for the dashboard. A room nobody is in is "idle"
+ * (not open right now), which is normal, not an error.
+ *   unplaced  never opened on a game server yet
+ *   offline   its game server is down or taken offline
+ *   live      people are connected now
+ *   idle      on a healthy server, nobody connected
+ */
+export function liveState(row) {
+  if (!row.placed) return { state: 'unplaced' };
+  if (!row.node_online || row.placement_status !== 'assigned') return { state: 'offline', node: row.node_name || null };
+  if (row.live_fresh && row.live_clients > 0) {
+    return { state: 'live', clients: row.live_clients, bots: row.live_bots || 0, adventure: row.live_adventure || null, node: row.node_name, reported_at: row.live_reported_at };
+  }
+  return { state: 'idle', node: row.node_name };
+}
+const withLive = row => {
+  const { placed, placement_status, node_name, node_online, live_clients, live_bots, live_adventure, live_reported_at, live_fresh, ...rest } = row;
+  return { ...rest, live: liveState(row) };
+};
+
+export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, providers = [], oidcFetch, log = silentLogger }) {
   requireThat(pepper?.length >= 32, 500, 'Manager pepper must contain at least 32 characters');
   const app = express();
   app.disable('x-powered-by');
@@ -23,6 +53,20 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   const hash = value => digest(value, pepper);
   const dummyPasswordHash = argon2.hash(secret());
   const cookie = (req, name) => (req.headers.cookie || '').split(';').map(v => v.trim()).find(v => v.startsWith(`${name}=`))?.slice(name.length + 1);
+  // One console line per request. The route template is logged, never the
+  // raw URL: paths such as /v1/invitations/:token/accept carry secrets.
+  app.use((req, res, next) => {
+    const started = process.hrtime.bigint();
+    res.on('finish', () => {
+      const route = req.route ? req.route.path : (req.path.startsWith('/v1') ? '(unmatched /v1 route)' : req.path);
+      const fields = { status: res.statusCode, ms: Number((process.hrtime.bigint() - started) / 1000000n), request_id: req.requestId, ...(req.account ? { account: req.account.username } : {}) };
+      const internal = route.startsWith('/v1/internal/') || route === '/health';
+      // 503 means no game server could take the room: worth seeing, not a bug.
+      const level = res.statusCode === 503 ? 'warn' : res.statusCode >= 500 ? 'error' : internal || (req.method === 'GET' && res.statusCode < 400) ? 'debug' : 'info';
+      log[level](`${req.method} ${route}`, fields);
+    });
+    next();
+  });
   app.use((req, res, next) => {
     req.requestId = randomUUID();
     res.set({ 'X-Request-ID': req.requestId, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
@@ -124,12 +168,12 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
       const node = await one(tx, `SELECT n.server_id FROM socket_nodes n LEFT JOIN room_placements p ON p.server_id=n.server_id
         WHERE n.status='ready' AND n.last_heartbeat_at>now()-interval '60 seconds'
         GROUP BY n.server_id HAVING count(p.room_id)<n.capacity_rooms ORDER BY count(p.room_id),n.server_id LIMIT 1`);
-      requireThat(node, 503, 'No healthy socket node has capacity');
+      requireThat(node, 503, 'No game server is available to open this room right now. Ask your operator to start one or free up capacity.');
       placement = await one(tx, 'INSERT INTO room_placements(room_id,server_id) VALUES($1,$2) RETURNING *', [member.room_id, node.server_id]);
     }
     const node = await one(tx, `SELECT * FROM socket_nodes WHERE server_id=$1 AND status IN ('ready','draining')
       AND last_heartbeat_at>now()-interval '60 seconds'`, [placement.server_id]);
-    requireThat(node && placement.status === 'assigned', 503, 'The assigned node is unavailable. An operator must restore it.');
+    requireThat(node && placement.status === 'assigned', 503, 'This room’s game server is offline. The room stays assigned to it so nothing is lost; an operator must bring that server back before the room can open.');
     const claims = { sub: member.account_id, room_id: member.room_id, room_code: member.room_code,
       membership_id: member.id, role: member.role, scope: scopes, authz_version: member.authz_version,
       server_id: node.server_id, placement_version: placement.placement_version, ...(keyId ? { key_id: keyId } : {}) };
@@ -175,8 +219,8 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
     const account = await one(tx,'INSERT INTO accounts(id,username,password_hash) VALUES($1,$2,$3) RETURNING id,username', [randomUUID(),username,await argon2.hash(password)]);
     await audit(tx,req,'account.created',null,account.id); return account;
   });
-  route('get', '/v1/me/rooms', 'human', (tx,req) => many(tx, `SELECT r.*,m.role,m.control_role FROM managed_rooms r
-    JOIN room_memberships m ON m.room_id=r.id WHERE m.account_id=$1 AND m.status='active' ORDER BY r.created_at DESC`,[req.account.id]));
+  route('get', '/v1/me/rooms', 'human', async (tx,req) => (await many(tx, `SELECT r.*,m.role,m.control_role,${LIVE_FIELDS} FROM managed_rooms r
+    JOIN room_memberships m ON m.room_id=r.id ${LIVE_JOIN} WHERE m.account_id=$1 AND m.status='active' ORDER BY r.created_at DESC`,[req.account.id])).map(withLive));
   route('post', '/v1/rooms', 'human', async (tx,req) => {
     const room = await one(tx,'INSERT INTO managed_rooms(id,room_code,name) VALUES($1,$2,$3) RETURNING *',
       [randomUUID(),randomBytes(5).toString('hex').toUpperCase(),text(req.body.name)]);
@@ -187,7 +231,8 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
     const member = await context(tx,req,req.params.roomId,false,true);
     const roster = ['owner','administrator'].includes(member.control_role) ? await many(tx, `SELECT m.account_id,a.username,m.role,m.control_role,m.status
       FROM room_memberships m JOIN accounts a ON a.id=m.account_id WHERE m.room_id=$1 ORDER BY a.username`,[member.room_id]) : [];
-    return { ...member, scopes:scopesFor(member), roster:roster.map(m=>({...m,scopes:scopesFor(m)})) };
+    const live = await one(tx, `SELECT ${LIVE_FIELDS} FROM managed_rooms r ${LIVE_JOIN} WHERE r.id=$1`, [member.room_id]);
+    return { ...member, scopes:scopesFor(member), roster:roster.map(m=>({...m,scopes:scopesFor(m)})), live: liveState(live || {}) };
   });
   route('patch', '/v1/rooms/:roomId', 'human', async (tx,req) => {
     const member=await context(tx,req,req.params.roomId,true,true);
@@ -302,11 +347,16 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   });
   route('get','/v1/me/audit','human',(tx,req)=>many(tx,'SELECT action,occurred_at,request_id FROM audit_events WHERE actor_account_id=$1 ORDER BY occurred_at DESC LIMIT 100',[req.account.id]));
   route('get','/v1/nodes','operator',tx=>many(tx,`SELECT n.*,count(p.room_id)::int AS assigned_rooms,
-    (n.last_heartbeat_at>now()-interval '60 seconds') AS healthy FROM socket_nodes n LEFT JOIN room_placements p ON p.server_id=n.server_id GROUP BY n.server_id ORDER BY n.name`));
+    (n.last_heartbeat_at>now()-interval '60 seconds') AS healthy,
+    floor(extract(epoch FROM now()-n.last_heartbeat_at))::int AS heartbeat_age_seconds,
+    count(p.room_id) FILTER (WHERE p.live_clients>0 AND p.live_reported_at>now()-interval '90 seconds')::int AS live_rooms,
+    coalesce(sum(p.live_clients) FILTER (WHERE p.live_reported_at>now()-interval '90 seconds'),0)::int AS live_clients
+    FROM socket_nodes n LEFT JOIN room_placements p ON p.server_id=n.server_id GROUP BY n.server_id ORDER BY n.name`));
   route('get','/v1/nodes/:serverId/rooms','operator',async(tx,req)=>{
     const id=uuid(req.params.serverId);
     requireThat(await one(tx,'SELECT server_id FROM socket_nodes WHERE server_id=$1',[id]),404,'Node not found');
-    return many(tx,`SELECT r.id,r.name,r.room_code,r.status,p.placement_version,p.status AS placement_status
+    return many(tx,`SELECT r.id,r.name,r.room_code,r.status,p.placement_version,p.status AS placement_status,
+      CASE WHEN p.live_reported_at>now()-interval '90 seconds' THEN p.live_clients ELSE 0 END AS live_clients
       FROM room_placements p JOIN managed_rooms r ON r.id=p.room_id WHERE p.server_id=$1 ORDER BY r.name`,[id]);
   });
   route('patch','/v1/nodes/:serverId','operator',async(tx,req)=>{
@@ -326,6 +376,16 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   route('post','/v1/internal/nodes/:serverId/heartbeat','service',async(tx,req)=>{
     const node=await one(tx,'UPDATE socket_nodes SET last_heartbeat_at=now() WHERE server_id=$1 RETURNING server_id',[req.serverId]);
     requireThat(node,404,'Register the node first');
+    // Live report: who is connected to each room. Only rooms placed on
+    // this node are updated; anything it does not mention is not open.
+    const reported=Array.isArray(req.body.rooms) ? req.body.rooms.slice(0,10000) : [];
+    const count=v=>Number.isInteger(v) && v>=0 && v<=100000 ? v : 0;
+    const live=reported.filter(r=>r && typeof r.room_id==='string' && /^[0-9a-f-]{36}$/i.test(r.room_id));
+    await tx.query(`UPDATE room_placements SET live_clients=0,live_bots=0,live_adventure=NULL,live_reported_at=now() WHERE server_id=$1`,[req.serverId]);
+    for (const r of live) {
+      await tx.query(`UPDATE room_placements SET live_clients=$3,live_bots=$4,live_adventure=$5,live_reported_at=now() WHERE server_id=$1 AND room_id=$2`,
+        [req.serverId,r.room_id,count(r.clients),Math.min(count(r.bots),count(r.clients)),typeof r.adventure==='string' ? r.adventure.slice(0,200) : null]);
+    }
     return many(tx,`SELECT p.*,r.room_code,r.authz_version,CASE WHEN n.status='offline' THEN 'suspended' ELSE r.status END AS room_status
       FROM room_placements p JOIN managed_rooms r ON r.id=p.room_id JOIN socket_nodes n ON n.server_id=p.server_id WHERE p.server_id=$1`,[req.serverId]);
   });
@@ -335,6 +395,9 @@ export function createApp({ db, tokens, origin, pepper, nodeCredentials = {}, pr
   app.use((error,req,res,next)=>{
     if (res.headersSent) return next(error);
     const status=error.status || (error.code==='23505'?409:500);
+    // Server errors are answered with a generic message; the cause goes to
+    // the console with the request id the user sees, so it can be traced.
+    if (status >= 500 && !error.status) log.error('Request failed', { request_id: req.requestId, error });
     const message = error.type === 'entity.parse.failed' ? 'Invalid JSON request body'
       : error.type === 'entity.too.large' ? 'Request body is too large'
       : status >= 500 ? 'Request failed' : error.code === '23505' ? 'That record already exists' : error.message;

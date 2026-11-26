@@ -50,6 +50,12 @@ CREATE TABLE IF NOT EXISTS room_placements (
   placement_version integer NOT NULL DEFAULT 1,
   status text NOT NULL DEFAULT 'assigned' CHECK(status IN ('assigned','unavailable'))
 );
+-- What the node last reported about the room: who is connected right now.
+-- Counts and an adventure title only; no names or game content.
+ALTER TABLE room_placements ADD COLUMN IF NOT EXISTS live_clients integer NOT NULL DEFAULT 0;
+ALTER TABLE room_placements ADD COLUMN IF NOT EXISTS live_bots integer NOT NULL DEFAULT 0;
+ALTER TABLE room_placements ADD COLUMN IF NOT EXISTS live_adventure text;
+ALTER TABLE room_placements ADD COLUMN IF NOT EXISTS live_reported_at timestamptz;
 CREATE TABLE IF NOT EXISTS audit_events (
   id uuid PRIMARY KEY, actor_account_id uuid REFERENCES accounts(id), room_id uuid REFERENCES managed_rooms(id),
   action text NOT NULL, target_id text, request_id uuid NOT NULL, occurred_at timestamptz NOT NULL DEFAULT now()

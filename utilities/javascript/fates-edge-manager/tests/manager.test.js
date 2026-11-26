@@ -173,6 +173,10 @@ test('real Socket.IO, plain WebSocket and REST enforce manager claims',async t=>
   assert.equal((await fetch(url,{headers:{Authorization:`Bearer ${grant.data.room_token}`}})).status,200);
   assert.equal((await fetch(url.replace(roomA.room_code,roomB.room_code),{headers:{Authorization:`Bearer ${grant.data.room_token}`}})).status,403);
   assert.equal((await fetch(`${url}?apiKey=legacy`,{headers:{Authorization:`Bearer ${grant.data.room_token}`}})).status,403);
+  // The node's next heartbeat tells the manager who is connected.
+  await node.refresh();
+  const live=(await request('/v1/me/rooms','GET',null,alice)).data.find(r=>r.id===roomA.id).live;
+  assert.equal(live.state,'live');assert.equal(live.clients,2);
 });
 
 test('owners manage integration keys for active members without widening their scopes',async()=>{
@@ -234,4 +238,34 @@ test('configuration rejects origins with paths and node registration rejects mal
   assert.throws(()=>createApp({db,tokens,origin:base+'/path',pepper:'p'.repeat(48)}),/exact HTTP/);
   const result=await request('/v1/internal/nodes/register','POST',{server_id:nodeId,public_url:'not a URL'},null,{Authorization:`Bearer ${nodeKey}`});
   assert.equal(result.status,400);
+});
+
+test('nodes report who is connected; rooms read as live, idle or offline, never as an error',async()=>{
+  const beat=rooms=>fetch(`${base}/v1/internal/nodes/${nodeId}/heartbeat`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${nodeKey}`},body:JSON.stringify({rooms})});
+  const liveOf=async()=>((await request('/v1/me/rooms','GET',null,alice)).data.find(r=>r.id===roomA.id)||{}).live;
+  // A room nobody has opened on a game server yet.
+  const fresh=(await request('/v1/rooms','POST',{name:'Unopened'},alice)).data;
+  assert.equal((await request('/v1/me/rooms','GET',null,alice)).data.find(r=>r.id===fresh.id).live.state,'unplaced');
+
+  assert.equal((await beat([{room_id:roomA.id,clients:3,bots:1,adventure:'The Salt Road'}])).status,200);
+  assert.deepEqual(await liveOf().then(l=>({state:l.state,clients:l.clients,bots:l.bots,adventure:l.adventure})),{state:'live',clients:3,bots:1,adventure:'The Salt Road'});
+  assert.equal((await request(`/v1/rooms/${roomA.id}`,'GET',null,alice)).data.live.state,'live');
+  const nodes=(await request('/v1/nodes','GET',null,alice)).data.find(n=>n.server_id===nodeId);
+  assert.equal(nodes.live_rooms,1);assert.equal(nodes.live_clients,3);
+  assert.ok(nodes.heartbeat_age_seconds>=0);
+
+  // A node cannot report rooms placed elsewhere.
+  await beat([{room_id:fresh.id,clients:9}]);
+  assert.equal((await request('/v1/me/rooms','GET',null,alice)).data.find(r=>r.id===fresh.id).live.state,'unplaced');
+  // Everyone left: the room is simply not open right now.
+  assert.equal((await liveOf()).state,'idle');
+
+  // The node stops reporting: its rooms read as offline, still assigned.
+  await db.query("UPDATE socket_nodes SET last_heartbeat_at=now()-interval '5 minutes' WHERE server_id=$1",[nodeId]);
+  const offline=await liveOf();assert.equal(offline.state,'offline');assert.equal(offline.node,'Test node');
+  await beat([]);assert.equal((await liveOf()).state,'idle');
+
+  // Malformed reports are ignored, not trusted.
+  assert.equal((await beat([{room_id:'not-a-uuid',clients:5},{room_id:roomA.id,clients:-4,bots:99}])).status,200);
+  assert.equal((await liveOf()).state,'idle');
 });

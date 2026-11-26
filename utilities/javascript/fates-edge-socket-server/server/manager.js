@@ -50,6 +50,20 @@ function createManagerNode({ origin, serverId, credential, publicUrl, name, capa
             throw new Error('Managed room access rejected');
         }
     }
+    // Who is connected to each room placed here, for the manager's
+    // dashboard: counts and the adventure title only.
+    function liveRooms() {
+        const room=require('./room.js');
+        const out=[];
+        for (const placement of placements.values()) {
+            const live=room.resolveRoom(placement.room_code);
+            if (!live || !live.clients?.size) continue;
+            const clients=[...live.clients.values()];
+            out.push({ room_id:placement.room_id, clients:clients.length, bots:clients.filter(c=>c.botMode).length,
+                adventure:live.data?.adventure?.module?.title ? String(live.data.adventure.module.title).slice(0,200) : null });
+        }
+        return out;
+    }
     async function refresh() {
         if (inFlight) return inFlight;
         inFlight=(async()=>{
@@ -57,7 +71,7 @@ function createManagerNode({ origin, serverId, credential, publicUrl, name, capa
                 await request('/v1/internal/nodes/register',{server_id:serverId,name,public_url:publicUrl,capacity_rooms:capacity,region});
                 registered=true;
             }
-            const rows=await request(`/v1/internal/nodes/${serverId}/heartbeat`,{});
+            const rows=await request(`/v1/internal/nodes/${serverId}/heartbeat`,{rooms:liveRooms()});
             const response=await fetcher(`${origin}/.well-known/jwks.json`,{signal:AbortSignal.timeout(5000)});
             if (!response.ok) throw new Error('Manager signing keys unavailable');
             const keys=await response.json();

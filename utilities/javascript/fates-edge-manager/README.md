@@ -70,6 +70,26 @@ the room becomes unavailable until that same stable node identity is restored. T
 creating two authoritative copies or losing live game state. Game-state migration requires
 a separate storage/fencing protocol; a drain operation does not pretend to move campaigns.
 
+## Room status and the console
+
+Each managed node reports, with its heartbeat, how many people (and bots) are connected to
+each room placed on it, plus the adventure title. Only counts and the title are sent, never
+names or game content, and a node can report only its own rooms. The dashboard shows every
+room in words: **Live now · 3 people · The Salt Road**, **Not open right now** (nobody is
+connected, which is normal), **Its game server is offline** (the room stays assigned to that
+server until an operator restores it), or **Not opened on a game server yet**. The status
+refreshes in place every 15 seconds. A room you can no longer see is explained as such, not
+shown as a failed page. The operator Nodes view adds live rooms, connected people and
+heartbeat age per node.
+
+The manager logs one line per request (`time LEVEL METHOD /route status ms request_id`),
+using the route template so tokens in paths are never written, plus every server error with
+the request id shown to the user. Set `MANAGER_LOG_LEVEL` (or `LOG_LEVEL`) to `debug` to
+include reads and node heartbeats, and `LOG_FORMAT=json` for log collectors. The startup
+banner shows the dashboard address, database (without credentials), registered game servers
+and single sign-on, and warns when no node credentials are set or the bootstrap password is
+still in `.env`.
+
 ## Using room credentials
 
 Create an API key under a room. Its secret is displayed once, with copy/download actions.

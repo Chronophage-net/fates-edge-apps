@@ -60,3 +60,18 @@ test('mobile roster retains labelled cells and editable membership controls',asy
   assert.match(html,/data-control-member="member-1"/);
   assert.match(html,/data-action="remove-member"/);
 });
+
+test('room status reads in words, and a room you cannot see is explained, not an error',async()=>{
+  const ui=await dashboard();
+  const text=live=>vm.runInContext(`liveText(${JSON.stringify(live)})`,ui.context);
+  assert.equal(text({state:'live',clients:3,bots:1,adventure:'The Salt Road'}),'Live now · 3 people (1 bot) · The Salt Road');
+  assert.match(text({state:'idle'}),/^Not open right now/);
+  assert.match(text({state:'offline',node:'Test node'}),/game server \(Test node\) is offline/);
+  assert.match(text({state:'unplaced'}),/Not opened on a game server yet/);
+  assert.match(vm.runInContext(`liveLine('<x>',{state:'live',clients:1,adventure:'<img src=x>'})`,ui.context),/&lt;img src=x&gt;/);
+
+  const render=vm.runInContext("location.hash='#rooms/gone';render()",ui.context);
+  ui.respond('/v1/rooms/gone',{error:'Room not found'},404);await render;
+  assert.match(ui.element('#content').innerHTML,/This room isn’t available to you/);
+  assert.doesNotMatch(ui.element('#content').innerHTML,/could not load/);
+});
