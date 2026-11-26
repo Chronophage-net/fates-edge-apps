@@ -75,7 +75,9 @@
         "portable"
       ],
       "icon": "build/icon.ico",
-      "publisherName": "Fate's Edge"
+      "signtoolOptions": {
+        "publisherName": "Fate's Edge"
+      }
     },
     "mac": {
       "target": [
