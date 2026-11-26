@@ -17,6 +17,8 @@ const config = require('./config.js').loadConfig();
 config.manager = require('./manager.js').fromEnvironment();
 const logger = require('./logger.js').createLogger(config.logLevel);
 const room = require('./room.js');
+// Show rooms by their code in the console, not by internal id.
+require('./logger.js').setRoomLabeler(id => room.resolveRoom?.(id)?.code);
 room.configureDirectory(process.env.ROOM_DIRECTORY_FILE || require('path').join(__dirname, 'campaigns', 'room-directory.json'));
 const api = require('./api.js');
 const wsHandlers = require('./ws-handlers.js');
@@ -82,7 +84,11 @@ app.get('/', (req, res) => {
 app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);
     const status = error.type === 'entity.too.large' ? 413 : error.type === 'entity.parse.failed' ? 400 : 500;
-    logger.warn('HTTP request failed', { status, type: error.type || 'internal' });
+    // Name the route and the cause: a bare "request failed" hid a 500 on
+    // every GET /api/rooms for several releases.
+    (status === 500 ? logger.error : logger.warn)('HTTP request failed', {
+        status, method: req.method, path: req.path, type: error.type || 'internal', error,
+    });
     res.status(status).json({ error: status === 413 ? 'Request body is too large.' : status === 400 ? 'Invalid JSON request body.' : 'The request could not be completed.' });
 });
 
@@ -198,8 +204,9 @@ function startServer(port, retriesLeft) {
         console.log(`🔌 WebSocket (plain): ws://localhost:${port}?room=ROOM_CODE`);
         console.log(`   (also supports /campaign/ROOM_CODE path)`);
         console.log(`🔌 WebSocket (Socket.io): http://localhost:${port}`);
-        console.log(`📋 Rooms: ${room.rooms.size}`);
-        console.log(`📊 Log Level: ${config.logLevel}`);
+        console.log(`📊 Log Level: ${config.logLevel}${process.env.LOG_FORMAT ? ` (${process.env.LOG_FORMAT})` : ''}`);
+        console.log('-'.repeat(70));
+        for (const line of startupReport(config)) console.log(line);
         console.log('='.repeat(70));
         console.log('✅ Server ready for connections\n');
     }
@@ -214,17 +221,44 @@ if (isClusterWorker) {
 }
 
 // ---------- Stats logging ----------
+function formatUptime(seconds) {
+    const d = Math.floor(seconds / 86400), h = Math.floor(seconds % 86400 / 3600), m = Math.floor(seconds % 3600 / 60);
+    return d ? `${d}d${h}h` : h ? `${h}h${m}m` : `${m}m`;
+}
 setInterval(() => {
     const total = (ioHandlers.socketStats.socketIOConnections || 0) + (wsHandlers.socketStats.wsConnections || 0);
     if (total > 0 || room.rooms.size > 0) {
+        const codes = Array.from(room.rooms.values()).map(r => `${r.code}:${r.clients.size}`).slice(0, 10).join(',');
         logger.info('📊 Server stats', {
             rooms: room.rooms.size,
+            clients: total,
             socketIO: ioHandlers.socketStats.socketIOConnections || 0,
             plainWS: wsHandlers.socketStats.wsConnections || 0,
-            totalClients: total,
-            uptime: Math.floor(process.uptime()) + 's'
+            ...(codes ? { active: codes } : {}),
+            memory: Math.round(process.memoryUsage().rss / 1048576) + 'MB',
+            uptime: formatUptime(process.uptime()),
         });
     }
-}, config.statsInterval);
+}, config.statsInterval).unref();
+
+/**
+ * The banner's configuration summary: what is on, and what needs
+ * attention before the server faces the internet.
+ */
+function startupReport(cfg) {
+    const lines = [];
+    const warn = text => lines.push(`⚠️  ${text}`);
+    lines.push(`🔑 Admin API: ${cfg.apiKeyGenerated ? 'temporary key (printed above; changes on restart)' : 'API_KEY set'}`);
+    lines.push(`💾 Storage: ${(process.env.DATABASE_TYPE || 'sqlite').toLowerCase()}`);
+    lines.push(`🌐 CORS: ${cfg.corsOrigin === '*' ? 'any origin' : [].concat(cfg.corsOrigin).join(', ')}`);
+    lines.push(`📡 Voice relay (TURN): ${cfg.turnSecret && cfg.turnUrls?.length ? cfg.turnUrls.join(', ') : 'off (peer-to-peer only)'}`);
+    const scale = [cfg.redisUrl ? 'Redis' : null, cfg.clusterWorkers ? `${cfg.clusterWorkers} workers` : null].filter(Boolean);
+    lines.push(`📈 Scaling: ${scale.length ? scale.join(' + ') : 'single process'}`);
+    if (cfg.manager) lines.push('🧭 Managed node: rooms are placed and admitted by the manager');
+    if (cfg.apiKeyGenerated) warn('No API_KEY: the AI GM bot and the CLI need the key printed above, and it changes on every restart.');
+    if (!process.env.AUTH_JWT_SECRET) warn('No AUTH_JWT_SECRET: player logins end on every restart.');
+    if (cfg.corsOrigin === '*' && cfg.host !== '127.0.0.1' && cfg.host !== 'localhost') warn('CORS_ORIGIN is * on a public interface; set it to your web client origin.');
+    return lines;
+}
 
 module.exports = { app, server, io, wss };

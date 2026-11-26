@@ -182,8 +182,11 @@ function createApiRouter(appConfig) {
 
     // ─── Room list ──────────────────────────────────────────────────
     router.get('/api/rooms', authenticate, (req, res) => {
-        const totalClients = Array.from(room.rooms.values()).reduce((sum, entry) => sum + entry.clients.size, 0);
-        res.json({ rooms: roomStats, count: roomStats.length, timestamp: Date.now() });
+        // This used to reference an undefined `roomStats` and answer every
+        // call with a 500, which broke the CLI's `rooms list`.
+        const roomStats = Array.from(room.rooms.keys()).map(key => room.getRoomStats(key)).filter(Boolean);
+        const totalClients = roomStats.reduce((sum, entry) => sum + entry.clients, 0);
+        res.json({ rooms: roomStats, count: roomStats.length, totalClients, timestamp: Date.now() });
     });
 
     // ─── Optional account auth ──────────────────────────────────────

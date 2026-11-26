@@ -43,7 +43,7 @@ function setupSocketIO(io, appConfig) {
         socketStats.socketIOConnections++;
         socketStats.totalConnections++;
 
-        logger.info('🔌 Socket.io client connected', { socketId: socket.id });
+        logger.debug('🔌 Socket.io client connected', { socketId: socket.id });
 
         socket.on('bot-seat', data => {
             const current = room.rooms.get(socket.room);
@@ -424,6 +424,7 @@ function setupSocketIO(io, appConfig) {
 
             // Broadcast with sender exclusion
             room.broadcastToRoom(roomKey, 'presence', { clients: clientsList }, socket.id);
+            logger.info('🔌 Client joined', { room: roomKey, name: socket.clientData.name, role: socket.clientData.role, via: 'socket.io' });
             room.broadcastToRoom(roomKey, 'player-joined', {
                 clientId: socket.id,
                 clientName: socket.clientData.name,
@@ -1225,7 +1226,7 @@ function setupSocketIO(io, appConfig) {
                 }
                 if (r.clients.size === 0 && !r.sideTask) {
                     room.rooms.delete(targetRoom);
-                    logger.info('🗑️ Room deleted (empty)', { room: targetRoom });
+                    logger.info('🗑️ Room closed (empty)', { room: r.code });
                 }
             }
             socket.room = null;
@@ -1241,9 +1242,10 @@ function setupSocketIO(io, appConfig) {
             callback(r ? room.getClientsList(r) : []);
         });
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', (reason) => {
             socketStats.socketIOConnections--;
             if (socket.room) {
+                logger.info('👋 Client left', { room: socket.room, name: socket.clientData?.name, via: 'socket.io', reason });
                 const r = room.rooms.get(socket.room);
                 if (r) {
                     const wasGm = r.clients.get(socket.id)?.role === 'gm';
@@ -1262,7 +1264,7 @@ function setupSocketIO(io, appConfig) {
                     }
                     if (r.clients.size === 0 && !r.sideTask) {
                         room.rooms.delete(socket.room);
-                        logger.info('🗑️ Room deleted (empty)', { room: socket.room });
+                        logger.info('🗑️ Room closed (empty)', { room: r.code });
                     }
                 }
             }

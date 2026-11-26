@@ -1,5 +1,4 @@
-# requirements-cli.txt
-# Python dependencies for the CLI management tool
-
-requests>=2.31.0
-pyyaml>=6.0
+# requirements.txt
+# The CLI management tool (fates-edge-cli.py) uses only the Python
+# standard library; there is nothing to install. Kept so existing
+# `pip install -r requirements.txt` steps keep working.

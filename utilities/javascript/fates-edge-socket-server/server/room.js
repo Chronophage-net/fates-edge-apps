@@ -95,6 +95,10 @@ function getRoomStats(roomCode) {
         deckRemaining: room.deck?.length || 0,
         historyCount: room.deckHistory?.length || 0,
         characterCount: room.characters ? Object.keys(room.characters).length : 0,
+        gm: getExistingGm(room)?.name || null,
+        bots: Array.from(room.clients.values()).filter(c => c.botMode).length,
+        adventure: room.data?.adventure?.module ? { title: room.data.adventure.module.title, status: room.data.adventure.status } : null,
+        hasPassword: !!room.password,
         lastActivity: room.lastActivity,
         created: room.created
     };

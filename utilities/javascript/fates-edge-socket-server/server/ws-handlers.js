@@ -933,7 +933,7 @@ function setupWSS(wss, appConfig) {
         ws.on('close', () => {
             ws.finishHandshake();
             if (pingInterval) clearInterval(pingInterval);
-            logger.info('🔌 Plain WebSocket client disconnected', { clientId, room: roomKey });
+            logger.info('👋 Client left', { room: roomKey, name: ws.clientData?.name, via: 'ws' });
             const r = room.rooms.get(roomKey);
             if (r && r.clients.has(clientId)) {
                 const wasGm = r.clients.get(clientId)?.role === 'gm';
@@ -952,7 +952,7 @@ function setupWSS(wss, appConfig) {
                 }
                 if (r.clients.size === 0 && !r.sideTask) {
                     room.rooms.delete(roomKey);
-                    logger.info('🗑️ Room deleted (empty)', { room: roomKey });
+                    logger.info('🗑️ Room closed (empty)', { room: r.code });
                 }
             }
             // An idle/failed handshake may have created an otherwise empty room.
@@ -1094,6 +1094,7 @@ async function handleHandshake(ws, roomState, data) {
     roomState.clients.set(ws.clientId, ws.clientData);
     ws.handshakeComplete = true;
     ws.finishHandshake();
+    logger.info('🔌 Client joined', { room: roomState.code, name: ws.clientData.name, role: assignedRole, via: 'ws', ...(ws.clientData.botMode ? { bot: ws.clientData.botMode } : {}) });
     const clientsList = room.getClientsList(roomState);
     ws.send(JSON.stringify({ type: 'handshake_ack', success: true, room_id: roomState.room_id, sideTasks: true, sideTaskId: roomState.sideTask?.id || null, clientId: ws.clientId, clientRole: assignedRole, versionVector: {}, activeClients: clientsList,
         ...(managerClaims ? { serverId: managerClaims.server_id, placementVersion: managerClaims.placement_version } : {}) }));

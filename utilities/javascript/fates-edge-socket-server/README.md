@@ -26,7 +26,25 @@ Failed assistant suggestions appear as failures in the updated VTT. Check the ta
 - **Rate limiting & per-room client caps** — a general per-IP limit across the REST API, a per-connection message-rate limit on both WebSocket transports, and an optional per-room client cap. All configurable, all generous/off by default. See [`DESIGN.md`](DESIGN.md) §5.
 - **Campaign persistence** — `server/storage.js` stores campaigns, rooms, accounts, and characters in SQLite by default (`campaigns.db`; see [`INSTALL.md`](INSTALL.md#backing-up-your-campaigns-your-world-save) for backups), or Postgres/MySQL via `DATABASE_TYPE`/`DATABASE_URL`.
 - **TURN credential minting** — `server/turn.js` mints short-lived coturn credentials for the web client's voice chat, so it can traverse symmetric NAT and restrictive firewalls rather than relying on STUN alone.
-- **A bundled reference dataset** (`data/patrons/the_traveler.json`, `data/regions/acasia.json`) and a Python CLI (`fates-edge-cli.py`, v1.6.0) — room/client/module management, backups, and ad-hoc timers from the command line, plus enough to smoke-test deck draws and patron lookups without the full web client's data folder.
+- **A bundled reference dataset** (`data/patrons/the_traveler.json`, `data/regions/acasia.json`) and a Python CLI (`fates-edge-cli.py`, v1.7.0, standard library only) — room/client/module management, backups, and ad-hoc timers from the command line, plus enough to smoke-test deck draws and patron lookups without the full web client's data folder.
+
+### Server console and CLI
+
+The server logs one line per event (`16:56:33.248 INFO  🔌 Client joined  room=ABCD name=Wren role=player via=ws`), coloured in a terminal and ISO-timestamped elsewhere; `LOG_FORMAT=json` prints JSON lines for log collectors. The startup banner lists what is configured (admin key, storage, CORS, TURN, scaling) and warns about anything that needs attention before going public.
+
+`fates-edge-cli` (run with no arguments for an interactive shell with history and Tab completion):
+
+```
+fates-edge-cli status                       # health plus a table of open rooms
+fates-edge-cli watch [CODE]                 # live view, refreshes every few seconds
+fates-edge-cli rooms info CODE              # GM, clients, adventure, characters
+fates-edge-cli rooms adventure CODE [next|reset|load MODULE|tick NAME|log "TEXT"]
+fates-edge-cli rooms characters CODE        # Harm, Fatigue, Boons, XP
+fates-edge-cli rooms clients role CODE --id ID --role co-gm
+fates-edge-cli logs -f                      # follow the log of a server started with `server start`
+```
+
+It reads `FATES_EDGE_SERVER_URL` and `FATES_EDGE_API_KEY` (or the server's own `API_KEY`) before its saved config, so `docker exec -it <container> fates-edge-cli status` works with no setup.
 
 ---
 
@@ -105,14 +123,14 @@ fates-edge-socket-server/
 ├── ROADMAP.md                  # planned, not-yet-built work (server-specific)
 ├── docker-compose.yml          # server + coturn (see "Docker Compose" above)
 ├── Dockerfile
-├── fates-edge-cli.py           # Python CLI test client
+├── fates-edge-cli.py           # Python CLI (management console)
 ├── generate-manifest.js        # CLI: derive manifest.json for a hand-placed modules/<id>/adventure.json
 ├── modules/                    # installable adventure modules (see MODULES.md)
 │   └── example-module/
 │       ├── adventure.json
 │       └── manifest.json
 ├── package.json
-├── requirements.txt            # for fates-edge-cli.py
+├── requirements.txt            # empty: the CLI needs only the standard library
 ├── server/
 │   ├── adventure.js             # Adventure Engine state machine (acts/scenes/timers/encounters)
 │   ├── api.js                   # REST endpoints — see "REST API" below

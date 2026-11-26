@@ -45,6 +45,17 @@ test('an AI-GM adventure reaches WebSocket and Socket.IO players', { timeout: 20
         assert.equal(loaded.dynamicGrowth, true);
     }
 
+    // The room list (used by the CLI's status/rooms/watch) shows the room,
+    // its GM and its adventure. It used to answer every call with a 500.
+    const list = await fetch(`${server.base}/api/rooms`, { headers: { 'x-api-key': 'isolated-test-admin-key' } });
+    assert.equal(list.status, 200);
+    const { rooms, totalClients } = await list.json();
+    const salt = rooms.find(r => r.code === 'SALT');
+    assert.ok(salt, 'room listed');
+    assert.equal(salt.gm, 'AI GM');
+    assert.equal(salt.adventure.title, 'The Salt Road');
+    assert.equal(totalClients, 3);
+
     // A late look-up gets the same state on both transports.
     ws.send('adventure-state-request');
     assert.equal((await ws.wait('adventure-state')).moduleId, 'custom_salt');

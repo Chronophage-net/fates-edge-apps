@@ -54,7 +54,6 @@ import os
 import json
 import argparse
 import subprocess
-import requests
 import time
 import signal
 import shutil
@@ -65,13 +64,16 @@ import readline
 import getpass
 import socket
 import tempfile
-from urllib.parse import urljoin
+import shlex
+import urllib.request
+import urllib.error
+from urllib.parse import urljoin, quote
 
 # ============================================================
 # Constants
 # ============================================================
 
-VERSION = "1.6.0"
+VERSION = "1.7.0"
 DEFAULT_CONFIG_PATH = Path.home() / ".fates-edge" / "cli-config.json"
 
 # Detect if running inside a container
@@ -86,6 +88,14 @@ else:
 
 DEFAULT_API_KEY = ""
 DEFAULT_WS_URL = "ws://localhost:10000"
+HISTORY_PATH = Path.home() / ".fates-edge" / "cli-history"
+SERVER_LOG_PATH = Path.home() / ".fates-edge" / "server.log"
+
+
+class CLIError(Exception):
+    """A command failed; the message is already user-facing. The
+    interactive shell prints it and carries on; one-shot mode exits 1."""
+
 
 # ============================================================
 # Color Output
@@ -104,12 +114,14 @@ class Colors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+    ENABLED = sys.stdout.isatty() and not os.environ.get('NO_COLOR')
+
     @staticmethod
     def colorize(text: str, color: str) -> str:
-        return f"{color}{text}{Colors.ENDC}"
+        return f"{color}{text}{Colors.ENDC}" if Colors.ENABLED else text
 
 def print_success(text): print(Colors.colorize(f"✅ {text}", Colors.GREEN))
-def print_error(text): print(Colors.colorize(f"❌ {text}", Colors.RED))
+def print_error(text): print(Colors.colorize(f"❌ {text}", Colors.RED), file=sys.stderr)
 def print_warning(text): print(Colors.colorize(f"⚠️  {text}", Colors.YELLOW))
 def print_info(text): print(Colors.colorize(f"ℹ️  {text}", Colors.CYAN))
 def print_header(text): print(Colors.colorize(f"\n{text}\n{'=' * len(text)}", Colors.HEADER + Colors.BOLD))
@@ -146,10 +158,14 @@ class Config:
         self.save()
 
     def get_server_url(self) -> str:
-        return self.get('server_url', DEFAULT_SERVER_URL)
+        # Environment first (the Docker image sets FATES_EDGE_SERVER_URL),
+        # then the saved config, then the default.
+        return os.environ.get('FATES_EDGE_SERVER_URL') or self.get('server_url') or DEFAULT_SERVER_URL
 
     def get_api_key(self) -> str:
-        return self.get('api_key', DEFAULT_API_KEY)
+        # FATES_EDGE_API_KEY, else the server's own API_KEY (same machine
+        # or container), else the saved config.
+        return os.environ.get('FATES_EDGE_API_KEY') or os.environ.get('API_KEY') or self.get('api_key') or DEFAULT_API_KEY
 
     def get_ws_url(self) -> str:
         return self.get('ws_url', DEFAULT_WS_URL)
@@ -166,53 +182,70 @@ class ServerClient:
         self.headers = {"X-API-Key": self.api_key} if self.api_key else {}
 
     def _request(self, method: str, endpoint: str, data: Dict = None, timeout: int = 30) -> Dict:
-        """Make an API request to the server"""
+        """Call the server's REST API. Raises CLIError with a clear message."""
         url = urljoin(self.server_url, endpoint)
-
+        body = json.dumps(data).encode() if data is not None and method in ('POST', 'PUT') else None
+        headers = dict(self.headers)
+        if body is not None:
+            headers['Content-Type'] = 'application/json'
+        req = urllib.request.Request(url, data=body, headers=headers, method=method)
         try:
-            if method == 'GET':
-                resp = requests.get(url, headers=self.headers, timeout=timeout)
-            elif method == 'POST':
-                resp = requests.post(url, json=data, headers=self.headers, timeout=timeout)
-            elif method == 'PUT':
-                resp = requests.put(url, json=data, headers=self.headers, timeout=timeout)
-            elif method == 'DELETE':
-                resp = requests.delete(url, headers=self.headers, timeout=timeout)
-            else:
-                raise ValueError(f"Unsupported method: {method}")
-
-            resp.raise_for_status()
-            return resp.json()
-        except requests.exceptions.ConnectionError:
-            print_error(f"Could not connect to server at {self.server_url}")
-            print_info("Make sure the server is running and the URL is correct")
-            sys.exit(1)
-        except requests.exceptions.Timeout:
-            print_error("Request timed out")
-            sys.exit(1)
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 401:
-                print_error("Authentication failed. Check your API key.")
-                print_info("Set API key with: fates-edge-cli config set api_key YOUR_KEY")
-            elif e.response.status_code == 403:
-                print_error("Forbidden. Check your API key permissions.")
-            elif e.response.status_code == 404:
-                print_error("Endpoint not found. Check the server version.")
-            else:
-                try:
-                    body = e.response.json()
-                    print_error(f"HTTP error: {body.get('error', e)}")
-                except Exception:
-                    print_error(f"HTTP error: {e}")
-            sys.exit(1)
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                raw = resp.read().decode('utf-8', 'replace')
+        except urllib.error.HTTPError as e:
+            raw = e.read().decode('utf-8', 'replace')
+            try:
+                detail = json.loads(raw).get('error') or raw
+            except Exception:
+                detail = raw or e.reason
+            if e.code == 401:
+                raise CLIError("Authentication failed: no API key sent. Set one with: config set api_key YOUR_KEY (or FATES_EDGE_API_KEY).")
+            if e.code == 403:
+                raise CLIError(f"Forbidden: {detail}. Check the API key matches the server's API_KEY.")
+            if e.code == 404:
+                raise CLIError(f"Not found: {detail} (a room exists only while someone is connected to it).")
+            raise CLIError(f"HTTP {e.code}: {detail}")
+        except urllib.error.URLError as e:
+            raise CLIError(f"Could not connect to {self.server_url} ({e.reason}). Is the server running? Set the URL with: config set server_url URL")
+        except TimeoutError:
+            raise CLIError(f"Request to {url} timed out after {timeout}s")
+        if not raw:
+            return {}
+        try:
+            return json.loads(raw)
+        except ValueError:
+            return {'text': raw}
 
     def health(self) -> Dict:
-        """Get server health"""
-        return self._request('GET', '/api/healthz')
+        """Server health with room/client counts (no API key needed)"""
+        return self._request('GET', '/api/health')
 
-    def status(self) -> Dict:
-        """Get server status (via health)"""
-        return self._request('GET', '/api/healthz')
+    # ─── Adventure (server-side; see server/adventure.js) ───────────
+    def get_adventure(self, code: str) -> Dict:
+        return self._request('GET', f'/api/rooms/{quote(code)}/adventure')
+
+    def adventure_next(self, code: str) -> Dict:
+        return self._request('POST', f'/api/rooms/{quote(code)}/adventure/scene', {})
+
+    def adventure_load(self, code: str, module_id: str) -> Dict:
+        return self._request('POST', f'/api/rooms/{quote(code)}/adventure/load', {'moduleId': module_id})
+
+    def adventure_reset(self, code: str) -> Dict:
+        return self._request('POST', f'/api/rooms/{quote(code)}/adventure/reset', {})
+
+    def adventure_log(self, code: str, text: str) -> Dict:
+        return self._request('POST', f'/api/rooms/{quote(code)}/adventure/log', {'text': text, 'author': 'CLI'})
+
+    def adventure_tick(self, code: str, scope: str, ref: str, amount: int) -> Dict:
+        ref_value = int(ref) if str(ref).isdigit() else ref
+        return self._request('POST', f'/api/rooms/{quote(code)}/adventure/timer', {'scope': scope, 'ref': ref_value, 'amount': amount})
+
+    # ─── Characters and roles ───────────────────────────────────────
+    def list_characters(self, code: str) -> List[Dict]:
+        return self._request('GET', f'/api/rooms/{quote(code)}/characters').get('characters', [])
+
+    def set_role(self, code: str, client_id: str, role: str, persist: bool = False) -> Dict:
+        return self._request('POST', f'/api/rooms/{quote(code)}/clients/{quote(client_id)}/role', {'role': role, 'persist': persist})
 
     # ─── Rooms ──────────────────────────────────────────────────────
     # NOTE: there is no REST route to create/delete/fetch a single room.
@@ -376,55 +409,75 @@ def cmd_server_start(args, config: Config):
 
     print_info(f"Starting Fate's Edge Server on {host}:{port}...")
 
-    server_path = Path.cwd() / 'server.js'
-    if not server_path.exists():
-        print_error("server.js not found in current directory")
-        print_info("Make sure you're in the server directory")
+    # The entry point is server-start.js in a checkout and server.js in
+    # the Docker image; look next to this script first, then here.
+    script_dir = Path(__file__).resolve().parent
+    candidates = [script_dir / 'server-start.js', Path.cwd() / 'server-start.js', Path.cwd() / 'server.js']
+    server_path = next((p for p in candidates if p.exists()), None)
+    if not server_path:
+        print_error("Could not find server-start.js (or server.js). Run this from the server directory.")
         return False
 
+    SERVER_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     try:
-        cmd = ['node', 'server.js']
         env = os.environ.copy()
         env['PORT'] = str(port)
         env['HOST'] = host
         if api_key:
             env['API_KEY'] = api_key
-
+        # Server output goes to a log file. It used to go to an unread
+        # pipe, which blocked the server once ~64 KB of logs piled up.
+        log_file = open(SERVER_LOG_PATH, 'a')
         process = subprocess.Popen(
-            cmd,
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
+            ['node', str(server_path)],
+            cwd=str(server_path.parent), env=env,
+            stdout=log_file, stderr=subprocess.STDOUT,
+            start_new_session=True,
         )
 
-        time.sleep(2)
+        # Wait for the health endpoint rather than a fixed sleep.
+        url = f"http://127.0.0.1:{port}/healthz"
+        for _ in range(40):
+            if process.poll() is not None:
+                break
+            try:
+                urllib.request.urlopen(url, timeout=1).close()
+                break
+            except Exception:
+                time.sleep(0.25)
 
         if process.poll() is None:
             print_success(f"Server started on {host}:{port} (PID: {process.pid})")
-            if api_key:
-                print_info("API key configured")
-            print_info(f"WebSocket: ws://{host}:{port}")
-            print_info(f"HTTP: http://{host}:{port}")
-            print_info(f"Health Check: http://{host}:{port}/api/healthz")
-
+            print_info(f"WebSocket: ws://localhost:{port}   HTTP: http://localhost:{port}")
+            print_info(f"Logs: {SERVER_LOG_PATH}  (fates-edge-cli logs --follow)")
             config.set('server_pid', process.pid)
             config.set('server_port', port)
             config.set('server_host', host)
+            config.set('server_url', f"http://localhost:{port}")
             if api_key:
                 config.set('api_key', api_key)
-
             return True
-        else:
-            stdout, stderr = process.communicate()
-            print_error(f"Server failed to start: {stderr}")
-            if stdout:
-                print_info(f"Output: {stdout}")
-            return False
+        print_error("Server exited during startup. Last log lines:")
+        for line in tail_file(SERVER_LOG_PATH, 15):
+            print("   " + line)
+        return False
 
     except Exception as e:
         print_error(f"Failed to start server: {e}")
         return False
+
+
+def tail_file(path: Path, lines: int) -> List[str]:
+    """Last `lines` lines of a text file (empty list if missing)."""
+    try:
+        with open(path, 'rb') as fh:
+            fh.seek(0, os.SEEK_END)
+            size = fh.tell()
+            block = min(size, 64 * 1024 * max(1, lines // 200 + 1))
+            fh.seek(size - block)
+            return fh.read().decode('utf-8', 'replace').splitlines()[-lines:]
+    except OSError:
+        return []
 
 def cmd_server_stop(args, config: Config):
     """Stop the Fate's Edge server (standalone)"""
@@ -504,6 +557,83 @@ def cmd_server_docker(args, config: Config):
         return False
 
 # ============================================================
+# Formatting helpers
+# ============================================================
+
+def format_duration(seconds) -> str:
+    seconds = int(seconds or 0)
+    d, rem = divmod(seconds, 86400)
+    h, rem = divmod(rem, 3600)
+    m = rem // 60
+    return f"{d}d {h}h" if d else f"{h}h {m}m" if h else f"{m}m"
+
+def format_time(ms) -> str:
+    return datetime.fromtimestamp(ms / 1000).strftime('%Y-%m-%d %H:%M') if ms else '—'
+
+def format_ago(ms) -> str:
+    if not ms:
+        return '—'
+    return format_duration(max(0, time.time() - ms / 1000)) + ' ago'
+
+def harm_label(harm, dead=False) -> str:
+    if dead:
+        return 'DEAD'
+    harm = int(harm or 0)
+    return f"{harm}" + (' (down)' if harm >= 3 else '')
+
+def print_table(headers: List[str], rows: List[List[str]]):
+    """A plain aligned table; columns size to their content."""
+    widths = [max(len(str(h)), *(len(str(r[i])) for r in rows)) if rows else len(str(h)) for i, h in enumerate(headers)]
+    print("  " + "  ".join(Colors.colorize(str(h).ljust(w), Colors.BOLD) for h, w in zip(headers, widths)))
+    for row in rows:
+        print("  " + "  ".join(str(c).ljust(w) for c, w in zip(row, widths)))
+
+def print_rooms_table(rooms: List[Dict]):
+    print_table(['Room', 'Clients', 'GM', 'Adventure', 'Last activity'], [
+        [r.get('code', '?'), f"{r.get('clients', 0)}" + (f" ({r.get('bots')} bot)" if r.get('bots') else ''),
+         r.get('gm') or '—', (r.get('adventure') or {}).get('title') or '—', format_ago(r.get('lastActivity'))]
+        for r in sorted(rooms, key=lambda r: -(r.get('lastActivity') or 0))])
+
+ROLE_ICONS = {'gm': '👑', 'co-gm': '🛡️', 'assistant-gm': '🤖', 'spectator': '👁️'}
+
+def print_clients(clients: List[Dict]):
+    print_table(['', 'Name', 'Role', 'Character', 'ID'], [
+        [ROLE_ICONS.get(c.get('role'), '👤'), c.get('name') or '?', c.get('role') or 'player',
+         ', '.join(c.get('selectedCharacters') or []) or c.get('selectedCharacter') or '—', c.get('id', '')]
+        for c in clients])
+
+def print_adventure(state: Dict, with_log: bool = True):
+    if not state.get('moduleId'):
+        print_info("No adventure loaded. Load one with: rooms adventure CODE load MODULE")
+        return
+    scene = state.get('currentScene') or {}
+    print_header(f"{state.get('title', 'Adventure')} — {state.get('status', '')}")
+    print(f"  Act: {(state.get('currentAct') or {}).get('title', '—')}")
+    print(f"  Scene: {scene.get('title', '—')}")
+    enc = state.get('activeEncounter')
+    if enc:
+        print(f"  Encounter: {enc.get('name', '?')}" + (f" (DV {enc.get('dv')})" if enc.get('dv') else ''))
+    clocks = [('scene', i, t) for i, t in enumerate(scene.get('timers') or [])] + [('campaign', i, t) for i, t in enumerate(state.get('campaignTimers') or [])]
+    for scope, i, t in clocks:
+        segs = max(1, int(t.get('segments') or 1))
+        cur = min(segs, int(t.get('current') or 0))
+        print(f"  ⏱️  {t.get('name', 'Clock')} [{scope} {i}]  {'■' * cur}{'□' * (segs - cur)}  {cur}/{segs}")
+    if state.get('dynamicGrowth'):
+        print(f"  Growing: sessions {state.get('sessionsPlayed', 0)}/{state.get('climaxAfterSessions', '?')}, climax {'started' if state.get('climaxTriggered') else 'not yet'}")
+    if with_log and state.get('log'):
+        print("  Recent:")
+        for entry in state['log'][-5:]:
+            print(f"    · {entry.get('message', '')}")
+
+def capture(fn, *args) -> List[str]:
+    """Run a printing helper and return its output lines (for watch)."""
+    import io, contextlib
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        fn(*args)
+    return buf.getvalue().splitlines()
+
+# ============================================================
 # CLI Class
 # ============================================================
 
@@ -515,61 +645,107 @@ class CLI:
         self.running = True
 
     def _setup_completion(self):
-        """Setup tab completion for interactive shell"""
+        """Tab completion for every command level, plus saved history."""
         try:
             readline.parse_and_bind("tab: complete")
+            readline.parse_and_bind("bind ^I rl_complete")  # libedit (macOS)
+            readline.set_completer_delims(' \t\n')
             readline.set_completer(self._completer)
-        except:
+            HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+            if HISTORY_PATH.exists():
+                readline.read_history_file(str(HISTORY_PATH))
+            readline.set_history_length(1000)
+        except Exception:
             pass
 
+    def _command_tree(self, parser=None) -> Dict:
+        """{word: subtree} from the argparse subcommands, for completion."""
+        parser = parser or self._build_parser()
+        tree = {}
+        for action in parser._actions:
+            if isinstance(action, argparse._SubParsersAction):
+                for name, sub in action.choices.items():
+                    tree[name] = self._command_tree(sub)
+            elif action.option_strings and action.dest != 'help':
+                for opt in action.option_strings:
+                    if opt.startswith('--'):
+                        tree[opt] = {}
+        return tree
+
     def _completer(self, text, state):
-        commands = [
-            'server', 'status', 'health', 'rooms', 'modules',
-            'backup', 'restore', 'config', 'logs', 'help', 'exit', 'quit'
-        ]
-        matches = [c for c in commands if c.startswith(text)]
-        if state < len(matches):
-            return matches[state]
-        return None
+        if state == 0:
+            if not hasattr(self, '_tree'):
+                self._tree = self._command_tree()
+                self._tree.update({'help': {}, 'exit': {}, 'quit': {}})
+            words = readline.get_line_buffer().split()
+            if text and words:
+                words = words[:-1]
+            node = self._tree
+            for word in words:
+                node = node.get(word, node if word.startswith('-') or word not in node else {})
+            self._matches = sorted(w for w in node if w.startswith(text))
+        return self._matches[state] if state < len(self._matches) else None
+
+    def run(self, argv: List[str]):
+        """Run one command; returns the handler's result. Raises CLIError."""
+        if argv and argv[0] == 'help':
+            self.print_help()
+            return True
+        args = self._parse_args(argv)
+        if not args:
+            return False
+        if not args.command:
+            self.print_help()
+            return True
+        handler = getattr(self, f'cmd_{args.command}', None)
+        if not handler:
+            raise CLIError(f"Unknown command: {args.command} (try: help)")
+        return handler(args)
 
     def interactive(self):
-        """Interactive shell mode"""
+        """Interactive shell. A failed command prints its error and the
+        shell carries on; it used to exit the whole console."""
         print_header("Fate's Edge CLI v" + VERSION)
-        print_info("Type 'help' for commands, 'exit' to quit\n")
+        print_info(f"Server: {self.client.server_url}   API key: {'set' if self.client.api_key else 'not set'}")
+        print_info("Type 'help' for commands, Tab to complete, 'exit' to quit\n")
 
         while self.running:
             try:
-                cmd = input(f"{Colors.GREEN}fe>{Colors.ENDC} ").strip()
-                if not cmd:
+                line = input(Colors.colorize("fe> ", Colors.GREEN)).strip()
+                if not line:
                     continue
-                if cmd in ['exit', 'quit']:
-                    self.running = False
-                    print_info("Goodbye!")
+                if line in ('exit', 'quit'):
                     break
-                if cmd == 'help':
-                    self.print_help()
-                    continue
-                args = self._parse_args(cmd.split())
-                if args:
-                    if hasattr(self, f'cmd_{args.command}'):
-                        func = getattr(self, f'cmd_{args.command}')
-                        func(args)
-                    else:
-                        print_error(f"Unknown command: {args.command}")
-                        self.print_help()
+                self.run(shlex.split(line))
+            except CLIError as e:
+                print_error(str(e))
+            except ValueError as e:  # shlex: unbalanced quotes
+                print_error(f"Could not read that command: {e}")
+            except SystemExit:
+                pass  # argparse already printed its usage message
             except KeyboardInterrupt:
-                print("\n")
-                continue
+                print()
             except EOFError:
-                self.running = False
-                print_info("\nGoodbye!")
+                print()
                 break
             except Exception as e:
-                print_error(f"Error: {e}")
+                print_error(f"Unexpected error: {e}")
+        try:
+            readline.write_history_file(str(HISTORY_PATH))
+        except Exception:
+            pass
+        print_info("Goodbye!")
 
     def _parse_args(self, argv):
-        """Parse command line arguments"""
-        parser = argparse.ArgumentParser(prog='fates-edge')
+        """Parse a command; None if argparse rejected it (it prints why)."""
+        try:
+            return self._build_parser().parse_args(argv)
+        except SystemExit:
+            return None
+
+    def _build_parser(self):
+        """The full command grammar (also drives tab completion)."""
+        parser = argparse.ArgumentParser(prog='fates-edge-cli')
         subparsers = parser.add_subparsers(dest='command', help='Commands')
 
         # Server Control
@@ -600,45 +776,45 @@ class CLI:
 
         rooms_subparsers.add_parser('list', help='List all rooms')
         rooms_info = rooms_subparsers.add_parser('info', help='Get room details (from the room list)')
-        rooms_info.add_argument('code', help='Room code')
+        rooms_info.add_argument('code', type=str.upper, help='Room code')
 
         # Deck operations
         deck_parser = rooms_subparsers.add_parser('draw', help='Draw cards from deck')
-        deck_parser.add_argument('code', help='Room code')
+        deck_parser.add_argument('code', type=str.upper, help='Room code')
         deck_parser.add_argument('--count', type=int, default=1, help='Number of cards to draw')
         deck_parser.add_argument('--region', default='Acasia', help='Region name')
 
         crown_parser = rooms_subparsers.add_parser('crown', help='Draw a Crown Spread')
-        crown_parser.add_argument('code', help='Room code')
+        crown_parser.add_argument('code', type=str.upper, help='Room code')
         crown_parser.add_argument('--region', default='Acasia', help='Region name')
 
         shuffle_parser = rooms_subparsers.add_parser('shuffle', help='Shuffle deck')
-        shuffle_parser.add_argument('code', help='Room code')
+        shuffle_parser.add_argument('code', type=str.upper, help='Room code')
 
         history_parser = rooms_subparsers.add_parser('deck-history', help='View deck history')
-        history_parser.add_argument('code', help='Room code')
+        history_parser.add_argument('code', type=str.upper, help='Room code')
         history_parser.add_argument('--limit', type=int, default=50, help='Number of entries to show')
 
         history_clear = rooms_subparsers.add_parser('deck-history-clear', help='Clear deck history')
-        history_clear.add_argument('code', help='Room code')
+        history_clear.add_argument('code', type=str.upper, help='Room code')
 
         # Grid Combat / Whiteboard
         grid_parser = rooms_subparsers.add_parser('grid-combat', help='Toggle/configure grid combat mode')
-        grid_parser.add_argument('code', help='Room code')
+        grid_parser.add_argument('code', type=str.upper, help='Room code')
         grid_parser.add_argument('--enable', action='store_true', help='Enable grid combat')
         grid_parser.add_argument('--disable', action='store_true', help='Disable grid combat')
         grid_parser.add_argument('--grid-type', choices=['square', 'hex', 'isometric'], help='Grid type')
         grid_parser.add_argument('--cell-size', type=int, help='Cell size in pixels')
 
         whiteboard_parser = rooms_subparsers.add_parser('whiteboard', help='Get whiteboard state')
-        whiteboard_parser.add_argument('code', help='Room code')
+        whiteboard_parser.add_argument('code', type=str.upper, help='Room code')
 
         # Tokens (addressed by grid cell -- col/row, not raw x/y pixels)
         token_parser = rooms_subparsers.add_parser('token', help='Manage grid combat tokens')
         token_subparsers = token_parser.add_subparsers(dest='token_action')
 
         token_add = token_subparsers.add_parser('add', help='Add (or update) a token')
-        token_add.add_argument('code', help='Room code')
+        token_add.add_argument('code', type=str.upper, help='Room code')
         token_add.add_argument('--name', required=True, help='Token label')
         token_add.add_argument('--id', help='Existing token id, to update it in place')
         token_add.add_argument('--col', type=int, default=0, help='Grid column')
@@ -648,13 +824,13 @@ class CLI:
         token_add.add_argument('--body', type=int, help='Body/health value')
 
         token_move = token_subparsers.add_parser('move', help='Move a token to a new cell')
-        token_move.add_argument('code', help='Room code')
+        token_move.add_argument('code', type=str.upper, help='Room code')
         token_move.add_argument('--id', required=True, help='Token ID')
         token_move.add_argument('--col', type=int, required=True, help='Grid column')
         token_move.add_argument('--row', type=int, required=True, help='Grid row')
 
         token_remove = token_subparsers.add_parser('remove', help='Remove a token')
-        token_remove.add_argument('code', help='Room code')
+        token_remove.add_argument('code', type=str.upper, help='Room code')
         token_remove.add_argument('--id', required=True, help='Token ID')
 
         # Client management
@@ -662,46 +838,71 @@ class CLI:
         clients_subparsers = clients_parser.add_subparsers(dest='clients_action')
 
         clients_list = clients_subparsers.add_parser('list', help='List clients in a room')
-        clients_list.add_argument('code', help='Room code')
+        clients_list.add_argument('code', type=str.upper, help='Room code')
 
         client_kick = clients_subparsers.add_parser('kick', help='Kick a client from a room')
-        client_kick.add_argument('code', help='Room code')
+        client_kick.add_argument('code', type=str.upper, help='Room code')
         client_kick.add_argument('--id', required=True, help='Client ID')
         client_kick.add_argument('--reason', default='Kicked by CLI', help='Reason for kick')
 
         client_ban = clients_subparsers.add_parser('ban', help='Ban a client from a room')
-        client_ban.add_argument('code', help='Room code')
+        client_ban.add_argument('code', type=str.upper, help='Room code')
         client_ban.add_argument('--id', required=True, help='Client ID')
         client_ban.add_argument('--reason', default='Banned by CLI', help='Reason for ban')
 
         client_unban = clients_subparsers.add_parser('unban', help='Unban a client from a room')
-        client_unban.add_argument('code', help='Room code')
+        client_unban.add_argument('code', type=str.upper, help='Room code')
         client_unban.add_argument('--id', required=True, help='Client ID')
+
+        client_role = clients_subparsers.add_parser('role', help='Change a client\'s role')
+        client_role.add_argument('code', type=str.upper, help='Room code')
+        client_role.add_argument('--id', required=True, help='Client ID')
+        client_role.add_argument('--role', required=True, choices=['gm', 'co-gm', 'assistant-gm', 'player', 'spectator'], help='New role')
+        client_role.add_argument('--persist', action='store_true', help='Keep the role for this account in future sessions')
+
+        # Adventure (server-side, the one the AI GM runs)
+        adv_parser = rooms_subparsers.add_parser('adventure', help='Show or drive the room\'s adventure')
+        adv_parser.add_argument('code', type=str.upper, help='Room code')
+        adv_sub = adv_parser.add_subparsers(dest='adventure_action')
+        adv_sub.add_parser('show', help='Show the current scene, clocks and log (default)')
+        adv_sub.add_parser('next', help='Advance to the next scene')
+        adv_load = adv_sub.add_parser('load', help='Load an adventure module')
+        adv_load.add_argument('module', help='Module ID (see: modules list)')
+        adv_sub.add_parser('reset', help='Reset the adventure to its start')
+        adv_log = adv_sub.add_parser('log', help='Add a line to the adventure log')
+        adv_log.add_argument('text', help='Text to log (quote it)')
+        adv_tick = adv_sub.add_parser('tick', help='Tick an adventure clock')
+        adv_tick.add_argument('ref', help='Clock name or index')
+        adv_tick.add_argument('--scope', choices=['scene', 'campaign'], default='scene')
+        adv_tick.add_argument('--amount', type=int, default=1)
+
+        chars_parser = rooms_subparsers.add_parser('characters', help='List characters with Harm, Fatigue and Boons')
+        chars_parser.add_argument('code', type=str.upper, help='Room code')
 
         # Ad-Hoc Timers (server/timers.js) -- NEW in v1.6.0
         timer_parser = rooms_subparsers.add_parser('timer', help='Manage ad-hoc timers (independent of any loaded adventure)')
         timer_subparsers = timer_parser.add_subparsers(dest='timer_action')
 
         timer_list = timer_subparsers.add_parser('list', help='List active ad-hoc timers')
-        timer_list.add_argument('code', help='Room code')
+        timer_list.add_argument('code', type=str.upper, help='Room code')
 
         timer_create = timer_subparsers.add_parser('create', help='Create (or re-arm) an ad-hoc timer')
-        timer_create.add_argument('code', help='Room code')
+        timer_create.add_argument('code', type=str.upper, help='Room code')
         timer_create.add_argument('--name', required=True, help='Timer name')
         timer_create.add_argument('--segments', type=int, required=True, help='Number of segments')
         timer_create.add_argument('--description', default='', help='What happens when this timer fills')
 
         timer_tick = timer_subparsers.add_parser('tick', help='Tick a timer forward (or back, with a negative amount)')
-        timer_tick.add_argument('code', help='Room code')
+        timer_tick.add_argument('code', type=str.upper, help='Room code')
         timer_tick.add_argument('--name', required=True, help='Timer name')
         timer_tick.add_argument('--amount', type=int, default=1, help='Number of ticks')
 
         timer_resolve = timer_subparsers.add_parser('resolve', help='Resolve a (typically filled) timer')
-        timer_resolve.add_argument('code', help='Room code')
+        timer_resolve.add_argument('code', type=str.upper, help='Room code')
         timer_resolve.add_argument('--name', required=True, help='Timer name')
 
         timer_remove = timer_subparsers.add_parser('remove', help='Remove a timer outright, no resolve narration')
-        timer_remove.add_argument('code', help='Room code')
+        timer_remove.add_argument('code', type=str.upper, help='Room code')
         timer_remove.add_argument('--name', required=True, help='Timer name')
 
         # Modules
@@ -739,97 +940,64 @@ class CLI:
         config_unset = config_subparsers.add_parser('unset', help='Remove configuration value')
         config_unset.add_argument('key', help='Configuration key')
 
+        # Watch
+        watch_parser = subparsers.add_parser('watch', help='Live view of rooms (or one room); Ctrl+C to stop')
+        watch_parser.add_argument('code', nargs='?', type=str.upper, help='Room code to focus on')
+        watch_parser.add_argument('--interval', type=float, default=3.0, help='Seconds between refreshes')
+
         # Logs
         logs_parser = subparsers.add_parser('logs', help='View server logs')
         logs_parser.add_argument('--tail', type=int, default=50, help='Number of lines to show')
+        logs_parser.add_argument('--follow', '-f', action='store_true', help='Keep printing new lines')
         logs_parser.add_argument('--docker', action='store_true', help='Use docker logs (requires container name)')
         logs_parser.add_argument('--container', help='Docker container name (default: auto-detect)')
 
-        # Help
-        subparsers.add_parser('help', help='Show this help')
-
-        try:
-            return parser.parse_args(argv)
-        except SystemExit:
-            return None
+        return parser
 
     def print_help(self):
-        """Print help message"""
-        print(f"""
-╔══════════════════════════════════════════════════════════════╗
-║              Fate's Edge CLI v{VERSION}                          ║
-╠══════════════════════════════════════════════════════════════╣
-║                                                              ║
-║  Server Management:                                          ║
-║    server start [--port PORT] [--host HOST] [--api-key KEY] ║
-║    server stop                         Stop server           ║
-║    server restart                      Restart server        ║
-║    server docker [--image] [--port] [--host-port]           ║
-║                                       Run in Docker          ║
-║                                                              ║
-║  Server Status:                                              ║
-║    health                             Check server health    ║
-║    status                             Get server status      ║
-║                                                              ║
-║  Room Management:                                             ║
-║    rooms list                         List all rooms         ║
-║    rooms info CODE                    Show room details      ║
-║    rooms draw CODE [--count] [--region] Draw cards          ║
-║    rooms crown CODE [--region]        Crown Spread           ║
-║    rooms shuffle CODE                 Shuffle deck           ║
-║    rooms deck-history CODE [--limit]  View deck history      ║
-║    rooms deck-history-clear CODE      Clear deck history     ║
-║                                                              ║
-║  Client Management:                                          ║
-║    rooms clients list CODE            List clients in room   ║
-║    rooms clients kick CODE --id ID    Kick a client          ║
-║    rooms clients ban CODE --id ID     Ban a client           ║
-║    rooms clients unban CODE --id ID   Unban a client         ║
-║                                                              ║
-║  Grid Combat:                                                ║
-║    rooms grid-combat CODE [--enable|--disable] [--grid-type] ║
-║    rooms whiteboard CODE              Get whiteboard state   ║
-║    rooms token add CODE --name NAME [--col C] [--row R]     ║
-║    rooms token move CODE --id ID --col C --row R            ║
-║    rooms token remove CODE --id ID                           ║
-║                                                              ║
-║  Ad-Hoc Timers (independent of any loaded adventure):        ║
-║    rooms timer list CODE              List active timers     ║
-║    rooms timer create CODE --name N --segments N             ║
-║    rooms timer tick CODE --name N [--amount N]               ║
-║    rooms timer resolve CODE --name N  Resolve a filled timer ║
-║    rooms timer remove CODE --name N   Remove without resolve ║
-║                                                              ║
-║  Module Management:                                          ║
-║    modules list                       List modules           ║
-║    modules push ID [--room]           Push module            ║
-║    modules cleanup ID [--room]        Cleanup module         ║
-║                                                              ║
-║  Backup & Restore:                                            ║
-║    backup [filename]                  Backup server data     ║
-║    restore filename                   Restore server data    ║
-║                                                              ║
-║  Configuration:                                               ║
-║    config get [key]                   Get configuration      ║
-║    config set KEY VALUE               Set configuration      ║
-║    config unset KEY                   Remove configuration   ║
-║                                                              ║
-║  Logs:                                                       ║
-║    logs [--tail N] [--docker] [--container NAME]            ║
-║                                      View server logs        ║
-║                                                              ║
-║  General:                                                    ║
-║    help                               Show this help         ║
-║    exit                               Exit the CLI           ║
-║                                                              ║
-║  Docker Integration:                                          ║
-║    - Detects when running inside a container and adjusts     ║
-║      default server URL to host.docker.internal.             ║
-║    - 'server docker' runs the server in a new container.     ║
-║    - 'logs --docker' fetches logs from the container.        ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
-        """)
+        """Grouped command overview; add --help to any command for details."""
+        groups = [
+            ("Server", [
+                ("status", "Health plus a table of open rooms"),
+                ("health", "Is the server up? (no API key needed)"),
+                ("watch [CODE] [--interval S]", "Live view of all rooms, or one room"),
+                ("logs [--tail N] [-f] [--docker]", "Server log (from 'server start', or Docker)"),
+                ("server start|stop|restart|docker", "Run the server locally or in Docker"),
+            ]),
+            ("Rooms", [
+                ("rooms list", "Open rooms with GM, clients and adventure"),
+                ("rooms info CODE", "One room in detail, with its clients"),
+                ("rooms characters CODE", "Characters with Harm, Fatigue, Boons, XP"),
+                ("rooms clients list|kick|ban|unban CODE --id ID", "Manage connected clients"),
+                ("rooms clients role CODE --id ID --role ROLE", "gm, co-gm, assistant-gm, player, spectator"),
+            ]),
+            ("Adventure (the one the AI GM runs)", [
+                ("rooms adventure CODE", "Current act, scene, clocks and recent log"),
+                ("rooms adventure CODE next|reset", "Advance the scene, or start over"),
+                ("rooms adventure CODE load MODULE", "Load an adventure module"),
+                ("rooms adventure CODE tick NAME [--scope] [--amount]", "Tick a scene or campaign clock"),
+                ("rooms adventure CODE log \"TEXT\"", "Add a line to the adventure log"),
+            ]),
+            ("Deck, timers and the table", [
+                ("rooms draw|crown|shuffle CODE", "Deck of Consequences / Crown Spread"),
+                ("rooms deck-history[-clear] CODE", "Recent draws"),
+                ("rooms timer list|create|tick|resolve|remove CODE", "Ad-hoc timers"),
+                ("rooms grid-combat|whiteboard|token ... CODE", "Grid combat and tokens"),
+            ]),
+            ("Other", [
+                ("modules list|push|cleanup", "Content modules"),
+                ("backup [FILE] / restore FILE", "Local snapshot of rooms and modules"),
+                ("config get|set|unset", "server_url, api_key (env FATES_EDGE_SERVER_URL / FATES_EDGE_API_KEY win)"),
+                ("help / exit", ""),
+            ]),
+        ]
+        print_header(f"Fate's Edge CLI v{VERSION}")
+        for title, rows in groups:
+            print(Colors.colorize(f"\n  {title}", Colors.BOLD))
+            width = max(len(c) for c, _ in rows)
+            for cmd, desc in rows:
+                print(f"    {cmd.ljust(width)}  {desc}")
+        print("\n  Add --help to any command for its options. Quote arguments with spaces.\n")
 
     # ============================================================
     # Command Handlers
@@ -851,41 +1019,59 @@ class CLI:
 
     def cmd_health(self, args):
         """Check server health"""
-        try:
-            data = self.client.health()
-            print_success("Server is healthy")
-            print_data(json.dumps(data, indent=2))
-        except:
-            print_error("Server health check failed")
+        data = self.client.health()
+        stats = data.get('stats', {})
+        print_success(f"Server is up at {self.client.server_url} — {stats.get('totalRooms', 0)} rooms, {stats.get('totalClients', 0)} clients, up {format_duration(data.get('uptime', 0))}")
+        return True
 
     def cmd_status(self, args):
-        """Get server status"""
-        try:
-            data = self.client.status()
-            print_header("Server Status")
-            for key, value in data.items():
-                print(f"  {key}: {value}")
-        except:
-            print_error("Failed to get server status")
+        """Server health plus a table of rooms (needs the API key)"""
+        data = self.client.health()
+        print_header(f"Fate's Edge server — {self.client.server_url}")
+        print(f"  Uptime: {format_duration(data.get('uptime', 0))}")
+        rooms = self.client.list_rooms()
+        print(f"  Rooms: {len(rooms)}   Clients: {sum(r.get('clients', 0) for r in rooms)}")
+        if rooms:
+            print()
+            print_rooms_table(rooms)
+        return True
 
     def cmd_rooms(self, args):
         """Handle room commands"""
+        if args.action is None:
+            raise CLIError("Choose a room action, e.g. rooms list (see: help)")
         if args.action == 'list':
             rooms = self.client.list_rooms()
             if rooms:
                 print_header(f"Rooms ({len(rooms)})")
-                for room in rooms:
-                    print(f"  🟢 {room.get('code')}: {room.get('name')} ({room.get('clients', 0)} clients, {room.get('deckRemaining', 0)} cards left)")
+                print_rooms_table(rooms)
             else:
-                print_info("No rooms found")
+                print_info("No rooms open (a room exists while someone is connected)")
         elif args.action == 'info':
             room = self.client.get_room_info(args.code)
             if not room:
-                print_error(f"Room {args.code} not found (or has no connected clients yet)")
-                return
-            print_header(f"Room: {room.get('code')}")
-            for key, value in room.items():
-                print(f"  {key}: {value}")
+                raise CLIError(f"Room {args.code.upper()} is not open (no one is connected to it)")
+            print_header(f"Room {room.get('code')}")
+            adventure = room.get('adventure')
+            print(f"  GM: {room.get('gm') or '—'}   Clients: {room.get('clients', 0)} ({room.get('bots', 0)} bots)   Password: {'yes' if room.get('hasPassword') else 'no'}")
+            print(f"  Adventure: {adventure['title'] + ' (' + adventure.get('status', '') + ')' if adventure else '—'}")
+            print(f"  Characters: {room.get('characterCount', 0)}   Deck: {room.get('deckRemaining', 0)} cards, {room.get('historyCount', 0)} draws")
+            print(f"  Open since: {format_time(room.get('created'))}   Last activity: {format_ago(room.get('lastActivity'))}")
+            clients = self.client.get_clients(args.code)
+            if clients:
+                print()
+                print_clients(clients)
+        elif args.action == 'adventure':
+            self._adventure(args)
+        elif args.action == 'characters':
+            chars = self.client.list_characters(args.code)
+            if not chars:
+                print_info("No characters in this room")
+            else:
+                print_header(f"Characters — room {args.code.upper()} ({len(chars)})")
+                print_table(['Name', 'Player', 'Harm', 'Fatigue', 'Boons', 'XP'], [
+                    [c.get('name', '?'), c.get('playerName') or '—', harm_label(c.get('harm', 0), c.get('dead')),
+                     str(c.get('fatigue', 0)), str(c.get('boons', 0)), str(c.get('xp', 0))] for c in chars])
         elif args.action == 'draw':
             result = self.client.deck_draw(args.code, args.count, args.region)
             print_success(f"Drew {args.count} card(s) from {args.region}")
@@ -961,10 +1147,8 @@ class CLI:
             if args.clients_action == 'list':
                 clients = self.client.get_clients(args.code)
                 if clients:
-                    print_header(f"Clients in room {args.code} ({len(clients)})")
-                    for client in clients:
-                        role_icon = '👑' if client.get('role') == 'gm' else '👤'
-                        print(f"  {role_icon} {client.get('id')}: {client.get('name')} ({client.get('role')})")
+                    print_header(f"Clients in room {args.code.upper()} ({len(clients)})")
+                    print_clients(clients)
                 else:
                     print_info("No clients in room")
             elif args.clients_action == 'kick':
@@ -976,6 +1160,9 @@ class CLI:
             elif args.clients_action == 'unban':
                 self.client.unban_client(args.code, args.id)
                 print_success(f"Client {args.id} unbanned from room {args.code}")
+            elif args.clients_action == 'role':
+                result = self.client.set_role(args.code, args.id, args.role, args.persist)
+                print_success(f"Client {args.id} is now {result.get('role', args.role)}" + (" (kept for future sessions)" if result.get('persist') else ""))
             else:
                 print_error(f"Unknown clients action: {args.clients_action}")
         elif args.action == 'timer':
@@ -1008,7 +1195,57 @@ class CLI:
             else:
                 print_error("Specify a timer action: list, create, tick, resolve, or remove")
         else:
-            print_error(f"Unknown room action: {args.action}")
+            raise CLIError(f"Unknown room action: {args.action}")
+        return True
+
+    def _adventure(self, args):
+        action = args.adventure_action or 'show'
+        if action == 'next':
+            state = self.client.adventure_next(args.code)
+            print_success(f"Now at: {(state.get('currentScene') or {}).get('title', 'the end of the adventure')}")
+        elif action == 'load':
+            state = self.client.adventure_load(args.code, args.module)
+            print_success(f"Loaded \"{state.get('title', args.module)}\"")
+        elif action == 'reset':
+            self.client.adventure_reset(args.code)
+            print_success("Adventure reset to its first scene")
+        elif action == 'log':
+            self.client.adventure_log(args.code, args.text)
+            print_success("Logged")
+        elif action == 'tick':
+            self.client.adventure_tick(args.code, args.scope, args.ref, args.amount)
+            print_success(f"Ticked {args.scope} clock {args.ref} by {args.amount}")
+        state = self.client.get_adventure(args.code)
+        print_adventure(state)
+
+    def cmd_watch(self, args):
+        """Refresh a live view until Ctrl+C."""
+        try:
+            while True:
+                lines = [f"Fate's Edge — {self.client.server_url} — {datetime.now().strftime('%H:%M:%S')} (Ctrl+C to stop)", ""]
+                if args.code:
+                    room = self.client.get_room_info(args.code)
+                    if not room:
+                        lines.append(f"Room {args.code.upper()} is not open.")
+                    else:
+                        lines.append(f"Room {room.get('code')} — GM {room.get('gm') or '—'} — {room.get('clients', 0)} connected — last activity {format_ago(room.get('lastActivity'))}")
+                        lines += capture(print_clients, self.client.get_clients(args.code))
+                        if room.get('adventure'):
+                            lines.append("")
+                            lines += capture(print_adventure, self.client.get_adventure(args.code), False)
+                else:
+                    rooms = self.client.list_rooms()
+                    lines.append(f"{len(rooms)} rooms, {sum(r.get('clients', 0) for r in rooms)} clients")
+                    if rooms:
+                        lines.append("")
+                        lines += capture(print_rooms_table, rooms)
+                if sys.stdout.isatty():
+                    print("\033[2J\033[H", end="")
+                print("\n".join(lines), flush=True)
+                time.sleep(max(0.5, args.interval))
+        except KeyboardInterrupt:
+            print()
+        return True
 
     def cmd_modules(self, args):
         """Handle module commands"""
@@ -1028,7 +1265,8 @@ class CLI:
             self.client.cleanup_module(args.id, args.room)
             print_success(f"Module {args.id} cleaned up" + (f" from room {args.room}" if args.room else " from all rooms"))
         else:
-            print_error(f"Unknown module action: {args.action}")
+            raise CLIError(f"Unknown module action: {args.action}")
+        return True
 
     def cmd_backup(self, args):
         """Backup server data (a local snapshot of the room/module listings + this CLI's config -- not a server-side backup)"""
@@ -1057,8 +1295,9 @@ class CLI:
 
             print_success(f"Backup saved to {filepath}")
             print_info(f"Size: {filepath.stat().st_size} bytes")
-        except Exception as e:
-            print_error(f"Backup failed: {e}")
+            return True
+        except OSError as e:
+            raise CLIError(f"Backup failed: {e}")
 
     def cmd_restore(self, args):
         """Show what a backup snapshot contained (informational only -- rooms are ephemeral and re-created live, not restored from a file)"""
@@ -1104,7 +1343,8 @@ class CLI:
             self.config.set(args.key, None)
             print_success(f"Unset {args.key}")
         else:
-            print_error(f"Unknown config action: {args.action}")
+            raise CLIError(f"Unknown config action: {args.action}")
+        return True
 
     def cmd_logs(self, args):
         """View server logs"""
@@ -1121,30 +1361,44 @@ class CLI:
                     if matching:
                         container = matching[0]
                     else:
-                        print_error("No fates-edge container found. Specify --container.")
-                        return
-                except:
-                    print_error("Docker not available or no containers found.")
-                    return
+                        raise CLIError("No fates-edge container found. Specify --container.")
+                except FileNotFoundError:
+                    raise CLIError("Docker is not installed or not on PATH.")
 
-            cmd = ['docker', 'logs', '--tail', str(args.tail), container]
+            cmd = ['docker', 'logs', '--tail', str(args.tail)] + (['--follow'] if args.follow else []) + [container]
             try:
                 subprocess.run(cmd, check=True)
             except subprocess.CalledProcessError as e:
-                print_error(f"Failed to get logs: {e}")
+                raise CLIError(f"Failed to get logs: {e}")
             except FileNotFoundError:
-                print_error("Docker not found.")
-        else:
-            print_info("Log viewing not implemented for standalone mode.")
-            print_info("Check the server logs directly in your deployment.")
+                raise CLIError("Docker is not installed or not on PATH.")
+            except KeyboardInterrupt:
+                print()
+            return True
+        if not SERVER_LOG_PATH.exists():
+            raise CLIError(f"No log at {SERVER_LOG_PATH}. It is written when the server is started with 'server start'; for Docker use 'logs --docker'.")
+        for line in tail_file(SERVER_LOG_PATH, args.tail):
+            print(line)
+        if args.follow:
+            try:
+                with open(SERVER_LOG_PATH, 'r', errors='replace') as fh:
+                    fh.seek(0, os.SEEK_END)
+                    while True:
+                        line = fh.readline()
+                        if line:
+                            print(line, end='', flush=True)
+                        else:
+                            time.sleep(0.3)
+            except KeyboardInterrupt:
+                print()
+        return True
 
 # ============================================================
 # Main Entry Point
 # ============================================================
 
 def main():
-    # If running with no arguments and in a non-interactive environment,
-    # start the server automatically (useful for Docker).
+    # No arguments and no terminal (e.g. a container): start the server.
     if len(sys.argv) == 1 and not sys.stdin.isatty():
         print_info("No command given; starting server automatically (Docker mode).")
         class Args:
@@ -1152,31 +1406,23 @@ def main():
             host = '0.0.0.0'
             api_key = os.environ.get('API_KEY')
         cli = CLI()
-        success = cmd_server_start(Args(), cli.config)
-        sys.exit(0 if success else 1)
+        sys.exit(0 if cmd_server_start(Args(), cli.config) else 1)
 
     cli = CLI()
     if len(sys.argv) > 1:
-        args = cli._parse_args(sys.argv[1:])
-        if args:
-            if hasattr(cli, f'cmd_{args.command}'):
-                func = getattr(cli, f'cmd_{args.command}')
-                success = func(args)
-                sys.exit(0 if success else 1)
-            else:
-                print_error(f"Unknown command: {args.command}")
-                cli.print_help()
-                sys.exit(1)
-        else:
-            sys.exit(1)
-    else:
         try:
-            cli.interactive()
-        except KeyboardInterrupt:
-            print("\nGoodbye!")
-        except Exception as e:
-            print_error(f"Fatal error: {e}")
+            result = cli.run(sys.argv[1:])
+        except CLIError as e:
+            print_error(str(e))
             sys.exit(1)
+        except KeyboardInterrupt:
+            sys.exit(130)
+        # Handlers return False on failure; anything else is success.
+        sys.exit(1 if result is False else 0)
+    try:
+        cli.interactive()
+    except KeyboardInterrupt:
+        print("\nGoodbye!")
 
 if __name__ == '__main__':
     main()

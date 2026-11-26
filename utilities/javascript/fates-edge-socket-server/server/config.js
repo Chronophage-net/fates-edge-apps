@@ -83,6 +83,7 @@ function loadConfig({ env = process.env, logger = console } = {}) {
 
     if (!config.apiKey) {
         config.apiKey = crypto.randomBytes(24).toString('hex');
+        config.apiKeyGenerated = true;
         logger.log(`No API_KEY configured. Temporary admin key: ${config.apiKey}`);
         logger.log('Set API_KEY to keep the same key across restarts.');
     }
