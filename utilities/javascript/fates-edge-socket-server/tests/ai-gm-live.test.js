@@ -59,9 +59,9 @@ test('AI-GM wire contract bridges browser transports, preserves authority, and i
         ['scene-status-update', { sceneId: 'scene-1', status: 'active' }],
         ['combat-status-update', { active: true }],
     ];
-    // Plain WS excludes the sender; Socket.IO also echoes to its sender.
+    // Neither transport echoes a chat line to its sender: each browser
+    // sees only the other's command.
     await browsers[0].wait('chat-message');
-    await browsers[1].wait('chat-message');
     await browsers[1].wait('chat-message');
     for (const [event, payload] of events) {
         bot.send(event, payload);

@@ -630,7 +630,10 @@ function handleWebSocketMessage(data) {
             triggerEvent(type, data);
             break;
 
+        // 'roll-dice' is what older Socket.IO clients emitted for a roll;
+        // the server relays both names, so treat them as one event.
         case 'roll-result':
+        case 'roll-dice':
             triggerEvent('roll-result', data);
             break;
             
@@ -767,6 +770,10 @@ function handleWebSocketMessage(data) {
             // For any unhandled event, dispatch a custom event and also trigger the generic 'event'
             const customEvent = new CustomEvent('ws-message', { detail: data });
             document.dispatchEvent(customEvent);
+            // Subscribers listen by message type (onWSEvent('adhoc-timer-
+            // ticked', ...)); before this, anything without its own case
+            // only reached generic 'event' listeners and was lost to them.
+            if (type !== 'event') triggerEvent(type, data);
             triggerEvent('event', data);
             // Optional debug: console.debug('Unhandled WebSocket event type:', type);
     }
@@ -1044,6 +1051,14 @@ export function initSocketIO(serverUrl = null, options = {}) {
  */
 function setupSocketIOListeners() {
     if (!socket) return;
+
+    // Socket.IO drops events nobody listens for by name. Every server
+    // event without an explicit listener below still reaches onWSEvent()
+    // subscribers, matching the plain-WebSocket default case.
+    socket.onAny((event, data) => {
+        if (socket.listeners(event).length === 0) triggerEvent(event, data);
+    });
+    socket.on('roll-dice', (data) => triggerEvent('roll-result', data));
     
     // Room events
     socket.on('room-joined', (data) => {
@@ -1250,8 +1265,12 @@ function setupSocketIOListeners() {
         triggerEvent('timer-ticked', data);
     });
 
-    // Other events
+    // Other events. A nested { type } (X-card, spell cards, scene and
+    // combat status) arrives over plain WebSocket under that type, since
+    // the server spreads the payload over its envelope; do the same here
+    // so the named handlers fire on both transports.
     socket.on('event', (data) => {
+        if (data && typeof data.type === 'string' && data.type !== 'event') triggerEvent(data.type, data);
         triggerEvent('event', data);
     });
     
@@ -1289,11 +1308,10 @@ export function leaveRoom() {
  * Register event handler
  */
 export function onEvent(event, callback) {
-    if (eventHandlers[event]) {
-        eventHandlers[event].push(callback);
-    } else {
-        console.warn('Unknown event type:', event);
-    }
+    // Register on demand: a fixed list here silently dropped subscribers
+    // to real server events it didn't name (adhoc timers, AI-GM
+    // suggestions, whiteboard pings).
+    (eventHandlers[event] ||= []).push(callback);
 }
 
 /**
@@ -1401,7 +1419,11 @@ export function sendMessage(data) {
             console.warn('Cannot send message: not connected to server');
             return false;
         }
-        socket.emit('message', data);
+        // No server handles a bare 'message' event: send under the
+        // payload's own type, as the plain-WebSocket path does.
+        if (!data || typeof data.type !== 'string') return false;
+        const { type, ...payload } = data;
+        socket.emit(type, { ...payload, room: roomCode });
         return true;
     } else {
         return sendWSMessage(data);
@@ -1459,7 +1481,9 @@ export function sendRoll(rollData) {
             console.warn('Cannot send roll: not connected to server');
             return false;
         }
-        socket.emit('roll-dice', { ...rollData, room: roomCode });
+        // Same event name as the plain-WebSocket path, so every client's
+        // 'roll-result' listener sees it whichever transport sent it.
+        socket.emit('roll-result', { ...rollData, room: roomCode });
         return true;
     } else {
         return sendWSMessage({ 
@@ -1479,6 +1503,16 @@ export function sendEvent(eventData) {
         if (!isConnected || !socket || !socket.connected || !roomCode) {
             console.warn('Cannot send event: not connected to server');
             return false;
+        }
+        // A typed event goes out under its own name, exactly as on plain
+        // WebSocket (whose { type: 'event', ...eventData } lets the nested
+        // type win). Wrapped in 'event' here, ad-hoc timers never reached
+        // the timer engine, state-updated never stored the roster, and
+        // presence/character-select never updated the client list.
+        if (typeof eventData?.type === 'string' && eventData.type !== 'event') {
+            const { type, ...payload } = eventData;
+            socket.emit(type, { ...payload, room: roomCode });
+            return true;
         }
         socket.emit('event', { ...eventData, room: roomCode });
         return true;

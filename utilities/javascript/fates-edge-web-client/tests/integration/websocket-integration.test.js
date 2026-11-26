@@ -15,7 +15,11 @@ describe('AI-GM browser event delivery', () => {
             const context = {
                 pendingCallbacks: new Map(),
                 triggerEvent: (event, data) => received.push({ event, data }),
-                socket: { on: (event, fn) => listeners.set(event, fn) },
+                socket: {
+                    on: (event, fn) => listeners.set(event, fn),
+                    onAny: fn => listeners.set('*', fn),
+                    listeners: event => (listeners.has(event) ? [listeners.get(event)] : []),
+                },
                 document: { dispatchEvent() {} },
                 CustomEvent: class {},
             };
@@ -33,6 +37,46 @@ describe('AI-GM browser event delivery', () => {
                 assertEqual(received[0].event, event);
                 assert(received[0].data === data, 'payload preserved');
                 received.length = 0;
+            }
+        });
+    }
+
+    // Events with no case of their own (ad-hoc timers, whiteboard pings,
+    // nested sendEvent types) must still reach onWSEvent(type) subscribers.
+    for (const transport of ['websocket', 'socketio']) {
+        it(`${transport} delivers unlisted and nested event types to named subscribers`, () => {
+            const received = [], listeners = new Map();
+            const context = {
+                pendingCallbacks: new Map(),
+                triggerEvent: (event, data) => received.push({ event, data }),
+                socket: {
+                    on: (event, fn) => listeners.set(event, fn),
+                    onAny: fn => listeners.set('*', fn),
+                    listeners: event => (listeners.has(event) ? [listeners.get(event)] : []),
+                },
+                document: { dispatchEvent() {} },
+                CustomEvent: class {},
+            };
+            const names = list => list.map(r => r.event);
+            if (transport === 'websocket') {
+                const dispatch = vm.runInNewContext(plainDispatcher + ';handleWebSocketMessage;', context);
+                dispatch({ type: 'adhoc-timer-created', timers: [] });
+                assert(names(received).includes('adhoc-timer-created'), 'named subscribers see unlisted types');
+                received.length = 0;
+                dispatch({ type: 'roll-dice', outcome: 'Success' });
+                assertEqual(names(received).join(), 'roll-result', 'roll-dice is a roll-result');
+            } else {
+                vm.runInNewContext(ioDispatcher + ';setupSocketIOListeners();', context);
+                listeners.get('*')('adhoc-timer-created', { timers: [] });
+                assertEqual(names(received).join(), 'adhoc-timer-created');
+                received.length = 0;
+                listeners.get('*')('roll-result', {});
+                assertEqual(received.length, 0, 'onAny skips events that have their own listener');
+                listeners.get('roll-dice')({ outcome: 'Success' });
+                assertEqual(names(received).join(), 'roll-result', 'roll-dice is a roll-result');
+                received.length = 0;
+                listeners.get('event')({ type: 'x-card-raised', from: 'Ana' });
+                assertEqual(names(received).join(), 'x-card-raised,event', 'nested type reaches its named handler');
             }
         });
     }

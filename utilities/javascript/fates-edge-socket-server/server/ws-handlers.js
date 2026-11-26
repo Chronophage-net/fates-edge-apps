@@ -461,6 +461,11 @@ function setupWSS(wss, appConfig) {
                     case 'voice-status':
                     case 'roll-dice':
                     case 'roll-result':
+                    // Live cursor ping on the shared whiteboard; never stored.
+                    case 'whiteboard-ping':
+                    // Safety-tool X-card: a pause any participant may call.
+                    case 'x-card-raised':
+                    case 'x-card-resumed':
                     case 'operation':
                     case 'operation_ack':
                     case 'module-push':
@@ -565,6 +570,8 @@ function setupWSS(wss, appConfig) {
                     }
 
                     case 'adventure-timer': {
+                        // See socketio-handlers.js: no server-side adventure, no tick.
+                        if (!adventure.ensureAdventureState(currentRoom).module) break;
                         try {
                             const state = adventure.tickTimer(currentRoom, { scope: data.scope, ref: data.ref, name: data.name, amount: data.amount });
                             room.broadcastToRoom(roomKey, 'timer-ticked', state);

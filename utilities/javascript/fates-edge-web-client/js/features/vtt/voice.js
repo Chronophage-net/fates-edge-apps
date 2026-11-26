@@ -321,11 +321,13 @@ function setupVoiceEvents() {
     const joinedHandler = (data) => {
         // The client will send their own voice-status, so we wait for that
     };
-    onWSEvent('client-joined', joinedHandler);
-    wsEventListeners.push({ event: 'client-joined', handler: joinedHandler });
+    onWSEvent('player-joined', joinedHandler);
+    wsEventListeners.push({ event: 'player-joined', handler: joinedHandler });
 
     // Client left – cleanup voice for that client
-    const leftHandler = (clientId) => {
+    // The server sends 'player-left' as { clientId, clientName, clients }.
+    const leftHandler = (data) => {
+        const clientId = typeof data === 'string' ? data : data?.clientId;
         if (!clientId) return;
         voiceClients.delete(clientId);
         if (voiceChat) {
@@ -334,8 +336,8 @@ function setupVoiceEvents() {
         stopSpeakingDetector(clientId);
         notifyClientsChanged();
     };
-    onWSEvent('client-left', leftHandler);
-    wsEventListeners.push({ event: 'client-left', handler: leftHandler });
+    onWSEvent('player-left', leftHandler);
+    wsEventListeners.push({ event: 'player-left', handler: leftHandler });
 
     // Disconnect – cleanup all voice
     const disconnectHandler = () => {

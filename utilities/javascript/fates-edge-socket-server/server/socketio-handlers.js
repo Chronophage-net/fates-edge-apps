@@ -464,6 +464,26 @@ function setupSocketIO(io, appConfig) {
             room.broadcastToRoom(socket.room, 'character-select', data || {}, socket.id);
         });
 
+        // ─── Presence ─────────────────────────────────────────────
+        // Mirrors ws-handlers.js's 'presence' case: update this client's
+        // display name / active view and send everyone the refreshed
+        // roster. Role is never taken from the payload; it changes only
+        // through the guarded GM/role flow.
+        socket.on('presence', (data) => {
+            if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
+            const r = room.rooms.get(socket.room);
+            if (!r) return;
+            const entry = r.clients.get(socket.id);
+            if (!entry) return;
+            if (data && data.name) {
+                const name = clampString(data.name, MAX_NAME_LENGTH);
+                if (name) { entry.name = name; if (socket.clientData) socket.clientData.name = name; }
+            }
+            if (data && typeof data.activeView === 'string') entry.activeView = clampString(data.activeView, MAX_NAME_LENGTH);
+            r.clients.set(socket.id, entry);
+            room.broadcastToRoom(socket.room, 'presence', { clients: room.getClientsList(r) }, socket.id);
+        });
+
         // ─── GM requests ────────────────────────────────────────────
         socket.on('request_gm', () => {
             if (!socket.room) return;
@@ -735,6 +755,9 @@ function setupSocketIO(io, appConfig) {
             if (!socket.room) return socket.emit('error', { message: 'Not in a room' });
             const r = room.rooms.get(socket.room);
             if (!r) return socket.emit('error', { message: 'Room not found' });
+            // The web client runs adventures locally and reports every tick
+            // here; with nothing loaded server-side there is nothing to tick.
+            if (!adventure.ensureAdventureState(r).module) return;
             try {
                 const state = adventure.tickTimer(r, { scope: data?.scope, ref: data?.ref, name: data?.name, amount: data?.amount });
                 room.broadcastToRoom(socket.room, 'timer-ticked', state);
@@ -1043,14 +1066,16 @@ function setupSocketIO(io, appConfig) {
                 }
                 return;
             }
-            room.broadcastToRoom(socket.room, 'chat-message', payload, socket.id);
+            room.broadcastToRoom(socket.room, 'chat-message', payload, socket.id, { exceptSender: true });
         });
 
         // ─── Relay events ───────────────────────────────────────────
         const relayEvents = [
             'media_recording', 'voice-offer', 'voice-answer', 'voice-ice-candidate',
-            'voice-status', 'roll-dice', 'roll-result',
-            'event', 'operation', 'operation_ack', 'presence',
+            'voice-status', 'roll-dice', 'roll-result', 'whiteboard-ping',
+            // Safety-tool X-card: a pause any participant may call.
+            'x-card-raised', 'x-card-resumed',
+            'event', 'operation', 'operation_ack',
             // NEW: parity with the plain-WS handler's direct-broadcast list
             // (ws-handlers.js) -- these were relay-only there but silently
             // dropped for Socket.IO-connected clients, since Socket.IO only
@@ -1125,7 +1150,7 @@ function setupSocketIO(io, appConfig) {
                     // overwriting any client-supplied value. See ws-handlers.js's
                     // matching fix for the plain-WS transport.
                     ...(eventName === 'event' ? { socketId: socket.id } : {}),
-                }, socket.id);
+                }, socket.id, { exceptSender: true });
             });
         });
 

@@ -332,6 +332,10 @@ const GM_GATED_EVENTS = new Set([
     'module-push-request',
     'module-cleanup',
     'module-cleanup-request',
+    // The full reference includes knowledge the GM has not revealed yet;
+    // players get the filtered 'adventure-state' instead.
+    'adventure-reference',
+    'adventure-reference-request',
 ]);
 
 const STORY_AUTHORITY_ROLES = new Set(['gm', 'co-gm', 'assistant-gm']);

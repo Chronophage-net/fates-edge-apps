@@ -617,7 +617,7 @@ function resolveRoom(idOrCode) {
     return null;
 }
 
-function broadcastToRoom(roomCode, event, data, senderId = null) {
+function broadcastToRoom(roomCode, event, data, senderId = null, options = {}) {
     const room = resolveRoom(roomCode);
     if (!room) return;
 
@@ -631,7 +631,12 @@ function broadcastToRoom(roomCode, event, data, senderId = null) {
     // attached the Redis adapter (io.adapter(...)) -- no extra call
     // needed here either way.
     if (io) {
-        io.to(room.room_id).emit(event, payload);
+        // Socket.IO senders get their own broadcast back by default (deck
+        // draws and crown spreads reach the requester that way). Pure
+        // relays pass exceptSender, matching plain WebSocket, so the sender
+        // doesn't see its own chat line or roll twice.
+        const target = io.to(room.room_id);
+        (senderId && options.exceptSender ? target.except(senderId) : target).emit(event, payload);
     }
 
     // Plain-ws clients connected to THIS instance.

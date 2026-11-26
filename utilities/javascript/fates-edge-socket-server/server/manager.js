@@ -3,7 +3,32 @@ const crypto = require('node:crypto');
 const jwt = require('jsonwebtoken');
 const { STORY_AUTHORITY_EVENTS, GM_GATED_EVENTS, SPECTATOR_READ_EVENTS, checkEventPermission } = require('./security.js');
 
-const participantEvents = new Set(['chat-message','roll','dice-roll','character-select','claim-character','release-character','character-update','character-create','character-delete','character-sync','whiteboard-update','whiteboard-clear','player-update','webrtc-offer','webrtc-answer','webrtc-ice-candidate','voice-state']);
+// Names must match what the transports actually handle (ws-handlers.js's
+// switch, socketio-handlers.js's listeners and relayEvents). This list once
+// held invented names ('roll', 'dice-roll', 'webrtc-offer', 'voice-state')
+// while the real 'roll-result'/'roll-dice' were refused, so every dice roll
+// in a managed room came back "not enabled for managed rooms".
+const participantEvents = new Set([
+    'chat-message', 'roll-result', 'roll-dice', 'event', 'presence',
+    'x-card-raised', 'x-card-resumed',
+    'character-select', 'claim-character', 'release-character',
+    'whiteboard-update', 'whiteboard-ping', 'sync-state', 'state-updated',
+    'operation', 'operation_ack', 'media_recording',
+    'voice-offer', 'voice-answer', 'voice-ice-candidate', 'voice-status',
+    'turn-credentials-request',
+]);
+
+
+/** Scope a managed-room token needs for `event`, or null when managed rooms
+ *  refuse it (membership and seat changes belong to the manager). */
+function managedEventScope(event) {
+    if (['handshake','join-room','leave-room','ping'].includes(event)) return 'room:connect';
+    if (SPECTATOR_READ_EVENTS.has(event)) return 'room:read';
+    if (STORY_AUTHORITY_EVENTS.has(event)) return 'session:run';
+    if (GM_GATED_EVENTS.has(event)) return 'campaign:write';
+    if (participantEvents.has(event)) return 'character:write';
+    return null;
+}
 
 function createManagerNode({ origin, serverId, credential, publicUrl, name, capacity = 100, region = 'default', fetcher = fetch }) {
     const url = new URL(origin);
@@ -60,13 +85,8 @@ function createManagerNode({ origin, serverId, credential, publicUrl, name, capa
     }
     function permit(claims,event,code) {
         // Membership and seat changes have exactly one writer: the manager.
-        let scope;
-        if (['handshake','join-room','leave-room','ping'].includes(event)) scope='room:connect';
-        else if (SPECTATOR_READ_EVENTS.has(event)) scope='room:read';
-        else if (STORY_AUTHORITY_EVENTS.has(event)) scope='session:run';
-        else if (GM_GATED_EVENTS.has(event)) scope='campaign:write';
-        else if (participantEvents.has(event)) scope='character:write';
-        else throw new Error('This event is not enabled for managed rooms');
+        const scope=managedEventScope(event);
+        if (!scope) throw new Error('This event is not enabled for managed rooms');
         assertClaims(claims,code,scope);
         // Handshake assigns the verified role; spectator query checks start after it.
         if (event!=='handshake' && checkEventPermission(event,claims.role)) throw new Error('Role does not allow this event');
@@ -99,4 +119,4 @@ function fromEnvironment(env=process.env) {
     return createManagerNode({origin:env.MANAGER_URL,serverId:env.MANAGER_SERVER_ID,credential:env.MANAGER_NODE_CREDENTIAL,
         publicUrl:env.MANAGER_PUBLIC_URL,name:env.MANAGER_NODE_NAME || env.MANAGER_SERVER_ID,capacity:Number(env.MANAGER_CAPACITY_ROOMS || 100),region:env.MANAGER_REGION || 'default'});
 }
-module.exports={createManagerNode,fromEnvironment};
+module.exports={createManagerNode,fromEnvironment,managedEventScope};
