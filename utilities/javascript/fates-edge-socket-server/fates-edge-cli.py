@@ -64,6 +64,7 @@ import readline
 import getpass
 import socket
 import tempfile
+import re
 import shlex
 import urllib.request
 import urllib.error
@@ -95,6 +96,14 @@ SERVER_LOG_PATH = Path.home() / ".fates-edge" / "server.log"
 class CLIError(Exception):
     """A command failed; the message is already user-facing. The
     interactive shell prints it and carries on; one-shot mode exits 1."""
+
+
+class NoRoom(CLIError):
+    """The room isn't open. Not a failure: rooms exist only while someone
+    is connected, so this is reported as information and exits 0."""
+    def __init__(self, code: str):
+        self.code = code.upper()
+        super().__init__(f"No room {self.code} is open right now (a room exists only while someone is connected to it).")
 
 
 # ============================================================
@@ -198,6 +207,11 @@ class ServerClient:
                 detail = json.loads(raw).get('error') or raw
             except Exception:
                 detail = raw or e.reason
+            # Every room route reports a missing room as "Room CODE not
+            # found", with a 400, 404 or 500 depending on the route.
+            missing = re.match(r'^Room (\S+) not found$', str(detail).strip())
+            if missing:
+                raise NoRoom(missing.group(1))
             if e.code == 401:
                 raise CLIError("Authentication failed: no API key sent. Set one with: config set api_key YOUR_KEY (or FATES_EDGE_API_KEY).")
             if e.code == 403:
@@ -700,7 +714,11 @@ class CLI:
         handler = getattr(self, f'cmd_{args.command}', None)
         if not handler:
             raise CLIError(f"Unknown command: {args.command} (try: help)")
-        return handler(args)
+        try:
+            return handler(args)
+        except NoRoom as e:
+            print_info(str(e))
+            return True
 
     def interactive(self):
         """Interactive shell. A failed command prints its error and the
@@ -1050,7 +1068,7 @@ class CLI:
         elif args.action == 'info':
             room = self.client.get_room_info(args.code)
             if not room:
-                raise CLIError(f"Room {args.code.upper()} is not open (no one is connected to it)")
+                raise NoRoom(args.code)
             print_header(f"Room {room.get('code')}")
             adventure = room.get('adventure')
             print(f"  GM: {room.get('gm') or '—'}   Clients: {room.get('clients', 0)} ({room.get('bots', 0)} bots)   Password: {'yes' if room.get('hasPassword') else 'no'}")
@@ -1224,15 +1242,19 @@ class CLI:
             while True:
                 lines = [f"Fate's Edge — {self.client.server_url} — {datetime.now().strftime('%H:%M:%S')} (Ctrl+C to stop)", ""]
                 if args.code:
-                    room = self.client.get_room_info(args.code)
-                    if not room:
-                        lines.append(f"Room {args.code.upper()} is not open.")
-                    else:
+                    # Keep watching while the room is closed: it opens again
+                    # the moment someone reconnects.
+                    try:
+                        room = self.client.get_room_info(args.code)
+                        if not room:
+                            raise NoRoom(args.code)
                         lines.append(f"Room {room.get('code')} — GM {room.get('gm') or '—'} — {room.get('clients', 0)} connected — last activity {format_ago(room.get('lastActivity'))}")
                         lines += capture(print_clients, self.client.get_clients(args.code))
                         if room.get('adventure'):
                             lines.append("")
                             lines += capture(print_adventure, self.client.get_adventure(args.code), False)
+                    except NoRoom as e:
+                        lines.append(str(e))
                 else:
                     rooms = self.client.list_rooms()
                     lines.append(f"{len(rooms)} rooms, {sum(r.get('clients', 0) for r in rooms)} clients")
