@@ -30,6 +30,31 @@ const RESET = '\x1b[0m';
 
 let roomLabeler = null;
 
+// Recent entries for the web console (GET /api/admin/log). Shared by
+// every logger instance in the process; details are stored as display
+// strings so nothing live (sockets, errors with stacks) is retained.
+const RING_SIZE = Math.max(50, parseInt(process.env.LOG_RING_SIZE || '500', 10) || 500);
+const ring = [];
+let seq = 0;
+
+function remember(level, message, fields) {
+    const entry = { id: ++seq, time: Date.now(), level: level.toLowerCase(), msg: message };
+    if (fields) {
+        entry.fields = {};
+        for (const [key, value] of Object.entries(fields)) {
+            if (value !== undefined) entry.fields[key] = formatValue(value, 'INFO');
+        }
+    }
+    ring.push(entry);
+    if (ring.length > RING_SIZE) ring.shift();
+}
+
+/** Entries after `sinceId` (all retained entries when 0), oldest first. */
+function recentLogs(sinceId = 0, limit = 200) {
+    const after = ring.filter(e => e.id > sinceId);
+    return after.slice(-limit);
+}
+
 /** Register a function mapping a room id to its human-readable code. */
 function setRoomLabeler(fn) {
     roomLabeler = typeof fn === 'function' ? fn : null;
@@ -74,6 +99,7 @@ function createLogger(levelName = 'INFO') {
         if (levelNum < currentLevel) return;
         const fields = normalize(data);
         const now = new Date();
+        remember(level, message, fields);
 
         if (json) {
             const entry = { time: now.toISOString(), level: level.toLowerCase(), msg: message };
@@ -105,4 +131,4 @@ function createLogger(levelName = 'INFO') {
     };
 }
 
-module.exports = { createLogger, setRoomLabeler };
+module.exports = { createLogger, setRoomLabeler, recentLogs };

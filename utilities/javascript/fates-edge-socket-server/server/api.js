@@ -180,6 +180,12 @@ function createApiRouter(appConfig) {
         res.json(result);
     });
 
+    // ─── Recent server log (web console) ─────────────────────────────
+    router.get('/api/admin/log', authenticate, (req, res) => {
+        const since = Math.max(0, parseInt(req.query.since, 10) || 0);
+        res.json({ entries: require('./logger.js').recentLogs(since) });
+    });
+
     // ─── Room list ──────────────────────────────────────────────────
     router.get('/api/rooms', authenticate, (req, res) => {
         // This used to reference an undefined `roomStats` and answer every

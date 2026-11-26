@@ -32,6 +32,8 @@ Failed assistant suggestions appear as failures in the updated VTT. Check the ta
 
 The server logs one line per event (`16:56:33.248 INFO  🔌 Client joined  room=ABCD name=Wren role=player via=ws`), coloured in a terminal and ISO-timestamped elsewhere; `LOG_FORMAT=json` prints JSON lines for log collectors. The startup banner lists what is configured (admin key, storage, CORS, TURN, scaling) and warns about anything that needs attention before going public.
 
+**Web console** at `http://<server>/console`: open rooms, each room's people (with role changes and kick), adventure (with Next scene), characters and timers, and the live server log with level and text filters. The page carries no data itself: it asks for the admin `API_KEY` (kept in that browser tab only) and uses the same authenticated API as the CLI, refreshing every few seconds. A room that closes is reported as "No room CODE is open right now", not as an error. It is served with a strict Content-Security-Policy and cannot be framed. On a managed node it says to use the manager's console.
+
 `fates-edge-cli` (run with no arguments for an interactive shell with history and Tab completion):
 
 ```

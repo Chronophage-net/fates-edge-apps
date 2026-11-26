@@ -63,6 +63,10 @@ app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Web console (static page; its data comes from the authenticated API).
+// Mounted before the manager gate so a managed node can say so itself.
+app.get('/console', require('./console.js').consoleRoute(version));
+
 // Mount API routes (health, rooms, deck, modules, characters, campaigns)
 if (config.manager) {
     app.use(config.manager.httpGate);
@@ -76,6 +80,7 @@ app.get('/', (req, res) => {
         name: "Fate's Edge WebSocket Server",
         version,
         status: "running",
+        console: '/console',
         rooms: room.rooms.size,
         timestamp: Date.now()
     });
@@ -200,6 +205,7 @@ function startServer(port, retriesLeft) {
         console.log('='.repeat(70));
         console.log(`🚀 Server running on ${config.host}:${port}`);
         console.log(`📊 Health: http://localhost:${port}${config.healthEndpoint}`);
+        console.log(`🖥️  Console: http://localhost:${port}/console`);
         console.log(`📚 API Docs: http://localhost:${port}/api/data/docs`);
         console.log(`🔌 WebSocket (plain): ws://localhost:${port}?room=ROOM_CODE`);
         console.log(`   (also supports /campaign/ROOM_CODE path)`);
