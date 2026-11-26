@@ -270,7 +270,7 @@ export async function installPack(file) {
                             
                             // If it's a route module, register it
                             if (mod.route && mod.type !== 'data') {
-                                registerRoute(mod.route, () => import(/* webpackIgnore: true */ blobUrl));
+                                registerRoute(mod.route, () => import(/* @vite-ignore */ /* webpackIgnore: true */ blobUrl));
                                 console.log(`📦 Registered route: ${mod.route}`);
                             }
                             

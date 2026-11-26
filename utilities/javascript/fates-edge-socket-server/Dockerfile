@@ -48,12 +48,12 @@ RUN mkdir -p /app/logs /app/modules /data
 # Health Check (FIX: use /healthz)
 # ---------------------------------------------------------------
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:${PORT:-3000}/healthz', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
+    CMD node -e "require('http').get('http://localhost:${PORT:-10000}/healthz', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
 
 # ---------------------------------------------------------------
 # Expose Ports
 # ---------------------------------------------------------------
-EXPOSE 3000
+EXPOSE 10000
 
 # ---------------------------------------------------------------
 # Volumes
@@ -63,13 +63,13 @@ VOLUME ["/app/data", "/app/logs", "/app/modules"]
 # ---------------------------------------------------------------
 # Environment Variables
 # ---------------------------------------------------------------
-ENV PORT=3000
+ENV PORT=10000
 ENV AUTO_CREATE_ROOMS=false
 ENV ENABLE_RATE_LIMITING=true
 ENV ENABLE_CACHING=false
 ENV ENABLE_SESSIONS=true
 ENV NODE_ENV=production
-ENV FATES_EDGE_SERVER_URL=http://localhost:3000
+ENV FATES_EDGE_SERVER_URL=http://localhost:10000
 
 # ---------------------------------------------------------------
 # Entry Point & Command

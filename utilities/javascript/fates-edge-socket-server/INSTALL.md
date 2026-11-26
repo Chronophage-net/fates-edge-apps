@@ -106,7 +106,7 @@ For admins who'd rather not install Docker at all.
 **3. Install dependencies and configure:**
 ```bash
 npm install
-cp env-example.md .env
+cp .env.example .env
 ```
 Edit `.env` the same way as the Docker path above — set a real `API_KEY`
 at minimum.
@@ -142,7 +142,7 @@ fates-edge-server` to restart it, `pm2 stop fates-edge-server` to stop it.
 ## Configuration Reference
 
 Your server config file (`.env`) is a list of `KEY=value` lines. The full
-list lives in `env-example.md`; here's the short version of what actually
+list lives in `.env.example`; here's the short version of what actually
 matters day-to-day:
 
 | Setting | Default | What it means |

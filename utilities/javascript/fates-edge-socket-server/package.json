@@ -29,7 +29,7 @@
     "pg": "^8.13.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.12.0"
   },
   "license": "MIT",
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",

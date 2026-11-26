@@ -21,7 +21,7 @@ the web client or one of the VTT integrations (Foundry, Roll20, Discord,
 Avrae). A few things worth knowing:
 
 - API keys and credentials belong in local `.env` files only — every
-  `.env.example`/`env-example.md` in this repo is a template, never commit
+  `.env.example` in this repo is a template, never commit
   a real one. `.gitignore` covers `*.env` everywhere in the monorepo.
 - The socket server's auth rate limiting currently only covers
   `/api/auth/login` and `/api/auth/register` — see the socket server's own

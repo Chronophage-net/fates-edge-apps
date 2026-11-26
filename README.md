@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE.code)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/SRD-CC_BY--NC--SA_4.0-lightgray.svg)](LICENSE.srd)
 [![License: All Rights Reserved](https://img.shields.io/badge/Content-All_Rights_Reserved-red.svg)](LICENSE.proprietary)
-[![Node.js](https://img.shields.io/badge/Node.js-24.x-green.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-22.12%2B-green.svg)](https://nodejs.org/)
 [![Foundry VTT](https://img.shields.io/badge/Foundry-VTT-orange)](https://foundryvtt.com/)
 [![Discord](https://img.shields.io/badge/Discord-Bot-5865F2)](https://discord.com/)
 
@@ -82,30 +82,58 @@ Add `-- --voice` or `-- --voice-rvc` to hear the GM speak in a cloned voice via 
 
 To recapture the guided-tour video after changing the interface, leave the demo running and use `npm run demo:record` in another terminal. It drives the live client with local Chrome or Chromium and assembles the new MP4 with ffmpeg; set `DEMO_URL` if the client is not on port 8080.
 
-### Run it for real
+### Run it on your computer
 
-**Prerequisites:** Node.js 24.x+, npm, a modern browser.
+**Prerequisites:** Node.js 22.12 or newer (the current LTS is fine) and a modern browser.
+For the AI GM, also clone its repository next to this one:
+`git clone https://github.com/Chronophage-net/fates-edge-ai-gm-bot ../fates-edge-ai-gm-bot`.
 
-**Web client** (runs entirely in the browser — all data lives in `localStorage` until you connect it to a server):
+```bash
+npm run setup     # install everything and write working settings (once)
+npm start         # run the server, the web client and the AI GM; Ctrl+C stops them
+npm run doctor    # if something is off: checks the setup and says how to fix it
+```
+
+`npm start` prints where everything is:
+
+| | |
+|---|---|
+| Play | http://localhost:5173 |
+| Server console | http://localhost:10000/console (key: `API_KEY` in the server's `.env`) |
+| AI GM status | http://localhost:4141 |
+
+`setup` generates the server's admin key and sign-in secret, and gives the AI GM the same
+key so it can join. It never overwrites a setting you chose, so it is safe to run again,
+for example after pulling new code. The AI GM uses a local
+[Ollama](https://ollama.com) model by default (`ollama pull gemma3:12b`); for a hosted model
+run `npm run setup -- --provider=openai` (or `deepseek`) and add the key it asks for.
+`npm start -- --no-bot` runs without the AI GM.
+
+<details><summary>Running the pieces by hand</summary>
+
+**Web client** (runs entirely in the browser; data lives in `localStorage` until you connect to a server):
 
 ```bash
 cd utilities/javascript/fates-edge-web-client
-npm install
-npm run dev      # local dev server via Vite
+npm ci
+npm run dev      # http://localhost:5173
 # or
 ./build.sh       # produces dist/ for static hosting
 ```
 
-**Real-time / campaign server** (needed for shared play — chat, sync, the Adventure Engine, GM election):
+**Socket server** (needed for shared play: chat, sync, the Adventure Engine, GM election):
 
 ```bash
 cd utilities/javascript/fates-edge-socket-server
-npm install
-cp env-example.md .env   # edit with your settings
-node server-start.js     # listens on :3000 by default (:10000 via Docker — see its own README)
+npm ci
+cp .env.example .env     # set API_KEY and AUTH_JWT_SECRET
+node server-start.js     # listens on :10000
 ```
 
-See [the socket server's own README](utilities/javascript/fates-edge-socket-server/README.md) for what it does and its full setup guide.
+See [the socket server's README](utilities/javascript/fates-edge-socket-server/README.md) for
+every setting, and the AI GM repository's README for its own options.
+
+</details>
 
 ### Docker on a home server or NAS
 

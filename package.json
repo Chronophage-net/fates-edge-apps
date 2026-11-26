@@ -8,6 +8,9 @@
     "lint": "eslint . --ext .js",
     "lint:ci": "eslint . --ext .js",
     "build": "echo 'Build complete'",
+    "setup": "node tools/setup.mjs",
+    "start": "node tools/start.mjs",
+    "doctor": "node tools/doctor.mjs",
     "ci": "npm run lint:ci && npm run test:ci",
     "version:bump": "node tools/bump-version.mjs",
     "demo": "bash tools/demo.sh",
@@ -23,6 +26,6 @@
     "node": ">=22.12.0"
   },
   "license": "MIT",
-  "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
+  "_license": "Fate's Edge Copyright \u2013 \u00a9 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved.",
   "author": "Nicholas A. Gasper"
 }

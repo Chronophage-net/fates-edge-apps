@@ -67,7 +67,7 @@ The server listens on port **10000** by default (`PORT` in `.env`).
 ```bash
 cd utilities/javascript/fates-edge-socket-server
 npm install
-cp env-example.md .env   # copy and edit with your settings
+cp .env.example .env   # set API_KEY and AUTH_JWT_SECRET (or run `npm run setup` at the repo root)
 node server-start.js
 ```
 
@@ -91,7 +91,7 @@ cp .env.example .env   # fill in API_KEY, and TURN_SECRET/TURN_URLS if you want 
 docker compose up -d
 ```
 
-Starts the server (with campaign persistence already configured) plus a [coturn](https://github.com/coturn/coturn) TURN relay for the web client's voice chat. Voice chat works without any TURN configuration too — it just falls back to STUN-only, which can't traverse symmetric NAT/restrictive firewalls. See `env-example.md`, [`INSTALL.md`](INSTALL.md#voice-chat-optional), and the comments in `docker-compose.yml` for the full TURN setup, including optional TLS.
+Starts the server (with campaign persistence already configured) plus a [coturn](https://github.com/coturn/coturn) TURN relay for the web client's voice chat. Voice chat works without any TURN configuration too — it just falls back to STUN-only, which can't traverse symmetric NAT/restrictive firewalls. See `.env.example`, [`INSTALL.md`](INSTALL.md#voice-chat-optional), and the comments in `docker-compose.yml` for the full TURN setup, including optional TLS.
 
 ---
 
@@ -112,7 +112,7 @@ For live, always-connected play — chat, dice, GM election, and deck draws shar
 ```
 fates-edge-socket-server/
 ├── .dockerignore
-├── .env / env-example.md / .env.example
+├── .env / .env.example        # .env.example lists every setting
 ├── build.sh
 ├── campaigns.db                # SQLite database: campaigns, rooms, accounts, characters (default DATABASE_TYPE)
 ├── coturn/                     # optional TLS cert/key + README for the `turn` docker-compose profile
@@ -196,7 +196,7 @@ Real-time events (chat, dice, GM election, deck draws, scene/timer sync, voice s
 
 ## Configuration
 
-Configuration precedence is environment variables, then `server/config.json`, then defaults. `CONFIG_FILE` selects another JSON file. Invalid values stop startup with a configuration error. See `env-example.md` for environment settings and `.env.example` for the Docker Compose subset.
+Configuration precedence is environment variables, then `server/config.json`, then defaults. `CONFIG_FILE` selects another JSON file. Invalid values stop startup with a configuration error. See `.env.example` for every environment setting; Docker Compose reads the same file.
 
 | Env var | Default | Description |
 |---|---|---|

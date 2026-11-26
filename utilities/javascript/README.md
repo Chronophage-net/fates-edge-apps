@@ -44,7 +44,7 @@ Needed for real-time sync, the Adventure Engine, or account authentication:
 ```bash
 cd fates-edge-socket-server
 npm install
-cp env-example.md .env   # edit with your settings
+cp .env.example .env   # set API_KEY and AUTH_JWT_SECRET (or run `npm run setup` at the repo root)
 node server-start.js
 ```
 
@@ -137,7 +137,7 @@ utilities/javascript/
 | `LOG_LEVEL` | `INFO` | Logging level |
 | `ADVENTURES_DIR` | `./data/adventures` | Adventure module directory |
 
-See [`fates-edge-socket-server/env-example.md`](fates-edge-socket-server/env-example.md) for the full list.
+See [`fates-edge-socket-server/.env.example`](fates-edge-socket-server/.env.example) for the full list.
 
 ---
 

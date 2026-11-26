@@ -64,7 +64,16 @@ saved addresses in Settings; rebuilding does not overwrite browser storage.
 
 ## Local solo use or development (without Docker)
 
-Install Node.js 24 and npm. From the repository root:
+Install Node.js 22.12 or newer and npm. To run the client together with the
+game server (and the AI GM, if it is cloned next to this repository), use the
+toolkit commands from the repository root:
+
+```sh
+npm run setup    # once
+npm start        # Ctrl+C stops everything
+```
+
+To run only the web client:
 
 ```sh
 cd utilities/javascript/fates-edge-web-client
@@ -76,8 +85,8 @@ Open the address Vite prints. Keep that terminal running. In Settings, disable
 WebSocket connectivity if you want to work completely offline.
 
 For static hosting, run `npm run build` and serve the resulting `dist/` folder.
-Use `PORT=8080 npm run serve` on Linux/macOS to serve it on port 8080.
-The serve script's default port is 10000, which would conflict with the game server.
+`npm run serve` serves it on port 8080 (set `PORT` to change it; 10000 is the
+game server's port).
 For long-running home hosting, use Docker instead of leaving a development server open.
 
 ## Locking and access
