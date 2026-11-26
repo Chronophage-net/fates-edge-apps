@@ -103,6 +103,7 @@ import { escHtml, generateId, safeParseInt, maxBoonsForXp } from '@core/utils.js
 import { showToast } from '@components/Toast.js';
 import { performRoll } from '@core/dice.js';
 import { spellDV } from '../spell-dv.js';
+import { getTag, tagColor, canonicalTag as rulesTag } from '../tags.js';
 import { getState } from '@core/state.js';
 import patronsModule from '@features/patrons/index.js';
 import { sendEvent, sendRoll, isConnectedToServer } from '@core/websocket.js';
@@ -111,79 +112,11 @@ import { sendEvent, sendRoll, isConnectedToServer } from '@core/websocket.js';
 // CONSTANTS
 // ============================================================
 
-// ─── Tag Colors (from the TAGS system) ────────────────────────
+// Tag colours and descriptions come from the rules vocabulary in ../tags.js.
 
-const TAG_COLORS = {
-    // Elemental
-    'Burning': '#e67e22', 'Freezing': '#3498db', 'Storm': '#f1c40f',
-    'Stone': '#7f8c8d', 'Wave': '#2980b9', 'Wind': '#ecf0f1',
-    // Force
-    'Force': '#e74c3c', 'Area': '#9b59b6', 'Strike': '#c0392b',
-    'Wall': '#2c3e50', 'Bind': '#e67e22', 'Dispel': '#8e44ad',
-    // Mind/Illusion
-    'Veil': '#1abc9c', 'Scry': '#2ecc71', 'Memory': '#f39c12',
-    'Command': '#d35400', 'Fear': '#c0392b',
-    // Life/Body
-    'HEAL': '#27ae60', 'Purify': '#2ecc71', 'Strengthen': '#f1c40f',
-    'Waken': '#e67e22', 'Beast': '#d35400',
-    // Space/Motion
-    'Leap': '#8e44ad', 'Fold': '#8e44ad', 'Gate': '#c0392b', 'Gravity': '#2c3e50',
-    // Creation
-    'Create': '#f39c12', 'Summon': '#9b59b6', 'Transmute': '#e74c3c', 'Animate': '#e67e22',
-    // Utility
-    'Sense': '#3498db', 'Reveal': '#1abc9c', 'Light': '#f1c40f',
-    'Shadow': '#2c3e50', 'Silence': '#7f8f8d', 'Protect': '#27ae60',
-    // Reaction
-    'Counter': '#c0392b', 'Reflect': '#8e44ad', 'Store': '#d35400',
-    // Affliction
-    'Curse': '#c0392b', 'Bless': '#27ae60'
-};
 
 // ─── Tag Definitions ───────────────────────────────────────────
 
-const TAG_DEFINITIONS = {
-    'Burning': 'Ignite, heat, combustion, smoke',
-    'Freezing': 'Ice, slowing, brittle shatter, cold',
-    'Storm': 'Lightning, shock, arc, thunder',
-    'Stone': 'Walls, spikes, tremors, armor',
-    'Wave': 'Crushing water, currents, pressure',
-    'Wind': 'Levitation, gusts, deflection, push/pull',
-    'Force': 'Kinetic power, shields, blasts, telekinesis',
-    'Area': 'Cone, circle, corridor, zone effect',
-    'Strike': 'Single target precision',
-    'Wall': 'Barrier or blockade',
-    'Bind': 'Restrain, hold, suspend, entangle',
-    'Dispel': 'Suppress magic, unravel ongoing effects',
-    'Veil': 'Conceal, blur, illusion, silence',
-    'Scry': 'Reveal hidden, see distance, read traces',
-    'Memory': 'Erase, alter, restore memories',
-    'Command': 'Compel a short action (one word)',
-    'Fear': 'Panic, flee, break morale',
-    'HEAL': 'Close wounds, restore flesh, reduce Harm 1',
-    'Purify': 'Remove poison, corruption, disease',
-    'Strengthen': 'Enhance body, armor, senses (temporary)',
-    'Waken': 'Counter sleep, paralysis, stun',
-    'Beast': 'Speak with or influence animals',
-    'Leap': 'Jump far, blink across short space (Near)',
-    'Fold': 'Short-range teleport, vanish-reappear (Far)',
-    'Gate': 'Long distance passage, open/close path',
-    'Gravity': 'Crush, lift, suspend, walk on walls/ceiling',
-    'Create': 'Manifest mundane matter briefly (1 scene)',
-    'Summon': 'Call a being or construct',
-    'Transmute': 'Turn one thing into another (temporary)',
-    'Animate': 'Make objects act with intent (1 scene)',
-    'Sense': 'Detect presence of a named tag/element',
-    'Reveal': 'Unveil hidden, glamoured, or invisible things',
-    'Light': 'Create illumination (glow, torch-bright)',
-    'Shadow': 'Deepen darkness, hide edges, obscure',
-    'Silence': 'Suppress sound in zone or on target',
-    'Protect': 'Reduce/deflect next harm (Armor 1)',
-    'Counter': 'Interrupt a casting/ritual in its window',
-    'Reflect': 'Turn next targeted effect back on its source',
-    'Store': 'Bank 1-2 successes in a vessel (once)',
-    'Curse': 'Attach hostile tag/timer to target',
-    'Bless': 'Grant favourable tag (luck, favor, ward-key)'
-};
 
 // ─── Spell Templates ───────────────────────────────────────────
 
@@ -191,116 +124,104 @@ const SPELL_TEMPLATES = [
     {
         name: '🔥 Ember Flick',
         tags: ['Burning', 'Strike'],
-        dv: 2,
         description: 'A small bolt of flame strikes a single target. Deal 1 Fatigue or ignite a small object.',
         category: 'Offensive'
     },
     {
         name: '❄️ Frost Grasp',
         tags: ['Freezing', 'Bind'],
-        dv: 2,
         description: 'Ice encases a target\'s limbs. They suffer -1 die to physical actions until they break free (Body DV 3).',
         category: 'Control'
     },
     {
         name: '🌿 Healing Touch',
         tags: ['HEAL', 'Strengthen'],
-        dv: 2,
         description: 'Close wounds and restore vitality. Target clears 1 Fatigue and gains +1 die on their next physical action.',
         category: 'Support'
     },
     {
         name: '🌀 Telekinetic Push',
         tags: ['Force', 'Strike'],
-        dv: 2,
         description: 'A blast of invisible force knocks a target back one range band. If they hit an obstacle, they suffer Harm 1.',
         category: 'Offensive'
     },
     {
         name: '🌙 Shadow Veil',
-        tags: ['Veil', 'Shadow', 'Silence'],
-        dv: 3,
+        tags: ['DEATH', 'VEIL'],
         description: 'Conceal yourself and nearby allies in moving shadow. Gain +2 dice to Stealth for one scene.',
         category: 'Utility'
     },
     {
         name: '⚡ Storm Bolt',
         tags: ['Storm', 'Strike', 'Area'],
-        dv: 3,
         description: 'A crackling bolt of lightning arcs through a zone. All targets in the zone must test Body+Athletics (DV 4) or suffer Harm 1.',
         category: 'Offensive'
     },
     {
         name: '🛡️ Aegis',
-        tags: ['Protect', 'Strengthen'],
-        dv: 2,
+        tags: ['DEFEND', 'STRENGTHEN'],
         description: 'A shimmering barrier of force protects you. Gain Armor 1 against the next attack this scene.',
         category: 'Defensive'
     },
     {
         name: '🔮 Scrying Eye',
-        tags: ['Scry', 'Sense', 'Reveal'],
-        dv: 3,
+        tags: ['SCRY', 'REVEAL'],
         description: 'Glimpse a distant place or hidden truth. Ask the GM one yes/no question about a location or object you can describe.',
         category: 'Utility'
     },
     {
         name: '💀 Leashed Curse',
         tags: ['Curse', 'Bind', 'Fear'],
-        dv: 3,
         description: 'A curse that tightens as the target struggles. They suffer -1 die to all actions until they succeed on a Spirit + Endurance test (DV 4).',
         category: 'Control'
     },
     {
         name: '✨ Momentary Forge',
         tags: ['Create', 'Transmute', 'Animate'],
-        dv: 3,
         description: 'Shape raw matter into a temporary tool or weapon. Lasts one scene, then crumbles to dust.',
         category: 'Utility'
     },
     {
         name: '🌊 Tidal Wave',
         tags: ['Wave', 'Area', 'Force'],
-        dv: 3,
         description: 'A surge of water crashes through a zone. All targets must test Body+Athletics (DV 3) or be knocked prone and suffer Harm 1.',
         category: 'Offensive'
     },
     {
         name: '💨 Wind Step',
         tags: ['Wind', 'Leap'],
-        dv: 2,
         description: 'A gust of wind carries you. Move to any unoccupied space within Near range without provoking opportunity attacks.',
         category: 'Movement'
     },
     {
         name: '🔮 Counterspell',
         tags: ['Counter', 'Dispel'],
-        dv: 3,
         description: 'Interrupt a spell being cast within Near range. The caster must test Spirit + Endurance (DV 4) or their spell fails.',
         category: 'Defensive'
     },
     {
         name: '🌿 Verdant Grasp',
         tags: ['Stone', 'Bind', 'Area'],
-        dv: 3,
         description: 'Roots erupt from the ground in a zone. All targets must test Body+Athletics (DV 3) or become Entangled (-1 die to movement).',
         category: 'Control'
     },
     {
         name: '🔥 Dragon\'s Breath',
         tags: ['Burning', 'Area', 'Force'],
-        dv: 4,
         description: 'A cone of flame erupts from your mouth. All targets in Close range must test Body+Athletics (DV 4) or suffer Harm 2 (Burn).',
         category: 'Offensive'
     },
     {
         name: '🧠 Mind Probe',
         tags: ['Scry', 'Memory', 'Command'],
-        dv: 4,
         description: 'Delve into a target\'s mind. Learn one surface thought or memory. The target may resist with Spirit + Endurance (DV 4).',
         category: 'Utility'
     }
 ];
+
+// SRD: DV = 1 + the sum of tag costs (dangerous tags cost 2). The templates
+// used to hard-code DV = number of tags, one too easy every time.
+SPELL_TEMPLATES.forEach(t => { t.dv = spellDV(t.tags); });
 
 // ─── Categories ────────────────────────────────────────────────
 
@@ -347,16 +268,15 @@ function formatText(text) {
 }
 
 function getTagColor(tag) {
-    return TAG_COLORS[canonicalTag(tag)] || 'var(--text3)';
+    return tagColor(tag);
 }
 
 function getTagDefinition(tag) {
-    return TAG_DEFINITIONS[canonicalTag(tag)] || 'Unknown tag';
+    return getTag(tag)?.description || 'Unknown tag';
 }
 
 function canonicalTag(tag) {
-    const value = String(tag || '').toUpperCase();
-    return Object.keys(TAG_DEFINITIONS).find(key => key.toUpperCase() === value) || tag;
+    return rulesTag(tag);
 }
 
 function getCategoryIcon(category) {
@@ -1174,8 +1094,8 @@ window.spellbookFromTags = async function() {
     if (!tagsInput) return;
     const tags = tagsInput.trim().split(/\s+/).map(t => t.toUpperCase());
 
-    const validTags = tags.filter(t => TAG_COLORS[canonicalTag(t)]);
-    const invalidTags = tags.filter(t => !TAG_COLORS[canonicalTag(t)]);
+    const validTags = tags.filter(t => getTag(t)).map(canonicalTag);
+    const invalidTags = tags.filter(t => !getTag(t));
     if (invalidTags.length > 0) {
         showToast(i18nText("feature.spellcraft.components.spellbook.unknownTagsValueTheyWillBeIncluded", { value0: invalidTags.join(', ') }, "Unknown tags: {{value0}}. They will be included but have no color."), 'warning');
     }

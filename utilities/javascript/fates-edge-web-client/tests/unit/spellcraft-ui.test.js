@@ -1,6 +1,7 @@
 import { describe, it, assert, assertEqual } from '../runner.js';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import { canonicalTag, getTag } from '../../js/features/spellcraft/tags.js';
 
 const source = readFileSync(new URL('../../js/features/spellcraft/index.js', import.meta.url), 'utf8');
 const helperSource = source.slice(source.indexOf('function hasHedgeAccess('), source.indexOf('export async function renderActiveTabContent(')).replace('export function', 'function');
@@ -8,12 +9,14 @@ const available = vm.runInNewContext(`${helperSource}; getAvailableTabs;`);
 
 describe('Spellcraft calculator tags', () => {
     it('recognizes calculator tags in the spellbook regardless of case', () => {
+        // Both screens resolve tags through the shared rules vocabulary (../tags.js).
         const book = readFileSync(new URL('../../js/features/spellcraft/components/spellbook.js', import.meta.url), 'utf8');
-        const canonical = book.slice(book.indexOf('function canonicalTag('), book.indexOf('\nfunction getCategoryIcon('));
-        const normalize = vm.runInNewContext(`${canonical}; canonicalTag;`, {TAG_DEFINITIONS:{Burning:'heat',Strike:'precision'}});
-        assertEqual(normalize('BURNING'), 'Burning');
-        assertEqual(normalize('strike'), 'Strike');
-        assertEqual(normalize('Custom'), 'Custom');
+        assert(book.includes("from '../tags.js'"), 'spellbook must use the shared tag vocabulary');
+        assertEqual(canonicalTag('burning'), 'BURNING');
+        assertEqual(canonicalTag('Strike'), 'STRIKE');
+        assertEqual(canonicalTag('[fold]'), 'FOLD');
+        assertEqual(canonicalTag('Custom'), 'CUSTOM');
+        assertEqual(getTag('Custom'), null);
     });
     it('saves a captured tag list with its calculated difficulty', () => {
         const calculator = readFileSync(new URL('../../js/features/spellcraft/components/calculator.js', import.meta.url), 'utf8');
@@ -31,13 +34,15 @@ describe('Spellcraft calculator tags', () => {
     });
     it('resolves every quick-template tag using the same uppercase keys as typed input', () => {
         const calculator = readFileSync(new URL('../../js/features/spellcraft/components/calculator.js', import.meta.url), 'utf8');
-        const definitions = calculator.slice(calculator.indexOf('function buildTagDefinitions()'), calculator.indexOf('const CATEGORY_COLORS'));
-        const templates = calculator.slice(calculator.indexOf('const SPELL_TEMPLATES ='), calculator.indexOf('\n];', calculator.indexOf('const SPELL_TEMPLATES =')) + 3);
-        const {tags, presets} = vm.runInNewContext(`${definitions}\n${templates}\n({tags: buildTagDefinitions(), presets: SPELL_TEMPLATES});`);
+        const start = calculator.indexOf('const SPELL_TEMPLATES =');
+        const templates = calculator.slice(start, calculator.indexOf('\n];', start) + 3);
+        const presets = vm.runInNewContext(`${templates}\nSPELL_TEMPLATES;`);
+        assert(presets.length > 0, 'calculator has templates');
         for (const preset of presets) {
-            for (const tag of preset.tags) assert(tags.has(tag.toUpperCase()), `${preset.name}: ${tag}`);
+            for (const tag of preset.tags) assert(getTag(tag.toUpperCase()), `${preset.name}: ${tag}`);
         }
     });
+
 });
 
 describe('Spellcraft tool access', () => {

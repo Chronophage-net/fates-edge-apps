@@ -1,4 +1,4 @@
-import { TIERS } from './utils.js';
+import { TIERS } from './tiers.js';
 /**
  * Core Dice Engine - Fate's Edge Resolution System
  * 
